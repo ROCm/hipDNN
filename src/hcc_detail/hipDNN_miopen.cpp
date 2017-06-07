@@ -58,7 +58,7 @@ static std::map<miopenTensorDescriptor_t, size_t>  sDescToWorkspacePoolingSize; 
 static std::map<miopenTensorDescriptor_t, int8_t*>  sDescToWorkspaceLRN;  //device pointers
 static std::map<miopenTensorDescriptor_t, size_t>  sDescToWorkspaceLRNSize;  //host
 
-//================
+//=============================================================================
 
 
 
@@ -97,7 +97,7 @@ hipdnnStatus_t miopenTohipdnnStatus(miopenStatus_t  cStatus)
     return retVal;
 } 
 
-//-----------------------
+//=============================================================================
 
 hipdnnStatus_t hipTomiopenDataType(hipdnnDataType_t in, miopenDataType_t* out)
 {
@@ -137,7 +137,7 @@ hipdnnStatus_t miopenTohipDataType(miopenDataType_t in, hipdnnDataType_t* out)
     return HIPDNN_STATUS_SUCCESS;
 }
 
-//================================
+//=============================================================================
 
 hipdnnStatus_t miopenTohipOpTensorOp(miopenTensorOp_t in, hipdnnOpTensorOp_t* out)
 {
@@ -188,7 +188,7 @@ hipdnnStatus_t hipTomiopenOpTensorOp(hipdnnOpTensorOp_t in, miopenTensorOp_t* ou
 }
 
 
-//===============================
+//=============================================================================
 
 hipdnnConvolutionMode_t miopenTohipConvolutionMode( miopenConvolutionMode_t in )
 {
@@ -212,7 +212,7 @@ miopenConvolutionMode_t hipTomiopenConvolutionMode( hipdnnConvolutionMode_t in )
 
 
 
-//=============================
+//=============================================================================
 
 hipdnnStatus_t  hipTomiopenPoolingMode( hipdnnPoolingMode_t in, 
                                         miopenPoolingMode_t* out)
@@ -257,7 +257,7 @@ hipdnnStatus_t  miopenTohipPoolingMode( miopenPoolingMode_t in,
 } 
 
 
-//===================================
+//=============================================================================
 
 hipdnnStatus_t  hipTomiopenLRNMode( hipdnnLRNMode_t in, 
                                     miopenLRNMode_t* out)
@@ -291,7 +291,7 @@ hipdnnStatus_t  miopenTohipLRNMode( miopenLRNMode_t  in,
     return retVal;
 } 
 
-//======================================
+//=============================================================================
 
 
 miopenBatchNormMode_t hipTomiopenBatchNormMode( hipdnnBatchNormMode_t in)
@@ -304,7 +304,7 @@ miopenBatchNormMode_t hipTomiopenBatchNormMode( hipdnnBatchNormMode_t in)
     return miopenBNPerActivation;
 }
 
-//================================================
+//=============================================================================
 
 hipdnnStatus_t  hipTomiopenActivationMode(hipdnnActivationMode_t in, 
                                         miopenActivationMode_t* out)
@@ -350,7 +350,7 @@ hipdnnStatus_t  hipTomiopenActivationMode(hipdnnActivationMode_t in,
 }
 
 
-//==========================================================
+//=============================================================================
 
 hipdnnStatus_t  hipTomiopenConvolutionFwdAlgo(  hipdnnConvolutionFwdAlgo_t in, 
                                                 miopenConvFwdAlgorithm_t* out)
@@ -439,7 +439,7 @@ hipdnnConvolutionFwdAlgo_t  GetConvolutionFwdAlgo(int i)
     return retVal;
 }
 
-//===========================================================
+//=============================================================================
 
 hipdnnStatus_t  hipTomiopenConvolutionBwdFilterAlgo(    hipdnnConvolutionBwdFilterAlgo_t in, 
                                                         miopenConvBwdWeightsAlgorithm_t* out)
@@ -514,7 +514,7 @@ hipdnnConvolutionBwdFilterAlgo_t  GetConvolutionBwdFilterAlgo(int i)
 
 
 
-//============================================================
+//=============================================================================
 
 
 hipdnnStatus_t  hipTomiopenConvolutionBwdDataAlgo(  hipdnnConvolutionBwdDataAlgo_t in, 
@@ -589,7 +589,7 @@ hipdnnConvolutionBwdDataAlgo_t  GetConvolutionBwdDataAlgo(int i)
     return retVal;
 }
 
-//============================================================
+//=============================================================================
 
 hipdnnStatus_t  hipSoftmaxModeSupported( hipdnnSoftmaxMode_t in)
 {
@@ -670,7 +670,7 @@ hipdnnStatus_t  ConvolutionBwdFilterPreferenceSupported(    hipdnnConvolutionBwd
 
 
 
-//==============================================================
+//=============================================================================
 
 HIPDNN_EXPORT hipdnnStatus_t hipdnnCreate(hipdnnHandle_t *handle)
 {
@@ -705,7 +705,7 @@ hipdnnStatus_t hipdnnCreateTensorDescriptor(hipdnnTensorDescriptor_t *tensorDesc
     return miopenTohipdnnStatus(miopenCreateTensorDescriptor(tensorDesc));
 }
 
-//===============================
+//=============================================================================
 
 hipdnnStatus_t  hipdnnSetTensor4dDescriptor(    hipdnnTensorDescriptor_t tensorDesc,
                                                 hipdnnTensorFormat_t format, 
@@ -731,7 +731,7 @@ hipdnnStatus_t  hipdnnSetTensor4dDescriptor(    hipdnnTensorDescriptor_t tensorD
                     
 }   
             
-//==================
+//=============================================================================
 
 hipdnnStatus_t hipdnnGetTensor4dDescriptor( hipdnnTensorDescriptor_t tensorDesc,
                                             hipdnnDataType_t *dataType,
@@ -755,14 +755,14 @@ hipdnnStatus_t hipdnnGetTensor4dDescriptor( hipdnnTensorDescriptor_t tensorDesc,
     return miopenTohipDataType(midT, dataType);
 }
 
-//==================
+//=============================================================================
 
 hipdnnStatus_t hipdnnDestroyTensorDescriptor(hipdnnTensorDescriptor_t tensorDesc)
 {
     return miopenTohipdnnStatus(miopenDestroyTensorDescriptor(tensorDesc));
 }
 
-//============================================
+//=============================================================================
 
 //dstValue = alpha[0]*srcValue + beta[0]*priorDstValue
 
@@ -802,7 +802,7 @@ Currently-supported ops are listed by the miopenOpTensorDescriptor_t enum.
 
 }
 
-//============================================!
+//=============================================================================
 
 hipdnnStatus_t
 hipdnnOpTensor( hipdnnHandle_t handle,
@@ -821,7 +821,7 @@ hipdnnOpTensor( hipdnnHandle_t handle,
     return miopenTohipdnnStatus(miopenOpTensor( handle,opTensorDesc, alpha1, 
                                                 aDesc,A,alpha2,bDesc, B,beta, cDesc, C));
 }
-//======
+//=============================================================================
 
 hipdnnStatus_t hipdnnSetTensor( hipdnnHandle_t handle,
                                 const hipdnnTensorDescriptor_t yDesc, 
@@ -831,7 +831,7 @@ hipdnnStatus_t hipdnnSetTensor( hipdnnHandle_t handle,
     return miopenTohipdnnStatus(miopenSetTensor(handle,yDesc, y,valuePtr));
 }
 
-//==========
+//=============================================================================
 
 hipdnnStatus_t
 hipdnnScaleTensor(  hipdnnHandle_t handle,
@@ -842,7 +842,7 @@ hipdnnScaleTensor(  hipdnnHandle_t handle,
     return miopenTohipdnnStatus( miopenScaleTensor( handle,yDesc, y,alpha));
 }
 
-//=============================
+//=============================================================================
 
 hipdnnStatus_t
 hipdnnCreateFilterDescriptor(hipdnnFilterDescriptor_t *filterDesc)
@@ -851,14 +851,14 @@ hipdnnCreateFilterDescriptor(hipdnnFilterDescriptor_t *filterDesc)
     return hipdnnCreateTensorDescriptor(filterDesc);
 }
 
-//=====================================!
+//=============================================================================
 
 hipdnnStatus_t
 hipdnnCreateConvolutionDescriptor(hipdnnConvolutionDescriptor_t *convDesc)
 {
     return miopenTohipdnnStatus( miopenCreateConvolutionDescriptor(convDesc));
 }
-//============
+//=============================================================================
 
 hipdnnStatus_t
 hipdnnSetConvolution2dDescriptor(hipdnnConvolutionDescriptor_t convDesc,
@@ -878,7 +878,7 @@ hipdnnSetConvolution2dDescriptor(hipdnnConvolutionDescriptor_t convDesc,
 }
 
 
-//=============
+//=============================================================================
 
 hipdnnStatus_t
 hipdnnGetConvolution2dDescriptor(const hipdnnConvolutionDescriptor_t convDesc,
@@ -929,7 +929,7 @@ return  miopenTohipdnnStatus(
                             n, c, h, w));
 }
 
-//==============
+//==============================================================================
 
 hipdnnStatus_t
 hipdnnDestroyConvolutionDescriptor(hipdnnConvolutionDescriptor_t convDesc)
@@ -938,7 +938,7 @@ return  miopenTohipdnnStatus(
             miopenDestroyConvolutionDescriptor(convDesc));
 }
 
-//===============
+//===============================================================================
 
 
 hipdnnStatus_t
@@ -1103,7 +1103,7 @@ hipdnnGetConvolutionForwardWorkspaceSize(   hipdnnHandle_t handle,
 }
 
 
-//============================
+//=============================================================================
 
 hipdnnStatus_t
 hipdnnConvolutionForward(   hipdnnHandle_t handle,
@@ -1143,7 +1143,8 @@ hipdnnConvolutionForward(   hipdnnHandle_t handle,
 
 }
 
-//==============
+//=============================================================================
+
 
 hipdnnStatus_t
 hipdnnConvolutionBackwardBias(  hipdnnHandle_t handle,
@@ -1262,7 +1263,7 @@ hipdnnGetConvolutionBackwardFilterWorkspaceSize(    hipdnnHandle_t handle,
 
 }
 
-//==================
+//=============================================================================
 
 hipdnnStatus_t
 hipdnnConvolutionBackwardFilter(    hipdnnHandle_t handle,
@@ -1302,7 +1303,8 @@ hipdnnConvolutionBackwardFilter(    hipdnnHandle_t handle,
                                                     workSpaceSizeInBytes));
 }
 
-//==============
+//=============================================================================
+
 
 hipdnnStatus_t
 hipdnnGetConvolutionBackwardDataWorkspaceSize(  hipdnnHandle_t handle,
@@ -1324,7 +1326,7 @@ hipdnnGetConvolutionBackwardDataWorkspaceSize(  hipdnnHandle_t handle,
                                                         sizeInBytes));
 }
 
-//=========================================
+//=============================================================================
 
 hipdnnStatus_t
 hipdnnFindConvolutionBackwardDataAlgorithm( hipdnnHandle_t handle,
@@ -1397,7 +1399,7 @@ hipdnnFindConvolutionBackwardDataAlgorithmEx(hipdnnHandle_t handle,
                 ));
 }
 
-//============================================!
+//=============================================================================
 
 
 hipdnnStatus_t
@@ -1437,7 +1439,7 @@ hipdnnConvolutionBackwardData(  hipdnnHandle_t handle,
                                                     workSpaceSizeInBytes));
 }
 
-//============
+//=============================================================================
 
 hipdnnStatus_t
 hipdnnSoftmaxForward(hipdnnHandle_t handle,
@@ -1470,7 +1472,7 @@ hipdnnSoftmaxForward(hipdnnHandle_t handle,
                                         y));
 }
 
-//=====================
+//=============================================================================
 
 hipdnnStatus_t
 hipdnnSoftmaxBackward(  hipdnnHandle_t handle,
@@ -1506,7 +1508,8 @@ hipdnnSoftmaxBackward(  hipdnnHandle_t handle,
                                         dx));
 }
 
-//==============
+//=============================================================================
+
 
 hipdnnStatus_t
 hipdnnCreatePoolingDescriptor(hipdnnPoolingDescriptor_t *poolingDesc)
@@ -1514,7 +1517,7 @@ hipdnnCreatePoolingDescriptor(hipdnnPoolingDescriptor_t *poolingDesc)
     return  miopenTohipdnnStatus(
                 miopenCreatePoolingDescriptor(poolingDesc));
 }
-//====================
+//=============================================================================
 
 hipdnnStatus_t
 hipdnnSetPooling2dDescriptor(   hipdnnPoolingDescriptor_t poolingDesc,
@@ -1547,7 +1550,7 @@ hipdnnSetPooling2dDescriptor(   hipdnnPoolingDescriptor_t poolingDesc,
 }
 
 
-//=======================
+//=============================================================================
 
 hipdnnStatus_t
 hipdnnGetPooling2dDescriptor(   const hipdnnPoolingDescriptor_t poolingDesc,
@@ -1580,7 +1583,7 @@ hipdnnGetPooling2dDescriptor(   const hipdnnPoolingDescriptor_t poolingDesc,
 }
 
 
-//=============
+//=============================================================================
 
 hipdnnStatus_t
 hipdnnGetPooling2dForwardOutputDim( const hipdnnPoolingDescriptor_t poolingDesc,
@@ -1593,7 +1596,7 @@ hipdnnGetPooling2dForwardOutputDim( const hipdnnPoolingDescriptor_t poolingDesc,
                                                     n, c, h, w));
 }
 
-//=============
+//=============================================================================
 
 hipdnnStatus_t
 hipdnnDestroyPoolingDescriptor(hipdnnPoolingDescriptor_t poolingDesc)
@@ -1601,7 +1604,7 @@ hipdnnDestroyPoolingDescriptor(hipdnnPoolingDescriptor_t poolingDesc)
     return miopenTohipdnnStatus(miopenDestroyPoolingDescriptor(poolingDesc));
 }
 
-//============================
+//=============================================================================
 
 hipdnnStatus_t hipdnnPoolingForward(hipdnnHandle_t handle,
                                     const hipdnnPoolingDescriptor_t poolingDesc,
@@ -1721,14 +1724,14 @@ hipdnnPoolingBackward(  hipdnnHandle_t handle,
                                         devptr) ); //HGSOS  //NOTYET no worspace size!  const!!!????
 
 }
-//=======================
+//=============================================================================
 
 hipdnnStatus_t
 hipdnnCreateActivationDescriptor(hipdnnActivationDescriptor_t *activationDesc)
 {
     return miopenTohipdnnStatus(miopenCreateActivationDescriptor(activationDesc));
 }
-//=============================
+//=============================================================================
 
 hipdnnStatus_t
 hipdnnSetActivationDescriptor(  hipdnnActivationDescriptor_t activationDesc, 
@@ -1751,7 +1754,7 @@ double activPower)
 
 }
 
-//==========================
+//=============================================================================
 
 //HGSOS may need another function to accommodate the 3 parameters.
 
@@ -1786,7 +1789,7 @@ double *activPower)
     
 }
 
-//====================
+//=============================================================================
 
 hipdnnStatus_t
 hipdnnDestroyActivationDescriptor(hipdnnActivationDescriptor_t activationDesc)
@@ -1845,15 +1848,14 @@ hipdnnActivationBackward(   hipdnnHandle_t handle,
                                             dxDesc,
                                             dx));
 }
-//=====================
-
+//=============================================================================
 
 hipdnnStatus_t
 hipdnnCreateLRNDescriptor(hipdnnLRNDescriptor_t *normDesc)
 {
     return  miopenTohipdnnStatus(miopenCreateLRNDescriptor(normDesc));
 }
-//====================
+//=============================================================================
 
 hipdnnStatus_t
 hipdnnSetLRNDescriptor( hipdnnLRNDescriptor_t normDesc,
@@ -1905,7 +1907,7 @@ hipdnnGetLRNDescriptor( hipdnnLRNDescriptor_t normDesc,
     return miopenTohipLRNMode(mimode, mode);
 }
 
-//=====================
+//=============================================================================
 
 hipdnnStatus_t
 hipdnnDestroyLRNDescriptor(hipdnnLRNDescriptor_t normDesc)
@@ -1913,7 +1915,7 @@ hipdnnDestroyLRNDescriptor(hipdnnLRNDescriptor_t normDesc)
     return miopenTohipdnnStatus(miopenDestroyLRNDescriptor(normDesc));
 }
 
-//===================
+//=============================================================================
 
 hipdnnStatus_t
 hipdnnLRNCrossChannelForward(   hipdnnHandle_t handle,
@@ -2016,7 +2018,7 @@ hipdnnLRNCrossChannelForwardEx( hipdnnHandle_t handle,
 
     
 
-//==================
+//=============================================================================
 
 hipdnnStatus_t
 hipdnnLRNCrossChannelBackward(  hipdnnHandle_t handle,
@@ -2140,7 +2142,7 @@ hipdnnDeriveBNTensorDescriptor( hipdnnTensorDescriptor_t derivedBnDesc,
                                                 hipTomiopenBatchNormMode(mode)));
 }
 
-//=====================
+//=============================================================================
 
 hipdnnStatus_t
 hipdnnBatchNormalizationForwardTraining(    hipdnnHandle_t handle,
@@ -2179,7 +2181,7 @@ hipdnnBatchNormalizationForwardTraining(    hipdnnHandle_t handle,
                                             resultSaveMean,
                                             resultSaveInvVariance));
 }
-//===================
+//=============================================================================
 
 hipdnnStatus_t
 hipdnnnBatchNormalizationForwardInference(  hipdnnHandle_t handle,
@@ -2219,7 +2221,7 @@ return  miopenTohipdnnStatus(
 #endif
 
 }
-//====================
+//=============================================================================
 
 hipdnnStatus_t
 hipdnnBatchNormalizationBackward(hipdnnHandle_t handle,
