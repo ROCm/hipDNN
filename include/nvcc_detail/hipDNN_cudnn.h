@@ -53,3 +53,22 @@ typedef cudaStream_t hipdnnStream_t;
 
 
 typedef cudnnHandle_t hipdnnHandle_t;
+
+hipdnnStatus_t cudnnTohipdnnStatus(cudnnStatus_t  cStatus);
+
+hipdnnStatus_t hipTocudnnDataType(hipdnnDataType_t in, cudnnDataType_t* out);
+
+hipdnnStatus_t  cudnnTohipConvolutionFwdAlgo(cudnnConvolutionFwdAlgo_t  in,
+                                            hipdnnConvolutionFwdAlgo_t* out);
+
+hipdnnStatus_t  cudnnTohipConvolutionBwdFilterAlgo(    cudnnConvolutionBwdFilterAlgo_t  in,
+                                                    hipdnnConvolutionBwdFilterAlgo_t* out);
+
+hipdnnStatus_t  cudnnTohipConvolutionBwdDataAlgo(    cudnnConvolutionBwdDataAlgo_t in,
+                                                    hipdnnConvolutionBwdDataAlgo_t* out);
+
+typedef cudnnDropoutDescriptor_t hipdnnDropoutDescriptor_t;
+
+typedef cudnnRNNDescriptor_t hipdnnRNNDescriptor_t;
+
+typedef cudnnPersistentRNNPlan_t hipdnnPersistentRNNPlan_t;
