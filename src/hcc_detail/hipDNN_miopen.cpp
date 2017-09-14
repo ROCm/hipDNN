@@ -194,8 +194,8 @@ hipdnnConvolutionMode_t miopenTohipConvolutionMode( miopenConvolutionMode_t in )
 {
     if( in == miopenConvolution )
         return HIPDNN_CONVOLUTION;
-    else if( in == miopenCrossCorrelation )
-        return HIPDNN_CROSS_CORRELATION;
+    /*else if( in == miopenCrossCorrelation )
+        return HIPDNN_CROSS_CORRELATION;*/ //TODO: to be added
     
     return HIPDNN_CONVOLUTION;
 }
@@ -204,8 +204,8 @@ miopenConvolutionMode_t hipTomiopenConvolutionMode( hipdnnConvolutionMode_t in )
 {
     if( in == HIPDNN_CONVOLUTION )
         return miopenConvolution;
-    else if( in == HIPDNN_CROSS_CORRELATION )
-        return miopenCrossCorrelation;
+    /*else if( in == HIPDNN_CROSS_CORRELATION )
+        return miopenCrossCorrelation;*/ //TODO: to be added
     
     return miopenConvolution;
 }
