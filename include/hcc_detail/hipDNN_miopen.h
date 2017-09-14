@@ -48,3 +48,17 @@ typedef miopenAcceleratorQueue_t hipdnnStream_t;
 
 typedef miopenHandle_t hipdnnHandle_t;
 
+typedef miopenTensorOp_t *hipdnnDropoutDescriptor_t;
+
+typedef miopenTensorOp_t *hipdnnRNNDescriptor_t;
+
+typedef miopenTensorOp_t *hipdnnPersistentRNNPlan_t;
+
+hipdnnStatus_t  miopenTohipConvolutionFwdAlgo(  miopenConvFwdAlgorithm_t  in,
+                                                hipdnnConvolutionFwdAlgo_t* out);
+
+hipdnnStatus_t  miopenTohipConvolutionBwdFilterAlgo(    miopenConvBwdWeightsAlgorithm_t  in,
+                                                        hipdnnConvolutionBwdFilterAlgo_t* out);
+
+hipdnnStatus_t  miopenTohipConvolutionBwdDataAlgo(  miopenConvBwdDataAlgorithm_t in,
+                                                    hipdnnConvolutionBwdDataAlgo_t* out);
