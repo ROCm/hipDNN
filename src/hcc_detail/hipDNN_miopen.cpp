@@ -194,8 +194,8 @@ hipdnnConvolutionMode_t miopenTohipConvolutionMode( miopenConvolutionMode_t in )
 {
     if( in == miopenConvolution )
         return HIPDNN_CONVOLUTION;
-    else if( in == miopenCrossCorrelation )
-        return HIPDNN_CROSS_CORRELATION;
+    /*else if( in == miopenCrossCorrelation )
+        return HIPDNN_CROSS_CORRELATION;*/ //TODO: to be added
     
     return HIPDNN_CONVOLUTION;
 }
@@ -204,8 +204,8 @@ miopenConvolutionMode_t hipTomiopenConvolutionMode( hipdnnConvolutionMode_t in )
 {
     if( in == HIPDNN_CONVOLUTION )
         return miopenConvolution;
-    else if( in == HIPDNN_CROSS_CORRELATION )
-        return miopenCrossCorrelation;
+    /*else if( in == HIPDNN_CROSS_CORRELATION )
+        return miopenCrossCorrelation;*/ //TODO: to be added
     
     return miopenConvolution;
 }
@@ -2266,6 +2266,268 @@ return  miopenTohipdnnStatus(
                                                 savedInvVariance));
 }
 
+hipdnnStatus_t hipdnnSetTensorNdDescriptor(
+                                hipdnnTensorDescriptor_t             tensorDesc,
+                                hipdnnDataType_t                     dataType,
+                                int                                 nbDims,
+                                const int                           dimA[],
+                                const int                           strideA[] )
+{
+        return HIPDNN_STATUS_SUCCESS;
+}
+
+hipdnnStatus_t hipdnnGetTensorNdDescriptor(
+                                const hipdnnTensorDescriptor_t       tensorDesc,
+                                int                                 nbDimsRequested,
+                                hipdnnDataType_t                    *dataType,
+                                int                                *nbDims,
+                                int                                 dimA[],
+                                int                                 strideA[] )
+{
+        return HIPDNN_STATUS_SUCCESS;
+}
+
+hipdnnStatus_t hipdnnSetFilterNdDescriptor(
+                                hipdnnFilterDescriptor_t             filterDesc,
+                                hipdnnDataType_t                     dataType, // image data type
+                                hipdnnTensorFormat_t                 format,
+                                int                                 nbDims,
+                                const int                           filterDimA[] )
+{
+        return HIPDNN_STATUS_SUCCESS;
+}
+
+hipdnnStatus_t hipdnnGetFilterNdDescriptor(
+                                const hipdnnFilterDescriptor_t       filterDesc,
+                                int                                 nbDimsRequested,
+                                hipdnnDataType_t                    *dataType, // image data type
+                                hipdnnTensorFormat_t                *format,
+                                int                                *nbDims,
+                                int                                 filterDimA[] )
+{
+        return HIPDNN_STATUS_SUCCESS;
+}
 
 
+hipdnnStatus_t hipdnnDestroyFilterDescriptor(
+                                hipdnnFilterDescriptor_t             filterDesc )
+{
+        return HIPDNN_STATUS_SUCCESS;
+}
+
+//RNN APIs
+
+hipdnnStatus_t hipdnnCreateRNNDescriptor(hipdnnRNNDescriptor_t * rnnDesc)
+{
+        return HIPDNN_STATUS_SUCCESS;
+}
+
+hipdnnStatus_t hipdnnDestroyRNNDescriptor(hipdnnRNNDescriptor_t rnnDesc)
+{
+        return HIPDNN_STATUS_SUCCESS;
+}
+
+hipdnnStatus_t  hipdnnCreatePersistentRNNPlan(hipdnnRNNDescriptor_t rnnDesc,
+                                             const int minibatch,
+                                             const hipdnnDataType_t dataType,
+                                             hipdnnPersistentRNNPlan_t * plan)
+{
+        return HIPDNN_STATUS_SUCCESS;
+}
+                                             
+hipdnnStatus_t  hipdnnSetPersistentRNNPlan(hipdnnRNNDescriptor_t rnnDesc,
+                                          hipdnnPersistentRNNPlan_t plan)
+{
+        return HIPDNN_STATUS_SUCCESS;
+}
+                                          
+hipdnnStatus_t  hipdnnDestroyPersistentRNNPlan(hipdnnPersistentRNNPlan_t plan)
+{
+        return HIPDNN_STATUS_SUCCESS;
+}
+                                          
+hipdnnStatus_t  hipdnnSetRNNDescriptor_v6(hipdnnHandle_t handle, 
+                                                hipdnnRNNDescriptor_t rnnDesc,
+                                                const int hiddenSize, 
+                                                const int numLayers, 
+                                                hipdnnDropoutDescriptor_t dropoutDesc, // Between layers, not between recurrent steps.
+                                                hipdnnRNNInputMode_t inputMode,                                                 
+                                                hipdnnDirectionMode_t direction, 
+                                                hipdnnRNNMode_t mode, 
+                                                hipdnnRNNAlgo_t algo, 
+                                                hipdnnDataType_t dataType)
+{
+        return HIPDNN_STATUS_SUCCESS;
+}
+
+
+hipdnnStatus_t  hipdnnSetRNNDescriptor(hipdnnRNNDescriptor_t rnnDesc,
+                                                int hiddenSize, 
+                                                int numLayers, 
+                                                hipdnnDropoutDescriptor_t dropoutDesc, // Between layers, not between recurrent steps.
+                                                hipdnnRNNInputMode_t inputMode,                                                 
+                                                hipdnnDirectionMode_t direction, 
+                                                hipdnnRNNMode_t mode, 
+                                                hipdnnDataType_t dataType)
+{
+        return HIPDNN_STATUS_SUCCESS;
+}
+
+hipdnnStatus_t  hipdnnGetRNNWorkspaceSize( hipdnnHandle_t              handle,
+                                                    const hipdnnRNNDescriptor_t rnnDesc,  
+                                                    const int seqLength, 
+                                                    const hipdnnTensorDescriptor_t    *xDesc,
+                                                    size_t                     *sizeInBytes
+                                                    )
+{
+        return HIPDNN_STATUS_SUCCESS;
+}
+                                                      
+hipdnnStatus_t  hipdnnGetRNNTrainingReserveSize( hipdnnHandle_t              handle,
+                                                          const hipdnnRNNDescriptor_t rnnDesc,  
+                                                          const int seqLength, 
+                                                          const hipdnnTensorDescriptor_t    *xDesc,
+                                                          size_t                     *sizeInBytes
+                                                    )
+{
+        return HIPDNN_STATUS_SUCCESS;
+}
+
+                                                    
+hipdnnStatus_t  hipdnnGetRNNParamsSize( hipdnnHandle_t              handle,
+                                                 const hipdnnRNNDescriptor_t rnnDesc,  
+                                                 const hipdnnTensorDescriptor_t    xDesc,                                                    
+                                                 size_t                     *sizeInBytes,
+                                                 hipdnnDataType_t dataType
+                                                    )
+{
+        return HIPDNN_STATUS_SUCCESS;
+}
+
+hipdnnStatus_t  hipdnnGetRNNLinLayerMatrixParams( hipdnnHandle_t              handle,
+                             const hipdnnRNNDescriptor_t rnnDesc,  
+                             const int layer,
+                             const hipdnnTensorDescriptor_t xDesc, 
+                             const hipdnnFilterDescriptor_t wDesc, 
+                             const void * w, 
+                             const int linLayerID,  
+                             hipdnnFilterDescriptor_t linLayerMatDesc, 
+                             void ** linLayerMat
+                             )
+{
+        return HIPDNN_STATUS_SUCCESS;
+}
+
+hipdnnStatus_t  hipdnnGetRNNLinLayerBiasParams( hipdnnHandle_t              handle,
+                             const hipdnnRNNDescriptor_t rnnDesc,  
+                             const int layer,
+                             const hipdnnTensorDescriptor_t xDesc, 
+                             const hipdnnFilterDescriptor_t wDesc, 
+                             const void * w, 
+                             const int linLayerID, 
+                             hipdnnFilterDescriptor_t linLayerBiasDesc, 
+                             void ** linLayerBias                       
+                             )
+{
+        return HIPDNN_STATUS_SUCCESS;
+}
+
+hipdnnStatus_t  hipdnnRNNForwardInference( hipdnnHandle_t handle, 
+                                                    const hipdnnRNNDescriptor_t rnnDesc, 
+                                                    const int seqLength, 
+                                                    const hipdnnTensorDescriptor_t * xDesc, 
+                                                    const void * x, 
+                                                    const hipdnnTensorDescriptor_t hxDesc, 
+                                                    const void * hx, 
+                                                    const hipdnnTensorDescriptor_t cxDesc, 
+                                                    const void * cx, 
+                                                    const hipdnnFilterDescriptor_t wDesc, 
+                                                    const void * w, 
+                                                    const hipdnnTensorDescriptor_t *yDesc,  
+                                                    void * y, 
+                                                    const hipdnnTensorDescriptor_t hyDesc, 
+                                                    void * hy, 
+                                                    const hipdnnTensorDescriptor_t cyDesc, 
+                                                    void * cy, 
+                                                    void * workspace, 
+                                                    size_t workSpaceSizeInBytes)
+{
+        return HIPDNN_STATUS_SUCCESS;
+}
+
+hipdnnStatus_t  hipdnnRNNForwardTraining( hipdnnHandle_t handle, 
+                                                   const hipdnnRNNDescriptor_t rnnDesc, 
+                                                   const int seqLength, 
+                                                   const hipdnnTensorDescriptor_t *xDesc, 
+                                                   const void * x, 
+                                                   const hipdnnTensorDescriptor_t hxDesc, 
+                                                   const void * hx, 
+                                                   const hipdnnTensorDescriptor_t cxDesc, 
+                                                   const void * cx, 
+                                                   const hipdnnFilterDescriptor_t wDesc, 
+                                                   const void * w, 
+                                                   const hipdnnTensorDescriptor_t *yDesc,  
+                                                   void * y, 
+                                                   const hipdnnTensorDescriptor_t hyDesc, 
+                                                   void * hy, 
+                                                   const hipdnnTensorDescriptor_t cyDesc, 
+                                                   void * cy, 
+                                                   void * workspace, 
+                                                   size_t workSpaceSizeInBytes,
+                                                   void * reserveSpace, 
+                                                   size_t reserveSpaceSizeInBytes)
+{
+        return HIPDNN_STATUS_SUCCESS;
+}
+
+hipdnnStatus_t  hipdnnRNNBackwardData( hipdnnHandle_t handle, 
+                                                const hipdnnRNNDescriptor_t rnnDesc, 
+                                                const int seqLength, 
+                                                const hipdnnTensorDescriptor_t * yDesc, 
+                                                const void * y,                                                
+                                                const hipdnnTensorDescriptor_t * dyDesc, 
+                                                const void * dy, 
+                                                const hipdnnTensorDescriptor_t dhyDesc, 
+                                                const void * dhy, 
+                                                const hipdnnTensorDescriptor_t dcyDesc, 
+                                                const void * dcy, 
+                                                const hipdnnFilterDescriptor_t wDesc, 
+                                                const void * w, 
+                                                const hipdnnTensorDescriptor_t hxDesc, 
+                                                const void * hx,                                                                  
+                                                const hipdnnTensorDescriptor_t cxDesc, 
+                                                const void * cx,                                                 
+                                                const hipdnnTensorDescriptor_t * dxDesc, 
+                                                void * dx, 
+                                                const hipdnnTensorDescriptor_t dhxDesc,
+                                                void * dhx,
+                                                const hipdnnTensorDescriptor_t dcxDesc,
+                                                void * dcx,
+                                                void * workspace,
+                                                size_t workSpaceSizeInBytes,
+                                                void * reserveSpace, 
+                                                size_t reserveSpaceSizeInBytes )
+{
+        return HIPDNN_STATUS_SUCCESS;
+}
+
+
+hipdnnStatus_t  hipdnnRNNBackwardWeights( hipdnnHandle_t handle, 
+                                                   const hipdnnRNNDescriptor_t rnnDesc, 
+                                                   const int seqLength, 
+                                                   const hipdnnTensorDescriptor_t * xDesc, 
+                                                   const void * x, 
+                                                   const hipdnnTensorDescriptor_t hxDesc, 
+                                                   const void * hx,                                                   
+                                                   const hipdnnTensorDescriptor_t * yDesc, 
+                                                   const void * y,
+                                                   const void * workspace, 
+                                                   size_t workSpaceSizeInBytes, 
+                                                   const hipdnnFilterDescriptor_t dwDesc, 
+                                                   void * dw,
+                                                   const void * reserveSpace, 
+                                                   size_t reserveSpaceSizeInBytes )
+{
+        return HIPDNN_STATUS_SUCCESS;
+}
 
