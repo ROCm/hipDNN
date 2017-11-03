@@ -1028,6 +1028,11 @@ hipdnnStatus_t hipdnnGetStream(hipdnnHandle_t handle, hipdnnStream_t *streamId)
     return cudnnTohipdnnStatus(cudnnGetStream(handle, streamId));
 }
 
+size_t hipdnnGetVersion()
+{
+    return cudnnGetVersion();
+}
+
 hipdnnStatus_t hipdnnCreateTensorDescriptor(hipdnnTensorDescriptor_t *tensorDesc)
 {
     return cudnnTohipdnnStatus(cudnnCreateTensorDescriptor(tensorDesc));
@@ -3055,4 +3060,26 @@ hipdnnStatus_t  hipdnnRNNBackwardWeights( hipdnnHandle_t handle,
         return cudnnTohipdnnStatus(
 		cudnnRNNBackwardWeights(handle, rnnDesc, seqLength, xDesc, x, hxDesc, hx, yDesc, y, workspace, workSpaceSizeInBytes, 
 						dwDesc, dw, reserveSpace, reserveSpaceSizeInBytes));
+}
+
+hipdnnStatus_t hipdnnBatchNormalizationForwardInference(
+                                hipdnnHandle_t                       handle,
+                                hipdnnBatchNormMode_t                mode,
+                                const void                         *alpha, // alpha[0] = result blend factor
+                                const void                         *beta,  // beta[0] = dest layer blend factor
+                                const hipdnnTensorDescriptor_t       xDesc,
+                                const void                         *x,     // NxCxHxW
+                                const hipdnnTensorDescriptor_t       yDesc,
+                                void                               *y,     // NxCxHxW
+                                const hipdnnTensorDescriptor_t       bnScaleBiasMeanVarDesc,
+                                const void                         *bnScale,
+                                const void                         *bnBias,
+                                const void                         *estimatedMean,
+                                const void                         *estimatedVariance,
+                                double                              epsilon )
+{
+
+        return cudnnTohipdnnStatus(
+                cudnnBatchNormalizationForwardInference(handle, hipTocudnnBatchNormMode(mode), alpha, beta, xDesc, x, yDesc,
+                                                        y, bnScaleBiasMeanVarDesc, bnScale, bnBias, estimatedMean, estimatedVariance, epsilon));
 }	
