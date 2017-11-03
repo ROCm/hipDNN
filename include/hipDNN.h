@@ -299,6 +299,8 @@ HIPDNN_EXPORT hipdnnStatus_t hipdnnSetStream(hipdnnHandle_t handle, hipdnnStream
 
 HIPDNN_EXPORT hipdnnStatus_t hipdnnGetStream(hipdnnHandle_t handle, hipdnnStream_t *streamId);
 
+HIPDNN_EXPORT size_t hipdnnGetVersion(void);
+
 HIPDNN_EXPORT hipdnnStatus_t hipdnnCreateTensorDescriptor(hipdnnTensorDescriptor_t *tensorDesc);
 
 
@@ -1144,6 +1146,22 @@ hipdnnStatus_t  hipdnnRNNBackwardWeights( hipdnnHandle_t handle,
                                                    void * dw,
                                                    const void * reserveSpace, 
                                                    size_t reserveSpaceSizeInBytes );
+
+hipdnnStatus_t hipdnnBatchNormalizationForwardInference(
+                                hipdnnHandle_t                       handle,
+                                hipdnnBatchNormMode_t                mode,
+                                const void                         *alpha, // alpha[0] = result blend factor
+                                const void                         *beta,  // beta[0] = dest layer blend factor
+                                const hipdnnTensorDescriptor_t       xDesc,
+                                const void                         *x,     // NxCxHxW
+                                const hipdnnTensorDescriptor_t       yDesc,
+                                void                               *y,     // NxCxHxW
+                                const hipdnnTensorDescriptor_t       bnScaleBiasMeanVarDesc,
+                                const void                         *bnScale,
+                                const void                         *bnBias,
+                                const void                         *estimatedMean,
+                                const void                         *estimatedVariance,
+                                double                              epsilon );
  
 #ifdef __cplusplus
 }
