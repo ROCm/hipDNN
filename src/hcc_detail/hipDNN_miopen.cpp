@@ -700,6 +700,11 @@ hipdnnStatus_t hipdnnGetStream(hipdnnHandle_t handle, hipdnnStream_t *streamId)
     return miopenTohipdnnStatus(miopenGetStream(handle, streamId));
 }
 
+size_t hipdnnGetVersion()
+{
+    return 6000;
+}
+
 hipdnnStatus_t hipdnnCreateTensorDescriptor(hipdnnTensorDescriptor_t *tensorDesc)
 {
     return miopenTohipdnnStatus(miopenCreateTensorDescriptor(tensorDesc));
