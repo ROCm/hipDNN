@@ -1,12 +1,16 @@
 HIP_PATH ?= /opt/rocm/hip
 HCC_PATH ?= /opt/rocm/hcc
 HIP_PLATFORM = $(shell $(HIP_PATH)/bin/hipconfig --platform)
-HIP_INCLUDE = -I${HIP_PATH}/include -I${HCC_PATH}/include
+HIP_INCLUDE = -I${HIP_PATH}/include
 BUILD_DIR ?= build
-INSTALL_DIR ?= /opt/rocm/hipDNN
+
+ifndef INSTALL_DIR
+	INSTALL_DIR = /opt/rocm/hipDNN
+endif
 
 HIPCC = ${HIP_PATH}/bin/hipcc
 
+CPPFLAGS += $(shell $(HIP_PATH)/bin/hipconfig --cpp_config)
 ifeq (${HIP_PLATFORM}, nvcc)
 INCLUDE_DIR = /usr/local/cudnn-6.0/cuda/include/
 
@@ -27,9 +31,10 @@ LIB_DIR=/opt/rocm/miopen/lib
 LDFLAGS = -lm -lMIOpen
 
 SOURCEDIR = src/hcc_detail
+
+HIP_INCLUDE += ${HIP_INCLUDE} -I${HCC_PATH}/include
 endif
 
-CPPFLAGS += $(shell $(HIP_PATH)/bin/hipconfig --cpp_config)
 COMMONFLAGS = -fPIC
 
 SOURCESLIST := $(shell find $(SOURCEDIR) -name '*.cpp')
