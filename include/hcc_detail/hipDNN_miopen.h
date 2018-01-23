@@ -50,7 +50,7 @@ typedef miopenHandle_t hipdnnHandle_t;
 
 typedef miopenTensorOp_t *hipdnnDropoutDescriptor_t;
 
-typedef miopenTensorOp_t *hipdnnRNNDescriptor_t;
+typedef miopenRNNDescriptor_t hipdnnRNNDescriptor_t;
 
 typedef miopenTensorOp_t *hipdnnPersistentRNNPlan_t;
 
