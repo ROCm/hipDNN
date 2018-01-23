@@ -32,7 +32,7 @@ LDFLAGS = -lm -lMIOpen
 
 SOURCEDIR = src/hcc_detail
 
-HIP_INCLUDE += ${HIP_INCLUDE} -I${HCC_PATH}/include
+HIP_INCLUDE += -I${HCC_PATH}/include
 endif
 
 COMMONFLAGS = -fPIC
