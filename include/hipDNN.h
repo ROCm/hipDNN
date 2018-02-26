@@ -29,7 +29,7 @@ THE SOFTWARE.
 #include <hip/hip_runtime_api.h>
 
 #define HIPDNN_EXPORT
-
+#define HIPDNN_VERSION 7000
     
 //uncomment this out to enable value substitution for
 //incompatible types.
@@ -68,6 +68,15 @@ typedef enum
 
 
 //=============================================================================
+
+typedef enum 
+{
+    HIPDNN_DEFAULT_MATH   = 0,
+    HIPDNN_TENSOR_OP_MATH = 1,
+} hipdnnMathType_t;
+
+//=============================================================================
+
 
 typedef enum
 {
@@ -117,6 +126,12 @@ typedef enum
 
     //bnScale, bnBias tensor dims are 1xCx1x1 (one value per C-dim normalized over Nx1xHxW subtensors)
     HIPDNN_BATCHNORM_SPATIAL        = 1,
+
+    /* 
+     * bnScale, bnBias tensor dims are 1xCx1x1 (one value per C-dim normalized over Nx1xHxW subtensors). 
+     * May be faster than CUDNN_BATCHNORM_SPATIAL but imposes some limits on the range of values 
+     */
+    HIPDNN_BATCHNORM_SPATIAL_PERSISTENT = 2,
 } hipdnnBatchNormMode_t;
 
 
@@ -271,6 +286,41 @@ typedef enum
     HIPDNN_CONVOLUTION_BWD_FILTER_PREFER_FASTEST          = 1,
     HIPDNN_CONVOLUTION_BWD_FILTER_SPECIFY_WORKSPACE_LIMIT = 2,
 } hipdnnConvolutionBwdFilterPreference_t;
+
+//=============================================================================
+
+//CNTK 2.4
+
+typedef enum
+{
+    HIPDNN_REDUCE_TENSOR_ADD          = 0,
+    HIPDNN_REDUCE_TENSOR_MUL          = 1,
+    HIPDNN_REDUCE_TENSOR_MIN          = 2,
+    HIPDNN_REDUCE_TENSOR_MAX          = 3,
+    HIPDNN_REDUCE_TENSOR_AMAX         = 4,
+    HIPDNN_REDUCE_TENSOR_AVG          = 5,
+    HIPDNN_REDUCE_TENSOR_NORM1        = 6,
+    HIPDNN_REDUCE_TENSOR_NORM2        = 7,
+    HIPDNN_REDUCE_TENSOR_MUL_NO_ZEROS = 8,
+} hipdnnReduceTensorOp_t;
+
+//=============================================================================
+
+typedef enum
+{
+    HIPDNN_REDUCE_TENSOR_NO_INDICES        = 0,
+    HIPDNN_REDUCE_TENSOR_FLATTENED_INDICES = 1,
+} hipdnnReduceTensorIndices_t;
+
+//=============================================================================
+
+typedef enum
+{
+    HIPDNN_32BIT_INDICES = 0,
+    HIPDNN_64BIT_INDICES = 1,
+    HIPDNN_16BIT_INDICES = 2,
+    HIPDNN_8BIT_INDICES  = 3,
+} hipdnnIndicesType_t;
 
 //=============================================================================
 
@@ -999,14 +1049,25 @@ hipdnnStatus_t  hipdnnSetRNNDescriptor_v6(hipdnnHandle_t handle,
                                                 hipdnnDataType_t dataType);
 
 
-hipdnnStatus_t  hipdnnSetRNNDescriptor(hipdnnRNNDescriptor_t rnnDesc,
+hipdnnStatus_t  hipdnnSetRNNDescriptor(hipdnnHandle_t handle,
+                                                hipdnnRNNDescriptor_t rnnDesc,
                                                 int hiddenSize, 
                                                 int numLayers, 
                                                 hipdnnDropoutDescriptor_t dropoutDesc, // Between layers, not between recurrent steps.
                                                 hipdnnRNNInputMode_t inputMode,                                                 
                                                 hipdnnDirectionMode_t direction, 
-                                                hipdnnRNNMode_t mode, 
+                                                hipdnnRNNMode_t mode,
+                                                hipdnnRNNAlgo_t algo, 
                                                 hipdnnDataType_t dataType);
+
+hipdnnStatus_t hipdnnSetRNNDescriptor_v5(hipdnnRNNDescriptor_t rnnDesc,
+                                                    int hiddenSize,
+                                                    int numLayers,
+                                                    hipdnnDropoutDescriptor_t dropoutDesc, /* Between layers, not between recurrent steps. */
+                                                    hipdnnRNNInputMode_t inputMode,
+                                                    hipdnnDirectionMode_t direction,
+                                                    hipdnnRNNMode_t mode,
+                                                    hipdnnDataType_t dataType);
 
 
 
@@ -1162,6 +1223,58 @@ hipdnnStatus_t hipdnnBatchNormalizationForwardInference(
                                 const void                         *estimatedMean,
                                 const void                         *estimatedVariance,
                                 double                              epsilon );
+
+
+hipdnnStatus_t hipdnnCreateReduceTensorDescriptor(
+                                hipdnnReduceTensorDescriptor_t          *reduceTensorDesc );
+
+
+hipdnnStatus_t hipdnnSetTensor4dDescriptorEx(
+                                hipdnnTensorDescriptor_t             tensorDesc,
+                                hipdnnDataType_t                     dataType, /* image data type */
+                                int                                 n,        /* number of inputs (batch size) */
+                                int                                 c,        /* number of input feature maps */
+                                int                                 h,        /* height of input section */
+                                int                                 w,        /* width of input section */
+                                int                                 nStride,
+                                int                                 cStride,
+                                int                                 hStride,
+                                int                                 wStride );
+
+
+hipdnnStatus_t hipdnnSetReduceTensorDescriptor(
+                                hipdnnReduceTensorDescriptor_t           reduceTensorDesc,
+                                hipdnnReduceTensorOp_t                   reduceTensorOp,
+                                hipdnnDataType_t                     reduceTensorCompType,
+                                hipdnnNanPropagation_t               reduceTensorNanOpt,
+                                hipdnnReduceTensorIndices_t          reduceTensorIndices,
+                                hipdnnIndicesType_t                  reduceTensorIndicesType );
+
+
+hipdnnStatus_t hipdnnGetReductionWorkspaceSize(
+                                hipdnnHandle_t handle,
+                                const cudnnReduceTensorDescriptor_t reduceTensorDesc,
+                                const cudnnTensorDescriptor_t aDesc,
+                                const cudnnTensorDescriptor_t cDesc,
+                                size_t *sizeInBytes );
+
+
+hipdnnStatus_t hipdnnReduceTensor(
+                        hipdnnHandle_t                       handle,
+                        const hipdnnReduceTensorDescriptor_t reduceTensorDesc,
+                        void                               *indices,
+                        size_t                              indicesSizeInBytes,
+                        void                               *workspace,
+                        size_t                              workspaceSizeInBytes,
+                        const void                         *alpha,
+                        const hipdnnTensorDescriptor_t       aDesc,
+                        const void                         *A,
+                        const void                         *beta,
+                        const hipdnnTensorDescriptor_t       cDesc,
+                        void                               *C );
+
+
+hipdnnStatus_t hipdnnDestroyReduceTensorDescriptor(hipdnnReduceTensorDescriptor_t reduceTensorDesc );
  
 #ifdef __cplusplus
 }
