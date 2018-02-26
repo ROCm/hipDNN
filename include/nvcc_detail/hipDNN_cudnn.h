@@ -47,6 +47,8 @@ typedef cudnnConvolutionBwdFilterAlgoPerf_t hipdnnConvolutionBwdFilterAlgoPerf_t
 
 typedef cudnnOpTensorDescriptor_t hipdnnOpTensorDescriptor_t;
 
+typedef cudnnReduceTensorDescriptor_t hipdnnReduceTensorDescriptor_t;
+
 
 
 typedef cudaStream_t hipdnnStream_t;
@@ -58,6 +60,9 @@ hipdnnStatus_t cudnnTohipdnnStatus(cudnnStatus_t  cStatus);
 
 hipdnnStatus_t hipTocudnnDataType(hipdnnDataType_t in, cudnnDataType_t* out);
 
+hipdnnStatus_t hipdnnSetConvolutionMathType(hipdnnConvolutionDescriptor_t convDesc,
+                                                       hipdnnMathType_t mathType );
+
 hipdnnStatus_t  cudnnTohipConvolutionFwdAlgo(cudnnConvolutionFwdAlgo_t  in,
                                             hipdnnConvolutionFwdAlgo_t* out);
 
@@ -66,6 +71,8 @@ hipdnnStatus_t  cudnnTohipConvolutionBwdFilterAlgo(    cudnnConvolutionBwdFilter
 
 hipdnnStatus_t  cudnnTohipConvolutionBwdDataAlgo(    cudnnConvolutionBwdDataAlgo_t in,
                                                     hipdnnConvolutionBwdDataAlgo_t* out);
+
+hipdnnStatus_t cudnnTohipMathType(cudnnMathType_t in, hipdnnMathType_t *out);
 
 typedef cudnnDropoutDescriptor_t hipdnnDropoutDescriptor_t;
 
