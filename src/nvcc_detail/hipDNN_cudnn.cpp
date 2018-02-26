@@ -22,7 +22,7 @@ THE SOFTWARE.
 
 
 #include <hipDNN.h>
-
+#include "iostream"
 
 
 hipdnnStatus_t cudnnTohipdnnStatus(cudnnStatus_t  cStatus)
@@ -175,7 +175,35 @@ hipdnnStatus_t cudnnTohipDataType(cudnnDataType_t in, hipdnnDataType_t* out)
     return HIPDNN_STATUS_SUCCESS;
 }
 
+//================================
 
+hipdnnStatus_t hipTocudnnMathType(hipdnnMathType_t in, cudnnMathType_t *out)
+{
+	switch(in)
+	{
+	case HIPDNN_DEFAULT_MATH:
+	    *out = CUDNN_DEFAULT_MATH;
+	    break;
+	case HIPDNN_TENSOR_OP_MATH:
+	    *out = CUDNN_TENSOR_OP_MATH;
+	}
+	return HIPDNN_STATUS_SUCCESS;
+}
+
+
+hipdnnStatus_t cudnnTohipMathType(cudnnMathType_t in, hipdnnMathType_t *out)
+{
+	switch(in)
+	{
+	case CUDNN_DEFAULT_MATH:
+	    *out = HIPDNN_DEFAULT_MATH;
+	    break;
+	case CUDNN_TENSOR_OP_MATH:
+	    *out = HIPDNN_TENSOR_OP_MATH;
+	}
+	return HIPDNN_STATUS_SUCCESS;
+}
+	
 //================================
 
 hipdnnStatus_t cudnnTohipOpTensorOp(cudnnOpTensorOp_t in, hipdnnOpTensorOp_t* out)
@@ -325,6 +353,8 @@ cudnnBatchNormMode_t hipTocudnnBatchNormMode( hipdnnBatchNormMode_t in)
         return CUDNN_BATCHNORM_PER_ACTIVATION;
     else if( in == HIPDNN_BATCHNORM_SPATIAL )
         return CUDNN_BATCHNORM_SPATIAL;
+    else if( in == HIPDNN_BATCHNORM_SPATIAL_PERSISTENT )
+        return CUDNN_BATCHNORM_SPATIAL_PERSISTENT;
     
     return CUDNN_BATCHNORM_PER_ACTIVATION;
 }
@@ -531,6 +561,8 @@ hipdnnStatus_t  hipTocudnnConvolutionBwdFilterAlgo(    hipdnnConvolutionBwdFilte
     case HIPDNN_CONVOLUTION_BWD_FILTER_ALGO_COUNT:
         *out = CUDNN_CONVOLUTION_BWD_FILTER_ALGO_COUNT;
         break;
+    default:
+        retVal = HIPDNN_STATUS_NOT_SUPPORTED;
     }
     return retVal;
 } 
@@ -1008,6 +1040,173 @@ hipdnnStatus_t cudnnTohipdnnRNNAlgo(cudnnRNNAlgo_t in, hipdnnRNNAlgo_t *out)
 
 //=============================================================================
 
+// CNTK 2.4
+
+hipdnnStatus_t cudnnTohipReduceTensorOp(cudnnReduceTensorOp_t in, hipdnnReduceTensorOp_t *out)
+{
+    hipdnnStatus_t retVal = HIPDNN_STATUS_SUCCESS;
+    switch(in)
+    {
+    case CUDNN_REDUCE_TENSOR_ADD:
+	*out = HIPDNN_REDUCE_TENSOR_ADD;
+	break;
+    case CUDNN_REDUCE_TENSOR_MUL:
+	*out = HIPDNN_REDUCE_TENSOR_MUL;
+	break;
+    case CUDNN_REDUCE_TENSOR_MIN:
+	*out = HIPDNN_REDUCE_TENSOR_MIN;
+	break;
+    case CUDNN_REDUCE_TENSOR_MAX:
+	*out = HIPDNN_REDUCE_TENSOR_MAX;
+	break;
+    case CUDNN_REDUCE_TENSOR_AMAX:
+	*out = HIPDNN_REDUCE_TENSOR_AMAX;
+	break;
+    case CUDNN_REDUCE_TENSOR_AVG:
+	*out = HIPDNN_REDUCE_TENSOR_AVG;
+	break;
+    case CUDNN_REDUCE_TENSOR_NORM1:
+	*out = HIPDNN_REDUCE_TENSOR_NORM1;
+	break;
+    case CUDNN_REDUCE_TENSOR_NORM2:
+	*out = HIPDNN_REDUCE_TENSOR_NORM2;
+	break;
+    case CUDNN_REDUCE_TENSOR_MUL_NO_ZEROS:
+	*out = HIPDNN_REDUCE_TENSOR_MUL_NO_ZEROS;
+	break;
+    default:
+	retVal = HIPDNN_STATUS_NOT_SUPPORTED;
+    }
+    return retVal;
+}
+
+hipdnnStatus_t hipTocudnnReduceTensorOp(hipdnnReduceTensorOp_t in, cudnnReduceTensorOp_t *out)
+{
+    hipdnnStatus_t retVal = HIPDNN_STATUS_SUCCESS;
+    switch(in)
+    {
+    case HIPDNN_REDUCE_TENSOR_ADD:
+        *out = CUDNN_REDUCE_TENSOR_ADD;
+        break;
+    case HIPDNN_REDUCE_TENSOR_MUL:
+        *out = CUDNN_REDUCE_TENSOR_MUL;
+        break;
+    case HIPDNN_REDUCE_TENSOR_MIN:
+        *out = CUDNN_REDUCE_TENSOR_MIN;
+        break;
+    case HIPDNN_REDUCE_TENSOR_MAX:
+        *out = CUDNN_REDUCE_TENSOR_MAX;
+        break;
+    case HIPDNN_REDUCE_TENSOR_AMAX:
+        *out = CUDNN_REDUCE_TENSOR_AMAX;
+        break;
+    case HIPDNN_REDUCE_TENSOR_AVG:
+        *out = CUDNN_REDUCE_TENSOR_AVG;
+        break;
+    case HIPDNN_REDUCE_TENSOR_NORM1:
+        *out = CUDNN_REDUCE_TENSOR_NORM1;
+        break;
+    case HIPDNN_REDUCE_TENSOR_NORM2:
+        *out = CUDNN_REDUCE_TENSOR_NORM2;
+        break;
+    case HIPDNN_REDUCE_TENSOR_MUL_NO_ZEROS:
+        *out = CUDNN_REDUCE_TENSOR_MUL_NO_ZEROS;
+        break;
+    default:
+        retVal = HIPDNN_STATUS_NOT_SUPPORTED;
+    }
+    return retVal;
+}
+
+//=============================================================================
+
+hipdnnStatus_t cudnnTohipReduceTensorIndices(cudnnReduceTensorIndices_t in, hipdnnReduceTensorIndices_t *out)
+{
+    hipdnnStatus_t retVal = HIPDNN_STATUS_SUCCESS;
+    switch(in)
+    {
+    case CUDNN_REDUCE_TENSOR_NO_INDICES:
+	*out = HIPDNN_REDUCE_TENSOR_NO_INDICES;
+	break;
+    case CUDNN_REDUCE_TENSOR_FLATTENED_INDICES:
+	*out = HIPDNN_REDUCE_TENSOR_FLATTENED_INDICES;
+	break;
+    default:
+	retVal = HIPDNN_STATUS_NOT_SUPPORTED;
+    }
+
+    return retVal;
+}
+
+hipdnnStatus_t hipTocudnnReduceTensorIndices(hipdnnReduceTensorIndices_t in, cudnnReduceTensorIndices_t *out)
+{
+    hipdnnStatus_t retVal = HIPDNN_STATUS_SUCCESS;
+    switch(in)
+    {
+    case HIPDNN_REDUCE_TENSOR_NO_INDICES:
+        *out = CUDNN_REDUCE_TENSOR_NO_INDICES;
+        break;
+    case HIPDNN_REDUCE_TENSOR_FLATTENED_INDICES:
+        *out = CUDNN_REDUCE_TENSOR_FLATTENED_INDICES;
+        break;
+    default:
+        retVal = HIPDNN_STATUS_NOT_SUPPORTED;
+    }
+
+    return retVal;
+}
+
+//=============================================================================
+
+
+hipdnnStatus_t cudnnTohipIndicesType(cudnnIndicesType_t in, hipdnnIndicesType_t *out)
+{
+    hipdnnStatus_t retVal = HIPDNN_STATUS_SUCCESS;
+    switch(in)
+    {
+    case CUDNN_32BIT_INDICES:
+        *out = HIPDNN_32BIT_INDICES;
+        break;
+    case CUDNN_64BIT_INDICES:
+        *out = HIPDNN_64BIT_INDICES;
+        break;
+    case CUDNN_16BIT_INDICES:
+        *out = HIPDNN_16BIT_INDICES;
+        break;
+    case CUDNN_8BIT_INDICES:
+        *out = HIPDNN_8BIT_INDICES;
+        break;
+    default:
+        retVal = HIPDNN_STATUS_NOT_SUPPORTED;
+    }
+    return retVal;
+}
+
+hipdnnStatus_t hipTocudnnIndicesType(hipdnnIndicesType_t in, cudnnIndicesType_t *out)
+{
+    hipdnnStatus_t retVal = HIPDNN_STATUS_SUCCESS;
+    switch(in)
+    {
+    case HIPDNN_32BIT_INDICES:
+        *out = CUDNN_32BIT_INDICES;
+        break;
+    case HIPDNN_64BIT_INDICES:
+        *out = CUDNN_64BIT_INDICES;
+        break;
+    case HIPDNN_16BIT_INDICES:
+        *out = CUDNN_16BIT_INDICES;
+        break;
+    case HIPDNN_8BIT_INDICES:
+        *out = CUDNN_8BIT_INDICES;
+        break;
+    default:
+        retVal = HIPDNN_STATUS_NOT_SUPPORTED;
+    }
+    return retVal;
+}
+
+//=============================================================================
+
 hipdnnStatus_t hipdnnCreate(hipdnnHandle_t *handle)
 {
     return cudnnTohipdnnStatus(cudnnCreate(handle));
@@ -1177,6 +1376,20 @@ return cudnnTohipdnnStatus( cudnnCreateConvolutionDescriptor(convDesc));
 
 }
 //=====
+
+hipdnnStatus_t
+hipdnnSetConvolutionMathType(hipdnnConvolutionDescriptor_t convDesc,
+                                                       hipdnnMathType_t mathType )
+{
+
+	hipdnnStatus_t retVal;
+	cudnnMathType_t cuMT;
+
+	retVal = hipTocudnnMathType(mathType, &cuMT);
+	if(retVal == HIPDNN_STATUS_SUCCESS)
+		return cudnnTohipdnnStatus(cudnnSetConvolutionMathType(convDesc, cuMT));
+	return retVal;
+}
 
 
 hipdnnStatus_t
@@ -1489,7 +1702,7 @@ hipdnnGetConvolutionBackwardFilterAlgorithm(hipdnnHandle_t handle,
     if(retVal != HIPDNN_STATUS_SUCCESS )
         return retVal;
 
-    return     cudnnTohipdnnStatus(
+    retVal = cudnnTohipdnnStatus(
                 cudnnGetConvolutionBackwardFilterAlgorithm( handle,
                                                             xDesc,
                                                             dyDesc,
@@ -1498,6 +1711,11 @@ hipdnnGetConvolutionBackwardFilterAlgorithm(hipdnnHandle_t handle,
                                                             cupreference,
                                                             memoryLimitInBytes,
                                                             &cualgo));
+
+    if(retVal != HIPDNN_STATUS_SUCCESS )
+        return retVal;
+
+    return cudnnTohipConvolutionBwdFilterAlgo(cualgo, algo);
                                                             
                                                             
 }
@@ -1606,8 +1824,9 @@ hipdnnConvolutionBackwardFilter(    hipdnnHandle_t handle,
         hipdnnStatus_t hstatus = hipTocudnnConvolutionBwdFilterAlgo(algo, &cualgo);
         if( hstatus != HIPDNN_STATUS_SUCCESS )
                 return hstatus;
-
-	return cudnnTohipdnnStatus(cudnnConvolutionBackwardFilter(handle,alpha,xDesc,x,dyDesc,dy,convDesc,CUDNN_CONVOLUTION_BWD_FILTER_ALGO_0,workSpace,workSpaceSizeInBytes,beta,dwDesc,dw));
+    std::cout<<"\n Done with algo change bro";
+	//return cudnnTohipdnnStatus(cudnnConvolutionBackwardFilter(handle,alpha,xDesc,x,dyDesc,dy,convDesc,CUDNN_CONVOLUTION_BWD_FILTER_ALGO_0,workSpace,workSpaceSizeInBytes,beta,dwDesc,dw));
+	return cudnnTohipdnnStatus(cudnnConvolutionBackwardFilter(handle,alpha,xDesc,x,dyDesc,dy,convDesc,cualgo,workSpace,workSpaceSizeInBytes,beta,dwDesc,dw));
 }
 
 //=============================================================================
@@ -2778,18 +2997,20 @@ hipdnnStatus_t  hipdnnSetRNNDescriptor_v6(hipdnnHandle_t handle,
 }
 
 
-hipdnnStatus_t  hipdnnSetRNNDescriptor(hipdnnRNNDescriptor_t rnnDesc,
+hipdnnStatus_t  hipdnnSetRNNDescriptor(hipdnnHandle_t handle, hipdnnRNNDescriptor_t rnnDesc,
                                                 int hiddenSize, 
                                                 int numLayers, 
                                                 hipdnnDropoutDescriptor_t dropoutDesc, // Between layers, not between recurrent steps.
                                                 hipdnnRNNInputMode_t inputMode,                                                 
                                                 hipdnnDirectionMode_t direction, 
                                                 hipdnnRNNMode_t mode, 
+						hipdnnRNNAlgo_t algo,
                                                 hipdnnDataType_t dataType)
 {
 	cudnnRNNInputMode_t cuRIM;
         cudnnDirectionMode_t cuDM;
         cudnnRNNMode_t cuRM;
+	cudnnRNNAlgo_t cuRA;
         cudnnDataType_t cuDT;
         hipdnnStatus_t retval;
 
@@ -2809,16 +3030,67 @@ hipdnnStatus_t  hipdnnSetRNNDescriptor(hipdnnRNNDescriptor_t rnnDesc,
         if (retval != HIPDNN_STATUS_SUCCESS)
                 return retval;
 
+	retval = hipTocudnnRNNAlgo(algo, &cuRA);
+        if (retval != HIPDNN_STATUS_SUCCESS)
+                return retval;
+
         return cudnnTohipdnnStatus(
-		cudnnSetRNNDescriptor(rnnDesc,
+		cudnnSetRNNDescriptor(handle, rnnDesc,
                                       hiddenSize,
                                       numLayers,
                                       dropoutDesc,
                                       cuRIM,
                                       cuDM,
                                       cuRM,
+				                      cuRA,
                                       cuDT));
 }
+
+
+
+hipdnnStatus_t hipdnnSetRNNDescriptor_v5(hipdnnRNNDescriptor_t rnnDesc,
+                                                    int hiddenSize,
+                                                    int numLayers,
+                                                    hipdnnDropoutDescriptor_t dropoutDesc, /* Between layers, not between recurrent steps. */
+                                                    hipdnnRNNInputMode_t inputMode,
+                                                    hipdnnDirectionMode_t direction,
+                                                    hipdnnRNNMode_t mode,
+                                                    hipdnnDataType_t dataType)
+{
+    cudnnRNNInputMode_t cuRIM;
+    cudnnDirectionMode_t cuDM;
+    cudnnRNNMode_t cuRM;
+    cudnnDataType_t cuDT;
+    hipdnnStatus_t retval;
+
+    
+        retval = hipTocudnnRNNInputMode(inputMode, &cuRIM);
+        if (retval != HIPDNN_STATUS_SUCCESS)
+                return retval;
+
+        retval = hipTocudnnDirectionMode(direction, &cuDM);
+        if (retval != HIPDNN_STATUS_SUCCESS)
+                return retval;
+
+        retval = hipTocudnnRNNMode(mode, &cuRM);
+        if (retval != HIPDNN_STATUS_SUCCESS)
+                return retval;
+
+        retval = hipTocudnnDataType(dataType, &cuDT);
+        if (retval != HIPDNN_STATUS_SUCCESS)
+                return retval;
+        return cudnnTohipdnnStatus(
+                cudnnSetRNNDescriptor_v5(rnnDesc,
+                                         hiddenSize,
+                                         numLayers, 
+                                         dropoutDesc,
+                                         cuRIM,
+                                         cuDM,
+                                         cuRM,
+                                         cuDT));
+}
+
+
 
 hipdnnStatus_t  hipdnnGetRNNWorkspaceSize( hipdnnHandle_t              handle,
                                                     const hipdnnRNNDescriptor_t rnnDesc,  
@@ -3082,4 +3354,110 @@ hipdnnStatus_t hipdnnBatchNormalizationForwardInference(
         return cudnnTohipdnnStatus(
                 cudnnBatchNormalizationForwardInference(handle, hipTocudnnBatchNormMode(mode), alpha, beta, xDesc, x, yDesc,
                                                         y, bnScaleBiasMeanVarDesc, bnScale, bnBias, estimatedMean, estimatedVariance, epsilon));
-}	
+}
+
+
+//CNTK 2.4 SUPPORT
+
+hipdnnStatus_t hipdnnCreateReduceTensorDescriptor(
+                                hipdnnReduceTensorDescriptor_t          *reduceTensorDesc )
+{
+	return cudnnTohipdnnStatus(
+		cudnnCreateReduceTensorDescriptor(reduceTensorDesc));
+}
+
+hipdnnStatus_t hipdnnSetTensor4dDescriptorEx(
+                                hipdnnTensorDescriptor_t             tensorDesc,
+                                hipdnnDataType_t                     dataType, /* image data type */
+                                int                                 n,        /* number of inputs (batch size) */
+                                int                                 c,        /* number of input feature maps */
+                                int                                 h,        /* height of input section */
+                                int                                 w,        /* width of input section */
+                                int                                 nStride,
+                                int                                 cStride,
+                                int                                 hStride,
+                                int                                 wStride )
+{
+	cudnnDataType_t cuDT;
+	hipdnnStatus_t retVal;
+	retVal = hipTocudnnDataType(dataType, &cuDT);
+	if(retVal == HIPDNN_STATUS_SUCCESS)
+		return cudnnTohipdnnStatus(cudnnSetTensor4dDescriptorEx(tensorDesc, cuDT, n, c, h, w,
+									nStride, cStride, hStride, wStride));
+	return retVal;
+}
+
+hipdnnStatus_t hipdnnSetReduceTensorDescriptor(
+                                hipdnnReduceTensorDescriptor_t           reduceTensorDesc,
+                                hipdnnReduceTensorOp_t                   reduceTensorOp,
+                                hipdnnDataType_t                     reduceTensorCompType,
+                                hipdnnNanPropagation_t               reduceTensorNanOpt,
+                                hipdnnReduceTensorIndices_t          reduceTensorIndices,
+                                hipdnnIndicesType_t                  reduceTensorIndicesType )
+{
+    cudnnReduceTensorOp_t cuRTO;
+    cudnnDataType_t cuDT;
+    cudnnNanPropagation_t cuNP;
+    cudnnReduceTensorIndices_t cuRTI;
+    cudnnIndicesType_t cuIT;
+    hipdnnStatus_t retVal;
+
+    retVal = hipTocudnnReduceTensorOp(reduceTensorOp, &cuRTO);
+    if(retVal == HIPDNN_STATUS_SUCCESS)
+    {
+        retVal = hipTocudnnDataType(reduceTensorCompType, &cuDT);
+        if(retVal == HIPDNN_STATUS_SUCCESS)
+        {
+            retVal = hipTocudnnNanPropagation(reduceTensorNanOpt, &cuNP);
+            if(retVal == HIPDNN_STATUS_SUCCESS)
+            {
+                retVal = hipTocudnnReduceTensorIndices(reduceTensorIndices, &cuRTI);
+                if(retVal == HIPDNN_STATUS_SUCCESS)
+                {
+                    retVal = hipTocudnnIndicesType(reduceTensorIndicesType, &cuIT);
+                    if(retVal == HIPDNN_STATUS_SUCCESS)
+                    {
+                        return cudnnTohipdnnStatus(cudnnSetReduceTensorDescriptor(reduceTensorDesc, cuRTO, cuDT, cuNP, cuRTI, cuIT));
+                    }
+                }
+            }
+        }
+    }
+    return retVal;
+}
+
+hipdnnStatus_t hipdnnGetReductionWorkspaceSize(
+                                hipdnnHandle_t handle,
+                                const cudnnReduceTensorDescriptor_t reduceTensorDesc,
+                                const cudnnTensorDescriptor_t aDesc,
+                                const cudnnTensorDescriptor_t cDesc,
+                                size_t *sizeInBytes )
+{
+    return cudnnTohipdnnStatus(cudnnGetReductionWorkspaceSize(handle, reduceTensorDesc, aDesc, cDesc, sizeInBytes));
+}
+
+hipdnnStatus_t hipdnnReduceTensor(
+                        hipdnnHandle_t                       handle,
+                        const hipdnnReduceTensorDescriptor_t reduceTensorDesc,
+                        void                               *indices,
+                        size_t                              indicesSizeInBytes,
+                        void                               *workspace,
+                        size_t                              workspaceSizeInBytes,
+                        const void                         *alpha,
+                        const hipdnnTensorDescriptor_t       aDesc,
+                        const void                         *A,
+                        const void                         *beta,
+                        const hipdnnTensorDescriptor_t       cDesc,
+                        void                               *C )
+{
+    return cudnnTohipdnnStatus(cudnnReduceTensor(handle, reduceTensorDesc, indices, indicesSizeInBytes, workspace,
+                                                    workspaceSizeInBytes, alpha, aDesc, A, beta, cDesc, C));
+}
+
+hipdnnStatus_t hipdnnDestroyReduceTensorDescriptor(hipdnnReduceTensorDescriptor_t reduceTensorDesc )
+{
+    return cudnnTohipdnnStatus(cudnnDestroyReduceTensorDescriptor(reduceTensorDesc));
+}
+
+
+

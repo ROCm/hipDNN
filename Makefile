@@ -12,9 +12,9 @@ HIPCC = ${HIP_PATH}/bin/hipcc
 
 CPPFLAGS += $(shell $(HIP_PATH)/bin/hipconfig --cpp_config)
 ifeq (${HIP_PLATFORM}, nvcc)
-INCLUDE_DIR = /usr/local/cudnn-6.0/cuda/include/
+INCLUDE_DIR = /usr/local/cudnn-7.0/cuda/include/
 
-LIB_DIR= /usr/local/cudnn-6.0/cuda/lib64/
+LIB_DIR= /usr/local/cudnn-7.0/cuda/lib64/
 
 LDFLAGS = -lm -lcudnn
 
