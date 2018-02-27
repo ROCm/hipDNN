@@ -25,7 +25,7 @@ THE SOFTWARE.
 #include <cudnn.h>
 #include <cuda_runtime.h>
 
-
+#define HIPDNN_BN_MIN_EPSILON CUDNN_BN_MIN_EPSILON
 
 typedef cudnnTensorDescriptor_t hipdnnTensorDescriptor_t;
 

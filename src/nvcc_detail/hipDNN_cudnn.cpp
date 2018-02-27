@@ -1824,7 +1824,6 @@ hipdnnConvolutionBackwardFilter(    hipdnnHandle_t handle,
         hipdnnStatus_t hstatus = hipTocudnnConvolutionBwdFilterAlgo(algo, &cualgo);
         if( hstatus != HIPDNN_STATUS_SUCCESS )
                 return hstatus;
-    std::cout<<"\n Done with algo change bro";
 	//return cudnnTohipdnnStatus(cudnnConvolutionBackwardFilter(handle,alpha,xDesc,x,dyDesc,dy,convDesc,CUDNN_CONVOLUTION_BWD_FILTER_ALGO_0,workSpace,workSpaceSizeInBytes,beta,dwDesc,dw));
 	return cudnnTohipdnnStatus(cudnnConvolutionBackwardFilter(handle,alpha,xDesc,x,dyDesc,dy,convDesc,cualgo,workSpace,workSpaceSizeInBytes,beta,dwDesc,dw));
 }
