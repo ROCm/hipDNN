@@ -8,6 +8,11 @@ ifndef INSTALL_DIR
 	INSTALL_DIR = /opt/rocm/hipDNN
 endif
 
+ifndef MIOPEN_PATH
+       MIOPEN_PATH=/opt/rocm/miopen
+endif
+
+
 HIPCC = ${HIP_PATH}/bin/hipcc
 
 CPPFLAGS += $(shell $(HIP_PATH)/bin/hipconfig --cpp_config)
@@ -24,9 +29,9 @@ SOURCEDIR = src/nvcc_detail
 endif
 
 ifeq (${HIP_PLATFORM}, hcc)
-INCLUDE_DIR=/opt/rocm/miopen/include/
+INCLUDE_DIR=${MIOPEN_PATH}include/
 
-LIB_DIR=/opt/rocm/miopen/lib
+LIB_DIR=${MIOPEN_PATH}lib
 
 LDFLAGS = -lm -lMIOpen
 
