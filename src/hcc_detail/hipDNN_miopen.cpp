@@ -868,6 +868,17 @@ hipdnnCreateConvolutionDescriptor(hipdnnConvolutionDescriptor_t *convDesc)
 {
     return miopenTohipdnnStatus( miopenCreateConvolutionDescriptor(convDesc));
 }
+
+
+//=============================================================================
+
+hipdnnStatus_t
+hipdnnSetConvolutionMathType(hipdnnConvolutionDescriptor_t convDesc,
+                                                       hipdnnMathType_t mathType )
+{
+	return HIPDNN_STATUS_NOT_SUPPORTED;
+}
+
 //=============================================================================
 
 hipdnnStatus_t
@@ -2428,6 +2439,18 @@ hipdnnStatus_t  hipdnnSetRNNDescriptor(hipdnnRNNDescriptor_t rnnDesc,
         return HIPDNN_STATUS_NOT_SUPPORTED;
 }
 
+hipdnnStatus_t hipdnnSetRNNDescriptor_v5(hipdnnRNNDescriptor_t rnnDesc,
+                                                    int hiddenSize,
+                                                    int numLayers,
+                                                    hipdnnDropoutDescriptor_t dropoutDesc, /* Between layers, not between recurrent steps. */
+                                                    hipdnnRNNInputMode_t inputMode,
+                                                    hipdnnDirectionMode_t direction,
+                                                    hipdnnRNNMode_t mode,
+                                                    hipdnnDataType_t dataType)
+{
+        return HIPDNN_STATUS_NOT_SUPPORTED;
+}
+
 hipdnnStatus_t  hipdnnGetRNNWorkspaceSize( hipdnnHandle_t              handle,
                                                     const hipdnnRNNDescriptor_t rnnDesc,  
                                                     const int seqLength, 
@@ -2668,4 +2691,68 @@ hipdnnStatus_t hipdnnDropoutGetStatesSize(hipdnnHandle_t handle, size_t * sizeIn
 hipdnnStatus_t hipdnnDestroyDropoutDescriptor(hipdnnDropoutDescriptor_t dropoutDesc)
 {
 	return HIPDNN_STATUS_NOT_SUPPORTED;
+}
+
+hipdnnStatus_t hipdnnCreateReduceTensorDescriptor(
+                                hipdnnReduceTensorDescriptor_t          *reduceTensorDesc )
+{
+    return HIPDNN_STATUS_NOT_SUPPORTED;
+}
+
+hipdnnStatus_t hipdnnSetTensor4dDescriptorEx(
+                                hipdnnTensorDescriptor_t             tensorDesc,
+                                hipdnnDataType_t                     dataType, /* image data type */
+                                int                                 n,        /* number of inputs (batch size) */
+                                int                                 c,        /* number of input feature maps */
+                                int                                 h,        /* height of input section */
+                                int                                 w,        /* width of input section */
+                                int                                 nStride,
+                                int                                 cStride,
+                                int                                 hStride,
+                                int                                 wStride )
+{
+    return HIPDNN_STATUS_NOT_SUPPORTED;
+}
+        
+hipdnnStatus_t hipdnnSetReduceTensorDescriptor(
+                                hipdnnReduceTensorDescriptor_t           reduceTensorDesc,
+                                hipdnnReduceTensorOp_t                   reduceTensorOp,
+                                hipdnnDataType_t                     reduceTensorCompType,
+                                hipdnnNanPropagation_t               reduceTensorNanOpt,
+                                hipdnnReduceTensorIndices_t          reduceTensorIndices,
+                                hipdnnIndicesType_t                  reduceTensorIndicesType )
+{
+    return HIPDNN_STATUS_NOT_SUPPORTED;
+}
+
+hipdnnStatus_t hipdnnGetReductionWorkspaceSize(
+                                hipdnnHandle_t handle,
+                                const hipdnnReduceTensorDescriptor_t reduceTensorDesc,
+                                const hipdnnTensorDescriptor_t aDesc,
+                                const hipdnnTensorDescriptor_t cDesc,
+                                size_t *sizeInBytes )
+{
+    return HIPDNN_STATUS_NOT_SUPPORTED;
+}
+
+hipdnnStatus_t hipdnnReduceTensor(
+                        hipdnnHandle_t                       handle,
+                        const hipdnnReduceTensorDescriptor_t reduceTensorDesc,
+                        void                               *indices,
+                        size_t                              indicesSizeInBytes,
+                        void                               *workspace,
+                        size_t                              workspaceSizeInBytes,
+                        const void                         *alpha,
+                        const hipdnnTensorDescriptor_t       aDesc,
+                        const void                         *A,
+                        const void                         *beta,
+                        const hipdnnTensorDescriptor_t       cDesc,
+                        void                               *C )
+{
+    return HIPDNN_STATUS_NOT_SUPPORTED;
+}
+
+hipdnnStatus_t hipdnnDestroyReduceTensorDescriptor(hipdnnReduceTensorDescriptor_t reduceTensorDesc )
+{
+    return HIPDNN_STATUS_NOT_SUPPORTED;
 }
