@@ -3427,9 +3427,9 @@ hipdnnStatus_t hipdnnSetReduceTensorDescriptor(
 
 hipdnnStatus_t hipdnnGetReductionWorkspaceSize(
                                 hipdnnHandle_t handle,
-                                const cudnnReduceTensorDescriptor_t reduceTensorDesc,
-                                const cudnnTensorDescriptor_t aDesc,
-                                const cudnnTensorDescriptor_t cDesc,
+                                const hipdnnReduceTensorDescriptor_t reduceTensorDesc,
+                                const hipdnnTensorDescriptor_t aDesc,
+                                const hipdnnTensorDescriptor_t cDesc,
                                 size_t *sizeInBytes )
 {
     return cudnnTohipdnnStatus(cudnnGetReductionWorkspaceSize(handle, reduceTensorDesc, aDesc, cDesc, sizeInBytes));
