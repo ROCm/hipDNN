@@ -60,8 +60,6 @@ hipdnnStatus_t cudnnTohipdnnStatus(cudnnStatus_t  cStatus);
 
 hipdnnStatus_t hipTocudnnDataType(hipdnnDataType_t in, cudnnDataType_t* out);
 
-hipdnnStatus_t hipdnnSetConvolutionMathType(hipdnnConvolutionDescriptor_t convDesc,
-                                                       hipdnnMathType_t mathType );
 
 hipdnnStatus_t  cudnnTohipConvolutionFwdAlgo(cudnnConvolutionFwdAlgo_t  in,
                                             hipdnnConvolutionFwdAlgo_t* out);

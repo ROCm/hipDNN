@@ -1253,9 +1253,9 @@ hipdnnStatus_t hipdnnSetReduceTensorDescriptor(
 
 hipdnnStatus_t hipdnnGetReductionWorkspaceSize(
                                 hipdnnHandle_t handle,
-                                const cudnnReduceTensorDescriptor_t reduceTensorDesc,
-                                const cudnnTensorDescriptor_t aDesc,
-                                const cudnnTensorDescriptor_t cDesc,
+                                const hipdnnReduceTensorDescriptor_t reduceTensorDesc,
+                                const hipdnnTensorDescriptor_t aDesc,
+                                const hipdnnTensorDescriptor_t cDesc,
                                 size_t *sizeInBytes );
 
 
@@ -1275,6 +1275,9 @@ hipdnnStatus_t hipdnnReduceTensor(
 
 
 hipdnnStatus_t hipdnnDestroyReduceTensorDescriptor(hipdnnReduceTensorDescriptor_t reduceTensorDesc );
+
+hipdnnStatus_t hipdnnSetConvolutionMathType(hipdnnConvolutionDescriptor_t convDesc,
+                                                       hipdnnMathType_t mathType );
  
 #ifdef __cplusplus
 }
