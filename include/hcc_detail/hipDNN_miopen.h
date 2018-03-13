@@ -24,8 +24,11 @@ THE SOFTWARE.
 #include <hip/hip_runtime_api.h>
 #include <miopen/miopen.h>
 
+#define HIPDNN_BN_MIN_EPSILON 1e-05
 
 typedef miopenTensorDescriptor_t hipdnnTensorDescriptor_t;
+
+typedef miopenTensorDescriptor_t hipdnnReduceTensorDescriptor_t;
 
 typedef miopenTensorDescriptor_t hipdnnFilterDescriptor_t; 
 
