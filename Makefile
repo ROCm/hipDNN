@@ -31,7 +31,7 @@ endif
 ifeq (${HIP_PLATFORM}, hcc)
 INCLUDE_DIR=${MIOPEN_PATH}/include/
 
-LIB_DIR=${MIOPEN_PATH}lib
+LIB_DIR=${MIOPEN_PATH}/lib
 
 LDFLAGS = -lm -lMIOpen
 
