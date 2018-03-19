@@ -784,32 +784,17 @@ hipdnnStatus_t hipdnnAddTensor(hipdnnHandle_t handle,
                                 const hipdnnTensorDescriptor_t
                                 cDesc, void *C)
 {
-    return HIPDNN_STATUS_NOT_SUPPORTED;
-    
-#ifdef NOTYET
+    miopenTensorOp_t tensorOp = miopenTensorOpAdd;
+    int alpha2 = 0;
 
-
-// suggestion is to set tensorOp to miopenOpTensorAdd.
-
-/* miopenOpTensor This function implements the equation C = op ( alpha1[0] * A, alpha2[0] * B ) + beta[0] * C, given tensors A, B, and C and scaling factors alpha1, alpha2, and beta. The op to use is indicated by the descriptor opTensorDesc. 
-Currently-supported ops are listed by the miopenOpTensorDescriptor_t enum. 
-*/ 
-
-    miopenStatus_t miopenOpTensor(miopenHandle_t handle,
-                                    miopenTensorOp_t tensorOp,
-                                    const void *alpha1,
-                                    const miopenTensorDescriptor_t
-                                    aDesc, const void *A,
-                                    const void *alpha2,
-                                    const miopenTensorDescriptor_t
-                                    bDesc, const void *B,
-                                    const void *beta,
-                                    const miopenTensorDescriptor_t
-                                    cDesc, void *C)
-                                    // For Forward Bias use,
-                                    miopenConvolutionForwardBias
-#endif
-
+    return miopenTohipdnnStatus(miopenOpTensor(handle,
+                                    tensorOp,
+                                    alpha,
+                                    aDesc, A,
+                                    beta,
+                                    cDesc, C,
+                                    &alpha2,
+                                    cDesc, C));
 }
 
 //=============================================================================
@@ -1774,19 +1759,16 @@ hipdnnSetActivationDescriptor(  hipdnnActivationDescriptor_t activationDesc,
                                 hipdnnNanPropagation_t reluNanOpt, 
                                 double reluCeiling)
 {
-    return HIPDNN_STATUS_NOT_SUPPORTED;
+    miopenActivationMode_t mimode;
+    hipTomiopenActivationMode(mode, &mimode);
 
-#ifdef NOTYET
-
-miopenStatus_t
-miopenSetActivationDescriptor(
-const miopenActivationDescriptor_t activDesc,  //HGSOS //NOTYET how can this be const in miopen!!!???
-miopenActivationMode_t mode,
-double activAlpha,
-double activBeta,
-double activPower)
-#endif
-
+    return miopenTohipdnnStatus (
+                miopenSetActivationDescriptor(
+                                              activationDesc,
+                                              mimode,
+                                              0, //Alpha
+                                              0, //Beta
+                                              1)); //Power
 }
 
 //=============================================================================
