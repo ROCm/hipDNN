@@ -29,7 +29,7 @@ SOURCEDIR = src/nvcc_detail
 endif
 
 ifeq (${HIP_PLATFORM}, hcc)
-INCLUDE_DIR=${MIOPEN_PATH}include/
+INCLUDE_DIR=${MIOPEN_PATH}/include/
 
 LIB_DIR=${MIOPEN_PATH}lib
 
