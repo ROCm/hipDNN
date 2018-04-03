@@ -2603,8 +2603,29 @@ hipdnnStatus_t hipdnnSetPoolingNdDescriptor(hipdnnPoolingDescriptor_t poolingDes
 }
 
 const char * hipdnnGetErrorString(hipdnnStatus_t status)
-{
-	return "Not implemented";
+{    
+    switch(status)
+    {
+        case HIPDNN_STATUS_SUCCESS:
+           return "HIPDNN_STATUS_SUCCESS";
+        case HIPDNN_STATUS_NOT_INITIALIZED:
+           return "HIPDNN_STATUS_NOT_INITIALIZED";  
+    case HIPDNN_STATUS_ALLOC_FAILED:
+        return "HIPDNN_STATUS_ALLOC_FAILED";  
+    case HIPDNN_STATUS_BAD_PARAM:
+        return "HIPDNN_STATUS_ALLOC_FAILED";  
+    case HIPDNN_STATUS_INTERNAL_ERROR:
+        return "HIPDNN_STATUS_INTERNAL_ERROR";  
+    case HIPDNN_STATUS_INVALID_VALUE:
+        return "HIPDNN_STATUS_INVALID_VALUE";
+    case HIPDNN_STATUS_EXECUTION_FAILED:
+        return "HIPDNN_STATUS_EXECUTION_FAILED";
+    case HIPDNN_STATUS_NOT_SUPPORTED:
+        return "HIPDNN_STATUS_NOT_SUPPORTED";
+    default:
+        return "HIPDNN_STATUS_INTERNAL_ERROR";
+    }
+ 
 }
 
 hipdnnStatus_t hipdnnSetConvolutionNdDescriptor(
