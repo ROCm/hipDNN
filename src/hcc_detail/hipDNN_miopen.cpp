@@ -1171,14 +1171,13 @@ hipdnnConvolutionForward(   hipdnnHandle_t handle,
        if( retVal != HIPDNN_STATUS_SUCCESS)
           return retVal;
 
-          std::cout<<"miopenConvolutionForwardGetWorkSpaceSize size "<<size<< " requested AlgoCount: "<<requestedAlgoCount<<std::endl;
     
           hipMalloc((void**)&sConvolutionForwardAlgorithmWorkspace, size);
           
           miopenConvFwdAlgorithm_t mialgo;
           std::cout<<"Invoking hipToMopenConvolutionFwdAlgo" <<std::endl;
           std::cout << "Passed algo" <<algo<<std::endl;
-          hipdnnStatus_t retVal = hipTomiopenConvolutionFwdAlgo(algo, &mialgo);
+          retVal = hipTomiopenConvolutionFwdAlgo(algo, &mialgo);
           std::cout<<"Invoked hipToMopenConvolutionFwdAlgo" <<std::endl;
     
           if( retVal != HIPDNN_STATUS_SUCCESS )
@@ -1197,8 +1196,8 @@ hipdnnConvolutionForward(   hipdnnHandle_t handle,
                                             beta,
                                             yDesc,
                                             y,
-                                            workSpace,
-                                            workSpaceSizeInBytes));  
+                                            sConvolutionForwardAlgorithmWorkspace,
+                                            size));  
 
 
     } else {
