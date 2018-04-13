@@ -22,6 +22,7 @@ THE SOFTWARE.
 
 #include <hipDNN.h>
 #include <stdint.h>
+#include <assert.h>
 #include <map>
 
 #ifndef thread_local
@@ -47,6 +48,7 @@ THE SOFTWARE.
 
 //HGSOS not implemented yet because i dont know how to get the device pointers from the desc!!!
 static thread_local void* sConvolutionForwardAlgorithmWorkspace;
+static thread_local void* sConvolutionBackwardDataAlgorithmWorkspace;
 
 //Eventually those can be merged, but currently i will not mix device pointers with host data in the same map...
 //HGSOS static std::map<miopenPoolingDescriptor_t, void *>  sPoolingDescToWorkspace;  ????
@@ -361,10 +363,12 @@ hipdnnStatus_t  hipTomiopenConvolutionFwdAlgo(  hipdnnConvolutionFwdAlgo_t in,
                                                 miopenConvFwdAlgorithm_t* out)
 {
     hipdnnStatus_t retVal = HIPDNN_STATUS_SUCCESS;
+    std::cout<<"input in to switch case "<<in <<std::endl;
     switch(in)
     {
     
     case HIPDNN_CONVOLUTION_FWD_ALGO_GEMM:
+        std::cout <<"Case 0: HIPDNN_CONVOLUTION_FWD_ALGO_GEMM"<<std::endl;
         *out = miopenConvolutionFwdAlgoGEMM;
         break;  
     case HIPDNN_CONVOLUTION_FWD_ALGO_DIRECT:
@@ -376,12 +380,8 @@ hipdnnStatus_t  hipTomiopenConvolutionFwdAlgo(  hipdnnConvolutionFwdAlgo_t in,
     case HIPDNN_CONVOLUTION_FWD_ALGO_WINOGRAD:
         *out = miopenConvolutionFwdAlgoWinograd;
         break;
-    /*case HIPDNN_CONVOLUTION_FWD_ALGO_COUNT:
-    case HIPDNN_CONVOLUTION_FWD_ALGO_IMPLICIT_GEMM:
-    case HIPDNN_CONVOLUTION_FWD_ALGO_IMPLICIT_PRECOMP_GEMM:
-    case HIPDNN_CONVOLUTION_FWD_ALGO_FFT_TILING:
-    case HIPDNN_CONVOLUTION_FWD_ALGO_WINOGRAD_NONFUSED:*/ //TODO: will be added in future
     default:
+        std::cout <<"Case default: HIPDNN_STATUS_NOT_SUPPORTED "<<std::endl;
         retVal = HIPDNN_STATUS_NOT_SUPPORTED;
         break;
     }
@@ -680,7 +680,7 @@ hipdnnStatus_t  ConvolutionBwdFilterPreferenceSupported(    hipdnnConvolutionBwd
 HIPDNN_EXPORT hipdnnStatus_t hipdnnCreate(hipdnnHandle_t *handle)
 {
     sConvolutionForwardAlgorithmWorkspace = 0;
-    
+    sConvolutionBackwardDataAlgorithmWorkspace = 0; 
     return miopenTohipdnnStatus(miopenCreate(handle));
 }
 
@@ -690,6 +690,11 @@ hipdnnStatus_t hipdnnDestroy(hipdnnHandle_t handle)
     {
         hipFree(sConvolutionForwardAlgorithmWorkspace);
         sConvolutionForwardAlgorithmWorkspace = 0;
+    }
+     if( sConvolutionBackwardDataAlgorithmWorkspace != 0 )
+    {
+        hipFree(sConvolutionBackwardDataAlgorithmWorkspace);
+        sConvolutionBackwardDataAlgorithmWorkspace = 0;
     }
     
     return miopenTohipdnnStatus(miopenDestroy(handle));
@@ -1061,6 +1066,12 @@ hipdnnFindConvolutionForwardAlgorithmEx(hipdnnHandle_t handle,
                                         void *workSpace,
                                         size_t workSpaceSizeInBytes)
 {
+   assert(x);
+   assert(w);
+   assert(y);
+#ifdef HIPDNN_DEBUG
+    std::cout<<"Inside hipdnnFindConvolutionForwardAlgorithmEx\n";
+#endif
     size_t size;
     hipdnnStatus_t retVal;
     retVal =  miopenTohipdnnStatus(
@@ -1073,8 +1084,10 @@ hipdnnFindConvolutionForwardAlgorithmEx(hipdnnHandle_t handle,
     if( retVal != HIPDNN_STATUS_SUCCESS)
         return retVal;
 
+    std::cout<<"miopenConvolutionForwardGetWorkSpaceSize size "<<size<< " requested AlgoCount: "<<requestedAlgoCount<<std::endl;
     
     hipMalloc((void**)&sConvolutionForwardAlgorithmWorkspace, size);
+
     return  miopenTohipdnnStatus(
                 miopenFindConvolutionForwardAlgorithm(handle,
                                                     xDesc,
@@ -1091,6 +1104,9 @@ hipdnnFindConvolutionForwardAlgorithmEx(hipdnnHandle_t handle,
                                                     size,
                                                     true //exhaustiveSearch
                                                     ));
+#ifdef HIPDNN_DEBUG
+    std::cout<<"hipdnnFindConvolutionForwardAlgorithmEx exits\n";
+#endif
 }
 
 
@@ -1140,13 +1156,36 @@ hipdnnConvolutionForward(   hipdnnHandle_t handle,
                             const hipdnnTensorDescriptor_t yDesc,
                             void *y)
 {
-    miopenConvFwdAlgorithm_t mialgo;
-    hipdnnStatus_t retVal = hipTomiopenConvolutionFwdAlgo(algo, &mialgo);
-    
-    if( retVal != HIPDNN_STATUS_SUCCESS )
-        return retVal;
 
-    return  miopenTohipdnnStatus(
+    if(workSpace == NULL || workSpaceSizeInBytes == 0) {
+        // Allocate sConvolutionForwardAlgorithmWorkspace to gather work space value
+        size_t size;
+        hipdnnStatus_t retVal;
+        retVal =  miopenTohipdnnStatus(
+                   miopenConvolutionForwardGetWorkSpaceSize(handle,
+                                                            wDesc,  
+                                                            xDesc,  
+                                                            convDesc,
+                                                            yDesc,
+                                                            &size));
+       if( retVal != HIPDNN_STATUS_SUCCESS)
+          return retVal;
+
+          std::cout<<"miopenConvolutionForwardGetWorkSpaceSize size "<<size<< " requested AlgoCount: "<<requestedAlgoCount<<std::endl;
+    
+          hipMalloc((void**)&sConvolutionForwardAlgorithmWorkspace, size);
+          
+          miopenConvFwdAlgorithm_t mialgo;
+          std::cout<<"Invoking hipToMopenConvolutionFwdAlgo" <<std::endl;
+          std::cout << "Passed algo" <<algo<<std::endl;
+          hipdnnStatus_t retVal = hipTomiopenConvolutionFwdAlgo(algo, &mialgo);
+          std::cout<<"Invoked hipToMopenConvolutionFwdAlgo" <<std::endl;
+    
+          if( retVal != HIPDNN_STATUS_SUCCESS )
+             return retVal;
+
+          std::cout<<"Invoking MiopenConvolutionFwd" <<std::endl;
+          return  miopenTohipdnnStatus(
                     miopenConvolutionForward(handle,
                                             alpha,
                                             xDesc,
@@ -1160,6 +1199,36 @@ hipdnnConvolutionForward(   hipdnnHandle_t handle,
                                             y,
                                             workSpace,
                                             workSpaceSizeInBytes));  
+
+
+    } else {
+
+
+      miopenConvFwdAlgorithm_t mialgo;
+      std::cout<<"Invoking hipToMopenConvolutionFwdAlgo" <<std::endl;
+      std::cout << "Passed algo" <<algo<<std::endl;
+      hipdnnStatus_t retVal = hipTomiopenConvolutionFwdAlgo(algo, &mialgo);
+      std::cout<<"Invoked hipToMopenConvolutionFwdAlgo" <<std::endl;
+    
+      if( retVal != HIPDNN_STATUS_SUCCESS )
+        return retVal;
+
+      std::cout<<"Invoking MiopenConvolutionFwd" <<std::endl;
+      return  miopenTohipdnnStatus(
+                    miopenConvolutionForward(handle,
+                                            alpha,
+                                            xDesc,
+                                            x,
+                                            wDesc,
+                                            w,
+                                            convDesc,
+                                            mialgo,
+                                            beta,
+                                            yDesc,
+                                            y,
+                                            workSpace,
+                                            workSpaceSizeInBytes));  
+   }
 
 }
 
@@ -1401,6 +1470,24 @@ hipdnnFindConvolutionBackwardDataAlgorithmEx(hipdnnHandle_t handle,
 
 {
 
+    std::cout<<"Inside hipdnnFindConvolutionBackwardDataAlgorithmEx\n";
+    size_t size;
+    hipdnnStatus_t retVal;
+    retVal =  miopenTohipdnnStatus(
+                   miopenConvolutionBackwardDataGetWorkSpaceSize(handle,
+                                                            dyDesc,  
+                                                            wDesc,  
+                                                            convDesc,
+                                                            dxDesc,
+                                                            &size));
+    if( retVal != HIPDNN_STATUS_SUCCESS)
+        return retVal;
+
+    std::cout<<"miopenConvolutionBackwardGetWorkSpaceSize size "<<size<< " requested AlgoCount: "<<requestedAlgoCount<<std::endl;
+    
+    hipMalloc((void**)&sConvolutionBackwardDataAlgorithmWorkspace, size);
+
+ 
     return  miopenTohipdnnStatus(
                 miopenFindConvolutionBackwardDataAlgorithm( handle,
                 dyDesc,
@@ -1413,8 +1500,8 @@ hipdnnFindConvolutionBackwardDataAlgorithmEx(hipdnnHandle_t handle,
                 requestedAlgoCount,
                 returnedAlgoCount,
                 perfResults,
-                workSpace,
-                workSpaceSizeInBytes,
+                sConvolutionBackwardDataAlgorithmWorkspace,
+                size,
                 true // exhaustiveSearch
                 ));
 }
@@ -1443,6 +1530,16 @@ hipdnnConvolutionBackwardData(  hipdnnHandle_t handle,
     if( retVal != HIPDNN_STATUS_SUCCESS )
         return retVal;
 
+    std::cout << "Inside hipdnnConvolutionBackward Data"<<std::endl;
+
+    float a = *(static_cast<const float*>(alpha));
+    float b = *(static_cast<const float*>(beta));
+
+    
+
+    std::cout << "alpha and beta values are " << a << " and " << b<<std::endl;
+    std::cout << "Invoking miopenConvolutionBackwardData " <<std::endl;
+
     return  miopenTohipdnnStatus(
                     miopenConvolutionBackwardData(  handle,
                                                     alpha,
@@ -1457,6 +1554,7 @@ hipdnnConvolutionBackwardData(  hipdnnHandle_t handle,
                                                     dx,
                                                     workSpace,
                                                     workSpaceSizeInBytes));
+    std::cout << "Invoked miopenConvolutionBackwardData " <<std::endl;
 }
 
 //=============================================================================
@@ -2639,6 +2737,7 @@ hipdnnStatus_t hipdnnSetConvolutionNdDescriptor(
 {
         if(arrayLength == 2)
 	{
+                std::cout <<"Inside hipdnnSetConvolutionNdDescriptor arraylength 2"<<std::endl;
 		int pad_h, pad_w, u, v;
 		pad_h = padA[0];
 		pad_w = padA[1];
@@ -2648,8 +2747,10 @@ hipdnnStatus_t hipdnnSetConvolutionNdDescriptor(
 		retVal = miopenTohipdnnStatus(miopenInitConvolutionDescriptor(convDesc, miopenConvolution, pad_h, pad_w, u, v, 1, 1));
 		return retVal;	
 	}
-	else
+	else {
+                std::cout <<"Inside hipdnnSetConvolutionNdDescriptor returns HIPDNN_STATUS_NOT_SUPPORTED"<<std::endl;
         	return HIPDNN_STATUS_NOT_SUPPORTED;
+        }
 }
 
 hipdnnStatus_t hipdnnBatchNormalizationForwardInference(
