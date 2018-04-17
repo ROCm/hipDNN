@@ -1477,16 +1477,50 @@ hipdnnConvolutionBackwardFilter(    hipdnnHandle_t handle,
 {
     if (workSpaceSizeInBytes == 0 || workSpace == NULL) {
 
+      size_t size;
+      hipdnnStatus_t retVal;
+      retVal =  miopenTohipdnnStatus(
+			   miopenConvolutionBackwardWeightsGetWorkSpaceSize(handle,
+								    dyDesc,  
+								    xDesc,  
+								    convDesc,
+								    dwDesc,
+								    &size));
+   
+       if( retVal != HIPDNN_STATUS_SUCCESS)
+           return retVal;
 
-    } 
+       hipMalloc((void**)&sConvolutionBackwardFilterAlgorithmWorkspace, size);
+          
+     
+       miopenConvBwdWeightsAlgorithm_t mialgo;
+       retVal = hipTomiopenConvolutionBwdFilterAlgo(algo, &mialgo);
+       
+       return  miopenTohipdnnStatus(
+                miopenConvolutionBackwardWeights(   handle,
+                                                    alpha,
+                                                    dyDesc,
+                                                    dy,
+                                                    xDesc,
+                                                    x,
+                                                    convDesc,
+                                                    mialgo,
+                                                    beta,
+                                                    dwDesc,
+                                                    dw,
+                                                    sConvolutionBackwardFilterAlgorithmWorkspace,
+                                                    size));
+
+
+    } else {
                                             
-    miopenConvBwdWeightsAlgorithm_t mialgo;
-    hipdnnStatus_t retVal = hipTomiopenConvolutionBwdFilterAlgo(algo, &mialgo);
+        miopenConvBwdWeightsAlgorithm_t mialgo;
+        hipdnnStatus_t retVal = hipTomiopenConvolutionBwdFilterAlgo(algo, &mialgo);
     
-    if( retVal != HIPDNN_STATUS_SUCCESS )
-        return retVal;
+        if( retVal != HIPDNN_STATUS_SUCCESS )
+            return retVal;
     
-    return  miopenTohipdnnStatus(
+        return  miopenTohipdnnStatus(
                 miopenConvolutionBackwardWeights(   handle,
                                                     alpha,
                                                     dyDesc,
@@ -1500,6 +1534,8 @@ hipdnnConvolutionBackwardFilter(    hipdnnHandle_t handle,
                                                     dw,
                                                     workSpace,
                                                     workSpaceSizeInBytes));
+     }
+
 }
 
 //=============================================================================
