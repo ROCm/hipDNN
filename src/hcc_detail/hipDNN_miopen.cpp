@@ -2895,7 +2895,25 @@ hipdnnStatus_t hipdnnSetPoolingNdDescriptor(hipdnnPoolingDescriptor_t poolingDes
                                             const int paddingA[],
                                             const int strideA[] )
 {
-	return HIPDNN_STATUS_NOT_SUPPORTED;
+        std::cout<<"Invoking hipdnnSetPoolingNDDescriptor with nbDims :"<<nbDims<<std::endl;
+        if (nbDims == 2) {
+           // 2D Pooling
+           hipdnnStatus_t retVal = HIPDNN_STATUS_SUCCESS;
+           int windowHeight =  windowDimA[0];
+           int windowWidth  =  windowDimA[1];
+           int pad_h = paddingA[0];
+           int pad_w = paddingA[1];
+           int u = strideA[0];
+           int v = strideA[1];
+           miopenPoolingMode_t* pooling_mode;
+           retVal = hipTomiopenPoolingMode(mode, pooling_mode);
+           if (retVal != HIPDNN_STATUS_SUCCESS)
+               return retVal;
+           return miopenTohipdnnStatus(miopenSet2dPoolingDescriptor(poolingDesc, *pooling_mode, windowHeight, windowWidth, pad_h, pad_w, u, v));          
+        } else {
+          std::cout<<"Higher dimensions > 2 Pooling is not supported"<<std::endl;
+	  return HIPDNN_STATUS_NOT_SUPPORTED;
+        }
 }
 
 const char * hipdnnGetErrorString(hipdnnStatus_t status)
