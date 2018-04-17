@@ -1089,9 +1089,7 @@ hipdnnFindConvolutionForwardAlgorithmEx(hipdnnHandle_t handle,
     assert(w);
     assert(y);
     if (workSpace == NULL || workSpaceSizeInBytes == 0) {
-#ifdef HIPDNN_DEBUG
             std::cout<<"Inside hipdnnFindConvolutionForwardAlgorithmEx\n";
-#endif
 	    size_t size;
 	    hipdnnStatus_t retVal;
 	    retVal =  miopenTohipdnnStatus(
@@ -1108,7 +1106,11 @@ hipdnnFindConvolutionForwardAlgorithmEx(hipdnnHandle_t handle,
 	    
 	    hipMalloc((void**)&sConvolutionForwardAlgorithmWorkspace, size);
 
-	    return  miopenTohipdnnStatus(
+            miopenConvAlgoPerf_t miopenPerfResults[1];
+
+ 
+            printf("Size of miopenPerfResults %d\n", sizeof(miopenPerfResults));
+	    retVal = miopenTohipdnnStatus(
 			miopenFindConvolutionForwardAlgorithm(handle,
 							    xDesc,
 							    x,
@@ -1119,16 +1121,25 @@ hipdnnFindConvolutionForwardAlgorithmEx(hipdnnHandle_t handle,
 							    y,
 							    requestedAlgoCount,
 							    returnedAlgoCount,
-							    perfResults,
+							    miopenPerfResults,
 							    sConvolutionForwardAlgorithmWorkspace,
 							    size,
 							    true //exhaustiveSearch
 							    ));
-#ifdef HIPDNN_DEBUG
+	    if( retVal != HIPDNN_STATUS_SUCCESS)
+		return retVal;
+
+           miopenTohipConvolutionFwdAlgo(miopenPerfResults->fwd_algo, &(perfResults->algo)); 
+
+           return retVal;
 	    std::cout<<"hipdnnFindConvolutionForwardAlgorithmEx exits\n";
-#endif
 	} else {
-	    return  miopenTohipdnnStatus(
+
+            hipdnnStatus_t retVal = HIPDNN_STATUS_SUCCESS;
+
+            miopenConvAlgoPerf_t miopenPerfResults[1];
+
+	    retVal = miopenTohipdnnStatus(
 			miopenFindConvolutionForwardAlgorithm(handle,
 							    xDesc,
 							    x,
@@ -1139,11 +1150,15 @@ hipdnnFindConvolutionForwardAlgorithmEx(hipdnnHandle_t handle,
 							    y,
 							    requestedAlgoCount,
 							    returnedAlgoCount,
-							    perfResults,
+							    miopenPerfResults,
 							    workSpace,
 							    workSpaceSizeInBytes,
 							    true //exhaustiveSearch
 							    ));
+
+           miopenTohipConvolutionFwdAlgo(miopenPerfResults->fwd_algo, &(perfResults->algo)); 
+
+           return retVal;
         }
 }
 
@@ -1366,10 +1381,10 @@ hipdnnFindConvolutionBackwardFilterAlgorithmEx( hipdnnHandle_t handle,
 	    
 	   hipMalloc((void**)&sConvolutionBackwardFilterAlgorithmWorkspace, size);
 
-	 
-	 
+            miopenConvAlgoPerf_t miopenPerfResults[1];
+
 						    
-	    return  miopenTohipdnnStatus(
+	    retVal = miopenTohipdnnStatus(
 			miopenFindConvolutionBackwardWeightsAlgorithm(  handle,
 									dyDesc,
 									dy,
@@ -1380,13 +1395,21 @@ hipdnnFindConvolutionBackwardFilterAlgorithmEx( hipdnnHandle_t handle,
 									dw,
 									requestedAlgoCount,
 									returnedAlgoCount,
-									perfResults,
+									miopenPerfResults,
 									sConvolutionBackwardFilterAlgorithmWorkspace,
 									size,
 									true //exhaustiveSearch
 									)); 
+           miopenTohipConvolutionBwdFilterAlgo(miopenPerfResults->bwd_weights_algo, &(perfResults->algo)); 
+	 
+           return retVal;
+
     } else {
-	    return  miopenTohipdnnStatus(
+            hipdnnStatus_t retVal = HIPDNN_STATUS_SUCCESS;
+
+            miopenConvAlgoPerf_t* miopenPerfResults = new miopenConvAlgoPerf_t;
+
+	    retVal =  miopenTohipdnnStatus(
 			miopenFindConvolutionBackwardWeightsAlgorithm(  handle,
 									dyDesc,
 									dy,
@@ -1397,11 +1420,15 @@ hipdnnFindConvolutionBackwardFilterAlgorithmEx( hipdnnHandle_t handle,
 									dw,
 									requestedAlgoCount,
 									returnedAlgoCount,
-									perfResults,
+									miopenPerfResults,
 									workSpace,
 									workSpaceSizeInBytes,
 									true //exhaustiveSearch
 									)); 
+            
+            miopenTohipConvolutionBwdFilterAlgo(miopenPerfResults->bwd_weights_algo, &(perfResults->algo)); 
+            
+            return retVal;
 
     }
 
@@ -1569,9 +1596,10 @@ hipdnnFindConvolutionBackwardDataAlgorithmEx(hipdnnHandle_t handle,
     std::cout<<"miopenConvolutionBackwardGetWorkSpaceSize size "<<size<< " requested AlgoCount: "<<requestedAlgoCount<<std::endl;
     
     hipMalloc((void**)&sConvolutionBackwardDataAlgorithmWorkspace, size);
-
+    
+    miopenConvAlgoPerf_t  miopenPerfResults[1];
  
-    return  miopenTohipdnnStatus(
+    retVal =  miopenTohipdnnStatus(
                 miopenFindConvolutionBackwardDataAlgorithm( handle,
                 dyDesc,
                 dy,
@@ -1582,11 +1610,15 @@ hipdnnFindConvolutionBackwardDataAlgorithmEx(hipdnnHandle_t handle,
                 dx,
                 requestedAlgoCount,
                 returnedAlgoCount,
-                perfResults,
+                miopenPerfResults,
                 sConvolutionBackwardDataAlgorithmWorkspace,
                 size,
                 true // exhaustiveSearch
                 ));
+
+    miopenTohipConvolutionBwdDataAlgo(miopenPerfResults->bwd_data_algo, &(perfResults->algo)); 
+
+    return retVal;
 }
 
 //=============================================================================

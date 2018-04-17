@@ -26,6 +26,33 @@ THE SOFTWARE.
 
 #define HIPDNN_BN_MIN_EPSILON 1e-05
 
+// Defining structure for containing performance and algorithm results
+
+struct hipdnnConvolutionFwdAlgoPerf_t {
+   hipdnnConvolutionFwdAlgo_t algo;
+   hipdnnStatus_t status;
+   float time;
+   size_t memory;
+   long reserved[3];
+};
+
+struct hipdnnConvolutionBwdDataAlgoPerf_t {
+   hipdnnConvolutionBwdDataAlgo_t algo;
+   hipdnnStatus_t status;
+   float time;
+   size_t memory;
+   long reserved[3];
+};
+struct hipdnnConvolutionBwdFilterAlgoPerf_t {
+   hipdnnConvolutionBwdFilterAlgo_t algo;
+   hipdnnStatus_t status;
+   float time;
+   size_t memory;
+   long reserved[3];
+};
+
+
+
 typedef miopenTensorDescriptor_t hipdnnTensorDescriptor_t;
 
 typedef miopenTensorDescriptor_t hipdnnReduceTensorDescriptor_t;
@@ -40,9 +67,6 @@ typedef miopenActivationDescriptor_t hipdnnActivationDescriptor_t;
 
 typedef miopenPoolingDescriptor_t hipdnnPoolingDescriptor_t;
 
-typedef miopenConvAlgoPerf_t hipdnnConvolutionFwdAlgoPerf_t;
-typedef miopenConvAlgoPerf_t hipdnnConvolutionBwdDataAlgoPerf_t;
-typedef miopenConvAlgoPerf_t hipdnnConvolutionBwdFilterAlgoPerf_t;
 
 //HGSOS cudnn makes a distinction 
 typedef miopenTensorOp_t hipdnnOpTensorDescriptor_t;
