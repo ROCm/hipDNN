@@ -2905,11 +2905,11 @@ hipdnnStatus_t hipdnnSetPoolingNdDescriptor(hipdnnPoolingDescriptor_t poolingDes
            int pad_w = paddingA[1];
            int u = strideA[0];
            int v = strideA[1];
-           miopenPoolingMode_t* pooling_mode;
-           retVal = hipTomiopenPoolingMode(mode, pooling_mode);
+           miopenPoolingMode_t pooling_mode;
+           retVal = hipTomiopenPoolingMode(mode, &pooling_mode);
            if (retVal != HIPDNN_STATUS_SUCCESS)
                return retVal;
-           return miopenTohipdnnStatus(miopenSet2dPoolingDescriptor(poolingDesc, *pooling_mode, windowHeight, windowWidth, pad_h, pad_w, u, v));          
+           return miopenTohipdnnStatus(miopenSet2dPoolingDescriptor(poolingDesc, pooling_mode, windowHeight, windowWidth, pad_h, pad_w, u, v));          
         } else {
           std::cout<<"Higher dimensions > 2 Pooling is not supported"<<std::endl;
 	  return HIPDNN_STATUS_NOT_SUPPORTED;
