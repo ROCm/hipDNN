@@ -1814,7 +1814,7 @@ hipdnnStatus_t hipdnnFindConvolutionBackwardDataAlgorithmEx(
 #endif
     }
 
-    for (int i = 0; i < 4; i++)
+    for (int i = 0; i < *returnedAlgoCount; i++)
     {
         retVal = miopenTohipConvolutionBwdDataAlgo(
                     miopenPerfResults[i].bwd_data_algo,
@@ -1834,6 +1834,7 @@ hipdnnStatus_t hipdnnFindConvolutionBackwardDataAlgorithmEx(
         }
     }
 
+    delete [] miopenPerfResults;
 //HGSOS    workSpace = sConvolutionBackwardDataAlgorithmWorkspace;
 
     return retVal;
