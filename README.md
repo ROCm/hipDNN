@@ -8,7 +8,7 @@ This is work in progress. Current status:
 + Search and replace CUDNN with HIPDNN (typically for enumerated types).
 + Include hipDNN.h, and link the DSO hipDNN.so  (currently you need to compile the scr file for the platform, no DSO yet).
 
-2. There are known issues in MIOpen that need to be addressed, not only for hipDNN, but in general. This problematic code is currently disabled in hipDNN as it would not compile. You can find such code by searching the string NOTYET. Generally speaking, issues fall into the following categories: 
+3. There are known issues in MIOpen that need to be addressed, not only for hipDNN, but in general. This problematic code is currently disabled in hipDNN as it would not compile. You can find such code by searching the string NOTYET. Generally speaking, issues fall into the following categories: 
 
 + Some miopen API calls define descriptors as "const" while they shouldn't be, or do not define them as const when const is appropriate.
 
@@ -17,3 +17,13 @@ This is work in progress. Current status:
 + miopen provides the "Ex" version of some cudnn calls. This would be fine, except miopen does not export a way to discover the device pointer from the descriptor (to be added).
 
 3. There are known thigns but need to be improved besides MIOpen. Some of those are noted as HGSOS, mostly "notes to self" that should disappear over time.
+
+
+
+Debug logging is supported in the MIOpen implementation, and is deeply enabled by default. It is controlled by DEBUG_CURRENT_CALL_STACK_LEVEL.
+
+to build:
+make HIP_PATH=/your/path/to/hip/if/not/standard MIOPEN_PATH=/your/path/to/miopen/if/not/standard
+
+The default installation is at /opr/rocm/hipDNN. 
+
