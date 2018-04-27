@@ -1,29 +1,29 @@
 # hipDNN
 
-This is work in progress. Current status:
-1. The makefiles are still in amateur state. You can expect to edit them to your particular configuration if you want to compile this code. This needs to be improved significantly (help is welcome!)
+AMD's library (in beta stage) that supports a layer of abstraction around cuDNN and AMD's MIOpen.
 
-2. There is no hipify, although hipification is trivial enough.  Main steps:
+## Prerequisites
+
+1. [HIP](https://github.com/ROCm-Developer-Tools/HIP)
+2. On AMD platforms, [MIOpen](https://github.com/ROCmSoftwarePlatform/MIOpen)
+3. On Nvidia platforms, a functioning cuDNN installation.
+
+## Build instructions
+1. make HIP_PATH=/your/path/to/hip/if/not/standard MIOPEN_PATH=/your/path/to/miopen/if/not/standard
+2. The default installation path of the shared linrary is at /opr/rocm/hipDNN.  
+
+## General description 
+
+hipDNN defines a marshalling API between MIOpen-hipDNN, and cuDNN-hipDNN. Client programs only need to use the hipDNN API, and that will work on both nvidia and AMD platforms. On AMD(NVIDIA) platforms, the hipDNN datastructures are internally converted to appropriate MIOpen(cuDNN) datastructures, and the underlying library calls are made on behalf of the client. Results produced by those calls are mashalled back to hipDNN datastructures, so the calling program does not ever have to deal with the specific APIS.
+
+hipDNN supports a very rich debugging model, which currently can be enabled at compile time by setting the DEBUG_CURRENT_CALL_STACK_LEVEL macro (currently supported on AMD platforms only). If enabled, the inputs of function calls, as well as the results (typically return by reference) are displayed to stdout.  
+
+In order to hipify a cuDNN program, it just suffices to
 + Search and replace cudnn with hipdnn (typically for function calls and descriptors).
 + Search and replace CUDNN with HIPDNN (typically for enumerated types).
-+ Include hipDNN.h, and link the DSO hipDNN.so  (currently you need to compile the scr file for the platform, no DSO yet).
++ Include hipDNN.h, and link the DSO hipDNN.so
 
-3. There are known issues in MIOpen that need to be addressed, not only for hipDNN, but in general. This problematic code is currently disabled in hipDNN as it would not compile. You can find such code by searching the string NOTYET. Generally speaking, issues fall into the following categories: 
-
-+ Some miopen API calls define descriptors as "const" while they shouldn't be, or do not define them as const when const is appropriate.
-
-+ Some miopen API calls do not treat workspace well, for example they are missing workspaceSize.
-
-+ miopen provides the "Ex" version of some cudnn calls. This would be fine, except miopen does not export a way to discover the device pointer from the descriptor (to be added).
-
-3. There are known thigns but need to be improved besides MIOpen. Some of those are noted as HGSOS, mostly "notes to self" that should disappear over time.
+HIPDNN, and HIP overall, operate at compile time, i.e. you compile HIP programs for a particular platform. However hipDNN does not require the client programs to explicitly add platform specific header files and library paths to the makefiles, this is handled by hipDNN transparently.
 
 
-
-Debug logging is supported in the MIOpen implementation, and is deeply enabled by default. It is controlled by DEBUG_CURRENT_CALL_STACK_LEVEL.
-
-to build:
-make HIP_PATH=/your/path/to/hip/if/not/standard MIOPEN_PATH=/your/path/to/miopen/if/not/standard
-
-The default installation is at /opr/rocm/hipDNN. 
 
