@@ -1311,10 +1311,15 @@ hipdnnStatus_t hipdnnFindConvolutionForwardAlgorithmEx(hipdnnHandle_t handle,
     assert(x);
     assert(w);
     assert(y);
+
+    hipdnnStatus_t retVal = HIPDNN_STATUS_EXECUTION_FAILED;
+
+    miopenConvAlgoPerf_t* miopenPerfResults =
+                            new miopenConvAlgoPerf_t[requestedAlgoCount];
+
     if (workSpace == NULL || workSpaceSizeInBytes == 0)
     {
         size_t size;
-        hipdnnStatus_t retVal;
         retVal = miopenTohipdnnStatus(
                 miopenConvolutionForwardGetWorkSpaceSize(handle, wDesc,
                         xDesc, convDesc, yDesc, &size));
@@ -1338,8 +1343,6 @@ hipdnnStatus_t hipdnnFindConvolutionForwardAlgorithmEx(hipdnnHandle_t handle,
         << " size = " << size << std::endl HIPDNNFLUSH;
 #endif
 
-        miopenConvAlgoPerf_t miopenPerfResults[1];
-
 #if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_CALLS
         std::cout << "Size of miopenPerfResults " << sizeof(miopenPerfResults)
         << std::endl HIPDNNFLUSH;
@@ -1359,14 +1362,10 @@ hipdnnStatus_t hipdnnFindConvolutionForwardAlgorithmEx(hipdnnHandle_t handle,
             return retVal;
         }
 
-        miopenTohipConvolutionFwdAlgo(miopenPerfResults->fwd_algo,
-                &(perfResults->algo));
 
 #if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_CALLS
         std::cout << "HIPDNN EXIT FindConvolutionForwardAlgorithmEx: " << retVal << std::endl HIPDNNFLUSH;
 #endif
-
-        return retVal;
 
     }
     else
@@ -1378,8 +1377,6 @@ hipdnnStatus_t hipdnnFindConvolutionForwardAlgorithmEx(hipdnnHandle_t handle,
 #endif
 
         hipdnnStatus_t retVal = HIPDNN_STATUS_SUCCESS;
-
-        miopenConvAlgoPerf_t miopenPerfResults[1];
 
         retVal = miopenTohipdnnStatus(
                 miopenFindConvolutionForwardAlgorithm(handle, xDesc, x,
@@ -1396,8 +1393,16 @@ hipdnnStatus_t hipdnnFindConvolutionForwardAlgorithmEx(hipdnnHandle_t handle,
         std::cout << "HIPDNN EXIT FindConvolutionForwardAlgorithmEx: retval=" << retVal << ", WS size=" << workSpaceSizeInBytes << ", algo =" << perfResults->algo << std::endl HIPDNNFLUSH;
 #endif
 
-        return retVal;
     }
+
+    for(int i = 0; i < requestedAlgoCount; i++)
+    {
+        miopenTohipConvolutionFwdAlgo(  miopenPerfResults[i].fwd_algo,
+                                        &(perfResults[i].algo));
+    }
+
+    delete [] miopenPerfResults;
+    return retVal;
 }
 
 //=========================================!
@@ -1615,6 +1620,12 @@ hipdnnStatus_t hipdnnFindConvolutionBackwardFilterAlgorithmEx(
     assert(dy);
     assert(dw);
 
+
+    miopenConvAlgoPerf_t* miopenPerfResults = new miopenConvAlgoPerf_t[requestedAlgoCount];
+    hipdnnStatus_t retVal = HIPDNN_STATUS_EXECUTION_FAILED;
+
+try
+{
     if (workSpace == NULL || workSpaceSizeInBytes == 0)
     {
 
@@ -1624,7 +1635,6 @@ hipdnnStatus_t hipdnnFindConvolutionBackwardFilterAlgorithmEx(
 #endif
 
         size_t size;
-        hipdnnStatus_t retVal;
         retVal = miopenTohipdnnStatus(
                 miopenConvolutionBackwardWeightsGetWorkSpaceSize(handle, dyDesc,
                         xDesc, convDesc, dwDesc, &size));
@@ -1646,25 +1656,16 @@ hipdnnStatus_t hipdnnFindConvolutionBackwardFilterAlgorithmEx(
                 << " size = " << size << std::endl HIPDNNFLUSH;
 #endif
 
-        miopenConvAlgoPerf_t miopenPerfResults[1];
-
         retVal = miopenTohipdnnStatus(
                 miopenFindConvolutionBackwardWeightsAlgorithm(handle, dyDesc,
                         dy, xDesc, x, convDesc, dwDesc, dw, requestedAlgoCount,
                         returnedAlgoCount, miopenPerfResults,
                         sConvolutionBackwardFilterAlgorithmWorkspace, size, true //exhaustiveSearch
                         ));
-        miopenTohipConvolutionBwdFilterAlgo(miopenPerfResults->bwd_weights_algo,
-                &(perfResults->algo));
-
-        return retVal;
 
     }
     else
     {
-        hipdnnStatus_t retVal = HIPDNN_STATUS_SUCCESS;
-
-        miopenConvAlgoPerf_t* miopenPerfResults = new miopenConvAlgoPerf_t;
 
         retVal = miopenTohipdnnStatus(
                 miopenFindConvolutionBackwardWeightsAlgorithm(handle, dyDesc,
@@ -1672,18 +1673,27 @@ hipdnnStatus_t hipdnnFindConvolutionBackwardFilterAlgorithmEx(
                         returnedAlgoCount, miopenPerfResults, workSpace,
                         workSpaceSizeInBytes, true //exhaustiveSearch
                         ));
-
-        miopenTohipConvolutionBwdFilterAlgo(miopenPerfResults->bwd_weights_algo,
-                &(perfResults->algo));
-
-        return retVal;
-
     }
+}
+catch(std::exception& e)
+{
+    std::cout << "EXCEPTION: hipdnnFindConvolutionBackwardFilterAlgorithmEx"
+              << e.what() << std::endl HIPDNNFLUSH
+}
+
+for(int i = 0; i < requestedAlgoCount; i++)
+{
+    miopenTohipConvolutionBwdFilterAlgo(  miopenPerfResults[i].bwd_weights_algo,
+                                          &(perfResults[i].algo));
+}
+
+delete [] miopenPerfResults;
 
 #if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_CALLS
     std::cout << "EXIT: hipdnnFindConvolutionBackwardFilterAlgorithmEx\n";
 #endif
 
+    return retVal;
 }
 
 //=================HGSOS======================!
@@ -1932,6 +1942,10 @@ hipdnnStatus_t hipdnnFindConvolutionBackwardDataAlgorithmEx(
 
     size_t size;
     hipdnnStatus_t retVal;
+
+    miopenConvAlgoPerf_t* miopenPerfResults =
+                            new miopenConvAlgoPerf_t[requestedAlgoCount];
+
     try
     {
         retVal = miopenTohipdnnStatus(
@@ -1975,9 +1989,6 @@ hipdnnStatus_t hipdnnFindConvolutionBackwardDataAlgorithmEx(
         << " size = " << size << std::endl HIPDNNFLUSH;
 #endif
 
-        miopenConvAlgoPerf_t* miopenPerfResults =
-        new miopenConvAlgoPerf_t[requestedAlgoCount];
-
         retVal =
         miopenTohipdnnStatus(
                 miopenFindConvolutionBackwardDataAlgorithm(
@@ -1990,14 +2001,6 @@ hipdnnStatus_t hipdnnFindConvolutionBackwardDataAlgorithmEx(
                         sConvolutionBackwardDataAlgorithmWorkspace,
                         size, true // exhaustiveSearch
                 ));
-
-        for (int i = 0; i < *returnedAlgoCount; i++)
-        {
-            std::cout << "miopenPerfResults:" << " algo = "
-            << miopenPerfResults[i].bwd_data_algo << " time = "
-            << miopenPerfResults[i].time << " memory = "
-            << miopenPerfResults[i].memory << std::endl HIPDNNFLUSH;
-        }
 
         if (retVal != HIPDNN_STATUS_SUCCESS)
         {
@@ -2016,29 +2019,7 @@ hipdnnStatus_t hipdnnFindConvolutionBackwardDataAlgorithmEx(
 #endif
         }
 
-        for (int i = 0; i < *returnedAlgoCount; i++)
-        {
-            retVal = miopenTohipConvolutionBwdDataAlgo(
-                    miopenPerfResults[i].bwd_data_algo,
-                    &(perfResults[i].algo));
 
-            if (retVal != HIPDNN_STATUS_SUCCESS)
-            {
-#if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_ERRORS
-                std::cout << "...failed miopenTohipConvolutionBwdDataAlgo"
-                << std::endl HIPDNNFLUSH;
-#endif
-            }
-            else
-            {
-#if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_CALLS
-                std::cout << "...miopenTohipConvolutionBwdDataAlgo OK"
-                << std::endl HIPDNNFLUSH;
-#endif
-            }
-        }
-
-        delete[] miopenPerfResults;
 //HGSOS    workSpace = sConvolutionBackwardDataAlgorithmWorkspace;
     }
     catch (std::exception& e)
@@ -2046,6 +2027,33 @@ hipdnnStatus_t hipdnnFindConvolutionBackwardDataAlgorithmEx(
         std::cout << "Exception in hipdnnGetConvolutionBackwardDataWorkspaceSize: "
         << e.what() << std::endl HIPDNNFLUSH;
     }
+
+    if (retVal == HIPDNN_STATUS_SUCCESS)
+    {
+        for (int i = 0; i < *returnedAlgoCount; i++)
+        {
+            retVal = miopenTohipConvolutionBwdDataAlgo(
+                            miopenPerfResults[i].bwd_data_algo,
+                            &(perfResults[i].algo));
+
+            if (retVal != HIPDNN_STATUS_SUCCESS)
+            {
+    #if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_ERRORS
+                std::cout << "...failed miopenTohipConvolutionBwdDataAlgo"
+                << std::endl HIPDNNFLUSH;
+    #endif
+            }
+            else
+            {
+    #if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_CALLS
+                std::cout << "...miopenTohipConvolutionBwdDataAlgo OK"
+                << std::endl HIPDNNFLUSH;
+    #endif
+            }
+        }
+    }
+    delete[] miopenPerfResults;
+
     return retVal;
 }
 
