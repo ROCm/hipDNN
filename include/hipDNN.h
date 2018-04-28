@@ -579,15 +579,18 @@ HIPDNN_EXPORT hipdnnStatus_t hipdnnPoolingBackward(hipdnnHandle_t handle,
 HIPDNN_EXPORT hipdnnStatus_t hipdnnCreateActivationDescriptor(
 		hipdnnActivationDescriptor_t *activationDesc);
 
+// cudnn uses only one parameter. MIOpen supports three.
+// the first parameter reluCeilingOrAlpha is the common denominator.
+// unless you use MIOpen specific mode, you can pass zeros for activBeta and activExp
 HIPDNN_EXPORT hipdnnStatus_t hipdnnSetActivationDescriptor(
 		hipdnnActivationDescriptor_t activationDesc, //HGSOS const
 		hipdnnActivationMode_t mode, hipdnnNanPropagation_t reluNanOpt,
-		double reluCeiling);
+		double reluCeilingOrAlpha,double activBeta, double activExp);
 
 HIPDNN_EXPORT hipdnnStatus_t hipdnnGetActivationDescriptor(
 		const hipdnnActivationDescriptor_t activationDesc,
 		hipdnnActivationMode_t *mode, hipdnnNanPropagation_t *reluNanOpt,
-		double* reluCeiling);
+		double* reluCeilingOrAlpha, double* activBeta, double* activExp);
 
 HIPDNN_EXPORT hipdnnStatus_t hipdnnDestroyActivationDescriptor(
 		hipdnnActivationDescriptor_t activationDesc);

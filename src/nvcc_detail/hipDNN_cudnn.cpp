@@ -1947,7 +1947,7 @@ hipdnnStatus_t hipdnnCreateActivationDescriptor(
 hipdnnStatus_t hipdnnSetActivationDescriptor(
 		hipdnnActivationDescriptor_t activationDesc, //HGSOS const
 		hipdnnActivationMode_t mode, hipdnnNanPropagation_t reluNanOpt,
-		double reluCeiling)
+		double reluCeilingOrAlpha, double activBeta, double activExp)
 {
 	cudnnActivationMode_t cuAMode;
 	hipdnnStatus_t retVal;
@@ -1963,24 +1963,28 @@ hipdnnStatus_t hipdnnSetActivationDescriptor(
 		return retVal;
 
 	return cudnnTohipdnnStatus(cudnnSetActivationDescriptor(activationDesc, //const
-			cuAMode, cuNaN, reluCeiling));
+			cuAMode, cuNaN, reluCeilingOrAlpha));
 
 }
 
 //=============================================================================
 
 hipdnnStatus_t hipdnnGetActivationDescriptor(
-		const hipdnnActivationDescriptor_t activationDesc,
-		hipdnnActivationMode_t *mode, hipdnnNanPropagation_t *reluNanOpt,
-		double* reluCeiling)
+                    const hipdnnActivationDescriptor_t activationDesc,
+                    hipdnnActivationMode_t *mode, hipdnnNanPropagation_t *reluNanOpt,
+                    double* reluCeilingOrAlpha,double* activBeta,double* activExp)
 {
-	hipdnnStatus_t retVal;
-	cudnnActivationMode_t cuactmode;
-	cudnnNanPropagation_t cureluNanOpt;
+    hipdnnStatus_t retVal;
+    cudnnActivationMode_t cuactmode;
+    cudnnNanPropagation_t cureluNanOpt;
+
+    // not supported.
+    *activBeta = 0.0;
+    *activExp = 0.0;
 
 	retVal = cudnnTohipdnnStatus(
 			cudnnGetActivationDescriptor(activationDesc, &cuactmode,
-					&cureluNanOpt, reluCeiling));
+					&cureluNanOpt, reluCeilingOrAlpha));
 
 	if (retVal != HIPDNN_STATUS_SUCCESS)
 		return retVal;

@@ -334,6 +334,47 @@ miopenBatchNormMode_t hipTomiopenBatchNormMode(hipdnnBatchNormMode_t in)
 
 //=============================================================================
 
+hipdnnStatus_t  miopenTohipActivationMode(miopenActivationMode_t in,
+                                          hipdnnActivationMode_t* out)
+{
+    hipdnnStatus_t retVal = HIPDNN_STATUS_SUCCESS;
+
+    switch(in)
+    {
+    case miopenActivationLOGISTIC:
+        *out = HIPDNN_ACTIVATION_SIGMOID;
+        break;
+
+    case miopenActivationRELU:
+        *out = HIPDNN_ACTIVATION_RELU;
+        break;
+
+    case miopenActivationTANH:
+        *out = HIPDNN_ACTIVATION_TANH;
+        break;
+
+    case miopenActivationPATHTRU:
+        *out = HIPDNN_ACTIVATION_PATHTRU;
+        break;
+
+    case miopenActivationSOFTRELU:
+        *out = HIPDNN_ACTIVATION_SOFTRELU;
+        break;
+
+    case miopenActivationABS:
+        *out = HIPDNN_ACTIVATION_ABS;
+        break;
+
+    case miopenActivationPOWER:
+        *out = HIPDNN_ACTIVATION_POWER;
+        break;
+
+    default:
+        retVal = HIPDNN_STATUS_NOT_SUPPORTED;
+    }
+    return retVal;
+}
+
 hipdnnStatus_t hipTomiopenActivationMode(hipdnnActivationMode_t in,
         miopenActivationMode_t* out)
 {
@@ -2473,7 +2514,7 @@ hipdnnStatus_t hipdnnCreateActivationDescriptor(
 hipdnnStatus_t hipdnnSetActivationDescriptor(
         hipdnnActivationDescriptor_t activationDesc,
         hipdnnActivationMode_t mode, hipdnnNanPropagation_t reluNanOpt,
-        double reluCeiling)
+        double reluCeilingOrAlpha, double activBeta, double activExp)
 {
     miopenActivationMode_t mimode;
 
@@ -2484,47 +2525,49 @@ hipdnnStatus_t hipdnnSetActivationDescriptor(
     hipTomiopenActivationMode(mode, &mimode);
 
     return miopenTohipdnnStatus(
-            miopenSetActivationDescriptor(activationDesc, mimode, 0, //Alpha
-                    0, //Beta
-                    1)); //Power
+            miopenSetActivationDescriptor(activationDesc, mimode,
+                    reluCeilingOrAlpha, activBeta, activExp));
 }
 
 //=============================================================================
 
-//HGSOS may need another function to accommodate the 3 parameters.
 
 hipdnnStatus_t hipdnnGetActivationDescriptor(
         const hipdnnActivationDescriptor_t activationDesc,
         hipdnnActivationMode_t *mode, hipdnnNanPropagation_t *reluNanOpt,
-        double* reluCeiling)
+        double* reluCeilingOrAlpha, double* activBeta,  double* activExp)
 {
 
 #if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_ERRORS
-    std::cout << "Inside hipdnnGetActivationDescriptor\n";
+    std::cout << "ENTER hipdnnGetActivationDescriptor\n";
 #endif
 
-    return HIPDNN_STATUS_NOT_SUPPORTED;
-
-#ifdef NOTYET
-
-//HGSOS //NOTYET fix the miopenSetActivationDescriptor api first
-
-    miopenStatus_t
-    miopenGetActivationDescriptor(
-            const miopenActivationDescriptor_t activDesc,
-            miopenActivationMode_t *mode,
-            double *activAlpha,
-            double *activBeta,
-            double *activPower)
-
-    miopenActivationDescriptor_t miActDes;
     hipdnnStatus_t retVal;
 
-    retVal = hipTomiopenActivationMode(activationDesc, &miActDes);
+    miopenActivationMode_t miactmode;
+
+    retVal = miopenTohipdnnStatus(
+           miopenGetActivationDescriptor(  (miopenActivationDescriptor_t) activationDesc,
+                                           &miactmode,
+                                           reluCeilingOrAlpha,
+                                           activBeta,
+                                           activExp));
 
     if( retVal != HIPDNN_STATUS_SUCCESS )
-    return retVal;
+        return retVal;
+
+    retVal = miopenTohipActivationMode( miactmode, mode );
+
+    if( retVal != HIPDNN_STATUS_SUCCESS )
+        return retVal;
+
+    *reluNanOpt = HIPDNN_PROPAGATE_NAN;
+
+#if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_ERRORS
+    std::cout << "EXIT hipdnnGetActivationDescriptor: " << retVal HIPDNNFLUSH ;
 #endif
+
+    return retVal;
 
 }
 
