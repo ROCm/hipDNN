@@ -1440,6 +1440,7 @@ hipdnnStatus_t hipdnnFindConvolutionForwardAlgorithmEx(hipdnnHandle_t handle,
     {
         miopenTohipConvolutionFwdAlgo(  miopenPerfResults[i].fwd_algo,
                                         &(perfResults[i].algo));
+        perfResults[i].status = HIPDNN_STATUS_SUCCESS; //TODO: miopen doesn't contain a 'status' member variable , setting it to success as of now.
     }
 
     delete [] miopenPerfResults;
