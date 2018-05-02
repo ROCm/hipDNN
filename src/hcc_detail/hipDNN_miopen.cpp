@@ -1436,11 +1436,30 @@ hipdnnStatus_t hipdnnFindConvolutionForwardAlgorithmEx(hipdnnHandle_t handle,
 
     }
 
-    for(int i = 0; i < requestedAlgoCount; i++)
+    if(retVal == HIPDNN_STATUS_SUCCESS)
     {
-        miopenTohipConvolutionFwdAlgo(  miopenPerfResults[i].fwd_algo,
+        for(int i = 0; i < *returnedAlgoCount; i++)
+        {
+            retVal = miopenTohipConvolutionFwdAlgo(  miopenPerfResults[i].fwd_algo,
                                         &(perfResults[i].algo));
-        perfResults[i].status = HIPDNN_STATUS_SUCCESS; //TODO: miopen doesn't contain a 'status' member variable , setting it to success as of now.
+            if(retVal != HIPDNN_STATUS_SUCCESS)
+            {
+    #if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_ERRORS
+                std::cout << "...failed miopenTohipConvolutionFwdDataAlgo"
+                << std::endl HIPDNNFLUSH;
+    #endif
+            }
+            else
+            {
+    #if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_CALLS
+                std::cout << "...miopenTohipConvolutionFwdDataAlgo OK"
+                << std::endl HIPDNNFLUSH;
+                perfResults[i].status = HIPDNN_STATUS_SUCCESS; //TODO: miopen doesn't contain a 'status' member variable , setting it to success as of now.
+                perfResults[i].time = miopenPerfResults[i].time;
+                perfResults[i].memory = miopenPerfResults[i].memory;
+    #endif
+            }
+        }
     }
 
     delete [] miopenPerfResults;
@@ -1723,10 +1742,30 @@ catch(std::exception& e)
               << e.what() << std::endl HIPDNNFLUSH
 }
 
-for(int i = 0; i < requestedAlgoCount; i++)
+if (retVal == HIPDNN_STATUS_SUCCESS)
 {
-    miopenTohipConvolutionBwdFilterAlgo(  miopenPerfResults[i].bwd_weights_algo,
+    for (int i = 0; i < *returnedAlgoCount; i++)
+    {
+        retVal = miopenTohipConvolutionBwdFilterAlgo(  miopenPerfResults[i].bwd_weights_algo,
                                           &(perfResults[i].algo));
+        if (retVal != HIPDNN_STATUS_SUCCESS)
+        {
+#if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_ERRORS
+            std::cout << "...failed miopenTohipConvolutionBwdFilterAlgo"
+            << std::endl HIPDNNFLUSH;
+#endif
+        }
+        else
+        {
+#if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_CALLS
+            std::cout << "...miopenTohipConvolutionBwdFilterAlgo OK"
+            << std::endl HIPDNNFLUSH;
+            perfResults[i].status = HIPDNN_STATUS_SUCCESS; //TODO: miopen doesn't contain a 'status' member variable , setting it to success as of now.
+            perfResults[i].time = miopenPerfResults[i].time;
+            perfResults[i].memory = miopenPerfResults[i].memory;
+#endif
+        }
+    }
 }
 
 delete [] miopenPerfResults;
@@ -2090,6 +2129,9 @@ hipdnnStatus_t hipdnnFindConvolutionBackwardDataAlgorithmEx(
     #if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_CALLS
                 std::cout << "...miopenTohipConvolutionBwdDataAlgo OK"
                 << std::endl HIPDNNFLUSH;
+                perfResults[i].status = HIPDNN_STATUS_SUCCESS; //TODO: miopen doesn't contain a 'status' member variable , setting it to success as of now.
+                perfResults[i].time = miopenPerfResults[i].time;
+                perfResults[i].memory = miopenPerfResults[i].memory;
     #endif
             }
         }
