@@ -2237,7 +2237,7 @@ hipdnnStatus_t hipdnnPoolingForward(hipdnnHandle_t handle,
 
     return miopenTohipdnnStatus(
             miopenPoolingForward(handle, poolingDesc, alpha, xDesc, x, beta,
-                    yDesc, y, false, // do_backward,
+                    yDesc, y, true, // do_backward,
                     (void *) devptr, workSpaceSize));
 
 }
