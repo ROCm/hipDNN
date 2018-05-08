@@ -2050,7 +2050,6 @@ hipdnnStatus_t hipdnnFindConvolutionBackwardDataAlgorithmEx(
         if (size == 0)
         {
             std::cout << "...zero WS size" << std::endl HIPDNNFLUSH;
-            return HIPDNN_STATUS_NOT_INITIALIZED;
         }
 #endif
 
