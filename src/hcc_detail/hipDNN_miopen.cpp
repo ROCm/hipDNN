@@ -2490,7 +2490,7 @@ hipdnnStatus_t hipdnnLRNCrossChannelForward(hipdnnHandle_t handle,
     if (retVal != HIPDNN_STATUS_SUCCESS)
         return retVal;
 
-    if (sDescToWorkspaceLRN.find(yDesc) != sDescToWorkspaceLRN.end()) {
+    if (sDescToWorkspaceLRN.find(yDesc) == sDescToWorkspaceLRN.end()) {
         //HGSOS looks like the yDesc is used for the workspace, not the hipdnnLRNDescriptor_t
 
         miStat = miopenLRNGetWorkSpaceSize(yDesc, &workSpaceSize);
@@ -2564,7 +2564,7 @@ hipdnnStatus_t hipdnnLRNCrossChannelBackward(hipdnnHandle_t handle,
     if (retVal != HIPDNN_STATUS_SUCCESS)
         return retVal;
 
-    if (sDescToWorkspaceLRN.find(yDesc) != sDescToWorkspaceLRN.end()) {
+    if (sDescToWorkspaceLRN.find(yDesc) == sDescToWorkspaceLRN.end()) {
         //HGSOS looks like the yDesc is used for the workspace, not the hipdnnLRNDescriptor_t
 
         miStat = miopenLRNGetWorkSpaceSize(yDesc, &workSpaceSize);
