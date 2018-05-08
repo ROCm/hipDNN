@@ -245,7 +245,7 @@ hipdnnStatus_t miopenTohipPoolingMode(miopenPoolingMode_t in,
 
 #if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_MARSHALLING
         std::cout << "miopenTohipPoolingMode " << in << ": NOT SUPPORTED."
-                << std::endlHIPDNNFLUSH;
+                << std::endl HIPDNNFLUSH;
 #endif
 
         retVal = HIPDNN_STATUS_NOT_SUPPORTED;
@@ -287,21 +287,21 @@ miopenBatchNormMode_t hipTomiopenBatchNormMode(hipdnnBatchNormMode_t in) {
     if (in == HIPDNN_BATCHNORM_PER_ACTIVATION) {
 
 #if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_MARSHALLING
-        std::cout << "HIPDNN_BATCHNORM_PER_ACTIVATION" << std::endlHIPDNNFLUSH;
+        std::cout << "HIPDNN_BATCHNORM_PER_ACTIVATION" << std::endl HIPDNNFLUSH;
 #endif
 
         return miopenBNPerActivation;
     } else if (in == HIPDNN_BATCHNORM_SPATIAL) {
 
 #if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_MARSHALLING
-        std::cout << "HIPDNN_BATCHNORM_SPATIAL" << std::endlHIPDNNFLUSH;
+        std::cout << "HIPDNN_BATCHNORM_SPATIAL" << std::endl HIPDNNFLUSH;
 #endif
 
         return miopenBNSpatial;
     }
 
 #if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_ERRORS
-    std::cout << "HIPDNN_BATCHNORM_SPATIAL" << std::endlHIPDNNFLUSH;
+    std::cout << "HIPDNN_BATCHNORM_SPATIAL" << std::endl HIPDNNFLUSH;
 #endif
 
 //HGSOS need to return error code, those are not the only options!
@@ -357,7 +357,7 @@ hipdnnStatus_t hipTomiopenActivationMode(hipdnnActivationMode_t in,
     case HIPDNN_ACTIVATION_SIGMOID:
 
 #if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_MARSHALLING
-        std::cout << "HIPDNN_ACTIVATION_SIGMOID" << std::endlHIPDNNFLUSH;
+        std::cout << "HIPDNN_ACTIVATION_SIGMOID" << std::endl HIPDNNFLUSH;
 #endif
 
         *out = miopenActivationLOGISTIC;
@@ -366,7 +366,7 @@ hipdnnStatus_t hipTomiopenActivationMode(hipdnnActivationMode_t in,
     case HIPDNN_ACTIVATION_RELU:
 
 #if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_MARSHALLING
-        std::cout << "HIPDNN_ACTIVATION_RELU" << std::endlHIPDNNFLUSH;
+        std::cout << "HIPDNN_ACTIVATION_RELU" << std::endl HIPDNNFLUSH;
 #endif
 
         *out = miopenActivationRELU;
@@ -375,7 +375,7 @@ hipdnnStatus_t hipTomiopenActivationMode(hipdnnActivationMode_t in,
     case HIPDNN_ACTIVATION_TANH:
 
 #if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_MARSHALLING
-        std::cout << "HIPDNN_ACTIVATION_TANH" << std::endlHIPDNNFLUSH;
+        std::cout << "HIPDNN_ACTIVATION_TANH" << std::endl HIPDNNFLUSH;
 #endif
 
         *out = miopenActivationTANH;
@@ -384,7 +384,7 @@ hipdnnStatus_t hipTomiopenActivationMode(hipdnnActivationMode_t in,
     case HIPDNN_ACTIVATION_PATHTRU:
 
 #if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_MARSHALLING
-        std::cout << "HIPDNN_ACTIVATION_TANH" << std::endlHIPDNNFLUSH;
+        std::cout << "HIPDNN_ACTIVATION_TANH" << std::endl HIPDNNFLUSH;
 #endif
 
         *out = miopenActivationPATHTRU;
@@ -393,7 +393,7 @@ hipdnnStatus_t hipTomiopenActivationMode(hipdnnActivationMode_t in,
     case HIPDNN_ACTIVATION_SOFTRELU:
 
 #if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_MARSHALLING
-        std::cout << "HIPDNN_ACTIVATION_TANH" << std::endlHIPDNNFLUSH;
+        std::cout << "HIPDNN_ACTIVATION_TANH" << std::endl HIPDNNFLUSH;
 #endif
 
         *out = miopenActivationSOFTRELU;
@@ -402,7 +402,7 @@ hipdnnStatus_t hipTomiopenActivationMode(hipdnnActivationMode_t in,
     case HIPDNN_ACTIVATION_ABS:
 
 #if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_MARSHALLING
-        std::cout << "HIPDNN_ACTIVATION_TANH" << std::endlHIPDNNFLUSH;
+        std::cout << "HIPDNN_ACTIVATION_TANH" << std::endl HIPDNNFLUSH;
 #endif
 
         *out = miopenActivationABS;
@@ -411,7 +411,7 @@ hipdnnStatus_t hipTomiopenActivationMode(hipdnnActivationMode_t in,
     case HIPDNN_ACTIVATION_POWER:
 
 #if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_MARSHALLING
-        std::cout << "HIPDNN_ACTIVATION_TANH" << std::endlHIPDNNFLUSH;
+        std::cout << "HIPDNN_ACTIVATION_TANH" << std::endl HIPDNNFLUSH;
 #endif
 
         *out = miopenActivationPOWER;
@@ -420,7 +420,7 @@ hipdnnStatus_t hipTomiopenActivationMode(hipdnnActivationMode_t in,
     case HIPDNN_ACTIVATION_ELU:
 
 #if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_ERRORS
-        std::cout << "HIPDNN_ACTIVATION_TANH" << std::endlHIPDNNFLUSH;
+        std::cout << "HIPDNN_ACTIVATION_TANH" << std::endl HIPDNNFLUSH;
 #endif
 
         retVal = HIPDNN_STATUS_NOT_SUPPORTED;
@@ -429,7 +429,7 @@ hipdnnStatus_t hipTomiopenActivationMode(hipdnnActivationMode_t in,
     case HIPDNN_ACTIVATION_CLIPPED_RELU:
 
 #if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_ERRORS
-        std::cout << "HIPDNN_ACTIVATION_TANH" << std::endlHIPDNNFLUSH;
+        std::cout << "HIPDNN_ACTIVATION_TANH" << std::endl HIPDNNFLUSH;
 #endif
 
         retVal = HIPDNN_STATUS_NOT_SUPPORTED;
@@ -438,7 +438,7 @@ hipdnnStatus_t hipTomiopenActivationMode(hipdnnActivationMode_t in,
     default:
 
 #if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_ERRORS
-        std::cout << "HIPDNN_ACTIVATION_TANH" << std::endlHIPDNNFLUSH;
+        std::cout << "HIPDNN_ACTIVATION_TANH" << std::endl HIPDNNFLUSH;
 #endif
 
         retVal = HIPDNN_STATUS_NOT_SUPPORTED;
@@ -457,7 +457,7 @@ hipdnnStatus_t hipTomiopenConvolutionFwdAlgo(hipdnnConvolutionFwdAlgo_t in,
     case HIPDNN_CONVOLUTION_FWD_ALGO_GEMM:
 
 #if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_MARSHALLING
-        std::cout << "HIPDNN_CONVOLUTION_FWD_ALGO_GEMM" << std::endlHIPDNNFLUSH;
+        std::cout << "HIPDNN_CONVOLUTION_FWD_ALGO_GEMM" << std::endl HIPDNNFLUSH;
 #endif
 
         *out = miopenConvolutionFwdAlgoGEMM;
@@ -477,7 +477,7 @@ hipdnnStatus_t hipTomiopenConvolutionFwdAlgo(hipdnnConvolutionFwdAlgo_t in,
     case HIPDNN_CONVOLUTION_FWD_ALGO_FFT:
 
 #if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_MARSHALLING
-        std::cout << "HIPDNN_CONVOLUTION_FWD_ALGO_FFT" << std::endlHIPDNNFLUSH;
+        std::cout << "HIPDNN_CONVOLUTION_FWD_ALGO_FFT" << std::endl HIPDNNFLUSH;
 #endif
 
         *out = miopenConvolutionFwdAlgoFFT;
@@ -508,7 +508,7 @@ hipdnnStatus_t hipTomiopenConvolutionFwdAlgo(hipdnnConvolutionFwdAlgo_t in,
 
 #if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_ERRORS
         std::cout << "hipdnnConvolutionFwdAlgo_t: " << in << " NOT SUPPORTED."
-                << std::endlHIPDNNFLUSH;
+                << std::endl HIPDNNFLUSH;
 #endif
 
         retVal = HIPDNN_STATUS_NOT_SUPPORTED;
@@ -604,7 +604,7 @@ hipdnnStatus_t hipTomiopenConvolutionBwdFilterAlgo(
 
 #if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_ERRORS
         std::cout << "hipdnnConvolutionBwdFilterAlgo_t: " << in
-                << " NOT SUPPORTED." << std::endlHIPDNNFLUSH;
+                << " NOT SUPPORTED." << std::endl HIPDNNFLUSH;
 #endif
 
         retVal = HIPDNN_STATUS_NOT_SUPPORTED;
@@ -696,7 +696,7 @@ hipdnnStatus_t hipTomiopenConvolutionBwdDataAlgo(
 
 #if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_MARSHALLING
         std::cout << "HIPDNN_CONVOLUTION_BWD_DATA_ALGO_WINOGRAD_NONFUSED"
-                << std::endlHIPDNNFLUSH;
+                << std::endl HIPDNNFLUSH;
 #endif
 
         *out = miopenConvolutionBwdDataAlgoWinograd;
@@ -719,7 +719,7 @@ hipdnnStatus_t hipTomiopenConvolutionBwdDataAlgo(
 
 #if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_MARSHALLING
         std::cout << "HIPDNN_CONVOLUTION_BWD_DATA_ALGO_TRANSPOSE_GEMM"
-                << std::endlHIPDNNFLUSH;
+                << std::endl HIPDNNFLUSH;
 #endif
 
         *out = miopenTransposeBwdDataAlgoGEMM;
@@ -729,7 +729,7 @@ hipdnnStatus_t hipTomiopenConvolutionBwdDataAlgo(
 
 #if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_ERRORS
         std::cout << "hipdnnConvolutionBwdDataAlgo_t: " << in
-                << " NOT SUPPORTED." << std::endlHIPDNNFLUSH;
+                << " NOT SUPPORTED." << std::endl HIPDNNFLUSH;
 #endif
 
         retVal = HIPDNN_STATUS_NOT_SUPPORTED;
@@ -823,7 +823,7 @@ hipdnnStatus_t SoftmaxAlgorithmSupported(hipdnnSoftmaxAlgorithm_t in) {
 hipdnnStatus_t hipTensorFormatSupported(hipdnnTensorFormat_t in) {
     if (in == HIPDNN_TENSOR_NCHW) {
 #if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_MARSHALLING
-        std::cout << "HIPDNN_TENSOR_NCHW" << std::endlHIPDNNFLUSH;
+        std::cout << "HIPDNN_TENSOR_NCHW" << std::endl HIPDNNFLUSH;
 #endif
 
         return HIPDNN_STATUS_SUCCESS;
@@ -854,7 +854,7 @@ hipdnnStatus_t ConvolutionFwdPreferenceSupported(
 #if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_ERRORS
     if (retVal == HIPDNN_STATUS_NOT_SUPPORTED) {
         std::cout << "hipdnnConvolutionFwdPreference_t " << in
-                << " NOT SUPPORTED." << std::endlHIPDNNFLUSH;
+                << " NOT SUPPORTED." << std::endl HIPDNNFLUSH;
     }
 #endif
 
@@ -878,7 +878,7 @@ hipdnnStatus_t ConvolutionBwdFilterPreferenceSupported(
 #if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_ERRORS
     if (retVal == HIPDNN_STATUS_NOT_SUPPORTED) {
         std::cout << "hipdnnConvolutionBwdFilterPreference_t " << in
-                << " NOT SUPPORTED." << std::endlHIPDNNFLUSH;
+                << " NOT SUPPORTED." << std::endl HIPDNNFLUSH;
     }
 #endif
 
@@ -932,7 +932,7 @@ hipdnnStatus_t hipdnnCreateTensorDescriptor(
 
 #if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_CALLS
     std::cout << "hipdnnCreateTensorDescriptor:" << retVal << " for "
-            << *tensorDesc << std::endlHIPDNNFLUSH;
+            << *tensorDesc << std::endl HIPDNNFLUSH;
 #endif
 
     return retVal;
@@ -975,7 +975,7 @@ hipdnnStatus_t hipdnnGetTensor4dDescriptor(hipdnnTensorDescriptor_t tensorDesc,
     if (retVal != HIPDNN_STATUS_SUCCESS) {
 #if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_ERRORS
         std::cout << "ERROR: hipdnnGetTensor4dDescriptor:" << retVal
-                << std::endlHIPDNNFLUSH;
+                << std::endl HIPDNNFLUSH;
 #endif
 
         return retVal;
@@ -985,7 +985,7 @@ hipdnnStatus_t hipdnnGetTensor4dDescriptor(hipdnnTensorDescriptor_t tensorDesc,
         if (retVal != HIPDNN_STATUS_SUCCESS) {
 #if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_ERRORS
             std::cout << "ERROR: hipdnnGetTensor4dDescriptor does not support:"
-                    << dataType << std::endlHIPDNNFLUSH;
+                    << dataType << std::endl HIPDNNFLUSH;
 #endif
         }
     }
@@ -1047,7 +1047,7 @@ hipdnnStatus_t hipdnnCreateFilterDescriptor(
     hipdnnStatus_t retVal;
 #if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_CALLS
     std::cout << "Inside hipdnnCreateFilterDescriptor, " << filterDesc
-            << std::endlHIPDNNFLUSH;
+            << std::endl HIPDNNFLUSH;
 #endif
 
     //in miopen a filter descriptor is just a typedef to a tensor descriptor
@@ -1055,7 +1055,7 @@ hipdnnStatus_t hipdnnCreateFilterDescriptor(
 
 #if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_CALLS
     std::cout << "Inside hipdnnCreateFilterDescriptor, " << filterDesc
-            << std::endlHIPDNNFLUSH;
+            << std::endl HIPDNNFLUSH;
 #endif
 
     return retVal;
@@ -1074,7 +1074,7 @@ hipdnnStatus_t hipdnnSetConvolutionMathType(
         hipdnnConvolutionDescriptor_t convDesc, hipdnnMathType_t mathType) {
 #if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_ERRORS
     std::cout << "hipdnnSetConvolutionMathType " << mathType
-            << " NOT SUPPORTED." << std::endlHIPDNNFLUSH;
+            << " NOT SUPPORTED." << std::endl HIPDNNFLUSH;
 #endif
 
     return HIPDNN_STATUS_NOT_SUPPORTED;
@@ -1154,7 +1154,7 @@ hipdnnStatus_t hipdnnFindConvolutionForwardAlgorithm(hipdnnHandle_t handle,
 
 #if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_ERRORS
     std::cout << "hipdnnFindConvolutionForwardAlgorithm NOT IMPLEMENTED."
-            << std::endlHIPDNNFLUSH;
+            << std::endl HIPDNNFLUSH;
 #endif
 
     return HIPDNN_STATUS_NOT_SUPPORTED;
@@ -1209,7 +1209,7 @@ hipdnnStatus_t hipdnnGetConvolutionForwardAlgorithm(hipdnnHandle_t handle,
 
 #if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_ERRORS
     std::cout << "hipdnnGetConvolutionForwardAlgorithm NOT IMPLEMENTED."
-            << std::endlHIPDNNFLUSH;
+            << std::endl HIPDNNFLUSH;
 #endif
 
     return HIPDNN_STATUS_NOT_SUPPORTED;
@@ -1266,7 +1266,7 @@ hipdnnStatus_t hipdnnFindConvolutionForwardAlgorithmEx(hipdnnHandle_t handle,
 #if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_CALLS
     std::cout << "ENTER hipdnnFindConvolutionForwardAlgorithmEx: WS PTR"
             << workSpace << ", " << workSpaceSizeInBytes
-            << std::endlHIPDNNFLUSH;
+            << std::endl HIPDNNFLUSH;
 #endif
 
     assert(x);
@@ -1292,7 +1292,7 @@ hipdnnStatus_t hipdnnFindConvolutionForwardAlgorithmEx(hipdnnHandle_t handle,
         std::cout
                 << "INTERNAL_ALLOC: hipdnnFindConvolutionForwardAlgorithmEx size "
                 << size << " requested AlgoCount: " << requestedAlgoCount
-                << std::endlHIPDNNFLUSH;
+                << std::endl HIPDNNFLUSH;
 #endif
 
         hipMalloc((void**) &sConvolutionForwardAlgorithmWorkspace, size);
@@ -1300,12 +1300,12 @@ hipdnnStatus_t hipdnnFindConvolutionForwardAlgorithmEx(hipdnnHandle_t handle,
 #if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_INTERNAL_ALLOC
         std::cout << "INTERNAL_ALLOC: sConvolutionForwardAlgorithmWorkspace "
                 << "WSP = " << sConvolutionForwardAlgorithmWorkspace
-                << " size = " << size << std::endlHIPDNNFLUSH;
+                << " size = " << size << std::endl HIPDNNFLUSH;
 #endif
 
 #if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_CALLS
         std::cout << "Size of miopenPerfResults " << sizeof(miopenPerfResults)
-                << std::endlHIPDNNFLUSH;
+                << std::endl HIPDNNFLUSH;
 #endif
 
         retVal = miopenTohipdnnStatus(
@@ -1321,7 +1321,7 @@ hipdnnStatus_t hipdnnFindConvolutionForwardAlgorithmEx(hipdnnHandle_t handle,
 
 #if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_CALLS
         std::cout << "HIPDNN EXIT FindConvolutionForwardAlgorithmEx: " << retVal
-                << std::endlHIPDNNFLUSH;
+                << std::endl HIPDNNFLUSH;
 #endif
 
     } else {
@@ -1348,7 +1348,7 @@ hipdnnStatus_t hipdnnFindConvolutionForwardAlgorithmEx(hipdnnHandle_t handle,
 #if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_CALLS
         std::cout << "HIPDNN EXIT FindConvolutionForwardAlgorithmEx: retval="
                 << retVal << ", WS size=" << workSpaceSizeInBytes << ", algo ="
-                << perfResults->algo << std::endlHIPDNNFLUSH;
+                << perfResults->algo << std::endl HIPDNNFLUSH;
 #endif
 
     }
@@ -1360,12 +1360,12 @@ hipdnnStatus_t hipdnnFindConvolutionForwardAlgorithmEx(hipdnnHandle_t handle,
             if (retVal != HIPDNN_STATUS_SUCCESS) {
 #if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_ERRORS
                 std::cout << "...failed miopenTohipConvolutionFwdDataAlgo"
-                        << std::endlHIPDNNFLUSH;
+                        << std::endl HIPDNNFLUSH;
 #endif
             } else {
 #if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_CALLS
                 std::cout << "...miopenTohipConvolutionFwdDataAlgo OK"
-                        << std::endlHIPDNNFLUSH;
+                        << std::endl HIPDNNFLUSH;
                 perfResults[i].status = HIPDNN_STATUS_SUCCESS; //TODO: miopen doesn't contain a 'status' member variable , setting it to success as of now.
                 perfResults[i].time = miopenPerfResults[i].time;
                 perfResults[i].memory = miopenPerfResults[i].memory;
@@ -1390,7 +1390,7 @@ hipdnnStatus_t hipdnnGetConvolutionForwardWorkspaceSize(hipdnnHandle_t handle,
 
 #if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_CALLS
     std::cout << "HIPDNN ENTER hipdnnGetConvolutionForwardWorkspaceSize, algo ="
-            << algo << std::endlHIPDNNFLUSH;
+            << algo << std::endl HIPDNNFLUSH;
 #endif
 
     miopenConvFwdAlgorithm_t mialgo;
@@ -1407,7 +1407,7 @@ hipdnnStatus_t hipdnnGetConvolutionForwardWorkspaceSize(hipdnnHandle_t handle,
 
 #if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_CALLS
     std::cout << "EXIT hipdnnGetConvolutionForwardWorkspaceSize, retVal = "
-            << retVal << ",size = " << *sizeInBytes << std::endlHIPDNNFLUSH;
+            << retVal << ",size = " << *sizeInBytes << std::endl HIPDNNFLUSH;
 #endif
 
     return retVal;
@@ -1424,7 +1424,7 @@ hipdnnStatus_t hipdnnConvolutionForward(hipdnnHandle_t handle,
         size_t workSpaceSizeInBytes, const void *beta,
         const hipdnnTensorDescriptor_t yDesc, void *y) {
 #if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_CALLS
-    std::cout << "calling hipdnnConvolutionForward." << std::endlHIPDNNFLUSH;
+    std::cout << "calling hipdnnConvolutionForward." << std::endl HIPDNNFLUSH;
 #endif
 
     if (workSpace == NULL || workSpaceSizeInBytes == 0) {
@@ -1434,7 +1434,7 @@ hipdnnStatus_t hipdnnConvolutionForward(hipdnnHandle_t handle,
 
 #if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_INTERNAL_ALLOC
         std::cout << "INTERNAL_ALLOC: hipdnnConvolutionForward size."
-                << std::endlHIPDNNFLUSH;
+                << std::endl HIPDNNFLUSH;
 #endif
 
         retVal = miopenTohipdnnStatus(
@@ -1449,13 +1449,13 @@ hipdnnStatus_t hipdnnConvolutionForward(hipdnnHandle_t handle,
 #if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_INTERNAL_ALLOC
         std::cout << "INTERNAL_ALLOC: sConvolutionForwardAlgorithmWorkspace "
                 << "WSP= " << sConvolutionForwardAlgorithmWorkspace
-                << " size = " << size << std::endlHIPDNNFLUSH;
+                << " size = " << size << std::endl HIPDNNFLUSH;
 #endif
 
 #if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_CALLS
         std::cout << "Invoking hipToMopenConvolutionFwdAlgo" << std::endl
                 HIPDNNFLUSH;
-        std::cout << "Passed algo" << algo << std::endlHIPDNNFLUSH;
+        std::cout << "Passed algo" << algo << std::endl HIPDNNFLUSH;
 #endif
         miopenConvFwdAlgorithm_t mialgo;
         retVal = hipTomiopenConvolutionFwdAlgo(algo, &mialgo);
@@ -1469,7 +1469,7 @@ hipdnnStatus_t hipdnnConvolutionForward(hipdnnHandle_t handle,
             return retVal;
 
 #if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_CALLS
-        std::cout << "Invoking MiopenConvolutionFwd" << std::endlHIPDNNFLUSH;
+        std::cout << "Invoking MiopenConvolutionFwd" << std::endl HIPDNNFLUSH;
 #endif
 
         return miopenTohipdnnStatus(
@@ -1484,7 +1484,7 @@ hipdnnStatus_t hipdnnConvolutionForward(hipdnnHandle_t handle,
 #if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_CALLS
         std::cout << "Invoking hipToMopenConvolutionFwdAlgo" << std::endl
                 HIPDNNFLUSH;
-        std::cout << "Passed algo" << algo << std::endlHIPDNNFLUSH;
+        std::cout << "Passed algo" << algo << std::endl HIPDNNFLUSH;
 #endif
 
         hipdnnStatus_t retVal = hipTomiopenConvolutionFwdAlgo(algo, &mialgo);
@@ -1498,7 +1498,7 @@ hipdnnStatus_t hipdnnConvolutionForward(hipdnnHandle_t handle,
             return retVal;
 
 #if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_CALLS
-        std::cout << "Invoking MiopenConvolutionFwd" << std::endlHIPDNNFLUSH;
+        std::cout << "Invoking MiopenConvolutionFwd" << std::endl HIPDNNFLUSH;
 #endif
 
         return miopenTohipdnnStatus(
@@ -1536,7 +1536,7 @@ hipdnnStatus_t hipdnnFindConvolutionBackwardFilterAlgorithm(
         hipdnnConvolutionBwdFilterAlgoPerf_t *perfResults) {
 #if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_ERRORS
     std::cout << "hipdnnFindConvolutionBackwardFilterAlgorithm NOT IMPLEMENTED"
-            << std::endlHIPDNNFLUSH;
+            << std::endl HIPDNNFLUSH;
 #endif
 
     return HIPDNN_STATUS_NOT_SUPPORTED;
@@ -1557,7 +1557,7 @@ hipdnnStatus_t hipdnnGetConvolutionBackwardFilterAlgorithm(
 
 #if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_ERRORS
     std::cout << "hipdnnGetConvolutionBackwardFilterAlgorithm NOT IMPLEMENTED"
-            << std::endlHIPDNNFLUSH;
+            << std::endl HIPDNNFLUSH;
 #endif
 
 #ifdef NOTYET
@@ -1606,7 +1606,7 @@ hipdnnStatus_t hipdnnFindConvolutionBackwardFilterAlgorithmEx(
 #if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_CALLS
             std::cout << "miopenConvolutionBackwardGetWorkSpaceSize size "
                     << size << " requested AlgoCount: " << requestedAlgoCount
-                    << std::endlHIPDNNFLUSH;
+                    << std::endl HIPDNNFLUSH;
 #endif
 
             hipMalloc((void**) &sConvolutionBackwardFilterAlgorithmWorkspace,
@@ -1616,7 +1616,7 @@ hipdnnStatus_t hipdnnFindConvolutionBackwardFilterAlgorithmEx(
             std::cout
                     << "INTERNAL_ALLOC: sConvolutionBackwardFilterAlgorithmWorkspace "
                     << "WSP= " << sConvolutionBackwardFilterAlgorithmWorkspace
-                    << " size = " << size << std::endlHIPDNNFLUSH;
+                    << " size = " << size << std::endl HIPDNNFLUSH;
 #endif
 
             retVal = miopenTohipdnnStatus(
@@ -1640,7 +1640,7 @@ hipdnnStatus_t hipdnnFindConvolutionBackwardFilterAlgorithmEx(
         }
     } catch (std::exception& e) {
         std::cout << "EXCEPTION: hipdnnFindConvolutionBackwardFilterAlgorithmEx"
-                << e.what() << std::endlHIPDNNFLUSH
+                << e.what() << std::endl HIPDNNFLUSH
     }
 
     if (retVal == HIPDNN_STATUS_SUCCESS) {
@@ -1651,12 +1651,12 @@ hipdnnStatus_t hipdnnFindConvolutionBackwardFilterAlgorithmEx(
             if (retVal != HIPDNN_STATUS_SUCCESS) {
 #if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_ERRORS
                 std::cout << "...failed miopenTohipConvolutionBwdFilterAlgo"
-                        << std::endlHIPDNNFLUSH;
+                        << std::endl HIPDNNFLUSH;
 #endif
             } else {
 #if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_CALLS
                 std::cout << "...miopenTohipConvolutionBwdFilterAlgo OK"
-                        << std::endlHIPDNNFLUSH;
+                        << std::endl HIPDNNFLUSH;
                 perfResults[i].status = HIPDNN_STATUS_SUCCESS; //TODO: miopen doesn't contain a 'status' member variable , setting it to success as of now.
                 perfResults[i].time = miopenPerfResults[i].time;
                 perfResults[i].memory = miopenPerfResults[i].memory;
@@ -1686,7 +1686,7 @@ hipdnnStatus_t hipdnnGetConvolutionBackwardFilterWorkspaceSize(
 
 #if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_CALLS
     std::cout << "ENTER hipdnnGetConvolutionBackwardFilterWorkspaceSize algo:"
-            << algo << std::endlHIPDNNFLUSH;
+            << algo << std::endl HIPDNNFLUSH;
 #endif
     hipdnnStatus_t retVal = HIPDNN_STATUS_SUCCESS;
 
@@ -1697,13 +1697,13 @@ hipdnnStatus_t hipdnnGetConvolutionBackwardFilterWorkspaceSize(
     if (retVal != HIPDNN_STATUS_SUCCESS) {
 #if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_ERRORS
         std::cout << "ERROR hipdnnGetConvolutionBackwardFilterWorkspaceSize."
-                << std::endlHIPDNNFLUSH;
+                << std::endl HIPDNNFLUSH;
 #endif
     }
 
 #if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_CALLS
     std::cout << "EXIT hipdnnGetConvolutionBackwardFilterWorkspaceSize:"
-            << *sizeInBytes << std::endlHIPDNNFLUSH;
+            << *sizeInBytes << std::endl HIPDNNFLUSH;
 #endif
 
     return retVal;
@@ -1744,7 +1744,7 @@ hipdnnStatus_t hipdnnConvolutionBackwardFilter(hipdnnHandle_t handle,
         std::cout
                 << "INTERNAL_ALLOC: sConvolutionBackwardFilterAlgorithmWorkspace "
                 << "WSP= " << sConvolutionBackwardFilterAlgorithmWorkspace
-                << " size = " << size << std::endlHIPDNNFLUSH;
+                << " size = " << size << std::endl HIPDNNFLUSH;
 #endif
 
         miopenConvBwdWeightsAlgorithm_t mialgo;
@@ -1759,7 +1759,7 @@ hipdnnStatus_t hipdnnConvolutionBackwardFilter(hipdnnHandle_t handle,
 #if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_INTERNAL_ALLOC
         std::cout << "PREALLCOATED: hipdnnConvolutionBackwardFilter:"
                 << workSpace << ", size= " << workSpaceSizeInBytes
-                << ",x PTR = " << x << std::endlHIPDNNFLUSH;
+                << ",x PTR = " << x << std::endl HIPDNNFLUSH;
 #endif
 
         miopenConvBwdWeightsAlgorithm_t mialgo;
@@ -1787,7 +1787,7 @@ hipdnnStatus_t hipdnnConvolutionBackwardFilter(hipdnnHandle_t handle,
                     << algo << ",workSpace=" << workSpace
                     << ",workSpaceSizeInBytes = " << workSpaceSizeInBytes
                     << ",beta=" << beta << ",dwDesc=" << dwDesc << ",dw=" << dw
-                    << std::endlHIPDNNFLUSH;
+                    << std::endl HIPDNNFLUSH;
 #endif
 
         }
@@ -1813,7 +1813,7 @@ hipdnnStatus_t hipdnnGetConvolutionBackwardDataWorkspaceSize(
     } catch (std::exception& e) {
         std::cout
                 << "Exception in hipdnnGetConvolutionBackwardDataWorkspaceSize: "
-                << e.what() << std::endlHIPDNNFLUSH;
+                << e.what() << std::endl HIPDNNFLUSH;
     }
 }
 
@@ -1830,7 +1830,7 @@ hipdnnStatus_t hipdnnFindConvolutionBackwardDataAlgorithm(hipdnnHandle_t handle,
 #if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_ERRORS
         std::cout
                 << "ERROR: hipdnnFindConvolutionBackwardDataAlgorithm NOT IMPLEMENTED"
-                << std::endlHIPDNNFLUSH;
+                << std::endl HIPDNNFLUSH;
 #endif
 
         return HIPDNN_STATUS_NOT_SUPPORTED;
@@ -1841,7 +1841,7 @@ hipdnnStatus_t hipdnnFindConvolutionBackwardDataAlgorithm(hipdnnHandle_t handle,
     } catch (std::exception& e) {
         std::cout
                 << "Exception in hipdnnGetConvolutionBackwardDataWorkspaceSize: "
-                << e.what() << std::endlHIPDNNFLUSH;
+                << e.what() << std::endl HIPDNNFLUSH;
     }
 }
 
@@ -1856,7 +1856,7 @@ hipdnnStatus_t hipdnnGetConvolutionBackwardDataAlgorithm(hipdnnHandle_t handle,
 #if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_ERRORS
         std::cout
                 << "ERROR: hipdnnGetConvolutionBackwardDataAlgorithm NOT IMPLEMENTED"
-                << std::endlHIPDNNFLUSH;
+                << std::endl HIPDNNFLUSH;
 #endif
 
         return HIPDNN_STATUS_NOT_SUPPORTED;
@@ -1867,7 +1867,7 @@ hipdnnStatus_t hipdnnGetConvolutionBackwardDataAlgorithm(hipdnnHandle_t handle,
     } catch (std::exception& e) {
         std::cout
                 << "Exception in hipdnnGetConvolutionBackwardDataWorkspaceSize: "
-                << e.what() << std::endlHIPDNNFLUSH;
+                << e.what() << std::endl HIPDNNFLUSH;
     }
 }
 
@@ -1906,7 +1906,7 @@ hipdnnStatus_t hipdnnFindConvolutionBackwardDataAlgorithmEx(
 #if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_ERRORS
             std::cout
                     << "...failed miopenConvolutionBackwardDataGetWorkSpaceSize"
-                    << std::endlHIPDNNFLUSH;
+                    << std::endl HIPDNNFLUSH;
 #endif
 
             return retVal;
@@ -1914,7 +1914,7 @@ hipdnnStatus_t hipdnnFindConvolutionBackwardDataAlgorithmEx(
 
 #if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_ERRORS
         if (size == 0) {
-            std::cout << "...zero WS size" << std::endlHIPDNNFLUSH;
+            std::cout << "...zero WS size" << std::endl HIPDNNFLUSH;
         }
 #endif
 
@@ -1922,7 +1922,7 @@ hipdnnStatus_t hipdnnFindConvolutionBackwardDataAlgorithmEx(
         std::cout
                 << "INTERNAL_ALLOC: miopenConvolutionBackwardGetWorkSpaceSize size "
                 << size << " requested AlgoCount: " << requestedAlgoCount
-                << std::endlHIPDNNFLUSH;
+                << std::endl HIPDNNFLUSH;
 #endif
 
         hipMalloc((void**) &sConvolutionBackwardDataAlgorithmWorkspace, size);
@@ -1931,7 +1931,7 @@ hipdnnStatus_t hipdnnFindConvolutionBackwardDataAlgorithmEx(
         std::cout
                 << "INTERNAL_ALLOC: miopenConvolutionBackwardGetWorkSpaceSize "
                 << "WSP= " << sConvolutionBackwardDataAlgorithmWorkspace
-                << " size = " << size << std::endlHIPDNNFLUSH;
+                << " size = " << size << std::endl HIPDNNFLUSH;
 #endif
 
         retVal = miopenTohipdnnStatus(
@@ -1945,13 +1945,13 @@ hipdnnStatus_t hipdnnFindConvolutionBackwardDataAlgorithmEx(
 #if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_ERRORS
             std::cout
                     << "...failed miopenFindConvolutionBackwardDataAlgorithm, returnedAlgoCount:"
-                    << *returnedAlgoCount << std::endlHIPDNNFLUSH;
+                    << *returnedAlgoCount << std::endl HIPDNNFLUSH;
 #endif
         } else {
 #if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_CALLS
             std::cout
                     << "...miopenFindConvolutionBackwardDataAlgorithm OK, returnedAlgoCount:"
-                    << *returnedAlgoCount << std::endlHIPDNNFLUSH;
+                    << *returnedAlgoCount << std::endl HIPDNNFLUSH;
 #endif
         }
 
@@ -1959,7 +1959,7 @@ hipdnnStatus_t hipdnnFindConvolutionBackwardDataAlgorithmEx(
     } catch (std::exception& e) {
         std::cout
                 << "Exception in hipdnnGetConvolutionBackwardDataWorkspaceSize: "
-                << e.what() << std::endlHIPDNNFLUSH;
+                << e.what() << std::endl HIPDNNFLUSH;
     }
 
     if (retVal == HIPDNN_STATUS_SUCCESS) {
@@ -1970,12 +1970,12 @@ hipdnnStatus_t hipdnnFindConvolutionBackwardDataAlgorithmEx(
             if (retVal != HIPDNN_STATUS_SUCCESS) {
 #if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_ERRORS
                 std::cout << "...failed miopenTohipConvolutionBwdDataAlgo"
-                        << std::endlHIPDNNFLUSH;
+                        << std::endl HIPDNNFLUSH;
 #endif
             } else {
 #if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_CALLS
                 std::cout << "...miopenTohipConvolutionBwdDataAlgo OK"
-                        << std::endlHIPDNNFLUSH;
+                        << std::endl HIPDNNFLUSH;
                 perfResults[i].status = HIPDNN_STATUS_SUCCESS; //TODO: miopen doesn't contain a 'status' member variable , setting it to success as of now.
                 perfResults[i].time = miopenPerfResults[i].time;
                 perfResults[i].memory = miopenPerfResults[i].memory;
@@ -2000,7 +2000,7 @@ hipdnnStatus_t hipdnnConvolutionBackwardData(hipdnnHandle_t handle,
 
 #if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_CALLS
     std::cout << "ConvolutionBackwardData: WS PTR=" << workSpace
-            << ", WS size = " << workSpaceSizeInBytes << std::endlHIPDNNFLUSH;
+            << ", WS size = " << workSpaceSizeInBytes << std::endl HIPDNNFLUSH;
 #endif
     try {
         if (workSpace == NULL || workSpaceSizeInBytes == 0) {
@@ -2019,7 +2019,7 @@ hipdnnStatus_t hipdnnConvolutionBackwardData(hipdnnHandle_t handle,
 #if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_ERRORS
                 std::cout
                         << "ConvolutionBackwardData: failed miopenConvolutionBackwardDataGetWorkSpaceSize: "
-                        << retVal << std::endlHIPDNNFLUSH;
+                        << retVal << std::endl HIPDNNFLUSH;
 #endif
 
                 return retVal;
@@ -2031,7 +2031,7 @@ hipdnnStatus_t hipdnnConvolutionBackwardData(hipdnnHandle_t handle,
 #if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_INTERNAL_ALLOC
             std::cout << "ConvolutionBackwardData: Allocated workspace "
                     << "WSP = " << sConvolutionBackwardDataAlgorithmWorkspace
-                    << ", size:" << size << std::endlHIPDNNFLUSH;
+                    << ", size:" << size << std::endl HIPDNNFLUSH;
 #endif
 
             // Allocate sConvolutionBackwardDataAlgorithmWorkspace to gather work space value
@@ -2044,7 +2044,7 @@ hipdnnStatus_t hipdnnConvolutionBackwardData(hipdnnHandle_t handle,
                         << "ConvolutionBackwardData: failed hipTomiopenConvolutionBwdDataAlgo: "
                                 "HIP algo = " << algo << ", miopen algo= "
                         << mialgo << ", error = " << retVal
-                        << std::endlHIPDNNFLUSH;
+                        << std::endl HIPDNNFLUSH;
 #endif
 
                 return retVal;
@@ -2052,12 +2052,12 @@ hipdnnStatus_t hipdnnConvolutionBackwardData(hipdnnHandle_t handle,
 #if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_CALLS
             std::cout
                     << "ConvolutionBackwardData:  hipTomiopenConvolutionBwdDataAlgo OK."
-                    << std::endlHIPDNNFLUSH;
+                    << std::endl HIPDNNFLUSH;
             std::cout
                     << "ConvolutionBackwardData: about to invoke miopenConvolutionBackwardData."
                     << ", WS PTR = "
                     << sConvolutionBackwardDataAlgorithmWorkspace
-                    << ", WS size =" << size << std::endlHIPDNNFLUSH;
+                    << ", WS size =" << size << std::endl HIPDNNFLUSH;
 #endif
 
             return miopenTohipdnnStatus(
@@ -2068,7 +2068,7 @@ hipdnnStatus_t hipdnnConvolutionBackwardData(hipdnnHandle_t handle,
         } else {
 #if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_CALLS
             std::cout << "ConvolutionBackwardData: workspace preallocated."
-                    << std::endlHIPDNNFLUSH;
+                    << std::endl HIPDNNFLUSH;
 #endif
 
             miopenConvBwdDataAlgorithm_t mialgo;
@@ -2081,7 +2081,7 @@ hipdnnStatus_t hipdnnConvolutionBackwardData(hipdnnHandle_t handle,
                         << "ConvolutionBackwardData: failed hipTomiopenConvolutionBwdDataAlgo: "
                                 "HIP algo = " << algo << ", miopen algo= "
                         << mialgo << ", error = " << retVal
-                        << std::endlHIPDNNFLUSH;
+                        << std::endl HIPDNNFLUSH;
 #endif
                 return retVal;
             }
@@ -2091,7 +2091,7 @@ hipdnnStatus_t hipdnnConvolutionBackwardData(hipdnnHandle_t handle,
 
 #if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_CALLS
             std::cout << "ConvolutionBackwardData: alpha and beta values are "
-                    << a << " and " << b << std::endlHIPDNNFLUSH;
+                    << a << " and " << b << std::endl HIPDNNFLUSH;
 #endif
 
             return miopenTohipdnnStatus(
@@ -2102,7 +2102,7 @@ hipdnnStatus_t hipdnnConvolutionBackwardData(hipdnnHandle_t handle,
 #if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_CALLS
             std::cout
                     << "ConvolutionBackwardData: Invoked miopenConvolutionBackwardData "
-                    << std::endlHIPDNNFLUSH;
+                    << std::endl HIPDNNFLUSH;
 #endif
 
         }
@@ -2110,7 +2110,7 @@ hipdnnStatus_t hipdnnConvolutionBackwardData(hipdnnHandle_t handle,
     } catch (std::exception& e) {
         std::cout
                 << "Exception in hipdnnGetConvolutionBackwardDataWorkspaceSize: "
-                << e.what() << std::endlHIPDNNFLUSH;
+                << e.what() << std::endl HIPDNNFLUSH;
     }
 }
 
@@ -2412,7 +2412,7 @@ hipdnnStatus_t hipdnnGetActivationDescriptor(
     *reluNanOpt = HIPDNN_PROPAGATE_NAN;
 
 #if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_ERRORS
-    std::cout << "EXIT hipdnnGetActivationDescriptor: " << retValHIPDNNFLUSH;
+    std::cout << "EXIT hipdnnGetActivationDescriptor: " << retVal    HIPDNNFLUSH;
 #endif
 
     return retVal;
@@ -2722,7 +2722,7 @@ hipdnnStatus_t hipdnnnBatchNormalizationForwardInference(hipdnnHandle_t handle,
 
 #if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_ERRORS
     std::cout << "hipdnnnBatchNormalizationForwardInference NOT IMPLEMENTED"
-            << std::endlHIPDNNFLUSH;
+            << std::endl HIPDNNFLUSH;
 #endif
 
     return HIPDNN_STATUS_NOT_SUPPORTED;
@@ -2778,13 +2778,13 @@ hipdnnStatus_t hipdnnSetTensorNdDescriptor(hipdnnTensorDescriptor_t tensorDesc,
 
 #if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_CALLS
     std::cout << "ENTER: hipdnnSetTensorNdDescriptor " << tensorDesc
-            << "... nbDims=" << nbDims << std::endlHIPDNNFLUSH;
+            << "... nbDims=" << nbDims << std::endl HIPDNNFLUSH;
 #endif
 
     if (dataType != HIPDNN_DATA_FLOAT) {
 #if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_ERRORS
         std::cout << "ERROR: hipdnnSetTensorNdDescriptor only supports floats:"
-                << dataType << std::endlHIPDNNFLUSH;
+                << dataType << std::endl HIPDNNFLUSH;
         retVal = HIPDNN_STATUS_NOT_SUPPORTED;
 #endif
 
@@ -2798,14 +2798,14 @@ hipdnnStatus_t hipdnnSetTensorNdDescriptor(hipdnnTensorDescriptor_t tensorDesc,
 #if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_ERRORS
             std::cout
                     << "ERROR: hipdnnSetTensorNdDescriptor only supports floats:"
-                    << dataType << std::endlHIPDNNFLUSH;
+                    << dataType << std::endl HIPDNNFLUSH;
             retVal = HIPDNN_STATUS_NOT_SUPPORTED;
 #endif
         }
     }
 
 #if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_CALLS
-    std::cout << "EXIT: hipdnnSetTensorNdDescriptor." << std::endlHIPDNNFLUSH;
+    std::cout << "EXIT: hipdnnSetTensorNdDescriptor." << std::endl HIPDNNFLUSH;
 #endif
 
     return retVal;
@@ -2819,7 +2819,7 @@ hipdnnStatus_t hipdnnGetTensorNdDescriptor(
 
 #if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_CALLS
     std::cout << "ENTER hipdnnGetTensorNdDescriptor " << tensorDesc
-            << std::endlHIPDNNFLUSH;
+            << std::endl HIPDNNFLUSH;
 #endif
 
     retVal = miopenTohipdnnStatus(
@@ -2833,7 +2833,7 @@ hipdnnStatus_t hipdnnGetTensorNdDescriptor(
         } else {
 #if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_ERRORS
             std::cout << "ERROR: hipdnnGetTensorNdDescriptor does not support:"
-                    << moDT << ", " << *dataType << std::endlHIPDNNFLUSH;
+                    << moDT << ", " << *dataType << std::endl HIPDNNFLUSH;
 #endif
         }
     } else {
@@ -2847,7 +2847,7 @@ hipdnnStatus_t hipdnnGetTensorNdDescriptor(
     std::cout
             << "EXIT hipdnnGetTensorNdDescriptor, datatype  (miopen, hipdnn)= "
             << moDT << ", " << *dataType << ",size=" << *nbDims
-            << std::endlHIPDNNFLUSH;
+            << std::endl HIPDNNFLUSH;
 #endif
     return retVal;
 }
@@ -2860,7 +2860,7 @@ hipdnnStatus_t hipdnnSetFilterNdDescriptor(hipdnnFilterDescriptor_t filterDesc,
 
 #if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_CALLS
     std::cout << "ENTER hipdnnSetFilterNdDescriptor " << filterDesc
-            << std::endlHIPDNNFLUSH;
+            << std::endl HIPDNNFLUSH;
 #endif
 
     retVal = hipTomiopenDataType(dataType, &moDT);
@@ -2873,20 +2873,20 @@ hipdnnStatus_t hipdnnSetFilterNdDescriptor(hipdnnFilterDescriptor_t filterDesc,
         if (retVal != HIPDNN_STATUS_SUCCESS) {
 #if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_ERRORS
             std::cout << "ERROR: hipdnnSetFilterNdDescriptor" << retVal
-                    << std::endlHIPDNNFLUSH;
+                    << std::endl HIPDNNFLUSH;
             retVal = HIPDNN_STATUS_NOT_SUPPORTED;
 #endif
         }
     } else {
 #if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_ERRORS
         std::cout << "ERROR: hipdnnSetFilterNdDescriptor only supports floats:"
-                << dataType << std::endlHIPDNNFLUSH;
+                << dataType << std::endl HIPDNNFLUSH;
         retVal = HIPDNN_STATUS_NOT_SUPPORTED;
 #endif
     }
 
 #if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_CALLS
-    std::cout << "EXIT hipdnnSetFilterNdDescriptor." << std::endlHIPDNNFLUSH;
+    std::cout << "EXIT hipdnnSetFilterNdDescriptor." << std::endl HIPDNNFLUSH;
 #endif
 
     return retVal;
@@ -2901,7 +2901,7 @@ hipdnnStatus_t hipdnnGetFilterNdDescriptor(
 
 #if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_CALLS
     std::cout << "ENTER hipdnnGetFilterNdDescriptor " << filterDesc
-            << std::endlHIPDNNFLUSH;
+            << std::endl HIPDNNFLUSH;
 #endif
 
     retVal = miopenTohipdnnStatus(
@@ -2920,7 +2920,7 @@ hipdnnStatus_t hipdnnGetFilterNdDescriptor(
     if (retVal != HIPDNN_STATUS_SUCCESS) {
 #if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_ERRORS
         std::cout << "ERROR: hipdnnGetFilterNdDescriptor " << retVal
-                << std::endlHIPDNNFLUSH;
+                << std::endl HIPDNNFLUSH;
 #endif
     }
 
@@ -2937,13 +2937,13 @@ hipdnnStatus_t hipdnnDestroyFilterDescriptor(
 
 #if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_CALLS
     std::cout << "ENTER hipdnnDestroyFilterDescriptor " << filterDesc
-            << std::endlHIPDNNFLUSH;
+            << std::endl HIPDNNFLUSH;
 #endif
 
     retVal = miopenTohipdnnStatus(miopenDestroyTensorDescriptor(filterDesc));
 
 #if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_CALLS
-    std::cout << "EXIT hipdnnDestroyFilterDescriptor." << std::endlHIPDNNFLUSH;
+    std::cout << "EXIT hipdnnDestroyFilterDescriptor." << std::endl HIPDNNFLUSH;
 #endif
 
     return retVal;
@@ -3133,7 +3133,7 @@ hipdnnStatus_t hipdnnSetPoolingNdDescriptor(
 
 #if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_CALLS
     std::cout << "Inside hipdnnSetPoolingNdDescriptor with nbDims :" << nbDims
-            << std::endlHIPDNNFLUSH;
+            << std::endl HIPDNNFLUSH;
 #endif
 
     if (nbDims == 2) {
@@ -3155,7 +3155,7 @@ hipdnnStatus_t hipdnnSetPoolingNdDescriptor(
     } else {
 #if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_ERRORS
         std::cout << "Higher dimensions > 2 Pooling is not supported"
-                << std::endlHIPDNNFLUSH;
+                << std::endl HIPDNNFLUSH;
 #endif
 
         return HIPDNN_STATUS_NOT_SUPPORTED;
@@ -3193,7 +3193,7 @@ hipdnnStatus_t hipdnnSetConvolutionNdDescriptor(
         {
 #if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_CALLS
     std::cout << "Inside hipdnnSetConvolutionNdDescriptor with arrayLength :"
-            << arrayLength << std::endlHIPDNNFLUSH;
+            << arrayLength << std::endl HIPDNNFLUSH;
 #endif
 
     if (arrayLength == 2) {
@@ -3210,7 +3210,7 @@ hipdnnStatus_t hipdnnSetConvolutionNdDescriptor(
     } else {
 #if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_ERRORS
         std::cout << "Inside hipdnnSetConvolutionNdDescriptor NOT SUPPORTED"
-                << std::endlHIPDNNFLUSH;
+                << std::endl HIPDNNFLUSH;
 #endif
         return HIPDNN_STATUS_NOT_SUPPORTED;
     }
@@ -3230,7 +3230,7 @@ hipdnnStatus_t hipdnnBatchNormalizationForwardInference(hipdnnHandle_t handle,
 
 #if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_ERRORS
     std::cout << "hipdnnBatchNormalizationForwardInference: NOT IMPLEMENTED."
-            << std::endlHIPDNNFLUSH;
+            << std::endl HIPDNNFLUSH;
 #endif
 
     return HIPDNN_STATUS_NOT_SUPPORTED;
@@ -3285,7 +3285,7 @@ hipdnnStatus_t hipdnnCreateReduceTensorDescriptor(
 
 #if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_ERRORS
     std::cout << "hipdnnCreateReduceTensorDescriptor: NOT SUPPORTED."
-            << std::endlHIPDNNFLUSH;
+            << std::endl HIPDNNFLUSH;
 #endif
 
     return HIPDNN_STATUS_NOT_SUPPORTED;
@@ -3343,7 +3343,7 @@ hipdnnStatus_t hipdnnReduceTensor(hipdnnHandle_t handle,
         const void *beta, const hipdnnTensorDescriptor_t cDesc, void *C) {
 
 #if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_ERRORS
-    std::cout << "hipdnnReduceTensor: NOT SUPPORTED." << std::endlHIPDNNFLUSH;
+    std::cout << "hipdnnReduceTensor: NOT SUPPORTED." << std::endl HIPDNNFLUSH;
 #endif
 
     return HIPDNN_STATUS_NOT_SUPPORTED;
@@ -3354,7 +3354,7 @@ hipdnnStatus_t hipdnnDestroyReduceTensorDescriptor(
 
 #if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_ERRORS
     std::cout << "hipdnnDestroyReduceTensorDescriptor: NOT SUPPORTED."
-            << std::endlHIPDNNFLUSH;
+            << std::endl HIPDNNFLUSH;
 #endif
 
     return HIPDNN_STATUS_NOT_SUPPORTED;
