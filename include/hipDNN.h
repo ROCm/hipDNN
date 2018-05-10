@@ -25,6 +25,26 @@
 
 #include <hip/hip_runtime_api.h>
 
+#define CHECK_HIP(cmd)                                                                                          \
+{                                                                                                           \
+    hipError_t error  = cmd;                                                                                \
+    if (error != hipSuccess) {                                                                              \
+        fprintf(stderr, "error: '%s'(%d) at %s:%d\n", hipGetErrorString(error), error,__FILE__, __LINE__);  \
+        exit(EXIT_FAILURE);\
+          }                                                                                                 \
+}
+
+#define CHECK_HIPDNN(expression)                                                        \
+{                                                                                       \
+    hipdnnStatus_t status = (expression);                                               \
+    if (status != HIPDNN_STATUS_SUCCESS) {                                              \
+      std::cerr << "HIPDNN Error on line " << __LINE__ << "With error status "<<": "    \
+                << hipdnnGetErrorString(status) << std::endl;                           \
+      std::exit(EXIT_FAILURE);                                                          \
+    }                                                                                   \
+}
+
+
 #define HIPDNN_EXPORT
 #define HIPDNN_VERSION 7000
 
@@ -726,7 +746,49 @@ hipdnnStatus_t hipdnnSetPoolingNdDescriptor(
 		const int windowDimA[], const int paddingA[], const int strideA[]);
 
 // human-readable error messages
-const char * hipdnnGetErrorString(hipdnnStatus_t status);
+// hipdnnGetErrorString
+const char* hipdnnGetErrorString(hipdnnStatus_t status) {
+    switch (status) {
+    case HIPDNN_STATUS_SUCCESS:
+        return "HIPDNN_STATUS_SUCCESS";
+
+    case HIPDNN_STATUS_NOT_INITIALIZED:
+        return "HIPDNN_STATUS_NOT_INITIALIZED";
+
+    case HIPDNN_STATUS_ALLOC_FAILED:
+        return "HIPDNN_STATUS_ALLOC_FAILED";
+
+    case HIPDNN_STATUS_BAD_PARAM:
+        return "HIPDNN_STATUS_BAD_PARAM";
+
+    case HIPDNN_STATUS_INTERNAL_ERROR:
+        return "HIPDNN_STATUS_INTERNAL_ERROR";
+
+    case HIPDNN_STATUS_INVALID_VALUE:
+        return "HIPDNN_STATUS_INVALID_VALUE";
+
+    case HIPDNN_STATUS_ARCH_MISMATCH:
+        return "HIPDNN_STATUS_ARCH_MISMATCH";
+
+    case HIPDNN_STATUS_MAPPING_ERROR:
+        return "HIPDNN_STATUS_MAPPING_ERROR";
+
+    case HIPDNN_STATUS_EXECUTION_FAILED:
+        return "HIPDNN_STATUS_EXECUTION_FAILED";
+
+    case HIPDNN_STATUS_NOT_SUPPORTED:
+        return "HIPDNN_STATUS_NOT_SUPPORTED";
+
+    case HIPDNN_STATUS_LICENSE_ERROR:
+        return "HIPDNN_STATUS_LICENSE_ERROR";
+
+    case HIPDNN_STATUS_RUNTIME_PREREQUISITE_MISSING:
+        return "HIPDNN_STATUS_RUNTIME_PREREQUISITE_MISSING";
+
+    default:
+        return "Unrecognized Status Code";
+    }
+}
 
 /* RNN API */
 typedef enum
