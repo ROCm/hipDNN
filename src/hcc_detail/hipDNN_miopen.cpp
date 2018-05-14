@@ -323,7 +323,7 @@ hipdnnStatus_t miopenTohipActivationMode(miopenActivationMode_t in,
         *out = HIPDNN_ACTIVATION_TANH;
         break;
 
-    case miopenActivationPATHTRU:
+    case miopenActivationPASTHRU:
         *out = HIPDNN_ACTIVATION_PATHTRU;
         break;
 
@@ -366,7 +366,7 @@ hipdnnStatus_t hipTomiopenActivationMode(hipdnnActivationMode_t in,
 
     case HIPDNN_ACTIVATION_PATHTRU:
         HIPDNN_OPEN_LOG_M("HIPDNN_ACTIVATION_PATHTRU"  << std::flush);
-        *out = miopenActivationPATHTRU;
+        *out = miopenActivationPASTHRU;
         break;
 
     case HIPDNN_ACTIVATION_SOFTRELU:
@@ -861,6 +861,7 @@ hipdnnStatus_t hipdnnCreateFilterDescriptor(
 hipdnnStatus_t hipdnnCreateConvolutionDescriptor(
         hipdnnConvolutionDescriptor_t *convDesc) {
     CHECK_MIO(miopenCreateConvolutionDescriptor(convDesc));
+    return HIPDNN_STATUS_SUCCESS;
 }
 
 //=============================================================================
