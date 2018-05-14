@@ -1113,9 +1113,8 @@ hipdnnStatus_t hipdnnGetConvolutionForwardWorkspaceSize(hipdnnHandle_t handle,
 
 
     miopenConvFwdAlgorithm_t mialgo;
-    CHECK_HIPDNN(hipTomiopenConvolutionFwdAlgo(algo, &mialgo));
 
-        //in miopen, workspace size does not depend on algo.
+    //in miopen, workspace size does not depend on algo.
     CHECK_MIO(miopenConvolutionForwardGetWorkSpaceSize(handle, wDesc, xDesc,
                         convDesc, yDesc, sizeInBytes));
 
