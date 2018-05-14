@@ -65,6 +65,9 @@ static std::map<miopenTensorDescriptor_t, int8_t*> sDescToWorkspaceLRN; //device
 static std::map<miopenTensorDescriptor_t, size_t> sDescToWorkspaceLRNSize; //host
 //static std::map<miopenConvolutionDescriptor_t, >
 
+
+static
+
 //=============================================================================
 
 hipdnnStatus_t miopenTohipdnnStatus(miopenStatus_t cStatus) {
@@ -1580,6 +1583,12 @@ hipdnnStatus_t hipdnnConvolutionBackwardData(hipdnnHandle_t handle,
     HIPDNN_OPEN_LOG_C("ConvolutionBackwardData: WS PTR=" << workSpace
             << ", WS size = " << workSpaceSizeInBytes  << std::flush);
 
+    void* priorDst = NULL; // Pointer to keep track of priorDst value
+    size_t priorDstSize;   // PriorDstSize
+    CHECK_HIP(hipMemPtrGetInfo(dx,&priorDstSize)); // Get the info of the gradient dx size
+    CHECK_HIP(hipMalloc(&priorDst, priorDstSize)); // Allocate priorDst
+    CHECK_HIP(hipMemcpy(priorDst, dx, priorDstSize, hipMemcpyDeviceToDevice)); //Copy gradient to prior Destination
+
     try
     {
         if (workSpace == NULL || workSpaceSizeInBytes == 0)
@@ -1612,9 +1621,25 @@ hipdnnStatus_t hipdnnConvolutionBackwardData(hipdnnHandle_t handle,
             << ", WS size =" << size  << std::flush);
 
 
-            CHECK_MIO(miopenConvolutionBackwardData(handle, alpha, dyDesc, dy,
+            HIPDNN_OPEN_LOG_C( "priorDstSize." << priorDstSize << std::flush);
+
+            if(*static_cast<const float*>(beta) == 0) {
+
+                CHECK_MIO(miopenConvolutionBackwardData(handle, alpha, dyDesc, dy,
                             wDesc, w, convDesc, mialgo, beta, dxDesc, dx,
                             sConvolutionBackwardDataAlgorithmWorkspace, size));
+            } else {
+                HIPDNN_OPEN_LOG_C( "Case Beta !=0."
+                             << std::flush);
+                const float tempBeta = 0;
+                CHECK_MIO(miopenConvolutionBackwardData(handle, alpha, dyDesc, dy,
+                                            wDesc, w, convDesc, mialgo, &tempBeta , dxDesc, dx,
+                                            sConvolutionBackwardDataAlgorithmWorkspace, size));
+
+                CHECK_HIPDNN(hipdnnAddTensor(handle, alpha, dxDesc, priorDst, beta, dxDesc, dx));
+
+            }
+
 
         }
         else
@@ -1635,10 +1660,17 @@ hipdnnStatus_t hipdnnConvolutionBackwardData(hipdnnHandle_t handle,
             HIPDNN_OPEN_LOG_C("ConvolutionBackwardData: alpha and beta values are "
             << a << " and " << b  << std::flush);
 
-
-            CHECK_MIO(miopenConvolutionBackwardData(handle, alpha, dyDesc, dy,
+            if(*static_cast<const float*>(beta) == 0) {
+                CHECK_MIO(miopenConvolutionBackwardData(handle, alpha, dyDesc, dy,
                             wDesc, w, convDesc, mialgo, beta, dxDesc, dx,
                             workSpace, workSpaceSizeInBytes));
+            } else {
+                const float tempBeta = 0;
+                CHECK_MIO(miopenConvolutionBackwardData(handle, alpha, dyDesc, dy,
+                                            wDesc, w, convDesc, mialgo, &tempBeta, dxDesc, dx,
+                                            workSpace, workSpaceSizeInBytes));
+                CHECK_HIPDNN(hipdnnAddTensor(handle, alpha, dxDesc, priorDst, beta, dxDesc, dx));
+            }
 
 
             HIPDNN_OPEN_LOG_C( "ConvolutionBackwardData: Invoked miopenConvolutionBackwardData "
@@ -1650,6 +1682,7 @@ hipdnnStatus_t hipdnnConvolutionBackwardData(hipdnnHandle_t handle,
                 << "Exception in hipdnnGetConvolutionBackwardDataWorkspaceSize: "
                 << e.what() << std::endl HIPDNNFLUSH;
     }
+    CHECK_HIP(hipFree(priorDst));
     return HIPDNN_STATUS_SUCCESS;
 }
 
