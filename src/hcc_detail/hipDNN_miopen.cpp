@@ -26,6 +26,7 @@
 #include <exception>
 #include <map>
 #include <logger.h>
+#include "hip/hip_runtime.h"
 
 #define HIPDNNFLUSH <<std::flush;
 #define PROMOTE_TO_SUPPORTED
@@ -66,7 +67,24 @@ static std::map<miopenTensorDescriptor_t, size_t> sDescToWorkspaceLRNSize; //hos
 //static std::map<miopenConvolutionDescriptor_t, >
 
 
-static
+// Custom TensorAdd Kernel
+
+/*
+ * Square each element in the array A and write to array C.
+ */
+template <typename T>
+__global__ void
+TensorAdd(T *C_d, T *A_d, size_t N)
+{
+    size_t offset = (hipBlockIdx_x * hipBlockDim_x + hipThreadIdx_x);
+    size_t stride = hipBlockDim_x * hipGridDim_x ;
+
+    for (size_t i=offset; i<N; i+=stride) {
+        C_d[i] = A_d[i] + C_d[i];
+    }
+}
+
+
 
 //=============================================================================
 
@@ -1400,9 +1418,16 @@ hipdnnStatus_t hipdnnConvolutionBackwardFilter(hipdnnHandle_t handle,
             CHECK_MIO(miopenConvolutionBackwardWeights(handle, alpha, dyDesc, dy,
                                    xDesc, x, convDesc, mialgo, &tempBeta, dwDesc, dw,
                                    sConvolutionBackwardFilterAlgorithmWorkspace, size));
-            CHECK_HIPDNN(hipdnnAddTensor(handle, alpha, dwDesc, priorDst, beta, dwDesc, dw));
+            // Trying to get the individual planes info
+            miopenDataType_t dataType = miopenFloat;
+            int dwArray[5];
+            int dwStride[5];
+            CHECK_MIO(miopenGetTensorDescriptor(dwDesc, &dataType, dwArray, dwStride));
+            int totalElements = dwArray[0] * dwArray[1] * dwArray[2] * dwArray[3];
+            const unsigned blocks = 512;
+            const unsigned threadsPerBlock = 256;
+            hipLaunchKernelGGL((TensorAdd<float>), dim3(blocks), dim3(threadsPerBlock), 0, 0, (float*)dw, (float*)priorDst, totalElements);
         }
-
     } else {
 
         HIPDNN_OPEN_LOG_I("PREALLCOATED: hipdnnConvolutionBackwardFilter:" << workSpace
@@ -1422,7 +1447,15 @@ hipdnnStatus_t hipdnnConvolutionBackwardFilter(hipdnnHandle_t handle,
             CHECK_MIO(miopenConvolutionBackwardWeights(handle, alpha, dyDesc, dy,
                                         xDesc, x, convDesc, mialgo, &tempBeta, dwDesc, dw,
                                         workSpace, workSpaceSizeInBytes));
-            CHECK_HIPDNN(hipdnnAddTensor(handle, alpha, dwDesc, priorDst, beta, dwDesc, dw));
+            // Trying to get the individual planes info
+            miopenDataType_t dataType = miopenFloat;
+            int dwArray[5];
+            int dwStride[5];
+            CHECK_MIO(miopenGetTensorDescriptor(dwDesc, &dataType, dwArray, dwStride));
+            int totalElements = dwArray[0] * dwArray[1] * dwArray[2] * dwArray[3];
+            const unsigned blocks = 512;
+            const unsigned threadsPerBlock = 256;
+            hipLaunchKernelGGL((TensorAdd<float>), dim3(blocks), dim3(threadsPerBlock), 0, 0, (float*)dw, (float*)priorDst, totalElements);
         }
 
         HIPDNN_OPEN_LOG_C("miopenConvolutionBackwardWeights "
@@ -1608,9 +1641,11 @@ hipdnnStatus_t hipdnnConvolutionBackwardData(hipdnnHandle_t handle,
             << ", WS size = " << workSpaceSizeInBytes  << std::flush);
 
     void* priorDst = NULL; // Pointer to keep track of priorDst value
+    void* TempResult = NULL;
     size_t priorDstSize;   // PriorDstSize
     CHECK_HIP(hipMemPtrGetInfo(dx,&priorDstSize)); // Get the info of the gradient dx size
     CHECK_HIP(hipMalloc(&priorDst, priorDstSize)); // Allocate priorDst
+    CHECK_HIP(hipHostMalloc(&TempResult, priorDstSize));
     CHECK_HIP(hipMemcpy(priorDst, dx, priorDstSize, hipMemcpyDeviceToDevice)); //Copy gradient to prior Destination
 
     try
@@ -1659,12 +1694,20 @@ hipdnnStatus_t hipdnnConvolutionBackwardData(hipdnnHandle_t handle,
                 CHECK_MIO(miopenConvolutionBackwardData(handle, alpha, dyDesc, dy,
                                             wDesc, w, convDesc, mialgo, &tempBeta , dxDesc, dx,
                                             sConvolutionBackwardDataAlgorithmWorkspace, size));
-                int dxDescSize;
-                CHECK_MIO(miopenGetTensorDescriptorSize(dxDesc, &dxDescSize));
 
-                HIPDNN_OPEN_LOG_M( "dxDesc size."<< dxDescSize
-                                             << std::flush);
-                CHECK_HIPDNN(hipdnnAddTensor(handle, alpha, dxDesc, priorDst, beta, dxDesc, dx));
+                // Trying to get the individual planes info
+                miopenDataType_t dataType = miopenFloat;
+                int dxArray[5];
+                int dxStride[5];
+                CHECK_MIO(miopenGetTensorDescriptor(dxDesc, &dataType, dxArray, dxStride));
+
+
+                int totalElements = dxArray[0] * dxArray[1] * dxArray[2] * dxArray[3];
+
+                const unsigned blocks = 512;
+                const unsigned threadsPerBlock = 256;
+                hipLaunchKernelGGL((TensorAdd<float>), dim3(blocks), dim3(threadsPerBlock), 0, 0, (float*)dx, (float*)priorDst, totalElements);
+                //CHECK_HIPDNN(hipdnnAddTensor(handle, alpha, dxDesc, priorDst, beta, dxDesc, dx));
 
             }
 
@@ -1697,7 +1740,18 @@ hipdnnStatus_t hipdnnConvolutionBackwardData(hipdnnHandle_t handle,
                 CHECK_MIO(miopenConvolutionBackwardData(handle, alpha, dyDesc, dy,
                                             wDesc, w, convDesc, mialgo, &tempBeta, dxDesc, dx,
                                             workSpace, workSpaceSizeInBytes));
-                CHECK_HIPDNN(hipdnnAddTensor(handle, alpha, dxDesc, priorDst, beta, dxDesc, dx));
+                // Trying to get the individual planes info
+                 miopenDataType_t dataType = miopenFloat;
+                 int dxArray[5];
+                 int dxStride[5];
+                 CHECK_MIO(miopenGetTensorDescriptor(dxDesc, &dataType, dxArray, dxStride));
+
+
+                 int totalElements = dxArray[0] * dxArray[1] * dxArray[2] * dxArray[3];
+
+                 const unsigned blocks = 512;
+                 const unsigned threadsPerBlock = 256;
+                             hipLaunchKernelGGL((TensorAdd<float>), dim3(blocks), dim3(threadsPerBlock), 0, 0, (float*)dx, (float*)priorDst, totalElements);
             }
 
 
