@@ -64,7 +64,7 @@ static std::map<miopenTensorDescriptor_t, size_t> sDescToWorkspacePoolingSize; /
 
 static std::map<miopenTensorDescriptor_t, int8_t*> sDescToWorkspaceLRN; //device pointers
 static std::map<miopenTensorDescriptor_t, size_t> sDescToWorkspaceLRNSize; //host
-//static std::map<miopenConvolutionDescriptor_t, >
+static std::map<miopenConvolutionDescriptor_t, int*> sDescTo3DConvolution;
 
 
 // Custom TensorAdd Kernel
@@ -2681,15 +2681,29 @@ hipdnnStatus_t hipdnnSetConvolutionNdDescriptor(
                 miopenInitConvolutionDescriptor(convDesc, miopenConvolution,
                         pad_h, pad_w, u, v, 1, 1));
     } else if (arrayLength == 3) {
-        pad_h = padA[1];
-        pad_w = padA[2];
-        u = filterStrideA[1];
-        v = filterStrideA[2];
-        d_h = dilationA[1];
-        d_w = dilationA[2];
+      // 3D convolution Scenario
+      // Got to book keep additional padding, stride and dilation info along
+      //  depth direction
+      // Book keeping using global static std::map container
+      // But first lets initialize the 2D Description
+        pad_h = padA[0];
+        pad_w = padA[1];
+        u = filterStrideA[0];
+        v = filterStrideA[1];
+        d_h = dilationA[0];
+        d_w = dilationA[1];
         CHECK_MIO(
                 miopenInitConvolutionDescriptor(convDesc, miopenConvolution,
-                        pad_h, pad_w, u, v, d_h, d_w));
+                        pad_h, pad_w, u, v, 1, 1));
+        // Populate the map container with key being newly created 2Ddescriptor
+        // and value a 3 dim array with index mapping as
+        // 0-pad, 1-stride and 2-dilation
+        int depthDesc[3];
+        depthDesc[0] = padA[2];
+        depthDesc[1] = filterStrideA[2];
+        depthDesc[2] = dilationA[2];
+        sDescTo3DConvolution[convDesc]=depthDesc;
+
     }
     else
     {
