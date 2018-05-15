@@ -64,7 +64,7 @@ static std::map<miopenTensorDescriptor_t, size_t> sDescToWorkspacePoolingSize; /
 
 static std::map<miopenTensorDescriptor_t, int8_t*> sDescToWorkspaceLRN; //device pointers
 static std::map<miopenTensorDescriptor_t, size_t> sDescToWorkspaceLRNSize; //host
-static std::map<miopenConvolutionDescriptor_t, int*> sDescTo3DConvolution;
+static std::map<miopenConvolutionDescriptor_t, int*> sDescTo3DConvolution; // To bookkeep 3D depth information
 
 
 // Custom TensorAdd Kernel
@@ -310,21 +310,22 @@ hipdnnStatus_t miopenTohipLRNMode(miopenLRNMode_t in, hipdnnLRNMode_t* out) {
 
 //=============================================================================
 
-miopenBatchNormMode_t hipTomiopenBatchNormMode(hipdnnBatchNormMode_t in) {
-    if (in == HIPDNN_BATCHNORM_PER_ACTIVATION) {
-
-        HIPDNN_OPEN_LOG_M("HIPDNN_BATCHNORM_PER_ACTIVATION"  << std::flush);
-        return miopenBNPerActivation;
-    } else if (in == HIPDNN_BATCHNORM_SPATIAL) {
-
-        HIPDNN_OPEN_LOG_M("HIPDNN_BATCHNORM_SPATIAL"  << std ::flush);
-        return miopenBNSpatial;
+hipdnnStatus_t hipTomiopenBatchNormMode(hipdnnBatchNormMode_t in, miopenBatchNormMode_t *out) {
+    switch(in) {
+    case HIPDNN_BATCHNORM_PER_ACTIVATION:
+        *out = miopenBNPerActivation;
+        break;
+    case HIPDNN_BATCHNORM_SPATIAL:
+        *out = miopenBNSpatial;
+        break;
+    case HIPDNN_BATCHNORM_SPATIAL_PERSISTENT:
+        *out = miopenBNSpatial; // TODO: Change when Spatial persistent is supported on MIOPEN
+        break;
+    default:
+        HIPDNN_OPEN_LOG_E("Invalid HIPDNN_BATCHNORM_MODE"  << std::flush);
+        return HIPDNN_STATUS_NOT_SUPPORTED;
     }
-
-    HIPDNN_OPEN_LOG_E("HIPDNN_BATCHNORM_SPATIAL"  << std ::flush);
-
-//HGSOS need to return error code, those are not the only options!
-    return miopenBNPerActivation;
+    return HIPDNN_STATUS_SUCCESS;
 }
 
 //=============================================================================
@@ -2255,9 +2256,9 @@ hipdnnStatus_t hipdnnDeriveBNTensorDescriptor(
 #if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_CALLS
     std::cout << "Inside hipdnnDeriveBNTensorDescriptor\n";
 #endif
-    CHECK_MIO(
-            miopenDeriveBNTensorDescriptor(derivedBnDesc, xDesc,
-                    hipTomiopenBatchNormMode(mode)));
+    miopenBatchNormMode_t miBNMode;
+    CHECK_HIPDNN(hipTomiopenBatchNormMode(mode, &miBNMode));
+    CHECK_MIO(miopenDeriveBNTensorDescriptor(derivedBnDesc, xDesc, miBNMode));
     return HIPDNN_STATUS_SUCCESS;
 }
 
@@ -2275,10 +2276,11 @@ hipdnnStatus_t hipdnnBatchNormalizationForwardTraining(hipdnnHandle_t handle,
 #if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_CALLS
     std::cout << "Inside hipdnnBatchNormalizationForwardTraining\n";
 #endif
-
+    miopenBatchNormMode_t miBNMode;
+    CHECK_HIPDNN(hipTomiopenBatchNormMode(mode, &miBNMode));
     CHECK_MIO(
             miopenBatchNormalizationForwardTraining(handle,
-                    hipTomiopenBatchNormMode(mode), alpha, beta, xDesc, x,
+                    miBNMode, alpha, beta, xDesc, x,
                     yDesc, y, bnScaleBiasMeanVarDesc, bnScale, bnBias,
                     exponentialAverageFactor, resultRunningMean,
                     resultRunningVariance, epsilon, resultSaveMean,
@@ -2299,9 +2301,11 @@ hipdnnStatus_t hipdnnnBatchNormalizationForwardInference(hipdnnHandle_t handle,
     return HIPDNN_STATUS_NOT_SUPPORTED;
 #ifdef NOTYET
     //arguments 10,11,12,13 below are not const in miopen.
+    miopenBatchNormMode_t miBNMode;
+    CHECK_HIPDNN(hipTomiopenBatchNormMode(mode, &miBNMode));
     CHECK_MIO(
             miopenBatchNormalizationForwardInference( handle,
-                    hipTomiopenBatchNormMode(mode),
+                    miBNMode,
                     alpha,
                     beta,
                     xDesc,
@@ -2328,9 +2332,11 @@ hipdnnStatus_t hipdnnBatchNormalizationBackward(hipdnnHandle_t handle,
         void *resultBnScaleDiff, void *resultBnBiasDiff, double epsilon,
         const void *savedMean, const void *savedInvVariance) {
     HIPDNN_OPEN_LOG_C("Inside hipdnnBatchNormalizationBackward");
+    miopenBatchNormMode_t miBNMode;
+    CHECK_HIPDNN(hipTomiopenBatchNormMode(mode, &miBNMode));
     CHECK_MIO(
             miopenBatchNormalizationBackward(handle,
-                    hipTomiopenBatchNormMode(mode), alphaDataDiff, betaDataDiff,
+                    miBNMode, alphaDataDiff, betaDataDiff,
                     alphaParamDiff, betaParamDiff, xDesc, x, dyDesc, dy, dxDesc,
                     dx, bnScaleBiasDiffDesc, bnScale, resultBnScaleDiff,
                     resultBnBiasDiff, epsilon, savedMean, savedInvVariance));
