@@ -33,7 +33,7 @@ int IsLogging(LoggingLevel level);
         if(open::IsLogging(level))                                           \
         {                                                                    \
             std::cerr<< __VA_ARGS__<< std ::endl;                            \
-        }                                                                    \               
+        }                                                                    \
 }while(false)
 
 #define HIPDNN_OPEN_LOG_E(...) OPEN_LOG(open::LoggingLevel::ERRORS, __VA_ARGS__) 
