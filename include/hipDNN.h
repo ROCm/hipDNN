@@ -745,50 +745,8 @@ hipdnnStatus_t hipdnnSetPoolingNdDescriptor(
 		const hipdnnNanPropagation_t maxpoolingNanOpt, int nbDims,
 		const int windowDimA[], const int paddingA[], const int strideA[]);
 
-// human-readable error messages
-// hipdnnGetErrorString
-const char* hipdnnGetErrorString(hipdnnStatus_t status) {
-    switch (status) {
-    case HIPDNN_STATUS_SUCCESS:
-        return "HIPDNN_STATUS_SUCCESS";
 
-    case HIPDNN_STATUS_NOT_INITIALIZED:
-        return "HIPDNN_STATUS_NOT_INITIALIZED";
-
-    case HIPDNN_STATUS_ALLOC_FAILED:
-        return "HIPDNN_STATUS_ALLOC_FAILED";
-
-    case HIPDNN_STATUS_BAD_PARAM:
-        return "HIPDNN_STATUS_BAD_PARAM";
-
-    case HIPDNN_STATUS_INTERNAL_ERROR:
-        return "HIPDNN_STATUS_INTERNAL_ERROR";
-
-    case HIPDNN_STATUS_INVALID_VALUE:
-        return "HIPDNN_STATUS_INVALID_VALUE";
-
-    case HIPDNN_STATUS_ARCH_MISMATCH:
-        return "HIPDNN_STATUS_ARCH_MISMATCH";
-
-    case HIPDNN_STATUS_MAPPING_ERROR:
-        return "HIPDNN_STATUS_MAPPING_ERROR";
-
-    case HIPDNN_STATUS_EXECUTION_FAILED:
-        return "HIPDNN_STATUS_EXECUTION_FAILED";
-
-    case HIPDNN_STATUS_NOT_SUPPORTED:
-        return "HIPDNN_STATUS_NOT_SUPPORTED";
-
-    case HIPDNN_STATUS_LICENSE_ERROR:
-        return "HIPDNN_STATUS_LICENSE_ERROR";
-
-    case HIPDNN_STATUS_RUNTIME_PREREQUISITE_MISSING:
-        return "HIPDNN_STATUS_RUNTIME_PREREQUISITE_MISSING";
-
-    default:
-        return "Unrecognized Status Code";
-    }
-}
+const char* hipdnnGetErrorString(hipdnnStatus_t status);
 
 /* RNN API */
 typedef enum
