@@ -941,6 +941,7 @@ hipdnnStatus_t hipdnnGetConvolution2dForwardOutputDim(
             << std::flush);
     CHECK_MIO(miopenGetConvolutionForwardOutputDim(convDesc, //HGSOSOS should be const in miopen.
             inputTensorDesc, filterDesc, n, c, h, w));
+    return HIPDNN_STATUS_SUCCESS;
 }
 
 //==============================================================================
@@ -948,6 +949,7 @@ hipdnnStatus_t hipdnnGetConvolution2dForwardOutputDim(
 hipdnnStatus_t hipdnnDestroyConvolutionDescriptor(
         hipdnnConvolutionDescriptor_t convDesc) {
     CHECK_MIO(miopenDestroyConvolutionDescriptor(convDesc));
+    return HIPDNN_STATUS_SUCCESS;
 }
 
 //===============================================================================
@@ -1530,6 +1532,7 @@ hipdnnStatus_t hipdnnFindConvolutionBackwardDataAlgorithm(hipdnnHandle_t handle,
                 << "Exception in hipdnnGetConvolutionBackwardDataWorkspaceSize: "
                 << e.what() << std::endl HIPDNNFLUSH;
     }
+    return HIPDNN_STATUS_NOT_SUPPORTED;
 }
 
 hipdnnStatus_t hipdnnGetConvolutionBackwardDataAlgorithm(hipdnnHandle_t handle,
@@ -1555,6 +1558,7 @@ hipdnnStatus_t hipdnnGetConvolutionBackwardDataAlgorithm(hipdnnHandle_t handle,
                 << "Exception in hipdnnGetConvolutionBackwardDataWorkspaceSize: "
                 << e.what() << std::endl HIPDNNFLUSH;
     }
+    return HIPDNN_STATUS_NOT_SUPPORTED;
 }
 
 hipdnnStatus_t hipdnnFindConvolutionBackwardDataAlgorithmEx(
