@@ -85,6 +85,10 @@ TensorAdd(T *C_d, T *A_d, size_t N)
 }
 
 
+//GetForwardOutputDim for 3D Convolution
+
+
+
 
 //=============================================================================
 
@@ -1390,11 +1394,11 @@ hipdnnStatus_t hipdnnConvolutionBackwardFilter(hipdnnHandle_t handle,
 
 
     HIPDNN_OPEN_LOG_C("CALL_STACK: Inside hipdnnConvolutionBackwardFilter");
-    void* priorDst = NULL; // Pointer to keep track of priorDst value
-    size_t priorDstSize;   // PriorDstSize
-    CHECK_HIP(hipMemPtrGetInfo(dw,&priorDstSize)); // Get the info of the gradient dw size
-    CHECK_HIP(hipMalloc(&priorDst, priorDstSize)); // Allocate priorDst
-    CHECK_HIP(hipMemcpy(priorDst, dw, priorDstSize, hipMemcpyDeviceToDevice)); //Copy gradient to prior Destination
+    void* dwPrior = NULL; // Pointer to keep track of priorDst value
+    size_t dwPriorSize;   // PriorDstSize
+    CHECK_HIP(hipMemPtrGetInfo(dw,&dwPriorSize)); // Get the info of the gradient dw size
+    CHECK_HIP(hipMalloc(&dwPrior, dwPriorSize)); // Allocate priorDst
+    CHECK_HIP(hipMemcpy(dwPrior, dw, dwPriorSize, hipMemcpyDeviceToDevice)); //Copy gradient to prior Destination
 
 
     if (workSpaceSizeInBytes == 0 || workSpace == NULL) {
@@ -1427,7 +1431,7 @@ hipdnnStatus_t hipdnnConvolutionBackwardFilter(hipdnnHandle_t handle,
             int totalElements = dwArray[0] * dwArray[1] * dwArray[2] * dwArray[3];
             const unsigned blocks = 512;
             const unsigned threadsPerBlock = 256;
-            hipLaunchKernelGGL((TensorAdd<float>), dim3(blocks), dim3(threadsPerBlock), 0, 0, (float*)dw, (float*)priorDst, totalElements);
+            hipLaunchKernelGGL((TensorAdd<float>), dim3(blocks), dim3(threadsPerBlock), 0, 0, (float*)dw, (float*)dwPrior, totalElements);
         }
     } else {
 
@@ -1456,7 +1460,7 @@ hipdnnStatus_t hipdnnConvolutionBackwardFilter(hipdnnHandle_t handle,
             int totalElements = dwArray[0] * dwArray[1] * dwArray[2] * dwArray[3];
             const unsigned blocks = 512;
             const unsigned threadsPerBlock = 256;
-            hipLaunchKernelGGL((TensorAdd<float>), dim3(blocks), dim3(threadsPerBlock), 0, 0, (float*)dw, (float*)priorDst, totalElements);
+            hipLaunchKernelGGL((TensorAdd<float>), dim3(blocks), dim3(threadsPerBlock), 0, 0, (float*)dw, (float*)dwPrior, totalElements);
         }
 
         HIPDNN_OPEN_LOG_C("miopenConvolutionBackwardWeights "
@@ -1475,7 +1479,7 @@ hipdnnStatus_t hipdnnConvolutionBackwardFilter(hipdnnHandle_t handle,
             << ",dw=" << dw  << std::flush);
     }
 
-    CHECK_HIP(hipFree(priorDst));
+    CHECK_HIP(hipFree(dwPrior));
     return HIPDNN_STATUS_SUCCESS;
 
 }
@@ -1641,13 +1645,11 @@ hipdnnStatus_t hipdnnConvolutionBackwardData(hipdnnHandle_t handle,
     HIPDNN_OPEN_LOG_C("ConvolutionBackwardData: WS PTR=" << workSpace
             << ", WS size = " << workSpaceSizeInBytes  << std::flush);
 
-    void* priorDst = NULL; // Pointer to keep track of priorDst value
-    void* TempResult = NULL;
-    size_t priorDstSize;   // PriorDstSize
-    CHECK_HIP(hipMemPtrGetInfo(dx,&priorDstSize)); // Get the info of the gradient dx size
-    CHECK_HIP(hipMalloc(&priorDst, priorDstSize)); // Allocate priorDst
-    CHECK_HIP(hipHostMalloc(&TempResult, priorDstSize));
-    CHECK_HIP(hipMemcpy(priorDst, dx, priorDstSize, hipMemcpyDeviceToDevice)); //Copy gradient to prior Destination
+    void* dxPrior = NULL; // Pointer to keep track of priorDst value
+    size_t dxPriorSize;   // PriorDstSize
+    CHECK_HIP(hipMemPtrGetInfo(dx,&dxPriorSize)); // Get the info of the gradient dx size
+    CHECK_HIP(hipMalloc(&dxPrior, dxPriorSize)); // Allocate priorDst
+    CHECK_HIP(hipMemcpy(dxPrior, dx, dxPriorSize, hipMemcpyDeviceToDevice)); //Copy gradient to prior Destination
 
     try
     {
@@ -1680,9 +1682,6 @@ hipdnnStatus_t hipdnnConvolutionBackwardData(hipdnnHandle_t handle,
             << sConvolutionBackwardDataAlgorithmWorkspace
             << ", WS size =" << size  << std::flush);
 
-
-            HIPDNN_OPEN_LOG_C( "priorDstSize." << priorDstSize << std::flush);
-
             if(*static_cast<const float*>(beta) == 0) {
 
                 CHECK_MIO(miopenConvolutionBackwardData(handle, alpha, dyDesc, dy,
@@ -1707,8 +1706,8 @@ hipdnnStatus_t hipdnnConvolutionBackwardData(hipdnnHandle_t handle,
 
                 const unsigned blocks = 512;
                 const unsigned threadsPerBlock = 256;
-                hipLaunchKernelGGL((TensorAdd<float>), dim3(blocks), dim3(threadsPerBlock), 0, 0, (float*)dx, (float*)priorDst, totalElements);
-                //CHECK_HIPDNN(hipdnnAddTensor(handle, alpha, dxDesc, priorDst, beta, dxDesc, dx));
+                hipLaunchKernelGGL((TensorAdd<float>), dim3(blocks), dim3(threadsPerBlock), 0, 0, (float*)dx, (float*)dxPrior, totalElements);
+
 
             }
 
@@ -1752,7 +1751,7 @@ hipdnnStatus_t hipdnnConvolutionBackwardData(hipdnnHandle_t handle,
 
                  const unsigned blocks = 512;
                  const unsigned threadsPerBlock = 256;
-                             hipLaunchKernelGGL((TensorAdd<float>), dim3(blocks), dim3(threadsPerBlock), 0, 0, (float*)dx, (float*)priorDst, totalElements);
+                             hipLaunchKernelGGL((TensorAdd<float>), dim3(blocks), dim3(threadsPerBlock), 0, 0, (float*)dx, (float*)dxPrior, totalElements);
             }
 
 
@@ -1765,7 +1764,7 @@ hipdnnStatus_t hipdnnConvolutionBackwardData(hipdnnHandle_t handle,
                 << "Exception in hipdnnGetConvolutionBackwardDataWorkspaceSize: "
                 << e.what() << std::endl HIPDNNFLUSH;
     }
-    CHECK_HIP(hipFree(priorDst));
+    CHECK_HIP(hipFree(dxPrior));
     return HIPDNN_STATUS_SUCCESS;
 }
 
