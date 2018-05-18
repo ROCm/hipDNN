@@ -70,17 +70,16 @@ static std::map<miopenConvolutionDescriptor_t, int*> sDescTo3DConvolution; // To
 // Custom TensorAdd Kernel
 
 /*
- * Square each element in the array A and write to array C.
+ * dst= dst + beta * prior
  */
 template <typename T>
 __global__ void
-TensorAdd(T *C_d, T *A_d, size_t N)
+TensorAdd(T *C_d, T *A_d, T beta, int N)
 {
     size_t offset = (hipBlockIdx_x * hipBlockDim_x + hipThreadIdx_x);
     size_t stride = hipBlockDim_x * hipGridDim_x ;
-
     for (size_t i=offset; i<N; i+=stride) {
-        C_d[i] = A_d[i] + C_d[i];
+        C_d[i] = beta * A_d[i] +  C_d[i];
     }
 }
 
@@ -1433,7 +1432,12 @@ hipdnnStatus_t hipdnnConvolutionBackwardFilter(hipdnnHandle_t handle,
             int totalElements = dwArray[0] * dwArray[1] * dwArray[2] * dwArray[3];
             const unsigned blocks = 512;
             const unsigned threadsPerBlock = 256;
-            hipLaunchKernelGGL((TensorAdd<float>), dim3(blocks), dim3(threadsPerBlock), 0, 0, (float*)dw, (float*)dwPrior, totalElements);
+            float betaVal = *(static_cast<const float*>(beta));
+            std::cout<<"betaVal***********************"<<betaVal<<std::endl;
+            float* dwF = static_cast<float*>(dw);
+            float* dwPriorF = static_cast<float*>(dwPrior);
+            hipLaunchKernelGGL((TensorAdd<float>), dim3(blocks), dim3(threadsPerBlock), 0, 0, dwF, dwPriorF, betaVal, totalElements);
+            hipDeviceSynchronize();
         }
     } else {
 
@@ -1462,7 +1466,12 @@ hipdnnStatus_t hipdnnConvolutionBackwardFilter(hipdnnHandle_t handle,
             int totalElements = dwArray[0] * dwArray[1] * dwArray[2] * dwArray[3];
             const unsigned blocks = 512;
             const unsigned threadsPerBlock = 256;
-            hipLaunchKernelGGL((TensorAdd<float>), dim3(blocks), dim3(threadsPerBlock), 0, 0, (float*)dw, (float*)dwPrior, totalElements);
+            float betaVal = *(static_cast<const float*>(beta));
+            std::cout<<"betaVal***********************"<<betaVal<<std::endl;
+            float* dwF = static_cast<float*>(dw);
+            float* dwPriorF = static_cast<float*>(dwPrior);
+            hipLaunchKernelGGL((TensorAdd<float>), dim3(blocks), dim3(threadsPerBlock), 0, 0, dwF, dwPriorF, betaVal, totalElements);
+            hipDeviceSynchronize();
         }
 
         HIPDNN_OPEN_LOG_C("miopenConvolutionBackwardWeights "
@@ -1710,8 +1719,12 @@ hipdnnStatus_t hipdnnConvolutionBackwardData(hipdnnHandle_t handle,
 
                 const unsigned blocks = 512;
                 const unsigned threadsPerBlock = 256;
-                hipLaunchKernelGGL((TensorAdd<float>), dim3(blocks), dim3(threadsPerBlock), 0, 0, (float*)dx, (float*)dxPrior, totalElements);
-
+                float betaVal = *(static_cast<const float*>(beta));
+                std::cout<<"betaVal***********************"<<betaVal<<std::endl;
+                float* dxF = static_cast<float*>(dx);
+                float* dxPriorF = static_cast<float*>(dxPrior);
+                hipLaunchKernelGGL((TensorAdd<float>), dim3(blocks), dim3(threadsPerBlock), 0, 0, dxF, dxPriorF, betaVal, totalElements);
+                hipDeviceSynchronize();
 
             }
 
@@ -1755,7 +1768,11 @@ hipdnnStatus_t hipdnnConvolutionBackwardData(hipdnnHandle_t handle,
 
                  const unsigned blocks = 512;
                  const unsigned threadsPerBlock = 256;
-                             hipLaunchKernelGGL((TensorAdd<float>), dim3(blocks), dim3(threadsPerBlock), 0, 0, (float*)dx, (float*)dxPrior, totalElements);
+                 float betaVal = *(static_cast<const float*>(beta));
+                 float* dxF = static_cast<float*>(dx);
+                 float* dxPriorF = static_cast<float*>(dxPrior);
+                 hipLaunchKernelGGL((TensorAdd<float>), dim3(blocks), dim3(threadsPerBlock), 0, 0, dxF, dxPriorF, betaVal, totalElements);
+                 hipDeviceSynchronize();
             }
 
 
