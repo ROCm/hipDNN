@@ -1093,7 +1093,7 @@ hipdnnStatus_t hipdnnFindConvolutionForwardAlgorithmEx(hipdnnHandle_t handle,
                 miopenFindConvolutionForwardAlgorithm(handle, xDesc, x, wDesc,
                         w, convDesc, yDesc, y, requestedAlgoCount,
                         returnedAlgoCount, miopenPerfResults,
-                        sConvolutionForwardAlgorithmWorkspace, size, true //exhaustiveSearch
+                        sConvolutionForwardAlgorithmWorkspace, size, false //exhaustiveSearch
                         ));
     }
     else {
@@ -1104,7 +1104,7 @@ hipdnnStatus_t hipdnnFindConvolutionForwardAlgorithmEx(hipdnnHandle_t handle,
                 miopenFindConvolutionForwardAlgorithm(handle, xDesc, x, wDesc,
                         w, convDesc, yDesc, y, requestedAlgoCount,
                         returnedAlgoCount, miopenPerfResults, workSpace,
-                        workSpaceSizeInBytes, true //exhaustiveSearch
+                        workSpaceSizeInBytes, false //exhaustiveSearch
                         ));
 
         CHECK_HIPDNN(miopenTohipConvolutionFwdAlgo(miopenPerfResults->fwd_algo,
@@ -1323,7 +1323,7 @@ hipdnnStatus_t hipdnnFindConvolutionBackwardFilterAlgorithmEx(
                             requestedAlgoCount, returnedAlgoCount,
                             miopenPerfResults,
                             sConvolutionBackwardFilterAlgorithmWorkspace, size,
-                            true //exhaustiveSearch
+                            false //exhaustiveSearch
                             ));
 
 
@@ -1334,7 +1334,7 @@ hipdnnStatus_t hipdnnFindConvolutionBackwardFilterAlgorithmEx(
                             dyDesc, dy, xDesc, x, convDesc, dwDesc, dw,
                             requestedAlgoCount, returnedAlgoCount,
                             miopenPerfResults, workSpace, workSpaceSizeInBytes,
-                            true //exhaustiveSearch
+                            false //exhaustiveSearch
                             ));
         }
     } catch (std::exception& e) {
@@ -1608,7 +1608,7 @@ hipdnnStatus_t hipdnnFindConvolutionBackwardDataAlgorithmEx(
             miopenFindConvolutionBackwardDataAlgorithm(handle, dyDesc, dy,
                     wDesc, w, convDesc, dxDesc, dx, requestedAlgoCount,
                     returnedAlgoCount, miopenPerfResults,
-                    sConvolutionBackwardDataAlgorithmWorkspace, size, true // exhaustiveSearch
+                    sConvolutionBackwardDataAlgorithmWorkspace, size, false // exhaustiveSearch
                     ));
 
         HIPDNN_OPEN_LOG_C( "...miopenFindConvolutionBackwardDataAlgorithm OK, returnedAlgoCount:"
