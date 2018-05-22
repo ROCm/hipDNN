@@ -1333,7 +1333,7 @@ hipdnnStatus_t hipdnnFindConvolutionBackwardFilterAlgorithmEx(
 
 
     try {
-      //  if (workSpaceSizeInBytes != expectedWorkSpaceSize) {
+        if (workSpaceSizeInBytes != expectedWorkSpaceSize) {
 
             void* workSpaceInternal = NULL;
             HIPDNN_OPEN_LOG_I( "INTERNAL_ALLOC hipdnnFindConvolutionBackwardFilterAlgorithmEx");
@@ -1352,15 +1352,15 @@ hipdnnStatus_t hipdnnFindConvolutionBackwardFilterAlgorithmEx(
                             false //exhaustiveSearch
                             ));
             CHECK_HIP(hipFree(workSpaceInternal));
-  //      }
-//        else {
-//            CHECK_MIO(miopenFindConvolutionBackwardWeightsAlgorithm(handle,
-//                            dyDesc, dy, xDesc, x, convDesc, dwDesc, dw,
-//                            requestedAlgoCount, returnedAlgoCount,
-//                            miopenPerfResults, workSpace, workSpaceSizeInBytes,
-//                            false //exhaustiveSearch
-//                            ));
-//        }
+        }
+        else {
+            CHECK_MIO(miopenFindConvolutionBackwardWeightsAlgorithm(handle,
+                            dyDesc, dy, xDesc, x, convDesc, dwDesc, dw,
+                            requestedAlgoCount, returnedAlgoCount,
+                            miopenPerfResults, workSpace, workSpaceSizeInBytes,
+                            false //exhaustiveSearch
+                            ));
+        }
     } catch (std::exception& e) {
           std::cout << "EXCEPTION: hipdnnFindConvolutionBackwardFilterAlgorithmEx"
                 << e.what() << std::endl HIPDNNFLUSH
@@ -1424,7 +1424,7 @@ hipdnnStatus_t hipdnnConvolutionBackwardFilter(hipdnnHandle_t handle,
                         xDesc, convDesc, dwDesc, &expectedWorkSpaceSize));
 
 
-    //if (workSpaceSizeInBytes != expectedWorkSpaceSize) {
+    if (workSpaceSizeInBytes != expectedWorkSpaceSize) {
         void* workSpaceInternal = NULL;
         HIPDNN_OPEN_LOG_I("INTERNAL_ALLOC: hipdnnConvolutionBackwardFilter");
         CHECK_HIP(hipMalloc((void**) &workSpaceInternal, expectedWorkSpaceSize));
@@ -1449,7 +1449,7 @@ hipdnnStatus_t hipdnnConvolutionBackwardFilter(hipdnnHandle_t handle,
 
         }
         CHECK_HIP(hipFree(workSpaceInternal));
-    /*} else {
+    } else {
         HIPDNN_OPEN_LOG_I("PREALLCOATED: hipdnnConvolutionBackwardFilter:" << workSpace
                   << ", size= " << workSpaceSizeInBytes
                   << ",x PTR = "  << x  << std::flush);
@@ -1486,7 +1486,7 @@ hipdnnStatus_t hipdnnConvolutionBackwardFilter(hipdnnHandle_t handle,
             << ",beta=" << beta
             << ",dwDesc=" << dwDesc
             << ",dw=" << dw  << std::flush);
-    }*/
+    }
 
 
     return HIPDNN_STATUS_SUCCESS;
@@ -2344,7 +2344,7 @@ hipdnnStatus_t hipdnnBatchNormalizationBackward(hipdnnHandle_t handle,
         deallocPrior(resultBnScaleDiffPrior);
     }
 
-    return HIPDNN_STATUS_SUCCESS;*/
+    return HIPDNN_STATUS_SUCCESS;
 }
 
 hipdnnStatus_t hipdnnSetTensorNdDescriptor(hipdnnTensorDescriptor_t tensorDesc,
