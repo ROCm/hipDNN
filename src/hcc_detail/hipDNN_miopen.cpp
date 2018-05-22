@@ -2315,7 +2315,7 @@ hipdnnStatus_t hipdnnBatchNormalizationBackward(hipdnnHandle_t handle,
     
     miopenBatchNormMode_t miBNMode;
     CHECK_HIPDNN(hipTomiopenBatchNormMode(mode, &miBNMode));
-    //if((*static_cast<const float*>(betaDataDiff) == 0) && (*static_cast<const float*>(betaParamDiff) == 0)) {
+    if((*static_cast<const float*>(betaDataDiff) == 0) && (*static_cast<const float*>(betaParamDiff) == 0)) {
         CHECK_MIO(
             miopenBatchNormalizationBackward(handle,
                     miBNMode, alphaDataDiff, betaDataDiff,
@@ -2323,7 +2323,7 @@ hipdnnStatus_t hipdnnBatchNormalizationBackward(hipdnnHandle_t handle,
                     dx, bnScaleBiasDiffDesc, bnScale, resultBnScaleDiff,
                     resultBnBiasDiff, epsilon, savedMean, savedInvVariance));
         return HIPDNN_STATUS_SUCCESS;
-    /*} else {
+    } else {
         HIPDNN_OPEN_LOG_C("Case where either betaDataDiff or betaParamDiff is nonzero");
         // Accumulate for resultBnScaleDiff
         const float tempBetaDataDiff = 0;
@@ -2336,9 +2336,9 @@ hipdnnStatus_t hipdnnBatchNormalizationBackward(hipdnnHandle_t handle,
                                     alphaParamDiff, &tempBetaParamDiff, xDesc, x, dyDesc, dy, dxDesc,
                                     dx, bnScaleBiasDiffDesc, bnScale, resultBnScaleDiff,
                                     resultBnBiasDiff, epsilon, savedMean, savedInvVariance));
-        //accumulateGradients(dx, dxPrior, dxDesc, betaDataDiff);
-        //accumulateGradients(resultBnScaleDiff, resultBnScaleDiffPrior, bnScaleBiasDiffDesc, betaParamDiff);
-        //accumulateGradients(resultBnBiasDiff, resultBnBiasDiffPrior, bnScaleBiasDiffDesc, betaParamDiff);
+        accumulateGradients(dx, dxPrior, dxDesc, betaDataDiff);
+        accumulateGradients(resultBnScaleDiff, resultBnScaleDiffPrior, bnScaleBiasDiffDesc, betaParamDiff);
+        accumulateGradients(resultBnBiasDiff, resultBnBiasDiffPrior, bnScaleBiasDiffDesc, betaParamDiff);
         deallocPrior(dxPrior);
         deallocPrior(resultBnBiasDiffPrior);
         deallocPrior(resultBnScaleDiffPrior);
