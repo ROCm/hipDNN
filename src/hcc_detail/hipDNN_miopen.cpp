@@ -28,6 +28,18 @@
 #include <logger.h>
 #include "hip/hip_runtime.h"
 
+
+#define CHECK_MIO(expression)                                                           \
+{                                                                                       \
+    hipdnnStatus_t status = miopenTohipdnnStatus(expression);                           \
+    if (status != HIPDNN_STATUS_SUCCESS) {                                              \
+      std::cerr << "HIPDNN Error on line " << __LINE__ << "With error status "<<": "    \
+                << hipdnnGetErrorString(status) << std::endl;                           \
+      std::exit(EXIT_FAILURE);                                                          \
+    }                                                                                   \
+}
+
+
 #define HIPDNNFLUSH <<std::flush;
 #define PROMOTE_TO_SUPPORTED
 
@@ -84,7 +96,30 @@ TensorAdd(T *C_d, T *A_d, T beta, int N)
 }
 
 
-//GetForwardOutputDim for 3D Convolution
+// SaveAsPriorBuffer routine to book keep and return priorData before any
+// activation or convolution
+
+// Returns the hipMalloc'ed PriorData to be used for accumalation when
+// the scaling factor beta is non zero
+void* SaveAsPriorBuffer(void *dData) {
+    void* dPrior = NULL; // Pointer to keep track of priorDst value
+    size_t dPriorSize = 0;   // PriorDstSize
+    CHECK_HIP(hipMemPtrGetInfo(dData,&dPriorSize)); // Get the info of the gradient dx size
+    CHECK_HIP(hipMalloc(&dPrior, dPriorSize)); // Allocate priorDst
+    CHECK_HIP(hipMemcpy(dPrior, dData, dPriorSize, hipMemcpyDeviceToDevice)); //Copy gradient to prior Destination
+    return dPrior;
+}
+
+// Revoke the PriorBuffer
+void deallocPrior(void *dData) {
+    size_t dPriorSize = 0;   // PriorDstSize
+    CHECK_HIP(hipMemPtrGetInfo(dData,&dPriorSize));
+    if (dPriorSize > 0)
+        CHECK_HIP(hipFree(dData));
+}
+
+
+
 
 
 
@@ -123,16 +158,6 @@ hipdnnStatus_t miopenTohipdnnStatus(miopenStatus_t cStatus) {
     return HIPDNN_STATUS_SUCCESS;
 }
 
-
-#define CHECK_MIO(expression)                                                           \
-{                                                                                       \
-    hipdnnStatus_t status = miopenTohipdnnStatus(expression);                           \
-    if (status != HIPDNN_STATUS_SUCCESS) {                                              \
-      std::cerr << "HIPDNN Error on line " << __LINE__ << "With error status "<<": "    \
-                << hipdnnGetErrorString(status) << std::endl;                           \
-      std::exit(EXIT_FAILURE);                                                          \
-    }                                                                                   \
-}
 
 
 //=============================================================================
@@ -744,6 +769,31 @@ hipdnnStatus_t ConvolutionBwdFilterPreferenceSupported(
     }
     return HIPDNN_STATUS_SUCCESS;
 }
+
+
+// Accumulate Gradients Method to accumulate the dst and Prior with scaling factor beta
+
+hipdnnStatus_t accumulateGradients(void *gradient, void* gradientPrior, hipdnnTensorDescriptor_t gradientDesc, const void* beta) {
+    // Trying to get the individual planes info
+    miopenDataType_t dataType = miopenFloat;  // Currently only this format is supported
+    int gradientArray[5];
+    int gradientStride[5];
+    CHECK_MIO(miopenGetTensorDescriptor(gradientDesc, &dataType, gradientArray, gradientStride));
+
+
+    int totalElements = gradientArray[0] * gradientArray[1] * gradientArray[2] * gradientArray[3];
+
+    const unsigned blocks = 512;
+    const unsigned threadsPerBlock = 256;
+    float betaVal = *(static_cast<const float*>(beta));
+    float* gradientF = static_cast<float*>(gradient);
+    float* gradientPriorF = static_cast<float*>(gradientPrior);
+    hipLaunchKernelGGL((TensorAdd<float>), dim3(blocks), dim3(threadsPerBlock), 0, 0, gradientF, gradientPriorF, betaVal, totalElements);
+    CHECK_HIP(hipDeviceSynchronize());
+}
+
+
+
 
 //=============================================================================
 
@@ -1395,11 +1445,7 @@ hipdnnStatus_t hipdnnConvolutionBackwardFilter(hipdnnHandle_t handle,
 
 
     HIPDNN_OPEN_LOG_C("CALL_STACK: Inside hipdnnConvolutionBackwardFilter");
-    void* dwPrior = NULL; // Pointer to keep track of priorDst value
-    size_t dwPriorSize;   // PriorDstSize
-    CHECK_HIP(hipMemPtrGetInfo(dw,&dwPriorSize)); // Get the info of the gradient dw size
-    CHECK_HIP(hipMalloc(&dwPrior, dwPriorSize)); // Allocate priorDst
-    CHECK_HIP(hipMemcpy(dwPrior, dw, dwPriorSize, hipMemcpyDeviceToDevice)); //Copy gradient to prior Destination
+    void* dwPrior = SaveAsPriorBuffer(dw);
 
 
     if (workSpaceSizeInBytes == 0 || workSpace == NULL) {
@@ -1424,20 +1470,8 @@ hipdnnStatus_t hipdnnConvolutionBackwardFilter(hipdnnHandle_t handle,
             CHECK_MIO(miopenConvolutionBackwardWeights(handle, alpha, dyDesc, dy,
                                    xDesc, x, convDesc, mialgo, &tempBeta, dwDesc, dw,
                                    sConvolutionBackwardFilterAlgorithmWorkspace, size));
-            // Trying to get the individual planes info
-            miopenDataType_t dataType = miopenFloat;
-            int dwArray[5];
-            int dwStride[5];
-            CHECK_MIO(miopenGetTensorDescriptor(dwDesc, &dataType, dwArray, dwStride));
-            int totalElements = dwArray[0] * dwArray[1] * dwArray[2] * dwArray[3];
-            const unsigned blocks = 512;
-            const unsigned threadsPerBlock = 256;
-            float betaVal = *(static_cast<const float*>(beta));
-            std::cout<<"betaVal***********************"<<betaVal<<std::endl;
-            float* dwF = static_cast<float*>(dw);
-            float* dwPriorF = static_cast<float*>(dwPrior);
-            hipLaunchKernelGGL((TensorAdd<float>), dim3(blocks), dim3(threadsPerBlock), 0, 0, dwF, dwPriorF, betaVal, totalElements);
-            hipDeviceSynchronize();
+            accumulateGradients(dw, dwPrior, dwDesc, beta);
+
         }
     } else {
 
@@ -1458,20 +1492,7 @@ hipdnnStatus_t hipdnnConvolutionBackwardFilter(hipdnnHandle_t handle,
             CHECK_MIO(miopenConvolutionBackwardWeights(handle, alpha, dyDesc, dy,
                                         xDesc, x, convDesc, mialgo, &tempBeta, dwDesc, dw,
                                         workSpace, workSpaceSizeInBytes));
-            // Trying to get the individual planes info
-            miopenDataType_t dataType = miopenFloat;
-            int dwArray[5];
-            int dwStride[5];
-            CHECK_MIO(miopenGetTensorDescriptor(dwDesc, &dataType, dwArray, dwStride));
-            int totalElements = dwArray[0] * dwArray[1] * dwArray[2] * dwArray[3];
-            const unsigned blocks = 512;
-            const unsigned threadsPerBlock = 256;
-            float betaVal = *(static_cast<const float*>(beta));
-            std::cout<<"betaVal***********************"<<betaVal<<std::endl;
-            float* dwF = static_cast<float*>(dw);
-            float* dwPriorF = static_cast<float*>(dwPrior);
-            hipLaunchKernelGGL((TensorAdd<float>), dim3(blocks), dim3(threadsPerBlock), 0, 0, dwF, dwPriorF, betaVal, totalElements);
-            hipDeviceSynchronize();
+            accumulateGradients(dw, dwPrior, dwDesc, beta);
         }
 
         HIPDNN_OPEN_LOG_C("miopenConvolutionBackwardWeights "
@@ -1490,7 +1511,7 @@ hipdnnStatus_t hipdnnConvolutionBackwardFilter(hipdnnHandle_t handle,
             << ",dw=" << dw  << std::flush);
     }
 
-    CHECK_HIP(hipFree(dwPrior));
+    deallocPrior(dwPrior);
     return HIPDNN_STATUS_SUCCESS;
 
 }
@@ -1658,11 +1679,7 @@ hipdnnStatus_t hipdnnConvolutionBackwardData(hipdnnHandle_t handle,
     HIPDNN_OPEN_LOG_C("ConvolutionBackwardData: WS PTR=" << workSpace
             << ", WS size = " << workSpaceSizeInBytes  << std::flush);
 
-    void* dxPrior = NULL; // Pointer to keep track of priorDst value
-    size_t dxPriorSize;   // PriorDstSize
-    CHECK_HIP(hipMemPtrGetInfo(dx,&dxPriorSize)); // Get the info of the gradient dx size
-    CHECK_HIP(hipMalloc(&dxPrior, dxPriorSize)); // Allocate priorDst
-    CHECK_HIP(hipMemcpy(dxPrior, dx, dxPriorSize, hipMemcpyDeviceToDevice)); //Copy gradient to prior Destination
+    void* dxPrior = SaveAsPriorBuffer(dx);
 
     try
     {
@@ -1707,35 +1724,14 @@ hipdnnStatus_t hipdnnConvolutionBackwardData(hipdnnHandle_t handle,
                 CHECK_MIO(miopenConvolutionBackwardData(handle, alpha, dyDesc, dy,
                                             wDesc, w, convDesc, mialgo, &tempBeta , dxDesc, dx,
                                             sConvolutionBackwardDataAlgorithmWorkspace, size));
-
-                // Trying to get the individual planes info
-                miopenDataType_t dataType = miopenFloat;
-                int dxArray[5];
-                int dxStride[5];
-                CHECK_MIO(miopenGetTensorDescriptor(dxDesc, &dataType, dxArray, dxStride));
-
-
-                int totalElements = dxArray[0] * dxArray[1] * dxArray[2] * dxArray[3];
-
-                const unsigned blocks = 512;
-                const unsigned threadsPerBlock = 256;
-                float betaVal = *(static_cast<const float*>(beta));
-                std::cout<<"betaVal***********************"<<betaVal<<std::endl;
-                float* dxF = static_cast<float*>(dx);
-                float* dxPriorF = static_cast<float*>(dxPrior);
-                hipLaunchKernelGGL((TensorAdd<float>), dim3(blocks), dim3(threadsPerBlock), 0, 0, dxF, dxPriorF, betaVal, totalElements);
-                hipDeviceSynchronize();
-
+                accumulateGradients(dx, dxPrior, dxDesc, beta);
             }
-
 
         }
         else
         {
-
             HIPDNN_OPEN_LOG_C( "ConvolutionBackwardData: workspace preallocated."
              << std::flush);
-
 
             miopenConvBwdDataAlgorithm_t mialgo;
             CHECK_HIPDNN(hipTomiopenConvolutionBwdDataAlgo(algo,
@@ -1757,22 +1753,7 @@ hipdnnStatus_t hipdnnConvolutionBackwardData(hipdnnHandle_t handle,
                 CHECK_MIO(miopenConvolutionBackwardData(handle, alpha, dyDesc, dy,
                                             wDesc, w, convDesc, mialgo, &tempBeta, dxDesc, dx,
                                             workSpace, workSpaceSizeInBytes));
-                // Trying to get the individual planes info
-                 miopenDataType_t dataType = miopenFloat;
-                 int dxArray[5];
-                 int dxStride[5];
-                 CHECK_MIO(miopenGetTensorDescriptor(dxDesc, &dataType, dxArray, dxStride));
-
-
-                 int totalElements = dxArray[0] * dxArray[1] * dxArray[2] * dxArray[3];
-
-                 const unsigned blocks = 512;
-                 const unsigned threadsPerBlock = 256;
-                 float betaVal = *(static_cast<const float*>(beta));
-                 float* dxF = static_cast<float*>(dx);
-                 float* dxPriorF = static_cast<float*>(dxPrior);
-                 hipLaunchKernelGGL((TensorAdd<float>), dim3(blocks), dim3(threadsPerBlock), 0, 0, dxF, dxPriorF, betaVal, totalElements);
-                 hipDeviceSynchronize();
+                accumulateGradients(dx, dxPrior, dxDesc, beta);
             }
 
 
@@ -1785,7 +1766,7 @@ hipdnnStatus_t hipdnnConvolutionBackwardData(hipdnnHandle_t handle,
                 << "Exception in hipdnnGetConvolutionBackwardDataWorkspaceSize: "
                 << e.what() << std::endl HIPDNNFLUSH;
     }
-    CHECK_HIP(hipFree(dxPrior));
+    deallocPrior(dxPrior);
     return HIPDNN_STATUS_SUCCESS;
 }
 
@@ -2352,23 +2333,10 @@ hipdnnStatus_t hipdnnBatchNormalizationBackward(hipdnnHandle_t handle,
         void *resultBnScaleDiff, void *resultBnBiasDiff, double epsilon,
         const void *savedMean, const void *savedInvVariance) {
     HIPDNN_OPEN_LOG_C("Inside hipdnnBatchNormalizationBackward");
-    void* dxPrior = NULL; // Pointer to keep track of priorDst value
-    size_t dxPriorSize;   // PriorDstSize
-    CHECK_HIP(hipMemPtrGetInfo(dx,&dxPriorSize)); // Get the info of the gradient dx size
-    CHECK_HIP(hipMalloc(&dxPrior, dxPriorSize)); // Allocate priorDst
-    CHECK_HIP(hipMemcpy(dxPrior, dx, dxPriorSize, hipMemcpyDeviceToDevice)); //Copy gradient to prior Destination
+    void* dxPrior = SaveAsPriorBuffer(dx);
+    void* resultBnScaleDiffPrior = SaveAsPriorBuffer(resultBnScaleDiff); // Pointer to keep track of priorDst value
+    void* resultBnBiasDiffPrior = SaveAsPriorBuffer(resultBnBiasDiff);
     
-    void* resultBnScaleDiffPrior = NULL; // Pointer to keep track of priorDst value
-    void* resultBnBiasDiffPrior = NULL;
-    size_t resultBnScaleDiffPriorSize = 0;   // PriorDstSize
-    size_t resultBnBiasDiffPriorSize = 0;   // PriorDstSize
-    CHECK_HIP(hipMemPtrGetInfo(resultBnScaleDiff,&resultBnScaleDiffPriorSize)); // Get the info of the gradient dx size
-    CHECK_HIP(hipMalloc(&resultBnScaleDiffPrior, resultBnScaleDiffPriorSize)); // Allocate priorDst
-    CHECK_HIP(hipMemcpy(resultBnScaleDiffPrior, resultBnScaleDiff, resultBnScaleDiffPriorSize, hipMemcpyDeviceToDevice)); //Copy gradient to prior Destination
-    CHECK_HIP(hipMemPtrGetInfo(resultBnBiasDiff,&resultBnBiasDiffPriorSize)); // Get the info of the gradient dx size
-    CHECK_HIP(hipMalloc(&resultBnBiasDiffPrior, resultBnBiasDiffPriorSize)); // Allocate priorDst
-    CHECK_HIP(hipMemcpy(resultBnBiasDiffPrior, resultBnBiasDiff, resultBnBiasDiffPriorSize, hipMemcpyDeviceToDevice)); //Copy gradient to prior Destination
-
     miopenBatchNormMode_t miBNMode;
     CHECK_HIPDNN(hipTomiopenBatchNormMode(mode, &miBNMode));
     if((*static_cast<const float*>(betaDataDiff) == 0) && (*static_cast<const float*>(betaParamDiff) == 0)) {
@@ -2380,83 +2348,22 @@ hipdnnStatus_t hipdnnBatchNormalizationBackward(hipdnnHandle_t handle,
                     resultBnBiasDiff, epsilon, savedMean, savedInvVariance));
         return HIPDNN_STATUS_SUCCESS;
     } else {
-        HIPDNN_OPEN_LOG_C( "Case BetaDataDiff !=0."<< std::flush);
+        HIPDNN_OPEN_LOG_C("Case where either betaDataDiff or betaParamDiff is nonzero");
+        // Accumulate for resultBnScaleDiff
         const float tempBetaDataDiff = 0;
-        if (*static_cast<const float*>(betaParamDiff) == 0) {   // Check if the betaParamDiff to scale the result is also zero
-            CHECK_MIO(miopenBatchNormalizationBackward(handle,
-                            miBNMode, alphaDataDiff, &tempBetaDataDiff,
-                            alphaParamDiff, betaParamDiff, xDesc, x, dyDesc, dy, dxDesc,
-                            dx, bnScaleBiasDiffDesc, bnScale, resultBnScaleDiff,
-                            resultBnBiasDiff, epsilon, savedMean, savedInvVariance));
-        } else { // When betaParamDiff is not zero got to scale the result
-            HIPDNN_OPEN_LOG_C( "Case BetaDataDiff !=0. && BetaParamDiff !=0"<< std::flush);
-            // Accumulate for resultBnScaleDiff
-            const float tempBetaParamDiff =0;
-            CHECK_MIO(miopenBatchNormalizationBackward(handle,
-                                        miBNMode, alphaDataDiff, &tempBetaDataDiff,
-                                        alphaParamDiff, &tempBetaParamDiff, xDesc, x, dyDesc, dy, dxDesc,
-                                        dx, bnScaleBiasDiffDesc, bnScale, resultBnScaleDiff,
-                                        resultBnBiasDiff, epsilon, savedMean, savedInvVariance));
-            miopenDataType_t dataType = miopenFloat;
-            int resultBnScaleDiffArray[5];
-            int resultBnScaleDiffStride[5];
-            CHECK_MIO(miopenGetTensorDescriptor(bnScaleBiasDiffDesc, &dataType, resultBnScaleDiffArray, resultBnScaleDiffStride));
-
-            int totalElements = resultBnScaleDiffArray[0] * resultBnScaleDiffArray[1] * resultBnScaleDiffArray[2] * resultBnScaleDiffArray[3];
-
-            const unsigned blocks = 512;
-            const unsigned threadsPerBlock = 256;
-            float betaParamVal = *(static_cast<const float*>(betaParamDiff));
-            float* resultBnScaleDiffF  = static_cast<float*>(resultBnScaleDiff);
-            float* resultBnScaleDiffPriorF = static_cast<float*>(resultBnScaleDiffPrior);
-            hipLaunchKernelGGL((TensorAdd<float>), dim3(blocks), dim3(threadsPerBlock), 0, 0, resultBnScaleDiffF , resultBnScaleDiffPriorF, betaParamVal, totalElements);
-
-
-            // Accumulate for resultBnBiansDiff
-            CHECK_MIO(miopenBatchNormalizationBackward(handle,
-                                                    miBNMode, alphaDataDiff, &tempBetaDataDiff,
-                                                    alphaParamDiff, &tempBetaParamDiff, xDesc, x, dyDesc, dy, dxDesc,
-                                                    dx, bnScaleBiasDiffDesc, bnScale, resultBnScaleDiff,
-                                        resultBnBiasDiff, epsilon, savedMean, savedInvVariance));
-            int resultBnBiasDiffArray[5];
-            int resultBnBiasDiffStride[5];
-            CHECK_MIO(miopenGetTensorDescriptor(bnScaleBiasDiffDesc, &dataType, resultBnBiasDiffArray, resultBnBiasDiffStride));
-
-            totalElements = resultBnBiasDiffArray[0] * resultBnBiasDiffArray[1] * resultBnBiasDiffArray[2] * resultBnBiasDiffArray[3];
-
-            float* resultBnBiasDiffF  = static_cast<float*>(resultBnBiasDiff);
-            float* resultBnBiasDiffPriorF = static_cast<float*>(resultBnBiasDiffPrior);
-            hipLaunchKernelGGL((TensorAdd<float>), dim3(blocks), dim3(threadsPerBlock), 0, 0, resultBnBiasDiffF , resultBnBiasDiffPriorF, betaParamVal, totalElements);
-
-
-
-
-            hipFree(resultBnScaleDiffPrior);
-            hipFree(resultBnBiasDiffPrior);
-
-
-
-            return HIPDNN_STATUS_SUCCESS;
-
-        }
-        // Trying to get the individual planes info
-         miopenDataType_t dataType = miopenFloat;
-         int dxArray[5];
-         int dxStride[5];
-         CHECK_MIO(miopenGetTensorDescriptor(dxDesc, &dataType, dxArray, dxStride));
-
-
-         int totalElements = dxArray[0] * dxArray[1] * dxArray[2] * dxArray[3];
-
-         const unsigned blocks = 512;
-         const unsigned threadsPerBlock = 256;
-         float betaVal = *(static_cast<const float*>(betaDataDiff));
-         float* dxF = static_cast<float*>(dx);
-         float* dxPriorF = static_cast<float*>(dxPrior);
-         hipLaunchKernelGGL((TensorAdd<float>), dim3(blocks), dim3(threadsPerBlock), 0, 0, dxF, dxPriorF, betaVal, totalElements);
-         hipFree(dxPrior);
-         return HIPDNN_STATUS_SUCCESS;
+        const float tempBetaParamDiff =0;
+        CHECK_MIO(miopenBatchNormalizationBackward(handle,
+                                    miBNMode, alphaDataDiff, &tempBetaDataDiff,
+                                    alphaParamDiff, &tempBetaParamDiff, xDesc, x, dyDesc, dy, dxDesc,
+                                    dx, bnScaleBiasDiffDesc, bnScale, resultBnScaleDiff,
+                                    resultBnBiasDiff, epsilon, savedMean, savedInvVariance));
+        accumulateGradients(dx, dxPrior, dxDesc, betaDataDiff);
+        accumulateGradients(resultBnScaleDiff, resultBnScaleDiffPrior, bnScaleBiasDiffDesc, betaParamDiff);
+        accumulateGradients(resultBnBiasDiff, resultBnBiasDiffPrior, bnScaleBiasDiffDesc, betaParamDiff);
     }
+    deallocPrior(dxPrior);
+    deallocPrior(resultBnBiasDiffPrior);
+    deallocPrior(resultBnScaleDiffPrior);
     return HIPDNN_STATUS_SUCCESS;
 }
 
