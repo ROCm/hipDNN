@@ -790,6 +790,7 @@ hipdnnStatus_t accumulateGradients(void *gradient, void* gradientPrior, hipdnnTe
     float* gradientPriorF = static_cast<float*>(gradientPrior);
     hipLaunchKernelGGL((TensorAdd<float>), dim3(blocks), dim3(threadsPerBlock), 0, 0, gradientF, gradientPriorF, betaVal, totalElements);
     CHECK_HIP(hipDeviceSynchronize());
+    return HIPDNN_STATUS_SUCCESS;
 }
 
 
@@ -1445,7 +1446,7 @@ hipdnnStatus_t hipdnnConvolutionBackwardFilter(hipdnnHandle_t handle,
 
 
     HIPDNN_OPEN_LOG_C("CALL_STACK: Inside hipdnnConvolutionBackwardFilter");
-    void* dwPrior = SaveAsPriorBuffer(dw);
+
 
 
     if (workSpaceSizeInBytes == 0 || workSpace == NULL) {
@@ -1467,10 +1468,12 @@ hipdnnStatus_t hipdnnConvolutionBackwardFilter(hipdnnHandle_t handle,
                         sConvolutionBackwardFilterAlgorithmWorkspace, size));
         } else {
             const float tempBeta=0;
+            void* dwPrior = SaveAsPriorBuffer(dw);
             CHECK_MIO(miopenConvolutionBackwardWeights(handle, alpha, dyDesc, dy,
                                    xDesc, x, convDesc, mialgo, &tempBeta, dwDesc, dw,
                                    sConvolutionBackwardFilterAlgorithmWorkspace, size));
             accumulateGradients(dw, dwPrior, dwDesc, beta);
+            deallocPrior(dwPrior);
 
         }
     } else {
@@ -1489,10 +1492,12 @@ hipdnnStatus_t hipdnnConvolutionBackwardFilter(hipdnnHandle_t handle,
         } else
         {
             const float tempBeta=0;
+            void* dwPrior = SaveAsPriorBuffer(dw);
             CHECK_MIO(miopenConvolutionBackwardWeights(handle, alpha, dyDesc, dy,
                                         xDesc, x, convDesc, mialgo, &tempBeta, dwDesc, dw,
                                         workSpace, workSpaceSizeInBytes));
             accumulateGradients(dw, dwPrior, dwDesc, beta);
+            deallocPrior(dwPrior);
         }
 
         HIPDNN_OPEN_LOG_C("miopenConvolutionBackwardWeights "
@@ -1511,7 +1516,7 @@ hipdnnStatus_t hipdnnConvolutionBackwardFilter(hipdnnHandle_t handle,
             << ",dw=" << dw  << std::flush);
     }
 
-    deallocPrior(dwPrior);
+
     return HIPDNN_STATUS_SUCCESS;
 
 }
@@ -1679,8 +1684,6 @@ hipdnnStatus_t hipdnnConvolutionBackwardData(hipdnnHandle_t handle,
     HIPDNN_OPEN_LOG_C("ConvolutionBackwardData: WS PTR=" << workSpace
             << ", WS size = " << workSpaceSizeInBytes  << std::flush);
 
-    void* dxPrior = SaveAsPriorBuffer(dx);
-
     try
     {
         if (workSpace == NULL || workSpaceSizeInBytes == 0)
@@ -1721,10 +1724,12 @@ hipdnnStatus_t hipdnnConvolutionBackwardData(hipdnnHandle_t handle,
                 HIPDNN_OPEN_LOG_C( "Case Beta !=0."
                              << std::flush);
                 const float tempBeta = 0;
+                void* dxPrior = SaveAsPriorBuffer(dx);
                 CHECK_MIO(miopenConvolutionBackwardData(handle, alpha, dyDesc, dy,
                                             wDesc, w, convDesc, mialgo, &tempBeta , dxDesc, dx,
                                             sConvolutionBackwardDataAlgorithmWorkspace, size));
                 accumulateGradients(dx, dxPrior, dxDesc, beta);
+                deallocPrior(dxPrior);
             }
 
         }
@@ -1750,10 +1755,12 @@ hipdnnStatus_t hipdnnConvolutionBackwardData(hipdnnHandle_t handle,
                             workSpace, workSpaceSizeInBytes));
             } else {
                 const float tempBeta = 0;
+                void* dxPrior = SaveAsPriorBuffer(dx);
                 CHECK_MIO(miopenConvolutionBackwardData(handle, alpha, dyDesc, dy,
                                             wDesc, w, convDesc, mialgo, &tempBeta, dxDesc, dx,
                                             workSpace, workSpaceSizeInBytes));
                 accumulateGradients(dx, dxPrior, dxDesc, beta);
+                deallocPrior(dxPrior);
             }
 
 
@@ -1766,7 +1773,6 @@ hipdnnStatus_t hipdnnConvolutionBackwardData(hipdnnHandle_t handle,
                 << "Exception in hipdnnGetConvolutionBackwardDataWorkspaceSize: "
                 << e.what() << std::endl HIPDNNFLUSH;
     }
-    deallocPrior(dxPrior);
     return HIPDNN_STATUS_SUCCESS;
 }
 
@@ -2333,9 +2339,6 @@ hipdnnStatus_t hipdnnBatchNormalizationBackward(hipdnnHandle_t handle,
         void *resultBnScaleDiff, void *resultBnBiasDiff, double epsilon,
         const void *savedMean, const void *savedInvVariance) {
     HIPDNN_OPEN_LOG_C("Inside hipdnnBatchNormalizationBackward");
-    void* dxPrior = SaveAsPriorBuffer(dx);
-    void* resultBnScaleDiffPrior = SaveAsPriorBuffer(resultBnScaleDiff); // Pointer to keep track of priorDst value
-    void* resultBnBiasDiffPrior = SaveAsPriorBuffer(resultBnBiasDiff);
     
     miopenBatchNormMode_t miBNMode;
     CHECK_HIPDNN(hipTomiopenBatchNormMode(mode, &miBNMode));
@@ -2352,6 +2355,9 @@ hipdnnStatus_t hipdnnBatchNormalizationBackward(hipdnnHandle_t handle,
         // Accumulate for resultBnScaleDiff
         const float tempBetaDataDiff = 0;
         const float tempBetaParamDiff =0;
+        void* dxPrior = SaveAsPriorBuffer(dx);
+        void* resultBnScaleDiffPrior = SaveAsPriorBuffer(resultBnScaleDiff); // Pointer to keep track of priorDst value
+        void* resultBnBiasDiffPrior = SaveAsPriorBuffer(resultBnBiasDiff);
         CHECK_MIO(miopenBatchNormalizationBackward(handle,
                                     miBNMode, alphaDataDiff, &tempBetaDataDiff,
                                     alphaParamDiff, &tempBetaParamDiff, xDesc, x, dyDesc, dy, dxDesc,
@@ -2360,10 +2366,11 @@ hipdnnStatus_t hipdnnBatchNormalizationBackward(hipdnnHandle_t handle,
         accumulateGradients(dx, dxPrior, dxDesc, betaDataDiff);
         accumulateGradients(resultBnScaleDiff, resultBnScaleDiffPrior, bnScaleBiasDiffDesc, betaParamDiff);
         accumulateGradients(resultBnBiasDiff, resultBnBiasDiffPrior, bnScaleBiasDiffDesc, betaParamDiff);
+        deallocPrior(dxPrior);
+        deallocPrior(resultBnBiasDiffPrior);
+        deallocPrior(resultBnScaleDiffPrior);
     }
-    deallocPrior(dxPrior);
-    deallocPrior(resultBnBiasDiffPrior);
-    deallocPrior(resultBnScaleDiffPrior);
+
     return HIPDNN_STATUS_SUCCESS;
 }
 
