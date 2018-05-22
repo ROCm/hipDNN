@@ -2352,14 +2352,111 @@ hipdnnStatus_t hipdnnBatchNormalizationBackward(hipdnnHandle_t handle,
         void *resultBnScaleDiff, void *resultBnBiasDiff, double epsilon,
         const void *savedMean, const void *savedInvVariance) {
     HIPDNN_OPEN_LOG_C("Inside hipdnnBatchNormalizationBackward");
+    void* dxPrior = NULL; // Pointer to keep track of priorDst value
+    size_t dxPriorSize;   // PriorDstSize
+    CHECK_HIP(hipMemPtrGetInfo(dx,&dxPriorSize)); // Get the info of the gradient dx size
+    CHECK_HIP(hipMalloc(&dxPrior, dxPriorSize)); // Allocate priorDst
+    CHECK_HIP(hipMemcpy(dxPrior, dx, dxPriorSize, hipMemcpyDeviceToDevice)); //Copy gradient to prior Destination
+    
+    void* resultBnScaleDiffPrior = NULL; // Pointer to keep track of priorDst value
+    void* resultBnBiasDiffPrior = NULL;
+    size_t resultBnScaleDiffPriorSize = 0;   // PriorDstSize
+    size_t resultBnBiasDiffPriorSize = 0;   // PriorDstSize
+    CHECK_HIP(hipMemPtrGetInfo(resultBnScaleDiff,&resultBnScaleDiffPriorSize)); // Get the info of the gradient dx size
+    CHECK_HIP(hipMalloc(&resultBnScaleDiffPrior, resultBnScaleDiffPriorSize)); // Allocate priorDst
+    CHECK_HIP(hipMemcpy(resultBnScaleDiffPrior, resultBnScaleDiff, resultBnScaleDiffPriorSize, hipMemcpyDeviceToDevice)); //Copy gradient to prior Destination
+    CHECK_HIP(hipMemPtrGetInfo(resultBnBiasDiff,&resultBnBiasDiffPriorSize)); // Get the info of the gradient dx size
+    CHECK_HIP(hipMalloc(&resultBnBiasDiffPrior, resultBnBiasDiffPriorSize)); // Allocate priorDst
+    CHECK_HIP(hipMemcpy(resultBnBiasDiffPrior, resultBnBiasDiff, resultBnBiasDiffPriorSize, hipMemcpyDeviceToDevice)); //Copy gradient to prior Destination
+
     miopenBatchNormMode_t miBNMode;
     CHECK_HIPDNN(hipTomiopenBatchNormMode(mode, &miBNMode));
-    CHECK_MIO(
+    if((*static_cast<const float*>(betaDataDiff) == 0) && (*static_cast<const float*>(betaParamDiff) == 0)) {
+        CHECK_MIO(
             miopenBatchNormalizationBackward(handle,
                     miBNMode, alphaDataDiff, betaDataDiff,
                     alphaParamDiff, betaParamDiff, xDesc, x, dyDesc, dy, dxDesc,
                     dx, bnScaleBiasDiffDesc, bnScale, resultBnScaleDiff,
                     resultBnBiasDiff, epsilon, savedMean, savedInvVariance));
+        return HIPDNN_STATUS_SUCCESS;
+    } else {
+        HIPDNN_OPEN_LOG_C( "Case BetaDataDiff !=0."<< std::flush);
+        const float tempBetaDataDiff = 0;
+        if (*static_cast<const float*>(betaParamDiff) == 0) {   // Check if the betaParamDiff to scale the result is also zero
+            CHECK_MIO(miopenBatchNormalizationBackward(handle,
+                            miBNMode, alphaDataDiff, &tempBetaDataDiff,
+                            alphaParamDiff, betaParamDiff, xDesc, x, dyDesc, dy, dxDesc,
+                            dx, bnScaleBiasDiffDesc, bnScale, resultBnScaleDiff,
+                            resultBnBiasDiff, epsilon, savedMean, savedInvVariance));
+        } else { // When betaParamDiff is not zero got to scale the result
+            HIPDNN_OPEN_LOG_C( "Case BetaDataDiff !=0. && BetaParamDiff !=0"<< std::flush);
+            // Accumulate for resultBnScaleDiff
+            const float tempBetaParamDiff =0;
+            CHECK_MIO(miopenBatchNormalizationBackward(handle,
+                                        miBNMode, alphaDataDiff, &tempBetaDataDiff,
+                                        alphaParamDiff, &tempBetaParamDiff, xDesc, x, dyDesc, dy, dxDesc,
+                                        dx, bnScaleBiasDiffDesc, bnScale, resultBnScaleDiff,
+                                        resultBnBiasDiff, epsilon, savedMean, savedInvVariance));
+            miopenDataType_t dataType = miopenFloat;
+            int resultBnScaleDiffArray[5];
+            int resultBnScaleDiffStride[5];
+            CHECK_MIO(miopenGetTensorDescriptor(bnScaleBiasDiffDesc, &dataType, resultBnScaleDiffArray, resultBnScaleDiffStride));
+
+            int totalElements = resultBnScaleDiffArray[0] * resultBnScaleDiffArray[1] * resultBnScaleDiffArray[2] * resultBnScaleDiffArray[3];
+
+            const unsigned blocks = 512;
+            const unsigned threadsPerBlock = 256;
+            float betaParamVal = *(static_cast<const float*>(betaParamDiff));
+            float* resultBnScaleDiffF  = static_cast<float*>(resultBnScaleDiff);
+            float* resultBnScaleDiffPriorF = static_cast<float*>(resultBnScaleDiffPrior);
+            hipLaunchKernelGGL((TensorAdd<float>), dim3(blocks), dim3(threadsPerBlock), 0, 0, resultBnScaleDiffF , resultBnScaleDiffPriorF, betaParamVal, totalElements);
+
+
+            // Accumulate for resultBnBiansDiff
+            CHECK_MIO(miopenBatchNormalizationBackward(handle,
+                                                    miBNMode, alphaDataDiff, &tempBetaDataDiff,
+                                                    alphaParamDiff, &tempBetaParamDiff, xDesc, x, dyDesc, dy, dxDesc,
+                                                    dx, bnScaleBiasDiffDesc, bnScale, resultBnScaleDiff,
+                                        resultBnBiasDiff, epsilon, savedMean, savedInvVariance));
+            int resultBnBiasDiffArray[5];
+            int resultBnBiasDiffStride[5];
+            CHECK_MIO(miopenGetTensorDescriptor(bnScaleBiasDiffDesc, &dataType, resultBnBiasDiffArray, resultBnBiasDiffStride));
+
+            totalElements = resultBnBiasDiffArray[0] * resultBnBiasDiffArray[1] * resultBnBiasDiffArray[2] * resultBnBiasDiffArray[3];
+
+            float* resultBnBiasDiffF  = static_cast<float*>(resultBnBiasDiff);
+            float* resultBnBiasDiffPriorF = static_cast<float*>(resultBnBiasDiffPrior);
+            hipLaunchKernelGGL((TensorAdd<float>), dim3(blocks), dim3(threadsPerBlock), 0, 0, resultBnBiasDiffF , resultBnBiasDiffPriorF, betaParamVal, totalElements);
+
+
+
+
+            hipFree(resultBnScaleDiffPrior);
+            hipFree(resultBnBiasDiffPrior);
+
+
+
+            return HIPDNN_STATUS_SUCCESS;
+
+        }
+        // Trying to get the individual planes info
+         miopenDataType_t dataType = miopenFloat;
+         int dxArray[5];
+         int dxStride[5];
+         CHECK_MIO(miopenGetTensorDescriptor(dxDesc, &dataType, dxArray, dxStride));
+
+
+         int totalElements = dxArray[0] * dxArray[1] * dxArray[2] * dxArray[3];
+
+         const unsigned blocks = 512;
+         const unsigned threadsPerBlock = 256;
+         float betaVal = *(static_cast<const float*>(betaDataDiff));
+         float* dxF = static_cast<float*>(dx);
+         float* dxPriorF = static_cast<float*>(dxPrior);
+         hipLaunchKernelGGL((TensorAdd<float>), dim3(blocks), dim3(threadsPerBlock), 0, 0, dxF, dxPriorF, betaVal, totalElements);
+         hipFree(dxPrior);
+         return HIPDNN_STATUS_SUCCESS;
+    }
     return HIPDNN_STATUS_SUCCESS;
 }
 
