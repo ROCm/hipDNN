@@ -663,6 +663,7 @@ hipdnnStatus_t miopenTohipConvolutionBwdDataAlgo(
         break;
     case miopenConvolutionBwdDataAlgoWinograd:
         *out = HIPDNN_CONVOLUTION_BWD_DATA_ALGO_WINOGRAD;
+        break;
     case miopenTransposeBwdDataAlgoGEMM:
         *out = HIPDNN_CONVOLUTION_BWD_DATA_ALGO_TRANSPOSE_GEMM;
         break;
