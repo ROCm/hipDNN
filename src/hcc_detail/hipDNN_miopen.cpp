@@ -1123,7 +1123,7 @@ hipdnnStatus_t hipdnnFindConvolutionForwardAlgorithmEx(hipdnnHandle_t handle,
 
         HIPDNN_OPEN_LOG_C("Size of miopenPerfResults " << sizeof(miopenPerfResults)
         << std::flush);
-
+        std::cout<<"Invoking miopenFindConvolutionForwardAlgorithm cD "<<convDesc<<std::endl;
         CHECK_MIO(
                 miopenFindConvolutionForwardAlgorithm(handle, xDesc, x, wDesc,
                         w, convDesc, yDesc, y, requestedAlgoCount,
@@ -1131,6 +1131,7 @@ hipdnnStatus_t hipdnnFindConvolutionForwardAlgorithmEx(hipdnnHandle_t handle,
                         workSpaceInternal, expectedWorkSpaceSize, false //exhaustiveSearch
                         ));
 
+        std::cout<<"Invoked miopenFindConvolutionForwardAlgorithm"<<std::endl;
         CHECK_HIP(hipFree(workSpaceInternal));
     }
     else {
@@ -2277,11 +2278,9 @@ hipdnnStatus_t hipdnnnBatchNormalizationForwardInference(hipdnnHandle_t handle,
         const hipdnnTensorDescriptor_t bnScaleBiasMeanVarDesc,
         const void *bnScale, const void *bnBias, const void *estimatedMean,
         const void *estimatedVariance, double epsilon) {
-    HIPDNN_OPEN_LOG_E("hipdnnnBatchNormalizationForwardInference NOT IMPLEMENTED"
-            << std::flush);
-    return HIPDNN_STATUS_NOT_SUPPORTED;
-#ifdef NOTYET
-    //arguments 10,11,12,13 below are not const in miopen.
+#if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_CALLS
+    std::cout << "Inside hipdnnBatchNormalizationForwardInference\n";
+#endif
     miopenBatchNormMode_t miBNMode;
     CHECK_HIPDNN(hipTomiopenBatchNormMode(mode, &miBNMode));
     CHECK_MIO(
@@ -2294,11 +2293,11 @@ hipdnnStatus_t hipdnnnBatchNormalizationForwardInference(hipdnnHandle_t handle,
                     yDesc,
                     y,
                     bnScaleBiasMeanVarDesc,
-                    bnScale, bnBias,
-                    estimatedMean,
-                    estimatedVariance,
+                    const_cast<void*>(bnScale), const_cast<void*>(bnBias),
+                    const_cast<void*>(estimatedMean),
+                    const_cast<void*>(estimatedVariance),
                     epsilon));
-#endif
+     return HIPDNN_STATUS_SUCCESS;
 
 }
 //=============================================================================
@@ -2317,6 +2316,7 @@ hipdnnStatus_t hipdnnBatchNormalizationBackward(hipdnnHandle_t handle,
     miopenBatchNormMode_t miBNMode;
     CHECK_HIPDNN(hipTomiopenBatchNormMode(mode, &miBNMode));
     if((*static_cast<const float*>(betaDataDiff) == 0) && (*static_cast<const float*>(betaParamDiff) == 0)) {
+        std::cout<<"Accumulate Gradients is false"<<std::endl;
         CHECK_MIO(
             miopenBatchNormalizationBackward(handle,
                     miBNMode, alphaDataDiff, betaDataDiff,
@@ -2325,6 +2325,7 @@ hipdnnStatus_t hipdnnBatchNormalizationBackward(hipdnnHandle_t handle,
                     resultBnBiasDiff, epsilon, savedMean, savedInvVariance));
         return HIPDNN_STATUS_SUCCESS;
     } else {
+        std::cout<<"Case Accumulate Gradients is true"<<std::endl;
         HIPDNN_OPEN_LOG_C("Case where either betaDataDiff or betaParamDiff is nonzero");
         // Accumulate for resultBnScaleDiff
         const float tempBetaDataDiff = 0;
@@ -2759,12 +2760,26 @@ hipdnnStatus_t hipdnnBatchNormalizationForwardInference(hipdnnHandle_t handle,
         const void *bnScale, const void *bnBias, const void *estimatedMean,
         const void *estimatedVariance, double epsilon) {
 
-
-    HIPDNN_OPEN_LOG_E("hipdnnBatchNormalizationForwardInference: NOT IMPLEMENTED."
-            << std::flush);
-
-
-    return HIPDNN_STATUS_NOT_SUPPORTED;
+#if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_CALLS
+    std::cout << "Inside hipdnnBatchNormalizationForwardInference\n";
+#endif
+    miopenBatchNormMode_t miBNMode;
+    CHECK_HIPDNN(hipTomiopenBatchNormMode(mode, &miBNMode));
+    CHECK_MIO(
+            miopenBatchNormalizationForwardInference( handle,
+                    miBNMode,
+                    const_cast<void*>(alpha),
+                    const_cast<void*>(beta),
+                    xDesc,
+                    x,
+                    yDesc,
+                    y,
+                    bnScaleBiasMeanVarDesc,
+                    const_cast<void*>(bnScale), const_cast<void*>(bnBias),
+                    const_cast<void*>(estimatedMean),
+                    const_cast<void*>(estimatedVariance),
+                    epsilon));
+     return HIPDNN_STATUS_SUCCESS;
 }
 
 hipdnnStatus_t hipdnnCreateDropoutDescriptor(
