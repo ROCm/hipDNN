@@ -2,6 +2,10 @@
 #include <iostream>
 extern std::ostream cerr;
 
+#if ENABLE_LOG == 0
+#define DEBUG_CURRENT_STACK_LEVEL DEBUG_CALL_STACK_LEVEL_NONE
+#endif
+
 #define DEBUG_CALL_STACK_LEVEL_NONE 0
 #define DEBUG_CALL_STACK_LEVEL_ERRORS 1
 #define DEBUG_CALL_STACK_LEVEL_PROMOTED 2
