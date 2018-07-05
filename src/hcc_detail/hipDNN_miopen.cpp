@@ -1006,9 +1006,7 @@ hipdnnStatus_t hipdnnFindConvolutionForwardAlgorithm(hipdnnHandle_t handle,
                     sizeInBytes));
 
 
-#if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_INTERNAL_ALLOC
-    std::cout << "INTERNAL_ALLOC hipdnnFindConvolutionForwardAlgorithm\n";
-#endif
+    HIPDNN_OPEN_LOG_I("INTERNAL_ALLOC hipdnnFindConvolutionForwardAlgorithm");
 
     CHECK_HIP(hipMalloc((void**)&sConvolutionForwardAlgorithmWorkspace, sizeInBytes));
 
@@ -1123,7 +1121,7 @@ hipdnnStatus_t hipdnnFindConvolutionForwardAlgorithmEx(hipdnnHandle_t handle,
 
         HIPDNN_OPEN_LOG_C("Size of miopenPerfResults " << sizeof(miopenPerfResults)
         << std::flush);
-        std::cout<<"Invoking miopenFindConvolutionForwardAlgorithm cD "<<convDesc<<std::endl;
+        HIPDNN_OPEN_LOG_C("Invoking miopenFindConvolutionForwardAlgorithm cD "<< convDesc);
         CHECK_MIO(
                 miopenFindConvolutionForwardAlgorithm(handle, xDesc, x, wDesc,
                         w, convDesc, yDesc, y, requestedAlgoCount,
@@ -1131,7 +1129,7 @@ hipdnnStatus_t hipdnnFindConvolutionForwardAlgorithmEx(hipdnnHandle_t handle,
                         workSpaceInternal, expectedWorkSpaceSize, false //exhaustiveSearch
                         ));
 
-        std::cout<<"Invoked miopenFindConvolutionForwardAlgorithm"<<std::endl;
+        HIPDNN_OPEN_LOG_C("Invoked miopenFindConvolutionForwardAlgorithm");
         CHECK_HIP(hipFree(workSpaceInternal));
     }
     else {
@@ -1379,9 +1377,7 @@ hipdnnStatus_t hipdnnFindConvolutionBackwardFilterAlgorithmEx(
     }
     delete[] miopenPerfResults;
 
-#if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_CALLS
-    std::cout << "EXIT: hipdnnFindConvolutionBackwardFilterAlgorithmEx\n";
-#endif
+    HIPDNN_OPEN_LOG_C("EXIT: hipdnnFindConvolutionBackwardFilterAlgorithmEx");
 
     return HIPDNN_STATUS_SUCCESS;
 }
@@ -1758,9 +1754,7 @@ hipdnnStatus_t hipdnnSoftmaxForward(hipdnnHandle_t handle,
         const void *alpha, const hipdnnTensorDescriptor_t xDesc, const void *x,
         const void *beta, const hipdnnTensorDescriptor_t yDesc, void *y) {
 
-#if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_CALLS
-    std::cout << "Inside hipdnnSoftmaxForward\n";
-#endif
+    HIPDNN_OPEN_LOG_C( "Inside hipdnnSoftmaxForward");
 
     CHECK_HIPDNN(SoftmaxAlgorithmSupported(algo));
     CHECK_HIPDNN(hipSoftmaxModeSupported(mode));
@@ -1775,9 +1769,8 @@ hipdnnStatus_t hipdnnSoftmaxBackward(hipdnnHandle_t handle,
         const void *alpha, const hipdnnTensorDescriptor_t yDesc, const void *y,
         const hipdnnTensorDescriptor_t dyDesc, const void *dy, const void *beta,
         const hipdnnTensorDescriptor_t dxDesc, void *dx) {
- #if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_CALLS
-    std::cout << "Inside hipdnnSoftmaxBackward\n";
-#endif
+
+    HIPDNN_OPEN_LOG_C( "Inside hipdnnSoftmaxBackward");
 
     CHECK_HIPDNN(SoftmaxAlgorithmSupported(algo));
     CHECK_HIPDNN(hipSoftmaxModeSupported(mode));
@@ -1790,9 +1783,8 @@ hipdnnStatus_t hipdnnSoftmaxBackward(hipdnnHandle_t handle,
 
 hipdnnStatus_t hipdnnCreatePoolingDescriptor(
         hipdnnPoolingDescriptor_t *poolingDesc) {
- #if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_CALLS
-    std::cout << "Inside hipdnnCreatePoolingDescriptor\n";
-#endif
+
+    HIPDNN_OPEN_LOG_C( "Inside hipdnnCreatePoolingDescriptor");
 
     CHECK_MIO(miopenCreatePoolingDescriptor(poolingDesc));
     return HIPDNN_STATUS_SUCCESS;
@@ -1806,9 +1798,8 @@ hipdnnStatus_t hipdnnSetPooling2dDescriptor(
         int verticalStride, int horizontalStride) {
 
     miopenPoolingMode_t miPMode;
-#if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_CALLS
-    std::cout << "Inside hipdnnSetPooling2dDescriptor\n";
-#endif
+   
+    HIPDNN_OPEN_LOG_C("Inside hipdnnSetPooling2dDescriptor");
 
     CHECK_HIPDNN(hipTomiopenPoolingMode(mode, &miPMode));
     CHECK_MIO(
@@ -1828,9 +1819,7 @@ hipdnnStatus_t hipdnnGetPooling2dDescriptor(
         int *verticalStride, int *horizontalStride) {
     miopenPoolingMode_t mipmmode;
 
-#if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_CALLS
-    std::cout << "Inside hipdnnGetPooling2dDescriptor\n";
-#endif
+    HIPDNN_OPEN_LOG_C("Inside hipdnnGetPooling2dDescriptor");
 
     CHECK_MIO(
             miopenGet2dPoolingDescriptor(poolingDesc, &mipmmode, windowHeight,
@@ -1848,9 +1837,7 @@ hipdnnStatus_t hipdnnGetPooling2dForwardOutputDim(
         const hipdnnPoolingDescriptor_t poolingDesc,
         const hipdnnTensorDescriptor_t inputTensorDesc, int *n, int *c, int *h,
         int *w) {
-#if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_CALLS
-    std::cout << "Inside hipdnnGetPooling2dDescriptor\n";
-#endif
+    HIPDNN_OPEN_LOG_C("Inside hipdnnGetPooling2dDescriptor");
 
     CHECK_MIO(
             miopenGetPoolingForwardOutputDim(poolingDesc, inputTensorDesc, n, c,
@@ -1862,9 +1849,7 @@ hipdnnStatus_t hipdnnGetPooling2dForwardOutputDim(
 
 hipdnnStatus_t hipdnnDestroyPoolingDescriptor(
         hipdnnPoolingDescriptor_t poolingDesc) {
-#if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_CALLS
-    std::cout << "Inside hipdnnDestroyPoolingDescriptor\n";
-#endif
+    HIPDNN_OPEN_LOG_C( "Inside hipdnnDestroyPoolingDescriptor");
 
     CHECK_MIO(miopenDestroyPoolingDescriptor(poolingDesc));
     return HIPDNN_STATUS_SUCCESS;
@@ -1881,17 +1866,12 @@ hipdnnStatus_t hipdnnPoolingForward(hipdnnHandle_t handle,
 
     size_t workSpaceSize = 0;
 
-
-#if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_CALLS
-    std::cout << "Inside hipdnnPoolingForward\n";
-#endif
-
+    HIPDNN_OPEN_LOG_C( "Inside hipdnnPoolingForward");
 
     if (sDescToWorkspacePooling.find(yDesc) == sDescToWorkspacePooling.end()) {
     // If the descriptor is not present in the bookkept map container, create one and add to the container
-#if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_INTERNAL_ALLOC
-        std::cout << "INTERNAL_ALLOC: hipdnnPoolingForward\n";
-#endif
+        HIPDNN_OPEN_LOG_I("INTERNAL_ALLOC: hipdnnPoolingForward");
+
         //HGSOS looks like the yDesc is used for the workspace, not the poolingDesc
         CHECK_MIO(miopenPoolingGetWorkSpaceSize(yDesc, &workSpaceSize));
         CHECK_HIP(hipMalloc((void**) &devptr, workSpaceSize));
@@ -1923,19 +1903,14 @@ hipdnnStatus_t hipdnnPoolingBackward(hipdnnHandle_t handle,
     int8_t* devptr = 0;
     size_t workSpaceSize = 0;
 
-
-#if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_CALLS
-    std::cout << "Inside hipdnnPoolingBackward\n";
-#endif
+    HIPDNN_OPEN_LOG_C( "Inside hipdnnPoolingBackward");
 
     //HGSOS it appears that forward and backward pooling can reuse tha same map.
 
     if (sDescToWorkspacePooling.find(yDesc) == sDescToWorkspacePooling.end()) {
         //HGSOS looks like the yDesc is used for the workspace, not the poolingDesc
 
-#if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_INTERNAL_ALLOC
-        std::cout << "INTERNAL_ALLOC: hipdnnPoolingBackward\n";
-#endif
+        HIPDNN_OPEN_LOG_I( "INTERNAL_ALLOC: hipdnnPoolingBackward");
 
         CHECK_MIO(miopenPoolingGetWorkSpaceSize(yDesc, &workSpaceSize));
 
@@ -1957,9 +1932,7 @@ hipdnnStatus_t hipdnnPoolingBackward(hipdnnHandle_t handle,
 
 hipdnnStatus_t hipdnnCreateActivationDescriptor(
         hipdnnActivationDescriptor_t *activationDesc) {
-#if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_CALLS
-    std::cout << "Inside hipdnnCreateActivationDescriptor\n";
-#endif
+    HIPDNN_OPEN_LOG_C("Inside hipdnnCreateActivationDescriptor");
 
     CHECK_MIO(
             miopenCreateActivationDescriptor(activationDesc));
@@ -1973,9 +1946,7 @@ hipdnnStatus_t hipdnnSetActivationDescriptor(
         double reluCeilingOrAlpha, double activBeta, double activExp) {
     miopenActivationMode_t mimode;
 
-#if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_CALLS
-    std::cout << "Inside hipdnnSetActivationDescriptor\n";
-#endif
+    HIPDNN_OPEN_LOG_C( "Inside hipdnnSetActivationDescriptor");
 
     CHECK_HIPDNN(hipTomiopenActivationMode(mode, &mimode));
 
@@ -1992,9 +1963,7 @@ hipdnnStatus_t hipdnnGetActivationDescriptor(
         hipdnnActivationMode_t *mode, hipdnnNanPropagation_t *reluNanOpt,
         double* reluCeilingOrAlpha, double* activBeta, double* activExp) {
 
-#if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_ERRORS
-    std::cout << "ENTER hipdnnGetActivationDescriptor\n";
-#endif
+    HIPDNN_OPEN_LOG_E("ENTER hipdnnGetActivationDescriptor");
 
     miopenActivationMode_t miactmode;
 
@@ -2049,9 +2018,7 @@ hipdnnStatus_t hipdnnActivationBackward(hipdnnHandle_t handle,
 //=============================================================================
 
 hipdnnStatus_t hipdnnCreateLRNDescriptor(hipdnnLRNDescriptor_t *normDesc) {
-#if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_CALLS
-    std::cout << "Inside hipdnnCreateLRNDescriptor\n";
-#endif
+    HIPDNN_OPEN_LOG_C("Inside hipdnnCreateLRNDescriptor");
 
     CHECK_MIO(miopenCreateLRNDescriptor(normDesc));
     return HIPDNN_STATUS_SUCCESS;
@@ -2063,9 +2030,7 @@ hipdnnStatus_t hipdnnSetLRNDescriptor(hipdnnLRNDescriptor_t normDesc,
         double lrnK) {
     miopenLRNMode_t mimode;
 
-#if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_CALLS
-    std::cout << "Inside hipdnnCreateLRNDescriptor\n";
-#endif
+    HIPDNN_OPEN_LOG_C( "Inside hipdnnCreateLRNDescriptor");
 
     CHECK_HIPDNN(hipTomiopenLRNMode(mode, &mimode));
     CHECK_MIO(
@@ -2082,9 +2047,7 @@ hipdnnStatus_t hipdnnGetLRNDescriptor(hipdnnLRNDescriptor_t normDesc,
         double* lrnBeta, double* lrnK) {
       miopenLRNMode_t mimode;
 
-#if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_CALLS
-    std::cout << "Inside hipdnnCreateLRNDescriptor\n";
-#endif
+    HIPDNN_OPEN_LOG_C("Inside hipdnnCreateLRNDescriptor");
 
     CHECK_MIO(
             miopenGetLRNDescriptor(normDesc, &mimode, lrnN, lrnAlpha, lrnBeta,
@@ -2098,9 +2061,7 @@ hipdnnStatus_t hipdnnGetLRNDescriptor(hipdnnLRNDescriptor_t normDesc,
 //=============================================================================
 
 hipdnnStatus_t hipdnnDestroyLRNDescriptor(hipdnnLRNDescriptor_t normDesc) {
-#if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_CALLS
-    std::cout << "Inside hipdnnDestroyLRNDescriptor\n";
-#endif
+    HIPDNN_OPEN_LOG_C("Inside hipdnnDestroyLRNDescriptor");
 
     CHECK_MIO(miopenDestroyLRNDescriptor(normDesc));
     return HIPDNN_STATUS_SUCCESS;
@@ -2120,9 +2081,7 @@ hipdnnStatus_t hipdnnLRNCrossChannelForward(hipdnnHandle_t handle,
     miopenStatus_t miStat;
     miopenLRNMode_t mimode;
 
-#if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_CALLS
-    std::cout << "Inside hipdnnLRNCrossChannelForward\n";
-#endif
+    HIPDNN_OPEN_LOG_C( "Inside hipdnnLRNCrossChannelForward");
 
     CHECK_HIPDNN(hipTomiopenLRNMode(lrnMode, &mimode));
 
@@ -2153,9 +2112,7 @@ hipdnnStatus_t hipdnnLRNCrossChannelForwardEx(hipdnnHandle_t handle,
         size_t workspaceSize, void* workspace) {
     miopenLRNMode_t mimode;
 
-#if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_CALLS
-    std::cout << "Inside hipdnnLRNCrossChannelForward\n";
-#endif
+    HIPDNN_OPEN_LOG_C("Inside hipdnnLRNCrossChannelForward");
 
     CHECK_HIPDNN(hipTomiopenLRNMode(lrnMode, &mimode));
     //mimode is otherwise unused.
@@ -2183,9 +2140,7 @@ hipdnnStatus_t hipdnnLRNCrossChannelBackward(hipdnnHandle_t handle,
     miopenStatus_t miStat;
     miopenLRNMode_t mimode;
 
-#if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_CALLS
-    std::cout << "Inside hipdnnLRNCrossChannelBackward\n";
-#endif
+    HIPDNN_OPEN_LOG_C("Inside hipdnnLRNCrossChannelBackward");
 
     CHECK_HIPDNN(hipTomiopenLRNMode(lrnMode, &mimode));
     if (sDescToWorkspaceLRN.find(yDesc) == sDescToWorkspaceLRN.end()) {
@@ -2217,9 +2172,7 @@ hipdnnStatus_t hipdnnLRNCrossChannelBackwardEx(hipdnnHandle_t handle,
         void* workspace) {
     miopenLRNMode_t mimode;
 
-#if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_CALLS
-    std::cout << "Inside hipdnnLRNCrossChannelBackwardEx\n";
-#endif
+    HIPDNN_OPEN_LOG_C("Inside hipdnnLRNCrossChannelBackwardEx");
 
     CHECK_HIPDNN(hipTomiopenLRNMode(lrnMode, &mimode));
     //mimode is otherwise unused.
@@ -2235,9 +2188,8 @@ hipdnnStatus_t hipdnnDeriveBNTensorDescriptor(
         hipdnnTensorDescriptor_t derivedBnDesc,
         const hipdnnTensorDescriptor_t xDesc, hipdnnBatchNormMode_t mode) {
 
-#if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_CALLS
-    std::cout << "Inside hipdnnDeriveBNTensorDescriptor\n";
-#endif
+    HIPDNN_OPEN_LOG_C( "Inside hipdnnDeriveBNTensorDescriptor");
+
     miopenBatchNormMode_t miBNMode;
     CHECK_HIPDNN(hipTomiopenBatchNormMode(mode, &miBNMode));
     CHECK_MIO(miopenDeriveBNTensorDescriptor(derivedBnDesc, xDesc, miBNMode));
@@ -2255,9 +2207,7 @@ hipdnnStatus_t hipdnnBatchNormalizationForwardTraining(hipdnnHandle_t handle,
         void *resultRunningVariance, double epsilon, void *resultSaveMean,
         void *resultSaveInvVariance) {
 
-#if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_CALLS
-    std::cout << "Inside hipdnnBatchNormalizationForwardTraining\n";
-#endif
+    HIPDNN_OPEN_LOG_C("Inside hipdnnBatchNormalizationForwardTraining");
     miopenBatchNormMode_t miBNMode;
     CHECK_HIPDNN(hipTomiopenBatchNormMode(mode, &miBNMode));
     CHECK_MIO(
@@ -2278,9 +2228,7 @@ hipdnnStatus_t hipdnnnBatchNormalizationForwardInference(hipdnnHandle_t handle,
         const hipdnnTensorDescriptor_t bnScaleBiasMeanVarDesc,
         const void *bnScale, const void *bnBias, const void *estimatedMean,
         const void *estimatedVariance, double epsilon) {
-#if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_CALLS
-    std::cout << "Inside hipdnnBatchNormalizationForwardInference\n";
-#endif
+    HIPDNN_OPEN_LOG_C("Inside hipdnnBatchNormalizationForwardInference");
     miopenBatchNormMode_t miBNMode;
     CHECK_HIPDNN(hipTomiopenBatchNormMode(mode, &miBNMode));
     CHECK_MIO(
@@ -2760,9 +2708,7 @@ hipdnnStatus_t hipdnnBatchNormalizationForwardInference(hipdnnHandle_t handle,
         const void *bnScale, const void *bnBias, const void *estimatedMean,
         const void *estimatedVariance, double epsilon) {
 
-#if DEBUG_CURRENT_CALL_STACK_LEVEL >= DEBUG_CALL_STACK_LEVEL_CALLS
-    std::cout << "Inside hipdnnBatchNormalizationForwardInference\n";
-#endif
+    HIPDNN_OPEN_LOG_C("Inside hipdnnBatchNormalizationForwardInference");
     miopenBatchNormMode_t miBNMode;
     CHECK_HIPDNN(hipTomiopenBatchNormMode(mode, &miBNMode));
     CHECK_MIO(
