@@ -12,6 +12,18 @@ ifndef MIOPEN_PATH
        MIOPEN_PATH=/opt/rocm/miopen
 endif
 
+ifndef ENABLE_LOG
+       ENABLE_LOG = 0
+endif
+
+ifeq (${ENABLE_LOG}, ON)
+       ENABLE_LOG = 1
+endif
+
+ifeq (${ENABLE_LOG}, OFF)
+       ENABLE_LOG = 0
+endif
+
 
 HIPCC = ${HIP_PATH}/bin/hipcc
 
@@ -38,6 +50,9 @@ LDFLAGS = -lm -lMIOpen
 SOURCEDIR = src/hcc_detail
 
 HIP_INCLUDE += -I${HCC_PATH}/include
+
+CPPFLAGS += -DENABLE_LOG=${ENABLE_LOG}
+
 endif
 
 COMMONFLAGS = -fPIC
