@@ -1589,8 +1589,6 @@ hipdnnStatus_t hipdnnFindConvolutionBackwardDataAlgorithmEx(
 
     try {
 
-        HIPDNN_OPEN_LOG_E( "...failed miopenConvolutionBackwardDataGetWorkSpaceSize"
-         << std::flush);
         void* workSpaceInternal = NULL;
 
         HIPDNN_OPEN_LOG_I( "INTERNAL_ALLOC: miopenConvolutionBackwardGetWorkSpaceSize size "
