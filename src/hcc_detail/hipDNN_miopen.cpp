@@ -107,10 +107,10 @@ void* SaveAsPriorBuffer(void *dData) {
 }
 
 // Revoke the PriorBuffer
-void deallocPrior(void *dData) {
-    size_t dPriorSize = 0;   // PriorDstSize
-    CHECK_HIP(hipMemPtrGetInfo(dData,&dPriorSize));
-    if (dPriorSize > 0)
+void FreeUpBuffer(void *dData) {
+    size_t toBeFreedSize = 0;   // PriorDstSize
+    CHECK_HIP(hipMemPtrGetInfo(dData,&toBeFreedSize));
+    if (toBeFreedSize > 0 && (dData !=NULL))
         CHECK_HIP(hipFree(dData));
 }
 
@@ -1130,7 +1130,7 @@ hipdnnStatus_t hipdnnFindConvolutionForwardAlgorithmEx(hipdnnHandle_t handle,
                         ));
 
         HIPDNN_OPEN_LOG_C("Invoked miopenFindConvolutionForwardAlgorithm");
-        CHECK_HIP(hipFree(workSpaceInternal));
+        FreeUpBuffer(workSpaceInternal);
     }
     else {
         HIPDNN_OPEN_LOG_I("PREALLOCATED hipdnnFindConvolutionForwardAlgorithmEx size "
@@ -1226,7 +1226,7 @@ hipdnnStatus_t hipdnnConvolutionForward(hipdnnHandle_t handle,
                 miopenConvolutionForward(handle, alpha, xDesc, x, wDesc, w,
                         convDesc, mialgo, beta, yDesc, y,
                         workSpaceInternal, expectedWorkSpaceSize));
-        CHECK_HIP(hipFree(workSpaceInternal));
+        FreeUpBuffer(workSpaceInternal);
         return HIPDNN_STATUS_SUCCESS;
     } else {
 
@@ -1351,7 +1351,7 @@ hipdnnStatus_t hipdnnFindConvolutionBackwardFilterAlgorithmEx(
                             workSpaceInternal, expectedWorkSpaceSize,
                             false //exhaustiveSearch
                             ));
-            CHECK_HIP(hipFree(workSpaceInternal));
+            FreeUpBuffer(workSpaceInternal);
         }
         else {
             CHECK_MIO(miopenFindConvolutionBackwardWeightsAlgorithm(handle,
@@ -1443,10 +1443,10 @@ hipdnnStatus_t hipdnnConvolutionBackwardFilter(hipdnnHandle_t handle,
                                    xDesc, x, convDesc, mialgo, &tempBeta, dwDesc, dw,
                                    workSpaceInternal, expectedWorkSpaceSize));
             accumulateGradients(dw, dwPrior, dwDesc, beta);
-            deallocPrior(dwPrior);
+            FreeUpBuffer(dwPrior);
 
         }
-        CHECK_HIP(hipFree(workSpaceInternal));
+        FreeUpBuffer(workSpaceInternal);
     } else {
         HIPDNN_OPEN_LOG_I("PREALLCOATED: hipdnnConvolutionBackwardFilter:" << workSpace
                   << ", size= " << workSpaceSizeInBytes
@@ -1467,7 +1467,7 @@ hipdnnStatus_t hipdnnConvolutionBackwardFilter(hipdnnHandle_t handle,
                                         xDesc, x, convDesc, mialgo, &tempBeta, dwDesc, dw,
                                         workSpace, workSpaceSizeInBytes));
             accumulateGradients(dw, dwPrior, dwDesc, beta);
-            deallocPrior(dwPrior);
+            FreeUpBuffer(dwPrior);
         }
 
         HIPDNN_OPEN_LOG_C("miopenConvolutionBackwardWeights "
@@ -1614,7 +1614,7 @@ hipdnnStatus_t hipdnnFindConvolutionBackwardDataAlgorithmEx(
         HIPDNN_OPEN_LOG_C( "...miopenFindConvolutionBackwardDataAlgorithm OK, returnedAlgoCount:"
         << *returnedAlgoCount  << std::flush);
 
-        CHECK_HIP(hipFree(workSpaceInternal));
+        FreeUpBuffer(workSpaceInternal);
     }
     catch (std::exception& e) {
         std::cout
@@ -1697,9 +1697,9 @@ hipdnnStatus_t hipdnnConvolutionBackwardData(hipdnnHandle_t handle,
                                             wDesc, w, convDesc, mialgo, &tempBeta , dxDesc, dx,
                                             workSpaceInternal, expectedWorkSpaceSize));
                 accumulateGradients(dx, dxPrior, dxDesc, beta);
-                deallocPrior(dxPrior);
+                FreeUpBuffer(dxPrior);
             }
-            CHECK_HIP(hipFree(workSpaceInternal));
+            FreeUpBuffer(workSpaceInternal);
 
         }
         else
@@ -1729,7 +1729,7 @@ hipdnnStatus_t hipdnnConvolutionBackwardData(hipdnnHandle_t handle,
                                             wDesc, w, convDesc, mialgo, &tempBeta, dxDesc, dx,
                                             workSpace, workSpaceSizeInBytes));
                 accumulateGradients(dx, dxPrior, dxDesc, beta);
-                deallocPrior(dxPrior);
+                FreeUpBuffer(dxPrior);
             }
 
 
@@ -2287,9 +2287,9 @@ hipdnnStatus_t hipdnnBatchNormalizationBackward(hipdnnHandle_t handle,
         accumulateGradients(dx, dxPrior, dxDesc, betaDataDiff);
         accumulateGradients(resultBnScaleDiff, resultBnScaleDiffPrior, bnScaleBiasDiffDesc, betaParamDiff);
         accumulateGradients(resultBnBiasDiff, resultBnBiasDiffPrior, bnScaleBiasDiffDesc, betaParamDiff);
-        deallocPrior(dxPrior);
-        deallocPrior(resultBnBiasDiffPrior);
-        deallocPrior(resultBnScaleDiffPrior);
+        FreeUpBuffer(dxPrior);
+        FreeUpBuffer(resultBnBiasDiffPrior);
+        FreeUpBuffer(resultBnScaleDiffPrior);
     }
 
     return HIPDNN_STATUS_SUCCESS;
