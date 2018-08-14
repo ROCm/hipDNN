@@ -842,6 +842,18 @@ hipdnnStatus_t hipdnnSetTensor4dDescriptor(hipdnnTensorDescriptor_t tensorDesc,
 
 //=============================================================================
 
+hipdnnStatus_t hipdnnSetFilter4dDescriptor(hipdnnFilterDescriptor_t filterDesc,
+                hipdnnTensorFormat_t format, hipdnnDataType_t dataType, int k, int c,
+                int h, int w) {
+     miopenDataType_t miDT;
+     CHECK_HIPDNN(hipTensorFormatSupported(format));
+     CHECK_HIPDNN(hipTomiopenDataType(dataType, &miDT));
+     CHECK_MIO(miopenSet4dTensorDescriptor(filterDesc, miDT, k, c, h, w));
+     return HIPDNN_STATUS_SUCCESS;
+}
+
+//=============================================================================
+
 hipdnnStatus_t hipdnnGetTensor4dDescriptor(hipdnnTensorDescriptor_t tensorDesc,
         hipdnnDataType_t *dataType, int *n, int *c, int *h, int *w,
         int *nStride, int *cStride, int *hStride, int *wStride) {
@@ -868,7 +880,7 @@ hipdnnStatus_t hipdnnAddTensor(hipdnnHandle_t handle, const void *alpha,
         const hipdnnTensorDescriptor_t cDesc, void *C) {
     miopenTensorOp_t tensorOp = miopenTensorOpAdd;
     int alpha2 = 0;
-
+    
     CHECK_MIO(miopenOpTensor(handle, tensorOp, alpha, aDesc, A, beta, cDesc, C,
                     &alpha2, cDesc, C));
     return HIPDNN_STATUS_SUCCESS;
@@ -1299,16 +1311,49 @@ hipdnnStatus_t hipdnnGetConvolutionBackwardFilterAlgorithm(
         size_t memoryLimitInBytes, hipdnnConvolutionBwdFilterAlgo_t *algo) {
 
 
-    HIPDNN_OPEN_LOG_E("hipdnnGetConvolutionBackwardFilterAlgorithm NOT IMPLEMENTED"
+    HIPDNN_OPEN_LOG_C("Inside hipdnnGetConvolutionBackwardFilterAlgorithm ");
 
-            << std::flush);
+    size_t numBytes;
+    void* x;
+    void* dy;
+    void* dw;
+    const int requestedAlgoCount=1;   
+    int returnedAlgoCount;
+    void *sConvolutionBackwardAlgorithmWorkspace=NULL;
 
+    CHECK_MIO(miopenGetTensorNumBytes(xDesc, &numBytes));
+    CHECK_HIP(hipMalloc((void**)&x, numBytes));
 
-#ifdef NOTYET
-//HGSOS   Could use the extended version, but don't know how to get x from xDesc etc.
-#endif
+    CHECK_MIO(miopenGetTensorNumBytes(dwDesc,  &numBytes));
+    CHECK_HIP(hipMalloc((void**)&dw, numBytes));
 
-    return HIPDNN_STATUS_NOT_SUPPORTED;
+    CHECK_MIO(miopenGetTensorNumBytes(dyDesc, &numBytes));
+    CHECK_HIP(hipMalloc((void**)&dy, numBytes));
+    
+    hipdnnConvolutionBwdFilterAlgoPerf_t* perfResults = new hipdnnConvolutionBwdFilterAlgoPerf_t[requestedAlgoCount];
+
+    CHECK_HIPDNN(hipdnnFindConvolutionBackwardFilterAlgorithmEx( handle,
+            xDesc,
+            x,
+            dwDesc,
+            dw,
+            convDesc,
+            dyDesc,
+            dy,
+            requestedAlgoCount,
+            &returnedAlgoCount,
+            perfResults,
+            sConvolutionBackwardAlgorithmWorkspace,
+            0));
+
+  
+    *algo = perfResults[0].algo;
+
+    CHECK_HIP(hipFree(x));
+    CHECK_HIP(hipFree(dw));
+    CHECK_HIP(hipFree(dy));
+    delete[] perfResults;
+    return HIPDNN_STATUS_SUCCESS;
 }
 
 hipdnnStatus_t hipdnnFindConvolutionBackwardFilterAlgorithmEx(
@@ -1531,9 +1576,6 @@ hipdnnStatus_t hipdnnFindConvolutionBackwardDataAlgorithm(hipdnnHandle_t handle,
 
         return HIPDNN_STATUS_NOT_SUPPORTED;
 
-#ifdef NOTYET
-//HGSOS   Could use the extended version, but don't know how to get x from xDesc etc.
-#endif
     } catch (std::exception& e) {
         std::cout
                 << "Exception in hipdnnGetConvolutionBackwardDataWorkspaceSize: "
@@ -1551,21 +1593,54 @@ hipdnnStatus_t hipdnnGetConvolutionBackwardDataAlgorithm(hipdnnHandle_t handle,
         size_t memoryLimitInBytes, hipdnnConvolutionBwdDataAlgo_t *algo) {
     try {
 
-        HIPDNN_OPEN_LOG_E("ERROR: hipdnnGetConvolutionBackwardDataAlgorithm NOT IMPLEMENTED"
+        HIPDNN_OPEN_LOG_C("Inside hipdnnGetConvolutionBackwardDataAlgorithm "
                 << std::flush);
+    size_t numBytes;
+    void* dx;
+    void* dy;
+    void* w;
+    const int requestedAlgoCount=1;   
+    int returnedAlgoCount;
+    void *sConvolutionBackwardDataAlgorithmWorkspace=NULL;
 
+    CHECK_MIO(miopenGetTensorNumBytes(dxDesc, &numBytes));
+    CHECK_HIP(hipMalloc((void**)&dx, numBytes));
 
-        return HIPDNN_STATUS_NOT_SUPPORTED;
+    CHECK_MIO(miopenGetTensorNumBytes(wDesc,  &numBytes));
+    CHECK_HIP(hipMalloc((void**)&w, numBytes));
 
-#ifdef NOTYET
-//HGSOS   Could use the extended version, but don't know how to get x from xDesc etc.
-#endif
+    CHECK_MIO(miopenGetTensorNumBytes(dyDesc, &numBytes));
+    CHECK_HIP(hipMalloc((void**)&dy, numBytes));
+    
+    hipdnnConvolutionBwdDataAlgoPerf_t* perfResults = new hipdnnConvolutionBwdDataAlgoPerf_t[requestedAlgoCount];
+
+    CHECK_HIPDNN(hipdnnFindConvolutionBackwardDataAlgorithmEx( handle,
+            wDesc,
+            w,
+            dyDesc,
+            dy,
+            convDesc,
+            dxDesc,
+            dx,
+            requestedAlgoCount,
+            &returnedAlgoCount,
+            perfResults,
+            sConvolutionBackwardDataAlgorithmWorkspace,
+            0));
+
+    *algo = perfResults[0].algo;
+
+    CHECK_HIP(hipFree(dx));
+    CHECK_HIP(hipFree(w));
+    CHECK_HIP(hipFree(dy));
+    delete[] perfResults;
+    
     } catch (std::exception& e) {
         std::cout
                 << "Exception in hipdnnGetConvolutionBackwardDataWorkspaceSize: "
                 << e.what() << std::endl HIPDNNFLUSH;
     }
-    return HIPDNN_STATUS_NOT_SUPPORTED;
+    return HIPDNN_STATUS_SUCCESS;
 }
 
 hipdnnStatus_t hipdnnFindConvolutionBackwardDataAlgorithmEx(
