@@ -109,9 +109,11 @@ void* SaveAsPriorBuffer(void *dData) {
 // Revoke the PriorBuffer
 void FreeUpBuffer(void *dData) {
     size_t toBeFreedSize = 0;   // PriorDstSize
-    CHECK_HIP(hipMemPtrGetInfo(dData,&toBeFreedSize));
-    if (toBeFreedSize > 0 && (dData !=NULL))
-        CHECK_HIP(hipFree(dData));
+    if (dData != NULL) {  // Check the pointer isn't null
+        CHECK_HIP(hipMemPtrGetInfo(dData,&toBeFreedSize));
+        if (toBeFreedSize > 0)
+            CHECK_HIP(hipFree(dData));
+    }
 }
 
 
