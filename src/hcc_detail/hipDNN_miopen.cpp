@@ -1050,44 +1050,62 @@ hipdnnStatus_t hipdnnGetConvolutionForwardAlgorithm(hipdnnHandle_t handle,
         const hipdnnTensorDescriptor_t yDesc,
         hipdnnConvolutionFwdPreference_t preference, size_t memoryLimitInBytes,
         hipdnnConvolutionFwdAlgo_t *algo) {
-    HIPDNN_OPEN_LOG_E("hipdnnGetConvolutionForwardAlgorithm NOT IMPLEMENTED."
-             << std::flush);
-    return HIPDNN_STATUS_NOT_SUPPORTED;
-#ifdef NOTYET   
 
     miopenConvFwdAlgorithm_t mialgo;
-
+    size_t sizeInBytes = 0;
+    void* sConvolutionForwardAlgorithmWorkspace;
     //in miopen, workspace size does not depend on algo.
-    CHECK_MIO(
-            miopenConvolutionForwardGetWorkSpaceSize( handle,
-                    wDesc,
-                    xDesc,
-                    convDesc,
-                    yDesc,
-                    sizeInBytes));
+    
+    size_t numBytes;
+    void* x;
+    void* y;
+    void* w;
+    const int requestedAlgoCount=1;
+    int returnedAlgoCount;
 
+    CHECK_MIO(miopenGetTensorNumBytes(xDesc, &numBytes));
+    CHECK_HIP(hipMalloc((void**)&x, numBytes));
 
-    HIPDNN_OPEN_LOG_I("INTERNAL_ALLOC hipdnnGetConvolutionForwardAlgorithm");
+    CHECK_MIO(miopenGetTensorNumBytes(wDesc,  &numBytes));
+    CHECK_HIP(hipMalloc((void**)&w, numBytes));
 
+    CHECK_MIO(miopenGetTensorNumBytes(yDesc, &numBytes));
+    CHECK_HIP(hipMalloc((void**)&y, numBytes));
 
-    CHECK_HIP(hipMalloc((void**)&sConvolutionForwardAlgorithmWorkspace, sizeInBytes));
-
-//HGSOS //NOTYET dont know how to get x,y,w from the descriptors but it should be possible.
+    hipdnnConvolutionFwdAlgoPerf_t* perfResults = new hipdnnConvolutionFwdAlgoPerf_t[requestedAlgoCount];
 
     CHECK_HIPDNN(hipdnnFindConvolutionForwardAlgorithmEx( handle,
             xDesc,
-            const void *x,
+            x,
             wDesc,
-            const void *w,
+            w,
             convDesc,
             yDesc,
-            void *y,
+            y,
             requestedAlgoCount,
-            returnedAlgoCount,
+            &returnedAlgoCount,
             perfResults,
-            void *workSpace,
-            size_t workSpaceSizeInBytes));
-#endif  
+            sConvolutionForwardAlgorithmWorkspace,
+            sizeInBytes));
+
+    *algo = perfResults[0].algo;
+
+    CHECK_HIPDNN(
+          hipdnnGetConvolutionForwardWorkspaceSize(handle,
+                   xDesc,
+                   wDesc,
+                   convDesc,
+                   yDesc,
+                   *algo,
+                   &sizeInBytes));
+
+    hipMalloc((void**)&sConvolutionForwardAlgorithmWorkspace, sizeInBytes);
+
+    CHECK_HIP(hipFree(x));
+    CHECK_HIP(hipFree(w));
+    CHECK_HIP(hipFree(y));
+    delete[] perfResults;
+    return HIPDNN_STATUS_SUCCESS;
 }
 
 hipdnnStatus_t hipdnnFindConvolutionForwardAlgorithmEx(hipdnnHandle_t handle,
