@@ -1309,16 +1309,49 @@ hipdnnStatus_t hipdnnGetConvolutionBackwardFilterAlgorithm(
         size_t memoryLimitInBytes, hipdnnConvolutionBwdFilterAlgo_t *algo) {
 
 
-    HIPDNN_OPEN_LOG_E("hipdnnGetConvolutionBackwardFilterAlgorithm NOT IMPLEMENTED"
+    HIPDNN_OPEN_LOG_C("Inside hipdnnGetConvolutionBackwardFilterAlgorithm ");
 
-            << std::flush);
+    size_t numBytes;
+    void* x;
+    void* dy;
+    void* dw;
+    const int requestedAlgoCount=1;   
+    int returnedAlgoCount;
+    void *sConvolutionBackwardAlgorithmWorkspace=NULL;
 
+    CHECK_MIO(miopenGetTensorNumBytes(xDesc, &numBytes));
+    CHECK_HIP(hipMalloc((void**)&x, numBytes));
 
-#ifdef NOTYET
-//HGSOS   Could use the extended version, but don't know how to get x from xDesc etc.
-#endif
+    CHECK_MIO(miopenGetTensorNumBytes(dwDesc,  &numBytes));
+    CHECK_HIP(hipMalloc((void**)&dw, numBytes));
 
-    return HIPDNN_STATUS_NOT_SUPPORTED;
+    CHECK_MIO(miopenGetTensorNumBytes(dyDesc, &numBytes));
+    CHECK_HIP(hipMalloc((void**)&dy, numBytes));
+    
+    hipdnnConvolutionBwdFilterAlgoPerf_t* perfResults = new hipdnnConvolutionBwdFilterAlgoPerf_t[requestedAlgoCount];
+
+    CHECK_HIPDNN(hipdnnFindConvolutionBackwardFilterAlgorithmEx( handle,
+            xDesc,
+            x,
+            dwDesc,
+            dw,
+            convDesc,
+            dyDesc,
+            dy,
+            requestedAlgoCount,
+            &returnedAlgoCount,
+            perfResults,
+            sConvolutionBackwardAlgorithmWorkspace,
+            0));
+
+  
+    *algo = perfResults[0].algo;
+
+    CHECK_HIP(hipFree(x));
+    CHECK_HIP(hipFree(dw));
+    CHECK_HIP(hipFree(dy));
+    delete[] perfResults;
+    return HIPDNN_STATUS_SUCCESS;
 }
 
 hipdnnStatus_t hipdnnFindConvolutionBackwardFilterAlgorithmEx(
