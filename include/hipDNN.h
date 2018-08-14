@@ -352,6 +352,10 @@ HIPDNN_EXPORT hipdnnStatus_t hipdnnSetTensor4dDescriptor(
 		hipdnnTensorDescriptor_t tensorDesc, hipdnnTensorFormat_t format,
 		hipdnnDataType_t dataType, int n, int c, int h, int w);
 
+HIPDNN_EXPORT hipdnnStatus_t hipdnnSetFilter4dDescriptor(
+                hipdnnFilterDescriptor_t filterDesc, hipdnnTensorFormat_t format,
+                hipdnnDataType_t dataType, int k, int c, int h, int w);
+
 HIPDNN_EXPORT hipdnnStatus_t hipdnnGetTensor4dDescriptor(
 		hipdnnTensorDescriptor_t tensorDesc, hipdnnDataType_t *dataType, int *n,
 		int *c, int *h, int *w, int *nStride, int *cStride, int *hStride,
