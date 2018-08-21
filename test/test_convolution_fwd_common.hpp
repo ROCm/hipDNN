@@ -25,7 +25,7 @@ void compute_cpuref_conv_fwd(test_convolution_sizes_t& c, dataType* src, dataTyp
                                     + ic * c.ih * c.iw + ih * c.iw + iw;
                                 size_t widx = oc * c.ic  * c.kh * c.kw
                                     + ic * c.kh * c.kw + kh * c.kw + kw;
-                                a += (dataType)src[iidx *  weights_data[widx];
+                                a += (dataType)src[iidx] *  weights[widx];
                             }
                         }
                     }
@@ -33,7 +33,7 @@ void compute_cpuref_conv_fwd(test_convolution_sizes_t& c, dataType* src, dataTyp
                     float a_fp = (float)a;
 
                     a_fp += (float)(bias ?
-                        bias[c.oc + oc)] :
+                        bias[oc] :
                         0);
 
                     size_t oidx = n * c.oc * c.oh * c.ow
