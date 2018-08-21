@@ -1,6 +1,9 @@
 #ifndef HIPDNN_TEST_COMMON_HPP
 #define HIPDNN_TEST_COMMON_HPP
 
+#include "hipDNN.h"
+#include <cstdlib>
+
 struct test_convolution_sizes_t {
     test_convolution_sizes_t(
         int mb,
@@ -29,6 +32,26 @@ struct test_convolution_sizes_t {
     int strh, strw; // stride along height and width
     int dilh, dilw; // dilation along height and width
 };
+
+
+#define checkHIPDNN(expression)                               \
+  {                                                          \
+    hipdnnStatus_t status = (expression);                     \
+    if (status != HIPDNN_STATUS_SUCCESS) {                    \
+      std::cerr << "Error on line " << __LINE__ << ": "      \
+                << hipdnnGetErrorString(status) << std::endl; \
+      std::exit(EXIT_FAILURE);                               \
+    }                                                        \
+  }
+
+#define HIP_CALL(f) { \
+  hipError_t err = (f); \
+  if (err != hipSuccess) { \
+    std::cout \
+        << "    Error occurred: " << err << std::endl; \
+    std::exit(1); \
+  } \
+}
 
 
 #endif
