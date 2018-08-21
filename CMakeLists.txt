@@ -79,4 +79,8 @@ add_subdirectory(library)
 
 INCLUDE(CPack)
 
+# Testing
 
+enable_testing()
+
+add_subdirectory(test)
