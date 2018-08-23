@@ -12,17 +12,29 @@
 #include <vector>
 
 template<typename dataType>
-void populateMemoryRandom(Memory<dataType> mem) {
+bool Equals(Memory<dataType> A, Memory<dataType> B) {
+    // Memcpy the device results to host buffer
+    HIP_CALL(hipMemcpy(B.cpu(), B.gpu(), B.size(), hipMemcpyDeviceToHost));
+    assert(A.size()!=B.size());
+    for (int i=0; i < B.get_num_elements(); i++) {
+       EXPECT_NEAR(A.get_vector()[i], B.get_vector()[i], 0.001);
+    }
+}
+
+template<typename dataType>
+void populateMemoryRandom(Memory<dataType> &mem) {
     // First create an instance of an engine.
     std::random_device rnd_device;
     // Specify the engine and distribution.
     std::mt19937 mersenne_engine {rnd_device()};  // Generates random integers
     std::uniform_int_distribution<int> dist {1, 52};
-
+    printf("Creating vector of Size %d\n", mem.get_num_elements());
+    std::vector<dataType> v(mem.get_num_elements());
     auto gen = [&dist, &mersenne_engine](){
                    return dist(mersenne_engine);
                };
-    std::generate(mem.get_vector().begin(), mem.get_vector().end(), gen);
+    std::generate(v.begin(), v.end(), gen);
+    std::copy(v.begin(), v.end(), mem.cpu());
 
     // Copy the stuff to device too
     HIP_CALL(hipMemcpy(mem.gpu(), mem.cpu(), mem.size(), hipMemcpyHostToDevice));
