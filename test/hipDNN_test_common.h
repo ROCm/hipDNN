@@ -67,11 +67,13 @@ private:
     dataType* h_data;
     dataType *d_data;
     size_t mem_size =0;
+    int num_of_items =0;
 public:
     Memory(int numElements) {
+        num_of_items = numElements;
         mem_size = sizeof(dataType) * numElements;
         hVec[numElements];
-        this->h_data = hVec.data();
+        this->h_data = (dataType*)malloc(mem_size);
         HIP_CALL(hipMalloc(&this->d_data, mem_size));
 
     }
@@ -87,6 +89,9 @@ public:
     std::vector<dataType> get_vector() {
         return hVec;
     }
+    int get_num_elements() {
+        return num_of_items;
+    }
 };
 
 
@@ -101,7 +106,7 @@ struct Desc {
 
 // Note we are currently only dealing with 2D convolution
 Desc calculateConv2DOutputDesc(Desc inputDesc, Desc filterDesc, int pad[2], int stride[2]) {
-    assert(inputDesc.C != filterDesc.C);
+    assert(inputDesc.C == filterDesc.C);
     int outputHeight = ((inputDesc.H - filterDesc.H + 2 * pad[0]) / 2 * stride[0]) + 1;
     int outputWidth = ((inputDesc.W - filterDesc.W + 2 * pad[1]) / 2 * stride[1]) + 1;
     Desc outputDesc(inputDesc.N, filterDesc.N, outputHeight, outputWidth);
