@@ -12,12 +12,12 @@
 #include <vector>
 
 template<typename dataType>
-bool Equals(Memory<dataType> A, Memory<dataType> B) {
+bool Equals(Memory<dataType> &A, Memory<dataType> &B) {
     // Memcpy the device results to host buffer
     HIP_CALL(hipMemcpy(B.cpu(), B.gpu(), B.size(), hipMemcpyDeviceToHost));
-    assert(A.size()!=B.size());
+    assert(A.size()==B.size());
     for (int i=0; i < B.get_num_elements(); i++) {
-       EXPECT_NEAR(A.get_vector()[i], B.get_vector()[i], 0.001);
+       EXPECT_NEAR(A.cpu()[i], B.cpu()[i], 0.001);
     }
 }
 
