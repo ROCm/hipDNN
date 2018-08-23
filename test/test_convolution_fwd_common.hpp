@@ -4,6 +4,30 @@
 #include "gtest/gtest.h"
 #include "hipDNN_test_common.h"
 #include "hipDNN.h"
+#include <random>
+#include <algorithm>
+#include <iterator>
+#include <iostream>
+#include <functional>
+#include <vector>
+
+template<typename dataType>
+void populateMemoryRandom(Memory<dataType> mem) {
+    // First create an instance of an engine.
+    std::random_device rnd_device;
+    // Specify the engine and distribution.
+    std::mt19937 mersenne_engine {rnd_device()};  // Generates random integers
+    std::uniform_int_distribution<int> dist {1, 52};
+
+    auto gen = [&dist, &mersenne_engine](){
+                   return dist(mersenne_engine);
+               };
+    std::generate(mem.get_vector().begin(), mem.get_vector().end(), gen);
+
+    // Copy the stuff to device too
+    HIP_CALL(hipMemcpy(mem.gpu(), mem.cpu(), mem.size(), hipMemcpyHostToDevice));
+
+}
 
 
 // CPU reference code
@@ -52,7 +76,7 @@ void compute_cpuref_conv_fwd(test_convolution_sizes_t& c, dataType* src, dataTyp
 
 // GPU Reference code
 template <typename dataType>
-void convolution_forward(test_convolution_sizes_t& c, dataType* src, dataType* weights, dataType* bias, dataType* dst) {
+void compute_hipdnn_conv_fwd(test_convolution_sizes_t& c, dataType* src, dataType* weights, dataType* bias, dataType* dst) {
 
 
   hipdnnHandle_t hipdnn;

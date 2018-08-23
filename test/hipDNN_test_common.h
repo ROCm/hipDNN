@@ -3,6 +3,7 @@
 
 #include "hipDNN.h"
 #include <cstdlib>
+#include <vector>
 
 struct test_convolution_sizes_t {
     test_convolution_sizes_t(
@@ -34,6 +35,9 @@ struct test_convolution_sizes_t {
 };
 
 
+
+
+
 #define checkHIPDNN(expression)                               \
   {                                                          \
     hipdnnStatus_t status = (expression);                     \
@@ -55,3 +59,57 @@ struct test_convolution_sizes_t {
 
 
 #endif
+
+template<typename dataType>
+struct Memory {
+private:
+    std::vector<dataType> hVec;
+    dataType* h_data;
+    dataType *d_data;
+    size_t mem_size =0;
+public:
+    Memory(int numElements) {
+        mem_size = sizeof(dataType) * numElements;
+        hVec[numElements];
+        this->h_data = hVec.data();
+        HIP_CALL(hipMalloc(&this->d_data, mem_size));
+
+    }
+    dataType* cpu() {
+        return this->h_data;
+    }
+    dataType* gpu() {
+        return this->d_data;
+    }
+    size_t size(){
+        return this->mem_size;
+    }
+    std::vector<dataType> get_vector() {
+        return hVec;
+    }
+};
+
+
+// Note; We are testing only NCHW format for now
+struct Desc {
+    Desc(int N, int C, int H, int W): N(N), C(C), H(H), W(W) {}
+    int N;
+    int C;
+    int H;
+    int W;
+};
+
+// Note we are currently only dealing with 2D convolution
+Desc calculateConv2DOutputDesc(Desc inputDesc, Desc filterDesc, int pad[2], int stride[2]) {
+    assert(inputDesc.C != filterDesc.C);
+    int outputHeight = ((inputDesc.H - filterDesc.H + 2 * pad[0]) / 2 * stride[0]) + 1;
+    int outputWidth = ((inputDesc.W - filterDesc.W + 2 * pad[1]) / 2 * stride[1]) + 1;
+    Desc outputDesc(inputDesc.N, filterDesc.N, outputHeight, outputWidth);
+    return outputDesc;
+}
+
+template <typename dataType>
+Memory<dataType> createMemory(Desc desc) {
+    Memory<dataType> m = Memory<dataType>(desc.N * desc.C * desc.H * desc.W);
+    return m;
+}
