@@ -4,38 +4,12 @@
 #include "hipDNN.h"
 #include <cstdlib>
 #include <vector>
-
-struct test_convolution_sizes_t {
-    test_convolution_sizes_t(
-        int mb,
-        int ng,
-        int ic, int ih, int iw,
-        int oc, int oh, int ow,
-        int kh, int kw,
-        int padh, int padw,
-        int strh, int strw,
-        int dilh=0, int dilw=0
-    ) :
-        mb(mb),
-        ng(ng),
-        ic(ic), ih(ih), iw(iw),
-        oc(oc), oh(oh), ow(ow),
-        kh(kh), kw(kw),
-        padh(padh), padw(padw),
-        strh(strh), strw(strw),
-        dilh(dilh), dilw(dilw) {}
-    int mb; // mini batches
-    int ng; // number of groups
-    int ic, ih, iw;  // Input channels, height and width
-    int oc, oh, ow;  // Output channels, height and width
-    int kh, kw;  // kernel height and width
-    int padh, padw; // padding along height and width
-    int strh, strw; // stride along height and width
-    int dilh, dilw; // dilation along height and width
-};
-
-
-
+#include <random>
+#include <algorithm>
+#include <iterator>
+#include <iostream>
+#include <functional>
+#include <vector>
 
 
 #define checkHIPDNN(expression)                               \
@@ -110,17 +84,39 @@ struct Desc {
     int W;
 };
 
-// Note we are currently only dealing with 2D convolution
-Desc calculateConv2DOutputDesc(Desc inputDesc, Desc filterDesc, int pad[2], int stride[2]) {
-    assert(inputDesc.C == filterDesc.C);
-    int outputHeight = ((inputDesc.H - filterDesc.H + 2 * pad[0]) / 2 * stride[0]) + 1;
-    int outputWidth = ((inputDesc.W - filterDesc.W + 2 * pad[1]) / 2 * stride[1]) + 1;
-    Desc outputDesc(inputDesc.N, filterDesc.N, outputHeight, outputWidth);
-    return outputDesc;
-}
 
 template <typename dataType>
 Memory<dataType> createMemory(Desc desc) {
     Memory<dataType> m = Memory<dataType>(desc.N * desc.C * desc.H * desc.W);
     return m;
+}
+
+template<typename dataType>
+bool Equals(Memory<dataType> &A, Memory<dataType> &B) {
+    // Memcpy the device results to host buffer
+    HIP_CALL(hipMemcpy(B.cpu(), B.gpu(), B.size(), hipMemcpyDeviceToHost));
+    assert(A.size()==B.size());
+    for (int i=0; i < B.get_num_elements(); i++) {
+       EXPECT_NEAR(A.cpu()[i], B.cpu()[i], 0.001);
+    }
+}
+
+template<typename dataType>
+void populateMemoryRandom(Memory<dataType> &mem) {
+    // First create an instance of an engine.
+    std::random_device rnd_device;
+    // Specify the engine and distribution.
+    std::mt19937 mersenne_engine {rnd_device()};  // Generates random integers
+    std::uniform_int_distribution<int> dist {1, 52};
+    printf("Creating vector of Size %d\n", mem.get_num_elements());
+    std::vector<dataType> v(mem.get_num_elements());
+    auto gen = [&dist, &mersenne_engine](){
+                   return dist(mersenne_engine);
+               };
+    std::generate(v.begin(), v.end(), gen);
+    std::copy(v.begin(), v.end(), mem.cpu());
+
+    // Copy the stuff to device too
+    HIP_CALL(hipMemcpy(mem.gpu(), mem.cpu(), mem.size(), hipMemcpyHostToDevice));
+
 }
