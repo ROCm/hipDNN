@@ -64,8 +64,8 @@ template<typename dataType>
 struct Memory {
 private:
     std::vector<dataType> hVec;
-    dataType* h_data;
-    dataType *d_data;
+    dataType* h_data=NULL;
+    dataType* d_data=NULL;
     size_t mem_size =0;
     int num_of_items =0;
 public:
@@ -91,6 +91,12 @@ public:
     }
     int get_num_elements() {
         return num_of_items;
+    }
+    ~Memory() {
+        assert(h_data);
+        assert(d_data);
+        free(h_data);
+        HIP_CALL(hipFree(d_data));
     }
 };
 
