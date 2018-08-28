@@ -39,8 +39,8 @@ struct test_convolution_sizes_t {
 // Note we are currently only dealing with 2D convolution
 Desc calculateConv2DOutputDesc(Desc inputDesc, Desc filterDesc, int pad[2], int stride[2]) {
     assert(inputDesc.C == filterDesc.C);
-    int outputHeight = ((inputDesc.H - filterDesc.H + 2 * pad[0]) / 2 * stride[0]) + 1;
-    int outputWidth = ((inputDesc.W - filterDesc.W + 2 * pad[1]) / 2 * stride[1]) + 1;
+    int outputHeight = ((inputDesc.H - filterDesc.H + 2 * pad[0]) / stride[0]) + 1;
+    int outputWidth = ((inputDesc.W - filterDesc.W + 2 * pad[1]) /  stride[1]) + 1;
     Desc outputDesc(inputDesc.N, filterDesc.N, outputHeight, outputWidth);
     return outputDesc;
 }
@@ -60,9 +60,9 @@ void compute_cpuref_conv_fwd(test_convolution_sizes_t& c, dataType* src, dataTyp
                         for (int kh = 0; kh < c.kh; kh++) {
                             for (int kw = 0; kw < c.kw; kw++) {
                                 int iw = ow * c.strw
-                                      - c.padw + kw * (1 + c.dilw);
+                                      - c.padw + kw * (c.dilw);
                                 int ih = oh * c.strh
-                                      - c.padh + kh * (1 + c.dilh);
+                                      - c.padh + kh * (c.dilh);
                                 if (iw < 0 || iw >= c.iw) continue;
                                 if (ih < 0 || ih >= c.ih) continue;
                                 size_t iidx = n * c.ic * c.ih * c.iw
