@@ -92,7 +92,7 @@ Memory<dataType> createMemory(Desc desc) {
 }
 
 template<typename dataType>
-bool Equals(Memory<dataType> &A, Memory<dataType> &B) {
+void Equals(Memory<dataType> &A, Memory<dataType> &B) {
     // Memcpy the device results to host buffer
     HIP_CALL(hipMemcpy(B.cpu(), B.gpu(), B.size(), hipMemcpyDeviceToHost));
     assert(A.size()==B.size());
