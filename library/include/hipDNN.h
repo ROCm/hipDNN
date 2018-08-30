@@ -25,7 +25,7 @@
 
 #include <hip/hip_runtime_api.h>
 
-#define CHECK_HIP(cmd)                                                                                          \
+#define CHECK_HIP(cmd)                                                                                      \
 {                                                                                                           \
     hipError_t error  = cmd;                                                                                \
     if (error != hipSuccess) {                                                                              \
