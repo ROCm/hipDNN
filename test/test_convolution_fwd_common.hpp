@@ -125,7 +125,7 @@ void compute_hipdnn_conv_fwd(test_convolution_sizes_t& c, dataType* src, dataTyp
   checkHIPDNN(hipdnnSetConvolution2dDescriptor(
         conv_desc,
         c.padh, c.padw, c.strh, c.strw, c.dilh, c.dilw,
-        HIPDNN_CONVOLUTION, HIPDNN_DATA_FLOAT));
+        HIPDNN_CROSS_CORRELATION, HIPDNN_DATA_FLOAT));
 
   checkHIPDNN(hipdnnGetConvolution2dForwardOutputDim(
         conv_desc, in_desc, filt_desc,
