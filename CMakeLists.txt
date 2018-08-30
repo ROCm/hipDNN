@@ -12,6 +12,8 @@ set(CPACK_PACKAGING_INSTALL_PREFIX "/opt/rocm/hipdnn" CACHE STRING "Package inst
 
 project(hipdnn CXX)
 
+add_definitions(-std=c++11)
+
 # HIP_PATH
 IF(NOT DEFINED ENV{HIP_PATH})
   SET(HIP_PATH "/opt/rocm/hip")
@@ -31,7 +33,7 @@ IF(${HIP_PLATFORM} MATCHES "hcc")
   endif()
 ELSE()
   if (NOT DEFINED ENV{CUDNN_PATH})
-    set(CUDNN_PATH "/usr/local/cudnn")
+    set(CUDNN_PATH "/usr/local/cudnn-7.0/cuda")
   else()
     set(CUDNN_PATH $ENV{CUDNN_PATH})
   endif()

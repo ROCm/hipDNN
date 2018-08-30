@@ -109,11 +109,12 @@ void compute_hipdnn_conv_fwd(test_convolution_sizes_t& c, dataType* src, dataTyp
        &src, in_n * in_c * in_h * in_w * sizeof(float));*/
 
 
-  hipdnnTensorDescriptor_t filt_desc;
-  checkHIPDNN(hipdnnCreateTensorDescriptor(&filt_desc));
-  checkHIPDNN(hipdnnSetTensor4dDescriptor(
-        filt_desc, HIPDNN_TENSOR_NCHW, HIPDNN_DATA_FLOAT,
-        c.oc, c.ic, c.kh, c.kw));
+  hipdnnFilterDescriptor_t filt_desc;
+  checkHIPDNN(hipdnnCreateFilterDescriptor(&filt_desc));
+  int filterDimA[] = {c.oc, c.ic, c.kh, c.kw};
+  checkHIPDNN(hipdnnSetFilterNdDescriptor(
+        filt_desc, HIPDNN_DATA_FLOAT, HIPDNN_TENSOR_NCHW,
+        4, filterDimA));
 
  /* float *weights;
   hipMalloc(
@@ -149,7 +150,7 @@ void compute_hipdnn_conv_fwd(test_convolution_sizes_t& c, dataType* src, dataTyp
     hipdnnConvolutionFwdAlgoPerf_t algoPerf[MaxAlgoCount];
 
   hipdnnFindConvolutionForwardAlgorithmEx(hipdnn, in_desc, src, filt_desc, weights, conv_desc, out_desc, dst, MaxAlgoCount , &calgo, algoPerf, ws_data, ws_size);
-  algo = algoPerf[0].algo;
+  algo = (hipdnnConvolutionFwdAlgo_t)algoPerf[0].algo;
 
 
   checkHIPDNN(hipdnnGetConvolutionForwardWorkspaceSize(hipdnn, in_desc, filt_desc, conv_desc, out_desc, algo, &ws_size));
