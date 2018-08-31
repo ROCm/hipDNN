@@ -35,7 +35,7 @@ void compute_cpuref_maxpool_fwd(test_2dpool_desc_t pd, dataType* src, dataType* 
      for (int n = 0; n < pd.mb; n++) {
          for (int c = 0; c < pd.c; c++) {
              for (int oh = 0; oh < pd.oh; oh++) {
-                 for (int ow = 0; ow < pd.ow; ow++) {
+                for (int ow = 0; ow < pd.ow; ow++) {
                      size_t oidx = (size_t)n * pd.c * pd.oh * pd.ow
                              + (size_t)c * pd.oh * pd.ow
                              + (size_t)oh * pd.ow + ow;
@@ -47,8 +47,8 @@ void compute_cpuref_maxpool_fwd(test_2dpool_desc_t pd, dataType* src, dataType* 
                      bool is_initialized = false;
 
 
-                     for (int kh = 0; kh < pd.kh; ++kh)
-                     for (int kw = 0; kw < pd.kw; ++kw)
+                    for (int kh = 0; kh < pd.kh; ++kh)
+                    for (int kw = 0; kw < pd.kw; ++kw)
                      {
                          const int ih = oh * pd.strh - pd.padt + kh;
                          const int iw = ow * pd.strw - pd.padl + kw;
@@ -74,12 +74,9 @@ void compute_cpuref_maxpool_fwd(test_2dpool_desc_t pd, dataType* src, dataType* 
                              }
                          }
                      }
-
-
-
                      const dataType out_ref = (dataType)acc_ref;
                      dst[oidx] = out_ref;
-                                          }
+                }
              }
          }
      }
