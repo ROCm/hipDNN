@@ -149,7 +149,7 @@ void compute_hipdnn_conv_fwd(test_convolution_sizes_t& c, dataType* src, dataTyp
     int calgo;
     hipdnnConvolutionFwdAlgoPerf_t algoPerf[MaxAlgoCount];
 
-  hipdnnFindConvolutionForwardAlgorithmEx(hipdnn, in_desc, src, filt_desc, weights, conv_desc, out_desc, dst, MaxAlgoCount , &calgo, algoPerf, ws_data, ws_size);
+  checkHIPDNN(hipdnnFindConvolutionForwardAlgorithmEx(hipdnn, in_desc, src, filt_desc, weights, conv_desc, out_desc, dst, MaxAlgoCount , &calgo, algoPerf, ws_data, ws_size));
   algo = (hipdnnConvolutionFwdAlgo_t)algoPerf[0].algo;
 
 
