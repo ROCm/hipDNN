@@ -25,6 +25,20 @@ struct test_2dpool_desc_t {
     int kh, kw; // kernel dimensions
     int padt, padl; // padding dimensions
     int strh, strw; // stride dimensions
+    test_2dpool_desc_t(int mb, int c, 
+                       int ih, int iw, 
+                       int oh, int ow,
+                       int kh, int kw,
+                       int padt, int padl,
+                       int strh, int strw
+                    ): mb(mb), c(c),
+                       ih(ih), iw(iw),
+                       oh(oh), ow(ow),
+                       kh(kh), kw(kw),
+                       padt(padt), padl(padl),
+                       strh(strh), strw(strw){
+                           
+                       }
 };
 
 template <typename dataType> struct acc_t { typedef dataType type; };
@@ -82,6 +96,48 @@ void compute_cpuref_maxpool_fwd(test_2dpool_desc_t pd, dataType* src, dataType* 
      }
  }
 
+template<typename dataType>
+void compute_hipdnn_maxpool_fwd(test_2dpool_desc_t &c, dataType *src, dataType *dst){
+    hipdnnHandle_t handle;
+    checkHIPDNN(hipdnnCreate(&handle));
+    hipdnnTensorDescriptor_t in_desc, out_desc;
+    checkHIPDNN(hipdnnCreateTensorDescriptor(&in_desc));
+    checkHIPDNN(hipdnnSetTensor4dDescriptor(in_desc, HIPDNN_TENSOR_NCHW,
+                                            HIPDNN_DATA_FLOAT, c.mb, c.c, c.ih,
+                                            c.iw));
+
+    hipdnnPoolingDescriptor_t pool_desc;
+    checkHIPDNN(hipdnnCreatePoolingDescriptor(&pool_desc));
+    checkHIPDNN(hipdnnSetPooling2dDescriptor(
+        pool_desc, HIPDNN_POOLING_MAX,
+        HIPDNN_NOT_PROPAGATE_NAN, c.kw, c.kh, c.padt, c.padl, c.strh, c.strw
+    ));
+    checkHIPDNN(hipdnnGetPooling2dForwardOutputDim(pool_desc, in_desc, &c.mb, &c.c, &c.oh, &c.ow));
+
+    checkHIPDNN(hipdnnCreateTensorDescriptor(&out_desc));
+    checkHIPDNN(hipdnnSetTensor4dDescriptor(out_desc, HIPDNN_TENSOR_NCHW,
+                                            HIPDNN_DATA_FLOAT, c.mb, c.c, c.oh,
+                                            c.ow));
+    printf("%d, %d, %d, %d\n", c.mb, c.c, c.oh, c.ow);
+    float alpha = 1.f;
+    float beta = 0.f;
+
+    checkHIPDNN(hipdnnPoolingForward(
+        handle,
+        pool_desc,
+        &alpha,
+        in_desc,
+        src,
+        &beta,
+        out_desc,
+        dst
+    ));
+
+    checkHIPDNN(hipdnnDestroyTensorDescriptor(in_desc));
+    checkHIPDNN(hipdnnDestroyTensorDescriptor(out_desc));
+    checkHIPDNN(hipdnnDestroyPoolingDescriptor(pool_desc));
+    checkHIPDNN(hipdnnDestroy(handle));
+}
 
 
 
