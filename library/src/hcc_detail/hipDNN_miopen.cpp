@@ -371,7 +371,7 @@ hipdnnStatus_t miopenTohipActivationMode(miopenActivationMode_t in,
         *out = HIPDNN_ACTIVATION_TANH;
         break;
 
-    case miopenActivationPASTHRU:
+    case miopenActivationPATHTRU:
         *out = HIPDNN_ACTIVATION_PATHTRU;
         break;
 
@@ -414,7 +414,7 @@ hipdnnStatus_t hipTomiopenActivationMode(hipdnnActivationMode_t in,
 
     case HIPDNN_ACTIVATION_PATHTRU:
         HIPDNN_OPEN_LOG_M("HIPDNN_ACTIVATION_PATHTRU"  << std::flush);
-        *out = miopenActivationPASTHRU;
+        *out = miopenActivationPATHTRU;
         break;
 
     case HIPDNN_ACTIVATION_SOFTRELU:
