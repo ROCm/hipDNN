@@ -69,7 +69,7 @@ template <typename dataType> struct Memory {
         for (int i = 0; i < num_of_items; i++) {
             std::cout << temp[i] << std::endl;
         }
-        delete temp;
+        delete[] temp;
     }
 };
 
