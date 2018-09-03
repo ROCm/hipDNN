@@ -4,3 +4,6 @@
 
 # vscode directories
 .vscode
+
+# vim files
+*.swp
