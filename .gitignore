@@ -1,3 +1,6 @@
-#build directories
+# build directories
 /build/*
 *_build/*
+
+# vscode directories
+.vscode
