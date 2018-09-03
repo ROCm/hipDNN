@@ -118,7 +118,6 @@ void compute_hipdnn_maxpool_fwd(test_2dpool_desc_t &c, dataType *src, dataType *
     checkHIPDNN(hipdnnSetTensor4dDescriptor(out_desc, HIPDNN_TENSOR_NCHW,
                                             HIPDNN_DATA_FLOAT, c.mb, c.c, c.oh,
                                             c.ow));
-    printf("%d, %d, %d, %d\n", c.mb, c.c, c.oh, c.ow);
     float alpha = 1.f;
     float beta = 0.f;
 

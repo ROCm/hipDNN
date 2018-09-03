@@ -24,7 +24,7 @@
 }; */
 
 TEST(pooling_fwd, func_check_zero_padding) {
-    test_2dpool_desc_t pool(1, 3, 
+    test_2dpool_desc_t pool(1, 1, 
               224, 224,
               224 / 2, 224 / 2, 
                2, 2, 
