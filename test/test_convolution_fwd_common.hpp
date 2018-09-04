@@ -126,7 +126,7 @@ void compute_hipdnn_conv_fwd(test_convolution_sizes_t &c, dataType *src,
     hipdnnConvolutionFwdAlgo_t algo;
     int MaxAlgoCount = 1;
     size_t ws_size{0};
-    float *ws_data = nullptr;
+    float *ws_data{nullptr};
     int calgo;
     hipdnnConvolutionFwdAlgoPerf_t algoPerf[MaxAlgoCount];
 
