@@ -1,4 +1,5 @@
 #include "test_convolution_fwd_common.hpp"
+#include "utils/csv/csv_integration.hpp"
 
 TEST(convolution_fwd, func_check_zero_padding) {
     Desc inputDesc(1, 3, 224, 224);
@@ -23,5 +24,13 @@ TEST(convolution_fwd, func_check_zero_padding) {
     compute_hipdnn_conv_fwd<float>(testConvolutionSizes, srcData.gpu(),
                                    filterData.gpu(), NULL, dstDataGPU.gpu());
     Equals<float>(dstDataCPU, dstDataGPU);
+
+    std::string strt = "./result_unittest_func_check_zero_padding.csv";
+    std::string testname = "func_check_zero_padding";
+    float* temp = dstDataGPU.getDataFromGPU();
+    std::string str  = convert_to_string((float*)temp,(int)dstDataGPU.get_num_elements());
+    write_to_csv(strt, str, testname);
+
+
     EXPECT_EQ(0, 0);
 }
