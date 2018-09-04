@@ -12,8 +12,6 @@ set(CPACK_PACKAGING_INSTALL_PREFIX "/opt/rocm/hipdnn" CACHE STRING "Package inst
 
 project(hipdnn CXX)
 
-add_definitions(-std=c++11)
-
 # HIP_PATH
 IF(NOT DEFINED ENV{HIP_PATH})
   SET(HIP_PATH "/opt/rocm/hip")
