@@ -1,12 +1,14 @@
 import csv
-import argparse
+import sys
 
-reader1 = csv.DictReader(open('new_amd_result.csv', 'r'))
+hcc_result = sys.argv[1]
+nvcc_result = sys.argv[2]
+reader1 = csv.DictReader(open(hcc_result, 'r'))
 amd_op = []
 for line1 in reader1:
 	amd_op.append(line1)
 	
-reader2 = csv.DictReader(open('new_nvidia_result.csv', 'r'))
+reader2 = csv.DictReader(open(nvcc_result, 'r'))
 nv_op = []
 
 for line2 in reader2:
