@@ -10,6 +10,7 @@
 #include <iterator>
 #include <random>
 #include <vector>
+#include <memory>
 
 #define checkHIPDNN(expression)                                                \
     {                                                                          \
@@ -41,35 +42,46 @@ template <typename dataType> struct Memory {
     int num_of_items = 0;
 
   public:
-    Memory(int numElements) {
-        num_of_items = numElements;
-        mem_size = sizeof(dataType) * numElements;
-        hVec.reserve(num_of_items);
-        this->h_data = (dataType *)malloc(mem_size);
-        HIP_CALL(hipMalloc(&this->d_data, mem_size));
+    Memory(int num_of_items) {
+        this->num_of_items = num_of_items;
+        mem_size = sizeof(dataType) * this->num_of_items;
+        this->hVec.reserve(this->num_of_items);
+        this->h_data = (dataType *)malloc(this->mem_size);
+        HIP_CALL(hipMalloc((void**)&this->d_data, this->mem_size));
     }
     dataType *cpu() { return this->h_data; }
     dataType *gpu() { return this->d_data; }
     size_t size() { return this->mem_size; }
-    std::vector<dataType> get_vector() { return hVec; }
-    int get_num_elements() { return num_of_items; }
+    std::vector<dataType> get_vector() { return this->hVec; }
+    int get_num_elements() { return this->num_of_items; }
     ~Memory() {
-        assert(h_data);
-        assert(d_data);
-        free(h_data);
-        HIP_CALL(hipFree(d_data));
+        assert(this->h_data);
+        assert(this->d_data);
+        free(this->h_data);
+        HIP_CALL(hipFree(this->d_data));
     }
     void printCPUMemory() {
         for (int i = 0; i < num_of_items; i++)
             std::cout << h_data[i] << std::endl;
     }
     void printGPUMemory() {
-        dataType *temp = new dataType[num_of_items];
+        std::unique_ptr<dataType> temp = std::make_unique<dataType>(num_of_items);
         hipMemcpy(temp, d_data, mem_size, hipMemcpyDeviceToHost);
         for (int i = 0; i < num_of_items; i++) {
             std::cout << temp[i] << std::endl;
         }
         delete[] temp;
+    }
+    dataType* getDataFromGPU(){
+        dataType* temp = new dataType[this->num_of_items];
+        hipMemcpy(temp, d_data, num_of_items * sizeof(dataType), hipMemcpyDeviceToHost);
+        return temp;
+    }
+    dataType* toGPU(){
+        hipMemcpy(this->d_data, this->h_data, this->mem_size, hipMemcpyHostToDevice);
+    }
+    dataType* toCPU(){
+        hipMempcpy(this->h_data, this->d_data, this->mem_size, hipMemcpyDeviceToHost);
     }
 };
 
