@@ -65,7 +65,7 @@ template <typename dataType> struct Memory {
             std::cout << h_data[i] << std::endl;
     }
     void printGPUMemory() {
-        std::unique_ptr<dataType> temp = std::make_unique<dataType>(num_of_items);
+        dataType* temp = new dataType[num_of_items];
         hipMemcpy(temp, d_data, mem_size, hipMemcpyDeviceToHost);
         for (int i = 0; i < num_of_items; i++) {
             std::cout << temp[i] << std::endl;
@@ -118,7 +118,10 @@ template <typename dataType> void populateMemoryRandom(Memory<dataType> &mem) {
     printf("Creating vector of Size %d\n", mem.get_num_elements());
     std::vector<dataType> v(mem.get_num_elements());
     auto gen = [&dist, &mersenne_engine]() { return dist(mersenne_engine); };
-    std::generate(v.begin(), v.end(), gen);
+    int i = 0;
+    std::generate(v.begin(), v.end(), [&i](){
+                return i++ % 10;
+            });
     std::copy(v.begin(), v.end(), mem.cpu());
 
     // Copy the stuff to device too
