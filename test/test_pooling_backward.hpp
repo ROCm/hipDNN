@@ -1,21 +1,5 @@
 #include "hipDNN_test_common.h"
 
-__global__ void dev_const(hipLaunchParm lp, float *px, float k) {
-  int tid = hipThreadIdx_x + hipBlockIdx_x * hipBlockDim_x; 
-  px[tid] = k;
-}
-
-__global__ void dev_iota(hipLaunchParm lp, float *px) {
-  int tid = hipThreadIdx_x + hipBlockIdx_x * hipBlockDim_x;
-  px[tid] = tid;
-}
-
-
-__global__ void dev_bias(hipLaunchParm lp, float *px, float *k) {
-  int tid = hipThreadIdx_x + hipBlockIdx_x * hipBlockDim_x;
-  px[tid] = *k;
-}
-
 struct test_pooling_t{    
     size_t in, ichannel, iheight, iwidth;
     size_t wheight, wwidth;
@@ -40,7 +24,7 @@ struct test_pooling_t{
 };
 
 template <typename dataType>
-void compute_hipdnn_conv_fwd(test_pooling_t &test_case, dataType *src, dataType *grad, dataType *dst){
+void compute_hipdnn_pooling_backward(test_pooling_t &test_case, dataType *src, dataType *grad, dataType *dst){
   hipdnnHandle_t hipdnn;
   checkHIPDNN(hipdnnCreate(&hipdnn));
   hipdnnTensorDescriptor_t in_desc;
