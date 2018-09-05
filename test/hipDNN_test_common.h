@@ -65,7 +65,7 @@ template <typename dataType> struct Memory {
             std::cout << h_data[i] << std::endl;
     }
     void printGPUMemory() {
-        dataType* temp = new dataType[num_of_items];
+	    dataType* temp = new dataType[this->num_of_items];
         hipMemcpy(temp, d_data, mem_size, hipMemcpyDeviceToHost);
         for (int i = 0; i < num_of_items; i++) {
             std::cout << temp[i] << std::endl;
