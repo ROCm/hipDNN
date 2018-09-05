@@ -1,4 +1,4 @@
-#include "test_convolution_forward_common.hpp"
+#include "test_convolution_forward.hpp"
 #include "utils/csv/csv_integration.hpp"
 
 TEST(convolution_fwd, func_check_zero_padding) {
