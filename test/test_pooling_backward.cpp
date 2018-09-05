@@ -1,4 +1,4 @@
-#include "test_pooling_common.hpp"
+#include "test_pooling_backward.hpp"
 
 TEST(pooling_backward, func_check_pooling_stride_2x2){
     int oheight = 4 / 2 + 1, owidth = 4 / 2 + 1;
@@ -12,6 +12,6 @@ TEST(pooling_backward, func_check_pooling_stride_2x2){
     Memory<float> dataGrad(test_case.in * test_case.ichannel * test_case.iheight * test_case.iwidth);
     populateMemoryRandom(dataSrc);
     populateMemoryRandom(dataGrad);
-    Memory<float> dataDst;
-    compute_hipdnn_conv_fwd(test_case, dataSrc.gpu(), dataGrad.gpu(),dataDst.gpu());
+    Memory<float> dataDst(test_case.in * test_case.ichannel * test_case.iheight * test_case.iwidth);;
+    compute_hipdnn_pooling_backward(test_case, dataSrc.gpu(), dataGrad.gpu(),dataDst.gpu());
 }

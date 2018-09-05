@@ -1,4 +1,4 @@
-#include "test_pooling_forward_common.hpp"
+#include "test_pooling_forward.hpp"
 
 TEST(pooling_fwd, func_check_zero_padding) {
     test_2dpool_desc_t pool(1, 1, 
