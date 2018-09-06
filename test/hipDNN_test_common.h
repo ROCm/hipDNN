@@ -14,6 +14,7 @@
 #include <vector>
 #include <numeric>
 #include "csv/csv_integration.hpp"
+#include "timer/timer.hpp"
 
 #define checkHIPDNN(expression)                                                \
   {                                                                            \
