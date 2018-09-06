@@ -12,4 +12,9 @@ TEST(activation_backward, func_test_naive_activation) {
   populateMemoryRandom(dataGrad);
   compute_hipdnn_activation_backward(test_case, dataSrc.gpu(), dataGrad.gpu(),
                                      dataDst.gpu());
+    std::string strt = "./result_unittest.csv";
+    std::string testname = "func_test_naive_activation";
+    float* temp = dataDst.getDataFromGPU();
+    std::string str  = convert_to_string((float*)temp,(int)dataDst.get_num_elements());
+    write_to_csv(strt, str, testname);                                     
 }
