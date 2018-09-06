@@ -45,20 +45,11 @@ void compute_hipdnn_conv_fwd(test_convolution_sizes_t &c, dataType *src,
   checkHIPDNN(hipdnnSetTensor4dDescriptor(
       in_desc, HIPDNN_TENSOR_NCHW, HIPDNN_DATA_FLOAT, c.mb, c.ic, c.ih, c.iw));
 
-  /* float *src;
-  hipMalloc(
-       &src, in_n * in_c * in_h * in_w * sizeof(float));*/
-
   hipdnnFilterDescriptor_t filt_desc;
   checkHIPDNN(hipdnnCreateFilterDescriptor(&filt_desc));
   int filterDimA[] = {c.oc, c.ic, c.kh, c.kw};
   checkHIPDNN(hipdnnSetFilterNdDescriptor(filt_desc, HIPDNN_DATA_FLOAT,
                                           HIPDNN_TENSOR_NCHW, 4, filterDimA));
-
-  /* float *weights;
-   hipMalloc(
-       &weights, filt_k * filt_c * filt_h * filt_w * sizeof(float));*/
-
   hipdnnConvolutionDescriptor_t conv_desc;
   checkHIPDNN(hipdnnCreateConvolutionDescriptor(&conv_desc));
   checkHIPDNN(hipdnnSetConvolution2dDescriptor(
@@ -72,11 +63,6 @@ void compute_hipdnn_conv_fwd(test_convolution_sizes_t &c, dataType *src,
   checkHIPDNN(hipdnnCreateTensorDescriptor(&out_desc));
   checkHIPDNN(hipdnnSetTensor4dDescriptor(
       out_desc, HIPDNN_TENSOR_NCHW, HIPDNN_DATA_FLOAT, c.mb, c.oc, c.oh, c.ow));
-
-  /* float *dst;
-  hipMalloc(
-        &dst, out_n * out_c * out_h * out_w * sizeof(float));*/
-
   hipdnnConvolutionFwdAlgo_t algo;
   int MaxAlgoCount = 1;
   size_t ws_size{0};
@@ -94,7 +80,6 @@ void compute_hipdnn_conv_fwd(test_convolution_sizes_t &c, dataType *src,
 
   hipMalloc(&ws_data, ws_size);
 
-  // perform
   float alpha = 1.f;
   float beta = 0.f;
 
@@ -102,7 +87,6 @@ void compute_hipdnn_conv_fwd(test_convolution_sizes_t &c, dataType *src,
                                        weights, conv_desc, algo, ws_data,
                                        ws_size, &beta, out_desc, dst));
 
-  // finalizing
   hipFree(ws_data);
   hipdnnDestroyTensorDescriptor(out_desc);
   hipdnnDestroyConvolutionDescriptor(conv_desc);
