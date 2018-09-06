@@ -14,4 +14,10 @@ TEST(pooling_backward, func_check_pooling_stride_2x2) {
   ;
   compute_hipdnn_pooling_backward(test_case, dataSrc.gpu(), dataGrad.gpu(),
                                   dataDst.gpu());
+
+    std::string strt = "./result_unittest.csv";
+    std::string testname = "func_check_pooling_stride_2x2";
+    float* temp = dataDst.getDataFromGPU();
+    std::string str  = convert_to_string((float*)temp,(int)dataDst.get_num_elements());
+    write_to_csv(strt, str, testname);
 }
