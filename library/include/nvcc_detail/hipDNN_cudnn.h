@@ -22,8 +22,8 @@
 #pragma once
 
 #include <cuda.h>
-#include <cudnn.h>
 #include <cuda_runtime.h>
+#include <cudnn.h>
 
 #define HIPDNN_BN_MIN_EPSILON CUDNN_BN_MIN_EPSILON
 
@@ -43,7 +43,8 @@ typedef cudnnConvolutionFwdAlgoPerf_t hipdnnConvolutionFwdAlgoPerf_t;
 
 typedef cudnnConvolutionBwdDataAlgoPerf_t hipdnnConvolutionBwdDataAlgoPerf_t;
 
-typedef cudnnConvolutionBwdFilterAlgoPerf_t hipdnnConvolutionBwdFilterAlgoPerf_t;
+typedef cudnnConvolutionBwdFilterAlgoPerf_t
+    hipdnnConvolutionBwdFilterAlgoPerf_t;
 
 typedef cudnnOpTensorDescriptor_t hipdnnOpTensorDescriptor_t;
 
@@ -55,17 +56,18 @@ typedef cudnnHandle_t hipdnnHandle_t;
 
 hipdnnStatus_t cudnnTohipdnnStatus(cudnnStatus_t cStatus);
 
-hipdnnStatus_t hipTocudnnDataType(hipdnnDataType_t in, cudnnDataType_t* out);
+hipdnnStatus_t hipTocudnnDataType(hipdnnDataType_t in, cudnnDataType_t *out);
 
 hipdnnStatus_t cudnnTohipConvolutionFwdAlgo(cudnnConvolutionFwdAlgo_t in,
-		hipdnnConvolutionFwdAlgo_t* out);
+                                            hipdnnConvolutionFwdAlgo_t *out);
 
-hipdnnStatus_t cudnnTohipConvolutionBwdFilterAlgo(
-		cudnnConvolutionBwdFilterAlgo_t in,
-		hipdnnConvolutionBwdFilterAlgo_t* out);
+hipdnnStatus_t
+cudnnTohipConvolutionBwdFilterAlgo(cudnnConvolutionBwdFilterAlgo_t in,
+                                   hipdnnConvolutionBwdFilterAlgo_t *out);
 
-hipdnnStatus_t cudnnTohipConvolutionBwdDataAlgo(
-		cudnnConvolutionBwdDataAlgo_t in, hipdnnConvolutionBwdDataAlgo_t* out);
+hipdnnStatus_t
+cudnnTohipConvolutionBwdDataAlgo(cudnnConvolutionBwdDataAlgo_t in,
+                                 hipdnnConvolutionBwdDataAlgo_t *out);
 
 hipdnnStatus_t cudnnTohipMathType(cudnnMathType_t in, hipdnnMathType_t *out);
 
