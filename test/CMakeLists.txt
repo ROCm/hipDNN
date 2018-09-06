@@ -8,6 +8,7 @@ MESSAGE (STATUS "HIP_PATH : ${HIP_PATH}")
 
 #Make sure HIP is installed in the target system
 FIND_PACKAGE(HIP 1.0 REQUIRED)
+add_subdirectory(./utils/csv)
 
 SET(CMAKE_CXX_COMPILER "${HIP_PATH}/bin/hipcc")
 set(CMAKE_SHARED_LIBRARY_LINK_CXX_FLAGS "-Xcompiler ${CMAKE_SHARED_LIBRARY_LINK_CXX_FLAGS}")
@@ -19,4 +20,4 @@ ADD_EXECUTABLE(unittest ${HIPDNNTESTSRCS})
 SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH FALSE)
 set_target_properties(unittest PROPERTIES LINKER_LANGUAGE CXX)
 set_target_properties(unittest PROPERTIES CMAKE_SKIP_RPATH FALSE)
-TARGET_LINK_LIBRARIES(unittest hipDNN pthread)
+TARGET_LINK_LIBRARIES(unittest hipDNN pthread csv_integration)
