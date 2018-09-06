@@ -13,6 +13,7 @@
 #include <random>
 #include <vector>
 #include <numeric>
+#include "csv/csv_integration.hpp"
 
 #define checkHIPDNN(expression)                                                \
   {                                                                            \
