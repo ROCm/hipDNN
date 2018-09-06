@@ -1,6 +1,8 @@
 import csv
 import sys
 
+csv.field_size_limit(sys.maxsize)
+
 hcc_result = sys.argv[1]
 nvcc_result = sys.argv[2]
 reader1 = csv.DictReader(open(hcc_result, 'r'))
@@ -24,7 +26,6 @@ def test_compare(amd_op,nv_op):
 			else:
 				print ("test fail for "+line1['Test_name']+"!!!difference in outputs!!!!")
 				print(sum(c1!=c2 for c1,c2 in zip(line1['Output'],line2['Output'])))
-						
 		else:
 			print ("error in test cases!!!")
 			
