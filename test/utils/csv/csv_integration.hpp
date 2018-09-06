@@ -1,9 +1,10 @@
 #ifndef CSV_INTEGRATION_HPP
 #define CSV_INTEGRATION_HPP
 
-#include <string>
 #include <iostream>
 #include <fstream>
+#include <string>
+#include <sstream>
 
 template <typename dataType>
 std::string convert_to_string(dataType *arr, int s_size) {
@@ -25,20 +26,6 @@ std::string convert_to_string(dataType *arr, int s_size) {
   return str;
 }
 
-void write_to_csv(std::string filename, std::string str, std::string testname) {
-    std::fstream fs;
-
-  fs.open(filename, std::ios_base::app);
-
-  fs << "Test_name"
-     << ","
-     << "Output" << std::endl;
-
-  fs << testname << ",";
-
-  fs << str << std::endl;
-
-  fs.close();
-}
+void write_to_csv(std::string filename, std::string str, std::string testname);
 
 #endif // CSV_INTEGRATION_HPP
