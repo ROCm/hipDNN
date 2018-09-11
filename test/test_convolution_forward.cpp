@@ -21,7 +21,7 @@ high_resolution_timer_t timer;
     compute_hipdnn_conv_fwd<float>(testConvolutionSizes, srcData.gpu(),
                                    filterData.gpu(), NULL, dstDataGPU.gpu());
   std::uint64_t time_elapsed = timer.elapsed_nanoseconds();
-  std::cout << "time taken: " << (time_elapsed / 1000.0) << " ms"<< std::endl;
+    std::cout << "time taken: " << ((double)time_elapsed / 1e6) << " ms"<< std::endl;
 
     std::string strt = "./result_unittest.csv";
     std::string testname = "func_check_zero_padding";
@@ -51,7 +51,7 @@ high_resolution_timer_t timer;
     compute_hipdnn_conv_fwd<float>(testConvolutionSizes, srcData.gpu(),
                                    filterData.gpu(), NULL, dstDataGPU.gpu());
   std::uint64_t time_elapsed = timer.elapsed_nanoseconds();
-  std::cout << "time taken: " << (time_elapsed / 1000.0) << " ms"<< std::endl;
+    std::cout << "time taken: " << ((double)time_elapsed / 1e6) << " ms"<< std::endl;
 
     std::string strt = "./result_unittest.csv";
     std::string testname = "func_check_two_strides_medium_kernelsize";
@@ -81,7 +81,7 @@ high_resolution_timer_t timer;
     compute_hipdnn_conv_fwd<float>(testConvolutionSizes, srcData.gpu(),
                                    filterData.gpu(), NULL, dstDataGPU.gpu());
   std::uint64_t time_elapsed = timer.elapsed_nanoseconds();
-  std::cout << "time taken: " << (time_elapsed / 1000.0) << " ms"<< std::endl;
+    std::cout << "time taken: " << ((double)time_elapsed / 1e6) << " ms"<< std::endl;
 
     std::string strt = "./result_unittest.csv";
     std::string testname = "func_check_padding_and_strides_small_size";
@@ -111,7 +111,7 @@ high_resolution_timer_t timer;
     compute_hipdnn_conv_fwd<float>(testConvolutionSizes, srcData.gpu(),
                                    filterData.gpu(), NULL, dstDataGPU.gpu());
   std::uint64_t time_elapsed = timer.elapsed_nanoseconds();
-  std::cout << "time taken: " << (time_elapsed / 1000.0) << " ms"<< std::endl;
+    std::cout << "time taken: " << ((double)time_elapsed / 1e6) << " ms"<< std::endl;
     std::string strt = "./result_unittest.csv";
     std::string testname = "func_check_full_conv";
     float* temp = dstDataGPU.getDataFromGPU();
@@ -140,7 +140,7 @@ high_resolution_timer_t timer;
 compute_hipdnn_conv_fwd<float>(testConvolutionSizes, srcData.gpu(),
 filterData.gpu(), NULL, dstDataGPU.gpu());
 std::uint64_t time_elapsed = timer.elapsed_nanoseconds();
-std::cout << "time taken: " << (time_elapsed / 1000.0) << " ms"<< std::endl;
+    std::cout << "time taken: " << ((double)time_elapsed / 1e6) << " ms"<< std::endl;
 
 std::string strt = "./result_unittest.csv";
 std::string testname = "func_check_dilation1x1";

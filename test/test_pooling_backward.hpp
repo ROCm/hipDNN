@@ -47,7 +47,9 @@ void compute_hipdnn_pooling_backward(test_pooling_t &test_case, dataType *src,
 
   checkHIPDNN(hipdnnGetPooling2dForwardOutputDim(
       pool_desc, in_desc, &test_case.on, &test_case.ochannel,
-      &test_case.oheight, &test_case.owidth)) hipdnnTensorDescriptor_t out_desc;
+      &test_case.oheight, &test_case.owidth));
+      std::cout << "Dimensions: " << test_case.oheight << " " << test_case.owidth << std::endl; 
+    hipdnnTensorDescriptor_t out_desc;
   checkHIPDNN(hipdnnCreateTensorDescriptor(&out_desc));
   checkHIPDNN(hipdnnSetTensor4dDescriptor(
       out_desc, HIPDNN_TENSOR_NCHW, HIPDNN_DATA_FLOAT, test_case.on,
