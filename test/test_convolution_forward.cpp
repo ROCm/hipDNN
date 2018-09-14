@@ -17,11 +17,18 @@ TEST(convolution_fwd, func_check_zero_padding) {
         inputDesc.N, 1, inputDesc.C, inputDesc.H, inputDesc.W, outputDesc.C,
         outputDesc.H, outputDesc.W, filterDesc.H, filterDesc.W, pad[0], pad[1],
         stride[0], stride[1], 1, 1);
-high_resolution_timer_t timer;
-    compute_hipdnn_conv_fwd<float>(testConvolutionSizes, srcData.gpu(),
-                                   filterData.gpu(), NULL, dstDataGPU.gpu());
-  std::uint64_t time_elapsed = timer.elapsed_nanoseconds();
-    std::cout << "time taken: " << ((double)time_elapsed / 1e6) << " ms"<< std::endl;
+    
+    high_resolution_timer_t timer;
+    std::vector<double> time_vector(benchmark_iterations, 0);
+    for(int i = 0; i < benchmark_iterations; i++){
+      timer.restart();
+        compute_hipdnn_conv_fwd<float>(testConvolutionSizes, srcData.gpu(),
+                                filterData.gpu(), NULL, dstDataGPU.gpu());
+      std::uint64_t time_elapsed = timer.elapsed_nanoseconds();
+      time_vector[i] = (double)time_elapsed / 1e6;
+    }
+    double avg_time = std::accumulate(time_vector.begin() + 10, time_vector.end(), 0) / (benchmark_iterations - 10);
+    std::cout << "Average Time: " << avg_time << std::endl;
 
     std::string strt = "./result_unittest.csv";
     std::string testname = "func_check_zero_padding";
@@ -47,11 +54,18 @@ TEST(convolution_fwd, func_check_two_strides_medium_kernelsize) {
         inputDesc.N, 1, inputDesc.C, inputDesc.H, inputDesc.W, outputDesc.C,
         outputDesc.H, outputDesc.W, filterDesc.H, filterDesc.W, pad[0], pad[1],
         stride[0], stride[1], 1, 1);
-high_resolution_timer_t timer;
-    compute_hipdnn_conv_fwd<float>(testConvolutionSizes, srcData.gpu(),
-                                   filterData.gpu(), NULL, dstDataGPU.gpu());
-  std::uint64_t time_elapsed = timer.elapsed_nanoseconds();
-    std::cout << "time taken: " << ((double)time_elapsed / 1e6) << " ms"<< std::endl;
+
+    high_resolution_timer_t timer;
+    std::vector<double> time_vector(benchmark_iterations, 0);
+    for(int i = 0; i < benchmark_iterations; i++){
+      timer.restart();
+        compute_hipdnn_conv_fwd<float>(testConvolutionSizes, srcData.gpu(),
+                                filterData.gpu(), NULL, dstDataGPU.gpu());
+      std::uint64_t time_elapsed = timer.elapsed_nanoseconds();
+      time_vector[i] = (double)time_elapsed / 1e6;
+    }
+    double avg_time = std::accumulate(time_vector.begin() + 10, time_vector.end(), 0) / (benchmark_iterations - 10);
+    std::cout << "Average Time: " << avg_time << std::endl;
 
     std::string strt = "./result_unittest.csv";
     std::string testname = "func_check_two_strides_medium_kernelsize";
@@ -77,11 +91,18 @@ TEST(convolution_fwd, func_check_padding_and_strides_small_size) {
         inputDesc.N, 1, inputDesc.C, inputDesc.H, inputDesc.W, outputDesc.C,
         outputDesc.H, outputDesc.W, filterDesc.H, filterDesc.W, pad[0], pad[1],
         stride[0], stride[1], 1, 1);
+
 high_resolution_timer_t timer;
-    compute_hipdnn_conv_fwd<float>(testConvolutionSizes, srcData.gpu(),
-                                   filterData.gpu(), NULL, dstDataGPU.gpu());
-  std::uint64_t time_elapsed = timer.elapsed_nanoseconds();
-    std::cout << "time taken: " << ((double)time_elapsed / 1e6) << " ms"<< std::endl;
+    std::vector<double> time_vector(benchmark_iterations, 0);
+    for(int i = 0; i < benchmark_iterations; i++){
+      timer.restart();
+        compute_hipdnn_conv_fwd<float>(testConvolutionSizes, srcData.gpu(),
+                                filterData.gpu(), NULL, dstDataGPU.gpu());
+      std::uint64_t time_elapsed = timer.elapsed_nanoseconds();
+      time_vector[i] = (double)time_elapsed / 1e6;
+    }
+    double avg_time = std::accumulate(time_vector.begin() + 10, time_vector.end(), 0) / (benchmark_iterations - 10);
+    std::cout << "Average Time: " << avg_time << std::endl;
 
     std::string strt = "./result_unittest.csv";
     std::string testname = "func_check_padding_and_strides_small_size";
@@ -107,11 +128,19 @@ TEST(convolution_fwd, func_check_full_conv) {
         inputDesc.N, 1, inputDesc.C, inputDesc.H, inputDesc.W, outputDesc.C,
         outputDesc.H, outputDesc.W, filterDesc.H, filterDesc.W, pad[0], pad[1],
         stride[0], stride[1], 1, 1);
+
 high_resolution_timer_t timer;
-    compute_hipdnn_conv_fwd<float>(testConvolutionSizes, srcData.gpu(),
-                                   filterData.gpu(), NULL, dstDataGPU.gpu());
-  std::uint64_t time_elapsed = timer.elapsed_nanoseconds();
-    std::cout << "time taken: " << ((double)time_elapsed / 1e6) << " ms"<< std::endl;
+    std::vector<double> time_vector(benchmark_iterations, 0);
+    for(int i = 0; i < benchmark_iterations; i++){
+      timer.restart();
+        compute_hipdnn_conv_fwd<float>(testConvolutionSizes, srcData.gpu(),
+                                filterData.gpu(), NULL, dstDataGPU.gpu());
+      std::uint64_t time_elapsed = timer.elapsed_nanoseconds();
+      time_vector[i] = (double)time_elapsed / 1e6;
+    }
+    double avg_time = std::accumulate(time_vector.begin() + 10, time_vector.end(), 0) / (benchmark_iterations - 10);
+    std::cout << "Average Time: " << avg_time << std::endl;
+
     std::string strt = "./result_unittest.csv";
     std::string testname = "func_check_full_conv";
     float* temp = dstDataGPU.getDataFromGPU();
@@ -136,11 +165,18 @@ test_convolution_sizes_t testConvolutionSizes(
 inputDesc.N, 1, inputDesc.C, inputDesc.H, inputDesc.W, outputDesc.C,
 outputDesc.H, outputDesc.W, filterDesc.H, filterDesc.W, pad[0], pad[1],
 stride[0], stride[1], 1, 1);
+
 high_resolution_timer_t timer;
-compute_hipdnn_conv_fwd<float>(testConvolutionSizes, srcData.gpu(),
-filterData.gpu(), NULL, dstDataGPU.gpu());
-std::uint64_t time_elapsed = timer.elapsed_nanoseconds();
-    std::cout << "time taken: " << ((double)time_elapsed / 1e6) << " ms"<< std::endl;
+    std::vector<double> time_vector(benchmark_iterations, 0);
+    for(int i = 0; i < benchmark_iterations; i++){
+      timer.restart();
+        compute_hipdnn_conv_fwd<float>(testConvolutionSizes, srcData.gpu(),
+                                filterData.gpu(), NULL, dstDataGPU.gpu());
+      std::uint64_t time_elapsed = timer.elapsed_nanoseconds();
+      time_vector[i] = (double)time_elapsed / 1e6;
+    }
+    double avg_time = std::accumulate(time_vector.begin() + 10, time_vector.end(), 0) / (benchmark_iterations - 10);
+    std::cout << "Average Time: " << avg_time << std::endl;
 
 std::string strt = "./result_unittest.csv";
 std::string testname = "func_check_dilation1x1";
