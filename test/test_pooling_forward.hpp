@@ -81,6 +81,7 @@ void compute_cpuref_maxpool_fwd(test_2dpool_desc_t pd, dataType *src,
 template <typename dataType>
 void compute_hipdnn_maxpool_fwd(test_2dpool_desc_t &c, dataType *src,
                                 dataType *dst) {
+
   hipdnnHandle_t handle;
   checkHIPDNN(hipdnnCreate(&handle));
   hipdnnTensorDescriptor_t in_desc, out_desc;

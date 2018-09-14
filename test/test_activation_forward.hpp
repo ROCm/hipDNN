@@ -1,14 +1,14 @@
 #include "hipDNN_test_common.h"
 
-struct activation_params_t {
+struct activation_fwd_params {
   int n, channels, height, width;
-  activation_params_t(int n, int channels, int height, int width)
+  activation_fwd_params(int n, int channels, int height, int width)
       : n(n), channels(channels), height(height), width(width) {}
 };
 
 template <typename dataType>
-void compute_hipdnn_activation_backward(activation_params_t &test_case,
-                                        dataType *src, dataType *grad,
+void compute_hipdnn_activation_forward(activation_fwd_params &test_case,
+                                        dataType *src,
                                         dataType *dst) {
   hipdnnHandle_t hipdnn;
   checkHIPDNN(hipdnnCreate(&hipdnn));
@@ -40,11 +40,8 @@ void compute_hipdnn_activation_backward(activation_params_t &test_case,
   hipdnnActivationForward(hipdnn, activationDesc, &alpha, in_desc, src, &beta,
                           out_desc, dst);
 
-  hipdnnActivationBackward(hipdnn, activationDesc, &alpha, in_desc, src,
-                           in_desc, src, out_desc, dst, &beta, out_desc, grad);
-
   hipdnnDestroyTensorDescriptor(out_desc);
   hipdnnDestroyActivationDescriptor(activationDesc);
   hipdnnDestroyTensorDescriptor(in_desc);
   hipdnnDestroy(hipdnn);
-}
+} 
