@@ -43,8 +43,6 @@
     }                                                                          \
   }
 
-#endif
-
 template <typename dataType> struct Memory {
 private:
   std::vector<dataType> hVec;
@@ -60,7 +58,10 @@ public:
     mem_size = sizeof(dataType) * this->num_of_items;
     this->hVec.reserve(this->num_of_items);
     this->h_data = (dataType *)malloc(this->mem_size);
+    memset(h_data, 0, this->mem_size);
     HIP_CALL(hipMalloc((void **)&this->d_data, this->mem_size));
+	//std::cout << "Memsetting" << std::endl;
+    HIP_CALL(hipMemset((void **)&this->d_data, 0, this->mem_size));
   }
   dataType *cpu() { return this->h_data; }
 
@@ -100,12 +101,12 @@ public:
     return temp;
   }
 
-  dataType *toGPU() {
+  void toGPU() {
     hipMemcpy(this->d_data, this->h_data, this->mem_size,
               hipMemcpyHostToDevice);
   }
 
-  dataType *toCPU() {
+  void toCPU() {
     hipMempcpy(this->h_data, this->d_data, this->mem_size,
                hipMemcpyDeviceToHost);
   }
@@ -140,12 +141,15 @@ template <typename dataType> void populateMemoryRandom(Memory<dataType> &mem) {
   std::random_device rnd_device;
   // Specify the engine and distribution.
   std::mt19937 mersenne_engine{rnd_device()}; // Generates random integers
-  std::uniform_int_distribution<int> dist{1, 52};
+  std::uniform_int_distribution<int> dist{-50, 5};
   std::cout << "Creating vector of Size: " << mem.get_num_elements() << std::endl;
   std::vector<dataType> v(mem.get_num_elements());
   auto gen = [&dist, &mersenne_engine]() { return dist(mersenne_engine); };
-  std::iota(v.begin(), v.end(), 0);
+  std::iota(v.begin(), v.end(), -5);
   std::copy(v.begin(), v.end(), mem.cpu());
   // Copy the stuff to device too
   HIP_CALL(hipMemcpy(mem.gpu(), mem.cpu(), mem.size(), hipMemcpyHostToDevice));
 }
+
+#endif
+
