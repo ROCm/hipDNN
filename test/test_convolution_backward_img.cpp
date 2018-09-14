@@ -1,4 +1,4 @@
-#include "test_convolution_backward_img.hpp"
+/* #include "test_convolution_backward_img.hpp"
 
 TEST(convolution_bwd_img, func_check_backward_conv_img) {
     Desc inputDesc(1, 3, 224, 224);
@@ -30,4 +30,4 @@ high_resolution_timer_t timer;
     write_to_csv(strt, str, testname);
 }
 
-
+*/
