@@ -14,7 +14,7 @@ TEST(activation_backward, func_test_naive_activation) {
   compute_hipdnn_activation_backward(test_case, dataSrc.gpu(), dataGrad.gpu(),
                                      dataDst.gpu());
   std::uint64_t time_elapsed = timer.elapsed_nanoseconds();
-    std::cout << "time taken: " << ((double)time_elapsed / 1e6) << " ms"<< std::endl;
+  std::cout << "time taken: " << (time_elapsed / 1000.0) << " ms"<< std::endl;
     std::string strt = "./result_unittest.csv";
     std::string testname = "func_test_naive_activation";
     float* temp = dataDst.getDataFromGPU();
