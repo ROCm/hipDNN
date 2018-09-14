@@ -6,10 +6,7 @@ TEST(pooling_fwd, func_check_zero_padding) {
   Memory<float> dstDataCPU((224 / 2) * (224 / 2));
   Memory<float> dstDataGPU((224 / 2) * (224 / 2));
   populateMemoryRandom<float>(srcData);
-  high_resolution_timer_t timer;
   compute_hipdnn_maxpool_fwd<float>(pool, srcData.gpu(), dstDataGPU.gpu());
-  std::uint64_t time_elapsed = timer.elapsed_nanoseconds();
-      std::cout << "time taken: " << ((double)time_elapsed / 1e6) << " ms"<< std::endl;
   std::string strt = "./result_unittest.csv";
   std::string testname = "func_check_pooling";
   float* temp = dstDataGPU.getDataFromGPU();
