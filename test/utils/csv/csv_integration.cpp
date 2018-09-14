@@ -1,6 +1,6 @@
 #include "csv_integration.hpp"
 
- void write_to_csv(std::string filename, std::string str, std::string testname){
+void write_to_csv(std::string filename, std::string str, std::string testname, double avg_time){
 	std::fstream fs2;
 	fs2.open(filename, std::ios::in);
 	std::fstream fs;
@@ -9,9 +9,13 @@
         
         fs << "Test_name"
          << ","
-         << "Output" << std::endl;
+         << "Output" 
+         << ","
+         <<"Average Excecution Time (milliseconds)"
+         << std::endl;
    }
   fs << testname << ",";
-  fs << str << std::endl;
+  fs << str <<",";
+  fs << avg_time << std::endl;
   fs.close();
 }

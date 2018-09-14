@@ -5,6 +5,7 @@ TEST(pooling_fwd, func_check_zero_padding) {
   Memory<float> srcData(pool.ih * pool.iw);
   Memory<float> dstDataCPU((224 / 2) * (224 / 2));
   Memory<float> dstDataGPU((224 / 2) * (224 / 2));
+
   populateMemoryRandom<float>(srcData);
 
   high_resolution_timer_t timer;
@@ -15,12 +16,14 @@ TEST(pooling_fwd, func_check_zero_padding) {
       std::uint64_t time_elapsed = timer.elapsed_nanoseconds();
       time_vector[i] = (double)time_elapsed / 1e6;
     }
+
+    float* temp = dstDataGPU.getDataFromGPU();
     double avg_time = std::accumulate(time_vector.begin() + 10, time_vector.end(), 0) / (benchmark_iterations - 10);
     std::cout << "Average Time: " << avg_time << std::endl;
 
   std::string strt = "./result_unittest.csv";
   std::string testname = "func_check_pooling";
-  float* temp = dstDataGPU.getDataFromGPU();
+
   std::string str  = convert_to_string((float*)temp,(int)dstDataGPU.get_num_elements());
-  write_to_csv(strt, str, testname); 
+  write_to_csv(strt, str, testname, avg_time); 
 }
