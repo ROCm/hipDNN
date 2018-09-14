@@ -27,5 +27,5 @@ TEST(pooling_backward, func_check_pooling_stride_2x2) {
     std::string testname = "func_check_pooling_stride_2x2";
     float* temp = dataGrad.getDataFromGPU();
     std::string str  = convert_to_string((float*)temp,(int)dataDst.get_num_elements());
-    write_to_csv(strt, str, testname);
+    write_to_csv(strt, str, testname,avg_time);
 }

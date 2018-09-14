@@ -10,14 +10,21 @@ TEST(activation_forward, func_test_fwd_activation) {
   populateMemoryRandom(dataSrc);
 
   high_resolution_timer_t timer;
-  compute_hipdnn_activation_forward(test_case, dataSrc.gpu(), dataDst.gpu());
+ 
+  std::vector<double> time_vector(benchmark_iterations);
+    for(int i = 0; i < benchmark_iterations; i++){
+      timer.restart();
+      compute_hipdnn_activation_forward(test_case, dataSrc.gpu(), dataDst.gpu());
+      std::uint64_t time_elapsed = timer.elapsed_nanoseconds();
+      time_vector[i] = (double)time_elapsed / 1e6;
+    }
+    double avg_time = std::accumulate(time_vector.begin() + 10, time_vector.end(), 0.0) / (benchmark_iterations - 10);
+    std::cout << "Average Time: " << avg_time << std::endl;
 
   float* temp = dataDst.getDataFromGPU();
 
-    std::uint64_t time_elapsed = timer.elapsed_nanoseconds();
-    std::cout << "time taken: " << (time_elapsed / 1000.0) << " ms"<< std::endl;
     std::string strt = "./result_unittest.csv";
     std::string testname = "func_test_fwd_activation";
     std::string str  = convert_to_string((float*)temp,(int)dataDst.get_num_elements());
-    write_to_csv(strt, str, testname);                                     
+    write_to_csv(strt, str, testname,avg_time);                                     
 }

@@ -34,7 +34,7 @@ TEST(convolution_fwd, func_check_zero_padding) {
     std::string testname = "func_check_zero_padding";
     float* temp = dstDataGPU.getDataFromGPU();
     std::string str  = convert_to_string((float*)temp,(int)dstDataGPU.get_num_elements());
-    write_to_csv(strt, str, testname);
+    write_to_csv(strt, str, testname, avg_time);
 }
 
 TEST(convolution_fwd, func_check_two_strides_medium_kernelsize) {
@@ -71,7 +71,7 @@ TEST(convolution_fwd, func_check_two_strides_medium_kernelsize) {
     std::string testname = "func_check_two_strides_medium_kernelsize";
     float* temp = dstDataGPU.getDataFromGPU();
     std::string str  = convert_to_string((float*)temp,(int)dstDataGPU.get_num_elements());
-    write_to_csv(strt, str, testname);
+    write_to_csv(strt, str, testname,avg_time);
 }
 
 TEST(convolution_fwd, func_check_padding_and_strides_small_size) {
@@ -108,7 +108,7 @@ high_resolution_timer_t timer;
     std::string testname = "func_check_padding_and_strides_small_size";
     float* temp = dstDataGPU.getDataFromGPU();
     std::string str  = convert_to_string((float*)temp,(int)dstDataGPU.get_num_elements());
-    write_to_csv(strt, str, testname);
+    write_to_csv(strt, str, testname,avg_time);
 }
 
 TEST(convolution_fwd, func_check_full_conv) {
@@ -145,7 +145,7 @@ high_resolution_timer_t timer;
     std::string testname = "func_check_full_conv";
     float* temp = dstDataGPU.getDataFromGPU();
     std::string str  = convert_to_string((float*)temp,(int)dstDataGPU.get_num_elements());
-    write_to_csv(strt, str, testname);
+    write_to_csv(strt, str, testname, avg_time);
 }
 
 TEST(convolution_fwd, func_check_dilation1x1) {
@@ -182,5 +182,5 @@ std::string strt = "./result_unittest.csv";
 std::string testname = "func_check_dilation1x1";
 float* temp = dstDataGPU.getDataFromGPU();
 std::string str = convert_to_string((float*)temp,(int)dstDataGPU.get_num_elements());
-write_to_csv(strt, str, testname);
+write_to_csv(strt, str, testname,avg_time);
 }
