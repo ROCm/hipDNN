@@ -8,18 +8,22 @@ TEST(pooling_fwd, func_check_zero_padding) {
 
   populateMemoryRandom<float>(srcData);
 
- high_resolution_timer_t timer;
-  compute_hipdnn_maxpool_fwd<float>(pool, srcData.gpu(), dstDataGPU.gpu());
-  
-  float* temp = dstDataGPU.getDataFromGPU();
+  high_resolution_timer_t timer;
+    std::vector<double> time_vector(benchmark_iterations, 0);
+    for(int i = 0; i < benchmark_iterations; i++){
+      timer.restart();
+      compute_hipdnn_maxpool_fwd<float>(pool, srcData.gpu(), dstDataGPU.gpu());
+      std::uint64_t time_elapsed = timer.elapsed_nanoseconds();
+      time_vector[i] = (double)time_elapsed / 1e6;
+    }
 
-  std::uint64_t time_elapsed = timer.elapsed_nanoseconds();
-  std::uint64_t timer_t = (time_elapsed / 1000.0);
-  std::cout << "time taken: " << timer_t << " ms"<< std::endl;
+    float* temp = dstDataGPU.getDataFromGPU();
+    double avg_time = std::accumulate(time_vector.begin() + 10, time_vector.end(), 0) / (benchmark_iterations - 10);
+    std::cout << "Average Time: " << avg_time << std::endl;
 
   std::string strt = "./result_unittest.csv";
   std::string testname = "func_check_pooling";
 
   std::string str  = convert_to_string((float*)temp,(int)dstDataGPU.get_num_elements());
-  write_to_csv(strt, str, testname, timer_t); 
+  write_to_csv(strt, str, testname, avg_time); 
 }

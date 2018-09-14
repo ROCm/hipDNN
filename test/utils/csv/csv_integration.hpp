@@ -26,6 +26,6 @@ std::string convert_to_string(dataType *arr, int s_size) {
   return str;
 }
 
-void write_to_csv(std::string filename, std::string str, std::string testname, std::uint64_t timer_t);
+void write_to_csv(std::string filename, std::string str, std::string testname, std::uint64_t avg_time);
 
 #endif // CSV_INTEGRATION_HPP

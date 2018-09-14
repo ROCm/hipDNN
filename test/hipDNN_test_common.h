@@ -16,6 +16,14 @@
 #include "csv/csv_integration.hpp"
 #include "timer/timer.hpp"
 
+#define BENCHMARK 1
+
+#if BENCHMARK
+  int benchmark_iterations = 100;
+#else
+  int benchmark_iterations = 1;
+#endif
+
 #define checkHIPDNN(expression)                                                \
   {                                                                            \
     hipdnnStatus_t status = (expression);                                      \
