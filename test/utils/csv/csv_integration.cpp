@@ -11,7 +11,7 @@
          << ","
          << "Output" 
          << ","
-         <<"Excecution Time (milliseconds)"
+         <<"Average Excecution Time (milliseconds)"
          << std::endl;
    }
   fs << testname << ",";
