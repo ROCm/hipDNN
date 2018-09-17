@@ -3,7 +3,7 @@
 # ########################################################################
 
 # The ROCm platform requires Ubuntu 16.04 or Fedora 24, which has cmake 3.5
-cmake_minimum_required( VERSION 3.5 )
+cmake_minimum_required( VERSION 2.8.8 )
 
 #Set default install and package paths.
 set(CMAKE_INSTALL_PREFIX "/opt/rocm/" CACHE STRING "Install location.")
@@ -31,7 +31,7 @@ IF(${HIP_PLATFORM} MATCHES "hcc")
   endif()
 ELSE()
   if (NOT DEFINED ENV{CUDNN_PATH})
-    set(CUDNN_PATH "/usr/local/cudnn-7.0/cuda")
+    set(CUDNN_PATH "/usr/local/cuda-9.2/")
   else()
     set(CUDNN_PATH $ENV{CUDNN_PATH})
   endif()
@@ -81,6 +81,6 @@ INCLUDE(CPack)
 
 # Testing
 
-enable_testing()
+# enable_testing()
 
 add_subdirectory(test)
