@@ -13,11 +13,21 @@ TEST(convolution_bwd_filter, func_check_backward_conv_filter) {
     Memory<float> filterData = createMemory<float>(filterDesc);
     populateMemoryRandom<float>(srcData);
     populateMemoryRandom<float>(filterData);
+
     test_convolution_bwd_filter testConvolutionSizes(
         inputDesc.N, 1, inputDesc.C, inputDesc.H, inputDesc.W, outputDesc.C,
         outputDesc.H, outputDesc.W, filterDesc.H, filterDesc.W, pad[0], pad[1],
         stride[0], stride[1], 1, 1);
-high_resolution_timer_t timer;  
+
+  int ip_size[4] = {inputDesc.N, inputDesc.C, inputDesc.H, inputDesc.W};
+  int k_size[4] = {filterDesc.N, filterDesc.C, filterDesc.H, filterDesc.W};
+  int op_size[4] =  {outputDesc.N, outputDesc.C, outputDesc.H, outputDesc.W};
+
+  std::string str_ip_size  = convert_to_string((int*)ip_size,4);
+  std::string str_k_size  = convert_to_string((int*)k_size,4);
+  std::string str_op_size  = convert_to_string((int*)op_size,4);
+
+high_resolution_timer_t timer;
 std::vector<double> time_vector(benchmark_iterations, 0);
     for(int i = 0; i < benchmark_iterations; i++){
       timer.restart();
@@ -33,6 +43,6 @@ std::vector<double> time_vector(benchmark_iterations, 0);
     std::string testname = "func_check_backward_conv_filter";
     float* temp = gradData.getDataFromGPU();
     std::string str  = convert_to_string((float*)temp,(int)gradData.get_num_elements());
-    write_to_csv(strt, str, testname,avg_time);
+    write_to_csv(strt, str, testname,avg_time, str_ip_size, str_k_size, str_op_size);
  }
 

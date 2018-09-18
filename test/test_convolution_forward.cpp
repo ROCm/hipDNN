@@ -17,7 +17,16 @@ TEST(convolution_fwd, func_check_zero_padding) {
         inputDesc.N, 1, inputDesc.C, inputDesc.H, inputDesc.W, outputDesc.C,
         outputDesc.H, outputDesc.W, filterDesc.H, filterDesc.W, pad[0], pad[1],
         stride[0], stride[1], 1, 1);
-    
+
+  int ip_size[4] = {inputDesc.N, inputDesc.C, inputDesc.H, inputDesc.W};
+  int k_size[4] = {filterDesc.N, filterDesc.C, filterDesc.H, filterDesc.W};
+  int op_size[4] =  {outputDesc.N, outputDesc.C, outputDesc.H, outputDesc.W};
+
+  std::string str_ip_size  = convert_to_string((int*)ip_size,4);
+  std::string str_k_size  = convert_to_string((int*)k_size,4);
+  std::string str_op_size  = convert_to_string((int*)op_size,4);
+
+
     high_resolution_timer_t timer;
     std::vector<double> time_vector(benchmark_iterations, 0);
     for(int i = 0; i < benchmark_iterations; i++){
@@ -34,7 +43,7 @@ TEST(convolution_fwd, func_check_zero_padding) {
     std::string testname = "func_check_zero_padding";
     float* temp = dstDataGPU.getDataFromGPU();
     std::string str  = convert_to_string((float*)temp,(int)dstDataGPU.get_num_elements());
-    write_to_csv(strt, str, testname, avg_time);
+    write_to_csv(strt, str, testname, avg_time, str_ip_size, str_k_size, str_op_size);
 }
 
 TEST(convolution_fwd, func_check_two_strides_medium_kernelsize) {
@@ -55,6 +64,15 @@ TEST(convolution_fwd, func_check_two_strides_medium_kernelsize) {
         outputDesc.H, outputDesc.W, filterDesc.H, filterDesc.W, pad[0], pad[1],
         stride[0], stride[1], 1, 1);
 
+  int ip_size[4] = {inputDesc.N, inputDesc.C, inputDesc.H, inputDesc.W};
+  int k_size[4] = {filterDesc.N, filterDesc.C, filterDesc.H, filterDesc.W};
+  int op_size[4] =  {outputDesc.N, outputDesc.C, outputDesc.H, outputDesc.W};
+
+  std::string str_ip_size  = convert_to_string((int*)ip_size,4);
+  std::string str_k_size  = convert_to_string((int*)k_size,4);
+  std::string str_op_size  = convert_to_string((int*)op_size,4);
+
+
     high_resolution_timer_t timer;
     std::vector<double> time_vector(benchmark_iterations, 0);
     for(int i = 0; i < benchmark_iterations; i++){
@@ -71,7 +89,7 @@ TEST(convolution_fwd, func_check_two_strides_medium_kernelsize) {
     std::string testname = "func_check_two_strides_medium_kernelsize";
     float* temp = dstDataGPU.getDataFromGPU();
     std::string str  = convert_to_string((float*)temp,(int)dstDataGPU.get_num_elements());
-    write_to_csv(strt, str, testname,avg_time);
+    write_to_csv(strt, str, testname,avg_time, str_ip_size, str_k_size, str_op_size);
 }
 
 TEST(convolution_fwd, func_check_padding_and_strides_small_size) {
@@ -92,6 +110,14 @@ TEST(convolution_fwd, func_check_padding_and_strides_small_size) {
         outputDesc.H, outputDesc.W, filterDesc.H, filterDesc.W, pad[0], pad[1],
         stride[0], stride[1], 1, 1);
 
+  int ip_size[4] = {inputDesc.N, inputDesc.C, inputDesc.H, inputDesc.W};
+  int k_size[4] = {filterDesc.N, filterDesc.C, filterDesc.H, filterDesc.W};
+  int op_size[4] =  {outputDesc.N, outputDesc.C, outputDesc.H, outputDesc.W};
+
+  std::string str_ip_size  = convert_to_string((int*)ip_size,4);
+  std::string str_k_size  = convert_to_string((int*)k_size,4);
+  std::string str_op_size  = convert_to_string((int*)op_size,4);
+
 high_resolution_timer_t timer;
     std::vector<double> time_vector(benchmark_iterations, 0);
     for(int i = 0; i < benchmark_iterations; i++){
@@ -108,7 +134,7 @@ high_resolution_timer_t timer;
     std::string testname = "func_check_padding_and_strides_small_size";
     float* temp = dstDataGPU.getDataFromGPU();
     std::string str  = convert_to_string((float*)temp,(int)dstDataGPU.get_num_elements());
-    write_to_csv(strt, str, testname,avg_time);
+    write_to_csv(strt, str, testname,avg_time, str_ip_size, str_k_size, str_op_size);
 }
 
 TEST(convolution_fwd, func_check_full_conv) {
@@ -129,6 +155,15 @@ TEST(convolution_fwd, func_check_full_conv) {
         outputDesc.H, outputDesc.W, filterDesc.H, filterDesc.W, pad[0], pad[1],
         stride[0], stride[1], 1, 1);
 
+  int ip_size[4] = {inputDesc.N, inputDesc.C, inputDesc.H, inputDesc.W};
+  int k_size[4] = {filterDesc.N, filterDesc.C, filterDesc.H, filterDesc.W};
+  int op_size[4] =  {outputDesc.N, outputDesc.C, outputDesc.H, outputDesc.W};
+
+  std::string str_ip_size  = convert_to_string((int*)ip_size,4);
+  std::string str_k_size  = convert_to_string((int*)k_size,4);
+  std::string str_op_size  = convert_to_string((int*)op_size,4);
+
+
 high_resolution_timer_t timer;
     std::vector<double> time_vector(benchmark_iterations, 0);
     for(int i = 0; i < benchmark_iterations; i++){
@@ -145,7 +180,7 @@ high_resolution_timer_t timer;
     std::string testname = "func_check_full_conv";
     float* temp = dstDataGPU.getDataFromGPU();
     std::string str  = convert_to_string((float*)temp,(int)dstDataGPU.get_num_elements());
-    write_to_csv(strt, str, testname, avg_time);
+    write_to_csv(strt, str, testname, avg_time, str_ip_size, str_k_size, str_op_size);
 }
 
 TEST(convolution_fwd, func_check_dilation1x1) {
@@ -166,6 +201,15 @@ inputDesc.N, 1, inputDesc.C, inputDesc.H, inputDesc.W, outputDesc.C,
 outputDesc.H, outputDesc.W, filterDesc.H, filterDesc.W, pad[0], pad[1],
 stride[0], stride[1], 1, 1);
 
+  int ip_size[4] = {inputDesc.N, inputDesc.C, inputDesc.H, inputDesc.W};
+  int k_size[4] = {filterDesc.N, filterDesc.C, filterDesc.H, filterDesc.W};
+  int op_size[4] =  {outputDesc.N, outputDesc.C, outputDesc.H, outputDesc.W};
+
+  std::string str_ip_size  = convert_to_string((int*)ip_size,4);
+  std::string str_k_size  = convert_to_string((int*)k_size,4);
+  std::string str_op_size  = convert_to_string((int*)op_size,4);
+
+
 high_resolution_timer_t timer;
     std::vector<double> time_vector(benchmark_iterations, 0);
     for(int i = 0; i < benchmark_iterations; i++){
@@ -182,5 +226,5 @@ std::string strt = "./result_unittest.csv";
 std::string testname = "func_check_dilation1x1";
 float* temp = dstDataGPU.getDataFromGPU();
 std::string str = convert_to_string((float*)temp,(int)dstDataGPU.get_num_elements());
-write_to_csv(strt, str, testname,avg_time);
+write_to_csv(strt, str, testname,avg_time, str_ip_size, str_k_size, str_op_size);
 }
