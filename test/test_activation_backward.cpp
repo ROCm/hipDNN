@@ -26,4 +26,5 @@ TEST(activation_backward, func_test_naive_activation) {
     float* temp = dataDst.getDataFromGPU();
     std::string str  = convert_to_string((float*)temp,(int)dataDst.get_num_elements());
     write_to_csv(strt, str, testname, avg_time);                                     
+
 }
