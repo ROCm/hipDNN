@@ -24,9 +24,9 @@ TEST(activation_fwd_bwd, func_test_fwd_bwd_activation) {
       compute_hipdnn_activation_forward(test_case1, dataSrc.gpu(),dataDst.gpu());
       compute_hipdnn_activation_backward(test_case2, dataSrc.gpu(), dataGrad.gpu(),
                                      dataDst.gpu());
-
+      hipDeviceSynchronize();
       std::uint64_t time_elapsed = timer.elapsed_nanoseconds();
-      time_vector[i] = (double)time_elapsed / 1e6;
+      time_vector[i] = (double)time_elapsed / 1000.0;
     }
     double avg_time = std::accumulate(time_vector.begin() + 10, time_vector.end(), 0.0) / (benchmark_iterations - 10);
     std::cout << "Average Time: " << avg_time << std::endl;
