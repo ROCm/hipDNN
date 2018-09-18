@@ -11,6 +11,14 @@ TEST(pooling_backward, func_check_pooling_stride_2x2) {
   Memory<float> dataDst(test_case.on * test_case.ochannel * test_case.oheight *
                         test_case.owidth);
 
+  int ip_size[4] = {1,1,4,4};
+  int k_size[4] = {1,1,2,2};
+  int op_size[4] =  {test_case.on, test_case.ochannel, test_case.oheight, test_case.owidth};
+
+  std::string str_ip_size  = convert_to_string((int*)ip_size,4);
+  std::string str_k_size  = convert_to_string((int*)k_size,4);
+  std::string str_op_size  = convert_to_string((int*)op_size,4);
+
   high_resolution_timer_t timer;
     std::vector<double> time_vector(benchmark_iterations, 0);
     for(int i = 0; i < benchmark_iterations; i++){
@@ -28,5 +36,5 @@ TEST(pooling_backward, func_check_pooling_stride_2x2) {
     std::string testname = "func_check_pooling_stride_2x2";
     float* temp = dataGrad.getDataFromGPU();
     std::string str  = convert_to_string((float*)temp,(int)dataDst.get_num_elements());
-    write_to_csv(strt, str, testname,avg_time);
+    write_to_csv(strt, str, testname,avg_time, str_ip_size, str_k_size, str_op_size);
 }
