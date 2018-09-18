@@ -18,11 +18,7 @@
 
 #define BENCHMARK 1
 
-#if BENCHMARK
-  int benchmark_iterations = 100;
-#else
-  int benchmark_iterations = 1;
-#endif
+#define benchmark_iterations 100
 
 #define checkHIPDNN(expression)                                                \
   {                                                                            \
@@ -38,7 +34,7 @@
   {                                                                            \
     hipError_t err = (f);                                                      \
     if (err != hipSuccess) {                                                   \
-      std::cout << "    Error occurred: " << err << std::endl;                 \
+      std::cout << "Error occurred: " << __FILE__ << " " <<  __LINE__ << err << std::endl;                 \
       std::exit(1);                                                            \
     }                                                                          \
   }
@@ -61,7 +57,7 @@ public:
     memset(h_data, 0, this->mem_size);
     HIP_CALL(hipMalloc((void **)&this->d_data, this->mem_size));
 	//std::cout << "Memsetting" << std::endl;
-    HIP_CALL(hipMemset((void **)&this->d_data, 0, this->mem_size));
+//    HIP_CALL(hipMemset((void **)&this->d_data, 0, this->mem_size));
   }
   dataType *cpu() { return this->h_data; }
 

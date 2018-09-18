@@ -16,8 +16,9 @@ TEST(pooling_fwd_back, func_check_fwd_bwd) {
       timer.restart();
       hipdnn_maxpool_fwd<float>(pool, srcData.gpu(), dstData.gpu());
       hipdnn_pooling_backward(test_case, srcData.gpu(), gradData.gpu(), dstData.gpu());
+      hipDeviceSynchronize();
       std::uint64_t time_elapsed = timer.elapsed_nanoseconds();
-      time_vector[i] = (double)time_elapsed / 1e6;
+      time_vector[i] = (double)time_elapsed / 1000.0;
     }
     double avg_time = std::accumulate(time_vector.begin() + 10, time_vector.end(), 0.0) / (benchmark_iterations - 10);
     std::cout << "Average Time: " << avg_time << std::endl;
