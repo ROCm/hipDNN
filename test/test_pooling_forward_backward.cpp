@@ -8,7 +8,15 @@ TEST(pooling_fwd_back, func_check_fwd_bwd) {
   Memory<float> dstData(pool.oh * pool.ow);
   Memory<float> gradData(pool.ih * pool.iw);
   populateMemoryRandom<float>(srcData);
-       
+
+  int ip_size[4] = {pool.mb, pool.c, pool.ih, pool.iw};
+  int k_size[4] = {pool.mb, pool.c, pool.kh, pool.kw};
+  int op_size[4] =  {pool.mb, pool.c, pool.oh, pool.ow};
+
+  std::string str_ip_size  = convert_to_string((int*)ip_size,4);
+  std::string str_k_size  = convert_to_string((int*)k_size,4);
+  std::string str_op_size  = convert_to_string((int*)op_size,4);
+
   high_resolution_timer_t timer;
 
     std::vector<double> time_vector(benchmark_iterations);
@@ -24,9 +32,9 @@ TEST(pooling_fwd_back, func_check_fwd_bwd) {
     std::cout << "Average Time: " << avg_time << std::endl;
 
     float* temp2 = gradData.getDataFromGPU();
-   
+
     std::string strt = "./result_unittest.csv";
     std::string testname = "func_pooling_fwd_bwd";
     std::string str  = convert_to_string((float*)temp2,(int)gradData.get_num_elements());
-    write_to_csv(strt, str, testname, avg_time);
+    write_to_csv(strt, str, testname, avg_time, str_ip_size, str_k_size, str_op_size);
 }
