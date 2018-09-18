@@ -26,10 +26,6 @@ TEST(convolution_fwd_bwd, func_test_fwd_bwd_convolution) {
   std::string str_ip_size  = convert_to_string((int*)ip_size,4);
   std::string str_k_size  = convert_to_string((int*)k_size,4);
   std::string str_op_size  = convert_to_string((int*)op_size,4);
-  
-  std::cout<<"\n input size:"<<str_ip_size;
-  std::cout<<"\n kernel size:"<<str_k_size;
-  std::cout<<"\n output size:"<<str_op_size;
 
   high_resolution_timer_t timer;
 
