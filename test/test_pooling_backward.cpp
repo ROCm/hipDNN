@@ -11,8 +11,8 @@ TEST(pooling_backward, func_check_pooling_stride_2x2) {
   Memory<float> dataDst(test_case.on * test_case.ochannel * test_case.oheight *
                         test_case.owidth);
 
-  size_t ip_size[4] = {test_case.in, test_case.ichannel, test_case.iheight, test_case.iwidth};
-  size_t k_size[4] = {test_case.in, test_case.ichannel, test_case.wheight, test_case.wwidth};
+  int ip_size[4] = {1,1,4,4};
+  int k_size[4] = {1,1,2,2};
   int op_size[4] =  {test_case.on, test_case.ochannel, test_case.oheight, test_case.owidth};
 
   std::string str_ip_size  = convert_to_string((int*)ip_size,4);
