@@ -16,7 +16,8 @@ TEST(activation_forward, func_test_fwd_activation) {
       timer.restart();
       compute_hipdnn_activation_forward(test_case, dataSrc.gpu(), dataDst.gpu());
       std::uint64_t time_elapsed = timer.elapsed_nanoseconds();
-      time_vector[i] = (double)time_elapsed / 1e6;
+      hipDeviceSynchronize();
+      time_vector[i] = (double)time_elapsed / 1000.0;
     }
     double avg_time = std::accumulate(time_vector.begin() + 10, time_vector.end(), 0.0) / (benchmark_iterations - 10);
     std::cout << "Average Time: " << avg_time << std::endl;

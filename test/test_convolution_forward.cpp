@@ -24,8 +24,9 @@ TEST(convolution_fwd, func_check_zero_padding) {
       timer.restart();
         compute_hipdnn_conv_fwd<float>(testConvolutionSizes, srcData.gpu(),
                                 filterData.gpu(), NULL, dstDataGPU.gpu());
+      hipDeviceSynchronize();                                
       std::uint64_t time_elapsed = timer.elapsed_nanoseconds();
-      time_vector[i] = (double)time_elapsed / 1e6;
+      time_vector[i] = (double)time_elapsed / 1000.0;
     }
     double avg_time = std::accumulate(time_vector.begin() + 10, time_vector.end(), 0) / (benchmark_iterations - 10);
     std::cout << "Average Time: " << avg_time << std::endl;
@@ -61,8 +62,9 @@ TEST(convolution_fwd, func_check_two_strides_medium_kernelsize) {
       timer.restart();
         compute_hipdnn_conv_fwd<float>(testConvolutionSizes, srcData.gpu(),
                                 filterData.gpu(), NULL, dstDataGPU.gpu());
+      hipDeviceSynchronize();                                
       std::uint64_t time_elapsed = timer.elapsed_nanoseconds();
-      time_vector[i] = (double)time_elapsed / 1e6;
+      time_vector[i] = (double)time_elapsed / 1000.0;
     }
     double avg_time = std::accumulate(time_vector.begin() + 10, time_vector.end(), 0) / (benchmark_iterations - 10);
     std::cout << "Average Time: " << avg_time << std::endl;
@@ -98,8 +100,9 @@ high_resolution_timer_t timer;
       timer.restart();
         compute_hipdnn_conv_fwd<float>(testConvolutionSizes, srcData.gpu(),
                                 filterData.gpu(), NULL, dstDataGPU.gpu());
+      hipDeviceSynchronize();                                
       std::uint64_t time_elapsed = timer.elapsed_nanoseconds();
-      time_vector[i] = (double)time_elapsed / 1e6;
+      time_vector[i] = (double)time_elapsed / 1000.0;
     }
     double avg_time = std::accumulate(time_vector.begin() + 10, time_vector.end(), 0) / (benchmark_iterations - 10);
     std::cout << "Average Time: " << avg_time << std::endl;
@@ -135,8 +138,9 @@ high_resolution_timer_t timer;
       timer.restart();
         compute_hipdnn_conv_fwd<float>(testConvolutionSizes, srcData.gpu(),
                                 filterData.gpu(), NULL, dstDataGPU.gpu());
+      hipDeviceSynchronize();                                
       std::uint64_t time_elapsed = timer.elapsed_nanoseconds();
-      time_vector[i] = (double)time_elapsed / 1e6;
+      time_vector[i] = (double)time_elapsed / 1000.0;
     }
     double avg_time = std::accumulate(time_vector.begin() + 10, time_vector.end(), 0) / (benchmark_iterations - 10);
     std::cout << "Average Time: " << avg_time << std::endl;
@@ -172,8 +176,9 @@ high_resolution_timer_t timer;
       timer.restart();
         compute_hipdnn_conv_fwd<float>(testConvolutionSizes, srcData.gpu(),
                                 filterData.gpu(), NULL, dstDataGPU.gpu());
+      hipDeviceSynchronize();                                
       std::uint64_t time_elapsed = timer.elapsed_nanoseconds();
-      time_vector[i] = (double)time_elapsed / 1e6;
+      time_vector[i] = (double)time_elapsed / 1000.0;
     }
     double avg_time = std::accumulate(time_vector.begin() + 10, time_vector.end(), 0) / (benchmark_iterations - 10);
     std::cout << "Average Time: " << avg_time << std::endl;

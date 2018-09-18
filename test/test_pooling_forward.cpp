@@ -13,8 +13,9 @@ TEST(pooling_fwd, func_check_zero_padding) {
     for(int i = 0; i < benchmark_iterations; i++){
       timer.restart();
       compute_hipdnn_maxpool_fwd<float>(pool, srcData.gpu(), dstDataGPU.gpu());
+      hipDeviceSynchronize();
       std::uint64_t time_elapsed = timer.elapsed_nanoseconds();
-      time_vector[i] = (double)time_elapsed / 1e6;
+      time_vector[i] = (double)time_elapsed / 1000.0;
     }
 
     float* temp = dstDataGPU.getDataFromGPU();

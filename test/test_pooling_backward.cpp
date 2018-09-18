@@ -17,8 +17,9 @@ TEST(pooling_backward, func_check_pooling_stride_2x2) {
       timer.restart();
   compute_hipdnn_pooling_backward(test_case, dataSrc.gpu(), dataGrad.gpu(),
                                   dataDst.gpu());
+      hipDeviceSynchronize();                                  
       std::uint64_t time_elapsed = timer.elapsed_nanoseconds();
-      time_vector[i] = (double)time_elapsed / 1e6;
+      time_vector[i] = (double)time_elapsed / 1000.0;
     }
     double avg_time = std::accumulate(time_vector.begin() + 10, time_vector.end(), 0) / (benchmark_iterations - 10);
     std::cout << "Average Time: " << avg_time << std::endl;
