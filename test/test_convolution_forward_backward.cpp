@@ -19,6 +19,18 @@ TEST(convolution_fwd_bwd, func_test_fwd_bwd_convolution) {
         outputDesc.H, outputDesc.W, filterDesc.H, filterDesc.W, pad[0], pad[1],
         stride[0], stride[1], 1, 1);
     	
+  int ip_size[4] = {inputDesc.N, inputDesc.C, inputDesc.H, inputDesc.W};
+  int k_size[4] = {filterDesc.N, filterDesc.C, filterDesc.H, filterDesc.W}; 
+  int op_size[4] =  {outputDesc.N, outputDesc.C, outputDesc.H, outputDesc.W};
+
+  std::string str_ip_size  = convert_to_string((int*)ip_size,4);
+  std::string str_k_size  = convert_to_string((int*)k_size,4);
+  std::string str_op_size  = convert_to_string((int*)op_size,4);
+  
+  std::cout<<"\n input size:"<<str_ip_size;
+  std::cout<<"\n kernel size:"<<str_k_size;
+  std::cout<<"\n output size:"<<str_op_size;
+
   high_resolution_timer_t timer;
 
     std::vector<double> time_vector(benchmark_iterations,0);
@@ -40,6 +52,6 @@ TEST(convolution_fwd_bwd, func_test_fwd_bwd_convolution) {
     std::string strt = "./result_unittest.csv";
     std::string testname = "func_test_fwd_bwd_convolution";
     std::string str  = convert_to_string((float*)temp2,(int)gradData.get_num_elements());
-    write_to_csv(strt, str, testname, avg_time);  
+    write_to_csv(strt, str, testname, avg_time, str_ip_size, str_k_size, str_op_size);  
 
 }
