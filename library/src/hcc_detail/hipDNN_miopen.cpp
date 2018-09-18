@@ -70,8 +70,14 @@
 //Eventually those can be merged, but currently i will not mix device pointers with host data in the same map...
 //HGSOS static std::map<miopenPoolingDescriptor_t, void *>  sPoolingDescToWorkspace;  ????
 
-static std::map<hipdnnConvolutionDescriptor_t, void*> sDescToWorkSpaceConvolution;
-static std::map<hipdnnConvolutionDescriptor_t, size_t> sDescToWorkSpaceConvolutionSize;
+static std::map<hipdnnConvolutionDescriptor_t, void*> sDescToWorkSpaceForwardConvolution;
+static std::map<hipdnnConvolutionDescriptor_t, size_t> sDescToWorkSpaceForwardConvolutionSize;
+
+static std::map<hipdnnConvolutionDescriptor_t, void*> sDescToWorkSpaceBackwardDataConvolution;
+static std::map<hipdnnConvolutionDescriptor_t, size_t> sDescToWorkSpaceBackwardDataConvolutionSize;
+
+static std::map<hipdnnConvolutionDescriptor_t, void*> sDescToWorkSpaceBackwardKernelConvolution;
+static std::map<hipdnnConvolutionDescriptor_t, size_t> sDescToWorkSpaceBackwardKernelConvolutionSize;
 
 static std::map<miopenTensorDescriptor_t, int8_t*> sDescToWorkspacePooling; //device pointers
 static std::map<miopenTensorDescriptor_t, size_t> sDescToWorkspacePoolingSize; //host
@@ -80,19 +86,23 @@ static std::map<miopenTensorDescriptor_t, int8_t*> sDescToWorkspaceLRN; //device
 static std::map<miopenTensorDescriptor_t, size_t> sDescToWorkspaceLRNSize; //host
 static std::map<miopenConvolutionDescriptor_t, int*> sDescTo3DConvolution; // To bookkeep 3D depth information
 
-
-void Free()
-{
+void Free(hipdnnConvolutionDescriptor_t convDesc, std::map<hipdnnConvolutionDescriptor_t, void*> &map, std::map<hipdnnConvolutionDescriptor_t, size_t> &size) {
 std::map<hipdnnConvolutionDescriptor_t, void*> :: iterator itr;
-for( itr =sDescToWorkSpaceConvolution .begin() ; itr != sDescToWorkSpaceConvolution.end() ; ++itr)
-     if (itr->second != NULL) {
-     //CHECK_HIP(hipMemPtrGetInfo(itr->second,&toBeFreedSize));
-	 if (sDescToWorkSpaceConvolutionSize[itr->first] > 0 ) {
-	    sDescToWorkSpaceConvolution.erase(itr);
-	    sDescToWorkSpaceConvolutionSize.clear();
-         }
-     }
+
+if ( map.find(convDesc) != map.end() ) {
+    if (map[convDesc] != NULL) {
+        if (size[convDesc] > 0 ) {
+
+           hipFree(map[convDesc]);
+           map.erase(convDesc);
+           size.erase(convDesc);
+          }
+      }
+  }
+  size.clear();
 }
+
+
 // Custom TensorAdd Kernel
 
 /*
@@ -387,7 +397,7 @@ hipdnnStatus_t miopenTohipActivationMode(miopenActivationMode_t in,
         *out = HIPDNN_ACTIVATION_TANH;
         break;
 
-    case miopenActivationPASTHRU:
+    case miopenActivationPATHTRU:
         *out = HIPDNN_ACTIVATION_PATHTRU;
         break;
 
@@ -430,7 +440,7 @@ hipdnnStatus_t hipTomiopenActivationMode(hipdnnActivationMode_t in,
 
     case HIPDNN_ACTIVATION_PATHTRU:
         HIPDNN_OPEN_LOG_M("HIPDNN_ACTIVATION_PATHTRU"  << std::flush);
-        *out = miopenActivationPASTHRU;
+        *out = miopenActivationPATHTRU;
         break;
 
     case HIPDNN_ACTIVATION_SOFTRELU:
@@ -819,9 +829,9 @@ HIPDNN_EXPORT hipdnnStatus_t hipdnnCreate(hipdnnHandle_t *handle) {
 }
 
 hipdnnStatus_t hipdnnDestroy(hipdnnHandle_t handle) {
-
-    Free();
+    
     CHECK_MIO(miopenDestroy(handle));
+
     return HIPDNN_STATUS_SUCCESS;
 }
 
@@ -1011,7 +1021,12 @@ hipdnnStatus_t hipdnnGetConvolution2dForwardOutputDim(
 
 hipdnnStatus_t hipdnnDestroyConvolutionDescriptor(
         hipdnnConvolutionDescriptor_t convDesc) {
+    Free(convDesc,sDescToWorkSpaceForwardConvolution, sDescToWorkSpaceForwardConvolutionSize);
+    Free(convDesc,sDescToWorkSpaceBackwardKernelConvolution, sDescToWorkSpaceBackwardKernelConvolutionSize);
+    Free(convDesc,sDescToWorkSpaceBackwardDataConvolution, sDescToWorkSpaceBackwardDataConvolutionSize);
+
     CHECK_MIO(miopenDestroyConvolutionDescriptor(convDesc));
+
     return HIPDNN_STATUS_SUCCESS;
 }
 
@@ -1150,37 +1165,26 @@ hipdnnStatus_t hipdnnFindConvolutionForwardAlgorithmEx(hipdnnHandle_t handle,
     size_t expectedWorkSpaceSize = 0, infoWorkSpaceSize = 0;
     void *workSpaceInternal = NULL;
 
-    if ( sDescToWorkSpaceConvolution.find(convDesc) == sDescToWorkSpaceConvolution.end()) {
+    if ( sDescToWorkSpaceForwardConvolution.find(convDesc) == sDescToWorkSpaceForwardConvolution.end()) {
          // If the descriptor is not present in the map , create one and add to the container
 
-         HIPDNN_OPEN_LOG_I("INTERNAL_ALLOC: hipdnnConvolutionForward size and workspace."
-         << std::flush);
+         HIPDNN_OPEN_LOG_I("\nINTERNAL_ALLOC: hipdnnConvolutionForward size and workspace.");
+
+
          // convDesc is used for workspace
          CHECK_MIO(miopenConvolutionForwardGetWorkSpaceSize(handle, wDesc, xDesc,
                   convDesc, yDesc, &expectedWorkSpaceSize));
          CHECK_HIP(hipMalloc((void**) &workSpaceInternal, expectedWorkSpaceSize));
-         sDescToWorkSpaceConvolution[convDesc] = workSpaceInternal;
-         sDescToWorkSpaceConvolutionSize[convDesc] = expectedWorkSpaceSize;
+         sDescToWorkSpaceForwardConvolution[convDesc] = workSpaceInternal;
+         sDescToWorkSpaceForwardConvolutionSize[convDesc] = expectedWorkSpaceSize;
 
        }
     else
       {
-	 CHECK_MIO(miopenConvolutionForwardGetWorkSpaceSize(handle, wDesc, xDesc,
-                  convDesc, yDesc, &infoWorkSpaceSize));
-         if(infoWorkSpaceSize > sDescToWorkSpaceConvolutionSize[convDesc]) {
-
-             sDescToWorkSpaceConvolution.erase(convDesc);
-             hipFree(workSpaceInternal);
-
-             CHECK_HIP(hipMalloc((void**) &workSpaceInternal, infoWorkSpaceSize));
-             sDescToWorkSpaceConvolution[convDesc] = workSpaceInternal;
-             sDescToWorkSpaceConvolutionSize[convDesc] = infoWorkSpaceSize;
-         }
-
-         workSpaceInternal = sDescToWorkSpaceConvolution[convDesc];
-         expectedWorkSpaceSize = sDescToWorkSpaceConvolutionSize[convDesc];
+         workSpaceInternal = sDescToWorkSpaceForwardConvolution[convDesc];
+         expectedWorkSpaceSize = sDescToWorkSpaceForwardConvolutionSize[convDesc];
        }
- 
+
         CHECK_MIO(
                 miopenFindConvolutionForwardAlgorithm(handle, xDesc, x, wDesc,
                         w, convDesc, yDesc, y, requestedAlgoCount,
@@ -1242,7 +1246,7 @@ hipdnnStatus_t hipdnnConvolutionForward(hipdnnHandle_t handle,
     size_t expectedWorkSpaceSize =0, infoWorkSpaceSize = 0;
     void *workSpaceInternal = NULL;
 
-    if ( sDescToWorkSpaceConvolution.find(convDesc) == sDescToWorkSpaceConvolution.end() ) {
+    if ( sDescToWorkSpaceForwardConvolution.find(convDesc) == sDescToWorkSpaceForwardConvolution.end() ) {
          // If the descriptor is not present in the map , create one and add to the container
 
          HIPDNN_OPEN_LOG_I("INTERNAL_ALLOC: hipdnnConvolutionForward size and workspace."
@@ -1251,26 +1255,15 @@ hipdnnStatus_t hipdnnConvolutionForward(hipdnnHandle_t handle,
          CHECK_MIO(miopenConvolutionForwardGetWorkSpaceSize(handle, wDesc, xDesc,
                   convDesc, yDesc, &expectedWorkSpaceSize));
          CHECK_HIP(hipMalloc((void**) &workSpaceInternal, expectedWorkSpaceSize));
-         sDescToWorkSpaceConvolution[convDesc] = workSpaceInternal;
-         sDescToWorkSpaceConvolutionSize[convDesc] = expectedWorkSpaceSize;
+         sDescToWorkSpaceForwardConvolution[convDesc] = workSpaceInternal;
+         sDescToWorkSpaceForwardConvolutionSize[convDesc] = expectedWorkSpaceSize;
 
        }
     else
       {
-         CHECK_MIO(miopenConvolutionForwardGetWorkSpaceSize(handle, wDesc, xDesc,
-                  convDesc, yDesc, &infoWorkSpaceSize));
-         if(infoWorkSpaceSize > sDescToWorkSpaceConvolutionSize[convDesc]) {
-
-             sDescToWorkSpaceConvolution.erase(convDesc);
-             hipFree(workSpaceInternal);
-
-	     CHECK_HIP(hipMalloc((void**) &workSpaceInternal, infoWorkSpaceSize));
-             sDescToWorkSpaceConvolution[convDesc] = workSpaceInternal;
-             sDescToWorkSpaceConvolutionSize[convDesc] = infoWorkSpaceSize;
-         }
-         workSpaceInternal = sDescToWorkSpaceConvolution[convDesc];
-         expectedWorkSpaceSize = sDescToWorkSpaceConvolutionSize[convDesc];
-       }
+         workSpaceInternal = sDescToWorkSpaceForwardConvolution[convDesc];
+         expectedWorkSpaceSize = sDescToWorkSpaceForwardConvolutionSize[convDesc];
+      }
 
         miopenConvFwdAlgorithm_t mialgo;
         CHECK_HIPDNN(hipTomiopenConvolutionFwdAlgo(algo, &mialgo));
@@ -1399,7 +1392,7 @@ hipdnnStatus_t hipdnnFindConvolutionBackwardFilterAlgorithmEx(
     void *workSpaceInternal = NULL;
 	size_t infoWorkSpaceSize = 0;
 
-    if ( sDescToWorkSpaceConvolution.find(convDesc) == sDescToWorkSpaceConvolution.end() ) {
+    if ( sDescToWorkSpaceBackwardKernelConvolution.find(convDesc) == sDescToWorkSpaceBackwardKernelConvolution.end() ) {
          // If the descriptor is not present in the map , create one and add to the container
 
          HIPDNN_OPEN_LOG_I( "INTERNAL_ALLOC hipdnnFindConvolutionBackwardFilterAlgorithmEx");
@@ -1408,28 +1401,15 @@ hipdnnStatus_t hipdnnFindConvolutionBackwardFilterAlgorithmEx(
                           dyDesc, xDesc, convDesc, dwDesc, &expectedWorkSpaceSize));
 
          CHECK_HIP(hipMalloc((void**) &workSpaceInternal, expectedWorkSpaceSize));
-         sDescToWorkSpaceConvolution[convDesc] = workSpaceInternal;
-         sDescToWorkSpaceConvolutionSize[convDesc] = expectedWorkSpaceSize;
+         sDescToWorkSpaceBackwardKernelConvolution[convDesc] = workSpaceInternal;
+         sDescToWorkSpaceBackwardKernelConvolutionSize[convDesc] = expectedWorkSpaceSize;
 
        }
     else
       {
-         CHECK_MIO(miopenConvolutionBackwardWeightsGetWorkSpaceSize(handle,
-                          dyDesc, xDesc, convDesc, dwDesc, &infoWorkSpaceSize));
-
-         if(infoWorkSpaceSize > sDescToWorkSpaceConvolutionSize[convDesc]) {
-
-             sDescToWorkSpaceConvolution.erase(convDesc);
-             hipFree(workSpaceInternal);
-
-	     CHECK_HIP(hipMalloc((void**) &workSpaceInternal, infoWorkSpaceSize));
-             sDescToWorkSpaceConvolution[convDesc] = workSpaceInternal;
-             sDescToWorkSpaceConvolutionSize[convDesc] = infoWorkSpaceSize;
-         }
-
-         workSpaceInternal = sDescToWorkSpaceConvolution[convDesc];
-         expectedWorkSpaceSize = sDescToWorkSpaceConvolutionSize[convDesc];
-       }
+         workSpaceInternal = sDescToWorkSpaceBackwardKernelConvolution[convDesc];
+         expectedWorkSpaceSize = sDescToWorkSpaceBackwardKernelConvolutionSize[convDesc];
+      }
 
 
     try {
@@ -1501,7 +1481,7 @@ hipdnnStatus_t hipdnnConvolutionBackwardFilter(hipdnnHandle_t handle,
     void *workSpaceInternal = NULL;
 	size_t infoWorkSpaceSize;
 
-    if ( sDescToWorkSpaceConvolution.find(convDesc) == sDescToWorkSpaceConvolution.end() ) {
+    if ( sDescToWorkSpaceBackwardKernelConvolution.find(convDesc) == sDescToWorkSpaceBackwardKernelConvolution.end() ) {
          // If the descriptor is not present in the map , create one and add to the container
 
          HIPDNN_OPEN_LOG_I("INTERNAL_ALLOC: hipdnnConvolutionBackwardFilter");
@@ -1509,27 +1489,14 @@ hipdnnStatus_t hipdnnConvolutionBackwardFilter(hipdnnHandle_t handle,
          CHECK_MIO(miopenConvolutionBackwardWeightsGetWorkSpaceSize(handle, dyDesc,
                         xDesc, convDesc, dwDesc, &expectedWorkSpaceSize));
          CHECK_HIP(hipMalloc((void**) &workSpaceInternal, expectedWorkSpaceSize));
-         sDescToWorkSpaceConvolution[convDesc] = workSpaceInternal;
-         sDescToWorkSpaceConvolutionSize[convDesc] = expectedWorkSpaceSize;
+         sDescToWorkSpaceBackwardKernelConvolution[convDesc] = workSpaceInternal;
+         sDescToWorkSpaceBackwardKernelConvolutionSize[convDesc] = expectedWorkSpaceSize;
 
        }
     else
       {
-         CHECK_MIO(miopenConvolutionBackwardWeightsGetWorkSpaceSize(handle,
-                          dyDesc, xDesc, convDesc, dwDesc, &infoWorkSpaceSize));
-
-         if(infoWorkSpaceSize > sDescToWorkSpaceConvolutionSize[convDesc]) {
-
-             sDescToWorkSpaceConvolution.erase(convDesc);
-             hipFree(workSpaceInternal);
-
-	     CHECK_HIP(hipMalloc((void**) &workSpaceInternal, infoWorkSpaceSize));
-             sDescToWorkSpaceConvolution[convDesc] = workSpaceInternal;
-             sDescToWorkSpaceConvolutionSize[convDesc] = infoWorkSpaceSize;
-         }
-
-         workSpaceInternal = sDescToWorkSpaceConvolution[convDesc];
-         expectedWorkSpaceSize = sDescToWorkSpaceConvolutionSize[convDesc];
+         workSpaceInternal = sDescToWorkSpaceBackwardKernelConvolution[convDesc];
+         expectedWorkSpaceSize = sDescToWorkSpaceBackwardKernelConvolutionSize[convDesc];
        }
 
         miopenConvBwdWeightsAlgorithm_t mialgo;
@@ -1693,7 +1660,7 @@ hipdnnStatus_t hipdnnFindConvolutionBackwardDataAlgorithmEx(
     miopenConvAlgoPerf_t* miopenPerfResults =
           new miopenConvAlgoPerf_t[requestedAlgoCount];
 
-    if ( sDescToWorkSpaceConvolution.find(convDesc) == sDescToWorkSpaceConvolution.end() ) {
+    if ( sDescToWorkSpaceBackwardDataConvolution.find(convDesc) == sDescToWorkSpaceBackwardDataConvolution.end() ) {
          // If the descriptor is not present in the map , create one and add to the container
 
           HIPDNN_OPEN_LOG_I( "INTERNAL_ALLOC: miopenConvolutionBackwardGetWorkSpaceSize size "
@@ -1704,27 +1671,14 @@ hipdnnStatus_t hipdnnFindConvolutionBackwardDataAlgorithmEx(
               miopenConvolutionBackwardDataGetWorkSpaceSize(handle, dyDesc,
                       wDesc, convDesc, dxDesc, &expectedWorkSpaceSize));
          CHECK_HIP(hipMalloc((void**) &workSpaceInternal, expectedWorkSpaceSize));
-         sDescToWorkSpaceConvolution[convDesc] = workSpaceInternal;
-         sDescToWorkSpaceConvolutionSize[convDesc] = expectedWorkSpaceSize;
+         sDescToWorkSpaceBackwardDataConvolution[convDesc] = workSpaceInternal;
+         sDescToWorkSpaceBackwardDataConvolutionSize[convDesc] = expectedWorkSpaceSize;
 
        }
     else
        {
-          CHECK_MIO(
-              miopenConvolutionBackwardDataGetWorkSpaceSize(handle, dyDesc,
-                    wDesc, convDesc, dxDesc, &infoWorkSpaceSize));
-
-         if(infoWorkSpaceSize > sDescToWorkSpaceConvolutionSize[convDesc]) {
-
-            sDescToWorkSpaceConvolution.erase(convDesc);
-            hipFree(workSpaceInternal);
-            CHECK_HIP(hipMalloc((void**) &workSpaceInternal, infoWorkSpaceSize));
-            sDescToWorkSpaceConvolution[convDesc] = workSpaceInternal;
-            sDescToWorkSpaceConvolutionSize[convDesc] = infoWorkSpaceSize;
-          }
-
-            workSpaceInternal = sDescToWorkSpaceConvolution[convDesc];
-           expectedWorkSpaceSize = sDescToWorkSpaceConvolutionSize[convDesc];
+           workSpaceInternal = sDescToWorkSpaceBackwardDataConvolution[convDesc];
+           expectedWorkSpaceSize = sDescToWorkSpaceBackwardDataConvolutionSize[convDesc];
        }
 
     try {
@@ -1777,35 +1731,20 @@ hipdnnStatus_t hipdnnConvolutionBackwardData(hipdnnHandle_t handle,
     void *workSpaceInternal = NULL;
 	size_t infoWorkSpaceSize = 0;
 
-    if ( sDescToWorkSpaceConvolution.find(convDesc) == sDescToWorkSpaceConvolution.end() ) {
+    if ( sDescToWorkSpaceBackwardDataConvolution.find(convDesc) == sDescToWorkSpaceBackwardDataConvolution.end() ) {
          // If the descriptor is not present in the map , create one and add to the container
          CHECK_MIO(miopenConvolutionBackwardDataGetWorkSpaceSize(handle,
                                 dyDesc, wDesc, convDesc, dxDesc, &expectedWorkSpaceSize));
 
          CHECK_HIP(hipMalloc((void**) &workSpaceInternal, expectedWorkSpaceSize));
-         sDescToWorkSpaceConvolution[convDesc] = workSpaceInternal;
-         sDescToWorkSpaceConvolutionSize[convDesc] = expectedWorkSpaceSize;
+         sDescToWorkSpaceBackwardDataConvolution[convDesc] = workSpaceInternal;
+         sDescToWorkSpaceBackwardDataConvolutionSize[convDesc] = expectedWorkSpaceSize;
 
        }
     else
-      {
-         CHECK_MIO(miopenConvolutionBackwardDataGetWorkSpaceSize(handle,
-                          dyDesc, wDesc, convDesc, dxDesc, &infoWorkSpaceSize));
-
-         if(infoWorkSpaceSize > sDescToWorkSpaceConvolutionSize[convDesc]) {
-
-             sDescToWorkSpaceConvolution.erase(convDesc);
-             hipFree(workSpaceInternal);
-
-	     CHECK_HIP(hipMalloc((void**) &workSpaceInternal, infoWorkSpaceSize));
-             sDescToWorkSpaceConvolution[convDesc] = workSpaceInternal;
-             sDescToWorkSpaceConvolutionSize[convDesc] = infoWorkSpaceSize;
-         }
-
-         workSpaceInternal = sDescToWorkSpaceConvolution[convDesc];
-         expectedWorkSpaceSize = sDescToWorkSpaceConvolutionSize[convDesc];
+       {  workSpaceInternal = sDescToWorkSpaceBackwardDataConvolution[convDesc];
+         expectedWorkSpaceSize = sDescToWorkSpaceBackwardDataConvolutionSize[convDesc];
        }
-
 
     try
     {
@@ -2476,7 +2415,7 @@ hipdnnStatus_t hipdnnGetFilterNdDescriptor(
 
 hipdnnStatus_t hipdnnDestroyFilterDescriptor(
         hipdnnFilterDescriptor_t filterDesc) {
-    //Free();
+
     HIPDNN_OPEN_LOG_C("ENTER hipdnnDestroyFilterDescriptor " << filterDesc
              << std::flush);
     CHECK_MIO(miopenDestroyTensorDescriptor(filterDesc));
