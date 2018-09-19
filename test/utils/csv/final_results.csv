@@ -1,0 +1,14 @@
+Test name,Performance in Nvidia,Performance in AMD,Input size,kernel size,output size,Results
+func_test_naive_activation,1624.6,0.332309,"[1,1,224,244]",NIL,"[1,1,224,244]",fail
+func_check_pooling,1442,0,"[1,1,224,224]","[1,1,2,2]","[1,1,112,112]",pass
+func_check_zero_padding,2099,65,"[1,3,224,224]","[21,3,3,3]","[1,21,222,222]",fail
+func_check_two_strides_medium_kernelsize,22973,140,"[1,3,600,600]","[2,3,30,30]","[1,2,286,286]",fail
+func_check_padding_and_strides_small_size,1563,51,"[1,3,7,7]","[21,3,3,3]","[1,21,5,5]",pass
+func_check_full_conv,1657,53,"[1,3,7,7]","[3,3,7,7]","[1,3,1,1]",pass
+func_check_dilation1x1,1567,52,"[1,3,7,7]","[3,3,3,3]","[1,3,9,9]",pass
+func_test_fwd_bwd_activation,2802.08,0.600132,"[1,1,4,4]",NIL,"[1,1,4,4]",fail
+func_test_fwd_activation,1435.1,0.272461,"[1,1,4,4]",NIL,"[1,1,4,4]",fail
+func_check_pooling_stride_2x2,1411,0,"[1,1,4,4]","[1,1,2,2]","[1,1,4,4]",pass
+func_test_fwd_bwd_convolution,6.61147,105.1,"[1,3,224,224]","[21,3,3,3]","[1,21,222,222]",fail
+func_pooling_fwd_bwd,2817.01,0.804375,"[1,1,4,4]","[1,1,2,2]","[1,1,2,2]",pass
+func_check_backward_conv_filter,4,100,"[1,3,224,224]","[21,3,3,3]","[1,21,222,222]",fail
