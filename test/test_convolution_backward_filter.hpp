@@ -69,7 +69,7 @@ void compute_hipdnn_conv_bwd_filter(test_convolution_bwd_filter &c, dataType *sr
   hipdnnConvolutionFwdAlgoPerf_t algoPerf[MaxAlgoCount];   
 
    hipdnnFindConvolutionForwardAlgorithmEx(hipdnn, in_desc, src, filt_desc, weights, conv_desc, out_desc, dst, MaxAlgoCount , &calgo, algoPerf, ws_data, ws_size);
-   algo = algoPerf[0].algo;
+   algo = (hipdnnConvolutionFwdAlgo_t)algoPerf[0].algo;
 
   checkHIPDNN(hipdnnGetConvolutionForwardWorkspaceSize( hipdnn, in_desc, filt_desc, conv_desc, out_desc, algo, &ws_size));
 
@@ -94,7 +94,7 @@ checkHIPDNN(hipdnnConvolutionForward(
    hipMalloc(&ws_data, ws_size);
 
   hipdnnFindConvolutionBackwardFilterAlgorithmEx(hipdnn, in_desc, src, out_desc, dst, conv_desc, filt_desc, weights, MaxAlgoCount , &calgo, b_algoPerf, ws_data, ws_size);
-  b_algo = b_algoPerf[0].algo;
+  b_algo = (hipdnnConvolutionBwdFilterAlgo_t)b_algoPerf[0].algo;
 
 
 checkHIPDNN(hipdnnConvolutionBackwardFilter(hipdnn, &alpha, in_desc,
