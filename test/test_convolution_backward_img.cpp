@@ -24,7 +24,7 @@ high_resolution_timer_t timer;
   std::cout << "time taken: " << (time_elapsed / 1000.0) << " ms"<< std::endl;
 
     std::string strt = "./result_unittest.csv";
-    std::string testname = "func_check_backward_conv_img";
+    std::string testname = "convolution_bwd_img:func_check_backward_conv_img";
     float* temp = dstDataGPU.getDataFromGPU();
     std::string str  = convert_to_string((float*)temp,(int)dstDataGPU.get_num_elements());
     write_to_csv(strt, str, testname);
