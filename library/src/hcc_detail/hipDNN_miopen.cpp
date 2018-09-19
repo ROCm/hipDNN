@@ -397,7 +397,7 @@ hipdnnStatus_t miopenTohipActivationMode(miopenActivationMode_t in,
         *out = HIPDNN_ACTIVATION_TANH;
         break;
 
-    case miopenActivationPATHTRU:
+    case miopenActivationPASTHRU:
         *out = HIPDNN_ACTIVATION_PATHTRU;
         break;
 
@@ -440,7 +440,7 @@ hipdnnStatus_t hipTomiopenActivationMode(hipdnnActivationMode_t in,
 
     case HIPDNN_ACTIVATION_PATHTRU:
         HIPDNN_OPEN_LOG_M("HIPDNN_ACTIVATION_PATHTRU"  << std::flush);
-        *out = miopenActivationPATHTRU;
+        *out = miopenActivationPASTHRU;
         break;
 
     case HIPDNN_ACTIVATION_SOFTRELU:
@@ -1167,7 +1167,7 @@ hipdnnStatus_t hipdnnFindConvolutionForwardAlgorithmEx(hipdnnHandle_t handle,
 
     if ( sDescToWorkSpaceForwardConvolution.find(convDesc) == sDescToWorkSpaceForwardConvolution.end()) {
          // If the descriptor is not present in the map , create one and add to the container
-
+         
          HIPDNN_OPEN_LOG_I("\nINTERNAL_ALLOC: hipdnnConvolutionForward size and workspace.");
 
 
