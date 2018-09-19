@@ -141,7 +141,11 @@ template <typename dataType> void populateMemoryRandom(Memory<dataType> &mem) {
   std::cout << "Creating vector of Size: " << mem.get_num_elements() << std::endl;
   std::vector<dataType> v(mem.get_num_elements());
   auto gen = [&dist, &mersenne_engine]() { return dist(mersenne_engine); };
-  std::iota(v.begin(), v.end(), -5);
+int i = 0;
+	std::generate(v.begin(), v.end(), [&i]() mutable{
+			return ++i % 10;
+		});
+//  std::iota(v.begin(), v.end(), -5);
   std::copy(v.begin(), v.end(), mem.cpu());
   // Copy the stuff to device too
   HIP_CALL(hipMemcpy(mem.gpu(), mem.cpu(), mem.size(), hipMemcpyHostToDevice));
