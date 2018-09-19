@@ -40,7 +40,7 @@ std::vector<double> time_vector(benchmark_iterations, 0);
     std::cout << "Average Time: " << avg_time << std::endl;
 
     std::string strt = "./result_unittest.csv";
-    std::string testname = "func_check_backward_conv_filter";
+    std::string testname = "convolution_bwd_filter:func_check_backward_conv_filter";
     float* temp = gradData.getDataFromGPU();
     std::string str  = convert_to_string((float*)temp,(int)gradData.get_num_elements());
     write_to_csv(strt, str, testname,avg_time, str_ip_size, str_k_size, str_op_size);
