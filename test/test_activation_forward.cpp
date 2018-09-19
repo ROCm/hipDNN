@@ -32,7 +32,7 @@ TEST(activation_forward, func_test_fwd_activation) {
   float* temp = dataDst.getDataFromGPU();
 
     std::string strt = "./result_unittest.csv";
-    std::string testname = "func_test_fwd_activation";
+    std::string testname = "activation_forward:func_test_fwd_activation";
     std::string str  = convert_to_string((float*)temp,(int)dataDst.get_num_elements());
     write_to_csv(strt, str, testname, avg_time, str_ip_size, str_k_size, str_op_size);
 }
