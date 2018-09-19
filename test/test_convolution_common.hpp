@@ -141,7 +141,7 @@ void compute_hipdnn_conv_backward_filter(test_convolution_size &c, dataType *src
    hipMalloc(&ws_data, ws_size);
 
   hipdnnFindConvolutionBackwardFilterAlgorithmEx(hipdnn, in_desc, src, out_desc, dst, conv_desc, filt_desc, weights, MaxAlgoCount , &calgo, b_algoPerf, ws_data, ws_size);
-  b_algo = b_algoPerf[0].algo;
+  b_algo = (hipdnnConvolutionBwdFilterAlgo_t)b_algoPerf[0].algo;
 
 
 checkHIPDNN(hipdnnConvolutionBackwardFilter(hipdnn, &alpha, in_desc,
