@@ -39,7 +39,7 @@ TEST(activation_fwd_bwd, func_test_fwd_bwd_activation) {
     std::cout << "Average Time: " << avg_time << std::endl;
     float* temp2 = dataGrad.getDataFromGPU();
     std::string strt = "./result_unittest.csv";
-    std::string testname = "func_test_fwd_bwd_activation";
+    std::string testname = "activation_fwd_bwd:func_test_fwd_bwd_activation";
     std::string str  = convert_to_string((float*)temp2,(int)dataGrad.get_num_elements());
     write_to_csv(strt, str, testname, avg_time, str_ip_size, str_k_size, str_op_size);
 }

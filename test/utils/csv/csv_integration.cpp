@@ -10,23 +10,23 @@ void write_to_csv(std::string filename, std::string str, std::string testname,
    if (!fs2.is_open()) {
         
         fs << "Test_name"
-         << ","
-         << "Output" 
-         << ","
-         << "Average Excecution Time (milliseconds)"
-         << ","
-         << "Input size"
-         << ","
-         << "kernel size"
-         << ","
-         << "output size"
-         << std::endl;
+           << ","
+           << "Average Excecution Time (microseconds)"
+           << ","
+           << "Input size"
+           << ","
+           << "kernel size"
+           << ","
+           << "output size"
+           << ","
+           << "Output" 
+           << std::endl;
    }
   fs << testname << ",";
-  fs << str << ",";
   fs << avg_time << ",";
   fs << str_ip_size << ",";
   fs << str_k_size << ",";
-  fs << str_op_size << std::endl;
+  fs << str_op_size << ",";
+  fs << str << std::endl;
   fs.close();
 }

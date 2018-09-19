@@ -33,7 +33,7 @@ TEST(pooling_fwd_back, func_check_fwd_bwd) {
     float* temp2 = gradData.getDataFromGPU();
 
     std::string strt = "./result_unittest.csv";
-    std::string testname = "func_pooling_fwd_bwd";
+    std::string testname = "pooling_intg:func_pooling_fwd_bwd";
     std::string str  = convert_to_string((float*)temp2,(int)gradData.get_num_elements());
     write_to_csv(strt, str, testname, avg_time, str_ip_size, str_k_size, str_op_size);
 }
