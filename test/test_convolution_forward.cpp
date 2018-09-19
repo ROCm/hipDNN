@@ -40,7 +40,7 @@ TEST(convolution_fwd, func_check_zero_padding) {
     std::cout << "Average Time: " << avg_time << std::endl;
 
     std::string strt = "./result_unittest.csv";
-    std::string testname = "func_check_zero_padding";
+    std::string testname = "convolution_fwd:func_check_zero_padding";
     float* temp = dstDataGPU.getDataFromGPU();
     std::string str  = convert_to_string((float*)temp,(int)dstDataGPU.get_num_elements());
     write_to_csv(strt, str, testname, avg_time, str_ip_size, str_k_size, str_op_size);
@@ -86,7 +86,7 @@ TEST(convolution_fwd, func_check_two_strides_medium_kernelsize) {
     std::cout << "Average Time: " << avg_time << std::endl;
 
     std::string strt = "./result_unittest.csv";
-    std::string testname = "func_check_two_strides_medium_kernelsize";
+    std::string testname = "convolution_fwd:func_check_two_strides_medium_kernelsize";
     float* temp = dstDataGPU.getDataFromGPU();
     std::string str  = convert_to_string((float*)temp,(int)dstDataGPU.get_num_elements());
     write_to_csv(strt, str, testname,avg_time, str_ip_size, str_k_size, str_op_size);
@@ -131,7 +131,7 @@ high_resolution_timer_t timer;
     std::cout << "Average Time: " << avg_time << std::endl;
 
     std::string strt = "./result_unittest.csv";
-    std::string testname = "func_check_padding_and_strides_small_size";
+    std::string testname = "convolution_fwd:func_check_padding_and_strides_small_size";
     float* temp = dstDataGPU.getDataFromGPU();
     std::string str  = convert_to_string((float*)temp,(int)dstDataGPU.get_num_elements());
     write_to_csv(strt, str, testname,avg_time, str_ip_size, str_k_size, str_op_size);
@@ -177,7 +177,7 @@ high_resolution_timer_t timer;
     std::cout << "Average Time: " << avg_time << std::endl;
 
     std::string strt = "./result_unittest.csv";
-    std::string testname = "func_check_full_conv";
+    std::string testname = "convolution_fwd:func_check_full_conv";
     float* temp = dstDataGPU.getDataFromGPU();
     std::string str  = convert_to_string((float*)temp,(int)dstDataGPU.get_num_elements());
     write_to_csv(strt, str, testname, avg_time, str_ip_size, str_k_size, str_op_size);
@@ -223,7 +223,7 @@ high_resolution_timer_t timer;
     std::cout << "Average Time: " << avg_time << std::endl;
 
 std::string strt = "./result_unittest.csv";
-std::string testname = "func_check_dilation1x1";
+std::string testname = "convolution_fwd:func_check_dilation1x1";
 float* temp = dstDataGPU.getDataFromGPU();
 std::string str = convert_to_string((float*)temp,(int)dstDataGPU.get_num_elements());
 write_to_csv(strt, str, testname,avg_time, str_ip_size, str_k_size, str_op_size);

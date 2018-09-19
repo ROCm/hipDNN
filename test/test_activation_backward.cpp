@@ -30,7 +30,7 @@ TEST(activation_backward, func_test_naive_activation) {
     double avg_time = std::accumulate(time_vector.begin() + 10, time_vector.end(), 0.0) / (benchmark_iterations - 10);
     std::cout << "Average Time: " << avg_time << std::endl;
     std::string strt = "./result_unittest.csv";
-    std::string testname = "func_test_naive_activation";
+    std::string testname = "activation_backward:func_test_naive_activation";
     float* temp = dataDst.getDataFromGPU();
     std::string str  = convert_to_string((float*)temp,(int)dataDst.get_num_elements());
     write_to_csv(strt, str, testname, avg_time, str_ip_size, str_k_size, str_op_size);
