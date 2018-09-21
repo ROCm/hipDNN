@@ -27,6 +27,8 @@
 #include <map>
 #include <logger.h>
 #include "hip/hip_runtime.h"
+#include <iterator>
+
 
 
 #define CHECK_MIO(expression)                                                           \
@@ -67,12 +69,35 @@
 
 //Eventually those can be merged, but currently i will not mix device pointers with host data in the same map...
 //HGSOS static std::map<miopenPoolingDescriptor_t, void *>  sPoolingDescToWorkspace;  ????
+
+static std::map<hipdnnConvolutionDescriptor_t, void*> sDescToWorkSpaceForwardConvolution;
+static std::map<hipdnnConvolutionDescriptor_t, size_t> sDescToWorkSpaceForwardConvolutionSize;
+
+static std::map<hipdnnConvolutionDescriptor_t, void*> sDescToWorkSpaceBackwardDataConvolution;
+static std::map<hipdnnConvolutionDescriptor_t, size_t> sDescToWorkSpaceBackwardDataConvolutionSize;
+
+static std::map<hipdnnConvolutionDescriptor_t, void*> sDescToWorkSpaceBackwardKernelConvolution;
+static std::map<hipdnnConvolutionDescriptor_t, size_t> sDescToWorkSpaceBackwardKernelConvolutionSize;
+
 static std::map<miopenTensorDescriptor_t, int8_t*> sDescToWorkspacePooling; //device pointers
 static std::map<miopenTensorDescriptor_t, size_t> sDescToWorkspacePoolingSize; //host
 
 static std::map<miopenTensorDescriptor_t, int8_t*> sDescToWorkspaceLRN; //device pointers
 static std::map<miopenTensorDescriptor_t, size_t> sDescToWorkspaceLRNSize; //host
 static std::map<miopenConvolutionDescriptor_t, int*> sDescTo3DConvolution; // To bookkeep 3D depth information
+
+void Free(hipdnnConvolutionDescriptor_t convDesc, std::map<hipdnnConvolutionDescriptor_t, void*> &map, std::map<hipdnnConvolutionDescriptor_t, size_t> &size) {
+std::map<hipdnnConvolutionDescriptor_t, void*> :: iterator itr;
+
+if ( map.find(convDesc) != map.end() )
+    if (map[convDesc] != NULL)
+        if (size[convDesc] > 0 ) {
+
+           hipFree(map[convDesc]);
+           map.erase(convDesc);
+           size.erase(convDesc);
+        }
+}
 
 
 // Custom TensorAdd Kernel
@@ -993,6 +1018,10 @@ hipdnnStatus_t hipdnnGetConvolution2dForwardOutputDim(
 
 hipdnnStatus_t hipdnnDestroyConvolutionDescriptor(
         hipdnnConvolutionDescriptor_t convDesc) {
+    Free(convDesc,sDescToWorkSpaceForwardConvolution, sDescToWorkSpaceForwardConvolutionSize);
+    Free(convDesc,sDescToWorkSpaceBackwardKernelConvolution, sDescToWorkSpaceBackwardKernelConvolutionSize);
+    Free(convDesc,sDescToWorkSpaceBackwardDataConvolution, sDescToWorkSpaceBackwardDataConvolutionSize);
+
     CHECK_MIO(miopenDestroyConvolutionDescriptor(convDesc));
     return HIPDNN_STATUS_SUCCESS;
 }
@@ -1130,30 +1159,28 @@ hipdnnStatus_t hipdnnFindConvolutionForwardAlgorithmEx(hipdnnHandle_t handle,
 
     HIPDNN_OPEN_LOG_C("Invoking miopenConvolutionForwardGetWorkSpaceSize"<<std::flush);
     size_t expectedWorkSpaceSize = 0, infoWorkSpaceSize = 0;
-    CHECK_MIO(miopenConvolutionForwardGetWorkSpaceSize(handle, wDesc, xDesc,
-                        convDesc, yDesc, &expectedWorkSpaceSize));
-    /*CHECK_HIP(hipMemPtrGetInfo(workSpace, &infoWorkSpaceSize));
-    if (infoWorkSpaceSize != workSpaceSizeInBytes) {
-        HIPDNN_OPEN_LOG_C("Incompatible workSpace size and workSpaceSizeInBytes"<< std::flush);
-        return HIPDNN_STATUS_INVALID_VALUE;
-    }*/
-    if (workSpaceSizeInBytes != expectedWorkSpaceSize) {
-        // If workSpaceSize provided isn't as expected we make an internal workspace allocation
-        void* workSpaceInternal = NULL;
-        HIPDNN_OPEN_LOG_I("INTERNAL_ALLOC: hipdnnFindConvolutionForwardAlgorithmEx size "
-        << workSpaceSizeInBytes << " requested AlgoCount: "
-        << requestedAlgoCount  << std::flush);
+    void *workSpaceInternal = NULL;
 
-        CHECK_HIP(hipMalloc((void**) &workSpaceInternal, expectedWorkSpaceSize));
+    if ( sDescToWorkSpaceForwardConvolution.find(convDesc) == sDescToWorkSpaceForwardConvolution.end()) {
+         // If the descriptor is not present in the map , create one and add to the container
+
+         HIPDNN_OPEN_LOG_I("INTERNAL_ALLOC: hipdnnConvolutionForward size and workspace.");
 
 
-        HIPDNN_OPEN_LOG_I("INTERNAL_ALLOC: workspaceInternal "
-        << "WSP = " << workSpaceInternal
-        << " size = " << expectedWorkSpaceSize  << std::flush);
+         // convDesc is used for workspace
+         CHECK_MIO(miopenConvolutionForwardGetWorkSpaceSize(handle, wDesc, xDesc,
+                  convDesc, yDesc, &expectedWorkSpaceSize));
+         CHECK_HIP(hipMalloc((void**) &workSpaceInternal, expectedWorkSpaceSize));
+         sDescToWorkSpaceForwardConvolution[convDesc] = workSpaceInternal;
+         sDescToWorkSpaceForwardConvolutionSize[convDesc] = expectedWorkSpaceSize;
 
-        HIPDNN_OPEN_LOG_C("Size of miopenPerfResults " << sizeof(miopenPerfResults)
-        << std::flush);
-        HIPDNN_OPEN_LOG_C("Invoking miopenFindConvolutionForwardAlgorithm cD "<< convDesc);
+       }
+    else
+      {
+         workSpaceInternal = sDescToWorkSpaceForwardConvolution[convDesc];
+         expectedWorkSpaceSize = sDescToWorkSpaceForwardConvolutionSize[convDesc];
+       }
+
         CHECK_MIO(
                 miopenFindConvolutionForwardAlgorithm(handle, xDesc, x, wDesc,
                         w, convDesc, yDesc, y, requestedAlgoCount,
@@ -1162,19 +1189,6 @@ hipdnnStatus_t hipdnnFindConvolutionForwardAlgorithmEx(hipdnnHandle_t handle,
                         ));
 
         HIPDNN_OPEN_LOG_C("Invoked miopenFindConvolutionForwardAlgorithm");
-        FreeUpBuffer(workSpaceInternal);
-    }
-    else {
-        HIPDNN_OPEN_LOG_I("PREALLOCATED hipdnnFindConvolutionForwardAlgorithmEx size "
-        << workSpaceSizeInBytes << ", WS PTR =" << workSpace <<",requested AlgoCount: "
-        << requestedAlgoCount  << std::flush);
-        CHECK_MIO(
-                miopenFindConvolutionForwardAlgorithm(handle, xDesc, x, wDesc,
-                        w, convDesc, yDesc, y, requestedAlgoCount,
-                        returnedAlgoCount, miopenPerfResults, workSpace,
-                        workSpaceSizeInBytes, false //exhaustiveSearch
-                        ));
-    }
 
     for (int i = 0; i < *returnedAlgoCount; i++) {
         CHECK_HIPDNN(miopenTohipConvolutionFwdAlgo(
@@ -1226,29 +1240,26 @@ hipdnnStatus_t hipdnnConvolutionForward(hipdnnHandle_t handle,
     HIPDNN_OPEN_LOG_C("calling hipdnnConvolutionForward."  << std::flush);
 
     size_t expectedWorkSpaceSize =0, infoWorkSpaceSize = 0;
+    void *workSpaceInternal = NULL;
 
-    CHECK_MIO(miopenConvolutionForwardGetWorkSpaceSize(handle, wDesc, xDesc,
-            convDesc, yDesc, &expectedWorkSpaceSize));
-//    CHECK_HIP(hipMemPtrGetInfo(workSpace, &infoWorkSpaceSize));
-//
-//    if (infoWorkSpaceSize != workSpaceSizeInBytes) {
-//         HIPDNN_OPEN_LOG_C("Incompatible workSpace size and workSpaceSizeInBytes"<< std::flush);
-//         return HIPDNN_STATUS_INVALID_VALUE;
-//     }
-    if (workSpaceSizeInBytes != expectedWorkSpaceSize) {
-        void* workSpaceInternal = NULL;
-        HIPDNN_OPEN_LOG_I("INTERNAL_ALLOC: hipdnnConvolutionForward size."
+    if ( sDescToWorkSpaceForwardConvolution.find(convDesc) == sDescToWorkSpaceForwardConvolution.end() ) {
+         // If the descriptor is not present in the map , create one and add to the container
+
+         HIPDNN_OPEN_LOG_I("INTERNAL_ALLOC: hipdnnConvolutionForward size and workspace."
          << std::flush);
+         // convDesc is used for workspace
+         CHECK_MIO(miopenConvolutionForwardGetWorkSpaceSize(handle, wDesc, xDesc,
+                  convDesc, yDesc, &expectedWorkSpaceSize));
+         CHECK_HIP(hipMalloc((void**) &workSpaceInternal, expectedWorkSpaceSize));
+         sDescToWorkSpaceForwardConvolution[convDesc] = workSpaceInternal;
+         sDescToWorkSpaceForwardConvolutionSize[convDesc] = expectedWorkSpaceSize;
 
-
-        CHECK_HIP(hipMalloc((void**) &workSpaceInternal, expectedWorkSpaceSize));
-
-        HIPDNN_OPEN_LOG_I("INTERNAL_ALLOC: sConvolutionForwardAlgorithmWorkspace "
-        << "WSP= " << workSpaceInternal
-        << " size = " << expectedWorkSpaceSize  << std::flush);
-
-        HIPDNN_OPEN_LOG_C("Invoking hipToMopenConvolutionFwdAlgo"  << std::flush);
-        HIPDNN_OPEN_LOG_C("Passed algo" << algo  << std::flush);
+       }
+    else
+      {
+         workSpaceInternal = sDescToWorkSpaceForwardConvolution[convDesc];
+         expectedWorkSpaceSize = sDescToWorkSpaceForwardConvolutionSize[convDesc];
+      }
 
         miopenConvFwdAlgorithm_t mialgo;
         CHECK_HIPDNN(hipTomiopenConvolutionFwdAlgo(algo, &mialgo));
@@ -1258,27 +1269,8 @@ hipdnnStatus_t hipdnnConvolutionForward(hipdnnHandle_t handle,
                 miopenConvolutionForward(handle, alpha, xDesc, x, wDesc, w,
                         convDesc, mialgo, beta, yDesc, y,
                         workSpaceInternal, expectedWorkSpaceSize));
-        FreeUpBuffer(workSpaceInternal);
-        return HIPDNN_STATUS_SUCCESS;
-    } else {
-
-        miopenConvFwdAlgorithm_t mialgo;
-        HIPDNN_OPEN_LOG_C("Invoking hipToMopenConvolutionFwdAlgo"  << std::flush);
-        HIPDNN_OPEN_LOG_C("Passed algo" << algo  << std::flush);
-
-        CHECK_HIPDNN(hipTomiopenConvolutionFwdAlgo(algo, &mialgo));
-
-        HIPDNN_OPEN_LOG_C("Invoked hipToMopenConvolutionFwdAlgo"  << std::flush);
-
-        HIPDNN_OPEN_LOG_C("Invoking MiopenConvolutionFwd"  << std::flush);
-
-        CHECK_MIO(
-                miopenConvolutionForward(handle, alpha, xDesc, x, wDesc, w,
-                        convDesc, mialgo, beta, yDesc, y, workSpace,
-                        workSpaceSizeInBytes));
 
         return HIPDNN_STATUS_SUCCESS;
-    }
 
 }
 
@@ -1393,39 +1385,38 @@ hipdnnStatus_t hipdnnFindConvolutionBackwardFilterAlgorithmEx(
             new miopenConvAlgoPerf_t[requestedAlgoCount];
 
     size_t expectedWorkSpaceSize = 0;
-    CHECK_MIO(miopenConvolutionBackwardWeightsGetWorkSpaceSize(handle,
+    void *workSpaceInternal = NULL;
+	size_t infoWorkSpaceSize = 0;
+
+    if ( sDescToWorkSpaceBackwardKernelConvolution.find(convDesc) == sDescToWorkSpaceBackwardKernelConvolution.end() ) {
+         // If the descriptor is not present in the map , create one and add to the container
+
+         HIPDNN_OPEN_LOG_I( "INTERNAL_ALLOC hipdnnFindConvolutionBackwardFilterAlgorithmEx");
+         // convDesc is used for workspace
+         CHECK_MIO(miopenConvolutionBackwardWeightsGetWorkSpaceSize(handle,
                           dyDesc, xDesc, convDesc, dwDesc, &expectedWorkSpaceSize));
+
+         CHECK_HIP(hipMalloc((void**) &workSpaceInternal, expectedWorkSpaceSize));
+         sDescToWorkSpaceBackwardKernelConvolution[convDesc] = workSpaceInternal;
+         sDescToWorkSpaceBackwardKernelConvolutionSize[convDesc] = expectedWorkSpaceSize;
+
+       }
+    else
+      {
+         workSpaceInternal = sDescToWorkSpaceBackwardKernelConvolution[convDesc];
+         expectedWorkSpaceSize = sDescToWorkSpaceBackwardKernelConvolutionSize[convDesc];
+      }
 
 
     try {
-        if (workSpaceSizeInBytes != expectedWorkSpaceSize) {
-
-            void* workSpaceInternal = NULL;
-            HIPDNN_OPEN_LOG_I( "INTERNAL_ALLOC hipdnnFindConvolutionBackwardFilterAlgorithmEx");
-
-            CHECK_HIP(hipMalloc((void**) &workSpaceInternal, expectedWorkSpaceSize));
-
-            HIPDNN_OPEN_LOG_I("INTERNAL_ALLOC: sConvolutionBackwardFilterAlgorithmWorkspace "
-                << "WSP= " << workSpaceInternal
-                << " size = " << expectedWorkSpaceSize  << std::flush);
-
-            CHECK_MIO(miopenFindConvolutionBackwardWeightsAlgorithm(handle,
+          CHECK_MIO(miopenFindConvolutionBackwardWeightsAlgorithm(handle,
                             dyDesc, dy, xDesc, x, convDesc, dwDesc, dw,
                             requestedAlgoCount, returnedAlgoCount,
                             miopenPerfResults,
                             workSpaceInternal, expectedWorkSpaceSize,
                             false //exhaustiveSearch
                             ));
-            FreeUpBuffer(workSpaceInternal);
-        }
-        else {
-            CHECK_MIO(miopenFindConvolutionBackwardWeightsAlgorithm(handle,
-                            dyDesc, dy, xDesc, x, convDesc, dwDesc, dw,
-                            requestedAlgoCount, returnedAlgoCount,
-                            miopenPerfResults, workSpace, workSpaceSizeInBytes,
-                            false //exhaustiveSearch
-                            ));
-        }
+
     } catch (std::exception& e) {
           std::cout << "EXCEPTION: hipdnnFindConvolutionBackwardFilterAlgorithmEx"
                 << e.what() << std::endl HIPDNNFLUSH
@@ -1483,18 +1474,27 @@ hipdnnStatus_t hipdnnConvolutionBackwardFilter(hipdnnHandle_t handle,
 
     HIPDNN_OPEN_LOG_C("CALL_STACK: Inside hipdnnConvolutionBackwardFilter");
     size_t expectedWorkSpaceSize;
-    CHECK_MIO(miopenConvolutionBackwardWeightsGetWorkSpaceSize(handle, dyDesc,
+    void *workSpaceInternal = NULL;
+	size_t infoWorkSpaceSize;
+
+    if ( sDescToWorkSpaceBackwardKernelConvolution.find(convDesc) == sDescToWorkSpaceBackwardKernelConvolution.end() ) {
+         // If the descriptor is not present in the map , create one and add to the container
+
+         HIPDNN_OPEN_LOG_I("INTERNAL_ALLOC: hipdnnConvolutionBackwardFilter");
+         // convDesc is used for workspace
+         CHECK_MIO(miopenConvolutionBackwardWeightsGetWorkSpaceSize(handle, dyDesc,
                         xDesc, convDesc, dwDesc, &expectedWorkSpaceSize));
+         CHECK_HIP(hipMalloc((void**) &workSpaceInternal, expectedWorkSpaceSize));
+         sDescToWorkSpaceBackwardKernelConvolution[convDesc] = workSpaceInternal;
+         sDescToWorkSpaceBackwardKernelConvolutionSize[convDesc] = expectedWorkSpaceSize;
 
+       }
+    else
+      {
+         workSpaceInternal = sDescToWorkSpaceBackwardKernelConvolution[convDesc];
+         expectedWorkSpaceSize = sDescToWorkSpaceBackwardKernelConvolutionSize[convDesc];
+       }
 
-    if (workSpaceSizeInBytes != expectedWorkSpaceSize) {
-        void* workSpaceInternal = NULL;
-        HIPDNN_OPEN_LOG_I("INTERNAL_ALLOC: hipdnnConvolutionBackwardFilter");
-        CHECK_HIP(hipMalloc((void**) &workSpaceInternal, expectedWorkSpaceSize));
-
-        HIPDNN_OPEN_LOG_I("INTERNAL_ALLOC: sConvolutionBackwardFilterAlgorithmWorkspace "
-                << "WSP= " << workSpaceInternal
-                << " size = " << expectedWorkSpaceSize  << std::flush);
         miopenConvBwdWeightsAlgorithm_t mialgo;
         CHECK_HIPDNN(hipTomiopenConvolutionBwdFilterAlgo(algo, &mialgo));
         if(*static_cast<const float*>(beta) == 0) {
@@ -1511,29 +1511,6 @@ hipdnnStatus_t hipdnnConvolutionBackwardFilter(hipdnnHandle_t handle,
             FreeUpBuffer(dwPrior);
 
         }
-        FreeUpBuffer(workSpaceInternal);
-    } else {
-        HIPDNN_OPEN_LOG_I("PREALLCOATED: hipdnnConvolutionBackwardFilter:" << workSpace
-                  << ", size= " << workSpaceSizeInBytes
-                  << ",x PTR = "  << x  << std::flush);
-        miopenConvBwdWeightsAlgorithm_t mialgo;
-        CHECK_HIPDNN(hipTomiopenConvolutionBwdFilterAlgo(algo,
-                &mialgo));
-        if(*static_cast<const float*>(beta) == 0) {
-
-            CHECK_MIO(miopenConvolutionBackwardWeights(handle, alpha, dyDesc, dy,
-                            xDesc, x, convDesc, mialgo, beta, dwDesc, dw,
-                            workSpace, workSpaceSizeInBytes));
-        } else
-        {
-            const float tempBeta=0;
-            void* dwPrior = SaveAsPriorBuffer(dw);
-            CHECK_MIO(miopenConvolutionBackwardWeights(handle, alpha, dyDesc, dy,
-                                        xDesc, x, convDesc, mialgo, &tempBeta, dwDesc, dw,
-                                        workSpace, workSpaceSizeInBytes));
-            accumulateGradients(dw, dwPrior, dwDesc, beta);
-            FreeUpBuffer(dwPrior);
-        }
 
         HIPDNN_OPEN_LOG_C("miopenConvolutionBackwardWeights "
             << ",handle= " <<  handle
@@ -1549,8 +1526,6 @@ hipdnnStatus_t hipdnnConvolutionBackwardFilter(hipdnnHandle_t handle,
             << ",beta=" << beta
             << ",dwDesc=" << dwDesc
             << ",dw=" << dw  << std::flush);
-    }
-
 
     return HIPDNN_STATUS_SUCCESS;
 
@@ -1675,29 +1650,34 @@ hipdnnStatus_t hipdnnFindConvolutionBackwardDataAlgorithmEx(
             << requestedAlgoCount << ", WS PTR=" << workSpace 
             << std::flush);
 
-    size_t expectedWorkSpaceSize;
+    size_t expectedWorkSpaceSize, infoWorkSpaceSize;
+    void *workSpaceInternal = NULL;
+
     miopenConvAlgoPerf_t* miopenPerfResults =
-            new miopenConvAlgoPerf_t[requestedAlgoCount];
-    CHECK_MIO(
-              miopenConvolutionBackwardDataGetWorkSpaceSize(handle, dyDesc,
-                      wDesc, convDesc, dxDesc, &expectedWorkSpaceSize));
+          new miopenConvAlgoPerf_t[requestedAlgoCount];
 
-    try {
-
-        void* workSpaceInternal = NULL;
+    if ( sDescToWorkSpaceBackwardDataConvolution.find(convDesc) == sDescToWorkSpaceBackwardDataConvolution.end() ) {
+         // If the descriptor is not present in the map , create one and add to the container
 
         HIPDNN_OPEN_LOG_I( "INTERNAL_ALLOC: miopenConvolutionBackwardGetWorkSpaceSize size "
                 << expectedWorkSpaceSize << " requested AlgoCount: "
                 << requestedAlgoCount  << std::flush);
 
+         CHECK_MIO(
+              miopenConvolutionBackwardDataGetWorkSpaceSize(handle, dyDesc,
+                      wDesc, convDesc, dxDesc, &expectedWorkSpaceSize));
+         CHECK_HIP(hipMalloc((void**) &workSpaceInternal, expectedWorkSpaceSize));
+         sDescToWorkSpaceBackwardDataConvolution[convDesc] = workSpaceInternal;
+         sDescToWorkSpaceBackwardDataConvolutionSize[convDesc] = expectedWorkSpaceSize;
 
-        CHECK_HIP(hipMalloc((void**) &workSpaceInternal, expectedWorkSpaceSize));
+       }
+    else
+       {
+           workSpaceInternal = sDescToWorkSpaceBackwardDataConvolution[convDesc];
+           expectedWorkSpaceSize = sDescToWorkSpaceBackwardDataConvolutionSize[convDesc];
+       }
 
-
-        HIPDNN_OPEN_LOG_I( "INTERNAL_ALLOC: miopenConvolutionBackwardGetWorkSpaceSize "
-                << "WSP= " << workSpaceInternal
-                << " size = " << expectedWorkSpaceSize  << std::flush);
-
+    try {
 
         CHECK_MIO(
             miopenFindConvolutionBackwardDataAlgorithm(handle, dyDesc, dy,
@@ -1708,8 +1688,6 @@ hipdnnStatus_t hipdnnFindConvolutionBackwardDataAlgorithmEx(
 
         HIPDNN_OPEN_LOG_C( "...miopenFindConvolutionBackwardDataAlgorithm OK, returnedAlgoCount:"
         << *returnedAlgoCount  << std::flush);
-
-        FreeUpBuffer(workSpaceInternal);
     }
     catch (std::exception& e) {
         std::cout
@@ -1746,26 +1724,26 @@ hipdnnStatus_t hipdnnConvolutionBackwardData(hipdnnHandle_t handle,
             << ", WS size = " << workSpaceSizeInBytes  << std::flush);
 
     size_t expectedWorkSpaceSize = 0;
-    CHECK_MIO(miopenConvolutionBackwardDataGetWorkSpaceSize(handle,
+    void *workSpaceInternal = NULL;
+	size_t infoWorkSpaceSize = 0;
+
+    if ( sDescToWorkSpaceBackwardDataConvolution.find(convDesc) == sDescToWorkSpaceBackwardDataConvolution.end() ) {
+         // If the descriptor is not present in the map , create one and add to the container
+         CHECK_MIO(miopenConvolutionBackwardDataGetWorkSpaceSize(handle,
                                 dyDesc, wDesc, convDesc, dxDesc, &expectedWorkSpaceSize));
 
+         CHECK_HIP(hipMalloc((void**) &workSpaceInternal, expectedWorkSpaceSize));
+         sDescToWorkSpaceBackwardDataConvolution[convDesc] = workSpaceInternal;
+         sDescToWorkSpaceBackwardDataConvolutionSize[convDesc] = expectedWorkSpaceSize;
+
+       }
+    else
+       {  workSpaceInternal = sDescToWorkSpaceBackwardDataConvolution[convDesc];
+         expectedWorkSpaceSize = sDescToWorkSpaceBackwardDataConvolutionSize[convDesc];
+       }
 
     try
     {
-        if (workSpace == NULL || workSpaceSizeInBytes == 0)
-        {
-            void* workSpaceInternal = NULL;
-            HIPDNN_OPEN_LOG_I("ConvolutionBackwardData: INTERNAL_ALLOC: hipdnnConvolutionBackwardData");
-
-            CHECK_HIP(hipMalloc((void**) &workSpaceInternal,
-                    expectedWorkSpaceSize));
-
-            HIPDNN_OPEN_LOG_I("ConvolutionBackwardData: Allocated workspace "
-            << "WSP = "
-            << workSpaceInternal
-            << ", size:" << expectedWorkSpaceSize  << std::flush);
-
-
             // Allocate sConvolutionBackwardDataAlgorithmWorkspace to gather work space value
             miopenConvBwdDataAlgorithm_t mialgo;
             CHECK_HIPDNN(hipTomiopenConvolutionBwdDataAlgo(algo, &mialgo));
@@ -1793,43 +1771,6 @@ hipdnnStatus_t hipdnnConvolutionBackwardData(hipdnnHandle_t handle,
                                             workSpaceInternal, expectedWorkSpaceSize));
                 accumulateGradients(dx, dxPrior, dxDesc, beta);
                 FreeUpBuffer(dxPrior);
-            }
-            FreeUpBuffer(workSpaceInternal);
-
-        }
-        else
-        {
-            HIPDNN_OPEN_LOG_C( "ConvolutionBackwardData: workspace preallocated."
-             << std::flush);
-
-            miopenConvBwdDataAlgorithm_t mialgo;
-            CHECK_HIPDNN(hipTomiopenConvolutionBwdDataAlgo(algo,
-                    &mialgo));
-
-            float a = *(static_cast<const float*>(alpha));
-            float b = *(static_cast<const float*>(beta));
-
-
-            HIPDNN_OPEN_LOG_C("ConvolutionBackwardData: alpha and beta values are "
-            << a << " and " << b  << std::flush);
-
-            if(*static_cast<const float*>(beta) == 0) {
-                CHECK_MIO(miopenConvolutionBackwardData(handle, alpha, dyDesc, dy,
-                            wDesc, w, convDesc, mialgo, beta, dxDesc, dx,
-                            workSpace, workSpaceSizeInBytes));
-            } else {
-                const float tempBeta = 0;
-                void* dxPrior = SaveAsPriorBuffer(dx);
-                CHECK_MIO(miopenConvolutionBackwardData(handle, alpha, dyDesc, dy,
-                                            wDesc, w, convDesc, mialgo, &tempBeta, dxDesc, dx,
-                                            workSpace, workSpaceSizeInBytes));
-                accumulateGradients(dx, dxPrior, dxDesc, beta);
-                FreeUpBuffer(dxPrior);
-            }
-
-
-            HIPDNN_OPEN_LOG_C( "ConvolutionBackwardData: Invoked miopenConvolutionBackwardData "
-             << std::flush);
         }
 
     } catch (std::exception& e) {
