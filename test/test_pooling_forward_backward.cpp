@@ -11,7 +11,7 @@ TEST(pooling_fwd_back, func_check_fwd_bwd) {
 
   int ip_size[4] = {pool.mb, pool.c, pool.ih, pool.iw};
   int k_size[4] = {pool.mb, pool.c, pool.kh, pool.kw};
-  int op_size[4] =  {pool.mb, pool.c, pool.oh, pool.ow};
+  int op_size[4] =  {pool.mb, pool.c, pool.ih, pool.iw};
 
   std::string str_ip_size  = convert_to_string((int*)ip_size,4);
   std::string str_k_size  = convert_to_string((int*)k_size,4);
