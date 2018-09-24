@@ -1,4 +1,4 @@
-# Taken from Caffe2
+# Taken from facebook/TensorComprehensions
 
 # - Try to find cuDNN
 #

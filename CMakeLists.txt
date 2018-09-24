@@ -11,7 +11,7 @@ set(CPACK_PACKAGING_INSTALL_PREFIX "/opt/rocm/hipdnn" CACHE STRING "Package inst
 
 
 project(hipdnn CXX)
-add_definitions(-std=c++11)
+
 # HIP_PATH
 IF(NOT DEFINED ENV{HIP_PATH})
   SET(HIP_PATH "/opt/rocm/hip")
@@ -30,11 +30,8 @@ IF(${HIP_PLATFORM} MATCHES "hcc")
     set(MIOPEN_PATH $ENV{MIOPEN_PATH})
   endif()
 ELSE()
-  if (NOT DEFINED ENV{CUDNN_PATH})
-    set(CUDNN_PATH "/usr/local/cuda-9.2/")
-  else()
-    set(CUDNN_PATH $ENV{CUDNN_PATH})
-  endif()
+  set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR}/cmake)
+  find_package(CuDNN REQUIRED)
 ENDIF()
 
 add_subdirectory(library)
