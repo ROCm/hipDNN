@@ -47,4 +47,3 @@ int IsLogging(LoggingLevel level);
   OPEN_LOG(open::LoggingLevel::MARSHALLING, __VA_ARGS__)
 
 } // namespace open
-  // namespace open
