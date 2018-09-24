@@ -5,7 +5,7 @@ TEST(convolution_bwd_filter, func_check_backward_conv_filter) {
     Desc filterDesc(1, 3, 5, 5);
     int pad[2] = {0, 0};    // zero padding
     int stride[2] = {5, 5}; // stride 1
-    double avg_time = 0;
+    double avg_time = 0.0;
 	
     Desc outputDesc =
         calculateConv2DOutputDesc_bwd(inputDesc, filterDesc, pad, stride);
