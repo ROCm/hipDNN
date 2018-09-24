@@ -1,6 +1,6 @@
 #include "test_convolution_forward.hpp"
 
-TEST(convolution_fwd, func_check_zero_padding) {
+TEST(convolution_fwd, func_check_zero_padding_medium_input) {
     Desc inputDesc(1, 3, 224, 224);
     Desc filterDesc(21, 3, 3, 3);
     int pad[2] = {0, 0};    // zero padding
@@ -41,7 +41,7 @@ TEST(convolution_fwd, func_check_zero_padding) {
     std::cout << "Average Time: " << avg_time << std::endl;
 
     std::string strt = "./result_unittest.csv";
-    std::string testname = "convolution_fwd:func_check_zero_padding";
+    std::string testname = "convolution_fwd:func_check_zero_padding_medium_input";
     float* temp = dstDataGPU.getDataFromGPU();
     std::string str  = convert_to_string((float*)temp,(int)dstDataGPU.get_num_elements());
     write_to_csv(strt, str, testname, avg_time, str_ip_size, str_k_size, str_op_size);

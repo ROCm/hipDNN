@@ -29,16 +29,16 @@ def test_compare(amd_op,nv_op):
 			if (line1['Test_name'] == line2['Test_name']):
 				flag = 'pass'
 				if (line1['Output'] == line2['Output']):
-					time_nv = line2['Average Excecution Time (milliseconds)']
+					time_nv = line2['Average Excecution Time (microseconds)']
 					print ("test pass for "+line1['Test_name'])
 					print(sum(c1!=c2 for c1,c2 in zip(line1['Output'],line2['Output'])))
 					
 				else:
-					time_nv = line2['Average Excecution Time (milliseconds)']
+					time_nv = line2['Average Excecution Time (microseconds)']
 					flag = "fail"
 					print ("test fail for "+line1['Test_name']+"!!!difference in outputs!!!!")
 					print(sum(c1!=c2 for c1,c2 in zip(line1['Output'],line2['Output'])))
 
-		writer.writerow({'Test name':line1['Test_name'],'Performance in Nvidia':time_nv,'Performance in AMD':line1['Average Excecution Time (milliseconds)'],'Input size':line1['Input size'], 'kernel size':line1['kernel size'], 'output size':line1['output size'], 'Results':flag})
+		writer.writerow({'Test name':line1['Test_name'],'Performance in Nvidia':time_nv,'Performance in AMD':line1['Average Excecution Time (microseconds)'],'Input size':line1['Input size'], 'kernel size':line1['kernel size'], 'output size':line1['output size'], 'Results':flag})
 			
 test_compare(amd_op,nv_op)

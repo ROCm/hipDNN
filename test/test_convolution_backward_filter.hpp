@@ -3,6 +3,33 @@
 
 #include "hipDNN_test_common.h"
 
+void print2(const float *data, int n, int c, int h, int w) {
+  std::vector<float> buffer ( 1 << 20 );
+  
+
+  HIP_CALL(hipMemcpy(
+        buffer.data(), data,
+        n * c * h * w * sizeof(float),
+        hipMemcpyDeviceToHost));
+
+
+
+  int a = 0;
+  for (int i = 0; i < n; ++i) {
+    for (int j = 0; j < c; ++j) {
+      std::cout << "n=" << n << ", c=" << c << ":" << std::endl;
+      for (int k = 0; k < h; ++k) {
+        for (int l = 0; l < w; ++l) {
+          std::cout << "\t"<<  std::setw(4) << std::right << buffer[a];
+          ++a;
+        }
+        std::cout << std::endl;
+      }
+    }
+  }
+  std::cout << std::endl;
+}
+
 Desc calculateConv2DOutputDesc_bwd(Desc inputDesc, Desc filterDesc, int pad[2],
                                int stride[2]) {
   assert(inputDesc.C == filterDesc.C);
@@ -30,10 +57,16 @@ struct test_convolution_bwd_filter {
   int dilh, dilw; // dilation along height and width
 };
 
+template <typename T>
+__global__ void dev_const(hipLaunchParm lp, T *px, float k) {
+  int tid = hipThreadIdx_x + hipBlockIdx_x * hipBlockDim_x;
+  px[tid] = k;
+}
+
 template <typename dataType>
 void compute_hipdnn_conv_bwd_filter(test_convolution_bwd_filter &c, dataType *src,
                              dataType *weights, dataType *grad, dataType *bias, 
-                             dataType *dst) {
+                             dataType *dst, dataType& avg_time) {
 
   hipdnnHandle_t hipdnn;
   checkHIPDNN(hipdnnCreate(&hipdnn));
@@ -73,6 +106,8 @@ void compute_hipdnn_conv_bwd_filter(test_convolution_bwd_filter &c, dataType *sr
 
   checkHIPDNN(hipdnnGetConvolutionForwardWorkspaceSize( hipdnn, in_desc, filt_desc, conv_desc, out_desc, algo, &ws_size));
 
+  hipLaunchKernel(dev_const, c.mb * c.oc, c.oh * c.ow , 0, 0 ,dst, 0);
+
   float alpha = 1.f;
   float beta = 0.f;
 
@@ -93,14 +128,52 @@ checkHIPDNN(hipdnnConvolutionForward(
 
    hipMalloc(&ws_data, ws_size);
 
+   hipLaunchKernel(dev_const, c.oc * c.ic, c.kh * c.kw , 0, 0 ,grad, 0);
+
+
   hipdnnFindConvolutionBackwardFilterAlgorithmEx(hipdnn, in_desc, src, out_desc, dst, conv_desc, filt_desc, weights, MaxAlgoCount , &calgo, b_algoPerf, ws_data, ws_size);
   b_algo = (hipdnnConvolutionBwdFilterAlgo_t)b_algoPerf[0].algo;
 
+ //std::cout<<"\nweights bfr back_conv:\n";
 
-checkHIPDNN(hipdnnConvolutionBackwardFilter(hipdnn, &alpha, in_desc,
+ //print2(weights,c.oc,c.ic,c.kh,c.kw);
+
+ //std::cout<<"\ngrad bfr back_conv:\n";
+
+ //print2(grad,c.oc,c.ic,c.kh,c.kw);
+
+ //std::cout<<"\ndst bfr back_conv:\n";
+
+ //print2(dst,c.mb,c.oc,c.oh,c.ow);
+
+ high_resolution_timer_t timer;
+std::vector<double> time_vector(benchmark_iterations, 0);
+    for(int i = 0; i < benchmark_iterations; i++){
+  ///std::cout<<"\nweights for iteration back_conv "<<i<<" :\n";
+
+ //print2(weights,c.oc,c.ic,c.kh,c.kw);  
+
+  timer.restart();
+ checkHIPDNN(hipdnnConvolutionBackwardFilter(hipdnn, &alpha, in_desc,
                                                   src, out_desc, dst, conv_desc,
                                                   b_algo, ws_data, ws_size,
                                                   &beta,filt_desc,grad ));
+std::uint64_t time_elapsed = timer.elapsed_nanoseconds();
+        time_vector[i] = (double)time_elapsed / 1000;
+ }
+ 
+ avg_time = std::accumulate(time_vector.begin() + 10, time_vector.end(), 0) / (benchmark_iterations - 10);
+    std::cout << "#######################################Average Time: " << avg_time << std::endl;
+  //std::cout<<"\nweights aftr back_conv:\n";
+  //print2(weights,c.oc,c.ic,c.kh,c.kw);
+
+  //std::cout<<"\ngrad aftr back_conv:\n";
+
+ //print2(grad,c.oc,c.ic,c.kh,c.kw);
+
+ //std::cout<<"\ndst aftr back_conv:\n";
+
+ //print2(dst,c.mb,c.oc,c.oh,c.ow);
 
   hipFree(ws_data);
   hipdnnDestroyTensorDescriptor(out_desc);
