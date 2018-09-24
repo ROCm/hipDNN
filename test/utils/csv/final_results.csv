@@ -1,0 +1,14 @@
+Test name,Performance in Nvidia,Performance in AMD,Input size,kernel size,output size,Results
+activation_backward:func_test_naive_activation,2505.64,0.289592,"[1,1,224,244]",NIL,"[1,1,224,244]",pass
+pooling_fwd:func_check_zero_padding,2485,0,"[1,1,224,224]","[1,1,2,2]","[1,1,112,112]",pass
+convolution_fwd:func_check_zero_padding_medium_input,0,47,"[1,3,224,224]","[21,3,3,3]","[1,21,222,222]",pass
+convolution_fwd:func_check_two_strides_medium_kernelsize,50523,132,"[1,3,600,600]","[2,3,30,30]","[1,2,286,286]",pass
+convolution_fwd:func_check_padding_and_strides_small_size,5196,47,"[1,3,7,7]","[21,3,3,3]","[1,21,5,5]",pass
+convolution_fwd:func_check_full_conv,5430,48,"[1,3,7,7]","[3,3,7,7]","[1,3,1,1]",pass
+convolution_fwd:func_check_dilation1x1,5596,47,"[1,3,7,7]","[3,3,3,3]","[1,3,9,9]",pass
+activation_fwd_bwd:func_test_fwd_bwd_activation,4956.96,0.587426,"[1,1,4,4]",NIL,"[1,1,4,4]",pass
+activation_forward:func_test_fwd_activation,2563.02,0.278414,"[1,1,4,4]",NIL,"[1,1,4,4]",pass
+pooling_backward:func_check_pooling_stride_2x2,2535,0,"[1,1,4,4]","[1,1,2,2]","[1,1,4,4]",pass
+convolution_intg:func_test_fwd_bwd_convolution,18.3494,96.2634,"[1,3,9,9]","[1,3,3,3]","[1,3,3,3]",pass
+pooling_intg:func_pooling_fwd_bwd,5071.47,0.744727,"[1,1,4,4]","[1,1,2,2]","[1,1,4,4]",pass
+convolution_bwd_filter:func_check_backward_conv_filter,14,93,"[1,3,30,30]","[1,3,5,5]","[1,3,5,5]",pass
