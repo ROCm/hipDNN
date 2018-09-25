@@ -89,17 +89,14 @@ static std::map<miopenConvolutionDescriptor_t, int*> sDescTo3DConvolution; // To
 void Free(hipdnnConvolutionDescriptor_t convDesc, std::map<hipdnnConvolutionDescriptor_t, void*> &map, std::map<hipdnnConvolutionDescriptor_t, size_t> &size) {
 std::map<hipdnnConvolutionDescriptor_t, void*> :: iterator itr;
 
-if ( map.find(convDesc) != map.end() ) {
-    if (map[convDesc] != NULL) {
+if ( map.find(convDesc) != map.end() )
+    if (map[convDesc] != NULL)
         if (size[convDesc] > 0 ) {
 
            hipFree(map[convDesc]);
            map.erase(convDesc);
            size.erase(convDesc);
-          }
-      }
-  }
-  size.clear();
+        }
 }
 
 
