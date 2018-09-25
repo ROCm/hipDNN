@@ -1,6 +1,7 @@
 #include "test_pooling_common.hpp"
 
 TEST(pooling_fwd_back, func_check_fwd_bwd) {
+  float avg_time = 0, avg_time1 = 0, avg_time2 = 0;
   int oheight = 4, owidth = 4;
   pool_fwd pool(1, 1, 4, 4, 2, 2, 2, 2, 0, 0, 2, 2);
   pool_bwd test_case(1, 1, 4, 4, 2, 2, 0, 0, 2, 2, 1, 1, oheight, owidth);
@@ -17,19 +18,12 @@ TEST(pooling_fwd_back, func_check_fwd_bwd) {
   std::string str_k_size  = convert_to_string((int*)k_size,4);
   std::string str_op_size  = convert_to_string((int*)op_size,4);
 
-  high_resolution_timer_t timer;
+  hipdnn_maxpool_fwd<float>(pool, srcData.gpu(), dstData.gpu(), &avg_time1);
+  hipdnn_pooling_backward<float>(test_case, srcData.gpu(), gradData.gpu(), dstData.gpu(), &avg_time2);
+     
+    avg_time = (avg_time1 + avg_time2);
 
-    std::vector<double> time_vector(benchmark_iterations);
-    for(int i = 0; i < benchmark_iterations; i++){
-      timer.restart();
-      hipdnn_maxpool_fwd<float>(pool, srcData.gpu(), dstData.gpu());
-      hipdnn_pooling_backward(test_case, srcData.gpu(), gradData.gpu(), dstData.gpu());
-      hipDeviceSynchronize();
-      std::uint64_t time_elapsed = timer.elapsed_nanoseconds();
-      time_vector[i] = (double)time_elapsed / 1000.0;
-    }
-    double avg_time = std::accumulate(time_vector.begin() + 10, time_vector.end(), 0.0) / (benchmark_iterations - 10);
-    std::cout << "Average Time: " << avg_time << std::endl;
+    std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
 
     float* temp2 = gradData.getDataFromGPU();
 

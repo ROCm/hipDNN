@@ -43,7 +43,7 @@ struct pool_bwd {
 
 template <typename dataType>
 void hipdnn_maxpool_fwd(pool_fwd &c, dataType *src,
-                                dataType *dst) {
+                                dataType *dst, float *avg_time) {
 
   hipdnnHandle_t handle;
   checkHIPDNN(hipdnnCreate(&handle));
@@ -66,8 +66,19 @@ void hipdnn_maxpool_fwd(pool_fwd &c, dataType *src,
   float alpha = 1.f;
   float beta = 0.f;
 
-  checkHIPDNN(hipdnnPoolingForward(handle, pool_desc, &alpha, in_desc, src,
+  high_resolution_timer_t timer;
+  std::vector<double> time_vector(benchmark_iterations, 0);
+  for (int i = 0; i < benchmark_iterations; i++) {
+
+      timer.restart();  
+      checkHIPDNN(hipdnnPoolingForward(handle, pool_desc, &alpha, in_desc, src,
                                    &beta, out_desc, dst));
+      hipDeviceSynchronize();
+      std::uint64_t time_elapsed = timer.elapsed_nanoseconds();
+      time_vector[i] = (double)time_elapsed / 1000;
+    }
+
+    *avg_time = (float)std::accumulate(time_vector.begin() + 10, time_vector.end(), 0) / (benchmark_iterations - 10);
 
   checkHIPDNN(hipdnnDestroyTensorDescriptor(in_desc));
   checkHIPDNN(hipdnnDestroyTensorDescriptor(out_desc));
@@ -78,7 +89,7 @@ void hipdnn_maxpool_fwd(pool_fwd &c, dataType *src,
 
 template <typename dataType>
 void hipdnn_pooling_backward(pool_bwd &test_case, dataType *src,
-                                     dataType *grad, dataType *dst) {
+                                     dataType *grad, dataType *dst, float *avg_time) {
 
   hipdnnHandle_t hipdnn;
   checkHIPDNN(hipdnnCreate(&hipdnn));
@@ -110,9 +121,20 @@ void hipdnn_pooling_backward(pool_bwd &test_case, dataType *src,
 
   hipdnnPoolingForward(hipdnn, pool_desc, &alpha, in_desc, src, &beta, out_desc,
                        dst);
-  
-  hipdnnPoolingBackward(hipdnn, pool_desc, &alpha, out_desc, dst, out_desc, dst,
+
+  high_resolution_timer_t timer;
+  std::vector<double> time_vector(benchmark_iterations, 0);
+  for (int i = 0; i < benchmark_iterations; i++) {
+
+      timer.restart();
+      hipdnnPoolingBackward(hipdnn, pool_desc, &alpha, out_desc, dst, out_desc, dst,
                         in_desc, src, &beta, in_desc, grad);
+       hipDeviceSynchronize();
+       std::uint64_t time_elapsed = timer.elapsed_nanoseconds();
+       time_vector[i] = (double)time_elapsed / 1000;
+    }
+
+    *avg_time = (float)std::accumulate(time_vector.begin() + 10, time_vector.end(), 0) / (benchmark_iterations - 10);
 
   hipdnnDestroyTensorDescriptor(out_desc);
   hipdnnDestroyPoolingDescriptor(pool_desc);
