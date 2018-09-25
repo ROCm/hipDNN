@@ -5,7 +5,7 @@ TEST(convolution_fwd_bwd, func_test_fwd_bwd_convolution) {
     Desc filterDesc(1, 3, 3, 3);
     int pad[2] = {0, 0};    // zero padding
     int stride[2] = {1, 1}; // stride 1
-
+    float avg_time = 0, avg_time1 = 0, avg_time2 = 0;
     Desc outputDesc =
         calculateConv2DOutputDesc_int(inputDesc, filterDesc, pad, stride);
     Memory<float> srcData = createMemory<float>(inputDesc);
@@ -26,25 +26,19 @@ TEST(convolution_fwd_bwd, func_test_fwd_bwd_convolution) {
   std::string str_k_size  = convert_to_string((int*)k_size,4);
   std::string str_op_size  = convert_to_string((int*)op_size,4);
 
-  high_resolution_timer_t timer;
-
-    std::vector<double> time_vector(benchmark_iterations,0);
-    for(int i = 0; i < benchmark_iterations; i++){
-      populateMemoryRandom<float>(srcData);
-      populateMemoryRandom<float>(filterData);
-      timer.restart();
-
-      compute_hipdnn_conv_forward<float>(testConvolutionSizes, srcData.gpu(),
-                                filterData.gpu(), NULL, dstDataGPU.gpu());
-      compute_hipdnn_conv_backward_filter<float>(testConvolutionSizes, srcData.gpu(),
+  populateMemoryRandom<float>(srcData);
+  populateMemoryRandom<float>(filterData);
+  
+  compute_hipdnn_conv_forward<float>(testConvolutionSizes, srcData.gpu(),
+                                filterData.gpu(), NULL, dstDataGPU.gpu(),&avg_time1);
+  compute_hipdnn_conv_backward_filter<float>(testConvolutionSizes, srcData.gpu(),
                                  filterData.gpu(), gradData.gpu(), NULL,
-                                 dstDataGPU.gpu());
+                                 dstDataGPU.gpu(),&avg_time2);
 
-      std::uint64_t time_elapsed = timer.elapsed_nanoseconds();
-      time_vector[i] = (double)time_elapsed / 1e6;
-    }
-    double avg_time = std::accumulate(time_vector.begin() + 10, time_vector.end(), 0.0) / (benchmark_iterations - 10);
-    std::cout << "Average Time: " << avg_time << std::endl;
+  avg_time = (avg_time1 + avg_time2);
+    
+ std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
+
     float* temp2 = gradData.getDataFromGPU();
     std::string strt = "./result_unittest.csv";
     std::string testname = "convolution_intg:func_test_fwd_bwd_convolution";

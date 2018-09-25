@@ -3,29 +3,6 @@
 
 #include "hipDNN_test_common.h"
 
-void print2(const float *data, int n, int c, int h, int w) {
-    std::vector<float> buffer(1 << 20);
-
-    HIP_CALL(hipMemcpy(buffer.data(), data, n * c * h * w * sizeof(float),
-                       hipMemcpyDeviceToHost));
-
-    int a = 0;
-    for (int i = 0; i < n; ++i) {
-        for (int j = 0; j < c; ++j) {
-            std::cout << "n=" << n << ", c=" << c << ":" << std::endl;
-            for (int k = 0; k < h; ++k) {
-                for (int l = 0; l < w; ++l) {
-                    std::cout << "\t" << std::setw(4) << std::right
-                              << buffer[a];
-                    ++a;
-                }
-                std::cout << std::endl;
-            }
-        }
-    }
-    std::cout << std::endl;
-}
-
 Desc calculateConv2DOutputDesc_bwd(Desc inputDesc, Desc filterDesc, int pad[2],
                                    int stride[2]) {
     assert(inputDesc.C == filterDesc.C);
@@ -65,7 +42,7 @@ template <typename dataType>
 void compute_hipdnn_conv_bwd_filter(test_convolution_bwd_filter &c,
                                     dataType *src, dataType *weights,
                                     dataType *grad, dataType *bias,
-                                    dataType *dst, double &avg_time) {
+                                    dataType *dst, float *avg_time) {
 
     hipdnnHandle_t hipdnn;
     checkHIPDNN(hipdnnCreate(&hipdnn));
@@ -144,24 +121,13 @@ void compute_hipdnn_conv_bwd_filter(test_convolution_bwd_filter &c,
         checkHIPDNN(hipdnnConvolutionBackwardFilter(
             hipdnn, &alpha, in_desc, src, out_desc, dst, conv_desc, b_algo,
             ws_data, ws_size, &beta, filt_desc, grad));
+
+        hipDeviceSynchronize();
         std::uint64_t time_elapsed = timer.elapsed_nanoseconds();
         time_vector[i] = (double)time_elapsed / 1000;
     }
 
-    avg_time = std::accumulate(time_vector.begin() + 10, time_vector.end(), 0) /
-               (benchmark_iterations - 10);
-    std::cout << "#######################################Average Time: "
-              << avg_time << std::endl;
-    // std::cout<<"\nweights aftr back_conv:\n";
-    // print2(weights,c.oc,c.ic,c.kh,c.kw);
-
-    // std::cout<<"\ngrad aftr back_conv:\n";
-
-    // print2(grad,c.oc,c.ic,c.kh,c.kw);
-
-    // std::cout<<"\ndst aftr back_conv:\n";
-
-    // print2(dst,c.mb,c.oc,c.oh,c.ow);
+    *avg_time = (float)std::accumulate(time_vector.begin() + 10, time_vector.end(), 0) / (benchmark_iterations - 10);
 
     hipFree(ws_data);
     hipdnnDestroyTensorDescriptor(out_desc);
