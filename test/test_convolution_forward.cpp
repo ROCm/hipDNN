@@ -1,7 +1,7 @@
 #include "test_convolution_forward.hpp"
 
-TEST(convolution_fwd, func_check_zero_padding_medium_input) {
-    Desc inputDesc(1, 3, 224, 224);
+TEST(convolution_fwd, func_check_zero_padding_medium_input_batch32) {
+    Desc inputDesc(32, 3, 224, 224);
     Desc filterDesc(21, 3, 3, 3);
     int pad[2] = {0, 0};    // zero padding
     int stride[2] = {1, 1}; // stride 1
@@ -34,7 +34,7 @@ TEST(convolution_fwd, func_check_zero_padding_medium_input) {
   std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
 
     std::string strt = "./result_unittest.csv";
-    std::string testname = "convolution_fwd:func_check_zero_padding_medium_input";
+    std::string testname = "convolution_fwd:func_check_zero_padding_medium_input_batch32";
     float* temp = dstDataGPU.getDataFromGPU();
     std::string str  = convert_to_string((float*)temp,(int)dstDataGPU.get_num_elements());
     write_to_csv(strt, str, testname, avg_time, str_ip_size, str_k_size, str_op_size);
@@ -160,8 +160,8 @@ TEST(convolution_fwd, func_check_full_conv) {
     write_to_csv(strt, str, testname, avg_time, str_ip_size, str_k_size, str_op_size);
 }
 
-TEST(convolution_fwd, func_check_dilation1x1) {
-Desc inputDesc(1, 3, 7, 7);
+TEST(convolution_fwd, func_check_dilation1x1_batch64) {
+Desc inputDesc(64, 3, 7, 7);
 Desc filterDesc(3, 3, 3, 3);
 int pad[2] = {2, 2}; // padding 2
 int stride[2] = {1, 1}; // stride 1
@@ -194,7 +194,7 @@ stride[0], stride[1], 1, 1);
 std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
 
 std::string strt = "./result_unittest.csv";
-std::string testname = "convolution_fwd:func_check_dilation1x1";
+std::string testname = "convolution_fwd:func_check_dilation1x1_batch64";
 float* temp = dstDataGPU.getDataFromGPU();
 std::string str = convert_to_string((float*)temp,(int)dstDataGPU.get_num_elements());
 write_to_csv(strt, str, testname,avg_time, str_ip_size, str_k_size, str_op_size);
