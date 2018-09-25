@@ -1,7 +1,7 @@
 #ifndef TEST_CONVOLUTION_COMMON_H
 #define TEST_CONVOLUTION_COMMON_H
 
-#include "hipDNN_test_common.h"
+#include "hipdnn_test_common.h"
 
 struct test_convolution_size {
   test_convolution_size(int mb, int ng, int ic, int ih, int iw, int oc,

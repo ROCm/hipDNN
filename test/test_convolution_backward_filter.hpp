@@ -1,7 +1,7 @@
 #ifndef TEST_CONVOLUTION_BACKWARD_FILTER_HPP
 #define TEST_CONVOLUTION_BACKWARD_FILTER_HPP
 
-#include "hipDNN_test_common.h"
+#include "hipdnn_test_common.h"
 
 Desc calculateConv2DOutputDesc_bwd(Desc inputDesc, Desc filterDesc, int pad[2],
                                    int stride[2]) {
