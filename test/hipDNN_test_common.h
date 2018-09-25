@@ -143,7 +143,7 @@ template <typename dataType> void populateMemoryRandom(Memory<dataType> &mem) {
   auto gen = [&dist, &mersenne_engine]() { return dist(mersenne_engine); };
 int i = 0;
 	std::generate(v.begin(), v.end(), [&i]() mutable{
-			return ++i % 10;
+			return ++i % 5;
 		});
 //  std::iota(v.begin(), v.end(), -5);
   std::copy(v.begin(), v.end(), mem.cpu());
