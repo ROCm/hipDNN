@@ -1,7 +1,7 @@
 #include "csv_integration.hpp"
 
 void write_to_csv(std::string filename, std::string str, std::string testname,
-                  double avg_time, std::string str_ip_size, 
+                  float avg_time, std::string str_ip_size, 
                   std::string str_k_size, std::string str_op_size){
 	std::fstream fs2;
 	fs2.open(filename, std::ios::in);

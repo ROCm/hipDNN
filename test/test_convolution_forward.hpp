@@ -35,7 +35,7 @@ Desc calculateConv2DOutputDesc(Desc inputDesc, Desc filterDesc, int pad[2],
 
 template <typename dataType>
 void compute_hipdnn_conv_fwd(test_convolution_sizes_t &c, dataType *src,
-                             dataType *weights, dataType *bias, dataType *dst) {
+                             dataType *weights, dataType *bias, dataType *dst, float *avg_time) {
 
   hipdnnHandle_t hipdnn;
   checkHIPDNN(hipdnnCreate(&hipdnn));
@@ -83,9 +83,21 @@ void compute_hipdnn_conv_fwd(test_convolution_sizes_t &c, dataType *src,
   float alpha = 1.f;
   float beta = 0.f;
 
-  checkHIPDNN(hipdnnConvolutionForward(hipdnn, &alpha, in_desc, src, filt_desc,
+    high_resolution_timer_t timer;
+    std::vector<double> time_vector(benchmark_iterations, 0);
+    for (int i = 0; i < benchmark_iterations; i++) {
+
+        timer.restart();
+        checkHIPDNN(hipdnnConvolutionForward(hipdnn, &alpha, in_desc, src, filt_desc,
                                        weights, conv_desc, algo, ws_data,
                                        ws_size, &beta, out_desc, dst));
+     
+        hipDeviceSynchronize();
+        std::uint64_t time_elapsed = timer.elapsed_nanoseconds();
+        time_vector[i] = (double)time_elapsed / 1000;
+    }
+
+    *avg_time = (float)std::accumulate(time_vector.begin() + 10, time_vector.end(), 0) / (benchmark_iterations - 10);
 
   hipFree(ws_data);
   hipdnnDestroyTensorDescriptor(out_desc);
