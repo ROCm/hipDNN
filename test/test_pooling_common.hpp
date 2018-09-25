@@ -1,8 +1,8 @@
 #ifndef TEST_POOLING_COMMON_H
 #define TEST_POOLING_COMMON_H
 
-#include "hipDNN.h"
-#include "hipDNN_test_common.h"
+#include "hipdnn.h"
+#include "hipdnn_test_common.h"
 
 struct pool_fwd {
   int mb, c;      // Minibatch and channels
