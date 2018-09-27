@@ -353,11 +353,32 @@ typedef void *hipdnnRNNDescriptor_t;
 
 typedef void *hipdnnPersistentRNNPlan_t;
 
-typedef void *hipdnnConvolutionFwdAlgoPerf_t;
+typedef void *hipdnnDeterminism_t;
 
-typedef void *hipdnnConvolutionBwdFilterAlgoPerf_t;
-
-typedef void *hipdnnConvolutionBwdDataAlgoPerf_t;
+struct hipdnnConvolutionFwdAlgoPerf_t {
+    hipdnnConvolutionFwdAlgo_t algo;
+    hipdnnStatus_t status;
+    float time;
+    size_t memory;
+    hipdnnMathType_t mathType;
+    long reserved[3];
+};
+struct hipdnnConvolutionBwdDataAlgoPerf_t {
+    hipdnnConvolutionBwdDataAlgo_t algo;
+    hipdnnStatus_t status;
+    float time;
+    size_t memory;
+    hipdnnMathType_t mathType;
+    long reserved[3];
+};
+struct hipdnnConvolutionBwdFilterAlgoPerf_t {
+    hipdnnConvolutionBwdFilterAlgo_t algo;
+    hipdnnStatus_t status;
+    float time;
+    size_t memory;
+    hipdnnMathType_t mathType;
+    long reserved[3];
+};
 
 HIPDNN_EXPORT hipdnnStatus_t hipdnnCreate(hipdnnHandle_t *handle);
 
