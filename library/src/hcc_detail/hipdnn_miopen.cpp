@@ -2835,7 +2835,7 @@ hipdnnStatus_t hipdnnSetConvolutionNdDescriptor(
         d_w = dilationA[1];
         CHECK_MIO(miopenInitConvolutionDescriptor(
             (miopenConvolutionDescriptor_t)convDesc, miopenConvolution, pad_h,
-            pad_w, u, v, 1, 1));
+            pad_w, u, v, d_h, d_w));
     } else if (arrayLength == 3) {
         // 3D convolution Scenario
         // Got to book keep additional padding, stride and dilation info along
@@ -2850,7 +2850,7 @@ hipdnnStatus_t hipdnnSetConvolutionNdDescriptor(
         d_w = dilationA[1];
         CHECK_MIO(miopenInitConvolutionDescriptor(
             (miopenConvolutionDescriptor_t)convDesc, miopenConvolution, pad_h,
-            pad_w, u, v, 1, 1));
+            pad_w, u, v, d_h, d_w));
         // Populate the map container with key being newly created 2Ddescriptor
         // and value a 3 dim array with index mapping as
         // 0-pad, 1-stride and 2-dilation
