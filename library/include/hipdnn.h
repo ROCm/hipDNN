@@ -313,16 +313,6 @@ typedef enum {
 
 //=============================================================================
 
-// platform specific typedefs
-
-// #if defined(__HIP_PLATFORM_HCC__) and not defined(__HIP_PLATFORM_NVCC__)
-// #include <hcc_detail/hipdnn_miopen.h>
-// #elif defined(__HIP_PLATFORM_NVCC__) and not defined(__HIP_PLATFORM_HCC__)
-// #include <nvcc_detail/hipdnn_cudnn.h>
-// #else
-// #error("Must define exactly one of __HIP_PLATFORM_HCC__ or
-// __HIP_PLATFORM_NVCC__"); #endif
-
 #ifdef __cplusplus
 extern "C" {
 #endif
