@@ -6,7 +6,7 @@
 cmake_minimum_required( VERSION 2.8.8 )
 
 #Set default install and package paths.
-set(CMAKE_INSTALL_PREFIX "/opt/rocm/" CACHE STRING "Install location.")
+set(CMAKE_INSTALL_PREFIX "/opt/rocm/hipdnn" CACHE STRING "Install location.")
 set(CPACK_PACKAGING_INSTALL_PREFIX "/opt/rocm/hipdnn" CACHE STRING "Package install location.")
 
 
@@ -22,12 +22,7 @@ ENDIF()
 SET(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake  "${HIP_PATH}/cmake")
 EXECUTE_PROCESS(COMMAND ${HIP_PATH}/bin/hipconfig -P OUTPUT_VARIABLE HIP_PLATFORM)
 IF(${HIP_PLATFORM} MATCHES "hcc")
-# MIOPEN
-  if (NOT DEFINED ENV{MIOPEN_PATH})
-    set(MIOPEN_PATH "/opt/rocm/miopen")
-  else()
-    set(MIOPEN_PATH $ENV{MIOPEN_PATH})
-  endif()
+  find_package(MIOpen REQUIRED)
 ELSE()
   find_package(CuDNN REQUIRED)
   set(CUDNN_ROOT_DIR ${CUDNN_INCLUDE_DIR}/../)
@@ -77,6 +72,6 @@ INCLUDE(CPack)
 
 # Testing
 
-# enable_testing()
+enable_testing()
 
 add_subdirectory(test)

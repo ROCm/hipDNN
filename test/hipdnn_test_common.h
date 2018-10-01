@@ -1,7 +1,7 @@
 #ifndef HIPDNN_TEST_COMMON_HPP
 #define HIPDNN_TEST_COMMON_HPP
 
-#include "hipDNN.h"
+#include "hipdnn.h"
 #include "hip/hip_runtime.h"
 #include "gtest/gtest.h"
 #include <algorithm>

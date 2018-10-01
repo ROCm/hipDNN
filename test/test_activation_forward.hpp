@@ -1,4 +1,7 @@
-#include "hipDNN_test_common.h"
+#ifndef TEST_ACTIVATION_FORWARD_HPP
+#define TEST_ACTIVATION_FORWARD_HPP
+
+#include "hipdnn_test_common.h"
 
 struct activation_fwd_params {
   int n, channels, height, width;
@@ -9,7 +12,7 @@ struct activation_fwd_params {
 template <typename dataType>
 void compute_hipdnn_activation_forward(activation_fwd_params &test_case,
                                         dataType *src,
-                                        dataType *dst) {
+                                        dataType *dst, float *avg_time) {
   hipdnnHandle_t hipdnn;
   checkHIPDNN(hipdnnCreate(&hipdnn));
   hipdnnTensorDescriptor_t in_desc;
@@ -37,11 +40,26 @@ void compute_hipdnn_activation_forward(activation_fwd_params &test_case,
   float alpha = 1.f;
   float beta = 0.f;
 
-  hipdnnActivationForward(hipdnn, activationDesc, &alpha, in_desc, src, &beta,
+   high_resolution_timer_t timer;
+    std::vector<double> time_vector(benchmark_iterations, 0);
+    for (int i = 0; i < benchmark_iterations; i++) {
+
+        timer.restart();
+        hipdnnActivationForward(hipdnn, activationDesc, &alpha, in_desc, src, &beta,
                           out_desc, dst);
+
+        hipDeviceSynchronize();
+        std::uint64_t time_elapsed = timer.elapsed_nanoseconds();
+        time_vector[i] = (double)time_elapsed / 1000;
+    }
+
+    *avg_time = (float)std::accumulate(time_vector.begin() + 10, time_vector.end(), 0) / (benchmark_iterations - 10);
+
 
   hipdnnDestroyTensorDescriptor(out_desc);
   hipdnnDestroyActivationDescriptor(activationDesc);
   hipdnnDestroyTensorDescriptor(in_desc);
   hipdnnDestroy(hipdnn);
-} 
+}
+
+#endif //TEST_ACTIVATION_FORWARD_HPP
