@@ -807,7 +807,8 @@ hipdnnStatus_t accumulateGradients(void *gradient, void *gradientPrior,
         miopenFloat; // Currently only this format is supported
     int gradientArray[5];
     int gradientStride[5];
-    CHECK_MIO(miopenGetTensorDescriptor(gradientDesc, &dataType, gradientArray,
+    CHECK_MIO(miopenGetTensorDescriptor((miopenTensorDescriptor_t)gradientDesc,
+                                        &dataType, gradientArray,
                                         gradientStride));
 
     int totalElements = gradientArray[0] * gradientArray[1] * gradientArray[2] *
@@ -827,25 +828,27 @@ hipdnnStatus_t accumulateGradients(void *gradient, void *gradientPrior,
 //=============================================================================
 
 HIPDNN_EXPORT hipdnnStatus_t hipdnnCreate(hipdnnHandle_t *handle) {
-    CHECK_MIO(miopenCreate(handle));
+    CHECK_MIO(miopenCreate((miopenHandle_t *)handle));
     return HIPDNN_STATUS_SUCCESS;
 }
 
 hipdnnStatus_t hipdnnDestroy(hipdnnHandle_t handle) {
 
-    CHECK_MIO(miopenDestroy(handle));
+    CHECK_MIO(miopenDestroy((miopenHandle_t)handle));
 
     return HIPDNN_STATUS_SUCCESS;
 }
 
 hipdnnStatus_t hipdnnSetStream(hipdnnHandle_t handle, hipdnnStream_t streamId) {
-    CHECK_MIO(miopenSetStream(handle, streamId));
+    CHECK_MIO(miopenSetStream((miopenHandle_t)handle,
+                              (miopenAcceleratorQueue_t)streamId));
     return HIPDNN_STATUS_SUCCESS;
 }
 
 hipdnnStatus_t hipdnnGetStream(hipdnnHandle_t handle,
                                hipdnnStream_t *streamId) {
-    CHECK_MIO(miopenGetStream(handle, streamId));
+    CHECK_MIO(miopenGetStream((miopenHandle_t)handle,
+                              (miopenAcceleratorQueue_t *)streamId));
     return HIPDNN_STATUS_SUCCESS;
 }
 
@@ -853,7 +856,8 @@ size_t hipdnnGetVersion() { return 6000; }
 
 hipdnnStatus_t
 hipdnnCreateTensorDescriptor(hipdnnTensorDescriptor_t *tensorDesc) {
-    CHECK_MIO(miopenCreateTensorDescriptor(tensorDesc));
+    CHECK_MIO(
+        miopenCreateTensorDescriptor((miopenTensorDescriptor_t *)tensorDesc));
     return HIPDNN_STATUS_SUCCESS;
 }
 
@@ -866,7 +870,8 @@ hipdnnStatus_t hipdnnSetTensor4dDescriptor(hipdnnTensorDescriptor_t tensorDesc,
     miopenDataType_t miDT;
     CHECK_HIPDNN(hipTensorFormatSupported(format));
     CHECK_HIPDNN(hipTomiopenDataType(dataType, &miDT));
-    CHECK_MIO(miopenSet4dTensorDescriptor(tensorDesc, miDT, n, c, h, w));
+    CHECK_MIO(miopenSet4dTensorDescriptor((miopenTensorDescriptor_t)tensorDesc,
+                                          miDT, n, c, h, w));
     return HIPDNN_STATUS_SUCCESS;
 }
 
@@ -879,7 +884,8 @@ hipdnnStatus_t hipdnnSetFilter4dDescriptor(hipdnnFilterDescriptor_t filterDesc,
     miopenDataType_t miDT;
     CHECK_HIPDNN(hipTensorFormatSupported(format));
     CHECK_HIPDNN(hipTomiopenDataType(dataType, &miDT));
-    CHECK_MIO(miopenSet4dTensorDescriptor(filterDesc, miDT, k, c, h, w));
+    CHECK_MIO(miopenSet4dTensorDescriptor((miopenTensorDescriptor_t)filterDesc,
+                                          miDT, k, c, h, w));
     return HIPDNN_STATUS_SUCCESS;
 }
 
@@ -891,8 +897,9 @@ hipdnnStatus_t hipdnnGetTensor4dDescriptor(hipdnnTensorDescriptor_t tensorDesc,
                                            int *cStride, int *hStride,
                                            int *wStride) {
     miopenDataType_t midT;
-    CHECK_MIO(miopenGet4dTensorDescriptor(tensorDesc, &midT, n, c, h, w,
-                                          nStride, cStride, hStride, wStride));
+    CHECK_MIO(miopenGet4dTensorDescriptor((miopenTensorDescriptor_t)tensorDesc,
+                                          &midT, n, c, h, w, nStride, cStride,
+                                          hStride, wStride));
     return HIPDNN_STATUS_SUCCESS;
 }
 
@@ -900,7 +907,8 @@ hipdnnStatus_t hipdnnGetTensor4dDescriptor(hipdnnTensorDescriptor_t tensorDesc,
 
 hipdnnStatus_t
 hipdnnDestroyTensorDescriptor(hipdnnTensorDescriptor_t tensorDesc) {
-    CHECK_MIO(miopenDestroyTensorDescriptor(tensorDesc));
+    CHECK_MIO(
+        miopenDestroyTensorDescriptor((miopenTensorDescriptor_t)tensorDesc));
     return HIPDNN_STATUS_SUCCESS;
 }
 
@@ -915,12 +923,31 @@ hipdnnStatus_t hipdnnAddTensor(hipdnnHandle_t handle, const void *alpha,
     miopenTensorOp_t tensorOp = miopenTensorOpAdd;
     int alpha2 = 0;
 
-    CHECK_MIO(miopenOpTensor(handle, tensorOp, alpha, aDesc, A, beta, cDesc, C,
-                             &alpha2, cDesc, C));
+    CHECK_MIO(miopenOpTensor((miopenHandle_t)handle, tensorOp, alpha,
+                             (miopenTensorDescriptor_t)aDesc, A, beta,
+                             (miopenTensorDescriptor_t)cDesc, C, &alpha2,
+                             (miopenTensorDescriptor_t)cDesc, C));
     return HIPDNN_STATUS_SUCCESS;
 }
 
 //=============================================================================
+
+miopenTensorOp_t hipToMIOpenTensorOp(hipdnnOpTensorDescriptor_t opTensorDesc) {
+    // int *result = reinterpret_cast<int *>(opTensorDesc);
+    uintptr_t result = (uintptr_t)opTensorDesc;
+    switch (result) {
+    case 1:
+        return miopenTensorOpAdd;
+    case 2:
+        return miopenTensorOpMul;
+    case 3:
+        return miopenTensorOpMin;
+    case 4:
+        return miopenTensorOpMax;
+    default:
+        return miopenTensorOpAdd;
+    }
+}
 
 hipdnnStatus_t hipdnnOpTensor(
     hipdnnHandle_t handle, const hipdnnOpTensorDescriptor_t opTensorDesc,
@@ -928,8 +955,11 @@ hipdnnStatus_t hipdnnOpTensor(
     const void *alpha2, const hipdnnTensorDescriptor_t bDesc, const void *B,
     const void *beta, const hipdnnTensorDescriptor_t cDesc, void *C) {
 
-    CHECK_MIO(miopenOpTensor(handle, opTensorDesc, alpha1, aDesc, A, alpha2,
-                             bDesc, B, beta, cDesc, C));
+    CHECK_MIO(miopenOpTensor((miopenHandle_t)handle,
+                             hipToMIOpenTensorOp(opTensorDesc), alpha1,
+                             (miopenTensorDescriptor_t)aDesc, A, alpha2,
+                             (miopenTensorDescriptor_t)bDesc, B, beta,
+                             (miopenTensorDescriptor_t)cDesc, C));
     return HIPDNN_STATUS_SUCCESS;
 }
 //=============================================================================
@@ -937,7 +967,8 @@ hipdnnStatus_t hipdnnOpTensor(
 hipdnnStatus_t hipdnnSetTensor(hipdnnHandle_t handle,
                                const hipdnnTensorDescriptor_t yDesc, void *y,
                                const void *valuePtr) {
-    CHECK_MIO(miopenSetTensor(handle, yDesc, y, valuePtr));
+    CHECK_MIO(miopenSetTensor((miopenHandle_t)handle,
+                              (miopenTensorDescriptor_t)yDesc, y, valuePtr));
     return HIPDNN_STATUS_SUCCESS;
 }
 
@@ -946,7 +977,8 @@ hipdnnStatus_t hipdnnSetTensor(hipdnnHandle_t handle,
 hipdnnStatus_t hipdnnScaleTensor(hipdnnHandle_t handle,
                                  const hipdnnTensorDescriptor_t yDesc, void *y,
                                  const void *alpha) {
-    CHECK_MIO(miopenScaleTensor(handle, yDesc, y, alpha));
+    CHECK_MIO(miopenScaleTensor((miopenHandle_t)handle,
+                                (miopenTensorDescriptor_t)yDesc, y, alpha));
     return HIPDNN_STATUS_SUCCESS;
 }
 
@@ -967,7 +999,8 @@ hipdnnCreateFilterDescriptor(hipdnnFilterDescriptor_t *filterDesc) {
 
 hipdnnStatus_t
 hipdnnCreateConvolutionDescriptor(hipdnnConvolutionDescriptor_t *convDesc) {
-    CHECK_MIO(miopenCreateConvolutionDescriptor(convDesc));
+    CHECK_MIO(miopenCreateConvolutionDescriptor(
+        (miopenConvolutionDescriptor_t *)convDesc));
     return HIPDNN_STATUS_SUCCESS;
 }
 
@@ -987,9 +1020,10 @@ hipdnnStatus_t hipdnnSetConvolution2dDescriptor(
     hipdnnConvolutionDescriptor_t convDesc, int pad_h, int pad_w, int u, int v,
     int upscalex, int upscaley, hipdnnConvolutionMode_t mode,
     hipdnnDataType_t computeType) {
-    CHECK_MIO(miopenInitConvolutionDescriptor(
-        convDesc, hipTomiopenConvolutionMode(mode), pad_h, pad_w, u, v,
-        upscalex, upscaley));
+    CHECK_MIO(
+        miopenInitConvolutionDescriptor((miopenConvolutionDescriptor_t)convDesc,
+                                        hipTomiopenConvolutionMode(mode), pad_h,
+                                        pad_w, u, v, upscalex, upscaley));
     return HIPDNN_STATUS_SUCCESS;
 }
 
@@ -1001,8 +1035,9 @@ hipdnnStatus_t hipdnnGetConvolution2dDescriptor(
     hipdnnDataType_t *computeType) {
 
     miopenConvolutionMode_t miMode;
-    CHECK_MIO(miopenGetConvolutionDescriptor(convDesc, &miMode, pad_h, pad_y, u,
-                                             v, upscalex, upscaley));
+    CHECK_MIO(miopenGetConvolutionDescriptor(
+        (miopenConvolutionDescriptor_t)convDesc, &miMode, pad_h, pad_y, u, v,
+        upscalex, upscaley));
 
     *mode = miopenTohipConvolutionMode(miMode);
     // HGSOS miopen does not support this. Any better way to do this?
@@ -1020,8 +1055,10 @@ hipdnnStatus_t hipdnnGetConvolution2dForwardOutputDim(
     HIPDNN_OPEN_LOG_C("HIPDNN_SOFTMAX_MODE_INSTANCE NOT SUPPORTED."
                       << std::flush);
     CHECK_MIO(miopenGetConvolutionForwardOutputDim(
-        convDesc, // HGSOSOS should be const in miopen.
-        inputTensorDesc, filterDesc, n, c, h, w));
+        (miopenConvolutionDescriptor_t)
+            convDesc, // HGSOSOS should be const in miopen.
+        (miopenTensorDescriptor_t)inputTensorDesc,
+        (miopenTensorDescriptor_t)filterDesc, n, c, h, w));
     return HIPDNN_STATUS_SUCCESS;
 }
 
@@ -1036,7 +1073,8 @@ hipdnnDestroyConvolutionDescriptor(hipdnnConvolutionDescriptor_t convDesc) {
     Free(convDesc, sDescToWorkSpaceBackwardDataConvolution,
          sDescToWorkSpaceBackwardDataConvolutionSize);
 
-    CHECK_MIO(miopenDestroyConvolutionDescriptor(convDesc));
+    CHECK_MIO(miopenDestroyConvolutionDescriptor(
+        (miopenConvolutionDescriptor_t)convDesc));
 
     return HIPDNN_STATUS_SUCCESS;
 }
@@ -1056,7 +1094,10 @@ hipdnnStatus_t hipdnnFindConvolutionForwardAlgorithm(
     miopenConvFwdAlgorithm_t mialgo;
     // in miopen, workspace size does not depend on algo.
     CHECK_MIO(miopenConvolutionForwardGetWorkSpaceSize(
-        handle, wDesc, xDesc, convDesc, yDesc, sizeInBytes));
+        (miopenHandle_t)handle, (miopenTensorDescriptor_t)wDesc,
+        (miopenTensorDescriptor_t)xDesc,
+        (miopenConvolutionDescriptor_t)convDesc,
+        (miopenTensorDescriptor_t)yDesc, sizeInBytes));
 
     HIPDNN_OPEN_LOG_I("INTERNAL_ALLOC hipdnnFindConvolutionForwardAlgorithm");
 
@@ -1094,13 +1135,16 @@ hipdnnStatus_t hipdnnGetConvolutionForwardAlgorithm(
     const int requestedAlgoCount = 1;
     int returnedAlgoCount;
 
-    CHECK_MIO(miopenGetTensorNumBytes(xDesc, &numBytes));
+    CHECK_MIO(
+        miopenGetTensorNumBytes((miopenTensorDescriptor_t)xDesc, &numBytes));
     CHECK_HIP(hipMalloc((void **)&x, numBytes));
 
-    CHECK_MIO(miopenGetTensorNumBytes(wDesc, &numBytes));
+    CHECK_MIO(
+        miopenGetTensorNumBytes((miopenTensorDescriptor_t)wDesc, &numBytes));
     CHECK_HIP(hipMalloc((void **)&w, numBytes));
 
-    CHECK_MIO(miopenGetTensorNumBytes(yDesc, &numBytes));
+    CHECK_MIO(
+        miopenGetTensorNumBytes((miopenTensorDescriptor_t)yDesc, &numBytes));
     CHECK_HIP(hipMalloc((void **)&y, numBytes));
 
     hipdnnConvolutionFwdAlgoPerf_t *perfResults =
@@ -1157,7 +1201,10 @@ hipdnnStatus_t hipdnnFindConvolutionForwardAlgorithmEx(
 
         // convDesc is used for workspace
         CHECK_MIO(miopenConvolutionForwardGetWorkSpaceSize(
-            handle, wDesc, xDesc, convDesc, yDesc, &expectedWorkSpaceSize));
+            (miopenHandle_t)handle, (miopenTensorDescriptor_t)wDesc,
+            (miopenTensorDescriptor_t)xDesc,
+            (miopenConvolutionDescriptor_t)convDesc,
+            (miopenTensorDescriptor_t)yDesc, &expectedWorkSpaceSize));
         CHECK_HIP(
             hipMalloc((void **)&workSpaceInternal, expectedWorkSpaceSize));
         sDescToWorkSpaceForwardConvolution[convDesc] = workSpaceInternal;
@@ -1171,7 +1218,10 @@ hipdnnStatus_t hipdnnFindConvolutionForwardAlgorithmEx(
     }
 
     CHECK_MIO(miopenFindConvolutionForwardAlgorithm(
-        handle, xDesc, x, wDesc, w, convDesc, yDesc, y, requestedAlgoCount,
+        (miopenHandle_t)handle, (miopenTensorDescriptor_t)xDesc, x,
+        (miopenTensorDescriptor_t)wDesc, w,
+        (miopenConvolutionDescriptor_t)convDesc,
+        (miopenTensorDescriptor_t)yDesc, y, requestedAlgoCount,
         returnedAlgoCount, miopenPerfResults, workSpaceInternal,
         expectedWorkSpaceSize, false // exhaustiveSearch
         ));
@@ -1211,7 +1261,10 @@ hipdnnStatus_t hipdnnGetConvolutionForwardWorkspaceSize(
 
     // in miopen, workspace size does not depend on algo.
     CHECK_MIO(miopenConvolutionForwardGetWorkSpaceSize(
-        handle, wDesc, xDesc, convDesc, yDesc, sizeInBytes));
+        (miopenHandle_t)handle, (miopenTensorDescriptor_t)wDesc,
+        (miopenTensorDescriptor_t)xDesc,
+        (miopenConvolutionDescriptor_t)convDesc,
+        (miopenTensorDescriptor_t)yDesc, sizeInBytes));
 
     return HIPDNN_STATUS_SUCCESS;
 }
@@ -1242,7 +1295,10 @@ hipdnnConvolutionForward(hipdnnHandle_t handle, const void *alpha,
             << std::flush);
         // convDesc is used for workspace
         CHECK_MIO(miopenConvolutionForwardGetWorkSpaceSize(
-            handle, wDesc, xDesc, convDesc, yDesc, &expectedWorkSpaceSize));
+            (miopenHandle_t)handle, (miopenTensorDescriptor_t)wDesc,
+            (miopenTensorDescriptor_t)xDesc,
+            (miopenConvolutionDescriptor_t)convDesc,
+            (miopenTensorDescriptor_t)yDesc, &expectedWorkSpaceSize));
         CHECK_HIP(
             hipMalloc((void **)&workSpaceInternal, expectedWorkSpaceSize));
         sDescToWorkSpaceForwardConvolution[convDesc] = workSpaceInternal;
@@ -1260,8 +1316,11 @@ hipdnnConvolutionForward(hipdnnHandle_t handle, const void *alpha,
     HIPDNN_OPEN_LOG_C("Invoked hipToMopenConvolutionFwdAlgo" << std::flush);
     HIPDNN_OPEN_LOG_C("Invoking MiopenConvolutionFwd" << std::flush);
     CHECK_MIO(miopenConvolutionForward(
-        handle, alpha, xDesc, x, wDesc, w, convDesc, mialgo, beta, yDesc, y,
-        workSpaceInternal, expectedWorkSpaceSize));
+        (miopenHandle_t)handle, alpha, (miopenTensorDescriptor_t)xDesc, x,
+        (miopenTensorDescriptor_t)wDesc, w,
+        (miopenConvolutionDescriptor_t)convDesc, mialgo, beta,
+        (miopenTensorDescriptor_t)yDesc, y, workSpaceInternal,
+        expectedWorkSpaceSize));
 
     return HIPDNN_STATUS_SUCCESS;
 }
@@ -1276,8 +1335,9 @@ hipdnnConvolutionBackwardBias(hipdnnHandle_t handle, const void *alpha,
 
     HIPDNN_OPEN_LOG_C("calling hipdnnConvolutionBackwardBias." << std::flush);
 
-    CHECK_MIO(miopenConvolutionBackwardBias(handle, alpha, dyDesc, dy, beta,
-                                            dbDesc, db));
+    CHECK_MIO(miopenConvolutionBackwardBias(
+        (miopenHandle_t)handle, alpha, (miopenTensorDescriptor_t)dyDesc, dy,
+        beta, (miopenTensorDescriptor_t)dbDesc, db));
 
     return HIPDNN_STATUS_SUCCESS;
 }
@@ -1320,13 +1380,16 @@ hipdnnStatus_t hipdnnGetConvolutionBackwardFilterAlgorithm(
     int returnedAlgoCount;
     void *sConvolutionBackwardAlgorithmWorkspace = NULL;
 
-    CHECK_MIO(miopenGetTensorNumBytes(xDesc, &numBytes));
+    CHECK_MIO(
+        miopenGetTensorNumBytes((miopenTensorDescriptor_t)xDesc, &numBytes));
     CHECK_HIP(hipMalloc((void **)&x, numBytes));
 
-    CHECK_MIO(miopenGetTensorNumBytes(dwDesc, &numBytes));
+    CHECK_MIO(
+        miopenGetTensorNumBytes((miopenTensorDescriptor_t)dwDesc, &numBytes));
     CHECK_HIP(hipMalloc((void **)&dw, numBytes));
 
-    CHECK_MIO(miopenGetTensorNumBytes(dyDesc, &numBytes));
+    CHECK_MIO(
+        miopenGetTensorNumBytes((miopenTensorDescriptor_t)dyDesc, &numBytes));
     CHECK_HIP(hipMalloc((void **)&dy, numBytes));
 
     hipdnnConvolutionBwdFilterAlgoPerf_t *perfResults =
@@ -1376,7 +1439,10 @@ hipdnnStatus_t hipdnnFindConvolutionBackwardFilterAlgorithmEx(
             "INTERNAL_ALLOC hipdnnFindConvolutionBackwardFilterAlgorithmEx");
         // convDesc is used for workspace
         CHECK_MIO(miopenConvolutionBackwardWeightsGetWorkSpaceSize(
-            handle, dyDesc, xDesc, convDesc, dwDesc, &expectedWorkSpaceSize));
+            (miopenHandle_t)handle, (miopenTensorDescriptor_t)dyDesc,
+            (miopenTensorDescriptor_t)xDesc,
+            (miopenConvolutionDescriptor_t)convDesc,
+            (miopenTensorDescriptor_t)dwDesc, &expectedWorkSpaceSize));
 
         CHECK_HIP(
             hipMalloc((void **)&workSpaceInternal, expectedWorkSpaceSize));
@@ -1392,9 +1458,12 @@ hipdnnStatus_t hipdnnFindConvolutionBackwardFilterAlgorithmEx(
 
     try {
         CHECK_MIO(miopenFindConvolutionBackwardWeightsAlgorithm(
-            handle, dyDesc, dy, xDesc, x, convDesc, dwDesc, dw,
-            requestedAlgoCount, returnedAlgoCount, miopenPerfResults,
-            workSpaceInternal, expectedWorkSpaceSize,
+            (miopenHandle_t)handle, (miopenTensorDescriptor_t)dyDesc, dy,
+            (miopenTensorDescriptor_t)xDesc, x,
+            (miopenConvolutionDescriptor_t)convDesc,
+            (miopenTensorDescriptor_t)dwDesc, dw, requestedAlgoCount,
+            returnedAlgoCount, miopenPerfResults, workSpaceInternal,
+            expectedWorkSpaceSize,
             false // exhaustiveSearch
             ));
 
@@ -1435,7 +1504,10 @@ hipdnnStatus_t hipdnnGetConvolutionBackwardFilterWorkspaceSize(
         << algo << std::flush);
 
     CHECK_MIO(miopenConvolutionBackwardWeightsGetWorkSpaceSize(
-        handle, dyDesc, xDesc, convDesc, dwDesc, sizeInBytes));
+        (miopenHandle_t)handle, (miopenTensorDescriptor_t)dyDesc,
+        (miopenTensorDescriptor_t)xDesc,
+        (miopenConvolutionDescriptor_t)convDesc,
+        (miopenTensorDescriptor_t)dwDesc, sizeInBytes));
 
     HIPDNN_OPEN_LOG_C("EXIT hipdnnGetConvolutionBackwardFilterWorkspaceSize:"
                       << *sizeInBytes << std::flush);
@@ -1467,7 +1539,10 @@ hipdnnStatus_t hipdnnConvolutionBackwardFilter(
         HIPDNN_OPEN_LOG_I("INTERNAL_ALLOC: hipdnnConvolutionBackwardFilter");
         // convDesc is used for workspace
         CHECK_MIO(miopenConvolutionBackwardWeightsGetWorkSpaceSize(
-            handle, dyDesc, xDesc, convDesc, dwDesc, &expectedWorkSpaceSize));
+            (miopenHandle_t)handle, (miopenTensorDescriptor_t)dyDesc,
+            (miopenTensorDescriptor_t)xDesc,
+            (miopenConvolutionDescriptor_t)convDesc,
+            (miopenTensorDescriptor_t)dwDesc, &expectedWorkSpaceSize));
         CHECK_HIP(
             hipMalloc((void **)&workSpaceInternal, expectedWorkSpaceSize));
         sDescToWorkSpaceBackwardKernelConvolution[convDesc] = workSpaceInternal;
@@ -1484,14 +1559,20 @@ hipdnnStatus_t hipdnnConvolutionBackwardFilter(
     CHECK_HIPDNN(hipTomiopenConvolutionBwdFilterAlgo(algo, &mialgo));
     if (*static_cast<const float *>(beta) == 0) {
         CHECK_MIO(miopenConvolutionBackwardWeights(
-            handle, alpha, dyDesc, dy, xDesc, x, convDesc, mialgo, beta, dwDesc,
-            dw, workSpaceInternal, expectedWorkSpaceSize));
+            (miopenHandle_t)handle, alpha, (miopenTensorDescriptor_t)dyDesc, dy,
+            (miopenTensorDescriptor_t)xDesc, x,
+            (miopenConvolutionDescriptor_t)convDesc, mialgo, beta,
+            (miopenTensorDescriptor_t)dwDesc, dw, workSpaceInternal,
+            expectedWorkSpaceSize));
     } else {
         const float tempBeta = 0;
         void *dwPrior = SaveAsPriorBuffer(dw);
         CHECK_MIO(miopenConvolutionBackwardWeights(
-            handle, alpha, dyDesc, dy, xDesc, x, convDesc, mialgo, &tempBeta,
-            dwDesc, dw, workSpaceInternal, expectedWorkSpaceSize));
+            (miopenHandle_t)handle, alpha, (miopenTensorDescriptor_t)dyDesc, dy,
+            (miopenTensorDescriptor_t)xDesc, x,
+            (miopenConvolutionDescriptor_t)convDesc, mialgo, &tempBeta,
+            (miopenTensorDescriptor_t)dwDesc, dw, workSpaceInternal,
+            expectedWorkSpaceSize));
         accumulateGradients(dw, dwPrior, dwDesc, beta);
         deallocPrior(dwPrior);
     }
@@ -1520,7 +1601,10 @@ hipdnnStatus_t hipdnnGetConvolutionBackwardDataWorkspaceSize(
     // does not depend on algo in miopen
     try {
         CHECK_MIO(miopenConvolutionBackwardDataGetWorkSpaceSize(
-            handle, dyDesc, wDesc, convDesc, dxDesc, sizeInBytes));
+            (miopenHandle_t)handle, (miopenTensorDescriptor_t)dyDesc,
+            (miopenTensorDescriptor_t)wDesc,
+            (miopenConvolutionDescriptor_t)convDesc,
+            (miopenTensorDescriptor_t)dxDesc, sizeInBytes));
     } catch (std::exception &e) {
         std::cout
             << "Exception in hipdnnGetConvolutionBackwardDataWorkspaceSize: "
@@ -1572,13 +1656,16 @@ hipdnnStatus_t hipdnnGetConvolutionBackwardDataAlgorithm(
         int returnedAlgoCount;
         void *sConvolutionBackwardDataAlgorithmWorkspace = NULL;
 
-        CHECK_MIO(miopenGetTensorNumBytes(dxDesc, &numBytes));
+        CHECK_MIO(miopenGetTensorNumBytes((miopenTensorDescriptor_t)dxDesc,
+                                          &numBytes));
         CHECK_HIP(hipMalloc((void **)&dx, numBytes));
 
-        CHECK_MIO(miopenGetTensorNumBytes(wDesc, &numBytes));
+        CHECK_MIO(miopenGetTensorNumBytes((miopenTensorDescriptor_t)wDesc,
+                                          &numBytes));
         CHECK_HIP(hipMalloc((void **)&w, numBytes));
 
-        CHECK_MIO(miopenGetTensorNumBytes(dyDesc, &numBytes));
+        CHECK_MIO(miopenGetTensorNumBytes((miopenTensorDescriptor_t)dyDesc,
+                                          &numBytes));
         CHECK_HIP(hipMalloc((void **)&dy, numBytes));
 
         hipdnnConvolutionBwdDataAlgoPerf_t *perfResults =
@@ -1635,7 +1722,10 @@ hipdnnStatus_t hipdnnFindConvolutionBackwardDataAlgorithmEx(
             << " requested AlgoCount: " << requestedAlgoCount << std::flush);
 
         CHECK_MIO(miopenConvolutionBackwardDataGetWorkSpaceSize(
-            handle, dyDesc, wDesc, convDesc, dxDesc, &expectedWorkSpaceSize));
+            (miopenHandle_t)handle, (miopenTensorDescriptor_t)dyDesc,
+            (miopenTensorDescriptor_t)wDesc,
+            (miopenConvolutionDescriptor_t)convDesc,
+            (miopenTensorDescriptor_t)dxDesc, &expectedWorkSpaceSize));
         CHECK_HIP(
             hipMalloc((void **)&workSpaceInternal, expectedWorkSpaceSize));
         sDescToWorkSpaceBackwardDataConvolution[convDesc] = workSpaceInternal;
@@ -1651,9 +1741,13 @@ hipdnnStatus_t hipdnnFindConvolutionBackwardDataAlgorithmEx(
     try {
 
         CHECK_MIO(miopenFindConvolutionBackwardDataAlgorithm(
-            handle, dyDesc, dy, wDesc, w, convDesc, dxDesc, dx,
-            requestedAlgoCount, returnedAlgoCount, miopenPerfResults,
-            workSpaceInternal, expectedWorkSpaceSize, false // exhaustiveSearch
+            (miopenHandle_t)handle, (miopenTensorDescriptor_t)dyDesc, dy,
+            (miopenTensorDescriptor_t)wDesc, w,
+            (miopenConvolutionDescriptor_t)convDesc,
+            (miopenTensorDescriptor_t)dxDesc, dx, requestedAlgoCount,
+            returnedAlgoCount, miopenPerfResults, workSpaceInternal,
+            expectedWorkSpaceSize,
+            false // exhaustiveSearch
             ));
 
         HIPDNN_OPEN_LOG_C("...miopenFindConvolutionBackwardDataAlgorithm OK, "
@@ -1705,7 +1799,10 @@ hipdnnStatus_t hipdnnConvolutionBackwardData(
         // If the descriptor is not present in the map , create one and add to
         // the container
         CHECK_MIO(miopenConvolutionBackwardDataGetWorkSpaceSize(
-            handle, dyDesc, wDesc, convDesc, dxDesc, &expectedWorkSpaceSize));
+            (miopenHandle_t)handle, (miopenTensorDescriptor_t)dyDesc,
+            (miopenTensorDescriptor_t)wDesc,
+            (miopenConvolutionDescriptor_t)convDesc,
+            (miopenTensorDescriptor_t)dxDesc, &expectedWorkSpaceSize));
 
         CHECK_HIP(
             hipMalloc((void **)&workSpaceInternal, expectedWorkSpaceSize));
@@ -1736,15 +1833,20 @@ hipdnnStatus_t hipdnnConvolutionBackwardData(
         if (*static_cast<const float *>(beta) == 0) {
 
             CHECK_MIO(miopenConvolutionBackwardData(
-                handle, alpha, dyDesc, dy, wDesc, w, convDesc, mialgo, beta,
-                dxDesc, dx, workSpaceInternal, expectedWorkSpaceSize));
+                (miopenHandle_t)handle, alpha, (miopenTensorDescriptor_t)dyDesc,
+                dy, (miopenTensorDescriptor_t)wDesc, w,
+                (miopenConvolutionDescriptor_t)convDesc, mialgo, beta,
+                (miopenTensorDescriptor_t)dxDesc, dx, workSpaceInternal,
+                expectedWorkSpaceSize));
         } else {
             HIPDNN_OPEN_LOG_C("Case Beta !=0." << std::flush);
             const float tempBeta = 0;
             void *dxPrior = SaveAsPriorBuffer(dx);
             CHECK_MIO(miopenConvolutionBackwardData(
-                handle, alpha, dyDesc, dy, wDesc, w, convDesc, mialgo,
-                &tempBeta, dxDesc, dx, workSpaceInternal,
+                (miopenHandle_t)handle, alpha, (miopenTensorDescriptor_t)dyDesc,
+                dy, (miopenTensorDescriptor_t)wDesc, w,
+                (miopenConvolutionDescriptor_t)convDesc, mialgo, &tempBeta,
+                (miopenTensorDescriptor_t)dxDesc, dx, workSpaceInternal,
                 expectedWorkSpaceSize));
             accumulateGradients(dx, dxPrior, dxDesc, beta);
             deallocPrior(dxPrior);
@@ -1772,7 +1874,9 @@ hipdnnStatus_t hipdnnSoftmaxForward(hipdnnHandle_t handle,
 
     CHECK_HIPDNN(SoftmaxAlgorithmSupported(algo));
     CHECK_HIPDNN(hipSoftmaxModeSupported(mode));
-    CHECK_MIO(miopenSoftmaxForward(handle, alpha, xDesc, x, beta, yDesc, y));
+    CHECK_MIO(miopenSoftmaxForward((miopenHandle_t)handle, alpha,
+                                   (miopenTensorDescriptor_t)xDesc, x, beta,
+                                   (miopenTensorDescriptor_t)yDesc, y));
     return HIPDNN_STATUS_SUCCESS;
 }
 
@@ -1790,8 +1894,10 @@ hipdnnSoftmaxBackward(hipdnnHandle_t handle, hipdnnSoftmaxAlgorithm_t algo,
 
     CHECK_HIPDNN(SoftmaxAlgorithmSupported(algo));
     CHECK_HIPDNN(hipSoftmaxModeSupported(mode));
-    CHECK_MIO(miopenSoftmaxBackward(handle, alpha, yDesc, y, dyDesc, dy, beta,
-                                    dxDesc, dx));
+    CHECK_MIO(miopenSoftmaxBackward((miopenHandle_t)handle, alpha,
+                                    (miopenTensorDescriptor_t)yDesc, y,
+                                    (miopenTensorDescriptor_t)dyDesc, dy, beta,
+                                    (miopenTensorDescriptor_t)dxDesc, dx));
     return HIPDNN_STATUS_SUCCESS;
 }
 
@@ -1802,7 +1908,8 @@ hipdnnCreatePoolingDescriptor(hipdnnPoolingDescriptor_t *poolingDesc) {
 
     HIPDNN_OPEN_LOG_C("Inside hipdnnCreatePoolingDescriptor");
 
-    CHECK_MIO(miopenCreatePoolingDescriptor(poolingDesc));
+    CHECK_MIO(miopenCreatePoolingDescriptor(
+        (miopenPoolingDescriptor_t *)poolingDesc));
     return HIPDNN_STATUS_SUCCESS;
 }
 //=============================================================================
@@ -1819,8 +1926,9 @@ hipdnnStatus_t hipdnnSetPooling2dDescriptor(
 
     CHECK_HIPDNN(hipTomiopenPoolingMode(mode, &miPMode));
     CHECK_MIO(miopenSet2dPoolingDescriptor(
-        poolingDesc, miPMode, windowHeight, windowWidth, horizontalPadding,
-        verticalPadding, horizontalStride, verticalStride));
+        (miopenPoolingDescriptor_t)poolingDesc, miPMode, windowHeight,
+        windowWidth, horizontalPadding, verticalPadding, horizontalStride,
+        verticalStride));
     return HIPDNN_STATUS_SUCCESS;
 }
 
@@ -1836,8 +1944,9 @@ hipdnnStatus_t hipdnnGetPooling2dDescriptor(
     HIPDNN_OPEN_LOG_C("Inside hipdnnGetPooling2dDescriptor");
 
     CHECK_MIO(miopenGet2dPoolingDescriptor(
-        poolingDesc, &mipmmode, windowHeight, windowWidth, horizontalPadding,
-        horizontalPadding, horizontalStride, verticalStride));
+        (miopenPoolingDescriptor_t)poolingDesc, &mipmmode, windowHeight,
+        windowWidth, horizontalPadding, horizontalPadding, horizontalStride,
+        verticalStride));
     *maxpoolingNanOpt = HIPDNN_PROPAGATE_NAN;
 
     CHECK_HIPDNN(miopenTohipPoolingMode(mipmmode, mode));
@@ -1852,8 +1961,9 @@ hipdnnStatus_t hipdnnGetPooling2dForwardOutputDim(
     int *w) {
     HIPDNN_OPEN_LOG_C("Inside hipdnnGetPooling2dDescriptor");
 
-    CHECK_MIO(miopenGetPoolingForwardOutputDim(poolingDesc, inputTensorDesc, n,
-                                               c, h, w));
+    CHECK_MIO(miopenGetPoolingForwardOutputDim(
+        (miopenPoolingDescriptor_t)poolingDesc,
+        (miopenTensorDescriptor_t)inputTensorDesc, n, c, h, w));
     return HIPDNN_STATUS_SUCCESS;
 }
 
@@ -1863,7 +1973,8 @@ hipdnnStatus_t
 hipdnnDestroyPoolingDescriptor(hipdnnPoolingDescriptor_t poolingDesc) {
     HIPDNN_OPEN_LOG_C("Inside hipdnnDestroyPoolingDescriptor");
 
-    CHECK_MIO(miopenDestroyPoolingDescriptor(poolingDesc));
+    CHECK_MIO(
+        miopenDestroyPoolingDescriptor((miopenPoolingDescriptor_t)poolingDesc));
     return HIPDNN_STATUS_SUCCESS;
 }
 
@@ -1880,26 +1991,33 @@ hipdnnStatus_t hipdnnPoolingForward(
 
     HIPDNN_OPEN_LOG_C("Inside hipdnnPoolingForward");
 
-    if (sDescToWorkspacePooling.find(yDesc) == sDescToWorkspacePooling.end()) {
+    if (sDescToWorkspacePooling.find((miopenTensorDescriptor_t)yDesc) ==
+        sDescToWorkspacePooling.end()) {
         // If the descriptor is not present in the bookkept map container,
         // create one and add to the container
         HIPDNN_OPEN_LOG_I("INTERNAL_ALLOC: hipdnnPoolingForward");
 
         // HGSOS looks like the yDesc is used for the workspace, not the
         // poolingDesc
-        CHECK_MIO(miopenPoolingGetWorkSpaceSize(yDesc, &workSpaceSize));
+        CHECK_MIO(miopenPoolingGetWorkSpaceSize((miopenTensorDescriptor_t)yDesc,
+                                                &workSpaceSize));
         CHECK_HIP(hipMalloc((void **)&devptr, workSpaceSize));
-        sDescToWorkspacePooling[yDesc] = devptr;
-        sDescToWorkspacePoolingSize[yDesc] = workSpaceSize;
+        sDescToWorkspacePooling[(miopenTensorDescriptor_t)yDesc] = devptr;
+        sDescToWorkspacePoolingSize[(miopenTensorDescriptor_t)yDesc] =
+            workSpaceSize;
 
     } else {
         // Reuse the preallocated workspace
-        devptr = sDescToWorkspacePooling[yDesc];
-        workSpaceSize = sDescToWorkspacePoolingSize[yDesc];
+        devptr = sDescToWorkspacePooling[(miopenTensorDescriptor_t)yDesc];
+        workSpaceSize =
+            sDescToWorkspacePoolingSize[(miopenTensorDescriptor_t)yDesc];
     }
 
-    CHECK_MIO(miopenPoolingForward(handle, poolingDesc, alpha, xDesc, x, beta,
-                                   yDesc, y, true, // do_backward,
+    CHECK_MIO(miopenPoolingForward((miopenHandle_t)handle,
+                                   (miopenPoolingDescriptor_t)poolingDesc,
+                                   alpha, (miopenTensorDescriptor_t)xDesc, x,
+                                   beta, (miopenTensorDescriptor_t)yDesc, y,
+                                   true, // do_backward,
                                    (void *)devptr, workSpaceSize));
 
     return HIPDNN_STATUS_SUCCESS;
@@ -1922,25 +2040,32 @@ hipdnnStatus_t hipdnnPoolingBackward(
     // HGSOS it appears that forward and backward pooling can reuse tha same
     // map.
 
-    if (sDescToWorkspacePooling.find(yDesc) == sDescToWorkspacePooling.end()) {
+    if (sDescToWorkspacePooling.find((miopenTensorDescriptor_t)yDesc) ==
+        sDescToWorkspacePooling.end()) {
         // HGSOS looks like the yDesc is used for the workspace, not the
         // poolingDesc
 
         HIPDNN_OPEN_LOG_I("INTERNAL_ALLOC: hipdnnPoolingBackward");
 
-        CHECK_MIO(miopenPoolingGetWorkSpaceSize(yDesc, &workSpaceSize));
+        CHECK_MIO(miopenPoolingGetWorkSpaceSize((miopenTensorDescriptor_t)yDesc,
+                                                &workSpaceSize));
 
         CHECK_HIP(hipMalloc((void **)&devptr, workSpaceSize));
-        sDescToWorkspacePooling[yDesc] = devptr;
-        sDescToWorkspacePoolingSize[yDesc] = workSpaceSize;
+        sDescToWorkspacePooling[(miopenTensorDescriptor_t)yDesc] = devptr;
+        sDescToWorkspacePoolingSize[(miopenTensorDescriptor_t)yDesc] =
+            workSpaceSize;
     } else {
-        devptr = sDescToWorkspacePooling[yDesc];
-        workSpaceSize = sDescToWorkspacePoolingSize[yDesc];
+        devptr = sDescToWorkspacePooling[(miopenTensorDescriptor_t)yDesc];
+        workSpaceSize =
+            sDescToWorkspacePoolingSize[(miopenTensorDescriptor_t)yDesc];
     }
 
     CHECK_MIO(miopenPoolingBackward(
-        handle, poolingDesc, alpha, yDesc, y, dyDesc, dy, xDesc, x, beta,
-        dxDesc, dx, devptr)); // HGSOS  //NOTYET no worspace size!  const!!!????
+        (miopenHandle_t)handle, (miopenPoolingDescriptor_t)poolingDesc, alpha,
+        (miopenTensorDescriptor_t)yDesc, y, (miopenTensorDescriptor_t)dyDesc,
+        dy, (miopenTensorDescriptor_t)xDesc, x, beta,
+        (miopenTensorDescriptor_t)dxDesc, dx,
+        devptr)); // HGSOS  //NOTYET no worspace size!  const!!!????
     return HIPDNN_STATUS_SUCCESS;
 }
 //=============================================================================
@@ -1949,7 +2074,8 @@ hipdnnStatus_t
 hipdnnCreateActivationDescriptor(hipdnnActivationDescriptor_t *activationDesc) {
     HIPDNN_OPEN_LOG_C("Inside hipdnnCreateActivationDescriptor");
 
-    CHECK_MIO(miopenCreateActivationDescriptor(activationDesc));
+    CHECK_MIO(miopenCreateActivationDescriptor(
+        (miopenActivationDescriptor_t *)activationDesc));
     return HIPDNN_STATUS_SUCCESS;
 }
 //=============================================================================
@@ -1965,7 +2091,8 @@ hipdnnStatus_t hipdnnSetActivationDescriptor(
     CHECK_HIPDNN(hipTomiopenActivationMode(mode, &mimode));
 
     CHECK_MIO(miopenSetActivationDescriptor(
-        activationDesc, mimode, reluCeilingOrAlpha, activBeta, activExp));
+        (miopenActivationDescriptor_t)activationDesc, mimode,
+        reluCeilingOrAlpha, activBeta, activExp));
     return HIPDNN_STATUS_SUCCESS;
 }
 
@@ -1994,7 +2121,8 @@ hipdnnStatus_t hipdnnGetActivationDescriptor(
 hipdnnStatus_t
 hipdnnDestroyActivationDescriptor(hipdnnActivationDescriptor_t activationDesc) {
     HIPDNN_OPEN_LOG_C("Inside hipdnnDestroyActivationDescriptor");
-    CHECK_MIO(miopenDestroyActivationDescriptor(activationDesc));
+    CHECK_MIO(miopenDestroyActivationDescriptor(
+        (miopenActivationDescriptor_t)activationDesc));
     return HIPDNN_STATUS_SUCCESS;
 }
 //=================
@@ -2005,8 +2133,10 @@ hipdnnStatus_t hipdnnActivationForward(
     const void *alpha, const hipdnnTensorDescriptor_t xDesc, const void *x,
     const void *beta, const hipdnnTensorDescriptor_t yDesc, void *y) {
     HIPDNN_OPEN_LOG_C("Inside hipdnnActivationForward");
-    CHECK_MIO(miopenActivationForward(handle, activationDesc, alpha, xDesc, x,
-                                      beta, yDesc, y));
+    CHECK_MIO(miopenActivationForward(
+        (miopenHandle_t)handle, (miopenActivationDescriptor_t)activationDesc,
+        alpha, (miopenTensorDescriptor_t)xDesc, x, beta,
+        (miopenTensorDescriptor_t)yDesc, y));
     return HIPDNN_STATUS_SUCCESS;
 }
 //======================
@@ -2020,8 +2150,11 @@ hipdnnStatus_t hipdnnActivationBackward(
     const hipdnnTensorDescriptor_t dxDesc, void *dx) {
 
     HIPDNN_OPEN_LOG_C("Inside hipdnnActivationBackward");
-    CHECK_MIO(miopenActivationBackward(handle, activationDesc, alpha, yDesc, y,
-                                       dyDesc, dy, xDesc, x, beta, dxDesc, dx));
+    CHECK_MIO(miopenActivationBackward(
+        (miopenHandle_t)handle, (miopenActivationDescriptor_t)activationDesc,
+        alpha, (miopenTensorDescriptor_t)yDesc, y,
+        (miopenTensorDescriptor_t)dyDesc, dy, (miopenTensorDescriptor_t)xDesc,
+        x, beta, (miopenTensorDescriptor_t)dxDesc, dx));
     return HIPDNN_STATUS_SUCCESS;
 }
 //=============================================================================
@@ -2029,7 +2162,7 @@ hipdnnStatus_t hipdnnActivationBackward(
 hipdnnStatus_t hipdnnCreateLRNDescriptor(hipdnnLRNDescriptor_t *normDesc) {
     HIPDNN_OPEN_LOG_C("Inside hipdnnCreateLRNDescriptor");
 
-    CHECK_MIO(miopenCreateLRNDescriptor(normDesc));
+    CHECK_MIO(miopenCreateLRNDescriptor((miopenLRNDescriptor_t *)normDesc));
     return HIPDNN_STATUS_SUCCESS;
 }
 //=============================================================================
@@ -2043,8 +2176,8 @@ hipdnnStatus_t hipdnnSetLRNDescriptor(hipdnnLRNDescriptor_t normDesc,
     HIPDNN_OPEN_LOG_C("Inside hipdnnCreateLRNDescriptor");
 
     CHECK_HIPDNN(hipTomiopenLRNMode(mode, &mimode));
-    CHECK_MIO(miopenSetLRNDescriptor(normDesc, mimode, lrnN, lrnAlpha, lrnBeta,
-                                     lrnK));
+    CHECK_MIO(miopenSetLRNDescriptor((miopenLRNDescriptor_t)normDesc, mimode,
+                                     lrnN, lrnAlpha, lrnBeta, lrnK));
     return HIPDNN_STATUS_SUCCESS;
 }
 
@@ -2058,8 +2191,8 @@ hipdnnStatus_t hipdnnGetLRNDescriptor(hipdnnLRNDescriptor_t normDesc,
 
     HIPDNN_OPEN_LOG_C("Inside hipdnnCreateLRNDescriptor");
 
-    CHECK_MIO(miopenGetLRNDescriptor(normDesc, &mimode, lrnN, lrnAlpha, lrnBeta,
-                                     lrnK));
+    CHECK_MIO(miopenGetLRNDescriptor((miopenLRNDescriptor_t)normDesc, &mimode,
+                                     lrnN, lrnAlpha, lrnBeta, lrnK));
 
     CHECK_HIPDNN(miopenTohipLRNMode(mimode, mode));
     return HIPDNN_STATUS_SUCCESS;
@@ -2070,7 +2203,7 @@ hipdnnStatus_t hipdnnGetLRNDescriptor(hipdnnLRNDescriptor_t normDesc,
 hipdnnStatus_t hipdnnDestroyLRNDescriptor(hipdnnLRNDescriptor_t normDesc) {
     HIPDNN_OPEN_LOG_C("Inside hipdnnDestroyLRNDescriptor");
 
-    CHECK_MIO(miopenDestroyLRNDescriptor(normDesc));
+    CHECK_MIO(miopenDestroyLRNDescriptor((miopenLRNDescriptor_t)normDesc));
     return HIPDNN_STATUS_SUCCESS;
 }
 
@@ -2093,22 +2226,28 @@ hipdnnStatus_t hipdnnLRNCrossChannelForward(
 
     CHECK_HIPDNN(hipTomiopenLRNMode(lrnMode, &mimode));
 
-    if (sDescToWorkspaceLRN.find(yDesc) == sDescToWorkspaceLRN.end()) {
+    if (sDescToWorkspaceLRN.find((miopenTensorDescriptor_t)yDesc) ==
+        sDescToWorkspaceLRN.end()) {
         // HGSOS looks like the yDesc is used for the workspace, not the
         // hipdnnLRNDescriptor_t
 
-        CHECK_MIO(miopenLRNGetWorkSpaceSize(yDesc, &workSpaceSize));
+        CHECK_MIO(miopenLRNGetWorkSpaceSize((miopenTensorDescriptor_t)yDesc,
+                                            &workSpaceSize));
 
         CHECK_HIP(hipMalloc((void **)&devptr, workSpaceSize));
-        sDescToWorkspaceLRN[yDesc] = devptr;
-        sDescToWorkspaceLRNSize[yDesc] = workSpaceSize;
+        sDescToWorkspaceLRN[(miopenTensorDescriptor_t)yDesc] = devptr;
+        sDescToWorkspaceLRNSize[(miopenTensorDescriptor_t)yDesc] =
+            workSpaceSize;
     } else {
-        devptr = sDescToWorkspaceLRN[yDesc];
-        workSpaceSize = sDescToWorkspaceLRNSize[yDesc];
+        devptr = sDescToWorkspaceLRN[(miopenTensorDescriptor_t)yDesc];
+        workSpaceSize =
+            sDescToWorkspaceLRNSize[(miopenTensorDescriptor_t)yDesc];
     }
 
-    CHECK_MIO(miopenLRNForward(handle, normDesc, alpha, xDesc, x, beta, yDesc,
-                               y,
+    CHECK_MIO(miopenLRNForward((miopenHandle_t)handle,
+                               (miopenLRNDescriptor_t)normDesc, alpha,
+                               (miopenTensorDescriptor_t)xDesc, x, beta,
+                               (miopenTensorDescriptor_t)yDesc, y,
                                false,    // bool do_backward, //HGSOS
                                devptr)); // HGSOS //NOTYET no workspace size
     return HIPDNN_STATUS_SUCCESS;
@@ -2127,8 +2266,10 @@ hipdnnStatus_t hipdnnLRNCrossChannelForwardEx(
     CHECK_HIPDNN(hipTomiopenLRNMode(lrnMode, &mimode));
     // mimode is otherwise unused.
 
-    CHECK_MIO(miopenLRNForward(handle, normDesc, alpha, xDesc, x, beta, yDesc,
-                               y,
+    CHECK_MIO(miopenLRNForward((miopenHandle_t)handle,
+                               (miopenLRNDescriptor_t)normDesc, alpha,
+                               (miopenTensorDescriptor_t)xDesc, x, beta,
+                               (miopenTensorDescriptor_t)yDesc, y,
                                false, // bool do_backward, //HGSOS //NOTYET
                                workspace)); // NOTYET  no workspace size!
     return HIPDNN_STATUS_SUCCESS;
@@ -2154,18 +2295,22 @@ hipdnnStatus_t hipdnnLRNCrossChannelBackward(
     HIPDNN_OPEN_LOG_C("Inside hipdnnLRNCrossChannelBackward");
 
     CHECK_HIPDNN(hipTomiopenLRNMode(lrnMode, &mimode));
-    if (sDescToWorkspaceLRN.find(yDesc) == sDescToWorkspaceLRN.end()) {
+    if (sDescToWorkspaceLRN.find((miopenTensorDescriptor_t)yDesc) ==
+        sDescToWorkspaceLRN.end()) {
         // HGSOS looks like the yDesc is used for the workspace, not the
         // hipdnnLRNDescriptor_t
 
-        CHECK_MIO(miopenLRNGetWorkSpaceSize(yDesc, &workSpaceSize));
+        CHECK_MIO(miopenLRNGetWorkSpaceSize((miopenTensorDescriptor_t)yDesc,
+                                            &workSpaceSize));
 
         CHECK_HIP(hipMalloc((void **)&devptr, workSpaceSize));
-        sDescToWorkspaceLRN[yDesc] = devptr;
-        sDescToWorkspaceLRNSize[yDesc] = workSpaceSize;
+        sDescToWorkspaceLRN[(miopenTensorDescriptor_t)yDesc] = devptr;
+        sDescToWorkspaceLRNSize[(miopenTensorDescriptor_t)yDesc] =
+            workSpaceSize;
     } else {
-        devptr = sDescToWorkspaceLRN[yDesc];
-        workSpaceSize = sDescToWorkspaceLRNSize[yDesc];
+        devptr = sDescToWorkspaceLRN[(miopenTensorDescriptor_t)yDesc];
+        workSpaceSize =
+            sDescToWorkspaceLRNSize[(miopenTensorDescriptor_t)yDesc];
     }
 
     CHECK_HIPDNN(hipdnnLRNCrossChannelBackwardEx(
@@ -2190,8 +2335,11 @@ hipdnnStatus_t hipdnnLRNCrossChannelBackwardEx(
 
     CHECK_HIPDNN(hipTomiopenLRNMode(lrnMode, &mimode));
     // mimode is otherwise unused.
-    CHECK_MIO(miopenLRNBackward(handle, normDesc, alpha, yDesc, y, dyDesc, dy,
-                                xDesc, x, beta, dxDesc, dx, workspace));
+    CHECK_MIO(miopenLRNBackward(
+        (miopenHandle_t)handle, (miopenLRNDescriptor_t)normDesc, alpha,
+        (miopenTensorDescriptor_t)yDesc, y, (miopenTensorDescriptor_t)dyDesc,
+        dy, (miopenTensorDescriptor_t)xDesc, x, beta,
+        (miopenTensorDescriptor_t)dxDesc, dx, workspace));
     return HIPDNN_STATUS_SUCCESS;
 }
 
@@ -2206,7 +2354,9 @@ hipdnnDeriveBNTensorDescriptor(hipdnnTensorDescriptor_t derivedBnDesc,
 
     miopenBatchNormMode_t miBNMode;
     CHECK_HIPDNN(hipTomiopenBatchNormMode(mode, &miBNMode));
-    CHECK_MIO(miopenDeriveBNTensorDescriptor(derivedBnDesc, xDesc, miBNMode));
+    CHECK_MIO(miopenDeriveBNTensorDescriptor(
+        (miopenTensorDescriptor_t)derivedBnDesc,
+        (miopenTensorDescriptor_t)xDesc, miBNMode));
     return HIPDNN_STATUS_SUCCESS;
 }
 
@@ -2225,10 +2375,11 @@ hipdnnStatus_t hipdnnBatchNormalizationForwardTraining(
     miopenBatchNormMode_t miBNMode;
     CHECK_HIPDNN(hipTomiopenBatchNormMode(mode, &miBNMode));
     CHECK_MIO(miopenBatchNormalizationForwardTraining(
-        handle, miBNMode, alpha, beta, xDesc, x, yDesc, y,
-        bnScaleBiasMeanVarDesc, bnScale, bnBias, exponentialAverageFactor,
-        resultRunningMean, resultRunningVariance, epsilon, resultSaveMean,
-        resultSaveInvVariance));
+        (miopenHandle_t)handle, miBNMode, alpha, beta,
+        (miopenTensorDescriptor_t)xDesc, x, (miopenTensorDescriptor_t)yDesc, y,
+        (miopenTensorDescriptor_t)bnScaleBiasMeanVarDesc, bnScale, bnBias,
+        exponentialAverageFactor, resultRunningMean, resultRunningVariance,
+        epsilon, resultSaveMean, resultSaveInvVariance));
     return HIPDNN_STATUS_SUCCESS;
 }
 //=============================================================================
@@ -2244,9 +2395,11 @@ hipdnnStatus_t hipdnnnBatchNormalizationForwardInference(
     miopenBatchNormMode_t miBNMode;
     CHECK_HIPDNN(hipTomiopenBatchNormMode(mode, &miBNMode));
     CHECK_MIO(miopenBatchNormalizationForwardInference(
-        handle, miBNMode, alpha, beta, xDesc, x, yDesc, y,
-        bnScaleBiasMeanVarDesc, const_cast<void *>(bnScale),
-        const_cast<void *>(bnBias), const_cast<void *>(estimatedMean),
+        (miopenHandle_t)handle, miBNMode, alpha, beta,
+        (miopenTensorDescriptor_t)xDesc, x, (miopenTensorDescriptor_t)yDesc, y,
+        (miopenTensorDescriptor_t)bnScaleBiasMeanVarDesc,
+        const_cast<void *>(bnScale), const_cast<void *>(bnBias),
+        const_cast<void *>(estimatedMean),
         const_cast<void *>(estimatedVariance), epsilon));
     return HIPDNN_STATUS_SUCCESS;
 }
@@ -2270,10 +2423,13 @@ hipdnnStatus_t hipdnnBatchNormalizationBackward(
         (*static_cast<const float *>(betaParamDiff) == 0)) {
         std::cout << "Accumulate Gradients is false" << std::endl;
         CHECK_MIO(miopenBatchNormalizationBackward(
-            handle, miBNMode, alphaDataDiff, betaDataDiff, alphaParamDiff,
-            betaParamDiff, xDesc, x, dyDesc, dy, dxDesc, dx,
-            bnScaleBiasDiffDesc, bnScale, resultBnScaleDiff, resultBnBiasDiff,
-            epsilon, savedMean, savedInvVariance));
+            (miopenHandle_t)handle, miBNMode, alphaDataDiff, betaDataDiff,
+            alphaParamDiff, betaParamDiff, (miopenTensorDescriptor_t)xDesc, x,
+            (miopenTensorDescriptor_t)dyDesc, dy,
+            (miopenTensorDescriptor_t)dxDesc, dx,
+            (miopenTensorDescriptor_t)bnScaleBiasDiffDesc, bnScale,
+            resultBnScaleDiff, resultBnBiasDiff, epsilon, savedMean,
+            savedInvVariance));
         return HIPDNN_STATUS_SUCCESS;
     } else {
         std::cout << "Case Accumulate Gradients is true" << std::endl;
@@ -2287,10 +2443,13 @@ hipdnnStatus_t hipdnnBatchNormalizationBackward(
             resultBnScaleDiff); // Pointer to keep track of priorDst value
         void *resultBnBiasDiffPrior = SaveAsPriorBuffer(resultBnBiasDiff);
         CHECK_MIO(miopenBatchNormalizationBackward(
-            handle, miBNMode, alphaDataDiff, &tempBetaDataDiff, alphaParamDiff,
-            &tempBetaParamDiff, xDesc, x, dyDesc, dy, dxDesc, dx,
-            bnScaleBiasDiffDesc, bnScale, resultBnScaleDiff, resultBnBiasDiff,
-            epsilon, savedMean, savedInvVariance));
+            (miopenHandle_t)handle, miBNMode, alphaDataDiff, &tempBetaDataDiff,
+            alphaParamDiff, &tempBetaParamDiff, (miopenTensorDescriptor_t)xDesc,
+            x, (miopenTensorDescriptor_t)dyDesc, dy,
+            (miopenTensorDescriptor_t)dxDesc, dx,
+            (miopenTensorDescriptor_t)bnScaleBiasDiffDesc, bnScale,
+            resultBnScaleDiff, resultBnBiasDiff, epsilon, savedMean,
+            savedInvVariance));
         accumulateGradients(dx, dxPrior, dxDesc, betaDataDiff);
         accumulateGradients(resultBnScaleDiff, resultBnScaleDiffPrior,
                             bnScaleBiasDiffDesc, betaParamDiff);
@@ -2320,9 +2479,9 @@ hipdnnStatus_t hipdnnSetTensorNdDescriptor(hipdnnTensorDescriptor_t tensorDesc,
 
     } else {
         CHECK_HIPDNN(hipTomiopenDataType(dataType, &moDT));
-        CHECK_MIO(miopenSetTensorDescriptor(tensorDesc, moDT, nbDims,
-                                            const_cast<int *>(dimA),
-                                            const_cast<int *>(strideA)));
+        CHECK_MIO(miopenSetTensorDescriptor(
+            (miopenTensorDescriptor_t)tensorDesc, moDT, nbDims,
+            const_cast<int *>(dimA), const_cast<int *>(strideA)));
     }
 
     HIPDNN_OPEN_LOG_C("EXIT: hipdnnSetTensorNdDescriptor." << std::flush);
@@ -2336,10 +2495,12 @@ hipdnnGetTensorNdDescriptor(const hipdnnTensorDescriptor_t tensorDesc,
     miopenDataType_t moDT;
     HIPDNN_OPEN_LOG_C("ENTER hipdnnGetTensorNdDescriptor " << tensorDesc
                                                            << std::flush);
-    CHECK_MIO(miopenGetTensorDescriptor(tensorDesc, &moDT, dimA, strideA));
+    CHECK_MIO(miopenGetTensorDescriptor((miopenTensorDescriptor_t)tensorDesc,
+                                        &moDT, dimA, strideA));
 
     CHECK_HIPDNN(miopenTohipDataType(moDT, dataType));
-    CHECK_MIO(miopenGetTensorDescriptorSize(tensorDesc, nbDims));
+    CHECK_MIO(miopenGetTensorDescriptorSize(
+        (miopenTensorDescriptor_t)tensorDesc, nbDims));
     HIPDNN_OPEN_LOG_C(
         "EXIT hipdnnGetTensorNdDescriptor, datatype  (miopen, hipdnn)= "
         << moDT << ", " << *dataType << ",size=" << *nbDims << std::flush);
@@ -2356,9 +2517,9 @@ hipdnnSetFilterNdDescriptor(hipdnnFilterDescriptor_t filterDesc,
     HIPDNN_OPEN_LOG_C("ENTER hipdnnSetFilterNdDescriptor " << filterDesc
                                                            << std::flush);
     CHECK_HIPDNN(hipTomiopenDataType(dataType, &moDT));
-    CHECK_MIO(miopenSetTensorDescriptor(filterDesc, moDT, nbDims,
-                                        const_cast<int *>(filterDimA),
-                                        const_cast<int *>(filterDimA)));
+    CHECK_MIO(miopenSetTensorDescriptor(
+        (miopenTensorDescriptor_t)filterDesc, moDT, nbDims,
+        const_cast<int *>(filterDimA), const_cast<int *>(filterDimA)));
     HIPDNN_OPEN_LOG_C("EXIT hipdnnSetFilterNdDescriptor." << std::flush);
     return HIPDNN_STATUS_SUCCESS;
 }
@@ -2370,12 +2531,13 @@ hipdnnStatus_t hipdnnGetFilterNdDescriptor(
     miopenDataType_t moDT;
     HIPDNN_OPEN_LOG_C("ENTER hipdnnGetFilterNdDescriptor " << filterDesc
                                                            << std::flush);
-    CHECK_MIO(
-        miopenGetTensorDescriptor(filterDesc, &moDT, filterDimA, filterDimA));
+    CHECK_MIO(miopenGetTensorDescriptor((miopenTensorDescriptor_t)filterDesc,
+                                        &moDT, filterDimA, filterDimA));
 
     CHECK_HIPDNN(miopenTohipDataType(moDT, dataType));
 
-    CHECK_MIO(miopenGetTensorDescriptorSize(filterDesc, nbDims));
+    CHECK_MIO(miopenGetTensorDescriptorSize(
+        (miopenTensorDescriptor_t)filterDesc, nbDims));
     *format = HIPDNN_TENSOR_NCHW; // miopen defines only this format
 
     HIPDNN_OPEN_LOG_C("EXIT hipdnnGetFilterNdDescriptor");
@@ -2388,7 +2550,8 @@ hipdnnDestroyFilterDescriptor(hipdnnFilterDescriptor_t filterDesc) {
 
     HIPDNN_OPEN_LOG_C("ENTER hipdnnDestroyFilterDescriptor " << filterDesc
                                                              << std::flush);
-    CHECK_MIO(miopenDestroyTensorDescriptor(filterDesc));
+    CHECK_MIO(
+        miopenDestroyTensorDescriptor((miopenTensorDescriptor_t)filterDesc));
     HIPDNN_OPEN_LOG_C("EXIT hipdnnDestroyFilterDescriptor." << std::flush);
     return HIPDNN_STATUS_SUCCESS;
 }
@@ -2397,12 +2560,12 @@ hipdnnDestroyFilterDescriptor(hipdnnFilterDescriptor_t filterDesc) {
 
 hipdnnStatus_t hipdnnCreateRNNDescriptor(hipdnnRNNDescriptor_t *rnnDesc) {
     HIPDNN_OPEN_LOG_C("Inside hipdnnCreateRNNDescriptor");
-    CHECK_MIO(miopenCreateRNNDescriptor(rnnDesc));
+    CHECK_MIO(miopenCreateRNNDescriptor((miopenRNNDescriptor_t *)rnnDesc));
     return HIPDNN_STATUS_SUCCESS;
 }
 
 hipdnnStatus_t hipdnnDestroyRNNDescriptor(hipdnnRNNDescriptor_t rnnDesc) {
-    CHECK_MIO(miopenDestroyRNNDescriptor(rnnDesc));
+    CHECK_MIO(miopenDestroyRNNDescriptor((miopenRNNDescriptor_t)rnnDesc));
     return HIPDNN_STATUS_SUCCESS;
 }
 
@@ -2456,8 +2619,8 @@ hipdnnStatus_t hipdnnGetRNNWorkspaceSize(hipdnnHandle_t handle,
                                          const hipdnnTensorDescriptor_t *xDesc,
                                          size_t *sizeInBytes) {
     CHECK_MIO(miopenGetRNNWorkspaceSize(
-        handle, rnnDesc, seqLength,
-        const_cast<hipdnnTensorDescriptor_t *>(xDesc), sizeInBytes));
+        (miopenHandle_t)handle, (miopenRNNDescriptor_t)rnnDesc, seqLength,
+        (miopenTensorDescriptor_t *)xDesc, sizeInBytes));
     return HIPDNN_STATUS_SUCCESS;
 }
 
@@ -2466,8 +2629,8 @@ hipdnnStatus_t hipdnnGetRNNTrainingReserveSize(
     const int seqLength, const hipdnnTensorDescriptor_t *xDesc,
     size_t *sizeInBytes) {
     CHECK_MIO(miopenGetRNNTrainingReserveSize(
-        handle, rnnDesc, seqLength,
-        const_cast<hipdnnTensorDescriptor_t *>(xDesc), sizeInBytes));
+        (miopenHandle_t)handle, (miopenRNNDescriptor_t)rnnDesc, seqLength,
+        (miopenTensorDescriptor_t *)xDesc, sizeInBytes));
     return HIPDNN_STATUS_SUCCESS;
 }
 
@@ -2520,14 +2683,13 @@ hipdnnStatus_t hipdnnRNNForwardTraining(
     size_t workSpaceSizeInBytes, void *reserveSpace,
     size_t reserveSpaceSizeInBytes) {
     CHECK_MIO(miopenRNNForwardTraining(
-        handle, rnnDesc, seqLength,
-        const_cast<hipdnnTensorDescriptor_t *>(xDesc), x,
-        const_cast<hipdnnTensorDescriptor_t>(hxDesc), hx,
-        const_cast<hipdnnTensorDescriptor_t>(cxDesc), cx, wDesc, w,
-        const_cast<hipdnnTensorDescriptor_t *>(yDesc), y,
-        const_cast<hipdnnTensorDescriptor_t>(hyDesc), hy,
-        const_cast<hipdnnTensorDescriptor_t>(cyDesc), cy, workspace,
-        workSpaceSizeInBytes, reserveSpace, reserveSpaceSizeInBytes));
+        (miopenHandle_t)handle, (miopenRNNDescriptor_t)rnnDesc, seqLength,
+        (miopenTensorDescriptor_t *)xDesc, x, (miopenTensorDescriptor_t)hxDesc,
+        hx, (miopenTensorDescriptor_t)cxDesc, cx,
+        (miopenTensorDescriptor_t)wDesc, w, (miopenTensorDescriptor_t *)yDesc,
+        y, (miopenTensorDescriptor_t)hyDesc, hy,
+        (miopenTensorDescriptor_t)cyDesc, cy, workspace, workSpaceSizeInBytes,
+        reserveSpace, reserveSpaceSizeInBytes));
     return HIPDNN_STATUS_SUCCESS;
 }
 
@@ -2547,17 +2709,17 @@ hipdnnRNNBackwardData(hipdnnHandle_t handle,
                       void *workspace, size_t workSpaceSizeInBytes,
                       void *reserveSpace, size_t reserveSpaceSizeInBytes) {
     CHECK_MIO(miopenRNNBackwardData(
-        handle, rnnDesc, seqLength,
-        const_cast<hipdnnTensorDescriptor_t *>(yDesc), y,
-        const_cast<hipdnnTensorDescriptor_t *>(dyDesc), dy,
-        const_cast<hipdnnTensorDescriptor_t>(dhyDesc), dhy,
-        const_cast<hipdnnTensorDescriptor_t>(dcyDesc), dcy, wDesc, w,
-        const_cast<hipdnnTensorDescriptor_t>(hxDesc), hx,
-        const_cast<hipdnnTensorDescriptor_t>(cxDesc), cx,
-        const_cast<hipdnnTensorDescriptor_t *>(dxDesc), dx,
-        const_cast<hipdnnTensorDescriptor_t>(dhxDesc), dhx,
-        const_cast<hipdnnTensorDescriptor_t>(dcxDesc), dcx, workspace,
-        workSpaceSizeInBytes, reserveSpace, reserveSpaceSizeInBytes));
+        (miopenHandle_t)handle, (miopenRNNDescriptor_t)rnnDesc, seqLength,
+        (miopenTensorDescriptor_t *)yDesc, y,
+        (miopenTensorDescriptor_t *)dyDesc, dy,
+        (miopenTensorDescriptor_t)dhyDesc, dhy,
+        (miopenTensorDescriptor_t)dcyDesc, dcy, (miopenTensorDescriptor_t)wDesc,
+        w, (miopenTensorDescriptor_t)hxDesc, hx,
+        (miopenTensorDescriptor_t)cxDesc, cx,
+        (miopenTensorDescriptor_t *)dxDesc, dx,
+        (miopenTensorDescriptor_t)dhxDesc, dhx,
+        (miopenTensorDescriptor_t)dcxDesc, dcx, workspace, workSpaceSizeInBytes,
+        reserveSpace, reserveSpaceSizeInBytes));
     return HIPDNN_STATUS_SUCCESS;
 }
 
@@ -2569,12 +2731,11 @@ hipdnnStatus_t hipdnnRNNBackwardWeights(
     size_t workSpaceSizeInBytes, const hipdnnFilterDescriptor_t dwDesc,
     void *dw, const void *reserveSpace, size_t reserveSpaceSizeInBytes) {
     CHECK_MIO(miopenRNNBackwardWeights(
-        handle, rnnDesc, seqLength,
-        const_cast<hipdnnTensorDescriptor_t *>(xDesc), x,
-        const_cast<hipdnnTensorDescriptor_t>(hxDesc), hx,
-        const_cast<hipdnnTensorDescriptor_t *>(yDesc), y, dwDesc, dw,
-        const_cast<void *>(workspace), workSpaceSizeInBytes, reserveSpace,
-        reserveSpaceSizeInBytes));
+        (miopenHandle_t)handle, (miopenRNNDescriptor_t)rnnDesc, seqLength,
+        (miopenTensorDescriptor_t *)xDesc, x, (miopenTensorDescriptor_t)hxDesc,
+        hx, (miopenTensorDescriptor_t *)yDesc, y,
+        (miopenTensorDescriptor_t)dwDesc, dw, const_cast<void *>(workspace),
+        workSpaceSizeInBytes, reserveSpace, reserveSpaceSizeInBytes));
     return HIPDNN_STATUS_SUCCESS;
 }
 
@@ -2596,9 +2757,9 @@ hipdnnStatus_t hipdnnSetPoolingNdDescriptor(
         int v = strideA[1];
         miopenPoolingMode_t pooling_mode;
         CHECK_HIPDNN(hipTomiopenPoolingMode(mode, &pooling_mode));
-        CHECK_MIO(miopenSet2dPoolingDescriptor(poolingDesc, pooling_mode,
-                                               windowHeight, windowWidth, pad_h,
-                                               pad_w, u, v));
+        CHECK_MIO(miopenSet2dPoolingDescriptor(
+            (miopenPoolingDescriptor_t)poolingDesc, pooling_mode, windowHeight,
+            windowWidth, pad_h, pad_w, u, v));
     } else {
         HIPDNN_OPEN_LOG_E("Higher dimensions > 2 Pooling is not supported"
                           << std::flush);
@@ -2672,8 +2833,9 @@ hipdnnStatus_t hipdnnSetConvolutionNdDescriptor(
         v = filterStrideA[1];
         d_h = dilationA[0];
         d_w = dilationA[1];
-        CHECK_MIO(miopenInitConvolutionDescriptor(convDesc, miopenConvolution,
-                                                  pad_h, pad_w, u, v, 1, 1));
+        CHECK_MIO(miopenInitConvolutionDescriptor(
+            (miopenConvolutionDescriptor_t)convDesc, miopenConvolution, pad_h,
+            pad_w, u, v, 1, 1));
     } else if (arrayLength == 3) {
         // 3D convolution Scenario
         // Got to book keep additional padding, stride and dilation info along
@@ -2686,8 +2848,9 @@ hipdnnStatus_t hipdnnSetConvolutionNdDescriptor(
         v = filterStrideA[1];
         d_h = dilationA[0];
         d_w = dilationA[1];
-        CHECK_MIO(miopenInitConvolutionDescriptor(convDesc, miopenConvolution,
-                                                  pad_h, pad_w, u, v, 1, 1));
+        CHECK_MIO(miopenInitConvolutionDescriptor(
+            (miopenConvolutionDescriptor_t)convDesc, miopenConvolution, pad_h,
+            pad_w, u, v, 1, 1));
         // Populate the map container with key being newly created 2Ddescriptor
         // and value a 3 dim array with index mapping as
         // 0-pad, 1-stride and 2-dilation
@@ -2695,7 +2858,8 @@ hipdnnStatus_t hipdnnSetConvolutionNdDescriptor(
         depthDesc[0] = padA[2];
         depthDesc[1] = filterStrideA[2];
         depthDesc[2] = dilationA[2];
-        sDescTo3DConvolution[convDesc] = depthDesc;
+        sDescTo3DConvolution[(miopenConvolutionDescriptor_t)convDesc] =
+            depthDesc;
 
     } else {
 
@@ -2723,9 +2887,12 @@ hipdnnStatus_t hipdnnBatchNormalizationForwardInference(
     miopenBatchNormMode_t miBNMode;
     CHECK_HIPDNN(hipTomiopenBatchNormMode(mode, &miBNMode));
     CHECK_MIO(miopenBatchNormalizationForwardInference(
-        handle, miBNMode, const_cast<void *>(alpha), const_cast<void *>(beta),
-        xDesc, x, yDesc, y, bnScaleBiasMeanVarDesc, const_cast<void *>(bnScale),
-        const_cast<void *>(bnBias), const_cast<void *>(estimatedMean),
+        (miopenHandle_t)handle, miBNMode, const_cast<void *>(alpha),
+        const_cast<void *>(beta), (miopenTensorDescriptor_t)xDesc, x,
+        (miopenTensorDescriptor_t)yDesc, y,
+        (miopenTensorDescriptor_t)bnScaleBiasMeanVarDesc,
+        const_cast<void *>(bnScale), const_cast<void *>(bnBias),
+        const_cast<void *>(estimatedMean),
         const_cast<void *>(estimatedVariance), epsilon));
     return HIPDNN_STATUS_SUCCESS;
 }
