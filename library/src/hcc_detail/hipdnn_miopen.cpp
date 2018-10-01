@@ -2987,3 +2987,10 @@ hipdnnStatus_t hipdnnDestroyReduceTensorDescriptor(
                       << std::flush);
     return HIPDNN_STATUS_NOT_SUPPORTED;
 }
+
+ hipdnnStatus_t hipdnnSetConvolutionGroupCount(
+    hipdnnConvolutionDescriptor_t convDesc, int groupCount ) {
+    CHECK_MIO(miopenSetConvolutionGroupCount(
+        (miopenConvolutionDescriptor_t)convDesc, groupCount) );
+    return HIPDNN_STATUS_SUCCESS;
+} 
