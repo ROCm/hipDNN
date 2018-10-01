@@ -2835,7 +2835,7 @@ hipdnnStatus_t hipdnnSetConvolutionNdDescriptor(
         d_w = dilationA[1];
         CHECK_MIO(miopenInitConvolutionDescriptor(
             (miopenConvolutionDescriptor_t)convDesc, miopenConvolution, pad_h,
-            pad_w, u, v, 1, 1));
+            pad_w, u, v, d_h, d_w));
     } else if (arrayLength == 3) {
         // 3D convolution Scenario
         // Got to book keep additional padding, stride and dilation info along
