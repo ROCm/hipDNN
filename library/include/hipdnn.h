@@ -988,6 +988,9 @@ hipdnnStatus_t
 hipdnnSetConvolutionMathType(hipdnnConvolutionDescriptor_t convDesc,
                              hipdnnMathType_t mathType);
 
+ hipdnnStatus_t hipdnnSetConvolutionGroupCount(
+    hipdnnConvolutionDescriptor_t convDesc, int groupCount );                        
+
 #ifdef __cplusplus
 }
 #endif
