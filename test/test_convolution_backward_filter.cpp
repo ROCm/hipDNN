@@ -4,8 +4,8 @@ TEST(convolution_bwd_filter, func_check_backward_conv_filter) {
     Desc inputDesc(1, 3, 30, 30);
     Desc filterDesc(1, 3, 5, 5);
     int pad[2] = {0, 0};    // zero padding
-    int stride[2] = {5, 5}; // stride 1
-    double avg_time = 0.0;
+    int stride[2] = {5, 5}; // stride 5
+    float avg_time = 0;
 	
     Desc outputDesc =
         calculateConv2DOutputDesc_bwd(inputDesc, filterDesc, pad, stride);
@@ -27,30 +27,104 @@ TEST(convolution_bwd_filter, func_check_backward_conv_filter) {
   std::string str_k_size  = convert_to_string((int*)k_size,4);
   std::string str_op_size  = convert_to_string((int*)op_size,4);
 
-//high_resolution_timer_t timer;
-//std::vector<double> time_vector(benchmark_iterations, 0);
-//    for(int i = 0; i < benchmark_iterations; i++){
-    populateMemoryRandom<float>(srcData);
-    populateMemoryRandom<float>(filterData);
-  //  timer.restart();
-        compute_hipdnn_conv_bwd_filter<float>(testConvolutionSizes, srcData.gpu(),
-                                 filterData.gpu(), gradData.gpu(), NULL, dstDataGPU.gpu(), avg_time); 
-  //      std::uint64_t time_elapsed = timer.elapsed_nanoseconds();
-  //      time_vector[i] = (double)time_elapsed / 1e6;
-  //  }
+  populateMemoryRandom<float>(srcData);
+  populateMemoryRandom<float>(filterData);
   
+  compute_hipdnn_conv_bwd_filter<float>(testConvolutionSizes, srcData.gpu(),
+                                 filterData.gpu(), gradData.gpu(), NULL, dstDataGPU.gpu(),&avg_time); 
   
-     std::cout << "!!!!!!!!!!!!!!!!!!!!!!Average Time: " << avg_time << std::endl;
-    //double avg_time = std::accumulate(time_vector.begin() + 10, time_vector.end(), 0) / (benchmark_iterations - 10);
-    //std::cout << "Average Time: " << avg_time << std::endl;
+  std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
+    
+  std::string strt = "./result_unittest.csv";
+  std::string testname = "convolution_bwd_filter:func_check_backward_conv_filter";
+  float* temp = gradData.getDataFromGPU();
 
-  /*  std::string strt = "./result_unittest.csv";
-    std::string testname = "convolution_bwd_filter:func_check_backward_conv_filter";
-    float* temp = gradData.getDataFromGPU();
+  std::string str  = convert_to_string((float*)temp,(int)gradData.get_num_elements());
+  write_to_csv(strt, str, testname,avg_time, str_ip_size, str_k_size, str_op_size); 
+ }
+
+TEST(convolution_bwd_filter, func_backward_conv_filter_batch32) {
+    Desc inputDesc(32, 3, 10, 10);
+    Desc filterDesc(32, 3, 5, 5);
+    int pad[2] = {0, 0};    // zero padding
+    int stride[2] = {5, 5}; // stride 5
+    float avg_time = 0;
 	
-	double time_avg = getFromGPU<double>(avg_time);
-		
-    std::string str  = convert_to_string((float*)temp,(int)gradData.get_num_elements());
-    write_to_csv(strt, str, testname,time_avg, str_ip_size, str_k_size, str_op_size); 
-*/ }
+    Desc outputDesc =
+        calculateConv2DOutputDesc_bwd(inputDesc, filterDesc, pad, stride);
+    Memory<float> srcData = createMemory<float>(inputDesc);
+    Memory<float> gradData = createMemory<float>(filterDesc);
+    Memory<float> dstDataGPU = createMemory<float>(outputDesc);
+    Memory<float> filterData = createMemory<float>(filterDesc);
+    
+    test_convolution_bwd_filter testConvolutionSizes(
+        inputDesc.N, 1, inputDesc.C, inputDesc.H, inputDesc.W, outputDesc.C,
+        outputDesc.H, outputDesc.W, filterDesc.H, filterDesc.W, pad[0], pad[1],
+        stride[0], stride[1], 1, 1);
 
+  int ip_size[4] = {inputDesc.N, inputDesc.C, inputDesc.H, inputDesc.W};
+  int k_size[4] = {filterDesc.N, filterDesc.C, filterDesc.H, filterDesc.W};
+  int op_size[4] =  {filterDesc.N, filterDesc.C, filterDesc.H, filterDesc.W};
+
+  std::string str_ip_size  = convert_to_string((int*)ip_size,4);
+  std::string str_k_size  = convert_to_string((int*)k_size,4);
+  std::string str_op_size  = convert_to_string((int*)op_size,4);
+
+  populateMemoryRandom<float>(srcData);
+  populateMemoryRandom<float>(filterData);
+  
+  compute_hipdnn_conv_bwd_filter<float>(testConvolutionSizes, srcData.gpu(),
+                                 filterData.gpu(), gradData.gpu(), NULL, dstDataGPU.gpu(),&avg_time); 
+  
+  std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
+    
+  std::string strt = "./result_unittest.csv";
+  std::string testname = "convolution_bwd_filter:func_backward_conv_filter_batch32";
+  float* temp = gradData.getDataFromGPU();
+
+  std::string str  = convert_to_string((float*)temp,(int)gradData.get_num_elements());
+  write_to_csv(strt, str, testname,avg_time, str_ip_size, str_k_size, str_op_size); 
+ }
+
+TEST(convolution_bwd_filter, func_backward_conv_filter_batch64) {
+    Desc inputDesc(64, 3, 10, 10);
+    Desc filterDesc(64, 3, 5, 5);
+    int pad[2] = {0, 0};    // zero padding
+    int stride[2] = {5, 5}; // stride 5
+    float avg_time = 0;
+	
+    Desc outputDesc =
+        calculateConv2DOutputDesc_bwd(inputDesc, filterDesc, pad, stride);
+    Memory<float> srcData = createMemory<float>(inputDesc);
+    Memory<float> gradData = createMemory<float>(filterDesc);
+    Memory<float> dstDataGPU = createMemory<float>(outputDesc);
+    Memory<float> filterData = createMemory<float>(filterDesc);
+    
+    test_convolution_bwd_filter testConvolutionSizes(
+        inputDesc.N, 1, inputDesc.C, inputDesc.H, inputDesc.W, outputDesc.C,
+        outputDesc.H, outputDesc.W, filterDesc.H, filterDesc.W, pad[0], pad[1],
+        stride[0], stride[1], 1, 1);
+
+  int ip_size[4] = {inputDesc.N, inputDesc.C, inputDesc.H, inputDesc.W};
+  int k_size[4] = {filterDesc.N, filterDesc.C, filterDesc.H, filterDesc.W};
+  int op_size[4] =  {filterDesc.N, filterDesc.C, filterDesc.H, filterDesc.W};
+
+  std::string str_ip_size  = convert_to_string((int*)ip_size,4);
+  std::string str_k_size  = convert_to_string((int*)k_size,4);
+  std::string str_op_size  = convert_to_string((int*)op_size,4);
+
+  populateMemoryRandom<float>(srcData);
+  populateMemoryRandom<float>(filterData);
+  
+  compute_hipdnn_conv_bwd_filter<float>(testConvolutionSizes, srcData.gpu(),
+                                 filterData.gpu(), gradData.gpu(), NULL, dstDataGPU.gpu(),&avg_time); 
+  
+  std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
+    
+  std::string strt = "./result_unittest.csv";
+  std::string testname = "convolution_bwd_filter:func_backward_conv_filter_batch64";
+  float* temp = gradData.getDataFromGPU();
+
+  std::string str  = convert_to_string((float*)temp,(int)gradData.get_num_elements());
+  write_to_csv(strt, str, testname,avg_time, str_ip_size, str_k_size, str_op_size); 
+ }
