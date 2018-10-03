@@ -2987,3 +2987,55 @@ hipdnnStatus_t hipdnnDestroyReduceTensorDescriptor(
                       << std::flush);
     return HIPDNN_STATUS_NOT_SUPPORTED;
 }
+
+hipdnnStatus_t
+hipdnnCreateFusionPlan(hipdnnFusionPlanDescriptor_t *fusePlanDesc,
+                       const hipdnnFusionDirection_t fuseDirection,
+                       const miopenTensorDescriptor_t inputDesc) {
+    CHECK_MIO(
+        miopenCreateFusionPlan((miopenFusionPlanDescriptor_t *)fusePlanDesc,
+                               (miopenFusionDirection_t)fuseDirection,
+                               (miopenTensorDescriptor_t)inputDesc));
+    return HIPDNN_STATUS_SUCCESS;
+}
+
+hipdnnStatus_t
+hipdnnCreateOpConvForward(hipdnnFusionPlanDescriptor_t fusePlanDesc,
+                          hipdnnFusionOpDescriptor_t *convOp,
+                          hipdnnConvolutionDescriptor_t convDesc,
+                          const hipdnnTensorDescriptor_t wDesc) {
+    CHECK_MIO(
+        miopenCreateOpConvForward((miopenFusionPlanDescriptor_t)fusePlanDesc,
+                                  (miopenFusionOpDescriptor_t *)convOp,
+                                  (miopenConvolutionDescriptor_t)convDesc,
+                                  (miopenTensorDescriptor_t)wDesc));
+    return HIPDNN_STATUS_SUCCESS;
+}
+
+hipdnnStatus_t
+hipdnnCreateOpBiasForward(hipdnnFusionPlanDescriptor_t fusePlanDesc,
+                          hipdnnFusionOpDescriptor_t *biasOp,
+                          const hipdnnTensorDescriptor_t bDesc) {
+    CHECK_MIO(miopenCreateOpBiasForward(
+        (miopenFusionPlanDescriptor_t)fusePlanDesc,
+        (miopenFusionOpDescriptor_t *)biasOp, (miopenTensorDescriptor_t)bDesc));
+    return HIPDNN_STATUS_SUCCESS;
+}
+
+hipdnnStatus_t
+miopenCreateOpActivationForward(hipdnnFusionPlanDescriptor_t fusePlanDesc,
+                                hipdnnFusionOpDescriptor_t *activOp,
+                                hipdnnActivationMode_t mode) {
+    CHECK_MIO(miopenCreateOpActivationForward(
+        (miopenFusionPlanDescriptor_t)fusePlanDesc,
+        (miopenFusionOpDescriptor_t *)activOp, (miopenActivationMode_t)mode));
+    return HIPDNN_STATUS_SUCCESS;
+}
+
+hipdnnStatus_t
+hipdnnCompileFusionPlan(hipdnnHandle_t handle,
+                        hipdnnFusionPlanDescriptor_t fusePlanDesc) {
+    CHECK_MIO(miopenCompileFusionPlan(
+        (miopenHandle_t)handle, (miopenFusionPlanDescriptor_t)fusePlanDesc));
+    return HIPDNN_STATUS_SUCCESS;
+}
