@@ -26,24 +26,25 @@
 #include <hip/hip_runtime_api.h>
 
 #define CHECK_HIP(cmd)                                                         \
-  {                                                                            \
-    hipError_t error = cmd;                                                    \
-    if (error != hipSuccess) {                                                 \
-      fprintf(stderr, "error: '%s'(%d) at %s:%d\n", hipGetErrorString(error),  \
-              error, __FILE__, __LINE__);                                      \
-      exit(EXIT_FAILURE);                                                      \
-    }                                                                          \
-  }
+    {                                                                          \
+        hipError_t error = cmd;                                                \
+        if (error != hipSuccess) {                                             \
+            fprintf(stderr, "error: '%s'(%d) at %s:%d\n",                      \
+                    hipGetErrorString(error), error, __FILE__, __LINE__);      \
+            exit(EXIT_FAILURE);                                                \
+        }                                                                      \
+    }
 
 #define CHECK_HIPDNN(expression)                                               \
-  {                                                                            \
-    hipdnnStatus_t status = (expression);                                      \
-    if (status != HIPDNN_STATUS_SUCCESS) {                                     \
-      std::cerr << "HIPDNN Error on line " << __LINE__ << "With error status " \
-                << ": " << hipdnnGetErrorString(status) << std::endl;          \
-      std::exit(EXIT_FAILURE);                                                 \
-    }                                                                          \
-  }
+    {                                                                          \
+        hipdnnStatus_t status = (expression);                                  \
+        if (status != HIPDNN_STATUS_SUCCESS) {                                 \
+            std::cerr << "HIPDNN Error on line " << __LINE__                   \
+                      << "With error status "                                  \
+                      << ": " << hipdnnGetErrorString(status) << std::endl;    \
+            std::exit(EXIT_FAILURE);                                           \
+        }                                                                      \
+    }
 
 #define HIPDNN_EXPORT
 #define HIPDNN_VERSION 7000
@@ -54,118 +55,118 @@
 //#define HIPDNN_ENABLE_SUBSTITUTION
 
 typedef enum {
-  HIPDNN_STATUS_SUCCESS = 0,
-  HIPDNN_STATUS_NOT_INITIALIZED = 1,
-  HIPDNN_STATUS_ALLOC_FAILED = 2,
-  HIPDNN_STATUS_BAD_PARAM = 3,
-  HIPDNN_STATUS_INTERNAL_ERROR = 4,
-  HIPDNN_STATUS_INVALID_VALUE = 5,
-  HIPDNN_STATUS_ARCH_MISMATCH = 6,
-  HIPDNN_STATUS_MAPPING_ERROR = 7,
-  HIPDNN_STATUS_EXECUTION_FAILED = 8,
-  HIPDNN_STATUS_NOT_SUPPORTED = 9,
-  HIPDNN_STATUS_LICENSE_ERROR = 10,
-  HIPDNN_STATUS_RUNTIME_PREREQUISITE_MISSING = 11,
+    HIPDNN_STATUS_SUCCESS = 0,
+    HIPDNN_STATUS_NOT_INITIALIZED = 1,
+    HIPDNN_STATUS_ALLOC_FAILED = 2,
+    HIPDNN_STATUS_BAD_PARAM = 3,
+    HIPDNN_STATUS_INTERNAL_ERROR = 4,
+    HIPDNN_STATUS_INVALID_VALUE = 5,
+    HIPDNN_STATUS_ARCH_MISMATCH = 6,
+    HIPDNN_STATUS_MAPPING_ERROR = 7,
+    HIPDNN_STATUS_EXECUTION_FAILED = 8,
+    HIPDNN_STATUS_NOT_SUPPORTED = 9,
+    HIPDNN_STATUS_LICENSE_ERROR = 10,
+    HIPDNN_STATUS_RUNTIME_PREREQUISITE_MISSING = 11,
 } hipdnnStatus_t;
 
 //=============================================================================
 
 typedef enum {
-  HIPDNN_DATA_FLOAT = 0,
-  HIPDNN_DATA_DOUBLE = 1,
-  HIPDNN_DATA_HALF = 2,
-  HIPDNN_DATA_INT8 = 3,
-  HIPDNN_DATA_INT32 = 4,
-  HIPDNN_DATA_INT8x4 = 5
+    HIPDNN_DATA_FLOAT = 0,
+    HIPDNN_DATA_DOUBLE = 1,
+    HIPDNN_DATA_HALF = 2,
+    HIPDNN_DATA_INT8 = 3,
+    HIPDNN_DATA_INT32 = 4,
+    HIPDNN_DATA_INT8x4 = 5
 } hipdnnDataType_t;
 
 //=============================================================================
 
 typedef enum {
-  HIPDNN_DEFAULT_MATH = 0,
-  HIPDNN_TENSOR_OP_MATH = 1,
+    HIPDNN_DEFAULT_MATH = 0,
+    HIPDNN_TENSOR_OP_MATH = 1,
 } hipdnnMathType_t;
 
 //=============================================================================
 
 typedef enum {
-  HIPDNN_OP_TENSOR_ADD = 0,
-  HIPDNN_OP_TENSOR_MUL = 1,
-  HIPDNN_OP_TENSOR_MIN = 2,
-  HIPDNN_OP_TENSOR_MAX = 3,
-  HIPDNN_OP_TENSOR_SQRT = 4,
+    HIPDNN_OP_TENSOR_ADD = 0,
+    HIPDNN_OP_TENSOR_MUL = 1,
+    HIPDNN_OP_TENSOR_MIN = 2,
+    HIPDNN_OP_TENSOR_MAX = 3,
+    HIPDNN_OP_TENSOR_SQRT = 4,
 } hipdnnOpTensorOp_t;
 
 //=============================================================================
 
 typedef enum {
-  HIPDNN_CONVOLUTION = 0,
-  HIPDNN_CROSS_CORRELATION = 1
+    HIPDNN_CONVOLUTION = 0,
+    HIPDNN_CROSS_CORRELATION = 1
 } hipdnnConvolutionMode_t;
 
 //=============================================================================
 
 typedef enum {
-  HIPDNN_POOLING_MAX = 0,
-  HIPDNN_POOLING_AVERAGE_COUNT_INCLUDE_PADDING =
-      1, // count for average includes padded values
-  HIPDNN_POOLING_AVERAGE_COUNT_EXCLUDE_PADDING =
-      2, // count for average does not include padded values
-  HIPDNN_POOLING_MAX_DETERMINISTIC = 3
+    HIPDNN_POOLING_MAX = 0,
+    HIPDNN_POOLING_AVERAGE_COUNT_INCLUDE_PADDING =
+        1, // count for average includes padded values
+    HIPDNN_POOLING_AVERAGE_COUNT_EXCLUDE_PADDING =
+        2, // count for average does not include padded values
+    HIPDNN_POOLING_MAX_DETERMINISTIC = 3
 } hipdnnPoolingMode_t;
 
 //=============================================================================
 
 typedef enum {
-  HIPDNN_LRN_WITHIN_CHANNEL = 0,
-  HIPDNN_LRN_CROSS_CHANNEL = 1,
+    HIPDNN_LRN_WITHIN_CHANNEL = 0,
+    HIPDNN_LRN_CROSS_CHANNEL = 1,
 } hipdnnLRNMode_t;
 
 //=============================================================================
 
 typedef enum {
-  // bnScale, bnBias tensor dims are 1xCxHxWx.. (one value per CHW...-slice,
-  // normalized over N slice)
-  HIPDNN_BATCHNORM_PER_ACTIVATION = 0,
+    // bnScale, bnBias tensor dims are 1xCxHxWx.. (one value per CHW...-slice,
+    // normalized over N slice)
+    HIPDNN_BATCHNORM_PER_ACTIVATION = 0,
 
-  // bnScale, bnBias tensor dims are 1xCx1x1 (one value per C-dim normalized
-  // over Nx1xHxW subtensors)
-  HIPDNN_BATCHNORM_SPATIAL = 1,
+    // bnScale, bnBias tensor dims are 1xCx1x1 (one value per C-dim normalized
+    // over Nx1xHxW subtensors)
+    HIPDNN_BATCHNORM_SPATIAL = 1,
 
-  /*
-   * bnScale, bnBias tensor dims are 1xCx1x1 (one value per C-dim normalized
-   * over Nx1xHxW subtensors). May be faster than CUDNN_BATCHNORM_SPATIAL but
-   * imposes some limits on the range of values
-   */
-  HIPDNN_BATCHNORM_SPATIAL_PERSISTENT = 2,
+    /*
+     * bnScale, bnBias tensor dims are 1xCx1x1 (one value per C-dim normalized
+     * over Nx1xHxW subtensors). May be faster than CUDNN_BATCHNORM_SPATIAL but
+     * imposes some limits on the range of values
+     */
+    HIPDNN_BATCHNORM_SPATIAL_PERSISTENT = 2,
 } hipdnnBatchNormMode_t;
 
 //=============================================================================
 
 typedef enum {
-  HIPDNN_ACTIVATION_SIGMOID = 0,
-  HIPDNN_ACTIVATION_RELU,
-  HIPDNN_ACTIVATION_TANH,
-  HIPDNN_ACTIVATION_CLIPPED_RELU,
-  HIPDNN_ACTIVATION_ELU,
-  HIPDNN_ACTIVATION_PATHTRU,
-  HIPDNN_ACTIVATION_SOFTRELU,
-  HIPDNN_ACTIVATION_ABS,
-  HIPDNN_ACTIVATION_POWER
+    HIPDNN_ACTIVATION_SIGMOID = 0,
+    HIPDNN_ACTIVATION_RELU,
+    HIPDNN_ACTIVATION_TANH,
+    HIPDNN_ACTIVATION_CLIPPED_RELU,
+    HIPDNN_ACTIVATION_ELU,
+    HIPDNN_ACTIVATION_PATHTRU,
+    HIPDNN_ACTIVATION_SOFTRELU,
+    HIPDNN_ACTIVATION_ABS,
+    HIPDNN_ACTIVATION_POWER
 } hipdnnActivationMode_t;
 
 //=============================================================================
 
 typedef enum {
-  HIPDNN_CONVOLUTION_FWD_ALGO_IMPLICIT_GEMM = 0,
-  HIPDNN_CONVOLUTION_FWD_ALGO_IMPLICIT_PRECOMP_GEMM = 1,
-  HIPDNN_CONVOLUTION_FWD_ALGO_GEMM = 2,
-  HIPDNN_CONVOLUTION_FWD_ALGO_DIRECT = 3,
-  HIPDNN_CONVOLUTION_FWD_ALGO_FFT = 4,
-  HIPDNN_CONVOLUTION_FWD_ALGO_FFT_TILING = 5,
-  HIPDNN_CONVOLUTION_FWD_ALGO_WINOGRAD = 6,
-  HIPDNN_CONVOLUTION_FWD_ALGO_WINOGRAD_NONFUSED = 7,
-  HIPDNN_CONVOLUTION_FWD_ALGO_COUNT = 8,
+    HIPDNN_CONVOLUTION_FWD_ALGO_IMPLICIT_GEMM = 0,
+    HIPDNN_CONVOLUTION_FWD_ALGO_IMPLICIT_PRECOMP_GEMM = 1,
+    HIPDNN_CONVOLUTION_FWD_ALGO_GEMM = 2,
+    HIPDNN_CONVOLUTION_FWD_ALGO_DIRECT = 3,
+    HIPDNN_CONVOLUTION_FWD_ALGO_FFT = 4,
+    HIPDNN_CONVOLUTION_FWD_ALGO_FFT_TILING = 5,
+    HIPDNN_CONVOLUTION_FWD_ALGO_WINOGRAD = 6,
+    HIPDNN_CONVOLUTION_FWD_ALGO_WINOGRAD_NONFUSED = 7,
+    HIPDNN_CONVOLUTION_FWD_ALGO_COUNT = 8,
 } hipdnnConvolutionFwdAlgo_t;
 
 int ConvolutionFwdAlgoCount();
@@ -178,15 +179,15 @@ hipdnnConvolutionFwdAlgo_t GetConvolutionFwdAlgo(int i);
 //=============================================================================
 
 typedef enum {
-  HIPDNN_CONVOLUTION_BWD_FILTER_ALGO_0 = 0, // non-deterministic
-  HIPDNN_CONVOLUTION_BWD_FILTER_ALGO_1 = 1,
-  HIPDNN_CONVOLUTION_BWD_FILTER_ALGO_FFT = 2,
-  HIPDNN_CONVOLUTION_BWD_FILTER_ALGO_3 =
-      3, // non-deterministic, algo0 with workspace
-  HIPDNN_CONVOLUTION_BWD_FILTER_ALGO_WINOGRAD = 4, // not implemented
-  HIPDNN_CONVOLUTION_BWD_FILTER_ALGO_WINOGRAD_NONFUSED = 5,
-  HIPDNN_CONVOLUTION_BWD_FILTER_ALGO_FFT_TILING = 6,
-  HIPDNN_CONVOLUTION_BWD_FILTER_ALGO_COUNT = 7,
+    HIPDNN_CONVOLUTION_BWD_FILTER_ALGO_0 = 0, // non-deterministic
+    HIPDNN_CONVOLUTION_BWD_FILTER_ALGO_1 = 1,
+    HIPDNN_CONVOLUTION_BWD_FILTER_ALGO_FFT = 2,
+    HIPDNN_CONVOLUTION_BWD_FILTER_ALGO_3 =
+        3, // non-deterministic, algo0 with workspace
+    HIPDNN_CONVOLUTION_BWD_FILTER_ALGO_WINOGRAD = 4, // not implemented
+    HIPDNN_CONVOLUTION_BWD_FILTER_ALGO_WINOGRAD_NONFUSED = 5,
+    HIPDNN_CONVOLUTION_BWD_FILTER_ALGO_FFT_TILING = 6,
+    HIPDNN_CONVOLUTION_BWD_FILTER_ALGO_COUNT = 7,
 } hipdnnConvolutionBwdFilterAlgo_t;
 
 int ConvolutionBwdFilterAlgoCount();
@@ -199,14 +200,14 @@ hipdnnConvolutionBwdFilterAlgo_t GetConvolutionBwdFilterAlgo(int i);
 //=============================================================================
 
 typedef enum {
-  HIPDNN_CONVOLUTION_BWD_DATA_ALGO_0 = 0, // non-deterministic
-  HIPDNN_CONVOLUTION_BWD_DATA_ALGO_1 = 1,
-  HIPDNN_CONVOLUTION_BWD_DATA_ALGO_FFT = 2,
-  HIPDNN_CONVOLUTION_BWD_DATA_ALGO_FFT_TILING = 3,
-  HIPDNN_CONVOLUTION_BWD_DATA_ALGO_WINOGRAD = 4,
-  HIPDNN_CONVOLUTION_BWD_DATA_ALGO_WINOGRAD_NONFUSED = 5,
-  HIPDNN_CONVOLUTION_BWD_DATA_ALGO_TRANSPOSE_GEMM = 6,
-  HIPDNN_CONVOLUTION_BWD_DATA_ALGO_COUNT = 7,
+    HIPDNN_CONVOLUTION_BWD_DATA_ALGO_0 = 0, // non-deterministic
+    HIPDNN_CONVOLUTION_BWD_DATA_ALGO_1 = 1,
+    HIPDNN_CONVOLUTION_BWD_DATA_ALGO_FFT = 2,
+    HIPDNN_CONVOLUTION_BWD_DATA_ALGO_FFT_TILING = 3,
+    HIPDNN_CONVOLUTION_BWD_DATA_ALGO_WINOGRAD = 4,
+    HIPDNN_CONVOLUTION_BWD_DATA_ALGO_WINOGRAD_NONFUSED = 5,
+    HIPDNN_CONVOLUTION_BWD_DATA_ALGO_TRANSPOSE_GEMM = 6,
+    HIPDNN_CONVOLUTION_BWD_DATA_ALGO_COUNT = 7,
 } hipdnnConvolutionBwdDataAlgo_t;
 
 int ConvolutionBwdDataAlgoCount();
@@ -219,37 +220,37 @@ hipdnnConvolutionBwdDataAlgo_t GetConvolutionBwdDataAlgo(int i);
 //=============================================================================
 
 typedef enum {
-  HIPDNN_CONVOLUTION_BWD_DATA_NO_WORKSPACE = 0,
-  HIPDNN_CONVOLUTION_BWD_DATA_PREFER_FASTEST = 1,
-  HIPDNN_CONVOLUTION_BWD_DATA_SPECIFY_WORKSPACE_LIMIT = 2,
+    HIPDNN_CONVOLUTION_BWD_DATA_NO_WORKSPACE = 0,
+    HIPDNN_CONVOLUTION_BWD_DATA_PREFER_FASTEST = 1,
+    HIPDNN_CONVOLUTION_BWD_DATA_SPECIFY_WORKSPACE_LIMIT = 2,
 } hipdnnConvolutionBwdDataPreference_t;
 
 //=============================================================================
 
 typedef enum {
-  HIPDNN_SOFTMAX_FAST = 0, /* straightforward implementation */
-  HIPDNN_SOFTMAX_ACCURATE =
-      1, /* subtract max from every point to avoid overflow */
-  HIPDNN_SOFTMAX_LOG = 2
+    HIPDNN_SOFTMAX_FAST = 0, /* straightforward implementation */
+    HIPDNN_SOFTMAX_ACCURATE =
+        1, /* subtract max from every point to avoid overflow */
+    HIPDNN_SOFTMAX_LOG = 2
 } hipdnnSoftmaxAlgorithm_t;
 
 //=============================================================================
 
 typedef enum {
-  HIPDNN_SOFTMAX_MODE_INSTANCE =
-      0, /* compute the softmax over all C, H, W for each N */
-  HIPDNN_SOFTMAX_MODE_CHANNEL =
-      1 /* compute the softmax over all C for each H, W, N */
+    HIPDNN_SOFTMAX_MODE_INSTANCE =
+        0, /* compute the softmax over all C, H, W for each N */
+    HIPDNN_SOFTMAX_MODE_CHANNEL =
+        1 /* compute the softmax over all C for each H, W, N */
 } hipdnnSoftmaxMode_t;
 
 //=============================================================================
 
 typedef enum {
-  HIPDNN_TENSOR_NCHW = 0, /* row major (wStride = 1, hStride = w) */
-  HIPDNN_TENSOR_NHWC = 1, /* feature maps interleaved ( cStride = 1 )*/
-  HIPDNN_TENSOR_NCHW_VECT_C =
-      2 /* each image point is vector of element of C : the length of the vector
-           is carried by the data type*/
+    HIPDNN_TENSOR_NCHW = 0, /* row major (wStride = 1, hStride = w) */
+    HIPDNN_TENSOR_NHWC = 1, /* feature maps interleaved ( cStride = 1 )*/
+    HIPDNN_TENSOR_NCHW_VECT_C =
+        2 /* each image point is vector of element of C : the length of the
+             vector is carried by the data type*/
 } hipdnnTensorFormat_t;
 
 //=============================================================================
@@ -258,24 +259,24 @@ typedef enum {
  * CUDNN propagate Nan
  */
 typedef enum {
-  HIPDNN_NOT_PROPAGATE_NAN = 0,
-  HIPDNN_PROPAGATE_NAN = 1,
+    HIPDNN_NOT_PROPAGATE_NAN = 0,
+    HIPDNN_PROPAGATE_NAN = 1,
 } hipdnnNanPropagation_t;
 
 //=============================================================================
 
 typedef enum {
-  HIPDNN_CONVOLUTION_FWD_NO_WORKSPACE = 0,
-  HIPDNN_CONVOLUTION_FWD_PREFER_FASTEST = 1,
-  HIPDNN_CONVOLUTION_FWD_SPECIFY_WORKSPACE_LIMIT = 2,
+    HIPDNN_CONVOLUTION_FWD_NO_WORKSPACE = 0,
+    HIPDNN_CONVOLUTION_FWD_PREFER_FASTEST = 1,
+    HIPDNN_CONVOLUTION_FWD_SPECIFY_WORKSPACE_LIMIT = 2,
 } hipdnnConvolutionFwdPreference_t;
 
 //=============================================================================
 
 typedef enum {
-  HIPDNN_CONVOLUTION_BWD_FILTER_NO_WORKSPACE = 0,
-  HIPDNN_CONVOLUTION_BWD_FILTER_PREFER_FASTEST = 1,
-  HIPDNN_CONVOLUTION_BWD_FILTER_SPECIFY_WORKSPACE_LIMIT = 2,
+    HIPDNN_CONVOLUTION_BWD_FILTER_NO_WORKSPACE = 0,
+    HIPDNN_CONVOLUTION_BWD_FILTER_PREFER_FASTEST = 1,
+    HIPDNN_CONVOLUTION_BWD_FILTER_SPECIFY_WORKSPACE_LIMIT = 2,
 } hipdnnConvolutionBwdFilterPreference_t;
 
 //=============================================================================
@@ -283,48 +284,91 @@ typedef enum {
 // CNTK 2.4
 
 typedef enum {
-  HIPDNN_REDUCE_TENSOR_ADD = 0,
-  HIPDNN_REDUCE_TENSOR_MUL = 1,
-  HIPDNN_REDUCE_TENSOR_MIN = 2,
-  HIPDNN_REDUCE_TENSOR_MAX = 3,
-  HIPDNN_REDUCE_TENSOR_AMAX = 4,
-  HIPDNN_REDUCE_TENSOR_AVG = 5,
-  HIPDNN_REDUCE_TENSOR_NORM1 = 6,
-  HIPDNN_REDUCE_TENSOR_NORM2 = 7,
-  HIPDNN_REDUCE_TENSOR_MUL_NO_ZEROS = 8,
+    HIPDNN_REDUCE_TENSOR_ADD = 0,
+    HIPDNN_REDUCE_TENSOR_MUL = 1,
+    HIPDNN_REDUCE_TENSOR_MIN = 2,
+    HIPDNN_REDUCE_TENSOR_MAX = 3,
+    HIPDNN_REDUCE_TENSOR_AMAX = 4,
+    HIPDNN_REDUCE_TENSOR_AVG = 5,
+    HIPDNN_REDUCE_TENSOR_NORM1 = 6,
+    HIPDNN_REDUCE_TENSOR_NORM2 = 7,
+    HIPDNN_REDUCE_TENSOR_MUL_NO_ZEROS = 8,
 } hipdnnReduceTensorOp_t;
 
 //=============================================================================
 
 typedef enum {
-  HIPDNN_REDUCE_TENSOR_NO_INDICES = 0,
-  HIPDNN_REDUCE_TENSOR_FLATTENED_INDICES = 1,
+    HIPDNN_REDUCE_TENSOR_NO_INDICES = 0,
+    HIPDNN_REDUCE_TENSOR_FLATTENED_INDICES = 1,
 } hipdnnReduceTensorIndices_t;
 
 //=============================================================================
 
 typedef enum {
-  HIPDNN_32BIT_INDICES = 0,
-  HIPDNN_64BIT_INDICES = 1,
-  HIPDNN_16BIT_INDICES = 2,
-  HIPDNN_8BIT_INDICES = 3,
+    HIPDNN_32BIT_INDICES = 0,
+    HIPDNN_64BIT_INDICES = 1,
+    HIPDNN_16BIT_INDICES = 2,
+    HIPDNN_8BIT_INDICES = 3,
 } hipdnnIndicesType_t;
 
 //=============================================================================
 
-// platform specific typedefs
-
-#if defined(__HIP_PLATFORM_HCC__) and not defined(__HIP_PLATFORM_NVCC__)
-#include <hcc_detail/hipDNN_miopen.h>
-#elif defined(__HIP_PLATFORM_NVCC__) and not defined(__HIP_PLATFORM_HCC__)
-#include <nvcc_detail/hipDNN_cudnn.h>
-#else
-#error("Must define exactly one of __HIP_PLATFORM_HCC__ or __HIP_PLATFORM_NVCC__");
-#endif
-
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+typedef void *hipdnnHandle_t;
+
+typedef void *hipdnnStream_t;
+
+typedef void *hipdnnTensorDescriptor_t;
+
+typedef void *hipdnnReduceTensorDescriptor_t;
+
+typedef void *hipdnnFilterDescriptor_t;
+
+typedef void *hipdnnConvolutionDescriptor_t;
+
+typedef void *hipdnnLRNDescriptor_t;
+
+typedef void *hipdnnActivationDescriptor_t;
+
+typedef void *hipdnnPoolingDescriptor_t;
+
+typedef void *hipdnnOpTensorDescriptor_t;
+
+typedef void *hipdnnDropoutDescriptor_t;
+
+typedef void *hipdnnRNNDescriptor_t;
+
+typedef void *hipdnnPersistentRNNPlan_t;
+
+typedef void *hipdnnDeterminism_t;
+
+struct hipdnnConvolutionFwdAlgoPerf_t {
+    hipdnnConvolutionFwdAlgo_t algo;
+    hipdnnStatus_t status;
+    float time;
+    size_t memory;
+    hipdnnMathType_t mathType;
+    long reserved[3];
+};
+struct hipdnnConvolutionBwdDataAlgoPerf_t {
+    hipdnnConvolutionBwdDataAlgo_t algo;
+    hipdnnStatus_t status;
+    float time;
+    size_t memory;
+    hipdnnMathType_t mathType;
+    long reserved[3];
+};
+struct hipdnnConvolutionBwdFilterAlgoPerf_t {
+    hipdnnConvolutionBwdFilterAlgo_t algo;
+    hipdnnStatus_t status;
+    float time;
+    size_t memory;
+    hipdnnMathType_t mathType;
+    long reserved[3];
+};
 
 HIPDNN_EXPORT hipdnnStatus_t hipdnnCreate(hipdnnHandle_t *handle);
 
@@ -749,28 +793,28 @@ const char *hipdnnGetErrorString(hipdnnStatus_t status);
 
 /* RNN API */
 typedef enum {
-  HIPDNN_RNN_RELU = 0, // Stock RNN with ReLu activation
-  HIPDNN_RNN_TANH = 1, // Stock RNN with tanh activation
-  HIPDNN_LSTM = 2,     // LSTM with no peephole connections
-  HIPDNN_GRU =
-      3 // Using h' = tanh(r * Uh(t-1) + Wx) and h = (1 - z) * h' + z * h(t-1);
+    HIPDNN_RNN_RELU = 0, // Stock RNN with ReLu activation
+    HIPDNN_RNN_TANH = 1, // Stock RNN with tanh activation
+    HIPDNN_LSTM = 2,     // LSTM with no peephole connections
+    HIPDNN_GRU = 3 // Using h' = tanh(r * Uh(t-1) + Wx) and h = (1 - z) * h' + z
+                   // * h(t-1);
 } hipdnnRNNMode_t;
 
 typedef enum {
-  HIPDNN_UNIDIRECTIONAL = 0,
-  HIPDNN_BIDIRECTIONAL = 1 // Using output concatination at each step. Do we
-                           // also want to support output sum?
+    HIPDNN_UNIDIRECTIONAL = 0,
+    HIPDNN_BIDIRECTIONAL = 1 // Using output concatination at each step. Do we
+                             // also want to support output sum?
 } hipdnnDirectionMode_t;
 
 typedef enum {
-  HIPDNN_LINEAR_INPUT = 0,
-  HIPDNN_SKIP_INPUT = 1
+    HIPDNN_LINEAR_INPUT = 0,
+    HIPDNN_SKIP_INPUT = 1
 } hipdnnRNNInputMode_t;
 
 typedef enum {
-  HIPDNN_RNN_ALGO_STANDARD = 0,
-  HIPDNN_RNN_ALGO_PERSIST_STATIC = 1,
-  HIPDNN_RNN_ALGO_PERSIST_DYNAMIC = 2
+    HIPDNN_RNN_ALGO_STANDARD = 0,
+    HIPDNN_RNN_ALGO_PERSIST_STATIC = 1,
+    HIPDNN_RNN_ALGO_PERSIST_DYNAMIC = 2
 } hipdnnRNNAlgo_t;
 
 hipdnnStatus_t hipdnnCreateRNNDescriptor(hipdnnRNNDescriptor_t *rnnDesc);
@@ -943,6 +987,9 @@ hipdnnStatus_t hipdnnDestroyReduceTensorDescriptor(
 hipdnnStatus_t
 hipdnnSetConvolutionMathType(hipdnnConvolutionDescriptor_t convDesc,
                              hipdnnMathType_t mathType);
+
+ hipdnnStatus_t hipdnnSetConvolutionGroupCount(
+    hipdnnConvolutionDescriptor_t convDesc, int groupCount );                        
 
 #ifdef __cplusplus
 }
