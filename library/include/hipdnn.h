@@ -313,6 +313,13 @@ typedef enum {
 
 //=============================================================================
 
+typedef enum {
+    HIPDNN_VERTICAL_FUSION = 0,
+    HIPDNN_HORIZONTAL_FUSION = 1,
+} hipdnnFusionDirection_t;
+
+//=============================================================================
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -988,8 +995,10 @@ hipdnnStatus_t
 hipdnnSetConvolutionMathType(hipdnnConvolutionDescriptor_t convDesc,
                              hipdnnMathType_t mathType);
 
- hipdnnStatus_t hipdnnSetConvolutionGroupCount(
-    hipdnnConvolutionDescriptor_t convDesc, int groupCount );                        
+hipdnnStatus_t hipdnnSetConvolutionGroupCount(
+    hipdnnConvolutionDescriptor_t convDesc, int groupCount );
+
+
 
 #ifdef __cplusplus
 }
