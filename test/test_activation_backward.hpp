@@ -1,7 +1,7 @@
 #ifndef TEST_ACTIVATION_BACKWARD_HPP
 #define TEST_ACTIVATION_BACKWARD_HPP
 
-#include "hipDNN_test_common.h"
+#include "hipdnn_test_common.h"
 
 struct activation_params_t {
   int n, channels, height, width;

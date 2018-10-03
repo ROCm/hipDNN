@@ -1,6 +1,6 @@
 #ifndef POOLING_BACKWARD
 #define POOLING_BACKWARD
-#include "hipDNN_test_common.h"
+#include "hipdnn_test_common.h"
 
 struct test_pooling_t {
   size_t in, ichannel, iheight, iwidth;

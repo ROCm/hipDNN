@@ -1,8 +1,8 @@
 #ifndef TEST_CONVOLUTION_FORWARD_COMMON_HPP
 #define TEST_CONVOLUTION_FORWARD_COMMON_HPP
 
-#include "hipDNN.h"
-#include "hipDNN_test_common.h"
+#include "hipdnn.h"
+#include "hipdnn_test_common.h"
 #include "gtest/gtest.h"
 
 struct test_convolution_sizes_t {
