@@ -313,6 +313,13 @@ typedef enum {
 
 //=============================================================================
 
+typedef enum {
+    HIPDNN_VERTICAL_FUSION = 0,
+    HIPDNN_HORIZONTAL_FUSION = 1,
+} hipdnnFusionDirection_t;
+
+//=============================================================================
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -344,6 +351,11 @@ typedef void *hipdnnRNNDescriptor_t;
 typedef void *hipdnnPersistentRNNPlan_t;
 
 typedef void *hipdnnDeterminism_t;
+
+// Fusion API
+typedef void *hipdnnFusionPlanDescriptor_t;
+
+typedef void *hipdnnFusionOpDescriptor_t;
 
 struct hipdnnConvolutionFwdAlgoPerf_t {
     hipdnnConvolutionFwdAlgo_t algo;
@@ -987,6 +999,11 @@ hipdnnStatus_t hipdnnDestroyReduceTensorDescriptor(
 hipdnnStatus_t
 hipdnnSetConvolutionMathType(hipdnnConvolutionDescriptor_t convDesc,
                              hipdnnMathType_t mathType);
+
+hipdnnStatus_t
+hipdnnCreateFusionPlan(hipdnnFusionPlanDescriptor_t *fusePlanDesc,
+                       const hipdnnFusionDirection_t fuseDirection,
+                       const hipdnnTensorDescriptor_t inputDesc);
 
 #ifdef __cplusplus
 }
