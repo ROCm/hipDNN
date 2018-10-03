@@ -27,10 +27,10 @@ std::string convert_to_string(dataType *arr, int s_size) {
 }
 
 template <typename dataType>
-std::string integration_dims_to_string(dataType *arr1, dataType *arr2) {
+std::string integration_dims_to_string(dataType *arr1, dataType *arr2, std::string a, std::string b) {
   std::ostringstream os;
 
-  os << "\"C:[";
+  os << "\""<<a<<":[";
 
   for (int i = 0; i < 4; i++) {
     os << arr1[i];
@@ -39,7 +39,7 @@ std::string integration_dims_to_string(dataType *arr1, dataType *arr2) {
       os << ",";
   }
 
-  os << "] MP:[";
+  os << "]"<< b <<":[";
 
   for (int i = 0; i < 4; i++) {
     os << arr2[i];

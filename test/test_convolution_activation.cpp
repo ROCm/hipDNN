@@ -1,52 +1,52 @@
-#include "test_convolution_pooling_int.hpp"
+#include "test_convolution_activation.hpp"
 
-TEST(convolution_pooling_fwd_intg, func_check_naive_conv_pool) {
+TEST(convolution_activation_fwd_intg, func_check_naive_conv_activation) {
   float avg_time = 0, avg_time1 = 0, avg_time2 = 0;
-  int oheight = 4, owidth = 4;
-  test_pooling_descriptor pool(1, 1, 4, 4, 2, 2, 2, 2, 0, 0, 2, 2);
-  
-  Memory<float> dstData(pool.mb * pool.c * pool.oh * pool.ow);
-  
+      
     Desc inputDesc(1, 3, 16, 16);
     Desc filterDesc(1, 3, 4, 4);
     int pad[2] = {0, 0};    // zero padding
     int stride[2] = {4, 4}; // stride 1
-    
+
     Desc outputDesc =
-        calculateConvDesc(inputDesc, filterDesc, pad, stride);
+        calculateConv2DOutDim(inputDesc, filterDesc, pad, stride);
     Memory<float> srcDataConv = createMemory<float>(inputDesc);
     Memory<float> dstDataGPU = createMemory<float>(outputDesc);
     Memory<float> filterData = createMemory<float>(filterDesc);
     populateMemoryRandom<float>(srcDataConv);
     populateMemoryRandom<float>(filterData);
-    test_conv_sizes testConvolutionSizes(
+    test_convolution_sizes_t testConvolutionSizes(
         inputDesc.N, 1, inputDesc.C, inputDesc.H, inputDesc.W, outputDesc.C,
         outputDesc.H, outputDesc.W, filterDesc.H, filterDesc.W, pad[0], pad[1],
         stride[0], stride[1], 1, 1);
+
+  activation_fwd_params test_case(1, 1, 4, 4);
+   Memory<float> dataDst(test_case.n * test_case.channels * test_case.height *
+                        test_case.width);
 
   int ip_size_c[4] = {inputDesc.N, inputDesc.C, inputDesc.H, inputDesc.W};
   int k_size_c[4] = {filterDesc.N, filterDesc.C, filterDesc.H, filterDesc.W};
   int op_size_c[4] =  {outputDesc.N, outputDesc.C, outputDesc.H, outputDesc.W};
 
-  int ip_size_p[4] = {outputDesc.N, outputDesc.C, outputDesc.H, outputDesc.W};
-  int k_size_p[4] = {pool.mb, pool.c, pool.kh, pool.kw};
-  int op_size_p[4] =  {pool.mb, pool.c, pool.oh, pool.ow};
+  int ip_size_a[4] = {test_case.n, test_case.channels, test_case.height,               test_case.width};
+  int k_size_a[4] = {0,0,0,0};
+  int op_size_a[4] =  {test_case.n, test_case.channels, test_case.height,               test_case.width};
 
- std::string str_ip_size = integration_dims_to_string(ip_size_c,ip_size_p,"Conv","MP");
- std::string str_k_size = integration_dims_to_string(k_size_c,k_size_p,"Conv","MP");
- std::string str_op_size = integration_dims_to_string(op_size_c,op_size_p,"Conv","MP");
+ std::string str_ip_size = integration_dims_to_string(ip_size_c,ip_size_a,"Conv","Act");
+ std::string str_k_size = integration_dims_to_string(k_size_c,k_size_a,"Conv","Act");
+ std::string str_op_size = integration_dims_to_string(op_size_c,op_size_a,"Conv","Act");
 
-  compute_conv_forward<float>(testConvolutionSizes, srcDataConv.gpu(),
+  compute_hipdnn_conv_fwd<float>(testConvolutionSizes, srcDataConv.gpu(),
                                 filterData.gpu(), NULL, dstDataGPU.gpu(),&avg_time1);
-  compute_pooling_fwd<float>(pool, dstDataGPU.gpu(), dstData.gpu(), &avg_time2);
+  compute_hipdnn_activation_forward<float>(test_case, dstDataGPU.gpu(), dataDst.gpu(), &avg_time2);
         
   avg_time = avg_time1 + avg_time2;
    
   std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
 
     std::string strt = "./result_unittest.csv";
-    std::string testname = "convolution_pooling_fwd_intg:func_check_naive_conv_pool";
-    float* temp = dstData.getDataFromGPU();
+    std::string testname = "convolution_activation_fwd_intg: func_check_naive_conv_activation";
+    float* temp = dataDst.getDataFromGPU();
     std::string str  = convert_to_string((float*)temp,(int)dstDataGPU.get_num_elements());
     write_to_csv(strt, str, testname, avg_time, str_ip_size, str_k_size, str_op_size); 
 }
