@@ -357,6 +357,8 @@ typedef void *hipdnnFusionPlanDescriptor_t;
 
 typedef void *hipdnnFusionOpDescriptor_t;
 
+typedef void *hipdnnOperatorArgs_t;
+
 struct hipdnnConvolutionFwdAlgoPerf_t {
     hipdnnConvolutionFwdAlgo_t algo;
     hipdnnStatus_t status;
