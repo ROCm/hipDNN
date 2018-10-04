@@ -3000,7 +3000,7 @@ hipdnnStatus_t hipdnnDestroyReduceTensorDescriptor(
 hipdnnStatus_t
 hipdnnCreateFusionPlan(hipdnnFusionPlanDescriptor_t *fusePlanDesc,
                        const hipdnnFusionDirection_t fuseDirection,
-                       const miopenTensorDescriptor_t inputDesc) {
+                       const hipdnnTensorDescriptor_t inputDesc) {
     CHECK_MIO(
         miopenCreateFusionPlan((miopenFusionPlanDescriptor_t *)fusePlanDesc,
                                (miopenFusionDirection_t)fuseDirection,
