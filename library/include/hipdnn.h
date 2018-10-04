@@ -352,6 +352,13 @@ typedef void *hipdnnPersistentRNNPlan_t;
 
 typedef void *hipdnnDeterminism_t;
 
+// --- Fusion API ---
+typedef void *hipdnnFusionPlanDescriptor_t;
+
+typedef void *hipdnnFusionOpDescriptor_t;
+
+typedef void *hipdnnOperatorArgs_t;
+
 struct hipdnnConvolutionFwdAlgoPerf_t {
     hipdnnConvolutionFwdAlgo_t algo;
     hipdnnStatus_t status;
@@ -998,7 +1005,12 @@ hipdnnSetConvolutionMathType(hipdnnConvolutionDescriptor_t convDesc,
 hipdnnStatus_t hipdnnSetConvolutionGroupCount(
     hipdnnConvolutionDescriptor_t convDesc, int groupCount );
 
+// --- Fusion API ---
 
+hipdnnStatus_t
+hipdnnCreateFusionPlan(hipdnnFusionPlanDescriptor_t *fusePlanDesc,
+                       const hipdnnFusionDirection_t fuseDirection,
+                       const hipdnnTensorDescriptor_t inputDesc);
 
 #ifdef __cplusplus
 }
