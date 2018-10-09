@@ -1823,7 +1823,7 @@ hipdnnStatus_t hipdnnSetActivationDescriptor(
     hipdnnActivationDescriptor_t activationDesc, // HGSOS const
     hipdnnActivationMode_t mode, hipdnnNanPropagation_t reluNanOpt,
     double reluCeilingOrAlpha, double activBeta, double activExp) {
-    cudnnActivationMode_t cuAMode;
+    hipdnnActivationMode_t cuAMode;
     hipdnnStatus_t retVal;
     cudnnNanPropagation_t cuNaN;
 
