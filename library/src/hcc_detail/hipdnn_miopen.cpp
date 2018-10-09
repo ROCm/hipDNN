@@ -3111,11 +3111,11 @@ hipdnnStatus_t hipdnnSetOpArgsBiasForward(
 }
 
 hipdnnStatus_t hipdnnSetOpArgsActivForward(
-    hipdnnOperatorArgs_t args, const hipdnnFusionOpDescriptor_t biasOp,
+    hipdnnOperatorArgs_t args, const hipdnnFusionOpDescriptor_t activOp,
     const void *alpha, const void *beta, double activAlpha, double activBeta,
     double activGamma) {
     CHECK_MIO(miopenSetOpArgsActivForward(
-        (miopenOperatorArgs_t)args, (miopenFusionOpDescriptor_t)biasOp, alpha,
+        (miopenOperatorArgs_t)args, (miopenFusionOpDescriptor_t)activOp, alpha,
         beta, activAlpha, activBeta, activGamma));
     return HIPDNN_STATUS_SUCCESS;
 }
@@ -3144,6 +3144,11 @@ hipdnnExecuteFusionPlan(const hipdnnHandle_t handle,
         (miopenTensorDescriptor_t)outputDesc, output,
         (miopenOperatorArgs_t)args));
     return HIPDNN_STATUS_SUCCESS;
+}
+
+hipdnnStatus_t hipdnnDestroyOperatorArgs(hipdnnOperatorArgs_t args) {
+    CHECK_MIO(miopenDestroyOperatorArgs((miopenOperatorArgs_t) args) );
+    return HIPDNN_STATUS_SUCCESS;    
 }
 
 hipdnnStatus_t
