@@ -3027,10 +3027,14 @@ hipdnnStatus_t hipdnnFusionPlanGetWorkSpaceSize(
 
 hipdnnStatus_t hipdnnFusionPlanConvolutionGetAlgo(
     hipdnnFusionPlanDescriptor_t fusePlanDesc, const int requestAlgoCount,
-    int *returnedAlgoCount, hipdnnConvolutionFwdAlgo_t *returnedAlgos) {
+    int* returnedAlgoCount, hipdnnConvolutionFwdAlgo_t* returnedAlgos) {
+    
+    miopenConvFwdAlgorithm_t mi_returnedAlgos;
     CHECK_MIO(miopenFusionPlanConvolutionGetAlgo(
         (miopenFusionPlanDescriptor_t)fusePlanDesc, requestAlgoCount,
-        returnedAlgoCount, (miopenConvFwdAlgorithm_t *)returnedAlgos));
+        returnedAlgoCount, &mi_returnedAlgos));
+    miopenTohipConvolutionFwdAlgo(mi_returnedAlgos,returnedAlgos);    
+    
     return HIPDNN_STATUS_SUCCESS;
 }
 
@@ -3061,9 +3065,11 @@ hipdnnStatus_t
 hipdnnCreateOpActivationForward(hipdnnFusionPlanDescriptor_t fusePlanDesc,
                                 hipdnnFusionOpDescriptor_t *activOp,
                                 hipdnnActivationMode_t mode) {
+    miopenActivationMode_t mi_mode;
+    hipTomiopenActivationMode(mode, &mi_mode);
     CHECK_MIO(miopenCreateOpActivationForward(
         (miopenFusionPlanDescriptor_t)fusePlanDesc,
-        (miopenFusionOpDescriptor_t *)activOp, (miopenActivationMode_t)mode));
+        (miopenFusionOpDescriptor_t *)activOp, mi_mode));
     return HIPDNN_STATUS_SUCCESS;
 }
 
@@ -3071,9 +3077,12 @@ hipdnnStatus_t hipdnnCreateOpBatchNormInference(
     hipdnnFusionPlanDescriptor_t fusePlanDesc, hipdnnFusionOpDescriptor_t *bnOp,
     const hipdnnBatchNormMode_t bn_mode,
     const hipdnnTensorDescriptor_t bnScaleBiasMeanVarDesc) {
+    
+    miopenBatchNormMode_t mi_bn_mode;
+    hipTomiopenBatchNormMode(bn_mode, &mi_bn_mode);
     CHECK_MIO(miopenCreateOpBatchNormInference(
         (miopenFusionPlanDescriptor_t)fusePlanDesc,
-        (miopenFusionOpDescriptor_t *)bnOp, (miopenBatchNormMode_t)bn_mode,
+        (miopenFusionOpDescriptor_t *)bnOp, mi_bn_mode,
         (miopenTensorDescriptor_t)bnScaleBiasMeanVarDesc));
     return HIPDNN_STATUS_SUCCESS;
 }
