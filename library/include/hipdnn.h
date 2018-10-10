@@ -1074,7 +1074,7 @@ hipdnnSetOpArgsBiasForward( hipdnnOperatorArgs_t args,
 
 hipdnnStatus_t 
 hipdnnSetOpArgsActivForward( hipdnnOperatorArgs_t args, 
-                             const hipdnnFusionOpDescriptor_t biasOp,
+                             const hipdnnFusionOpDescriptor_t activOp,
                              const void *alpha, 
                              const void *beta, 
                              double activAlpha, 
