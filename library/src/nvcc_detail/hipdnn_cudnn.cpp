@@ -2885,8 +2885,15 @@ hipdnnCompileFusionPlan(hipdnnHandle_t handle,
 hipdnnStatus_t hipdnnFusionPlanGetOp(hipdnnFusionPlanDescriptor_t fusePlanDesc,
                                      const int op_idx,
                                      hipdnnFusionOpDescriptor_t *op) {
-    // TO BE COMPLETED
-    return HIPDNN_STATUS_NOT_SUPPORTED;
+    
+    if( (fusionPlan_t)fusePlanDesc)->fuseOpCount > op_idx ) {
+        *op = ((fusionPlan_t)fusePlanDesc)->fuseOpPtrs[op_idx];
+        return HIPDNN_STATUS_SUCCESS;
+    }
+    else {
+        return HIPDNN_STATUS_INVALID_VALUE;
+    }    
+    
 }
 
 hipdnnStatus_t hipdnnFusionPlanGetWorkSpaceSize(
