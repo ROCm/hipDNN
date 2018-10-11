@@ -2743,13 +2743,13 @@ typedef struct { /* Fusion plan */
     int                      fusePlanId;
     char*                    fuseOpSeq;
     int                      fuseOpCount;
-    void**                   fuseOpPtrs; // for free purpose
+    void**                   fuseOpPtrs;
 } fusionPlan_t;
 
 typedef struct {
     char*                    fuseOpArgsSeq;
     int                      fuseOpArgsCount;
-    void**                   fuseOpArgsPtrs; // for free purpose
+    void**                   fuseOpArgsPtrs;
 }fusionOpArgs_t;
 
 int fusionValidate (fusionPlan_t* basePlan, fusionPlan_t* checkPlan) {
@@ -2907,9 +2907,46 @@ hipdnnStatus_t hipdnnFusionPlanGetWorkSpaceSize(
 hipdnnStatus_t hipdnnFusionPlanConvolutionGetAlgo(
     hipdnnFusionPlanDescriptor_t fusePlanDesc, const int requestAlgoCount,
     int* returnedAlgoCount, hipdnnConvolutionFwdAlgo_t* returnedAlgos) {
+    
+    int convFlag = 0 ;
+    int convId =0; 
+    hipdnnStatus_t retVal;
+    fusionPlan_t* fusePlanDesc_cast = (fusionPlan_t*)fusePlanDesc;
+    for( int convId=0; convId < fusePlanDesc_cast->fuseOpCount; convId++ ) {
+        if (fusePlanDesc_cast->fuseOpSeq[convId] == 'C') {
+            convFlag = 1;
+            break;  
+        } 
+    }
+    
+    if (convFlag==1){
+        hipdnnHandle_t handle = fusePlanDesc_cast->handle;
+        hipdnnTensorDescriptor_t xDesc = fusePlanDesc_cast->inputDesc;
+        fusionConvolutionForwardCreate_t* fuseOpPtrsDesc_cast = 
+            (fusionConvolutionForwardCreate_t*)(fusePlanDesc_cast->fuseOpPtrs[convId]);
+        hipdnnFilterDescriptor_t wDesc = fuseOpPtrsDesc_cast->wDesc;
+        hipdnnConvolutionDescriptor_t convDesc = fuseOpPtrsDesc_cast->convDesc;
+        hipdnnTensorDescriptor_t yDesc;
 
-    // Dont Know How to Implement??
-    return HIPDNN_STATUS_NOT_SUPPORTED;
+        hipdnnCreateTensorDescriptor(&yDesc);
+        int n, c, h, w ;
+        hipdnnGetConvolution2dForwardOutputDim(convDesc, xDesc, wDesc, &n, &c, &h, &w);
+        hipdnnDataType_t dataType; 
+        int temp; // temp is passed for unncessary information
+        hipdnnGetTensor4dDescriptor(xDesc, &dataType, &temp, &temp, &temp, &temp, 
+            &temp, &temp, &temp, &temp);
+        hipdnnTensorFormat_t format = HIPDNN_TENSOR_NCHW;
+        hipdnnSetTensor4dDescriptor(yDesc, format, dataType, n, c, h, w);
+
+        hipdnnConvolutionFwdAlgoPerf_t perfResults;
+        retVal = hipdnnFindConvolutionForwardAlgorithm( handle, xDesc, wDesc, 
+            convDesc, yDesc, requestAlgoCount, returnedAlgoCount, &perfResults);
+    }
+    else {
+        retVal = HIPDNN_STATUS_NOT_INITIALIZED;
+    }
+
+    return retVal;
 }
 
 hipdnnStatus_t hipdnnCreateOperatorArgs(hipdnnOperatorArgs_t* args) {
