@@ -20,11 +20,11 @@ find_path(MIOPEN_INCLUDE_DIR miopen_kernels.h
     PATH_SUFFIXES miopen/include include)
 
 find_path(MIOPEN_LIBRARY_DIR libMIOpen.so
-HINTS ${HIP_PATH} /opt/rocm/
-PATH_SUFFIXES miopen/lib lib lib64)
+    HINTS /opt/rocm/miopen/ /opt/rocm/miopen ${HIP_PATH}
+    PATH_SUFFIXES miopen/lib lib lib64)
 
 find_library(MIOPEN_LIBRARY MIOpen
-    HINTS ${HIP_PATH} /opt/rocm/
+    HINTS /opt/rocm/miopen/ /opt/rocm/miopen ${HIP_PATH}
     PATH_SUFFIXES lib lib64 miopen/lib)
 
 if(MIOPEN_FOUND)
