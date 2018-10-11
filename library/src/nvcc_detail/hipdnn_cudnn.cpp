@@ -2886,8 +2886,8 @@ hipdnnStatus_t hipdnnFusionPlanGetOp(hipdnnFusionPlanDescriptor_t fusePlanDesc,
                                      const int op_idx,
                                      hipdnnFusionOpDescriptor_t *op) {
     
-    if( (fusionPlan_t)fusePlanDesc)->fuseOpCount > op_idx ) {
-        *op = ((fusionPlan_t)fusePlanDesc)->fuseOpPtrs[op_idx];
+    if( ((fusionPlan_t*)fusePlanDesc)->fuseOpCount > op_idx ) {
+        *op = ((fusionPlan_t*)fusePlanDesc)->fuseOpPtrs[op_idx];
         return HIPDNN_STATUS_SUCCESS;
     }
     else {
