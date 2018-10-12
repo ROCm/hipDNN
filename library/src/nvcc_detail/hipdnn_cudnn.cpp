@@ -3073,48 +3073,84 @@ hipdnnExecuteFusionPlan(const hipdnnHandle_t handle,
                         const void *input,
                         const hipdnnTensorDescriptor_t outputDesc, void *output,
                         hipdnnOperatorArgs_t args) {
-    fusionPlan_t* fusionPlanDesc_cast = (fusionPlan_t*)fusePlanDesc;
-    fusionOpArgs_t* args_cast = (fusionOpArgs_t*)args;
-    int opCount = fusionPlanDesc_cast->fuseOpCount;
-    char* opSeq = fusionPlanDesc_cast->fuseOpSeq;
-    char* setSeq; int cntr;
 
+    fusionPlan_t* fusePlanDesc_cast = (fusionPlan_t*)fusePlanDesc;
+    fusionOpArgs_t* args_cast = (fusionOpArgs_t*)args;
+    hipdnnTensorDescriptor_t curInputDesc = inputDesc;
+    const void* curInput = input;
     // Sanity Checks
-    if (fusionPlanDesc_cast->fuseOpCount != args_cast->fuseOpArgsCount) {
+    if (fusePlanDesc_cast->fuseOpCount != args_cast->fuseOpArgsCount) {
         return HIPDNN_STATUS_INVALID_VALUE;
     }
 
-    setSeq = "CBA";
-    for(cntr = 0; (opSeq[cntr] == setSeq[cntr]) && (cntr<opCount) ; cntr++); //string compare
-    if (opCount == cntr) {
-        fusionConvolutionForwardArgs_t* convArgs_cast;
-        fusionBiasForwardArgs_t* biasArgs_cast;
-        fusionActivationForwardArgs_t* activArgs_cast;
-        for( int Id=0; Id < fusePlanDesc_cast->fuseOpCount; Id++ ) {
-            if (args_cast->fuseOpArgsSeq[Id] == 'C') {
-                convArgs_cast = (fusionConvolutionForwardArgs_t*)(args_cast->fuseOpArgsPtrs[Id]);
+    for( int Id=0; Id < fusePlanDesc_cast->fuseOpCount; Id++ ) {
+
+        if (fusePlanDesc_cast->fuseOpSeq[Id] == 'C') {
+            fusionConvolutionForwardArgs_t* convArgs_cast;
+            for( int convId=0; convId < args_cast->fuseOpArgsCount; convId++ ) {
+                if (args_cast->fuseOpArgsSeq[convId] == 'C') {
+                    convArgs_cast = (fusionConvolutionForwardArgs_t*)(args_cast->fuseOpArgsPtrs[Id]);
+                    args_cast->fuseOpArgsSeq[convId]='\0'; break;
                 }
-            else if (args_cast->fuseOpArgsSeq[Id] == 'B') {
-                biasArgs_cast = (fusionBiasForwardArgs_t*)(args_cast->fuseOpArgsPtrs[Id]);
-                }
-            else if (args_cast->fuseOpArgsSeq[Id] == 'A') {
-                biasArgs_cast = (fusionActivationForwardArgs_t*)(args_cast->fuseOpArgsPtrs[Id]);
-                }
+            }
+            hipdnnHandle_t handle = fusePlanDesc_cast->handle;
+            hipdnnFilterDescriptor_t filterDesc = convArgs_cast->creationParam.wDesc;
+            void* filter = convArgs_cast->w;
+            hipdnnConvolutionDescriptor_t convDesc = convArgs_cast->creationParam.convDesc;
+            void* workSpace;
+            hipdnnTensorDescriptor_t outDesc; void *out;
+            hipdnnCreateTensorDescriptor(&outDesc);
+            int n, c, h, w ;
+            hipdnnGetConvolution2dForwardOutputDim(convDesc, curInputDesc, filterDesc,
+                &n, &c, &h, &w);
+            hipdnnDataType_t dataType;
+            int temp; // temp is passed for unncessary information
+            hipdnnGetTensor4dDescriptor(curInputDesc, &dataType, &temp, &temp, &temp,
+                &temp, &temp, &temp, &temp, &temp);
+            hipdnnTensorFormat_t format = HIPDNN_TENSOR_NCHW;
+            hipdnnSetTensor4dDescriptor(outDesc, format, dataType, n, c, h, w);
+            hipdnnConvolutionFwdPreference_t preference = HIPDNN_CONVOLUTION_FWD_PREFER_FASTEST;
+            hipdnnConvolutionFwdAlgo_t algo;
+            hipdnnGetConvolutionForwardAlgorithm( handle, curInputDesc, filterDesc,
+                convDesc, outDesc, preference, 0 /*memoryLimitInBytes*/ ,&algo);
+            size_t workSpaceSizeInBytes;
+            hipdnnGetConvolutionForwardWorkspaceSize( handle, curInputDesc,
+                filterDesc, convDesc, outDesc, algo, &workSpaceSizeInBytes);
+
+            hipdnnConvolutionForward( handle, convArgs_cast->alpha, curInputDesc,
+                curInput, filterDesc, filter, convDesc, algo, workSpace,
+                workSpaceSizeInBytes, convArgs_cast->beta, outDesc, &out );
         }
 
-    return HIPDNN_STATUS_NOT_SUPPORTED;
-    }
+        else if (fusePlanDesc_cast->fuseOpSeq[Id] == 'B') {
+            fusionBiasForwardArgs_t* biasArgs_cast;
+            for( int biasId=0; biasId < args_cast->fuseOpArgsCount; biasId++ ) {
+                if (args_cast->fuseOpArgsSeq[biasId] == 'B') {
+                    biasArgs_cast = (fusionBiasForwardArgs_t*)(args_cast->fuseOpArgsPtrs[Id]);
+                    args_cast->fuseOpArgsSeq[biasId]='\0'; break;
+                }
+            }
 
-    setSeq = "CBNA";
-    for(cntr = 0; (opSeq[cntr] == setSeq[cntr]) && (cntr<opCount) ; cntr++); //string compare
-    if (opCount == cntr) {
-        return HIPDNN_STATUS_NOT_SUPPORTED;
-    }
+        }
+        else if (fusePlanDesc_cast->fuseOpSeq[Id] == 'A') {
+            fusionActivationForwardArgs_t* activArgs_cast;
+            for( int activId=0; activId < args_cast->fuseOpArgsCount; activId++ ) {
+                if (args_cast->fuseOpArgsSeq[activId] == 'A') {
+                    activArgs_cast = (fusionActivationForwardArgs_t*)(args_cast->fuseOpArgsPtrs[Id]);
+                    args_cast->fuseOpArgsSeq[activId]='\0'; break;
+                }
+            }
+        }
+        else if (fusePlanDesc_cast->fuseOpSeq[Id] == 'N') {
+            fusionBatchNormInferenceArgs_t* normArgs_cast;
+            for( int normId=0; normId < args_cast->fuseOpArgsCount; normId++ ) {
+                if (args_cast->fuseOpArgsSeq[normId] == 'C') {
+                    normArgs_cast = (fusionBatchNormInferenceArgs_t*)(args_cast->fuseOpArgsPtrs[Id]);
+                    args_cast->fuseOpArgsSeq[normId]='\0'; break;
+                }
+            }
+        }
 
-    setSeq = "NA";
-    for(cntr = 0; (opSeq[cntr] == setSeq[cntr]) && (cntr<opCount) ; cntr++); //string compare
-    if (opCount == cntr) {
-        return HIPDNN_STATUS_NOT_SUPPORTED;
     }
 
     return HIPDNN_STATUS_NOT_SUPPORTED;
