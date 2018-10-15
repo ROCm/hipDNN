@@ -23,6 +23,8 @@
 #ifndef HIPDNN_H
 #define HIPDNN_H
 
+#define HIPDNN_BN_MIN_EPSILON 1e-05
+
 #include <hip/hip_runtime_api.h>
 
 #define CHECK_HIP(cmd)                                                         \

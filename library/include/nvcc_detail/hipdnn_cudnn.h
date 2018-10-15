@@ -25,7 +25,6 @@
 #include <cuda_runtime.h>
 #include <cudnn.h>
 
-#define HIPDNN_BN_MIN_EPSILON CUDNN_BN_MIN_EPSILON
 
 hipdnnStatus_t cudnnTohipdnnStatus(cudnnStatus_t cStatus);
 
