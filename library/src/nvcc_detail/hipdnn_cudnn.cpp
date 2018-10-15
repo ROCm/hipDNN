@@ -2900,8 +2900,44 @@ hipdnnStatus_t hipdnnFusionPlanGetWorkSpaceSize(
     hipdnnHandle_t handle, hipdnnFusionPlanDescriptor_t fusePlanDesc,
     size_t *workSpaceSize, hipdnnConvolutionFwdAlgo_t algo) {
 
-    // Return regular convolution
-    return HIPDNN_STATUS_NOT_SUPPORTED;
+    int convFlag = 0 ;
+    int convId = 0;
+    hipdnnStatus_t retVal;
+    fusionPlan_t* fusePlanDesc_cast = (fusionPlan_t*)fusePlanDesc;
+    for( int convId=0; convId < fusePlanDesc_cast->fuseOpCount; convId++ ) {
+        if (fusePlanDesc_cast->fuseOpSeq[convId] == 'C') {
+            convFlag = 1;
+            break;
+        }
+    }
+
+    if (convFlag==1){
+        hipdnnHandle_t handle = fusePlanDesc_cast->handle;
+        hipdnnTensorDescriptor_t xDesc = fusePlanDesc_cast->inputDesc;
+        fusionConvolutionForwardCreate_t* fuseOpPtrsDesc_cast =
+            (fusionConvolutionForwardCreate_t*)(fusePlanDesc_cast->fuseOpPtrs[convId]);
+        hipdnnFilterDescriptor_t wDesc = fuseOpPtrsDesc_cast->wDesc;
+        hipdnnConvolutionDescriptor_t convDesc = fuseOpPtrsDesc_cast->convDesc;
+        hipdnnTensorDescriptor_t yDesc;
+
+        hipdnnCreateTensorDescriptor(&yDesc);
+        int n, c, h, w ;
+        hipdnnGetConvolution2dForwardOutputDim(convDesc, xDesc, wDesc, &n, &c, &h, &w);
+        hipdnnDataType_t dataType;
+        int temp; // temp is passed for unncessary information
+        hipdnnGetTensor4dDescriptor(xDesc, &dataType, &temp, &temp, &temp, &temp,
+            &temp, &temp, &temp, &temp);
+        hipdnnTensorFormat_t format = HIPDNN_TENSOR_NCHW;
+        hipdnnSetTensor4dDescriptor(yDesc, format, dataType, n, c, h, w);
+        size_t workSpaceSizeInBytes;
+        hipdnnGetConvolutionForwardWorkspaceSize( handle, xDesc,
+            wDesc, convDesc, yDesc, algo, &workSpaceSizeInBytes);
+    }
+    else {
+        retVal = HIPDNN_STATUS_NOT_INITIALIZED;
+    }
+
+    return retVal;
 }
 
 hipdnnStatus_t hipdnnFusionPlanConvolutionGetAlgo(
