@@ -2993,4 +2993,177 @@ hipdnnStatus_t hipdnnDestroyReduceTensorDescriptor(
     CHECK_MIO(miopenSetConvolutionGroupCount(
         (miopenConvolutionDescriptor_t)convDesc, groupCount) );
     return HIPDNN_STATUS_SUCCESS;
-} 
+
+}
+
+// --- Fusion API ---
+
+hipdnnStatus_t
+hipdnnCreateFusionPlan(hipdnnFusionPlanDescriptor_t *fusePlanDesc,
+                       const hipdnnFusionDirection_t fuseDirection,
+                       const hipdnnTensorDescriptor_t inputDesc) {
+    CHECK_MIO(
+        miopenCreateFusionPlan((miopenFusionPlanDescriptor_t *)fusePlanDesc,
+                               (miopenFusionDirection_t)fuseDirection,
+                               (miopenTensorDescriptor_t)inputDesc));
+    return HIPDNN_STATUS_SUCCESS;
+}
+
+hipdnnStatus_t hipdnnFusionPlanGetOp(hipdnnFusionPlanDescriptor_t fusePlanDesc,
+                                     const int op_idx,
+                                     hipdnnFusionOpDescriptor_t *op) {
+    CHECK_MIO(miopenFusionPlanGetOp((miopenFusionPlanDescriptor_t)fusePlanDesc,
+                                    op_idx, (miopenFusionOpDescriptor_t *)op));
+    return HIPDNN_STATUS_SUCCESS;
+}
+
+hipdnnStatus_t hipdnnFusionPlanGetWorkSpaceSize(
+    hipdnnHandle_t handle, hipdnnFusionPlanDescriptor_t fusePlanDesc,
+    size_t *workSpaceSize, hipdnnConvolutionFwdAlgo_t algo) {
+    CHECK_MIO(miopenFusionPlanGetWorkSpaceSize(
+        (miopenHandle_t)handle, (miopenFusionPlanDescriptor_t)fusePlanDesc,
+        workSpaceSize, (miopenConvFwdAlgorithm_t)algo));
+    return HIPDNN_STATUS_SUCCESS;
+}
+
+hipdnnStatus_t hipdnnFusionPlanConvolutionGetAlgo(
+    hipdnnFusionPlanDescriptor_t fusePlanDesc, const int requestAlgoCount,
+    int* returnedAlgoCount, hipdnnConvolutionFwdAlgo_t* returnedAlgos) {
+
+    miopenConvFwdAlgorithm_t mi_returnedAlgos;
+    CHECK_MIO(miopenFusionPlanConvolutionGetAlgo(
+        (miopenFusionPlanDescriptor_t)fusePlanDesc, requestAlgoCount,
+        returnedAlgoCount, &mi_returnedAlgos));
+    miopenTohipConvolutionFwdAlgo(mi_returnedAlgos,returnedAlgos);
+
+    return HIPDNN_STATUS_SUCCESS;
+}
+
+hipdnnStatus_t
+hipdnnCreateOpConvForward(hipdnnFusionPlanDescriptor_t fusePlanDesc,
+                          hipdnnFusionOpDescriptor_t *convOp,
+                          hipdnnConvolutionDescriptor_t convDesc,
+                          const hipdnnTensorDescriptor_t wDesc) {
+    CHECK_MIO(
+        miopenCreateOpConvForward((miopenFusionPlanDescriptor_t)fusePlanDesc,
+                                  (miopenFusionOpDescriptor_t *)convOp,
+                                  (miopenConvolutionDescriptor_t)convDesc,
+                                  (miopenTensorDescriptor_t)wDesc));
+    return HIPDNN_STATUS_SUCCESS;
+}
+
+hipdnnStatus_t
+hipdnnCreateOpBiasForward(hipdnnFusionPlanDescriptor_t fusePlanDesc,
+                          hipdnnFusionOpDescriptor_t *biasOp,
+                          const hipdnnTensorDescriptor_t bDesc) {
+    CHECK_MIO(miopenCreateOpBiasForward(
+        (miopenFusionPlanDescriptor_t)fusePlanDesc,
+        (miopenFusionOpDescriptor_t *)biasOp, (miopenTensorDescriptor_t)bDesc));
+    return HIPDNN_STATUS_SUCCESS;
+}
+
+hipdnnStatus_t
+hipdnnCreateOpActivationForward(hipdnnFusionPlanDescriptor_t fusePlanDesc,
+                                hipdnnFusionOpDescriptor_t *activOp,
+                                hipdnnActivationMode_t mode) {
+    miopenActivationMode_t mi_mode;
+    hipTomiopenActivationMode(mode, &mi_mode);
+    CHECK_MIO(miopenCreateOpActivationForward(
+        (miopenFusionPlanDescriptor_t)fusePlanDesc,
+        (miopenFusionOpDescriptor_t *)activOp, mi_mode));
+    return HIPDNN_STATUS_SUCCESS;
+}
+
+hipdnnStatus_t hipdnnCreateOpBatchNormInference(
+    hipdnnFusionPlanDescriptor_t fusePlanDesc, hipdnnFusionOpDescriptor_t *bnOp,
+    const hipdnnBatchNormMode_t bn_mode,
+    const hipdnnTensorDescriptor_t bnScaleBiasMeanVarDesc) {
+
+    miopenBatchNormMode_t mi_bn_mode;
+    hipTomiopenBatchNormMode(bn_mode, &mi_bn_mode);
+    CHECK_MIO(miopenCreateOpBatchNormInference(
+        (miopenFusionPlanDescriptor_t)fusePlanDesc,
+        (miopenFusionOpDescriptor_t *)bnOp, mi_bn_mode,
+        (miopenTensorDescriptor_t)bnScaleBiasMeanVarDesc));
+    return HIPDNN_STATUS_SUCCESS;
+}
+
+hipdnnStatus_t
+hipdnnCompileFusionPlan(hipdnnHandle_t handle,
+                        hipdnnFusionPlanDescriptor_t fusePlanDesc) {
+    CHECK_MIO(miopenCompileFusionPlan(
+        (miopenHandle_t)handle, (miopenFusionPlanDescriptor_t)fusePlanDesc));
+    return HIPDNN_STATUS_SUCCESS;
+}
+
+hipdnnStatus_t hipdnnCreateOperatorArgs(hipdnnOperatorArgs_t *args) {
+    CHECK_MIO(miopenCreateOperatorArgs((miopenOperatorArgs_t *)args));
+    return HIPDNN_STATUS_SUCCESS;
+}
+
+hipdnnStatus_t
+hipdnnSetOpArgsConvForward(hipdnnOperatorArgs_t args,
+                           const hipdnnFusionOpDescriptor_t convOp,
+                           const void *alpha, const void *beta, const void *w) {
+    CHECK_MIO(miopenSetOpArgsConvForward((miopenOperatorArgs_t)args,
+                                         (miopenFusionOpDescriptor_t)convOp,
+                                         alpha, beta, w));
+    return HIPDNN_STATUS_SUCCESS;
+}
+
+hipdnnStatus_t hipdnnSetOpArgsBiasForward(
+    hipdnnOperatorArgs_t args, const hipdnnFusionOpDescriptor_t biasOp,
+    const void *alpha, const void *beta, const void *bias) {
+    CHECK_MIO(miopenSetOpArgsBiasForward((miopenOperatorArgs_t)args,
+                                         (miopenFusionOpDescriptor_t)biasOp,
+                                         alpha, beta, bias));
+    return HIPDNN_STATUS_SUCCESS;
+}
+
+hipdnnStatus_t hipdnnSetOpArgsActivForward(
+    hipdnnOperatorArgs_t args, const hipdnnFusionOpDescriptor_t activOp,
+    const void *alpha, const void *beta, double activAlpha, double activBeta,
+    double activGamma) {
+    CHECK_MIO(miopenSetOpArgsActivForward(
+        (miopenOperatorArgs_t)args, (miopenFusionOpDescriptor_t)activOp, alpha,
+        beta, activAlpha, activBeta, activGamma));
+    return HIPDNN_STATUS_SUCCESS;
+}
+
+hipdnnStatus_t hipdnnSetOpArgsBatchNormInference(
+    hipdnnOperatorArgs_t args, const hipdnnFusionOpDescriptor_t bnOp,
+    const void *alpha, const void *beta, const void *bnScale,
+    const void *bnBias, const void *estimatedMean,
+    const void *estimatedVariance, double epsilon) {
+    CHECK_MIO(miopenSetOpArgsBatchNormInference(
+        (miopenOperatorArgs_t)args, (miopenFusionOpDescriptor_t)bnOp, alpha,
+        beta, bnScale, bnBias, estimatedMean, estimatedVariance, epsilon));
+    return HIPDNN_STATUS_SUCCESS;
+}
+
+hipdnnStatus_t
+hipdnnExecuteFusionPlan(const hipdnnHandle_t handle,
+                        const hipdnnFusionPlanDescriptor_t fusePlanDesc,
+                        const hipdnnTensorDescriptor_t inputDesc,
+                        const void *input,
+                        const hipdnnTensorDescriptor_t outputDesc, void *output,
+                        hipdnnOperatorArgs_t args) {
+    CHECK_MIO(miopenExecuteFusionPlan(
+        (miopenHandle_t)handle, (miopenFusionPlanDescriptor_t)fusePlanDesc,
+        (miopenTensorDescriptor_t)inputDesc, input,
+        (miopenTensorDescriptor_t)outputDesc, output,
+        (miopenOperatorArgs_t)args));
+    return HIPDNN_STATUS_SUCCESS;
+}
+
+hipdnnStatus_t hipdnnDestroyOperatorArgs(hipdnnOperatorArgs_t args) {
+    CHECK_MIO(miopenDestroyOperatorArgs((miopenOperatorArgs_t) args) );
+    return HIPDNN_STATUS_SUCCESS;
+}
+
+hipdnnStatus_t
+hipdnnDestroyFusionPlan(hipdnnFusionPlanDescriptor_t fusePlanDesc) {
+    CHECK_MIO(
+        miopenDestroyFusionPlan((miopenFusionPlanDescriptor_t)fusePlanDesc));
+    return HIPDNN_STATUS_SUCCESS;
+}
