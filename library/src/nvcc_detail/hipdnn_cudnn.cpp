@@ -3082,7 +3082,7 @@ hipdnnExecuteFusionPlan(const hipdnnHandle_t handle,
     if (fusePlanDesc_cast->fuseOpCount != args_cast->fuseOpArgsCount) {
         return HIPDNN_STATUS_INVALID_VALUE;
     }
-
+    // Convolution
     for( int Id=0; Id < fusePlanDesc_cast->fuseOpCount; Id++ ) {
 
         if (fusePlanDesc_cast->fuseOpSeq[Id] == 'C') {
@@ -3120,9 +3120,12 @@ hipdnnExecuteFusionPlan(const hipdnnHandle_t handle,
             hipdnnConvolutionForward( handle, convArgs_cast->alpha, curInputDesc,
                 curInput, filterDesc, filter, convDesc, algo, workSpace,
                 workSpaceSizeInBytes, convArgs_cast->beta, outDesc, &out );
+            hipFree(workSpace);
+            curInputDesc = outDesc;
+            curInput = out;
 
         }
-
+        // Bias
         else if (fusePlanDesc_cast->fuseOpSeq[Id] == 'B') {
             fusionBiasForwardArgs_t* biasArgs_cast;
             for( int biasId=0; biasId < args_cast->fuseOpArgsCount; biasId++ ) {
@@ -3132,8 +3135,15 @@ hipdnnExecuteFusionPlan(const hipdnnHandle_t handle,
                 }
             }
 
+            hipdnnHandle_t handle =  fusePlanDesc_cast->handle;
+            hipdnnTensorDescriptor_t biasDesc = biasArgs_cast->creationParam.biasDesc;
+            void* bias = biasArgs_cast->bias;
+            hipdnnAddTensor( handle, biasArgs_cast->alpha,
+                         biasDesc, bias,  biasArgs_cast->beta,
+                         curInputDesc, (void*)curInput /*Inplace add*/);
 
         }
+        // Activation
         else if (fusePlanDesc_cast->fuseOpSeq[Id] == 'A') {
             fusionActivationForwardArgs_t* activArgs_cast;
             for( int activId=0; activId < args_cast->fuseOpArgsCount; activId++ ) {
@@ -3161,8 +3171,11 @@ hipdnnExecuteFusionPlan(const hipdnnHandle_t handle,
             hipdnnActivationForward( fusePlanDesc_cast->handle, activationDesc,
                 activArgs_cast->alpha, curInputDesc, curInput,
                 activArgs_cast->beta, outDesc, &out);
+            curInputDesc = outDesc;
+            curInput = out;
 
         }
+        // Batch Norm
         else if (fusePlanDesc_cast->fuseOpSeq[Id] == 'N') {
             fusionBatchNormInferenceArgs_t* normArgs_cast;
             for( int normId=0; normId < args_cast->fuseOpArgsCount; normId++ ) {
@@ -3171,6 +3184,23 @@ hipdnnExecuteFusionPlan(const hipdnnHandle_t handle,
                     args_cast->fuseOpArgsSeq[normId]='\0'; break;
                 }
             }
+            hipdnnBatchNormMode_t bnMode = normArgs_cast->creationParam.bnMode;
+            hipdnnTensorDescriptor_t outDesc; void *out;
+            hipdnnCreateTensorDescriptor(&outDesc);
+            hipdnnDataType_t dataType;
+            int n,c,h,w; int temp;
+            hipdnnGetTensor4dDescriptor(curInputDesc, &dataType, &n, &c, &h, &w,
+                &temp, &temp, &temp, &temp );
+            hipdnnTensorFormat_t format = HIPDNN_TENSOR_NCHW;
+            hipdnnSetTensor4dDescriptor(outDesc, format, dataType, n, c, h, w);
+            hipdnnTensorDescriptor_t bnDesc = normArgs_cast->creationParam.bnScaleBiasMeanVarDesc;
+            hipdnnnBatchNormalizationForwardInference( fusePlanDesc_cast->handle,
+                bnMode, normArgs_cast->alpha, normArgs_cast->beta,
+                curInputDesc, curInput, outDesc, out, bnDesc, normArgs_cast->bnScale,
+                normArgs_cast->bnBias, normArgs_cast->estimatedMean,
+                normArgs_cast->estimatedVariance, normArgs_cast->epsilon);
+            curInputDesc = outDesc;
+            curInput = out;
         }
 
     }
