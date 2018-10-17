@@ -48,6 +48,17 @@
         }                                                                      \
     }
 
+#define CHECK_MALLOC(pointer)                                                  \
+    {                                                                          \
+        if ( (pointer) == '\0') {   /*if Null pointer*/                        \
+            std::cerr << "Error on line " << __LINE__                          \
+                      << " Malloc returned NULL "<< std::endl;                 \
+            std::exit(EXIT_FAILURE);                                           \
+        }                                                                      \
+      /*std::cout << "The Pointer:"<<(void*)(pointer)                          \
+                  <<" on line:" <<__LINE__<< std::endl;*/                      \
+    }
+
 #define HIPDNN_EXPORT
 #define HIPDNN_VERSION 7000
 
