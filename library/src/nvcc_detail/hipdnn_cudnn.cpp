@@ -3153,9 +3153,9 @@ hipdnnExecuteFusionPlan(const hipdnnHandle_t handle,
                 }
             }
             hipdnnHandle_t handle = fusePlanDesc_cast->handle;
-            hipdnnFilterDescriptor_t filterDesc = convArgs_cast->creationParam.wDesc;
+            hipdnnFilterDescriptor_t filterDesc = (convArgs_cast->creationParam).wDesc;
             void* filter = convArgs_cast->w;
-            hipdnnConvolutionDescriptor_t convDesc = convArgs_cast->creationParam.convDesc;
+            hipdnnConvolutionDescriptor_t convDesc = (convArgs_cast->creationParam).convDesc;
             hipdnnTensorDescriptor_t outDesc; void *out;
             CHECK_HIPDNN(hipdnnCreateTensorDescriptor(&outDesc));
             int n, c, h, w ;
@@ -3197,7 +3197,7 @@ hipdnnExecuteFusionPlan(const hipdnnHandle_t handle,
             }
 
             hipdnnHandle_t handle =  fusePlanDesc_cast->handle;
-            hipdnnTensorDescriptor_t biasDesc = biasArgs_cast->creationParam.biasDesc;
+            hipdnnTensorDescriptor_t biasDesc = (biasArgs_cast->creationParam).biasDesc;
             void* bias = biasArgs_cast->bias;
             CHECK_HIPDNN(hipdnnAddTensor( handle, biasArgs_cast->alpha,
                 biasDesc, bias,  biasArgs_cast->beta,
@@ -3216,7 +3216,7 @@ hipdnnExecuteFusionPlan(const hipdnnHandle_t handle,
 
             hipdnnActivationDescriptor_t activationDesc;
             CHECK_HIPDNN(hipdnnCreateActivationDescriptor(&activationDesc));
-            hipdnnActivationMode_t activMode = activArgs_cast->creationParam.activationMode;
+            hipdnnActivationMode_t activMode = (activArgs_cast->creationParam).activationMode;
             hipdnnNanPropagation_t reluNanOpt = HIPDNN_PROPAGATE_NAN;
             CHECK_HIPDNN(hipdnnSetActivationDescriptor( activationDesc, activMode,
                 reluNanOpt, activArgs_cast->activAlpha, activArgs_cast->activBeta,
@@ -3246,7 +3246,7 @@ hipdnnExecuteFusionPlan(const hipdnnHandle_t handle,
                     args_cast->fuseOpArgsSeq[normId]='\0'; break;
                 }
             }
-            hipdnnBatchNormMode_t bnMode = normArgs_cast->creationParam.bnMode;
+            hipdnnBatchNormMode_t bnMode = (normArgs_cast->creationParam).bnMode;
             hipdnnTensorDescriptor_t outDesc; void *out;
             CHECK_HIPDNN(hipdnnCreateTensorDescriptor(&outDesc));
             hipdnnDataType_t dataType;
