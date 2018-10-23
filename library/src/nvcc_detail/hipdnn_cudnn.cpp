@@ -2647,96 +2647,58 @@ hipdnnStatus_t hipdnnDestroyReduceTensorDescriptor(
         (cudnnConvolutionDescriptor_t)convDesc, groupCount) );
 }
 
-// --- Fusion API ---
-// typedef struct fusionConvolutionForwardCreate fusionConvolutionForwardCreate_t;
-  typedef struct{
-        hipdnnConvolutionDescriptor_t  convDesc;
-        hipdnnFilterDescriptor_t       wDesc;
-    }fusionConvolutionForwardCreate_t;
+// =========================== Fusion API ===================================
+
+typedef struct{
+    hipdnnConvolutionDescriptor_t       convDesc;
+    hipdnnFilterDescriptor_t            wDesc;
+} fusionConvolutionForwardCreate_t;
 typedef struct {
-    fusionConvolutionForwardCreate_t     creationParam;
-    void                           *alpha;
-    /*hipdnnTensorDescriptor_t       xDesc; */ // set at execution call
-    /* void                           *x; */ // set at execution call
-    /* hipdnnFilterDescriptor_t       wDesc;*/ //set at operator creation
-    void                           *w;
-    /* hipdnnConvolutionDescriptor_t  convDesc;*/ //set at operator creation
-    /*hipdnnConvolutionFwdAlgo_t           algo; */ //calculate at execution call
-    /*void                                 *workSpace; */ //calculate at execution call
-    /*size_t                               workSpaceSizeInBytes; */
-     void                           *beta;
-    /* hipdnnTensorDescriptor_t       yDesc; */ // set at execution call
-    /*void                                 *y; */ // set at execution call
+    fusionConvolutionForwardCreate_t    creationParam;
+    void                                *alpha;
+    void                                *w;
+    void                                *beta;
 } fusionConvolutionForwardArgs_t;
 
-// typedef struct fusionActivationForwardCreate fusionActivationForwardCreate_t;
 typedef struct {
-        hipdnnActivationMode_t activationMode;
+    hipdnnActivationMode_t          activationMode;
 } fusionActivationForwardCreate_t;
 typedef struct {
- fusionActivationForwardCreate_t       creationParam;
-    /*hipdnnActivationDescriptor_t     activationDesc;*/ // set at exection time
-     void                         *alpha;
-    /* hipdnnTensorDescriptor_t   xDesc; */ // set at execution time
-    /* void                       *x; */ // set at execution time
-     void                         *beta;
-    /* hipdnnTensorDescriptor_t   yDesc;*/ // set at execution time
-    /*void                             *y;*/ // set at execution time
-    double                             activAlpha;
-    double                             activBeta;
-    double                             activGamma;
+    fusionActivationForwardCreate_t creationParam;
+    void                            *alpha;
+    void                            *beta;
+    double                          activAlpha;
+    double                          activBeta;
+    double                          activGamma;
 } fusionActivationForwardArgs_t;
 
-// typedef struct fusionBatchNormInferenceCreate fusionBatchNormInferenceCreate_t;
 typedef struct {
-        hipdnnBatchNormMode_t             bnMode;
-         hipdnnTensorDescriptor_t    bnScaleBiasMeanVarDesc;
+    hipdnnBatchNormMode_t             bnMode;
+    hipdnnTensorDescriptor_t          bnScaleBiasMeanVarDesc;
 }fusionBatchNormInferenceCreate_t;
 typedef struct {
     fusionBatchNormInferenceCreate_t  creationParam;
-    /*hipdnnBatchNormMode_t             mode;*/
-     void                        *alpha;
-     void                        *beta;
-    /* hipdnnTensorDescriptor_t    xDesc;*/ //set at execution
-    /* void                        *x;*/ //set at execution
-    /* hipdnnTensorDescriptor_t    yDesc;*/ //set at execution
-    /*void                              *y;*/ // set at execution
-    /* hipdnnTensorDescriptor_t    bnScaleBiasMeanVarDesc;*/
-     void                        *bnScale;
-     void                        *bnBias;
-     void                        *estimatedMean;
-     void                        *estimatedVariance;
+    void                              *alpha;
+    void                              *beta;
+    void                              *bnScale;
+    void                              *bnBias;
+    void                              *estimatedMean;
+    void                              *estimatedVariance;
     double                            epsilon;
 } fusionBatchNormInferenceArgs_t;
 
-// typedef struct fusionBiasForwardCreate fusionBiasForwardCreate_t;
 typedef struct {
-        hipdnnTensorDescriptor_t       biasDesc;
+        hipdnnTensorDescriptor_t   biasDesc;
 } fusionBiasForwardCreate_t;
 typedef struct {
-    // No separate bias Forward function in cudnn
-    fusionBiasForwardCreate_t            creationParam;
+    fusionBiasForwardCreate_t      creationParam;
     void                           *alpha; //alpha1
-    /* hipdnnTensorDescriptor_t       xDesc;*/ // unused
-    /* void                           *x;*/ // unused
-    /* hipdnnFilterDescriptor_t       wDesc;*/ //used
-    /* void                           *w; */ //unused
-    /* hipdnnConvolutionDescriptor_t  convDesc;*/ //unused
-    /*hipdnnConvolutionFwdAlgo_t           algo; */ //unused
-    /*void                                 *workSpace; */ //unused
-    /*size_t                               workSpaceSizeInBytes; */ //unused
     void                           *beta; //alpha2
-    /* hipdnnTensorDescriptor_t       zDesc; */ //unused
-    /* void                           *z;  */ //unused
-    /* hipdnnTensorDescriptor_t       biasDesc;*/ //set at creation time
     void                           *bias;
-    /* hipdnnActivationDescriptor_t   activationDesc;*/ //execution time
-    /* hipdnnTensorDescriptor_t       yDesc; */ // unused
-    /*void                                 *y; */ //unused
 } fusionBiasForwardArgs_t;
 
 #define FUSION_MAX 7 // Max Number of layers to be fused in single fusion plan
-typedef struct { /* Fusion plan */
+typedef struct {
     hipdnnHandle_t           handle;
     hipdnnFusionDirection_t  fuseDirection;
     hipdnnTensorDescriptor_t inputDesc;
@@ -2748,9 +2710,9 @@ typedef struct { /* Fusion plan */
 } fusionPlan_t;
 
 typedef struct {
-    char                    fuseOpArgsSeq[FUSION_MAX];
+    char                     fuseOpArgsSeq[FUSION_MAX];
     int                      fuseOpArgsCount;
-    void*                   fuseOpArgsPtrs[FUSION_MAX];
+    void*                    fuseOpArgsPtrs[FUSION_MAX];
 }fusionOpArgs_t;
 
 int fusionValidate (fusionPlan_t* basePlan, fusionPlan_t* checkPlan) {
@@ -2762,7 +2724,7 @@ int fusionValidate (fusionPlan_t* basePlan, fusionPlan_t* checkPlan) {
     return 0;
 }
 
-// ============================================================================
+// ----------------------------------------------------------------------------
 
 hipdnnStatus_t
 hipdnnCreateFusionPlan(hipdnnFusionPlanDescriptor_t*  fusePlanDesc,
@@ -2798,7 +2760,8 @@ hipdnnCreateOpConvForward(hipdnnFusionPlanDescriptor_t    fusePlanDesc,
 
     *convOp = (void*)malloc(sizeof(fusionConvolutionForwardCreate_t));
     CHECK_MALLOC(*convOp);
-    fusionConvolutionForwardCreate_t* convOp_cast = (fusionConvolutionForwardCreate_t*)(*convOp);
+    fusionConvolutionForwardCreate_t* convOp_cast =
+                                    (fusionConvolutionForwardCreate_t*)(*convOp);
     convOp_cast->convDesc=(hipdnnConvolutionDescriptor_t)convDesc;
     convOp_cast->wDesc=(hipdnnTensorDescriptor_t)wDesc;
     fusePlanDesc_cast->fuseOpPtrs[newCount-1] = *convOp;
@@ -2812,7 +2775,6 @@ hipdnnCreateOpBiasForward(hipdnnFusionPlanDescriptor_t fusePlanDesc,
                           hipdnnFusionOpDescriptor_t *biasOp,
                           const hipdnnTensorDescriptor_t bDesc) {
 
-    // No separate bias Forward function in cudnn
     fusionPlan_t* fusePlanDesc_cast = (fusionPlan_t*)fusePlanDesc;
     fusePlanDesc_cast->fuseOpCount += 1;
     int newCount = fusePlanDesc_cast->fuseOpCount;
@@ -2841,8 +2803,9 @@ hipdnnCreateOpActivationForward(hipdnnFusionPlanDescriptor_t fusePlanDesc,
 
     *activOp = (void*)malloc(sizeof(fusionActivationForwardCreate_t));
     CHECK_MALLOC(*activOp);
-    fusionActivationForwardCreate_t* activOp_cast = (fusionActivationForwardCreate_t*)(*activOp);
-    activOp_cast->activationMode = (hipdnnActivationMode_t)mode; // decriptor will be created on execution based on this
+    fusionActivationForwardCreate_t* activOp_cast =
+                                    (fusionActivationForwardCreate_t*)(*activOp);
+    activOp_cast->activationMode = (hipdnnActivationMode_t)mode;   // decriptor will be created on execution call
     fusePlanDesc_cast->fuseOpPtrs[newCount-1] = *activOp;
 
     return HIPDNN_STATUS_SUCCESS;
@@ -2860,7 +2823,8 @@ hipdnnStatus_t hipdnnCreateOpBatchNormInference(
 
     *bnOp = (void*)malloc(sizeof(fusionBatchNormInferenceCreate_t));
     CHECK_MALLOC(*bnOp);
-    fusionBatchNormInferenceCreate_t* bnOp_cast = (fusionBatchNormInferenceCreate_t*)(*bnOp);
+    fusionBatchNormInferenceCreate_t* bnOp_cast =
+                                      (fusionBatchNormInferenceCreate_t*)(*bnOp);
     bnOp_cast->bnMode=(hipdnnBatchNormMode_t)bn_mode;
     bnOp_cast->bnScaleBiasMeanVarDesc=(hipdnnTensorDescriptor_t)bnScaleBiasMeanVarDesc;
     fusePlanDesc_cast->fuseOpPtrs[newCount-1] = *bnOp;
@@ -3008,10 +2972,14 @@ hipdnnSetOpArgsConvForward(hipdnnOperatorArgs_t args,
     int newCount = args_cast->fuseOpArgsCount;
     args_cast->fuseOpArgsSeq[newCount-1]='C';
 
-    fusionConvolutionForwardArgs_t* convOpArgs_cast =(fusionConvolutionForwardArgs_t*)malloc(sizeof(fusionConvolutionForwardArgs_t));
-    fusionConvolutionForwardCreate_t* convOp_cast = (fusionConvolutionForwardCreate_t*)convOp;
-    convOpArgs_cast->creationParam.convDesc = (hipdnnConvolutionDescriptor_t)(convOp_cast->convDesc);
-    convOpArgs_cast->creationParam.wDesc = (hipdnnFilterDescriptor_t)(convOp_cast->wDesc);
+    fusionConvolutionForwardArgs_t* convOpArgs_cast =
+            (fusionConvolutionForwardArgs_t*)malloc(sizeof(fusionConvolutionForwardArgs_t));
+    fusionConvolutionForwardCreate_t* convOp_cast =
+                         (fusionConvolutionForwardCreate_t*)convOp;
+    convOpArgs_cast->creationParam.convDesc =
+                         (hipdnnConvolutionDescriptor_t)(convOp_cast->convDesc);
+    convOpArgs_cast->creationParam.wDesc =
+                         (hipdnnFilterDescriptor_t)(convOp_cast->wDesc);
     convOpArgs_cast->alpha = (void*)alpha;
     convOpArgs_cast->beta = (void*)beta;
     convOpArgs_cast->w = (void*)w;
@@ -3029,10 +2997,12 @@ hipdnnStatus_t hipdnnSetOpArgsBiasForward(
     int newCount = args_cast->fuseOpArgsCount;
     args_cast->fuseOpArgsSeq[newCount-1]='B';
 
-    fusionBiasForwardArgs_t* biasOpArgs_cast =(fusionBiasForwardArgs_t*)malloc(sizeof(fusionBiasForwardArgs_t));
+    fusionBiasForwardArgs_t* biasOpArgs_cast =
+                (fusionBiasForwardArgs_t*)malloc(sizeof(fusionBiasForwardArgs_t));
     CHECK_MALLOC(biasOpArgs_cast);
     fusionBiasForwardCreate_t* biasOp_cast = (fusionBiasForwardCreate_t*)biasOp;
-    biasOpArgs_cast->creationParam.biasDesc = (hipdnnTensorDescriptor_t)(biasOp_cast->biasDesc);
+    biasOpArgs_cast->creationParam.biasDesc =
+                (hipdnnTensorDescriptor_t)(biasOp_cast->biasDesc);
     biasOpArgs_cast->alpha = (void*)alpha;
     biasOpArgs_cast->beta = (void*)beta;
     biasOpArgs_cast->bias = (void*)bias;
@@ -3051,9 +3021,12 @@ hipdnnStatus_t hipdnnSetOpArgsActivForward(
     int newCount = args_cast->fuseOpArgsCount;
     args_cast->fuseOpArgsSeq[newCount-1]='A';
 
-    fusionActivationForwardArgs_t* activOpArgs_cast =(fusionActivationForwardArgs_t*)malloc(sizeof(fusionActivationForwardArgs_t));
-    fusionActivationForwardCreate_t* activOp_cast = (fusionActivationForwardCreate_t*)activOp;
-    activOpArgs_cast->creationParam.activationMode = (hipdnnActivationMode_t)(activOp_cast->activationMode);
+    fusionActivationForwardArgs_t* activOpArgs_cast =
+            (fusionActivationForwardArgs_t*)malloc(sizeof(fusionActivationForwardArgs_t));
+    fusionActivationForwardCreate_t* activOp_cast =
+                        (fusionActivationForwardCreate_t*)activOp;
+    activOpArgs_cast->creationParam.activationMode =
+                        (hipdnnActivationMode_t)(activOp_cast->activationMode);
     activOpArgs_cast->alpha = (void*)alpha;
     activOpArgs_cast->beta = (void*)beta;
     activOpArgs_cast->activAlpha = (double)activAlpha;
@@ -3075,10 +3048,14 @@ hipdnnStatus_t hipdnnSetOpArgsBatchNormInference(
     int newCount = args_cast->fuseOpArgsCount;
     args_cast->fuseOpArgsSeq[newCount-1]='N';
 
-    fusionBatchNormInferenceArgs_t* bnOpArgs_cast =(fusionBatchNormInferenceArgs_t*) malloc(sizeof(fusionBiasForwardArgs_t));
-    fusionBatchNormInferenceCreate_t* bnOp_cast = (fusionBatchNormInferenceCreate_t*)bnOp;
-    bnOpArgs_cast->creationParam.bnMode = (hipdnnBatchNormMode_t)(bnOp_cast->bnMode);
-    bnOpArgs_cast->creationParam.bnScaleBiasMeanVarDesc = (hipdnnTensorDescriptor_t)(bnOp_cast->bnScaleBiasMeanVarDesc);
+    fusionBatchNormInferenceArgs_t* bnOpArgs_cast =
+            (fusionBatchNormInferenceArgs_t*) malloc(sizeof(fusionBiasForwardArgs_t));
+    fusionBatchNormInferenceCreate_t* bnOp_cast =
+                        (fusionBatchNormInferenceCreate_t*)bnOp;
+    bnOpArgs_cast->creationParam.bnMode =
+                        (hipdnnBatchNormMode_t)(bnOp_cast->bnMode);
+    bnOpArgs_cast->creationParam.bnScaleBiasMeanVarDesc =
+                        (hipdnnTensorDescriptor_t)(bnOp_cast->bnScaleBiasMeanVarDesc);
     bnOpArgs_cast->alpha = (void*)alpha;
     bnOpArgs_cast->beta = (void*)beta;
     bnOpArgs_cast->bnScale = (void*)bnScale;
@@ -3090,31 +3067,7 @@ hipdnnStatus_t hipdnnSetOpArgsBatchNormInference(
 
     return HIPDNN_STATUS_SUCCESS;
 }
-//++++++++++++++++++++++++++++++++++++++++++++
-#include <vector>
-#include <iomanip>
-void print(const float *data, int n, int c, int h, int w) {
-  std::vector<float> buffer ( 1 << 20 );
-  hipMemcpy(
-        buffer.data(), data,
-        n * c * h * w * sizeof(float),
-        hipMemcpyDeviceToHost);
-  int a = 0;
-  for (int i = 0; i < n; ++i) {
-    for (int j = 0; j < c; ++j) {
-      std::cout << "n=" << n << ", c=" << c << ":" << std::endl;
-      for (int k = 0; k < h; ++k) {
-        for (int l = 0; l < w; ++l) {
-          std::cout << "\t"<<  std::setw(4) << std::right << buffer[a];
-          ++a;
-        }
-        std::cout << std::endl;
-      }
-    }
-  }
-  std::cout << std::endl;
-}
-//++++++++++++++++++++++++++++++++++++++++++++
+
 hipdnnStatus_t
 hipdnnExecuteFusionPlan(const hipdnnHandle_t handle,
                         const hipdnnFusionPlanDescriptor_t fusePlanDesc,
@@ -3138,15 +3091,17 @@ hipdnnExecuteFusionPlan(const hipdnnHandle_t handle,
             fusionConvolutionForwardArgs_t* convArgs_cast;
             for( int convId=0; convId < args_cast->fuseOpArgsCount; convId++ ) {
                 if (args_cast->fuseOpArgsSeq[convId] == 'C') {
-                    convArgs_cast = (fusionConvolutionForwardArgs_t*)(args_cast->fuseOpArgsPtrs[convId]);
+                    convArgs_cast = (fusionConvolutionForwardArgs_t*)
+                                            (args_cast->fuseOpArgsPtrs[convId]);
                     args_cast->fuseOpArgsSeq[convId]='\0'; break;
                 }
             }
             hipdnnHandle_t handle = fusePlanDesc_cast->handle;
-            hipdnnFilterDescriptor_t filterDesc = (convArgs_cast->creationParam).wDesc;
+            hipdnnFilterDescriptor_t filterDesc =
+                                    (convArgs_cast->creationParam).wDesc;
             void* filter = convArgs_cast->w;
-            hipdnnConvolutionDescriptor_t convDesc = (convArgs_cast->creationParam).convDesc;
-
+            hipdnnConvolutionDescriptor_t convDesc =
+                                    (convArgs_cast->creationParam).convDesc;
             hipdnnConvolutionFwdAlgo_t algo;
             int retAlgoCount;
             hipdnnConvolutionFwdAlgoPerf_t algoPerf[5];
@@ -3157,51 +3112,10 @@ hipdnnExecuteFusionPlan(const hipdnnHandle_t handle,
                 output, 5 /*MaxAlgoCount*/, &retAlgoCount, algoPerf, workSpace,
                 workSpaceSizeInBytes));
             algo = algoPerf[0].algo;
-            // hipdnnConvolutionFwdPreference_t preference = HIPDNN_CONVOLUTION_FWD_PREFER_FASTEST;
-            // CHECK_HIPDNN(hipdnnGetConvolutionForwardAlgorithm( handle,
-            //     curInputDesc, filterDesc, convDesc, outDesc, preference,
-            //     0 /*memoryLimitInBytes*/ ,&algo));
-            CHECK_HIPDNN(hipdnnGetConvolutionForwardWorkspaceSize( handle, curInputDesc,
-                filterDesc, convDesc, outputDesc, algo, &workSpaceSizeInBytes));
+            CHECK_HIPDNN(hipdnnGetConvolutionForwardWorkspaceSize( handle,
+                curInputDesc, filterDesc, convDesc, outputDesc, algo,
+                &workSpaceSizeInBytes));
             CHECK_HIP(hipMalloc(&workSpace, workSpaceSizeInBytes));
-
-          //+++++++++++++++ Conv Fwd call +++++++++++++++++++++
-              std::cout << "Handle Inside:" <<handle<<std::endl;
-              hipdnnDataType_t dataType;
-              int ni,ci,hi,wi,sni,sci,shi,swi;
-              CHECK_HIPDNN(hipdnnGetTensor4dDescriptor(curInputDesc, &dataType,
-                  &ni,&ci,&hi,&wi,&sni,&sci,&shi,&swi));
-              std::cout << "in_data:" << std::endl;
-              print((float*)curInput,ni,ci,hi,wi);
-
-              hipdnnDataType_t ftype;
-              hipdnnTensorFormat_t fformat;
-              int filtDim[4]; int nbDim;
-              CHECK_HIPDNN(hipdnnGetFilterNdDescriptor(filterDesc, 4, &ftype, &fformat,
-                    &nbDim, filtDim));
-              std::cout << "filter_data:" << std::endl;
-              print((float*)filter, filtDim[0],filtDim[1],filtDim[2],filtDim[3]);
-
-              int phc,pwc,uc,vc,xc,yc;
-              hipdnnConvolutionMode_t modec;
-              hipdnnDataType_t cctype;
-              CHECK_HIPDNN(hipdnnGetConvolution2dDescriptor(convDesc,&phc,&pwc,&uc,&vc,&xc,&yc,&modec,&cctype));
-              std::cout<< "Conv-Exec:"<<convDesc<<std::endl;
-                std::cout << "pad_h: " << phc << std::endl;
-                std::cout << "pad_w: " << pwc << std::endl;
-                std::cout << "str_h: " << uc << std::endl;
-                std::cout << "str_w: " << vc << std::endl;
-                std::cout << "dil_h: " << xc << std::endl;
-                std::cout << "dil_w: " << yc << std::endl;
-                std::cout << "mode:" << modec << std::endl;
-                std::cout << "Type:" << cctype << std::endl;
-                std::cout << "alpha:" << *((float*)(convArgs_cast->alpha)) << std::endl;
-                std::cout << "beta:" << *((float*)(convArgs_cast->beta)) << std::endl;
-                std::cout << std::endl;
-                std::cout << "Workspace size: " <<workSpaceSizeInBytes  << std::endl;
-                std::cout<<"ConvAlgorithm:"<<algo<<std::endl;
-                std::cout << std::endl;
-            //++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
             CHECK_HIPDNN(hipdnnConvolutionForward( handle, convArgs_cast->alpha,
                  curInputDesc, curInput, filterDesc, filter, convDesc, algo,
@@ -3209,14 +3123,14 @@ hipdnnExecuteFusionPlan(const hipdnnHandle_t handle,
             curInput = output;
             curInputDesc = outputDesc;
             CHECK_HIP(hipFree(workSpace));
-
         }
         // Bias
         else if (fusePlanDesc_cast->fuseOpSeq[Id] == 'B') {
             fusionBiasForwardArgs_t* biasArgs_cast;
             for( int biasId=0; biasId < args_cast->fuseOpArgsCount; biasId++ ) {
                 if (args_cast->fuseOpArgsSeq[biasId] == 'B') {
-                    biasArgs_cast = (fusionBiasForwardArgs_t*)(args_cast->fuseOpArgsPtrs[biasId]);
+                    biasArgs_cast = (fusionBiasForwardArgs_t*)
+                                            (args_cast->fuseOpArgsPtrs[biasId]);
                     args_cast->fuseOpArgsSeq[biasId]='\0'; break;
                 }
             }
@@ -3227,18 +3141,17 @@ hipdnnExecuteFusionPlan(const hipdnnHandle_t handle,
             CHECK_HIPDNN(hipdnnAddTensor( handle, biasArgs_cast->alpha,
                 biasDesc, bias,  biasArgs_cast->beta,
                 outputDesc, (void*)curInput /*Inplace add*/));
-
         }
         // Activation
         else if (fusePlanDesc_cast->fuseOpSeq[Id] == 'A') {
             fusionActivationForwardArgs_t* activArgs_cast;
             for( int activId=0; activId < args_cast->fuseOpArgsCount; activId++ ) {
                 if (args_cast->fuseOpArgsSeq[activId] == 'A') {
-                    activArgs_cast = (fusionActivationForwardArgs_t*)(args_cast->fuseOpArgsPtrs[activId]);
+                    activArgs_cast = (fusionActivationForwardArgs_t*)
+                                            (args_cast->fuseOpArgsPtrs[activId]);
                     args_cast->fuseOpArgsSeq[activId]='\0'; break;
                 }
             }
-
             hipdnnActivationDescriptor_t activationDesc;
             CHECK_HIPDNN(hipdnnCreateActivationDescriptor(&activationDesc));
             hipdnnActivationMode_t activMode = (activArgs_cast->creationParam).activationMode;
@@ -3252,14 +3165,14 @@ hipdnnExecuteFusionPlan(const hipdnnHandle_t handle,
                 activArgs_cast->beta, outputDesc, output));
                 curInput = output;
                 curInputDesc = outputDesc;
-
         }
         // Batch Norm
         else if (fusePlanDesc_cast->fuseOpSeq[Id] == 'N') {
             fusionBatchNormInferenceArgs_t* normArgs_cast;
             for( int normId=0; normId < args_cast->fuseOpArgsCount; normId++ ) {
                 if (args_cast->fuseOpArgsSeq[normId] == 'C') {
-                    normArgs_cast = (fusionBatchNormInferenceArgs_t*)(args_cast->fuseOpArgsPtrs[normId]);
+                    normArgs_cast = (fusionBatchNormInferenceArgs_t*)
+                                            (args_cast->fuseOpArgsPtrs[normId]);
                     args_cast->fuseOpArgsSeq[normId]='\0'; break;
                 }
             }
@@ -3272,6 +3185,10 @@ hipdnnExecuteFusionPlan(const hipdnnHandle_t handle,
                 normArgs_cast->estimatedVariance, normArgs_cast->epsilon));
             curInput = output;
         }
+       else {
+           std::cerr <<"Corrupted parameter or unsupported layer fusion";
+           return HIPDNN_STATUS_BAD_PARAM;
+       }
     }
     return HIPDNN_STATUS_SUCCESS;
 }

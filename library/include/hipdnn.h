@@ -42,7 +42,7 @@
         hipdnnStatus_t status = (expression);                                  \
         if (status != HIPDNN_STATUS_SUCCESS) {                                 \
             std::cerr << "HIPDNN Error on line " << __LINE__                   \
-                      << " With error status "                                  \
+                      << " With error status "                                 \
                       << ": " << hipdnnGetErrorString(status) << std::endl;    \
             std::exit(EXIT_FAILURE);                                           \
         }                                                                      \
