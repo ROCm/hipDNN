@@ -3103,20 +3103,18 @@ hipdnnExecuteFusionPlan(const hipdnnHandle_t handle,
             hipdnnConvolutionDescriptor_t convDesc =
                                     (convArgs_cast->creationParam).convDesc;
             hipdnnConvolutionFwdAlgo_t algo;
-            int retAlgoCount;
-            hipdnnConvolutionFwdAlgoPerf_t algoPerf[5];
             void* workSpace;
             size_t workSpaceSizeInBytes;
-            CHECK_HIPDNN(hipdnnFindConvolutionForwardAlgorithmEx(handle,
-                curInputDesc, curInput, filterDesc, filter, convDesc, outputDesc,
-                output, 5 /*MaxAlgoCount*/, &retAlgoCount, algoPerf, workSpace,
-                workSpaceSizeInBytes));
-            algo = algoPerf[0].algo;
+            hipdnnConvolutionFwdPreference_t preference = HIPDNN_CONVOLUTION_FWD_PREFER_FASTEST;
+            CHECK_HIPDNN(hipdnnGetConvolutionForwardAlgorithm( handle,
+                curInputDesc, filterDesc, convDesc, outputDesc, preference,
+                0 /*memoryLimitInBytes*/ ,&algo));
             CHECK_HIPDNN(hipdnnGetConvolutionForwardWorkspaceSize( handle,
                 curInputDesc, filterDesc, convDesc, outputDesc, algo,
                 &workSpaceSizeInBytes));
             CHECK_HIP(hipMalloc(&workSpace, workSpaceSizeInBytes));
-
+            std::cout<<"Algorithm:"<<algo<<std::endl;
+            std::cout<<"Workspace size:"<<workSpaceSizeInBytes<<std::endl;
             CHECK_HIPDNN(hipdnnConvolutionForward( handle, convArgs_cast->alpha,
                  curInputDesc, curInput, filterDesc, filter, convDesc, algo,
                  workSpace, workSpaceSizeInBytes, convArgs_cast->beta, outputDesc, output));
