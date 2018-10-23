@@ -2872,6 +2872,8 @@ hipdnnStatus_t
 hipdnnCompileFusionPlan(hipdnnHandle_t handle,
                         hipdnnFusionPlanDescriptor_t fusePlanDesc) {
 
+    fusionPlan_t* fusePlanDesc_cast = (fusionPlan_t*)fusePlanDesc;
+    fusePlanDesc_cast->handle = handle;
     return HIPDNN_STATUS_SUCCESS;
 }
 
@@ -3088,7 +3090,31 @@ hipdnnStatus_t hipdnnSetOpArgsBatchNormInference(
 
     return HIPDNN_STATUS_SUCCESS;
 }
-
+//++++++++++++++++++++++++++++++++++++++++++++
+#include <vector>
+#include <iomanip>
+void print(const float *data, int n, int c, int h, int w) {
+  std::vector<float> buffer ( 1 << 20 );
+  hipMemcpy(
+        buffer.data(), data,
+        n * c * h * w * sizeof(float),
+        hipMemcpyDeviceToHost);
+  int a = 0;
+  for (int i = 0; i < n; ++i) {
+    for (int j = 0; j < c; ++j) {
+      std::cout << "n=" << n << ", c=" << c << ":" << std::endl;
+      for (int k = 0; k < h; ++k) {
+        for (int l = 0; l < w; ++l) {
+          std::cout << "\t"<<  std::setw(4) << std::right << buffer[a];
+          ++a;
+        }
+        std::cout << std::endl;
+      }
+    }
+  }
+  std::cout << std::endl;
+}
+//++++++++++++++++++++++++++++++++++++++++++++
 hipdnnStatus_t
 hipdnnExecuteFusionPlan(const hipdnnHandle_t handle,
                         const hipdnnFusionPlanDescriptor_t fusePlanDesc,
@@ -3105,6 +3131,7 @@ hipdnnExecuteFusionPlan(const hipdnnHandle_t handle,
     }
 
     const void* curInput = input;
+    hipdnnTensorDescriptor_t curInputDesc = inputDesc;
     for( int Id=0; Id < fusePlanDesc_cast->fuseOpCount; Id++ ) {
         // Convolution
         if (fusePlanDesc_cast->fuseOpSeq[Id] == 'C') {
@@ -3126,22 +3153,61 @@ hipdnnExecuteFusionPlan(const hipdnnHandle_t handle,
             void* workSpace;
             size_t workSpaceSizeInBytes;
             CHECK_HIPDNN(hipdnnFindConvolutionForwardAlgorithmEx(handle,
-                inputDesc, curInput, filterDesc, filter, convDesc, outputDesc,
+                curInputDesc, curInput, filterDesc, filter, convDesc, outputDesc,
                 output, 5 /*MaxAlgoCount*/, &retAlgoCount, algoPerf, workSpace,
                 workSpaceSizeInBytes));
-            // algo = algoPerf[0].algo;
+            algo = algoPerf[0].algo;
             // hipdnnConvolutionFwdPreference_t preference = HIPDNN_CONVOLUTION_FWD_PREFER_FASTEST;
             // CHECK_HIPDNN(hipdnnGetConvolutionForwardAlgorithm( handle,
             //     curInputDesc, filterDesc, convDesc, outDesc, preference,
             //     0 /*memoryLimitInBytes*/ ,&algo));
-            // CHECK_HIPDNN(hipdnnGetConvolutionForwardWorkspaceSize( handle, curInputDesc,
-            //     filterDesc, convDesc, outDesc, algo, &workSpaceSizeInBytes));
-            // CHECK_HIP(hipMalloc(&workSpace, workSpaceSizeInBytes));
+            CHECK_HIPDNN(hipdnnGetConvolutionForwardWorkspaceSize( handle, curInputDesc,
+                filterDesc, convDesc, outputDesc, algo, &workSpaceSizeInBytes));
+            CHECK_HIP(hipMalloc(&workSpace, workSpaceSizeInBytes));
+
+          //+++++++++++++++ Conv Fwd call +++++++++++++++++++++
+              std::cout << "Handle Inside:" <<handle<<std::endl;
+              hipdnnDataType_t dataType;
+              int ni,ci,hi,wi,sni,sci,shi,swi;
+              CHECK_HIPDNN(hipdnnGetTensor4dDescriptor(curInputDesc, &dataType,
+                  &ni,&ci,&hi,&wi,&sni,&sci,&shi,&swi));
+              std::cout << "in_data:" << std::endl;
+              print((float*)curInput,ni,ci,hi,wi);
+
+              hipdnnDataType_t ftype;
+              hipdnnTensorFormat_t fformat;
+              int filtDim[4]; int nbDim;
+              CHECK_HIPDNN(hipdnnGetFilterNdDescriptor(filterDesc, 4, &ftype, &fformat,
+                    &nbDim, filtDim));
+              std::cout << "filter_data:" << std::endl;
+              print((float*)filter, filtDim[0],filtDim[1],filtDim[2],filtDim[3]);
+
+              int phc,pwc,uc,vc,xc,yc;
+              hipdnnConvolutionMode_t modec;
+              hipdnnDataType_t cctype;
+              CHECK_HIPDNN(hipdnnGetConvolution2dDescriptor(convDesc,&phc,&pwc,&uc,&vc,&xc,&yc,&modec,&cctype));
+              std::cout<< "Conv-Exec:"<<convDesc<<std::endl;
+                std::cout << "pad_h: " << phc << std::endl;
+                std::cout << "pad_w: " << pwc << std::endl;
+                std::cout << "str_h: " << uc << std::endl;
+                std::cout << "str_w: " << vc << std::endl;
+                std::cout << "dil_h: " << xc << std::endl;
+                std::cout << "dil_w: " << yc << std::endl;
+                std::cout << "mode:" << modec << std::endl;
+                std::cout << "Type:" << cctype << std::endl;
+                std::cout << "alpha:" << *((float*)(convArgs_cast->alpha)) << std::endl;
+                std::cout << "beta:" << *((float*)(convArgs_cast->beta)) << std::endl;
+                std::cout << std::endl;
+                std::cout << "Workspace size: " <<workSpaceSizeInBytes  << std::endl;
+                std::cout<<"ConvAlgorithm:"<<algo<<std::endl;
+                std::cout << std::endl;
+            //++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
             CHECK_HIPDNN(hipdnnConvolutionForward( handle, convArgs_cast->alpha,
-                inputDesc, curInput, filterDesc, filter, convDesc, algo,
-                workSpace, workSpaceSizeInBytes, convArgs_cast->beta, outputDesc, output));
+                 curInputDesc, curInput, filterDesc, filter, convDesc, algo,
+                 workSpace, workSpaceSizeInBytes, convArgs_cast->beta, outputDesc, output));
             curInput = output;
+            curInputDesc = outputDesc;
             CHECK_HIP(hipFree(workSpace));
 
         }
@@ -3182,9 +3248,10 @@ hipdnnExecuteFusionPlan(const hipdnnHandle_t handle,
                 activArgs_cast->activGamma));
 
             CHECK_HIPDNN(hipdnnActivationForward( fusePlanDesc_cast->handle,
-                activationDesc, activArgs_cast->alpha, inputDesc, curInput,
+                activationDesc, activArgs_cast->alpha, curInputDesc, curInput,
                 activArgs_cast->beta, outputDesc, output));
                 curInput = output;
+                curInputDesc = outputDesc;
 
         }
         // Batch Norm
@@ -3206,7 +3273,7 @@ hipdnnExecuteFusionPlan(const hipdnnHandle_t handle,
             curInput = output;
         }
     }
-    return HIPDNN_STATUS_NOT_SUPPORTED;
+    return HIPDNN_STATUS_SUCCESS;
 }
 
 hipdnnStatus_t
