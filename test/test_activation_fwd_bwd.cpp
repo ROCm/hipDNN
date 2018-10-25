@@ -5,7 +5,7 @@ TEST(activation_fwd_bwd, func_test_int_activation) {
 
   float avg_time = 0, avg_time1 = 0, avg_time2 = 0;
 
-  activation_fwd_params test_case1(1, 1, 4, 4);
+  activation_params_t test_case1(1, 1, 4, 4);
   activation_params_t test_case2(1, 1, 4, 4);
 
   Memory<float> dataSrc(test_case1.n * test_case1.channels * test_case1.height *
@@ -43,7 +43,7 @@ TEST(activation_fwd_bwd, func_int_activation_batch32) {
 
   float avg_time = 0, avg_time1 = 0, avg_time2 = 0;
 
-  activation_fwd_params test_case1(32, 1, 4, 4);
+  activation_params_t test_case1(32, 1, 4, 4);
   activation_params_t test_case2(32, 1, 4, 4);
 
   Memory<float> dataSrc(test_case1.n * test_case1.channels * test_case1.height *
@@ -81,7 +81,7 @@ TEST(activation_fwd_bwd, func_int_activation_batch64) {
 
   float avg_time = 0, avg_time1 = 0, avg_time2 = 0;
 
-  activation_fwd_params test_case1(64, 1, 4, 4);
+  activation_params_t test_case1(64, 1, 4, 4);
   activation_params_t test_case2(64, 1, 4, 4);
 
   Memory<float> dataSrc(test_case1.n * test_case1.channels * test_case1.height *
@@ -119,7 +119,7 @@ TEST(activation_fwd_bwd, func_int_activation_batch128) {
 
   float avg_time = 0, avg_time1 = 0, avg_time2 = 0;
 
-  activation_fwd_params test_case1(128, 1, 25, 25);
+  activation_params_t test_case1(128, 1, 25, 25);
   activation_params_t test_case2(128, 1, 25, 25);
 
   Memory<float> dataSrc(test_case1.n * test_case1.channels * test_case1.height *
