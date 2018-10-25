@@ -1,7 +1,7 @@
 #include "test_pooling_forward.hpp"
 
 TEST(pooling_fwd, func_check_zero_padding) {
-  test_2dpool_desc_t pool(1, 1, 224, 224, 224 / 2, 224 / 2, 2, 2, 0, 0, 2, 2);
+  test_pooling_descriptor pool(1, 1, 224, 224, 224 / 2, 224 / 2, 2, 2, 0, 0, 2, 2);
   Memory<float> srcData(pool.ih * pool.iw);
   Memory<float> dstDataGPU((224 / 2) * (224 / 2));
   float avg_time = 0;
@@ -29,7 +29,7 @@ TEST(pooling_fwd, func_check_zero_padding) {
 }
 
 TEST(pooling_fwd, func_check_batch32) {
-  test_2dpool_desc_t pool(32, 1, 224, 224, 224 / 2, 224 / 2, 2, 2, 0, 0, 2, 2);
+  test_pooling_descriptor pool(32, 1, 224, 224, 224 / 2, 224 / 2, 2, 2, 0, 0, 2, 2);
   Memory<float> srcData(pool.mb * pool.c * pool.ih * pool.iw);
   Memory<float> dstDataGPU(pool.mb * pool.c * pool.oh * pool.ow);
   float avg_time = 0;
@@ -57,7 +57,7 @@ TEST(pooling_fwd, func_check_batch32) {
 }
 
 TEST(pooling_fwd, func_check_batch64) {
-  test_2dpool_desc_t pool(64, 1, 224, 224, 224 / 2, 224 / 2, 2, 2, 0, 0, 2, 2);
+  test_pooling_descriptor pool(64, 1, 224, 224, 224 / 2, 224 / 2, 2, 2, 0, 0, 2, 2);
   Memory<float> srcData(pool.mb * pool.c * pool.ih * pool.iw);
   Memory<float> dstDataGPU(pool.mb * pool.c * pool.oh * pool.ow);
   float avg_time = 0;
@@ -85,7 +85,7 @@ TEST(pooling_fwd, func_check_batch64) {
 }
 
 TEST(pooling_fwd, func_check_batch128) {
-  test_2dpool_desc_t pool(128, 1, 4, 4, 2, 2, 2, 2, 0, 0, 2, 2);
+  test_pooling_descriptor pool(128, 1, 4, 4, 2, 2, 2, 2, 0, 0, 2, 2);
   Memory<float> srcData(pool.mb * pool.c * pool.ih * pool.iw);
   Memory<float> dstDataGPU(pool.mb * pool.c * pool.oh * pool.ow);
   float avg_time = 0;

@@ -6,18 +6,19 @@ TEST(LRN_fwd, func_check_naive_LRN) {
     int pad[2] = {2, 2};    // padding 2
     int stride[2] = {2, 2}; // stride 2
     float avg_time = 0;
+    int dil[2] = {1,1};
 
     Desc outputDesc =
-        calculateOpDesc(inputDesc, filterDesc, pad, stride);
+        calculate_Dims(inputDesc, filterDesc, pad, stride, dil);
     Memory<float> srcData = createMemory<float>(inputDesc);
     Memory<float> dstDataGPU = createMemory<float>(outputDesc);
     Memory<float> filterData = createMemory<float>(filterDesc);
     populateMemoryRandom<float>(srcData);
     populateMemoryRandom<float>(filterData);
-    test_conv_2d_sizes_t testConvolutionSizes(
+    convulution_Size testConvolutionSizes(
         inputDesc.N, 1, inputDesc.C, inputDesc.H, inputDesc.W, outputDesc.C,
         outputDesc.H, outputDesc.W, filterDesc.H, filterDesc.W, pad[0], pad[1],
-        stride[0], stride[1], 1, 1);
+        stride[0], stride[1], dil[0], dil[1]);
 
   int ip_size[4] = {inputDesc.N, inputDesc.C, inputDesc.H, inputDesc.W};
   int k_size[4] = {filterDesc.N, filterDesc.C, filterDesc.H, filterDesc.W};
@@ -45,18 +46,19 @@ TEST(LRN_fwd, func_check_LRN_batch16) {
     int pad[2] = {0, 0};    // padding 2
     int stride[2] = {2, 2}; // stride 2
     float avg_time = 0;
+    int dil[2] = {1,1};
 
     Desc outputDesc =
-        calculateOpDesc(inputDesc, filterDesc, pad, stride);
+        calculate_Dims(inputDesc, filterDesc, pad, stride, dil);
     Memory<float> srcData = createMemory<float>(inputDesc);
     Memory<float> dstDataGPU = createMemory<float>(outputDesc);
     Memory<float> filterData = createMemory<float>(filterDesc);
     populateMemoryRandom<float>(srcData);
     populateMemoryRandom<float>(filterData);
-    test_conv_2d_sizes_t testConvolutionSizes(
+    convulution_Size testConvolutionSizes(
         inputDesc.N, 1, inputDesc.C, inputDesc.H, inputDesc.W, outputDesc.C,
         outputDesc.H, outputDesc.W, filterDesc.H, filterDesc.W, pad[0], pad[1],
-        stride[0], stride[1], 1, 1);
+        stride[0], stride[1], dil[0], dil[1]);
 
   int ip_size[4] = {inputDesc.N, inputDesc.C, inputDesc.H, inputDesc.W};
   int k_size[4] = {filterDesc.N, filterDesc.C, filterDesc.H, filterDesc.W};
@@ -84,18 +86,19 @@ TEST(LRN_fwd, func_check_LRN_batch32) {
     int pad[2] = {0, 0};    // padding 2
     int stride[2] = {2, 2}; // stride 2
     float avg_time = 0;
+    int dil[2] = {1,1};
 
     Desc outputDesc =
-        calculateOpDesc(inputDesc, filterDesc, pad, stride);
+        calculate_Dims(inputDesc, filterDesc, pad, stride, dil);
     Memory<float> srcData = createMemory<float>(inputDesc);
     Memory<float> dstDataGPU = createMemory<float>(outputDesc);
     Memory<float> filterData = createMemory<float>(filterDesc);
     populateMemoryRandom<float>(srcData);
     populateMemoryRandom<float>(filterData);
-    test_conv_2d_sizes_t testConvolutionSizes(
+    convulution_Size testConvolutionSizes(
         inputDesc.N, 1, inputDesc.C, inputDesc.H, inputDesc.W, outputDesc.C,
         outputDesc.H, outputDesc.W, filterDesc.H, filterDesc.W, pad[0], pad[1],
-        stride[0], stride[1], 1, 1);
+        stride[0], stride[1], dil[0], dil[1]);
 
   int ip_size[4] = {inputDesc.N, inputDesc.C, inputDesc.H, inputDesc.W};
   int k_size[4] = {filterDesc.N, filterDesc.C, filterDesc.H, filterDesc.W};
@@ -123,18 +126,19 @@ TEST(LRN_fwd, func_check_LRN_batch64) {
     int pad[2] = {2, 2};    // padding 2
     int stride[2] = {2, 2}; // stride 2
     float avg_time = 0;
+    int dil[2] = {1,1};
 
     Desc outputDesc =
-        calculateOpDesc(inputDesc, filterDesc, pad, stride);
+        calculate_Dims(inputDesc, filterDesc, pad, stride, dil);
     Memory<float> srcData = createMemory<float>(inputDesc);
     Memory<float> dstDataGPU = createMemory<float>(outputDesc);
     Memory<float> filterData = createMemory<float>(filterDesc);
     populateMemoryRandom<float>(srcData);
     populateMemoryRandom<float>(filterData);
-    test_conv_2d_sizes_t testConvolutionSizes(
+    convulution_Size testConvolutionSizes(
         inputDesc.N, 1, inputDesc.C, inputDesc.H, inputDesc.W, outputDesc.C,
         outputDesc.H, outputDesc.W, filterDesc.H, filterDesc.W, pad[0], pad[1],
-        stride[0], stride[1], 1, 1);
+        stride[0], stride[1], dil[0], dil[1]);
 
   int ip_size[4] = {inputDesc.N, inputDesc.C, inputDesc.H, inputDesc.W};
   int k_size[4] = {filterDesc.N, filterDesc.C, filterDesc.H, filterDesc.W};
@@ -162,18 +166,19 @@ TEST(LRN_fwd, func_check_LRN_batch128) {
     int pad[2] = {2, 2};    // padding 2
     int stride[2] = {2, 2}; // stride 2
     float avg_time = 0;
+    int dil[2] = {1,1};
 
     Desc outputDesc =
-        calculateOpDesc(inputDesc, filterDesc, pad, stride);
+        calculate_Dims(inputDesc, filterDesc, pad, stride, dil);
     Memory<float> srcData = createMemory<float>(inputDesc);
     Memory<float> dstDataGPU = createMemory<float>(outputDesc);
     Memory<float> filterData = createMemory<float>(filterDesc);
     populateMemoryRandom<float>(srcData);
     populateMemoryRandom<float>(filterData);
-    test_conv_2d_sizes_t testConvolutionSizes(
+    convulution_Size testConvolutionSizes(
         inputDesc.N, 1, inputDesc.C, inputDesc.H, inputDesc.W, outputDesc.C,
         outputDesc.H, outputDesc.W, filterDesc.H, filterDesc.W, pad[0], pad[1],
-        stride[0], stride[1], 1, 1);
+        stride[0], stride[1], dil[0], dil[1]);
 
   int ip_size[4] = {inputDesc.N, inputDesc.C, inputDesc.H, inputDesc.W};
   int k_size[4] = {filterDesc.N, filterDesc.C, filterDesc.H, filterDesc.W};

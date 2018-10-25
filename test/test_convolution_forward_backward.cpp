@@ -5,18 +5,19 @@ TEST(convolution_fwd_bwd, func_test_fwd_bwd_convolution) {
     Desc filterDesc(1, 3, 3, 3);
     int pad[2] = {0, 0};    // zero padding
     int stride[2] = {1, 1}; // stride 1
+    int dil[2] = {1,1};
     float avg_time = 0, avg_time1 = 0, avg_time2 = 0;
     Desc outputDesc =
-        calculateConv2DOutputDesc_int(inputDesc, filterDesc, pad, stride);
+        calculate_Dims(inputDesc, filterDesc, pad, stride, dil);
     Memory<float> srcData = createMemory<float>(inputDesc);
     Memory<float> gradData = createMemory<float>(filterDesc);
     Memory<float> dstDataGPU = createMemory<float>(outputDesc);
     Memory<float> filterData = createMemory<float>(filterDesc);
     
-    test_convolution_size testConvolutionSizes(
+    convulution_Size testConvolutionSizes(
         inputDesc.N, 1, inputDesc.C, inputDesc.H, inputDesc.W, outputDesc.C,
         outputDesc.H, outputDesc.W, filterDesc.H, filterDesc.W, pad[0], pad[1],
-        stride[0], stride[1], 1, 1);
+        stride[0], stride[1], dil[0], dil[1]);
 
   int ip_size[4] = {inputDesc.N, inputDesc.C, inputDesc.H, inputDesc.W};
   int k_size[4] = {filterDesc.N, filterDesc.C, filterDesc.H, filterDesc.W};
@@ -52,18 +53,19 @@ TEST(convolution_fwd_bwd, func_test_fwd_bwd_convolution_batch32) {
     Desc filterDesc(1, 3, 3, 3);
     int pad[2] = {0, 0};    // zero padding
     int stride[2] = {1, 1}; // stride 1
+    int dil[2] = {1,1};
     float avg_time = 0, avg_time1 = 0, avg_time2 = 0;
     Desc outputDesc =
-        calculateConv2DOutputDesc_int(inputDesc, filterDesc, pad, stride);
+        calculate_Dims(inputDesc, filterDesc, pad, stride, dil);
     Memory<float> srcData = createMemory<float>(inputDesc);
     Memory<float> gradData = createMemory<float>(filterDesc);
     Memory<float> dstDataGPU = createMemory<float>(outputDesc);
     Memory<float> filterData = createMemory<float>(filterDesc);
     
-    test_convolution_size testConvolutionSizes(
+    convulution_Size testConvolutionSizes(
         inputDesc.N, 1, inputDesc.C, inputDesc.H, inputDesc.W, outputDesc.C,
         outputDesc.H, outputDesc.W, filterDesc.H, filterDesc.W, pad[0], pad[1],
-        stride[0], stride[1], 1, 1);
+        stride[0], stride[1], dil[0], dil[1]);
 
   int ip_size[4] = {inputDesc.N, inputDesc.C, inputDesc.H, inputDesc.W};
   int k_size[4] = {filterDesc.N, filterDesc.C, filterDesc.H, filterDesc.W};
@@ -99,18 +101,19 @@ TEST(convolution_fwd_bwd, func_test_fwd_bwd_convolution_batch64) {
     Desc filterDesc(21, 3, 3, 3);
     int pad[2] = {0, 0};    // zero padding
     int stride[2] = {1, 1}; // stride 1
+    int dil[2] = {1,1};
     float avg_time = 0, avg_time1 = 0, avg_time2 = 0;
     Desc outputDesc =
-        calculateConv2DOutputDesc_int(inputDesc, filterDesc, pad, stride);
+        calculate_Dims(inputDesc, filterDesc, pad, stride, dil);
     Memory<float> srcData = createMemory<float>(inputDesc);
     Memory<float> gradData = createMemory<float>(filterDesc);
     Memory<float> dstDataGPU = createMemory<float>(outputDesc);
     Memory<float> filterData = createMemory<float>(filterDesc);
     
-    test_convolution_size testConvolutionSizes(
+    convulution_Size testConvolutionSizes(
         inputDesc.N, 1, inputDesc.C, inputDesc.H, inputDesc.W, outputDesc.C,
         outputDesc.H, outputDesc.W, filterDesc.H, filterDesc.W, pad[0], pad[1],
-        stride[0], stride[1], 1, 1);
+        stride[0], stride[1], dil[0], dil[1]);
 
   int ip_size[4] = {inputDesc.N, inputDesc.C, inputDesc.H, inputDesc.W};
   int k_size[4] = {filterDesc.N, filterDesc.C, filterDesc.H, filterDesc.W};
@@ -146,18 +149,19 @@ TEST(convolution_fwd_bwd, func_test_fwd_bwd_convolution_batch128) {
     Desc filterDesc(1, 3, 2, 2);
     int pad[2] = {0, 0};    // zero padding
     int stride[2] = {1, 1}; // stride 1
+    int dil[2] = {1,1};
     float avg_time = 0, avg_time1 = 0, avg_time2 = 0;
     Desc outputDesc =
-        calculateConv2DOutputDesc_int(inputDesc, filterDesc, pad, stride);
+        calculate_Dims(inputDesc, filterDesc, pad, stride, dil);
     Memory<float> srcData = createMemory<float>(inputDesc);
     Memory<float> gradData = createMemory<float>(filterDesc);
     Memory<float> dstDataGPU = createMemory<float>(outputDesc);
     Memory<float> filterData = createMemory<float>(filterDesc);
     
-    test_convolution_size testConvolutionSizes(
+    convulution_Size testConvolutionSizes(
         inputDesc.N, 1, inputDesc.C, inputDesc.H, inputDesc.W, outputDesc.C,
         outputDesc.H, outputDesc.W, filterDesc.H, filterDesc.W, pad[0], pad[1],
-        stride[0], stride[1], 1, 1);
+        stride[0], stride[1], dil[0], dil[1]);
 
   int ip_size[4] = {inputDesc.N, inputDesc.C, inputDesc.H, inputDesc.W};
   int k_size[4] = {filterDesc.N, filterDesc.C, filterDesc.H, filterDesc.W};

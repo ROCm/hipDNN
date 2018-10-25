@@ -7,20 +7,20 @@ TEST(convolution_activation_fwd_intg, func_check_naive_conv_activation) {
     Desc filterDesc(1, 3, 4, 4);
     int pad[2] = {0, 0};    // zero padding
     int stride[2] = {4, 4}; // stride 1
-
+    int dil[2] = {1,1};
     Desc outputDesc =
-        calculateConv2DOutDim(inputDesc, filterDesc, pad, stride);
+        calculate_Dims(inputDesc, filterDesc, pad, stride, dil);
     Memory<float> srcDataConv = createMemory<float>(inputDesc);
     Memory<float> dstDataGPU = createMemory<float>(outputDesc);
     Memory<float> filterData = createMemory<float>(filterDesc);
     populateMemoryRandom<float>(srcDataConv);
     populateMemoryRandom<float>(filterData);
-    test_convolution_sizes_t testConvolutionSizes(
+    convulution_Size testConvolutionSizes(
         inputDesc.N, 1, inputDesc.C, inputDesc.H, inputDesc.W, outputDesc.C,
         outputDesc.H, outputDesc.W, filterDesc.H, filterDesc.W, pad[0], pad[1],
         stride[0], stride[1], 1, 1);
 
-  activation_fwd_params test_case(1, 1, 4, 4);
+  activation_params_t test_case(1, 1, 4, 4);
    Memory<float> dataDst(test_case.n * test_case.channels * test_case.height *
                         test_case.width);
 
