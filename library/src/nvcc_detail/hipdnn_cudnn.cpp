@@ -2638,3 +2638,9 @@ hipdnnStatus_t hipdnnDestroyReduceTensorDescriptor(
     return cudnnTohipdnnStatus(cudnnDestroyReduceTensorDescriptor(
         (cudnnReduceTensorDescriptor_t)reduceTensorDesc));
 }
+
+ hipdnnStatus_t hipdnnSetConvolutionGroupCount(
+    hipdnnConvolutionDescriptor_t convDesc, int groupCount ) {
+    return cudnnTohipdnnStatus(cudnnSetConvolutionGroupCount(
+        (cudnnConvolutionDescriptor_t)convDesc, groupCount) );
+} 
