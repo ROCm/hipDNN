@@ -3049,7 +3049,7 @@ hipdnnStatus_t hipdnnSetOpArgsBatchNormInference(
     args_cast->fuseOpArgsSeq[newCount-1]='N';
 
     fusionBatchNormInferenceArgs_t* bnOpArgs_cast =
-            (fusionBatchNormInferenceArgs_t*) malloc(sizeof(fusionBiasForwardArgs_t));
+            (fusionBatchNormInferenceArgs_t*) malloc(sizeof(fusionBatchNormInferenceArgs_t));
     fusionBatchNormInferenceCreate_t* bnOp_cast =
                         (fusionBatchNormInferenceCreate_t*)bnOp;
     bnOpArgs_cast->creationParam.bnMode =
@@ -3168,7 +3168,7 @@ hipdnnExecuteFusionPlan(const hipdnnHandle_t handle,
         else if (fusePlanDesc_cast->fuseOpSeq[Id] == 'N') {
             fusionBatchNormInferenceArgs_t* normArgs_cast;
             for( int normId=0; normId < args_cast->fuseOpArgsCount; normId++ ) {
-                if (args_cast->fuseOpArgsSeq[normId] == 'C') {
+                if (args_cast->fuseOpArgsSeq[normId] == 'N') {
                     normArgs_cast = (fusionBatchNormInferenceArgs_t*)
                                             (args_cast->fuseOpArgsPtrs[normId]);
                     args_cast->fuseOpArgsSeq[normId]='\0'; break;
@@ -3178,10 +3178,12 @@ hipdnnExecuteFusionPlan(const hipdnnHandle_t handle,
             hipdnnTensorDescriptor_t bnDesc = normArgs_cast->creationParam.bnScaleBiasMeanVarDesc;
             CHECK_HIPDNN(hipdnnnBatchNormalizationForwardInference( fusePlanDesc_cast->handle,
                 bnMode, normArgs_cast->alpha, normArgs_cast->beta,
-                inputDesc, curInput, outputDesc, output, bnDesc, normArgs_cast->bnScale,
+                curInputDesc, curInput, outputDesc, output, bnDesc, normArgs_cast->bnScale,
                 normArgs_cast->bnBias, normArgs_cast->estimatedMean,
                 normArgs_cast->estimatedVariance, normArgs_cast->epsilon));
             curInput = output;
+            curInputDesc = outputDesc;
+
         }
        else {
            std::cerr <<"Corrupted parameter or unsupported layer fusion";
