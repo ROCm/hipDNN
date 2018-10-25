@@ -42,10 +42,21 @@
         hipdnnStatus_t status = (expression);                                  \
         if (status != HIPDNN_STATUS_SUCCESS) {                                 \
             std::cerr << "HIPDNN Error on line " << __LINE__                   \
-                      << "With error status "                                  \
+                      << " With error status "                                 \
                       << ": " << hipdnnGetErrorString(status) << std::endl;    \
             std::exit(EXIT_FAILURE);                                           \
         }                                                                      \
+    }
+
+#define CHECK_MALLOC(pointer)                                                  \
+    {                                                                          \
+        if ( (pointer) == '\0') {   /*if Null pointer*/                        \
+            std::cerr << "Error on line " << __LINE__                          \
+                      << " Malloc returned NULL "<< std::endl;                 \
+            std::exit(EXIT_FAILURE);                                           \
+        }                                                                      \
+      /*std::cout << "The Pointer:"<<(void*)(pointer)                          \
+                  <<" on line:" <<__LINE__<< std::endl;*/                      \
     }
 
 #define HIPDNN_EXPORT
