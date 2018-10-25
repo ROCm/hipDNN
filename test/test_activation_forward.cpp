@@ -2,7 +2,7 @@
 
 TEST(activation_forward, func_test_fwd_activation) {
   float avg_time = 0;
-  activation_fwd_params test_case(1, 1, 224, 224);
+  activation_params_t test_case(1, 1, 224, 224);
   Memory<float> dataSrc(test_case.n * test_case.channels * test_case.height *
                         test_case.width);
   Memory<float> dataDst(test_case.n * test_case.channels * test_case.height *
@@ -30,7 +30,7 @@ TEST(activation_forward, func_test_fwd_activation) {
 
 TEST(activation_forward, func_fwd_activation_batch32) {
   float avg_time = 0;
-  activation_fwd_params test_case(32, 1, 4, 4);
+  activation_params_t test_case(32, 1, 4, 4);
   Memory<float> dataSrc(test_case.n * test_case.channels * test_case.height *
                         test_case.width);
   Memory<float> dataDst(test_case.n * test_case.channels * test_case.height *
@@ -58,7 +58,7 @@ TEST(activation_forward, func_fwd_activation_batch32) {
 
 TEST(activation_forward, func_fwd_activation_batch64) {
   float avg_time = 0;
-  activation_fwd_params test_case(64, 1, 4, 4);
+  activation_params_t test_case(64, 1, 4, 4);
   Memory<float> dataSrc(test_case.n * test_case.channels * test_case.height *
                         test_case.width);
   Memory<float> dataDst(test_case.n * test_case.channels * test_case.height *
@@ -86,7 +86,7 @@ TEST(activation_forward, func_fwd_activation_batch64) {
 
 TEST(activation_forward, func_fwd_activation_batch128) {
   float avg_time = 0;
-  activation_fwd_params test_case(128, 1, 32, 32);
+  activation_params_t test_case(128, 1, 32, 32);
   Memory<float> dataSrc(test_case.n * test_case.channels * test_case.height *
                         test_case.width);
   Memory<float> dataDst(test_case.n * test_case.channels * test_case.height *

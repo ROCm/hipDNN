@@ -1,44 +1,11 @@
 #ifndef TEST_CONVOLUTION_ACTIVATION_FORWARD_HPP
 #define TEST_CONVOLUTION_ACTIVATION_FORWARD_HPP
 
-#include "hipDNN_test_common.h"
-
-struct activation_fwd_params {
-  int n, channels, height, width;
-  activation_fwd_params(int n, int channels, int height, int width)
-      : n(n), channels(channels), height(height), width(width) {}
-};
-
-struct test_convolution_sizes_t {
-  test_convolution_sizes_t(int mb, int ng, int ic, int ih, int iw, int oc,
-                           int oh, int ow, int kh, int kw, int padh, int padw,
-                           int strh, int strw, int dilh = 0, int dilw = 0)
-      : mb(mb), ng(ng), ic(ic), ih(ih), iw(iw), oc(oc), oh(oh), ow(ow), kh(kh),
-        kw(kw), padh(padh), padw(padw), strh(strh), strw(strw), dilh(dilh),
-        dilw(dilw) {}
-  int mb;         // mini batches
-  int ng;         // number of groups
-  int ic, ih, iw; // Input channels, height and width
-  int oc, oh, ow; // Output channels, height and width
-  int kh, kw;     // kernel height and width
-  int padh, padw; // padding along height and width
-  int strh, strw; // stride along height and width
-  int dilh, dilw; // dilation along height and width
-};
-
-// Note we are currently only dealing with 2D convolution
-Desc calculateConv2DOutDim(Desc inputDesc, Desc filterDesc, int pad[2],
-                               int stride[2]) {
-  assert(inputDesc.C == filterDesc.C);
-  int outputHeight =
-      ((inputDesc.H - filterDesc.H + 2 * pad[0]) / stride[0]) + 1;
-  int outputWidth = ((inputDesc.W - filterDesc.W + 2 * pad[1]) / stride[1]) + 1;
-  Desc outputDesc(inputDesc.N, filterDesc.N, outputHeight, outputWidth);
-  return outputDesc;
-}
+#include "hipdnn_test_common.h"
+#include "common.hpp"
 
 template <typename dataType>
-void compute_hipdnn_conv_fwd(test_convolution_sizes_t &c, dataType *src,
+void compute_hipdnn_conv_fwd(convulution_Size &c, dataType *src,
                              dataType *weights, dataType *bias, dataType *dst, float *avg_time) {
 
   hipdnnHandle_t hipdnn;
@@ -112,7 +79,7 @@ void compute_hipdnn_conv_fwd(test_convolution_sizes_t &c, dataType *src,
 }
 
 template <typename dataType>
-void compute_hipdnn_activation_forward(activation_fwd_params &test_case,
+void compute_hipdnn_activation_forward(activation_params_t &test_case,
                                         dataType *src,
                                         dataType *dst, float *avg_time) {
   hipdnnHandle_t hipdnn;

@@ -11,18 +11,18 @@ TEST(convolution_pooling_fwd_intg, func_check_naive_conv_pool) {
     Desc filterDesc(1, 3, 4, 4);
     int pad[2] = {0, 0};    // zero padding
     int stride[2] = {4, 4}; // stride 1
-    
+    int dil[2] = {1,1};
     Desc outputDesc =
-        calculateConvDesc(inputDesc, filterDesc, pad, stride);
+        calculate_Dims(inputDesc, filterDesc, pad, stride, dil);
     Memory<float> srcDataConv = createMemory<float>(inputDesc);
     Memory<float> dstDataGPU = createMemory<float>(outputDesc);
     Memory<float> filterData = createMemory<float>(filterDesc);
     populateMemoryRandom<float>(srcDataConv);
     populateMemoryRandom<float>(filterData);
-    test_conv_sizes testConvolutionSizes(
+    convulution_Size testConvolutionSizes(
         inputDesc.N, 1, inputDesc.C, inputDesc.H, inputDesc.W, outputDesc.C,
         outputDesc.H, outputDesc.W, filterDesc.H, filterDesc.W, pad[0], pad[1],
-        stride[0], stride[1], 1, 1);
+        stride[0], stride[1], dil[0], dil[1]);
 
   int ip_size_c[4] = {inputDesc.N, inputDesc.C, inputDesc.H, inputDesc.W};
   int k_size_c[4] = {filterDesc.N, filterDesc.C, filterDesc.H, filterDesc.W};
