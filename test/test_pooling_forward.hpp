@@ -10,22 +10,10 @@
 #include <iterator>
 #include <random>
 #include <vector>
-
-struct test_2dpool_desc_t {
-  int mb, c;      // Minibatch and channels
-  int ih, iw;     // input dimensions
-  int oh, ow;     // output dimensions
-  int kh, kw;     // kernel dimensions
-  int padt, padl; // padding dimensions
-  int strh, strw; // stride dimensions
-  test_2dpool_desc_t(int mb, int c, int ih, int iw, int oh, int ow, int kh,
-                     int kw, int padt, int padl, int strh, int strw)
-      : mb(mb), c(c), ih(ih), iw(iw), oh(oh), ow(ow), kh(kh), kw(kw),
-        padt(padt), padl(padl), strh(strh), strw(strw) {}
-};
+#include "common.hpp"
 
 template <typename dataType>
-void compute_hipdnn_maxpool_fwd(test_2dpool_desc_t &c, dataType *src,
+void compute_hipdnn_maxpool_fwd(test_pooling_descriptor &c, dataType *src,
                                 dataType *dst, float *avg_time) {
 
   hipdnnHandle_t handle;

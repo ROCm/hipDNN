@@ -2,15 +2,10 @@
 #define TEST_ACTIVATION_FORWARD_HPP
 
 #include "hipdnn_test_common.h"
-
-struct activation_fwd_params {
-  int n, channels, height, width;
-  activation_fwd_params(int n, int channels, int height, int width)
-      : n(n), channels(channels), height(height), width(width) {}
-};
+#include "common.hpp"
 
 template <typename dataType>
-void compute_hipdnn_activation_forward(activation_fwd_params &test_case,
+void compute_hipdnn_activation_forward(activation_params_t &test_case,
                                         dataType *src,
                                         dataType *dst, float *avg_time) {
   hipdnnHandle_t hipdnn;

@@ -1738,6 +1738,12 @@ hipdnnStatus_t hipdnnFindConvolutionBackwardDataAlgorithmEx(
             sDescToWorkSpaceBackwardDataConvolutionSize[convDesc];
     }
 
+        CHECK_MIO(miopenConvolutionBackwardDataGetWorkSpaceSize(
+            (miopenHandle_t)handle, (miopenTensorDescriptor_t)dyDesc,
+            (miopenTensorDescriptor_t)wDesc,
+            (miopenConvolutionDescriptor_t)convDesc,
+            (miopenTensorDescriptor_t)dxDesc, &infoWorkSpaceSize));
+
     try {
 
         CHECK_MIO(miopenFindConvolutionBackwardDataAlgorithm(
@@ -2516,10 +2522,17 @@ hipdnnSetFilterNdDescriptor(hipdnnFilterDescriptor_t filterDesc,
     miopenDataType_t moDT;
     HIPDNN_OPEN_LOG_C("ENTER hipdnnSetFilterNdDescriptor " << filterDesc
                                                            << std::flush);
+
+     int strideA[nbDims - 1]; 
+    
+   for (int k = nbDims - 1 ; k >= 0  ; k--){
+         strideA[k] = (k != nbDims - 1)  ? strideA[k + 1] * filterDimA[k + 1] : 1;
+        // std::cout<<"\nChecking k:"<<k<<"\t"<<filterDimA[k]<<"\t"<<strideA[k];
+    } 
     CHECK_HIPDNN(hipTomiopenDataType(dataType, &moDT));
     CHECK_MIO(miopenSetTensorDescriptor(
         (miopenTensorDescriptor_t)filterDesc, moDT, nbDims,
-        const_cast<int *>(filterDimA), const_cast<int *>(filterDimA)));
+        const_cast<int *>(filterDimA), const_cast<int *>(strideA)));
     HIPDNN_OPEN_LOG_C("EXIT hipdnnSetFilterNdDescriptor." << std::flush);
     return HIPDNN_STATUS_SUCCESS;
 }
@@ -2850,7 +2863,7 @@ hipdnnStatus_t hipdnnSetConvolutionNdDescriptor(
         d_w = dilationA[1];
         CHECK_MIO(miopenInitConvolutionDescriptor(
             (miopenConvolutionDescriptor_t)convDesc, miopenConvolution, pad_h,
-            pad_w, u, v, 1, 1));
+            pad_w, u, v, d_h, d_w));
         // Populate the map container with key being newly created 2Ddescriptor
         // and value a 3 dim array with index mapping as
         // 0-pad, 1-stride and 2-dilation
@@ -2987,3 +3000,10 @@ hipdnnStatus_t hipdnnDestroyReduceTensorDescriptor(
                       << std::flush);
     return HIPDNN_STATUS_NOT_SUPPORTED;
 }
+
+ hipdnnStatus_t hipdnnSetConvolutionGroupCount(
+    hipdnnConvolutionDescriptor_t convDesc, int groupCount ) {
+    CHECK_MIO(miopenSetConvolutionGroupCount(
+        (miopenConvolutionDescriptor_t)convDesc, groupCount) );
+    return HIPDNN_STATUS_SUCCESS;
+} 

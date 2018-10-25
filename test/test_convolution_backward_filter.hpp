@@ -1,36 +1,7 @@
 #ifndef TEST_CONVOLUTION_BACKWARD_FILTER_HPP
 #define TEST_CONVOLUTION_BACKWARD_FILTER_HPP
-
+#include "common.hpp"
 #include "hipdnn_test_common.h"
-
-Desc calculateConv2DOutputDesc_bwd(Desc inputDesc, Desc filterDesc, int pad[2],
-                                   int stride[2]) {
-    assert(inputDesc.C == filterDesc.C);
-    int outputHeight =
-        ((inputDesc.H - filterDesc.H + 2 * pad[0]) / stride[0]) + 1;
-    int outputWidth =
-        ((inputDesc.W - filterDesc.W + 2 * pad[1]) / stride[1]) + 1;
-    Desc outputDesc(inputDesc.N, filterDesc.N, outputHeight, outputWidth);
-    return outputDesc;
-}
-
-struct test_convolution_bwd_filter {
-    test_convolution_bwd_filter(int mb, int ng, int ic, int ih, int iw, int oc,
-                                int oh, int ow, int kh, int kw, int padh,
-                                int padw, int strh, int strw, int dilh = 0,
-                                int dilw = 0)
-        : mb(mb), ng(ng), ic(ic), ih(ih), iw(iw), oc(oc), oh(oh), ow(ow),
-          kh(kh), kw(kw), padh(padh), padw(padw), strh(strh), strw(strw),
-          dilh(dilh), dilw(dilw) {}
-    int mb;         // mini batches
-    int ng;         // number of groups
-    int ic, ih, iw; // Input channels, height and width
-    int oc, oh, ow; // Output channels, height and width
-    int kh, kw;     // kernel height and width
-    int padh, padw; // padding along height and width
-    int strh, strw; // stride along height and width
-    int dilh, dilw; // dilation along height and width
-};
 
 template <typename T>
 __global__ void dev_const(hipLaunchParm lp, T *px, float k) {
@@ -39,7 +10,7 @@ __global__ void dev_const(hipLaunchParm lp, T *px, float k) {
 }
 
 template <typename dataType>
-void compute_hipdnn_conv_bwd_filter(test_convolution_bwd_filter &c,
+void compute_hipdnn_conv_bwd_filter(convulution_Size &c,
                                     dataType *src, dataType *weights,
                                     dataType *grad, dataType *bias,
                                     dataType *dst, float *avg_time) {
@@ -136,5 +107,7 @@ void compute_hipdnn_conv_bwd_filter(test_convolution_bwd_filter &c,
     hipdnnDestroyTensorDescriptor(in_desc);
     hipdnnDestroy(hipdnn);
 }
+
+
 
 #endif // TEST_CONVOLUTION_FORWARD_FILTER_HPP
