@@ -2724,6 +2724,34 @@ int fusionValidate (fusionPlan_t* basePlan, fusionPlan_t* checkPlan) {
     return 0;
 }
 
+int hipdnnSizeof(hipdnnDataType_t dataTypeIn) {
+    int retVal=0;
+    switch (dataTypeIn) {
+    case HIPDNN_DATA_FLOAT:
+        retVal = sizeof(float); // 32 bit
+        break;
+    case HIPDNN_DATA_DOUBLE:
+        retVal = sizeof(double); // 64 bit
+        break;
+    case HIPDNN_DATA_HALF:
+        retVal = sizeof(float)/2; // 16 bit
+        break;
+    case HIPDNN_DATA_INT8:
+        retVal = sizeof(char); //8 bit
+        break;
+    case HIPDNN_DATA_INT32:
+        retVal = sizeof(char)*4; // 32 bit
+        break;
+    case HIPDNN_DATA_INT8x4:
+        retVal = sizeof(char)*4; // 32 bit
+        break;
+    default:
+        std::cerr << std::endl <<"ERROR:Unimplemented Datatype passed to hipdnnSizeof"
+                  << std::endl;
+        retVal=0;
+    }
+    return retVal;
+}
 // ----------------------------------------------------------------------------
 
 hipdnnStatus_t
@@ -3083,8 +3111,19 @@ hipdnnExecuteFusionPlan(const hipdnnHandle_t handle,
         return HIPDNN_STATUS_INVALID_VALUE;
     }
 
-    const void* curInput = input;
+    hipdnnDataType_t dataTypeIn;
+    int nIn, cIn, hIn, wIn, nStrideIn,cStrideIn, hStrideIn, wStrideIn;
+    CHECK_HIPDNN(hipdnnGetTensor4dDescriptor(inputDesc, &dataTypeIn, &nIn, &cIn,
+        &hIn, &wIn, &nStrideIn, &cStrideIn, &hStrideIn, &wStrideIn));
+    void* curInput;
+    CHECK_HIP(hipMalloc(&curInput, nIn*cIn*hIn*wIn*hipdnnSizeof(dataTypeIn)));
+    CHECK_HIP(hipMemcpy(curInput,input,nIn*cIn*hIn*wIn*hipdnnSizeof(dataTypeIn),
+        hipMemcpyDefault));
     hipdnnTensorDescriptor_t curInputDesc = inputDesc;
+    int nOut, cOut, hOut, wOut, nStrideOut, cStrideOut, hStrideOut, wStrideOut;
+    CHECK_HIPDNN(hipdnnGetTensor4dDescriptor(outputDesc, &dataTypeIn, &nOut,
+        &cOut, &hOut, &wOut, &nStrideOut, &cStrideOut, &hStrideOut, &wStrideOut));
+
     for( int Id=0; Id < fusePlanDesc_cast->fuseOpCount; Id++ ) {
         // Convolution
         if (fusePlanDesc_cast->fuseOpSeq[Id] == 'C') {
@@ -3096,12 +3135,18 @@ hipdnnExecuteFusionPlan(const hipdnnHandle_t handle,
                     args_cast->fuseOpArgsSeq[convId]='\0'; break;
                 }
             }
+            /*
+             * TODO: Memory handling Multiple convolution in single fusion
+             *       MIopen-1.5 equivalent doesn't support this as of now
+             */
             hipdnnHandle_t handle = fusePlanDesc_cast->handle;
             hipdnnFilterDescriptor_t filterDesc =
                                     (convArgs_cast->creationParam).wDesc;
             void* filter = convArgs_cast->w;
             hipdnnConvolutionDescriptor_t convDesc =
                                     (convArgs_cast->creationParam).convDesc;
+            void* outputConv;
+            CHECK_HIP(hipMalloc(&outputConv, nOut*cOut*hOut*wOut*hipdnnSizeof(dataTypeIn)));
             hipdnnConvolutionFwdAlgo_t algo;
             void* workSpace;
             size_t workSpaceSizeInBytes;
@@ -3113,13 +3158,17 @@ hipdnnExecuteFusionPlan(const hipdnnHandle_t handle,
                 curInputDesc, filterDesc, convDesc, outputDesc, algo,
                 &workSpaceSizeInBytes));
             CHECK_HIP(hipMalloc(&workSpace, workSpaceSizeInBytes));
-            std::cout<<"Algorithm:"<<algo<<std::endl;
-            std::cout<<"Workspace size:"<<workSpaceSizeInBytes<<std::endl;
             CHECK_HIPDNN(hipdnnConvolutionForward( handle, convArgs_cast->alpha,
                  curInputDesc, curInput, filterDesc, filter, convDesc, algo,
-                 workSpace, workSpaceSizeInBytes, convArgs_cast->beta, outputDesc, output));
-            curInput = output;
+                 workSpace, workSpaceSizeInBytes, convArgs_cast->beta,
+                 outputDesc, outputConv));
+
+            CHECK_HIP(hipFree(curInput));
+            CHECK_HIP(hipMalloc(&curInput,nOut*cOut*hOut*wOut*hipdnnSizeof(dataTypeIn)));
+            CHECK_HIP(hipMemcpy(curInput, outputConv,
+                nOut*cOut*hOut*wOut*hipdnnSizeof(dataTypeIn),hipMemcpyDefault));
             curInputDesc = outputDesc;
+            CHECK_HIP(hipFree(outputConv));
             CHECK_HIP(hipFree(workSpace));
         }
         // Bias
@@ -3134,11 +3183,12 @@ hipdnnExecuteFusionPlan(const hipdnnHandle_t handle,
             }
 
             hipdnnHandle_t handle =  fusePlanDesc_cast->handle;
-            hipdnnTensorDescriptor_t biasDesc = (biasArgs_cast->creationParam).biasDesc;
+            hipdnnTensorDescriptor_t biasDesc = (
+                                          biasArgs_cast->creationParam).biasDesc;
             void* bias = biasArgs_cast->bias;
             CHECK_HIPDNN(hipdnnAddTensor( handle, biasArgs_cast->alpha,
                 biasDesc, bias,  biasArgs_cast->beta,
-                outputDesc, (void*)curInput /*Inplace add*/));
+                curInputDesc, (void*)curInput /*Inplace add*/));
         }
         // Activation
         else if (fusePlanDesc_cast->fuseOpSeq[Id] == 'A') {
@@ -3152,7 +3202,8 @@ hipdnnExecuteFusionPlan(const hipdnnHandle_t handle,
             }
             hipdnnActivationDescriptor_t activationDesc;
             CHECK_HIPDNN(hipdnnCreateActivationDescriptor(&activationDesc));
-            hipdnnActivationMode_t activMode = (activArgs_cast->creationParam).activationMode;
+            hipdnnActivationMode_t activMode =
+                                  (activArgs_cast->creationParam).activationMode;
             hipdnnNanPropagation_t reluNanOpt = HIPDNN_PROPAGATE_NAN;
             CHECK_HIPDNN(hipdnnSetActivationDescriptor( activationDesc, activMode,
                 reluNanOpt, activArgs_cast->activAlpha, activArgs_cast->activBeta,
@@ -3160,9 +3211,8 @@ hipdnnExecuteFusionPlan(const hipdnnHandle_t handle,
 
             CHECK_HIPDNN(hipdnnActivationForward( fusePlanDesc_cast->handle,
                 activationDesc, activArgs_cast->alpha, curInputDesc, curInput,
-                activArgs_cast->beta, outputDesc, output));
-                curInput = output;
-                curInputDesc = outputDesc;
+                activArgs_cast->beta, curInputDesc, curInput));
+            CHECK_HIPDNN(hipdnnDestroyActivationDescriptor(activationDesc));
         }
         // Batch Norm
         else if (fusePlanDesc_cast->fuseOpSeq[Id] == 'N') {
@@ -3175,14 +3225,15 @@ hipdnnExecuteFusionPlan(const hipdnnHandle_t handle,
                 }
             }
             hipdnnBatchNormMode_t bnMode = (normArgs_cast->creationParam).bnMode;
-            hipdnnTensorDescriptor_t bnDesc = normArgs_cast->creationParam.bnScaleBiasMeanVarDesc;
-            CHECK_HIPDNN(hipdnnnBatchNormalizationForwardInference( fusePlanDesc_cast->handle,
+            hipdnnTensorDescriptor_t bnDesc =
+                            normArgs_cast->creationParam.bnScaleBiasMeanVarDesc;
+            CHECK_HIPDNN(hipdnnnBatchNormalizationForwardInference(
+                fusePlanDesc_cast->handle,
                 bnMode, normArgs_cast->alpha, normArgs_cast->beta,
-                curInputDesc, curInput, outputDesc, output, bnDesc, normArgs_cast->bnScale,
-                normArgs_cast->bnBias, normArgs_cast->estimatedMean,
-                normArgs_cast->estimatedVariance, normArgs_cast->epsilon));
-            curInput = output;
-            curInputDesc = outputDesc;
+                curInputDesc, curInput, curInputDesc, curInput, bnDesc,
+                normArgs_cast->bnScale, normArgs_cast->bnBias,
+                normArgs_cast->estimatedMean, normArgs_cast->estimatedVariance,
+                normArgs_cast->epsilon));
 
         }
        else {
@@ -3190,6 +3241,9 @@ hipdnnExecuteFusionPlan(const hipdnnHandle_t handle,
            return HIPDNN_STATUS_BAD_PARAM;
        }
     }
+    CHECK_HIP(hipMemcpy(output,curInput,
+        nOut*cOut*hOut*wOut*hipdnnSizeof(dataTypeIn), hipMemcpyDefault));
+    CHECK_HIP(hipFree(curInput));
     return HIPDNN_STATUS_SUCCESS;
 }
 
