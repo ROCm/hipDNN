@@ -1317,7 +1317,7 @@ hipdnnStatus_t hipdnnGetConvolutionBackwardFilterAlgorithm(
         new hipdnnConvolutionBwdFilterAlgoPerf_t[requestedAlgoCount];
 
     CHECK_HIPDNN(hipdnnFindConvolutionBackwardFilterAlgorithmEx(
-        handle, xDesc, x, dwDesc, dw, convDesc, dyDesc, dy, requestedAlgoCount,
+        handle, xDesc, x, dyDesc, dy, convDesc, dwDesc, dw, requestedAlgoCount,
         &returnedAlgoCount, perfResults, sConvolutionBackwardAlgorithmWorkspace,
         0));
 
