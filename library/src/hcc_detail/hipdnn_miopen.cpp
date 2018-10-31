@@ -2248,7 +2248,7 @@ hipdnnStatus_t hipdnnLRNCrossChannelForward(
                                (miopenLRNDescriptor_t)normDesc, alpha,
                                (miopenTensorDescriptor_t)xDesc, x, beta,
                                (miopenTensorDescriptor_t)yDesc, y,
-                               false,    // bool do_backward, //HGSOS
+                               true,    // bool do_backward, //HGSOS
                                devptr)); // HGSOS //NOTYET no workspace size
     return HIPDNN_STATUS_SUCCESS;
 }
@@ -2270,7 +2270,7 @@ hipdnnStatus_t hipdnnLRNCrossChannelForwardEx(
                                (miopenLRNDescriptor_t)normDesc, alpha,
                                (miopenTensorDescriptor_t)xDesc, x, beta,
                                (miopenTensorDescriptor_t)yDesc, y,
-                               false, // bool do_backward, //HGSOS //NOTYET
+                               true, // bool do_backward, //HGSOS //NOTYET
                                workspace)); // NOTYET  no workspace size!
     return HIPDNN_STATUS_SUCCESS;
 }
