@@ -1,27 +1,15 @@
-#ifndef TEST_CONVOLUTION_FORWARD_COMMON_HPP
-#define TEST_CONVOLUTION_FORWARD_COMMON_HPP
+#ifndef TEST_CONVOLUTION_GROUP_HPP
+#define TEST_CONVOLUTION_GROUP_HPP
 
 #include "hipdnn.h"
 #include "hipdnn_test_common.h"
 #include "gtest/gtest.h"
 #include "common.hpp"
 
-Desc calculate_Dims(Desc inputDesc, Desc filterDesc, int pad[2],
-                               int stride[2], int dilution[2]) {
- assert(inputDesc.C == filterDesc.C);
-  
-  int outputHeight = ((inputDesc.H - filterDesc.H + 2 * pad[0] - (filterDesc.H - 1)*(dilution[0] -1)) / stride[0]) + 1;
- 
-  int outputWidth = ((inputDesc.W - filterDesc.W + 2 * pad[1] - (filterDesc.H -1)*(dilution[1] -1)) / stride[1]) + 1;
-
-    Desc outputDesc(inputDesc.N, filterDesc.N, outputHeight, outputWidth);
-
-  return outputDesc;
-}
-
 template <typename dataType>
-void compute_hipdnn_conv_fwd(convulution_Size &c, dataType *src,
+void compute_hipdnn_group_conv(convulution_Size &c, dataType *src,
                              dataType *weights, dataType *bias, dataType *dst, float *avg_time) {
+
   hipdnnHandle_t hipdnn;
   checkHIPDNN(hipdnnCreate(&hipdnn));
 
@@ -65,6 +53,8 @@ void compute_hipdnn_conv_fwd(convulution_Size &c, dataType *src,
 
   hipMalloc(&ws_data, ws_size);
 
+  checkHIPDNN(hipdnnSetConvolutionGroupCount(conv_desc, c.ng));
+
   float alpha = 1.f;
   float beta = 0.f;
 
@@ -92,4 +82,4 @@ void compute_hipdnn_conv_fwd(convulution_Size &c, dataType *src,
   hipdnnDestroy(hipdnn);
 }
 
-#endif // TEST_CONVOLUTION_FORWARD_COMMON_HPP
+#endif // TEST_CONVOLUTION_GROUP_HPP
