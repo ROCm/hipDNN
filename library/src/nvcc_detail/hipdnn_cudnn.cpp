@@ -3268,3 +3268,4 @@ hipdnnDestroyFusionPlan(hipdnnFusionPlanDescriptor_t fusePlanDesc) {
     free(fusePlanDesc);
     return HIPDNN_STATUS_SUCCESS;
 }
+
