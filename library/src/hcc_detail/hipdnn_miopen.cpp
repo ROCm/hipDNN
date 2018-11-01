@@ -2506,12 +2506,8 @@ hipdnnStatus_t hipdnnSetFilterNdDescriptor(
             (k != nbDims - 1) ? strideDimA[k + 1] * filterDimA[k + 1] : 1;
     }
     CHECK_MIO(miopenSetTensorDescriptor(
-        (miopenTensorDescriptor_t)filterDesc, moDT, nbDims,
-<<<<<<< HEAD
-        const_cast<int *>(filterDimA), const_cast<int *>(strideDimA)));
-=======
-        const_cast<int *>(filterDimA), const_cast<int *>(strideA)));
->>>>>>> 3624c78a42dd59a1ec8bc15a67b613f51df94f91
+    	(miopenTensorDescriptor_t)filterDesc, moDT, nbDims,
+	const_cast<int *>(filterDimA), const_cast<int *>(strideDimA)));
     HIPDNN_OPEN_LOG_C("EXIT hipdnnSetFilterNdDescriptor." << std::flush);
     return HIPDNN_STATUS_SUCCESS;
 }
