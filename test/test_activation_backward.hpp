@@ -1,13 +1,7 @@
 #ifndef TEST_ACTIVATION_BACKWARD_HPP
 #define TEST_ACTIVATION_BACKWARD_HPP
-
+#include "common.hpp"
 #include "hipdnn_test_common.h"
-
-struct activation_params_t {
-  int n, channels, height, width;
-  activation_params_t(int n, int channels, int height, int width)
-      : n(n), channels(channels), height(height), width(width) {}
-};
 
 template <typename dataType>
 void compute_hipdnn_activation_backward(activation_params_t &test_case,
