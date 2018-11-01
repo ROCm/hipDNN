@@ -2066,8 +2066,9 @@ hipdnnStatus_t hipdnnLRNCrossChannelForward(
                                (miopenLRNDescriptor_t)normDesc, alpha,
                                (miopenTensorDescriptor_t)xDesc, x, beta,
                                (miopenTensorDescriptor_t)yDesc, y,
-                               false,     // bool do_backward, //HGSOS
-                               devptr));  // HGSOS //NOTYET no workspace size
+                               true,    // bool do_backward, //HGSOS
+                               devptr)); // HGSOS //NOTYET no workspace size
+
     return HIPDNN_STATUS_SUCCESS;
 }
 
@@ -2088,8 +2089,9 @@ hipdnnStatus_t hipdnnLRNCrossChannelForwardEx(
                                (miopenLRNDescriptor_t)normDesc, alpha,
                                (miopenTensorDescriptor_t)xDesc, x, beta,
                                (miopenTensorDescriptor_t)yDesc, y,
-                               false,  // bool do_backward, //HGSOS //NOTYET
-                               workspace));  // NOTYET  no workspace size!
+                               true, // bool do_backward, //HGSOS //NOTYET
+                               workspace)); // NOTYET  no workspace size!
+
     return HIPDNN_STATUS_SUCCESS;
 }
 
@@ -2806,10 +2808,21 @@ hipdnnStatus_t hipdnnDestroyReduceTensorDescriptor(
     return HIPDNN_STATUS_NOT_SUPPORTED;
 }
 
-hipdnnStatus_t hipdnnCreateFusionPlan(
-    hipdnnFusionPlanDescriptor_t *fusePlanDesc,
-    const hipdnnFusionDirection_t fuseDirection,
-    const miopenTensorDescriptor_t inputDesc) {
+
+ hipdnnStatus_t hipdnnSetConvolutionGroupCount(
+    hipdnnConvolutionDescriptor_t convDesc, int groupCount ) {
+    CHECK_MIO(miopenSetConvolutionGroupCount(
+        (miopenConvolutionDescriptor_t)convDesc, groupCount) );
+    return HIPDNN_STATUS_SUCCESS;
+
+}
+
+// --- Fusion API ---
+
+hipdnnStatus_t
+hipdnnCreateFusionPlan(hipdnnFusionPlanDescriptor_t *fusePlanDesc,
+                       const hipdnnFusionDirection_t fuseDirection,
+                       const hipdnnTensorDescriptor_t inputDesc) {
     CHECK_MIO(
         miopenCreateFusionPlan((miopenFusionPlanDescriptor_t *)fusePlanDesc,
                                (miopenFusionDirection_t)fuseDirection,
@@ -2836,10 +2849,14 @@ hipdnnStatus_t hipdnnFusionPlanGetWorkSpaceSize(
 
 hipdnnStatus_t hipdnnFusionPlanConvolutionGetAlgo(
     hipdnnFusionPlanDescriptor_t fusePlanDesc, const int requestAlgoCount,
-    int *returnedAlgoCount, hipdnnConvolutionFwdAlgo_t *returnedAlgos) {
+    int* returnedAlgoCount, hipdnnConvolutionFwdAlgo_t* returnedAlgos) {
+
+    miopenConvFwdAlgorithm_t mi_returnedAlgos;
     CHECK_MIO(miopenFusionPlanConvolutionGetAlgo(
         (miopenFusionPlanDescriptor_t)fusePlanDesc, requestAlgoCount,
-        returnedAlgoCount, (miopenConvFwdAlgorithm_t *)returnedAlgos));
+        returnedAlgoCount, &mi_returnedAlgos));
+    miopenTohipConvolutionFwdAlgo(mi_returnedAlgos,returnedAlgos);
+
     return HIPDNN_STATUS_SUCCESS;
 }
 
@@ -2864,12 +2881,17 @@ hipdnnStatus_t hipdnnCreateOpBiasForward(
     return HIPDNN_STATUS_SUCCESS;
 }
 
-hipdnnStatus_t hipdnnCreateOpActivationForward(
-    hipdnnFusionPlanDescriptor_t fusePlanDesc,
-    hipdnnFusionOpDescriptor_t *activOp, hipdnnActivationMode_t mode) {
+
+hipdnnStatus_t
+hipdnnCreateOpActivationForward(hipdnnFusionPlanDescriptor_t fusePlanDesc,
+                                hipdnnFusionOpDescriptor_t *activOp,
+                                hipdnnActivationMode_t mode) {
+    miopenActivationMode_t mi_mode;
+    hipTomiopenActivationMode(mode, &mi_mode);
+
     CHECK_MIO(miopenCreateOpActivationForward(
         (miopenFusionPlanDescriptor_t)fusePlanDesc,
-        (miopenFusionOpDescriptor_t *)activOp, (miopenActivationMode_t)mode));
+        (miopenFusionOpDescriptor_t *)activOp, mi_mode));
     return HIPDNN_STATUS_SUCCESS;
 }
 
@@ -2877,9 +2899,12 @@ hipdnnStatus_t hipdnnCreateOpBatchNormInference(
     hipdnnFusionPlanDescriptor_t fusePlanDesc, hipdnnFusionOpDescriptor_t *bnOp,
     const hipdnnBatchNormMode_t bn_mode,
     const hipdnnTensorDescriptor_t bnScaleBiasMeanVarDesc) {
+
+    miopenBatchNormMode_t mi_bn_mode;
+    hipTomiopenBatchNormMode(bn_mode, &mi_bn_mode);
     CHECK_MIO(miopenCreateOpBatchNormInference(
         (miopenFusionPlanDescriptor_t)fusePlanDesc,
-        (miopenFusionOpDescriptor_t *)bnOp, (miopenBatchNormMode_t)bn_mode,
+        (miopenFusionOpDescriptor_t *)bnOp, mi_bn_mode,
         (miopenTensorDescriptor_t)bnScaleBiasMeanVarDesc));
     return HIPDNN_STATUS_SUCCESS;
 }
@@ -2915,11 +2940,11 @@ hipdnnStatus_t hipdnnSetOpArgsBiasForward(
 }
 
 hipdnnStatus_t hipdnnSetOpArgsActivForward(
-    hipdnnOperatorArgs_t args, const hipdnnFusionOpDescriptor_t biasOp,
+    hipdnnOperatorArgs_t args, const hipdnnFusionOpDescriptor_t activOp,
     const void *alpha, const void *beta, double activAlpha, double activBeta,
     double activGamma) {
     CHECK_MIO(miopenSetOpArgsActivForward(
-        (miopenOperatorArgs_t)args, (miopenFusionOpDescriptor_t)biasOp, alpha,
+        (miopenOperatorArgs_t)args, (miopenFusionOpDescriptor_t)activOp, alpha,
         beta, activAlpha, activBeta, activGamma));
     return HIPDNN_STATUS_SUCCESS;
 }
@@ -2946,6 +2971,11 @@ hipdnnStatus_t hipdnnExecuteFusionPlan(
         (miopenTensorDescriptor_t)inputDesc, input,
         (miopenTensorDescriptor_t)outputDesc, output,
         (miopenOperatorArgs_t)args));
+    return HIPDNN_STATUS_SUCCESS;
+}
+
+hipdnnStatus_t hipdnnDestroyOperatorArgs(hipdnnOperatorArgs_t args) {
+    CHECK_MIO(miopenDestroyOperatorArgs((miopenOperatorArgs_t) args) );
     return HIPDNN_STATUS_SUCCESS;
 }
 
