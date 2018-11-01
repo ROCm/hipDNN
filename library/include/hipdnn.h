@@ -37,15 +37,26 @@
         }                                                                 \
     }
 
-#define CHECK_HIPDNN(expression)                                            \
-    {                                                                       \
-        hipdnnStatus_t status = (expression);                               \
-        if (status != HIPDNN_STATUS_SUCCESS) {                              \
-            std::cerr << "HIPDNN Error on line " << __LINE__                \
-                      << "With error status "                               \
-                      << ": " << hipdnnGetErrorString(status) << std::endl; \
-            std::exit(EXIT_FAILURE);                                        \
-        }                                                                   \
+#define CHECK_HIPDNN(expression)                                               \
+    {                                                                          \
+        hipdnnStatus_t status = (expression);                                  \
+        if (status != HIPDNN_STATUS_SUCCESS) {                                 \
+            std::cerr << "HIPDNN Error on line " << __LINE__                   \
+                      << " With error status "                                 \
+                      << ": " << hipdnnGetErrorString(status) << std::endl;    \
+            std::exit(EXIT_FAILURE);                                           \
+        }                                                                      \
+    }
+
+#define CHECK_MALLOC(pointer)                                                  \
+    {                                                                          \
+        if ( (pointer) == '\0') {   /*if Null pointer*/                        \
+            std::cerr << "Error on line " << __LINE__                          \
+                      << " Malloc returned NULL "<< std::endl;                 \
+            std::exit(EXIT_FAILURE);                                           \
+        }                                                                      \
+      /*std::cout << "The Pointer:"<<(void*)(pointer)                          \
+                  <<" on line:" <<__LINE__<< std::endl;*/                      \
     }
 
 #define HIPDNN_EXPORT
@@ -353,13 +364,6 @@ typedef void *hipdnnRNNDescriptor_t;
 typedef void *hipdnnPersistentRNNPlan_t;
 
 typedef void *hipdnnDeterminism_t;
-
-// Fusion API
-typedef void *hipdnnFusionPlanDescriptor_t;
-
-typedef void *hipdnnFusionOpDescriptor_t;
-
-typedef void *hipdnnOperatorArgs_t;
 
 struct hipdnnConvolutionFwdAlgoPerf_t {
     hipdnnConvolutionFwdAlgo_t algo;
@@ -1001,12 +1005,118 @@ hipdnnStatus_t hipdnnDestroyReduceTensorDescriptor(
 hipdnnStatus_t hipdnnSetConvolutionMathType(
     hipdnnConvolutionDescriptor_t convDesc, hipdnnMathType_t mathType);
 
-hipdnnStatus_t hipdnnCreateFusionPlan(
-    hipdnnFusionPlanDescriptor_t *fusePlanDesc,
-    const hipdnnFusionDirection_t fuseDirection,
-    const hipdnnTensorDescriptor_t inputDesc);
 hipdnnStatus_t hipdnnSetConvolutionGroupCount(
-    hipdnnConvolutionDescriptor_t convDesc, int groupCount);
+    hipdnnConvolutionDescriptor_t convDesc, int groupCount );
+
+// ----- Fusion API -----
+
+typedef void *hipdnnFusionPlanDescriptor_t;
+
+typedef void *hipdnnFusionOpDescriptor_t;
+
+typedef void *hipdnnOperatorArgs_t;
+
+hipdnnStatus_t
+hipdnnCreateFusionPlan(hipdnnFusionPlanDescriptor_t *fusePlanDesc,
+                       const hipdnnFusionDirection_t fuseDirection,
+                       const hipdnnTensorDescriptor_t inputDesc);
+
+
+hipdnnStatus_t
+hipdnnCreateOpConvForward(hipdnnFusionPlanDescriptor_t    fusePlanDesc,
+                          hipdnnFusionOpDescriptor_t*     convOp,
+                          hipdnnConvolutionDescriptor_t   convDesc,
+                          const hipdnnTensorDescriptor_t  wDesc );
+
+hipdnnStatus_t
+hipdnnCreateOpBiasForward(hipdnnFusionPlanDescriptor_t fusePlanDesc,
+                          hipdnnFusionOpDescriptor_t *biasOp,
+                          const hipdnnTensorDescriptor_t bDesc);
+
+hipdnnStatus_t
+hipdnnCreateOpActivationForward(hipdnnFusionPlanDescriptor_t fusePlanDesc,
+                                hipdnnFusionOpDescriptor_t *activOp,
+                                hipdnnActivationMode_t mode);
+
+hipdnnStatus_t
+hipdnnCreateOpBatchNormInference(
+                 hipdnnFusionPlanDescriptor_t fusePlanDesc,
+                 hipdnnFusionOpDescriptor_t *bnOp,
+                 const hipdnnBatchNormMode_t bn_mode,
+                 const hipdnnTensorDescriptor_t bnScaleBiasMeanVarDesc);
+
+hipdnnStatus_t
+hipdnnCompileFusionPlan(hipdnnHandle_t handle,
+                        hipdnnFusionPlanDescriptor_t fusePlanDesc);
+
+hipdnnStatus_t
+hipdnnFusionPlanGetOp(hipdnnFusionPlanDescriptor_t fusePlanDesc,
+                      const int op_idx,
+                      hipdnnFusionOpDescriptor_t *op);
+
+hipdnnStatus_t
+hipdnnFusionPlanGetWorkSpaceSize( hipdnnHandle_t handle,
+                                  hipdnnFusionPlanDescriptor_t fusePlanDesc,
+                                  size_t *workSpaceSize,
+                                  hipdnnConvolutionFwdAlgo_t algo);
+
+hipdnnStatus_t
+hipdnnFusionPlanConvolutionGetAlgo(
+                        hipdnnFusionPlanDescriptor_t fusePlanDesc,
+                        const int requestAlgoCount,
+                        int* returnedAlgoCount,
+                        hipdnnConvolutionFwdAlgo_t* returnedAlgos);
+
+hipdnnStatus_t hipdnnCreateOperatorArgs(hipdnnOperatorArgs_t* args);
+
+hipdnnStatus_t
+hipdnnSetOpArgsConvForward( hipdnnOperatorArgs_t args,
+                            const hipdnnFusionOpDescriptor_t convOp,
+                            const void *alpha,
+                            const void *beta,
+                            const void *w );
+
+hipdnnStatus_t
+hipdnnSetOpArgsBiasForward( hipdnnOperatorArgs_t args,
+                            const hipdnnFusionOpDescriptor_t biasOp,
+                            const void *alpha,
+                            const void *beta,
+                            const void *bias );
+
+hipdnnStatus_t
+hipdnnSetOpArgsActivForward( hipdnnOperatorArgs_t args,
+                             const hipdnnFusionOpDescriptor_t activOp,
+                             const void *alpha,
+                             const void *beta,
+                             double activAlpha,
+                             double activBeta,
+                             double activGamma);
+
+hipdnnStatus_t
+hipdnnSetOpArgsBatchNormInference( hipdnnOperatorArgs_t args,
+                                   const hipdnnFusionOpDescriptor_t bnOp,
+                                   const void* alpha,
+                                   const void* beta,
+                                   const void* bnScale,
+                                   const void* bnBias,
+                                   const void* estimatedMean,
+                                   const void* estimatedVariance,
+                                   double epsilon);
+
+
+hipdnnStatus_t
+hipdnnExecuteFusionPlan(const hipdnnHandle_t handle,
+                        const hipdnnFusionPlanDescriptor_t fusePlanDesc,
+                        const hipdnnTensorDescriptor_t inputDesc,
+                        const void *input,
+                        const hipdnnTensorDescriptor_t outputDesc, void *output,
+                        hipdnnOperatorArgs_t args);
+
+hipdnnStatus_t hipdnnDestroyOperatorArgs(hipdnnOperatorArgs_t args);
+
+hipdnnStatus_t
+hipdnnDestroyFusionPlan(hipdnnFusionPlanDescriptor_t fusePlanDesc);
+
 
 #ifdef __cplusplus
 }
