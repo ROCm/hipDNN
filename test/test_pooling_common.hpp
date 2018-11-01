@@ -3,46 +3,10 @@
 
 #include "hipdnn.h"
 #include "hipdnn_test_common.h"
-
-struct pool_fwd {
-  int mb, c;      // Minibatch and channels
-  int ih, iw;     // input dimensions
-  int oh, ow;     // output dimensions
-  int kh, kw;     // kernel dimensions
-  int padt, padl; // padding dimensions
-  int strh, strw; // stride dimensions
-  pool_fwd(int mb, int c, int ih, int iw, int oh, int ow, int kh,
-                     int kw, int padt, int padl, int strh, int strw)
-      : mb(mb), c(c), ih(ih), iw(iw), oh(oh), ow(ow), kh(kh), kw(kw),
-        padt(padt), padl(padl), strh(strh), strw(strw) {}
-};
-
-struct pool_bwd {
-  size_t in, ichannel, iheight, iwidth;
-  size_t wheight, wwidth;
-  size_t vpadding, hpadding;
-  size_t vstride, hstride;
-  int on, ochannel, oheight, owidth;
-
-  pool_bwd(size_t in, size_t ichannel, size_t iheight, size_t iwidth,
-                 size_t wheight, size_t wwidth, size_t vpadding,
-                 size_t hpadding, size_t vstride, size_t hstride)
-      : in(in), ichannel(ichannel), iheight(iheight), iwidth(iwidth),
-        wheight(wheight), wwidth(wwidth), vpadding(vpadding),
-        hpadding(hpadding), vstride(vstride), hstride(hstride) {}
-
-  pool_bwd(size_t in, size_t ichannel, size_t iheight, size_t iwidth,
-                 size_t wheight, size_t wwidth, size_t vpadding,
-                 size_t hpadding, size_t vstride, size_t hstride, size_t on,
-                 size_t ochannel, size_t oheight, size_t owidth)
-      : in(in), ichannel(ichannel), iheight(iheight), iwidth(iwidth),
-        wheight(wheight), wwidth(wwidth), vpadding(vpadding),
-        hpadding(hpadding), vstride(vstride), hstride(hstride), on(on),
-        ochannel(ochannel), oheight(oheight), owidth(owidth) {}
-};
+#include "common.hpp"
 
 template <typename dataType>
-void hipdnn_maxpool_fwd(pool_fwd &c, dataType *src,
+void hipdnn_pooling_forward(test_pooling_descriptor &c, dataType *src,
                                 dataType *dst, float *avg_time) {
 
   hipdnnHandle_t handle;
