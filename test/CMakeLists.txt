@@ -19,6 +19,7 @@ INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/utils/)
 FILE(GLOB HIPDNNTESTSRCS "${CMAKE_CURRENT_SOURCE_DIR}/utils/src/*.cc" ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp)
 INCLUDE_DIRECTORIES(${MIOPEN_PATH}/include/)
 ADD_EXECUTABLE(unittest ${HIPDNNTESTSRCS})
+
 TARGET_LINK_LIBRARIES(unittest csv_integration)
 if(${HIP_PLATFORM} MATCHES "nvcc")
     set_target_properties(unittest PROPERTIES LINK_FLAGS "-Xcompiler \\\"-Wl\\\\,-rpath=./library/\\\"")
