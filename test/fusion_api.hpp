@@ -1,4 +1,4 @@
-#ifndef TEST_FUSION_API_HPP
+fndef TEST_FUSION_API_HPP
 #define TEST_FUSION_API_HPP
 
 #include "hipdnn_test_common.h"
@@ -89,19 +89,19 @@ void compute_hipdnn_fusion_api(convulution_Size &c, dataType *src,
 	checkHIPDNN(hipdnnCreateOpBiasForward(fusePlanDesc, &biasOp, bias_desc));
 	checkHIPDNN(hipdnnCreateOpActivationForward(fusePlanDesc,  &activOp, mode));
 	
-	/*hipdnnFusionPlanConvolutionGetAlgo( fusePlanDesc, 4, &calgo, &algo);*/
-  size_t workSpaceSize;
+	/* hipdnnFusionPlanConvolutionGetAlgo( fusePlanDesc, 4, &calgo, &algo);*/
+        size_t workSpaceSize;
 	hipdnnFusionPlanGetWorkSpaceSize(hipdnn, fusePlanDesc, &workSpaceSize, algo);
 	std::cout<<"\nALGO:"<<algo<<"\t"<<workSpaceSize;
 	
- 	 auto status = hipdnnCompileFusionPlan( hipdnn, fusePlanDesc);
+       auto status = hipdnnCompileFusionPlan( hipdnn, fusePlanDesc);
 	hipdnnOperatorArgs_t args;
     hipdnnCreateOperatorArgs( &args);
-    hipdnnSetOpArgsConvForward(args, convOp, &alpha, &beta, weights);
+        hipdnnSetOpArgsConvForward(args, convOp, &alpha, &beta, weights);
 	hipdnnSetOpArgsBiasForward(args, biasOp,&alpha, &beta, bias_data);
 	hipdnnSetOpArgsActivForward(args, activOp, &alpha,&beta,1, 1 ,1);
 	   
-   high_resolution_timer_t timer;
+    high_resolution_timer_t timer;
     std::vector<double> time_vector(benchmark_iterations, 0);
     for (int i = 0; i < benchmark_iterations; i++) {
 
@@ -121,7 +121,7 @@ void compute_hipdnn_fusion_api(convulution_Size &c, dataType *src,
   hipdnnDestroyTensorDescriptor(in_desc);
   hipdnnDestroyOperatorArgs(args);
   hipdnnDestroyFusionPlan(fusePlanDesc);
-  hipdnnDestroy(hipdnn);
+  hipdnnDestroy(hipdnn); 
 }
 
 #endif //TEST_FUSION_API_HPP
