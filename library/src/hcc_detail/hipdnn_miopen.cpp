@@ -981,9 +981,9 @@ hipdnnStatus_t hipdnnCreateConvolutionDescriptor(
 
 hipdnnStatus_t hipdnnSetConvolutionMathType(
     hipdnnConvolutionDescriptor_t convDesc, hipdnnMathType_t mathType) {
-    HIPDNN_OPEN_LOG_E("hipdnnSetConvolutionMathType "
-                      << mathType << " NOT SUPPORTED." << std::flush);
-    return HIPDNN_STATUS_NOT_SUPPORTED;
+    /*HIPDNN_OPEN_LOG_E("hipdnnSetConvolutionMathType "
+                      << mathType << " NOT SUPPORTED." << std::flush);*/
+    return HIPDNN_STATUS_SUCCESS; //HIPDNN_STATUS_NOT_SUPPORTED;
 }
 
 //=============================================================================
