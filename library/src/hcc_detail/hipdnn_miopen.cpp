@@ -776,27 +776,41 @@ hipdnnStatus_t ConvolutionBwdFilterPreferenceSupported(
 
 hipdnnStatus_t accumulateGradients(void *gradient, void *gradientPrior,
                                    hipdnnTensorDescriptor_t gradientDesc,
-                                   const void *beta) {
+                                   const void *beta, hipdnnDataType_t *dataType) {
     // Trying to get the individual planes info
-    miopenDataType_t dataType =
-        miopenFloat;  // Currently only this format is supported
+
     int gradientArray[5];
     int gradientStride[5];
+
     CHECK_MIO(miopenGetTensorDescriptor((miopenTensorDescriptor_t)gradientDesc,
-                                        &dataType, gradientArray,
+                                        (miopenDataType_t*)dataType, gradientArray,
                                         gradientStride));
+
 
     int totalElements = gradientArray[0] * gradientArray[1] * gradientArray[2] *
                         gradientArray[3];
-
     const unsigned blocks = 512;
     const unsigned threadsPerBlock = 256;
+
+   if(*dataType == miopenFloat) {
+
     float betaVal = *(static_cast<const float *>(beta));
     float *gradientF = static_cast<float *>(gradient);
     float *gradientPriorF = static_cast<float *>(gradientPrior);
     hipLaunchKernelGGL((TensorAdd<float>), dim3(blocks), dim3(threadsPerBlock),
                        0, 0, gradientF, gradientPriorF, betaVal, totalElements);
     CHECK_HIP(hipDeviceSynchronize());
+    }
+    else if (*dataType == miopenHalf){
+
+    hc::half betaVal = *(static_cast<const hc::half *>(beta));
+    hc::half *gradientF = static_cast<hc::half *>(gradient);
+    hc::half *gradientPriorF = static_cast<hc::half *>(gradientPrior);
+    hipLaunchKernelGGL((TensorAdd<hc::half>), dim3(blocks), dim3(threadsPerBlock),
+                       0, 0, gradientF, gradientPriorF, betaVal, totalElements);
+    CHECK_HIP(hipDeviceSynchronize());
+    }
+
     return HIPDNN_STATUS_SUCCESS;
 }
 
@@ -1422,6 +1436,15 @@ hipdnnStatus_t hipdnnConvolutionBackwardFilter(
         workSpaceInternal = workSpace;
         expectedWorkSpaceSize = workSpaceSizeInBytes;
 
+    int nbDimsRequested =1;
+    int nbDims,dimA[1],strideA[1];
+    hipdnnDataType_t dataType;
+    hipdnnTensorFormat_t format = HIPDNN_TENSOR_NCHW;
+    int filterDimA[1];
+
+    hipdnnGetFilterNdDescriptor(dwDesc, nbDimsRequested, &dataType,
+                                             &format, &nbDims, filterDimA);
+
     miopenConvBwdWeightsAlgorithm_t mialgo;
     CHECK_HIPDNN(hipTomiopenConvolutionBwdFilterAlgo(algo, &mialgo));
     if (*static_cast<const float *>(beta) == 0) {
@@ -1440,7 +1463,7 @@ hipdnnStatus_t hipdnnConvolutionBackwardFilter(
             (miopenConvolutionDescriptor_t)convDesc, mialgo, &tempBeta,
             (miopenTensorDescriptor_t)dwDesc, dw, workSpaceInternal,
             expectedWorkSpaceSize));
-        accumulateGradients(dw, dwPrior, dwDesc, beta);
+        accumulateGradients(dw, dwPrior, dwDesc, beta, &dataType);
         deallocPrior(dwPrior);
     }
 
@@ -1642,6 +1665,11 @@ hipdnnStatus_t hipdnnConvolutionBackwardData(
         workSpaceInternal = workSpace;
         expectedWorkSpaceSize = workSpaceSizeInBytes;
 
+    int nbDimsRequested=1;
+    int nbDims,dimA[1],strideA[1];
+    hipdnnDataType_t dataType;
+    hipdnnGetTensorNdDescriptor(dxDesc, nbDimsRequested, &dataType, &nbDims, dimA,strideA);
+
     try {
         // Allocate sConvolutionBackwardDataAlgorithmWorkspace to gather work
         // space value
@@ -1674,7 +1702,7 @@ hipdnnStatus_t hipdnnConvolutionBackwardData(
                 (miopenConvolutionDescriptor_t)convDesc, mialgo, &tempBeta,
                 (miopenTensorDescriptor_t)dxDesc, dx, workSpaceInternal,
                 expectedWorkSpaceSize));
-            accumulateGradients(dx, dxPrior, dxDesc, beta);
+            accumulateGradients(dx, dxPrior, dxDesc, beta, &dataType);
             deallocPrior(dxPrior);
         }
 
@@ -2235,6 +2263,10 @@ hipdnnStatus_t hipdnnBatchNormalizationBackward(
     HIPDNN_OPEN_LOG_C("Inside hipdnnBatchNormalizationBackward");
 
     miopenBatchNormMode_t miBNMode;
+	int nbDimsRequested=1;
+    int nbDims,dimA[1],strideA[1];
+    hipdnnDataType_t dataType;
+    hipdnnGetTensorNdDescriptor(xDesc, nbDimsRequested, &dataType, &nbDims, dimA,strideA);
     CHECK_HIPDNN(hipTomiopenBatchNormMode(mode, &miBNMode));
     if ((*static_cast<const float *>(betaDataDiff) == 0) &&
         (*static_cast<const float *>(betaParamDiff) == 0)) {
@@ -2267,11 +2299,11 @@ hipdnnStatus_t hipdnnBatchNormalizationBackward(
             (miopenTensorDescriptor_t)bnScaleBiasDiffDesc, bnScale,
             resultBnScaleDiff, resultBnBiasDiff, epsilon, savedMean,
             savedInvVariance));
-        accumulateGradients(dx, dxPrior, dxDesc, betaDataDiff);
+        accumulateGradients(dx, dxPrior, dxDesc, betaDataDiff, &dataType);
         accumulateGradients(resultBnScaleDiff, resultBnScaleDiffPrior,
-                            bnScaleBiasDiffDesc, betaParamDiff);
+                            bnScaleBiasDiffDesc, betaParamDiff, &dataType);
         accumulateGradients(resultBnBiasDiff, resultBnBiasDiffPrior,
-                            bnScaleBiasDiffDesc, betaParamDiff);
+                            bnScaleBiasDiffDesc, betaParamDiff, &dataType);
         deallocPrior(dxPrior);
         deallocPrior(resultBnBiasDiffPrior);
         deallocPrior(resultBnScaleDiffPrior);
@@ -2287,9 +2319,9 @@ hipdnnStatus_t hipdnnSetTensorNdDescriptor(hipdnnTensorDescriptor_t tensorDesc,
     miopenDataType_t moDT;
     HIPDNN_OPEN_LOG_C("ENTER: hipdnnSetTensorNdDescriptor "
                       << tensorDesc << "... nbDims=" << nbDims << std::flush);
-    if (dataType != HIPDNN_DATA_FLOAT) {
+    if (dataType != HIPDNN_DATA_FLOAT && dataType!= HIPDNN_DATA_HALF) {
         HIPDNN_OPEN_LOG_E(
-            "ERROR: hipdnnSetTensorNdDescriptor only supports floats:"
+            "ERROR: hipdnnSetTensorNdDescriptor only supports floats and half:"
             << dataType << std::flush);
         return HIPDNN_STATUS_NOT_SUPPORTED;
 
