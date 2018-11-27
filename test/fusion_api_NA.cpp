@@ -1,5 +1,5 @@
 #include "fusion_api_NA.hpp"
-
+/*
 TEST(fusion_api_NA, func_check_fusion_api_NA) {
   float avg_time = 0;
       
@@ -42,4 +42,4 @@ TEST(fusion_api_NA, func_check_fusion_api_NA) {
     float* temp = dstDataGPU.getDataFromGPU();
     std::string str  = convert_to_string((float*)temp,(int)dstDataGPU.get_num_elements());
     write_to_csv(strt, str, testname, avg_time, str_ip_size, str_k_size, str_op_size);
-}
+}*/

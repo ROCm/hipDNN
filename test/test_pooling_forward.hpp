@@ -11,6 +11,7 @@
 #include <random>
 #include <vector>
 #include "common.hpp"
+#include "/opt/rocm/hip/include/hip_fp16.h"
 
 template <typename dataType>
 void compute_hipdnn_maxpool_fwd(test_pooling_descriptor &c, dataType *src,

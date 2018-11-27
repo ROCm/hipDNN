@@ -1,5 +1,5 @@
 #include "test_convolution_activation_fwd_bwd.hpp"
-
+/*
 TEST(convolution_activation_fwd_bwd_intg, func_check_naive_conv_activation_fwd_bwd) {
   float avg_time = 0, avg_time1 = 0, avg_time2 = 0, avg_time3 = 0, avg_time4 = 0;
       
@@ -62,4 +62,4 @@ TEST(convolution_activation_fwd_bwd_intg, func_check_naive_conv_activation_fwd_b
     std::string str  = convert_to_string((float*)temp,(int)dstDataGPU.get_num_elements());
     write_to_csv(strt, str, testname, avg_time, str_ip_size, str_k_size, str_op_size); 
 }
-
+*/
