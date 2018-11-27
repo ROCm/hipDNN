@@ -136,7 +136,7 @@ void compute_hipdnn_fusion_api_NA
       resultSaveInvVariance);
 
  // std::cout<<"\n **************** output desc:"<<c.mb<<"\t"<<c.oc<<"\t"<<c.oh<<"\t"<<c.ow;
-/*	  
+	  
   //Fusion
 
 	hipdnnFusionOpDescriptor_t activOp;
@@ -182,6 +182,6 @@ void compute_hipdnn_fusion_api_NA
   hipdnnDestroyOperatorArgs(args);
   hipdnnDestroyFusionPlan(fusePlanDesc);
   hipdnnDestroy(hipdnn); 
-*/}
+}
 
 #endif //TEST_FUSION_API__NA_HPP
