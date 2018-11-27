@@ -247,6 +247,7 @@ std::string str = convert_to_string((float*)temp,(int)dstDataGPU.get_num_element
 write_to_csv(strt, str, testname,avg_time, str_ip_size, str_k_size, str_op_size);
 }
 
+/*
 TEST(convolution_fwd, func_check_zero_padding_medium_input_batch128) {
     Desc inputDesc(128, 3, 16, 16);
     Desc filterDesc(21, 3, 4, 4);
@@ -369,3 +370,4 @@ float* temp = dstDataGPU.getDataFromGPU();
 std::string str = convert_to_string((float*)temp,(int)dstDataGPU.get_num_elements());
 write_to_csv(strt, str, testname,avg_time, str_ip_size, str_k_size, str_op_size);
 }
+*/
