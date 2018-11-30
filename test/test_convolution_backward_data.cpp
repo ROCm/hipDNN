@@ -1,6 +1,5 @@
-/*
 #include "test_convolution_backward_data.hpp"
-
+/*
 TEST(convolution_bwd_data, func_check_backward_conv_data) {
     Desc inputDesc(1, 3, 30, 30);
     Desc filterDesc(3, 3, 5, 5);
@@ -185,6 +184,6 @@ TEST(convolution_bwd_img, func_bwd_conv_batch128_pad1_stride3) {
     std::string str  = convert_to_string((float*)temp,(int)dstDataGPU.get_num_elements());
     write_to_csv(strt, str, testname,avg_time, str_ip_size, str_k_size, str_op_size);
 }
-
-
 */
+
+

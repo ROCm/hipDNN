@@ -143,7 +143,7 @@ TEST(convolution_fwd_bwd, func_test_fwd_bwd_convolution_batch64) {
     write_to_csv(strt, str, testname, avg_time, str_ip_size, str_k_size, str_op_size);
 
 }
-/*
+
 TEST(convolution_fwd_bwd, func_test_fwd_bwd_convolution_batch128) {
     Desc inputDesc(128, 3, 4, 4);
     Desc filterDesc(1, 3, 2, 2);
@@ -190,4 +190,4 @@ TEST(convolution_fwd_bwd, func_test_fwd_bwd_convolution_batch128) {
     std::string str  = convert_to_string((float*)temp2,(int)gradData.get_num_elements());
     write_to_csv(strt, str, testname, avg_time, str_ip_size, str_k_size, str_op_size);
 
-}*/
+}

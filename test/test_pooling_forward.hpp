@@ -11,7 +11,36 @@
 #include <random>
 #include <vector>
 #include "common.hpp"
-#include "/opt/rocm/hip/include/hip_fp16.h"
+#include "/opt/rocm/hip/include/hip/hip_fp16.h"
+
+void print(const float *data, int n, int c, int h, int w) {
+  std::vector<float> buffer ( 1 << 20 );
+  
+
+  HIP_CALL(hipMemcpy(
+        buffer.data(), data,
+        n * c * h * w * sizeof(float),
+        hipMemcpyDeviceToHost));
+
+
+
+  int a = 0;
+  for (int i = 0; i < n; ++i) {
+    for (int j = 0; j < c; ++j) {
+      std::cout << "n=" << n << ", c=" << c << ":" << std::endl;
+      for (int k = 0; k < h; ++k) {
+        for (int l = 0; l < w; ++l) {
+          std::cout << "\t"<<  std::setw(4) << std::right << buffer[a];
+          ++a;
+        }
+        std::cout << std::endl;
+      }
+    }
+  }
+  std::cout << std::endl;
+
+
+}
 
 template <typename dataType>
 void compute_hipdnn_maxpool_fwd(test_pooling_descriptor &c, dataType *src,
@@ -52,6 +81,9 @@ void compute_hipdnn_maxpool_fwd(test_pooling_descriptor &c, dataType *src,
     }
 
     *avg_time = (float)std::accumulate(time_vector.begin() + 10, time_vector.end(), 0) / (benchmark_iterations - 10);
+
+  //float * temp = (float *)dst;
+  //print((float *)dst, c.mb,c.c,c.oh,c.ow);
 
   checkHIPDNN(hipdnnDestroyTensorDescriptor(in_desc));
   checkHIPDNN(hipdnnDestroyTensorDescriptor(out_desc));
