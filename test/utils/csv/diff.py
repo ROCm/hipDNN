@@ -17,7 +17,7 @@ for line2 in reader2:
 
 csvfile = open('final_results.csv', 'w')
 
-fieldnames = ['Test name','Performance in Nvidia','Performance in AMD','Input size', 'kernel size', 'output size', 'Results']
+fieldnames = ['Test name','Performance in Nvidia (microseconds)','Performance in AMD (microseconds)','Input size', 'kernel size', 'output size', 'Results', 'AMD vs NVidia speedup']
 writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
 writer.writeheader()
 
@@ -39,6 +39,7 @@ def test_compare(amd_op,nv_op):
 					print ("test fail for "+line1['Test_name']+"!!!difference in outputs!!!!")
 					print(sum(c1!=c2 for c1,c2 in zip(line1['Output'],line2['Output'])))
 
-		writer.writerow({'Test name':line1['Test_name'],'Performance in Nvidia':time_nv,'Performance in AMD':line1['Average Excecution Time (microseconds)'],'Input size':line1['Input size'], 'kernel size':line1['kernel size'], 'output size':line1['output size'], 'Results':flag})
+		writer.writerow({'Test name':line1['Test_name'],'Performance in Nvidia (microseconds)':time_nv,'Performance in AMD (microseconds)':line1['Average Excecution Time (microseconds)'],'Input size':line1['Input size'], 'kernel size':line1['kernel size'], 'output size':line1['output size'], 'Results':flag, 'AMD vs NVidia speedup':(float)(float(line1['Average Excecution Time (microseconds)'])/float(time_nv))})
 			
 test_compare(amd_op,nv_op)
+

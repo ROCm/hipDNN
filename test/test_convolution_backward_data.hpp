@@ -43,16 +43,15 @@ void compute_hipdnn_conv_backward_data(convulution_Size &c, dataType *src,
   int calgo;
   hipdnnConvolutionFwdAlgoPerf_t algoPerf[MaxAlgoCount];
 
+  checkHIPDNN(hipdnnGetConvolutionForwardWorkspaceSize(
+      hipdnn, in_desc, filt_desc, conv_desc, out_desc, algo, &ws_size));
+  
+  hipMalloc(&ws_data, ws_size);
+
   hipdnnFindConvolutionForwardAlgorithmEx(
       hipdnn, in_desc, src, filt_desc, weights, conv_desc, out_desc, dst,
       MaxAlgoCount, &calgo, algoPerf, ws_data, ws_size);
   algo = (hipdnnConvolutionFwdAlgo_t)algoPerf[0].algo;
-
-  checkHIPDNN(hipdnnGetConvolutionForwardWorkspaceSize(
-      hipdnn, in_desc, filt_desc, conv_desc, out_desc, algo, &ws_size));
-
-  
-  hipMalloc(&ws_data, ws_size);
 
   float alpha = 1.f;
   float beta = 0.f;
@@ -66,14 +65,14 @@ void compute_hipdnn_conv_backward_data(convulution_Size &c, dataType *src,
      ws_size =0;
      hipdnnConvolutionBwdDataAlgoPerf_t algoPerf_bd[MaxAlgoCount];        
 
+     checkHIPDNN(hipdnnGetConvolutionBackwardDataWorkspaceSize(hipdnn, filt_desc, in_desc, conv_desc, out_desc, algo_bd, &ws_size));
+
+     hipMalloc(&ws_data, ws_size);
+
      hipdnnFindConvolutionBackwardDataAlgorithmEx(hipdnn, filt_desc, weights, in_desc, src, conv_desc, out_desc, dst, MaxAlgoCount , &calgo, algoPerf_bd, ws_data, ws_size);
 
- algo_bd = algoPerf_bd[0].algo;
+    algo_bd = algoPerf_bd[0].algo;
    
-  checkHIPDNN(hipdnnGetConvolutionBackwardDataWorkspaceSize(hipdnn, filt_desc, in_desc, conv_desc, out_desc, algo_bd, &ws_size));
-
-  hipMalloc(&ws_data, ws_size);
-
     high_resolution_timer_t timer;
     std::vector<double> time_vector(benchmark_iterations, 0);
     for (int i = 0; i < benchmark_iterations; i++) {

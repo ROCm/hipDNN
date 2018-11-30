@@ -41,15 +41,15 @@ void compute_hipdnn_conv_forward(convulution_Size &c, dataType *src,
   int calgo;
   hipdnnConvolutionFwdAlgoPerf_t algoPerf[MaxAlgoCount];
 
+  checkHIPDNN(hipdnnGetConvolutionForwardWorkspaceSize(
+     hipdnn, in_desc, filt_desc, conv_desc, out_desc, algo, &ws_size));
+
+  hipMalloc(&ws_data, ws_size);
+
   hipdnnFindConvolutionForwardAlgorithmEx(
       hipdnn, in_desc, src, filt_desc, weights, conv_desc, out_desc, dst,
       MaxAlgoCount, &calgo, algoPerf, ws_data, ws_size);
   algo = (hipdnnConvolutionFwdAlgo_t)algoPerf[0].algo;
-
-  checkHIPDNN(hipdnnGetConvolutionForwardWorkspaceSize(
-      hipdnn, in_desc, filt_desc, conv_desc, out_desc, algo, &ws_size));
-
-  hipMalloc(&ws_data, ws_size);
 
   float alpha = 1.f;
   float beta = 0.f;

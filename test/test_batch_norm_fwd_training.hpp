@@ -6,11 +6,6 @@
 #include "gtest/gtest.h"
 #include "common.hpp"
 
-__global__ void dev_const(hipLaunchParm lp, float *px, float k) {
-  int tid = hipThreadIdx_x + hipBlockIdx_x * hipBlockDim_x; 
-  px[tid] = k;
-}
-
 template <typename dataType>
 void compute_hipdnn_batchnorm_fwd_train(BNorm_params_t &d, dataType *src,
                                 dataType *dst, float *avg_time) {
