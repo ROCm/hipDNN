@@ -6,15 +6,9 @@
 #include "gtest/gtest.h"
 #include "common.hpp"
 
-template <typename T>
-__global__ void dev_const(hipLaunchParm lp, T *px, float k) {
-    int tid = hipThreadIdx_x + hipBlockIdx_x * hipBlockDim_x;
-    px[tid] = k;
-}
-
 template <typename dataType>
-void compute_conv_fwd(convulution_Size &c, dataType *src,
-                             dataType *weights, dataType *bias, dataType *dst, float *avg_time) {
+void compute_conv_fwd(convulution_Size &c, dataType *src, dataType *weights,
+                      dataType *bias, dataType *dst, float *avg_time) {
 
   hipdnnHandle_t hipdnn;
   checkHIPDNN(hipdnnCreate(&hipdnn));
@@ -29,6 +23,7 @@ void compute_conv_fwd(convulution_Size &c, dataType *src,
   int filterDimA[] = {c.oc, c.ic, c.kh, c.kw};
   checkHIPDNN(hipdnnSetFilterNdDescriptor(filt_desc, HIPDNN_DATA_FLOAT,
                                           HIPDNN_TENSOR_NCHW, 4, filterDimA));
+
   hipdnnConvolutionDescriptor_t conv_desc;
   checkHIPDNN(hipdnnCreateConvolutionDescriptor(&conv_desc));
   checkHIPDNN(hipdnnSetConvolution2dDescriptor(
@@ -42,6 +37,7 @@ void compute_conv_fwd(convulution_Size &c, dataType *src,
   checkHIPDNN(hipdnnCreateTensorDescriptor(&out_desc));
   checkHIPDNN(hipdnnSetTensor4dDescriptor(
       out_desc, HIPDNN_TENSOR_NCHW, HIPDNN_DATA_FLOAT, c.mb, c.oc, c.oh, c.ow));
+
   hipdnnConvolutionFwdAlgo_t algo;
   int MaxAlgoCount = 1;
   size_t ws_size{0};
@@ -53,31 +49,36 @@ void compute_conv_fwd(convulution_Size &c, dataType *src,
       hipdnn, in_desc, filt_desc, conv_desc, out_desc, algo, &ws_size));
 
   hipMalloc(&ws_data, ws_size);
- 
+
   std::cout<<"\nWS:"<<ws_size;
+
   hipdnnFindConvolutionForwardAlgorithmEx(
       hipdnn, in_desc, src, filt_desc, weights, conv_desc, out_desc, dst,
       MaxAlgoCount, &calgo, algoPerf, ws_data, ws_size);
+
   algo = (hipdnnConvolutionFwdAlgo_t)algoPerf[0].algo;
 
   float alpha = 1.f;
   float beta = 0.f;
 
-    high_resolution_timer_t timer;
-    std::vector<double> time_vector(benchmark_iterations, 0);
-    for (int i = 0; i < benchmark_iterations; i++) {
+  high_resolution_timer_t timer;
+  std::vector<double> time_vector(benchmark_iterations, 0);
+
+  for (int i = 0; i < benchmark_iterations; i++) {
 
         timer.restart();
-        checkHIPDNN(hipdnnConvolutionForward(hipdnn, &alpha, in_desc, src, filt_desc,
-                                       weights, conv_desc, algo, ws_data,
-                                       ws_size, &beta, out_desc, dst));
-     
+        checkHIPDNN(hipdnnConvolutionForward(hipdnn, &alpha, in_desc, src,
+                                       filt_desc, weights, conv_desc, algo,
+                                       ws_data, ws_size, &beta, out_desc, dst));
+
         hipDeviceSynchronize();
+
         std::uint64_t time_elapsed = timer.elapsed_nanoseconds();
         time_vector[i] = (double)time_elapsed / 1000;
     }
 
-    *avg_time = (float)std::accumulate(time_vector.begin() + 10, time_vector.end(), 0) / (benchmark_iterations - 10);
+  *avg_time = (float)std::accumulate(time_vector.begin() + 10, time_vector.end(),
+                                    0) / (benchmark_iterations - 10);
 
   hipFree(ws_data);
   hipdnnDestroyTensorDescriptor(out_desc);
@@ -85,6 +86,7 @@ void compute_conv_fwd(convulution_Size &c, dataType *src,
   hipdnnDestroyFilterDescriptor(filt_desc);
   hipdnnDestroyTensorDescriptor(in_desc);
   hipdnnDestroy(hipdnn);
+
 }
 
 template <typename dataType>
@@ -93,7 +95,9 @@ void compute_mpool_fwd(test_pooling_descriptor &c, dataType *src,
 
   hipdnnHandle_t handle;
   checkHIPDNN(hipdnnCreate(&handle));
+
   hipdnnTensorDescriptor_t in_desc, out_desc;
+
   checkHIPDNN(hipdnnCreateTensorDescriptor(&in_desc));
   checkHIPDNN(hipdnnSetTensor4dDescriptor(
       in_desc, HIPDNN_TENSOR_NCHW, HIPDNN_DATA_FLOAT, c.mb, c.c, c.ih, c.iw));
@@ -109,23 +113,27 @@ void compute_mpool_fwd(test_pooling_descriptor &c, dataType *src,
   checkHIPDNN(hipdnnCreateTensorDescriptor(&out_desc));
   checkHIPDNN(hipdnnSetTensor4dDescriptor(
       out_desc, HIPDNN_TENSOR_NCHW, HIPDNN_DATA_FLOAT, c.mb, c.c, c.oh, c.ow));
+
   float alpha = 1.f;
   float beta = 0.f;
 
   high_resolution_timer_t timer;
   std::vector<double> time_vector(benchmark_iterations, 0);
+
   for (int i = 0; i < benchmark_iterations; i++) {
 
-      timer.restart();
-      checkHIPDNN(hipdnnPoolingForward(handle, pool_desc, &alpha, in_desc, src,
+        timer.restart();
+        checkHIPDNN(hipdnnPoolingForward(handle, pool_desc, &alpha, in_desc, src,
                                    &beta, out_desc, dst));
-      
-       hipDeviceSynchronize();
+
+        hipDeviceSynchronize();
+
         std::uint64_t time_elapsed = timer.elapsed_nanoseconds();
         time_vector[i] = (double)time_elapsed / 1000;
     }
 
-    *avg_time = (float)std::accumulate(time_vector.begin() + 10, time_vector.end(), 0) / (benchmark_iterations - 10);
+  *avg_time = (float)std::accumulate(time_vector.begin() + 10, time_vector.end(),
+                                    0) / (benchmark_iterations - 10);
 
   checkHIPDNN(hipdnnDestroyTensorDescriptor(in_desc));
   checkHIPDNN(hipdnnDestroyTensorDescriptor(out_desc));
@@ -135,15 +143,17 @@ void compute_mpool_fwd(test_pooling_descriptor &c, dataType *src,
 
 template <typename dataType>
 void compute_mpool_bwd(pool_bwd &test_case, dataType *src,
-                                     dataType *grad, dataType *dst, float *avg_time) {
+                               dataType *grad, dataType *dst, float *avg_time) {
 
   hipdnnHandle_t hipdnn;
   checkHIPDNN(hipdnnCreate(&hipdnn));
+
   hipdnnTensorDescriptor_t in_desc;
   checkHIPDNN(hipdnnCreateTensorDescriptor(&in_desc));
   checkHIPDNN(hipdnnSetTensor4dDescriptor(
       in_desc, HIPDNN_TENSOR_NCHW, HIPDNN_DATA_FLOAT, test_case.in,
       test_case.ichannel, test_case.iheight, test_case.oheight));
+
   hipdnnPoolingDescriptor_t pool_desc;
   checkHIPDNN(hipdnnCreatePoolingDescriptor(&pool_desc));
 
@@ -162,114 +172,125 @@ void compute_mpool_bwd(pool_bwd &test_case, dataType *src,
   checkHIPDNN(hipdnnSetTensor4dDescriptor(
       out_desc, HIPDNN_TENSOR_NCHW, HIPDNN_DATA_FLOAT, test_case.on,
       test_case.ochannel, test_case.oheight, test_case.owidth));
+
   float alpha = 1.f;
   float beta = 0.f;
 
   hipdnnPoolingForward(hipdnn, pool_desc, &alpha, in_desc, src, &beta, out_desc,
                        dst);
 
-    high_resolution_timer_t timer;
-    std::vector<double> time_vector(benchmark_iterations, 0);
-    for (int i = 0; i < benchmark_iterations; i++) {
+  high_resolution_timer_t timer;
+  std::vector<double> time_vector(benchmark_iterations, 0);
+
+  for (int i = 0; i < benchmark_iterations; i++) {
 
         timer.restart();
-        hipdnnPoolingBackward(hipdnn, pool_desc, &alpha, out_desc, dst, out_desc, dst,
-                        in_desc, src, &beta, in_desc, grad);
-        
+        hipdnnPoolingBackward(hipdnn, pool_desc, &alpha, out_desc, dst, out_desc,
+                        dst, in_desc, src, &beta, in_desc, grad);
+
         hipDeviceSynchronize();
+
         std::uint64_t time_elapsed = timer.elapsed_nanoseconds();
         time_vector[i] = (double)time_elapsed / 1000;
     }
 
-    *avg_time = (float)std::accumulate(time_vector.begin() + 10, time_vector.end(), 0) / (benchmark_iterations - 10);
+  *avg_time = (float)std::accumulate(time_vector.begin() + 10, time_vector.end(),
+                                    0) / (benchmark_iterations - 10);
 
- 
   hipdnnDestroyTensorDescriptor(out_desc);
   hipdnnDestroyPoolingDescriptor(pool_desc);
   hipdnnDestroyTensorDescriptor(in_desc);
   hipdnnDestroy(hipdnn);
+
 }
 
 template <typename dataType>
-void compute_conv_bwd_kernel(convulution_Size &c,
-                                    dataType *src, dataType *weights,
-                                    dataType *grad, dataType *bias,
-                                    dataType *dst, float *avg_time) {
+void compute_conv_bwd_kernel(convulution_Size &c, dataType *src,
+                             dataType *weights, dataType *grad, dataType *bias,
+                             dataType *dst, float *avg_time) {
 
-    hipdnnHandle_t hipdnn;
-    checkHIPDNN(hipdnnCreate(&hipdnn));
+  hipdnnHandle_t hipdnn;
+  checkHIPDNN(hipdnnCreate(&hipdnn));
 
-    hipdnnTensorDescriptor_t in_desc;
-    checkHIPDNN(hipdnnCreateTensorDescriptor(&in_desc));
-    checkHIPDNN(hipdnnSetTensor4dDescriptor(in_desc, HIPDNN_TENSOR_NCHW,
-                                            HIPDNN_DATA_FLOAT, c.mb, c.ic, c.ih,
-                                            c.iw));
+  hipdnnTensorDescriptor_t in_desc;
+  checkHIPDNN(hipdnnCreateTensorDescriptor(&in_desc));
+  checkHIPDNN(hipdnnSetTensor4dDescriptor(in_desc, HIPDNN_TENSOR_NCHW,
+                                          HIPDNN_DATA_FLOAT, c.mb, c.ic, c.ih,
+                                          c.iw));
 
-    hipdnnFilterDescriptor_t filt_desc;
-    checkHIPDNN(hipdnnCreateFilterDescriptor(&filt_desc));
-    int filterDimA[] = {c.oc, c.ic, c.kh, c.kw};
-    checkHIPDNN(hipdnnSetFilterNdDescriptor(filt_desc, HIPDNN_DATA_FLOAT,
+  hipdnnFilterDescriptor_t filt_desc;
+  checkHIPDNN(hipdnnCreateFilterDescriptor(&filt_desc));
+
+  int filterDimA[] = {c.oc, c.ic, c.kh, c.kw};
+
+  checkHIPDNN(hipdnnSetFilterNdDescriptor(filt_desc, HIPDNN_DATA_FLOAT,
                                             HIPDNN_TENSOR_NCHW, 4, filterDimA));
-    hipdnnConvolutionDescriptor_t conv_desc;
-    checkHIPDNN(hipdnnCreateConvolutionDescriptor(&conv_desc));
-    checkHIPDNN(hipdnnSetConvolution2dDescriptor(
+
+  hipdnnConvolutionDescriptor_t conv_desc;
+  checkHIPDNN(hipdnnCreateConvolutionDescriptor(&conv_desc));
+  checkHIPDNN(hipdnnSetConvolution2dDescriptor(
         conv_desc, c.padh, c.padw, c.strh, c.strw, c.dilh, c.dilw,
         HIPDNN_CROSS_CORRELATION, HIPDNN_DATA_FLOAT));
 
-    checkHIPDNN(hipdnnGetConvolution2dForwardOutputDim(
+  checkHIPDNN(hipdnnGetConvolution2dForwardOutputDim(
         conv_desc, in_desc, filt_desc, &c.mb, &c.oc, &c.oh, &c.ow));
 
-    hipdnnTensorDescriptor_t out_desc;
-    checkHIPDNN(hipdnnCreateTensorDescriptor(&out_desc));
-    checkHIPDNN(hipdnnSetTensor4dDescriptor(out_desc, HIPDNN_TENSOR_NCHW,
+  hipdnnTensorDescriptor_t out_desc;
+  checkHIPDNN(hipdnnCreateTensorDescriptor(&out_desc));
+  checkHIPDNN(hipdnnSetTensor4dDescriptor(out_desc, HIPDNN_TENSOR_NCHW,
                                             HIPDNN_DATA_FLOAT, c.mb, c.oc, c.oh,
                                             c.ow));
-    hipdnnConvolutionFwdAlgo_t algo;
-    int MaxAlgoCount = 2;
-    size_t ws_size{0};
-    float *ws_data{nullptr};
-    int calgo;
-    hipdnnConvolutionFwdAlgoPerf_t algoPerf[MaxAlgoCount];
 
-     checkHIPDNN(hipdnnGetConvolutionForwardWorkspaceSize(
+  hipdnnConvolutionFwdAlgo_t algo;
+  int MaxAlgoCount = 2;
+  size_t ws_size{0};
+  float *ws_data{nullptr};
+  int calgo;
+  hipdnnConvolutionFwdAlgoPerf_t algoPerf[MaxAlgoCount];
+
+  checkHIPDNN(hipdnnGetConvolutionForwardWorkspaceSize(
         hipdnn, in_desc, filt_desc, conv_desc, out_desc, algo, &ws_size));
 
-    hipMalloc(&ws_data, ws_size);
+  hipMalloc(&ws_data, ws_size);
 
-    hipdnnFindConvolutionForwardAlgorithmEx(
+  hipdnnFindConvolutionForwardAlgorithmEx(
         hipdnn, in_desc, src, filt_desc, weights, conv_desc, out_desc, dst,
         MaxAlgoCount, &calgo, algoPerf, ws_data, ws_size);
-    algo = (hipdnnConvolutionFwdAlgo_t)algoPerf[0].algo;
 
-    hipLaunchKernel(dev_const, c.mb * c.oc, c.oh * c.ow, 0, 0, dst, 0.0f);
+  algo = (hipdnnConvolutionFwdAlgo_t)algoPerf[0].algo;
 
-    float alpha = 1.f;
-    float beta = 0.f;
+  hipLaunchKernel(dev_const, c.mb * c.oc, c.oh * c.ow, 0, 0, dst, 0.0f);
 
-    checkHIPDNN(hipdnnConvolutionForward(
+  float alpha = 1.f;
+  float beta = 0.f;
+
+  checkHIPDNN(hipdnnConvolutionForward(
         hipdnn, &alpha, in_desc, src, filt_desc, weights, conv_desc, algo,
         ws_data, ws_size, &beta, out_desc, dst));
 
-    hipdnnConvolutionBwdFilterAlgo_t b_algo =
-        HIPDNN_CONVOLUTION_BWD_FILTER_ALGO_1;
-    ws_size = 0;
-    hipdnnConvolutionBwdFilterAlgoPerf_t b_algoPerf[MaxAlgoCount];
+  hipdnnConvolutionBwdFilterAlgo_t b_algo = HIPDNN_CONVOLUTION_BWD_FILTER_ALGO_1;
 
-    checkHIPDNN(hipdnnGetConvolutionBackwardFilterWorkspaceSize(
+  ws_size = 0;
+
+  hipdnnConvolutionBwdFilterAlgoPerf_t b_algoPerf[MaxAlgoCount];
+
+  checkHIPDNN(hipdnnGetConvolutionBackwardFilterWorkspaceSize(
         hipdnn, in_desc, out_desc, conv_desc, filt_desc, b_algo, &ws_size));
 
-    hipMalloc(&ws_data, ws_size);
+  hipMalloc(&ws_data, ws_size);
 
-    hipLaunchKernel(dev_const, c.oc * c.ic, c.kh * c.kw, 0, 0, grad, 0.0f);
+  hipLaunchKernel(dev_const, c.oc * c.ic, c.kh * c.kw, 0, 0, grad, 0.0f);
 
-    hipdnnFindConvolutionBackwardFilterAlgorithmEx(
+  hipdnnFindConvolutionBackwardFilterAlgorithmEx(
         hipdnn, in_desc, src, out_desc, dst, conv_desc, filt_desc, weights,
         MaxAlgoCount, &calgo, b_algoPerf, ws_data, ws_size);
-    b_algo = (hipdnnConvolutionBwdFilterAlgo_t)b_algoPerf[0].algo;
 
-    high_resolution_timer_t timer;
-    std::vector<double> time_vector(benchmark_iterations, 0);
-    for (int i = 0; i < benchmark_iterations; i++) {
+  b_algo = (hipdnnConvolutionBwdFilterAlgo_t)b_algoPerf[0].algo;
+
+  high_resolution_timer_t timer;
+  std::vector<double> time_vector(benchmark_iterations, 0);
+
+  for (int i = 0; i < benchmark_iterations; i++) {
 
         timer.restart();
         checkHIPDNN(hipdnnConvolutionBackwardFilter(
@@ -277,18 +298,21 @@ void compute_conv_bwd_kernel(convulution_Size &c,
             ws_data, ws_size, &beta, filt_desc, grad));
 
         hipDeviceSynchronize();
+
         std::uint64_t time_elapsed = timer.elapsed_nanoseconds();
         time_vector[i] = (double)time_elapsed / 1000;
     }
-  
-    *avg_time = (float)std::accumulate(time_vector.begin() + 10, time_vector.end(), 0) / (benchmark_iterations - 10);
 
-    hipFree(ws_data);
-    hipdnnDestroyTensorDescriptor(out_desc);
-    hipdnnDestroyConvolutionDescriptor(conv_desc);
-    hipdnnDestroyFilterDescriptor(filt_desc);
-    hipdnnDestroyTensorDescriptor(in_desc);
-    hipdnnDestroy(hipdnn);
+  *avg_time = (float)std::accumulate(time_vector.begin() + 10, time_vector.end(),
+                                    0) / (benchmark_iterations - 10);
+
+  hipFree(ws_data);
+  hipdnnDestroyTensorDescriptor(out_desc);
+  hipdnnDestroyConvolutionDescriptor(conv_desc);
+  hipdnnDestroyFilterDescriptor(filt_desc);
+  hipdnnDestroyTensorDescriptor(in_desc);
+  hipdnnDestroy(hipdnn);
+
 }
 
 #endif //TEST_CONVOLUTION_POOLING_HPP
