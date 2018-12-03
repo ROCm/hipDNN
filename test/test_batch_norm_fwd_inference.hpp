@@ -33,7 +33,8 @@ void compute_hipdnn_batchnorm_fwd_inference(BNorm_params_t &d, dataType *src,
   float betaN = 0.f;
 
   hipdnnTensorDescriptor_t bnScaleBiasMeanVarDesc;
-  /*checkHIPDNN(hipdnnDeriveBNTensorDescriptor(&bnScaleBiasMeanVarDesc, out_desc, bn_mode));*/ //Only for training
+  /*checkHIPDNN(hipdnnDeriveBNTensorDescriptor(&bnScaleBiasMeanVarDesc,
+                         out_desc, bn_mode));*/           //Only for training
   checkHIPDNN(hipdnnCreateTensorDescriptor(&bnScaleBiasMeanVarDesc));
   checkHIPDNN(hipdnnSetTensor4dDescriptor(
           bnScaleBiasMeanVarDesc, HIPDNN_TENSOR_NCHW, HIPDNN_DATA_FLOAT,
@@ -76,9 +77,14 @@ void compute_hipdnn_batchnorm_fwd_inference(BNorm_params_t &d, dataType *src,
         time_vector[i] = (double)time_elapsed / 1000;
       }
 
-  *avg_time = (float)std::accumulate(time_vector.begin() + 10, time_vector.end(), 0) / (benchmark_iterations - 10);
+  *avg_time = (float)std::accumulate(time_vector.begin() + 10, time_vector.end(),
+                                     0) / (benchmark_iterations - 10);
 
   // finalizing
+  hipFree(bnScale);
+  hipFree(bnBias);
+  hipFree(estimatedMean);
+  hipFree(estimatedVariance);
   hipdnnDestroyTensorDescriptor(out_desc);
   hipdnnDestroyTensorDescriptor(in_desc);
   hipdnnDestroyTensorDescriptor(bnScaleBiasMeanVarDesc);

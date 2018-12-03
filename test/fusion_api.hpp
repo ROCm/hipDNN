@@ -55,7 +55,7 @@ void compute_hipdnn_fusion_api(convulution_Size &c, dataType *src,
                                           HIPDNN_DATA_FLOAT, c.mb, c.oc,
                                           c.oh, c.ow));
 
-//    hipdnnConvolutionFwdAlgo_t algo;
+  //hipdnnConvolutionFwdAlgo_t algo;
   int MaxAlgoCount =5;
   size_t ws_size;
   float *ws_data;
@@ -127,6 +127,8 @@ void compute_hipdnn_fusion_api(convulution_Size &c, dataType *src,
   // finalizing
   hipdnnDestroyTensorDescriptor(out_desc);
   hipdnnDestroyConvolutionDescriptor(conv_desc);
+  hipdnnDestroyTensorDescriptor(bias_desc);
+  hipdnnDestroyActivationDescriptor(activationDesc);
   hipdnnDestroyTensorDescriptor(filt_desc);
   hipdnnDestroyTensorDescriptor(in_desc);
   hipdnnDestroyOperatorArgs(args);

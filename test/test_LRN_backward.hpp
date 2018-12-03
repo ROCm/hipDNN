@@ -81,6 +81,7 @@ void compute_hipdnn_LRN_backward(LRN_params_t &d, dataType *src, dataType *grad,
                                     0) / (benchmark_iterations - 10);
 
   // finalizing
+  hipFree(dy);
   hipdnnDestroyTensorDescriptor(out_desc);
   hipdnnDestroyLRNDescriptor(lrn_desc);
   hipdnnDestroyTensorDescriptor(dy_desc);
