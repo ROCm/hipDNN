@@ -1,7 +1,7 @@
 #include "test_convolution_activation_fwd_bwd.hpp"
 
 TEST(convolution_activation_fwd_bwd_intg,
-     func_check_naive_conv_activation_fwd_bwd) {
+     func_check_conv_activation_fwd_bwd) {
 
   float avg_time = 0, avg_time1 = 0, avg_time2 = 0, avg_time3 = 0, avg_time4 = 0;
 
@@ -79,7 +79,7 @@ TEST(convolution_activation_fwd_bwd_intg,
   std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
 
   std::string strt = "./result_unittest.csv";
-  std::string testname = "convolution_activation_fwd_bwd_intg: func_check_naive_conv_activation_fwd_bwd";
+  std::string testname = "convolution_activation_fwd_bwd_intg: func_check_conv_activation_fwd_bwd";
   float* temp = gradData2.getDataFromGPU();
 
   std::string str  = convert_to_string((float*)temp,

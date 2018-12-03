@@ -12,10 +12,10 @@ TEST(convolution_bwd_filter, func_check_backward_conv_filter) {
 
   Desc outputDesc = calculate_Dims(inputDesc, filterDesc, pad, stride,dil);
 
-Memory<float> srcData = createMemory<float>(inputDesc);
-Memory<float> gradData = createMemory<float>(filterDesc);
-Memory<float> dstDataGPU = createMemory<float>(outputDesc);
-Memory<float> filterData = createMemory<float>(filterDesc);
+  Memory<float> srcData = createMemory<float>(inputDesc);
+  Memory<float> gradData = createMemory<float>(filterDesc);
+  Memory<float> dstDataGPU = createMemory<float>(outputDesc);
+  Memory<float> filterData = createMemory<float>(filterDesc);
 
   convulution_Size testConvolutionSizes(
       inputDesc.N, 1, inputDesc.C, inputDesc.H, inputDesc.W, outputDesc.C,
@@ -60,13 +60,13 @@ TEST(convolution_bwd_filter, func_backward_conv_filter_batch32) {
   int dil[2] = {1,1};
   float avg_time = 0;
 
-Desc outputDesc =
+  Desc outputDesc =
     calculate_Dims(inputDesc, filterDesc, pad, stride, dil);
 
-Memory<float> srcData = createMemory<float>(inputDesc);
-Memory<float> gradData = createMemory<float>(filterDesc);
-Memory<float> dstDataGPU = createMemory<float>(outputDesc);
-Memory<float> filterData = createMemory<float>(filterDesc);
+  Memory<float> srcData = createMemory<float>(inputDesc);
+  Memory<float> gradData = createMemory<float>(filterDesc);
+  Memory<float> dstDataGPU = createMemory<float>(outputDesc);
+  Memory<float> filterData = createMemory<float>(filterDesc);
 
   convulution_Size testConvolutionSizes(
       inputDesc.N, 1, inputDesc.C, inputDesc.H, inputDesc.W, outputDesc.C,
