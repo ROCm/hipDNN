@@ -118,7 +118,7 @@ void compute_hipdnn_batchnorm_bwd(BNorm_params_t &d, dataType *src,
         timer.restart();
 
    	    checkHIPDNN( hipdnnBatchNormalizationBackward( hipdnn, bn_modeT_back,
-                   		&alphaDataDiff, &betaDataDiff, &alphaParamDiff,
+                      &alphaDataDiff, &betaDataDiff, &alphaParamDiff,
                       &betaParamDiff, in_desc, src, dy_desc, dy, dx_desc, dx,
                       bnScaleBiasDiffDesc, bnScaleT_back, resultBnScaleDiff,
                       resultBnBiasDiff, epsilonT_back, savedMean,
@@ -133,8 +133,8 @@ void compute_hipdnn_batchnorm_bwd(BNorm_params_t &d, dataType *src,
                             bn_modeT_back, &alphaDataDiff, &betaDataDiff,
                             &alphaParamDiff, &betaParamDiff, in_desc, src,
                             dy_desc, dy, dx_desc, dx, bnScaleBiasDiffDesc,
-      		                  bnScaleT_back, resultBnScaleDiff, resultBnBiasDiff,
-      		                  epsilonT_back, savedMean, savedInvVariance));
+      		          bnScaleT_back, resultBnScaleDiff, resultBnBiasDiff,
+      		          epsilonT_back, savedMean, savedInvVariance));
            }
 
         hipDeviceSynchronize();
@@ -144,10 +144,16 @@ void compute_hipdnn_batchnorm_bwd(BNorm_params_t &d, dataType *src,
 
       }
 
-  *avg_time = (float)std::accumulate(time_vector.begin() + 10, time_vector.end(), 0) / (benchmark_iterations - 10);
+  *avg_time = (float)std::accumulate(time_vector.begin() + 10,
+                            time_vector.end(), 0) / (benchmark_iterations - 10);
 
+  hipFree(bnScaleT_back);
+  hipFree(savedMean);
+  hipFree(savedInvVariance);
   hipdnnDestroyTensorDescriptor(out_desc);
   hipdnnDestroyTensorDescriptor(in_desc);
+  hipdnnDestroyTensorDescriptor(dy_desc);
+  hipdnnDestroyTensorDescriptor(dx_desc);
   hipdnnDestroyTensorDescriptor(bnScaleBiasDiffDesc);
   hipdnnDestroy(hipdnn);
 

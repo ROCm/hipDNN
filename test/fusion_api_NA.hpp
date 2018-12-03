@@ -111,6 +111,7 @@ void compute_hipdnn_fusion_api_NA(convulution_Size &c, dataType *src,
 
   // finalizing
   hipdnnDestroyTensorDescriptor(out_desc);
+  hipdnnDestroyTensorDescriptor(bnScaleBiasMeanVarDesc);
   hipdnnDestroyTensorDescriptor(in_desc);
   hipdnnDestroyOperatorArgs(args);
   hipdnnDestroyFusionPlan(fusePlanDesc);

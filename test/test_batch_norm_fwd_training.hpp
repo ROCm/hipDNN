@@ -83,6 +83,10 @@ void compute_hipdnn_batchnorm_fwd_train(BNorm_params_t &d, dataType *src,
                                      / (benchmark_iterations - 10);
 
   // finalizing
+  hipFree(bnScaleT);
+  hipFree(bnBiasT);
+  hipFree(resultRunningMean);
+  hipFree(resultRunningVariance);
   hipdnnDestroyTensorDescriptor(out_desc);
   hipdnnDestroyTensorDescriptor(in_desc);
   hipdnnDestroyTensorDescriptor(bnScaleBiasMeanVarDescT);
