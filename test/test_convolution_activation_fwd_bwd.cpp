@@ -80,11 +80,14 @@ TEST(convolution_activation_fwd_bwd_intg,
 
   std::string strt = "./result_unittest.csv";
   std::string testname = "convolution_activation_fwd_bwd_intg: func_check_conv_activation_fwd_bwd";
+  std::string filename="convolution_activation_fwd_bwd.csv";
+
   float* temp = gradData2.getDataFromGPU();
 
   std::string str  = convert_to_string((float*)temp,
-                                       (int)dstDataGPU.get_num_elements());
+                                       (int)gradData2.get_num_elements());
 
   write_to_csv(strt, str, testname, avg_time, str_ip_size, str_k_size, str_op_size);
+  dump_result_csv(filename, testname, temp, (int)gradData2.get_num_elements());
 
 }

@@ -36,3 +36,40 @@ void write_to_csv(std::string filename, std::string str, std::string testname,
   fs.close();
 
 }
+
+void dump_result_csv(std::string filename, std::string testname, float* output,
+                     int n){
+
+  if (mkdir("./results_csv", 0777) == -1)
+        std::cerr << strerror(errno) << std::endl;
+
+  else
+        std::cout << "Directory created \n";
+
+  std::string file_path = "./results_csv/" + filename;
+
+  std::fstream fs2;
+  fs2.open(file_path, std::ios::in);
+
+  std::fstream fs;
+  fs.open(file_path, std::ios_base::app);
+
+  if (!fs2.is_open()) {
+
+      fs << "Test_name"
+         << ","
+         << "Output"
+         << std::endl;
+   }
+
+  fs << testname << ",";
+
+  for (int i=0; i<n; i++)
+
+      fs << *(output+i) << ",";
+
+  fs << std::endl;
+
+  fs.close();
+
+}

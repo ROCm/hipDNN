@@ -5,6 +5,9 @@
 #include <fstream>
 #include <string>
 #include <sstream>
+#include <bits/stdc++.h>
+#include <sys/stat.h>
+#include <sys/types.h>
 
 template <typename dataType>
 std::string convert_to_string(dataType *arr, int s_size) {
@@ -220,5 +223,7 @@ std::string integration_dims_to_string3(dataType *arr1, dataType *arr2,
 void write_to_csv(std::string filename, std::string str, std::string testname,
                   float avg_time, std::string str_ip_size,
                   std::string str_k_size, std::string str_op_size);
+
+void dump_result_csv(std::string filename, std::string testname, float* output, int n);
 
 #endif // CSV_INTEGRATION_HPP

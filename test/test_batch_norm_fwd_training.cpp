@@ -26,6 +26,8 @@ TEST(BNorm_Fwd_train, func_check_naive_BNorm_forward_trian) {
 
   std::string strt = "./result_unittest.csv";
   std::string testname = "BNorm_Fwd_train: func_check_naive_BNorm_forward_train";
+  std::string filename="BNorm_Fwd_train.csv";
+
   float* temp = dstDataGPU.getDataFromGPU();
 
   std::string str  = convert_to_string((float*)temp,
@@ -33,5 +35,6 @@ TEST(BNorm_Fwd_train, func_check_naive_BNorm_forward_trian) {
 
   write_to_csv(strt, str, testname,avg_time, str_ip_size, str_k_size,
                str_op_size);
+  dump_result_csv(filename, testname, temp, (int)dstDataGPU.get_num_elements());
 
 }

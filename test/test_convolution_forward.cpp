@@ -40,13 +40,14 @@ TEST(convolution_fwd, func_check_zero_padding_medium_input_batch32) {
 
   std::string strt = "./result_unittest.csv";
   std::string testname = "convolution_fwd:func_check_zero_padding_medium_input_batch32";
+  std::string filename="convolution_forward.csv";
 
   float* temp = dstDataGPU.getDataFromGPU();
 
   std::string str  = convert_to_string((float*)temp,(int)dstDataGPU.get_num_elements());
 
   write_to_csv(strt, str, testname, avg_time, str_ip_size, str_k_size, str_op_size);
-
+  dump_result_csv(filename, testname, temp, (int)dstDataGPU.get_num_elements());
 }
 
 TEST(convolution_fwd, func_compare_group_conv) {
@@ -91,10 +92,12 @@ TEST(convolution_fwd, func_compare_group_conv) {
   std::string testname = "convolution_fwd: func_compare_group_conv";
 
   float* temp = dstDataGPU.getDataFromGPU();
+  std::string filename="convolution_forward.csv";
 
   std::string str  = convert_to_string((float*)temp,(int)dstDataGPU.get_num_elements());
 
   write_to_csv(strt, str, testname, avg_time, str_ip_size, str_k_size, str_op_size);
+  dump_result_csv(filename, testname, temp, (int)dstDataGPU.get_num_elements());
 
 }
 
@@ -138,12 +141,14 @@ TEST(convolution_fwd, func_check_two_strides_medium_kernelsize) {
 
   std::string strt = "./result_unittest.csv";
   std::string testname = "convolution_fwd:func_check_two_strides_medium_kernelsize";
+  std::string filename="convolution_forward.csv";
 
   float* temp = dstDataGPU.getDataFromGPU();
 
   std::string str  = convert_to_string((float*)temp,(int)dstDataGPU.get_num_elements());
 
   write_to_csv(strt, str, testname,avg_time, str_ip_size, str_k_size, str_op_size);
+  dump_result_csv(filename, testname, temp, (int)dstDataGPU.get_num_elements());
 
 }
 
@@ -185,11 +190,13 @@ TEST(convolution_fwd, func_check_padding_and_strides_small_size) {
 
   std::string strt = "./result_unittest.csv";
   std::string testname = "convolution_fwd:func_check_padding_and_strides_small_size";
+  std::string filename="convolution_forward.csv";
 
   float* temp = dstDataGPU.getDataFromGPU();
 
   std::string str  = convert_to_string((float*)temp,(int)dstDataGPU.get_num_elements());
   write_to_csv(strt, str, testname,avg_time, str_ip_size, str_k_size, str_op_size);
+  dump_result_csv(filename, testname, temp, (int)dstDataGPU.get_num_elements());
 
 }
 
@@ -231,12 +238,14 @@ TEST(convolution_fwd, func_check_full_conv) {
 
   std::string strt = "./result_unittest.csv";
   std::string testname = "convolution_fwd:func_check_full_conv";
+  std::string filename="convolution_forward.csv";
 
   float* temp = dstDataGPU.getDataFromGPU();
 
   std::string str  = convert_to_string((float*)temp,(int)dstDataGPU.get_num_elements());
 
   write_to_csv(strt, str, testname, avg_time, str_ip_size, str_k_size, str_op_size);
+  dump_result_csv(filename, testname, temp, (int)dstDataGPU.get_num_elements());
 
 }
 
@@ -280,11 +289,13 @@ TEST(convolution_fwd, func_check_batch64) {
 
   std::string strt = "./result_unittest.csv";
   std::string testname = "convolution_fwd:func_check_dilation1x1_batch64";
+  std::string filename="convolution_forward.csv";
 
   float* temp = dstDataGPU.getDataFromGPU();
 
   std::string str = convert_to_string((float*)temp,(int)dstDataGPU.get_num_elements());
   write_to_csv(strt, str, testname,avg_time, str_ip_size, str_k_size, str_op_size);
+  dump_result_csv(filename, testname, temp, (int)dstDataGPU.get_num_elements());
 
 }
 
@@ -327,12 +338,14 @@ Desc outputDesc = calculate_Dims(inputDesc, filterDesc, pad, stride,dil);
 
   std::string strt = "./result_unittest.csv";
   std::string testname = "convolution_fwd:func_check_zero_padding_medium_input_batch128";
+  std::string filename="convolution_forward.csv";
 
   float* temp = dstDataGPU.getDataFromGPU();
 
   std::string str  = convert_to_string((float*)temp,(int)dstDataGPU.get_num_elements());
 
   write_to_csv(strt, str, testname, avg_time, str_ip_size, str_k_size, str_op_size);
+  dump_result_csv(filename, testname, temp, (int)dstDataGPU.get_num_elements());
 
 }
 
@@ -376,12 +389,14 @@ TEST(convolution_fwd, func_check_dilation2x2_batch8) {
 
   std::string strt = "./result_unittest.csv";
   std::string testname = "convolution_fwd:func_check_dilation2x2_batch8";
+  std::string filename="convolution_forward.csv";
 
   float* temp = dstDataGPU.getDataFromGPU();
 
   std::string str = convert_to_string((float*)temp,(int)dstDataGPU.get_num_elements());
 
   write_to_csv(strt, str, testname,avg_time, str_ip_size, str_k_size, str_op_size);
+  dump_result_csv(filename, testname, temp, (int)dstDataGPU.get_num_elements());
 
 }
 
@@ -425,11 +440,13 @@ convulution_Size testConvolutionSizes(
 
   std::string strt = "./result_unittest.csv";
   std::string testname = "convolution_fwd:func_check_dilation3x3_batch8";
+  std::string filename="convolution_forward.csv";
 
   float* temp = dstDataGPU.getDataFromGPU();
 
   std::string str = convert_to_string((float*)temp,(int)dstDataGPU.get_num_elements());
 
   write_to_csv(strt, str, testname,avg_time, str_ip_size, str_k_size, str_op_size);
+  dump_result_csv(filename, testname, temp, (int)dstDataGPU.get_num_elements());
 
 }

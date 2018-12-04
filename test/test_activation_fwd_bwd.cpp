@@ -39,11 +39,14 @@ TEST(activation_fwd_bwd, func_test_int_activation) {
 
   std::string strt = "./result_unittest.csv";
   std::string testname = "activation_fwd_bwd:func_test_int_activation";
+  std::string filename="activation_forward_backward.csv";
   std::string str  = convert_to_string((float*)temp2,
                                        (int)dataGrad.get_num_elements());
 
   write_to_csv(strt, str, testname, avg_time, str_ip_size, str_k_size,
                str_op_size);
+
+  dump_result_csv(filename, testname, temp2, (int)dataGrad.get_num_elements());
 
 }
 
@@ -78,18 +81,20 @@ TEST(activation_fwd_bwd, func_int_activation_batch32) {
   compute_hipdnn_activation_backward(test_case2, dataSrc.gpu(), dataGrad.gpu(),
                                      dataDst.gpu(), &avg_time2);
 
-   avg_time = (avg_time1 + avg_time2);
+  avg_time = (avg_time1 + avg_time2);
 
-   std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
+  std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
 
-    float* temp2 = dataGrad.getDataFromGPU();
-    std::string strt = "./result_unittest.csv";
-    std::string testname = "activation_fwd_bwd:func_int_activation_batch32";
-    std::string str  = convert_to_string((float*)temp2,
+  float* temp2 = dataGrad.getDataFromGPU();
+  std::string strt = "./result_unittest.csv";
+  std::string testname = "activation_fwd_bwd:func_int_activation_batch32";
+  std::string filename="activation_forward_backward.csv";
+  std::string str  = convert_to_string((float*)temp2,
                                          (int)dataGrad.get_num_elements());
 
-    write_to_csv(strt, str, testname, avg_time, str_ip_size, str_k_size,
+  write_to_csv(strt, str, testname, avg_time, str_ip_size, str_k_size,
                  str_op_size);
+  dump_result_csv(filename, testname, temp2, (int)dataGrad.get_num_elements());
 
 }
 
@@ -132,12 +137,13 @@ TEST(activation_fwd_bwd, func_int_activation_batch64) {
 
   std::string strt = "./result_unittest.csv";
   std::string testname = "activation_fwd_bwd:func_int_activation_batch64";
+  std::string filename="activation_forward_backward.csv";
   std::string str  = convert_to_string((float*)temp2,
                                        (int)dataGrad.get_num_elements());
 
   write_to_csv(strt, str, testname, avg_time, str_ip_size, str_k_size,
                str_op_size);
-
+  dump_result_csv(filename, testname, temp2, (int)dataGrad.get_num_elements());
 }
 
 TEST(activation_fwd_bwd, func_int_activation_batch128) {
@@ -179,10 +185,12 @@ TEST(activation_fwd_bwd, func_int_activation_batch128) {
 
   std::string strt = "./result_unittest.csv";
   std::string testname = "activation_fwd_bwd:func_int_activation_batch128";
+  std::string filename="activation_forward_backward.csv";
   std::string str  = convert_to_string((float*)temp2,
                                        (int)dataGrad.get_num_elements());
 
   write_to_csv(strt, str, testname, avg_time, str_ip_size, str_k_size,
                str_op_size);
+  dump_result_csv(filename, testname, temp2, (int)dataGrad.get_num_elements());
 
 }
