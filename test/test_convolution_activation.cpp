@@ -59,10 +59,12 @@ TEST(convolution_activation_fwd_intg, func_check_naive_conv_activation) {
 
   std::string strt = "./result_unittest.csv";
   std::string testname = "convolution_activation_fwd_intg: func_check_naive_conv_activation";
+  std::string filename="convolution_activation_fwd_intg.csv";
 
   float* temp = dataDst.getDataFromGPU();
-  std::string str  = convert_to_string((float*)temp,(int)dstDataGPU.get_num_elements());
+  std::string str  = convert_to_string((float*)temp,(int)dataDst.get_num_elements());
 
   write_to_csv(strt, str, testname, avg_time, str_ip_size, str_k_size, str_op_size);
+  dump_result_csv(filename, testname, temp, (int)dataDst.get_num_elements());
 
 }

@@ -35,11 +35,12 @@ TEST(pooling_fwd_back, func_check_fwd_bwd) {
 
   std::string strt = "./result_unittest.csv";
   std::string testname = "pooling_intg:func_pooling_fwd_bwd";
+  std::string filename="pooling_fwd_bwd_intg.csv";
 
   std::string str  = convert_to_string((float*)temp2,(int)gradData.get_num_elements());
 
   write_to_csv(strt, str, testname, avg_time, str_ip_size, str_k_size, str_op_size);
-
+  dump_result_csv(filename, testname, temp2, (int)gradData.get_num_elements());
 }
 
 TEST(pooling_fwd_back, func_int_batch32) {
@@ -76,11 +77,12 @@ TEST(pooling_fwd_back, func_int_batch32) {
 
   std::string strt = "./result_unittest.csv";
   std::string testname = "pooling_intg:func_int_batch32";
+  std::string filename="pooling_fwd_bwd_intg.csv";
 
   std::string str  = convert_to_string((float*)temp2,(int)gradData.get_num_elements());
 
   write_to_csv(strt, str, testname, avg_time, str_ip_size, str_k_size, str_op_size);
-
+  dump_result_csv(filename, testname, temp2, (int)gradData.get_num_elements());
 }
 
 TEST(pooling_fwd_back, func_int_batch64) {
@@ -117,11 +119,12 @@ TEST(pooling_fwd_back, func_int_batch64) {
 
   std::string strt = "./result_unittest.csv";
   std::string testname = "pooling_intg:func_int_batch64";
+  std::string filename="pooling_fwd_bwd_intg.csv";
 
   std::string str  = convert_to_string((float*)temp2,(int)gradData.get_num_elements());
 
   write_to_csv(strt, str, testname, avg_time, str_ip_size, str_k_size, str_op_size);
-
+  dump_result_csv(filename, testname, temp2, (int)gradData.get_num_elements());
 }
 
 TEST(pooling_fwd_back, func_int_batch128) {
@@ -158,9 +161,10 @@ TEST(pooling_fwd_back, func_int_batch128) {
 
   std::string strt = "./result_unittest.csv";
   std::string testname = "pooling_intg:func_int_batch128";
+  std::string filename="pooling_fwd_bwd_intg.csv";
 
   std::string str  = convert_to_string((float*)temp2,(int)gradData.get_num_elements());
 
   write_to_csv(strt, str, testname, avg_time, str_ip_size, str_k_size, str_op_size);
-
+  dump_result_csv(filename, testname, temp2, (int)gradData.get_num_elements());
 }

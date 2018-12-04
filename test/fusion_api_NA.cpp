@@ -36,12 +36,15 @@ TEST(fusion_api_NA, func_check_fusion_api_NA) {
 
   std::string strt = "./result_unittest.csv";
   std::string testname = "fusion_api_NA: func_check_fusion_api_NA";
+  std::string filename="fusion_NA.csv";
+
   float* temp = dstDataGPU.getDataFromGPU();
   std::string str  = convert_to_string((float*)temp,
                                        (int)dstDataGPU.get_num_elements());
 
   write_to_csv(strt, str, testname, avg_time, str_ip_size,
                str_k_size, str_op_size);
+ dump_result_csv(filename, testname, temp, (int)dstDataGPU.get_num_elements());
 
 }
 */
