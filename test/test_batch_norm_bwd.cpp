@@ -32,6 +32,7 @@ TEST(BNorm_Backward, func_check_spatial_no_grad_bwd) {
 
   std::string strt = "./result_unittest.csv";
   std::string testname = "BNorm_Backward: func_check_spatial_no_grad_bwd";
+  std::string filename="BNorm_backward.csv";
 
   float* temp1 = dstDataGPU.getDataFromGPU();
   float* temp2 = resultBnScaleDiff.getDataFromGPU();
@@ -52,6 +53,9 @@ TEST(BNorm_Backward, func_check_spatial_no_grad_bwd) {
 
   write_to_csv(strt, str, testname,avg_time, str_ip_size, str_k_size,
               str_op_size);
+  dump_result_csv(filename, testname, temp1, (int)dstDataGPU.get_num_elements());
+  dump_result_csv(filename, testname, temp2, (int)resultBnScaleDiff.get_num_elements());
+  dump_result_csv(filename, testname, temp3, (int)resultBnBiasDiff.get_num_elements());
 
 }
 
@@ -88,6 +92,7 @@ TEST(BNorm_Backward, func_check_BNorm_bwd_per_act_mode_no_grad) {
 
   std::string strt = "./result_unittest.csv";
   std::string testname = "BNorm_Backward: func_check_BNorm_bwd_per_act_mode_no_grad";
+  std::string filename="BNorm_backward.csv";
 
   float* temp1 = dstDataGPU.getDataFromGPU();
   float* temp2 = resultBnScaleDiff.getDataFromGPU();
@@ -108,6 +113,10 @@ TEST(BNorm_Backward, func_check_BNorm_bwd_per_act_mode_no_grad) {
 
   write_to_csv(strt, str, testname,avg_time, str_ip_size, str_k_size,
                str_op_size);
+
+  dump_result_csv(filename, testname, temp1, (int)dstDataGPU.get_num_elements());
+  dump_result_csv(filename, testname, temp2, (int)resultBnScaleDiff.get_num_elements());
+  dump_result_csv(filename, testname, temp3, (int)resultBnBiasDiff.get_num_elements());
 
   }
 
@@ -143,6 +152,7 @@ TEST(BNorm_Backward, func_check_spatial_grad_bwd) {
 
   std::string strt = "./result_unittest.csv";
   std::string testname = "BNorm_Backward: func_check_spatial_grad_bwd";
+  std::string filename="BNorm_backward.csv";
 
   float* temp1 = dstDataGPU.getDataFromGPU();
   float* temp2 = resultBnScaleDiff.getDataFromGPU();
@@ -163,6 +173,10 @@ TEST(BNorm_Backward, func_check_spatial_grad_bwd) {
 
     write_to_csv(strt, str, testname,avg_time, str_ip_size, str_k_size,
                  str_op_size);
+
+  dump_result_csv(filename, testname, temp1, (int)dstDataGPU.get_num_elements());
+  dump_result_csv(filename, testname, temp2, (int)resultBnScaleDiff.get_num_elements());
+  dump_result_csv(filename, testname, temp3, (int)resultBnBiasDiff.get_num_elements());
 
   }
 
@@ -198,6 +212,7 @@ TEST(BNorm_Backward, func_check_BNorm_bwd_per_act_mode_grad) {
 
   std::string strt = "./result_unittest.csv";
   std::string testname = "BNorm_Backward: func_check_BNorm_bwd_per_act_mode_grad";
+  std::string filename="BNorm_backward.csv";
 
   float* temp1 = dstDataGPU.getDataFromGPU();
   float* temp2 = resultBnScaleDiff.getDataFromGPU();
@@ -218,5 +233,9 @@ TEST(BNorm_Backward, func_check_BNorm_bwd_per_act_mode_grad) {
 
   write_to_csv(strt, str, testname,avg_time, str_ip_size, str_k_size,
                str_op_size);
+
+  dump_result_csv(filename, testname, temp1, (int)dstDataGPU.get_num_elements());
+  dump_result_csv(filename, testname, temp2, (int)resultBnScaleDiff.get_num_elements());
+  dump_result_csv(filename, testname, temp3, (int)resultBnBiasDiff.get_num_elements());
 
 }

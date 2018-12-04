@@ -97,11 +97,12 @@ TEST(convolution_pooling_fwd_bwd_intg, func_check_naive_conv_pool_fwd_bwd) {
   std::string strt = "./result_unittest.csv";
   std::string testname =
          "convolution_pooling_fwd_bwd_intg: func_check_naive_conv_pool_fwd_bwd";
+  std::string filename = "convolution_pooling_fwd_bwd_intg";
 
   float* temp = gradData2.getDataFromGPU();
 
   std::string str  = convert_to_string((float*)temp,(int)gradData2.get_num_elements());
 
   write_to_csv(strt, str, testname, avg_time, str_ip_size, str_k_size, str_op_size);
-
+  dump_result_csv(filename, testname, temp, (int)gradData2.get_num_elements());
 }

@@ -29,6 +29,7 @@ TEST(LRN_fwd, func_check_naive_LRN) {
 
   std::string strt = "./result_unittest.csv";
   std::string testname = "LRN_fwd:func_check_naive_LRN";
+  std::string filename="LRN_fwd.csv";
 
   float* temp = dstDataGPU.getDataFromGPU();
 
@@ -37,7 +38,7 @@ TEST(LRN_fwd, func_check_naive_LRN) {
 
   write_to_csv(strt, str, testname,avg_time, str_ip_size, str_k_size,
                str_op_size);
-
+  dump_result_csv(filename, testname, temp, (int)dstDataGPU.get_num_elements());
 }
 
 TEST(LRN_fwd, func_check_LRN_batch16) {
@@ -69,6 +70,7 @@ TEST(LRN_fwd, func_check_LRN_batch16) {
 
   std::string strt = "./result_unittest.csv";
   std::string testname = "LRN_fwd:func_check_LRN_batch16";
+  std::string filename="LRN_fwd.csv";
 
   float* temp = dstDataGPU.getDataFromGPU();
 
@@ -77,7 +79,7 @@ TEST(LRN_fwd, func_check_LRN_batch16) {
 
   write_to_csv(strt, str, testname,avg_time, str_ip_size, str_k_size,
                str_op_size);
-
+  dump_result_csv(filename, testname, temp, (int)dstDataGPU.get_num_elements());
 }
 
 TEST(LRN_fwd, func_check_LRN_batch32) {
@@ -108,6 +110,7 @@ TEST(LRN_fwd, func_check_LRN_batch32) {
 
   std::string strt = "./result_unittest.csv";
   std::string testname = "LRN_fwd:func_check_LRN_batch32";
+  std::string filename="LRN_fwd.csv";
 
   float* temp = dstDataGPU.getDataFromGPU();
   std::string str  = convert_to_string((float*)temp,
@@ -115,7 +118,7 @@ TEST(LRN_fwd, func_check_LRN_batch32) {
 
   write_to_csv(strt, str, testname,avg_time, str_ip_size, str_k_size,
                str_op_size);
-
+  dump_result_csv(filename, testname, temp, (int)dstDataGPU.get_num_elements());
 }
 
 TEST(LRN_fwd, func_check_LRN_batch64) {
@@ -147,6 +150,7 @@ TEST(LRN_fwd, func_check_LRN_batch64) {
 
   std::string strt = "./result_unittest.csv";
   std::string testname = "LRN_fwd:func_check_LRN_batch64";
+  std::string filename="LRN_fwd.csv";
 
   float* temp = dstDataGPU.getDataFromGPU();
 
@@ -155,7 +159,7 @@ TEST(LRN_fwd, func_check_LRN_batch64) {
 
   write_to_csv(strt, str, testname,avg_time, str_ip_size, str_k_size,
                str_op_size);
-
+  dump_result_csv(filename, testname, temp, (int)dstDataGPU.get_num_elements());
 }
 
 TEST(LRN_fwd, func_check_LRN_batch128) {
@@ -187,6 +191,7 @@ TEST(LRN_fwd, func_check_LRN_batch128) {
 
   std::string strt = "./result_unittest.csv";
   std::string testname = "LRN_fwd:func_check_LRN_batch128";
+  std::string filename="LRN_fwd.csv";
 
   float* temp = dstDataGPU.getDataFromGPU();
 
@@ -194,5 +199,5 @@ TEST(LRN_fwd, func_check_LRN_batch128) {
                                        (int)dstDataGPU.get_num_elements());
   write_to_csv(strt, str, testname,avg_time, str_ip_size, str_k_size,
                str_op_size);
-
+  dump_result_csv(filename, testname, temp, (int)dstDataGPU.get_num_elements());
 }

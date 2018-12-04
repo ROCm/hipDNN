@@ -31,11 +31,12 @@ TEST(LRN_bwd, func_check_naive_LRN_backward) {
 
   std::string strt = "./result_unittest.csv";
   std::string testname = "LRN_bwd: func_check_naive_LRN_backward";
+  std::string filename="LRN_bwd.csv";
 
   float* temp = gradDataGPU.getDataFromGPU();
   std::string str  = convert_to_string((float*)temp,
                                        (int)gradDataGPU.get_num_elements());
 
   write_to_csv(strt, str, testname,avg_time, str_ip_size, str_k_size, str_op_size);
-
+  dump_result_csv(filename, testname, temp, (int)gradDataGPU.get_num_elements());
 }

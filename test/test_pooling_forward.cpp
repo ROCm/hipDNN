@@ -30,11 +30,12 @@ TEST(pooling_fwd, func_check_zero_padding) {
 
   std::string strt = "./result_unittest.csv";
   std::string testname = "pooling_fwd:func_check_zero_padding";
+  std::string filename="pooling_forward.csv";
 
   std::string str  = convert_to_string((float*)temp,(int)dstDataGPU.get_num_elements());
 
   write_to_csv(strt, str, testname, avg_time, str_ip_size, str_k_size, str_op_size);
-
+  dump_result_csv(filename, testname, temp, (int)dstDataGPU.get_num_elements());
 }
 
 TEST(pooling_fwd, func_check_batch32) {
@@ -64,11 +65,12 @@ TEST(pooling_fwd, func_check_batch32) {
 
   std::string strt = "./result_unittest.csv";
   std::string testname = "pooling_fwd:func_check_batch32";
+  std::string filename="pooling_forward.csv";
 
   std::string str  = convert_to_string((float*)temp,(int)dstDataGPU.get_num_elements());
 
   write_to_csv(strt, str, testname, avg_time, str_ip_size, str_k_size, str_op_size);
-
+  dump_result_csv(filename, testname, temp, (int)dstDataGPU.get_num_elements());
 }
 /*
 TEST(pooling_fwd, func_check_batch64) {
@@ -97,10 +99,11 @@ TEST(pooling_fwd, func_check_batch64) {
 
   std::string strt = "./result_unittest.csv";
   std::string testname = "pooling_fwd:func_check_batch64";
+  std::string filename="pooling_forward.csv";
 
   std::string str  = convert_to_string((float*)temp,(int)dstDataGPU.get_num_elements());
   write_to_csv(strt, str, testname, avg_time, str_ip_size, str_k_size, str_op_size);
-
+  dump_result_csv(filename, testname, temp, (int)dstDataGPU.get_num_elements());
 }
 
 TEST(pooling_fwd, func_check_batch128) {
@@ -129,10 +132,11 @@ TEST(pooling_fwd, func_check_batch128) {
 
   std::string strt = "./result_unittest.csv";
   std::string testname = "pooling_fwd:func_check_batch128";
+  std::string filename="pooling_forward.csv";
 
   std::string str  = convert_to_string((float*)temp,(int)dstDataGPU.get_num_elements());
   write_to_csv(strt, str, testname, avg_time, str_ip_size, str_k_size, str_op_size);
-
+  dump_result_csv(filename, testname, temp, (int)dstDataGPU.get_num_elements());
 }
 */
 //This test currently fails in NVidia, so it has been commented
@@ -165,6 +169,7 @@ TEST(pooling_fwd, func_check_half) {
 
   std::string strt = "./result_unittest.csv";
   std::string testname = "pooling_fwd:func_half_datatype";
+  std::string filename="pooling_forward.csv";
 
   std::string str  = convert_to_string((float*)temp,(int)dstDataGPU.get_num_elements());
 
@@ -172,5 +177,6 @@ TEST(pooling_fwd, func_check_half) {
   std::string ip = convert_to_string((float*)temp2,(int)srcData.get_num_elements());
 
   write_to_csv(strt, str, testname, avg_time, str_ip_size, str_k_size, str_op_size);
+  dump_result_csv(filename, testname, temp, (int)dstDataGPU.get_num_elements());
 }
 */
