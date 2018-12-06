@@ -117,7 +117,7 @@ TEST(convolution_pooling_act_fwd_bwd_intg, func_check_conv_pool_act_fwd_bwd) {
 
   std::string strt = "./result_unittest.csv";
   std::string testname = "convolution_pooling_act_fwd_bwd_intg: func_check_naive_conv_pool_act_fwd_bwd";
-  std::string filename = "convolution_pooling_act_fwd_bwd_intg";
+  std::string filename = "convolution_pooling_act_fwd_bwd_intg.csv";
   float* temp = gradData2.getDataFromGPU();
 
   std::string str  = convert_to_string((float*)temp,(int)gradData2.get_num_elements());
