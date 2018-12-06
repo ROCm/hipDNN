@@ -31,7 +31,9 @@ TEST(BNorm_Backward, func_check_spatial_no_grad_bwd) {
   std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
 
   std::string strt = "./result_unittest.csv";
-  std::string testname = "BNorm_Backward: func_check_spatial_no_grad_bwd";
+  std::string testname1 = "BNorm_Backward: func_check_spatial_no_grad_bwd_dx";
+  std::string testname2 = "BNorm_Backward: func_check_spatial_no_grad_bwd_resultBnScaleDiff";
+  std::string testname3 = "BNorm_Backward: func_check_spatial_no_grad_bwd_resultBnBiasDiff";
   std::string filename="BNorm_backward.csv";
 
   float* temp1 = dstDataGPU.getDataFromGPU();
@@ -45,17 +47,16 @@ TEST(BNorm_Backward, func_check_spatial_no_grad_bwd) {
   std::string str3  = convert_to_string2((float*)temp3,
                                     (int)resultBnBiasDiff.get_num_elements());
 
-  std::ostringstream os;
-  os <<  "\" dx: " << str1 << ", resultBnScaleDiff: " << str2
-     << ", resultBnBiasDiff: " << str3 << "\"";
-
-  std::string str(os.str());
-
-  write_to_csv(strt, str, testname,avg_time, str_ip_size, str_k_size,
+  write_to_csv(strt, str1, testname1, avg_time, str_ip_size, str_k_size,
               str_op_size);
-  dump_result_csv(filename, testname, temp1, (int)dstDataGPU.get_num_elements());
-  dump_result_csv(filename, testname, temp2, (int)resultBnScaleDiff.get_num_elements());
-  dump_result_csv(filename, testname, temp3, (int)resultBnBiasDiff.get_num_elements());
+  write_to_csv(strt, str2, testname2, avg_time, str_ip_size, str_k_size,
+              str_op_size);
+  write_to_csv(strt, str3, testname3, avg_time, str_ip_size, str_k_size,
+              str_op_size);
+
+  dump_result_csv(filename, testname1, temp1, (int)dstDataGPU.get_num_elements());
+  dump_result_csv(filename, testname2, temp2, (int)resultBnScaleDiff.get_num_elements());
+  dump_result_csv(filename, testname3, temp3, (int)resultBnBiasDiff.get_num_elements());
 
 }
 
@@ -91,7 +92,9 @@ TEST(BNorm_Backward, func_check_BNorm_bwd_per_act_mode_no_grad) {
   std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
 
   std::string strt = "./result_unittest.csv";
-  std::string testname = "BNorm_Backward: func_check_BNorm_bwd_per_act_mode_no_grad";
+  std::string testname1 = "BNorm_Backward: func_check_spatial_no_grad_bwd_dx";
+  std::string testname2 = "BNorm_Backward: func_check_spatial_no_grad_bwd_resultBnScaleDiff";
+  std::string testname3 = "BNorm_Backward: func_check_spatial_no_grad_bwd_resultBnBiasDiff";
   std::string filename="BNorm_backward.csv";
 
   float* temp1 = dstDataGPU.getDataFromGPU();
@@ -105,18 +108,16 @@ TEST(BNorm_Backward, func_check_BNorm_bwd_per_act_mode_no_grad) {
   std::string str3  = convert_to_string2((float*)temp3,
                                      (int)resultBnBiasDiff.get_num_elements());
 
-  std::ostringstream os;
-  os <<  "\" dx: " << str1 << ", resultBnScaleDiff: " << str2
-     << ", resultBnBiasDiff: " << str3 << "\"";
+  write_to_csv(strt, str1, testname1, avg_time, str_ip_size, str_k_size,
+              str_op_size);
+  write_to_csv(strt, str2, testname2, avg_time, str_ip_size, str_k_size,
+              str_op_size);
+  write_to_csv(strt, str3, testname3, avg_time, str_ip_size, str_k_size,
+              str_op_size);
 
-  std::string str(os.str());
-
-  write_to_csv(strt, str, testname,avg_time, str_ip_size, str_k_size,
-               str_op_size);
-
-  dump_result_csv(filename, testname, temp1, (int)dstDataGPU.get_num_elements());
-  dump_result_csv(filename, testname, temp2, (int)resultBnScaleDiff.get_num_elements());
-  dump_result_csv(filename, testname, temp3, (int)resultBnBiasDiff.get_num_elements());
+  dump_result_csv(filename, testname1, temp1, (int)dstDataGPU.get_num_elements());
+  dump_result_csv(filename, testname2, temp2, (int)resultBnScaleDiff.get_num_elements());
+  dump_result_csv(filename, testname3, temp3, (int)resultBnBiasDiff.get_num_elements());
 
   }
 
@@ -151,7 +152,9 @@ TEST(BNorm_Backward, func_check_spatial_grad_bwd) {
   std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
 
   std::string strt = "./result_unittest.csv";
-  std::string testname = "BNorm_Backward: func_check_spatial_grad_bwd";
+  std::string testname1 = "BNorm_Backward: func_check_spatial_no_grad_bwd_dx";
+  std::string testname2 = "BNorm_Backward: func_check_spatial_no_grad_bwd_resultBnScaleDiff";
+  std::string testname3 = "BNorm_Backward: func_check_spatial_no_grad_bwd_resultBnBiasDiff";
   std::string filename="BNorm_backward.csv";
 
   float* temp1 = dstDataGPU.getDataFromGPU();
@@ -165,18 +168,16 @@ TEST(BNorm_Backward, func_check_spatial_grad_bwd) {
   std::string str3  = convert_to_string2((float*)temp3,
                                      (int)resultBnBiasDiff.get_num_elements());
 
-    std::ostringstream os;
-    os <<  "\" dx: " << str1 << ", resultBnScaleDiff: " << str2
-       << ", resultBnBiasDiff: " << str3 << "\"";
+  write_to_csv(strt, str1, testname1, avg_time, str_ip_size, str_k_size,
+              str_op_size);
+  write_to_csv(strt, str2, testname2, avg_time, str_ip_size, str_k_size,
+              str_op_size);
+  write_to_csv(strt, str3, testname3, avg_time, str_ip_size, str_k_size,
+              str_op_size);
 
-    std::string str(os.str());
-
-    write_to_csv(strt, str, testname,avg_time, str_ip_size, str_k_size,
-                 str_op_size);
-
-  dump_result_csv(filename, testname, temp1, (int)dstDataGPU.get_num_elements());
-  dump_result_csv(filename, testname, temp2, (int)resultBnScaleDiff.get_num_elements());
-  dump_result_csv(filename, testname, temp3, (int)resultBnBiasDiff.get_num_elements());
+  dump_result_csv(filename, testname1, temp1, (int)dstDataGPU.get_num_elements());
+  dump_result_csv(filename, testname2, temp2, (int)resultBnScaleDiff.get_num_elements());
+  dump_result_csv(filename, testname3, temp3, (int)resultBnBiasDiff.get_num_elements());
 
   }
 
@@ -211,7 +212,9 @@ TEST(BNorm_Backward, func_check_BNorm_bwd_per_act_mode_grad) {
   std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
 
   std::string strt = "./result_unittest.csv";
-  std::string testname = "BNorm_Backward: func_check_BNorm_bwd_per_act_mode_grad";
+  std::string testname1 = "BNorm_Backward: func_check_spatial_no_grad_bwd_dx";
+  std::string testname2 = "BNorm_Backward: func_check_spatial_no_grad_bwd_resultBnScaleDiff";
+  std::string testname3 = "BNorm_Backward: func_check_spatial_no_grad_bwd_resultBnBiasDiff";
   std::string filename="BNorm_backward.csv";
 
   float* temp1 = dstDataGPU.getDataFromGPU();
@@ -225,17 +228,15 @@ TEST(BNorm_Backward, func_check_BNorm_bwd_per_act_mode_grad) {
   std::string str3  = convert_to_string2((float*)temp3,
                                      (int)resultBnBiasDiff.get_num_elements());
 
-  std::ostringstream os;
-  os <<  "\" dx: " << str1 << ", resultBnScaleDiff: " << str2
-     << ", resultBnBiasDiff: " << str3 << "\"";
+  write_to_csv(strt, str1, testname1, avg_time, str_ip_size, str_k_size,
+              str_op_size);
+  write_to_csv(strt, str2, testname2, avg_time, str_ip_size, str_k_size,
+              str_op_size);
+  write_to_csv(strt, str3, testname3, avg_time, str_ip_size, str_k_size,
+              str_op_size);
 
-  std::string str(os.str());
-
-  write_to_csv(strt, str, testname,avg_time, str_ip_size, str_k_size,
-               str_op_size);
-
-  dump_result_csv(filename, testname, temp1, (int)dstDataGPU.get_num_elements());
-  dump_result_csv(filename, testname, temp2, (int)resultBnScaleDiff.get_num_elements());
-  dump_result_csv(filename, testname, temp3, (int)resultBnBiasDiff.get_num_elements());
+  dump_result_csv(filename, testname1, temp1, (int)dstDataGPU.get_num_elements());
+  dump_result_csv(filename, testname2, temp2, (int)resultBnScaleDiff.get_num_elements());
+  dump_result_csv(filename, testname3, temp3, (int)resultBnBiasDiff.get_num_elements());
 
 }
