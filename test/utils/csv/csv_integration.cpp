@@ -53,23 +53,12 @@ void dump_result_csv(std::string filename, std::string testname, float* output,
 
   std::fstream fs;
   fs.open(file_path, std::ios_base::app);
-
-  if (!fs2.is_open()) {
-
-      fs << "Test_name"
-         << ","
-         << "Output"
-         << std::endl;
-   }
-
   fs << testname << ",";
 
   for (int i=0; i<n; i++)
-
       fs << *(output+i) << ",";
 
   fs << std::endl;
-
   fs.close();
 
 }
