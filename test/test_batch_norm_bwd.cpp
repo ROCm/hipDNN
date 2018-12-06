@@ -92,9 +92,9 @@ TEST(BNorm_Backward, func_check_BNorm_bwd_per_act_mode_no_grad) {
   std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
 
   std::string strt = "./result_unittest.csv";
-  std::string testname1 = "BNorm_Backward: func_check_spatial_no_grad_bwd_dx";
-  std::string testname2 = "BNorm_Backward: func_check_spatial_no_grad_bwd_resultBnScaleDiff";
-  std::string testname3 = "BNorm_Backward: func_check_spatial_no_grad_bwd_resultBnBiasDiff";
+  std::string testname1 = "BNorm_Backward: per_act_mode_no_grad_bwd_dx";
+  std::string testname2 = "BNorm_Backward: per_act_mode_no_grad_bwd_resultBnScaleDiff";
+  std::string testname3 = "BNorm_Backward: per_act_mode_no_grad_bwd_resultBnBiasDiff";
   std::string filename="BNorm_backward.csv";
 
   float* temp1 = dstDataGPU.getDataFromGPU();
@@ -152,9 +152,9 @@ TEST(BNorm_Backward, func_check_spatial_grad_bwd) {
   std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
 
   std::string strt = "./result_unittest.csv";
-  std::string testname1 = "BNorm_Backward: func_check_spatial_no_grad_bwd_dx";
-  std::string testname2 = "BNorm_Backward: func_check_spatial_no_grad_bwd_resultBnScaleDiff";
-  std::string testname3 = "BNorm_Backward: func_check_spatial_no_grad_bwd_resultBnBiasDiff";
+  std::string testname1 = "BNorm_Backward: func_check_spatial_grad_bwd_dx";
+  std::string testname2 = "BNorm_Backward: func_check_spatial_grad_bwd_resultBnScaleDiff";
+  std::string testname3 = "BNorm_Backward: func_check_spatial_grad_bwd_resultBnBiasDiff";
   std::string filename="BNorm_backward.csv";
 
   float* temp1 = dstDataGPU.getDataFromGPU();
@@ -212,9 +212,9 @@ TEST(BNorm_Backward, func_check_BNorm_bwd_per_act_mode_grad) {
   std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
 
   std::string strt = "./result_unittest.csv";
-  std::string testname1 = "BNorm_Backward: func_check_spatial_no_grad_bwd_dx";
-  std::string testname2 = "BNorm_Backward: func_check_spatial_no_grad_bwd_resultBnScaleDiff";
-  std::string testname3 = "BNorm_Backward: func_check_spatial_no_grad_bwd_resultBnBiasDiff";
+  std::string testname1 = "BNorm_Backward: func_check_BNorm_bwd_per_act_mode_grad_bwd_dx";
+  std::string testname2 = "BNorm_Backward: func_check_BNorm_bwd_per_act_mode_grad_bwd_resultBnScaleDiff";
+  std::string testname3 = "BNorm_Backward: func_check_BNorm_bwd_per_act_mode_grad_bwd_resultBnBiasDiff";
   std::string filename="BNorm_backward.csv";
 
   float* temp1 = dstDataGPU.getDataFromGPU();
