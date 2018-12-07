@@ -1,8 +1,5 @@
 #include "test_convolution_backward_data.hpp"
 
-//This test currently fails in NVidia, so it has been commented
-
-
 TEST(convolution_bwd_data, func_check_backward_conv_data) {
 
   Desc inputDesc(1, 3, 30, 30);
