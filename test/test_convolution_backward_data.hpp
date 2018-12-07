@@ -72,12 +72,12 @@ void compute_hipdnn_conv_backward_data(convulution_Size &c, dataType *src,
   hipdnnConvolutionBwdDataAlgoPerf_t algoPerf_bd[MaxAlgoCount];
 
   checkHIPDNN(hipdnnGetConvolutionBackwardDataWorkspaceSize(hipdnn, filt_desc,
-                              in_desc, conv_desc, out_desc, algo_bd, &ws_size));
+                              out_desc, conv_desc, in_desc, algo_bd, &ws_size));
 
   hipMalloc(&ws_data, ws_size);
 
   hipdnnFindConvolutionBackwardDataAlgorithmEx(hipdnn, filt_desc, weights,
-                          in_desc, src, conv_desc, out_desc, dst, MaxAlgoCount,
+                          out_desc, dst, conv_desc, in_desc, src, MaxAlgoCount,
                           &calgo, algoPerf_bd, ws_data, ws_size);
 
   algo_bd = algoPerf_bd[0].algo;
@@ -92,7 +92,7 @@ void compute_hipdnn_conv_backward_data(convulution_Size &c, dataType *src,
 
         checkHIPDNN(hipdnnConvolutionBackwardData( hipdnn, &alpha, filt_desc,
                                weights, out_desc, dst, conv_desc, algo_bd,
-                               ws_data, ws_size, &beta, out_desc, grad));
+                               ws_data, ws_size, &beta, in_desc, grad));
 
         hipDeviceSynchronize();
 
