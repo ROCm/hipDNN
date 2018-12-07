@@ -2,7 +2,7 @@
 
 //This test currently fails in NVidia, so it has been commented
 
-/*
+
 TEST(convolution_bwd_data, func_check_backward_conv_data) {
 
   Desc inputDesc(1, 3, 30, 30);
@@ -16,7 +16,7 @@ TEST(convolution_bwd_data, func_check_backward_conv_data) {
   Desc outputDesc = calculate_Dims(inputDesc, filterDesc, pad, stride,dil);
 
   Memory<float> srcData = createMemory<float>(inputDesc);
-  Memory<float> gradData = createMemory<float>(outputDesc);
+  Memory<float> gradData = createMemory<float>(inputDesc);
   Memory<float> dstDataGPU = createMemory<float>(outputDesc);
   Memory<float> filterData = createMemory<float>(filterDesc);
 
@@ -43,12 +43,12 @@ TEST(convolution_bwd_data, func_check_backward_conv_data) {
   std::string testname = "convolution_bwd_data:func_check_backward_conv_img";
   std::string filename="convolution_bwd_data.csv";
 
-  float* temp = dstDataGPU.getDataFromGPU();
+  float* temp = gradData.getDataFromGPU();
   std::string str  = convert_to_string((float*)temp,
-                                       (int)dstDataGPU.get_num_elements());
+                                       (int)gradData.get_num_elements());
 
   write_to_csv(strt, str, testname,avg_time, str_ip_size, str_k_size, str_op_size);
-  dump_result_csv(filename, testname, temp, (int)dstDataGPU.get_num_elements());
+  dump_result_csv(filename, testname, temp, (int)gradData.get_num_elements());
 }
 
 TEST(convolution_bwd_img, func_bwd_conv_batch8) {
@@ -64,7 +64,7 @@ TEST(convolution_bwd_img, func_bwd_conv_batch8) {
   Desc outputDesc = calculate_Dims(inputDesc, filterDesc, pad, stride,dil);
 
   Memory<float> srcData = createMemory<float>(inputDesc);
-  Memory<float> gradData = createMemory<float>(outputDesc);
+  Memory<float> gradData = createMemory<float>(inputDesc);
   Memory<float> dstDataGPU = createMemory<float>(outputDesc);
   Memory<float> filterData = createMemory<float>(filterDesc);
 
@@ -90,13 +90,13 @@ TEST(convolution_bwd_img, func_bwd_conv_batch8) {
   std::string strt = "./result_unittest.csv";
   std::string testname = "convolution_bwd_data:func_bwd_conv_batch8";
   std::string filename="convolution_bwd_data.csv";
-  float* temp = dstDataGPU.getDataFromGPU();
+  float* temp = gradData.getDataFromGPU();
 
   std::string str  = convert_to_string((float*)temp,
-                                       (int)dstDataGPU.get_num_elements());
+                                       (int)gradData.get_num_elements());
 
   write_to_csv(strt, str, testname,avg_time, str_ip_size, str_k_size, str_op_size);
-  dump_result_csv(filename, testname, temp, (int)dstDataGPU.get_num_elements());
+  dump_result_csv(filename, testname, temp, (int)gradData.get_num_elements());
 }
 
 TEST(convolution_bwd_img, func_bwd_conv_batch16) {
@@ -113,7 +113,7 @@ TEST(convolution_bwd_img, func_bwd_conv_batch16) {
   Desc outputDesc = calculate_Dims(inputDesc, filterDesc, pad, stride,dil);
 
   Memory<float> srcData = createMemory<float>(inputDesc);
-  Memory<float> gradData = createMemory<float>(outputDesc);
+  Memory<float> gradData = createMemory<float>(inputDesc);
   Memory<float> dstDataGPU = createMemory<float>(outputDesc);
   Memory<float> filterData = createMemory<float>(filterDesc);
 
@@ -139,12 +139,12 @@ TEST(convolution_bwd_img, func_bwd_conv_batch16) {
   std::string strt = "./result_unittest.csv";
   std::string testname = "convolution_bwd_data:func_bwd_conv_batch16";
   std::string filename="convolution_bwd_data.csv";
-  float* temp = dstDataGPU.getDataFromGPU();
+  float* temp = gradData.getDataFromGPU();
 
-  std::string str  = convert_to_string((float*)temp,(int)dstDataGPU.get_num_elements());
+  std::string str  = convert_to_string((float*)temp,(int)gradData.get_num_elements());
 
   write_to_csv(strt, str, testname,avg_time, str_ip_size, str_k_size, str_op_size);
-  dump_result_csv(filename, testname, temp, (int)dstDataGPU.get_num_elements());
+  dump_result_csv(filename, testname, temp, (int)gradData.get_num_elements());
 }
 
 TEST(convolution_bwd_img, func_bwd_conv_batch64_pad) {
@@ -160,7 +160,7 @@ TEST(convolution_bwd_img, func_bwd_conv_batch64_pad) {
   Desc outputDesc = calculate_Dims(inputDesc, filterDesc, pad, stride,dil);
 
   Memory<float> srcData = createMemory<float>(inputDesc);
-  Memory<float> gradData = createMemory<float>(outputDesc);
+  Memory<float> gradData = createMemory<float>(inputDesc);
   Memory<float> dstDataGPU = createMemory<float>(outputDesc);
   Memory<float> filterData = createMemory<float>(filterDesc);
 
@@ -186,12 +186,12 @@ TEST(convolution_bwd_img, func_bwd_conv_batch64_pad) {
   std::string strt = "./result_unittest.csv";
   std::string testname = "convolution_bwd_img:func_bwd_conv_batch64_pad";
   std::string filename="convolution_bwd_data.csv";
-  float* temp = dstDataGPU.getDataFromGPU();
+  float* temp = gradData.getDataFromGPU();
 
-  std::string str  = convert_to_string((float*)temp,(int)dstDataGPU.get_num_elements());
+  std::string str  = convert_to_string((float*)temp,(int)gradData.get_num_elements());
 
   write_to_csv(strt, str, testname,avg_time, str_ip_size, str_k_size, str_op_size);
-  dump_result_csv(filename, testname, temp, (int)dstDataGPU.get_num_elements());
+  dump_result_csv(filename, testname, temp, (int)gradData.get_num_elements());
 }
 
 TEST(convolution_bwd_img, func_bwd_conv_batch128_pad1_stride3) {
@@ -207,7 +207,7 @@ TEST(convolution_bwd_img, func_bwd_conv_batch128_pad1_stride3) {
   Desc outputDesc = calculate_Dims(inputDesc, filterDesc, pad, stride,dil);
 
   Memory<float> srcData = createMemory<float>(inputDesc);
-  Memory<float> gradData = createMemory<float>(outputDesc);
+  Memory<float> gradData = createMemory<float>(inputDesc);
   Memory<float> dstDataGPU = createMemory<float>(outputDesc);
   Memory<float> filterData = createMemory<float>(filterDesc);
 
@@ -233,11 +233,10 @@ TEST(convolution_bwd_img, func_bwd_conv_batch128_pad1_stride3) {
   std::string strt = "./result_unittest.csv";
   std::string testname = "convolution_bwd_data:func_bwd_conv_batch128_pad1_stride3";
   std::string filename="convolution_bwd_data.csv";
-  float* temp = dstDataGPU.getDataFromGPU();
+  float* temp = gradData.getDataFromGPU();
 
-  std::string str  = convert_to_string((float*)temp,(int)dstDataGPU.get_num_elements());
+  std::string str  = convert_to_string((float*)temp,(int)gradData.get_num_elements());
 
   write_to_csv(strt, str, testname,avg_time, str_ip_size, str_k_size, str_op_size);
-  dump_result_csv(filename, testname, temp, (int)dstDataGPU.get_num_elements());
+  dump_result_csv(filename, testname, temp, (int)gradData.get_num_elements());
 }
-*/
