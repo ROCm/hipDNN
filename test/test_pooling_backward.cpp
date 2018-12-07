@@ -1,4 +1,4 @@
-#include "test_pooling_backward.hpp"
+#include "test_pooling_common.hpp"
 
 TEST(pooling_backward, func_check_pooling_stride_2x2) {
 
@@ -25,7 +25,7 @@ TEST(pooling_backward, func_check_pooling_stride_2x2) {
   std::string str_k_size  = convert_to_string((int*)k_size,4);
   std::string str_op_size  = convert_to_string((int*)op_size,4);
 
-  compute_hipdnn_pooling_backward(test_case, dataSrc.gpu(), dataGrad.gpu(),
+  hipdnn_pooling_backward(test_case, dataSrc.gpu(), dataGrad.gpu(),
                                   dataDst.gpu(), &avg_time);
 
   std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
@@ -71,7 +71,7 @@ TEST(pooling_backward, func_check_pooling_batch32) {
   std::string str_k_size  = convert_to_string((int*)k_size,4);
   std::string str_op_size  = convert_to_string((int*)op_size,4);
 
-  compute_hipdnn_pooling_backward(test_case, dataSrc.gpu(), dataGrad.gpu(),
+  hipdnn_pooling_backward(test_case, dataSrc.gpu(), dataGrad.gpu(),
                                   dataDst.gpu(), &avg_time);
 
   float* temp = dataGrad.getDataFromGPU();
@@ -116,7 +116,7 @@ TEST(pooling_backward, func_check_pooling_batch64) {
   std::string str_k_size  = convert_to_string((int*)k_size,4);
   std::string str_op_size  = convert_to_string((int*)op_size,4);
 
-  compute_hipdnn_pooling_backward(test_case, dataSrc.gpu(), dataGrad.gpu(),
+  hipdnn_pooling_backward(test_case, dataSrc.gpu(), dataGrad.gpu(),
                                   dataDst.gpu(), &avg_time);
 
   std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
@@ -160,7 +160,7 @@ TEST(pooling_backward, func_check_pooling_batch128) {
   std::string str_k_size  = convert_to_string((int*)k_size,4);
   std::string str_op_size  = convert_to_string((int*)op_size,4);
 
-  compute_hipdnn_pooling_backward(test_case, dataSrc.gpu(), dataGrad.gpu(),
+  hipdnn_pooling_backward(test_case, dataSrc.gpu(), dataGrad.gpu(),
                                   dataDst.gpu(), &avg_time);
 
   std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
