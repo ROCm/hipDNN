@@ -40,9 +40,10 @@ void compute_hipdnn_conv_backward_data(convulution_Size &c, dataType *src,
       out_desc, HIPDNN_TENSOR_NCHW, HIPDNN_DATA_FLOAT, c.mb, c.oc, c.oh, c.ow));
 
   hipdnnConvolutionFwdAlgo_t algo;
+  algo = HIPDNN_CONVOLUTION_FWD_ALGO_IMPLICIT_GEMM;
 
   int MaxAlgoCount = 5;
-  size_t ws_size;
+  size_t ws_size = 0;
   float *ws_data;
   int calgo;
 
@@ -66,7 +67,7 @@ void compute_hipdnn_conv_backward_data(convulution_Size &c, dataType *src,
                                        weights, conv_desc, algo, ws_data,
                                        ws_size, &beta, out_desc, dst));
 
-  hipdnnConvolutionBwdDataAlgo_t algo_bd;
+  hipdnnConvolutionBwdDataAlgo_t algo_bd = HIPDNN_CONVOLUTION_BWD_DATA_ALGO_0;
   ws_size =0;
 
   hipdnnConvolutionBwdDataAlgoPerf_t algoPerf_bd[MaxAlgoCount];
