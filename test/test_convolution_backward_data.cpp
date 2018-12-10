@@ -37,7 +37,7 @@ TEST(convolution_bwd_data, func_check_backward_conv_data) {
            filterData.gpu(), gradData.gpu(), NULL, dstDataGPU.gpu(), &avg_time);
 
   std::string strt = "./result_unittest.csv";
-  std::string testname = "convolution_bwd_data:func_check_backward_conv_img";
+  std::string testname = "convolution_bwd_data:func_check_backward_conv_data";
   std::string filename="convolution_bwd_data.csv";
 
   float* temp = gradData.getDataFromGPU();
@@ -48,7 +48,7 @@ TEST(convolution_bwd_data, func_check_backward_conv_data) {
   dump_result_csv(filename, testname, temp, (int)gradData.get_num_elements());
 }
 
-TEST(convolution_bwd_img, func_bwd_conv_batch8) {
+TEST(convolution_bwd_data, func_bwd_conv_batch8) {
 
   Desc inputDesc(8, 3, 3, 3);
   Desc filterDesc(8, 3, 2, 2);
@@ -96,7 +96,7 @@ TEST(convolution_bwd_img, func_bwd_conv_batch8) {
   dump_result_csv(filename, testname, temp, (int)gradData.get_num_elements());
 }
 
-TEST(convolution_bwd_img, func_bwd_conv_batch16) {
+TEST(convolution_bwd_data, func_bwd_conv_batch16) {
 
   Desc inputDesc(16, 3, 3, 3);
   Desc filterDesc(16, 3, 2, 2);
@@ -144,7 +144,7 @@ TEST(convolution_bwd_img, func_bwd_conv_batch16) {
   dump_result_csv(filename, testname, temp, (int)gradData.get_num_elements());
 }
 
-TEST(convolution_bwd_img, func_bwd_conv_batch64_pad) {
+TEST(convolution_bwd_data, func_bwd_conv_batch64_pad) {
 
   Desc inputDesc(64, 3, 3, 3);
   Desc filterDesc(64, 3, 2, 2);
@@ -181,7 +181,7 @@ TEST(convolution_bwd_img, func_bwd_conv_batch64_pad) {
           filterData.gpu(), gradData.gpu(), NULL, dstDataGPU.gpu(), &avg_time);
 
   std::string strt = "./result_unittest.csv";
-  std::string testname = "convolution_bwd_img:func_bwd_conv_batch64_pad";
+  std::string testname = "convolution_bwd_data:func_bwd_conv_batch64_pad";
   std::string filename="convolution_bwd_data.csv";
   float* temp = gradData.getDataFromGPU();
 
@@ -191,7 +191,7 @@ TEST(convolution_bwd_img, func_bwd_conv_batch64_pad) {
   dump_result_csv(filename, testname, temp, (int)gradData.get_num_elements());
 }
 
-TEST(convolution_bwd_img, func_bwd_conv_batch128_pad1_stride3) {
+TEST(convolution_bwd_data, func_bwd_conv_batch128_pad1_stride3) {
 
   Desc inputDesc(128, 3, 3, 3);
   Desc filterDesc(128, 3, 2, 2);
