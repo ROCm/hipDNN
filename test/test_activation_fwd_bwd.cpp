@@ -1,5 +1,4 @@
-#include "test_activation_backward.hpp"
-#include "test_activation_forward.hpp"
+#include "test_activation_common.hpp"
 
 TEST(activation_fwd_bwd, func_test_int_activation) {
 

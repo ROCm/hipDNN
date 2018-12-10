@@ -1,4 +1,4 @@
-#include "test_activation_backward.hpp"
+#include "test_activation_common.hpp"
 
 TEST(activation_backward, func_test_naive_activation) {
 
