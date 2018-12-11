@@ -1,11 +1,8 @@
 #include "fusion_api.hpp"
 
-//This test currently fails in NVidia, so it has been commented
+TEST(fusion_api, func_check_fusion_api_CBA) {
 
-/*
-TEST(fusion_api, func_check_fusion_api) {
-
-  float avg_time = 0, avg_time1 = 0, avg_time2 = 0;
+  float avg_time = 0;
 
   Desc inputDesc(1, 3, 5, 5);
   Desc filterDesc(1, 3, 3, 3);
@@ -48,7 +45,7 @@ TEST(fusion_api, func_check_fusion_api) {
   std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
 
   std::string strt = "./result_unittest.csv";
-  std::string testname = "fusion_api: func_check_fusion_api";
+  std::string testname = "fusion_api: func_check_fusion_api_CBA";
   std::string filename="fusion_CBA.csv";
 
   float* temp = dstDataGPU.getDataFromGPU();
@@ -60,4 +57,3 @@ TEST(fusion_api, func_check_fusion_api) {
   dump_result_csv(filename, testname, temp, (int)dstDataGPU.get_num_elements());
 
 }
-*/
