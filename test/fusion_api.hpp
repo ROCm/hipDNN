@@ -103,8 +103,24 @@ void compute_hipdnn_fusion_api(convulution_Size &c, dataType *src,
   checkHIPDNN(hipdnnSetOpArgsActivForward(args, activOp, &alphaA, &betaA,
               reluCeilingOrAlpha, activBeta, activExp));
 
-  checkHIPDNN(hipdnnExecuteFusionPlan( hipdnn, fusePlanDesc, in_desc, src,
+  high_resolution_timer_t timer;
+  std::vector<double> time_vector(benchmark_iterations, 0);
+
+  for (int i = 0; i < benchmark_iterations; i++) {
+
+      timer.restart();
+
+      checkHIPDNN(hipdnnExecuteFusionPlan( hipdnn, fusePlanDesc, in_desc, src,
               out_desc, dst, args));
+      hipDeviceSynchronize();
+
+      std::uint64_t time_elapsed = timer.elapsed_nanoseconds();
+      time_vector[i] = (double)time_elapsed / 1000;
+    }
+
+  *avg_time = (float)std::accumulate(time_vector.begin() + 10,
+                                     time_vector.end(), 0)
+                                     / (benchmark_iterations - 10);
 
   hipdnnDestroyTensorDescriptor(in_desc);
   hipdnnDestroyFilterDescriptor(filt_desc);
