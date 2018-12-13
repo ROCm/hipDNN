@@ -45,7 +45,7 @@ void compute_hipdnn_LRN_fwd(LRN_params_t &d, dataType *src, dataType *dst,
                                      lrn_beta, lrn_k));
 
   float lrn_blendAlpha = 1.f;
-  float lrn_blendBeta = 0f;
+  float lrn_blendBeta = 0.5;
 
   high_resolution_timer_t timer;
 
