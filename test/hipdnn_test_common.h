@@ -56,8 +56,7 @@ public:
     this->h_data = (dataType *)malloc(this->mem_size);
     memset(h_data, 0, this->mem_size);
     HIP_CALL(hipMalloc((void **)&this->d_data, this->mem_size));
-	//std::cout << "Memsetting" << std::endl;
-//    HIP_CALL(hipMemset((void **)&this->d_data, 0, this->mem_size));
+    HIP_CALL(hipMemset(this->d_data, 0, this->mem_size));
   }
   dataType *cpu() { return this->h_data; }
 
