@@ -2061,6 +2061,7 @@ hipdnnStatus_t hipdnnLRNCrossChannelForward(
         workSpaceSize =
             sDescToWorkspaceLRNSize[(miopenTensorDescriptor_t)yDesc];
     }
+    void *dwPrior = SaveAsPriorBuffer(y);
 
     CHECK_MIO(miopenLRNForward((miopenHandle_t)handle,
                                (miopenLRNDescriptor_t)normDesc, alpha,
@@ -2068,6 +2069,9 @@ hipdnnStatus_t hipdnnLRNCrossChannelForward(
                                (miopenTensorDescriptor_t)yDesc, y,
                                true,    // bool do_backward, //HGSOS
                                devptr)); // HGSOS //NOTYET no workspace size
+
+    CHECK_HIPDNN(hipdnnAddTensor(handle, beta, yDesc, dwPrior, alpha, yDesc, y ));
+	deallocPrior(dwPrior);
 
     return HIPDNN_STATUS_SUCCESS;
 }
@@ -2155,11 +2159,18 @@ hipdnnStatus_t hipdnnLRNCrossChannelBackwardEx(
 
     CHECK_HIPDNN(hipTomiopenLRNMode(lrnMode, &mimode));
     // mimode is otherwise unused.
+
+	void *dwPrior = SaveAsPriorBuffer(dx);
+
     CHECK_MIO(miopenLRNBackward(
         (miopenHandle_t)handle, (miopenLRNDescriptor_t)normDesc, alpha,
         (miopenTensorDescriptor_t)yDesc, y, (miopenTensorDescriptor_t)dyDesc,
         dy, (miopenTensorDescriptor_t)xDesc, x, beta,
         (miopenTensorDescriptor_t)dxDesc, dx, workspace));
+
+	CHECK_HIPDNN(hipdnnAddTensor(handle, beta, dxDesc, dwPrior, alpha, dxDesc, dx ));
+	deallocPrior(dwPrior);
+
     return HIPDNN_STATUS_SUCCESS;
 }
 
