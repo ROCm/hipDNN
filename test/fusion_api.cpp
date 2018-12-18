@@ -10,6 +10,7 @@ TEST(fusion_api, func_check_fusion_api_CBA) {
   int pad[2] = {0, 0};    // zero padding
   int stride[2] = {1, 1}; // stride 1
   int dil[2] = {1,1};
+  float bias = 2;
 
   Desc outputDesc =
         calculate_Dims(inputDesc, filterDesc, pad, stride, dil);
@@ -21,7 +22,8 @@ TEST(fusion_api, func_check_fusion_api_CBA) {
 
   populateMemoryRandom<float>(srcDataConv);
   populateMemoryRandom<float>(filterData);
-  populateMemoryRandom<float>(biasData);
+  populateMemory<float>(biasData, bias);
+
 
   convulution_Size testConvolutionSizes(
                     inputDesc.N, 1, inputDesc.C, inputDesc.H,
