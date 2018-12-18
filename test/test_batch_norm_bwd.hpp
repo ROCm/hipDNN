@@ -25,7 +25,7 @@ template <typename dataType>
 void compute_hipdnn_batchnorm_bwd(BNorm_params_t &d, dataType *src,
                                 dataType *dx, dataType *resultBnScaleDiff,
                                 dataType *resultBnBiasDiff, float *avg_time,
-                                int flag) {
+                                int mode, int acc_grad) {
 
   hipdnnHandle_t hipdnn;
   checkHIPDNN(hipdnnCreate(&hipdnn));
@@ -50,12 +50,9 @@ void compute_hipdnn_batchnorm_bwd(BNorm_params_t &d, dataType *src,
 
   hipdnnBatchNormMode_t bn_modeT_back;
 
-  if (flag == 0 || flag == 2)
-
+  if (mode == 0)
       bn_modeT_back = HIPDNN_BATCHNORM_SPATIAL;
-
   else
-
       bn_modeT_back = HIPDNN_BATCHNORM_PER_ACTIVATION;
 
   checkHIPDNN(hipdnnDeriveBNTensorDescriptor(bnScaleBiasDiffDesc,
@@ -124,7 +121,7 @@ void compute_hipdnn_batchnorm_bwd(BNorm_params_t &d, dataType *src,
                       resultBnBiasDiff, epsilonT_back, savedMean,
                       savedInvVariance));
 
-        if (flag == 2 || flag == 3)
+        if (acc_grad == 1)
            {
               betaDataDiff = 1.f;
               betaParamDiff = 1.f;
