@@ -6,6 +6,12 @@
 #include "gtest/gtest.h"
 #include "common.hpp"
 
+
+__global__ void dev_iota3(hipLaunchParm lp, float *px) {
+  int tid = hipThreadIdx_x + hipBlockIdx_x * hipBlockDim_x;
+  px[tid] = tid + 1;
+}
+
 template <typename dataType>
 void compute_hipdnn_LRN_backward(LRN_params_t &d, dataType *src, dataType *grad,
                                 dataType *dst, float *avg_time) {
@@ -44,20 +50,11 @@ void compute_hipdnn_LRN_backward(LRN_params_t &d, dataType *src, dataType *grad,
   checkHIPDNN(hipdnnLRNCrossChannelForward( hipdnn, lrn_desc, lrn_mode,
                 &lrn_blendAlpha, in_desc, src, &lrn_blendBeta, out_desc, dst));
 
-  hipdnnTensorDescriptor_t dy_desc;
-  checkHIPDNN(hipdnnCreateTensorDescriptor(&dy_desc));
-  checkHIPDNN(hipdnnSetTensor4dDescriptor(
-          dy_desc, HIPDNN_TENSOR_NCHW, HIPDNN_DATA_FLOAT,
-          d.mb, d.ic, d.ih, d.iw));
 
-  float* dy; // passed as input
-  HIP_CALL(hipMalloc(&dy, d.mb*d.ic*d.ih*d.iw*sizeof(float)));
-  hipLaunchKernel(dev_const, d.mb*d.ic, d.ih*d.iw, 0, 0 ,dy ,1.f);
-  hipdnnTensorDescriptor_t grad_desc;
-  checkHIPDNN(hipdnnCreateTensorDescriptor(&grad_desc));
-  checkHIPDNN(hipdnnSetTensor4dDescriptor(
-          grad_desc, HIPDNN_TENSOR_NCHW, HIPDNN_DATA_FLOAT,
-          d.mb, d.ic, d.ih, d.iw));
+  float* dx; // passed as input
+  HIP_CALL(hipMalloc(&dx, d.mb*d.ic*d.ih*d.iw*sizeof(float)));
+  hipLaunchKernel(dev_iota3, d.ih*d.iw, d.mb*d.ic, 0, 0 ,dx);
+
 
   high_resolution_timer_t timer;
 
@@ -68,8 +65,8 @@ void compute_hipdnn_LRN_backward(LRN_params_t &d, dataType *src, dataType *grad,
         timer.restart();
 
         checkHIPDNN(hipdnnLRNCrossChannelBackward( hipdnn, lrn_desc, lrn_mode,
-                   &lrn_blendAlpha, out_desc, dst, dy_desc, dy, in_desc, src,
-                   &lrn_blendBeta, grad_desc, grad));
+                   &lrn_blendAlpha, in_desc, src, out_desc, dst, in_desc, dx,
+                   &lrn_blendBeta, in_desc, grad));
 
         hipDeviceSynchronize();
 
@@ -81,11 +78,9 @@ void compute_hipdnn_LRN_backward(LRN_params_t &d, dataType *src, dataType *grad,
                                     0) / (benchmark_iterations - 10);
 
   // finalizing
-  hipFree(dy);
+  hipFree(dx);
   hipdnnDestroyTensorDescriptor(out_desc);
   hipdnnDestroyLRNDescriptor(lrn_desc);
-  hipdnnDestroyTensorDescriptor(dy_desc);
-  hipdnnDestroyTensorDescriptor(grad_desc);
   hipdnnDestroyTensorDescriptor(in_desc);
   hipdnnDestroy(hipdnn);
 
