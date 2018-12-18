@@ -9,6 +9,7 @@ void compute_hipdnn_fusion_api(convulution_Size &c, dataType *src,
                              dataType *weights, dataType *bias_data,
                              dataType *dst, float *avg_time) {
 
+
   hipdnnHandle_t hipdnn;
   checkHIPDNN(hipdnnCreate(&hipdnn));
 
@@ -29,7 +30,7 @@ void compute_hipdnn_fusion_api(convulution_Size &c, dataType *src,
   checkHIPDNN(hipdnnCreateConvolutionDescriptor(&conv_desc));
   checkHIPDNN(hipdnnSetConvolution2dDescriptor(
           conv_desc, c.padh, c.padw, c.strh, c.strw, c.dilh, c.dilw,
-          HIPDNN_CONVOLUTION, HIPDNN_DATA_FLOAT));
+          HIPDNN_CROSS_CORRELATION, HIPDNN_DATA_FLOAT));
 
   checkHIPDNN(hipdnnGetConvolution2dForwardOutputDim(
           conv_desc, in_desc, filt_desc,
@@ -63,7 +64,7 @@ void compute_hipdnn_fusion_api(convulution_Size &c, dataType *src,
           c.mb, c.oc , c.oh, c.ow));
 
   float alphaB = 1.f;
-  float betaB = 0.f;
+  float betaB = 1.f;
   checkHIPDNN(hipdnnAddTensor(hipdnn, &alphaB, bias_desc, bias_data, &betaB,
                               out_desc, dst));
 
@@ -89,7 +90,6 @@ void compute_hipdnn_fusion_api(convulution_Size &c, dataType *src,
   hipdnnFusionOpDescriptor_t convOp;
   hipdnnFusionOpDescriptor_t biasOp;
   hipdnnFusionOpDescriptor_t activOp;
-  hipdnnFusionOpDescriptor_t bnOp;
 
   checkHIPDNN(hipdnnCreateOpConvForward( fusePlanDesc, &convOp, conv_desc, filt_desc));
   checkHIPDNN(hipdnnCreateOpBiasForward(fusePlanDesc, &biasOp, bias_desc));
@@ -104,23 +104,24 @@ void compute_hipdnn_fusion_api(convulution_Size &c, dataType *src,
               reluCeilingOrAlpha, activBeta, activExp));
 
   high_resolution_timer_t timer;
-  std::vector<double> time_vector(benchmark_iterations, 0);
+  std::vector<double> time_vector(1, 0);
 
-  for (int i = 0; i < benchmark_iterations; i++) {
+  for (int i = 0; i < 1; i++) {
 
       timer.restart();
 
       checkHIPDNN(hipdnnExecuteFusionPlan( hipdnn, fusePlanDesc, in_desc, src,
               out_desc, dst, args));
+
       hipDeviceSynchronize();
 
       std::uint64_t time_elapsed = timer.elapsed_nanoseconds();
       time_vector[i] = (double)time_elapsed / 1000;
+
     }
 
-  *avg_time = (float)std::accumulate(time_vector.begin() + 10,
-                                     time_vector.end(), 0)
-                                     / (benchmark_iterations - 10);
+  *avg_time = (float)std::accumulate(time_vector.begin(),
+                            time_vector.end(), 0) / (benchmark_iterations);
 
   hipdnnDestroyTensorDescriptor(in_desc);
   hipdnnDestroyFilterDescriptor(filt_desc);
