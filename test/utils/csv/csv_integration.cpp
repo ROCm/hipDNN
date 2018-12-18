@@ -44,8 +44,18 @@ void dump_result_csv(std::string filename, std::string testname, float* output,
         std::cerr << strerror(errno) << std::endl;
 
   else
+      {
         std::cout << "Directory created \n";
-
+        static int device = 0;
+        hipSetDevice(device);
+        hipDeviceProp_t props;
+        hipGetDeviceProperties(&props, device /*deviceID*/);
+        std::cout<<"info: running on device" << props.name << std::endl;
+        std::ofstream file;
+        file.open ("device.txt");
+        file << props.name;
+        file.close();
+      }
   std::string file_path = "./results_csv/" + filename;
 
   std::fstream fs2;
