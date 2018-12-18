@@ -2,10 +2,10 @@
 
 TEST(LRN_fwd, func_check_naive_LRN) {
 
-  Desc inputDesc(1, 3, 7, 7);
+  Desc inputDesc(1, 3, 6, 6);
   float avg_time = 0;
 
-  Desc outputDesc(1, 3, 7, 7);
+  Desc outputDesc(1, 3, 6, 6);
 
   Memory<float> srcData = createMemory<float>(inputDesc);
   Memory<float> dstDataGPU = createMemory<float>(outputDesc);
@@ -123,10 +123,10 @@ TEST(LRN_fwd, func_check_LRN_batch32) {
 
 TEST(LRN_fwd, func_check_LRN_batch64) {
 
-  Desc inputDesc(64, 3, 7, 7);
+  Desc inputDesc(64, 3, 6, 6);
   float avg_time = 0;
 
-  Desc outputDesc(64, 3, 7, 7);
+  Desc outputDesc(64, 3, 6, 6);
 
   Memory<float> srcData = createMemory<float>(inputDesc);
   Memory<float> dstDataGPU = createMemory<float>(outputDesc);
@@ -164,10 +164,10 @@ TEST(LRN_fwd, func_check_LRN_batch64) {
 
 TEST(LRN_fwd, func_check_LRN_batch128) {
 
-  Desc inputDesc(128, 3, 7, 7);
+  Desc inputDesc(128, 3, 6, 6);
   float avg_time = 0;
 
-  Desc outputDesc(128, 3, 7, 7);
+  Desc outputDesc(128, 3, 6, 6);
 
   Memory<float> srcData = createMemory<float>(inputDesc);
   Memory<float> dstDataGPU = createMemory<float>(outputDesc);
