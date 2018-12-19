@@ -11,6 +11,15 @@ nvcc_folder = sys.argv[2]
 hcc_result = sys.argv[3]
 nvcc_result = sys.argv[4]
 
+hcc_dev = sys.argv[5]
+nvcc_dev = sys.argv[6]
+
+with open(hcc_dev, 'r') as myfile1:
+  data1 = myfile1.read()
+
+with open(nvcc_dev, 'r') as myfile2:
+  data2 = myfile2.read()
+
 reader1 = csv.DictReader(open(hcc_result, 'r'))
 amd_op = []
 for line1 in reader1:
@@ -21,11 +30,13 @@ nv_op = []
 for line2 in reader2:
     nv_op.append(line2)
 
+string1 = 'Performance in '+str(data2)+' (microseconds)'
+string2 = 'Performance in '+str(data1)+' (microseconds)'
+string3 = str(data1)+' vs '+str(data2)+' speedup'
 csvfile = open('final_results.csv', 'w+')
 
 fieldnames = ['TestName','Results','Input size', 'kernel size',
-              'output size', 'Performance in Nvidia (microseconds)',
-              'Performance in AMD (microseconds)','AMD vs NVidia speedup']
+              'output size', string1, string2, string3]
 
 writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
 writer.writeheader()
@@ -82,9 +93,9 @@ for filename1 in os.listdir(hcc_folder):
                                                  'Input size':op3['Input size'],
                                                  'kernel size':op3['kernel size'],
                                                  'output size':op3['output size'],
-                                                 'Performance in Nvidia (microseconds)': op4['Average Excecution Time (microseconds)'],
-                                                 'Performance in AMD (microseconds)': op3['Average Excecution Time (microseconds)'],
-                                                 'AMD vs NVidia speedup':(float)(float(op3['Average Excecution Time (microseconds)'])/
+                                                 string1: op4['Average Excecution Time (microseconds)'],
+                                                 string2: op3['Average Excecution Time (microseconds)'],
+                                                 string3:(float)(float(op3['Average Excecution Time (microseconds)'])/
                                                                                 float(op4['Average Excecution Time (microseconds)']))})
                                  cnt_p = cnt_p + 1
                               else:
@@ -104,9 +115,9 @@ for filename1 in os.listdir(hcc_folder):
                                                   'Input size':op3['Input size'],
                                                   'kernel size':op3['kernel size'],
                                                   'output size':op3['output size'],
-                                                  'Performance in Nvidia (microseconds)': op4['Average Excecution Time (microseconds)'],
-                                                  'Performance in AMD (microseconds)': op3['Average Excecution Time (microseconds)'],
-                                                  'AMD vs NVidia speedup':(float)(float(op3['Average Excecution Time (microseconds)'])/
+                                                  string1: op4['Average Excecution Time (microseconds)'],
+                                                  string2: op3['Average Excecution Time (microseconds)'],
+                                                  string3:(float)(float(op3['Average Excecution Time (microseconds)'])/
                                                                                   float(op4['Average Excecution Time (microseconds)']))})
                               count = count + 1
                               print "\n"

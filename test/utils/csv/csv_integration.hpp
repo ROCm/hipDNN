@@ -8,6 +8,7 @@
 #include <bits/stdc++.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include "hip/hip_runtime.h"
 
 template <typename dataType>
 std::string convert_to_string(dataType *arr, int s_size) {
