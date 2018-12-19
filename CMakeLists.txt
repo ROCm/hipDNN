@@ -6,8 +6,8 @@
 cmake_minimum_required( VERSION 2.8.8 )
 
 #Set default install and package paths.
-set(CMAKE_INSTALL_PREFIX "/opt/rocm/hipdnn" CACHE STRING "Install location.")
-set(CPACK_PACKAGING_INSTALL_PREFIX "/opt/rocm/hipdnn" CACHE STRING "Package install location.")
+set(CMAKE_INSTALL_PREFIX "/opt/rocm" CACHE STRING "Install location.")
+set(CPACK_PACKAGING_INSTALL_PREFIX "/opt/rocm" CACHE STRING "Package install location.")
 
 
 project(hipdnn CXX)
