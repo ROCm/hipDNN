@@ -46,6 +46,7 @@ void compute_hipdnn_LRN_fwd(LRN_params_t &d, dataType *src, dataType *dst,
 
   float lrn_blendAlpha = 1.f;
   float lrn_blendBeta = 0.5;
+  bool do_backward = false;
 
   high_resolution_timer_t timer;
 
@@ -55,7 +56,7 @@ void compute_hipdnn_LRN_fwd(LRN_params_t &d, dataType *src, dataType *dst,
 
          timer.restart();
          checkHIPDNN(hipdnnLRNCrossChannelForward( hipdnn, lrn_desc, lrn_mode,
-                 &lrn_blendAlpha, in_desc, src, &lrn_blendBeta, out_desc, dst));
+                 &lrn_blendAlpha, in_desc, src, &lrn_blendBeta, out_desc, dst, do_backward));
 
          hipDeviceSynchronize();
 
