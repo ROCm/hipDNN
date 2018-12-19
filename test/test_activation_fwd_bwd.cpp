@@ -1,5 +1,4 @@
-#include "test_activation_backward.hpp"
-#include "test_activation_forward.hpp"
+#include "test_activation_common.hpp"
 
 TEST(activation_fwd_bwd, func_test_int_activation) {
 
@@ -17,26 +16,37 @@ TEST(activation_fwd_bwd, func_test_int_activation) {
 
   populateMemoryRandom(dataSrc);
 
-  int ip_size[4] = {test_case1.n, test_case1.channels, test_case1.height, test_case1.width};
-  int op_size[4] =  {test_case1.n, test_case1.channels, test_case1.height, test_case1.width};
+  int ip_size[4] = {test_case1.n, test_case1.channels, test_case1.height,
+                    test_case1.width};
+  int op_size[4] = {test_case1.n, test_case1.channels, test_case1.height,
+                    test_case1.width};
 
   std::string str_ip_size  = convert_to_string((int*)ip_size,4);
   std::string str_k_size  = "NIL";
   std::string str_op_size  = convert_to_string((int*)op_size,4);
 
-  compute_hipdnn_activation_forward(test_case1, dataSrc.gpu(),dataDst.gpu(),&avg_time1);
+  compute_hipdnn_activation_forward(test_case1, dataSrc.gpu(),dataDst.gpu(),
+                                    &avg_time1);
   compute_hipdnn_activation_backward(test_case2, dataSrc.gpu(), dataGrad.gpu(),
                                      dataDst.gpu(), &avg_time2);
 
-   avg_time = (avg_time1 + avg_time2);
+  avg_time = (avg_time1 + avg_time2);
 
-   std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
+  std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
 
-    float* temp2 = dataGrad.getDataFromGPU();
-    std::string strt = "./result_unittest.csv";
-    std::string testname = "activation_fwd_bwd:func_test_int_activation";
-    std::string str  = convert_to_string((float*)temp2,(int)dataGrad.get_num_elements());
-    write_to_csv(strt, str, testname, avg_time, str_ip_size, str_k_size, str_op_size);
+  float* temp2 = dataGrad.getDataFromGPU();
+
+  std::string strt = "./result_unittest.csv";
+  std::string testname = "activation_fwd_bwd:func_test_int_activation";
+  std::string filename="activation_forward_backward.csv";
+  std::string str  = convert_to_string((float*)temp2,
+                                       (int)dataGrad.get_num_elements());
+
+  write_to_csv(strt, str, testname, avg_time, str_ip_size, str_k_size,
+               str_op_size);
+
+  dump_result_csv(filename, testname, temp2, (int)dataGrad.get_num_elements());
+
 }
 
 TEST(activation_fwd_bwd, func_int_activation_batch32) {
@@ -55,26 +65,36 @@ TEST(activation_fwd_bwd, func_int_activation_batch32) {
 
   populateMemoryRandom(dataSrc);
 
-  int ip_size[4] = {test_case1.n, test_case1.channels, test_case1.height, test_case1.width};
-  int op_size[4] =  {test_case1.n, test_case1.channels, test_case1.height, test_case1.width};
+  int ip_size[4] = {test_case1.n, test_case1.channels, test_case1.height,
+                    test_case1.width};
+  int op_size[4] = {test_case1.n, test_case1.channels, test_case1.height,
+                    test_case1.width};
 
   std::string str_ip_size  = convert_to_string((int*)ip_size,4);
   std::string str_k_size  = "NIL";
   std::string str_op_size  = convert_to_string((int*)op_size,4);
 
-  compute_hipdnn_activation_forward(test_case1, dataSrc.gpu(),dataDst.gpu(),&avg_time1);
+  compute_hipdnn_activation_forward(test_case1, dataSrc.gpu(),dataDst.gpu(),
+                                    &avg_time1);
+
   compute_hipdnn_activation_backward(test_case2, dataSrc.gpu(), dataGrad.gpu(),
                                      dataDst.gpu(), &avg_time2);
 
-   avg_time = (avg_time1 + avg_time2);
+  avg_time = (avg_time1 + avg_time2);
 
-   std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
+  std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
 
-    float* temp2 = dataGrad.getDataFromGPU();
-    std::string strt = "./result_unittest.csv";
-    std::string testname = "activation_fwd_bwd:func_int_activation_batch32";
-    std::string str  = convert_to_string((float*)temp2,(int)dataGrad.get_num_elements());
-    write_to_csv(strt, str, testname, avg_time, str_ip_size, str_k_size, str_op_size);
+  float* temp2 = dataGrad.getDataFromGPU();
+  std::string strt = "./result_unittest.csv";
+  std::string testname = "activation_fwd_bwd:func_int_activation_batch32";
+  std::string filename="activation_forward_backward.csv";
+  std::string str  = convert_to_string((float*)temp2,
+                                         (int)dataGrad.get_num_elements());
+
+  write_to_csv(strt, str, testname, avg_time, str_ip_size, str_k_size,
+                 str_op_size);
+  dump_result_csv(filename, testname, temp2, (int)dataGrad.get_num_elements());
+
 }
 
 TEST(activation_fwd_bwd, func_int_activation_batch64) {
@@ -93,26 +113,36 @@ TEST(activation_fwd_bwd, func_int_activation_batch64) {
 
   populateMemoryRandom(dataSrc);
 
-  int ip_size[4] = {test_case1.n, test_case1.channels, test_case1.height, test_case1.width};
-  int op_size[4] =  {test_case1.n, test_case1.channels, test_case1.height, test_case1.width};
+  int ip_size[4] = {test_case1.n, test_case1.channels, test_case1.height,
+                    test_case1.width};
+  int op_size[4] =  {test_case1.n, test_case1.channels, test_case1.height,
+                     test_case1.width};
 
   std::string str_ip_size  = convert_to_string((int*)ip_size,4);
   std::string str_k_size  = "NIL";
   std::string str_op_size  = convert_to_string((int*)op_size,4);
 
-  compute_hipdnn_activation_forward(test_case1, dataSrc.gpu(),dataDst.gpu(),&avg_time1);
+  compute_hipdnn_activation_forward(test_case1, dataSrc.gpu(),dataDst.gpu(),
+                                    &avg_time1);
+
   compute_hipdnn_activation_backward(test_case2, dataSrc.gpu(), dataGrad.gpu(),
                                      dataDst.gpu(), &avg_time2);
 
-   avg_time = (avg_time1 + avg_time2);
+  avg_time = (avg_time1 + avg_time2);
 
-   std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
+  std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
 
-    float* temp2 = dataGrad.getDataFromGPU();
-    std::string strt = "./result_unittest.csv";
-    std::string testname = "activation_fwd_bwd:func_int_activation_batch64";
-    std::string str  = convert_to_string((float*)temp2,(int)dataGrad.get_num_elements());
-    write_to_csv(strt, str, testname, avg_time, str_ip_size, str_k_size, str_op_size);
+  float* temp2 = dataGrad.getDataFromGPU();
+
+  std::string strt = "./result_unittest.csv";
+  std::string testname = "activation_fwd_bwd:func_int_activation_batch64";
+  std::string filename="activation_forward_backward.csv";
+  std::string str  = convert_to_string((float*)temp2,
+                                       (int)dataGrad.get_num_elements());
+
+  write_to_csv(strt, str, testname, avg_time, str_ip_size, str_k_size,
+               str_op_size);
+  dump_result_csv(filename, testname, temp2, (int)dataGrad.get_num_elements());
 }
 
 TEST(activation_fwd_bwd, func_int_activation_batch128) {
@@ -131,24 +161,35 @@ TEST(activation_fwd_bwd, func_int_activation_batch128) {
 
   populateMemoryRandom(dataSrc);
 
-  int ip_size[4] = {test_case1.n, test_case1.channels, test_case1.height, test_case1.width};
-  int op_size[4] =  {test_case1.n, test_case1.channels, test_case1.height, test_case1.width};
+  int ip_size[4] = {test_case1.n, test_case1.channels, test_case1.height,
+                    test_case1.width};
+  int op_size[4] = {test_case1.n, test_case1.channels, test_case1.height,
+                    test_case1.width};
 
   std::string str_ip_size  = convert_to_string((int*)ip_size,4);
   std::string str_k_size  = "NIL";
   std::string str_op_size  = convert_to_string((int*)op_size,4);
 
-  compute_hipdnn_activation_forward(test_case1, dataSrc.gpu(),dataDst.gpu(),&avg_time1);
+  compute_hipdnn_activation_forward(test_case1, dataSrc.gpu(),dataDst.gpu(),
+                                    &avg_time1);
+
   compute_hipdnn_activation_backward(test_case2, dataSrc.gpu(), dataGrad.gpu(),
                                      dataDst.gpu(), &avg_time2);
 
-   avg_time = (avg_time1 + avg_time2);
+  avg_time = (avg_time1 + avg_time2);
 
-   std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
+  std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
 
-    float* temp2 = dataGrad.getDataFromGPU();
-    std::string strt = "./result_unittest.csv";
-    std::string testname = "activation_fwd_bwd:func_int_activation_batch128";
-    std::string str  = convert_to_string((float*)temp2,(int)dataGrad.get_num_elements());
-    write_to_csv(strt, str, testname, avg_time, str_ip_size, str_k_size, str_op_size);
+  float* temp2 = dataGrad.getDataFromGPU();
+
+  std::string strt = "./result_unittest.csv";
+  std::string testname = "activation_fwd_bwd:func_int_activation_batch128";
+  std::string filename="activation_forward_backward.csv";
+  std::string str  = convert_to_string((float*)temp2,
+                                       (int)dataGrad.get_num_elements());
+
+  write_to_csv(strt, str, testname, avg_time, str_ip_size, str_k_size,
+               str_op_size);
+  dump_result_csv(filename, testname, temp2, (int)dataGrad.get_num_elements());
+
 }
