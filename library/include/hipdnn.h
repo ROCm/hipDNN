@@ -704,14 +704,14 @@ HIPDNN_EXPORT hipdnnStatus_t hipdnnLRNCrossChannelForward(
     hipdnnHandle_t handle, hipdnnLRNDescriptor_t normDesc,
     hipdnnLRNMode_t lrnMode, const void *alpha,
     const hipdnnTensorDescriptor_t xDesc, const void *x, const void *beta,
-    const hipdnnTensorDescriptor_t yDesc, void *y);
+    const hipdnnTensorDescriptor_t yDesc, void *y, bool do_backward);
 
 HIPDNN_EXPORT hipdnnStatus_t hipdnnLRNCrossChannelForwardEx(
     hipdnnHandle_t handle, hipdnnLRNDescriptor_t normDesc,
     hipdnnLRNMode_t lrnMode, const void *alpha,
     const hipdnnTensorDescriptor_t xDesc, const void *x, const void *beta,
     const hipdnnTensorDescriptor_t yDesc, void *y, size_t workspacesize,
-    void *workspace);
+    void *workspace, bool do_backward);
 
 HIPDNN_EXPORT hipdnnStatus_t hipdnnLRNCrossChannelBackward(
     hipdnnHandle_t handle, hipdnnLRNDescriptor_t normDesc,
