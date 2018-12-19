@@ -6,11 +6,14 @@
 #include "gtest/gtest.h"
 #include "common.hpp"
 
-
+#define maxvalue 17
 __global__ void dev_iota3(hipLaunchParm lp, float *px) {
   int tid = hipThreadIdx_x + hipBlockIdx_x * hipBlockDim_x;
-  px[tid] = tid + 1;
+  px[tid] = (tid + 1) % maxvalue ;
 }
+
+//Maxvalue = half? 5 : 17
+//TO:DO Set max value wrt to datatype
 
 template <typename dataType>
 void compute_hipdnn_LRN_backward(LRN_params_t &d, dataType *src, dataType *grad,
@@ -48,7 +51,7 @@ void compute_hipdnn_LRN_backward(LRN_params_t &d, dataType *src, dataType *grad,
   float lrn_blendBeta = 0.5f;
 
   checkHIPDNN(hipdnnLRNCrossChannelForward( hipdnn, lrn_desc, lrn_mode,
-                &lrn_blendAlpha, in_desc, src, &lrn_blendBeta, out_desc, dst));
+                &lrn_blendAlpha, in_desc, src, &lrn_blendBeta, out_desc, dst, true));
 
 
   float* dx; // passed as input
@@ -65,8 +68,8 @@ void compute_hipdnn_LRN_backward(LRN_params_t &d, dataType *src, dataType *grad,
         timer.restart();
 
         checkHIPDNN(hipdnnLRNCrossChannelBackward( hipdnn, lrn_desc, lrn_mode,
-                   &lrn_blendAlpha, in_desc, src, out_desc, dst, in_desc, dx,
-                   &lrn_blendBeta, in_desc, grad));
+                   &lrn_blendAlpha, in_desc, src, out_desc, dst, out_desc, dx,
+                   &lrn_blendBeta, out_desc, grad));
 
         hipDeviceSynchronize();
 
@@ -74,8 +77,9 @@ void compute_hipdnn_LRN_backward(LRN_params_t &d, dataType *src, dataType *grad,
         time_vector[i] = (double)time_elapsed / 1000;
 	}
 
-  *avg_time = (float)std::accumulate(time_vector.begin() + 10, time_vector.end(),
-                                    0) / (benchmark_iterations - 10);
+  *avg_time = (float)std::accumulate(time_vector.begin() + 10,
+                            time_vector.end(), 0) / (benchmark_iterations - 10);
+
 
   // finalizing
   hipFree(dx);

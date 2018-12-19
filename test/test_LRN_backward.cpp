@@ -2,11 +2,11 @@
 
 TEST(LRN_bwd, func_check_naive_LRN_backward) {
 
-  Desc inputDesc(1, 3, 7, 7);
+  Desc inputDesc(1, 3, 6, 6);
   float avg_time = 0;
 
-  Desc gradDesc(1, 3, 7, 7);
-  Desc outputDesc(1, 3, 7, 7);
+  Desc gradDesc(1, 3, 6, 6);
+  Desc outputDesc(1, 3, 6, 6);
 
   Memory<float> srcData = createMemory<float>(inputDesc);
   Memory<float> gradDataGPU = createMemory<float>(gradDesc);
