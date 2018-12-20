@@ -2059,8 +2059,7 @@ hipdnnStatus_t hipdnnLRNCrossChannelForward(
     hipdnnHandle_t handle, hipdnnLRNDescriptor_t normDesc,
     hipdnnLRNMode_t lrnMode, const void *alpha,
     const hipdnnTensorDescriptor_t xDesc, const void *x, const void *beta,
-    const hipdnnTensorDescriptor_t yDesc, void *y) {
-    //    return HIPDNN_STATUS_NOT_SUPPORTED;
+    const hipdnnTensorDescriptor_t yDesc, void *y, bool do_backward) {
 
     int8_t *devptr = 0;
 
@@ -2071,32 +2070,33 @@ hipdnnStatus_t hipdnnLRNCrossChannelForward(
     HIPDNN_OPEN_LOG_C("Inside hipdnnLRNCrossChannelForward");
 
     CHECK_HIPDNN(hipTomiopenLRNMode(lrnMode, &mimode));
+    
+	if( do_backward == 1) {
+        if (sDescToWorkspaceLRN.find((miopenTensorDescriptor_t)yDesc) ==
+            sDescToWorkspaceLRN.end()) {
+            //yDesc is used for the workspace, not the 
+			//hipdnnLRNDescriptor_t
 
-    if (sDescToWorkspaceLRN.find((miopenTensorDescriptor_t)yDesc) ==
-        sDescToWorkspaceLRN.end()) {
-        // HGSOS looks like the yDesc is used for the workspace, not the
-        // hipdnnLRNDescriptor_t
-
-        CHECK_MIO(miopenLRNGetWorkSpaceSize((miopenTensorDescriptor_t)yDesc,
-                                            &workSpaceSize));
-
-        CHECK_HIP(hipMalloc((void **)&devptr, workSpaceSize));
-        sDescToWorkspaceLRN[(miopenTensorDescriptor_t)yDesc] = devptr;
-        sDescToWorkspaceLRNSize[(miopenTensorDescriptor_t)yDesc] =
-            workSpaceSize;
-    } else {
-        devptr = sDescToWorkspaceLRN[(miopenTensorDescriptor_t)yDesc];
-        workSpaceSize =
-            sDescToWorkspaceLRNSize[(miopenTensorDescriptor_t)yDesc];
-    }
+             CHECK_MIO(miopenLRNGetWorkSpaceSize((miopenTensorDescriptor_t)yDesc,
+                                                &workSpaceSize));
+             CHECK_HIP(hipMalloc((void **)&devptr, workSpaceSize));
+             sDescToWorkspaceLRN[(miopenTensorDescriptor_t)yDesc] = devptr;
+             sDescToWorkspaceLRNSize[(miopenTensorDescriptor_t)yDesc] =
+                workSpaceSize;
+        } else {
+             devptr = sDescToWorkspaceLRN[(miopenTensorDescriptor_t)yDesc];
+             workSpaceSize =
+                sDescToWorkspaceLRNSize[(miopenTensorDescriptor_t)yDesc];
+        }
+	}
     void *dwPrior = SaveAsPriorBuffer(y);
 
     CHECK_MIO(miopenLRNForward((miopenHandle_t)handle,
                                (miopenLRNDescriptor_t)normDesc, alpha,
                                (miopenTensorDescriptor_t)xDesc, x, beta,
                                (miopenTensorDescriptor_t)yDesc, y,
-                               true,    // bool do_backward, //HGSOS
-                               devptr)); // HGSOS //NOTYET no workspace size
+                               do_backward,
+                               devptr));
 
     CHECK_HIPDNN(hipdnnAddTensor(handle, beta, yDesc, dwPrior, alpha, yDesc, y ));
 	deallocPrior(dwPrior);
@@ -2109,7 +2109,7 @@ hipdnnStatus_t hipdnnLRNCrossChannelForwardEx(
     hipdnnLRNMode_t lrnMode, const void *alpha,
     const hipdnnTensorDescriptor_t xDesc, const void *x, const void *beta,
     const hipdnnTensorDescriptor_t yDesc, void *y, size_t workspaceSize,
-    void *workspace) {
+    void *workspace, bool do_backward) {
     miopenLRNMode_t mimode;
 
     HIPDNN_OPEN_LOG_C("Inside hipdnnLRNCrossChannelForward");
@@ -2121,8 +2121,8 @@ hipdnnStatus_t hipdnnLRNCrossChannelForwardEx(
                                (miopenLRNDescriptor_t)normDesc, alpha,
                                (miopenTensorDescriptor_t)xDesc, x, beta,
                                (miopenTensorDescriptor_t)yDesc, y,
-                               true, // bool do_backward, //HGSOS //NOTYET
-                               workspace)); // NOTYET  no workspace size!
+                               do_backward,
+                               workspace));
 
     return HIPDNN_STATUS_SUCCESS;
 }
@@ -2136,7 +2136,6 @@ hipdnnStatus_t hipdnnLRNCrossChannelBackward(
     const hipdnnTensorDescriptor_t dyDesc, const void *dy,
     const hipdnnTensorDescriptor_t xDesc, const void *x, const void *beta,
     const hipdnnTensorDescriptor_t dxDesc, void *dx) {
-    //    return HIPDNN_STATUS_NOT_SUPPORTED;
 
     int8_t *devptr = 0;
 
@@ -2149,7 +2148,7 @@ hipdnnStatus_t hipdnnLRNCrossChannelBackward(
     CHECK_HIPDNN(hipTomiopenLRNMode(lrnMode, &mimode));
     if (sDescToWorkspaceLRN.find((miopenTensorDescriptor_t)yDesc) ==
         sDescToWorkspaceLRN.end()) {
-        // HGSOS looks like the yDesc is used for the workspace, not the
+        // yDesc is used for the workspace, not the
         // hipdnnLRNDescriptor_t
 
         CHECK_MIO(miopenLRNGetWorkSpaceSize((miopenTensorDescriptor_t)yDesc,
