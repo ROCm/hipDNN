@@ -402,59 +402,79 @@ HIPDNN_EXPORT hipdnnStatus_t hipdnnGetStream(hipdnnHandle_t handle,
 
 HIPDNN_EXPORT size_t hipdnnGetVersion(void);
 
-HIPDNN_EXPORT hipdnnStatus_t
+// ---------------------- Tensors & operations ------------------------------------
+
+hipdnnStatus_t
 hipdnnCreateTensorDescriptor(hipdnnTensorDescriptor_t *tensorDesc);
 
-HIPDNN_EXPORT hipdnnStatus_t hipdnnSetTensor4dDescriptor(
-    hipdnnTensorDescriptor_t tensorDesc, hipdnnTensorFormat_t format,
-    hipdnnDataType_t dataType, int n, int c, int h, int w);
+hipdnnStatus_t
+hipdnnSetTensor4dDescriptor(hipdnnTensorDescriptor_t tensorDesc,
+                            hipdnnTensorFormat_t format,
+                            hipdnnDataType_t dataType,
+                            int n, int c, int h, int w);
 
-HIPDNN_EXPORT hipdnnStatus_t hipdnnGetTensor4dDescriptor(
-    hipdnnTensorDescriptor_t tensorDesc, hipdnnDataType_t *dataType, int *n,
-    int *c, int *h, int *w, int *nStride, int *cStride, int *hStride,
-    int *wStride);
+hipdnnStatus_t
+hipdnnGetTensor4dDescriptor(hipdnnTensorDescriptor_t tensorDesc,
+                            hipdnnDataType_t *dataType,
+                            int *n, int *c, int *h, int *w,
+                            int *nStride, int *cStride,
+                            int *hStride, int *wStride);
 
 HIPDNN_EXPORT hipdnnStatus_t
 hipdnnDestroyTensorDescriptor(hipdnnTensorDescriptor_t tensorDesc);
 
-HIPDNN_EXPORT hipdnnStatus_t hipdnnAddTensor(
-    hipdnnHandle_t handle, const void *alpha,
-    const hipdnnTensorDescriptor_t aDesc, const void *A, const void *beta,
-    const hipdnnTensorDescriptor_t cDesc, void *C);
 
-#ifdef HGSOS
+hipdnnStatus_t hipdnnSetTensor( hipdnnHandle_t handle,
+                                const hipdnnTensorDescriptor_t yDesc,
+                                void *y,
+                                const void *valuePtr );
 
-// cudnn has more rich notion of TensorOp.  Need to implement following that at
-// some point
-HIPDNN_EXPORT hipdnnStatus_t
+hipdnnStatus_t hipdnnAddTensor( hipdnnHandle_t handle,
+                                const void *alpha,
+                                const hipdnnTensorDescriptor_t aDesc,
+                                const void *A,
+                                const void *beta,
+                                const hipdnnTensorDescriptor_t cDesc,
+                                void *C);
+
+hipdnnStatus_t
 hipdnnCreateOpTensorDescriptor(hipdnnOpTensorDescriptor_t *opTensorDesc);
 
-HIPDNN_EXPORT hipdnnStatus_t hipdnnSetOpTensorDescriptor(
-    hipdnnOpTensorDescriptor_t opTensorDesc, hipdnnOpTensorOp_t opTensorOp,
-    hipdnnDataType_t opTensorCompType, hipdnnNanPropagation_t opTensorNanOpt);
+hipdnnStatus_t
+hipdnnSetOpTensorDescriptor(hipdnnOpTensorDescriptor_t opTensorDesc,
+                            hipdnnOpTensorOp_t opTensorOp,
+                            hipdnnDataType_t opTensorCompType,
+                            hipdnnNanPropagation_t opTensorNanOpt);
 
-HIPDNN_EXPORT hipdnnStatus_t hipdnnGetOpTensorDescriptor(
-    const hipdnnOpTensorDescriptor_t opTensorDesc,
-    hipdnnOpTensorOp_t *opTensorOp, hipdnnDataType_t *opTensorCompType,
-    hipdnnNanPropagation_t *opTensorNanOpt);
+hipdnnStatus_t
+hipdnnGetOpTensorDescriptor(const hipdnnOpTensorDescriptor_t opTensorDesc,
+                            hipdnnOpTensorOp_t *opTensorOp,
+                            hipdnnDataType_t *opTensorCompType,
+                            hipdnnNanPropagation_t *opTensorNanOpt);
 
-HIPDNN_EXPORT hipdnnStatus_t
+hipdnnStatus_t
 hipdnnDestroyOpTensorDescriptor(hipdnnOpTensorDescriptor_t opTensorDesc);
-#endif
 
-HIPDNN_EXPORT hipdnnStatus_t hipdnnOpTensor(
-    hipdnnHandle_t handle, const hipdnnOpTensorDescriptor_t opTensorDesc,
-    const void *alpha1, const hipdnnTensorDescriptor_t aDesc, const void *A,
-    const void *alpha2, const hipdnnTensorDescriptor_t bDesc, const void *B,
-    const void *beta, const hipdnnTensorDescriptor_t cDesc, void *C);
+hipdnnStatus_t
+hipdnnOpTensor( hipdnnHandle_t handle,
+                const hipdnnOpTensorDescriptor_t opTensorDesc,
+                const void *alpha1,
+                const hipdnnTensorDescriptor_t aDesc,
+                const void *A,
+                const void *alpha2,
+                const hipdnnTensorDescriptor_t bDesc,
+                const void *B,
+                const void *beta,
+                const hipdnnTensorDescriptor_t cDesc,
+                void *C);
 
-HIPDNN_EXPORT hipdnnStatus_t
-hipdnnSetTensor(hipdnnHandle_t handle, const hipdnnTensorDescriptor_t yDesc,
-                void *y, const void *valuePtr);
+hipdnnStatus_t
+hipdnnScaleTensor(hipdnnHandle_t handle,
+                  const hipdnnTensorDescriptor_t yDesc,
+                  void *y,
+                  const void *alpha);
 
-HIPDNN_EXPORT hipdnnStatus_t
-hipdnnScaleTensor(hipdnnHandle_t handle, const hipdnnTensorDescriptor_t yDesc,
-                  void *y, const void *alpha);
+//------------------------------------------------------------------------------
 
 HIPDNN_EXPORT hipdnnStatus_t
 hipdnnCreateFilterDescriptor(hipdnnFilterDescriptor_t *filterDesc);
