@@ -1256,7 +1256,28 @@ hipdnnSetOpTensorDescriptor(hipdnnOpTensorDescriptor_t opTensorDesc,
                             hipdnnDataType_t opTensorCompType,
                             hipdnnNanPropagation_t opTensorNanOpt) {
 
-    return HIPDNN_STATUS_NOT_SUPPORTED;
+    hipdnnStatus_t retVal = HIPDNN_STATUS_SUCCESS;
+
+    cudnnOpTensorOp_t cuTensorOp;
+    retVal = hipdnnTocudnnOpTensorOp(opTensorOp, &cuTensorOp);
+    if (retVal != HIPDNN_STATUS_SUCCESS)
+        return retVal;
+
+    cudnnDataType_t cuCompType;
+    retVal = hipdnnTocudnnDataType(opTensorCompType,&cuCompType);
+    if (retVal != HIPDNN_STATUS_SUCCESS)
+        return retVal;
+
+    cudnnNanPropagation_t cuNan;
+    retVal = hipTocudnnNanPropagation(opTensorNanOpt, &cuNan);
+    if (retVal != HIPDNN_STATUS_SUCCESS)
+        return retVal;
+
+    retVal = cudnnTohipdnnStatus(cudnnSetOpTensorDescriptor(
+                    (cudnnOpTensorDescriptor_t)opTensorDesc, cuTensorOp,
+                    cuCompType,cuNan));
+
+    return retVal;
 
 }
 
