@@ -946,6 +946,60 @@ miopenTensorOp_t hipToMIOpenTensorOp(hipdnnOpTensorDescriptor_t opTensorDesc) {
             return miopenTensorOpAdd;
     }
 }
+//============================ Tensor Operations ===============================
+
+hipdnnStatus_t
+hipdnnCreateOpTensorDescriptor(hipdnnOpTensorDescriptor_t *opTensorDesc) {
+
+    return HIPDNN_STATUS_NOT_SUPPORTED;
+}
+
+//------------------------------------------------------------------------------
+
+hipdnnStatus_t
+hipdnnSetOpTensorDescriptor(hipdnnOpTensorDescriptor_t opTensorDesc,
+                            hipdnnOpTensorOp_t opTensorOp,
+                            hipdnnDataType_t opTensorCompType,
+                            hipdnnNanPropagation_t opTensorNanOpt) {
+
+    return HIPDNN_STATUS_NOT_SUPPORTED;
+
+}
+
+//------------------------------------------------------------------------------
+
+hipdnnStatus_t
+hipdnnGetOpTensorDescriptor(const hipdnnOpTensorDescriptor_t opTensorDesc,
+                            hipdnnOpTensorOp_t *opTensorOp,
+                            hipdnnDataType_t *opTensorCompType,
+                            hipdnnNanPropagation_t *opTensorNanOpt) {
+
+    return HIPDNN_STATUS_NOT_SUPPORTED;
+
+}
+//------------------------------------------------------------------------------
+
+hipdnnStatus_t
+hipdnnDestroyOpTensorDescriptor(hipdnnOpTensorDescriptor_t opTensorDesc) {
+
+    return HIPDNN_STATUS_NOT_SUPPORTED;
+
+}
+
+//------------------------------------------------------------------------------
+
+hipdnnStatus_t hipdnnOpTensor(
+    hipdnnHandle_t handle, const hipdnnOpTensorDescriptor_t opTensorDesc,
+    const void *alpha1, const hipdnnTensorDescriptor_t aDesc, const void *A,
+    const void *alpha2, const hipdnnTensorDescriptor_t bDesc, const void *B,
+    const void *beta, const hipdnnTensorDescriptor_t cDesc, void *C) {
+
+    return cudnnTohipdnnStatus(cudnnOpTensor(
+        (cudnnHandle_t)handle, (cudnnOpTensorDescriptor_t)opTensorDesc, alpha1,
+        (cudnnTensorDescriptor_t)aDesc, A, alpha2,
+        (cudnnTensorDescriptor_t)bDesc, B, beta, (cudnnTensorDescriptor_t)cDesc,
+        C));
+}
 
 //------------------------------------------------------------------------------
 

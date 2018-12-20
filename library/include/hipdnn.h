@@ -108,6 +108,7 @@ typedef enum {
     HIPDNN_OP_TENSOR_MIN = 2,
     HIPDNN_OP_TENSOR_MAX = 3,
     HIPDNN_OP_TENSOR_SQRT = 4,
+    HIPDNN_OP_TENSOR_NOT  = 5,
 } hipdnnOpTensorOp_t;
 
 //=============================================================================
@@ -402,7 +403,7 @@ HIPDNN_EXPORT hipdnnStatus_t hipdnnGetStream(hipdnnHandle_t handle,
 
 HIPDNN_EXPORT size_t hipdnnGetVersion(void);
 
-// ---------------------- Tensors & operations ------------------------------------
+// ---------------------- Tensors & operations ---------------------------------
 
 hipdnnStatus_t
 hipdnnCreateTensorDescriptor(hipdnnTensorDescriptor_t *tensorDesc);
