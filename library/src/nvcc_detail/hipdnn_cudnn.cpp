@@ -194,8 +194,10 @@ hipdnnStatus_t cudnnTohipMathType(cudnnMathType_t in, hipdnnMathType_t *out) {
 
 //================================
 
-hipdnnStatus_t cudnnTohipOpTensorOp(cudnnOpTensorOp_t in,
+hipdnnStatus_t cudnnTohipdnnOpTensorOp(cudnnOpTensorOp_t in,
                                     hipdnnOpTensorOp_t *out) {
+
+    hipdnnStatus_t retVal = HIPDNN_STATUS_SUCCESS;
     switch (in) {
     case CUDNN_OP_TENSOR_ADD:
         *out = HIPDNN_OP_TENSOR_ADD;
@@ -212,13 +214,20 @@ hipdnnStatus_t cudnnTohipOpTensorOp(cudnnOpTensorOp_t in,
     case CUDNN_OP_TENSOR_SQRT:
         *out = HIPDNN_OP_TENSOR_SQRT;
         break;
+    case CUDNN_OP_TENSOR_NOT:
+        *out = HIPDNN_OP_TENSOR_NOT;
+        break;
+    default:
+        retVal = HIPDNN_STATUS_NOT_SUPPORTED;
     }
 
     return HIPDNN_STATUS_SUCCESS;
 }
 
-hipdnnStatus_t hipTocudnnOpTensorOp(hipdnnOpTensorOp_t in,
+hipdnnStatus_t hipdnnTocudnnOpTensorOp(hipdnnOpTensorOp_t in,
                                     cudnnOpTensorOp_t *out) {
+
+    hipdnnStatus_t retVal = HIPDNN_STATUS_SUCCESS;
     switch (in) {
     case HIPDNN_OP_TENSOR_ADD:
         *out = CUDNN_OP_TENSOR_ADD;
@@ -235,9 +244,14 @@ hipdnnStatus_t hipTocudnnOpTensorOp(hipdnnOpTensorOp_t in,
     case HIPDNN_OP_TENSOR_SQRT:
         *out = CUDNN_OP_TENSOR_SQRT;
         break;
+    case HIPDNN_OP_TENSOR_NOT:
+        *out = CUDNN_OP_TENSOR_NOT;
+        break;
+    default:
+        retVal = HIPDNN_STATUS_NOT_SUPPORTED;
     }
 
-    return HIPDNN_STATUS_SUCCESS;
+    return retVal;
 }
 
 //===============================
@@ -1138,7 +1152,7 @@ hipdnnStatus_t hipdnnGetStream(hipdnnHandle_t handle,
 
 size_t hipdnnGetVersion() { return cudnnGetVersion(); }
 
-//======================== Tensor and Operations ==============================
+//============================== Tensors =======================================
 
 hipdnnStatus_t
 hipdnnCreateTensorDescriptor(hipdnnTensorDescriptor_t *tensorDesc) {
@@ -1225,7 +1239,7 @@ hipdnnStatus_t hipdnnScaleTensor(hipdnnHandle_t handle,
         (cudnnHandle_t)handle, (cudnnTensorDescriptor_t)yDesc, y, alpha));
 }
 
-//------------------------------------------------------------------------------
+//============================ Tensor Operations ===============================
 
 hipdnnStatus_t
 hipdnnCreateOpTensorDescriptor(hipdnnOpTensorDescriptor_t *opTensorDesc) {
@@ -1233,7 +1247,41 @@ hipdnnCreateOpTensorDescriptor(hipdnnOpTensorDescriptor_t *opTensorDesc) {
     return cudnnTohipdnnStatus( cudnnCreateOpTensorDescriptor(
                                 (cudnnOpTensorDescriptor_t*) opTensorDesc));
 }
+
 //------------------------------------------------------------------------------
+
+hipdnnStatus_t
+hipdnnSetOpTensorDescriptor(hipdnnOpTensorDescriptor_t opTensorDesc,
+                            hipdnnOpTensorOp_t opTensorOp,
+                            hipdnnDataType_t opTensorCompType,
+                            hipdnnNanPropagation_t opTensorNanOpt) {
+
+    return HIPDNN_STATUS_NOT_SUPPORTED;
+
+}
+
+//------------------------------------------------------------------------------
+
+hipdnnStatus_t
+hipdnnGetOpTensorDescriptor(const hipdnnOpTensorDescriptor_t opTensorDesc,
+                            hipdnnOpTensorOp_t *opTensorOp,
+                            hipdnnDataType_t *opTensorCompType,
+                            hipdnnNanPropagation_t *opTensorNanOpt) {
+
+    return HIPDNN_STATUS_NOT_SUPPORTED;
+
+}
+//------------------------------------------------------------------------------
+
+hipdnnStatus_t
+hipdnnDestroyOpTensorDescriptor(hipdnnOpTensorDescriptor_t opTensorDesc) {
+
+    return HIPDNN_STATUS_NOT_SUPPORTED;
+
+}
+
+//------------------------------------------------------------------------------
+
 hipdnnStatus_t hipdnnOpTensor(
     hipdnnHandle_t handle, const hipdnnOpTensorDescriptor_t opTensorDesc,
     const void *alpha1, const hipdnnTensorDescriptor_t aDesc, const void *A,
