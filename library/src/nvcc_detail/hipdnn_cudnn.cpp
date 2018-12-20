@@ -1227,6 +1227,13 @@ hipdnnStatus_t hipdnnScaleTensor(hipdnnHandle_t handle,
 
 //------------------------------------------------------------------------------
 
+hipdnnStatus_t
+hipdnnCreateOpTensorDescriptor(hipdnnOpTensorDescriptor_t *opTensorDesc) {
+
+    return cudnnTohipdnnStatus( cudnnCreateOpTensorDescriptor(
+                                (cudnnOpTensorDescriptor_t*) opTensorDesc));
+}
+//------------------------------------------------------------------------------
 hipdnnStatus_t hipdnnOpTensor(
     hipdnnHandle_t handle, const hipdnnOpTensorDescriptor_t opTensorDesc,
     const void *alpha1, const hipdnnTensorDescriptor_t aDesc, const void *A,
