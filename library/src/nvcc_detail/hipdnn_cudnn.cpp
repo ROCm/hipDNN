@@ -1138,13 +1138,14 @@ hipdnnStatus_t hipdnnGetStream(hipdnnHandle_t handle,
 
 size_t hipdnnGetVersion() { return cudnnGetVersion(); }
 
+//======================== Tensor and Operations ==============================
+
 hipdnnStatus_t
 hipdnnCreateTensorDescriptor(hipdnnTensorDescriptor_t *tensorDesc) {
     return cudnnTohipdnnStatus(
         cudnnCreateTensorDescriptor((cudnnTensorDescriptor_t *)tensorDesc));
 }
-
-//===============================
+//------------------------------------------------------------------------------
 
 hipdnnStatus_t hipdnnSetTensor4dDescriptor(hipdnnTensorDescriptor_t tensorDesc,
                                            hipdnnTensorFormat_t format,
@@ -1167,7 +1168,7 @@ hipdnnStatus_t hipdnnSetTensor4dDescriptor(hipdnnTensorDescriptor_t tensorDesc,
         (cudnnDataType_t)cuDT, n, c, h, w));
 }
 
-//=============================================================================
+//------------------------------------------------------------------------------
 
 hipdnnStatus_t hipdnnGetTensor4dDescriptor(hipdnnTensorDescriptor_t tensorDesc,
                                            hipdnnDataType_t *dataType, int *n,
@@ -1187,7 +1188,7 @@ hipdnnStatus_t hipdnnGetTensor4dDescriptor(hipdnnTensorDescriptor_t tensorDesc,
     return cudnnTohipDataType(cudT, dataType);
 }
 
-//=============================================================================
+//------------------------------------------------------------------------------
 
 hipdnnStatus_t
 hipdnnDestroyTensorDescriptor(hipdnnTensorDescriptor_t tensorDesc) {
@@ -1195,7 +1196,16 @@ hipdnnDestroyTensorDescriptor(hipdnnTensorDescriptor_t tensorDesc) {
         (cudnnTensorDescriptor_t)tensorDesc));
 }
 
-//=============================================================================
+//------------------------------------------------------------------------------
+
+hipdnnStatus_t hipdnnSetTensor(hipdnnHandle_t handle,
+                               const hipdnnTensorDescriptor_t yDesc, void *y,
+                               const void *valuePtr) {
+    return cudnnTohipdnnStatus(cudnnSetTensor(
+        (cudnnHandle_t)handle, (cudnnTensorDescriptor_t)yDesc, y, valuePtr));
+}
+
+//------------------------------------------------------------------------------
 
 hipdnnStatus_t hipdnnAddTensor(hipdnnHandle_t handle, const void *alpha,
                                const hipdnnTensorDescriptor_t aDesc,
@@ -1206,7 +1216,16 @@ hipdnnStatus_t hipdnnAddTensor(hipdnnHandle_t handle, const void *alpha,
         (cudnnTensorDescriptor_t)cDesc, C));
 }
 
-//======================HGSOS======================!
+//------------------------------------------------------------------------------
+
+hipdnnStatus_t hipdnnScaleTensor(hipdnnHandle_t handle,
+                                 const hipdnnTensorDescriptor_t yDesc, void *y,
+                                 const void *alpha) {
+    return cudnnTohipdnnStatus(cudnnScaleTensor(
+        (cudnnHandle_t)handle, (cudnnTensorDescriptor_t)yDesc, y, alpha));
+}
+
+//------------------------------------------------------------------------------
 
 hipdnnStatus_t hipdnnOpTensor(
     hipdnnHandle_t handle, const hipdnnOpTensorDescriptor_t opTensorDesc,
@@ -1220,23 +1239,7 @@ hipdnnStatus_t hipdnnOpTensor(
         (cudnnTensorDescriptor_t)bDesc, B, beta, (cudnnTensorDescriptor_t)cDesc,
         C));
 }
-//======
 
-hipdnnStatus_t hipdnnSetTensor(hipdnnHandle_t handle,
-                               const hipdnnTensorDescriptor_t yDesc, void *y,
-                               const void *valuePtr) {
-    return cudnnTohipdnnStatus(cudnnSetTensor(
-        (cudnnHandle_t)handle, (cudnnTensorDescriptor_t)yDesc, y, valuePtr));
-}
-
-//==========
-
-hipdnnStatus_t hipdnnScaleTensor(hipdnnHandle_t handle,
-                                 const hipdnnTensorDescriptor_t yDesc, void *y,
-                                 const void *alpha) {
-    return cudnnTohipdnnStatus(cudnnScaleTensor(
-        (cudnnHandle_t)handle, (cudnnTensorDescriptor_t)yDesc, y, alpha));
-}
 //=============================================================================
 
 hipdnnStatus_t
@@ -3268,4 +3271,3 @@ hipdnnDestroyFusionPlan(hipdnnFusionPlanDescriptor_t fusePlanDesc) {
     free(fusePlanDesc);
     return HIPDNN_STATUS_SUCCESS;
 }
-

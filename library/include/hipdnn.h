@@ -420,9 +420,8 @@ hipdnnGetTensor4dDescriptor(hipdnnTensorDescriptor_t tensorDesc,
                             int *nStride, int *cStride,
                             int *hStride, int *wStride);
 
-HIPDNN_EXPORT hipdnnStatus_t
+hipdnnStatus_t
 hipdnnDestroyTensorDescriptor(hipdnnTensorDescriptor_t tensorDesc);
-
 
 hipdnnStatus_t hipdnnSetTensor( hipdnnHandle_t handle,
                                 const hipdnnTensorDescriptor_t yDesc,
@@ -436,6 +435,11 @@ hipdnnStatus_t hipdnnAddTensor( hipdnnHandle_t handle,
                                 const void *beta,
                                 const hipdnnTensorDescriptor_t cDesc,
                                 void *C);
+hipdnnStatus_t
+hipdnnScaleTensor(hipdnnHandle_t handle,
+                  const hipdnnTensorDescriptor_t yDesc,
+                  void *y,
+                  const void *alpha);
 
 hipdnnStatus_t
 hipdnnCreateOpTensorDescriptor(hipdnnOpTensorDescriptor_t *opTensorDesc);
@@ -467,12 +471,6 @@ hipdnnOpTensor( hipdnnHandle_t handle,
                 const void *beta,
                 const hipdnnTensorDescriptor_t cDesc,
                 void *C);
-
-hipdnnStatus_t
-hipdnnScaleTensor(hipdnnHandle_t handle,
-                  const hipdnnTensorDescriptor_t yDesc,
-                  void *y,
-                  const void *alpha);
 
 //------------------------------------------------------------------------------
 
