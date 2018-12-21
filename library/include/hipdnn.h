@@ -55,13 +55,13 @@
         }                                                                       \
     }
 
-#define HIPDNN_EXPORT
 #define HIPDNN_VERSION 7000
 
-// uncomment this out to enable value substitution for
-// incompatible types.
-// HGSOS plan to support "best effort" at some point, as opposed to strict
-//#define HIPDNN_ENABLE_SUBSTITUTION
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+//============================ Datatypes =======================================
 
 typedef enum {
     HIPDNN_STATUS_SUCCESS = 0,
@@ -78,8 +78,6 @@ typedef enum {
     HIPDNN_STATUS_RUNTIME_PREREQUISITE_MISSING = 11,
 } hipdnnStatus_t;
 
-//=============================================================================
-
 typedef enum {
     HIPDNN_DATA_FLOAT = 0,
     HIPDNN_DATA_DOUBLE = 1,
@@ -89,14 +87,24 @@ typedef enum {
     HIPDNN_DATA_INT8x4 = 5
 } hipdnnDataType_t;
 
-//=============================================================================
+typedef enum {
+    HIPDNN_NOT_PROPAGATE_NAN = 0,
+    HIPDNN_PROPAGATE_NAN = 1,
+} hipdnnNanPropagation_t;
+
+//------------------------- Tensors datatypes ----------------------------------
 
 typedef enum {
     HIPDNN_DEFAULT_MATH = 0,
     HIPDNN_TENSOR_OP_MATH = 1,
 } hipdnnMathType_t;
 
-//=============================================================================
+typedef enum {
+    HIPDNN_TENSOR_NCHW = 0, /* row major (wStride = 1, hStride = w) */
+    HIPDNN_TENSOR_NHWC = 1, /* feature maps interleaved ( cStride = 1 )*/
+    HIPDNN_TENSOR_NCHW_VECT_C = 2 /* each image point is vector of element of C:
+                          the length of the vector is carried by the data type*/
+} hipdnnTensorFormat_t;
 
 typedef enum {
     HIPDNN_OP_TENSOR_ADD = 0,
@@ -107,65 +115,38 @@ typedef enum {
     HIPDNN_OP_TENSOR_NOT  = 5,
 } hipdnnOpTensorOp_t;
 
-//=============================================================================
+// CNTK 2.4
+
+typedef enum {
+    HIPDNN_REDUCE_TENSOR_ADD = 0,
+    HIPDNN_REDUCE_TENSOR_MUL = 1,
+    HIPDNN_REDUCE_TENSOR_MIN = 2,
+    HIPDNN_REDUCE_TENSOR_MAX = 3,
+    HIPDNN_REDUCE_TENSOR_AMAX = 4,
+    HIPDNN_REDUCE_TENSOR_AVG = 5,
+    HIPDNN_REDUCE_TENSOR_NORM1 = 6,
+    HIPDNN_REDUCE_TENSOR_NORM2 = 7,
+    HIPDNN_REDUCE_TENSOR_MUL_NO_ZEROS = 8,
+} hipdnnReduceTensorOp_t;
+
+typedef enum {
+    HIPDNN_REDUCE_TENSOR_NO_INDICES = 0,
+    HIPDNN_REDUCE_TENSOR_FLATTENED_INDICES = 1,
+} hipdnnReduceTensorIndices_t;
+
+typedef enum {
+    HIPDNN_32BIT_INDICES = 0,
+    HIPDNN_64BIT_INDICES = 1,
+    HIPDNN_16BIT_INDICES = 2,
+    HIPDNN_8BIT_INDICES = 3,
+} hipdnnIndicesType_t;
+
+//------------------------- Convolutional datatypes ----------------------------
 
 typedef enum {
     HIPDNN_CONVOLUTION = 0,
     HIPDNN_CROSS_CORRELATION = 1
 } hipdnnConvolutionMode_t;
-
-//=============================================================================
-
-typedef enum {
-    HIPDNN_POOLING_MAX = 0,
-    HIPDNN_POOLING_AVERAGE_COUNT_INCLUDE_PADDING =
-        1,  // count for average includes padded values
-    HIPDNN_POOLING_AVERAGE_COUNT_EXCLUDE_PADDING =
-        2,  // count for average does not include padded values
-    HIPDNN_POOLING_MAX_DETERMINISTIC = 3
-} hipdnnPoolingMode_t;
-
-//=============================================================================
-
-typedef enum {
-    HIPDNN_LRN_WITHIN_CHANNEL = 0,
-    HIPDNN_LRN_CROSS_CHANNEL = 1,
-} hipdnnLRNMode_t;
-
-//=============================================================================
-
-typedef enum {
-    // bnScale, bnBias tensor dims are 1xCxHxWx.. (one value per CHW...-slice,
-    // normalized over N slice)
-    HIPDNN_BATCHNORM_PER_ACTIVATION = 0,
-
-    // bnScale, bnBias tensor dims are 1xCx1x1 (one value per C-dim normalized
-    // over Nx1xHxW subtensors)
-    HIPDNN_BATCHNORM_SPATIAL = 1,
-
-    /*
-     * bnScale, bnBias tensor dims are 1xCx1x1 (one value per C-dim normalized
-     * over Nx1xHxW subtensors). May be faster than CUDNN_BATCHNORM_SPATIAL but
-     * imposes some limits on the range of values
-     */
-    HIPDNN_BATCHNORM_SPATIAL_PERSISTENT = 2,
-} hipdnnBatchNormMode_t;
-
-//=============================================================================
-
-typedef enum {
-    HIPDNN_ACTIVATION_SIGMOID = 0,
-    HIPDNN_ACTIVATION_RELU,
-    HIPDNN_ACTIVATION_TANH,
-    HIPDNN_ACTIVATION_CLIPPED_RELU,
-    HIPDNN_ACTIVATION_ELU,
-    HIPDNN_ACTIVATION_PATHTRU,
-    HIPDNN_ACTIVATION_SOFTRELU,
-    HIPDNN_ACTIVATION_ABS,
-    HIPDNN_ACTIVATION_POWER
-} hipdnnActivationMode_t;
-
-//=============================================================================
 
 typedef enum {
     HIPDNN_CONVOLUTION_FWD_ALGO_IMPLICIT_GEMM = 0,
@@ -186,7 +167,6 @@ int ConvolutionFwdAlgoCount();
 //
 hipdnnConvolutionFwdAlgo_t GetConvolutionFwdAlgo(int i);
 
-//=============================================================================
 
 typedef enum {
     HIPDNN_CONVOLUTION_BWD_FILTER_ALGO_0 = 0,  // non-deterministic
@@ -207,7 +187,6 @@ int ConvolutionBwdFilterAlgoCount();
 //
 hipdnnConvolutionBwdFilterAlgo_t GetConvolutionBwdFilterAlgo(int i);
 
-//=============================================================================
 
 typedef enum {
     HIPDNN_CONVOLUTION_BWD_DATA_ALGO_0 = 0,  // non-deterministic
@@ -227,7 +206,6 @@ int ConvolutionBwdDataAlgoCount();
 //
 hipdnnConvolutionBwdDataAlgo_t GetConvolutionBwdDataAlgo(int i);
 
-//=============================================================================
 
 typedef enum {
     HIPDNN_CONVOLUTION_BWD_DATA_NO_WORKSPACE = 0,
@@ -235,7 +213,98 @@ typedef enum {
     HIPDNN_CONVOLUTION_BWD_DATA_SPECIFY_WORKSPACE_LIMIT = 2,
 } hipdnnConvolutionBwdDataPreference_t;
 
-//=============================================================================
+typedef enum {
+    HIPDNN_CONVOLUTION_FWD_NO_WORKSPACE = 0,
+    HIPDNN_CONVOLUTION_FWD_PREFER_FASTEST = 1,
+    HIPDNN_CONVOLUTION_FWD_SPECIFY_WORKSPACE_LIMIT = 2,
+} hipdnnConvolutionFwdPreference_t;
+
+typedef enum {
+    HIPDNN_CONVOLUTION_BWD_FILTER_NO_WORKSPACE = 0,
+    HIPDNN_CONVOLUTION_BWD_FILTER_PREFER_FASTEST = 1,
+    HIPDNN_CONVOLUTION_BWD_FILTER_SPECIFY_WORKSPACE_LIMIT = 2,
+} hipdnnConvolutionBwdFilterPreference_t;
+
+struct hipdnnConvolutionFwdAlgoPerf_t {
+    hipdnnConvolutionFwdAlgo_t algo;
+    hipdnnStatus_t status;
+    float time;
+    size_t memory;
+    hipdnnMathType_t mathType;
+    long reserved[3];
+};
+
+struct hipdnnConvolutionBwdDataAlgoPerf_t {
+    hipdnnConvolutionBwdDataAlgo_t algo;
+    hipdnnStatus_t status;
+    float time;
+    size_t memory;
+    hipdnnMathType_t mathType;
+    long reserved[3];
+};
+
+struct hipdnnConvolutionBwdFilterAlgoPerf_t {
+    hipdnnConvolutionBwdFilterAlgo_t algo;
+    hipdnnStatus_t status;
+    float time;
+    size_t memory;
+    hipdnnMathType_t mathType;
+    long reserved[3];
+};
+
+//-------------------------- Pooling datatypes ---------------------------------
+
+typedef enum {
+    HIPDNN_POOLING_MAX = 0,
+    HIPDNN_POOLING_AVERAGE_COUNT_INCLUDE_PADDING =
+        1,  // count for average includes padded values
+    HIPDNN_POOLING_AVERAGE_COUNT_EXCLUDE_PADDING =
+        2,  // count for average does not include padded values
+    HIPDNN_POOLING_MAX_DETERMINISTIC = 3
+} hipdnnPoolingMode_t;
+
+//--------------------------- LRN datatypes ------------------------------------
+
+typedef enum {
+    HIPDNN_LRN_WITHIN_CHANNEL = 0,
+    HIPDNN_LRN_CROSS_CHANNEL = 1,
+} hipdnnLRNMode_t;
+
+//--------------------------- BN datatypes ------------------------------------
+
+typedef enum {
+    /* bnScale, bnBias tensor dims are 1xCxHxWx.. (one value per CHW...-slice,
+     * normalized over N slice)
+     */
+    HIPDNN_BATCHNORM_PER_ACTIVATION = 0,
+
+    /* bnScale, bnBias tensor dims are 1xCx1x1 (one value per C-dim normalized
+     * over Nx1xHxW subtensors)
+     */
+    HIPDNN_BATCHNORM_SPATIAL = 1,
+
+    /* bnScale, bnBias tensor dims are 1xCx1x1 (one value per C-dim normalized
+     * over Nx1xHxW subtensors). May be faster than CUDNN_BATCHNORM_SPATIAL but
+     * imposes some limits on the range of values
+     */
+    HIPDNN_BATCHNORM_SPATIAL_PERSISTENT = 2,
+} hipdnnBatchNormMode_t;
+
+//--------------------------- Activation datatypes -----------------------------
+
+typedef enum {
+    HIPDNN_ACTIVATION_SIGMOID = 0,
+    HIPDNN_ACTIVATION_RELU,
+    HIPDNN_ACTIVATION_TANH,
+    HIPDNN_ACTIVATION_CLIPPED_RELU,
+    HIPDNN_ACTIVATION_ELU,
+    HIPDNN_ACTIVATION_PATHTRU,
+    HIPDNN_ACTIVATION_SOFTRELU,
+    HIPDNN_ACTIVATION_ABS,
+    HIPDNN_ACTIVATION_POWER
+} hipdnnActivationMode_t;
+
+//--------------------------- Softmax datatypes -----------------------------
 
 typedef enum {
     HIPDNN_SOFTMAX_FAST = 0, /* straightforward implementation */
@@ -244,8 +313,6 @@ typedef enum {
     HIPDNN_SOFTMAX_LOG = 2
 } hipdnnSoftmaxAlgorithm_t;
 
-//=============================================================================
-
 typedef enum {
     HIPDNN_SOFTMAX_MODE_INSTANCE =
         0, /* compute the softmax over all C, H, W for each N */
@@ -253,86 +320,42 @@ typedef enum {
         1 /* compute the softmax over all C for each H, W, N */
 } hipdnnSoftmaxMode_t;
 
-//=============================================================================
+//--------------------------- RNN datatypes -----------------------------
 
 typedef enum {
-    HIPDNN_TENSOR_NCHW = 0, /* row major (wStride = 1, hStride = w) */
-    HIPDNN_TENSOR_NHWC = 1, /* feature maps interleaved ( cStride = 1 )*/
-    HIPDNN_TENSOR_NCHW_VECT_C =
-        2 /* each image point is vector of element of C : the length of the
-             vector is carried by the data type*/
-} hipdnnTensorFormat_t;
-
-//=============================================================================
-
-/*
- * CUDNN propagate Nan
- */
-typedef enum {
-    HIPDNN_NOT_PROPAGATE_NAN = 0,
-    HIPDNN_PROPAGATE_NAN = 1,
-} hipdnnNanPropagation_t;
-
-//=============================================================================
+    HIPDNN_RNN_RELU = 0,  // Stock RNN with ReLu activation
+    HIPDNN_RNN_TANH = 1,  // Stock RNN with tanh activation
+    HIPDNN_LSTM = 2,      // LSTM with no peephole connections
+    HIPDNN_GRU =
+        3  // Using h' = tanh(r * Uh(t-1) + Wx) and h = (1 - z) * h' + z
+           // * h(t-1);
+} hipdnnRNNMode_t;
 
 typedef enum {
-    HIPDNN_CONVOLUTION_FWD_NO_WORKSPACE = 0,
-    HIPDNN_CONVOLUTION_FWD_PREFER_FASTEST = 1,
-    HIPDNN_CONVOLUTION_FWD_SPECIFY_WORKSPACE_LIMIT = 2,
-} hipdnnConvolutionFwdPreference_t;
-
-//=============================================================================
+    HIPDNN_UNIDIRECTIONAL = 0,
+    HIPDNN_BIDIRECTIONAL = 1  // Using output concatination at each step.
+                              // HGSOS: Do we also want to support output sum?
+} hipdnnDirectionMode_t;
 
 typedef enum {
-    HIPDNN_CONVOLUTION_BWD_FILTER_NO_WORKSPACE = 0,
-    HIPDNN_CONVOLUTION_BWD_FILTER_PREFER_FASTEST = 1,
-    HIPDNN_CONVOLUTION_BWD_FILTER_SPECIFY_WORKSPACE_LIMIT = 2,
-} hipdnnConvolutionBwdFilterPreference_t;
-
-//=============================================================================
-
-// CNTK 2.4
+    HIPDNN_LINEAR_INPUT = 0,
+    HIPDNN_SKIP_INPUT = 1
+} hipdnnRNNInputMode_t;
 
 typedef enum {
-    HIPDNN_REDUCE_TENSOR_ADD = 0,
-    HIPDNN_REDUCE_TENSOR_MUL = 1,
-    HIPDNN_REDUCE_TENSOR_MIN = 2,
-    HIPDNN_REDUCE_TENSOR_MAX = 3,
-    HIPDNN_REDUCE_TENSOR_AMAX = 4,
-    HIPDNN_REDUCE_TENSOR_AVG = 5,
-    HIPDNN_REDUCE_TENSOR_NORM1 = 6,
-    HIPDNN_REDUCE_TENSOR_NORM2 = 7,
-    HIPDNN_REDUCE_TENSOR_MUL_NO_ZEROS = 8,
-} hipdnnReduceTensorOp_t;
+    HIPDNN_RNN_ALGO_STANDARD = 0,
+    HIPDNN_RNN_ALGO_PERSIST_STATIC = 1,
+    HIPDNN_RNN_ALGO_PERSIST_DYNAMIC = 2
+} hipdnnRNNAlgo_t;
 
-//=============================================================================
-
-typedef enum {
-    HIPDNN_REDUCE_TENSOR_NO_INDICES = 0,
-    HIPDNN_REDUCE_TENSOR_FLATTENED_INDICES = 1,
-} hipdnnReduceTensorIndices_t;
-
-//=============================================================================
-
-typedef enum {
-    HIPDNN_32BIT_INDICES = 0,
-    HIPDNN_64BIT_INDICES = 1,
-    HIPDNN_16BIT_INDICES = 2,
-    HIPDNN_8BIT_INDICES = 3,
-} hipdnnIndicesType_t;
-
-//=============================================================================
+//--------------------------- Fusion datatypes ---------------------------------
 
 typedef enum {
     HIPDNN_VERTICAL_FUSION = 0,
     HIPDNN_HORIZONTAL_FUSION = 1,
 } hipdnnFusionDirection_t;
 
-//=============================================================================
-
-#ifdef __cplusplus
-extern "C" {
-#endif
+//------------------------------- Opaque Pointers ------------------------------
 
 typedef void *hipdnnHandle_t;
 
@@ -362,63 +385,68 @@ typedef void *hipdnnPersistentRNNPlan_t;
 
 typedef void *hipdnnDeterminism_t;
 
-struct hipdnnConvolutionFwdAlgoPerf_t {
-    hipdnnConvolutionFwdAlgo_t algo;
-    hipdnnStatus_t status;
-    float time;
-    size_t memory;
-    hipdnnMathType_t mathType;
-    long reserved[3];
-};
-struct hipdnnConvolutionBwdDataAlgoPerf_t {
-    hipdnnConvolutionBwdDataAlgo_t algo;
-    hipdnnStatus_t status;
-    float time;
-    size_t memory;
-    hipdnnMathType_t mathType;
-    long reserved[3];
-};
-struct hipdnnConvolutionBwdFilterAlgoPerf_t {
-    hipdnnConvolutionBwdFilterAlgo_t algo;
-    hipdnnStatus_t status;
-    float time;
-    size_t memory;
-    hipdnnMathType_t mathType;
-    long reserved[3];
-};
+typedef void *hipdnnFusionPlanDescriptor_t;
 
-HIPDNN_EXPORT hipdnnStatus_t hipdnnCreate(hipdnnHandle_t *handle);
+typedef void *hipdnnFusionOpDescriptor_t;
 
-HIPDNN_EXPORT hipdnnStatus_t hipdnnDestroy(hipdnnHandle_t handle);
+typedef void *hipdnnOperatorArgs_t;
 
-HIPDNN_EXPORT hipdnnStatus_t hipdnnSetStream(hipdnnHandle_t handle,
-                                             hipdnnStream_t streamId);
+//==============================================================================
 
-HIPDNN_EXPORT hipdnnStatus_t hipdnnGetStream(hipdnnHandle_t handle,
-                                             hipdnnStream_t *streamId);
+hipdnnStatus_t hipdnnCreate(hipdnnHandle_t *handle);
 
-HIPDNN_EXPORT size_t hipdnnGetVersion(void);
+hipdnnStatus_t hipdnnDestroy(hipdnnHandle_t handle);
 
-// ---------------------- Tensors & operations ---------------------------------
+hipdnnStatus_t hipdnnSetStream(hipdnnHandle_t handle, hipdnnStream_t streamId);
+
+hipdnnStatus_t hipdnnGetStream(hipdnnHandle_t handle, hipdnnStream_t *streamId);
+
+size_t hipdnnGetVersion(void);
+
+//=============================== Tensors ======================================
 
 hipdnnStatus_t
-hipdnnCreateTensorDescriptor(hipdnnTensorDescriptor_t *tensorDesc);
+hipdnnCreateTensorDescriptor( hipdnnTensorDescriptor_t *tensorDesc);
 
 hipdnnStatus_t
-hipdnnSetTensor4dDescriptor(hipdnnTensorDescriptor_t tensorDesc,
-                            hipdnnTensorFormat_t format,
-                            hipdnnDataType_t dataType,
-                            int n, int c, int h, int w);
+hipdnnSetTensor4dDescriptor( hipdnnTensorDescriptor_t tensorDesc,
+                             hipdnnTensorFormat_t format,
+                             hipdnnDataType_t dataType,
+                             int n, int c, int h, int w);
 
 hipdnnStatus_t
-hipdnnGetTensor4dDescriptor(hipdnnTensorDescriptor_t tensorDesc,
-                            hipdnnDataType_t *dataType,
-                            int *n, int *c, int *h, int *w,
-                            int *nStride, int *cStride,
-                            int *hStride, int *wStride);
+hipdnnGetTensor4dDescriptor( hipdnnTensorDescriptor_t tensorDesc,
+                             hipdnnDataType_t *dataType,
+                             int *n, int *c, int *h, int *w,
+                             int *nStride, int *cStride,
+                             int *hStride, int *wStride);
 
 hipdnnStatus_t
-hipdnnDestroyTensorDescriptor(hipdnnTensorDescriptor_t tensorDesc);
+hipdnnSetTensor4dDescriptorEx( hipdnnTensorDescriptor_t tensorDesc,
+                               hipdnnDataType_t dataType, /* image data type */
+                               int n,                     /* number of inputs (batch size) */
+                               int c,                     /* number of input feature maps */
+                               int h,                     /* height of input section */
+                               int w,                     /* width of input section */
+                               int nStride, int cStride, int hStride, int wStride);
+
+hipdnnStatus_t
+hipdnnSetTensorNdDescriptor( hipdnnTensorDescriptor_t tensorDesc,
+                             hipdnnDataType_t dataType,
+                             int nbDims,
+                             const int dimA[],
+                             const int strideA[]);
+
+hipdnnStatus_t
+hipdnnGetTensorNdDescriptor( const hipdnnTensorDescriptor_t tensorDesc,
+                             int nbDimsRequested,
+                             hipdnnDataType_t *dataType,
+                             int *nbDims,
+                             int dimA[],
+                             int strideA[]);
+
+hipdnnStatus_t
+hipdnnDestroyTensorDescriptor( hipdnnTensorDescriptor_t tensorDesc);
 
 hipdnnStatus_t hipdnnSetTensor( hipdnnHandle_t handle,
                                 const hipdnnTensorDescriptor_t yDesc,
@@ -432,427 +460,648 @@ hipdnnStatus_t hipdnnAddTensor( hipdnnHandle_t handle,
                                 const void *beta,
                                 const hipdnnTensorDescriptor_t cDesc,
                                 void *C);
-hipdnnStatus_t
-hipdnnScaleTensor(hipdnnHandle_t handle,
-                  const hipdnnTensorDescriptor_t yDesc,
-                  void *y,
-                  const void *alpha);
 
-hipdnnStatus_t
-hipdnnCreateOpTensorDescriptor(hipdnnOpTensorDescriptor_t *opTensorDesc);
+hipdnnStatus_t hipdnnScaleTensor( hipdnnHandle_t handle,
+                                  const hipdnnTensorDescriptor_t yDesc,
+                                  void *y,
+                                  const void *alpha);
 
+//-------------------------- Tensor Operation -----------------------------------
 hipdnnStatus_t
-hipdnnSetOpTensorDescriptor(hipdnnOpTensorDescriptor_t opTensorDesc,
-                            hipdnnOpTensorOp_t opTensorOp,
-                            hipdnnDataType_t opTensorCompType,
-                            hipdnnNanPropagation_t opTensorNanOpt);
+hipdnnCreateOpTensorDescriptor( hipdnnOpTensorDescriptor_t *opTensorDesc);
 
 hipdnnStatus_t
-hipdnnGetOpTensorDescriptor(const hipdnnOpTensorDescriptor_t opTensorDesc,
-                            hipdnnOpTensorOp_t *opTensorOp,
-                            hipdnnDataType_t *opTensorCompType,
-                            hipdnnNanPropagation_t *opTensorNanOpt);
+hipdnnSetOpTensorDescriptor( hipdnnOpTensorDescriptor_t opTensorDesc,
+                             hipdnnOpTensorOp_t opTensorOp,
+                             hipdnnDataType_t opTensorCompType,
+                             hipdnnNanPropagation_t opTensorNanOpt);
 
 hipdnnStatus_t
-hipdnnDestroyOpTensorDescriptor(hipdnnOpTensorDescriptor_t opTensorDesc);
+hipdnnGetOpTensorDescriptor( const hipdnnOpTensorDescriptor_t opTensorDesc,
+                             hipdnnOpTensorOp_t *opTensorOp,
+                             hipdnnDataType_t *opTensorCompType,
+                             hipdnnNanPropagation_t *opTensorNanOpt);
 
 hipdnnStatus_t
-hipdnnOpTensor( hipdnnHandle_t handle,
-                const hipdnnOpTensorDescriptor_t opTensorDesc,
-                const void *alpha1,
-                const hipdnnTensorDescriptor_t aDesc,
-                const void *A,
-                const void *alpha2,
-                const hipdnnTensorDescriptor_t bDesc,
-                const void *B,
-                const void *beta,
-                const hipdnnTensorDescriptor_t cDesc,
-                void *C);
+hipdnnDestroyOpTensorDescriptor( hipdnnOpTensorDescriptor_t opTensorDesc);
 
-//------------------------------------------------------------------------------
+hipdnnStatus_t hipdnnOpTensor( hipdnnHandle_t handle,
+                               const hipdnnOpTensorDescriptor_t opTensorDesc,
+                               const void *alpha1,
+                               const hipdnnTensorDescriptor_t aDesc,
+                               const void *A,
+                               const void *alpha2,
+                               const hipdnnTensorDescriptor_t bDesc,
+                               const void *B,
+                               const void *beta,
+                               const hipdnnTensorDescriptor_t cDesc,
+                               void *C);
 
-HIPDNN_EXPORT hipdnnStatus_t
-hipdnnCreateFilterDescriptor(hipdnnFilterDescriptor_t *filterDesc);
+//--------------------------- Tensor Reduction ---------------------------------
 
-HIPDNN_EXPORT hipdnnStatus_t
-hipdnnCreateConvolutionDescriptor(hipdnnConvolutionDescriptor_t *convDesc);
+hipdnnStatus_t
+hipdnnCreateReduceTensorDescriptor( hipdnnReduceTensorDescriptor_t *reduceTensorDesc);
 
-HIPDNN_EXPORT hipdnnStatus_t hipdnnSetConvolution2dDescriptor(
-    hipdnnConvolutionDescriptor_t convDesc, int pad_h, int pad_w, int u, int v,
-    int upscalex, int upscaley, hipdnnConvolutionMode_t mode,
-    hipdnnDataType_t computeType);
+hipdnnStatus_t
+hipdnnSetReduceTensorDescriptor( hipdnnReduceTensorDescriptor_t reduceTensorDesc,
+                                 hipdnnReduceTensorOp_t reduceTensorOp,
+                                 hipdnnDataType_t reduceTensorCompType,
+                                 hipdnnNanPropagation_t reduceTensorNanOpt,
+                                 hipdnnReduceTensorIndices_t reduceTensorIndices,
+                                 hipdnnIndicesType_t reduceTensorIndicesType);
 
-HIPDNN_EXPORT hipdnnStatus_t hipdnnGetConvolution2dDescriptor(
-    const hipdnnConvolutionDescriptor_t convDesc, int *pad_h, int *pad_y,
-    int *u, int *v, int *upscalex, int *upscaley, hipdnnConvolutionMode_t *mode,
-    hipdnnDataType_t *computeType);
+hipdnnStatus_t
+hipdnnGetReductionWorkspaceSize( hipdnnHandle_t handle,
+                         const hipdnnReduceTensorDescriptor_t reduceTensorDesc,
+                         const hipdnnTensorDescriptor_t aDesc,
+                         const hipdnnTensorDescriptor_t cDesc,
+                         size_t *sizeInBytes);
 
-HIPDNN_EXPORT hipdnnStatus_t hipdnnGetConvolution2dForwardOutputDim(
-    const hipdnnConvolutionDescriptor_t convDesc,  // HGSOSOS const
-    const hipdnnTensorDescriptor_t inputTensorDesc,
-    const hipdnnFilterDescriptor_t filterDesc, int *n, int *c, int *h, int *w);
+hipdnnStatus_t
+hipdnnReduceTensor( hipdnnHandle_t handle,
+                    const hipdnnReduceTensorDescriptor_t reduceTensorDesc,
+                    void *indices,   size_t indicesSizeInBytes,
+                    void *workspace, size_t workspaceSizeInBytes,
+                    const void *alpha,
+                    const hipdnnTensorDescriptor_t aDesc, const void *A,
+                    const void *beta,
+                    const hipdnnTensorDescriptor_t cDesc, void *C);
 
-HIPDNN_EXPORT hipdnnStatus_t
-hipdnnDestroyConvolutionDescriptor(hipdnnConvolutionDescriptor_t convDesc);
+hipdnnStatus_t
+hipdnnDestroyReduceTensorDescriptor( hipdnnReduceTensorDescriptor_t reduceTensorDesc);
 
-HIPDNN_EXPORT hipdnnStatus_t hipdnnFindConvolutionForwardAlgorithm(
-    hipdnnHandle_t handle, const hipdnnTensorDescriptor_t xDesc,
-    const hipdnnFilterDescriptor_t wDesc,
-    const hipdnnConvolutionDescriptor_t convDesc,
-    const hipdnnTensorDescriptor_t yDesc, const int requestedAlgoCount,
-    int *returnedAlgoCount, hipdnnConvolutionFwdAlgoPerf_t *perfResults);
+//=============================== Filter =======================================
+// In MIOpen Filter data and descriptor is same as tensor data and decriptor
 
-HIPDNN_EXPORT hipdnnStatus_t hipdnnGetConvolutionForwardAlgorithm(
-    hipdnnHandle_t handle, const hipdnnTensorDescriptor_t xDesc,
-    const hipdnnFilterDescriptor_t wDesc,
-    const hipdnnConvolutionDescriptor_t convDesc,
-    const hipdnnTensorDescriptor_t yDesc,
-    hipdnnConvolutionFwdPreference_t preference, size_t memoryLimitInBytes,
-    hipdnnConvolutionFwdAlgo_t *algo);
+hipdnnStatus_t
+hipdnnCreateFilterDescriptor( hipdnnFilterDescriptor_t *filterDesc);
 
-HIPDNN_EXPORT hipdnnStatus_t hipdnnFindConvolutionForwardAlgorithmEx(
-    hipdnnHandle_t handle, const hipdnnTensorDescriptor_t xDesc, const void *x,
-    const hipdnnFilterDescriptor_t wDesc, const void *w,
-    const hipdnnConvolutionDescriptor_t convDesc,
-    const hipdnnTensorDescriptor_t yDesc, void *y, const int requestedAlgoCount,
-    int *returnedAlgoCount, hipdnnConvolutionFwdAlgoPerf_t *perfResults,
-    void *workSpace, size_t workSpaceSizeInBytes);
+hipdnnStatus_t
+hipdnnSetFilterNdDescriptor( hipdnnFilterDescriptor_t filterDesc,
+                             hipdnnDataType_t dataType,  /* image data type */
+                             hipdnnTensorFormat_t format,
+                             int nbDims,
+                             const int filterDimA[]);
 
-HIPDNN_EXPORT hipdnnStatus_t hipdnnGetConvolutionForwardWorkspaceSize(
-    hipdnnHandle_t handle, const hipdnnTensorDescriptor_t xDesc,
-    const hipdnnFilterDescriptor_t wDesc,
-    const hipdnnConvolutionDescriptor_t convDesc,
-    const hipdnnTensorDescriptor_t yDesc, hipdnnConvolutionFwdAlgo_t algo,
-    size_t *sizeInBytes);
+hipdnnStatus_t
+hipdnnGetFilterNdDescriptor( const hipdnnFilterDescriptor_t filterDesc,
+                             int nbDimsRequested,
+                             hipdnnDataType_t *dataType,  /* image data type */
+                             hipdnnTensorFormat_t *format,
+                             int *nbDims,
+                             int filterDimA[]);
 
-HIPDNN_EXPORT hipdnnStatus_t
-hipdnnConvolutionForward(hipdnnHandle_t handle, const void *alpha,
-                         const hipdnnTensorDescriptor_t xDesc, const void *x,
-                         const hipdnnFilterDescriptor_t wDesc, const void *w,
+hipdnnStatus_t
+hipdnnDestroyFilterDescriptor( hipdnnFilterDescriptor_t filterDesc);
+
+//========================== Convolutional =====================================
+
+hipdnnStatus_t
+hipdnnCreateConvolutionDescriptor( hipdnnConvolutionDescriptor_t *convDesc);
+
+hipdnnStatus_t
+hipdnnSetConvolution2dDescriptor( hipdnnConvolutionDescriptor_t convDesc,
+                                  int pad_h, int pad_w, int u, int v,
+                                  int upscalex, int upscaley,
+                                  hipdnnConvolutionMode_t mode,
+                                  hipdnnDataType_t computeType);
+
+hipdnnStatus_t
+hipdnnGetConvolution2dDescriptor( const hipdnnConvolutionDescriptor_t convDesc,
+                                  int *pad_h, int *pad_y, int *u, int *v,
+                                  int *upscalex, int *upscaley,
+                                  hipdnnConvolutionMode_t *mode,
+                                  hipdnnDataType_t *computeType);
+
+hipdnnStatus_t
+hipdnnGetConvolution2dForwardOutputDim(
+                                const hipdnnConvolutionDescriptor_t convDesc,
+                                const hipdnnTensorDescriptor_t inputTensorDesc,
+                                const hipdnnFilterDescriptor_t filterDesc,
+                                int *n, int *c, int *h, int *w);
+
+
+hipdnnStatus_t
+hipdnnSetConvolutionNdDescriptor( hipdnnConvolutionDescriptor_t convDesc,
+                                  int arrayLength, /* nbDims-2 size */
+                                  const int padA[],
+                                  const int filterStrideA[],
+                                  const int dilationA[],
+                                  hipdnnConvolutionMode_t mode,
+                                  hipdnnDataType_t computeType);  /* convolution data type */
+
+hipdnnStatus_t
+hipdnnDestroyConvolutionDescriptor( hipdnnConvolutionDescriptor_t convDesc);
+
+hipdnnStatus_t
+hipdnnFindConvolutionForwardAlgorithm( hipdnnHandle_t handle,
+                                    const hipdnnTensorDescriptor_t xDesc,
+                                    const hipdnnFilterDescriptor_t wDesc,
+                                    const hipdnnConvolutionDescriptor_t convDesc,
+                                    const hipdnnTensorDescriptor_t yDesc,
+                                    const int requestedAlgoCount,
+                                    int *returnedAlgoCount,
+                                    hipdnnConvolutionFwdAlgoPerf_t *perfResults);
+
+hipdnnStatus_t
+hipdnnGetConvolutionForwardAlgorithm( hipdnnHandle_t handle,
+                                    const hipdnnTensorDescriptor_t xDesc,
+                                    const hipdnnFilterDescriptor_t wDesc,
+                                    const hipdnnConvolutionDescriptor_t convDesc,
+                                    const hipdnnTensorDescriptor_t yDesc,
+                                    hipdnnConvolutionFwdPreference_t preference,
+                                    size_t memoryLimitInBytes,
+                                    hipdnnConvolutionFwdAlgo_t *algo);
+
+hipdnnStatus_t
+hipdnnFindConvolutionForwardAlgorithmEx( hipdnnHandle_t handle,
+                                    const hipdnnTensorDescriptor_t xDesc,
+                                    const void *x,
+                                    const hipdnnFilterDescriptor_t wDesc,
+                                    const void *w,
+                                    const hipdnnConvolutionDescriptor_t convDesc,
+                                    const hipdnnTensorDescriptor_t yDesc,
+                                    void *y,
+                                    const int requestedAlgoCount,
+                                    int *returnedAlgoCount,
+                                    hipdnnConvolutionFwdAlgoPerf_t *perfResults,
+                                    void *workSpace,
+                                    size_t workSpaceSizeInBytes);
+
+hipdnnStatus_t
+hipdnnGetConvolutionForwardWorkspaceSize( hipdnnHandle_t handle,
+                                    const hipdnnTensorDescriptor_t xDesc,
+                                    const hipdnnFilterDescriptor_t wDesc,
+                                    const hipdnnConvolutionDescriptor_t convDesc,
+                                    const hipdnnTensorDescriptor_t yDesc,
+                                    hipdnnConvolutionFwdAlgo_t algo,
+                                    size_t *sizeInBytes);
+
+hipdnnStatus_t
+hipdnnConvolutionForward( hipdnnHandle_t handle,
+                         const void *alpha,
+                         const hipdnnTensorDescriptor_t xDesc,
+                         const void *x,
+                         const hipdnnFilterDescriptor_t wDesc,
+                         const void *w,
                          const hipdnnConvolutionDescriptor_t convDesc,
-                         hipdnnConvolutionFwdAlgo_t algo, void *workSpace,
-                         size_t workSpaceSizeInBytes, const void *beta,
-                         const hipdnnTensorDescriptor_t yDesc, void *y);
+                         hipdnnConvolutionFwdAlgo_t algo,
+                         void *workSpace,
+                         size_t workSpaceSizeInBytes,
+                         const void *beta,
+                         const hipdnnTensorDescriptor_t yDesc,
+                         void *y);
 
-HIPDNN_EXPORT hipdnnStatus_t hipdnnConvolutionBackwardBias(
-    hipdnnHandle_t handle, const void *alpha,
-    const hipdnnTensorDescriptor_t dyDesc, const void *dy, const void *beta,
-    const hipdnnTensorDescriptor_t dbDesc, void *db);
+hipdnnStatus_t
+hipdnnConvolutionBackwardBias( hipdnnHandle_t handle,
+                                const void *alpha,
+                                const hipdnnTensorDescriptor_t dyDesc,
+                                const void *dy,
+                                const void *beta,
+                                const hipdnnTensorDescriptor_t dbDesc,
+                                void *db);
 
-HIPDNN_EXPORT hipdnnStatus_t hipdnnFindConvolutionBackwardFilterAlgorithm(
-    hipdnnHandle_t handle, const hipdnnTensorDescriptor_t xDesc,
-    const hipdnnTensorDescriptor_t dyDesc,
-    const hipdnnConvolutionDescriptor_t convDesc,
-    const hipdnnFilterDescriptor_t dwDesc, const int requestedAlgoCount,
-    int *returnedAlgoCount, hipdnnConvolutionBwdFilterAlgoPerf_t *perfResults);
+hipdnnStatus_t
+hipdnnFindConvolutionBackwardFilterAlgorithm( hipdnnHandle_t handle,
+                            const hipdnnTensorDescriptor_t xDesc,
+                            const hipdnnTensorDescriptor_t dyDesc,
+                            const hipdnnConvolutionDescriptor_t convDesc,
+                            const hipdnnFilterDescriptor_t dwDesc,
+                            const int requestedAlgoCount,
+                            int *returnedAlgoCount,
+                            hipdnnConvolutionBwdFilterAlgoPerf_t *perfResults);
 
-HIPDNN_EXPORT hipdnnStatus_t hipdnnGetConvolutionBackwardFilterAlgorithm(
-    hipdnnHandle_t handle, const hipdnnTensorDescriptor_t xDesc,
-    const hipdnnTensorDescriptor_t dyDesc,
-    const hipdnnConvolutionDescriptor_t convDesc,
-    const hipdnnFilterDescriptor_t dwDesc,
-    hipdnnConvolutionBwdFilterPreference_t preference,
-    size_t memoryLimitInBytes, hipdnnConvolutionBwdFilterAlgo_t *algo);
+hipdnnStatus_t
+hipdnnGetConvolutionBackwardFilterAlgorithm( hipdnnHandle_t handle,
+                              const hipdnnTensorDescriptor_t xDesc,
+                              const hipdnnTensorDescriptor_t dyDesc,
+                              const hipdnnConvolutionDescriptor_t convDesc,
+                              const hipdnnFilterDescriptor_t dwDesc,
+                              hipdnnConvolutionBwdFilterPreference_t preference,
+                              size_t memoryLimitInBytes,
+                              hipdnnConvolutionBwdFilterAlgo_t *algo);
 
-HIPDNN_EXPORT hipdnnStatus_t hipdnnFindConvolutionBackwardFilterAlgorithmEx(
-    hipdnnHandle_t handle, const hipdnnTensorDescriptor_t xDesc, const void *x,
-    const hipdnnTensorDescriptor_t dyDesc, const void *dy,
-    const hipdnnConvolutionDescriptor_t convDesc,
-    const hipdnnFilterDescriptor_t dwDesc, void *dw,
-    const int requestedAlgoCount, int *returnedAlgoCount,
-    hipdnnConvolutionBwdFilterAlgoPerf_t *perfResults, void *workSpace,
-    size_t workSpaceSizeInBytes);
+hipdnnStatus_t
+hipdnnFindConvolutionBackwardFilterAlgorithmEx( hipdnnHandle_t handle,
+                                const hipdnnTensorDescriptor_t xDesc,
+                                const void *x,
+                                const hipdnnTensorDescriptor_t dyDesc,
+                                const void *dy,
+                                const hipdnnConvolutionDescriptor_t convDesc,
+                                const hipdnnFilterDescriptor_t dwDesc,
+                                void *dw,
+                                const int requestedAlgoCount,
+                                int *returnedAlgoCount,
+                                hipdnnConvolutionBwdFilterAlgoPerf_t *perfResults,
+                                void *workSpace,
+                                size_t workSpaceSizeInBytes);
 
-HIPDNN_EXPORT hipdnnStatus_t hipdnnGetConvolutionBackwardFilterWorkspaceSize(
-    hipdnnHandle_t handle, const hipdnnTensorDescriptor_t xDesc,
-    const hipdnnTensorDescriptor_t dyDesc,
-    const hipdnnConvolutionDescriptor_t convDesc,
-    const hipdnnFilterDescriptor_t dwDesc,
-    hipdnnConvolutionBwdFilterAlgo_t algo, size_t *sizeInBytes);
+hipdnnStatus_t
+hipdnnGetConvolutionBackwardFilterWorkspaceSize( hipdnnHandle_t handle,
+                                    const hipdnnTensorDescriptor_t xDesc,
+                                    const hipdnnTensorDescriptor_t dyDesc,
+                                    const hipdnnConvolutionDescriptor_t convDesc,
+                                    const hipdnnFilterDescriptor_t dwDesc,
+                                    hipdnnConvolutionBwdFilterAlgo_t algo,
+                                    size_t *sizeInBytes);
 
-HIPDNN_EXPORT hipdnnStatus_t hipdnnConvolutionBackwardFilter(
-    hipdnnHandle_t handle, const void *alpha,
-    const hipdnnTensorDescriptor_t xDesc, const void *x,
-    const hipdnnTensorDescriptor_t dyDesc, const void *dy,
-    const hipdnnConvolutionDescriptor_t convDesc,
-    hipdnnConvolutionBwdFilterAlgo_t algo, void *workSpace,
-    size_t workSpaceSizeInBytes, const void *beta,
-    const hipdnnFilterDescriptor_t dwDesc, void *dw);
+hipdnnStatus_t
+hipdnnConvolutionBackwardFilter( hipdnnHandle_t handle,
+                                  const void *alpha,
+                                  const hipdnnTensorDescriptor_t xDesc,
+                                  const void *x,
+                                  const hipdnnTensorDescriptor_t dyDesc,
+                                  const void *dy,
+                                  const hipdnnConvolutionDescriptor_t convDesc,
+                                  hipdnnConvolutionBwdFilterAlgo_t algo,
+                                  void *workSpace,
+                                  size_t workSpaceSizeInBytes,
+                                  const void *beta,
+                                  const hipdnnFilterDescriptor_t dwDesc,
+                                  void *dw);
 
-HIPDNN_EXPORT hipdnnStatus_t hipdnnGetConvolutionBackwardDataWorkspaceSize(
-    hipdnnHandle_t handle, const hipdnnFilterDescriptor_t wDesc,
-    const hipdnnTensorDescriptor_t dyDesc,
-    const hipdnnConvolutionDescriptor_t convDesc,
-    const hipdnnTensorDescriptor_t dxDesc, hipdnnConvolutionBwdDataAlgo_t algo,
-    size_t *sizeInBytes);
+hipdnnStatus_t
+hipdnnGetConvolutionBackwardDataWorkspaceSize( hipdnnHandle_t handle,
+                                    const hipdnnFilterDescriptor_t wDesc,
+                                    const hipdnnTensorDescriptor_t dyDesc,
+                                    const hipdnnConvolutionDescriptor_t convDesc,
+                                    const hipdnnTensorDescriptor_t dxDesc,
+                                    hipdnnConvolutionBwdDataAlgo_t algo,
+                                    size_t *sizeInBytes);
 
-HIPDNN_EXPORT hipdnnStatus_t hipdnnFindConvolutionBackwardDataAlgorithm(
-    hipdnnHandle_t handle, const hipdnnFilterDescriptor_t wDesc,
-    const hipdnnTensorDescriptor_t dyDesc,
-    const hipdnnConvolutionDescriptor_t convDesc,
-    const hipdnnTensorDescriptor_t dxDesc, const int requestedAlgoCount,
-    int *returnedAlgoCount, hipdnnConvolutionBwdDataAlgoPerf_t *perfResults);
+hipdnnStatus_t
+hipdnnFindConvolutionBackwardDataAlgorithm( hipdnnHandle_t handle,
+                                const hipdnnFilterDescriptor_t wDesc,
+                                const hipdnnTensorDescriptor_t dyDesc,
+                                const hipdnnConvolutionDescriptor_t convDesc,
+                                const hipdnnTensorDescriptor_t dxDesc,
+                                const int requestedAlgoCount,
+                                int *returnedAlgoCount,
+                                hipdnnConvolutionBwdDataAlgoPerf_t *perfResults);
 
-HIPDNN_EXPORT hipdnnStatus_t hipdnnGetConvolutionBackwardDataAlgorithm(
-    hipdnnHandle_t handle, const hipdnnFilterDescriptor_t wDesc,
-    const hipdnnTensorDescriptor_t dyDesc,
-    const hipdnnConvolutionDescriptor_t convDesc,
-    const hipdnnTensorDescriptor_t dxDesc,
-    hipdnnConvolutionBwdDataPreference_t preference, size_t memoryLimitInBytes,
-    hipdnnConvolutionBwdDataAlgo_t *algo);
+hipdnnStatus_t
+hipdnnGetConvolutionBackwardDataAlgorithm( hipdnnHandle_t handle,
+                                const hipdnnFilterDescriptor_t wDesc,
+                                const hipdnnTensorDescriptor_t dyDesc,
+                                const hipdnnConvolutionDescriptor_t convDesc,
+                                const hipdnnTensorDescriptor_t dxDesc,
+                                hipdnnConvolutionBwdDataPreference_t preference,
+                                size_t memoryLimitInBytes,
+                                hipdnnConvolutionBwdDataAlgo_t *algo);
 
-HIPDNN_EXPORT hipdnnStatus_t hipdnnFindConvolutionBackwardDataAlgorithmEx(
-    hipdnnHandle_t handle, const hipdnnFilterDescriptor_t wDesc, const void *w,
-    const hipdnnTensorDescriptor_t dyDesc, const void *dy,
-    const hipdnnConvolutionDescriptor_t convDesc,
-    const hipdnnTensorDescriptor_t dxDesc, void *dx,
-    const int requestedAlgoCount, int *returnedAlgoCount,
-    hipdnnConvolutionBwdDataAlgoPerf_t *perfResults, void *workSpace,
-    size_t workSpaceSizeInBytes);
+hipdnnStatus_t
+hipdnnFindConvolutionBackwardDataAlgorithmEx( hipdnnHandle_t handle,
+                               const hipdnnFilterDescriptor_t wDesc,
+                               const void *w,
+                               const hipdnnTensorDescriptor_t dyDesc,
+                               const void *dy,
+                               const hipdnnConvolutionDescriptor_t convDesc,
+                               const hipdnnTensorDescriptor_t dxDesc,
+                               void *dx,
+                               const int requestedAlgoCount,
+                               int *returnedAlgoCount,
+                               hipdnnConvolutionBwdDataAlgoPerf_t *perfResults,
+                               void *workSpace,
+                               size_t workSpaceSizeInBytes);
+hipdnnStatus_t
+hipdnnConvolutionBackwardData( hipdnnHandle_t handle,
+                               const void *alpha,
+                               const hipdnnFilterDescriptor_t wDesc,
+                               const void *w,
+                               const hipdnnTensorDescriptor_t dyDesc,
+                               const void *dy,
+                               const hipdnnConvolutionDescriptor_t convDesc,
+                               hipdnnConvolutionBwdDataAlgo_t algo,
+                               void *workSpace,
+                               size_t workSpaceSizeInBytes,
+                               const void *beta,
+                               const hipdnnTensorDescriptor_t dxDesc,
+                               void *dx);
 
-HIPDNN_EXPORT hipdnnStatus_t hipdnnConvolutionBackwardData(
-    hipdnnHandle_t handle, const void *alpha,
-    const hipdnnFilterDescriptor_t wDesc, const void *w,
-    const hipdnnTensorDescriptor_t dyDesc, const void *dy,
-    const hipdnnConvolutionDescriptor_t convDesc,
-    hipdnnConvolutionBwdDataAlgo_t algo, void *workSpace,
-    size_t workSpaceSizeInBytes, const void *beta,
-    const hipdnnTensorDescriptor_t dxDesc, void *dx);
+hipdnnStatus_t hipdnnSetConvolutionMathType(
+    hipdnnConvolutionDescriptor_t convDesc, hipdnnMathType_t mathType);
 
-HIPDNN_EXPORT hipdnnStatus_t hipdnnSoftmaxForward(
-    hipdnnHandle_t handle, hipdnnSoftmaxAlgorithm_t algo,
-    hipdnnSoftmaxMode_t mode, const void *alpha,
-    const hipdnnTensorDescriptor_t xDesc, const void *x, const void *beta,
-    const hipdnnTensorDescriptor_t yDesc, void *y);
+hipdnnStatus_t
+hipdnnSetConvolutionGroupCount( hipdnnConvolutionDescriptor_t convDesc,
+                                int groupCount );
 
-HIPDNN_EXPORT hipdnnStatus_t hipdnnSoftmaxBackward(
-    hipdnnHandle_t handle, hipdnnSoftmaxAlgorithm_t algo,
-    hipdnnSoftmaxMode_t mode, const void *alpha,
-    const hipdnnTensorDescriptor_t yDesc, const void *y,
-    const hipdnnTensorDescriptor_t dyDesc, const void *dy, const void *beta,
-    const hipdnnTensorDescriptor_t dxDesc, void *dx);
+//============================== SoftMax =======================================
 
-HIPDNN_EXPORT hipdnnStatus_t
+hipdnnStatus_t hipdnnSoftmaxForward( hipdnnHandle_t handle,
+                                     hipdnnSoftmaxAlgorithm_t algo,
+                                     hipdnnSoftmaxMode_t mode,
+                                     const void *alpha,
+                                     const hipdnnTensorDescriptor_t xDesc,
+                                     const void *x,
+                                     const void *beta,
+                                     const hipdnnTensorDescriptor_t yDesc,
+                                     void *y);
+
+ hipdnnStatus_t hipdnnSoftmaxBackward( hipdnnHandle_t handle,
+                                       hipdnnSoftmaxAlgorithm_t algo,
+                                       hipdnnSoftmaxMode_t mode,
+                                       const void *alpha,
+                                       const hipdnnTensorDescriptor_t yDesc,
+                                       const void *y,
+                                       const hipdnnTensorDescriptor_t dyDesc,
+                                       const void *dy,
+                                       const void *beta,
+                                       const hipdnnTensorDescriptor_t dxDesc,
+                                       void *dx);
+
+//================================ Pooling =====================================
+
+hipdnnStatus_t
 hipdnnCreatePoolingDescriptor(hipdnnPoolingDescriptor_t *poolingDesc);
 
-HIPDNN_EXPORT hipdnnStatus_t hipdnnSetPooling2dDescriptor(
-    hipdnnPoolingDescriptor_t poolingDesc, hipdnnPoolingMode_t mode,
-    hipdnnNanPropagation_t maxpoolingNanOpt, int windowHeight, int windowWidth,
-    int verticalPadding, int horizontalPadding, int verticalStride,
-    int horizontalStride);
+hipdnnStatus_t
+hipdnnSetPooling2dDescriptor( hipdnnPoolingDescriptor_t poolingDesc,
+                              hipdnnPoolingMode_t mode,
+                              hipdnnNanPropagation_t maxpoolingNanOpt,
+                              int windowHeight,
+                              int windowWidth,
+                              int verticalPadding,
+                              int horizontalPadding,
+                              int verticalStride,
+                              int horizontalStride);
 
-HIPDNN_EXPORT hipdnnStatus_t hipdnnGetPooling2dDescriptor(
-    const hipdnnPoolingDescriptor_t poolingDesc, hipdnnPoolingMode_t *mode,
-    hipdnnNanPropagation_t *maxpoolingNanOpt, int *windowHeight,
-    int *windowWidth, int *verticalPadding, int *horizontalPadding,
-    int *verticalStride, int *horizontalStride);
+hipdnnStatus_t
+hipdnnSetPoolingNdDescriptor( hipdnnPoolingDescriptor_t poolingDesc,
+                              const hipdnnPoolingMode_t mode,
+                              const hipdnnNanPropagation_t maxpoolingNanOpt,
+                              int nbDims,
+                              const int windowDimA[],
+                              const int paddingA[],
+                              const int strideA[]);
+hipdnnStatus_t
+hipdnnGetPooling2dDescriptor( const hipdnnPoolingDescriptor_t poolingDesc,
+                               hipdnnPoolingMode_t *mode,
+                               hipdnnNanPropagation_t *maxpoolingNanOpt,
+                               int *windowHeight,    int *windowWidth,
+                               int *verticalPadding, int *horizontalPadding,
+                               int *verticalStride,  int *horizontalStride);
 
-HIPDNN_EXPORT hipdnnStatus_t hipdnnGetPooling2dForwardOutputDim(
-    const hipdnnPoolingDescriptor_t poolingDesc,
-    const hipdnnTensorDescriptor_t inputTensorDesc, int *n, int *c, int *h,
-    int *w);
+hipdnnStatus_t
+hipdnnGetPooling2dForwardOutputDim( const hipdnnPoolingDescriptor_t poolingDesc,
+                                const hipdnnTensorDescriptor_t inputTensorDesc,
+                                int *n, int *c, int *h, int *w);
 
-HIPDNN_EXPORT hipdnnStatus_t
-hipdnnDestroyPoolingDescriptor(hipdnnPoolingDescriptor_t poolingDesc);
+hipdnnStatus_t
+hipdnnDestroyPoolingDescriptor( hipdnnPoolingDescriptor_t poolingDesc);
 
-HIPDNN_EXPORT hipdnnStatus_t hipdnnPoolingForward(
-    hipdnnHandle_t handle, const hipdnnPoolingDescriptor_t poolingDesc,
-    const void *alpha, const hipdnnTensorDescriptor_t xDesc, const void *x,
-    const void *beta, const hipdnnTensorDescriptor_t yDesc, void *y);
+hipdnnStatus_t hipdnnPoolingForward( hipdnnHandle_t handle,
+                                    const hipdnnPoolingDescriptor_t poolingDesc,
+                                    const void *alpha,
+                                    const hipdnnTensorDescriptor_t xDesc,
+                                    const void *x,
+                                    const void *beta,
+                                    const hipdnnTensorDescriptor_t yDesc,
+                                    void *y);
 
-HIPDNN_EXPORT hipdnnStatus_t hipdnnPoolingBackward(
-    hipdnnHandle_t handle, const hipdnnPoolingDescriptor_t poolingDesc,
-    const void *alpha, const hipdnnTensorDescriptor_t yDesc, const void *y,
-    const hipdnnTensorDescriptor_t dyDesc, const void *dy,
-    const hipdnnTensorDescriptor_t xDesc, const void *x, const void *beta,
-    const hipdnnTensorDescriptor_t dxDesc, void *dx);
+hipdnnStatus_t hipdnnPoolingBackward( hipdnnHandle_t handle,
+                                    const hipdnnPoolingDescriptor_t poolingDesc,
+                                    const void *alpha,
+                                    const hipdnnTensorDescriptor_t yDesc,
+                                    const void *y,
+                                    const hipdnnTensorDescriptor_t dyDesc,
+                                    const void *dy,
+                                    const hipdnnTensorDescriptor_t xDesc,
+                                    const void *x,
+                                    const void *beta,
+                                    const hipdnnTensorDescriptor_t dxDesc,
+                                    void *dx);
 
-HIPDNN_EXPORT hipdnnStatus_t
+//============================ Activation ======================================
+
+hipdnnStatus_t
 hipdnnCreateActivationDescriptor(hipdnnActivationDescriptor_t *activationDesc);
 
-// cudnn uses only one parameter. MIOpen supports three.
-// the first parameter reluCeilingOrAlpha is the common denominator.
-// unless you use MIOpen specific mode, you can pass zeros for activBeta and
-// activExp
-HIPDNN_EXPORT hipdnnStatus_t hipdnnSetActivationDescriptor(
-    hipdnnActivationDescriptor_t activationDesc,  // HGSOS const
-    hipdnnActivationMode_t mode, hipdnnNanPropagation_t reluNanOpt,
-    double reluCeilingOrAlpha, double activBeta, double activExp);
+/* cudnn uses only one coeff param - for clipping threashold or alpha coefficient.
+ * MIOpen supports three - Alpha, Beta and Gamma
+ * The first parameter reluCeilingOrAlpha is the common denominator.
+ * unless MIOpen specific mode used, zeros can be passed for activBeta and activExp
+ */
+hipdnnStatus_t
+hipdnnSetActivationDescriptor( hipdnnActivationDescriptor_t activationDesc,
+                                hipdnnActivationMode_t mode,
+                                hipdnnNanPropagation_t reluNanOpt,
+                                double reluCeilingOrAlpha,
+                                double activBeta,
+                                double activExp);
 
-HIPDNN_EXPORT hipdnnStatus_t hipdnnGetActivationDescriptor(
-    const hipdnnActivationDescriptor_t activationDesc,
-    hipdnnActivationMode_t *mode, hipdnnNanPropagation_t *reluNanOpt,
-    double *reluCeilingOrAlpha, double *activBeta, double *activExp);
+hipdnnStatus_t
+hipdnnGetActivationDescriptor( const hipdnnActivationDescriptor_t activationDesc,
+                                hipdnnActivationMode_t *mode,
+                                hipdnnNanPropagation_t *reluNanOpt,
+                                double *reluCeilingOrAlpha,
+                                double *activBeta,
+                                double *activExp);
 
-HIPDNN_EXPORT hipdnnStatus_t
+hipdnnStatus_t
 hipdnnDestroyActivationDescriptor(hipdnnActivationDescriptor_t activationDesc);
 
-HIPDNN_EXPORT hipdnnStatus_t hipdnnActivationForward(
-    hipdnnHandle_t handle,
-    hipdnnActivationDescriptor_t activationDesc,  // HGSOS not const in cudnn.
-    const void *alpha, const hipdnnTensorDescriptor_t xDesc, const void *x,
-    const void *beta, const hipdnnTensorDescriptor_t yDesc, void *y);
+hipdnnStatus_t
+hipdnnActivationForward( hipdnnHandle_t handle,
+                         hipdnnActivationDescriptor_t activationDesc,
+                         const void *alpha,
+                         const hipdnnTensorDescriptor_t xDesc,
+                         const void *x,
+                         const void *beta,
+                         const hipdnnTensorDescriptor_t yDesc,
+                         void *y);
 
-HIPDNN_EXPORT hipdnnStatus_t hipdnnActivationBackward(
-    hipdnnHandle_t handle,
-    hipdnnActivationDescriptor_t activationDesc,  // HGSOS not const in cuda
-    const void *alpha, const hipdnnTensorDescriptor_t yDesc, const void *y,
-    const hipdnnTensorDescriptor_t dyDesc, const void *dy,
-    const hipdnnTensorDescriptor_t xDesc, const void *x, const void *beta,
-    const hipdnnTensorDescriptor_t dxDesc, void *dx);
+hipdnnStatus_t
+hipdnnActivationBackward( hipdnnHandle_t handle,
+                           hipdnnActivationDescriptor_t activationDesc,
+                           const void *alpha,
+                           const hipdnnTensorDescriptor_t yDesc,
+                           const void *y,
+                           const hipdnnTensorDescriptor_t dyDesc,
+                           const void *dy,
+                           const hipdnnTensorDescriptor_t xDesc,
+                           const void *x,
+                           const void *beta,
+                           const hipdnnTensorDescriptor_t dxDesc,
+                           void *dx);
 
-HIPDNN_EXPORT hipdnnStatus_t
+//=======================Local Responce Normalization ==========================
+
+hipdnnStatus_t
 hipdnnCreateLRNDescriptor(hipdnnLRNDescriptor_t *normDesc);
 
-HIPDNN_EXPORT hipdnnStatus_t hipdnnSetLRNDescriptor(
-    hipdnnLRNDescriptor_t normDesc, hipdnnLRNMode_t mode, unsigned lrnN,
-    double lrnAlpha, double lrnBeta, double lrnK);
+hipdnnStatus_t
+hipdnnSetLRNDescriptor( hipdnnLRNDescriptor_t normDesc,
+                        hipdnnLRNMode_t mode,
+                        unsigned lrnN,
+                        double lrnAlpha,
+                        double lrnBeta,
+                        double lrnK);
 
-HIPDNN_EXPORT hipdnnStatus_t hipdnnGetLRNDescriptor(
-    hipdnnLRNDescriptor_t normDesc, hipdnnLRNMode_t *mode, unsigned *lrnN,
-    double *lrnAlpha, double *lrnBeta, double *lrnK);
+hipdnnStatus_t
+hipdnnGetLRNDescriptor( hipdnnLRNDescriptor_t normDesc,
+                        hipdnnLRNMode_t *mode,
+                        unsigned *lrnN,
+                        double *lrnAlpha,
+                        double *lrnBeta,
+                        double *lrnK);
 
-HIPDNN_EXPORT hipdnnStatus_t
+hipdnnStatus_t
 hipdnnDestroyLRNDescriptor(hipdnnLRNDescriptor_t lrnDesc);
 
-HIPDNN_EXPORT hipdnnStatus_t hipdnnLRNCrossChannelForward(
-    hipdnnHandle_t handle, hipdnnLRNDescriptor_t normDesc,
-    hipdnnLRNMode_t lrnMode, const void *alpha,
-    const hipdnnTensorDescriptor_t xDesc, const void *x, const void *beta,
-    const hipdnnTensorDescriptor_t yDesc, void *y, bool do_backward);
+hipdnnStatus_t
+hipdnnLRNCrossChannelForward( hipdnnHandle_t handle,
+                              hipdnnLRNDescriptor_t normDesc,
+                              hipdnnLRNMode_t lrnMode,
+                              const void *alpha,
+                              const hipdnnTensorDescriptor_t xDesc,
+                              const void *x,
+                              const void *beta,
+                              const hipdnnTensorDescriptor_t yDesc,
+                              void *y,
+                              bool do_backward);
 
-HIPDNN_EXPORT hipdnnStatus_t hipdnnLRNCrossChannelForwardEx(
-    hipdnnHandle_t handle, hipdnnLRNDescriptor_t normDesc,
-    hipdnnLRNMode_t lrnMode, const void *alpha,
-    const hipdnnTensorDescriptor_t xDesc, const void *x, const void *beta,
-    const hipdnnTensorDescriptor_t yDesc, void *y, size_t workspacesize,
-    void *workspace, bool do_backward);
+hipdnnStatus_t
+hipdnnLRNCrossChannelForwardEx( hipdnnHandle_t handle,
+                                hipdnnLRNDescriptor_t normDesc,
+                                hipdnnLRNMode_t lrnMode,
+                                const void *alpha,
+                                const hipdnnTensorDescriptor_t xDesc,
+                                const void *x,
+                                const void *beta,
+                                const hipdnnTensorDescriptor_t yDesc,
+                                void *y,
+                                size_t workspacesize,
+                                void *workspace,
+                                bool do_backward);
 
-HIPDNN_EXPORT hipdnnStatus_t hipdnnLRNCrossChannelBackward(
-    hipdnnHandle_t handle, hipdnnLRNDescriptor_t normDesc,
-    hipdnnLRNMode_t lrnMode, const void *alpha,
-    const hipdnnTensorDescriptor_t yDesc, const void *y,
-    const hipdnnTensorDescriptor_t dyDesc, const void *dy,
-    const hipdnnTensorDescriptor_t xDesc, const void *x, const void *beta,
-    const hipdnnTensorDescriptor_t dxDesc, void *dx);
+hipdnnStatus_t
+hipdnnLRNCrossChannelBackward( hipdnnHandle_t handle,
+                               hipdnnLRNDescriptor_t normDesc,
+                               hipdnnLRNMode_t lrnMode,
+                               const void *alpha,
+                               const hipdnnTensorDescriptor_t yDesc,
+                               const void *y,
+                               const hipdnnTensorDescriptor_t dyDesc,
+                               const void *dy,
+                               const hipdnnTensorDescriptor_t xDesc,
+                               const void *x,
+                               const void *beta,
+                               const hipdnnTensorDescriptor_t dxDesc,
+                               void *dx);
 
-HIPDNN_EXPORT hipdnnStatus_t hipdnnLRNCrossChannelBackwardEx(
-    hipdnnHandle_t handle, hipdnnLRNDescriptor_t normDesc,
-    hipdnnLRNMode_t lrnMode, const void *alpha,
-    const hipdnnTensorDescriptor_t yDesc, const void *y,
-    const hipdnnTensorDescriptor_t dyDesc, const void *dy,
-    const hipdnnTensorDescriptor_t xDesc, const void *x, const void *beta,
-    const hipdnnTensorDescriptor_t dxDesc, void *dx, size_t workspacesize,
-    void *workspace);
+hipdnnStatus_t
+hipdnnLRNCrossChannelBackwardEx( hipdnnHandle_t handle,
+                                  hipdnnLRNDescriptor_t normDesc,
+                                  hipdnnLRNMode_t lrnMode,
+                                  const void *alpha,
+                                  const hipdnnTensorDescriptor_t yDesc,
+                                  const void *y,
+                                  const hipdnnTensorDescriptor_t dyDesc,
+                                  const void *dy,
+                                  const hipdnnTensorDescriptor_t xDesc,
+                                  const void *x, const void *beta,
+                                  const hipdnnTensorDescriptor_t dxDesc,
+                                  void *dx,
+                                  size_t workspacesize,
+                                  void *workspace);
 
-HIPDNN_EXPORT hipdnnStatus_t hipdnnDeriveBNTensorDescriptor(
-    hipdnnTensorDescriptor_t derivedBnDesc,
-    const hipdnnTensorDescriptor_t xDesc, hipdnnBatchNormMode_t mode);
+//============================ Batch Normalization =============================
 
-HIPDNN_EXPORT hipdnnStatus_t hipdnnBatchNormalizationForwardTraining(
-    hipdnnHandle_t handle, hipdnnBatchNormMode_t mode, void *alpha, void *beta,
-    const hipdnnTensorDescriptor_t xDesc, const void *x,
-    const hipdnnTensorDescriptor_t yDesc, void *y,
-    const hipdnnTensorDescriptor_t bnScaleBiasMeanVarDesc, void *bnScale,
-    void *bnBias, double exponentialAverageFactor, void *resultRunningMean,
-    void *resultRunningVariance, double epsilon, void *resultSaveMean,
-    void *resultSaveInvVariance);
+hipdnnStatus_t hipdnnDeriveBNTensorDescriptor(
+                                         hipdnnTensorDescriptor_t derivedBnDesc,
+                                         const hipdnnTensorDescriptor_t xDesc,
+                                         hipdnnBatchNormMode_t mode);
 
-HIPDNN_EXPORT hipdnnStatus_t hipdnnnBatchNormalizationForwardInference(
-    hipdnnHandle_t handle, hipdnnBatchNormMode_t mode, void *alpha, void *beta,
-    const hipdnnTensorDescriptor_t xDesc, const void *x,
-    const hipdnnTensorDescriptor_t yDesc, void *y,
-    const hipdnnTensorDescriptor_t bnScaleBiasMeanVarDesc, const void *bnScale,
-    const void *bnBias, const void *estimatedMean,
-    const void *estimatedVariance, double epsilon);
+hipdnnStatus_t
+hipdnnBatchNormalizationForwardTraining( hipdnnHandle_t handle,
+                          hipdnnBatchNormMode_t mode,
+                          void *alpha, void *beta,
+                          const hipdnnTensorDescriptor_t xDesc,
+                          const void *x,
+                          const hipdnnTensorDescriptor_t yDesc,
+                          void *y,
+                          const hipdnnTensorDescriptor_t bnScaleBiasMeanVarDesc,
+                          void *bnScale, void *bnBias,
+                          double exponentialAverageFactor,
+                          void *resultRunningMean,
+                          void *resultRunningVariance,
+                          double epsilon,
+                          void *resultSaveMean,
+                          void *resultSaveInvVariance);
 
-HIPDNN_EXPORT hipdnnStatus_t hipdnnBatchNormalizationBackward(
-    hipdnnHandle_t handle, hipdnnBatchNormMode_t mode,
-    const void *alphaDataDiff, const void *betaDataDiff,
-    const void *alphaParamDiff, const void *betaParamDiff,
-    const hipdnnTensorDescriptor_t xDesc, const void *x,
-    const hipdnnTensorDescriptor_t dyDesc, const void *dy,
-    const hipdnnTensorDescriptor_t dxDesc, void *dx,
-    const hipdnnTensorDescriptor_t bnScaleBiasDiffDesc, const void *bnScale,
-    void *resultBnScaleDiff, void *resultBnBiasDiff, double epsilon,
-    const void *savedMean, const void *savedInvVariance);
+hipdnnStatus_t
+hipdnnnBatchNormalizationForwardInference( hipdnnHandle_t handle,
+                           hipdnnBatchNormMode_t mode,
+                           void *alpha, void *beta,
+                           const hipdnnTensorDescriptor_t xDesc,
+                           const void *x,
+                           const hipdnnTensorDescriptor_t yDesc,
+                           void *y,
+                           const hipdnnTensorDescriptor_t bnScaleBiasMeanVarDesc,
+                           const void *bnScale, const void *bnBias,
+                           const void *estimatedMean,
+                           const void *estimatedVariance,
+                           double epsilon);
 
-HIPDNN_EXPORT hipdnnStatus_t hipdnnSetTensorNdDescriptor(
-    hipdnnTensorDescriptor_t tensorDesc, hipdnnDataType_t dataType, int nbDims,
-    const int dimA[], const int strideA[]);
+hipdnnStatus_t
+hipdnnBatchNormalizationBackward( hipdnnHandle_t handle,
+                             hipdnnBatchNormMode_t mode,
+                             const void *alphaDataDiff,
+                             const void *betaDataDiff,
+                             const void *alphaParamDiff,
+                             const void *betaParamDiff,
+                             const hipdnnTensorDescriptor_t xDesc,
+                             const void *x,
+                             const hipdnnTensorDescriptor_t dyDesc,
+                             const void *dy,
+                             const hipdnnTensorDescriptor_t dxDesc,
+                             void *dx,
+                             const hipdnnTensorDescriptor_t bnScaleBiasDiffDesc,
+                             const void *bnScale,
+                             void *resultBnScaleDiff,
+                             void *resultBnBiasDiff,
+                             double epsilon,
+                             const void *savedMean,
+                             const void *savedInvVariance);
 
-HIPDNN_EXPORT hipdnnStatus_t hipdnnGetTensorNdDescriptor(
-    const hipdnnTensorDescriptor_t tensorDesc, int nbDimsRequested,
-    hipdnnDataType_t *dataType, int *nbDims, int dimA[], int strideA[]);
+hipdnnStatus_t
+hipdnnBatchNormalizationForwardInference( hipdnnHandle_t handle,
+                          hipdnnBatchNormMode_t mode,
+                          const void *alpha,  // alpha[0] = result blend factor
+                          const void *beta,   // beta[0] = dest layer blend factor
+                          const hipdnnTensorDescriptor_t xDesc,
+                          const void *x,  // NxCxHxW
+                          const hipdnnTensorDescriptor_t yDesc,
+                          void *y,  // NxCxHxW
+                          const hipdnnTensorDescriptor_t bnScaleBiasMeanVarDesc,
+                          const void *bnScale, const void *bnBias,
+                          const void *estimatedMean,
+                          const void *estimatedVariance,
+                          double epsilon);
 
-hipdnnStatus_t hipdnnCreateDropoutDescriptor(
-    hipdnnDropoutDescriptor_t *dropoutDesc);
+//======================== Drop out Layer ======================================
 
-hipdnnStatus_t hipdnnDropoutGetStatesSize(hipdnnHandle_t handle,
-                                          size_t *sizeInBytes);
+hipdnnStatus_t
+hipdnnCreateDropoutDescriptor( hipdnnDropoutDescriptor_t *dropoutDesc);
 
-hipdnnStatus_t hipdnnSetDropoutDescriptor(hipdnnDropoutDescriptor_t dropoutDesc,
-                                          hipdnnHandle_t handle, float dropout,
-                                          void *states, size_t stateSizeInBytes,
-                                          unsigned long long seed);
+hipdnnStatus_t
+hipdnnDropoutGetStatesSize(hipdnnHandle_t handle, size_t *sizeInBytes);
 
-hipdnnStatus_t hipdnnDestroyDropoutDescriptor(
-    hipdnnDropoutDescriptor_t dropoutDesc);
+hipdnnStatus_t
+hipdnnSetDropoutDescriptor( hipdnnDropoutDescriptor_t dropoutDesc,
+                            hipdnnHandle_t handle,
+                            float dropout,
+                            void *states,
+                            size_t stateSizeInBytes,
+                            unsigned long long seed);
 
-hipdnnStatus_t hipdnnSetFilterNdDescriptor(
-    hipdnnFilterDescriptor_t filterDesc,
-    hipdnnDataType_t dataType,  // image data type
-    hipdnnTensorFormat_t format, int nbDims, const int filterDimA[]);
+hipdnnStatus_t
+hipdnnDestroyDropoutDescriptor( hipdnnDropoutDescriptor_t dropoutDesc);
 
-hipdnnStatus_t hipdnnGetFilterNdDescriptor(
-    const hipdnnFilterDescriptor_t filterDesc, int nbDimsRequested,
-    hipdnnDataType_t *dataType,  // image data type
-    hipdnnTensorFormat_t *format, int *nbDims, int filterDimA[]);
-
-hipdnnStatus_t hipdnnDestroyFilterDescriptor(
-    hipdnnFilterDescriptor_t filterDesc);
-
-hipdnnStatus_t hipdnnSetConvolutionNdDescriptor(
-    hipdnnConvolutionDescriptor_t convDesc, int arrayLength, /* nbDims-2 size */
-    const int padA[], const int filterStrideA[], const int dilationA[],
-    hipdnnConvolutionMode_t mode,
-    hipdnnDataType_t computeType);  // convolution data type
-
-hipdnnStatus_t hipdnnSetPoolingNdDescriptor(
-    hipdnnPoolingDescriptor_t poolingDesc, const hipdnnPoolingMode_t mode,
-    const hipdnnNanPropagation_t maxpoolingNanOpt, int nbDims,
-    const int windowDimA[], const int paddingA[], const int strideA[]);
-
-const char *hipdnnGetErrorString(hipdnnStatus_t status);
-
-/* RNN API */
-typedef enum {
-    HIPDNN_RNN_RELU = 0,  // Stock RNN with ReLu activation
-    HIPDNN_RNN_TANH = 1,  // Stock RNN with tanh activation
-    HIPDNN_LSTM = 2,      // LSTM with no peephole connections
-    HIPDNN_GRU =
-        3  // Using h' = tanh(r * Uh(t-1) + Wx) and h = (1 - z) * h' + z
-           // * h(t-1);
-} hipdnnRNNMode_t;
-
-typedef enum {
-    HIPDNN_UNIDIRECTIONAL = 0,
-    HIPDNN_BIDIRECTIONAL = 1  // Using output concatination at each step. Do we
-                              // also want to support output sum?
-} hipdnnDirectionMode_t;
-
-typedef enum {
-    HIPDNN_LINEAR_INPUT = 0,
-    HIPDNN_SKIP_INPUT = 1
-} hipdnnRNNInputMode_t;
-
-typedef enum {
-    HIPDNN_RNN_ALGO_STANDARD = 0,
-    HIPDNN_RNN_ALGO_PERSIST_STATIC = 1,
-    HIPDNN_RNN_ALGO_PERSIST_DYNAMIC = 2
-} hipdnnRNNAlgo_t;
+//======================= Recurrent Neural Net =================================
 
 hipdnnStatus_t hipdnnCreateRNNDescriptor(hipdnnRNNDescriptor_t *rnnDesc);
+
 hipdnnStatus_t hipdnnDestroyRNNDescriptor(hipdnnRNNDescriptor_t rnnDesc);
 
 // Expensive. Creates the plan for the specific settings.
@@ -867,32 +1116,43 @@ hipdnnStatus_t hipdnnSetPersistentRNNPlan(hipdnnRNNDescriptor_t rnnDesc,
 
 hipdnnStatus_t hipdnnDestroyPersistentRNNPlan(hipdnnPersistentRNNPlan_t plan);
 
-hipdnnStatus_t hipdnnSetRNNDescriptor_v6(
-    hipdnnHandle_t handle, hipdnnRNNDescriptor_t rnnDesc, const int hiddenSize,
-    const int numLayers,
-    hipdnnDropoutDescriptor_t
-        dropoutDesc,  // Between layers, not between recurrent steps.
-    hipdnnRNNInputMode_t inputMode, hipdnnDirectionMode_t direction,
-    hipdnnRNNMode_t mode, hipdnnRNNAlgo_t algo, hipdnnDataType_t dataType);
+/* DataType in the RNN descriptor is used to determine math precision
+ * DataType in weight descriptors and input descriptors is used to describe storage
+ */
 
-hipdnnStatus_t hipdnnSetRNNDescriptor(
-    hipdnnHandle_t handle, hipdnnRNNDescriptor_t rnnDesc, int hiddenSize,
-    int numLayers,
-    hipdnnDropoutDescriptor_t
-        dropoutDesc,  // Between layers, not between recurrent steps.
-    hipdnnRNNInputMode_t inputMode, hipdnnDirectionMode_t direction,
-    hipdnnRNNMode_t mode, hipdnnRNNAlgo_t algo, hipdnnDataType_t dataType);
+hipdnnStatus_t
+hipdnnSetRNNDescriptor_v6( hipdnnHandle_t handle,
+            hipdnnRNNDescriptor_t rnnDesc,
+            const int hiddenSize,
+            const int numLayers,
+            hipdnnDropoutDescriptor_t dropoutDesc, /*Between layers, not between recurrent steps*/
+            hipdnnRNNInputMode_t inputMode,
+            hipdnnDirectionMode_t direction,
+            hipdnnRNNMode_t mode,
+            hipdnnRNNAlgo_t algo,
+            hipdnnDataType_t dataType);
 
-hipdnnStatus_t hipdnnSetRNNDescriptor_v5(
-    hipdnnRNNDescriptor_t rnnDesc, int hiddenSize, int numLayers,
-    hipdnnDropoutDescriptor_t
-        dropoutDesc, /* Between layers, not between recurrent steps. */
-    hipdnnRNNInputMode_t inputMode, hipdnnDirectionMode_t direction,
-    hipdnnRNNMode_t mode, hipdnnDataType_t dataType);
+hipdnnStatus_t
+hipdnnSetRNNDescriptor( hipdnnHandle_t handle,
+            hipdnnRNNDescriptor_t rnnDesc,
+            int hiddenSize,
+            int numLayers,
+            hipdnnDropoutDescriptor_t dropoutDesc,/*Between layers, not between recurrent steps*/
+            hipdnnRNNInputMode_t inputMode,
+            hipdnnDirectionMode_t direction,
+            hipdnnRNNMode_t mode,
+            hipdnnRNNAlgo_t algo,
+            hipdnnDataType_t dataType);
 
-// dataType in the RNN descriptor is used to determine math precision
-// dataType in weight descriptors and input descriptors is used to describe
-// storage
+hipdnnStatus_t
+hipdnnSetRNNDescriptor_v5( hipdnnRNNDescriptor_t rnnDesc,
+            int hiddenSize,
+            int numLayers,
+            hipdnnDropoutDescriptor_t dropoutDesc, /* Between layers, not between recurrent steps. */
+            hipdnnRNNInputMode_t inputMode,
+            hipdnnDirectionMode_t direction,
+            hipdnnRNNMode_t mode,
+            hipdnnDataType_t dataType);
 
 hipdnnStatus_t hipdnnGetRNNWorkspaceSize(hipdnnHandle_t handle,
                                          const hipdnnRNNDescriptor_t rnnDesc,
@@ -900,10 +1160,12 @@ hipdnnStatus_t hipdnnGetRNNWorkspaceSize(hipdnnHandle_t handle,
                                          const hipdnnTensorDescriptor_t *xDesc,
                                          size_t *sizeInBytes);
 
-hipdnnStatus_t hipdnnGetRNNTrainingReserveSize(
-    hipdnnHandle_t handle, const hipdnnRNNDescriptor_t rnnDesc,
-    const int seqLength, const hipdnnTensorDescriptor_t *xDesc,
-    size_t *sizeInBytes);
+hipdnnStatus_t
+hipdnnGetRNNTrainingReserveSize( hipdnnHandle_t handle,
+                                 const hipdnnRNNDescriptor_t rnnDesc,
+                                 const int seqLength,
+                                 const hipdnnTensorDescriptor_t *xDesc,
+                                 size_t *sizeInBytes);
 
 hipdnnStatus_t hipdnnGetRNNParamsSize(hipdnnHandle_t handle,
                                       const hipdnnRNNDescriptor_t rnnDesc,
@@ -911,147 +1173,107 @@ hipdnnStatus_t hipdnnGetRNNParamsSize(hipdnnHandle_t handle,
                                       size_t *sizeInBytes,
                                       hipdnnDataType_t dataType);
 
-hipdnnStatus_t hipdnnGetRNNLinLayerMatrixParams(
-    hipdnnHandle_t handle, const hipdnnRNNDescriptor_t rnnDesc, const int layer,
-    const hipdnnTensorDescriptor_t xDesc, const hipdnnFilterDescriptor_t wDesc,
-    const void *w, const int linLayerID,
-    hipdnnFilterDescriptor_t linLayerMatDesc, void **linLayerMat);
-
-hipdnnStatus_t hipdnnGetRNNLinLayerBiasParams(
-    hipdnnHandle_t handle, const hipdnnRNNDescriptor_t rnnDesc, const int layer,
-    const hipdnnTensorDescriptor_t xDesc, const hipdnnFilterDescriptor_t wDesc,
-    const void *w, const int linLayerID,
-    hipdnnFilterDescriptor_t linLayerBiasDesc, void **linLayerBias);
-
-hipdnnStatus_t hipdnnRNNForwardInference(
-    hipdnnHandle_t handle, const hipdnnRNNDescriptor_t rnnDesc,
-    const int seqLength, const hipdnnTensorDescriptor_t *xDesc, const void *x,
-    const hipdnnTensorDescriptor_t hxDesc, const void *hx,
-    const hipdnnTensorDescriptor_t cxDesc, const void *cx,
-    const hipdnnFilterDescriptor_t wDesc, const void *w,
-    const hipdnnTensorDescriptor_t *yDesc, void *y,
-    const hipdnnTensorDescriptor_t hyDesc, void *hy,
-    const hipdnnTensorDescriptor_t cyDesc, void *cy, void *workspace,
-    size_t workSpaceSizeInBytes);
-
-hipdnnStatus_t hipdnnRNNForwardTraining(
-    hipdnnHandle_t handle, const hipdnnRNNDescriptor_t rnnDesc,
-    const int seqLength, const hipdnnTensorDescriptor_t *xDesc, const void *x,
-    const hipdnnTensorDescriptor_t hxDesc, const void *hx,
-    const hipdnnTensorDescriptor_t cxDesc, const void *cx,
-    const hipdnnFilterDescriptor_t wDesc, const void *w,
-    const hipdnnTensorDescriptor_t *yDesc, void *y,
-    const hipdnnTensorDescriptor_t hyDesc, void *hy,
-    const hipdnnTensorDescriptor_t cyDesc, void *cy, void *workspace,
-    size_t workSpaceSizeInBytes, void *reserveSpace,
-    size_t reserveSpaceSizeInBytes);
-
-hipdnnStatus_t hipdnnRNNBackwardData(
-    hipdnnHandle_t handle, const hipdnnRNNDescriptor_t rnnDesc,
-    const int seqLength, const hipdnnTensorDescriptor_t *yDesc, const void *y,
-    const hipdnnTensorDescriptor_t *dyDesc, const void *dy,
-    const hipdnnTensorDescriptor_t dhyDesc, const void *dhy,
-    const hipdnnTensorDescriptor_t dcyDesc, const void *dcy,
-    const hipdnnFilterDescriptor_t wDesc, const void *w,
-    const hipdnnTensorDescriptor_t hxDesc, const void *hx,
-    const hipdnnTensorDescriptor_t cxDesc, const void *cx,
-    const hipdnnTensorDescriptor_t *dxDesc, void *dx,
-    const hipdnnTensorDescriptor_t dhxDesc, void *dhx,
-    const hipdnnTensorDescriptor_t dcxDesc, void *dcx, void *workspace,
-    size_t workSpaceSizeInBytes, void *reserveSpace,
-    size_t reserveSpaceSizeInBytes);
-
-hipdnnStatus_t hipdnnRNNBackwardWeights(
-    hipdnnHandle_t handle, const hipdnnRNNDescriptor_t rnnDesc,
-    const int seqLength, const hipdnnTensorDescriptor_t *xDesc, const void *x,
-    const hipdnnTensorDescriptor_t hxDesc, const void *hx,
-    const hipdnnTensorDescriptor_t *yDesc, const void *y, const void *workspace,
-    size_t workSpaceSizeInBytes, const hipdnnFilterDescriptor_t dwDesc,
-    void *dw, const void *reserveSpace, size_t reserveSpaceSizeInBytes);
-
-hipdnnStatus_t hipdnnBatchNormalizationForwardInference(
-    hipdnnHandle_t handle, hipdnnBatchNormMode_t mode,
-    const void *alpha,  // alpha[0] = result blend factor
-    const void *beta,   // beta[0] = dest layer blend factor
-    const hipdnnTensorDescriptor_t xDesc,
-    const void *x,  // NxCxHxW
-    const hipdnnTensorDescriptor_t yDesc,
-    void *y,  // NxCxHxW
-    const hipdnnTensorDescriptor_t bnScaleBiasMeanVarDesc, const void *bnScale,
-    const void *bnBias, const void *estimatedMean,
-    const void *estimatedVariance, double epsilon);
-
-hipdnnStatus_t hipdnnCreateReduceTensorDescriptor(
-    hipdnnReduceTensorDescriptor_t *reduceTensorDesc);
-
-hipdnnStatus_t hipdnnSetTensor4dDescriptorEx(
-    hipdnnTensorDescriptor_t tensorDesc,
-    hipdnnDataType_t dataType, /* image data type */
-    int n,                     /* number of inputs (batch size) */
-    int c,                     /* number of input feature maps */
-    int h,                     /* height of input section */
-    int w,                     /* width of input section */
-    int nStride, int cStride, int hStride, int wStride);
-
-hipdnnStatus_t hipdnnSetReduceTensorDescriptor(
-    hipdnnReduceTensorDescriptor_t reduceTensorDesc,
-    hipdnnReduceTensorOp_t reduceTensorOp,
-    hipdnnDataType_t reduceTensorCompType,
-    hipdnnNanPropagation_t reduceTensorNanOpt,
-    hipdnnReduceTensorIndices_t reduceTensorIndices,
-    hipdnnIndicesType_t reduceTensorIndicesType);
-
-hipdnnStatus_t hipdnnGetReductionWorkspaceSize(
-    hipdnnHandle_t handle,
-    const hipdnnReduceTensorDescriptor_t reduceTensorDesc,
-    const hipdnnTensorDescriptor_t aDesc, const hipdnnTensorDescriptor_t cDesc,
-    size_t *sizeInBytes);
-
-hipdnnStatus_t hipdnnReduceTensor(
-    hipdnnHandle_t handle,
-    const hipdnnReduceTensorDescriptor_t reduceTensorDesc, void *indices,
-    size_t indicesSizeInBytes, void *workspace, size_t workspaceSizeInBytes,
-    const void *alpha, const hipdnnTensorDescriptor_t aDesc, const void *A,
-    const void *beta, const hipdnnTensorDescriptor_t cDesc, void *C);
-
-hipdnnStatus_t hipdnnDestroyReduceTensorDescriptor(
-    hipdnnReduceTensorDescriptor_t reduceTensorDesc);
-
-hipdnnStatus_t hipdnnSetConvolutionMathType(
-    hipdnnConvolutionDescriptor_t convDesc, hipdnnMathType_t mathType);
-
-hipdnnStatus_t hipdnnSetConvolutionGroupCount(
-    hipdnnConvolutionDescriptor_t convDesc, int groupCount );
-
-// ----- Fusion API -----
-
-typedef void *hipdnnFusionPlanDescriptor_t;
-
-typedef void *hipdnnFusionOpDescriptor_t;
-
-typedef void *hipdnnOperatorArgs_t;
+hipdnnStatus_t
+hipdnnGetRNNLinLayerMatrixParams( hipdnnHandle_t handle,
+                                  const hipdnnRNNDescriptor_t rnnDesc,
+                                  const int layer,
+                                  const hipdnnTensorDescriptor_t xDesc,
+                                  const hipdnnFilterDescriptor_t wDesc,
+                                  const void *w,
+                                  const int linLayerID,
+                                  hipdnnFilterDescriptor_t linLayerMatDesc,
+                                  void **linLayerMat);
 
 hipdnnStatus_t
-hipdnnCreateFusionPlan(hipdnnFusionPlanDescriptor_t *fusePlanDesc,
-                       const hipdnnFusionDirection_t fuseDirection,
-                       const hipdnnTensorDescriptor_t inputDesc);
+hipdnnGetRNNLinLayerBiasParams( hipdnnHandle_t handle,
+                                const hipdnnRNNDescriptor_t rnnDesc,
+                                const int layer,
+                                const hipdnnTensorDescriptor_t xDesc,
+                                const hipdnnFilterDescriptor_t wDesc,
+                                const void *w,
+                                const int linLayerID,
+                                hipdnnFilterDescriptor_t linLayerBiasDesc,
+                                void **linLayerBias);
+
+hipdnnStatus_t
+hipdnnRNNForwardInference( hipdnnHandle_t handle,
+                           const hipdnnRNNDescriptor_t rnnDesc,
+                           const int seqLength,
+                           const hipdnnTensorDescriptor_t *xDesc, const void *x,
+                           const hipdnnTensorDescriptor_t hxDesc, const void *hx,
+                           const hipdnnTensorDescriptor_t cxDesc, const void *cx,
+                           const hipdnnFilterDescriptor_t wDesc,  const void *w,
+                           const hipdnnTensorDescriptor_t *yDesc, void *y,
+                           const hipdnnTensorDescriptor_t hyDesc, void *hy,
+                           const hipdnnTensorDescriptor_t cyDesc, void *cy,
+                           void *workspace,
+                           size_t workSpaceSizeInBytes);
+
+hipdnnStatus_t
+hipdnnRNNForwardTraining( hipdnnHandle_t handle,
+                          const hipdnnRNNDescriptor_t rnnDesc,
+                          const int seqLength,
+                          const hipdnnTensorDescriptor_t *xDesc, const void *x,
+                          const hipdnnTensorDescriptor_t hxDesc, const void *hx,
+                          const hipdnnTensorDescriptor_t cxDesc, const void *cx,
+                          const hipdnnFilterDescriptor_t wDesc,  const void *w,
+                          const hipdnnTensorDescriptor_t *yDesc, void *y,
+                          const hipdnnTensorDescriptor_t hyDesc, void *hy,
+                          const hipdnnTensorDescriptor_t cyDesc, void *cy,
+                          void *workspace, size_t workSpaceSizeInBytes,
+                          void *reserveSpace, size_t reserveSpaceSizeInBytes);
+
+hipdnnStatus_t
+hipdnnRNNBackwardData( hipdnnHandle_t handle,
+                       const hipdnnRNNDescriptor_t rnnDesc,
+                       const int seqLength,
+                       const hipdnnTensorDescriptor_t *yDesc,  const void *y,
+                       const hipdnnTensorDescriptor_t *dyDesc, const void *dy,
+                       const hipdnnTensorDescriptor_t dhyDesc, const void *dhy,
+                       const hipdnnTensorDescriptor_t dcyDesc, const void *dcy,
+                       const hipdnnFilterDescriptor_t wDesc,   const void *w,
+                       const hipdnnTensorDescriptor_t hxDesc,  const void *hx,
+                       const hipdnnTensorDescriptor_t cxDesc,  const void *cx,
+                       const hipdnnTensorDescriptor_t *dxDesc, void *dx,
+                       const hipdnnTensorDescriptor_t dhxDesc, void *dhx,
+                       const hipdnnTensorDescriptor_t dcxDesc, void *dcx,
+                       void *workspace, size_t workSpaceSizeInBytes,
+                       void *reserveSpace, size_t reserveSpaceSizeInBytes);
+
+hipdnnStatus_t
+hipdnnRNNBackwardWeights( hipdnnHandle_t handle,
+                          const hipdnnRNNDescriptor_t rnnDesc,
+                          const int seqLength,
+                          const hipdnnTensorDescriptor_t *xDesc, const void *x,
+                          const hipdnnTensorDescriptor_t hxDesc, const void *hx,
+                          const hipdnnTensorDescriptor_t *yDesc, const void *y,
+                          const void *workspace, size_t workSpaceSizeInBytes,
+                          const hipdnnFilterDescriptor_t dwDesc, void *dw,
+                          const void *reserveSpace, size_t reserveSpaceSizeInBytes);
+
+//========================== Fusion API ========================================
+
+hipdnnStatus_t
+hipdnnCreateFusionPlan( hipdnnFusionPlanDescriptor_t *fusePlanDesc,
+                        const hipdnnFusionDirection_t fuseDirection,
+                        const hipdnnTensorDescriptor_t inputDesc);
 
 
 hipdnnStatus_t
-hipdnnCreateOpConvForward(hipdnnFusionPlanDescriptor_t    fusePlanDesc,
-                          hipdnnFusionOpDescriptor_t*     convOp,
-                          hipdnnConvolutionDescriptor_t   convDesc,
-                          const hipdnnTensorDescriptor_t  wDesc );
+hipdnnCreateOpConvForward( hipdnnFusionPlanDescriptor_t    fusePlanDesc,
+                           hipdnnFusionOpDescriptor_t*     convOp,
+                           hipdnnConvolutionDescriptor_t   convDesc,
+                           const hipdnnTensorDescriptor_t  wDesc );
 
 hipdnnStatus_t
-hipdnnCreateOpBiasForward(hipdnnFusionPlanDescriptor_t fusePlanDesc,
-                          hipdnnFusionOpDescriptor_t *biasOp,
-                          const hipdnnTensorDescriptor_t bDesc);
+hipdnnCreateOpBiasForward( hipdnnFusionPlanDescriptor_t fusePlanDesc,
+                           hipdnnFusionOpDescriptor_t *biasOp,
+                           const hipdnnTensorDescriptor_t bDesc);
 
 hipdnnStatus_t
-hipdnnCreateOpActivationForward(hipdnnFusionPlanDescriptor_t fusePlanDesc,
-                                hipdnnFusionOpDescriptor_t *activOp,
-                                hipdnnActivationMode_t mode);
+hipdnnCreateOpActivationForward( hipdnnFusionPlanDescriptor_t fusePlanDesc,
+                                 hipdnnFusionOpDescriptor_t *activOp,
+                                 hipdnnActivationMode_t mode);
 
 hipdnnStatus_t
 hipdnnCreateOpBatchNormInference(
@@ -1061,13 +1283,13 @@ hipdnnCreateOpBatchNormInference(
                  const hipdnnTensorDescriptor_t bnScaleBiasMeanVarDesc);
 
 hipdnnStatus_t
-hipdnnCompileFusionPlan(hipdnnHandle_t handle,
-                        hipdnnFusionPlanDescriptor_t fusePlanDesc);
+hipdnnCompileFusionPlan( hipdnnHandle_t handle,
+                         hipdnnFusionPlanDescriptor_t fusePlanDesc);
 
 hipdnnStatus_t
-hipdnnFusionPlanGetOp(hipdnnFusionPlanDescriptor_t fusePlanDesc,
-                      const int op_idx,
-                      hipdnnFusionOpDescriptor_t *op);
+hipdnnFusionPlanGetOp( hipdnnFusionPlanDescriptor_t fusePlanDesc,
+                       const int op_idx,
+                       hipdnnFusionOpDescriptor_t *op);
 
 hipdnnStatus_t
 hipdnnFusionPlanGetWorkSpaceSize( hipdnnHandle_t handle,
@@ -1082,7 +1304,7 @@ hipdnnFusionPlanConvolutionGetAlgo(
                         int* returnedAlgoCount,
                         hipdnnConvolutionFwdAlgo_t* returnedAlgos);
 
-hipdnnStatus_t hipdnnCreateOperatorArgs(hipdnnOperatorArgs_t* args);
+hipdnnStatus_t hipdnnCreateOperatorArgs( hipdnnOperatorArgs_t* args);
 
 hipdnnStatus_t
 hipdnnSetOpArgsConvForward( hipdnnOperatorArgs_t args,
@@ -1120,17 +1342,21 @@ hipdnnSetOpArgsBatchNormInference( hipdnnOperatorArgs_t args,
 
 
 hipdnnStatus_t
-hipdnnExecuteFusionPlan(const hipdnnHandle_t handle,
-                        const hipdnnFusionPlanDescriptor_t fusePlanDesc,
-                        const hipdnnTensorDescriptor_t inputDesc,
-                        const void *input,
-                        const hipdnnTensorDescriptor_t outputDesc, void *output,
-                        hipdnnOperatorArgs_t args);
+hipdnnExecuteFusionPlan( const hipdnnHandle_t handle,
+                         const hipdnnFusionPlanDescriptor_t fusePlanDesc,
+                         const hipdnnTensorDescriptor_t inputDesc,
+                         const void *input,
+                         const hipdnnTensorDescriptor_t outputDesc, void *output,
+                         hipdnnOperatorArgs_t args);
 
-hipdnnStatus_t hipdnnDestroyOperatorArgs(hipdnnOperatorArgs_t args);
+hipdnnStatus_t hipdnnDestroyOperatorArgs( hipdnnOperatorArgs_t args);
 
 hipdnnStatus_t
-hipdnnDestroyFusionPlan(hipdnnFusionPlanDescriptor_t fusePlanDesc);
+hipdnnDestroyFusionPlan( hipdnnFusionPlanDescriptor_t fusePlanDesc);
+
+//==============================================================================
+
+const char *hipdnnGetErrorString(hipdnnStatus_t status);
 
 
 #ifdef __cplusplus
