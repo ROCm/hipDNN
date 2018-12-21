@@ -8,7 +8,11 @@
 
 template <typename dataType>
 void compute_hipdnn_batchnorm_fwd_train(BNorm_params_t &d, dataType *src,
-                                dataType *dst, float *avg_time, int mode) {
+                                dataType *dst, dataType *resultRunningMean,
+                                dataType *resultRunningVariance,
+                                dataType *resultSaveMean,
+                                dataType *resultSaveInvVariance,
+                                float *avg_time, int mode) {
 
   hipdnnHandle_t hipdnn;
   checkHIPDNN(hipdnnCreate(&hipdnn));
@@ -59,21 +63,10 @@ void compute_hipdnn_batchnorm_fwd_train(BNorm_params_t &d, dataType *src,
   HIP_CALL(hipMalloc(&bnBiasT, out_h * out_w * out_c * sizeof(float)));
   hipLaunchKernel(dev_const, out_w * out_h, out_c, 0, 0 ,bnBiasT ,0.f);
 
-  float* resultRunningMean;
-
-  HIP_CALL(hipMalloc(&resultRunningMean,  out_h * out_w * out_c * sizeof(float)));
-  hipLaunchKernel(dev_const, out_w * out_h, out_c, 0, 0 ,resultRunningMean ,1.f);
-
-  float* resultRunningVariance;
-  HIP_CALL(hipMalloc(&resultRunningVariance, out_h * out_w * out_c * sizeof(float)));
-  hipLaunchKernel(dev_const, out_w * out_h, out_c, 0, 0 , resultRunningVariance, 1.f);
-
   float alphaNT = 1.f;
   float betaNT = 0.f;
   double epsilonT = 2.f;
   double exponentialAverageFactor = 0.5;
-  double* resultSaveMean = 0;
-  double* resultSaveInvVariance = 0 ;
 
   high_resolution_timer_t timer;
   std::vector<double> time_vector(benchmark_iterations, 0);
@@ -102,8 +95,6 @@ void compute_hipdnn_batchnorm_fwd_train(BNorm_params_t &d, dataType *src,
   // finalizing
   hipFree(bnScaleT);
   hipFree(bnBiasT);
-  hipFree(resultRunningMean);
-  hipFree(resultRunningVariance);
   hipdnnDestroyTensorDescriptor(out_desc);
   hipdnnDestroyTensorDescriptor(in_desc);
   hipdnnDestroyTensorDescriptor(bnScaleBiasMeanVarDescT);
