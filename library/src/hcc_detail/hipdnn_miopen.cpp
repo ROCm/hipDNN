@@ -1118,6 +1118,15 @@ hipdnnStatus_t hipdnnGetConvolutionForwardAlgorithm(
     void *sConvolutionForwardAlgorithmWorkspace;
     // in miopen, workspace size does not depend on algo.
 
+    if(preference == HIPDNN_CONVOLUTION_FWD_PREFER_FASTEST)
+        CHECK_HIPDNN(hipdnnGetConvolutionForwardWorkspaceSize(
+            handle, xDesc, wDesc, convDesc, yDesc, *algo, &sizeInBytes));
+
+    if(prefernce == HIPDNN_CONVOLUTION_FWD_SPECIFY_WORKSPACE_LIMIT)
+        sizeInBytes = memoryLimitInBytes;
+
+    hipMalloc((void **)&sConvolutionForwardAlgorithmWorkspace, sizeInBytes);
+
     size_t numBytes;
     void *x;
     void *y;
@@ -1147,11 +1156,6 @@ hipdnnStatus_t hipdnnGetConvolutionForwardAlgorithm(
 
     *algo = perfResults[0].algo;
 
-    CHECK_HIPDNN(hipdnnGetConvolutionForwardWorkspaceSize(
-        handle, xDesc, wDesc, convDesc, yDesc, *algo, &sizeInBytes));
-
-    hipMalloc((void **)&sConvolutionForwardAlgorithmWorkspace, sizeInBytes);
-
     CHECK_HIP(hipFree(x));
     CHECK_HIP(hipFree(w));
     CHECK_HIP(hipFree(y));
@@ -1180,8 +1184,8 @@ hipdnnStatus_t hipdnnFindConvolutionForwardAlgorithmEx(
     size_t expectedWorkSpaceSize = 0, infoWorkSpaceSize = 0;
     void *workSpaceInternal = NULL;
 
-        workSpaceInternal = workSpace;
-        expectedWorkSpaceSize = workSpaceSizeInBytes;
+    workSpaceInternal = workSpace;
+    expectedWorkSpaceSize = workSpaceSizeInBytes;
 
     CHECK_MIO(miopenFindConvolutionForwardAlgorithm(
         (miopenHandle_t)handle, (miopenTensorDescriptor_t)xDesc, x,
