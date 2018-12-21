@@ -2833,8 +2833,7 @@ int hipdnnSizeof(hipdnnDataType_t dataTypeIn) {
         retVal = sizeof(char)*4; // 32 bit
         break;
     default:
-        std::cerr << std::endl <<"ERROR:Unimplemented Datatype passed to hipdnnSizeof"
-                  << std::endl;
+        fprintf(stderr, "error:Unimplemented Datatype passed to hipdnnSizeof");
         retVal=0;
     }
     return retVal;
@@ -3324,8 +3323,8 @@ hipdnnExecuteFusionPlan(const hipdnnHandle_t handle,
 
         }
        else {
-           std::cerr <<"Corrupted parameter or unsupported layer fusion";
-           return HIPDNN_STATUS_BAD_PARAM;
+           fprintf(stderr, "error:Corrupted parameter or unsupported layer fusion");
+           return HIPDNN_STATUS_NOT_SUPPORTED;
        }
     }
     CHECK_HIP(hipMemcpy(output,curInput,
