@@ -26,6 +26,16 @@
 #include <hipdnn.h>
 #include <nvcc_detail/hipdnn_cudnn.h>
 
+#define CHECK_CUDNN(expression)                                                 \
+    {                                                                           \
+        hipdnnStatus_t error = cudnnTohipdnnStatus(expression);                 \
+        if (error != HIPDNN_STATUS_SUCCESS) {                                   \
+            fprintf(stderr, "HIPDNN error: '%s'(%d) at %s:%d\n",                \
+                    hipdnnGetErrorString(error), error, __FILE__, __LINE__);    \
+            return error;                                                       \
+        }                                                                       \
+    }
+
 hipdnnStatus_t cudnnTohipdnnStatus(cudnnStatus_t cStatus) {
     hipdnnStatus_t retVal;
     switch (cStatus) {
@@ -116,6 +126,51 @@ cudnnStatus_t hipdnnTocudnnStatus(hipdnnStatus_t cStatus) {
     }
 
     return retVal;
+}
+
+// human-readable error messages
+// hipdnnGetErrorString
+const char *hipdnnGetErrorString(hipdnnStatus_t status) {
+    switch (status) {
+        case HIPDNN_STATUS_SUCCESS:
+            return "HIPDNN_STATUS_SUCCESS";
+
+        case HIPDNN_STATUS_NOT_INITIALIZED:
+            return "HIPDNN_STATUS_NOT_INITIALIZED";
+
+        case HIPDNN_STATUS_ALLOC_FAILED:
+            return "HIPDNN_STATUS_ALLOC_FAILED";
+
+        case HIPDNN_STATUS_BAD_PARAM:
+            return "HIPDNN_STATUS_BAD_PARAM";
+
+        case HIPDNN_STATUS_INTERNAL_ERROR:
+            return "HIPDNN_STATUS_INTERNAL_ERROR";
+
+        case HIPDNN_STATUS_INVALID_VALUE:
+            return "HIPDNN_STATUS_INVALID_VALUE";
+
+        case HIPDNN_STATUS_ARCH_MISMATCH:
+            return "HIPDNN_STATUS_ARCH_MISMATCH";
+
+        case HIPDNN_STATUS_MAPPING_ERROR:
+            return "HIPDNN_STATUS_MAPPING_ERROR";
+
+        case HIPDNN_STATUS_EXECUTION_FAILED:
+            return "HIPDNN_STATUS_EXECUTION_FAILED";
+
+        case HIPDNN_STATUS_NOT_SUPPORTED:
+            return "HIPDNN_STATUS_NOT_SUPPORTED";
+
+        case HIPDNN_STATUS_LICENSE_ERROR:
+            return "HIPDNN_STATUS_LICENSE_ERROR";
+
+        case HIPDNN_STATUS_RUNTIME_PREREQUISITE_MISSING:
+            return "HIPDNN_STATUS_RUNTIME_PREREQUISITE_MISSING";
+
+        default:
+            return "Unrecognized Status Code";
+    }
 }
 
 hipdnnStatus_t hipTocudnnDataType(hipdnnDataType_t in, cudnnDataType_t *out) {
@@ -1298,7 +1353,7 @@ hipdnnGetOpTensorDescriptor(const hipdnnOpTensorDescriptor_t opTensorDesc,
         (const cudnnOpTensorDescriptor_t) opTensorDesc, &cuOpTensorOp,
         &cuOpTensorCompType, &cuOpTensorNanOpt));
     if (retVal != HIPDNN_STATUS_SUCCESS)
-        return retVal;    
+        return retVal;
 
     retVal = cudnnTohipdnnOpTensorOp(cuOpTensorOp, opTensorOp);
     if (retVal != HIPDNN_STATUS_SUCCESS)
@@ -2334,11 +2389,6 @@ hipdnnStatus_t hipdnnSetPoolingNdDescriptor(
         paddingA, strideA));
 }
 
-const char *hipdnnGetErrorString(hipdnnStatus_t status) {
-    cudnnStatus_t cstatus;
-    cstatus = hipdnnTocudnnStatus(status);
-    return cudnnGetErrorString(cstatus);
-}
 
 // RNN APIs
 
