@@ -2330,8 +2330,7 @@ hipdnnStatus_t hipdnnSetConvolutionNdDescriptor(
     hipdnnDataType_t computeType) // convolution data type
 {
     cudnnDataType_t cuDT;
-    cudnnConvolutionMode_t cuCM;
-    CHECK_HIPDNN(hipTocudnnConvolutionMode(mode));
+    cudnnConvolutionMode_t cuCM = hipTocudnnConvolutionMode(mode);
     CHECK_HIPDNN(hipTocudnnDataType(computeType, &cuDT));
     CHECK_CUDNN(cudnnSetConvolutionNdDescriptor(
         (cudnnConvolutionDescriptor_t)convDesc, arrayLength, padA,
