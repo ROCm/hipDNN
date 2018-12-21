@@ -27,6 +27,12 @@
 
 #include <hip/hip_runtime_api.h>
 
+#define HIPDNN_VERSION 7000
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define CHECK_HIP(expression)                                                   \
     {                                                                           \
         hipError_t error = (expression);                                        \
@@ -54,12 +60,6 @@
             std::exit(EXIT_FAILURE);                                            \
         }                                                                       \
     }
-
-#define HIPDNN_VERSION 7000
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 //============================ Datatypes =======================================
 
