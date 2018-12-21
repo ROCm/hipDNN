@@ -2311,8 +2311,8 @@ hipdnnStatus_t hipdnnGetFilterNdDescriptor(
     CHECK_CUDNN(cudnnGetFilterNdDescriptor(
         (cudnnFilterDescriptor_t)filterDesc, nbDimsRequested, &cuDT, &cuTF,
         nbDims, filterDimA));
-    CHECK_CUDNN(cudnnTohipTensorFormat(cuTF, format));
-    CHECK_CUDNN(cudnnTohipDataType(cuDT, dataType));
+    CHECK_HIPDNN(cudnnTohipTensorFormat(cuTF, format));
+    CHECK_HIPDNN(cudnnTohipDataType(cuDT, dataType));
 
     return HIPDNN_STATUS_SUCCESS;
 }
