@@ -27,36 +27,32 @@
 
 #include <hip/hip_runtime_api.h>
 
-#define CHECK_HIP(cmd)                                                    \
-    {                                                                     \
-        hipError_t error = cmd;                                           \
-        if (error != hipSuccess) {                                        \
-            fprintf(stderr, "error: '%s'(%d) at %s:%d\n",                 \
-                    hipGetErrorString(error), error, __FILE__, __LINE__); \
-            exit(EXIT_FAILURE);                                           \
-        }                                                                 \
+#define CHECK_HIP(expression)                                                   \
+    {                                                                           \
+        hipError_t error = (expression);                                        \
+        if (error != hipSuccess) {                                              \
+            fprintf(stderr, "HIP error: '%s'(%d) at %s:%d\n",                   \
+                    hipGetErrorString(error), error, __FILE__, __LINE__);       \
+            exit(EXIT_FAILURE);                                                 \
+        }                                                                       \
     }
 
-#define CHECK_HIPDNN(expression)                                               \
-    {                                                                          \
-        hipdnnStatus_t status = (expression);                                  \
-        if (status != HIPDNN_STATUS_SUCCESS) {                                 \
-            std::cerr << "HIPDNN Error on line " << __LINE__                   \
-                      << " With error status "                                 \
-                      << ": " << hipdnnGetErrorString(status) << std::endl;    \
-            std::exit(EXIT_FAILURE);                                           \
-        }                                                                      \
+#define CHECK_HIPDNN(expression)                                                \
+    {                                                                           \
+        hipdnnStatus_t error = (expression);                                    \
+        if (error != HIPDNN_STATUS_SUCCESS) {                                   \
+            fprintf(stderr, "HIPDNN error: '%s'(%d) at %s:%d\n",                \
+                    hipdnnGetErrorString(error), error, __FILE__, __LINE__);    \
+            exit(EXIT_FAILURE);                                                 \
+        }                                                                       \
     }
 
-#define CHECK_MALLOC(pointer)                                                  \
-    {                                                                          \
-        if ( (pointer) == '\0') {   /*if Null pointer*/                        \
-            std::cerr << "Error on line " << __LINE__                          \
-                      << " Malloc returned NULL "<< std::endl;                 \
-            std::exit(EXIT_FAILURE);                                           \
-        }                                                                      \
-      /*std::cout << "The Pointer:"<<(void*)(pointer)                          \
-                  <<" on line:" <<__LINE__<< std::endl;*/                      \
+#define CHECK_MALLOC(pointer)                                                   \
+    {                                                                           \
+        if ( (pointer) == '\0') {   /*if Null pointer*/                         \
+            fprintf(stderr, "Malloc failed at %s:%d\n", __FILE__, __LINE__);    \
+            std::exit(EXIT_FAILURE);                                            \
+        }                                                                       \
     }
 
 #define HIPDNN_EXPORT
