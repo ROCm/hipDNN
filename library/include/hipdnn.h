@@ -49,14 +49,14 @@ extern "C" {
         if (error != HIPDNN_STATUS_SUCCESS) {                                   \
             fprintf(stderr, "HIPDNN error: '%s'(%d) at %s:%d\n",                \
                     hipdnnGetErrorString(error), error, __FILE__, __LINE__);    \
-            exit(EXIT_FAILURE);                                                 \
+            return error;                                                 \
         }                                                                       \
     }
 
 #define CHECK_MALLOC(pointer)                                                   \
     {                                                                           \
         if ( (pointer) == '\0') {   /*if Null pointer*/                         \
-            fprintf(stderr, "Malloc failed at %s:%d\n", __FILE__, __LINE__);    \
+            fprintf(stderr, "Malloc failed error:%s:%d\n", __FILE__, __LINE__); \
             std::exit(EXIT_FAILURE);                                            \
         }                                                                       \
     }
