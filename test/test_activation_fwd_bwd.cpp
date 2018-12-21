@@ -1,8 +1,12 @@
 #include "test_activation_common.hpp"
 
+hipdnnActivationMode_t mode_a;
+
 TEST(activation_fwd_bwd, func_test_int_activation) {
 
   float avg_time = 0, avg_time1 = 0, avg_time2 = 0;
+
+  mode_a = HIPDNN_ACTIVATION_RELU;
 
   activation_params_t test_case1(1, 1, 4, 4);
   activation_params_t test_case2(1, 1, 4, 4);
@@ -26,9 +30,9 @@ TEST(activation_fwd_bwd, func_test_int_activation) {
   std::string str_op_size  = convert_to_string((int*)op_size,4);
 
   compute_hipdnn_activation_forward(test_case1, dataSrc.gpu(),dataDst.gpu(),
-                                    &avg_time1);
+                                    mode_a, &avg_time1);
   compute_hipdnn_activation_backward(test_case2, dataSrc.gpu(), dataGrad.gpu(),
-                                     dataDst.gpu(), &avg_time2);
+                                     dataDst.gpu(), mode_a, &avg_time2);
 
   avg_time = (avg_time1 + avg_time2);
 
@@ -53,6 +57,8 @@ TEST(activation_fwd_bwd, func_int_activation_batch32) {
 
   float avg_time = 0, avg_time1 = 0, avg_time2 = 0;
 
+  mode_a = HIPDNN_ACTIVATION_RELU;
+
   activation_params_t test_case1(32, 1, 4, 4);
   activation_params_t test_case2(32, 1, 4, 4);
 
@@ -75,10 +81,10 @@ TEST(activation_fwd_bwd, func_int_activation_batch32) {
   std::string str_op_size  = convert_to_string((int*)op_size,4);
 
   compute_hipdnn_activation_forward(test_case1, dataSrc.gpu(),dataDst.gpu(),
-                                    &avg_time1);
+                                    mode_a, &avg_time1);
 
   compute_hipdnn_activation_backward(test_case2, dataSrc.gpu(), dataGrad.gpu(),
-                                     dataDst.gpu(), &avg_time2);
+                                     dataDst.gpu(), mode_a, &avg_time2);
 
   avg_time = (avg_time1 + avg_time2);
 
@@ -100,6 +106,8 @@ TEST(activation_fwd_bwd, func_int_activation_batch32) {
 TEST(activation_fwd_bwd, func_int_activation_batch64) {
 
   float avg_time = 0, avg_time1 = 0, avg_time2 = 0;
+
+  mode_a = HIPDNN_ACTIVATION_RELU;
 
   activation_params_t test_case1(64, 1, 4, 4);
   activation_params_t test_case2(64, 1, 4, 4);
@@ -123,10 +131,10 @@ TEST(activation_fwd_bwd, func_int_activation_batch64) {
   std::string str_op_size  = convert_to_string((int*)op_size,4);
 
   compute_hipdnn_activation_forward(test_case1, dataSrc.gpu(),dataDst.gpu(),
-                                    &avg_time1);
+                                    mode_a, &avg_time1);
 
   compute_hipdnn_activation_backward(test_case2, dataSrc.gpu(), dataGrad.gpu(),
-                                     dataDst.gpu(), &avg_time2);
+                                     dataDst.gpu(), mode_a, &avg_time2);
 
   avg_time = (avg_time1 + avg_time2);
 
@@ -148,6 +156,8 @@ TEST(activation_fwd_bwd, func_int_activation_batch64) {
 TEST(activation_fwd_bwd, func_int_activation_batch128) {
 
   float avg_time = 0, avg_time1 = 0, avg_time2 = 0;
+
+  mode_a = HIPDNN_ACTIVATION_RELU;
 
   activation_params_t test_case1(128, 1, 25, 25);
   activation_params_t test_case2(128, 1, 25, 25);
@@ -171,10 +181,10 @@ TEST(activation_fwd_bwd, func_int_activation_batch128) {
   std::string str_op_size  = convert_to_string((int*)op_size,4);
 
   compute_hipdnn_activation_forward(test_case1, dataSrc.gpu(),dataDst.gpu(),
-                                    &avg_time1);
+                                    mode_a, &avg_time1);
 
   compute_hipdnn_activation_backward(test_case2, dataSrc.gpu(), dataGrad.gpu(),
-                                     dataDst.gpu(), &avg_time2);
+                                     dataDst.gpu(), mode_a, &avg_time2);
 
   avg_time = (avg_time1 + avg_time2);
 
