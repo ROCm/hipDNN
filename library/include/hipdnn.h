@@ -49,7 +49,7 @@ extern "C" {
         if (error != HIPDNN_STATUS_SUCCESS) {                                   \
             fprintf(stderr, "HIPDNN error: '%s'(%d) at %s:%d\n",                \
                     hipdnnGetErrorString(error), error, __FILE__, __LINE__);    \
-            return error;                                                 \
+            return error;                                                       \
         }                                                                       \
     }
 
