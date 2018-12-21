@@ -37,7 +37,7 @@
             std::cerr << "HIPDNN Error on line " << __LINE__                \
                       << "With error status "                               \
                       << ": " << hipdnnGetErrorString(status) << std::endl; \
-            std::exit(EXIT_FAILURE);                                        \
+            return status;                                                  \
         }                                                                   \
     }
 
