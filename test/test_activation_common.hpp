@@ -7,7 +7,9 @@
 template <typename dataType>
 void compute_hipdnn_activation_forward(activation_params_t &test_case,
                                         dataType *src,
-                                        dataType *dst, float *avg_time) {
+                                        dataType *dst,
+                                        hipdnnActivationMode_t mode,
+                                        float *avg_time) {
   hipdnnHandle_t hipdnn;
   checkHIPDNN(hipdnnCreate(&hipdnn));
 
@@ -19,8 +21,6 @@ void compute_hipdnn_activation_forward(activation_params_t &test_case,
       test_case.channels, test_case.height, test_case.width));
 
   hipdnnActivationDescriptor_t activationDesc;
-  //hipdnnActivationMode_t mode = HIPDNN_ACTIVATION_SIGMOID;
-  hipdnnActivationMode_t mode = HIPDNN_ACTIVATION_RELU;
   hipdnnNanPropagation_t reluNanOpt = HIPDNN_NOT_PROPAGATE_NAN;
 
   double reluCeilingOrAlpha = 0;
@@ -70,7 +70,9 @@ void compute_hipdnn_activation_forward(activation_params_t &test_case,
 template <typename dataType>
 void compute_hipdnn_activation_backward(activation_params_t &test_case,
                                         dataType *src, dataType *grad,
-                                        dataType *dst, float *avg_time) {
+                                        dataType *dst,
+                                        hipdnnActivationMode_t mode,
+                                        float *avg_time) {
   hipdnnHandle_t hipdnn;
   checkHIPDNN(hipdnnCreate(&hipdnn));
 
@@ -82,8 +84,6 @@ void compute_hipdnn_activation_backward(activation_params_t &test_case,
       test_case.channels, test_case.height, test_case.width));
 
   hipdnnActivationDescriptor_t activationDesc;
-  //hipdnnActivationMode_t mode = HIPDNN_ACTIVATION_SIGMOID;
-  hipdnnActivationMode_t mode = HIPDNN_ACTIVATION_RELU;
   hipdnnNanPropagation_t reluNanOpt = HIPDNN_NOT_PROPAGATE_NAN;
 
   double reluCeilingOrAlpha = 0;
