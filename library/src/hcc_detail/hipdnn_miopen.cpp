@@ -1286,7 +1286,6 @@ hipdnnStatus_t hipdnnConvolutionBackwardBias(
     return HIPDNN_STATUS_SUCCESS;
 }
 
-//================HGSOS======================
 hipdnnStatus_t hipdnnFindConvolutionBackwardFilterAlgorithm(
     hipdnnHandle_t handle, const hipdnnTensorDescriptor_t xDesc,
     const hipdnnTensorDescriptor_t dyDesc,
@@ -1342,13 +1341,28 @@ hipdnnStatus_t hipdnnGetConvolutionBackwardFilterAlgorithm(
     size_t memoryLimitInBytes, hipdnnConvolutionBwdFilterAlgo_t *algo) {
     HIPDNN_OPEN_LOG_C("Inside hipdnnGetConvolutionBackwardFilterAlgorithm ");
 
+    size_t sizeInBytes = 0;
+    void *sConvolutionBackwardFilterAlgorithmWorkspace;
+
+    if(preference == HIPDNN_CONVOLUTION_BWD_FILTER_PREFER_FASTEST)
+        CHECK_MIO(miopenConvolutionBackwardWeightsGetWorkSpaceSize(
+        (miopenHandle_t)handle, (miopenTensorDescriptor_t)dyDesc,
+        (miopenTensorDescriptor_t)xDesc,
+        (miopenConvolutionDescriptor_t)convDesc,
+        (miopenTensorDescriptor_t)dwDesc, &sizeInBytes));
+
+    if(preference == HIPDNN_CONVOLUTION_BWD_FILTER_SPECIFY_WORKSPACE_LIMIT)
+        sizeInBytes = memoryLimitInBytes;
+
+    HIPDNN_OPEN_LOG_I("INTERNAL_ALLOC hipdnnGetConvolutionBackwardFilterAlgorithm");
+    hipMalloc((void **)&sConvolutionBackwardFilterAlgorithmWorkspace, sizeInBytes);
+
     size_t numBytes;
     void *x;
     void *dy;
     void *dw;
     const int requestedAlgoCount = 1;
     int returnedAlgoCount;
-    void *sConvolutionBackwardAlgorithmWorkspace = NULL;
 
     CHECK_MIO(
         miopenGetTensorNumBytes((miopenTensorDescriptor_t)xDesc, &numBytes));
@@ -1367,7 +1381,7 @@ hipdnnStatus_t hipdnnGetConvolutionBackwardFilterAlgorithm(
 
     CHECK_HIPDNN(hipdnnFindConvolutionBackwardFilterAlgorithmEx(
         handle, xDesc, x, dyDesc, dy, convDesc, dwDesc, dw, requestedAlgoCount,
-        &returnedAlgoCount, perfResults, sConvolutionBackwardAlgorithmWorkspace,
+        &returnedAlgoCount, perfResults, sConvolutionBackwardFilterAlgorithmWorkspace,
         0));
 
     *algo = perfResults[0].algo;
@@ -1434,8 +1448,6 @@ hipdnnStatus_t hipdnnFindConvolutionBackwardFilterAlgorithmEx(
 
     return HIPDNN_STATUS_SUCCESS;
 }
-
-//=================HGSOS======================!
 
 hipdnnStatus_t hipdnnGetConvolutionBackwardFilterWorkspaceSize(
     hipdnnHandle_t handle, const hipdnnTensorDescriptor_t xDesc,
