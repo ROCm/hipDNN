@@ -2081,8 +2081,8 @@ hipdnnStatus_t hipdnnGetLRNDescriptor(hipdnnLRNDescriptor_t normDesc,
 //=============================================================================
 
 hipdnnStatus_t hipdnnDestroyLRNDescriptor(hipdnnLRNDescriptor_t lrnDesc) {
-    return cudnnTohipdnnStatus(
-        cudnnDestroyLRNDescriptor((cudnnLRNDescriptor_t)lrnDesc));
+    CHECK_CUDNN( cudnnDestroyLRNDescriptor((cudnnLRNDescriptor_t)lrnDesc));
+    return HIPDNN_STATUS_SUCCESS;
 }
 
 //=============================================================================
@@ -2092,18 +2092,14 @@ hipdnnStatus_t hipdnnLRNCrossChannelForward(
     hipdnnLRNMode_t lrnMode, const void *alpha,
     const hipdnnTensorDescriptor_t xDesc, const void *x, const void *beta,
     const hipdnnTensorDescriptor_t yDesc, void *y, bool do_backward) {
-    hipdnnStatus_t retVal = HIPDNN_STATUS_SUCCESS;
+
     cudnnLRNMode_t cumode;
+    CHECK_HIPDNN(hipTocudnnLRNMode(lrnMode, &cumode));
 
-    retVal = hipTocudnnLRNMode(lrnMode, &cumode);
-
-    if (retVal != HIPDNN_STATUS_SUCCESS)
-        return retVal;
-
-    return cudnnTohipdnnStatus(cudnnLRNCrossChannelForward(
-        (cudnnHandle_t)handle, (cudnnLRNDescriptor_t)normDesc, cumode, alpha,
-        (cudnnTensorDescriptor_t)xDesc, x, beta, (cudnnTensorDescriptor_t)yDesc,
-        y));
+    CHECK_CUDNN(cudnnLRNCrossChannelForward( (cudnnHandle_t)handle,
+        (cudnnLRNDescriptor_t)normDesc, cumode, alpha,
+        (cudnnTensorDescriptor_t)xDesc, x, beta,
+        (cudnnTensorDescriptor_t)yDesc,y));
 }
 
 hipdnnStatus_t hipdnnLRNCrossChannelForwardEx(
@@ -2112,10 +2108,12 @@ hipdnnStatus_t hipdnnLRNCrossChannelForwardEx(
     const hipdnnTensorDescriptor_t xDesc, const void *x, const void *beta,
     const hipdnnTensorDescriptor_t yDesc, void *y, size_t workspacesize,
     void *workspace, bool do_backward) {
-    return hipdnnLRNCrossChannelForward(
+    CHECK_HIPDNN(hipdnnLRNCrossChannelForward(
         (cudnnHandle_t)handle, (cudnnLRNDescriptor_t)normDesc, lrnMode, alpha,
         (cudnnTensorDescriptor_t)xDesc, x, beta, (cudnnTensorDescriptor_t)yDesc,
-        y, do_backward);
+        y, do_backward));
+
+    return HIPDNN_STATUS_SUCCESS;
 }
 
 //=============================================================================
@@ -2128,19 +2126,16 @@ hipdnnStatus_t hipdnnLRNCrossChannelBackward(
     const hipdnnTensorDescriptor_t xDesc, const void *x, const void *beta,
     const hipdnnTensorDescriptor_t dxDesc, void *dx) {
 
-    hipdnnStatus_t retVal = HIPDNN_STATUS_SUCCESS;
     cudnnLRNMode_t cumode;
+    CHECK_HIPDNN(hipTocudnnLRNMode(lrnMode, &cumode));
 
-    retVal = hipTocudnnLRNMode(lrnMode, &cumode);
-
-    if (retVal != HIPDNN_STATUS_SUCCESS)
-        return retVal;
-
-    return cudnnTohipdnnStatus(cudnnLRNCrossChannelBackward(
+    CHECK_CUDNN(cudnnLRNCrossChannelBackward(
         (cudnnHandle_t)handle, (cudnnLRNDescriptor_t)normDesc, cumode, alpha,
         (cudnnTensorDescriptor_t)yDesc, y, (cudnnTensorDescriptor_t)dyDesc, dy,
         (cudnnTensorDescriptor_t)xDesc, x, beta,
         (cudnnTensorDescriptor_t)dxDesc, dx));
+
+    return HIPDNN_STATUS_SUCCESS;
 }
 
 hipdnnStatus_t hipdnnLRNCrossChannelBackwardEx(
@@ -2151,11 +2146,13 @@ hipdnnStatus_t hipdnnLRNCrossChannelBackwardEx(
     const hipdnnTensorDescriptor_t xDesc, const void *x, const void *beta,
     const hipdnnTensorDescriptor_t dxDesc, void *dx, size_t workspacesize,
     void *workspace) {
-    return hipdnnLRNCrossChannelBackward(
+    CHECK_HIPDNN( hipdnnLRNCrossChannelBackward(
         (cudnnHandle_t)handle, (cudnnLRNDescriptor_t)normDesc, lrnMode, alpha,
         (cudnnTensorDescriptor_t)yDesc, y, (cudnnTensorDescriptor_t)dyDesc, dy,
         (cudnnTensorDescriptor_t)xDesc, x, beta,
-        (cudnnTensorDescriptor_t)dxDesc, dx);
+        (cudnnTensorDescriptor_t)dxDesc, dx));
+
+    return HIPDNN_STATUS_SUCCESS;
 }
 
 //=============================================================================
@@ -2164,9 +2161,11 @@ hipdnnStatus_t
 hipdnnDeriveBNTensorDescriptor(hipdnnTensorDescriptor_t derivedBnDesc,
                                const hipdnnTensorDescriptor_t xDesc,
                                hipdnnBatchNormMode_t mode) {
-    return cudnnTohipdnnStatus(cudnnDeriveBNTensorDescriptor(
+    CHECK_CUDNN(cudnnDeriveBNTensorDescriptor(
         (cudnnTensorDescriptor_t)derivedBnDesc, (cudnnTensorDescriptor_t)xDesc,
         hipTocudnnBatchNormMode(mode)));
+
+    return HIPDNN_STATUS_SUCCESS;
 }
 
 //=============================================================================
@@ -2179,12 +2178,14 @@ hipdnnStatus_t hipdnnBatchNormalizationForwardTraining(
     void *bnBias, double exponentialAverageFactor, void *resultRunningMean,
     void *resultRunningVariance, double epsilon, void *resultSaveMean,
     void *resultSaveInvVariance) {
-    return cudnnTohipdnnStatus(cudnnBatchNormalizationForwardTraining(
+    CHECK_CUDNN(cudnnBatchNormalizationForwardTraining(
         (cudnnHandle_t)handle, hipTocudnnBatchNormMode(mode), alpha, beta,
         (cudnnTensorDescriptor_t)xDesc, x, (cudnnTensorDescriptor_t)yDesc, y,
         (cudnnTensorDescriptor_t)bnScaleBiasMeanVarDesc, bnScale, bnBias,
         exponentialAverageFactor, resultRunningMean, resultRunningVariance,
         epsilon, resultSaveMean, resultSaveInvVariance));
+
+    return HIPDNN_STATUS_SUCCESS;
 }
 //=============================================================================
 
@@ -2195,11 +2196,13 @@ hipdnnStatus_t hipdnnnBatchNormalizationForwardInference(
     const hipdnnTensorDescriptor_t bnScaleBiasMeanVarDesc, const void *bnScale,
     const void *bnBias, const void *estimatedMean,
     const void *estimatedVariance, double epsilon) {
-    return cudnnTohipdnnStatus(cudnnBatchNormalizationForwardInference(
+    CHECK_CUDNN(cudnnBatchNormalizationForwardInference(
         (cudnnHandle_t)handle, hipTocudnnBatchNormMode(mode), alpha, beta,
         (cudnnTensorDescriptor_t)xDesc, x, (cudnnTensorDescriptor_t)yDesc, y,
         (cudnnTensorDescriptor_t)bnScaleBiasMeanVarDesc, bnScale, bnBias,
         estimatedMean, estimatedVariance, epsilon));
+
+    return HIPDNN_STATUS_SUCCESS;
 }
 //=============================================================================
 
@@ -2213,7 +2216,7 @@ hipdnnStatus_t hipdnnBatchNormalizationBackward(
     const hipdnnTensorDescriptor_t bnScaleBiasDiffDesc, const void *bnScale,
     void *resultBnScaleDiff, void *resultBnBiasDiff, double epsilon,
     const void *savedMean, const void *savedInvVariance) {
-    return cudnnTohipdnnStatus(cudnnBatchNormalizationBackward(
+    CHECK_CUDNN(cudnnBatchNormalizationBackward(
         (cudnnHandle_t)handle, hipTocudnnBatchNormMode(mode), alphaDataDiff,
         betaDataDiff, alphaParamDiff, betaParamDiff,
         (cudnnTensorDescriptor_t)xDesc, x, (cudnnTensorDescriptor_t)dyDesc, dy,
@@ -2221,6 +2224,8 @@ hipdnnStatus_t hipdnnBatchNormalizationBackward(
         (cudnnTensorDescriptor_t)bnScaleBiasDiffDesc, bnScale,
         resultBnScaleDiff, resultBnBiasDiff, epsilon, savedMean,
         savedInvVariance));
+
+    return HIPDNN_STATUS_SUCCESS;
 }
 
 hipdnnStatus_t hipdnnSetTensorNdDescriptor(hipdnnTensorDescriptor_t tensorDesc,
@@ -2229,13 +2234,11 @@ hipdnnStatus_t hipdnnSetTensorNdDescriptor(hipdnnTensorDescriptor_t tensorDesc,
                                            const int strideA[]) {
 
     cudnnDataType_t cuDT;
-    hipdnnStatus_t retval;
-    retval = hipTocudnnDataType(dataType, &cuDT);
-    if (retval != HIPDNN_STATUS_SUCCESS)
-        return retval;
-
-    return cudnnTohipdnnStatus(cudnnSetTensorNdDescriptor(
+    CHECK_HIPDNN(hipTocudnnDataType(dataType, &cuDT));
+    CHECK_CUDNN(cudnnSetTensorNdDescriptor(
         (cudnnTensorDescriptor_t)tensorDesc, cuDT, nbDims, dimA, strideA));
+
+    return HIPDNN_STATUS_SUCCESS;
 }
 
 hipdnnStatus_t
@@ -2243,40 +2246,42 @@ hipdnnGetTensorNdDescriptor(const hipdnnTensorDescriptor_t tensorDesc,
                             int nbDimsRequested, hipdnnDataType_t *dataType,
                             int *nbDims, int dimA[], int strideA[]) {
     cudnnDataType_t cuDT;
-    hipdnnStatus_t retval;
-    retval = cudnnTohipdnnStatus(cudnnGetTensorNdDescriptor(
+    CHECK_CUDNN(cudnnGetTensorNdDescriptor(
         (cudnnTensorDescriptor_t)tensorDesc, nbDimsRequested, &cuDT, nbDims,
         dimA, strideA));
-    if (retval != HIPDNN_STATUS_SUCCESS)
-        return retval;
-    return cudnnTohipDataType(cuDT, dataType);
+    CHECK_HIPDNN(cudnnTohipDataType(cuDT, dataType));
+
+    return HIPDNN_STATUS_SUCCESS;
 }
 
 hipdnnStatus_t
 hipdnnCreateDropoutDescriptor(hipdnnDropoutDescriptor_t *dropoutDesc) {
-    return cudnnTohipdnnStatus(
-        cudnnCreateDropoutDescriptor((cudnnDropoutDescriptor_t *)dropoutDesc));
+    CHECK_CUDNN(cudnnCreateDropoutDescriptor((cudnnDropoutDescriptor_t *)dropoutDesc));
+    return HIPDNN_STATUS_SUCCESS;
 }
 
 hipdnnStatus_t hipdnnDropoutGetStatesSize(hipdnnHandle_t handle,
                                           size_t *sizeInBytes) {
-    return cudnnTohipdnnStatus(
-        cudnnDropoutGetStatesSize((cudnnHandle_t)handle, sizeInBytes));
+    CHECK_CUDNN(cudnnDropoutGetStatesSize((cudnnHandle_t)handle, sizeInBytes));
+
+    return HIPDNN_STATUS_SUCCESS;
 }
 
 hipdnnStatus_t hipdnnSetDropoutDescriptor(hipdnnDropoutDescriptor_t dropoutDesc,
                                           hipdnnHandle_t handle, float dropout,
                                           void *states, size_t stateSizeInBytes,
                                           unsigned long long seed) {
-    return cudnnTohipdnnStatus(cudnnSetDropoutDescriptor(
+    CHECK_CUDNN(cudnnSetDropoutDescriptor(
         (cudnnDropoutDescriptor_t)dropoutDesc, (cudnnHandle_t)handle, dropout,
         states, stateSizeInBytes, seed));
+
+    return HIPDNN_STATUS_SUCCESS;
 }
 
 hipdnnStatus_t
 hipdnnDestroyDropoutDescriptor(hipdnnDropoutDescriptor_t dropoutDesc) {
-    return cudnnTohipdnnStatus(
-        cudnnDestroyDropoutDescriptor((cudnnDropoutDescriptor_t)dropoutDesc));
+    CHECK_CUDNN(cudnnDestroyDropoutDescriptor((cudnnDropoutDescriptor_t)dropoutDesc));
+    return HIPDNN_STATUS_SUCCESS;
 }
 
 hipdnnStatus_t
@@ -2286,43 +2291,36 @@ hipdnnSetFilterNdDescriptor(hipdnnFilterDescriptor_t filterDesc,
                             const int filterDimA[]) {
     cudnnDataType_t cuDT;
     cudnnTensorFormat_t cuTF;
-    hipdnnStatus_t retval;
-    retval = hipTocudnnDataType(dataType, &cuDT);
-    if (retval != HIPDNN_STATUS_SUCCESS)
-        return retval;
+    CHECK_HIPDNN(hipTocudnnDataType(dataType, &cuDT));
 
-    retval = hipTocudnnTensorFormat(format, &cuTF);
-    if (retval != HIPDNN_STATUS_SUCCESS)
-        return retval;
+    CHECK_HIPDNN(hipTocudnnTensorFormat(format, &cuTF));
 
-    return cudnnTohipdnnStatus(cudnnSetFilterNdDescriptor(
+    CHECK_CUDNN(cudnnSetFilterNdDescriptor(
         (cudnnFilterDescriptor_t)filterDesc, cuDT, cuTF, nbDims, filterDimA));
+
+    return HIPDNN_STATUS_SUCCESS;
 }
 
 hipdnnStatus_t hipdnnGetFilterNdDescriptor(
     const hipdnnFilterDescriptor_t filterDesc, int nbDimsRequested,
     hipdnnDataType_t *dataType, // image data type
     hipdnnTensorFormat_t *format, int *nbDims, int filterDimA[]) {
+
     cudnnDataType_t cuDT;
     cudnnTensorFormat_t cuTF;
-    hipdnnStatus_t retval;
-    retval = cudnnTohipdnnStatus(cudnnGetFilterNdDescriptor(
+    CHECK_CUDNN(cudnnGetFilterNdDescriptor(
         (cudnnFilterDescriptor_t)filterDesc, nbDimsRequested, &cuDT, &cuTF,
         nbDims, filterDimA));
-    if (retval != HIPDNN_STATUS_SUCCESS)
-        return retval;
+    CHECK_CUDNN(cudnnTohipTensorFormat(cuTF, format));
+    CHECK_CUDNN(cudnnTohipDataType(cuDT, dataType));
 
-    retval = cudnnTohipTensorFormat(cuTF, format);
-    if (retval != HIPDNN_STATUS_SUCCESS)
-        return retval;
-
-    return cudnnTohipDataType(cuDT, dataType);
+    return HIPDNN_STATUS_SUCCESS;
 }
 
 hipdnnStatus_t
 hipdnnDestroyFilterDescriptor(hipdnnFilterDescriptor_t filterDesc) {
-    return cudnnTohipdnnStatus(
-        cudnnDestroyFilterDescriptor((cudnnFilterDescriptor_t)filterDesc));
+    CHECK_CUDNN(cudnnDestroyFilterDescriptor((cudnnFilterDescriptor_t)filterDesc));
+    return HIPDNN_STATUS_SUCCESS;
 }
 
 hipdnnStatus_t hipdnnSetConvolutionNdDescriptor(
@@ -2333,17 +2331,13 @@ hipdnnStatus_t hipdnnSetConvolutionNdDescriptor(
 {
     cudnnDataType_t cuDT;
     cudnnConvolutionMode_t cuCM;
-    hipdnnStatus_t retval;
-
-    cuCM = hipTocudnnConvolutionMode(mode);
-
-    retval = hipTocudnnDataType(computeType, &cuDT);
-    if (retval != HIPDNN_STATUS_SUCCESS)
-        return retval;
-
-    return cudnnTohipdnnStatus(cudnnSetConvolutionNdDescriptor(
+    CHECK_HIPDNN(hipTocudnnConvolutionMode(mode));
+    CHECK_HIPDNN(hipTocudnnDataType(computeType, &cuDT));
+    CHECK_CUDNN(cudnnSetConvolutionNdDescriptor(
         (cudnnConvolutionDescriptor_t)convDesc, arrayLength, padA,
         filterStrideA, dilationA, cuCM, cuDT));
+
+    return HIPDNN_STATUS_SUCCESS;
 }
 
 hipdnnStatus_t hipdnnSetPoolingNdDescriptor(
@@ -2354,30 +2348,27 @@ hipdnnStatus_t hipdnnSetPoolingNdDescriptor(
     cudnnNanPropagation_t cuNP;
     hipdnnStatus_t retval;
 
-    retval = hipTocudnnPoolingMode(mode, &cuPM);
-    if (retval != HIPDNN_STATUS_SUCCESS)
-        return retval;
+    CHECK_HIPDNN(hipTocudnnPoolingMode(mode, &cuPM));
+    CHECK_HIPDNN(hipTocudnnNanPropagation(maxpoolingNanOpt, &cuNP));
 
-    retval = hipTocudnnNanPropagation(maxpoolingNanOpt, &cuNP);
-    if (retval != HIPDNN_STATUS_SUCCESS)
-        return retval;
-
-    return cudnnTohipdnnStatus(cudnnSetPoolingNdDescriptor(
+    CHECK_CUDNN(cudnnSetPoolingNdDescriptor(
         (cudnnPoolingDescriptor_t)poolingDesc, cuPM, cuNP, nbDims, windowDimA,
         paddingA, strideA));
+
+    return HIPDNN_STATUS_SUCCESS;
 }
 
 
 // RNN APIs
 
 hipdnnStatus_t hipdnnCreateRNNDescriptor(hipdnnRNNDescriptor_t *rnnDesc) {
-    return cudnnTohipdnnStatus(
-        cudnnCreateRNNDescriptor((cudnnRNNDescriptor_t *)rnnDesc));
+    CHECK_CUDNN(cudnnCreateRNNDescriptor((cudnnRNNDescriptor_t *)rnnDesc));
+    return HIPDNN_STATUS_SUCCESS;
 }
 
 hipdnnStatus_t hipdnnDestroyRNNDescriptor(hipdnnRNNDescriptor_t rnnDesc) {
-    return cudnnTohipdnnStatus(
-        cudnnDestroyRNNDescriptor((cudnnRNNDescriptor_t)rnnDesc));
+    CHECK_CUDNN(cudnnDestroyRNNDescriptor((cudnnRNNDescriptor_t)rnnDesc));
+    return HIPDNN_STATUS_SUCCESS;
 }
 
 hipdnnStatus_t hipdnnCreatePersistentRNNPlan(hipdnnRNNDescriptor_t rnnDesc,
@@ -2385,26 +2376,23 @@ hipdnnStatus_t hipdnnCreatePersistentRNNPlan(hipdnnRNNDescriptor_t rnnDesc,
                                              const hipdnnDataType_t dataType,
                                              hipdnnPersistentRNNPlan_t *plan) {
     cudnnDataType_t cuDT;
-    hipdnnStatus_t retval;
+    CHECK_HIPDNN(hipTocudnnDataType(dataType, &cuDT));
 
-    retval = hipTocudnnDataType(dataType, &cuDT);
-    if (retval != HIPDNN_STATUS_SUCCESS)
-        return retval;
-
-    return cudnnTohipdnnStatus(
-        cudnnCreatePersistentRNNPlan((cudnnRNNDescriptor_t)rnnDesc, minibatch,
+    CHECK_CUDNN(cudnnCreatePersistentRNNPlan((cudnnRNNDescriptor_t)rnnDesc, minibatch,
                                      cuDT, (cudnnPersistentRNNPlan_t *)plan));
+    return HIPDNN_STATUS_SUCCESS;
 }
 
 hipdnnStatus_t hipdnnSetPersistentRNNPlan(hipdnnRNNDescriptor_t rnnDesc,
                                           hipdnnPersistentRNNPlan_t plan) {
-    return cudnnTohipdnnStatus(cudnnSetPersistentRNNPlan(
+    CHECK_CUDNN(cudnnSetPersistentRNNPlan(
         (cudnnRNNDescriptor_t)rnnDesc, (cudnnPersistentRNNPlan_t)plan));
+    return HIPDNN_STATUS_SUCCESS;
 }
 
 hipdnnStatus_t hipdnnDestroyPersistentRNNPlan(hipdnnPersistentRNNPlan_t plan) {
-    return cudnnTohipdnnStatus(
-        cudnnDestroyPersistentRNNPlan((cudnnPersistentRNNPlan_t)plan));
+    CHECK_CUDNN(cudnnDestroyPersistentRNNPlan((cudnnPersistentRNNPlan_t)plan));
+    return HIPDNN_STATUS_SUCCESS;
 }
 
 hipdnnStatus_t hipdnnSetRNNDescriptor_v6(
@@ -2414,37 +2402,25 @@ hipdnnStatus_t hipdnnSetRNNDescriptor_v6(
         dropoutDesc, // Between layers, not between recurrent steps.
     hipdnnRNNInputMode_t inputMode, hipdnnDirectionMode_t direction,
     hipdnnRNNMode_t mode, hipdnnRNNAlgo_t algo, hipdnnDataType_t dataType) {
+
     cudnnRNNInputMode_t cuRIM;
     cudnnDirectionMode_t cuDM;
     cudnnRNNMode_t cuRM;
     cudnnRNNAlgo_t cuRA;
     cudnnDataType_t cuDT;
-    hipdnnStatus_t retval;
 
-    retval = hipTocudnnRNNInputMode(inputMode, &cuRIM);
-    if (retval != HIPDNN_STATUS_SUCCESS)
-        return retval;
+    CHECK_HIPDNN(hipTocudnnRNNInputMode(inputMode, &cuRIM));
+    CHECK_HIPDNN(hipTocudnnDirectionMode(direction, &cuDM));
+    CHECK_HIPDNN(hipTocudnnRNNMode(mode, &cuRM));
+    CHECK_HIPDNN(hipTocudnnRNNAlgo(algo, &cuRA));
+    CHECK_HIPDNN(hipTocudnnDataType(dataType, &cuDT));
 
-    retval = hipTocudnnDirectionMode(direction, &cuDM);
-    if (retval != HIPDNN_STATUS_SUCCESS)
-        return retval;
-
-    retval = hipTocudnnRNNMode(mode, &cuRM);
-    if (retval != HIPDNN_STATUS_SUCCESS)
-        return retval;
-
-    retval = hipTocudnnRNNAlgo(algo, &cuRA);
-    if (retval != HIPDNN_STATUS_SUCCESS)
-        return retval;
-
-    retval = hipTocudnnDataType(dataType, &cuDT);
-    if (retval != HIPDNN_STATUS_SUCCESS)
-        return retval;
-
-    return cudnnTohipdnnStatus(cudnnSetRNNDescriptor_v6(
+    CHECK_CUDNN(cudnnSetRNNDescriptor_v6(
         (cudnnHandle_t)handle, (cudnnRNNDescriptor_t)rnnDesc, hiddenSize,
         numLayers, (cudnnDropoutDescriptor_t)dropoutDesc, cuRIM, cuDM, cuRM,
         cuRA, cuDT));
+
+    return HIPDNN_STATUS_SUCCESS;
 }
 
 hipdnnStatus_t hipdnnSetRNNDescriptor(
