@@ -1100,8 +1100,7 @@ hipdnnStatus_t hipdnnGetConvolution2dForwardOutputDim(
     HIPDNN_OPEN_LOG_C("HIPDNN_SOFTMAX_MODE_INSTANCE NOT SUPPORTED."
                       << std::flush);
     CHECK_MIO(miopenGetConvolutionForwardOutputDim(
-        (miopenConvolutionDescriptor_t)
-            convDesc,  // HGSOSOS should be const in miopen.
+        static_cast<miopenConvolutionDescriptor_t>(convDesc), // should be const in miopen.
         (miopenTensorDescriptor_t)inputTensorDesc,
         (miopenTensorDescriptor_t)filterDesc, n, c, h, w));
     return HIPDNN_STATUS_SUCCESS;
@@ -1126,32 +1125,45 @@ hipdnnStatus_t hipdnnFindConvolutionForwardAlgorithm(
     const hipdnnConvolutionDescriptor_t convDesc,
     const hipdnnTensorDescriptor_t yDesc, const int requestedAlgoCount,
     int *returnedAlgoCount, hipdnnConvolutionFwdAlgoPerf_t *perfResults) {
-    HIPDNN_OPEN_LOG_E("hipdnnFindConvolutionForwardAlgorithm NOT IMPLEMENTED."
-                      << std::flush);
-    return HIPDNN_STATUS_NOT_SUPPORTED;
-#ifdef NOTYET
+
+    size_t sizeInBytes = 0;
+    void *sConvolutionForwardAlgorithmWorkspace;
     miopenConvFwdAlgorithm_t mialgo;
     // in miopen, workspace size does not depend on algo.
     CHECK_MIO(miopenConvolutionForwardGetWorkSpaceSize(
         (miopenHandle_t)handle, (miopenTensorDescriptor_t)wDesc,
         (miopenTensorDescriptor_t)xDesc,
         (miopenConvolutionDescriptor_t)convDesc,
-        (miopenTensorDescriptor_t)yDesc, sizeInBytes));
+        (miopenTensorDescriptor_t)yDesc, &sizeInBytes));
 
     HIPDNN_OPEN_LOG_I("INTERNAL_ALLOC hipdnnFindConvolutionForwardAlgorithm");
 
     CHECK_HIP(hipMalloc((void **)&sConvolutionForwardAlgorithmWorkspace,
                         sizeInBytes));
 
-    // HGSOS //NOTYET dont know how to get x,y,w from the descriptors but it
-    // should be possible.
+    size_t numBytes;
+    void *x;
+    void *y;
+    void *w;
+
+    CHECK_MIO(
+        miopenGetTensorNumBytes((miopenTensorDescriptor_t)xDesc, &numBytes));
+    CHECK_HIP(hipMalloc((void **)&x, numBytes));
+
+    CHECK_MIO(
+        miopenGetTensorNumBytes((miopenTensorDescriptor_t)wDesc, &numBytes));
+    CHECK_HIP(hipMalloc((void **)&w, numBytes));
+
+    CHECK_MIO(
+        miopenGetTensorNumBytes((miopenTensorDescriptor_t)yDesc, &numBytes));
+    CHECK_HIP(hipMalloc((void **)&y, numBytes));
 
     CHECK_HIPDNN(hipdnnFindConvolutionForwardAlgorithmEx(
-        handle, xDesc, const void *x, wDesc, const void *w, convDesc, yDesc,
-        void *y, requestedAlgoCount, returnedAlgoCount, perfResults,
-        void *workSpace, size_t workSpaceSizeInBytes));
+        handle, xDesc, x, wDesc, w, convDesc, yDesc,
+        y, requestedAlgoCount, returnedAlgoCount, perfResults,
+        sConvolutionForwardAlgorithmWorkspace, sizeInBytes));
+
     return HIPDNN_STATUS_SUCCESS;
-#endif
 }
 
 hipdnnStatus_t hipdnnGetConvolutionForwardAlgorithm(
@@ -1165,6 +1177,15 @@ hipdnnStatus_t hipdnnGetConvolutionForwardAlgorithm(
     size_t sizeInBytes = 0;
     void *sConvolutionForwardAlgorithmWorkspace;
     // in miopen, workspace size does not depend on algo.
+
+    if(preference == HIPDNN_CONVOLUTION_FWD_PREFER_FASTEST)
+        CHECK_HIPDNN(hipdnnGetConvolutionForwardWorkspaceSize(
+            handle, xDesc, wDesc, convDesc, yDesc, *algo, &sizeInBytes));
+
+    if(prefernce == HIPDNN_CONVOLUTION_FWD_SPECIFY_WORKSPACE_LIMIT)
+        sizeInBytes = memoryLimitInBytes;
+
+    hipMalloc((void **)&sConvolutionForwardAlgorithmWorkspace, sizeInBytes);
 
     size_t numBytes;
     void *x;
@@ -1195,11 +1216,6 @@ hipdnnStatus_t hipdnnGetConvolutionForwardAlgorithm(
 
     *algo = perfResults[0].algo;
 
-    CHECK_HIPDNN(hipdnnGetConvolutionForwardWorkspaceSize(
-        handle, xDesc, wDesc, convDesc, yDesc, *algo, &sizeInBytes));
-
-    hipMalloc((void **)&sConvolutionForwardAlgorithmWorkspace, sizeInBytes);
-
     CHECK_HIP(hipFree(x));
     CHECK_HIP(hipFree(w));
     CHECK_HIP(hipFree(y));
@@ -1228,8 +1244,8 @@ hipdnnStatus_t hipdnnFindConvolutionForwardAlgorithmEx(
     size_t expectedWorkSpaceSize = 0, infoWorkSpaceSize = 0;
     void *workSpaceInternal = NULL;
 
-        workSpaceInternal = workSpace;
-        expectedWorkSpaceSize = workSpaceSizeInBytes;
+    workSpaceInternal = workSpace;
+    expectedWorkSpaceSize = workSpaceSizeInBytes;
 
     CHECK_MIO(miopenFindConvolutionForwardAlgorithm(
         (miopenHandle_t)handle, (miopenTensorDescriptor_t)xDesc, x,
@@ -1989,7 +2005,8 @@ hipdnnStatus_t hipdnnCreateActivationDescriptor(
 //=============================================================================
 
 hipdnnStatus_t hipdnnSetActivationDescriptor(
-    hipdnnActivationDescriptor_t activationDesc, hipdnnActivationMode_t mode,
+    hipdnnActivationDescriptor_t activationDesc, // not const in cudnn
+    hipdnnActivationMode_t mode,
     hipdnnNanPropagation_t reluNanOpt, double reluCeilingOrAlpha,
     double activBeta, double activExp) {
     miopenActivationMode_t mimode;
@@ -1999,7 +2016,7 @@ hipdnnStatus_t hipdnnSetActivationDescriptor(
     CHECK_HIPDNN(hipTomiopenActivationMode(mode, &mimode));
 
     CHECK_MIO(miopenSetActivationDescriptor(
-        (miopenActivationDescriptor_t)activationDesc, mimode,
+        static_cast<const miopenActivationDescriptor_t>(activationDesc), mimode,
         reluCeilingOrAlpha, activBeta, activExp));
     return HIPDNN_STATUS_SUCCESS;
 }
@@ -2036,12 +2053,12 @@ hipdnnStatus_t hipdnnDestroyActivationDescriptor(
 
 hipdnnStatus_t hipdnnActivationForward(
     hipdnnHandle_t handle,
-    hipdnnActivationDescriptor_t activationDesc,  // HGSOS not const in cudnn
+    hipdnnActivationDescriptor_t activationDesc,  // not const in cudnn
     const void *alpha, const hipdnnTensorDescriptor_t xDesc, const void *x,
     const void *beta, const hipdnnTensorDescriptor_t yDesc, void *y) {
     HIPDNN_OPEN_LOG_C("Inside hipdnnActivationForward");
     CHECK_MIO(miopenActivationForward(
-        (miopenHandle_t)handle, (miopenActivationDescriptor_t)activationDesc,
+        (miopenHandle_t)handle, static_cast<const miopenActivationDescriptor_t>(activationDesc),
         alpha, (miopenTensorDescriptor_t)xDesc, x, beta,
         (miopenTensorDescriptor_t)yDesc, y));
     return HIPDNN_STATUS_SUCCESS;
@@ -2050,14 +2067,14 @@ hipdnnStatus_t hipdnnActivationForward(
 
 hipdnnStatus_t hipdnnActivationBackward(
     hipdnnHandle_t handle,
-    hipdnnActivationDescriptor_t activationDesc,  // HGSOS const missing in cuda
+    hipdnnActivationDescriptor_t activationDesc,  // const missing in cuda
     const void *alpha, const hipdnnTensorDescriptor_t yDesc, const void *y,
     const hipdnnTensorDescriptor_t dyDesc, const void *dy,
     const hipdnnTensorDescriptor_t xDesc, const void *x, const void *beta,
     const hipdnnTensorDescriptor_t dxDesc, void *dx) {
     HIPDNN_OPEN_LOG_C("Inside hipdnnActivationBackward");
     CHECK_MIO(miopenActivationBackward(
-        (miopenHandle_t)handle, (miopenActivationDescriptor_t)activationDesc,
+        (miopenHandle_t)handle, static_cast<const miopenActivationDescriptor_t>(activationDesc),
         alpha, (miopenTensorDescriptor_t)yDesc, y,
         (miopenTensorDescriptor_t)dyDesc, dy, (miopenTensorDescriptor_t)xDesc,
         x, beta, (miopenTensorDescriptor_t)dxDesc, dx));

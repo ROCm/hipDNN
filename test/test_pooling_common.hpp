@@ -7,7 +7,8 @@
 
 template <typename dataType>
 void hipdnn_pooling_forward(test_pooling_descriptor &c, dataType *src,
-                                dataType *dst, float *avg_time) {
+                                dataType *dst, hipdnnPoolingMode_t mode,
+                                float *avg_time) {
 
   hipdnnHandle_t handle;
   checkHIPDNN(hipdnnCreate(&handle));
@@ -19,7 +20,7 @@ void hipdnn_pooling_forward(test_pooling_descriptor &c, dataType *src,
 
   hipdnnPoolingDescriptor_t pool_desc;
   checkHIPDNN(hipdnnCreatePoolingDescriptor(&pool_desc));
-  checkHIPDNN(hipdnnSetPooling2dDescriptor(pool_desc, HIPDNN_POOLING_MAX,
+  checkHIPDNN(hipdnnSetPooling2dDescriptor(pool_desc, mode,
                                            HIPDNN_NOT_PROPAGATE_NAN, c.kw, c.kh,
                                            c.padt, c.padl, c.strh, c.strw));
 
@@ -60,7 +61,9 @@ void hipdnn_pooling_forward(test_pooling_descriptor &c, dataType *src,
 
 template <typename dataType>
 void hipdnn_pooling_backward(pool_bwd &test_case, dataType *src,
-                               dataType *grad, dataType *dst, float *avg_time) {
+                               dataType *grad, dataType *dst,
+                               hipdnnPoolingMode_t mode,
+                               float *avg_time) {
 
   hipdnnHandle_t hipdnn;
   checkHIPDNN(hipdnnCreate(&hipdnn));
@@ -75,11 +78,10 @@ void hipdnn_pooling_backward(pool_bwd &test_case, dataType *src,
   hipdnnPoolingDescriptor_t pool_desc;
   checkHIPDNN(hipdnnCreatePoolingDescriptor(&pool_desc));
 
-  hipdnnPoolingMode_t poolmode = HIPDNN_POOLING_MAX;
   hipdnnNanPropagation_t maxpoolingNanOpt = HIPDNN_NOT_PROPAGATE_NAN;
 
   checkHIPDNN(hipdnnSetPooling2dDescriptor(
-      pool_desc, poolmode, maxpoolingNanOpt, test_case.wheight,
+      pool_desc, mode, maxpoolingNanOpt, test_case.wheight,
       test_case.wwidth, test_case.vpadding, test_case.hpadding,
       test_case.vstride, test_case.hstride));
 
