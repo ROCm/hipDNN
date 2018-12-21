@@ -48,7 +48,7 @@ void compute_hipdnn_fusion_api(convulution_Size &c, dataType *src,
   float betaC = 0.f;
 
   hipdnnConvolutionFwdPreference_t preference = HIPDNN_CONVOLUTION_FWD_PREFER_FASTEST;
-  CHECK_HIPDNN(hipdnnGetConvolutionForwardAlgorithm( hipdnn,
+  checkHIPDNN(hipdnnGetConvolutionForwardAlgorithm( hipdnn,
           in_desc, filt_desc, conv_desc, out_desc, preference,
           0 /*memoryLimitInBytes*/ ,&algo));
                                       // WorkspaceSize to be based on preference
