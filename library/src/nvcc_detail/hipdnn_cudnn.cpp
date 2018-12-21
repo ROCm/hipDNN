@@ -1320,7 +1320,8 @@ hipdnnGetOpTensorDescriptor(const hipdnnOpTensorDescriptor_t opTensorDesc,
 hipdnnStatus_t
 hipdnnDestroyOpTensorDescriptor(hipdnnOpTensorDescriptor_t opTensorDesc) {
 
-    return HIPDNN_STATUS_NOT_SUPPORTED;
+    return cudnnTohipdnnStatus(cudnnDestroyOpTensorDescriptor(
+                                    (cudnnOpTensorDescriptor_t)opTensorDesc));
 
 }
 
