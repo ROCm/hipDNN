@@ -1309,7 +1309,7 @@ hipdnnStatus_t hipdnnGetConvolution2dDescriptor(
 //===========
 
 hipdnnStatus_t hipdnnGetConvolution2dForwardOutputDim(
-    const hipdnnConvolutionDescriptor_t convDesc, // HGSOSOS const
+    const hipdnnConvolutionDescriptor_t convDesc,
     const hipdnnTensorDescriptor_t inputTensorDesc,
     const hipdnnFilterDescriptor_t filterDesc, int *n, int *c, int *h, int *w) {
     return cudnnTohipdnnStatus(cudnnGetConvolution2dForwardOutputDim(
@@ -1820,7 +1820,7 @@ hipdnnCreateActivationDescriptor(hipdnnActivationDescriptor_t *activationDesc) {
 //=============================================================================
 
 hipdnnStatus_t hipdnnSetActivationDescriptor(
-    hipdnnActivationDescriptor_t activationDesc, // HGSOS const
+    hipdnnActivationDescriptor_t activationDesc,
     hipdnnActivationMode_t mode, hipdnnNanPropagation_t reluNanOpt,
     double reluCeilingOrAlpha, double activBeta, double activExp) {
     cudnnActivationMode_t cuAMode;
@@ -1880,7 +1880,7 @@ hipdnnDestroyActivationDescriptor(hipdnnActivationDescriptor_t activationDesc) {
 
 hipdnnStatus_t hipdnnActivationForward(
     hipdnnHandle_t handle,
-    hipdnnActivationDescriptor_t activationDesc, // HGSOS not const in cudnn.
+    hipdnnActivationDescriptor_t activationDesc,
     const void *alpha, const hipdnnTensorDescriptor_t xDesc, const void *x,
     const void *beta, const hipdnnTensorDescriptor_t yDesc, void *y) {
     return cudnnTohipdnnStatus(cudnnActivationForward(
@@ -1892,7 +1892,7 @@ hipdnnStatus_t hipdnnActivationForward(
 
 hipdnnStatus_t hipdnnActivationBackward(
     hipdnnHandle_t handle,
-    hipdnnActivationDescriptor_t activationDesc, // HGSOS not const in cuda
+    hipdnnActivationDescriptor_t activationDesc,
     const void *alpha, const hipdnnTensorDescriptor_t yDesc, const void *y,
     const hipdnnTensorDescriptor_t dyDesc, const void *dy,
     const hipdnnTensorDescriptor_t xDesc, const void *x, const void *beta,
@@ -1955,7 +1955,7 @@ hipdnnStatus_t hipdnnLRNCrossChannelForward(
     hipdnnHandle_t handle, hipdnnLRNDescriptor_t normDesc,
     hipdnnLRNMode_t lrnMode, const void *alpha,
     const hipdnnTensorDescriptor_t xDesc, const void *x, const void *beta,
-    const hipdnnTensorDescriptor_t yDesc, void *y) {
+    const hipdnnTensorDescriptor_t yDesc, void *y, bool do_backward) {
     hipdnnStatus_t retVal = HIPDNN_STATUS_SUCCESS;
     cudnnLRNMode_t cumode;
 
@@ -1975,11 +1975,11 @@ hipdnnStatus_t hipdnnLRNCrossChannelForwardEx(
     hipdnnLRNMode_t lrnMode, const void *alpha,
     const hipdnnTensorDescriptor_t xDesc, const void *x, const void *beta,
     const hipdnnTensorDescriptor_t yDesc, void *y, size_t workspacesize,
-    void *workspace) {
+    void *workspace, bool do_backward) {
     return hipdnnLRNCrossChannelForward(
         (cudnnHandle_t)handle, (cudnnLRNDescriptor_t)normDesc, lrnMode, alpha,
         (cudnnTensorDescriptor_t)xDesc, x, beta, (cudnnTensorDescriptor_t)yDesc,
-        y);
+        y, do_backward);
 }
 
 //=============================================================================
