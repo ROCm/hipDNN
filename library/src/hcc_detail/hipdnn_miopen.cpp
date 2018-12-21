@@ -1026,8 +1026,7 @@ hipdnnStatus_t hipdnnGetConvolution2dForwardOutputDim(
     HIPDNN_OPEN_LOG_C("HIPDNN_SOFTMAX_MODE_INSTANCE NOT SUPPORTED."
                       << std::flush);
     CHECK_MIO(miopenGetConvolutionForwardOutputDim(
-        (miopenConvolutionDescriptor_t)
-            convDesc,  // HGSOSOS should be const in miopen.
+        static_cast<miopenConvolutionDescriptor_t>(convDesc), // should be const in miopen.
         (miopenTensorDescriptor_t)inputTensorDesc,
         (miopenTensorDescriptor_t)filterDesc, n, c, h, w));
     return HIPDNN_STATUS_SUCCESS;
@@ -1901,7 +1900,8 @@ hipdnnStatus_t hipdnnCreateActivationDescriptor(
 //=============================================================================
 
 hipdnnStatus_t hipdnnSetActivationDescriptor(
-    hipdnnActivationDescriptor_t activationDesc, hipdnnActivationMode_t mode,
+    hipdnnActivationDescriptor_t activationDesc, // not const in cudnn
+    hipdnnActivationMode_t mode,
     hipdnnNanPropagation_t reluNanOpt, double reluCeilingOrAlpha,
     double activBeta, double activExp) {
     miopenActivationMode_t mimode;
@@ -1911,7 +1911,7 @@ hipdnnStatus_t hipdnnSetActivationDescriptor(
     CHECK_HIPDNN(hipTomiopenActivationMode(mode, &mimode));
 
     CHECK_MIO(miopenSetActivationDescriptor(
-        (miopenActivationDescriptor_t)activationDesc, mimode,
+        static_cast<const miopenActivationDescriptor_t>(activationDesc), mimode,
         reluCeilingOrAlpha, activBeta, activExp));
     return HIPDNN_STATUS_SUCCESS;
 }
@@ -1948,12 +1948,12 @@ hipdnnStatus_t hipdnnDestroyActivationDescriptor(
 
 hipdnnStatus_t hipdnnActivationForward(
     hipdnnHandle_t handle,
-    hipdnnActivationDescriptor_t activationDesc,  // HGSOS not const in cudnn
+    hipdnnActivationDescriptor_t activationDesc,  // not const in cudnn
     const void *alpha, const hipdnnTensorDescriptor_t xDesc, const void *x,
     const void *beta, const hipdnnTensorDescriptor_t yDesc, void *y) {
     HIPDNN_OPEN_LOG_C("Inside hipdnnActivationForward");
     CHECK_MIO(miopenActivationForward(
-        (miopenHandle_t)handle, (miopenActivationDescriptor_t)activationDesc,
+        (miopenHandle_t)handle, static_cast<const miopenActivationDescriptor_t>(activationDesc),
         alpha, (miopenTensorDescriptor_t)xDesc, x, beta,
         (miopenTensorDescriptor_t)yDesc, y));
     return HIPDNN_STATUS_SUCCESS;
@@ -1962,14 +1962,14 @@ hipdnnStatus_t hipdnnActivationForward(
 
 hipdnnStatus_t hipdnnActivationBackward(
     hipdnnHandle_t handle,
-    hipdnnActivationDescriptor_t activationDesc,  // HGSOS const missing in cuda
+    hipdnnActivationDescriptor_t activationDesc,  // const missing in cuda
     const void *alpha, const hipdnnTensorDescriptor_t yDesc, const void *y,
     const hipdnnTensorDescriptor_t dyDesc, const void *dy,
     const hipdnnTensorDescriptor_t xDesc, const void *x, const void *beta,
     const hipdnnTensorDescriptor_t dxDesc, void *dx) {
     HIPDNN_OPEN_LOG_C("Inside hipdnnActivationBackward");
     CHECK_MIO(miopenActivationBackward(
-        (miopenHandle_t)handle, (miopenActivationDescriptor_t)activationDesc,
+        (miopenHandle_t)handle, static_cast<const miopenActivationDescriptor_t>(activationDesc),
         alpha, (miopenTensorDescriptor_t)yDesc, y,
         (miopenTensorDescriptor_t)dyDesc, dy, (miopenTensorDescriptor_t)xDesc,
         x, beta, (miopenTensorDescriptor_t)dxDesc, dx));
