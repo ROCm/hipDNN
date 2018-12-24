@@ -41,6 +41,15 @@
         }                                                                   \
     }
 
+#define CHECK_HIPDNN_NO_RET(expression)                                         \
+    {                                                                           \
+        hipdnnStatus_t error = (expression);                                    \
+        if (error != HIPDNN_STATUS_SUCCESS) {                                   \
+            fprintf(stderr, "HIPDNN error: '%s'(%d) at %s:%d\n",                \
+                    hipdnnGetErrorString(error), error, __FILE__, __LINE__);    \
+        }                                                                       \
+    }
+
 #define HIPDNNFLUSH << std::flush;
 #define PROMOTE_TO_SUPPORTED
 
@@ -531,7 +540,7 @@ hipdnnConvolutionFwdAlgo_t GetConvolutionFwdAlgo(int i) {
         // for protection
         mialgo = (miopenConvFwdAlgorithm_t)miopenConvolutionFwdAlgoWinograd;
     }
-    CHECK_HIPDNN(miopenTohipConvolutionFwdAlgo(mialgo, &retVal));
+    CHECK_HIPDNN_NO_RET( miopenTohipConvolutionFwdAlgo(mialgo, &retVal));
     return retVal;
 }
 
@@ -601,7 +610,7 @@ hipdnnConvolutionBwdFilterAlgo_t GetConvolutionBwdFilterAlgo(int i) {
         mialgo = (miopenConvBwdWeightsAlgorithm_t)
             miopenConvolutionBwdWeightsAlgoGEMM;
     }
-    CHECK_HIPDNN(miopenTohipConvolutionBwdFilterAlgo(mialgo, &retVal));
+    CHECK_HIPDNN_NO_RET(miopenTohipConvolutionBwdFilterAlgo(mialgo, &retVal));
 
     return retVal;
 }
@@ -698,7 +707,7 @@ hipdnnConvolutionBwdDataAlgo_t GetConvolutionBwdDataAlgo(int i) {
         mialgo =
             (miopenConvBwdDataAlgorithm_t)miopenConvolutionBwdDataAlgoWinograd;
     }
-    CHECK_HIPDNN(miopenTohipConvolutionBwdDataAlgo(mialgo, &retVal));
+    CHECK_HIPDNN_NO_RET(miopenTohipConvolutionBwdDataAlgo(mialgo, &retVal));
 
     return retVal;
 }
