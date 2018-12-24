@@ -2957,7 +2957,7 @@ hipdnnStatus_t hipdnnDestroyReduceTensorDescriptor(
 
 }
 
-// --- Fusion API ---
+//============================ MIO-Fusion ======================================
 
 hipdnnStatus_t
 hipdnnCreateFusionPlan(hipdnnFusionPlanDescriptor_t *fusePlanDesc,
@@ -2970,6 +2970,8 @@ hipdnnCreateFusionPlan(hipdnnFusionPlanDescriptor_t *fusePlanDesc,
     return HIPDNN_STATUS_SUCCESS;
 }
 
+//------------------------------------------------------------------------------
+
 hipdnnStatus_t hipdnnFusionPlanGetOp(hipdnnFusionPlanDescriptor_t fusePlanDesc,
                                      const int op_idx,
                                      hipdnnFusionOpDescriptor_t *op) {
@@ -2977,6 +2979,8 @@ hipdnnStatus_t hipdnnFusionPlanGetOp(hipdnnFusionPlanDescriptor_t fusePlanDesc,
                                     op_idx, (miopenFusionOpDescriptor_t *)op));
     return HIPDNN_STATUS_SUCCESS;
 }
+
+//------------------------------------------------------------------------------
 
 hipdnnStatus_t hipdnnFusionPlanGetWorkSpaceSize(
     hipdnnHandle_t handle, hipdnnFusionPlanDescriptor_t fusePlanDesc,
@@ -2986,6 +2990,8 @@ hipdnnStatus_t hipdnnFusionPlanGetWorkSpaceSize(
         workSpaceSize, (miopenConvFwdAlgorithm_t)algo));
     return HIPDNN_STATUS_SUCCESS;
 }
+
+//------------------------------------------------------------------------------
 
 hipdnnStatus_t hipdnnFusionPlanConvolutionGetAlgo(
     hipdnnFusionPlanDescriptor_t fusePlanDesc, const int requestAlgoCount,
@@ -3000,6 +3006,8 @@ hipdnnStatus_t hipdnnFusionPlanConvolutionGetAlgo(
     return HIPDNN_STATUS_SUCCESS;
 }
 
+//------------------------------------------------------------------------------
+
 hipdnnStatus_t hipdnnCreateOpConvForward(
     hipdnnFusionPlanDescriptor_t fusePlanDesc,
     hipdnnFusionOpDescriptor_t *convOp, hipdnnConvolutionDescriptor_t convDesc,
@@ -3012,6 +3020,8 @@ hipdnnStatus_t hipdnnCreateOpConvForward(
     return HIPDNN_STATUS_SUCCESS;
 }
 
+//------------------------------------------------------------------------------
+
 hipdnnStatus_t hipdnnCreateOpBiasForward(
     hipdnnFusionPlanDescriptor_t fusePlanDesc,
     hipdnnFusionOpDescriptor_t *biasOp, const hipdnnTensorDescriptor_t bDesc) {
@@ -3021,6 +3031,7 @@ hipdnnStatus_t hipdnnCreateOpBiasForward(
     return HIPDNN_STATUS_SUCCESS;
 }
 
+//------------------------------------------------------------------------------
 
 hipdnnStatus_t
 hipdnnCreateOpActivationForward(hipdnnFusionPlanDescriptor_t fusePlanDesc,
@@ -3034,6 +3045,8 @@ hipdnnCreateOpActivationForward(hipdnnFusionPlanDescriptor_t fusePlanDesc,
         (miopenFusionOpDescriptor_t *)activOp, mi_mode));
     return HIPDNN_STATUS_SUCCESS;
 }
+
+//------------------------------------------------------------------------------
 
 hipdnnStatus_t hipdnnCreateOpBatchNormInference(
     hipdnnFusionPlanDescriptor_t fusePlanDesc, hipdnnFusionOpDescriptor_t *bnOp,
@@ -3049,6 +3062,8 @@ hipdnnStatus_t hipdnnCreateOpBatchNormInference(
     return HIPDNN_STATUS_SUCCESS;
 }
 
+//------------------------------------------------------------------------------
+
 hipdnnStatus_t hipdnnCompileFusionPlan(
     hipdnnHandle_t handle, hipdnnFusionPlanDescriptor_t fusePlanDesc) {
     CHECK_MIO(miopenCompileFusionPlan(
@@ -3056,10 +3071,14 @@ hipdnnStatus_t hipdnnCompileFusionPlan(
     return HIPDNN_STATUS_SUCCESS;
 }
 
+//------------------------------------------------------------------------------
+
 hipdnnStatus_t hipdnnCreateOperatorArgs(hipdnnOperatorArgs_t *args) {
     CHECK_MIO(miopenCreateOperatorArgs((miopenOperatorArgs_t *)args));
     return HIPDNN_STATUS_SUCCESS;
 }
+
+//------------------------------------------------------------------------------
 
 hipdnnStatus_t hipdnnSetOpArgsConvForward(
     hipdnnOperatorArgs_t args, const hipdnnFusionOpDescriptor_t convOp,
@@ -3070,6 +3089,8 @@ hipdnnStatus_t hipdnnSetOpArgsConvForward(
     return HIPDNN_STATUS_SUCCESS;
 }
 
+//------------------------------------------------------------------------------
+
 hipdnnStatus_t hipdnnSetOpArgsBiasForward(
     hipdnnOperatorArgs_t args, const hipdnnFusionOpDescriptor_t biasOp,
     const void *alpha, const void *beta, const void *bias) {
@@ -3078,6 +3099,8 @@ hipdnnStatus_t hipdnnSetOpArgsBiasForward(
                                          alpha, beta, bias));
     return HIPDNN_STATUS_SUCCESS;
 }
+
+//------------------------------------------------------------------------------
 
 hipdnnStatus_t hipdnnSetOpArgsActivForward(
     hipdnnOperatorArgs_t args, const hipdnnFusionOpDescriptor_t activOp,
@@ -3089,6 +3112,8 @@ hipdnnStatus_t hipdnnSetOpArgsActivForward(
     return HIPDNN_STATUS_SUCCESS;
 }
 
+//------------------------------------------------------------------------------
+
 hipdnnStatus_t hipdnnSetOpArgsBatchNormInference(
     hipdnnOperatorArgs_t args, const hipdnnFusionOpDescriptor_t bnOp,
     const void *alpha, const void *beta, const void *bnScale,
@@ -3099,6 +3124,8 @@ hipdnnStatus_t hipdnnSetOpArgsBatchNormInference(
         beta, bnScale, bnBias, estimatedMean, estimatedVariance, epsilon));
     return HIPDNN_STATUS_SUCCESS;
 }
+
+//------------------------------------------------------------------------------
 
 hipdnnStatus_t hipdnnExecuteFusionPlan(
     const hipdnnHandle_t handle,
@@ -3114,10 +3141,14 @@ hipdnnStatus_t hipdnnExecuteFusionPlan(
     return HIPDNN_STATUS_SUCCESS;
 }
 
+//------------------------------------------------------------------------------
+
 hipdnnStatus_t hipdnnDestroyOperatorArgs(hipdnnOperatorArgs_t args) {
     CHECK_MIO(miopenDestroyOperatorArgs((miopenOperatorArgs_t) args) );
     return HIPDNN_STATUS_SUCCESS;
 }
+
+//------------------------------------------------------------------------------
 
 hipdnnStatus_t hipdnnDestroyFusionPlan(
     hipdnnFusionPlanDescriptor_t fusePlanDesc) {
@@ -3125,9 +3156,14 @@ hipdnnStatus_t hipdnnDestroyFusionPlan(
         miopenDestroyFusionPlan((miopenFusionPlanDescriptor_t)fusePlanDesc));
     return HIPDNN_STATUS_SUCCESS;
 }
+
+//------------------------------------------------------------------------------
+
 hipdnnStatus_t hipdnnSetConvolutionGroupCount(
     hipdnnConvolutionDescriptor_t convDesc, int groupCount) {
     CHECK_MIO(miopenSetConvolutionGroupCount(
         (miopenConvolutionDescriptor_t)convDesc, groupCount));
     return HIPDNN_STATUS_SUCCESS;
 }
+
+//==============================================================================
