@@ -890,6 +890,7 @@ hipdnnStatus_t hipdnnScaleTensor(hipdnnHandle_t handle,
 //============================ Tensor Operations ===============================
 
 miopenTensorOp_t hipToMIOpenTensorOp(hipdnnOpTensorDescriptor_t opTensorDesc) {
+    //TODO: Not needed, can be removed
     // int *result = reinterpret_cast<int *>(opTensorDesc);
     uintptr_t result = (uintptr_t)opTensorDesc;
     switch (result) {
@@ -1026,11 +1027,14 @@ hipdnnStatus_t hipdnnOpTensor(
     const void *alpha2, const hipdnnTensorDescriptor_t bDesc, const void *B,
     const void *beta, const hipdnnTensorDescriptor_t cDesc, void *C) {
 
-    CHECK_MIO(miopenOpTensor((miopenHandle_t)handle,
-                             hipToMIOpenTensorOp(opTensorDesc), alpha1,
-                             (miopenTensorDescriptor_t)aDesc, A, alpha2,
-                             (miopenTensorDescriptor_t)bDesc, B, beta,
-                             (miopenTensorDescriptor_t)cDesc, C));
+    miopenTensorOp_t miOpType;
+    CHECK_HIPDNN( hipTomiopenOpTensorOp(
+            ((structOpTensorDesc_t*)opTensorDesc)->opTensorOp, &miOpType ));
+
+    CHECK_MIO(miopenOpTensor((miopenHandle_t)handle, miOpType, alpha1,
+                (miopenTensorDescriptor_t)aDesc, A, alpha2,
+                (miopenTensorDescriptor_t)bDesc, B, beta,
+                (miopenTensorDescriptor_t)cDesc, C));
     return HIPDNN_STATUS_SUCCESS;
 }
 
