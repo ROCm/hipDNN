@@ -964,13 +964,15 @@ typedef struct {
     hipdnnOpTensorOp_t opTensorOp;
     hipdnnDataType_t opTensorCompType;
     hipdnnNanPropagation_t opTensorNanOpt;
-}structOpTensorDescriptor_t;
+}structOpTensorDesc_t;
 
 //------------------------------------------------------------------------------
 
 hipdnnStatus_t
 hipdnnCreateOpTensorDescriptor(hipdnnOpTensorDescriptor_t *opTensorDesc) {
 
+    *opTensorDesc = (void*)malloc(sizeof(structOpTensorDesc_t));
+    CHECK_MALLOC(*opTensorDesc);
 
     return HIPDNN_STATUS_SUCCESS;
 }
@@ -983,7 +985,11 @@ hipdnnSetOpTensorDescriptor(hipdnnOpTensorDescriptor_t opTensorDesc,
                             hipdnnDataType_t opTensorCompType,
                             hipdnnNanPropagation_t opTensorNanOpt) {
 
-    return HIPDNN_STATUS_NOT_SUPPORTED;
+    ((structOpTensorDesc_t*)opTensorDesc)->opTensorOp = opTensorOp;
+    ((structOpTensorDesc_t*)opTensorDesc)->opTensorCompType = opTensorCompType;
+    ((structOpTensorDesc_t*)opTensorDesc)->opTensorNanOpt = opTensorNanOpt;
+
+    return HIPDNN_STATUS_SUCCESS;
 
 }
 
@@ -995,7 +1001,11 @@ hipdnnGetOpTensorDescriptor(const hipdnnOpTensorDescriptor_t opTensorDesc,
                             hipdnnDataType_t *opTensorCompType,
                             hipdnnNanPropagation_t *opTensorNanOpt) {
 
-    return HIPDNN_STATUS_NOT_SUPPORTED;
+    *opTensorOp = ((structOpTensorDesc_t*)opTensorDesc)->opTensorOp;
+    *opTensorCompType = ((structOpTensorDesc_t*)opTensorDesc)->opTensorCompType;
+    *opTensorNanOpt = ((structOpTensorDesc_t*)opTensorDesc)->opTensorNanOpt;
+
+    return HIPDNN_STATUS_SUCCESS;
 
 }
 //------------------------------------------------------------------------------
@@ -1003,7 +1013,8 @@ hipdnnGetOpTensorDescriptor(const hipdnnOpTensorDescriptor_t opTensorDesc,
 hipdnnStatus_t
 hipdnnDestroyOpTensorDescriptor(hipdnnOpTensorDescriptor_t opTensorDesc) {
 
-    return HIPDNN_STATUS_NOT_SUPPORTED;
+    free(opTensorDesc);
+    return HIPDNN_STATUS_SUCCESS;
 
 }
 
