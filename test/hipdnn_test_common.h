@@ -56,8 +56,7 @@ public:
     this->h_data = (dataType *)malloc(this->mem_size);
     memset(h_data, 0, this->mem_size);
     HIP_CALL(hipMalloc((void **)&this->d_data, this->mem_size));
-	//std::cout << "Memsetting" << std::endl;
-//    HIP_CALL(hipMemset((void **)&this->d_data, 0, this->mem_size));
+    HIP_CALL(hipMemset(this->d_data, 0, this->mem_size));
   }
   dataType *cpu() { return this->h_data; }
 
@@ -143,7 +142,7 @@ template <typename dataType> void populateMemoryRandom(Memory<dataType> &mem) {
   auto gen = [&dist, &mersenne_engine]() { return dist(mersenne_engine); };
 int i = 0;
 	std::generate(v.begin(), v.end(), [&i]() mutable{
-			return ++i % 10;
+	                return ++i % 10;
 		});
 //  std::iota(v.begin(), v.end(), -5);
   std::copy(v.begin(), v.end(), mem.cpu());
@@ -151,5 +150,10 @@ int i = 0;
   HIP_CALL(hipMemcpy(mem.gpu(), mem.cpu(), mem.size(), hipMemcpyHostToDevice));
 }
 
+template <typename dataType> void populateMemory(Memory<dataType> &mem, float n) {
+   std::vector<dataType> v(mem.get_num_elements(), n);
+   std::copy(v.begin(), v.end(), mem.cpu());
+  // Copy the stuff to device too
+  HIP_CALL(hipMemcpy(mem.gpu(), mem.cpu(), mem.size(), hipMemcpyHostToDevice));
+}
 #endif
-
