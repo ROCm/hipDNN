@@ -816,7 +816,7 @@ hipdnnStatus_t accumulateGradients(void *gradient, void *gradientPrior,
 
 //=============================================================================
 
-HIPDNN_EXPORT hipdnnStatus_t hipdnnCreate(hipdnnHandle_t *handle) {
+hipdnnStatus_t hipdnnCreate(hipdnnHandle_t *handle) {
     CHECK_MIO(miopenCreate((miopenHandle_t *)handle));
     return HIPDNN_STATUS_SUCCESS;
 }
@@ -994,11 +994,7 @@ hipdnnStatus_t hipdnnOpTensor(
     const void *alpha2, const hipdnnTensorDescriptor_t bDesc, const void *B,
     const void *beta, const hipdnnTensorDescriptor_t cDesc, void *C) {
 
-    return cudnnTohipdnnStatus(cudnnOpTensor(
-        (cudnnHandle_t)handle, (cudnnOpTensorDescriptor_t)opTensorDesc, alpha1,
-        (cudnnTensorDescriptor_t)aDesc, A, alpha2,
-        (cudnnTensorDescriptor_t)bDesc, B, beta, (cudnnTensorDescriptor_t)cDesc,
-        C));
+    return HIPDNN_STATUS_NOT_SUPPORTED;
 }
 
 //------------------------------------------------------------------------------
@@ -1182,7 +1178,7 @@ hipdnnStatus_t hipdnnGetConvolutionForwardAlgorithm(
         CHECK_HIPDNN(hipdnnGetConvolutionForwardWorkspaceSize(
             handle, xDesc, wDesc, convDesc, yDesc, *algo, &sizeInBytes));
 
-    if(prefernce == HIPDNN_CONVOLUTION_FWD_SPECIFY_WORKSPACE_LIMIT)
+    if(preference == HIPDNN_CONVOLUTION_FWD_SPECIFY_WORKSPACE_LIMIT)
         sizeInBytes = memoryLimitInBytes;
 
     hipMalloc((void **)&sConvolutionForwardAlgorithmWorkspace, sizeInBytes);
