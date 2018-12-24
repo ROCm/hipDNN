@@ -55,7 +55,7 @@ extern "C" {
 
 #define CHECK_MALLOC(pointer)                                                   \
     {                                                                           \
-        if ( (pointer) == '\0') {   /*if Null pointer*/                         \
+        if ( (pointer) == 0) {   /*if Null pointer*/                         \
             fprintf(stderr, "Malloc failed error:%s:%d\n", __FILE__, __LINE__); \
             std::exit(EXIT_FAILURE);                                            \
         }                                                                       \
