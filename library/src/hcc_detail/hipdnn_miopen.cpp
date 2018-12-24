@@ -200,56 +200,6 @@ hipdnnStatus_t miopenTohipDataType(miopenDataType_t in, hipdnnDataType_t *out) {
 
 //=============================================================================
 
-hipdnnStatus_t miopenTohipOpTensorOp(miopenTensorOp_t in,
-                                     hipdnnOpTensorOp_t *out) {
-    switch (in) {
-        case miopenTensorOpAdd:
-            *out = HIPDNN_OP_TENSOR_ADD;
-            break;
-        case miopenTensorOpMul:
-            *out = HIPDNN_OP_TENSOR_MUL;
-            break;
-        case miopenTensorOpMin:
-            *out = HIPDNN_OP_TENSOR_MIN;
-            break;
-        case miopenTensorOpMax:
-            *out = HIPDNN_OP_TENSOR_MAX;
-            break;
-        default:
-            HIPDNN_OPEN_LOG_M("miopenTohipTensorOp " << in << ": NOT SUPPORTED."
-                                                     << std::flush);
-            return HIPDNN_STATUS_NOT_SUPPORTED;
-    }
-    return HIPDNN_STATUS_SUCCESS;
-}
-
-hipdnnStatus_t hipTomiopenOpTensorOp(hipdnnOpTensorOp_t in,
-                                     miopenTensorOp_t *out) {
-    switch (in) {
-        case HIPDNN_OP_TENSOR_ADD:
-            *out = miopenTensorOpAdd;
-            break;
-        case HIPDNN_OP_TENSOR_MUL:
-            *out = miopenTensorOpMul;
-            break;
-        case HIPDNN_OP_TENSOR_MIN:
-            *out = miopenTensorOpMin;
-            break;
-        case HIPDNN_OP_TENSOR_MAX:
-            *out = miopenTensorOpMax;
-            break;
-        case HIPDNN_OP_TENSOR_SQRT:
-        default:
-            HIPDNN_OPEN_LOG_M("hipTomiopenTensorOp " << in << ": NOT SUPPORTED."
-                                                     << std::flush);
-            return HIPDNN_STATUS_NOT_SUPPORTED;
-    }
-
-    return HIPDNN_STATUS_SUCCESS;
-}
-
-//=============================================================================
-
 hipdnnConvolutionMode_t miopenTohipConvolutionMode(miopenConvolutionMode_t in) {
     if (in == miopenConvolution) return HIPDNN_CONVOLUTION;
     /*else if( in == miopenCrossCorrelation )
@@ -937,7 +887,7 @@ hipdnnStatus_t hipdnnScaleTensor(hipdnnHandle_t handle,
     return HIPDNN_STATUS_SUCCESS;
 }
 
-//------------------------------------------------------------------------------
+//============================ Tensor Operations ===============================
 
 miopenTensorOp_t hipToMIOpenTensorOp(hipdnnOpTensorDescriptor_t opTensorDesc) {
     // int *result = reinterpret_cast<int *>(opTensorDesc);
@@ -955,12 +905,74 @@ miopenTensorOp_t hipToMIOpenTensorOp(hipdnnOpTensorDescriptor_t opTensorDesc) {
             return miopenTensorOpAdd;
     }
 }
-//============================ Tensor Operations ===============================
+
+//------------------------------------------------------------------------------
+
+hipdnnStatus_t miopenTohipOpTensorOp(miopenTensorOp_t in,
+                                     hipdnnOpTensorOp_t *out) {
+    switch (in) {
+        case miopenTensorOpAdd:
+            *out = HIPDNN_OP_TENSOR_ADD;
+            break;
+        case miopenTensorOpMul:
+            *out = HIPDNN_OP_TENSOR_MUL;
+            break;
+        case miopenTensorOpMin:
+            *out = HIPDNN_OP_TENSOR_MIN;
+            break;
+        case miopenTensorOpMax:
+            *out = HIPDNN_OP_TENSOR_MAX;
+            break;
+        default:
+            HIPDNN_OPEN_LOG_M("miopenTohipTensorOp " << in << ": NOT SUPPORTED."
+                                                     << std::flush);
+            return HIPDNN_STATUS_NOT_SUPPORTED;
+    }
+    return HIPDNN_STATUS_SUCCESS;
+}
+
+//------------------------------------------------------------------------------
+
+hipdnnStatus_t hipTomiopenOpTensorOp(hipdnnOpTensorOp_t in,
+                                     miopenTensorOp_t *out) {
+    switch (in) {
+        case HIPDNN_OP_TENSOR_ADD:
+            *out = miopenTensorOpAdd;
+            break;
+        case HIPDNN_OP_TENSOR_MUL:
+            *out = miopenTensorOpMul;
+            break;
+        case HIPDNN_OP_TENSOR_MIN:
+            *out = miopenTensorOpMin;
+            break;
+        case HIPDNN_OP_TENSOR_MAX:
+            *out = miopenTensorOpMax;
+            break;
+        case HIPDNN_OP_TENSOR_SQRT:
+        default:
+            HIPDNN_OPEN_LOG_M("hipTomiopenTensorOp " << in << ": NOT SUPPORTED."
+                                                     << std::flush);
+            return HIPDNN_STATUS_NOT_SUPPORTED;
+    }
+
+    return HIPDNN_STATUS_SUCCESS;
+}
+
+//------------------------------------------------------------------------------
+
+typedef struct {
+    hipdnnOpTensorOp_t opTensorOp;
+    hipdnnDataType_t opTensorCompType;
+    hipdnnNanPropagation_t opTensorNanOpt;
+}structOpTensorDescriptor_t;
+
+//------------------------------------------------------------------------------
 
 hipdnnStatus_t
 hipdnnCreateOpTensorDescriptor(hipdnnOpTensorDescriptor_t *opTensorDesc) {
 
-    return HIPDNN_STATUS_NOT_SUPPORTED;
+
+    return HIPDNN_STATUS_SUCCESS;
 }
 
 //------------------------------------------------------------------------------
@@ -993,17 +1005,6 @@ hipdnnDestroyOpTensorDescriptor(hipdnnOpTensorDescriptor_t opTensorDesc) {
 
     return HIPDNN_STATUS_NOT_SUPPORTED;
 
-}
-
-//------------------------------------------------------------------------------
-
-hipdnnStatus_t hipdnnOpTensor(
-    hipdnnHandle_t handle, const hipdnnOpTensorDescriptor_t opTensorDesc,
-    const void *alpha1, const hipdnnTensorDescriptor_t aDesc, const void *A,
-    const void *alpha2, const hipdnnTensorDescriptor_t bDesc, const void *B,
-    const void *beta, const hipdnnTensorDescriptor_t cDesc, void *C) {
-
-    return HIPDNN_STATUS_NOT_SUPPORTED;
 }
 
 //------------------------------------------------------------------------------
