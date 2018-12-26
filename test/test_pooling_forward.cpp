@@ -23,7 +23,7 @@ TEST(pooling_fwd, func_check_zero_padding) {
   std::string str_op_size  = convert_to_string((int*)op_size,4);
 
   hipdnn_pooling_forward<float>(pool, srcData.gpu(), dstDataGPU.gpu(), pool_mode,
-                                &avg_time);
+                                false, &avg_time);
 
   std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
 
@@ -63,7 +63,7 @@ TEST(pooling_fwd, func_check_zero_padding_DETERMINISTIC) {
   std::string str_op_size  = convert_to_string((int*)op_size,4);
 
   hipdnn_pooling_forward<float>(pool, srcData.gpu(), dstDataGPU.gpu(), pool_mode,
-                                &avg_time);
+                                false, &avg_time);
 
   std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
 
@@ -103,7 +103,7 @@ TEST(pooling_fwd, func_check_AVERAGE_COUNT_INCLUDE_PADDING) {
   std::string str_op_size  = convert_to_string((int*)op_size,4);
 
   hipdnn_pooling_forward<float>(pool, srcData.gpu(), dstDataGPU.gpu(), pool_mode,
-                                &avg_time);
+                                false, &avg_time);
 
   std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
 
@@ -143,7 +143,7 @@ TEST(pooling_fwd, func_check_AVERAGE_COUNT_EXCLUDE_PADDING) {
   std::string str_op_size  = convert_to_string((int*)op_size,4);
 
   hipdnn_pooling_forward<float>(pool, srcData.gpu(), dstDataGPU.gpu(), pool_mode,
-                                &avg_time);
+                                false, &avg_time);
 
   std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
 
@@ -183,7 +183,7 @@ TEST(pooling_fwd, func_check_batch32) {
   std::string str_op_size  = convert_to_string((int*)op_size,4);
 
   hipdnn_pooling_forward<float>(pool, srcData.gpu(), dstDataGPU.gpu(), pool_mode,
-                                &avg_time);
+                                false, &avg_time);
 
   std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
 
@@ -198,10 +198,11 @@ TEST(pooling_fwd, func_check_batch32) {
   write_to_csv(strt, str, testname, avg_time, str_ip_size, str_k_size, str_op_size);
   dump_result_csv(filename, testname, temp, (int)dstDataGPU.get_num_elements());
 }
-/*
-TEST(pooling_fwd, func_check_batch64) {
+
+/*TEST(pooling_fwd, func_check_batch64) {
 
   test_pooling_descriptor pool(64, 1, 224, 224, 224 / 2, 224 / 2, 2, 2, 0, 0, 2, 2);
+  pool_mode = HIPDNN_POOLING_MAX;
 
   Memory<float> srcData(pool.mb * pool.c * pool.ih * pool.iw);
   Memory<float> dstDataGPU(pool.mb * pool.c * pool.oh * pool.ow);
@@ -218,7 +219,7 @@ TEST(pooling_fwd, func_check_batch64) {
   std::string str_k_size  = convert_to_string((int*)k_size,4);
   std::string str_op_size  = convert_to_string((int*)op_size,4);
 
-  hipdnn_pooling_forward<float>(pool, srcData.gpu(), dstDataGPU.gpu(), &avg_time);
+  hipdnn_pooling_forward<float>(pool, srcData.gpu(), dstDataGPU.gpu(), pool_mode, false, &avg_time);
   std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
 
   float* temp = dstDataGPU.getDataFromGPU();
@@ -235,6 +236,7 @@ TEST(pooling_fwd, func_check_batch64) {
 TEST(pooling_fwd, func_check_batch128) {
 
   test_pooling_descriptor pool(128, 1, 4, 4, 2, 2, 2, 2, 0, 0, 2, 2);
+  pool_mode = HIPDNN_POOLING_MAX;
 
   Memory<float> srcData(pool.mb * pool.c * pool.ih * pool.iw);
   Memory<float> dstDataGPU(pool.mb * pool.c * pool.oh * pool.ow);
@@ -251,7 +253,7 @@ TEST(pooling_fwd, func_check_batch128) {
   std::string str_k_size  = convert_to_string((int*)k_size,4);
   std::string str_op_size  = convert_to_string((int*)op_size,4);
 
-  hipdnn_pooling_forward<float>(pool, srcData.gpu(), dstDataGPU.gpu(), &avg_time);
+  hipdnn_pooling_forward<float>(pool, srcData.gpu(), dstDataGPU.gpu(), pool_mode, false, &avg_time);
   std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
 
   float* temp = dstDataGPU.getDataFromGPU();
@@ -263,8 +265,7 @@ TEST(pooling_fwd, func_check_batch128) {
   std::string str  = convert_to_string((float*)temp,(int)dstDataGPU.get_num_elements());
   write_to_csv(strt, str, testname, avg_time, str_ip_size, str_k_size, str_op_size);
   dump_result_csv(filename, testname, temp, (int)dstDataGPU.get_num_elements());
-}
-*/
+}*/
 //This test currently fails in NVidia, so it has been commented
 /*
 //half2
