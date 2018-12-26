@@ -1969,8 +1969,9 @@ hipdnnStatus_t hipdnnDestroyPoolingDescriptor(
 hipdnnStatus_t hipdnnPoolingForward(
     hipdnnHandle_t handle, const hipdnnPoolingDescriptor_t poolingDesc,
     const void *alpha, const hipdnnTensorDescriptor_t xDesc, const void *x,
-    const void *beta, const hipdnnTensorDescriptor_t yDesc, void *y) {
-    //    return HIPDNN_STATUS_NOT_SUPPORTED;
+    const void *beta, const hipdnnTensorDescriptor_t yDesc, void *y,
+    bool do_backward) {
+
     int8_t *devptr = 0;
 
     size_t workSpaceSize = 0;
@@ -1983,7 +1984,7 @@ hipdnnStatus_t hipdnnPoolingForward(
         // create one and add to the container
         HIPDNN_OPEN_LOG_I("INTERNAL_ALLOC: hipdnnPoolingForward");
 
-        // HGSOS looks like the yDesc is used for the workspace, not the
+        // the yDesc is used for the workspace, not the
         // poolingDesc
         CHECK_MIO(miopenPoolingGetWorkSpaceSize((miopenTensorDescriptor_t)yDesc,
                                                 &workSpaceSize));
@@ -2003,7 +2004,7 @@ hipdnnStatus_t hipdnnPoolingForward(
                                    (miopenPoolingDescriptor_t)poolingDesc,
                                    alpha, (miopenTensorDescriptor_t)xDesc, x,
                                    beta, (miopenTensorDescriptor_t)yDesc, y,
-                                   true,  // do_backward,
+                                   do_backward,
                                    (void *)devptr, workSpaceSize));
 
     return HIPDNN_STATUS_SUCCESS;
