@@ -37,8 +37,17 @@
             std::cerr << "HIPDNN Error on line " << __LINE__                \
                       << "With error status "                               \
                       << ": " << hipdnnGetErrorString(status) << std::endl; \
-            std::exit(EXIT_FAILURE);                                        \
+            return status;                                                  \
         }                                                                   \
+    }
+
+#define CHECK_HIPDNN_NO_RET(expression)                                         \
+    {                                                                           \
+        hipdnnStatus_t error = (expression);                                    \
+        if (error != HIPDNN_STATUS_SUCCESS) {                                   \
+            fprintf(stderr, "HIPDNN error: '%s'(%d) at %s:%d\n",                \
+                    hipdnnGetErrorString(error), error, __FILE__, __LINE__);    \
+        }                                                                       \
     }
 
 #define HIPDNNFLUSH << std::flush;
@@ -186,56 +195,6 @@ hipdnnStatus_t miopenTohipDataType(miopenDataType_t in, hipdnnDataType_t *out) {
                                                      << std::flush);
             return HIPDNN_STATUS_NOT_SUPPORTED;
     }
-    return HIPDNN_STATUS_SUCCESS;
-}
-
-//=============================================================================
-
-hipdnnStatus_t miopenTohipOpTensorOp(miopenTensorOp_t in,
-                                     hipdnnOpTensorOp_t *out) {
-    switch (in) {
-        case miopenTensorOpAdd:
-            *out = HIPDNN_OP_TENSOR_ADD;
-            break;
-        case miopenTensorOpMul:
-            *out = HIPDNN_OP_TENSOR_MUL;
-            break;
-        case miopenTensorOpMin:
-            *out = HIPDNN_OP_TENSOR_MIN;
-            break;
-        case miopenTensorOpMax:
-            *out = HIPDNN_OP_TENSOR_MAX;
-            break;
-        default:
-            HIPDNN_OPEN_LOG_M("miopenTohipTensorOp " << in << ": NOT SUPPORTED."
-                                                     << std::flush);
-            return HIPDNN_STATUS_NOT_SUPPORTED;
-    }
-    return HIPDNN_STATUS_SUCCESS;
-}
-
-hipdnnStatus_t hipTomiopenOpTensorOp(hipdnnOpTensorOp_t in,
-                                     miopenTensorOp_t *out) {
-    switch (in) {
-        case HIPDNN_OP_TENSOR_ADD:
-            *out = miopenTensorOpAdd;
-            break;
-        case HIPDNN_OP_TENSOR_MUL:
-            *out = miopenTensorOpMul;
-            break;
-        case HIPDNN_OP_TENSOR_MIN:
-            *out = miopenTensorOpMin;
-            break;
-        case HIPDNN_OP_TENSOR_MAX:
-            *out = miopenTensorOpMax;
-            break;
-        case HIPDNN_OP_TENSOR_SQRT:
-        default:
-            HIPDNN_OPEN_LOG_M("hipTomiopenTensorOp " << in << ": NOT SUPPORTED."
-                                                     << std::flush);
-            return HIPDNN_STATUS_NOT_SUPPORTED;
-    }
-
     return HIPDNN_STATUS_SUCCESS;
 }
 
@@ -531,7 +490,7 @@ hipdnnConvolutionFwdAlgo_t GetConvolutionFwdAlgo(int i) {
         // for protection
         mialgo = (miopenConvFwdAlgorithm_t)miopenConvolutionFwdAlgoWinograd;
     }
-    CHECK_HIPDNN(miopenTohipConvolutionFwdAlgo(mialgo, &retVal));
+    CHECK_HIPDNN_NO_RET( miopenTohipConvolutionFwdAlgo(mialgo, &retVal));
     return retVal;
 }
 
@@ -601,7 +560,7 @@ hipdnnConvolutionBwdFilterAlgo_t GetConvolutionBwdFilterAlgo(int i) {
         mialgo = (miopenConvBwdWeightsAlgorithm_t)
             miopenConvolutionBwdWeightsAlgoGEMM;
     }
-    CHECK_HIPDNN(miopenTohipConvolutionBwdFilterAlgo(mialgo, &retVal));
+    CHECK_HIPDNN_NO_RET(miopenTohipConvolutionBwdFilterAlgo(mialgo, &retVal));
 
     return retVal;
 }
@@ -698,7 +657,7 @@ hipdnnConvolutionBwdDataAlgo_t GetConvolutionBwdDataAlgo(int i) {
         mialgo =
             (miopenConvBwdDataAlgorithm_t)miopenConvolutionBwdDataAlgoWinograd;
     }
-    CHECK_HIPDNN(miopenTohipConvolutionBwdDataAlgo(mialgo, &retVal));
+    CHECK_HIPDNN_NO_RET(miopenTohipConvolutionBwdDataAlgo(mialgo, &retVal));
 
     return retVal;
 }
@@ -816,7 +775,7 @@ hipdnnStatus_t accumulateGradients(void *gradient, void *gradientPrior,
 
 //=============================================================================
 
-HIPDNN_EXPORT hipdnnStatus_t hipdnnCreate(hipdnnHandle_t *handle) {
+hipdnnStatus_t hipdnnCreate(hipdnnHandle_t *handle) {
     CHECK_MIO(miopenCreate((miopenHandle_t *)handle));
     return HIPDNN_STATUS_SUCCESS;
 }
@@ -842,19 +801,22 @@ hipdnnStatus_t hipdnnGetStream(hipdnnHandle_t handle,
 
 size_t hipdnnGetVersion() { return 6000; }
 
-hipdnnStatus_t hipdnnCreateTensorDescriptor(
-    hipdnnTensorDescriptor_t *tensorDesc) {
-    CHECK_MIO(
-        miopenCreateTensorDescriptor((miopenTensorDescriptor_t *)tensorDesc));
+//======================== Tensor and Operations ==============================
+
+hipdnnStatus_t
+hipdnnCreateTensorDescriptor( hipdnnTensorDescriptor_t *tensorDesc) {
+
+    CHECK_MIO(miopenCreateTensorDescriptor((miopenTensorDescriptor_t*)tensorDesc));
     return HIPDNN_STATUS_SUCCESS;
 }
 
-//=============================================================================
+//------------------------------------------------------------------------------
 
 hipdnnStatus_t hipdnnSetTensor4dDescriptor(hipdnnTensorDescriptor_t tensorDesc,
                                            hipdnnTensorFormat_t format,
                                            hipdnnDataType_t dataType, int n,
                                            int c, int h, int w) {
+
     miopenDataType_t miDT;
     CHECK_HIPDNN(hipTensorFormatSupported(format));
     CHECK_HIPDNN(hipTomiopenDataType(dataType, &miDT));
@@ -863,21 +825,7 @@ hipdnnStatus_t hipdnnSetTensor4dDescriptor(hipdnnTensorDescriptor_t tensorDesc,
     return HIPDNN_STATUS_SUCCESS;
 }
 
-//=============================================================================
-
-hipdnnStatus_t hipdnnSetFilter4dDescriptor(hipdnnFilterDescriptor_t filterDesc,
-                                           hipdnnTensorFormat_t format,
-                                           hipdnnDataType_t dataType, int k,
-                                           int c, int h, int w) {
-    miopenDataType_t miDT;
-    CHECK_HIPDNN(hipTensorFormatSupported(format));
-    CHECK_HIPDNN(hipTomiopenDataType(dataType, &miDT));
-    CHECK_MIO(miopenSet4dTensorDescriptor((miopenTensorDescriptor_t)filterDesc,
-                                          miDT, k, c, h, w));
-    return HIPDNN_STATUS_SUCCESS;
-}
-
-//=============================================================================
+//------------------------------------------------------------------------------
 
 hipdnnStatus_t hipdnnGetTensor4dDescriptor(hipdnnTensorDescriptor_t tensorDesc,
                                            hipdnnDataType_t *dataType, int *n,
@@ -886,31 +834,41 @@ hipdnnStatus_t hipdnnGetTensor4dDescriptor(hipdnnTensorDescriptor_t tensorDesc,
                                            int *wStride) {
     miopenDataType_t midT;
     CHECK_MIO(miopenGet4dTensorDescriptor((miopenTensorDescriptor_t)tensorDesc,
-                                          &midT, n, c, h, w, nStride, cStride,
-                                          hStride, wStride));
+                                          &midT, n, c, h, w,
+                                          nStride, cStride, hStride, wStride));
     return HIPDNN_STATUS_SUCCESS;
 }
 
-//=============================================================================
+//------------------------------------------------------------------------------
 
-hipdnnStatus_t hipdnnDestroyTensorDescriptor(
-    hipdnnTensorDescriptor_t tensorDesc) {
-    CHECK_MIO(
-        miopenDestroyTensorDescriptor((miopenTensorDescriptor_t)tensorDesc));
+hipdnnStatus_t
+hipdnnDestroyTensorDescriptor( hipdnnTensorDescriptor_t tensorDesc) {
+
+    CHECK_MIO(miopenDestroyTensorDescriptor((miopenTensorDescriptor_t)tensorDesc));
     return HIPDNN_STATUS_SUCCESS;
 }
 
-//=============================================================================
+//------------------------------------------------------------------------------
 
+hipdnnStatus_t hipdnnSetTensor(hipdnnHandle_t handle,
+                               const hipdnnTensorDescriptor_t yDesc, void *y,
+                               const void *valuePtr) {
+
+    CHECK_MIO(miopenSetTensor((miopenHandle_t)handle,
+                              (miopenTensorDescriptor_t)yDesc, y, valuePtr));
+    return HIPDNN_STATUS_SUCCESS;
+}
+
+//------------------------------------------------------------------------------
 // dstValue = alpha[0]*srcValue + beta[0]*priorDstValue
 
 hipdnnStatus_t hipdnnAddTensor(hipdnnHandle_t handle, const void *alpha,
                                const hipdnnTensorDescriptor_t aDesc,
                                const void *A, const void *beta,
                                const hipdnnTensorDescriptor_t cDesc, void *C) {
+
     miopenTensorOp_t tensorOp = miopenTensorOpAdd;
     int alpha2 = 0;
-
     CHECK_MIO(miopenOpTensor((miopenHandle_t)handle, tensorOp, alpha,
                              (miopenTensorDescriptor_t)aDesc, A, beta,
                              (miopenTensorDescriptor_t)cDesc, C, &alpha2,
@@ -918,9 +876,21 @@ hipdnnStatus_t hipdnnAddTensor(hipdnnHandle_t handle, const void *alpha,
     return HIPDNN_STATUS_SUCCESS;
 }
 
-//=============================================================================
+//------------------------------------------------------------------------------
+
+hipdnnStatus_t hipdnnScaleTensor(hipdnnHandle_t handle,
+                                 const hipdnnTensorDescriptor_t yDesc, void *y,
+                                 const void *alpha) {
+
+    CHECK_MIO(miopenScaleTensor((miopenHandle_t)handle,
+                                (miopenTensorDescriptor_t)yDesc, y, alpha));
+    return HIPDNN_STATUS_SUCCESS;
+}
+
+//============================ Tensor Operations ===============================
 
 miopenTensorOp_t hipToMIOpenTensorOp(hipdnnOpTensorDescriptor_t opTensorDesc) {
+    //TODO: Not needed, can be removed
     // int *result = reinterpret_cast<int *>(opTensorDesc);
     uintptr_t result = (uintptr_t)opTensorDesc;
     switch (result) {
@@ -937,39 +907,150 @@ miopenTensorOp_t hipToMIOpenTensorOp(hipdnnOpTensorDescriptor_t opTensorDesc) {
     }
 }
 
+//------------------------------------------------------------------------------
+
+hipdnnStatus_t miopenTohipOpTensorOp(miopenTensorOp_t in,
+                                     hipdnnOpTensorOp_t *out) {
+    switch (in) {
+        case miopenTensorOpAdd:
+            *out = HIPDNN_OP_TENSOR_ADD;
+            break;
+        case miopenTensorOpMul:
+            *out = HIPDNN_OP_TENSOR_MUL;
+            break;
+        case miopenTensorOpMin:
+            *out = HIPDNN_OP_TENSOR_MIN;
+            break;
+        case miopenTensorOpMax:
+            *out = HIPDNN_OP_TENSOR_MAX;
+            break;
+        default:
+            HIPDNN_OPEN_LOG_M("miopenTohipTensorOp " << in << ": NOT SUPPORTED."
+                                                     << std::flush);
+            return HIPDNN_STATUS_NOT_SUPPORTED;
+    }
+    return HIPDNN_STATUS_SUCCESS;
+}
+
+//------------------------------------------------------------------------------
+
+hipdnnStatus_t hipTomiopenOpTensorOp(hipdnnOpTensorOp_t in,
+                                     miopenTensorOp_t *out) {
+    switch (in) {
+        case HIPDNN_OP_TENSOR_ADD:
+            *out = miopenTensorOpAdd;
+            break;
+        case HIPDNN_OP_TENSOR_MUL:
+            *out = miopenTensorOpMul;
+            break;
+        case HIPDNN_OP_TENSOR_MIN:
+            *out = miopenTensorOpMin;
+            break;
+        case HIPDNN_OP_TENSOR_MAX:
+            *out = miopenTensorOpMax;
+            break;
+        case HIPDNN_OP_TENSOR_SQRT:
+        default:
+            HIPDNN_OPEN_LOG_M("hipTomiopenTensorOp " << in << ": NOT SUPPORTED."
+                                                     << std::flush);
+            return HIPDNN_STATUS_NOT_SUPPORTED;
+    }
+
+    return HIPDNN_STATUS_SUCCESS;
+}
+
+//------------------------------------------------------------------------------
+
+typedef struct {
+    hipdnnOpTensorOp_t opTensorOp;
+    hipdnnDataType_t opTensorCompType;
+    hipdnnNanPropagation_t opTensorNanOpt;
+}structOpTensorDesc_t;
+
+//------------------------------------------------------------------------------
+
+hipdnnStatus_t
+hipdnnCreateOpTensorDescriptor(hipdnnOpTensorDescriptor_t *opTensorDesc) {
+
+    *opTensorDesc = (void*)malloc(sizeof(structOpTensorDesc_t));
+    CHECK_MALLOC(*opTensorDesc);
+
+    return HIPDNN_STATUS_SUCCESS;
+}
+
+//------------------------------------------------------------------------------
+
+hipdnnStatus_t
+hipdnnSetOpTensorDescriptor(hipdnnOpTensorDescriptor_t opTensorDesc,
+                            hipdnnOpTensorOp_t opTensorOp,
+                            hipdnnDataType_t opTensorCompType,
+                            hipdnnNanPropagation_t opTensorNanOpt) {
+
+    ((structOpTensorDesc_t*)opTensorDesc)->opTensorOp = opTensorOp;
+    ((structOpTensorDesc_t*)opTensorDesc)->opTensorCompType = opTensorCompType;
+    ((structOpTensorDesc_t*)opTensorDesc)->opTensorNanOpt = opTensorNanOpt;
+
+    return HIPDNN_STATUS_SUCCESS;
+
+}
+
+//------------------------------------------------------------------------------
+
+hipdnnStatus_t
+hipdnnGetOpTensorDescriptor(const hipdnnOpTensorDescriptor_t opTensorDesc,
+                            hipdnnOpTensorOp_t *opTensorOp,
+                            hipdnnDataType_t *opTensorCompType,
+                            hipdnnNanPropagation_t *opTensorNanOpt) {
+
+    *opTensorOp = ((structOpTensorDesc_t*)opTensorDesc)->opTensorOp;
+    *opTensorCompType = ((structOpTensorDesc_t*)opTensorDesc)->opTensorCompType;
+    *opTensorNanOpt = ((structOpTensorDesc_t*)opTensorDesc)->opTensorNanOpt;
+
+    return HIPDNN_STATUS_SUCCESS;
+
+}
+//------------------------------------------------------------------------------
+
+hipdnnStatus_t
+hipdnnDestroyOpTensorDescriptor(hipdnnOpTensorDescriptor_t opTensorDesc) {
+
+    free(opTensorDesc);
+    return HIPDNN_STATUS_SUCCESS;
+
+}
+
+//------------------------------------------------------------------------------
+
 hipdnnStatus_t hipdnnOpTensor(
     hipdnnHandle_t handle, const hipdnnOpTensorDescriptor_t opTensorDesc,
     const void *alpha1, const hipdnnTensorDescriptor_t aDesc, const void *A,
     const void *alpha2, const hipdnnTensorDescriptor_t bDesc, const void *B,
     const void *beta, const hipdnnTensorDescriptor_t cDesc, void *C) {
-    CHECK_MIO(miopenOpTensor((miopenHandle_t)handle,
-                             hipToMIOpenTensorOp(opTensorDesc), alpha1,
-                             (miopenTensorDescriptor_t)aDesc, A, alpha2,
-                             (miopenTensorDescriptor_t)bDesc, B, beta,
-                             (miopenTensorDescriptor_t)cDesc, C));
-    return HIPDNN_STATUS_SUCCESS;
-}
-//=============================================================================
 
-hipdnnStatus_t hipdnnSetTensor(hipdnnHandle_t handle,
-                               const hipdnnTensorDescriptor_t yDesc, void *y,
-                               const void *valuePtr) {
-    CHECK_MIO(miopenSetTensor((miopenHandle_t)handle,
-                              (miopenTensorDescriptor_t)yDesc, y, valuePtr));
+    miopenTensorOp_t miOpType;
+    CHECK_HIPDNN( hipTomiopenOpTensorOp(
+            ((structOpTensorDesc_t*)opTensorDesc)->opTensorOp, &miOpType ));
+
+    CHECK_MIO(miopenOpTensor((miopenHandle_t)handle, miOpType, alpha1,
+                (miopenTensorDescriptor_t)aDesc, A, alpha2,
+                (miopenTensorDescriptor_t)bDesc, B, beta,
+                (miopenTensorDescriptor_t)cDesc, C));
     return HIPDNN_STATUS_SUCCESS;
 }
 
 //=============================================================================
 
-hipdnnStatus_t hipdnnScaleTensor(hipdnnHandle_t handle,
-                                 const hipdnnTensorDescriptor_t yDesc, void *y,
-                                 const void *alpha) {
-    CHECK_MIO(miopenScaleTensor((miopenHandle_t)handle,
-                                (miopenTensorDescriptor_t)yDesc, y, alpha));
+hipdnnStatus_t hipdnnSetFilter4dDescriptor(hipdnnFilterDescriptor_t filterDesc,
+                                           hipdnnTensorFormat_t format,
+                                           hipdnnDataType_t dataType, int k,
+                                           int c, int h, int w) {
+    miopenDataType_t miDT;
+    CHECK_HIPDNN(hipTensorFormatSupported(format));
+    CHECK_HIPDNN(hipTomiopenDataType(dataType, &miDT));
+    CHECK_MIO(miopenSet4dTensorDescriptor((miopenTensorDescriptor_t)filterDesc,
+                                          miDT, k, c, h, w));
     return HIPDNN_STATUS_SUCCESS;
 }
-
-//=============================================================================
 
 hipdnnStatus_t hipdnnCreateFilterDescriptor(
     hipdnnFilterDescriptor_t *filterDesc) {
@@ -2127,11 +2208,11 @@ hipdnnStatus_t hipdnnLRNCrossChannelForward(
     HIPDNN_OPEN_LOG_C("Inside hipdnnLRNCrossChannelForward");
 
     CHECK_HIPDNN(hipTomiopenLRNMode(lrnMode, &mimode));
-    
+
 	if( do_backward == 1) {
         if (sDescToWorkspaceLRN.find((miopenTensorDescriptor_t)yDesc) ==
             sDescToWorkspaceLRN.end()) {
-            //yDesc is used for the workspace, not the 
+            //yDesc is used for the workspace, not the
 			//hipdnnLRNDescriptor_t
 
              CHECK_MIO(miopenLRNGetWorkSpaceSize((miopenTensorDescriptor_t)yDesc,
@@ -2916,7 +2997,7 @@ hipdnnStatus_t hipdnnDestroyReduceTensorDescriptor(
 
 }
 
-// --- Fusion API ---
+//============================ MIO-Fusion ======================================
 
 hipdnnStatus_t
 hipdnnCreateFusionPlan(hipdnnFusionPlanDescriptor_t *fusePlanDesc,
@@ -2929,6 +3010,8 @@ hipdnnCreateFusionPlan(hipdnnFusionPlanDescriptor_t *fusePlanDesc,
     return HIPDNN_STATUS_SUCCESS;
 }
 
+//------------------------------------------------------------------------------
+
 hipdnnStatus_t hipdnnFusionPlanGetOp(hipdnnFusionPlanDescriptor_t fusePlanDesc,
                                      const int op_idx,
                                      hipdnnFusionOpDescriptor_t *op) {
@@ -2936,6 +3019,8 @@ hipdnnStatus_t hipdnnFusionPlanGetOp(hipdnnFusionPlanDescriptor_t fusePlanDesc,
                                     op_idx, (miopenFusionOpDescriptor_t *)op));
     return HIPDNN_STATUS_SUCCESS;
 }
+
+//------------------------------------------------------------------------------
 
 hipdnnStatus_t hipdnnFusionPlanGetWorkSpaceSize(
     hipdnnHandle_t handle, hipdnnFusionPlanDescriptor_t fusePlanDesc,
@@ -2945,6 +3030,8 @@ hipdnnStatus_t hipdnnFusionPlanGetWorkSpaceSize(
         workSpaceSize, (miopenConvFwdAlgorithm_t)algo));
     return HIPDNN_STATUS_SUCCESS;
 }
+
+//------------------------------------------------------------------------------
 
 hipdnnStatus_t hipdnnFusionPlanConvolutionGetAlgo(
     hipdnnFusionPlanDescriptor_t fusePlanDesc, const int requestAlgoCount,
@@ -2959,6 +3046,8 @@ hipdnnStatus_t hipdnnFusionPlanConvolutionGetAlgo(
     return HIPDNN_STATUS_SUCCESS;
 }
 
+//------------------------------------------------------------------------------
+
 hipdnnStatus_t hipdnnCreateOpConvForward(
     hipdnnFusionPlanDescriptor_t fusePlanDesc,
     hipdnnFusionOpDescriptor_t *convOp, hipdnnConvolutionDescriptor_t convDesc,
@@ -2971,6 +3060,8 @@ hipdnnStatus_t hipdnnCreateOpConvForward(
     return HIPDNN_STATUS_SUCCESS;
 }
 
+//------------------------------------------------------------------------------
+
 hipdnnStatus_t hipdnnCreateOpBiasForward(
     hipdnnFusionPlanDescriptor_t fusePlanDesc,
     hipdnnFusionOpDescriptor_t *biasOp, const hipdnnTensorDescriptor_t bDesc) {
@@ -2980,6 +3071,7 @@ hipdnnStatus_t hipdnnCreateOpBiasForward(
     return HIPDNN_STATUS_SUCCESS;
 }
 
+//------------------------------------------------------------------------------
 
 hipdnnStatus_t
 hipdnnCreateOpActivationForward(hipdnnFusionPlanDescriptor_t fusePlanDesc,
@@ -2993,6 +3085,8 @@ hipdnnCreateOpActivationForward(hipdnnFusionPlanDescriptor_t fusePlanDesc,
         (miopenFusionOpDescriptor_t *)activOp, mi_mode));
     return HIPDNN_STATUS_SUCCESS;
 }
+
+//------------------------------------------------------------------------------
 
 hipdnnStatus_t hipdnnCreateOpBatchNormInference(
     hipdnnFusionPlanDescriptor_t fusePlanDesc, hipdnnFusionOpDescriptor_t *bnOp,
@@ -3008,6 +3102,8 @@ hipdnnStatus_t hipdnnCreateOpBatchNormInference(
     return HIPDNN_STATUS_SUCCESS;
 }
 
+//------------------------------------------------------------------------------
+
 hipdnnStatus_t hipdnnCompileFusionPlan(
     hipdnnHandle_t handle, hipdnnFusionPlanDescriptor_t fusePlanDesc) {
     CHECK_MIO(miopenCompileFusionPlan(
@@ -3015,10 +3111,14 @@ hipdnnStatus_t hipdnnCompileFusionPlan(
     return HIPDNN_STATUS_SUCCESS;
 }
 
+//------------------------------------------------------------------------------
+
 hipdnnStatus_t hipdnnCreateOperatorArgs(hipdnnOperatorArgs_t *args) {
     CHECK_MIO(miopenCreateOperatorArgs((miopenOperatorArgs_t *)args));
     return HIPDNN_STATUS_SUCCESS;
 }
+
+//------------------------------------------------------------------------------
 
 hipdnnStatus_t hipdnnSetOpArgsConvForward(
     hipdnnOperatorArgs_t args, const hipdnnFusionOpDescriptor_t convOp,
@@ -3029,6 +3129,8 @@ hipdnnStatus_t hipdnnSetOpArgsConvForward(
     return HIPDNN_STATUS_SUCCESS;
 }
 
+//------------------------------------------------------------------------------
+
 hipdnnStatus_t hipdnnSetOpArgsBiasForward(
     hipdnnOperatorArgs_t args, const hipdnnFusionOpDescriptor_t biasOp,
     const void *alpha, const void *beta, const void *bias) {
@@ -3037,6 +3139,8 @@ hipdnnStatus_t hipdnnSetOpArgsBiasForward(
                                          alpha, beta, bias));
     return HIPDNN_STATUS_SUCCESS;
 }
+
+//------------------------------------------------------------------------------
 
 hipdnnStatus_t hipdnnSetOpArgsActivForward(
     hipdnnOperatorArgs_t args, const hipdnnFusionOpDescriptor_t activOp,
@@ -3048,6 +3152,8 @@ hipdnnStatus_t hipdnnSetOpArgsActivForward(
     return HIPDNN_STATUS_SUCCESS;
 }
 
+//------------------------------------------------------------------------------
+
 hipdnnStatus_t hipdnnSetOpArgsBatchNormInference(
     hipdnnOperatorArgs_t args, const hipdnnFusionOpDescriptor_t bnOp,
     const void *alpha, const void *beta, const void *bnScale,
@@ -3058,6 +3164,8 @@ hipdnnStatus_t hipdnnSetOpArgsBatchNormInference(
         beta, bnScale, bnBias, estimatedMean, estimatedVariance, epsilon));
     return HIPDNN_STATUS_SUCCESS;
 }
+
+//------------------------------------------------------------------------------
 
 hipdnnStatus_t hipdnnExecuteFusionPlan(
     const hipdnnHandle_t handle,
@@ -3073,10 +3181,14 @@ hipdnnStatus_t hipdnnExecuteFusionPlan(
     return HIPDNN_STATUS_SUCCESS;
 }
 
+//------------------------------------------------------------------------------
+
 hipdnnStatus_t hipdnnDestroyOperatorArgs(hipdnnOperatorArgs_t args) {
     CHECK_MIO(miopenDestroyOperatorArgs((miopenOperatorArgs_t) args) );
     return HIPDNN_STATUS_SUCCESS;
 }
+
+//------------------------------------------------------------------------------
 
 hipdnnStatus_t hipdnnDestroyFusionPlan(
     hipdnnFusionPlanDescriptor_t fusePlanDesc) {
@@ -3084,9 +3196,14 @@ hipdnnStatus_t hipdnnDestroyFusionPlan(
         miopenDestroyFusionPlan((miopenFusionPlanDescriptor_t)fusePlanDesc));
     return HIPDNN_STATUS_SUCCESS;
 }
+
+//------------------------------------------------------------------------------
+
 hipdnnStatus_t hipdnnSetConvolutionGroupCount(
     hipdnnConvolutionDescriptor_t convDesc, int groupCount) {
     CHECK_MIO(miopenSetConvolutionGroupCount(
         (miopenConvolutionDescriptor_t)convDesc, groupCount));
     return HIPDNN_STATUS_SUCCESS;
 }
+
+//==============================================================================
