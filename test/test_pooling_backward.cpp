@@ -30,7 +30,7 @@ TEST(pooling_backward, func_check_pooling_stride_2x2) {
   std::string str_op_size  = convert_to_string((int*)op_size,4);
 
   hipdnn_pooling_backward(test_case, dataSrc.gpu(), dataGrad.gpu(),
-                                  dataDst.gpu(), poolB_mode,&avg_time);
+                                  dataDst.gpu(), poolB_mode, &avg_time);
 
   std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
 
@@ -75,7 +75,7 @@ TEST(pooling_backward, func_check_pooling_DETERMINISTIC) {
   std::string str_op_size  = convert_to_string((int*)op_size,4);
 
   hipdnn_pooling_backward(test_case, dataSrc.gpu(), dataGrad.gpu(),
-                                  dataDst.gpu(), poolB_mode,&avg_time);
+                                  dataDst.gpu(), poolB_mode, &avg_time);
 
   std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
 
@@ -120,7 +120,7 @@ TEST(pooling_backward, func_check_pooling_AVERAGE_COUNT_INCLUDE_PADDING) {
   std::string str_op_size  = convert_to_string((int*)op_size,4);
 
   hipdnn_pooling_backward(test_case, dataSrc.gpu(), dataGrad.gpu(),
-                                  dataDst.gpu(), poolB_mode,&avg_time);
+                                  dataDst.gpu(), poolB_mode, &avg_time);
 
   std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
 
@@ -165,7 +165,7 @@ TEST(pooling_backward, func_check_pooling_AVERAGE_COUNT_EXCLUDE_PADDING) {
   std::string str_op_size  = convert_to_string((int*)op_size,4);
 
   hipdnn_pooling_backward(test_case, dataSrc.gpu(), dataGrad.gpu(),
-                                  dataDst.gpu(), poolB_mode,&avg_time);
+                                  dataDst.gpu(), poolB_mode, &avg_time);
 
   std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
 
