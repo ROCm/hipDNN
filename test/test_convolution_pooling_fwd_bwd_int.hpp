@@ -124,7 +124,7 @@ void compute_mpool_fwd(test_pooling_descriptor &c, dataType *src,
 
         timer.restart();
         checkHIPDNN(hipdnnPoolingForward(handle, pool_desc, &alpha, in_desc, src,
-                                   &beta, out_desc, dst));
+                                   &beta, out_desc, dst, true));
 
         hipDeviceSynchronize();
 
@@ -177,7 +177,7 @@ void compute_mpool_bwd(pool_bwd &test_case, dataType *src,
   float beta = 0.f;
 
   hipdnnPoolingForward(hipdnn, pool_desc, &alpha, in_desc, src, &beta, out_desc,
-                       dst);
+                       dst, true);
 
   high_resolution_timer_t timer;
   std::vector<double> time_vector(benchmark_iterations, 0);

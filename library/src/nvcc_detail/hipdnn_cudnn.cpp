@@ -1919,7 +1919,8 @@ hipdnnDestroyPoolingDescriptor(hipdnnPoolingDescriptor_t poolingDesc) {
 hipdnnStatus_t hipdnnPoolingForward(
     hipdnnHandle_t handle, const hipdnnPoolingDescriptor_t poolingDesc,
     const void *alpha, const hipdnnTensorDescriptor_t xDesc, const void *x,
-    const void *beta, const hipdnnTensorDescriptor_t yDesc, void *y) {
+    const void *beta, const hipdnnTensorDescriptor_t yDesc, void *y,
+    bool do_backward) {
     CHECK_CUDNN(cudnnPoolingForward(
         (cudnnHandle_t)handle, (cudnnPoolingDescriptor_t)poolingDesc, alpha,
         (cudnnTensorDescriptor_t)xDesc, x, beta, (cudnnTensorDescriptor_t)yDesc,

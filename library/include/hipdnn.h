@@ -856,7 +856,7 @@ hipdnnStatus_t hipdnnPoolingForward( hipdnnHandle_t handle,
                                     const void *x,
                                     const void *beta,
                                     const hipdnnTensorDescriptor_t yDesc,
-                                    void *y);
+                                    void *y, bool do_backward);
 
 hipdnnStatus_t hipdnnPoolingBackward( hipdnnHandle_t handle,
                                     const hipdnnPoolingDescriptor_t poolingDesc,
