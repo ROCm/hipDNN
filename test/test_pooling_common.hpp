@@ -1,5 +1,5 @@
-#ifndef TEST_POOLING_COMMON_H
-#define TEST_POOLING_COMMON_H
+#ifndef TEST_POOLING_COMMON_HPP
+#define TEST_POOLING_COMMON_HPP
 
 #include "hipdnn.h"
 #include "hipdnn_test_common.h"
@@ -8,6 +8,7 @@
 template <typename dataType>
 void hipdnn_pooling_forward(test_pooling_descriptor &c, dataType *src,
                                 dataType *dst, hipdnnPoolingMode_t mode,
+                                bool do_backward,
                                 float *avg_time) {
 
   hipdnnHandle_t handle;
@@ -41,7 +42,7 @@ void hipdnn_pooling_forward(test_pooling_descriptor &c, dataType *src,
 
         timer.restart();
         checkHIPDNN(hipdnnPoolingForward(handle, pool_desc, &alpha, in_desc, src,
-                                   &beta, out_desc, dst, false))
+                                   &beta, out_desc, dst, do_backward))
 
         hipDeviceSynchronize();
 

@@ -1,11 +1,15 @@
 #include "test_convolution_pooling_act_fwd_bwd_int.hpp"
 #include "test_convolution_pooling_int.hpp"
+#include "test_pooling_common.hpp"
+
+hipdnnPoolingMode_t poolCAP_mode;
 
 TEST(convolution_pooling_act_fwd_bwd_intg, func_check_conv_pool_act_fwd_bwd) {
 
   float avg_time = 0, avg_time1 = 0, avg_time2 = 0, avg_time3 = 0, avg_time4 = 0;
   float avg_time5 = 0, avg_time6 = 0;
   int oheight = 4, owidth = 4;
+  poolCAP_mode = HIPDNN_POOLING_MAX;
 
   test_pooling_descriptor pool(1, 1, 4, 4, 2, 2, 2, 2, 0, 0, 2, 2);
   pool_bwd test_case(1, 1, 4, 4, 2, 2, 0, 0, 2, 2, 1, 1, oheight, owidth);
@@ -99,10 +103,10 @@ TEST(convolution_pooling_act_fwd_bwd_intg, func_check_conv_pool_act_fwd_bwd) {
 
   compute_act_fwd(test_case1, dstDataGPU.gpu(), dataDst_act.gpu(),&avg_time2);
 
-  comp_pool_fwd<float>(pool, dataDst_act.gpu(), dstData.gpu(), &avg_time3);
+  hipdnn_pooling_forward<float>(pool, dataDst_act.gpu(), dstData.gpu(), poolCAP_mode, true, &avg_time3);
 
-  comp_pool_bwd<float>(test_case, dataDst_act.gpu(), gradData1.gpu(),
-                       dstData.gpu(), &avg_time4);
+  hipdnn_pooling_backward<float>(test_case, dataDst_act.gpu(), gradData1.gpu(),
+                       dstData.gpu(), poolCAP_mode, &avg_time4);
 
   compute_hipdnn_act_bwd(test_case1, dataDst_act.gpu(), dataGrad_act.gpu(),
                          dstData.gpu(), &avg_time5);
