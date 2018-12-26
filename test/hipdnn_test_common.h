@@ -1,5 +1,5 @@
-#ifndef HIPDNN_TEST_COMMON_HPP
-#define HIPDNN_TEST_COMMON_HPP
+#ifndef HIPDNN_TEST_COMMON_H
+#define HIPDNN_TEST_COMMON_H
 
 #include "hipdnn.h"
 #include "hip/hip_runtime.h"
@@ -38,6 +38,11 @@
       std::exit(1);                                                            \
     }                                                                          \
   }
+
+inline __global__  void dev_populate (hipLaunchParm lp, float *px, int maxvalue) {
+  int tid = hipThreadIdx_x + hipBlockIdx_x * hipBlockDim_x;
+  px[tid] = tid + 1 % maxvalue;
+}
 
 template <typename dataType> struct Memory {
 private:
