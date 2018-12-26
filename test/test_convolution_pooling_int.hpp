@@ -122,7 +122,7 @@ void compute_pooling_fwd(test_pooling_descriptor &c, dataType *src,
 
         timer.restart();
         checkHIPDNN(hipdnnPoolingForward(handle, pool_desc, &alpha, in_desc, src,
-                                   &beta, out_desc, dst));
+                                   &beta, out_desc, dst, false));
 
         hipDeviceSynchronize();
 
