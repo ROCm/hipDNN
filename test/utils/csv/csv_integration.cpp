@@ -40,12 +40,8 @@ void write_to_csv(std::string filename, std::string str, std::string testname,
 void dump_result_csv(std::string filename, std::string testname, float* output,
                      int n){
 
-  if (mkdir("./results_csv", 0777) == -1)
-        std::cerr << strerror(errno) << std::endl;
-
-  else
+  if (mkdir("./results_csv", 0777) != -1)
       {
-        std::cout << "Directory created \n";
         static int device = 0;
         hipSetDevice(device);
         hipDeviceProp_t props;
