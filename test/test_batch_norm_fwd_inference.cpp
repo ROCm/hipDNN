@@ -1,4 +1,4 @@
-#include "test_batch_norm_fwd_inference.hpp"
+#include "test_batchnorm_common.hpp"
 
 TEST(BNorm_Fwd_inference, func_check_naive_BNorm_forward_inf) {
 

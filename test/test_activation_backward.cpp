@@ -28,6 +28,9 @@ TEST(activation_backward, func_test_activation_RELU) {
   std::string str_k_size  = "NIL";
   std::string str_op_size  = convert_to_string((int*)op_size,4);
 
+  compute_hipdnn_activation_forward(test_case, dataSrc.gpu(), dataDst.gpu(),
+                                    actB_mode, &avg_time);
+
   compute_hipdnn_activation_backward<float>(test_case, dataSrc.gpu(),
                                             dataGrad.gpu(), dataDst.gpu(),
                                             actB_mode, &avg_time);
@@ -74,6 +77,9 @@ TEST(activation_backward, func_test_activation_SIGMOID) {
   std::string str_ip_size  = convert_to_string((int*)ip_size,4);
   std::string str_k_size  = "NIL";
   std::string str_op_size  = convert_to_string((int*)op_size,4);
+
+  compute_hipdnn_activation_forward(test_case, dataSrc.gpu(), dataDst.gpu(),
+                                    actB_mode, &avg_time);
 
   compute_hipdnn_activation_backward<float>(test_case, dataSrc.gpu(),
                                             dataGrad.gpu(), dataDst.gpu(),
@@ -122,6 +128,9 @@ TEST(activation_backward, func_test_activation_TANH) {
   std::string str_k_size  = "NIL";
   std::string str_op_size  = convert_to_string((int*)op_size,4);
 
+  compute_hipdnn_activation_forward(test_case, dataSrc.gpu(), dataDst.gpu(),
+                                    actB_mode, &avg_time);
+
   compute_hipdnn_activation_backward<float>(test_case, dataSrc.gpu(),
                                             dataGrad.gpu(), dataDst.gpu(),
                                             actB_mode, &avg_time);
@@ -167,6 +176,9 @@ TEST(activation_backward, func_test_activation_batch32) {
   std::string str_ip_size  = convert_to_string((int*)ip_size,4);
   std::string str_k_size  = "NIL";
   std::string str_op_size  = convert_to_string((int*)op_size,4);
+
+  compute_hipdnn_activation_forward(test_case, dataSrc.gpu(), dataDst.gpu(),
+                                    actB_mode, &avg_time);
 
   compute_hipdnn_activation_backward<float>(test_case, dataSrc.gpu(),
                                             dataGrad.gpu(), dataDst.gpu(),
@@ -214,6 +226,9 @@ TEST(activation_backward, func_test_activation_batch64) {
   std::string str_k_size  = "NIL";
   std::string str_op_size  = convert_to_string((int*)op_size,4);
 
+  compute_hipdnn_activation_forward(test_case, dataSrc.gpu(), dataDst.gpu(),
+                                    actB_mode, &avg_time);
+
   compute_hipdnn_activation_backward<float>(test_case, dataSrc.gpu(),
                                             dataGrad.gpu(), dataDst.gpu(),
                                             actB_mode, &avg_time);
@@ -258,6 +273,9 @@ TEST(activation_backward, func_test_activation_batch128) {
   std::string str_ip_size  = convert_to_string((int*)ip_size,4);
   std::string str_k_size  = "NIL";
   std::string str_op_size  = convert_to_string((int*)op_size,4);
+
+  compute_hipdnn_activation_forward(test_case, dataSrc.gpu(), dataDst.gpu(),
+                                    actB_mode, &avg_time);
 
   compute_hipdnn_activation_backward<float>(test_case, dataSrc.gpu(),
                                             dataGrad.gpu(), dataDst.gpu(),
