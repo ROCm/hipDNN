@@ -55,7 +55,7 @@ extern "C" {
 
 #define CHECK_MALLOC(pointer)                                                   \
     {                                                                           \
-        if ( (pointer) == 0) {   /*if Null pointer*/                         \
+        if ( (pointer) == 0) {   /*if Null pointer*/                            \
             fprintf(stderr, "Malloc failed error:%s:%d\n", __FILE__, __LINE__); \
             std::exit(EXIT_FAILURE);                                            \
         }                                                                       \
@@ -144,8 +144,11 @@ typedef enum {
 //------------------------- Convolutional datatypes ----------------------------
 
 typedef enum {
-    HIPDNN_CONVOLUTION = 0,
-    HIPDNN_CROSS_CORRELATION = 1
+    HIPDNN_CONVOLUTION = 0,         //Not supported in MIopen
+    HIPDNN_CROSS_CORRELATION = 1,   //MIopen's Convolution
+    HIPDNN_TRANSPOSE = 2,           //Not supported in CUDNN
+    HIPDNN_GROUP_CONVOLUTION = 3,   //Not supported in CUDNN
+    HIPDNN_DEPTHWISE = 4,           //Not supported in CUDNN
 } hipdnnConvolutionMode_t;
 
 typedef enum {
