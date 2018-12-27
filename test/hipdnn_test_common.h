@@ -39,9 +39,18 @@
     }                                                                          \
   }
 
-inline __global__  void dev_populate (hipLaunchParm lp, float *px, int maxvalue) {
+inline __global__ void dev_populate (hipLaunchParm lp, float *px, int maxvalue) {
   int tid = hipThreadIdx_x + hipBlockIdx_x * hipBlockDim_x;
   px[tid] = tid + 1 % maxvalue;
+}
+
+inline __global__ void dev_const(hipLaunchParm lp, float *px, float k) {
+  int tid = hipThreadIdx_x + hipBlockIdx_x * hipBlockDim_x;
+  px[tid] = k;
+}
+inline __global__ void dev_iota(hipLaunchParm lp, float *px) {
+  int tid = hipThreadIdx_x + hipBlockIdx_x * hipBlockDim_x;
+  px[tid] = tid + 1;
 }
 
 template <typename dataType> struct Memory {
