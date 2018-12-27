@@ -1,4 +1,5 @@
-#include "test_batch_norm_bwd.hpp"
+#include "test_batchnorm_common.hpp"
+
 int mode; //0:SPATIAL 1:Per_Activation
 int acc_grad;
 
