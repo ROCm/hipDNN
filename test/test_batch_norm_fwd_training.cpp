@@ -1,4 +1,4 @@
-#include "test_batch_norm_fwd_training.hpp"
+#include "test_batchnorm_common.hpp"
 int modeB; //0:SPATIAL 1:Per_Activation
 
 TEST(BNorm_Fwd_train, func_check_spatial_fwd) {

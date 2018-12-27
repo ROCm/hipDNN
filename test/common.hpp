@@ -6,8 +6,6 @@
 #include "gtest/gtest.h"
 #include "common.hpp"
 
-__global__ void dev_const(hipLaunchParm lp, float *px, float k);
-
 inline Desc calculate_Dims(Desc inputDesc, Desc filterDesc, int pad[2],
                                int stride[2], int dilution[2]) {
   assert(inputDesc.C == filterDesc.C);
