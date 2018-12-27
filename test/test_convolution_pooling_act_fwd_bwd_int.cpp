@@ -1,6 +1,6 @@
 #include "test_convolution_pooling_act_fwd_bwd_int.hpp"
-#include "test_convolution_pooling_int.hpp"
 #include "test_pooling_common.hpp"
+#include "test_convolution_common.hpp"
 
 hipdnnPoolingMode_t poolCAP_mode;
 
@@ -98,7 +98,7 @@ TEST(convolution_pooling_act_fwd_bwd_intg, func_check_conv_pool_act_fwd_bwd) {
                                     "Conv_fwd","MP_fwd","act_fwd","Conv_bwd",
                                     "MP_bwd","act_bwd");
 
-  comp_conv_fwd<float>(testConvolutionSizes, srcDataConv.gpu(), filterData.gpu(),
+  compute_hipdnn_conv_forward<float>(testConvolutionSizes, srcDataConv.gpu(), filterData.gpu(),
                        NULL, dstDataGPU.gpu(),&avg_time1);
 
   compute_act_fwd(test_case1, dstDataGPU.gpu(), dataDst_act.gpu(),&avg_time2);
@@ -111,7 +111,7 @@ TEST(convolution_pooling_act_fwd_bwd_intg, func_check_conv_pool_act_fwd_bwd) {
   compute_hipdnn_act_bwd(test_case1, dataDst_act.gpu(), dataGrad_act.gpu(),
                          dstData.gpu(), &avg_time5);
 
-  comp_conv_bwd_filter<float>(testConvolutionSizes2, dataDst_act.gpu(),
+  compute_hipdnn_conv_backward_filter<float>(testConvolutionSizes2, dataDst_act.gpu(),
                                  filterData.gpu(), gradData2.gpu(), NULL,
                                  dataGrad_act.gpu(),&avg_time6);
 
