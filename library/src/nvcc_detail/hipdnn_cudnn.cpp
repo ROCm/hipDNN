@@ -311,22 +311,25 @@ hipdnnStatus_t hipdnnTocudnnOpTensorOp(hipdnnOpTensorOp_t in,
 
 //===============================
 
-hipdnnConvolutionMode_t cudnnTohipConvolutionMode(cudnnConvolutionMode_t in) {
+hipdnnStatus_t cudnnTohipdnnConvolutionMode(cudnnConvolutionMode_t in, hipdnnConvolutionMode_t* out) {
     if (in == CUDNN_CONVOLUTION)
-        return HIPDNN_CONVOLUTION;
+        *out = HIPDNN_CONVOLUTION;
     else if (in == CUDNN_CROSS_CORRELATION)
-        return HIPDNN_CROSS_CORRELATION;
+        *out = HIPDNN_CROSS_CORRELATION;
+    else
+        return HIPDNN_STATUS_NOT_SUPPORTED;
 
-    return HIPDNN_CONVOLUTION;
+    return HIPDNN_STATUS_SUCCESS;
 }
 
-cudnnConvolutionMode_t hipTocudnnConvolutionMode(hipdnnConvolutionMode_t in) {
+hipdnnStatus_t hipdnnTocudnnConvolutionMode(hipdnnConvolutionMode_t in, cudnnConvolutionMode_t* out) {
     if (in == HIPDNN_CONVOLUTION)
-        return CUDNN_CONVOLUTION;
+        *out = CUDNN_CONVOLUTION;
     else if (in == HIPDNN_CROSS_CORRELATION)
-        return CUDNN_CROSS_CORRELATION;
-
-    return CUDNN_CONVOLUTION;
+        *out = CUDNN_CROSS_CORRELATION;
+    else
+        return HIPDNN_STATUS_NOT_SUPPORTED;
+    return HIPDNN_STATUS_SUCCESS;
 }
 
 //=============================================================================
@@ -1415,12 +1418,12 @@ hipdnnStatus_t hipdnnSetConvolution2dDescriptor(
     hipdnnDataType_t computeType) {
 
     cudnnDataType_t cuDT;
-
+    cudnnConvolutionMode_t cuConvMode;
     CHECK_HIPDNN(hipTocudnnDataType(computeType, &cuDT));
-
+    CHECK_HIPDNN(hipdnnTocudnnConvolutionMode(mode,&cuConvMode));
     CHECK_CUDNN(cudnnSetConvolution2dDescriptor(
         (cudnnConvolutionDescriptor_t)convDesc, pad_h, pad_w, u, v, upscalex,
-        upscaley, hipTocudnnConvolutionMode(mode), (cudnnDataType_t)cuDT));
+        upscaley, cuConvMode, (cudnnDataType_t)cuDT));
 
     return HIPDNN_STATUS_SUCCESS;
 }
@@ -1438,7 +1441,7 @@ hipdnnStatus_t hipdnnGetConvolution2dDescriptor(
     CHECK_CUDNN(cudnnGetConvolution2dDescriptor(
         (cudnnConvolutionDescriptor_t)convDesc, pad_h, pad_y, u, v, upscalex,
         upscaley, &cuMode, &cutype));
-    *mode = cudnnTohipConvolutionMode(cuMode);
+    CHECK_HIPDNN(cudnnTohipdnnConvolutionMode(cuMode, mode));
 
     CHECK_HIPDNN(cudnnTohipDataType(cutype, computeType));
 
@@ -2331,8 +2334,9 @@ hipdnnStatus_t hipdnnSetConvolutionNdDescriptor(
     hipdnnDataType_t computeType) // convolution data type
 {
     cudnnDataType_t cuDT;
-    cudnnConvolutionMode_t cuCM = hipTocudnnConvolutionMode(mode);
+    cudnnConvolutionMode_t cuCM;
     CHECK_HIPDNN(hipTocudnnDataType(computeType, &cuDT));
+    CHECK_HIPDNN(hipdnnTocudnnConvolutionMode(mode,&cuCM));
     CHECK_CUDNN(cudnnSetConvolutionNdDescriptor(
         (cudnnConvolutionDescriptor_t)convDesc, arrayLength, padA,
         filterStrideA, dilationA, cuCM, cuDT));
