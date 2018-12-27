@@ -1,5 +1,5 @@
-#ifndef TEST_CONVOLUTION_COMMON_H
-#define TEST_CONVOLUTION_COMMON_H
+#ifndef TEST_CONVOLUTION_COMMON_HPP
+#define TEST_CONVOLUTION_COMMON_HPP
 
 #include "hipdnn_test_common.h"
 #include "common.hpp"
@@ -113,6 +113,9 @@ void compute_hipdnn_conv_backward_filter(convulution_Size &c, dataType *src,
   checkHIPDNN(hipdnnSetConvolution2dDescriptor(
       conv_desc, c.padh, c.padw, c.strh, c.strw, c.dilh, c.dilw,
       HIPDNN_CROSS_CORRELATION, HIPDNN_DATA_FLOAT));
+
+  checkHIPDNN(hipdnnGetConvolution2dForwardOutputDim(
+        conv_desc, in_desc, filt_desc, &c.mb, &c.oc, &c.oh, &c.ow));
 
   hipdnnTensorDescriptor_t out_desc;
   checkHIPDNN(hipdnnCreateTensorDescriptor(&out_desc));

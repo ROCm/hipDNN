@@ -6,10 +6,18 @@
 #include "gtest/gtest.h"
 #include "common.hpp"
 
-Desc calculate_Dims(Desc inputDesc, Desc filterDesc, int pad[2],
-                               int stride[2], int dilution[2]);
-
 __global__ void dev_const(hipLaunchParm lp, float *px, float k);
+
+inline Desc calculate_Dims(Desc inputDesc, Desc filterDesc, int pad[2],
+                               int stride[2], int dilution[2]) {
+  assert(inputDesc.C == filterDesc.C);
+  int outputHeight = ((inputDesc.H - filterDesc.H + 2 * pad[0] -
+                       (filterDesc.H - 1)*(dilution[0] -1)) / stride[0]) + 1;
+  int outputWidth = ((inputDesc.W - filterDesc.W + 2 * pad[1] -
+                     (filterDesc.H -1)*(dilution[1] -1)) / stride[1]) + 1;
+  Desc outputDesc(inputDesc.N, filterDesc.N, outputHeight, outputWidth);
+  return outputDesc;
+}
 
 struct convulution_Size {
   convulution_Size(int mb, int ng, int ic, int ih, int iw, int oc,
