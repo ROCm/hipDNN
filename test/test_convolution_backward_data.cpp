@@ -1,4 +1,4 @@
-#include "test_convolution_backward_data.hpp"
+#include "test_convolution_common.hpp"
 
 TEST(convolution_bwd_data, func_check_backward_conv_data) {
 
