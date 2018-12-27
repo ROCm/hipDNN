@@ -1,4 +1,4 @@
-#include "test_convolution_backward_filter.hpp"
+#include "test_convolution_common.hpp"
 
 TEST(convolution_bwd_filter, func_check_backward_conv_filter) {
 
@@ -32,8 +32,9 @@ TEST(convolution_bwd_filter, func_check_backward_conv_filter) {
 
   populateMemoryRandom<float>(srcData);
   populateMemoryRandom<float>(filterData);
+  populateMemoryRandom<float>(dstDataGPU);
 
-  compute_hipdnn_conv_bwd_filter<float>(testConvolutionSizes, srcData.gpu(),
+  compute_hipdnn_conv_backward_filter<float>(testConvolutionSizes, srcData.gpu(),
                                 filterData.gpu(), gradData.gpu(), NULL,
                                 dstDataGPU.gpu(),&avg_time);
 
@@ -84,8 +85,9 @@ TEST(convolution_bwd_filter, func_backward_conv_filter_batch32) {
 
   populateMemoryRandom<float>(srcData);
   populateMemoryRandom<float>(filterData);
+  populateMemoryRandom<float>(dstDataGPU);
 
-  compute_hipdnn_conv_bwd_filter<float>(testConvolutionSizes, srcData.gpu(),
+  compute_hipdnn_conv_backward_filter<float>(testConvolutionSizes, srcData.gpu(),
                                 filterData.gpu(), gradData.gpu(),
                                 NULL, dstDataGPU.gpu(),&avg_time);
 
@@ -133,8 +135,9 @@ TEST(convolution_bwd_filter, func_backward_conv_filter_batch64) {
 
   populateMemoryRandom<float>(srcData);
   populateMemoryRandom<float>(filterData);
+  populateMemoryRandom<float>(dstDataGPU);
 
-  compute_hipdnn_conv_bwd_filter<float>(testConvolutionSizes, srcData.gpu(),
+  compute_hipdnn_conv_backward_filter<float>(testConvolutionSizes, srcData.gpu(),
                                 filterData.gpu(), gradData.gpu(),
                                 NULL, dstDataGPU.gpu(),&avg_time);
 
@@ -183,8 +186,9 @@ TEST(convolution_bwd_filter, func_backward_conv_filter_batch128) {
 
   populateMemoryRandom<float>(srcData);
   populateMemoryRandom<float>(filterData);
+  populateMemoryRandom<float>(dstDataGPU);
 
-  compute_hipdnn_conv_bwd_filter<float>(testConvolutionSizes, srcData.gpu(),
+  compute_hipdnn_conv_backward_filter<float>(testConvolutionSizes, srcData.gpu(),
             filterData.gpu(), gradData.gpu(), NULL, dstDataGPU.gpu(),&avg_time);
 
   std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
