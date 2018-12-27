@@ -1,4 +1,4 @@
-#include "test_LRN_forward.hpp"
+#include "test_LRN_common.hpp"
 
 TEST(LRN_fwd, func_check_naive_LRN) {
 

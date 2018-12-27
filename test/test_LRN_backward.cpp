@@ -1,4 +1,4 @@
-#include "test_LRN_backward.hpp"
+#include "test_LRN_common.hpp"
 
 TEST(LRN_bwd, func_check_naive_LRN_backward) {
 
