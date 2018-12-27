@@ -1,5 +1,5 @@
-#include "test_convolution_pooling_int.hpp"
 #include "test_pooling_common.hpp"
+#include "test_convolution_common.hpp"
 
 hipdnnPoolingMode_t poolCF_mode;
 
@@ -49,7 +49,7 @@ TEST(convolution_pooling_fwd_intg, func_check_naive_conv_pool) {
   std::string str_op_size = integration_dims_to_string(op_size_c,op_size_p,
                                                        "Conv","MP");
 
-  compute_conv_forward<float>(testConvolutionSizes, srcDataConv.gpu(),
+  compute_hipdnn_conv_forward<float>(testConvolutionSizes, srcDataConv.gpu(),
                            filterData.gpu(), NULL, dstDataGPU.gpu(),&avg_time1);
 
   hipdnn_pooling_forward<float>(pool, dstDataGPU.gpu(), dstData.gpu(), poolCF_mode, false, &avg_time2);
