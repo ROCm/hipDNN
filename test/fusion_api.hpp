@@ -44,8 +44,8 @@ void compute_hipdnn_fusion_api(convulution_Size &c, dataType *src,
   hipdnnConvolutionFwdAlgo_t algo;
   size_t ws_size;
   float *ws_data;
-  float alphaC = 1.f;
-  float betaC = 0.f;
+  float alphaA = 1.f;
+  float betaA = 0.f;
 
   hipdnnConvolutionFwdPreference_t preference = HIPDNN_CONVOLUTION_FWD_PREFER_FASTEST;
   checkHIPDNN(hipdnnGetConvolutionForwardAlgorithm( hipdnn,
@@ -65,11 +65,6 @@ void compute_hipdnn_fusion_api(convulution_Size &c, dataType *src,
 
   float alphaB = 1.f;
   float betaB = 1.f;
-  checkHIPDNN(hipdnnAddTensor(hipdnn, &alphaB, bias_desc, bias_data, &betaB,
-                              out_desc, dst));
-
-  float alphaA = 1.f;
-  float betaA = 0.f;
 
   hipdnnActivationDescriptor_t activationDesc;
   hipdnnActivationMode_t act_mode = HIPDNN_ACTIVATION_RELU;
@@ -98,7 +93,7 @@ void compute_hipdnn_fusion_api(convulution_Size &c, dataType *src,
 
   hipdnnOperatorArgs_t args;
   checkHIPDNN(hipdnnCreateOperatorArgs( &args));
-  checkHIPDNN(hipdnnSetOpArgsConvForward(args, convOp, &alphaC, &betaC, weights));
+  checkHIPDNN(hipdnnSetOpArgsConvForward(args, convOp, &alphaA, &betaA, weights));
   checkHIPDNN(hipdnnSetOpArgsBiasForward(args, biasOp, &alphaB, &betaB, bias_data));
   checkHIPDNN(hipdnnSetOpArgsActivForward(args, activOp, &alphaA, &betaA,
               reluCeilingOrAlpha, activBeta, activExp));
@@ -133,6 +128,117 @@ void compute_hipdnn_fusion_api(convulution_Size &c, dataType *src,
   hipdnnDestroyFusionPlan(fusePlanDesc);
   hipdnnDestroy(hipdnn);
 
+}
+
+template <typename dataType>
+void compute_hipdnn_fusion_api_NA(convulution_Size &c, dataType *src,
+                                  dataType *dst, float *avg_time) {
+
+  hipdnnHandle_t hipdnn;
+  checkHIPDNN(hipdnnCreate(&hipdnn));
+
+  hipdnnTensorDescriptor_t in_desc;
+  checkHIPDNN(hipdnnCreateTensorDescriptor(&in_desc));
+  checkHIPDNN(hipdnnSetTensor4dDescriptor(in_desc, HIPDNN_TENSOR_NCHW,
+               HIPDNN_DATA_FLOAT, c.mb, c.ic, c.ih, c.iw));
+
+  hipdnnFusionPlanDescriptor_t fusePlanDesc;
+  hipdnnFusionDirection_t fuseDirection = HIPDNN_VERTICAL_FUSION;
+  hipdnnCreateFusionPlan( &fusePlanDesc, fuseDirection, in_desc);
+
+  hipdnnTensorDescriptor_t out_desc;
+  checkHIPDNN(hipdnnCreateTensorDescriptor(&out_desc));
+  checkHIPDNN(hipdnnSetTensor4dDescriptor(out_desc, HIPDNN_TENSOR_NCHW,
+               HIPDNN_DATA_FLOAT, c.mb, c.ic, c.ih, c.iw));
+
+  // perform
+  float alpha = 1.f;
+  float beta = 0.f;
+
+  hipdnnBatchNormMode_t BN_mode= HIPDNN_BATCHNORM_SPATIAL;
+
+  double epsilon= 0.5e-10;
+  hipdnnTensorDescriptor_t bnScaleBiasMeanVarDesc;
+
+  checkHIPDNN(hipdnnCreateTensorDescriptor(&bnScaleBiasMeanVarDesc));
+  checkHIPDNN(hipdnnSetTensor4dDescriptor(bnScaleBiasMeanVarDesc,
+               HIPDNN_TENSOR_NCHW, HIPDNN_DATA_FLOAT, 1, c.oc, 1, 1));
+
+  float * resultRunningMean;
+  hipMalloc(&resultRunningMean, 1 * c.oc  *sizeof(float));
+
+  float * resultRunningVariance;
+  hipMalloc(&resultRunningVariance, 1 * c.oc * sizeof(float));
+
+  float * bnScale;
+  hipMalloc(&bnScale, 1 * c.oc *  sizeof(float));
+
+  float * bnBias;
+  hipMalloc(&bnBias, 1 * c.oc *  sizeof(float));
+
+  hipLaunchKernel(dev_const, 1 * c.oc, 1 , 0, 0 ,bnScale ,0.f);
+  hipLaunchKernel(dev_const, 1* c.oc, 1, 0, 0 ,bnBias, 1.f);
+  hipLaunchKernel(dev_const, 1*c.ic, 1*1, 0, 0 ,resultRunningMean ,0.f);
+  hipLaunchKernel(dev_const, 1*c.ic, 1*1, 0, 0 , resultRunningVariance,2.f);
+
+  //Fusion
+
+  hipdnnFusionOpDescriptor_t activOp;
+  hipdnnFusionOpDescriptor_t bnOp;
+
+  hipdnnActivationMode_t mode = HIPDNN_ACTIVATION_RELU;
+
+  checkHIPDNN(hipdnnCreateTensorDescriptor(&bnScaleBiasMeanVarDesc));
+  checkHIPDNN(hipdnnSetTensor4dDescriptor(
+               bnScaleBiasMeanVarDesc, HIPDNN_TENSOR_NCHW, HIPDNN_DATA_FLOAT,
+               1, c.oc, 1, 1));
+
+
+  checkHIPDNN(hipdnnCreateOpBatchNormInference(fusePlanDesc, &bnOp, BN_mode,
+                                               bnScaleBiasMeanVarDesc));
+
+  checkHIPDNN(hipdnnCreateOpActivationForward(fusePlanDesc,  &activOp, mode));
+
+  auto status = hipdnnCompileFusionPlan( hipdnn, fusePlanDesc);
+
+  hipdnnOperatorArgs_t args;
+  hipdnnCreateOperatorArgs( &args);
+
+  hipdnnSetOpArgsBatchNormInference(args, bnOp, &alpha, &beta, &bnScale,
+                                    &bnBias, &resultRunningMean,
+                                    &resultRunningVariance, epsilon);
+
+  double reluCeilingOrAlpha=1;
+  double activBeta=1;
+  double activExp=1;
+  hipdnnSetOpArgsActivForward(args, activOp, &alpha, &beta,reluCeilingOrAlpha, activBeta ,activExp);
+
+  high_resolution_timer_t timer;
+  std::vector<double> time_vector(1, 0);
+
+  for (int i = 0; i < 1; i++) {
+
+      timer.restart();
+
+      hipdnnExecuteFusionPlan( hipdnn, fusePlanDesc, in_desc, src, out_desc,
+                               dst, args);
+      hipDeviceSynchronize();
+
+      std::uint64_t time_elapsed = timer.elapsed_nanoseconds();
+      time_vector[i] = (double)time_elapsed / 1000;
+    }
+
+  *avg_time = (float)std::accumulate(time_vector.begin(),
+                                     time_vector.end(), 0)
+                                     / (benchmark_iterations );
+
+  // finalizing
+  hipdnnDestroyTensorDescriptor(out_desc);
+  hipdnnDestroyTensorDescriptor(bnScaleBiasMeanVarDesc);
+  hipdnnDestroyTensorDescriptor(in_desc);
+  hipdnnDestroyOperatorArgs(args);
+  hipdnnDestroyFusionPlan(fusePlanDesc);
+  hipdnnDestroy(hipdnn);
 }
 
 #endif //TEST_FUSION_API_HPP
