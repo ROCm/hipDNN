@@ -69,21 +69,14 @@
 #endif
 #endif
 
-// Eventually those can be merged, but currently i will not mix device pointers
-// with host data in the same map... HGSOS static
 // std::map<miopenPoolingDescriptor_t, void *>  sPoolingDescToWorkspace;  ????
 
-
-
-static std::map<miopenTensorDescriptor_t, int8_t *>
+static std::map<miopenTensorDescriptor_t, std::pair<int8_t *, size_t>>
     sDescToWorkspacePooling;  // device pointers
-static std::map<miopenTensorDescriptor_t, size_t>
-    sDescToWorkspacePoolingSize;  // host
 
-static std::map<miopenTensorDescriptor_t, int8_t *>
+static std::map<miopenTensorDescriptor_t, std::pair<int8_t *, size_t>>
     sDescToWorkspaceLRN;  // device pointers
-static std::map<miopenTensorDescriptor_t, size_t>
-    sDescToWorkspaceLRNSize;  // host
+
 static std::map<miopenConvolutionDescriptor_t, int *>
     sDescTo3DConvolution;  // To bookkeep 3D depth information
 
@@ -1989,15 +1982,13 @@ hipdnnStatus_t hipdnnPoolingForward(
         CHECK_MIO(miopenPoolingGetWorkSpaceSize((miopenTensorDescriptor_t)yDesc,
                                                 &workSpaceSize));
         CHECK_HIP(hipMalloc((void **)&devptr, workSpaceSize));
-        sDescToWorkspacePooling[(miopenTensorDescriptor_t)yDesc] = devptr;
-        sDescToWorkspacePoolingSize[(miopenTensorDescriptor_t)yDesc] =
-            workSpaceSize;
+        sDescToWorkspacePooling[(miopenTensorDescriptor_t)yDesc] = std::make_pair(devptr, workSpaceSize);
 
     } else {
         // Reuse the preallocated workspace
-        devptr = sDescToWorkspacePooling[(miopenTensorDescriptor_t)yDesc];
+        devptr = sDescToWorkspacePooling[(miopenTensorDescriptor_t)yDesc].first;
         workSpaceSize =
-            sDescToWorkspacePoolingSize[(miopenTensorDescriptor_t)yDesc];
+            sDescToWorkspacePooling[(miopenTensorDescriptor_t)yDesc].second;
     }
 
     CHECK_MIO(miopenPoolingForward((miopenHandle_t)handle,
@@ -2023,12 +2014,12 @@ hipdnnStatus_t hipdnnPoolingBackward(
 
     HIPDNN_OPEN_LOG_C("Inside hipdnnPoolingBackward");
 
-    // HGSOS it appears that forward and backward pooling can reuse tha same
+    // forward and backward pooling can reuse tha same
     // map.
 
     if (sDescToWorkspacePooling.find((miopenTensorDescriptor_t)yDesc) ==
         sDescToWorkspacePooling.end()) {
-        // HGSOS looks like the yDesc is used for the workspace, not the
+        // yDesc is used for the workspace, not the
         // poolingDesc
 
         HIPDNN_OPEN_LOG_I("INTERNAL_ALLOC: hipdnnPoolingBackward");
@@ -2037,13 +2028,12 @@ hipdnnStatus_t hipdnnPoolingBackward(
                                                 &workSpaceSize));
 
         CHECK_HIP(hipMalloc((void **)&devptr, workSpaceSize));
-        sDescToWorkspacePooling[(miopenTensorDescriptor_t)yDesc] = devptr;
-        sDescToWorkspacePoolingSize[(miopenTensorDescriptor_t)yDesc] =
-            workSpaceSize;
+        sDescToWorkspacePooling[(miopenTensorDescriptor_t)yDesc] = std::make_pair(devptr, workSpaceSize);
+
     } else {
-        devptr = sDescToWorkspacePooling[(miopenTensorDescriptor_t)yDesc];
+        devptr = sDescToWorkspacePooling[(miopenTensorDescriptor_t)yDesc].first;
         workSpaceSize =
-            sDescToWorkspacePoolingSize[(miopenTensorDescriptor_t)yDesc];
+            sDescToWorkspacePooling[(miopenTensorDescriptor_t)yDesc].second;
     }
 
     CHECK_MIO(miopenPoolingBackward(
@@ -2051,7 +2041,7 @@ hipdnnStatus_t hipdnnPoolingBackward(
         (miopenTensorDescriptor_t)yDesc, y, (miopenTensorDescriptor_t)dyDesc,
         dy, (miopenTensorDescriptor_t)xDesc, x, beta,
         (miopenTensorDescriptor_t)dxDesc, dx,
-        devptr));  // HGSOS  //NOTYET no worspace size!  const!!!????
+        devptr));
     return HIPDNN_STATUS_SUCCESS;
 }
 //=============================================================================
@@ -2216,16 +2206,15 @@ hipdnnStatus_t hipdnnLRNCrossChannelForward(
             //yDesc is used for the workspace, not the
 			//hipdnnLRNDescriptor_t
 
-             CHECK_MIO(miopenLRNGetWorkSpaceSize((miopenTensorDescriptor_t)yDesc,
+            CHECK_MIO(miopenLRNGetWorkSpaceSize((miopenTensorDescriptor_t)yDesc,
                                                 &workSpaceSize));
-             CHECK_HIP(hipMalloc((void **)&devptr, workSpaceSize));
-             sDescToWorkspaceLRN[(miopenTensorDescriptor_t)yDesc] = devptr;
-             sDescToWorkspaceLRNSize[(miopenTensorDescriptor_t)yDesc] =
-                workSpaceSize;
+            CHECK_HIP(hipMalloc((void **)&devptr, workSpaceSize));
+            sDescToWorkspaceLRN[(miopenTensorDescriptor_t)yDesc] = std::make_pair(devptr, workSpaceSize);
+
         } else {
-             devptr = sDescToWorkspaceLRN[(miopenTensorDescriptor_t)yDesc];
-             workSpaceSize =
-                sDescToWorkspaceLRNSize[(miopenTensorDescriptor_t)yDesc];
+            devptr = sDescToWorkspaceLRN[(miopenTensorDescriptor_t)yDesc].first;
+            workSpaceSize =
+             sDescToWorkspaceLRN[(miopenTensorDescriptor_t)yDesc].second;
         }
 	}
     void *dwPrior = SaveAsPriorBuffer(y);
@@ -2292,15 +2281,13 @@ hipdnnStatus_t hipdnnLRNCrossChannelBackward(
 
         CHECK_MIO(miopenLRNGetWorkSpaceSize((miopenTensorDescriptor_t)yDesc,
                                             &workSpaceSize));
-
         CHECK_HIP(hipMalloc((void **)&devptr, workSpaceSize));
-        sDescToWorkspaceLRN[(miopenTensorDescriptor_t)yDesc] = devptr;
-        sDescToWorkspaceLRNSize[(miopenTensorDescriptor_t)yDesc] =
-            workSpaceSize;
+        sDescToWorkspaceLRN[(miopenTensorDescriptor_t)yDesc] = std::make_pair(devptr, workSpaceSize);
+
     } else {
-        devptr = sDescToWorkspaceLRN[(miopenTensorDescriptor_t)yDesc];
+        devptr = sDescToWorkspaceLRN[(miopenTensorDescriptor_t)yDesc].first;
         workSpaceSize =
-            sDescToWorkspaceLRNSize[(miopenTensorDescriptor_t)yDesc];
+            sDescToWorkspaceLRN[(miopenTensorDescriptor_t)yDesc].second;
     }
 
     CHECK_HIPDNN(hipdnnLRNCrossChannelBackwardEx(
