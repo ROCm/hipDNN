@@ -104,10 +104,8 @@ void compute_hipdnn_activation_backward(activation_params_t &test_case,
   float alpha = 1.f;
   float beta = 0.f;
 
-  hipdnnActivationForward(hipdnn, activationDesc, &alpha, in_desc, src, &beta,
-                          out_desc, dst);
-
   high_resolution_timer_t timer;
+
   std::vector<double> time_vector(benchmark_iterations, 0);
 
   for (int i = 0; i < benchmark_iterations; i++) {
