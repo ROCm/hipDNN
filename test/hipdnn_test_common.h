@@ -1,5 +1,5 @@
-#ifndef HIPDNN_TEST_COMMON_HPP
-#define HIPDNN_TEST_COMMON_HPP
+#ifndef HIPDNN_TEST_COMMON_H
+#define HIPDNN_TEST_COMMON_H
 
 #include "hipdnn.h"
 #include "hip/hip_runtime.h"
@@ -39,6 +39,20 @@
     }                                                                          \
   }
 
+inline __global__ void dev_populate (hipLaunchParm lp, float *px, int maxvalue) {
+  int tid = hipThreadIdx_x + hipBlockIdx_x * hipBlockDim_x;
+  px[tid] = tid + 1 % maxvalue;
+}
+
+inline __global__ void dev_const(hipLaunchParm lp, float *px, float k) {
+  int tid = hipThreadIdx_x + hipBlockIdx_x * hipBlockDim_x;
+  px[tid] = k;
+}
+inline __global__ void dev_iota(hipLaunchParm lp, float *px) {
+  int tid = hipThreadIdx_x + hipBlockIdx_x * hipBlockDim_x;
+  px[tid] = tid + 1;
+}
+
 template <typename dataType> struct Memory {
 private:
   std::vector<dataType> hVec;
@@ -56,8 +70,7 @@ public:
     this->h_data = (dataType *)malloc(this->mem_size);
     memset(h_data, 0, this->mem_size);
     HIP_CALL(hipMalloc((void **)&this->d_data, this->mem_size));
-	//std::cout << "Memsetting" << std::endl;
-//    HIP_CALL(hipMemset((void **)&this->d_data, 0, this->mem_size));
+    HIP_CALL(hipMemset(this->d_data, 0, this->mem_size));
   }
   dataType *cpu() { return this->h_data; }
 
@@ -143,7 +156,7 @@ template <typename dataType> void populateMemoryRandom(Memory<dataType> &mem) {
   auto gen = [&dist, &mersenne_engine]() { return dist(mersenne_engine); };
 int i = 0;
 	std::generate(v.begin(), v.end(), [&i]() mutable{
-			return ++i % 10;
+	                return ++i % 10;
 		});
 //  std::iota(v.begin(), v.end(), -5);
   std::copy(v.begin(), v.end(), mem.cpu());
@@ -151,5 +164,10 @@ int i = 0;
   HIP_CALL(hipMemcpy(mem.gpu(), mem.cpu(), mem.size(), hipMemcpyHostToDevice));
 }
 
+template <typename dataType> void populateMemory(Memory<dataType> &mem, float n) {
+   std::vector<dataType> v(mem.get_num_elements(), n);
+   std::copy(v.begin(), v.end(), mem.cpu());
+  // Copy the stuff to device too
+  HIP_CALL(hipMemcpy(mem.gpu(), mem.cpu(), mem.size(), hipMemcpyHostToDevice));
+}
 #endif
-
