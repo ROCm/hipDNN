@@ -200,18 +200,26 @@ hipdnnStatus_t miopenTohipDataType(miopenDataType_t in, hipdnnDataType_t *out) {
 
 //=============================================================================
 
-hipdnnConvolutionMode_t miopenTohipConvolutionMode(miopenConvolutionMode_t in) {
-    if (in == miopenConvolution) return HIPDNN_CONVOLUTION;
-    /*else if( in == miopenCrossCorrelation )
-     return HIPDNN_CROSS_CORRELATION;*/ //TODO: to be added
-    return HIPDNN_CONVOLUTION;
+hipdnnStatus_t miopenTohipdnnConvolutionMode(miopenConvolutionMode_t in,
+                                                hipdnnConvolutionMode_t* out) {
+    if (in == miopenConvolution) //MIOpen's convolution is cudnn's corss corelation equivalent
+        *out = HIPDNN_CROSS_CORRELATION;
+    else
+        return HIPDNN_STATUS_NOT_SUPPORTED;
+
+    return HIPDNN_STATUS_SUCCESS;
 }
 
-miopenConvolutionMode_t hipTomiopenConvolutionMode(hipdnnConvolutionMode_t in) {
-    if (in == HIPDNN_CONVOLUTION) return miopenConvolution;
-    /*else if( in == HIPDNN_CROSS_CORRELATION )
-     return miopenCrossCorrelation;*/ //TODO: to be added
-    return miopenConvolution;
+hipdnnStatus_t hipTomiopenConvolutionMode(hipdnnConvolutionMode_t in,
+                                                miopenConvolutionMode_t* out) {
+    if (in == HIPDNN_CROSS_CORRELATION)
+        *out = miopenConvolution;
+    else if( in == HIPDNN_CONVOLUTION) {
+        std::cerr<< "CONVOLUTION is Not supported in MIOpen. Use CROSS_CORELATION instead";
+        return HIPDNN_STATUS_NOT_SUPPORTED;
+    }
+
+    return HIPDNN_STATUS_NOT_SUPPORTED;
 }
 
 //=============================================================================
@@ -1117,11 +1125,13 @@ hipdnnStatus_t hipdnnSetConvolution2dDescriptor(
     int upscalex, int upscaley, hipdnnConvolutionMode_t mode,
     hipdnnDataType_t computeType) {
 
+    miopenConvolutionMode_t miConvMode;
+    CHECK_HIPDNN(hipTomiopenConvolutionMode(mode,&miConvMode));
     hipdnnConvolutionDescriptor_t* convDesc_cast =
                                     ((structConvDesc_t*)(convDesc))->descriptor;
     CHECK_MIO( miopenInitConvolutionDescriptor(
                                     (miopenConvolutionDescriptor_t)convDesc_cast,
-                                    hipTomiopenConvolutionMode(mode), pad_h,
+                                    miConvMode, pad_h,
                                     pad_w, u, v, upscalex, upscaley));
 
     std::cerr<<"Setting computeType by user is not supported in MIOpen."
@@ -1145,7 +1155,7 @@ hipdnnStatus_t hipdnnGetConvolution2dDescriptor(
         (miopenConvolutionDescriptor_t)convDesc_cast, &miMode, pad_h, pad_y, u, v,
         upscalex, upscaley));
 
-    *mode = miopenTohipConvolutionMode(miMode);
+    CHECK_HIPDNN( miopenTohipdnnConvolutionMode(miMode, mode) );
     *computeType = ((structConvDesc_t*)(convDesc))->convDataType;
 
     return HIPDNN_STATUS_SUCCESS;
