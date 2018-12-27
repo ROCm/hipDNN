@@ -204,6 +204,12 @@ hipdnnStatus_t miopenTohipdnnConvolutionMode(miopenConvolutionMode_t in,
                                                 hipdnnConvolutionMode_t* out) {
     if (in == miopenConvolution) //MIOpen's convolution is cudnn's corss corelation equivalent
         *out = HIPDNN_CROSS_CORRELATION;
+    else if( in == miopenTranspose)
+        *out = HIPDNN_TRANSPOSE;
+    else if( in == miopenGroupConv)
+        *out = HIPDNN_GROUP_CONVOLUTION;
+    else if( in == miopenDepthwise)
+        *out = HIPDNN_DEPTHWISE;
     else
         return HIPDNN_STATUS_NOT_SUPPORTED;
 
@@ -214,12 +220,22 @@ hipdnnStatus_t hipTomiopenConvolutionMode(hipdnnConvolutionMode_t in,
                                                 miopenConvolutionMode_t* out) {
     if (in == HIPDNN_CROSS_CORRELATION)
         *out = miopenConvolution;
+    else if( in == HIPDNN_TRANSPOSE)
+        *out = miopenTranspose;
+    else if( in == HIPDNN_GROUP_CONVOLUTION)
+        *out = miopenGroupConv;
+    else if( in == HIPDNN_DEPTHWISE)
+        *out = miopenDepthwise;
+
     else if( in == HIPDNN_CONVOLUTION) {
-        std::cerr<< "CONVOLUTION is Not supported in MIOpen. Use CROSS_CORELATION instead";
+        std::cerr << "CONVOLUTION is Not supported in MIOpen."
+                  <<"CROSS_CORRELATION can be used instead for (Train+Inference)";
         return HIPDNN_STATUS_NOT_SUPPORTED;
     }
+    else
+        return HIPDNN_STATUS_NOT_SUPPORTED;
 
-    return HIPDNN_STATUS_NOT_SUPPORTED;
+    return HIPDNN_STATUS_SUCCESS;
 }
 
 //=============================================================================
