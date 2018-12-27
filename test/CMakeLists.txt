@@ -1,4 +1,4 @@
-CMAKE_MINIMUM_REQUIRED (VERSION 2.8.8) 
+CMAKE_MINIMUM_REQUIRED (VERSION 2.8.8)
 MESSAGE(STATUS "CMAKE VERSION ${CMAKE_VERSION}")
 
 SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/../cmake ${CMAKE_CURRENT_SOURCE_DIR}/cmake ${HIP_PATH}/cmake ${MIOPEN_PATH}/lib/cmake/miopen)
@@ -19,6 +19,7 @@ INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/utils/)
 FILE(GLOB HIPDNNTESTSRCS "${CMAKE_CURRENT_SOURCE_DIR}/utils/src/*.cc" ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp)
 INCLUDE_DIRECTORIES(${MIOPEN_PATH}/include/)
 ADD_EXECUTABLE(unittest ${HIPDNNTESTSRCS})
+
 TARGET_LINK_LIBRARIES(unittest csv_integration)
 if(${HIP_PLATFORM} MATCHES "nvcc")
     set_target_properties(unittest PROPERTIES LINK_FLAGS "-Xcompiler \\\"-Wl\\\\,-rpath=./library/\\\"")
@@ -26,4 +27,3 @@ endif()
 
 set_target_properties(unittest PROPERTIES SKIP_BUILD_RPATH 1)
 set_target_properties(unittest PROPERTIES LINK_FLAGS "${CMAKE_SOURCE_DIR}/build/library/libhipdnn.so")
-
