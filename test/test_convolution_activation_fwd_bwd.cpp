@@ -1,4 +1,5 @@
-#include "test_convolution_activation_fwd_bwd.hpp"
+#include "test_convolution_common.hpp"
+#include "test_activation_common.hpp"
 
 TEST(convolution_activation_fwd_bwd_intg,
      func_check_conv_activation_fwd_bwd) {
@@ -7,6 +8,7 @@ TEST(convolution_activation_fwd_bwd_intg,
 
   Desc inputDesc(1, 3, 16, 16);
   Desc filterDesc(1, 3, 4, 4);
+  hipdnnActivationMode_t act_mode = HIPDNN_ACTIVATION_RELU;
 
   int pad[2] = {0, 0};    // zero padding
   int stride[2] = {4, 4}; // stride 1
@@ -61,16 +63,16 @@ TEST(convolution_activation_fwd_bwd_intg,
   std::string str_op_size = integration_dims_to_string2(op_size_cf,op_size_af,
                op_size_cb,op_size_ab,"Conv_fwd","Act_fwd","Conv_bwd","Act_bwd");
 
-  compute_hipdnn_conv_fwd<float>(testConvolutionSizes, srcDataConv.gpu(),
+  compute_hipdnn_conv_forward<float>(testConvolutionSizes, srcDataConv.gpu(),
                            filterData.gpu(), NULL, dstDataGPU.gpu(),&avg_time1);
 
   compute_hipdnn_activation_forward<float>(test_case, dstDataGPU.gpu(),
-                                           dataDst.gpu(), &avg_time2);
+                                           dataDst.gpu(), act_mode, &avg_time2);
 
-  compute_hipdnn_activation_bwd<float>(test_case, dstDataGPU.gpu(),
-                            data_grad.gpu(), dataDst.gpu(), &avg_time3);
+  compute_hipdnn_activation_backward<float>(test_case, dstDataGPU.gpu(),
+                            data_grad.gpu(), dataDst.gpu(), act_mode, &avg_time3);
 
-  compute_conv_back_filter<float>(testConvolutionSizes, srcDataConv.gpu(),
+  compute_hipdnn_conv_backward_filter<float>(testConvolutionSizes, srcDataConv.gpu(),
                             filterData.gpu(), gradData2.gpu(), NULL,
                             data_grad.gpu(), &avg_time4);
 

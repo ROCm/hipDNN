@@ -1,15 +1,14 @@
-#include "test_convolution_pooling_act_fwd_bwd_int.hpp"
 #include "test_pooling_common.hpp"
 #include "test_convolution_common.hpp"
-
-hipdnnPoolingMode_t poolCAP_mode;
+#include "test_activation_common.hpp"
 
 TEST(convolution_pooling_act_fwd_bwd_intg, func_check_conv_pool_act_fwd_bwd) {
 
   float avg_time = 0, avg_time1 = 0, avg_time2 = 0, avg_time3 = 0, avg_time4 = 0;
   float avg_time5 = 0, avg_time6 = 0;
   int oheight = 4, owidth = 4;
-  poolCAP_mode = HIPDNN_POOLING_MAX;
+  hipdnnPoolingMode_t pool_mode = HIPDNN_POOLING_MAX;
+  hipdnnActivationMode_t act_mode = HIPDNN_ACTIVATION_RELU;
 
   test_pooling_descriptor pool(1, 1, 4, 4, 2, 2, 2, 2, 0, 0, 2, 2);
   pool_bwd test_case(1, 1, 4, 4, 2, 2, 0, 0, 2, 2, 1, 1, oheight, owidth);
@@ -101,15 +100,15 @@ TEST(convolution_pooling_act_fwd_bwd_intg, func_check_conv_pool_act_fwd_bwd) {
   compute_hipdnn_conv_forward<float>(testConvolutionSizes, srcDataConv.gpu(), filterData.gpu(),
                        NULL, dstDataGPU.gpu(),&avg_time1);
 
-  compute_act_fwd(test_case1, dstDataGPU.gpu(), dataDst_act.gpu(),&avg_time2);
+  compute_hipdnn_activation_forward(test_case1, dstDataGPU.gpu(), dataDst_act.gpu(), act_mode, &avg_time2);
 
-  hipdnn_pooling_forward<float>(pool, dataDst_act.gpu(), dstData.gpu(), poolCAP_mode, true, &avg_time3);
+  hipdnn_pooling_forward<float>(pool, dataDst_act.gpu(), dstData.gpu(), pool_mode, true, &avg_time3);
 
   hipdnn_pooling_backward<float>(test_case, dataDst_act.gpu(), gradData1.gpu(),
-                       dstData.gpu(), poolCAP_mode, &avg_time4);
+                       dstData.gpu(), pool_mode, &avg_time4);
 
-  compute_hipdnn_act_bwd(test_case1, dataDst_act.gpu(), dataGrad_act.gpu(),
-                         dstData.gpu(), &avg_time5);
+  compute_hipdnn_activation_backward(test_case1, dataDst_act.gpu(), dataGrad_act.gpu(),
+                         dstData.gpu(), act_mode, &avg_time5);
 
   compute_hipdnn_conv_backward_filter<float>(testConvolutionSizes2, dataDst_act.gpu(),
                                  filterData.gpu(), gradData2.gpu(), NULL,
