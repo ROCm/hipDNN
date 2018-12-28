@@ -37,7 +37,7 @@ extern "C" {
     {                                                                           \
         hipError_t error = (expression);                                        \
         if (error != hipSuccess) {                                              \
-            fprintf(stderr, "HIP error: '%s'(%d) at %s:%d\n",                   \
+            fprintf(stderr, "HIP error: %s (%d) at %s:%d\n",                    \
                     hipGetErrorString(error), error, __FILE__, __LINE__);       \
             exit(EXIT_FAILURE);                                                 \
         }                                                                       \
@@ -47,7 +47,7 @@ extern "C" {
     {                                                                           \
         hipdnnStatus_t error = (expression);                                    \
         if (error != HIPDNN_STATUS_SUCCESS) {                                   \
-            fprintf(stderr, "HIPDNN error: '%s'(%d) at %s:%d\n",                \
+            fprintf(stderr, "HIPDNN error: %s (%d) at %s:%d\n",                 \
                     hipdnnGetErrorString(error), error, __FILE__, __LINE__);    \
             return error;                                                       \
         }                                                                       \
