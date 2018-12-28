@@ -3314,13 +3314,4 @@ hipdnnStatus_t hipdnnDestroyFusionPlan(
     return HIPDNN_STATUS_SUCCESS;
 }
 
-//------------------------------------------------------------------------------
-
-hipdnnStatus_t hipdnnSetConvolutionGroupCount(
-    hipdnnConvolutionDescriptor_t convDesc, int groupCount) {
-    CHECK_MIO(miopenSetConvolutionGroupCount(
-        (miopenConvolutionDescriptor_t)convDesc, groupCount));
-    return HIPDNN_STATUS_SUCCESS;
-}
-
 //==============================================================================
