@@ -30,15 +30,14 @@
 #include <map>
 #include "hip/hip_runtime.h"
 
-#define CHECK_MIO(expression)                                               \
-    {                                                                       \
-        hipdnnStatus_t status = miopenTohipdnnStatus(expression);           \
-        if (status != HIPDNN_STATUS_SUCCESS) {                              \
-            std::cerr << "HIPDNN Error on line " << __LINE__                \
-                      << "With error status "                               \
-                      << ": " << hipdnnGetErrorString(status) << std::endl; \
-            return status;                                                  \
-        }                                                                   \
+#define CHECK_MIO(expression)                                                   \
+    {                                                                           \
+        hipdnnStatus_t status = miopenTohipdnnStatus(expression);               \
+        if (status != HIPDNN_STATUS_SUCCESS) {                                  \
+            fprintf(stderr, "HIPDNN error: %s (%d) at %s:%d\n",                 \
+                    hipdnnGetErrorString(status), status, __FILE__, __LINE__);  \
+            return status;                                                      \
+        }                                                                       \
     }
 
 #define CHECK_HIPDNN_NO_RET(expression)                                         \
