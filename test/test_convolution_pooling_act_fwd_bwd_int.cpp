@@ -9,6 +9,8 @@ TEST(convolution_pooling_act_fwd_bwd_intg, func_check_conv_pool_act_fwd_bwd) {
   int oheight = 4, owidth = 4;
   hipdnnPoolingMode_t pool_mode = HIPDNN_POOLING_MAX;
   hipdnnActivationMode_t act_mode = HIPDNN_ACTIVATION_RELU;
+  hipdnnDataType_t dataType = HIPDNN_DATA_FLOAT;
+
 
   test_pooling_descriptor pool(1, 1, 4, 4, 2, 2, 2, 2, 0, 0, 2, 2);
   pool_bwd test_case(1, 1, 4, 4, 2, 2, 0, 0, 2, 2, 1, 1, oheight, owidth);
@@ -102,10 +104,10 @@ TEST(convolution_pooling_act_fwd_bwd_intg, func_check_conv_pool_act_fwd_bwd) {
 
   compute_hipdnn_activation_forward(test_case1, dstDataGPU.gpu(), dataDst_act.gpu(), act_mode, &avg_time2);
 
-  hipdnn_pooling_forward<float>(pool, dataDst_act.gpu(), dstData.gpu(), pool_mode, true, &avg_time3);
+  hipdnn_pooling_forward<float>(pool, dataDst_act.gpu(), dstData.gpu(), pool_mode, dataType, true, &avg_time3);
 
   hipdnn_pooling_backward<float>(test_case, dataDst_act.gpu(), gradData1.gpu(),
-                       dstData.gpu(), pool_mode, &avg_time4);
+                       dstData.gpu(), pool_mode, dataType, &avg_time4);
 
   compute_hipdnn_activation_backward(test_case1, dataDst_act.gpu(), dataGrad_act.gpu(),
                          dstData.gpu(), act_mode, &avg_time5);

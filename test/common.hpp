@@ -5,6 +5,8 @@
 #include "hipdnn_test_common.h"
 #include "gtest/gtest.h"
 #include "common.hpp"
+#include "hip/hip_runtime_api.h"
+#include "hip/hip_fp16.h"
 
 inline Desc calculate_Dims(Desc inputDesc, Desc filterDesc, int pad[2],
                                int stride[2], int dilution[2]) {

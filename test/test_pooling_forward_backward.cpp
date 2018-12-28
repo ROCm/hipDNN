@@ -1,5 +1,7 @@
 #include "test_pooling_common.hpp"
 hipdnnPoolingMode_t poolFB_mode;
+hipdnnDataType_t dataType_I = HIPDNN_DATA_FLOAT;
+
 
 TEST(pooling_fwd_back, func_check_fwd_bwd) {
 
@@ -27,9 +29,9 @@ TEST(pooling_fwd_back, func_check_fwd_bwd) {
   std::string str_op_size  = convert_to_string((int*)op_size,4);
 
   hipdnn_pooling_forward<float>(pool, srcData.gpu(), dstData.gpu(), poolFB_mode,
-                                true, &avg_time1);
+                                dataType_I, true, &avg_time1);
   hipdnn_pooling_backward<float>(test_case, srcData.gpu(), gradData.gpu(),
-                                 dstData.gpu(), poolFB_mode, &avg_time2);
+                                 dstData.gpu(), poolFB_mode, dataType_I, &avg_time2);
 
   avg_time = (avg_time1 + avg_time2);
 
@@ -72,9 +74,9 @@ TEST(pooling_fwd_back, func_int_batch32) {
   std::string str_op_size  = convert_to_string((int*)op_size,4);
 
   hipdnn_pooling_forward<float>(pool, srcData.gpu(), dstData.gpu(), poolFB_mode,
-                                true, &avg_time1);
+                                dataType_I, true, &avg_time1);
   hipdnn_pooling_backward<float>(test_case, srcData.gpu(), gradData.gpu(),
-                                 dstData.gpu(), poolFB_mode, &avg_time2);
+                                 dstData.gpu(), poolFB_mode, dataType_I, &avg_time2);
 
   avg_time = (avg_time1 + avg_time2);
 
@@ -117,9 +119,9 @@ TEST(pooling_fwd_back, func_int_batch64) {
   std::string str_op_size  = convert_to_string((int*)op_size,4);
 
   hipdnn_pooling_forward<float>(pool, srcData.gpu(), dstData.gpu(), poolFB_mode,
-                                true, &avg_time1);
+                                dataType_I, true, &avg_time1);
   hipdnn_pooling_backward<float>(test_case, srcData.gpu(), gradData.gpu(),
-                                 dstData.gpu(), poolFB_mode, &avg_time2);
+                                 dstData.gpu(), poolFB_mode, dataType_I, &avg_time2);
 
   avg_time = (avg_time1 + avg_time2);
 
@@ -162,9 +164,9 @@ TEST(pooling_fwd_back, func_int_batch128) {
   std::string str_op_size  = convert_to_string((int*)op_size,4);
 
   hipdnn_pooling_forward<float>(pool, srcData.gpu(), dstData.gpu(), poolFB_mode,
-                                true, &avg_time1);
+                                dataType_I, true, &avg_time1);
   hipdnn_pooling_backward<float>(test_case, srcData.gpu(), gradData.gpu(),
-                                 dstData.gpu(), poolFB_mode, &avg_time2);
+                                 dstData.gpu(), poolFB_mode, dataType_I, &avg_time2);
 
   avg_time = (avg_time1 + avg_time2);
 
