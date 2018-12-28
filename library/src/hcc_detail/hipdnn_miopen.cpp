@@ -1098,7 +1098,7 @@ hipdnnStatus_t hipdnnCreateFilterDescriptor(
 
 // structure to be used in place of convolution descriptor
 typedef struct {
-    hipdnnConvolutionDescriptor_t* descriptor;
+    hipdnnConvolutionDescriptor_t descriptor;
     hipdnnDataType_t convDataType;
     hipdnnMathType_t convMathType;
 }structConvDesc_t;
@@ -1111,7 +1111,7 @@ hipdnnStatus_t hipdnnCreateConvolutionDescriptor(
     *convDesc = (void*)malloc(sizeof(structConvDesc_t));
     CHECK_MALLOC(*convDesc);
     hipdnnConvolutionDescriptor_t* convDesc_cast =
-                                    ((structConvDesc_t*)(*convDesc))->descriptor;
+                            &( ((structConvDesc_t*)(*convDesc))->descriptor );
     CHECK_MIO(miopenCreateConvolutionDescriptor(
         (miopenConvolutionDescriptor_t *)convDesc_cast));
     return HIPDNN_STATUS_SUCCESS;
@@ -1142,7 +1142,7 @@ hipdnnStatus_t hipdnnSetConvolution2dDescriptor(
 
     miopenConvolutionMode_t miConvMode;
     CHECK_HIPDNN(hipTomiopenConvolutionMode(mode,&miConvMode));
-    hipdnnConvolutionDescriptor_t* convDesc_cast =
+    hipdnnConvolutionDescriptor_t convDesc_cast =
                                     ((structConvDesc_t*)(convDesc))->descriptor;
     CHECK_MIO( miopenInitConvolutionDescriptor(
                                     (miopenConvolutionDescriptor_t)convDesc_cast,
@@ -1164,7 +1164,7 @@ hipdnnStatus_t hipdnnGetConvolution2dDescriptor(
     hipdnnDataType_t *computeType) {
 
     miopenConvolutionMode_t miMode;
-    hipdnnConvolutionDescriptor_t* convDesc_cast =
+    hipdnnConvolutionDescriptor_t convDesc_cast =
                                     ((structConvDesc_t*)(convDesc))->descriptor;
     CHECK_MIO(miopenGetConvolutionDescriptor(
         (miopenConvolutionDescriptor_t)convDesc_cast, &miMode, pad_h, pad_y, u, v,
@@ -1186,7 +1186,7 @@ hipdnnStatus_t hipdnnGetConvolution2dForwardOutputDim(
     HIPDNN_OPEN_LOG_C("HIPDNN_SOFTMAX_MODE_INSTANCE NOT SUPPORTED."
                       << std::flush);
 
-    hipdnnConvolutionDescriptor_t* convDesc_cast =
+    hipdnnConvolutionDescriptor_t convDesc_cast =
                                     ((structConvDesc_t*)(convDesc))->descriptor;
     CHECK_MIO(miopenGetConvolutionForwardOutputDim(
         (miopenConvolutionDescriptor_t)(convDesc_cast), // should be const in miopen.
@@ -1199,7 +1199,7 @@ hipdnnStatus_t hipdnnGetConvolution2dForwardOutputDim(
 
 hipdnnStatus_t
 hipdnnDestroyConvolutionDescriptor(hipdnnConvolutionDescriptor_t convDesc) {
-    hipdnnConvolutionDescriptor_t* convDesc_cast =
+    hipdnnConvolutionDescriptor_t convDesc_cast =
                                     ((structConvDesc_t*)(convDesc))->descriptor;
     CHECK_MIO(miopenDestroyConvolutionDescriptor(
         (miopenConvolutionDescriptor_t)convDesc_cast));
@@ -1220,7 +1220,7 @@ hipdnnStatus_t hipdnnFindConvolutionForwardAlgorithm(
     size_t sizeInBytes = 0;
     void *sConvolutionForwardAlgorithmWorkspace;
     miopenConvFwdAlgorithm_t mialgo;
-    hipdnnConvolutionDescriptor_t* convDesc_cast =
+    hipdnnConvolutionDescriptor_t convDesc_cast =
                                     ((structConvDesc_t*)(convDesc))->descriptor;
     // in miopen, workspace size does not depend on algo.
     CHECK_MIO(miopenConvolutionForwardGetWorkSpaceSize(
@@ -1344,7 +1344,7 @@ hipdnnStatus_t hipdnnFindConvolutionForwardAlgorithmEx(
     workSpaceInternal = workSpace;
     expectedWorkSpaceSize = workSpaceSizeInBytes;
 
-    hipdnnConvolutionDescriptor_t* convDesc_cast =
+    hipdnnConvolutionDescriptor_t convDesc_cast =
                                     ((structConvDesc_t*)(convDesc))->descriptor;
     CHECK_MIO(miopenFindConvolutionForwardAlgorithm(
         (miopenHandle_t)handle, (miopenTensorDescriptor_t)xDesc, x,
@@ -1388,7 +1388,7 @@ hipdnnStatus_t hipdnnGetConvolutionForwardWorkspaceSize(
         << algo << std::flush);
 
     miopenConvFwdAlgorithm_t mialgo;
-    hipdnnConvolutionDescriptor_t* convDesc_cast =
+    hipdnnConvolutionDescriptor_t convDesc_cast =
                                     ((structConvDesc_t*)(convDesc))->descriptor;
     // in miopen, workspace size does not depend on algo.
     CHECK_MIO(miopenConvolutionForwardGetWorkSpaceSize(
@@ -1422,7 +1422,7 @@ hipdnnStatus_t hipdnnConvolutionForward(
     CHECK_HIPDNN(hipTomiopenConvolutionFwdAlgo(algo, &mialgo));
     HIPDNN_OPEN_LOG_C("Invoked hipToMopenConvolutionFwdAlgo" << std::flush);
     HIPDNN_OPEN_LOG_C("Invoking MiopenConvolutionFwd" << std::flush);
-    hipdnnConvolutionDescriptor_t* convDesc_cast =
+    hipdnnConvolutionDescriptor_t convDesc_cast =
                                     ((structConvDesc_t*)(convDesc))->descriptor;
     CHECK_MIO(miopenConvolutionForward(
         (miopenHandle_t)handle, alpha, (miopenTensorDescriptor_t)xDesc, x,
@@ -1459,7 +1459,7 @@ hipdnnStatus_t hipdnnFindConvolutionBackwardFilterAlgorithm(
 
     size_t sizeInBytes = 0;
     void *sConvolutionBackwardFilterAlgorithmWorkspace;
-    hipdnnConvolutionDescriptor_t* convDesc_cast =
+    hipdnnConvolutionDescriptor_t convDesc_cast =
                                     ((structConvDesc_t*)(convDesc))->descriptor;
     // in miopen, workspace size does not depend on algo.
     CHECK_MIO(miopenConvolutionBackwardWeightsGetWorkSpaceSize(
@@ -1511,7 +1511,7 @@ hipdnnStatus_t hipdnnGetConvolutionBackwardFilterAlgorithm(
 
     size_t sizeInBytes = 0;
     void *sConvolutionBackwardFilterAlgorithmWorkspace;
-    hipdnnConvolutionDescriptor_t* convDesc_cast =
+    hipdnnConvolutionDescriptor_t convDesc_cast =
                                     ((structConvDesc_t*)(convDesc))->descriptor;
     if(preference == HIPDNN_CONVOLUTION_BWD_FILTER_PREFER_FASTEST)
         CHECK_MIO(miopenConvolutionBackwardWeightsGetWorkSpaceSize(
@@ -1586,7 +1586,7 @@ hipdnnStatus_t hipdnnFindConvolutionBackwardFilterAlgorithmEx(
 
     workSpaceInternal = workSpace;
     expectedWorkSpaceSize = workSpaceSizeInBytes;
-    hipdnnConvolutionDescriptor_t* convDesc_cast =
+    hipdnnConvolutionDescriptor_t convDesc_cast =
                                     ((structConvDesc_t*)(convDesc))->descriptor;
     try {
         CHECK_MIO(miopenFindConvolutionBackwardWeightsAlgorithm(
@@ -1634,7 +1634,7 @@ hipdnnStatus_t hipdnnGetConvolutionBackwardFilterWorkspaceSize(
     HIPDNN_OPEN_LOG_C(
         "ENTER hipdnnGetConvolutionBackwardFilterWorkspaceSize algo:"
         << algo << std::flush);
-    hipdnnConvolutionDescriptor_t* convDesc_cast =
+    hipdnnConvolutionDescriptor_t convDesc_cast =
                                     ((structConvDesc_t*)(convDesc))->descriptor;
     CHECK_MIO(miopenConvolutionBackwardWeightsGetWorkSpaceSize(
         (miopenHandle_t)handle, (miopenTensorDescriptor_t)dyDesc,
@@ -1679,7 +1679,7 @@ hipdnnStatus_t hipdnnConvolutionBackwardFilter(
 
     miopenConvBwdWeightsAlgorithm_t mialgo;
     CHECK_HIPDNN(hipTomiopenConvolutionBwdFilterAlgo(algo, &mialgo));
-    hipdnnConvolutionDescriptor_t* convDesc_cast =
+    hipdnnConvolutionDescriptor_t convDesc_cast =
                                     ((structConvDesc_t*)(convDesc))->descriptor;
     if (*static_cast<const float *>(beta) == 0) {
         CHECK_MIO(miopenConvolutionBackwardWeights(
@@ -1723,7 +1723,7 @@ hipdnnStatus_t hipdnnGetConvolutionBackwardDataWorkspaceSize(
     size_t *sizeInBytes) {
 
     *sizeInBytes = 0;
-    hipdnnConvolutionDescriptor_t* convDesc_cast =
+    hipdnnConvolutionDescriptor_t convDesc_cast =
                                     ((structConvDesc_t*)(convDesc))->descriptor;
     // does not depend on algo in miopen
     try {
@@ -1840,7 +1840,7 @@ hipdnnStatus_t hipdnnFindConvolutionBackwardDataAlgorithmEx(
         workSpaceInternal = workSpace;
         expectedWorkSpaceSize = workSpaceSizeInBytes;
 
-    hipdnnConvolutionDescriptor_t* convDesc_cast =
+    hipdnnConvolutionDescriptor_t convDesc_cast =
                                     ((structConvDesc_t*)(convDesc))->descriptor;
     CHECK_MIO(miopenConvolutionBackwardDataGetWorkSpaceSize(
         (miopenHandle_t)handle, (miopenTensorDescriptor_t)dyDesc,
@@ -1926,7 +1926,7 @@ hipdnnStatus_t hipdnnConvolutionBackwardData(
             << ", WS PTR = " << workSpaceInternal
             << ", WS size =" << expectedWorkSpaceSize << std::flush);
 
-        hipdnnConvolutionDescriptor_t* convDesc_cast =
+        hipdnnConvolutionDescriptor_t convDesc_cast =
                                     ((structConvDesc_t*)(convDesc))->descriptor;
         if (*static_cast<const float *>(beta) == 0) {
             CHECK_MIO(miopenConvolutionBackwardData(
