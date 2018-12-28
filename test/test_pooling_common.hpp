@@ -7,7 +7,7 @@
 
 template <typename dataType>
 void hipdnn_pooling_forward(test_pooling_descriptor &c, dataType *src,
-                                dataType *dst, hipdnnPoolingMode_t mode,
+                                dataType *dst, hipdnnPoolingMode_t mode, hipdnnDataType_t hipdataType,
                                 bool do_backward,
                                 float *avg_time) {
 
@@ -17,7 +17,7 @@ void hipdnn_pooling_forward(test_pooling_descriptor &c, dataType *src,
   hipdnnTensorDescriptor_t in_desc, out_desc;
   checkHIPDNN(hipdnnCreateTensorDescriptor(&in_desc));
   checkHIPDNN(hipdnnSetTensor4dDescriptor(
-      in_desc, HIPDNN_TENSOR_NCHW, HIPDNN_DATA_FLOAT, c.mb, c.c, c.ih, c.iw));
+      in_desc, HIPDNN_TENSOR_NCHW, hipdataType, c.mb, c.c, c.ih, c.iw));
 
   hipdnnPoolingDescriptor_t pool_desc;
   checkHIPDNN(hipdnnCreatePoolingDescriptor(&pool_desc));
@@ -30,7 +30,7 @@ void hipdnn_pooling_forward(test_pooling_descriptor &c, dataType *src,
 
   checkHIPDNN(hipdnnCreateTensorDescriptor(&out_desc));
   checkHIPDNN(hipdnnSetTensor4dDescriptor(
-      out_desc, HIPDNN_TENSOR_NCHW, HIPDNN_DATA_FLOAT, c.mb, c.c, c.oh, c.ow));
+      out_desc, HIPDNN_TENSOR_NCHW, hipdataType, c.mb, c.c, c.oh, c.ow));
 
   float alpha = 1.f;
   float beta = 0.f;
@@ -64,6 +64,7 @@ template <typename dataType>
 void hipdnn_pooling_backward(pool_bwd &test_case, dataType *src,
                                dataType *grad, dataType *dst,
                                hipdnnPoolingMode_t mode,
+							   hipdnnDataType_t hipdataType,
                                float *avg_time) {
 
   hipdnnHandle_t hipdnn;
@@ -73,7 +74,7 @@ void hipdnn_pooling_backward(pool_bwd &test_case, dataType *src,
   checkHIPDNN(hipdnnCreateTensorDescriptor(&in_desc));
 
   checkHIPDNN(hipdnnSetTensor4dDescriptor(
-      in_desc, HIPDNN_TENSOR_NCHW, HIPDNN_DATA_FLOAT, test_case.in,
+      in_desc, HIPDNN_TENSOR_NCHW, hipdataType, test_case.in,
       test_case.ichannel, test_case.iheight, test_case.oheight));
 
   hipdnnPoolingDescriptor_t pool_desc;
@@ -88,12 +89,13 @@ void hipdnn_pooling_backward(pool_bwd &test_case, dataType *src,
 
   checkHIPDNN(hipdnnGetPooling2dForwardOutputDim(
       pool_desc, in_desc, &test_case.on, &test_case.ochannel,
-      &test_case.oheight, &test_case.owidth)) hipdnnTensorDescriptor_t out_desc;
+      &test_case.oheight, &test_case.owidth)) 
+  hipdnnTensorDescriptor_t out_desc;
 
   checkHIPDNN(hipdnnCreateTensorDescriptor(&out_desc));
 
   checkHIPDNN(hipdnnSetTensor4dDescriptor(
-      out_desc, HIPDNN_TENSOR_NCHW, HIPDNN_DATA_FLOAT, test_case.on,
+      out_desc, HIPDNN_TENSOR_NCHW, hipdataType, test_case.on,
       test_case.ochannel, test_case.oheight, test_case.owidth));
 
   float alpha = 1.f;
