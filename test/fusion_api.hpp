@@ -211,7 +211,8 @@ void compute_hipdnn_fusion_api_NA(convulution_Size &c, dataType *src,
   double reluCeilingOrAlpha=1;
   double activBeta=1;
   double activExp=1;
-  hipdnnSetOpArgsActivForward(args, activOp, &alpha, &beta,reluCeilingOrAlpha, activBeta ,activExp);
+  hipdnnSetOpArgsActivForward(args, activOp, &alpha, &beta,reluCeilingOrAlpha,
+                              activBeta ,activExp);
 
   high_resolution_timer_t timer;
   std::vector<double> time_vector(1, 0);
