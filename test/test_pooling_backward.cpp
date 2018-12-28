@@ -288,6 +288,7 @@ TEST(pooling_backward, func_check_pooling_batch128) {
 
   Memory<float> dataSrc(test_case.in * test_case.ichannel * test_case.iheight *
                         test_case.iwidth);
+
   Memory<float> dataGrad(test_case.in * test_case.ichannel * test_case.iheight *
                          test_case.iwidth);
 
