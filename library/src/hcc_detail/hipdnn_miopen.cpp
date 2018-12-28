@@ -1123,7 +1123,8 @@ hipdnnStatus_t hipdnnSetConvolutionMathType(
     hipdnnConvolutionDescriptor_t convDesc, hipdnnMathType_t mathType) {
 
     std::cerr<<"Setting MathType by user is not supported in MIOpen."
-             <<"Internally set based on datatype of input." ;
+             <<"Internally set based on datatype of input."
+             <<std::endl;
     HIPDNN_OPEN_LOG_E("hipdnnSetConvolutionMathType"
                       << mathType << " NOT SUPPORTED in MIOpen"
                       << std::flush);
@@ -1153,6 +1154,71 @@ hipdnnStatus_t hipdnnSetConvolution2dDescriptor(
             <<"Internally set based on datatype of input." ;
     ((structConvDesc_t*)(convDesc))->convDataType = computeType;
 
+    return HIPDNN_STATUS_SUCCESS;
+}
+
+//------------------------------------------------------------------------------
+
+hipdnnStatus_t hipdnnSetConvolutionNdDescriptor(
+    hipdnnConvolutionDescriptor_t convDesc, int arrayLength, /* nbDims-2 size */
+    const int padA[], const int filterStrideA[], const int dilationA[],
+    hipdnnConvolutionMode_t mode,
+    hipdnnDataType_t computeType)  // convolution data type
+{
+    HIPDNN_OPEN_LOG_C("Inside hipdnnSetConvolutionNdDescriptor with arrayLength:"
+                        << arrayLength << std::flush);
+
+    int pad_h, pad_w, u, v, d_h, d_w;
+
+    hipdnnConvolutionDescriptor_t convDesc_cast =
+                                    ((structConvDesc_t*)(convDesc))->descriptor;
+
+    if (arrayLength == 2) {
+        pad_h = padA[0];
+        pad_w = padA[1];
+        u = filterStrideA[0];
+        v = filterStrideA[1];
+        d_h = dilationA[0];
+        d_w = dilationA[1];
+
+        CHECK_MIO(miopenInitConvolutionDescriptor(
+                                    (miopenConvolutionDescriptor_t)convDesc_cast,
+                                    miopenConvolution, pad_h,
+                                    pad_w, u, v, d_h, d_w) );
+    }
+    else if (arrayLength == 3) {
+        // 3D convolution Scenario
+        // Got to book keep additional padding, stride and dilation info along
+        //  depth direction
+        // Book keeping using global static std::map container
+        // But first lets initialize the 2D Description
+        pad_h = padA[0];
+        pad_w = padA[1];
+        u = filterStrideA[0];
+        v = filterStrideA[1];
+        d_h = dilationA[0];
+        d_w = dilationA[1];
+        CHECK_MIO(miopenInitConvolutionDescriptor(
+                                    (miopenConvolutionDescriptor_t)convDesc_cast,
+                                    miopenConvolution, pad_h,
+                                    pad_w, u, v, d_h, d_w) );
+        // Populate the map container with key being newly created 2Ddescriptor
+        // and value a 3 dim array with index mapping as
+        // 0-pad, 1-stride and 2-dilation
+        int depthDesc[3];
+        depthDesc[0] = padA[2];
+        depthDesc[1] = filterStrideA[2];
+        depthDesc[2] = dilationA[2];
+        sDescTo3DConvolution[(miopenConvolutionDescriptor_t)convDesc_cast] =
+            depthDesc;
+
+    }
+    else {
+        HIPDNN_OPEN_LOG_E(
+            "Inside hipdnnSetConvolutionNdDescriptor NOT SUPPORTED"
+            << std::flush);
+        return HIPDNN_STATUS_NOT_SUPPORTED;
+    }
     return HIPDNN_STATUS_SUCCESS;
 }
 
@@ -2922,62 +2988,6 @@ const char *hipdnnGetErrorString(hipdnnStatus_t status) {
         default:
             return "Unrecognized Status Code";
     }
-}
-
-hipdnnStatus_t hipdnnSetConvolutionNdDescriptor(
-    hipdnnConvolutionDescriptor_t convDesc, int arrayLength, /* nbDims-2 size */
-    const int padA[], const int filterStrideA[], const int dilationA[],
-    hipdnnConvolutionMode_t mode,
-    hipdnnDataType_t computeType)  // convolution data type
-{
-    HIPDNN_OPEN_LOG_C(
-        "Inside hipdnnSetConvolutionNdDescriptor with arrayLength :"
-        << arrayLength << std::flush);
-
-    int pad_h, pad_w, u, v, d_h, d_w;
-
-    if (arrayLength == 2) {
-        pad_h = padA[0];
-        pad_w = padA[1];
-        u = filterStrideA[0];
-        v = filterStrideA[1];
-        d_h = dilationA[0];
-        d_w = dilationA[1];
-        CHECK_MIO(miopenInitConvolutionDescriptor(
-            (miopenConvolutionDescriptor_t)convDesc, miopenConvolution, pad_h,
-            pad_w, u, v, d_h, d_w));
-    } else if (arrayLength == 3) {
-        // 3D convolution Scenario
-        // Got to book keep additional padding, stride and dilation info along
-        //  depth direction
-        // Book keeping using global static std::map container
-        // But first lets initialize the 2D Description
-        pad_h = padA[0];
-        pad_w = padA[1];
-        u = filterStrideA[0];
-        v = filterStrideA[1];
-        d_h = dilationA[0];
-        d_w = dilationA[1];
-        CHECK_MIO(miopenInitConvolutionDescriptor(
-            (miopenConvolutionDescriptor_t)convDesc, miopenConvolution, pad_h,
-            pad_w, u, v, d_h, d_w));
-        // Populate the map container with key being newly created 2Ddescriptor
-        // and value a 3 dim array with index mapping as
-        // 0-pad, 1-stride and 2-dilation
-        int depthDesc[3];
-        depthDesc[0] = padA[2];
-        depthDesc[1] = filterStrideA[2];
-        depthDesc[2] = dilationA[2];
-        sDescTo3DConvolution[(miopenConvolutionDescriptor_t)convDesc] =
-            depthDesc;
-
-    } else {
-        HIPDNN_OPEN_LOG_E(
-            "Inside hipdnnSetConvolutionNdDescriptor NOT SUPPORTED"
-            << std::flush);
-        return HIPDNN_STATUS_NOT_SUPPORTED;
-    }
-    return HIPDNN_STATUS_SUCCESS;
 }
 
 hipdnnStatus_t hipdnnBatchNormalizationForwardInference(
