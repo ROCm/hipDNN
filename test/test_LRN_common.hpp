@@ -118,9 +118,9 @@ void compute_hipdnn_LRN_backward(LRN_params_t &d, dataType *src, dataType *grad,
                 &lrn_blendAlpha, in_desc, src, &lrn_blendBeta, out_desc, dst, true));
 
 
-  float* dx; // passed as input
-  HIP_CALL(hipMalloc(&dx, d.mb*d.ic*d.ih*d.iw*sizeof(float)));
-  hipLaunchKernel(dev_populate, d.ih*d.iw, d.mb*d.ic, 0, 0 , dx, maxvalue);
+  float* dy; // passed as input
+  HIP_CALL(hipMalloc(&dy, d.mb*d.ic*d.ih*d.iw*sizeof(float)));
+  hipLaunchKernel(dev_populate, d.ih*d.iw, d.mb*d.ic, 0, 0 , dy, maxvalue);
 
 
   high_resolution_timer_t timer;
@@ -132,7 +132,7 @@ void compute_hipdnn_LRN_backward(LRN_params_t &d, dataType *src, dataType *grad,
         timer.restart();
 
         checkHIPDNN(hipdnnLRNCrossChannelBackward( hipdnn, lrn_desc, lrn_mode,
-                   &lrn_blendAlpha, in_desc, src, out_desc, dst, out_desc, dx,
+                   &lrn_blendAlpha, out_desc, dst, out_desc, dy, in_desc, src,
                    &lrn_blendBeta, out_desc, grad));
 
         hipDeviceSynchronize();
@@ -146,7 +146,7 @@ void compute_hipdnn_LRN_backward(LRN_params_t &d, dataType *src, dataType *grad,
 
 
   // finalizing
-  hipFree(dx);
+  hipFree(dy);
   hipdnnDestroyTensorDescriptor(out_desc);
   hipdnnDestroyLRNDescriptor(lrn_desc);
   hipdnnDestroyTensorDescriptor(in_desc);
