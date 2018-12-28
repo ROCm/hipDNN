@@ -3108,8 +3108,11 @@ hipdnnStatus_t hipdnnDestroyReduceTensorDescriptor(
 
  hipdnnStatus_t hipdnnSetConvolutionGroupCount(
     hipdnnConvolutionDescriptor_t convDesc, int groupCount ) {
+
+    hipdnnConvolutionDescriptor_t convDesc_cast =
+                                    ((structConvDesc_t*)(convDesc))->descriptor;
     CHECK_MIO(miopenSetConvolutionGroupCount(
-        (miopenConvolutionDescriptor_t)convDesc, groupCount) );
+        (miopenConvolutionDescriptor_t)convDesc_cast, groupCount) );
     return HIPDNN_STATUS_SUCCESS;
 
 }
@@ -3169,10 +3172,13 @@ hipdnnStatus_t hipdnnCreateOpConvForward(
     hipdnnFusionPlanDescriptor_t fusePlanDesc,
     hipdnnFusionOpDescriptor_t *convOp, hipdnnConvolutionDescriptor_t convDesc,
     const hipdnnTensorDescriptor_t wDesc) {
+
+    hipdnnConvolutionDescriptor_t convDesc_cast =
+                                    ((structConvDesc_t*)(convDesc))->descriptor;
     CHECK_MIO(
         miopenCreateOpConvForward((miopenFusionPlanDescriptor_t)fusePlanDesc,
                                   (miopenFusionOpDescriptor_t *)convOp,
-                                  (miopenConvolutionDescriptor_t)convDesc,
+                                  (miopenConvolutionDescriptor_t)convDesc_cast,
                                   (miopenTensorDescriptor_t)wDesc));
     return HIPDNN_STATUS_SUCCESS;
 }
