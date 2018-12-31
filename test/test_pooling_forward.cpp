@@ -305,10 +305,6 @@ TEST(pooling_fwd, func_check_half) {
 
   std::string str  = convert_to_string((float*)temp,(int)dstDataGPU.get_num_elements());
 
-  temp1 = __half2float(*(__half*)srcData.getDataFromGPU());
-  float *temp2 = &temp1;
-  std::string ip = convert_to_string((float*)temp2,(int)srcData.get_num_elements());
-
   write_to_csv(strt, str, testname, avg_time, str_ip_size, str_k_size, str_op_size);
   dump_result_csv(filename, testname, temp, (int)dstDataGPU.get_num_elements());
 }
