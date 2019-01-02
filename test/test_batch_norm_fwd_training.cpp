@@ -35,8 +35,8 @@ TEST(BNorm_Fwd_train, func_check_spatial_fwd) {
                                             resultRunningMean.gpu(),
                                             resultRunningVariance.gpu(),
                                             resultSaveMean.gpu(),
-                                            resultSaveVariance.gpu(), &avg_time,
-                                            modeB);
+                                            resultSaveVariance.gpu(), dataType,
+                                            &avg_time, modeB);
 
   std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
 
@@ -118,8 +118,8 @@ TEST(BNorm_Fwd_train, func_check_per_act_fwd) {
                                             resultRunningMean.gpu(),
                                             resultRunningVariance.gpu(),
                                             resultSaveMean.gpu(),
-                                            resultSaveVariance.gpu(), &avg_time,
-                                            modeB);
+                                            resultSaveVariance.gpu(), dataType,
+                                            &avg_time, modeB);
 
   std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
 
@@ -201,8 +201,8 @@ TEST(BNorm_Fwd_train, func_check_spatial_fwd_channel3) {
                                             resultRunningMean.gpu(),
                                             resultRunningVariance.gpu(),
                                             resultSaveMean.gpu(),
-                                            resultSaveVariance.gpu(), &avg_time,
-                                            modeB);
+                                            resultSaveVariance.gpu(), dataType,
+                                            &avg_time, modeB);
 
   std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
 
@@ -284,8 +284,8 @@ TEST(BNorm_Fwd_train, func_check_per_act_fwd_channel3) {
                                             resultRunningMean.gpu(),
                                             resultRunningVariance.gpu(),
                                             resultSaveMean.gpu(),
-                                            resultSaveVariance.gpu(), &avg_time,
-                                            modeB);
+                                            resultSaveVariance.gpu(), dataType,
+                                            &avg_time, modeB);
 
   std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
 
