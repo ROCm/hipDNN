@@ -42,7 +42,7 @@ TEST(fusion_api, func_check_fusion_api_CBA) {
 
   compute_hipdnn_fusion_api<float>(testConvolutionSizes, srcDataConv.gpu(),
                                    filterData.gpu(), biasData.gpu(),
-                                  dstDataGPU.gpu(),&avg_time);
+                                  dstDataGPU.gpu(), dataType, &avg_time);
 
   std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
 
@@ -102,7 +102,7 @@ TEST(fusion_api, func_check_fusion_api_CBA_batch32) {
 
   compute_hipdnn_fusion_api<float>(testConvolutionSizes, srcDataConv.gpu(),
                                    filterData.gpu(), biasData.gpu(),
-                                  dstDataGPU.gpu(),&avg_time);
+                                  dstDataGPU.gpu(), dataType, &avg_time);
 
   std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
 
@@ -144,7 +144,7 @@ TEST(fusion_api, func_check_fusion_api_CBA_batch32) {
   std::string str_op_size  = convert_to_string((int*)ip_size,4);
 
   compute_hipdnn_fusion_api_NA<float>(testConvolutionSizes, srcDataConv.gpu(),
-                                      dstDataGPU.gpu(),&avg_time);
+                                      dstDataGPU.gpu(), dataType, &avg_time);
 
   std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
 

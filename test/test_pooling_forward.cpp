@@ -6,7 +6,6 @@ TEST(pooling_fwd, func_check_zero_padding) {
 
   pool_mode = HIPDNN_POOLING_MAX;
   test_pooling_descriptor pool(1, 1, 4, 4, 2, 2, 2, 2, 0, 0, 2, 2);
-  dataType = HIPDNN_DATA_FLOAT;
   Memory<float> srcData(pool.mb * pool.c * pool.ih * pool.iw);
   Memory<float> dstDataGPU(pool.mb * pool.c * pool.oh * pool.ow);
 
