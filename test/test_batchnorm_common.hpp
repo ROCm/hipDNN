@@ -13,7 +13,7 @@ void compute_hipdnn_batchnorm_fwd_train(BNorm_params_t &d, dataType *src,
                                 dataType *resultSaveMean,
                                 dataType *resultSaveInvVariance,
                                 hipdnnDataType_t hipdataType,
-                                float *avg_time, int mode) {
+                                float *avg_time, hipdnnBatchNormMode_t bn_modeT) {
 
   hipdnnHandle_t hipdnn;
   checkHIPDNN(hipdnnCreate(&hipdnn));
@@ -31,13 +31,6 @@ void compute_hipdnn_batchnorm_fwd_train(BNorm_params_t &d, dataType *src,
   checkHIPDNN(hipdnnSetTensor4dDescriptor(
         out_desc, HIPDNN_TENSOR_NCHW, hipdataType,
         d.mb, d.ic, d.ih, d.iw));
-
-  hipdnnBatchNormMode_t bn_modeT;
-
-  if (mode == 0)
-      bn_modeT = HIPDNN_BATCHNORM_SPATIAL;
-  else
-      bn_modeT = HIPDNN_BATCHNORM_PER_ACTIVATION;
 
   hipdnnTensorDescriptor_t bnScaleBiasMeanVarDescT;
 
@@ -194,7 +187,8 @@ template <typename dataType>
 void compute_hipdnn_batchnorm_bwd(BNorm_params_t &d, dataType *src,
                                   dataType *dx, dataType *resultBnScaleDiff,
                                   dataType *resultBnBiasDiff, float *avg_time,
-                                  hipdnnDataType_t hipdataType, int mode,
+                                  hipdnnDataType_t hipdataType,
+                                  hipdnnBatchNormMode_t bn_modeT_back,
                                   int acc_grad) {
 
   hipdnnHandle_t hipdnn;
@@ -217,13 +211,6 @@ void compute_hipdnn_batchnorm_bwd(BNorm_params_t &d, dataType *src,
 
   hipdnnTensorDescriptor_t bnScaleBiasDiffDesc;
   checkHIPDNN(hipdnnCreateTensorDescriptor(&bnScaleBiasDiffDesc));
-
-  hipdnnBatchNormMode_t bn_modeT_back;
-
-  if (mode == 0)
-      bn_modeT_back = HIPDNN_BATCHNORM_SPATIAL;
-  else
-      bn_modeT_back = HIPDNN_BATCHNORM_PER_ACTIVATION;
 
   checkHIPDNN(hipdnnDeriveBNTensorDescriptor(bnScaleBiasDiffDesc,
                                              in_desc, bn_modeT_back));

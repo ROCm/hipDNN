@@ -7,8 +7,8 @@ TEST(convolution_pooling_act_fwd_bwd_intg, func_check_conv_pool_act_fwd_bwd) {
   float avg_time = 0, avg_time1 = 0, avg_time2 = 0, avg_time3 = 0, avg_time4 = 0;
   float avg_time5 = 0, avg_time6 = 0;
   int oheight = 4, owidth = 4;
-  hipdnnPoolingMode_t pool_mode = HIPDNN_POOLING_MAX;
-  hipdnnActivationMode_t act_mode = HIPDNN_ACTIVATION_RELU;
+  pool_mode = HIPDNN_POOLING_MAX;
+  act_mode = HIPDNN_ACTIVATION_RELU;
 
   test_pooling_descriptor pool(1, 1, 4, 4, 2, 2, 2, 2, 0, 0, 2, 2);
   pool_bwd test_case(1, 1, 4, 4, 2, 2, 0, 0, 2, 2, 1, 1, oheight, owidth);
