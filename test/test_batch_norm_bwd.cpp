@@ -29,8 +29,9 @@ TEST(BNorm_Backward, func_check_spatial_no_grad_bwd) {
   std::string str_op_size  = convert_to_string((int*)op_size,4);
 
   compute_hipdnn_batchnorm_bwd<float>(BN_sizes, srcData.gpu(), dstDataGPU.gpu(),
-                                      resultBnScaleDiff.gpu(),
-                                      resultBnBiasDiff.gpu(), &avg_time, mode, acc_grad);
+                                     resultBnScaleDiff.gpu(),
+                                     resultBnBiasDiff.gpu(), &avg_time, dataType,
+                                     mode, acc_grad);
 
   std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
 
@@ -91,8 +92,9 @@ TEST(BNorm_Backward, func_check_BNorm_bwd_per_act_mode_no_grad) {
   std::string str_op_size  = convert_to_string((int*)op_size,4);
 
   compute_hipdnn_batchnorm_bwd<float>(BN_sizes, srcData.gpu(), dstDataGPU.gpu(),
-                                      resultBnScaleDiff.gpu(),
-                                      resultBnBiasDiff.gpu(), &avg_time, mode, acc_grad);
+                                     resultBnScaleDiff.gpu(),
+                                     resultBnBiasDiff.gpu(), &avg_time, dataType,
+                                     mode, acc_grad);
 
   std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
 
@@ -124,7 +126,7 @@ TEST(BNorm_Backward, func_check_BNorm_bwd_per_act_mode_no_grad) {
   dump_result_csv(filename, testname2, temp2, (int)resultBnScaleDiff.get_num_elements());
   dump_result_csv(filename, testname3, temp3, (int)resultBnBiasDiff.get_num_elements());
 
-  }
+}
 
 TEST(BNorm_Backward, func_check_spatial_grad_bwd) {
 
@@ -153,7 +155,8 @@ TEST(BNorm_Backward, func_check_spatial_grad_bwd) {
 
   compute_hipdnn_batchnorm_bwd<float>(BN_sizes, srcData.gpu(), dstDataGPU.gpu(),
                                      resultBnScaleDiff.gpu(),
-                                     resultBnBiasDiff.gpu(), &avg_time, mode, acc_grad);
+                                     resultBnBiasDiff.gpu(), &avg_time, dataType,
+                                     mode, acc_grad);
 
   std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
 
@@ -213,8 +216,9 @@ TEST(BNorm_Backward, func_check_BNorm_bwd_per_act_mode_grad) {
   std::string str_op_size  = convert_to_string((int*)op_size,4);
 
   compute_hipdnn_batchnorm_bwd<float>(BN_sizes, srcData.gpu(), dstDataGPU.gpu(),
-                                      resultBnScaleDiff.gpu(),
-                                      resultBnBiasDiff.gpu(), &avg_time, mode, acc_grad);
+                                     resultBnScaleDiff.gpu(),
+                                     resultBnBiasDiff.gpu(), &avg_time, dataType,
+                                     mode, acc_grad);
 
   std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
 

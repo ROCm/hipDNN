@@ -21,7 +21,7 @@ TEST(BNorm_Fwd_inference, func_check_naive_BNorm_forward_inf) {
   std::string str_op_size  = convert_to_string((int*)op_size,4);
 
   compute_hipdnn_batchnorm_fwd_inference<float>(BN_sizes, srcData.gpu(),
-                                                dstDataGPU.gpu(), &avg_time);
+                                         dstDataGPU.gpu(), dataType, &avg_time);
 
   std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
 
@@ -59,7 +59,7 @@ TEST(BNorm_Fwd_inference, func_check_naive_BNorm_forward_inf_batch32) {
   std::string str_op_size  = convert_to_string((int*)op_size,4);
 
   compute_hipdnn_batchnorm_fwd_inference<float>(BN_sizes, srcData.gpu(),
-                                                dstDataGPU.gpu(), &avg_time);
+                                         dstDataGPU.gpu(), dataType, &avg_time);
 
   std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
 
