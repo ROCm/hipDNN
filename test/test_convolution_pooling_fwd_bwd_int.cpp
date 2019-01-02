@@ -1,13 +1,11 @@
 #include "test_pooling_common.hpp"
 #include "test_convolution_common.hpp"
 
-hipdnnPoolingMode_t poolCPI_mode;
-
 TEST(convolution_pooling_fwd_bwd_intg, func_check_naive_conv_pool_fwd_bwd) {
 
   float avg_time = 0, avg_time1 = 0, avg_time2 = 0, avg_time3 = 0, avg_time4 = 0;
   int oheight = 4, owidth = 4;
-  poolCPI_mode = HIPDNN_POOLING_MAX;
+  pool_mode = HIPDNN_POOLING_MAX;
 
   test_pooling_descriptor pool(1, 1, 4, 4, 2, 2, 2, 2, 0, 0, 2, 2);
   pool_bwd test_case(1, 1, 4, 4, 2, 2, 0, 0, 2, 2, 1, 1, oheight, owidth);
@@ -86,10 +84,10 @@ TEST(convolution_pooling_fwd_bwd_intg, func_check_naive_conv_pool_fwd_bwd) {
                               &avg_time1);
 
   hipdnn_pooling_forward<float>(pool, dstDataGPU.gpu(), dstData.gpu(),
-                                poolCPI_mode, dataType, true, &avg_time2);
+                                pool_mode, dataType, true, &avg_time2);
 
   hipdnn_pooling_backward<float>(test_case, dstDataGPU.gpu(), gradData1.gpu(),
-                           dstData.gpu(), poolCPI_mode, dataType, &avg_time3);
+                           dstData.gpu(), pool_mode, dataType, &avg_time3);
 
   compute_hipdnn_conv_backward_filter<float>(testConvolutionSizes2, dstDataGPU.gpu(),
                                  filterData.gpu(), gradData2.gpu(), NULL,

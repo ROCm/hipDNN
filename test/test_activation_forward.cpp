@@ -1,7 +1,5 @@
 #include "test_activation_common.hpp"
 
-hipdnnActivationMode_t act_mode;
-
 TEST(activation_forward, func_test_fwd_activation_RELU) {
 
   float avg_time = 0;

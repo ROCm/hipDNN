@@ -7,7 +7,7 @@ TEST(convolution_activation_fwd_intg, func_check_naive_conv_activation) {
 
   Desc inputDesc(1, 3, 16, 16);
   Desc filterDesc(1, 3, 4, 4);
-  hipdnnActivationMode_t act_mode = HIPDNN_ACTIVATION_RELU;
+  act_mode = HIPDNN_ACTIVATION_RELU;
 
   int pad[2] = {0, 0};    // zero padding
   int stride[2] = {4, 4}; // stride 1
@@ -78,7 +78,7 @@ TEST(convolution_activation_fwd_intg, func_check_conv_activation_medium_size) {
 
   Desc inputDesc(1, 1, 100, 100);
   Desc filterDesc(1, 1, 5, 5);
-  hipdnnActivationMode_t act_mode = HIPDNN_ACTIVATION_RELU;
+  act_mode = HIPDNN_ACTIVATION_RELU;
 
   int pad[2] = {0, 0};    // zero padding
   int stride[2] = {5, 5}; // stride 1

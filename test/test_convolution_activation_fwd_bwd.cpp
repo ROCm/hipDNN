@@ -10,7 +10,7 @@ TEST(convolution_activation_fwd_bwd_intg,
 
   Desc inputDesc(1, 3, 16, 16);
   Desc filterDesc(1, 3, 4, 4);
-  hipdnnActivationMode_t act_mode = HIPDNN_ACTIVATION_RELU;
+  act_mode = HIPDNN_ACTIVATION_RELU;
 
   int pad[2] = {0, 0};    // zero padding
   int stride[2] = {4, 4}; // stride 1
@@ -105,7 +105,7 @@ TEST(convolution_activation_fwd_bwd_intg,
 
   Desc inputDesc(1, 1, 100, 100);
   Desc filterDesc(1, 1, 5, 5);
-  hipdnnActivationMode_t act_mode = HIPDNN_ACTIVATION_RELU;
+  act_mode = HIPDNN_ACTIVATION_RELU;
 
   int pad[2] = {0, 0};    // zero padding
   int stride[2] = {5, 5}; // stride 1
