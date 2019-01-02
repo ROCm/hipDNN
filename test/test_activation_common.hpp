@@ -6,10 +6,10 @@
 
 template <typename dataType>
 void compute_hipdnn_activation_forward(activation_params_t &test_case,
-                                        dataType *src,
-                                        dataType *dst,
-                                        hipdnnActivationMode_t mode,
-                                        float *avg_time) {
+                                       dataType *src, dataType *dst,
+                                       hipdnnDataType_t hipdataType,
+                                       hipdnnActivationMode_t mode,
+                                       float *avg_time) {
   hipdnnHandle_t hipdnn;
   checkHIPDNN(hipdnnCreate(&hipdnn));
 
@@ -17,7 +17,7 @@ void compute_hipdnn_activation_forward(activation_params_t &test_case,
   checkHIPDNN(hipdnnCreateTensorDescriptor(&in_desc));
 
   checkHIPDNN(hipdnnSetTensor4dDescriptor(
-      in_desc, HIPDNN_TENSOR_NCHW, HIPDNN_DATA_FLOAT, test_case.n,
+      in_desc, HIPDNN_TENSOR_NCHW, hipdataType, test_case.n,
       test_case.channels, test_case.height, test_case.width));
 
   hipdnnActivationDescriptor_t activationDesc;
@@ -35,7 +35,7 @@ void compute_hipdnn_activation_forward(activation_params_t &test_case,
   hipdnnTensorDescriptor_t out_desc;
   checkHIPDNN(hipdnnCreateTensorDescriptor(&out_desc));
   checkHIPDNN(hipdnnSetTensor4dDescriptor(
-               out_desc, HIPDNN_TENSOR_NCHW, HIPDNN_DATA_FLOAT, test_case.n,
+               out_desc, HIPDNN_TENSOR_NCHW, hipdataType, test_case.n,
                test_case.channels, test_case.height, test_case.width));
 
   float alpha = 1.f;
@@ -71,6 +71,7 @@ template <typename dataType>
 void compute_hipdnn_activation_backward(activation_params_t &test_case,
                                         dataType *src, dataType *grad,
                                         dataType *dst,
+                                        hipdnnDataType_t hipdataType,
                                         hipdnnActivationMode_t mode,
                                         float *avg_time) {
   hipdnnHandle_t hipdnn;
@@ -80,7 +81,7 @@ void compute_hipdnn_activation_backward(activation_params_t &test_case,
   checkHIPDNN(hipdnnCreateTensorDescriptor(&in_desc));
 
   checkHIPDNN(hipdnnSetTensor4dDescriptor(
-      in_desc, HIPDNN_TENSOR_NCHW, HIPDNN_DATA_FLOAT, test_case.n,
+      in_desc, HIPDNN_TENSOR_NCHW, hipdataType, test_case.n,
       test_case.channels, test_case.height, test_case.width));
 
   hipdnnActivationDescriptor_t activationDesc;
@@ -98,7 +99,7 @@ void compute_hipdnn_activation_backward(activation_params_t &test_case,
   hipdnnTensorDescriptor_t out_desc;
   checkHIPDNN(hipdnnCreateTensorDescriptor(&out_desc));
   checkHIPDNN(hipdnnSetTensor4dDescriptor(
-      out_desc, HIPDNN_TENSOR_NCHW, HIPDNN_DATA_FLOAT, test_case.n,
+      out_desc, HIPDNN_TENSOR_NCHW, hipdataType, test_case.n,
       test_case.channels, test_case.height, test_case.width));
 
   float alpha = 1.f;

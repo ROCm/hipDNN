@@ -7,9 +7,9 @@
 
 template <typename dataType>
 void hipdnn_pooling_forward(test_pooling_descriptor &c, dataType *src,
-                                dataType *dst, hipdnnPoolingMode_t mode, hipdnnDataType_t hipdataType,
-                                bool do_backward,
-                                float *avg_time) {
+                            dataType *dst, hipdnnPoolingMode_t mode,
+                            hipdnnDataType_t hipdataType, bool do_backward,
+                            float *avg_time) {
 
   hipdnnHandle_t handle;
   checkHIPDNN(hipdnnCreate(&handle));
