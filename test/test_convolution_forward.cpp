@@ -13,7 +13,6 @@ TEST(convolution_fwd, func_check_zero_padding_medium_input_batch32) {
   Desc outputDesc = calculate_Dims(inputDesc, filterDesc, pad, stride,dil);
 
   Memory<float> srcData = createMemory<float>(inputDesc);
-  Memory<float> dstDataCPU = createMemory<float>(outputDesc);
   Memory<float> dstDataGPU = createMemory<float>(outputDesc);
   Memory<float> filterData = createMemory<float>(filterDesc);
 
@@ -64,7 +63,6 @@ TEST(convolution_fwd, func_compare_group_conv) {
   Desc outputDesc = calculate_Dims(inputDesc, filterDesc, pad, stride,dil);
 
   Memory<float> srcData = createMemory<float>(inputDesc);
-  Memory<float> dstDataCPU = createMemory<float>(outputDesc);
   Memory<float> dstDataGPU = createMemory<float>(outputDesc);
   Memory<float> filterData = createMemory<float>(filterDesc);
 
@@ -116,7 +114,6 @@ TEST(convolution_fwd, func_check_two_strides_medium_kernelsize) {
   Desc outputDesc = calculate_Dims(inputDesc, filterDesc, pad, stride,dil);
 
   Memory<float> srcData = createMemory<float>(inputDesc);
-  Memory<float> dstDataCPU = createMemory<float>(outputDesc);
   Memory<float> dstDataGPU = createMemory<float>(outputDesc);
   Memory<float> filterData = createMemory<float>(filterDesc);
 
@@ -168,7 +165,6 @@ TEST(convolution_fwd, func_check_padding_and_strides_small_size) {
   Desc outputDesc = calculate_Dims(inputDesc, filterDesc, pad, stride, dil);
 
   Memory<float> srcData = createMemory<float>(inputDesc);
-  Memory<float> dstDataCPU = createMemory<float>(outputDesc);
   Memory<float> dstDataGPU = createMemory<float>(outputDesc);
   Memory<float> filterData = createMemory<float>(filterDesc);
 
@@ -218,7 +214,6 @@ TEST(convolution_fwd, func_check_full_conv) {
   Desc outputDesc = calculate_Dims(inputDesc, filterDesc, pad, stride,dil);
 
   Memory<float> srcData = createMemory<float>(inputDesc);
-  Memory<float> dstDataCPU = createMemory<float>(outputDesc);
   Memory<float> dstDataGPU = createMemory<float>(outputDesc);
   Memory<float> filterData = createMemory<float>(filterDesc);
 
@@ -270,7 +265,6 @@ TEST(convolution_fwd, func_check_batch64) {
   Desc outputDesc = calculate_Dims(inputDesc, filterDesc, pad, stride, dil);
 
   Memory<float> srcData = createMemory<float>(inputDesc);
-  Memory<float> dstDataCPU = createMemory<float>(outputDesc);
   Memory<float> dstDataGPU = createMemory<float>(outputDesc);
   Memory<float> filterData = createMemory<float>(filterDesc);
 
@@ -321,7 +315,6 @@ TEST(convolution_fwd, func_check_zero_padding_medium_input_batch128) {
   Desc outputDesc = calculate_Dims(inputDesc, filterDesc, pad, stride,dil);
 
   Memory<float> srcData = createMemory<float>(inputDesc);
-  Memory<float> dstDataCPU = createMemory<float>(outputDesc);
   Memory<float> dstDataGPU = createMemory<float>(outputDesc);
   Memory<float> filterData = createMemory<float>(filterDesc);
 
@@ -373,7 +366,6 @@ TEST(convolution_fwd, func_check_dilation2x2_batch8) {
   Desc outputDesc = calculate_Dims(inputDesc, filterDesc, pad, stride,dil);
 
   Memory<float> srcData = createMemory<float>(inputDesc);
-  Memory<float> dstDataCPU = createMemory<float>(outputDesc);
   Memory<float> dstDataGPU = createMemory<float>(outputDesc);
   Memory<float> filterData = createMemory<float>(filterDesc);
 
@@ -425,7 +417,6 @@ TEST(convolution_fwd, func_check_dilation3x3_batch8) {
   Desc outputDesc = calculate_Dims(inputDesc, filterDesc, pad, stride,dil);
 
   Memory<float> srcData = createMemory<float>(inputDesc);
-  Memory<float> dstDataCPU = createMemory<float>(outputDesc);
   Memory<float> dstDataGPU = createMemory<float>(outputDesc);
   Memory<float> filterData = createMemory<float>(filterDesc);
 
@@ -479,7 +470,6 @@ TEST(convolution_fwd, func_check_half_small_size) {
   Desc outputDesc = calculate_Dims(inputDesc, filterDesc, pad, stride, dil);
 
   Memory<half> srcData = createMemory<half>(inputDesc);
-  Memory<half> dstDataCPU = createMemory<half>(outputDesc);
   Memory<half> dstDataGPU = createMemory<half>(outputDesc);
   Memory<half> filterData = createMemory<half>(filterDesc);
 
