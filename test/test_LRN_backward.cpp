@@ -25,7 +25,7 @@ TEST(LRN_bwd, func_check_naive_LRN_backward) {
   std::string str_op_size  = convert_to_string((int*)op_size,4);
 
   compute_hipdnn_LRN_backward<float>(LRN_params, srcData.gpu(),
-                                gradDataGPU.gpu(), dstDataGPU.gpu(), &avg_time);
+                      gradDataGPU.gpu(), dstDataGPU.gpu(), dataType, &avg_time);
 
   std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
 
@@ -66,7 +66,7 @@ TEST(LRN_bwd, func_check_naive_LRN_backward_batch32) {
   std::string str_op_size  = convert_to_string((int*)op_size,4);
 
   compute_hipdnn_LRN_backward<float>(LRN_params, srcData.gpu(),
-                                gradDataGPU.gpu(), dstDataGPU.gpu(), &avg_time);
+                      gradDataGPU.gpu(), dstDataGPU.gpu(), dataType, &avg_time);
 
   std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
 
@@ -107,7 +107,7 @@ TEST(LRN_bwd, func_check_naive_LRN_backward_batch64) {
   std::string str_op_size  = convert_to_string((int*)op_size,4);
 
   compute_hipdnn_LRN_backward<float>(LRN_params, srcData.gpu(),
-                                gradDataGPU.gpu(), dstDataGPU.gpu(), &avg_time);
+                      gradDataGPU.gpu(), dstDataGPU.gpu(), dataType, &avg_time);
 
   std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
 
