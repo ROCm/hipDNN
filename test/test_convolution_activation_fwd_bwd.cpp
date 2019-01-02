@@ -1,6 +1,8 @@
 #include "test_convolution_common.hpp"
 #include "test_activation_common.hpp"
 
+hipdnnDataType_t dataType = HIPDNN_DATA_FLOAT;
+
 TEST(convolution_activation_fwd_bwd_intg,
      func_check_conv_activation_fwd_bwd) {
 
@@ -64,7 +66,8 @@ TEST(convolution_activation_fwd_bwd_intg,
                op_size_cb,op_size_ab,"Conv_fwd","Act_fwd","Conv_bwd","Act_bwd");
 
   compute_hipdnn_conv_forward<float>(testConvolutionSizes, srcDataConv.gpu(),
-                           filterData.gpu(), NULL, dstDataGPU.gpu(),&avg_time1);
+                           filterData.gpu(), NULL, dstDataGPU.gpu(), dataType,
+                           &avg_time1);
 
   compute_hipdnn_activation_forward<float>(test_case, dstDataGPU.gpu(),
                                            dataDst.gpu(), act_mode, &avg_time2);
@@ -74,7 +77,7 @@ TEST(convolution_activation_fwd_bwd_intg,
 
   compute_hipdnn_conv_backward_filter<float>(testConvolutionSizes, srcDataConv.gpu(),
                             filterData.gpu(), gradData2.gpu(), NULL,
-                            data_grad.gpu(), &avg_time4);
+                            data_grad.gpu(), dataType, &avg_time4);
 
   avg_time = avg_time1 + avg_time2 + avg_time3 + avg_time4;
 
@@ -157,7 +160,8 @@ TEST(convolution_activation_fwd_bwd_intg,
                op_size_cb,op_size_ab,"Conv_fwd","Act_fwd","Conv_bwd","Act_bwd");
 
   compute_hipdnn_conv_forward<float>(testConvolutionSizes, srcDataConv.gpu(),
-                           filterData.gpu(), NULL, dstDataGPU.gpu(),&avg_time1);
+                           filterData.gpu(), NULL, dstDataGPU.gpu(), dataType,
+                           &avg_time1);
 
   compute_hipdnn_activation_forward<float>(test_case, dstDataGPU.gpu(),
                                            dataDst.gpu(), act_mode, &avg_time2);
@@ -167,7 +171,7 @@ TEST(convolution_activation_fwd_bwd_intg,
 
   compute_hipdnn_conv_backward_filter<float>(testConvolutionSizes, srcDataConv.gpu(),
                             filterData.gpu(), gradData2.gpu(), NULL,
-                            data_grad.gpu(), &avg_time4);
+                            data_grad.gpu(), dataType, &avg_time4);
 
   avg_time = avg_time1 + avg_time2 + avg_time3 + avg_time4;
 

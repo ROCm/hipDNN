@@ -50,7 +50,8 @@ TEST(convolution_activation_fwd_intg, func_check_naive_conv_activation) {
                                                        "Conv","Act");
 
   compute_hipdnn_conv_forward<float>(testConvolutionSizes, srcDataConv.gpu(),
-                           filterData.gpu(), NULL, dstDataGPU.gpu(),&avg_time1);
+                           filterData.gpu(), NULL, dstDataGPU.gpu(), dataType,
+                           &avg_time1);
 
   compute_hipdnn_activation_forward<float>(test_case, dstDataGPU.gpu(),
                                            dataDst.gpu(), act_mode, &avg_time2);
@@ -120,7 +121,8 @@ TEST(convolution_activation_fwd_intg, func_check_conv_activation_medium_size) {
                                                        "Conv","Act");
 
   compute_hipdnn_conv_forward<float>(testConvolutionSizes, srcDataConv.gpu(),
-                           filterData.gpu(), NULL, dstDataGPU.gpu(),&avg_time1);
+                           filterData.gpu(), NULL, dstDataGPU.gpu(), dataType,
+                           &avg_time1);
 
   compute_hipdnn_activation_forward<float>(test_case, dstDataGPU.gpu(),
                                            dataDst.gpu(), act_mode, &avg_time2);
