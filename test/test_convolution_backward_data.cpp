@@ -34,7 +34,8 @@ TEST(convolution_bwd_data, func_check_backward_conv_data) {
   std::string str_op_size  = convert_to_string((int*)op_size,4);
 
   compute_hipdnn_conv_backward_data<float>(conv_back_param, srcData.gpu(),
-           filterData.gpu(), gradData.gpu(), NULL, dstDataGPU.gpu(), &avg_time);
+           filterData.gpu(), gradData.gpu(), NULL, dstDataGPU.gpu(), dataType,
+           &avg_time);
 
   std::string strt = "./result_unittest.csv";
   std::string testname = "convolution_bwd_data:func_check_backward_conv_data";
@@ -82,7 +83,8 @@ TEST(convolution_bwd_data, func_bwd_conv_batch8) {
   std::string str_op_size  = convert_to_string((int*)op_size,4);
 
   compute_hipdnn_conv_backward_data<float>(conv_back_param, srcData.gpu(),
-           filterData.gpu(), gradData.gpu(), NULL, dstDataGPU.gpu(), &avg_time);
+           filterData.gpu(), gradData.gpu(), NULL, dstDataGPU.gpu(), dataType,
+           &avg_time);
 
   std::string strt = "./result_unittest.csv";
   std::string testname = "convolution_bwd_data:func_bwd_conv_batch8";
@@ -131,7 +133,8 @@ TEST(convolution_bwd_data, func_bwd_conv_batch16) {
   std::string str_op_size  = convert_to_string((int*)op_size,4);
 
   compute_hipdnn_conv_backward_data<float>(conv_back_param, srcData.gpu(),
-           filterData.gpu(), gradData.gpu(), NULL, dstDataGPU.gpu(), &avg_time);
+           filterData.gpu(), gradData.gpu(), NULL, dstDataGPU.gpu(), dataType,
+           &avg_time);
 
   std::string strt = "./result_unittest.csv";
   std::string testname = "convolution_bwd_data:func_bwd_conv_batch16";
@@ -178,7 +181,8 @@ TEST(convolution_bwd_data, func_bwd_conv_batch64_pad) {
   std::string str_op_size  = convert_to_string((int*)op_size,4);
 
   compute_hipdnn_conv_backward_data<float>(conv_back_param, srcData.gpu(),
-          filterData.gpu(), gradData.gpu(), NULL, dstDataGPU.gpu(), &avg_time);
+          filterData.gpu(), gradData.gpu(), NULL, dstDataGPU.gpu(), dataType,
+          &avg_time);
 
   std::string strt = "./result_unittest.csv";
   std::string testname = "convolution_bwd_data:func_bwd_conv_batch64_pad";
@@ -225,7 +229,8 @@ TEST(convolution_bwd_data, func_bwd_conv_batch128_pad1_stride3) {
   std::string str_op_size  = convert_to_string((int*)op_size,4);
 
   compute_hipdnn_conv_backward_data<float>(conv_back_param, srcData.gpu(),
-           filterData.gpu(), gradData.gpu(), NULL, dstDataGPU.gpu(), &avg_time);
+           filterData.gpu(), gradData.gpu(), NULL, dstDataGPU.gpu(), dataType,
+           &avg_time);
 
   std::string strt = "./result_unittest.csv";
   std::string testname = "convolution_bwd_data:func_bwd_conv_batch128_pad1_stride3";
