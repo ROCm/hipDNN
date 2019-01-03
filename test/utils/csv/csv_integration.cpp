@@ -40,7 +40,8 @@ void write_to_csv(std::string filename, std::string str, std::string testname,
 void dump_result_csv(std::string filename, std::string testname, float* output,
                      int n){
 
-   if (mkdir("./results_csv", 0777) != -1){
+  if (mkdir("./results_csv", 0777) != -1)
+      {
         static int device = 0;
         hipSetDevice(device);
         hipDeviceProp_t props;
@@ -50,7 +51,7 @@ void dump_result_csv(std::string filename, std::string testname, float* output,
         file.open ("device.txt");
         file << props.name;
         file.close();
-   }
+    }
   std::string file_path = "./results_csv/" + filename;
 
   std::fstream fs2;
