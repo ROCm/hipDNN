@@ -38,7 +38,8 @@ TEST(group_convolution_fwd, func_check_group_conv) {
   std::string str_op_size  = convert_to_string((int*)op_size,4);
 
   compute_hipdnn_group_conv<float>(testConvolutionSizes, srcData.gpu(),
-                            filterData.gpu(), NULL, dstDataGPU.gpu(),&avg_time);
+                                   filterData.gpu(), NULL, dstDataGPU.gpu(),
+                                   dataType, &avg_time);
 
   std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
 
