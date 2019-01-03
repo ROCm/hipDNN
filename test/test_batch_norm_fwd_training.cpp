@@ -1,5 +1,4 @@
 #include "test_batchnorm_common.hpp"
-int modeB; //0:SPATIAL 1:Per_Activation
 
 TEST(BNorm_Fwd_train, func_check_spatial_fwd) {
   Desc inputDesc(1, 1, 4, 4);
@@ -7,7 +6,7 @@ TEST(BNorm_Fwd_train, func_check_spatial_fwd) {
   Desc bnScaleBiasMeanVarDesc(1, 1, 1, 1);
 
   float avg_time = 0;
-  modeB = 0;
+  bn_mode = HIPDNN_BATCHNORM_SPATIAL;
 
   Memory<float> srcData = createMemory<float>(inputDesc);
   Memory<float> dstDataGPU = createMemory<float>(outputDesc);
@@ -35,8 +34,8 @@ TEST(BNorm_Fwd_train, func_check_spatial_fwd) {
                                             resultRunningMean.gpu(),
                                             resultRunningVariance.gpu(),
                                             resultSaveMean.gpu(),
-                                            resultSaveVariance.gpu(), &avg_time,
-                                            modeB);
+                                            resultSaveVariance.gpu(), dataType,
+                                            &avg_time, bn_mode);
 
   std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
 
@@ -90,7 +89,7 @@ TEST(BNorm_Fwd_train, func_check_per_act_fwd) {
   Desc bnScaleBiasMeanVarDesc(1, 1, 4, 4);
 
   float avg_time = 0;
-  modeB = 1;
+  bn_mode = HIPDNN_BATCHNORM_PER_ACTIVATION;
 
   Memory<float> srcData = createMemory<float>(inputDesc);
   Memory<float> dstDataGPU = createMemory<float>(outputDesc);
@@ -118,8 +117,8 @@ TEST(BNorm_Fwd_train, func_check_per_act_fwd) {
                                             resultRunningMean.gpu(),
                                             resultRunningVariance.gpu(),
                                             resultSaveMean.gpu(),
-                                            resultSaveVariance.gpu(), &avg_time,
-                                            modeB);
+                                            resultSaveVariance.gpu(), dataType,
+                                            &avg_time, bn_mode);
 
   std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
 
@@ -173,7 +172,7 @@ TEST(BNorm_Fwd_train, func_check_spatial_fwd_channel3) {
   Desc bnScaleBiasMeanVarDesc(1, 3, 1, 1);
 
   float avg_time = 0;
-  modeB = 0;
+  bn_mode = HIPDNN_BATCHNORM_SPATIAL;
 
   Memory<float> srcData = createMemory<float>(inputDesc);
   Memory<float> dstDataGPU = createMemory<float>(outputDesc);
@@ -201,8 +200,8 @@ TEST(BNorm_Fwd_train, func_check_spatial_fwd_channel3) {
                                             resultRunningMean.gpu(),
                                             resultRunningVariance.gpu(),
                                             resultSaveMean.gpu(),
-                                            resultSaveVariance.gpu(), &avg_time,
-                                            modeB);
+                                            resultSaveVariance.gpu(), dataType,
+                                            &avg_time, bn_mode);
 
   std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
 
@@ -256,7 +255,7 @@ TEST(BNorm_Fwd_train, func_check_per_act_fwd_channel3) {
   Desc bnScaleBiasMeanVarDesc(1, 3, 4, 4);
 
   float avg_time = 0;
-  modeB = 1;
+  bn_mode = HIPDNN_BATCHNORM_PER_ACTIVATION;
 
   Memory<float> srcData = createMemory<float>(inputDesc);
   Memory<float> dstDataGPU = createMemory<float>(outputDesc);
@@ -284,8 +283,8 @@ TEST(BNorm_Fwd_train, func_check_per_act_fwd_channel3) {
                                             resultRunningMean.gpu(),
                                             resultRunningVariance.gpu(),
                                             resultSaveMean.gpu(),
-                                            resultSaveVariance.gpu(), &avg_time,
-                                            modeB);
+                                            resultSaveVariance.gpu(), dataType,
+                                            &avg_time, bn_mode);
 
   std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
 

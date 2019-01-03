@@ -1,7 +1,7 @@
 #include "test_batchnorm_common.hpp"
 
-int mode; //0:SPATIAL 1:Per_Activation
-int acc_grad;
+int acc_grad; //0:no_grad 1:accumulate_grad
+hipdnnBatchNormMode_t bn_mode;
 
 TEST(BNorm_Backward, func_check_spatial_no_grad_bwd) {
 
@@ -9,7 +9,7 @@ TEST(BNorm_Backward, func_check_spatial_no_grad_bwd) {
   Desc outputDesc(1, 1, 1, 1);
 
   float avg_time = 0;
-  mode = 0;
+  bn_mode = HIPDNN_BATCHNORM_SPATIAL;
   acc_grad = 0;
 
   Memory<float> srcData = createMemory<float>(inputDesc);
@@ -29,8 +29,9 @@ TEST(BNorm_Backward, func_check_spatial_no_grad_bwd) {
   std::string str_op_size  = convert_to_string((int*)op_size,4);
 
   compute_hipdnn_batchnorm_bwd<float>(BN_sizes, srcData.gpu(), dstDataGPU.gpu(),
-                                      resultBnScaleDiff.gpu(),
-                                      resultBnBiasDiff.gpu(), &avg_time, mode, acc_grad);
+                                     resultBnScaleDiff.gpu(),
+                                     resultBnBiasDiff.gpu(), &avg_time, dataType,
+                                     bn_mode, acc_grad);
 
   std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
 
@@ -70,7 +71,7 @@ TEST(BNorm_Backward, func_check_BNorm_bwd_per_act_mode_no_grad) {
   Desc outputDesc(1, 1, 1, 6);
 
   float avg_time = 0;
-  mode = 1;
+  bn_mode = HIPDNN_BATCHNORM_PER_ACTIVATION;
   acc_grad = 0;
 
   Memory<float> srcData = createMemory<float>(inputDesc);
@@ -91,8 +92,9 @@ TEST(BNorm_Backward, func_check_BNorm_bwd_per_act_mode_no_grad) {
   std::string str_op_size  = convert_to_string((int*)op_size,4);
 
   compute_hipdnn_batchnorm_bwd<float>(BN_sizes, srcData.gpu(), dstDataGPU.gpu(),
-                                      resultBnScaleDiff.gpu(),
-                                      resultBnBiasDiff.gpu(), &avg_time, mode, acc_grad);
+                                     resultBnScaleDiff.gpu(),
+                                     resultBnBiasDiff.gpu(), &avg_time, dataType,
+                                     bn_mode, acc_grad);
 
   std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
 
@@ -124,7 +126,7 @@ TEST(BNorm_Backward, func_check_BNorm_bwd_per_act_mode_no_grad) {
   dump_result_csv(filename, testname2, temp2, (int)resultBnScaleDiff.get_num_elements());
   dump_result_csv(filename, testname3, temp3, (int)resultBnBiasDiff.get_num_elements());
 
-  }
+}
 
 TEST(BNorm_Backward, func_check_spatial_grad_bwd) {
 
@@ -132,7 +134,7 @@ TEST(BNorm_Backward, func_check_spatial_grad_bwd) {
   Desc outputDesc(1, 1, 1, 1);
 
   float avg_time = 0;
-  mode = 0;
+  bn_mode = HIPDNN_BATCHNORM_SPATIAL;
   acc_grad = 1;
 
   Memory<float> srcData = createMemory<float>(inputDesc);
@@ -153,7 +155,8 @@ TEST(BNorm_Backward, func_check_spatial_grad_bwd) {
 
   compute_hipdnn_batchnorm_bwd<float>(BN_sizes, srcData.gpu(), dstDataGPU.gpu(),
                                      resultBnScaleDiff.gpu(),
-                                     resultBnBiasDiff.gpu(), &avg_time, mode, acc_grad);
+                                     resultBnBiasDiff.gpu(), &avg_time, dataType,
+                                     bn_mode, acc_grad);
 
   std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
 
@@ -193,7 +196,7 @@ TEST(BNorm_Backward, func_check_BNorm_bwd_per_act_mode_grad) {
   Desc outputDesc(1, 1, 1, 6);
 
   float avg_time = 0;
-  mode = 1;
+  bn_mode = HIPDNN_BATCHNORM_PER_ACTIVATION;
   acc_grad = 1;
 
   Memory<float> srcData = createMemory<float>(inputDesc);
@@ -213,8 +216,9 @@ TEST(BNorm_Backward, func_check_BNorm_bwd_per_act_mode_grad) {
   std::string str_op_size  = convert_to_string((int*)op_size,4);
 
   compute_hipdnn_batchnorm_bwd<float>(BN_sizes, srcData.gpu(), dstDataGPU.gpu(),
-                                      resultBnScaleDiff.gpu(),
-                                      resultBnBiasDiff.gpu(), &avg_time, mode, acc_grad);
+                                     resultBnScaleDiff.gpu(),
+                                     resultBnBiasDiff.gpu(), &avg_time, dataType,
+                                     bn_mode, acc_grad);
 
   std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
 

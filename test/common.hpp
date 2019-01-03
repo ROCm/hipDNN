@@ -8,6 +8,11 @@
 #include "hip/hip_runtime_api.h"
 #include "hip/hip_fp16.h"
 
+extern hipdnnDataType_t dataType;
+extern hipdnnActivationMode_t act_mode;
+extern hipdnnBatchNormMode_t bn_mode;
+extern hipdnnPoolingMode_t pool_mode;
+
 inline Desc calculate_Dims(Desc inputDesc, Desc filterDesc, int pad[2],
                                int stride[2], int dilution[2]) {
   assert(inputDesc.C == filterDesc.C);

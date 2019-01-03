@@ -6,7 +6,8 @@
 
 template <typename dataType>
 void compute_hipdnn_conv_forward(convulution_Size &c, dataType *src,
-            dataType *weights, dataType *bias, dataType *dst,float *avg_time) {
+            dataType *weights, dataType *bias, dataType *dst,
+            hipdnnDataType_t hipdataType, float *avg_time) {
 
   hipdnnHandle_t hipdnn;
   checkHIPDNN(hipdnnCreate(&hipdnn));
@@ -14,12 +15,12 @@ void compute_hipdnn_conv_forward(convulution_Size &c, dataType *src,
   hipdnnTensorDescriptor_t in_desc;
   checkHIPDNN(hipdnnCreateTensorDescriptor(&in_desc));
   checkHIPDNN(hipdnnSetTensor4dDescriptor(
-      in_desc, HIPDNN_TENSOR_NCHW, HIPDNN_DATA_FLOAT, c.mb, c.ic, c.ih, c.iw));
+      in_desc, HIPDNN_TENSOR_NCHW, hipdataType, c.mb, c.ic, c.ih, c.iw));
 
   hipdnnFilterDescriptor_t filt_desc;
   checkHIPDNN(hipdnnCreateFilterDescriptor(&filt_desc));
   int filterDimA[] = {c.oc, c.ic, c.kh, c.kw};
-  checkHIPDNN(hipdnnSetFilterNdDescriptor(filt_desc, HIPDNN_DATA_FLOAT,
+  checkHIPDNN(hipdnnSetFilterNdDescriptor(filt_desc, hipdataType,
                                           HIPDNN_TENSOR_NCHW, 4, filterDimA));
 
   hipdnnConvolutionDescriptor_t conv_desc;
@@ -27,7 +28,7 @@ void compute_hipdnn_conv_forward(convulution_Size &c, dataType *src,
 
   checkHIPDNN(hipdnnSetConvolution2dDescriptor(
       conv_desc, c.padh, c.padw, c.strh, c.strw, c.dilh, c.dilw,
-      HIPDNN_CROSS_CORRELATION, HIPDNN_DATA_FLOAT));
+      HIPDNN_CROSS_CORRELATION, hipdataType));
 
   checkHIPDNN(hipdnnGetConvolution2dForwardOutputDim(
       conv_desc, in_desc, filt_desc, &c.mb, &c.oc, &c.oh, &c.ow));
@@ -35,7 +36,7 @@ void compute_hipdnn_conv_forward(convulution_Size &c, dataType *src,
   hipdnnTensorDescriptor_t out_desc;
   checkHIPDNN(hipdnnCreateTensorDescriptor(&out_desc));
   checkHIPDNN(hipdnnSetTensor4dDescriptor(
-      out_desc, HIPDNN_TENSOR_NCHW, HIPDNN_DATA_FLOAT, c.mb, c.oc, c.oh, c.ow));
+      out_desc, HIPDNN_TENSOR_NCHW, hipdataType, c.mb, c.oc, c.oh, c.ow));
 
   hipdnnConvolutionFwdAlgo_t algo;
 
@@ -92,7 +93,8 @@ void compute_hipdnn_conv_forward(convulution_Size &c, dataType *src,
 template <typename dataType>
 void compute_hipdnn_conv_backward_filter(convulution_Size &c, dataType *src,
                              dataType *weights, dataType *grad, dataType *bias,
-                             dataType *dst, float *avg_time) {
+                             dataType *dst, hipdnnDataType_t hipdataType,
+                             float *avg_time) {
 
   hipdnnHandle_t hipdnn;
   checkHIPDNN(hipdnnCreate(&hipdnn));
@@ -100,19 +102,19 @@ void compute_hipdnn_conv_backward_filter(convulution_Size &c, dataType *src,
   hipdnnTensorDescriptor_t in_desc;
   checkHIPDNN(hipdnnCreateTensorDescriptor(&in_desc));
   checkHIPDNN(hipdnnSetTensor4dDescriptor(
-      in_desc, HIPDNN_TENSOR_NCHW, HIPDNN_DATA_FLOAT, c.mb, c.ic, c.ih, c.iw));
+      in_desc, HIPDNN_TENSOR_NCHW, hipdataType, c.mb, c.ic, c.ih, c.iw));
 
   hipdnnFilterDescriptor_t filt_desc;
   checkHIPDNN(hipdnnCreateFilterDescriptor(&filt_desc));
   int filterDimA[] = {c.oc, c.ic, c.kh, c.kw};
-  checkHIPDNN(hipdnnSetFilterNdDescriptor(filt_desc, HIPDNN_DATA_FLOAT,
+  checkHIPDNN(hipdnnSetFilterNdDescriptor(filt_desc, hipdataType,
                                           HIPDNN_TENSOR_NCHW, 4, filterDimA));
 
   hipdnnConvolutionDescriptor_t conv_desc;
   checkHIPDNN(hipdnnCreateConvolutionDescriptor(&conv_desc));
   checkHIPDNN(hipdnnSetConvolution2dDescriptor(
       conv_desc, c.padh, c.padw, c.strh, c.strw, c.dilh, c.dilw,
-      HIPDNN_CROSS_CORRELATION, HIPDNN_DATA_FLOAT));
+      HIPDNN_CROSS_CORRELATION, hipdataType));
 
   checkHIPDNN(hipdnnGetConvolution2dForwardOutputDim(
         conv_desc, in_desc, filt_desc, &c.mb, &c.oc, &c.oh, &c.ow));
@@ -120,7 +122,7 @@ void compute_hipdnn_conv_backward_filter(convulution_Size &c, dataType *src,
   hipdnnTensorDescriptor_t out_desc;
   checkHIPDNN(hipdnnCreateTensorDescriptor(&out_desc));
   checkHIPDNN(hipdnnSetTensor4dDescriptor(
-      out_desc, HIPDNN_TENSOR_NCHW, HIPDNN_DATA_FLOAT, c.mb, c.oc, c.oh, c.ow));
+      out_desc, HIPDNN_TENSOR_NCHW, hipdataType, c.mb, c.oc, c.oh, c.ow));
 
   int MaxAlgoCount = 2;
   size_t ws_size{0};
@@ -180,7 +182,7 @@ void compute_hipdnn_conv_backward_filter(convulution_Size &c, dataType *src,
 template <typename dataType>
 void compute_hipdnn_conv_backward_data(convulution_Size &c, dataType *src,
                              dataType *weights, dataType *grad, dataType *bias,
-                             dataType *dst, float *avg_time) {
+                             dataType *dst, hipdnnDataType_t hipdataType, float *avg_time) {
 
   hipdnnHandle_t hipdnn;
   checkHIPDNN(hipdnnCreate(&hipdnn));
@@ -188,19 +190,19 @@ void compute_hipdnn_conv_backward_data(convulution_Size &c, dataType *src,
   hipdnnTensorDescriptor_t in_desc;
   checkHIPDNN(hipdnnCreateTensorDescriptor(&in_desc));
   checkHIPDNN(hipdnnSetTensor4dDescriptor(
-      in_desc, HIPDNN_TENSOR_NCHW, HIPDNN_DATA_FLOAT, c.mb, c.ic, c.ih, c.iw));
+      in_desc, HIPDNN_TENSOR_NCHW, hipdataType, c.mb, c.ic, c.ih, c.iw));
 
   hipdnnFilterDescriptor_t filt_desc;
   checkHIPDNN(hipdnnCreateFilterDescriptor(&filt_desc));
   int filterDimA[] = {c.oc, c.ic, c.kh, c.kw};
-  checkHIPDNN(hipdnnSetFilterNdDescriptor(filt_desc, HIPDNN_DATA_FLOAT,
+  checkHIPDNN(hipdnnSetFilterNdDescriptor(filt_desc, hipdataType,
                                           HIPDNN_TENSOR_NCHW, 4, filterDimA));
 
   hipdnnConvolutionDescriptor_t conv_desc;
   checkHIPDNN(hipdnnCreateConvolutionDescriptor(&conv_desc));
   checkHIPDNN(hipdnnSetConvolution2dDescriptor(
       conv_desc, c.padh, c.padw, c.strh, c.strw, c.dilh, c.dilw,
-      HIPDNN_CROSS_CORRELATION, HIPDNN_DATA_FLOAT));
+      HIPDNN_CROSS_CORRELATION, hipdataType));
 
   checkHIPDNN(hipdnnGetConvolution2dForwardOutputDim(
       conv_desc, in_desc, filt_desc, &c.mb, &c.oc, &c.oh, &c.ow));
@@ -208,7 +210,7 @@ void compute_hipdnn_conv_backward_data(convulution_Size &c, dataType *src,
   hipdnnTensorDescriptor_t out_desc;
   checkHIPDNN(hipdnnCreateTensorDescriptor(&out_desc));
   checkHIPDNN(hipdnnSetTensor4dDescriptor(
-      out_desc, HIPDNN_TENSOR_NCHW, HIPDNN_DATA_FLOAT, c.mb, c.oc, c.oh, c.ow));
+      out_desc, HIPDNN_TENSOR_NCHW, hipdataType, c.mb, c.oc, c.oh, c.ow));
 
   hipdnnConvolutionFwdAlgo_t algo;
   algo = HIPDNN_CONVOLUTION_FWD_ALGO_IMPLICIT_GEMM;
