@@ -123,7 +123,7 @@ TEST(pooling_fwd, func_check_AVERAGE_COUNT_INCLUDE_PADDING) {
   dump_result_csv(filename, testname, temp, (int)dstDataGPU.get_num_elements());
 }
 
-TEST(pooling_fwd, func_check_AVERAGE_COUNT_EXCLUDE_PADDING) {
+/*TEST(pooling_fwd, func_check_AVERAGE_COUNT_EXCLUDE_PADDING) {
 
   pool_mode = HIPDNN_POOLING_AVERAGE_COUNT_EXCLUDE_PADDING;
   test_pooling_descriptor pool(1, 1, 4, 4, 2, 2, 2, 2, 2, 2, 2, 2);
@@ -161,7 +161,7 @@ TEST(pooling_fwd, func_check_AVERAGE_COUNT_EXCLUDE_PADDING) {
 
   write_to_csv(strt, str, testname, avg_time, str_ip_size, str_k_size, str_op_size);
   dump_result_csv(filename, testname, temp, (int)dstDataGPU.get_num_elements());
-}
+}*/
 
 TEST(pooling_fwd, func_check_batch32) {
 
@@ -283,7 +283,6 @@ TEST(pooling_fwd, func_check_half) {
   float avg_time = 0;
 
   populateMemoryRandom<half>(srcData);
-
   int ip_size[4] = {pool.mb, pool.c, pool.ih, pool.iw};
   int k_size[4] = {pool.mb, pool.c, pool.kh, pool.kw};
   int op_size[4] =  {pool.mb, pool.c, pool.oh, pool.ow};
@@ -295,18 +294,16 @@ TEST(pooling_fwd, func_check_half) {
   hipdnn_pooling_forward(pool, srcData.gpu(), dstDataGPU.gpu(), pool_mode, dataType, false, &avg_time);
   std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
 
-  float temp1 = __half2float(*(__half*)dstDataGPU.getDataFromGPU());
-  float *temp = &temp1;
+  Memory<float> dstDataGPU_f(pool.mb * pool.c * pool.oh * pool.ow);
+
+  Convert_toFloat<half>(dstDataGPU, dstDataGPU_f);
+  float *temp = dstDataGPU_f.getDataFromGPU();
 
   std::string strt = "./result_unittest.csv";
   std::string testname = "pooling_fwd:func_half_datatype";
   std::string filename="pooling_forward.csv";
 
   std::string str  = convert_to_string((float*)temp,(int)dstDataGPU.get_num_elements());
-
-  temp1 = __half2float(*(__half*)srcData.getDataFromGPU());
-  float *temp2 = &temp1;
-  std::string ip = convert_to_string((float*)temp2,(int)srcData.get_num_elements());
 
   write_to_csv(strt, str, testname, avg_time, str_ip_size, str_k_size, str_op_size);
   dump_result_csv(filename, testname, temp, (int)dstDataGPU.get_num_elements());
