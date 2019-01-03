@@ -85,8 +85,6 @@ TEST(convolution_pooling_fwd_bwd_intg, func_check_naive_conv_pool_fwd_bwd) {
   compute_hipdnn_conv_forward<float>(testConvolutionSizes, srcDataConv.gpu(),
                           filterData.gpu(), NULL, dstDataGPU.gpu(),&avg_time1);
 
-  hipdnn_pooling_forward<float>(pool, dstDataGPU.gpu(), dstData.gpu(), poolCPI_mode, dataType, true, &avg_time2);
-
   hipdnn_pooling_backward<float>(test_case, dstDataGPU.gpu(), gradData1.gpu(),
                            dstData.gpu(), poolCPI_mode, dataType, &avg_time3);
 
