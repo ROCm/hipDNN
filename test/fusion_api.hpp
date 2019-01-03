@@ -7,7 +7,8 @@
 template <typename dataType>
 void compute_hipdnn_fusion_api(convulution_Size &c, dataType *src,
                              dataType *weights, dataType *bias_data,
-                             dataType *dst, float *avg_time) {
+                             dataType *dst, hipdnnDataType_t hipdataType,
+                             float *avg_time) {
 
 
   hipdnnHandle_t hipdnn;
@@ -16,21 +17,21 @@ void compute_hipdnn_fusion_api(convulution_Size &c, dataType *src,
   hipdnnTensorDescriptor_t in_desc;
   checkHIPDNN(hipdnnCreateTensorDescriptor(&in_desc));
   checkHIPDNN(hipdnnSetTensor4dDescriptor(
-          in_desc, HIPDNN_TENSOR_NCHW, HIPDNN_DATA_FLOAT,
+          in_desc, HIPDNN_TENSOR_NCHW, hipdataType,
           c.mb, c.ic, c.ih, c.iw));
 
   int filterDimA[] = {c.oc, c.ic, c.kh, c.kw};
   hipdnnFilterDescriptor_t filt_desc;
   checkHIPDNN(hipdnnCreateFilterDescriptor(&filt_desc));
   checkHIPDNN(hipdnnSetFilterNdDescriptor(
-          filt_desc, HIPDNN_DATA_FLOAT,HIPDNN_TENSOR_NCHW,
+          filt_desc, hipdataType,HIPDNN_TENSOR_NCHW,
           4, filterDimA));
 
   hipdnnConvolutionDescriptor_t conv_desc;
   checkHIPDNN(hipdnnCreateConvolutionDescriptor(&conv_desc));
   checkHIPDNN(hipdnnSetConvolution2dDescriptor(
           conv_desc, c.padh, c.padw, c.strh, c.strw, c.dilh, c.dilw,
-          HIPDNN_CROSS_CORRELATION, HIPDNN_DATA_FLOAT));
+          HIPDNN_CROSS_CORRELATION, hipdataType));
 
   checkHIPDNN(hipdnnGetConvolution2dForwardOutputDim(
           conv_desc, in_desc, filt_desc,
@@ -38,7 +39,7 @@ void compute_hipdnn_fusion_api(convulution_Size &c, dataType *src,
   hipdnnTensorDescriptor_t out_desc;
   checkHIPDNN(hipdnnCreateTensorDescriptor(&out_desc));
   checkHIPDNN(hipdnnSetTensor4dDescriptor(
-          out_desc, HIPDNN_TENSOR_NCHW, HIPDNN_DATA_FLOAT,
+          out_desc, HIPDNN_TENSOR_NCHW, hipdataType,
           c.mb, c.oc, c.oh, c.ow));
 
   hipdnnConvolutionFwdAlgo_t algo;
@@ -60,7 +61,7 @@ void compute_hipdnn_fusion_api(convulution_Size &c, dataType *src,
   hipdnnTensorDescriptor_t bias_desc;
   checkHIPDNN(hipdnnCreateTensorDescriptor(&bias_desc));
   checkHIPDNN(hipdnnSetTensor4dDescriptor(
-          bias_desc, HIPDNN_TENSOR_NCHW, HIPDNN_DATA_FLOAT,
+          bias_desc, HIPDNN_TENSOR_NCHW, hipdataType,
           c.mb, c.oc , c.oh, c.ow));
 
   float alphaB = 1.f;
@@ -132,7 +133,8 @@ void compute_hipdnn_fusion_api(convulution_Size &c, dataType *src,
 
 template <typename dataType>
 void compute_hipdnn_fusion_api_NA(convulution_Size &c, dataType *src,
-                                  dataType *dst, float *avg_time) {
+                                  dataType *dst, hipdnnDataType_t hipdataType,
+                                  float *avg_time) {
 
   hipdnnHandle_t hipdnn;
   checkHIPDNN(hipdnnCreate(&hipdnn));
@@ -140,7 +142,7 @@ void compute_hipdnn_fusion_api_NA(convulution_Size &c, dataType *src,
   hipdnnTensorDescriptor_t in_desc;
   checkHIPDNN(hipdnnCreateTensorDescriptor(&in_desc));
   checkHIPDNN(hipdnnSetTensor4dDescriptor(in_desc, HIPDNN_TENSOR_NCHW,
-               HIPDNN_DATA_FLOAT, c.mb, c.ic, c.ih, c.iw));
+               hipdataType, c.mb, c.ic, c.ih, c.iw));
 
   hipdnnFusionPlanDescriptor_t fusePlanDesc;
   hipdnnFusionDirection_t fuseDirection = HIPDNN_VERTICAL_FUSION;
@@ -149,7 +151,7 @@ void compute_hipdnn_fusion_api_NA(convulution_Size &c, dataType *src,
   hipdnnTensorDescriptor_t out_desc;
   checkHIPDNN(hipdnnCreateTensorDescriptor(&out_desc));
   checkHIPDNN(hipdnnSetTensor4dDescriptor(out_desc, HIPDNN_TENSOR_NCHW,
-               HIPDNN_DATA_FLOAT, c.mb, c.ic, c.ih, c.iw));
+               hipdataType, c.mb, c.ic, c.ih, c.iw));
 
   // perform
   float alpha = 1.f;
@@ -162,7 +164,7 @@ void compute_hipdnn_fusion_api_NA(convulution_Size &c, dataType *src,
 
   checkHIPDNN(hipdnnCreateTensorDescriptor(&bnScaleBiasMeanVarDesc));
   checkHIPDNN(hipdnnSetTensor4dDescriptor(bnScaleBiasMeanVarDesc,
-               HIPDNN_TENSOR_NCHW, HIPDNN_DATA_FLOAT, 1, c.oc, 1, 1));
+               HIPDNN_TENSOR_NCHW, hipdataType, 1, c.oc, 1, 1));
 
   float * resultRunningMean;
   hipMalloc(&resultRunningMean, 1 * c.oc  *sizeof(float));
@@ -190,7 +192,7 @@ void compute_hipdnn_fusion_api_NA(convulution_Size &c, dataType *src,
 
   checkHIPDNN(hipdnnCreateTensorDescriptor(&bnScaleBiasMeanVarDesc));
   checkHIPDNN(hipdnnSetTensor4dDescriptor(
-               bnScaleBiasMeanVarDesc, HIPDNN_TENSOR_NCHW, HIPDNN_DATA_FLOAT,
+               bnScaleBiasMeanVarDesc, HIPDNN_TENSOR_NCHW, hipdataType,
                1, c.oc, 1, 1));
 
 
@@ -211,7 +213,8 @@ void compute_hipdnn_fusion_api_NA(convulution_Size &c, dataType *src,
   double reluCeilingOrAlpha=1;
   double activBeta=1;
   double activExp=1;
-  hipdnnSetOpArgsActivForward(args, activOp, &alpha, &beta,reluCeilingOrAlpha, activBeta ,activExp);
+  hipdnnSetOpArgsActivForward(args, activOp, &alpha, &beta,reluCeilingOrAlpha,
+                              activBeta ,activExp);
 
   high_resolution_timer_t timer;
   std::vector<double> time_vector(1, 0);
