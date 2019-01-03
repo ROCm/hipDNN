@@ -104,8 +104,6 @@ TEST(convolution_pooling_act_fwd_bwd_intg, func_check_conv_pool_act_fwd_bwd) {
 
   compute_hipdnn_activation_forward(test_case1, dstDataGPU.gpu(), dataDst_act.gpu(), act_mode, &avg_time2);
 
-  hipdnn_pooling_forward<float>(pool, dataDst_act.gpu(), dstData.gpu(), pool_mode, dataType, true, &avg_time3);
-
   hipdnn_pooling_backward<float>(test_case, dataDst_act.gpu(), gradData1.gpu(),
                        dstData.gpu(), pool_mode, dataType, &avg_time4);
 
