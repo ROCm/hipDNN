@@ -152,8 +152,8 @@ TEST(BNorm_Fwd_train, func_check_per_act_fwd) {
                str_op_size);
   write_to_csv(strt, str1, testname1,avg_time, str_ip_size, str_k_size,
                str_op_size);
-  write_to_csv(strt, str2, testname2,avg_time, str_ip_size, str_k_size,
-               str_op_size);
+  //write_to_csv(strt, str2, testname2,avg_time, str_ip_size, str_k_size,
+  //             str_op_size);
   write_to_csv(strt, str3, testname3,avg_time, str_ip_size, str_k_size,
                str_op_size);
   write_to_csv(strt, str4, testname4,avg_time, str_ip_size, str_k_size,
@@ -161,7 +161,7 @@ TEST(BNorm_Fwd_train, func_check_per_act_fwd) {
 
   dump_result_csv(filename, testname, temp, (int)dstDataGPU.get_num_elements());
   dump_result_csv(filename, testname1, temp1, (int)resultRunningMean.get_num_elements());
-  dump_result_csv(filename, testname2, temp2, (int)resultRunningVariance.get_num_elements());
+  //dump_result_csv(filename, testname2, temp2, (int)resultRunningVariance.get_num_elements());
   dump_result_csv(filename, testname3, temp3, (int)resultSaveMean.get_num_elements());
   dump_result_csv(filename, testname4, temp4, (int)resultSaveVariance.get_num_elements());
 
@@ -318,8 +318,8 @@ TEST(BNorm_Fwd_train, func_check_per_act_fwd_channel3) {
                str_op_size);
   write_to_csv(strt, str1, testname1,avg_time, str_ip_size, str_k_size,
                str_op_size);
-  write_to_csv(strt, str2, testname2,avg_time, str_ip_size, str_k_size,
-               str_op_size);
+  //write_to_csv(strt, str2, testname2,avg_time, str_ip_size, str_k_size,
+  //             str_op_size);
   write_to_csv(strt, str3, testname3,avg_time, str_ip_size, str_k_size,
                str_op_size);
   write_to_csv(strt, str4, testname4,avg_time, str_ip_size, str_k_size,
@@ -327,7 +327,7 @@ TEST(BNorm_Fwd_train, func_check_per_act_fwd_channel3) {
 
   dump_result_csv(filename, testname, temp, (int)dstDataGPU.get_num_elements());
   dump_result_csv(filename, testname1, temp1, (int)resultRunningMean.get_num_elements());
-  dump_result_csv(filename, testname2, temp2, (int)resultRunningVariance.get_num_elements());
+  //dump_result_csv(filename, testname2, temp2, (int)resultRunningVariance.get_num_elements());
   dump_result_csv(filename, testname3, temp3, (int)resultSaveMean.get_num_elements());
   dump_result_csv(filename, testname4, temp4, (int)resultSaveVariance.get_num_elements());
 
