@@ -1,13 +1,13 @@
 #include "test_activation_common.hpp"
 
-hipdnnActivationMode_t actB_mode;
+hipdnnActivationMode_t act_mode;
 
 TEST(activation_backward, func_test_activation_RELU) {
 
   activation_params_t test_case(1, 1, 224, 244);
   float avg_time = 0;
 
-  actB_mode = HIPDNN_ACTIVATION_RELU;
+  act_mode = HIPDNN_ACTIVATION_RELU;
 
   Memory<float> dataSrc(test_case.n * test_case.channels * test_case.height *
                         test_case.width);
@@ -29,11 +29,11 @@ TEST(activation_backward, func_test_activation_RELU) {
   std::string str_op_size  = convert_to_string((int*)op_size,4);
 
   compute_hipdnn_activation_forward(test_case, dataSrc.gpu(), dataDst.gpu(),
-                                    actB_mode, &avg_time);
+                                    dataType,act_mode, &avg_time);
 
   compute_hipdnn_activation_backward<float>(test_case, dataSrc.gpu(),
                                             dataGrad.gpu(), dataDst.gpu(),
-                                            actB_mode, &avg_time);
+                                            dataType, act_mode, &avg_time);
 
   std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
 
@@ -57,7 +57,7 @@ TEST(activation_backward, func_test_activation_SIGMOID) {
   activation_params_t test_case(1, 1, 224, 244);
   float avg_time = 0;
 
-  actB_mode = HIPDNN_ACTIVATION_SIGMOID;
+  act_mode = HIPDNN_ACTIVATION_SIGMOID;
 
   Memory<float> dataSrc(test_case.n * test_case.channels * test_case.height *
                         test_case.width);
@@ -79,11 +79,11 @@ TEST(activation_backward, func_test_activation_SIGMOID) {
   std::string str_op_size  = convert_to_string((int*)op_size,4);
 
   compute_hipdnn_activation_forward(test_case, dataSrc.gpu(), dataDst.gpu(),
-                                    actB_mode, &avg_time);
+                                    dataType, act_mode, &avg_time);
 
   compute_hipdnn_activation_backward<float>(test_case, dataSrc.gpu(),
                                             dataGrad.gpu(), dataDst.gpu(),
-                                            actB_mode, &avg_time);
+                                            dataType, act_mode, &avg_time);
 
   std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
 
@@ -107,7 +107,7 @@ TEST(activation_backward, func_test_activation_TANH) {
   activation_params_t test_case(1, 1, 224, 244);
   float avg_time = 0;
 
-  actB_mode = HIPDNN_ACTIVATION_TANH;
+  act_mode = HIPDNN_ACTIVATION_TANH;
 
   Memory<float> dataSrc(test_case.n * test_case.channels * test_case.height *
                         test_case.width);
@@ -129,11 +129,11 @@ TEST(activation_backward, func_test_activation_TANH) {
   std::string str_op_size  = convert_to_string((int*)op_size,4);
 
   compute_hipdnn_activation_forward(test_case, dataSrc.gpu(), dataDst.gpu(),
-                                    actB_mode, &avg_time);
+                                    dataType, act_mode, &avg_time);
 
   compute_hipdnn_activation_backward<float>(test_case, dataSrc.gpu(),
                                             dataGrad.gpu(), dataDst.gpu(),
-                                            actB_mode, &avg_time);
+                                            dataType, act_mode, &avg_time);
 
   std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
 
@@ -156,7 +156,7 @@ TEST(activation_backward, func_test_activation_batch32) {
 
   activation_params_t test_case(32, 1, 224, 244);
   float avg_time = 0;
-  actB_mode = HIPDNN_ACTIVATION_RELU;
+  act_mode = HIPDNN_ACTIVATION_RELU;
 
   Memory<float> dataSrc(test_case.n * test_case.channels * test_case.height *
                         test_case.width);
@@ -178,11 +178,11 @@ TEST(activation_backward, func_test_activation_batch32) {
   std::string str_op_size  = convert_to_string((int*)op_size,4);
 
   compute_hipdnn_activation_forward(test_case, dataSrc.gpu(), dataDst.gpu(),
-                                    actB_mode, &avg_time);
+                                    dataType, act_mode, &avg_time);
 
   compute_hipdnn_activation_backward<float>(test_case, dataSrc.gpu(),
                                             dataGrad.gpu(), dataDst.gpu(),
-                                            actB_mode, &avg_time);
+                                            dataType, act_mode, &avg_time);
 
   std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
 
@@ -205,7 +205,7 @@ TEST(activation_backward, func_test_activation_batch64) {
 
   activation_params_t test_case(64, 1, 224, 244);
   float avg_time = 0;
-  actB_mode = HIPDNN_ACTIVATION_RELU;
+  act_mode = HIPDNN_ACTIVATION_RELU;
 
   Memory<float> dataSrc(test_case.n * test_case.channels * test_case.height *
                         test_case.width);
@@ -227,11 +227,11 @@ TEST(activation_backward, func_test_activation_batch64) {
   std::string str_op_size  = convert_to_string((int*)op_size,4);
 
   compute_hipdnn_activation_forward(test_case, dataSrc.gpu(), dataDst.gpu(),
-                                    actB_mode, &avg_time);
+                                    dataType, act_mode, &avg_time);
 
   compute_hipdnn_activation_backward<float>(test_case, dataSrc.gpu(),
                                             dataGrad.gpu(), dataDst.gpu(),
-                                            actB_mode, &avg_time);
+                                            dataType, act_mode, &avg_time);
 
   std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
 
@@ -254,7 +254,7 @@ TEST(activation_backward, func_test_activation_batch128) {
 
   activation_params_t test_case(128, 1, 4, 4);
   float avg_time = 0;
-  actB_mode = HIPDNN_ACTIVATION_RELU;
+  act_mode = HIPDNN_ACTIVATION_RELU;
 
   Memory<float> dataSrc(test_case.n * test_case.channels * test_case.height *
                         test_case.width);
@@ -275,11 +275,11 @@ TEST(activation_backward, func_test_activation_batch128) {
   std::string str_op_size  = convert_to_string((int*)op_size,4);
 
   compute_hipdnn_activation_forward(test_case, dataSrc.gpu(), dataDst.gpu(),
-                                    actB_mode, &avg_time);
+                                    dataType, act_mode, &avg_time);
 
   compute_hipdnn_activation_backward<float>(test_case, dataSrc.gpu(),
                                             dataGrad.gpu(), dataDst.gpu(),
-                                            actB_mode, &avg_time);
+                                            dataType, act_mode, &avg_time);
 
   std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
 
