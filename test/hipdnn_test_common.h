@@ -10,11 +10,10 @@
 #include <iostream>
 #include <iterator>
 #include <memory>
-#include <random>
-#include <vector>
 #include <numeric>
 #include "csv/csv_integration.hpp"
 #include "timer/timer.hpp"
+#include "hip/hip_fp16.h"
 
 #define BENCHMARK 1
 
@@ -50,12 +49,11 @@ inline __global__ void dev_const(hipLaunchParm lp, float *px, float k) {
 }
 inline __global__ void dev_iota(hipLaunchParm lp, float *px) {
   int tid = hipThreadIdx_x + hipBlockIdx_x * hipBlockDim_x;
-  px[tid] = tid + 1;
+  px[tid] = (tid + 1) % 255;
 }
 
 template <typename dataType> struct Memory {
 private:
-  std::vector<dataType> hVec;
   dataType *h_data = NULL;
   dataType *d_data = NULL;
   size_t mem_size = 0;
@@ -66,7 +64,6 @@ public:
   Memory(int num_of_items) {
     this->num_of_items = num_of_items;
     mem_size = sizeof(dataType) * this->num_of_items;
-    this->hVec.reserve(this->num_of_items);
     this->h_data = (dataType *)malloc(this->mem_size);
     memset(h_data, 0, this->mem_size);
     HIP_CALL(hipMalloc((void **)&this->d_data, this->mem_size));
@@ -77,8 +74,6 @@ public:
   dataType *gpu() { return this->d_data; }
 
   size_t size() { return this->mem_size; }
-
-  std::vector<dataType> get_vector() { return this->hVec; }
 
   int get_num_elements() { return this->num_of_items; }
 
@@ -145,28 +140,25 @@ void Equals(Memory<dataType> &A, Memory<dataType> &B) {
   }
 }
 
+template <typename dataType> void Convert_toFloat (Memory<dataType> &mem, Memory<float> &mem_f) {
+   for (int i = 0; i <= mem.get_num_elements(); i++) {
+       *(mem_f.cpu() + i) = __half2float(*(mem.cpu() + i)); }
+     HIP_CALL(hipMemcpy(mem_f.gpu(), mem_f.cpu(), mem_f.size(), hipMemcpyHostToDevice));
+}
+
 template <typename dataType> void populateMemoryRandom(Memory<dataType> &mem) {
-  // First create an instance of an engine.
-  std::random_device rnd_device;
-  // Specify the engine and distribution.
-  std::mt19937 mersenne_engine{rnd_device()}; // Generates random integers
-  std::uniform_int_distribution<int> dist{-50, 5};
   std::cout << "Creating vector of Size: " << mem.get_num_elements() << std::endl;
-  std::vector<dataType> v(mem.get_num_elements());
-  auto gen = [&dist, &mersenne_engine]() { return dist(mersenne_engine); };
-int i = 0;
-	std::generate(v.begin(), v.end(), [&i]() mutable{
-	                return ++i % 10;
-		});
-//  std::iota(v.begin(), v.end(), -5);
-  std::copy(v.begin(), v.end(), mem.cpu());
+  float n = 1.0f;
+  for (int i = 0; i <= mem.get_num_elements(); i++) {
+      if(n == 256) { n = 1.0f; }
+      *(mem.cpu() + i) = n++; }
   // Copy the stuff to device too
   HIP_CALL(hipMemcpy(mem.gpu(), mem.cpu(), mem.size(), hipMemcpyHostToDevice));
 }
 
 template <typename dataType> void populateMemory(Memory<dataType> &mem, float n) {
-   std::vector<dataType> v(mem.get_num_elements(), n);
-   std::copy(v.begin(), v.end(), mem.cpu());
+   for (int i = 0; i <= mem.get_num_elements(); i++)
+      *(mem.cpu() + i) = n;
   // Copy the stuff to device too
   HIP_CALL(hipMemcpy(mem.gpu(), mem.cpu(), mem.size(), hipMemcpyHostToDevice));
 }
