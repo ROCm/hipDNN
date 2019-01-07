@@ -5,14 +5,17 @@ from termcolor import colored
 
 csv.field_size_limit(sys.maxsize)
 
-hcc_folder = sys.argv[1]
-nvcc_folder = sys.argv[2]
+abs_path = os.path.abspath('.')
+nv_result_path = abs_path.rsplit('/',1)[0]
 
-hcc_result = sys.argv[3]
-nvcc_result = sys.argv[4]
+hcc_folder = os.path.join(abs_path,'results_csv')
+nvcc_folder = os.path.join(nv_result_path,'NV_results','results_csv_nv')
 
-hcc_dev = sys.argv[5]
-nvcc_dev = sys.argv[6]
+hcc_result = os.path.join(abs_path,'result_unittest.csv')
+nvcc_result = os.path.join(nv_result_path,'NV_results','result_unittest_nv.csv')
+
+hcc_dev = os.path.join(abs_path,'device.txt')
+nvcc_dev = os.path.join(nv_result_path,'NV_results','device_nv.txt')
 
 with open(hcc_dev, 'r') as myfile1:
   data1 = myfile1.read()
@@ -33,7 +36,7 @@ for line2 in reader2:
 string1 = 'Performance in '+str(data2)+' (microseconds)'
 string2 = 'Performance in '+str(data1)+' (microseconds)'
 string3 = str(data1)+' vs '+str(data2)+' speedup'
-csvfile = open('final_results.csv', 'w+')
+csvfile = open('/home/neel/sree/latest/hipDNN/build/final_results.csv', 'w+')
 
 fieldnames = ['TestName','Results','Input size', 'kernel size',
               'output size', string1, string2, string3]
