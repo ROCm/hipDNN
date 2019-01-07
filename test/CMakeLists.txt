@@ -27,3 +27,7 @@ endif()
 
 set_target_properties(unittest PROPERTIES SKIP_BUILD_RPATH 1)
 set_target_properties(unittest PROPERTIES LINK_FLAGS "${CMAKE_SOURCE_DIR}/build/library/libhipdnn.so")
+FILE(GLOB HIPDNNRESULT "${CMAKE_CURRENT_SOURCE_DIR}/utils/csv/compare_result.cpp")
+ADD_EXECUTABLE(compare_results ${HIPDNNRESULT})
+file(COPY ${CMAKE_SOURCE_DIR}/execute.sh
+     DESTINATION ${CMAKE_SOURCE_DIR}/build)
