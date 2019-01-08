@@ -18,7 +18,7 @@
 
 template <typename dataType>
 void compute_hipdnn_LRN_fwd(LRN_params_t &d, dataType *src, dataType *dst,
-                            hipdnnDataType_t hipdataType, float *avg_time) {
+                            float *avg_time) {
 
   hipdnnHandle_t hipdnn;
 	checkHIPDNN(hipdnnCreate(&hipdnn));
@@ -27,13 +27,13 @@ void compute_hipdnn_LRN_fwd(LRN_params_t &d, dataType *src, dataType *dst,
 
   checkHIPDNN(hipdnnCreateTensorDescriptor(&in_desc));
   checkHIPDNN(hipdnnSetTensor4dDescriptor(in_desc, HIPDNN_TENSOR_NCHW,
-                                          hipdataType, d.mb, d.ic, d.ih,
+                                          HIPDNN_DATA_FLOAT, d.mb, d.ic, d.ih,
                                           d.iw));
 
   hipdnnTensorDescriptor_t out_desc;
   checkHIPDNN(hipdnnCreateTensorDescriptor(&out_desc));
   checkHIPDNN(hipdnnSetTensor4dDescriptor(out_desc, HIPDNN_TENSOR_NCHW,
-                                          hipdataType, d.mb, d.ic, d.ih,
+                                          HIPDNN_DATA_FLOAT, d.mb, d.ic, d.ih,
                                           d.iw));
 
   hipdnnLRNDescriptor_t lrn_desc;
@@ -81,7 +81,7 @@ void compute_hipdnn_LRN_fwd(LRN_params_t &d, dataType *src, dataType *dst,
 
 template <typename dataType>
 void compute_hipdnn_LRN_backward(LRN_params_t &d, dataType *src, dataType *grad,
-                 dataType *dst, hipdnnDataType_t hipdataType, float *avg_time) {
+                                dataType *dst, float *avg_time) {
 
   hipdnnHandle_t hipdnn;
   checkHIPDNN(hipdnnCreate(&hipdnn));
@@ -89,13 +89,13 @@ void compute_hipdnn_LRN_backward(LRN_params_t &d, dataType *src, dataType *grad,
   hipdnnTensorDescriptor_t in_desc;
   checkHIPDNN(hipdnnCreateTensorDescriptor(&in_desc));
   checkHIPDNN(hipdnnSetTensor4dDescriptor(
-        in_desc, HIPDNN_TENSOR_NCHW, hipdataType,
+        in_desc, HIPDNN_TENSOR_NCHW, HIPDNN_DATA_FLOAT,
         d.mb, d.ic, d.ih, d.iw));
 
   hipdnnTensorDescriptor_t out_desc;
   checkHIPDNN(hipdnnCreateTensorDescriptor(&out_desc));
   checkHIPDNN(hipdnnSetTensor4dDescriptor(
-        out_desc, HIPDNN_TENSOR_NCHW, hipdataType,
+        out_desc, HIPDNN_TENSOR_NCHW, HIPDNN_DATA_FLOAT,
         d.mb, d.ic, d.ih, d.iw));
 
   hipdnnLRNDescriptor_t lrn_desc;
