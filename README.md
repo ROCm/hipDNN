@@ -25,5 +25,21 @@ In order to hipify a cuDNN program, it suffices to just:
 
 HIPDNN, and HIP overall, operate at compile time, i.e. you compile HIP programs for a particular platform. However hipDNN does not require the client programs to explicitly add platform specific header files and library paths to the makefiles, this is handled by hipDNN transparently.
 
+## Comparing unit test results with Benchmark results
+
+In order to verify the unit test results and evaluate the performance, checkout to the hipDNN branch comparison_unittest. We have used the results obtained by running the unit test in GeForce GTX 980 Ti (NVidia GPU) as benchmark results. These results are available in compressed folder NV_results.tar.gz. The python script compare_results.py in utils extracts these results inside hipDNN into a folder of the same name during execution and compares it with the results obtained during the execution of unit test every run. The final comparison results are saved as final_results.csv inside build folder in hipDNN. 
+
+## BUILD instructions
+
+1. mkdir build && cd build
+2. cmake ..
+4. make -j4
+
+## execution instructions
+
+Inside build folder, run 
+        ./execute.sh
+This shell script runs the unit test and compares the results with the benchmark results.
+
 
 
