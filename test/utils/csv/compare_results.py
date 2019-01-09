@@ -1,12 +1,24 @@
 import os
 import csv
 import sys
+import tarfile
 from termcolor import colored
 
 csv.field_size_limit(sys.maxsize)
 
+def untar(fname,dest):
+    if (fname.endswith("tar.gz")):
+        tar = tarfile.open(fname)
+        tar.extractall(path=dest)
+        tar.close()
+        print "Extracted in Current Directory"
+    else:
+        print "Not a tar.gz file: '%s '" % sys.argv[0]
+
 abs_path = os.path.abspath('.')
 nv_result_path = abs_path.rsplit('/',1)[0]
+NVidia_result = os.path.join(nv_result_path,'NV_results.tar.gz')
+untar(NVidia_result,nv_result_path)
 
 hcc_folder = os.path.join(abs_path,'results_csv')
 nvcc_folder = os.path.join(nv_result_path,'NV_results','results_csv_nv')
@@ -36,7 +48,8 @@ for line2 in reader2:
 string1 = 'Performance in '+str(data2)+' (microseconds)'
 string2 = 'Performance in '+str(data1)+' (microseconds)'
 string3 = str(data1)+' vs '+str(data2)+' speedup'
-csvfile = open('/home/neel/sree/latest/hipDNN/build/final_results.csv', 'w+')
+final_result = os.path.join(abs_path,'final_results.csv')
+csvfile = open(final_result, 'w+')
 
 fieldnames = ['TestName','Results','Input size', 'kernel size',
               'output size', string1, string2, string3]
