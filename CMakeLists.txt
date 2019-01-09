@@ -70,6 +70,9 @@ add_subdirectory(library)
 
 INCLUDE(CPack)
 
+file(COPY ${CMAKE_SOURCE_DIR}/execute.sh
+     DESTINATION ${CMAKE_SOURCE_DIR}/build)
+
 # Testing
 
 enable_testing()
