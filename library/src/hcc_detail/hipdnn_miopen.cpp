@@ -1483,12 +1483,23 @@ hipdnnStatus_t hipdnnConvolutionForward(
     HIPDNN_OPEN_LOG_C("Invoking MiopenConvolutionFwd" << std::flush);
     hipdnnConvolutionDescriptor_t convDesc_cast =
                                     ((structConvDesc_t*)(convDesc))->descriptor;
+    void *dwPrior = SaveAsPriorBuffer(y);
+    const float alpha1 = 1;
+    const float beta1 = 0;
+
     CHECK_MIO(miopenConvolutionForward(
-        (miopenHandle_t)handle, alpha, (miopenTensorDescriptor_t)xDesc, x,
+        (miopenHandle_t)handle, &alpha1, (miopenTensorDescriptor_t)xDesc, x,
         (miopenTensorDescriptor_t)wDesc, w,
-        (miopenConvolutionDescriptor_t)convDesc_cast, mialgo, beta,
+        (miopenConvolutionDescriptor_t)convDesc_cast, mialgo, &beta1,
         (miopenTensorDescriptor_t)yDesc, y, workSpaceInternal,
         expectedWorkSpaceSize));
+
+    int alpha2 =0;
+    CHECK_MIO(miopenOpTensor((miopenHandle_t)handle, miopenTensorOpAdd, alpha,
+                             (miopenTensorDescriptor_t)yDesc, y, beta,
+                             (miopenTensorDescriptor_t)yDesc, dwPrior, &alpha2,
+                             (miopenTensorDescriptor_t)yDesc, y));
+    deallocPrior(dwPrior);
     return HIPDNN_STATUS_SUCCESS;
 }
 
@@ -2163,12 +2174,21 @@ hipdnnStatus_t hipdnnPoolingForward(
             sDescToWorkspacePooling[(miopenTensorDescriptor_t)yDesc].second;
     }
 
+    void *dwPrior = SaveAsPriorBuffer(y);
+    const float alpha1 = 1;
+    const float beta1 = 0;
     CHECK_MIO(miopenPoolingForward((miopenHandle_t)handle,
                                    (miopenPoolingDescriptor_t)poolingDesc,
-                                   alpha, (miopenTensorDescriptor_t)xDesc, x,
-                                   beta, (miopenTensorDescriptor_t)yDesc, y,
+                                   &alpha1, (miopenTensorDescriptor_t)xDesc, x,
+                                   &beta1, (miopenTensorDescriptor_t)yDesc, y,
                                    do_backward,
                                    (void *)devptr, workSpaceSize));
+    int alpha2 =0;
+    CHECK_MIO(miopenOpTensor((miopenHandle_t)handle, miopenTensorOpAdd, alpha,
+                             (miopenTensorDescriptor_t)yDesc, y, beta,
+                             (miopenTensorDescriptor_t)yDesc, dwPrior, &alpha2,
+                             (miopenTensorDescriptor_t)yDesc, y));
+    deallocPrior(dwPrior);
 
     return HIPDNN_STATUS_SUCCESS;
 }
@@ -2208,12 +2228,23 @@ hipdnnStatus_t hipdnnPoolingBackward(
             sDescToWorkspacePooling[(miopenTensorDescriptor_t)yDesc].second;
     }
 
+    void *dwPrior = SaveAsPriorBuffer(dx);
+    const float alpha1 = 1;
+    const float beta1 = 0;
+
     CHECK_MIO(miopenPoolingBackward(
-        (miopenHandle_t)handle, (miopenPoolingDescriptor_t)poolingDesc, alpha,
+        (miopenHandle_t)handle, (miopenPoolingDescriptor_t)poolingDesc, &alpha1,
         (miopenTensorDescriptor_t)yDesc, y, (miopenTensorDescriptor_t)dyDesc,
-        dy, (miopenTensorDescriptor_t)xDesc, x, beta,
+        dy, (miopenTensorDescriptor_t)xDesc, x, &beta1,
         (miopenTensorDescriptor_t)dxDesc, dx,
         devptr));
+
+    int alpha2 =0;
+    CHECK_MIO(miopenOpTensor((miopenHandle_t)handle, miopenTensorOpAdd, alpha,
+                             (miopenTensorDescriptor_t)dxDesc, dx, beta,
+                             (miopenTensorDescriptor_t)dxDesc, dwPrior, &alpha2,
+                             (miopenTensorDescriptor_t)dxDesc, dx));
+    deallocPrior(dwPrior);
     return HIPDNN_STATUS_SUCCESS;
 }
 //=============================================================================
@@ -2389,19 +2420,20 @@ hipdnnStatus_t hipdnnLRNCrossChannelForward(
              sDescToWorkspaceLRN[(miopenTensorDescriptor_t)yDesc].second;
         }
 	}
-    void *dwPrior = SaveAsPriorBuffer(y);
 
-//miopen supports alpha = 1, beta =0;
+    void *dwPrior = SaveAsPriorBuffer(y);
+    const float alpha1 = 1;
+    const float beta1 = 0;
+
     CHECK_MIO(miopenLRNForward((miopenHandle_t)handle,
-                               (miopenLRNDescriptor_t)normDesc, alpha,
-                               (miopenTensorDescriptor_t)xDesc, x, 0,
+                               (miopenLRNDescriptor_t)normDesc, &alpha1,
+                               (miopenTensorDescriptor_t)xDesc, x, &beta1,
                                (miopenTensorDescriptor_t)yDesc, y,
                                do_backward,
                                devptr));
 
-    miopenTensorOp_t tensorOp = miopenTensorOpAdd;
     int alpha2 =0;
-    CHECK_MIO(miopenOpTensor((miopenHandle_t)handle, tensorOp, alpha,
+    CHECK_MIO(miopenOpTensor((miopenHandle_t)handle, miopenTensorOpAdd, alpha,
                              (miopenTensorDescriptor_t)yDesc, y, beta,
                              (miopenTensorDescriptor_t)yDesc, dwPrior, &alpha2,
                              (miopenTensorDescriptor_t)yDesc, y));
@@ -2490,17 +2522,18 @@ hipdnnStatus_t hipdnnLRNCrossChannelBackwardEx(
     CHECK_HIPDNN(hipTomiopenLRNMode(lrnMode, &mimode));
     // mimode is otherwise unused.
 
-	void *dwPrior = SaveAsPriorBuffer(dx);
+    void *dwPrior = SaveAsPriorBuffer(dx);
+    const float alpha1 = 1;
+    const float beta1 = 0;
 
     CHECK_MIO(miopenLRNBackward(
-        (miopenHandle_t)handle, (miopenLRNDescriptor_t)normDesc, alpha,
+        (miopenHandle_t)handle, (miopenLRNDescriptor_t)normDesc, &alpha1,
         (miopenTensorDescriptor_t)yDesc, y, (miopenTensorDescriptor_t)dyDesc,
-        dy, (miopenTensorDescriptor_t)xDesc, x, 0,
+        dy, (miopenTensorDescriptor_t)xDesc, x, &beta1,
         (miopenTensorDescriptor_t)dxDesc, dx, workspace));
 
-    miopenTensorOp_t tensorOp = miopenTensorOpAdd;
     int alpha2 =0;
-    CHECK_MIO(miopenOpTensor((miopenHandle_t)handle, tensorOp, alpha,
+    CHECK_MIO(miopenOpTensor((miopenHandle_t)handle, miopenTensorOpAdd, alpha,
                              (miopenTensorDescriptor_t)dxDesc, dx, beta,
                              (miopenTensorDescriptor_t)dxDesc, dwPrior, &alpha2,
                              (miopenTensorDescriptor_t)dxDesc, dx));
