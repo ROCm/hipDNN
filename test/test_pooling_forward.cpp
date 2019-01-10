@@ -140,7 +140,9 @@ TEST(pooling_fwd, func_check_batch64) {
   std::string str_k_size  = convert_to_string((int*)k_size,4);
   std::string str_op_size  = convert_to_string((int*)op_size,4);
 
-  hipdnn_pooling_forward<float>(pool, srcData.gpu(), dstDataGPU.gpu(), pool_mode, false, &avg_time);
+  hipdnn_pooling_forward<float>(pool, srcData.gpu(), dstDataGPU.gpu(), pool_mode,
+                                dataType, false, &avg_time);
+
   std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
 
   float* temp = dstDataGPU.getDataFromGPU();
@@ -174,7 +176,9 @@ TEST(pooling_fwd, func_check_batch128) {
   std::string str_k_size  = convert_to_string((int*)k_size,4);
   std::string str_op_size  = convert_to_string((int*)op_size,4);
 
-  hipdnn_pooling_forward<float>(pool, srcData.gpu(), dstDataGPU.gpu(), pool_mode, false, &avg_time);
+  hipdnn_pooling_forward<float>(pool, srcData.gpu(), dstDataGPU.gpu(), pool_mode,
+                                dataType, false, &avg_time);
+
   std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
 
   float* temp = dstDataGPU.getDataFromGPU();
@@ -210,7 +214,9 @@ TEST(pooling_fwd, func_check_half) {
   std::string str_k_size  = convert_to_string((int*)k_size,4);
   std::string str_op_size  = convert_to_string((int*)op_size,4);
 
-  hipdnn_pooling_forward(pool, srcData.gpu(), dstDataGPU.gpu(), pool_mode, dataType, false, &avg_time);
+  hipdnn_pooling_forward(pool, srcData.gpu(), dstDataGPU.gpu(), pool_mode,
+                         dataType, false, &avg_time);
+
   std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
 
   Memory<float> dstDataGPU_f(pool.mb * pool.c * pool.oh * pool.ow);
