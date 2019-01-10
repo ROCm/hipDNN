@@ -23,8 +23,8 @@ void compute_hipdnn_activation_forward(activation_params_t &test_case,
   hipdnnActivationDescriptor_t activationDesc;
   hipdnnNanPropagation_t reluNanOpt = HIPDNN_NOT_PROPAGATE_NAN;
 
-  double reluCeilingOrAlpha = 0;
-  double activBeta = 0;
+  double reluCeilingOrAlpha = 1;
+  double activBeta = 1;
   double activExp = 0;
 
   checkHIPDNN(hipdnnCreateActivationDescriptor(&activationDesc));
@@ -86,8 +86,8 @@ void compute_hipdnn_activation_backward(activation_params_t &test_case,
   hipdnnActivationDescriptor_t activationDesc;
   hipdnnNanPropagation_t reluNanOpt = HIPDNN_NOT_PROPAGATE_NAN;
 
-  double reluCeilingOrAlpha = 0;
-  double activBeta = 0;
+  double reluCeilingOrAlpha = 1;
+  double activBeta = 1;
   double activExp = 0;
 
   checkHIPDNN(hipdnnCreateActivationDescriptor(&activationDesc));
