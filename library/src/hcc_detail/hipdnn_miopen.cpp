@@ -2312,10 +2312,20 @@ hipdnnStatus_t hipdnnActivationForward(
     const void *alpha, const hipdnnTensorDescriptor_t xDesc, const void *x,
     const void *beta, const hipdnnTensorDescriptor_t yDesc, void *y) {
     HIPDNN_OPEN_LOG_C("Inside hipdnnActivationForward");
+
+    void *dwPrior = SaveAsPriorBuffer(y);
+    const float alpha1 = 1;
+    const float beta1 = 0;
     CHECK_MIO(miopenActivationForward(
         (miopenHandle_t)handle, static_cast<const miopenActivationDescriptor_t>(activationDesc),
-        alpha, (miopenTensorDescriptor_t)xDesc, x, beta,
+        &alpha1, (miopenTensorDescriptor_t)xDesc, x, &beta1,
         (miopenTensorDescriptor_t)yDesc, y));
+    int alpha2 =0;
+    CHECK_MIO(miopenOpTensor((miopenHandle_t)handle, miopenTensorOpAdd, alpha,
+                             (miopenTensorDescriptor_t)yDesc, y, beta,
+                             (miopenTensorDescriptor_t)yDesc, dwPrior, &alpha2,
+                             (miopenTensorDescriptor_t)yDesc, y));
+    deallocPrior(dwPrior);
     return HIPDNN_STATUS_SUCCESS;
 }
 //======================
@@ -2328,11 +2338,22 @@ hipdnnStatus_t hipdnnActivationBackward(
     const hipdnnTensorDescriptor_t xDesc, const void *x, const void *beta,
     const hipdnnTensorDescriptor_t dxDesc, void *dx) {
     HIPDNN_OPEN_LOG_C("Inside hipdnnActivationBackward");
+
+    void *dwPrior = SaveAsPriorBuffer(dx);
+    const float alpha1 = 1;
+    const float beta1 = 0;
     CHECK_MIO(miopenActivationBackward(
         (miopenHandle_t)handle, static_cast<const miopenActivationDescriptor_t>(activationDesc),
-        alpha, (miopenTensorDescriptor_t)yDesc, y,
+        &alpha1, (miopenTensorDescriptor_t)yDesc, y,
         (miopenTensorDescriptor_t)dyDesc, dy, (miopenTensorDescriptor_t)xDesc,
-        x, beta, (miopenTensorDescriptor_t)dxDesc, dx));
+        x, &beta1, (miopenTensorDescriptor_t)dxDesc, dx));
+    int alpha2 =0;
+    CHECK_MIO(miopenOpTensor((miopenHandle_t)handle, miopenTensorOpAdd, alpha,
+                             (miopenTensorDescriptor_t)dxDesc, dx, beta,
+                             (miopenTensorDescriptor_t)dxDesc, dwPrior, &alpha2,
+                             (miopenTensorDescriptor_t)dxDesc, dx));
+    deallocPrior(dwPrior);
+
     return HIPDNN_STATUS_SUCCESS;
 }
 //=============================================================================
