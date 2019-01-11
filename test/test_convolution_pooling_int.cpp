@@ -1,11 +1,14 @@
 #include "test_pooling_common.hpp"
 #include "test_convolution_common.hpp"
 
+hipdnnPoolingMode_t poolCF_mode;
+
 TEST(convolution_pooling_fwd_intg, func_check_naive_conv_pool) {
 
   float avg_time = 0, avg_time1 = 0, avg_time2 = 0;
   int oheight = 4, owidth = 4;
-  pool_mode = HIPDNN_POOLING_MAX;
+  poolCF_mode = HIPDNN_POOLING_MAX;
+  hipdnnDataType_t dataType = HIPDNN_DATA_FLOAT;
 
   test_pooling_descriptor pool(1, 1, 4, 4, 2, 2, 2, 2, 0, 0, 2, 2);
 
@@ -48,11 +51,9 @@ TEST(convolution_pooling_fwd_intg, func_check_naive_conv_pool) {
                                                        "Conv","MP");
 
   compute_hipdnn_conv_forward<float>(testConvolutionSizes, srcDataConv.gpu(),
-                           filterData.gpu(), NULL, dstDataGPU.gpu(),
-                           dataType, &avg_time1);
+                           filterData.gpu(), NULL, dstDataGPU.gpu(),&avg_time1);
 
-  hipdnn_pooling_forward<float>(pool, dstDataGPU.gpu(), dstData.gpu(), pool_mode,
-                                dataType, false, &avg_time2);
+  hipdnn_pooling_forward<float>(pool, dstDataGPU.gpu(), dstData.gpu(), poolCF_mode, dataType, false, &avg_time2);
 
   avg_time = avg_time1 + avg_time2;
 
@@ -69,3 +70,4 @@ TEST(convolution_pooling_fwd_intg, func_check_naive_conv_pool) {
   write_to_csv(strt, str, testname, avg_time, str_ip_size, str_k_size, str_op_size);
   dump_result_csv(filename, testname, temp, (int)dstData.get_num_elements());
 }
+

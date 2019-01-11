@@ -34,12 +34,11 @@ TEST(convolution_fwd_bwd, func_test_fwd_bwd_convolution) {
   populateMemoryRandom<float>(filterData);
 
   compute_hipdnn_conv_forward<float>(testConvolutionSizes, srcData.gpu(),
-                           filterData.gpu(), NULL, dstDataGPU.gpu(), dataType,
-                           &avg_time1);
+                           filterData.gpu(), NULL, dstDataGPU.gpu(),&avg_time1);
 
   compute_hipdnn_conv_backward_filter<float>(testConvolutionSizes, srcData.gpu(),
                            filterData.gpu(), gradData.gpu(), NULL,
-                           dstDataGPU.gpu(), dataType, &avg_time2);
+                           dstDataGPU.gpu(),&avg_time2);
 
   avg_time = (avg_time1 + avg_time2);
 
@@ -90,11 +89,10 @@ TEST(convolution_fwd_bwd, func_test_fwd_bwd_convolution_batch32) {
   populateMemoryRandom<float>(filterData);
 
   compute_hipdnn_conv_forward<float>(testConvolutionSizes, srcData.gpu(),
-                                filterData.gpu(), NULL, dstDataGPU.gpu(), dataType,
-                                &avg_time1);
+                                filterData.gpu(), NULL, dstDataGPU.gpu(),&avg_time1);
   compute_hipdnn_conv_backward_filter<float>(testConvolutionSizes, srcData.gpu(),
                                  filterData.gpu(), gradData.gpu(), NULL,
-                                 dstDataGPU.gpu(), dataType, &avg_time2);
+                                 dstDataGPU.gpu(),&avg_time2);
 
   avg_time = (avg_time1 + avg_time2);
 
@@ -145,12 +143,11 @@ TEST(convolution_fwd_bwd, func_test_fwd_bwd_convolution_batch64) {
   populateMemoryRandom<float>(filterData);
 
   compute_hipdnn_conv_forward<float>(testConvolutionSizes, srcData.gpu(),
-                                filterData.gpu(), NULL, dstDataGPU.gpu(), dataType,
-                                &avg_time1);
+                                filterData.gpu(), NULL, dstDataGPU.gpu(),&avg_time1);
 
   compute_hipdnn_conv_backward_filter<float>(testConvolutionSizes, srcData.gpu(),
                                  filterData.gpu(), gradData.gpu(), NULL,
-                                 dstDataGPU.gpu(), dataType, &avg_time2);
+                                 dstDataGPU.gpu(),&avg_time2);
 
   avg_time = (avg_time1 + avg_time2);
 
@@ -201,11 +198,10 @@ TEST(convolution_fwd_bwd, func_test_fwd_bwd_convolution_batch128) {
   populateMemoryRandom<float>(filterData);
 
   compute_hipdnn_conv_forward<float>(testConvolutionSizes, srcData.gpu(),
-                                filterData.gpu(), NULL, dstDataGPU.gpu(), dataType,
-                                &avg_time1);
+                                filterData.gpu(), NULL, dstDataGPU.gpu(),&avg_time1);
   compute_hipdnn_conv_backward_filter<float>(testConvolutionSizes, srcData.gpu(),
                                  filterData.gpu(), gradData.gpu(), NULL,
-                                 dstDataGPU.gpu(), dataType, &avg_time2);
+                                 dstDataGPU.gpu(),&avg_time2);
 
   avg_time = (avg_time1 + avg_time2);
 

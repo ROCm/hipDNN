@@ -13,6 +13,7 @@ TEST(convolution_fwd, func_check_zero_padding_medium_input_batch32) {
   Desc outputDesc = calculate_Dims(inputDesc, filterDesc, pad, stride,dil);
 
   Memory<float> srcData = createMemory<float>(inputDesc);
+  Memory<float> dstDataCPU = createMemory<float>(outputDesc);
   Memory<float> dstDataGPU = createMemory<float>(outputDesc);
   Memory<float> filterData = createMemory<float>(filterDesc);
 
@@ -33,8 +34,7 @@ TEST(convolution_fwd, func_check_zero_padding_medium_input_batch32) {
   std::string str_op_size  = convert_to_string((int*)op_size,4);
 
   compute_hipdnn_conv_forward<float>(testConvolutionSizes, srcData.gpu(),
-                            filterData.gpu(), NULL, dstDataGPU.gpu(),
-                            dataType, &avg_time);
+                            filterData.gpu(), NULL, dstDataGPU.gpu(),&avg_time);
 
   std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
 
@@ -63,6 +63,7 @@ TEST(convolution_fwd, func_compare_group_conv) {
   Desc outputDesc = calculate_Dims(inputDesc, filterDesc, pad, stride,dil);
 
   Memory<float> srcData = createMemory<float>(inputDesc);
+  Memory<float> dstDataCPU = createMemory<float>(outputDesc);
   Memory<float> dstDataGPU = createMemory<float>(outputDesc);
   Memory<float> filterData = createMemory<float>(filterDesc);
 
@@ -83,8 +84,7 @@ TEST(convolution_fwd, func_compare_group_conv) {
   std::string str_op_size  = convert_to_string((int*)op_size,4);
 
   compute_hipdnn_conv_forward<float>(testConvolutionSizes, srcData.gpu(),
-                            filterData.gpu(), NULL, dstDataGPU.gpu(),
-                            dataType, &avg_time);
+                            filterData.gpu(), NULL, dstDataGPU.gpu(),&avg_time);
 
   std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
 
@@ -114,6 +114,7 @@ TEST(convolution_fwd, func_check_two_strides_medium_kernelsize) {
   Desc outputDesc = calculate_Dims(inputDesc, filterDesc, pad, stride,dil);
 
   Memory<float> srcData = createMemory<float>(inputDesc);
+  Memory<float> dstDataCPU = createMemory<float>(outputDesc);
   Memory<float> dstDataGPU = createMemory<float>(outputDesc);
   Memory<float> filterData = createMemory<float>(filterDesc);
 
@@ -134,8 +135,7 @@ TEST(convolution_fwd, func_check_two_strides_medium_kernelsize) {
   std::string str_op_size  = convert_to_string((int*)op_size,4);
 
   compute_hipdnn_conv_forward<float>(testConvolutionSizes, srcData.gpu(),
-                            filterData.gpu(), NULL, dstDataGPU.gpu(),
-                            dataType, &avg_time);
+                            filterData.gpu(), NULL, dstDataGPU.gpu(),&avg_time);
 
   std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
 
@@ -153,7 +153,6 @@ TEST(convolution_fwd, func_check_two_strides_medium_kernelsize) {
 }
 
 TEST(convolution_fwd, func_check_padding_and_strides_small_size) {
-
   Desc inputDesc(1, 3, 7, 7);
   Desc filterDesc(21, 3, 3, 3);
 
@@ -165,6 +164,7 @@ TEST(convolution_fwd, func_check_padding_and_strides_small_size) {
   Desc outputDesc = calculate_Dims(inputDesc, filterDesc, pad, stride, dil);
 
   Memory<float> srcData = createMemory<float>(inputDesc);
+  Memory<float> dstDataCPU = createMemory<float>(outputDesc);
   Memory<float> dstDataGPU = createMemory<float>(outputDesc);
   Memory<float> filterData = createMemory<float>(filterDesc);
 
@@ -184,8 +184,7 @@ TEST(convolution_fwd, func_check_padding_and_strides_small_size) {
   std::string str_op_size  = convert_to_string((int*)op_size,4);
 
   compute_hipdnn_conv_forward<float>(testConvolutionSizes, srcData.gpu(),
-                                filterData.gpu(), NULL, dstDataGPU.gpu(),
-                                dataType, &avg_time);
+                                filterData.gpu(), NULL, dstDataGPU.gpu(), &avg_time);
 
   std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
 
@@ -202,10 +201,8 @@ TEST(convolution_fwd, func_check_padding_and_strides_small_size) {
 }
 
 TEST(convolution_fwd, func_check_full_conv) {
-
   Desc inputDesc(1, 3, 7, 7);
   Desc filterDesc(3, 3, 7, 7);
-
   int pad[2] = {0, 0};    // zero padding
   int stride[2] = {1, 1}; // stride 1
   int dil[2] = {1, 1};
@@ -214,6 +211,7 @@ TEST(convolution_fwd, func_check_full_conv) {
   Desc outputDesc = calculate_Dims(inputDesc, filterDesc, pad, stride,dil);
 
   Memory<float> srcData = createMemory<float>(inputDesc);
+  Memory<float> dstDataCPU = createMemory<float>(outputDesc);
   Memory<float> dstDataGPU = createMemory<float>(outputDesc);
   Memory<float> filterData = createMemory<float>(filterDesc);
 
@@ -234,8 +232,7 @@ TEST(convolution_fwd, func_check_full_conv) {
   std::string str_op_size  = convert_to_string((int*)op_size,4);
 
   compute_hipdnn_conv_forward<float>(testConvolutionSizes, srcData.gpu(),
-                                filterData.gpu(), NULL, dstDataGPU.gpu(),
-                                dataType, &avg_time);
+                                filterData.gpu(), NULL, dstDataGPU.gpu(),&avg_time);
 
   std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
 
@@ -265,6 +262,7 @@ TEST(convolution_fwd, func_check_batch64) {
   Desc outputDesc = calculate_Dims(inputDesc, filterDesc, pad, stride, dil);
 
   Memory<float> srcData = createMemory<float>(inputDesc);
+  Memory<float> dstDataCPU = createMemory<float>(outputDesc);
   Memory<float> dstDataGPU = createMemory<float>(outputDesc);
   Memory<float> filterData = createMemory<float>(filterDesc);
 
@@ -285,8 +283,7 @@ TEST(convolution_fwd, func_check_batch64) {
   std::string str_op_size  = convert_to_string((int*)op_size,4);
 
   compute_hipdnn_conv_forward<float>(testConvolutionSizes, srcData.gpu(),
-                            filterData.gpu(), NULL, dstDataGPU.gpu(),
-                            dataType, &avg_time);
+                            filterData.gpu(), NULL, dstDataGPU.gpu(),&avg_time);
 
   std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
 
@@ -306,15 +303,15 @@ TEST(convolution_fwd, func_check_zero_padding_medium_input_batch128) {
 
   Desc inputDesc(128, 3, 16, 16);
   Desc filterDesc(21, 3, 4, 4);
-
   int pad[2] = {0, 0};    // zero padding
   int stride[2] = {1, 1}; // stride 1
   int dil[2] = {1, 1};
   float avg_time = 0;
 
-  Desc outputDesc = calculate_Dims(inputDesc, filterDesc, pad, stride,dil);
+Desc outputDesc = calculate_Dims(inputDesc, filterDesc, pad, stride,dil);
 
   Memory<float> srcData = createMemory<float>(inputDesc);
+  Memory<float> dstDataCPU = createMemory<float>(outputDesc);
   Memory<float> dstDataGPU = createMemory<float>(outputDesc);
   Memory<float> filterData = createMemory<float>(filterDesc);
 
@@ -335,8 +332,7 @@ TEST(convolution_fwd, func_check_zero_padding_medium_input_batch128) {
   std::string str_op_size  = convert_to_string((int*)op_size,4);
 
   compute_hipdnn_conv_forward<float>(testConvolutionSizes, srcData.gpu(),
-                            filterData.gpu(), NULL, dstDataGPU.gpu(),
-                            dataType, &avg_time);
+                            filterData.gpu(), NULL, dstDataGPU.gpu(),&avg_time);
 
   std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
 
@@ -366,6 +362,7 @@ TEST(convolution_fwd, func_check_dilation2x2_batch8) {
   Desc outputDesc = calculate_Dims(inputDesc, filterDesc, pad, stride,dil);
 
   Memory<float> srcData = createMemory<float>(inputDesc);
+  Memory<float> dstDataCPU = createMemory<float>(outputDesc);
   Memory<float> dstDataGPU = createMemory<float>(outputDesc);
   Memory<float> filterData = createMemory<float>(filterDesc);
 
@@ -386,8 +383,7 @@ TEST(convolution_fwd, func_check_dilation2x2_batch8) {
   std::string str_op_size  = convert_to_string((int*)op_size,4);
 
   compute_hipdnn_conv_forward<float>(testConvolutionSizes, srcData.gpu(),
-                            filterData.gpu(), NULL, dstDataGPU.gpu(),
-                            dataType, &avg_time);
+                            filterData.gpu(), NULL, dstDataGPU.gpu(),&avg_time);
 
   std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
 
@@ -417,6 +413,7 @@ TEST(convolution_fwd, func_check_dilation3x3_batch8) {
   Desc outputDesc = calculate_Dims(inputDesc, filterDesc, pad, stride,dil);
 
   Memory<float> srcData = createMemory<float>(inputDesc);
+  Memory<float> dstDataCPU = createMemory<float>(outputDesc);
   Memory<float> dstDataGPU = createMemory<float>(outputDesc);
   Memory<float> filterData = createMemory<float>(filterDesc);
 
@@ -437,8 +434,7 @@ convulution_Size testConvolutionSizes(
   std::string str_op_size  = convert_to_string((int*)op_size,4);
 
   compute_hipdnn_conv_forward<float>(testConvolutionSizes, srcData.gpu(),
-                            filterData.gpu(), NULL, dstDataGPU.gpu(),
-                            dataType, &avg_time);
+                            filterData.gpu(), NULL, dstDataGPU.gpu(),&avg_time);
 
   std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
 
@@ -454,56 +450,3 @@ convulution_Size testConvolutionSizes(
   dump_result_csv(filename, testname, temp, (int)dstDataGPU.get_num_elements());
 
 }
-/*
-TEST(convolution_fwd, func_check_half_small_size) {
-
-  Desc inputDesc(1, 1, 3, 3);
-  Desc filterDesc(1, 1, 2, 2);
-
-  dataType = HIPDNN_DATA_HALF;
-
-  int pad[2] = {0, 0};    // padding 2
-  int stride[2] = {1, 1}; // stride 2
-  int dil[2] = {1, 1};
-  float avg_time = 0;
-
-  Desc outputDesc = calculate_Dims(inputDesc, filterDesc, pad, stride, dil);
-
-  Memory<half> srcData = createMemory<half>(inputDesc);
-  Memory<half> dstDataGPU = createMemory<half>(outputDesc);
-  Memory<half> filterData = createMemory<half>(filterDesc);
-
-  populateMemoryRandom<half>(srcData);
-  populateMemoryRandom<half>(filterData);
-  convulution_Size testConvolutionSizes(
-        inputDesc.N, 1, inputDesc.C, inputDesc.H, inputDesc.W, outputDesc.C,
-        outputDesc.H, outputDesc.W, filterDesc.H, filterDesc.W, pad[0], pad[1],
-        stride[0], stride[1], dil[0], dil[1]);
-
-  int ip_size[4] = {inputDesc.N, inputDesc.C, inputDesc.H, inputDesc.W};
-  int k_size[4] = {filterDesc.N, filterDesc.C, filterDesc.H, filterDesc.W};
-  int op_size[4] =  {outputDesc.N, outputDesc.C, outputDesc.H, outputDesc.W};
-
-  std::string str_ip_size  = convert_to_string((int*)ip_size,4);
-  std::string str_k_size  = convert_to_string((int*)k_size,4);
-  std::string str_op_size  = convert_to_string((int*)op_size,4);
-
-  compute_hipdnn_conv_forward<half>(testConvolutionSizes, srcData.gpu(),
-                                filterData.gpu(), NULL, dstDataGPU.gpu(),
-                                dataType, &avg_time);
-
-  std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
-
-  float temp1 = __half2float(*(__half*)dstDataGPU.getDataFromGPU());
-  float *temp = &temp1;
-
-  std::string strt = "./result_unittest.csv";
-  std::string testname = "convolution_fwd:func_check_half_small_size";
-  std::string filename="convolution_forward.csv";
-
-  std::string str  = convert_to_string((float*)temp,(int)dstDataGPU.get_num_elements());
-  write_to_csv(strt, str, testname,avg_time, str_ip_size, str_k_size, str_op_size);
-  dump_result_csv(filename, testname, temp, (int)dstDataGPU.get_num_elements());
-
-}
-*/
