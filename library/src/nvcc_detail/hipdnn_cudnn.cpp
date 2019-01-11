@@ -327,6 +327,8 @@ hipdnnStatus_t hipdnnTocudnnConvolutionMode(hipdnnConvolutionMode_t in, cudnnCon
         *out = CUDNN_CONVOLUTION;
     else if (in == HIPDNN_CROSS_CORRELATION)
         *out = CUDNN_CROSS_CORRELATION;
+	else if(in = HIPDNN_GROUP_CONVOLUTION)
+	     *out = CUDNN_CONVOLUTION;
     else
         return HIPDNN_STATUS_NOT_SUPPORTED;
     return HIPDNN_STATUS_SUCCESS;
