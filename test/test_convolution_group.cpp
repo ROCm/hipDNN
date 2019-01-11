@@ -5,8 +5,8 @@
 /*
 TEST(group_convolution_fwd, func_check_group_conv) {
 
-  Desc inputDesc(32, 12, 224, 224);
-  Desc filterDesc(4, 12, 3, 3);
+  Desc inputDesc(32, 2, 224, 224);
+  Desc filterDesc(4, 2, 3, 3);
 
   int pad[2] = {0, 0};    // zero padding
   int stride[2] = {1, 1}; // stride 1
@@ -25,7 +25,7 @@ TEST(group_convolution_fwd, func_check_group_conv) {
   populateMemoryRandom<float>(filterData);
 
   convulution_Size testConvolutionSizes(
-        inputDesc.N, 2, inputDesc.C, inputDesc.H, inputDesc.W, outputDesc.C,
+        inputDesc.N, grp_cnt, inputDesc.C, inputDesc.H, inputDesc.W, outputDesc.C,
         outputDesc.H, outputDesc.W, filterDesc.H, filterDesc.W, pad[0], pad[1],
         stride[0], stride[1], dil[0], dil[1]);
 
