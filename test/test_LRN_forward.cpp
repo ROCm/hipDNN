@@ -23,7 +23,7 @@ TEST(LRN_fwd, func_check_naive_LRN) {
   std::string str_op_size  = convert_to_string((int*)op_size,4);
 
   compute_hipdnn_LRN_fwd<float>(LRN_params, srcData.gpu(), dstDataGPU.gpu(),
-                                dataType, &avg_time);
+                                &avg_time);
 
   std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
 
@@ -64,7 +64,7 @@ TEST(LRN_fwd, func_check_LRN_batch16) {
   std::string str_op_size  = convert_to_string((int*)op_size,4);
 
   compute_hipdnn_LRN_fwd<float>(LRN_params, srcData.gpu(), dstDataGPU.gpu(),
-                                dataType, &avg_time);
+                                &avg_time);
 
   std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
 
@@ -104,7 +104,7 @@ TEST(LRN_fwd, func_check_LRN_batch32) {
   std::string str_op_size  = convert_to_string((int*)op_size,4);
 
   compute_hipdnn_LRN_fwd<float>(LRN_params, srcData.gpu(), dstDataGPU.gpu(),
-                                dataType, &avg_time);
+                                &avg_time);
 
   std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
 
@@ -144,7 +144,7 @@ TEST(LRN_fwd, func_check_LRN_batch64) {
   std::string str_op_size  = convert_to_string((int*)op_size,4);
 
   compute_hipdnn_LRN_fwd<float>(LRN_params, srcData.gpu(), dstDataGPU.gpu(),
-                                dataType, &avg_time);
+                                &avg_time);
 
   std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
 
@@ -185,7 +185,7 @@ TEST(LRN_fwd, func_check_LRN_batch128) {
   std::string str_op_size  = convert_to_string((int*)op_size,4);
 
   compute_hipdnn_LRN_fwd<float>(LRN_params, srcData.gpu(), dstDataGPU.gpu(),
-                                dataType, &avg_time);
+                                &avg_time);
 
    std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
 

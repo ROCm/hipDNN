@@ -36,7 +36,7 @@ TEST(convolution_bwd_filter, func_check_backward_conv_filter) {
 
   compute_hipdnn_conv_backward_filter<float>(testConvolutionSizes, srcData.gpu(),
                                 filterData.gpu(), gradData.gpu(), NULL,
-                                dstDataGPU.gpu(), dataType, &avg_time);
+                                dstDataGPU.gpu(),&avg_time);
 
   std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
 
@@ -89,7 +89,7 @@ TEST(convolution_bwd_filter, func_backward_conv_filter_batch32) {
 
   compute_hipdnn_conv_backward_filter<float>(testConvolutionSizes, srcData.gpu(),
                                 filterData.gpu(), gradData.gpu(),
-                                NULL, dstDataGPU.gpu(), dataType, &avg_time);
+                                NULL, dstDataGPU.gpu(),&avg_time);
 
   std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
 
@@ -139,7 +139,7 @@ TEST(convolution_bwd_filter, func_backward_conv_filter_batch64) {
 
   compute_hipdnn_conv_backward_filter<float>(testConvolutionSizes, srcData.gpu(),
                                 filterData.gpu(), gradData.gpu(),
-                                NULL, dstDataGPU.gpu(), dataType, &avg_time);
+                                NULL, dstDataGPU.gpu(),&avg_time);
 
   std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
 
@@ -189,8 +189,7 @@ TEST(convolution_bwd_filter, func_backward_conv_filter_batch128) {
   populateMemoryRandom<float>(dstDataGPU);
 
   compute_hipdnn_conv_backward_filter<float>(testConvolutionSizes, srcData.gpu(),
-            filterData.gpu(), gradData.gpu(), NULL, dstDataGPU.gpu(), dataType,
-            &avg_time);
+            filterData.gpu(), gradData.gpu(), NULL, dstDataGPU.gpu(),&avg_time);
 
   std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
 
