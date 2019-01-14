@@ -7,6 +7,8 @@ TEST(pooling_backward, func_check_pooling_stride_2x2) {
 
   float avg_time = 0;
   int oheight = 4, owidth = 4;
+  alpha = 1.f;
+  beta = 0.f;
 
   poolB_mode = HIPDNN_POOLING_MAX;
 
@@ -31,7 +33,8 @@ TEST(pooling_backward, func_check_pooling_stride_2x2) {
   std::string str_op_size  = convert_to_string((int*)op_size,4);
 
   hipdnn_pooling_backward(test_case, dataSrc.gpu(), dataGrad.gpu(),
-                                  dataDst.gpu(), poolB_mode, dataType_b, &avg_time);
+                                  dataDst.gpu(), poolB_mode, dataType_b, &alpha,
+                                  &beta, &avg_time);
 
   std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
 
@@ -52,7 +55,8 @@ TEST(pooling_backward, func_check_pooling_DETERMINISTIC) {
 
   float avg_time = 0;
   int oheight = 4, owidth = 4;
-
+  alpha = 1.f;
+  beta = 0.5f;
   poolB_mode = HIPDNN_POOLING_MAX_DETERMINISTIC;
 
   pool_bwd test_case(1, 1, 4, 4, 2, 2, 0, 0, 2, 2, 1, 1, oheight, owidth);
@@ -76,7 +80,8 @@ TEST(pooling_backward, func_check_pooling_DETERMINISTIC) {
   std::string str_op_size  = convert_to_string((int*)op_size,4);
 
   hipdnn_pooling_backward(test_case, dataSrc.gpu(), dataGrad.gpu(),
-                                  dataDst.gpu(), poolB_mode, dataType_b, &avg_time);
+                                  dataDst.gpu(), poolB_mode, dataType_b, &alpha,
+                                  &beta, &avg_time);
 
   std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
 
@@ -97,6 +102,8 @@ TEST(pooling_backward, func_check_pooling_AVERAGE_COUNT_INCLUDE_PADDING) {
 
   float avg_time = 0;
   int oheight = 4, owidth = 4;
+  alpha = 2.f;
+  beta = 0.5f;
 
   poolB_mode = HIPDNN_POOLING_AVERAGE_COUNT_INCLUDE_PADDING;
 
@@ -121,7 +128,8 @@ TEST(pooling_backward, func_check_pooling_AVERAGE_COUNT_INCLUDE_PADDING) {
   std::string str_op_size  = convert_to_string((int*)op_size,4);
 
   hipdnn_pooling_backward(test_case, dataSrc.gpu(), dataGrad.gpu(),
-                                  dataDst.gpu(), poolB_mode, dataType_b, &avg_time);
+                                  dataDst.gpu(), poolB_mode, dataType_b,  &alpha,
+                                  &beta, &avg_time);
 
   std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
 
@@ -142,6 +150,8 @@ TEST(pooling_backward, func_check_pooling_AVERAGE_COUNT_EXCLUDE_PADDING) {
 
   float avg_time = 0;
   int oheight = 4, owidth = 4;
+  alpha = 0.f;
+  beta = 0.5f;
 
   poolB_mode = HIPDNN_POOLING_AVERAGE_COUNT_EXCLUDE_PADDING;
 
@@ -166,7 +176,8 @@ TEST(pooling_backward, func_check_pooling_AVERAGE_COUNT_EXCLUDE_PADDING) {
   std::string str_op_size  = convert_to_string((int*)op_size,4);
 
   hipdnn_pooling_backward(test_case, dataSrc.gpu(), dataGrad.gpu(),
-                                  dataDst.gpu(), poolB_mode, dataType_b, &avg_time);
+                                  dataDst.gpu(), poolB_mode, dataType_b,  &alpha,
+                                  &beta, &avg_time);
 
   std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
 
@@ -187,6 +198,8 @@ TEST(pooling_backward, func_check_pooling_batch32) {
 
   float avg_time = 0;
   int oheight = 4, owidth = 4;
+  alpha = 1.f;
+  beta = 0.f;
 
   poolB_mode = HIPDNN_POOLING_MAX;
 
@@ -214,7 +227,8 @@ TEST(pooling_backward, func_check_pooling_batch32) {
   std::string str_op_size  = convert_to_string((int*)op_size,4);
 
   hipdnn_pooling_backward(test_case, dataSrc.gpu(), dataGrad.gpu(),
-                                  dataDst.gpu(), poolB_mode, dataType_b, &avg_time);
+                                  dataDst.gpu(), poolB_mode, dataType_b,  &alpha,
+                                  &beta, &avg_time);
 
   float* temp = dataGrad.getDataFromGPU();
 
@@ -235,6 +249,8 @@ TEST(pooling_backward, func_check_pooling_batch64) {
 
   float avg_time = 0;
   int oheight = 4, owidth = 4;
+  alpha = 2.f;
+  beta = 1.f;
 
   poolB_mode = HIPDNN_POOLING_MAX;
 
@@ -261,7 +277,8 @@ TEST(pooling_backward, func_check_pooling_batch64) {
   std::string str_op_size  = convert_to_string((int*)op_size,4);
 
   hipdnn_pooling_backward(test_case, dataSrc.gpu(), dataGrad.gpu(),
-                                  dataDst.gpu(), poolB_mode, dataType_b, &avg_time);
+                                  dataDst.gpu(), poolB_mode, dataType_b,  &alpha,
+                                  &beta, &avg_time);
 
   std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
 
@@ -281,6 +298,8 @@ TEST(pooling_backward, func_check_pooling_batch128) {
 
   float avg_time = 0;
   int oheight = 4, owidth = 4;
+  alpha = 0.5f;
+  beta = 0.f;
 
   poolB_mode = HIPDNN_POOLING_MAX;
 
@@ -307,7 +326,8 @@ TEST(pooling_backward, func_check_pooling_batch128) {
   std::string str_op_size  = convert_to_string((int*)op_size,4);
 
   hipdnn_pooling_backward(test_case, dataSrc.gpu(), dataGrad.gpu(),
-                                  dataDst.gpu(), poolB_mode, dataType_b, &avg_time);
+                                  dataDst.gpu(), poolB_mode, dataType_b,  &alpha,
+                                  &beta, &avg_time);
 
   std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
 

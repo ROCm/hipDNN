@@ -20,6 +20,8 @@ TEST(convolution_pooling_fwd_intg, func_check_naive_conv_pool) {
   int pad[2] = {0, 0};    // zero padding
   int stride[2] = {4, 4}; // stride 1
   int dil[2] = {1,1};
+  alpha = 1.f;
+  beta = 0.f;
 
   Desc outputDesc = calculate_Dims(inputDesc, filterDesc, pad, stride, dil);
 
@@ -54,7 +56,8 @@ TEST(convolution_pooling_fwd_intg, func_check_naive_conv_pool) {
                            filterData.gpu(), NULL, dstDataGPU.gpu(), &alpha,
                            &beta, &avg_time1);
 
-  hipdnn_pooling_forward<float>(pool, dstDataGPU.gpu(), dstData.gpu(), poolCF_mode, dataType, false, &avg_time2);
+  hipdnn_pooling_forward<float>(pool, dstDataGPU.gpu(), dstData.gpu(), poolCF_mode,
+                                dataType, false, &alpha, &beta, &avg_time2);
 
   avg_time = avg_time1 + avg_time2;
 

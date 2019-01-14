@@ -9,6 +9,8 @@ TEST(convolution_pooling_fwd_bwd_intg, func_check_naive_conv_pool_fwd_bwd) {
   int oheight = 4, owidth = 4;
   poolCPI_mode = HIPDNN_POOLING_MAX;
   hipdnnDataType_t dataType = HIPDNN_DATA_FLOAT;
+  alpha = 1.f;
+  beta = 0.f;
 
   test_pooling_descriptor pool(1, 1, 4, 4, 2, 2, 2, 2, 0, 0, 2, 2);
   pool_bwd test_case(1, 1, 4, 4, 2, 2, 0, 0, 2, 2, 1, 1, oheight, owidth);
@@ -87,7 +89,8 @@ TEST(convolution_pooling_fwd_bwd_intg, func_check_naive_conv_pool_fwd_bwd) {
                           &avg_time1);
 
   hipdnn_pooling_backward<float>(test_case, dstDataGPU.gpu(), gradData1.gpu(),
-                           dstData.gpu(), poolCPI_mode, dataType, &avg_time3);
+                           dstData.gpu(), poolCPI_mode, dataType, &alpha, &beta,
+                           &avg_time3);
 
   compute_hipdnn_conv_backward_filter<float>(testConvolutionSizes2, dstDataGPU.gpu(),
                                  filterData.gpu(), gradData2.gpu(), NULL,
