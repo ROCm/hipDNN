@@ -2,11 +2,10 @@
 
 //This test currently fails in NVidia, so it has been commented
 
-/*
 TEST(group_convolution_fwd, func_check_group_conv) {
 
-  Desc inputDesc(32, 2, 224, 224);
-  Desc filterDesc(4, 2, 3, 3);
+  Desc inputDesc(2, 2, 224, 224);
+  Desc filterDesc(2, 2, 3, 3);
 
   int pad[2] = {0, 0};    // zero padding
   int stride[2] = {1, 1}; // stride 1
@@ -53,4 +52,4 @@ TEST(group_convolution_fwd, func_check_group_conv) {
   write_to_csv(strt, str, testname, avg_time, str_ip_size, str_k_size, str_op_size);
   dump_result_csv(filename, testname, temp, (int)dstDataGPU.get_num_elements());
 }
-*/
+
