@@ -29,7 +29,9 @@ void compute_hipdnn_group_conv(convulution_Size &c, dataType *src,
       conv_desc, c.padh, c.padw, c.strh, c.strw, c.dilh, c.dilw,
       HIPDNN_GROUP_CONVOLUTION, HIPDNN_DATA_FLOAT));
 
+#ifdef __HIP_PLATFORM_HCC__
   checkHIPDNN(hipdnnSetConvolutionGroupCount(conv_desc, c.ng));
+#endif
 
   checkHIPDNN(hipdnnGetConvolution2dForwardOutputDim(
       conv_desc, in_desc, filt_desc, &c.mb, &c.oc, &c.oh, &c.ow));
@@ -58,6 +60,10 @@ void compute_hipdnn_group_conv(convulution_Size &c, dataType *src,
       MaxAlgoCount, &calgo, algoPerf, ws_data, ws_size);
 
   algo = (hipdnnConvolutionFwdAlgo_t)algoPerf[0].algo;
+
+#ifdef __HIP_PLATFORM_NVCC__
+  checkHIPDNN(hipdnnSetConvolutionGroupCount(conv_desc, c.ng));
+#endif
 
   float alpha = 1.f;
   float beta = 0.f;
