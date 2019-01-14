@@ -7,6 +7,9 @@ TEST(convolution_pooling_act_fwd_bwd_intg, func_check_conv_pool_act_fwd_bwd) {
   float avg_time = 0, avg_time1 = 0, avg_time2 = 0, avg_time3 = 0, avg_time4 = 0;
   float avg_time5 = 0, avg_time6 = 0;
   int oheight = 4, owidth = 4;
+  alpha = 1.f;
+  beta = 0.f;
+
   hipdnnPoolingMode_t pool_mode = HIPDNN_POOLING_MAX;
   hipdnnActivationMode_t act_mode = HIPDNN_ACTIVATION_RELU;
   hipdnnDataType_t dataType = HIPDNN_DATA_FLOAT;
@@ -99,8 +102,9 @@ TEST(convolution_pooling_act_fwd_bwd_intg, func_check_conv_pool_act_fwd_bwd) {
                                     "Conv_fwd","MP_fwd","act_fwd","Conv_bwd",
                                     "MP_bwd","act_bwd");
 
-  compute_hipdnn_conv_forward<float>(testConvolutionSizes, srcDataConv.gpu(), filterData.gpu(),
-                       NULL, dstDataGPU.gpu(),&avg_time1);
+  compute_hipdnn_conv_forward<float>(testConvolutionSizes, srcDataConv.gpu(),
+                              filterData.gpu(), NULL, dstDataGPU.gpu(), &alpha,
+                              &beta, &avg_time1);
 
   compute_hipdnn_activation_forward(test_case1, dstDataGPU.gpu(), dataDst_act.gpu(), act_mode, &avg_time2);
 
