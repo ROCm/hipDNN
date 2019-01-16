@@ -110,7 +110,7 @@ TEST(convolution_pooling_act_fwd_bwd_intg, func_check_conv_pool_act_fwd_bwd) {
                                     act_mode, &avg_time2);
 
   hipdnn_pooling_backward<float>(test_case, dataDst_act.gpu(), gradData1.gpu(),
-                       dstData.gpu(), pool_mode, dataType,  &alpha, &beta, &avg_time4);
+                       dstData.gpu(), pool_mode, dataType, &avg_time4);
 
   compute_hipdnn_activation_backward(test_case1, dataDst_act.gpu(), dataGrad_act.gpu(),
                          dstData.gpu(), act_mode, &avg_time5);

@@ -89,8 +89,7 @@ TEST(convolution_pooling_fwd_bwd_intg, func_check_naive_conv_pool_fwd_bwd) {
                           &avg_time1);
 
   hipdnn_pooling_backward<float>(test_case, dstDataGPU.gpu(), gradData1.gpu(),
-                           dstData.gpu(), poolCPI_mode, dataType, &alpha, &beta,
-                           &avg_time3);
+                           dstData.gpu(), poolCPI_mode, dataType, &avg_time3);
 
   compute_hipdnn_conv_backward_filter<float>(testConvolutionSizes2, dstDataGPU.gpu(),
                                  filterData.gpu(), gradData2.gpu(), NULL,
