@@ -83,7 +83,8 @@ TEST(convolution_pooling_fwd_bwd_intg, func_check_naive_conv_pool_fwd_bwd) {
                                       "Conv_bwd","MP_bwd");
 
   compute_hipdnn_conv_forward<float>(testConvolutionSizes, srcDataConv.gpu(),
-                          filterData.gpu(), NULL, dstDataGPU.gpu(),&avg_time1);
+                          filterData.gpu(), NULL, dstDataGPU.gpu(), &alpha, &beta,
+                          &avg_time1);
 
   hipdnn_pooling_backward<float>(test_case, dstDataGPU.gpu(), gradData1.gpu(),
                            dstData.gpu(), poolCPI_mode, dataType, &avg_time3);
@@ -108,4 +109,3 @@ TEST(convolution_pooling_fwd_bwd_intg, func_check_naive_conv_pool_fwd_bwd) {
   write_to_csv(strt, str, testname, avg_time, str_ip_size, str_k_size, str_op_size);
   dump_result_csv(filename, testname, temp, (int)gradData2.get_num_elements());
 }
-
