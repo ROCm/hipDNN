@@ -27,7 +27,11 @@ void compute_hipdnn_group_conv(convulution_Size &c, dataType *src,
   checkHIPDNN(hipdnnCreateConvolutionDescriptor(&conv_desc));
   checkHIPDNN(hipdnnSetConvolution2dDescriptor(
       conv_desc, c.padh, c.padw, c.strh, c.strw, c.dilh, c.dilw,
-      HIPDNN_CROSS_CORRELATION, HIPDNN_DATA_FLOAT));
+      HIPDNN_GROUP_CONVOLUTION, HIPDNN_DATA_FLOAT));
+
+#ifdef __HIP_PLATFORM_HCC__
+  checkHIPDNN(hipdnnSetConvolutionGroupCount(conv_desc, c.ng));
+#endif
 
   checkHIPDNN(hipdnnGetConvolution2dForwardOutputDim(
       conv_desc, in_desc, filt_desc, &c.mb, &c.oc, &c.oh, &c.ow));
@@ -46,18 +50,20 @@ void compute_hipdnn_group_conv(convulution_Size &c, dataType *src,
 
   hipdnnConvolutionFwdAlgoPerf_t algoPerf[MaxAlgoCount];
 
+  checkHIPDNN(hipdnnGetConvolutionForwardWorkspaceSize(
+      hipdnn, in_desc, filt_desc, conv_desc, out_desc, algo, &ws_size));
+
+  hipMalloc(&ws_data, ws_size);
+
   hipdnnFindConvolutionForwardAlgorithmEx(
       hipdnn, in_desc, src, filt_desc, weights, conv_desc, out_desc, dst,
       MaxAlgoCount, &calgo, algoPerf, ws_data, ws_size);
 
   algo = (hipdnnConvolutionFwdAlgo_t)algoPerf[0].algo;
 
-  checkHIPDNN(hipdnnGetConvolutionForwardWorkspaceSize(
-      hipdnn, in_desc, filt_desc, conv_desc, out_desc, algo, &ws_size));
-
-  hipMalloc(&ws_data, ws_size);
-
+#ifdef __HIP_PLATFORM_NVCC__
   checkHIPDNN(hipdnnSetConvolutionGroupCount(conv_desc, c.ng));
+#endif
 
   float alpha = 1.f;
   float beta = 0.f;
