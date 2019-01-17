@@ -22,6 +22,14 @@ inline Desc calculate_Dims(Desc inputDesc, Desc filterDesc, int pad[2],
   return outputDesc;
 }
 
+inline Desc calculate_pool_Dims(Desc inputDesc, int spatial_ext[2], int pad[2],
+                                int stride[2]) {
+  int outputHeight = ((inputDesc.H - spatial_ext[0] + 2 * pad[0]) / stride[0]) + 1;
+  int outputWidth = ((inputDesc.W - spatial_ext[1] + 2 * pad[1]) / stride[1]) + 1;
+  Desc outputDesc(inputDesc.N, inputDesc.C, outputHeight, outputWidth);
+  return outputDesc;
+}
+
 struct convulution_Size {
   convulution_Size(int mb, int ng, int ic, int ih, int iw, int oc,
                            int oh, int ow, int kh, int kw, int padh, int padw,
