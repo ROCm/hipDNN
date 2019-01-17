@@ -9,6 +9,7 @@ void compute_hipdnn_activation_forward(activation_params_t &test_case,
                                         dataType *src,
                                         dataType *dst,
                                         hipdnnActivationMode_t mode,
+                                        float *alpha, float *beta,
                                         float *avg_time) {
   hipdnnHandle_t hipdnn;
   checkHIPDNN(hipdnnCreate(&hipdnn));
@@ -38,8 +39,8 @@ void compute_hipdnn_activation_forward(activation_params_t &test_case,
                out_desc, HIPDNN_TENSOR_NCHW, HIPDNN_DATA_FLOAT, test_case.n,
                test_case.channels, test_case.height, test_case.width));
 
-  float alpha = 1.f;
-  float beta = 0.f;
+//  float alpha = 1.f;
+//  float beta = 0.f;
 
   high_resolution_timer_t timer;
 
@@ -72,6 +73,7 @@ void compute_hipdnn_activation_backward(activation_params_t &test_case,
                                         dataType *src, dataType *grad,
                                         dataType *dst,
                                         hipdnnActivationMode_t mode,
+                                        float *alpha, float *beta,
                                         float *avg_time) {
   hipdnnHandle_t hipdnn;
   checkHIPDNN(hipdnnCreate(&hipdnn));
@@ -101,8 +103,8 @@ void compute_hipdnn_activation_backward(activation_params_t &test_case,
       out_desc, HIPDNN_TENSOR_NCHW, HIPDNN_DATA_FLOAT, test_case.n,
       test_case.channels, test_case.height, test_case.width));
 
-  float alpha = 1.f;
-  float beta = 0.f;
+//  float alpha = 1.f;
+//  float beta = 0.f;
 
   high_resolution_timer_t timer;
 
