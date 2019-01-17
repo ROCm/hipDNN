@@ -4,6 +4,12 @@
 
 TEST(convolution_pooling_act_fwd_bwd_intg, func_check_conv_pool_act_fwd_bwd) {
 
+  Desc inputDescP(1, 1, 4, 4);
+  int spatial_ext[2] = {2, 2};
+  int strideP[2] = {2, 2};
+  int pad_p[2] = {0,0};
+  Desc outputDescP = calculate_pool_Dims(inputDescP, spatial_ext, pad_p, strideP);
+
   float avg_time = 0, avg_time1 = 0, avg_time2 = 0, avg_time3 = 0, avg_time4 = 0;
   float avg_time5 = 0, avg_time6 = 0;
   int oheight = 4, owidth = 4;
@@ -15,8 +21,15 @@ TEST(convolution_pooling_act_fwd_bwd_intg, func_check_conv_pool_act_fwd_bwd) {
   hipdnnDataType_t dataType = HIPDNN_DATA_FLOAT;
 
 
-  test_pooling_descriptor pool(1, 1, 4, 4, 2, 2, 2, 2, 0, 0, 2, 2);
-  pool_bwd test_case(1, 1, 4, 4, 2, 2, 0, 0, 2, 2, 1, 1, oheight, owidth);
+  test_pooling_descriptor pool(inputDescP.N, inputDescP.C, inputDescP.H,
+                               inputDescP.W, outputDescP.H, outputDescP.W,
+                               spatial_ext[0], spatial_ext[1], pad_p[0], pad_p[1],
+                               strideP[0], strideP[1]);
+
+  pool_bwd test_case(inputDescP.N, inputDescP.C, inputDescP.H, inputDescP.W,
+                     spatial_ext[0], spatial_ext[1], pad_p[0], pad_p[1],
+                     strideP[0], strideP[1], inputDescP.N, inputDescP.C,
+                     inputDescP.H, inputDescP.W);
 
   Memory<float> dstData(pool.mb * pool.c * pool.oh * pool.ow);
 

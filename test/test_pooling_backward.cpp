@@ -5,26 +5,28 @@ hipdnnDataType_t dataType_b = HIPDNN_DATA_FLOAT;
 
 TEST(pooling_backward, func_check_pooling_stride_2x2) {
 
+  Desc inputDesc(1, 1, 4, 4);
+  int spatial_ext[2] = {2, 2};
+  int stride[2] = {2, 2};
+  int pad[2] = {0,0};
   float avg_time = 0;
-  int oheight = 4, owidth = 4;
-
   poolB_mode = HIPDNN_POOLING_MAX;
 
-  pool_bwd test_case(1, 1, 4, 4, 2, 2, 0, 0, 2, 2, 1, 1, oheight, owidth);
+  pool_bwd test_case(inputDesc.N, inputDesc.C, inputDesc.H, inputDesc.W,
+                     spatial_ext[0], spatial_ext[1], pad[0], pad[1], stride[0],
+                     stride[1], inputDesc.N, inputDesc.C, inputDesc.H,
+                     inputDesc.W);
 
-  Memory<float> dataSrc(16);
-  Memory<float> dataGrad(16);
+  Memory<float> dataSrc = createMemory<float>(inputDesc);
+  Memory<float> dataGrad = createMemory<float>(inputDesc);
+  Memory<float> dataDst = createMemory<float>(inputDesc);
 
   populateMemoryRandom(dataSrc);
   populateMemoryRandom(dataGrad);
 
-  Memory<float> dataDst(test_case.on * test_case.ochannel * test_case.oheight *
-                        test_case.owidth);
-
-  int ip_size[4] = {1,1,4,4};
-  int k_size[4] = {1,1,2,2};
-  int op_size[4] =  {test_case.on, test_case.ochannel, test_case.oheight,
-                     test_case.owidth};
+  int ip_size[4] = {inputDesc.N, inputDesc.C, inputDesc.H, inputDesc.W};
+  int k_size[4] = {inputDesc.N, inputDesc.C, spatial_ext[0], spatial_ext[1]};
+  int op_size[4] = {inputDesc.N, inputDesc.C, inputDesc.H, inputDesc.W};
 
   std::string str_ip_size  = convert_to_string((int*)ip_size,4);
   std::string str_k_size  = convert_to_string((int*)k_size,4);
@@ -50,26 +52,28 @@ TEST(pooling_backward, func_check_pooling_stride_2x2) {
 
 TEST(pooling_backward, func_check_pooling_AVERAGE_COUNT_INCLUDE_PADDING) {
 
+  Desc inputDesc(1, 1, 4, 4);
+  int spatial_ext[2] = {2, 2};
+  int stride[2] = {2, 2};
+  int pad[2] = {0,0};
   float avg_time = 0;
-  int oheight = 4, owidth = 4;
-
   poolB_mode = HIPDNN_POOLING_AVERAGE_COUNT_INCLUDE_PADDING;
 
-  pool_bwd test_case(1, 1, 4, 4, 2, 2, 0, 0, 2, 2, 1, 1, oheight, owidth);
+    pool_bwd test_case(inputDesc.N, inputDesc.C, inputDesc.H, inputDesc.W,
+                     spatial_ext[0], spatial_ext[1], pad[0], pad[1], stride[0],
+                     stride[1], inputDesc.N, inputDesc.C, inputDesc.H,
+                     inputDesc.W);
 
-  Memory<float> dataSrc(16);
-  Memory<float> dataGrad(16);
+  Memory<float> dataSrc = createMemory<float>(inputDesc);
+  Memory<float> dataGrad = createMemory<float>(inputDesc);
+  Memory<float> dataDst = createMemory<float>(inputDesc);
 
   populateMemoryRandom(dataSrc);
   populateMemoryRandom(dataGrad);
 
-  Memory<float> dataDst(test_case.on * test_case.ochannel * test_case.oheight *
-                        test_case.owidth);
-
-  int ip_size[4] = {1,1,4,4};
-  int k_size[4] = {1,1,2,2};
-  int op_size[4] =  {test_case.on, test_case.ochannel, test_case.oheight,
-                     test_case.owidth};
+  int ip_size[4] = {inputDesc.N, inputDesc.C, inputDesc.H, inputDesc.W};
+  int k_size[4] = {inputDesc.N, inputDesc.C, spatial_ext[0], spatial_ext[1]};
+  int op_size[4] = {inputDesc.N, inputDesc.C, inputDesc.H, inputDesc.W};
 
   std::string str_ip_size  = convert_to_string((int*)ip_size,4);
   std::string str_k_size  = convert_to_string((int*)k_size,4);
@@ -95,29 +99,28 @@ TEST(pooling_backward, func_check_pooling_AVERAGE_COUNT_INCLUDE_PADDING) {
 
 TEST(pooling_backward, func_check_pooling_batch32) {
 
+  Desc inputDesc(32, 1, 4, 4);
+  int spatial_ext[2] = {2, 2};
+  int stride[2] = {2, 2};
+  int pad[2] = {0,0};
   float avg_time = 0;
-  int oheight = 4, owidth = 4;
-
   poolB_mode = HIPDNN_POOLING_MAX;
 
-  pool_bwd test_case(32, 1, 4, 4, 2, 2, 0, 0, 2, 2, 32, 1, oheight, owidth);
+  pool_bwd test_case(inputDesc.N, inputDesc.C, inputDesc.H, inputDesc.W,
+                     spatial_ext[0], spatial_ext[1], pad[0], pad[1], stride[0],
+                     stride[1], inputDesc.N, inputDesc.C, inputDesc.H,
+                     inputDesc.W);
 
-  Memory<float> dataSrc(test_case.in * test_case.ichannel * test_case.iheight *
-                        test_case.iwidth);
-
-  Memory<float> dataGrad(test_case.in * test_case.ichannel * test_case.iheight *
-                         test_case.iwidth);
+  Memory<float> dataSrc = createMemory<float>(inputDesc);
+  Memory<float> dataGrad = createMemory<float>(inputDesc);
+  Memory<float> dataDst = createMemory<float>(inputDesc);
 
   populateMemoryRandom(dataSrc);
   populateMemoryRandom(dataGrad);
 
-  Memory<float> dataDst(test_case.on * test_case.ochannel * test_case.oheight *
-                        test_case.owidth);
-
-  int ip_size[4] = {32,1,4,4};
-  int k_size[4] = {1,1,2,2};
-  int op_size[4] =  {test_case.on, test_case.ochannel, test_case.oheight,
-                     test_case.owidth};
+  int ip_size[4] = {inputDesc.N, inputDesc.C, inputDesc.H, inputDesc.W};
+  int k_size[4] = {inputDesc.N, inputDesc.C, spatial_ext[0], spatial_ext[1]};
+  int op_size[4] = {inputDesc.N, inputDesc.C, inputDesc.H, inputDesc.W};
 
   std::string str_ip_size  = convert_to_string((int*)ip_size,4);
   std::string str_k_size  = convert_to_string((int*)k_size,4);
@@ -143,28 +146,28 @@ TEST(pooling_backward, func_check_pooling_batch32) {
 
 TEST(pooling_backward, func_check_pooling_batch64) {
 
+  Desc inputDesc(64, 1, 4, 4);
+  int spatial_ext[2] = {2, 2};
+  int stride[2] = {2, 2};
+  int pad[2] = {0,0};
   float avg_time = 0;
-  int oheight = 4, owidth = 4;
-
   poolB_mode = HIPDNN_POOLING_MAX;
 
-  pool_bwd test_case(64, 1, 4, 4, 2, 2, 0, 0, 2, 2, 64, 1, oheight, owidth);
+  pool_bwd test_case(inputDesc.N, inputDesc.C, inputDesc.H, inputDesc.W,
+                     spatial_ext[0], spatial_ext[1], pad[0], pad[1], stride[0],
+                     stride[1], inputDesc.N, inputDesc.C, inputDesc.H,
+                     inputDesc.W);
 
-  Memory<float> dataSrc(test_case.in * test_case.ichannel * test_case.iheight *
-                        test_case.iwidth);
-  Memory<float> dataGrad(test_case.in * test_case.ichannel * test_case.iheight *
-                         test_case.iwidth);
+  Memory<float> dataSrc = createMemory<float>(inputDesc);
+  Memory<float> dataGrad = createMemory<float>(inputDesc);
+  Memory<float> dataDst = createMemory<float>(inputDesc);
 
   populateMemoryRandom(dataSrc);
   populateMemoryRandom(dataGrad);
 
-  Memory<float> dataDst(test_case.on * test_case.ochannel * test_case.oheight *
-                        test_case.owidth);
-
-  int ip_size[4] = {64,1,4,4};
-  int k_size[4] = {1,1,2,2};
-  int op_size[4] =  {test_case.on, test_case.ochannel, test_case.oheight,
-                     test_case.owidth};
+  int ip_size[4] = {inputDesc.N, inputDesc.C, inputDesc.H, inputDesc.W};
+  int k_size[4] = {inputDesc.N, inputDesc.C, spatial_ext[0], spatial_ext[1]};
+  int op_size[4] = {inputDesc.N, inputDesc.C, inputDesc.H, inputDesc.W};
 
   std::string str_ip_size  = convert_to_string((int*)ip_size,4);
   std::string str_k_size  = convert_to_string((int*)k_size,4);
@@ -189,28 +192,28 @@ TEST(pooling_backward, func_check_pooling_batch64) {
 
 TEST(pooling_backward, func_check_pooling_batch128) {
 
+  Desc inputDesc(128, 1, 4, 4);
+  int spatial_ext[2] = {2, 2};
+  int stride[2] = {2, 2};
+  int pad[2] = {0,0};
   float avg_time = 0;
-  int oheight = 4, owidth = 4;
-
   poolB_mode = HIPDNN_POOLING_MAX;
 
-  pool_bwd test_case(128, 1, 4, 4, 2, 2, 0, 0, 2, 2, 128, 1, oheight, owidth);
+  pool_bwd test_case(inputDesc.N, inputDesc.C, inputDesc.H, inputDesc.W,
+                     spatial_ext[0], spatial_ext[1], pad[0], pad[1], stride[0],
+                     stride[1], inputDesc.N, inputDesc.C, inputDesc.H,
+                     inputDesc.W);
 
-  Memory<float> dataSrc(test_case.in * test_case.ichannel * test_case.iheight *
-                        test_case.iwidth);
-  Memory<float> dataGrad(test_case.in * test_case.ichannel * test_case.iheight *
-                         test_case.iwidth);
+  Memory<float> dataSrc = createMemory<float>(inputDesc);
+  Memory<float> dataGrad = createMemory<float>(inputDesc);
+  Memory<float> dataDst = createMemory<float>(inputDesc);
 
   populateMemoryRandom(dataSrc);
   populateMemoryRandom(dataGrad);
 
-  Memory<float> dataDst(test_case.on * test_case.ochannel * test_case.oheight *
-                        test_case.owidth);
-
-  int ip_size[4] = {128,1,4,4};
-  int k_size[4] = {1,1,2,2};
-  int op_size[4] =  {test_case.on, test_case.ochannel, test_case.oheight,
-                     test_case.owidth};
+  int ip_size[4] = {inputDesc.N, inputDesc.C, inputDesc.H, inputDesc.W};
+  int k_size[4] = {inputDesc.N, inputDesc.C, spatial_ext[0], spatial_ext[1]};
+  int op_size[4] = {inputDesc.N, inputDesc.C, inputDesc.H, inputDesc.W};
 
   std::string str_ip_size  = convert_to_string((int*)ip_size,4);
   std::string str_k_size  = convert_to_string((int*)k_size,4);
