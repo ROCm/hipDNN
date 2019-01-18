@@ -94,7 +94,7 @@ void hipdnn_pooling_backward(pool_bwd &test_case, dataType *src, dataType *grad,
       test_case.ochannel, test_case.oheight, test_case.owidth));
 
   float alpha = 1.f;
-  float beta = 0.f;
+  float beta = 0.5f;
 
   hipdnnPoolingForward(hipdnn, pool_desc, &alpha, in_desc, src, &beta, out_desc,
                        dst, true);

@@ -13,7 +13,6 @@ TEST(pooling_fwd, func_check_zero_padding) {
 
   Desc outputDesc = calculate_pool_Dims(inputDesc, spatial_ext, pad, stride);
 
-  std::cout<<"\n output Dims: "<<outputDesc.H <<"\t"<< outputDesc.W;
   Memory<float> srcData = createMemory<float>(inputDesc);
   Memory<float> dstDataGPU = createMemory<float>(outputDesc);
   populateMemoryRandom<float>(srcData);

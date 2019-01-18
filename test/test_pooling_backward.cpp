@@ -12,6 +12,8 @@ TEST(pooling_backward, func_check_pooling_stride_2x2) {
   float avg_time = 0;
   poolB_mode = HIPDNN_POOLING_MAX;
 
+  Desc outputDesc = calculate_pool_Dims(inputDesc, spatial_ext, pad, stride);
+
   pool_bwd test_case(inputDesc.N, inputDesc.C, inputDesc.H, inputDesc.W,
                      spatial_ext[0], spatial_ext[1], pad[0], pad[1], stride[0],
                      stride[1], inputDesc.N, inputDesc.C, inputDesc.H,
@@ -19,10 +21,9 @@ TEST(pooling_backward, func_check_pooling_stride_2x2) {
 
   Memory<float> dataSrc = createMemory<float>(inputDesc);
   Memory<float> dataGrad = createMemory<float>(inputDesc);
-  Memory<float> dataDst = createMemory<float>(inputDesc);
+  Memory<float> dataDst = createMemory<float>(outputDesc);
 
   populateMemoryRandom(dataSrc);
-  populateMemoryRandom(dataGrad);
 
   int ip_size[4] = {inputDesc.N, inputDesc.C, inputDesc.H, inputDesc.W};
   int k_size[4] = {inputDesc.N, inputDesc.C, spatial_ext[0], spatial_ext[1]};
@@ -59,17 +60,18 @@ TEST(pooling_backward, func_check_pooling_AVERAGE_COUNT_INCLUDE_PADDING) {
   float avg_time = 0;
   poolB_mode = HIPDNN_POOLING_AVERAGE_COUNT_INCLUDE_PADDING;
 
-    pool_bwd test_case(inputDesc.N, inputDesc.C, inputDesc.H, inputDesc.W,
+  Desc outputDesc = calculate_pool_Dims(inputDesc, spatial_ext, pad, stride);
+
+  pool_bwd test_case(inputDesc.N, inputDesc.C, inputDesc.H, inputDesc.W,
                      spatial_ext[0], spatial_ext[1], pad[0], pad[1], stride[0],
                      stride[1], inputDesc.N, inputDesc.C, inputDesc.H,
                      inputDesc.W);
 
   Memory<float> dataSrc = createMemory<float>(inputDesc);
   Memory<float> dataGrad = createMemory<float>(inputDesc);
-  Memory<float> dataDst = createMemory<float>(inputDesc);
+  Memory<float> dataDst = createMemory<float>(outputDesc);
 
   populateMemoryRandom(dataSrc);
-  populateMemoryRandom(dataGrad);
 
   int ip_size[4] = {inputDesc.N, inputDesc.C, inputDesc.H, inputDesc.W};
   int k_size[4] = {inputDesc.N, inputDesc.C, spatial_ext[0], spatial_ext[1]};
@@ -106,6 +108,8 @@ TEST(pooling_backward, func_check_pooling_batch32) {
   float avg_time = 0;
   poolB_mode = HIPDNN_POOLING_MAX;
 
+  Desc outputDesc = calculate_pool_Dims(inputDesc, spatial_ext, pad, stride);
+
   pool_bwd test_case(inputDesc.N, inputDesc.C, inputDesc.H, inputDesc.W,
                      spatial_ext[0], spatial_ext[1], pad[0], pad[1], stride[0],
                      stride[1], inputDesc.N, inputDesc.C, inputDesc.H,
@@ -113,10 +117,9 @@ TEST(pooling_backward, func_check_pooling_batch32) {
 
   Memory<float> dataSrc = createMemory<float>(inputDesc);
   Memory<float> dataGrad = createMemory<float>(inputDesc);
-  Memory<float> dataDst = createMemory<float>(inputDesc);
+  Memory<float> dataDst = createMemory<float>(outputDesc);
 
   populateMemoryRandom(dataSrc);
-  populateMemoryRandom(dataGrad);
 
   int ip_size[4] = {inputDesc.N, inputDesc.C, inputDesc.H, inputDesc.W};
   int k_size[4] = {inputDesc.N, inputDesc.C, spatial_ext[0], spatial_ext[1]};
@@ -153,6 +156,8 @@ TEST(pooling_backward, func_check_pooling_batch64) {
   float avg_time = 0;
   poolB_mode = HIPDNN_POOLING_MAX;
 
+  Desc outputDesc = calculate_pool_Dims(inputDesc, spatial_ext, pad, stride);
+
   pool_bwd test_case(inputDesc.N, inputDesc.C, inputDesc.H, inputDesc.W,
                      spatial_ext[0], spatial_ext[1], pad[0], pad[1], stride[0],
                      stride[1], inputDesc.N, inputDesc.C, inputDesc.H,
@@ -160,10 +165,9 @@ TEST(pooling_backward, func_check_pooling_batch64) {
 
   Memory<float> dataSrc = createMemory<float>(inputDesc);
   Memory<float> dataGrad = createMemory<float>(inputDesc);
-  Memory<float> dataDst = createMemory<float>(inputDesc);
+  Memory<float> dataDst = createMemory<float>(outputDesc);
 
   populateMemoryRandom(dataSrc);
-  populateMemoryRandom(dataGrad);
 
   int ip_size[4] = {inputDesc.N, inputDesc.C, inputDesc.H, inputDesc.W};
   int k_size[4] = {inputDesc.N, inputDesc.C, spatial_ext[0], spatial_ext[1]};
@@ -199,6 +203,8 @@ TEST(pooling_backward, func_check_pooling_batch128) {
   float avg_time = 0;
   poolB_mode = HIPDNN_POOLING_MAX;
 
+  Desc outputDesc = calculate_pool_Dims(inputDesc, spatial_ext, pad, stride);
+
   pool_bwd test_case(inputDesc.N, inputDesc.C, inputDesc.H, inputDesc.W,
                      spatial_ext[0], spatial_ext[1], pad[0], pad[1], stride[0],
                      stride[1], inputDesc.N, inputDesc.C, inputDesc.H,
@@ -206,10 +212,9 @@ TEST(pooling_backward, func_check_pooling_batch128) {
 
   Memory<float> dataSrc = createMemory<float>(inputDesc);
   Memory<float> dataGrad = createMemory<float>(inputDesc);
-  Memory<float> dataDst = createMemory<float>(inputDesc);
+  Memory<float> dataDst = createMemory<float>(outputDesc);
 
   populateMemoryRandom(dataSrc);
-  populateMemoryRandom(dataGrad);
 
   int ip_size[4] = {inputDesc.N, inputDesc.C, inputDesc.H, inputDesc.W};
   int k_size[4] = {inputDesc.N, inputDesc.C, spatial_ext[0], spatial_ext[1]};
