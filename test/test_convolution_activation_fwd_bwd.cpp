@@ -70,12 +70,12 @@ TEST(convolution_activation_fwd_bwd_intg,
                            &beta, &avg_time1);
 
   compute_hipdnn_activation_forward<float>(test_case, dstDataGPU.gpu(),
-                                           dataDst.gpu(), act_mode, &alpha, &beta,
+                                           dataDst.gpu(), act_mode, alpha, beta,
                                            &avg_time2);
 
   compute_hipdnn_activation_backward<float>(test_case, dstDataGPU.gpu(),
                                             data_grad.gpu(), dataDst.gpu(),
-                                            act_mode, &alpha, &beta,&avg_time3);
+                                            act_mode, alpha, beta,&avg_time3);
 
   compute_hipdnn_conv_backward_filter<float>(testConvolutionSizes, srcDataConv.gpu(),
                             filterData.gpu(), gradData2.gpu(), NULL,
