@@ -4,6 +4,12 @@
 
 TEST(convolution_pooling_act_fwd_bwd_intg, func_check_conv_pool_act_fwd_bwd) {
 
+  Desc inputDescP(1, 1, 4, 4);
+  int spatial_ext[2] = {2, 2};
+  int strideP[2] = {2, 2};
+  int pad_p[2] = {0,0};
+  Desc outputDescP = calculate_pool_Dims(inputDescP, spatial_ext, pad_p, strideP);
+
   float avg_time = 0, avg_time1 = 0, avg_time2 = 0, avg_time3 = 0, avg_time4 = 0;
   float avg_time5 = 0, avg_time6 = 0;
   int oheight = 4, owidth = 4;
@@ -15,8 +21,15 @@ TEST(convolution_pooling_act_fwd_bwd_intg, func_check_conv_pool_act_fwd_bwd) {
   hipdnnDataType_t dataType = HIPDNN_DATA_FLOAT;
 
 
-  test_pooling_descriptor pool(1, 1, 4, 4, 2, 2, 2, 2, 0, 0, 2, 2);
-  pool_bwd test_case(1, 1, 4, 4, 2, 2, 0, 0, 2, 2, 1, 1, oheight, owidth);
+  test_pooling_descriptor pool(inputDescP.N, inputDescP.C, inputDescP.H,
+                               inputDescP.W, outputDescP.H, outputDescP.W,
+                               spatial_ext[0], spatial_ext[1], pad_p[0], pad_p[1],
+                               strideP[0], strideP[1]);
+
+  pool_bwd test_case(inputDescP.N, inputDescP.C, inputDescP.H, inputDescP.W,
+                     spatial_ext[0], spatial_ext[1], pad_p[0], pad_p[1],
+                     strideP[0], strideP[1], inputDescP.N, inputDescP.C,
+                     inputDescP.H, inputDescP.W);
 
   Memory<float> dstData(pool.mb * pool.c * pool.oh * pool.ow);
 
@@ -106,13 +119,14 @@ TEST(convolution_pooling_act_fwd_bwd_intg, func_check_conv_pool_act_fwd_bwd) {
                               filterData.gpu(), NULL, dstDataGPU.gpu(), &alpha,
                               &beta, &avg_time1);
 
-  compute_hipdnn_activation_forward(test_case1, dstDataGPU.gpu(), dataDst_act.gpu(), act_mode, &avg_time2);
+  compute_hipdnn_activation_forward(test_case1, dstDataGPU.gpu(), dataDst_act.gpu(),
+                                    act_mode, &alpha, &beta, &avg_time2);
 
   hipdnn_pooling_backward<float>(test_case, dataDst_act.gpu(), gradData1.gpu(),
                        dstData.gpu(), pool_mode, dataType, &avg_time4);
 
   compute_hipdnn_activation_backward(test_case1, dataDst_act.gpu(), dataGrad_act.gpu(),
-                         dstData.gpu(), act_mode, &avg_time5);
+                         dstData.gpu(), act_mode,  &alpha, &beta, &avg_time5);
 
   compute_hipdnn_conv_backward_filter<float>(testConvolutionSizes2, dataDst_act.gpu(),
                                  filterData.gpu(), gradData2.gpu(), NULL,
