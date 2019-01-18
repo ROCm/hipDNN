@@ -56,7 +56,7 @@ TEST(convolution_activation_fwd_intg, func_check_naive_conv_activation) {
                            &beta, &avg_time1);
 
   compute_hipdnn_activation_forward<float>(test_case, dstDataGPU.gpu(),
-                                           dataDst.gpu(), act_mode, &alpha, &beta,
+                                           dataDst.gpu(), act_mode, alpha, beta,
                                            &avg_time2);
 
   avg_time = avg_time1 + avg_time2;

@@ -65,7 +65,7 @@ TEST(convolution_pooling_fwd_intg, func_check_naive_conv_pool) {
                            &beta, &avg_time1);
 
   hipdnn_pooling_forward<float>(pool, dstDataGPU.gpu(), dstData.gpu(), poolCF_mode,
-                                dataType, false, &alpha, &beta, &avg_time2);
+                                dataType, false, alpha, beta, &avg_time2);
 
   avg_time = avg_time1 + avg_time2;
 
