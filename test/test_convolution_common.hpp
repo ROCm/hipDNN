@@ -6,8 +6,8 @@
 
 template <typename dataType>
 void compute_hipdnn_conv_forward(convulution_Size &c, dataType *src,
-            dataType *weights, dataType *bias, dataType *dst, float *alpha,
-            float *beta, float *avg_time) {
+            dataType *weights, dataType *bias, dataType *dst, float alpha,
+            float beta, float *avg_time) {
 
   hipdnnHandle_t hipdnn;
   checkHIPDNN(hipdnnCreate(&hipdnn));
