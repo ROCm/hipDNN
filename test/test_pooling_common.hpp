@@ -58,9 +58,10 @@ void hipdnn_pooling_forward(test_pooling_descriptor &c, dataType *src,
 }
 
 template <typename dataType>
-void hipdnn_pooling_backward(test_pooling_descriptor &test_case, dataType *src, dataType *grad,
-                             dataType *dst, hipdnnPoolingMode_t mode,
-							 hipdnnDataType_t hipdataType, float *avg_time) {
+void hipdnn_pooling_backward(test_pooling_descriptor &test_case, dataType *src,
+                        dataType *grad, dataType *dst, hipdnnPoolingMode_t mode,
+                        hipdnnDataType_t hipdataType, float alpha, float beta,
+                        float *avg_time) {
 
   hipdnnHandle_t hipdnn;
   checkHIPDNN(hipdnnCreate(&hipdnn));
@@ -92,9 +93,6 @@ void hipdnn_pooling_backward(test_pooling_descriptor &test_case, dataType *src, 
   checkHIPDNN(hipdnnSetTensor4dDescriptor(
       out_desc, HIPDNN_TENSOR_NCHW, hipdataType, test_case.mb,
       test_case.c, test_case.oh, test_case.ow));
-
-  float alpha = 1.f;
-  float beta = 0.5f;
 
   hipdnnPoolingForward(hipdnn, pool_desc, &alpha, in_desc, src, &beta, out_desc,
                        dst, true);
