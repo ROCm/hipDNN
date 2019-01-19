@@ -78,28 +78,4 @@ struct LRN_params_t {
       : mb(mb), ic(ic), ih(ih), iw(iw) {}
 };
 
-struct pool_bwd {
-  size_t in, ichannel, iheight, iwidth;
-  size_t wheight, wwidth;
-  size_t vpadding, hpadding;
-  size_t vstride, hstride;
-  int on, ochannel, oheight, owidth;
-
-  pool_bwd(size_t in, size_t ichannel, size_t iheight, size_t iwidth,
-                 size_t wheight, size_t wwidth, size_t vpadding,
-                 size_t hpadding, size_t vstride, size_t hstride)
-      : in(in), ichannel(ichannel), iheight(iheight), iwidth(iwidth),
-        wheight(wheight), wwidth(wwidth), vpadding(vpadding),
-        hpadding(hpadding), vstride(vstride), hstride(hstride) {}
-
-  pool_bwd(size_t in, size_t ichannel, size_t iheight, size_t iwidth,
-                 size_t wheight, size_t wwidth, size_t vpadding,
-                 size_t hpadding, size_t vstride, size_t hstride, size_t on,
-                 size_t ochannel, size_t oheight, size_t owidth)
-      : in(in), ichannel(ichannel), iheight(iheight), iwidth(iwidth),
-        wheight(wheight), wwidth(wwidth), vpadding(vpadding),
-        hpadding(hpadding), vstride(vstride), hstride(hstride), on(on),
-        ochannel(ochannel), oheight(oheight), owidth(owidth) {}
-};
-
 #endif //COMMON_HPP
