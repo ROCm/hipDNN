@@ -7,9 +7,9 @@
 
 template <typename dataType>
 void hipdnn_pooling_forward(test_pooling_descriptor &c, dataType *src,
-                                dataType *dst, hipdnnPoolingMode_t mode, hipdnnDataType_t hipdataType,
-                                bool do_backward, float alpha, float beta,
-                                float *avg_time) {
+                            dataType *dst, hipdnnPoolingMode_t mode,
+                            hipdnnDataType_t hipdataType, bool do_backward,
+                            float alpha, float beta, float *avg_time) {
 
   hipdnnHandle_t handle;
   checkHIPDNN(hipdnnCreate(&handle));
@@ -58,7 +58,7 @@ void hipdnn_pooling_forward(test_pooling_descriptor &c, dataType *src,
 }
 
 template <typename dataType>
-void hipdnn_pooling_backward(pool_bwd &test_case, dataType *src, dataType *grad,
+void hipdnn_pooling_backward(test_pooling_descriptor &test_case, dataType *src, dataType *grad,
                              dataType *dst, hipdnnPoolingMode_t mode,
 							 hipdnnDataType_t hipdataType, float *avg_time) {
 
@@ -69,8 +69,8 @@ void hipdnn_pooling_backward(pool_bwd &test_case, dataType *src, dataType *grad,
   checkHIPDNN(hipdnnCreateTensorDescriptor(&in_desc));
 
   checkHIPDNN(hipdnnSetTensor4dDescriptor(
-      in_desc, HIPDNN_TENSOR_NCHW, hipdataType, test_case.in,
-      test_case.ichannel, test_case.iheight, test_case.oheight));
+      in_desc, HIPDNN_TENSOR_NCHW, hipdataType, test_case.mb,
+      test_case.c, test_case.ih, test_case.oh));
 
   hipdnnPoolingDescriptor_t pool_desc;
   checkHIPDNN(hipdnnCreatePoolingDescriptor(&pool_desc));
@@ -78,20 +78,20 @@ void hipdnn_pooling_backward(pool_bwd &test_case, dataType *src, dataType *grad,
   hipdnnNanPropagation_t maxpoolingNanOpt = HIPDNN_NOT_PROPAGATE_NAN;
 
   checkHIPDNN(hipdnnSetPooling2dDescriptor(
-      pool_desc, mode, maxpoolingNanOpt, test_case.wheight,
-      test_case.wwidth, test_case.vpadding, test_case.hpadding,
-      test_case.vstride, test_case.hstride));
+      pool_desc, mode, maxpoolingNanOpt, test_case.kh,
+      test_case.kw, test_case.padt, test_case.padl,
+      test_case.strh, test_case.strw));
 
   checkHIPDNN(hipdnnGetPooling2dForwardOutputDim(
-      pool_desc, in_desc, &test_case.on, &test_case.ochannel,
-      &test_case.oheight, &test_case.owidth))
+      pool_desc, in_desc, &test_case.mb, &test_case.c,
+      &test_case.oh, &test_case.ow))
   hipdnnTensorDescriptor_t out_desc;
 
   checkHIPDNN(hipdnnCreateTensorDescriptor(&out_desc));
 
   checkHIPDNN(hipdnnSetTensor4dDescriptor(
-      out_desc, HIPDNN_TENSOR_NCHW, hipdataType, test_case.on,
-      test_case.ochannel, test_case.oheight, test_case.owidth));
+      out_desc, HIPDNN_TENSOR_NCHW, hipdataType, test_case.mb,
+      test_case.c, test_case.oh, test_case.ow));
 
   float alpha = 1.f;
   float beta = 0.5f;

@@ -200,11 +200,6 @@ TEST(convolution_fwd, func_check_padding_and_strides_small_size) {
 
   std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
 
-  std::cout<<"\nSource: ";
-  srcData.printGPUMemory();
-  std::cout<<"\nDest: ";
-  dstDataGPU.printGPUMemory();
-
   std::string strt = "./result_unittest.csv";
   std::string testname = "convolution_fwd:func_check_padding_and_strides_small_size";
   std::string filename="convolution_forward.csv";
@@ -254,6 +249,10 @@ TEST(convolution_fwd, func_check_full_conv) {
                                 beta, &avg_time);
 
   std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
+
+  std::string strt = "./result_unittest.csv";
+  std::string testname = "convolution_fwd:func_check_full_conv";
+  std::string filename="convolution_forward.csv";
 
   float* temp = dstDataGPU.getDataFromGPU();
 

@@ -14,10 +14,9 @@ TEST(pooling_backward, func_check_pooling_stride_2x2) {
 
   Desc outputDesc = calculate_pool_Dims(inputDesc, spatial_ext, pad, stride);
 
-  pool_bwd test_case(inputDesc.N, inputDesc.C, inputDesc.H, inputDesc.W,
-                     spatial_ext[0], spatial_ext[1], pad[0], pad[1], stride[0],
-                     stride[1], inputDesc.N, inputDesc.C, inputDesc.H,
-                     inputDesc.W);
+  test_pooling_descriptor test_case(inputDesc.N, inputDesc.C, inputDesc.H,
+                          inputDesc.W, outputDesc.H, outputDesc.W, spatial_ext[0],
+                          spatial_ext[1], pad[0], pad[1], stride[0], stride[1]);
 
   Memory<float> dataSrc = createMemory<float>(inputDesc);
   Memory<float> dataGrad = createMemory<float>(inputDesc);
@@ -62,10 +61,9 @@ TEST(pooling_backward, func_check_pooling_AVERAGE_COUNT_INCLUDE_PADDING) {
 
   Desc outputDesc = calculate_pool_Dims(inputDesc, spatial_ext, pad, stride);
 
-  pool_bwd test_case(inputDesc.N, inputDesc.C, inputDesc.H, inputDesc.W,
-                     spatial_ext[0], spatial_ext[1], pad[0], pad[1], stride[0],
-                     stride[1], inputDesc.N, inputDesc.C, inputDesc.H,
-                     inputDesc.W);
+  test_pooling_descriptor test_case(inputDesc.N, inputDesc.C, inputDesc.H,
+                          inputDesc.W, outputDesc.H, outputDesc.W, spatial_ext[0],
+                          spatial_ext[1], pad[0], pad[1], stride[0], stride[1]);
 
   Memory<float> dataSrc = createMemory<float>(inputDesc);
   Memory<float> dataGrad = createMemory<float>(inputDesc);
@@ -110,10 +108,9 @@ TEST(pooling_backward, func_check_pooling_batch32) {
 
   Desc outputDesc = calculate_pool_Dims(inputDesc, spatial_ext, pad, stride);
 
-  pool_bwd test_case(inputDesc.N, inputDesc.C, inputDesc.H, inputDesc.W,
-                     spatial_ext[0], spatial_ext[1], pad[0], pad[1], stride[0],
-                     stride[1], inputDesc.N, inputDesc.C, inputDesc.H,
-                     inputDesc.W);
+  test_pooling_descriptor test_case(inputDesc.N, inputDesc.C, inputDesc.H,
+                          inputDesc.W, outputDesc.H, outputDesc.W, spatial_ext[0],
+                          spatial_ext[1], pad[0], pad[1], stride[0], stride[1]);
 
   Memory<float> dataSrc = createMemory<float>(inputDesc);
   Memory<float> dataGrad = createMemory<float>(inputDesc);
@@ -158,10 +155,9 @@ TEST(pooling_backward, func_check_pooling_batch64) {
 
   Desc outputDesc = calculate_pool_Dims(inputDesc, spatial_ext, pad, stride);
 
-  pool_bwd test_case(inputDesc.N, inputDesc.C, inputDesc.H, inputDesc.W,
-                     spatial_ext[0], spatial_ext[1], pad[0], pad[1], stride[0],
-                     stride[1], inputDesc.N, inputDesc.C, inputDesc.H,
-                     inputDesc.W);
+    test_pooling_descriptor test_case(inputDesc.N, inputDesc.C, inputDesc.H,
+                          inputDesc.W, outputDesc.H, outputDesc.W, spatial_ext[0],
+                          spatial_ext[1], pad[0], pad[1], stride[0], stride[1]);
 
   Memory<float> dataSrc = createMemory<float>(inputDesc);
   Memory<float> dataGrad = createMemory<float>(inputDesc);
@@ -205,10 +201,9 @@ TEST(pooling_backward, func_check_pooling_batch128) {
 
   Desc outputDesc = calculate_pool_Dims(inputDesc, spatial_ext, pad, stride);
 
-  pool_bwd test_case(inputDesc.N, inputDesc.C, inputDesc.H, inputDesc.W,
-                     spatial_ext[0], spatial_ext[1], pad[0], pad[1], stride[0],
-                     stride[1], inputDesc.N, inputDesc.C, inputDesc.H,
-                     inputDesc.W);
+    test_pooling_descriptor test_case(inputDesc.N, inputDesc.C, inputDesc.H,
+                          inputDesc.W, outputDesc.H, outputDesc.W, spatial_ext[0],
+                          spatial_ext[1], pad[0], pad[1], stride[0], stride[1]);
 
   Memory<float> dataSrc = createMemory<float>(inputDesc);
   Memory<float> dataGrad = createMemory<float>(inputDesc);
