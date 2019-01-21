@@ -79,7 +79,7 @@ TEST(convolution_activation_fwd_bwd_intg,
 
   compute_hipdnn_conv_backward_filter<float>(testConvolutionSizes, srcDataConv.gpu(),
                             filterData.gpu(), gradData2.gpu(), NULL,
-                            data_grad.gpu(), &avg_time4);
+                            data_grad.gpu(), alpha, beta,  &avg_time4);
 
   avg_time = avg_time1 + avg_time2 + avg_time3 + avg_time4;
 
