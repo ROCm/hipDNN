@@ -66,14 +66,16 @@ TEST(convolution_activation_fwd_bwd_intg,
                op_size_cb,op_size_ab,"Conv_fwd","Act_fwd","Conv_bwd","Act_bwd");
 
   compute_hipdnn_conv_forward<float>(testConvolutionSizes, srcDataConv.gpu(),
-                           filterData.gpu(), NULL, dstDataGPU.gpu(), &alpha,
-                           &beta, &avg_time1);
+                           filterData.gpu(), NULL, dstDataGPU.gpu(), alpha,
+                           beta, &avg_time1);
 
   compute_hipdnn_activation_forward<float>(test_case, dstDataGPU.gpu(),
-                                           dataDst.gpu(), act_mode, &avg_time2);
+                                           dataDst.gpu(), act_mode, alpha, beta,
+                                           &avg_time2);
 
   compute_hipdnn_activation_backward<float>(test_case, dstDataGPU.gpu(),
-                            data_grad.gpu(), dataDst.gpu(), act_mode, &avg_time3);
+                                            data_grad.gpu(), dataDst.gpu(),
+                                            act_mode, alpha, beta,&avg_time3);
 
   compute_hipdnn_conv_backward_filter<float>(testConvolutionSizes, srcDataConv.gpu(),
                             filterData.gpu(), gradData2.gpu(), NULL,
