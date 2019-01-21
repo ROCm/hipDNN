@@ -263,7 +263,7 @@ TEST(pooling_fwd, func_check_rectangular_dims_small_size) {
   Desc inputDesc(1, 1, 4, 4);
   pool_mode = HIPDNN_POOLING_MAX;
   int spatial_ext[2] = {2, 1};
-  int stride[2] = {2, 1};
+  int stride[2] = {1, 1};
   int pad[2] = {0,0};
 
   Desc outputDesc = calculate_pool_Dims(inputDesc, spatial_ext, pad, stride);
@@ -314,7 +314,7 @@ TEST(pooling_fwd, func_check_rectangular_dims_medium_size) {
   Desc inputDesc(32, 1, 64, 64);
   pool_mode = HIPDNN_POOLING_MAX;
   int spatial_ext[2] = {4, 2};
-  int stride[2] = {4, 2};
+  int stride[2] = {1, 1};
   int pad[2] = {0,0};
 
   Desc outputDesc = calculate_pool_Dims(inputDesc, spatial_ext, pad, stride);
