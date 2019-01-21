@@ -4,9 +4,18 @@
 
 TEST(convolution_pooling_act_fwd_bwd_intg, func_check_conv_pool_act_fwd_bwd) {
 
+  Desc inputDescP(1, 1, 4, 4);
+  Desc inputDesc(1, 1, 16, 16);
+  Desc filterDesc(1, 1, 4, 4);
+
+  int pad[2] = {0, 0};
+  int stride[2] = {4, 4};
+  int dil[2] = {1,1};
+  int spatial_ext[2] = {2, 2};
+  int strideP[2] = {2, 2};
+  int pad_p[2] = {0,0};
   float avg_time = 0, avg_time1 = 0, avg_time2 = 0, avg_time3 = 0, avg_time4 = 0;
   float avg_time5 = 0, avg_time6 = 0;
-  int oheight = 4, owidth = 4;
   alpha = 1.f;
   beta = 0.f;
 
@@ -14,40 +23,14 @@ TEST(convolution_pooling_act_fwd_bwd_intg, func_check_conv_pool_act_fwd_bwd) {
   hipdnnActivationMode_t act_mode = HIPDNN_ACTIVATION_RELU;
   hipdnnDataType_t dataType = HIPDNN_DATA_FLOAT;
 
-
-  test_pooling_descriptor pool(1, 1, 4, 4, 2, 2, 2, 2, 0, 0, 2, 2);
-  pool_bwd test_case(1, 1, 4, 4, 2, 2, 0, 0, 2, 2, 1, 1, oheight, owidth);
-
-  Memory<float> dstData(pool.mb * pool.c * pool.oh * pool.ow);
-
-  activation_params_t test_case1(1, 1, 4, 4);
-
-  Memory<float> dataSrc_act(test_case1.n * test_case1.channels * test_case1.height *
-                        test_case1.width);
-  Memory<float> dataGrad_act(test_case1.n * test_case1.channels * test_case1.height
-                          * test_case1.width);
-  Memory<float> dataDst_act(test_case1.n * test_case1.channels * test_case1.height *
-                        test_case1.width);
-
-  populateMemoryRandom(dataSrc_act);
-
-  Desc inputDesc(1, 1, 16, 16);
-  Desc filterDesc(1, 1, 4, 4);
-
-  int pad[2] = {0, 0};    // zero padding
-  int stride[2] = {4, 4}; // stride 1
-  int dil[2] = {1,1};
-
+  Desc outputDescP = calculate_pool_Dims(inputDescP, spatial_ext, pad_p, strideP);
   Desc outputDesc = calculate_Dims(inputDesc, filterDesc, pad, stride, dil);
 
-  Memory<float> srcDataConv = createMemory<float>(inputDesc);
-  Memory<float> dstDataGPU = createMemory<float>(outputDesc);
-  Memory<float> filterData = createMemory<float>(filterDesc);
-  Memory<float> gradData1 = createMemory<float>(outputDesc);
-  Memory<float> gradData2 = createMemory<float>(filterDesc);
-
-  populateMemoryRandom<float>(srcDataConv);
-  populateMemoryRandom<float>(filterData);
+  activation_params_t test_case1(1, 1, 4, 4);
+  test_pooling_descriptor pool(inputDescP.N, inputDescP.C, inputDescP.H,
+                               inputDescP.W, outputDescP.H, outputDescP.W,
+                               spatial_ext[0], spatial_ext[1], pad_p[0], pad_p[1],
+                               strideP[0], strideP[1]);
 
   convulution_Size testConvolutionSizes(
         inputDesc.N, 1, inputDesc.C, inputDesc.H, inputDesc.W, outputDesc.C,
@@ -58,6 +41,23 @@ TEST(convolution_pooling_act_fwd_bwd_intg, func_check_conv_pool_act_fwd_bwd) {
         test_case1.n, 1, test_case1.channels, test_case1.height, test_case1.width,
         test_case1.channels, test_case1.height, test_case1.width, filterDesc.H,
         filterDesc.W, pad[0], pad[1], stride[0], stride[1], dil[0], dil[1]);
+
+  Memory<float> dstData = createMemory<float>(outputDescP);
+  Memory<float> srcDataConv = createMemory<float>(inputDesc);
+  Memory<float> dstDataGPU = createMemory<float>(outputDesc);
+  Memory<float> filterData = createMemory<float>(filterDesc);
+  Memory<float> gradData1 = createMemory<float>(outputDesc);
+  Memory<float> gradData2 = createMemory<float>(filterDesc);
+  Memory<float> dataSrc_act(test_case1.n * test_case1.channels * test_case1.height *
+                        test_case1.width);
+  Memory<float> dataGrad_act(test_case1.n * test_case1.channels * test_case1.height
+                          * test_case1.width);
+  Memory<float> dataDst_act(test_case1.n * test_case1.channels * test_case1.height *
+                        test_case1.width);
+
+  populateMemoryRandom(dataSrc_act);
+  populateMemoryRandom<float>(srcDataConv);
+  populateMemoryRandom<float>(filterData);
 
   int ip_size_cf[4] = {inputDesc.N, inputDesc.C, inputDesc.H, inputDesc.W};
   int k_size_cf[4] = {filterDesc.N, filterDesc.C, filterDesc.H, filterDesc.W};
@@ -103,16 +103,17 @@ TEST(convolution_pooling_act_fwd_bwd_intg, func_check_conv_pool_act_fwd_bwd) {
                                     "MP_bwd","act_bwd");
 
   compute_hipdnn_conv_forward<float>(testConvolutionSizes, srcDataConv.gpu(),
-                              filterData.gpu(), NULL, dstDataGPU.gpu(), &alpha,
-                              &beta, &avg_time1);
+                              filterData.gpu(), NULL, dstDataGPU.gpu(), alpha,
+                              beta, &avg_time1);
 
-  compute_hipdnn_activation_forward(test_case1, dstDataGPU.gpu(), dataDst_act.gpu(), act_mode, &avg_time2);
+  compute_hipdnn_activation_forward(test_case1, dstDataGPU.gpu(), dataDst_act.gpu(),
+                                    act_mode, alpha, beta, &avg_time2);
 
-  hipdnn_pooling_backward<float>(test_case, dataDst_act.gpu(), gradData1.gpu(),
+  hipdnn_pooling_backward<float>(pool, dataDst_act.gpu(), gradData1.gpu(),
                        dstData.gpu(), pool_mode, dataType, &avg_time4);
 
   compute_hipdnn_activation_backward(test_case1, dataDst_act.gpu(), dataGrad_act.gpu(),
-                         dstData.gpu(), act_mode, &avg_time5);
+                         dstData.gpu(), act_mode, alpha, beta, &avg_time5);
 
   compute_hipdnn_conv_backward_filter<float>(testConvolutionSizes2, dataDst_act.gpu(),
                                  filterData.gpu(), gradData2.gpu(), NULL,

@@ -5,6 +5,8 @@ hipdnnActivationMode_t act_mode;
 TEST(activation_forward, func_test_fwd_activation_RELU) {
 
   float avg_time = 0;
+  alpha = 1.f;
+  beta = 0.f;
 
   act_mode = HIPDNN_ACTIVATION_RELU;
 
@@ -27,7 +29,7 @@ TEST(activation_forward, func_test_fwd_activation_RELU) {
   std::string str_op_size  = convert_to_string((int*)op_size,4);
 
   compute_hipdnn_activation_forward(test_case, dataSrc.gpu(), dataDst.gpu(),
-                                    act_mode, &avg_time);
+                                    act_mode, alpha, beta, &avg_time);
 
   std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
 
@@ -49,6 +51,8 @@ TEST(activation_forward, func_test_fwd_activation_RELU) {
 TEST(activation_forward, func_test_fwd_activation_SIGMOID) {
 
   float avg_time = 0;
+  alpha = 2.f;
+  beta = 1.f;
 
   act_mode = HIPDNN_ACTIVATION_SIGMOID;
 
@@ -71,7 +75,7 @@ TEST(activation_forward, func_test_fwd_activation_SIGMOID) {
   std::string str_op_size  = convert_to_string((int*)op_size,4);
 
   compute_hipdnn_activation_forward(test_case, dataSrc.gpu(), dataDst.gpu(),
-                                    act_mode, &avg_time);
+                                    act_mode, alpha, beta, &avg_time);
 
   std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
 
@@ -93,6 +97,8 @@ TEST(activation_forward, func_test_fwd_activation_SIGMOID) {
 TEST(activation_forward, func_test_fwd_activation_TANH) {
 
   float avg_time = 0;
+  alpha = 1.f;
+  beta = 0.5f;
 
   act_mode = HIPDNN_ACTIVATION_TANH;
 
@@ -115,7 +121,7 @@ TEST(activation_forward, func_test_fwd_activation_TANH) {
   std::string str_op_size  = convert_to_string((int*)op_size,4);
 
   compute_hipdnn_activation_forward(test_case, dataSrc.gpu(), dataDst.gpu(),
-                                    act_mode, &avg_time);
+                                    act_mode, alpha, beta, &avg_time);
 
   std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
 
@@ -137,6 +143,8 @@ TEST(activation_forward, func_test_fwd_activation_TANH) {
 TEST(activation_forward, func_fwd_activation_batch32) {
 
   float avg_time = 0;
+  alpha = 2.f;
+  beta = 0.f;
 
   act_mode = HIPDNN_ACTIVATION_RELU;
 
@@ -159,7 +167,7 @@ TEST(activation_forward, func_fwd_activation_batch32) {
   std::string str_op_size  = convert_to_string((int*)op_size,4);
 
   compute_hipdnn_activation_forward(test_case, dataSrc.gpu(), dataDst.gpu(),
-                                    act_mode, &avg_time);
+                                    act_mode, alpha, beta, &avg_time);
 
   std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
 
@@ -181,6 +189,8 @@ TEST(activation_forward, func_fwd_activation_batch32) {
 TEST(activation_forward, func_fwd_activation_batch64) {
 
   float avg_time = 0;
+  alpha = 0.5f;
+  beta = 0.f;
 
   act_mode = HIPDNN_ACTIVATION_RELU;
 
@@ -202,7 +212,7 @@ TEST(activation_forward, func_fwd_activation_batch64) {
   std::string str_op_size  = convert_to_string((int*)op_size,4);
 
   compute_hipdnn_activation_forward(test_case, dataSrc.gpu(), dataDst.gpu(),
-                                    act_mode, &avg_time);
+                                    act_mode, alpha, beta, &avg_time);
 
   std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
 
@@ -223,6 +233,8 @@ TEST(activation_forward, func_fwd_activation_batch64) {
 TEST(activation_forward, func_fwd_activation_batch128) {
 
   float avg_time = 0;
+  alpha = 1.f;
+  beta = 0.5f;
 
   act_mode = HIPDNN_ACTIVATION_RELU;
 
@@ -245,7 +257,7 @@ TEST(activation_forward, func_fwd_activation_batch128) {
   std::string str_op_size  = convert_to_string((int*)op_size,4);
 
   compute_hipdnn_activation_forward(test_case, dataSrc.gpu(), dataDst.gpu(),
-                                    act_mode, &avg_time);
+                                    act_mode, alpha, beta, &avg_time);
 
   std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
 
