@@ -1115,9 +1115,9 @@ hipdnnStatus_t hipdnnCreateConvolutionDescriptor(
 hipdnnStatus_t hipdnnSetConvolutionMathType(
     hipdnnConvolutionDescriptor_t convDesc, hipdnnMathType_t mathType) {
 
-    std::cerr<<"Setting MathType by user is not supported in MIOpen."
-             <<"Internally set based on datatype of input."
-             <<std::endl;
+    HIPDNN_OPEN_LOG_I2( "Setting MathType by user is not supported in MIOpen."
+                      << "Internally set based on datatype of input.");
+
     HIPDNN_OPEN_LOG_E("hipdnnSetConvolutionMathType"
                       << mathType << " NOT SUPPORTED in MIOpen"
                       << std::flush);
@@ -1143,8 +1143,9 @@ hipdnnStatus_t hipdnnSetConvolution2dDescriptor(
                                     miConvMode, pad_h,
                                     pad_w, u, v, upscalex, upscaley));
 
-    std::cerr<<"Setting computeType by user is not supported in MIOpen."
-            <<"Internally set based on datatype of input." ;
+    HIPDNN_OPEN_LOG_I2( "Setting MathType by user is not supported in MIOpen."
+                      << "Internally set based on datatype of input.");
+
     ((structConvDesc_t*)(convDesc))->convDataType = computeType;
 
     return HIPDNN_STATUS_SUCCESS;
@@ -2641,7 +2642,7 @@ hipdnnStatus_t hipdnnBatchNormalizationBackward(
     CHECK_HIPDNN(hipTomiopenBatchNormMode(mode, &miBNMode));
     if ((*static_cast<const float *>(betaDataDiff) == 0) &&
         (*static_cast<const float *>(betaParamDiff) == 0)) {
-        std::cout << "Accumulate Gradients is false" << std::endl;
+        HIPDNN_OPEN_LOG_I2("Accumulate Gradients is false");
         CHECK_MIO(miopenBatchNormalizationBackward(
             (miopenHandle_t)handle, miBNMode, alphaDataDiff, betaDataDiff,
             alphaParamDiff, betaParamDiff, (miopenTensorDescriptor_t)xDesc, x,
@@ -2652,7 +2653,7 @@ hipdnnStatus_t hipdnnBatchNormalizationBackward(
             savedInvVariance));
         return HIPDNN_STATUS_SUCCESS;
     } else {
-        std::cout << "Case Accumulate Gradients is true" << std::endl;
+        HIPDNN_OPEN_LOG_I2("Accumulate Gradients is true");
         HIPDNN_OPEN_LOG_C(
             "Case where either betaDataDiff or betaParamDiff is nonzero");
         // Accumulate for resultBnScaleDiff
@@ -2738,7 +2739,6 @@ hipdnnStatus_t hipdnnSetFilterNdDescriptor(
 
     for (int k = nbDims - 1; k >= 0; k--) {
         strideA[k] = (k != nbDims - 1) ? strideA[k + 1] * filterDimA[k + 1] : 1;
-        // std::cout<<"\nChecking k:"<<k<<"\t"<<filterDimA[k]<<"\t"<<strideA[k];
     }
     CHECK_HIPDNN(hipTomiopenDataType(dataType, &moDT));
     int strideDimA[nbDims - 1];
