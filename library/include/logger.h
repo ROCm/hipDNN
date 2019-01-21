@@ -12,9 +12,10 @@ extern std::ostream cerr;
 #define DEBUG_CALL_STACK_LEVEL_INTERNAL_ALLOC 2
 #define DEBUG_CALL_STACK_LEVEL_CALLS 3
 #define DEBUG_CALL_STACK_LEVEL_MARSHALLING 4
+#define DEBUG_CALL_STACK_LEVEL_INFO 5
 
 #ifndef DEBUG_CURRENT_CALL_STACK_LEVEL
-#define DEBUG_CURRENT_CALL_STACK_LEVEL DEBUG_CALL_STACK_LEVEL_MARSHALLING
+#define DEBUG_CURRENT_CALL_STACK_LEVEL DEBUG_CALL_STACK_LEVEL_INFO
 #endif
 
 namespace open {
@@ -25,7 +26,8 @@ enum class LoggingLevel {
   PROMOTED,
   INTERNAL_ALLOC = 2,
   CALLS,
-  MARSHALLING = 4
+  MARSHALLING = 4,
+  INFO = 5
 };
 
 int IsLogging(LoggingLevel level);
@@ -45,5 +47,6 @@ int IsLogging(LoggingLevel level);
 #define HIPDNN_OPEN_LOG_C(...) OPEN_LOG(open::LoggingLevel::CALLS, __VA_ARGS__)
 #define HIPDNN_OPEN_LOG_M(...)                                                 \
   OPEN_LOG(open::LoggingLevel::MARSHALLING, __VA_ARGS__)
+#define HIPDNN_OPEN_LOG_I2(...) OPEN_LOG(open::LoggingLevel::INFO, __VA_ARGS__)
 
 } // namespace open
