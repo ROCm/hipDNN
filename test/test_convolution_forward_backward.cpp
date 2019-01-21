@@ -41,7 +41,7 @@ TEST(convolution_fwd_bwd, func_test_fwd_bwd_convolution) {
 
   compute_hipdnn_conv_backward_filter<float>(testConvolutionSizes, srcData.gpu(),
                            filterData.gpu(), gradData.gpu(), NULL,
-                           dstDataGPU.gpu(),&avg_time2);
+                           dstDataGPU.gpu(), alpha, beta, &avg_time2);
 
   avg_time = (avg_time1 + avg_time2);
 
@@ -98,7 +98,7 @@ TEST(convolution_fwd_bwd, func_test_fwd_bwd_convolution_batch32) {
                                 beta, &avg_time1);
   compute_hipdnn_conv_backward_filter<float>(testConvolutionSizes, srcData.gpu(),
                                  filterData.gpu(), gradData.gpu(), NULL,
-                                 dstDataGPU.gpu(),&avg_time2);
+                                 dstDataGPU.gpu(), alpha, beta, &avg_time2);
 
   avg_time = (avg_time1 + avg_time2);
 
@@ -156,7 +156,7 @@ TEST(convolution_fwd_bwd, func_test_fwd_bwd_convolution_batch64) {
 
   compute_hipdnn_conv_backward_filter<float>(testConvolutionSizes, srcData.gpu(),
                                  filterData.gpu(), gradData.gpu(), NULL,
-                                 dstDataGPU.gpu(),&avg_time2);
+                                 dstDataGPU.gpu(), alpha, beta, &avg_time2);
 
   avg_time = (avg_time1 + avg_time2);
 
@@ -213,7 +213,7 @@ TEST(convolution_fwd_bwd, func_test_fwd_bwd_convolution_batch128) {
                                 beta, &avg_time1);
   compute_hipdnn_conv_backward_filter<float>(testConvolutionSizes, srcData.gpu(),
                                  filterData.gpu(), gradData.gpu(), NULL,
-                                 dstDataGPU.gpu(),&avg_time2);
+                                 dstDataGPU.gpu(), alpha, beta, &avg_time2);
 
   avg_time = (avg_time1 + avg_time2);
 
