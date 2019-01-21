@@ -70,7 +70,7 @@ void hipdnn_pooling_backward(test_pooling_descriptor &test_case, dataType *src, 
 
   checkHIPDNN(hipdnnSetTensor4dDescriptor(
       in_desc, HIPDNN_TENSOR_NCHW, hipdataType, test_case.mb,
-      test_case.c, test_case.ih, test_case.oh));
+      test_case.c, test_case.ih, test_case.iw));
 
   hipdnnPoolingDescriptor_t pool_desc;
   checkHIPDNN(hipdnnCreatePoolingDescriptor(&pool_desc));
