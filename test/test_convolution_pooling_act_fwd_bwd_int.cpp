@@ -117,7 +117,7 @@ TEST(convolution_pooling_act_fwd_bwd_intg, func_check_conv_pool_act_fwd_bwd) {
 
   compute_hipdnn_conv_backward_filter<float>(testConvolutionSizes2, dataDst_act.gpu(),
                                  filterData.gpu(), gradData2.gpu(), NULL,
-                                 dataGrad_act.gpu(),&avg_time6);
+                                 dataGrad_act.gpu(), alpha, beta, &avg_time6);
 
   avg_time = avg_time1 + avg_time2 + avg_time3 + avg_time4 + avg_time5 + avg_time6;
 
