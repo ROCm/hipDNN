@@ -5,34 +5,25 @@ hipdnnPoolingMode_t poolCF_mode;
 
 TEST(convolution_pooling_fwd_intg, func_check_naive_conv_pool) {
 
-  float avg_time = 0, avg_time1 = 0, avg_time2 = 0;
+  Desc inputDesc(1, 3, 16, 16);
+  Desc filterDesc(1, 3, 4, 4);
   Desc inputDescP(1, 1, 4, 4);
   int spatial_ext[2] = {2, 2};
   int strideP[2] = {2, 2};
   int pad_p[2] = {0,0};
-  poolCF_mode = HIPDNN_POOLING_MAX;
-  hipdnnDataType_t dataType = HIPDNN_DATA_FLOAT;
-
-  Desc outputDescP = calculate_pool_Dims(inputDescP, spatial_ext, pad_p, strideP);
-
-  test_pooling_descriptor pool(inputDescP.N, inputDescP.C, inputDescP.H,
-                               inputDescP.W, outputDescP.H, outputDescP.W,
-                               spatial_ext[0], spatial_ext[1], pad_p[0], pad_p[1],
-                               strideP[0], strideP[1]);
-
-  Memory<float> dstData = createMemory<float>(outputDescP);
-
-  Desc inputDesc(1, 3, 16, 16);
-  Desc filterDesc(1, 3, 4, 4);
-
   int pad[2] = {0, 0};    // zero padding
   int stride[2] = {4, 4}; // stride 1
   int dil[2] = {1,1};
   alpha = 1.f;
   beta = 0.f;
+  poolCF_mode = HIPDNN_POOLING_MAX;
+  hipdnnDataType_t dataType = HIPDNN_DATA_FLOAT;
+  float avg_time = 0, avg_time1 = 0, avg_time2 = 0;
 
+  Desc outputDescP = calculate_pool_Dims(inputDescP, spatial_ext, pad_p, strideP);
   Desc outputDesc = calculate_Dims(inputDesc, filterDesc, pad, stride, dil);
 
+  Memory<float> dstData = createMemory<float>(outputDescP);
   Memory<float> srcDataConv = createMemory<float>(inputDesc);
   Memory<float> dstDataGPU = createMemory<float>(outputDesc);
   Memory<float> filterData = createMemory<float>(filterDesc);
@@ -44,6 +35,11 @@ TEST(convolution_pooling_fwd_intg, func_check_naive_conv_pool) {
         inputDesc.N, 1, inputDesc.C, inputDesc.H, inputDesc.W, outputDesc.C,
         outputDesc.H, outputDesc.W, filterDesc.H, filterDesc.W, pad[0], pad[1],
         stride[0], stride[1], dil[0], dil[1]);
+
+  test_pooling_descriptor pool(inputDescP.N, inputDescP.C, inputDescP.H,
+                               inputDescP.W, outputDescP.H, outputDescP.W,
+                               spatial_ext[0], spatial_ext[1], pad_p[0], pad_p[1],
+                               strideP[0], strideP[1]);
 
   int ip_size_c[4] = {inputDesc.N, inputDesc.C, inputDesc.H, inputDesc.W};
   int k_size_c[4] = {filterDesc.N, filterDesc.C, filterDesc.H, filterDesc.W};
