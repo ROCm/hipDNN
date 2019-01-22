@@ -174,7 +174,7 @@ TEST(convolution_bwd_filter, func_backward_conv_filter_batch128) {
   float avg_time = 0;
 
   alpha = 1.f;
-  beta = 2.f;
+  beta = 0.f;
 
   Desc outputDesc = calculate_Dims(inputDesc, filterDesc, pad, stride, dil);
 

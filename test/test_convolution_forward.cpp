@@ -71,8 +71,8 @@ TEST(convolution_fwd, func_check_full_conv) {
   int pad[2] = {0, 0};    // zero padding
   int stride[2] = {1, 1}; // stride 1
   int dil[2] = {1, 1};
-  alpha = 2.f;
-  beta = 1.f;
+  alpha = 1.f;
+  beta = 0.f;
 
   Test_convolution_fwd<float>( inputDesc, filterDesc, pad, stride, dil,
                      "convolution_fwd:func_check_full_conv", alpha, beta);
@@ -101,8 +101,8 @@ TEST(convolution_fwd, func_check_zero_padding_medium_input_batch128) {
   int pad[2] = {0, 0};    // zero padding
   int stride[2] = {1, 1}; // stride 1
   int dil[2] = {1, 1};
-  alpha = 2.f;
-  beta = 1.f;
+  alpha = 1.f;
+  beta = 0.f;
 
   Test_convolution_fwd<float>( inputDesc, filterDesc, pad, stride, dil,
   "convolution_fwd:func_check_zero_padding_medium_input_batch128", alpha, beta);
@@ -146,7 +146,7 @@ TEST(convolution_fwd, func_check_filter_rectangular_dims) {
   int pad[2] = {0, 0};    // zero padding
   int stride[2] = {2, 2}; // stride 2
   int dil[2] = {1, 1};
-  alpha = 2.f;
+  alpha = 1.f;
   beta = 0.f;
 
   Test_convolution_fwd<float>( inputDesc, filterDesc, pad, stride, dil,
@@ -161,7 +161,7 @@ TEST(convolution_fwd, func_check_rectangular_dims_length_smaller) {
   int pad[2] = {0, 0};    // zero padding
   int stride[2] = {2, 2}; // stride 2
   int dil[2] = {1, 1};
-  alpha = 0.5f;
+  alpha = 1.f;
   beta = 0.f;
 
   Test_convolution_fwd<float>( inputDesc, filterDesc, pad, stride, dil,
