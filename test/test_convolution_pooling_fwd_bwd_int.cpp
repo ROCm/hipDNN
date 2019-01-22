@@ -17,11 +17,11 @@ TEST(convolution_pooling_fwd_bwd_intg, func_check_naive_conv_pool_fwd_bwd) {
   int pad_p[2] = {0,0};
   float avg_time = 0, avg_time1 = 0, avg_time2 = 0, avg_time3 = 0, avg_time4 = 0;
 
-  poolCPI_mode = HIPDNN_POOLING_MAX;
-  hipdnnDataType_t dataType = HIPDNN_DATA_FLOAT;
-
   alpha = 1.f;
   beta = 0.f;
+
+  poolCPI_mode = HIPDNN_POOLING_MAX;
+  hipdnnDataType_t dataType = HIPDNN_DATA_FLOAT;
 
   Desc outputDesc = calculate_Dims(inputDesc, filterDesc, pad, stride, dil);
   Desc outputDescP = calculate_pool_Dims(inputDescP, spatial_ext, pad_p, strideP);
@@ -92,11 +92,11 @@ TEST(convolution_pooling_fwd_bwd_intg, func_check_naive_conv_pool_fwd_bwd) {
                           &avg_time1);
 
   hipdnn_pooling_backward<float>(pool, dstDataGPU.gpu(), gradData1.gpu(),
-                           dstData.gpu(), poolCPI_mode, dataType, &avg_time3);
+                dstData.gpu(), poolCPI_mode, dataType, alpha, beta, &avg_time3);
 
   compute_hipdnn_conv_backward_filter<float>(testConvolutionSizes2, dstDataGPU.gpu(),
                                  filterData.gpu(), gradData2.gpu(), NULL,
-                                 gradData1.gpu(),&avg_time4);
+                                 gradData1.gpu(), alpha, beta, &avg_time4);
 
   avg_time = avg_time1 + avg_time2 + avg_time3 + avg_time4;
 
