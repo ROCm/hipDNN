@@ -374,9 +374,8 @@ TEST(pooling_fwd, func_check_half) {
   int pad[2] = {0, 0};
 
   Desc outputDesc = calculate_pool_Dims(inputDesc, spatial_ext, pad, stride);
-  Memory<float> srcData = createMemory<float>(inputDesc);
-  Memory<float> dstDataGPU = createMemory<float>(outputDesc);
-  populateMemoryRandom<float>(srcData);
+  Memory<half> srcData = createMemory<half>(inputDesc);
+  Memory<half> dstDataGPU = createMemory<half>(outputDesc);
 
   test_pooling_descriptor pool(inputDesc.N, inputDesc.C, inputDesc.H, inputDesc.W,
                                outputDesc.H, outputDesc.W, spatial_ext[0],
@@ -397,7 +396,7 @@ TEST(pooling_fwd, func_check_half) {
   std::string str_k_size  = convert_to_string((int*)k_size,4);
   std::string str_op_size  = convert_to_string((int*)op_size,4);
 
-  hipdnn_pooling_forward(pool, srcData.gpu(), dstDataGPU.gpu(), pool_mode,
+  hipdnn_pooling_forward<half>(pool, srcData.gpu(), dstDataGPU.gpu(), pool_mode,
                          dataType, false, alpha, beta, &avg_time);
 
   std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
