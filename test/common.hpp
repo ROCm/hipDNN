@@ -8,6 +8,9 @@
 #include "hip/hip_runtime_api.h"
 #include "hip/hip_fp16.h"
 
+extern float alpha;
+extern float beta;
+
 inline Desc calculate_Dims(Desc inputDesc, Desc filterDesc, int pad[2],
                                int stride[2], int dilution[2]) {
   assert(inputDesc.C == filterDesc.C);
@@ -16,6 +19,14 @@ inline Desc calculate_Dims(Desc inputDesc, Desc filterDesc, int pad[2],
   int outputWidth = ((inputDesc.W - filterDesc.W + 2 * pad[1] -
                      (filterDesc.H -1)*(dilution[1] -1)) / stride[1]) + 1;
   Desc outputDesc(inputDesc.N, filterDesc.N, outputHeight, outputWidth);
+  return outputDesc;
+}
+
+inline Desc calculate_pool_Dims(Desc inputDesc, int spatial_ext[2], int pad[2],
+                                int stride[2]) {
+  int outputHeight = ((inputDesc.H - spatial_ext[0] + 2 * pad[0]) / stride[0]) + 1;
+  int outputWidth = ((inputDesc.W - spatial_ext[1] + 2 * pad[1]) / stride[1]) + 1;
+  Desc outputDesc(inputDesc.N, inputDesc.C, outputHeight, outputWidth);
   return outputDesc;
 }
 
@@ -65,30 +76,6 @@ struct LRN_params_t {
   int mb, ic, ih, iw;
   LRN_params_t(int mb, int ic, int ih, int iw)
       : mb(mb), ic(ic), ih(ih), iw(iw) {}
-};
-
-struct pool_bwd {
-  size_t in, ichannel, iheight, iwidth;
-  size_t wheight, wwidth;
-  size_t vpadding, hpadding;
-  size_t vstride, hstride;
-  int on, ochannel, oheight, owidth;
-
-  pool_bwd(size_t in, size_t ichannel, size_t iheight, size_t iwidth,
-                 size_t wheight, size_t wwidth, size_t vpadding,
-                 size_t hpadding, size_t vstride, size_t hstride)
-      : in(in), ichannel(ichannel), iheight(iheight), iwidth(iwidth),
-        wheight(wheight), wwidth(wwidth), vpadding(vpadding),
-        hpadding(hpadding), vstride(vstride), hstride(hstride) {}
-
-  pool_bwd(size_t in, size_t ichannel, size_t iheight, size_t iwidth,
-                 size_t wheight, size_t wwidth, size_t vpadding,
-                 size_t hpadding, size_t vstride, size_t hstride, size_t on,
-                 size_t ochannel, size_t oheight, size_t owidth)
-      : in(in), ichannel(ichannel), iheight(iheight), iwidth(iwidth),
-        wheight(wheight), wwidth(wwidth), vpadding(vpadding),
-        hpadding(hpadding), vstride(vstride), hstride(hstride), on(on),
-        ochannel(ochannel), oheight(oheight), owidth(owidth) {}
 };
 
 #endif //COMMON_HPP

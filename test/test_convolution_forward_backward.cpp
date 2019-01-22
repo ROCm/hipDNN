@@ -8,6 +8,8 @@ TEST(convolution_fwd_bwd, func_test_fwd_bwd_convolution) {
   int pad[2] = {0, 0};    // zero padding
   int stride[2] = {1, 1}; // stride 1
   int dil[2] = {1,1};
+  alpha = 1.f;
+  beta = 0.f;
 
   float avg_time = 0, avg_time1 = 0, avg_time2 = 0;
 
@@ -34,11 +36,12 @@ TEST(convolution_fwd_bwd, func_test_fwd_bwd_convolution) {
   populateMemoryRandom<float>(filterData);
 
   compute_hipdnn_conv_forward<float>(testConvolutionSizes, srcData.gpu(),
-                           filterData.gpu(), NULL, dstDataGPU.gpu(),&avg_time1);
+                           filterData.gpu(), NULL, dstDataGPU.gpu(), alpha,
+                           beta, &avg_time1);
 
   compute_hipdnn_conv_backward_filter<float>(testConvolutionSizes, srcData.gpu(),
                            filterData.gpu(), gradData.gpu(), NULL,
-                           dstDataGPU.gpu(),&avg_time2);
+                           dstDataGPU.gpu(), alpha, beta, &avg_time2);
 
   avg_time = (avg_time1 + avg_time2);
 
@@ -64,6 +67,8 @@ TEST(convolution_fwd_bwd, func_test_fwd_bwd_convolution_batch32) {
   int stride[2] = {1, 1}; // stride 1
   int dil[2] = {1,1};
   float avg_time = 0, avg_time1 = 0, avg_time2 = 0;
+  alpha = 1.f;
+  beta = 0.f;
 
   Desc outputDesc = calculate_Dims(inputDesc, filterDesc, pad, stride, dil);
 
@@ -89,10 +94,11 @@ TEST(convolution_fwd_bwd, func_test_fwd_bwd_convolution_batch32) {
   populateMemoryRandom<float>(filterData);
 
   compute_hipdnn_conv_forward<float>(testConvolutionSizes, srcData.gpu(),
-                                filterData.gpu(), NULL, dstDataGPU.gpu(),&avg_time1);
+                                filterData.gpu(), NULL, dstDataGPU.gpu(), alpha,
+                                beta, &avg_time1);
   compute_hipdnn_conv_backward_filter<float>(testConvolutionSizes, srcData.gpu(),
                                  filterData.gpu(), gradData.gpu(), NULL,
-                                 dstDataGPU.gpu(),&avg_time2);
+                                 dstDataGPU.gpu(), alpha, beta, &avg_time2);
 
   avg_time = (avg_time1 + avg_time2);
 
@@ -112,12 +118,14 @@ TEST(convolution_fwd_bwd, func_test_fwd_bwd_convolution_batch32) {
 TEST(convolution_fwd_bwd, func_test_fwd_bwd_convolution_batch64) {
 
   Desc inputDesc(64, 3, 9, 9);
-  Desc filterDesc(21, 3, 3, 3);
+  Desc filterDesc(1, 3, 3, 3);
 
   int pad[2] = {0, 0};    // zero padding
   int stride[2] = {1, 1}; // stride 1
   int dil[2] = {1,1};
   float avg_time = 0, avg_time1 = 0, avg_time2 = 0;
+  alpha = 1.f;
+  beta = 0.f;
 
   Desc outputDesc = calculate_Dims(inputDesc, filterDesc, pad, stride, dil);
 
@@ -143,11 +151,12 @@ TEST(convolution_fwd_bwd, func_test_fwd_bwd_convolution_batch64) {
   populateMemoryRandom<float>(filterData);
 
   compute_hipdnn_conv_forward<float>(testConvolutionSizes, srcData.gpu(),
-                                filterData.gpu(), NULL, dstDataGPU.gpu(),&avg_time1);
+                                filterData.gpu(), NULL, dstDataGPU.gpu(), alpha,
+                                beta, &avg_time1);
 
   compute_hipdnn_conv_backward_filter<float>(testConvolutionSizes, srcData.gpu(),
                                  filterData.gpu(), gradData.gpu(), NULL,
-                                 dstDataGPU.gpu(),&avg_time2);
+                                 dstDataGPU.gpu(), alpha, beta, &avg_time2);
 
   avg_time = (avg_time1 + avg_time2);
 
@@ -173,6 +182,8 @@ TEST(convolution_fwd_bwd, func_test_fwd_bwd_convolution_batch128) {
   int stride[2] = {1, 1}; // stride 1
   int dil[2] = {1,1};
   float avg_time = 0, avg_time1 = 0, avg_time2 = 0;
+  alpha = 1.f;
+  beta = 0.f;
 
   Desc outputDesc = calculate_Dims(inputDesc, filterDesc, pad, stride, dil);
 
@@ -198,10 +209,11 @@ TEST(convolution_fwd_bwd, func_test_fwd_bwd_convolution_batch128) {
   populateMemoryRandom<float>(filterData);
 
   compute_hipdnn_conv_forward<float>(testConvolutionSizes, srcData.gpu(),
-                                filterData.gpu(), NULL, dstDataGPU.gpu(),&avg_time1);
+                                filterData.gpu(), NULL, dstDataGPU.gpu(), alpha,
+                                beta, &avg_time1);
   compute_hipdnn_conv_backward_filter<float>(testConvolutionSizes, srcData.gpu(),
                                  filterData.gpu(), gradData.gpu(), NULL,
-                                 dstDataGPU.gpu(),&avg_time2);
+                                 dstDataGPU.gpu(), alpha, beta, &avg_time2);
 
   avg_time = (avg_time1 + avg_time2);
 

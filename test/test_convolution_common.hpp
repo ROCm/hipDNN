@@ -6,7 +6,8 @@
 
 template <typename dataType>
 void compute_hipdnn_conv_forward(convulution_Size &c, dataType *src,
-            dataType *weights, dataType *bias, dataType *dst,float *avg_time) {
+            dataType *weights, dataType *bias, dataType *dst, float alpha,
+            float beta, float *avg_time) {
 
   hipdnnHandle_t hipdnn;
   checkHIPDNN(hipdnnCreate(&hipdnn));
@@ -57,9 +58,6 @@ void compute_hipdnn_conv_forward(convulution_Size &c, dataType *src,
 
   algo = (hipdnnConvolutionFwdAlgo_t)algoPerf[0].algo;
 
-  float alpha = 1.f;
-  float beta = 0.f;
-
   high_resolution_timer_t timer;
 
   std::vector<double> time_vector(benchmark_iterations, 0);
@@ -92,7 +90,8 @@ void compute_hipdnn_conv_forward(convulution_Size &c, dataType *src,
 template <typename dataType>
 void compute_hipdnn_conv_backward_filter(convulution_Size &c, dataType *src,
                              dataType *weights, dataType *grad, dataType *bias,
-                             dataType *dst, float *avg_time) {
+                             dataType *dst, float alpha, float beta,
+                             float *avg_time) {
 
   hipdnnHandle_t hipdnn;
   checkHIPDNN(hipdnnCreate(&hipdnn));
@@ -126,8 +125,6 @@ void compute_hipdnn_conv_backward_filter(convulution_Size &c, dataType *src,
   size_t ws_size{0};
   float *ws_data{nullptr};
   int calgo;
-  float alpha = 1.f;
-  float beta = 0.f;
 
   hipdnnConvolutionBwdFilterAlgo_t  b_algo=HIPDNN_CONVOLUTION_BWD_FILTER_ALGO_1;
 

@@ -13,6 +13,8 @@ TEST(convolution_activation_fwd_bwd_intg,
   int pad[2] = {0, 0};    // zero padding
   int stride[2] = {4, 4}; // stride 1
   int dil[2] = {1,1};
+  alpha = 1.f;
+  beta = 0.f;
 
   Desc outputDesc = calculate_Dims(inputDesc, filterDesc, pad, stride, dil);
 
@@ -64,17 +66,20 @@ TEST(convolution_activation_fwd_bwd_intg,
                op_size_cb,op_size_ab,"Conv_fwd","Act_fwd","Conv_bwd","Act_bwd");
 
   compute_hipdnn_conv_forward<float>(testConvolutionSizes, srcDataConv.gpu(),
-                           filterData.gpu(), NULL, dstDataGPU.gpu(),&avg_time1);
+                           filterData.gpu(), NULL, dstDataGPU.gpu(), alpha,
+                           beta, &avg_time1);
 
   compute_hipdnn_activation_forward<float>(test_case, dstDataGPU.gpu(),
-                                           dataDst.gpu(), act_mode, &avg_time2);
+                                           dataDst.gpu(), act_mode, alpha, beta,
+                                           &avg_time2);
 
   compute_hipdnn_activation_backward<float>(test_case, dstDataGPU.gpu(),
-                            data_grad.gpu(), dataDst.gpu(), act_mode, &avg_time3);
+                                            data_grad.gpu(), dataDst.gpu(),
+                                            act_mode, alpha, beta,&avg_time3);
 
   compute_hipdnn_conv_backward_filter<float>(testConvolutionSizes, srcDataConv.gpu(),
                             filterData.gpu(), gradData2.gpu(), NULL,
-                            data_grad.gpu(), &avg_time4);
+                            data_grad.gpu(), alpha, beta,  &avg_time4);
 
   avg_time = avg_time1 + avg_time2 + avg_time3 + avg_time4;
 

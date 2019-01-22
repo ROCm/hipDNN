@@ -93,7 +93,7 @@ public:
     dataType *temp = new dataType[this->num_of_items];
     hipMemcpy(temp, d_data, mem_size, hipMemcpyDeviceToHost);
     for (int i = 0; i < num_of_items; i++) {
-      std::cout << temp[i] << std::endl;
+      std::cout << temp[i] << "\t";
     }
     delete[] temp;
   }
@@ -157,7 +157,7 @@ template <typename dataType> void populateMemoryRandom(Memory<dataType> &mem) {
 }
 
 template <typename dataType> void populateMemory(Memory<dataType> &mem, float n) {
-   for (int i = 0; i <= mem.get_num_elements(); i++)
+   for (int i = 0; i < mem.get_num_elements(); i++)
       *(mem.cpu() + i) = n;
   // Copy the stuff to device too
   HIP_CALL(hipMemcpy(mem.gpu(), mem.cpu(), mem.size(), hipMemcpyHostToDevice));

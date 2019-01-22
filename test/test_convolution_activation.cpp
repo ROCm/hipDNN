@@ -12,6 +12,8 @@ TEST(convolution_activation_fwd_intg, func_check_naive_conv_activation) {
   int pad[2] = {0, 0};    // zero padding
   int stride[2] = {4, 4}; // stride 1
   int dil[2] = {1,1};
+  alpha = 1.f;
+  beta = 0.f;
 
   Desc outputDesc =
         calculate_Dims(inputDesc, filterDesc, pad, stride, dil);
@@ -50,10 +52,12 @@ TEST(convolution_activation_fwd_intg, func_check_naive_conv_activation) {
                                                        "Conv","Act");
 
   compute_hipdnn_conv_forward<float>(testConvolutionSizes, srcDataConv.gpu(),
-                           filterData.gpu(), NULL, dstDataGPU.gpu(),&avg_time1);
+                           filterData.gpu(), NULL, dstDataGPU.gpu(), alpha,
+                           beta, &avg_time1);
 
   compute_hipdnn_activation_forward<float>(test_case, dstDataGPU.gpu(),
-                                           dataDst.gpu(), act_mode, &avg_time2);
+                                           dataDst.gpu(), act_mode, alpha, beta,
+                                           &avg_time2);
 
   avg_time = avg_time1 + avg_time2;
 
