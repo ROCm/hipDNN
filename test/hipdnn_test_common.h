@@ -93,7 +93,7 @@ public:
     dataType *temp = new dataType[this->num_of_items];
     hipMemcpy(temp, d_data, mem_size, hipMemcpyDeviceToHost);
     for (int i = 0; i < num_of_items; i++) {
-      std::cout << temp[i] << std::endl;
+      std::cout << temp[i] << "\t";
     }
     delete[] temp;
   }
