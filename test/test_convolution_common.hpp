@@ -281,4 +281,141 @@ void compute_hipdnn_conv_backward_data(convulution_Size &c, dataType *src,
   hipdnnDestroy(hipdnn);
 }
 
+template <typename dataType>
+void Test_convolution_fwd(Desc inputDesc, Desc filterDesc, int pad[2],
+                          int stride[2], int dil[2], std::string testname,
+                          float alpha, float beta)
+{
+  float avg_time = 0;
+  Desc outputDesc = calculate_Dims(inputDesc, filterDesc, pad, stride, dil);
+
+  Memory<float> srcData = createMemory<float>(inputDesc);
+  Memory<float> dstDataGPU = createMemory<float>(outputDesc);
+  Memory<float> filterData = createMemory<float>(filterDesc);
+
+  populateMemoryRandom<float>(srcData);
+  populateMemoryRandom<float>(filterData);
+
+  convulution_Size testConvolutionSizes(
+        inputDesc.N, 1, inputDesc.C, inputDesc.H, inputDesc.W, outputDesc.C,
+        outputDesc.H, outputDesc.W, filterDesc.H, filterDesc.W, pad[0], pad[1],
+        stride[0], stride[1], dil[0], dil[1]);
+
+  compute_hipdnn_conv_forward<float>(testConvolutionSizes, srcData.gpu(),
+                            filterData.gpu(), NULL, dstDataGPU.gpu(), alpha,
+                            beta, &avg_time);
+
+  std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
+
+  std::string strt = "./result_unittest.csv";
+  std::string filename="convolution_forward.csv";
+
+  int ip_size[4] = {inputDesc.N, inputDesc.C, inputDesc.H, inputDesc.W};
+  int k_size[4] = {filterDesc.N, filterDesc.C, filterDesc.H, filterDesc.W};
+  int op_size[4] =  {outputDesc.N, outputDesc.C, outputDesc.H, outputDesc.W};
+
+  std::string str_ip_size  = convert_to_string((int*)ip_size,4);
+  std::string str_k_size  = convert_to_string((int*)k_size,4);
+  std::string str_op_size  = convert_to_string((int*)op_size,4);
+
+  float* temp = dstDataGPU.getDataFromGPU();
+
+  std::string str  = convert_to_string((float*)temp,(int)dstDataGPU.get_num_elements());
+
+  write_to_csv(strt, str, testname, avg_time, str_ip_size, str_k_size, str_op_size);
+  dump_result_csv(filename, testname, temp, (int)dstDataGPU.get_num_elements());
+
+}
+
+template <typename dataType>
+void Test_convolution_bwd_filter(Desc inputDesc, Desc filterDesc, int pad[2],
+                                 int stride[2], int dil[2], std::string testname,
+                                 float alpha, float beta)
+{
+  float avg_time = 0;
+  Desc outputDesc = calculate_Dims(inputDesc, filterDesc, pad, stride, dil);
+
+  Memory<float> srcData = createMemory<float>(inputDesc);
+  Memory<float> gradData = createMemory<float>(filterDesc);
+  Memory<float> dstDataGPU = createMemory<float>(outputDesc);
+  Memory<float> filterData = createMemory<float>(filterDesc);
+
+  populateMemoryRandom<float>(srcData);
+  populateMemoryRandom<float>(filterData);
+  populateMemoryRandom<float>(dstDataGPU);
+
+  convulution_Size testConvolutionSizes(
+      inputDesc.N, 1, inputDesc.C, inputDesc.H, inputDesc.W, outputDesc.C,
+      outputDesc.H, outputDesc.W, filterDesc.H, filterDesc.W, pad[0], pad[1],
+      stride[0], stride[1], dil[0], dil[1]);
+
+  compute_hipdnn_conv_backward_filter<float>(testConvolutionSizes, srcData.gpu(),
+                                filterData.gpu(), gradData.gpu(), NULL,
+                                dstDataGPU.gpu(), alpha, beta, &avg_time);
+
+  std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
+
+  int ip_size[4] = {inputDesc.N, inputDesc.C, inputDesc.H, inputDesc.W};
+  int k_size[4] = {filterDesc.N, filterDesc.C, filterDesc.H, filterDesc.W};
+  int op_size[4] =  {filterDesc.N, filterDesc.C, filterDesc.H, filterDesc.W};
+
+  std::string str_ip_size  = convert_to_string((int*)ip_size,4);
+  std::string str_k_size  = convert_to_string((int*)k_size,4);
+  std::string str_op_size  = convert_to_string((int*)op_size,4);
+
+  std::string strt = "./result_unittest.csv";
+  std::string filename = "convolution_bwd_filter.csv";
+
+  float* temp = gradData.getDataFromGPU();
+
+  std::string str  = convert_to_string((float*)temp,(int)gradData.get_num_elements());
+
+  write_to_csv(strt, str, testname,avg_time, str_ip_size, str_k_size, str_op_size);
+  dump_result_csv(filename, testname, temp, (int)gradData.get_num_elements());
+
+}
+
+template <typename dataType>
+void Test_convolution_bwd_data(Desc inputDesc, Desc filterDesc, int pad[2],
+                               int stride[2], int dil[2], std::string testname)
+{
+  float avg_time = 0;
+
+  Desc outputDesc = calculate_Dims(inputDesc, filterDesc, pad, stride, dil);
+
+  Memory<float> srcData = createMemory<float>(inputDesc);
+  Memory<float> gradData = createMemory<float>(inputDesc);
+  Memory<float> dstDataGPU = createMemory<float>(outputDesc);
+  Memory<float> filterData = createMemory<float>(filterDesc);
+
+  populateMemoryRandom<float>(srcData);
+  populateMemoryRandom<float>(filterData);
+
+  convulution_Size conv_back_param(
+    inputDesc.N, 1, inputDesc.C, inputDesc.H, inputDesc.W, outputDesc.C,
+    outputDesc.H, outputDesc.W, filterDesc.H, filterDesc.W, pad[0], pad[1],
+    stride[0], stride[1], dil[0], dil[1]);
+
+  int ip_size[4] = {inputDesc.N, inputDesc.C, inputDesc.H, inputDesc.W};
+  int k_size[4] = {filterDesc.N, filterDesc.C, filterDesc.H, filterDesc.W};
+  int op_size[4] =  {outputDesc.N, outputDesc.C, outputDesc.H, outputDesc.W};
+
+  std::string str_ip_size  = convert_to_string((int*)ip_size,4);
+  std::string str_k_size  = convert_to_string((int*)k_size,4);
+  std::string str_op_size  = convert_to_string((int*)op_size,4);
+
+  compute_hipdnn_conv_backward_data<float>(conv_back_param, srcData.gpu(),
+           filterData.gpu(), gradData.gpu(), NULL, dstDataGPU.gpu(), &avg_time);
+
+  std::string strt = "./result_unittest.csv";
+  std::string filename="convolution_bwd_data.csv";
+
+  float* temp = gradData.getDataFromGPU();
+  std::string str  = convert_to_string((float*)temp,
+                                       (int)gradData.get_num_elements());
+
+  write_to_csv(strt, str, testname,avg_time, str_ip_size, str_k_size, str_op_size);
+  dump_result_csv(filename, testname, temp, (int)gradData.get_num_elements());
+}
+
 #endif // TEST_CONVOLUTION_COMMON_H

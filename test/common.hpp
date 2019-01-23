@@ -10,6 +10,7 @@
 
 extern float alpha;
 extern float beta;
+extern float alpha_beta[4];
 
 inline Desc calculate_Dims(Desc inputDesc, Desc filterDesc, int pad[2],
                                int stride[2], int dilution[2]) {
