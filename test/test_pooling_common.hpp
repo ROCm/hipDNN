@@ -122,4 +122,98 @@ void hipdnn_pooling_backward(test_pooling_descriptor &test_case, dataType *src,
 
 }
 
+template <typename dataType>
+void Test_pooling_fwd(Desc inputDesc, int spatial_ext[2], int stride[2],
+           int pad[2], std::string testname, float alpha = 1.f, float beta = 0.f,
+           hipdnnPoolingMode_t pool_mode = HIPDNN_POOLING_MAX,
+           hipdnnDataType_t hipdataType = HIPDNN_DATA_FLOAT)
+{
+
+  float avg_time = 0;
+
+  Desc outputDesc = calculate_pool_Dims(inputDesc, spatial_ext, pad, stride);
+
+  Memory<float> srcData = createMemory<float>(inputDesc);
+  Memory<float> dstDataGPU = createMemory<float>(outputDesc);
+  populateMemoryRandom<float>(srcData);
+
+  test_pooling_descriptor pool(inputDesc.N, inputDesc.C, inputDesc.H, inputDesc.W,
+                               outputDesc.H, outputDesc.W, spatial_ext[0],
+                               spatial_ext[1], pad[0], pad[1], stride[0],
+                               stride[1]);
+
+  int ip_size[4] = {pool.mb, pool.c, pool.ih, pool.iw};
+  int k_size[4] = {pool.mb, pool.c, pool.kh, pool.kw};
+  int op_size[4] =  {pool.mb, pool.c, pool.oh, pool.ow};
+
+  std::string str_ip_size  = convert_to_string((int*)ip_size,4);
+  std::string str_k_size  = convert_to_string((int*)k_size,4);
+  std::string str_op_size  = convert_to_string((int*)op_size,4);
+
+  hipdnn_pooling_forward<float>(pool, srcData.gpu(), dstDataGPU.gpu(), pool_mode,
+                                hipdataType, false, alpha, beta, &avg_time);
+
+  std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
+
+  float* temp2 = srcData.getDataFromGPU();
+  std::string ip = convert_to_string((float*)temp2,(int)srcData.get_num_elements());
+
+  float* temp = dstDataGPU.getDataFromGPU();
+
+  std::string strt = "./result_unittest.csv";
+  std::string filename="pooling_forward.csv";
+
+  std::string str  = convert_to_string((float*)temp,(int)dstDataGPU.get_num_elements());
+
+  write_to_csv(strt, str, testname, avg_time, str_ip_size, str_k_size, str_op_size);
+  dump_result_csv(filename, testname, temp, (int)dstDataGPU.get_num_elements());
+}
+
+template <typename dataType>
+void Test_pooling_bwd(Desc inputDesc, int spatial_ext[2], int stride[2],
+          int pad[2], std::string testname, float alpha = 1.f, float beta = 0.f,
+          hipdnnPoolingMode_t pool_mode = HIPDNN_POOLING_MAX,
+          hipdnnDataType_t hipdataType = HIPDNN_DATA_FLOAT)
+{
+
+  float avg_time = 0;
+
+  Desc outputDesc = calculate_pool_Dims(inputDesc, spatial_ext, pad, stride);
+
+  test_pooling_descriptor test_case(inputDesc.N, inputDesc.C, inputDesc.H,
+                        inputDesc.W, outputDesc.H, outputDesc.W, spatial_ext[0],
+                        spatial_ext[1], pad[0], pad[1], stride[0], stride[1]);
+
+  Memory<float> dataSrc = createMemory<float>(inputDesc);
+  Memory<float> dataGrad = createMemory<float>(inputDesc);
+  Memory<float> dataDst = createMemory<float>(outputDesc);
+
+  populateMemoryRandom(dataSrc);
+
+  hipdnn_pooling_backward(test_case, dataSrc.gpu(), dataGrad.gpu(),
+                 dataDst.gpu(), pool_mode, hipdataType, alpha, beta, &avg_time);
+
+  std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
+
+  int ip_size[4] = {inputDesc.N, inputDesc.C, inputDesc.H, inputDesc.W};
+  int k_size[4] = {inputDesc.N, inputDesc.C, spatial_ext[0], spatial_ext[1]};
+  int op_size[4] = {inputDesc.N, inputDesc.C, inputDesc.H, inputDesc.W};
+
+  std::string str_ip_size  = convert_to_string((int*)ip_size,4);
+  std::string str_k_size  = convert_to_string((int*)k_size,4);
+  std::string str_op_size  = convert_to_string((int*)op_size,4);
+
+  float* temp = dataGrad.getDataFromGPU();
+
+  std::string str  = convert_to_string((float*)temp,
+                                       (int)dataGrad.get_num_elements());
+
+  std::string strt = "./result_unittest.csv";
+  std::string filename="pooling_backward.csv";
+
+  write_to_csv(strt, str, testname,avg_time, str_ip_size, str_k_size, str_op_size);
+  dump_result_csv(filename, testname, temp, (int)dataGrad.get_num_elements());
+
+}
+
 #endif // TEST_POOLING_COMMON_H
