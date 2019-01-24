@@ -13,7 +13,6 @@ extern float beta;
 extern float alpha_beta[4];
 extern hipdnnActivationMode_t act_mode;
 extern hipdnnPoolingMode_t pool_mode;
-extern hipdnnBatchNormMode_t bn_mode;
 
 inline Desc calculate_Dims(Desc inputDesc, Desc filterDesc, int pad[2],
                                int stride[2], int dilution[2]) {
