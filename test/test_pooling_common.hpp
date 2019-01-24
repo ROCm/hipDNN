@@ -220,7 +220,7 @@ void Test_pooling_bwd(Desc inputDesc, int spatial_ext[2], int stride[2],
 
   else
   {
-    Memory<float> dstDataGPU_f(pool.mb * pool.c * pool.ih * pool.iw);
+    Memory<float> dstDataGPU_f(test_case.mb * test_case.c * test_case.ih * test_case.iw);
     Convert_toFloat<dataType>(dataGrad, dstDataGPU_f);
     temp = dstDataGPU_f.getDataFromGPU();
   }
