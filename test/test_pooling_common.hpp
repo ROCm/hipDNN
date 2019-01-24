@@ -130,17 +130,23 @@ void Test_pooling_fwd(Desc inputDesc, int spatial_ext[2], int stride[2],
 {
 
   float avg_time = 0;
+  float* temp;
 
   Desc outputDesc = calculate_pool_Dims(inputDesc, spatial_ext, pad, stride);
 
-  Memory<float> srcData = createMemory<float>(inputDesc);
-  Memory<float> dstDataGPU = createMemory<float>(outputDesc);
-  populateMemoryRandom<float>(srcData);
+  Memory<dataType> srcData = createMemory<dataType>(inputDesc);
+  Memory<dataType> dstDataGPU = createMemory<dataType>(outputDesc);
+  populateMemoryRandom<dataType>(srcData);
 
   test_pooling_descriptor pool(inputDesc.N, inputDesc.C, inputDesc.H, inputDesc.W,
                                outputDesc.H, outputDesc.W, spatial_ext[0],
                                spatial_ext[1], pad[0], pad[1], stride[0],
                                stride[1]);
+
+  hipdnn_pooling_forward<dataType>(pool, srcData.gpu(), dstDataGPU.gpu(), pool_mode,
+                                hipdataType, false, alpha, beta, &avg_time);
+
+  std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
 
   int ip_size[4] = {pool.mb, pool.c, pool.ih, pool.iw};
   int k_size[4] = {pool.mb, pool.c, pool.kh, pool.kw};
@@ -150,15 +156,18 @@ void Test_pooling_fwd(Desc inputDesc, int spatial_ext[2], int stride[2],
   std::string str_k_size  = convert_to_string((int*)k_size,4);
   std::string str_op_size  = convert_to_string((int*)op_size,4);
 
-  hipdnn_pooling_forward<float>(pool, srcData.gpu(), dstDataGPU.gpu(), pool_mode,
-                                hipdataType, false, alpha, beta, &avg_time);
 
-  std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
+  if (hipdataType == HIPDNN_DATA_FLOAT)
+  {
+    temp = dstDataGPU.getDataFromGPU();
+  }
 
-  float* temp2 = srcData.getDataFromGPU();
-  std::string ip = convert_to_string((float*)temp2,(int)srcData.get_num_elements());
-
-  float* temp = dstDataGPU.getDataFromGPU();
+  else
+  {
+    Memory<float> dstDataGPU_f(pool.mb * pool.c * pool.oh * pool.ow);
+    Convert_toFloat<dataType>(dstDataGPU, dstDataGPU_f);
+    temp = dstDataGPU_f.getDataFromGPU();
+  }
 
   std::string strt = "./result_unittest.csv";
   std::string filename="pooling_forward.csv";
@@ -177,6 +186,7 @@ void Test_pooling_bwd(Desc inputDesc, int spatial_ext[2], int stride[2],
 {
 
   float avg_time = 0;
+  float* temp;
 
   Desc outputDesc = calculate_pool_Dims(inputDesc, spatial_ext, pad, stride);
 
@@ -184,13 +194,13 @@ void Test_pooling_bwd(Desc inputDesc, int spatial_ext[2], int stride[2],
                         inputDesc.W, outputDesc.H, outputDesc.W, spatial_ext[0],
                         spatial_ext[1], pad[0], pad[1], stride[0], stride[1]);
 
-  Memory<float> dataSrc = createMemory<float>(inputDesc);
-  Memory<float> dataGrad = createMemory<float>(inputDesc);
-  Memory<float> dataDst = createMemory<float>(outputDesc);
+  Memory<dataType> dataSrc = createMemory<dataType>(inputDesc);
+  Memory<dataType> dataGrad = createMemory<dataType>(inputDesc);
+  Memory<dataType> dataDst = createMemory<dataType>(outputDesc);
 
   populateMemoryRandom(dataSrc);
 
-  hipdnn_pooling_backward(test_case, dataSrc.gpu(), dataGrad.gpu(),
+  hipdnn_pooling_backward<dataType>(test_case, dataSrc.gpu(), dataGrad.gpu(),
                  dataDst.gpu(), pool_mode, hipdataType, alpha, beta, &avg_time);
 
   std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
@@ -203,7 +213,17 @@ void Test_pooling_bwd(Desc inputDesc, int spatial_ext[2], int stride[2],
   std::string str_k_size  = convert_to_string((int*)k_size,4);
   std::string str_op_size  = convert_to_string((int*)op_size,4);
 
-  float* temp = dataGrad.getDataFromGPU();
+  if (hipdataType == HIPDNN_DATA_FLOAT)
+  {
+    temp = dataGrad.getDataFromGPU();
+  }
+
+  else
+  {
+    Memory<float> dstDataGPU_f(pool.mb * pool.c * pool.ih * pool.iw);
+    Convert_toFloat<dataType>(dataGrad, dstDataGPU_f);
+    temp = dstDataGPU_f.getDataFromGPU();
+  }
 
   std::string str  = convert_to_string((float*)temp,
                                        (int)dataGrad.get_num_elements());
