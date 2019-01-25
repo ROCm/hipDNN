@@ -161,6 +161,7 @@ void Test_LRN_fwd(Desc inputDesc, Desc outputDesc, std::string testname,
                   hipdnnDataType_t hipdataType = HIPDNN_DATA_FLOAT) {
 
   float avg_time = 0;
+  float* temp;
 
   Memory<dataType> srcData = createMemory<dataType>(inputDesc);
   Memory<dataType> dstDataGPU = createMemory<dataType>(outputDesc);
@@ -185,7 +186,17 @@ void Test_LRN_fwd(Desc inputDesc, Desc outputDesc, std::string testname,
   std::string strt = "./result_unittest.csv";
   std::string filename="LRN_fwd.csv";
 
-  float* temp = dstDataGPU.getDataFromGPU();
+  if (hipdataType == HIPDNN_DATA_FLOAT)
+  {
+    temp =  dstDataGPU.getDataFromGPU();
+  }
+
+  else
+  {
+    Memory<float> dstDataGPU_f(outputDesc.N * outputDesc.C * outputDesc.H * outputDesc.W);
+    Convert_toFloat<dataType>(dstDataGPU_f, dstDataGPU_f);
+    temp = dstDataGPU_f.getDataFromGPU();
+  }
 
   std::string str  = convert_to_string((float*)temp,
                                        (int)dstDataGPU.get_num_elements());
