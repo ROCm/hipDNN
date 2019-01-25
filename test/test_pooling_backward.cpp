@@ -1,7 +1,5 @@
 #include "test_pooling_common.hpp"
 
-hipdnnPoolingMode_t pool_mode;
-
 TEST(pooling_backward, func_check_pooling_stride_2x2) {
 
   Desc inputDesc(1, 1, 4, 4);
@@ -19,11 +17,10 @@ TEST(pooling_backward, func_check_pooling_AVERAGE_COUNT_INCLUDE_PADDING) {
   int spatial_ext[2] = {2, 2};
   int stride[2] = {2, 2};
   int pad[2] = {0,0};
-  pool_mode = HIPDNN_POOLING_AVERAGE_COUNT_INCLUDE_PADDING;
 
   Test_pooling_bwd<float>(inputDesc, spatial_ext, stride, pad,
             "pooling_backward:func_check_pooling_AVERAGE_COUNT_INCLUDE_PADDING",
-            1.f, 0.5f, pool_mode);
+            1.f, 0.5f, HIPDNN_POOLING_AVERAGE_COUNT_INCLUDE_PADDING);
 }
 
 TEST(pooling_backward, func_check_pooling_batch32) {
@@ -46,7 +43,7 @@ TEST(pooling_backward, func_check_pooling_batch64) {
 
   Test_pooling_bwd<float>(inputDesc, spatial_ext, stride, pad,
             "pooling_backward:func_check_pooling_batch64",
-            1.5, 0.f,pool_mode);
+            1.5, 0.f);
 }
 
 TEST(pooling_backward, func_check_pooling_batch128) {
@@ -55,7 +52,6 @@ TEST(pooling_backward, func_check_pooling_batch128) {
   int spatial_ext[2] = {2, 2};
   int stride[2] = {2, 2};
   int pad[2] = {0,0};
-  float avg_time = 0;
 
   Test_pooling_bwd<float>(inputDesc, spatial_ext, stride, pad,
             "pooling_backward:func_check_pooling_batch128");
