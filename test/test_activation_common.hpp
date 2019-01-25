@@ -8,6 +8,7 @@ template <typename dataType>
 void compute_hipdnn_activation_forward(activation_params_t &test_case,
                                         dataType *src,
                                         dataType *dst,
+                                        hipdnnDataType_t hipdataType,
                                         hipdnnActivationMode_t mode,
                                         float alpha, float beta,
                                         float *avg_time) {
@@ -18,7 +19,7 @@ void compute_hipdnn_activation_forward(activation_params_t &test_case,
   checkHIPDNN(hipdnnCreateTensorDescriptor(&in_desc));
 
   checkHIPDNN(hipdnnSetTensor4dDescriptor(
-      in_desc, HIPDNN_TENSOR_NCHW, HIPDNN_DATA_FLOAT, test_case.n,
+      in_desc, HIPDNN_TENSOR_NCHW, hipdataType, test_case.n,
       test_case.channels, test_case.height, test_case.width));
 
   hipdnnActivationDescriptor_t activationDesc;
@@ -36,7 +37,7 @@ void compute_hipdnn_activation_forward(activation_params_t &test_case,
   hipdnnTensorDescriptor_t out_desc;
   checkHIPDNN(hipdnnCreateTensorDescriptor(&out_desc));
   checkHIPDNN(hipdnnSetTensor4dDescriptor(
-               out_desc, HIPDNN_TENSOR_NCHW, HIPDNN_DATA_FLOAT, test_case.n,
+               out_desc, HIPDNN_TENSOR_NCHW, hipdataType, test_case.n,
                test_case.channels, test_case.height, test_case.width));
 
   high_resolution_timer_t timer;
@@ -69,6 +70,7 @@ template <typename dataType>
 void compute_hipdnn_activation_backward(activation_params_t &test_case,
                                         dataType *src, dataType *grad,
                                         dataType *dst,
+                                        hipdnnDataType_t hipdataType,
                                         hipdnnActivationMode_t mode,
                                         float alpha, float beta,
                                         float *avg_time) {
@@ -79,7 +81,7 @@ void compute_hipdnn_activation_backward(activation_params_t &test_case,
   checkHIPDNN(hipdnnCreateTensorDescriptor(&in_desc));
 
   checkHIPDNN(hipdnnSetTensor4dDescriptor(
-      in_desc, HIPDNN_TENSOR_NCHW, HIPDNN_DATA_FLOAT, test_case.n,
+      in_desc, HIPDNN_TENSOR_NCHW, hipdataType, test_case.n,
       test_case.channels, test_case.height, test_case.width));
 
   hipdnnActivationDescriptor_t activationDesc;
@@ -97,7 +99,7 @@ void compute_hipdnn_activation_backward(activation_params_t &test_case,
   hipdnnTensorDescriptor_t out_desc;
   checkHIPDNN(hipdnnCreateTensorDescriptor(&out_desc));
   checkHIPDNN(hipdnnSetTensor4dDescriptor(
-      out_desc, HIPDNN_TENSOR_NCHW, HIPDNN_DATA_FLOAT, test_case.n,
+      out_desc, HIPDNN_TENSOR_NCHW, hipdataType, test_case.n,
       test_case.channels, test_case.height, test_case.width));
 
   high_resolution_timer_t timer;
@@ -129,14 +131,16 @@ void compute_hipdnn_activation_backward(activation_params_t &test_case,
 
 template <typename dataType>
 void Test_activation_fwd(activation_params_t test_case,
-                         hipdnnActivationMode_t act_mode, std::string testname,
-                         float alpha, float beta)
+                         std::string testname,
+                         float alpha = 1.f, float beta = 0.f,
+                         hipdnnActivationMode_t act_mode = HIPDNN_ACTIVATION_RELU,
+                         hipdnnDataType_t hipdataType = HIPDNN_DATA_FLOAT)
 {
   float avg_time = 0;
 
-  Memory<float> dataSrc(test_case.n * test_case.channels * test_case.height *
+  Memory<dataType> dataSrc(test_case.n * test_case.channels * test_case.height *
                         test_case.width);
-  Memory<float> dataDst(test_case.n * test_case.channels * test_case.height *
+  Memory<dataType> dataDst(test_case.n * test_case.channels * test_case.height *
                         test_case.width);
 
   populateMemoryRandom(dataSrc);
@@ -150,8 +154,8 @@ void Test_activation_fwd(activation_params_t test_case,
   std::string str_k_size  = "NIL";
   std::string str_op_size  = convert_to_string((int*)op_size,4);
 
-  compute_hipdnn_activation_forward(test_case, dataSrc.gpu(), dataDst.gpu(),
-                                    act_mode, alpha, beta, &avg_time);
+  compute_hipdnn_activation_forward<dataType>(test_case, dataSrc.gpu(), dataDst.gpu(),
+                                 hipdataType, act_mode, alpha, beta, &avg_time);
 
   std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
 
@@ -170,8 +174,10 @@ void Test_activation_fwd(activation_params_t test_case,
 
 template <typename dataType>
 void Test_activation_bwd(activation_params_t test_case,
-                         hipdnnActivationMode_t act_mode, std::string testname,
-                         float alpha, float beta)
+                         std::string testname,
+                         float alpha = 1.f, float beta = 0.f,
+                         hipdnnActivationMode_t act_mode = HIPDNN_ACTIVATION_RELU,
+                         hipdnnDataType_t hipdataType = HIPDNN_DATA_FLOAT)
 {
   float avg_time = 0;
 
@@ -194,12 +200,12 @@ void Test_activation_bwd(activation_params_t test_case,
   std::string str_k_size  = "NIL";
   std::string str_op_size  = convert_to_string((int*)op_size,4);
 
-  compute_hipdnn_activation_forward(test_case, dataSrc.gpu(), dataDst.gpu(),
-                                    act_mode, alpha, beta, &avg_time);
+  compute_hipdnn_activation_forward<dataType>(test_case, dataSrc.gpu(), dataDst.gpu(),
+                                 hipdataType, act_mode, alpha, beta, &avg_time);
 
   compute_hipdnn_activation_backward<dataType>(test_case, dataSrc.gpu(),
-                                            dataGrad.gpu(), dataDst.gpu(),
-                                            act_mode, alpha, beta, &avg_time);
+                                 dataGrad.gpu(), dataDst.gpu(), hipdataType,
+                                 act_mode, alpha, beta, &avg_time);
 
   std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
 
