@@ -1,7 +1,5 @@
 #include "test_pooling_common.hpp"
 
-hipdnnPoolingMode_t pool_mode;
-
 TEST(pooling_fwd, func_check_zero_padding) {
 
   Desc inputDesc(1, 1, 4, 4);
@@ -16,14 +14,13 @@ TEST(pooling_fwd, func_check_zero_padding) {
 TEST(pooling_fwd, func_check_AVERAGE_COUNT_INCLUDE_PADDING) {
 
   Desc inputDesc(1, 1, 4, 4);
-  pool_mode = HIPDNN_POOLING_AVERAGE_COUNT_INCLUDE_PADDING;
   int spatial_ext[2] = {2, 2};
   int stride[2] = {2, 2};
   int pad[2] = {2, 2};
 
   Test_pooling_fwd<float>(inputDesc, spatial_ext, stride, pad,
               "pooling_fwd:func_check_AVERAGE_COUNT_INCLUDE_PADDING", 2.f, 0.f,
-              pool_mode);
+              HIPDNN_POOLING_AVERAGE_COUNT_INCLUDE_PADDING);
 }
 
 TEST(pooling_fwd, func_check_batch32) {
@@ -88,12 +85,11 @@ TEST(pooling_fwd, func_check_rectangular_dims_medium_size) {
 TEST(pooling_fwd, func_check_half) {
 
   Desc inputDesc(1, 1, 4, 4);
-  pool_mode = HIPDNN_POOLING_MAX;
   dataType = HIPDNN_DATA_HALF;
   int spatial_ext[2] = {2, 2};
   int stride[2] = {2, 2};
   int pad[2] = {0, 0};
 
   Test_pooling_fwd<half>(inputDesc, spatial_ext, stride, pad,
-              "pooling_fwd:func_check_half", 1.f, 0.f, pool_mode, dataType);
+         "pooling_fwd:func_check_half", 1.f, 0.f, HIPDNN_POOLING_MAX, dataType);
 } */
