@@ -318,6 +318,7 @@ void Test_bnorm_fwd_train(Desc inputDesc, Desc outputDesc,
                           hipdnnDataType_t hipdataType = HIPDNN_DATA_FLOAT){
 
   float avg_time = 0;
+  float *temp, *temp1, *temp2, *temp3, *temp4;
 
   Memory<dataType> srcData = createMemory<dataType>(inputDesc);
   Memory<dataType> dstDataGPU = createMemory<dataType>(outputDesc);
@@ -353,12 +354,40 @@ void Test_bnorm_fwd_train(Desc inputDesc, Desc outputDesc,
   std::string str_k_size  = convert_to_string((int*)k_size,4);
   std::string str_op_size  = convert_to_string((int*)op_size,4);
 
+  if (hipdataType == HIPDNN_DATA_FLOAT)
+  {
+    temp = dstDataGPU.getDataFromGPU();
+    temp1 = resultRunningMean.getDataFromGPU();
+    temp2 = resultRunningVariance.getDataFromGPU();
+    temp3 = resultSaveMean.getDataFromGPU();
+    temp4 = resultSaveVariance.getDataFromGPU();
+  }
 
-  float* temp = dstDataGPU.getDataFromGPU();
-  float* temp1 = resultRunningMean.getDataFromGPU();
-  float* temp2 = resultRunningVariance.getDataFromGPU();
-  float* temp3 = resultSaveMean.getDataFromGPU();
-  float* temp4 = resultSaveVariance.getDataFromGPU();
+  else
+  {
+    Memory<float> dstDataGPU_f(outputDesc.N * outputDesc.C * outputDesc.H
+                               * outputDesc.W);
+    Memory<float> dstDataGPU_f1(bnScaleBiasMeanVarDesc.N * bnScaleBiasMeanVarDesc.C
+                              * bnScaleBiasMeanVarDesc.H * bnScaleBiasMeanVarDesc.W);
+    Memory<float> dstDataGPU_f2(bnScaleBiasMeanVarDesc.N * bnScaleBiasMeanVarDesc.C
+                              * bnScaleBiasMeanVarDesc.H * bnScaleBiasMeanVarDesc.W);
+    Memory<float> dstDataGPU_f3(bnScaleBiasMeanVarDesc.N * bnScaleBiasMeanVarDesc.C
+                              * bnScaleBiasMeanVarDesc.H * bnScaleBiasMeanVarDesc.W);
+    Memory<float> dstDataGPU_f4(bnScaleBiasMeanVarDesc.N * bnScaleBiasMeanVarDesc.C
+                              * bnScaleBiasMeanVarDesc.H * bnScaleBiasMeanVarDesc.W);
+
+    Convert_toFloat<dataType>(dstDataGPU, dstDataGPU_f);
+    Convert_toFloat<dataType>(resultRunningMean, dstDataGPU_f1);
+    Convert_toFloat<dataType>(resultRunningVariance, dstDataGPU_f2);
+    Convert_toFloat<dataType>(resultSaveMean, dstDataGPU_f3);
+    Convert_toFloat<dataType>(resultSaveVariance, dstDataGPU_f4);
+
+    temp = dstDataGPU_f.getDataFromGPU();
+    temp1 = dstDataGPU_f1.getDataFromGPU();
+    temp2 = dstDataGPU_f2.getDataFromGPU();
+    temp3 = dstDataGPU_f3.getDataFromGPU();
+    temp4 = dstDataGPU_f4.getDataFromGPU();
+  }
 
   std::string str  = convert_to_string((float*)temp,
                                        (int)dstDataGPU.get_num_elements());
@@ -396,6 +425,7 @@ void Test_bnorm_bwd(Desc inputDesc, Desc outputDesc,
             hipdnnDataType_t hipdataType = HIPDNN_DATA_FLOAT){
 
   float avg_time = 0;
+  float* temp1, *temp2, *temp3;
 
   Memory<dataType> srcData = createMemory<dataType>(inputDesc);
   Memory<dataType> dstDataGPU = createMemory<dataType>(inputDesc);
@@ -423,9 +453,27 @@ void Test_bnorm_bwd(Desc inputDesc, Desc outputDesc,
   std::string strt = "./result_unittest.csv";
   std::string filename="BNorm_backward.csv";
 
-  float* temp1 = dstDataGPU.getDataFromGPU();
-  float* temp2 = resultBnScaleDiff.getDataFromGPU();
-  float* temp3 = resultBnBiasDiff.getDataFromGPU();
+  if (hipdataType == HIPDNN_DATA_FLOAT)
+  {
+      temp1 = dstDataGPU.getDataFromGPU();
+      temp2 = resultBnScaleDiff.getDataFromGPU();
+      temp3 = resultBnBiasDiff.getDataFromGPU();
+  }
+
+  else
+  {
+    Memory<float> dstDataGPU_f1(inputDesc.N * inputDesc.C * inputDesc.H * inputDesc.W);
+    Memory<float> dstDataGPU_f2(outputDesc.N * outputDesc.C * outputDesc.H * outputDesc.W);
+    Memory<float> dstDataGPU_f3(outputDesc.N * outputDesc.C * outputDesc.H * outputDesc.W);
+
+    Convert_toFloat<dataType>(dstDataGPU, dstDataGPU_f1);
+    Convert_toFloat<dataType>(resultBnScaleDiff, dstDataGPU_f2);
+    Convert_toFloat<dataType>(resultBnBiasDiff, dstDataGPU_f3);
+
+    temp1 = dstDataGPU_f1.getDataFromGPU();
+    temp2 = dstDataGPU_f2.getDataFromGPU();
+    temp3 = dstDataGPU_f3.getDataFromGPU();
+  }
 
   std::string str1  = convert_to_string2((float*)temp1,
                                     (int)dstDataGPU.get_num_elements());
