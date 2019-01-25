@@ -284,24 +284,24 @@ void compute_hipdnn_conv_backward_data(convulution_Size &c, dataType *src,
 template <typename dataType>
 void Test_convolution_fwd(Desc inputDesc, Desc filterDesc, int pad[2],
                           int stride[2], int dil[2], std::string testname,
-                          float alpha, float beta)
+                          float alpha = 1.f, float beta = 0.f)
 {
   float avg_time = 0;
   Desc outputDesc = calculate_Dims(inputDesc, filterDesc, pad, stride, dil);
 
-  Memory<float> srcData = createMemory<float>(inputDesc);
-  Memory<float> dstDataGPU = createMemory<float>(outputDesc);
-  Memory<float> filterData = createMemory<float>(filterDesc);
+  Memory<dataType> srcData = createMemory<dataType>(inputDesc);
+  Memory<dataType> dstDataGPU = createMemory<dataType>(outputDesc);
+  Memory<dataType> filterData = createMemory<dataType>(filterDesc);
 
-  populateMemoryRandom<float>(srcData);
-  populateMemoryRandom<float>(filterData);
+  populateMemoryRandom<dataType>(srcData);
+  populateMemoryRandom<dataType>(filterData);
 
   convulution_Size testConvolutionSizes(
         inputDesc.N, 1, inputDesc.C, inputDesc.H, inputDesc.W, outputDesc.C,
         outputDesc.H, outputDesc.W, filterDesc.H, filterDesc.W, pad[0], pad[1],
         stride[0], stride[1], dil[0], dil[1]);
 
-  compute_hipdnn_conv_forward<float>(testConvolutionSizes, srcData.gpu(),
+  compute_hipdnn_conv_forward<dataType>(testConvolutionSizes, srcData.gpu(),
                             filterData.gpu(), NULL, dstDataGPU.gpu(), alpha,
                             beta, &avg_time);
 
@@ -330,26 +330,26 @@ void Test_convolution_fwd(Desc inputDesc, Desc filterDesc, int pad[2],
 template <typename dataType>
 void Test_convolution_bwd_filter(Desc inputDesc, Desc filterDesc, int pad[2],
                                  int stride[2], int dil[2], std::string testname,
-                                 float alpha, float beta)
+                                 float alpha = 1.f, float beta = 0.f)
 {
   float avg_time = 0;
   Desc outputDesc = calculate_Dims(inputDesc, filterDesc, pad, stride, dil);
 
-  Memory<float> srcData = createMemory<float>(inputDesc);
-  Memory<float> gradData = createMemory<float>(filterDesc);
-  Memory<float> dstDataGPU = createMemory<float>(outputDesc);
-  Memory<float> filterData = createMemory<float>(filterDesc);
+  Memory<dataType> srcData = createMemory<dataType>(inputDesc);
+  Memory<dataType> gradData = createMemory<dataType>(filterDesc);
+  Memory<dataType> dstDataGPU = createMemory<dataType>(outputDesc);
+  Memory<dataType> filterData = createMemory<dataType>(filterDesc);
 
-  populateMemoryRandom<float>(srcData);
-  populateMemoryRandom<float>(filterData);
-  populateMemoryRandom<float>(dstDataGPU);
+  populateMemoryRandom<dataType>(srcData);
+  populateMemoryRandom<dataType>(filterData);
+  populateMemoryRandom<dataType>(dstDataGPU);
 
   convulution_Size testConvolutionSizes(
       inputDesc.N, 1, inputDesc.C, inputDesc.H, inputDesc.W, outputDesc.C,
       outputDesc.H, outputDesc.W, filterDesc.H, filterDesc.W, pad[0], pad[1],
       stride[0], stride[1], dil[0], dil[1]);
 
-  compute_hipdnn_conv_backward_filter<float>(testConvolutionSizes, srcData.gpu(),
+  compute_hipdnn_conv_backward_filter<dataType>(testConvolutionSizes, srcData.gpu(),
                                 filterData.gpu(), gradData.gpu(), NULL,
                                 dstDataGPU.gpu(), alpha, beta, &avg_time);
 
@@ -383,13 +383,13 @@ void Test_convolution_bwd_data(Desc inputDesc, Desc filterDesc, int pad[2],
 
   Desc outputDesc = calculate_Dims(inputDesc, filterDesc, pad, stride, dil);
 
-  Memory<float> srcData = createMemory<float>(inputDesc);
-  Memory<float> gradData = createMemory<float>(inputDesc);
-  Memory<float> dstDataGPU = createMemory<float>(outputDesc);
-  Memory<float> filterData = createMemory<float>(filterDesc);
+  Memory<dataType> srcData = createMemory<dataType>(inputDesc);
+  Memory<dataType> gradData = createMemory<dataType>(inputDesc);
+  Memory<dataType> dstDataGPU = createMemory<dataType>(outputDesc);
+  Memory<dataType> filterData = createMemory<dataType>(filterDesc);
 
-  populateMemoryRandom<float>(srcData);
-  populateMemoryRandom<float>(filterData);
+  populateMemoryRandom<dataType>(srcData);
+  populateMemoryRandom<dataType>(filterData);
 
   convulution_Size conv_back_param(
     inputDesc.N, 1, inputDesc.C, inputDesc.H, inputDesc.W, outputDesc.C,
@@ -404,7 +404,7 @@ void Test_convolution_bwd_data(Desc inputDesc, Desc filterDesc, int pad[2],
   std::string str_k_size  = convert_to_string((int*)k_size,4);
   std::string str_op_size  = convert_to_string((int*)op_size,4);
 
-  compute_hipdnn_conv_backward_data<float>(conv_back_param, srcData.gpu(),
+  compute_hipdnn_conv_backward_data<dataType>(conv_back_param, srcData.gpu(),
            filterData.gpu(), gradData.gpu(), NULL, dstDataGPU.gpu(), &avg_time);
 
   std::string strt = "./result_unittest.csv";
