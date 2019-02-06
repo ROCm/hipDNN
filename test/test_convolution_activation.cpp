@@ -53,8 +53,8 @@ TEST(convolution_activation_fwd_intg, func_check_naive_conv_activation) {
                                                        "Conv","Act");
 
   compute_hipdnn_conv_forward<float>(testConvolutionSizes, srcDataConv.gpu(),
-                           filterData.gpu(), NULL, dstDataGPU.gpu(), alpha,
-                           beta, &avg_time1);
+                           filterData.gpu(), NULL, dstDataGPU.gpu(), dataType,
+                           alpha, beta, &avg_time1);
 
   compute_hipdnn_activation_forward<float>(test_case, dstDataGPU.gpu(),
                                            dataDst.gpu(), dataType, act_mode,
