@@ -2758,10 +2758,12 @@ hipdnnStatus_t hipdnnGetFilterNdDescriptor(
     hipdnnDataType_t *dataType,  // image data type
     hipdnnTensorFormat_t *format, int *nbDims, int filterDimA[]) {
     miopenDataType_t moDT;
+    int strideDimA[nbDimsRequested];
+
     HIPDNN_OPEN_LOG_C("ENTER hipdnnGetFilterNdDescriptor " << filterDesc
                                                            << std::flush);
     CHECK_MIO(miopenGetTensorDescriptor((miopenTensorDescriptor_t)filterDesc,
-                                        &moDT, filterDimA, filterDimA));
+                                        &moDT, filterDimA, strideDimA ));
 
     CHECK_HIPDNN(miopenTohipDataType(moDT, dataType));
 
