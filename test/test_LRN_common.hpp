@@ -161,7 +161,7 @@ void Test_LRN_fwd(Desc inputDesc, Desc outputDesc, std::string testname,
                   hipdnnDataType_t hipdataType = HIPDNN_DATA_FLOAT) {
 
   float avg_time = 0;
-  float* temp;
+  dataType* temp;
 
   Memory<dataType> srcData = createMemory<dataType>(inputDesc);
   Memory<dataType> dstDataGPU = createMemory<dataType>(outputDesc);
@@ -186,17 +186,52 @@ void Test_LRN_fwd(Desc inputDesc, Desc outputDesc, std::string testname,
   std::string strt = "./result_unittest.csv";
   std::string filename="LRN_fwd.csv";
 
-  if (hipdataType == HIPDNN_DATA_FLOAT)
-  {
     temp =  dstDataGPU.getDataFromGPU();
-  }
 
-  else
-  {
+  std::string str  = convert_to_string((float*)temp,
+                                       (int)dstDataGPU.get_num_elements());
+
+  write_to_csv(strt, str, testname,avg_time, str_ip_size, str_k_size,
+               str_op_size);
+  dump_result_csv(filename, testname, temp, (int)dstDataGPU.get_num_elements());
+}
+
+
+template <>
+inline void Test_LRN_fwd<half>(Desc inputDesc, Desc outputDesc, std::string testname,
+                  hipdnnDataType_t hipdataType) {
+
+  float avg_time = 0;
+  float* temp;
+  hipdataType = HIPDNN_DATA_FLOAT;
+
+  Memory<half> srcData = createMemory<half>(inputDesc);
+  Memory<half> dstDataGPU = createMemory<half>(outputDesc);
+
+  populateMemoryRandom<half>(srcData);
+
+  LRN_params_t LRN_params(inputDesc.N, inputDesc.C, inputDesc.H, inputDesc.W);
+
+  int ip_size[4] = {inputDesc.N, inputDesc.C, inputDesc.H, inputDesc.W};
+  int k_size[4] = {0,0,0,0};
+  int op_size[4] =  {outputDesc.N, outputDesc.C, outputDesc.H, outputDesc.W};
+
+  std::string str_ip_size  = convert_to_string((int*)ip_size,4);
+  std::string str_k_size  = convert_to_string((int*)k_size,4);
+  std::string str_op_size  = convert_to_string((int*)op_size,4);
+
+  compute_hipdnn_LRN_fwd<half>(LRN_params, srcData.gpu(), dstDataGPU.gpu(),
+                                &avg_time, hipdataType);
+
+  std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
+
+  std::string strt = "./result_unittest.csv";
+  std::string filename="LRN_fwd.csv";
+
+
     Memory<float> dstDataGPU_f(outputDesc.N * outputDesc.C * outputDesc.H * outputDesc.W);
-    Convert_toFloat<dataType>(dstDataGPU_f, dstDataGPU_f);
+    Convert_toFloat<half>(dstDataGPU, dstDataGPU_f);
     temp = dstDataGPU_f.getDataFromGPU();
-  }
 
   std::string str  = convert_to_string((float*)temp,
                                        (int)dstDataGPU.get_num_elements());
