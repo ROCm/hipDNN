@@ -6,6 +6,9 @@ TEST(activation_backward, func_test_activation_RELU) {
 
   Test_activation_bwd<float>(test_case,
                      "activation_backward:func_test_activation_RELU");
+
+  Test_activation_bwd<half>(test_case,
+                     "activation_backward:func_test_activation_RELU_HALF");
 }
 
 TEST(activation_backward, func_test_activation_SIGMOID) {
@@ -14,6 +17,10 @@ TEST(activation_backward, func_test_activation_SIGMOID) {
 
   Test_activation_bwd<float>(test_case,
                      "activation_backward:func_test_activation_SIGMOID",
+                     1.f, 0.5f, HIPDNN_ACTIVATION_SIGMOID);
+
+  Test_activation_bwd<half>(test_case,
+                     "activation_backward:func_test_activation_SIGMOID_HALF",
                      1.f, 0.5f, HIPDNN_ACTIVATION_SIGMOID);
 }
 
@@ -24,6 +31,10 @@ TEST(activation_backward, func_test_activation_TANH) {
   Test_activation_bwd<float>(test_case,
                      "activation_backward:func_test_activation_TANH",
                      2.f, 0.f, HIPDNN_ACTIVATION_TANH);
+
+  Test_activation_bwd<half>(test_case,
+                     "activation_backward:func_test_activation_TANH_HALF",
+                     2.f, 0.f, HIPDNN_ACTIVATION_TANH);
 }
 
 TEST(activation_backward, func_test_activation_batch32) {
@@ -32,6 +43,10 @@ TEST(activation_backward, func_test_activation_batch32) {
 
   Test_activation_bwd<float>(test_case,
                      "activation_backward:func_test_activation_batch32",
+                     2.f, 1.f);
+
+  Test_activation_bwd<half>(test_case,
+                     "activation_backward:func_test_activation_batch32_HALF",
                      2.f, 1.f);
 }
 
@@ -42,6 +57,10 @@ TEST(activation_backward, func_test_activation_batch64) {
   Test_activation_bwd<float>(test_case,
                      "activation_backward:func_test_activation_batch32",
                      0.5f, 0.f);
+
+  Test_activation_bwd<half>(test_case,
+                     "activation_backward:func_test_activation_batch32_HALF",
+                     0.5f, 0.f);
 }
 
 TEST(activation_backward, func_test_activation_batch128) {
@@ -50,5 +69,9 @@ TEST(activation_backward, func_test_activation_batch128) {
 
   Test_activation_bwd<float>(test_case,
                      "activation_backward:func_test_activation_batch32",
+                     2.f, 0.5f);
+
+  Test_activation_bwd<half>(test_case,
+                     "activation_backward:func_test_activation_batch32_HALF",
                      2.f, 0.5f);
 }
