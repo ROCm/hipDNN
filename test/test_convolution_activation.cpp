@@ -8,6 +8,7 @@ TEST(convolution_activation_fwd_intg, func_check_naive_conv_activation) {
   Desc inputDesc(1, 3, 16, 16);
   Desc filterDesc(1, 3, 4, 4);
   hipdnnActivationMode_t act_mode = HIPDNN_ACTIVATION_RELU;
+  hipdnnDataType_t dataType = HIPDNN_DATA_FLOAT;
 
   int pad[2] = {0, 0};    // zero padding
   int stride[2] = {4, 4}; // stride 1
@@ -56,8 +57,8 @@ TEST(convolution_activation_fwd_intg, func_check_naive_conv_activation) {
                            beta, &avg_time1);
 
   compute_hipdnn_activation_forward<float>(test_case, dstDataGPU.gpu(),
-                                           dataDst.gpu(), act_mode, alpha, beta,
-                                           &avg_time2);
+                                           dataDst.gpu(), dataType, act_mode,
+                                           alpha, beta, &avg_time2);
 
   avg_time = avg_time1 + avg_time2;
 
