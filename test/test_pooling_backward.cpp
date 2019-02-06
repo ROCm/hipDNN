@@ -9,6 +9,9 @@ TEST(pooling_backward, func_check_pooling_stride_2x2) {
 
   Test_pooling_bwd<float>(inputDesc, spatial_ext, stride, pad,
                   "pooling_backward:func_check_pooling_stride_2x2", 1.f, 0.5f);
+
+  Test_pooling_bwd<half>(inputDesc, spatial_ext, stride, pad,
+                  "pooling_backward:func_check_pooling_stride_2x2_half", 1.f, 0.5f);
 }
 
 TEST(pooling_backward, func_check_pooling_AVERAGE_COUNT_INCLUDE_PADDING) {
@@ -21,6 +24,10 @@ TEST(pooling_backward, func_check_pooling_AVERAGE_COUNT_INCLUDE_PADDING) {
   Test_pooling_bwd<float>(inputDesc, spatial_ext, stride, pad,
             "pooling_backward:func_check_pooling_AVERAGE_COUNT_INCLUDE_PADDING",
             1.f, 0.5f, HIPDNN_POOLING_AVERAGE_COUNT_INCLUDE_PADDING);
+
+  Test_pooling_bwd<half>(inputDesc, spatial_ext, stride, pad,
+            "pooling_backward:func_check_pooling_AVERAGE_COUNT_INCLUDE_PADDING_half",
+            1.f, 0.5f, HIPDNN_POOLING_AVERAGE_COUNT_INCLUDE_PADDING);
 }
 
 TEST(pooling_backward, func_check_pooling_batch32) {
@@ -32,6 +39,9 @@ TEST(pooling_backward, func_check_pooling_batch32) {
 
   Test_pooling_bwd<float>(inputDesc, spatial_ext, stride, pad,
             "pooling_backward:func_check_pooling_batch32", 2.f, 0.f);
+
+  Test_pooling_bwd<half>(inputDesc, spatial_ext, stride, pad,
+            "pooling_backward:func_check_pooling_batch32_half", 2.f, 0.f);
 }
 
 TEST(pooling_backward, func_check_pooling_batch64) {
@@ -44,6 +54,10 @@ TEST(pooling_backward, func_check_pooling_batch64) {
   Test_pooling_bwd<float>(inputDesc, spatial_ext, stride, pad,
             "pooling_backward:func_check_pooling_batch64",
             1.5, 0.f);
+
+  Test_pooling_bwd<half>(inputDesc, spatial_ext, stride, pad,
+            "pooling_backward:func_check_pooling_batch64_half",
+            1.5, 0.f);
 }
 
 TEST(pooling_backward, func_check_pooling_batch128) {
@@ -55,5 +69,8 @@ TEST(pooling_backward, func_check_pooling_batch128) {
 
   Test_pooling_bwd<float>(inputDesc, spatial_ext, stride, pad,
             "pooling_backward:func_check_pooling_batch128");
+
+  Test_pooling_bwd<half>(inputDesc, spatial_ext, stride, pad,
+            "pooling_backward:func_check_pooling_batch128_half");
 
 }

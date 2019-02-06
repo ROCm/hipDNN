@@ -130,7 +130,6 @@ void Test_pooling_fwd(Desc inputDesc, int spatial_ext[2], int stride[2],
 {
 
   float avg_time = 0;
-  float* temp;
 
   Desc outputDesc = calculate_pool_Dims(inputDesc, spatial_ext, pad, stride);
 
@@ -156,18 +155,53 @@ void Test_pooling_fwd(Desc inputDesc, int spatial_ext[2], int stride[2],
   std::string str_k_size  = convert_to_string((int*)k_size,4);
   std::string str_op_size  = convert_to_string((int*)op_size,4);
 
+  dataType* temp = dstDataGPU.getDataFromGPU();
 
-  if (hipdataType == HIPDNN_DATA_FLOAT)
-  {
-    temp = dstDataGPU.getDataFromGPU();
-  }
+  std::string strt = "./result_unittest.csv";
+  std::string filename="pooling_forward.csv";
 
-  else
-  {
-    Memory<float> dstDataGPU_f(pool.mb * pool.c * pool.oh * pool.ow);
-    Convert_toFloat<dataType>(dstDataGPU, dstDataGPU_f);
-    temp = dstDataGPU_f.getDataFromGPU();
-  }
+  std::string str  = convert_to_string((float*)temp,(int)dstDataGPU.get_num_elements());
+
+  write_to_csv(strt, str, testname, avg_time, str_ip_size, str_k_size, str_op_size);
+  dump_result_csv(filename, testname, temp, (int)dstDataGPU.get_num_elements());
+}
+
+template <>
+inline void Test_pooling_fwd<half>(Desc inputDesc, int spatial_ext[2], int stride[2],
+           int pad[2], std::string testname, float alpha, float beta,
+           hipdnnPoolingMode_t pool_mode, hipdnnDataType_t hipdataType) {
+
+  float avg_time = 0;
+  hipdataType = HIPDNN_DATA_HALF;
+
+  Desc outputDesc = calculate_pool_Dims(inputDesc, spatial_ext, pad, stride);
+
+  Memory<half> srcData = createMemory<half>(inputDesc);
+  Memory<half> dstDataGPU = createMemory<half>(outputDesc);
+  populateMemoryRandom<half>(srcData);
+
+  test_pooling_descriptor pool(inputDesc.N, inputDesc.C, inputDesc.H, inputDesc.W,
+                               outputDesc.H, outputDesc.W, spatial_ext[0],
+                               spatial_ext[1], pad[0], pad[1], stride[0],
+                               stride[1]);
+
+  hipdnn_pooling_forward<half>(pool, srcData.gpu(), dstDataGPU.gpu(), pool_mode,
+                                hipdataType, false, alpha, beta, &avg_time);
+
+  std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
+
+  int ip_size[4] = {pool.mb, pool.c, pool.ih, pool.iw};
+  int k_size[4] = {pool.mb, pool.c, pool.kh, pool.kw};
+  int op_size[4] =  {pool.mb, pool.c, pool.oh, pool.ow};
+
+  std::string str_ip_size  = convert_to_string((int*)ip_size,4);
+  std::string str_k_size  = convert_to_string((int*)k_size,4);
+  std::string str_op_size  = convert_to_string((int*)op_size,4);
+
+
+  Memory<float> dstDataGPU_f(pool.mb * pool.c * pool.oh * pool.ow);
+  Convert_toFloat<half>(dstDataGPU, dstDataGPU_f);
+  float* temp = dstDataGPU_f.getDataFromGPU();
 
   std::string strt = "./result_unittest.csv";
   std::string filename="pooling_forward.csv";
@@ -186,7 +220,6 @@ void Test_pooling_bwd(Desc inputDesc, int spatial_ext[2], int stride[2],
 {
 
   float avg_time = 0;
-  float* temp;
 
   Desc outputDesc = calculate_pool_Dims(inputDesc, spatial_ext, pad, stride);
 
@@ -213,17 +246,57 @@ void Test_pooling_bwd(Desc inputDesc, int spatial_ext[2], int stride[2],
   std::string str_k_size  = convert_to_string((int*)k_size,4);
   std::string str_op_size  = convert_to_string((int*)op_size,4);
 
-  if (hipdataType == HIPDNN_DATA_FLOAT)
-  {
-    temp = dataGrad.getDataFromGPU();
-  }
+  dataType* temp = dataGrad.getDataFromGPU();
 
-  else
-  {
-    Memory<float> dstDataGPU_f(test_case.mb * test_case.c * test_case.ih * test_case.iw);
-    Convert_toFloat<dataType>(dataGrad, dstDataGPU_f);
-    temp = dstDataGPU_f.getDataFromGPU();
-  }
+  std::string str  = convert_to_string((float*)temp,
+                                       (int)dataGrad.get_num_elements());
+
+  std::string strt = "./result_unittest.csv";
+  std::string filename="pooling_backward.csv";
+
+  write_to_csv(strt, str, testname,avg_time, str_ip_size, str_k_size, str_op_size);
+  dump_result_csv(filename, testname, temp, (int)dataGrad.get_num_elements());
+
+}
+
+template <>
+inline void Test_pooling_bwd<half>(Desc inputDesc, int spatial_ext[2], int stride[2],
+          int pad[2], std::string testname, float alpha, float beta,
+          hipdnnPoolingMode_t pool_mode,
+          hipdnnDataType_t hipdataType)
+{
+
+  float avg_time = 0;
+  hipdataType = HIPDNN_DATA_HALF;
+
+  Desc outputDesc = calculate_pool_Dims(inputDesc, spatial_ext, pad, stride);
+
+  test_pooling_descriptor test_case(inputDesc.N, inputDesc.C, inputDesc.H,
+                        inputDesc.W, outputDesc.H, outputDesc.W, spatial_ext[0],
+                        spatial_ext[1], pad[0], pad[1], stride[0], stride[1]);
+
+  Memory<half> dataSrc = createMemory<half>(inputDesc);
+  Memory<half> dataGrad = createMemory<half>(inputDesc);
+  Memory<half> dataDst = createMemory<half>(outputDesc);
+
+  populateMemoryRandom(dataSrc);
+
+  hipdnn_pooling_backward<half>(test_case, dataSrc.gpu(), dataGrad.gpu(),
+                 dataDst.gpu(), pool_mode, hipdataType, alpha, beta, &avg_time);
+
+  std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
+
+  int ip_size[4] = {inputDesc.N, inputDesc.C, inputDesc.H, inputDesc.W};
+  int k_size[4] = {inputDesc.N, inputDesc.C, spatial_ext[0], spatial_ext[1]};
+  int op_size[4] = {inputDesc.N, inputDesc.C, inputDesc.H, inputDesc.W};
+
+  std::string str_ip_size  = convert_to_string((int*)ip_size,4);
+  std::string str_k_size  = convert_to_string((int*)k_size,4);
+  std::string str_op_size  = convert_to_string((int*)op_size,4);
+
+  Memory<float> dstDataGPU_f(test_case.mb * test_case.c * test_case.ih * test_case.iw);
+  Convert_toFloat<half>(dataGrad, dstDataGPU_f);
+  float* temp = dstDataGPU_f.getDataFromGPU();
 
   std::string str  = convert_to_string((float*)temp,
                                        (int)dataGrad.get_num_elements());
