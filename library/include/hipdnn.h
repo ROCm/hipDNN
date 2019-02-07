@@ -351,6 +351,15 @@ typedef enum {
     HIPDNN_RNN_ALGO_PERSIST_DYNAMIC = 2
 } hipdnnRNNAlgo_t;
 
+typedef enum {
+    HIPDNN_RNN_NO_BIAS = 0,
+    HIPDNN_RNN_WITH_BIAS = 1
+} hipdnnRNNBiasMode_t;
+
+typedef enum {
+    HIPDNN_RNN_ALGO_GEMM = 0
+}hipdnnRNNGEMMalgoMode_t;
+
 //--------------------------- Fusion datatypes ---------------------------------
 
 typedef enum {
@@ -1145,7 +1154,8 @@ hipdnnSetRNNDescriptor( hipdnnHandle_t handle,
             hipdnnDirectionMode_t direction,
             hipdnnRNNMode_t mode,
             hipdnnRNNAlgo_t algo,
-            hipdnnDataType_t dataType);
+            hipdnnDataType_t dataType,
+            hipdnnRNNBiasMode_t biasMode);
 
 hipdnnStatus_t
 hipdnnSetRNNDescriptor_v5( hipdnnRNNDescriptor_t rnnDesc,
@@ -1156,6 +1166,40 @@ hipdnnSetRNNDescriptor_v5( hipdnnRNNDescriptor_t rnnDesc,
             hipdnnDirectionMode_t direction,
             hipdnnRNNMode_t mode,
             hipdnnDataType_t dataType);
+
+hipdnnStatus_t
+hipdnnGetRNNDescriptor(hipdnnHandle_t handle,
+           hipdnnRNNDescriptor_t rnnDesc,
+           int* hiddenSize, int* numLayers,
+           hipdnnDropoutDescriptor_t *dropoutDesc,
+           hipdnnRNNInputMode_t *inputMode,
+           hipdnnDirectionMode_t *direction,
+           hipdnnRNNMode_t *mode,
+           hipdnnRNNAlgo_t *algo,
+           hipdnnDataType_t *dataType,
+           hipdnnRNNBiasMode_t *biasMode);
+
+hipdnnStatus_t
+hipdnnGetRNNParamsSize(hipdnnHandle_t handle,
+            const hipdnnRNNDescriptor_t rnnDesc,
+            const hipdnnTensorDescriptor_t xDesc,
+            size_t *sizeInBytes,
+            hipdnnDataType_t dataType);
+
+hipdnnStatus_t
+hipdnnGetRNNLayerParamSize(hipdnnHandle_t handle,
+                hipdnnRNNDescriptor_t rnnDesc,
+                const int layer,
+                hipdnnTensorDescriptor_t xDesc,
+                const int paramID,
+                size_t *numBytes);
+
+hipdnnStatus_t
+hipdnnGetRNNLayerBiasSize(hipdnnHandle_t handle,
+                    hipdnnRNNDescriptor_t rnnDesc,
+                    const int layer,
+                    const int biasID,
+                    size_t *numBytes);
 
 hipdnnStatus_t hipdnnGetRNNWorkspaceSize(hipdnnHandle_t handle,
                                          const hipdnnRNNDescriptor_t rnnDesc,
@@ -1197,6 +1241,49 @@ hipdnnGetRNNLinLayerBiasParams( hipdnnHandle_t handle,
                                 const int linLayerID,
                                 hipdnnFilterDescriptor_t linLayerBiasDesc,
                                 void **linLayerBias);
+
+hipdnnStatus_t
+hipdnnGetRNNParamsDescriptor(hipdnnHandle_t handle,
+                             hipdnnRNNDescriptor_t rnnDesc,
+                             hipdnnTensorDescriptor_t xDesc,
+                             hipdnnTensorDescriptor_t wDesc,
+                             hipdnnDataType_t dtype);
+
+hipdnnStatus_t
+hipdnnGetRNNInputTensorSize(hipdnnHandle_t handle,
+                            hipdnnRNNDescriptor_t rnnDesc,
+                            const int seqLen,
+                            hipdnnTensorDescriptor_t *xDesc,
+                            size_t *numBytes);
+
+hipdnnStatus_t
+hipdnnGetRNNHiddenTensorSize(hipdnnHandle_t handle,
+                             hipdnnRNNDescriptor_t rnnDesc,
+                             const int seqLen,
+                             hipdnnTensorDescriptor_t *xDesc,
+                             size_t *numBytes);
+
+hipdnnStatus_t
+hipdnnSetRNNLayerParam(hipdnnHandle_t handle,
+                       hipdnnRNNDescriptor_t rnnDesc,
+                       const int layer,
+                       hipdnnTensorDescriptor_t xDesc,
+                       hipdnnTensorDescriptor_t wDesc,
+                       void *w,
+                       const int paramID,
+                       hipdnnTensorDescriptor_t paramDesc,
+                       const void *layerParam);
+
+hipdnnStatus_t
+hipdnnSetRNNLayerBias(hipdnnHandle_t handle,
+                      hipdnnRNNDescriptor_t rnnDesc,
+                      const int layer,
+                      hipdnnTensorDescriptor_t xDesc,
+                      hipdnnTensorDescriptor_t wDesc,
+                      void *w,
+                      const int biasID,
+                      hipdnnTensorDescriptor_t biasDesc,
+                      const void *layerBias);
 
 hipdnnStatus_t
 hipdnnRNNForwardInference( hipdnnHandle_t handle,
