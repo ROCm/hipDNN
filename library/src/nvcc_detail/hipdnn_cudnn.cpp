@@ -2435,7 +2435,9 @@ hipdnnStatus_t hipdnnSetRNNDescriptor(
     hipdnnDropoutDescriptor_t
         dropoutDesc, // Between layers, not between recurrent steps.
     hipdnnRNNInputMode_t inputMode, hipdnnDirectionMode_t direction,
-    hipdnnRNNMode_t mode, hipdnnRNNAlgo_t algo, hipdnnDataType_t dataType) {
+    hipdnnRNNMode_t mode, hipdnnRNNAlgo_t algo, hipdnnDataType_t dataType,
+    hipdnnRNNBiasMode_t biasMode) {
+
     cudnnRNNInputMode_t cuRIM;
     cudnnDirectionMode_t cuDM;
     cudnnRNNMode_t cuRM;
@@ -2467,6 +2469,7 @@ hipdnnStatus_t hipdnnSetRNNDescriptor_v5(
     cudnnRNNMode_t cuRM;
     cudnnDataType_t cuDT;
 
+
     CHECK_HIPDNN(hipTocudnnRNNInputMode(inputMode, &cuRIM));
     CHECK_HIPDNN(hipTocudnnDirectionMode(direction, &cuDM));
     CHECK_HIPDNN(hipTocudnnRNNMode(mode, &cuRM));
@@ -2479,11 +2482,57 @@ hipdnnStatus_t hipdnnSetRNNDescriptor_v5(
     return HIPDNN_STATUS_SUCCESS;
 }
 
-hipdnnStatus_t hipdnnGetRNNWorkspaceSize(hipdnnHandle_t handle,
-                                         const hipdnnRNNDescriptor_t rnnDesc,
-                                         const int seqLength,
-                                         const hipdnnTensorDescriptor_t *xDesc,
-                                         size_t *sizeInBytes) {
+hipdnnStatus_t hipdnnGetRNNDescriptor(hipdnnHandle_t handle,
+    hipdnnRNNDescriptor_t rnnDesc, int* hiddenSize, int* numLayers,
+    hipdnnDropoutDescriptor_t *dropoutDesc, hipdnnRNNInputMode_t *inputMode,
+    hipdnnDirectionMode_t *direction, hipdnnRNNMode_t *mode, hipdnnRNNAlgo_t *algo,
+    hipdnnDataType_t *dataType, hipdnnRNNBiasMode_t *biasMode) {
+
+    cudnnRNNInputMode_t cuRIM;
+    cudnnDirectionMode_t cuDM;
+    cudnnRNNMode_t cuRM;
+    cudnnDataType_t cuDT;
+    cudnnRNNAlgo_t cuRA;
+
+    biasMode = HIPDNN_RNN_WITH_BIAS;
+
+    CHECK_CUDNN(cudnnGetRNNDescriptor((cudnnHandle_t)handle,
+        (cudnnRNNDescriptor_t)rnnDesc, hiddenSize, numLayers, (cudnnDropoutDescriptor_t*) dropoutDesc,
+        &cuRIM, &cuDM, &cuRM, &cuRA, &cuDT));
+
+    CHECK_HIPDNN(cudnnTohipdnnRNNInputMode(cuRIM, inputMode));
+    CHECK_HIPDNN(cudnnTohipDirectionMode(cuDM, direction));
+    CHECK_HIPDNN(cudnnTohipdnnRNNAlgo(cuRA, algo));
+    CHECK_HIPDNN(cudnnTohipDataType(cuDT, dataType));
+    CHECK_HIPDNN(cudnnTohipRNNMode(cuRM, mode));
+
+    return HIPDNN_STATUS_SUCCESS;
+}
+
+hipdnnStatus_t hipdnnGetRNNParamsSize(hipdnnHandle_t handle, const hipdnnRNNDescriptor_t rnnDesc,
+    const hipdnnTensorDescriptor_t xDesc, size_t *sizeInBytes, hipdnnDataType_t dataType) {
+
+    cudnnDataType_t cuDT;
+    CHECK_HIPDNN(hipTocudnnDataType(dataType, &cuDT));
+
+    CHECK_CUDNN(cudnnGetRNNParamsSize((cudnnHandle_t) handle, (cudnnRNNDescriptor_t)rnnDesc,
+        (cudnnTensorDescriptor_t   xDesc, sizeInBytes, cuDT));
+
+    return HIPDNN_STATUS_SUCCESS;
+}
+
+hipdnnStatus_t hipdnnGetRNNLayerParamSize(hipdnnHandle_t handle, hipdnnRNNDescriptor_t rnnDesc,
+    const int layer, hipdnnTensorDescriptor_t xDesc, const int paramID, size_t *numBytes) {
+    return HIPDNN_STATUS_NOT_SUPPORTED;
+}
+
+hipdnnStatus_t hipdnnGetRNNLayerBiasSize(hipdnnHandle_t handle, hipdnnRNNDescriptor_t rnnDesc,
+    const int layer, const int biasID, size_t *numBytes) {
+    return HIPDNN_STATUS_NOT_SUPPORTED;
+}
+
+hipdnnStatus_t hipdnnGetRNNWorkspaceSize(hipdnnHandle_t handle, const hipdnnRNNDescriptor_t rnnDesc,
+    const int seqLength, const hipdnnTensorDescriptor_t *xDesc, size_t *sizeInBytes) {
 
     CHECK_CUDNN(cudnnGetRNNWorkspaceSize(
         (cudnnHandle_t)handle, (cudnnRNNDescriptor_t)rnnDesc, seqLength,
@@ -2492,10 +2541,9 @@ hipdnnStatus_t hipdnnGetRNNWorkspaceSize(hipdnnHandle_t handle,
     return HIPDNN_STATUS_SUCCESS;
 }
 
-hipdnnStatus_t hipdnnGetRNNTrainingReserveSize(
-    hipdnnHandle_t handle, const hipdnnRNNDescriptor_t rnnDesc,
-    const int seqLength, const hipdnnTensorDescriptor_t *xDesc,
-    size_t *sizeInBytes) {
+hipdnnStatus_t hipdnnGetRNNTrainingReserveSize(hipdnnHandle_t handle,
+    const hipdnnRNNDescriptor_t rnnDesc, const int seqLength,
+    const hipdnnTensorDescriptor_t *xDesc, size_t *sizeInBytes) {
 
     CHECK_CUDNN(cudnnGetRNNTrainingReserveSize(
         (cudnnHandle_t)handle, (cudnnRNNDescriptor_t)rnnDesc, seqLength,
@@ -2504,16 +2552,16 @@ hipdnnStatus_t hipdnnGetRNNTrainingReserveSize(
 }
 
 hipdnnStatus_t hipdnnGetRNNParamsSize(hipdnnHandle_t handle,
-                                      const hipdnnRNNDescriptor_t rnnDesc,
-                                      const hipdnnTensorDescriptor_t xDesc,
-                                      size_t *sizeInBytes,
-                                      hipdnnDataType_t dataType) {
+    const hipdnnRNNDescriptor_t rnnDesc, const hipdnnTensorDescriptor_t xDesc, size_t *sizeInBytes,
+    hipdnnDataType_t dataType) {
+
     cudnnDataType_t cuDT;
     CHECK_HIPDNN(hipTocudnnDataType(dataType, &cuDT));
 
     CHECK_CUDNN(cudnnGetRNNParamsSize(
         (cudnnHandle_t)handle, (cudnnRNNDescriptor_t)rnnDesc,
         (cudnnTensorDescriptor_t)xDesc, sizeInBytes, cuDT));
+
     return HIPDNN_STATUS_SUCCESS;
 }
 
@@ -2540,6 +2588,38 @@ hipdnnStatus_t hipdnnGetRNNLinLayerBiasParams(
         linLayerID, (cudnnFilterDescriptor_t)linLayerBiasDesc, linLayerBias));
     return HIPDNN_STATUS_SUCCESS;
 }
+
+hipdnnStatus_t hipdnnGetRNNParamsDescriptor(
+    hipdnnHandle_t handle, hipdnnRNNDescriptor_t rnnDesc, hipdnnTensorDescriptor_t xDesc,
+    hipdnnTensorDescriptor_t wDesc, hipdnnDataType_t dtype) {
+    return HIPDNN_STATUS_NOT_SUPPORTED;
+}
+
+hipdnnStatus_t hipdnnGetRNNInputTensorSize(
+    hipdnnHandle_t handle, hipdnnRNNDescriptor_t rnnDesc, const int seqLen,
+    hipdnnTensorDescriptor_t *xDesc, size_t *numBytes) {
+    return HIPDNN_STATUS_NOT_SUPPORTED;
+}
+
+hipdnnStatus_t hipdnnGetRNNHiddenTensorSize(
+    hipdnnHandle_t handle, hipdnnRNNDescriptor_t rnnDesc, const int seqLen,
+    hipdnnTensorDescriptor_t *xDesc, size_t *numBytes) {
+    return HIPDNN_STATUS_NOT_SUPPORTED;
+}
+
+hipdnnStatus_t hipdnnSetRNNLayerParam(
+    hipdnnHandle_t handle, hipdnnRNNDescriptor_t rnnDesc, const int layer,
+    hipdnnTensorDescriptor_t xDesc, hipdnnTensorDescriptor_t wDesc, void *w,
+    const int paramID, hipdnnTensorDescriptor_t paramDesc, const void *layerParam) {
+    return HIPDNN_STATUS_NOT_SUPPORTED;
+}
+
+hipdnnStatus_t hipdnnSetRNNLayerBias(hipdnnHandle_t handle, hipdnnRNNDescriptor_t rnnDesc,
+    const int layer, hipdnnTensorDescriptor_t xDesc, hipdnnTensorDescriptor_t wDesc, void *w,
+    const int biasID, hipdnnTensorDescriptor_t biasDesc, const void *layerBias) {
+    return HIPDNN_STATUS_NOT_SUPPORTED;
+}
+
 
 hipdnnStatus_t hipdnnRNNForwardInference(
     hipdnnHandle_t handle, const hipdnnRNNDescriptor_t rnnDesc,
