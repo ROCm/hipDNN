@@ -15,7 +15,8 @@ TEST(convolution_fwd, func_check_zero_padding_medium_input_batch32) {
 // alpha = 1.f, beta = 0.f;
 
   Test_convolution_fwd<float>( inputDesc, filterDesc, pad, stride, dil,
-  "convolution_fwd:func_check_zero_padding_medium_input_batch32", alpha_beta[2], alpha_beta[0]);
+                 "convolution_fwd:func_check_zero_padding_medium_input_batch32",
+                 alpha_beta[2], alpha_beta[0]);
 }
 
 TEST(convolution_fwd, func_check_zero_padding_small_input_batch32) {
@@ -29,7 +30,8 @@ TEST(convolution_fwd, func_check_zero_padding_small_input_batch32) {
 //  alpha = 1.f, beta = 0.5f;
 
   Test_convolution_fwd<float>( inputDesc, filterDesc, pad, stride, dil,
-  "convolution_fwd:func_check_zero_padding_small_input_batch32", alpha_beta[2], alpha_beta[1]);
+                  "convolution_fwd:func_check_zero_padding_small_input_batch32",
+                  alpha_beta[2], alpha_beta[1]);
 }
 
 TEST(convolution_fwd, func_check_two_strides_medium_kernelsize) {
@@ -40,11 +42,11 @@ TEST(convolution_fwd, func_check_two_strides_medium_kernelsize) {
   int pad[2] = {0, 0};    // zero padding
   int stride[2] = {2, 2}; // stride 2
   int dil[2] = {1, 1};
-  alpha = 0.5f;
-  beta = 0.f;
+  // alpha = 0.5f, beta = 0.f;
 
   Test_convolution_fwd<float>( inputDesc, filterDesc, pad, stride, dil,
-  "convolution_fwd:func_check_two_strides_medium_kernelsize", alpha_beta[1], alpha_beta[0]);
+                     "convolution_fwd:func_check_two_strides_medium_kernelsize",
+                     alpha_beta[1], alpha_beta[0]);
 }
 
 TEST(convolution_fwd, func_check_padding_and_strides_small_size) {
@@ -55,10 +57,11 @@ TEST(convolution_fwd, func_check_padding_and_strides_small_size) {
   int pad[2] = {1, 1}; // padding 1
   int stride[2] = {2, 2}; // stride 2
   int dil[2] = {1, 1};
-//  alpha = 1.f, beta = 0.f;
+  // alpha = 1.f, beta = 0.f;
 
   Test_convolution_fwd<float>( inputDesc, filterDesc, pad, stride, dil,
-  "convolution_fwd:func_check_padding_and_strides_small_size", alpha_beta[2], alpha_beta[0]);
+                    "convolution_fwd:func_check_padding_and_strides_small_size",
+                    alpha_beta[2], alpha_beta[0]);
 }
 
 TEST(convolution_fwd, func_check_full_conv) {
@@ -69,10 +72,10 @@ TEST(convolution_fwd, func_check_full_conv) {
   int pad[2] = {0, 0};    // zero padding
   int stride[2] = {1, 1}; // stride 1
   int dil[2] = {1, 1};
-//  alpha = 1.f, beta = 0.f;
+  //  alpha = 1.f, beta = 0.f;
 
   Test_convolution_fwd<float>( inputDesc, filterDesc, pad, stride, dil,
-                     "convolution_fwd:func_check_full_conv", alpha_beta[2], alpha_beta[0]);
+          "convolution_fwd:func_check_full_conv", alpha_beta[2], alpha_beta[0]);
 }
 
 TEST(convolution_fwd, func_check_batch64) {
@@ -83,11 +86,10 @@ TEST(convolution_fwd, func_check_batch64) {
   int pad[2] = {2, 2}; // padding 2
   int stride[2] = {1, 1}; // stride 1
   int dil[2] = {1, 1};
-  alpha = 0.f;
-  beta = 0.5f;
+  // alpha = 0.f, beta = 0.5f;
 
   Test_convolution_fwd<float>( inputDesc, filterDesc, pad, stride, dil,
-                     "convolution_fwd:func_check_batch64", alpha_beta[0], alpha_beta[0]);
+            "convolution_fwd:func_check_batch64", alpha_beta[0], alpha_beta[0]);
 }
 
 TEST(convolution_fwd, func_check_zero_padding_medium_input_batch128) {
@@ -98,10 +100,11 @@ TEST(convolution_fwd, func_check_zero_padding_medium_input_batch128) {
   int pad[2] = {0, 0};    // zero padding
   int stride[2] = {1, 1}; // stride 1
   int dil[2] = {1, 1};
-//  alpha = 1.f, beta = 0.f;
+  // alpha = 1.f, beta = 0.f;
 
   Test_convolution_fwd<float>( inputDesc, filterDesc, pad, stride, dil,
-  "convolution_fwd:func_check_zero_padding_medium_input_batch128", alpha_beta[2], alpha_beta[0]);
+            "convolution_fwd:func_check_zero_padding_medium_input_batch128",
+            alpha_beta[2], alpha_beta[0]);
 }
 
 TEST(convolution_fwd, func_check_dilation2x2_batch8) {
@@ -112,10 +115,11 @@ TEST(convolution_fwd, func_check_dilation2x2_batch8) {
   int pad[2] = {2, 2}; // padding 2
   int stride[2] = {1, 1}; // stride 1
   int dil[2] = {2, 2};
- // alpha = 1.f, beta = 0.f;
+  // alpha = 1.f, beta = 0.f;
 
   Test_convolution_fwd<float>( inputDesc, filterDesc, pad, stride, dil,
-                     "convolution_fwd:func_check_dilation2x2_batch8", alpha_beta[2], alpha_beta[0]);
+                 "convolution_fwd:func_check_dilation2x2_batch8", alpha_beta[2],
+                 alpha_beta[0]);
 }
 
 TEST(convolution_fwd, func_check_dilation3x3_batch8) {
@@ -126,41 +130,43 @@ TEST(convolution_fwd, func_check_dilation3x3_batch8) {
   int pad[2] = {2, 2}; // padding 2
   int stride[2] = {1, 1}; // stride 1
   int dil[2] = {3, 3};
-//  alpha = 2.f, beta = 0.5f;
+  // alpha = 2.f, beta = 0.5f;
 
   Test_convolution_fwd<float>( inputDesc, filterDesc, pad, stride, dil,
-                     "convolution_fwd:func_check_dilation3x3_batch8", alpha_beta[3], alpha_beta[1]);
+                 "convolution_fwd:func_check_dilation3x3_batch8", alpha_beta[3],
+                 alpha_beta[1]);
 }
 
-TEST(convolution_fwd, func_check_filter_rectangular_dims) {
+TEST(convolution_fwd, func_check_filter_rectangular_dims_height_smaller) {
 
-  Desc inputDesc(32, 3, 224, 224);
-  Desc filterDesc(21, 3, 50, 60);
+  Desc inputDesc(32, 3, 100, 100);
+  Desc filterDesc(21, 3, 2, 4);
 
   int pad[2] = {0, 0};    // zero padding
   int stride[2] = {2, 2}; // stride 2
   int dil[2] = {1, 1};
-//  alpha = 1.f, beta = 0.f;
+  // alpha = 1.f, beta = 0.f;
 
   Test_convolution_fwd<float>( inputDesc, filterDesc, pad, stride, dil,
-            "convolution_fwd:func_check_filter_rectangular_dims", alpha_beta[2], alpha_beta[0]);
+            "convolution_fwd:func_check_filter_rectangular_dims", alpha_beta[2],
+            alpha_beta[0]);
 }
 
-TEST(convolution_fwd, func_check_rectangular_dims_length_smaller) {
+TEST(convolution_fwd, func_check_rectangular_dims_width_smaller_large_size) {
 
-  Desc inputDesc(32, 3, 100, 224);
-  Desc filterDesc(21, 3, 50, 60);
+  Desc inputDesc(1, 3, 224, 224);
+  Desc filterDesc(1, 3, 64, 32);
 
   int pad[2] = {0, 0};    // zero padding
-  int stride[2] = {2, 2}; // stride 2
+  int stride[2] = {4, 4}; // stride 4
   int dil[2] = {1, 1};
-//  alpha = 1.f,  beta = 0.f;
+  // alpha = 1.f,  beta = 0.f;
 
   Test_convolution_fwd<float>( inputDesc, filterDesc, pad, stride, dil,
-  "convolution_fwd:func_check_rectangular_dims_length_smaller", alpha_beta[2], alpha_beta[0]);
+                   "convolution_fwd:func_check_rectangular_dims_length_smaller",
+                   alpha_beta[2], alpha_beta[0]);
 }
-
-TEST(convolution_fwd, func_check_rectangular_dims_breadth_smaller) {
+TEST(convolution_fwd, func_check_rectangular_dims_small_size) {
 
   Desc inputDesc(32, 3, 10, 5);
   Desc filterDesc(21, 3, 5, 3);
@@ -168,8 +174,9 @@ TEST(convolution_fwd, func_check_rectangular_dims_breadth_smaller) {
   int pad[2] = {0, 0};    // zero padding
   int stride[2] = {2, 2}; // stride 2
   int dil[2] = {1, 1};
-// alpha = 1.f, beta = 0.f;
+  // alpha = 1.f, beta = 0.f;
 
   Test_convolution_fwd<float>( inputDesc, filterDesc, pad, stride, dil,
-  "convolution_fwd:func_check_rectangular_dims_breadth_smaller", alpha_beta[2], alpha_beta[0]);
+                  "convolution_fwd:func_check_rectangular_dims_breadth_smaller",
+                  alpha_beta[2], alpha_beta[0]);
 }
