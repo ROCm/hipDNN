@@ -66,8 +66,8 @@ for filename1 in os.listdir(hcc_folder):
                               for op1,op2 in zip(row1[1:],row2[1:]):
                                   if (op1=='' or op2==''):
                                      break
-                                  n1 = float(format(float(op1), '.2e'))
-                                  n2 = float(format(float(op2), '.2e'))
+                                  n1 = float(format(float(op1), '.1e'))
+                                  n2 = float(format(float(op2), '.1e'))
                                   if (n1 != n2):
                                      if ((abs(n1 - n2)) > 0.001):
                                         if (count2 == 0):

@@ -8,11 +8,12 @@
 
 template <typename dataType>
 void compute_hipdnn_batchnorm_fwd_train(BNorm_params_t &d, dataType *src,
-                                dataType *dst, dataType *resultRunningMean,
-                                dataType *resultRunningVariance,
-                                dataType *resultSaveMean,
-                                dataType *resultSaveInvVariance,
-                                float *avg_time, int mode) {
+                              dataType *dst, dataType *resultRunningMean,
+                              dataType *resultRunningVariance,
+                              dataType *resultSaveMean,
+                              dataType *resultSaveInvVariance,
+                              float *avg_time, hipdnnBatchNormMode_t bn_modeT,
+                              hipdnnDataType_t hipdataType) {
 
   hipdnnHandle_t hipdnn;
   checkHIPDNN(hipdnnCreate(&hipdnn));
@@ -21,22 +22,15 @@ void compute_hipdnn_batchnorm_fwd_train(BNorm_params_t &d, dataType *src,
   checkHIPDNN(hipdnnCreateTensorDescriptor(&in_desc));
 
   checkHIPDNN(hipdnnSetTensor4dDescriptor(
-        in_desc, HIPDNN_TENSOR_NCHW, HIPDNN_DATA_FLOAT,
+        in_desc, HIPDNN_TENSOR_NCHW, hipdataType,
         d.mb, d.ic, d.ih, d.iw));
 
   hipdnnTensorDescriptor_t out_desc;
   checkHIPDNN(hipdnnCreateTensorDescriptor(&out_desc));
 
   checkHIPDNN(hipdnnSetTensor4dDescriptor(
-        out_desc, HIPDNN_TENSOR_NCHW, HIPDNN_DATA_FLOAT,
+        out_desc, HIPDNN_TENSOR_NCHW, hipdataType,
         d.mb, d.ic, d.ih, d.iw));
-
-  hipdnnBatchNormMode_t bn_modeT;
-
-  if (mode == 0)
-      bn_modeT = HIPDNN_BATCHNORM_SPATIAL;
-  else
-      bn_modeT = HIPDNN_BATCHNORM_PER_ACTIVATION;
 
   hipdnnTensorDescriptor_t bnScaleBiasMeanVarDescT;
 
@@ -49,7 +43,7 @@ void compute_hipdnn_batchnorm_fwd_train(BNorm_params_t &d, dataType *src,
 
   int out_n,out_c,out_h,out_w, nStride,cStride,hStride,wStride;
 
-  hipdnnDataType_t dt = HIPDNN_DATA_FLOAT;
+  hipdnnDataType_t dt = hipdataType;
 
   hipdnnGetTensor4dDescriptor(
              bnScaleBiasMeanVarDescT, &dt, &out_n, &out_c, &out_h, &out_w, &nStride,
@@ -192,7 +186,8 @@ template <typename dataType>
 void compute_hipdnn_batchnorm_bwd(BNorm_params_t &d, dataType *src,
                                 dataType *dx, dataType *resultBnScaleDiff,
                                 dataType *resultBnBiasDiff, float *avg_time,
-                                int mode, int acc_grad) {
+                                hipdnnBatchNormMode_t bn_modeT_back, int acc_grad,
+                                hipdnnDataType_t hipdataType) {
 
   hipdnnHandle_t hipdnn;
   checkHIPDNN(hipdnnCreate(&hipdnn));
@@ -201,7 +196,7 @@ void compute_hipdnn_batchnorm_bwd(BNorm_params_t &d, dataType *src,
   checkHIPDNN(hipdnnCreateTensorDescriptor(&in_desc));
 
   checkHIPDNN(hipdnnSetTensor4dDescriptor(
-        in_desc, HIPDNN_TENSOR_NCHW, HIPDNN_DATA_FLOAT,
+        in_desc, HIPDNN_TENSOR_NCHW, hipdataType,
         d.mb, d.ic, d.ih, d.iw));
 
 
@@ -209,25 +204,18 @@ void compute_hipdnn_batchnorm_bwd(BNorm_params_t &d, dataType *src,
   checkHIPDNN(hipdnnCreateTensorDescriptor(&out_desc));
 
   checkHIPDNN(hipdnnSetTensor4dDescriptor(
-        out_desc, HIPDNN_TENSOR_NCHW, HIPDNN_DATA_FLOAT,
+        out_desc, HIPDNN_TENSOR_NCHW, hipdataType,
         d.mb, d.ic, d.ih, d.iw));
 
   hipdnnTensorDescriptor_t bnScaleBiasDiffDesc;
   checkHIPDNN(hipdnnCreateTensorDescriptor(&bnScaleBiasDiffDesc));
-
-  hipdnnBatchNormMode_t bn_modeT_back;
-
-  if (mode == 0)
-      bn_modeT_back = HIPDNN_BATCHNORM_SPATIAL;
-  else
-      bn_modeT_back = HIPDNN_BATCHNORM_PER_ACTIVATION;
 
   checkHIPDNN(hipdnnDeriveBNTensorDescriptor(bnScaleBiasDiffDesc,
                                              in_desc, bn_modeT_back));
 
   int out_n,out_c,out_h,out_w, nStride,cStride,hStride,wStride;
 
-  hipdnnDataType_t dt = HIPDNN_DATA_FLOAT;
+  hipdnnDataType_t dt = hipdataType;
 
   hipdnnGetTensor4dDescriptor(
              bnScaleBiasDiffDesc, &dt, &out_n, &out_c, &out_h, &out_w, &nStride,
@@ -236,7 +224,7 @@ void compute_hipdnn_batchnorm_bwd(BNorm_params_t &d, dataType *src,
   hipdnnTensorDescriptor_t dy_desc;
   checkHIPDNN(hipdnnCreateTensorDescriptor(&dy_desc));
   checkHIPDNN(hipdnnSetTensor4dDescriptor(
-              dy_desc, HIPDNN_TENSOR_NCHW, HIPDNN_DATA_FLOAT,
+              dy_desc, HIPDNN_TENSOR_NCHW, hipdataType,
               d.mb, d.ic, d.ih, d.iw));
 
   float* dy;
@@ -248,7 +236,7 @@ void compute_hipdnn_batchnorm_bwd(BNorm_params_t &d, dataType *src,
   hipdnnTensorDescriptor_t dx_desc;
   checkHIPDNN(hipdnnCreateTensorDescriptor(&dx_desc));
   checkHIPDNN(hipdnnSetTensor4dDescriptor(
-              dx_desc, HIPDNN_TENSOR_NCHW, HIPDNN_DATA_FLOAT,
+              dx_desc, HIPDNN_TENSOR_NCHW, hipdataType,
               d.mb, d.ic, d.ih, d.iw));
 
   float* bnScaleT_back;
@@ -281,7 +269,7 @@ void compute_hipdnn_batchnorm_bwd(BNorm_params_t &d, dataType *src,
 
         timer.restart();
 
-   	    checkHIPDNN( hipdnnBatchNormalizationBackward( hipdnn, bn_modeT_back,
+              checkHIPDNN( hipdnnBatchNormalizationBackward( hipdnn, bn_modeT_back,
                       &alphaDataDiff, &betaDataDiff, &alphaParamDiff,
                       &betaParamDiff, in_desc, src, dy_desc, dy, dx_desc, dx,
                       bnScaleBiasDiffDesc, bnScaleT_back, resultBnScaleDiff,
@@ -297,8 +285,8 @@ void compute_hipdnn_batchnorm_bwd(BNorm_params_t &d, dataType *src,
                             bn_modeT_back, &alphaDataDiff, &betaDataDiff,
                             &alphaParamDiff, &betaParamDiff, in_desc, src,
                             dy_desc, dy, dx_desc, dx, bnScaleBiasDiffDesc,
-      		          bnScaleT_back, resultBnScaleDiff, resultBnBiasDiff,
-      		          epsilonT_back, savedMean, savedInvVariance));
+                            bnScaleT_back, resultBnScaleDiff, resultBnBiasDiff,
+                            epsilonT_back, savedMean, savedInvVariance));
            }
 
         hipDeviceSynchronize();
@@ -320,6 +308,306 @@ void compute_hipdnn_batchnorm_bwd(BNorm_params_t &d, dataType *src,
   hipdnnDestroyTensorDescriptor(dx_desc);
   hipdnnDestroyTensorDescriptor(bnScaleBiasDiffDesc);
   hipdnnDestroy(hipdnn);
+
+}
+
+template <typename dataType>
+void Test_bnorm_fwd_train(Desc inputDesc, Desc outputDesc,
+                          Desc bnScaleBiasMeanVarDesc,
+                          hipdnnBatchNormMode_t bn_mode, std::string testname[4],
+                          hipdnnDataType_t hipdataType = HIPDNN_DATA_FLOAT){
+
+  float avg_time = 0;
+  dataType *temp, *temp1, *temp2, *temp3, *temp4;
+
+  Memory<dataType> srcData = createMemory<dataType>(inputDesc);
+  Memory<dataType> dstDataGPU = createMemory<dataType>(outputDesc);
+  Memory<dataType> resultRunningMean = createMemory<dataType>(bnScaleBiasMeanVarDesc);
+  Memory<dataType> resultRunningVariance = createMemory<dataType>(bnScaleBiasMeanVarDesc);
+  Memory<dataType> resultSaveMean = createMemory<dataType>(bnScaleBiasMeanVarDesc);
+  Memory<dataType> resultSaveVariance = createMemory<dataType>(bnScaleBiasMeanVarDesc);
+
+  populateMemoryRandom<dataType>(srcData);
+  populateMemoryRandom<dataType>(resultRunningMean);
+  populateMemoryRandom<dataType>(resultRunningVariance);
+
+  BNorm_params_t BN_sizes(inputDesc.N, inputDesc.C, inputDesc.H, inputDesc.W);
+
+  compute_hipdnn_batchnorm_fwd_train<dataType>(BN_sizes, srcData.gpu(),
+                                            dstDataGPU.gpu(),
+                                            resultRunningMean.gpu(),
+                                            resultRunningVariance.gpu(),
+                                            resultSaveMean.gpu(),
+                                            resultSaveVariance.gpu(), &avg_time,
+                                            bn_mode, hipdataType);
+
+  std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
+
+  std::string strt = "./result_unittest.csv";
+  std::string filename="BNorm_Fwd_train.csv";
+
+  int ip_size[4] = {inputDesc.N, inputDesc.C, inputDesc.H, inputDesc.W};
+  int k_size[4] = {0,0,0};
+  int op_size[4] =  {outputDesc.N, outputDesc.C, outputDesc.H, outputDesc.W};
+
+  std::string str_ip_size  = convert_to_string((int*)ip_size,4);
+  std::string str_k_size  = convert_to_string((int*)k_size,4);
+  std::string str_op_size  = convert_to_string((int*)op_size,4);
+
+    temp = dstDataGPU.getDataFromGPU();
+    temp1 = resultRunningMean.getDataFromGPU();
+    temp2 = resultRunningVariance.getDataFromGPU();
+    temp3 = resultSaveMean.getDataFromGPU();
+    temp4 = resultSaveVariance.getDataFromGPU();
+
+  std::string str  = convert_to_string((float*)temp,
+                                       (int)dstDataGPU.get_num_elements());
+  std::string str1  = convert_to_string((float*)temp1,
+                                       (int)resultRunningMean.get_num_elements());
+  std::string str2  = convert_to_string((float*)temp2,
+                                       (int)resultRunningVariance.get_num_elements());
+  std::string str3  = convert_to_string((float*)temp3,
+                                       (int)resultSaveMean.get_num_elements());
+  std::string str4  = convert_to_string((float*)temp4,
+                                       (int)resultSaveVariance.get_num_elements());
+
+  write_to_csv(strt, str, testname[0], avg_time, str_ip_size, str_k_size,
+               str_op_size);
+  write_to_csv(strt, str1, testname[1], avg_time, str_ip_size, str_k_size,
+               str_op_size);
+  write_to_csv(strt, str2, testname[2], avg_time, str_ip_size, str_k_size,
+               str_op_size);
+  write_to_csv(strt, str3, testname[3], avg_time, str_ip_size, str_k_size,
+               str_op_size);
+  write_to_csv(strt, str4, testname[4], avg_time, str_ip_size, str_k_size,
+               str_op_size);
+
+  dump_result_csv(filename, testname[0], temp, (int)dstDataGPU.get_num_elements());
+  dump_result_csv(filename, testname[1], temp1, (int)resultRunningMean.get_num_elements());
+  dump_result_csv(filename, testname[2], temp2, (int)resultRunningVariance.get_num_elements());
+  dump_result_csv(filename, testname[3], temp3, (int)resultSaveMean.get_num_elements());
+  dump_result_csv(filename, testname[4], temp4, (int)resultSaveVariance.get_num_elements());
+
+}
+
+template <>
+inline void Test_bnorm_fwd_train<half>(Desc inputDesc, Desc outputDesc,
+                          Desc bnScaleBiasMeanVarDesc,
+                          hipdnnBatchNormMode_t bn_mode, std::string testname[4],
+                          hipdnnDataType_t hipdataType){
+
+  float avg_time = 0;
+  float *temp, *temp1, *temp2, *temp3, *temp4;
+  hipdataType = HIPDNN_DATA_HALF;
+
+  Memory<half> srcData = createMemory<half>(inputDesc);
+  Memory<half> dstDataGPU = createMemory<half>(outputDesc);
+  Memory<half> resultRunningMean = createMemory<half>(bnScaleBiasMeanVarDesc);
+  Memory<half> resultRunningVariance = createMemory<half>(bnScaleBiasMeanVarDesc);
+  Memory<half> resultSaveMean = createMemory<half>(bnScaleBiasMeanVarDesc);
+  Memory<half> resultSaveVariance = createMemory<half>(bnScaleBiasMeanVarDesc);
+
+  populateMemoryRandom<half>(srcData);
+  populateMemoryRandom<half>(resultRunningMean);
+  populateMemoryRandom<half>(resultRunningVariance);
+
+  BNorm_params_t BN_sizes(inputDesc.N, inputDesc.C, inputDesc.H, inputDesc.W);
+
+  compute_hipdnn_batchnorm_fwd_train<half>(BN_sizes, srcData.gpu(),
+                                            dstDataGPU.gpu(),
+                                            resultRunningMean.gpu(),
+                                            resultRunningVariance.gpu(),
+                                            resultSaveMean.gpu(),
+                                            resultSaveVariance.gpu(), &avg_time,
+                                            bn_mode, hipdataType);
+
+  std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
+
+  std::string strt = "./result_unittest.csv";
+  std::string filename="BNorm_Fwd_train.csv";
+
+  int ip_size[4] = {inputDesc.N, inputDesc.C, inputDesc.H, inputDesc.W};
+  int k_size[4] = {0,0,0};
+  int op_size[4] =  {outputDesc.N, outputDesc.C, outputDesc.H, outputDesc.W};
+
+  std::string str_ip_size  = convert_to_string((int*)ip_size,4);
+  std::string str_k_size  = convert_to_string((int*)k_size,4);
+  std::string str_op_size  = convert_to_string((int*)op_size,4);
+
+    Memory<float> dstDataGPU_f(outputDesc.N * outputDesc.C * outputDesc.H
+                               * outputDesc.W);
+    Memory<float> dstDataGPU_f1(bnScaleBiasMeanVarDesc.N * bnScaleBiasMeanVarDesc.C
+                              * bnScaleBiasMeanVarDesc.H * bnScaleBiasMeanVarDesc.W);
+    Memory<float> dstDataGPU_f2(bnScaleBiasMeanVarDesc.N * bnScaleBiasMeanVarDesc.C
+                              * bnScaleBiasMeanVarDesc.H * bnScaleBiasMeanVarDesc.W);
+    Memory<float> dstDataGPU_f3(bnScaleBiasMeanVarDesc.N * bnScaleBiasMeanVarDesc.C
+                              * bnScaleBiasMeanVarDesc.H * bnScaleBiasMeanVarDesc.W);
+    Memory<float> dstDataGPU_f4(bnScaleBiasMeanVarDesc.N * bnScaleBiasMeanVarDesc.C
+                              * bnScaleBiasMeanVarDesc.H * bnScaleBiasMeanVarDesc.W);
+
+    Convert_toFloat<half>(dstDataGPU, dstDataGPU_f);
+    Convert_toFloat<half>(resultRunningMean, dstDataGPU_f1);
+    Convert_toFloat<half>(resultRunningVariance, dstDataGPU_f2);
+    Convert_toFloat<half>(resultSaveMean, dstDataGPU_f3);
+    Convert_toFloat<half>(resultSaveVariance, dstDataGPU_f4);
+
+    temp = dstDataGPU_f.getDataFromGPU();
+    temp1 = dstDataGPU_f1.getDataFromGPU();
+    temp2 = dstDataGPU_f2.getDataFromGPU();
+    temp3 = dstDataGPU_f3.getDataFromGPU();
+    temp4 = dstDataGPU_f4.getDataFromGPU();
+
+  std::string str  = convert_to_string((float*)temp,
+                                       (int)dstDataGPU.get_num_elements());
+  std::string str1  = convert_to_string((float*)temp1,
+                                       (int)resultRunningMean.get_num_elements());
+  std::string str2  = convert_to_string((float*)temp2,
+                                       (int)resultRunningVariance.get_num_elements());
+  std::string str3  = convert_to_string((float*)temp3,
+                                       (int)resultSaveMean.get_num_elements());
+  std::string str4  = convert_to_string((float*)temp4,
+                                       (int)resultSaveVariance.get_num_elements());
+
+  write_to_csv(strt, str, testname[0], avg_time, str_ip_size, str_k_size,
+               str_op_size);
+  write_to_csv(strt, str1, testname[1], avg_time, str_ip_size, str_k_size,
+               str_op_size);
+  write_to_csv(strt, str2, testname[2], avg_time, str_ip_size, str_k_size,
+               str_op_size);
+  write_to_csv(strt, str3, testname[3], avg_time, str_ip_size, str_k_size,
+               str_op_size);
+  write_to_csv(strt, str4, testname[4], avg_time, str_ip_size, str_k_size,
+               str_op_size);
+
+  dump_result_csv(filename, testname[0], temp, (int)dstDataGPU.get_num_elements());
+  dump_result_csv(filename, testname[1], temp1, (int)resultRunningMean.get_num_elements());
+  dump_result_csv(filename, testname[2], temp2, (int)resultRunningVariance.get_num_elements());
+  dump_result_csv(filename, testname[3], temp3, (int)resultSaveMean.get_num_elements());
+  dump_result_csv(filename, testname[4], temp4, (int)resultSaveVariance.get_num_elements());
+
+}
+template <typename dataType>
+void Test_bnorm_bwd(Desc inputDesc, Desc outputDesc,
+            hipdnnBatchNormMode_t bn_mode, int acc_grad, std::string testname[2],
+            hipdnnDataType_t hipdataType = HIPDNN_DATA_FLOAT){
+
+  float avg_time = 0;
+  dataType* temp1, *temp2, *temp3;
+
+  Memory<dataType> srcData = createMemory<dataType>(inputDesc);
+  Memory<dataType> dstDataGPU = createMemory<dataType>(inputDesc);
+  Memory<dataType> resultBnScaleDiff = createMemory<dataType>(outputDesc);
+  Memory<dataType> resultBnBiasDiff = createMemory<dataType>(outputDesc);
+
+  populateMemoryRandom<dataType>(srcData);
+
+  BNorm_params_t BN_sizes(inputDesc.N, inputDesc.C, inputDesc.H, inputDesc.W);
+
+  int ip_size[4] = {inputDesc.N, inputDesc.C, inputDesc.H, inputDesc.W};
+  int k_size[4] = {0,0,0};
+  int op_size[4] =  {outputDesc.N, outputDesc.C, outputDesc.H, outputDesc.W};
+
+  std::string str_ip_size  = convert_to_string((int*)ip_size,4);
+  std::string str_k_size  = convert_to_string((int*)k_size,4);
+  std::string str_op_size  = convert_to_string((int*)op_size,4);
+
+  compute_hipdnn_batchnorm_bwd<dataType>(BN_sizes, srcData.gpu(), dstDataGPU.gpu(),
+                              resultBnScaleDiff.gpu(), resultBnBiasDiff.gpu(),
+                              &avg_time, bn_mode, acc_grad, hipdataType);
+
+  std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
+
+  std::string strt = "./result_unittest.csv";
+  std::string filename="BNorm_backward.csv";
+
+      temp1 = dstDataGPU.getDataFromGPU();
+      temp2 = resultBnScaleDiff.getDataFromGPU();
+      temp3 = resultBnBiasDiff.getDataFromGPU();
+
+  std::string str1  = convert_to_string2((float*)temp1,
+                                    (int)dstDataGPU.get_num_elements());
+  std::string str2  = convert_to_string2((float*)temp2,
+                                    (int)resultBnScaleDiff.get_num_elements());
+  std::string str3  = convert_to_string2((float*)temp3,
+                                    (int)resultBnBiasDiff.get_num_elements());
+
+  write_to_csv(strt, str1, testname[0], avg_time, str_ip_size, str_k_size,
+              str_op_size);
+  write_to_csv(strt, str2, testname[1], avg_time, str_ip_size, str_k_size,
+              str_op_size);
+  write_to_csv(strt, str3, testname[2], avg_time, str_ip_size, str_k_size,
+              str_op_size);
+
+  dump_result_csv(filename, testname[0], temp1, (int)dstDataGPU.get_num_elements());
+  dump_result_csv(filename, testname[1], temp2, (int)resultBnScaleDiff.get_num_elements());
+  dump_result_csv(filename, testname[2], temp3, (int)resultBnBiasDiff.get_num_elements());
+
+}
+
+template <>
+inline void Test_bnorm_bwd<half>(Desc inputDesc, Desc outputDesc,
+            hipdnnBatchNormMode_t bn_mode, int acc_grad, std::string testname[2],
+            hipdnnDataType_t hipdataType){
+
+  float avg_time = 0;
+  float* temp1, *temp2, *temp3;
+  hipdataType = HIPDNN_DATA_HALF;
+
+  Memory<half> srcData = createMemory<half>(inputDesc);
+  Memory<half> dstDataGPU = createMemory<half>(inputDesc);
+  Memory<half> resultBnScaleDiff = createMemory<half>(outputDesc);
+  Memory<half> resultBnBiasDiff = createMemory<half>(outputDesc);
+
+  populateMemoryRandom<half>(srcData);
+
+  BNorm_params_t BN_sizes(inputDesc.N, inputDesc.C, inputDesc.H, inputDesc.W);
+
+  int ip_size[4] = {inputDesc.N, inputDesc.C, inputDesc.H, inputDesc.W};
+  int k_size[4] = {0,0,0};
+  int op_size[4] =  {outputDesc.N, outputDesc.C, outputDesc.H, outputDesc.W};
+
+  std::string str_ip_size  = convert_to_string((int*)ip_size,4);
+  std::string str_k_size  = convert_to_string((int*)k_size,4);
+  std::string str_op_size  = convert_to_string((int*)op_size,4);
+
+  compute_hipdnn_batchnorm_bwd<half>(BN_sizes, srcData.gpu(), dstDataGPU.gpu(),
+                              resultBnScaleDiff.gpu(), resultBnBiasDiff.gpu(),
+                              &avg_time, bn_mode, acc_grad, hipdataType);
+
+  std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
+
+  std::string strt = "./result_unittest.csv";
+  std::string filename="BNorm_backward.csv";
+
+    Memory<float> dstDataGPU_f1(inputDesc.N * inputDesc.C * inputDesc.H * inputDesc.W);
+    Memory<float> dstDataGPU_f2(outputDesc.N * outputDesc.C * outputDesc.H * outputDesc.W);
+    Memory<float> dstDataGPU_f3(outputDesc.N * outputDesc.C * outputDesc.H * outputDesc.W);
+
+    Convert_toFloat<half>(dstDataGPU, dstDataGPU_f1);
+    Convert_toFloat<half>(resultBnScaleDiff, dstDataGPU_f2);
+    Convert_toFloat<half>(resultBnBiasDiff, dstDataGPU_f3);
+
+    temp1 = dstDataGPU_f1.getDataFromGPU();
+    temp2 = dstDataGPU_f2.getDataFromGPU();
+    temp3 = dstDataGPU_f3.getDataFromGPU();
+
+  std::string str1  = convert_to_string2((float*)temp1,
+                                    (int)dstDataGPU.get_num_elements());
+  std::string str2  = convert_to_string2((float*)temp2,
+                                    (int)resultBnScaleDiff.get_num_elements());
+  std::string str3  = convert_to_string2((float*)temp3,
+                                    (int)resultBnBiasDiff.get_num_elements());
+
+  write_to_csv(strt, str1, testname[0], avg_time, str_ip_size, str_k_size,
+              str_op_size);
+  write_to_csv(strt, str2, testname[1], avg_time, str_ip_size, str_k_size,
+              str_op_size);
+  write_to_csv(strt, str3, testname[2], avg_time, str_ip_size, str_k_size,
+              str_op_size);
+
+  dump_result_csv(filename, testname[0], temp1, (int)dstDataGPU.get_num_elements());
+  dump_result_csv(filename, testname[1], temp2, (int)resultBnScaleDiff.get_num_elements());
+  dump_result_csv(filename, testname[2], temp3, (int)resultBnBiasDiff.get_num_elements());
 
 }
 

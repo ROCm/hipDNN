@@ -19,6 +19,16 @@
 
 #define benchmark_iterations 100
 
+inline __global__ void half_to_float( half *din, float *dout, int dsize){
+	
+    size_t offset = (hipBlockIdx_x * hipBlockDim_x + hipThreadIdx_x);
+    size_t stride = hipBlockDim_x * hipGridDim_x ;
+	
+	for (int i = offset; i < dsize; i+=stride) {
+	 dout[i] = __half2float(din[i]);
+   }
+}
+
 #define checkHIPDNN(expression)                                                \
   {                                                                            \
     hipdnnStatus_t status = (expression);                                      \
@@ -141,17 +151,18 @@ void Equals(Memory<dataType> &A, Memory<dataType> &B) {
 }
 
 template <typename dataType> void Convert_toFloat (Memory<dataType> &mem, Memory<float> &mem_f) {
-   for (int i = 0; i <= mem.get_num_elements(); i++) {
-       *(mem_f.cpu() + i) = __half2float(*(mem.cpu() + i)); }
-     HIP_CALL(hipMemcpy(mem_f.gpu(), mem_f.cpu(), mem_f.size(), hipMemcpyHostToDevice));
+
+    const unsigned blocks = 512;
+    const unsigned threadsPerBlock = 256;
+    hipLaunchKernelGGL(half_to_float, dim3(blocks), dim3(threadsPerBlock), 0, 0, mem.gpu() ,mem_f.gpu(),mem.get_num_elements());
 }
 
 template <typename dataType> void populateMemoryRandom(Memory<dataType> &mem) {
   std::cout << "Creating vector of Size: " << mem.get_num_elements() << std::endl;
   float n = 1.0f;
   for (int i = 0; i <= mem.get_num_elements(); i++) {
-      if(n == 256) { n = 1.0f; }
-      *(mem.cpu() + i) = n++; }
+      if(n > 255) { n = 1.0f; }
+      *(mem.cpu() + i) = n++ + 0.001; }
   // Copy the stuff to device too
   HIP_CALL(hipMemcpy(mem.gpu(), mem.cpu(), mem.size(), hipMemcpyHostToDevice));
 }
