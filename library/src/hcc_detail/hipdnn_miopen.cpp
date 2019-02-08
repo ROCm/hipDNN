@@ -3078,17 +3078,6 @@ hipdnnStatus_t hipdnnGetRNNDescriptor(hipdnnHandle_t handle,
     CHECK_HIPDNN(miopenTohipRNNBias(moBM, biasMode));
 }
 
-hipdnnStatus_t hipdnnGetRNNParamsSize(hipdnnHandle_t handle, const hipdnnRNNDescriptor_t rnnDesc,
-    const hipdnnTensorDescriptor_t xDesc, size_t *sizeInBytes, hipdnnDataType_t dataType) {
-
-    miopenDataType_t moDT;
-    CHECK_HIPDNN(hipTomiopenDataType(dataType, &moDT));
-
-   CHECK_MIO(miopenGetRNNParamsSize((miopenHandle_t) handle, (miopenRNNDescriptor_t) rnnDesc,
-        (miopenTensorDescriptor_t) xDesc, sizeInBytes, moDT));
-    return HIPDNN_STATUS_SUCCESS;
-}
-
 hipdnnStatus_t hipdnnGetRNNLayerParamSize(hipdnnHandle_t handle,
                                         hipdnnRNNDescriptor_t rnnDesc,
                                         const int layer,
