@@ -2469,7 +2469,6 @@ hipdnnStatus_t hipdnnSetRNNDescriptor_v5(
     cudnnRNNMode_t cuRM;
     cudnnDataType_t cuDT;
 
-
     CHECK_HIPDNN(hipTocudnnRNNInputMode(inputMode, &cuRIM));
     CHECK_HIPDNN(hipTocudnnDirectionMode(direction, &cuDM));
     CHECK_HIPDNN(hipTocudnnRNNMode(mode, &cuRM));
@@ -2481,6 +2480,7 @@ hipdnnStatus_t hipdnnSetRNNDescriptor_v5(
 
     return HIPDNN_STATUS_SUCCESS;
 }
+
 
 hipdnnStatus_t hipdnnGetRNNDescriptor(hipdnnHandle_t handle,
     hipdnnRNNDescriptor_t rnnDesc, int* hiddenSize, int* numLayers,
@@ -2494,7 +2494,7 @@ hipdnnStatus_t hipdnnGetRNNDescriptor(hipdnnHandle_t handle,
     cudnnDataType_t cuDT;
     cudnnRNNAlgo_t cuRA;
 
-    biasMode = HIPDNN_RNN_WITH_BIAS;
+    *biasMode = HIPDNN_RNN_WITH_BIAS;
 
     CHECK_CUDNN(cudnnGetRNNDescriptor((cudnnHandle_t)handle,
         (cudnnRNNDescriptor_t)rnnDesc, hiddenSize, numLayers, (cudnnDropoutDescriptor_t*) dropoutDesc,
@@ -2505,18 +2505,6 @@ hipdnnStatus_t hipdnnGetRNNDescriptor(hipdnnHandle_t handle,
     CHECK_HIPDNN(cudnnTohipdnnRNNAlgo(cuRA, algo));
     CHECK_HIPDNN(cudnnTohipDataType(cuDT, dataType));
     CHECK_HIPDNN(cudnnTohipRNNMode(cuRM, mode));
-
-    return HIPDNN_STATUS_SUCCESS;
-}
-
-hipdnnStatus_t hipdnnGetRNNParamsSize(hipdnnHandle_t handle, const hipdnnRNNDescriptor_t rnnDesc,
-    const hipdnnTensorDescriptor_t xDesc, size_t *sizeInBytes, hipdnnDataType_t dataType) {
-
-    cudnnDataType_t cuDT;
-    CHECK_HIPDNN(hipTocudnnDataType(dataType, &cuDT));
-
-    CHECK_CUDNN(cudnnGetRNNParamsSize((cudnnHandle_t) handle, (cudnnRNNDescriptor_t)rnnDesc,
-        (cudnnTensorDescriptor_t   xDesc, sizeInBytes, cuDT));
 
     return HIPDNN_STATUS_SUCCESS;
 }
@@ -2541,9 +2529,10 @@ hipdnnStatus_t hipdnnGetRNNWorkspaceSize(hipdnnHandle_t handle, const hipdnnRNND
     return HIPDNN_STATUS_SUCCESS;
 }
 
-hipdnnStatus_t hipdnnGetRNNTrainingReserveSize(hipdnnHandle_t handle,
-    const hipdnnRNNDescriptor_t rnnDesc, const int seqLength,
-    const hipdnnTensorDescriptor_t *xDesc, size_t *sizeInBytes) {
+hipdnnStatus_t hipdnnGetRNNTrainingReserveSize(
+    hipdnnHandle_t handle, const hipdnnRNNDescriptor_t rnnDesc,
+    const int seqLength, const hipdnnTensorDescriptor_t *xDesc,
+    size_t *sizeInBytes) {
 
     CHECK_CUDNN(cudnnGetRNNTrainingReserveSize(
         (cudnnHandle_t)handle, (cudnnRNNDescriptor_t)rnnDesc, seqLength,
@@ -2552,16 +2541,16 @@ hipdnnStatus_t hipdnnGetRNNTrainingReserveSize(hipdnnHandle_t handle,
 }
 
 hipdnnStatus_t hipdnnGetRNNParamsSize(hipdnnHandle_t handle,
-    const hipdnnRNNDescriptor_t rnnDesc, const hipdnnTensorDescriptor_t xDesc, size_t *sizeInBytes,
-    hipdnnDataType_t dataType) {
-
+                                      const hipdnnRNNDescriptor_t rnnDesc,
+                                      const hipdnnTensorDescriptor_t xDesc,
+                                      size_t *sizeInBytes,
+                                      hipdnnDataType_t dataType) {
     cudnnDataType_t cuDT;
     CHECK_HIPDNN(hipTocudnnDataType(dataType, &cuDT));
 
     CHECK_CUDNN(cudnnGetRNNParamsSize(
         (cudnnHandle_t)handle, (cudnnRNNDescriptor_t)rnnDesc,
         (cudnnTensorDescriptor_t)xDesc, sizeInBytes, cuDT));
-
     return HIPDNN_STATUS_SUCCESS;
 }
 
