@@ -176,10 +176,10 @@ void compute_hipdnn_fusion_api_NA(convulution_Size &c, dataType *src,
   float * bnBias;
   hipMalloc(&bnBias, 1 * c.oc *  sizeof(float));
 
-  hipLaunchKernel(dev_const, 1 * c.oc, 1 , 0, 0 ,bnScale ,0.f);
-  hipLaunchKernel(dev_const, 1* c.oc, 1, 0, 0 ,bnBias, 1.f);
-  hipLaunchKernel(dev_const, 1*c.ic, 1*1, 0, 0 ,resultRunningMean ,0.f);
-  hipLaunchKernel(dev_const, 1*c.ic, 1*1, 0, 0 , resultRunningVariance,2.f);
+  hipLaunchKernelGGL(dev_const, 1 * c.oc, 1 , 0, 0 ,bnScale ,0.f);
+  hipLaunchKernelGGL(dev_const, 1* c.oc, 1, 0, 0 ,bnBias, 1.f);
+  hipLaunchKernelGGL(dev_const, 1*c.ic, 1*1, 0, 0 ,resultRunningMean ,0.f);
+  hipLaunchKernelGGL(dev_const, 1*c.ic, 1*1, 0, 0 , resultRunningVariance,2.f);
 
   //Fusion
 
