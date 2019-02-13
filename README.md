@@ -9,8 +9,12 @@ AMD's library (in beta stage) that supports a layer of abstraction around cuDNN 
 3. On Nvidia platforms, a functioning cuDNN installation.
 
 ## Build instructions
-1. make HIP_PATH=/your/path/to/hip/if/not/standard MIOPEN_PATH=/your/path/to/miopen/if/not/standard
-2. The default installation path of the shared library is at /opr/rocm/hipDNN.  
+1. mkdir build
+   cd build
+   cmake ..
+   make
+2. The default installation path of the shared library is at /opr/rocm/hipdnn.
+3. Use '-DENABLE_TEST = 1' option along with cmake to build unit test for hipdnn.
 
 ## General description 
 

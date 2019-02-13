@@ -51,11 +51,11 @@ void compute_hipdnn_batchnorm_fwd_train(BNorm_params_t &d, dataType *src,
 
   float* bnScaleT;
   HIP_CALL(hipMalloc(&bnScaleT, out_h * out_w * out_c * sizeof(float)));
-  hipLaunchKernel(dev_const, out_w * out_h, out_c, 0, 0 ,bnScaleT ,1.f);
+  hipLaunchKernelGGL(dev_const, out_w * out_h, out_c, 0, 0 ,bnScaleT ,1.f);
 
   float* bnBiasT;
   HIP_CALL(hipMalloc(&bnBiasT, out_h * out_w * out_c * sizeof(float)));
-  hipLaunchKernel(dev_const, out_w * out_h, out_c, 0, 0 ,bnBiasT ,0.f);
+  hipLaunchKernelGGL(dev_const, out_w * out_h, out_c, 0, 0 ,bnBiasT ,0.f);
 
   float alphaNT = 1.f;
   float betaNT = 0.f;
@@ -132,19 +132,19 @@ void compute_hipdnn_batchnorm_fwd_inference(BNorm_params_t &d, dataType *src,
 
   float* bnScale;
   HIP_CALL(hipMalloc(&bnScale, 1*d.ic*1*1*sizeof(float)));
-  hipLaunchKernel(dev_const, 1*d.ic, 1*1, 0, 0 ,bnScale ,1.f);
+  hipLaunchKernelGGL(dev_const, 1*d.ic, 1*1, 0, 0 ,bnScale ,1.f);
 
   float* bnBias;
   HIP_CALL(hipMalloc(&bnBias, 1*d.ic*1*1*sizeof(float)));
-  hipLaunchKernel(dev_const, 1*d.ic, 1*1, 0, 0 ,bnBias ,0.f);
+  hipLaunchKernelGGL(dev_const, 1*d.ic, 1*1, 0, 0 ,bnBias ,0.f);
 
   float* estimatedMean;
   HIP_CALL(hipMalloc(&estimatedMean, 1*d.ic*1*1*sizeof(float)));
-  hipLaunchKernel(dev_const, 1*d.ic, 1*1, 0, 0 ,estimatedMean ,0.f);
+  hipLaunchKernelGGL(dev_const, 1*d.ic, 1*1, 0, 0 ,estimatedMean ,0.f);
 
   float* estimatedVariance;
   HIP_CALL(hipMalloc(&estimatedVariance, 1*d.ic*1*1*sizeof(float)));
-  hipLaunchKernel(dev_const, 1*d.ic, 1*1, 0, 0 ,estimatedVariance ,2.f);
+  hipLaunchKernelGGL(dev_const, 1*d.ic, 1*1, 0, 0 ,estimatedVariance ,2.f);
 
   double epsilon = 2.f; // Minimum 1e-5
 
@@ -231,7 +231,7 @@ void compute_hipdnn_batchnorm_bwd(BNorm_params_t &d, dataType *src,
 
   HIP_CALL(hipMalloc(&dy, d.mb*d.ic*d.ih*d.iw*sizeof(float)));
 
-  hipLaunchKernel(dev_iota, d.iw * d.ih, d.mb * d.ic , 0, 0 ,dy);
+  hipLaunchKernelGGL(dev_iota, d.iw * d.ih, d.mb * d.ic , 0, 0 ,dy);
 
   hipdnnTensorDescriptor_t dx_desc;
   checkHIPDNN(hipdnnCreateTensorDescriptor(&dx_desc));
@@ -241,7 +241,7 @@ void compute_hipdnn_batchnorm_bwd(BNorm_params_t &d, dataType *src,
 
   float* bnScaleT_back;
   HIP_CALL(hipMalloc(&bnScaleT_back, out_h * out_w * out_c * sizeof(float)));
-  hipLaunchKernel(dev_const, out_w * out_h, out_c , 0, 0 ,bnScaleT_back ,1.f);
+  hipLaunchKernelGGL(dev_const, out_w * out_h, out_c , 0, 0 ,bnScaleT_back ,1.f);
 
   float alphaDataDiff = 1.f;
   float betaDataDiff = 0.f;
@@ -254,12 +254,12 @@ void compute_hipdnn_batchnorm_bwd(BNorm_params_t &d, dataType *src,
   hipMalloc(
         &savedMean, out_h * out_w * out_c * sizeof(float));
 
-  hipLaunchKernel(dev_iota, out_w * out_h,  out_c , 0, 0 ,savedMean);
+  hipLaunchKernelGGL(dev_iota, out_w * out_h,  out_c , 0, 0 ,savedMean);
 
   float *savedInvVariance;
   hipMalloc(
         &savedInvVariance, out_h * out_w * out_c * sizeof(float));
-  hipLaunchKernel(dev_iota, out_w * out_h,  out_c , 0, 0 ,savedInvVariance);
+  hipLaunchKernelGGL(dev_iota, out_w * out_h,  out_c , 0, 0 ,savedInvVariance);
 
   high_resolution_timer_t timer;
 

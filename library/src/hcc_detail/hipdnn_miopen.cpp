@@ -746,6 +746,197 @@ hipdnnStatus_t ConvolutionBwdFilterPreferenceSupported(
     return HIPDNN_STATUS_SUCCESS;
 }
 
+//==================================RNN Operations =============================
+
+hipdnnStatus_t hipTomiopenRNNInputMode(hipdnnRNNInputMode_t in,
+                                      miopenRNNInputMode_t *out) {
+    switch (in) {
+        case HIPDNN_LINEAR_INPUT:
+            *out = miopenRNNlinear;
+            break;
+        case HIPDNN_SKIP_INPUT:
+            *out = miopenRNNskip;
+            break;
+        default:
+            HIPDNN_OPEN_LOG_M("hipTomiopenRNNInputMode "
+                              << in << ": NOT SUPPORTED." << std::flush);
+            return HIPDNN_STATUS_NOT_SUPPORTED;
+    }
+    return HIPDNN_STATUS_SUCCESS;
+}
+
+hipdnnStatus_t miopenTohipRNNInputMode(miopenRNNInputMode_t in,
+                                      hipdnnRNNInputMode_t *out) {
+    switch (in) {
+        case miopenRNNlinear:
+            *out = HIPDNN_LINEAR_INPUT;
+            break;
+        case miopenRNNskip:
+            *out = HIPDNN_SKIP_INPUT;
+            break;
+        default:
+            HIPDNN_OPEN_LOG_M("miopenTohipRNNInputMode "
+                              << in << ": NOT SUPPORTED." << std::flush);
+            return HIPDNN_STATUS_NOT_SUPPORTED;
+    }
+    return HIPDNN_STATUS_SUCCESS;
+}
+
+//====================================================================================
+
+hipdnnStatus_t hipTomiopenRNNDirectionMode(hipdnnDirectionMode_t in,
+                                       miopenRNNDirectionMode_t *out) {
+    switch (in) {
+        case HIPDNN_UNIDIRECTIONAL:
+            *out = miopenRNNunidirection;
+            break;
+        case HIPDNN_BIDIRECTIONAL:
+            *out = miopenRNNbidirection;
+            break;
+        default:
+            HIPDNN_OPEN_LOG_M("hipTomiopenRNNDirectionMode "
+                              << in << ": NOT SUPPORTED." << std::flush);
+            return HIPDNN_STATUS_NOT_SUPPORTED;
+    }
+    return HIPDNN_STATUS_SUCCESS;
+}
+
+hipdnnStatus_t miopenTohipRNNDirectionMode(miopenRNNDirectionMode_t in,
+                                        hipdnnDirectionMode_t *out) {
+    switch (in) {
+        case miopenRNNunidirection:
+            *out = HIPDNN_UNIDIRECTIONAL ;
+            break;
+        case miopenRNNbidirection:
+            *out = HIPDNN_BIDIRECTIONAL;
+            break;
+        default:
+            HIPDNN_OPEN_LOG_M("miopenTohipRNNDirectionMode "
+                              << in << ": NOT SUPPORTED." << std::flush);
+            return HIPDNN_STATUS_NOT_SUPPORTED;
+    }
+    return HIPDNN_STATUS_SUCCESS;
+}
+
+//=====================================================================================
+
+hipdnnStatus_t hipTomiopenRNNMode(hipdnnRNNMode_t in,
+                                miopenRNNMode_t *out) {
+    switch (in) {
+        case HIPDNN_RNN_RELU:
+            *out = miopenRNNRELU;
+            break;
+        case HIPDNN_RNN_TANH:
+            *out = miopenRNNTANH;
+            break;
+        case HIPDNN_LSTM:
+            *out = miopenLSTM;
+            break;
+        case HIPDNN_GRU:
+            *out = miopenGRU;
+            break;
+        default:
+            HIPDNN_OPEN_LOG_M("hipTomiopenRNNMode "
+                              << in << ": NOT SUPPORTED." << std::flush);
+            return HIPDNN_STATUS_NOT_SUPPORTED;
+    }
+    return HIPDNN_STATUS_SUCCESS;
+}
+
+hipdnnStatus_t miopenTohipRNNMode(miopenRNNMode_t in,
+                                hipdnnRNNMode_t *out) {
+    switch (in) {
+        case miopenRNNRELU:
+            *out = HIPDNN_RNN_RELU ;
+            break;
+        case miopenRNNTANH:
+            *out = HIPDNN_RNN_TANH ;
+            break;
+        case miopenLSTM:
+            *out = HIPDNN_LSTM ;
+            break;
+        case miopenGRU:
+            *out = HIPDNN_GRU ;
+            break;
+        default:
+            HIPDNN_OPEN_LOG_M("miopenTohipRNNMode "
+                              << in << ": NOT SUPPORTED." << std::flush);
+            return HIPDNN_STATUS_NOT_SUPPORTED;
+    }
+    return HIPDNN_STATUS_SUCCESS;
+}
+
+//==========================================================================================
+
+hipdnnStatus_t hipTomiopenRNNAlgo(hipdnnRNNAlgo_t in,
+                                        miopenRNNAlgo_t *out) {
+    switch (in) {
+        case HIPDNN_RNN_ALGO_STANDARD:
+            *out = miopenRNNdefault;
+            break;
+        case HIPDNN_RNN_ALGO_PERSIST_STATIC:
+        case HIPDNN_RNN_ALGO_PERSIST_DYNAMIC:
+        default:
+            HIPDNN_OPEN_LOG_M("hipTomiopenRNNAlgo"
+                              << in << ": NOT SUPPORTED." << std::flush);
+            return HIPDNN_STATUS_NOT_SUPPORTED;
+    }
+    return HIPDNN_STATUS_SUCCESS;
+}
+
+hipdnnStatus_t miopenTohipRNNAlgo(miopenRNNAlgo_t in,
+                                hipdnnRNNAlgo_t *out) {
+    switch (in) {
+        case miopenRNNdefault:
+            *out = HIPDNN_RNN_ALGO_STANDARD;
+            break;
+        default:
+            HIPDNN_OPEN_LOG_M("miopenTohipRNNAlgo"
+                              << in << ": NOT SUPPORTED." << std::flush);
+            return HIPDNN_STATUS_NOT_SUPPORTED;
+    }
+    return HIPDNN_STATUS_SUCCESS;
+}
+
+//============================================================================================================
+
+hipdnnStatus_t hipTomiopenRNNBias(hipdnnRNNBiasMode_t in,
+                                        miopenRNNBiasMode_t *out) {
+
+    switch (in) {
+        case HIPDNN_RNN_NO_BIAS:
+            *out = miopenRNNNoBias;
+            break;
+        case HIPDNN_RNN_WITH_BIAS:
+            *out = miopenRNNwithBias;
+             break;
+        default:
+            HIPDNN_OPEN_LOG_M("hipTomiopenRNNBias"
+                              << in << ": NOT SUPPORTED." << std::flush);
+            return HIPDNN_STATUS_NOT_SUPPORTED;
+    }
+    return HIPDNN_STATUS_SUCCESS;
+}
+
+hipdnnStatus_t miopenTohipRNNBias(miopenRNNBiasMode_t in,
+                                hipdnnRNNBiasMode_t *out) {
+
+    switch (in) {
+        case miopenRNNNoBias:
+            *out = HIPDNN_RNN_NO_BIAS;
+            break;
+        case miopenRNNwithBias:
+            *out = HIPDNN_RNN_WITH_BIAS ;
+             break;
+        default:
+            HIPDNN_OPEN_LOG_M("miopenTohipRNNBias"
+                              << in << ": NOT SUPPORTED." << std::flush);
+            return HIPDNN_STATUS_NOT_SUPPORTED;
+    }
+    return HIPDNN_STATUS_SUCCESS;
+}
+//=======================================================================================
+
 // Accumulate Gradients Method to accumulate the dst and Prior with scaling
 // factor beta
 
@@ -1484,23 +1675,35 @@ hipdnnStatus_t hipdnnConvolutionForward(
     HIPDNN_OPEN_LOG_C("Invoking MiopenConvolutionFwd" << std::flush);
     hipdnnConvolutionDescriptor_t convDesc_cast =
                                     ((structConvDesc_t*)(convDesc))->descriptor;
-    void *dwPrior = SaveAsPriorBuffer(y);
-    const float alpha1 = 1;
-    const float beta1 = 0;
 
-    CHECK_MIO(miopenConvolutionForward(
-        (miopenHandle_t)handle, &alpha1, (miopenTensorDescriptor_t)xDesc, x,
+    if((*static_cast<const float *>(alpha)) == 1 && (*static_cast<const float *>(beta)) == 0) {
+
+     CHECK_MIO(miopenConvolutionForward(
+	    (miopenHandle_t)handle, alpha, (miopenTensorDescriptor_t)xDesc, x,
         (miopenTensorDescriptor_t)wDesc, w,
-        (miopenConvolutionDescriptor_t)convDesc_cast, mialgo, &beta1,
+        (miopenConvolutionDescriptor_t)convDesc_cast, mialgo, beta,
         (miopenTensorDescriptor_t)yDesc, y, workSpaceInternal,
         expectedWorkSpaceSize));
 
-    int alpha2 =0;
-    CHECK_MIO(miopenOpTensor((miopenHandle_t)handle, miopenTensorOpAdd, alpha,
-                             (miopenTensorDescriptor_t)yDesc, y, beta,
-                             (miopenTensorDescriptor_t)yDesc, dwPrior, &alpha2,
-                             (miopenTensorDescriptor_t)yDesc, y));
-    deallocPrior(dwPrior);
+    } else {
+     void *dwPrior = SaveAsPriorBuffer(y);
+     const float alpha1 = 1;
+     const float beta1 = 0;
+
+     CHECK_MIO(miopenConvolutionForward(
+         (miopenHandle_t)handle, &alpha1, (miopenTensorDescriptor_t)xDesc, x,
+         (miopenTensorDescriptor_t)wDesc, w,
+         (miopenConvolutionDescriptor_t)convDesc_cast, mialgo, &beta1,
+         (miopenTensorDescriptor_t)yDesc, y, workSpaceInternal,
+         expectedWorkSpaceSize));
+
+     int alpha2 =0;
+     CHECK_MIO(miopenOpTensor((miopenHandle_t)handle, miopenTensorOpAdd, alpha,
+                              (miopenTensorDescriptor_t)yDesc, y, beta,
+                              (miopenTensorDescriptor_t)yDesc, dwPrior, &alpha2,
+                              (miopenTensorDescriptor_t)yDesc, y));
+     deallocPrior(dwPrior);
+    }
     return HIPDNN_STATUS_SUCCESS;
 }
 
@@ -2175,22 +2378,32 @@ hipdnnStatus_t hipdnnPoolingForward(
             sDescToWorkspacePooling[(miopenTensorDescriptor_t)yDesc].second;
     }
 
-    void *dwPrior = SaveAsPriorBuffer(y);
-    const float alpha1 = 1;
-    const float beta1 = 0;
-    CHECK_MIO(miopenPoolingForward((miopenHandle_t)handle,
-                                   (miopenPoolingDescriptor_t)poolingDesc,
-                                   &alpha1, (miopenTensorDescriptor_t)xDesc, x,
-                                   &beta1, (miopenTensorDescriptor_t)yDesc, y,
-                                   do_backward,
-                                   (void *)devptr, workSpaceSize));
-    int alpha2 =0;
-    CHECK_MIO(miopenOpTensor((miopenHandle_t)handle, miopenTensorOpAdd, alpha,
-                             (miopenTensorDescriptor_t)yDesc, y, beta,
-                             (miopenTensorDescriptor_t)yDesc, dwPrior, &alpha2,
-                             (miopenTensorDescriptor_t)yDesc, y));
-    deallocPrior(dwPrior);
+    if((*static_cast<const float *>(alpha)) == 1 && (*static_cast<const float *>(beta)) == 0) {
 
+        CHECK_MIO(miopenPoolingForward((miopenHandle_t)handle,
+                                      (miopenPoolingDescriptor_t)poolingDesc,
+                                      alpha, (miopenTensorDescriptor_t)xDesc, x,
+                                      beta, (miopenTensorDescriptor_t)yDesc, y,
+                                      do_backward,
+                                      (void *)devptr, workSpaceSize));
+	} else {
+
+        void *dwPrior = SaveAsPriorBuffer(y);
+        const float alpha1 = 1;
+        const float beta1 = 0;
+        CHECK_MIO(miopenPoolingForward((miopenHandle_t)handle,
+                                       (miopenPoolingDescriptor_t)poolingDesc,
+                                       &alpha1, (miopenTensorDescriptor_t)xDesc, x,
+                                       &beta1, (miopenTensorDescriptor_t)yDesc, y,
+                                       do_backward,
+                                       (void *)devptr, workSpaceSize));
+        int alpha2 =0;
+        CHECK_MIO(miopenOpTensor((miopenHandle_t)handle, miopenTensorOpAdd, alpha,
+                                 (miopenTensorDescriptor_t)yDesc, y, beta,
+                                 (miopenTensorDescriptor_t)yDesc, dwPrior, &alpha2,
+                                 (miopenTensorDescriptor_t)yDesc, y));
+        deallocPrior(dwPrior);
+    }
     return HIPDNN_STATUS_SUCCESS;
 }
 
@@ -2229,23 +2442,34 @@ hipdnnStatus_t hipdnnPoolingBackward(
             sDescToWorkspacePooling[(miopenTensorDescriptor_t)yDesc].second;
     }
 
-    void *dwPrior = SaveAsPriorBuffer(dx);
-    const float alpha1 = 1;
-    const float beta1 = 0;
+    if((*static_cast<const float *>(alpha)) == 1 && (*static_cast<const float *>(beta)) == 0) {
 
-    CHECK_MIO(miopenPoolingBackward(
-        (miopenHandle_t)handle, (miopenPoolingDescriptor_t)poolingDesc, &alpha1,
-        (miopenTensorDescriptor_t)yDesc, y, (miopenTensorDescriptor_t)dyDesc,
-        dy, (miopenTensorDescriptor_t)xDesc, x, &beta1,
-        (miopenTensorDescriptor_t)dxDesc, dx,
-        devptr));
+        CHECK_MIO(miopenPoolingBackward(
+            (miopenHandle_t)handle, (miopenPoolingDescriptor_t)poolingDesc, &alpha,
+            (miopenTensorDescriptor_t)yDesc, y, (miopenTensorDescriptor_t)dyDesc,
+            dy, (miopenTensorDescriptor_t)xDesc, x, &beta,
+            (miopenTensorDescriptor_t)dxDesc, dx,
+            devptr));
+    } else {
 
-    int alpha2 =0;
-    CHECK_MIO(miopenOpTensor((miopenHandle_t)handle, miopenTensorOpAdd, alpha,
-                             (miopenTensorDescriptor_t)dxDesc, dx, beta,
-                             (miopenTensorDescriptor_t)dxDesc, dwPrior, &alpha2,
-                             (miopenTensorDescriptor_t)dxDesc, dx));
-    deallocPrior(dwPrior);
+        void *dwPrior = SaveAsPriorBuffer(dx);
+        const float alpha1 = 1;
+        const float beta1 = 0;
+
+        CHECK_MIO(miopenPoolingBackward(
+            (miopenHandle_t)handle, (miopenPoolingDescriptor_t)poolingDesc, &alpha1,
+            (miopenTensorDescriptor_t)yDesc, y, (miopenTensorDescriptor_t)dyDesc,
+            dy, (miopenTensorDescriptor_t)xDesc, x, &beta1,
+            (miopenTensorDescriptor_t)dxDesc, dx,
+            devptr));
+
+        int alpha2 =0;
+        CHECK_MIO(miopenOpTensor((miopenHandle_t)handle, miopenTensorOpAdd, alpha,
+                                (miopenTensorDescriptor_t)dxDesc, dx, beta,
+                                (miopenTensorDescriptor_t)dxDesc, dwPrior, &alpha2,
+                                (miopenTensorDescriptor_t)dxDesc, dx));
+        deallocPrior(dwPrior);
+}
     return HIPDNN_STATUS_SUCCESS;
 }
 //=============================================================================
@@ -2830,18 +3054,86 @@ hipdnnStatus_t hipdnnSetRNNDescriptor(
     hipdnnDropoutDescriptor_t
         dropoutDesc,  // Between layers, not between recurrent steps.
     hipdnnRNNInputMode_t inputMode, hipdnnDirectionMode_t direction,
-    hipdnnRNNMode_t mode, hipdnnDataType_t dataType) {
-    return HIPDNN_STATUS_NOT_SUPPORTED;
+    hipdnnRNNMode_t mode, hipdnnRNNAlgo_t algo, hipdnnDataType_t dataType,
+    hipdnnRNNBiasMode_t biasMode) {
+
+    HIPDNN_OPEN_LOG_C("Inside hipdnnSetRNNDescriptor");
+
+    miopenRNNInputMode_t inMode;
+    miopenRNNDirectionMode_t miopendirection;
+    miopenRNNMode_t rnnMode;
+    miopenRNNAlgo_t algorithm;
+    miopenDataType_t moDT;
+    miopenRNNBiasMode_t moBT;
+
+    CHECK_HIPDNN(hipTomiopenRNNInputMode(inputMode, &inMode));
+    CHECK_HIPDNN(hipTomiopenRNNDirectionMode(direction, &miopendirection));
+    CHECK_HIPDNN(hipTomiopenRNNMode(mode, &rnnMode));
+    CHECK_HIPDNN(hipTomiopenRNNAlgo(algo, &algorithm));
+    CHECK_HIPDNN(hipTomiopenDataType(dataType, &moDT));
+    CHECK_HIPDNN(hipTomiopenRNNBias(biasMode, &moBT))
+
+    CHECK_MIO(miopenSetRNNDescriptor((miopenRNNDescriptor_t) rnnDesc,
+        hiddenSize, numLayers, inMode, miopendirection, rnnMode,  moBT,
+        algorithm, moDT));
 }
 
 hipdnnStatus_t hipdnnSetRNNDescriptor_v5(
     hipdnnRNNDescriptor_t rnnDesc, int hiddenSize, int numLayers,
     hipdnnDropoutDescriptor_t
-        dropoutDesc, /* Between layers, not between recurrent steps. */
+        dropoutDesc, /* Between layers, not between remorrent steps. */
     hipdnnRNNInputMode_t inputMode, hipdnnDirectionMode_t direction,
     hipdnnRNNMode_t mode, hipdnnDataType_t dataType) {
     return HIPDNN_STATUS_NOT_SUPPORTED;
 }
+
+hipdnnStatus_t hipdnnGetRNNDescriptor(hipdnnHandle_t handle,
+    hipdnnRNNDescriptor_t rnnDesc, int* hiddenSize, int* numLayers,
+    hipdnnDropoutDescriptor_t *dropoutDesc, hipdnnRNNInputMode_t *inputMode,
+    hipdnnDirectionMode_t *direction, hipdnnRNNMode_t *mode, hipdnnRNNAlgo_t *algo,
+    hipdnnDataType_t *dataType, hipdnnRNNBiasMode_t *biasMode) {
+
+    miopenRNNInputMode_t moRIM;
+    miopenRNNDirectionMode_t moDM;
+    miopenRNNMode_t moRM;
+    miopenDataType_t moDT;
+    miopenRNNAlgo_t moRA;
+    miopenRNNBiasMode_t moBM;
+
+    CHECK_MIO(miopenGetRNNDescriptor((miopenRNNDescriptor_t) rnnDesc, &moRM, &moRA, &moRIM, &moDM,
+        &moBM, hiddenSize, numLayers));
+
+    CHECK_HIPDNN(miopenTohipRNNInputMode(moRIM, inputMode));
+    CHECK_HIPDNN(miopenTohipRNNDirectionMode(moDM, direction));
+    CHECK_HIPDNN(miopenTohipRNNAlgo(moRA, algo));
+    CHECK_HIPDNN(miopenTohipDataType(moDT, dataType));
+    CHECK_HIPDNN(miopenTohipRNNMode(moRM, mode));
+    CHECK_HIPDNN(miopenTohipRNNBias(moBM, biasMode));
+}
+
+hipdnnStatus_t hipdnnGetRNNLayerParamSize(hipdnnHandle_t handle,
+                                        hipdnnRNNDescriptor_t rnnDesc,
+                                        const int layer,
+                                        hipdnnTensorDescriptor_t xDesc,
+                                        const int paramID,
+                                        size_t *numBytes) {
+    CHECK_MIO(miopenGetRNNLayerParamSize(
+        (miopenHandle_t) handle, (miopenRNNDescriptor_t) rnnDesc,
+        layer, (miopenTensorDescriptor_t) xDesc, paramID, numBytes));
+    return HIPDNN_STATUS_SUCCESS;
+}
+
+hipdnnStatus_t hipdnnGetRNNLayerBiasSize(hipdnnHandle_t handle,
+                                        hipdnnRNNDescriptor_t rnnDesc,
+                                        const int layer,
+                                        const int biasID,
+                                        size_t *numBytes) {
+
+    CHECK_MIO(miopenGetRNNLayerBiasSize((miopenHandle_t) handle, (miopenRNNDescriptor_t) rnnDesc, layer,
+                    biasID, numBytes));
+    return HIPDNN_STATUS_SUCCESS;
+}
+
 
 hipdnnStatus_t hipdnnGetRNNWorkspaceSize(hipdnnHandle_t handle,
                                          const hipdnnRNNDescriptor_t rnnDesc,
@@ -2869,7 +3161,15 @@ hipdnnStatus_t hipdnnGetRNNParamsSize(hipdnnHandle_t handle,
                                       const hipdnnTensorDescriptor_t xDesc,
                                       size_t *sizeInBytes,
                                       hipdnnDataType_t dataType) {
-    return HIPDNN_STATUS_NOT_SUPPORTED;
+
+    miopenDataType_t moDT;
+    CHECK_HIPDNN(hipTomiopenDataType(dataType, &moDT));
+
+    CHECK_MIO(miopenGetRNNParamsSize((miopenHandle_t)handle,
+        static_cast<miopenRNNDescriptor_t> (rnnDesc),
+        static_cast<miopenTensorDescriptor_t> (xDesc), sizeInBytes, moDT));
+
+    return HIPDNN_STATUS_SUCCESS;
 }
 
 hipdnnStatus_t hipdnnGetRNNLinLayerMatrixParams(
@@ -2877,7 +3177,13 @@ hipdnnStatus_t hipdnnGetRNNLinLayerMatrixParams(
     const hipdnnTensorDescriptor_t xDesc, const hipdnnFilterDescriptor_t wDesc,
     const void *w, const int linLayerID,
     hipdnnFilterDescriptor_t linLayerMatDesc, void **linLayerMat) {
-    return HIPDNN_STATUS_NOT_SUPPORTED;
+
+    CHECK_MIO(miopenGetRNNLayerParam(
+        (miopenHandle_t)handle, (miopenRNNDescriptor_t)rnnDesc, layer,
+        (miopenTensorDescriptor_t) xDesc, (miopenTensorDescriptor_t) wDesc, w,
+        linLayerID, (miopenTensorDescriptor_t) linLayerMatDesc, linLayerMat));
+
+    return HIPDNN_STATUS_SUCCESS;
 }
 
 hipdnnStatus_t hipdnnGetRNNLinLayerBiasParams(
@@ -2885,7 +3191,72 @@ hipdnnStatus_t hipdnnGetRNNLinLayerBiasParams(
     const hipdnnTensorDescriptor_t xDesc, const hipdnnFilterDescriptor_t wDesc,
     const void *w, const int linLayerID,
     hipdnnFilterDescriptor_t linLayerBiasDesc, void **linLayerBias) {
-    return HIPDNN_STATUS_NOT_SUPPORTED;
+
+    CHECK_MIO(miopenGetRNNLayerBias((miopenHandle_t) handle,
+        (miopenRNNDescriptor_t) rnnDesc, layer,
+        static_cast<miopenTensorDescriptor_t> (xDesc),
+        static_cast<miopenTensorDescriptor_t> (wDesc), w, linLayerID,
+        (miopenTensorDescriptor_t) linLayerBiasDesc, *linLayerBias));
+
+    return HIPDNN_STATUS_SUCCESS;
+}
+
+hipdnnStatus_t hipdnnGetRNNParamsDescriptor(
+    hipdnnHandle_t handle, hipdnnRNNDescriptor_t rnnDesc, hipdnnTensorDescriptor_t xDesc,
+    hipdnnTensorDescriptor_t wDesc, hipdnnDataType_t dtype) {
+
+    miopenDataType_t moDT;
+    CHECK_HIPDNN(hipTomiopenDataType(dtype, &moDT));
+    CHECK_MIO(miopenGetRNNParamsDescriptor((miopenHandle_t) handle,
+            (miopenRNNDescriptor_t) rnnDesc, (miopenTensorDescriptor_t) xDesc,
+            (miopenTensorDescriptor_t) wDesc, moDT));
+
+    return HIPDNN_STATUS_SUCCESS;
+}
+
+hipdnnStatus_t hipdnnGetRNNInputTensorSize(
+    hipdnnHandle_t handle, hipdnnRNNDescriptor_t rnnDesc, const int seqLen,
+    hipdnnTensorDescriptor_t *xDesc, size_t *numBytes) {
+
+    CHECK_MIO(miopenGetRNNInputTensorSize((miopenHandle_t) handle,
+            (miopenRNNDescriptor_t) rnnDesc, seqLen, (miopenTensorDescriptor_t *) xDesc,
+            numBytes));
+
+    return HIPDNN_STATUS_SUCCESS;
+}
+hipdnnStatus_t hipdnnGetRNNHiddenTensorSize(
+    hipdnnHandle_t handle, hipdnnRNNDescriptor_t rnnDesc, const int seqLen,
+    hipdnnTensorDescriptor_t *xDesc, size_t *numBytes) {
+
+    CHECK_MIO(miopenGetRNNHiddenTensorSize((miopenHandle_t) handle,
+           (miopenRNNDescriptor_t) rnnDesc, seqLen, (miopenTensorDescriptor_t* )xDesc,
+            numBytes));
+
+    return HIPDNN_STATUS_SUCCESS;
+}
+
+hipdnnStatus_t hipdnnSetRNNLayerParam(
+    hipdnnHandle_t handle, hipdnnRNNDescriptor_t rnnDesc, const int layer,
+    hipdnnTensorDescriptor_t xDesc, hipdnnTensorDescriptor_t wDesc, void *w,
+    const int paramID, hipdnnTensorDescriptor_t paramDesc, const void *layerParam) {
+
+    CHECK_MIO(miopenSetRNNLayerParam((miopenHandle_t) handle,
+            (miopenRNNDescriptor_t) rnnDesc, layer, (miopenTensorDescriptor_t) xDesc,
+            (miopenTensorDescriptor_t) wDesc, w, paramID, (miopenTensorDescriptor_t) paramDesc,
+            layerParam));
+
+    return HIPDNN_STATUS_SUCCESS;
+}
+
+hipdnnStatus_t hipdnnSetRNNLayerBias(hipdnnHandle_t handle, hipdnnRNNDescriptor_t rnnDesc,
+    const int layer, hipdnnTensorDescriptor_t xDesc, hipdnnTensorDescriptor_t wDesc, void *w,
+    const int biasID, hipdnnTensorDescriptor_t biasDesc, const void *layerBias) {
+
+    CHECK_MIO(miopenSetRNNLayerBias((miopenHandle_t) handle, (miopenRNNDescriptor_t) rnnDesc,
+            layer, (miopenTensorDescriptor_t) xDesc, (miopenTensorDescriptor_t) wDesc, w, biasID,
+            (miopenTensorDescriptor_t) biasDesc, layerBias));;
+
+    return HIPDNN_STATUS_SUCCESS;
 }
 
 hipdnnStatus_t hipdnnRNNForwardInference(
@@ -2898,7 +3269,17 @@ hipdnnStatus_t hipdnnRNNForwardInference(
     const hipdnnTensorDescriptor_t hyDesc, void *hy,
     const hipdnnTensorDescriptor_t cyDesc, void *cy, void *workspace,
     size_t workSpaceSizeInBytes) {
-    return HIPDNN_STATUS_NOT_SUPPORTED;
+
+    CHECK_MIO(miopenRNNForwardInference(
+        (miopenHandle_t) handle, static_cast<miopenRNNDescriptor_t> (rnnDesc),
+        seqLength, (miopenTensorDescriptor_t *)xDesc, x,
+        (miopenTensorDescriptor_t) hxDesc, hx, (miopenTensorDescriptor_t) cxDesc, cx,
+        (miopenTensorDescriptor_t) wDesc, w, (miopenTensorDescriptor_t *) yDesc, y,
+        (miopenTensorDescriptor_t) hyDesc, hy, (miopenTensorDescriptor_t) cyDesc, cy,
+        workspace, workSpaceSizeInBytes));
+
+    return HIPDNN_STATUS_SUCCESS;
+
 }
 
 hipdnnStatus_t hipdnnRNNForwardTraining(

@@ -48,16 +48,16 @@ inline __global__ void half_to_float( half *din, float *dout, int dsize){
     }                                                                          \
   }
 
-inline __global__ void dev_populate (hipLaunchParm lp, float *px, int maxvalue) {
+inline __global__ void dev_populate (float *px, int maxvalue) {
   int tid = hipThreadIdx_x + hipBlockIdx_x * hipBlockDim_x;
   px[tid] = tid + 1 % maxvalue;
 }
 
-inline __global__ void dev_const(hipLaunchParm lp, float *px, float k) {
+inline __global__ void dev_const(float *px, float k) {
   int tid = hipThreadIdx_x + hipBlockIdx_x * hipBlockDim_x;
   px[tid] = k;
 }
-inline __global__ void dev_iota(hipLaunchParm lp, float *px) {
+inline __global__ void dev_iota(float *px) {
   int tid = hipThreadIdx_x + hipBlockIdx_x * hipBlockDim_x;
   px[tid] = (tid + 1) % 255;
 }
