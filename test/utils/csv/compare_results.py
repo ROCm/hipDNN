@@ -16,31 +16,30 @@ def untar(fname,dest):
         print "Not a tar.gz file: '%s '" % sys.argv[0]
 
 abs_path = os.path.abspath('.')
-nv_result_path = abs_path.rsplit('/',1)[0]
-NVidia_result = os.path.join(nv_result_path,'NV_results.tar.gz')
-untar(NVidia_result,nv_result_path)
+benchmark_result_path = abs_path.rsplit('/',1)[0]
+benchmarking_result = os.path.join(benchmark_result_path,'benchmark_results.tar.gz')
+untar(benchmarking_result,benchmark_result_path)
+local_folder = os.path.join(abs_path,'results_csv')
+benchmarking_folder = os.path.join(benchmark_result_path,'benchmark_results','benchmarking_results_csv')
 
-hcc_folder = os.path.join(abs_path,'results_csv')
-nvcc_folder = os.path.join(nv_result_path,'NV_results','results_csv_nv')
+local_result = os.path.join(abs_path,'result_unittest.csv')
+benchmarking_result = os.path.join(benchmark_result_path,'benchmark_results','benchmarking_result_unittest.csv')
 
-hcc_result = os.path.join(abs_path,'result_unittest.csv')
-nvcc_result = os.path.join(nv_result_path,'NV_results','result_unittest_nv.csv')
+local_dev = os.path.join(abs_path,'device.txt')
+benchmark_dev = os.path.join(benchmark_result_path,'benchmark_results','benchmark_device.txt')
 
-hcc_dev = os.path.join(abs_path,'device.txt')
-nvcc_dev = os.path.join(nv_result_path,'NV_results','device_nv.txt')
-
-with open(hcc_dev, 'r') as myfile1:
+with open(local_dev, 'r') as myfile1:
   data1 = myfile1.read()
 
-with open(nvcc_dev, 'r') as myfile2:
+with open(benchmark_dev, 'r') as myfile2:
   data2 = myfile2.read()
 
-reader1 = csv.DictReader(open(hcc_result, 'r'))
+reader1 = csv.DictReader(open(local_result, 'r'))
 amd_op = []
 for line1 in reader1:
     amd_op.append(line1)
 
-reader2 = csv.DictReader(open(nvcc_result, 'r'))
+reader2 = csv.DictReader(open(benchmarking_result, 'r'))
 nv_op = []
 for line2 in reader2:
     nv_op.append(line2)
@@ -65,10 +64,10 @@ t_pass = colored('Test passed!', 'green', attrs=['bold'])
 t_fail = colored('Test failed!', 'red', attrs=['bold'])
 test_name = colored('Test name: ', 'blue', attrs=['bold'])
 
-for filename1 in os.listdir(hcc_folder):
-    for filename2 in os.listdir(nvcc_folder):
+for filename1 in os.listdir(local_folder):
+    for filename2 in os.listdir(benchmarking_folder):
        if (filename1 == filename2):
-          with open((hcc_folder+"/"+filename1),'rb') as csvfile1, open((nvcc_folder+"/"+filename2),'rb') as csvfile2:
+          with open((local_folder+"/"+filename1),'rb') as csvfile1, open((benchmarking_folder+"/"+filename2),'rb') as csvfile2:
                     readCSV1 = csv.reader(csvfile1, delimiter=',')
                     readCSV2 = csv.reader(csvfile2, delimiter=',')
                     for row1 in readCSV1:
