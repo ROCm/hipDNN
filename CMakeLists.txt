@@ -75,6 +75,8 @@ file(COPY ${CMAKE_SOURCE_DIR}/execute.sh
 
 # Testing
 
-enable_testing()
+option(ENABLE_TEST "Option description" OFF)
+
 
 add_subdirectory(test)
+enable_testing()

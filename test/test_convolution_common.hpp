@@ -6,21 +6,21 @@
 
 template <typename dataType>
 void compute_hipdnn_conv_forward(convulution_Size &c, dataType *src,
-            dataType *weights, dataType *bias, dataType *dst, float alpha,
+            dataType *weights, dataType *bias, dataType *dst,
+			hipdnnDataType_t hipdataType,float alpha,
             float beta, float *avg_time) {
 
   hipdnnHandle_t hipdnn;
   checkHIPDNN(hipdnnCreate(&hipdnn));
-
   hipdnnTensorDescriptor_t in_desc;
   checkHIPDNN(hipdnnCreateTensorDescriptor(&in_desc));
   checkHIPDNN(hipdnnSetTensor4dDescriptor(
-      in_desc, HIPDNN_TENSOR_NCHW, HIPDNN_DATA_FLOAT, c.mb, c.ic, c.ih, c.iw));
+      in_desc, HIPDNN_TENSOR_NCHW, hipdataType, c.mb, c.ic, c.ih, c.iw));
 
   hipdnnFilterDescriptor_t filt_desc;
   checkHIPDNN(hipdnnCreateFilterDescriptor(&filt_desc));
   int filterDimA[] = {c.oc, c.ic, c.kh, c.kw};
-  checkHIPDNN(hipdnnSetFilterNdDescriptor(filt_desc, HIPDNN_DATA_FLOAT,
+  checkHIPDNN(hipdnnSetFilterNdDescriptor(filt_desc, hipdataType,
                                           HIPDNN_TENSOR_NCHW, 4, filterDimA));
 
   hipdnnConvolutionDescriptor_t conv_desc;
@@ -28,7 +28,7 @@ void compute_hipdnn_conv_forward(convulution_Size &c, dataType *src,
 
   checkHIPDNN(hipdnnSetConvolution2dDescriptor(
       conv_desc, c.padh, c.padw, c.strh, c.strw, c.dilh, c.dilw,
-      HIPDNN_CROSS_CORRELATION, HIPDNN_DATA_FLOAT));
+      HIPDNN_CROSS_CORRELATION, hipdataType));
 
   checkHIPDNN(hipdnnGetConvolution2dForwardOutputDim(
       conv_desc, in_desc, filt_desc, &c.mb, &c.oc, &c.oh, &c.ow));
@@ -36,9 +36,9 @@ void compute_hipdnn_conv_forward(convulution_Size &c, dataType *src,
   hipdnnTensorDescriptor_t out_desc;
   checkHIPDNN(hipdnnCreateTensorDescriptor(&out_desc));
   checkHIPDNN(hipdnnSetTensor4dDescriptor(
-      out_desc, HIPDNN_TENSOR_NCHW, HIPDNN_DATA_FLOAT, c.mb, c.oc, c.oh, c.ow));
+      out_desc, HIPDNN_TENSOR_NCHW, hipdataType, c.mb, c.oc, c.oh, c.ow));
 
-  hipdnnConvolutionFwdAlgo_t algo;
+  hipdnnConvolutionFwdAlgo_t algo ;
 
   int MaxAlgoCount = 1;
   size_t ws_size{0};
@@ -47,22 +47,35 @@ void compute_hipdnn_conv_forward(convulution_Size &c, dataType *src,
 
   hipdnnConvolutionFwdAlgoPerf_t algoPerf[MaxAlgoCount];
 
+#ifdef __HIP_PLATFORM_NVCC__
+
+  checkHIPDNN(hipdnnFindConvolutionForwardAlgorithm(
+     hipdnn, in_desc, filt_desc, conv_desc, out_desc, MaxAlgoCount,
+    &calgo,  algoPerf));
+
+	algo = (hipdnnConvolutionFwdAlgo_t)algoPerf[0].algo;
+
+#endif
+
   checkHIPDNN(hipdnnGetConvolutionForwardWorkspaceSize(
      hipdnn, in_desc, filt_desc, conv_desc, out_desc, algo, &ws_size));
 
   hipMalloc(&ws_data, ws_size);
 
-  hipdnnFindConvolutionForwardAlgorithmEx(
+#ifdef __HIP_PLATFORM_HCC__
+
+  checkHIPDNN(hipdnnFindConvolutionForwardAlgorithmEx(
       hipdnn, in_desc, src, filt_desc, weights, conv_desc, out_desc, dst,
-      MaxAlgoCount, &calgo, algoPerf, ws_data, ws_size);
+      MaxAlgoCount, &calgo, algoPerf, ws_data, ws_size));
 
   algo = (hipdnnConvolutionFwdAlgo_t)algoPerf[0].algo;
+#endif
 
   high_resolution_timer_t timer;
 
-  std::vector<double> time_vector(benchmark_iterations, 0);
+  std::vector<double> time_vector(1, 0);
 
-  for (int i = 0; i < benchmark_iterations; i++) {
+  for (int i = 0; i < 1; i++) {
 
         timer.restart();
         checkHIPDNN(hipdnnConvolutionForward(hipdnn, &alpha, in_desc, src,
@@ -75,8 +88,8 @@ void compute_hipdnn_conv_forward(convulution_Size &c, dataType *src,
         time_vector[i] = (double)time_elapsed / 1000;
     }
 
-  *avg_time = (float)std::accumulate(time_vector.begin() + 10,
-                           time_vector.end(), 0) / (benchmark_iterations - 10);
+  *avg_time = (float)std::accumulate(time_vector.begin() ,
+                           time_vector.end(), 0) / (benchmark_iterations );
 
   hipFree(ws_data);
   hipdnnDestroyTensorDescriptor(out_desc);
@@ -279,6 +292,195 @@ void compute_hipdnn_conv_backward_data(convulution_Size &c, dataType *src,
   hipdnnDestroyFilterDescriptor(filt_desc);
   hipdnnDestroyTensorDescriptor(in_desc);
   hipdnnDestroy(hipdnn);
+}
+
+template <typename dataType>
+void Test_convolution_fwd(Desc inputDesc, Desc filterDesc, int pad[2],
+                          int stride[2], int dil[2], std::string testname,
+                          float alpha = 1.f, float beta = 0.f,
+                           hipdnnDataType_t hipdataType = HIPDNN_DATA_FLOAT)
+{
+  float avg_time = 0;
+  Desc outputDesc = calculate_Dims(inputDesc, filterDesc, pad, stride, dil);
+
+  Memory<dataType> srcData = createMemory<dataType>(inputDesc);
+  Memory<dataType> dstDataGPU = createMemory<dataType>(outputDesc);
+  Memory<dataType> filterData = createMemory<dataType>(filterDesc);
+
+
+  populateMemoryRandom<dataType>(srcData);
+  populateMemoryRandom<dataType>(filterData);
+
+  convulution_Size testConvolutionSizes(
+        inputDesc.N, 1, inputDesc.C, inputDesc.H, inputDesc.W, outputDesc.C,
+        outputDesc.H, outputDesc.W, filterDesc.H, filterDesc.W, pad[0], pad[1],
+        stride[0], stride[1], dil[0], dil[1]);
+
+  compute_hipdnn_conv_forward<dataType>(testConvolutionSizes, srcData.gpu(),
+                            filterData.gpu(), NULL, dstDataGPU.gpu(), hipdataType, alpha,
+                            beta, &avg_time);
+
+  std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
+
+  std::string strt = "./result_unittest.csv";
+  std::string filename="convolution_forward.csv";
+
+  int ip_size[4] = {inputDesc.N, inputDesc.C, inputDesc.H, inputDesc.W};
+  int k_size[4] = {filterDesc.N, filterDesc.C, filterDesc.H, filterDesc.W};
+  int op_size[4] =  {outputDesc.N, outputDesc.C, outputDesc.H, outputDesc.W};
+
+  std::string str_ip_size  = convert_to_string((int*)ip_size,4);
+  std::string str_k_size  = convert_to_string((int*)k_size,4);
+  std::string str_op_size  = convert_to_string((int*)op_size,4);
+
+  dataType* temp = dstDataGPU.getDataFromGPU();
+
+  std::string str  = convert_to_string((float*)temp,(int)dstDataGPU.get_num_elements());
+
+  write_to_csv(strt, str, testname, avg_time, str_ip_size, str_k_size, str_op_size);
+  dump_result_csv(filename, testname, temp, (int)dstDataGPU.get_num_elements());
+
+}
+
+template <>
+inline void Test_convolution_fwd<half>(Desc inputDesc, Desc filterDesc, int pad[2],
+                          int stride[2], int dil[2], std::string testname,
+                          float alpha, float beta, hipdnnDataType_t hipdataType)
+{
+  float avg_time = 0;
+  hipdataType = HIPDNN_DATA_HALF;
+  Desc outputDesc = calculate_Dims(inputDesc, filterDesc, pad, stride, dil);
+
+  Memory<half> srcData = createMemory<half>(inputDesc);
+  Memory<half> dstDataGPU = createMemory<half>(outputDesc);
+  Memory<half> filterData = createMemory<half>(filterDesc);
+
+  populateMemoryRandom<half>(srcData);
+  populateMemoryRandom<half>(filterData);
+
+  convulution_Size testConvolutionSizes(
+        inputDesc.N, 1, inputDesc.C, inputDesc.H, inputDesc.W, outputDesc.C,
+        outputDesc.H, outputDesc.W, filterDesc.H, filterDesc.W, pad[0], pad[1],
+        stride[0], stride[1], dil[0], dil[1]);
+
+  compute_hipdnn_conv_forward<half>(testConvolutionSizes, srcData.gpu(),
+                            filterData.gpu(), NULL, dstDataGPU.gpu(), hipdataType, alpha,
+                            beta, &avg_time);
+
+  std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
+
+  std::string strt = "./result_unittest.csv";
+  std::string filename="convolution_forward.csv";
+
+  int ip_size[4] = {inputDesc.N, inputDesc.C, inputDesc.H, inputDesc.W};
+  int k_size[4] = {filterDesc.N, filterDesc.C, filterDesc.H, filterDesc.W};
+  int op_size[4] =  {outputDesc.N, outputDesc.C, outputDesc.H, outputDesc.W};
+
+  std::string str_ip_size  = convert_to_string((int*)ip_size,4);
+  std::string str_k_size  = convert_to_string((int*)k_size,4);
+  std::string str_op_size  = convert_to_string((int*)op_size,4);
+
+  Memory<float> dstDataGPU_f = createMemory<float>(outputDesc);;
+  Convert_toFloat<half>(dstDataGPU, dstDataGPU_f);
+
+  float* temp = dstDataGPU_f.getDataFromGPU();
+
+  std::string str  = convert_to_string((float*)temp,(int)dstDataGPU.get_num_elements());
+
+  write_to_csv(strt, str, testname, avg_time, str_ip_size, str_k_size, str_op_size);
+  dump_result_csv(filename, testname, temp, (int)dstDataGPU.get_num_elements());
+
+}
+
+template <typename dataType>
+void Test_convolution_bwd_filter(Desc inputDesc, Desc filterDesc, int pad[2],
+                                 int stride[2], int dil[2], std::string testname,
+                                 float alpha = 1.f, float beta = 0.f)
+{
+  float avg_time = 0;
+  Desc outputDesc = calculate_Dims(inputDesc, filterDesc, pad, stride, dil);
+
+  Memory<dataType> srcData = createMemory<dataType>(inputDesc);
+  Memory<dataType> gradData = createMemory<dataType>(filterDesc);
+  Memory<dataType> dstDataGPU = createMemory<dataType>(outputDesc);
+  Memory<dataType> filterData = createMemory<dataType>(filterDesc);
+
+  populateMemoryRandom<dataType>(srcData);
+  populateMemoryRandom<dataType>(filterData);
+  populateMemoryRandom<dataType>(dstDataGPU);
+
+  convulution_Size testConvolutionSizes(
+      inputDesc.N, 1, inputDesc.C, inputDesc.H, inputDesc.W, outputDesc.C,
+      outputDesc.H, outputDesc.W, filterDesc.H, filterDesc.W, pad[0], pad[1],
+      stride[0], stride[1], dil[0], dil[1]);
+
+  compute_hipdnn_conv_backward_filter<dataType>(testConvolutionSizes, srcData.gpu(),
+                                filterData.gpu(), gradData.gpu(), NULL,
+                                dstDataGPU.gpu(), alpha, beta, &avg_time);
+
+  std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
+
+  int ip_size[4] = {inputDesc.N, inputDesc.C, inputDesc.H, inputDesc.W};
+  int k_size[4] = {filterDesc.N, filterDesc.C, filterDesc.H, filterDesc.W};
+  int op_size[4] =  {filterDesc.N, filterDesc.C, filterDesc.H, filterDesc.W};
+
+  std::string str_ip_size  = convert_to_string((int*)ip_size,4);
+  std::string str_k_size  = convert_to_string((int*)k_size,4);
+  std::string str_op_size  = convert_to_string((int*)op_size,4);
+
+  std::string strt = "./result_unittest.csv";
+  std::string filename = "convolution_bwd_filter.csv";
+
+  float* temp = gradData.getDataFromGPU();
+
+  std::string str  = convert_to_string((float*)temp,(int)gradData.get_num_elements());
+
+  write_to_csv(strt, str, testname,avg_time, str_ip_size, str_k_size, str_op_size);
+  dump_result_csv(filename, testname, temp, (int)gradData.get_num_elements());
+
+}
+
+template <typename dataType>
+void Test_convolution_bwd_data(Desc inputDesc, Desc filterDesc, int pad[2],
+                               int stride[2], int dil[2], std::string testname)
+{
+  float avg_time = 0;
+
+  Desc outputDesc = calculate_Dims(inputDesc, filterDesc, pad, stride, dil);
+
+  Memory<dataType> srcData = createMemory<dataType>(inputDesc);
+  Memory<dataType> gradData = createMemory<dataType>(inputDesc);
+  Memory<dataType> dstDataGPU = createMemory<dataType>(outputDesc);
+  Memory<dataType> filterData = createMemory<dataType>(filterDesc);
+
+  populateMemoryRandom<dataType>(srcData);
+  populateMemoryRandom<dataType>(filterData);
+
+  convulution_Size conv_back_param(
+    inputDesc.N, 1, inputDesc.C, inputDesc.H, inputDesc.W, outputDesc.C,
+    outputDesc.H, outputDesc.W, filterDesc.H, filterDesc.W, pad[0], pad[1],
+    stride[0], stride[1], dil[0], dil[1]);
+
+  int ip_size[4] = {inputDesc.N, inputDesc.C, inputDesc.H, inputDesc.W};
+  int k_size[4] = {filterDesc.N, filterDesc.C, filterDesc.H, filterDesc.W};
+  int op_size[4] =  {outputDesc.N, outputDesc.C, outputDesc.H, outputDesc.W};
+
+  std::string str_ip_size  = convert_to_string((int*)ip_size,4);
+  std::string str_k_size  = convert_to_string((int*)k_size,4);
+  std::string str_op_size  = convert_to_string((int*)op_size,4);
+
+  compute_hipdnn_conv_backward_data<dataType>(conv_back_param, srcData.gpu(),
+           filterData.gpu(), gradData.gpu(), NULL, dstDataGPU.gpu(), &avg_time);
+
+  std::string strt = "./result_unittest.csv";
+  std::string filename="convolution_bwd_data.csv";
+
+  float* temp = gradData.getDataFromGPU();
+  std::string str  = convert_to_string((float*)temp,
+                                       (int)gradData.get_num_elements());
+
+  write_to_csv(strt, str, testname,avg_time, str_ip_size, str_k_size, str_op_size);
+  dump_result_csv(filename, testname, temp, (int)gradData.get_num_elements());
 }
 
 #endif // TEST_CONVOLUTION_COMMON_H

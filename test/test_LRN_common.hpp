@@ -18,7 +18,7 @@
 
 template <typename dataType>
 void compute_hipdnn_LRN_fwd(LRN_params_t &d, dataType *src, dataType *dst,
-                            float *avg_time) {
+                            float *avg_time, hipdnnDataType_t hipdataType) {
 
   hipdnnHandle_t hipdnn;
 	checkHIPDNN(hipdnnCreate(&hipdnn));
@@ -27,13 +27,13 @@ void compute_hipdnn_LRN_fwd(LRN_params_t &d, dataType *src, dataType *dst,
 
   checkHIPDNN(hipdnnCreateTensorDescriptor(&in_desc));
   checkHIPDNN(hipdnnSetTensor4dDescriptor(in_desc, HIPDNN_TENSOR_NCHW,
-                                          HIPDNN_DATA_FLOAT, d.mb, d.ic, d.ih,
+                                          hipdataType, d.mb, d.ic, d.ih,
                                           d.iw));
 
   hipdnnTensorDescriptor_t out_desc;
   checkHIPDNN(hipdnnCreateTensorDescriptor(&out_desc));
   checkHIPDNN(hipdnnSetTensor4dDescriptor(out_desc, HIPDNN_TENSOR_NCHW,
-                                          HIPDNN_DATA_FLOAT, d.mb, d.ic, d.ih,
+                                          hipdataType, d.mb, d.ic, d.ih,
                                           d.iw));
 
   hipdnnLRNDescriptor_t lrn_desc;
@@ -60,7 +60,8 @@ void compute_hipdnn_LRN_fwd(LRN_params_t &d, dataType *src, dataType *dst,
 
          timer.restart();
          checkHIPDNN(hipdnnLRNCrossChannelForward( hipdnn, lrn_desc, lrn_mode,
-                 &lrn_blendAlpha, in_desc, src, &lrn_blendBeta, out_desc, dst, do_backward));
+                 &lrn_blendAlpha, in_desc, src, &lrn_blendBeta, out_desc, dst,
+                 do_backward));
 
          hipDeviceSynchronize();
 
@@ -81,7 +82,8 @@ void compute_hipdnn_LRN_fwd(LRN_params_t &d, dataType *src, dataType *dst,
 
 template <typename dataType>
 void compute_hipdnn_LRN_backward(LRN_params_t &d, dataType *src, dataType *grad,
-                                dataType *dst, float *avg_time) {
+                             dataType *dst, float *avg_time,
+                             hipdnnDataType_t hipdataType = HIPDNN_DATA_FLOAT) {
 
   hipdnnHandle_t hipdnn;
   checkHIPDNN(hipdnnCreate(&hipdnn));
@@ -89,13 +91,13 @@ void compute_hipdnn_LRN_backward(LRN_params_t &d, dataType *src, dataType *grad,
   hipdnnTensorDescriptor_t in_desc;
   checkHIPDNN(hipdnnCreateTensorDescriptor(&in_desc));
   checkHIPDNN(hipdnnSetTensor4dDescriptor(
-        in_desc, HIPDNN_TENSOR_NCHW, HIPDNN_DATA_FLOAT,
+        in_desc, HIPDNN_TENSOR_NCHW, hipdataType,
         d.mb, d.ic, d.ih, d.iw));
 
   hipdnnTensorDescriptor_t out_desc;
   checkHIPDNN(hipdnnCreateTensorDescriptor(&out_desc));
   checkHIPDNN(hipdnnSetTensor4dDescriptor(
-        out_desc, HIPDNN_TENSOR_NCHW, HIPDNN_DATA_FLOAT,
+        out_desc, HIPDNN_TENSOR_NCHW, hipdataType,
         d.mb, d.ic, d.ih, d.iw));
 
   hipdnnLRNDescriptor_t lrn_desc;
@@ -120,7 +122,7 @@ void compute_hipdnn_LRN_backward(LRN_params_t &d, dataType *src, dataType *grad,
 
   float* dy; // passed as input
   HIP_CALL(hipMalloc(&dy, d.mb*d.ic*d.ih*d.iw*sizeof(float)));
-  hipLaunchKernel(dev_populate, d.ih*d.iw, d.mb*d.ic, 0, 0 , dy, maxvalue);
+  hipLaunchKernelGGL(dev_populate, d.ih*d.iw, d.mb*d.ic, 0, 0 , dy, maxvalue);
 
 
   high_resolution_timer_t timer;
@@ -152,6 +154,91 @@ void compute_hipdnn_LRN_backward(LRN_params_t &d, dataType *src, dataType *grad,
   hipdnnDestroyTensorDescriptor(in_desc);
   hipdnnDestroy(hipdnn);
 
+}
+
+template <typename dataType>
+void Test_LRN_fwd(Desc inputDesc, Desc outputDesc, std::string testname,
+                  hipdnnDataType_t hipdataType = HIPDNN_DATA_FLOAT) {
+
+  float avg_time = 0;
+  dataType* temp;
+
+  Memory<dataType> srcData = createMemory<dataType>(inputDesc);
+  Memory<dataType> dstDataGPU = createMemory<dataType>(outputDesc);
+
+  populateMemoryRandom<dataType>(srcData);
+
+  LRN_params_t LRN_params(inputDesc.N, inputDesc.C, inputDesc.H, inputDesc.W);
+
+  int ip_size[4] = {inputDesc.N, inputDesc.C, inputDesc.H, inputDesc.W};
+  int k_size[4] = {0,0,0,0};
+  int op_size[4] =  {outputDesc.N, outputDesc.C, outputDesc.H, outputDesc.W};
+
+  std::string str_ip_size  = convert_to_string((int*)ip_size,4);
+  std::string str_k_size  = convert_to_string((int*)k_size,4);
+  std::string str_op_size  = convert_to_string((int*)op_size,4);
+
+  compute_hipdnn_LRN_fwd<dataType>(LRN_params, srcData.gpu(), dstDataGPU.gpu(),
+                                &avg_time, hipdataType);
+
+  std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
+
+  std::string strt = "./result_unittest.csv";
+  std::string filename="LRN_fwd.csv";
+
+    temp =  dstDataGPU.getDataFromGPU();
+
+  std::string str  = convert_to_string((float*)temp,
+                                       (int)dstDataGPU.get_num_elements());
+
+  write_to_csv(strt, str, testname,avg_time, str_ip_size, str_k_size,
+               str_op_size);
+  dump_result_csv(filename, testname, temp, (int)dstDataGPU.get_num_elements());
+}
+
+
+template <>
+inline void Test_LRN_fwd<half>(Desc inputDesc, Desc outputDesc, std::string testname,
+                  hipdnnDataType_t hipdataType) {
+
+  float avg_time = 0;
+  float* temp;
+  hipdataType = HIPDNN_DATA_FLOAT;
+
+  Memory<half> srcData = createMemory<half>(inputDesc);
+  Memory<half> dstDataGPU = createMemory<half>(outputDesc);
+
+  populateMemoryRandom<half>(srcData);
+
+  LRN_params_t LRN_params(inputDesc.N, inputDesc.C, inputDesc.H, inputDesc.W);
+
+  int ip_size[4] = {inputDesc.N, inputDesc.C, inputDesc.H, inputDesc.W};
+  int k_size[4] = {0,0,0,0};
+  int op_size[4] =  {outputDesc.N, outputDesc.C, outputDesc.H, outputDesc.W};
+
+  std::string str_ip_size  = convert_to_string((int*)ip_size,4);
+  std::string str_k_size  = convert_to_string((int*)k_size,4);
+  std::string str_op_size  = convert_to_string((int*)op_size,4);
+
+  compute_hipdnn_LRN_fwd<half>(LRN_params, srcData.gpu(), dstDataGPU.gpu(),
+                                &avg_time, hipdataType);
+
+  std::cout << "\nAverage Time is: " << avg_time << "micro seconds"<<std::endl;
+
+  std::string strt = "./result_unittest.csv";
+  std::string filename="LRN_fwd.csv";
+
+
+    Memory<float> dstDataGPU_f(outputDesc.N * outputDesc.C * outputDesc.H * outputDesc.W);
+    Convert_toFloat<half>(dstDataGPU, dstDataGPU_f);
+    temp = dstDataGPU_f.getDataFromGPU();
+
+  std::string str  = convert_to_string((float*)temp,
+                                       (int)dstDataGPU.get_num_elements());
+
+  write_to_csv(strt, str, testname,avg_time, str_ip_size, str_k_size,
+               str_op_size);
+  dump_result_csv(filename, testname, temp, (int)dstDataGPU.get_num_elements());
 }
 
 #endif // TEST_LRN_FWD_COMMON_H

@@ -9,6 +9,7 @@ TEST(convolution_activation_fwd_bwd_intg,
   Desc inputDesc(1, 3, 16, 16);
   Desc filterDesc(1, 3, 4, 4);
   hipdnnActivationMode_t act_mode = HIPDNN_ACTIVATION_RELU;
+  hipdnnDataType_t dataType = HIPDNN_DATA_FLOAT;
 
   int pad[2] = {0, 0};    // zero padding
   int stride[2] = {4, 4}; // stride 1
@@ -66,16 +67,17 @@ TEST(convolution_activation_fwd_bwd_intg,
                op_size_cb,op_size_ab,"Conv_fwd","Act_fwd","Conv_bwd","Act_bwd");
 
   compute_hipdnn_conv_forward<float>(testConvolutionSizes, srcDataConv.gpu(),
-                           filterData.gpu(), NULL, dstDataGPU.gpu(), alpha,
+                           filterData.gpu(), NULL, dstDataGPU.gpu(), dataType, alpha,
                            beta, &avg_time1);
 
   compute_hipdnn_activation_forward<float>(test_case, dstDataGPU.gpu(),
-                                           dataDst.gpu(), act_mode, alpha, beta,
-                                           &avg_time2);
+                                           dataDst.gpu(), dataType, act_mode,
+                                           alpha, beta, &avg_time2);
 
   compute_hipdnn_activation_backward<float>(test_case, dstDataGPU.gpu(),
                                             data_grad.gpu(), dataDst.gpu(),
-                                            act_mode, alpha, beta,&avg_time3);
+                                            dataType, act_mode, alpha, beta,
+                                            &avg_time3);
 
   compute_hipdnn_conv_backward_filter<float>(testConvolutionSizes, srcDataConv.gpu(),
                             filterData.gpu(), gradData2.gpu(), NULL,
