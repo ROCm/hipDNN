@@ -1,4 +1,5 @@
 #include "test_convolution_common.hpp"
+hipdnnDataType_t dataType = HIPDNN_DATA_FLOAT;
 
 TEST(convolution_fwd_bwd, func_test_fwd_bwd_convolution) {
 
@@ -36,7 +37,7 @@ TEST(convolution_fwd_bwd, func_test_fwd_bwd_convolution) {
   populateMemoryRandom<float>(filterData);
 
   compute_hipdnn_conv_forward<float>(testConvolutionSizes, srcData.gpu(),
-                           filterData.gpu(), NULL, dstDataGPU.gpu(), alpha,
+                           filterData.gpu(), NULL, dstDataGPU.gpu(), dataType, alpha,
                            beta, &avg_time1);
 
   compute_hipdnn_conv_backward_filter<float>(testConvolutionSizes, srcData.gpu(),
@@ -94,8 +95,9 @@ TEST(convolution_fwd_bwd, func_test_fwd_bwd_convolution_batch32) {
   populateMemoryRandom<float>(filterData);
 
   compute_hipdnn_conv_forward<float>(testConvolutionSizes, srcData.gpu(),
-                                filterData.gpu(), NULL, dstDataGPU.gpu(), alpha,
-                                beta, &avg_time1);
+                                filterData.gpu(), NULL, dstDataGPU.gpu(), dataType,
+                                 alpha, beta, &avg_time1);
+
   compute_hipdnn_conv_backward_filter<float>(testConvolutionSizes, srcData.gpu(),
                                  filterData.gpu(), gradData.gpu(), NULL,
                                  dstDataGPU.gpu(), alpha, beta, &avg_time2);
@@ -151,8 +153,8 @@ TEST(convolution_fwd_bwd, func_test_fwd_bwd_convolution_batch64) {
   populateMemoryRandom<float>(filterData);
 
   compute_hipdnn_conv_forward<float>(testConvolutionSizes, srcData.gpu(),
-                                filterData.gpu(), NULL, dstDataGPU.gpu(), alpha,
-                                beta, &avg_time1);
+                                filterData.gpu(), NULL, dstDataGPU.gpu(), dataType,
+                                alpha, beta, &avg_time1);
 
   compute_hipdnn_conv_backward_filter<float>(testConvolutionSizes, srcData.gpu(),
                                  filterData.gpu(), gradData.gpu(), NULL,
@@ -209,8 +211,8 @@ TEST(convolution_fwd_bwd, func_test_fwd_bwd_convolution_batch128) {
   populateMemoryRandom<float>(filterData);
 
   compute_hipdnn_conv_forward<float>(testConvolutionSizes, srcData.gpu(),
-                                filterData.gpu(), NULL, dstDataGPU.gpu(), alpha,
-                                beta, &avg_time1);
+                                filterData.gpu(), NULL, dstDataGPU.gpu(), dataType,
+                                alpha, beta, &avg_time1);
   compute_hipdnn_conv_backward_filter<float>(testConvolutionSizes, srcData.gpu(),
                                  filterData.gpu(), gradData.gpu(), NULL,
                                  dstDataGPU.gpu(), alpha, beta, &avg_time2);

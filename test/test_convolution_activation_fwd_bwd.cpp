@@ -67,7 +67,7 @@ TEST(convolution_activation_fwd_bwd_intg,
                op_size_cb,op_size_ab,"Conv_fwd","Act_fwd","Conv_bwd","Act_bwd");
 
   compute_hipdnn_conv_forward<float>(testConvolutionSizes, srcDataConv.gpu(),
-                           filterData.gpu(), NULL, dstDataGPU.gpu(), alpha,
+                           filterData.gpu(), NULL, dstDataGPU.gpu(), dataType, alpha,
                            beta, &avg_time1);
 
   compute_hipdnn_activation_forward<float>(test_case, dstDataGPU.gpu(),

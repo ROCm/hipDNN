@@ -122,7 +122,7 @@ void compute_hipdnn_LRN_backward(LRN_params_t &d, dataType *src, dataType *grad,
 
   float* dy; // passed as input
   HIP_CALL(hipMalloc(&dy, d.mb*d.ic*d.ih*d.iw*sizeof(float)));
-  hipLaunchKernel(dev_populate, d.ih*d.iw, d.mb*d.ic, 0, 0 , dy, maxvalue);
+  hipLaunchKernelGGL(dev_populate, d.ih*d.iw, d.mb*d.ic, 0, 0 , dy, maxvalue);
 
 
   high_resolution_timer_t timer;

@@ -72,6 +72,9 @@ INCLUDE(CPack)
 
 # Testing
 
-enable_testing()
+option(ENABLE_TEST "Option description" OFF)
 
-add_subdirectory(test)
+if(ENABLE_TEST)
+    enable_testing()
+    add_subdirectory(test)
+endif()
