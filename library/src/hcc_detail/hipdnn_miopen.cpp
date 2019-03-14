@@ -2445,9 +2445,9 @@ hipdnnStatus_t hipdnnPoolingBackward(
     if((*static_cast<const float *>(alpha)) == 1 && (*static_cast<const float *>(beta)) == 0) {
 
         CHECK_MIO(miopenPoolingBackward(
-            (miopenHandle_t)handle, (miopenPoolingDescriptor_t)poolingDesc, &alpha,
+            (miopenHandle_t)handle, (miopenPoolingDescriptor_t)poolingDesc, alpha,
             (miopenTensorDescriptor_t)yDesc, y, (miopenTensorDescriptor_t)dyDesc,
-            dy, (miopenTensorDescriptor_t)xDesc, x, &beta,
+            dy, (miopenTensorDescriptor_t)xDesc, x, beta,
             (miopenTensorDescriptor_t)dxDesc, dx,
             devptr));
     } else {
