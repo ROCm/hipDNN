@@ -3049,7 +3049,7 @@ hipdnnStatus_t hipdnnSetRNNDescriptor_v6(
     return HIPDNN_STATUS_NOT_SUPPORTED;
 }
 
-hipdnnStatus_t hipdnnSetRNNDescriptor(
+hipdnnStatus_t hipdnnSetRNNDescriptor( hipdnnHandle_t handle,
     hipdnnRNNDescriptor_t rnnDesc, int hiddenSize, int numLayers,
     hipdnnDropoutDescriptor_t
         dropoutDesc,  // Between layers, not between recurrent steps.
