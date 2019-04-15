@@ -239,7 +239,7 @@ hipdnnStatus_t hipTomiopenPoolingMode(hipdnnPoolingMode_t in,
             *out = miopenPoolingMax;
             break;
         case HIPDNN_POOLING_AVERAGE_COUNT_INCLUDE_PADDING:
-            *out = miopenPoolingAverage;
+            *out = miopenPoolingAverageInclusive;
             break;
         case HIPDNN_POOLING_AVERAGE_COUNT_EXCLUDE_PADDING:
             *out = miopenPoolingAverage;
@@ -261,10 +261,12 @@ hipdnnStatus_t miopenTohipPoolingMode(miopenPoolingMode_t in,
         case miopenPoolingMax:
             *out = HIPDNN_POOLING_MAX;
             break;
-        case miopenPoolingAverage:
+        case miopenPoolingAverageInclusive:
             *out = HIPDNN_POOLING_AVERAGE_COUNT_INCLUDE_PADDING;
             break;
-            // HGSOS     *out = HIPDNN_POOLING_AVERAGE_COUNT_EXCLUDE_PADDING;
+        case miopenPoolingAverage:
+            *out = HIPDNN_POOLING_AVERAGE_COUNT_EXCLUDE_PADDING;
+            break;
             // HGSOS     *out = HIPDNN_POOLING_MAX_DETERMINISTIC;
         default:
             HIPDNN_OPEN_LOG_M("miopenTohipPoolingMode "
