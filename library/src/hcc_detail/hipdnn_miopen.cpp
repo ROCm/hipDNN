@@ -526,10 +526,16 @@ hipdnnStatus_t hipTomiopenConvolutionBwdFilterAlgo(
                               << std::flush);
             *out = miopenConvolutionBwdWeightsAlgoDirect;
             break;
+
+        case HIPDNN_CONVOLUTION_BWD_FILTER_ALGO_WINOGRAD:
+            HIPDNN_OPEN_LOG_M("HIPDNN_CONVOLUTION_BWD_FILTER_ALGO_WINOGRAD"
+                              << std::flush);
+            *out = miopenConvolutionBwdWeightsAlgoWinograd;
+            break;
+
             // TODO NEEL: Add other BwdFilter algorithms
             /*case HIPDNN_CONVOLUTION_BWD_FILTER_ALGO_COUNT:
              case HIPDNN_CONVOLUTION_BWD_FILTER_ALGO_3:
-             case HIPDNN_CONVOLUTION_BWD_FILTER_ALGO_WINOGRAD:
              case HIPDNN_CONVOLUTION_BWD_FILTER_ALGO_WINOGRAD_NONFUSED:
              case HIPDNN_CONVOLUTION_BWD_FILTER_ALGO_FFT_TILING:
              case HIPDNN_CONVOLUTION_BWD_FILTER_ALGO_FFT:*/ //TODO: will be added in future
@@ -551,6 +557,9 @@ hipdnnStatus_t miopenTohipConvolutionBwdFilterAlgo(
             break;
         case miopenConvolutionBwdWeightsAlgoDirect:
             *out = HIPDNN_CONVOLUTION_BWD_FILTER_ALGO_1;
+            break;
+        case miopenConvolutionBwdWeightsAlgoWinograd:
+            *out = HIPDNN_CONVOLUTION_BWD_FILTER_ALGO_WINOGRAD;
             break;
         default:
             HIPDNN_OPEN_LOG_E("miopenTohipConvolutionBwdFilterAlgo: "
