@@ -239,7 +239,7 @@ hipdnnStatus_t hipTomiopenPoolingMode(hipdnnPoolingMode_t in,
             *out = miopenPoolingMax;
             break;
         case HIPDNN_POOLING_AVERAGE_COUNT_INCLUDE_PADDING:
-            *out = miopenPoolingAverage;
+            *out = miopenPoolingAverageInclusive;
             break;
         case HIPDNN_POOLING_AVERAGE_COUNT_EXCLUDE_PADDING:
             *out = miopenPoolingAverage;
@@ -261,10 +261,12 @@ hipdnnStatus_t miopenTohipPoolingMode(miopenPoolingMode_t in,
         case miopenPoolingMax:
             *out = HIPDNN_POOLING_MAX;
             break;
-        case miopenPoolingAverage:
+        case miopenPoolingAverageInclusive:
             *out = HIPDNN_POOLING_AVERAGE_COUNT_INCLUDE_PADDING;
             break;
-            // HGSOS     *out = HIPDNN_POOLING_AVERAGE_COUNT_EXCLUDE_PADDING;
+        case miopenPoolingAverage:
+            *out = HIPDNN_POOLING_AVERAGE_COUNT_EXCLUDE_PADDING;
+            break;
             // HGSOS     *out = HIPDNN_POOLING_MAX_DETERMINISTIC;
         default:
             HIPDNN_OPEN_LOG_M("miopenTohipPoolingMode "
@@ -526,10 +528,16 @@ hipdnnStatus_t hipTomiopenConvolutionBwdFilterAlgo(
                               << std::flush);
             *out = miopenConvolutionBwdWeightsAlgoDirect;
             break;
+
+        case HIPDNN_CONVOLUTION_BWD_FILTER_ALGO_WINOGRAD:
+            HIPDNN_OPEN_LOG_M("HIPDNN_CONVOLUTION_BWD_FILTER_ALGO_WINOGRAD"
+                              << std::flush);
+            *out = miopenConvolutionBwdWeightsAlgoWinograd;
+            break;
+
             // TODO NEEL: Add other BwdFilter algorithms
             /*case HIPDNN_CONVOLUTION_BWD_FILTER_ALGO_COUNT:
              case HIPDNN_CONVOLUTION_BWD_FILTER_ALGO_3:
-             case HIPDNN_CONVOLUTION_BWD_FILTER_ALGO_WINOGRAD:
              case HIPDNN_CONVOLUTION_BWD_FILTER_ALGO_WINOGRAD_NONFUSED:
              case HIPDNN_CONVOLUTION_BWD_FILTER_ALGO_FFT_TILING:
              case HIPDNN_CONVOLUTION_BWD_FILTER_ALGO_FFT:*/ //TODO: will be added in future
@@ -551,6 +559,9 @@ hipdnnStatus_t miopenTohipConvolutionBwdFilterAlgo(
             break;
         case miopenConvolutionBwdWeightsAlgoDirect:
             *out = HIPDNN_CONVOLUTION_BWD_FILTER_ALGO_1;
+            break;
+        case miopenConvolutionBwdWeightsAlgoWinograd:
+            *out = HIPDNN_CONVOLUTION_BWD_FILTER_ALGO_WINOGRAD;
             break;
         default:
             HIPDNN_OPEN_LOG_E("miopenTohipConvolutionBwdFilterAlgo: "
@@ -3049,7 +3060,7 @@ hipdnnStatus_t hipdnnSetRNNDescriptor_v6(
     return HIPDNN_STATUS_NOT_SUPPORTED;
 }
 
-hipdnnStatus_t hipdnnSetRNNDescriptor(
+hipdnnStatus_t hipdnnSetRNNDescriptor( hipdnnHandle_t handle,
     hipdnnRNNDescriptor_t rnnDesc, int hiddenSize, int numLayers,
     hipdnnDropoutDescriptor_t
         dropoutDesc,  // Between layers, not between recurrent steps.
