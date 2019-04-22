@@ -549,6 +549,11 @@ hipdnnStatus_t
 hipdnnCreateFilterDescriptor( hipdnnFilterDescriptor_t *filterDesc);
 
 hipdnnStatus_t
+hipdnnSetFilter4dDescriptor( hipdnnFilterDescriptor_t filterDesc,
+                             hipdnnTensorFormat_t format,
+                             hipdnnDataType_t dataType,
+                             int k, int c, int h, int w);
+hipdnnStatus_t
 hipdnnSetFilterNdDescriptor( hipdnnFilterDescriptor_t filterDesc,
                              hipdnnDataType_t dataType,  /* image data type */
                              hipdnnTensorFormat_t format,
