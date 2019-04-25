@@ -2338,6 +2338,21 @@ hipdnnStatus_t hipdnnGetFilterNdDescriptor(
     return HIPDNN_STATUS_SUCCESS;
 }
 
+hipdnnStatus_t hipdnnGetFilter4dDescriptor( const hipdnnFilterDescriptor_t filterDesc,
+                             hipdnnDataType_t *dataType,
+                             hipdnnTensorFormat_t *format,
+                             int *k, int *c, int *h, int *w) {
+
+    cudnnDataType_t cuDT;
+    cudnnTensorFormat_t cuTF;
+    CHECK_CUDNN(cudnnGetFilter4dDescriptor( cudnnFilterDescriptor_t)filterDesc, &cuDT,
+                                            &cuTF, &k, &c, &h, &w);
+    CHECK_HIPDNN(cudnnTohipTensorFormat(cuTF, format));
+    CHECK_HIPDNN(cudnnTohipDataType(cuDT, dataType));
+
+    return HIPDNN_STATUS_SUCCESS;
+}
+
 hipdnnStatus_t
 hipdnnDestroyFilterDescriptor(hipdnnFilterDescriptor_t filterDesc) {
     CHECK_CUDNN(cudnnDestroyFilterDescriptor((cudnnFilterDescriptor_t)filterDesc));
