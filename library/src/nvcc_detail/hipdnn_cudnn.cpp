@@ -1384,6 +1384,21 @@ hipdnnStatus_t hipdnnOpTensor(
 
 //=============================================================================
 
+hipdnnStatus_t hipdnnSetFilter4dDescriptor(hipdnnFilterDescriptor_t filterDesc,
+                                           hipdnnTensorFormat_t format,
+                                           hipdnnDataType_t dataType, int k,
+                                           int c, int h, int w) {
+
+    cudnnDataType_t cuDT;
+    cudnnTensorFormat_t cuTF;
+    CHECK_HIPDNN(hipTocudnnDataType(dataType, &cuDT));
+    CHECK_HIPDNN(hipTocudnnTensorFormat(format, &cuTF));
+
+    CHECK_CUDNN(cudnnSetFilter4dDescriptor((cudnnFilterDescriptor_t)filterDesc,
+                                         (cudnnDataType_t)cuDT, (cudnnTensorFormat_t)format, k, c, h, w));
+    return HIPDNN_STATUS_SUCCESS;
+}
+
 hipdnnStatus_t
 hipdnnCreateFilterDescriptor(hipdnnFilterDescriptor_t *filterDesc) {
     CHECK_CUDNN(cudnnCreateFilterDescriptor((cudnnFilterDescriptor_t *)filterDesc));
