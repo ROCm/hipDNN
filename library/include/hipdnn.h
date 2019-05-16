@@ -553,6 +553,7 @@ hipdnnSetFilter4dDescriptor( hipdnnFilterDescriptor_t filterDesc,
                              hipdnnTensorFormat_t format,
                              hipdnnDataType_t dataType,
                              int k, int c, int h, int w);
+
 hipdnnStatus_t
 hipdnnSetFilterNdDescriptor( hipdnnFilterDescriptor_t filterDesc,
                              hipdnnDataType_t dataType,  /* image data type */
@@ -567,6 +568,12 @@ hipdnnGetFilterNdDescriptor( const hipdnnFilterDescriptor_t filterDesc,
                              hipdnnTensorFormat_t *format,
                              int *nbDims,
                              int filterDimA[]);
+
+hipdnnStatus_t
+hipdnnGetFilter4dDescriptor( const hipdnnFilterDescriptor_t filterDesc,
+                             hipdnnDataType_t *dataType,
+                             hipdnnTensorFormat_t *format,
+                             int *k, int *c, int *h, int *w);
 
 hipdnnStatus_t
 hipdnnDestroyFilterDescriptor( hipdnnFilterDescriptor_t filterDesc);
