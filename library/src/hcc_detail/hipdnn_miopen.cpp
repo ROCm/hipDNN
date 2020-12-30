@@ -692,6 +692,24 @@ hipdnnConvolutionBwdDataAlgo_t GetConvolutionBwdDataAlgo(int i) {
 
 //=============================================================================
 
+
+hipdnnStatus_t hipTomiopenCTCLossAlgo(hipdnnCTCLossAlgo_t in,
+                                     miopenCTCLossAlgo_t *out) {
+    hipdnnStatus_t retVal = HIPDNN_STATUS_SUCCESS;
+    switch (in) {
+    case HIPDNN_CTC_LOSS_ALGO_DETERMINISTIC:
+        *out = MIOPEN_CTC_LOSS_ALGO_DETERMINISTIC;
+        break;
+    default:
+        HIPDNN_OPEN_LOG_E("hipdnnCTCLossAlgo_t: "
+                           << in << " NOT SUPPORTED." << std::flush);
+        return HIPDNN_STATUS_NOT_SUPPORTED;
+    }
+    return retVal;
+}
+
+//=============================================================================
+
 hipdnnStatus_t hipSoftmaxModeSupported(hipdnnSoftmaxMode_t in) {
     switch (in) {
         // PRNSOS: MAX mode need to check
@@ -3831,9 +3849,11 @@ hipdnnGetCTCLossWorkspaceSize(hipdnnHandle_t handle,
                               hipdnnCTCLossAlgo_t algo,
                               const hipdnnCTCLossDescriptor_t ctcLossDesc,
                               size_t* workSpaceSize) {
+    miopenCTCLossAlgo_t miAlgo;
+    CHECK_HIPDNN(hipTomiopenCTCLossAlgo(algo, &miAlgo));
     CHECK_MIO(miopenGetCTCLossWorkspaceSize((miopenHandle_t) handle,
             (miopenTensorDescriptor_t) probsDesc, (miopenTensorDescriptor_t) gradientsDesc,
-            labels, labelLengths, inputLengths, (miopenCTCLossAlgo_t) algo, 
+            labels, labelLengths, inputLengths, miAlgo,
             (miopenCTCLossDescriptor_t) ctcLossDesc, workSpaceSize));
     return HIPDNN_STATUS_SUCCESS;
 }
@@ -3851,11 +3871,13 @@ hipdnnCTCLoss(hipdnnHandle_t handle,
               hipdnnCTCLossAlgo_t algo,
               const hipdnnCTCLossDescriptor_t ctcLossDesc,
               void* workSpace,
-              size_t workSpaceSize) {
+              size_t* workSpaceSize) {
+    miopenCTCLossAlgo_t miAlgo;
+    CHECK_HIPDNN(hipTomiopenCTCLossAlgo(algo, &miAlgo));
     CHECK_MIO(miopenCTCLoss((miopenHandle_t) handle, (miopenTensorDescriptor_t) probsDesc, 
                              probs, labels, labelLengths, inputLengths, losses, 
                              (miopenTensorDescriptor_t) gradientsDesc, gradients,
-                             (miopenCTCLossAlgo_t) algo, (miopenCTCLossDescriptor_t) ctcLossDesc, 
-                             workSpace, workSpaceSize));
+                             miAlgo, (miopenCTCLossDescriptor_t) ctcLossDesc, 
+                             workSpace, *workSpaceSize));
     return HIPDNN_STATUS_SUCCESS;
 }
