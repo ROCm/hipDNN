@@ -3510,33 +3510,42 @@ hipdnnStatus_t hipdnnBatchNormalizationForwardInference(
 
 hipdnnStatus_t hipdnnCreateDropoutDescriptor(
     hipdnnDropoutDescriptor_t *dropoutDesc) {
-    HIPDNN_OPEN_LOG_E("hipdnnCreateDropoutDescriptor: NOT SUPPORTED."
-                      << std::flush);
-    return HIPDNN_STATUS_NOT_SUPPORTED;
+    CHECK_MIO(miopenCreateDropoutDescriptor((miopenDropoutDescriptor_t *)dropoutDesc));
+    return HIPDNN_STATUS_SUCCESS;
+}
+
+hipdnnStatus_t hipdnnDestroyDropoutDescriptor(
+    hipdnnDropoutDescriptor_t dropoutDesc) {
+    CHECK_MIO(miopenDestroyDropoutDescriptor((miopenDropoutDescriptor_t)dropoutDesc));
+    return HIPDNN_STATUS_SUCCESS;
 }
 
 hipdnnStatus_t hipdnnSetDropoutDescriptor(hipdnnDropoutDescriptor_t dropoutDesc,
                                           hipdnnHandle_t handle, float dropout,
                                           void *states, size_t stateSizeInBytes,
                                           unsigned long long seed) {
-    HIPDNN_OPEN_LOG_E("hipdnnSetDropoutDescriptor: NOT SUPPORTED."
-                      << std::flush);
-    return HIPDNN_STATUS_NOT_SUPPORTED;
+    CHECK_MIO(miopenSetDropoutDescriptor((miopenDropoutDescriptor_t)dropoutDesc,
+              (miopenHandle_t)handle, dropout, states, stateSizeInBytes, seed,
+              false, false, MIOPEN_RNG_PSEUDO_XORWOW));
+    return HIPDNN_STATUS_SUCCESS;
 }
 
 hipdnnStatus_t hipdnnDropoutGetStatesSize(hipdnnHandle_t handle,
                                           size_t *sizeInBytes) {
-    HIPDNN_OPEN_LOG_E("hipdnnDropoutGetStatesSize: NOT SUPPORTED."
-                      << std::endl
-                      << std::flush);
-    return HIPDNN_STATUS_NOT_SUPPORTED;
+    CHECK_MIO(miopenDropoutGetStatesSize((miopenHandle_t)handle, sizeInBytes));
+    return HIPDNN_STATUS_SUCCESS;
 }
 
-hipdnnStatus_t hipdnnDestroyDropoutDescriptor(
-    hipdnnDropoutDescriptor_t dropoutDesc) {
-    HIPDNN_OPEN_LOG_E("hipdnnDestroyDropoutDescriptor: NOT SUPPORTED."
-                      << std::flush);
-    return HIPDNN_STATUS_NOT_SUPPORTED;
+
+hipdnnStatus_t 
+hipdnnRestoreDropoutDescriptor(hipdnnDropoutDescriptor_t dropoutDesc,
+                               hipdnnHandle_t handle, float dropout,
+                               void *states, size_t stateSizeInBytes,
+                               unsigned long long seed) {
+    CHECK_MIO(miopenRestoreDropoutDescriptor((miopenDropoutDescriptor_t)dropoutDesc,
+              (miopenHandle_t)handle, dropout, states, stateSizeInBytes, seed,
+              false, false, MIOPEN_RNG_PSEUDO_XORWOW));
+    return HIPDNN_STATUS_SUCCESS;
 }
 
 hipdnnStatus_t hipdnnCreateReduceTensorDescriptor(

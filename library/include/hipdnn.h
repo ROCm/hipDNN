@@ -1128,6 +1128,9 @@ hipdnnStatus_t
 hipdnnCreateDropoutDescriptor( hipdnnDropoutDescriptor_t *dropoutDesc);
 
 hipdnnStatus_t
+hipdnnDestroyDropoutDescriptor( hipdnnDropoutDescriptor_t dropoutDesc);
+
+hipdnnStatus_t
 hipdnnDropoutGetStatesSize(hipdnnHandle_t handle, size_t *sizeInBytes);
 
 hipdnnStatus_t
@@ -1139,7 +1142,12 @@ hipdnnSetDropoutDescriptor( hipdnnDropoutDescriptor_t dropoutDesc,
                             unsigned long long seed);
 
 hipdnnStatus_t
-hipdnnDestroyDropoutDescriptor( hipdnnDropoutDescriptor_t dropoutDesc);
+hipdnnRestoreDropoutDescriptor(hipdnnDropoutDescriptor_t dropoutDesc,
+                               hipdnnHandle_t handle,
+                               float dropout,
+                               void *states,
+                               size_t stateSizeInBytes,
+                               unsigned long long seed);
 
 //======================= Recurrent Neural Net =================================
 

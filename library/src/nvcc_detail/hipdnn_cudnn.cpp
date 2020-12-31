@@ -2307,6 +2307,12 @@ hipdnnCreateDropoutDescriptor(hipdnnDropoutDescriptor_t *dropoutDesc) {
     return HIPDNN_STATUS_SUCCESS;
 }
 
+hipdnnStatus_t
+hipdnnDestroyDropoutDescriptor(hipdnnDropoutDescriptor_t dropoutDesc) {
+    CHECK_CUDNN(cudnnDestroyDropoutDescriptor((cudnnDropoutDescriptor_t)dropoutDesc));
+    return HIPDNN_STATUS_SUCCESS;
+}
+
 hipdnnStatus_t hipdnnDropoutGetStatesSize(hipdnnHandle_t handle,
                                           size_t *sizeInBytes) {
     CHECK_CUDNN(cudnnDropoutGetStatesSize((cudnnHandle_t)handle, sizeInBytes));
@@ -2326,8 +2332,16 @@ hipdnnStatus_t hipdnnSetDropoutDescriptor(hipdnnDropoutDescriptor_t dropoutDesc,
 }
 
 hipdnnStatus_t
-hipdnnDestroyDropoutDescriptor(hipdnnDropoutDescriptor_t dropoutDesc) {
-    CHECK_CUDNN(cudnnDestroyDropoutDescriptor((cudnnDropoutDescriptor_t)dropoutDesc));
+hipdnnRestoreDropoutDescriptor(hipdnnDropoutDescriptor_t dropoutDesc,
+                               hipdnnHandle_t handle,
+                               float dropout,
+                               void *states,
+                               size_t stateSizeInBytes,
+                               unsigned long long seed) {
+    CHECK_CUDNN(cudnnRestoreDropoutDescriptor(
+        (cudnnDropoutDescriptor_t)dropoutDesc, (cudnnHandle_t)handle, dropout,
+        states, stateSizeInBytes, seed));
+
     return HIPDNN_STATUS_SUCCESS;
 }
 
