@@ -2208,12 +2208,22 @@ hipdnnDeriveBNTensorDescriptor(hipdnnTensorDescriptor_t derivedBnDesc,
 //=============================================================================
 
 hipdnnStatus_t hipdnnBatchNormalizationForwardTraining(
-    hipdnnHandle_t handle, hipdnnBatchNormMode_t mode, void *alpha, void *beta,
-    const hipdnnTensorDescriptor_t xDesc, const void *x,
-    const hipdnnTensorDescriptor_t yDesc, void *y,
-    const hipdnnTensorDescriptor_t bnScaleBiasMeanVarDesc, void *bnScale,
-    void *bnBias, double exponentialAverageFactor, void *resultRunningMean,
-    void *resultRunningVariance, double epsilon, void *resultSaveMean,
+    hipdnnHandle_t handle, 
+    hipdnnBatchNormMode_t mode, 
+    const void *alpha,
+    const void *beta,
+    const hipdnnTensorDescriptor_t xDesc, 
+    const void *x,
+    const hipdnnTensorDescriptor_t yDesc, 
+    void *y,
+    const hipdnnTensorDescriptor_t bnScaleBiasMeanVarDesc, 
+    const void *bnScale,
+    const void *bnBias, 
+    double exponentialAverageFactor, 
+    void *resultRunningMean,
+    void *resultRunningVariance, 
+    double epsilon, 
+    void *resultSaveMean,
     void *resultSaveInvVariance) {
     CHECK_CUDNN(cudnnBatchNormalizationForwardTraining(
         (cudnnHandle_t)handle, hipTocudnnBatchNormMode(mode), alpha, beta,

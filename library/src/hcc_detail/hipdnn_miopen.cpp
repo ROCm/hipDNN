@@ -2852,20 +2852,33 @@ hipdnnStatus_t hipdnnDeriveBNTensorDescriptor(
 //=============================================================================
 
 hipdnnStatus_t hipdnnBatchNormalizationForwardTraining(
-    hipdnnHandle_t handle, hipdnnBatchNormMode_t mode, void *alpha, void *beta,
-    const hipdnnTensorDescriptor_t xDesc, const void *x,
-    const hipdnnTensorDescriptor_t yDesc, void *y,
-    const hipdnnTensorDescriptor_t bnScaleBiasMeanVarDesc, void *bnScale,
-    void *bnBias, double exponentialAverageFactor, void *resultRunningMean,
-    void *resultRunningVariance, double epsilon, void *resultSaveMean,
+    hipdnnHandle_t handle, 
+    hipdnnBatchNormMode_t mode, 
+    const void *alpha,
+    const void *beta,
+    const hipdnnTensorDescriptor_t xDesc, 
+    const void *x,
+    const hipdnnTensorDescriptor_t yDesc, 
+    void *y,
+    const hipdnnTensorDescriptor_t bnScaleBiasMeanVarDesc, 
+    const void *bnScale,
+    const void *bnBias, 
+    double exponentialAverageFactor, 
+    void *resultRunningMean,
+    void *resultRunningVariance, 
+    double epsilon, 
+    void *resultSaveMean,
     void *resultSaveInvVariance) {
     HIPDNN_OPEN_LOG_C("Inside hipdnnBatchNormalizationForwardTraining");
     miopenBatchNormMode_t miBNMode;
     CHECK_HIPDNN(hipTomiopenBatchNormMode(mode, &miBNMode));
     CHECK_MIO(miopenBatchNormalizationForwardTraining(
-        (miopenHandle_t)handle, miBNMode, alpha, beta,
-        (miopenTensorDescriptor_t)xDesc, x, (miopenTensorDescriptor_t)yDesc, y,
-        (miopenTensorDescriptor_t)bnScaleBiasMeanVarDesc, bnScale, bnBias,
+        (miopenHandle_t)handle, miBNMode, 
+        const_cast<void*>(alpha), const_cast<void*>(beta),
+        (miopenTensorDescriptor_t)xDesc, x, 
+        (miopenTensorDescriptor_t)yDesc, y,
+        (miopenTensorDescriptor_t)bnScaleBiasMeanVarDesc, 
+        const_cast<void*>(bnScale), const_cast<void*>(bnBias),
         exponentialAverageFactor, resultRunningMean, resultRunningVariance,
         epsilon, resultSaveMean, resultSaveInvVariance));
     return HIPDNN_STATUS_SUCCESS;

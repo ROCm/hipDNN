@@ -1053,22 +1053,24 @@ hipdnnStatus_t hipdnnDeriveBNTensorDescriptor(
                                          const hipdnnTensorDescriptor_t xDesc,
                                          hipdnnBatchNormMode_t mode);
 
-hipdnnStatus_t
-hipdnnBatchNormalizationForwardTraining( hipdnnHandle_t handle,
-                          hipdnnBatchNormMode_t mode,
-                          void *alpha, void *beta,
-                          const hipdnnTensorDescriptor_t xDesc,
-                          const void *x,
-                          const hipdnnTensorDescriptor_t yDesc,
-                          void *y,
-                          const hipdnnTensorDescriptor_t bnScaleBiasMeanVarDesc,
-                          void *bnScale, void *bnBias,
-                          double exponentialAverageFactor,
-                          void *resultRunningMean,
-                          void *resultRunningVariance,
-                          double epsilon,
-                          void *resultSaveMean,
-                          void *resultSaveInvVariance);
+hipdnnStatus_t hipdnnBatchNormalizationForwardTraining(
+    hipdnnHandle_t handle, 
+    hipdnnBatchNormMode_t mode, 
+    const void *alpha,
+    const void *beta,
+    const hipdnnTensorDescriptor_t xDesc, 
+    const void *x,
+    const hipdnnTensorDescriptor_t yDesc, 
+    void *y,
+    const hipdnnTensorDescriptor_t bnScaleBiasMeanVarDesc, 
+    const void *bnScale,
+    const void *bnBias, 
+    double exponentialAverageFactor, 
+    void *resultRunningMean,
+    void *resultRunningVariance, 
+    double epsilon, 
+    void *resultSaveMean,
+    void *resultSaveInvVariance);
 
 hipdnnStatus_t
 hipdnnnBatchNormalizationForwardInference( hipdnnHandle_t handle,
