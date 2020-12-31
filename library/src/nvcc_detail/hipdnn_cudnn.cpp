@@ -776,6 +776,22 @@ hipdnnStatus_t hipTocudnnSoftmaxAlgorithm(hipdnnSoftmaxAlgorithm_t in,
     return retVal;
 }
 
+//==================================================
+
+hipdnnStatus_t hipTocudnnCTCLossAlgo(hipdnnCTCLossAlgo_t in,
+                                     cudnnCTCLossAlgo_t *out) {
+    hipdnnStatus_t retVal = HIPDNN_STATUS_SUCCESS;
+    switch (in) {
+    case HIPDNN_CTC_LOSS_ALGO_DETERMINISTIC:
+        *out = CUDNN_CTC_LOSS_ALGO_DETERMINISTIC;
+        break;
+    case HIPDNN_CTC_LOSS_ALGO_NON_DETERMINISTIC:
+        *out = CUDNN_CTC_LOSS_ALGO_NON_DETERMINISTIC;
+        break;
+    }
+    return retVal;
+}
+
 //=============================================================================
 
 hipdnnStatus_t hipTocudnnSoftmaxMode(hipdnnSoftmaxMode_t in,
@@ -2192,12 +2208,22 @@ hipdnnDeriveBNTensorDescriptor(hipdnnTensorDescriptor_t derivedBnDesc,
 //=============================================================================
 
 hipdnnStatus_t hipdnnBatchNormalizationForwardTraining(
-    hipdnnHandle_t handle, hipdnnBatchNormMode_t mode, void *alpha, void *beta,
-    const hipdnnTensorDescriptor_t xDesc, const void *x,
-    const hipdnnTensorDescriptor_t yDesc, void *y,
-    const hipdnnTensorDescriptor_t bnScaleBiasMeanVarDesc, void *bnScale,
-    void *bnBias, double exponentialAverageFactor, void *resultRunningMean,
-    void *resultRunningVariance, double epsilon, void *resultSaveMean,
+    hipdnnHandle_t handle, 
+    hipdnnBatchNormMode_t mode, 
+    const void *alpha,
+    const void *beta,
+    const hipdnnTensorDescriptor_t xDesc, 
+    const void *x,
+    const hipdnnTensorDescriptor_t yDesc, 
+    void *y,
+    const hipdnnTensorDescriptor_t bnScaleBiasMeanVarDesc, 
+    const void *bnScale,
+    const void *bnBias, 
+    double exponentialAverageFactor, 
+    void *resultRunningMean,
+    void *resultRunningVariance, 
+    double epsilon, 
+    void *resultSaveMean,
     void *resultSaveInvVariance) {
     CHECK_CUDNN(cudnnBatchNormalizationForwardTraining(
         (cudnnHandle_t)handle, hipTocudnnBatchNormMode(mode), alpha, beta,
@@ -2281,6 +2307,12 @@ hipdnnCreateDropoutDescriptor(hipdnnDropoutDescriptor_t *dropoutDesc) {
     return HIPDNN_STATUS_SUCCESS;
 }
 
+hipdnnStatus_t
+hipdnnDestroyDropoutDescriptor(hipdnnDropoutDescriptor_t dropoutDesc) {
+    CHECK_CUDNN(cudnnDestroyDropoutDescriptor((cudnnDropoutDescriptor_t)dropoutDesc));
+    return HIPDNN_STATUS_SUCCESS;
+}
+
 hipdnnStatus_t hipdnnDropoutGetStatesSize(hipdnnHandle_t handle,
                                           size_t *sizeInBytes) {
     CHECK_CUDNN(cudnnDropoutGetStatesSize((cudnnHandle_t)handle, sizeInBytes));
@@ -2300,8 +2332,16 @@ hipdnnStatus_t hipdnnSetDropoutDescriptor(hipdnnDropoutDescriptor_t dropoutDesc,
 }
 
 hipdnnStatus_t
-hipdnnDestroyDropoutDescriptor(hipdnnDropoutDescriptor_t dropoutDesc) {
-    CHECK_CUDNN(cudnnDestroyDropoutDescriptor((cudnnDropoutDescriptor_t)dropoutDesc));
+hipdnnRestoreDropoutDescriptor(hipdnnDropoutDescriptor_t dropoutDesc,
+                               hipdnnHandle_t handle,
+                               float dropout,
+                               void *states,
+                               size_t stateSizeInBytes,
+                               unsigned long long seed) {
+    CHECK_CUDNN(cudnnRestoreDropoutDescriptor(
+        (cudnnDropoutDescriptor_t)dropoutDesc, (cudnnHandle_t)handle, dropout,
+        states, stateSizeInBytes, seed));
+
     return HIPDNN_STATUS_SUCCESS;
 }
 
@@ -2345,8 +2385,8 @@ hipdnnStatus_t hipdnnGetFilter4dDescriptor( const hipdnnFilterDescriptor_t filte
 
     cudnnDataType_t cuDT;
     cudnnTensorFormat_t cuTF;
-    CHECK_CUDNN(cudnnGetFilter4dDescriptor( cudnnFilterDescriptor_t)filterDesc, &cuDT,
-                                            &cuTF, &k, &c, &h, &w);
+    CHECK_CUDNN(cudnnGetFilter4dDescriptor((cudnnFilterDescriptor_t)filterDesc, &cuDT,
+                                            &cuTF, k, c, h, w));
     CHECK_HIPDNN(cudnnTohipTensorFormat(cuTF, format));
     CHECK_HIPDNN(cudnnTohipDataType(cuDT, dataType));
 
@@ -2373,6 +2413,25 @@ hipdnnStatus_t hipdnnSetConvolutionNdDescriptor(
         (cudnnConvolutionDescriptor_t)convDesc, arrayLength, padA,
         filterStrideA, dilationA, cuCM, cuDT));
 
+    return HIPDNN_STATUS_SUCCESS;
+}
+
+hipdnnStatus_t
+hipdnnGetConvolutionNdDescriptor( hipdnnConvolutionDescriptor_t convDesc,
+                                  int requestedSpatialDim,
+                                  int* spatialDim,
+                                  int* padA,
+                                  int* strideA,
+                                  int* dilationA,
+                                  hipdnnConvolutionMode_t* mode,
+                                  hipdnnDataType_t* computeType) {
+    cudnnDataType_t cuDataType;
+    cudnnConvolutionMode_t cuConvMode;
+    CHECK_CUDNN(cudnnGetConvolutionNdDescriptor(
+        (cudnnConvolutionDescriptor_t)convDesc, requestedSpatialDim,
+        spatialDim, padA, strideA, dilationA, &cuConvMode, &cuDataType));
+    CHECK_HIPDNN(cudnnTohipDataType(cuDataType, computeType));
+    CHECK_HIPDNN(cudnnTohipConvolutionMode(cuConvMode, mode));
     return HIPDNN_STATUS_SUCCESS;
 }
 
@@ -3516,6 +3575,85 @@ hipdnnDestroyFusionPlan(hipdnnFusionPlanDescriptor_t fusePlanDesc) {
         free(fusePlanDesc_cast->fuseOpPtrs[i]);
     }
     free(fusePlanDesc);
+    return HIPDNN_STATUS_SUCCESS;
+}
+
+//==============================================================================
+
+hipdnnStatus_t 
+hipdnnCreateCTCLossDescriptor(hipdnnCTCLossDescriptor_t *ctcLossDesc) {
+    CHECK_CUDNN(cudnnCreateCTCLossDescriptor((cudnnCTCLossDescriptor_t *)ctcLossDesc));
+    return HIPDNN_STATUS_SUCCESS;
+}
+
+hipdnnStatus_t 
+hipdnnDestroyCTCLossDescriptor(hipdnnCTCLossDescriptor_t ctcLossDesc) {
+    CHECK_CUDNN(cudnnDestroyCTCLossDescriptor((cudnnCTCLossDescriptor_t)ctcLossDesc));
+    return HIPDNN_STATUS_SUCCESS;
+}
+
+hipdnnStatus_t 
+hipdnnGetCTCLossDescriptor(hipdnnCTCLossDescriptor_t ctcLossDesc, 
+                           hipdnnDataType_t *dataType, 
+                           int* blank_label_id, 
+                           bool* apply_softmax_layer) {
+    cudnnDataType_t cuDT;
+    CHECK_HIPDNN(cudnnGetCTCLossDescriptor((cudnnCTCLossDescriptor_t) ctcLossDesc, 
+                 &cuDT, blank_label_id, apply_softmax_layer));
+    CHECK_HIPDNN(cudnnTohipDataType(cuDT, dataType));
+    return HIPDNN_STATUS_SUCCESS;
+}
+
+hipdnnStatus_t 
+hipdnnSetCTCLossDescriptor(hipdnnCTCLossDescriptor_t ctcLossDesc, 
+                           hipdnnDataType_t dataType, 
+                           const int blank_label_id, 
+                           bool apply_softmax_layer) {
+    cudnnDataType_t cuDT;
+    CHECK_HIPDNN(hipTocudnnDataType(dataType, &cuDT));
+    CHECK_CUDNN(cudnnSetCTCLossDescriptor((cudnnCTCLossDescriptor_t) ctcLossDesc, cuDT));
+    return HIPDNN_STATUS_SUCCESS;
+}
+
+hipdnnStatus_t 
+hipdnnGetCTCLossWorkspaceSize(hipdnnHandle_t handle,
+                              const hipdnnTensorDescriptor_t probsDesc,
+                              const hipdnnTensorDescriptor_t gradientsDesc,
+                              const int* labels,
+                              const int* labelLengths,
+                              const int* inputLengths,
+                              hipdnnCTCLossAlgo_t algo,
+                              const hipdnnCTCLossDescriptor_t ctcLossDesc,
+                              size_t* workSpaceSize) {
+    cudnnCTCLossAlgo_t cualgo;
+    CHECK_HIPDNN(hipTocudnnCTCLossAlgo(algo, &cualgo));
+    CHECK_CUDNN(cudnnGetCTCLossWorkspaceSize((cudnnHandle_t) handle,
+            (cudnnTensorDescriptor_t) probsDesc, (cudnnTensorDescriptor_t) gradientsDesc,
+            labels, labelLengths, inputLengths, cualgo, (cudnnCTCLossDescriptor_t) ctcLossDesc, 
+            workSpaceSize));
+    return HIPDNN_STATUS_SUCCESS;
+}
+
+hipdnnStatus_t 
+hipdnnCTCLoss(hipdnnHandle_t handle,
+              const hipdnnTensorDescriptor_t probsDesc,
+              const void* probs,
+              const int* labels,
+              const int* labelLengths,
+              const int* inputLengths,
+              void* losses,
+              const hipdnnTensorDescriptor_t gradientsDesc,
+              void* gradients,
+              hipdnnCTCLossAlgo_t algo,
+              const hipdnnCTCLossDescriptor_t ctcLossDesc,
+              void* workSpace,
+              size_t* workSpaceSize) {
+    cudnnCTCLossAlgo_t cualgo;
+    CHECK_HIPDNN(hipTocudnnCTCLossAlgo(algo, &cualgo));
+    CHECK_CUDNN(cudnnCTCLoss((cudnnHandle_t) handle, (cudnnTensorDescriptor_t) probsDesc, 
+                            probs, labels, labelLengths, inputLengths, losses, 
+                            (cudnnTensorDescriptor_t) gradientsDesc, gradients, cualgo, 
+                            (cudnnCTCLossDescriptor_t) ctcLossDesc, workSpace, workSpaceSize));
     return HIPDNN_STATUS_SUCCESS;
 }
 

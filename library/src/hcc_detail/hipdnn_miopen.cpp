@@ -28,7 +28,8 @@
 #include <exception>
 #include <iterator>
 #include <map>
-#include "hip/hip_runtime.h"
+#include <hip/hip_runtime.h>
+#include <hip/hip_fp16.h>
 
 #define CHECK_MIO(expression)                                                   \
     {                                                                           \
@@ -691,6 +692,24 @@ hipdnnConvolutionBwdDataAlgo_t GetConvolutionBwdDataAlgo(int i) {
 
 //=============================================================================
 
+
+hipdnnStatus_t hipTomiopenCTCLossAlgo(hipdnnCTCLossAlgo_t in,
+                                     miopenCTCLossAlgo_t *out) {
+    hipdnnStatus_t retVal = HIPDNN_STATUS_SUCCESS;
+    switch (in) {
+    case HIPDNN_CTC_LOSS_ALGO_DETERMINISTIC:
+        *out = MIOPEN_CTC_LOSS_ALGO_DETERMINISTIC;
+        break;
+    default:
+        HIPDNN_OPEN_LOG_E("hipdnnCTCLossAlgo_t: "
+                           << in << " NOT SUPPORTED." << std::flush);
+        return HIPDNN_STATUS_NOT_SUPPORTED;
+    }
+    return retVal;
+}
+
+//=============================================================================
+
 hipdnnStatus_t hipSoftmaxModeSupported(hipdnnSoftmaxMode_t in) {
     switch (in) {
         // PRNSOS: MAX mode need to check
@@ -980,10 +999,10 @@ hipdnnStatus_t accumulateGradients(void *gradient, void *gradientPrior,
     }
     else if (*dataType == miopenHalf){
 
-    hc::half betaVal = *(static_cast<const hc::half *>(beta));
-    hc::half *gradientF = static_cast<hc::half *>(gradient);
-    hc::half *gradientPriorF = static_cast<hc::half *>(gradientPrior);
-    hipLaunchKernelGGL((TensorAdd<hc::half>), dim3(blocks), dim3(threadsPerBlock),
+    __half betaVal = *(static_cast<const __half *>(beta));
+    __half *gradientF = static_cast<__half *>(gradient);
+    __half *gradientPriorF = static_cast<__half *>(gradientPrior);
+    hipLaunchKernelGGL((TensorAdd<__half>), dim3(blocks), dim3(threadsPerBlock),
                        0, 0, gradientF, gradientPriorF, betaVal, totalElements);
     CHECK_HIP(hipDeviceSynchronize());
     }
@@ -1415,6 +1434,23 @@ hipdnnStatus_t hipdnnSetConvolutionNdDescriptor(
             << std::flush);
         return HIPDNN_STATUS_NOT_SUPPORTED;
     }
+    return HIPDNN_STATUS_SUCCESS;
+}
+
+hipdnnStatus_t
+hipdnnGetConvolutionNdDescriptor( hipdnnConvolutionDescriptor_t convDesc,
+                                  int requestedSpatialDim,
+                                  int* spatialDim,
+                                  int* padA,
+                                  int* strideA,
+                                  int* dilationA,
+                                  hipdnnConvolutionMode_t* mode,
+                                  hipdnnDataType_t* computeType) {
+    miopenConvolutionMode_t miConvMode;
+    CHECK_MIO(miopenGetConvolutionNdDescriptor((miopenConvolutionDescriptor_t) convDesc,
+                                               requestedSpatialDim, spatialDim, padA,
+                                               strideA, dilationA, &miConvMode));
+    CHECK_HIPDNN(miopenTohipdnnConvolutionMode(miConvMode, mode));
     return HIPDNN_STATUS_SUCCESS;
 }
 
@@ -2816,20 +2852,33 @@ hipdnnStatus_t hipdnnDeriveBNTensorDescriptor(
 //=============================================================================
 
 hipdnnStatus_t hipdnnBatchNormalizationForwardTraining(
-    hipdnnHandle_t handle, hipdnnBatchNormMode_t mode, void *alpha, void *beta,
-    const hipdnnTensorDescriptor_t xDesc, const void *x,
-    const hipdnnTensorDescriptor_t yDesc, void *y,
-    const hipdnnTensorDescriptor_t bnScaleBiasMeanVarDesc, void *bnScale,
-    void *bnBias, double exponentialAverageFactor, void *resultRunningMean,
-    void *resultRunningVariance, double epsilon, void *resultSaveMean,
+    hipdnnHandle_t handle, 
+    hipdnnBatchNormMode_t mode, 
+    const void *alpha,
+    const void *beta,
+    const hipdnnTensorDescriptor_t xDesc, 
+    const void *x,
+    const hipdnnTensorDescriptor_t yDesc, 
+    void *y,
+    const hipdnnTensorDescriptor_t bnScaleBiasMeanVarDesc, 
+    const void *bnScale,
+    const void *bnBias, 
+    double exponentialAverageFactor, 
+    void *resultRunningMean,
+    void *resultRunningVariance, 
+    double epsilon, 
+    void *resultSaveMean,
     void *resultSaveInvVariance) {
     HIPDNN_OPEN_LOG_C("Inside hipdnnBatchNormalizationForwardTraining");
     miopenBatchNormMode_t miBNMode;
     CHECK_HIPDNN(hipTomiopenBatchNormMode(mode, &miBNMode));
     CHECK_MIO(miopenBatchNormalizationForwardTraining(
-        (miopenHandle_t)handle, miBNMode, alpha, beta,
-        (miopenTensorDescriptor_t)xDesc, x, (miopenTensorDescriptor_t)yDesc, y,
-        (miopenTensorDescriptor_t)bnScaleBiasMeanVarDesc, bnScale, bnBias,
+        (miopenHandle_t)handle, miBNMode, 
+        const_cast<void*>(alpha), const_cast<void*>(beta),
+        (miopenTensorDescriptor_t)xDesc, x, 
+        (miopenTensorDescriptor_t)yDesc, y,
+        (miopenTensorDescriptor_t)bnScaleBiasMeanVarDesc, 
+        const_cast<void*>(bnScale), const_cast<void*>(bnBias),
         exponentialAverageFactor, resultRunningMean, resultRunningVariance,
         epsilon, resultSaveMean, resultSaveInvVariance));
     return HIPDNN_STATUS_SUCCESS;
@@ -3461,33 +3510,42 @@ hipdnnStatus_t hipdnnBatchNormalizationForwardInference(
 
 hipdnnStatus_t hipdnnCreateDropoutDescriptor(
     hipdnnDropoutDescriptor_t *dropoutDesc) {
-    HIPDNN_OPEN_LOG_E("hipdnnCreateDropoutDescriptor: NOT SUPPORTED."
-                      << std::flush);
-    return HIPDNN_STATUS_NOT_SUPPORTED;
+    CHECK_MIO(miopenCreateDropoutDescriptor((miopenDropoutDescriptor_t *)dropoutDesc));
+    return HIPDNN_STATUS_SUCCESS;
+}
+
+hipdnnStatus_t hipdnnDestroyDropoutDescriptor(
+    hipdnnDropoutDescriptor_t dropoutDesc) {
+    CHECK_MIO(miopenDestroyDropoutDescriptor((miopenDropoutDescriptor_t)dropoutDesc));
+    return HIPDNN_STATUS_SUCCESS;
 }
 
 hipdnnStatus_t hipdnnSetDropoutDescriptor(hipdnnDropoutDescriptor_t dropoutDesc,
                                           hipdnnHandle_t handle, float dropout,
                                           void *states, size_t stateSizeInBytes,
                                           unsigned long long seed) {
-    HIPDNN_OPEN_LOG_E("hipdnnSetDropoutDescriptor: NOT SUPPORTED."
-                      << std::flush);
-    return HIPDNN_STATUS_NOT_SUPPORTED;
+    CHECK_MIO(miopenSetDropoutDescriptor((miopenDropoutDescriptor_t)dropoutDesc,
+              (miopenHandle_t)handle, dropout, states, stateSizeInBytes, seed,
+              false, false, MIOPEN_RNG_PSEUDO_XORWOW));
+    return HIPDNN_STATUS_SUCCESS;
 }
 
 hipdnnStatus_t hipdnnDropoutGetStatesSize(hipdnnHandle_t handle,
                                           size_t *sizeInBytes) {
-    HIPDNN_OPEN_LOG_E("hipdnnDropoutGetStatesSize: NOT SUPPORTED."
-                      << std::endl
-                      << std::flush);
-    return HIPDNN_STATUS_NOT_SUPPORTED;
+    CHECK_MIO(miopenDropoutGetStatesSize((miopenHandle_t)handle, sizeInBytes));
+    return HIPDNN_STATUS_SUCCESS;
 }
 
-hipdnnStatus_t hipdnnDestroyDropoutDescriptor(
-    hipdnnDropoutDescriptor_t dropoutDesc) {
-    HIPDNN_OPEN_LOG_E("hipdnnDestroyDropoutDescriptor: NOT SUPPORTED."
-                      << std::flush);
-    return HIPDNN_STATUS_NOT_SUPPORTED;
+
+hipdnnStatus_t 
+hipdnnRestoreDropoutDescriptor(hipdnnDropoutDescriptor_t dropoutDesc,
+                               hipdnnHandle_t handle, float dropout,
+                               void *states, size_t stateSizeInBytes,
+                               unsigned long long seed) {
+    CHECK_MIO(miopenRestoreDropoutDescriptor((miopenDropoutDescriptor_t)dropoutDesc,
+              (miopenHandle_t)handle, dropout, states, stateSizeInBytes, seed,
+              false, false, MIOPEN_RNG_PSEUDO_XORWOW));
+    return HIPDNN_STATUS_SUCCESS;
 }
 
 hipdnnStatus_t hipdnnCreateReduceTensorDescriptor(
@@ -3765,3 +3823,83 @@ hipdnnStatus_t hipdnnDestroyFusionPlan(
 }
 
 //==============================================================================
+
+hipdnnStatus_t 
+hipdnnCreateCTCLossDescriptor(hipdnnCTCLossDescriptor_t *ctcLossDesc) {
+
+    CHECK_MIO(miopenCreateCTCLossDescriptor((miopenCTCLossDescriptor_t *)ctcLossDesc));
+    return HIPDNN_STATUS_SUCCESS;
+}
+
+hipdnnStatus_t 
+hipdnnDestroyCTCLossDescriptor(hipdnnCTCLossDescriptor_t ctcLossDesc) {
+    CHECK_MIO(miopenDestroyCTCLossDescriptor((miopenCTCLossDescriptor_t)ctcLossDesc));
+    return HIPDNN_STATUS_SUCCESS;
+}
+
+hipdnnStatus_t 
+hipdnnGetCTCLossDescriptor(hipdnnCTCLossDescriptor_t ctcLossDesc, 
+                           hipdnnDataType_t *dataType, 
+                           int* blank_label_id, 
+                           bool* apply_softmax_layer) {
+    miopenDataType_t miDT;
+    CHECK_MIO(miopenGetCTCLossDescriptor((miopenCTCLossDescriptor_t) ctcLossDesc, 
+              &miDT, blank_label_id, apply_softmax_layer));
+    CHECK_HIPDNN(miopenTohipDataType(miDT, dataType));
+    return HIPDNN_STATUS_SUCCESS;
+}
+
+hipdnnStatus_t 
+hipdnnSetCTCLossDescriptor(hipdnnCTCLossDescriptor_t ctcLossDesc, 
+                           hipdnnDataType_t dataType, 
+                           const int blank_label_id, 
+                           bool apply_softmax_layer) {
+    miopenDataType_t miDT;
+    CHECK_HIPDNN(hipTomiopenDataType(dataType, &miDT));
+    CHECK_MIO(miopenSetCTCLossDescriptor((miopenCTCLossDescriptor_t) ctcLossDesc, 
+              miDT, blank_label_id, apply_softmax_layer));
+    return HIPDNN_STATUS_SUCCESS;
+}
+
+hipdnnStatus_t 
+hipdnnGetCTCLossWorkspaceSize(hipdnnHandle_t handle,
+                              const hipdnnTensorDescriptor_t probsDesc,
+                              const hipdnnTensorDescriptor_t gradientsDesc,
+                              const int* labels,
+                              const int* labelLengths,
+                              const int* inputLengths,
+                              hipdnnCTCLossAlgo_t algo,
+                              const hipdnnCTCLossDescriptor_t ctcLossDesc,
+                              size_t* workSpaceSize) {
+    miopenCTCLossAlgo_t miAlgo;
+    CHECK_HIPDNN(hipTomiopenCTCLossAlgo(algo, &miAlgo));
+    CHECK_MIO(miopenGetCTCLossWorkspaceSize((miopenHandle_t) handle,
+            (miopenTensorDescriptor_t) probsDesc, (miopenTensorDescriptor_t) gradientsDesc,
+            labels, labelLengths, inputLengths, miAlgo,
+            (miopenCTCLossDescriptor_t) ctcLossDesc, workSpaceSize));
+    return HIPDNN_STATUS_SUCCESS;
+}
+
+hipdnnStatus_t 
+hipdnnCTCLoss(hipdnnHandle_t handle,
+              const hipdnnTensorDescriptor_t probsDesc,
+              const void* probs,
+              const int* labels,
+              const int* labelLengths,
+              const int* inputLengths,
+              void* losses,
+              const hipdnnTensorDescriptor_t gradientsDesc,
+              void* gradients,
+              hipdnnCTCLossAlgo_t algo,
+              const hipdnnCTCLossDescriptor_t ctcLossDesc,
+              void* workSpace,
+              size_t* workSpaceSize) {
+    miopenCTCLossAlgo_t miAlgo;
+    CHECK_HIPDNN(hipTomiopenCTCLossAlgo(algo, &miAlgo));
+    CHECK_MIO(miopenCTCLoss((miopenHandle_t) handle, (miopenTensorDescriptor_t) probsDesc, 
+                             probs, labels, labelLengths, inputLengths, losses, 
+                             (miopenTensorDescriptor_t) gradientsDesc, gradients,
+                             miAlgo, (miopenCTCLossDescriptor_t) ctcLossDesc, 
+                             workSpace, *workSpaceSize));
+    return HIPDNN_STATUS_SUCCESS;
+}

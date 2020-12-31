@@ -367,6 +367,12 @@ typedef enum {
     HIPDNN_HORIZONTAL_FUSION = 1,
 } hipdnnFusionDirection_t;
 
+//--------------------------- CTCLoss datatypes ---------------------------------
+
+typedef enum {
+    HIPDNN_CTC_LOSS_ALGO_DETERMINISTIC = 0,
+} hipdnnCTCLossAlgo_t;
+
 //------------------------------- Opaque Pointers ------------------------------
 
 typedef void *hipdnnHandle_t;
@@ -402,6 +408,8 @@ typedef void *hipdnnFusionPlanDescriptor_t;
 typedef void *hipdnnFusionOpDescriptor_t;
 
 typedef void *hipdnnOperatorArgs_t;
+
+typedef void *hipdnnCTCLossDescriptor_t;
 
 //==============================================================================
 
@@ -613,6 +621,15 @@ hipdnnSetConvolutionNdDescriptor( hipdnnConvolutionDescriptor_t convDesc,
                                   const int dilationA[],
                                   hipdnnConvolutionMode_t mode,
                                   hipdnnDataType_t computeType);  /* convolution data type */
+hipdnnStatus_t
+hipdnnGetConvolutionNdDescriptor( hipdnnConvolutionDescriptor_t convDesc,
+                                  int requestedSpatialDim,
+                                  int* spatialDim,
+                                  int* padA,
+                                  int* strideA,
+                                  int* dilationA,
+                                  hipdnnConvolutionMode_t* mode,
+                                  hipdnnDataType_t* computeType);
 
 hipdnnStatus_t
 hipdnnDestroyConvolutionDescriptor( hipdnnConvolutionDescriptor_t convDesc);
@@ -1036,22 +1053,24 @@ hipdnnStatus_t hipdnnDeriveBNTensorDescriptor(
                                          const hipdnnTensorDescriptor_t xDesc,
                                          hipdnnBatchNormMode_t mode);
 
-hipdnnStatus_t
-hipdnnBatchNormalizationForwardTraining( hipdnnHandle_t handle,
-                          hipdnnBatchNormMode_t mode,
-                          void *alpha, void *beta,
-                          const hipdnnTensorDescriptor_t xDesc,
-                          const void *x,
-                          const hipdnnTensorDescriptor_t yDesc,
-                          void *y,
-                          const hipdnnTensorDescriptor_t bnScaleBiasMeanVarDesc,
-                          void *bnScale, void *bnBias,
-                          double exponentialAverageFactor,
-                          void *resultRunningMean,
-                          void *resultRunningVariance,
-                          double epsilon,
-                          void *resultSaveMean,
-                          void *resultSaveInvVariance);
+hipdnnStatus_t hipdnnBatchNormalizationForwardTraining(
+    hipdnnHandle_t handle, 
+    hipdnnBatchNormMode_t mode, 
+    const void *alpha,
+    const void *beta,
+    const hipdnnTensorDescriptor_t xDesc, 
+    const void *x,
+    const hipdnnTensorDescriptor_t yDesc, 
+    void *y,
+    const hipdnnTensorDescriptor_t bnScaleBiasMeanVarDesc, 
+    const void *bnScale,
+    const void *bnBias, 
+    double exponentialAverageFactor, 
+    void *resultRunningMean,
+    void *resultRunningVariance, 
+    double epsilon, 
+    void *resultSaveMean,
+    void *resultSaveInvVariance);
 
 hipdnnStatus_t
 hipdnnnBatchNormalizationForwardInference( hipdnnHandle_t handle,
@@ -1109,6 +1128,9 @@ hipdnnStatus_t
 hipdnnCreateDropoutDescriptor( hipdnnDropoutDescriptor_t *dropoutDesc);
 
 hipdnnStatus_t
+hipdnnDestroyDropoutDescriptor( hipdnnDropoutDescriptor_t dropoutDesc);
+
+hipdnnStatus_t
 hipdnnDropoutGetStatesSize(hipdnnHandle_t handle, size_t *sizeInBytes);
 
 hipdnnStatus_t
@@ -1120,7 +1142,12 @@ hipdnnSetDropoutDescriptor( hipdnnDropoutDescriptor_t dropoutDesc,
                             unsigned long long seed);
 
 hipdnnStatus_t
-hipdnnDestroyDropoutDescriptor( hipdnnDropoutDescriptor_t dropoutDesc);
+hipdnnRestoreDropoutDescriptor(hipdnnDropoutDescriptor_t dropoutDesc,
+                               hipdnnHandle_t handle,
+                               float dropout,
+                               void *states,
+                               size_t stateSizeInBytes,
+                               unsigned long long seed);
 
 //======================= Recurrent Neural Net =================================
 
@@ -1456,6 +1483,48 @@ hipdnnStatus_t hipdnnDestroyOperatorArgs( hipdnnOperatorArgs_t args);
 hipdnnStatus_t
 hipdnnDestroyFusionPlan( hipdnnFusionPlanDescriptor_t fusePlanDesc);
 
+//========================== CTCLoss API ========================================
+
+hipdnnStatus_t 
+hipdnnCreateCTCLossDescriptor(hipdnnCTCLossDescriptor_t *CTCLossDesc);
+
+hipdnnStatus_t 
+hipdnnDestroyCTCLossDescriptor(hipdnnCTCLossDescriptor_t CTCLossDesc);
+
+hipdnnStatus_t 
+hipdnnGetCTCLossDescriptor(hipdnnCTCLossDescriptor_t ctcLossDesc, 
+                           hipdnnDataType_t* dataType, 
+                           int* blank_label_id, 
+                           bool* apply_softmax_layer);
+hipdnnStatus_t 
+hipdnnSetCTCLossDescriptor(hipdnnCTCLossDescriptor_t ctcLossDesc, 
+                           hipdnnDataType_t dataType, 
+                           const int blank_label_id, 
+                           bool apply_softmax_layer);
+hipdnnStatus_t 
+hipdnnGetCTCLossWorkspaceSize(hipdnnHandle_t handle,
+                              const hipdnnTensorDescriptor_t probsDesc,
+                              const hipdnnTensorDescriptor_t gradientsDesc,
+                              const int* labels,
+                              const int* labelLengths,
+                              const int* inputLengths,
+                              hipdnnCTCLossAlgo_t algo,
+                              const hipdnnCTCLossDescriptor_t ctcLossDesc,
+                              size_t* workSpaceSize);
+
+hipdnnStatus_t hipdnnCTCLoss(hipdnnHandle_t handle,
+                             const hipdnnTensorDescriptor_t probsDesc,
+                             const void* probs,
+                             const int* labels,
+                             const int* labelLengths,
+                             const int* inputLengths,
+                             void* losses,
+                             const hipdnnTensorDescriptor_t gradientsDesc,
+                             void* gradients,
+                             hipdnnCTCLossAlgo_t algo,
+                             const hipdnnCTCLossDescriptor_t ctcLossDesc,
+                             void* workSpace,
+                             size_t workSpaceSize);
 //==============================================================================
 
 const char *hipdnnGetErrorString(hipdnnStatus_t status);
