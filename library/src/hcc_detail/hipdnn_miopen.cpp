@@ -22,6 +22,7 @@
 
 #include <assert.h>
 #include <hcc_detail/hipdnn_miopen.h>
+#include <hip/hip_fp16.h>
 #include <hipdnn.h>
 #include <logger.h>
 #include <stdint.h>
@@ -980,10 +981,10 @@ hipdnnStatus_t accumulateGradients(void *gradient, void *gradientPrior,
     }
     else if (*dataType == miopenHalf){
 
-    hc::half betaVal = *(static_cast<const hc::half *>(beta));
-    hc::half *gradientF = static_cast<hc::half *>(gradient);
-    hc::half *gradientPriorF = static_cast<hc::half *>(gradientPrior);
-    hipLaunchKernelGGL((TensorAdd<hc::half>), dim3(blocks), dim3(threadsPerBlock),
+    half betaVal = *(static_cast<const half *>(beta));
+    __half *gradientF = static_cast<__half *>(gradient);
+    __half *gradientPriorF = static_cast<__half *>(gradientPrior);
+    hipLaunchKernelGGL((TensorAdd<__half>), dim3(blocks), dim3(threadsPerBlock),
                        0, 0, gradientF, gradientPriorF, betaVal, totalElements);
     CHECK_HIP(hipDeviceSynchronize());
     }
