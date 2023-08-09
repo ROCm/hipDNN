@@ -981,7 +981,7 @@ hipdnnStatus_t accumulateGradients(void *gradient, void *gradientPrior,
     }
     else if (*dataType == miopenHalf){
 
-    __half betaVal = *(static_cast<const __half *>(beta));
+    half betaVal = *(static_cast<const half *>(beta));
     __half *gradientF = static_cast<__half *>(gradient);
     __half *gradientPriorF = static_cast<__half *>(gradientPrior);
     hipLaunchKernelGGL((TensorAdd<__half>), dim3(blocks), dim3(threadsPerBlock),
