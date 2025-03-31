@@ -1,6 +1,3 @@
-# Prerequisites
-*.d
-
 # Compiled Object files
 *.slo
 *.lo
@@ -10,6 +7,7 @@
 # Precompiled Headers
 *.gch
 *.pch
+*.ipch
 
 # Compiled Dynamic libraries
 *.so
@@ -18,7 +16,6 @@
 
 # Fortran module files
 *.mod
-*.smod
 
 # Compiled Static libraries
 *.lai
@@ -30,3 +27,41 @@
 *.exe
 *.out
 *.app
+
+# vim tags
+tags
+.tags
+.*.swp
+
+# Editors
+.vscode
+
+# build-in-source directory
+
+# emacs temporary/backup files
+.\#*
+\#*\#
+*~
+
+# GDB temporary files
+.gdb_history
+install.dir*
+
+# documentation artifacts
+_build/
+_images/
+_static/
+_templates/
+_toc.yml
+_doxygen/
+
+# JetBrains IDE
+.idea/
+cmake-build*/
+build*/
+
+# Python virtualenv
+.venv/
+
+# Python cache
+__pycache__/
