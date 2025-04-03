@@ -5,6 +5,7 @@
   - format the entire repo
 - front end portion
 - front end integration tests
+- call integration tests just test, then add readme for whats expected.
 
 ## VSCode Setup
 

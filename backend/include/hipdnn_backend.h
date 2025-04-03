@@ -1,12 +1,13 @@
 #pragma once
 
-#define HIPDNN_EXPORT __attribute__((visibility("default")))
+// Cmake Generated export header.
+#include "hipdnn_backend_export.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-    HIPDNN_EXPORT int publicFunctionHello();
+    HIPDNN_BACKEND_EXPORT int publicFunctionHello();
 
 #ifdef __cplusplus
 }

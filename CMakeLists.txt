@@ -27,13 +27,14 @@
 cmake_minimum_required(VERSION 3.21...3.22)
 
 
+set(CMAKE_TOOLCHAIN_FILE "${CMAKE_SOURCE_DIR}/cmake/ClangToolChain.cmake" CACHE STRING "Toolchain file")
 set(HIPDNN_VERSION "0.0.1")
 project(
     hipDNN
     VERSION ${HIPDNN_VERSION}
     LANGUAGES CXX)
     
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 17)#
 
 list(
     APPEND
@@ -43,6 +44,7 @@ list(
     /opt/rocm/lib/cmake/hip
     ${HIP_DIR}/cmake
 )
+
 
 include(cmake/Dependencies.cmake)
 rocroller_add_dependency(
@@ -58,11 +60,11 @@ include(ROCMClients)
 
 option(HIP_DNN_BUILD_BACKEND "Build the backend code" ON)
 
-
 # Add global compile options
-# fvisibility=hidden: hides all exported symbols by default. Must specify __attribute__((visibility("default"))) for symbols that should be exported.
-add_compile_options(-fvisibility=hidden)
+# fPIC: generates position-independent code,
+add_compile_options(-fPIC)
 if(HIP_DNN_BUILD_BACKEND)
     add_subdirectory(backend)
-    add_subdirectory(integrationtests)
 endif()
+
+add_subdirectory(integrationtests)
