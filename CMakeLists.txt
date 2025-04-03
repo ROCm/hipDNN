@@ -59,12 +59,17 @@ include(ROCMInstallTargets)
 include(ROCMClients)
 
 option(HIP_DNN_BUILD_BACKEND "Build the backend code" ON)
+option(HIP_DNN_BUILD_FRONTEND "Build the frontend code" ON)
 
 # Add global compile options
 # fPIC: generates position-independent code,
 add_compile_options(-fPIC)
 if(HIP_DNN_BUILD_BACKEND)
     add_subdirectory(backend)
+endif()
+
+if(HIP_DNN_BUILD_FRONTEND)
+    add_subdirectory(frontend)
 endif()
 
 add_subdirectory(tests)
