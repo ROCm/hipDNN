@@ -47,7 +47,7 @@ list(
 
 
 include(cmake/Dependencies.cmake)
-rocroller_add_dependency(
+hipdnn_add_dependency(
     ROCmCMakeBuildTools
     VERSION 0.11.0
     FIND_PACKAGE_ARGS NO_DEFAULT_PATH # PATHS "${ROCM_PATH}"

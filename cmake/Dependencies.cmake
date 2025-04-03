@@ -27,11 +27,11 @@ cmake_minimum_required(VERSION 3.21...3.22)
 
 include(FetchContent)
 
-option(ROCROLLER_NO_DOWNLOAD
+option(HIPDNN_NO_DOWNLOAD
        "Disables downloading of any external dependencies" OFF
 )
 
-if(ROCROLLER_NO_DOWNLOAD)
+if(HIPDNN_NO_DOWNLOAD)
     set(FETCHCONTENT_FULLY_DISCONNECTED
         OFF
         CACHE BOOL "Don't attempt to download or update anything" FORCE
@@ -39,16 +39,16 @@ if(ROCROLLER_NO_DOWNLOAD)
 endif()
 
 # Dependencies where the local version should be used, if available
-set(_rocroller_all_local_deps
+set(_hipdnn_all_local_deps
     ROCmCMakeBuildTools
 )
 # Dependencies where we never look for a local version
-set(_rocroller_all_remote_deps
+set(_hipdnn_all_remote_deps
     boost
     googletest
 )
 
-# rocroller_add_dependency(
+# hipdnn_add_dependency(
 #   dep_name
 #   [NO_LOCAL]
 #   [VERSION version]
@@ -59,7 +59,7 @@ set(_rocroller_all_remote_deps
 #      [DEB deb_package_name]
 #      [RPM rpm_package_name]]
 # )
-function(rocroller_add_dependency dep_name)
+function(hipdnn_add_dependency dep_name)
     set(options NO_LOCAL)
     set(oneValueArgs VERSION HASH)
     set(multiValueArgs FIND_PACKAGE_ARGS PACKAGE_NAME COMPONENTS)
@@ -71,7 +71,7 @@ function(rocroller_add_dependency dep_name)
         ${ARGN}
     )
 
-    if(dep_name IN_LIST _rocroller_all_local_deps)
+    if(dep_name IN_LIST _hipdnn_all_local_deps)
         if(NOT PARSE_NO_LOCAL)
             find_package(
                 ${dep_name} ${PARSE_VERSION} QUIET ${PARSE_FIND_PACKAGE_ARGS}
@@ -92,7 +92,7 @@ function(rocroller_add_dependency dep_name)
                 )
             endforeach()
         endif()
-    elseif(dep_name IN_LIST _rocroller_all_remote_deps)
+    elseif(dep_name IN_LIST _hipdnn_all_remote_deps)
         message(TRACE "Will build ${dep_name} locally")
         _build_local()
     else()
@@ -200,10 +200,10 @@ function(_fetch_googletest VERSION HASH)
         ${HASH_ARG}
     )
 
-    option(ROCROLLER_GTEST_SHARED "Build GTest as a shared library." OFF)
+    option(HIPDNN_GTEST_SHARED "Build GTest as a shared library." OFF)
     _save_var(BUILD_SHARED_LIBS)
     set(BUILD_SHARED_LIBS
-        ${ROCROLLER_GTEST_SHARED}
+        ${HIPDNN_GTEST_SHARED}
         CACHE INTERNAL ""
     )
     set(INSTALL_GTEST OFF)

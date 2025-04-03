@@ -1,4 +1,4 @@
-rocroller_add_dependency(googletest VERSION 1.12.1)
+hipdnn_add_dependency(googletest VERSION 1.12.1)
 
 add_executable(hipdnn_backend_tests test_hello_world.cpp)
 

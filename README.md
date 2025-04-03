@@ -1,10 +1,9 @@
 # hipDNN-internal
 
 ## Repo setup todo
-- front end portion
-- front end integration tests
+- front end integration tests(todo, chat about this monday with team.)
+    - Do we want integration tests how I set them up, do they make sense for the front end split out.
 - Integrate coverage build stuff
-- rename rocroller stuff
 
 ## Ci Setup todo
 - Ask to get coverage build setup
