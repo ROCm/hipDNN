@@ -2,7 +2,8 @@
 
 namespace hipdnn_backend
 {
-    const char* HelloWorld::getMessage() {
+    const char* HelloWorld::getMessage()
+    {
         return "Hello, World!";
     }
 }

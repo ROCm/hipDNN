@@ -34,7 +34,7 @@ project(
     VERSION ${HIPDNN_VERSION}
     LANGUAGES CXX)
     
-set(CMAKE_CXX_STANDARD 17)#
+set(CMAKE_CXX_STANDARD 17)
 
 list(
     APPEND

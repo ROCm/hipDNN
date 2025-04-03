@@ -1,5 +1,5 @@
-#include <gtest/gtest.h>
 #include "hello_world.hpp"
+#include <gtest/gtest.h>
 
 using namespace hipdnn_backend;
 

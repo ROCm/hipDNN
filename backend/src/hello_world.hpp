@@ -2,9 +2,9 @@
 
 namespace hipdnn_backend
 {
-    class HelloWorld 
+    class HelloWorld
     {
-        public:
-            static const char* getMessage();
+    public:
+        static const char* getMessage();
     };
 }

@@ -7,7 +7,7 @@
 extern "C" {
 #endif
 
-    HIPDNN_BACKEND_EXPORT int publicFunctionHello();
+HIPDNN_BACKEND_EXPORT int publicFunctionHello();
 
 #ifdef __cplusplus
 }
