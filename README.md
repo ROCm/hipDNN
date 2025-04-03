@@ -5,7 +5,6 @@
   - format the entire repo
 - front end portion
 - front end integration tests
-- call integration tests just test, then add readme for whats expected.
 
 ## VSCode Setup
 
@@ -16,4 +15,4 @@
 
 ### Test Explorer
 You can use https://github.com/matepek/vscode-catch2-test-adapter to have vscode test explorer auto load the
-gtest binaries into the editor.
+gtest binaries into the editor.d

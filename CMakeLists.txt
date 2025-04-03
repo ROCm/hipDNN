@@ -67,4 +67,4 @@ if(HIP_DNN_BUILD_BACKEND)
     add_subdirectory(backend)
 endif()
 
-add_subdirectory(integrationtests)
+add_subdirectory(tests)
