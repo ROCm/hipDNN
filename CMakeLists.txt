@@ -59,7 +59,10 @@ include(ROCMClients)
 option(HIP_DNN_BUILD_BACKEND "Build the backend code" ON)
 
 
-
+# Add global compile options
+# fvisibility=hidden: hides all exported symbols by default. Must specify __attribute__((visibility("default"))) for symbols that should be exported.
+add_compile_options(-fvisibility=hidden)
 if(HIP_DNN_BUILD_BACKEND)
     add_subdirectory(backend)
+    add_subdirectory(integrationtests)
 endif()

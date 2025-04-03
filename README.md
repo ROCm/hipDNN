@@ -1,5 +1,11 @@
 # hipDNN-internal
 
+## Repo setup todo
+- clang format
+  - format the entire repo
+- front end portion
+- front end integration tests
+
 ## VSCode Setup
 
 ### CMake

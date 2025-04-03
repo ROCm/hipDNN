@@ -1,13 +1,12 @@
 #pragma once
 
-//nothing for now, eventually setup as needed.
-#define HIPDNN_EXPORT 
+#define HIPDNN_EXPORT __attribute__((visibility("default")))
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-HIPDNN_EXPORT int publicFunctionHello();
+    HIPDNN_EXPORT int publicFunctionHello();
 
 #ifdef __cplusplus
 }
