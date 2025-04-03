@@ -1,4 +1,4 @@
-#include "hello_world.h"
+#include "hello_world.hpp"
 
 namespace hipdnn_backend
 {
