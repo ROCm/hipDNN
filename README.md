@@ -3,7 +3,7 @@
 ## Repo setup todo
 - front end integration tests(todo, chat about this monday with team.)
     - Do we want integration tests how I set them up, do they make sense for the front end split out.
-- Integrate coverage build stuff
+- create install package scaffolding
 
 ## Ci Setup todo
 - Ask to get coverage build setup
@@ -22,3 +22,5 @@
 ### Test Explorer
 You can use https://github.com/matepek/vscode-catch2-test-adapter to have vscode test explorer auto load the
 gtest binaries into the editor
+
+test

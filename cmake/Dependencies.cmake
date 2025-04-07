@@ -185,6 +185,23 @@ macro(_build_local)
     endforeach()
 endmacro()
 
+function(_fetch_boost VERSION HASH)
+    _determine_git_tag("boost-" "boost-1.81.0")
+    FetchContent_Declare(
+        boost
+        URL https://github.com/boostorg/boost/releases/download/${GIT_TAG}/${GIT_TAG}.tar.gz
+    )
+    _save_var(BUILD_TESTING)
+    set(BUILD_TESTING OFF)
+    _save_var(BUILD_SHARED_LIBS)
+    set(BUILD_SHARED_LIBS OFF)
+    FetchContent_MakeAvailable(boost)
+    _restore_var(BUILD_SHARED_LIBS)
+    _restore_var(BUILD_TESTING)
+    _exclude_from_all(${boost_SOURCE_DIR})
+    _mark_targets_as_system(${boost_SOURCE_DIR})
+endfunction()
+
 function(_fetch_googletest VERSION HASH)
     if(VERSION AND VERSION STREQUAL 1.12.1)
         set(GIT_TAG release-1.12.1)

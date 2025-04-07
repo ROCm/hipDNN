@@ -1,3 +1,5 @@
+hipdnn_add_dependency(boost)
+
 add_library(hipdnn_backend_private
     hello_world.cpp
     )
