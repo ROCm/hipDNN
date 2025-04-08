@@ -26,7 +26,6 @@
 
 cmake_minimum_required(VERSION 3.21...3.22)
 
-
 set(CMAKE_TOOLCHAIN_FILE "${CMAKE_SOURCE_DIR}/cmake/ClangToolChain.cmake" CACHE STRING "Toolchain file")
 set(HIPDNN_VERSION "0.0.1")
 project(
@@ -47,6 +46,7 @@ list(
 
 
 include(cmake/Dependencies.cmake)
+include(cmake/ClangCheck.cmake)
 hipdnn_add_dependency(
     ROCmCMakeBuildTools
     VERSION 0.11.0
