@@ -22,5 +22,3 @@
 ### Test Explorer
 You can use https://github.com/matepek/vscode-catch2-test-adapter to have vscode test explorer auto load the
 gtest binaries into the editor
-
-test

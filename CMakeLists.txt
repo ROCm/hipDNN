@@ -81,6 +81,9 @@ endif()
 add_compile_options(-fPIC ${EXTRA_COMPILE_OPTIONS})
 add_link_options(${EXTRA_LINK_OPTIONS})
 
+set(HIP_DNN_SDK_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/sdk/include")
+add_subdirectory(sdk)
+
 if(HIP_DNN_BUILD_BACKEND)
     add_subdirectory(backend)
 endif()

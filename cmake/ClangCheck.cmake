@@ -6,7 +6,7 @@ file(GLOB_RECURSE SRC_FILES
     *.c *.h *.cpp *.hpp
 )
 
-list(FILTER SRC_FILES EXCLUDE REGEX "/build*/")
+list(FILTER SRC_FILES EXCLUDE REGEX "/build*/|/sdk/include*/")
 
 add_custom_target(
     check_format

@@ -46,6 +46,7 @@ set(_hipdnn_all_local_deps
 set(_hipdnn_all_remote_deps
     boost
     googletest
+    flatbuffers
 )
 
 # hipdnn_add_dependency(
@@ -190,6 +191,7 @@ function(_fetch_boost VERSION HASH)
     FetchContent_Declare(
         boost
         URL https://github.com/boostorg/boost/releases/download/${GIT_TAG}/${GIT_TAG}.tar.gz
+        DOWNLOAD_EXTRACT_TIMESTAMP TRUE
     )
     _save_var(BUILD_TESTING)
     set(BUILD_TESTING OFF)
@@ -215,6 +217,7 @@ function(_fetch_googletest VERSION HASH)
         googletest
         URL https://github.com/google/googletest/archive/refs/tags/${GIT_TAG}.zip
         ${HASH_ARG}
+        DOWNLOAD_EXTRACT_TIMESTAMP TRUE
     )
 
     option(HIPDNN_GTEST_SHARED "Build GTest as a shared library." OFF)
@@ -233,6 +236,40 @@ function(_fetch_googletest VERSION HASH)
     target_compile_options(gmock PUBLIC ${EXTRA_COMPILE_OPTIONS})
 endfunction()
 
+function(_fetch_flatbuffers VERSION HASH)
+    _determine_git_tag(v 23.1.21)
+    
+    _save_var(FLATBUFFERS_BUILD_FLATC)
+    _save_var(FLATBUFFERS_INSTALL)
+    _save_var(FLATBUFFERS_BUILD_TESTS)
+    _save_var(FLATBUFFERS_BUILD_FLATHASH)
+    _save_var(FLATBUFFERS_ENABLE_PCH)
+
+    set(FLATBUFFERS_BUILD_FLATC ON)
+    set(FLATBUFFERS_INSTALL OFF)
+    set(FLATBUFFERS_BUILD_TESTS OFF)
+    set(FLATBUFFERS_BUILD_FLATHASH OFF)
+    set(FLATBUFFERS_ENABLE_PCH ON)
+
+    FetchContent_Declare(
+        flatbuffers
+        GIT_REPOSITORY https://github.com/google/flatbuffers.git
+        GIT_TAG ${GIT_TAG}
+        DOWNLOAD_EXTRACT_TIMESTAMP TRUE
+    )
+
+    FetchContent_MakeAvailable(flatbuffers)
+
+    _restore_var(FLATBUFFERS_BUILD_FLATC)
+    _restore_var(FLATBUFFERS_INSTALL)
+    _restore_var(FLATBUFFERS_BUILD_TESTS)
+    _restore_var(FLATBUFFERS_BUILD_FLATHASH)
+    _restore_var(FLATBUFFERS_ENABLE_PCH)
+    
+    _exclude_from_all(${flatbuffers_SOURCE_DIR})
+    _mark_targets_as_system(${flatbuffers_SOURCE_DIR})
+endfunction()
+
 function(_fetch_ROCmCMakeBuildTools VERSION HASH)
     _determine_git_tag(FALSE rocm-6.3.0)
     FetchContent_Declare(
@@ -240,6 +277,7 @@ function(_fetch_ROCmCMakeBuildTools VERSION HASH)
         GIT_REPOSITORY https://github.com/ROCm/rocm-cmake.git
         GIT_TAG ${GIT_TAG}
         SOURCE_SUBDIR "DISABLE ADDING TO BUILD"
+        DOWNLOAD_EXTRACT_TIMESTAMP TRUE
         # Don't consume the build/test targets of ROCmCMakeBuildTools
     )
     FetchContent_MakeAvailable(ROCmCMakeBuildTools)
