@@ -1,3 +1,6 @@
+# Copyright © Advanced Micro Devices, Inc., or its affiliates.
+# SPDX-License-Identifier:  MIT
+
 # use cmake glob_recurse to find all source files that are not in the build folder
 # this isnt the most ideal way to do this, but it works for now.  I attempted to use a find . command but kept hitting issues
 # the find command I tried:  COMMAND find ${CMAKE_SOURCE_DIR}/* -regex '.*\.\(cpp\|hpp\|c\|h\)' -not -path \"${CMAKE_BINARY_DIR}/*\" -exec clang-format-12 --dry-run --Werror {} +

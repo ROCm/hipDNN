@@ -1,3 +1,6 @@
+# Copyright © Advanced Micro Devices, Inc., or its affiliates.
+# SPDX-License-Identifier:  MIT
+
 # Ensure the /opt/rocm/llvm/bin path exists before setting the compilers
 
 if(UNIX)

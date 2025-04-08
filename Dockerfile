@@ -57,4 +57,6 @@ RUN apt-get update && \
 # Remove unnecessary rocm components
     apt-get remove -y miopen-hip
 
+RUN pip3 install --upgrade cmake==3.27.5
+
 ENV PATH="/opt/rocm:${PATH}"
