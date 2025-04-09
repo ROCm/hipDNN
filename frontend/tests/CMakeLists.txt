@@ -1,7 +1,11 @@
 # Copyright © Advanced Micro Devices, Inc., or its affiliates.
 # SPDX-License-Identifier:  MIT
 
-hipdnn_add_dependency(googletest VERSION 1.12.1)
+if(HIP_DNN_SKIP_TESTS)
+    message(STATUS "Skipping HIP-DNN Frontend Unit tests")
+    return()
+endif()
+
 include(GoogleTest)
 
 add_executable(hipdnn_frontend_tests 

@@ -1,7 +1,6 @@
 # Copyright © Advanced Micro Devices, Inc., or its affiliates.
 # SPDX-License-Identifier:  MIT
 
-hipdnn_add_dependency(googletest VERSION 1.12.1)
 include(GoogleTest)
 
 add_executable(public_hipdnn_backend_tests test_backend_public_functions.cpp)

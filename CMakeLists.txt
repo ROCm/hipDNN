@@ -29,6 +29,8 @@ hipdnn_add_dependency(
     VERSION 0.11.0
     FIND_PACKAGE_ARGS NO_DEFAULT_PATH # PATHS "${ROCM_PATH}"
 )
+hipdnn_add_dependency(boost)
+hipdnn_add_dependency(googletest VERSION 1.12.1)
 
 include(ROCMSetupVersion)
 include(ROCMCreatePackage)
@@ -37,6 +39,7 @@ include(ROCMClients)
 
 option(HIP_DNN_BUILD_BACKEND "Build the backend code" ON)
 option(HIP_DNN_BUILD_FRONTEND "Build the frontend code" ON)
+option(HIP_DNN_SKIP_TESTS "Skips building all tests" OFF)
 
 option(CODE_COVERAGE "Build with code coverage flags" OFF)
 

@@ -1,8 +1,6 @@
 # Copyright © Advanced Micro Devices, Inc., or its affiliates.
 # SPDX-License-Identifier:  MIT
 
-hipdnn_add_dependency(boost)
-
 add_library(hipdnn_backend_private
     hello_world.cpp
     )
