@@ -2,7 +2,12 @@
 # SPDX-License-Identifier: MIT
 hipdnn_add_dependency(flatbuffers VERSION 23.1.21)
 
-set(SCHEMA_FILES schemas/graph.fbs)
+set(SCHEMA_FILES 
+    schemas/batchnorm_inference_attributes.fbs
+    schemas/data_types.fbs
+    schemas/graph.fbs
+    schemas/pointwise_attributes.fbs
+    schemas/tensor_attributes.fbs )
 
 _save_var(FLATBUFFERS_FLATC_SCHEMA_EXTRA_ARGS)
 

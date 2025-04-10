@@ -9,7 +9,7 @@ endif()
 include(GoogleTest)
 
 add_executable(hipdnn_frontend_tests 
-    test_hipdnn_frontend_hello_world.cpp
+    test_hipdnn_frontend_api.cpp
 )
 
 target_link_libraries(hipdnn_frontend_tests gtest gtest_main pthread flatbuffers)
@@ -18,6 +18,7 @@ target_include_directories(hipdnn_frontend_tests PRIVATE
     ${HIP_DNN_SDK_INCLUDE_DIR}
 )
 
+add_dependencies(hipdnn_frontend_tests generate_hipdnn_sdk_headers)
 add_dependencies(check hipdnn_frontend_tests)
 gtest_discover_tests(
     hipdnn_frontend_tests

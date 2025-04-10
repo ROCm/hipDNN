@@ -13,26 +13,173 @@ static_assert(FLATBUFFERS_VERSION_MAJOR == 23 &&
               FLATBUFFERS_VERSION_REVISION == 21,
              "Non-compatible flatbuffers version included");
 
+#include "batchnorm_inference_attributes_generated.h"
+#include "data_types_generated.h"
+#include "pointwise_attributes_generated.h"
+#include "tensor_attributes_generated.h"
+
 namespace hipdnn {
 namespace sdk {
+
+struct Node;
+struct NodeBuilder;
+struct NodeT;
 
 struct Graph;
 struct GraphBuilder;
 struct GraphT;
 
+bool operator==(const NodeT &lhs, const NodeT &rhs);
+bool operator!=(const NodeT &lhs, const NodeT &rhs);
 bool operator==(const GraphT &lhs, const GraphT &rhs);
 bool operator!=(const GraphT &lhs, const GraphT &rhs);
 
-struct GraphT : public ::flatbuffers::NativeTable {
-  typedef Graph TableType;
-  std::string name{};
+enum NodeAttributes : uint8_t {
+  NodeAttributes_NONE = 0,
+  NodeAttributes_BatchNormInferenceAttributes = 1,
+  NodeAttributes_PointwiseAttributes = 2,
+  NodeAttributes_MIN = NodeAttributes_NONE,
+  NodeAttributes_MAX = NodeAttributes_PointwiseAttributes
 };
 
-struct Graph FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
-  typedef GraphT NativeTableType;
-  typedef GraphBuilder Builder;
+inline const NodeAttributes (&EnumValuesNodeAttributes())[3] {
+  static const NodeAttributes values[] = {
+    NodeAttributes_NONE,
+    NodeAttributes_BatchNormInferenceAttributes,
+    NodeAttributes_PointwiseAttributes
+  };
+  return values;
+}
+
+inline const char * const *EnumNamesNodeAttributes() {
+  static const char * const names[4] = {
+    "NONE",
+    "BatchNormInferenceAttributes",
+    "PointwiseAttributes",
+    nullptr
+  };
+  return names;
+}
+
+inline const char *EnumNameNodeAttributes(NodeAttributes e) {
+  if (::flatbuffers::IsOutRange(e, NodeAttributes_NONE, NodeAttributes_PointwiseAttributes)) return "";
+  const size_t index = static_cast<size_t>(e);
+  return EnumNamesNodeAttributes()[index];
+}
+
+template<typename T> struct NodeAttributesTraits {
+  static const NodeAttributes enum_value = NodeAttributes_NONE;
+};
+
+template<> struct NodeAttributesTraits<hipdnn::sdk::BatchNormInferenceAttributes> {
+  static const NodeAttributes enum_value = NodeAttributes_BatchNormInferenceAttributes;
+};
+
+template<> struct NodeAttributesTraits<hipdnn::sdk::PointwiseAttributes> {
+  static const NodeAttributes enum_value = NodeAttributes_PointwiseAttributes;
+};
+
+template<typename T> struct NodeAttributesUnionTraits {
+  static const NodeAttributes enum_value = NodeAttributes_NONE;
+};
+
+template<> struct NodeAttributesUnionTraits<hipdnn::sdk::BatchNormInferenceAttributesT> {
+  static const NodeAttributes enum_value = NodeAttributes_BatchNormInferenceAttributes;
+};
+
+template<> struct NodeAttributesUnionTraits<hipdnn::sdk::PointwiseAttributesT> {
+  static const NodeAttributes enum_value = NodeAttributes_PointwiseAttributes;
+};
+
+struct NodeAttributesUnion {
+  NodeAttributes type;
+  void *value;
+
+  NodeAttributesUnion() : type(NodeAttributes_NONE), value(nullptr) {}
+  NodeAttributesUnion(NodeAttributesUnion&& u) FLATBUFFERS_NOEXCEPT :
+    type(NodeAttributes_NONE), value(nullptr)
+    { std::swap(type, u.type); std::swap(value, u.value); }
+  NodeAttributesUnion(const NodeAttributesUnion &);
+  NodeAttributesUnion &operator=(const NodeAttributesUnion &u)
+    { NodeAttributesUnion t(u); std::swap(type, t.type); std::swap(value, t.value); return *this; }
+  NodeAttributesUnion &operator=(NodeAttributesUnion &&u) FLATBUFFERS_NOEXCEPT
+    { std::swap(type, u.type); std::swap(value, u.value); return *this; }
+  ~NodeAttributesUnion() { Reset(); }
+
+  void Reset();
+
+  template <typename T>
+  void Set(T&& val) {
+    typedef typename std::remove_reference<T>::type RT;
+    Reset();
+    type = NodeAttributesUnionTraits<RT>::enum_value;
+    if (type != NodeAttributes_NONE) {
+      value = new RT(std::forward<T>(val));
+    }
+  }
+
+  static void *UnPack(const void *obj, NodeAttributes type, const ::flatbuffers::resolver_function_t *resolver);
+  ::flatbuffers::Offset<void> Pack(::flatbuffers::FlatBufferBuilder &_fbb, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr) const;
+
+  hipdnn::sdk::BatchNormInferenceAttributesT *AsBatchNormInferenceAttributes() {
+    return type == NodeAttributes_BatchNormInferenceAttributes ?
+      reinterpret_cast<hipdnn::sdk::BatchNormInferenceAttributesT *>(value) : nullptr;
+  }
+  const hipdnn::sdk::BatchNormInferenceAttributesT *AsBatchNormInferenceAttributes() const {
+    return type == NodeAttributes_BatchNormInferenceAttributes ?
+      reinterpret_cast<const hipdnn::sdk::BatchNormInferenceAttributesT *>(value) : nullptr;
+  }
+  hipdnn::sdk::PointwiseAttributesT *AsPointwiseAttributes() {
+    return type == NodeAttributes_PointwiseAttributes ?
+      reinterpret_cast<hipdnn::sdk::PointwiseAttributesT *>(value) : nullptr;
+  }
+  const hipdnn::sdk::PointwiseAttributesT *AsPointwiseAttributes() const {
+    return type == NodeAttributes_PointwiseAttributes ?
+      reinterpret_cast<const hipdnn::sdk::PointwiseAttributesT *>(value) : nullptr;
+  }
+};
+
+
+inline bool operator==(const NodeAttributesUnion &lhs, const NodeAttributesUnion &rhs) {
+  if (lhs.type != rhs.type) return false;
+  switch (lhs.type) {
+    case NodeAttributes_NONE: {
+      return true;
+    }
+    case NodeAttributes_BatchNormInferenceAttributes: {
+      return *(reinterpret_cast<const hipdnn::sdk::BatchNormInferenceAttributesT *>(lhs.value)) ==
+             *(reinterpret_cast<const hipdnn::sdk::BatchNormInferenceAttributesT *>(rhs.value));
+    }
+    case NodeAttributes_PointwiseAttributes: {
+      return *(reinterpret_cast<const hipdnn::sdk::PointwiseAttributesT *>(lhs.value)) ==
+             *(reinterpret_cast<const hipdnn::sdk::PointwiseAttributesT *>(rhs.value));
+    }
+    default: {
+      return false;
+    }
+  }
+}
+
+inline bool operator!=(const NodeAttributesUnion &lhs, const NodeAttributesUnion &rhs) {
+    return !(lhs == rhs);
+}
+
+bool VerifyNodeAttributes(::flatbuffers::Verifier &verifier, const void *obj, NodeAttributes type);
+bool VerifyNodeAttributesVector(::flatbuffers::Verifier &verifier, const ::flatbuffers::Vector<::flatbuffers::Offset<void>> *values, const ::flatbuffers::Vector<uint8_t> *types);
+
+struct NodeT : public ::flatbuffers::NativeTable {
+  typedef Node TableType;
+  std::string name{};
+  hipdnn::sdk::NodeAttributesUnion attributes{};
+};
+
+struct Node FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef NodeT NativeTableType;
+  typedef NodeBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
-    VT_NAME = 4
+    VT_NAME = 4,
+    VT_ATTRIBUTES_TYPE = 6,
+    VT_ATTRIBUTES = 8
   };
   const ::flatbuffers::String *name() const {
     return GetPointer<const ::flatbuffers::String *>(VT_NAME);
@@ -40,10 +187,169 @@ struct Graph FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   ::flatbuffers::String *mutable_name() {
     return GetPointer<::flatbuffers::String *>(VT_NAME);
   }
+  hipdnn::sdk::NodeAttributes attributes_type() const {
+    return static_cast<hipdnn::sdk::NodeAttributes>(GetField<uint8_t>(VT_ATTRIBUTES_TYPE, 0));
+  }
+  const void *attributes() const {
+    return GetPointer<const void *>(VT_ATTRIBUTES);
+  }
+  template<typename T> const T *attributes_as() const;
+  const hipdnn::sdk::BatchNormInferenceAttributes *attributes_as_BatchNormInferenceAttributes() const {
+    return attributes_type() == hipdnn::sdk::NodeAttributes_BatchNormInferenceAttributes ? static_cast<const hipdnn::sdk::BatchNormInferenceAttributes *>(attributes()) : nullptr;
+  }
+  const hipdnn::sdk::PointwiseAttributes *attributes_as_PointwiseAttributes() const {
+    return attributes_type() == hipdnn::sdk::NodeAttributes_PointwiseAttributes ? static_cast<const hipdnn::sdk::PointwiseAttributes *>(attributes()) : nullptr;
+  }
+  void *mutable_attributes() {
+    return GetPointer<void *>(VT_ATTRIBUTES);
+  }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyOffset(verifier, VT_NAME) &&
            verifier.VerifyString(name()) &&
+           VerifyField<uint8_t>(verifier, VT_ATTRIBUTES_TYPE, 1) &&
+           VerifyOffset(verifier, VT_ATTRIBUTES) &&
+           VerifyNodeAttributes(verifier, attributes(), attributes_type()) &&
+           verifier.EndTable();
+  }
+  NodeT *UnPack(const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(NodeT *_o, const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static ::flatbuffers::Offset<Node> Pack(::flatbuffers::FlatBufferBuilder &_fbb, const NodeT* _o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
+};
+
+template<> inline const hipdnn::sdk::BatchNormInferenceAttributes *Node::attributes_as<hipdnn::sdk::BatchNormInferenceAttributes>() const {
+  return attributes_as_BatchNormInferenceAttributes();
+}
+
+template<> inline const hipdnn::sdk::PointwiseAttributes *Node::attributes_as<hipdnn::sdk::PointwiseAttributes>() const {
+  return attributes_as_PointwiseAttributes();
+}
+
+struct NodeBuilder {
+  typedef Node Table;
+  ::flatbuffers::FlatBufferBuilder &fbb_;
+  ::flatbuffers::uoffset_t start_;
+  void add_name(::flatbuffers::Offset<::flatbuffers::String> name) {
+    fbb_.AddOffset(Node::VT_NAME, name);
+  }
+  void add_attributes_type(hipdnn::sdk::NodeAttributes attributes_type) {
+    fbb_.AddElement<uint8_t>(Node::VT_ATTRIBUTES_TYPE, static_cast<uint8_t>(attributes_type), 0);
+  }
+  void add_attributes(::flatbuffers::Offset<void> attributes) {
+    fbb_.AddOffset(Node::VT_ATTRIBUTES, attributes);
+  }
+  explicit NodeBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  ::flatbuffers::Offset<Node> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = ::flatbuffers::Offset<Node>(end);
+    return o;
+  }
+};
+
+inline ::flatbuffers::Offset<Node> CreateNode(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    ::flatbuffers::Offset<::flatbuffers::String> name = 0,
+    hipdnn::sdk::NodeAttributes attributes_type = hipdnn::sdk::NodeAttributes_NONE,
+    ::flatbuffers::Offset<void> attributes = 0) {
+  NodeBuilder builder_(_fbb);
+  builder_.add_attributes(attributes);
+  builder_.add_name(name);
+  builder_.add_attributes_type(attributes_type);
+  return builder_.Finish();
+}
+
+inline ::flatbuffers::Offset<Node> CreateNodeDirect(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    const char *name = nullptr,
+    hipdnn::sdk::NodeAttributes attributes_type = hipdnn::sdk::NodeAttributes_NONE,
+    ::flatbuffers::Offset<void> attributes = 0) {
+  auto name__ = name ? _fbb.CreateString(name) : 0;
+  return hipdnn::sdk::CreateNode(
+      _fbb,
+      name__,
+      attributes_type,
+      attributes);
+}
+
+::flatbuffers::Offset<Node> CreateNode(::flatbuffers::FlatBufferBuilder &_fbb, const NodeT *_o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
+struct GraphT : public ::flatbuffers::NativeTable {
+  typedef Graph TableType;
+  std::string name{};
+  hipdnn::sdk::DataType compute_type = hipdnn::sdk::DataType_UNSET;
+  hipdnn::sdk::DataType intermediate_type = hipdnn::sdk::DataType_UNSET;
+  hipdnn::sdk::DataType io_type = hipdnn::sdk::DataType_UNSET;
+  std::vector<std::unique_ptr<hipdnn::sdk::TensorAttributesT>> tensors{};
+  std::vector<std::unique_ptr<hipdnn::sdk::NodeT>> nodes{};
+  GraphT() = default;
+  GraphT(const GraphT &o);
+  GraphT(GraphT&&) FLATBUFFERS_NOEXCEPT = default;
+  GraphT &operator=(GraphT o) FLATBUFFERS_NOEXCEPT;
+};
+
+struct Graph FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef GraphT NativeTableType;
+  typedef GraphBuilder Builder;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_NAME = 4,
+    VT_COMPUTE_TYPE = 6,
+    VT_INTERMEDIATE_TYPE = 8,
+    VT_IO_TYPE = 10,
+    VT_TENSORS = 12,
+    VT_NODES = 14
+  };
+  const ::flatbuffers::String *name() const {
+    return GetPointer<const ::flatbuffers::String *>(VT_NAME);
+  }
+  ::flatbuffers::String *mutable_name() {
+    return GetPointer<::flatbuffers::String *>(VT_NAME);
+  }
+  hipdnn::sdk::DataType compute_type() const {
+    return static_cast<hipdnn::sdk::DataType>(GetField<int8_t>(VT_COMPUTE_TYPE, 0));
+  }
+  bool mutate_compute_type(hipdnn::sdk::DataType _compute_type = static_cast<hipdnn::sdk::DataType>(0)) {
+    return SetField<int8_t>(VT_COMPUTE_TYPE, static_cast<int8_t>(_compute_type), 0);
+  }
+  hipdnn::sdk::DataType intermediate_type() const {
+    return static_cast<hipdnn::sdk::DataType>(GetField<int8_t>(VT_INTERMEDIATE_TYPE, 0));
+  }
+  bool mutate_intermediate_type(hipdnn::sdk::DataType _intermediate_type = static_cast<hipdnn::sdk::DataType>(0)) {
+    return SetField<int8_t>(VT_INTERMEDIATE_TYPE, static_cast<int8_t>(_intermediate_type), 0);
+  }
+  hipdnn::sdk::DataType io_type() const {
+    return static_cast<hipdnn::sdk::DataType>(GetField<int8_t>(VT_IO_TYPE, 0));
+  }
+  bool mutate_io_type(hipdnn::sdk::DataType _io_type = static_cast<hipdnn::sdk::DataType>(0)) {
+    return SetField<int8_t>(VT_IO_TYPE, static_cast<int8_t>(_io_type), 0);
+  }
+  const ::flatbuffers::Vector<::flatbuffers::Offset<hipdnn::sdk::TensorAttributes>> *tensors() const {
+    return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<hipdnn::sdk::TensorAttributes>> *>(VT_TENSORS);
+  }
+  ::flatbuffers::Vector<::flatbuffers::Offset<hipdnn::sdk::TensorAttributes>> *mutable_tensors() {
+    return GetPointer<::flatbuffers::Vector<::flatbuffers::Offset<hipdnn::sdk::TensorAttributes>> *>(VT_TENSORS);
+  }
+  const ::flatbuffers::Vector<::flatbuffers::Offset<hipdnn::sdk::Node>> *nodes() const {
+    return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<hipdnn::sdk::Node>> *>(VT_NODES);
+  }
+  ::flatbuffers::Vector<::flatbuffers::Offset<hipdnn::sdk::Node>> *mutable_nodes() {
+    return GetPointer<::flatbuffers::Vector<::flatbuffers::Offset<hipdnn::sdk::Node>> *>(VT_NODES);
+  }
+  bool Verify(::flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyOffset(verifier, VT_NAME) &&
+           verifier.VerifyString(name()) &&
+           VerifyField<int8_t>(verifier, VT_COMPUTE_TYPE, 1) &&
+           VerifyField<int8_t>(verifier, VT_INTERMEDIATE_TYPE, 1) &&
+           VerifyField<int8_t>(verifier, VT_IO_TYPE, 1) &&
+           VerifyOffset(verifier, VT_TENSORS) &&
+           verifier.VerifyVector(tensors()) &&
+           verifier.VerifyVectorOfTables(tensors()) &&
+           VerifyOffset(verifier, VT_NODES) &&
+           verifier.VerifyVector(nodes()) &&
+           verifier.VerifyVectorOfTables(nodes()) &&
            verifier.EndTable();
   }
   GraphT *UnPack(const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
@@ -58,6 +364,21 @@ struct GraphBuilder {
   void add_name(::flatbuffers::Offset<::flatbuffers::String> name) {
     fbb_.AddOffset(Graph::VT_NAME, name);
   }
+  void add_compute_type(hipdnn::sdk::DataType compute_type) {
+    fbb_.AddElement<int8_t>(Graph::VT_COMPUTE_TYPE, static_cast<int8_t>(compute_type), 0);
+  }
+  void add_intermediate_type(hipdnn::sdk::DataType intermediate_type) {
+    fbb_.AddElement<int8_t>(Graph::VT_INTERMEDIATE_TYPE, static_cast<int8_t>(intermediate_type), 0);
+  }
+  void add_io_type(hipdnn::sdk::DataType io_type) {
+    fbb_.AddElement<int8_t>(Graph::VT_IO_TYPE, static_cast<int8_t>(io_type), 0);
+  }
+  void add_tensors(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<hipdnn::sdk::TensorAttributes>>> tensors) {
+    fbb_.AddOffset(Graph::VT_TENSORS, tensors);
+  }
+  void add_nodes(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<hipdnn::sdk::Node>>> nodes) {
+    fbb_.AddOffset(Graph::VT_NODES, nodes);
+  }
   explicit GraphBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
@@ -71,33 +392,125 @@ struct GraphBuilder {
 
 inline ::flatbuffers::Offset<Graph> CreateGraph(
     ::flatbuffers::FlatBufferBuilder &_fbb,
-    ::flatbuffers::Offset<::flatbuffers::String> name = 0) {
+    ::flatbuffers::Offset<::flatbuffers::String> name = 0,
+    hipdnn::sdk::DataType compute_type = hipdnn::sdk::DataType_UNSET,
+    hipdnn::sdk::DataType intermediate_type = hipdnn::sdk::DataType_UNSET,
+    hipdnn::sdk::DataType io_type = hipdnn::sdk::DataType_UNSET,
+    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<hipdnn::sdk::TensorAttributes>>> tensors = 0,
+    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<hipdnn::sdk::Node>>> nodes = 0) {
   GraphBuilder builder_(_fbb);
+  builder_.add_nodes(nodes);
+  builder_.add_tensors(tensors);
   builder_.add_name(name);
+  builder_.add_io_type(io_type);
+  builder_.add_intermediate_type(intermediate_type);
+  builder_.add_compute_type(compute_type);
   return builder_.Finish();
 }
 
 inline ::flatbuffers::Offset<Graph> CreateGraphDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
-    const char *name = nullptr) {
+    const char *name = nullptr,
+    hipdnn::sdk::DataType compute_type = hipdnn::sdk::DataType_UNSET,
+    hipdnn::sdk::DataType intermediate_type = hipdnn::sdk::DataType_UNSET,
+    hipdnn::sdk::DataType io_type = hipdnn::sdk::DataType_UNSET,
+    const std::vector<::flatbuffers::Offset<hipdnn::sdk::TensorAttributes>> *tensors = nullptr,
+    const std::vector<::flatbuffers::Offset<hipdnn::sdk::Node>> *nodes = nullptr) {
   auto name__ = name ? _fbb.CreateString(name) : 0;
+  auto tensors__ = tensors ? _fbb.CreateVector<::flatbuffers::Offset<hipdnn::sdk::TensorAttributes>>(*tensors) : 0;
+  auto nodes__ = nodes ? _fbb.CreateVector<::flatbuffers::Offset<hipdnn::sdk::Node>>(*nodes) : 0;
   return hipdnn::sdk::CreateGraph(
       _fbb,
-      name__);
+      name__,
+      compute_type,
+      intermediate_type,
+      io_type,
+      tensors__,
+      nodes__);
 }
 
 ::flatbuffers::Offset<Graph> CreateGraph(::flatbuffers::FlatBufferBuilder &_fbb, const GraphT *_o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
 
 
+inline bool operator==(const NodeT &lhs, const NodeT &rhs) {
+  return
+      (lhs.name == rhs.name) &&
+      (lhs.attributes == rhs.attributes);
+}
+
+inline bool operator!=(const NodeT &lhs, const NodeT &rhs) {
+    return !(lhs == rhs);
+}
+
+
+inline NodeT *Node::UnPack(const ::flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = std::unique_ptr<NodeT>(new NodeT());
+  UnPackTo(_o.get(), _resolver);
+  return _o.release();
+}
+
+inline void Node::UnPackTo(NodeT *_o, const ::flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = name(); if (_e) _o->name = _e->str(); }
+  { auto _e = attributes_type(); _o->attributes.type = _e; }
+  { auto _e = attributes(); if (_e) _o->attributes.value = hipdnn::sdk::NodeAttributesUnion::UnPack(_e, attributes_type(), _resolver); }
+}
+
+inline ::flatbuffers::Offset<Node> Node::Pack(::flatbuffers::FlatBufferBuilder &_fbb, const NodeT* _o, const ::flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateNode(_fbb, _o, _rehasher);
+}
+
+inline ::flatbuffers::Offset<Node> CreateNode(::flatbuffers::FlatBufferBuilder &_fbb, const NodeT *_o, const ::flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { ::flatbuffers::FlatBufferBuilder *__fbb; const NodeT* __o; const ::flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _name = _o->name.empty() ? 0 : _fbb.CreateString(_o->name);
+  auto _attributes_type = _o->attributes.type;
+  auto _attributes = _o->attributes.Pack(_fbb);
+  return hipdnn::sdk::CreateNode(
+      _fbb,
+      _name,
+      _attributes_type,
+      _attributes);
+}
+
+
 inline bool operator==(const GraphT &lhs, const GraphT &rhs) {
   return
-      (lhs.name == rhs.name);
+      (lhs.name == rhs.name) &&
+      (lhs.compute_type == rhs.compute_type) &&
+      (lhs.intermediate_type == rhs.intermediate_type) &&
+      (lhs.io_type == rhs.io_type) &&
+      (lhs.tensors.size() == rhs.tensors.size() && std::equal(lhs.tensors.cbegin(), lhs.tensors.cend(), rhs.tensors.cbegin(), [](std::unique_ptr<hipdnn::sdk::TensorAttributesT> const &a, std::unique_ptr<hipdnn::sdk::TensorAttributesT> const &b) { return (a == b) || (a && b && *a == *b); })) &&
+      (lhs.nodes.size() == rhs.nodes.size() && std::equal(lhs.nodes.cbegin(), lhs.nodes.cend(), rhs.nodes.cbegin(), [](std::unique_ptr<hipdnn::sdk::NodeT> const &a, std::unique_ptr<hipdnn::sdk::NodeT> const &b) { return (a == b) || (a && b && *a == *b); }));
 }
 
 inline bool operator!=(const GraphT &lhs, const GraphT &rhs) {
     return !(lhs == rhs);
 }
 
+
+inline GraphT::GraphT(const GraphT &o)
+      : name(o.name),
+        compute_type(o.compute_type),
+        intermediate_type(o.intermediate_type),
+        io_type(o.io_type) {
+  tensors.reserve(o.tensors.size());
+  for (const auto &tensors_ : o.tensors) { tensors.emplace_back((tensors_) ? new hipdnn::sdk::TensorAttributesT(*tensors_) : nullptr); }
+  nodes.reserve(o.nodes.size());
+  for (const auto &nodes_ : o.nodes) { nodes.emplace_back((nodes_) ? new hipdnn::sdk::NodeT(*nodes_) : nullptr); }
+}
+
+inline GraphT &GraphT::operator=(GraphT o) FLATBUFFERS_NOEXCEPT {
+  std::swap(name, o.name);
+  std::swap(compute_type, o.compute_type);
+  std::swap(intermediate_type, o.intermediate_type);
+  std::swap(io_type, o.io_type);
+  std::swap(tensors, o.tensors);
+  std::swap(nodes, o.nodes);
+  return *this;
+}
 
 inline GraphT *Graph::UnPack(const ::flatbuffers::resolver_function_t *_resolver) const {
   auto _o = std::unique_ptr<GraphT>(new GraphT());
@@ -109,6 +522,11 @@ inline void Graph::UnPackTo(GraphT *_o, const ::flatbuffers::resolver_function_t
   (void)_o;
   (void)_resolver;
   { auto _e = name(); if (_e) _o->name = _e->str(); }
+  { auto _e = compute_type(); _o->compute_type = _e; }
+  { auto _e = intermediate_type(); _o->intermediate_type = _e; }
+  { auto _e = io_type(); _o->io_type = _e; }
+  { auto _e = tensors(); if (_e) { _o->tensors.resize(_e->size()); for (::flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { if(_o->tensors[_i]) { _e->Get(_i)->UnPackTo(_o->tensors[_i].get(), _resolver); } else { _o->tensors[_i] = std::unique_ptr<hipdnn::sdk::TensorAttributesT>(_e->Get(_i)->UnPack(_resolver)); }; } } else { _o->tensors.resize(0); } }
+  { auto _e = nodes(); if (_e) { _o->nodes.resize(_e->size()); for (::flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { if(_o->nodes[_i]) { _e->Get(_i)->UnPackTo(_o->nodes[_i].get(), _resolver); } else { _o->nodes[_i] = std::unique_ptr<hipdnn::sdk::NodeT>(_e->Get(_i)->UnPack(_resolver)); }; } } else { _o->nodes.resize(0); } }
 }
 
 inline ::flatbuffers::Offset<Graph> Graph::Pack(::flatbuffers::FlatBufferBuilder &_fbb, const GraphT* _o, const ::flatbuffers::rehasher_function_t *_rehasher) {
@@ -120,9 +538,161 @@ inline ::flatbuffers::Offset<Graph> CreateGraph(::flatbuffers::FlatBufferBuilder
   (void)_o;
   struct _VectorArgs { ::flatbuffers::FlatBufferBuilder *__fbb; const GraphT* __o; const ::flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
   auto _name = _o->name.empty() ? 0 : _fbb.CreateString(_o->name);
+  auto _compute_type = _o->compute_type;
+  auto _intermediate_type = _o->intermediate_type;
+  auto _io_type = _o->io_type;
+  auto _tensors = _o->tensors.size() ? _fbb.CreateVector<::flatbuffers::Offset<hipdnn::sdk::TensorAttributes>> (_o->tensors.size(), [](size_t i, _VectorArgs *__va) { return CreateTensorAttributes(*__va->__fbb, __va->__o->tensors[i].get(), __va->__rehasher); }, &_va ) : 0;
+  auto _nodes = _o->nodes.size() ? _fbb.CreateVector<::flatbuffers::Offset<hipdnn::sdk::Node>> (_o->nodes.size(), [](size_t i, _VectorArgs *__va) { return CreateNode(*__va->__fbb, __va->__o->nodes[i].get(), __va->__rehasher); }, &_va ) : 0;
   return hipdnn::sdk::CreateGraph(
       _fbb,
-      _name);
+      _name,
+      _compute_type,
+      _intermediate_type,
+      _io_type,
+      _tensors,
+      _nodes);
+}
+
+inline bool VerifyNodeAttributes(::flatbuffers::Verifier &verifier, const void *obj, NodeAttributes type) {
+  switch (type) {
+    case NodeAttributes_NONE: {
+      return true;
+    }
+    case NodeAttributes_BatchNormInferenceAttributes: {
+      auto ptr = reinterpret_cast<const hipdnn::sdk::BatchNormInferenceAttributes *>(obj);
+      return verifier.VerifyTable(ptr);
+    }
+    case NodeAttributes_PointwiseAttributes: {
+      auto ptr = reinterpret_cast<const hipdnn::sdk::PointwiseAttributes *>(obj);
+      return verifier.VerifyTable(ptr);
+    }
+    default: return true;
+  }
+}
+
+inline bool VerifyNodeAttributesVector(::flatbuffers::Verifier &verifier, const ::flatbuffers::Vector<::flatbuffers::Offset<void>> *values, const ::flatbuffers::Vector<uint8_t> *types) {
+  if (!values || !types) return !values && !types;
+  if (values->size() != types->size()) return false;
+  for (::flatbuffers::uoffset_t i = 0; i < values->size(); ++i) {
+    if (!VerifyNodeAttributes(
+        verifier,  values->Get(i), types->GetEnum<NodeAttributes>(i))) {
+      return false;
+    }
+  }
+  return true;
+}
+
+inline void *NodeAttributesUnion::UnPack(const void *obj, NodeAttributes type, const ::flatbuffers::resolver_function_t *resolver) {
+  (void)resolver;
+  switch (type) {
+    case NodeAttributes_BatchNormInferenceAttributes: {
+      auto ptr = reinterpret_cast<const hipdnn::sdk::BatchNormInferenceAttributes *>(obj);
+      return ptr->UnPack(resolver);
+    }
+    case NodeAttributes_PointwiseAttributes: {
+      auto ptr = reinterpret_cast<const hipdnn::sdk::PointwiseAttributes *>(obj);
+      return ptr->UnPack(resolver);
+    }
+    default: return nullptr;
+  }
+}
+
+inline ::flatbuffers::Offset<void> NodeAttributesUnion::Pack(::flatbuffers::FlatBufferBuilder &_fbb, const ::flatbuffers::rehasher_function_t *_rehasher) const {
+  (void)_rehasher;
+  switch (type) {
+    case NodeAttributes_BatchNormInferenceAttributes: {
+      auto ptr = reinterpret_cast<const hipdnn::sdk::BatchNormInferenceAttributesT *>(value);
+      return CreateBatchNormInferenceAttributes(_fbb, ptr, _rehasher).Union();
+    }
+    case NodeAttributes_PointwiseAttributes: {
+      auto ptr = reinterpret_cast<const hipdnn::sdk::PointwiseAttributesT *>(value);
+      return CreatePointwiseAttributes(_fbb, ptr, _rehasher).Union();
+    }
+    default: return 0;
+  }
+}
+
+inline NodeAttributesUnion::NodeAttributesUnion(const NodeAttributesUnion &u) : type(u.type), value(nullptr) {
+  switch (type) {
+    case NodeAttributes_BatchNormInferenceAttributes: {
+      value = new hipdnn::sdk::BatchNormInferenceAttributesT(*reinterpret_cast<hipdnn::sdk::BatchNormInferenceAttributesT *>(u.value));
+      break;
+    }
+    case NodeAttributes_PointwiseAttributes: {
+      value = new hipdnn::sdk::PointwiseAttributesT(*reinterpret_cast<hipdnn::sdk::PointwiseAttributesT *>(u.value));
+      break;
+    }
+    default:
+      break;
+  }
+}
+
+inline void NodeAttributesUnion::Reset() {
+  switch (type) {
+    case NodeAttributes_BatchNormInferenceAttributes: {
+      auto ptr = reinterpret_cast<hipdnn::sdk::BatchNormInferenceAttributesT *>(value);
+      delete ptr;
+      break;
+    }
+    case NodeAttributes_PointwiseAttributes: {
+      auto ptr = reinterpret_cast<hipdnn::sdk::PointwiseAttributesT *>(value);
+      delete ptr;
+      break;
+    }
+    default: break;
+  }
+  value = nullptr;
+  type = NodeAttributes_NONE;
+}
+
+inline const hipdnn::sdk::Graph *GetGraph(const void *buf) {
+  return ::flatbuffers::GetRoot<hipdnn::sdk::Graph>(buf);
+}
+
+inline const hipdnn::sdk::Graph *GetSizePrefixedGraph(const void *buf) {
+  return ::flatbuffers::GetSizePrefixedRoot<hipdnn::sdk::Graph>(buf);
+}
+
+inline Graph *GetMutableGraph(void *buf) {
+  return ::flatbuffers::GetMutableRoot<Graph>(buf);
+}
+
+inline hipdnn::sdk::Graph *GetMutableSizePrefixedGraph(void *buf) {
+  return ::flatbuffers::GetMutableSizePrefixedRoot<hipdnn::sdk::Graph>(buf);
+}
+
+inline bool VerifyGraphBuffer(
+    ::flatbuffers::Verifier &verifier) {
+  return verifier.VerifyBuffer<hipdnn::sdk::Graph>(nullptr);
+}
+
+inline bool VerifySizePrefixedGraphBuffer(
+    ::flatbuffers::Verifier &verifier) {
+  return verifier.VerifySizePrefixedBuffer<hipdnn::sdk::Graph>(nullptr);
+}
+
+inline void FinishGraphBuffer(
+    ::flatbuffers::FlatBufferBuilder &fbb,
+    ::flatbuffers::Offset<hipdnn::sdk::Graph> root) {
+  fbb.Finish(root);
+}
+
+inline void FinishSizePrefixedGraphBuffer(
+    ::flatbuffers::FlatBufferBuilder &fbb,
+    ::flatbuffers::Offset<hipdnn::sdk::Graph> root) {
+  fbb.FinishSizePrefixed(root);
+}
+
+inline std::unique_ptr<hipdnn::sdk::GraphT> UnPackGraph(
+    const void *buf,
+    const ::flatbuffers::resolver_function_t *res = nullptr) {
+  return std::unique_ptr<hipdnn::sdk::GraphT>(GetGraph(buf)->UnPack(res));
+}
+
+inline std::unique_ptr<hipdnn::sdk::GraphT> UnPackSizePrefixedGraph(
+    const void *buf,
+    const ::flatbuffers::resolver_function_t *res = nullptr) {
+  return std::unique_ptr<hipdnn::sdk::GraphT>(GetSizePrefixedGraph(buf)->UnPack(res));
 }
 
 }  // namespace sdk
