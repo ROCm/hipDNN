@@ -11,6 +11,7 @@ target_include_directories(public_hipdnn_backend_tests PRIVATE
 )
 
 add_dependencies(check public_hipdnn_backend_tests)
+clang_tidy_check(public_hipdnn_backend_tests)
 gtest_discover_tests(
     public_hipdnn_backend_tests
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}

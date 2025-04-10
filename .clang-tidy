@@ -1,0 +1,41 @@
+# Copyright © Advanced Micro Devices, Inc., or its affiliates.
+# SPDX-License-Identifier:  MIT
+
+Checks: >
+  -*,
+  bugprone-*
+  misc-*,
+  modernize-*,
+  performance-*,
+  portability-*,
+  readability-*,
+  -fuchsia-trailing-return,
+  -modernize-use-trailing-return-type,
+  -modernize-concat-nested-namespaces,
+  -modernize-use-nodiscard,
+  -modernize-use-using,
+  -performance-enum-size,
+  -readability-magic-numbers,
+  -readability-identifier-length,
+  -readability-qualified-auto,
+  -readability-uppercase-literal-suffix,
+  -readability-avoid-unconditional-preprocessor-if,
+
+WarningsAsErrors: "*"
+HeaderFileExtensions: ['h','hpp']
+
+# This regex is a inclusion filter for the files to be checked. Its a Posix regex and
+# does not seem to support negative lookahead.  
+HeaderFilterRegex: '^(.*backend.*|.*frontend.*)$'
+
+CheckOptions:
+  - { key: readability-identifier-naming.NamespaceCase,           value: lower_case }
+  - { key: readability-identifier-naming.ClassCase,               value: Leading_upper_snake_case }
+  - { key: readability-identifier-naming.StructCase,              value: Leading_upper_snake_case }
+  - { key: readability-identifier-naming.FunctionCase,            value: lower_case }
+  - { key: readability-identifier-naming.VariableCase,            value: lower_case }
+  - { key: readability-identifier-naming.PrivateMemberCase,       value: lower_case }
+  - { key: readability-identifier-naming.PrivateMemberPrefix,     value: _ }
+#  - { key: readability-identifier-naming.EnumCase,                value: Leading_upper_snake_case  }
+#  - { key: readability-identifier-naming.EnumConstantCase,        value: UPPER_CASE }
+  - { key: readability-identifier-naming.GlobalConstantCase,      value: UPPER_CASE }

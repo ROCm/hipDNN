@@ -17,11 +17,13 @@ target_link_libraries(hipdnn_backend_tests
     gtest_main 
     pthread 
     hipdnn_backend_private)
-target_include_directories(hipdnn_backend_tests 
+    target_include_directories(hipdnn_backend_tests 
     PRIVATE 
-        ${HIP_DNN_BACKEND_SRC_DIR}
-        ${HIP_DNN_BACKEND_INCLUDE_DIR}
-)
+    ${HIP_DNN_BACKEND_SRC_DIR}
+    ${HIP_DNN_BACKEND_INCLUDE_DIR}
+    )
+    
+clang_tidy_check(hipdnn_backend_tests)
 
 add_dependencies(check hipdnn_backend_tests)
 gtest_discover_tests(

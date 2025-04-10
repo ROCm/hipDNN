@@ -8,7 +8,7 @@
 TEST(HipDNNBackendTest, PublicFunctionHelloTest)
 {
     // Call the function and check its return value
-    int result = publicFunctionHello();
+    int result = public_function_hello();
 
     // Assuming the function should return 0 for success
     EXPECT_EQ(result, 1337) << "publicFunctionHello did not return the expected value.";

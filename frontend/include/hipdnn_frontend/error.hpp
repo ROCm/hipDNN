@@ -18,62 +18,61 @@
 
 namespace hipdnn_frontend
 {
-    enum class error_code_t
+enum class error_code_t
+{
+    OK,
+    INVALID_VALUE
+};
+
+typedef struct error_object // NOLINT
+{
+    error_code_t code;
+    std::string  err_msg;
+
+    error_object()
+        : code(error_code_t::OK)
     {
-        OK,
-        INVALID_VALUE
-    };
-
-    typedef struct error_object
+    }
+    error_object(error_code_t error_code, const std::string& message) // NOLINT
+        : code(error_code)
+        , err_msg(message)
     {
-        error_code_t code;
-        std::string  err_msg;
+    }
 
-        error_object()
-            : code(error_code_t::OK)
-            , err_msg("")
-        {
-        }
-        error_object(error_code_t error_code, const std::string& message)
-            : code(error_code)
-            , err_msg(message)
-        {
-        }
+    std::string get_message() const
+    {
+        return err_msg;
+    }
 
-        std::string get_message() const
-        {
-            return err_msg;
-        }
+    error_code_t get_code() const
+    {
+        return code;
+    }
 
-        error_code_t get_code() const
-        {
-            return code;
-        }
+    bool is_good() const
+    {
+        return code == error_code_t::OK;
+    }
+    bool is_bad() const
+    {
+        return code != error_code_t::OK;
+    }
 
-        bool is_good() const
-        {
-            return code == error_code_t::OK;
-        }
-        bool is_bad() const
-        {
-            return code != error_code_t::OK;
-        }
-
-        bool operator==(error_code_t other_code) const
-        {
-            return code == other_code;
-        }
-        bool operator!=(error_code_t other_code) const
-        {
-            return code != other_code;
-        }
-        bool operator==(const error_object& other) const
-        {
-            return code == other.code;
-        }
-        bool operator!=(const error_object& other) const
-        {
-            return code != other.code;
-        }
-    } error_t;
+    bool operator==(error_code_t other_code) const
+    {
+        return code == other_code;
+    }
+    bool operator!=(error_code_t other_code) const
+    {
+        return code != other_code;
+    }
+    bool operator==(const error_object& other) const
+    {
+        return code == other.code;
+    }
+    bool operator!=(const error_object& other) const
+    {
+        return code != other.code;
+    }
+} error_t;
 }

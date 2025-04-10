@@ -10,7 +10,7 @@
 extern "C" {
 #endif
 
-HIPDNN_BACKEND_EXPORT int publicFunctionHello();
+HIPDNN_BACKEND_EXPORT int public_function_hello();
 
 #ifdef __cplusplus
 }

@@ -24,6 +24,8 @@ list(
 
 include(cmake/Dependencies.cmake)
 include(cmake/ClangCheck.cmake)
+include(cmake/ClangTidy.cmake)
+
 hipdnn_add_dependency(
     ROCmCMakeBuildTools
     VERSION 0.11.0
@@ -42,6 +44,7 @@ option(HIP_DNN_BUILD_FRONTEND "Build the frontend code" ON)
 option(HIP_DNN_SKIP_TESTS "Skips building all tests" OFF)
 
 option(CODE_COVERAGE "Build with code coverage flags" OFF)
+option(ENABLE_CLANG_TIDY "Enable Clang-Tidy checks" OFF)
 
 enable_testing() # Cmake wont discover or run tests without this line
 

@@ -8,5 +8,5 @@ using namespace hipdnn_backend;
 
 TEST(HelloWorld, getMessage)
 {
-    ASSERT_STREQ(HelloWorld::getMessage(), "Hello, World!");
+    ASSERT_STREQ(Hello_world::get_message(), "Hello, World!");
 }

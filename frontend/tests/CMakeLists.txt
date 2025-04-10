@@ -17,6 +17,7 @@ target_include_directories(hipdnn_frontend_tests PRIVATE
     ${HIP_DNN_FRONTEND_INCLUDE_DIR}
     ${HIP_DNN_SDK_INCLUDE_DIR}
 )
+clang_tidy_check(hipdnn_frontend_tests)
 
 add_dependencies(hipdnn_frontend_tests generate_hipdnn_sdk_headers)
 add_dependencies(check hipdnn_frontend_tests)

@@ -6,8 +6,8 @@
 
 #include "hello_world.hpp"
 
-int publicFunctionHello()
+int public_function_hello()
 {
-    std::cout << hipdnn_backend::HelloWorld::getMessage() << std::endl;
+    std::cout << hipdnn_backend::Hello_world::get_message();
     return 1337;
 }

@@ -88,7 +88,7 @@ MacroBlockBegin: ''
 MacroBlockEnd:   ''
 #JavaScriptQuotes: Double
 MaxEmptyLinesToKeep: 1
-NamespaceIndentation: All
+NamespaceIndentation: None
 ObjCBlockIndentWidth: 4
 #ObjCSpaceAfterProperty: true
 #ObjCSpaceBeforeProtocolList: true
