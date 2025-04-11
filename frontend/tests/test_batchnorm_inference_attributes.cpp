@@ -1,72 +1,7 @@
-// Copyright © Advanced Micro Devices, Inc., or its affiliates.
-// SPDX-License-Identifier:  MIT
-#include "graph_generated.h"
 #include <gtest/gtest.h>
-#include <hipdnn_frontend.hpp>
+#include <hipdnn_frontend/attributes/batchnorm_inference_attributes.hpp>
 
-using namespace hipdnn::sdk;
-
-TEST(FlatBuffersFrontendTests, SerializeAndDeserialize)
-{
-    flatbuffers::FlatBufferBuilder builder;
-
-    auto graph = CreateGraphDirect(builder, "Graph");
-    builder.Finish(graph);
-
-    auto deserialized_graph = flatbuffers::GetRoot<Graph>(builder.GetBufferPointer());
-    EXPECT_EQ(deserialized_graph->name()->str(), "Graph");
-}
-
-TEST(FrontendAPITests, CreatePointwiseAttributes)
-{
-    hipdnn_frontend::graph::Pointwise_attributes pointwise_attributes;
-
-    pointwise_attributes.set_input_0(std::make_shared<hipdnn_frontend::graph::Tensor_attributes>());
-    pointwise_attributes.set_output_0(
-        std::make_shared<hipdnn_frontend::graph::Tensor_attributes>());
-    pointwise_attributes.set_operation(hipdnn_frontend::graph::PointwiseMode_t::RELU)
-        .set_relu_lower_clip(0.1f)
-        .set_relu_upper_clip(6.0f)
-        .set_relu_lower_slope(0.01f)
-        .set_axis(1);
-
-    auto input_tensor = pointwise_attributes.get_input_0();
-    EXPECT_FALSE(input_tensor->has_uid());
-
-    input_tensor->set_uid(1)
-        .set_name("InputTensor")
-        .set_data_type(hipdnn_frontend::graph::DataType_t::FLOAT)
-        .set_dim({1, 2, 3, 4})
-        .set_stride({5, 6, 7, 8});
-
-    auto output_tensor = pointwise_attributes.get_output_0();
-    EXPECT_FALSE(output_tensor->has_uid());
-
-    output_tensor->set_uid(2)
-        .set_name("OutputTensor")
-        .set_data_type(hipdnn_frontend::graph::DataType_t::HALF)
-        .set_dim({5, 6, 7, 8})
-        .set_stride({1, 2, 3, 4});
-
-    EXPECT_EQ(input_tensor->get_uid(), 1);
-    EXPECT_EQ(input_tensor->get_name(), "InputTensor");
-    EXPECT_EQ(input_tensor->get_data_type(), hipdnn_frontend::graph::DataType_t::FLOAT);
-    EXPECT_EQ(input_tensor->get_dim(), (std::vector<int64_t>{1, 2, 3, 4}));
-    EXPECT_EQ(input_tensor->get_stride(), (std::vector<int64_t>{5, 6, 7, 8}));
-
-    EXPECT_EQ(output_tensor->get_uid(), 2);
-    EXPECT_EQ(output_tensor->get_name(), "OutputTensor");
-    EXPECT_EQ(output_tensor->get_data_type(), hipdnn_frontend::graph::DataType_t::HALF);
-    EXPECT_EQ(output_tensor->get_dim(), (std::vector<int64_t>{5, 6, 7, 8}));
-    EXPECT_EQ(output_tensor->get_stride(), (std::vector<int64_t>{1, 2, 3, 4}));
-
-    EXPECT_EQ(pointwise_attributes.get_operation(), hipdnn_frontend::graph::PointwiseMode_t::RELU);
-    EXPECT_EQ(pointwise_attributes.get_relu_lower_clip(), 0.1f);
-    EXPECT_EQ(pointwise_attributes.get_relu_upper_clip(), 6.0f);
-    EXPECT_EQ(pointwise_attributes.get_relu_lower_slope(), 0.01f);
-    EXPECT_EQ(pointwise_attributes.get_axis(), 1);
-}
-TEST(FrontendAPITests, CreateBatchnormInferenceAttributes)
+TEST(BatchnormInferenceAttributesTests, CreateBatchnormInferenceAttributes)
 {
     hipdnn_frontend::graph::Batchnorm_inference_attributes batchnorm_attributes;
 

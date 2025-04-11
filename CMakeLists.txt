@@ -12,6 +12,13 @@ project(
     
 set(CMAKE_CXX_STANDARD 17)
 
+option(HIP_DNN_BUILD_BACKEND "Build the backend code" ON)
+option(HIP_DNN_BUILD_FRONTEND "Build the frontend code" ON)
+option(HIP_DNN_SKIP_TESTS "Skips building all tests" OFF)
+
+option(CODE_COVERAGE "Build with code coverage flags" OFF)
+option(ENABLE_CLANG_TIDY "Enable Clang-Tidy checks" ON)
+
 list(
     APPEND
     CMAKE_MODULE_PATH
@@ -38,13 +45,6 @@ include(ROCMSetupVersion)
 include(ROCMCreatePackage)
 include(ROCMInstallTargets)
 include(ROCMClients)
-
-option(HIP_DNN_BUILD_BACKEND "Build the backend code" ON)
-option(HIP_DNN_BUILD_FRONTEND "Build the frontend code" ON)
-option(HIP_DNN_SKIP_TESTS "Skips building all tests" OFF)
-
-option(CODE_COVERAGE "Build with code coverage flags" OFF)
-option(ENABLE_CLANG_TIDY "Enable Clang-Tidy checks" OFF)
 
 enable_testing() # Cmake wont discover or run tests without this line
 

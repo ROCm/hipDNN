@@ -2,6 +2,7 @@
 // SPDX-License-Identifier:  MIT
 #pragma once
 
+#include "attributes.hpp"
 #include "tensor_attributes.hpp"
 #include <memory>
 #include <unordered_map>
@@ -10,7 +11,7 @@ namespace hipdnn_frontend
 {
 namespace graph
 {
-class Batchnorm_inference_attributes
+class Batchnorm_inference_attributes : public AttributesCRTP<Batchnorm_inference_attributes>
 {
 public:
     enum class input_names

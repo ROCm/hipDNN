@@ -3,6 +3,7 @@
 #pragma once
 
 #include "../types.hpp"
+#include "attributes.hpp"
 #include "tensor_attributes.hpp"
 #include <memory>
 #include <optional>
@@ -12,7 +13,7 @@ namespace hipdnn_frontend
 {
 namespace graph
 {
-class Pointwise_attributes
+class Pointwise_attributes : public AttributesCRTP<Pointwise_attributes>
 {
 public:
     PointwiseMode_t get_operation() const

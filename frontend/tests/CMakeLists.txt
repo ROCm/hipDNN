@@ -9,7 +9,13 @@ endif()
 include(GoogleTest)
 
 add_executable(hipdnn_frontend_tests 
-    test_hipdnn_frontend_api.cpp
+    test_pointwise_node.cpp
+    test_pointwise_attributes.cpp
+    test_batchnorm_inference_node.cpp
+    test_batchnorm_inference_attributes.cpp
+    test_graph.cpp
+    test_utilities.cpp
+    test_graph_generated.cpp
 )
 
 target_link_libraries(hipdnn_frontend_tests gtest gtest_main pthread flatbuffers)

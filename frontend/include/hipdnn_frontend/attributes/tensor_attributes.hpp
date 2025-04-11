@@ -3,6 +3,7 @@
 #pragma once
 
 #include "../types.hpp"
+#include "graph_attributes.hpp"
 #include <string>
 #include <vector>
 
@@ -104,6 +105,23 @@ public:
     {
         _uid     = 0;
         _uid_set = false;
+        return *this;
+    }
+
+    Tensor_attributes& set_from_graph_attributes(const Graph_attributes& graph_attributes)
+    {
+        if(_data_type == DataType_t::NOT_SET)
+        {
+            if(_is_virtual)
+            {
+                _data_type = graph_attributes.get_intermediate_data_type();
+            }
+            else
+            {
+                _data_type = graph_attributes.get_io_data_type();
+            }
+        }
+
         return *this;
     }
 
