@@ -9,7 +9,7 @@ endif()
 include(GoogleTest)
 
 add_executable(hipdnn_backend_tests 
-    test_hello_world.cpp
+    test_graph_creation.cpp
 )
 
 target_link_libraries(hipdnn_backend_tests 

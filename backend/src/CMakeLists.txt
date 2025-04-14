@@ -2,8 +2,8 @@
 # SPDX-License-Identifier:  MIT
 
 add_library(hipdnn_backend_private
-    hello_world.cpp
-    )
+    graph_instance.cpp
+)
     
 target_include_directories(hipdnn_backend_private 
     PUBLIC 
@@ -13,7 +13,7 @@ target_include_directories(hipdnn_backend_private
 clang_tidy_check(hipdnn_backend_private)
 
 add_library(hipdnn_backend SHARED 
-hipdnn_backend_api.cpp
+    hipdnn_backend.cpp
 )
 target_include_directories(hipdnn_backend 
 PUBLIC 
