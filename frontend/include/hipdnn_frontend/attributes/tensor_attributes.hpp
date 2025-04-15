@@ -97,7 +97,7 @@ public:
         return *this;
     }
 
-    Tensor_attributes& set_ouput(bool output)
+    Tensor_attributes& set_output(bool output)
     {
         return set_is_virtual(!output);
     }

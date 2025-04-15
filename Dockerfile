@@ -46,6 +46,7 @@ RUN apt-get update && \
     python3-dev \
     python3-pip \
     python3-venv \
+    python3-pybind11 \
     redis \
     rocm-developer-tools \
     rocm-llvm-dev \
