@@ -3,13 +3,19 @@
 
 add_library(hipdnn_backend_private
     graph_instance.cpp
+    plugin/engine_plugin.cpp
+    plugin/plugin_core.cpp
 )
     
 target_include_directories(hipdnn_backend_private 
     PUBLIC 
         ${HIP_DNN_BACKEND_INCLUDE_DIR}
         ${HIP_DNN_BACKEND_SRC_DIR}
+        ${HIP_DNN_SDK_INCLUDE_DIR}
 )
+
+target_link_libraries(hipdnn_backend_private PUBLIC Boost::dll)
+
 clang_tidy_check(hipdnn_backend_private)
 
 add_library(hipdnn_backend SHARED 

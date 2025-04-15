@@ -9,6 +9,7 @@ endif()
 include(GoogleTest)
 
 add_executable(hipdnn_backend_tests 
+    test_engine_plugin.cpp
     test_graph_creation.cpp
 )
 
@@ -17,13 +18,22 @@ target_link_libraries(hipdnn_backend_tests
     gtest_main 
     pthread 
     hipdnn_backend_private)
-    target_include_directories(hipdnn_backend_tests 
+
+target_include_directories(hipdnn_backend_tests 
     PRIVATE 
     ${HIP_DNN_BACKEND_SRC_DIR}
     ${HIP_DNN_BACKEND_INCLUDE_DIR}
     )
     
 clang_tidy_check(hipdnn_backend_tests)
+
+add_library(engineplugin1 SHARED plugins/engine_plugin1.cpp)
+target_include_directories(engineplugin1 PRIVATE ${HIP_DNN_SDK_INCLUDE_DIR})
+add_dependencies(hipdnn_backend_tests engineplugin1)
+
+add_library(engineplugin2 SHARED plugins/engine_plugin2.cpp)
+target_include_directories(engineplugin2 PRIVATE ${HIP_DNN_SDK_INCLUDE_DIR})
+add_dependencies(hipdnn_backend_tests engineplugin2)
 
 add_dependencies(check hipdnn_backend_tests)
 gtest_discover_tests(
