@@ -2,11 +2,12 @@
 // SPDX-License-Identifier:  MIT
 #pragma once
 
-#include "../attributes/graph_attributes.hpp"
-#include "../attributes/pointwise_attributes.hpp"
-#include "../error.hpp"
-#include "../utilities.hpp"
+#include "graph_generated.h"
 #include "node.hpp"
+#include <hipdnn_frontend/attributes/graph_attributes.hpp>
+#include <hipdnn_frontend/attributes/pointwise_attributes.hpp>
+#include <hipdnn_frontend/error.hpp>
+#include <hipdnn_frontend/utilities.hpp>
 
 namespace hipdnn_frontend::graph
 {
@@ -21,23 +22,43 @@ public:
     {
     }
 
+    error_t pre_validate_node() const override
+    {
+        if(!attributes.get_input_0())
+        {
+            return {error_code_t::ATTRIBUTE_NOT_SET,
+                    "PointwiseNode missing IN_0 for pre-validation"};
+        }
+        if(!attributes.get_output_0())
+        {
+            return {error_code_t::ATTRIBUTE_NOT_SET,
+                    "PointwiseNode missing OUT_0 for pre-validation"};
+        }
+        if(attributes.get_operation() == PointwiseMode_t::NOT_SET)
+        {
+            return {error_code_t::ATTRIBUTE_NOT_SET,
+                    "PointwiseNode missing operation for pre-validation"};
+        }
+
+        return {};
+    }
+
     error_t infer_properties_node() override
     {
         if(attributes.inputs.empty())
         {
-            return {error_code_t::INVALID_VALUE,
+            return {error_code_t::ATTRIBUTE_NOT_SET,
                     "PointwiseNode missing input for setting properties"};
         }
 
         if(attributes.outputs.empty())
         {
-            return {error_code_t::INVALID_VALUE,
+            return {error_code_t::ATTRIBUTE_NOT_SET,
                     "PointwiseNode missing output for setting properties"};
         }
 
         CHECK_HIPDNN_ERROR(attributes.fill_from_graph_attributes(graph_attributes));
 
-        auto x   = attributes.inputs[Pointwise_attributes::input_names::in_0];
         auto out = attributes.outputs[Pointwise_attributes::output_names::out_0];
 
         if(out->get_dim().empty())
@@ -71,11 +92,21 @@ public:
 
             if(out->get_stride().empty())
             {
-                return {error_code_t::INVALID_VALUE, "PointwiseNode output missing stride"};
+                return {error_code_t::ATTRIBUTE_NOT_SET, "PointwiseNode output missing stride"};
             }
         }
 
         return {};
+    }
+
+    flatbuffers::Offset<hipdnn::sdk::Node>
+        pack_node(flatbuffers::FlatBufferBuilder& builder) const override
+    {
+        return hipdnn::sdk::CreateNodeDirect(
+            builder,
+            attributes.name.c_str(),
+            hipdnn::sdk::NodeAttributes::NodeAttributes_PointwiseAttributes,
+            attributes.pack_attributes(builder).Union());
     }
 };
 }

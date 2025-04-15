@@ -2,10 +2,10 @@
 // SPDX-License-Identifier:  MIT
 #pragma once
 
+#include <hipdnn_frontend/types.hpp>
 #include <memory>
 #include <string>
 #include <unordered_map>
-#include "../types.hpp"
 
 namespace hipdnn_frontend
 {

@@ -2,9 +2,9 @@
 // SPDX-License-Identifier:  MIT
 #pragma once
 
-#include "../error.hpp"
-#include "../types.hpp"
 #include "graph_attributes.hpp"
+#include <hipdnn_frontend/error.hpp>
+#include <hipdnn_frontend/types.hpp>
 #include <string>
 #include <vector>
 

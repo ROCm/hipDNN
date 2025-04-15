@@ -2,9 +2,10 @@
 // SPDX-License-Identifier:  MIT
 #pragma once
 
-#include "../attributes/graph_attributes.hpp"
-#include "../attributes/tensor_attributes.hpp"
-#include "../error.hpp"
+#include "graph_generated.h"
+#include <hipdnn_frontend/attributes/graph_attributes.hpp>
+#include <hipdnn_frontend/attributes/tensor_attributes.hpp>
+#include <hipdnn_frontend/error.hpp>
 #include <memory>
 #include <unordered_map>
 #include <unordered_set>
@@ -24,7 +25,6 @@ public:
     }
     virtual ~INode() = default;
 
-private:
     virtual error_t pre_validate_node() const
     {
         return {};
@@ -44,9 +44,13 @@ private:
     {
         return {};
     }
-    virtual void gather_hipdnn_tensor_ids(std::unordered_set<int64_t>& used_ids) const {
+    virtual void gather_hipdnn_tensor_ids(std::unordered_set<int64_t>& used_ids) const {};
 
-    };
+    virtual flatbuffers::Offset<hipdnn::sdk::Node>
+        pack_node(flatbuffers::FlatBufferBuilder& builder) const
+    {
+        return {};
+    }
 
 protected:
     std::vector<std::shared_ptr<INode>> _sub_nodes;

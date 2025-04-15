@@ -4,6 +4,7 @@
 #include <gtest/gtest.h>
 #include <hipdnn_frontend/attributes/pointwise_attributes.hpp>
 
+using namespace hipdnn_frontend;
 using namespace hipdnn_frontend::graph;
 
 TEST(PointwiseAttributesTests, CreatePointwiseAttributes)

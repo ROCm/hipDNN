@@ -2,9 +2,10 @@
 // SPDX-License-Identifier:  MIT
 #pragma once
 
-#include "../types.hpp"
 #include "attributes.hpp"
 #include "tensor_attributes.hpp"
+#include "tensor_attributes_generated.h"
+#include <hipdnn_frontend/types.hpp>
 #include <memory>
 #include <optional>
 #include <unordered_map>
@@ -111,6 +112,27 @@ public:
     };
     std::unordered_map<input_names, std::shared_ptr<Tensor_attributes>>  inputs;
     std::unordered_map<output_names, std::shared_ptr<Tensor_attributes>> outputs;
+
+    flatbuffers::Offset<hipdnn::sdk::PointwiseAttributes>
+        pack_attributes(flatbuffers::FlatBufferBuilder& builder) const
+    {
+        auto in_0  = get_input_0();
+        auto in_1  = get_input_1();
+        auto in_2  = get_input_2();
+        auto out_0 = get_output_0();
+
+        return hipdnn::sdk::CreatePointwiseAttributes(
+            builder,
+            to_sdk_type(_operation),
+            _relu_lower_clip,
+            _relu_upper_clip,
+            _relu_lower_slope,
+            _axis,
+            in_0->get_uid(),
+            in_1 ? flatbuffers::Optional<int64_t>(in_1->get_uid()) : flatbuffers::nullopt,
+            in_2 ? flatbuffers::Optional<int64_t>(in_2->get_uid()) : flatbuffers::nullopt,
+            out_0->get_uid());
+    }
 
 private:
     std::shared_ptr<Tensor_attributes> get_input(input_names name) const

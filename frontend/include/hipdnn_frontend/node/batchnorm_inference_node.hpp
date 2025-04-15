@@ -2,10 +2,11 @@
 // SPDX-License-Identifier:  MIT
 #pragma once
 
-#include "../attributes/batchnorm_inference_attributes.hpp"
-#include "../attributes/graph_attributes.hpp"
-#include "../error.hpp"
+#include "graph_generated.h"
 #include "node.hpp"
+#include <hipdnn_frontend/attributes/batchnorm_inference_attributes.hpp>
+#include <hipdnn_frontend/attributes/graph_attributes.hpp>
+#include <hipdnn_frontend/error.hpp>
 
 namespace hipdnn_frontend::graph
 {
@@ -21,24 +22,60 @@ public:
     {
     }
 
-    error_t infer_properties_node() override
+    error_t pre_validate_node() const override
     {
-        if(attributes.inputs.empty())
+        if(!attributes.get_x())
         {
-            return {error_code_t::INVALID_VALUE,
-                    "BatchnormInferenceNode missing input for setting properties"};
+            return {error_code_t::ATTRIBUTE_NOT_SET,
+                    "BatchnormInferenceNode missing x for pre-validation"};
+        }
+        if(!attributes.get_mean())
+        {
+            return {error_code_t::ATTRIBUTE_NOT_SET,
+                    "BatchnormInferenceNode missing mean for pre-validation"};
+        }
+        if(!attributes.get_inv_variance())
+        {
+            return {error_code_t::ATTRIBUTE_NOT_SET,
+                    "BatchnormInferenceNode missing inv_variance for pre-validation"};
+        }
+        if(!attributes.get_scale())
+        {
+            return {error_code_t::ATTRIBUTE_NOT_SET,
+                    "BatchnormInferenceNode missing scale for pre-validation"};
+        }
+        if(!attributes.get_bias())
+        {
+            return {error_code_t::ATTRIBUTE_NOT_SET,
+                    "BatchnormInferenceNode missing bias for pre-validation"};
+        }
+        if(!attributes.get_y())
+        {
+            return {error_code_t::ATTRIBUTE_NOT_SET,
+                    "BatchnormInferenceNode missing y for pre-validation"};
         }
 
-        if(attributes.outputs.empty())
+        return {};
+    }
+
+    error_t infer_properties_node() override
+    {
+        auto x = attributes.get_x();
+        auto y = attributes.get_y();
+
+        if(!x)
         {
-            return {error_code_t::INVALID_VALUE,
-                    "BatchnormInferenceNode missing output for setting properties"};
+            return {error_code_t::ATTRIBUTE_NOT_SET,
+                    "BatchnormInferenceNode missing x for setting properties"};
+        }
+
+        if(!y)
+        {
+            return {error_code_t::ATTRIBUTE_NOT_SET,
+                    "BatchnormInferenceNode missing y for setting properties"};
         }
 
         CHECK_HIPDNN_ERROR(attributes.fill_from_graph_attributes(graph_attributes));
-
-        auto x = attributes.inputs[Batchnorm_inference_attributes::input_names::x];
-        auto y = attributes.outputs[Batchnorm_inference_attributes::output_names::y];
 
         if(y->get_dim().empty())
         {
@@ -51,6 +88,16 @@ public:
         }
 
         return {};
+    }
+
+    flatbuffers::Offset<hipdnn::sdk::Node>
+        pack_node(flatbuffers::FlatBufferBuilder& builder) const override
+    {
+        return hipdnn::sdk::CreateNodeDirect(
+            builder,
+            attributes.name.c_str(),
+            hipdnn::sdk::NodeAttributes::NodeAttributes_BatchNormInferenceAttributes,
+            attributes.pack_attributes(builder).Union());
     }
 };
 }

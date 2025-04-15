@@ -21,7 +21,8 @@ namespace hipdnn_frontend
 enum class error_code_t
 {
     OK,
-    INVALID_VALUE
+    INVALID_VALUE,
+    ATTRIBUTE_NOT_SET
 };
 
 typedef struct error_object // NOLINT

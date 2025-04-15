@@ -4,6 +4,7 @@
 
 #include "attributes/batchnorm_inference_attributes.hpp"
 #include "attributes/pointwise_attributes.hpp"
+#include "flatbuffers/detached_buffer.h"
 #include "node/batchnorm_inference_node.hpp"
 #include "node/node.hpp"
 #include "node/pointwise_node.hpp"
@@ -23,9 +24,63 @@ private:
     }
 
 public:
+    // Will be set after building the operation graph.
+    // Once we integrate the backend, then we will instead hold onto the descriptor associated with it after building.
+    flatbuffers::DetachedBuffer serialized_graph;
+
     Graph()
         : INode(Graph_attributes{})
     {
+    }
+
+    error_t validate()
+    {
+        return validate_subtree();
+    }
+
+    error_t build_operation_graph()
+    {
+        std::unordered_set<int64_t> used_tensor_uids;
+        gather_hipdnn_tensor_ids_subtree(used_tensor_uids);
+
+        std::unordered_map<int64_t, std::shared_ptr<Tensor_attributes>> tensor_lookup;
+        int64_t                                                         current_tensor_id = 0;
+
+        populate_hipdnn_tensor_ids_subtree(tensor_lookup, current_tensor_id, used_tensor_uids);
+        flatbuffers::FlatBufferBuilder builder;
+
+        std::vector<::flatbuffers::Offset<hipdnn::sdk::TensorAttributes>> tensor_attributes;
+        for(auto& [_, tensor] : tensor_lookup)
+        {
+            if(tensor)
+            {
+                tensor_attributes.emplace_back(tensor->pack_attributes(builder));
+            }
+        }
+
+        std::vector<::flatbuffers::Offset<hipdnn::sdk::Node>> nodes;
+        for(auto& node : _sub_nodes)
+        {
+            if(node)
+            {
+                nodes.emplace_back(node->pack_node(builder));
+            }
+        }
+        auto graph = hipdnn::sdk::CreateGraphDirect(
+            builder,
+            graph_attributes.get_name().c_str(),
+            to_sdk_type(graph_attributes.get_compute_data_type()),
+            to_sdk_type(graph_attributes.get_intermediate_data_type()),
+            to_sdk_type(graph_attributes.get_io_data_type()),
+            &tensor_attributes,
+            &nodes);
+
+        builder.Finish(graph);
+        serialized_graph = builder.Release();
+        // TODO - Lower graph to the backend.
+        //        For now we will hold onto the graph, and make it accessible.
+
+        return {};
     }
 
     const std::string& get_name() const

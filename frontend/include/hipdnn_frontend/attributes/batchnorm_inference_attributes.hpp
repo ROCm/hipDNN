@@ -3,6 +3,7 @@
 #pragma once
 
 #include "attributes.hpp"
+#include "batchnorm_inference_attributes_generated.h"
 #include "tensor_attributes.hpp"
 #include <memory>
 #include <unordered_map>
@@ -80,6 +81,18 @@ public:
     Batchnorm_inference_attributes& set_y(const std::shared_ptr<Tensor_attributes>& value)
     {
         return set_output(output_names::y, value);
+    }
+
+    flatbuffers::Offset<hipdnn::sdk::BatchNormInferenceAttributes>
+        pack_attributes(flatbuffers::FlatBufferBuilder& builder) const
+    {
+        return hipdnn::sdk::CreateBatchNormInferenceAttributes(builder,
+                                                               get_x()->get_uid(),
+                                                               get_mean()->get_uid(),
+                                                               get_inv_variance()->get_uid(),
+                                                               get_scale()->get_uid(),
+                                                               get_bias()->get_uid(),
+                                                               get_y()->get_uid());
     }
 
 private:

@@ -2,8 +2,9 @@
 // SPDX-License-Identifier:  MIT
 #pragma once
 
-#include "../types.hpp"
 #include "graph_attributes.hpp"
+#include "tensor_attributes_generated.h"
+#include <hipdnn_frontend/types.hpp>
 #include <string>
 #include <vector>
 
@@ -123,6 +124,13 @@ public:
         }
 
         return *this;
+    }
+
+    flatbuffers::Offset<hipdnn::sdk::TensorAttributes>
+        pack_attributes(flatbuffers::FlatBufferBuilder& builder) const
+    {
+        return CreateTensorAttributesDirect(
+            builder, _uid, _name.c_str(), to_sdk_type(_data_type), &_stride, &_dim, _is_virtual);
     }
 
 private:
