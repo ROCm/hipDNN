@@ -1,7 +1,7 @@
 # Copyright © Advanced Micro Devices, Inc., or its affiliates.
 # SPDX-License-Identifier:  MIT
 
-cmake_minimum_required(VERSION 3.27...3.29)
+cmake_minimum_required(VERSION 3.25.2)
 
 set(CMAKE_TOOLCHAIN_FILE "${CMAKE_SOURCE_DIR}/cmake/ClangToolChain.cmake" CACHE STRING "Toolchain file")
 set(HIPDNN_VERSION "0.0.1")
