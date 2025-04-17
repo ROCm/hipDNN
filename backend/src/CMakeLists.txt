@@ -1,12 +1,13 @@
 # Copyright © Advanced Micro Devices, Inc., or its affiliates.
 # SPDX-License-Identifier:  MIT
+find_package(hip REQUIRED)
 
 add_library(hipdnn_backend_private
     graph_instance.cpp
     plugin/engine_plugin.cpp
     plugin/plugin_core.cpp
 )
-    
+
 target_include_directories(hipdnn_backend_private 
     PUBLIC 
         ${HIP_DNN_BACKEND_INCLUDE_DIR}
@@ -21,12 +22,14 @@ clang_tidy_check(hipdnn_backend_private)
 add_library(hipdnn_backend SHARED 
     hipdnn_backend.cpp
 )
+
 target_include_directories(hipdnn_backend 
 PUBLIC 
+    ${HIP_INCLUDE_DIRS}
     ${HIP_DNN_BACKEND_INCLUDE_DIR} 
     ${HIP_DNN_BACKEND_EXPORT_INCLUDE_DIR})
 
-target_link_libraries(hipdnn_backend PRIVATE hipdnn_backend_private)
+target_link_libraries(hipdnn_backend PRIVATE hipdnn_backend_private hip::device)
 target_link_libraries(hipdnn_backend PRIVATE "-Xlinker --exclude-libs=ALL" ) # HIDE symbols from linked static libs
 
 clang_tidy_check(hipdnn_backend)

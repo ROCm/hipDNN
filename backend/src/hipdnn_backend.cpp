@@ -4,6 +4,21 @@
 #include "hipdnn_backend.h"
 #include <iostream>
 
+hipdnnStatus_t hipdnnCreate(hipdnnHandle_t* handle)
+{
+    return HIPDNN_STATUS_SUCCESS;
+}
+
+hipdnnStatus_t hipdnnDestroy(hipdnnHandle_t handle)
+{
+    return HIPDNN_STATUS_SUCCESS;
+}
+
+hipdnnStatus_t hipdnnSetStream(hipdnnHandle_t handle, hipStream_t streamId)
+{
+    return HIPDNN_STATUS_SUCCESS;
+}
+
 hipdnnStatus_t hipdnnBackendCreateDescriptor(hipdnnBackendDescriptorType_t descriptor_type,
                                              hipdnnBackendDescriptor_t*    descriptor)
 {

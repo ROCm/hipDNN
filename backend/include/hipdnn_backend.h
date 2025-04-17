@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include <hip/hip_runtime_api.h>
 #include <stdint.h>
 // Cmake Generated export header.
 #include "hipdnn_backend_export.h"
@@ -17,17 +18,50 @@
 extern "C" {
 #endif
 
-//note: this will change once the struct is in place, im only defining the API for now.
-struct hipdnnBackendDescriptor
-{
-};
+/*!
+* @brief Creates the hipdnnHandle_t type
+*/
+typedef struct hipdnnHandle* hipdnnHandle_t;
+
+/*!
+* @brief Creates the hipdnnBackendDescriptor_t type
+*/
 typedef struct hipdnnBackendDescriptor* hipdnnBackendDescriptor_t;
 
-//note: this will change once the struct is in place, im only defining the API for now.
-struct hipdnnHandle
-{
-};
-typedef struct hipdnnHandle* hipdnnHandle_t;
+/*! @brief Creates a hipdnnHandle_t
+ *
+ * @param [in] handle        An instance of hipdnnHandle_t
+ *
+ * @retval HIPDNN_STATUS_SUCCESS            The creation was successful
+ * @retval HIPDNN_STATUS_BAD_PARAM          The descriptor is not a valid (NULL) descriptor.
+ * @retval HIPDNN_STATUS_ALLOC_FAILED       The memory allocation failed.
+ * @retval HIPDNN_STATUS_INTERNAL_ERROR     Some internal errors were encountered.
+ * 
+ */
+hipdnnStatus_t hipdnnCreate(hipdnnHandle_t* handle);
+
+/*! @brief Destroyes hipdnnHandle_t
+ *
+ * @param [in] handle        An instance of hipdnnHandle_t
+ *
+ * @retval HIPDNN_STATUS_SUCCESS            The destruction was successful
+ * 
+ */
+hipdnnStatus_t hipdnnDestroy(hipdnnHandle_t handle);
+
+/*! @brief Sets the stream for the hipdnnHandle_t
+ *
+ * @param [in] handle        An instance of hipdnnHandle_t
+ * @param [in] streamId      The stream to be set
+ *
+ * @retval HIPDNN_STATUS_BAD_PARAM                  invalid (NULL) handle.
+ * @retval HIPDNN_STATUS_BAD_PARAM_STREAM_MISMATCH  Mismatch between the stream and the handle.
+ * @retval HIPDNN_STATUS_NOT_SUPPORTED              Creating a descriptor of a given type is not supported.
+ * @retval HIPDNN_STATUS_INTERNAL_ERROR             Some internal errors were encountered.
+ * @retval HIPDNN_STATUS_SUCCESS                    The creation was successful
+ * 
+ */
+hipdnnStatus_t hipdnnSetStream(hipdnnHandle_t handle, hipStream_t streamId);
 
 /*! @brief Creates a backend descriptor
  *
