@@ -4,7 +4,9 @@
 #pragma once
 
 #include <hip/hip_runtime_api.h>
+#include <stddef.h>
 #include <stdint.h>
+
 // Cmake Generated export header.
 #include "hipdnn_backend_export.h"
 
@@ -206,7 +208,38 @@ HIPDNN_BACKEND_EXPORT hipdnnStatus_t
                               hipdnnBackendAttributeName_t attribute_name,
                               hipdnnBackendAttributeType_t attribute_type,
                               int64_t                      element_count,
-                              void*                        array_of_elements);
+                              const void*                  array_of_elements);
+
+/*
+ **************************************************************************************************
+ *
+ *  Extension API Below
+ *
+ **************************************************************************************************
+ */
+
+/*!
+ * @brief Creates and deserializes a graph into a backend descriptor.
+ *
+ * This function creates a backend descriptor and deserializes a graph from a serialized byte array 
+ * into the descriptor. The serialized graph is provided as an input byte array, and the size of 
+ * the graph in bytes is specified. The created descriptor will encapsulate the deserialized graph.
+ *
+ * @param [out] descriptor        Pointer to a backend descriptor where the deserialized graph will 
+ *                                be stored.
+ * @param [in]  serialized_graph  Pointer to the serialized graph data in a byte array.
+ * @param [in]  graph_byte_size   Size of the serialized graph in bytes.
+ *
+ * @retval HIPDNN_STATUS_SUCCESS           The graph was successfully deserialized and stored in the descriptor.
+ * @retval HIPDNN_STATUS_BAD_PARAM         Invalid or inconsistent parameter values were encountered, such as:
+ *                                         - descriptor is null.
+ *                                         - serialized_graph is null.
+ *                                         - graph_byte_size is zero.
+ * @retval HIPDNN_STATUS_ALLOC_FAILED      Memory allocation for the descriptor or graph failed.
+ * @retval HIPDNN_STATUS_INTERNAL_ERROR    An internal error occurred during deserialization.
+ */
+HIPDNN_BACKEND_EXPORT hipdnnStatus_t hipdnnBackendCreateAndDeserializeGraph_ext(
+    hipdnnBackendDescriptor_t* descriptor, const uint8_t* serialized_graph, size_t graph_byte_size);
 
 #ifdef __cplusplus
 }

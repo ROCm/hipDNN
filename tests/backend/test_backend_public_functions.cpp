@@ -1,26 +1,47 @@
 // Copyright © Advanced Micro Devices, Inc., or its affiliates.
 // SPDX-License-Identifier:  MIT
 
+#include "graph_generated.h"
 #include "hipdnn_backend.h"
 #include <gtest/gtest.h>
 
-TEST(HipDNNBackendTest, CreateDescriptor)
+TEST(HipDNNBackendTest, WillCreateDestroyGraphDescriptorSuccessfully)
+{
+    hipdnnBackendDescriptor_t descriptor = nullptr;
+
+    hipdnnStatus_t status
+        = hipdnnBackendCreateDescriptor(HIPDNN_BACKEND_OPERATIONGRAPH_DESCRIPTOR, &descriptor);
+    EXPECT_EQ(status, HIPDNN_STATUS_SUCCESS);
+
+    status = hipdnnBackendDestroyDescriptor(descriptor);
+    EXPECT_EQ(status, HIPDNN_STATUS_SUCCESS);
+}
+
+TEST(HipDNNBackendTest, WillNotCreateDescriptorIfPassedNullptr)
+{
+    hipdnnStatus_t status
+        = hipdnnBackendCreateDescriptor(HIPDNN_BACKEND_ENGINE_DESCRIPTOR, nullptr);
+
+    EXPECT_EQ(status, HIPDNN_STATUS_BAD_PARAM);
+}
+
+TEST(HipDNNBackendTest, WillNotCreateDescriptorIfTypeNotSupported)
 {
     hipdnnBackendDescriptor_t descriptor = nullptr;
 
     hipdnnStatus_t status
         = hipdnnBackendCreateDescriptor(HIPDNN_BACKEND_ENGINE_DESCRIPTOR, &descriptor);
 
-    EXPECT_EQ(status, HIPDNN_STATUS_SUCCESS);
+    EXPECT_EQ(status, HIPDNN_STATUS_NOT_SUPPORTED);
 }
 
-TEST(HipDNNBackendTest, DestroyDescriptor)
+TEST(HipDNNBackendTest, WontDestroyDescriptorIfNull)
 {
     hipdnnBackendDescriptor_t descriptor = nullptr;
 
     hipdnnStatus_t status = hipdnnBackendDestroyDescriptor(descriptor);
 
-    EXPECT_EQ(status, HIPDNN_STATUS_SUCCESS);
+    EXPECT_EQ(status, HIPDNN_STATUS_BAD_PARAM);
 }
 
 TEST(HipDNNBackendTest, Execute)
@@ -74,4 +95,38 @@ TEST(HipDNNBackendTest, SetAttribute)
         descriptor, attribute_name, attribute_type, element_count, array_of_elements);
 
     EXPECT_EQ(status, HIPDNN_STATUS_SUCCESS);
+}
+
+TEST(HipDNNBackendTest, WillSetBackendGraphCorrectly)
+{
+    flatbuffers::FlatBufferBuilder                                    builder;
+    std::vector<::flatbuffers::Offset<hipdnn::sdk::TensorAttributes>> tensor_attributes;
+    std::vector<::flatbuffers::Offset<hipdnn::sdk::Node>>             nodes;
+    auto graph = hipdnn::sdk::CreateGraphDirect(builder,
+                                                "Test GRAPH!",
+                                                hipdnn::sdk::DataType_FLOAT,
+                                                hipdnn::sdk::DataType_FLOAT,
+                                                hipdnn::sdk::DataType_FLOAT,
+                                                &tensor_attributes,
+                                                &nodes);
+    builder.Finish(graph);
+    flatbuffers::DetachedBuffer serialized_graph = builder.Release();
+
+    hipdnnBackendDescriptor_t descriptor = nullptr;
+
+    auto status = hipdnnBackendCreateAndDeserializeGraph_ext(
+        &descriptor, serialized_graph.data(), serialized_graph.size());
+
+    EXPECT_EQ(status, HIPDNN_STATUS_SUCCESS);
+    hipdnnBackendDestroyDescriptor(descriptor);
+}
+
+TEST(HipDNNBackendTest, WillFailToCreateGraphIfGraphIsNull)
+{
+    hipdnnBackendDescriptor_t descriptor = nullptr;
+
+    auto status = hipdnnBackendCreateAndDeserializeGraph_ext(&descriptor, nullptr, 0);
+
+    EXPECT_EQ(status, HIPDNN_STATUS_BAD_PARAM);
+    EXPECT_EQ(descriptor, nullptr);
 }

@@ -3,7 +3,9 @@
 find_package(hip REQUIRED)
 
 add_library(hipdnn_backend_private
-    graph_instance.cpp
+    descriptors/graph_descriptor.cpp
+    descriptors/descriptor_factory.cpp
+    flatbuffer_utilities.cpp
     plugin/engine_plugin.cpp
     plugin/plugin_core.cpp
 )
@@ -13,9 +15,12 @@ target_include_directories(hipdnn_backend_private
         ${HIP_DNN_BACKEND_INCLUDE_DIR}
         ${HIP_DNN_BACKEND_SRC_DIR}
         ${HIP_DNN_SDK_INCLUDE_DIR}
+        ${HIP_DNN_BACKEND_EXPORT_INCLUDE_DIR}
 )
+target_link_libraries(hipdnn_backend_private PRIVATE 
+    flatbuffers)
 
-target_link_libraries(hipdnn_backend_private PUBLIC Boost::dll)
+target_link_libraries(hipdnn_backend_private PUBLIC Boost::dll hip::device )
 
 clang_tidy_check(hipdnn_backend_private)
 
@@ -29,7 +34,7 @@ PUBLIC
     ${HIP_DNN_BACKEND_INCLUDE_DIR} 
     ${HIP_DNN_BACKEND_EXPORT_INCLUDE_DIR})
 
-target_link_libraries(hipdnn_backend PRIVATE hipdnn_backend_private hip::device)
+target_link_libraries(hipdnn_backend PRIVATE hipdnn_backend_private flatbuffers)
 target_link_libraries(hipdnn_backend PRIVATE "-Xlinker --exclude-libs=ALL" ) # HIDE symbols from linked static libs
 
 clang_tidy_check(hipdnn_backend)

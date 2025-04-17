@@ -1,3 +1,8 @@
+// Copyright © Advanced Micro Devices, Inc., or its affiliates.
+// SPDX-License-Identifier:  MIT
+
+#pragma once
+
 typedef enum
 {
     HIPDNN_ATTR_ENGINEHEUR_MODE            = 100,

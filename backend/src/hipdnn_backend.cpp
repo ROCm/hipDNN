@@ -2,7 +2,14 @@
 // SPDX-License-Identifier:  MIT
 
 #include "hipdnn_backend.h"
+#include "descriptors/backend_descriptor.hpp"
+#include "descriptors/descriptor_factory.hpp"
+#include "descriptors/graph_descriptor.hpp"
+#include "helpers.hpp"
+
 #include <iostream>
+
+using namespace hipdnn_backend;
 
 hipdnnStatus_t hipdnnCreate(hipdnnHandle_t* handle)
 {
@@ -22,12 +29,25 @@ hipdnnStatus_t hipdnnSetStream(hipdnnHandle_t handle, hipStream_t streamId)
 hipdnnStatus_t hipdnnBackendCreateDescriptor(hipdnnBackendDescriptorType_t descriptor_type,
                                              hipdnnBackendDescriptor_t*    descriptor)
 {
-    return HIPDNN_STATUS_SUCCESS;
+    return hipdnn_backend::try_catch(
+        [&] { return hipdnn_backend::Descriptor_factory::create(descriptor_type, descriptor); },
+        false);
 }
 
 hipdnnStatus_t hipdnnBackendDestroyDescriptor(hipdnnBackendDescriptor_t descriptor)
 {
-    return HIPDNN_STATUS_SUCCESS;
+    return hipdnn_backend::try_catch(
+        [&] {
+            if(descriptor == nullptr)
+            {
+                return HIPDNN_STATUS_BAD_PARAM;
+            }
+
+            delete descriptor;
+
+            return HIPDNN_STATUS_SUCCESS;
+        },
+        false);
 }
 
 hipdnnStatus_t hipdnnBackendExecute(hipdnnHandle_t            handle,
@@ -56,7 +76,18 @@ hipdnnStatus_t hipdnnBackendSetAttribute(hipdnnBackendDescriptor_t    descriptor
                                          hipdnnBackendAttributeName_t attribute_name,
                                          hipdnnBackendAttributeType_t attribute_type,
                                          int64_t                      element_count,
-                                         void*                        array_of_elements)
+                                         const void*                  array_of_elements)
 {
     return HIPDNN_STATUS_SUCCESS;
+}
+
+HIPDNN_BACKEND_EXPORT hipdnnStatus_t hipdnnBackendCreateAndDeserializeGraph_ext(
+    hipdnnBackendDescriptor_t* descriptor, const uint8_t* serialized_graph, size_t graph_byte_size)
+{
+    return hipdnn_backend::try_catch(
+        [&] {
+            return Descriptor_factory::create_graph_ext(
+                descriptor, serialized_graph, graph_byte_size);
+        },
+        false);
 }

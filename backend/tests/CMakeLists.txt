@@ -9,21 +9,25 @@ endif()
 include(GoogleTest)
 
 add_executable(hipdnn_backend_tests 
+    descriptors/test_graph_descriptor.cpp
+    descriptors/test_descriptor_factory.cpp
     test_engine_plugin.cpp
-    test_graph_creation.cpp
+    test_flatbuffer_utilities.cpp
 )
 
 target_link_libraries(hipdnn_backend_tests 
     gtest 
     gtest_main 
     pthread 
-    hipdnn_backend_private)
+    flatbuffers
+    hipdnn_backend_private
+)
 
 target_include_directories(hipdnn_backend_tests 
     PRIVATE 
     ${HIP_DNN_BACKEND_SRC_DIR}
     ${HIP_DNN_BACKEND_INCLUDE_DIR}
-    )
+)
     
 clang_tidy_check(hipdnn_backend_tests)
 
