@@ -78,14 +78,23 @@ endif()
 add_subdirectory(tests)
 
 if(CODE_COVERAGE)
-    set(CODE_COVERAGE_IGNORE_REGEX "\(.*deps.*\)|\(.*tests.*\)")
+    set(CODE_COVERAGE_IGNORE_REGEX "\(.*deps.*\)|\(.*tests.*\)|\(.*sdk/include.*\)")
+    set(CODE_COVERAGE_OBJECTS -object ./backend/src/libhipdnn_backend.so -object ./backend/tests/hipdnn_backend_tests -object ./frontend/tests/hipdnn_frontend_tests -object ./tests/backend/public_hipdnn_backend_tests)
     add_custom_target(
         code_coverage
+        COMMAND cd backend/tests && ./hipdnn_backend_tests
+        COMMAND cd frontend/tests && ./hipdnn_frontend_tests
+        COMMAND cd tests/backend && ./public_hipdnn_backend_tests
         COMMAND find . -name "*.profraw" -print0 | xargs -0 /opt/rocm/llvm/bin/llvm-profdata merge -sparse -o ./hipdnn.profdata
-        COMMAND /opt/rocm/llvm/bin/llvm-cov report -object ./backend/src/libhipdnn_backend.so -object ./frontend/tests/hipdnn_frontend_tests -instr-profile=./hipdnn.profdata -ignore-filename-regex=\"${CODE_COVERAGE_IGNORE_REGEX}\" > ./code_cov_hipdnn.report
-        COMMAND /opt/rocm/llvm/bin/llvm-cov show -Xdemangler=/opt/rocm/llvm/bin/llvm-cxxfilt -object ./backend/src/libhipdnn_backend.so -object ./frontend/tests/hipdnn_frontend_tests -instr-profile=./hipdnn.profdata -ignore-filename-regex=\"${CODE_COVERAGE_IGNORE_REGEX}\" > ./code_cov_hipdnn.txt
-        DEPENDS check
+        COMMAND /opt/rocm/llvm/bin/llvm-cov report ${CODE_COVERAGE_OBJECTS} -instr-profile=./hipdnn.profdata -ignore-filename-regex=\"${CODE_COVERAGE_IGNORE_REGEX}\" > ./code_cov_hipdnn.report
+        COMMAND /opt/rocm/llvm/bin/llvm-cov show -Xdemangler=/opt/rocm/llvm/bin/llvm-cxxfilt ${CODE_COVERAGE_OBJECTS} -instr-profile=./hipdnn.profdata -ignore-filename-regex=\"${CODE_COVERAGE_IGNORE_REGEX}\" --format=html --output-dir=./hipdnn_coverage_html
+        # We cant depend on the make check target due to the fact that ctest runs each test in a separate process
+        # this causes the .profraw file to get rewritten every time a test executes.  This means we only get coverage
+        # for the test that runs last.  The current workaround is to simply invoke the gtests directly.
+        # This is not ideal but it works for now.
+        #DEPENDS check
         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
         COMMENT "Generating code coverage report"
     )
 endif()
+
