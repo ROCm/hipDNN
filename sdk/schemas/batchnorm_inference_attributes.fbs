@@ -3,7 +3,7 @@
 
 namespace hipdnn.sdk;
 
-table BatchNormInferenceAttributes {
+table BatchnormInferenceAttributes {
     x: long;
     mean: long = null;
     inv_variance: long = null;

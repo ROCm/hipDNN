@@ -118,7 +118,7 @@ public:
         return set_mean(mean).set_inv_variance(inv_variance);
     }
 
-    flatbuffers::Offset<hipdnn::sdk::BatchNormBackwardAttributes>
+    flatbuffers::Offset<hipdnn::sdk::BatchnormBackwardAttributes>
         pack_attributes(flatbuffers::FlatBufferBuilder& builder) const
     {
         auto peer_stats_vector = std::vector<int64_t>{};
@@ -133,7 +133,7 @@ public:
         auto mean         = get_mean();
         auto inv_variance = get_inv_variance();
 
-        return hipdnn::sdk::CreateBatchNormBackwardAttributesDirect(
+        return hipdnn::sdk::CreateBatchnormBackwardAttributesDirect(
             builder,
             get_dy()->get_uid(),
             get_x()->get_uid(),

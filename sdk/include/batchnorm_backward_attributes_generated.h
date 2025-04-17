@@ -16,15 +16,15 @@ static_assert(FLATBUFFERS_VERSION_MAJOR == 23 &&
 namespace hipdnn {
 namespace sdk {
 
-struct BatchNormBackwardAttributes;
-struct BatchNormBackwardAttributesBuilder;
-struct BatchNormBackwardAttributesT;
+struct BatchnormBackwardAttributes;
+struct BatchnormBackwardAttributesBuilder;
+struct BatchnormBackwardAttributesT;
 
-bool operator==(const BatchNormBackwardAttributesT &lhs, const BatchNormBackwardAttributesT &rhs);
-bool operator!=(const BatchNormBackwardAttributesT &lhs, const BatchNormBackwardAttributesT &rhs);
+bool operator==(const BatchnormBackwardAttributesT &lhs, const BatchnormBackwardAttributesT &rhs);
+bool operator!=(const BatchnormBackwardAttributesT &lhs, const BatchnormBackwardAttributesT &rhs);
 
-struct BatchNormBackwardAttributesT : public ::flatbuffers::NativeTable {
-  typedef BatchNormBackwardAttributes TableType;
+struct BatchnormBackwardAttributesT : public ::flatbuffers::NativeTable {
+  typedef BatchnormBackwardAttributes TableType;
   int64_t dy = 0;
   int64_t x = 0;
   ::flatbuffers::Optional<int64_t> mean = ::flatbuffers::nullopt;
@@ -36,9 +36,9 @@ struct BatchNormBackwardAttributesT : public ::flatbuffers::NativeTable {
   int64_t dbias = 0;
 };
 
-struct BatchNormBackwardAttributes FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
-  typedef BatchNormBackwardAttributesT NativeTableType;
-  typedef BatchNormBackwardAttributesBuilder Builder;
+struct BatchnormBackwardAttributes FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef BatchnormBackwardAttributesT NativeTableType;
+  typedef BatchnormBackwardAttributesBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_DY = 4,
     VT_X = 6,
@@ -118,54 +118,54 @@ struct BatchNormBackwardAttributes FLATBUFFERS_FINAL_CLASS : private ::flatbuffe
            VerifyField<int64_t>(verifier, VT_DBIAS, 8) &&
            verifier.EndTable();
   }
-  BatchNormBackwardAttributesT *UnPack(const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
-  void UnPackTo(BatchNormBackwardAttributesT *_o, const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
-  static ::flatbuffers::Offset<BatchNormBackwardAttributes> Pack(::flatbuffers::FlatBufferBuilder &_fbb, const BatchNormBackwardAttributesT* _o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
+  BatchnormBackwardAttributesT *UnPack(const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(BatchnormBackwardAttributesT *_o, const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static ::flatbuffers::Offset<BatchnormBackwardAttributes> Pack(::flatbuffers::FlatBufferBuilder &_fbb, const BatchnormBackwardAttributesT* _o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
 };
 
-struct BatchNormBackwardAttributesBuilder {
-  typedef BatchNormBackwardAttributes Table;
+struct BatchnormBackwardAttributesBuilder {
+  typedef BatchnormBackwardAttributes Table;
   ::flatbuffers::FlatBufferBuilder &fbb_;
   ::flatbuffers::uoffset_t start_;
   void add_dy(int64_t dy) {
-    fbb_.AddElement<int64_t>(BatchNormBackwardAttributes::VT_DY, dy, 0);
+    fbb_.AddElement<int64_t>(BatchnormBackwardAttributes::VT_DY, dy, 0);
   }
   void add_x(int64_t x) {
-    fbb_.AddElement<int64_t>(BatchNormBackwardAttributes::VT_X, x, 0);
+    fbb_.AddElement<int64_t>(BatchnormBackwardAttributes::VT_X, x, 0);
   }
   void add_mean(int64_t mean) {
-    fbb_.AddElement<int64_t>(BatchNormBackwardAttributes::VT_MEAN, mean);
+    fbb_.AddElement<int64_t>(BatchnormBackwardAttributes::VT_MEAN, mean);
   }
   void add_inv_variance(int64_t inv_variance) {
-    fbb_.AddElement<int64_t>(BatchNormBackwardAttributes::VT_INV_VARIANCE, inv_variance);
+    fbb_.AddElement<int64_t>(BatchnormBackwardAttributes::VT_INV_VARIANCE, inv_variance);
   }
   void add_scale(int64_t scale) {
-    fbb_.AddElement<int64_t>(BatchNormBackwardAttributes::VT_SCALE, scale, 0);
+    fbb_.AddElement<int64_t>(BatchnormBackwardAttributes::VT_SCALE, scale, 0);
   }
   void add_peer_stats(::flatbuffers::Offset<::flatbuffers::Vector<int64_t>> peer_stats) {
-    fbb_.AddOffset(BatchNormBackwardAttributes::VT_PEER_STATS, peer_stats);
+    fbb_.AddOffset(BatchnormBackwardAttributes::VT_PEER_STATS, peer_stats);
   }
   void add_dx(int64_t dx) {
-    fbb_.AddElement<int64_t>(BatchNormBackwardAttributes::VT_DX, dx, 0);
+    fbb_.AddElement<int64_t>(BatchnormBackwardAttributes::VT_DX, dx, 0);
   }
   void add_dscale(int64_t dscale) {
-    fbb_.AddElement<int64_t>(BatchNormBackwardAttributes::VT_DSCALE, dscale, 0);
+    fbb_.AddElement<int64_t>(BatchnormBackwardAttributes::VT_DSCALE, dscale, 0);
   }
   void add_dbias(int64_t dbias) {
-    fbb_.AddElement<int64_t>(BatchNormBackwardAttributes::VT_DBIAS, dbias, 0);
+    fbb_.AddElement<int64_t>(BatchnormBackwardAttributes::VT_DBIAS, dbias, 0);
   }
-  explicit BatchNormBackwardAttributesBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+  explicit BatchnormBackwardAttributesBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  ::flatbuffers::Offset<BatchNormBackwardAttributes> Finish() {
+  ::flatbuffers::Offset<BatchnormBackwardAttributes> Finish() {
     const auto end = fbb_.EndTable(start_);
-    auto o = ::flatbuffers::Offset<BatchNormBackwardAttributes>(end);
+    auto o = ::flatbuffers::Offset<BatchnormBackwardAttributes>(end);
     return o;
   }
 };
 
-inline ::flatbuffers::Offset<BatchNormBackwardAttributes> CreateBatchNormBackwardAttributes(
+inline ::flatbuffers::Offset<BatchnormBackwardAttributes> CreateBatchnormBackwardAttributes(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     int64_t dy = 0,
     int64_t x = 0,
@@ -176,7 +176,7 @@ inline ::flatbuffers::Offset<BatchNormBackwardAttributes> CreateBatchNormBackwar
     int64_t dx = 0,
     int64_t dscale = 0,
     int64_t dbias = 0) {
-  BatchNormBackwardAttributesBuilder builder_(_fbb);
+  BatchnormBackwardAttributesBuilder builder_(_fbb);
   builder_.add_dbias(dbias);
   builder_.add_dscale(dscale);
   builder_.add_dx(dx);
@@ -189,7 +189,7 @@ inline ::flatbuffers::Offset<BatchNormBackwardAttributes> CreateBatchNormBackwar
   return builder_.Finish();
 }
 
-inline ::flatbuffers::Offset<BatchNormBackwardAttributes> CreateBatchNormBackwardAttributesDirect(
+inline ::flatbuffers::Offset<BatchnormBackwardAttributes> CreateBatchnormBackwardAttributesDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     int64_t dy = 0,
     int64_t x = 0,
@@ -201,7 +201,7 @@ inline ::flatbuffers::Offset<BatchNormBackwardAttributes> CreateBatchNormBackwar
     int64_t dscale = 0,
     int64_t dbias = 0) {
   auto peer_stats__ = peer_stats ? _fbb.CreateVector<int64_t>(*peer_stats) : 0;
-  return hipdnn::sdk::CreateBatchNormBackwardAttributes(
+  return hipdnn::sdk::CreateBatchnormBackwardAttributes(
       _fbb,
       dy,
       x,
@@ -214,10 +214,10 @@ inline ::flatbuffers::Offset<BatchNormBackwardAttributes> CreateBatchNormBackwar
       dbias);
 }
 
-::flatbuffers::Offset<BatchNormBackwardAttributes> CreateBatchNormBackwardAttributes(::flatbuffers::FlatBufferBuilder &_fbb, const BatchNormBackwardAttributesT *_o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
+::flatbuffers::Offset<BatchnormBackwardAttributes> CreateBatchnormBackwardAttributes(::flatbuffers::FlatBufferBuilder &_fbb, const BatchnormBackwardAttributesT *_o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
 
 
-inline bool operator==(const BatchNormBackwardAttributesT &lhs, const BatchNormBackwardAttributesT &rhs) {
+inline bool operator==(const BatchnormBackwardAttributesT &lhs, const BatchnormBackwardAttributesT &rhs) {
   return
       (lhs.dy == rhs.dy) &&
       (lhs.x == rhs.x) &&
@@ -230,18 +230,18 @@ inline bool operator==(const BatchNormBackwardAttributesT &lhs, const BatchNormB
       (lhs.dbias == rhs.dbias);
 }
 
-inline bool operator!=(const BatchNormBackwardAttributesT &lhs, const BatchNormBackwardAttributesT &rhs) {
+inline bool operator!=(const BatchnormBackwardAttributesT &lhs, const BatchnormBackwardAttributesT &rhs) {
     return !(lhs == rhs);
 }
 
 
-inline BatchNormBackwardAttributesT *BatchNormBackwardAttributes::UnPack(const ::flatbuffers::resolver_function_t *_resolver) const {
-  auto _o = std::unique_ptr<BatchNormBackwardAttributesT>(new BatchNormBackwardAttributesT());
+inline BatchnormBackwardAttributesT *BatchnormBackwardAttributes::UnPack(const ::flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = std::unique_ptr<BatchnormBackwardAttributesT>(new BatchnormBackwardAttributesT());
   UnPackTo(_o.get(), _resolver);
   return _o.release();
 }
 
-inline void BatchNormBackwardAttributes::UnPackTo(BatchNormBackwardAttributesT *_o, const ::flatbuffers::resolver_function_t *_resolver) const {
+inline void BatchnormBackwardAttributes::UnPackTo(BatchnormBackwardAttributesT *_o, const ::flatbuffers::resolver_function_t *_resolver) const {
   (void)_o;
   (void)_resolver;
   { auto _e = dy(); _o->dy = _e; }
@@ -255,14 +255,14 @@ inline void BatchNormBackwardAttributes::UnPackTo(BatchNormBackwardAttributesT *
   { auto _e = dbias(); _o->dbias = _e; }
 }
 
-inline ::flatbuffers::Offset<BatchNormBackwardAttributes> BatchNormBackwardAttributes::Pack(::flatbuffers::FlatBufferBuilder &_fbb, const BatchNormBackwardAttributesT* _o, const ::flatbuffers::rehasher_function_t *_rehasher) {
-  return CreateBatchNormBackwardAttributes(_fbb, _o, _rehasher);
+inline ::flatbuffers::Offset<BatchnormBackwardAttributes> BatchnormBackwardAttributes::Pack(::flatbuffers::FlatBufferBuilder &_fbb, const BatchnormBackwardAttributesT* _o, const ::flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateBatchnormBackwardAttributes(_fbb, _o, _rehasher);
 }
 
-inline ::flatbuffers::Offset<BatchNormBackwardAttributes> CreateBatchNormBackwardAttributes(::flatbuffers::FlatBufferBuilder &_fbb, const BatchNormBackwardAttributesT *_o, const ::flatbuffers::rehasher_function_t *_rehasher) {
+inline ::flatbuffers::Offset<BatchnormBackwardAttributes> CreateBatchnormBackwardAttributes(::flatbuffers::FlatBufferBuilder &_fbb, const BatchnormBackwardAttributesT *_o, const ::flatbuffers::rehasher_function_t *_rehasher) {
   (void)_rehasher;
   (void)_o;
-  struct _VectorArgs { ::flatbuffers::FlatBufferBuilder *__fbb; const BatchNormBackwardAttributesT* __o; const ::flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  struct _VectorArgs { ::flatbuffers::FlatBufferBuilder *__fbb; const BatchnormBackwardAttributesT* __o; const ::flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
   auto _dy = _o->dy;
   auto _x = _o->x;
   auto _mean = _o->mean;
@@ -272,7 +272,7 @@ inline ::flatbuffers::Offset<BatchNormBackwardAttributes> CreateBatchNormBackwar
   auto _dx = _o->dx;
   auto _dscale = _o->dscale;
   auto _dbias = _o->dbias;
-  return hipdnn::sdk::CreateBatchNormBackwardAttributes(
+  return hipdnn::sdk::CreateBatchnormBackwardAttributes(
       _fbb,
       _dy,
       _x,

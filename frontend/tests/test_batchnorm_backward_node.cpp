@@ -215,7 +215,7 @@ TEST(DBNNodeTests, PopulateHipdnnTensorIds)
 TEST(DBNNodeTests, PackNode)
 {
     Batchnorm_backward_attributes batchnorm_attributes;
-    batchnorm_attributes.name = "BatchNormBackward";
+    batchnorm_attributes.name = "BatchnormBackward";
 
     // Set up tensor attributes
     auto dy_tensor = std::make_shared<Tensor_attributes>();
@@ -294,11 +294,11 @@ TEST(DBNNodeTests, PackNode)
     auto buffer_pointer  = builder.GetBufferPointer();
     auto node_flatbuffer = flatbuffers::GetRoot<hipdnn::sdk::Node>(buffer_pointer);
 
-    EXPECT_STREQ(node_flatbuffer->name()->c_str(), "BatchNormBackward");
+    EXPECT_STREQ(node_flatbuffer->name()->c_str(), "BatchnormBackward");
     EXPECT_EQ(node_flatbuffer->attributes_type(),
-              hipdnn::sdk::NodeAttributes_BatchNormBackwardAttributes);
+              hipdnn::sdk::NodeAttributes_BatchnormBackwardAttributes);
 
-    auto packed_attributes = node_flatbuffer->attributes_as_BatchNormBackwardAttributes();
+    auto packed_attributes = node_flatbuffer->attributes_as_BatchnormBackwardAttributes();
     ASSERT_NE(packed_attributes, nullptr);
 
     EXPECT_EQ(packed_attributes->dy(), dy_tensor->get_uid());
@@ -314,7 +314,7 @@ TEST(DBNNodeTests, PackNode)
 TEST(DBNNodeTests, PackNodeWithoutMeanAndInvVariance)
 {
     Batchnorm_backward_attributes batchnorm_attributes;
-    batchnorm_attributes.name = "BatchNormBackward";
+    batchnorm_attributes.name = "BatchnormBackward";
 
     // Set up tensor attributes
     auto dy_tensor = std::make_shared<Tensor_attributes>();
@@ -376,11 +376,11 @@ TEST(DBNNodeTests, PackNodeWithoutMeanAndInvVariance)
     auto buffer_pointer  = builder.GetBufferPointer();
     auto node_flatbuffer = flatbuffers::GetRoot<hipdnn::sdk::Node>(buffer_pointer);
 
-    EXPECT_STREQ(node_flatbuffer->name()->c_str(), "BatchNormBackward");
+    EXPECT_STREQ(node_flatbuffer->name()->c_str(), "BatchnormBackward");
     EXPECT_EQ(node_flatbuffer->attributes_type(),
-              hipdnn::sdk::NodeAttributes_BatchNormBackwardAttributes);
+              hipdnn::sdk::NodeAttributes_BatchnormBackwardAttributes);
 
-    auto packed_attributes = node_flatbuffer->attributes_as_BatchNormBackwardAttributes();
+    auto packed_attributes = node_flatbuffer->attributes_as_BatchnormBackwardAttributes();
     ASSERT_NE(packed_attributes, nullptr);
 
     EXPECT_EQ(packed_attributes->dy(), dy_tensor->get_uid());

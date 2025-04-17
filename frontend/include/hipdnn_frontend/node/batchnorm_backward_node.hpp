@@ -159,7 +159,7 @@ public:
         return hipdnn::sdk::CreateNodeDirect(
             builder,
             attributes.name.c_str(),
-            hipdnn::sdk::NodeAttributes::NodeAttributes_BatchNormBackwardAttributes,
+            hipdnn::sdk::NodeAttributes::NodeAttributes_BatchnormBackwardAttributes,
             attributes.pack_attributes(builder).Union());
     }
 };

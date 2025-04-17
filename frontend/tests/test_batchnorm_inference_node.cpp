@@ -123,7 +123,7 @@ TEST(BatchnormInferenceNodeTests, InferPropertiesNode)
 TEST(BatchnormInferenceNodeTests, PackNode)
 {
     Batchnorm_inference_attributes batchnorm_attributes;
-    batchnorm_attributes.name = "BatchNormInference";
+    batchnorm_attributes.name = "BatchnormInference";
 
     auto x_tensor = std::make_shared<Tensor_attributes>();
     x_tensor->set_uid(1)
@@ -184,11 +184,11 @@ TEST(BatchnormInferenceNodeTests, PackNode)
     auto buffer_pointer  = builder.GetBufferPointer();
     auto node_flatbuffer = flatbuffers::GetRoot<hipdnn::sdk::Node>(buffer_pointer);
 
-    EXPECT_STREQ(node_flatbuffer->name()->c_str(), "BatchNormInference");
+    EXPECT_STREQ(node_flatbuffer->name()->c_str(), "BatchnormInference");
     EXPECT_EQ(node_flatbuffer->attributes_type(),
-              hipdnn::sdk::NodeAttributes_BatchNormInferenceAttributes);
+              hipdnn::sdk::NodeAttributes_BatchnormInferenceAttributes);
 
-    auto packed_attributes = node_flatbuffer->attributes_as_BatchNormInferenceAttributes();
+    auto packed_attributes = node_flatbuffer->attributes_as_BatchnormInferenceAttributes();
     ASSERT_NE(packed_attributes, nullptr);
 
     EXPECT_EQ(packed_attributes->x(), x_tensor->get_uid());
@@ -202,7 +202,7 @@ TEST(BatchnormInferenceNodeTests, PackNode)
 TEST(BatchnormInferenceNodeTests, PackNodeWithoutMeanAndInvVariance)
 {
     Batchnorm_inference_attributes batchnorm_attributes;
-    batchnorm_attributes.name = "BatchNormInference";
+    batchnorm_attributes.name = "BatchnormInference";
 
     auto x_tensor = std::make_shared<Tensor_attributes>();
     x_tensor->set_uid(1)
@@ -249,11 +249,11 @@ TEST(BatchnormInferenceNodeTests, PackNodeWithoutMeanAndInvVariance)
     auto buffer_pointer  = builder.GetBufferPointer();
     auto node_flatbuffer = flatbuffers::GetRoot<hipdnn::sdk::Node>(buffer_pointer);
 
-    EXPECT_STREQ(node_flatbuffer->name()->c_str(), "BatchNormInference");
+    EXPECT_STREQ(node_flatbuffer->name()->c_str(), "BatchnormInference");
     EXPECT_EQ(node_flatbuffer->attributes_type(),
-              hipdnn::sdk::NodeAttributes_BatchNormInferenceAttributes);
+              hipdnn::sdk::NodeAttributes_BatchnormInferenceAttributes);
 
-    auto packed_attributes = node_flatbuffer->attributes_as_BatchNormInferenceAttributes();
+    auto packed_attributes = node_flatbuffer->attributes_as_BatchnormInferenceAttributes();
     ASSERT_NE(packed_attributes, nullptr);
 
     EXPECT_EQ(packed_attributes->x(), x_tensor->get_uid());

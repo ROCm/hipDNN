@@ -83,13 +83,13 @@ public:
         return set_output(output_names::y, value);
     }
 
-    flatbuffers::Offset<hipdnn::sdk::BatchNormInferenceAttributes>
+    flatbuffers::Offset<hipdnn::sdk::BatchnormInferenceAttributes>
         pack_attributes(flatbuffers::FlatBufferBuilder& builder) const
     {
         auto mean         = get_mean();
         auto inv_variance = get_inv_variance();
 
-        return hipdnn::sdk::CreateBatchNormInferenceAttributes(
+        return hipdnn::sdk::CreateBatchnormInferenceAttributes(
             builder,
             get_x()->get_uid(),
             mean ? flatbuffers::Optional<int64_t>(mean->get_uid()) : flatbuffers::nullopt,

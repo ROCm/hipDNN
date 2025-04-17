@@ -195,9 +195,9 @@ TEST(GraphTests, BuildAndSerializeBatchnormInferenceGraph)
 
     EXPECT_EQ(deserialized_graph->nodes[0]->name, "BatchnormNode");
     EXPECT_EQ(deserialized_graph->nodes[0]->attributes.type,
-              hipdnn::sdk::NodeAttributes::NodeAttributes_BatchNormInferenceAttributes);
+              hipdnn::sdk::NodeAttributes::NodeAttributes_BatchnormInferenceAttributes);
     auto deserialized_batchnorm_attributes
-        = deserialized_graph->nodes[0]->attributes.AsBatchNormInferenceAttributes();
+        = deserialized_graph->nodes[0]->attributes.AsBatchnormInferenceAttributes();
     EXPECT_EQ(deserialized_batchnorm_attributes->x, x->get_uid());
     EXPECT_EQ(deserialized_batchnorm_attributes->mean, mean->get_uid());
     EXPECT_EQ(deserialized_batchnorm_attributes->inv_variance, inv_variance->get_uid());
@@ -334,9 +334,9 @@ TEST(GraphTests, BuildAndSerializePointwiseAndBatchnormGraph)
 
     EXPECT_EQ(deserialized_graph->nodes[0]->name, "BatchnormNode");
     EXPECT_EQ(deserialized_graph->nodes[0]->attributes.type,
-              hipdnn::sdk::NodeAttributes::NodeAttributes_BatchNormInferenceAttributes);
+              hipdnn::sdk::NodeAttributes::NodeAttributes_BatchnormInferenceAttributes);
     auto deserialized_batchnorm_attributes
-        = deserialized_graph->nodes[0]->attributes.AsBatchNormInferenceAttributes();
+        = deserialized_graph->nodes[0]->attributes.AsBatchnormInferenceAttributes();
     EXPECT_EQ(deserialized_batchnorm_attributes->x, x->get_uid());
     EXPECT_EQ(deserialized_batchnorm_attributes->mean, mean->get_uid());
     EXPECT_EQ(deserialized_batchnorm_attributes->inv_variance, inv_variance->get_uid());
@@ -425,9 +425,9 @@ TEST(GraphTests, BuildAndSerializeBatchnormBackwardGraph)
 
     EXPECT_EQ(deserialized_graph->nodes[0]->name, "BatchnormBackwardNode");
     EXPECT_EQ(deserialized_graph->nodes[0]->attributes.type,
-              hipdnn::sdk::NodeAttributes::NodeAttributes_BatchNormBackwardAttributes);
+              hipdnn::sdk::NodeAttributes::NodeAttributes_BatchnormBackwardAttributes);
     auto deserialized_batchnorm_attributes
-        = deserialized_graph->nodes[0]->attributes.AsBatchNormBackwardAttributes();
+        = deserialized_graph->nodes[0]->attributes.AsBatchnormBackwardAttributes();
     EXPECT_EQ(deserialized_batchnorm_attributes->dy, dy->get_uid());
     EXPECT_EQ(deserialized_batchnorm_attributes->x, x->get_uid());
     EXPECT_EQ(deserialized_batchnorm_attributes->scale, scale->get_uid());
@@ -525,9 +525,9 @@ TEST(GraphTests, BuildAndSerializePointwiseAndBatchnormBackwardGraph)
 
     EXPECT_EQ(deserialized_graph->nodes[1]->name, "BatchnormBackwardNode");
     EXPECT_EQ(deserialized_graph->nodes[1]->attributes.type,
-              hipdnn::sdk::NodeAttributes::NodeAttributes_BatchNormBackwardAttributes);
+              hipdnn::sdk::NodeAttributes::NodeAttributes_BatchnormBackwardAttributes);
     auto deserialized_batchnorm_attributes
-        = deserialized_graph->nodes[1]->attributes.AsBatchNormBackwardAttributes();
+        = deserialized_graph->nodes[1]->attributes.AsBatchnormBackwardAttributes();
     EXPECT_EQ(deserialized_batchnorm_attributes->dy, dy->get_uid());
     EXPECT_EQ(deserialized_batchnorm_attributes->x, x->get_uid());
     EXPECT_EQ(deserialized_batchnorm_attributes->scale, scale->get_uid());

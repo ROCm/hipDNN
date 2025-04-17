@@ -3,7 +3,7 @@
 
 namespace hipdnn.sdk;
 
-table BatchNormBackwardAttributes {
+table BatchnormBackwardAttributes {
     dy: long;
     x: long;
     mean: long = null;

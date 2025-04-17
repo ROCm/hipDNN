@@ -16,15 +16,15 @@ static_assert(FLATBUFFERS_VERSION_MAJOR == 23 &&
 namespace hipdnn {
 namespace sdk {
 
-struct BatchNormInferenceAttributes;
-struct BatchNormInferenceAttributesBuilder;
-struct BatchNormInferenceAttributesT;
+struct BatchnormInferenceAttributes;
+struct BatchnormInferenceAttributesBuilder;
+struct BatchnormInferenceAttributesT;
 
-bool operator==(const BatchNormInferenceAttributesT &lhs, const BatchNormInferenceAttributesT &rhs);
-bool operator!=(const BatchNormInferenceAttributesT &lhs, const BatchNormInferenceAttributesT &rhs);
+bool operator==(const BatchnormInferenceAttributesT &lhs, const BatchnormInferenceAttributesT &rhs);
+bool operator!=(const BatchnormInferenceAttributesT &lhs, const BatchnormInferenceAttributesT &rhs);
 
-struct BatchNormInferenceAttributesT : public ::flatbuffers::NativeTable {
-  typedef BatchNormInferenceAttributes TableType;
+struct BatchnormInferenceAttributesT : public ::flatbuffers::NativeTable {
+  typedef BatchnormInferenceAttributes TableType;
   int64_t x = 0;
   ::flatbuffers::Optional<int64_t> mean = ::flatbuffers::nullopt;
   ::flatbuffers::Optional<int64_t> inv_variance = ::flatbuffers::nullopt;
@@ -33,9 +33,9 @@ struct BatchNormInferenceAttributesT : public ::flatbuffers::NativeTable {
   int64_t y = 0;
 };
 
-struct BatchNormInferenceAttributes FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
-  typedef BatchNormInferenceAttributesT NativeTableType;
-  typedef BatchNormInferenceAttributesBuilder Builder;
+struct BatchnormInferenceAttributes FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef BatchnormInferenceAttributesT NativeTableType;
+  typedef BatchnormInferenceAttributesBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_X = 4,
     VT_MEAN = 6,
@@ -90,45 +90,45 @@ struct BatchNormInferenceAttributes FLATBUFFERS_FINAL_CLASS : private ::flatbuff
            VerifyField<int64_t>(verifier, VT_Y, 8) &&
            verifier.EndTable();
   }
-  BatchNormInferenceAttributesT *UnPack(const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
-  void UnPackTo(BatchNormInferenceAttributesT *_o, const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
-  static ::flatbuffers::Offset<BatchNormInferenceAttributes> Pack(::flatbuffers::FlatBufferBuilder &_fbb, const BatchNormInferenceAttributesT* _o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
+  BatchnormInferenceAttributesT *UnPack(const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(BatchnormInferenceAttributesT *_o, const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static ::flatbuffers::Offset<BatchnormInferenceAttributes> Pack(::flatbuffers::FlatBufferBuilder &_fbb, const BatchnormInferenceAttributesT* _o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
 };
 
-struct BatchNormInferenceAttributesBuilder {
-  typedef BatchNormInferenceAttributes Table;
+struct BatchnormInferenceAttributesBuilder {
+  typedef BatchnormInferenceAttributes Table;
   ::flatbuffers::FlatBufferBuilder &fbb_;
   ::flatbuffers::uoffset_t start_;
   void add_x(int64_t x) {
-    fbb_.AddElement<int64_t>(BatchNormInferenceAttributes::VT_X, x, 0);
+    fbb_.AddElement<int64_t>(BatchnormInferenceAttributes::VT_X, x, 0);
   }
   void add_mean(int64_t mean) {
-    fbb_.AddElement<int64_t>(BatchNormInferenceAttributes::VT_MEAN, mean);
+    fbb_.AddElement<int64_t>(BatchnormInferenceAttributes::VT_MEAN, mean);
   }
   void add_inv_variance(int64_t inv_variance) {
-    fbb_.AddElement<int64_t>(BatchNormInferenceAttributes::VT_INV_VARIANCE, inv_variance);
+    fbb_.AddElement<int64_t>(BatchnormInferenceAttributes::VT_INV_VARIANCE, inv_variance);
   }
   void add_scale(int64_t scale) {
-    fbb_.AddElement<int64_t>(BatchNormInferenceAttributes::VT_SCALE, scale, 0);
+    fbb_.AddElement<int64_t>(BatchnormInferenceAttributes::VT_SCALE, scale, 0);
   }
   void add_bias(int64_t bias) {
-    fbb_.AddElement<int64_t>(BatchNormInferenceAttributes::VT_BIAS, bias, 0);
+    fbb_.AddElement<int64_t>(BatchnormInferenceAttributes::VT_BIAS, bias, 0);
   }
   void add_y(int64_t y) {
-    fbb_.AddElement<int64_t>(BatchNormInferenceAttributes::VT_Y, y, 0);
+    fbb_.AddElement<int64_t>(BatchnormInferenceAttributes::VT_Y, y, 0);
   }
-  explicit BatchNormInferenceAttributesBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+  explicit BatchnormInferenceAttributesBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  ::flatbuffers::Offset<BatchNormInferenceAttributes> Finish() {
+  ::flatbuffers::Offset<BatchnormInferenceAttributes> Finish() {
     const auto end = fbb_.EndTable(start_);
-    auto o = ::flatbuffers::Offset<BatchNormInferenceAttributes>(end);
+    auto o = ::flatbuffers::Offset<BatchnormInferenceAttributes>(end);
     return o;
   }
 };
 
-inline ::flatbuffers::Offset<BatchNormInferenceAttributes> CreateBatchNormInferenceAttributes(
+inline ::flatbuffers::Offset<BatchnormInferenceAttributes> CreateBatchnormInferenceAttributes(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     int64_t x = 0,
     ::flatbuffers::Optional<int64_t> mean = ::flatbuffers::nullopt,
@@ -136,7 +136,7 @@ inline ::flatbuffers::Offset<BatchNormInferenceAttributes> CreateBatchNormInfere
     int64_t scale = 0,
     int64_t bias = 0,
     int64_t y = 0) {
-  BatchNormInferenceAttributesBuilder builder_(_fbb);
+  BatchnormInferenceAttributesBuilder builder_(_fbb);
   builder_.add_y(y);
   builder_.add_bias(bias);
   builder_.add_scale(scale);
@@ -146,10 +146,10 @@ inline ::flatbuffers::Offset<BatchNormInferenceAttributes> CreateBatchNormInfere
   return builder_.Finish();
 }
 
-::flatbuffers::Offset<BatchNormInferenceAttributes> CreateBatchNormInferenceAttributes(::flatbuffers::FlatBufferBuilder &_fbb, const BatchNormInferenceAttributesT *_o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
+::flatbuffers::Offset<BatchnormInferenceAttributes> CreateBatchnormInferenceAttributes(::flatbuffers::FlatBufferBuilder &_fbb, const BatchnormInferenceAttributesT *_o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
 
 
-inline bool operator==(const BatchNormInferenceAttributesT &lhs, const BatchNormInferenceAttributesT &rhs) {
+inline bool operator==(const BatchnormInferenceAttributesT &lhs, const BatchnormInferenceAttributesT &rhs) {
   return
       (lhs.x == rhs.x) &&
       (lhs.mean == rhs.mean) &&
@@ -159,18 +159,18 @@ inline bool operator==(const BatchNormInferenceAttributesT &lhs, const BatchNorm
       (lhs.y == rhs.y);
 }
 
-inline bool operator!=(const BatchNormInferenceAttributesT &lhs, const BatchNormInferenceAttributesT &rhs) {
+inline bool operator!=(const BatchnormInferenceAttributesT &lhs, const BatchnormInferenceAttributesT &rhs) {
     return !(lhs == rhs);
 }
 
 
-inline BatchNormInferenceAttributesT *BatchNormInferenceAttributes::UnPack(const ::flatbuffers::resolver_function_t *_resolver) const {
-  auto _o = std::unique_ptr<BatchNormInferenceAttributesT>(new BatchNormInferenceAttributesT());
+inline BatchnormInferenceAttributesT *BatchnormInferenceAttributes::UnPack(const ::flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = std::unique_ptr<BatchnormInferenceAttributesT>(new BatchnormInferenceAttributesT());
   UnPackTo(_o.get(), _resolver);
   return _o.release();
 }
 
-inline void BatchNormInferenceAttributes::UnPackTo(BatchNormInferenceAttributesT *_o, const ::flatbuffers::resolver_function_t *_resolver) const {
+inline void BatchnormInferenceAttributes::UnPackTo(BatchnormInferenceAttributesT *_o, const ::flatbuffers::resolver_function_t *_resolver) const {
   (void)_o;
   (void)_resolver;
   { auto _e = x(); _o->x = _e; }
@@ -181,21 +181,21 @@ inline void BatchNormInferenceAttributes::UnPackTo(BatchNormInferenceAttributesT
   { auto _e = y(); _o->y = _e; }
 }
 
-inline ::flatbuffers::Offset<BatchNormInferenceAttributes> BatchNormInferenceAttributes::Pack(::flatbuffers::FlatBufferBuilder &_fbb, const BatchNormInferenceAttributesT* _o, const ::flatbuffers::rehasher_function_t *_rehasher) {
-  return CreateBatchNormInferenceAttributes(_fbb, _o, _rehasher);
+inline ::flatbuffers::Offset<BatchnormInferenceAttributes> BatchnormInferenceAttributes::Pack(::flatbuffers::FlatBufferBuilder &_fbb, const BatchnormInferenceAttributesT* _o, const ::flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateBatchnormInferenceAttributes(_fbb, _o, _rehasher);
 }
 
-inline ::flatbuffers::Offset<BatchNormInferenceAttributes> CreateBatchNormInferenceAttributes(::flatbuffers::FlatBufferBuilder &_fbb, const BatchNormInferenceAttributesT *_o, const ::flatbuffers::rehasher_function_t *_rehasher) {
+inline ::flatbuffers::Offset<BatchnormInferenceAttributes> CreateBatchnormInferenceAttributes(::flatbuffers::FlatBufferBuilder &_fbb, const BatchnormInferenceAttributesT *_o, const ::flatbuffers::rehasher_function_t *_rehasher) {
   (void)_rehasher;
   (void)_o;
-  struct _VectorArgs { ::flatbuffers::FlatBufferBuilder *__fbb; const BatchNormInferenceAttributesT* __o; const ::flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  struct _VectorArgs { ::flatbuffers::FlatBufferBuilder *__fbb; const BatchnormInferenceAttributesT* __o; const ::flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
   auto _x = _o->x;
   auto _mean = _o->mean;
   auto _inv_variance = _o->inv_variance;
   auto _scale = _o->scale;
   auto _bias = _o->bias;
   auto _y = _o->y;
-  return hipdnn::sdk::CreateBatchNormInferenceAttributes(
+  return hipdnn::sdk::CreateBatchnormInferenceAttributes(
       _fbb,
       _x,
       _mean,
