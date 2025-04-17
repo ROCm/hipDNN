@@ -3,12 +3,13 @@
 
 include "data_types.fbs";
 include "tensor_attributes.fbs";
+include "batchnorm_backward_attributes.fbs";
 include "batchnorm_inference_attributes.fbs";
 include "pointwise_attributes.fbs";
 
 namespace hipdnn.sdk;
 
-union NodeAttributes {BatchNormInferenceAttributes, PointwiseAttributes}
+union NodeAttributes {BatchNormInferenceAttributes, PointwiseAttributes, BatchNormBackwardAttributes}
 
 table Node {
 	name: string;

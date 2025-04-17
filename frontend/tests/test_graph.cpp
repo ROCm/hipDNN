@@ -1,11 +1,11 @@
 // Copyright © Advanced Micro Devices, Inc., or its affiliates.
 // SPDX-License-Identifier:  MIT
 
+#include "graph_generated.h"
 #include <gtest/gtest.h>
 #include <hipdnn_frontend/attributes/batchnorm_inference_attributes.hpp>
 #include <hipdnn_frontend/attributes/pointwise_attributes.hpp>
 #include <hipdnn_frontend/graph.hpp>
-#include "graph_generated.h"
 
 using namespace hipdnn_frontend;
 using namespace hipdnn_frontend::graph;
@@ -352,5 +352,189 @@ TEST(GraphTests, BuildAndSerializePointwiseAndBatchnormGraph)
     EXPECT_EQ(deserialized_pointwise_attributes->in_0, y->get_uid());
     EXPECT_EQ(deserialized_pointwise_attributes->out_0, out_0->get_uid());
     EXPECT_EQ(deserialized_pointwise_attributes->operation, hipdnn::sdk::PointwiseMode_RELU_FWD);
+}
+
+TEST(GraphTests, BuildAndSerializeBatchnormBackwardGraph)
+{
+    Graph graph;
+
+    graph.set_name("SerializedGraphTest")
+        .set_compute_type(DataType_t::FLOAT)
+        .set_intermediate_type(DataType_t::HALF)
+        .set_io_type(DataType_t::FLOAT);
+
+    auto dy = std::make_shared<Tensor_attributes>();
+    dy->set_uid(1)
+        .set_name("Dy")
+        .set_dim({1, 2, 3, 4})
+        .set_stride({5, 6, 7, 8})
+        .set_data_type(DataType_t::FLOAT);
+
+    auto x = std::make_shared<Tensor_attributes>();
+    x->set_uid(2)
+        .set_name("X")
+        .set_dim({1, 2, 3, 4})
+        .set_stride({5, 6, 7, 8})
+        .set_data_type(DataType_t::FLOAT);
+
+    auto scale = std::make_shared<Tensor_attributes>();
+    scale->set_uid(3).set_name("Scale").set_data_type(DataType_t::FLOAT);
+
+    auto mean = std::make_shared<Tensor_attributes>();
+    mean->set_uid(4).set_name("Mean").set_data_type(DataType_t::FLOAT);
+
+    auto inv_variance = std::make_shared<Tensor_attributes>();
+    inv_variance->set_uid(5).set_name("InvVariance").set_data_type(DataType_t::FLOAT);
+
+    Batchnorm_backward_attributes batchnorm_attributes;
+    batchnorm_attributes.name = "BatchnormBackwardNode";
+    batchnorm_attributes.set_saved_mean_and_inv_variance(mean, inv_variance);
+
+    auto [dx, dscale, dbias] = graph.batchnorm_backward(dy, x, scale, batchnorm_attributes);
+
+    auto validation_result = graph.validate();
+    EXPECT_TRUE(validation_result.is_good()) << validation_result.get_message();
+
+    auto build_result = graph.build_operation_graph();
+    EXPECT_TRUE(build_result.is_good()) << build_result.get_message();
+
+    auto deserialized_graph = hipdnn::sdk::UnPackGraph(graph.serialized_graph.data());
+    ASSERT_NE(deserialized_graph, nullptr);
+
+    EXPECT_EQ(deserialized_graph->name, "SerializedGraphTest");
+    EXPECT_EQ(deserialized_graph->compute_type, hipdnn::sdk::DataType_FLOAT);
+    EXPECT_EQ(deserialized_graph->intermediate_type, hipdnn::sdk::DataType_HALF);
+    EXPECT_EQ(deserialized_graph->io_type, hipdnn::sdk::DataType_FLOAT);
+    EXPECT_EQ(deserialized_graph->tensors.size(), 8);
+    EXPECT_EQ(deserialized_graph->nodes.size(), 1);
+
+    std::unordered_map<int64_t, hipdnn::sdk::TensorAttributesT> tensor_lookup;
+    for(auto& tensor : deserialized_graph->tensors)
+    {
+        tensor_lookup[tensor->uid] = *tensor;
+    }
+
+    validate_tensor(*dy, tensor_lookup[dy->get_uid()]);
+    validate_tensor(*x, tensor_lookup[x->get_uid()]);
+    validate_tensor(*scale, tensor_lookup[scale->get_uid()]);
+    validate_tensor(*mean, tensor_lookup[mean->get_uid()]);
+    validate_tensor(*inv_variance, tensor_lookup[inv_variance->get_uid()]);
+    validate_tensor(*dx, tensor_lookup[dx->get_uid()]);
+    validate_tensor(*dscale, tensor_lookup[dscale->get_uid()]);
+    validate_tensor(*dbias, tensor_lookup[dbias->get_uid()]);
+
+    EXPECT_EQ(deserialized_graph->nodes[0]->name, "BatchnormBackwardNode");
+    EXPECT_EQ(deserialized_graph->nodes[0]->attributes.type,
+              hipdnn::sdk::NodeAttributes::NodeAttributes_BatchNormBackwardAttributes);
+    auto deserialized_batchnorm_attributes
+        = deserialized_graph->nodes[0]->attributes.AsBatchNormBackwardAttributes();
+    EXPECT_EQ(deserialized_batchnorm_attributes->dy, dy->get_uid());
+    EXPECT_EQ(deserialized_batchnorm_attributes->x, x->get_uid());
+    EXPECT_EQ(deserialized_batchnorm_attributes->scale, scale->get_uid());
+    EXPECT_EQ(deserialized_batchnorm_attributes->mean, mean->get_uid());
+    EXPECT_EQ(deserialized_batchnorm_attributes->inv_variance, inv_variance->get_uid());
+    EXPECT_EQ(deserialized_batchnorm_attributes->dx, dx->get_uid());
+    EXPECT_EQ(deserialized_batchnorm_attributes->dscale, dscale->get_uid());
+    EXPECT_EQ(deserialized_batchnorm_attributes->dbias, dbias->get_uid());
+}
+
+TEST(GraphTests, BuildAndSerializePointwiseAndBatchnormBackwardGraph)
+{
+    Graph graph;
+
+    graph.set_name("SerializedGraphTest")
+        .set_compute_type(DataType_t::FLOAT)
+        .set_intermediate_type(DataType_t::HALF)
+        .set_io_type(DataType_t::FLOAT);
+
+    auto x_pointwise = std::make_shared<Tensor_attributes>();
+    x_pointwise->set_uid(6)
+        .set_name("X_Pointwise")
+        .set_dim({1, 2, 3, 4})
+        .set_stride({5, 6, 7, 8})
+        .set_data_type(DataType_t::FLOAT);
+
+    Pointwise_attributes pointwise_attributes;
+    pointwise_attributes.name = "PointwiseNode";
+    pointwise_attributes.set_operation(PointwiseMode_t::RELU);
+
+    auto dy = graph.pointwise(x_pointwise, pointwise_attributes);
+
+    auto x = std::make_shared<Tensor_attributes>();
+    x->set_uid(1)
+        .set_name("X")
+        .set_dim({1, 2, 3, 4})
+        .set_stride({5, 6, 7, 8})
+        .set_data_type(DataType_t::FLOAT);
+
+    auto scale = std::make_shared<Tensor_attributes>();
+    scale->set_uid(2).set_name("Scale").set_data_type(DataType_t::FLOAT);
+
+    auto mean = std::make_shared<Tensor_attributes>();
+    mean->set_uid(3).set_name("Mean").set_data_type(DataType_t::FLOAT);
+
+    auto inv_variance = std::make_shared<Tensor_attributes>();
+    inv_variance->set_uid(4).set_name("InvVariance").set_data_type(DataType_t::FLOAT);
+
+    Batchnorm_backward_attributes batchnorm_attributes;
+    batchnorm_attributes.name = "BatchnormBackwardNode";
+    batchnorm_attributes.set_saved_mean_and_inv_variance(mean, inv_variance);
+
+    auto [dx, dscale, dbias] = graph.batchnorm_backward(dy, x, scale, batchnorm_attributes);
+
+    auto validation_result = graph.validate();
+    EXPECT_TRUE(validation_result.is_good()) << validation_result.get_message();
+
+    auto build_result = graph.build_operation_graph();
+    EXPECT_TRUE(build_result.is_good()) << build_result.get_message();
+
+    auto deserialized_graph = hipdnn::sdk::UnPackGraph(graph.serialized_graph.data());
+    ASSERT_NE(deserialized_graph, nullptr);
+
+    EXPECT_EQ(deserialized_graph->name, "SerializedGraphTest");
+    EXPECT_EQ(deserialized_graph->compute_type, hipdnn::sdk::DataType_FLOAT);
+    EXPECT_EQ(deserialized_graph->intermediate_type, hipdnn::sdk::DataType_HALF);
+    EXPECT_EQ(deserialized_graph->io_type, hipdnn::sdk::DataType_FLOAT);
+    EXPECT_EQ(deserialized_graph->tensors.size(), 9);
+    EXPECT_EQ(deserialized_graph->nodes.size(), 2);
+
+    std::unordered_map<int64_t, hipdnn::sdk::TensorAttributesT> tensor_lookup;
+    for(auto& tensor : deserialized_graph->tensors)
+    {
+        tensor_lookup[tensor->uid] = *tensor;
+    }
+
+    validate_tensor(*x_pointwise, tensor_lookup[x_pointwise->get_uid()]);
+    validate_tensor(*x, tensor_lookup[x->get_uid()]);
+    validate_tensor(*scale, tensor_lookup[scale->get_uid()]);
+    validate_tensor(*mean, tensor_lookup[mean->get_uid()]);
+    validate_tensor(*inv_variance, tensor_lookup[inv_variance->get_uid()]);
+    validate_tensor(*dy, tensor_lookup[dy->get_uid()]);
+    validate_tensor(*dx, tensor_lookup[dx->get_uid()]);
+    validate_tensor(*dscale, tensor_lookup[dscale->get_uid()]);
+    validate_tensor(*dbias, tensor_lookup[dbias->get_uid()]);
+
+    EXPECT_EQ(deserialized_graph->nodes[0]->name, "PointwiseNode");
+    EXPECT_EQ(deserialized_graph->nodes[0]->attributes.type,
+              hipdnn::sdk::NodeAttributes::NodeAttributes_PointwiseAttributes);
+    auto deserialized_pointwise_attributes
+        = deserialized_graph->nodes[0]->attributes.AsPointwiseAttributes();
+    EXPECT_EQ(deserialized_pointwise_attributes->in_0, x_pointwise->get_uid());
+    EXPECT_EQ(deserialized_pointwise_attributes->out_0, dy->get_uid());
+    EXPECT_EQ(deserialized_pointwise_attributes->operation, hipdnn::sdk::PointwiseMode_RELU_FWD);
+
+    EXPECT_EQ(deserialized_graph->nodes[1]->name, "BatchnormBackwardNode");
+    EXPECT_EQ(deserialized_graph->nodes[1]->attributes.type,
+              hipdnn::sdk::NodeAttributes::NodeAttributes_BatchNormBackwardAttributes);
+    auto deserialized_batchnorm_attributes
+        = deserialized_graph->nodes[1]->attributes.AsBatchNormBackwardAttributes();
+    EXPECT_EQ(deserialized_batchnorm_attributes->dy, dy->get_uid());
+    EXPECT_EQ(deserialized_batchnorm_attributes->x, x->get_uid());
+    EXPECT_EQ(deserialized_batchnorm_attributes->scale, scale->get_uid());
+    EXPECT_EQ(deserialized_batchnorm_attributes->mean, mean->get_uid());
+    EXPECT_EQ(deserialized_batchnorm_attributes->inv_variance, inv_variance->get_uid());
+    EXPECT_EQ(deserialized_batchnorm_attributes->dx, dx->get_uid());
+    EXPECT_EQ(deserialized_batchnorm_attributes->dscale, dscale->get_uid());
+    EXPECT_EQ(deserialized_batchnorm_attributes->dbias, dbias->get_uid());
 }
 // NOLINTEND

@@ -29,16 +29,6 @@ public:
             return {error_code_t::ATTRIBUTE_NOT_SET,
                     "BatchnormInferenceNode missing x for pre-validation"};
         }
-        if(!attributes.get_mean())
-        {
-            return {error_code_t::ATTRIBUTE_NOT_SET,
-                    "BatchnormInferenceNode missing mean for pre-validation"};
-        }
-        if(!attributes.get_inv_variance())
-        {
-            return {error_code_t::ATTRIBUTE_NOT_SET,
-                    "BatchnormInferenceNode missing inv_variance for pre-validation"};
-        }
         if(!attributes.get_scale())
         {
             return {error_code_t::ATTRIBUTE_NOT_SET,

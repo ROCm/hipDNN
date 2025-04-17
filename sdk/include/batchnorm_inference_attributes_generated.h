@@ -26,8 +26,8 @@ bool operator!=(const BatchNormInferenceAttributesT &lhs, const BatchNormInferen
 struct BatchNormInferenceAttributesT : public ::flatbuffers::NativeTable {
   typedef BatchNormInferenceAttributes TableType;
   int64_t x = 0;
-  int64_t mean = 0;
-  int64_t inv_variance = 0;
+  ::flatbuffers::Optional<int64_t> mean = ::flatbuffers::nullopt;
+  ::flatbuffers::Optional<int64_t> inv_variance = ::flatbuffers::nullopt;
   int64_t scale = 0;
   int64_t bias = 0;
   int64_t y = 0;
@@ -50,17 +50,17 @@ struct BatchNormInferenceAttributes FLATBUFFERS_FINAL_CLASS : private ::flatbuff
   bool mutate_x(int64_t _x = 0) {
     return SetField<int64_t>(VT_X, _x, 0);
   }
-  int64_t mean() const {
-    return GetField<int64_t>(VT_MEAN, 0);
+  ::flatbuffers::Optional<int64_t> mean() const {
+    return GetOptional<int64_t, int64_t>(VT_MEAN);
   }
-  bool mutate_mean(int64_t _mean = 0) {
-    return SetField<int64_t>(VT_MEAN, _mean, 0);
+  bool mutate_mean(int64_t _mean) {
+    return SetField<int64_t>(VT_MEAN, _mean);
   }
-  int64_t inv_variance() const {
-    return GetField<int64_t>(VT_INV_VARIANCE, 0);
+  ::flatbuffers::Optional<int64_t> inv_variance() const {
+    return GetOptional<int64_t, int64_t>(VT_INV_VARIANCE);
   }
-  bool mutate_inv_variance(int64_t _inv_variance = 0) {
-    return SetField<int64_t>(VT_INV_VARIANCE, _inv_variance, 0);
+  bool mutate_inv_variance(int64_t _inv_variance) {
+    return SetField<int64_t>(VT_INV_VARIANCE, _inv_variance);
   }
   int64_t scale() const {
     return GetField<int64_t>(VT_SCALE, 0);
@@ -103,10 +103,10 @@ struct BatchNormInferenceAttributesBuilder {
     fbb_.AddElement<int64_t>(BatchNormInferenceAttributes::VT_X, x, 0);
   }
   void add_mean(int64_t mean) {
-    fbb_.AddElement<int64_t>(BatchNormInferenceAttributes::VT_MEAN, mean, 0);
+    fbb_.AddElement<int64_t>(BatchNormInferenceAttributes::VT_MEAN, mean);
   }
   void add_inv_variance(int64_t inv_variance) {
-    fbb_.AddElement<int64_t>(BatchNormInferenceAttributes::VT_INV_VARIANCE, inv_variance, 0);
+    fbb_.AddElement<int64_t>(BatchNormInferenceAttributes::VT_INV_VARIANCE, inv_variance);
   }
   void add_scale(int64_t scale) {
     fbb_.AddElement<int64_t>(BatchNormInferenceAttributes::VT_SCALE, scale, 0);
@@ -131,8 +131,8 @@ struct BatchNormInferenceAttributesBuilder {
 inline ::flatbuffers::Offset<BatchNormInferenceAttributes> CreateBatchNormInferenceAttributes(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     int64_t x = 0,
-    int64_t mean = 0,
-    int64_t inv_variance = 0,
+    ::flatbuffers::Optional<int64_t> mean = ::flatbuffers::nullopt,
+    ::flatbuffers::Optional<int64_t> inv_variance = ::flatbuffers::nullopt,
     int64_t scale = 0,
     int64_t bias = 0,
     int64_t y = 0) {
@@ -140,8 +140,8 @@ inline ::flatbuffers::Offset<BatchNormInferenceAttributes> CreateBatchNormInfere
   builder_.add_y(y);
   builder_.add_bias(bias);
   builder_.add_scale(scale);
-  builder_.add_inv_variance(inv_variance);
-  builder_.add_mean(mean);
+  if(inv_variance) { builder_.add_inv_variance(*inv_variance); }
+  if(mean) { builder_.add_mean(*mean); }
   builder_.add_x(x);
   return builder_.Finish();
 }

@@ -5,6 +5,7 @@
 #include "attributes/batchnorm_inference_attributes.hpp"
 #include "attributes/pointwise_attributes.hpp"
 #include "flatbuffers/detached_buffer.h"
+#include "node/batchnorm_backward_node.hpp"
 #include "node/batchnorm_inference_node.hpp"
 #include "node/node.hpp"
 #include "node/pointwise_node.hpp"
@@ -120,6 +121,31 @@ public:
     {
         graph_attributes.set_io_data_type(io_type);
         return *this;
+    }
+
+    std::array<std::shared_ptr<Tensor_attributes>, 3>
+        batchnorm_backward(const std::shared_ptr<Tensor_attributes>& dy,
+                           const std::shared_ptr<Tensor_attributes>& x,
+                           const std::shared_ptr<Tensor_attributes>& scale,
+                           Batchnorm_backward_attributes             attributes)
+    {
+        auto dx = output_tensor(attributes.name + "::DX");
+        attributes.set_dx(dx);
+
+        auto dscale = output_tensor(attributes.name + "::DSCALE");
+        attributes.set_dscale(dscale);
+
+        auto dbias = output_tensor(attributes.name + "::DBIAS");
+        attributes.set_dbias(dbias);
+
+        attributes.set_x(x);
+        attributes.set_dy(dy);
+        attributes.set_scale(scale);
+
+        _sub_nodes.emplace_back(
+            std::make_shared<BatchnormBackwardNode>(std::move(attributes), graph_attributes));
+
+        return {dx, dscale, dbias};
     }
 
     std::shared_ptr<Tensor_attributes>

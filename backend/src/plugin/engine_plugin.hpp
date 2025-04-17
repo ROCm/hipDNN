@@ -25,7 +25,7 @@ private:
     bool _initialized = false; // Flag to check if the plugin is initialized
 #endif
 
-    std::function<unsigned()>         _func_get_num_engines; // Function to get the number of engines
+    std::function<unsigned()> _func_get_num_engines; // Function to get the number of engines
     std::function<int(unsigned, int)> _func_run_engine; // Function to run the engine
 
     using Plugin::Plugin;

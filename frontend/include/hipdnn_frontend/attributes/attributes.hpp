@@ -31,6 +31,17 @@ private:
 public:
     std::string name;
 
+    DerivedT& set_name(const std::string& name_)
+    {
+        name = name_;
+        return self();
+    }
+
+    const std::string& get_name() const
+    {
+        return name;
+    }
+
     error_t fill_from_graph_attributes(const Graph_attributes& graph_attributes)
     {
         for(auto& [_, tensor] : self().inputs)

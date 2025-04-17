@@ -106,6 +106,8 @@ private:
     {
         return static_cast<const DerivedT&>(*this);
     }
+
+public:
     void gather_hipdnn_tensor_ids(std::unordered_set<int64_t>& used_ids) const override
     {
         for(auto& [_, tensor] : self().attributes.inputs)

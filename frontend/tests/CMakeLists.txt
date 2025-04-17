@@ -12,7 +12,9 @@ add_executable(hipdnn_frontend_tests
     test_pointwise_node.cpp
     test_pointwise_attributes.cpp
     test_batchnorm_inference_node.cpp
+    test_batchnorm_backward_node.cpp
     test_batchnorm_inference_attributes.cpp
+    test_batchnorm_backward_attributes.cpp
     test_graph.cpp
     test_utilities.cpp
     test_graph_generated.cpp

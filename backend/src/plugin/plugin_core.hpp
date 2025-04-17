@@ -82,8 +82,7 @@ public:
             catch(const std::system_error& e)
             {
                 // TODO We do not have a logger yet, so we just print to stderr
-                std::cerr << "Error loading plugin: " << path << ", error=" << e.what()
-                          << '\n';
+                std::cerr << "Error loading plugin: " << path << ", error=" << e.what() << '\n';
                 // TODO For now we just print the error message and continue
                 continue;
             }

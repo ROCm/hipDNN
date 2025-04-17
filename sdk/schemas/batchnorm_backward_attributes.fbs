@@ -3,11 +3,14 @@
 
 namespace hipdnn.sdk;
 
-table BatchNormInferenceAttributes {
+table BatchNormBackwardAttributes {
+    dy: long;
     x: long;
     mean: long = null;
     inv_variance: long = null;
     scale: long;
-    bias: long;
-    y: long;
+    peer_stats: [long];
+    dx: long;
+    dscale: long;
+    dbias: long;
 }
