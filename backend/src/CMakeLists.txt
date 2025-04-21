@@ -1,5 +1,6 @@
 # Copyright © Advanced Micro Devices, Inc., or its affiliates.
 # SPDX-License-Identifier:  MIT
+
 find_package(hip REQUIRED)
 
 add_library(hipdnn_backend_private
@@ -17,12 +18,11 @@ target_include_directories(hipdnn_backend_private
         ${HIP_DNN_SDK_INCLUDE_DIR}
         ${HIP_DNN_BACKEND_EXPORT_INCLUDE_DIR}
 )
-target_link_libraries(hipdnn_backend_private PRIVATE 
-    flatbuffers)
 
-target_link_libraries(hipdnn_backend_private PUBLIC Boost::dll hip::device )
-
+target_compile_options(hipdnn_backend_private PRIVATE ${HIPDNN_WARNING_COMPILE_OPTIONS})
+target_link_libraries(hipdnn_backend_private PUBLIC Boost::dll hip::device flatbuffers )
 clang_tidy_check(hipdnn_backend_private)
+
 
 add_library(hipdnn_backend SHARED 
     hipdnn_backend.cpp
@@ -34,6 +34,7 @@ PUBLIC
     ${HIP_DNN_BACKEND_INCLUDE_DIR} 
     ${HIP_DNN_BACKEND_EXPORT_INCLUDE_DIR})
 
+target_compile_options(hipdnn_backend PRIVATE ${HIPDNN_WARNING_COMPILE_OPTIONS})
 target_link_libraries(hipdnn_backend PRIVATE hipdnn_backend_private flatbuffers)
 target_link_libraries(hipdnn_backend PRIVATE "-Xlinker --exclude-libs=ALL" ) # HIDE symbols from linked static libs
 

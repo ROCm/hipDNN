@@ -38,16 +38,18 @@ public:
         return {};
     }
     virtual error_t populate_hipdnn_tensor_ids(
-        std::unordered_map<int64_t, std::shared_ptr<Tensor_attributes>>& tensor_lookup,
-        int64_t&                                                         current_tensor_id,
-        std::unordered_set<int64_t>&                                     used_ids) const
+        [[maybe_unused]] std::unordered_map<int64_t, std::shared_ptr<Tensor_attributes>>&
+                                                      tensor_lookup,
+        [[maybe_unused]] int64_t&                     current_tensor_id,
+        [[maybe_unused]] std::unordered_set<int64_t>& used_ids) const
     {
         return {};
     }
-    virtual void gather_hipdnn_tensor_ids(std::unordered_set<int64_t>& used_ids) const {};
+    virtual void
+        gather_hipdnn_tensor_ids([[maybe_unused]] std::unordered_set<int64_t>& used_ids) const {};
 
     virtual flatbuffers::Offset<hipdnn::sdk::Node>
-        pack_node(flatbuffers::FlatBufferBuilder& builder) const
+        pack_node([[maybe_unused]] flatbuffers::FlatBufferBuilder& builder) const
     {
         return {};
     }

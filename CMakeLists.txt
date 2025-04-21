@@ -54,16 +54,40 @@ enable_testing() # Cmake wont discover or run tests without this line
 add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND} --output-on-failure -C ${CMAKE_CFG_INTDIR})
 
 # Add global compile options
-# fPIC: generates position-independent code,
 set(EXTRA_COMPILE_OPTIONS)
 set(EXTRA_LINK_OPTIONS)
 if(CODE_COVERAGE)
-    list(PREPEND EXTRA_COMPILE_OPTIONS -fprofile-instr-generate
-         -fcoverage-mapping
+    list(PREPEND EXTRA_COMPILE_OPTIONS 
+        -fprofile-instr-generate
+        -fcoverage-mapping
     )
-    list(PREPEND EXTRA_LINK_OPTIONS -fprofile-instr-generate -fcoverage-mapping)
+    list(PREPEND EXTRA_LINK_OPTIONS 
+        -fprofile-instr-generate 
+        -fcoverage-mapping)
 endif()
-add_compile_options(-fPIC ${EXTRA_COMPILE_OPTIONS})
+
+list(PREPEND HIPDNN_WARNING_COMPILE_OPTIONS
+    -Werror                 # Treat all warnings as errors
+    -Wall                   # Enable most common warnings
+    -Wextra                 # Enable additional warnings not covered by -Wall
+    -Wpedantic              # Enforce strict ISO C++ compliance
+    -Wshadow                # Warn about variable shadowing
+    -Wnon-virtual-dtor      # Warn if a class with virtual functions has a non-virtual destructor
+    -Wold-style-cast        # Warn about C-style casts
+    -Wcast-align            # Warn about potential performance issues with misaligned casts
+    -Woverloaded-virtual    # Warn if a base class function is hidden by a derived class function with the same name
+    -Wconversion            # Warn about implicit type conversions that may alter a value
+    -Wsign-conversion       # Warn about implicit conversions between signed and unsigned types
+    -Wnull-dereference      # Warn about dereferencing null pointers
+    -Wdouble-promotion      # Warn when a float is implicitly promoted to a double
+    -Wformat=2              # Enable stricter format string checks
+    -Winit-self             # Warn about variables initialized with itself
+    -Wunreachable-code      # Warn about unreachable code
+)
+
+add_compile_options(
+    -fPIC # Position Independent Code
+    ${EXTRA_COMPILE_OPTIONS})
 add_link_options(${EXTRA_LINK_OPTIONS})
 
 set(HIP_DNN_SDK_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/sdk/include")

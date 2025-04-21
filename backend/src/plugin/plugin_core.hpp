@@ -8,7 +8,16 @@
 // Use std::system_error instead of boost::system::system_error for boost::dll::fs::system_error
 #define BOOST_DLL_USE_STD_FS
 
+// disable warning check for implicit signed change clang
+
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wsign-conversion"
+#pragma clang diagnostic ignored "-Wold-style-cast"
+
 #include <boost/dll.hpp>
+
+#pragma clang diagnostic pop
+
 #include <filesystem>
 #include <functional>
 #include <iostream>

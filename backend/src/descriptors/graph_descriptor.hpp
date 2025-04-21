@@ -20,19 +20,20 @@ public:
     Graph_descriptor();
     ~Graph_descriptor() override = default;
 
-    hipdnnStatus_t execute(hipdnnHandle_t handle, hipdnnBackendDescriptor_t variant_pack) override;
+    hipdnnStatus_t execute([[maybe_unused]] hipdnnHandle_t            handle,
+                           [[maybe_unused]] hipdnnBackendDescriptor_t variant_pack) override;
     hipdnnStatus_t finalize() override;
 
-    hipdnnStatus_t get_attribute(hipdnnBackendAttributeName_t attribute_name,
-                                 hipdnnBackendAttributeType_t attribute_type,
-                                 int64_t                      requested_element_count,
-                                 int64_t*                     element_count,
-                                 void*                        array_of_elements) override;
+    hipdnnStatus_t get_attribute([[maybe_unused]] hipdnnBackendAttributeName_t attribute_name,
+                                 [[maybe_unused]] hipdnnBackendAttributeType_t attribute_type,
+                                 [[maybe_unused]] int64_t  requested_element_count,
+                                 [[maybe_unused]] int64_t* element_count,
+                                 [[maybe_unused]] void*    array_of_elements) override;
 
-    hipdnnStatus_t set_attribute(hipdnnBackendAttributeName_t attribute_name,
-                                 hipdnnBackendAttributeType_t attribute_type,
-                                 int64_t                      element_count,
-                                 const void*                  array_of_elements) override;
+    hipdnnStatus_t set_attribute([[maybe_unused]] hipdnnBackendAttributeName_t attribute_name,
+                                 [[maybe_unused]] hipdnnBackendAttributeType_t attribute_type,
+                                 [[maybe_unused]] int64_t                      element_count,
+                                 [[maybe_unused]] const void* array_of_elements) override;
 
     hipdnnStatus_t deserialize_graph(const uint8_t* serialized_graph, size_t graph_byte_size);
 };

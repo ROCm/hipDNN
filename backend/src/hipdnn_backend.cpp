@@ -13,16 +13,20 @@ using namespace hipdnn_backend;
 
 hipdnnStatus_t hipdnnCreate(hipdnnHandle_t* handle)
 {
+    (void)handle;
     return HIPDNN_STATUS_SUCCESS;
 }
 
 hipdnnStatus_t hipdnnDestroy(hipdnnHandle_t handle)
 {
+    (void)handle;
     return HIPDNN_STATUS_SUCCESS;
 }
 
 hipdnnStatus_t hipdnnSetStream(hipdnnHandle_t handle, hipStream_t streamId)
 {
+    (void)handle;
+    (void)streamId;
     return HIPDNN_STATUS_SUCCESS;
 }
 
@@ -54,11 +58,15 @@ hipdnnStatus_t hipdnnBackendExecute(hipdnnHandle_t            handle,
                                     hipdnnBackendDescriptor_t execution_plan,
                                     hipdnnBackendDescriptor_t variant_pack)
 {
+    (void)handle;
+    (void)execution_plan;
+    (void)variant_pack;
     return HIPDNN_STATUS_SUCCESS;
 }
 
 hipdnnStatus_t hipdnnBackendFinalize(hipdnnBackendDescriptor_t descriptor)
 {
+    (void)descriptor;
     return HIPDNN_STATUS_SUCCESS;
 }
 
@@ -69,6 +77,12 @@ hipdnnStatus_t hipdnnBackendGetAttribute(hipdnnBackendDescriptor_t    descriptor
                                          int64_t*                     element_count,
                                          void*                        array_of_elements)
 {
+    (void)descriptor;
+    (void)attribute_name;
+    (void)attribute_type;
+    (void)requested_element_count;
+    *element_count = 0;
+    (void)array_of_elements;
     return HIPDNN_STATUS_SUCCESS;
 }
 
@@ -78,6 +92,11 @@ hipdnnStatus_t hipdnnBackendSetAttribute(hipdnnBackendDescriptor_t    descriptor
                                          int64_t                      element_count,
                                          const void*                  array_of_elements)
 {
+    (void)descriptor;
+    (void)attribute_name;
+    (void)attribute_type;
+    (void)element_count;
+    (void)array_of_elements;
     return HIPDNN_STATUS_SUCCESS;
 }
 

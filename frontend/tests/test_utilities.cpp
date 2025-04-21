@@ -93,40 +93,40 @@ TEST(UtilitiesTests, GenerateStridesSingleDimension)
 
 TEST(UtilitiesTests, StrideOrderNHWCFiveDimensions)
 {
-    int64_t num_dims     = 5;
-    auto    stride_order = stride_order_nhwc(num_dims);
+    size_t num_dims     = 5;
+    auto   stride_order = stride_order_nhwc(num_dims);
 
     EXPECT_EQ(stride_order, (std::vector<int64_t>{4, 0, 3, 2, 1}));
 }
 
 TEST(UtilitiesTests, StrideOrderNHWCFourDimensions)
 {
-    int64_t num_dims     = 4;
-    auto    stride_order = stride_order_nhwc(num_dims);
+    size_t num_dims     = 4;
+    auto   stride_order = stride_order_nhwc(num_dims);
 
     EXPECT_EQ(stride_order, (std::vector<int64_t>{3, 0, 2, 1}));
 }
 
 TEST(UtilitiesTests, StrideOrderNHWCThreeDimensions)
 {
-    int64_t num_dims     = 3;
-    auto    stride_order = stride_order_nhwc(num_dims);
+    size_t num_dims     = 3;
+    auto   stride_order = stride_order_nhwc(num_dims);
 
     EXPECT_EQ(stride_order, (std::vector<int64_t>{2, 0, 1}));
 }
 
 TEST(UtilitiesTests, StrideOrderNHWCWithTwoDimensions)
 {
-    int64_t num_dims     = 2;
-    auto    stride_order = stride_order_nhwc(num_dims);
+    size_t num_dims     = 2;
+    auto   stride_order = stride_order_nhwc(num_dims);
 
     EXPECT_EQ(stride_order, (std::vector<int64_t>{1, 0}));
 }
 
 TEST(UtilitiesTests, StrideOrderNHWCWithSingleDimension)
 {
-    int64_t num_dims     = 1;
-    auto    stride_order = stride_order_nhwc(num_dims);
+    size_t num_dims     = 1;
+    auto   stride_order = stride_order_nhwc(num_dims);
 
     EXPECT_EQ(stride_order, (std::vector<int64_t>{0}));
 }

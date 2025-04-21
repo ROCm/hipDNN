@@ -16,10 +16,12 @@ add_executable(hipdnn_frontend_tests
     test_batchnorm_inference_attributes.cpp
     test_batchnorm_backward_attributes.cpp
     test_graph.cpp
+    test_types.cpp
     test_utilities.cpp
     test_graph_generated.cpp
 )
 
+target_compile_options(hipdnn_frontend_tests PRIVATE ${HIPDNN_WARNING_COMPILE_OPTIONS})
 target_link_libraries(hipdnn_frontend_tests gtest gtest_main pthread flatbuffers)
 target_include_directories(hipdnn_frontend_tests PRIVATE 
     ${HIP_DNN_FRONTEND_INCLUDE_DIR}

@@ -24,7 +24,7 @@ inline error_t find_common_shape(const std::vector<std::vector<int64_t>>& input_
         return {error_code_t::INVALID_VALUE, "Input shapes cannot be empty"};
     }
 
-    int64_t dims
+    size_t dims
         = std::max_element(input_shapes.begin(),
                            input_shapes.end(),
                            [](const std::vector<int64_t>& a, const std::vector<int64_t>& b) {

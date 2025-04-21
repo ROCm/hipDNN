@@ -22,13 +22,12 @@ target_link_libraries(hipdnn_backend_tests
     flatbuffers
     hipdnn_backend_private
 )
-
 target_include_directories(hipdnn_backend_tests 
     PRIVATE 
     ${HIP_DNN_BACKEND_SRC_DIR}
     ${HIP_DNN_BACKEND_INCLUDE_DIR}
 )
-    
+target_compile_options(hipdnn_backend_tests PRIVATE ${HIPDNN_WARNING_COMPILE_OPTIONS})
 clang_tidy_check(hipdnn_backend_tests)
 
 add_library(engineplugin1 SHARED plugins/engine_plugin1.cpp)

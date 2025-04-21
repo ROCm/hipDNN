@@ -21,7 +21,7 @@ enum class DataType_t
     BFLOAT16 = 3,
 };
 
-static hipdnn::sdk::DataType to_sdk_type(const DataType_t& type)
+[[maybe_unused]] static hipdnn::sdk::DataType to_sdk_type(const DataType_t& type)
 {
     switch(type)
     {
@@ -36,7 +36,7 @@ static hipdnn::sdk::DataType to_sdk_type(const DataType_t& type)
     }
 }
 
-static hipdnn::sdk::PointwiseMode to_sdk_type(const PointwiseMode_t& type)
+[[maybe_unused]] static hipdnn::sdk::PointwiseMode to_sdk_type(const PointwiseMode_t& type)
 {
     switch(type)
     {
