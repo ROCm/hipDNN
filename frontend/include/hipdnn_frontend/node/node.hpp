@@ -2,10 +2,10 @@
 // SPDX-License-Identifier:  MIT
 #pragma once
 
-#include "graph_generated.h"
 #include <hipdnn_frontend/attributes/graph_attributes.hpp>
 #include <hipdnn_frontend/attributes/tensor_attributes.hpp>
 #include <hipdnn_frontend/error.hpp>
+#include <hipdnn_sdk/data_objects/graph_generated.h>
 #include <memory>
 #include <unordered_map>
 #include <unordered_set>
@@ -48,7 +48,7 @@ public:
     virtual void
         gather_hipdnn_tensor_ids([[maybe_unused]] std::unordered_set<int64_t>& used_ids) const {};
 
-    virtual flatbuffers::Offset<hipdnn::sdk::Node>
+    virtual flatbuffers::Offset<hipdnn_sdk::data_objects::Node>
         pack_node([[maybe_unused]] flatbuffers::FlatBufferBuilder& builder) const
     {
         return {};

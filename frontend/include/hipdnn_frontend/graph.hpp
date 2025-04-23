@@ -52,7 +52,8 @@ public:
         populate_hipdnn_tensor_ids_subtree(tensor_lookup, current_tensor_id, used_tensor_uids);
         flatbuffers::FlatBufferBuilder builder;
 
-        std::vector<::flatbuffers::Offset<hipdnn::sdk::TensorAttributes>> tensor_attributes;
+        std::vector<::flatbuffers::Offset<hipdnn_sdk::data_objects::TensorAttributes>>
+            tensor_attributes;
         for(auto& [_, tensor] : tensor_lookup)
         {
             if(tensor)
@@ -61,7 +62,7 @@ public:
             }
         }
 
-        std::vector<::flatbuffers::Offset<hipdnn::sdk::Node>> nodes;
+        std::vector<::flatbuffers::Offset<hipdnn_sdk::data_objects::Node>> nodes;
         for(auto& node : _sub_nodes)
         {
             if(node)
@@ -69,7 +70,7 @@ public:
                 nodes.emplace_back(node->pack_node(builder));
             }
         }
-        auto graph = hipdnn::sdk::CreateGraphDirect(
+        auto graph = hipdnn_sdk::data_objects::CreateGraphDirect(
             builder,
             graph_attributes.get_name().c_str(),
             to_sdk_type(graph_attributes.get_compute_data_type()),

@@ -1,11 +1,11 @@
 // Copyright © Advanced Micro Devices, Inc., or its affiliates.
 // SPDX-License-Identifier:  MIT
 
-#include "graph_generated.h"
 #include <gtest/gtest.h>
 #include <hipdnn_frontend/attributes/batchnorm_inference_attributes.hpp>
 #include <hipdnn_frontend/attributes/pointwise_attributes.hpp>
 #include <hipdnn_frontend/graph.hpp>
+#include <hipdnn_sdk/data_objects/graph_generated.h>
 
 using namespace hipdnn_frontend;
 using namespace hipdnn_frontend::graph;
@@ -182,8 +182,8 @@ TEST(GraphTests, PointwiseNodeCreationThreeInputs)
     EXPECT_TRUE(validation_result.is_good()) << validation_result.get_message();
 }
 
-static void validate_tensor(const Tensor_attributes&              tensor,
-                            const hipdnn::sdk::TensorAttributesT& serialized_tensor)
+static void validate_tensor(const Tensor_attributes&                           tensor,
+                            const hipdnn_sdk::data_objects::TensorAttributesT& serialized_tensor)
 {
     EXPECT_EQ(tensor.get_name(), serialized_tensor.name);
     EXPECT_EQ(tensor.get_uid(), serialized_tensor.uid);
@@ -232,17 +232,17 @@ TEST(GraphTests, BuildAndSerializeBatchnormInferenceGraph)
     auto build_result = graph.build_operation_graph();
     EXPECT_TRUE(build_result.is_good()) << build_result.get_message();
 
-    auto deserialized_graph = hipdnn::sdk::UnPackGraph(graph.serialized_graph.data());
+    auto deserialized_graph = hipdnn_sdk::data_objects::UnPackGraph(graph.serialized_graph.data());
     ASSERT_NE(deserialized_graph, nullptr);
 
     EXPECT_EQ(deserialized_graph->name, "SerializedGraphTest");
-    EXPECT_EQ(deserialized_graph->compute_type, hipdnn::sdk::DataType_FLOAT);
-    EXPECT_EQ(deserialized_graph->intermediate_type, hipdnn::sdk::DataType_HALF);
-    EXPECT_EQ(deserialized_graph->io_type, hipdnn::sdk::DataType_FLOAT);
+    EXPECT_EQ(deserialized_graph->compute_type, hipdnn_sdk::data_objects::DataType_FLOAT);
+    EXPECT_EQ(deserialized_graph->intermediate_type, hipdnn_sdk::data_objects::DataType_HALF);
+    EXPECT_EQ(deserialized_graph->io_type, hipdnn_sdk::data_objects::DataType_FLOAT);
     EXPECT_EQ(deserialized_graph->tensors.size(), 6);
     EXPECT_EQ(deserialized_graph->nodes.size(), 1);
 
-    std::unordered_map<int64_t, hipdnn::sdk::TensorAttributesT> tensor_lookup;
+    std::unordered_map<int64_t, hipdnn_sdk::data_objects::TensorAttributesT> tensor_lookup;
     for(auto& tensor : deserialized_graph->tensors)
     {
         tensor_lookup[tensor->uid] = *tensor;
@@ -256,8 +256,9 @@ TEST(GraphTests, BuildAndSerializeBatchnormInferenceGraph)
     validate_tensor(*y, tensor_lookup[y->get_uid()]);
 
     EXPECT_EQ(deserialized_graph->nodes[0]->name, "BatchnormNode");
-    EXPECT_EQ(deserialized_graph->nodes[0]->attributes.type,
-              hipdnn::sdk::NodeAttributes::NodeAttributes_BatchnormInferenceAttributes);
+    EXPECT_EQ(
+        deserialized_graph->nodes[0]->attributes.type,
+        hipdnn_sdk::data_objects::NodeAttributes::NodeAttributes_BatchnormInferenceAttributes);
     auto deserialized_batchnorm_attributes
         = deserialized_graph->nodes[0]->attributes.AsBatchnormInferenceAttributes();
     EXPECT_EQ(deserialized_batchnorm_attributes->x, x->get_uid());
@@ -319,17 +320,17 @@ TEST(GraphTests, BuildAndSerializeBatchnormGraph)
     auto build_result = graph.build_operation_graph();
     EXPECT_TRUE(build_result.is_good()) << build_result.get_message();
 
-    auto deserialized_graph = hipdnn::sdk::UnPackGraph(graph.serialized_graph.data());
+    auto deserialized_graph = hipdnn_sdk::data_objects::UnPackGraph(graph.serialized_graph.data());
     ASSERT_NE(deserialized_graph, nullptr);
 
     EXPECT_EQ(deserialized_graph->name, "SerializedBatchnormGraph");
-    EXPECT_EQ(deserialized_graph->compute_type, hipdnn::sdk::DataType_FLOAT);
-    EXPECT_EQ(deserialized_graph->intermediate_type, hipdnn::sdk::DataType_HALF);
-    EXPECT_EQ(deserialized_graph->io_type, hipdnn::sdk::DataType_FLOAT);
+    EXPECT_EQ(deserialized_graph->compute_type, hipdnn_sdk::data_objects::DataType_FLOAT);
+    EXPECT_EQ(deserialized_graph->intermediate_type, hipdnn_sdk::data_objects::DataType_HALF);
+    EXPECT_EQ(deserialized_graph->io_type, hipdnn_sdk::data_objects::DataType_FLOAT);
     EXPECT_EQ(deserialized_graph->tensors.size(), 12);
     EXPECT_EQ(deserialized_graph->nodes.size(), 1);
 
-    std::unordered_map<int64_t, hipdnn::sdk::TensorAttributesT> tensor_lookup;
+    std::unordered_map<int64_t, hipdnn_sdk::data_objects::TensorAttributesT> tensor_lookup;
     for(auto& tensor : deserialized_graph->tensors)
     {
         tensor_lookup[tensor->uid] = *tensor;
@@ -350,7 +351,7 @@ TEST(GraphTests, BuildAndSerializeBatchnormGraph)
 
     EXPECT_EQ(deserialized_graph->nodes[0]->name, "BatchnormNode");
     EXPECT_EQ(deserialized_graph->nodes[0]->attributes.type,
-              hipdnn::sdk::NodeAttributes::NodeAttributes_BatchnormAttributes);
+              hipdnn_sdk::data_objects::NodeAttributes::NodeAttributes_BatchnormAttributes);
     auto deserialized_batchnorm_attributes
         = deserialized_graph->nodes[0]->attributes.AsBatchnormAttributes();
     EXPECT_EQ(deserialized_batchnorm_attributes->x, x->get_uid());
@@ -426,17 +427,17 @@ TEST(GraphTests, BuildAndSerializeBatchnormAndPointwiseGraph)
     auto build_result = graph.build_operation_graph();
     EXPECT_TRUE(build_result.is_good()) << build_result.get_message();
 
-    auto deserialized_graph = hipdnn::sdk::UnPackGraph(graph.serialized_graph.data());
+    auto deserialized_graph = hipdnn_sdk::data_objects::UnPackGraph(graph.serialized_graph.data());
     ASSERT_NE(deserialized_graph, nullptr);
 
     EXPECT_EQ(deserialized_graph->name, "SerializedBatchnormAndPointwiseGraph");
-    EXPECT_EQ(deserialized_graph->compute_type, hipdnn::sdk::DataType_FLOAT);
-    EXPECT_EQ(deserialized_graph->intermediate_type, hipdnn::sdk::DataType_HALF);
-    EXPECT_EQ(deserialized_graph->io_type, hipdnn::sdk::DataType_FLOAT);
+    EXPECT_EQ(deserialized_graph->compute_type, hipdnn_sdk::data_objects::DataType_FLOAT);
+    EXPECT_EQ(deserialized_graph->intermediate_type, hipdnn_sdk::data_objects::DataType_HALF);
+    EXPECT_EQ(deserialized_graph->io_type, hipdnn_sdk::data_objects::DataType_FLOAT);
     EXPECT_EQ(deserialized_graph->tensors.size(), 13);
     EXPECT_EQ(deserialized_graph->nodes.size(), 2);
 
-    std::unordered_map<int64_t, hipdnn::sdk::TensorAttributesT> tensor_lookup;
+    std::unordered_map<int64_t, hipdnn_sdk::data_objects::TensorAttributesT> tensor_lookup;
     for(auto& tensor : deserialized_graph->tensors)
     {
         tensor_lookup[tensor->uid] = *tensor;
@@ -458,7 +459,7 @@ TEST(GraphTests, BuildAndSerializeBatchnormAndPointwiseGraph)
 
     EXPECT_EQ(deserialized_graph->nodes[0]->name, "BatchnormNode");
     EXPECT_EQ(deserialized_graph->nodes[0]->attributes.type,
-              hipdnn::sdk::NodeAttributes::NodeAttributes_BatchnormAttributes);
+              hipdnn_sdk::data_objects::NodeAttributes::NodeAttributes_BatchnormAttributes);
     auto deserialized_batchnorm_attributes
         = deserialized_graph->nodes[0]->attributes.AsBatchnormAttributes();
     EXPECT_EQ(deserialized_batchnorm_attributes->x, x->get_uid());
@@ -478,12 +479,13 @@ TEST(GraphTests, BuildAndSerializeBatchnormAndPointwiseGraph)
 
     EXPECT_EQ(deserialized_graph->nodes[1]->name, "PointwiseNode");
     EXPECT_EQ(deserialized_graph->nodes[1]->attributes.type,
-              hipdnn::sdk::NodeAttributes::NodeAttributes_PointwiseAttributes);
+              hipdnn_sdk::data_objects::NodeAttributes::NodeAttributes_PointwiseAttributes);
     auto deserialized_pointwise_attributes
         = deserialized_graph->nodes[1]->attributes.AsPointwiseAttributes();
     EXPECT_EQ(deserialized_pointwise_attributes->in_0, y->get_uid());
     EXPECT_EQ(deserialized_pointwise_attributes->out_0, out_0->get_uid());
-    EXPECT_EQ(deserialized_pointwise_attributes->operation, hipdnn::sdk::PointwiseMode_RELU_FWD);
+    EXPECT_EQ(deserialized_pointwise_attributes->operation,
+              hipdnn_sdk::data_objects::PointwiseMode_RELU_FWD);
 }
 
 TEST(GraphTests, BuildAndSerializePointwiseGraph)
@@ -514,17 +516,17 @@ TEST(GraphTests, BuildAndSerializePointwiseGraph)
     auto build_result = graph.build_operation_graph();
     EXPECT_TRUE(build_result.is_good()) << build_result.get_message();
 
-    auto deserialized_graph = hipdnn::sdk::UnPackGraph(graph.serialized_graph.data());
+    auto deserialized_graph = hipdnn_sdk::data_objects::UnPackGraph(graph.serialized_graph.data());
     ASSERT_NE(deserialized_graph, nullptr);
 
     EXPECT_EQ(deserialized_graph->name, "SerializedGraphTest");
-    EXPECT_EQ(deserialized_graph->compute_type, hipdnn::sdk::DataType_FLOAT);
-    EXPECT_EQ(deserialized_graph->intermediate_type, hipdnn::sdk::DataType_HALF);
-    EXPECT_EQ(deserialized_graph->io_type, hipdnn::sdk::DataType_FLOAT);
+    EXPECT_EQ(deserialized_graph->compute_type, hipdnn_sdk::data_objects::DataType_FLOAT);
+    EXPECT_EQ(deserialized_graph->intermediate_type, hipdnn_sdk::data_objects::DataType_HALF);
+    EXPECT_EQ(deserialized_graph->io_type, hipdnn_sdk::data_objects::DataType_FLOAT);
     EXPECT_EQ(deserialized_graph->tensors.size(), 2);
     EXPECT_EQ(deserialized_graph->nodes.size(), 1);
 
-    std::unordered_map<int64_t, hipdnn::sdk::TensorAttributesT> tensor_lookup;
+    std::unordered_map<int64_t, hipdnn_sdk::data_objects::TensorAttributesT> tensor_lookup;
     for(auto& tensor : deserialized_graph->tensors)
     {
         tensor_lookup[tensor->uid] = *tensor;
@@ -535,12 +537,13 @@ TEST(GraphTests, BuildAndSerializePointwiseGraph)
 
     EXPECT_EQ(deserialized_graph->nodes[0]->name, "PointwiseNode");
     EXPECT_EQ(deserialized_graph->nodes[0]->attributes.type,
-              hipdnn::sdk::NodeAttributes::NodeAttributes_PointwiseAttributes);
+              hipdnn_sdk::data_objects::NodeAttributes::NodeAttributes_PointwiseAttributes);
     auto deserialized_pointwise_attributes
         = deserialized_graph->nodes[0]->attributes.AsPointwiseAttributes();
     EXPECT_EQ(deserialized_pointwise_attributes->in_0, in_0->get_uid());
     EXPECT_EQ(deserialized_pointwise_attributes->out_0, out_0->get_uid());
-    EXPECT_EQ(deserialized_pointwise_attributes->operation, hipdnn::sdk::PointwiseMode_RELU_FWD);
+    EXPECT_EQ(deserialized_pointwise_attributes->operation,
+              hipdnn_sdk::data_objects::PointwiseMode_RELU_FWD);
 }
 
 TEST(GraphTests, BuildAndSerializePointwiseAndBatchnormInferenceGraph)
@@ -588,17 +591,17 @@ TEST(GraphTests, BuildAndSerializePointwiseAndBatchnormInferenceGraph)
     auto build_result = graph.build_operation_graph();
     EXPECT_TRUE(build_result.is_good()) << build_result.get_message();
 
-    auto deserialized_graph = hipdnn::sdk::UnPackGraph(graph.serialized_graph.data());
+    auto deserialized_graph = hipdnn_sdk::data_objects::UnPackGraph(graph.serialized_graph.data());
     ASSERT_NE(deserialized_graph, nullptr);
 
     EXPECT_EQ(deserialized_graph->name, "SerializedGraphTest");
-    EXPECT_EQ(deserialized_graph->compute_type, hipdnn::sdk::DataType_FLOAT);
-    EXPECT_EQ(deserialized_graph->intermediate_type, hipdnn::sdk::DataType_HALF);
-    EXPECT_EQ(deserialized_graph->io_type, hipdnn::sdk::DataType_FLOAT);
+    EXPECT_EQ(deserialized_graph->compute_type, hipdnn_sdk::data_objects::DataType_FLOAT);
+    EXPECT_EQ(deserialized_graph->intermediate_type, hipdnn_sdk::data_objects::DataType_HALF);
+    EXPECT_EQ(deserialized_graph->io_type, hipdnn_sdk::data_objects::DataType_FLOAT);
     EXPECT_EQ(deserialized_graph->tensors.size(), 7);
     EXPECT_EQ(deserialized_graph->nodes.size(), 2);
 
-    std::unordered_map<int64_t, hipdnn::sdk::TensorAttributesT> tensor_lookup;
+    std::unordered_map<int64_t, hipdnn_sdk::data_objects::TensorAttributesT> tensor_lookup;
     for(auto& tensor : deserialized_graph->tensors)
     {
         tensor_lookup[tensor->uid] = *tensor;
@@ -613,8 +616,9 @@ TEST(GraphTests, BuildAndSerializePointwiseAndBatchnormInferenceGraph)
     validate_tensor(*out_0, tensor_lookup[out_0->get_uid()]);
 
     EXPECT_EQ(deserialized_graph->nodes[0]->name, "BatchnormNode");
-    EXPECT_EQ(deserialized_graph->nodes[0]->attributes.type,
-              hipdnn::sdk::NodeAttributes::NodeAttributes_BatchnormInferenceAttributes);
+    EXPECT_EQ(
+        deserialized_graph->nodes[0]->attributes.type,
+        hipdnn_sdk::data_objects::NodeAttributes::NodeAttributes_BatchnormInferenceAttributes);
     auto deserialized_batchnorm_attributes
         = deserialized_graph->nodes[0]->attributes.AsBatchnormInferenceAttributes();
     EXPECT_EQ(deserialized_batchnorm_attributes->x, x->get_uid());
@@ -626,12 +630,13 @@ TEST(GraphTests, BuildAndSerializePointwiseAndBatchnormInferenceGraph)
 
     EXPECT_EQ(deserialized_graph->nodes[1]->name, "PointwiseNode");
     EXPECT_EQ(deserialized_graph->nodes[1]->attributes.type,
-              hipdnn::sdk::NodeAttributes::NodeAttributes_PointwiseAttributes);
+              hipdnn_sdk::data_objects::NodeAttributes::NodeAttributes_PointwiseAttributes);
     auto deserialized_pointwise_attributes
         = deserialized_graph->nodes[1]->attributes.AsPointwiseAttributes();
     EXPECT_EQ(deserialized_pointwise_attributes->in_0, y->get_uid());
     EXPECT_EQ(deserialized_pointwise_attributes->out_0, out_0->get_uid());
-    EXPECT_EQ(deserialized_pointwise_attributes->operation, hipdnn::sdk::PointwiseMode_RELU_FWD);
+    EXPECT_EQ(deserialized_pointwise_attributes->operation,
+              hipdnn_sdk::data_objects::PointwiseMode_RELU_FWD);
 }
 
 TEST(GraphTests, BuildAndSerializeBatchnormBackwardGraph)
@@ -678,17 +683,17 @@ TEST(GraphTests, BuildAndSerializeBatchnormBackwardGraph)
     auto build_result = graph.build_operation_graph();
     EXPECT_TRUE(build_result.is_good()) << build_result.get_message();
 
-    auto deserialized_graph = hipdnn::sdk::UnPackGraph(graph.serialized_graph.data());
+    auto deserialized_graph = hipdnn_sdk::data_objects::UnPackGraph(graph.serialized_graph.data());
     ASSERT_NE(deserialized_graph, nullptr);
 
     EXPECT_EQ(deserialized_graph->name, "SerializedGraphTest");
-    EXPECT_EQ(deserialized_graph->compute_type, hipdnn::sdk::DataType_FLOAT);
-    EXPECT_EQ(deserialized_graph->intermediate_type, hipdnn::sdk::DataType_HALF);
-    EXPECT_EQ(deserialized_graph->io_type, hipdnn::sdk::DataType_FLOAT);
+    EXPECT_EQ(deserialized_graph->compute_type, hipdnn_sdk::data_objects::DataType_FLOAT);
+    EXPECT_EQ(deserialized_graph->intermediate_type, hipdnn_sdk::data_objects::DataType_HALF);
+    EXPECT_EQ(deserialized_graph->io_type, hipdnn_sdk::data_objects::DataType_FLOAT);
     EXPECT_EQ(deserialized_graph->tensors.size(), 8);
     EXPECT_EQ(deserialized_graph->nodes.size(), 1);
 
-    std::unordered_map<int64_t, hipdnn::sdk::TensorAttributesT> tensor_lookup;
+    std::unordered_map<int64_t, hipdnn_sdk::data_objects::TensorAttributesT> tensor_lookup;
     for(auto& tensor : deserialized_graph->tensors)
     {
         tensor_lookup[tensor->uid] = *tensor;
@@ -705,7 +710,7 @@ TEST(GraphTests, BuildAndSerializeBatchnormBackwardGraph)
 
     EXPECT_EQ(deserialized_graph->nodes[0]->name, "BatchnormBackwardNode");
     EXPECT_EQ(deserialized_graph->nodes[0]->attributes.type,
-              hipdnn::sdk::NodeAttributes::NodeAttributes_BatchnormBackwardAttributes);
+              hipdnn_sdk::data_objects::NodeAttributes::NodeAttributes_BatchnormBackwardAttributes);
     auto deserialized_batchnorm_attributes
         = deserialized_graph->nodes[0]->attributes.AsBatchnormBackwardAttributes();
     EXPECT_EQ(deserialized_batchnorm_attributes->dy, dy->get_uid());
@@ -768,17 +773,17 @@ TEST(GraphTests, BuildAndSerializePointwiseAndBatchnormBackwardGraph)
     auto build_result = graph.build_operation_graph();
     EXPECT_TRUE(build_result.is_good()) << build_result.get_message();
 
-    auto deserialized_graph = hipdnn::sdk::UnPackGraph(graph.serialized_graph.data());
+    auto deserialized_graph = hipdnn_sdk::data_objects::UnPackGraph(graph.serialized_graph.data());
     ASSERT_NE(deserialized_graph, nullptr);
 
     EXPECT_EQ(deserialized_graph->name, "SerializedGraphTest");
-    EXPECT_EQ(deserialized_graph->compute_type, hipdnn::sdk::DataType_FLOAT);
-    EXPECT_EQ(deserialized_graph->intermediate_type, hipdnn::sdk::DataType_HALF);
-    EXPECT_EQ(deserialized_graph->io_type, hipdnn::sdk::DataType_FLOAT);
+    EXPECT_EQ(deserialized_graph->compute_type, hipdnn_sdk::data_objects::DataType_FLOAT);
+    EXPECT_EQ(deserialized_graph->intermediate_type, hipdnn_sdk::data_objects::DataType_HALF);
+    EXPECT_EQ(deserialized_graph->io_type, hipdnn_sdk::data_objects::DataType_FLOAT);
     EXPECT_EQ(deserialized_graph->tensors.size(), 9);
     EXPECT_EQ(deserialized_graph->nodes.size(), 2);
 
-    std::unordered_map<int64_t, hipdnn::sdk::TensorAttributesT> tensor_lookup;
+    std::unordered_map<int64_t, hipdnn_sdk::data_objects::TensorAttributesT> tensor_lookup;
     for(auto& tensor : deserialized_graph->tensors)
     {
         tensor_lookup[tensor->uid] = *tensor;
@@ -796,16 +801,17 @@ TEST(GraphTests, BuildAndSerializePointwiseAndBatchnormBackwardGraph)
 
     EXPECT_EQ(deserialized_graph->nodes[0]->name, "PointwiseNode");
     EXPECT_EQ(deserialized_graph->nodes[0]->attributes.type,
-              hipdnn::sdk::NodeAttributes::NodeAttributes_PointwiseAttributes);
+              hipdnn_sdk::data_objects::NodeAttributes::NodeAttributes_PointwiseAttributes);
     auto deserialized_pointwise_attributes
         = deserialized_graph->nodes[0]->attributes.AsPointwiseAttributes();
     EXPECT_EQ(deserialized_pointwise_attributes->in_0, x_pointwise->get_uid());
     EXPECT_EQ(deserialized_pointwise_attributes->out_0, dy->get_uid());
-    EXPECT_EQ(deserialized_pointwise_attributes->operation, hipdnn::sdk::PointwiseMode_RELU_FWD);
+    EXPECT_EQ(deserialized_pointwise_attributes->operation,
+              hipdnn_sdk::data_objects::PointwiseMode_RELU_FWD);
 
     EXPECT_EQ(deserialized_graph->nodes[1]->name, "BatchnormBackwardNode");
     EXPECT_EQ(deserialized_graph->nodes[1]->attributes.type,
-              hipdnn::sdk::NodeAttributes::NodeAttributes_BatchnormBackwardAttributes);
+              hipdnn_sdk::data_objects::NodeAttributes::NodeAttributes_BatchnormBackwardAttributes);
     auto deserialized_batchnorm_attributes
         = deserialized_graph->nodes[1]->attributes.AsBatchnormBackwardAttributes();
     EXPECT_EQ(deserialized_batchnorm_attributes->dy, dy->get_uid());

@@ -219,12 +219,14 @@ function(_fetch_flatbuffers VERSION HASH)
     
     _save_var(FLATBUFFERS_BUILD_FLATC)
     _save_var(FLATBUFFERS_INSTALL)
+    _save_var(FLATBUFFERS_BUILD_FLATLIB)
     _save_var(FLATBUFFERS_BUILD_TESTS)
     _save_var(FLATBUFFERS_BUILD_FLATHASH)
     _save_var(FLATBUFFERS_ENABLE_PCH)
 
     set(FLATBUFFERS_BUILD_FLATC ON)
-    set(FLATBUFFERS_INSTALL OFF)
+    set(FLATBUFFERS_INSTALL ON)
+    set(FLATBUFFERS_BUILD_FLATLIB OFF)
     set(FLATBUFFERS_BUILD_TESTS OFF)
     set(FLATBUFFERS_BUILD_FLATHASH OFF)
     set(FLATBUFFERS_ENABLE_PCH ON)
@@ -240,10 +242,13 @@ function(_fetch_flatbuffers VERSION HASH)
 
     _restore_var(FLATBUFFERS_BUILD_FLATC)
     _restore_var(FLATBUFFERS_INSTALL)
+    _restore_var(FLATBUFFERS_BUILD_FLATLIB)
     _restore_var(FLATBUFFERS_BUILD_TESTS)
     _restore_var(FLATBUFFERS_BUILD_FLATHASH)
     _restore_var(FLATBUFFERS_ENABLE_PCH)
-    
+
+    set(HIP_DNN_FLATBUFFERS_INCLUDE_DIR ${flatbuffers_SOURCE_DIR}/include CACHE PATH "Path to flatbuffers include")
+
     _exclude_from_all(${flatbuffers_SOURCE_DIR})
     _mark_targets_as_system(${flatbuffers_SOURCE_DIR})
 endfunction()

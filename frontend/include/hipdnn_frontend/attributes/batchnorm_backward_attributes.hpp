@@ -3,8 +3,8 @@
 #pragma once
 
 #include "attributes.hpp"
-#include "batchnorm_backward_attributes_generated.h"
 #include "tensor_attributes.hpp"
+#include <hipdnn_sdk/data_objects/batchnorm_backward_attributes_generated.h>
 #include <memory>
 #include <unordered_map>
 
@@ -118,7 +118,7 @@ public:
         return set_mean(mean).set_inv_variance(inv_variance);
     }
 
-    flatbuffers::Offset<hipdnn::sdk::BatchnormBackwardAttributes>
+    flatbuffers::Offset<hipdnn_sdk::data_objects::BatchnormBackwardAttributes>
         pack_attributes(flatbuffers::FlatBufferBuilder& builder) const
     {
         auto peer_stats_vector = std::vector<int64_t>{};
@@ -133,7 +133,7 @@ public:
         auto mean         = get_mean();
         auto inv_variance = get_inv_variance();
 
-        return hipdnn::sdk::CreateBatchnormBackwardAttributesDirect(
+        return hipdnn_sdk::data_objects::CreateBatchnormBackwardAttributesDirect(
             builder,
             get_dy()->get_uid(),
             get_x()->get_uid(),

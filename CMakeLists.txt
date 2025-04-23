@@ -7,6 +7,11 @@ add_compile_definitions(__HIP_PLATFORM_AMD__)
 
 set(CMAKE_TOOLCHAIN_FILE "${CMAKE_SOURCE_DIR}/cmake/ClangToolChain.cmake" CACHE STRING "Toolchain file")
 set(HIPDNN_VERSION "0.0.1")
+
+if(NOT WIN32)
+    set(CMAKE_INSTALL_PREFIX "/opt/rocm" CACHE PATH "")
+endif()
+
 project(
     hipDNN
     VERSION ${HIPDNN_VERSION}
@@ -46,6 +51,7 @@ list(
 include(cmake/Dependencies.cmake)
 include(cmake/ClangCheck.cmake)
 include(cmake/ClangTidy.cmake)
+
 
 hipdnn_add_dependency(
     ROCmCMakeBuildTools
@@ -102,7 +108,6 @@ add_compile_options(
     ${EXTRA_COMPILE_OPTIONS})
 add_link_options(${EXTRA_LINK_OPTIONS})
 
-set(HIP_DNN_SDK_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/sdk/include")
 add_subdirectory(sdk)
 
 if(HIP_DNN_BUILD_BACKEND)
@@ -135,4 +140,3 @@ if(CODE_COVERAGE)
         COMMENT "Generating code coverage report"
     )
 endif()
-

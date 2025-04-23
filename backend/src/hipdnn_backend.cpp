@@ -4,7 +4,6 @@
 #include "hipdnn_backend.h"
 #include "descriptors/backend_descriptor.hpp"
 #include "descriptors/descriptor_factory.hpp"
-#include "descriptors/graph_descriptor.hpp"
 #include "helpers.hpp"
 
 #include <iostream>

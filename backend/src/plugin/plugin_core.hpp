@@ -25,7 +25,7 @@
 #include <system_error>
 #include <vector>
 
-#include "plugin_api.h"
+#include <hipdnn_sdk/plugin/plugin_api.h>
 
 namespace hipdnn_backend
 {

@@ -1,7 +1,7 @@
 // Copyright © Advanced Micro Devices, Inc., or its affiliates.
 // SPDX-License-Identifier: MIT
 
-namespace hipdnn.sdk;
+namespace hipdnn_sdk.data_objects;
 
 table BatchnormBackwardAttributes {
     dy: long;

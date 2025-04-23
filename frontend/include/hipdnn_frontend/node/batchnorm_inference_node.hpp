@@ -2,11 +2,11 @@
 // SPDX-License-Identifier:  MIT
 #pragma once
 
-#include "graph_generated.h"
 #include "node.hpp"
 #include <hipdnn_frontend/attributes/batchnorm_inference_attributes.hpp>
 #include <hipdnn_frontend/attributes/graph_attributes.hpp>
 #include <hipdnn_frontend/error.hpp>
+#include <hipdnn_sdk/data_objects/graph_generated.h>
 
 namespace hipdnn_frontend::graph
 {
@@ -80,13 +80,13 @@ public:
         return {};
     }
 
-    flatbuffers::Offset<hipdnn::sdk::Node>
+    flatbuffers::Offset<hipdnn_sdk::data_objects::Node>
         pack_node(flatbuffers::FlatBufferBuilder& builder) const override
     {
-        return hipdnn::sdk::CreateNodeDirect(
+        return hipdnn_sdk::data_objects::CreateNodeDirect(
             builder,
             attributes.name.c_str(),
-            hipdnn::sdk::NodeAttributes::NodeAttributes_BatchnormInferenceAttributes,
+            hipdnn_sdk::data_objects::NodeAttributes::NodeAttributes_BatchnormInferenceAttributes,
             attributes.pack_attributes(builder).Union());
     }
 };

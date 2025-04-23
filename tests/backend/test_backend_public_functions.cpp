@@ -1,9 +1,9 @@
 // Copyright © Advanced Micro Devices, Inc., or its affiliates.
 // SPDX-License-Identifier:  MIT
 
-#include "graph_generated.h"
 #include "hipdnn_backend.h"
 #include <gtest/gtest.h>
+#include <hipdnn_sdk/data_objects/graph_generated.h>
 
 TEST(HipDNNBackendTest, WillCreateDestroyGraphDescriptorSuccessfully)
 {
@@ -99,16 +99,18 @@ TEST(HipDNNBackendTest, SetAttribute)
 
 TEST(HipDNNBackendTest, WillSetBackendGraphCorrectly)
 {
-    flatbuffers::FlatBufferBuilder                                    builder;
-    std::vector<::flatbuffers::Offset<hipdnn::sdk::TensorAttributes>> tensor_attributes;
-    std::vector<::flatbuffers::Offset<hipdnn::sdk::Node>>             nodes;
-    auto graph = hipdnn::sdk::CreateGraphDirect(builder,
-                                                "Test GRAPH!",
-                                                hipdnn::sdk::DataType_FLOAT,
-                                                hipdnn::sdk::DataType_FLOAT,
-                                                hipdnn::sdk::DataType_FLOAT,
-                                                &tensor_attributes,
-                                                &nodes);
+    flatbuffers::FlatBufferBuilder builder;
+    std::vector<::flatbuffers::Offset<hipdnn_sdk::data_objects::TensorAttributes>>
+                                                                       tensor_attributes;
+    std::vector<::flatbuffers::Offset<hipdnn_sdk::data_objects::Node>> nodes;
+    auto                                                               graph
+        = hipdnn_sdk::data_objects::CreateGraphDirect(builder,
+                                                      "Test GRAPH!",
+                                                      hipdnn_sdk::data_objects::DataType_FLOAT,
+                                                      hipdnn_sdk::data_objects::DataType_FLOAT,
+                                                      hipdnn_sdk::data_objects::DataType_FLOAT,
+                                                      &tensor_attributes,
+                                                      &nodes);
     builder.Finish(graph);
     flatbuffers::DetachedBuffer serialized_graph = builder.Release();
 

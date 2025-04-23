@@ -19,23 +19,18 @@ target_link_libraries(hipdnn_backend_tests
     gtest 
     gtest_main 
     pthread 
-    flatbuffers
     hipdnn_backend_private
-)
-target_include_directories(hipdnn_backend_tests 
-    PRIVATE 
-    ${HIP_DNN_BACKEND_SRC_DIR}
-    ${HIP_DNN_BACKEND_INCLUDE_DIR}
+    hipdnn_sdk
 )
 target_compile_options(hipdnn_backend_tests PRIVATE ${HIPDNN_WARNING_COMPILE_OPTIONS})
 clang_tidy_check(hipdnn_backend_tests)
 
 add_library(engineplugin1 SHARED plugins/engine_plugin1.cpp)
-target_include_directories(engineplugin1 PRIVATE ${HIP_DNN_SDK_INCLUDE_DIR})
+target_link_libraries(engineplugin1 PRIVATE hipdnn_sdk)
 add_dependencies(hipdnn_backend_tests engineplugin1)
 
 add_library(engineplugin2 SHARED plugins/engine_plugin2.cpp)
-target_include_directories(engineplugin2 PRIVATE ${HIP_DNN_SDK_INCLUDE_DIR})
+target_link_libraries(engineplugin2 PRIVATE hipdnn_sdk)
 add_dependencies(hipdnn_backend_tests engineplugin2)
 
 add_dependencies(check hipdnn_backend_tests)

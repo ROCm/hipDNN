@@ -3,8 +3,8 @@
 #pragma once
 
 #include "attributes.hpp"
-#include "batchnorm_inference_attributes_generated.h"
 #include "tensor_attributes.hpp"
+#include <hipdnn_sdk/data_objects/batchnorm_inference_attributes_generated.h>
 #include <memory>
 #include <unordered_map>
 
@@ -83,13 +83,13 @@ public:
         return set_output(output_names::y, value);
     }
 
-    flatbuffers::Offset<hipdnn::sdk::BatchnormInferenceAttributes>
+    flatbuffers::Offset<hipdnn_sdk::data_objects::BatchnormInferenceAttributes>
         pack_attributes(flatbuffers::FlatBufferBuilder& builder) const
     {
         auto mean         = get_mean();
         auto inv_variance = get_inv_variance();
 
-        return hipdnn::sdk::CreateBatchnormInferenceAttributes(
+        return hipdnn_sdk::data_objects::CreateBatchnormInferenceAttributes(
             builder,
             get_x()->get_uid(),
             mean ? flatbuffers::Optional<int64_t>(mean->get_uid()) : flatbuffers::nullopt,

@@ -3,8 +3,8 @@
 #pragma once
 
 #include "attributes.hpp"
-#include "batchnorm_attributes_generated.h"
 #include "tensor_attributes.hpp"
+#include <hipdnn_sdk/data_objects/batchnorm_attributes_generated.h>
 #include <memory>
 #include <unordered_map>
 #include <vector>
@@ -156,7 +156,7 @@ public:
             momentum);
     }
 
-    flatbuffers::Offset<hipdnn::sdk::BatchnormAttributes>
+    flatbuffers::Offset<hipdnn_sdk::data_objects::BatchnormAttributes>
         pack_attributes(flatbuffers::FlatBufferBuilder& builder) const
     {
         auto peer_stats_vector = std::vector<int64_t>{};
@@ -176,7 +176,7 @@ public:
         auto next_running_mean     = get_next_running_mean();
         auto next_running_variance = get_next_running_variance();
 
-        return hipdnn::sdk::CreateBatchnormAttributesDirect(
+        return hipdnn_sdk::data_objects::CreateBatchnormAttributesDirect(
             builder,
             get_x()->get_uid(),
             get_scale()->get_uid(),

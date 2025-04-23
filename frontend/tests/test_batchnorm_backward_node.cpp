@@ -292,11 +292,11 @@ TEST(DBNNodeTests, PackNode)
 
     builder.Finish(offset);
     auto buffer_pointer  = builder.GetBufferPointer();
-    auto node_flatbuffer = flatbuffers::GetRoot<hipdnn::sdk::Node>(buffer_pointer);
+    auto node_flatbuffer = flatbuffers::GetRoot<hipdnn_sdk::data_objects::Node>(buffer_pointer);
 
     EXPECT_STREQ(node_flatbuffer->name()->c_str(), "BatchnormBackward");
     EXPECT_EQ(node_flatbuffer->attributes_type(),
-              hipdnn::sdk::NodeAttributes_BatchnormBackwardAttributes);
+              hipdnn_sdk::data_objects::NodeAttributes_BatchnormBackwardAttributes);
 
     auto packed_attributes = node_flatbuffer->attributes_as_BatchnormBackwardAttributes();
     ASSERT_NE(packed_attributes, nullptr);
@@ -374,11 +374,11 @@ TEST(DBNNodeTests, PackNodeWithoutMeanAndInvVariance)
 
     builder.Finish(offset);
     auto buffer_pointer  = builder.GetBufferPointer();
-    auto node_flatbuffer = flatbuffers::GetRoot<hipdnn::sdk::Node>(buffer_pointer);
+    auto node_flatbuffer = flatbuffers::GetRoot<hipdnn_sdk::data_objects::Node>(buffer_pointer);
 
     EXPECT_STREQ(node_flatbuffer->name()->c_str(), "BatchnormBackward");
     EXPECT_EQ(node_flatbuffer->attributes_type(),
-              hipdnn::sdk::NodeAttributes_BatchnormBackwardAttributes);
+              hipdnn_sdk::data_objects::NodeAttributes_BatchnormBackwardAttributes);
 
     auto packed_attributes = node_flatbuffer->attributes_as_BatchnormBackwardAttributes();
     ASSERT_NE(packed_attributes, nullptr);

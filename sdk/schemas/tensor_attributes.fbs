@@ -3,7 +3,7 @@
 
 include "data_types.fbs";
 
-namespace hipdnn.sdk;
+namespace hipdnn_sdk.data_objects;
 
 table TensorAttributes {
     uid: long;

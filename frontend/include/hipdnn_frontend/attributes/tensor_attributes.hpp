@@ -3,8 +3,8 @@
 #pragma once
 
 #include "graph_attributes.hpp"
-#include "tensor_attributes_generated.h"
 #include <hipdnn_frontend/types.hpp>
+#include <hipdnn_sdk/data_objects/tensor_attributes_generated.h>
 #include <string>
 #include <vector>
 
@@ -126,7 +126,7 @@ public:
         return *this;
     }
 
-    flatbuffers::Offset<hipdnn::sdk::TensorAttributes>
+    flatbuffers::Offset<hipdnn_sdk::data_objects::TensorAttributes>
         pack_attributes(flatbuffers::FlatBufferBuilder& builder) const
     {
         return CreateTensorAttributesDirect(

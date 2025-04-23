@@ -5,7 +5,7 @@
 // It is used to test the plugin system and ensure that plugins can be loaded and
 // unloaded correctly.
 
-#include "plugin_api.h"
+#include <hipdnn_sdk/plugin/plugin_api.h>
 
 static const char*              PLUGIN_NAME        = "EnginePlugin1";
 static const char*              PLUGIN_VERSION     = "1.0";

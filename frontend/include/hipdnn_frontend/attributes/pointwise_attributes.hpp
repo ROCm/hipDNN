@@ -4,8 +4,8 @@
 
 #include "attributes.hpp"
 #include "tensor_attributes.hpp"
-#include "tensor_attributes_generated.h"
 #include <hipdnn_frontend/types.hpp>
+#include <hipdnn_sdk/data_objects/tensor_attributes_generated.h>
 #include <memory>
 #include <optional>
 #include <unordered_map>
@@ -113,7 +113,7 @@ public:
     std::unordered_map<input_names, std::shared_ptr<Tensor_attributes>>  inputs;
     std::unordered_map<output_names, std::shared_ptr<Tensor_attributes>> outputs;
 
-    flatbuffers::Offset<hipdnn::sdk::PointwiseAttributes>
+    flatbuffers::Offset<hipdnn_sdk::data_objects::PointwiseAttributes>
         pack_attributes(flatbuffers::FlatBufferBuilder& builder) const
     {
         auto in_0  = get_input_0();
@@ -121,7 +121,7 @@ public:
         auto in_2  = get_input_2();
         auto out_0 = get_output_0();
 
-        return hipdnn::sdk::CreatePointwiseAttributes(
+        return hipdnn_sdk::data_objects::CreatePointwiseAttributes(
             builder,
             to_sdk_type(_operation),
             _relu_lower_clip,

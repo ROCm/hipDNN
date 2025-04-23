@@ -12,13 +12,8 @@ target_link_libraries(public_hipdnn_backend_tests
     gtest 
     gtest_main 
     pthread 
+    hipdnn_sdk
     hipdnn_backend
-    flatbuffers
-)
-
-target_include_directories(public_hipdnn_backend_tests PRIVATE 
-    ${HIP_DNN_BACKEND_INCLUDE_DIR}
-    ${HIP_DNN_SDK_INCLUDE_DIR}
 )
 
 add_dependencies(check public_hipdnn_backend_tests)

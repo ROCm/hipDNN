@@ -2,37 +2,38 @@
 // SPDX-License-Identifier: MIT
 
 #include "flatbuffer_utilities.hpp"
-#include "graph_generated.h"
 #include <flatbuffers/flatbuffers.h>
 #include <gtest/gtest.h>
+#include <hipdnn_sdk/data_objects/graph_generated.h>
 
 namespace hipdnn_backend
 {
 namespace testing
 {
 
-using namespace hipdnn::sdk;
+using namespace hipdnn_sdk::data_objects;
 
 class Flatbuffer_utilities_test : public ::testing::Test
 {
 public:
     static flatbuffers::FlatBufferBuilder create_valid_graph()
     {
-        std::vector<::flatbuffers::Offset<hipdnn::sdk::TensorAttributes>> tensor_attributes;
-        std::vector<::flatbuffers::Offset<hipdnn::sdk::Node>>             nodes;
-        flatbuffers::FlatBufferBuilder                                    builder;
-        auto graph_offset = hipdnn::sdk::CreateGraphDirect(builder,
-                                                           "test",
-                                                           DataType_FLOAT,
-                                                           DataType_HALF,
-                                                           DataType_BFLOAT16,
-                                                           &tensor_attributes,
-                                                           &nodes);
+        std::vector<::flatbuffers::Offset<hipdnn_sdk::data_objects::TensorAttributes>>
+                                                                           tensor_attributes;
+        std::vector<::flatbuffers::Offset<hipdnn_sdk::data_objects::Node>> nodes;
+        flatbuffers::FlatBufferBuilder                                     builder;
+        auto graph_offset = hipdnn_sdk::data_objects::CreateGraphDirect(builder,
+                                                                        "test",
+                                                                        DataType_FLOAT,
+                                                                        DataType_HALF,
+                                                                        DataType_BFLOAT16,
+                                                                        &tensor_attributes,
+                                                                        &nodes);
         builder.Finish(graph_offset);
         return builder;
     }
 
-    static void verify_graph(const hipdnn::sdk::GraphT& graph)
+    static void verify_graph(const hipdnn_sdk::data_objects::GraphT& graph)
     {
         EXPECT_EQ(graph.name, "test");
         EXPECT_EQ(graph.compute_type, DataType_FLOAT);
@@ -47,8 +48,8 @@ TEST_F(Flatbuffer_utilities_test, WillCorrectlyUnpackValidGraphBuffer)
 {
     auto builder = create_valid_graph();
 
-    auto                                 serialized_graph = builder.Release();
-    std::unique_ptr<hipdnn::sdk::GraphT> graph;
+    auto                                              serialized_graph = builder.Release();
+    std::unique_ptr<hipdnn_sdk::data_objects::GraphT> graph;
     auto status = flatbuffer_utilities::convert_serialized_graph_to_graph(
         serialized_graph.data(), serialized_graph.size(), graph);
 
@@ -58,7 +59,7 @@ TEST_F(Flatbuffer_utilities_test, WillCorrectlyUnpackValidGraphBuffer)
 
 TEST_F(Flatbuffer_utilities_test, WillStillHaveValidGraphAfterBuilderDestructs)
 {
-    std::unique_ptr<hipdnn::sdk::GraphT> graph;
+    std::unique_ptr<hipdnn_sdk::data_objects::GraphT> graph;
     {
         auto builder = create_valid_graph();
 
@@ -81,7 +82,7 @@ TEST_P(Flatbuffer_invalid_tests, WillNotUnpackInvalidBuffer)
 {
     auto [buffer, size] = GetParam();
 
-    std::unique_ptr<hipdnn::sdk::GraphT> graph;
+    std::unique_ptr<hipdnn_sdk::data_objects::GraphT> graph;
     auto status = flatbuffer_utilities::convert_serialized_graph_to_graph(buffer, size, graph);
 
     ASSERT_EQ(status, HIPDNN_STATUS_BAD_PARAM);

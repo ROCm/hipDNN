@@ -1,3 +1,6 @@
+# Copyright © Advanced Micro Devices, Inc., or its affiliates.
+# SPDX-License-Identifier:  MIT
+
 cmake_minimum_required(VERSION 3.25.2)
 
 find_package(Python REQUIRED COMPONENTS Interpreter Development.Module)
@@ -9,12 +12,13 @@ python_add_library(hipdnn
            types.cpp
     WITH_SOABI)
 target_link_libraries(hipdnn PRIVATE pybind11::headers)
-
-target_compile_definitions(hipdnn PRIVATE)
+target_link_libraries(hipdnn INTERFACE hipdnn_frontend hipdnn_sdk)
 
 target_include_directories(hipdnn PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/../../frontend/include/
     ${CMAKE_CURRENT_SOURCE_DIR}/../../sdk/include
     ${CMAKE_CURRENT_SOURCE_DIR}/../../build/_deps/flatbuffers-src/include)
+
+target_compile_definitions(hipdnn PRIVATE)
 
 add_subdirectory(tests)

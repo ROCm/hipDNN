@@ -279,8 +279,9 @@ TEST(BatchnormAttributesTests, PackAttributes)
     auto packed_attributes = batchnorm_attributes.pack_attributes(builder);
     builder.Finish(packed_attributes);
 
-    auto buffer                  = builder.GetBufferPointer();
-    auto batchnorm_attributes_fb = flatbuffers::GetRoot<hipdnn::sdk::BatchnormAttributes>(buffer);
+    auto buffer = builder.GetBufferPointer();
+    auto batchnorm_attributes_fb
+        = flatbuffers::GetRoot<hipdnn_sdk::data_objects::BatchnormAttributes>(buffer);
 
     EXPECT_EQ(batchnorm_attributes_fb->x(), 1);
     EXPECT_EQ(batchnorm_attributes_fb->y(), 2);
@@ -328,8 +329,9 @@ TEST(BatchnormAttributesTests, PackAttributesWithoutOptionalValues)
     auto packed_attributes = batchnorm_attributes.pack_attributes(builder);
     builder.Finish(packed_attributes);
 
-    auto buffer                  = builder.GetBufferPointer();
-    auto batchnorm_attributes_fb = flatbuffers::GetRoot<hipdnn::sdk::BatchnormAttributes>(buffer);
+    auto buffer = builder.GetBufferPointer();
+    auto batchnorm_attributes_fb
+        = flatbuffers::GetRoot<hipdnn_sdk::data_objects::BatchnormAttributes>(buffer);
 
     EXPECT_EQ(batchnorm_attributes_fb->x(), 1);
     EXPECT_EQ(batchnorm_attributes_fb->y(), 2);

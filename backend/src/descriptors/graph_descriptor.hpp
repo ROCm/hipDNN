@@ -6,7 +6,7 @@
 #include <memory>
 
 #include "backend_descriptor.hpp"
-#include "graph_generated.h"
+#include <hipdnn_sdk/data_objects/graph_generated.h>
 
 namespace hipdnn_backend
 {
@@ -14,7 +14,7 @@ namespace hipdnn_backend
 class Graph_descriptor : public Backend_descriptor
 {
 private:
-    std::unique_ptr<hipdnn::sdk::GraphT> _graph;
+    std::unique_ptr<hipdnn_sdk::data_objects::GraphT> _graph;
 
 public:
     Graph_descriptor();

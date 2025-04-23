@@ -221,10 +221,11 @@ TEST(PointwiseNodeTests, PackNode)
 
     builder.Finish(offset);
     auto buffer_pointer  = builder.GetBufferPointer();
-    auto node_flatbuffer = flatbuffers::GetRoot<hipdnn::sdk::Node>(buffer_pointer);
+    auto node_flatbuffer = flatbuffers::GetRoot<hipdnn_sdk::data_objects::Node>(buffer_pointer);
 
     EXPECT_STREQ(node_flatbuffer->name()->c_str(), "PointwiseNode");
-    EXPECT_EQ(node_flatbuffer->attributes_type(), hipdnn::sdk::NodeAttributes_PointwiseAttributes);
+    EXPECT_EQ(node_flatbuffer->attributes_type(),
+              hipdnn_sdk::data_objects::NodeAttributes_PointwiseAttributes);
 
     auto packed_attributes = node_flatbuffer->attributes_as_PointwiseAttributes();
     ASSERT_NE(packed_attributes, nullptr);

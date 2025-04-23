@@ -4,11 +4,11 @@
 #include "descriptors/graph_descriptor.hpp"
 #include "flatbuffer_test_utils.hpp"
 #include "flatbuffer_utilities.hpp"
-#include "graph_generated.h"
 #include "hipdnn_backend.h"
 
 #include <flatbuffers/flatbuffers.h>
 #include <gtest/gtest.h>
+#include <hipdnn_sdk/data_objects/graph_generated.h>
 
 using namespace hipdnn_backend;
 
@@ -20,12 +20,12 @@ public:
         return flatbuffer_test_utils::create_valid_graph();
     }
 
-    static void verify_graph(const hipdnn::sdk::GraphT& graph)
+    static void verify_graph(const hipdnn_sdk::data_objects::GraphT& graph)
     {
         EXPECT_EQ(graph.name, "test");
-        EXPECT_EQ(graph.compute_type, hipdnn::sdk::DataType_FLOAT);
-        EXPECT_EQ(graph.intermediate_type, hipdnn::sdk::DataType_HALF);
-        EXPECT_EQ(graph.io_type, hipdnn::sdk::DataType_BFLOAT16);
+        EXPECT_EQ(graph.compute_type, hipdnn_sdk::data_objects::DataType_FLOAT);
+        EXPECT_EQ(graph.intermediate_type, hipdnn_sdk::data_objects::DataType_HALF);
+        EXPECT_EQ(graph.io_type, hipdnn_sdk::data_objects::DataType_BFLOAT16);
         EXPECT_EQ(graph.tensors.size(), 0);
         EXPECT_EQ(graph.nodes.size(), 0);
     }
