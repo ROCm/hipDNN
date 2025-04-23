@@ -30,6 +30,18 @@ list(
     ${HIP_DIR}/cmake
 )
 
+# NOTE: Workaround until llvm & hip cmake modules fixes symlink logic in their config files; remove when fixed.
+#       Added to prevent issues with not finding hip cmake.
+list(
+    APPEND
+    CMAKE_PREFIX_PATH
+    ${ROCM_PATH}/llvm
+    ${ROCM_PATH}
+    ${ROCM_PATH}/hip
+    /opt/rocm/llvm
+    /opt/rocm
+    /opt/rocm/hip 
+)
 
 include(cmake/Dependencies.cmake)
 include(cmake/ClangCheck.cmake)
