@@ -15,14 +15,14 @@ TEST(GraphTests, SetAndGetAttributes)
     Graph graph;
 
     graph.set_name("TestGraph")
-        .set_compute_type(DataType_t::FLOAT)
-        .set_intermediate_type(DataType_t::HALF)
-        .set_io_type(DataType_t::FLOAT);
+        .set_compute_data_type(DataType_t::FLOAT)
+        .set_intermediate_data_type(DataType_t::HALF)
+        .set_io_data_type(DataType_t::FLOAT);
 
     EXPECT_EQ(graph.get_name(), "TestGraph");
-    EXPECT_EQ(graph.get_compute_type(), DataType_t::FLOAT);
-    EXPECT_EQ(graph.get_intermediate_type(), DataType_t::HALF);
-    EXPECT_EQ(graph.get_io_type(), DataType_t::FLOAT);
+    EXPECT_EQ(graph.get_compute_data_type(), DataType_t::FLOAT);
+    EXPECT_EQ(graph.get_intermediate_data_type(), DataType_t::HALF);
+    EXPECT_EQ(graph.get_io_data_type(), DataType_t::FLOAT);
 
     auto validation_result = graph.validate();
     EXPECT_TRUE(validation_result.is_good()) << validation_result.get_message();
@@ -123,7 +123,7 @@ TEST(GraphTests, PointwiseNodeCreationSingleInput)
 
     Pointwise_attributes attributes;
     attributes.name = "PointwiseNode";
-    attributes.set_operation(PointwiseMode_t::RELU);
+    attributes.set_mode(PointwiseMode_t::RELU_FWD);
 
     auto out_0 = graph.pointwise(in_0, attributes);
 
@@ -146,7 +146,7 @@ TEST(GraphTests, PointwiseNodeCreationTwoInputs)
 
     Pointwise_attributes attributes;
     attributes.name = "PointwiseNode";
-    attributes.set_operation(PointwiseMode_t::RELU);
+    attributes.set_mode(PointwiseMode_t::RELU_FWD);
 
     auto out_0 = graph.pointwise(in_0, in_1, attributes);
 
@@ -171,7 +171,7 @@ TEST(GraphTests, PointwiseNodeCreationThreeInputs)
 
     Pointwise_attributes attributes;
     attributes.name = "PointwiseNode";
-    attributes.set_operation(PointwiseMode_t::RELU);
+    attributes.set_mode(PointwiseMode_t::RELU_FWD);
 
     auto out_0 = graph.pointwise(in_0, in_1, in_2, attributes);
 
@@ -198,9 +198,9 @@ TEST(GraphTests, BuildAndSerializeBatchnormInferenceGraph)
     Graph graph;
 
     graph.set_name("SerializedGraphTest")
-        .set_compute_type(DataType_t::FLOAT)
-        .set_intermediate_type(DataType_t::HALF)
-        .set_io_type(DataType_t::FLOAT);
+        .set_compute_data_type(DataType_t::FLOAT)
+        .set_intermediate_data_type(DataType_t::HALF)
+        .set_io_data_type(DataType_t::FLOAT);
 
     auto x = std::make_shared<Tensor_attributes>();
     x->set_uid(1)
@@ -274,9 +274,9 @@ TEST(GraphTests, BuildAndSerializeBatchnormGraph)
     Graph graph;
 
     graph.set_name("SerializedBatchnormGraph")
-        .set_compute_type(DataType_t::FLOAT)
-        .set_intermediate_type(DataType_t::HALF)
-        .set_io_type(DataType_t::FLOAT);
+        .set_compute_data_type(DataType_t::FLOAT)
+        .set_intermediate_data_type(DataType_t::HALF)
+        .set_io_data_type(DataType_t::FLOAT);
 
     auto x = std::make_shared<Tensor_attributes>();
     x->set_uid(1)
@@ -375,9 +375,9 @@ TEST(GraphTests, BuildAndSerializeBatchnormAndPointwiseGraph)
     Graph graph;
 
     graph.set_name("SerializedBatchnormAndPointwiseGraph")
-        .set_compute_type(DataType_t::FLOAT)
-        .set_intermediate_type(DataType_t::HALF)
-        .set_io_type(DataType_t::FLOAT);
+        .set_compute_data_type(DataType_t::FLOAT)
+        .set_intermediate_data_type(DataType_t::HALF)
+        .set_io_data_type(DataType_t::FLOAT);
 
     auto x = std::make_shared<Tensor_attributes>();
     x->set_uid(1)
@@ -417,7 +417,7 @@ TEST(GraphTests, BuildAndSerializeBatchnormAndPointwiseGraph)
 
     Pointwise_attributes pointwise_attributes;
     pointwise_attributes.name = "PointwiseNode";
-    pointwise_attributes.set_operation(PointwiseMode_t::RELU);
+    pointwise_attributes.set_mode(PointwiseMode_t::RELU_FWD);
 
     auto out_0 = graph.pointwise(y, pointwise_attributes);
 
@@ -493,9 +493,9 @@ TEST(GraphTests, BuildAndSerializePointwiseGraph)
     Graph graph;
 
     graph.set_name("SerializedGraphTest")
-        .set_compute_type(DataType_t::FLOAT)
-        .set_intermediate_type(DataType_t::HALF)
-        .set_io_type(DataType_t::FLOAT);
+        .set_compute_data_type(DataType_t::FLOAT)
+        .set_intermediate_data_type(DataType_t::HALF)
+        .set_io_data_type(DataType_t::FLOAT);
 
     auto in_0 = std::make_shared<Tensor_attributes>();
     in_0->set_uid(1)
@@ -506,7 +506,7 @@ TEST(GraphTests, BuildAndSerializePointwiseGraph)
 
     Pointwise_attributes pointwise_attributes;
     pointwise_attributes.name = "PointwiseNode";
-    pointwise_attributes.set_operation(PointwiseMode_t::RELU);
+    pointwise_attributes.set_mode(PointwiseMode_t::RELU_FWD);
 
     auto out_0 = graph.pointwise(in_0, pointwise_attributes);
 
@@ -551,9 +551,9 @@ TEST(GraphTests, BuildAndSerializePointwiseAndBatchnormInferenceGraph)
     Graph graph;
 
     graph.set_name("SerializedGraphTest")
-        .set_compute_type(DataType_t::FLOAT)
-        .set_intermediate_type(DataType_t::HALF)
-        .set_io_type(DataType_t::FLOAT);
+        .set_compute_data_type(DataType_t::FLOAT)
+        .set_intermediate_data_type(DataType_t::HALF)
+        .set_io_data_type(DataType_t::FLOAT);
 
     auto x = std::make_shared<Tensor_attributes>();
     x->set_uid(1)
@@ -581,7 +581,7 @@ TEST(GraphTests, BuildAndSerializePointwiseAndBatchnormInferenceGraph)
 
     Pointwise_attributes pointwise_attributes;
     pointwise_attributes.name = "PointwiseNode";
-    pointwise_attributes.set_operation(PointwiseMode_t::RELU);
+    pointwise_attributes.set_mode(PointwiseMode_t::RELU_FWD);
 
     auto out_0 = graph.pointwise(y, pointwise_attributes);
 
@@ -644,9 +644,9 @@ TEST(GraphTests, BuildAndSerializeBatchnormBackwardGraph)
     Graph graph;
 
     graph.set_name("SerializedGraphTest")
-        .set_compute_type(DataType_t::FLOAT)
-        .set_intermediate_type(DataType_t::HALF)
-        .set_io_type(DataType_t::FLOAT);
+        .set_compute_data_type(DataType_t::FLOAT)
+        .set_intermediate_data_type(DataType_t::HALF)
+        .set_io_data_type(DataType_t::FLOAT);
 
     auto dy = std::make_shared<Tensor_attributes>();
     dy->set_uid(1)
@@ -728,9 +728,9 @@ TEST(GraphTests, BuildAndSerializePointwiseAndBatchnormBackwardGraph)
     Graph graph;
 
     graph.set_name("SerializedGraphTest")
-        .set_compute_type(DataType_t::FLOAT)
-        .set_intermediate_type(DataType_t::HALF)
-        .set_io_type(DataType_t::FLOAT);
+        .set_compute_data_type(DataType_t::FLOAT)
+        .set_intermediate_data_type(DataType_t::HALF)
+        .set_io_data_type(DataType_t::FLOAT);
 
     auto x_pointwise = std::make_shared<Tensor_attributes>();
     x_pointwise->set_uid(6)
@@ -741,7 +741,7 @@ TEST(GraphTests, BuildAndSerializePointwiseAndBatchnormBackwardGraph)
 
     Pointwise_attributes pointwise_attributes;
     pointwise_attributes.name = "PointwiseNode";
-    pointwise_attributes.set_operation(PointwiseMode_t::RELU);
+    pointwise_attributes.set_mode(PointwiseMode_t::RELU_FWD);
 
     auto dy = graph.pointwise(x_pointwise, pointwise_attributes);
 

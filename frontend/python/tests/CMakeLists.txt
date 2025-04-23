@@ -7,6 +7,6 @@ if(NOT BASH_EXECUTABLE)
 endif()
 
 add_test(
-    NAME pythonapi_tests
+    NAME python_api_tests
     COMMAND ${BASH_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/test_wrapper.sh ${CMAKE_CURRENT_SOURCE_DIR}
 )

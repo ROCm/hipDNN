@@ -10,7 +10,7 @@ namespace py = pybind11;
 namespace hipdnn_frontend
 {
 
-namespace pythonapi
+namespace python_api
 {
 
 void init_types(py::module_& m)
@@ -22,6 +22,6 @@ void init_types(py::module_& m)
         .value("BFLOAT16", DataType_t::BFLOAT16);
 }
 
-} // namespace pythonapi
+} // namespace python_api
 
 } // namespace hipdnn_frontend

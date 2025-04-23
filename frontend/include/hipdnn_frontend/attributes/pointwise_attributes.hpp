@@ -17,9 +17,9 @@ namespace graph
 class Pointwise_attributes : public AttributesCRTP<Pointwise_attributes>
 {
 public:
-    PointwiseMode_t get_operation() const
+    PointwiseMode_t get_mode() const
     {
-        return _operation;
+        return _mode;
     }
     std::optional<float> get_relu_lower_clip() const
     {
@@ -54,9 +54,9 @@ public:
         return get_output(output_names::out_0);
     }
 
-    Pointwise_attributes& set_operation(PointwiseMode_t operation)
+    Pointwise_attributes& set_mode(PointwiseMode_t mode)
     {
-        _operation = operation;
+        _mode = mode;
         return *this;
     }
     Pointwise_attributes& set_relu_lower_clip(std::optional<float> relu_lower_clip)
@@ -69,7 +69,7 @@ public:
         _relu_upper_clip = relu_upper_clip;
         return *this;
     }
-    Pointwise_attributes& set_relu_lower_slope(std::optional<float> relu_lower_slope)
+    Pointwise_attributes& set_relu_lower_clip_slope(std::optional<float> relu_lower_slope)
     {
         _relu_lower_slope = relu_lower_slope;
         return *this;
@@ -123,7 +123,7 @@ public:
 
         return hipdnn_sdk::data_objects::CreatePointwiseAttributes(
             builder,
-            to_sdk_type(_operation),
+            to_sdk_type(_mode),
             _relu_lower_clip,
             _relu_upper_clip,
             _relu_lower_slope,
@@ -153,7 +153,7 @@ private:
         }
         return nullptr;
     }
-    PointwiseMode_t        _operation        = PointwiseMode_t::NOT_SET;
+    PointwiseMode_t        _mode             = PointwiseMode_t::NOT_SET;
     std::optional<float>   _relu_lower_clip  = std::nullopt;
     std::optional<float>   _relu_upper_clip  = std::nullopt;
     std::optional<float>   _relu_lower_slope = std::nullopt;

@@ -10,8 +10,8 @@ namespace hipdnn_frontend
 
 enum class PointwiseMode_t
 {
-    NOT_SET = 0,
-    RELU    = 1,
+    NOT_SET  = 0,
+    RELU_FWD = 1,
 };
 
 enum class DataType_t
@@ -42,7 +42,7 @@ enum class DataType_t
 {
     switch(type)
     {
-    case PointwiseMode_t::RELU:
+    case PointwiseMode_t::RELU_FWD:
         return hipdnn_sdk::data_objects::PointwiseMode::PointwiseMode_RELU_FWD;
     default:
         return hipdnn_sdk::data_objects::PointwiseMode::PointwiseMode_UNSET;

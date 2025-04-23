@@ -19,7 +19,7 @@ TEST(TestTypes, PointwiseModeConversion)
 {
     using namespace hipdnn_frontend;
 
-    EXPECT_EQ(to_sdk_type(PointwiseMode_t::RELU),
+    EXPECT_EQ(to_sdk_type(PointwiseMode_t::RELU_FWD),
               hipdnn_sdk::data_objects::PointwiseMode::PointwiseMode_RELU_FWD);
     EXPECT_EQ(to_sdk_type(PointwiseMode_t::NOT_SET),
               hipdnn_sdk::data_objects::PointwiseMode::PointwiseMode_UNSET);

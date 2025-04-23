@@ -13,10 +13,10 @@ TEST(PointwiseAttributesTests, CreatePointwiseAttributes)
 
     pointwise_attributes.set_input_0(std::make_shared<Tensor_attributes>());
     pointwise_attributes.set_output_0(std::make_shared<Tensor_attributes>());
-    pointwise_attributes.set_operation(PointwiseMode_t::RELU)
+    pointwise_attributes.set_mode(PointwiseMode_t::RELU_FWD)
         .set_relu_lower_clip(0.1f)
         .set_relu_upper_clip(6.0f)
-        .set_relu_lower_slope(0.01f)
+        .set_relu_lower_clip_slope(0.01f)
         .set_axis(1);
 
     auto input_tensor = pointwise_attributes.get_input_0();
@@ -49,7 +49,7 @@ TEST(PointwiseAttributesTests, CreatePointwiseAttributes)
     EXPECT_EQ(output_tensor->get_dim(), (std::vector<int64_t>{5, 6, 7, 8}));
     EXPECT_EQ(output_tensor->get_stride(), (std::vector<int64_t>{1, 2, 3, 4}));
 
-    EXPECT_EQ(pointwise_attributes.get_operation(), PointwiseMode_t::RELU);
+    EXPECT_EQ(pointwise_attributes.get_mode(), PointwiseMode_t::RELU_FWD);
     EXPECT_EQ(pointwise_attributes.get_relu_lower_clip(), 0.1f);
     EXPECT_EQ(pointwise_attributes.get_relu_upper_clip(), 6.0f);
     EXPECT_EQ(pointwise_attributes.get_relu_lower_slope(), 0.01f);
@@ -63,7 +63,7 @@ TEST(PointwiseAttributesTests, CreatePointwiseAttributesWithTwoInputs)
     pointwise_attributes.set_input_0(std::make_shared<Tensor_attributes>());
     pointwise_attributes.set_input_1(std::make_shared<Tensor_attributes>());
     pointwise_attributes.set_output_0(std::make_shared<Tensor_attributes>());
-    pointwise_attributes.set_operation(PointwiseMode_t::RELU);
+    pointwise_attributes.set_mode(PointwiseMode_t::RELU_FWD);
 
     auto input_tensor_0 = pointwise_attributes.get_input_0();
     input_tensor_0->set_uid(1)
@@ -88,7 +88,7 @@ TEST(PointwiseAttributesTests, CreatePointwiseAttributesWithTwoInputs)
     EXPECT_EQ(input_tensor_1->get_name(), "InputTensor1");
     EXPECT_EQ(output_tensor->get_uid(), 3);
     EXPECT_EQ(output_tensor->get_name(), "OutputTensor");
-    EXPECT_EQ(pointwise_attributes.get_operation(), PointwiseMode_t::RELU);
+    EXPECT_EQ(pointwise_attributes.get_mode(), PointwiseMode_t::RELU_FWD);
 }
 
 TEST(PointwiseAttributesTests, CreatePointwiseAttributesWithThreeInputs)
@@ -99,7 +99,7 @@ TEST(PointwiseAttributesTests, CreatePointwiseAttributesWithThreeInputs)
     pointwise_attributes.set_input_1(std::make_shared<Tensor_attributes>());
     pointwise_attributes.set_input_2(std::make_shared<Tensor_attributes>());
     pointwise_attributes.set_output_0(std::make_shared<Tensor_attributes>());
-    pointwise_attributes.set_operation(PointwiseMode_t::RELU);
+    pointwise_attributes.set_mode(PointwiseMode_t::RELU_FWD);
 
     auto input_tensor_0 = pointwise_attributes.get_input_0();
     input_tensor_0->set_uid(1)
@@ -133,5 +133,5 @@ TEST(PointwiseAttributesTests, CreatePointwiseAttributesWithThreeInputs)
     EXPECT_EQ(input_tensor_2->get_name(), "InputTensor2");
     EXPECT_EQ(output_tensor->get_uid(), 4);
     EXPECT_EQ(output_tensor->get_name(), "OutputTensor");
-    EXPECT_EQ(pointwise_attributes.get_operation(), PointwiseMode_t::RELU);
+    EXPECT_EQ(pointwise_attributes.get_mode(), PointwiseMode_t::RELU_FWD);
 }

@@ -91,15 +91,15 @@ public:
     {
         return graph_attributes.get_name();
     }
-    DataType_t get_compute_type() const
+    DataType_t get_compute_data_type() const
     {
         return graph_attributes.get_compute_data_type();
     }
-    DataType_t get_intermediate_type() const
+    DataType_t get_intermediate_data_type() const
     {
         return graph_attributes.get_intermediate_data_type();
     }
-    DataType_t get_io_type() const
+    DataType_t get_io_data_type() const
     {
         return graph_attributes.get_io_data_type();
     }
@@ -110,17 +110,17 @@ public:
         graph_attributes.set_name(name);
         return *this;
     }
-    Graph& set_compute_type(DataType_t compute_type)
+    Graph& set_compute_data_type(DataType_t compute_type)
     {
         graph_attributes.set_compute_data_type(compute_type);
         return *this;
     }
-    Graph& set_intermediate_type(DataType_t intermediate_type)
+    Graph& set_intermediate_data_type(DataType_t intermediate_type)
     {
         graph_attributes.set_intermediate_data_type(intermediate_type);
         return *this;
     }
-    Graph& set_io_type(DataType_t io_type)
+    Graph& set_io_data_type(DataType_t io_type)
     {
         graph_attributes.set_io_data_type(io_type);
         return *this;

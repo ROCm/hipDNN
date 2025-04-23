@@ -34,7 +34,7 @@ public:
             return {error_code_t::ATTRIBUTE_NOT_SET,
                     "PointwiseNode missing OUT_0 for pre-validation"};
         }
-        if(attributes.get_operation() == PointwiseMode_t::NOT_SET)
+        if(attributes.get_mode() == PointwiseMode_t::NOT_SET)
         {
             return {error_code_t::ATTRIBUTE_NOT_SET,
                     "PointwiseNode missing operation for pre-validation"};

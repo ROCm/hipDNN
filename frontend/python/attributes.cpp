@@ -11,7 +11,7 @@ namespace py = pybind11;
 namespace hipdnn_frontend
 {
 
-namespace pythonapi
+namespace python_api
 {
 
 void init_attributes(py::module_& m)
@@ -37,6 +37,6 @@ void init_attributes(py::module_& m)
         .def("clear_uid", &graph::Tensor_attributes::clear_uid);
 }
 
-} // namespace pythonapi
+} // namespace python_api
 
 } // namespace hipdnn_frontend

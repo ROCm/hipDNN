@@ -10,6 +10,9 @@ python_add_library(hipdnn
     MODULE hipdnn.cpp
            attributes.cpp
            types.cpp
+           pygraph/pygraph.cpp
+           pygraph/norm.cpp
+           pygraph/pointwise.cpp
     WITH_SOABI)
 target_link_libraries(hipdnn PRIVATE pybind11::headers)
 target_link_libraries(hipdnn INTERFACE hipdnn_frontend hipdnn_sdk)
