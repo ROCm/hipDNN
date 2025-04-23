@@ -13,6 +13,7 @@ static_assert(FLATBUFFERS_VERSION_MAJOR == 23 &&
               FLATBUFFERS_VERSION_REVISION == 21,
              "Non-compatible flatbuffers version included");
 
+#include "batchnorm_attributes_generated.h"
 #include "batchnorm_backward_attributes_generated.h"
 #include "batchnorm_inference_attributes_generated.h"
 #include "data_types_generated.h"
@@ -40,33 +41,36 @@ enum NodeAttributes : uint8_t {
   NodeAttributes_BatchnormInferenceAttributes = 1,
   NodeAttributes_PointwiseAttributes = 2,
   NodeAttributes_BatchnormBackwardAttributes = 3,
+  NodeAttributes_BatchnormAttributes = 4,
   NodeAttributes_MIN = NodeAttributes_NONE,
-  NodeAttributes_MAX = NodeAttributes_BatchnormBackwardAttributes
+  NodeAttributes_MAX = NodeAttributes_BatchnormAttributes
 };
 
-inline const NodeAttributes (&EnumValuesNodeAttributes())[4] {
+inline const NodeAttributes (&EnumValuesNodeAttributes())[5] {
   static const NodeAttributes values[] = {
     NodeAttributes_NONE,
     NodeAttributes_BatchnormInferenceAttributes,
     NodeAttributes_PointwiseAttributes,
-    NodeAttributes_BatchnormBackwardAttributes
+    NodeAttributes_BatchnormBackwardAttributes,
+    NodeAttributes_BatchnormAttributes
   };
   return values;
 }
 
 inline const char * const *EnumNamesNodeAttributes() {
-  static const char * const names[5] = {
+  static const char * const names[6] = {
     "NONE",
     "BatchnormInferenceAttributes",
     "PointwiseAttributes",
     "BatchnormBackwardAttributes",
+    "BatchnormAttributes",
     nullptr
   };
   return names;
 }
 
 inline const char *EnumNameNodeAttributes(NodeAttributes e) {
-  if (::flatbuffers::IsOutRange(e, NodeAttributes_NONE, NodeAttributes_BatchnormBackwardAttributes)) return "";
+  if (::flatbuffers::IsOutRange(e, NodeAttributes_NONE, NodeAttributes_BatchnormAttributes)) return "";
   const size_t index = static_cast<size_t>(e);
   return EnumNamesNodeAttributes()[index];
 }
@@ -87,6 +91,10 @@ template<> struct NodeAttributesTraits<hipdnn::sdk::BatchnormBackwardAttributes>
   static const NodeAttributes enum_value = NodeAttributes_BatchnormBackwardAttributes;
 };
 
+template<> struct NodeAttributesTraits<hipdnn::sdk::BatchnormAttributes> {
+  static const NodeAttributes enum_value = NodeAttributes_BatchnormAttributes;
+};
+
 template<typename T> struct NodeAttributesUnionTraits {
   static const NodeAttributes enum_value = NodeAttributes_NONE;
 };
@@ -101,6 +109,10 @@ template<> struct NodeAttributesUnionTraits<hipdnn::sdk::PointwiseAttributesT> {
 
 template<> struct NodeAttributesUnionTraits<hipdnn::sdk::BatchnormBackwardAttributesT> {
   static const NodeAttributes enum_value = NodeAttributes_BatchnormBackwardAttributes;
+};
+
+template<> struct NodeAttributesUnionTraits<hipdnn::sdk::BatchnormAttributesT> {
+  static const NodeAttributes enum_value = NodeAttributes_BatchnormAttributes;
 };
 
 struct NodeAttributesUnion {
@@ -157,6 +169,14 @@ struct NodeAttributesUnion {
     return type == NodeAttributes_BatchnormBackwardAttributes ?
       reinterpret_cast<const hipdnn::sdk::BatchnormBackwardAttributesT *>(value) : nullptr;
   }
+  hipdnn::sdk::BatchnormAttributesT *AsBatchnormAttributes() {
+    return type == NodeAttributes_BatchnormAttributes ?
+      reinterpret_cast<hipdnn::sdk::BatchnormAttributesT *>(value) : nullptr;
+  }
+  const hipdnn::sdk::BatchnormAttributesT *AsBatchnormAttributes() const {
+    return type == NodeAttributes_BatchnormAttributes ?
+      reinterpret_cast<const hipdnn::sdk::BatchnormAttributesT *>(value) : nullptr;
+  }
 };
 
 
@@ -177,6 +197,10 @@ inline bool operator==(const NodeAttributesUnion &lhs, const NodeAttributesUnion
     case NodeAttributes_BatchnormBackwardAttributes: {
       return *(reinterpret_cast<const hipdnn::sdk::BatchnormBackwardAttributesT *>(lhs.value)) ==
              *(reinterpret_cast<const hipdnn::sdk::BatchnormBackwardAttributesT *>(rhs.value));
+    }
+    case NodeAttributes_BatchnormAttributes: {
+      return *(reinterpret_cast<const hipdnn::sdk::BatchnormAttributesT *>(lhs.value)) ==
+             *(reinterpret_cast<const hipdnn::sdk::BatchnormAttributesT *>(rhs.value));
     }
     default: {
       return false;
@@ -227,6 +251,9 @@ struct Node FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   const hipdnn::sdk::BatchnormBackwardAttributes *attributes_as_BatchnormBackwardAttributes() const {
     return attributes_type() == hipdnn::sdk::NodeAttributes_BatchnormBackwardAttributes ? static_cast<const hipdnn::sdk::BatchnormBackwardAttributes *>(attributes()) : nullptr;
   }
+  const hipdnn::sdk::BatchnormAttributes *attributes_as_BatchnormAttributes() const {
+    return attributes_type() == hipdnn::sdk::NodeAttributes_BatchnormAttributes ? static_cast<const hipdnn::sdk::BatchnormAttributes *>(attributes()) : nullptr;
+  }
   void *mutable_attributes() {
     return GetPointer<void *>(VT_ATTRIBUTES);
   }
@@ -254,6 +281,10 @@ template<> inline const hipdnn::sdk::PointwiseAttributes *Node::attributes_as<hi
 
 template<> inline const hipdnn::sdk::BatchnormBackwardAttributes *Node::attributes_as<hipdnn::sdk::BatchnormBackwardAttributes>() const {
   return attributes_as_BatchnormBackwardAttributes();
+}
+
+template<> inline const hipdnn::sdk::BatchnormAttributes *Node::attributes_as<hipdnn::sdk::BatchnormAttributes>() const {
+  return attributes_as_BatchnormAttributes();
 }
 
 struct NodeBuilder {
@@ -601,6 +632,10 @@ inline bool VerifyNodeAttributes(::flatbuffers::Verifier &verifier, const void *
       auto ptr = reinterpret_cast<const hipdnn::sdk::BatchnormBackwardAttributes *>(obj);
       return verifier.VerifyTable(ptr);
     }
+    case NodeAttributes_BatchnormAttributes: {
+      auto ptr = reinterpret_cast<const hipdnn::sdk::BatchnormAttributes *>(obj);
+      return verifier.VerifyTable(ptr);
+    }
     default: return true;
   }
 }
@@ -632,6 +667,10 @@ inline void *NodeAttributesUnion::UnPack(const void *obj, NodeAttributes type, c
       auto ptr = reinterpret_cast<const hipdnn::sdk::BatchnormBackwardAttributes *>(obj);
       return ptr->UnPack(resolver);
     }
+    case NodeAttributes_BatchnormAttributes: {
+      auto ptr = reinterpret_cast<const hipdnn::sdk::BatchnormAttributes *>(obj);
+      return ptr->UnPack(resolver);
+    }
     default: return nullptr;
   }
 }
@@ -651,6 +690,10 @@ inline ::flatbuffers::Offset<void> NodeAttributesUnion::Pack(::flatbuffers::Flat
       auto ptr = reinterpret_cast<const hipdnn::sdk::BatchnormBackwardAttributesT *>(value);
       return CreateBatchnormBackwardAttributes(_fbb, ptr, _rehasher).Union();
     }
+    case NodeAttributes_BatchnormAttributes: {
+      auto ptr = reinterpret_cast<const hipdnn::sdk::BatchnormAttributesT *>(value);
+      return CreateBatchnormAttributes(_fbb, ptr, _rehasher).Union();
+    }
     default: return 0;
   }
 }
@@ -667,6 +710,10 @@ inline NodeAttributesUnion::NodeAttributesUnion(const NodeAttributesUnion &u) : 
     }
     case NodeAttributes_BatchnormBackwardAttributes: {
       value = new hipdnn::sdk::BatchnormBackwardAttributesT(*reinterpret_cast<hipdnn::sdk::BatchnormBackwardAttributesT *>(u.value));
+      break;
+    }
+    case NodeAttributes_BatchnormAttributes: {
+      value = new hipdnn::sdk::BatchnormAttributesT(*reinterpret_cast<hipdnn::sdk::BatchnormAttributesT *>(u.value));
       break;
     }
     default:
@@ -688,6 +735,11 @@ inline void NodeAttributesUnion::Reset() {
     }
     case NodeAttributes_BatchnormBackwardAttributes: {
       auto ptr = reinterpret_cast<hipdnn::sdk::BatchnormBackwardAttributesT *>(value);
+      delete ptr;
+      break;
+    }
+    case NodeAttributes_BatchnormAttributes: {
+      auto ptr = reinterpret_cast<hipdnn::sdk::BatchnormAttributesT *>(value);
       delete ptr;
       break;
     }

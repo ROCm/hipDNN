@@ -28,6 +28,68 @@ TEST(GraphTests, SetAndGetAttributes)
     EXPECT_TRUE(validation_result.is_good()) << validation_result.get_message();
 }
 
+TEST(GraphTests, BatchnormNodeCreation)
+{
+    Graph graph;
+
+    auto x = std::make_shared<Tensor_attributes>();
+    x->set_dim({1, 2, 3, 4}).set_stride({5, 6, 7, 8}).set_data_type(DataType_t::FLOAT);
+
+    auto scale = std::make_shared<Tensor_attributes>();
+    auto bias  = std::make_shared<Tensor_attributes>();
+
+    Batchnorm_attributes attributes;
+    attributes.name = "BatchnormNode";
+    attributes.set_epsilon(std::make_shared<Tensor_attributes>());
+
+    auto [y, mean, inv_variance, next_running_mean, next_running_variance]
+        = graph.batchnorm(x, scale, bias, attributes);
+
+    EXPECT_EQ(y->get_name(), "BatchnormNode::Y");
+    EXPECT_TRUE(y->get_is_virtual());
+
+    EXPECT_EQ(mean->get_name(), "BatchnormNode::MEAN");
+    EXPECT_TRUE(mean->get_is_virtual());
+
+    EXPECT_EQ(inv_variance->get_name(), "BatchnormNode::INV_VARIANCE");
+    EXPECT_TRUE(inv_variance->get_is_virtual());
+
+    EXPECT_FALSE(next_running_mean);
+    EXPECT_FALSE(next_running_variance);
+
+    auto validation_result = graph.validate();
+    EXPECT_TRUE(validation_result.is_good()) << validation_result.get_message();
+}
+
+TEST(GraphTests, BatchnormBackwardNodeCreation)
+{
+    Graph graph;
+
+    auto dy    = std::make_shared<Tensor_attributes>();
+    auto x     = std::make_shared<Tensor_attributes>();
+    auto scale = std::make_shared<Tensor_attributes>();
+
+    dy->set_dim({1, 2, 3, 4}).set_stride({5, 6, 7, 8}).set_data_type(DataType_t::FLOAT);
+    x->set_dim({1, 2, 3, 4}).set_stride({5, 6, 7, 8}).set_data_type(DataType_t::FLOAT);
+
+    Batchnorm_backward_attributes attributes;
+    attributes.name = "BatchnormBackwardNode";
+
+    auto [dx, dscale, dbias] = graph.batchnorm_backward(dy, x, scale, attributes);
+
+    EXPECT_EQ(dx->get_name(), "BatchnormBackwardNode::DX");
+    EXPECT_TRUE(dx->get_is_virtual());
+
+    EXPECT_EQ(dscale->get_name(), "BatchnormBackwardNode::DSCALE");
+    EXPECT_TRUE(dscale->get_is_virtual());
+
+    EXPECT_EQ(dbias->get_name(), "BatchnormBackwardNode::DBIAS");
+    EXPECT_TRUE(dbias->get_is_virtual());
+
+    auto validation_result = graph.validate();
+    EXPECT_TRUE(validation_result.is_good()) << validation_result.get_message();
+}
+
 TEST(GraphTests, BatchnormInferenceNodeCreation)
 {
     Graph graph;
@@ -206,6 +268,224 @@ TEST(GraphTests, BuildAndSerializeBatchnormInferenceGraph)
     EXPECT_EQ(deserialized_batchnorm_attributes->y, y->get_uid());
 }
 
+TEST(GraphTests, BuildAndSerializeBatchnormGraph)
+{
+    Graph graph;
+
+    graph.set_name("SerializedBatchnormGraph")
+        .set_compute_type(DataType_t::FLOAT)
+        .set_intermediate_type(DataType_t::HALF)
+        .set_io_type(DataType_t::FLOAT);
+
+    auto x = std::make_shared<Tensor_attributes>();
+    x->set_uid(1)
+        .set_name("X")
+        .set_dim({1, 2, 3, 4})
+        .set_stride({5, 6, 7, 8})
+        .set_data_type(DataType_t::FLOAT);
+
+    auto scale = std::make_shared<Tensor_attributes>();
+    scale->set_uid(2).set_name("Scale").set_data_type(DataType_t::FLOAT);
+
+    auto bias = std::make_shared<Tensor_attributes>();
+    bias->set_uid(3).set_name("Bias").set_data_type(DataType_t::FLOAT);
+
+    auto prev_running_mean = std::make_shared<Tensor_attributes>();
+    prev_running_mean->set_uid(4).set_name("PrevRunningMean").set_data_type(DataType_t::FLOAT);
+
+    auto prev_running_variance = std::make_shared<Tensor_attributes>();
+    prev_running_variance->set_uid(5)
+        .set_name("PrevRunningVariance")
+        .set_data_type(DataType_t::FLOAT);
+
+    auto momentum = std::make_shared<Tensor_attributes>();
+    momentum->set_uid(6).set_name("Momentum").set_data_type(DataType_t::FLOAT);
+
+    auto epsilon = std::make_shared<Tensor_attributes>();
+    epsilon->set_uid(7).set_name("Epsilon").set_data_type(DataType_t::FLOAT);
+
+    Batchnorm_attributes batchnorm_attributes;
+    batchnorm_attributes.name = "BatchnormNode";
+    batchnorm_attributes.set_previous_running_stats(
+        prev_running_mean, prev_running_variance, momentum);
+    batchnorm_attributes.set_epsilon(epsilon);
+
+    auto [y, mean, inv_variance, next_running_mean, next_running_variance]
+        = graph.batchnorm(x, scale, bias, batchnorm_attributes);
+
+    auto validation_result = graph.validate();
+    EXPECT_TRUE(validation_result.is_good()) << validation_result.get_message();
+
+    auto build_result = graph.build_operation_graph();
+    EXPECT_TRUE(build_result.is_good()) << build_result.get_message();
+
+    auto deserialized_graph = hipdnn::sdk::UnPackGraph(graph.serialized_graph.data());
+    ASSERT_NE(deserialized_graph, nullptr);
+
+    EXPECT_EQ(deserialized_graph->name, "SerializedBatchnormGraph");
+    EXPECT_EQ(deserialized_graph->compute_type, hipdnn::sdk::DataType_FLOAT);
+    EXPECT_EQ(deserialized_graph->intermediate_type, hipdnn::sdk::DataType_HALF);
+    EXPECT_EQ(deserialized_graph->io_type, hipdnn::sdk::DataType_FLOAT);
+    EXPECT_EQ(deserialized_graph->tensors.size(), 12);
+    EXPECT_EQ(deserialized_graph->nodes.size(), 1);
+
+    std::unordered_map<int64_t, hipdnn::sdk::TensorAttributesT> tensor_lookup;
+    for(auto& tensor : deserialized_graph->tensors)
+    {
+        tensor_lookup[tensor->uid] = *tensor;
+    }
+
+    validate_tensor(*x, tensor_lookup[x->get_uid()]);
+    validate_tensor(*scale, tensor_lookup[scale->get_uid()]);
+    validate_tensor(*bias, tensor_lookup[bias->get_uid()]);
+    validate_tensor(*epsilon, tensor_lookup[epsilon->get_uid()]);
+    validate_tensor(*prev_running_mean, tensor_lookup[prev_running_mean->get_uid()]);
+    validate_tensor(*prev_running_variance, tensor_lookup[prev_running_variance->get_uid()]);
+    validate_tensor(*momentum, tensor_lookup[momentum->get_uid()]);
+    validate_tensor(*y, tensor_lookup[y->get_uid()]);
+    validate_tensor(*mean, tensor_lookup[mean->get_uid()]);
+    validate_tensor(*inv_variance, tensor_lookup[inv_variance->get_uid()]);
+    validate_tensor(*next_running_mean, tensor_lookup[next_running_mean->get_uid()]);
+    validate_tensor(*next_running_variance, tensor_lookup[next_running_variance->get_uid()]);
+
+    EXPECT_EQ(deserialized_graph->nodes[0]->name, "BatchnormNode");
+    EXPECT_EQ(deserialized_graph->nodes[0]->attributes.type,
+              hipdnn::sdk::NodeAttributes::NodeAttributes_BatchnormAttributes);
+    auto deserialized_batchnorm_attributes
+        = deserialized_graph->nodes[0]->attributes.AsBatchnormAttributes();
+    EXPECT_EQ(deserialized_batchnorm_attributes->x, x->get_uid());
+    EXPECT_EQ(deserialized_batchnorm_attributes->scale, scale->get_uid());
+    EXPECT_EQ(deserialized_batchnorm_attributes->bias, bias->get_uid());
+    EXPECT_EQ(deserialized_batchnorm_attributes->epsilon, epsilon->get_uid());
+    EXPECT_EQ(deserialized_batchnorm_attributes->prev_running_mean, prev_running_mean->get_uid());
+    EXPECT_EQ(deserialized_batchnorm_attributes->prev_running_variance,
+              prev_running_variance->get_uid());
+    EXPECT_EQ(deserialized_batchnorm_attributes->momentum, momentum->get_uid());
+    EXPECT_EQ(deserialized_batchnorm_attributes->y, y->get_uid());
+    EXPECT_EQ(deserialized_batchnorm_attributes->mean, mean->get_uid());
+    EXPECT_EQ(deserialized_batchnorm_attributes->inv_variance, inv_variance->get_uid());
+    EXPECT_EQ(deserialized_batchnorm_attributes->next_running_mean, next_running_mean->get_uid());
+    EXPECT_EQ(deserialized_batchnorm_attributes->next_running_variance,
+              next_running_variance->get_uid());
+}
+
+TEST(GraphTests, BuildAndSerializeBatchnormAndPointwiseGraph)
+{
+    Graph graph;
+
+    graph.set_name("SerializedBatchnormAndPointwiseGraph")
+        .set_compute_type(DataType_t::FLOAT)
+        .set_intermediate_type(DataType_t::HALF)
+        .set_io_type(DataType_t::FLOAT);
+
+    auto x = std::make_shared<Tensor_attributes>();
+    x->set_uid(1)
+        .set_name("X")
+        .set_dim({1, 2, 3, 4})
+        .set_stride({5, 6, 7, 8})
+        .set_data_type(DataType_t::FLOAT);
+
+    auto scale = std::make_shared<Tensor_attributes>();
+    scale->set_uid(2).set_name("Scale").set_data_type(DataType_t::FLOAT);
+
+    auto bias = std::make_shared<Tensor_attributes>();
+    bias->set_uid(3).set_name("Bias").set_data_type(DataType_t::FLOAT);
+
+    auto prev_running_mean = std::make_shared<Tensor_attributes>();
+    prev_running_mean->set_uid(4).set_name("PrevRunningMean").set_data_type(DataType_t::FLOAT);
+
+    auto prev_running_variance = std::make_shared<Tensor_attributes>();
+    prev_running_variance->set_uid(5)
+        .set_name("PrevRunningVariance")
+        .set_data_type(DataType_t::FLOAT);
+
+    auto momentum = std::make_shared<Tensor_attributes>();
+    momentum->set_uid(6).set_name("Momentum").set_data_type(DataType_t::FLOAT);
+
+    auto epsilon = std::make_shared<Tensor_attributes>();
+    epsilon->set_uid(7).set_name("Epsilon").set_data_type(DataType_t::FLOAT);
+
+    Batchnorm_attributes batchnorm_attributes;
+    batchnorm_attributes.name = "BatchnormNode";
+    batchnorm_attributes.set_previous_running_stats(
+        prev_running_mean, prev_running_variance, momentum);
+    batchnorm_attributes.set_epsilon(epsilon);
+
+    auto [y, mean, inv_variance, next_running_mean, next_running_variance]
+        = graph.batchnorm(x, scale, bias, batchnorm_attributes);
+
+    Pointwise_attributes pointwise_attributes;
+    pointwise_attributes.name = "PointwiseNode";
+    pointwise_attributes.set_operation(PointwiseMode_t::RELU);
+
+    auto out_0 = graph.pointwise(y, pointwise_attributes);
+
+    auto validation_result = graph.validate();
+    EXPECT_TRUE(validation_result.is_good()) << validation_result.get_message();
+
+    auto build_result = graph.build_operation_graph();
+    EXPECT_TRUE(build_result.is_good()) << build_result.get_message();
+
+    auto deserialized_graph = hipdnn::sdk::UnPackGraph(graph.serialized_graph.data());
+    ASSERT_NE(deserialized_graph, nullptr);
+
+    EXPECT_EQ(deserialized_graph->name, "SerializedBatchnormAndPointwiseGraph");
+    EXPECT_EQ(deserialized_graph->compute_type, hipdnn::sdk::DataType_FLOAT);
+    EXPECT_EQ(deserialized_graph->intermediate_type, hipdnn::sdk::DataType_HALF);
+    EXPECT_EQ(deserialized_graph->io_type, hipdnn::sdk::DataType_FLOAT);
+    EXPECT_EQ(deserialized_graph->tensors.size(), 13);
+    EXPECT_EQ(deserialized_graph->nodes.size(), 2);
+
+    std::unordered_map<int64_t, hipdnn::sdk::TensorAttributesT> tensor_lookup;
+    for(auto& tensor : deserialized_graph->tensors)
+    {
+        tensor_lookup[tensor->uid] = *tensor;
+    }
+
+    validate_tensor(*x, tensor_lookup[x->get_uid()]);
+    validate_tensor(*scale, tensor_lookup[scale->get_uid()]);
+    validate_tensor(*bias, tensor_lookup[bias->get_uid()]);
+    validate_tensor(*epsilon, tensor_lookup[epsilon->get_uid()]);
+    validate_tensor(*prev_running_mean, tensor_lookup[prev_running_mean->get_uid()]);
+    validate_tensor(*prev_running_variance, tensor_lookup[prev_running_variance->get_uid()]);
+    validate_tensor(*momentum, tensor_lookup[momentum->get_uid()]);
+    validate_tensor(*y, tensor_lookup[y->get_uid()]);
+    validate_tensor(*mean, tensor_lookup[mean->get_uid()]);
+    validate_tensor(*inv_variance, tensor_lookup[inv_variance->get_uid()]);
+    validate_tensor(*next_running_mean, tensor_lookup[next_running_mean->get_uid()]);
+    validate_tensor(*next_running_variance, tensor_lookup[next_running_variance->get_uid()]);
+    validate_tensor(*out_0, tensor_lookup[out_0->get_uid()]);
+
+    EXPECT_EQ(deserialized_graph->nodes[0]->name, "BatchnormNode");
+    EXPECT_EQ(deserialized_graph->nodes[0]->attributes.type,
+              hipdnn::sdk::NodeAttributes::NodeAttributes_BatchnormAttributes);
+    auto deserialized_batchnorm_attributes
+        = deserialized_graph->nodes[0]->attributes.AsBatchnormAttributes();
+    EXPECT_EQ(deserialized_batchnorm_attributes->x, x->get_uid());
+    EXPECT_EQ(deserialized_batchnorm_attributes->scale, scale->get_uid());
+    EXPECT_EQ(deserialized_batchnorm_attributes->bias, bias->get_uid());
+    EXPECT_EQ(deserialized_batchnorm_attributes->epsilon, epsilon->get_uid());
+    EXPECT_EQ(deserialized_batchnorm_attributes->prev_running_mean, prev_running_mean->get_uid());
+    EXPECT_EQ(deserialized_batchnorm_attributes->prev_running_variance,
+              prev_running_variance->get_uid());
+    EXPECT_EQ(deserialized_batchnorm_attributes->momentum, momentum->get_uid());
+    EXPECT_EQ(deserialized_batchnorm_attributes->y, y->get_uid());
+    EXPECT_EQ(deserialized_batchnorm_attributes->mean, mean->get_uid());
+    EXPECT_EQ(deserialized_batchnorm_attributes->inv_variance, inv_variance->get_uid());
+    EXPECT_EQ(deserialized_batchnorm_attributes->next_running_mean, next_running_mean->get_uid());
+    EXPECT_EQ(deserialized_batchnorm_attributes->next_running_variance,
+              next_running_variance->get_uid());
+
+    EXPECT_EQ(deserialized_graph->nodes[1]->name, "PointwiseNode");
+    EXPECT_EQ(deserialized_graph->nodes[1]->attributes.type,
+              hipdnn::sdk::NodeAttributes::NodeAttributes_PointwiseAttributes);
+    auto deserialized_pointwise_attributes
+        = deserialized_graph->nodes[1]->attributes.AsPointwiseAttributes();
+    EXPECT_EQ(deserialized_pointwise_attributes->in_0, y->get_uid());
+    EXPECT_EQ(deserialized_pointwise_attributes->out_0, out_0->get_uid());
+    EXPECT_EQ(deserialized_pointwise_attributes->operation, hipdnn::sdk::PointwiseMode_RELU_FWD);
+}
+
 TEST(GraphTests, BuildAndSerializePointwiseGraph)
 {
     Graph graph;
@@ -263,7 +543,7 @@ TEST(GraphTests, BuildAndSerializePointwiseGraph)
     EXPECT_EQ(deserialized_pointwise_attributes->operation, hipdnn::sdk::PointwiseMode_RELU_FWD);
 }
 
-TEST(GraphTests, BuildAndSerializePointwiseAndBatchnormGraph)
+TEST(GraphTests, BuildAndSerializePointwiseAndBatchnormInferenceGraph)
 {
     Graph graph;
 

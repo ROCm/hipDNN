@@ -2,13 +2,15 @@
 // SPDX-License-Identifier:  MIT
 #pragma once
 
-#include "attributes/batchnorm_inference_attributes.hpp"
-#include "attributes/pointwise_attributes.hpp"
 #include "flatbuffers/detached_buffer.h"
-#include "node/batchnorm_backward_node.hpp"
-#include "node/batchnorm_inference_node.hpp"
-#include "node/node.hpp"
-#include "node/pointwise_node.hpp"
+#include <hipdnn_frontend/attributes/batchnorm_attributes.hpp>
+#include <hipdnn_frontend/attributes/batchnorm_inference_attributes.hpp>
+#include <hipdnn_frontend/attributes/pointwise_attributes.hpp>
+#include <hipdnn_frontend/node/batchnorm_backward_node.hpp>
+#include <hipdnn_frontend/node/batchnorm_inference_node.hpp>
+#include <hipdnn_frontend/node/batchnorm_node.hpp>
+#include <hipdnn_frontend/node/node.hpp>
+#include <hipdnn_frontend/node/pointwise_node.hpp>
 
 namespace hipdnn_frontend
 {
@@ -121,6 +123,43 @@ public:
     {
         graph_attributes.set_io_data_type(io_type);
         return *this;
+    }
+
+    std::array<std::shared_ptr<Tensor_attributes>, 5>
+        batchnorm(const std::shared_ptr<Tensor_attributes>& x,
+                  const std::shared_ptr<Tensor_attributes>& scale,
+                  const std::shared_ptr<Tensor_attributes>& bias,
+                  Batchnorm_attributes                      attributes)
+    {
+        auto y                = output_tensor(attributes.name + "::Y");
+        auto mean_out         = output_tensor(attributes.name + "::MEAN");
+        auto inv_variance_out = output_tensor(attributes.name + "::INV_VARIANCE");
+
+        auto prev_running_mean     = attributes.get_prev_running_mean();
+        auto prev_running_variance = attributes.get_prev_running_variance();
+        auto momentum              = attributes.get_momentum();
+
+        std::shared_ptr<Tensor_attributes> next_running_mean;
+        std::shared_ptr<Tensor_attributes> next_running_variance;
+        if(prev_running_mean && prev_running_variance && momentum)
+        {
+            next_running_mean     = output_tensor(attributes.name + "::NEXT_RUNNING_MEAN");
+            next_running_variance = output_tensor(attributes.name + "::NEXT_RUNNING_VARIANCE");
+        }
+
+        attributes.set_x(x);
+        attributes.set_scale(scale);
+        attributes.set_bias(bias);
+        attributes.set_y(y);
+        attributes.set_mean(mean_out);
+        attributes.set_inv_variance(inv_variance_out);
+        attributes.set_next_running_mean(next_running_mean);
+        attributes.set_next_running_variance(next_running_variance);
+
+        _sub_nodes.emplace_back(
+            std::make_shared<BatchnormNode>(std::move(attributes), graph_attributes));
+
+        return {y, mean_out, inv_variance_out, next_running_mean, next_running_variance};
     }
 
     std::array<std::shared_ptr<Tensor_attributes>, 3>

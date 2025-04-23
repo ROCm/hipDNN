@@ -3,6 +3,7 @@
 hipdnn_add_dependency(flatbuffers VERSION 23.1.21)
 
 set(SCHEMA_FILES 
+    schemas/batchnorm_attributes.fbs
     schemas/batchnorm_backward_attributes.fbs
     schemas/batchnorm_inference_attributes.fbs
     schemas/data_types.fbs

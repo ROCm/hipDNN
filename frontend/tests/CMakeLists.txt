@@ -9,16 +9,18 @@ endif()
 include(GoogleTest)
 
 add_executable(hipdnn_frontend_tests 
-    test_pointwise_node.cpp
-    test_pointwise_attributes.cpp
-    test_batchnorm_inference_node.cpp
+    test_batchnorm_attributes.cpp
+    test_batchnorm_backward_attributes.cpp
     test_batchnorm_backward_node.cpp
     test_batchnorm_inference_attributes.cpp
-    test_batchnorm_backward_attributes.cpp
+    test_batchnorm_inference_node.cpp
     test_graph.cpp
     test_types.cpp
     test_utilities.cpp
     test_graph_generated.cpp
+    test_pointwise_attributes.cpp
+    test_pointwise_node.cpp
+    test_utilities.cpp
 )
 
 target_compile_options(hipdnn_frontend_tests PRIVATE ${HIPDNN_WARNING_COMPILE_OPTIONS})

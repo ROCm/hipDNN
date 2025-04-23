@@ -122,7 +122,7 @@ TEST(DBNNodeTests, InferPropertiesNode)
     EXPECT_EQ(dbias_tensor->get_stride(), (std::vector<int64_t>{2, 1, 2, 2}));
 }
 
-TEST(DBNNodeTests, GatherHipdnnTensorIds)
+TEST(DBNNodeTests, GatherhipdnnTensorIds)
 {
     Batchnorm_backward_attributes batchnorm_attributes;
     batchnorm_attributes.set_dy(std::make_shared<Tensor_attributes>());
@@ -152,7 +152,7 @@ TEST(DBNNodeTests, GatherHipdnnTensorIds)
     EXPECT_TRUE(used_ids.find(10) != used_ids.end());
 }
 
-TEST(DBNNodeTests, PopulateHipdnnTensorIds)
+TEST(DBNNodeTests, PopulatehipdnnTensorIds)
 {
     Batchnorm_backward_attributes batchnorm_attributes;
     batchnorm_attributes.set_dy(std::make_shared<Tensor_attributes>());
