@@ -15,12 +15,13 @@ add_executable(hipdnn_frontend_tests
     test_batchnorm_inference_attributes.cpp
     test_batchnorm_inference_node.cpp
     test_batchnorm_node.cpp
+    test_error.cpp
     test_graph.cpp
-    test_types.cpp
-    test_utilities.cpp
     test_graph_generated.cpp
     test_pointwise_attributes.cpp
     test_pointwise_node.cpp
+    test_tensor_attributes.cpp
+    test_types.cpp
     test_utilities.cpp
 )
 

@@ -12,7 +12,9 @@ add_executable(hipdnn_backend_tests
     descriptors/test_graph_descriptor.cpp
     descriptors/test_descriptor_factory.cpp
     test_engine_plugin.cpp
+    test_error.cpp
     test_flatbuffer_utilities.cpp
+    test_helpers.cpp
 )
 
 target_link_libraries(hipdnn_backend_tests 
