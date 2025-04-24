@@ -22,18 +22,24 @@ target_include_directories(hipdnn_backend_private
 )
 
 target_compile_options(hipdnn_backend_private PRIVATE ${HIPDNN_WARNING_COMPILE_OPTIONS})
-target_link_libraries(hipdnn_backend_private PUBLIC Boost::dll hip::device PRIVATE hipdnn_sdk)
+target_link_libraries(hipdnn_backend_private PUBLIC Boost::dll hip::device hipdnn_sdk)
 clang_tidy_check(hipdnn_backend_private)
 
 add_library(hipdnn_backend SHARED 
     hipdnn_backend.cpp
 )
 
-target_include_directories(hipdnn_backend SYSTEM PUBLIC ${HIP_INCLUDE_DIRS})
+target_include_directories(hipdnn_backend 
+    SYSTEM PUBLIC 
+        ${HIP_INCLUDE_DIRS}
+    PUBLIC 
+        ${HIP_DNN_BACKEND_INCLUDE_DIR}
+        ${HIP_DNN_BACKEND_EXPORT_INCLUDE_DIR})
 
 target_compile_options(hipdnn_backend PRIVATE ${HIPDNN_WARNING_COMPILE_OPTIONS})
-target_link_libraries(hipdnn_backend PUBLIC hipdnn_backend_private)
+target_link_libraries(hipdnn_backend PRIVATE hipdnn_backend_private)
 target_link_libraries(hipdnn_backend PRIVATE "-Xlinker --exclude-libs=ALL" ) # HIDE symbols from linked static libs
+set_target_properties(hipdnn_backend PROPERTIES CXX_VISIBILITY_PRESET hidden)
 
 clang_tidy_check(hipdnn_backend)
 

@@ -17,8 +17,8 @@ static bool not_equal(const T& expected, const T& actual)
     return expected != actual;
 }
 
-static bool not_equal(const Tensor_attributes& tensor,
-               const hipdnn_sdk::data_objects::TensorAttributesT& serialized_tensor)
+static bool not_equal(const Tensor_attributes&                           tensor,
+                      const hipdnn_sdk::data_objects::TensorAttributesT& serialized_tensor)
 {
     return not_equal(tensor.get_name(), serialized_tensor.name)
            || not_equal(tensor.get_uid(), serialized_tensor.uid)
@@ -200,7 +200,7 @@ int main()
     }
 
     if(not_equal(deserialized_graph->nodes[0]->attributes.type,
-                  hipdnn_sdk::data_objects::NodeAttributes::NodeAttributes_BatchnormAttributes))
+                 hipdnn_sdk::data_objects::NodeAttributes::NodeAttributes_BatchnormAttributes))
     {
         std::cout << "Graph node type mismatch: expected NodeAttributes_BatchnormAttributes, got "
                   << deserialized_graph->nodes[0]->attributes.type << std::endl;
@@ -238,14 +238,14 @@ int main()
     }
     if(!deserialized_batchnorm_attributes->prev_running_mean.has_value()
        || not_equal(deserialized_batchnorm_attributes->prev_running_mean.value(),
-                     prev_running_mean->get_uid()))
+                    prev_running_mean->get_uid()))
     {
         std::cout << "Batchnorm attribute mismatch: prev_running_mean" << std::endl;
         return EXIT_FAILURE;
     }
     if(!deserialized_batchnorm_attributes->prev_running_variance.has_value()
        || not_equal(deserialized_batchnorm_attributes->prev_running_variance.value(),
-                     prev_running_variance->get_uid()))
+                    prev_running_variance->get_uid()))
     {
         std::cout << "Batchnorm attribute mismatch: prev_running_variance" << std::endl;
         return EXIT_FAILURE;
@@ -269,21 +269,21 @@ int main()
     }
     if(!deserialized_batchnorm_attributes->inv_variance.has_value()
        || not_equal(deserialized_batchnorm_attributes->inv_variance.value(),
-                     inv_variance->get_uid()))
+                    inv_variance->get_uid()))
     {
         std::cout << "Batchnorm attribute mismatch: inv_variance" << std::endl;
         return EXIT_FAILURE;
     }
     if(!deserialized_batchnorm_attributes->next_running_mean.has_value()
        || not_equal(deserialized_batchnorm_attributes->next_running_mean.value(),
-                     next_running_mean->get_uid()))
+                    next_running_mean->get_uid()))
     {
         std::cout << "Batchnorm attribute mismatch: next_running_mean" << std::endl;
         return EXIT_FAILURE;
     }
     if(!deserialized_batchnorm_attributes->next_running_variance.has_value()
        || not_equal(deserialized_batchnorm_attributes->next_running_variance.value(),
-                     next_running_variance->get_uid()))
+                    next_running_variance->get_uid()))
     {
         std::cout << "Batchnorm attribute mismatch: next_running_variance" << std::endl;
         return EXIT_FAILURE;
