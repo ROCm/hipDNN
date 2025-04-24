@@ -3,8 +3,8 @@
 
 #pragma once
 
-#include "hipdnn_backend_descriptor_type_t.h"
-#include "hipdnn_status_t.h"
+#include "hipdnn_backend_descriptor_type.h"
+#include "hipdnn_status.h"
 
 namespace hipdnn_backend
 {

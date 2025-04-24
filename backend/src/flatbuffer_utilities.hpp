@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "hipdnn_status_t.h"
+#include "hipdnn_status.h"
 #include <hipdnn_sdk/data_objects/graph_generated.h>
 #include <memory>
 

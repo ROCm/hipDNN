@@ -4,7 +4,7 @@
 #pragma once
 
 #include "backend_descriptor.hpp"
-#include "hipdnn_status_t.h"
+#include "hipdnn_status.h"
 
 namespace hipdnn_backend
 {

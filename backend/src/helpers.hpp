@@ -3,7 +3,7 @@
 #pragma once
 
 #include "error.hpp"
-#include "hipdnn_status_t.h"
+#include "hipdnn_status.h"
 
 #include <iostream>
 

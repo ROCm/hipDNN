@@ -4,7 +4,7 @@
 #include "graph_descriptor.hpp"
 #include "error.hpp"
 #include "flatbuffer_utilities.hpp"
-#include "hipdnn_backend_descriptor_type_t.h"
+#include "hipdnn_backend_descriptor_type.h"
 #include <hipdnn_sdk/data_objects/graph_generated.h>
 
 namespace hipdnn_backend

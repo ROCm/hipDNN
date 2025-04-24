@@ -18,10 +18,10 @@
 // Cmake Generated export header.
 #include "hipdnn_backend_export.h"
 
-#include "hipdnn_backend_attribute_name_t.h"
-#include "hipdnn_backend_attribute_type_t.h"
-#include "hipdnn_backend_descriptor_type_t.h"
-#include "hipdnn_status_t.h"
+#include "hipdnn_backend_attribute_name.h"
+#include "hipdnn_backend_attribute_type.h"
+#include "hipdnn_backend_descriptor_type.h"
+#include "hipdnn_status.h"
 
 // NOLINTBEGIN
 #ifdef __cplusplus
