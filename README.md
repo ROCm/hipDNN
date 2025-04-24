@@ -19,6 +19,11 @@ cmake -DCMAKE_BUILD_TYPE=Debug ..
 mkdir build
 cd build
 cmake -DCODE_COVERAGE=ON ..
+
+# python frontend api
+mkdir build
+cd build
+cmake -DHIP_DNN_FRONTEND_BUILD_PYTHON_BINDINGS=ON ..
 ```
 4. Run your make commands(dont forget your -jnproc flag for using additional cores)
   - `make`: default build
