@@ -20,8 +20,6 @@ public:
     Graph_descriptor();
     ~Graph_descriptor() override = default;
 
-    hipdnnStatus_t execute([[maybe_unused]] hipdnnHandle_t            handle,
-                           [[maybe_unused]] hipdnnBackendDescriptor_t variant_pack) override;
     hipdnnStatus_t finalize() override;
 
     hipdnnStatus_t get_attribute([[maybe_unused]] hipdnnBackendAttributeName_t attribute_name,

@@ -21,7 +21,11 @@ public:
 
     virtual hipdnnStatus_t execute([[maybe_unused]] hipdnnHandle_t            handle,
                                    [[maybe_unused]] hipdnnBackendDescriptor_t variant_pack)
-        = 0;
+    {
+        // provide default implementation since this is only applicable to the execution plan descriptor
+        return HIPDNN_STATUS_NOT_SUPPORTED;
+    }
+
     virtual hipdnnStatus_t finalize() = 0;
 
     virtual hipdnnStatus_t

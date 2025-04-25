@@ -10,6 +10,24 @@
 
 using namespace hipdnn_backend;
 
+namespace
+{
+hipdnnStatus_t is_valid_descriptor(hipdnnBackendDescriptor_t descriptor)
+{
+    if(descriptor == nullptr)
+    {
+        return HIPDNN_STATUS_BAD_PARAM;
+    }
+
+    if(descriptor->type == HIPDNN_INVALID_TYPE)
+    {
+        return HIPDNN_STATUS_BAD_PARAM;
+    }
+
+    return HIPDNN_STATUS_SUCCESS;
+}
+}
+
 hipdnnStatus_t hipdnnCreate(hipdnnHandle_t* handle)
 {
     (void)handle;
@@ -57,16 +75,33 @@ hipdnnStatus_t hipdnnBackendExecute(hipdnnHandle_t            handle,
                                     hipdnnBackendDescriptor_t execution_plan,
                                     hipdnnBackendDescriptor_t variant_pack)
 {
-    (void)handle;
-    (void)execution_plan;
-    (void)variant_pack;
-    return HIPDNN_STATUS_SUCCESS;
+    return hipdnn_backend::try_catch(
+        [&] {
+            hipdnnStatus_t status = is_valid_descriptor(execution_plan);
+            if(status != HIPDNN_STATUS_SUCCESS)
+            {
+                return status;
+            }
+
+            return static_cast<hipdnn_backend::Backend_descriptor*>(execution_plan)
+                ->execute(handle, variant_pack);
+        },
+        false);
 }
 
 hipdnnStatus_t hipdnnBackendFinalize(hipdnnBackendDescriptor_t descriptor)
 {
-    (void)descriptor;
-    return HIPDNN_STATUS_SUCCESS;
+    return hipdnn_backend::try_catch(
+        [&] {
+            hipdnnStatus_t status = is_valid_descriptor(descriptor);
+            if(status != HIPDNN_STATUS_SUCCESS)
+            {
+                return status;
+            }
+
+            return static_cast<hipdnn_backend::Backend_descriptor*>(descriptor)->finalize();
+        },
+        false);
 }
 
 hipdnnStatus_t hipdnnBackendGetAttribute(hipdnnBackendDescriptor_t    descriptor,
@@ -76,13 +111,22 @@ hipdnnStatus_t hipdnnBackendGetAttribute(hipdnnBackendDescriptor_t    descriptor
                                          int64_t*                     element_count,
                                          void*                        array_of_elements)
 {
-    (void)descriptor;
-    (void)attribute_name;
-    (void)attribute_type;
-    (void)requested_element_count;
-    *element_count = 0;
-    (void)array_of_elements;
-    return HIPDNN_STATUS_SUCCESS;
+    return hipdnn_backend::try_catch(
+        [&] {
+            hipdnnStatus_t status = is_valid_descriptor(descriptor);
+            if(status != HIPDNN_STATUS_SUCCESS)
+            {
+                return status;
+            }
+
+            return static_cast<hipdnn_backend::Backend_descriptor*>(descriptor)
+                ->get_attribute(attribute_name,
+                                attribute_type,
+                                requested_element_count,
+                                element_count,
+                                array_of_elements);
+        },
+        false);
 }
 
 hipdnnStatus_t hipdnnBackendSetAttribute(hipdnnBackendDescriptor_t    descriptor,
@@ -91,12 +135,18 @@ hipdnnStatus_t hipdnnBackendSetAttribute(hipdnnBackendDescriptor_t    descriptor
                                          int64_t                      element_count,
                                          const void*                  array_of_elements)
 {
-    (void)descriptor;
-    (void)attribute_name;
-    (void)attribute_type;
-    (void)element_count;
-    (void)array_of_elements;
-    return HIPDNN_STATUS_SUCCESS;
+    return hipdnn_backend::try_catch(
+        [&] {
+            hipdnnStatus_t status = is_valid_descriptor(descriptor);
+            if(status != HIPDNN_STATUS_SUCCESS)
+            {
+                return status;
+            }
+
+            return static_cast<hipdnn_backend::Backend_descriptor*>(descriptor)
+                ->set_attribute(attribute_name, attribute_type, element_count, array_of_elements);
+        },
+        false);
 }
 
 HIPDNN_BACKEND_EXPORT hipdnnStatus_t hipdnnBackendCreateAndDeserializeGraph_ext(

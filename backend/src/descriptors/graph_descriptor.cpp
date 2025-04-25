@@ -15,12 +15,6 @@ Graph_descriptor::Graph_descriptor()
     type = HIPDNN_BACKEND_OPERATIONGRAPH_DESCRIPTOR;
 }
 
-hipdnnStatus_t Graph_descriptor::execute([[maybe_unused]] hipdnnHandle_t            handle,
-                                         [[maybe_unused]] hipdnnBackendDescriptor_t variant_pack)
-{
-    return HIPDNN_STATUS_NOT_SUPPORTED;
-}
-
 hipdnnStatus_t Graph_descriptor::finalize()
 {
     return HIPDNN_STATUS_NOT_SUPPORTED;
