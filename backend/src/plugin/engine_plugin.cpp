@@ -7,9 +7,10 @@ namespace hipdnn_backend
 {
 namespace plugin
 {
+
 bool Engine_plugin::resolve_symbols()
 {
-    if(!Plugin::resolve_symbols())
+    if(!Plugin_base::resolve_symbols())
     {
         return false;
     }
@@ -28,7 +29,7 @@ bool Engine_plugin::resolve_symbols()
         std::cerr << "Error: " << func_name_get_num_engines << "() not found\n";
         return false;
     }
-    _func_get_num_engines = _lib.get<unsigned()>(func_name_get_num_engines);
+    _func_get_num_engines = _lib.get<hipdnnPluginStatus_t(unsigned*)>(func_name_get_num_engines);
 
     const auto func_name_run_engine = "hipdnnPluginRunEngine";
     if(!_lib.has(func_name_run_engine))
@@ -37,7 +38,10 @@ bool Engine_plugin::resolve_symbols()
         std::cerr << "Error: " << func_name_run_engine << "() not found\n";
         return false;
     }
-    _func_run_engine = _lib.get<int(unsigned, int)>(func_name_run_engine);
+    // TODO Fix formatting: fix ugly formatting
+    _func_run_engine
+        = _lib.get<hipdnnPluginStatus_t(unsigned, const uint32_t*, uint32_t*, uint32_t)>(
+            func_name_run_engine);
 
 #ifndef NDEBUG
     _initialized = true;
@@ -48,13 +52,32 @@ bool Engine_plugin::resolve_symbols()
 unsigned Engine_plugin::num_engines() const
 {
     assert(_initialized);
-    return _func_get_num_engines();
+    // TODO Fix formatting: indentation between the type and the variable name
+    unsigned num_engines;
+    auto     status = _func_get_num_engines(&num_engines);
+    if(status != hipdnnPluginStatusSuccess)
+    {
+        // TODO we do not have an exception class yet, so we just throw std::runtime_error
+        throw std::runtime_error("Failed to get the number of engines. Status code: "
+                                 + std::to_string(status));
+    }
+    return num_engines;
 }
 
-int Engine_plugin::run_engine(unsigned engine_index, int input) const
+// TODO Fix formatting: indentation between the type and the variable name
+void Engine_plugin::run_engine(unsigned        engine_index,
+                               const uint32_t* input,
+                               uint32_t*       output,
+                               uint32_t        size) const
 {
     assert(_initialized);
-    return _func_run_engine(engine_index, input);
+    auto status = _func_run_engine(engine_index, input, output, size);
+    if(status != hipdnnPluginStatusSuccess)
+    {
+        // TODO we do not have an exception class yet, so we just throw std::runtime_error
+        throw std::runtime_error("Failed to run the engine. Status code: "
+                                 + std::to_string(status));
+    }
 }
 
 } // namespace plugin

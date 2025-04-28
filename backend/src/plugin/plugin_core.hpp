@@ -23,26 +23,26 @@
 #include <iostream>
 #include <string_view>
 #include <system_error>
+#include <type_traits>
 #include <vector>
 
-#include <hipdnn_sdk/plugin/plugin_api.h>
+#include <hipdnn_sdk/plugin/plugin_api_enums.h>
 
 namespace hipdnn_backend
 {
 namespace plugin
 {
 
-// The Plugin is the base class for all plugins.
-class Plugin
+// The Plugin_base is the base class for all plugins.
+class Plugin_base
 {
 protected:
-    // The constructor is protected to prevent direct instantiation of the Plugin class.
-    Plugin(boost::dll::shared_library&& lib);
+    // The constructor is protected to prevent direct instantiation of the class.
+    Plugin_base(boost::dll::shared_library&& lib);
 
 public:
-    virtual ~Plugin() = default;
+    virtual ~Plugin_base() = default;
 
-    // These functions are mandatory for all plugins. They are used to get the plugin name and version.
     std::string_view   name() const;
     std::string_view   version() const;
     hipdnnPluginType_t type() const;
@@ -55,19 +55,22 @@ protected:
 
 private:
 #ifndef NDEBUG
-    bool _initialized = false; // Flag to check if the plugin is initialized
+    bool _initialized = false;
 #endif
-    std::function<const char*()>        _func_get_name;
-    std::function<const char*()>        _func_get_version;
-    std::function<hipdnnPluginType_t()> _func_get_type;
+    std::function<hipdnnPluginStatus_t(const char**)>        _func_get_name;
+    std::function<hipdnnPluginStatus_t(const char**)>        _func_get_version;
+    std::function<hipdnnPluginStatus_t(hipdnnPluginType_t*)> _func_get_type;
 };
 
-// The plugin manager is responsible for loading and unloading plugins. This class is the base class for all plugin managers.
+// The Plugin_manager_base is responsible for loading and unloading plugins. This class is the base class for all plugin managers.
 template <class Plugin>
-class Plugin_manager
+class Plugin_manager_base
 {
+    static_assert(std::is_base_of_v<Plugin_base, Plugin>,
+                  "Plugin must be derived from Plugin_base");
+
 public:
-    virtual ~Plugin_manager() = default;
+    virtual ~Plugin_manager_base() = default;
 
     void load_plugins(const std::vector<std::filesystem::path>& plugin_paths)
     {
@@ -102,6 +105,30 @@ public:
             {
                 // TODO We do not have a logger yet, so we just print to stderr
                 std::cerr << "Error resolving symbols for plugin: " << path << '\n';
+                // The plugin is probably not valid or not compatible with the current version of the library
+                // TODO For now we just print the error message and continue
+                continue;
+            }
+
+            // Get the plugin name, version and type before we move it
+            // TODO Fix formatting: indentation between the type and the variable name
+            std::string_view   name;
+            std::string_view   version;
+            hipdnnPluginType_t type;
+            // Catch any exceptions thrown by plugin functions
+            try
+            {
+                name    = plugin.name();
+                version = plugin.version();
+                type    = plugin.type();
+            }
+            // TODO we do not have an exception class yet, catch specific exception instead of std::exception when we have one
+            catch(...)
+            {
+                // TODO Print error message and error code from the exception
+                // TODO We do not have a logger yet, so we just print to stderr
+                std::cerr << "Error getting plugin info: " << path << '\n';
+                // We should not use the plugin if we cannot get its name, version or type
                 // TODO For now we just print the error message and continue
                 continue;
             }
@@ -110,6 +137,10 @@ public:
 
             // TODO We do not have a logger yet, so we just print to stdout
             std::cout << "Plugin loaded successfully: " << path << '\n';
+            // Print plugin name, version and type
+            // TODO We do not have a logger yet, so we just print to stdout
+            std::cout << "Plugin info: name=" << name << ", version=" << version
+                      << ", type=" << type << '\n';
         }
     }
 
@@ -119,7 +150,7 @@ public:
     }
 
 private:
-    std::vector<Plugin> _plugins; // List of loaded plugins
+    std::vector<Plugin> _plugins;
 };
 
 } // namespace plugin
