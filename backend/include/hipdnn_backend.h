@@ -12,9 +12,6 @@
 #include <hip/hip_runtime_api.h>
 #pragma clang diagnostic pop
 
-#include <stddef.h>
-#include <stdint.h>
-
 // Cmake Generated export header.
 #include "hipdnn_backend_export.h"
 

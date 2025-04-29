@@ -120,7 +120,22 @@ TEST(HipDNNBackendTest, WillSetBackendGraphCorrectly)
         &descriptor, serialized_graph.data(), serialized_graph.size());
 
     EXPECT_EQ(status, HIPDNN_STATUS_SUCCESS);
+
+    status = hipdnnBackendFinalize(descriptor);
+    EXPECT_EQ(status, HIPDNN_STATUS_SUCCESS);
+
     hipdnnBackendDestroyDescriptor(descriptor);
+}
+
+TEST(HipDNNBackendTest, WillFailToFinalizeInvalidGraph)
+{
+    hipdnnBackendDescriptor_t descriptor = nullptr;
+    auto                      status
+        = hipdnnBackendCreateDescriptor(HIPDNN_BACKEND_OPERATIONGRAPH_DESCRIPTOR, &descriptor);
+    EXPECT_EQ(status, HIPDNN_STATUS_SUCCESS);
+
+    status = hipdnnBackendFinalize(descriptor);
+    EXPECT_EQ(status, HIPDNN_STATUS_BAD_PARAM);
 }
 
 TEST(HipDNNBackendTest, WillFailToCreateGraphIfGraphIsNull)

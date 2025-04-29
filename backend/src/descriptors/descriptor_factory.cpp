@@ -4,6 +4,7 @@
 #include "descriptor_factory.hpp"
 #include "error.hpp"
 #include "graph_descriptor.hpp"
+#include "variant_descriptor.hpp"
 
 namespace hipdnn_backend
 {
@@ -20,6 +21,9 @@ hipdnnStatus_t Descriptor_factory::create(hipdnnBackendDescriptorType_t descript
     {
     case HIPDNN_BACKEND_OPERATIONGRAPH_DESCRIPTOR:
         *descriptor = new Graph_descriptor();
+        break;
+    case HIPDNN_BACKEND_VARIANT_PACK_DESCRIPTOR:
+        *descriptor = new Variant_descriptor();
         break;
     default:
         return set_last_error(HIPDNN_STATUS_NOT_SUPPORTED,

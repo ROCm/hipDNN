@@ -3,6 +3,7 @@
 
 #include "descriptors/descriptor_factory.hpp"
 #include "descriptors/graph_descriptor.hpp"
+#include "descriptors/variant_descriptor.hpp"
 #include "flatbuffer_test_utils.hpp"
 #include "handle/handle_factory.hpp"
 
@@ -108,4 +109,39 @@ TEST(DescriptorFactoryTest, TestHandleFactory)
 
     status = hipdnn_backend::Handle_factory::create_handle(nullptr);
     EXPECT_EQ(status, HIPDNN_STATUS_BAD_PARAM);
+}
+
+TEST(Descriptor_Factory_Test, Create_Variant_Descriptor)
+{
+    hipdnnBackendDescriptor_t descriptor = nullptr;
+
+    auto status = Descriptor_factory::create(HIPDNN_BACKEND_VARIANT_PACK_DESCRIPTOR, &descriptor);
+
+    EXPECT_EQ(status, HIPDNN_STATUS_SUCCESS);
+    EXPECT_NE(descriptor, nullptr);
+
+    auto variant_descriptor = dynamic_cast<Variant_descriptor*>(descriptor);
+    EXPECT_NE(variant_descriptor, nullptr);
+
+    EXPECT_FALSE(variant_descriptor->is_finalized());
+
+    delete variant_descriptor;
+}
+
+TEST(Descriptor_Factory_Test, Create_Variant_Pack_With_Null_Descriptor)
+{
+    auto status = Descriptor_factory::create(HIPDNN_BACKEND_VARIANT_PACK_DESCRIPTOR, nullptr);
+
+    EXPECT_EQ(status, HIPDNN_STATUS_BAD_PARAM);
+}
+
+TEST(Descriptor_Factory_Test, Create_Variant_Pack_With_Unsupported_Type)
+{
+    hipdnnBackendDescriptor_t descriptor = nullptr;
+
+    auto status
+        = Descriptor_factory::create(static_cast<hipdnnBackendDescriptorType_t>(999), &descriptor);
+
+    EXPECT_EQ(status, HIPDNN_STATUS_NOT_SUPPORTED);
+    EXPECT_EQ(descriptor, nullptr);
 }

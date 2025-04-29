@@ -38,7 +38,9 @@ TEST_F(Graph_descriptor_test, WillCorrectlySetGraph)
 
     Graph_descriptor descriptor;
     auto status = descriptor.deserialize_graph(serialized_graph.data(), serialized_graph.size());
+    ASSERT_EQ(status, HIPDNN_STATUS_SUCCESS);
 
+    status = descriptor.finalize();
     ASSERT_EQ(status, HIPDNN_STATUS_SUCCESS);
 }
 
@@ -50,20 +52,12 @@ TEST_F(Graph_descriptor_test, WillFailToSetInvalidGraph)
     ASSERT_EQ(status, HIPDNN_STATUS_BAD_PARAM_NULL_POINTER);
 }
 
-TEST_F(Graph_descriptor_test, ExecuteReturnsNotSupported)
-{
-    Graph_descriptor descriptor;
-    auto             status = descriptor.execute(nullptr, nullptr);
-
-    ASSERT_EQ(status, HIPDNN_STATUS_NOT_SUPPORTED);
-}
-
-TEST_F(Graph_descriptor_test, FinalizeReturnsNotSupported)
+TEST_F(Graph_descriptor_test, FinalizeFailInvalidGraph)
 {
     Graph_descriptor descriptor;
     auto             status = descriptor.finalize();
 
-    ASSERT_EQ(status, HIPDNN_STATUS_NOT_SUPPORTED);
+    ASSERT_EQ(status, HIPDNN_STATUS_BAD_PARAM);
 }
 
 TEST_F(Graph_descriptor_test, GetAttributeReturnsNotSupported)

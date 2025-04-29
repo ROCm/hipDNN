@@ -17,7 +17,11 @@ Graph_descriptor::Graph_descriptor()
 
 hipdnnStatus_t Graph_descriptor::finalize()
 {
-    return HIPDNN_STATUS_NOT_SUPPORTED;
+    if(_graph == nullptr)
+    {
+        return set_last_error(HIPDNN_STATUS_BAD_PARAM, "Graph_descriptor::finalize: graph is null");
+    }
+    return Backend_descriptor::finalize();
 }
 
 hipdnnStatus_t

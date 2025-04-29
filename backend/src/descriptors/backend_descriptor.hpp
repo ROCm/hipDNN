@@ -16,30 +16,33 @@ namespace hipdnn_backend
 {
 class Backend_descriptor : public hipdnnBackendDescriptor
 {
+private:
+    bool _finalized = false;
+
 public:
     ~Backend_descriptor() override = default;
 
-    virtual hipdnnStatus_t execute([[maybe_unused]] hipdnnHandle_t            handle,
-                                   [[maybe_unused]] hipdnnBackendDescriptor_t variant_pack)
+    virtual hipdnnStatus_t finalize()
     {
-        // provide default implementation since this is only applicable to the execution plan descriptor
-        return HIPDNN_STATUS_NOT_SUPPORTED;
+        _finalized = true;
+        return HIPDNN_STATUS_SUCCESS;
     }
 
-    virtual hipdnnStatus_t finalize() = 0;
+    virtual bool is_finalized() const
+    {
+        return _finalized;
+    }
 
-    virtual hipdnnStatus_t
-        get_attribute([[maybe_unused]] hipdnnBackendAttributeName_t attribute_name,
-                      [[maybe_unused]] hipdnnBackendAttributeType_t attribute_type,
-                      [[maybe_unused]] int64_t                      requested_element_count,
-                      [[maybe_unused]] int64_t*                     element_count,
-                      [[maybe_unused]] void*                        array_of_elements)
+    virtual hipdnnStatus_t get_attribute(hipdnnBackendAttributeName_t attribute_name,
+                                         hipdnnBackendAttributeType_t attribute_type,
+                                         int64_t                      requested_element_count,
+                                         int64_t*                     element_count,
+                                         void*                        array_of_elements)
         = 0;
-    virtual hipdnnStatus_t
-        set_attribute([[maybe_unused]] hipdnnBackendAttributeName_t attribute_name,
-                      [[maybe_unused]] hipdnnBackendAttributeType_t attribute_type,
-                      [[maybe_unused]] int64_t                      element_count,
-                      [[maybe_unused]] const void*                  array_of_elements)
+    virtual hipdnnStatus_t set_attribute(hipdnnBackendAttributeName_t attribute_name,
+                                         hipdnnBackendAttributeType_t attribute_type,
+                                         int64_t                      element_count,
+                                         const void*                  array_of_elements)
         = 0;
 };
 }
