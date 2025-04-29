@@ -19,6 +19,7 @@ add_executable(hipdnn_backend_tests
     test_engine_plugin.cpp
     test_error.cpp
     test_flatbuffer_utilities.cpp
+    test_handle.cpp
     test_helpers.cpp
     test_plugin.cpp
 )

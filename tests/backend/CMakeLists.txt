@@ -2,9 +2,11 @@
 # SPDX-License-Identifier:  MIT
 
 include(GoogleTest)
+find_package(hip REQUIRED)
 
 add_executable(public_hipdnn_backend_tests 
     test_backend_public_functions.cpp
+    test_handle_api.cpp
 )
 
 target_compile_options(public_hipdnn_backend_tests PRIVATE ${HIPDNN_WARNING_COMPILE_OPTIONS})
@@ -14,6 +16,7 @@ target_link_libraries(public_hipdnn_backend_tests
     pthread 
     hipdnn_sdk
     hipdnn_backend
+    hip::device
 )
 
 add_dependencies(check public_hipdnn_backend_tests)

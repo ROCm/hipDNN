@@ -9,6 +9,8 @@ set(HIP_DNN_BACKEND_SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 add_library(hipdnn_backend_private
     descriptors/graph_descriptor.cpp
     descriptors/descriptor_factory.cpp
+    handle/handle_factory.cpp
+    handle/handle.cpp
     flatbuffer_utilities.cpp
     plugin/engine_plugin.cpp
     plugin/plugin_core.cpp

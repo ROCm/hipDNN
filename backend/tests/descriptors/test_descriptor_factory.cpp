@@ -4,6 +4,7 @@
 #include "descriptors/descriptor_factory.hpp"
 #include "descriptors/graph_descriptor.hpp"
 #include "flatbuffer_test_utils.hpp"
+#include "handle/handle_factory.hpp"
 
 #include "gtest/gtest.h"
 
@@ -95,4 +96,16 @@ TEST(DescriptorFactoryTest, CreateGraphExtInvalidGraphData)
 
     EXPECT_EQ(status, HIPDNN_STATUS_BAD_PARAM);
     EXPECT_EQ(descriptor, nullptr);
+}
+
+TEST(DescriptorFactoryTest, TestHandleFactory)
+{
+    hipdnnHandle_t handle_t = nullptr;
+
+    auto status = hipdnn_backend::Handle_factory::create_handle(&handle_t);
+    EXPECT_EQ(status, HIPDNN_STATUS_SUCCESS);
+    EXPECT_NE(handle_t, nullptr);
+
+    status = hipdnn_backend::Handle_factory::create_handle(nullptr);
+    EXPECT_EQ(status, HIPDNN_STATUS_BAD_PARAM);
 }

@@ -44,8 +44,7 @@ typedef struct hipdnnBackendDescriptor* hipdnnBackendDescriptor_t;
  *
  * @retval HIPDNN_STATUS_SUCCESS            The creation was successful
  * @retval HIPDNN_STATUS_BAD_PARAM          The descriptor is not a valid (NULL) descriptor.
- * @retval HIPDNN_STATUS_ALLOC_FAILED       The memory allocation failed.
- * @retval HIPDNN_STATUS_INTERNAL_ERROR     Some internal errors were encountered.
+ * @retval HIPDNN_STATUS_ALLOC_FAILED       The memory allocation failed when creating handle object.
  * 
  */
 hipdnnStatus_t hipdnnCreate(hipdnnHandle_t* handle);
@@ -53,7 +52,8 @@ hipdnnStatus_t hipdnnCreate(hipdnnHandle_t* handle);
 /*! @brief Destroyes hipdnnHandle_t
  *
  * @param [in] handle        An instance of hipdnnHandle_t
- *
+ * 
+ * @retval HIPDNN_STATUS_BAD_PARAM          The descriptor is not a valid (NULL) descriptor.
  * @retval HIPDNN_STATUS_SUCCESS            The destruction was successful
  * 
  */
@@ -65,13 +65,27 @@ hipdnnStatus_t hipdnnDestroy(hipdnnHandle_t handle);
  * @param [in] streamId      The stream to be set
  *
  * @retval HIPDNN_STATUS_BAD_PARAM                  invalid (NULL) handle.
- * @retval HIPDNN_STATUS_BAD_PARAM_STREAM_MISMATCH  Mismatch between the stream and the handle.
- * @retval HIPDNN_STATUS_NOT_SUPPORTED              Creating a descriptor of a given type is not supported.
- * @retval HIPDNN_STATUS_INTERNAL_ERROR             Some internal errors were encountered.
  * @retval HIPDNN_STATUS_SUCCESS                    The creation was successful
  * 
  */
 hipdnnStatus_t hipdnnSetStream(hipdnnHandle_t handle, hipStream_t streamId);
+
+/**
+ * @brief Retrieves the HIP stream associated with the specified hipDNN handle.
+ *
+ * @param[in] handle The hipDNN handle whose associated stream is to be retrieved.
+ * @param[out] streamId Pointer to a hipStream_t where the associated stream ID
+ *                      will be stored upon successful execution.
+ *
+ * @retval HIPDNN_STATUS_BAD_PARAM                  invalid (NULL) handle.
+ * @retval HIPDNN_STATUS_SUCCESS                    The creation was successful
+ *
+ * @note
+ * - The handle must be valid and initialized before calling this function.
+ * - The streamId pointer must not be null.
+ * - This function uses a try-catch mechanism to handle exceptions internally.
+ */
+hipdnnStatus_t hipdnnGetStream(hipdnnHandle_t handle, hipStream_t* streamId);
 
 /*! @brief Creates a backend descriptor
  *

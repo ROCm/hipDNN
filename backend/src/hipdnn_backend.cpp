@@ -4,6 +4,8 @@
 #include "hipdnn_backend.h"
 #include "descriptors/backend_descriptor.hpp"
 #include "descriptors/descriptor_factory.hpp"
+#include "handle/handle.hpp"
+#include "handle/handle_factory.hpp"
 #include "helpers.hpp"
 
 #include <iostream>
@@ -28,34 +30,79 @@ hipdnnStatus_t is_valid_descriptor(hipdnnBackendDescriptor_t descriptor)
 }
 }
 
-hipdnnStatus_t hipdnnCreate(hipdnnHandle_t* handle)
+HIPDNN_BACKEND_EXPORT hipdnnStatus_t hipdnnCreate(hipdnnHandle_t* handle)
 {
-    (void)handle;
-    return HIPDNN_STATUS_SUCCESS;
+    return hipdnn_backend::try_catch(
+        [&] { return hipdnn_backend::Handle_factory::create_handle(handle); }, false);
 }
 
-hipdnnStatus_t hipdnnDestroy(hipdnnHandle_t handle)
+HIPDNN_BACKEND_EXPORT hipdnnStatus_t hipdnnDestroy(hipdnnHandle_t handle)
 {
-    (void)handle;
-    return HIPDNN_STATUS_SUCCESS;
+    return hipdnn_backend::try_catch(
+        [&] {
+            if(handle == nullptr)
+            {
+                return HIPDNN_STATUS_BAD_PARAM;
+            }
+            delete handle;
+
+            return HIPDNN_STATUS_SUCCESS;
+        },
+        false);
 }
 
-hipdnnStatus_t hipdnnSetStream(hipdnnHandle_t handle, hipStream_t streamId)
+HIPDNN_BACKEND_EXPORT hipdnnStatus_t hipdnnSetStream(hipdnnHandle_t handle, hipStream_t streamId)
 {
-    (void)handle;
-    (void)streamId;
-    return HIPDNN_STATUS_SUCCESS;
+    return hipdnn_backend::try_catch(
+        [&] {
+            if(handle != nullptr)
+            {
+                auto backend_handle = dynamic_cast<hipdnn_backend::Handle*>(handle);
+                if(backend_handle == nullptr)
+                {
+                    return HIPDNN_STATUS_BAD_PARAM;
+                }
+
+                backend_handle->set_stream(streamId);
+
+                return HIPDNN_STATUS_SUCCESS;
+            }
+            return HIPDNN_STATUS_BAD_PARAM;
+        },
+        false);
 }
 
-hipdnnStatus_t hipdnnBackendCreateDescriptor(hipdnnBackendDescriptorType_t descriptor_type,
-                                             hipdnnBackendDescriptor_t*    descriptor)
+HIPDNN_BACKEND_EXPORT hipdnnStatus_t hipdnnGetStream(hipdnnHandle_t handle, hipStream_t* streamId)
+{
+    return hipdnn_backend::try_catch(
+        [&] {
+            if(handle == nullptr || streamId == nullptr)
+            {
+                return HIPDNN_STATUS_BAD_PARAM;
+            }
+
+            auto backend_handle = dynamic_cast<hipdnn_backend::Handle*>(handle);
+            if(backend_handle == nullptr)
+            {
+                return HIPDNN_STATUS_BAD_PARAM;
+            }
+
+            *streamId = backend_handle->get_stream();
+            return HIPDNN_STATUS_SUCCESS;
+        },
+        false);
+}
+
+HIPDNN_BACKEND_EXPORT hipdnnStatus_t hipdnnBackendCreateDescriptor(
+    hipdnnBackendDescriptorType_t descriptor_type, hipdnnBackendDescriptor_t* descriptor)
 {
     return hipdnn_backend::try_catch(
         [&] { return hipdnn_backend::Descriptor_factory::create(descriptor_type, descriptor); },
         false);
 }
 
-hipdnnStatus_t hipdnnBackendDestroyDescriptor(hipdnnBackendDescriptor_t descriptor)
+HIPDNN_BACKEND_EXPORT hipdnnStatus_t
+    hipdnnBackendDestroyDescriptor(hipdnnBackendDescriptor_t descriptor)
 {
     return hipdnn_backend::try_catch(
         [&] {
@@ -71,9 +118,9 @@ hipdnnStatus_t hipdnnBackendDestroyDescriptor(hipdnnBackendDescriptor_t descript
         false);
 }
 
-hipdnnStatus_t hipdnnBackendExecute(hipdnnHandle_t            handle,
-                                    hipdnnBackendDescriptor_t execution_plan,
-                                    hipdnnBackendDescriptor_t variant_pack)
+HIPDNN_BACKEND_EXPORT hipdnnStatus_t hipdnnBackendExecute(hipdnnHandle_t            handle,
+                                                          hipdnnBackendDescriptor_t execution_plan,
+                                                          hipdnnBackendDescriptor_t variant_pack)
 {
     return hipdnn_backend::try_catch(
         [&] {
@@ -89,7 +136,7 @@ hipdnnStatus_t hipdnnBackendExecute(hipdnnHandle_t            handle,
         false);
 }
 
-hipdnnStatus_t hipdnnBackendFinalize(hipdnnBackendDescriptor_t descriptor)
+HIPDNN_BACKEND_EXPORT hipdnnStatus_t hipdnnBackendFinalize(hipdnnBackendDescriptor_t descriptor)
 {
     return hipdnn_backend::try_catch(
         [&] {
@@ -104,12 +151,13 @@ hipdnnStatus_t hipdnnBackendFinalize(hipdnnBackendDescriptor_t descriptor)
         false);
 }
 
-hipdnnStatus_t hipdnnBackendGetAttribute(hipdnnBackendDescriptor_t    descriptor,
-                                         hipdnnBackendAttributeName_t attribute_name,
-                                         hipdnnBackendAttributeType_t attribute_type,
-                                         int64_t                      requested_element_count,
-                                         int64_t*                     element_count,
-                                         void*                        array_of_elements)
+HIPDNN_BACKEND_EXPORT hipdnnStatus_t
+    hipdnnBackendGetAttribute(hipdnnBackendDescriptor_t    descriptor,
+                              hipdnnBackendAttributeName_t attribute_name,
+                              hipdnnBackendAttributeType_t attribute_type,
+                              int64_t                      requested_element_count,
+                              int64_t*                     element_count,
+                              void*                        array_of_elements)
 {
     return hipdnn_backend::try_catch(
         [&] {
@@ -129,11 +177,12 @@ hipdnnStatus_t hipdnnBackendGetAttribute(hipdnnBackendDescriptor_t    descriptor
         false);
 }
 
-hipdnnStatus_t hipdnnBackendSetAttribute(hipdnnBackendDescriptor_t    descriptor,
-                                         hipdnnBackendAttributeName_t attribute_name,
-                                         hipdnnBackendAttributeType_t attribute_type,
-                                         int64_t                      element_count,
-                                         const void*                  array_of_elements)
+HIPDNN_BACKEND_EXPORT hipdnnStatus_t
+    hipdnnBackendSetAttribute(hipdnnBackendDescriptor_t    descriptor,
+                              hipdnnBackendAttributeName_t attribute_name,
+                              hipdnnBackendAttributeType_t attribute_type,
+                              int64_t                      element_count,
+                              const void*                  array_of_elements)
 {
     return hipdnn_backend::try_catch(
         [&] {
@@ -154,7 +203,7 @@ HIPDNN_BACKEND_EXPORT hipdnnStatus_t hipdnnBackendCreateAndDeserializeGraph_ext(
 {
     return hipdnn_backend::try_catch(
         [&] {
-            return Descriptor_factory::create_graph_ext(
+            return hipdnn_backend::Descriptor_factory::create_graph_ext(
                 descriptor, serialized_graph, graph_byte_size);
         },
         false);
