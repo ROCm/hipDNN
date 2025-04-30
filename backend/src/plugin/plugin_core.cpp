@@ -10,7 +10,7 @@ namespace hipdnn_backend
 namespace plugin
 {
 
-Plugin_base::Plugin_base(boost::dll::shared_library&& lib)
+Plugin_base::Plugin_base(Shared_library&& lib)
     : _lib(std::move(lib))
 {
 }
@@ -18,31 +18,31 @@ Plugin_base::Plugin_base(boost::dll::shared_library&& lib)
 bool Plugin_base::resolve_symbols()
 {
     const auto func_name_get_name = "hipdnnPluginGetName";
-    if(!_lib.has(func_name_get_name))
+    _func_get_name                = _lib.get_symbol<decltype(_func_get_name)>(func_name_get_name);
+    if(_func_get_name == nullptr)
     {
         // TODO We do not have a logger yet, so we just print to stderr
         std::cerr << "Error: " << func_name_get_name << "() not found\n";
         return false;
     }
-    _func_get_name = _lib.get<hipdnnPluginStatus_t(const char**)>(func_name_get_name);
 
     const auto func_name_get_version = "hipdnnPluginGetVersion";
-    if(!_lib.has(func_name_get_version))
+    _func_get_version = _lib.get_symbol<decltype(_func_get_version)>(func_name_get_version);
+    if(_func_get_version == nullptr)
     {
         // TODO We do not have a logger yet, so we just print to stderr
         std::cerr << "Error: " << func_name_get_version << "() not found\n";
         return false;
     }
-    _func_get_version = _lib.get<hipdnnPluginStatus_t(const char**)>(func_name_get_version);
 
     const auto func_name_get_type = "hipdnnPluginGetType";
-    if(!_lib.has(func_name_get_type))
+    _func_get_type                = _lib.get_symbol<decltype(_func_get_type)>(func_name_get_type);
+    if(_func_get_type == nullptr)
     {
         // TODO We do not have a logger yet, so we just print to stderr
         std::cerr << "Error: " << func_name_get_type << "() not found\n";
         return false;
     }
-    _func_get_type = _lib.get<hipdnnPluginStatus_t(hipdnnPluginType_t*)>(func_name_get_type);
 
 #ifndef NDEBUG
     _initialized = true;

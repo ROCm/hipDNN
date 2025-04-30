@@ -15,6 +15,7 @@ add_library(hipdnn_backend_private
     flatbuffer_utilities.cpp
     plugin/engine_plugin.cpp
     plugin/plugin_core.cpp
+    plugin/shared_library.cpp
 )
 
 target_include_directories(hipdnn_backend_private 
@@ -25,7 +26,7 @@ target_include_directories(hipdnn_backend_private
 )
 
 target_compile_options(hipdnn_backend_private PRIVATE ${HIPDNN_WARNING_COMPILE_OPTIONS})
-target_link_libraries(hipdnn_backend_private PUBLIC Boost::dll hip::device hipdnn_sdk)
+target_link_libraries(hipdnn_backend_private PUBLIC hip::device hipdnn_sdk)
 clang_tidy_check(hipdnn_backend_private)
 
 add_library(hipdnn_backend SHARED 

@@ -31,10 +31,8 @@ private:
     bool _initialized = false;
 #endif
 
-    std::function<hipdnnPluginStatus_t(unsigned*)> _func_get_num_engines;
-    // TODO Fix formatting: this looks ugly
-    std::function<hipdnnPluginStatus_t(unsigned, const uint32_t*, uint32_t*, uint32_t)>
-        _func_run_engine;
+    hipdnnPluginStatus_t (*_func_get_num_engines)(unsigned*);
+    hipdnnPluginStatus_t (*_func_run_engine)(unsigned, const uint32_t*, uint32_t*, uint32_t);
 
     using Plugin_base::Plugin_base;
     friend class Plugin_manager_base<Engine_plugin>;

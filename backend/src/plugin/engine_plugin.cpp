@@ -1,6 +1,8 @@
 // Copyright © Advanced Micro Devices, Inc., or its affiliates.
 // SPDX-License-Identifier:  MIT
 
+#include <cassert>
+
 #include "engine_plugin.hpp"
 
 namespace hipdnn_backend
@@ -23,25 +25,23 @@ bool Engine_plugin::resolve_symbols()
     }
 
     const auto func_name_get_num_engines = "hipdnnPluginGetNumEngines";
-    if(!_lib.has(func_name_get_num_engines))
+    _func_get_num_engines
+        = _lib.get_symbol<decltype(_func_get_num_engines)>(func_name_get_num_engines);
+    if(_func_get_num_engines == nullptr)
     {
         // TODO We do not have a logger yet, so we just print to stderr
         std::cerr << "Error: " << func_name_get_num_engines << "() not found\n";
         return false;
     }
-    _func_get_num_engines = _lib.get<hipdnnPluginStatus_t(unsigned*)>(func_name_get_num_engines);
 
     const auto func_name_run_engine = "hipdnnPluginRunEngine";
-    if(!_lib.has(func_name_run_engine))
+    _func_run_engine = _lib.get_symbol<decltype(_func_run_engine)>(func_name_run_engine);
+    if(_func_run_engine == nullptr)
     {
         // TODO We do not have a logger yet, so we just print to stderr
         std::cerr << "Error: " << func_name_run_engine << "() not found\n";
         return false;
     }
-    // TODO Fix formatting: fix ugly formatting
-    _func_run_engine
-        = _lib.get<hipdnnPluginStatus_t(unsigned, const uint32_t*, uint32_t*, uint32_t)>(
-            func_name_run_engine);
 
 #ifndef NDEBUG
     _initialized = true;

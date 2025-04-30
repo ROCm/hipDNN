@@ -23,6 +23,7 @@ add_executable(hipdnn_backend_tests
     test_handle.cpp
     test_helpers.cpp
     test_plugin.cpp
+    test_shared_library.cpp
 )
 
 target_link_libraries(hipdnn_backend_tests
@@ -35,7 +36,7 @@ target_link_libraries(hipdnn_backend_tests
 target_compile_options(hipdnn_backend_tests PRIVATE ${HIPDNN_WARNING_COMPILE_OPTIONS})
 clang_tidy_check(hipdnn_backend_tests)
 
-# libhipdnn_test_plugin1.so or hipdnn_test_plugin1.dll (used by test_plugin.cpp)
+# libhipdnn_test_plugin1.so or hipdnn_test_plugin1.dll (used by test_plugin.cpp and test_shared_library.cpp)
 add_library(hipdnn_test_plugin1 SHARED plugins/plugin1.cpp)
 target_link_libraries(hipdnn_test_plugin1 PRIVATE hipdnn_sdk)
 set_target_properties(hipdnn_test_plugin1 PROPERTIES CXX_VISIBILITY_PRESET hidden)
