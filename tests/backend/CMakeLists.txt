@@ -6,6 +6,7 @@ find_package(hip REQUIRED)
 
 add_executable(public_hipdnn_backend_tests 
     test_backend_public_functions.cpp
+    test_execution_plan_api.cpp
     test_variant_pack_api.cpp
     test_handle_api.cpp
 )

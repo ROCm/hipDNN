@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 #include "descriptors/descriptor_factory.hpp"
+#include "descriptors/execution_plan_descriptor.hpp"
 #include "descriptors/graph_descriptor.hpp"
 #include "descriptors/variant_descriptor.hpp"
 #include "flatbuffer_test_utils.hpp"
@@ -11,6 +12,17 @@
 
 using namespace hipdnn_backend;
 
+TEST(DescriptorFactoryTest, CreateExecutionPlanDescriptor)
+{
+    hipdnnBackendDescriptor_t descriptor = nullptr;
+    auto status = Descriptor_factory::create(HIPDNN_BACKEND_EXECUTION_PLAN_DESCRIPTOR, &descriptor);
+
+    EXPECT_EQ(status, HIPDNN_STATUS_SUCCESS);
+    EXPECT_NE(descriptor, nullptr);
+
+    delete descriptor;
+}
+
 TEST(DescriptorFactoryTest, CreateGraphDescriptor)
 {
     hipdnnBackendDescriptor_t descriptor = nullptr;
@@ -19,7 +31,7 @@ TEST(DescriptorFactoryTest, CreateGraphDescriptor)
     EXPECT_EQ(status, HIPDNN_STATUS_SUCCESS);
     EXPECT_NE(descriptor, nullptr);
 
-    delete static_cast<Graph_descriptor*>(descriptor);
+    delete descriptor;
 }
 
 TEST(DescriptorFactoryTest, CreateUnsupportedDescriptor)
@@ -51,7 +63,7 @@ TEST(DescriptorFactoryTest, CreateGraphExtValidInput)
     EXPECT_EQ(status, HIPDNN_STATUS_SUCCESS);
     EXPECT_NE(descriptor, nullptr);
 
-    delete static_cast<Graph_descriptor*>(descriptor);
+    delete descriptor;
 }
 
 TEST(DescriptorFactoryTest, CreateGraphExtNullDescriptorPointer)

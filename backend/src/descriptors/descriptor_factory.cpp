@@ -3,6 +3,7 @@
 
 #include "descriptor_factory.hpp"
 #include "error.hpp"
+#include "execution_plan_descriptor.hpp"
 #include "graph_descriptor.hpp"
 #include "variant_descriptor.hpp"
 
@@ -19,6 +20,9 @@ hipdnnStatus_t Descriptor_factory::create(hipdnnBackendDescriptorType_t descript
 
     switch(descriptor_type)
     {
+    case HIPDNN_BACKEND_EXECUTION_PLAN_DESCRIPTOR:
+        *descriptor = new Execution_plan_descriptor();
+        break;
     case HIPDNN_BACKEND_OPERATIONGRAPH_DESCRIPTOR:
         *descriptor = new Graph_descriptor();
         break;
