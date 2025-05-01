@@ -52,9 +52,8 @@ bool Engine_plugin::resolve_symbols()
 unsigned Engine_plugin::num_engines() const
 {
     assert(_initialized);
-    // TODO Fix formatting: indentation between the type and the variable name
     unsigned num_engines;
-    auto     status = _func_get_num_engines(&num_engines);
+    auto status = _func_get_num_engines(&num_engines);
     if(status != hipdnnPluginStatusSuccess)
     {
         // TODO we do not have an exception class yet, so we just throw std::runtime_error
@@ -64,11 +63,10 @@ unsigned Engine_plugin::num_engines() const
     return num_engines;
 }
 
-// TODO Fix formatting: indentation between the type and the variable name
-void Engine_plugin::run_engine(unsigned        engine_index,
+void Engine_plugin::run_engine(unsigned engine_index,
                                const uint32_t* input,
-                               uint32_t*       output,
-                               uint32_t        size) const
+                               uint32_t* output,
+                               uint32_t size) const
 {
     assert(_initialized);
     auto status = _func_run_engine(engine_index, input, output, size);

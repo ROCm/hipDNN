@@ -24,13 +24,13 @@ public:
 
     hipdnnStatus_t get_attribute([[maybe_unused]] hipdnnBackendAttributeName_t attribute_name,
                                  [[maybe_unused]] hipdnnBackendAttributeType_t attribute_type,
-                                 [[maybe_unused]] int64_t  requested_element_count,
+                                 [[maybe_unused]] int64_t requested_element_count,
                                  [[maybe_unused]] int64_t* element_count,
-                                 [[maybe_unused]] void*    array_of_elements) override;
+                                 [[maybe_unused]] void* array_of_elements) override;
 
     hipdnnStatus_t set_attribute([[maybe_unused]] hipdnnBackendAttributeName_t attribute_name,
                                  [[maybe_unused]] hipdnnBackendAttributeType_t attribute_type,
-                                 [[maybe_unused]] int64_t                      element_count,
+                                 [[maybe_unused]] int64_t element_count,
                                  [[maybe_unused]] const void* array_of_elements) override;
 
     hipdnnStatus_t deserialize_graph(const uint8_t* serialized_graph, size_t graph_byte_size);

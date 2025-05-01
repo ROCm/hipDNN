@@ -7,9 +7,9 @@
 
 #include <hipdnn_sdk/plugin/plugin_api.h>
 
-static const char* const        PLUGIN_NAME    = "Plugin1";
-static const char* const        PLUGIN_VERSION = "1.0";
-static const hipdnnPluginType_t PLUGIN_TYPE    = hipdnnPluginTypeUnspecified;
+static const char* const PLUGIN_NAME = "Plugin1";
+static const char* const PLUGIN_VERSION = "1.0";
+static const hipdnnPluginType_t PLUGIN_TYPE = hipdnnPluginTypeUnspecified;
 
 // Exported functions:
 

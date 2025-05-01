@@ -18,13 +18,11 @@ endif()
 
 # Dependencies where the local version should be used, if available
 set(_hipdnn_all_local_deps
-    ROCmCMakeBuildTools
+    GTest
+    flatbuffers
 )
 # Dependencies where we never look for a local version
 set(_hipdnn_all_remote_deps
-    boost
-    googletest
-    flatbuffers
 )
 
 # hipdnn_add_dependency(
@@ -78,67 +76,6 @@ function(hipdnn_add_dependency dep_name)
         message(WARNING "Unknown dependency: ${dep_name}")
         return()
     endif()
-
-    if(PARSE_COMPONENTS AND PROJECT_IS_TOP_LEVEL)
-        if(COMMAND rocm_package_add_dependencies)
-            unset(name_deb)
-            unset(name_rpm)
-            if(PARSE_PACKAGE_NAME)
-                cmake_parse_arguments(
-                    PKG_NAME
-                    ""
-                    "DEB;RPM"
-                    ""
-                    ${PARSE_PACKAGE_NAME}
-                )
-                if(PKG_NAME_DEB)
-                    set(name_deb "${PKG_NAME_DEB}")
-                elseif(PKG_NAME_UNPARSED_ARGUMENTS)
-                    set(name_deb "${PKG_NAME_UNPARSED_ARGUMENTS}")
-                endif()
-                if(PKG_NAME_RPM)
-                    set(name_rpm "${PKG_NAME_RPM}")
-                elseif(PKG_NAME_UNPARSED_ARGUMENTS)
-                    set(name_rpm "${PKG_NAME_UNPARSED_ARGUMENTS}")
-                endif()
-            endif()
-            foreach(COMPONENT IN LISTS PARSE_COMPONENTS)
-                if("${name_deb}" STREQUAL "")
-                    set(name_deb "lib${dep_name}-dev")
-                endif()
-                if("${name_rpm}" STREQUAL "")
-                    set(name_rpm "lib${dep_name}-devel")
-                endif()
-                if(PARSE_VERSION)
-                    set(VERSION_STR " >= ${PARSE_VERSION}")
-                endif()
-                rocm_package_add_deb_dependencies(
-                    QUIET
-                    COMPONENT ${COMPONENT}
-                    DEPENDS "${name_deb}${VERSION_STR}"
-                )
-                rocm_package_add_rpm_dependencies(
-                    QUIET
-                    COMPONENT ${COMPONENT}
-                    DEPENDS "${name_rpm}${VERSION_STR}"
-                )
-                string(TOUPPER "${COMPONENT}" COMPONENT_VAR)
-                set(CPACK_DEBIAN_${COMPONENT_VAR}_PACKAGE_DEPENDS
-                    "${CPACK_DEBIAN_${COMPONENT_VAR}_PACKAGE_DEPENDS}"
-                    PARENT_SCOPE
-                )
-                set(CPACK_RPM_${COMPONENT_VAR}_PACKAGE_REQUIRES
-                    "${CPACK_RPM_${COMPONENT_VAR}_PACKAGE_REQUIRES}"
-                    PARENT_SCOPE
-                )
-            endforeach()
-        else()
-            message(
-                ERROR
-                "ROCmCMakeBuildTools is required to add dependencies to a package"
-            )
-        endif()
-    endif()
 endfunction()
 
 macro(_build_local)
@@ -164,29 +101,11 @@ macro(_build_local)
     endforeach()
 endmacro()
 
-function(_fetch_boost VERSION HASH)
-    _determine_git_tag("boost-" "boost-1.81.0")
-    FetchContent_Declare(
-        boost
-        URL https://github.com/boostorg/boost/releases/download/${GIT_TAG}/${GIT_TAG}.tar.gz
-        DOWNLOAD_EXTRACT_TIMESTAMP TRUE
-    )
-    _save_var(BUILD_TESTING)
-    set(BUILD_TESTING OFF)
-    _save_var(BUILD_SHARED_LIBS)
-    set(BUILD_SHARED_LIBS OFF)
-    FetchContent_MakeAvailable(boost)
-    _restore_var(BUILD_SHARED_LIBS)
-    _restore_var(BUILD_TESTING)
-    _exclude_from_all(${boost_SOURCE_DIR})
-    _mark_targets_as_system(${boost_SOURCE_DIR})
-endfunction()
-
-function(_fetch_googletest VERSION HASH)
-    if(VERSION AND VERSION STREQUAL 1.12.1)
-        set(GIT_TAG release-1.12.1)
+function(_fetch_gtest VERSION HASH)
+    if(VERSION AND VERSION STREQUAL 1.16.0)
+        set(GIT_TAG v1.16.0)
     else()
-        _determine_git_tag(v release-1.12.1)
+        _determine_git_tag(v v1.16.0)
     endif()
     if(HASH)
         set(HASH_ARG HASH ${HASH})
@@ -252,25 +171,6 @@ function(_fetch_flatbuffers VERSION HASH)
     _exclude_from_all(${flatbuffers_SOURCE_DIR})
     _mark_targets_as_system(${flatbuffers_SOURCE_DIR})
 endfunction()
-
-function(_fetch_ROCmCMakeBuildTools VERSION HASH)
-    _determine_git_tag(FALSE rocm-6.3.0)
-    FetchContent_Declare(
-        ROCmCMakeBuildTools
-        GIT_REPOSITORY https://github.com/ROCm/rocm-cmake.git
-        GIT_TAG ${GIT_TAG}
-        SOURCE_SUBDIR "DISABLE ADDING TO BUILD"
-        DOWNLOAD_EXTRACT_TIMESTAMP TRUE
-        # Don't consume the build/test targets of ROCmCMakeBuildTools
-    )
-    FetchContent_MakeAvailable(ROCmCMakeBuildTools)
-    list(
-        APPEND CMAKE_MODULE_PATH
-        ${rocmcmakebuildtools_SOURCE_DIR}/share/rocmcmakebuildtools/cmake
-    )
-    set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} PARENT_SCOPE)
-endfunction()
-set(ROCmCMakeBuildTools_EXPORT_VARS CMAKE_MODULE_PATH)
 
 # Utility functions, pulled from rocroller repo
 macro(_determine_git_tag PREFIX DEFAULT)

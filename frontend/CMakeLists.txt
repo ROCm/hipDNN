@@ -12,21 +12,25 @@ add_subdirectory(tests)
 
 add_library(hipdnn_frontend INTERFACE)
 target_link_libraries(hipdnn_frontend INTERFACE hipdnn_sdk)
-target_compile_options(hipdnn_frontend INTERFACE ${HIPDNN_WARNING_COMPILE_OPTIONS})
+
+SET(HIP_DNN_FRONTEND_INSTALL_INCLUDE_DIR "${CMAKE_INSTALL_INCLUDEDIR}/hipdnn/frontend")
 
 target_include_directories(hipdnn_frontend INTERFACE
     $<BUILD_INTERFACE:${HIP_DNN_FRONTEND_INCLUDE_DIR}>
-    $<INSTALL_INTERFACE:include>
+    $<INSTALL_INTERFACE:${HIP_DNN_FRONTEND_INSTALL_INCLUDE_DIR}/include>
 )
 
-rocm_install_targets(
-    TARGETS hipdnn_frontend
-    INCLUDE ${HIP_DNN_FRONTEND_INCLUDE_DIR}
+install( 
+    TARGETS hipdnn_frontend hipdnn_sdk FlatBuffers
+    EXPORT hipdnn-frontend
 )
 
-rocm_create_package(
-    NAME hipDNN-frontend
-    DESCRIPTION "AMD DNN Library"
-    MAINTAINER "hipDNN-frontend Maintainer"
-    HEADER_ONLY
+install(
+    DIRECTORY ${HIP_DNN_FRONTEND_INCLUDE_DIR}
+    DESTINATION ${HIP_DNN_FRONTEND_INSTALL_INCLUDE_DIR}
+)
+
+install(EXPORT hipdnn-frontend
+    DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/cmake/hipdnn_frontend
+    FILE hipdnn_frontendConfig.cmake
 )

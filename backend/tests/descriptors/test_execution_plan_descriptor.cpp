@@ -12,11 +12,11 @@ using namespace hipdnn_backend;
 class Execution_plan_descriptor_test : public ::testing::Test
 {
 public:
-    Execution_plan_descriptor* _plan                 = nullptr;
-    hipdnnHandle_t             _handle               = reinterpret_cast<hipdnnHandle_t>(0x12345678);
-    Mock_descriptor*           _mock_engine_config   = nullptr;
-    Mock_descriptor*           _mock_engine_bad_type = nullptr;
-    Mock_descriptor*           _mock_engine_unfinished = nullptr;
+    Execution_plan_descriptor* _plan = nullptr;
+    hipdnnHandle_t _handle = reinterpret_cast<hipdnnHandle_t>(0x12345678);
+    Mock_descriptor* _mock_engine_config = nullptr;
+    Mock_descriptor* _mock_engine_bad_type = nullptr;
+    Mock_descriptor* _mock_engine_unfinished = nullptr;
 
     void make_execution_plan_finalized()
     {
@@ -52,7 +52,7 @@ protected:
         _plan = new Execution_plan_descriptor();
 
         _mock_engine_config = new Mock_descriptor(HIPDNN_BACKEND_ENGINE_DESCRIPTOR, true);
-        auto status         = _mock_engine_config->set_data(
+        auto status = _mock_engine_config->set_data(
             HIPDNN_ATTR_ENGINECFG_WORKSPACE_SIZE, HIPDNN_TYPE_INT64, 1, &dummy_workspace_size);
         ASSERT_EQ(status, HIPDNN_STATUS_SUCCESS);
 
@@ -132,7 +132,7 @@ TEST_F(Execution_plan_descriptor_test, SetExecutionPlanDescriptorEngineConfig)
     ASSERT_EQ(status, HIPDNN_STATUS_BAD_PARAM_NULL_POINTER);
 
     hipdnnBackendDescriptor_t engine = nullptr;
-    status                           = _plan->set_attribute(
+    status = _plan->set_attribute(
         HIPDNN_ATTR_EXECUTION_PLAN_ENGINE_CONFIG, HIPDNN_TYPE_BACKEND_DESCRIPTOR, 1, &engine);
     ASSERT_EQ(status, HIPDNN_STATUS_BAD_PARAM_NULL_POINTER);
 

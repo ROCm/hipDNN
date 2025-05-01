@@ -95,7 +95,7 @@ public:
             }
         };
 
-        auto mean    = attributes.get_mean();
+        auto mean = attributes.get_mean();
         auto inv_var = attributes.get_inv_variance();
 
         if(mean)
@@ -109,10 +109,10 @@ public:
         }
 
         auto prev_running_mean = attributes.get_prev_running_mean();
-        auto prev_running_var  = attributes.get_prev_running_variance();
+        auto prev_running_var = attributes.get_prev_running_variance();
 
         auto next_running_mean = attributes.get_next_running_mean();
-        auto next_running_var  = attributes.get_next_running_variance();
+        auto next_running_var = attributes.get_next_running_variance();
 
         if(prev_running_mean && prev_running_var && next_running_mean && next_running_var)
         {
@@ -138,8 +138,8 @@ public:
 
     error_t populate_hipdnn_tensor_ids(
         std::unordered_map<int64_t, std::shared_ptr<Tensor_attributes>>& tensor_lookup,
-        int64_t&                                                         current_tensor_id,
-        std::unordered_set<int64_t>&                                     used_ids) const override
+        int64_t& current_tensor_id,
+        std::unordered_set<int64_t>& used_ids) const override
     {
         NodeCRTP<BatchNormNode>::populate_hipdnn_tensor_ids(
             tensor_lookup, current_tensor_id, used_ids);

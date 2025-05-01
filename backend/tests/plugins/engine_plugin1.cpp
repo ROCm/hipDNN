@@ -12,10 +12,10 @@
 namespace
 {
 
-const char* const        PLUGIN_NAME        = "EnginePlugin1";
-const char* const        PLUGIN_VERSION     = "1.0";
-const hipdnnPluginType_t PLUGIN_TYPE        = hipdnnPluginTypeEngine;
-const unsigned           PLUGIN_NUM_ENGINES = 1;
+const char* const PLUGIN_NAME = "EnginePlugin1";
+const char* const PLUGIN_VERSION = "1.0";
+const hipdnnPluginType_t PLUGIN_TYPE = hipdnnPluginTypeEngine;
+const unsigned PLUGIN_NUM_ENGINES = 1;
 
 // TODO Use HIP RTC to compile the kernel at runtime
 __global__ void engine_kernel(const uint32_t* input, uint32_t* output, uint32_t size)
@@ -31,7 +31,7 @@ __global__ void engine_kernel(const uint32_t* input, uint32_t* output, uint32_t 
 hipdnnPluginStatus_t run_engine(const uint32_t* input, uint32_t* output, uint32_t size)
 {
     const auto block_size = 256U;
-    const auto grid_size  = (size + block_size - 1) / block_size;
+    const auto grid_size = (size + block_size - 1) / block_size;
 
     // Launch the kernel on the default stream.
     engine_kernel<<<dim3(grid_size), dim3(block_size), 0, hipStreamDefault>>>(input, output, size);
@@ -90,11 +90,10 @@ extern "C" hipdnnPluginStatus_t hipdnnPluginGetNumEngines(unsigned* num_engines)
     return hipdnnPluginStatusSuccess;
 }
 
-// TODO Fix formatting: indentation between the type and the variable name
-extern "C" hipdnnPluginStatus_t hipdnnPluginRunEngine(unsigned        engine_index,
+extern "C" hipdnnPluginStatus_t hipdnnPluginRunEngine(unsigned engine_index,
                                                       const uint32_t* input,
-                                                      uint32_t*       output,
-                                                      uint32_t        size)
+                                                      uint32_t* output,
+                                                      uint32_t size)
 {
     if(input == nullptr || output == nullptr)
     {

@@ -19,9 +19,9 @@ public:
     static flatbuffers::FlatBufferBuilder create_valid_graph()
     {
         std::vector<::flatbuffers::Offset<hipdnn_sdk::data_objects::TensorAttributes>>
-                                                                           tensor_attributes;
+            tensor_attributes;
         std::vector<::flatbuffers::Offset<hipdnn_sdk::data_objects::Node>> nodes;
-        flatbuffers::FlatBufferBuilder                                     builder;
+        flatbuffers::FlatBufferBuilder builder;
         auto graph_offset = hipdnn_sdk::data_objects::CreateGraphDirect(builder,
                                                                         "test",
                                                                         DataType_FLOAT,
@@ -48,7 +48,7 @@ TEST_F(Flatbuffer_utilities_test, WillCorrectlyUnpackValidGraphBuffer)
 {
     auto builder = create_valid_graph();
 
-    auto                                              serialized_graph = builder.Release();
+    auto serialized_graph = builder.Release();
     std::unique_ptr<hipdnn_sdk::data_objects::GraphT> graph;
     auto status = flatbuffer_utilities::convert_serialized_graph_to_graph(
         serialized_graph.data(), serialized_graph.size(), graph);
@@ -64,7 +64,7 @@ TEST_F(Flatbuffer_utilities_test, WillStillHaveValidGraphAfterBuilderDestructs)
         auto builder = create_valid_graph();
 
         auto serialized_graph = builder.Release();
-        auto status           = flatbuffer_utilities::convert_serialized_graph_to_graph(
+        auto status = flatbuffer_utilities::convert_serialized_graph_to_graph(
             serialized_graph.data(), serialized_graph.size(), graph);
         ASSERT_EQ(status, HIPDNN_STATUS_SUCCESS);
     }
@@ -95,7 +95,7 @@ INSTANTIATE_TEST_SUITE_P(
     ::testing::Values(std::make_pair(static_cast<const uint8_t*>(nullptr), size_t(10)),
                       std::make_pair(std::array<uint8_t, 10>{0}.data(), size_t(10)),
                       []() { //Valid graph but incorrect data size
-                          auto builder          = Flatbuffer_utilities_test::create_valid_graph();
+                          auto builder = Flatbuffer_utilities_test::create_valid_graph();
                           auto serialized_graph = builder.Release();
                           return std::make_pair(serialized_graph.data(),
                                                 serialized_graph.size() - 20);

@@ -61,10 +61,10 @@ public:
 
     error_t infer_properties_node() override
     {
-        auto x      = attributes.get_x();
-        auto dx     = attributes.get_dx();
+        auto x = attributes.get_x();
+        auto dx = attributes.get_dx();
         auto dscale = attributes.get_dscale();
-        auto dbias  = attributes.get_dbias();
+        auto dbias = attributes.get_dbias();
 
         if(!x)
         {
@@ -135,8 +135,8 @@ public:
 
     error_t populate_hipdnn_tensor_ids(
         std::unordered_map<int64_t, std::shared_ptr<Tensor_attributes>>& tensor_lookup,
-        int64_t&                                                         current_tensor_id,
-        std::unordered_set<int64_t>&                                     used_ids) const override
+        int64_t& current_tensor_id,
+        std::unordered_set<int64_t>& used_ids) const override
     {
         NodeCRTP<DBNNode>::populate_hipdnn_tensor_ids(tensor_lookup, current_tensor_id, used_ids);
 

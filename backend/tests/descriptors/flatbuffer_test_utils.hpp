@@ -14,10 +14,10 @@ namespace flatbuffer_test_utils
 static flatbuffers::FlatBufferBuilder create_valid_graph()
 {
     std::vector<::flatbuffers::Offset<hipdnn_sdk::data_objects::TensorAttributes>>
-                                                                       tensor_attributes;
+        tensor_attributes;
     std::vector<::flatbuffers::Offset<hipdnn_sdk::data_objects::Node>> nodes;
-    flatbuffers::FlatBufferBuilder                                     builder;
-    auto                                                               graph_offset
+    flatbuffers::FlatBufferBuilder builder;
+    auto graph_offset
         = hipdnn_sdk::data_objects::CreateGraphDirect(builder,
                                                       "test",
                                                       hipdnn_sdk::data_objects::DataType_FLOAT,

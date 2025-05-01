@@ -49,7 +49,7 @@ Shared_library& Shared_library::operator=(Shared_library&& other) noexcept
         unload();
 
         // Transfer ownership
-        _library_handle       = other._library_handle;
+        _library_handle = other._library_handle;
         other._library_handle = nullptr;
     }
     return *this;
@@ -97,7 +97,7 @@ bool Shared_library::load(const std::filesystem::path& library_path)
         modified_library_path.replace_extension(".dll");
 #elif defined(__linux__)
         // Add "lib" prefix to the filename and ".so" extension if no extension exists
-        auto filename         = std::filesystem::path("lib") += modified_library_path.filename();
+        auto filename = std::filesystem::path("lib") += modified_library_path.filename();
         modified_library_path = modified_library_path.parent_path() / filename;
         modified_library_path.replace_extension(".so");
 #else

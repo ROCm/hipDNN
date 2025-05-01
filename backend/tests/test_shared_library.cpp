@@ -10,10 +10,10 @@ using namespace hipdnn_backend;
 namespace
 {
 
-const char* const LIBRARY_PATH       = "./hipdnn_test_plugin1";
+const char* const LIBRARY_PATH = "./hipdnn_test_plugin1";
 const char* const WRONG_LIBRARY_PATH = "./wrong_path";
-const char* const SYMBOL_NAME        = "hipdnnPluginGetName";
-const char* const WRONG_SYMBOL_NAME  = "wrong_symbol_name";
+const char* const SYMBOL_NAME = "hipdnnPluginGetName";
+const char* const WRONG_SYMBOL_NAME = "wrong_symbol_name";
 
 }
 
@@ -72,13 +72,13 @@ TEST(SharedLibraryTest, CallFunction)
     plugin::Shared_library library(LIBRARY_PATH);
 
     // Get the function pointer
-    using Func_type    = hipdnnPluginStatus_t (*)(const char**);
+    using Func_type = hipdnnPluginStatus_t (*)(const char**);
     auto func_get_name = library.get_symbol<Func_type>(SYMBOL_NAME);
     ASSERT_NE(func_get_name, nullptr);
 
     // Call the function to get the plugin name
-    const char* name   = nullptr;
-    auto        status = func_get_name(&name);
+    const char* name = nullptr;
+    auto status = func_get_name(&name);
     ASSERT_EQ(status, hipdnnPluginStatusSuccess);
     ASSERT_NE(name, nullptr);
     ASSERT_STREQ(name, "Plugin1");

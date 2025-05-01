@@ -163,12 +163,12 @@ HIPDNN_BACKEND_EXPORT hipdnnStatus_t hipdnnBackendFinalize(hipdnnBackendDescript
 }
 
 HIPDNN_BACKEND_EXPORT hipdnnStatus_t
-    hipdnnBackendGetAttribute(hipdnnBackendDescriptor_t    descriptor,
+    hipdnnBackendGetAttribute(hipdnnBackendDescriptor_t descriptor,
                               hipdnnBackendAttributeName_t attribute_name,
                               hipdnnBackendAttributeType_t attribute_type,
-                              int64_t                      requested_element_count,
-                              int64_t*                     element_count,
-                              void*                        array_of_elements)
+                              int64_t requested_element_count,
+                              int64_t* element_count,
+                              void* array_of_elements)
 {
 
     return hipdnn_backend::try_catch(
@@ -195,11 +195,11 @@ HIPDNN_BACKEND_EXPORT hipdnnStatus_t
 }
 
 HIPDNN_BACKEND_EXPORT hipdnnStatus_t
-    hipdnnBackendSetAttribute(hipdnnBackendDescriptor_t    descriptor,
+    hipdnnBackendSetAttribute(hipdnnBackendDescriptor_t descriptor,
                               hipdnnBackendAttributeName_t attribute_name,
                               hipdnnBackendAttributeType_t attribute_type,
-                              int64_t                      element_count,
-                              const void*                  array_of_elements)
+                              int64_t element_count,
+                              const void* array_of_elements)
 {
     return hipdnn_backend::try_catch(
         [&] {

@@ -17,23 +17,23 @@ class Batchnorm_backward_attributes : public AttributesCRTP<Batchnorm_backward_a
 public:
     enum class input_names
     {
-        dy           = 0,
-        x            = 1,
-        scale        = 2,
-        mean         = 3,
+        dy = 0,
+        x = 1,
+        scale = 2,
+        mean = 3,
         inv_variance = 4
     };
 
     enum class output_names
     {
-        dx     = 0,
+        dx = 0,
         dscale = 1,
-        dbias  = 2
+        dbias = 2
     };
 
-    std::unordered_map<input_names, std::shared_ptr<Tensor_attributes>>  inputs;
+    std::unordered_map<input_names, std::shared_ptr<Tensor_attributes>> inputs;
     std::unordered_map<output_names, std::shared_ptr<Tensor_attributes>> outputs;
-    std::vector<std::shared_ptr<Tensor_attributes>>                      peer_stats;
+    std::vector<std::shared_ptr<Tensor_attributes>> peer_stats;
 
     std::shared_ptr<Tensor_attributes> get_dy() const
     {
@@ -130,7 +130,7 @@ public:
             }
         }
 
-        auto mean         = get_mean();
+        auto mean = get_mean();
         auto inv_variance = get_inv_variance();
 
         return hipdnn_sdk::data_objects::CreateBatchnormBackwardAttributesDirect(
@@ -168,14 +168,14 @@ private:
         return nullptr;
     }
 
-    Batchnorm_backward_attributes& set_input(input_names                               name,
+    Batchnorm_backward_attributes& set_input(input_names name,
                                              const std::shared_ptr<Tensor_attributes>& value)
     {
         inputs[name] = value;
         return *this;
     }
 
-    Batchnorm_backward_attributes& set_output(output_names                              name,
+    Batchnorm_backward_attributes& set_output(output_names name,
                                               const std::shared_ptr<Tensor_attributes>& value)
     {
         outputs[name] = value;

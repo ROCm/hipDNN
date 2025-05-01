@@ -28,10 +28,10 @@ protected:
 
 public:
     Plugin_base(Plugin_base&& other) = default;
-    virtual ~Plugin_base()           = default;
+    virtual ~Plugin_base() = default;
 
-    std::string_view   name() const;
-    std::string_view   version() const;
+    std::string_view name() const;
+    std::string_view version() const;
     hipdnnPluginType_t type() const;
 
 protected:
@@ -87,16 +87,15 @@ public:
             }
 
             // Get the plugin name, version and type before we move it
-            // TODO Fix formatting: indentation between the type and the variable name
-            std::string_view   name;
-            std::string_view   version;
+            std::string_view name;
+            std::string_view version;
             hipdnnPluginType_t type;
             // Catch any exceptions thrown by plugin functions
             try
             {
-                name    = plugin.name();
+                name = plugin.name();
                 version = plugin.version();
-                type    = plugin.type();
+                type = plugin.type();
             }
             // TODO we do not have an exception class yet, catch specific exception instead of std::exception when we have one
             catch(...)

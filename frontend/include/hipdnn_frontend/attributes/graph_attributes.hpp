@@ -54,9 +54,9 @@ public:
 
 private:
     std::string _name;
-    DataType_t  _compute_type      = DataType_t::NOT_SET;
-    DataType_t  _intermediate_type = DataType_t::NOT_SET;
-    DataType_t  _io_type           = DataType_t::NOT_SET;
+    DataType_t _compute_type = DataType_t::NOT_SET;
+    DataType_t _intermediate_type = DataType_t::NOT_SET;
+    DataType_t _io_type = DataType_t::NOT_SET;
 };
 }
 }

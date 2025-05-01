@@ -10,15 +10,15 @@ namespace hipdnn_frontend
 
 enum class PointwiseMode_t
 {
-    NOT_SET  = 0,
+    NOT_SET = 0,
     RELU_FWD = 1,
 };
 
 enum class DataType_t
 {
-    NOT_SET  = 0,
-    FLOAT    = 1,
-    HALF     = 2,
+    NOT_SET = 0,
+    FLOAT = 1,
+    HALF = 2,
     BFLOAT16 = 3,
 };
 

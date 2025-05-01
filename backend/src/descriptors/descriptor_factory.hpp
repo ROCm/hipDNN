@@ -13,11 +13,11 @@ class Descriptor_factory
 {
 public:
     static hipdnnStatus_t create(hipdnnBackendDescriptorType_t descriptor_type,
-                                 hipdnnBackendDescriptor_t*    descriptor);
+                                 hipdnnBackendDescriptor_t* descriptor);
 
     static hipdnnStatus_t create_graph_ext(hipdnnBackendDescriptor_t* descriptor,
-                                           const uint8_t*             serialized_graph,
-                                           size_t                     graph_byte_size);
+                                           const uint8_t* serialized_graph,
+                                           size_t graph_byte_size);
 };
 
 } // namespace hipdnn_backend

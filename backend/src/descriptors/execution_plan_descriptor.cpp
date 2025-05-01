@@ -41,9 +41,9 @@ hipdnnStatus_t Execution_plan_descriptor::finalize()
 
 hipdnnStatus_t Execution_plan_descriptor::get_attribute(hipdnnBackendAttributeName_t attribute_name,
                                                         hipdnnBackendAttributeType_t attribute_type,
-                                                        int64_t  requested_element_count,
+                                                        int64_t requested_element_count,
                                                         int64_t* element_count,
-                                                        void*    array_of_elements)
+                                                        void* array_of_elements)
 {
     if(!is_finalized())
     {
@@ -76,9 +76,9 @@ hipdnnStatus_t Execution_plan_descriptor::get_attribute(hipdnnBackendAttributeNa
 
 hipdnnStatus_t
     Execution_plan_descriptor::get_workspace_size(hipdnnBackendAttributeType_t attribute_type,
-                                                  int64_t  requested_element_count,
+                                                  int64_t requested_element_count,
                                                   int64_t* element_count,
-                                                  void*    array_of_elements)
+                                                  void* array_of_elements)
 {
     if(_engine == nullptr)
     {
@@ -104,7 +104,7 @@ hipdnnStatus_t
 
 hipdnnStatus_t Execution_plan_descriptor::set_attribute(hipdnnBackendAttributeName_t attribute_name,
                                                         hipdnnBackendAttributeType_t attribute_type,
-                                                        int64_t                      element_count,
+                                                        int64_t element_count,
                                                         const void* array_of_elements)
 {
     if(is_finalized())
@@ -137,8 +137,8 @@ hipdnnStatus_t Execution_plan_descriptor::set_attribute(hipdnnBackendAttributeNa
 }
 
 hipdnnStatus_t Execution_plan_descriptor::set_handle(hipdnnBackendAttributeType_t attribute_type,
-                                                     int64_t                      element_count,
-                                                     const void*                  array_of_elements)
+                                                     int64_t element_count,
+                                                     const void* array_of_elements)
 {
     if(attribute_type != HIPDNN_TYPE_HANDLE)
     {
@@ -174,8 +174,8 @@ hipdnnStatus_t Execution_plan_descriptor::set_handle(hipdnnBackendAttributeType_
 
 hipdnnStatus_t
     Execution_plan_descriptor::set_engine_config(hipdnnBackendAttributeType_t attribute_type,
-                                                 int64_t                      element_count,
-                                                 const void*                  array_of_elements)
+                                                 int64_t element_count,
+                                                 const void* array_of_elements)
 {
     if(attribute_type != HIPDNN_TYPE_BACKEND_DESCRIPTOR)
     {

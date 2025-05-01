@@ -12,9 +12,9 @@ using namespace pybind11::literals;
 namespace hipdnn_frontend::python_api
 {
 
-void throw_if(bool const                          cond,
+void throw_if(bool const cond,
               hipdnn_frontend::error_code_t const error_code,
-              std::string const&                  error_msg);
+              std::string const& error_msg);
 
 void init_pygraph_norm_submodule(py::class_<PyGraph>&);
 
@@ -37,8 +37,8 @@ std::vector<uint8_t> PyGraph::serialize() const
 {
     // TODO can be simplified when frontend serialize() method is added
     std::vector<uint8_t> data;
-    const uint8_t*       raw_data = _graph->serialized_graph.data();
-    size_t               size     = _graph->serialized_graph.size();
+    const uint8_t* raw_data = _graph->serialized_graph.data();
+    size_t size = _graph->serialized_graph.size();
     data.insert(data.end(), raw_data, raw_data + size);
     return data;
 }

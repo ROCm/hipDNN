@@ -18,11 +18,11 @@ namespace hipdnn_frontend::python_api
 
 std::shared_ptr<hipdnn_frontend::graph::Tensor_attributes>
     PyGraph::relu(std::shared_ptr<hipdnn_frontend::graph::Tensor_attributes>& input,
-                  std::optional<float> const&                                 negative_slope,
-                  std::optional<float> const&                                 lower_clip,
-                  std::optional<float> const&                                 upper_clip,
-                  hipdnn_frontend::DataType_t const&                          compute_data_type,
-                  std::string const&                                          name)
+                  std::optional<float> const& negative_slope,
+                  std::optional<float> const& lower_clip,
+                  std::optional<float> const& upper_clip,
+                  hipdnn_frontend::DataType_t const& compute_data_type,
+                  std::string const& name)
 {
     auto attributes = hipdnn_frontend::graph::Pointwise_attributes()
                           // TODO .set_compute_data_type(compute_data_type)

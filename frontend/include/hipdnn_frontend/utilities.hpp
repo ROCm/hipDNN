@@ -5,6 +5,7 @@
 #include "error.hpp"
 #include <algorithm>
 #include <numeric>
+#include <ranges>
 #include <vector>
 
 namespace hipdnn_frontend
@@ -17,20 +18,21 @@ namespace graph
 // input_shapes = {{1, 2}, {1, 2}, {1, 2, 5}} -> common_shape = {1, 2, 5}
 // input_shapes = {{1, 2, 3}, {1, 2, 4}, {1, 2}} -> error
 inline error_t find_common_shape(const std::vector<std::vector<int64_t>>& input_shapes,
-                                 std::vector<int64_t>&                    common_shape)
+                                 std::vector<int64_t>& common_shape)
 {
     if(input_shapes.empty())
     {
         return {error_code_t::INVALID_VALUE, "Input shapes cannot be empty"};
     }
 
-    size_t dims
-        = std::max_element(input_shapes.begin(),
-                           input_shapes.end(),
-                           [](const std::vector<int64_t>& a, const std::vector<int64_t>& b) {
-                               return a.size() < b.size();
-                           })
-              ->size();
+    size_t dims = std::ranges::max_element(
+                      input_shapes.begin(),
+                      input_shapes.end(),
+                      [](const std::vector<int64_t>& a, const std::vector<int64_t>& b) {
+                          return a.size() < b.size();
+                      })
+                      ->size();
+
     common_shape.resize(dims, 1);
 
     for(auto& current : input_shapes)
@@ -55,13 +57,13 @@ inline error_t find_common_shape(const std::vector<std::vector<int64_t>>& input_
 inline std::vector<int64_t> generate_strides(const std::vector<int64_t>& dim,
                                              const std::vector<int64_t>& stride_order)
 {
-    size_t               num_dims = dim.size();
+    size_t num_dims = dim.size();
     std::vector<int64_t> stride(num_dims, 1);
 
     // Create a mapping of stride order to dimension index
     std::vector<size_t> indices(num_dims);
     std::iota(indices.begin(), indices.end(), 0);
-    std::sort(indices.begin(), indices.end(), [&stride_order](size_t a, size_t b) {
+    std::ranges::sort(indices.begin(), indices.end(), [&stride_order](size_t a, size_t b) {
         return stride_order[a] < stride_order[b];
     });
 

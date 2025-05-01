@@ -20,11 +20,11 @@ protected:
 
 TEST_F(Initialize_variant_pack_descriptor_tests, ValidSetAttributes)
 {
-    std::array<void*, 3>   dev_ptrs  = {reinterpret_cast<void*>(0x1234),
+    std::array<void*, 3> dev_ptrs = {reinterpret_cast<void*>(0x1234),
                                      reinterpret_cast<void*>(0x5678),
                                      reinterpret_cast<void*>(0x9abc)};
-    std::array<int64_t, 3> uids      = {1, 2, 3};
-    void*                  workspace = reinterpret_cast<void*>(0xdeadbeef);
+    std::array<int64_t, 3> uids = {1, 2, 3};
+    void* workspace = reinterpret_cast<void*>(0xdeadbeef);
 
     EXPECT_EQ(descriptor.set_attribute(HIPDNN_ATTR_VARIANT_PACK_DATA_POINTERS,
                                        HIPDNN_TYPE_VOID_PTR,
@@ -46,11 +46,11 @@ TEST_F(Initialize_variant_pack_descriptor_tests, ValidSetAttributes)
 
 TEST_F(Initialize_variant_pack_descriptor_tests, ValidSetAndGetBeforeFinalAttributes)
 {
-    std::array<void*, 3>   dev_ptrs  = {reinterpret_cast<void*>(0x1234),
+    std::array<void*, 3> dev_ptrs = {reinterpret_cast<void*>(0x1234),
                                      reinterpret_cast<void*>(0x5678),
                                      reinterpret_cast<void*>(0x9abc)};
-    std::array<int64_t, 3> uids      = {1, 2, 3};
-    void*                  workspace = reinterpret_cast<void*>(0xdeadbeef);
+    std::array<int64_t, 3> uids = {1, 2, 3};
+    void* workspace = reinterpret_cast<void*>(0xdeadbeef);
 
     EXPECT_EQ(descriptor.set_attribute(HIPDNN_ATTR_VARIANT_PACK_DATA_POINTERS,
                                        HIPDNN_TYPE_VOID_PTR,
@@ -67,7 +67,7 @@ TEST_F(Initialize_variant_pack_descriptor_tests, ValidSetAndGetBeforeFinalAttrib
               HIPDNN_STATUS_SUCCESS);
     // getting before finalized
     std::array<void*, 3> retrieved_dev_ptrs;
-    int64_t              element_count = 0;
+    int64_t element_count = 0;
 
     EXPECT_EQ(descriptor.get_attribute(HIPDNN_ATTR_VARIANT_PACK_DATA_POINTERS,
                                        HIPDNN_TYPE_VOID_PTR,
@@ -79,11 +79,11 @@ TEST_F(Initialize_variant_pack_descriptor_tests, ValidSetAndGetBeforeFinalAttrib
 
 TEST_F(Initialize_variant_pack_descriptor_tests, InvalidSetAttributes)
 {
-    std::array<void*, 3>   dev_ptrs  = {reinterpret_cast<void*>(0x1234),
+    std::array<void*, 3> dev_ptrs = {reinterpret_cast<void*>(0x1234),
                                      reinterpret_cast<void*>(0x5678),
                                      reinterpret_cast<void*>(0x9abc)};
-    std::array<int64_t, 3> uids      = {1, 2, 3};
-    void*                  workspace = reinterpret_cast<void*>(0xdeadbeef);
+    std::array<int64_t, 3> uids = {1, 2, 3};
+    void* workspace = reinterpret_cast<void*>(0xdeadbeef);
 
     EXPECT_EQ(descriptor.set_attribute(HIPDNN_ATTR_VARIANT_PACK_DATA_POINTERS,
                                        HIPDNN_TYPE_INT64,
@@ -108,11 +108,11 @@ TEST_F(Initialize_variant_pack_descriptor_tests, InvalidSetAttributes)
 
 TEST_F(Initialize_variant_pack_descriptor_tests, InvalidFinalizeCounts)
 {
-    std::array<void*, 3>   dev_ptrs  = {reinterpret_cast<void*>(0x1234),
+    std::array<void*, 3> dev_ptrs = {reinterpret_cast<void*>(0x1234),
                                      reinterpret_cast<void*>(0x5678),
                                      reinterpret_cast<void*>(0x9abc)};
-    std::array<int64_t, 2> uids      = {1, 2};
-    void*                  workspace = reinterpret_cast<void*>(0xdeadbeef);
+    std::array<int64_t, 2> uids = {1, 2};
+    void* workspace = reinterpret_cast<void*>(0xdeadbeef);
 
     EXPECT_EQ(descriptor.set_attribute(HIPDNN_ATTR_VARIANT_PACK_DATA_POINTERS,
                                        HIPDNN_TYPE_VOID_PTR,
@@ -141,7 +141,7 @@ TEST_F(Initialize_variant_pack_descriptor_tests, InvalidFinalizeUnsetParams)
 TEST_F(Initialize_variant_pack_descriptor_tests, InvalidGetAttributeNotFinalized)
 {
     std::array<void*, 3> retrieved_dev_ptrs;
-    int64_t              element_count = 0;
+    int64_t element_count = 0;
 
     EXPECT_EQ(descriptor.get_attribute(HIPDNN_ATTR_VARIANT_PACK_DATA_POINTERS,
                                        HIPDNN_TYPE_VOID_PTR,
@@ -154,12 +154,12 @@ TEST_F(Initialize_variant_pack_descriptor_tests, InvalidGetAttributeNotFinalized
 class Finalized_variant_pack_descriptor_tests : public ::testing::Test
 {
 protected:
-    Variant_descriptor     descriptor;
-    std::array<void*, 3>   _dev_ptrs  = {reinterpret_cast<void*>(0x1234),
+    Variant_descriptor descriptor;
+    std::array<void*, 3> _dev_ptrs = {reinterpret_cast<void*>(0x1234),
                                       reinterpret_cast<void*>(0x5678),
                                       reinterpret_cast<void*>(0x9abc)};
-    std::array<int64_t, 3> _uids      = {1, 2, 3};
-    void*                  _workspace = reinterpret_cast<void*>(0xdeadbeef);
+    std::array<int64_t, 3> _uids = {1, 2, 3};
+    void* _workspace = reinterpret_cast<void*>(0xdeadbeef);
 
     void SetUp() override
     {
@@ -195,10 +195,10 @@ TEST_F(Finalized_variant_pack_descriptor_tests, InvalidSetAttribute)
 
 TEST_F(Finalized_variant_pack_descriptor_tests, ValidGetAttributes)
 {
-    std::array<void*, 3>   retrieved_dev_ptrs;
+    std::array<void*, 3> retrieved_dev_ptrs;
     std::array<int64_t, 3> retrieved_uids;
-    void*                  retrieved_workspace = nullptr;
-    int64_t                element_count       = 0;
+    void* retrieved_workspace = nullptr;
+    int64_t element_count = 0;
 
     EXPECT_EQ(descriptor.get_attribute(HIPDNN_ATTR_VARIANT_PACK_DATA_POINTERS,
                                        HIPDNN_TYPE_VOID_PTR,
@@ -232,10 +232,10 @@ TEST_F(Finalized_variant_pack_descriptor_tests, ValidGetAttributes)
 
 TEST_F(Finalized_variant_pack_descriptor_tests, InvalidGetAttributes)
 {
-    std::array<void*, 3>   retrieved_dev_ptrs;
+    std::array<void*, 3> retrieved_dev_ptrs;
     std::array<int64_t, 3> retrieved_uids;
-    void*                  retrieved_workspace = nullptr;
-    int64_t                element_count       = 0;
+    void* retrieved_workspace = nullptr;
+    int64_t element_count = 0;
 
     EXPECT_EQ(descriptor.get_attribute(HIPDNN_ATTR_VARIANT_PACK_DATA_POINTERS,
                                        HIPDNN_TYPE_INT64,

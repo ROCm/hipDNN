@@ -18,7 +18,7 @@ Plugin_base::Plugin_base(Shared_library&& lib)
 bool Plugin_base::resolve_symbols()
 {
     const auto func_name_get_name = "hipdnnPluginGetName";
-    _func_get_name                = _lib.get_symbol<decltype(_func_get_name)>(func_name_get_name);
+    _func_get_name = _lib.get_symbol<decltype(_func_get_name)>(func_name_get_name);
     if(_func_get_name == nullptr)
     {
         // TODO We do not have a logger yet, so we just print to stderr
@@ -36,7 +36,7 @@ bool Plugin_base::resolve_symbols()
     }
 
     const auto func_name_get_type = "hipdnnPluginGetType";
-    _func_get_type                = _lib.get_symbol<decltype(_func_get_type)>(func_name_get_type);
+    _func_get_type = _lib.get_symbol<decltype(_func_get_type)>(func_name_get_type);
     if(_func_get_type == nullptr)
     {
         // TODO We do not have a logger yet, so we just print to stderr
@@ -53,9 +53,8 @@ bool Plugin_base::resolve_symbols()
 std::string_view Plugin_base::name() const
 {
     assert(_initialized);
-    // TODO Fix formatting: indentation between the type and the variable name
     const char* name;
-    auto        status = _func_get_name(&name);
+    auto status = _func_get_name(&name);
     if(status != hipdnnPluginStatusSuccess)
     {
         // TODO we do not have an exception class yet, so we just throw std::runtime_error
@@ -68,9 +67,8 @@ std::string_view Plugin_base::name() const
 std::string_view Plugin_base::version() const
 {
     assert(_initialized);
-    // TODO Fix formatting: indentation between the type and the variable name
     const char* version;
-    auto        status = _func_get_version(&version);
+    auto status = _func_get_version(&version);
     if(status != hipdnnPluginStatusSuccess)
     {
         // TODO we do not have an exception class yet, so we just throw std::runtime_error
@@ -83,9 +81,8 @@ std::string_view Plugin_base::version() const
 hipdnnPluginType_t Plugin_base::type() const
 {
     assert(_initialized);
-    // TODO Fix formatting: indentation between the type and the variable name
     hipdnnPluginType_t type;
-    auto               status = _func_get_type(&type);
+    auto status = _func_get_type(&type);
     if(status != hipdnnPluginStatusSuccess)
     {
         // TODO we do not have an exception class yet, so we just throw std::runtime_error

@@ -1,12 +1,12 @@
 # Copyright © Advanced Micro Devices, Inc., or its affiliates.
 # SPDX-License-Identifier:  MIT
 
+include(GoogleTest)
+
 if(HIP_DNN_SKIP_TESTS)
     message(STATUS "Skipping HIP-DNN Frontend Unit tests")
     return()
 endif()
-
-include(GoogleTest)
 
 add_executable(hipdnn_frontend_tests 
     test_batchnorm_attributes.cpp
@@ -26,7 +26,13 @@ add_executable(hipdnn_frontend_tests
 )
 
 target_compile_options(hipdnn_frontend_tests PRIVATE ${HIPDNN_WARNING_COMPILE_OPTIONS})
-target_link_libraries(hipdnn_frontend_tests gtest gtest_main pthread hipdnn_sdk hipdnn_frontend)
+target_link_libraries(hipdnn_frontend_tests 
+    GTest::gtest 
+    GTest::gtest_main 
+    pthread 
+    hipdnn_sdk 
+    hipdnn_frontend
+)
 clang_tidy_check(hipdnn_frontend_tests)
 
 add_dependencies(hipdnn_frontend_tests generate_hipdnn_sdk_headers)

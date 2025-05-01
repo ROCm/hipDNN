@@ -37,7 +37,7 @@ TEST(DescriptorFactoryTest, CreateGraphDescriptor)
 TEST(DescriptorFactoryTest, CreateUnsupportedDescriptor)
 {
     hipdnnBackendDescriptor_t descriptor = nullptr;
-    auto                      status
+    auto status
         = Descriptor_factory::create(static_cast<hipdnnBackendDescriptorType_t>(999), &descriptor);
 
     EXPECT_EQ(status, HIPDNN_STATUS_NOT_SUPPORTED);
@@ -53,11 +53,11 @@ TEST(DescriptorFactoryTest, NullDescriptorPointer)
 
 TEST(DescriptorFactoryTest, CreateGraphExtValidInput)
 {
-    auto builder          = flatbuffer_test_utils::create_valid_graph();
+    auto builder = flatbuffer_test_utils::create_valid_graph();
     auto serialized_graph = builder.Release();
 
     hipdnnBackendDescriptor_t descriptor = nullptr;
-    auto                      status     = Descriptor_factory::create_graph_ext(
+    auto status = Descriptor_factory::create_graph_ext(
         &descriptor, serialized_graph.data(), serialized_graph.size());
 
     EXPECT_EQ(status, HIPDNN_STATUS_SUCCESS);
@@ -68,7 +68,7 @@ TEST(DescriptorFactoryTest, CreateGraphExtValidInput)
 
 TEST(DescriptorFactoryTest, CreateGraphExtNullDescriptorPointer)
 {
-    auto builder          = flatbuffer_test_utils::create_valid_graph();
+    auto builder = flatbuffer_test_utils::create_valid_graph();
     auto serialized_graph = builder.Release();
 
     auto status = Descriptor_factory::create_graph_ext(
@@ -88,7 +88,7 @@ TEST(DescriptorFactoryTest, CreateGraphExtNullSerializedGraph)
 
 TEST(DescriptorFactoryTest, CreateGraphExtZeroByteSize)
 {
-    auto builder          = flatbuffer_test_utils::create_valid_graph();
+    auto builder = flatbuffer_test_utils::create_valid_graph();
     auto serialized_graph = builder.Release();
 
     hipdnnBackendDescriptor_t descriptor = nullptr;
@@ -101,10 +101,10 @@ TEST(DescriptorFactoryTest, CreateGraphExtZeroByteSize)
 TEST(DescriptorFactoryTest, CreateGraphExtInvalidGraphData)
 {
     const std::array<uint8_t, 2> invalid_serialized_graph = {0xFF, 0xFF};
-    size_t                       graph_byte_size          = sizeof(invalid_serialized_graph);
+    size_t graph_byte_size = sizeof(invalid_serialized_graph);
 
     hipdnnBackendDescriptor_t descriptor = nullptr;
-    auto                      status     = Descriptor_factory::create_graph_ext(
+    auto status = Descriptor_factory::create_graph_ext(
         &descriptor, invalid_serialized_graph.data(), graph_byte_size);
 
     EXPECT_EQ(status, HIPDNN_STATUS_BAD_PARAM);

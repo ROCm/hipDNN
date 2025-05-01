@@ -11,7 +11,7 @@ namespace hipdnn_backend
 {
 
 hipdnnStatus_t Descriptor_factory::create(hipdnnBackendDescriptorType_t descriptor_type,
-                                          hipdnnBackendDescriptor_t*    descriptor)
+                                          hipdnnBackendDescriptor_t* descriptor)
 {
     if(descriptor == nullptr)
     {
@@ -42,8 +42,8 @@ hipdnnStatus_t Descriptor_factory::create(hipdnnBackendDescriptorType_t descript
 }
 
 hipdnnStatus_t Descriptor_factory::create_graph_ext(hipdnnBackendDescriptor_t* descriptor,
-                                                    const uint8_t*             serialized_graph,
-                                                    size_t                     graph_byte_size)
+                                                    const uint8_t* serialized_graph,
+                                                    size_t graph_byte_size)
 {
     if(descriptor == nullptr || serialized_graph == nullptr || graph_byte_size == 0)
     {

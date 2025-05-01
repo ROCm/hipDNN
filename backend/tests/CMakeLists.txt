@@ -1,6 +1,8 @@
 # Copyright © Advanced Micro Devices, Inc., or its affiliates.
 # SPDX-License-Identifier:  MIT
 
+include(GoogleTest)
+
 # TODO Do not enable HIP language globally, use HIP RTC instead.
 # The library does not contain any HIP code (or any other device code).
 # It is required only for hipdnn_test_engine_plugin1.
@@ -10,8 +12,6 @@ if(HIP_DNN_SKIP_TESTS)
     message(STATUS "Skipping HIP-DNN Backend Unit tests")
     return()
 endif()
-
-include(GoogleTest)
 
 add_executable(hipdnn_backend_tests
     descriptors/mocks/mock_descriptor.cpp
@@ -28,13 +28,15 @@ add_executable(hipdnn_backend_tests
     test_shared_library.cpp
 )
 
-target_link_libraries(hipdnn_backend_tests
-    gtest
-    gtest_main
+target_link_libraries(hipdnn_backend_tests 
+    GTest::gtest
+    GTest::gtest_main
     pthread
     hipdnn_backend_private
     hipdnn_sdk
+    ${CMAKE_DL_LIBS}
 )
+
 target_compile_options(hipdnn_backend_tests PRIVATE ${HIPDNN_WARNING_COMPILE_OPTIONS})
 clang_tidy_check(hipdnn_backend_tests)
 

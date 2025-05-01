@@ -12,8 +12,8 @@ namespace flatbuffer_utilities
 {
 
 hipdnnStatus_t
-    convert_serialized_graph_to_graph(const uint8_t*                                     buffer,
-                                      size_t                                             size,
+    convert_serialized_graph_to_graph(const uint8_t* buffer,
+                                      size_t size,
                                       std::unique_ptr<hipdnn_sdk::data_objects::GraphT>& graph_out)
 {
     flatbuffers::Verifier verifier(buffer, size);

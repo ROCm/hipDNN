@@ -23,8 +23,8 @@ std::shared_ptr<hipdnn_frontend::graph::Tensor_attributes> PyGraph::batchnorm_in
     std::shared_ptr<hipdnn_frontend::graph::Tensor_attributes>& inv_variance,
     std::shared_ptr<hipdnn_frontend::graph::Tensor_attributes>& scale,
     std::shared_ptr<hipdnn_frontend::graph::Tensor_attributes>& bias,
-    hipdnn_frontend::DataType_t const&                          compute_data_type,
-    std::string const&                                          name)
+    hipdnn_frontend::DataType_t const& compute_data_type,
+    std::string const& name)
 {
     auto attributes
         = hipdnn_frontend::graph::Batchnorm_inference_attributes()
@@ -34,14 +34,14 @@ std::shared_ptr<hipdnn_frontend::graph::Tensor_attributes> PyGraph::batchnorm_in
 }
 
 std::vector<std::shared_ptr<hipdnn_frontend::graph::Tensor_attributes>> PyGraph::batchnorm_backward(
-    std::shared_ptr<hipdnn_frontend::graph::Tensor_attributes> const&        dy,
-    std::shared_ptr<hipdnn_frontend::graph::Tensor_attributes> const&        x,
-    std::shared_ptr<hipdnn_frontend::graph::Tensor_attributes> const&        scale,
-    std::shared_ptr<hipdnn_frontend::graph::Tensor_attributes> const&        mean,
-    std::shared_ptr<hipdnn_frontend::graph::Tensor_attributes> const&        inv_variance,
+    std::shared_ptr<hipdnn_frontend::graph::Tensor_attributes> const& dy,
+    std::shared_ptr<hipdnn_frontend::graph::Tensor_attributes> const& x,
+    std::shared_ptr<hipdnn_frontend::graph::Tensor_attributes> const& scale,
+    std::shared_ptr<hipdnn_frontend::graph::Tensor_attributes> const& mean,
+    std::shared_ptr<hipdnn_frontend::graph::Tensor_attributes> const& inv_variance,
     std::vector<std::shared_ptr<hipdnn_frontend::graph::Tensor_attributes>>& peer_stats,
-    hipdnn_frontend::DataType_t const&                                       compute_data_type,
-    std::string const&                                                       name)
+    hipdnn_frontend::DataType_t const& compute_data_type,
+    std::string const& name)
 {
     auto attributes = hipdnn_frontend::graph::Batchnorm_backward_attributes()
                           .set_saved_mean_and_inv_variance(mean, inv_variance)

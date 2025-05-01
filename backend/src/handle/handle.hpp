@@ -19,7 +19,7 @@ class Handle : public hipdnnHandle
 {
 public:
     ~Handle() override = default;
-    void        set_stream(hipStream_t stream);
+    void set_stream(hipStream_t stream);
     hipStream_t get_stream() const;
     hipStream_t _stream = nullptr;
 };

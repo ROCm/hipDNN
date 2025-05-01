@@ -110,15 +110,15 @@ public:
     {
         out_0 = 0,
     };
-    std::unordered_map<input_names, std::shared_ptr<Tensor_attributes>>  inputs;
+    std::unordered_map<input_names, std::shared_ptr<Tensor_attributes>> inputs;
     std::unordered_map<output_names, std::shared_ptr<Tensor_attributes>> outputs;
 
     flatbuffers::Offset<hipdnn_sdk::data_objects::PointwiseAttributes>
         pack_attributes(flatbuffers::FlatBufferBuilder& builder) const
     {
-        auto in_0  = get_input_0();
-        auto in_1  = get_input_1();
-        auto in_2  = get_input_2();
+        auto in_0 = get_input_0();
+        auto in_1 = get_input_1();
+        auto in_2 = get_input_2();
         auto out_0 = get_output_0();
 
         return hipdnn_sdk::data_objects::CreatePointwiseAttributes(
@@ -153,11 +153,11 @@ private:
         }
         return nullptr;
     }
-    PointwiseMode_t        _mode             = PointwiseMode_t::NOT_SET;
-    std::optional<float>   _relu_lower_clip  = std::nullopt;
-    std::optional<float>   _relu_upper_clip  = std::nullopt;
-    std::optional<float>   _relu_lower_slope = std::nullopt;
-    std::optional<int64_t> _axis             = std::nullopt;
+    PointwiseMode_t _mode = PointwiseMode_t::NOT_SET;
+    std::optional<float> _relu_lower_clip = std::nullopt;
+    std::optional<float> _relu_upper_clip = std::nullopt;
+    std::optional<float> _relu_lower_slope = std::nullopt;
+    std::optional<int64_t> _axis = std::nullopt;
 };
 }
 }

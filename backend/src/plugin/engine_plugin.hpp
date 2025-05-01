@@ -14,13 +14,11 @@ namespace plugin
 class Engine_plugin : public Plugin_base
 {
 public:
-    // TODO Fix formatting: indentation between the type and the variable name
-    // TODO Fix formatting: Indentation between the return type and function name
     unsigned num_engines() const;
-    void     run_engine(unsigned        engine_index,
-                        const uint32_t* input,
-                        uint32_t*       output,
-                        uint32_t        size) const;
+    void run_engine(unsigned engine_index,
+                    const uint32_t* input,
+                    uint32_t* output,
+                    uint32_t size) const;
 
 protected:
     // resolve_symbols must be called before using the plugin. It is used to resolve the symbols in the plugin library.

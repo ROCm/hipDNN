@@ -46,9 +46,9 @@ TEST(HipDNNBackendTest, WontDestroyDescriptorIfNull)
 
 TEST(HipDNNBackendTest, Execute)
 {
-    hipdnnHandle_t            handle         = nullptr;
+    hipdnnHandle_t handle = nullptr;
     hipdnnBackendDescriptor_t execution_plan = nullptr;
-    hipdnnBackendDescriptor_t variant_pack   = nullptr;
+    hipdnnBackendDescriptor_t variant_pack = nullptr;
 
     hipdnnStatus_t status = hipdnnBackendExecute(handle, execution_plan, variant_pack);
 
@@ -66,12 +66,12 @@ TEST(HipDNNBackendTest, Finalize)
 
 TEST(HipDNNBackendTest, GetAttribute)
 {
-    hipdnnBackendDescriptor_t    descriptor              = nullptr;
-    hipdnnBackendAttributeName_t attribute_name          = HIPDNN_ATTR_ENGINEHEUR_OPERATION_GRAPH;
-    hipdnnBackendAttributeType_t attribute_type          = HIPDNN_TYPE_NUMERICAL_NOTE;
-    int64_t                      requested_element_count = 0;
-    int64_t                      element_count           = 0;
-    void*                        array_of_elements       = nullptr;
+    hipdnnBackendDescriptor_t descriptor = nullptr;
+    hipdnnBackendAttributeName_t attribute_name = HIPDNN_ATTR_ENGINEHEUR_OPERATION_GRAPH;
+    hipdnnBackendAttributeType_t attribute_type = HIPDNN_TYPE_NUMERICAL_NOTE;
+    int64_t requested_element_count = 0;
+    int64_t element_count = 0;
+    void* array_of_elements = nullptr;
 
     hipdnnStatus_t status = hipdnnBackendGetAttribute(descriptor,
                                                       attribute_name,
@@ -85,11 +85,11 @@ TEST(HipDNNBackendTest, GetAttribute)
 
 TEST(HipDNNBackendTest, SetAttribute)
 {
-    hipdnnBackendDescriptor_t    descriptor        = nullptr;
-    hipdnnBackendAttributeName_t attribute_name    = HIPDNN_ATTR_ENGINEHEUR_OPERATION_GRAPH;
-    hipdnnBackendAttributeType_t attribute_type    = HIPDNN_TYPE_NUMERICAL_NOTE;
-    int64_t                      element_count     = 0;
-    void*                        array_of_elements = nullptr;
+    hipdnnBackendDescriptor_t descriptor = nullptr;
+    hipdnnBackendAttributeName_t attribute_name = HIPDNN_ATTR_ENGINEHEUR_OPERATION_GRAPH;
+    hipdnnBackendAttributeType_t attribute_type = HIPDNN_TYPE_NUMERICAL_NOTE;
+    int64_t element_count = 0;
+    void* array_of_elements = nullptr;
 
     hipdnnStatus_t status = hipdnnBackendSetAttribute(
         descriptor, attribute_name, attribute_type, element_count, array_of_elements);
@@ -101,9 +101,9 @@ TEST(HipDNNBackendTest, WillSetBackendGraphCorrectly)
 {
     flatbuffers::FlatBufferBuilder builder;
     std::vector<::flatbuffers::Offset<hipdnn_sdk::data_objects::TensorAttributes>>
-                                                                       tensor_attributes;
+        tensor_attributes;
     std::vector<::flatbuffers::Offset<hipdnn_sdk::data_objects::Node>> nodes;
-    auto                                                               graph
+    auto graph
         = hipdnn_sdk::data_objects::CreateGraphDirect(builder,
                                                       "Test GRAPH!",
                                                       hipdnn_sdk::data_objects::DataType_FLOAT,
@@ -130,7 +130,7 @@ TEST(HipDNNBackendTest, WillSetBackendGraphCorrectly)
 TEST(HipDNNBackendTest, WillFailToFinalizeInvalidGraph)
 {
     hipdnnBackendDescriptor_t descriptor = nullptr;
-    auto                      status
+    auto status
         = hipdnnBackendCreateDescriptor(HIPDNN_BACKEND_OPERATIONGRAPH_DESCRIPTOR, &descriptor);
     EXPECT_EQ(status, HIPDNN_STATUS_SUCCESS);
 

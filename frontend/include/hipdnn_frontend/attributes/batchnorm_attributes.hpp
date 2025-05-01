@@ -18,27 +18,27 @@ class Batchnorm_attributes : public AttributesCRTP<Batchnorm_attributes>
 public:
     enum class input_names
     {
-        x                     = 0,
-        scale                 = 1,
-        bias                  = 2,
-        prev_running_mean     = 3,
+        x = 0,
+        scale = 1,
+        bias = 2,
+        prev_running_mean = 3,
         prev_running_variance = 4,
-        momentum              = 5,
-        epsilon               = 6
+        momentum = 5,
+        epsilon = 6
     };
 
     enum class output_names
     {
-        y                     = 0,
-        mean                  = 1,
-        inv_variance          = 2,
-        next_running_mean     = 3,
+        y = 0,
+        mean = 1,
+        inv_variance = 2,
+        next_running_mean = 3,
         next_running_variance = 4
     };
 
-    std::unordered_map<input_names, std::shared_ptr<Tensor_attributes>>  inputs;
+    std::unordered_map<input_names, std::shared_ptr<Tensor_attributes>> inputs;
     std::unordered_map<output_names, std::shared_ptr<Tensor_attributes>> outputs;
-    std::vector<std::shared_ptr<Tensor_attributes>>                      peer_stats;
+    std::vector<std::shared_ptr<Tensor_attributes>> peer_stats;
 
     std::shared_ptr<Tensor_attributes> get_x() const
     {
@@ -168,12 +168,12 @@ public:
             }
         }
 
-        auto prev_running_mean     = get_prev_running_mean();
+        auto prev_running_mean = get_prev_running_mean();
         auto prev_running_variance = get_prev_running_variance();
-        auto momentum              = get_momentum();
-        auto mean                  = get_mean();
-        auto inv_variance          = get_inv_variance();
-        auto next_running_mean     = get_next_running_mean();
+        auto momentum = get_momentum();
+        auto mean = get_mean();
+        auto inv_variance = get_inv_variance();
+        auto next_running_mean = get_next_running_mean();
         auto next_running_variance = get_next_running_variance();
 
         return hipdnn_sdk::data_objects::CreateBatchnormAttributesDirect(
@@ -219,14 +219,14 @@ private:
         return nullptr;
     }
 
-    Batchnorm_attributes& set_input(input_names                               name,
+    Batchnorm_attributes& set_input(input_names name,
                                     const std::shared_ptr<Tensor_attributes>& value)
     {
         inputs[name] = value;
         return *this;
     }
 
-    Batchnorm_attributes& set_output(output_names                              name,
+    Batchnorm_attributes& set_output(output_names name,
                                      const std::shared_ptr<Tensor_attributes>& value)
     {
         outputs[name] = value;

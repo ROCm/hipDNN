@@ -25,11 +25,11 @@ protected:
 
 TEST_F(Variant_pack_descriptor_api_tests, ValidSetAttributesAndFinalize)
 {
-    std::array<void*, 3>   dev_ptrs  = {reinterpret_cast<void*>(0x1234),
+    std::array<void*, 3> dev_ptrs = {reinterpret_cast<void*>(0x1234),
                                      reinterpret_cast<void*>(0x5678),
                                      reinterpret_cast<void*>(0x9abc)};
-    std::array<int64_t, 3> uids      = {1, 2, 3};
-    void*                  workspace = reinterpret_cast<void*>(0xdeadbeef);
+    std::array<int64_t, 3> uids = {1, 2, 3};
+    void* workspace = reinterpret_cast<void*>(0xdeadbeef);
 
     EXPECT_EQ(hipdnnBackendSetAttribute(_varpack,
                                         HIPDNN_ATTR_VARIANT_PACK_DATA_POINTERS,
@@ -49,11 +49,11 @@ TEST_F(Variant_pack_descriptor_api_tests, ValidSetAttributesAndFinalize)
 
 TEST_F(Variant_pack_descriptor_api_tests, ValidSetAttributesAndGetAttributesBeforeFinalize)
 {
-    std::array<void*, 3>   dev_ptrs  = {reinterpret_cast<void*>(0x1234),
+    std::array<void*, 3> dev_ptrs = {reinterpret_cast<void*>(0x1234),
                                      reinterpret_cast<void*>(0x5678),
                                      reinterpret_cast<void*>(0x9abc)};
-    std::array<int64_t, 3> uids      = {1, 2, 3};
-    void*                  workspace = reinterpret_cast<void*>(0xdeadbeef);
+    std::array<int64_t, 3> uids = {1, 2, 3};
+    void* workspace = reinterpret_cast<void*>(0xdeadbeef);
 
     EXPECT_EQ(hipdnnBackendSetAttribute(_varpack,
                                         HIPDNN_ATTR_VARIANT_PACK_DATA_POINTERS,
@@ -70,7 +70,7 @@ TEST_F(Variant_pack_descriptor_api_tests, ValidSetAttributesAndGetAttributesBefo
         HIPDNN_STATUS_SUCCESS);
 
     std::array<void*, 3> retrieved_dev_ptrs;
-    int64_t              element_count = 0;
+    int64_t element_count = 0;
 
     EXPECT_EQ(hipdnnBackendGetAttribute(_varpack,
                                         HIPDNN_ATTR_VARIANT_PACK_DATA_POINTERS,
@@ -83,11 +83,11 @@ TEST_F(Variant_pack_descriptor_api_tests, ValidSetAttributesAndGetAttributesBefo
 
 TEST_F(Variant_pack_descriptor_api_tests, InvalidSetAttributes)
 {
-    std::array<void*, 3>   dev_ptrs  = {reinterpret_cast<void*>(0x1234),
+    std::array<void*, 3> dev_ptrs = {reinterpret_cast<void*>(0x1234),
                                      reinterpret_cast<void*>(0x5678),
                                      reinterpret_cast<void*>(0x9abc)};
-    std::array<int64_t, 3> uids      = {1, 2, 3};
-    void*                  workspace = reinterpret_cast<void*>(0xdeadbeef);
+    std::array<int64_t, 3> uids = {1, 2, 3};
+    void* workspace = reinterpret_cast<void*>(0xdeadbeef);
 
     // HIPDNN_STATUS_BAD_PARAM since HIPDNN_ATTR_VARIANT_PACK_DATA_POINTERS expects HIPDNN_TYPE_VOID_PTR
     EXPECT_EQ(hipdnnBackendSetAttribute(_varpack,
@@ -119,7 +119,7 @@ TEST_F(Variant_pack_descriptor_api_tests, InvalidSetAttributes)
 TEST_F(Variant_pack_descriptor_api_tests, InvalidGetAttributes)
 {
     std::array<void*, 3> retrieved_dev_ptrs;
-    int64_t              element_count = 0;
+    int64_t element_count = 0;
 
     EXPECT_EQ(hipdnnBackendGetAttribute(_varpack,
                                         HIPDNN_ATTR_VARIANT_PACK_DATA_POINTERS,
@@ -139,10 +139,10 @@ TEST_F(Variant_pack_descriptor_api_tests, InvalidFinalizeEmpty)
 // Invalid finalize since dev_ptrs, and ids do not have the same size.
 TEST_F(Variant_pack_descriptor_api_tests, InvalidFinalizeParams)
 {
-    std::array<void*, 3>   dev_ptrs = {reinterpret_cast<void*>(0x1234),
+    std::array<void*, 3> dev_ptrs = {reinterpret_cast<void*>(0x1234),
                                      reinterpret_cast<void*>(0x5678),
                                      reinterpret_cast<void*>(0x9abc)};
-    std::array<int64_t, 2> uids     = {1, 2};
+    std::array<int64_t, 2> uids = {1, 2};
 
     EXPECT_EQ(hipdnnBackendSetAttribute(_varpack,
                                         HIPDNN_ATTR_VARIANT_PACK_DATA_POINTERS,
@@ -164,14 +164,14 @@ TEST_F(Variant_pack_descriptor_api_tests, InvalidFinalizeParams)
 TEST_F(Variant_pack_descriptor_api_tests, InvalidNullDescriptor)
 {
     hipdnnBackendDescriptor_t null_descriptor = nullptr;
-    int64_t                   dummy_data      = 42;
-    hipdnnStatus_t            status          = hipdnnBackendSetAttribute(
+    int64_t dummy_data = 42;
+    hipdnnStatus_t status = hipdnnBackendSetAttribute(
         null_descriptor, HIPDNN_ATTR_VARIANT_PACK_UNIQUE_IDS, HIPDNN_TYPE_INT64, 1, &dummy_data);
     EXPECT_EQ(status, HIPDNN_STATUS_BAD_PARAM);
 
     int64_t retrieved_data = 0;
-    int64_t element_count  = 0;
-    status                 = hipdnnBackendGetAttribute(null_descriptor,
+    int64_t element_count = 0;
+    status = hipdnnBackendGetAttribute(null_descriptor,
                                        HIPDNN_ATTR_VARIANT_PACK_UNIQUE_IDS,
                                        HIPDNN_TYPE_INT64,
                                        1,
@@ -184,11 +184,11 @@ class Finalized_variant_pack_descriptor_api_tests : public ::testing::Test
 {
 protected:
     hipdnnBackendDescriptor_t _varpack;
-    std::array<void*, 3>      _dev_ptrs  = {reinterpret_cast<void*>(0x1234),
+    std::array<void*, 3> _dev_ptrs = {reinterpret_cast<void*>(0x1234),
                                       reinterpret_cast<void*>(0x5678),
                                       reinterpret_cast<void*>(0x9abc)};
-    std::array<int64_t, 3>    _uids      = {1, 2, 3};
-    void*                     _workspace = reinterpret_cast<void*>(0xdeadbeef);
+    std::array<int64_t, 3> _uids = {1, 2, 3};
+    void* _workspace = reinterpret_cast<void*>(0xdeadbeef);
 
     void SetUp() override
     {
@@ -223,10 +223,10 @@ protected:
 
 TEST_F(Finalized_variant_pack_descriptor_api_tests, ValidGetAttributes)
 {
-    std::array<void*, 3>   retrieved_dev_ptrs;
+    std::array<void*, 3> retrieved_dev_ptrs;
     std::array<int64_t, 3> retrieved_uids;
-    void*                  retrieved_workspace = nullptr;
-    int64_t                element_count       = 0;
+    void* retrieved_workspace = nullptr;
+    int64_t element_count = 0;
 
     EXPECT_EQ(hipdnnBackendGetAttribute(_varpack,
                                         HIPDNN_ATTR_VARIANT_PACK_DATA_POINTERS,
@@ -263,10 +263,10 @@ TEST_F(Finalized_variant_pack_descriptor_api_tests, ValidGetAttributes)
 
 TEST_F(Finalized_variant_pack_descriptor_api_tests, InvalidGetAttributes)
 {
-    std::array<void*, 3>   retrieved_dev_ptrs;
+    std::array<void*, 3> retrieved_dev_ptrs;
     std::array<int64_t, 3> retrieved_uids;
-    void*                  retrieved_workspace = nullptr;
-    int64_t                element_count       = 0;
+    void* retrieved_workspace = nullptr;
+    int64_t element_count = 0;
 
     // HIPDNN_STATUS_BAD_PARAM since HIPDNN_ATTR_VARIANT_PACK_DATA_POINTERS expects HIPDNN_TYPE_VOID_PTR
     EXPECT_EQ(hipdnnBackendGetAttribute(_varpack,

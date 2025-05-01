@@ -12,12 +12,20 @@ if(NOT WIN32)
     set(CMAKE_INSTALL_PREFIX "/opt/rocm" CACHE PATH "")
 endif()
 
+if(NOT WIN32)
+    if(CMAKE_GENERATOR STREQUAL "Ninja")
+        message(STATUS "The CMake generator is Ninja.")
+    else()
+        message(WARNING "The CMake generator is not Ninja. Ninja is preferred over Make.")
+    endif()
+endif()
+
 project(
     hipDNN
     VERSION ${HIPDNN_VERSION}
     LANGUAGES CXX)
     
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 
 option(HIP_DNN_BUILD_BACKEND "Build the backend code" ON)
 option(HIP_DNN_BUILD_FRONTEND "Build the frontend code" ON)
@@ -52,19 +60,7 @@ include(cmake/Dependencies.cmake)
 include(cmake/ClangCheck.cmake)
 include(cmake/ClangTidy.cmake)
 
-
-hipdnn_add_dependency(
-    ROCmCMakeBuildTools
-    VERSION 0.11.0
-    FIND_PACKAGE_ARGS NO_DEFAULT_PATH # PATHS "${ROCM_PATH}"
-)
-hipdnn_add_dependency(boost)
-hipdnn_add_dependency(googletest VERSION 1.12.1)
-
-include(ROCMSetupVersion)
-include(ROCMCreatePackage)
-include(ROCMInstallTargets)
-include(ROCMClients)
+hipdnn_add_dependency(GTest v1.16.0)
 
 enable_testing() # Cmake wont discover or run tests without this line
 
@@ -137,6 +133,7 @@ if(CODE_COVERAGE)
         # for the test that runs last.  The current workaround is to simply invoke the gtests directly.
         # This is not ideal but it works for now.
         #DEPENDS check
+        DEPENDS hipdnn_backend_tests hipdnn_frontend_tests public_hipdnn_backend_tests
         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
         COMMENT "Generating code coverage report"
     )

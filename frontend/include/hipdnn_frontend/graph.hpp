@@ -47,7 +47,7 @@ public:
         gather_hipdnn_tensor_ids_subtree(used_tensor_uids);
 
         std::unordered_map<int64_t, std::shared_ptr<Tensor_attributes>> tensor_lookup;
-        int64_t                                                         current_tensor_id = 0;
+        int64_t current_tensor_id = 0;
 
         populate_hipdnn_tensor_ids_subtree(tensor_lookup, current_tensor_id, used_tensor_uids);
         flatbuffers::FlatBufferBuilder builder;
@@ -130,21 +130,21 @@ public:
         batchnorm(const std::shared_ptr<Tensor_attributes>& x,
                   const std::shared_ptr<Tensor_attributes>& scale,
                   const std::shared_ptr<Tensor_attributes>& bias,
-                  Batchnorm_attributes                      attributes)
+                  Batchnorm_attributes attributes)
     {
-        auto y                = output_tensor(attributes.name + "::Y");
-        auto mean_out         = output_tensor(attributes.name + "::MEAN");
+        auto y = output_tensor(attributes.name + "::Y");
+        auto mean_out = output_tensor(attributes.name + "::MEAN");
         auto inv_variance_out = output_tensor(attributes.name + "::INV_VARIANCE");
 
-        auto prev_running_mean     = attributes.get_prev_running_mean();
+        auto prev_running_mean = attributes.get_prev_running_mean();
         auto prev_running_variance = attributes.get_prev_running_variance();
-        auto momentum              = attributes.get_momentum();
+        auto momentum = attributes.get_momentum();
 
         std::shared_ptr<Tensor_attributes> next_running_mean;
         std::shared_ptr<Tensor_attributes> next_running_variance;
         if(prev_running_mean && prev_running_variance && momentum)
         {
-            next_running_mean     = output_tensor(attributes.name + "::NEXT_RUNNING_MEAN");
+            next_running_mean = output_tensor(attributes.name + "::NEXT_RUNNING_MEAN");
             next_running_variance = output_tensor(attributes.name + "::NEXT_RUNNING_VARIANCE");
         }
 
@@ -167,7 +167,7 @@ public:
         batchnorm_backward(const std::shared_ptr<Tensor_attributes>& dy,
                            const std::shared_ptr<Tensor_attributes>& x,
                            const std::shared_ptr<Tensor_attributes>& scale,
-                           Batchnorm_backward_attributes             attributes)
+                           Batchnorm_backward_attributes attributes)
     {
         auto dx = output_tensor(attributes.name + "::DX");
         attributes.set_dx(dx);
@@ -194,15 +194,15 @@ public:
                             const std::shared_ptr<Tensor_attributes>& inv_variance,
                             const std::shared_ptr<Tensor_attributes>& scale,
                             const std::shared_ptr<Tensor_attributes>& bias,
-                            Batchnorm_inference_attributes            attributes)
+                            Batchnorm_inference_attributes attributes)
     {
         auto y = attributes.outputs[Batchnorm_inference_attributes::output_names::y]
             = output_tensor(attributes.name + "::Y");
-        attributes.inputs[Batchnorm_inference_attributes::input_names::x]            = x;
-        attributes.inputs[Batchnorm_inference_attributes::input_names::mean]         = mean;
+        attributes.inputs[Batchnorm_inference_attributes::input_names::x] = x;
+        attributes.inputs[Batchnorm_inference_attributes::input_names::mean] = mean;
         attributes.inputs[Batchnorm_inference_attributes::input_names::inv_variance] = inv_variance;
-        attributes.inputs[Batchnorm_inference_attributes::input_names::scale]        = scale;
-        attributes.inputs[Batchnorm_inference_attributes::input_names::bias]         = bias;
+        attributes.inputs[Batchnorm_inference_attributes::input_names::scale] = scale;
+        attributes.inputs[Batchnorm_inference_attributes::input_names::bias] = bias;
 
         _sub_nodes.emplace_back(
             std::make_shared<BatchnormInferenceNode>(std::move(attributes), graph_attributes));

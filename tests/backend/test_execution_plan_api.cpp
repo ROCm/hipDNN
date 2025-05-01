@@ -8,7 +8,7 @@ class Execution_plan_api_tests : public ::testing::Test
 {
 protected:
     hipdnnBackendDescriptor_t _plan;
-    hipdnnHandle_t            _handle        = nullptr;
+    hipdnnHandle_t _handle = nullptr;
     hipdnnBackendDescriptor_t _engine_config = nullptr;
 
     void SetUp() override

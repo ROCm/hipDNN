@@ -18,7 +18,7 @@ TEST(BatchnormNodeTests, PreValidateNode)
     batchnorm_attributes.set_epsilon(std::make_shared<Tensor_attributes>());
 
     Graph_attributes graph_attributes;
-    BatchnormNode    node(std::move(batchnorm_attributes), graph_attributes);
+    BatchnormNode node(std::move(batchnorm_attributes), graph_attributes);
 
     auto error = node.pre_validate_node();
     EXPECT_EQ(error.code, error_code_t::OK);
@@ -29,13 +29,13 @@ TEST(BatchnormNodeTests, PreValidateNodeMissingValues)
     Batchnorm_attributes batchnorm_attributes;
 
     Graph_attributes graph_attributes;
-    BatchnormNode    node(std::move(batchnorm_attributes), graph_attributes);
+    BatchnormNode node(std::move(batchnorm_attributes), graph_attributes);
 
     auto error = node.pre_validate_node();
     EXPECT_EQ(error.code, error_code_t::ATTRIBUTE_NOT_SET);
 
     batchnorm_attributes.set_x(std::make_shared<Tensor_attributes>());
-    auto          batchnorm_attributes_copy = batchnorm_attributes;
+    auto batchnorm_attributes_copy = batchnorm_attributes;
     BatchnormNode node_with_x(std::move(batchnorm_attributes_copy), graph_attributes);
 
     error = node_with_x.pre_validate_node();
@@ -90,7 +90,7 @@ TEST(BatchnormNodeTests, InferPropertiesNode)
     output_tensor->set_uid(2).set_name("OutputTensor");
 
     Graph_attributes graph_attributes;
-    BatchnormNode    node(std::move(batchnorm_attributes), graph_attributes);
+    BatchnormNode node(std::move(batchnorm_attributes), graph_attributes);
 
     auto error = node.infer_properties_node();
     EXPECT_EQ(error.code, error_code_t::OK);
@@ -137,7 +137,7 @@ TEST(BatchnormNodeTests, InferPropertiesNodeWithStats)
     next_running_variance_tensor->set_uid(6).set_name("NextRunningVarianceTensor");
 
     Graph_attributes graph_attributes;
-    BatchnormNode    node(std::move(batchnorm_attributes), graph_attributes);
+    BatchnormNode node(std::move(batchnorm_attributes), graph_attributes);
 
     auto error = node.infer_properties_node();
     EXPECT_EQ(error.code, error_code_t::OK);
@@ -197,14 +197,14 @@ TEST(BatchnormNodeTests, PackNode)
     batchnorm_attributes.set_epsilon(epsilon_tensor);
 
     Graph_attributes graph_attributes;
-    BatchnormNode    node(std::move(batchnorm_attributes), graph_attributes);
+    BatchnormNode node(std::move(batchnorm_attributes), graph_attributes);
 
     flatbuffers::FlatBufferBuilder builder;
-    auto                           offset = node.pack_node(builder);
+    auto offset = node.pack_node(builder);
     EXPECT_NE(offset.o, 0);
 
     builder.Finish(offset);
-    auto buffer_pointer  = builder.GetBufferPointer();
+    auto buffer_pointer = builder.GetBufferPointer();
     auto node_flatbuffer = flatbuffers::GetRoot<hipdnn_sdk::data_objects::Node>(buffer_pointer);
 
     EXPECT_STREQ(node_flatbuffer->name()->c_str(), "Batchnorm");
@@ -224,7 +224,7 @@ TEST(BatchnormNodeTests, PackNode)
 TEST(BatchnormNodeTests, GatherhipdnnTensorIds)
 {
     Batchnorm_attributes batchnorm_attributes;
-    auto                 x_tensor = std::make_shared<Tensor_attributes>();
+    auto x_tensor = std::make_shared<Tensor_attributes>();
     x_tensor->set_uid(1).set_name("XTensor");
     batchnorm_attributes.set_x(x_tensor);
 
@@ -253,7 +253,7 @@ TEST(BatchnormNodeTests, GatherhipdnnTensorIds)
     batchnorm_attributes.set_peer_stats({peer_stat_1, peer_stat_2});
 
     Graph_attributes graph_attributes;
-    BatchnormNode    node(std::move(batchnorm_attributes), graph_attributes);
+    BatchnormNode node(std::move(batchnorm_attributes), graph_attributes);
 
     std::unordered_set<int64_t> used_ids;
     node.gather_hipdnn_tensor_ids(used_ids);
@@ -282,11 +282,11 @@ TEST(BatchnormNodeTests, PopulatehipdnnTensorIds)
     batchnorm_attributes.set_peer_stats({peer_stat_1, peer_stat_2});
 
     Graph_attributes graph_attributes;
-    BatchnormNode    node(std::move(batchnorm_attributes), graph_attributes);
+    BatchnormNode node(std::move(batchnorm_attributes), graph_attributes);
 
     std::unordered_map<int64_t, std::shared_ptr<Tensor_attributes>> tensor_lookup;
-    std::unordered_set<int64_t>                                     used_ids;
-    int64_t                                                         current_tensor_id = 1;
+    std::unordered_set<int64_t> used_ids;
+    int64_t current_tensor_id = 1;
 
     auto error = node.populate_hipdnn_tensor_ids(tensor_lookup, current_tensor_id, used_ids);
     EXPECT_EQ(error.code, error_code_t::OK);

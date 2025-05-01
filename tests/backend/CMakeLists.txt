@@ -13,8 +13,8 @@ add_executable(public_hipdnn_backend_tests
 
 target_compile_options(public_hipdnn_backend_tests PRIVATE ${HIPDNN_WARNING_COMPILE_OPTIONS})
 target_link_libraries(public_hipdnn_backend_tests
-    gtest 
-    gtest_main 
+    GTest::gtest 
+    GTest::gtest_main 
     pthread 
     hipdnn_sdk
     hipdnn_backend

@@ -16,7 +16,7 @@ public:
     Batchnorm_inference_attributes attributes;
 
     BatchnormInferenceNode(Batchnorm_inference_attributes&& batchnorm_attrs,
-                           const Graph_attributes&          graph_attrs)
+                           const Graph_attributes& graph_attrs)
         : NodeCRTP(graph_attrs)
         , attributes(std::move(batchnorm_attrs))
     {

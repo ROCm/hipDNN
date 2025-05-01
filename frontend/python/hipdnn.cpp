@@ -24,9 +24,9 @@ void init_pygraph_submodule(py::module_&);
 
 // Raise C++ exceptions corresponding to C++ FE error codes.
 // Pybind automatically converts C++ exceptions to python exceptions.
-void throw_if(bool const                          cond,
+void throw_if(bool const cond,
               hipdnn_frontend::error_code_t const error_code,
-              std::string const&                  error_msg)
+              std::string const& error_msg)
 {
     if(cond == false)
         return;

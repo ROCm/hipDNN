@@ -138,7 +138,7 @@ HIPDNN_BACKEND_EXPORT hipdnnStatus_t
  * @retval  HIPDNN_STATUS_EXECUTION_FAILED      An error was encountered executing the plan with the variant_pack.
  * 
  */
-HIPDNN_BACKEND_EXPORT hipdnnStatus_t hipdnnBackendExecute(hipdnnHandle_t            handle,
+HIPDNN_BACKEND_EXPORT hipdnnStatus_t hipdnnBackendExecute(hipdnnHandle_t handle,
                                                           hipdnnBackendDescriptor_t execution_plan,
                                                           hipdnnBackendDescriptor_t variant_pack);
 
@@ -189,12 +189,12 @@ HIPDNN_BACKEND_EXPORT hipdnnStatus_t hipdnnBackendFinalize(hipdnnBackendDescript
  * 
  */
 HIPDNN_BACKEND_EXPORT hipdnnStatus_t
-    hipdnnBackendGetAttribute(hipdnnBackendDescriptor_t    descriptor,
+    hipdnnBackendGetAttribute(hipdnnBackendDescriptor_t descriptor,
                               hipdnnBackendAttributeName_t attribute_name,
                               hipdnnBackendAttributeType_t attribute_type,
-                              int64_t                      requested_element_count,
-                              int64_t*                     element_count,
-                              void*                        array_of_elements);
+                              int64_t requested_element_count,
+                              int64_t* element_count,
+                              void* array_of_elements);
 
 /*! @brief Sets an attribute of a descriptor
  *
@@ -223,11 +223,11 @@ HIPDNN_BACKEND_EXPORT hipdnnStatus_t
  * 
  */
 HIPDNN_BACKEND_EXPORT hipdnnStatus_t
-    hipdnnBackendSetAttribute(hipdnnBackendDescriptor_t    descriptor,
+    hipdnnBackendSetAttribute(hipdnnBackendDescriptor_t descriptor,
                               hipdnnBackendAttributeName_t attribute_name,
                               hipdnnBackendAttributeType_t attribute_type,
-                              int64_t                      element_count,
-                              const void*                  array_of_elements);
+                              int64_t element_count,
+                              const void* array_of_elements);
 
 /*
  **************************************************************************************************

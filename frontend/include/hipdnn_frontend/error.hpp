@@ -28,7 +28,7 @@ enum class error_code_t
 typedef struct error_object // NOLINT
 {
     error_code_t code;
-    std::string  err_msg;
+    std::string err_msg;
 
     error_object()
         : code(error_code_t::OK)

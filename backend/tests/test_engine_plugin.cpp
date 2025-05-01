@@ -85,10 +85,10 @@ TEST(EnginePluginManagerTest, LoadPluginsAndRunEngines)
                 hipSuccess);
 
             // Check the results
-            ASSERT_EQ(std::equal(in_host_data.begin(),
-                                 in_host_data.end(),
-                                 out_host_data.begin(),
-                                 out_host_data.end()),
+            ASSERT_EQ(std::ranges::equal(in_host_data.begin(),
+                                         in_host_data.end(),
+                                         out_host_data.begin(),
+                                         out_host_data.end()),
                       true);
         }
     }

@@ -26,9 +26,9 @@ TEST(BatchnormInferenceNodeTests, BatchnormInferenceNodeProperties)
     auto output_tensor = batchnorm_attributes.get_y();
     output_tensor->set_uid(2).set_name("OutputTensor");
 
-    Graph_attributes       graph_attributes;
+    Graph_attributes graph_attributes;
     BatchnormInferenceNode node(std::move(batchnorm_attributes), graph_attributes);
-    auto                   error = node.infer_properties_node();
+    auto error = node.infer_properties_node();
 
     EXPECT_EQ(error.code, error_code_t::OK);
     EXPECT_EQ(output_tensor->get_dim(), (std::vector<int64_t>{1, 2, 3, 4}));
@@ -43,7 +43,7 @@ TEST(BatchnormInferenceNodeTests, PreValidateNode)
     batchnorm_attributes.set_scale(std::make_shared<Tensor_attributes>());
     batchnorm_attributes.set_bias(std::make_shared<Tensor_attributes>());
 
-    Graph_attributes       graph_attributes;
+    Graph_attributes graph_attributes;
     BatchnormInferenceNode node(std::move(batchnorm_attributes), graph_attributes);
 
     auto error = node.pre_validate_node();
@@ -54,14 +54,14 @@ TEST(BatchnormInferenceNodeTests, PreValidateNodeMissingValues)
 {
     Batchnorm_inference_attributes batchnorm_attributes;
 
-    Graph_attributes       graph_attributes;
+    Graph_attributes graph_attributes;
     BatchnormInferenceNode node(std::move(batchnorm_attributes), graph_attributes);
 
     auto error = node.pre_validate_node();
     EXPECT_EQ(error.code, error_code_t::ATTRIBUTE_NOT_SET);
 
     batchnorm_attributes.set_x(std::make_shared<Tensor_attributes>());
-    auto                   batchnorm_attributes_copy = batchnorm_attributes;
+    auto batchnorm_attributes_copy = batchnorm_attributes;
     BatchnormInferenceNode node_with_x(std::move(batchnorm_attributes_copy), graph_attributes);
 
     error = node_with_x.pre_validate_node();
@@ -110,7 +110,7 @@ TEST(BatchnormInferenceNodeTests, InferPropertiesNode)
     auto output_tensor = batchnorm_attributes.get_y();
     output_tensor->set_uid(2).set_name("OutputTensor");
 
-    Graph_attributes       graph_attributes;
+    Graph_attributes graph_attributes;
     BatchnormInferenceNode node(std::move(batchnorm_attributes), graph_attributes);
 
     auto error = node.infer_properties_node();
@@ -173,15 +173,15 @@ TEST(BatchnormInferenceNodeTests, PackNode)
         .set_stride({2, 1, 1, 1});
     batchnorm_attributes.set_bias(bias_tensor);
 
-    Graph_attributes       graph_attributes;
+    Graph_attributes graph_attributes;
     BatchnormInferenceNode node(std::move(batchnorm_attributes), graph_attributes);
 
     flatbuffers::FlatBufferBuilder builder;
-    auto                           offset = node.pack_node(builder);
+    auto offset = node.pack_node(builder);
     EXPECT_NE(offset.o, 0);
 
     builder.Finish(offset);
-    auto buffer_pointer  = builder.GetBufferPointer();
+    auto buffer_pointer = builder.GetBufferPointer();
     auto node_flatbuffer = flatbuffers::GetRoot<hipdnn_sdk::data_objects::Node>(buffer_pointer);
 
     EXPECT_STREQ(node_flatbuffer->name()->c_str(), "BatchnormInference");
@@ -238,15 +238,15 @@ TEST(BatchnormInferenceNodeTests, PackNodeWithoutMeanAndInvVariance)
 
     // Do not set mean and inv_variance
 
-    Graph_attributes       graph_attributes;
+    Graph_attributes graph_attributes;
     BatchnormInferenceNode node(std::move(batchnorm_attributes), graph_attributes);
 
     flatbuffers::FlatBufferBuilder builder;
-    auto                           offset = node.pack_node(builder);
+    auto offset = node.pack_node(builder);
     EXPECT_NE(offset.o, 0);
 
     builder.Finish(offset);
-    auto buffer_pointer  = builder.GetBufferPointer();
+    auto buffer_pointer = builder.GetBufferPointer();
     auto node_flatbuffer = flatbuffers::GetRoot<hipdnn_sdk::data_objects::Node>(buffer_pointer);
 
     EXPECT_STREQ(node_flatbuffer->name()->c_str(), "BatchnormInference");

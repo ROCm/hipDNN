@@ -62,7 +62,7 @@ public:
 
     Tensor_attributes& set_uid(int64_t uid)
     {
-        _uid     = uid;
+        _uid = uid;
         _uid_set = true;
         return *this;
     }
@@ -104,7 +104,7 @@ public:
 
     Tensor_attributes& clear_uid()
     {
-        _uid     = 0;
+        _uid = 0;
         _uid_set = false;
         return *this;
     }
@@ -134,13 +134,13 @@ public:
     }
 
 private:
-    int64_t              _uid     = 0;
-    bool                 _uid_set = false;
-    std::string          _name;
-    DataType_t           _data_type = DataType_t::NOT_SET;
+    int64_t _uid = 0;
+    bool _uid_set = false;
+    std::string _name;
+    DataType_t _data_type = DataType_t::NOT_SET;
     std::vector<int64_t> _stride;
     std::vector<int64_t> _dim;
-    bool                 _is_virtual = false;
+    bool _is_virtual = false;
 };
 
 }

@@ -20,9 +20,9 @@ public:
     using Graph_t = std::shared_ptr<hipdnn_frontend::graph::Graph>;
 
     PyGraph(Graph_t graph)
-        : _graph(graph){};
+        : _graph(graph) {};
 
-    PyGraph(std::string const&          name,
+    PyGraph(std::string const& name,
             hipdnn_frontend::DataType_t io_data_type,
             hipdnn_frontend::DataType_t intermediate_data_type,
             hipdnn_frontend::DataType_t compute_data_type)
@@ -54,26 +54,26 @@ public:
         std::shared_ptr<hipdnn_frontend::graph::Tensor_attributes>& inv_variance,
         std::shared_ptr<hipdnn_frontend::graph::Tensor_attributes>& scale,
         std::shared_ptr<hipdnn_frontend::graph::Tensor_attributes>& bias,
-        hipdnn_frontend::DataType_t const&                          compute_data_type,
-        std::string const&                                          name);
+        hipdnn_frontend::DataType_t const& compute_data_type,
+        std::string const& name);
 
     std::vector<std::shared_ptr<hipdnn_frontend::graph::Tensor_attributes>> batchnorm_backward(
-        std::shared_ptr<hipdnn_frontend::graph::Tensor_attributes> const&        dy,
-        std::shared_ptr<hipdnn_frontend::graph::Tensor_attributes> const&        x,
-        std::shared_ptr<hipdnn_frontend::graph::Tensor_attributes> const&        scale,
-        std::shared_ptr<hipdnn_frontend::graph::Tensor_attributes> const&        mean,
-        std::shared_ptr<hipdnn_frontend::graph::Tensor_attributes> const&        inv_variance,
+        std::shared_ptr<hipdnn_frontend::graph::Tensor_attributes> const& dy,
+        std::shared_ptr<hipdnn_frontend::graph::Tensor_attributes> const& x,
+        std::shared_ptr<hipdnn_frontend::graph::Tensor_attributes> const& scale,
+        std::shared_ptr<hipdnn_frontend::graph::Tensor_attributes> const& mean,
+        std::shared_ptr<hipdnn_frontend::graph::Tensor_attributes> const& inv_variance,
         std::vector<std::shared_ptr<hipdnn_frontend::graph::Tensor_attributes>>& peer_stats,
-        hipdnn_frontend::DataType_t const&                                       compute_data_type,
-        std::string const&                                                       name);
+        hipdnn_frontend::DataType_t const& compute_data_type,
+        std::string const& name);
 
     std::shared_ptr<hipdnn_frontend::graph::Tensor_attributes>
         relu(std::shared_ptr<hipdnn_frontend::graph::Tensor_attributes>& input,
-             std::optional<float> const&                                 negative_slope,
-             std::optional<float> const&                                 lower_clip,
-             std::optional<float> const&                                 upper_clip,
-             hipdnn_frontend::DataType_t const&                          compute_data_type,
-             std::string const&                                          name);
+             std::optional<float> const& negative_slope,
+             std::optional<float> const& lower_clip,
+             std::optional<float> const& upper_clip,
+             hipdnn_frontend::DataType_t const& compute_data_type,
+             std::string const& name);
 
     void validate();
 

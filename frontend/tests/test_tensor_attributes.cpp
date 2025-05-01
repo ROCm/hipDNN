@@ -109,7 +109,7 @@ TEST(TensorAttributesTests, PackAttributes)
         .set_is_virtual(true);
 
     flatbuffers::FlatBufferBuilder builder;
-    auto                           packed = tensor.pack_attributes(builder);
+    auto packed = tensor.pack_attributes(builder);
     builder.Finish(packed);
 
     auto buffer_pointer = builder.GetBufferPointer();

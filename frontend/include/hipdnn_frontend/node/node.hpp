@@ -39,8 +39,8 @@ public:
     }
     virtual error_t populate_hipdnn_tensor_ids(
         [[maybe_unused]] std::unordered_map<int64_t, std::shared_ptr<Tensor_attributes>>&
-                                                      tensor_lookup,
-        [[maybe_unused]] int64_t&                     current_tensor_id,
+            tensor_lookup,
+        [[maybe_unused]] int64_t& current_tensor_id,
         [[maybe_unused]] std::unordered_set<int64_t>& used_ids) const
     {
         return {};
@@ -80,8 +80,8 @@ protected:
 
     error_t populate_hipdnn_tensor_ids_subtree(
         std::unordered_map<int64_t, std::shared_ptr<Tensor_attributes>>& tensor_lookup,
-        int64_t&                                                         current_tensor_id,
-        std::unordered_set<int64_t>&                                     used_ids)
+        int64_t& current_tensor_id,
+        std::unordered_set<int64_t>& used_ids)
     {
         CHECK_HIPDNN_ERROR(populate_hipdnn_tensor_ids(tensor_lookup, current_tensor_id, used_ids));
         for(const auto& node : _sub_nodes)
@@ -129,7 +129,7 @@ public:
         }
     }
 
-    static int64_t get_unused_tensor_uid(int64_t&                     current_tensor_id,
+    static int64_t get_unused_tensor_uid(int64_t& current_tensor_id,
                                          std::unordered_set<int64_t>& used_ids)
     {
         while(used_ids.find(current_tensor_id) != used_ids.end())
@@ -142,8 +142,8 @@ public:
 
     error_t populate_hipdnn_tensor_ids(
         std::unordered_map<int64_t, std::shared_ptr<Tensor_attributes>>& tensor_lookup,
-        int64_t&                                                         current_tensor_id,
-        std::unordered_set<int64_t>&                                     used_ids) const override
+        int64_t& current_tensor_id,
+        std::unordered_set<int64_t>& used_ids) const override
     {
         for(auto& [_, tensor] : self().attributes.inputs)
         {

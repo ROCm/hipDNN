@@ -30,9 +30,9 @@ hipdnnStatus_t Variant_descriptor::finalize()
 
 hipdnnStatus_t Variant_descriptor::get_attribute(hipdnnBackendAttributeName_t attribute_name,
                                                  hipdnnBackendAttributeType_t attribute_type,
-                                                 int64_t  requested_element_count,
+                                                 int64_t requested_element_count,
                                                  int64_t* element_count,
-                                                 void*    array_of_elements)
+                                                 void* array_of_elements)
 {
     if(element_count == nullptr || array_of_elements == nullptr)
     {
@@ -77,7 +77,7 @@ hipdnnStatus_t Variant_descriptor::get_attribute(hipdnnBackendAttributeName_t at
         {
             return HIPDNN_STATUS_BAD_PARAM;
         }
-        *element_count                          = 1;
+        *element_count = 1;
         *static_cast<void**>(array_of_elements) = _workspace;
         break;
 
@@ -90,8 +90,8 @@ hipdnnStatus_t Variant_descriptor::get_attribute(hipdnnBackendAttributeName_t at
 
 hipdnnStatus_t Variant_descriptor::set_attribute(hipdnnBackendAttributeName_t attribute_name,
                                                  hipdnnBackendAttributeType_t attribute_type,
-                                                 int64_t                      element_count,
-                                                 const void*                  array_of_elements)
+                                                 int64_t element_count,
+                                                 const void* array_of_elements)
 {
     if(is_finalized())
     {

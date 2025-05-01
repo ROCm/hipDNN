@@ -17,11 +17,11 @@ class Batchnorm_inference_attributes : public AttributesCRTP<Batchnorm_inference
 public:
     enum class input_names
     {
-        x            = 0,
-        mean         = 1,
+        x = 0,
+        mean = 1,
         inv_variance = 2,
-        scale        = 3,
-        bias         = 4
+        scale = 3,
+        bias = 4
     };
 
     enum class output_names
@@ -29,7 +29,7 @@ public:
         y = 0
     };
 
-    std::unordered_map<input_names, std::shared_ptr<Tensor_attributes>>  inputs;
+    std::unordered_map<input_names, std::shared_ptr<Tensor_attributes>> inputs;
     std::unordered_map<output_names, std::shared_ptr<Tensor_attributes>> outputs;
 
     std::shared_ptr<Tensor_attributes> get_x() const
@@ -86,7 +86,7 @@ public:
     flatbuffers::Offset<hipdnn_sdk::data_objects::BatchnormInferenceAttributes>
         pack_attributes(flatbuffers::FlatBufferBuilder& builder) const
     {
-        auto mean         = get_mean();
+        auto mean = get_mean();
         auto inv_variance = get_inv_variance();
 
         return hipdnn_sdk::data_objects::CreateBatchnormInferenceAttributes(
@@ -121,14 +121,14 @@ private:
         return nullptr;
     }
 
-    Batchnorm_inference_attributes& set_input(input_names                               name,
+    Batchnorm_inference_attributes& set_input(input_names name,
                                               const std::shared_ptr<Tensor_attributes>& value)
     {
         inputs[name] = value;
         return *this;
     }
 
-    Batchnorm_inference_attributes& set_output(output_names                              name,
+    Batchnorm_inference_attributes& set_output(output_names name,
                                                const std::shared_ptr<Tensor_attributes>& value)
     {
         outputs[name] = value;

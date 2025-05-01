@@ -36,7 +36,7 @@ TEST(GraphTests, BatchnormNodeCreation)
     x->set_dim({1, 2, 3, 4}).set_stride({5, 6, 7, 8}).set_data_type(DataType_t::FLOAT);
 
     auto scale = std::make_shared<Tensor_attributes>();
-    auto bias  = std::make_shared<Tensor_attributes>();
+    auto bias = std::make_shared<Tensor_attributes>();
 
     Batchnorm_attributes attributes;
     attributes.name = "BatchnormNode";
@@ -65,8 +65,8 @@ TEST(GraphTests, BatchnormBackwardNodeCreation)
 {
     Graph graph;
 
-    auto dy    = std::make_shared<Tensor_attributes>();
-    auto x     = std::make_shared<Tensor_attributes>();
+    auto dy = std::make_shared<Tensor_attributes>();
+    auto x = std::make_shared<Tensor_attributes>();
     auto scale = std::make_shared<Tensor_attributes>();
 
     dy->set_dim({1, 2, 3, 4}).set_stride({5, 6, 7, 8}).set_data_type(DataType_t::FLOAT);
@@ -97,10 +97,10 @@ TEST(GraphTests, BatchnormInferenceNodeCreation)
     auto x = std::make_shared<Tensor_attributes>();
     x->set_dim({1, 2, 3, 4}).set_stride({5, 6, 7, 8}).set_data_type(DataType_t::FLOAT);
 
-    auto mean         = std::make_shared<Tensor_attributes>();
+    auto mean = std::make_shared<Tensor_attributes>();
     auto inv_variance = std::make_shared<Tensor_attributes>();
-    auto scale        = std::make_shared<Tensor_attributes>();
-    auto bias         = std::make_shared<Tensor_attributes>();
+    auto scale = std::make_shared<Tensor_attributes>();
+    auto bias = std::make_shared<Tensor_attributes>();
 
     Batchnorm_inference_attributes attributes;
     attributes.name = "BatchnormNode";
@@ -182,7 +182,7 @@ TEST(GraphTests, PointwiseNodeCreationThreeInputs)
     EXPECT_TRUE(validation_result.is_good()) << validation_result.get_message();
 }
 
-static void validate_tensor(const Tensor_attributes&                           tensor,
+static void validate_tensor(const Tensor_attributes& tensor,
                             const hipdnn_sdk::data_objects::TensorAttributesT& serialized_tensor)
 {
     EXPECT_EQ(tensor.get_name(), serialized_tensor.name);

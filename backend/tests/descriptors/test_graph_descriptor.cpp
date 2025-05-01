@@ -33,7 +33,7 @@ public:
 
 TEST_F(Graph_descriptor_test, WillCorrectlySetGraph)
 {
-    auto builder          = create_valid_graph();
+    auto builder = create_valid_graph();
     auto serialized_graph = builder.Release();
 
     Graph_descriptor descriptor;
@@ -47,7 +47,7 @@ TEST_F(Graph_descriptor_test, WillCorrectlySetGraph)
 TEST_F(Graph_descriptor_test, WillFailToSetInvalidGraph)
 {
     Graph_descriptor descriptor;
-    auto             status = descriptor.deserialize_graph(nullptr, 0);
+    auto status = descriptor.deserialize_graph(nullptr, 0);
 
     ASSERT_EQ(status, HIPDNN_STATUS_BAD_PARAM_NULL_POINTER);
 }
@@ -55,7 +55,7 @@ TEST_F(Graph_descriptor_test, WillFailToSetInvalidGraph)
 TEST_F(Graph_descriptor_test, FinalizeFailInvalidGraph)
 {
     Graph_descriptor descriptor;
-    auto             status = descriptor.finalize();
+    auto status = descriptor.finalize();
 
     ASSERT_EQ(status, HIPDNN_STATUS_BAD_PARAM);
 }
@@ -63,8 +63,8 @@ TEST_F(Graph_descriptor_test, FinalizeFailInvalidGraph)
 TEST_F(Graph_descriptor_test, GetAttributeReturnsNotSupported)
 {
     Graph_descriptor descriptor;
-    int64_t          element_count = 0;
-    auto             status        = descriptor.get_attribute(
+    int64_t element_count = 0;
+    auto status = descriptor.get_attribute(
         HIPDNN_ATTR_ENGINEHEUR_MODE, HIPDNN_TYPE_DATA_TYPE, 0, &element_count, nullptr);
 
     ASSERT_EQ(status, HIPDNN_STATUS_NOT_SUPPORTED);
@@ -73,7 +73,7 @@ TEST_F(Graph_descriptor_test, GetAttributeReturnsNotSupported)
 TEST_F(Graph_descriptor_test, SetAttributeReturnsNotSupported)
 {
     Graph_descriptor descriptor;
-    auto             status
+    auto status
         = descriptor.set_attribute(HIPDNN_ATTR_ENGINEHEUR_MODE, HIPDNN_TYPE_DATA_TYPE, 0, nullptr);
 
     ASSERT_EQ(status, HIPDNN_STATUS_NOT_SUPPORTED);

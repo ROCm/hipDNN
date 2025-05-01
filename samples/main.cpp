@@ -17,7 +17,7 @@ static bool not_equal(const T& expected, const T& actual)
     return expected != actual;
 }
 
-static bool not_equal(const Tensor_attributes&                           tensor,
+static bool not_equal(const Tensor_attributes& tensor,
                       const hipdnn_sdk::data_objects::TensorAttributesT& serialized_tensor)
 {
     return not_equal(tensor.get_name(), serialized_tensor.name)
@@ -32,9 +32,9 @@ int main()
     Graph graph;
 
     graph.set_name("SerializedBatchnormGraph")
-        .set_compute_type(DataType_t::FLOAT)
-        .set_intermediate_type(DataType_t::HALF)
-        .set_io_type(DataType_t::FLOAT);
+        .set_compute_data_type(DataType_t::FLOAT)
+        .set_intermediate_data_type(DataType_t::HALF)
+        .set_io_data_type(DataType_t::FLOAT);
 
     auto x = std::make_shared<Tensor_attributes>();
     x->set_uid(1)

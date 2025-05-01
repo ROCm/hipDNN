@@ -19,7 +19,7 @@ TEST(DBNNodeTests, PreValidateNode)
     batchnorm_attributes.set_dbias(std::make_shared<Tensor_attributes>());
 
     Graph_attributes graph_attributes;
-    DBNNode          node(std::move(batchnorm_attributes), graph_attributes);
+    DBNNode node(std::move(batchnorm_attributes), graph_attributes);
 
     auto error = node.pre_validate_node();
     EXPECT_EQ(error.code, error_code_t::OK);
@@ -30,13 +30,13 @@ TEST(DBNNodeTests, PreValidateNodeMissingValues)
     Batchnorm_backward_attributes batchnorm_attributes;
 
     Graph_attributes graph_attributes;
-    DBNNode          node(std::move(batchnorm_attributes), graph_attributes);
+    DBNNode node(std::move(batchnorm_attributes), graph_attributes);
 
     auto error = node.pre_validate_node();
     EXPECT_EQ(error.code, error_code_t::ATTRIBUTE_NOT_SET);
 
     batchnorm_attributes.set_dy(std::make_shared<Tensor_attributes>());
-    auto    batchnorm_attributes_copy = batchnorm_attributes;
+    auto batchnorm_attributes_copy = batchnorm_attributes;
     DBNNode node_with_dy(std::move(batchnorm_attributes_copy), graph_attributes);
 
     error = node_with_dy.pre_validate_node();
@@ -107,7 +107,7 @@ TEST(DBNNodeTests, InferPropertiesNode)
     dbias_tensor->set_uid(4).set_name("DbiasTensor");
 
     Graph_attributes graph_attributes;
-    DBNNode          node(std::move(batchnorm_attributes), graph_attributes);
+    DBNNode node(std::move(batchnorm_attributes), graph_attributes);
 
     auto error = node.infer_properties_node();
     EXPECT_EQ(error.code, error_code_t::OK);
@@ -143,7 +143,7 @@ TEST(DBNNodeTests, GatherhipdnnTensorIds)
     batchnorm_attributes.set_peer_stats({peer_stat_1, peer_stat_2});
 
     Graph_attributes graph_attributes;
-    DBNNode          node(std::move(batchnorm_attributes), graph_attributes);
+    DBNNode node(std::move(batchnorm_attributes), graph_attributes);
 
     std::unordered_set<int64_t> used_ids;
     node.gather_hipdnn_tensor_ids(used_ids);
@@ -170,11 +170,11 @@ TEST(DBNNodeTests, PopulatehipdnnTensorIds)
     batchnorm_attributes.set_peer_stats({peer_stat_1, peer_stat_2});
 
     Graph_attributes graph_attributes;
-    DBNNode          node(std::move(batchnorm_attributes), graph_attributes);
+    DBNNode node(std::move(batchnorm_attributes), graph_attributes);
 
     std::unordered_map<int64_t, std::shared_ptr<Tensor_attributes>> tensor_lookup;
-    std::unordered_set<int64_t>                                     used_ids;
-    int64_t                                                         current_tensor_id = 1;
+    std::unordered_set<int64_t> used_ids;
+    int64_t current_tensor_id = 1;
 
     auto error = node.populate_hipdnn_tensor_ids(tensor_lookup, current_tensor_id, used_ids);
     EXPECT_EQ(error.code, error_code_t::OK);
@@ -283,15 +283,15 @@ TEST(DBNNodeTests, PackNode)
     batchnorm_attributes.set_dbias(dbias_tensor);
 
     Graph_attributes graph_attributes;
-    DBNNode          node(std::move(batchnorm_attributes), graph_attributes);
+    DBNNode node(std::move(batchnorm_attributes), graph_attributes);
 
     // Pack the node
     flatbuffers::FlatBufferBuilder builder;
-    auto                           offset = node.pack_node(builder);
+    auto offset = node.pack_node(builder);
     EXPECT_NE(offset.o, 0);
 
     builder.Finish(offset);
-    auto buffer_pointer  = builder.GetBufferPointer();
+    auto buffer_pointer = builder.GetBufferPointer();
     auto node_flatbuffer = flatbuffers::GetRoot<hipdnn_sdk::data_objects::Node>(buffer_pointer);
 
     EXPECT_STREQ(node_flatbuffer->name()->c_str(), "BatchnormBackward");
@@ -366,14 +366,14 @@ TEST(DBNNodeTests, PackNodeWithoutMeanAndInvVariance)
     batchnorm_attributes.set_dbias(dbias_tensor);
 
     Graph_attributes graph_attributes;
-    DBNNode          node(std::move(batchnorm_attributes), graph_attributes);
+    DBNNode node(std::move(batchnorm_attributes), graph_attributes);
 
     flatbuffers::FlatBufferBuilder builder;
-    auto                           offset = node.pack_node(builder);
+    auto offset = node.pack_node(builder);
     EXPECT_NE(offset.o, 0);
 
     builder.Finish(offset);
-    auto buffer_pointer  = builder.GetBufferPointer();
+    auto buffer_pointer = builder.GetBufferPointer();
     auto node_flatbuffer = flatbuffers::GetRoot<hipdnn_sdk::data_objects::Node>(buffer_pointer);
 
     EXPECT_STREQ(node_flatbuffer->name()->c_str(), "BatchnormBackward");

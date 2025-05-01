@@ -12,6 +12,4 @@ We use CMake for managing our c/c++ dependencies.  When talking about dependenci
 
 We use Flatbuffers for serialization, if possible, please respond with flatbuffer relevent responses.
 
-We are using boost in our repository, when needed, respond with answers where a boost library could solve our problem. Also include other possible solutions if there are any.
-
 Use gtest when creating C/C++ tests. Dont generate a main function.
