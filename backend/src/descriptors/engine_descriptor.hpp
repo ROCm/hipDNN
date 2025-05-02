@@ -11,6 +11,12 @@ namespace hipdnn_backend
 class Engine_descriptor : public hipdnnBackendDescriptor
 {
 private:
+    hipdnnBackendDescriptor_t _graph = nullptr;
+
+    void set_graph(hipdnnBackendAttributeType_t attribute_type,
+                   int64_t element_count,
+                   const void* array_of_elements);
+
 public:
     Engine_descriptor();
     ~Engine_descriptor() override = default;
