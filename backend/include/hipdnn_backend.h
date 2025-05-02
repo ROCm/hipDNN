@@ -219,7 +219,7 @@ HIPDNN_BACKEND_EXPORT hipdnnStatus_t
  *                                              attribute_type is incorrect for this attribute_name.
  *                                              element_count value is unexpected.
  *                                              array_of_elements contains values invalid for the attribute_type.
- * @retval  HIPDNN_STATUS_NOT_SUPPORTED     The values to which the attributes are being set are not supported by the current version of cuDNN.
+ * @retval  HIPDNN_STATUS_NOT_SUPPORTED     The values to which the attributes are being set are not supported by the current version of hipDNN.
  * 
  */
 HIPDNN_BACKEND_EXPORT hipdnnStatus_t

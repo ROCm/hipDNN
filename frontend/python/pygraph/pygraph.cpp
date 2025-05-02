@@ -28,7 +28,7 @@ void PyGraph::validate()
 
 void PyGraph::build_operation_graph()
 {
-    // TODO cudnn build_operation_graph takes a handle
+    // TODO hipdnn build_operation_graph to take a handle
     auto status = _graph->build_operation_graph();
     throw_if(status.is_bad(), status.get_code(), status.get_message());
 }
