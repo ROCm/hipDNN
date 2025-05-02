@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 #include "descriptors/descriptor_factory.hpp"
+#include "descriptors/engine_descriptor.hpp"
 #include "descriptors/execution_plan_descriptor.hpp"
 #include "descriptors/graph_descriptor.hpp"
 #include "descriptors/variant_descriptor.hpp"
@@ -12,6 +13,15 @@
 #include "gtest/gtest.h"
 
 using namespace hipdnn_backend;
+
+TEST(DescriptorFactoryTest, CreateEngineDescriptor)
+{
+    hipdnnBackendDescriptor_t descriptor = nullptr;
+    ASSERT_NO_THROW(Descriptor_factory::create(HIPDNN_BACKEND_ENGINE_DESCRIPTOR, &descriptor));
+    EXPECT_NE(descriptor, nullptr);
+
+    delete descriptor;
+}
 
 TEST(DescriptorFactoryTest, CreateExecutionPlanDescriptor)
 {

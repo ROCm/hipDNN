@@ -29,8 +29,7 @@ TEST(HipDNNBackendTest, WillNotCreateDescriptorIfTypeNotSupported)
 {
     hipdnnBackendDescriptor_t descriptor = nullptr;
 
-    hipdnnStatus_t status
-        = hipdnnBackendCreateDescriptor(HIPDNN_BACKEND_ENGINE_DESCRIPTOR, &descriptor);
+    hipdnnStatus_t status = hipdnnBackendCreateDescriptor(HIPDNN_INVALID_TYPE, &descriptor);
 
     EXPECT_EQ(status, HIPDNN_STATUS_NOT_SUPPORTED);
 }

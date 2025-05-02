@@ -15,6 +15,7 @@ endif()
 
 add_executable(hipdnn_backend_tests
     descriptors/mocks/mock_descriptor.cpp
+    descriptors/test_engine_descriptor.cpp
     descriptors/test_execution_plan_descriptor.cpp
     descriptors/test_graph_descriptor.cpp
     descriptors/test_descriptor_factory.cpp
