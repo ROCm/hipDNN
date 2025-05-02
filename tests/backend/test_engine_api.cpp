@@ -62,3 +62,12 @@ TEST_F(Engine_api_tests, SetEngineGlobalIndex)
                   _engine, HIPDNN_ATTR_ENGINE_GLOBAL_INDEX, HIPDNN_TYPE_INT64, 1, &gidx),
               HIPDNN_STATUS_SUCCESS);
 }
+
+TEST_F(Engine_api_tests, FinalizeEngine)
+{
+    int64_t gidx = 0;
+
+    EXPECT_EQ(hipdnnBackendFinalize(_engine), HIPDNN_STATUS_BAD_PARAM);
+    test_util::populate_test_engine(_engine, &_graph, gidx);
+    EXPECT_EQ(hipdnnBackendFinalize(_engine), HIPDNN_STATUS_SUCCESS);
+}

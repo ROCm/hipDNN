@@ -30,7 +30,22 @@ void create_test_graph(hipdnnBackendDescriptor_t* descriptor)
     flatbuffers::DetachedBuffer serialized_graph = builder.Release();
 
     ASSERT_EQ(hipdnnBackendCreateAndDeserializeGraph_ext(
-        descriptor, serialized_graph.data(), serialized_graph.size()),
+                  descriptor, serialized_graph.data(), serialized_graph.size()),
+              HIPDNN_STATUS_SUCCESS);
+}
+
+void populate_test_engine(hipdnnBackendDescriptor_t engine,
+                          hipdnnBackendDescriptor_t* graph,
+                          int64_t gidx)
+{
+    create_test_graph(graph);
+    ASSERT_EQ(hipdnnBackendFinalize(*graph), HIPDNN_STATUS_SUCCESS);
+    ASSERT_EQ(
+        hipdnnBackendSetAttribute(
+            engine, HIPDNN_ATTR_ENGINE_OPERATION_GRAPH, HIPDNN_TYPE_BACKEND_DESCRIPTOR, 1, graph),
+        HIPDNN_STATUS_SUCCESS);
+    ASSERT_EQ(hipdnnBackendSetAttribute(
+                  engine, HIPDNN_ATTR_ENGINE_GLOBAL_INDEX, HIPDNN_TYPE_INT64, 1, &gidx),
               HIPDNN_STATUS_SUCCESS);
 }
 
