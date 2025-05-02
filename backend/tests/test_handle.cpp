@@ -3,6 +3,7 @@
 
 #include "handle/handle.hpp"
 #include <gtest/gtest.h>
+#include <hipdnn_sdk/test_utilities/test_utilities.hpp>
 
 namespace hipdnn_backend
 {
@@ -13,8 +14,10 @@ TEST(HandleTests, DefaultStreamIsNull)
     EXPECT_EQ(handle.get_stream(), nullptr) << "Default stream should be nullptr.";
 }
 
-TEST(HandleTests, SetAndGetStream)
+TEST(GPU_HandleTests, SetAndGetStream)
 {
+    SKIP_IF_NO_DEVICES();
+
     Handle handle;
 
     hipStream_t stream;
@@ -27,8 +30,10 @@ TEST(HandleTests, SetAndGetStream)
     ASSERT_EQ(hipStreamDestroy(stream), hipSuccess) << "Failed to destroy HIP stream.";
 }
 
-TEST(HandleTests, SetStreamToNull)
+TEST(GPU_HandleTests, SetStreamToNull)
 {
+    SKIP_IF_NO_DEVICES();
+
     Handle handle;
 
     hipStream_t stream;

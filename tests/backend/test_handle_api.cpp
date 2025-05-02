@@ -3,6 +3,7 @@
 
 #include "hipdnn_backend.h"
 #include <gtest/gtest.h>
+#include <hipdnn_sdk/test_utilities/test_utilities.hpp>
 
 TEST(hipDNNHandleAPITests, CreateAndDestroy)
 {
@@ -47,8 +48,10 @@ TEST(hipDNNHandleAPITests, GetStreamNullptrStreamPointer)
     ASSERT_EQ(destroy_status, HIPDNN_STATUS_SUCCESS);
 }
 
-TEST(hipDNNHandleAPITests, GetStreamPointer)
+TEST(GPU_hipDNNHandleAPITests, GetStreamPointer)
 {
+    SKIP_IF_NO_DEVICES();
+
     hipdnnHandle_t handle = nullptr;
 
     hipdnnStatus_t create_status = hipdnnCreate(&handle);

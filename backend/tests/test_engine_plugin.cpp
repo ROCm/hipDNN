@@ -5,24 +5,16 @@
 #include <algorithm>
 #include <gtest/gtest.h>
 #include <hip/hip_runtime.h>
+#include <hipdnn_sdk/test_utilities/test_utilities.hpp>
 #include <numeric>
 #include <vector>
 
 using namespace hipdnn_backend;
 
 // NOLINTBEGIN(readability-function-cognitive-complexity)
-TEST(EnginePluginManagerTest, LoadPluginsAndRunEngines)
+TEST(GPU_EnginePluginManagerTest, LoadPluginsAndRunEngines)
 {
-    // Skip the test if no devices are available.
-    int device_count;
-    // hipGetDeviceCount() can also return hipErrorNoDevice if no devices are available.
-    // This is not a failure, so we should not use ASSERT_EQ here.
-    auto result = hipGetDeviceCount(&device_count);
-    if(result == hipErrorNoDevice)
-    {
-        GTEST_SKIP() << "No devices available. Skipping test.";
-    }
-    ASSERT_EQ(result, hipSuccess);
+    SKIP_IF_NO_DEVICES();
 
     // Create an EngienPluginManager instance
     plugin::Engine_plugin_manager plugin_manager;
