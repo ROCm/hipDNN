@@ -49,4 +49,12 @@ void populate_test_engine(hipdnnBackendDescriptor_t engine,
               HIPDNN_STATUS_SUCCESS);
 }
 
+void populate_finalized_test_engine(hipdnnBackendDescriptor_t engine,
+                                    hipdnnBackendDescriptor_t* graph,
+                                    int64_t gidx)
+{
+    populate_test_engine(engine, graph, gidx);
+    ASSERT_EQ(hipdnnBackendFinalize(engine), HIPDNN_STATUS_SUCCESS);
+}
+
 } // namespace test_util
