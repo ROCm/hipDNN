@@ -14,6 +14,7 @@ add_library(hipdnn_backend_private
     handle/handle_factory.cpp
     handle/handle.cpp
     flatbuffer_utilities.cpp
+    plugin/plugin_manager.cpp
     plugin/engine_plugin.cpp
     plugin/plugin_core.cpp
     plugin/shared_library.cpp
