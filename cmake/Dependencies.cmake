@@ -20,6 +20,7 @@ endif()
 set(_hipdnn_all_local_deps
     GTest
     flatbuffers
+    spdlog
 )
 # Dependencies where we never look for a local version
 set(_hipdnn_all_remote_deps
@@ -170,6 +171,25 @@ function(_fetch_flatbuffers VERSION HASH)
 
     _exclude_from_all(${flatbuffers_SOURCE_DIR})
     _mark_targets_as_system(${flatbuffers_SOURCE_DIR})
+endfunction()
+
+function(_fetch_spdlog VERSION HASH)
+    _determine_git_tag(v v1.15.2)
+
+    FetchContent_Declare(
+        spdlog
+        GIT_REPOSITORY https://github.com/gabime/spdlog.git
+        GIT_TAG ${GIT_TAG}
+        DOWNLOAD_EXTRACT_TIMESTAMP TRUE
+    )
+
+    FetchContent_MakeAvailable(spdlog)
+
+    set(HIP_DNN_SPDLOG_INCLUDE_DIR ${spdlog_SOURCE_DIR}/include CACHE PATH "Path to spdlog include")
+
+
+    _exclude_from_all(${spdlog_SOURCE_DIR})
+    _mark_targets_as_system(${spdlog_SOURCE_DIR})
 endfunction()
 
 # Utility functions, pulled from rocroller repo

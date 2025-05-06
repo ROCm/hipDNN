@@ -19,18 +19,19 @@ add_executable(hipdnn_backend_tests
     descriptors/test_graph_descriptor.cpp
     descriptors/test_descriptor_factory.cpp
     descriptors/test_variant_pack.cpp
+    main.cpp
     test_engine_plugin.cpp
     test_error.cpp
     test_flatbuffer_utilities.cpp
     test_handle.cpp
     test_helpers.cpp
+    test_logger.cpp
     test_plugin.cpp
     test_shared_library.cpp
 )
 
 target_link_libraries(hipdnn_backend_tests 
     GTest::gtest
-    GTest::gtest_main
     pthread
     hipdnn_backend_private
     hipdnn_sdk

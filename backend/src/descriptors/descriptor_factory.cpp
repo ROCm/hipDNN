@@ -6,6 +6,7 @@
 #include "execution_plan_descriptor.hpp"
 #include "graph_descriptor.hpp"
 #include "variant_descriptor.hpp"
+#include <hipdnn_sdk/logging/logger.hpp>
 
 namespace hipdnn_backend
 {
@@ -17,6 +18,9 @@ hipdnnStatus_t Descriptor_factory::create(hipdnnBackendDescriptorType_t descript
     {
         return HIPDNN_STATUS_BAD_PARAM;
     }
+
+    HIPDNN_LOG_INFO("Creating descriptor of type: {}",
+                    hipdnn_get_backend_descriptor_type_name(descriptor_type));
 
     switch(descriptor_type)
     {

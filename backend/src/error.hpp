@@ -6,12 +6,14 @@
 #include "hipdnn_backend_attribute_name.h"
 #include "hipdnn_backend_descriptor_type.h"
 #include "hipdnn_status.h"
+#include <hipdnn_sdk/logging/logger.hpp>
 
 namespace hipdnn_backend
 {
 
-inline hipdnnStatus_t set_last_error(hipdnnStatus_t status, const char* /*message*/)
+inline hipdnnStatus_t set_last_error(hipdnnStatus_t status, const char* message)
 {
+    HIPDNN_LOG_ERROR("Error {}", message);
     //TODO
     // Set the last error message
     // stash the message in some global theadsafe map.

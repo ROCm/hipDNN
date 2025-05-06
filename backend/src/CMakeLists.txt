@@ -43,6 +43,10 @@ target_include_directories(hipdnn_backend
         ${HIP_DNN_BACKEND_EXPORT_INCLUDE_DIR})
 
 target_compile_options(hipdnn_backend PRIVATE ${HIPDNN_WARNING_COMPILE_OPTIONS})
+# This definition is used to enable logging in the backend.  It is #ifdef'ed in the backend code.
+# This is to stop the frontend/plugin from having lazy log initialization which will end up with the same
+# logger name. Frontend/plugin code will need to init the logger themselves so they have a different name.
+target_compile_definitions(hipdnn_backend PRIVATE ENABLE_BACKEND_LOGGING)
 target_link_libraries(hipdnn_backend PRIVATE hipdnn_backend_private)
 target_link_libraries(hipdnn_backend PRIVATE "-Xlinker --exclude-libs=ALL" ) # HIDE symbols from linked static libs
 set_target_properties(hipdnn_backend PROPERTIES CXX_VISIBILITY_PRESET hidden)

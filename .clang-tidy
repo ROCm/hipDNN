@@ -26,7 +26,7 @@ HeaderFileExtensions: ['h','hpp']
 
 # This regex is a inclusion filter for the files to be checked. Its a Posix regex and
 # does not seem to support negative lookahead.  
-HeaderFilterRegex: '^(.*backend.*|.*frontend.*)$'
+HeaderFilterRegex: '^(.*backend.*|.*frontend.*|.*sdk/include/hipdnn_sdk/logging.*)$'
 
 CheckOptions:
   - { key: readability-identifier-naming.NamespaceCase,           value: lower_case }
