@@ -4,6 +4,7 @@
 #include "execution_plan_descriptor.hpp"
 #include "error.hpp"
 #include "hipdnn_backend_descriptor_type.h"
+#include "hipdnn_exception.hpp"
 
 namespace hipdnn_backend
 {
@@ -13,30 +14,30 @@ Execution_plan_descriptor::Execution_plan_descriptor()
     type = HIPDNN_BACKEND_EXECUTION_PLAN_DESCRIPTOR;
 }
 
-hipdnnStatus_t Execution_plan_descriptor::finalize()
+void Execution_plan_descriptor::finalize()
 {
     if(is_finalized())
     {
-        return set_last_error(HIPDNN_STATUS_BAD_PARAM,
-                              "Execution_plan_descriptor::finalize() failed: "
-                              "Already finalized.");
+        throw Hipdnn_exception(HIPDNN_STATUS_BAD_PARAM,
+                               "Execution_plan_descriptor::finalize() failed: "
+                               "Already finalized.");
     }
 
     if(_handle == nullptr)
     {
-        return set_last_error(HIPDNN_STATUS_BAD_PARAM,
-                              "Execution_plan_descriptor::finalize() failed: "
-                              "Handle was not set.");
+        throw Hipdnn_exception(HIPDNN_STATUS_BAD_PARAM,
+                               "Execution_plan_descriptor::finalize() failed: "
+                               "Handle was not set.");
     }
 
     if(_engine == nullptr)
     {
-        return set_last_error(HIPDNN_STATUS_BAD_PARAM,
-                              "Execution_plan_descriptor::finalize() failed: "
-                              "Engine was not set.");
+        throw Hipdnn_exception(HIPDNN_STATUS_BAD_PARAM,
+                               "Execution_plan_descriptor::finalize() failed: "
+                               "Engine was not set.");
     }
 
-    return Backend_descriptor::finalize();
+    hipdnnBackendDescriptor::finalize();
 }
 
 hipdnnStatus_t Execution_plan_descriptor::get_attribute(hipdnnBackendAttributeName_t attribute_name,
@@ -88,18 +89,11 @@ hipdnnStatus_t
                               "Engine was not set (internal error).");
     }
 
-    auto engine_desc = dynamic_cast<Backend_descriptor*>(_engine);
-    if(engine_desc == nullptr)
-    {
-        return set_last_error(HIPDNN_STATUS_INTERNAL_ERROR,
-                              "Execution_plan_descriptor failed to get workspace size: "
-                              "Engine descriptor could not be cast (internal error).");
-    }
-    return engine_desc->get_attribute(HIPDNN_ATTR_ENGINECFG_WORKSPACE_SIZE,
-                                      attribute_type,
-                                      requested_element_count,
-                                      element_count,
-                                      array_of_elements);
+    return _engine->get_attribute(HIPDNN_ATTR_ENGINECFG_WORKSPACE_SIZE,
+                                  attribute_type,
+                                  requested_element_count,
+                                  element_count,
+                                  array_of_elements);
 }
 
 hipdnnStatus_t Execution_plan_descriptor::set_attribute(hipdnnBackendAttributeName_t attribute_name,
@@ -215,14 +209,7 @@ hipdnnStatus_t
                               "Invalid engine descriptor type.");
     }
 
-    auto engine_desc = dynamic_cast<Backend_descriptor*>(engine);
-    if(engine_desc == nullptr)
-    {
-        return set_last_error(HIPDNN_STATUS_BAD_PARAM_NULL_POINTER,
-                              "Execution_plan_descriptor failed to set engine config: "
-                              "Engine descriptor is null.");
-    }
-    if(!engine_desc->is_finalized())
+    if(!engine->is_finalized())
     {
         return set_last_error(HIPDNN_STATUS_BAD_PARAM_NOT_FINALIZED,
                               "Execution_plan_descriptor failed to set engine config: "

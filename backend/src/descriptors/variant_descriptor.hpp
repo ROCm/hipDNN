@@ -11,7 +11,7 @@
 namespace hipdnn_backend
 {
 
-class Variant_descriptor : public Backend_descriptor
+class Variant_descriptor : public hipdnnBackendDescriptor
 {
 private:
     std::vector<const void*> _data_pointers;
@@ -22,7 +22,7 @@ public:
     Variant_descriptor();
     ~Variant_descriptor() override = default;
 
-    hipdnnStatus_t finalize() override;
+    void finalize() override;
 
     hipdnnStatus_t get_attribute(hipdnnBackendAttributeName_t attribute_name,
                                  hipdnnBackendAttributeType_t attribute_type,

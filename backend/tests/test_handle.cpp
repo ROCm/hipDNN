@@ -10,7 +10,7 @@ namespace hipdnn_backend
 
 TEST(HandleTests, DefaultStreamIsNull)
 {
-    Handle handle;
+    hipdnnHandle handle;
     EXPECT_EQ(handle.get_stream(), nullptr) << "Default stream should be nullptr.";
 }
 
@@ -18,7 +18,7 @@ TEST(GPU_HandleTests, SetAndGetStream)
 {
     SKIP_IF_NO_DEVICES();
 
-    Handle handle;
+    hipdnnHandle handle;
 
     hipStream_t stream;
     ASSERT_EQ(hipStreamCreate(&stream), hipSuccess) << "Failed to create HIP stream.";
@@ -34,7 +34,7 @@ TEST(GPU_HandleTests, SetStreamToNull)
 {
     SKIP_IF_NO_DEVICES();
 
-    Handle handle;
+    hipdnnHandle handle;
 
     hipStream_t stream;
     ASSERT_EQ(hipStreamCreate(&stream), hipSuccess) << "Failed to create HIP stream.";

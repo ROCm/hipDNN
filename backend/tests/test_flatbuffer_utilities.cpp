@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 #include "flatbuffer_utilities.hpp"
+#include "hipdnn_exception.hpp"
 #include <flatbuffers/flatbuffers.h>
 #include <gtest/gtest.h>
 #include <hipdnn_sdk/data_objects/graph_generated.h>
@@ -50,10 +51,9 @@ TEST_F(Flatbuffer_utilities_test, WillCorrectlyUnpackValidGraphBuffer)
 
     auto serialized_graph = builder.Release();
     std::unique_ptr<hipdnn_sdk::data_objects::GraphT> graph;
-    auto status = flatbuffer_utilities::convert_serialized_graph_to_graph(
-        serialized_graph.data(), serialized_graph.size(), graph);
+    ASSERT_NO_THROW(flatbuffer_utilities::convert_serialized_graph_to_graph(
+        serialized_graph.data(), serialized_graph.size(), graph));
 
-    ASSERT_EQ(status, HIPDNN_STATUS_SUCCESS);
     verify_graph(*graph);
 }
 
@@ -64,9 +64,8 @@ TEST_F(Flatbuffer_utilities_test, WillStillHaveValidGraphAfterBuilderDestructs)
         auto builder = create_valid_graph();
 
         auto serialized_graph = builder.Release();
-        auto status = flatbuffer_utilities::convert_serialized_graph_to_graph(
-            serialized_graph.data(), serialized_graph.size(), graph);
-        ASSERT_EQ(status, HIPDNN_STATUS_SUCCESS);
+        ASSERT_NO_THROW(flatbuffer_utilities::convert_serialized_graph_to_graph(
+            serialized_graph.data(), serialized_graph.size(), graph));
     }
 
     verify_graph(*graph);
@@ -83,9 +82,8 @@ TEST_P(Flatbuffer_invalid_tests, WillNotUnpackInvalidBuffer)
     auto [buffer, size] = GetParam();
 
     std::unique_ptr<hipdnn_sdk::data_objects::GraphT> graph;
-    auto status = flatbuffer_utilities::convert_serialized_graph_to_graph(buffer, size, graph);
-
-    ASSERT_EQ(status, HIPDNN_STATUS_BAD_PARAM);
+    ASSERT_THROW(flatbuffer_utilities::convert_serialized_graph_to_graph(buffer, size, graph),
+                 hipdnn_backend::Hipdnn_exception);
     ASSERT_EQ(graph, nullptr);
 }
 

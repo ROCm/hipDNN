@@ -7,6 +7,7 @@
 #include "descriptors/variant_descriptor.hpp"
 #include "flatbuffer_test_utils.hpp"
 #include "handle/handle_factory.hpp"
+#include "hipdnn_exception.hpp"
 
 #include "gtest/gtest.h"
 
@@ -15,9 +16,8 @@ using namespace hipdnn_backend;
 TEST(DescriptorFactoryTest, CreateExecutionPlanDescriptor)
 {
     hipdnnBackendDescriptor_t descriptor = nullptr;
-    auto status = Descriptor_factory::create(HIPDNN_BACKEND_EXECUTION_PLAN_DESCRIPTOR, &descriptor);
-
-    EXPECT_EQ(status, HIPDNN_STATUS_SUCCESS);
+    ASSERT_NO_THROW(
+        Descriptor_factory::create(HIPDNN_BACKEND_EXECUTION_PLAN_DESCRIPTOR, &descriptor));
     EXPECT_NE(descriptor, nullptr);
 
     delete descriptor;
@@ -26,9 +26,9 @@ TEST(DescriptorFactoryTest, CreateExecutionPlanDescriptor)
 TEST(DescriptorFactoryTest, CreateGraphDescriptor)
 {
     hipdnnBackendDescriptor_t descriptor = nullptr;
-    auto status = Descriptor_factory::create(HIPDNN_BACKEND_OPERATIONGRAPH_DESCRIPTOR, &descriptor);
+    ASSERT_NO_THROW(
+        Descriptor_factory::create(HIPDNN_BACKEND_OPERATIONGRAPH_DESCRIPTOR, &descriptor));
 
-    EXPECT_EQ(status, HIPDNN_STATUS_SUCCESS);
     EXPECT_NE(descriptor, nullptr);
 
     delete descriptor;
@@ -37,18 +37,16 @@ TEST(DescriptorFactoryTest, CreateGraphDescriptor)
 TEST(DescriptorFactoryTest, CreateUnsupportedDescriptor)
 {
     hipdnnBackendDescriptor_t descriptor = nullptr;
-    auto status
-        = Descriptor_factory::create(static_cast<hipdnnBackendDescriptorType_t>(999), &descriptor);
-
-    EXPECT_EQ(status, HIPDNN_STATUS_NOT_SUPPORTED);
+    ASSERT_THROW(
+        Descriptor_factory::create(static_cast<hipdnnBackendDescriptorType_t>(999), &descriptor),
+        hipdnn_backend::Hipdnn_exception);
     EXPECT_EQ(descriptor, nullptr);
 }
 
 TEST(DescriptorFactoryTest, NullDescriptorPointer)
 {
-    auto status = Descriptor_factory::create(HIPDNN_BACKEND_OPERATIONGRAPH_DESCRIPTOR, nullptr);
-
-    EXPECT_EQ(status, HIPDNN_STATUS_BAD_PARAM);
+    ASSERT_THROW(Descriptor_factory::create(HIPDNN_BACKEND_OPERATIONGRAPH_DESCRIPTOR, nullptr),
+                 hipdnn_backend::Hipdnn_exception);
 }
 
 TEST(DescriptorFactoryTest, CreateGraphExtValidInput)
@@ -57,10 +55,9 @@ TEST(DescriptorFactoryTest, CreateGraphExtValidInput)
     auto serialized_graph = builder.Release();
 
     hipdnnBackendDescriptor_t descriptor = nullptr;
-    auto status = Descriptor_factory::create_graph_ext(
-        &descriptor, serialized_graph.data(), serialized_graph.size());
+    ASSERT_NO_THROW(Descriptor_factory::create_graph_ext(
+        &descriptor, serialized_graph.data(), serialized_graph.size()));
 
-    EXPECT_EQ(status, HIPDNN_STATUS_SUCCESS);
     EXPECT_NE(descriptor, nullptr);
 
     delete descriptor;
@@ -71,18 +68,17 @@ TEST(DescriptorFactoryTest, CreateGraphExtNullDescriptorPointer)
     auto builder = flatbuffer_test_utils::create_valid_graph();
     auto serialized_graph = builder.Release();
 
-    auto status = Descriptor_factory::create_graph_ext(
-        nullptr, serialized_graph.data(), serialized_graph.size());
-
-    EXPECT_EQ(status, HIPDNN_STATUS_BAD_PARAM);
+    ASSERT_THROW(Descriptor_factory::create_graph_ext(
+                     nullptr, serialized_graph.data(), serialized_graph.size()),
+                 hipdnn_backend::Hipdnn_exception);
 }
 
 TEST(DescriptorFactoryTest, CreateGraphExtNullSerializedGraph)
 {
     hipdnnBackendDescriptor_t descriptor = nullptr;
-    auto status = Descriptor_factory::create_graph_ext(&descriptor, nullptr, 10);
+    ASSERT_THROW(Descriptor_factory::create_graph_ext(&descriptor, nullptr, 10),
+                 hipdnn_backend::Hipdnn_exception);
 
-    EXPECT_EQ(status, HIPDNN_STATUS_BAD_PARAM);
     EXPECT_EQ(descriptor, nullptr);
 }
 
@@ -92,9 +88,9 @@ TEST(DescriptorFactoryTest, CreateGraphExtZeroByteSize)
     auto serialized_graph = builder.Release();
 
     hipdnnBackendDescriptor_t descriptor = nullptr;
-    auto status = Descriptor_factory::create_graph_ext(&descriptor, serialized_graph.data(), 0);
+    ASSERT_THROW(Descriptor_factory::create_graph_ext(&descriptor, serialized_graph.data(), 0),
+                 hipdnn_backend::Hipdnn_exception);
 
-    EXPECT_EQ(status, HIPDNN_STATUS_BAD_PARAM);
     EXPECT_EQ(descriptor, nullptr);
 }
 
@@ -104,10 +100,10 @@ TEST(DescriptorFactoryTest, CreateGraphExtInvalidGraphData)
     size_t graph_byte_size = sizeof(invalid_serialized_graph);
 
     hipdnnBackendDescriptor_t descriptor = nullptr;
-    auto status = Descriptor_factory::create_graph_ext(
-        &descriptor, invalid_serialized_graph.data(), graph_byte_size);
+    ASSERT_THROW(Descriptor_factory::create_graph_ext(
+                     &descriptor, invalid_serialized_graph.data(), graph_byte_size),
+                 hipdnn_backend::Hipdnn_exception);
 
-    EXPECT_EQ(status, HIPDNN_STATUS_BAD_PARAM);
     EXPECT_EQ(descriptor, nullptr);
 }
 
@@ -115,21 +111,19 @@ TEST(DescriptorFactoryTest, TestHandleFactory)
 {
     hipdnnHandle_t handle_t = nullptr;
 
-    auto status = hipdnn_backend::Handle_factory::create_handle(&handle_t);
-    EXPECT_EQ(status, HIPDNN_STATUS_SUCCESS);
+    ASSERT_NO_THROW(hipdnn_backend::Handle_factory::create_handle(&handle_t));
     EXPECT_NE(handle_t, nullptr);
 
-    status = hipdnn_backend::Handle_factory::create_handle(nullptr);
-    EXPECT_EQ(status, HIPDNN_STATUS_BAD_PARAM);
+    ASSERT_THROW(hipdnn_backend::Handle_factory::create_handle(nullptr),
+                 hipdnn_backend::Hipdnn_exception);
 }
 
 TEST(Descriptor_Factory_Test, Create_Variant_Descriptor)
 {
     hipdnnBackendDescriptor_t descriptor = nullptr;
 
-    auto status = Descriptor_factory::create(HIPDNN_BACKEND_VARIANT_PACK_DESCRIPTOR, &descriptor);
-
-    EXPECT_EQ(status, HIPDNN_STATUS_SUCCESS);
+    ASSERT_NO_THROW(
+        Descriptor_factory::create(HIPDNN_BACKEND_VARIANT_PACK_DESCRIPTOR, &descriptor));
     EXPECT_NE(descriptor, nullptr);
 
     auto variant_descriptor = dynamic_cast<Variant_descriptor*>(descriptor);
@@ -142,18 +136,17 @@ TEST(Descriptor_Factory_Test, Create_Variant_Descriptor)
 
 TEST(Descriptor_Factory_Test, Create_Variant_Pack_With_Null_Descriptor)
 {
-    auto status = Descriptor_factory::create(HIPDNN_BACKEND_VARIANT_PACK_DESCRIPTOR, nullptr);
-
-    EXPECT_EQ(status, HIPDNN_STATUS_BAD_PARAM);
+    ASSERT_THROW(Descriptor_factory::create(HIPDNN_BACKEND_VARIANT_PACK_DESCRIPTOR, nullptr),
+                 hipdnn_backend::Hipdnn_exception);
 }
 
 TEST(Descriptor_Factory_Test, Create_Variant_Pack_With_Unsupported_Type)
 {
     hipdnnBackendDescriptor_t descriptor = nullptr;
 
-    auto status
-        = Descriptor_factory::create(static_cast<hipdnnBackendDescriptorType_t>(999), &descriptor);
+    ASSERT_THROW(
+        Descriptor_factory::create(static_cast<hipdnnBackendDescriptorType_t>(999), &descriptor),
+        hipdnn_backend::Hipdnn_exception);
 
-    EXPECT_EQ(status, HIPDNN_STATUS_NOT_SUPPORTED);
     EXPECT_EQ(descriptor, nullptr);
 }

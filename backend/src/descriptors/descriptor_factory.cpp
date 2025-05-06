@@ -5,18 +5,20 @@
 #include "error.hpp"
 #include "execution_plan_descriptor.hpp"
 #include "graph_descriptor.hpp"
+#include "hipdnn_exception.hpp"
 #include "variant_descriptor.hpp"
 #include <hipdnn_sdk/logging/logger.hpp>
 
 namespace hipdnn_backend
 {
 
-hipdnnStatus_t Descriptor_factory::create(hipdnnBackendDescriptorType_t descriptor_type,
-                                          hipdnnBackendDescriptor_t* descriptor)
+void Descriptor_factory::create(hipdnnBackendDescriptorType_t descriptor_type,
+                                hipdnnBackendDescriptor_t* descriptor)
 {
     if(descriptor == nullptr)
     {
-        return HIPDNN_STATUS_BAD_PARAM;
+        throw Hipdnn_exception(HIPDNN_STATUS_BAD_PARAM_NULL_POINTER,
+                               "hipdnnBackendDescriptor_t* is null.");
     }
 
     HIPDNN_LOG_INFO("Creating descriptor of type: {}",
@@ -34,36 +36,44 @@ hipdnnStatus_t Descriptor_factory::create(hipdnnBackendDescriptorType_t descript
         *descriptor = new Variant_descriptor();
         break;
     default:
-        return set_last_error(HIPDNN_STATUS_NOT_SUPPORTED,
-                              (std::string("Descriptor type ")
-                               + hipdnn_get_backend_descriptor_type_name(descriptor_type)
-                               + " is not supported.")
-                                  .c_str());
-        return HIPDNN_STATUS_NOT_SUPPORTED;
+        throw Hipdnn_exception(HIPDNN_STATUS_NOT_SUPPORTED,
+                               std::string("Descriptor type ")
+                                   + hipdnn_get_backend_descriptor_type_name(descriptor_type)
+                                   + " is not supported.");
     }
-
-    return HIPDNN_STATUS_SUCCESS;
 }
 
-hipdnnStatus_t Descriptor_factory::create_graph_ext(hipdnnBackendDescriptor_t* descriptor,
-                                                    const uint8_t* serialized_graph,
-                                                    size_t graph_byte_size)
+void Descriptor_factory::create_graph_ext(hipdnnBackendDescriptor_t* descriptor,
+                                          const uint8_t* serialized_graph,
+                                          size_t graph_byte_size)
 {
-    if(descriptor == nullptr || serialized_graph == nullptr || graph_byte_size == 0)
+    if(descriptor == nullptr)
     {
-        return HIPDNN_STATUS_BAD_PARAM;
+        throw Hipdnn_exception(HIPDNN_STATUS_BAD_PARAM_NULL_POINTER,
+                               "hipdnnBackendDescriptor_t* is null.");
+    }
+
+    if(serialized_graph == nullptr)
+    {
+        throw Hipdnn_exception(HIPDNN_STATUS_BAD_PARAM_NULL_POINTER, "serialized_graph is null.");
+    }
+    if(graph_byte_size == 0)
+    {
+        throw Hipdnn_exception(HIPDNN_STATUS_BAD_PARAM, "graph_byte_size is 0.");
     }
 
     auto graph_descriptor = new Graph_descriptor();
-    if(auto status = graph_descriptor->deserialize_graph(serialized_graph, graph_byte_size);
-       status != HIPDNN_STATUS_SUCCESS)
+    try
+    {
+        graph_descriptor->deserialize_graph(serialized_graph, graph_byte_size);
+    }
+    catch(const std::exception& e)
     {
         delete graph_descriptor;
-        return status;
+        throw;
     }
-    *descriptor = graph_descriptor;
 
-    return HIPDNN_STATUS_SUCCESS;
+    *descriptor = graph_descriptor;
 }
 
 } // namespace hipdnn_backend

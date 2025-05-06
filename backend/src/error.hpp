@@ -17,6 +17,7 @@ inline hipdnnStatus_t set_last_error(hipdnnStatus_t status, const char* message)
     //TODO
     // Set the last error message
     // stash the message in some global theadsafe map.
+
     return status;
 }
 

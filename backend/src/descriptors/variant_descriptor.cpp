@@ -5,6 +5,7 @@
 #include "error.hpp"
 #include "flatbuffer_utilities.hpp"
 #include "hipdnn_backend_descriptor_type.h"
+#include "hipdnn_exception.hpp"
 
 namespace hipdnn_backend
 {
@@ -14,18 +15,19 @@ Variant_descriptor::Variant_descriptor()
     type = HIPDNN_BACKEND_VARIANT_PACK_DESCRIPTOR;
 }
 
-hipdnnStatus_t Variant_descriptor::finalize()
+void Variant_descriptor::finalize()
 {
-    if(_data_pointers.empty() || _unique_ids.empty())
-    {
-        return HIPDNN_STATUS_BAD_PARAM;
-    }
-
     if(_data_pointers.size() != _unique_ids.size())
     {
-        return HIPDNN_STATUS_BAD_PARAM;
+        throw Hipdnn_exception(HIPDNN_STATUS_BAD_PARAM, "Data pointers and unique ids don't match");
     }
-    return Backend_descriptor::finalize();
+
+    if(_data_pointers.empty())
+    {
+        throw Hipdnn_exception(HIPDNN_STATUS_BAD_PARAM, "Data pointers and unique ids are empty");
+    }
+
+    hipdnnBackendDescriptor::finalize();
 }
 
 hipdnnStatus_t Variant_descriptor::get_attribute(hipdnnBackendAttributeName_t attribute_name,

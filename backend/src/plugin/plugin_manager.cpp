@@ -16,8 +16,9 @@ void Plugin_manager::initialize(
     _plugins.push_back(std::make_shared<Fake_plugin>());
 }
 
-std::set<int64_t> Plugin_manager::get_applicable_engines(Graph_descriptor* graph,
-                                                         Handle* handle /*, Heuristic_Details*/)
+std::set<int64_t>
+    Plugin_manager::get_applicable_engines(Graph_descriptor* graph,
+                                           hipdnnHandle* handle /*, Heuristic_Details*/)
 {
     (void)handle;
     std::set<int64_t> applicable_engines;

@@ -12,7 +12,7 @@ namespace hipdnn_backend
 class Handle_factory
 {
 public:
-    static hipdnnStatus_t create_handle(hipdnnHandle_t* handle);
+    static void create_handle(hipdnnHandle_t* handle);
 };
 
 } // namespace hipdnn_backend

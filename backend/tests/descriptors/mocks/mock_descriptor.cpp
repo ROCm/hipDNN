@@ -4,6 +4,7 @@
 #include "mock_descriptor.hpp"
 #include "error.hpp"
 #include "hipdnn_backend_descriptor_type.h"
+#include "hipdnn_exception.hpp"
 
 #include <utility>
 
@@ -11,12 +12,12 @@ namespace hipdnn_backend
 {
 
 Mock_descriptor::Mock_descriptor(hipdnnBackendDescriptorType_t desc_type, bool finalized)
-    : Backend_descriptor()
+    : hipdnnBackendDescriptor()
 {
     type = desc_type;
     if(finalized)
     {
-        Backend_descriptor::finalize();
+        hipdnnBackendDescriptor::finalize();
     }
 }
 
@@ -46,15 +47,15 @@ hipdnnStatus_t Mock_descriptor::set_data(hipdnnBackendAttributeName_t attribute_
     return HIPDNN_STATUS_SUCCESS;
 }
 
-hipdnnStatus_t Mock_descriptor::finalize()
+void Mock_descriptor::finalize()
 {
     if(is_finalized())
     {
-        return set_last_error(HIPDNN_STATUS_NOT_INITIALIZED,
-                              "Mock_descriptor::finalize() is already finalized.");
+        throw Hipdnn_exception(HIPDNN_STATUS_NOT_INITIALIZED,
+                               "Mock_descriptor::finalize() is already finalized.");
     }
 
-    return Backend_descriptor::finalize();
+    hipdnnBackendDescriptor::finalize();
 }
 
 hipdnnStatus_t Mock_descriptor::get_attribute(hipdnnBackendAttributeName_t attribute_name,
