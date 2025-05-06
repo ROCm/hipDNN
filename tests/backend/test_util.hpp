@@ -18,4 +18,8 @@ void populate_finalized_test_engine(hipdnnBackendDescriptor_t engine,
                                     hipdnnBackendDescriptor_t* graph,
                                     int64_t gidx);
 
+void create_test_engine(hipdnnBackendDescriptor_t* engine,
+                        hipdnnBackendDescriptor_t* graph,
+                        int64_t gidx);
+
 } // namespace test_util

@@ -2,12 +2,16 @@
 // SPDX-License-Identifier:  MIT
 
 #include "hipdnn_backend.h"
+#include "test_util.hpp"
+
 #include <gtest/gtest.h>
 
 class Engine_config_api_tests : public ::testing::Test
 {
 protected:
     hipdnnBackendDescriptor_t _engine_config;
+    hipdnnBackendDescriptor_t _engine = nullptr;
+    hipdnnBackendDescriptor_t _graph = nullptr;
 
     void SetUp() override
     {
@@ -20,7 +24,35 @@ protected:
     void TearDown() override
     {
         EXPECT_EQ(hipdnnBackendDestroyDescriptor(_engine_config), HIPDNN_STATUS_SUCCESS);
+        if(_engine != nullptr)
+        {
+            EXPECT_EQ(hipdnnBackendDestroyDescriptor(_engine), HIPDNN_STATUS_SUCCESS);
+        }
+        if(_graph != nullptr)
+        {
+            EXPECT_EQ(hipdnnBackendDestroyDescriptor(_graph), HIPDNN_STATUS_SUCCESS);
+        }
     }
 };
 
 TEST_F(Engine_config_api_tests, CreateEngine) {}
+
+TEST_F(Engine_config_api_tests, SetEngineConfigEngine)
+{
+    int64_t gidx = -1; // TODO hardcode for now
+
+    EXPECT_EQ(hipdnnBackendSetAttribute(_engine_config,
+                                        HIPDNN_ATTR_ENGINECFG_ENGINE,
+                                        HIPDNN_TYPE_BACKEND_DESCRIPTOR,
+                                        1,
+                                        &_engine),
+              HIPDNN_STATUS_BAD_PARAM_NULL_POINTER);
+
+    test_util::create_test_engine(&_engine, &_graph, gidx);
+    EXPECT_EQ(hipdnnBackendSetAttribute(_engine_config,
+                                        HIPDNN_ATTR_ENGINECFG_ENGINE,
+                                        HIPDNN_TYPE_BACKEND_DESCRIPTOR,
+                                        1,
+                                        &_engine),
+              HIPDNN_STATUS_SUCCESS);
+}
