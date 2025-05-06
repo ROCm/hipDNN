@@ -88,3 +88,19 @@ TEST_F(Engine_api_tests, FinalizeEngine)
     test_util::populate_test_engine(_engine, &_graph, gidx);
     EXPECT_EQ(hipdnnBackendFinalize(_engine), HIPDNN_STATUS_SUCCESS);
 }
+
+TEST_F(Engine_api_tests, GetEngineGraph)
+{
+    hipdnnBackendDescriptor_t graph;
+    int64_t gidx = 0;
+
+    test_util::populate_finalized_test_engine(_engine, &_graph, gidx);
+    EXPECT_EQ(hipdnnBackendGetAttribute(_engine,
+                                        HIPDNN_ATTR_ENGINE_OPERATION_GRAPH,
+                                        HIPDNN_TYPE_BACKEND_DESCRIPTOR,
+                                        1,
+                                        nullptr,
+                                        &graph),
+              HIPDNN_STATUS_SUCCESS);
+    EXPECT_EQ(graph, _graph);
+}
