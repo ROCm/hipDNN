@@ -104,3 +104,16 @@ TEST_F(Engine_api_tests, GetEngineGraph)
               HIPDNN_STATUS_SUCCESS);
     EXPECT_EQ(graph, _graph);
 }
+
+TEST_F(Engine_api_tests, GetEngineGlobalIndex)
+{
+    int64_t gidx = 1;
+    int64_t gidx_out;
+
+    test_util::populate_finalized_test_engine(_engine, &_graph, gidx);
+    EXPECT_EQ(
+        hipdnnBackendGetAttribute(
+            _engine, HIPDNN_ATTR_ENGINE_GLOBAL_INDEX, HIPDNN_TYPE_INT64, 1, nullptr, &gidx_out),
+        HIPDNN_STATUS_SUCCESS);
+    EXPECT_EQ(gidx_out, gidx);
+}
