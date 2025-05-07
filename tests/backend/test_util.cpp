@@ -65,4 +65,18 @@ void create_test_engine(hipdnnBackendDescriptor_t* engine,
     populate_finalized_test_engine(*engine, graph, gidx);
 }
 
+void populate_test_engine_config(hipdnnBackendDescriptor_t* engine_config,
+                                 hipdnnBackendDescriptor_t* engine,
+                                 hipdnnBackendDescriptor_t* graph,
+                                 int64_t gidx)
+{
+    create_test_engine(engine, graph, gidx);
+    ASSERT_EQ(hipdnnBackendSetAttribute(*engine_config,
+                                        HIPDNN_ATTR_ENGINECFG_ENGINE,
+                                        HIPDNN_TYPE_BACKEND_DESCRIPTOR,
+                                        1,
+                                        engine),
+              HIPDNN_STATUS_SUCCESS);
+}
+
 } // namespace test_util

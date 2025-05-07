@@ -3,18 +3,17 @@
 
 #pragma once
 
+#include "descriptors/engine_config_descriptor.hpp"
 #include "descriptors/execution_plan_descriptor.hpp"
 #include "descriptors/graph_descriptor.hpp"
 #include "descriptors/variant_descriptor.hpp"
 #include "handle/handle.hpp"
 #include "hipdnn_plugin_base.hpp"
 
-class Engine_config_descriptor;
-
 namespace hipdnn_backend
 {
 
-class Plugin_manager
+struct Plugin_manager
 {
     // Populate the hipDNNPlugin's by finding the sources,
     // and constructing the cAPIPlugin, and then constructing

@@ -56,3 +56,12 @@ TEST_F(Engine_config_api_tests, SetEngineConfigEngine)
                                         &_engine),
               HIPDNN_STATUS_SUCCESS);
 }
+
+TEST_F(Engine_config_api_tests, FinalizeEngineConfig)
+{
+    int64_t gidx = -1; // TODO hardcode for now
+
+    EXPECT_EQ(hipdnnBackendFinalize(_engine_config), HIPDNN_STATUS_BAD_PARAM);
+    test_util::populate_test_engine_config(&_engine_config, &_engine, &_graph, gidx);
+    EXPECT_EQ(hipdnnBackendFinalize(_engine_config), HIPDNN_STATUS_SUCCESS);
+}

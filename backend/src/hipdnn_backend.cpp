@@ -8,6 +8,7 @@
 #include "handle/handle_factory.hpp"
 #include "helpers.hpp"
 #include "hipdnn_exception.hpp"
+#include "plugin/plugin_manager.hpp"
 
 #include <iostream>
 
@@ -113,6 +114,22 @@ HIPDNN_BACKEND_EXPORT hipdnnStatus_t hipdnnBackendFinalize(hipdnnBackendDescript
         throw_if_invalid_descriptor(descriptor);
 
         descriptor->finalize();
+
+        if(descriptor->type == HIPDNN_BACKEND_ENGINECFG_DESCRIPTOR)
+        {
+            auto engine_config
+                = dynamic_cast<hipdnn_backend::Engine_config_descriptor*>(descriptor);
+            if(engine_config == nullptr)
+            {
+                throw hipdnn_backend::Hipdnn_exception(
+                    HIPDNN_STATUS_BAD_PARAM,
+                    "hipdnnBackendDescriptor_t is not a valid Engine_config_descriptor");
+            }
+
+            Plugin_manager plugin_manager;
+            plugin_manager.initialize();
+            plugin_manager.finalize_engine_config(engine_config);
+        }
     });
 }
 
