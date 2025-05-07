@@ -34,8 +34,8 @@ public:
     void make_engine_config_finalized() const
     {
         set_engine();
-        set_max_workspace_size();
         ASSERT_NO_THROW(_engine_config->finalize());
+        set_max_workspace_size();
     }
 
 protected:
@@ -105,11 +105,11 @@ TEST_F(Engine_config_descriptor_test, SetEngineConfigDescriptorMaxWorkspaceSize)
     ASSERT_EQ(status, HIPDNN_STATUS_INTERNAL_ERROR);
 
     status = _engine_config->set_max_workspace_size(workspace_size);
-    ASSERT_EQ(status, HIPDNN_STATUS_SUCCESS);
+    ASSERT_EQ(status, HIPDNN_STATUS_INTERNAL_ERROR);
 
     make_engine_config_finalized();
     status = _engine_config->set_max_workspace_size(workspace_size);
-    ASSERT_EQ(status, HIPDNN_STATUS_INTERNAL_ERROR);
+    ASSERT_EQ(status, HIPDNN_STATUS_SUCCESS);
 }
 
 TEST_F(Engine_config_descriptor_test, SetAttrOnFinalizedEngineConfigDescriptor)
@@ -128,13 +128,8 @@ TEST_F(Engine_config_descriptor_test, FinalizeEngineConfigDescriptor)
 
     set_engine();
 
-    ASSERT_THROW_HIPDNN_STATUS(_engine_config->finalize(), HIPDNN_STATUS_BAD_PARAM);
-
-    set_max_workspace_size();
-
     ASSERT_NO_THROW(_engine_config->finalize());
-
-    ASSERT_THROW_HIPDNN_STATUS(_engine_config->finalize(), HIPDNN_STATUS_BAD_PARAM);
+    set_max_workspace_size();
 }
 
 TEST_F(Engine_config_descriptor_test, GetAttrOnUnfinalizedEngineConfigDescriptor)

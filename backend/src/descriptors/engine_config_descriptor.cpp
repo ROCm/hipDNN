@@ -30,13 +30,6 @@ void Engine_config_descriptor::finalize()
                                "Engine is not set.");
     }
 
-    if(_max_workspace_size == INVALID_WORKSPACE_SIZE)
-    {
-        throw Hipdnn_exception(HIPDNN_STATUS_BAD_PARAM,
-                               "Engine_config_descriptor::finalize() failed: "
-                               "Max workspace size is not set.");
-    }
-
     hipdnnBackendDescriptor::finalize();
 }
 
@@ -225,11 +218,11 @@ hipdnnStatus_t Engine_config_descriptor::set_max_workspace_size(int64_t workspac
     // This should only be called from the plugin manager, so all errors should be
     // internal errors rather than user errors.
 
-    if(is_finalized())
+    if(!is_finalized())
     {
         return set_last_error(HIPDNN_STATUS_INTERNAL_ERROR,
                               "Internal error:  Failed to set max workspace size:"
-                              "Already finalized.");
+                              "Must be called after finalized.");
     }
 
     if(workspace_size < 0)
