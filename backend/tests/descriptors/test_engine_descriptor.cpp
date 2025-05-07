@@ -21,13 +21,24 @@ public:
     std::unique_ptr<Mock_descriptor> _mock_graph_bad_type = nullptr;
     std::unique_ptr<Mock_descriptor> _mock_graph_unfinished = nullptr;
 
-    void set_graph()
+    void set_graph() const
     {
-        ASSERT_EQ(_engine->set_attribute(HIPDNN_ATTR_ENGINE_OPERATION_GRAPH,
-                                         HIPDNN_TYPE_BACKEND_DESCRIPTOR,
-                                         1,
-                                         &_mock_graph),
-                  HIPDNN_STATUS_SUCCESS);
+        ASSERT_NO_THROW(_engine->set_attribute(
+            HIPDNN_ATTR_ENGINE_OPERATION_GRAPH, HIPDNN_TYPE_BACKEND_DESCRIPTOR, 1, &_mock_graph));
+    }
+
+    void set_global_index() const
+    {
+        int64_t gidx = 0;
+        ASSERT_NO_THROW(
+            _engine->set_attribute(HIPDNN_ATTR_ENGINE_GLOBAL_INDEX, HIPDNN_TYPE_INT64, 1, &gidx));
+    }
+
+    void make_engine_finalized() const
+    {
+        set_graph();
+        set_global_index();
+        ASSERT_NO_THROW(_engine->finalize());
     }
 
 protected:
@@ -93,9 +104,10 @@ TEST_F(Engine_descriptor_test, SetEngineDescriptorGlobalId)
 {
     int64_t gidx = 0;
 
-    ASSERT_THROW_HIPDNN_STATUS(_engine->set_attribute(
-        HIPDNN_ATTR_ENGINE_GLOBAL_INDEX, HIPDNN_TYPE_BACKEND_DESCRIPTOR, 1, &gidx),
-                               HIPDNN_STATUS_BAD_PARAM);
+    ASSERT_THROW_HIPDNN_STATUS(
+        _engine->set_attribute(
+            HIPDNN_ATTR_ENGINE_GLOBAL_INDEX, HIPDNN_TYPE_BACKEND_DESCRIPTOR, 1, &gidx),
+        HIPDNN_STATUS_BAD_PARAM);
 
     ASSERT_THROW_HIPDNN_STATUS(
         _engine->set_attribute(HIPDNN_ATTR_ENGINE_GLOBAL_INDEX, HIPDNN_TYPE_INT64, 2, &gidx),
@@ -107,4 +119,26 @@ TEST_F(Engine_descriptor_test, SetEngineDescriptorGlobalId)
 
     ASSERT_NO_THROW(
         _engine->set_attribute(HIPDNN_ATTR_ENGINE_GLOBAL_INDEX, HIPDNN_TYPE_INT64, 1, &gidx));
+}
+
+TEST_F(Engine_descriptor_test, SetAttrOnFinalizedEngineDescriptor)
+{
+    make_engine_finalized();
+
+    ASSERT_THROW_HIPDNN_STATUS(
+        _engine->set_attribute(
+            HIPDNN_ATTR_ENGINE_OPERATION_GRAPH, HIPDNN_TYPE_BACKEND_DESCRIPTOR, 1, &_mock_graph),
+        HIPDNN_STATUS_NOT_INITIALIZED);
+}
+
+TEST_F(Engine_descriptor_test, FinalizeEngineDescriptor)
+{
+    ASSERT_THROW_HIPDNN_STATUS(_engine->finalize(), HIPDNN_STATUS_BAD_PARAM);
+
+    set_graph();
+    set_global_index();
+
+    ASSERT_NO_THROW(_engine->finalize());
+
+    ASSERT_THROW_HIPDNN_STATUS(_engine->finalize(), HIPDNN_STATUS_BAD_PARAM);
 }

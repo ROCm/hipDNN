@@ -16,9 +16,28 @@ Engine_descriptor::Engine_descriptor()
 
 void Engine_descriptor::finalize()
 {
-    throw Hipdnn_exception(HIPDNN_STATUS_NOT_SUPPORTED,
-                           "Engine_descriptor::finalize() is not implemented yet.");
-    // TODO call base finalize();
+    if(is_finalized())
+    {
+        throw Hipdnn_exception(HIPDNN_STATUS_BAD_PARAM,
+                               "Engine_descriptor::finalize() failed: "
+                               "Already finalized.");
+    }
+
+    if(_graph == nullptr)
+    {
+        throw Hipdnn_exception(HIPDNN_STATUS_BAD_PARAM,
+                               "Engine_descriptor::finalize() failed: "
+                               "Graph is not set.");
+    }
+
+    if(!_engine_id_set)
+    {
+        throw Hipdnn_exception(HIPDNN_STATUS_BAD_PARAM,
+                               "Engine_descriptor::finalize() failed: "
+                               "Engine id is not set.");
+    }
+
+    hipdnnBackendDescriptor::finalize();
 }
 
 hipdnnStatus_t
