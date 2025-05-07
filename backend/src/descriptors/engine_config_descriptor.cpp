@@ -16,9 +16,28 @@ Engine_config_descriptor::Engine_config_descriptor()
 
 void Engine_config_descriptor::finalize()
 {
-    throw Hipdnn_exception(HIPDNN_STATUS_NOT_SUPPORTED,
-                           "Engine_config_descriptor::finalize() is not implemented yet.");
-    // TODO return Backend_descriptor::finalize();
+    if(is_finalized())
+    {
+        throw Hipdnn_exception(HIPDNN_STATUS_BAD_PARAM,
+                               "Engine_config_descriptor::finalize() failed: "
+                               "Already finalized.");
+    }
+
+    if(_engine == nullptr)
+    {
+        throw Hipdnn_exception(HIPDNN_STATUS_BAD_PARAM,
+                               "Engine_config_descriptor::finalize() failed: "
+                               "Engine is not set.");
+    }
+
+    if(_max_workspace_size == INVALID_WORKSPACE_SIZE)
+    {
+        throw Hipdnn_exception(HIPDNN_STATUS_BAD_PARAM,
+                               "Engine_config_descriptor::finalize() failed: "
+                               "Max workspace size is not set.");
+    }
+
+    hipdnnBackendDescriptor::finalize();
 }
 
 hipdnnStatus_t Engine_config_descriptor::get_attribute(

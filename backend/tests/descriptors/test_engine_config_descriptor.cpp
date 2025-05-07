@@ -20,6 +20,24 @@ public:
     std::unique_ptr<Mock_descriptor> _mock_engine_bad_type = nullptr;
     std::unique_ptr<Mock_descriptor> _mock_engine_unfinished = nullptr;
 
+    void set_engine() const
+    {
+        ASSERT_NO_THROW(_engine_config->set_attribute(
+            HIPDNN_ATTR_ENGINECFG_ENGINE, HIPDNN_TYPE_BACKEND_DESCRIPTOR, 1, &_mock_engine));
+    }
+
+    void set_max_workspace_size() const
+    {
+        ASSERT_NO_THROW(_engine_config->set_max_workspace_size(1024));
+    }
+
+    void make_engine_config_finalized() const
+    {
+        set_engine();
+        set_max_workspace_size();
+        ASSERT_NO_THROW(_engine_config->finalize());
+    }
+
 protected:
     void SetUp() override
     {
@@ -88,4 +106,33 @@ TEST_F(Engine_config_descriptor_test, SetEngineConfigDescriptorMaxWorkspaceSize)
 
     status = _engine_config->set_max_workspace_size(workspace_size);
     ASSERT_EQ(status, HIPDNN_STATUS_SUCCESS);
+
+    make_engine_config_finalized();
+    status = _engine_config->set_max_workspace_size(workspace_size);
+    ASSERT_EQ(status, HIPDNN_STATUS_INTERNAL_ERROR);
+}
+
+TEST_F(Engine_config_descriptor_test, SetAttrOnFinalizedEngineConfigDescriptor)
+{
+    make_engine_config_finalized();
+
+    ASSERT_THROW_HIPDNN_STATUS(
+        _engine_config->set_attribute(
+            HIPDNN_ATTR_ENGINECFG_ENGINE, HIPDNN_TYPE_BACKEND_DESCRIPTOR, 1, &_mock_engine),
+        HIPDNN_STATUS_NOT_INITIALIZED);
+}
+
+TEST_F(Engine_config_descriptor_test, FinalizeEngineConfigDescriptor)
+{
+    ASSERT_THROW_HIPDNN_STATUS(_engine_config->finalize(), HIPDNN_STATUS_BAD_PARAM);
+
+    set_engine();
+
+    ASSERT_THROW_HIPDNN_STATUS(_engine_config->finalize(), HIPDNN_STATUS_BAD_PARAM);
+
+    set_max_workspace_size();
+
+    ASSERT_NO_THROW(_engine_config->finalize());
+
+    ASSERT_THROW_HIPDNN_STATUS(_engine_config->finalize(), HIPDNN_STATUS_BAD_PARAM);
 }
