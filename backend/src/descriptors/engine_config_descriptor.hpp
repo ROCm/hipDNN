@@ -12,12 +12,15 @@ class Engine_config_descriptor : public hipdnnBackendDescriptor
 {
 private:
     hipdnnBackendDescriptor_t _engine = nullptr;
+    int64_t _max_workspace_size = INVALID_WORKSPACE_SIZE;
 
     void set_engine(hipdnnBackendAttributeType_t attribute_type,
                     int64_t element_count,
                     const void* array_of_elements);
 
 public:
+    static constexpr int64_t INVALID_WORKSPACE_SIZE = -1;
+
     Engine_config_descriptor();
     ~Engine_config_descriptor() override = default;
 
@@ -33,6 +36,8 @@ public:
                                  hipdnnBackendAttributeType_t attribute_type,
                                  int64_t element_count,
                                  const void* array_of_elements) override;
+
+    hipdnnStatus_t set_max_workspace_size(int64_t max_workspace_size);
 };
 
 } // namespace hipdnn_backend

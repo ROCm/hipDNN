@@ -77,3 +77,15 @@ TEST_F(Engine_config_descriptor_test, SetEngineConfigDescriptorEngine)
     ASSERT_NO_THROW(_engine_config->set_attribute(
         HIPDNN_ATTR_ENGINECFG_ENGINE, HIPDNN_TYPE_BACKEND_DESCRIPTOR, 1, &_mock_engine));
 }
+
+TEST_F(Engine_config_descriptor_test, SetEngineConfigDescriptorMaxWorkspaceSize)
+{
+    int64_t workspace_size = 1024;
+    int64_t bad_workspace_size = -1024;
+
+    auto status = _engine_config->set_max_workspace_size(bad_workspace_size);
+    ASSERT_EQ(status, HIPDNN_STATUS_INTERNAL_ERROR);
+
+    status = _engine_config->set_max_workspace_size(workspace_size);
+    ASSERT_EQ(status, HIPDNN_STATUS_SUCCESS);
+}
