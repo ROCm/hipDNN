@@ -136,3 +136,61 @@ TEST_F(Engine_config_descriptor_test, FinalizeEngineConfigDescriptor)
 
     ASSERT_THROW_HIPDNN_STATUS(_engine_config->finalize(), HIPDNN_STATUS_BAD_PARAM);
 }
+
+TEST_F(Engine_config_descriptor_test, GetAttrOnUnfinalizedEngineConfigDescriptor)
+{
+    hipdnnBackendDescriptor_t dummy_engine = nullptr;
+
+    ASSERT_THROW_HIPDNN_STATUS(_engine_config->get_attribute(HIPDNN_ATTR_ENGINECFG_ENGINE,
+                                                             HIPDNN_TYPE_BACKEND_DESCRIPTOR,
+                                                             1,
+                                                             nullptr,
+                                                             &dummy_engine),
+                               HIPDNN_STATUS_NOT_INITIALIZED);
+}
+
+TEST_F(Engine_config_descriptor_test, GetEngineConfigDescriptorUnsupportedAttr)
+{
+    hipdnnBackendDescriptor_t dummy = nullptr;
+
+    make_engine_config_finalized();
+
+    ASSERT_THROW_HIPDNN_STATUS(
+        _engine_config->get_attribute(HIPDNN_ATTR_ENGINECFG_INTERMEDIATE_INFO,
+                                      HIPDNN_TYPE_BACKEND_DESCRIPTOR,
+                                      1,
+                                      nullptr,
+                                      &dummy),
+        HIPDNN_STATUS_NOT_SUPPORTED);
+}
+
+TEST_F(Engine_config_descriptor_test, GetEngineConfigDescriptorEngine)
+{
+    hipdnnBackendDescriptor_t engine = nullptr;
+
+    make_engine_config_finalized();
+
+    ASSERT_THROW_HIPDNN_STATUS(
+        _engine_config->get_attribute(
+            HIPDNN_ATTR_ENGINECFG_ENGINE, HIPDNN_TYPE_INT64, 1, nullptr, &engine),
+        HIPDNN_STATUS_BAD_PARAM);
+
+    ASSERT_THROW_HIPDNN_STATUS(
+        _engine_config->get_attribute(
+            HIPDNN_ATTR_ENGINECFG_ENGINE, HIPDNN_TYPE_BACKEND_DESCRIPTOR, 2, nullptr, &engine),
+        HIPDNN_STATUS_BAD_PARAM);
+
+    ASSERT_THROW_HIPDNN_STATUS(
+        _engine_config->get_attribute(
+            HIPDNN_ATTR_ENGINECFG_ENGINE, HIPDNN_TYPE_BACKEND_DESCRIPTOR, 1, nullptr, nullptr),
+        HIPDNN_STATUS_BAD_PARAM_NULL_POINTER);
+
+    ASSERT_NO_THROW(_engine_config->get_attribute(
+        HIPDNN_ATTR_ENGINECFG_ENGINE, HIPDNN_TYPE_BACKEND_DESCRIPTOR, 1, nullptr, &engine));
+    ASSERT_EQ(engine, _mock_engine.get());
+
+    int64_t count;
+    ASSERT_NO_THROW(_engine_config->get_attribute(
+        HIPDNN_ATTR_ENGINECFG_ENGINE, HIPDNN_TYPE_BACKEND_DESCRIPTOR, 1, &count, &engine));
+    ASSERT_EQ(count, 1);
+}
