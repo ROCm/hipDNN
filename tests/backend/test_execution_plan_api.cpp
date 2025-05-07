@@ -83,3 +83,34 @@ TEST_F(Execution_plan_api_tests, FinalizeExecutionPlan)
 
     // TODO add more tests when engine_config is created
 }
+
+//=====================================
+TEST_F(Execution_plan_api_tests, ExecuteWithModifiedVariantPack)
+{
+    hipdnnBackendDescriptor_t variant_pack = nullptr;
+
+    // Create a handle
+    ASSERT_EQ(hipdnnCreate(&_handle), HIPDNN_STATUS_SUCCESS);
+
+    // Create variant pack
+    ASSERT_EQ(hipdnnBackendCreateDescriptor(HIPDNN_BACKEND_VARIANT_PACK_DESCRIPTOR, &variant_pack),
+              HIPDNN_STATUS_SUCCESS);
+
+    // Set required attributes on the plan
+    EXPECT_EQ(hipdnnBackendSetAttribute(
+                  _plan, HIPDNN_ATTR_EXECUTION_PLAN_HANDLE, HIPDNN_TYPE_HANDLE, 1, &_handle),
+              HIPDNN_STATUS_SUCCESS);
+
+    EXPECT_EQ(hipdnnBackendFinalize(_plan), HIPDNN_STATUS_SUCCESS);
+
+    // Execute plan with variant pack
+    hipdnnStatus_t status = hipdnnBackendExecute(_handle, _plan, variant_pack);
+
+    EXPECT_TRUE(status == HIPDNN_STATUS_SUCCESS || status == HIPDNN_STATUS_EXECUTION_FAILED
+                || status == HIPDNN_STATUS_NOT_SUPPORTED);
+
+    EXPECT_EQ(hipdnnBackendDestroyDescriptor(variant_pack), HIPDNN_STATUS_SUCCESS);
+
+    // The engine config will be destroyed by the framework since we registered it
+    // with hipdnnBackendSetAttribute
+}

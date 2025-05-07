@@ -4,9 +4,11 @@
 #include "hipdnn_backend.h"
 #include "descriptors/backend_descriptor.hpp"
 #include "descriptors/descriptor_factory.hpp"
+#include "descriptors/variant_descriptor.hpp"
 #include "handle/handle.hpp"
 #include "handle/handle_factory.hpp"
 #include "helpers.hpp"
+#include "plugin/plugin_manager.hpp"
 
 #include <iostream>
 
@@ -118,7 +120,7 @@ HIPDNN_BACKEND_EXPORT hipdnnStatus_t
         false);
 }
 
-HIPDNN_BACKEND_EXPORT hipdnnStatus_t hipdnnBackendExecute([[maybe_unused]] hipdnnHandle_t handle,
+HIPDNN_BACKEND_EXPORT hipdnnStatus_t hipdnnBackendExecute(hipdnnHandle_t handle,
                                                           hipdnnBackendDescriptor_t execution_plan,
                                                           hipdnnBackendDescriptor_t variant_pack)
 {
@@ -136,7 +138,44 @@ HIPDNN_BACKEND_EXPORT hipdnnStatus_t hipdnnBackendExecute([[maybe_unused]] hipdn
                 return status;
             }
 
-            return HIPDNN_STATUS_NOT_SUPPORTED;
+            auto backend_handle = dynamic_cast<Handle*>(handle);
+            if(backend_handle == nullptr)
+            {
+                return HIPDNN_STATUS_BAD_PARAM;
+            }
+
+            auto plan_desc = dynamic_cast<Execution_plan_descriptor*>(execution_plan);
+            if(plan_desc == nullptr)
+            {
+                return HIPDNN_STATUS_BAD_PARAM;
+            }
+
+            auto variant_desc = dynamic_cast<Variant_descriptor*>(variant_pack);
+            if(variant_desc == nullptr)
+            {
+                return HIPDNN_STATUS_BAD_PARAM;
+            }
+
+            try
+            {
+                Plugin_manager plugin_manager;
+
+                // Initialize the plugin manager to load all available backend plugins
+                // This prepares the runtime environment for executing operations by loading
+                // appropriate plugins based on hardware capabilities and configurations
+                plugin_manager.initialize();
+                plugin_manager.execute(plan_desc, backend_handle, variant_desc);
+                return HIPDNN_STATUS_SUCCESS;
+            }
+            catch(const std::exception& ex)
+            {
+                return set_last_error(HIPDNN_STATUS_EXECUTION_FAILED, ex.what());
+            }
+            catch(...)
+            {
+                return set_last_error(HIPDNN_STATUS_EXECUTION_FAILED,
+                                      "Unknown error occurred during execution");
+            }
         },
         false);
 }
@@ -151,11 +190,17 @@ HIPDNN_BACKEND_EXPORT hipdnnStatus_t hipdnnBackendFinalize(hipdnnBackendDescript
                 return status;
             }
 
+            // plugin init and finalize
+
             auto backend_descriptor = dynamic_cast<hipdnn_backend::Backend_descriptor*>(descriptor);
             if(backend_descriptor == nullptr)
             {
                 return HIPDNN_STATUS_BAD_PARAM;
             }
+
+            // 1) call finalize on plugin manager
+            // 2) so that engine config can set the workspace
+            // 3) finalize on engine config
 
             return backend_descriptor->finalize();
         },
