@@ -60,6 +60,8 @@ hipdnnStatus_t
         get_graph(attribute_type, requested_element_count, element_count, array_of_elements);
         return HIPDNN_STATUS_SUCCESS;
     case HIPDNN_ATTR_ENGINE_GLOBAL_INDEX:
+        get_global_id(attribute_type, requested_element_count, element_count, array_of_elements);
+        return HIPDNN_STATUS_SUCCESS;
     case HIPDNN_ATTR_ENGINE_KNOB_INFO:
     case HIPDNN_ATTR_ENGINE_NUMERICAL_NOTE:
     case HIPDNN_ATTR_ENGINE_LAYOUT_INFO:
@@ -106,6 +108,40 @@ void Engine_descriptor::get_graph(hipdnnBackendAttributeType_t attribute_type,
     }
 
     *reinterpret_cast<hipdnnBackendDescriptor_t*>(array_of_elements) = _graph;
+}
+
+void Engine_descriptor::get_global_id(hipdnnBackendAttributeType_t attribute_type,
+                                      int64_t requested_element_count,
+                                      int64_t* element_count,
+                                      void* array_of_elements) const
+{
+    if(attribute_type != HIPDNN_TYPE_INT64)
+    {
+        throw Hipdnn_exception(HIPDNN_STATUS_BAD_PARAM,
+                               "Engine_descriptor failed to get global engine ID: "
+                               "Invalid attribute type.");
+    }
+
+    if(requested_element_count != 1)
+    {
+        throw Hipdnn_exception(HIPDNN_STATUS_BAD_PARAM,
+                               "Engine_descriptor failed to get global engine ID: "
+                               "Invalid element count.");
+    }
+
+    if(array_of_elements == nullptr)
+    {
+        throw Hipdnn_exception(HIPDNN_STATUS_BAD_PARAM_NULL_POINTER,
+                               "Engine_descriptor failed to get global engine ID: "
+                               "Null pointer.");
+    }
+
+    if(element_count != nullptr)
+    {
+        *element_count = 1;
+    }
+
+    *reinterpret_cast<int64_t*>(array_of_elements) = _engine_id;
 }
 
 hipdnnStatus_t Engine_descriptor::set_attribute(hipdnnBackendAttributeName_t attribute_name,

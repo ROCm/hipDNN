@@ -199,3 +199,34 @@ TEST_F(Engine_descriptor_test, GetEngineDescriptorGraph)
         HIPDNN_ATTR_ENGINE_OPERATION_GRAPH, HIPDNN_TYPE_BACKEND_DESCRIPTOR, 1, &count, &graph));
     ASSERT_EQ(count, 1);
 }
+
+TEST_F(Engine_descriptor_test, GetEngineDescriptorGlobalId)
+{
+    int64_t gidx = -1;
+
+    make_engine_finalized();
+
+    ASSERT_THROW_HIPDNN_STATUS(
+        _engine->get_attribute(
+            HIPDNN_ATTR_ENGINE_GLOBAL_INDEX, HIPDNN_TYPE_BACKEND_DESCRIPTOR, 1, nullptr, &gidx),
+        HIPDNN_STATUS_BAD_PARAM);
+
+    ASSERT_THROW_HIPDNN_STATUS(
+        _engine->get_attribute(
+            HIPDNN_ATTR_ENGINE_GLOBAL_INDEX, HIPDNN_TYPE_INT64, 2, nullptr, &gidx),
+        HIPDNN_STATUS_BAD_PARAM);
+
+    ASSERT_THROW_HIPDNN_STATUS(
+        _engine->get_attribute(
+            HIPDNN_ATTR_ENGINE_GLOBAL_INDEX, HIPDNN_TYPE_INT64, 1, nullptr, nullptr),
+        HIPDNN_STATUS_BAD_PARAM_NULL_POINTER);
+
+    ASSERT_NO_THROW(_engine->get_attribute(
+        HIPDNN_ATTR_ENGINE_GLOBAL_INDEX, HIPDNN_TYPE_INT64, 1, nullptr, &gidx));
+    ASSERT_EQ(gidx, 0);
+
+    int64_t count;
+    ASSERT_NO_THROW(_engine->get_attribute(
+        HIPDNN_ATTR_ENGINE_GLOBAL_INDEX, HIPDNN_TYPE_INT64, 1, &count, &gidx));
+    ASSERT_EQ(count, 1);
+}

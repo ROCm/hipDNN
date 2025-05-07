@@ -28,6 +28,11 @@ private:
                        int64_t element_count,
                        const void* array_of_elements);
 
+    void get_global_id(hipdnnBackendAttributeType_t attribute_type,
+                       int64_t requested_element_count,
+                       int64_t* element_count,
+                       void* array_of_elements) const;
+
 public:
     Engine_descriptor();
     ~Engine_descriptor() override = default;
