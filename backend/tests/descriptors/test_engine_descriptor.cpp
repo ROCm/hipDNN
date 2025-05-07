@@ -142,3 +142,60 @@ TEST_F(Engine_descriptor_test, FinalizeEngineDescriptor)
 
     ASSERT_THROW_HIPDNN_STATUS(_engine->finalize(), HIPDNN_STATUS_BAD_PARAM);
 }
+
+TEST_F(Engine_descriptor_test, GetAttrOnUnfinalizedEngineDescriptor)
+{
+    hipdnnBackendDescriptor_t dummy_graph = nullptr;
+
+    ASSERT_THROW_HIPDNN_STATUS(_engine->get_attribute(HIPDNN_ATTR_ENGINE_OPERATION_GRAPH,
+                                                      HIPDNN_TYPE_BACKEND_DESCRIPTOR,
+                                                      1,
+                                                      nullptr,
+                                                      &dummy_graph),
+                               HIPDNN_STATUS_NOT_INITIALIZED);
+}
+
+TEST_F(Engine_descriptor_test, GetEngineDescriptorUnsupportedAttr)
+{
+    int32_t dummy;
+
+    make_engine_finalized();
+
+    ASSERT_THROW_HIPDNN_STATUS(
+        _engine->get_attribute(
+            HIPDNN_ATTR_ENGINE_SM_COUNT_TARGET, HIPDNN_TYPE_INT32, 1, nullptr, &dummy),
+        HIPDNN_STATUS_NOT_SUPPORTED);
+}
+
+TEST_F(Engine_descriptor_test, GetEngineDescriptorGraph)
+{
+    hipdnnBackendDescriptor_t graph = nullptr;
+
+    make_engine_finalized();
+
+    ASSERT_THROW_HIPDNN_STATUS(
+        _engine->get_attribute(
+            HIPDNN_ATTR_ENGINE_OPERATION_GRAPH, HIPDNN_TYPE_INT64, 1, nullptr, &graph),
+        HIPDNN_STATUS_BAD_PARAM);
+
+    ASSERT_THROW_HIPDNN_STATUS(
+        _engine->get_attribute(
+            HIPDNN_ATTR_ENGINE_OPERATION_GRAPH, HIPDNN_TYPE_BACKEND_DESCRIPTOR, 2, nullptr, &graph),
+        HIPDNN_STATUS_BAD_PARAM);
+
+    ASSERT_THROW_HIPDNN_STATUS(_engine->get_attribute(HIPDNN_ATTR_ENGINE_OPERATION_GRAPH,
+                                                      HIPDNN_TYPE_BACKEND_DESCRIPTOR,
+                                                      1,
+                                                      nullptr,
+                                                      nullptr),
+                               HIPDNN_STATUS_BAD_PARAM_NULL_POINTER);
+
+    ASSERT_NO_THROW(_engine->get_attribute(
+        HIPDNN_ATTR_ENGINE_OPERATION_GRAPH, HIPDNN_TYPE_BACKEND_DESCRIPTOR, 1, nullptr, &graph));
+    ASSERT_EQ(graph, _mock_graph.get());
+
+    int64_t count;
+    ASSERT_NO_THROW(_engine->get_attribute(
+        HIPDNN_ATTR_ENGINE_OPERATION_GRAPH, HIPDNN_TYPE_BACKEND_DESCRIPTOR, 1, &count, &graph));
+    ASSERT_EQ(count, 1);
+}

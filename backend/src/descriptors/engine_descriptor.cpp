@@ -57,6 +57,8 @@ hipdnnStatus_t
     switch(attribute_name)
     {
     case HIPDNN_ATTR_ENGINE_OPERATION_GRAPH:
+        get_graph(attribute_type, requested_element_count, element_count, array_of_elements);
+        return HIPDNN_STATUS_SUCCESS;
     case HIPDNN_ATTR_ENGINE_GLOBAL_INDEX:
     case HIPDNN_ATTR_ENGINE_KNOB_INFO:
     case HIPDNN_ATTR_ENGINE_NUMERICAL_NOTE:
@@ -70,6 +72,40 @@ hipdnnStatus_t
             std::string("Engine_descriptor::get_attribute() is not supported for attribute ")
                 + hipdnn_backend::hipdnn_get_attribute_name_string(attribute_name) + ".");
     }
+}
+
+void Engine_descriptor::get_graph(hipdnnBackendAttributeType_t attribute_type,
+                                  int64_t requested_element_count,
+                                  int64_t* element_count,
+                                  void* array_of_elements)
+{
+    if(attribute_type != HIPDNN_TYPE_BACKEND_DESCRIPTOR)
+    {
+        throw Hipdnn_exception(HIPDNN_STATUS_BAD_PARAM,
+                               "Engine_descriptor failed to get graph: "
+                               "Invalid attribute type.");
+    }
+
+    if(requested_element_count != 1)
+    {
+        throw Hipdnn_exception(HIPDNN_STATUS_BAD_PARAM,
+                               "Engine_descriptor failed to get graph: "
+                               "Invalid element count.");
+    }
+
+    if(array_of_elements == nullptr)
+    {
+        throw Hipdnn_exception(HIPDNN_STATUS_BAD_PARAM_NULL_POINTER,
+                               "Engine_descriptor failed to get graph: "
+                               "Null pointer.");
+    }
+
+    if(element_count != nullptr)
+    {
+        *element_count = 1;
+    }
+
+    *reinterpret_cast<hipdnnBackendDescriptor_t*>(array_of_elements) = _graph;
 }
 
 hipdnnStatus_t Engine_descriptor::set_attribute(hipdnnBackendAttributeName_t attribute_name,
