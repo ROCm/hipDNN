@@ -58,9 +58,12 @@ hipdnnStatus_t Engine_config_descriptor::get_attribute(hipdnnBackendAttributeNam
     case HIPDNN_ATTR_ENGINECFG_ENGINE:
         get_engine(attribute_type, requested_element_count, element_count, array_of_elements);
         return HIPDNN_STATUS_SUCCESS;
+    case HIPDNN_ATTR_ENGINECFG_WORKSPACE_SIZE:
+        get_max_workspace_size(
+            attribute_type, requested_element_count, element_count, array_of_elements);
+        return HIPDNN_STATUS_SUCCESS;
     case HIPDNN_ATTR_ENGINECFG_INTERMEDIATE_INFO:
     case HIPDNN_ATTR_ENGINECFG_KNOB_CHOICES:
-    case HIPDNN_ATTR_ENGINECFG_WORKSPACE_SIZE:
     default:
         throw Hipdnn_exception(
             HIPDNN_STATUS_NOT_SUPPORTED,
@@ -101,6 +104,40 @@ void Engine_config_descriptor::get_engine(hipdnnBackendAttributeType_t attribute
     }
 
     *reinterpret_cast<hipdnnBackendDescriptor_t*>(array_of_elements) = _engine;
+}
+
+void Engine_config_descriptor::get_max_workspace_size(hipdnnBackendAttributeType_t attribute_type,
+                                                      int64_t requested_element_count,
+                                                      int64_t* element_count,
+                                                      void* array_of_elements) const
+{
+    if(attribute_type != HIPDNN_TYPE_INT64)
+    {
+        throw Hipdnn_exception(HIPDNN_STATUS_BAD_PARAM,
+                               "Engine_config_descriptor failed to get max workspace size: "
+                               "Invalid attribute type.");
+    }
+
+    if(requested_element_count != 1)
+    {
+        throw Hipdnn_exception(HIPDNN_STATUS_BAD_PARAM,
+                               "Engine_config_descriptor failed to get max workspace size: "
+                               "Invalid element count.");
+    }
+
+    if(array_of_elements == nullptr)
+    {
+        throw Hipdnn_exception(HIPDNN_STATUS_BAD_PARAM_NULL_POINTER,
+                               "Engine_config_descriptor failed to get max workspace size: "
+                               "Null pointer.");
+    }
+
+    if(element_count != nullptr)
+    {
+        *element_count = 1;
+    }
+
+    *reinterpret_cast<int64_t*>(array_of_elements) = _max_workspace_size;
 }
 
 hipdnnStatus_t Engine_config_descriptor::set_attribute(hipdnnBackendAttributeName_t attribute_name,

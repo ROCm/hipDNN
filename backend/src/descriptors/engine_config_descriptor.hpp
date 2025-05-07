@@ -23,6 +23,11 @@ private:
                     int64_t* element_count,
                     void* array_of_elements);
 
+    void get_max_workspace_size(hipdnnBackendAttributeType_t attribute_type,
+                                int64_t requested_element_count,
+                                int64_t* element_count,
+                                void* array_of_elements) const;
+
 public:
     static constexpr int64_t INVALID_WORKSPACE_SIZE = -1;
 
