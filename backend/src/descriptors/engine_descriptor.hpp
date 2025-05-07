@@ -12,10 +12,16 @@ class Engine_descriptor : public hipdnnBackendDescriptor
 {
 private:
     hipdnnBackendDescriptor_t _graph = nullptr;
+    int64_t _engine_id;
+    bool _engine_id_set = false;
 
     void set_graph(hipdnnBackendAttributeType_t attribute_type,
                    int64_t element_count,
                    const void* array_of_elements);
+
+    void set_global_id(hipdnnBackendAttributeType_t attribute_type,
+                       int64_t element_count,
+                       const void* array_of_elements);
 
 public:
     Engine_descriptor();

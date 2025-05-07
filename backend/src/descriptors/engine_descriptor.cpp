@@ -71,6 +71,8 @@ hipdnnStatus_t Engine_descriptor::set_attribute(hipdnnBackendAttributeName_t att
         set_graph(attribute_type, element_count, array_of_elements);
         return HIPDNN_STATUS_SUCCESS;
     case HIPDNN_ATTR_ENGINE_GLOBAL_INDEX:
+        set_global_id(attribute_type, element_count, array_of_elements);
+        return HIPDNN_STATUS_SUCCESS;
     case HIPDNN_ATTR_ENGINE_KNOB_INFO:
     case HIPDNN_ATTR_ENGINE_NUMERICAL_NOTE:
     case HIPDNN_ATTR_ENGINE_LAYOUT_INFO:
@@ -135,6 +137,35 @@ void Engine_descriptor::set_graph(hipdnnBackendAttributeType_t attribute_type,
     }
 
     _graph = graph;
+}
+
+void Engine_descriptor::set_global_id(hipdnnBackendAttributeType_t attribute_type,
+                                      int64_t element_count,
+                                      const void* array_of_elements)
+{
+    if(attribute_type != HIPDNN_TYPE_INT64)
+    {
+        throw Hipdnn_exception(HIPDNN_STATUS_BAD_PARAM,
+                               "Engine failed to set engine id: "
+                               "Invalid attribute type.");
+    }
+
+    if(element_count != 1)
+    {
+        throw Hipdnn_exception(HIPDNN_STATUS_BAD_PARAM,
+                               "Engine failed to set engine id: "
+                               "Invalid element count.");
+    }
+
+    if(array_of_elements == nullptr)
+    {
+        throw Hipdnn_exception(HIPDNN_STATUS_BAD_PARAM_NULL_POINTER,
+                               "Engine failed to set engine id: "
+                               "Null pointer.");
+    }
+
+    _engine_id = *reinterpret_cast<const int64_t*>(array_of_elements);
+    _engine_id_set = true;
 }
 
 } // namespace hipdnn_backend
