@@ -25,6 +25,7 @@ void create_test_engine(hipdnnBackendDescriptor_t* engine,
 void populate_test_engine_config(hipdnnBackendDescriptor_t* engine_config,
                                  hipdnnBackendDescriptor_t* engine,
                                  hipdnnBackendDescriptor_t* graph,
-                                 int64_t gidx);
+                                 int64_t gidx,
+                                 bool finalize = false);
 
 } // namespace test_util
