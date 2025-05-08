@@ -74,7 +74,7 @@ TEST_F(Engine_api_tests, SetEngineAttrAlreadyFinalized)
 {
     int64_t gidx = 0;
 
-    test_util::populate_finalized_test_engine(_engine, &_graph, gidx);
+    test_util::populate_test_engine(_engine, &_graph, gidx, true);
     EXPECT_EQ(hipdnnBackendSetAttribute(
                   _engine, HIPDNN_ATTR_ENGINE_GLOBAL_INDEX, HIPDNN_TYPE_INT64, 1, &gidx),
               HIPDNN_STATUS_NOT_INITIALIZED);
@@ -94,7 +94,7 @@ TEST_F(Engine_api_tests, GetEngineGraph)
     hipdnnBackendDescriptor_t graph;
     int64_t gidx = 0;
 
-    test_util::populate_finalized_test_engine(_engine, &_graph, gidx);
+    test_util::populate_test_engine(_engine, &_graph, gidx, true);
     EXPECT_EQ(hipdnnBackendGetAttribute(_engine,
                                         HIPDNN_ATTR_ENGINE_OPERATION_GRAPH,
                                         HIPDNN_TYPE_BACKEND_DESCRIPTOR,
@@ -110,7 +110,7 @@ TEST_F(Engine_api_tests, GetEngineGlobalIndex)
     int64_t gidx = 1;
     int64_t gidx_out;
 
-    test_util::populate_finalized_test_engine(_engine, &_graph, gidx);
+    test_util::populate_test_engine(_engine, &_graph, gidx, true);
     EXPECT_EQ(
         hipdnnBackendGetAttribute(
             _engine, HIPDNN_ATTR_ENGINE_GLOBAL_INDEX, HIPDNN_TYPE_INT64, 1, nullptr, &gidx_out),

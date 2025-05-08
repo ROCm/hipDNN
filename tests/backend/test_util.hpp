@@ -12,11 +12,8 @@ void create_test_graph(hipdnnBackendDescriptor_t* descriptor);
 
 void populate_test_engine(hipdnnBackendDescriptor_t engine,
                           hipdnnBackendDescriptor_t* graph,
-                          int64_t gidx);
-
-void populate_finalized_test_engine(hipdnnBackendDescriptor_t engine,
-                                    hipdnnBackendDescriptor_t* graph,
-                                    int64_t gidx);
+                          int64_t gidx,
+                          bool finalize = false);
 
 void create_test_engine(hipdnnBackendDescriptor_t* engine,
                         hipdnnBackendDescriptor_t* graph,

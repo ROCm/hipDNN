@@ -35,7 +35,8 @@ void create_test_graph(hipdnnBackendDescriptor_t* descriptor)
 
 void populate_test_engine(hipdnnBackendDescriptor_t engine,
                           hipdnnBackendDescriptor_t* graph,
-                          int64_t gidx)
+                          int64_t gidx,
+                          bool finalize)
 {
     create_test_graph(graph);
     ASSERT_EQ(hipdnnBackendFinalize(*graph), HIPDNN_STATUS_SUCCESS);
@@ -46,14 +47,11 @@ void populate_test_engine(hipdnnBackendDescriptor_t engine,
     ASSERT_EQ(hipdnnBackendSetAttribute(
                   engine, HIPDNN_ATTR_ENGINE_GLOBAL_INDEX, HIPDNN_TYPE_INT64, 1, &gidx),
               HIPDNN_STATUS_SUCCESS);
-}
 
-void populate_finalized_test_engine(hipdnnBackendDescriptor_t engine,
-                                    hipdnnBackendDescriptor_t* graph,
-                                    int64_t gidx)
-{
-    populate_test_engine(engine, graph, gidx);
-    ASSERT_EQ(hipdnnBackendFinalize(engine), HIPDNN_STATUS_SUCCESS);
+    if(finalize)
+    {
+        ASSERT_EQ(hipdnnBackendFinalize(engine), HIPDNN_STATUS_SUCCESS);
+    }
 }
 
 void create_test_engine(hipdnnBackendDescriptor_t* engine,
@@ -62,7 +60,7 @@ void create_test_engine(hipdnnBackendDescriptor_t* engine,
 {
     ASSERT_EQ(hipdnnBackendCreateDescriptor(HIPDNN_BACKEND_ENGINE_DESCRIPTOR, engine),
               HIPDNN_STATUS_SUCCESS);
-    populate_finalized_test_engine(*engine, graph, gidx);
+    populate_test_engine(*engine, graph, gidx, true);
 }
 
 void populate_test_engine_config(hipdnnBackendDescriptor_t* engine_config,
