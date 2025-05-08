@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include "descriptors/engine_config_descriptor.hpp"
 #include "descriptors/execution_plan_descriptor.hpp"
 #include "descriptors/graph_descriptor.hpp"
 #include "descriptors/variant_descriptor.hpp"
@@ -11,8 +12,6 @@
 #include <map>
 #include <memory>
 #include <set>
-
-class Engine_config_descriptor;
 
 namespace hipdnn_backend
 {
@@ -39,12 +38,22 @@ struct Plugin_manager
 
     // This will redirect the execute to the plugin that owns the engine selected inside the ExecutionPlan
     // Throws if invalid stuff is provided, and later is wrapped with a status + provides message
-    hipdnnStatus_t execute(Execution_plan_descriptor* execution_plan_desc,
+    void execute(Execution_plan_descriptor* execution_plan_desc,
                            hipdnnHandle* handle,
                            Variant_descriptor* variant_desc);
 
 private:
     std::map<int64_t, std::shared_ptr<Hipdnn_plugin_base>> _plugins;
+    
+    std::shared_ptr<Hipdnn_plugin_base> get_plugin(int64_t engine_id)
+    {
+        auto plugin_iter = _plugins.find(engine_id);
+        if(plugin_iter == _plugins.end())
+        {
+            return nullptr;
+        }
+        return plugin_iter->second;
+    }
 };
 
 }

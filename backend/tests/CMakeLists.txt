@@ -15,6 +15,8 @@ endif()
 
 add_executable(hipdnn_backend_tests
     descriptors/mocks/mock_descriptor.cpp
+    descriptors/test_engine_config_descriptor.cpp
+    descriptors/test_engine_descriptor.cpp
     descriptors/test_execution_plan_descriptor.cpp
     descriptors/test_graph_descriptor.cpp
     descriptors/test_descriptor_factory.cpp
@@ -56,14 +58,6 @@ set_target_properties(hipdnn_test_plugin2 PROPERTIES CXX_VISIBILITY_PRESET hidde
 target_compile_options(hipdnn_test_plugin2 PRIVATE ${HIPDNN_WARNING_COMPILE_OPTIONS})
 clang_tidy_check(hipdnn_test_plugin2)
 add_dependencies(hipdnn_backend_tests hipdnn_test_plugin2)
-
-# plugin_manager_test
-add_library(hipdnn_test_plugin_manager SHARED plugins/test_plugin_manager.cpp)
-target_link_libraries(hipdnn_test_plugin_manager PRIVATE hipdnn_sdk)
-set_target_properties(hipdnn_test_plugin_manager PROPERTIES CXX_VISIBILITY_PRESET hidden)
-target_compile_options(hipdnn_test_plugin_manager PRIVATE ${HIPDNN_WARNING_COMPILE_OPTIONS})
-clang_tidy_check(hipdnn_test_plugin_manager)
-add_dependencies(hipdnn_backend_tests hipdnn_test_plugin_manager)
 
 # libhipdnn_test_engine_plugin1.so or hipdnn_test_engine_plugin1.dll (used by test_engine_plugin.cpp)
 add_library(hipdnn_test_engine_plugin1 SHARED plugins/engine_plugin1.cpp)
