@@ -3,6 +3,7 @@
 
 #include "plugin_manager.hpp"
 #include "fake_plugin.hpp"
+#include "hipdnn_exception.hpp"
 
 namespace hipdnn_backend
 {
@@ -22,10 +23,9 @@ void Plugin_manager::initialize( // NOLINT(readability-convert-member-functions-
     }
 }
 
-std::set<int64_t> Plugin_manager::
-    get_applicable_engines( // NOLINT(readability-convert-member-functions-to-static)
+std::set<int64_t> Plugin_manager::get_applicable_engines( // NOLINT(readability-convert-member-functions-to-static)
         Graph_descriptor* graph,
-        Handle* handle /*, Heuristic_Details*/)
+        hipdnnHandle* handle /*, Heuristic_Details*/)
 {
     (void)handle;
     std::set<int64_t> applicable_engines;
@@ -43,7 +43,7 @@ std::set<int64_t> Plugin_manager::
 
 hipdnnStatus_t Plugin_manager::execute( // NOLINT(readability-convert-member-functions-to-static)
     Execution_plan_descriptor* execution_plan_desc,
-    Handle* handle,
+    hipdnnHandle* handle,
     Variant_descriptor* variant_desc)
 {
     if(execution_plan_desc == nullptr || handle == nullptr || variant_desc == nullptr)
@@ -53,16 +53,11 @@ hipdnnStatus_t Plugin_manager::execute( // NOLINT(readability-convert-member-fun
 
     hipdnnBackendDescriptor_t engine_config_t = nullptr;
     auto plan_desc = dynamic_cast<Execution_plan_descriptor*>(execution_plan_desc);
-    hipdnnStatus_t status = plan_desc->get_attribute(HIPDNN_ATTR_EXECUTION_PLAN_ENGINE_CONFIG,
+    plan_desc->get_attribute(HIPDNN_ATTR_EXECUTION_PLAN_ENGINE_CONFIG,
                                                      HIPDNN_TYPE_BACKEND_DESCRIPTOR,
                                                      1,
                                                      nullptr,
                                                      &engine_config_t);
-    if(status != HIPDNN_STATUS_SUCCESS)
-    {
-        return status;
-    }
-
     int64_t engine_id = -1;
     Graph_descriptor* graphdesc = nullptr;
     /*
@@ -86,7 +81,10 @@ hipdnnStatus_t Plugin_manager::execute( // NOLINT(readability-convert-member-fun
     auto plugin_iter = _plugins.find(engine_id);
     if(plugin_iter == _plugins.end())
     {
-        return HIPDNN_STATUS_NOT_SUPPORTED;
+        throw Hipdnn_exception(
+            HIPDNN_STATUS_BAD_PARAM_OUT_OF_BOUND,
+            std::string("Plugin_manager::execute has invalid engine id: ")
+                + std::to_string(engine_id) + " for the given engine config.");
     }
 
     plugin_iter->second->execute(graphdesc, variant_desc, handle);

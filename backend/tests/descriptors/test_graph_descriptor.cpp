@@ -5,6 +5,7 @@
 #include "flatbuffer_test_utils.hpp"
 #include "flatbuffer_utilities.hpp"
 #include "hipdnn_backend.h"
+#include "hipdnn_exception.hpp"
 
 #include <flatbuffers/flatbuffers.h>
 #include <gtest/gtest.h>
@@ -37,27 +38,20 @@ TEST_F(Graph_descriptor_test, WillCorrectlySetGraph)
     auto serialized_graph = builder.Release();
 
     Graph_descriptor descriptor;
-    auto status = descriptor.deserialize_graph(serialized_graph.data(), serialized_graph.size());
-    ASSERT_EQ(status, HIPDNN_STATUS_SUCCESS);
-
-    status = descriptor.finalize();
-    ASSERT_EQ(status, HIPDNN_STATUS_SUCCESS);
+    ASSERT_NO_THROW(descriptor.deserialize_graph(serialized_graph.data(), serialized_graph.size()));
+    ASSERT_NO_THROW(descriptor.finalize());
 }
 
 TEST_F(Graph_descriptor_test, WillFailToSetInvalidGraph)
 {
     Graph_descriptor descriptor;
-    auto status = descriptor.deserialize_graph(nullptr, 0);
-
-    ASSERT_EQ(status, HIPDNN_STATUS_BAD_PARAM_NULL_POINTER);
+    ASSERT_THROW(descriptor.deserialize_graph(nullptr, 0), hipdnn_backend::Hipdnn_exception);
 }
 
 TEST_F(Graph_descriptor_test, FinalizeFailInvalidGraph)
 {
     Graph_descriptor descriptor;
-    auto status = descriptor.finalize();
-
-    ASSERT_EQ(status, HIPDNN_STATUS_BAD_PARAM);
+    ASSERT_THROW(descriptor.finalize(), hipdnn_backend::Hipdnn_exception);
 }
 
 TEST_F(Graph_descriptor_test, GetAttributeReturnsNotSupported)

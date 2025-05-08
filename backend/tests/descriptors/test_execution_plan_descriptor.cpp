@@ -3,6 +3,7 @@
 
 #include "descriptors/execution_plan_descriptor.hpp"
 #include "hipdnn_backend.h"
+#include "hipdnn_exception.hpp"
 #include "mocks/mock_descriptor.hpp"
 
 #include <gtest/gtest.h>
@@ -26,8 +27,7 @@ public:
         status = set_engine_config();
         ASSERT_EQ(status, HIPDNN_STATUS_SUCCESS);
 
-        status = _plan->finalize();
-        ASSERT_EQ(status, HIPDNN_STATUS_SUCCESS);
+        ASSERT_NO_THROW(_plan->finalize());
     }
 
     hipdnnStatus_t set_handle()
@@ -157,19 +157,16 @@ TEST_F(Execution_plan_descriptor_test, SetExecutionPlanDescriptorEngineConfig)
 
 TEST_F(Execution_plan_descriptor_test, FinalizeExecutionPlanDescriptor)
 {
-    auto status = _plan->finalize();
-    ASSERT_EQ(status, HIPDNN_STATUS_BAD_PARAM);
+    EXPECT_THROW(_plan->finalize(), hipdnn_backend::Hipdnn_exception);
 
-    status = set_handle();
+    auto status = set_handle();
     ASSERT_EQ(status, HIPDNN_STATUS_SUCCESS);
     status = set_engine_config();
     ASSERT_EQ(status, HIPDNN_STATUS_SUCCESS);
 
-    status = _plan->finalize();
-    ASSERT_EQ(status, HIPDNN_STATUS_SUCCESS);
+    ASSERT_NO_THROW(_plan->finalize());
 
-    status = _plan->finalize();
-    ASSERT_EQ(status, HIPDNN_STATUS_BAD_PARAM);
+    ASSERT_THROW(_plan->finalize(), hipdnn_backend::Hipdnn_exception);
 }
 
 TEST_F(Execution_plan_descriptor_test, GetAttrOnUnfinalizedExecutionPlanDescriptor)

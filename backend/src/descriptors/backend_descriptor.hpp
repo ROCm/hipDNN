@@ -7,25 +7,15 @@
 
 struct hipdnnBackendDescriptor
 {
-public:
-    virtual ~hipdnnBackendDescriptor() = default;
-    hipdnnBackendDescriptorType_t type = HIPDNN_INVALID_TYPE;
-};
-
-namespace hipdnn_backend
-{
-class Backend_descriptor : public hipdnnBackendDescriptor
-{
 private:
     bool _finalized = false;
 
 public:
-    ~Backend_descriptor() override = default;
-
-    virtual hipdnnStatus_t finalize()
+    virtual ~hipdnnBackendDescriptor() = default;
+    hipdnnBackendDescriptorType_t type = HIPDNN_INVALID_TYPE;
+    virtual void finalize()
     {
         _finalized = true;
-        return HIPDNN_STATUS_SUCCESS;
     }
 
     virtual bool is_finalized() const
@@ -45,4 +35,3 @@ public:
                                          const void* array_of_elements)
         = 0;
 };
-}

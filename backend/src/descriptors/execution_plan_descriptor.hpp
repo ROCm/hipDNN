@@ -8,7 +8,7 @@
 namespace hipdnn_backend
 {
 
-class Execution_plan_descriptor : public Backend_descriptor
+class Execution_plan_descriptor : public hipdnnBackendDescriptor
 {
 private:
     hipdnnHandle_t _handle = nullptr;
@@ -31,7 +31,7 @@ public:
     Execution_plan_descriptor();
     ~Execution_plan_descriptor() override = default;
 
-    hipdnnStatus_t finalize() override;
+    void finalize() override;
 
     hipdnnStatus_t get_attribute(hipdnnBackendAttributeName_t attribute_name,
                                  hipdnnBackendAttributeType_t attribute_type,

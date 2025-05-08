@@ -21,7 +21,7 @@ target_include_directories(hipdnn_frontend INTERFACE
 )
 
 install( 
-    TARGETS hipdnn_frontend hipdnn_sdk FlatBuffers
+    TARGETS hipdnn_frontend hipdnn_sdk FlatBuffers spdlog_header_only
     EXPORT hipdnn-frontend
 )
 

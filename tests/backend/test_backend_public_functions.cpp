@@ -22,7 +22,7 @@ TEST(HipDNNBackendTest, WillNotCreateDescriptorIfPassedNullptr)
     hipdnnStatus_t status
         = hipdnnBackendCreateDescriptor(HIPDNN_BACKEND_ENGINE_DESCRIPTOR, nullptr);
 
-    EXPECT_EQ(status, HIPDNN_STATUS_BAD_PARAM);
+    EXPECT_EQ(status, HIPDNN_STATUS_BAD_PARAM_NULL_POINTER);
 }
 
 TEST(HipDNNBackendTest, WillNotCreateDescriptorIfTypeNotSupported)
@@ -41,7 +41,7 @@ TEST(HipDNNBackendTest, WontDestroyDescriptorIfNull)
 
     hipdnnStatus_t status = hipdnnBackendDestroyDescriptor(descriptor);
 
-    EXPECT_EQ(status, HIPDNN_STATUS_BAD_PARAM);
+    EXPECT_EQ(status, HIPDNN_STATUS_BAD_PARAM_NULL_POINTER);
 }
 
 TEST(HipDNNBackendTest, Execute)
@@ -52,7 +52,7 @@ TEST(HipDNNBackendTest, Execute)
 
     hipdnnStatus_t status = hipdnnBackendExecute(handle, execution_plan, variant_pack);
 
-    EXPECT_EQ(status, HIPDNN_STATUS_BAD_PARAM);
+    EXPECT_EQ(status, HIPDNN_STATUS_BAD_PARAM_NULL_POINTER);
 }
 
 TEST(HipDNNBackendTest, Finalize)
@@ -61,7 +61,7 @@ TEST(HipDNNBackendTest, Finalize)
 
     hipdnnStatus_t status = hipdnnBackendFinalize(descriptor);
 
-    EXPECT_EQ(status, HIPDNN_STATUS_BAD_PARAM);
+    EXPECT_EQ(status, HIPDNN_STATUS_BAD_PARAM_NULL_POINTER);
 }
 
 TEST(HipDNNBackendTest, GetAttribute)
@@ -80,7 +80,7 @@ TEST(HipDNNBackendTest, GetAttribute)
                                                       &element_count,
                                                       array_of_elements);
 
-    EXPECT_EQ(status, HIPDNN_STATUS_BAD_PARAM);
+    EXPECT_EQ(status, HIPDNN_STATUS_BAD_PARAM_NULL_POINTER);
 }
 
 TEST(HipDNNBackendTest, SetAttribute)
@@ -94,7 +94,7 @@ TEST(HipDNNBackendTest, SetAttribute)
     hipdnnStatus_t status = hipdnnBackendSetAttribute(
         descriptor, attribute_name, attribute_type, element_count, array_of_elements);
 
-    EXPECT_EQ(status, HIPDNN_STATUS_BAD_PARAM);
+    EXPECT_EQ(status, HIPDNN_STATUS_BAD_PARAM_NULL_POINTER);
 }
 
 TEST(HipDNNBackendTest, WillSetBackendGraphCorrectly)
@@ -144,6 +144,6 @@ TEST(HipDNNBackendTest, WillFailToCreateGraphIfGraphIsNull)
 
     auto status = hipdnnBackendCreateAndDeserializeGraph_ext(&descriptor, nullptr, 0);
 
-    EXPECT_EQ(status, HIPDNN_STATUS_BAD_PARAM);
+    EXPECT_EQ(status, HIPDNN_STATUS_BAD_PARAM_NULL_POINTER);
     EXPECT_EQ(descriptor, nullptr);
 }

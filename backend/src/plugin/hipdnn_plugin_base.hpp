@@ -14,7 +14,8 @@ struct Hipdnn_plugin_base
     virtual ~Hipdnn_plugin_base() = default;
     // Interface for plugin interaction using internal types.
     // Simplifies usage and integration with higher-level API handlers.
-    virtual void execute(Graph_descriptor* graphdesc, Variant_descriptor* vpack, Handle* handle)
+    virtual void
+        execute(Graph_descriptor* graphdesc, Variant_descriptor* vpack, hipdnnHandle* handle)
         = 0;
     virtual std::set<int64_t> get_applicable_engines(Graph_descriptor* graphdesc) = 0;
     virtual int64_t get_max_workspace_size(Graph_descriptor* graphdesc, int64_t engine_id) = 0;

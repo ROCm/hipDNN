@@ -5,6 +5,7 @@
 #include "error.hpp"
 #include "flatbuffer_utilities.hpp"
 #include "hipdnn_backend_descriptor_type.h"
+#include "hipdnn_exception.hpp"
 #include <hipdnn_sdk/data_objects/graph_generated.h>
 
 namespace hipdnn_backend
@@ -15,13 +16,14 @@ Graph_descriptor::Graph_descriptor()
     type = HIPDNN_BACKEND_OPERATIONGRAPH_DESCRIPTOR;
 }
 
-hipdnnStatus_t Graph_descriptor::finalize()
+void Graph_descriptor::finalize()
 {
     if(_graph == nullptr)
     {
-        return set_last_error(HIPDNN_STATUS_BAD_PARAM, "Graph_descriptor::finalize: graph is null");
+        throw Hipdnn_exception(HIPDNN_STATUS_BAD_PARAM,
+                               "Graph_descriptor::finalize: graph is null");
     }
-    return Backend_descriptor::finalize();
+    hipdnnBackendDescriptor::finalize();
 }
 
 hipdnnStatus_t
@@ -43,26 +45,16 @@ hipdnnStatus_t
     return HIPDNN_STATUS_NOT_SUPPORTED;
 }
 
-hipdnnStatus_t Graph_descriptor::deserialize_graph(const uint8_t* serialized_graph,
-                                                   size_t graph_byte_size)
+void Graph_descriptor::deserialize_graph(const uint8_t* serialized_graph, size_t graph_byte_size)
 {
     if(serialized_graph == nullptr || graph_byte_size == 0)
     {
-        return set_last_error(HIPDNN_STATUS_BAD_PARAM_NULL_POINTER,
-                              "Graph_descriptor::deserialize_graph: serialized_graph is null or "
-                              "graph_byte_size is 0");
+        throw Hipdnn_exception(HIPDNN_STATUS_BAD_PARAM_NULL_POINTER,
+                               "Graph_descriptor::deserialize_graph: serialized_graph is null or "
+                               "graph_byte_size is 0");
     }
 
-    auto status = flatbuffer_utilities::convert_serialized_graph_to_graph(
+    flatbuffer_utilities::convert_serialized_graph_to_graph(
         serialized_graph, graph_byte_size, _graph);
-
-    if(status != HIPDNN_STATUS_SUCCESS || _graph == nullptr)
-    {
-        return set_last_error(status,
-                              "Graph_descriptor::deserialize_graph: failed to convert serialized "
-                              "graph to graph");
-    }
-
-    return HIPDNN_STATUS_SUCCESS;
 }
 }

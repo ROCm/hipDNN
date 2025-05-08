@@ -2,6 +2,7 @@
 // SPDX-License-Identifier:  MIT
 
 #include "descriptors/variant_descriptor.hpp"
+#include "hipdnn_exception.hpp"
 #include <gtest/gtest.h>
 
 namespace hipdnn_backend
@@ -40,7 +41,7 @@ TEST_F(Initialize_variant_pack_descriptor_tests, ValidSetAttributes)
                   HIPDNN_ATTR_VARIANT_PACK_WORKSPACE, HIPDNN_TYPE_VOID_PTR, 1, &workspace),
               HIPDNN_STATUS_SUCCESS);
 
-    EXPECT_EQ(descriptor.finalize(), HIPDNN_STATUS_SUCCESS);
+    ASSERT_NO_THROW(descriptor.finalize());
     EXPECT_TRUE(descriptor.is_finalized());
 }
 
@@ -128,13 +129,13 @@ TEST_F(Initialize_variant_pack_descriptor_tests, InvalidFinalizeCounts)
                   HIPDNN_ATTR_VARIANT_PACK_WORKSPACE, HIPDNN_TYPE_VOID_PTR, 1, &workspace),
               HIPDNN_STATUS_SUCCESS);
 
-    EXPECT_EQ(descriptor.finalize(), HIPDNN_STATUS_BAD_PARAM);
+    ASSERT_THROW(descriptor.finalize(), Hipdnn_exception);
     EXPECT_FALSE(descriptor.is_finalized());
 }
 
 TEST_F(Initialize_variant_pack_descriptor_tests, InvalidFinalizeUnsetParams)
 {
-    EXPECT_EQ(descriptor.finalize(), HIPDNN_STATUS_BAD_PARAM);
+    ASSERT_THROW(descriptor.finalize(), Hipdnn_exception);
     EXPECT_FALSE(descriptor.is_finalized());
 }
 
@@ -151,6 +152,7 @@ TEST_F(Initialize_variant_pack_descriptor_tests, InvalidGetAttributeNotFinalized
               HIPDNN_STATUS_BAD_PARAM_NOT_FINALIZED);
 }
 
+// NOLINTBEGIN(readability-function-cognitive-complexity)
 class Finalized_variant_pack_descriptor_tests : public ::testing::Test
 {
 protected:
@@ -179,7 +181,7 @@ protected:
                       HIPDNN_ATTR_VARIANT_PACK_WORKSPACE, HIPDNN_TYPE_VOID_PTR, 1, &_workspace),
                   HIPDNN_STATUS_SUCCESS);
 
-        EXPECT_EQ(descriptor.finalize(), HIPDNN_STATUS_SUCCESS);
+        ASSERT_NO_THROW(descriptor.finalize());
         EXPECT_TRUE(descriptor.is_finalized());
     }
 };
@@ -273,4 +275,6 @@ TEST_F(Finalized_variant_pack_descriptor_tests, InvalidGetAttributes)
               HIPDNN_STATUS_BAD_PARAM);
 }
 
-}
+// NOLINTEND(readability-function-cognitive-complexity)
+
+} // namespace hipdnn_backend

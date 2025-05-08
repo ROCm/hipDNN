@@ -3,16 +3,12 @@
 
 #include "handle.hpp"
 
-namespace hipdnn_backend
-{
-void Handle::set_stream(hipStream_t stream)
+void hipdnnHandle::set_stream(hipStream_t stream)
 {
     _stream = stream;
 }
 
-hipStream_t Handle::get_stream() const
+hipStream_t hipdnnHandle::get_stream() const
 {
     return _stream;
-}
-
 }

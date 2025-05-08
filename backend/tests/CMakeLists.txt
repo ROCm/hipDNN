@@ -19,18 +19,19 @@ add_executable(hipdnn_backend_tests
     descriptors/test_graph_descriptor.cpp
     descriptors/test_descriptor_factory.cpp
     descriptors/test_variant_pack.cpp
+    main.cpp
     test_engine_plugin.cpp
     test_error.cpp
     test_flatbuffer_utilities.cpp
     test_handle.cpp
     test_helpers.cpp
+    test_logger.cpp
     test_plugin.cpp
     test_shared_library.cpp
 )
 
 target_link_libraries(hipdnn_backend_tests 
     GTest::gtest
-    GTest::gtest_main
     pthread
     hipdnn_backend_private
     hipdnn_sdk
@@ -55,6 +56,14 @@ set_target_properties(hipdnn_test_plugin2 PROPERTIES CXX_VISIBILITY_PRESET hidde
 target_compile_options(hipdnn_test_plugin2 PRIVATE ${HIPDNN_WARNING_COMPILE_OPTIONS})
 clang_tidy_check(hipdnn_test_plugin2)
 add_dependencies(hipdnn_backend_tests hipdnn_test_plugin2)
+
+# plugin_manager_test
+add_library(hipdnn_test_plugin_manager SHARED plugins/test_plugin_manager.cpp)
+target_link_libraries(hipdnn_test_plugin_manager PRIVATE hipdnn_sdk)
+set_target_properties(hipdnn_test_plugin_manager PROPERTIES CXX_VISIBILITY_PRESET hidden)
+target_compile_options(hipdnn_test_plugin_manager PRIVATE ${HIPDNN_WARNING_COMPILE_OPTIONS})
+clang_tidy_check(hipdnn_test_plugin_manager)
+add_dependencies(hipdnn_backend_tests hipdnn_test_plugin_manager)
 
 # libhipdnn_test_engine_plugin1.so or hipdnn_test_engine_plugin1.dll (used by test_engine_plugin.cpp)
 add_library(hipdnn_test_engine_plugin1 SHARED plugins/engine_plugin1.cpp)

@@ -167,7 +167,7 @@ TEST_F(Variant_pack_descriptor_api_tests, InvalidNullDescriptor)
     int64_t dummy_data = 42;
     hipdnnStatus_t status = hipdnnBackendSetAttribute(
         null_descriptor, HIPDNN_ATTR_VARIANT_PACK_UNIQUE_IDS, HIPDNN_TYPE_INT64, 1, &dummy_data);
-    EXPECT_EQ(status, HIPDNN_STATUS_BAD_PARAM);
+    EXPECT_EQ(status, HIPDNN_STATUS_BAD_PARAM_NULL_POINTER);
 
     int64_t retrieved_data = 0;
     int64_t element_count = 0;
@@ -177,7 +177,7 @@ TEST_F(Variant_pack_descriptor_api_tests, InvalidNullDescriptor)
                                        1,
                                        &element_count,
                                        &retrieved_data);
-    EXPECT_EQ(status, HIPDNN_STATUS_BAD_PARAM);
+    EXPECT_EQ(status, HIPDNN_STATUS_BAD_PARAM_NULL_POINTER);
 }
 
 class Finalized_variant_pack_descriptor_api_tests : public ::testing::Test

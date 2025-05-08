@@ -24,7 +24,9 @@ struct Fake_plugin : Hipdnn_plugin_base
         return {HIPDNN_ENGINE_ID_FAKE};
     }
 
-    void execute(Graph_descriptor* graphdesc, Variant_descriptor* vpack, Handle* handle) override
+    void execute(Graph_descriptor* graphdesc,
+                 Variant_descriptor* vpack,
+                 hipdnnHandle* handle) override
     {
         // calls gpu kernel to execute the graph using C API?
         (void)graphdesc;

@@ -21,14 +21,14 @@ TEST(hipDNNHandleAPITests, SetStreamNullptrHandle)
 {
     hipStream_t test_stream = nullptr;
     hipdnnStatus_t set_stream_status = hipdnnSetStream(nullptr, test_stream);
-    ASSERT_EQ(set_stream_status, HIPDNN_STATUS_BAD_PARAM);
+    ASSERT_EQ(set_stream_status, HIPDNN_STATUS_BAD_PARAM_NULL_POINTER);
 }
 
 TEST(hipDNNHandleAPITests, GetStreamNullptrHandle)
 {
     hipStream_t retrieved_stream = nullptr;
     hipdnnStatus_t get_stream_status = hipdnnGetStream(nullptr, &retrieved_stream);
-    ASSERT_EQ(get_stream_status, HIPDNN_STATUS_BAD_PARAM);
+    ASSERT_EQ(get_stream_status, HIPDNN_STATUS_BAD_PARAM_NULL_POINTER);
 }
 
 TEST(hipDNNHandleAPITests, GetStreamNullptrStreamPointer)

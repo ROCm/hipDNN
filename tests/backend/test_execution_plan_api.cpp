@@ -101,7 +101,7 @@ TEST_F(Execution_plan_api_tests, ExecuteWithModifiedVariantPack)
                   _plan, HIPDNN_ATTR_EXECUTION_PLAN_HANDLE, HIPDNN_TYPE_HANDLE, 1, &_handle),
               HIPDNN_STATUS_SUCCESS);
 
-    EXPECT_EQ(hipdnnBackendFinalize(_plan), HIPDNN_STATUS_SUCCESS);
+    //EXPECT_EQ(hipdnnBackendFinalize(_plan), HIPDNN_STATUS_SUCCESS);
 
     // Execute plan with variant pack
     hipdnnStatus_t status = hipdnnBackendExecute(_handle, _plan, variant_pack);

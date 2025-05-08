@@ -11,7 +11,7 @@
 namespace hipdnn_backend
 {
 
-class Graph_descriptor : public Backend_descriptor
+class Graph_descriptor : public hipdnnBackendDescriptor
 {
 private:
     std::unique_ptr<hipdnn_sdk::data_objects::GraphT> _graph;
@@ -20,7 +20,7 @@ public:
     Graph_descriptor();
     ~Graph_descriptor() override = default;
 
-    hipdnnStatus_t finalize() override;
+    void finalize() override;
 
     hipdnnStatus_t get_attribute([[maybe_unused]] hipdnnBackendAttributeName_t attribute_name,
                                  [[maybe_unused]] hipdnnBackendAttributeType_t attribute_type,
@@ -33,6 +33,6 @@ public:
                                  [[maybe_unused]] int64_t element_count,
                                  [[maybe_unused]] const void* array_of_elements) override;
 
-    hipdnnStatus_t deserialize_graph(const uint8_t* serialized_graph, size_t graph_byte_size);
+    void deserialize_graph(const uint8_t* serialized_graph, size_t graph_byte_size);
 };
 }

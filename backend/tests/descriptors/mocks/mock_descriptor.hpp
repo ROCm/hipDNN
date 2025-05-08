@@ -11,7 +11,7 @@
 namespace hipdnn_backend
 {
 
-class Mock_descriptor : public Backend_descriptor
+class Mock_descriptor : public hipdnnBackendDescriptor
 {
 private:
     std::map<std::pair<hipdnnBackendAttributeName_t, hipdnnBackendAttributeType_t>,
@@ -28,7 +28,7 @@ public:
                             int64_t element_count,
                             const void* elements);
 
-    hipdnnStatus_t finalize() override;
+    void finalize() override;
 
     hipdnnStatus_t get_attribute(hipdnnBackendAttributeName_t attribute_name,
                                  hipdnnBackendAttributeType_t attribute_type,
