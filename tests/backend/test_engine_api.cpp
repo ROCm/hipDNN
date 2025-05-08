@@ -29,8 +29,6 @@ protected:
     }
 };
 
-TEST_F(Engine_api_tests, CreateEngine) {}
-
 TEST_F(Engine_api_tests, SetEngineGraph)
 {
     EXPECT_EQ(hipdnnBackendSetAttribute(_engine,

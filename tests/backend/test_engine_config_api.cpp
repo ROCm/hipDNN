@@ -35,8 +35,6 @@ protected:
     }
 };
 
-TEST_F(Engine_config_api_tests, CreateEngine) {}
-
 TEST_F(Engine_config_api_tests, SetEngineConfigEngine)
 {
     int64_t gidx = -1; // TODO hardcode for now
