@@ -42,8 +42,8 @@ void Plugin_manager::finalize_engine_config(Engine_config_descriptor* config)
     auto graph_desc = static_cast<Graph_descriptor*>(graph);
     if(graph_desc == nullptr)
     {
-        throw hipdnn_backend::Hipdnn_exception(
-            HIPDNN_STATUS_BAD_PARAM, "hipdnnBackendDescriptor_t is not a valid graph descriptor");
+        throw Hipdnn_exception(HIPDNN_STATUS_BAD_PARAM,
+                               "hipdnnBackendDescriptor_t is not a valid graph descriptor");
     }
 
     int64_t engine_id;
@@ -54,26 +54,27 @@ void Plugin_manager::finalize_engine_config(Engine_config_descriptor* config)
     auto plugin = get_plugin(engine_id);
     if(plugin == nullptr)
     {
-        throw hipdnn_backend::Hipdnn_exception(
+        throw Hipdnn_exception(
             HIPDNN_STATUS_BAD_PARAM_OUT_OF_BOUND,
-            std::string("Plugin_manager::finalize_engine_config has invalid engine id: ") +
-                std::to_string(engine_id) + " for the given engine config.");
+            std::string("Plugin_manager::finalize_engine_config has invalid engine id: ")
+                + std::to_string(engine_id) + " for the given engine config.");
     }
 
     // Verify that the plugin supports this engine ID
     auto applicable_engines = plugin->get_applicable_engines(graph_desc);
     if(applicable_engines.find(engine_id) == applicable_engines.end())
     {
-        throw hipdnn_backend::Hipdnn_exception(
-            HIPDNN_STATUS_BAD_PARAM,
-            std::string("Plugin does not support engine id: ") + std::to_string(engine_id));
+        throw Hipdnn_exception(HIPDNN_STATUS_BAD_PARAM,
+                               std::string("Plugin does not support engine id: ")
+                                   + std::to_string(engine_id));
     }
 
     // Set the workspace size
     config->set_max_workspace_size(plugin->get_max_workspace_size(graph_desc, engine_id));
 }
 
-std::set<int64_t> Plugin_manager::get_applicable_engines( // NOLINT(readability-convert-member-functions-to-static)
+std::set<int64_t> Plugin_manager::
+    get_applicable_engines( // NOLINT(readability-convert-member-functions-to-static)
         Graph_descriptor* graph,
         hipdnnHandle* handle /*, Heuristic_Details*/)
 {
@@ -99,58 +100,61 @@ void Plugin_manager::execute( // NOLINT(readability-convert-member-functions-to-
     if(execution_plan_desc == nullptr)
     {
         throw Hipdnn_exception(HIPDNN_STATUS_BAD_PARAM,
-                              "Plugin_manager::execute failed: execution_plan_desc is null");
+                               "Plugin_manager::execute failed: execution_plan_desc is null");
     }
 
     if(handle == nullptr)
     {
-        throw Hipdnn_exception(HIPDNN_STATUS_BAD_PARAM, 
-                              "Plugin_manager::execute failed: handle is null");
+        throw Hipdnn_exception(HIPDNN_STATUS_BAD_PARAM,
+                               "Plugin_manager::execute failed: handle is null");
     }
 
     if(variant_desc == nullptr)
     {
-        throw Hipdnn_exception(HIPDNN_STATUS_BAD_PARAM, 
-                              "Plugin_manager::execute failed: variant_desc is null");
+        throw Hipdnn_exception(HIPDNN_STATUS_BAD_PARAM,
+                               "Plugin_manager::execute failed: variant_desc is null");
     }
 
     if(!execution_plan_desc->is_finalized())
     {
-        throw Hipdnn_exception(HIPDNN_STATUS_BAD_PARAM,
-                              "Plugin_manager::execute failed: execution_plan_desc is not finalized");
+        throw Hipdnn_exception(
+            HIPDNN_STATUS_BAD_PARAM,
+            "Plugin_manager::execute failed: execution_plan_desc is not finalized");
     }
     hipdnnStatus_t status = HIPDNN_STATUS_INTERNAL_ERROR;
 
     // First get engine config from engine plan descritpor
     hipdnnBackendDescriptor_t engine_config = nullptr;
-    status = hipdnnBackendGetAttribute(
-        execution_plan_desc,
-        HIPDNN_ATTR_EXECUTION_PLAN_ENGINE_CONFIG,
-        HIPDNN_TYPE_BACKEND_DESCRIPTOR,
-        1,
-        nullptr,
-        &engine_config);
+    status = hipdnnBackendGetAttribute(execution_plan_desc,
+                                       HIPDNN_ATTR_EXECUTION_PLAN_ENGINE_CONFIG,
+                                       HIPDNN_TYPE_BACKEND_DESCRIPTOR,
+                                       1,
+                                       nullptr,
+                                       &engine_config);
 
     if(status != HIPDNN_STATUS_SUCCESS)
     {
-        throw Hipdnn_exception(status,
-                              "Plugin_manager::execute failed: could not get engine configuration");
+        throw Hipdnn_exception(
+            status, "Plugin_manager::execute failed: could not get engine configuration");
     }
 
     if(engine_config == nullptr)
     {
         throw Hipdnn_exception(HIPDNN_STATUS_BAD_PARAM,
-                              "Plugin_manager::execute failed: engine_config is null");
+                               "Plugin_manager::execute failed: engine_config is null");
     }
 
     // second get the engine from the engine config
     hipdnnBackendDescriptor_t engine;
-    status = hipdnnBackendGetAttribute(
-        engine_config, HIPDNN_ATTR_ENGINECFG_ENGINE, HIPDNN_TYPE_BACKEND_DESCRIPTOR, 1, nullptr, &engine);
+    status = hipdnnBackendGetAttribute(engine_config,
+                                       HIPDNN_ATTR_ENGINECFG_ENGINE,
+                                       HIPDNN_TYPE_BACKEND_DESCRIPTOR,
+                                       1,
+                                       nullptr,
+                                       &engine);
     if(status != HIPDNN_STATUS_SUCCESS)
     {
-        throw Hipdnn_exception(status,
-                              "Plugin_manager::execute failed: could not get engine");
+        throw Hipdnn_exception(status, "Plugin_manager::execute failed: could not get engine");
     }
     // third get the engine id from the engine
     int64_t engine_id;
@@ -161,10 +165,9 @@ void Plugin_manager::execute( // NOLINT(readability-convert-member-functions-to-
     auto plugin = get_plugin(engine_id);
     if(plugin == nullptr)
     {
-        throw Hipdnn_exception(
-            HIPDNN_STATUS_BAD_PARAM_OUT_OF_BOUND,
-            std::string("Plugin_manager::execute has invalid engine id: ") + 
-                std::to_string(engine_id));
+        throw Hipdnn_exception(HIPDNN_STATUS_BAD_PARAM_OUT_OF_BOUND,
+                               std::string("Plugin_manager::execute has invalid engine id: ")
+                                   + std::to_string(engine_id));
     }
 
     // Then, get the graph from the engine
@@ -178,8 +181,8 @@ void Plugin_manager::execute( // NOLINT(readability-convert-member-functions-to-
     auto graph_desc = static_cast<Graph_descriptor*>(graph);
     if(graph_desc == nullptr)
     {
-        throw hipdnn_backend::Hipdnn_exception(
-            HIPDNN_STATUS_BAD_PARAM, "Plugin_manager::execute failed: could not get engine graph");
+        throw Hipdnn_exception(HIPDNN_STATUS_BAD_PARAM,
+                               "Plugin_manager::execute failed: could not get engine graph");
     }
 
     // Execute using the plugin

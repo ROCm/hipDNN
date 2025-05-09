@@ -83,4 +83,82 @@ void populate_test_engine_config(hipdnnBackendDescriptor_t* engine_config,
     }
 }
 
+void create_tensor(hipdnnBackendDescriptor_t* tensor,
+                   const int64_t* dims,
+                   int64_t dims_count,
+                   hipdnnDataType_t data_type)
+{
+    ASSERT_EQ(hipdnnBackendCreateDescriptor(HIPDNN_BACKEND_TENSOR_DESCRIPTOR, tensor),
+              HIPDNN_STATUS_SUCCESS);
+    populate_tensor(*tensor, dims, dims_count, data_type, true);
+}
+
+void populate_tensor(hipdnnBackendDescriptor_t tensor,
+                     const int64_t* dims,
+                     int64_t dims_count,
+                     hipdnnDataType_t data_type,
+                     bool finalize)
+{
+    ASSERT_EQ(hipdnnBackendSetAttribute(
+                  tensor, HIPDNN_ATTR_TENSOR_DIMENSIONS, HIPDNN_TYPE_INT64, dims_count, dims),
+              HIPDNN_STATUS_SUCCESS);
+
+    ASSERT_EQ(hipdnnBackendSetAttribute(
+                  tensor, HIPDNN_ATTR_TENSOR_DATA_TYPE, HIPDNN_TYPE_INT32, 1, &data_type),
+              HIPDNN_STATUS_SUCCESS);
+
+    if(finalize)
+    {
+        ASSERT_EQ(hipdnnBackendFinalize(tensor), HIPDNN_STATUS_SUCCESS);
+    }
+}
+
+void create_input_tensor(hipdnnBackendDescriptor_t* tensor, hipdnnDataType_t data_type)
+{
+    int64_t dims[] = {1, 3, 224, 224}; // Batch, Channels, Height, Width
+    create_tensor(tensor, dims, 4, data_type);
+}
+
+void create_output_tensor(hipdnnBackendDescriptor_t* tensor, hipdnnDataType_t data_type)
+{
+    int64_t dims[] = {1, 1000, 1, 1}; // Batch, Classes
+    create_tensor(tensor, dims, 4, data_type);
+}
+
+void create_variant_pack(hipdnnBackendDescriptor_t* variant_pack)
+{
+    ASSERT_EQ(hipdnnBackendCreateDescriptor(HIPDNN_BACKEND_VARIANT_PACK_DESCRIPTOR, variant_pack),
+              HIPDNN_STATUS_SUCCESS);
+    populate_variant_pack(*variant_pack);
+}
+
+void populate_variant_pack(hipdnnBackendDescriptor_t variant_pack,
+                           hipdnnBackendDescriptor_t input_tensor,
+                           hipdnnBackendDescriptor_t output_tensor,
+                           bool finalize = true)
+{
+    ASSERT_NE(input_tensor, nullptr) << "Input tensor must not be null";
+    ASSERT_NE(output_tensor, nullptr) << "Output tensor must not be null";
+
+    // Set the tensors on the variant pack
+    ASSERT_EQ(hipdnnBackendSetAttribute(variant_pack,
+                                        HIPDNN_ATTR_VARIANT_PACK_INPUT,
+                                        HIPDNN_TYPE_BACKEND_DESCRIPTOR,
+                                        1,
+                                        &input_tensor),
+              HIPDNN_STATUS_SUCCESS);
+
+    ASSERT_EQ(hipdnnBackendSetAttribute(variant_pack,
+                                        HIPDNN_ATTR_VARIANT_PACK_OUTPUT,
+                                        HIPDNN_TYPE_BACKEND_DESCRIPTOR,
+                                        1,
+                                        &output_tensor),
+              HIPDNN_STATUS_SUCCESS);
+
+    if(finalize)
+    {
+        ASSERT_EQ(hipdnnBackendFinalize(variant_pack), HIPDNN_STATUS_SUCCESS);
+    }
+}
+
 } // namespace test_util

@@ -2,6 +2,7 @@
 // SPDX-License-Identifier:  MIT
 
 #include "hipdnn_backend.h"
+#include "mock_descriptor.hpp"
 #include <gtest/gtest.h>
 
 class Execution_plan_api_tests : public ::testing::Test
@@ -11,14 +12,14 @@ protected:
     hipdnnHandle_t _handle = nullptr;
     hipdnnBackendDescriptor_t _engine_config = nullptr;
 
-    void SetUp() override
+    void SetUp(/* NOLINT(readability-convert-member-functions-to-static */) override
     {
         EXPECT_EQ(hipdnnBackendCreateDescriptor(HIPDNN_BACKEND_EXECUTION_PLAN_DESCRIPTOR, &_plan),
                   HIPDNN_STATUS_SUCCESS);
         ASSERT_NE(_plan, nullptr);
     }
 
-    void TearDown() override
+    void TearDown(/*NOLINT(readability-convert-member-functions-to-static*/) override
     {
         EXPECT_EQ(hipdnnBackendDestroyDescriptor(_plan), HIPDNN_STATUS_SUCCESS);
         if(_handle != nullptr)
@@ -84,33 +85,56 @@ TEST_F(Execution_plan_api_tests, FinalizeExecutionPlan)
     // TODO add more tests when engine_config is created
 }
 
-//=====================================
 TEST_F(Execution_plan_api_tests, ExecuteWithModifiedVariantPack)
 {
+    hipdnnBackendDescriptor_t engine = nullptr;
+    if (_handle == nullptr) {
+        ASSERT_EQ(hipdnnCreate(&_handle), HIPDNN_STATUS_SUCCESS);
+    }
+    ASSERT_EQ(hipdnnBackendCreateDescriptor(HIPDNN_BACKEND_ENGINE_DESCRIPTOR, &engine),
+              HIPDNN_STATUS_SUCCESS);
+
+    hipdnnBackendDescriptor_t graph = nullptr;
+    int64_t engine_id = -1; // HIPDNN_ENGINE_ID_FAKE; // -1 for the fake plugin
+
+    test_util::create_test_graph(graph);
+    ASSERT_NE(graph, nullptr);
+    ASSERT_EQ(hipdnnBackendFinalize(graph), HIPDNN_STATUS_SUCCESS);
+    
+    // only populate since engine has been created in test fixture`
+    populate_test_engine(engine, graph, engine_id, true);
+    create_test_engine_config(_engine_config, engine, graph, engine_id, true);
+
+    int64_t dummy_workspace_size = 1024;
+    auto status = _engine_config->set_data(
+        HIPDNN_ATTR_ENGINECFG_WORKSPACE_SIZE, HIPDNN_TYPE_INT64, 1, &dummy_workspace_size);
+
+    // We can verify it was set correctly:
+    int64_t workspace_size = 0;
+    ASSERT_EQ(hipdnnBackendGetAttribute(engine_config,
+                                        HIPDNN_ATTR_ENGINECFG_WORKSPACE_SIZE,
+                                        HIPDNN_TYPE_INT64,
+                                        1,
+                                        nullptr,
+                                        &workspace_size),
+              HIPDNN_STATUS_SUCCESS);
+    ASSERT_GT(workspace_size, dummy_workspace_size);
+
+    // 5) Create variant pack
     hipdnnBackendDescriptor_t variant_pack = nullptr;
-
-    // Create a handle
-    ASSERT_EQ(hipdnnCreate(&_handle), HIPDNN_STATUS_SUCCESS);
-
-    // Create variant pack
     ASSERT_EQ(hipdnnBackendCreateDescriptor(HIPDNN_BACKEND_VARIANT_PACK_DESCRIPTOR, &variant_pack),
               HIPDNN_STATUS_SUCCESS);
 
-    // Set required attributes on the plan
-    EXPECT_EQ(hipdnnBackendSetAttribute(
-                  _plan, HIPDNN_ATTR_EXECUTION_PLAN_HANDLE, HIPDNN_TYPE_HANDLE, 1, &_handle),
-              HIPDNN_STATUS_SUCCESS);
+    // 6) Set values to variant pack if needed
+    // For now, the Fake_plugin doesn't require any values
 
-    //EXPECT_EQ(hipdnnBackendFinalize(_plan), HIPDNN_STATUS_SUCCESS);
-
-    // Execute plan with variant pack
+    // 7) Execute plan with variant pack
     hipdnnStatus_t status = hipdnnBackendExecute(_handle, _plan, variant_pack);
+    EXPECT_EQ(status, HIPDNN_STATUS_SUCCESS);
 
-    EXPECT_TRUE(status == HIPDNN_STATUS_SUCCESS || status == HIPDNN_STATUS_EXECUTION_FAILED
-                || status == HIPDNN_STATUS_NOT_SUPPORTED);
-
+    // Clean up resources
     EXPECT_EQ(hipdnnBackendDestroyDescriptor(variant_pack), HIPDNN_STATUS_SUCCESS);
-
-    // The engine config will be destroyed by the framework since we registered it
-    // with hipdnnBackendSetAttribute
+    EXPECT_EQ(hipdnnBackendDestroyDescriptor(graph), HIPDNN_STATUS_SUCCESS);
+    EXPECT_EQ(hipdnnBackendDestroyDescriptor(engine), HIPDNN_STATUS_SUCCESS);
+    EXPECT_EQ(hipdnnBackendDestroyDescriptor(engine_config), HIPDNN_STATUS_SUCCESS);
 }
