@@ -1,8 +1,9 @@
 // Copyright © Advanced Micro Devices, Inc., or its affiliates.
 // SPDX-License-Identifier:  MIT
 
-#include "plugin/plugin_core.hpp"
 #include <gtest/gtest.h>
+
+#include "plugin/plugin_core.hpp"
 
 using namespace hipdnn_backend;
 

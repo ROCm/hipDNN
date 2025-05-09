@@ -1,9 +1,12 @@
 // Copyright © Advanced Micro Devices, Inc., or its affiliates.
 // SPDX-License-Identifier:  MIT
 
-#include "plugin/shared_library.hpp"
 #include <gtest/gtest.h>
+
 #include <hipdnn_sdk/plugin/plugin_api_enums.h>
+
+#include "hipdnn_exception.hpp"
+#include "plugin/shared_library.hpp"
 
 using namespace hipdnn_backend;
 
@@ -20,7 +23,7 @@ const char* const WRONG_SYMBOL_NAME = "wrong_symbol_name";
 TEST(SharedLibraryTest, LoadLibrary)
 {
     plugin::Shared_library library;
-    ASSERT_TRUE(library.load(LIBRARY_PATH));
+    library.load(LIBRARY_PATH);
     library.unload();
 }
 
@@ -32,39 +35,34 @@ TEST(SharedLibraryTest, LoadLibraryCtor)
 TEST(SharedLibraryTest, LoadLibraryWrongPath)
 {
     plugin::Shared_library library;
-    ASSERT_FALSE(library.load(WRONG_LIBRARY_PATH));
+    ASSERT_THROW(library.load(WRONG_LIBRARY_PATH), hipdnn_backend::Hipdnn_exception);
     library.unload();
 }
 
 TEST(SharedLibraryTest, LoadLibraryCtorWrongPath)
 {
     ASSERT_THROW(plugin::Shared_library library(WRONG_LIBRARY_PATH),
-                 std::runtime_error // TODO Replace with the actual exception type thrown
-    );
+                 hipdnn_backend::Hipdnn_exception);
 }
 
 TEST(SharedLibraryTest, GetSymbol)
 {
     plugin::Shared_library library(LIBRARY_PATH);
 
-    auto symbol = library.get_symbol(SYMBOL_NAME);
-    ASSERT_NE(symbol, nullptr);
+    ASSERT_NO_THROW(library.get_symbol(SYMBOL_NAME));
 }
 
 TEST(SharedLibraryTest, GetSymbolUninitialized)
 {
     plugin::Shared_library library;
-    ASSERT_THROW(library.get_symbol(SYMBOL_NAME),
-                 std::runtime_error // TODO Replace with the actual exception type thrown
-    );
+    ASSERT_THROW(library.get_symbol(SYMBOL_NAME), hipdnn_backend::Hipdnn_exception);
 }
 
 TEST(SharedLibraryTest, GetSymbolWrongName)
 {
     plugin::Shared_library library(LIBRARY_PATH);
 
-    auto symbol = library.get_symbol(WRONG_SYMBOL_NAME);
-    ASSERT_EQ(symbol, nullptr);
+    ASSERT_THROW(library.get_symbol(WRONG_SYMBOL_NAME), hipdnn_backend::Hipdnn_exception);
 }
 
 TEST(SharedLibraryTest, CallFunction)
@@ -74,7 +72,6 @@ TEST(SharedLibraryTest, CallFunction)
     // Get the function pointer
     using Func_type = hipdnnPluginStatus_t (*)(const char**);
     auto func_get_name = library.get_symbol<Func_type>(SYMBOL_NAME);
-    ASSERT_NE(func_get_name, nullptr);
 
     // Call the function to get the plugin name
     const char* name = nullptr;

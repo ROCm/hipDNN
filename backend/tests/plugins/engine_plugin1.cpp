@@ -6,6 +6,7 @@
 // unloaded correctly, and run the engine from the plugin.
 
 #include <cstdint> // for uint32_t
+
 #include <hip/hip_runtime.h>
 #include <hipdnn_sdk/plugin/plugin_api.h>
 

@@ -3,8 +3,9 @@
 
 #pragma once
 
-#include "plugin_core.hpp"
 #include <cstdint> // for uint32_t
+
+#include "plugin_core.hpp"
 
 namespace hipdnn_backend
 {
@@ -13,6 +14,10 @@ namespace plugin
 
 class Engine_plugin : public Plugin_base
 {
+protected:
+    // The constructor is protected to prevent direct instantiation of the class.
+    Engine_plugin(Shared_library&& lib);
+
 public:
     unsigned num_engines() const;
     void run_engine(unsigned engine_index,
@@ -20,11 +25,9 @@ public:
                     uint32_t* output,
                     uint32_t size) const;
 
-protected:
-    // resolve_symbols must be called before using the plugin. It is used to resolve the symbols in the plugin library.
-    bool resolve_symbols() override;
-
 private:
+    void resolve_symbols();
+
 #ifndef NDEBUG
     bool _initialized = false;
 #endif
@@ -32,7 +35,6 @@ private:
     hipdnnPluginStatus_t (*_func_get_num_engines)(unsigned*);
     hipdnnPluginStatus_t (*_func_run_engine)(unsigned, const uint32_t*, uint32_t*, uint32_t);
 
-    using Plugin_base::Plugin_base;
     friend class Plugin_manager_base<Engine_plugin>;
 };
 
