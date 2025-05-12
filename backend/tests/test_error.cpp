@@ -173,3 +173,79 @@ TEST(ErrorTests, GetBackendAttributeName)
     EXPECT_STREQ(hipdnn_get_attribute_name_string(HIPDNN_ATTR_DEVICEPROP_JSON_REPRESENTATION),
                  "HIPDNN_ATTR_DEVICEPROP_JSON_REPRESENTATION");
 }
+
+TEST(ErrorTests, Get_Status_String)
+{
+    EXPECT_STREQ(hipdnn_get_status_string(HIPDNN_STATUS_SUCCESS), "HIPDNN_STATUS_SUCCESS");
+    EXPECT_STREQ(hipdnn_get_status_string(HIPDNN_STATUS_NOT_INITIALIZED),
+                 "HIPDNN_STATUS_NOT_INITIALIZED");
+    EXPECT_STREQ(hipdnn_get_status_string(HIPDNN_STATUS_BAD_PARAM), "HIPDNN_STATUS_BAD_PARAM");
+    EXPECT_STREQ(hipdnn_get_status_string(HIPDNN_STATUS_BAD_PARAM_NULL_POINTER),
+                 "HIPDNN_STATUS_BAD_PARAM_NULL_POINTER");
+    EXPECT_STREQ(hipdnn_get_status_string(HIPDNN_STATUS_BAD_PARAM_NOT_FINALIZED),
+                 "HIPDNN_STATUS_BAD_PARAM_NOT_FINALIZED");
+    EXPECT_STREQ(hipdnn_get_status_string(HIPDNN_STATUS_BAD_PARAM_OUT_OF_BOUND),
+                 "HIPDNN_STATUS_BAD_PARAM_OUT_OF_BOUND");
+    EXPECT_STREQ(hipdnn_get_status_string(HIPDNN_STATUS_BAD_PARAM_SIZE_INSUFFICIENT),
+                 "HIPDNN_STATUS_BAD_PARAM_SIZE_INSUFFICIENT");
+    EXPECT_STREQ(hipdnn_get_status_string(HIPDNN_STATUS_BAD_PARAM_STREAM_MISMATCH),
+                 "HIPDNN_STATUS_BAD_PARAM_STREAM_MISMATCH");
+    EXPECT_STREQ(hipdnn_get_status_string(HIPDNN_STATUS_NOT_SUPPORTED),
+                 "HIPDNN_STATUS_NOT_SUPPORTED");
+    EXPECT_STREQ(hipdnn_get_status_string(HIPDNN_STATUS_INTERNAL_ERROR),
+                 "HIPDNN_STATUS_INTERNAL_ERROR");
+    EXPECT_STREQ(hipdnn_get_status_string(HIPDNN_STATUS_ALLOC_FAILED),
+                 "HIPDNN_STATUS_ALLOC_FAILED");
+    EXPECT_STREQ(hipdnn_get_status_string(HIPDNN_STATUS_INTERNAL_ERROR_HOST_ALLOCATION_FAILED),
+                 "HIPDNN_STATUS_INTERNAL_ERROR_HOST_ALLOCATION_FAILED");
+    EXPECT_STREQ(hipdnn_get_status_string(HIPDNN_STATUS_INTERNAL_ERROR_DEVICE_ALLOCATION_FAILED),
+                 "HIPDNN_STATUS_INTERNAL_ERROR_DEVICE_ALLOCATION_FAILED");
+    EXPECT_STREQ(hipdnn_get_status_string(HIPDNN_STATUS_EXECUTION_FAILED),
+                 "HIPDNN_STATUS_EXECUTION_FAILED");
+
+    EXPECT_STREQ(hipdnn_get_status_string(static_cast<hipdnnStatus_t>(-1)),
+                 "HIPDNN_STATUS_UNKNOWN");
+}
+
+TEST(ErrorTests, Get_Attribute_Type_String)
+{
+    EXPECT_STREQ(hipdnn_get_attribute_type_string(HIPDNN_TYPE_HANDLE), "HIPDNN_TYPE_HANDLE");
+    EXPECT_STREQ(hipdnn_get_attribute_type_string(HIPDNN_TYPE_DATA_TYPE), "HIPDNN_TYPE_DATA_TYPE");
+    EXPECT_STREQ(hipdnn_get_attribute_type_string(HIPDNN_TYPE_BOOLEAN), "HIPDNN_TYPE_BOOLEAN");
+    EXPECT_STREQ(hipdnn_get_attribute_type_string(HIPDNN_TYPE_INT64), "HIPDNN_TYPE_INT64");
+    EXPECT_STREQ(hipdnn_get_attribute_type_string(HIPDNN_TYPE_FLOAT), "HIPDNN_TYPE_FLOAT");
+    EXPECT_STREQ(hipdnn_get_attribute_type_string(HIPDNN_TYPE_DOUBLE), "HIPDNN_TYPE_DOUBLE");
+    EXPECT_STREQ(hipdnn_get_attribute_type_string(HIPDNN_TYPE_VOID_PTR), "HIPDNN_TYPE_VOID_PTR");
+    EXPECT_STREQ(hipdnn_get_attribute_type_string(HIPDNN_TYPE_HEUR_MODE), "HIPDNN_TYPE_HEUR_MODE");
+    EXPECT_STREQ(hipdnn_get_attribute_type_string(HIPDNN_TYPE_KNOB_TYPE), "HIPDNN_TYPE_KNOB_TYPE");
+    EXPECT_STREQ(hipdnn_get_attribute_type_string(HIPDNN_TYPE_NAN_PROPOGATION),
+                 "HIPDNN_TYPE_NAN_PROPOGATION");
+    EXPECT_STREQ(hipdnn_get_attribute_type_string(HIPDNN_TYPE_NUMERICAL_NOTE),
+                 "HIPDNN_TYPE_NUMERICAL_NOTE");
+    EXPECT_STREQ(hipdnn_get_attribute_type_string(HIPDNN_TYPE_LAYOUT_TYPE),
+                 "HIPDNN_TYPE_LAYOUT_TYPE");
+    EXPECT_STREQ(hipdnn_get_attribute_type_string(HIPDNN_TYPE_ATTRIB_NAME),
+                 "HIPDNN_TYPE_ATTRIB_NAME");
+    EXPECT_STREQ(hipdnn_get_attribute_type_string(HIPDNN_TYPE_BACKEND_DESCRIPTOR),
+                 "HIPDNN_TYPE_BACKEND_DESCRIPTOR");
+    EXPECT_STREQ(hipdnn_get_attribute_type_string(HIPDNN_TYPE_GENSTATS_MODE),
+                 "HIPDNN_TYPE_GENSTATS_MODE");
+    EXPECT_STREQ(hipdnn_get_attribute_type_string(HIPDNN_TYPE_BN_FINALIZE_STATS_MODE),
+                 "HIPDNN_TYPE_BN_FINALIZE_STATS_MODE");
+    EXPECT_STREQ(hipdnn_get_attribute_type_string(HIPDNN_TYPE_BEHAVIOR_NOTE),
+                 "HIPDNN_TYPE_BEHAVIOR_NOTE");
+    EXPECT_STREQ(hipdnn_get_attribute_type_string(HIPDNN_TYPE_TENSOR_REORDERING_MODE),
+                 "HIPDNN_TYPE_TENSOR_REORDERING_MODE");
+    EXPECT_STREQ(hipdnn_get_attribute_type_string(HIPDNN_TYPE_INT32), "HIPDNN_TYPE_INT32");
+    EXPECT_STREQ(hipdnn_get_attribute_type_string(HIPDNN_TYPE_CHAR), "HIPDNN_TYPE_CHAR");
+    EXPECT_STREQ(hipdnn_get_attribute_type_string(HIPDNN_TYPE_SIGNAL_MODE),
+                 "HIPDNN_TYPE_SIGNAL_MODE");
+    EXPECT_STREQ(hipdnn_get_attribute_type_string(HIPDNN_TYPE_FRACTION), "HIPDNN_TYPE_FRACTION");
+    EXPECT_STREQ(hipdnn_get_attribute_type_string(HIPDNN_TYPE_NORM_FWD_PHASE),
+                 "HIPDNN_TYPE_NORM_FWD_PHASE");
+    EXPECT_STREQ(hipdnn_get_attribute_type_string(HIPDNN_TYPE_RNG_DISTRIBUTION),
+                 "HIPDNN_TYPE_RNG_DISTRIBUTION");
+
+    EXPECT_STREQ(hipdnn_get_attribute_type_string(static_cast<hipdnnBackendAttributeType_t>(-1)),
+                 "HIPDNN_ATTRIBUTE_UNKNOWN");
+}

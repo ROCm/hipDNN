@@ -44,6 +44,13 @@ TEST(HipDNNBackendTest, WontDestroyDescriptorIfNull)
     EXPECT_EQ(status, HIPDNN_STATUS_BAD_PARAM_NULL_POINTER);
 }
 
+TEST(HipDNNBackendTest, CreateHandleFailsIfHandlePtrIsNull)
+{
+    hipdnnStatus_t status = hipdnnCreate(nullptr);
+
+    EXPECT_EQ(status, HIPDNN_STATUS_BAD_PARAM_NULL_POINTER);
+}
+
 TEST(HipDNNBackendTest, Execute)
 {
     hipdnnHandle_t handle = nullptr;

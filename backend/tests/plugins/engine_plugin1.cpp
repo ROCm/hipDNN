@@ -8,6 +8,7 @@
 #include <cstdint> // for uint32_t
 
 #include <hip/hip_runtime.h>
+#include <hipdnn_sdk/logging/logger.hpp>
 #include <hipdnn_sdk/plugin/plugin_api.h>
 
 namespace
@@ -41,7 +42,7 @@ hipdnnPluginStatus_t run_engine(const uint32_t* input, uint32_t* output, uint32_
     hipError_t error = hipGetLastError();
     if(error != hipSuccess)
     {
-        // TODO Add information about the error
+        HIPDNN_LOG_ERROR("Error - kernel launch failed. Message: {}", hipGetErrorString(error));
         return hipdnnPluginInternalError;
     }
     return hipdnnPluginStatusSuccess;

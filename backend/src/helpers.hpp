@@ -56,4 +56,4 @@ hipdnnStatus_t try_catch_with_status(F f)
     }
     return status;
 }
-}
+} // namespace hipdnn_backend
