@@ -9,6 +9,8 @@
 #include "handle/handle_factory.hpp"
 #include "helpers.hpp"
 #include "hipdnn_exception.hpp"
+#include "plugin/plugin_manager.hpp"
+
 #include <hipdnn_sdk/logging/logger.hpp>
 
 using namespace hipdnn_backend;
@@ -161,6 +163,13 @@ HIPDNN_BACKEND_EXPORT hipdnnStatus_t hipdnnBackendFinalize(hipdnnBackendDescript
         throw_if_invalid_descriptor(descriptor);
 
         descriptor->finalize();
+
+        if(descriptor->type == HIPDNN_BACKEND_ENGINECFG_DESCRIPTOR)
+        {
+            Plugin_manager plugin_manager;
+            plugin_manager.initialize();
+            plugin_manager.finalize_engine_config(descriptor);
+        }
 
         LOG_API_SUCCESS(api_name, "");
     });
