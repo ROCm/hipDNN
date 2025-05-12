@@ -9,8 +9,10 @@ priority=50\n\
 gpgcheck=1\n\
 gpgkey=https://repo.radeon.com/rocm/rocm.gpg.key" > /etc/yum.repos.d/rocm.repo
 
+# its miopen-hip or miopen-hip-devel.  need to figure out the difference. i think we need devel
 RUN yum install -y rocm-llvm-devel && \
-    yum install -y hip-devel
+    yum install -y hip-devel && \
+    yum install -y miopen-hip-devel 
 
 ENV PATH="/opt/rocm:${PATH}"
 ENV CMAKE_GENERATOR="Ninja"
