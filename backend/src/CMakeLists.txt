@@ -7,6 +7,8 @@ set(HIP_DNN_BACKEND_EXPORT_INCLUDE_DIR "${PROJECT_BINARY_DIR}/backend/include/")
 set(HIP_DNN_BACKEND_SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 
 add_library(hipdnn_backend_private
+    descriptors/engine_config_descriptor.cpp
+    descriptors/engine_descriptor.cpp
     descriptors/execution_plan_descriptor.cpp
     descriptors/graph_descriptor.cpp
     descriptors/variant_descriptor.cpp

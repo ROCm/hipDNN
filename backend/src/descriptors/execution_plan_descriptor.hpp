@@ -12,7 +12,7 @@ class Execution_plan_descriptor : public hipdnnBackendDescriptor
 {
 private:
     hipdnnHandle_t _handle = nullptr;
-    hipdnnBackendDescriptor_t _engine = nullptr;
+    hipdnnBackendDescriptor_t _engine_config = nullptr;
 
     hipdnnStatus_t get_workspace_size(hipdnnBackendAttributeType_t attribute_type,
                                       int64_t requested_element_count,

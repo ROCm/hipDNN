@@ -30,7 +30,7 @@ void Execution_plan_descriptor::finalize()
                                "Handle was not set.");
     }
 
-    if(_engine == nullptr)
+    if(_engine_config == nullptr)
     {
         throw Hipdnn_exception(HIPDNN_STATUS_BAD_PARAM,
                                "Execution_plan_descriptor::finalize() failed: "
@@ -81,7 +81,7 @@ hipdnnStatus_t
                                                   int64_t* element_count,
                                                   void* array_of_elements)
 {
-    if(_engine == nullptr)
+    if(_engine_config == nullptr)
     {
         // This would be a bug since we are finalized at this point
         return set_last_error(HIPDNN_STATUS_INTERNAL_ERROR,
@@ -89,11 +89,11 @@ hipdnnStatus_t
                               "Engine was not set (internal error).");
     }
 
-    return _engine->get_attribute(HIPDNN_ATTR_ENGINECFG_WORKSPACE_SIZE,
-                                  attribute_type,
-                                  requested_element_count,
-                                  element_count,
-                                  array_of_elements);
+    return _engine_config->get_attribute(HIPDNN_ATTR_ENGINECFG_WORKSPACE_SIZE,
+                                         attribute_type,
+                                         requested_element_count,
+                                         element_count,
+                                         array_of_elements);
 }
 
 hipdnnStatus_t Execution_plan_descriptor::set_attribute(hipdnnBackendAttributeName_t attribute_name,
@@ -192,31 +192,31 @@ hipdnnStatus_t
                               "Null pointer.");
     }
 
-    hipdnnBackendDescriptor_t engine
+    hipdnnBackendDescriptor_t engine_config
         = *reinterpret_cast<const hipdnnBackendDescriptor_t*>(array_of_elements);
 
-    if(engine == nullptr)
+    if(engine_config == nullptr)
     {
         return set_last_error(HIPDNN_STATUS_BAD_PARAM_NULL_POINTER,
                               "Execution_plan_descriptor failed to set engine config: "
-                              "Engine is null.");
+                              "Engine config is null.");
     }
 
-    if(engine->type != HIPDNN_BACKEND_ENGINE_DESCRIPTOR)
+    if(engine_config->type != HIPDNN_BACKEND_ENGINECFG_DESCRIPTOR)
     {
         return set_last_error(HIPDNN_STATUS_BAD_PARAM,
                               "Execution_plan_descriptor failed to set engine config: "
-                              "Invalid engine descriptor type.");
+                              "Invalid engine config descriptor type.");
     }
 
-    if(!engine->is_finalized())
+    if(!engine_config->is_finalized())
     {
         return set_last_error(HIPDNN_STATUS_BAD_PARAM_NOT_FINALIZED,
                               "Execution_plan_descriptor failed to set engine config: "
-                              "Engine descriptor is not finalized.");
+                              "Engine config descriptor is not finalized.");
     }
 
-    _engine = engine;
+    _engine_config = engine_config;
     return HIPDNN_STATUS_SUCCESS;
 }
 

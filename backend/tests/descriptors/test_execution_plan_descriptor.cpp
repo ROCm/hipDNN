@@ -8,16 +8,18 @@
 
 #include <gtest/gtest.h>
 
+#include <memory>
+
 using namespace hipdnn_backend;
 
 class Execution_plan_descriptor_test : public ::testing::Test
 {
 public:
-    Execution_plan_descriptor* _plan = nullptr;
+    std::unique_ptr<Execution_plan_descriptor> _plan = nullptr;
     hipdnnHandle_t _handle = reinterpret_cast<hipdnnHandle_t>(0x12345678);
-    Mock_descriptor* _mock_engine_config = nullptr;
-    Mock_descriptor* _mock_engine_bad_type = nullptr;
-    Mock_descriptor* _mock_engine_unfinished = nullptr;
+    std::unique_ptr<Mock_descriptor> _mock_engine_config = nullptr;
+    std::unique_ptr<Mock_descriptor> _mock_engine_bad_type = nullptr;
+    std::unique_ptr<Mock_descriptor> _mock_engine_unfinished = nullptr;
 
     void make_execution_plan_finalized()
     {
@@ -49,29 +51,26 @@ protected:
     {
         int64_t dummy_workspace_size = 1024;
 
-        _plan = new Execution_plan_descriptor();
+        _plan = std::make_unique<Execution_plan_descriptor>();
 
-        _mock_engine_config = new Mock_descriptor(HIPDNN_BACKEND_ENGINE_DESCRIPTOR, true);
+        _mock_engine_config
+            = std::make_unique<Mock_descriptor>(HIPDNN_BACKEND_ENGINECFG_DESCRIPTOR, true);
         auto status = _mock_engine_config->set_data(
             HIPDNN_ATTR_ENGINECFG_WORKSPACE_SIZE, HIPDNN_TYPE_INT64, 1, &dummy_workspace_size);
         ASSERT_EQ(status, HIPDNN_STATUS_SUCCESS);
 
-        _mock_engine_bad_type = new Mock_descriptor();
+        _mock_engine_bad_type = std::make_unique<Mock_descriptor>();
 
-        _mock_engine_unfinished = new Mock_descriptor(HIPDNN_BACKEND_ENGINE_DESCRIPTOR);
-    }
-    void TearDown() override
-    {
-        delete _plan;
-        delete _mock_engine_config;
-        delete _mock_engine_bad_type;
-        delete _mock_engine_unfinished;
+        _mock_engine_unfinished
+            = std::make_unique<Mock_descriptor>(HIPDNN_BACKEND_ENGINECFG_DESCRIPTOR);
     }
 };
 
 TEST_F(Execution_plan_descriptor_test, CreateExecutionPlanDescriptor)
 {
     ASSERT_NE(_plan, nullptr);
+    ASSERT_FALSE(_plan->is_finalized());
+    ASSERT_EQ(_plan->type, HIPDNN_BACKEND_EXECUTION_PLAN_DESCRIPTOR);
 }
 
 TEST_F(Execution_plan_descriptor_test, SetAttrOnUnfinalizedExecutionPlanDescriptor)

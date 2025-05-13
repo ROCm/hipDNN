@@ -2,6 +2,8 @@
 // SPDX-License-Identifier: MIT
 
 #include "descriptor_factory.hpp"
+#include "engine_config_descriptor.hpp"
+#include "engine_descriptor.hpp"
 #include "error.hpp"
 #include "execution_plan_descriptor.hpp"
 #include "graph_descriptor.hpp"
@@ -26,6 +28,12 @@ void Descriptor_factory::create(hipdnnBackendDescriptorType_t descriptor_type,
 
     switch(descriptor_type)
     {
+    case HIPDNN_BACKEND_ENGINECFG_DESCRIPTOR:
+        *descriptor = new Engine_config_descriptor();
+        break;
+    case HIPDNN_BACKEND_ENGINE_DESCRIPTOR:
+        *descriptor = new Engine_descriptor();
+        break;
     case HIPDNN_BACKEND_EXECUTION_PLAN_DESCRIPTOR:
         *descriptor = new Execution_plan_descriptor();
         break;
