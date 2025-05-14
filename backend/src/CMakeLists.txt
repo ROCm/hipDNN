@@ -20,6 +20,7 @@ add_library(hipdnn_backend_private
     plugin/engine_plugin.cpp
     plugin/plugin_core.cpp
     plugin/shared_library.cpp
+    error.cpp
 )
 
 target_include_directories(hipdnn_backend_private 

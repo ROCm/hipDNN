@@ -12,6 +12,7 @@
 #include "plugin/plugin_manager.hpp"
 
 #include <hipdnn_sdk/logging/logger.hpp>
+#include <hipdnn_sdk/utilities/string_util.hpp>
 
 using namespace hipdnn_backend;
 
@@ -142,16 +143,12 @@ HIPDNN_BACKEND_EXPORT hipdnnStatus_t hipdnnBackendExecute([[maybe_unused]] hipdn
                   static_cast<void*>(execution_plan),
                   static_cast<void*>(variant_pack));
 
-    return hipdnn_backend::try_catch_with_status([&, api_name = __func__]() -> hipdnnStatus_t {
+    return hipdnn_backend::try_catch([&]() {
         throw_if_invalid_descriptor(execution_plan);
         throw_if_invalid_descriptor(variant_pack);
 
-        HIPDNN_LOG_INFO("API not implemented: {}, status={}",
-                        api_name,
-                        hipdnn_backend::hipdnn_get_status_string(HIPDNN_STATUS_NOT_SUPPORTED));
-
         // TODO - add execute implementation
-        return HIPDNN_STATUS_NOT_SUPPORTED;
+        throw Hipdnn_exception(HIPDNN_STATUS_NOT_SUPPORTED, "hipdnnBackendExecute not implemented");
     });
 }
 
@@ -192,24 +189,19 @@ HIPDNN_BACKEND_EXPORT hipdnnStatus_t
                   static_cast<void*>(element_count),
                   array_of_elements);
 
-    return hipdnn_backend::try_catch_with_status([&, api_name = __func__]() -> hipdnnStatus_t {
+    return hipdnn_backend::try_catch([&, api_name = __func__]() {
         throw_if_invalid_descriptor(descriptor);
 
-        hipdnnStatus_t status = descriptor->get_attribute(attribute_name,
-                                                          attribute_type,
-                                                          requested_element_count,
-                                                          element_count,
-                                                          array_of_elements);
+        descriptor->get_attribute(attribute_name,
+                                  attribute_type,
+                                  requested_element_count,
+                                  element_count,
+                                  array_of_elements);
 
-        if(status == HIPDNN_STATUS_SUCCESS)
-        {
-            LOG_API_SUCCESS(api_name,
-                            "status={}, retrieved_element_count={}",
-                            hipdnn_backend::hipdnn_get_status_string(status),
-                            *element_count);
-        }
-
-        return status;
+        LOG_API_SUCCESS(api_name,
+                        "status={}, retrieved_element_count={}",
+                        hipdnn_backend::hipdnn_get_status_string(HIPDNN_STATUS_SUCCESS),
+                        *element_count);
     });
 }
 
@@ -228,19 +220,13 @@ HIPDNN_BACKEND_EXPORT hipdnnStatus_t
                   element_count,
                   array_of_elements);
 
-    return hipdnn_backend::try_catch_with_status([&, api_name = __func__]() -> hipdnnStatus_t {
+    return hipdnn_backend::try_catch([&, api_name = __func__]() {
         throw_if_invalid_descriptor(descriptor);
 
-        hipdnnStatus_t status = descriptor->set_attribute(
-            attribute_name, attribute_type, element_count, array_of_elements);
+        descriptor->set_attribute(attribute_name, attribute_type, element_count, array_of_elements);
 
-        if(status == HIPDNN_STATUS_SUCCESS)
-        {
-            LOG_API_SUCCESS(
-                api_name, "status={}", hipdnn_backend::hipdnn_get_status_string(status));
-        }
-
-        return status;
+        LOG_API_SUCCESS(
+            api_name, "status={}", hipdnn_backend::hipdnn_get_status_string(HIPDNN_STATUS_SUCCESS));
     });
 }
 
@@ -257,5 +243,33 @@ HIPDNN_BACKEND_EXPORT hipdnnStatus_t hipdnnBackendCreateAndDeserializeGraph_ext(
             descriptor, serialized_graph, graph_byte_size);
 
         LOG_API_SUCCESS(api_name, "created_descriptor={:p}", static_cast<void*>(*descriptor));
+    });
+}
+
+HIPDNN_BACKEND_EXPORT const char* hipdnnGetErrorString(hipdnnStatus_t status)
+{
+    LOG_API_ENTRY("status={}", hipdnn_backend::hipdnn_get_status_string(status));
+
+    return hipdnn_backend::hipdnn_get_status_string(status);
+}
+
+HIPDNN_BACKEND_EXPORT void hipdnnGetLastErrorString(char* message, size_t max_size)
+{
+    LOG_API_ENTRY("message_ptr={:p}, max_size={}", static_cast<void*>(message), max_size);
+
+    // Ignore status since API doesn't return it.
+    // We still want to catch and log if the user provides incorrect parameters.
+    auto _ = hipdnn_backend::try_catch([&, api_name = __func__] {
+        throw_if_null(message);
+
+        if(max_size == 0)
+        {
+            throw hipdnn_backend::Hipdnn_exception(HIPDNN_STATUS_BAD_PARAM, "max_size is 0");
+        }
+
+        hipdnn::sdk::utilities::copy_max_size_with_null_terminator(
+            message, hipdnn_backend::Last_error_manager::get_last_error(), max_size);
+
+        LOG_API_SUCCESS(api_name, "set_error_message={:p}", static_cast<void*>(message));
     });
 }

@@ -1,6 +1,7 @@
 // Copyright © Advanced Micro Devices, Inc., or its affiliates.
 // SPDX-License-Identifier: MIT
 
+#include "descriptors/test_macros.hpp"
 #include "flatbuffer_utilities.hpp"
 #include "hipdnn_exception.hpp"
 #include <flatbuffers/flatbuffers.h>
@@ -82,8 +83,9 @@ TEST_P(Flatbuffer_invalid_tests, WillNotUnpackInvalidBuffer)
     auto [buffer, size] = GetParam();
 
     std::unique_ptr<hipdnn_sdk::data_objects::GraphT> graph;
-    ASSERT_THROW(flatbuffer_utilities::convert_serialized_graph_to_graph(buffer, size, graph),
-                 hipdnn_backend::Hipdnn_exception);
+    ASSERT_THROW_HIPDNN_STATUS(
+        flatbuffer_utilities::convert_serialized_graph_to_graph(buffer, size, graph),
+        HIPDNN_STATUS_BAD_PARAM);
     ASSERT_EQ(graph, nullptr);
 }
 
