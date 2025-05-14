@@ -3,6 +3,8 @@
 
 #pragma once
 
+#include "callback_sink.hpp"
+#include "callback_types.h"
 #include "spdlog/sinks/stdout_color_sinks.h"
 #include <ctime>
 #include <iomanip>
@@ -154,6 +156,20 @@ inline std::string
 #endif
 
     return output_file;
+}
+
+inline void initialize_callback_logging(const std::string& logging_area_name,
+                                        hipdnnCallback_t callback_function,
+                                        void* user_data = nullptr)
+{
+    auto logger = hipdnn::logging::create_callback_logger_mt<spdlog::async_factory>(
+        logging_area_name, callback_function, user_data, logging_area_name);
+
+    spdlog::register_logger(logger);
+
+    spdlog::set_default_logger(logger);
+
+    setup_log_pattern(logging_area_name);
 }
 
 }

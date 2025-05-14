@@ -18,8 +18,8 @@
 #include "hipdnn_backend_attribute_name.h"
 #include "hipdnn_backend_attribute_type.h"
 #include "hipdnn_backend_descriptor_type.h"
-#include <hipdnn_sdk/logging/callback_types.h>
 #include "hipdnn_status.h"
+#include <hipdnn_sdk/logging/callback_types.h>
 
 // NOLINTBEGIN
 #ifdef __cplusplus
@@ -260,7 +260,6 @@ HIPDNN_BACKEND_EXPORT hipdnnStatus_t
  */
 HIPDNN_BACKEND_EXPORT hipdnnStatus_t hipdnnBackendCreateAndDeserializeGraph_ext(
     hipdnnBackendDescriptor_t* descriptor, const uint8_t* serialized_graph, size_t graph_byte_size);
-
 
 // /**
 //  * @brief callback function type used by hipDNN sinks to relay messages to the backend.
