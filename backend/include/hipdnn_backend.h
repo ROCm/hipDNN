@@ -18,7 +18,7 @@
 #include "hipdnn_backend_attribute_name.h"
 #include "hipdnn_backend_attribute_type.h"
 #include "hipdnn_backend_descriptor_type.h"
-#include "hipdnn_severity.h"
+#include <hipdnn_sdk/logging/callback_types.h>
 #include "hipdnn_status.h"
 
 // NOLINTBEGIN
@@ -261,26 +261,16 @@ HIPDNN_BACKEND_EXPORT hipdnnStatus_t
 HIPDNN_BACKEND_EXPORT hipdnnStatus_t hipdnnBackendCreateAndDeserializeGraph_ext(
     hipdnnBackendDescriptor_t* descriptor, const uint8_t* serialized_graph, size_t graph_byte_size);
 
-/*!
- * @brief Creates the hipdnnCallback_t type 
- */
-typedef void (*hipdnnCallback_t)(hipdnnSeverity_t sev, void* udata, const char* msg);
 
-/*! @brief Sets a callback function for logging.
- *
- * Allows an application to register a callback function to receive log messages
- * from the hipDNN library (including backend, frontend, and plugins).
- * All log messages will be routed to this callback in addition to any
- * internal file logging configured by the backend
- *
- * @param[in] callback      The callback function.
- * @param[in] user_data     User-defined data to be passed to the callback function.
- *
- * @retval HIPDNN_STATUS_SUCCESS            The callback was successfully set or cleared.
- * @retval HIPDNN_STATUS_BAD_PARAM          If setting the callback failed (e.g. internal error).
- */
-HIPDNN_BACKEND_EXPORT hipdnnStatus_t hipdnnSetExternalLogCallback_ext(hipdnnCallback_t callback,
-                                                                      void* user_data);
+// /**
+//  * @brief callback function type used by hipDNN sinks to relay messages to the backend.
+//  *
+//  * @param severity The severity level of the log message.
+//  * @param source_identifier A string identifying the origin of the log
+//  * @param msg The log message, typically formatted by the source logger's sink.
+//  * @param udata User data originally passed to the CallbackSink constructor, if any.
+//  */
+// typedef void (*hipdnnCallback_t)(hipdnnSeverity_t sev, const char* source_identifier, const char* msg, void* udata);
 
 #ifdef __cplusplus
 }

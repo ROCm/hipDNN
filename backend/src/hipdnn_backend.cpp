@@ -9,6 +9,7 @@
 #include "handle/handle_factory.hpp"
 #include "helpers.hpp"
 #include "hipdnn_exception.hpp"
+// #include "logging_factory.hpp"
 #include <hipdnn_sdk/logging/logger.hpp>
 
 using namespace hipdnn_backend;
