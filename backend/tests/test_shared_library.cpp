@@ -5,6 +5,7 @@
 
 #include <hipdnn_sdk/plugin/plugin_api_enums.h>
 
+#include "descriptors/test_macros.hpp"
 #include "hipdnn_exception.hpp"
 #include "plugin/shared_library.hpp"
 
@@ -35,14 +36,14 @@ TEST(SharedLibraryTest, LoadLibraryCtor)
 TEST(SharedLibraryTest, LoadLibraryWrongPath)
 {
     plugin::Shared_library library;
-    ASSERT_THROW(library.load(WRONG_LIBRARY_PATH), hipdnn_backend::Hipdnn_exception);
+    ASSERT_THROW_HIPDNN_STATUS(library.load(WRONG_LIBRARY_PATH), HIPDNN_STATUS_PLUGIN_ERROR);
     library.unload();
 }
 
 TEST(SharedLibraryTest, LoadLibraryCtorWrongPath)
 {
-    ASSERT_THROW(plugin::Shared_library library(WRONG_LIBRARY_PATH),
-                 hipdnn_backend::Hipdnn_exception);
+    ASSERT_THROW_HIPDNN_STATUS(plugin::Shared_library(WRONG_LIBRARY_PATH),
+                               HIPDNN_STATUS_PLUGIN_ERROR);
 }
 
 TEST(SharedLibraryTest, GetSymbol)
@@ -55,14 +56,14 @@ TEST(SharedLibraryTest, GetSymbol)
 TEST(SharedLibraryTest, GetSymbolUninitialized)
 {
     plugin::Shared_library library;
-    ASSERT_THROW(library.get_symbol(SYMBOL_NAME), hipdnn_backend::Hipdnn_exception);
+    ASSERT_THROW_HIPDNN_STATUS(library.get_symbol(SYMBOL_NAME), HIPDNN_STATUS_INTERNAL_ERROR);
 }
 
 TEST(SharedLibraryTest, GetSymbolWrongName)
 {
     plugin::Shared_library library(LIBRARY_PATH);
 
-    ASSERT_THROW(library.get_symbol(WRONG_SYMBOL_NAME), hipdnn_backend::Hipdnn_exception);
+    ASSERT_THROW_HIPDNN_STATUS(library.get_symbol(WRONG_SYMBOL_NAME), HIPDNN_STATUS_PLUGIN_ERROR);
 }
 
 TEST(SharedLibraryTest, CallFunction)

@@ -78,7 +78,7 @@ TEST_F(Variant_pack_descriptor_api_tests, ValidSetAttributesAndGetAttributesBefo
                                         3,
                                         &element_count,
                                         retrieved_dev_ptrs.data()),
-              HIPDNN_STATUS_BAD_PARAM_NOT_FINALIZED);
+              HIPDNN_STATUS_NOT_INITIALIZED);
 }
 
 TEST_F(Variant_pack_descriptor_api_tests, InvalidSetAttributes)
@@ -113,7 +113,7 @@ TEST_F(Variant_pack_descriptor_api_tests, InvalidSetAttributes)
     EXPECT_EQ(
         hipdnnBackendSetAttribute(
             _varpack, HIPDNN_ATTR_VARIANT_PACK_DATA_POINTERS, HIPDNN_TYPE_VOID_PTR, 3, nullptr),
-        HIPDNN_STATUS_BAD_PARAM);
+        HIPDNN_STATUS_BAD_PARAM_NULL_POINTER);
 }
 
 TEST_F(Variant_pack_descriptor_api_tests, InvalidGetAttributes)
@@ -127,7 +127,7 @@ TEST_F(Variant_pack_descriptor_api_tests, InvalidGetAttributes)
                                         3,
                                         &element_count,
                                         retrieved_dev_ptrs.data()),
-              HIPDNN_STATUS_BAD_PARAM_NOT_FINALIZED);
+              HIPDNN_STATUS_NOT_INITIALIZED);
 }
 
 // Invalid finalize since no dev_ptrs, or ids were set
@@ -303,7 +303,7 @@ TEST_F(Finalized_variant_pack_descriptor_api_tests, InvalidGetAttributes)
                                         3,
                                         &element_count,
                                         nullptr),
-              HIPDNN_STATUS_BAD_PARAM);
+              HIPDNN_STATUS_BAD_PARAM_NULL_POINTER);
 
     // HIPDNN_STATUS_BAD_PARAM since element_count cannot be nullptr
     EXPECT_EQ(hipdnnBackendGetAttribute(_varpack,
@@ -312,7 +312,7 @@ TEST_F(Finalized_variant_pack_descriptor_api_tests, InvalidGetAttributes)
                                         3,
                                         nullptr,
                                         retrieved_dev_ptrs.data()),
-              HIPDNN_STATUS_BAD_PARAM);
+              HIPDNN_STATUS_BAD_PARAM_NULL_POINTER);
 }
 
 TEST_F(Finalized_variant_pack_descriptor_api_tests, InvalidSetAttributes)

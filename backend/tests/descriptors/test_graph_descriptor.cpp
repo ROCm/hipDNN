@@ -6,6 +6,7 @@
 #include "flatbuffer_utilities.hpp"
 #include "hipdnn_backend.h"
 #include "hipdnn_exception.hpp"
+#include "test_macros.hpp"
 
 #include <flatbuffers/flatbuffers.h>
 #include <gtest/gtest.h>
@@ -45,30 +46,30 @@ TEST_F(Graph_descriptor_test, WillCorrectlySetGraph)
 TEST_F(Graph_descriptor_test, WillFailToSetInvalidGraph)
 {
     Graph_descriptor descriptor;
-    ASSERT_THROW(descriptor.deserialize_graph(nullptr, 0), hipdnn_backend::Hipdnn_exception);
+    ASSERT_THROW_HIPDNN_STATUS(descriptor.deserialize_graph(nullptr, 0),
+                               HIPDNN_STATUS_BAD_PARAM_NULL_POINTER);
 }
 
 TEST_F(Graph_descriptor_test, FinalizeFailInvalidGraph)
 {
     Graph_descriptor descriptor;
-    ASSERT_THROW(descriptor.finalize(), hipdnn_backend::Hipdnn_exception);
+    ASSERT_THROW_HIPDNN_STATUS(descriptor.finalize(), HIPDNN_STATUS_BAD_PARAM);
 }
 
 TEST_F(Graph_descriptor_test, GetAttributeReturnsNotSupported)
 {
     Graph_descriptor descriptor;
     int64_t element_count = 0;
-    auto status = descriptor.get_attribute(
-        HIPDNN_ATTR_ENGINEHEUR_MODE, HIPDNN_TYPE_DATA_TYPE, 0, &element_count, nullptr);
-
-    ASSERT_EQ(status, HIPDNN_STATUS_NOT_SUPPORTED);
+    ASSERT_THROW_HIPDNN_STATUS(
+        descriptor.get_attribute(
+            HIPDNN_ATTR_ENGINEHEUR_MODE, HIPDNN_TYPE_DATA_TYPE, 0, &element_count, nullptr),
+        HIPDNN_STATUS_NOT_SUPPORTED);
 }
 
 TEST_F(Graph_descriptor_test, SetAttributeReturnsNotSupported)
 {
     Graph_descriptor descriptor;
-    auto status
-        = descriptor.set_attribute(HIPDNN_ATTR_ENGINEHEUR_MODE, HIPDNN_TYPE_DATA_TYPE, 0, nullptr);
-
-    ASSERT_EQ(status, HIPDNN_STATUS_NOT_SUPPORTED);
+    ASSERT_THROW_HIPDNN_STATUS(
+        descriptor.set_attribute(HIPDNN_ATTR_ENGINEHEUR_MODE, HIPDNN_TYPE_DATA_TYPE, 0, nullptr),
+        HIPDNN_STATUS_NOT_SUPPORTED);
 }
