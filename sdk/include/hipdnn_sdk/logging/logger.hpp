@@ -158,18 +158,22 @@ inline std::string
     return output_file;
 }
 
-inline void initialize_callback_logging(const std::string& logging_area_name,
-                                        hipdnnCallback_t callback_function,
-                                        void* user_data = nullptr)
+inline void initialize_callback_logging(const std::string& logging_area,
+                                       hipdnnCallback_t callback_function,
+                                       void* user_data = nullptr)
 {
-    auto logger = hipdnn::logging::create_callback_logger_mt<spdlog::async_factory>(
-        logging_area_name, callback_function, user_data, logging_area_name);
+    const std::string& logger_name = logging_area;
+    
+    // optional - spdlog will create one automatically
+    if (!spdlog::thread_pool()) {
+        spdlog::init_thread_pool(8192, 1);
+    }
+    
+    auto callback_logger = hipdnn::logging::create_async_callback_logger_mt(
+        logger_name, callback_function, user_data, logging_area);
+    
+    // spdlog::register_logger(callback_logger);
 
-    spdlog::register_logger(logger);
-
-    spdlog::set_default_logger(logger);
-
-    setup_log_pattern(logging_area_name);
 }
 
 }
