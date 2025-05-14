@@ -1,9 +1,0 @@
-# build directories
-/build/*
-*_build/*
-
-# vscode directories
-.vscode
-
-# vim files
-*.swp
