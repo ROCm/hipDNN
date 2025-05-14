@@ -12,7 +12,7 @@ void Handle_factory::create_handle(hipdnnHandle_t* handle)
 {
     if(handle == nullptr)
     {
-        throw Hipdnn_exception(HIPDNN_STATUS_BAD_PARAM, "handle is null.");
+        throw Hipdnn_exception(HIPDNN_STATUS_BAD_PARAM_NULL_POINTER, "handle is null.");
     }
 
     *handle = new hipdnnHandle();

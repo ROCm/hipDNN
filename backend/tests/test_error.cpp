@@ -6,15 +6,72 @@
 
 using namespace hipdnn_backend;
 
-TEST(ErrorTests, SetLastError)
+TEST(ErrorTests, StaticSetLastError)
 {
-    // Test setting a valid error
-    hipdnnStatus_t status = set_last_error(HIPDNN_STATUS_NOT_SUPPORTED, "Feature not supported");
-    EXPECT_EQ(status, HIPDNN_STATUS_NOT_SUPPORTED);
-
     // Test setting a success status
-    status = set_last_error(HIPDNN_STATUS_SUCCESS, "Operation successful");
+    hipdnnStatus_t status
+        = Last_error_manager::set_last_error(HIPDNN_STATUS_SUCCESS, "Operation successful");
     EXPECT_EQ(status, HIPDNN_STATUS_SUCCESS);
+
+    // Test setting a valid error
+    std::string error_message = "An error occurred";
+    status = Last_error_manager::set_last_error(HIPDNN_STATUS_NOT_SUPPORTED, error_message.c_str());
+    EXPECT_EQ(status, HIPDNN_STATUS_NOT_SUPPORTED);
+    EXPECT_STREQ(Last_error_manager::get_last_error(), error_message.c_str());
+}
+
+TEST(ErrorTests, ErrorCStringMessagePerThread)
+{
+    std::string main_error = "Main thread error";
+    std::string worker_error = "Worker thread error";
+    Last_error_manager::set_last_error(HIPDNN_STATUS_BAD_PARAM, main_error.c_str());
+
+    std::string thread_error;
+    std::thread t([&thread_error, worker_error]() {
+        Last_error_manager::set_last_error(HIPDNN_STATUS_NOT_SUPPORTED, worker_error.c_str());
+        thread_error = Last_error_manager::get_last_error();
+    });
+    t.join();
+
+    EXPECT_EQ(Last_error_manager::get_last_error(), main_error);
+    EXPECT_EQ(thread_error, worker_error);
+}
+
+TEST(ErrorTests, ErrorSTDStringMessagePerThread)
+{
+    std::string main_error = "Main thread error";
+    std::string worker_error = "Worker thread error";
+    Last_error_manager::set_last_error(HIPDNN_STATUS_BAD_PARAM, main_error);
+
+    std::string thread_error;
+    std::thread t([&thread_error, worker_error]() {
+        Last_error_manager::set_last_error(HIPDNN_STATUS_NOT_SUPPORTED, worker_error);
+        thread_error = Last_error_manager::get_last_error();
+    });
+    t.join();
+
+    EXPECT_EQ(Last_error_manager::get_last_error(), main_error);
+    EXPECT_EQ(thread_error, worker_error);
+}
+
+TEST(ErrorTests, SetSuccessSTDStringDoesNotSetErrorMessage)
+{
+    std::string error_message = "This message should not be set";
+    hipdnnStatus_t status
+        = Last_error_manager::set_last_error(HIPDNN_STATUS_SUCCESS, error_message);
+    EXPECT_EQ(status, HIPDNN_STATUS_SUCCESS);
+
+    EXPECT_NE(Last_error_manager::get_last_error(), error_message);
+}
+
+TEST(ErrorTests, SetSuccessCStringDoesNotSetErrorMessage)
+{
+    std::string error_message = "This message should not be set";
+    hipdnnStatus_t status
+        = Last_error_manager::set_last_error(HIPDNN_STATUS_SUCCESS, error_message.c_str());
+    EXPECT_EQ(status, HIPDNN_STATUS_SUCCESS);
+
+    EXPECT_NE(Last_error_manager::get_last_error(), error_message);
 }
 
 TEST(ErrorTests, GetBackendDescriptorTypeName)

@@ -9,6 +9,7 @@ add_executable(public_hipdnn_backend_tests
     test_engine_config_api.cpp
     test_engine_api.cpp
     test_execution_plan_api.cpp
+    test_get_error_api.cpp
     test_variant_pack_api.cpp
     test_handle_api.cpp
     test_util.cpp

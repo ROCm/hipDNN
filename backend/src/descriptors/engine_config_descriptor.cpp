@@ -28,11 +28,11 @@ void Engine_config_descriptor::finalize()
     hipdnnBackendDescriptor::finalize();
 }
 
-hipdnnStatus_t Engine_config_descriptor::get_attribute(hipdnnBackendAttributeName_t attribute_name,
-                                                       hipdnnBackendAttributeType_t attribute_type,
-                                                       int64_t requested_element_count,
-                                                       int64_t* element_count,
-                                                       void* array_of_elements)
+void Engine_config_descriptor::get_attribute(hipdnnBackendAttributeName_t attribute_name,
+                                             hipdnnBackendAttributeType_t attribute_type,
+                                             int64_t requested_element_count,
+                                             int64_t* element_count,
+                                             void* array_of_elements)
 {
     THROW_IF_FALSE(is_finalized(),
                    HIPDNN_STATUS_NOT_INITIALIZED,
@@ -42,11 +42,11 @@ hipdnnStatus_t Engine_config_descriptor::get_attribute(hipdnnBackendAttributeNam
     {
     case HIPDNN_ATTR_ENGINECFG_ENGINE:
         get_engine(attribute_type, requested_element_count, element_count, array_of_elements);
-        return HIPDNN_STATUS_SUCCESS;
+        break;
     case HIPDNN_ATTR_ENGINECFG_WORKSPACE_SIZE:
         get_max_workspace_size(
             attribute_type, requested_element_count, element_count, array_of_elements);
-        return HIPDNN_STATUS_SUCCESS;
+        break;
     case HIPDNN_ATTR_ENGINECFG_INTERMEDIATE_INFO:
     case HIPDNN_ATTR_ENGINECFG_KNOB_CHOICES:
     default:
@@ -116,10 +116,10 @@ void Engine_config_descriptor::get_max_workspace_size(hipdnnBackendAttributeType
     *static_cast<int64_t*>(array_of_elements) = _max_workspace_size;
 }
 
-hipdnnStatus_t Engine_config_descriptor::set_attribute(hipdnnBackendAttributeName_t attribute_name,
-                                                       hipdnnBackendAttributeType_t attribute_type,
-                                                       int64_t element_count,
-                                                       const void* array_of_elements)
+void Engine_config_descriptor::set_attribute(hipdnnBackendAttributeName_t attribute_name,
+                                             hipdnnBackendAttributeType_t attribute_type,
+                                             int64_t element_count,
+                                             const void* array_of_elements)
 {
     THROW_IF_TRUE(is_finalized(),
                   HIPDNN_STATUS_NOT_INITIALIZED,
@@ -129,7 +129,7 @@ hipdnnStatus_t Engine_config_descriptor::set_attribute(hipdnnBackendAttributeNam
     {
     case HIPDNN_ATTR_ENGINECFG_ENGINE:
         set_engine(attribute_type, element_count, array_of_elements);
-        return HIPDNN_STATUS_SUCCESS;
+        break;
     case HIPDNN_ATTR_ENGINECFG_INTERMEDIATE_INFO:
     case HIPDNN_ATTR_ENGINECFG_KNOB_CHOICES:
     case HIPDNN_ATTR_ENGINECFG_WORKSPACE_SIZE:

@@ -7,19 +7,107 @@
 #include "hipdnn_backend_attribute_type.h"
 #include "hipdnn_backend_descriptor_type.h"
 #include "hipdnn_status.h"
-#include <hipdnn_sdk/logging/logger.hpp>
+#include <sstream>
+#include <thread>
 
 namespace hipdnn_backend
 {
 
-inline hipdnnStatus_t set_last_error(hipdnnStatus_t status, const char* message)
-{
-    HIPDNN_LOG_ERROR("Error {}", message);
-    //TODO
-    // Set the last error message
-    // stash the message in some global theadsafe map.
+// TODO replace with using the define from a common SDK header.
+static const size_t HIPDNN_MAX_ERROR_STRING_SIZE = 256;
 
-    return status;
+inline const char* hipdnn_get_status_string(hipdnnStatus_t status)
+{
+    switch(status)
+    {
+    case HIPDNN_STATUS_SUCCESS:
+        return "HIPDNN_STATUS_SUCCESS";
+    case HIPDNN_STATUS_NOT_INITIALIZED:
+        return "HIPDNN_STATUS_NOT_INITIALIZED";
+    case HIPDNN_STATUS_BAD_PARAM:
+        return "HIPDNN_STATUS_BAD_PARAM";
+    case HIPDNN_STATUS_BAD_PARAM_NULL_POINTER:
+        return "HIPDNN_STATUS_BAD_PARAM_NULL_POINTER";
+    case HIPDNN_STATUS_BAD_PARAM_NOT_FINALIZED:
+        return "HIPDNN_STATUS_BAD_PARAM_NOT_FINALIZED";
+    case HIPDNN_STATUS_BAD_PARAM_OUT_OF_BOUND:
+        return "HIPDNN_STATUS_BAD_PARAM_OUT_OF_BOUND";
+    case HIPDNN_STATUS_BAD_PARAM_SIZE_INSUFFICIENT:
+        return "HIPDNN_STATUS_BAD_PARAM_SIZE_INSUFFICIENT";
+    case HIPDNN_STATUS_BAD_PARAM_STREAM_MISMATCH:
+        return "HIPDNN_STATUS_BAD_PARAM_STREAM_MISMATCH";
+    case HIPDNN_STATUS_NOT_SUPPORTED:
+        return "HIPDNN_STATUS_NOT_SUPPORTED";
+    case HIPDNN_STATUS_INTERNAL_ERROR:
+        return "HIPDNN_STATUS_INTERNAL_ERROR";
+    case HIPDNN_STATUS_ALLOC_FAILED:
+        return "HIPDNN_STATUS_ALLOC_FAILED";
+    case HIPDNN_STATUS_INTERNAL_ERROR_HOST_ALLOCATION_FAILED:
+        return "HIPDNN_STATUS_INTERNAL_ERROR_HOST_ALLOCATION_FAILED";
+    case HIPDNN_STATUS_INTERNAL_ERROR_DEVICE_ALLOCATION_FAILED:
+        return "HIPDNN_STATUS_INTERNAL_ERROR_DEVICE_ALLOCATION_FAILED";
+    case HIPDNN_STATUS_EXECUTION_FAILED:
+        return "HIPDNN_STATUS_EXECUTION_FAILED";
+    default:
+        return "HIPDNN_STATUS_UNKNOWN";
+    }
+}
+
+inline const char* hipdnn_get_attribute_type_string(hipdnnBackendAttributeType_t type)
+{
+    switch(type)
+    {
+    case HIPDNN_TYPE_HANDLE:
+        return "HIPDNN_TYPE_HANDLE";
+    case HIPDNN_TYPE_DATA_TYPE:
+        return "HIPDNN_TYPE_DATA_TYPE";
+    case HIPDNN_TYPE_BOOLEAN:
+        return "HIPDNN_TYPE_BOOLEAN";
+    case HIPDNN_TYPE_INT64:
+        return "HIPDNN_TYPE_INT64";
+    case HIPDNN_TYPE_FLOAT:
+        return "HIPDNN_TYPE_FLOAT";
+    case HIPDNN_TYPE_DOUBLE:
+        return "HIPDNN_TYPE_DOUBLE";
+    case HIPDNN_TYPE_VOID_PTR:
+        return "HIPDNN_TYPE_VOID_PTR";
+    case HIPDNN_TYPE_HEUR_MODE:
+        return "HIPDNN_TYPE_HEUR_MODE";
+    case HIPDNN_TYPE_KNOB_TYPE:
+        return "HIPDNN_TYPE_KNOB_TYPE";
+    case HIPDNN_TYPE_NAN_PROPOGATION:
+        return "HIPDNN_TYPE_NAN_PROPOGATION";
+    case HIPDNN_TYPE_NUMERICAL_NOTE:
+        return "HIPDNN_TYPE_NUMERICAL_NOTE";
+    case HIPDNN_TYPE_LAYOUT_TYPE:
+        return "HIPDNN_TYPE_LAYOUT_TYPE";
+    case HIPDNN_TYPE_ATTRIB_NAME:
+        return "HIPDNN_TYPE_ATTRIB_NAME";
+    case HIPDNN_TYPE_BACKEND_DESCRIPTOR:
+        return "HIPDNN_TYPE_BACKEND_DESCRIPTOR";
+    case HIPDNN_TYPE_GENSTATS_MODE:
+        return "HIPDNN_TYPE_GENSTATS_MODE";
+    case HIPDNN_TYPE_BN_FINALIZE_STATS_MODE:
+        return "HIPDNN_TYPE_BN_FINALIZE_STATS_MODE";
+    case HIPDNN_TYPE_BEHAVIOR_NOTE:
+        return "HIPDNN_TYPE_BEHAVIOR_NOTE";
+    case HIPDNN_TYPE_TENSOR_REORDERING_MODE:
+        return "HIPDNN_TYPE_TENSOR_REORDERING_MODE";
+    case HIPDNN_TYPE_INT32:
+        return "HIPDNN_TYPE_INT32";
+    case HIPDNN_TYPE_CHAR:
+        return "HIPDNN_TYPE_CHAR";
+    case HIPDNN_TYPE_SIGNAL_MODE:
+        return "HIPDNN_TYPE_SIGNAL_MODE";
+    case HIPDNN_TYPE_FRACTION:
+        return "HIPDNN_TYPE_FRACTION";
+    case HIPDNN_TYPE_NORM_FWD_PHASE:
+        return "HIPDNN_TYPE_NORM_FWD_PHASE";
+    case HIPDNN_TYPE_RNG_DISTRIBUTION:
+        return "HIPDNN_TYPE_RNG_DISTRIBUTION";
+    default:
+        return "HIPDNN_ATTRIBUTE_UNKNOWN";
+    }
 }
 
 inline const char* hipdnn_get_backend_descriptor_type_name(hipdnnBackendDescriptorType_t type)
@@ -172,99 +260,18 @@ inline const char* hipdnn_get_attribute_name_string(hipdnnBackendAttributeName_t
         return "HIPDNN_ATTR_DEVICEPROP_JSON_REPRESENTATION";
     }
 }
-
-inline const char* hipdnn_get_status_string(hipdnnStatus_t status)
+class Last_error_manager
 {
-    switch(status)
-    {
-    case HIPDNN_STATUS_SUCCESS:
-        return "HIPDNN_STATUS_SUCCESS";
-    case HIPDNN_STATUS_NOT_INITIALIZED:
-        return "HIPDNN_STATUS_NOT_INITIALIZED";
-    case HIPDNN_STATUS_BAD_PARAM:
-        return "HIPDNN_STATUS_BAD_PARAM";
-    case HIPDNN_STATUS_BAD_PARAM_NULL_POINTER:
-        return "HIPDNN_STATUS_BAD_PARAM_NULL_POINTER";
-    case HIPDNN_STATUS_BAD_PARAM_NOT_FINALIZED:
-        return "HIPDNN_STATUS_BAD_PARAM_NOT_FINALIZED";
-    case HIPDNN_STATUS_BAD_PARAM_OUT_OF_BOUND:
-        return "HIPDNN_STATUS_BAD_PARAM_OUT_OF_BOUND";
-    case HIPDNN_STATUS_BAD_PARAM_SIZE_INSUFFICIENT:
-        return "HIPDNN_STATUS_BAD_PARAM_SIZE_INSUFFICIENT";
-    case HIPDNN_STATUS_BAD_PARAM_STREAM_MISMATCH:
-        return "HIPDNN_STATUS_BAD_PARAM_STREAM_MISMATCH";
-    case HIPDNN_STATUS_NOT_SUPPORTED:
-        return "HIPDNN_STATUS_NOT_SUPPORTED";
-    case HIPDNN_STATUS_INTERNAL_ERROR:
-        return "HIPDNN_STATUS_INTERNAL_ERROR";
-    case HIPDNN_STATUS_ALLOC_FAILED:
-        return "HIPDNN_STATUS_ALLOC_FAILED";
-    case HIPDNN_STATUS_INTERNAL_ERROR_HOST_ALLOCATION_FAILED:
-        return "HIPDNN_STATUS_INTERNAL_ERROR_HOST_ALLOCATION_FAILED";
-    case HIPDNN_STATUS_INTERNAL_ERROR_DEVICE_ALLOCATION_FAILED:
-        return "HIPDNN_STATUS_INTERNAL_ERROR_DEVICE_ALLOCATION_FAILED";
-    case HIPDNN_STATUS_EXECUTION_FAILED:
-        return "HIPDNN_STATUS_EXECUTION_FAILED";
-    default:
-        return "HIPDNN_STATUS_UNKNOWN";
-    }
-}
+private:
+    // We cannot use std::string in thread-local storage here because it requires a thread-local storage destructor.
+    // This prevents the shared object (plugin) from being unloaded until the program terminates.
+    // NOLINTNEXTLINE(modernize-avoid-c-arrays)
+    thread_local static char last_error[HIPDNN_MAX_ERROR_STRING_SIZE];
 
-inline const char* hipdnn_get_attribute_type_string(hipdnnBackendAttributeType_t type)
-{
-    switch(type)
-    {
-    case HIPDNN_TYPE_HANDLE:
-        return "HIPDNN_TYPE_HANDLE";
-    case HIPDNN_TYPE_DATA_TYPE:
-        return "HIPDNN_TYPE_DATA_TYPE";
-    case HIPDNN_TYPE_BOOLEAN:
-        return "HIPDNN_TYPE_BOOLEAN";
-    case HIPDNN_TYPE_INT64:
-        return "HIPDNN_TYPE_INT64";
-    case HIPDNN_TYPE_FLOAT:
-        return "HIPDNN_TYPE_FLOAT";
-    case HIPDNN_TYPE_DOUBLE:
-        return "HIPDNN_TYPE_DOUBLE";
-    case HIPDNN_TYPE_VOID_PTR:
-        return "HIPDNN_TYPE_VOID_PTR";
-    case HIPDNN_TYPE_HEUR_MODE:
-        return "HIPDNN_TYPE_HEUR_MODE";
-    case HIPDNN_TYPE_KNOB_TYPE:
-        return "HIPDNN_TYPE_KNOB_TYPE";
-    case HIPDNN_TYPE_NAN_PROPOGATION:
-        return "HIPDNN_TYPE_NAN_PROPOGATION";
-    case HIPDNN_TYPE_NUMERICAL_NOTE:
-        return "HIPDNN_TYPE_NUMERICAL_NOTE";
-    case HIPDNN_TYPE_LAYOUT_TYPE:
-        return "HIPDNN_TYPE_LAYOUT_TYPE";
-    case HIPDNN_TYPE_ATTRIB_NAME:
-        return "HIPDNN_TYPE_ATTRIB_NAME";
-    case HIPDNN_TYPE_BACKEND_DESCRIPTOR:
-        return "HIPDNN_TYPE_BACKEND_DESCRIPTOR";
-    case HIPDNN_TYPE_GENSTATS_MODE:
-        return "HIPDNN_TYPE_GENSTATS_MODE";
-    case HIPDNN_TYPE_BN_FINALIZE_STATS_MODE:
-        return "HIPDNN_TYPE_BN_FINALIZE_STATS_MODE";
-    case HIPDNN_TYPE_BEHAVIOR_NOTE:
-        return "HIPDNN_TYPE_BEHAVIOR_NOTE";
-    case HIPDNN_TYPE_TENSOR_REORDERING_MODE:
-        return "HIPDNN_TYPE_TENSOR_REORDERING_MODE";
-    case HIPDNN_TYPE_INT32:
-        return "HIPDNN_TYPE_INT32";
-    case HIPDNN_TYPE_CHAR:
-        return "HIPDNN_TYPE_CHAR";
-    case HIPDNN_TYPE_SIGNAL_MODE:
-        return "HIPDNN_TYPE_SIGNAL_MODE";
-    case HIPDNN_TYPE_FRACTION:
-        return "HIPDNN_TYPE_FRACTION";
-    case HIPDNN_TYPE_NORM_FWD_PHASE:
-        return "HIPDNN_TYPE_NORM_FWD_PHASE";
-    case HIPDNN_TYPE_RNG_DISTRIBUTION:
-        return "HIPDNN_TYPE_RNG_DISTRIBUTION";
-    default:
-        return "HIPDNN_ATTRIBUTE_UNKNOWN";
-    }
-}
+public:
+    static hipdnnStatus_t set_last_error(hipdnnStatus_t status, const char* message);
+    static hipdnnStatus_t set_last_error(hipdnnStatus_t status, const std::string& message);
+    static const char* get_last_error();
+};
 
 } // namespace hipdnn_backend
