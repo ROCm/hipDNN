@@ -284,15 +284,23 @@ HIPDNN_BACKEND_EXPORT void hipdnnGetLastErrorString(char* message, size_t max_si
 HIPDNN_BACKEND_EXPORT hipdnnStatus_t hipdnnBackendCreateAndDeserializeGraph_ext(
     hipdnnBackendDescriptor_t* descriptor, const uint8_t* serialized_graph, size_t graph_byte_size);
 
-// /**
-//  * @brief callback function type used by hipDNN sinks to relay messages to the backend.
-//  *
-//  * @param severity The severity level of the log message.
-//  * @param source_identifier A string identifying the origin of the log
-//  * @param msg The log message, typically formatted by the source logger's sink.
-//  * @param udata User data originally passed to the CallbackSink constructor, if any.
-//  */
-// typedef void (*hipdnnCallback_t)(hipdnnSeverity_t sev, const char* source_identifier, const char* msg, void* udata);
+/*!
+ * @brief Callback function for logging messages.
+ *
+ * This function is called by the hipDNN library to log messages. The severity level of the message
+ * is provided, along with the message itself and user-defined data.
+ * 
+ * @param severity   The severity level of the message (e.g., error, warning, info).
+ * @param msg        The message to be logged.
+ * @param user_data   User-defined data passed to the callback function.
+ * 
+ * @retval HIPDNN_STATUS_SUCCESS           The logging callback was successfully executed
+ * @retval HIPDNN_STATUS_BAD_PARAM         Invalid or inconsistent parameter values were encountered.
+ * @retval HIPDNN_STATUS_INTERNAL_ERROR    An internal error occurred during logging.
+ */
+HIPDNN_BACKEND_EXPORT hipdnnStatus_t hipdnnLoggingCallback(hipdnnSeverity_t severity,
+                                                           const char* msg,
+                                                           void* user_data);
 
 #ifdef __cplusplus
 }

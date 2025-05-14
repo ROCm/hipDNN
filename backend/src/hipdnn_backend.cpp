@@ -273,3 +273,27 @@ HIPDNN_BACKEND_EXPORT void hipdnnGetLastErrorString(char* message, size_t max_si
         LOG_API_SUCCESS(api_name, "set_error_message={:p}", static_cast<void*>(message));
     });
 }
+
+HIPDNN_BACKEND_EXPORT hipdnnStatus_t hipdnnLoggingCallback(hipdnnSeverity_t severity,
+                                                           const char* msg,
+                                                           void* user_data)
+{
+
+    (void)user_data;
+
+    switch (severity)
+    {
+    case HIPDNN_SEV_INFO:
+        HIPDNN_LOG_INFO("hipdnnLoggingCallback: {}", msg);
+        break;
+    case HIPDNN_SEV_ERROR:
+        HIPDNN_LOG_ERROR("hipdnnLoggingCallback: {}", msg);
+        break;
+    default:
+        HIPDNN_LOG_ERROR("hipdnnLoggingCallback: Unknown severity level: {}", static_cast<int>(severity));
+        break;
+    }    
+
+    return HIPDNN_STATUS_SUCCESS;
+
+}
