@@ -1,0 +1,13 @@
+// Copyright © Advanced Micro Devices, Inc., or its affiliates.
+// SPDX-License-Identifier: MIT
+
+namespace hipdnn_sdk.data_objects;
+
+table BatchnormInferenceAttributes {
+    x: long;
+    mean: long = null;
+    inv_variance: long = null;
+    scale: long;
+    bias: long;
+    y: long;
+}

@@ -1,0 +1,15 @@
+// Copyright © Advanced Micro Devices, Inc., or its affiliates.
+// SPDX-License-Identifier: MIT
+
+include "data_types.fbs";
+
+namespace hipdnn_sdk.data_objects;
+
+table TensorAttributes {
+    uid: long;
+    name: string;
+    data_type: DataType;
+    strides: [long];
+    dims: [long];
+    virtual: bool;
+}

@@ -1,0 +1,20 @@
+// Copyright © Advanced Micro Devices, Inc., or its affiliates.
+// SPDX-License-Identifier: MIT
+
+include "data_types.fbs";
+
+namespace hipdnn_sdk.data_objects;
+
+enum PointwiseMode : byte { UNSET = 0, RELU_FWD = 1 }
+
+table PointwiseAttributes {
+    operation: PointwiseMode;
+    relu_lower_clip: float = null;
+    relu_upper_clip: float = null;
+    relu_lower_slope: float = null;
+    axis: long = null;
+    in_0: long;
+    in_1: long = null;
+    in_2: long = null;
+    out_0: long;
+}
