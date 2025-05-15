@@ -30,7 +30,6 @@ RUN apt-get update && \
 ENV PATH="/opt/rocm/bin:/opt/rocm:${PATH}"
 ENV CMAKE_GENERATOR="Ninja"
 
-
 ######## CMake ########
 WORKDIR /install-cmake
 ENV CMAKE_VERSION="3.25.2"
