@@ -13,6 +13,9 @@
 
 using namespace hipdnn_backend;
 
+using ::testing::_;
+using ::testing::Return;
+
 // NOLINTBEGIN(readability-function-cognitive-complexity)
 class Execution_plan_descriptor_test : public ::testing::Test
 {
@@ -20,8 +23,7 @@ public:
     std::unique_ptr<Execution_plan_descriptor> _plan = nullptr;
     hipdnnHandle_t _handle = reinterpret_cast<hipdnnHandle_t>(0x12345678);
     std::unique_ptr<Mock_descriptor> _mock_engine_config = nullptr;
-    std::unique_ptr<Mock_descriptor> _mock_engine_bad_type = nullptr;
-    std::unique_ptr<Mock_descriptor> _mock_engine_unfinished = nullptr;
+    std::unique_ptr<Mock_descriptor> _mock_engine_config_bad_type = nullptr;
 
     void make_execution_plan_finalized()
     {
@@ -37,6 +39,7 @@ public:
 
     void set_engine_config()
     {
+        EXPECT_CALL(*_mock_engine_config, is_finalized()).WillOnce(Return(true));
         _plan->set_attribute(HIPDNN_ATTR_EXECUTION_PLAN_ENGINE_CONFIG,
                              HIPDNN_TYPE_BACKEND_DESCRIPTOR,
                              1,
@@ -46,19 +49,11 @@ public:
 protected:
     void SetUp() override
     {
-        int64_t dummy_workspace_size = 1024;
-
         _plan = std::make_unique<Execution_plan_descriptor>();
 
         _mock_engine_config
-            = std::make_unique<Mock_descriptor>(HIPDNN_BACKEND_ENGINECFG_DESCRIPTOR, true);
-        _mock_engine_config->set_data(
-            HIPDNN_ATTR_ENGINECFG_WORKSPACE_SIZE, HIPDNN_TYPE_INT64, 1, &dummy_workspace_size);
-
-        _mock_engine_bad_type = std::make_unique<Mock_descriptor>();
-
-        _mock_engine_unfinished
             = std::make_unique<Mock_descriptor>(HIPDNN_BACKEND_ENGINECFG_DESCRIPTOR);
+        _mock_engine_config_bad_type = std::make_unique<Mock_descriptor>();
     }
 };
 
@@ -128,24 +123,27 @@ TEST_F(Execution_plan_descriptor_test, SetExecutionPlanDescriptorEngineConfig)
             HIPDNN_ATTR_EXECUTION_PLAN_ENGINE_CONFIG, HIPDNN_TYPE_BACKEND_DESCRIPTOR, 1, nullptr),
         HIPDNN_STATUS_BAD_PARAM_NULL_POINTER);
 
-    hipdnnBackendDescriptor_t engine = nullptr;
-    ASSERT_THROW_HIPDNN_STATUS(
-        _plan->set_attribute(
-            HIPDNN_ATTR_EXECUTION_PLAN_ENGINE_CONFIG, HIPDNN_TYPE_BACKEND_DESCRIPTOR, 1, &engine),
-        HIPDNN_STATUS_BAD_PARAM_NULL_POINTER);
+    hipdnnBackendDescriptor_t engine_config = nullptr;
+    ASSERT_THROW_HIPDNN_STATUS(_plan->set_attribute(HIPDNN_ATTR_EXECUTION_PLAN_ENGINE_CONFIG,
+                                                    HIPDNN_TYPE_BACKEND_DESCRIPTOR,
+                                                    1,
+                                                    &engine_config),
+                               HIPDNN_STATUS_BAD_PARAM_NULL_POINTER);
 
     ASSERT_THROW_HIPDNN_STATUS(_plan->set_attribute(HIPDNN_ATTR_EXECUTION_PLAN_ENGINE_CONFIG,
                                                     HIPDNN_TYPE_BACKEND_DESCRIPTOR,
                                                     1,
-                                                    &_mock_engine_bad_type),
+                                                    &_mock_engine_config_bad_type),
                                HIPDNN_STATUS_BAD_PARAM);
 
+    EXPECT_CALL(*_mock_engine_config, is_finalized()).WillOnce(Return(false));
     ASSERT_THROW_HIPDNN_STATUS(_plan->set_attribute(HIPDNN_ATTR_EXECUTION_PLAN_ENGINE_CONFIG,
                                                     HIPDNN_TYPE_BACKEND_DESCRIPTOR,
                                                     1,
-                                                    &_mock_engine_unfinished),
+                                                    &_mock_engine_config),
                                HIPDNN_STATUS_BAD_PARAM_NOT_FINALIZED);
 
+    EXPECT_CALL(*_mock_engine_config, is_finalized()).WillOnce(Return(true));
     _plan->set_attribute(HIPDNN_ATTR_EXECUTION_PLAN_ENGINE_CONFIG,
                          HIPDNN_TYPE_BACKEND_DESCRIPTOR,
                          1,
@@ -181,7 +179,7 @@ TEST_F(Execution_plan_descriptor_test, GetExecutionPlanDescriptorWorkspaceSize)
     int64_t workspace_size = 0;
 
     make_execution_plan_finalized();
-
+    EXPECT_CALL(*_mock_engine_config, get_attribute(_, _, _, _, _)).WillOnce(SetArg4ToInt64(1024));
     _plan->get_attribute(
         HIPDNN_ATTR_EXECUTION_PLAN_WORKSPACE_SIZE, HIPDNN_TYPE_INT64, 1, nullptr, &workspace_size);
     ASSERT_EQ(workspace_size, 1024);
