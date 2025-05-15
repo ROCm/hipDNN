@@ -17,3 +17,5 @@ RUN yum install -y rocm-llvm-devel && \
 
 ENV PATH="/opt/rocm:${PATH}"
 ENV CMAKE_GENERATOR="Ninja"
+
+test 
