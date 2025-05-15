@@ -38,9 +38,9 @@ public:
                 (override));
 };
 
-ACTION_P(SetArg4ToInt64, value)
+ACTION_P(SetArg4ToInt64, value) // NOLINT
 {
     *static_cast<int64_t*>(arg4) = value;
-} // NOLINT
+}
 
 } // namespace hipdnn_backend
