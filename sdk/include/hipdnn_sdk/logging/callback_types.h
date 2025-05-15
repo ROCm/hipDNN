@@ -25,7 +25,7 @@ typedef enum
  * @param user_data User data pointer passed when registering the callback.
  * @param message The log message, formatted by the logger.
  */
-typedef void (*hipdnnCallback_t)(hipdnnSeverity_t severity, void* user_data, const char* message);
+typedef void (*hipdnnCallback_t)(hipdnnSeverity_t severity, const char* message, void* user_data);
 
 #ifdef __cplusplus
 }

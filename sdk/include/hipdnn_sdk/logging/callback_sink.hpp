@@ -43,11 +43,6 @@ public:
     {
     }
 
-    // explicit Callback_sink(hipdnnCallback_t callback)
-    //     : _callback_fn{callback}
-    // {
-    // }
-
 protected:
     void sink_it_(const spdlog::details::log_msg& msg) override
     {
@@ -62,7 +57,7 @@ protected:
 
         hipdnnSeverity_t severity = spdlog_to_hipdnn_severity(msg.level);
 
-        _callback_fn(severity, _udata, formatted_str.c_str());
+        _callback_fn(severity, formatted_str.c_str(), _udata);
     }
 
     void flush_() override {}
@@ -76,15 +71,6 @@ private:
 using callback_sink_mt = Callback_sink<std::mutex>;
 using callback_sink_st = Callback_sink<spdlog::details::null_mutex>;
 
-// template <typename Factory = spdlog::synchronous_factory>
-// inline std::shared_ptr<spdlog::logger> create_callback_logger_mt(
-//     const std::string& logger_name,
-//     hipdnnCallback_t callback,
-//     void* user_data,
-//     const std::string& source)
-// {
-//     return Factory::template create<hipdnn::logging::callback_sink_mt>(logger_name, callback, user_data, source);
-// }
 
 inline std::shared_ptr<spdlog::logger> create_async_callback_logger_mt(
     const std::string& logger_name,
@@ -93,6 +79,17 @@ inline std::shared_ptr<spdlog::logger> create_async_callback_logger_mt(
     const std::string& source)
 {
     return spdlog::async_factory::create<hipdnn::logging::callback_sink_mt>(
+        logger_name, callback, user_data, source);
+}
+
+template <typename Factory = spdlog::synchronous_factory>
+inline std::shared_ptr<spdlog::logger> create_callback_logger_mt(
+    const std::string& logger_name,
+    hipdnnCallback_t callback,
+    void* user_data,
+    const std::string& source)
+{
+    return Factory::template create<hipdnn::logging::callback_sink_mt>(
         logger_name, callback, user_data, source);
 }
 

@@ -169,11 +169,8 @@ inline void initialize_callback_logging(const std::string& logging_area,
         spdlog::init_thread_pool(8192, 1);
     }
     
-    auto callback_logger = hipdnn::logging::create_async_callback_logger_mt(
-        logger_name, callback_function, user_data, logging_area);
-    
-    // spdlog::register_logger(callback_logger);
-
+    auto callback_logger = hipdnn::logging::create_callback_logger_mt(
+        logger_name, callback_function, user_data, logging_area);    
 }
 
 }
