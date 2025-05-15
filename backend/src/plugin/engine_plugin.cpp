@@ -18,7 +18,7 @@ Engine_plugin::Engine_plugin(Shared_library&& lib)
 
 void Engine_plugin::resolve_symbols()
 {
-    if(type() != hipdnnPluginTypeEngine)
+    if(type() != HIPDNN_PLUGIN_TYPE_ENGINE)
     {
         throw Hipdnn_exception(HIPDNN_STATUS_PLUGIN_ERROR, "Wrong plugin type");
     }
@@ -40,11 +40,12 @@ unsigned Engine_plugin::num_engines() const
     assert(_initialized);
     unsigned num_engines;
     auto status = _func_get_num_engines(&num_engines);
-    if(status != hipdnnPluginStatusSuccess)
+    if(status != HIPDNN_PLUGIN_STATUS_SUCCESS)
     {
         throw Hipdnn_exception(HIPDNN_STATUS_PLUGIN_ERROR,
                                "Failed to get the number of engines. Status code: "
-                                   + std::to_string(status));
+                                   + std::to_string(status)
+                                   + ", Error: " + std::string(get_last_error_string()));
     }
     return num_engines;
 }
@@ -56,10 +57,11 @@ void Engine_plugin::run_engine(unsigned engine_index,
 {
     assert(_initialized);
     auto status = _func_run_engine(engine_index, input, output, size);
-    if(status != hipdnnPluginStatusSuccess)
+    if(status != HIPDNN_PLUGIN_STATUS_SUCCESS)
     {
         throw Hipdnn_exception(HIPDNN_STATUS_PLUGIN_ERROR,
-                               "Failed to run the engine. Status code: " + std::to_string(status));
+                               "Failed to run the engine. Status code: " + std::to_string(status)
+                                   + ", Error: " + std::string(get_last_error_string()));
     }
 }
 

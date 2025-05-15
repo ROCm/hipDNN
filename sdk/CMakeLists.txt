@@ -24,6 +24,10 @@ set(SCHEMA_FILES
     schemas/batchnorm_backward_attributes.fbs
     schemas/batchnorm_inference_attributes.fbs
     schemas/data_types.fbs
+    schemas/device_buffers.fbs
+    schemas/engine_config.fbs
+    schemas/engine.fbs
+    schemas/execution_plan.fbs
     schemas/graph.fbs
     schemas/pointwise_attributes.fbs
     schemas/tensor_attributes.fbs )

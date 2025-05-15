@@ -1,0 +1,11 @@
+// Copyright © Advanced Micro Devices, Inc., or its affiliates.
+// SPDX-License-Identifier: MIT
+
+namespace hipdnn_sdk.data_objects;
+
+table ExecutionPlan {
+    engine_id: int64;
+    data_ptr: uint64;
+}
+
+root_type ExecutionPlan;
