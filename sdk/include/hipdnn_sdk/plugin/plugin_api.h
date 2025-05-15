@@ -56,6 +56,9 @@ HIPDNN_PLUGIN_EXPORT hipdnnPluginStatus_t hipdnnPluginGetType(hipdnnPluginType_t
  * @brief Retrieves the last error string from the plugin.
  * @param[out] error_str Pointer to a constant character pointer where the pointer to the last error string will be stored.
  * @note Plugins must store the entire error string internally and maintain it on a per-thread basis.
+ *       This function should only be called after receiving an error status from the plugin API in the same thread.
+ *       The pointer returned by this function should not be stored, as its sole purpose is to retrieve the string
+ *       and immediately use it to form a complete error message.
  *       If the user passes a null pointer, this function does nothing.
  */
 HIPDNN_PLUGIN_EXPORT void hipdnnPluginGetLastErrorString(const char** error_str);
