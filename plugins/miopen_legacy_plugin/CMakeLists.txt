@@ -46,3 +46,9 @@ add_library(miopen_legacy_plugin SHARED
 target_link_libraries(miopen_legacy_plugin PUBLIC MIOpen hipdnn_sdk)
 
 add_subdirectory(tests)
+
+install(
+    TARGETS miopen_legacy_plugin
+    EXPORT miopen-legacy-plugin
+    LIBRARY DESTINATION lib/hipdnn_plugins
+)
