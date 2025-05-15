@@ -2,10 +2,9 @@
 // SPDX-License-Identifier: MIT
 
 #include "hipdnn_sdk/plugin/plugin_api.h"
-#include <array> // line 5, miopen_legacy_plugin_basic_api_tests.cpp
+#include <array>
 #include <gtest/gtest.h>
 
-// Test hipdnnPluginGetName
 TEST(MiopenLegacyPluginApiTest, GetNameSuccess)
 {
     const char* name = nullptr;
@@ -18,7 +17,6 @@ TEST(MiopenLegacyPluginApiTest, GetNameNullptr)
     EXPECT_EQ(hipdnnPluginGetName(nullptr), hipdnnPluginStatusBadParam);
 }
 
-// Test hipdnnPluginGetVersion
 TEST(MiopenLegacyPluginApiTest, GetVersionSuccess)
 {
     const char* version = nullptr;
@@ -31,7 +29,6 @@ TEST(MiopenLegacyPluginApiTest, GetVersionNullptr)
     EXPECT_EQ(hipdnnPluginGetVersion(nullptr), hipdnnPluginStatusBadParam);
 }
 
-// Test hipdnnPluginGetType
 TEST(MiopenLegacyPluginApiTest, GetTypeSuccess)
 {
     hipdnnPluginType_t type;
@@ -44,7 +41,6 @@ TEST(MiopenLegacyPluginApiTest, GetTypeNullptr)
     EXPECT_EQ(hipdnnPluginGetType(nullptr), hipdnnPluginStatusBadParam);
 }
 
-// Test hipdnnPluginGetNumEngines
 TEST(MiopenLegacyPluginApiTest, GetNumEnginesSuccess)
 {
     unsigned num_engines = 0;
@@ -57,12 +53,10 @@ TEST(MiopenLegacyPluginApiTest, GetNumEnginesNullptr)
     EXPECT_EQ(hipdnnPluginGetNumEngines(nullptr), hipdnnPluginStatusBadParam);
 }
 
-// Test hipdnnPluginRunEngine
 TEST(MiopenLegacyPluginApiTest, RunEngineSuccess)
 {
-    std::array<uint32_t, 4> input
-        = {1, 2, 3, 4}; // line 54, miopen_legacy_plugin_basic_api_tests.cpp
-    std::array<uint32_t, 4> output = {0}; // line 55, miopen_legacy_plugin_basic_api_tests.cpp
+    std::array<uint32_t, 4> input = {1, 2, 3, 4};
+    std::array<uint32_t, 4> output = {0};
     EXPECT_EQ(hipdnnPluginRunEngine(0, input.data(), output.data(), input.size()),
               hipdnnPluginStatusSuccess);
     for(size_t i = 0; i < input.size(); ++i)
@@ -73,7 +67,7 @@ TEST(MiopenLegacyPluginApiTest, RunEngineSuccess)
 
 TEST(MiopenLegacyPluginApiTest, RunEngineBadParam)
 {
-    std::array<uint32_t, 1> dummy = {0}; // line 64, miopen_legacy_plugin_basic_api_tests.cpp
+    std::array<uint32_t, 1> dummy = {0};
     // Bad engine index
     EXPECT_EQ(hipdnnPluginRunEngine(1, dummy.data(), dummy.data(), dummy.size()),
               hipdnnPluginStatusBadParam);
