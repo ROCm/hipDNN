@@ -14,5 +14,5 @@ In order to build the plugin standalone, you will need to have installed hipDNN 
 
 1. navigate to the `plugins/miopen_legacy_plugin` directory.
 2. make a build directory, `mkdir build && cd build`.
-3. run `cmake ..` to configure the build.
+3. run `cmake -DCMAKE_CXX_COMPILER=<path to amdclang>/clang++ ..` to configure the build.
 4. run `ninja` to build the plugin.
