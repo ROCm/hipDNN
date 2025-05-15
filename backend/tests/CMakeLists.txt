@@ -34,6 +34,7 @@ add_executable(hipdnn_backend_tests
 
 target_link_libraries(hipdnn_backend_tests 
     GTest::gtest
+    GTest::gmock
     pthread
     hipdnn_backend_private
     hipdnn_sdk
