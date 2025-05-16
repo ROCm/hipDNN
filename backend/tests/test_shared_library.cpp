@@ -3,7 +3,7 @@
 
 #include <gtest/gtest.h>
 
-#include <hipdnn_sdk/plugin/plugin_api_enums.h>
+#include <hipdnn_sdk/plugin/plugin_api_data_types.h>
 
 #include "descriptors/test_macros.hpp"
 #include "hipdnn_exception.hpp"
@@ -77,7 +77,7 @@ TEST(SharedLibraryTest, CallFunction)
     // Call the function to get the plugin name
     const char* name = nullptr;
     auto status = func_get_name(&name);
-    ASSERT_EQ(status, hipdnnPluginStatusSuccess);
+    ASSERT_EQ(status, HIPDNN_PLUGIN_STATUS_SUCCESS);
     ASSERT_NE(name, nullptr);
     ASSERT_STREQ(name, "Plugin1");
 }

@@ -10,7 +10,7 @@
 #include <vector>
 
 #include <hipdnn_sdk/logging/logger.hpp>
-#include <hipdnn_sdk/plugin/plugin_api_enums.h>
+#include <hipdnn_sdk/plugin/plugin_api_data_types.h>
 
 #include "hipdnn_exception.hpp"
 #include "shared_library.hpp"
@@ -36,6 +36,9 @@ public:
     hipdnnPluginType_t type() const;
 
 protected:
+    // This function must not throw as it is used during error handling.
+    std::string_view get_last_error_string() const noexcept;
+
     Shared_library _lib;
 
 private:
@@ -47,6 +50,7 @@ private:
     hipdnnPluginStatus_t (*_func_get_name)(const char**);
     hipdnnPluginStatus_t (*_func_get_version)(const char**);
     hipdnnPluginStatus_t (*_func_get_type)(hipdnnPluginType_t*);
+    void (*_func_get_last_error_str)(const char**);
 };
 
 // The Plugin_manager_base is responsible for loading and unloading plugins. This class is the base class for all plugin managers.
