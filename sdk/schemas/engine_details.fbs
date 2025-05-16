@@ -3,9 +3,8 @@
 
 namespace hipdnn_sdk.data_objects;
 
-table ExecutionPlan {
+table EngineDetails {
     engine_id: int64;
-    data_ptr: uint64;
 }
 
-root_type ExecutionPlan;
+root_type EngineDetails;
