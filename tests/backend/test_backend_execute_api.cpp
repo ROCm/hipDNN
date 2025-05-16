@@ -81,7 +81,6 @@ TEST_F(Execution_backend_end_api_tests, TestBackendExecute)
     std::unordered_map<std::string, int64_t> name_to_uid_map;
     std::unordered_map<int64_t, std::vector<int64_t>> uid_to_dims_map;
 
-    // Extract tensor information from the serialized graph
     test_util::extract_tensor_info_from_graph(
         graph.serialized_graph, uid_to_name_map, name_to_uid_map, uid_to_dims_map);
 
@@ -93,13 +92,10 @@ TEST_F(Execution_backend_end_api_tests, TestBackendExecute)
 
     std::unordered_map<int64_t, void*> data_ptr_mappings;
 
-    // For each tensor, allocate memory based on its dimensions
     for(const auto& [uid, dims] : uid_to_dims_map)
     {
-        void* tensor_data = test_util::allocate_tensor_memory(dims.data(),
-                                                              dims.size(),
-                                                              HIPDNN_TYPE_FLOAT,
-                                                              true); // Initialize inputs
+        void* tensor_data
+            = test_util::allocate_tensor_memory(dims.data(), dims.size(), HIPDNN_TYPE_FLOAT, true);
 
         ASSERT_NE(tensor_data, nullptr)
             << "Failed to allocate memory for tensor " << uid_to_name_map[uid];
@@ -112,6 +108,5 @@ TEST_F(Execution_backend_end_api_tests, TestBackendExecute)
 
     test_util::populate_variant_pack_with_mappings(_variant_pack, data_ptr_mappings, nullptr);
 
-    // Execute the operation
     ASSERT_EQ(hipdnnBackendExecute(_handle, _plan, _variant_pack), HIPDNN_STATUS_SUCCESS);
 }

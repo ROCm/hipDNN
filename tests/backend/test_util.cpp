@@ -288,12 +288,10 @@ void extract_tensor_info_from_graph(
     std::unordered_map<std::string, int64_t>& name_to_uid_map,
     std::unordered_map<int64_t, std::vector<int64_t>>& uid_to_dims_map)
 {
-    // Clear output maps
     uid_to_name_map.clear();
     name_to_uid_map.clear();
     uid_to_dims_map.clear();
 
-    // Deserialize the graph using FlatBuffers
     auto deserialized_graph = hipdnn_sdk::data_objects::UnPackGraph(serialized_graph.data());
     ASSERT_NE(deserialized_graph, nullptr);
 
@@ -303,11 +301,9 @@ void extract_tensor_info_from_graph(
         int64_t uid = tensor->uid;
         std::string name = tensor->name;
 
-        // Store mappings
         uid_to_name_map[uid] = name;
         name_to_uid_map[name] = uid;
 
-        // Store dimensions if available
         if(!tensor->dims.empty())
         {
             uid_to_dims_map[uid] = tensor->dims;

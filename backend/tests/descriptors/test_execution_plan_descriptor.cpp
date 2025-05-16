@@ -189,15 +189,26 @@ TEST_F(Execution_plan_descriptor_test, GetExecutionPlanDescriptorWorkspaceSize)
 
 TEST_F(Execution_plan_descriptor_test, GetExecutionPlanDescriptorUnsupportedAttr)
 {
-    void* dummy;
+    hipdnnBackendDescriptor_t returned_engine_config = nullptr;
+    int64_t count = 0;
 
     make_execution_plan_finalized();
 
-    ASSERT_THROW_HIPDNN_STATUS(_plan->get_attribute(HIPDNN_ATTR_EXECUTION_PLAN_ENGINE_CONFIG,
-                                                    HIPDNN_TYPE_BACKEND_DESCRIPTOR,
-                                                    1,
-                                                    nullptr,
-                                                    &dummy),
-                               HIPDNN_STATUS_NOT_SUPPORTED);
+    ASSERT_NO_THROW(_plan->get_attribute(HIPDNN_ATTR_EXECUTION_PLAN_ENGINE_CONFIG,
+                                         HIPDNN_TYPE_BACKEND_DESCRIPTOR,
+                                         1,
+                                         &count,
+                                         nullptr));
+    ASSERT_EQ(count, 1);
+
+    // Test retrieving the actual engine config
+    ASSERT_NO_THROW(_plan->get_attribute(HIPDNN_ATTR_EXECUTION_PLAN_ENGINE_CONFIG,
+                                         HIPDNN_TYPE_BACKEND_DESCRIPTOR,
+                                         1,
+                                         &count,
+                                         &returned_engine_config));
+
+    ASSERT_EQ(count, 1);
+    ASSERT_EQ(returned_engine_config, _mock_engine_config.get());
 }
 // NOLINTEND(readability-function-cognitive-complexity)

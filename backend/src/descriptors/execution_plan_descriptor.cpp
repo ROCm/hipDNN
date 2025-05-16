@@ -193,10 +193,8 @@ void Execution_plan_descriptor::get_engine_config(hipdnnBackendAttributeType_t a
                   HIPDNN_STATUS_BAD_PARAM_NULL_POINTER,
                   "Execution_plan_descriptor failed to get engine config: Element count is null.");
 
-    // We can only return one engine config descriptor
     *element_count = 1;
 
-    // If the user only wants to know the count, we're done
     if(array_of_elements == nullptr)
     {
         return;
