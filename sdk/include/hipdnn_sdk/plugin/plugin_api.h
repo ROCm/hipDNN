@@ -15,7 +15,7 @@
 
 /**
  * @file plugin_api.h
- * @brief hipDNN Plugin API
+ * @brief The hipDNN Plugin API
  *
  * This file contains the definitions and declarations for the hipDNN Plugin API.
  * The API allows users to create and manage custom plugins for hipDNN.
@@ -34,34 +34,34 @@ extern "C" {
 /**
  * @brief Retrieves the name of the plugin.
  *
- * @param[out] name Pointer to a pointer where the plugin name's address will be stored.
+ * @param[out] name A pointer to a pointer where the address of the plugin name will be stored.
  *
- * @return A value of type hipdnnPluginStatus_t.
+ * @return A value of type `hipdnnPluginStatus_t` indicating the status of the operation.
  */
 HIPDNN_PLUGIN_EXPORT hipdnnPluginStatus_t hipdnnPluginGetName(const char** name);
 
 /**
  * @brief Retrieves the version of the plugin.
  *
- * @param[out] version Pointer to a pointer where the plugin version's address will be stored.
+ * @param[out] version A pointer to a pointer where the address of the plugin version will be stored.
  *
- * @return A value of type hipdnnPluginStatus_t.
+ * @return A value of type `hipdnnPluginStatus_t` indicating the status of the operation.
  */
 HIPDNN_PLUGIN_EXPORT hipdnnPluginStatus_t hipdnnPluginGetVersion(const char** version);
 
 /**
  * @brief Retrieves the type of the plugin.
  *
- * @param[out] type Pointer to a hipdnnPluginType_t where the plugin type will be stored.
+ * @param[out] type A pointer to a `hipdnnPluginType_t` where the plugin type will be stored.
  *
- * @return A value of type hipdnnPluginStatus_t.
+ * @return A value of type `hipdnnPluginStatus_t` indicating the status of the operation.
  */
 HIPDNN_PLUGIN_EXPORT hipdnnPluginStatus_t hipdnnPluginGetType(hipdnnPluginType_t* type);
 
 /**
  * @brief Retrieves the last error string from the plugin.
  *
- * @param[out] error_str Pointer to a constant character pointer where the pointer to the last error string will be stored.
+ * @param[out] error_str A pointer to a constant character pointer where the address of the last error string will be stored.
  *
  * @note Plugins must store the entire error string internally and maintain it on a per-thread basis.
  *       This function should only be called after receiving an error status from the plugin API in the same thread.
@@ -72,7 +72,7 @@ HIPDNN_PLUGIN_EXPORT hipdnnPluginStatus_t hipdnnPluginGetType(hipdnnPluginType_t
 HIPDNN_PLUGIN_EXPORT void hipdnnPluginGetLastErrorString(const char** error_str);
 
 /**
- * @brief Maximum length for plugin error strings.
+ * @brief The maximum length for plugin error strings.
  *
  * Plugins are recommended to adhere to this value.
  * The length includes the null-terminating character.

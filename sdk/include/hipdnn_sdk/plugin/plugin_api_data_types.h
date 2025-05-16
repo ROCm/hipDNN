@@ -5,9 +5,9 @@
 
 /**
  * @file plugin_api_data_types.h
- * @brief Header file for hipDNN Plugin API data types.
+ * @brief Header file for the hipDNN Plugin API data types.
  *
- * This file contains the definitions of the data types used in the hipDNN Plugin API
+ * This file contains the definitions of the data types used in the hipDNN Plugin API.
  */
 
 #ifdef __cplusplus
@@ -35,7 +35,7 @@ typedef enum
 } hipdnnPluginStatus_t;
 
 /**
- * @brief Enumeration for the type of plugin.
+ * @brief Enumeration for the type of a plugin.
  *
  * This enumeration defines the different types of plugins.
  */
@@ -46,16 +46,15 @@ typedef enum
 } hipdnnPluginType_t;
 
 /**
- * @brief Structure for describing a const data buffer.
+ * @brief Structure for describing a constant data buffer.
  *
- * This structure provides a way to pass buffer information (pointer and size) into and out of functions.
+ * This structure provides a way to pass buffer information (a pointer and a size) into and out of functions.
  */
 typedef struct
 {
     const void* ptr;
     size_t size;
 } hipdnnPluginConstData_t;
-
 
 /**
  * @brief Represents a device buffer.
@@ -70,14 +69,14 @@ typedef struct
 } hipdnnPluginDeviceBuffer_t;
 
 /**
- * @brief Opaque handle for the engine plugin.
+ * @brief Opaque handle for an engine plugin.
  *
  * This handle is used to represent an engine plugin.
  */
 typedef struct hipdnnEnginePluginHandle* hipdnnEnginePluginHandle_t;
 
 /**
- * @brief Opaque handle for the engine execution context.
+ * @brief Opaque handle for an engine execution context.
  *
  * This handle is used to represent the execution context of an engine.
  */
