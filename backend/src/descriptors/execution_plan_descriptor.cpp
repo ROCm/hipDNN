@@ -49,6 +49,9 @@ void Execution_plan_descriptor::get_attribute(hipdnnBackendAttributeName_t attri
         break;
     case HIPDNN_ATTR_EXECUTION_PLAN_HANDLE:
     case HIPDNN_ATTR_EXECUTION_PLAN_ENGINE_CONFIG:
+        get_engine_config(
+            attribute_type, requested_element_count, element_count, array_of_elements);
+        break;
     case HIPDNN_ATTR_EXECUTION_PLAN_COMPUTED_INTERMEDIATE_UIDS:
     case HIPDNN_ATTR_EXECUTION_PLAN_RUN_ONLY_INTERMEDIATE_UIDS:
     case HIPDNN_ATTR_EXECUTION_PLAN_JSON_REPRESENTATION:
@@ -174,6 +177,45 @@ void Execution_plan_descriptor::set_engine_config(hipdnnBackendAttributeType_t a
                    "descriptor is not finalized.");
 
     _engine_config = engine_config;
+}
+
+void Execution_plan_descriptor::get_engine_config(hipdnnBackendAttributeType_t attribute_type,
+                                                  int64_t requested_element_count,
+                                                  int64_t* element_count,
+                                                  void* array_of_elements)
+{
+    THROW_IF_NE(attribute_type,
+                HIPDNN_TYPE_BACKEND_DESCRIPTOR,
+                HIPDNN_STATUS_BAD_PARAM,
+                "Execution_plan_descriptor failed to get engine config: Invalid attribute type.");
+
+    THROW_IF_NULL(element_count,
+                  HIPDNN_STATUS_BAD_PARAM_NULL_POINTER,
+                  "Execution_plan_descriptor failed to get engine config: Element count is null.");
+
+    // We can only return one engine config descriptor
+    *element_count = 1;
+
+    // If the user only wants to know the count, we're done
+    if(array_of_elements == nullptr)
+    {
+        return;
+    }
+
+    THROW_IF_LT(requested_element_count,
+                *element_count,
+                HIPDNN_STATUS_BAD_PARAM,
+                "Execution_plan_descriptor failed to get engine config: Requested element count "
+                "too small.");
+
+    THROW_IF_NULL(_engine_config,
+                  HIPDNN_STATUS_INTERNAL_ERROR,
+                  "Execution_plan_descriptor failed to get engine config: Engine config is null "
+                  "(internal error).");
+
+    // Write engine config descriptor to output array
+    auto* output = static_cast<hipdnnBackendDescriptor_t*>(array_of_elements);
+    *output = _engine_config;
 }
 
 } // namespace hipdnn_backend

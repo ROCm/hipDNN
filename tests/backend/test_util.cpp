@@ -128,8 +128,8 @@ void populate_test_execution_plan(hipdnnBackendDescriptor_t* execution_plan,
 }
 
 void* allocate_tensor_memory([[maybe_unused]] const int64_t* dims,
-                             [[maybe_unused]] int64_t dims_count,
-                             [[maybe_unused]] DataType_t data_type,
+                             [[maybe_unused]] size_t dims_count,
+                             [[maybe_unused]] hipdnnBackendAttributeType_t data_type,
                              [[maybe_unused]] bool initialize)
 {
     // TODO: Implement memory allocation logic based on the data type and dimensions
@@ -239,17 +239,12 @@ void create_and_initialize_backend_descriptor(hipdnnBackendDescriptor_t backend_
 {
     ASSERT_NE(backend_descriptor, nullptr);
 
-    auto status = hipdnnBackendCreateDescriptor(HIPDNN_BACKEND_OPERATIONGRAPH_DESCRIPTOR,
-                                                &backend_descriptor);
-
-    ASSERT_NE(status, HIPDNN_STATUS_SUCCESS);
-
-    status = hipdnnBackendCreateAndDeserializeGraph_ext(
+    auto status = hipdnnBackendCreateAndDeserializeGraph_ext(
         &backend_descriptor, serialized_graph.data(), serialized_graph.size());
-    ASSERT_NE(status, HIPDNN_STATUS_SUCCESS);
+    ASSERT_EQ(status, HIPDNN_STATUS_SUCCESS);
 
     status = hipdnnBackendFinalize(backend_descriptor);
-    ASSERT_NE(status, HIPDNN_STATUS_SUCCESS);
+    ASSERT_EQ(status, HIPDNN_STATUS_SUCCESS);
 }
 
 void create_and_populate_batchnorm_node(Graph& graph)
@@ -287,15 +282,12 @@ void create_and_populate_batchnorm_node(Graph& graph)
     EXPECT_TRUE(build_result.is_good()) << build_result.get_message();
 }
 
-void extract_tensor_info_from_graph(const flatbuffers::DetachedBuffer& serialized_graph)
+void extract_tensor_info_from_graph(
+    const flatbuffers::DetachedBuffer& serialized_graph,
+    std::unordered_map<int64_t, std::string>& uid_to_name_map,
+    std::unordered_map<std::string, int64_t>& name_to_uid_map,
+    std::unordered_map<int64_t, std::vector<int64_t>>& uid_to_dims_map)
 {
-    // Currently using FlatBuffers to directly deserialize the graph and extract tensor information.
-    // In the future, we will retrieve this information through the backend descriptor's get_attribute API.
-    //auto deserialized_graph = hipdnn_sdk::data_objects::UnPackGraph(serialized_graph.data());
-    //ASSERT_NE(deserialized_graph, nullptr);
-    std::unordered_map<int64_t, std::string> uid_to_name_map;
-    std::unordered_map<std::string, int64_t> name_to_uid_map;
-    std::unordered_map<int64_t, std::vector<int64_t>> uid_to_dims_map;
     // Clear output maps
     uid_to_name_map.clear();
     name_to_uid_map.clear();
@@ -303,7 +295,7 @@ void extract_tensor_info_from_graph(const flatbuffers::DetachedBuffer& serialize
 
     // Deserialize the graph using FlatBuffers
     auto deserialized_graph = hipdnn_sdk::data_objects::UnPackGraph(serialized_graph.data());
-    ASSERT_NE(deserialized_graph, nullptr) << "Failed to deserialize graph";
+    ASSERT_NE(deserialized_graph, nullptr);
 
     // Extract all tensor information from the deserialized graph
     for(const auto& tensor : deserialized_graph->tensors)

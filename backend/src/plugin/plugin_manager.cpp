@@ -123,11 +123,12 @@ void Plugin_manager::execute( // NOLINT(readability-convert-member-functions-to-
 
     // First get engine config from engine plan descritpor
     hipdnnBackendDescriptor_t engine_config = nullptr;
+    int64_t element_count = 0;
     status = hipdnnBackendGetAttribute(execution_plan_desc,
                                        HIPDNN_ATTR_EXECUTION_PLAN_ENGINE_CONFIG,
                                        HIPDNN_TYPE_BACKEND_DESCRIPTOR,
                                        1,
-                                       nullptr,
+                                       &element_count,
                                        &engine_config);
 
     if(status != HIPDNN_STATUS_SUCCESS)
@@ -148,7 +149,7 @@ void Plugin_manager::execute( // NOLINT(readability-convert-member-functions-to-
                                        HIPDNN_ATTR_ENGINECFG_ENGINE,
                                        HIPDNN_TYPE_BACKEND_DESCRIPTOR,
                                        1,
-                                       nullptr,
+                                       &element_count,
                                        &engine);
     if(status != HIPDNN_STATUS_SUCCESS)
     {
@@ -157,7 +158,7 @@ void Plugin_manager::execute( // NOLINT(readability-convert-member-functions-to-
     // third get the engine id from the engine
     int64_t engine_id;
     status = hipdnnBackendGetAttribute(
-        engine, HIPDNN_ATTR_ENGINE_GLOBAL_INDEX, HIPDNN_TYPE_INT64, 1, nullptr, &engine_id);
+        engine, HIPDNN_ATTR_ENGINE_GLOBAL_INDEX, HIPDNN_TYPE_INT64, 1, &element_count, &engine_id);
 
     // Use get_plugin helper to find the plugin for this engine ID
     auto plugin = get_plugin(engine_id);
@@ -174,7 +175,7 @@ void Plugin_manager::execute( // NOLINT(readability-convert-member-functions-to-
                               HIPDNN_ATTR_ENGINE_OPERATION_GRAPH,
                               HIPDNN_TYPE_BACKEND_DESCRIPTOR,
                               1,
-                              nullptr,
+                              &element_count,
                               &graph);
     auto graph_desc = static_cast<Graph_descriptor*>(graph);
     if(graph_desc == nullptr)

@@ -49,7 +49,12 @@ void populate_test_execution_plan(hipdnnBackendDescriptor_t* execution_plan,
 
 void create_variant_pack(hipdnnBackendDescriptor_t* variant_pack);
 
-void* allocate_tensor_memory(int64_t dims_count, DataType_t data_type, bool initialize = true);
+void create_and_populate_batchnorm_node(Graph& graph);
+
+void* allocate_tensor_memory([[maybe_unused]] const int64_t* dims,
+                             [[maybe_unused]] size_t dims_count,
+                             [[maybe_unused]] hipdnnBackendAttributeType_t data_type,
+                             [[maybe_unused]] bool initialize);
 
 void create_batchnorm_input_tensors(const std::vector<int64_t>& input_dims,
                                     const std::vector<int64_t>& input_strides,
@@ -72,15 +77,12 @@ void extract_tensor_mappings(const std::unordered_map<int64_t, void*>& data_ptr_
 void populate_variant_pack_with_mappings(
     hipdnnBackendDescriptor_t variant_pack,
     const std::unordered_map<int64_t, void*>& data_ptr_mappings,
-    void* workspace = nullptr,
-    bool finalize = true);
-
-void extract_tensor_info_from_graph(const flatbuffers::DetachedBuffer& serialized_graph,
-                                    const std::string& input_name,
-                                    const std::string& output_name,
-                                    int64_t& input_uid,
-                                    int64_t& output_uid,
-                                    std::vector<int64_t>& input_dims,
-                                    std::vector<int64_t>& output_dims);
-
+    void* workspace = nullptr);
+void create_and_initialize_backend_descriptor(hipdnnBackendDescriptor_t backend_descriptor,
+                                              const flatbuffers::DetachedBuffer& serialized_graph);
+void extract_tensor_info_from_graph(
+    const flatbuffers::DetachedBuffer& serialized_graph,
+    std::unordered_map<int64_t, std::string>& uid_to_name_map,
+    std::unordered_map<std::string, int64_t>& name_to_uid_map,
+    std::unordered_map<int64_t, std::vector<int64_t>>& uid_to_dims_map);
 } // namespace test_util
