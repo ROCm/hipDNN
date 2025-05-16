@@ -216,24 +216,6 @@ DataType_t convert_backend_attribute_to_data_type(hipdnnBackendAttributeType_t b
     }
 }
 
-void create_batchnorm_graph(const std::shared_ptr<Tensor_attributes>& x,
-                            const std::shared_ptr<Tensor_attributes>& scale,
-                            const std::shared_ptr<Tensor_attributes>& bias,
-                            const std::vector<int64_t>& input_dims,
-                            const std::vector<int64_t>& input_strides,
-                            DataType_t data_type,
-                            const std::string& node_name)
-{
-    x->set_dim(input_dims)
-        .set_stride(input_strides)
-        .set_data_type(data_type)
-        .set_name(node_name + "::Input");
-
-    scale->set_data_type(data_type).set_name(node_name + "::Scale");
-
-    bias->set_data_type(data_type).set_name(node_name + "::Bias");
-}
-
 void create_and_initialize_backend_descriptor(hipdnnBackendDescriptor_t backend_descriptor,
                                               const flatbuffers::DetachedBuffer& serialized_graph)
 {

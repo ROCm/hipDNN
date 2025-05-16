@@ -47,8 +47,6 @@ void populate_test_execution_plan(hipdnnBackendDescriptor_t* execution_plan,
                                   int64_t gidx,
                                   bool finalize = false);
 
-void create_variant_pack(hipdnnBackendDescriptor_t* variant_pack);
-
 void create_and_populate_batchnorm_node(Graph& graph);
 
 void* allocate_tensor_memory([[maybe_unused]] const int64_t* dims,
@@ -56,24 +54,6 @@ void* allocate_tensor_memory([[maybe_unused]] const int64_t* dims,
                              [[maybe_unused]] hipdnnBackendAttributeType_t data_type,
                              [[maybe_unused]] bool initialize);
 
-void create_batchnorm_input_tensors(const std::vector<int64_t>& input_dims,
-                                    const std::vector<int64_t>& input_strides,
-                                    DataType_t data_type,
-                                    const std::string& node_name);
-
-void create_batchnorm_graph(hipdnnBackendDescriptor_t* graph_descriptor,
-                            Graph& graph,
-                            const std::shared_ptr<Tensor_attributes>& x,
-                            const std::shared_ptr<Tensor_attributes>& scale,
-                            const std::shared_ptr<Tensor_attributes>& bias,
-                            const std::vector<int64_t>& input_dims,
-                            const std::vector<int64_t>& input_strides,
-                            DataType_t data_type,
-                            const std::string& node_name);
-
-void extract_tensor_mappings(const std::unordered_map<int64_t, void*>& data_ptr_mappings,
-                             std::vector<int64_t>& tensor_ids,
-                             std::vector<void*>& data_ptrs);
 void populate_variant_pack_with_mappings(
     hipdnnBackendDescriptor_t variant_pack,
     const std::unordered_map<int64_t, void*>& data_ptr_mappings,

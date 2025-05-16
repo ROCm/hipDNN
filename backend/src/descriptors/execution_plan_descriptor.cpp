@@ -211,7 +211,6 @@ void Execution_plan_descriptor::get_engine_config(hipdnnBackendAttributeType_t a
                   "Execution_plan_descriptor failed to get engine config: Engine config is null "
                   "(internal error).");
 
-    // Write engine config descriptor to output array
     auto* output = static_cast<hipdnnBackendDescriptor_t*>(array_of_elements);
     *output = _engine_config;
 }
