@@ -59,6 +59,8 @@ protected:
 TEST_F(Engine_descriptor_test, CreateEngineDescriptor)
 {
     ASSERT_NE(_engine, nullptr);
+    ASSERT_FALSE(_engine->is_finalized());
+    ASSERT_EQ(_engine->type, HIPDNN_BACKEND_ENGINE_DESCRIPTOR);
 }
 
 TEST_F(Engine_descriptor_test, SetEngineDescriptorGraph)

@@ -54,7 +54,7 @@ protected:
         _plan = std::make_unique<Execution_plan_descriptor>();
 
         _mock_engine_config
-            = std::make_unique<Mock_descriptor>(HIPDNN_BACKEND_ENGINE_DESCRIPTOR, true);
+            = std::make_unique<Mock_descriptor>(HIPDNN_BACKEND_ENGINECFG_DESCRIPTOR, true);
         auto status = _mock_engine_config->set_data(
             HIPDNN_ATTR_ENGINECFG_WORKSPACE_SIZE, HIPDNN_TYPE_INT64, 1, &dummy_workspace_size);
         ASSERT_EQ(status, HIPDNN_STATUS_SUCCESS);
@@ -62,13 +62,15 @@ protected:
         _mock_engine_bad_type = std::make_unique<Mock_descriptor>();
 
         _mock_engine_unfinished
-            = std::make_unique<Mock_descriptor>(HIPDNN_BACKEND_ENGINE_DESCRIPTOR);
+            = std::make_unique<Mock_descriptor>(HIPDNN_BACKEND_ENGINECFG_DESCRIPTOR);
     }
 };
 
 TEST_F(Execution_plan_descriptor_test, CreateExecutionPlanDescriptor)
 {
     ASSERT_NE(_plan, nullptr);
+    ASSERT_FALSE(_plan->is_finalized());
+    ASSERT_EQ(_plan->type, HIPDNN_BACKEND_EXECUTION_PLAN_DESCRIPTOR);
 }
 
 TEST_F(Execution_plan_descriptor_test, SetAttrOnUnfinalizedExecutionPlanDescriptor)

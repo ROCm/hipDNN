@@ -2,6 +2,7 @@
 // SPDX-License-Identifier:  MIT
 
 #include "plugin_manager.hpp"
+#include "descriptors/engine_config_descriptor.hpp"
 #include "fake_plugin.hpp"
 #include "hipdnn_exception.hpp"
 
@@ -23,11 +24,15 @@ void Plugin_manager::initialize( // NOLINT(readability-convert-member-functions-
     }
 }
 
-// Copyright © Advanced Micro Devices, Inc., or its affiliates.
-// SPDX-License-Identifier:  MIT
-
-void Plugin_manager::finalize_engine_config(Engine_config_descriptor* config)
+void Plugin_manager::finalize_engine_config(hipdnnBackendDescriptor_t desc)
 {
+    auto config = static_cast<Engine_config_descriptor*>(desc);
+    if(config == nullptr)
+    {
+        throw hipdnn_backend::Hipdnn_exception(
+            HIPDNN_STATUS_BAD_PARAM, "hipdnnBackendDescriptor_t is not a valid engine config");
+    }
+
     hipdnnBackendDescriptor_t engine;
     hipdnnBackendGetAttribute(
         config, HIPDNN_ATTR_ENGINECFG_ENGINE, HIPDNN_TYPE_BACKEND_DESCRIPTOR, 1, nullptr, &engine);

@@ -47,7 +47,7 @@ public:
                                  int64_t element_count,
                                  const void* array_of_elements) override;
 
-    hipdnnStatus_t set_max_workspace_size(int64_t max_workspace_size);
+    void set_max_workspace_size(int64_t max_workspace_size);
 };
 
 } // namespace hipdnn_backend

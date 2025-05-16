@@ -154,18 +154,9 @@ HIPDNN_BACKEND_EXPORT hipdnnStatus_t hipdnnBackendFinalize(hipdnnBackendDescript
 
         if(descriptor->type == HIPDNN_BACKEND_ENGINECFG_DESCRIPTOR)
         {
-            auto engine_config
-                = dynamic_cast<hipdnn_backend::Engine_config_descriptor*>(descriptor);
-            if(engine_config == nullptr)
-            {
-                throw hipdnn_backend::Hipdnn_exception(
-                    HIPDNN_STATUS_BAD_PARAM,
-                    "hipdnnBackendDescriptor_t is not a valid Engine_config_descriptor");
-            }
-
             Plugin_manager plugin_manager;
             plugin_manager.initialize();
-            plugin_manager.finalize_engine_config(engine_config);
+            plugin_manager.finalize_engine_config(descriptor);
         }
     });
 }

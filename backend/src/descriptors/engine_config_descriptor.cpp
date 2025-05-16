@@ -213,27 +213,26 @@ void Engine_config_descriptor::set_engine(hipdnnBackendAttributeType_t attribute
     _engine = engine;
 }
 
-hipdnnStatus_t Engine_config_descriptor::set_max_workspace_size(int64_t workspace_size)
+void Engine_config_descriptor::set_max_workspace_size(int64_t workspace_size)
 {
     // This should only be called from the plugin manager, so all errors should be
     // internal errors rather than user errors.
 
     if(!is_finalized())
     {
-        return set_last_error(HIPDNN_STATUS_INTERNAL_ERROR,
-                              "Internal error:  Failed to set max workspace size:"
-                              "Must be called after finalized.");
+        throw Hipdnn_exception(HIPDNN_STATUS_INTERNAL_ERROR,
+                               "Internal error:  Failed to set max workspace size:"
+                               "Must be called after finalized.");
     }
 
     if(workspace_size < 0)
     {
-        return set_last_error(HIPDNN_STATUS_INTERNAL_ERROR,
-                              "Internal error:  Failed to set max workspace size: "
-                              "Max workspace size cannot be negative.");
+        throw Hipdnn_exception(HIPDNN_STATUS_INTERNAL_ERROR,
+                               "Internal error:  Failed to set max workspace size: "
+                               "Max workspace size cannot be negative.");
     }
 
     _max_workspace_size = workspace_size;
-    return HIPDNN_STATUS_SUCCESS;
 }
 
 } // namespace hipdnn_backend

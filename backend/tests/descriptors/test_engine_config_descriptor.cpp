@@ -55,6 +55,8 @@ protected:
 TEST_F(Engine_config_descriptor_test, CreateEngineConfigDescriptor)
 {
     ASSERT_NE(_engine_config, nullptr);
+    ASSERT_FALSE(_engine_config->is_finalized());
+    ASSERT_EQ(_engine_config->type, HIPDNN_BACKEND_ENGINECFG_DESCRIPTOR);
 }
 
 TEST_F(Engine_config_descriptor_test, SetEngineConfigDescriptorEngine)
@@ -101,15 +103,14 @@ TEST_F(Engine_config_descriptor_test, SetEngineConfigDescriptorMaxWorkspaceSize)
     int64_t workspace_size = 1024;
     int64_t bad_workspace_size = -1024;
 
-    auto status = _engine_config->set_max_workspace_size(bad_workspace_size);
-    ASSERT_EQ(status, HIPDNN_STATUS_INTERNAL_ERROR);
+    ASSERT_THROW_HIPDNN_STATUS(_engine_config->set_max_workspace_size(bad_workspace_size),
+                               HIPDNN_STATUS_INTERNAL_ERROR);
 
-    status = _engine_config->set_max_workspace_size(workspace_size);
-    ASSERT_EQ(status, HIPDNN_STATUS_INTERNAL_ERROR);
+    ASSERT_THROW_HIPDNN_STATUS(_engine_config->set_max_workspace_size(workspace_size),
+                               HIPDNN_STATUS_INTERNAL_ERROR);
 
     make_engine_config_finalized();
-    status = _engine_config->set_max_workspace_size(workspace_size);
-    ASSERT_EQ(status, HIPDNN_STATUS_SUCCESS);
+    ASSERT_NO_THROW(_engine_config->set_max_workspace_size(workspace_size));
 }
 
 TEST_F(Engine_config_descriptor_test, SetAttrOnFinalizedEngineConfigDescriptor)

@@ -3,7 +3,6 @@
 
 #pragma once
 
-#include "descriptors/engine_config_descriptor.hpp"
 #include "descriptors/execution_plan_descriptor.hpp"
 #include "descriptors/graph_descriptor.hpp"
 #include "descriptors/variant_descriptor.hpp"
@@ -24,11 +23,11 @@ struct Plugin_manager
     void initialize(
         /* some stuff to help you find which plugins should be loaded, but for now blank */);
 
-    // This queries the workspace details for the given engine, and then sets the
+    // This queries the workspace details for the given engine config, and then sets the
     // workspace in the Engine_config_descriptor.  This should throw if
     // an error occurs that prevents the workspace size from being set on the engine
     // config.
-    void finalize_engine_config(Engine_config_descriptor* config);
+    void finalize_engine_config(hipdnnBackendDescriptor_t desc);
 
     // Note: Heuristic details is a future thing, for now we can ignore
     // 		 Heuristic details is used to determine sort order on the returned graphs.
