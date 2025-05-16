@@ -9,8 +9,6 @@
 #include "handle/handle.hpp"
 #include "hipdnn_plugin_base.hpp"
 #include <map>
-#include <memory>
-#include <set>
 
 namespace hipdnn_backend
 {
@@ -20,8 +18,7 @@ struct Plugin_manager
     // Populate the hipDNNPlugin's by finding the sources,
     // and constructing the cAPIPlugin, and then constructing
     // the wrapper hipDNNPlugin objects
-    void initialize(
-        /* some stuff to help you find which plugins should be loaded, but for now blank */);
+    void initialize(/* heuristics */);
 
     // This queries the workspace details for the given engine config, and then sets the
     // workspace in the Engine_config_descriptor.  This should throw if

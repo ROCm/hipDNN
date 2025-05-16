@@ -229,6 +229,29 @@ HIPDNN_BACKEND_EXPORT hipdnnStatus_t
                               int64_t element_count,
                               const void* array_of_elements);
 
+/**
+ * @brief Converts the hipDNN status code to a NULL terminated static string.
+ *
+ * This function takes a hipdnnStatus_t status code and returns a pointer to a
+ * static, NULL-terminated string describing the error or status.
+ *
+ * @param status The hipDNN status code to convert.
+ * @return A pointer to a static, NULL-terminated string describing the status.
+ */
+HIPDNN_BACKEND_EXPORT const char* hipdnnGetErrorString(hipdnnStatus_t status);
+
+/**
+ * @brief Retrieves the last error message for the calling thread.
+ *
+ * This function copies the last error message associated with the calling thread into the provided
+ * message buffer, up to max_size bytes (including the null terminator).
+ * Note the max size for an error message is 256 characters.
+ * 
+ * @param[out] message   Pointer to a character buffer where the error message will be copied.
+ * @param[in]  max_size  Maximum number of bytes to copy, including the null terminator.
+ */
+HIPDNN_BACKEND_EXPORT void hipdnnGetLastErrorString(char* message, size_t max_size);
+
 /*
  **************************************************************************************************
  *

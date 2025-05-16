@@ -30,7 +30,7 @@ public:
     // This function loads a shared library from the specified path.
     // On Windows, it adds a ".dll" extension if no extension exists.
     // On Linux, it adds a "lib" prefix to the filename and a ".so" extension if no extension exists.
-    bool load(const std::filesystem::path& library_path);
+    void load(const std::filesystem::path& library_path);
 
     // This function unloads the shared library.
     void unload() noexcept;

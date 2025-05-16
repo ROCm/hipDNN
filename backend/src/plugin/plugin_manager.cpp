@@ -9,29 +9,26 @@
 namespace hipdnn_backend
 {
 
-void Plugin_manager::initialize( // NOLINT(readability-convert-member-functions-to-static)
-    /* some stuff to help you find which plugins should be loaded, but for now blank */)
+void Plugin_manager::initialize(/* heuristics */)
 {
+
     // TODO : actually find and init the plugins properly
     // for now we will just use a fake plugin.
     // # DISCUSS: how do we find the plugins? store in json?
-    auto plugin = std::make_shared<Fake_plugin>();
+    auto fake_plugin = std::make_shared<Fake_plugin>();
 
     // for all the applicable engines, add the same plugin to the map
-    for(const int64_t& engine_id : plugin->get_applicable_engines(nullptr))
+    for(const int64_t& engine_id : fake_plugin->get_applicable_engines(nullptr))
     {
-        _plugins.emplace(engine_id, plugin);
+        _plugins.insert({engine_id, fake_plugin});
     }
 }
 
 void Plugin_manager::finalize_engine_config(hipdnnBackendDescriptor_t desc)
 {
+    assert(desc != nullptr);
+    assert(desc->type == HIPDNN_BACKEND_ENGINECFG_DESCRIPTOR);
     auto config = static_cast<Engine_config_descriptor*>(desc);
-    if(config == nullptr)
-    {
-        throw hipdnn_backend::Hipdnn_exception(
-            HIPDNN_STATUS_BAD_PARAM, "hipdnnBackendDescriptor_t is not a valid engine config");
-    }
 
     hipdnnBackendDescriptor_t engine;
     hipdnnBackendGetAttribute(
@@ -44,12 +41,8 @@ void Plugin_manager::finalize_engine_config(hipdnnBackendDescriptor_t desc)
                               1,
                               nullptr,
                               &graph);
+    assert(graph != nullptr);
     auto graph_desc = static_cast<Graph_descriptor*>(graph);
-    if(graph_desc == nullptr)
-    {
-        throw Hipdnn_exception(HIPDNN_STATUS_BAD_PARAM,
-                               "hipdnnBackendDescriptor_t is not a valid graph descriptor");
-    }
 
     int64_t engine_id;
     hipdnnBackendGetAttribute(
@@ -194,4 +187,4 @@ void Plugin_manager::execute( // NOLINT(readability-convert-member-functions-to-
     plugin->execute(graph_desc, variant_desc, handle);
 }
 
-}
+} // hipdnn_backend

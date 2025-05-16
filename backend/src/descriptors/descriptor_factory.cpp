@@ -17,11 +17,8 @@ namespace hipdnn_backend
 void Descriptor_factory::create(hipdnnBackendDescriptorType_t descriptor_type,
                                 hipdnnBackendDescriptor_t* descriptor)
 {
-    if(descriptor == nullptr)
-    {
-        throw Hipdnn_exception(HIPDNN_STATUS_BAD_PARAM_NULL_POINTER,
-                               "hipdnnBackendDescriptor_t* is null.");
-    }
+    THROW_IF_NULL(
+        descriptor, HIPDNN_STATUS_BAD_PARAM_NULL_POINTER, "hipdnnBackendDescriptor_t* is null.");
 
     HIPDNN_LOG_INFO("Creating descriptor of type: {}",
                     hipdnn_get_backend_descriptor_type_name(descriptor_type));
@@ -55,20 +52,11 @@ void Descriptor_factory::create_graph_ext(hipdnnBackendDescriptor_t* descriptor,
                                           const uint8_t* serialized_graph,
                                           size_t graph_byte_size)
 {
-    if(descriptor == nullptr)
-    {
-        throw Hipdnn_exception(HIPDNN_STATUS_BAD_PARAM_NULL_POINTER,
-                               "hipdnnBackendDescriptor_t* is null.");
-    }
-
-    if(serialized_graph == nullptr)
-    {
-        throw Hipdnn_exception(HIPDNN_STATUS_BAD_PARAM_NULL_POINTER, "serialized_graph is null.");
-    }
-    if(graph_byte_size == 0)
-    {
-        throw Hipdnn_exception(HIPDNN_STATUS_BAD_PARAM, "graph_byte_size is 0.");
-    }
+    THROW_IF_NULL(
+        descriptor, HIPDNN_STATUS_BAD_PARAM_NULL_POINTER, "hipdnnBackendDescriptor_t* is null.");
+    THROW_IF_NULL(
+        serialized_graph, HIPDNN_STATUS_BAD_PARAM_NULL_POINTER, "serialized_graph is null.");
+    THROW_IF_TRUE(graph_byte_size == 0, HIPDNN_STATUS_BAD_PARAM, "graph_byte_size is 0.");
 
     auto graph_descriptor = new Graph_descriptor();
     try

@@ -28,4 +28,6 @@ typedef enum
     = 12, // Resource allocation failed inside the hipDNN library.
     HIPDNN_STATUS_EXECUTION_FAILED
     = 13, // This is an error category code. The GPU program failed to execute.
+    HIPDNN_STATUS_PLUGIN_ERROR
+    = 14, // This is an error category code. An error occurred in the plugin.
 } hipdnnStatus_t;

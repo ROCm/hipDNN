@@ -8,10 +8,12 @@
 namespace hipdnn_backend
 {
 
+class Graph_descriptor;
+
 class Engine_descriptor : public hipdnnBackendDescriptor
 {
 private:
-    hipdnnBackendDescriptor_t _graph = nullptr;
+    const Graph_descriptor* _graph = nullptr;
     int64_t _engine_id;
     bool _engine_id_set = false;
 
@@ -39,16 +41,16 @@ public:
 
     void finalize() override;
 
-    hipdnnStatus_t get_attribute(hipdnnBackendAttributeName_t attribute_name,
-                                 hipdnnBackendAttributeType_t attribute_type,
-                                 int64_t requested_element_count,
-                                 int64_t* element_count,
-                                 void* array_of_elements) override;
+    void get_attribute(hipdnnBackendAttributeName_t attribute_name,
+                       hipdnnBackendAttributeType_t attribute_type,
+                       int64_t requested_element_count,
+                       int64_t* element_count,
+                       void* array_of_elements) override;
 
-    hipdnnStatus_t set_attribute(hipdnnBackendAttributeName_t attribute_name,
-                                 hipdnnBackendAttributeType_t attribute_type,
-                                 int64_t element_count,
-                                 const void* array_of_elements) override;
+    void set_attribute(hipdnnBackendAttributeName_t attribute_name,
+                       hipdnnBackendAttributeType_t attribute_type,
+                       int64_t element_count,
+                       const void* array_of_elements) override;
 };
 
 } // namespace hipdnn_backend

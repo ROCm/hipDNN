@@ -1,13 +1,15 @@
 // Copyright © Advanced Micro Devices, Inc., or its affiliates.
 // SPDX-License-Identifier:  MIT
 
-#include "plugin/engine_plugin.hpp"
 #include <algorithm>
+#include <numeric>
+#include <vector>
+
 #include <gtest/gtest.h>
 #include <hip/hip_runtime.h>
 #include <hipdnn_sdk/test_utilities/test_utilities.hpp>
-#include <numeric>
-#include <vector>
+
+#include "plugin/engine_plugin.hpp"
 
 using namespace hipdnn_backend;
 

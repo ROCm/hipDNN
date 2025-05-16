@@ -4,6 +4,7 @@
 #pragma once
 
 #include <cstdint> // for uint32_t
+
 #include <hipdnn_sdk/plugin/plugin_api_enums.h>
 
 #ifdef _WIN32
@@ -75,11 +76,10 @@ HIPDNN_PLUGIN_EXPORT hipdnnPluginStatus_t hipdnnPluginGetNumEngines(unsigned* nu
  * @param[out] output Pointer to a buffer where the processed output data will be stored.
  * @param[in] size The size of the input data array.
  */
-// TODO Fix formatting: indentation between the type and the variable name
-HIPDNN_PLUGIN_EXPORT hipdnnPluginStatus_t hipdnnPluginRunEngine(unsigned        engine_index,
+HIPDNN_PLUGIN_EXPORT hipdnnPluginStatus_t hipdnnPluginRunEngine(unsigned engine_index,
                                                                 const uint32_t* input,
-                                                                uint32_t*       output,
-                                                                uint32_t        size);
+                                                                uint32_t* output,
+                                                                uint32_t size);
 
 /** @} */ // End of EnginePluginFunctions group
 

@@ -4,9 +4,8 @@
 #ifndef _WIN32
 #include <dlfcn.h>
 #endif
-#include <iostream>
-#include <stdexcept>
 
+#include "hipdnn_exception.hpp"
 #include "shared_library.hpp"
 
 namespace hipdnn_backend
@@ -23,11 +22,7 @@ Shared_library::Shared_library()
 Shared_library::Shared_library(const std::filesystem::path& library_path)
     : _library_handle(nullptr)
 {
-    if(!load(library_path))
-    {
-        // TODO we do not have an exception class yet, so we just throw std::runtime_error
-        throw std::runtime_error("Failed to load shared library: " + library_path.string());
-    }
+    load(library_path);
 }
 
 Shared_library::Shared_library(Shared_library&& other) noexcept
@@ -58,13 +53,11 @@ Shared_library& Shared_library::operator=(Shared_library&& other) noexcept
 // This function loads a shared library from the specified path.
 // On Windows, it adds a ".dll" extension if no extension exists.
 // On Linux, it adds a "lib" prefix to the filename and a ".so" extension if no extension exists.
-bool Shared_library::load(const std::filesystem::path& library_path)
+void Shared_library::load(const std::filesystem::path& library_path)
 {
     if(_library_handle != nullptr)
     {
-        // TODO We do not have a logger yet, so we just print to stderr
-        std::cerr << "Error: Library is already loaded." << '\n';
-        return false;
+        throw Hipdnn_exception(HIPDNN_STATUS_INTERNAL_ERROR, "Library is already loaded.");
     }
 
     auto modified_library_path = library_path;
@@ -75,16 +68,14 @@ bool Shared_library::load(const std::filesystem::path& library_path)
 #ifdef _WIN32
         if(modified_library_path.extension() != ".dll")
         {
-            // TODO We do not have a logger yet, so we just print to stderr
-            std::cerr << "Error: Invalid file extension. Expected '.dll'." << '\n';
-            return false;
+            throw Hipdnn_exception(HIPDNN_STATUS_BAD_PARAM,
+                                   "Invalid file extension. Expected '.dll'.");
         }
 #elif defined(__linux__)
         if(modified_library_path.extension() != ".so")
         {
-            // TODO We do not have a logger yet, so we just print to stderr
-            std::cerr << "Error: Invalid file extension. Expected '.so'." << '\n';
-            return false;
+            throw Hipdnn_exception(HIPDNN_STATUS_BAD_PARAM,
+                                   "Invalid file extension. Expected '.so'.");
         }
 #else
 #error "Unsupported platform"
@@ -110,26 +101,23 @@ bool Shared_library::load(const std::filesystem::path& library_path)
     if(_library_handle == nullptr)
     {
         auto errorCode = GetLastError();
-        // TODO We do not have a logger yet, so we just print to stderr
-        std::cerr << "Error: Failed to load library: " << modified_library_path.string()
-                  << " (Error Code: " << errorCode << ")" << '\n';
-        return false;
+        throw Hipdnn_exception(HIPDNN_STATUS_PLUGIN_ERROR,
+                               "Failed to load library: " + modified_library_path.string()
+                                   + " (Error Code: " + std::to_string(errorCode) + ")");
     }
 #elif defined(__linux__)
     _library_handle = dlopen(modified_library_path.string().c_str(), RTLD_LAZY);
     if(_library_handle == nullptr)
     {
         const char* error = dlerror();
-        // TODO We do not have a logger yet, so we just print to stderr
-        std::cerr << "Error: Failed to load library: " << modified_library_path.string()
-                  << " (Error: " << (error != nullptr ? error : "Unknown error") << ")" << '\n';
-        return false;
+        throw Hipdnn_exception(
+            HIPDNN_STATUS_PLUGIN_ERROR,
+            "Failed to load library: " + modified_library_path.string()
+                + " (Error: " + (error != nullptr ? std::string(error) : "Unknown error") + ")");
     }
 #else
 #error "Unsupported platform"
 #endif
-
-    return true;
 }
 
 void Shared_library::unload() noexcept
@@ -151,9 +139,9 @@ void* Shared_library::get_symbol(std::string_view symbol_name) const
 {
     if(_library_handle == nullptr)
     {
-        // TODO we do not have an exception class yet, so we just throw std::runtime_error
-        throw std::runtime_error("Library is not loaded. Cannot get symbol: "
-                                 + std::string(symbol_name));
+        throw Hipdnn_exception(HIPDNN_STATUS_INTERNAL_ERROR,
+                               "Library is not loaded. Cannot get symbol: "
+                                   + std::string(symbol_name));
     }
 
 #ifdef _WIN32
@@ -161,20 +149,18 @@ void* Shared_library::get_symbol(std::string_view symbol_name) const
     if(symbol == nullptr)
     {
         auto errorCode = GetLastError();
-        // TODO We do not have a logger yet, so we just print to stderr
-        std::cerr << "Failed to get symbol: " << symbol_name << " (Error Code: " << errorCode << ")"
-                  << '\n';
-        return nullptr;
+        throw Hipdnn_exception(HIPDNN_STATUS_PLUGIN_ERROR,
+                               "Failed to get symbol: " + std::string(symbol_name)
+                                   + " (Error Code: " + std::to_string(errorCode) + ")");
     }
 #elif defined(__linux__)
     void* symbol = dlsym(_library_handle, symbol_name.data());
     if(symbol == nullptr)
     {
         const char* error = dlerror();
-        // TODO We do not have a logger yet, so we just print to stderr
-        std::cerr << "Failed to get symbol: " << symbol_name << " - "
-                  << (error != nullptr ? error : "Unknown error") << '\n';
-        return nullptr;
+        throw Hipdnn_exception(HIPDNN_STATUS_PLUGIN_ERROR,
+                               "Failed to get symbol: " + std::string(symbol_name) + " (Error: "
+                                   + (error != nullptr ? error : "Unknown error") + ")");
     }
 #else
 #error "Unsupported platform"
