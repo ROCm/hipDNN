@@ -147,46 +147,16 @@ HIPDNN_BACKEND_EXPORT hipdnnStatus_t hipdnnBackendExecute(hipdnnHandle_t handle,
     return hipdnn_backend::try_catch([&, api_name = __func__]() {
         throw_if_invalid_descriptor(execution_plan);
         throw_if_invalid_descriptor(variant_pack);
+        throw_if_null(handle);
 
-        auto backend_handle = dynamic_cast<hipdnnHandle*>(handle);
-        if(backend_handle == nullptr)
-        {
-            throw Hipdnn_exception(HIPDNN_STATUS_BAD_PARAM, "Invalid handle");
-        }
+        auto plan_desc = static_cast<Execution_plan_descriptor*>(execution_plan);
+        auto variant_desc = static_cast<Variant_descriptor*>(variant_pack);
 
-        auto plan_desc = dynamic_cast<Execution_plan_descriptor*>(execution_plan);
-        if(plan_desc == nullptr)
-        {
-            throw Hipdnn_exception(HIPDNN_STATUS_BAD_PARAM, "Invalid execution plan descriptor");
-        }
+        Plugin_manager plugin_manager;
+        plugin_manager.initialize();
+        plugin_manager.execute(plan_desc, handle, variant_desc);
 
-        auto variant_desc = dynamic_cast<Variant_descriptor*>(variant_pack);
-        if(variant_desc == nullptr)
-        {
-            throw Hipdnn_exception(HIPDNN_STATUS_BAD_PARAM, "Invalid variant pack descriptor");
-        }
-
-        try
-        {
-            Plugin_manager plugin_manager;
-
-            // Initialize the plugin manager to load all available backend plugins
-            // This prepares the runtime environment for executing operations by loading
-            // appropriate plugins based on hardware capabilities and configurations
-            plugin_manager.initialize();
-            plugin_manager.execute(plan_desc, backend_handle, variant_desc);
-
-            LOG_API_SUCCESS(api_name, "");
-        }
-        catch(const std::exception& ex)
-        {
-            throw Hipdnn_exception(HIPDNN_STATUS_EXECUTION_FAILED, ex.what());
-        }
-        catch(...)
-        {
-            throw Hipdnn_exception(HIPDNN_STATUS_EXECUTION_FAILED,
-                                   "Unknown error occurred during execution");
-        }
+        LOG_API_SUCCESS(api_name, "");
     });
 }
 
