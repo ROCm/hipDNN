@@ -108,12 +108,12 @@ HIPDNN_PLUGIN_EXPORT hipdnnPluginStatus_t
  *       `max_engines` IDs. If the number of applicable engines exceeds `max_engines`, only the first
  *       `max_engines` IDs will be returned, and the total count will be stored in `num_engines`.
  */
-HIPDNN_PLUGIN_EXPORT hipdnnPluginStatus_t hipdnnEnginePluginGetApplicableEngineIds(
-    hipdnnEnginePluginHandle_t handle,
-    const hipdnnPluginConstData_t* op_graph,
-    int64_t* engine_ids,
-    uint32_t max_engines,
-    uint32_t* num_engines);
+HIPDNN_PLUGIN_EXPORT hipdnnPluginStatus_t
+    hipdnnEnginePluginGetApplicableEngineIds(hipdnnEnginePluginHandle_t handle,
+                                             const hipdnnPluginConstData_t* op_graph,
+                                             int64_t* engine_ids,
+                                             uint32_t max_engines,
+                                             uint32_t* num_engines);
 
 /**
  * @brief Retrieves the details of a specific engine using its ID and the operation graph.
@@ -130,11 +130,11 @@ HIPDNN_PLUGIN_EXPORT hipdnnPluginStatus_t hipdnnEnginePluginGetApplicableEngineI
  *       allocating the buffer for the serialized `EngineDetails`. After use, this memory must be freed using
  *       hipdnnEnginePluginDestroyEngineDetails().
  */
-HIPDNN_PLUGIN_EXPORT hipdnnPluginStatus_t hipdnnEnginePluginGetEngineDetails(
-    hipdnnEnginePluginHandle_t handle,
-    int64_t engine_id,
-    const hipdnnPluginConstData_t* op_graph,
-    hipdnnPluginConstData_t* engine_details);
+HIPDNN_PLUGIN_EXPORT hipdnnPluginStatus_t
+    hipdnnEnginePluginGetEngineDetails(hipdnnEnginePluginHandle_t handle,
+                                       int64_t engine_id,
+                                       const hipdnnPluginConstData_t* op_graph,
+                                       hipdnnPluginConstData_t* engine_details);
 
 /**
  * @brief Destroys the `engine_details` object and releases the associated resources.
@@ -148,8 +148,7 @@ HIPDNN_PLUGIN_EXPORT hipdnnPluginStatus_t hipdnnEnginePluginGetEngineDetails(
  * @note This function takes a structure as input, deallocates the buffer, and sets all fields to 0.
  */
 HIPDNN_PLUGIN_EXPORT hipdnnPluginStatus_t hipdnnEnginePluginDestroyEngineDetails(
-    hipdnnEnginePluginHandle_t handle,
-    hipdnnPluginConstData_t* engine_details);
+    hipdnnEnginePluginHandle_t handle, hipdnnPluginConstData_t* engine_details);
 
 /**
  * @brief Retrieves the required workspace size for a specific engine configuration and an operation graph.
@@ -202,7 +201,6 @@ HIPDNN_PLUGIN_EXPORT hipdnnPluginStatus_t hipdnnEnginePluginCreateExecutionConte
  */
 HIPDNN_PLUGIN_EXPORT hipdnnPluginStatus_t hipdnnEnginePluginDestroyExecutionContext(
     hipdnnEnginePluginHandle_t handle, hipdnnEnginePluginExecutionContext_t execution_context);
-
 
 /**
  * @brief Executes an operation graph using a specified execution context.
