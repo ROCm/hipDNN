@@ -78,8 +78,10 @@ void populate_variant_pack_with_mappings(
     hipdnnBackendDescriptor_t variant_pack,
     const std::unordered_map<int64_t, void*>& data_ptr_mappings,
     void* workspace = nullptr);
+
 void create_and_initialize_backend_descriptor(hipdnnBackendDescriptor_t backend_descriptor,
                                               const flatbuffers::DetachedBuffer& serialized_graph);
+
 void extract_tensor_info_from_graph(
     const flatbuffers::DetachedBuffer& serialized_graph,
     std::unordered_map<int64_t, std::string>& uid_to_name_map,
