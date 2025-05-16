@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include <cstdint> // for uint32_t
+#include <stdint.h>
 
 #include <hip/hip_runtime.h>
 #include <hipdnn_sdk/plugin/plugin_api.h>
@@ -26,7 +26,9 @@ extern "C" {
  * @{
  */
 
-#if 1 // TODO Temporary functions, these are going to be removed soon.
+////////////////////////////////////////////////////////////////////////////////////////////
+// TODO Temporary functions, these are going to be removed soon.
+////////////////////////////////////////////////////////////////////////////////////////////
 /**
  * @brief Retrieves the number of engines available in the plugin.
  * @param[out] num_engines Pointer to an unsigned integer where the number of engines will be stored.
@@ -45,66 +47,114 @@ HIPDNN_PLUGIN_EXPORT hipdnnPluginStatus_t hipdnnPluginRunEngine(unsigned engine_
                                                                 const uint32_t* input,
                                                                 uint32_t* output,
                                                                 uint32_t size);
-#endif
+////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * @brief Creates a handle for the engine plugin.
- * @param[out] handle Pointer to a handle that will be created.
+ * @brief Creates a new engine plugin handle.
+ *
+ * @param[out] handle Pointer to a variable where the created engine plugin handle will be stored.
+ *                    The handle is used for subsequent operations with the engine plugin.
+ *
  * @return A value of type hipdnnPluginStatus_t.
+ *
+ * @note The caller is responsible for ensuring that the handle is properly destroyed
+ *       to avoid resource leaks.
  */
 HIPDNN_PLUGIN_EXPORT hipdnnPluginStatus_t
     hipdnnEnginePluginCreate(hipdnnEnginePluginHandle_t* handle);
 
 /**
- * @brief Destroys the handle for the engine plugin.
- * @param[in] handle The handle to be destroyed.
+ * @brief Destroys an engine plugin handle and releases associated resources.
+ *
+ * @param[in] handle The engine plugin handle to be destroyed.
+ *
  * @return A value of type hipdnnPluginStatus_t.
+ *
+ * @note The handle becomes invalid after this function is called.
  */
 HIPDNN_PLUGIN_EXPORT hipdnnPluginStatus_t
     hipdnnEnginePluginDestroy(hipdnnEnginePluginHandle_t handle);
 
 /**
- * @brief Sets the stream for the engine plugin.
- * @param[out] handle The handle to the engine plugin.
- * @param[in] stream The HIP stream to be used by the plugin.
+ * @brief Sets the HIP stream for the specified engine plugin handle.
+ *
+ * @param[in] handle The engine plugin handle.
+ * @param[in] stream The HIP stream to be associated with the engine plugin handle.
+ *
  * @return A value of type hipdnnPluginStatus_t.
+ *
+ * @note The caller must ensure that the provided stream remains valid for the lifetime
+ *       of the operations performed using the engine plugin handle.
  */
 HIPDNN_PLUGIN_EXPORT hipdnnPluginStatus_t
     hipdnnEnginePluginSetStream(hipdnnEnginePluginHandle_t handle, hipStream_t stream);
 
 /**
- * @brief Retrieves the serialized engines from the plugin.
- * @param[in] handle The handle to the engine plugin.
+ * @brief Retrieves the IDs of applicable engines for a given operation graph.
+ *
+ * @param[in] handle The engine plugin handle.
  * @param[in] op_graph Pointer to a structure where the serialized "Graph" from graph.fbs is stored.
- * @param[in] max_engines Limits the maximum number of engines to be returned.
- * @param[in,out] engines Pointer to a structure where the serialized "EngineContainer" from engine.fbs will be stored.
+ * @param[out] engine_ids Pointer to an array where the IDs of applicable engines will be stored.
+ *                        The array must have a size of at least `max_engines`.
+ * @param[in] max_engines The maximum number of engine IDs that can be stored in the `engine_ids` array.
+ * @param[out] num_engines Pointer to a variable where the total number of applicable engines will be stored.
+ *                         This value may exceed `max_engines` if more engines are applicable than the array can hold.
+ *
  * @return A value of type hipdnnPluginStatus_t.
- * @note The engines structure is provided by the user, while the function fills in its fields, including allocating
- *       the buffer for the serialized "EngineContainer". After use, this memory must be freed using
- *       hipdnnEnginePluginDestroyEngines().
+ *
+ * @note The caller is responsible for ensuring that the `engine_ids` array is large enough to hold
+ *       up to `max_engines` IDs. If the number of applicable engines exceeds `max_engines`, only
+ *       the first `max_engines` IDs will be returned, and the total count will be stored in `num_engines`.
  */
-HIPDNN_PLUGIN_EXPORT hipdnnPluginStatus_t
-    hipdnnEnginePluginGetEngines(hipdnnEnginePluginHandle_t handle,
-                                 const hipdnnPluginConstData_t* op_graph,
-                                 unsigned max_engines,
-                                 hipdnnPluginConstData_t* engines);
+HIPDNN_PLUGIN_EXPORT hipdnnPluginStatus_t hipdnnEnginePluginGetApplicableEngineIds(
+    hipdnnEnginePluginHandle_t handle,
+    const hipdnnPluginConstData_t* op_graph,
+    int64_t* engine_ids,
+    uint32_t max_engines,
+    uint32_t* num_engines);
+
 
 /**
- * @brief Destroys the serialized "EngineContainer".
- * @param[in] handle The handle to the engine plugin.
- * @param[in,out] engines Pointer to a structure where the serialized "EngineContainer" from engine.fbs is stored.
+ * @brief Retrieves the details of a specific engine using its ID and operation graph.
+ *
+ * @param[in] handle The engine plugin handle.
+ * @param[in] engine_id The ID of the engine whose details are to be retrieved.
+ * @param[in] op_graph Pointer to a structure where the serialized "Graph" from graph.fbs is stored.
+ * @param[in,out] engine_details Pointer to a structure where the serialized "EngineDetails" from engine_details.fbs
+ *                            will be stored.
+ *
  * @return A value of type hipdnnPluginStatus_t.
+ *
+ * @note The engine_details structure is provided by the user, while the function fills in its fields, including
+ *       allocating the buffer for the serialized "EngineDetails". After use, this memory must be freed using
+ *       hipdnnEnginePluginDestroyEngineDetails().
+ */
+HIPDNN_PLUGIN_EXPORT hipdnnPluginStatus_t hipdnnEnginePluginGetEngineDetails(hipdnnEnginePluginHandle_t handle, int64_t engine_id, const hipdnnPluginConstData_t* op_graph, hipdnnPluginConstData_t* engine_details);
+
+/**
+ * @brief Destroys the engine details object and releases associated resources.
+ *
+ * @param[in] handle The engine plugin handle.
+ * @param[in,out] engine_details Pointer to a structure where the serialized "EngineDetails" from engine_details.fbs
+ *                               is stored.
+ *
+ * @return A value of type hipdnnPluginStatus_t.
+ *
  * @note The function takes a structure as input, deallocates the buffer, and sets all fields to 0.
  */
-HIPDNN_PLUGIN_EXPORT hipdnnPluginStatus_t hipdnnEnginePluginDestroyEngines(
-    hipdnnEnginePluginHandle_t handle, hipdnnPluginConstData_t* engines);
+HIPDNN_PLUGIN_EXPORT hipdnnPluginStatus_t hipdnnEnginePluginDestroyEngineDetails(
+    hipdnnEnginePluginHandle_t handle, hipdnnPluginConstData_t* engine_details);
 
 /**
- * @brief Retrieves the workspace size required for the engine.
- * @param[in] handle The handle to the engine plugin.
+ * @brief Retrieves the required workspace size for a specific engine configuration and operation graph.
+ *
+ * @param[in] handle The engine plugin handle.
  * @param[in] engine_config Pointer to a structure where the serialized "EngineConfig" from engine_config.fbs is stored.
  * @param[in] op_graph Pointer to a structure where the serialized "Graph" from graph.fbs is stored.
- * @param[out] workspace_size Pointer to a size_t variable where the workspace size will be stored.
+ * @param[out] workspace_size Pointer to a variable where the required workspace size (in bytes)
+ *                            will be stored.
+ *
  * @return A value of type hipdnnPluginStatus_t.
  */
 HIPDNN_PLUGIN_EXPORT hipdnnPluginStatus_t
@@ -113,46 +163,62 @@ HIPDNN_PLUGIN_EXPORT hipdnnPluginStatus_t
                                        const hipdnnPluginConstData_t* op_graph,
                                        size_t* workspace_size);
 
+
 /**
- * @brief Creates a serialized "ExecutionPlan" for the engine config and operation graph.
- * @param[in] handle The handle to the engine plugin.
+ * @brief Creates an execution context for a specific engine configuration and operation graph.
+ *
+ * @param[in] handle The engine plugin handle.
  * @param[in] engine_config Pointer to a structure where the serialized "EngineConfig" from engine_config.fbs is stored.
  * @param[in] op_graph Pointer to a structure where the serialized "Graph" from graph.fbs is stored.
- * @param[in,out] exec_plan Pointer to a structure where the serialized "ExecutionPlan" from execution_plan.fbs will be stored.
+ * @param[out] execution_context Pointer to a variable where the created execution context will
+ *                               be stored.
+ *
  * @return A value of type hipdnnPluginStatus_t.
- * @note The exec_plan structure is provided by the user, while the function fills in its fields, including allocating
- *       the buffer for the serialized "ExecutionPlan". After use, this memory must be freed using
- *       hipdnnEnginePluginDestroyExecPlan().
+ *
+ * @note After calling this function, the engine configuration and operation graph are no longer needed, 
+ *       as the execution context stores all the required information internally. Internal resources are 
+ *       allocated for the execution context, and the user is responsible for releasing these resources 
+ *       by calling `hipdnnEnginePluginDestroyExecutionContext()` when the execution context is no longer needed.
  */
-HIPDNN_PLUGIN_EXPORT hipdnnPluginStatus_t
-    hipdnnEnginePluginCreateExecPlan(hipdnnEnginePluginHandle_t handle,
-                                     const hipdnnPluginConstData_t* engine_config,
-                                     const hipdnnPluginConstData_t* op_graph,
-                                     hipdnnPluginConstData_t* exec_plan);
+HIPDNN_PLUGIN_EXPORT hipdnnPluginStatus_t hipdnnEnginePluginCreateExecutionContext(
+                                       hipdnnEnginePluginHandle_t handle,
+                                       const hipdnnPluginConstData_t* engine_config,
+                                       const hipdnnPluginConstData_t* op_graph,
+                                       hipdnnEnginePluginExecutionContext_t* execution_context);
 
 /**
- * @brief Destroys the serialized "ExecutionPlan".
- * @param[in] handle The handle to the engine plugin.
- * @param[in,out] exec_plan Pointer to a structure where the serialized "ExecutionPlan" from execution_plan.fbs is stored.
+ * @brief Destroys an execution context and releases its associated resources.
+ *
+ * @param[in] handle The engine plugin handle.
+ * @param[in] execution_context The execution context to be destroyed.
+ *
  * @return A value of type hipdnnPluginStatus_t.
- * @note The function takes a structure as input, deallocates the buffer, and sets all fields to 0.
+ *
+ * @note The execution context becomes invalid after this function is called.
  */
-HIPDNN_PLUGIN_EXPORT hipdnnPluginStatus_t hipdnnEnginePluginDestroyExecPlan(
-    hipdnnEnginePluginHandle_t handle, hipdnnPluginConstData_t* exec_plan);
+HIPDNN_PLUGIN_EXPORT hipdnnPluginStatus_t hipdnnEnginePluginDestroyExecutionContext(
+    hipdnnEnginePluginHandle_t handle, hipdnnEnginePluginExecutionContext_t execution_context);
+
 
 /**
- * @brief Executes the operation graph using the specified execution plan.
- * @param[in] handle The handle to the engine plugin.
- * @param[in] exec_plan Pointer to a structure where the serialized "ExecutionPlan" from execution_plan.fbs is stored.
- * @param[in] op_graph Pointer to a structure where the serialized "Graph" from graph.fbs is stored.
- * @param[in] device_buffers Pointer to a structure where the serialized "DeviceBuffers" from device_buffers.fbs is stored.
+ * @brief Executes an operation graph using a specified execution context.
+ *
+ * @param[in] handle The engine plugin handle.
+ * @param[in] execution_context The execution context that encapsulates the operation graph
+ *                               and engine configuration to be executed.
+ * @param[in] workspace Pointer to the workspace memory allocated by the user. The workspace
+ *                      must be large enough to meet the requirements of the operation graph.
+ * @param[in] device_buffers Pointer to an array of device buffers.
+ * @param[in] num_device_buffers The number of device buffers provided in the `device_buffers` array.
+ *
  * @return A value of type hipdnnPluginStatus_t.
  */
 HIPDNN_PLUGIN_EXPORT hipdnnPluginStatus_t
     hipdnnEnginePluginExecuteOpGraph(hipdnnEnginePluginHandle_t handle,
-                                     const hipdnnPluginConstData_t* exec_plan,
-                                     const hipdnnPluginConstData_t* op_graph,
-                                     const hipdnnPluginConstData_t* device_buffers);
+                                     hipdnnEnginePluginExecutionContext_t execution_context,
+                                     void* workspace,
+                                     const hipdnnPluginDeviceBuffer_t* device_buffers,
+                                     uint32_t num_device_buffers);
 
 /** @} */ // End of EnginePluginFunctions group
 

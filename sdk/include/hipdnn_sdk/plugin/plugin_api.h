@@ -33,28 +33,36 @@ extern "C" {
 
 /**
  * @brief Retrieves the name of the plugin.
+ *
  * @param[out] name Pointer to a pointer where the plugin name's address will be stored.
+ *
  * @return A value of type hipdnnPluginStatus_t.
  */
 HIPDNN_PLUGIN_EXPORT hipdnnPluginStatus_t hipdnnPluginGetName(const char** name);
 
 /**
  * @brief Retrieves the version of the plugin.
+ *
  * @param[out] version Pointer to a pointer where the plugin version's address will be stored.
+ *
  * @return A value of type hipdnnPluginStatus_t.
  */
 HIPDNN_PLUGIN_EXPORT hipdnnPluginStatus_t hipdnnPluginGetVersion(const char** version);
 
 /**
  * @brief Retrieves the type of the plugin.
+ *
  * @param[out] type Pointer to a hipdnnPluginType_t where the plugin type will be stored.
+ *
  * @return A value of type hipdnnPluginStatus_t.
  */
 HIPDNN_PLUGIN_EXPORT hipdnnPluginStatus_t hipdnnPluginGetType(hipdnnPluginType_t* type);
 
 /**
  * @brief Retrieves the last error string from the plugin.
+ *
  * @param[out] error_str Pointer to a constant character pointer where the pointer to the last error string will be stored.
+ *
  * @note Plugins must store the entire error string internally and maintain it on a per-thread basis.
  *       This function should only be called after receiving an error status from the plugin API in the same thread.
  *       The pointer returned by this function should not be stored, as its sole purpose is to retrieve the string

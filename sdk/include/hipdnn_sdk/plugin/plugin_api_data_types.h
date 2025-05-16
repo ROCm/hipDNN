@@ -56,12 +56,32 @@ typedef struct
     size_t size;
 } hipdnnPluginConstData_t;
 
+
+/**
+ * @brief Represents a device buffer.
+ *
+ * This structure encapsulates information about a device buffer, including its unique identifier
+ * and a pointer to the memory location on the device.
+ */
+typedef struct
+{
+    int64_t uid;
+    void* ptr;
+} hipdnnPluginDeviceBuffer_t;
+
 /**
  * @brief Opaque handle for the engine plugin.
  *
  * This handle is used to represent an engine plugin.
  */
 typedef struct hipdnnEnginePluginHandle* hipdnnEnginePluginHandle_t;
+
+/**
+ * @brief Opaque handle for the engine execution context.
+ *
+ * This handle is used to represent the execution context of an engine.
+ */
+typedef struct hipdnnEnginePluginExecutionContext* hipdnnEnginePluginExecutionContext_t;
 
 /** @} */ // End of PluginDataTypes group
 
