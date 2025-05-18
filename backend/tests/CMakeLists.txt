@@ -40,6 +40,7 @@ target_link_libraries(hipdnn_backend_tests
     ${CMAKE_DL_LIBS}
 )
 
+target_compile_definitions(hipdnn_backend_tests PRIVATE ENABLE_BACKEND_LOGGING)
 target_compile_options(hipdnn_backend_tests PRIVATE ${HIPDNN_WARNING_COMPILE_OPTIONS})
 clang_tidy_check(hipdnn_backend_tests)
 

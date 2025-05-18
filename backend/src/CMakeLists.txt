@@ -32,18 +32,23 @@ target_include_directories(hipdnn_backend_private
 
 target_compile_options(hipdnn_backend_private PRIVATE ${HIPDNN_WARNING_COMPILE_OPTIONS})
 target_link_libraries(hipdnn_backend_private PUBLIC hip::device hipdnn_sdk)
+target_compile_definitions(hipdnn_backend_private PRIVATE ENABLE_BACKEND_LOGGING)
 clang_tidy_check(hipdnn_backend_private)
 
 add_library(hipdnn_backend SHARED 
     hipdnn_backend.cpp
 )
 
+
 target_include_directories(hipdnn_backend 
     SYSTEM PUBLIC 
         ${HIP_INCLUDE_DIRS}
     PUBLIC 
-        ${HIP_DNN_BACKEND_INCLUDE_DIR}
-        ${HIP_DNN_BACKEND_EXPORT_INCLUDE_DIR})
+        # System library for now
+        $<BUILD_INTERFACE:${HIP_DNN_BACKEND_INCLUDE_DIR}>
+        $<BUILD_INTERFACE:${HIP_DNN_BACKEND_EXPORT_INCLUDE_DIR}>
+        $<INSTALL_INTERFACE:include/hipdnn_backend>
+)
 
 target_compile_options(hipdnn_backend PRIVATE ${HIPDNN_WARNING_COMPILE_OPTIONS})
 # This definition is used to enable logging in the backend.  It is #ifdef'ed in the backend code.

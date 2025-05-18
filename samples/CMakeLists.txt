@@ -8,6 +8,7 @@ find_package(hip REQUIRED)
 
 find_package(hipdnn_frontend CONFIG REQUIRED)
 
+add_compile_definitions(__HIP_PLATFORM_AMD__)
 add_executable(hipdnn_samples 
     main.cpp
 )

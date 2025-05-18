@@ -16,6 +16,7 @@ add_executable(public_hipdnn_backend_tests
 )
 
 target_compile_options(public_hipdnn_backend_tests PRIVATE ${HIPDNN_WARNING_COMPILE_OPTIONS})
+target_compile_definitions(public_hipdnn_backend_tests PRIVATE ENABLE_BACKEND_LOGGING)
 target_link_libraries(public_hipdnn_backend_tests
     GTest::gtest 
     GTest::gtest_main 
