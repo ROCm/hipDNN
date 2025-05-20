@@ -34,22 +34,14 @@ struct Plugin_manager
 
     // This will redirect the execute to the plugin that owns the engine selected inside the ExecutionPlan
     // Throws if invalid stuff is provided, and later is wrapped with a status + provides message
-    void execute(Execution_plan_descriptor* execution_plan_desc,
-                 hipdnnHandle* handle,
-                 Variant_descriptor* variant_desc);
+    void execute(hipdnnHandle* handle,
+                 hipdnnBackendDescriptor_t execution_plan,
+                 hipdnnBackendDescriptor_t variant_pack);
 
 private:
     std::map<int64_t, std::shared_ptr<Hipdnn_plugin_base>> _plugins;
 
-    std::shared_ptr<Hipdnn_plugin_base> get_plugin(int64_t engine_id)
-    {
-        auto plugin_iter = _plugins.find(engine_id);
-        if(plugin_iter == _plugins.end())
-        {
-            return nullptr;
-        }
-        return plugin_iter->second;
-    }
+    std::shared_ptr<Hipdnn_plugin_base> get_plugin(int64_t engine_id);
 };
 
 }

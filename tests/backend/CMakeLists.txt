@@ -34,3 +34,7 @@ gtest_discover_tests(
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
     DISCOVERY_MODE PRE_TEST
 )
+target_include_directories(public_hipdnn_backend_tests
+    PRIVATE
+    ${HIPDNN_TEST_INCLUDE_DIRS}
+)

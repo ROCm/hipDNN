@@ -145,16 +145,14 @@ HIPDNN_BACKEND_EXPORT hipdnnStatus_t hipdnnBackendExecute(hipdnnHandle_t handle,
                   static_cast<void*>(variant_pack));
 
     return hipdnn_backend::try_catch([&, api_name = __func__]() {
+        throw_if_null(handle);
         throw_if_invalid_descriptor(execution_plan);
         throw_if_invalid_descriptor(variant_pack);
-        throw_if_null(handle);
 
-        auto plan_desc = static_cast<Execution_plan_descriptor*>(execution_plan);
-        auto variant_desc = static_cast<Variant_descriptor*>(variant_pack);
-
+        // TODO : will change later
         Plugin_manager plugin_manager;
         plugin_manager.initialize();
-        plugin_manager.execute(plan_desc, handle, variant_desc);
+        plugin_manager.execute(handle, execution_plan, variant_pack);
 
         LOG_API_SUCCESS(api_name, "");
     });

@@ -47,11 +47,11 @@ void Execution_plan_descriptor::get_attribute(hipdnnBackendAttributeName_t attri
         get_workspace_size(
             attribute_type, requested_element_count, element_count, array_of_elements);
         break;
-    case HIPDNN_ATTR_EXECUTION_PLAN_HANDLE:
     case HIPDNN_ATTR_EXECUTION_PLAN_ENGINE_CONFIG:
         get_engine_config(
             attribute_type, requested_element_count, element_count, array_of_elements);
         break;
+    case HIPDNN_ATTR_EXECUTION_PLAN_HANDLE:
     case HIPDNN_ATTR_EXECUTION_PLAN_COMPUTED_INTERMEDIATE_UIDS:
     case HIPDNN_ATTR_EXECUTION_PLAN_RUN_ONLY_INTERMEDIATE_UIDS:
     case HIPDNN_ATTR_EXECUTION_PLAN_JSON_REPRESENTATION:
@@ -189,11 +189,10 @@ void Execution_plan_descriptor::get_engine_config(hipdnnBackendAttributeType_t a
                 HIPDNN_STATUS_BAD_PARAM,
                 "Execution_plan_descriptor failed to get engine config: Invalid attribute type.");
 
-    THROW_IF_NULL(element_count,
-                  HIPDNN_STATUS_BAD_PARAM_NULL_POINTER,
-                  "Execution_plan_descriptor failed to get engine config: Element count is null.");
-
-    *element_count = 1;
+    if(element_count != nullptr)
+    {
+        *element_count = 1;
+    }
 
     if(array_of_elements == nullptr)
     {
@@ -201,15 +200,15 @@ void Execution_plan_descriptor::get_engine_config(hipdnnBackendAttributeType_t a
     }
 
     THROW_IF_LT(requested_element_count,
-                *element_count,
+                1,
                 HIPDNN_STATUS_BAD_PARAM,
                 "Execution_plan_descriptor failed to get engine config: Requested element count "
                 "too small.");
 
     THROW_IF_NULL(_engine_config,
                   HIPDNN_STATUS_INTERNAL_ERROR,
-                  "Execution_plan_descriptor failed to get engine config: Engine config is null "
-                  "(internal error).");
+                  "Execution_plan_descriptor failed to get engine config: Engine config is null. "
+                  "Engine config was not set.");
 
     auto* output = static_cast<hipdnnBackendDescriptor_t*>(array_of_elements);
     *output = _engine_config;
