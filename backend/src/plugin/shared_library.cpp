@@ -106,7 +106,7 @@ void Shared_library::load(const std::filesystem::path& library_path)
                                    + " (Error Code: " + std::to_string(errorCode) + ")");
     }
 #elif defined(__linux__)
-    _library_handle = dlopen(modified_library_path.string().c_str(), RTLD_LAZY);
+    _library_handle = dlopen(modified_library_path.string().c_str(), RTLD_NOW | RTLD_DEEPBIND);
     if(_library_handle == nullptr)
     {
         const char* error = dlerror();

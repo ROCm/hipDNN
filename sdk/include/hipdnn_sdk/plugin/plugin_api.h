@@ -3,9 +3,7 @@
 
 #pragma once
 
-#include <cstdint> // for uint32_t
-
-#include <hipdnn_sdk/plugin/plugin_api_enums.h>
+#include <hipdnn_sdk/plugin/plugin_api_data_types.h>
 
 #ifdef _WIN32
 #define HIPDNN_PLUGIN_EXPORT __declspec(dllexport)
@@ -17,7 +15,7 @@
 
 /**
  * @file plugin_api.h
- * @brief hipDNN Plugin API
+ * @brief The hipDNN Plugin API
  *
  * This file contains the definitions and declarations for the hipDNN Plugin API.
  * The API allows users to create and manage custom plugins for hipDNN.
@@ -35,53 +33,55 @@ extern "C" {
 
 /**
  * @brief Retrieves the name of the plugin.
- * @param[out] name Pointer to a constant character pointer where the plugin name will be stored.
- * @return A value of type hipdnnPluginStatus_t.
+ *
+ * @param[out] name A pointer to a pointer where the address of the plugin name will be stored.
+ *
+ * @return A value of type `hipdnnPluginStatus_t` indicating the status of the operation.
  */
 HIPDNN_PLUGIN_EXPORT hipdnnPluginStatus_t hipdnnPluginGetName(const char** name);
 
 /**
  * @brief Retrieves the version of the plugin.
- * @param[out] version Pointer to a constant character pointer where the plugin version will be stored.
- * @return A value of type hipdnnPluginStatus_t.
+ *
+ * @param[out] version A pointer to a pointer where the address of the plugin version will be stored.
+ *
+ * @return A value of type `hipdnnPluginStatus_t` indicating the status of the operation.
  */
 HIPDNN_PLUGIN_EXPORT hipdnnPluginStatus_t hipdnnPluginGetVersion(const char** version);
 
 /**
  * @brief Retrieves the type of the plugin.
- * @param[out] type Pointer to a hipdnnPluginType_t where the plugin type will be stored.
- * @return A value of type hipdnnPluginStatus_t.
+ *
+ * @param[out] type A pointer to a `hipdnnPluginType_t` where the plugin type will be stored.
+ *
+ * @return A value of type `hipdnnPluginStatus_t` indicating the status of the operation.
  */
 HIPDNN_PLUGIN_EXPORT hipdnnPluginStatus_t hipdnnPluginGetType(hipdnnPluginType_t* type);
 
+/**
+ * @brief Retrieves the last error string from the plugin.
+ *
+ * @param[out] error_str A pointer to a constant character pointer where the address of the last error string will
+ *                       be stored.
+ *
+ * @note Plugins must store the entire error string internally and maintain it on a per-thread basis. This function
+ *       should only be called after receiving an error status from the plugin API in the same thread. The pointer
+ *       returned by this function should not be stored, as its sole purpose is to retrieve the string and
+ *       immediately use it to form a complete error message. If the user passes a null pointer, this function does
+ *       nothing.
+ */
+HIPDNN_PLUGIN_EXPORT void hipdnnPluginGetLastErrorString(const char** error_str);
+
+/**
+ * @brief The maximum length for plugin error strings.
+ *
+ * Plugins are recommended to adhere to this value.
+ * The length includes the null-terminating character.
+ * This is the recommended size for the internal per-thread buffer.
+ */
+#define HIPDNN_PLUGIN_ERROR_STRING_MAX_LENGTH 256
+
 /** @} */ // End of PluginFunctions group
-
-/**
- * @defgroup EnginePluginFunctions Engine Plugin API Functions
- * @brief Functions that each engine plugin must implement.
- * @{
- */
-
-/**
- * @brief Retrieves the number of engines available in the plugin.
- * @param[out] num_engines Pointer to an unsigned integer where the number of engines will be stored.
- * @return A value of type hipdnnPluginStatus_t.
- */
-HIPDNN_PLUGIN_EXPORT hipdnnPluginStatus_t hipdnnPluginGetNumEngines(unsigned* num_engines);
-
-/**
- * @brief Runs the specified engine with the given input.
- * @param[in] engine_index The index of the engine to run.
- * @param[in] input Pointer to the input data to be processed by the engine.
- * @param[out] output Pointer to a buffer where the processed output data will be stored.
- * @param[in] size The size of the input data array.
- */
-HIPDNN_PLUGIN_EXPORT hipdnnPluginStatus_t hipdnnPluginRunEngine(unsigned engine_index,
-                                                                const uint32_t* input,
-                                                                uint32_t* output,
-                                                                uint32_t size);
-
-/** @} */ // End of EnginePluginFunctions group
 
 #ifdef __cplusplus
 }
