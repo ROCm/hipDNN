@@ -279,7 +279,7 @@ HIPDNN_BACKEND_EXPORT void
 {
     (void)user_data;
 
-    // Initialize raw logging to output file
+    // Lazy initialization of raw output logging to achieve all configuration existing in backend.
     if(!hipdnn::logging::g_logging_initialized)
     {
         hipdnn::logging::initialize_logging_based_on_environment_variables(

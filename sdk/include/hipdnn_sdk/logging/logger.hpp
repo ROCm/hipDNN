@@ -146,6 +146,7 @@ inline std::string
             spdlog::init_thread_pool(8192, 1);
         }
 
+        // Define the separate sinks for the callback receiver and backend logger because they need different patterms.
         std::shared_ptr<spdlog::sinks::sink> sink_for_callback_receiver;
         std::shared_ptr<spdlog::sinks::sink> sink_for_backend_logger;
 
@@ -153,6 +154,7 @@ inline std::string
             = std::make_shared<spdlog::sinks::basic_file_sink_mt>(output_file);
         sink_for_backend_logger = std::make_shared<spdlog::sinks::basic_file_sink_mt>(output_file);
 
+        // The backend logger cannot use a callback sink because it needs to be lazy initialized from anywhere in the backend.
         g_backend_logger = std::make_shared<spdlog::async_logger>(
             component_name, sink_for_backend_logger, spdlog::thread_pool());
         g_backend_logger->set_pattern(generate_pattern_string(component_name));
@@ -204,10 +206,11 @@ inline void initialize_callback_logging(const std::string& logging_area,
         spdlog::init_thread_pool(8192, 1);
     }
 
-    auto callback_sink = hipdnn::logging::create_callback_logger_mt(
-        callback_function, user_data, logging_area);
+    auto callback_sink
+        = hipdnn::logging::create_callback_logger_mt(callback_function, user_data, logging_area);
 
 #ifndef ENABLE_BACKEND_LOGGING
+    // Set the default logger to the callback sink so the macros will work without additional arguments. If 2 or more callback sinks are defined, this will no longer work.
     spdlog::set_default_logger(callback_sink);
 #endif
 }
