@@ -25,7 +25,7 @@ inline hipdnnSeverity_t spdlog_to_hipdnn_severity(spdlog::level::level_enum leve
     case spdlog::level::err:
         return HIPDNN_SEV_ERROR;
     case spdlog::level::warn:
-        return HIPDNN_SEV_WARNING;
+        return HIPDNN_SEV_WARN;
     case spdlog::level::info:
         return HIPDNN_SEV_INFO;
     default:

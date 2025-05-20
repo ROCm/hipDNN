@@ -17,6 +17,7 @@
 #include <spdlog/spdlog.h>
 #include <sstream>
 #include <string>
+#include <fstream>
 
 #ifdef ENABLE_BACKEND_LOGGING
 
@@ -141,6 +142,11 @@ inline std::string
 
     try
     {
+        {
+            // Manually truncate the file so one sink does not truncate another sink.
+            std::ofstream file_truncator(output_file, std::ios::trunc);
+        }
+
         if(!spdlog::thread_pool())
         {
             spdlog::init_thread_pool(8192, 1);
@@ -206,12 +212,13 @@ inline void initialize_callback_logging(const std::string& logging_area,
         spdlog::init_thread_pool(8192, 1);
     }
 
-    auto callback_sink
+    auto callback_logger
         = hipdnn::logging::create_callback_logger_mt(callback_function, user_data, logging_area);
 
 #ifndef ENABLE_BACKEND_LOGGING
-    // Set the default logger to the callback sink so the macros will work without additional arguments. If 2 or more callback sinks are defined, this will no longer work.
-    spdlog::set_default_logger(callback_sink);
+    // Set the default logger to the callback sink so the macros will work without additional arguments. 
+    // If 2 or more callback sinks are defined, this will no longer work and the log will be routed through the most recently defined callback sink.
+    spdlog::set_default_logger(callback_logger);
 #endif
 }
 

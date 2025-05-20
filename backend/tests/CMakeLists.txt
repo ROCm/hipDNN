@@ -27,7 +27,7 @@ add_executable(hipdnn_backend_tests
     test_flatbuffer_utilities.cpp
     test_handle.cpp
     test_helpers.cpp
-    test_logger.cpp
+    test_backend_logger.cpp
     test_plugin.cpp
     test_shared_library.cpp
 )

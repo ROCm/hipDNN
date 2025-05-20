@@ -13,7 +13,7 @@ extern "C" {
 typedef enum
 {
     HIPDNN_SEV_INFO = 0,
-    HIPDNN_SEV_WARNING,
+    HIPDNN_SEV_WARN,
     HIPDNN_SEV_ERROR,
     HIPDNN_SEV_FATAL,
     HIPDNN_SEV_OFF

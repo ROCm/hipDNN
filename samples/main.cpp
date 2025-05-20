@@ -37,6 +37,8 @@ int main()
 
     hipdnn::logging::initialize_callback_logging("hipdnn_sample", hipdnnLoggingCallback, nullptr);
 
+    HIPDNN_LOG_INFO("HipDNN SDK Sample: Graph Serialization and Deserialization");
+
     Graph graph;
 
     graph.set_name("SerializedBatchnormGraph")
@@ -297,7 +299,7 @@ int main()
         return EXIT_FAILURE;
     }
 
-    std::cout << "Graph serialization and deserialization successful!" << std::endl;
+    HIPDNN_LOG_INFO("Graph serialization and deserialization successful!");
 
     return EXIT_SUCCESS;
 }
