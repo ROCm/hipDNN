@@ -29,7 +29,7 @@ protected:
         setenv("HIPDNN_LOG_LEVEL", "info", 1);
 
         hipdnn::logging::initialize_callback_logging(
-            _test_logger_name, hipdnnLoggingCallback, nullptr);
+            _test_logger_name, hipdnnLoggingCallback_ext, nullptr);
 
         // Ensure logs of all levels are captured during tests
         spdlog::set_level(spdlog::level::trace);

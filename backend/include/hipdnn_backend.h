@@ -299,7 +299,7 @@ HIPDNN_BACKEND_EXPORT hipdnnStatus_t hipdnnBackendCreateAndDeserializeGraph_ext(
  * @retval HIPDNN_STATUS_INTERNAL_ERROR    An internal error occurred during logging.
  */
 HIPDNN_BACKEND_EXPORT void
-    hipdnnLoggingCallback(hipdnnSeverity_t severity, const char* msg, void* user_data);
+    hipdnnLoggingCallback_ext(hipdnnSeverity_t severity, const char* msg, void* user_data);
 
 #ifdef __cplusplus
 }

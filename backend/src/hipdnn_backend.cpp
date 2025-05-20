@@ -275,7 +275,7 @@ HIPDNN_BACKEND_EXPORT void hipdnnGetLastErrorString(char* message, size_t max_si
 }
 
 HIPDNN_BACKEND_EXPORT void
-    hipdnnLoggingCallback(hipdnnSeverity_t severity, const char* msg, void* user_data)
+    hipdnnLoggingCallback_ext(hipdnnSeverity_t severity, const char* msg, void* user_data)
 {
     (void)user_data;
 
