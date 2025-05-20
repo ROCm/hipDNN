@@ -274,23 +274,38 @@ HIPDNN_BACKEND_EXPORT void hipdnnGetLastErrorString(char* message, size_t max_si
     });
 }
 
-HIPDNN_BACKEND_EXPORT void hipdnnLoggingCallback(hipdnnSeverity_t severity,
-                                                           const char* msg,
-                                                           void* user_data)
+HIPDNN_BACKEND_EXPORT void
+    hipdnnLoggingCallback(hipdnnSeverity_t severity, const char* msg, void* user_data)
 {
-
     (void)user_data;
 
-    switch (severity)
+    // Initialize raw logging to output file
+    if(!hipdnn::logging::g_logging_initialized)
     {
-    case HIPDNN_SEV_INFO:
-        HIPDNN_LOG_INFO("hipdnnLoggingCallback: {}", msg);
-        break;
-    case HIPDNN_SEV_ERROR:
-        HIPDNN_LOG_ERROR("hipdnnLoggingCallback: {}", msg);
-        break;
-    default:
-        HIPDNN_LOG_ERROR("hipdnnLoggingCallback: Unknown severity level: {}", static_cast<int>(severity));
-        break;
-    }    
+        hipdnn::logging::initialize_logging_based_on_environment_variables(
+            hipdnn::logging::G_LOGGING_AREA);
+    }
+
+    // Send pre-formatted logs to output file
+    if(hipdnn::logging::g_callback_receiver_logger)
+    {
+        switch(severity)
+        {
+        case HIPDNN_SEV_FATAL:
+            hipdnn::logging::g_callback_receiver_logger->critical(msg);
+            break;
+        case HIPDNN_SEV_ERROR:
+            hipdnn::logging::g_callback_receiver_logger->error(msg);
+            break;
+        case HIPDNN_SEV_WARNING:
+            hipdnn::logging::g_callback_receiver_logger->warn(msg);
+            break;
+        case HIPDNN_SEV_INFO:
+            hipdnn::logging::g_callback_receiver_logger->info(msg);
+            break;
+        default:
+            // hipdnn::logging::g_callback_receiver_logger->info(msg);
+            break;
+        }
+    }
 }

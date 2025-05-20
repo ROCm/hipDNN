@@ -5,11 +5,13 @@
 
 #include "callback_sink.hpp"
 #include "callback_types.h"
+#include "formatting.hpp"
 #include "spdlog/sinks/stdout_color_sinks.h"
 #include <ctime>
 #include <iomanip>
 #include <iostream>
 #include <memory>
+#include <mutex>
 #include <spdlog/async.h>
 #include <spdlog/sinks/basic_file_sink.h>
 #include <spdlog/spdlog.h>
@@ -19,28 +21,28 @@
 #ifdef ENABLE_BACKEND_LOGGING
 
 #define HIPDNN_LOG_INFO(...)                                                \
-    if(!hipdnn::logging::G_LOGGING_INITIALIZED)                             \
+    if(!hipdnn::logging::g_logging_initialized)                             \
     {                                                                       \
         hipdnn::logging::initialize_logging_based_on_environment_variables( \
             hipdnn::logging::G_LOGGING_AREA);                               \
     }                                                                       \
-    spdlog::info(__VA_ARGS__);
+    hipdnn::logging::g_backend_logger->info(__VA_ARGS__);
 
 #define HIPDNN_LOG_WARN(...)                                                \
-    if(!hipdnn::logging::G_LOGGING_INITIALIZED)                             \
+    if(!hipdnn::logging::g_logging_initialized)                             \
     {                                                                       \
         hipdnn::logging::initialize_logging_based_on_environment_variables( \
             hipdnn::logging::G_LOGGING_AREA);                               \
     }                                                                       \
-    spdlog::warn(__VA_ARGS__);
+    hipdnn::logging::g_backend_logger->warn(__VA_ARGS__);
 
 #define HIPDNN_LOG_ERROR(...)                                               \
-    if(!hipdnn::logging::G_LOGGING_INITIALIZED)                             \
+    if(!hipdnn::logging::g_logging_initialized)                             \
     {                                                                       \
         hipdnn::logging::initialize_logging_based_on_environment_variables( \
             hipdnn::logging::G_LOGGING_AREA);                               \
     }                                                                       \
-    spdlog::error(__VA_ARGS__);
+    hipdnn::logging::g_backend_logger->error(__VA_ARGS__);
 
 #define HIPDNN_LOG_INFO_WITH_HANDLE(handle, ...)                                \
     if(handle)                                                                  \
@@ -48,60 +50,34 @@
         throw not_implemented_exception("handle logging not implemented yet."); \
     }
 #else
-#define HIPDNN_LOG_INFO(...) spdlog::info(__VA_ARGS__);
-#define HIPDNN_LOG_WARN(...) spdlog::warn(__VA_ARGS__);
-#define HIPDNN_LOG_ERROR(...) spdlog::error(__VA_ARGS__);
+#define HIPDNN_LOG_INFO(...) spdlog::default_logger_raw()->info(__VA_ARGS__);
+#define HIPDNN_LOG_WARN(...) spdlog::default_logger_raw()->warn(__VA_ARGS__);
+#define HIPDNN_LOG_ERROR(...) spdlog::default_logger_raw()->error(__VA_ARGS__);
 #define HIPDNN_LOG_INFO_WITH_HANDLE(handle, ...)
 #endif
 
 namespace hipdnn::logging
 {
 #ifdef ENABLE_BACKEND_LOGGING
-inline bool G_LOGGING_INITIALIZED = false;
-inline const std::string G_LOGGING_AREA = "hipdnn";
+inline bool g_logging_initialized = false; // the compiler wants lowercase
+inline std::string output_file;
+inline std::mutex g_logging_init_mutex;
+inline const std::string G_LOGGING_AREA = "hipdnn_backend";
+inline std::shared_ptr<spdlog::logger> g_backend_logger;
+inline std::shared_ptr<spdlog::logger> g_callback_receiver_logger;
 #endif
 
-inline std::string generate_log_file_name(const std::string& logging_area)
+inline std::string generate_log_file_name()
 {
     std::ostringstream oss;
     auto t = std::time(nullptr);
-    auto tm = *std::localtime(&t);
-    oss << logging_area << "_" << std::put_time(&tm, "%Y%m%d_%H%M%S") << ".log";
+    std::tm tm_buf;
+    auto tm = *localtime_r(&t, &tm_buf);
+    oss << "hipdnn_" << std::put_time(&tm, "%Y%m%d_%H%M%S") << ".log";
     return oss.str();
 }
 
-inline void setup_log_pattern(const std::string& logging_area)
-{
-    spdlog::set_pattern("[" + logging_area + "] [%Y-%m-%d %H:%M:%S.%e] [tid %t] [%l] %v");
-}
-
-inline std::string initialize_logger_with_output_file(const std::string& logging_area_name,
-                                                      const std::string& log_file_directory)
-{
-    auto log_file_name = generate_log_file_name(logging_area_name);
-    if(!log_file_directory.empty())
-    {
-        log_file_name = log_file_directory + "/" + log_file_name;
-    }
-
-    std::string logger_name = logging_area_name + "_logger";
-    auto file_logger = spdlog::basic_logger_mt<spdlog::async_factory>(logger_name, log_file_name);
-    file_logger->set_level(spdlog::level::off);
-
-    spdlog::set_default_logger(file_logger);
-    setup_log_pattern(logging_area_name);
-
-    return log_file_name;
-}
-
-inline void initialize_logger_to_std_out(const std::string& logging_area_name)
-{
-    std::string logger_name = logging_area_name + "_logger";
-    auto console_logger = spdlog::stdout_color_mt(logger_name);
-    spdlog::set_default_logger(console_logger);
-
-    setup_log_pattern(logging_area_name);
-}
+#ifdef ENABLE_BACKEND_LOGGING
 
 inline void set_log_level(const std::string& level)
 {
@@ -123,54 +99,117 @@ inline void set_log_level(const std::string& level)
     }
 }
 
-inline std::string
-    initialize_logging_based_on_environment_variables(const std::string& logging_area)
+inline void cleanup_logging()
 {
-    //values from getenv are a pointer to the environment table entry
-    //We do not need to free them and modifying them results in undefined behavior
-    const char* log_level = std::getenv("HIPDNN_LOG_LEVEL");
-    const char* log_file_directory = std::getenv("HIPDNN_LOG_DIR");
-
-    std::string output_file;
-    if(log_file_directory != nullptr)
+    if(g_backend_logger)
     {
-        output_file
-            = hipdnn::logging::initialize_logger_with_output_file(logging_area, log_file_directory);
-    }
-    else
-    {
-        hipdnn::logging::initialize_logger_to_std_out(logging_area);
+        spdlog::drop(g_backend_logger->name());
+        g_backend_logger.reset();
     }
 
-    if(log_level != nullptr)
+    if(g_callback_receiver_logger)
     {
-        hipdnn::logging::set_log_level(log_level);
-    }
-    else
-    {
-        hipdnn::logging::set_log_level("off");
+        spdlog::drop(g_callback_receiver_logger->name());
+        g_callback_receiver_logger.reset();
     }
 
-#ifdef ENABLE_BACKEND_LOGGING
-    G_LOGGING_INITIALIZED = true;
-#endif
-
-    return output_file;
+    output_file.clear();
+    g_logging_initialized = false;
 }
 
-inline void initialize_callback_logging(const std::string& logging_area,
-                                       hipdnnCallback_t callback_function,
-                                       void* user_data = nullptr)
+inline std::string
+    initialize_logging_based_on_environment_variables(const std::string& component_name)
 {
-    const std::string& logger_name = logging_area;
-    
-    // optional - spdlog will create one automatically
-    if (!spdlog::thread_pool()) {
+    std::lock_guard<std::mutex> lock(g_logging_init_mutex);
+
+    if(g_logging_initialized)
+    {
+        return output_file;
+    }
+
+    const char* log_level = std::getenv("HIPDNN_LOG_LEVEL");
+    const char* log_file_path = std::getenv("HIPDNN_LOG_FILE");
+
+    if(log_file_path != nullptr && !std::string(log_file_path).empty())
+    {
+        output_file = log_file_path;
+    }
+    else
+    {
+        output_file = generate_log_file_name();
+    }
+
+    try
+    {
+        if(!spdlog::thread_pool())
+        {
+            spdlog::init_thread_pool(8192, 1);
+        }
+
+        std::shared_ptr<spdlog::sinks::sink> sink_for_callback_receiver;
+        std::shared_ptr<spdlog::sinks::sink> sink_for_backend_logger;
+
+        sink_for_callback_receiver
+            = std::make_shared<spdlog::sinks::basic_file_sink_mt>(output_file);
+        sink_for_backend_logger = std::make_shared<spdlog::sinks::basic_file_sink_mt>(output_file);
+
+        g_backend_logger = std::make_shared<spdlog::async_logger>(
+            component_name, sink_for_backend_logger, spdlog::thread_pool());
+        g_backend_logger->set_pattern(generate_pattern_string(component_name));
+        ::spdlog::register_logger(g_backend_logger);
+        g_backend_logger->flush_on(spdlog::level::info);
+
+        g_callback_receiver_logger = std::make_shared<spdlog::async_logger>(
+            "hipdnn", sink_for_callback_receiver, spdlog::thread_pool());
+        g_callback_receiver_logger->set_pattern("%v");
+        ::spdlog::register_logger(g_callback_receiver_logger);
+        g_callback_receiver_logger->flush_on(spdlog::level::info);
+
+        if(log_level != nullptr)
+        {
+            hipdnn::logging::set_log_level(log_level);
+        }
+        else
+        {
+            hipdnn::logging::set_log_level("off");
+        }
+
+        g_logging_initialized = true;
+
+        return output_file;
+    }
+    catch(const spdlog::spdlog_ex& ex)
+    {
+        cleanup_logging();
+        return "";
+    }
+}
+
+#endif
+
+inline void initialize_callback_logging(const std::string& logging_area,
+                                        hipdnnCallback_t callback_function,
+                                        void* user_data = nullptr)
+{
+    static std::mutex callback_init_mutex;
+    std::lock_guard<std::mutex> lock(callback_init_mutex);
+
+    if(spdlog::get(logging_area))
+    {
+        spdlog::drop(logging_area);
+    }
+
+    if(!spdlog::thread_pool())
+    {
         spdlog::init_thread_pool(8192, 1);
     }
-    
-    auto callback_logger = hipdnn::logging::create_callback_logger_mt(
-        logger_name, callback_function, user_data, logging_area);    
+
+    auto callback_sink = hipdnn::logging::create_callback_logger_mt(
+        callback_function, user_data, logging_area);
+
+#ifndef ENABLE_BACKEND_LOGGING
+    spdlog::set_default_logger(callback_sink);
+#endif
 }
 
 }
