@@ -23,6 +23,14 @@ private:
     friend class plugin::Plugin_manager_base<Plugin>;
 };
 
+void dummy_callback(hipdnnSeverity_t severity, const char* msg, void* user_data)
+{
+    // Intentionally empty - just testing the mechanism
+    (void)severity;
+    (void)msg;
+    (void)user_data;
+}
+
 } // namespace
 
 TEST(PluginManagerTest, LoadPlugins)
@@ -142,4 +150,29 @@ TEST(PluginManagerTest, LastErrorOnSecondLoad)
         ASSERT_NE(func_get_name(nullptr), HIPDNN_PLUGIN_STATUS_SUCCESS);
         ASSERT_EQ(plugins[0].get_last_error_string(), "hipdnnPluginGetName: name is null");
     }
+}
+
+// Simple test to check that the callback is set appropriately
+TEST(PluginManagerTest, SetCallbackForPlugins)
+{
+    plugin::Plugin_manager_base<Plugin> plugin_manager;
+
+    std::vector<std::filesystem::path> plugin_paths
+        = {"./hipdnn_test_plugin1", "./hipdnn_test_plugin2"};
+
+    plugin_manager.load_plugins(plugin_paths);
+
+    const auto& plugins = plugin_manager.get_plugins();
+    if(plugins.empty())
+    {
+        GTEST_SKIP() << "No test plugins available";
+        return;
+    }
+
+    auto status = plugin_manager.set_callback_for_all_plugins(dummy_callback, nullptr);
+
+    EXPECT_EQ(status, HIPDNN_STATUS_SUCCESS);
+
+    status = plugin_manager.set_callback_for_all_plugins(nullptr, nullptr);
+    EXPECT_NE(status, HIPDNN_STATUS_SUCCESS);
 }

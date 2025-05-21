@@ -7,6 +7,8 @@
 
 #include <string>
 
+#include <hipdnn_sdk/logging/callback_types.h>
+#include <hipdnn_sdk/logging/logger.hpp>
 #include <hipdnn_sdk/plugin/plugin_api.h>
 #include <hipdnn_sdk/utilities/string_util.hpp>
 
@@ -58,6 +60,30 @@ extern "C" hipdnnPluginStatus_t hipdnnPluginGetType(hipdnnPluginType_t* type)
     }
     *type = PLUGIN_TYPE;
     return HIPDNN_PLUGIN_STATUS_SUCCESS;
+}
+
+extern "C" hipdnnPluginStatus_t hipdnnPluginSetLoggingCallback(hipdnnCallback_t callback,
+                                                               void* user_data)
+{
+    if(callback == nullptr)
+    {
+        set_last_error_string("hipdnnPluginSetLoggingCallback: callback is null");
+        return HIPDNN_PLUGIN_STATUS_BAD_PARAM;
+    }
+
+    try
+    {
+        hipdnn::logging::initialize_callback_logging(PLUGIN_NAME, callback, user_data);
+
+        HIPDNN_LOG_INFO("Logging initialized for plugin {}", PLUGIN_NAME);
+
+        return HIPDNN_PLUGIN_STATUS_SUCCESS;
+    }
+    catch(const std::exception& e)
+    {
+        set_last_error_string(std::string("Failed to initialize callback logging: ") + e.what());
+        return HIPDNN_PLUGIN_INTERNAL_ERROR;
+    }
 }
 
 extern "C" void hipdnnPluginGetLastErrorString(const char** error_str)

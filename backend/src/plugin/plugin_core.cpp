@@ -31,6 +31,18 @@ void Plugin_base::resolve_symbols()
     _func_get_last_error_str
         = _lib.get_symbol<decltype(_func_get_last_error_str)>(func_name_get_last_error_str);
 
+    // Logging callback is optional
+    try
+    {
+        const auto func_name_set_logging_callback = "hipdnnPluginSetLoggingCallback";
+        _func_set_logging_callback
+            = _lib.get_symbol<decltype(_func_set_logging_callback)>(func_name_set_logging_callback);
+    }
+    catch(const Hipdnn_exception&)
+    {
+        _func_set_logging_callback = nullptr;
+    }
+
 #ifndef NDEBUG
     _initialized = true;
 #endif
@@ -85,6 +97,18 @@ std::string_view Plugin_base::get_last_error_string() const noexcept
     const char* error_str = nullptr;
     _func_get_last_error_str(&error_str);
     return error_str;
+}
+
+hipdnnPluginStatus_t Plugin_base::set_logging_callback(hipdnnCallback_t callback, void* user_data)
+{
+    assert(_initialized);
+    if(_func_set_logging_callback == nullptr)
+    {
+        // Plugin does not support logging callback, so we vacuously return success
+        return HIPDNN_PLUGIN_STATUS_SUCCESS;
+    }
+
+    return _func_set_logging_callback(callback, user_data);
 }
 
 } // namespace plugin
