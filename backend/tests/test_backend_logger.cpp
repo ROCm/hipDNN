@@ -85,14 +85,14 @@ public:
     }
 };
 
-TEST_F(Backend_logging_test, MacrosLazilyInitializeLoggingWithDefaultSettings)
+TEST_F(Backend_logging_test, MacrosDontInitializeLoggingWhenOff)
 {
     HIPDNN_LOG_INFO("Initializing with info message");
     HIPDNN_LOG_WARN("Initializing with warn message");
     HIPDNN_LOG_ERROR("Initializing with error message");
 
-    EXPECT_TRUE(hipdnn::logging::g_logging_initialized);
-    EXPECT_NE(hipdnn::logging::g_backend_logger, nullptr);
+    EXPECT_FALSE(hipdnn::logging::g_logging_initialized);
+    EXPECT_EQ(hipdnn::logging::g_backend_logger, nullptr);
 
     // With default log level "off", nothing should be logged
     verify_log_not_contains("Initializing with info message");

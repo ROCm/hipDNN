@@ -21,29 +21,38 @@
 
 #ifdef ENABLE_BACKEND_LOGGING
 
-#define HIPDNN_LOG_INFO(...)                                                \
-    if(!hipdnn::logging::g_logging_initialized)                             \
-    {                                                                       \
-        hipdnn::logging::initialize_logging_based_on_environment_variables( \
-            hipdnn::logging::G_LOGGING_AREA);                               \
-    }                                                                       \
-    hipdnn::logging::g_backend_logger->info(__VA_ARGS__);
+#define HIPDNN_LOG_INFO(...)                                                        \
+    if(!hipdnn::logging::g_logging_initialized)                                     \
+    {                                                                               \
+        hipdnn::logging::initialize_logging_based_on_environment_variables(         \
+            hipdnn::logging::G_LOGGING_AREA);                                       \
+    }                                                                               \
+    if(hipdnn::logging::g_backend_logger)                                           \
+    {                                                                               \
+        hipdnn::logging::g_backend_logger->info(__VA_ARGS__);                       \
+    }
 
-#define HIPDNN_LOG_WARN(...)                                                \
-    if(!hipdnn::logging::g_logging_initialized)                             \
-    {                                                                       \
-        hipdnn::logging::initialize_logging_based_on_environment_variables( \
-            hipdnn::logging::G_LOGGING_AREA);                               \
-    }                                                                       \
-    hipdnn::logging::g_backend_logger->warn(__VA_ARGS__);
+#define HIPDNN_LOG_WARN(...)                                                        \
+    if(!hipdnn::logging::g_logging_initialized)                                     \
+    {                                                                               \
+        hipdnn::logging::initialize_logging_based_on_environment_variables(         \
+            hipdnn::logging::G_LOGGING_AREA);                                       \
+    }                                                                               \
+    if(hipdnn::logging::g_backend_logger)                                           \
+    {                                                                               \
+        hipdnn::logging::g_backend_logger->warn(__VA_ARGS__);                       \
+    }
 
-#define HIPDNN_LOG_ERROR(...)                                               \
-    if(!hipdnn::logging::g_logging_initialized)                             \
-    {                                                                       \
-        hipdnn::logging::initialize_logging_based_on_environment_variables( \
-            hipdnn::logging::G_LOGGING_AREA);                               \
-    }                                                                       \
-    hipdnn::logging::g_backend_logger->error(__VA_ARGS__);
+#define HIPDNN_LOG_ERROR(...)                                                       \
+    if(!hipdnn::logging::g_logging_initialized)                                     \
+    {                                                                               \
+        hipdnn::logging::initialize_logging_based_on_environment_variables(         \
+            hipdnn::logging::G_LOGGING_AREA);                                       \
+    }                                                                               \
+    if(hipdnn::logging::g_backend_logger)                                           \
+    {                                                                               \
+        hipdnn::logging::g_backend_logger->error(__VA_ARGS__);                      \
+    }
 
 #define HIPDNN_LOG_INFO_WITH_HANDLE(handle, ...)                                \
     if(handle)                                                                  \
@@ -135,13 +144,14 @@ inline std::string
 {
     std::lock_guard<std::mutex> lock(g_logging_init_mutex);
 
-    if(g_logging_initialized)
+    const char* log_level = std::getenv("HIPDNN_LOG_LEVEL");
+    const char* log_file_path = std::getenv("HIPDNN_LOG_FILE");
+
+    // No need to initialize logging if it is already initialized or if the log level is "off".
+    if(g_logging_initialized || log_level == nullptr || std::string(log_level) == "off")
     {
         return output_file;
     }
-
-    const char* log_level = std::getenv("HIPDNN_LOG_LEVEL");
-    const char* log_file_path = std::getenv("HIPDNN_LOG_FILE");
 
     if(log_file_path != nullptr && !std::string(log_file_path).empty())
     {
@@ -157,6 +167,11 @@ inline std::string
         {
             // Manually truncate the file so one sink does not truncate another sink.
             std::ofstream file_truncator(output_file, std::ios::trunc);
+            if (!file_truncator)
+            {
+                cleanup_logging();
+                return "";
+            }
         }
 
         if(!spdlog::thread_pool())
@@ -164,7 +179,7 @@ inline std::string
             spdlog::init_thread_pool(8192, 1);
         }
 
-        // Define the separate sinks for the callback receiver and backend logger because they need different patterms.
+        // Define the separate sinks for the callback receiver and backend logger because they need different patterns.
         std::shared_ptr<spdlog::sinks::sink> sink_for_callback_receiver;
         std::shared_ptr<spdlog::sinks::sink> sink_for_backend_logger;
 

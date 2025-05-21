@@ -300,10 +300,10 @@ HIPDNN_BACKEND_EXPORT void
         case HIPDNN_SEV_WARN:
             hipdnn::logging::g_callback_receiver_logger->warn(msg);
             break;
-        case HIPDNN_SEV_INFO:
-            hipdnn::logging::g_callback_receiver_logger->info(msg);
+        case HIPDNN_SEV_OFF:
             break;
         default:
+            hipdnn::logging::g_callback_receiver_logger->info(msg);
             break;
         }
     }
