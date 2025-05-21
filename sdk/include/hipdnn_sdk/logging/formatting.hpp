@@ -15,8 +15,7 @@ namespace hipdnn::logging
  */
 inline std::string generate_pattern_string(const std::string& component_name)
 {
-    (void)component_name;
-    return "[%Y-%m-%d %H:%M:%S.%e] [tid %t] [%l] [%n] %v";
+    return "[%Y-%m-%d %H:%M:%S.%e] [tid %t] [%l] [" + component_name + "] %v";
 }
 
 } // namespace hipdnn::logging
