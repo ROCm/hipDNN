@@ -14,7 +14,6 @@ if(HIP_DNN_SKIP_TESTS)
 endif()
 
 add_executable(hipdnn_backend_tests
-    descriptors/mocks/mock_descriptor.cpp
     descriptors/test_engine_config_descriptor.cpp
     descriptors/test_engine_descriptor.cpp
     descriptors/test_execution_plan_descriptor.cpp
@@ -34,6 +33,7 @@ add_executable(hipdnn_backend_tests
 
 target_link_libraries(hipdnn_backend_tests 
     GTest::gtest
+    GTest::gmock
     pthread
     hipdnn_backend_private
     hipdnn_sdk
