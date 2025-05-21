@@ -51,16 +51,28 @@
         throw not_implemented_exception("handle logging not implemented yet."); \
     }
 #else
-#define HIPDNN_LOG_INFO(...) spdlog::default_logger_raw()->info(__VA_ARGS__);
-#define HIPDNN_LOG_WARN(...) spdlog::default_logger_raw()->warn(__VA_ARGS__);
-#define HIPDNN_LOG_ERROR(...) spdlog::default_logger_raw()->error(__VA_ARGS__);
+// No-op if COMPONENT_NAME is not defined or if the logger is not initialized.
+#ifndef COMPONENT_NAME
+    #define _HIPDNN_INTERNAL_LOG_ACTION(level, ...) do { } while(0)
+#else
+    #define _HIPDNN_INTERNAL_LOG_ACTION(level, ...) \
+        do { \
+            if (auto logger = spdlog::get(COMPONENT_NAME)) { \
+                logger->level(__VA_ARGS__); \
+            } \
+        } while(0)
+#endif
+
+#define HIPDNN_LOG_INFO(...) _HIPDNN_INTERNAL_LOG_ACTION(info, __VA_ARGS__)
+#define HIPDNN_LOG_WARN(...) _HIPDNN_INTERNAL_LOG_ACTION(warn, __VA_ARGS__)
+#define HIPDNN_LOG_ERROR(...) _HIPDNN_INTERNAL_LOG_ACTION(error, __VA_ARGS__)
 #define HIPDNN_LOG_INFO_WITH_HANDLE(handle, ...)
 #endif
 
 namespace hipdnn::logging
 {
 #ifdef ENABLE_BACKEND_LOGGING
-inline bool g_logging_initialized = false; // the compiler wants lowercase
+inline bool g_logging_initialized = false; // The compiler wants lowercase
 inline std::string output_file;
 inline std::mutex g_logging_init_mutex;
 inline const std::string G_LOGGING_AREA = "hipdnn_backend";
@@ -213,13 +225,8 @@ inline void initialize_callback_logging(const std::string& logging_area,
     }
 
     auto callback_logger
-        = hipdnn::logging::create_callback_logger_mt(callback_function, user_data, logging_area);
-
-#ifndef ENABLE_BACKEND_LOGGING
-    // Set the default logger to the callback sink so the macros will work without additional arguments. 
-    // If 2 or more callback sinks are defined, this will no longer work and the log will be routed through the most recently defined callback sink.
-    spdlog::set_default_logger(callback_logger);
-#endif
+        = hipdnn::logging::create_async_callback_logger_mt(callback_function, user_data, logging_area);
+    spdlog::register_logger(callback_logger);
 }
 
 }

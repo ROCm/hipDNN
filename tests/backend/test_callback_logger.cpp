@@ -1,6 +1,8 @@
 // Copyright © Advanced Micro Devices, Inc., or its affiliates.
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier:  MIT
 
+#include "hipdnn_backend.h"
+#include <filesystem>
 #include <fstream>
 #include <gtest/gtest.h>
 #include <mutex>
@@ -9,67 +11,109 @@
 #include <string>
 #include <thread>
 
-#include <hipdnn_backend.h>
 #include <hipdnn_sdk/logging/callback_types.h>
 #include <hipdnn_sdk/logging/logger.hpp>
+
+#ifndef COMPONENT_NAME
+#define COMPONENT_NAME "backend_tests"
+#endif
 
 class Callback_logger_test : public ::testing::Test
 {
 protected:
-    std::string _log_file;
-    const std::string _test_logger_name = "test_callback_logger";
-    std::shared_ptr<spdlog::logger> _original_default_logger;
+    std::string _log_file_path;
+    const std::string _test_logger_name = COMPONENT_NAME;
 
     void SetUp() override
     {
-        _original_default_logger = spdlog::default_logger();
+        _log_file_path = hipdnn::logging::generate_log_file_name();
+        _log_file_path = (std::filesystem::current_path() / _log_file_path).string();
 
-        _log_file = hipdnn::logging::generate_log_file_name();
-        setenv("HIPDNN_LOG_FILE", _log_file.c_str(), 1);
-        setenv("HIPDNN_LOG_LEVEL", "info", 1);
+        setenv("HIPDNN_LOG_FILE", _log_file_path.c_str(), 1);
+        setenv("HIPDNN_LOG_LEVEL", "trace", 1);
 
         hipdnn::logging::initialize_callback_logging(
             _test_logger_name, hipdnnLoggingCallback_ext, nullptr);
 
-        // Ensure logs of all levels are captured during tests
-        spdlog::set_level(spdlog::level::trace);
+        auto test_logger = spdlog::get(_test_logger_name);
+        ASSERT_NE(test_logger, nullptr);
+        test_logger->set_level(spdlog::level::trace);
+        HIPDNN_LOG_INFO("");
+
+        auto file_writer_logger = spdlog::get("hipdnn");
+        if(file_writer_logger)
+        {
+            file_writer_logger->flush();
+        }
     }
 
     void TearDown() override
     {
-        // Restore original logger state
-        if(spdlog::get(_test_logger_name))
+        auto test_logger = spdlog::get(_test_logger_name);
+        if(test_logger)
+        {
+            test_logger->flush();
+        }
+
+        auto callback_receiver_log = spdlog::get("hipdnn");
+        if(callback_receiver_log)
+        {
+            callback_receiver_log->flush();
+        }
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+
+        if(test_logger)
         {
             spdlog::drop(_test_logger_name);
         }
 
-        spdlog::set_default_logger(_original_default_logger);
-
         unsetenv("HIPDNN_LOG_FILE");
         unsetenv("HIPDNN_LOG_LEVEL");
 
-        std::ifstream log_file_stream(_log_file);
+        std::ifstream log_file_stream(_log_file_path);
         if(log_file_stream.is_open())
         {
             log_file_stream.close();
-            std::remove(_log_file.c_str());
+            if(std::remove(_log_file_path.c_str()) != 0 && HasFailure())
+            {
+            }
+            else if(!HasFailure())
+            {
+            }
         }
     }
 
     std::string get_log_content() const
     {
-        spdlog::default_logger_raw()->flush();
+        auto component_logger = spdlog::get(_test_logger_name);
+        if(component_logger)
+        {
+            component_logger->flush();
+        }
 
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        auto file_writer_logger = spdlog::get("hipdnn");
+        if(file_writer_logger)
+        {
+            file_writer_logger->flush();
+        }
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(200));
 
         std::string log_content;
-        std::ifstream log_file_stream(_log_file);
+        std::ifstream log_file_stream(_log_file_path);
         if(log_file_stream.is_open())
         {
+            log_file_stream.seekg(0, std::ios::beg);
             log_content.assign((std::istreambuf_iterator<char>(log_file_stream)),
                                std::istreambuf_iterator<char>());
             log_file_stream.close();
         }
+        else
+        {
+            ADD_FAILURE() << "Failed to open log file for reading: " << _log_file_path;
+        }
+
         return log_content;
     }
 
@@ -77,7 +121,7 @@ protected:
     {
         std::string log_content = get_log_content();
         EXPECT_NE(log_content.find(expected_content), std::string::npos)
-            << "Expected to find: \"" << expected_content << "\" in log file " << _log_file
+            << "Expected to find: \"" << expected_content << "\" in log file " << _log_file_path
             << "\nActual log content:\n"
             << log_content;
     }
@@ -86,8 +130,8 @@ protected:
     {
         std::string log_content = get_log_content();
         EXPECT_EQ(log_content.find(unexpected_content), std::string::npos)
-            << "Expected NOT to find: \"" << unexpected_content << "\" in log file " << _log_file
-            << "\nActual log content:\n"
+            << "Expected NOT to find: \"" << unexpected_content << "\" in log file "
+            << _log_file_path << "\nActual log content:\n"
             << log_content;
     }
 
@@ -95,7 +139,6 @@ protected:
     {
         std::string log_content = get_log_content();
 
-        // [timestamp] [tid thread_id] [level] [logger_name] message
         std::regex pattern(R"(\[\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{3}\] \[tid \d+\] \[)"
                            + level + R"(\] \[)" + _test_logger_name + R"(\] )" + message_text);
 
@@ -161,7 +204,15 @@ TEST_F(Callback_logger_test, FormattedMessagesAreCorrectlyLogged)
 
 TEST_F(Callback_logger_test, LogLevelsAreRespected)
 {
-    spdlog::set_level(spdlog::level::err);
+    auto test_logger = spdlog::get(_test_logger_name);
+    ASSERT_NE(test_logger, nullptr);
+    test_logger->set_level(spdlog::level::err);
+
+    auto file_writer_logger = spdlog::get("hipdnn");
+    if(file_writer_logger)
+    {
+        file_writer_logger->set_level(spdlog::level::err);
+    }
 
     HIPDNN_LOG_INFO("This info should not appear");
     HIPDNN_LOG_WARN("This warning should not appear");
@@ -172,7 +223,11 @@ TEST_F(Callback_logger_test, LogLevelsAreRespected)
     verify_log_contains("This error should appear");
     verify_log_pattern("This error should appear", "error");
 
-    spdlog::set_level(spdlog::level::trace);
+    test_logger->set_level(spdlog::level::trace);
+    if(file_writer_logger)
+    {
+        file_writer_logger->set_level(spdlog::level::trace);
+    }
 }
 
 TEST_F(Callback_logger_test, MultipleMessagesAreLogged)
@@ -209,9 +264,10 @@ TEST_F(Callback_logger_test, VerifyLogPatternMatchesSpecification)
         }
     }
 
-    ASSERT_FALSE(matched_line.empty()) << "Test message not found in log: " << test_message;
+    ASSERT_FALSE(matched_line.empty())
+        << "Test message not found in log: " << test_message << "\nLog content:\n"
+        << log_content;
 
-    // "[%Y-%m-%d %H:%M:%S.%e] [tid %t] [%l] [%n] %v" (formatting.hpp)
     std::regex pattern_regex(
         R"(\[\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{3}\] \[tid \d+\] \[info\] \[)"
         + _test_logger_name + R"(\] )" + test_message);

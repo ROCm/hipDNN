@@ -290,9 +290,9 @@ HIPDNN_BACKEND_EXPORT hipdnnStatus_t hipdnnBackendCreateAndDeserializeGraph_ext(
  * This function is called by the hipDNN library to log messages. The severity level of the message
  * is provided, along with the message itself and user-defined data.
  * 
- * @param severity   The severity level of the message (e.g., error, warning, info).
- * @param msg        The message to be logged.
- * @param user_data   User-defined data passed to the callback function.
+ * @param [in] severity  The severity level of the message.
+ * @param [in] msg        The message to be logged.
+ * @param [in] user_data   User-defined data passed to the callback function.
  * 
  * @retval HIPDNN_STATUS_SUCCESS           The logging callback was successfully executed
  * @retval HIPDNN_STATUS_BAD_PARAM         Invalid or inconsistent parameter values were encountered.

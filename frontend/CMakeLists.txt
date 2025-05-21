@@ -11,6 +11,10 @@ endif()
 add_subdirectory(tests)
 
 add_library(hipdnn_frontend INTERFACE)
+
+# Since this is a header-only library, we set the INTERFACE property. However, this importantly assumes that logging will only be done by consumers of the frontend library.
+# If we intend to log from within the frontend library itself, one needs to manually set compile definition.
+target_compile_definitions(hipdnn_frontend INTERFACE COMPONENT_NAME="hipdnn_frontend")
 target_link_libraries(hipdnn_frontend INTERFACE hipdnn_sdk hipdnn_backend)
 
 SET(HIP_DNN_FRONTEND_INSTALL_INCLUDE_DIR "${CMAKE_INSTALL_INCLUDEDIR}/hipdnn/frontend")

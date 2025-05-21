@@ -34,8 +34,10 @@ static bool not_equal(const Tensor_attributes& tensor,
 
 int main()
 {
-
-    hipdnn::logging::initialize_callback_logging("hipdnn_sample", hipdnnLoggingCallback_ext, nullptr);
+#ifdef COMPONENT_NAME
+    hipdnn::logging::initialize_callback_logging(
+        COMPONENT_NAME, hipdnnLoggingCallback_ext, nullptr);
+#endif
 
     HIPDNN_LOG_INFO("HipDNN SDK Sample: Graph Serialization and Deserialization");
 
