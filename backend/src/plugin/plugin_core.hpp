@@ -35,7 +35,7 @@ public:
     std::string_view version() const;
     hipdnnPluginType_t type() const;
 
-    hipdnnPluginStatus_t set_logging_callback(hipdnnCallback_t callback, void* user_data);
+    hipdnnPluginStatus_t set_logging_callback(hipdnnCallback_t callback);
 
 protected:
     // This function must not throw as it is used during error handling.
@@ -53,7 +53,7 @@ private:
     hipdnnPluginStatus_t (*_func_get_version)(const char**);
     hipdnnPluginStatus_t (*_func_get_type)(hipdnnPluginType_t*);
     void (*_func_get_last_error_str)(const char**);
-    hipdnnPluginStatus_t (*_func_set_logging_callback)(hipdnnCallback_t, void*);
+    hipdnnPluginStatus_t (*_func_set_logging_callback)(hipdnnCallback_t);
 };
 
 // The Plugin_manager_base is responsible for loading and unloading plugins. This class is the base class for all plugin managers.
@@ -106,13 +106,13 @@ public:
         return _plugins;
     }
 
-    hipdnnStatus_t set_callback_for_all_plugins(hipdnnCallback_t callback, void* user_data)
+    hipdnnStatus_t set_callback_for_all_plugins(hipdnnCallback_t callback)
     {
         hipdnnStatus_t overall_status = HIPDNN_STATUS_SUCCESS;
 
         for(auto& plugin : _plugins)
         {
-            auto status = plugin.set_logging_callback(callback, user_data);
+            auto status = plugin.set_logging_callback(callback);
             if(status != HIPDNN_PLUGIN_STATUS_SUCCESS)
             {
                 HIPDNN_LOG_WARN("Failed to set logging callback for plugin {}", plugin.name());

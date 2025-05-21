@@ -23,12 +23,11 @@ private:
     friend class plugin::Plugin_manager_base<Plugin>;
 };
 
-void dummy_callback(hipdnnSeverity_t severity, const char* msg, void* user_data)
+void dummy_callback(hipdnnSeverity_t severity, const char* msg)
 {
     // Intentionally empty - just testing the mechanism
     (void)severity;
     (void)msg;
-    (void)user_data;
 }
 
 } // namespace
@@ -169,10 +168,10 @@ TEST(PluginManagerTest, SetCallbackForPlugins)
         return;
     }
 
-    auto status = plugin_manager.set_callback_for_all_plugins(dummy_callback, nullptr);
+    auto status = plugin_manager.set_callback_for_all_plugins(dummy_callback);
 
     EXPECT_EQ(status, HIPDNN_STATUS_SUCCESS);
 
-    status = plugin_manager.set_callback_for_all_plugins(nullptr, nullptr);
+    status = plugin_manager.set_callback_for_all_plugins(nullptr);
     EXPECT_NE(status, HIPDNN_STATUS_SUCCESS);
 }

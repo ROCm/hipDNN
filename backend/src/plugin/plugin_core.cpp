@@ -99,7 +99,7 @@ std::string_view Plugin_base::get_last_error_string() const noexcept
     return error_str;
 }
 
-hipdnnPluginStatus_t Plugin_base::set_logging_callback(hipdnnCallback_t callback, void* user_data)
+hipdnnPluginStatus_t Plugin_base::set_logging_callback(hipdnnCallback_t callback)
 {
     assert(_initialized);
     if(_func_set_logging_callback == nullptr)
@@ -108,7 +108,7 @@ hipdnnPluginStatus_t Plugin_base::set_logging_callback(hipdnnCallback_t callback
         return HIPDNN_PLUGIN_STATUS_SUCCESS;
     }
 
-    return _func_set_logging_callback(callback, user_data);
+    return _func_set_logging_callback(callback);
 }
 
 } // namespace plugin

@@ -62,8 +62,7 @@ extern "C" hipdnnPluginStatus_t hipdnnPluginGetType(hipdnnPluginType_t* type)
     return HIPDNN_PLUGIN_STATUS_SUCCESS;
 }
 
-extern "C" hipdnnPluginStatus_t hipdnnPluginSetLoggingCallback(hipdnnCallback_t callback,
-                                                               void* user_data)
+extern "C" hipdnnPluginStatus_t hipdnnPluginSetLoggingCallback(hipdnnCallback_t callback)
 {
     if(callback == nullptr)
     {
@@ -73,7 +72,7 @@ extern "C" hipdnnPluginStatus_t hipdnnPluginSetLoggingCallback(hipdnnCallback_t 
 
     try
     {
-        hipdnn::logging::initialize_callback_logging(PLUGIN_NAME, callback, user_data);
+        hipdnn::logging::initialize_callback_logging(PLUGIN_NAME, callback);
 
         HIPDNN_LOG_INFO("Logging initialized for plugin {}", PLUGIN_NAME);
 

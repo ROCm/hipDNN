@@ -32,8 +32,7 @@ protected:
         setenv("HIPDNN_LOG_FILE", _log_file_path.c_str(), 1);
         setenv("HIPDNN_LOG_LEVEL", "trace", 1);
 
-        hipdnn::logging::initialize_callback_logging(
-            _test_logger_name, hipdnnLoggingCallback_ext, nullptr);
+        hipdnn::logging::initialize_callback_logging(_test_logger_name, hipdnnLoggingCallback_ext);
 
         auto test_logger = spdlog::get(_test_logger_name);
         ASSERT_NE(test_logger, nullptr);

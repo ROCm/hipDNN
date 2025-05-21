@@ -274,11 +274,8 @@ HIPDNN_BACKEND_EXPORT void hipdnnGetLastErrorString(char* message, size_t max_si
     });
 }
 
-HIPDNN_BACKEND_EXPORT void
-    hipdnnLoggingCallback_ext(hipdnnSeverity_t severity, const char* msg, void* user_data)
+HIPDNN_BACKEND_EXPORT void hipdnnLoggingCallback_ext(hipdnnSeverity_t severity, const char* msg)
 {
-    (void)user_data;
-
     // Lazy initialization of raw output logging to achieve all configuration existing in backend.
     if(!hipdnn::logging::g_logging_initialized)
     {

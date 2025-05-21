@@ -37,9 +37,8 @@ template <typename Mutex>
 class Callback_sink final : public spdlog::sinks::base_sink<Mutex>
 {
 public:
-    explicit Callback_sink(hipdnnCallback_t callback, void* user_data)
+    explicit Callback_sink(hipdnnCallback_t callback)
         : _callback_fn{callback}
-        , _udata{user_data}
     {
     }
 
@@ -63,23 +62,21 @@ protected:
 
         hipdnnSeverity_t severity = spdlog_to_hipdnn_severity(msg.level);
 
-        _callback_fn(severity, formatted_str.c_str(), _udata);
+        _callback_fn(severity, formatted_str.c_str());
     }
 
     void flush_() override {}
 
 private:
     hipdnnCallback_t _callback_fn;
-    void* _udata;
 };
 
 using callback_sink_mt = Callback_sink<std::mutex>;
 
 inline std::shared_ptr<spdlog::logger> create_async_callback_logger_mt(hipdnnCallback_t callback,
-                                                                       void* user_data,
                                                                        const std::string& source)
 {
-    auto sink = std::make_shared<hipdnn::logging::callback_sink_mt>(callback, user_data);
+    auto sink = std::make_shared<hipdnn::logging::callback_sink_mt>(callback);
     auto logger = std::make_shared<spdlog::async_logger>(
         source, sink, spdlog::thread_pool(), spdlog::async_overflow_policy::block);
     logger->set_pattern(generate_pattern_string(source));
@@ -89,10 +86,10 @@ inline std::shared_ptr<spdlog::logger> create_async_callback_logger_mt(hipdnnCal
 
 template <typename Factory = spdlog::synchronous_factory>
 inline std::shared_ptr<spdlog::logger>
-    create_callback_logger_mt(hipdnnCallback_t callback, void* user_data, const std::string& source)
+    create_callback_logger_mt(hipdnnCallback_t callback, const std::string& source)
 {
     auto logger
-        = Factory::template create<hipdnn::logging::callback_sink_mt>(source, callback, user_data);
+        = Factory::template create<hipdnn::logging::callback_sink_mt>(source, callback);
     logger->set_pattern(generate_pattern_string(source));
     return logger;
 }

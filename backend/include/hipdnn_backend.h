@@ -292,14 +292,8 @@ HIPDNN_BACKEND_EXPORT hipdnnStatus_t hipdnnBackendCreateAndDeserializeGraph_ext(
  * 
  * @param [in] severity  The severity level of the message.
  * @param [in] msg        The message to be logged.
- * @param [in] user_data   User-defined data passed to the callback function.
- * 
- * @retval HIPDNN_STATUS_SUCCESS           The logging callback was successfully executed
- * @retval HIPDNN_STATUS_BAD_PARAM         Invalid or inconsistent parameter values were encountered.
- * @retval HIPDNN_STATUS_INTERNAL_ERROR    An internal error occurred during logging.
  */
-HIPDNN_BACKEND_EXPORT void
-    hipdnnLoggingCallback_ext(hipdnnSeverity_t severity, const char* msg, void* user_data);
+HIPDNN_BACKEND_EXPORT void hipdnnLoggingCallback_ext(hipdnnSeverity_t severity, const char* msg);
 
 #ifdef __cplusplus
 }

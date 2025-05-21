@@ -86,12 +86,11 @@ HIPDNN_PLUGIN_EXPORT void hipdnnPluginGetLastErrorString(const char** error_str)
  * @brief Sets the logging callback function for the plugin.
  *
  * @param[in] callback The logging callback function to use.
- * @param[in] user_data User data to pass to the callback function.
  *
  * @return A value of type `hipdnnPluginStatus_t` indicating the status of the operation.
  */
 HIPDNN_PLUGIN_EXPORT hipdnnPluginStatus_t hipdnnPluginSetLoggingCallback(
-    hipdnnCallback_t callback, void* user_data);
+    hipdnnCallback_t callback);
 
 /** @} */ // End of PluginFunctions group
 

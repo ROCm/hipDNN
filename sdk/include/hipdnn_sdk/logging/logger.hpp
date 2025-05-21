@@ -223,8 +223,7 @@ inline std::string
 #endif
 
 inline void initialize_callback_logging(const std::string& logging_area,
-                                        hipdnnCallback_t callback_function,
-                                        void* user_data = nullptr)
+                                        hipdnnCallback_t callback_function)
 {
     static std::mutex callback_init_mutex;
     std::lock_guard<std::mutex> lock(callback_init_mutex);
@@ -240,7 +239,7 @@ inline void initialize_callback_logging(const std::string& logging_area,
     }
 
     auto callback_logger
-        = hipdnn::logging::create_async_callback_logger_mt(callback_function, user_data, logging_area);
+        = hipdnn::logging::create_async_callback_logger_mt(callback_function, logging_area);
     spdlog::register_logger(callback_logger);
 }
 
