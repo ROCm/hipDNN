@@ -6,8 +6,8 @@ This plugin can be built as part of the MIOpen project or as a standalone plugin
 
 ### Building as part of hipDNN
 1. Follow the build instructions for hipDNN defined [Building hipDNN](../../docs/Building.md).
-2. Currently the plugin build is defaulted to on.  Eventually it will be always built separately.
-  - To disable the plugin build as part of hipdnn, set `HIP_DNN_BUILD_PLUGINS=OFF` in the CMake configuration.  `cmake -DHIP_DNN_BUILD_PLUGINS=OFF ..`
+2. Currently the plugin build is defaulted to off.  Eventually it wont be a hipdnn build option.
+  - To enable the plugin build as part of hipdnn, set `HIP_DNN_BUILD_PLUGINS=ON` in the CMake configuration.  `cmake -DHIP_DNN_BUILD_PLUGINS=ON ..`
 
 ### Building as a standalone plugin
 In order to build the plugin standalone, you will need to have installed hipDNN and MIOpen on the system first.

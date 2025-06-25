@@ -4,6 +4,7 @@
 #include <iostream>
 #include <miopen/miopen.h>
 
+#include "hipdnn_sdk/logging/logger.hpp"
 #include "hipdnn_sdk/plugin/plugin_api.h"
 
 static const char* _plugin_name = "miopen_legacy_plugin";
@@ -16,48 +17,43 @@ extern "C" {
 hipdnnPluginStatus_t hipdnnPluginGetName(const char** name)
 {
     if(!name)
-        return hipdnnPluginStatusBadParam;
+        return HIPDNN_PLUGIN_STATUS_BAD_PARAM;
     *name = _plugin_name;
-    return hipdnnPluginStatusSuccess;
+
+    miopenHandle_t handle = nullptr;
+    miopenStatus_t status = miopenCreate(&handle);
+    if(status != miopenStatusSuccess)
+    {
+        std::cerr << "Failed to create MIOpen handle: " << miopenGetErrorString(status)
+                  << std::endl;
+        return HIPDNN_PLUGIN_STATUS_SUCCESS;
+    }
+    status = miopenDestroy(handle);
+
+    return HIPDNN_PLUGIN_STATUS_SUCCESS;
 }
 
 hipdnnPluginStatus_t hipdnnPluginGetVersion(const char** version)
 {
     if(!version)
-        return hipdnnPluginStatusBadParam;
+        return HIPDNN_PLUGIN_STATUS_BAD_PARAM;
     *version = _plugin_version;
-    return hipdnnPluginStatusSuccess;
+    return HIPDNN_PLUGIN_STATUS_SUCCESS;
 }
 
 hipdnnPluginStatus_t hipdnnPluginGetType(hipdnnPluginType_t* type)
 {
     if(!type)
-        return hipdnnPluginStatusBadParam;
-    *type = hipdnnPluginTypeEngine;
-    return hipdnnPluginStatusSuccess;
+        return HIPDNN_PLUGIN_STATUS_BAD_PARAM;
+    *type = HIPDNN_PLUGIN_TYPE_ENGINE;
+    return HIPDNN_PLUGIN_STATUS_SUCCESS;
 }
 
-hipdnnPluginStatus_t hipdnnPluginGetNumEngines(unsigned* num_engines)
+void hipdnnPluginGetLastErrorString(const char** error_str)
 {
-    if(!num_engines)
-        return hipdnnPluginStatusBadParam;
-    *num_engines = 1;
-    return hipdnnPluginStatusSuccess;
-}
-
-hipdnnPluginStatus_t hipdnnPluginRunEngine(unsigned engine_index,
-                                           const uint32_t* input,
-                                           uint32_t* output,
-                                           uint32_t size)
-{
-    if(engine_index != 0 || !input || !output)
-        return hipdnnPluginStatusBadParam;
-    // Dummy implementation: just copy input to output
-    for(uint32_t i = 0; i < size; ++i)
-    {
-        output[i] = input[i];
-    }
-    return hipdnnPluginStatusSuccess;
+    if(!error_str)
+        return;
+    *error_str = "No error";
 }
 
 } // extern "C"

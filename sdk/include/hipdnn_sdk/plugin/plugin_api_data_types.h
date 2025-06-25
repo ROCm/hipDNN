@@ -10,7 +10,11 @@
  * This file contains the definitions of the data types used in the hipDNN Plugin API.
  */
 
+#include <stddef.h>
+#include <stdint.h>
+
 #ifdef __cplusplus
+
 extern "C" {
 #endif
 
