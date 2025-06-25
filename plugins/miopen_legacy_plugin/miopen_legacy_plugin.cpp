@@ -20,16 +20,6 @@ hipdnnPluginStatus_t hipdnnPluginGetName(const char** name)
         return HIPDNN_PLUGIN_STATUS_BAD_PARAM;
     *name = _plugin_name;
 
-    miopenHandle_t handle = nullptr;
-    miopenStatus_t status = miopenCreate(&handle);
-    if(status != miopenStatusSuccess)
-    {
-        std::cerr << "Failed to create MIOpen handle: " << miopenGetErrorString(status)
-                  << std::endl;
-        return HIPDNN_PLUGIN_STATUS_SUCCESS;
-    }
-    status = miopenDestroy(handle);
-
     return HIPDNN_PLUGIN_STATUS_SUCCESS;
 }
 
