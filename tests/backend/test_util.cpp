@@ -3,8 +3,8 @@
 
 #include "test_util.hpp"
 #include "hipdnn_backend.h"
-
 #include <hipdnn_sdk/data_objects/graph_generated.h>
+#include <hipdnn_sdk/logging/logger.hpp>
 
 #include <gtest/gtest.h>
 
@@ -125,6 +125,174 @@ void populate_test_execution_plan(hipdnnBackendDescriptor_t* execution_plan,
     {
         ASSERT_EQ(hipdnnBackendFinalize(*execution_plan), HIPDNN_STATUS_SUCCESS);
     }
+}
+
+void* allocate_tensor_memory([[maybe_unused]] const int64_t* dims,
+                             [[maybe_unused]] size_t dims_count,
+                             [[maybe_unused]] hipdnnBackendAttributeType_t data_type,
+                             [[maybe_unused]] bool initialize)
+{
+    // TODO: Implement memory allocation logic based on the data type and dimensions
+    // For now, just return a dummy pointer
+    void* memory = malloc(0);
+    return memory;
+}
+
+void set_tensor_mappings_in_variant_pack(hipdnnBackendDescriptor_t variant_pack,
+                                         const std::vector<int64_t>& tensor_ids,
+                                         const std::vector<void*>& data_ptrs)
+{
+    ASSERT_EQ(hipdnnBackendSetAttribute(variant_pack,
+                                        HIPDNN_ATTR_VARIANT_PACK_UNIQUE_IDS,
+                                        HIPDNN_TYPE_INT64,
+                                        static_cast<int64_t>(tensor_ids.size()),
+                                        tensor_ids.data()),
+              HIPDNN_STATUS_SUCCESS);
+
+    ASSERT_EQ(hipdnnBackendSetAttribute(variant_pack,
+                                        HIPDNN_ATTR_VARIANT_PACK_DATA_POINTERS,
+                                        HIPDNN_TYPE_VOID_PTR,
+                                        static_cast<int64_t>(data_ptrs.size()),
+                                        data_ptrs.data()),
+              HIPDNN_STATUS_SUCCESS);
+}
+
+void set_workspace_in_variant_pack(hipdnnBackendDescriptor_t variant_pack, void* workspace)
+{
+    if(workspace != nullptr)
+    {
+        ASSERT_EQ(hipdnnBackendSetAttribute(variant_pack,
+                                            HIPDNN_ATTR_VARIANT_PACK_WORKSPACE,
+                                            HIPDNN_TYPE_VOID_PTR,
+                                            1,
+                                            &workspace),
+                  HIPDNN_STATUS_SUCCESS);
+    }
+}
+
+void finalize_variant_pack(hipdnnBackendDescriptor_t variant_pack)
+{
+    ASSERT_EQ(hipdnnBackendFinalize(variant_pack), HIPDNN_STATUS_SUCCESS);
+}
+
+void extract_tensor_mappings(const std::unordered_map<int64_t, void*>& data_ptr_mappings,
+                             std::vector<int64_t>& tensor_ids,
+                             std::vector<void*>& data_ptrs)
+{
+    for(const auto& [id, data_ptr] : data_ptr_mappings)
+    {
+        ASSERT_NE(data_ptr, nullptr);
+        tensor_ids.push_back(id);
+        data_ptrs.push_back(data_ptr);
+    }
+    ASSERT_EQ(tensor_ids.size(), data_ptrs.size());
+    ASSERT_FALSE(tensor_ids.empty());
+    ASSERT_FALSE(data_ptrs.empty());
+}
+
+void populate_variant_pack_with_mappings(
+    hipdnnBackendDescriptor_t variant_pack,
+    const std::unordered_map<int64_t, void*>& data_ptr_mappings,
+    void* workspace)
+{
+    std::vector<int64_t> tensor_ids;
+    std::vector<void*> data_ptrs;
+
+    extract_tensor_mappings(data_ptr_mappings, tensor_ids, data_ptrs);
+    set_tensor_mappings_in_variant_pack(variant_pack, tensor_ids, data_ptrs);
+    set_workspace_in_variant_pack(variant_pack, workspace);
+    finalize_variant_pack(variant_pack);
+}
+
+DataType_t convert_backend_attribute_to_data_type(hipdnnBackendAttributeType_t backend_type)
+{
+    switch(backend_type)
+    {
+    case HIPDNN_TYPE_FLOAT:
+        return DataType_t::FLOAT;
+    default:
+        HIPDNN_LOG_WARN("Unsupported backend attribute type");
+        return DataType_t::FLOAT;
+    }
+}
+
+void create_and_initialize_backend_descriptor(hipdnnBackendDescriptor_t backend_descriptor,
+                                              const flatbuffers::DetachedBuffer& serialized_graph)
+{
+    ASSERT_NE(backend_descriptor, nullptr);
+
+    auto status = hipdnnBackendCreateAndDeserializeGraph_ext(
+        &backend_descriptor, serialized_graph.data(), serialized_graph.size());
+    ASSERT_EQ(status, HIPDNN_STATUS_SUCCESS);
+
+    status = hipdnnBackendFinalize(backend_descriptor);
+    ASSERT_EQ(status, HIPDNN_STATUS_SUCCESS);
+}
+
+void create_and_populate_batchnorm_node(Graph& graph)
+{
+    auto x = std::make_shared<Tensor_attributes>();
+    x->set_uid(1)
+        .set_name("Input")
+        .set_data_type(DataType_t::FLOAT)
+        .set_dim({1, 64, 28, 28}); // NCHW format
+
+    auto scale = std::make_shared<Tensor_attributes>();
+    scale->set_uid(2).set_name("Scale").set_data_type(DataType_t::FLOAT).set_dim({1, 64, 1, 1});
+
+    auto bias = std::make_shared<Tensor_attributes>();
+    bias->set_uid(3).set_name("Bias").set_data_type(DataType_t::FLOAT).set_dim({1, 64, 1, 1});
+
+    auto mean = std::make_shared<Tensor_attributes>();
+    mean->set_uid(4).set_name("Mean").set_data_type(DataType_t::FLOAT).set_dim({1, 64, 1, 1});
+
+    auto inv_variance = std::make_shared<Tensor_attributes>();
+    inv_variance->set_uid(5)
+        .set_name("InvVariance")
+        .set_data_type(DataType_t::FLOAT)
+        .set_dim({1, 64, 1, 1});
+
+    // Create BatchnormInference node
+    Batchnorm_inference_attributes attrs;
+
+    // TODO: add epsilon
+
+    [[maybe_unused]] auto y = graph.batchnorm_inference(x, mean, inv_variance, scale, bias, attrs);
+
+    // Build the operation graph
+    auto build_result = graph.build_operation_graph();
+    EXPECT_TRUE(build_result.is_good()) << build_result.get_message();
+}
+
+void extract_tensor_info_from_graph(
+    const flatbuffers::DetachedBuffer& serialized_graph,
+    std::unordered_map<int64_t, std::string>& uid_to_name_map,
+    std::unordered_map<std::string, int64_t>& name_to_uid_map,
+    std::unordered_map<int64_t, std::vector<int64_t>>& uid_to_dims_map)
+{
+    uid_to_name_map.clear();
+    name_to_uid_map.clear();
+    uid_to_dims_map.clear();
+
+    auto deserialized_graph = hipdnn_sdk::data_objects::UnPackGraph(serialized_graph.data());
+    ASSERT_NE(deserialized_graph, nullptr);
+
+    // Extract all tensor information from the deserialized graph
+    for(const auto& tensor : deserialized_graph->tensors)
+    {
+        int64_t uid = tensor->uid;
+        std::string name = tensor->name;
+
+        uid_to_name_map[uid] = name;
+        name_to_uid_map[name] = uid;
+
+        if(!tensor->dims.empty())
+        {
+            uid_to_dims_map[uid] = tensor->dims;
+        }
+    }
+
+    ASSERT_FALSE(uid_to_name_map.empty());
 }
 
 } // namespace test_util
