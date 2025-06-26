@@ -7,7 +7,7 @@ RUN apt-get update && \
         apt-utils ca-certificates curl libnuma-dev gnupg2 wget  && \
     curl -fsSL https://repo.radeon.com/rocm/rocm.gpg.key | gpg --dearmor -o /etc/apt/trusted.gpg.d/rocm-keyring.gpg
 
-RUN export ROCM_APT_VER=6.4; \
+RUN export ROCM_APT_VER=6.4.1; \
     echo $ROCM_APT_VER &&\
     sh -c 'echo deb [arch=amd64 signed-by=/etc/apt/trusted.gpg.d/rocm-keyring.gpg] https://repo.radeon.com/amdgpu/$ROCM_APT_VER/ubuntu jammy main > /etc/apt/sources.list.d/amdgpu.list' &&\
     sh -c 'echo deb [arch=amd64 signed-by=/etc/apt/trusted.gpg.d/rocm-keyring.gpg] https://repo.radeon.com/rocm/apt/$ROCM_APT_VER jammy main > /etc/apt/sources.list.d/rocm.list' &&\
@@ -29,6 +29,9 @@ RUN apt-get update && \
 
 ENV PATH="/opt/rocm/bin:/opt/rocm:${PATH}"
 ENV CMAKE_GENERATOR="Ninja"
+
+# Delete bunk flang file that causes VSCode CMake Extension to fail
+RUN rm -f /opt/rocm/llvm/bin/flang
 
 ######## CMake ########
 WORKDIR /install-cmake
