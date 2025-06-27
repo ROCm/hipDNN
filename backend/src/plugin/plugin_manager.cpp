@@ -1,6 +1,8 @@
 // Copyright © Advanced Micro Devices, Inc., or its affiliates.
 // SPDX-License-Identifier:  MIT
 
+#include <hipdnn_sdk/logging/logger.hpp>
+
 #include "plugin_manager.hpp"
 #include "descriptors/engine_config_descriptor.hpp"
 #include "descriptors/engine_descriptor.hpp"
@@ -10,27 +12,33 @@
 namespace hipdnn_backend
 {
 
-void Plugin_manager::initialize(/* heuristics */)
+void Plugin_manager::initialize()
 {
+    // TODO : actually find and init the plugins properly from the plugin directory.
+    // For now we will just use a fake plugin.
+    _plugins.push_back(std::make_shared<Fake_plugin>());
 
-    // TODO : actually find and init the plugins properly
-    // for now we will just use a fake plugin.
-    // # DISCUSS: how do we find the plugins? store in json?
-    auto fake_plugin = std::make_shared<Fake_plugin>();
-
-    // for all the applicable engines, add the same plugin to the map
-    for(const int64_t& engine_id : fake_plugin->get_applicable_engines(nullptr))
+    for(const auto& plugin : _plugins)
     {
-        _plugins.insert({engine_id, fake_plugin});
+        for(const auto& engine_id : plugin->get_engines())
+        {
+            if(_engine_id_plugin_lookup.find(engine_id) != _engine_id_plugin_lookup.end())
+            {
+                HIPDNN_LOG_ERROR("Plugin_manager::initialize: Duplicate engine_id found: " + std::to_string(engine_id) +
+                                   ". Skipping this engine.");
+                continue;   
+            }
+            _engine_id_plugin_lookup.insert({engine_id, plugin});
+        }
     }
 }
 
 std::shared_ptr<Hipdnn_plugin_base> Plugin_manager::get_plugin(int64_t engine_id)
 {
-    auto plugin_iter = _plugins.find(engine_id);
-    if(plugin_iter == _plugins.end())
+    auto plugin_iter = _engine_id_plugin_lookup.find(engine_id);
+    if(plugin_iter == _engine_id_plugin_lookup.end())
     {
-        return nullptr;
+        throw Hipdnn_exception(HIPDNN_STATUS_BAD_PARAM_OUT_OF_BOUND, "Plugin_manager::get_plugin failed: invalid engineId " + std::to_string(engine_id));
     }
     return plugin_iter->second;
 }
@@ -60,11 +68,9 @@ void Plugin_manager::finalize_engine_config(hipdnnBackendDescriptor_t desc)
         engine, HIPDNN_ATTR_ENGINE_GLOBAL_INDEX, HIPDNN_TYPE_INT64, 1, nullptr, &engine_id);
 
     auto plugin = get_plugin(engine_id);
-    THROW_IF_NULL(plugin,
-                  HIPDNN_STATUS_BAD_PARAM_OUT_OF_BOUND,
-                  std::string("Plugin_manager::finalize_engine_config has invalid engine id: ")
-                      + std::to_string(engine_id) + " for the given engine config.");
 
+    // TODO - We need to construct + store the engine config fbs with the properties that the user of the API set for the engine config,
+    // and then pass that to the plugin as well here.
     auto applicable_engines = plugin->get_applicable_engines(graph_desc);
     THROW_IF_EQ(applicable_engines.find(engine_id),
                 applicable_engines.end(),
@@ -80,11 +86,10 @@ std::set<int64_t>
 {
     (void)handle;
     std::set<int64_t> applicable_engines;
-    for(const auto& [engine_id, plugin] : _plugins)
+    for(const auto& plugin : _plugins)
     {
         auto current_applicable_engines = plugin->get_applicable_engines(graph);
 
-        // Check that there isn't a conflict since Ids must be unique for engines
         applicable_engines.insert(current_applicable_engines.begin(),
                                   current_applicable_engines.end());
     }
@@ -120,15 +125,7 @@ void Plugin_manager::execute(hipdnnHandle* handle,
                              1,
                              nullptr,
                              &engine_config);
-
-    THROW_IF_NULL(engine_config,
-                  HIPDNN_STATUS_BAD_PARAM,
-                  "Plugin_manager::execute failed: engine_config is null");
-
-    THROW_IF_NE(engine_config->type,
-                HIPDNN_BACKEND_ENGINECFG_DESCRIPTOR,
-                HIPDNN_STATUS_BAD_PARAM,
-                "Plugin_manager::execute failed: invalid engine_config descriptor type");
+    assert(engine_config != nullptr);
 
     auto engine_config_desc = static_cast<Engine_config_descriptor*>(engine_config);
 
@@ -136,14 +133,7 @@ void Plugin_manager::execute(hipdnnHandle* handle,
     hipdnnBackendDescriptor_t engine = nullptr;
     engine_config_desc->get_attribute(
         HIPDNN_ATTR_ENGINECFG_ENGINE, HIPDNN_TYPE_BACKEND_DESCRIPTOR, 1, nullptr, &engine);
-
-    THROW_IF_NULL(
-        engine, HIPDNN_STATUS_BAD_PARAM, "Plugin_manager::execute failed: engine is null");
-
-    THROW_IF_NE(engine->type,
-                HIPDNN_BACKEND_ENGINE_DESCRIPTOR,
-                HIPDNN_STATUS_BAD_PARAM,
-                "Plugin_manager::execute failed: invalid engine descriptor type");
+    assert(engine != nullptr);
 
     auto engine_desc = static_cast<Engine_descriptor*>(engine);
 
@@ -152,21 +142,12 @@ void Plugin_manager::execute(hipdnnHandle* handle,
         HIPDNN_ATTR_ENGINE_GLOBAL_INDEX, HIPDNN_TYPE_INT64, 1, nullptr, &engine_id);
 
     auto plugin = get_plugin(engine_id);
-    THROW_IF_NULL(plugin,
-                  HIPDNN_STATUS_BAD_PARAM_OUT_OF_BOUND,
-                  std::string("Plugin_manager::execute has invalid engine id: ")
-                      + std::to_string(engine_id));
+    assert(plugin != nullptr);
 
     hipdnnBackendDescriptor_t graph = nullptr;
     engine_desc->get_attribute(
         HIPDNN_ATTR_ENGINE_OPERATION_GRAPH, HIPDNN_TYPE_BACKEND_DESCRIPTOR, 1, nullptr, &graph);
-
-    THROW_IF_NULL(graph, HIPDNN_STATUS_BAD_PARAM, "Plugin_manager::execute failed: graph is null");
-
-    THROW_IF_NE(graph->type,
-                HIPDNN_BACKEND_OPERATIONGRAPH_DESCRIPTOR,
-                HIPDNN_STATUS_BAD_PARAM,
-                "Plugin_manager::execute failed: invalid graph descriptor type");
+    assert(graph != nullptr);
 
     auto graph_desc = static_cast<Graph_descriptor*>(graph);
 

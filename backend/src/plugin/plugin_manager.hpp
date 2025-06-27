@@ -39,7 +39,8 @@ struct Plugin_manager
                  hipdnnBackendDescriptor_t variant_pack);
 
 private:
-    std::map<int64_t, std::shared_ptr<Hipdnn_plugin_base>> _plugins;
+    std::map<int64_t, std::shared_ptr<Hipdnn_plugin_base>> _engine_id_plugin_lookup;
+    std::vector<std::shared_ptr<Hipdnn_plugin_base>> _plugins;
 
     std::shared_ptr<Hipdnn_plugin_base> get_plugin(int64_t engine_id);
 };

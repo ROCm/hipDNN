@@ -98,9 +98,7 @@ list(PREPEND HIPDNN_WARNING_COMPILE_OPTIONS
     -Winit-self                              # Warn about variables initialized with itself
     -Wunreachable-code                       # Warn about unreachable code
     -Wno-error=unused-command-line-argument  # Disable error for unused command line arguments
-    -Wimplicit-fallthrough                   # Warn about fallthrough cases in switch statements
-    #-Wswitch-enum                            # Warn if a switch statement does not cover all enumerators
-    #-Wswitch-default                         # Warn if a switch statement does not have a default case
+    -Wswitch-default                         # Warn if a switch statement does not have a default case
 )
 
 add_compile_options(

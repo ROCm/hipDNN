@@ -189,20 +189,19 @@ void Execution_plan_descriptor::get_engine_config(hipdnnBackendAttributeType_t a
                 HIPDNN_STATUS_BAD_PARAM,
                 "Execution_plan_descriptor failed to get engine config: Invalid attribute type.");
 
-    THROW_IF_LT(requested_element_count,
-                1,
-                HIPDNN_STATUS_BAD_PARAM,
-                "Execution_plan_descriptor failed to get engine config: Requested element count "
-                "too small.");
+    THROW_IF_NE(requested_element_count,
+            1,
+            HIPDNN_STATUS_BAD_PARAM,
+            "Execution_plan_descriptor failed to get engine config: "
+            "Invalid element count.");
+
+    THROW_IF_NULL(array_of_elements, 
+                  HIPDNN_STATUS_BAD_PARAM_NULL_POINTER,
+                  "Execution_plan_descriptor failed to get engine config: Null pointer for array_of_elements.");
 
     if(element_count != nullptr)
     {
-        *element_count = requested_element_count;
-    }
-
-    if(array_of_elements == nullptr)
-    {
-        return;
+        *element_count = 1;
     }
 
     THROW_IF_NULL(_engine_config,

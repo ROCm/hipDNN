@@ -198,13 +198,6 @@ TEST_F(Execution_plan_descriptor_test, GetExecutionPlanDescriptorEngineConfig)
                                          HIPDNN_TYPE_BACKEND_DESCRIPTOR,
                                          1,
                                          &count,
-                                         nullptr));
-    ASSERT_EQ(count, 1);
-
-    ASSERT_NO_THROW(_plan->get_attribute(HIPDNN_ATTR_EXECUTION_PLAN_ENGINE_CONFIG,
-                                         HIPDNN_TYPE_BACKEND_DESCRIPTOR,
-                                         1,
-                                         &count,
                                          &returned_engine_config));
 
     ASSERT_EQ(count, 1);
