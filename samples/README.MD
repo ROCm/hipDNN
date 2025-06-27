@@ -1,7 +1,7 @@
 # hipDNN-samples
 ## How to build
-- Follow the build and install instructions in the [Building readme](../docs/Building.md).
-- Once those are installed, then inside the samples directory, run the following commands:
+- Follow the hipdnn build and install instructions in the [Building readme](../docs/Building.md).
+- Once those are installed, inside the samples directory, run the following commands:
     - `mkdir build`
     - `cd build`
     - `cmake ..`

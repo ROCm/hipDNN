@@ -26,7 +26,7 @@ These can be found in our [Dependencies.cmake file](../cmake/Dependencies.cmake)
 for these dependencies installed on the system before it attempts to pull them from a remote source.
 
 ## Quickstart Building and Installing HipDNN
-1. Build a version of our development [Dockerfile](../Dockerfile). See [building docker](#build-the-development-docker-container)
+1. Build a version of our development [Dockerfiles](../dockerfiles). See [building docker](#build-the-development-docker-container)
 2. Run the docker image you built and mount the location of this repository.
     - `docker run -it -v $HOME:/location/of/repository --privileged --rm --device=/dev/kfd --device /dev/dri:/dev/dri:rw --volume /dev/dri:/dev/dri:rw -v /var/lib/docker/:/var/lib/docker --group-add video --cap-add=SYS_PTRACE --security-opt seccomp=unconfined docker_image_name`
 3. Use Cmake to generate the make files 
@@ -76,10 +76,7 @@ When building with ninja dont forget to add the -jnproc flag for using additiona
 
 
 ### Build the development docker container
-The development dockerfile is here: [Dockerfile](../Dockerfile).
-
-To build the docker file, all you need to do is navigate to the repository root 
-Run `docker build -t <imagename> .` from the repository root
+Our development dockerfiles are located in the `dockerfiles` directory.  See the [readme](../dockerfiles//README.md) for more information on building the docker containers.
 
 ## Building Samples
-todo
+See the samples [readme](../samples/README.MD) for how to build and run the samples.

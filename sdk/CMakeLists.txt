@@ -62,7 +62,7 @@ target_include_directories(hipdnn_sdk INTERFACE
 )
 
 install( 
-    TARGETS hipdnn_sdk
+    TARGETS hipdnn_sdk FlatBuffers spdlog_header_only
     EXPORT hipdnn_sdk_targets
 )
 

@@ -1,0 +1,54 @@
+FROM ubuntu:22.04 as hipdnn
+
+ENV APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE=DontWarn
+# Install preliminary dependencies and add rocm gpg key
+RUN apt-get update && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --allow-unauthenticated \
+        apt-utils ca-certificates curl libnuma-dev gnupg2 wget  && \
+    curl -fsSL https://repo.radeon.com/rocm/rocm.gpg.key | gpg --dearmor -o /etc/apt/trusted.gpg.d/rocm-keyring.gpg
+
+RUN export ROCM_APT_VER=6.4.1; \
+    echo $ROCM_APT_VER &&\
+    sh -c 'echo deb [arch=amd64 signed-by=/etc/apt/trusted.gpg.d/rocm-keyring.gpg] https://repo.radeon.com/amdgpu/$ROCM_APT_VER/ubuntu jammy main > /etc/apt/sources.list.d/amdgpu.list' &&\
+    sh -c 'echo deb [arch=amd64 signed-by=/etc/apt/trusted.gpg.d/rocm-keyring.gpg] https://repo.radeon.com/rocm/apt/$ROCM_APT_VER jammy main > /etc/apt/sources.list.d/rocm.list' &&\
+    sh -c "echo 'Package: *\nPin: release o=repo.radeon.com\nPin-Priority: 600' | tee /etc/apt/preferences.d/rocm-pin-600"
+
+RUN apt-get update && \
+    apt-get install -y gdb && \
+    apt-get install -y git && \
+    apt-get install -y git-lfs && \
+    apt-get install -y hip-dev && \
+    apt-get install -y miopen-hip-dev && \
+    apt-get install -y python3-dev && \
+    apt-get install -y python3-pip && \
+    apt-get install -y python3-venv && \
+    apt-get install -y python3-pybind11 && \
+    apt-get install -y rocm-developer-tools && \
+    apt-get install -y rocm-llvm-dev && \
+    apt-get install -y unzip
+
+ENV PATH="/opt/rocm/bin:/opt/rocm:${PATH}"
+ENV CMAKE_GENERATOR="Ninja"
+
+# Delete bunk flang file that causes VSCode CMake Extension to fail
+RUN rm -f /opt/rocm/llvm/bin/flang
+
+######## CMake ########
+WORKDIR /install-cmake
+ENV CMAKE_VERSION="3.25.2"
+COPY ./scripts/install_cmake.sh ./
+RUN ./install_cmake.sh "${CMAKE_VERSION}" && rm -rf /install-cmake
+
+######## Ninja #########
+WORKDIR /install-ninja
+ENV NINJA_VERSION="1.12.1"
+COPY ./scripts/install_ninja.sh ./
+RUN ./install_ninja.sh "${NINJA_VERSION}" && rm -rf /install-ninja
+
+######## Installing Google test #######
+WORKDIR /install-googletest
+ENV GOOGLE_TEST_VERSION="1.16.0"
+COPY ./scripts/install_gtest.sh ./
+RUN ./install_gtest.sh "${GOOGLE_TEST_VERSION}" && rm -rf /install-googletest
+
+WORKDIR /

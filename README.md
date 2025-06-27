@@ -9,9 +9,6 @@ The fastest way to get started with hipdnn is to follow the [quick start steps i
 ## Building
 The full build steps are documented in the [Building.md](./docs/Building.md) file.
 
-## Development Environment
-Most of the development team is using vscode.  A few of our setup tips are in the [vscode.md](./docs/vscode.md) file.
-
 ## Design
 The overall design of hipDNN is documented in the [Design.md](./docs/Design.md) file.  This document includes the overall
 architecture of the library.
