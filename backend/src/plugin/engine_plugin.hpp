@@ -34,11 +34,12 @@ public:
     void destroy_engine_details(hipdnnEnginePluginHandle_t handle,
                                 hipdnnPluginConstData_t* engine_details) const;
     size_t get_workspace_size(hipdnnEnginePluginHandle_t handle,
-                                const hipdnnPluginConstData_t* engine_config,
-                                const hipdnnPluginConstData_t* op_graph) const;
-    hipdnnEnginePluginExecutionContext_t create_execution_context(hipdnnEnginePluginHandle_t handle,
-                                                                  const hipdnnPluginConstData_t* engine_config,
-                                                                  const hipdnnPluginConstData_t* op_graph) const;
+                              const hipdnnPluginConstData_t* engine_config,
+                              const hipdnnPluginConstData_t* op_graph) const;
+    hipdnnEnginePluginExecutionContext_t
+        create_execution_context(hipdnnEnginePluginHandle_t handle,
+                                 const hipdnnPluginConstData_t* engine_config,
+                                 const hipdnnPluginConstData_t* op_graph) const;
     void destroy_execution_context(hipdnnEnginePluginHandle_t handle,
                                    hipdnnEnginePluginExecutionContext_t execution_context) const;
     void execute_op_graph(hipdnnEnginePluginHandle_t handle,
@@ -57,13 +58,29 @@ private:
     hipdnnPluginStatus_t (*_func_create_handle)(hipdnnEnginePluginHandle_t*);
     hipdnnPluginStatus_t (*_func_destroy_handle)(hipdnnEnginePluginHandle_t);
     hipdnnPluginStatus_t (*_func_set_stream)(hipdnnEnginePluginHandle_t, hipStream_t);
-    hipdnnPluginStatus_t (*_func_get_applicable_engine_ids)(hipdnnEnginePluginHandle_t, const hipdnnPluginConstData_t*, int64_t*, uint32_t, uint32_t*);
-    hipdnnPluginStatus_t (*_func_get_engine_details)(hipdnnEnginePluginHandle_t, int64_t, const hipdnnPluginConstData_t*, hipdnnPluginConstData_t*);
-    hipdnnPluginStatus_t (*_func_destroy_engine_details)(hipdnnEnginePluginHandle_t, hipdnnPluginConstData_t*);
-    hipdnnPluginStatus_t (*_func_get_workspace_size)(hipdnnEnginePluginHandle_t, const hipdnnPluginConstData_t*, const hipdnnPluginConstData_t*, size_t*);
-    hipdnnPluginStatus_t (*_func_create_execution_context)(hipdnnEnginePluginHandle_t, const hipdnnPluginConstData_t*, const hipdnnPluginConstData_t*, hipdnnEnginePluginExecutionContext_t*);
-    hipdnnPluginStatus_t (*_func_destroy_execution_context)(hipdnnEnginePluginHandle_t, hipdnnEnginePluginExecutionContext_t);
-    hipdnnPluginStatus_t (*_func_execute_op_graph)(hipdnnEnginePluginHandle_t, hipdnnEnginePluginExecutionContext_t, void*, const hipdnnPluginDeviceBuffer_t*, uint32_t);
+    hipdnnPluginStatus_t (*_func_get_applicable_engine_ids)(
+        hipdnnEnginePluginHandle_t, const hipdnnPluginConstData_t*, int64_t*, uint32_t, uint32_t*);
+    hipdnnPluginStatus_t (*_func_get_engine_details)(hipdnnEnginePluginHandle_t,
+                                                     int64_t,
+                                                     const hipdnnPluginConstData_t*,
+                                                     hipdnnPluginConstData_t*);
+    hipdnnPluginStatus_t (*_func_destroy_engine_details)(hipdnnEnginePluginHandle_t,
+                                                         hipdnnPluginConstData_t*);
+    hipdnnPluginStatus_t (*_func_get_workspace_size)(hipdnnEnginePluginHandle_t,
+                                                     const hipdnnPluginConstData_t*,
+                                                     const hipdnnPluginConstData_t*,
+                                                     size_t*);
+    hipdnnPluginStatus_t (*_func_create_execution_context)(hipdnnEnginePluginHandle_t,
+                                                           const hipdnnPluginConstData_t*,
+                                                           const hipdnnPluginConstData_t*,
+                                                           hipdnnEnginePluginExecutionContext_t*);
+    hipdnnPluginStatus_t (*_func_destroy_execution_context)(hipdnnEnginePluginHandle_t,
+                                                            hipdnnEnginePluginExecutionContext_t);
+    hipdnnPluginStatus_t (*_func_execute_op_graph)(hipdnnEnginePluginHandle_t,
+                                                   hipdnnEnginePluginExecutionContext_t,
+                                                   void*,
+                                                   const hipdnnPluginDeviceBuffer_t*,
+                                                   uint32_t);
 
     friend class Plugin_manager_base<Engine_plugin>;
 };
