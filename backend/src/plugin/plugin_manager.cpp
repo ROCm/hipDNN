@@ -3,11 +3,11 @@
 
 #include <hipdnn_sdk/logging/logger.hpp>
 
-#include "plugin_manager.hpp"
 #include "descriptors/engine_config_descriptor.hpp"
 #include "descriptors/engine_descriptor.hpp"
 #include "fake_plugin.hpp"
 #include "hipdnn_exception.hpp"
+#include "plugin_manager.hpp"
 
 namespace hipdnn_backend
 {
@@ -24,9 +24,9 @@ void Plugin_manager::initialize()
         {
             if(_engine_id_plugin_lookup.find(engine_id) != _engine_id_plugin_lookup.end())
             {
-                HIPDNN_LOG_ERROR("Plugin_manager::initialize: Duplicate engine_id found: " + std::to_string(engine_id) +
-                                   ". Skipping this engine.");
-                continue;   
+                HIPDNN_LOG_ERROR("Plugin_manager::initialize: Duplicate engine_id found: "
+                                 + std::to_string(engine_id) + ". Skipping this engine.");
+                continue;
             }
             _engine_id_plugin_lookup.insert({engine_id, plugin});
         }
@@ -38,7 +38,9 @@ std::shared_ptr<Hipdnn_plugin_base> Plugin_manager::get_plugin(int64_t engine_id
     auto plugin_iter = _engine_id_plugin_lookup.find(engine_id);
     if(plugin_iter == _engine_id_plugin_lookup.end())
     {
-        throw Hipdnn_exception(HIPDNN_STATUS_BAD_PARAM_OUT_OF_BOUND, "Plugin_manager::get_plugin failed: invalid engineId " + std::to_string(engine_id));
+        throw Hipdnn_exception(HIPDNN_STATUS_BAD_PARAM_OUT_OF_BOUND,
+                               "Plugin_manager::get_plugin failed: invalid engineId "
+                                   + std::to_string(engine_id));
     }
     return plugin_iter->second;
 }

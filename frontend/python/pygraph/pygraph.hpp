@@ -20,7 +20,7 @@ public:
     using Graph_t = std::shared_ptr<hipdnn_frontend::graph::Graph>;
 
     PyGraph(Graph_t graph)
-        : _graph(graph){};
+        : _graph(graph) {};
 
     PyGraph(std::string const& name,
             hipdnn_frontend::DataType_t io_data_type,
