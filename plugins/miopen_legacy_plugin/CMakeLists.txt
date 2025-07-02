@@ -41,6 +41,12 @@ find_package(miopen CONFIG REQUIRED)
 
 add_library(miopen_legacy_plugin SHARED
     miopen_legacy_plugin.cpp
+    miopen_handle_factory.cpp
+)
+
+target_include_directories(miopen_legacy_plugin 
+    PUBLIC 
+        ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
 target_link_libraries(miopen_legacy_plugin PUBLIC MIOpen hipdnn_sdk)
