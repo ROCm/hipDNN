@@ -47,8 +47,11 @@ void Execution_plan_descriptor::get_attribute(hipdnnBackendAttributeName_t attri
         get_workspace_size(
             attribute_type, requested_element_count, element_count, array_of_elements);
         break;
-    case HIPDNN_ATTR_EXECUTION_PLAN_HANDLE:
     case HIPDNN_ATTR_EXECUTION_PLAN_ENGINE_CONFIG:
+        get_engine_config(
+            attribute_type, requested_element_count, element_count, array_of_elements);
+        break;
+    case HIPDNN_ATTR_EXECUTION_PLAN_HANDLE:
     case HIPDNN_ATTR_EXECUTION_PLAN_COMPUTED_INTERMEDIATE_UIDS:
     case HIPDNN_ATTR_EXECUTION_PLAN_RUN_ONLY_INTERMEDIATE_UIDS:
     case HIPDNN_ATTR_EXECUTION_PLAN_JSON_REPRESENTATION:
@@ -174,6 +177,41 @@ void Execution_plan_descriptor::set_engine_config(hipdnnBackendAttributeType_t a
                    "descriptor is not finalized.");
 
     _engine_config = engine_config;
+}
+
+void Execution_plan_descriptor::get_engine_config(hipdnnBackendAttributeType_t attribute_type,
+                                                  int64_t requested_element_count,
+                                                  int64_t* element_count,
+                                                  void* array_of_elements)
+{
+    THROW_IF_NE(attribute_type,
+                HIPDNN_TYPE_BACKEND_DESCRIPTOR,
+                HIPDNN_STATUS_BAD_PARAM,
+                "Execution_plan_descriptor failed to get engine config: Invalid attribute type.");
+
+    THROW_IF_NE(requested_element_count,
+                1,
+                HIPDNN_STATUS_BAD_PARAM,
+                "Execution_plan_descriptor failed to get engine config: "
+                "Invalid element count.");
+
+    THROW_IF_NULL(array_of_elements,
+                  HIPDNN_STATUS_BAD_PARAM_NULL_POINTER,
+                  "Execution_plan_descriptor failed to get engine config: Null pointer for "
+                  "array_of_elements.");
+
+    if(element_count != nullptr)
+    {
+        *element_count = 1;
+    }
+
+    THROW_IF_NULL(_engine_config,
+                  HIPDNN_STATUS_BAD_PARAM_NULL_POINTER,
+                  "Execution_plan_descriptor failed to get engine config: Engine config is null. "
+                  "Engine config was not set.");
+
+    auto* output = static_cast<hipdnnBackendDescriptor_t*>(array_of_elements);
+    *output = _engine_config;
 }
 
 } // namespace hipdnn_backend

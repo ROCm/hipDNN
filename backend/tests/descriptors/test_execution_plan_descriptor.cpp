@@ -9,6 +9,7 @@
 
 #include <gtest/gtest.h>
 
+#include <array>
 #include <memory>
 
 using namespace hipdnn_backend;
@@ -185,17 +186,65 @@ TEST_F(Execution_plan_descriptor_test, GetExecutionPlanDescriptorWorkspaceSize)
     ASSERT_EQ(workspace_size, 1024);
 }
 
-TEST_F(Execution_plan_descriptor_test, GetExecutionPlanDescriptorUnsupportedAttr)
+TEST_F(Execution_plan_descriptor_test, GetExecutionPlanDescriptorEngineConfig)
 {
-    void* dummy;
+    hipdnnBackendDescriptor_t returned_engine_config = nullptr;
+    hipdnnBackendDescriptor_t null_count_engine_config = nullptr;
+    int64_t count = 0;
 
     make_execution_plan_finalized();
 
+    ASSERT_NO_THROW(_plan->get_attribute(HIPDNN_ATTR_EXECUTION_PLAN_ENGINE_CONFIG,
+                                         HIPDNN_TYPE_BACKEND_DESCRIPTOR,
+                                         1,
+                                         &count,
+                                         &returned_engine_config));
+
+    ASSERT_EQ(count, 1);
+    ASSERT_EQ(returned_engine_config, _mock_engine_config.get());
+
+    ASSERT_NO_THROW(_plan->get_attribute(HIPDNN_ATTR_EXECUTION_PLAN_ENGINE_CONFIG,
+                                         HIPDNN_TYPE_BACKEND_DESCRIPTOR,
+                                         1,
+                                         nullptr,
+                                         &null_count_engine_config));
+
+    ASSERT_EQ(null_count_engine_config, _mock_engine_config.get());
+}
+
+TEST_F(Execution_plan_descriptor_test, GetExecutionPlanDescriptorEngineConfigErrors)
+{
+    hipdnnBackendDescriptor_t returned_engine_config = nullptr;
+    int64_t count = 0;
+    void* dummy = &returned_engine_config;
+
+    make_execution_plan_finalized();
+
+    ASSERT_THROW_HIPDNN_STATUS(
+        _plan->get_attribute(
+            HIPDNN_ATTR_EXECUTION_PLAN_ENGINE_CONFIG, HIPDNN_TYPE_INT64, 1, &count, &dummy),
+        HIPDNN_STATUS_BAD_PARAM);
+
     ASSERT_THROW_HIPDNN_STATUS(_plan->get_attribute(HIPDNN_ATTR_EXECUTION_PLAN_ENGINE_CONFIG,
                                                     HIPDNN_TYPE_BACKEND_DESCRIPTOR,
-                                                    1,
-                                                    nullptr,
+                                                    0, // Too small (needs to be at least 1)
+                                                    &count,
                                                     &dummy),
+                               HIPDNN_STATUS_BAD_PARAM);
+}
+
+TEST_F(Execution_plan_descriptor_test, GetExecutionPlanDescriptorUnsupportedAttr)
+{
+    int64_t count = 0;
+    std::array<char, 256> dummy_buffer{};
+
+    make_execution_plan_finalized();
+
+    ASSERT_THROW_HIPDNN_STATUS(_plan->get_attribute(HIPDNN_ATTR_EXECUTION_PLAN_KERNEL_CACHE,
+                                                    HIPDNN_TYPE_INT64,
+                                                    1,
+                                                    &count,
+                                                    dummy_buffer.data()),
                                HIPDNN_STATUS_NOT_SUPPORTED);
 }
 // NOLINTEND(readability-function-cognitive-complexity)
