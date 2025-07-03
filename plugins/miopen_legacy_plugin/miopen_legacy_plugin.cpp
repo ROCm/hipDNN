@@ -7,17 +7,26 @@
 #include <hipdnn_sdk/logging/logger.hpp>
 #include <hipdnn_sdk/plugin/engine_plugin_api.h>
 #include <hipdnn_sdk/plugin/plugin_api.h>
+#include <hipdnn_sdk/plugin/plugin_data_type_helpers.hpp>
 #include <hipdnn_sdk/plugin/plugin_helpers.hpp>
 #include <hipdnn_sdk/plugin/plugin_last_error_manager.hpp>
 
+#include "hipdnn_engine_plugin_handle.hpp"
 #include "miopen_handle_factory.hpp"
 
 static const char* _plugin_name = "miopen_legacy_plugin";
 static const char* _plugin_version = "1.0.0";
 
+using namespace hipdnn_plugin;
+
 // NOLINTNEXTLINE(modernize-avoid-c-arrays)
-thread_local char hipdnn_plugin::Plugin_last_error_manager::last_error[HIPDNN_MAX_ERROR_STRING_SIZE]
-    = "";
+thread_local char Plugin_last_error_manager::last_error[HIPDNN_MAX_ERROR_STRING_SIZE] = "";
+
+#define LOG_API_ENTRY(format, ...) \
+    HIPDNN_LOG_INFO("API called: [{}] " format, __func__ __VA_OPT__(, ) __VA_ARGS__)
+
+#define LOG_API_SUCCESS(func_name, format, ...) \
+    HIPDNN_LOG_INFO("API success: [{}] " format, func_name __VA_OPT__(, ) __VA_ARGS__)
 
 template <typename T>
 void throw_if_null(T* value)
@@ -33,34 +42,54 @@ extern "C" {
 
 hipdnnPluginStatus_t hipdnnPluginGetName(const char** name)
 {
-    if(!name)
-        return HIPDNN_PLUGIN_STATUS_BAD_PARAM;
-    *name = _plugin_name;
+    LOG_API_ENTRY("name_ptr={:p}", static_cast<void*>(name));
 
-    return HIPDNN_PLUGIN_STATUS_SUCCESS;
+    return hipdnn_plugin::try_catch([&, api_name = __func__]() {
+        throw_if_null(name);
+
+        *name = _plugin_name;
+
+        LOG_API_SUCCESS(api_name, "get_plugin_name={:p}", static_cast<void*>(name));
+    });
 }
 
 hipdnnPluginStatus_t hipdnnPluginGetVersion(const char** version)
 {
-    if(!version)
-        return HIPDNN_PLUGIN_STATUS_BAD_PARAM;
-    *version = _plugin_version;
-    return HIPDNN_PLUGIN_STATUS_SUCCESS;
+    LOG_API_ENTRY("version_ptr={:p}", static_cast<void*>(version));
+
+    return hipdnn_plugin::try_catch([&, api_name = __func__]() {
+        throw_if_null(version);
+
+        *version = _plugin_version;
+
+        LOG_API_SUCCESS(api_name, "get_version={:p}", static_cast<void*>(version));
+    });
 }
 
 hipdnnPluginStatus_t hipdnnPluginGetType(hipdnnPluginType_t* type)
 {
-    if(!type)
-        return HIPDNN_PLUGIN_STATUS_BAD_PARAM;
-    *type = HIPDNN_PLUGIN_TYPE_ENGINE;
-    return HIPDNN_PLUGIN_STATUS_SUCCESS;
+    LOG_API_ENTRY("type_ptr={:p}", static_cast<void*>(type));
+
+    return hipdnn_plugin::try_catch([&, api_name = __func__]() {
+        throw_if_null(type);
+
+        *type = HIPDNN_PLUGIN_TYPE_ENGINE;
+
+        LOG_API_SUCCESS(api_name, "type={}", *type);
+    });
 }
 
 void hipdnnPluginGetLastErrorString(const char** error_str)
 {
-    if(!error_str)
-        return;
-    *error_str = "No error";
+    LOG_API_ENTRY("error_str_ptr={:p}", static_cast<void*>(error_str));
+
+    hipdnn_plugin::try_catch([&, api_name = __func__]() {
+        throw_if_null(error_str);
+
+        *error_str = Plugin_last_error_manager::get_last_error();
+
+        LOG_API_SUCCESS(api_name, "set_error_string={:p}", static_cast<void*>(error_str));
+    });
 }
 
 // Implementation of Engine Plugin API
@@ -91,30 +120,45 @@ hipdnnPluginStatus_t hipdnnPluginRunEngine(unsigned engine_index,
 
 hipdnnPluginStatus_t hipdnnEnginePluginCreate(hipdnnEnginePluginHandle_t* handle)
 {
+    LOG_API_ENTRY("handle_ptr={:p}", static_cast<void*>(handle));
+
     return hipdnn_plugin::try_catch([&, api_name = __func__]() {
         throw_if_null(handle);
 
         miopen_legacy_plugin::Miopen_handle_factory::create_miopen_handle(handle);
 
-        //LOG_API_SUCCESS(api_name, "created_handle={:p}", static_cast<void*>(*handle));
+        LOG_API_SUCCESS(api_name, "created_handle={:p}", static_cast<void*>(*handle));
     });
 }
 
 hipdnnPluginStatus_t hipdnnEnginePluginDestroy(hipdnnEnginePluginHandle_t handle)
 {
-    if(!handle)
-        return HIPDNN_PLUGIN_STATUS_BAD_PARAM;
+    LOG_API_ENTRY("handle={:p}", static_cast<void*>(handle));
 
-    return HIPDNN_PLUGIN_INTERNAL_ERROR;
+    return hipdnn_plugin::try_catch([&, api_name = __func__]() {
+        throw_if_null(handle);
+
+        miopen_legacy_plugin::Miopen_handle_factory::destroy_miopen_handle(handle);
+        delete handle;
+        handle = nullptr;
+
+        LOG_API_SUCCESS(api_name, "");
+    });
 }
 
 hipdnnPluginStatus_t hipdnnEnginePluginSetStream(hipdnnEnginePluginHandle_t handle,
                                                  hipStream_t stream)
 {
-    if(!handle)
-        return HIPDNN_PLUGIN_STATUS_BAD_PARAM;
+    LOG_API_ENTRY(
+        "handle={:p}, stream_id={:p}", static_cast<void*>(handle), static_cast<void*>(stream));
 
-    return HIPDNN_PLUGIN_INTERNAL_ERROR;
+    return hipdnn_plugin::try_catch([&, api_name = __func__]() {
+        throw_if_null(handle);
+
+        handle->stream = stream;
+
+        LOG_API_SUCCESS(api_name, "");
+    });
 }
 
 hipdnnPluginStatus_t

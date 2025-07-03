@@ -3,9 +3,10 @@
 
 #pragma once
 
-#include "hipdnn_sdk/logging/logger.hpp"
-#include "hipdnn_sdk/plugin/plugin_api_data_types.h"
-#include "hipdnn_sdk/utilities/string_util.hpp"
+#include <hipdnn_sdk/logging/logger.hpp>
+#include <hipdnn_sdk/plugin/plugin_api_data_types.h>
+#include <hipdnn_sdk/plugin/plugin_data_type_helpers.hpp>
+#include <hipdnn_sdk/utilities/string_util.hpp>
 
 #include <string>
 
@@ -13,23 +14,6 @@ namespace hipdnn_plugin
 {
 // TODO replace with using the define from a common SDK header.
 static const size_t HIPDNN_MAX_ERROR_STRING_SIZE = 256;
-
-inline const char* hipdnn_plugin_get_status_string(hipdnnPluginStatus_t status)
-{
-    switch(status)
-    {
-    case HIPDNN_PLUGIN_STATUS_SUCCESS:
-        return "HIPDNN_PLUGIN_STATUS_SUCCESS";
-    case HIPDNN_PLUGIN_STATUS_BAD_PARAM:
-        return "HIPDNN_PLUGIN_STATUS_BAD_PARAM";
-    case HIPDNN_PLUGIN_INVALID_VALUE:
-        return "HIPDNN_PLUGIN_INVALID_VALUE";
-    case HIPDNN_PLUGIN_INTERNAL_ERROR:
-        return "HIPDNN_PLUGIN_INTERNAL_ERROR";
-    default:
-        return "HIPDNN_PLUGIN_STATUS_UNKNOWN";
-    }
-}
 
 // TODO
 // Discuss moving this class elsewhere as the thread local storage must be instantiated in a
@@ -53,9 +37,7 @@ public:
             return status;
         }
 
-        HIPDNN_LOG_ERROR("Error occured in status:{} message:{}",
-                         hipdnn_plugin_get_status_string(status),
-                         message);
+        HIPDNN_LOG_ERROR("Error occured in status:{} message:{}", status, message);
 
         hipdnn::sdk::utilities::copy_max_size_with_null_terminator(
             last_error, message, HIPDNN_MAX_ERROR_STRING_SIZE);

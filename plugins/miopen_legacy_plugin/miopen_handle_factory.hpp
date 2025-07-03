@@ -12,6 +12,8 @@ class Miopen_handle_factory
 {
 public:
     static void create_miopen_handle(hipdnnEnginePluginHandle_t* handle);
+
+    static void destroy_miopen_handle(hipdnnEnginePluginHandle_t handle);
 };
 
 }

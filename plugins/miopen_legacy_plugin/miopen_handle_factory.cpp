@@ -32,4 +32,20 @@ void Miopen_handle_factory::create_miopen_handle(hipdnnEnginePluginHandle_t* han
     }
 }
 
+void Miopen_handle_factory::destroy_miopen_handle(hipdnnEnginePluginHandle_t handle)
+{
+    if(handle == nullptr)
+    {
+        throw Hipdnn_plugin_exception(HIPDNN_PLUGIN_STATUS_BAD_PARAM, "handle is null");
+    }
+
+    miopenStatus_t status = miopenDestroy(handle->miopen_handle);
+
+    if(status != miopenStatusSuccess)
+    {
+        throw Hipdnn_plugin_exception(HIPDNN_PLUGIN_INTERNAL_ERROR,
+                                      "Failed to destroy MIOpen handle");
+    }
+}
+
 } // namespace miopen_legacy_plugin

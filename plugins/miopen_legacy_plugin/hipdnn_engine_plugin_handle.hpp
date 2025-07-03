@@ -11,4 +11,5 @@ public:
     virtual ~hipdnnEnginePluginHandle() = default;
 
     miopenHandle_t miopen_handle = nullptr;
+    hipStream_t stream = nullptr;
 };

@@ -2,6 +2,7 @@
 // SPDX-License-Identifier:  MIT
 
 #include <gtest/gtest.h>
+#include <hipdnn_sdk/plugin/plugin_data_type_helpers.hpp>
 #include <hipdnn_sdk/plugin/plugin_last_error_manager.hpp>
 
 using namespace hipdnn_plugin;
@@ -29,18 +30,4 @@ TEST(PluginLastErrorManagerTest, SetLastErrorSuccessDoesNotChangeError)
     Plugin_last_error_manager::set_last_error(HIPDNN_PLUGIN_INTERNAL_ERROR, prev_msg);
     Plugin_last_error_manager::set_last_error(HIPDNN_PLUGIN_STATUS_SUCCESS, "should not overwrite");
     EXPECT_STREQ(Plugin_last_error_manager::get_last_error(), prev_msg);
-}
-
-TEST(PluginLastErrorManagerTest, StatusStringMapping)
-{
-    EXPECT_STREQ(hipdnn_plugin_get_status_string(HIPDNN_PLUGIN_STATUS_SUCCESS),
-                 "HIPDNN_PLUGIN_STATUS_SUCCESS");
-    EXPECT_STREQ(hipdnn_plugin_get_status_string(HIPDNN_PLUGIN_STATUS_BAD_PARAM),
-                 "HIPDNN_PLUGIN_STATUS_BAD_PARAM");
-    EXPECT_STREQ(hipdnn_plugin_get_status_string(HIPDNN_PLUGIN_INVALID_VALUE),
-                 "HIPDNN_PLUGIN_INVALID_VALUE");
-    EXPECT_STREQ(hipdnn_plugin_get_status_string(HIPDNN_PLUGIN_INTERNAL_ERROR),
-                 "HIPDNN_PLUGIN_INTERNAL_ERROR");
-    EXPECT_STREQ(hipdnn_plugin_get_status_string(static_cast<hipdnnPluginStatus_t>(999)),
-                 "HIPDNN_PLUGIN_STATUS_UNKNOWN");
 }
