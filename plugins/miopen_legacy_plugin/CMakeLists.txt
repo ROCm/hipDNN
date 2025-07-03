@@ -40,8 +40,10 @@ endif()
 find_package(miopen CONFIG REQUIRED)
 
 add_library(miopen_legacy_plugin SHARED
+    engines/miopen_fake_engine.cpp
     miopen_legacy_plugin.cpp
     miopen_handle_factory.cpp
+    miopen_engine_manager.cpp
 )
 
 target_include_directories(miopen_legacy_plugin 

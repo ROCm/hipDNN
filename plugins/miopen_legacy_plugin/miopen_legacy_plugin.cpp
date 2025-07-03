@@ -12,6 +12,7 @@
 #include <hipdnn_sdk/plugin/plugin_last_error_manager.hpp>
 
 #include "hipdnn_engine_plugin_handle.hpp"
+#include "miopen_engine_manager.hpp"
 #include "miopen_handle_factory.hpp"
 
 static const char* _plugin_name = "miopen_legacy_plugin";
@@ -36,6 +37,22 @@ void throw_if_null(T* value)
         throw hipdnn_plugin::Hipdnn_plugin_exception(HIPDNN_PLUGIN_STATUS_BAD_PARAM,
                                                      std::string(typeid(T).name()) + " is nullptr");
     }
+}
+
+//todo, determine what the requirements are for this manager, do we want to have multiple copies?
+// should we create a engine manager for each plugin handle created and store it on the handle?
+Miopen_engine_manager& get_miopen_engine_manager()
+{
+    static Miopen_engine_manager manager;
+    // Optionally, call initialize_engines() here if needed only once
+    // static bool initialized = (manager.initialize_engines(), true);
+    static bool _initialized = ([] {
+        manager.initialize_engines();
+        return true;
+    })();
+    (void)_initialized;
+
+    return manager;
 }
 
 extern "C" {
@@ -168,10 +185,42 @@ hipdnnPluginStatus_t
                                              uint32_t max_engines,
                                              uint32_t* num_engines)
 {
-    if(!handle || !op_graph || !engine_ids || !num_engines)
-        return HIPDNN_PLUGIN_STATUS_BAD_PARAM;
+    LOG_API_ENTRY("handle={:p}, op_graph={:p}, engine_ids={:p}, max_engines={}, num_engines={:p}",
+                  static_cast<void*>(handle),
+                  static_cast<const void*>(op_graph),
+                  static_cast<void*>(engine_ids),
+                  max_engines,
+                  static_cast<void*>(num_engines));
 
-    return HIPDNN_PLUGIN_INTERNAL_ERROR;
+    return hipdnn_plugin::try_catch([&, api_name = __func__]() {
+        throw_if_null(handle);
+        throw_if_null(op_graph);
+        throw_if_null(engine_ids);
+        throw_if_null(num_engines);
+
+        auto& engine_manager = get_miopen_engine_manager();
+
+        auto applicable_engines = engine_manager.get_applicable_engine_ids(op_graph);
+
+        *num_engines = 0;
+        for(auto& engine_id : applicable_engines)
+        {
+            if(*num_engines == max_engines)
+            {
+                *num_engines = applicable_engines.size();
+                HIPDNN_LOG_WARN("Maximum number of engines reached ({}), ignoring additional "
+                                "engines, num_engines count: {}",
+                                max_engines,
+                                *num_engines);
+                break;
+            }
+
+            engine_ids[*num_engines] = engine_id;
+            (*num_engines)++;
+        }
+
+        LOG_API_SUCCESS(api_name, "num_engines={}", *num_engines);
+    });
 }
 
 hipdnnPluginStatus_t hipdnnEnginePluginGetEngineDetails(hipdnnEnginePluginHandle_t handle,
