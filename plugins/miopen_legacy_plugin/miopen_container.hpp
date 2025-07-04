@@ -10,8 +10,6 @@ namespace miopen_legacy_plugin
 {
 
 class Engine_manager;
-class Engine;
-class Solver;
 
 /*
  * Container class to manage the intantiation and ownership of all MIOpen solvers and engines.
@@ -31,12 +29,6 @@ public:
     Engine_manager& get_engine_manager();
 
 private:
-    void create_solvers();
-    void create_engines();
-
-    std::set<std::unique_ptr<Solver>> _miopen_solvers;
-    std::set<std::unique_ptr<Engine>> _engines;
-
     std::unique_ptr<Engine_manager> _engine_manager;
 };
 

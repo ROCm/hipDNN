@@ -24,10 +24,9 @@ TEST(Engine_managerTest, ReturnsApplicableEngineIds)
     EXPECT_CALL(*mock_engine2, id()).WillRepeatedly(Return(2));
     EXPECT_CALL(*mock_engine2, is_applicable(::testing::_)).WillRepeatedly(Return(false));
 
-    engines.insert(std::move(mock_engine1));
-    engines.insert(std::move(mock_engine2));
-
-    Engine_manager manager(engines);
+    Engine_manager manager;
+    manager.add_engine(std::move(mock_engine1));
+    manager.add_engine(std::move(mock_engine2));
 
     hipdnnPluginConstData_t* dummy_op_graph = nullptr;
     auto applicable = manager.get_applicable_engine_ids(dummy_op_graph);
@@ -49,10 +48,9 @@ TEST(Engine_managerTest, ReturnsMultipleApplicableEngineIds)
     EXPECT_CALL(*mock_engine2, id()).WillRepeatedly(Return(2));
     EXPECT_CALL(*mock_engine2, is_applicable(::testing::_)).WillRepeatedly(Return(true));
 
-    engines.insert(std::move(mock_engine1));
-    engines.insert(std::move(mock_engine2));
-
-    Engine_manager manager(engines);
+    Engine_manager manager;
+    manager.add_engine(std::move(mock_engine1));
+    manager.add_engine(std::move(mock_engine2));
 
     hipdnnPluginConstData_t* dummy_op_graph = nullptr;
     auto applicable = manager.get_applicable_engine_ids(dummy_op_graph);
@@ -74,10 +72,9 @@ TEST(Engine_managerTest, ReturnsNoApplicableEngineIds)
     EXPECT_CALL(*mock_engine2, id()).WillRepeatedly(Return(2));
     EXPECT_CALL(*mock_engine2, is_applicable(::testing::_)).WillRepeatedly(Return(false));
 
-    engines.insert(std::move(mock_engine1));
-    engines.insert(std::move(mock_engine2));
-
-    Engine_manager manager(engines);
+    Engine_manager manager;
+    manager.add_engine(std::move(mock_engine1));
+    manager.add_engine(std::move(mock_engine2));
 
     hipdnnPluginConstData_t* dummy_op_graph = nullptr;
     auto applicable = manager.get_applicable_engine_ids(dummy_op_graph);

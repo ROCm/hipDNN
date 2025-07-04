@@ -9,9 +9,8 @@
 namespace miopen_legacy_plugin
 {
 
-Miopen_engine::Miopen_engine(int64_t id, std::set<std::unique_ptr<Solver>>& solvers)
+Miopen_engine::Miopen_engine(int64_t id)
     : _id(id)
-    , _solvers(solvers)
 {
 }
 
@@ -40,6 +39,11 @@ bool Miopen_engine::is_applicable(const hipdnnPluginConstData_t* op_graph) const
 size_t Miopen_engine::get_workspace_size() const
 {
     return 1337;
+}
+
+void Miopen_engine::add_solver(std::unique_ptr<Solver> solver)
+{
+    _solvers.insert(std::move(solver));
 }
 
 }

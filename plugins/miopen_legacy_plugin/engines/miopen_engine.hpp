@@ -16,16 +16,18 @@ namespace miopen_legacy_plugin
 class Miopen_engine : public Engine
 {
 public:
-    Miopen_engine(int64_t id, std::set<std::unique_ptr<Solver>>& solvers);
+    Miopen_engine(int64_t id);
 
     int64_t id() const override;
 
     bool is_applicable(const hipdnnPluginConstData_t* op_graph) const override;
     size_t get_workspace_size() const override;
 
+    void add_solver(std::unique_ptr<Solver> solver);
+
 private:
     int64_t _id;
-    std::set<std::unique_ptr<Solver>>& _solvers;
+    std::set<std::unique_ptr<Solver>> _solvers;
 };
 
 }

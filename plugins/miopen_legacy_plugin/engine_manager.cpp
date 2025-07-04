@@ -8,9 +8,11 @@
 namespace miopen_legacy_plugin
 {
 
-Engine_manager::Engine_manager(std::set<std::unique_ptr<Engine>>& engines)
-    : _engines(engines)
+Engine_manager::Engine_manager() {}
+
+void Engine_manager::add_engine(std::unique_ptr<Engine> engine)
 {
+    _engines.insert(std::move(engine));
 }
 
 std::set<int64_t> Engine_manager::get_applicable_engine_ids(const hipdnnPluginConstData_t* op_graph)
