@@ -16,24 +16,20 @@ TEST(Miopen_engineTest, ConstructorAndId)
 {
     std::set<std::unique_ptr<Solver>> solvers;
     Miopen_engine engine(42, solvers);
-    EXPECT_EQ(engine.id(),
-              42); // /data/hipDNN/plugins/miopen_legacy_plugin/engines/miopen_engine.cpp:13
+    EXPECT_EQ(engine.id(), 42);
 }
 
 TEST(Miopen_engineTest, WorkspaceSize)
 {
     std::set<std::unique_ptr<Solver>> solvers;
     Miopen_engine engine(1, solvers);
-    EXPECT_EQ(engine.get_workspace_size(),
-              1337); // /data/hipDNN/plugins/miopen_legacy_plugin/engines/miopen_engine.cpp:27
+    EXPECT_EQ(engine.get_workspace_size(), 1337);
 }
 
 TEST(Miopen_engineTest, IsApplicableReturnsTrueIfAnySolverApplicable)
 {
-    // Arrange
     auto mock_solver = std::make_unique<Mock_solver>();
-    EXPECT_CALL(*mock_solver, is_applicable(::testing::_))
-        .WillOnce(::testing::Return(true)); // Simulate applicable solver
+    EXPECT_CALL(*mock_solver, is_applicable(::testing::_)).WillOnce(::testing::Return(true));
 
     std::set<std::unique_ptr<Solver>> solvers;
     solvers.insert(std::move(mock_solver));
@@ -44,9 +40,7 @@ TEST(Miopen_engineTest, IsApplicableReturnsTrueIfAnySolverApplicable)
     hipdnnPluginConstData_t op_graph
         = flatbuffer_test_utils::create_valid_const_data_graph(serialized_graph);
 
-    // Act & Assert
-    EXPECT_TRUE(engine.is_applicable(
-        &op_graph)); // /data/hipDNN/plugins/miopen_legacy_plugin/engines/miopen_engine.cpp:19
+    EXPECT_TRUE(engine.is_applicable(&op_graph));
 }
 
 TEST(Miopen_engineTest, IsApplicableReturnsFalseIfNoSolvers)
@@ -59,15 +53,13 @@ TEST(Miopen_engineTest, IsApplicableReturnsFalseIfNoSolvers)
     hipdnnPluginConstData_t op_graph
         = flatbuffer_test_utils::create_valid_const_data_graph(serialized_graph);
 
-    EXPECT_FALSE(engine.is_applicable(
-        &op_graph)); // /data/hipDNN/plugins/miopen_legacy_plugin/engines/miopen_engine.cpp:19
+    EXPECT_FALSE(engine.is_applicable(&op_graph));
 }
 
 TEST(Miopen_engineTest, IsApplicableReturnsFalseIfNoSolverApplicable)
 {
     auto mock_solver = std::make_unique<Mock_solver>();
-    EXPECT_CALL(*mock_solver, is_applicable(::testing::_))
-        .WillOnce(::testing::Return(false)); // Simulate not applicable
+    EXPECT_CALL(*mock_solver, is_applicable(::testing::_)).WillOnce(::testing::Return(false));
 
     std::set<std::unique_ptr<Solver>> solvers;
     solvers.insert(std::move(mock_solver));
@@ -78,10 +70,5 @@ TEST(Miopen_engineTest, IsApplicableReturnsFalseIfNoSolverApplicable)
     hipdnnPluginConstData_t op_graph
         = flatbuffer_test_utils::create_valid_const_data_graph(serialized_graph);
 
-    EXPECT_FALSE(engine.is_applicable(
-        &op_graph)); // /data/hipDNN/plugins/miopen_legacy_plugin/engines/miopen_engine.cpp:19
+    EXPECT_FALSE(engine.is_applicable(&op_graph));
 }
-
-// Sources:
-// - /data/hipDNN/plugins/miopen_legacy_plugin/engines/miopen_engine.cpp
-// - /data/hipDNN/plugins/miopen_legacy_plugin/tests/test_miopen_engine.cpp

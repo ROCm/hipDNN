@@ -77,11 +77,10 @@ TEST(MiopenLegacyEnginePluginApiTest, EnginePluginSetStreamValidStream)
     hipdnnEnginePluginHandle_t handle = nullptr;
     EXPECT_EQ(hipdnnEnginePluginCreate(&handle), HIPDNN_PLUGIN_STATUS_SUCCESS);
 
-    auto stream = reinterpret_cast<hipStream_t>(0x1234); // Simulated valid stream
+    auto stream = reinterpret_cast<hipStream_t>(0x1234);
     EXPECT_EQ(hipdnnEnginePluginSetStream(handle, stream), HIPDNN_PLUGIN_STATUS_SUCCESS);
     EXPECT_EQ(handle->stream, stream);
 
-    // Clean up
     EXPECT_EQ(hipdnnEnginePluginDestroy(handle), HIPDNN_PLUGIN_STATUS_SUCCESS);
 }
 
@@ -92,25 +91,20 @@ TEST(MiopenLegacyEnginePluginApiTest, EnginePluginGetApplicableEngineIdsNull)
     std::array<int64_t, 1> engine_ids = {0};
     uint32_t num_engines = 0;
 
-    //all null
     EXPECT_EQ(hipdnnEnginePluginGetApplicableEngineIds(nullptr, nullptr, nullptr, 0, nullptr),
               HIPDNN_PLUGIN_STATUS_BAD_PARAM);
 
-    //null handle
     EXPECT_EQ(hipdnnEnginePluginGetApplicableEngineIds(
                   nullptr, op_graph, engine_ids.data(), 1, &num_engines),
               HIPDNN_PLUGIN_STATUS_BAD_PARAM);
 
-    //null op_graph
     EXPECT_EQ(hipdnnEnginePluginGetApplicableEngineIds(
                   handle, nullptr, engine_ids.data(), 1, &num_engines),
               HIPDNN_PLUGIN_STATUS_BAD_PARAM);
 
-    //null engine_ids
     EXPECT_EQ(hipdnnEnginePluginGetApplicableEngineIds(handle, op_graph, nullptr, 1, &num_engines),
               HIPDNN_PLUGIN_STATUS_BAD_PARAM);
 
-    //null num_engines
     EXPECT_EQ(
         hipdnnEnginePluginGetApplicableEngineIds(handle, op_graph, engine_ids.data(), 1, nullptr),
         HIPDNN_PLUGIN_STATUS_BAD_PARAM);
@@ -136,8 +130,7 @@ TEST(MiopenLegacyEnginePluginApiTest, EnginePluginGetApplicableEngineIdsValid)
     EXPECT_EQ(num_engines, 1u);
     EXPECT_EQ(engine_ids[0], 1u);
 
-    // get max 0 engines wont update engine_ids but will update num_engines
-    engine_ids[0] = 1337; // Reset engine_ids for the next call
+    engine_ids[0] = 1337;
     status = hipdnnEnginePluginGetApplicableEngineIds(
         handle, &op_graph, engine_ids.data(), 0, &num_engines);
 

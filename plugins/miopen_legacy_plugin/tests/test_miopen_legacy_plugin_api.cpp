@@ -46,12 +46,10 @@ TEST(MiopenLegacyPluginApiTest, GetLastErrorStringSuccess)
     const char* error_str = nullptr;
     hipdnnPluginGetLastErrorString(&error_str);
     ASSERT_NE(error_str, nullptr);
-    // The error string may be empty or contain a previous error, but should be a valid C string.
     EXPECT_GE(strlen(error_str), 0u);
 }
 
 TEST(MiopenLegacyPluginApiTest, GetLastErrorStringNullptr)
 {
-    // Should not throw or crash when passed nullptr
     EXPECT_NO_THROW(hipdnnPluginGetLastErrorString(nullptr));
 }
