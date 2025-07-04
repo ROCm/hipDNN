@@ -11,14 +11,16 @@
 #include <hipdnn_sdk/plugin/plugin_helpers.hpp>
 #include <hipdnn_sdk/plugin/plugin_last_error_manager.hpp>
 
+#include "engine_manager.hpp"
 #include "hipdnn_engine_plugin_handle.hpp"
-#include "miopen_engine_manager.hpp"
+#include "miopen_container.hpp"
 #include "miopen_handle_factory.hpp"
 
 static const char* _plugin_name = "miopen_legacy_plugin";
 static const char* _plugin_version = "1.0.0";
 
 using namespace hipdnn_plugin;
+using namespace miopen_legacy_plugin;
 
 // NOLINTNEXTLINE(modernize-avoid-c-arrays)
 thread_local char Plugin_last_error_manager::last_error[HIPDNN_MAX_ERROR_STRING_SIZE] = "";
@@ -39,20 +41,16 @@ void throw_if_null(T* value)
     }
 }
 
+//todo manage lifetime of miopen_container better.
+//std::weak_ptr<Miopen_container> miopen_container;
+
 //todo, determine what the requirements are for this manager, do we want to have multiple copies?
 // should we create a engine manager for each plugin handle created and store it on the handle?
-Miopen_engine_manager& get_miopen_engine_manager()
+Engine_manager& get_miopen_engine_manager()
 {
-    static Miopen_engine_manager manager;
-    // Optionally, call initialize_engines() here if needed only once
-    // static bool initialized = (manager.initialize_engines(), true);
-    static bool _initialized = ([] {
-        manager.initialize_engines();
-        return true;
-    })();
-    (void)_initialized;
+    static Miopen_container miopen_container;
 
-    return manager;
+    return miopen_container.get_engine_manager();
 }
 
 extern "C" {

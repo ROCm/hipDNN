@@ -3,18 +3,29 @@
 
 #pragma once
 
-#include <stdint.h>
+#include <memory>
+#include <set>
 
+#include "engine.hpp"
+#include "solvers/solver.hpp"
 #include <hipdnn_sdk/plugin/plugin_api_data_types.h>
 
-class Miopen_engine
+namespace miopen_legacy_plugin
+{
+
+class Miopen_engine : public Engine
 {
 public:
-    virtual ~Miopen_engine() = default;
+    Miopen_engine(int64_t id, std::set<std::unique_ptr<Solver>>& solvers);
 
-    virtual int64_t id() const = 0;
+    int64_t id() const override;
 
-    virtual bool is_applicable(const hipdnnPluginConstData_t* op_graph) const = 0;
+    bool is_applicable(const hipdnnPluginConstData_t* op_graph) const override;
+    size_t get_workspace_size() const override;
 
-    virtual size_t get_workspace_size() const = 0;
+private:
+    int64_t _id;
+    std::set<std::unique_ptr<Solver>>& _solvers;
 };
+
+}

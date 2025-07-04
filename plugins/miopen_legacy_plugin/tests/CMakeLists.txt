@@ -38,10 +38,13 @@ add_executable(miopen_legacy_plugin_tests
     test_miopen_legacy_engine_plugin_api.cpp
     test_miopen_legacy_plugin_api.cpp
     test_miopen_handle_factory.cpp
+    test_engine_manager.cpp
+    test_miopen_engine.cpp
 )
 
 target_link_libraries(miopen_legacy_plugin_tests PUBLIC 
     GTest::gtest
+    GTest::gmock
     miopen_legacy_plugin
     pthread
 )
