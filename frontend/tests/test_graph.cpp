@@ -847,12 +847,12 @@ TEST(GraphTests, TensorGraphAttributes)
 TEST(GraphTests, TensorLikeGraphAttributes)
 {
     auto tensor = Graph::tensor(Tensor_attributes()
-                                         .set_name("TestTensor")
-                                         .set_uid(100)
-                                         .set_dim({1, 2, 3, 4})
-                                         .set_stride({5, 6, 7, 8})
-                                         .set_is_virtual(false)
-                                         .set_data_type(DataType_t::FLOAT));
+                                    .set_name("TestTensor")
+                                    .set_uid(100)
+                                    .set_dim({1, 2, 3, 4})
+                                    .set_stride({5, 6, 7, 8})
+                                    .set_is_virtual(false)
+                                    .set_data_type(DataType_t::FLOAT));
 
     auto tensor_like = Graph::tensor_like(tensor, "TensorLike");
 
@@ -865,6 +865,5 @@ TEST(GraphTests, TensorLikeGraphAttributes)
 
     auto tensor_like_noname = Graph::tensor_like(tensor_like);
     EXPECT_EQ(tensor_like_noname->get_name(), "");
-
 }
 // NOLINTEND

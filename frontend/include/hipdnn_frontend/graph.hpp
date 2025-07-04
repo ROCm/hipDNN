@@ -294,8 +294,8 @@ public:
         return out_0;
     }
 
-    static std::shared_ptr<Tensor_attributes> tensor_like(const std::shared_ptr<Tensor_attributes>& tensor,
-                                                          const std::string& name = "")
+    static std::shared_ptr<Tensor_attributes>
+        tensor_like(const std::shared_ptr<Tensor_attributes>& tensor, const std::string& name = "")
     {
         auto new_tensor = std::make_shared<Tensor_attributes>(*tensor);
 
@@ -310,7 +310,7 @@ public:
         auto new_tensor = std::make_shared<Tensor_attributes>(tensor);
 
         return new_tensor;
-    }    
+    }
 };
 }
 }
