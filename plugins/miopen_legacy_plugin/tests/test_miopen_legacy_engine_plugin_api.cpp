@@ -5,6 +5,7 @@
 #include <gtest/gtest.h>
 #include <hipdnn_sdk/plugin/engine_plugin_api.h>
 #include <hipdnn_sdk/plugin/plugin_api_data_types.h>
+#include <hipdnn_sdk/test_utilities/flatbuffer_graph_test_utils.hpp>
 
 TEST(MiopenLegacyEnginePluginApiTest, EnginePluginCreateNullHandle)
 {
@@ -103,13 +104,16 @@ TEST(MiopenLegacyEnginePluginApiTest, EnginePluginGetApplicableEngineIdsValid)
     hipdnnEnginePluginHandle_t handle = nullptr;
     ASSERT_EQ(hipdnnEnginePluginCreate(&handle), HIPDNN_PLUGIN_STATUS_SUCCESS);
 
-    auto op_graph = reinterpret_cast<hipdnnPluginConstData_t*>(0x5678);
+    auto builder = flatbuffer_test_utils::create_valid_graph();
+    auto serialized_graph = builder.Release();
+    hipdnnPluginConstData_t op_graph
+        = flatbuffer_test_utils::create_valid_const_data_graph(serialized_graph);
     std::array<int64_t, 1> engine_ids = {0};
     uint32_t num_engines = 0;
 
     //get max 1 engine
     auto status = hipdnnEnginePluginGetApplicableEngineIds(
-        handle, op_graph, engine_ids.data(), 1, &num_engines);
+        handle, &op_graph, engine_ids.data(), 1, &num_engines);
 
     EXPECT_EQ(status, HIPDNN_PLUGIN_STATUS_SUCCESS);
     EXPECT_EQ(num_engines, 1u);
@@ -118,7 +122,7 @@ TEST(MiopenLegacyEnginePluginApiTest, EnginePluginGetApplicableEngineIdsValid)
     // get max 0 engines wont update engine_ids but will update num_engines
     engine_ids[0] = 1337; // Reset engine_ids for the next call
     status = hipdnnEnginePluginGetApplicableEngineIds(
-        handle, op_graph, engine_ids.data(), 0, &num_engines);
+        handle, &op_graph, engine_ids.data(), 0, &num_engines);
 
     EXPECT_EQ(status, HIPDNN_PLUGIN_STATUS_SUCCESS);
     EXPECT_EQ(num_engines, 1u);

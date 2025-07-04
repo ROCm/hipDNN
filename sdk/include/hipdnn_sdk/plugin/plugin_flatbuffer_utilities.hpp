@@ -18,11 +18,9 @@ namespace flatbuffer_utilities
 // Converts a serialized flatbuffer buffer into a hipdnn_plugin::PluginGraphT object.
 // Throws on verification or unpacking failure.
 inline void convert_serialized_plugin_graph_to_graph(
-    const uint8_t* buffer,
-    size_t size,
-    std::unique_ptr<hipdnn_sdk::data_objects::GraphT>& graph_out)
+    const void* buffer, size_t size, std::unique_ptr<hipdnn_sdk::data_objects::GraphT>& graph_out)
 {
-    flatbuffers::Verifier verifier(buffer, size);
+    flatbuffers::Verifier verifier(static_cast<const uint8_t*>(buffer), size);
     if(!verifier.VerifyBuffer<hipdnn_sdk::data_objects::Graph>())
     {
         throw Hipdnn_plugin_exception(HIPDNN_PLUGIN_STATUS_BAD_PARAM,
