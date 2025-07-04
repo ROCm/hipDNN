@@ -7,19 +7,24 @@
 #include "engine_manager.hpp"
 #include "engines/miopen_engine.hpp"
 #include "engines/solvers/miopen_batchnorm_solver.hpp"
+#include <hipdnn_sdk/logging/logger.hpp>
 
 namespace miopen_legacy_plugin
 {
 
 Miopen_container::Miopen_container()
 {
+    HIPDNN_LOG_INFO("Creating Miopen_container");
     create_solvers();
     create_engines();
 
     _engine_manager = std::make_unique<Engine_manager>(_engines);
 }
 
-Miopen_container::~Miopen_container() {}
+Miopen_container::~Miopen_container()
+{
+    HIPDNN_LOG_INFO("Destroying Miopen_container");
+}
 
 void Miopen_container::create_solvers()
 {

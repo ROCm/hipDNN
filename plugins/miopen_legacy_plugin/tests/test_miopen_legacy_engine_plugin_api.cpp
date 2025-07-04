@@ -25,6 +25,23 @@ TEST(MiopenLegacyEnginePluginApiTest, EnginePluginCreateAlsoCreatesMIOpenHandleO
     EXPECT_EQ(hipdnnEnginePluginDestroy(handle), HIPDNN_PLUGIN_STATUS_SUCCESS);
 }
 
+TEST(MiopenLegacyEnginePluginApiTest, EnginePluginCreateTwiceGivesTheSameContainerHandle)
+{
+    hipdnnEnginePluginHandle_t handle1 = nullptr;
+    auto status1 = hipdnnEnginePluginCreate(&handle1);
+
+    hipdnnEnginePluginHandle_t handle2 = nullptr;
+    auto status2 = hipdnnEnginePluginCreate(&handle2);
+
+    EXPECT_EQ(status1, HIPDNN_PLUGIN_STATUS_SUCCESS);
+    EXPECT_EQ(status2, HIPDNN_PLUGIN_STATUS_SUCCESS);
+
+    EXPECT_EQ(handle1->miopen_container, handle2->miopen_container);
+
+    EXPECT_EQ(hipdnnEnginePluginDestroy(handle1), HIPDNN_PLUGIN_STATUS_SUCCESS);
+    EXPECT_EQ(hipdnnEnginePluginDestroy(handle2), HIPDNN_PLUGIN_STATUS_SUCCESS);
+}
+
 TEST(MiopenLegacyEnginePluginApiTest, EnginePluginCreateNonNullHandlePointer)
 {
     auto handle = reinterpret_cast<hipdnnEnginePluginHandle_t>(0x1234);

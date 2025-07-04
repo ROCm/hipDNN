@@ -41,17 +41,12 @@ void throw_if_null(T* value)
     }
 }
 
-//todo manage lifetime of miopen_container better.
-//std::weak_ptr<Miopen_container> miopen_container;
-
-//todo, determine what the requirements are for this manager, do we want to have multiple copies?
-// should we create a engine manager for each plugin handle created and store it on the handle?
-Engine_manager& get_miopen_engine_manager()
-{
-    static Miopen_container miopen_container;
-
-    return miopen_container.get_engine_manager();
-}
+// Keep a weak pointer to the Miopen_container thats made when we create a plugin handle.
+// The original shared_ptr is then stored on the handle so that it can be used for the lifecycle
+// of the handle.  If we create another handle, then we can use the weak pointer to get access
+// to the existing Miopen_container.  If all handles are destroyed, then this allows us to properly
+// clean up the container without having to fully unload the plugin.
+std::weak_ptr<Miopen_container> miopen_container_lifecycle_ptr;
 
 extern "C" {
 
@@ -142,6 +137,16 @@ hipdnnPluginStatus_t hipdnnEnginePluginCreate(hipdnnEnginePluginHandle_t* handle
 
         miopen_legacy_plugin::Miopen_handle_factory::create_miopen_handle(handle);
 
+        if(auto miopen_container_ptr = miopen_container_lifecycle_ptr.lock())
+        {
+            (*handle)->miopen_container = miopen_container_ptr;
+        }
+        else
+        {
+            (*handle)->miopen_container = std::make_shared<Miopen_container>();
+            miopen_container_lifecycle_ptr = (*handle)->miopen_container;
+        }
+
         LOG_API_SUCCESS(api_name, "created_handle={:p}", static_cast<void*>(*handle));
     });
 }
@@ -196,7 +201,7 @@ hipdnnPluginStatus_t
         throw_if_null(engine_ids);
         throw_if_null(num_engines);
 
-        auto& engine_manager = get_miopen_engine_manager();
+        auto& engine_manager = handle->get_engine_manager();
 
         auto applicable_engines = engine_manager.get_applicable_engine_ids(op_graph);
 
