@@ -863,7 +863,13 @@ TEST(GraphTests, TensorLikeGraphAttributes)
     EXPECT_EQ(tensor_like->get_name(), "TensorLike");
     EXPECT_NE(tensor_like->get_uid(), 100);
 
+    EXPECT_NE(tensor_like, tensor);
+
     auto tensor_like_noname = Graph::tensor_like(tensor_like);
     EXPECT_EQ(tensor_like_noname->get_name(), "");
+
+    EXPECT_EQ(tensor->get_name(), "TestTensor");
+    EXPECT_EQ(tensor->get_uid(), 100);
+    EXPECT_NE(tensor->get_uid(), tensor_like_noname->get_uid());
 }
 // NOLINTEND
