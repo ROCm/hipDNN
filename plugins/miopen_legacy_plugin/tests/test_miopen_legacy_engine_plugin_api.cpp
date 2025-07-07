@@ -180,12 +180,24 @@ TEST(MiopenLegacyEnginePluginApiTest, EnginePluginGetEngineDetailsValid)
     EXPECT_EQ(unpacked_engine_details->engine_id, 1);
 
     // Clean up
+    EXPECT_EQ(hipdnnEnginePluginDestroyEngineDetails(handle, &engine_details_out),
+              HIPDNN_PLUGIN_STATUS_SUCCESS);
     EXPECT_EQ(hipdnnEnginePluginDestroy(handle), HIPDNN_PLUGIN_STATUS_SUCCESS);
 }
 
 TEST(MiopenLegacyEnginePluginApiTest, EnginePluginDestroyEngineDetailsNull)
 {
-    EXPECT_EQ(hipdnnEnginePluginDestroyEngineDetails(nullptr, nullptr),
+    auto handle = reinterpret_cast<hipdnnEnginePluginHandle_t>(0x1234);
+    hipdnnPluginConstData_t engine_details_out;
+
+    EXPECT_EQ(hipdnnEnginePluginDestroyEngineDetails(nullptr, &engine_details_out),
+              HIPDNN_PLUGIN_STATUS_BAD_PARAM);
+
+    EXPECT_EQ(hipdnnEnginePluginDestroyEngineDetails(handle, nullptr),
+              HIPDNN_PLUGIN_STATUS_BAD_PARAM);
+
+    engine_details_out.ptr = nullptr;
+    EXPECT_EQ(hipdnnEnginePluginDestroyEngineDetails(handle, nullptr),
               HIPDNN_PLUGIN_STATUS_BAD_PARAM);
 }
 
