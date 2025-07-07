@@ -143,8 +143,21 @@ hipdnnPluginStatus_t hipdnnEnginePluginCreate(hipdnnEnginePluginHandle_t* handle
         }
         else
         {
-            (*handle)->miopen_container = std::make_shared<Miopen_container>();
-            miopen_container_lifecycle_ptr = (*handle)->miopen_container;
+            static std::mutex miopen_container_mutex;
+            std::lock_guard<std::mutex> lock(miopen_container_mutex);
+
+            // if we do have a race condition that results in threads getting locked, we want to
+            // ensure that we only create one instance.  Therefore, the second thread to get
+            // through will just read from the weak pointer rather than create a new instance.
+            if(auto miopen_container_ptr = miopen_container_lifecycle_ptr.lock())
+            {
+                (*handle)->miopen_container = miopen_container_ptr;
+            }
+            else
+            {
+                (*handle)->miopen_container = std::make_shared<Miopen_container>();
+                miopen_container_lifecycle_ptr = (*handle)->miopen_container;
+            }
         }
 
         LOG_API_SUCCESS(api_name, "created_handle={:p}", static_cast<void*>(*handle));
