@@ -823,4 +823,53 @@ TEST(GraphTests, BuildAndSerializePointwiseAndBatchnormBackwardGraph)
     EXPECT_EQ(deserialized_batchnorm_attributes->dscale, dscale->get_uid());
     EXPECT_EQ(deserialized_batchnorm_attributes->dbias, dbias->get_uid());
 }
+
+// Test graph.tensor()
+TEST(GraphTests, TensorGraphAttributes)
+{
+    auto tensor = Graph::tensor(Tensor_attributes()
+                                    .set_name("TestTensor")
+                                    .set_uid(100)
+                                    .set_stride({5, 6, 7, 8})
+                                    .set_data_type(DataType_t::FLOAT)
+                                    .set_is_virtual(false)
+                                    .set_dim({1, 2, 3, 4}));
+
+    EXPECT_EQ(tensor->get_data_type(), DataType_t::FLOAT);
+    EXPECT_FALSE(tensor->get_is_virtual());
+    EXPECT_EQ(tensor->get_dim(), std::vector<int64_t>({1, 2, 3, 4}));
+    EXPECT_EQ(tensor->get_stride(), std::vector<int64_t>({5, 6, 7, 8}));
+    EXPECT_EQ(tensor->get_name(), "TestTensor");
+    EXPECT_EQ(tensor->get_uid(), 100);
+}
+
+// Test graph.tensor_like()
+TEST(GraphTests, TensorLikeGraphAttributes)
+{
+    auto tensor = Graph::tensor(Tensor_attributes()
+                                    .set_name("TestTensor")
+                                    .set_uid(100)
+                                    .set_dim({1, 2, 3, 4})
+                                    .set_stride({5, 6, 7, 8})
+                                    .set_is_virtual(false)
+                                    .set_data_type(DataType_t::FLOAT));
+
+    auto tensor_like = Graph::tensor_like(tensor, "TensorLike");
+
+    EXPECT_EQ(tensor_like->get_data_type(), DataType_t::FLOAT);
+    EXPECT_FALSE(tensor_like->get_is_virtual());
+    EXPECT_EQ(tensor_like->get_dim(), std::vector<int64_t>({1, 2, 3, 4}));
+    EXPECT_EQ(tensor_like->get_stride(), std::vector<int64_t>({5, 6, 7, 8}));
+    EXPECT_EQ(tensor_like->get_name(), "TensorLike");
+    EXPECT_NE(tensor_like->get_uid(), 100);
+
+    EXPECT_NE(tensor_like, tensor);
+
+    auto tensor_like_noname = Graph::tensor_like(tensor_like);
+    EXPECT_EQ(tensor_like_noname->get_name(), "");
+
+    EXPECT_EQ(tensor->get_name(), "TestTensor");
+    EXPECT_EQ(tensor->get_uid(), 100);
+    EXPECT_NE(tensor->get_uid(), tensor_like_noname->get_uid());
+}
 // NOLINTEND

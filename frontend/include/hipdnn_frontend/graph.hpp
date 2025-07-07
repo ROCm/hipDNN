@@ -293,6 +293,24 @@ public:
 
         return out_0;
     }
+
+    static std::shared_ptr<Tensor_attributes>
+        tensor_like(const std::shared_ptr<Tensor_attributes>& tensor, const std::string& name = "")
+    {
+        auto new_tensor = std::make_shared<Tensor_attributes>(*tensor);
+
+        new_tensor->clear_uid();
+        new_tensor->set_name(name);
+
+        return new_tensor;
+    }
+
+    static std::shared_ptr<Tensor_attributes> tensor(const Tensor_attributes& tensor)
+    {
+        auto new_tensor = std::make_shared<Tensor_attributes>(tensor);
+
+        return new_tensor;
+    }
 };
 }
 }

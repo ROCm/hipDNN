@@ -4,6 +4,7 @@
 #include "hipdnn_backend.h"
 #include "descriptors/backend_descriptor.hpp"
 #include "descriptors/descriptor_factory.hpp"
+#include "descriptors/variant_descriptor.hpp"
 #include "error.hpp"
 #include "handle/handle.hpp"
 #include "handle/handle_factory.hpp"
@@ -134,7 +135,7 @@ HIPDNN_BACKEND_EXPORT hipdnnStatus_t
     });
 }
 
-HIPDNN_BACKEND_EXPORT hipdnnStatus_t hipdnnBackendExecute([[maybe_unused]] hipdnnHandle_t handle,
+HIPDNN_BACKEND_EXPORT hipdnnStatus_t hipdnnBackendExecute(hipdnnHandle_t handle,
                                                           hipdnnBackendDescriptor_t execution_plan,
                                                           hipdnnBackendDescriptor_t variant_pack)
 {
@@ -143,12 +144,17 @@ HIPDNN_BACKEND_EXPORT hipdnnStatus_t hipdnnBackendExecute([[maybe_unused]] hipdn
                   static_cast<void*>(execution_plan),
                   static_cast<void*>(variant_pack));
 
-    return hipdnn_backend::try_catch([&]() {
+    return hipdnn_backend::try_catch([&, api_name = __func__]() {
+        throw_if_null(handle);
         throw_if_invalid_descriptor(execution_plan);
         throw_if_invalid_descriptor(variant_pack);
 
-        // TODO - add execute implementation
-        throw Hipdnn_exception(HIPDNN_STATUS_NOT_SUPPORTED, "hipdnnBackendExecute not implemented");
+        // TODO : will change later
+        Plugin_manager plugin_manager;
+        plugin_manager.initialize();
+        plugin_manager.execute(handle, execution_plan, variant_pack);
+
+        LOG_API_SUCCESS(api_name, "");
     });
 }
 
