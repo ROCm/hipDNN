@@ -44,7 +44,10 @@ void Miopen_engine::get_details(hipdnnPluginConstData_t& details_out) const
     builder.Finish(engine_details);
     auto serialized_details = builder.Release();
 
-    details_out.ptr = serialized_details.data();
+    auto* temp_buffer = new uint8_t[serialized_details.size()];
+    std::memcpy(temp_buffer, serialized_details.data(), serialized_details.size());
+
+    details_out.ptr = temp_buffer;
     details_out.size = serialized_details.size();
 }
 

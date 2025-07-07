@@ -80,4 +80,6 @@ TEST(Miopen_engineTest, GetDetailsReturnsSerializedEngineDetails)
     hipdnn_plugin::flatbuffer_utilities::unpack_serialized_engine_details(
         result.ptr, result.size, unpacked_engine_details);
     EXPECT_EQ(unpacked_engine_details->engine_id, 1);
+
+    delete[] static_cast<const uint8_t*>(result.ptr);
 }
