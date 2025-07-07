@@ -22,7 +22,7 @@ target_link_libraries(public_hipdnn_backend_tests
     pthread 
     hipdnn_sdk
     hipdnn_backend
-    hip::device
+    hip::host
 )
 
 add_dependencies(check public_hipdnn_backend_tests)
