@@ -244,10 +244,23 @@ hipdnnPluginStatus_t hipdnnEnginePluginGetEngineDetails(hipdnnEnginePluginHandle
                                                         const hipdnnPluginConstData_t* op_graph,
                                                         hipdnnPluginConstData_t* engine_details)
 {
-    if(!handle || !op_graph || !engine_details)
-        return HIPDNN_PLUGIN_STATUS_BAD_PARAM;
+    LOG_API_ENTRY("handle={:p}, engine_id={}, op_graph={:p}, engine_details={:p}",
+                  static_cast<void*>(handle),
+                  engine_id,
+                  static_cast<const void*>(op_graph),
+                  static_cast<void*>(engine_details));
 
-    return HIPDNN_PLUGIN_STATUS_INTERNAL_ERROR;
+    return hipdnn_plugin::try_catch([&, api_name = __func__]() {
+        throw_if_null(handle);
+        throw_if_null(op_graph);
+        throw_if_null(engine_details);
+
+        auto& engine_manager = handle->get_engine_manager();
+
+        engine_manager.get_engine_details(op_graph, engine_id, *engine_details);
+
+        LOG_API_SUCCESS(api_name, "engine_details={:p}", static_cast<void*>(engine_details));
+    });
 }
 
 hipdnnPluginStatus_t hipdnnEnginePluginDestroyEngineDetails(hipdnnEnginePluginHandle_t handle,

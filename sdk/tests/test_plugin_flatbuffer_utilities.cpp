@@ -4,9 +4,11 @@
 #include "hipdnn_sdk/plugin/test_utils/test_macros.hpp"
 #include <flatbuffers/flatbuffers.h>
 #include <gtest/gtest.h>
+#include <hipdnn_sdk/data_objects/engine_details_generated.h>
 #include <hipdnn_sdk/data_objects/graph_generated.h>
 #include <hipdnn_sdk/plugin/plugin_exception.hpp>
 #include <hipdnn_sdk/plugin/plugin_flatbuffer_utilities.hpp>
+#include <hipdnn_sdk/test_utilities/flatbuffer_graph_test_utils.hpp>
 
 namespace hipdnn_plugin
 {
@@ -72,6 +74,36 @@ TEST_F(Plugin_flatbuffer_utilities_test, WillStillHaveValidGraphAfterBuilderDest
     verify_graph(*graph);
 }
 
+TEST_F(Plugin_flatbuffer_utilities_test, WillCorrectlyUnpackEngineDetailsBuffer)
+{
+    auto builder = flatbuffer_test_utils::create_valid_engine_details(1);
+    auto serialized_engine_details = builder.Release();
+    hipdnnPluginConstData_t engine_details
+        = flatbuffer_test_utils::create_valid_const_data_engine_details(serialized_engine_details);
+
+    std::unique_ptr<hipdnn_sdk::data_objects::EngineDetailsT> unpacked_engine_details;
+    flatbuffer_utilities::unpack_serialized_engine_details(
+        engine_details.ptr, engine_details.size, unpacked_engine_details);
+}
+
+TEST_F(Plugin_flatbuffer_utilities_test, WillStillHaveValidEngineDetailsAfterBuilderDestructs)
+{
+    std::unique_ptr<hipdnn_sdk::data_objects::EngineDetailsT> unpacked_engine_details;
+    {
+        auto builder = flatbuffer_test_utils::create_valid_engine_details(1);
+        auto serialized_engine_details = builder.Release();
+        hipdnnPluginConstData_t engine_details
+            = flatbuffer_test_utils::create_valid_const_data_engine_details(
+                serialized_engine_details);
+
+        flatbuffer_utilities::unpack_serialized_engine_details(
+            engine_details.ptr, engine_details.size, unpacked_engine_details);
+    }
+
+    ASSERT_NE(unpacked_engine_details, nullptr);
+    EXPECT_EQ(unpacked_engine_details->engine_id, 1);
+}
+
 class Flatbuffer_invalid_tests
     : public Plugin_flatbuffer_utilities_test,
       public ::testing::WithParamInterface<std::pair<const uint8_t*, size_t>>
@@ -99,6 +131,31 @@ INSTANTIATE_TEST_SUITE_P(
                           auto serialized_graph = builder.Release();
                           return std::make_pair(serialized_graph.data(),
                                                 serialized_graph.size() - 20);
+                      }()));
+
+TEST_P(Flatbuffer_invalid_tests, WillNotUnpackInvalidEngineDetailsBuffer)
+{
+    auto [buffer, size] = GetParam();
+
+    std::unique_ptr<hipdnn_sdk::data_objects::EngineDetailsT> engine_details;
+    ASSERT_THROW_HIPDNN_PLUGIN_STATUS(
+        flatbuffer_utilities::unpack_serialized_engine_details(buffer, size, engine_details),
+        HIPDNN_PLUGIN_STATUS_BAD_PARAM);
+    ASSERT_EQ(engine_details, nullptr);
+}
+
+INSTANTIATE_TEST_SUITE_P(
+    InvalidEngineDetailsBufferTests,
+    Flatbuffer_invalid_tests,
+    ::testing::Values(std::make_pair(static_cast<const uint8_t*>(nullptr), size_t(10)),
+                      std::make_pair(std::array<uint8_t, 10>{0}.data(), size_t(10)),
+                      []() { // Valid engine_details but incorrect data size
+                          auto builder = flatbuffer_test_utils::create_valid_engine_details(1);
+                          auto serialized_engine_details = builder.Release();
+                          return std::make_pair(serialized_engine_details.data(),
+                                                serialized_engine_details.size() > 20
+                                                    ? serialized_engine_details.size() - 20
+                                                    : 0);
                       }()));
 
 } // namespace testing

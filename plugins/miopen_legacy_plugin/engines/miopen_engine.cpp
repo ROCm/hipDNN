@@ -4,6 +4,7 @@
 #include "miopen_engine.hpp"
 #include "solvers/miopen_batchnorm_solver.hpp"
 
+#include <hipdnn_sdk/data_objects/engine_details_generated.h>
 #include <hipdnn_sdk/plugin/plugin_flatbuffer_utilities.hpp>
 
 namespace miopen_legacy_plugin
@@ -34,6 +35,17 @@ bool Miopen_engine::is_applicable(const hipdnnPluginConstData_t* op_graph) const
         }
     }
     return false;
+}
+
+void Miopen_engine::get_details(hipdnnPluginConstData_t& details_out) const
+{
+    flatbuffers::FlatBufferBuilder builder;
+    auto engine_details = hipdnn_sdk::data_objects::CreateEngineDetails(builder, _id);
+    builder.Finish(engine_details);
+    auto serialized_details = builder.Release();
+
+    details_out.ptr = serialized_details.data();
+    details_out.size = serialized_details.size();
 }
 
 size_t Miopen_engine::get_workspace_size() const

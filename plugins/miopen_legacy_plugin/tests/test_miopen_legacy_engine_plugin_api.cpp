@@ -5,6 +5,7 @@
 #include <gtest/gtest.h>
 #include <hipdnn_sdk/plugin/engine_plugin_api.h>
 #include <hipdnn_sdk/plugin/plugin_api_data_types.h>
+#include <hipdnn_sdk/plugin/plugin_flatbuffer_utilities.hpp>
 #include <hipdnn_sdk/test_utilities/flatbuffer_graph_test_utils.hpp>
 
 TEST(MiopenLegacyEnginePluginApiTest, EnginePluginCreateNullHandle)
@@ -144,8 +145,42 @@ TEST(MiopenLegacyEnginePluginApiTest, EnginePluginGetApplicableEngineIdsValid)
 
 TEST(MiopenLegacyEnginePluginApiTest, EnginePluginGetEngineDetailsNull)
 {
-    EXPECT_EQ(hipdnnEnginePluginGetEngineDetails(nullptr, 0, nullptr, nullptr),
+    auto handle = reinterpret_cast<hipdnnEnginePluginHandle_t>(0x1234);
+    auto op_graph = reinterpret_cast<hipdnnPluginConstData_t*>(0x5678);
+    hipdnnPluginConstData_t engine_details_out;
+
+    EXPECT_EQ(hipdnnEnginePluginGetEngineDetails(nullptr, 1, nullptr, nullptr),
               HIPDNN_PLUGIN_STATUS_BAD_PARAM);
+
+    EXPECT_EQ(hipdnnEnginePluginGetEngineDetails(nullptr, 1, op_graph, &engine_details_out),
+              HIPDNN_PLUGIN_STATUS_BAD_PARAM);
+
+    EXPECT_EQ(hipdnnEnginePluginGetEngineDetails(handle, 1, nullptr, &engine_details_out),
+              HIPDNN_PLUGIN_STATUS_BAD_PARAM);
+
+    EXPECT_EQ(hipdnnEnginePluginGetEngineDetails(handle, 1, op_graph, nullptr),
+              HIPDNN_PLUGIN_STATUS_BAD_PARAM);
+}
+
+TEST(MiopenLegacyEnginePluginApiTest, EnginePluginGetEngineDetailsValid)
+{
+    hipdnnEnginePluginHandle_t handle = nullptr;
+    ASSERT_EQ(hipdnnEnginePluginCreate(&handle), HIPDNN_PLUGIN_STATUS_SUCCESS);
+
+    auto op_graph = reinterpret_cast<hipdnnPluginConstData_t*>(0x5678);
+    hipdnnPluginConstData_t engine_details_out;
+
+    auto status = hipdnnEnginePluginGetEngineDetails(handle, 1, op_graph, &engine_details_out);
+
+    std::unique_ptr<hipdnn_sdk::data_objects::EngineDetailsT> unpacked_engine_details;
+    hipdnn_plugin::flatbuffer_utilities::unpack_serialized_engine_details(
+        engine_details_out.ptr, engine_details_out.size, unpacked_engine_details);
+
+    EXPECT_EQ(status, HIPDNN_PLUGIN_STATUS_SUCCESS);
+    EXPECT_EQ(unpacked_engine_details->engine_id, 1);
+
+    // Clean up
+    EXPECT_EQ(hipdnnEnginePluginDestroy(handle), HIPDNN_PLUGIN_STATUS_SUCCESS);
 }
 
 TEST(MiopenLegacyEnginePluginApiTest, EnginePluginDestroyEngineDetailsNull)

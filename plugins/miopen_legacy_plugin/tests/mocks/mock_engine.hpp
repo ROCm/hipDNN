@@ -17,6 +17,7 @@ class Mock_engine : public Engine
 public:
     MOCK_METHOD(int64_t, id, (), (const, override));
     MOCK_METHOD(bool, is_applicable, (const hipdnnPluginConstData_t* op_graph), (const, override));
+    MOCK_METHOD(void, get_details, (hipdnnPluginConstData_t & details_out), (const, override));
     MOCK_METHOD(size_t, get_workspace_size, (), (const, override));
 };
 

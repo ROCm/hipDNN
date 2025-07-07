@@ -6,6 +6,7 @@
 #include "mocks/mock_engine.hpp"
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
+#include <hipdnn_sdk/plugin/plugin_exception.hpp>
 #include <memory>
 #include <set>
 
@@ -80,4 +81,40 @@ TEST(Engine_managerTest, ReturnsNoApplicableEngineIds)
     auto applicable = manager.get_applicable_engine_ids(dummy_op_graph);
 
     EXPECT_TRUE(applicable.empty());
+}
+
+TEST(Engine_managerTest, ReturnsEngineDetails)
+{
+    Engine_manager manager;
+
+    hipdnnPluginConstData_t engine_details;
+    engine_details.ptr = reinterpret_cast<const void*>(0x12345678);
+    engine_details.size = 200;
+    auto mock_engine = std::make_unique<Mock_engine>();
+    EXPECT_CALL(*mock_engine, id()).WillRepeatedly(Return(1));
+    EXPECT_CALL(*mock_engine, get_details(::testing::_))
+        .WillOnce([&engine_details](hipdnnPluginConstData_t& out) {
+            out.ptr = engine_details.ptr;
+            out.size = engine_details.size;
+        });
+
+    manager.add_engine(std::move(mock_engine));
+
+    hipdnnPluginConstData_t* dummy_op_graph = nullptr;
+    hipdnnPluginConstData_t details;
+    manager.get_engine_details(dummy_op_graph, 1, details);
+
+    EXPECT_EQ(details.ptr, engine_details.ptr);
+    EXPECT_EQ(details.size, engine_details.size);
+}
+
+TEST(Engine_managerTest, ThrowsOnInvalidEngineId)
+{
+    Engine_manager manager;
+
+    hipdnnPluginConstData_t* dummy_op_graph = nullptr;
+    hipdnnPluginConstData_t engine_details;
+
+    EXPECT_THROW(manager.get_engine_details(dummy_op_graph, 999, engine_details),
+                 hipdnn_plugin::Hipdnn_plugin_exception);
 }

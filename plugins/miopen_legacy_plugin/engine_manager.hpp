@@ -28,8 +28,12 @@ public:
 
     std::set<int64_t> get_applicable_engine_ids(const hipdnnPluginConstData_t* op_graph);
 
+    void get_engine_details(const hipdnnPluginConstData_t* op_graph,
+                            int64_t engine_id,
+                            hipdnnPluginConstData_t& engine_details_out);
+
 private:
-    std::set<std::unique_ptr<Engine>> _engines;
+    std::unordered_map<int64_t, std::unique_ptr<Engine>> _engines;
 };
 
 }

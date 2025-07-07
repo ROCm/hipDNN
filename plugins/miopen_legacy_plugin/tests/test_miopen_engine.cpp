@@ -6,6 +6,7 @@
 
 #include <gtest/gtest.h>
 #include <hipdnn_sdk/data_objects/graph_generated.h>
+#include <hipdnn_sdk/plugin/plugin_flatbuffer_utilities.hpp>
 #include <hipdnn_sdk/test_utilities/flatbuffer_graph_test_utils.hpp>
 #include <memory>
 #include <set>
@@ -66,4 +67,17 @@ TEST(Miopen_engineTest, IsApplicableReturnsFalseIfNoSolverApplicable)
         = flatbuffer_test_utils::create_valid_const_data_graph(serialized_graph);
 
     EXPECT_FALSE(engine.is_applicable(&op_graph));
+}
+
+TEST(Miopen_engineTest, GetDetailsReturnsSerializedEngineDetails)
+{
+    Miopen_engine engine(1);
+
+    hipdnnPluginConstData_t result;
+    engine.get_details(result);
+
+    std::unique_ptr<hipdnn_sdk::data_objects::EngineDetailsT> unpacked_engine_details;
+    hipdnn_plugin::flatbuffer_utilities::unpack_serialized_engine_details(
+        result.ptr, result.size, unpacked_engine_details);
+    EXPECT_EQ(unpacked_engine_details->engine_id, 1);
 }
