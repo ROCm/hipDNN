@@ -6,9 +6,7 @@
 #include "callback_sink.hpp"
 #include "callback_types.h"
 #include "formatting.hpp"
-#include <algorithm>
 #include <ctime>
-#include <filesystem>
 #include <iomanip>
 #include <iostream>
 #include <memory>
@@ -20,8 +18,6 @@
 #include <sstream>
 #include <string>
 #include <fstream>
-#include <vector>
-#include <regex>
 
 
 #ifdef ENABLE_BACKEND_LOGGING
@@ -86,68 +82,12 @@
 namespace hipdnn::logging
 {
 #ifdef ENABLE_BACKEND_LOGGING
-inline bool g_logging_initialized = false;
 inline std::string output_file;
+inline bool g_logging_initialized = false;
 inline std::mutex g_logging_init_mutex;
 inline const std::string G_LOGGING_AREA = "hipdnn_backend";
 inline std::shared_ptr<spdlog::logger> g_backend_logger;
 inline std::shared_ptr<spdlog::logger> g_callback_receiver_logger;
-#endif
-
-inline std::string generate_rotated_log_file_name(const std::filesystem::path& base_path)
-{
-    // timestamp string in YYYYMMDD_HHMMSS format
-    std::ostringstream oss;
-    auto t = std::time(nullptr);
-    std::tm tm_buf;
-    auto tm = *localtime_r(&t, &tm_buf);
-    oss << std::put_time(&tm, "%Y%m%d_%H%M%S");
-    const std::string timestamp = oss.str();
-
-    std::filesystem::path new_path = base_path.parent_path();
-    new_path /= base_path.stem().string() + "_" + timestamp + base_path.extension().string();
-
-    return new_path.string();
-}
-
-#ifdef ENABLE_BACKEND_LOGGING
-
-inline void rotate_log_files(const std::filesystem::path& base_path, size_t max_log_files)
-{
-    std::filesystem::path dir = base_path.parent_path();
-
-    if(!dir.empty() && !std::filesystem::exists(dir))
-    {
-        std::filesystem::create_directories(dir);
-    }
-
-    if(std::filesystem::exists(dir))
-    {
-        std::vector<std::filesystem::path> existing_logs;
-        const std::string stem_str = base_path.stem().string();
-        const std::string ext_str_escaped
-            = std::regex_replace(base_path.extension().string(), std::regex{"\\."}, "\\.");
-        const std::regex pattern{stem_str + "_\\d{8}_\\d{6}" + ext_str_escaped};
-
-        for(const auto& entry : std::filesystem::directory_iterator(dir))
-        {
-            if(entry.is_regular_file()
-               && std::regex_match(entry.path().filename().string(), pattern))
-            {
-                existing_logs.push_back(entry.path());
-            }
-        }
-
-        std::ranges::sort(existing_logs);
-
-        // Remove the oldest files until we are under the limit
-        while(existing_logs.size() >= max_log_files)
-        {
-            std::filesystem::remove(existing_logs.front());
-            existing_logs.erase(existing_logs.begin());
-        }
-    }
-}
 
 inline void set_log_level(const std::string& level)
 {
@@ -207,16 +147,12 @@ inline std::string
             spdlog::init_thread_pool(8192, 1);
         }
         
-        // Define the separate sinks for the callback receiver and backend logger because they need different patterns.
         std::shared_ptr<spdlog::sinks::sink> sink_for_callback_receiver;
         std::shared_ptr<spdlog::sinks::sink> sink_for_backend_logger;
 
         if(log_file_path != nullptr && !std::string(log_file_path).empty())
         {
-            const size_t max_log_files = 5;
-            rotate_log_files(log_file_path, max_log_files);
-
-            output_file = generate_rotated_log_file_name(log_file_path);
+            output_file = log_file_path;
 
             sink_for_callback_receiver
                 = std::make_shared<spdlog::sinks::basic_file_sink_mt>(output_file, false);
@@ -256,11 +192,6 @@ inline std::string
         return output_file;
     }
     catch(const spdlog::spdlog_ex& ex)
-    {
-        cleanup_logging();
-        return "";
-    }
-    catch(const std::filesystem::filesystem_error& ex)
     {
         cleanup_logging();
         return "";
