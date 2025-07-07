@@ -14,21 +14,28 @@
 
 using namespace hipdnn_backend;
 
-namespace {
+namespace
+{
 
 template <typename T, typename Destructor>
 class Scoped_resource
 {
 public:
     Scoped_resource(T resource, Destructor destructor)
-        : _resource(resource), _destructor(destructor) {}
+        : _resource(resource)
+        , _destructor(destructor)
+    {
+    }
 
     ~Scoped_resource()
     {
         _destructor(_resource);
     }
 
-    T get() const { return _resource; }
+    T get() const
+    {
+        return _resource;
+    }
 
 private:
     T _resource;
@@ -65,13 +72,9 @@ TEST(GPU_EnginePluginManagerTest, LoadPluginsAndExecuteOpGraph)
     Scoped_resource stream_res(stream, [](hipStream_t s) { std::ignore = hipStreamDestroy(s); });
 
     // TODO set a real op graph
-    const std::array<uint8_t, 8> op_graph_data = {
-        0x07, 0x06, 0x05, 0x04, 0x03, 0x02, 0x01, 0x00
-    };
-    const hipdnnPluginConstData_t op_graph = {
-        .ptr = op_graph_data.data(),
-        .size = op_graph_data.size()
-    };
+    const std::array<uint8_t, 8> op_graph_data = {0x07, 0x06, 0x05, 0x04, 0x03, 0x02, 0x01, 0x00};
+    const hipdnnPluginConstData_t op_graph
+        = {.ptr = op_graph_data.data(), .size = op_graph_data.size()};
 
     // The number of elements in the input vector.
     const unsigned data_size = 512;
@@ -94,7 +97,8 @@ TEST(GPU_EnginePluginManagerTest, LoadPluginsAndExecuteOpGraph)
     // Allocate output device buffer.
     uint32_t* out_dev_data{};
     ASSERT_EQ(hipMalloc(&out_dev_data, size_bytes), hipSuccess);
-    Scoped_resource out_dev_data_res(out_dev_data, [](uint32_t* ptr) { std::ignore = hipFree(ptr); });
+    Scoped_resource out_dev_data_res(out_dev_data,
+                                     [](uint32_t* ptr) { std::ignore = hipFree(ptr); });
 
     // Copy the input data from the host to the device.
     ASSERT_EQ(hipMemcpy(in_dev_data, in_host_data.data(), size_bytes, hipMemcpyHostToDevice),
@@ -115,14 +119,14 @@ TEST(GPU_EnginePluginManagerTest, LoadPluginsAndExecuteOpGraph)
             // Get engine details
             hipdnnPluginConstData_t engine_details;
             plugin.get_engine_details(handle, engine_id, &op_graph, &engine_details);
-            Scoped_resource engine_details_res(&engine_details, [handle, &plugin](hipdnnPluginConstData_t* ed) { plugin.destroy_engine_details(handle, ed);});
+            Scoped_resource engine_details_res(&engine_details,
+                                               [handle, &plugin](hipdnnPluginConstData_t* ed) {
+                                                   plugin.destroy_engine_details(handle, ed);
+                                               });
 
             // Prepare the engine configuration
             // TODO set a real engine config based on the engine details
-            const hipdnnPluginConstData_t engine_config = {
-                .ptr = nullptr,
-                .size = 0
-            };
+            const hipdnnPluginConstData_t engine_config = {.ptr = nullptr, .size = 0};
 
             // Create workspace for the operation
             auto workspace_size = plugin.get_workspace_size(handle, &engine_config, &op_graph);
@@ -134,21 +138,23 @@ TEST(GPU_EnginePluginManagerTest, LoadPluginsAndExecuteOpGraph)
             Scoped_resource workspace_res(workspace, [](void* ptr) { std::ignore = hipFree(ptr); });
 
             // Create execution context for the operation
-            auto execution_context = plugin.create_execution_context(handle, &engine_config, &op_graph);
-            Scoped_resource execution_context_res(execution_context, [&plugin, handle](auto ec) { plugin.destroy_execution_context(handle, ec); });
+            auto execution_context
+                = plugin.create_execution_context(handle, &engine_config, &op_graph);
+            Scoped_resource execution_context_res(execution_context, [&plugin, handle](auto ec) {
+                plugin.destroy_execution_context(handle, ec);
+            });
 
             // Fill output device buffer with zeros
             ASSERT_EQ(hipMemset(out_dev_data, 0, size_bytes), hipSuccess);
 
             // Prepare device buffers structure
             const uint32_t num_device_buffers = 2;
-            const std::array<hipdnnPluginDeviceBuffer_t, num_device_buffers> device_buffers = {{
-                {.uid = 0, .ptr = in_dev_data},
-                {.uid = 1, .ptr = out_dev_data}
-            }};
+            const std::array<hipdnnPluginDeviceBuffer_t, num_device_buffers> device_buffers
+                = {{{.uid = 0, .ptr = in_dev_data}, {.uid = 1, .ptr = out_dev_data}}};
 
             // Execute the operation graph
-            plugin.execute_op_graph(handle, execution_context, workspace, device_buffers.data(), num_device_buffers);
+            plugin.execute_op_graph(
+                handle, execution_context, workspace, device_buffers.data(), num_device_buffers);
 
             // Copy the results back to the host. This call blocks the host's execution until the copy is finished.
             ASSERT_EQ(

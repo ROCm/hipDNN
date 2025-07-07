@@ -61,7 +61,11 @@ hipdnnPluginStatus_t run_engine(const uint32_t* input, uint32_t* output, uint32_
 
 } // namespace
 
-hipdnnPluginStatus_t get_applicable_engine_ids(hipdnnEnginePluginHandle_t handle, const hipdnnPluginConstData_t* op_graph, int64_t* engine_ids, uint32_t max_engines, uint32_t* num_engines)
+hipdnnPluginStatus_t get_applicable_engine_ids(hipdnnEnginePluginHandle_t handle,
+                                               const hipdnnPluginConstData_t* op_graph,
+                                               int64_t* engine_ids,
+                                               uint32_t max_engines,
+                                               uint32_t* num_engines)
 {
     std::ignore = handle;
     std::ignore = op_graph;
@@ -79,11 +83,14 @@ hipdnnPluginStatus_t get_applicable_engine_ids(hipdnnEnginePluginHandle_t handle
 bool check_engine_id_validity(int64_t engine_id)
 {
     // Check if the engine_id is within the valid range.
-    return (engine_id >= PLUGIN_FIRST_ENGINE_ID &&
-            engine_id < PLUGIN_FIRST_ENGINE_ID + PLUGIN_NUM_ENGINES);
+    return (engine_id >= PLUGIN_FIRST_ENGINE_ID
+            && engine_id < PLUGIN_FIRST_ENGINE_ID + PLUGIN_NUM_ENGINES);
 }
 
-hipdnnPluginStatus_t get_engine_details(hipdnnEnginePluginHandle_t handle, int64_t engine_id, const hipdnnPluginConstData_t* op_graph, hipdnnPluginConstData_t* engine_details)
+hipdnnPluginStatus_t get_engine_details(hipdnnEnginePluginHandle_t handle,
+                                        int64_t engine_id,
+                                        const hipdnnPluginConstData_t* op_graph,
+                                        hipdnnPluginConstData_t* engine_details)
 {
     std::ignore = handle;
     std::ignore = engine_id;
@@ -96,7 +103,7 @@ hipdnnPluginStatus_t get_engine_details(hipdnnEnginePluginHandle_t handle, int64
     {
         engine_details->ptr = new uint8_t[size];
     }
-    catch (const std::bad_alloc&)
+    catch(const std::bad_alloc&)
     {
         set_last_error_string("hipdnnEnginePluginGetEngineDetails: memory allocation failed");
         return HIPDNN_PLUGIN_STATUS_ALLOC_FAILED;
@@ -105,7 +112,8 @@ hipdnnPluginStatus_t get_engine_details(hipdnnEnginePluginHandle_t handle, int64
     return HIPDNN_PLUGIN_STATUS_SUCCESS;
 }
 
-hipdnnPluginStatus_t destroy_engine_details(hipdnnEnginePluginHandle_t handle, hipdnnPluginConstData_t* engine_details)
+hipdnnPluginStatus_t destroy_engine_details(hipdnnEnginePluginHandle_t handle,
+                                            hipdnnPluginConstData_t* engine_details)
 {
     std::ignore = handle;
 
@@ -115,7 +123,10 @@ hipdnnPluginStatus_t destroy_engine_details(hipdnnEnginePluginHandle_t handle, h
     return HIPDNN_PLUGIN_STATUS_SUCCESS;
 }
 
-hipdnnPluginStatus_t get_workspace_size(hipdnnEnginePluginHandle_t handle, const hipdnnPluginConstData_t* engine_config, const hipdnnPluginConstData_t* op_graph, size_t* workspace_size)
+hipdnnPluginStatus_t get_workspace_size(hipdnnEnginePluginHandle_t handle,
+                                        const hipdnnPluginConstData_t* engine_config,
+                                        const hipdnnPluginConstData_t* op_graph,
+                                        size_t* workspace_size)
 {
     std::ignore = handle;
     std::ignore = engine_config;
@@ -127,7 +138,11 @@ hipdnnPluginStatus_t get_workspace_size(hipdnnEnginePluginHandle_t handle, const
     return HIPDNN_PLUGIN_STATUS_SUCCESS;
 }
 
-hipdnnPluginStatus_t create_execution_context(hipdnnEnginePluginHandle_t handle, const hipdnnPluginConstData_t* engine_config, const hipdnnPluginConstData_t* op_graph, hipdnnEnginePluginExecutionContext_t* execution_context)
+hipdnnPluginStatus_t
+    create_execution_context(hipdnnEnginePluginHandle_t handle,
+                             const hipdnnPluginConstData_t* engine_config,
+                             const hipdnnPluginConstData_t* op_graph,
+                             hipdnnEnginePluginExecutionContext_t* execution_context)
 {
     std::ignore = handle;
     std::ignore = engine_config;
@@ -138,7 +153,7 @@ hipdnnPluginStatus_t create_execution_context(hipdnnEnginePluginHandle_t handle,
     {
         *execution_context = new hipdnnEnginePluginExecutionContext(0);
     }
-    catch (const std::bad_alloc&)
+    catch(const std::bad_alloc&)
     {
         set_last_error_string("hipdnnEnginePluginCreateExecutionContext: memory allocation failed");
         return HIPDNN_PLUGIN_STATUS_ALLOC_FAILED;
@@ -146,7 +161,9 @@ hipdnnPluginStatus_t create_execution_context(hipdnnEnginePluginHandle_t handle,
     return HIPDNN_PLUGIN_STATUS_SUCCESS;
 }
 
-hipdnnPluginStatus_t destroy_execution_context(hipdnnEnginePluginHandle_t handle, hipdnnEnginePluginExecutionContext_t execution_context)
+hipdnnPluginStatus_t
+    destroy_execution_context(hipdnnEnginePluginHandle_t handle,
+                              hipdnnEnginePluginExecutionContext_t execution_context)
 {
     std::ignore = handle;
 
@@ -155,7 +172,11 @@ hipdnnPluginStatus_t destroy_execution_context(hipdnnEnginePluginHandle_t handle
     return HIPDNN_PLUGIN_STATUS_SUCCESS;
 }
 
-hipdnnPluginStatus_t execute_op_graph(hipdnnEnginePluginHandle_t handle, hipdnnEnginePluginExecutionContext_t execution_context, void* workspace, const hipdnnPluginDeviceBuffer_t* device_buffers, uint32_t num_device_buffers)
+hipdnnPluginStatus_t execute_op_graph(hipdnnEnginePluginHandle_t handle,
+                                      hipdnnEnginePluginExecutionContext_t execution_context,
+                                      void* workspace,
+                                      const hipdnnPluginDeviceBuffer_t* device_buffers,
+                                      uint32_t num_device_buffers)
 {
     std::ignore = handle;
     std::ignore = execution_context;
@@ -163,9 +184,12 @@ hipdnnPluginStatus_t execute_op_graph(hipdnnEnginePluginHandle_t handle, hipdnnE
 
     if(num_device_buffers != 2)
     {
-        set_last_error_string("hipdnnEnginePluginExecuteOpGraph: expected 2 device buffers, got " + std::to_string(num_device_buffers));
+        set_last_error_string("hipdnnEnginePluginExecuteOpGraph: expected 2 device buffers, got "
+                              + std::to_string(num_device_buffers));
         return HIPDNN_PLUGIN_STATUS_INVALID_VALUE;
     }
 
-    return run_engine(static_cast<const uint32_t*>(device_buffers[0].ptr), static_cast<uint32_t*>(device_buffers[1].ptr), GPU_DATA_SIZE);
+    return run_engine(static_cast<const uint32_t*>(device_buffers[0].ptr),
+                      static_cast<uint32_t*>(device_buffers[1].ptr),
+                      GPU_DATA_SIZE);
 }
