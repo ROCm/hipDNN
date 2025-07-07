@@ -2,7 +2,7 @@
 # SPDX-License-Identifier:  MIT
 
 if(HIP_DNN_SKIP_TESTS)
-    message(STATUS "Skipping MIOpen Legacy Plugin tests")
+    message(STATUS "Skipping SDK tests")
     return()
 endif()
 

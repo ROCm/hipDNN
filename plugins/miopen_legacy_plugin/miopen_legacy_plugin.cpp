@@ -59,7 +59,7 @@ hipdnnPluginStatus_t hipdnnPluginGetName(const char** name)
 
         *name = _plugin_name;
 
-        LOG_API_SUCCESS(api_name, "get_plugin_name={:p}", static_cast<void*>(name));
+        LOG_API_SUCCESS(api_name, "plugin_name={:p}", static_cast<void*>(name));
     });
 }
 
@@ -72,7 +72,7 @@ hipdnnPluginStatus_t hipdnnPluginGetVersion(const char** version)
 
         *version = _plugin_version;
 
-        LOG_API_SUCCESS(api_name, "get_version={:p}", static_cast<void*>(version));
+        LOG_API_SUCCESS(api_name, "version={:p}", static_cast<void*>(version));
     });
 }
 
@@ -98,7 +98,7 @@ void hipdnnPluginGetLastErrorString(const char** error_str)
 
         *error_str = Plugin_last_error_manager::get_last_error();
 
-        LOG_API_SUCCESS(api_name, "set_error_string={:p}", static_cast<void*>(error_str));
+        LOG_API_SUCCESS(api_name, "error_str={:p}", static_cast<void*>(error_str));
     });
 }
 
