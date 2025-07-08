@@ -19,10 +19,53 @@ TEST(Miopen_engineTest, ConstructorAndId)
     EXPECT_EQ(engine.id(), 42);
 }
 
-TEST(Miopen_engineTest, WorkspaceSize)
+TEST(Miopen_engineTest, WorkspaceSizeReturnsZeroIfNoSolvers)
 {
     Miopen_engine engine(1);
-    EXPECT_EQ(engine.get_workspace_size(), 1337);
+
+    auto builder = flatbuffer_test_utils::create_valid_graph();
+    auto serialized_graph = builder.Release();
+    hipdnnPluginConstData_t op_graph
+        = flatbuffer_test_utils::create_valid_const_data_graph(serialized_graph);
+
+    hipdnnEnginePluginHandle dummy_handle;
+    EXPECT_EQ(engine.get_workspace_size(dummy_handle, &op_graph), 0u);
+}
+
+TEST(Miopen_engineTest, WorkspaceSizeReturnsSolverWorkspace)
+{
+    auto mock_solver = std::make_unique<Mock_solver>();
+    EXPECT_CALL(*mock_solver, is_applicable(::testing::_)).WillOnce(::testing::Return(true));
+    EXPECT_CALL(*mock_solver, get_workspace_size(::testing::_, ::testing::_))
+        .WillOnce(::testing::Return(1337u));
+
+    Miopen_engine engine(1);
+    engine.add_solver(std::move(mock_solver));
+
+    auto builder = flatbuffer_test_utils::create_valid_graph();
+    auto serialized_graph = builder.Release();
+    hipdnnPluginConstData_t op_graph
+        = flatbuffer_test_utils::create_valid_const_data_graph(serialized_graph);
+
+    hipdnnEnginePluginHandle dummy_handle;
+    EXPECT_EQ(engine.get_workspace_size(dummy_handle, &op_graph), 1337u);
+}
+
+TEST(Miopen_engineTest, WorkspaceSizeReturnsZeroIfNoSolverApplicable)
+{
+    auto mock_solver = std::make_unique<Mock_solver>();
+    EXPECT_CALL(*mock_solver, is_applicable(::testing::_)).WillOnce(::testing::Return(false));
+
+    Miopen_engine engine(1);
+    engine.add_solver(std::move(mock_solver));
+
+    auto builder = flatbuffer_test_utils::create_valid_graph();
+    auto serialized_graph = builder.Release();
+    hipdnnPluginConstData_t op_graph
+        = flatbuffer_test_utils::create_valid_const_data_graph(serialized_graph);
+
+    hipdnnEnginePluginHandle dummy_handle;
+    EXPECT_EQ(engine.get_workspace_size(dummy_handle, &op_graph), 0u);
 }
 
 TEST(Miopen_engineTest, IsApplicableReturnsTrueIfAnySolverApplicable)

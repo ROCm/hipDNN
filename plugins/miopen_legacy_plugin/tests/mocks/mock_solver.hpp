@@ -18,7 +18,11 @@ public:
                 is_applicable,
                 (const hipdnn_sdk::data_objects::GraphT& op_graph),
                 (const, override));
-    MOCK_METHOD(size_t, get_workspace_size, (), (const, override));
+    MOCK_METHOD(size_t,
+                get_workspace_size,
+                (const hipdnnEnginePluginHandle& handle,
+                 const hipdnn_sdk::data_objects::GraphT& graph),
+                (const, override));
 };
 
 }

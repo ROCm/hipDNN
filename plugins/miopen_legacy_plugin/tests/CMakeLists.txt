@@ -34,12 +34,13 @@ if(HIP_DNN_SKIP_TESTS)
 endif()
 
 add_executable(miopen_legacy_plugin_tests
+    engines/test_miopen_engine.cpp
+    engines/solvers/test_miopen_batchnorm_solver.cpp
     main.cpp
     test_miopen_legacy_engine_plugin_api.cpp
     test_miopen_legacy_plugin_api.cpp
     test_miopen_handle_factory.cpp
     test_engine_manager.cpp
-    test_miopen_engine.cpp
 )
 
 target_link_libraries(miopen_legacy_plugin_tests PUBLIC 
@@ -47,6 +48,11 @@ target_link_libraries(miopen_legacy_plugin_tests PUBLIC
     GTest::gmock
     miopen_legacy_plugin
     pthread
+)
+
+# make it so tests inside folders can find the mocks folder without having to use a relative path.
+target_include_directories(miopen_legacy_plugin_tests PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
 target_compile_options(miopen_legacy_plugin_tests PRIVATE ${HIPDNN_WARNING_COMPILE_OPTIONS})

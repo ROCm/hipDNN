@@ -51,9 +51,22 @@ void Miopen_engine::get_details(hipdnnPluginConstData_t& details_out) const
     details_out.size = serialized_details.size();
 }
 
-size_t Miopen_engine::get_workspace_size() const
+size_t Miopen_engine::get_workspace_size(const hipdnnEnginePluginHandle& handle,
+                                         const hipdnnPluginConstData_t* op_graph) const
 {
-    return 1337;
+    std::unique_ptr<hipdnn_sdk::data_objects::GraphT> graph;
+    hipdnn_plugin::flatbuffer_utilities::convert_serialized_plugin_graph_to_graph(
+        op_graph->ptr, op_graph->size, graph);
+
+    size_t workspace_size = 0;
+    for(const auto& solver : _solvers)
+    {
+        if(solver->is_applicable(*graph))
+        {
+            workspace_size = solver->get_workspace_size(handle, *graph);
+        }
+    }
+    return workspace_size;
 }
 
 void Miopen_engine::add_solver(std::unique_ptr<Solver> solver)

@@ -19,7 +19,8 @@ public:
     Miopen_batchnorm_solver& operator=(const Miopen_batchnorm_solver&) = delete;
 
     bool is_applicable(const hipdnn_sdk::data_objects::GraphT& op_graph) const override;
-    size_t get_workspace_size() const override;
+    size_t get_workspace_size(const hipdnnEnginePluginHandle& handle,
+                              const hipdnn_sdk::data_objects::GraphT& graph) const override;
 };
 
 }

@@ -5,6 +5,7 @@
 
 #include <stdint.h>
 
+#include "hipdnn_engine_plugin_handle.hpp"
 #include <hipdnn_sdk/data_objects/graph_generated.h>
 
 namespace miopen_legacy_plugin
@@ -17,7 +18,9 @@ public:
 
     virtual bool is_applicable(const hipdnn_sdk::data_objects::GraphT& op_graph) const = 0;
 
-    virtual size_t get_workspace_size() const = 0;
+    virtual size_t get_workspace_size(const hipdnnEnginePluginHandle& handle,
+                                      const hipdnn_sdk::data_objects::GraphT& graph) const
+        = 0;
 };
 
 }

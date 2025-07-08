@@ -12,11 +12,11 @@ bool Miopen_batchnorm_solver::is_applicable(const hipdnn_sdk::data_objects::Grap
     return true;
 }
 
-size_t Miopen_batchnorm_solver::get_workspace_size() const
+size_t
+    Miopen_batchnorm_solver::get_workspace_size(const hipdnnEnginePluginHandle& handle,
+                                                const hipdnn_sdk::data_objects::GraphT& graph) const
 {
-    // TODO: Implement logic to determine the required workspace size.
-    // Placeholder: return 0.
-    return 0;
+    return 1337;
 }
 
 }

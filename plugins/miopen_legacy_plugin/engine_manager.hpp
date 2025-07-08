@@ -32,6 +32,10 @@ public:
                             int64_t engine_id,
                             hipdnnPluginConstData_t& engine_details_out);
 
+    size_t get_workspace_size(const hipdnnEnginePluginHandle& handle,
+                              int64_t engine_id,
+                              const hipdnnPluginConstData_t* op_graph) const;
+
 private:
     std::unordered_map<int64_t, std::unique_ptr<Engine>> _engines;
 };

@@ -20,7 +20,9 @@ public:
     virtual bool is_applicable(const hipdnnPluginConstData_t* op_graph) const = 0;
     virtual void get_details(hipdnnPluginConstData_t& details_out) const = 0;
 
-    virtual size_t get_workspace_size() const = 0;
+    virtual size_t get_workspace_size(const hipdnnEnginePluginHandle& handle,
+                                      const hipdnnPluginConstData_t* op_graph) const
+        = 0;
 };
 
 }
