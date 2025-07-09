@@ -4,8 +4,8 @@
 #pragma once
 
 #include <memory>
-#include <set>
 #include <unordered_map>
+#include <vector>
 
 #include <hipdnn_sdk/plugin/plugin_api_data_types.h>
 
@@ -26,7 +26,7 @@ public:
 
     void add_engine(std::unique_ptr<Engine_interface> engine);
 
-    std::set<int64_t> get_applicable_engine_ids(const hipdnnPluginConstData_t* op_graph);
+    std::vector<int64_t> get_applicable_engine_ids(const hipdnnPluginConstData_t* op_graph);
 
     void get_engine_details(const hipdnnPluginConstData_t* op_graph,
                             int64_t engine_id,

@@ -33,8 +33,7 @@ TEST(Engine_managerTest, ReturnsApplicableEngineIds)
     auto applicable = manager.get_applicable_engine_ids(dummy_op_graph);
 
     EXPECT_EQ(applicable.size(), 1);
-    EXPECT_TRUE(applicable.count(1));
-    EXPECT_FALSE(applicable.count(2));
+    EXPECT_EQ(applicable[0], 1);
 }
 
 TEST(Engine_managerTest, ReturnsMultipleApplicableEngineIds)
@@ -57,8 +56,8 @@ TEST(Engine_managerTest, ReturnsMultipleApplicableEngineIds)
     auto applicable = manager.get_applicable_engine_ids(dummy_op_graph);
 
     EXPECT_EQ(applicable.size(), 2);
-    EXPECT_TRUE(applicable.count(1));
-    EXPECT_TRUE(applicable.count(2));
+    EXPECT_TRUE(std::ranges::find(applicable, 1) != applicable.end());
+    EXPECT_TRUE(std::ranges::find(applicable, 2) != applicable.end());
 }
 
 TEST(Engine_managerTest, ReturnsNoApplicableEngineIds)

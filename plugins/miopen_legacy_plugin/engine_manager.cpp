@@ -20,14 +20,15 @@ void Engine_manager::add_engine(std::unique_ptr<Engine_interface> engine)
     _engines.emplace(engine->id(), std::move(engine));
 }
 
-std::set<int64_t> Engine_manager::get_applicable_engine_ids(const hipdnnPluginConstData_t* op_graph)
+std::vector<int64_t>
+    Engine_manager::get_applicable_engine_ids(const hipdnnPluginConstData_t* op_graph)
 {
-    std::set<int64_t> applicable;
+    std::vector<int64_t> applicable;
     for(const auto& engine : _engines)
     {
         if(engine.second->is_applicable(op_graph))
         {
-            applicable.insert(engine.second->id());
+            applicable.push_back(engine.second->id());
         }
     }
     return applicable;
