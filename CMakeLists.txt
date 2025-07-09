@@ -83,27 +83,61 @@ if(CODE_COVERAGE)
         -fcoverage-mapping)
 endif()
 
+# Function to detect GPU architecture and set appropriate flags
+function(configure_xnack_flags target_name)
+    # Get the current GPU architecture
+    execute_process(
+        COMMAND /opt/rocm/bin/rocm_agent_enumerator
+        OUTPUT_VARIABLE GPU_TARGETS
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+    )
+    
+    # Parse GPU targets and set appropriate offload-arch flags
+    string(REPLACE "\n" ";" GPU_LIST ${GPU_TARGETS})
+    
+    foreach(GPU_TARGET ${GPU_LIST})
+        if(NOT ${GPU_TARGET} STREQUAL "gfx000")
+            # Check if this architecture supports XNACK
+            if(${GPU_TARGET} MATCHES "gfx90a|gfx908|gfx940|gfx942")
+                # Enable XNACK for supported architectures
+                target_compile_options(${target_name} PRIVATE 
+                    --offload-arch=${GPU_TARGET}:xnack+
+                )
+                message(STATUS "Enabling XNACK for ${GPU_TARGET}")
+            else()
+                # Standard compilation for non-XNACK architectures
+                target_compile_options(${target_name} PRIVATE 
+                    --offload-arch=${GPU_TARGET}
+                )
+                message(STATUS "Standard compilation for ${GPU_TARGET}")
+            endif()
+        endif()
+    endforeach()
+endfunction()
+
 # Enable Address Sanitizer and set linker flags for security
 message(STATUS "Building with Sanitizers: ${BUILD_ADDRESS_SANITIZER}")
 if (BUILD_ADDRESS_SANITIZER)
-    if(NOT DEFINED GPU_TARGETS)
-        set(XNACK_PLUS_TARGETS
-            gfx90a:xnack+
-            #gfx908:xnack+
-            #gfx942:xnack+
-            #gfx950:xnack+
-        )
-        set(OPTIONAL_TARGETS ${XNACK_PLUS_TARGETS})
-        set(AMDGPU_TARGETS_INIT ${OPTIONAL_TARGETS} ${DEFAULT_TARGETS})
+    # if(NOT DEFINED GPU_TARGETS)
+    #     set(XNACK_PLUS_TARGETS
+    #         gfx90a:xnack+
+    #         #gfx908:xnack+
+    #         #gfx942:xnack+
+    #         #gfx950:xnack+
+    #     )
+    #     set(OPTIONAL_TARGETS ${XNACK_PLUS_TARGETS})
+    #     set(AMDGPU_TARGETS_INIT ${OPTIONAL_TARGETS} ${DEFAULT_TARGETS})
 
-        # Set this before finding hip so that hip::device has the required arch flags
-        # added as usage requirements on its interface
-        set(GPU_TARGETS "${AMDGPU_TARGETS_INIT}"
-            CACHE STRING "List of specific machine types for library to target")
+    #     # Set this before finding hip so that hip::device has the required arch flags
+    #     # added as usage requirements on its interface
+    #     set(GPU_TARGETS "${AMDGPU_TARGETS_INIT}"
+    #         CACHE STRING "List of specific machine types for library to target")
 
-        set(CMAKE_HIP_ARCHITECTURES "${AMDGPU_TARGETS_INIT}"
-            CACHE STRING "HIP architectures")
-    endif()
+    #     set(CMAKE_HIP_ARCHITECTURES "${AMDGPU_TARGETS_INIT}"
+    #         CACHE STRING "HIP architectures")
+         set(CMAKE_HIP_ARCHITECTURES "${GPU_TARGETS}"
+             CACHE STRING "HIP architectures")
+    # endif()
     
     message(STATUS "GPU Targets: ${CMAKE_HIP_ARCHITECTURES}")
 
