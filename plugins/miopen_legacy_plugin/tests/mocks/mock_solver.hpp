@@ -16,12 +16,12 @@ class Mock_solver : public Solver_interface
 public:
     MOCK_METHOD(bool,
                 is_applicable,
-                (const hipdnn_sdk::data_objects::GraphT& op_graph),
+                (const hipdnn_sdk::data_objects::Graph& op_graph),
                 (const, override));
     MOCK_METHOD(size_t,
                 get_workspace_size,
                 (const hipdnnEnginePluginHandle& handle,
-                 const hipdnn_sdk::data_objects::GraphT& graph),
+                 const hipdnn_sdk::data_objects::Graph& graph),
                 (const, override));
 };
 

@@ -16,10 +16,10 @@ class Solver_interface
 public:
     virtual ~Solver_interface() = default;
 
-    virtual bool is_applicable(const hipdnn_sdk::data_objects::GraphT& op_graph) const = 0;
+    virtual bool is_applicable(const hipdnn_sdk::data_objects::Graph& op_graph) const = 0;
 
     virtual size_t get_workspace_size(const hipdnnEnginePluginHandle& handle,
-                                      const hipdnn_sdk::data_objects::GraphT& graph) const
+                                      const hipdnn_sdk::data_objects::Graph& graph) const
         = 0;
 };
 

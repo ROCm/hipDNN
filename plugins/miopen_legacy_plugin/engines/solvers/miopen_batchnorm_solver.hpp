@@ -19,9 +19,9 @@ public:
     Miopen_batchnorm_solver(const Miopen_batchnorm_solver&) = delete;
     Miopen_batchnorm_solver& operator=(const Miopen_batchnorm_solver&) = delete;
 
-    bool is_applicable(const hipdnn_sdk::data_objects::GraphT& op_graph) const override;
+    bool is_applicable(const hipdnn_sdk::data_objects::Graph& op_graph) const override;
     size_t get_workspace_size(const hipdnnEnginePluginHandle& handle,
-                              const hipdnn_sdk::data_objects::GraphT& graph) const override;
+                              const hipdnn_sdk::data_objects::Graph& graph) const override;
 
     void execute_graph(const hipdnnEnginePluginHandle& handle,
                        const hipdnn_sdk::data_objects::GraphT& graph,

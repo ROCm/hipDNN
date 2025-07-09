@@ -39,9 +39,8 @@ TEST_F(Test_miopen_batchnorm_solver, IsApplicableReturnsTrue)
     auto builder = flatbuffer_test_utils::create_valid_batchnorm_graph();
     auto graph_fb
         = flatbuffers::GetRoot<hipdnn_sdk::data_objects::Graph>(builder.GetBufferPointer());
-    std::unique_ptr<hipdnn_sdk::data_objects::GraphT> graph(graph_fb->UnPack());
 
-    EXPECT_TRUE(solver.is_applicable(*graph));
+    EXPECT_TRUE(solver.is_applicable(*graph_fb));
 }
 
 TEST_F(Test_miopen_batchnorm_solver, GetWorkspaceSizeReturnsExpectedValue)
@@ -49,9 +48,8 @@ TEST_F(Test_miopen_batchnorm_solver, GetWorkspaceSizeReturnsExpectedValue)
     auto builder = flatbuffer_test_utils::create_valid_batchnorm_graph();
     auto graph_fb
         = flatbuffers::GetRoot<hipdnn_sdk::data_objects::Graph>(builder.GetBufferPointer());
-    std::unique_ptr<hipdnn_sdk::data_objects::GraphT> graph(graph_fb->UnPack());
 
-    size_t workspace_size = solver.get_workspace_size(dummy_handle, *graph);
+    size_t workspace_size = solver.get_workspace_size(dummy_handle, *graph_fb);
 
     EXPECT_EQ(workspace_size, 0u);
 }

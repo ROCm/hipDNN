@@ -15,24 +15,24 @@ namespace miopen_legacy_plugin
 // rather than making it configurable and adding extra complexity.
 const miopenBatchNormMode_t miopen_batchnorm_mode = miopenBNSpatial;
 
-bool Miopen_batchnorm_solver::is_applicable(const hipdnn_sdk::data_objects::GraphT& op_graph) const
+bool Miopen_batchnorm_solver::is_applicable(const hipdnn_sdk::data_objects::Graph& op_graph) const
 {
-    auto& nodes = op_graph.nodes;
+    auto nodes = op_graph.nodes();
 
-    if(nodes.size() != 1)
+    if(nodes->size() != 1)
     {
         HIPDNN_LOG_INFO(
             "Batchnorm solver is applicable only for single node graphs. Graph has {} nodes",
-            nodes.size());
+            nodes->size());
         return false;
     }
 
-    const auto& node = nodes[0];
+    auto node = nodes->Get(0);
 
-    if(node->attributes.type
+    if(node->attributes_type()
        != hipdnn_sdk::data_objects::NodeAttributes_BatchnormInferenceAttributes)
     {
-        HIPDNN_LOG_INFO("Batchnorm solver is not applicable for {} nodes", node->attributes.type);
+        HIPDNN_LOG_INFO("Batchnorm solver is not applicable for {} nodes", node->attributes_type());
         return false;
     }
 
@@ -41,12 +41,13 @@ bool Miopen_batchnorm_solver::is_applicable(const hipdnn_sdk::data_objects::Grap
 
 size_t
     Miopen_batchnorm_solver::get_workspace_size(const hipdnnEnginePluginHandle& handle,
-                                                const hipdnn_sdk::data_objects::GraphT& graph) const
+                                                const hipdnn_sdk::data_objects::Graph& graph) const
 {
     //batchnorm solver does not require workspace size
     return 0u;
 }
 
+//todo, ensure stream is used.
 void Miopen_batchnorm_solver::execute_graph(const hipdnnEnginePluginHandle& handle,
                                             const hipdnn_sdk::data_objects::GraphT& graph,
                                             const hipdnnPluginDeviceBuffer_t* device_buffers,

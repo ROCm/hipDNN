@@ -22,14 +22,11 @@ int64_t Miopen_engine::id() const
 
 bool Miopen_engine::is_applicable(const hipdnnPluginConstData_t* op_graph) const
 {
-
-    std::unique_ptr<hipdnn_sdk::data_objects::GraphT> graph;
-    hipdnn_plugin::flatbuffer_utilities::convert_serialized_plugin_graph_to_graph(
-        op_graph->ptr, op_graph->size, graph);
+    auto graph_ptr = hipdnn_sdk::data_objects::GetGraph(op_graph->ptr);
 
     for(const auto& solver : _solvers)
     {
-        if(solver->is_applicable(*graph))
+        if(solver->is_applicable(*graph_ptr))
         {
             return true;
         }
@@ -54,16 +51,14 @@ void Miopen_engine::get_details(hipdnnPluginConstData_t& details_out) const
 size_t Miopen_engine::get_workspace_size(const hipdnnEnginePluginHandle& handle,
                                          const hipdnnPluginConstData_t* op_graph) const
 {
-    std::unique_ptr<hipdnn_sdk::data_objects::GraphT> graph;
-    hipdnn_plugin::flatbuffer_utilities::convert_serialized_plugin_graph_to_graph(
-        op_graph->ptr, op_graph->size, graph);
+    auto graph_ptr = hipdnn_sdk::data_objects::GetGraph(op_graph->ptr);
 
     size_t workspace_size = 0;
     for(const auto& solver : _solvers)
     {
-        if(solver->is_applicable(*graph))
+        if(solver->is_applicable(*graph_ptr))
         {
-            workspace_size = solver->get_workspace_size(handle, *graph);
+            workspace_size = solver->get_workspace_size(handle, *graph_ptr);
         }
     }
     return workspace_size;
