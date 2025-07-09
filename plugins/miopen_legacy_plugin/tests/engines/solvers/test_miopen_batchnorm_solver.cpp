@@ -12,6 +12,7 @@
 #include "hipdnn_engine_plugin_handle.hpp"
 #include "miopen_handle_factory.hpp"
 #include <hipdnn_sdk/plugin/engine_plugin_api.h>
+#include <hipdnn_sdk/test_utilities/flatbuffer_graph_test_utils.hpp>
 
 #define HIP_CHECK(status)                                                                      \
     do                                                                                         \
@@ -30,18 +31,28 @@ class Test_miopen_batchnorm_solver : public ::testing::Test
 {
 protected:
     Miopen_batchnorm_solver solver;
-    hipdnn_sdk::data_objects::GraphT op_graph;
     hipdnnEnginePluginHandle dummy_handle;
 };
 
 TEST_F(Test_miopen_batchnorm_solver, IsApplicableReturnsTrue)
 {
-    EXPECT_TRUE(solver.is_applicable(op_graph));
+    auto builder = flatbuffer_test_utils::create_valid_batchnorm_graph();
+    auto graph_fb
+        = flatbuffers::GetRoot<hipdnn_sdk::data_objects::Graph>(builder.GetBufferPointer());
+    std::unique_ptr<hipdnn_sdk::data_objects::GraphT> graph(graph_fb->UnPack());
+
+    EXPECT_TRUE(solver.is_applicable(*graph));
 }
 
 TEST_F(Test_miopen_batchnorm_solver, GetWorkspaceSizeReturnsExpectedValue)
 {
-    size_t workspace_size = solver.get_workspace_size(dummy_handle, op_graph);
+    auto builder = flatbuffer_test_utils::create_valid_batchnorm_graph();
+    auto graph_fb
+        = flatbuffers::GetRoot<hipdnn_sdk::data_objects::Graph>(builder.GetBufferPointer());
+    std::unique_ptr<hipdnn_sdk::data_objects::GraphT> graph(graph_fb->UnPack());
+
+    size_t workspace_size = solver.get_workspace_size(dummy_handle, *graph);
+
     EXPECT_EQ(workspace_size, 0u);
 }
 

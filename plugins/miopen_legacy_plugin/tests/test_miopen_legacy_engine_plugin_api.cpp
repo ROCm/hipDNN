@@ -1,7 +1,9 @@
 // Copyright © Advanced Micro Devices, Inc., or its affiliates.
 // SPDX-License-Identifier:  MIT
 
+#include "hipdnn_engine_plugin_execution_context.hpp"
 #include "hipdnn_engine_plugin_handle.hpp"
+
 #include <gtest/gtest.h>
 #include <hipdnn_sdk/plugin/engine_plugin_api.h>
 #include <hipdnn_sdk/plugin/plugin_api_data_types.h>
@@ -116,7 +118,7 @@ TEST(MiopenLegacyEnginePluginApiTest, EnginePluginGetApplicableEngineIdsValid)
     hipdnnEnginePluginHandle_t handle = nullptr;
     ASSERT_EQ(hipdnnEnginePluginCreate(&handle), HIPDNN_PLUGIN_STATUS_SUCCESS);
 
-    auto builder = flatbuffer_test_utils::create_valid_graph();
+    auto builder = flatbuffer_test_utils::create_valid_batchnorm_graph();
     auto serialized_graph = builder.Release();
     hipdnnPluginConstData_t op_graph
         = flatbuffer_test_utils::create_valid_const_data_graph(serialized_graph);
@@ -231,7 +233,7 @@ TEST(MiopenLegacyEnginePluginApiTest, EnginePluginGetWorkspaceSizeValid)
     ASSERT_EQ(hipdnnEnginePluginCreate(&handle), HIPDNN_PLUGIN_STATUS_SUCCESS);
 
     // Create a valid flatbuffer graph and engine config
-    auto builder = flatbuffer_test_utils::create_valid_graph();
+    auto builder = flatbuffer_test_utils::create_valid_batchnorm_graph();
     auto serialized_graph = builder.Release();
     hipdnnPluginConstData_t op_graph
         = flatbuffer_test_utils::create_valid_const_data_graph(serialized_graph);
@@ -244,20 +246,76 @@ TEST(MiopenLegacyEnginePluginApiTest, EnginePluginGetWorkspaceSizeValid)
         = hipdnnEnginePluginGetWorkspaceSize(handle, engine_config, &op_graph, &workspace_size);
 
     EXPECT_EQ(status, HIPDNN_PLUGIN_STATUS_SUCCESS);
-    EXPECT_GT(workspace_size, 0u);
+    EXPECT_EQ(workspace_size, 0u); // batchnorm workspace size is always 0
 
     EXPECT_EQ(hipdnnEnginePluginDestroy(handle), HIPDNN_PLUGIN_STATUS_SUCCESS);
 }
 
 TEST(MiopenLegacyEnginePluginApiTest, EnginePluginCreateExecutionContextNull)
 {
-    EXPECT_EQ(hipdnnEnginePluginCreateExecutionContext(nullptr, nullptr, nullptr, nullptr),
+    auto handle = reinterpret_cast<hipdnnEnginePluginHandle_t>(0x1234);
+    auto engine_config = reinterpret_cast<hipdnnPluginConstData_t*>(0x5678);
+    auto op_graph = reinterpret_cast<hipdnnPluginConstData_t*>(0x9abc);
+    hipdnnEnginePluginExecutionContext_t execution_context;
+
+    // Null handle
+    EXPECT_EQ(hipdnnEnginePluginCreateExecutionContext(
+                  nullptr, engine_config, op_graph, &execution_context),
               HIPDNN_PLUGIN_STATUS_BAD_PARAM);
+
+    // Null engine_config
+    EXPECT_EQ(
+        hipdnnEnginePluginCreateExecutionContext(handle, nullptr, op_graph, &execution_context),
+        HIPDNN_PLUGIN_STATUS_BAD_PARAM);
+
+    // Null op_graph
+    EXPECT_EQ(hipdnnEnginePluginCreateExecutionContext(
+                  handle, engine_config, nullptr, &execution_context),
+              HIPDNN_PLUGIN_STATUS_BAD_PARAM);
+
+    // Null execution_context
+    EXPECT_EQ(hipdnnEnginePluginCreateExecutionContext(handle, engine_config, op_graph, nullptr),
+              HIPDNN_PLUGIN_STATUS_BAD_PARAM);
+}
+
+TEST(MiopenLegacyEnginePluginApiTest, EnginePluginCreateExecutionContextValid)
+{
+    auto handle = reinterpret_cast<hipdnnEnginePluginHandle_t>(0x1234);
+
+    // Create a valid flatbuffer graph and engine config
+    auto builder = flatbuffer_test_utils::create_valid_batchnorm_graph();
+    auto serialized_graph = builder.Release();
+    hipdnnPluginConstData_t op_graph
+        = flatbuffer_test_utils::create_valid_const_data_graph(serialized_graph);
+
+    // For now, engine_config is not used, so we can pass op_graph as a placeholder
+    auto engine_config_builder = flatbuffer_test_utils::create_valid_engine_config(123);
+    auto serialized_engine_config = engine_config_builder.Release();
+    hipdnnPluginConstData_t engine_config
+        = flatbuffer_test_utils::create_valid_const_data_engine_config(serialized_engine_config);
+
+    hipdnnEnginePluginExecutionContext_t execution_context = nullptr;
+    auto status = hipdnnEnginePluginCreateExecutionContext(
+        handle, &engine_config, &op_graph, &execution_context);
+
+    EXPECT_EQ(status, HIPDNN_PLUGIN_STATUS_SUCCESS);
+    ASSERT_NE(execution_context, nullptr);
+
+    EXPECT_EQ(hipdnnEnginePluginDestroyExecutionContext(handle, execution_context),
+              HIPDNN_PLUGIN_STATUS_SUCCESS);
 }
 
 TEST(MiopenLegacyEnginePluginApiTest, EnginePluginDestroyExecutionContextNull)
 {
-    EXPECT_EQ(hipdnnEnginePluginDestroyExecutionContext(nullptr, nullptr),
+    auto handle = reinterpret_cast<hipdnnEnginePluginHandle_t>(0x1234);
+    hipdnnEnginePluginExecutionContext execution_context;
+
+    // Null handle
+    EXPECT_EQ(hipdnnEnginePluginDestroyExecutionContext(nullptr, &execution_context),
+              HIPDNN_PLUGIN_STATUS_BAD_PARAM);
+
+    // Null execution_context
+    EXPECT_EQ(hipdnnEnginePluginDestroyExecutionContext(handle, nullptr),
               HIPDNN_PLUGIN_STATUS_BAD_PARAM);
 }
 

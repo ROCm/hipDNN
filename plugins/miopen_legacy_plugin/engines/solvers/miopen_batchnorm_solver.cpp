@@ -11,6 +11,10 @@
 namespace miopen_legacy_plugin
 {
 
+// We have made the intentional decision to hardcode the batchnorm mode to miopenBNSpatial
+// rather than making it configurable and adding extra complexity.
+const miopenBatchNormMode_t miopen_batchnorm_mode = miopenBNSpatial;
+
 bool Miopen_batchnorm_solver::is_applicable(const hipdnn_sdk::data_objects::GraphT& op_graph) const
 {
     auto& nodes = op_graph.nodes;
@@ -167,24 +171,24 @@ void Miopen_batchnorm_solver::execute_batchnorm_fwd_inference(
                                          num_device_buffers,
                                          estVarianceDesc);
 
-    auto miopen_status = miopenBatchNormalizationForwardInference_V2(
-        handle.miopen_handle,
-        miopenBNPerActivation, // what to do with this?????
-        &alpha,
-        &beta,
-        xDesc.tensor_desc,
-        xDesc.device_buffer.ptr,
-        yDesc.tensor_desc,
-        yDesc.device_buffer.ptr,
-        scaleDesc.tensor_desc,
-        biasDesc.tensor_desc,
-        estMeanDesc.tensor_desc,
-        estVarianceDesc.tensor_desc,
-        scaleDesc.device_buffer.ptr,
-        biasDesc.device_buffer.ptr,
-        estMeanDesc.device_buffer.ptr,
-        estVarianceDesc.device_buffer.ptr,
-        epsilon);
+    auto miopen_status
+        = miopenBatchNormalizationForwardInference_V2(handle.miopen_handle,
+                                                      miopen_batchnorm_mode,
+                                                      &alpha,
+                                                      &beta,
+                                                      xDesc.tensor_desc,
+                                                      xDesc.device_buffer.ptr,
+                                                      yDesc.tensor_desc,
+                                                      yDesc.device_buffer.ptr,
+                                                      scaleDesc.tensor_desc,
+                                                      biasDesc.tensor_desc,
+                                                      estMeanDesc.tensor_desc,
+                                                      estVarianceDesc.tensor_desc,
+                                                      scaleDesc.device_buffer.ptr,
+                                                      biasDesc.device_buffer.ptr,
+                                                      estMeanDesc.device_buffer.ptr,
+                                                      estVarianceDesc.device_buffer.ptr,
+                                                      epsilon);
 
     HIPDNN_LOG_INFO("MIOpen batchnorm forward inference status: {}",
                     miopenGetErrorString(miopen_status));

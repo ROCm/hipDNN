@@ -23,7 +23,7 @@ TEST(Miopen_engineTest, WorkspaceSizeReturnsZeroIfNoSolvers)
 {
     Miopen_engine engine(1);
 
-    auto builder = flatbuffer_test_utils::create_valid_graph();
+    auto builder = flatbuffer_test_utils::create_valid_batchnorm_graph();
     auto serialized_graph = builder.Release();
     hipdnnPluginConstData_t op_graph
         = flatbuffer_test_utils::create_valid_const_data_graph(serialized_graph);
@@ -42,7 +42,7 @@ TEST(Miopen_engineTest, WorkspaceSizeReturnsSolverWorkspace)
     Miopen_engine engine(1);
     engine.add_solver(std::move(mock_solver));
 
-    auto builder = flatbuffer_test_utils::create_valid_graph();
+    auto builder = flatbuffer_test_utils::create_valid_batchnorm_graph();
     auto serialized_graph = builder.Release();
     hipdnnPluginConstData_t op_graph
         = flatbuffer_test_utils::create_valid_const_data_graph(serialized_graph);
@@ -59,7 +59,7 @@ TEST(Miopen_engineTest, WorkspaceSizeReturnsZeroIfNoSolverApplicable)
     Miopen_engine engine(1);
     engine.add_solver(std::move(mock_solver));
 
-    auto builder = flatbuffer_test_utils::create_valid_graph();
+    auto builder = flatbuffer_test_utils::create_valid_batchnorm_graph();
     auto serialized_graph = builder.Release();
     hipdnnPluginConstData_t op_graph
         = flatbuffer_test_utils::create_valid_const_data_graph(serialized_graph);
@@ -76,7 +76,7 @@ TEST(Miopen_engineTest, IsApplicableReturnsTrueIfAnySolverApplicable)
     Miopen_engine engine(0);
     engine.add_solver(std::move(mock_solver));
 
-    auto builder = flatbuffer_test_utils::create_valid_graph();
+    auto builder = flatbuffer_test_utils::create_valid_batchnorm_graph();
     auto serialized_graph = builder.Release();
     hipdnnPluginConstData_t op_graph
         = flatbuffer_test_utils::create_valid_const_data_graph(serialized_graph);
@@ -88,7 +88,7 @@ TEST(Miopen_engineTest, IsApplicableReturnsFalseIfNoSolvers)
 {
     Miopen_engine engine(0);
 
-    auto builder = flatbuffer_test_utils::create_valid_graph();
+    auto builder = flatbuffer_test_utils::create_valid_batchnorm_graph();
     auto serialized_graph = builder.Release();
     hipdnnPluginConstData_t op_graph
         = flatbuffer_test_utils::create_valid_const_data_graph(serialized_graph);
@@ -104,7 +104,7 @@ TEST(Miopen_engineTest, IsApplicableReturnsFalseIfNoSolverApplicable)
     Miopen_engine engine(0);
     engine.add_solver(std::move(mock_solver));
 
-    auto builder = flatbuffer_test_utils::create_valid_graph();
+    auto builder = flatbuffer_test_utils::create_valid_batchnorm_graph();
     auto serialized_graph = builder.Release();
     hipdnnPluginConstData_t op_graph
         = flatbuffer_test_utils::create_valid_const_data_graph(serialized_graph);

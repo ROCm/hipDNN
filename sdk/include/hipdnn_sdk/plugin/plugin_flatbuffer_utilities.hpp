@@ -5,6 +5,7 @@
 
 #include <flatbuffers/flatbuffers.h>
 #include <flatbuffers/verifier.h>
+#include <hipdnn_sdk/data_objects/engine_config_generated.h>
 #include <hipdnn_sdk/data_objects/engine_details_generated.h>
 #include <hipdnn_sdk/data_objects/graph_generated.h>
 #include <hipdnn_sdk/plugin/plugin_exception.hpp>
@@ -58,6 +59,28 @@ inline void unpack_serialized_engine_details(
     }
 
     engine_details_out = std::move(engine_details);
+}
+
+inline void unpack_serialized_engine_config(
+    const void* buffer,
+    size_t size,
+    std::unique_ptr<hipdnn_sdk::data_objects::EngineConfigT>& engine_config_out)
+{
+    flatbuffers::Verifier verifier(static_cast<const uint8_t*>(buffer), size);
+    if(!verifier.VerifyBuffer<hipdnn_sdk::data_objects::EngineConfig>())
+    {
+        throw Hipdnn_plugin_exception(HIPDNN_PLUGIN_STATUS_BAD_PARAM,
+                                      "Invalid buffer: unable to verify the flatbuffer schema.");
+    }
+
+    auto engine_config = hipdnn_sdk::data_objects::UnPackEngineConfig(buffer);
+    if(engine_config == nullptr)
+    {
+        throw Hipdnn_plugin_exception(HIPDNN_PLUGIN_INTERNAL_ERROR,
+                                      "Invalid buffer: unable to unpack the flatbuffer schema.");
+    }
+
+    engine_config_out = std::move(engine_config);
 }
 
 } // namespace flatbuffer_utilities
