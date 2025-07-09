@@ -16,37 +16,37 @@ TEST(HipdnnPluginExceptionTest, WhatReturnsMessage)
 
 TEST(HipdnnPluginExceptionTest, ThrowIfNeMacroThrows)
 {
-    EXPECT_THROW(PLUGIN_THROW_IF_NE(1, 2, HIPDNN_PLUGIN_INTERNAL_ERROR, "not equal"),
+    EXPECT_THROW(PLUGIN_THROW_IF_NE(1, 2, HIPDNN_PLUGIN_STATUS_INTERNAL_ERROR, "not equal"),
                  Hipdnn_plugin_exception);
 }
 
 TEST(HipdnnPluginExceptionTest, ThrowIfEqMacroThrows)
 {
-    EXPECT_THROW(PLUGIN_THROW_IF_EQ(1, 1, HIPDNN_PLUGIN_INTERNAL_ERROR, "equal"),
+    EXPECT_THROW(PLUGIN_THROW_IF_EQ(1, 1, HIPDNN_PLUGIN_STATUS_INTERNAL_ERROR, "equal"),
                  Hipdnn_plugin_exception);
 }
 
 TEST(HipdnnPluginExceptionTest, ThrowIfTrueMacroThrows)
 {
-    EXPECT_THROW(PLUGIN_THROW_IF_TRUE(true, HIPDNN_PLUGIN_INTERNAL_ERROR, "true"),
+    EXPECT_THROW(PLUGIN_THROW_IF_TRUE(true, HIPDNN_PLUGIN_STATUS_INTERNAL_ERROR, "true"),
                  Hipdnn_plugin_exception);
 }
 
 TEST(HipdnnPluginExceptionTest, ThrowIfFalseMacroThrows)
 {
-    EXPECT_THROW(PLUGIN_THROW_IF_FALSE(false, HIPDNN_PLUGIN_INTERNAL_ERROR, "false"),
+    EXPECT_THROW(PLUGIN_THROW_IF_FALSE(false, HIPDNN_PLUGIN_STATUS_INTERNAL_ERROR, "false"),
                  Hipdnn_plugin_exception);
 }
 
 TEST(HipdnnPluginExceptionTest, ThrowIfNullMacroThrows)
 {
     void* ptr = nullptr;
-    EXPECT_THROW(PLUGIN_THROW_IF_NULL(ptr, HIPDNN_PLUGIN_INTERNAL_ERROR, "null"),
+    EXPECT_THROW(PLUGIN_THROW_IF_NULL(ptr, HIPDNN_PLUGIN_STATUS_INTERNAL_ERROR, "null"),
                  Hipdnn_plugin_exception);
 }
 
 TEST(HipdnnPluginExceptionTest, ThrowIfLtMacroThrows)
 {
-    EXPECT_THROW(PLUGIN_THROW_IF_LT(1, 2, HIPDNN_PLUGIN_INTERNAL_ERROR, "less than"),
+    EXPECT_THROW(PLUGIN_THROW_IF_LT(1, 2, HIPDNN_PLUGIN_STATUS_INTERNAL_ERROR, "less than"),
                  Hipdnn_plugin_exception);
 }

@@ -30,7 +30,7 @@ inline void convert_serialized_plugin_graph_to_graph(
     auto graph = hipdnn_sdk::data_objects::UnPackGraph(buffer);
     if(graph == nullptr)
     {
-        throw Hipdnn_plugin_exception(HIPDNN_PLUGIN_INTERNAL_ERROR,
+        throw Hipdnn_plugin_exception(HIPDNN_PLUGIN_STATUS_INTERNAL_ERROR,
                                       "Invalid buffer: unable to unpack the flatbuffer schema.");
     }
 

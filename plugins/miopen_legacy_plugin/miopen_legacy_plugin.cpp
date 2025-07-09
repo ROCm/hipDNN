@@ -123,7 +123,7 @@ hipdnnPluginStatus_t hipdnnPluginRunEngine(unsigned engine_index,
     if(!input || !output || size == 0)
         return HIPDNN_PLUGIN_STATUS_BAD_PARAM;
 
-    return HIPDNN_PLUGIN_INTERNAL_ERROR;
+    return HIPDNN_PLUGIN_STATUS_INTERNAL_ERROR;
 }
 ////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////
@@ -247,7 +247,7 @@ hipdnnPluginStatus_t hipdnnEnginePluginGetEngineDetails(hipdnnEnginePluginHandle
     if(!handle || !op_graph || !engine_details)
         return HIPDNN_PLUGIN_STATUS_BAD_PARAM;
 
-    return HIPDNN_PLUGIN_INTERNAL_ERROR;
+    return HIPDNN_PLUGIN_STATUS_INTERNAL_ERROR;
 }
 
 hipdnnPluginStatus_t hipdnnEnginePluginDestroyEngineDetails(hipdnnEnginePluginHandle_t handle,
@@ -256,7 +256,7 @@ hipdnnPluginStatus_t hipdnnEnginePluginDestroyEngineDetails(hipdnnEnginePluginHa
     if(!handle || !engine_details)
         return HIPDNN_PLUGIN_STATUS_BAD_PARAM;
 
-    return HIPDNN_PLUGIN_INTERNAL_ERROR;
+    return HIPDNN_PLUGIN_STATUS_INTERNAL_ERROR;
 }
 
 hipdnnPluginStatus_t
@@ -270,7 +270,7 @@ hipdnnPluginStatus_t
 
     // TODO: Calculate MIOpen workspace size from flatbuffer config and graph
     *workspace_size = 0;
-    return HIPDNN_PLUGIN_INTERNAL_ERROR;
+    return HIPDNN_PLUGIN_STATUS_INTERNAL_ERROR;
 }
 
 hipdnnPluginStatus_t hipdnnEnginePluginCreateExecutionContext(
@@ -284,7 +284,7 @@ hipdnnPluginStatus_t hipdnnEnginePluginCreateExecutionContext(
 
     // TODO: Parse flatbuffer config and graph to create MIOpen execution context
     *execution_context = nullptr;
-    return HIPDNN_PLUGIN_INTERNAL_ERROR;
+    return HIPDNN_PLUGIN_STATUS_INTERNAL_ERROR;
 }
 
 hipdnnPluginStatus_t hipdnnEnginePluginDestroyExecutionContext(
@@ -294,7 +294,7 @@ hipdnnPluginStatus_t hipdnnEnginePluginDestroyExecutionContext(
         return HIPDNN_PLUGIN_STATUS_BAD_PARAM;
 
     // TODO: Destroy MIOpen execution context and free resources
-    return HIPDNN_PLUGIN_INTERNAL_ERROR;
+    return HIPDNN_PLUGIN_STATUS_INTERNAL_ERROR;
 }
 
 hipdnnPluginStatus_t
@@ -308,7 +308,7 @@ hipdnnPluginStatus_t
         return HIPDNN_PLUGIN_STATUS_BAD_PARAM;
 
     // TODO: Execute MIOpen operations using execution context and device buffers
-    return HIPDNN_PLUGIN_INTERNAL_ERROR;
+    return HIPDNN_PLUGIN_STATUS_INTERNAL_ERROR;
 }
 
 } // extern "C"

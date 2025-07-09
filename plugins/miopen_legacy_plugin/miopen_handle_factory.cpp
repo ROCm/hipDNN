@@ -27,7 +27,7 @@ void Miopen_handle_factory::create_miopen_handle(hipdnnEnginePluginHandle_t* han
     {
         delete *handle;
         *handle = nullptr;
-        throw Hipdnn_plugin_exception(HIPDNN_PLUGIN_INTERNAL_ERROR,
+        throw Hipdnn_plugin_exception(HIPDNN_PLUGIN_STATUS_INTERNAL_ERROR,
                                       "Failed to create MIOpen handle");
     }
 }
@@ -43,7 +43,7 @@ void Miopen_handle_factory::destroy_miopen_handle(hipdnnEnginePluginHandle_t han
 
     if(status != miopenStatusSuccess)
     {
-        throw Hipdnn_plugin_exception(HIPDNN_PLUGIN_INTERNAL_ERROR,
+        throw Hipdnn_plugin_exception(HIPDNN_PLUGIN_STATUS_INTERNAL_ERROR,
                                       "Failed to destroy MIOpen handle");
     }
 }

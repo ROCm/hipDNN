@@ -25,11 +25,11 @@ hipdnnPluginStatus_t try_catch(F f)
     }
     catch(const std::exception& ex)
     {
-        return Plugin_last_error_manager::set_last_error(HIPDNN_PLUGIN_INTERNAL_ERROR, ex.what());
+        return Plugin_last_error_manager::set_last_error(HIPDNN_PLUGIN_STATUS_INTERNAL_ERROR, ex.what());
     }
     catch(...)
     {
-        return Plugin_last_error_manager::set_last_error(HIPDNN_PLUGIN_INTERNAL_ERROR,
+        return Plugin_last_error_manager::set_last_error(HIPDNN_PLUGIN_STATUS_INTERNAL_ERROR,
                                                          "Unknown exception occured");
     }
     return HIPDNN_PLUGIN_STATUS_SUCCESS;
