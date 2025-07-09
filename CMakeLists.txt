@@ -35,6 +35,7 @@ option(HIP_DNN_BUILD_PLUGINS "Builds the plugins as part of the main cmake" OFF)
 
 option(CODE_COVERAGE "Build with code coverage flags" OFF)
 option(ENABLE_CLANG_TIDY "Enable Clang-Tidy checks" ON)
+option(BUILD_ADDRESS_SANITIZER "Build with Address Sanitizer enabled" OFF)
 
 list(
     APPEND
@@ -67,7 +68,7 @@ hipdnn_add_dependency(GTest v1.16.0)
 enable_testing() # Cmake wont discover or run tests without this line
 
 # Add a check target which will run all tests discovered by gtest_discover_tests via ctest. 
-add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND} --output-on-failure -C ${CMAKE_CFG_INTDIR})
+add_custom_target(check COMMAND ASAN_SYMBOLIZER_PATH=/opt/rocm/llvm/bin/llvm-symbolizer ${CMAKE_CTEST_COMMAND} --output-on-failure -C ${CMAKE_CFG_INTDIR})
 
 # Add global compile options
 set(EXTRA_COMPILE_OPTIONS)
@@ -80,6 +81,56 @@ if(CODE_COVERAGE)
     list(PREPEND EXTRA_LINK_OPTIONS 
         -fprofile-instr-generate 
         -fcoverage-mapping)
+endif()
+
+# Enable Address Sanitizer and set linker flags for security
+message(STATUS "Building with Sanitizers: ${BUILD_ADDRESS_SANITIZER}")
+if (BUILD_ADDRESS_SANITIZER)
+    if(NOT DEFINED GPU_TARGETS)
+        set(XNACK_PLUS_TARGETS
+            gfx90a:xnack+
+            #gfx908:xnack+
+            #gfx942:xnack+
+            #gfx950:xnack+
+        )
+        set(OPTIONAL_TARGETS ${XNACK_PLUS_TARGETS})
+        set(AMDGPU_TARGETS_INIT ${OPTIONAL_TARGETS} ${DEFAULT_TARGETS})
+
+        # Set this before finding hip so that hip::device has the required arch flags
+        # added as usage requirements on its interface
+        set(GPU_TARGETS "${AMDGPU_TARGETS_INIT}"
+            CACHE STRING "List of specific machine types for library to target")
+
+        set(CMAKE_HIP_ARCHITECTURES "${AMDGPU_TARGETS_INIT}"
+            CACHE STRING "HIP architectures")
+    endif()
+    
+    message(STATUS "GPU Targets: ${CMAKE_HIP_ARCHITECTURES}")
+
+    #link_directories(/opt/rocm/llvm/lib/19/lib/linux)
+    link_directories(/opt/rocm/llvm/lib/clang/19/lib/linux)
+
+    # find_library(UBSAN_LIBRARY ubsan PATHS /opt/rocm/llvm/lib/clang/19/lib/linux)
+    # if(UBSAN_LIBRARY)
+    #     list(APPEND EXTRA_LINK_OPTIONS ${UBSAN_LIBRARY})
+    #     message(STATUS "UBSAN LIB: ${UBSAN_LIBRARY}")
+    # endif()
+
+    set(ENV{ASAN_SYMBOLIZER_PATH} "/opt/rocm/llvm/bin/llvm-symbolizer")
+    set(ENV{HSA_XNACK} "1")
+
+    list(APPEND EXTRA_COMPILE_OPTIONS 
+        -fsanitize=address,leak
+        -fno-omit-frame-pointer
+        -fno-optimize-sibling-calls
+        -fno-inline
+    )
+
+    list(APPEND EXTRA_LINK_OPTIONS 
+        -fsanitize=address,leak
+        -shared-libasan
+        #-lubsan
+    ) 
 endif()
 
 list(PREPEND HIPDNN_WARNING_COMPILE_OPTIONS

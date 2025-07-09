@@ -137,6 +137,9 @@ TEST(DescriptorFactoryTest, TestHandleFactory)
     ASSERT_NO_THROW(hipdnn_backend::Handle_factory::create_handle(&handle_t));
     EXPECT_NE(handle_t, nullptr);
 
+    hipdnn_backend::Handle_factory::destroy_handle(handle_t);
+    handle_t = nullptr;
+    
     ASSERT_THROW_HIPDNN_STATUS(hipdnn_backend::Handle_factory::create_handle(nullptr),
                                HIPDNN_STATUS_BAD_PARAM_NULL_POINTER);
 }
