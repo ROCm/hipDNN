@@ -54,7 +54,7 @@ inline void unpack_serialized_engine_details(
     auto engine_details = hipdnn_sdk::data_objects::UnPackEngineDetails(buffer);
     if(engine_details == nullptr)
     {
-        throw Hipdnn_plugin_exception(HIPDNN_PLUGIN_INTERNAL_ERROR,
+        throw Hipdnn_plugin_exception(HIPDNN_PLUGIN_STATUS_INTERNAL_ERROR,
                                       "Invalid buffer: unable to unpack the flatbuffer schema.");
     }
 
@@ -76,7 +76,7 @@ inline void unpack_serialized_engine_config(
     auto engine_config = hipdnn_sdk::data_objects::UnPackEngineConfig(buffer);
     if(engine_config == nullptr)
     {
-        throw Hipdnn_plugin_exception(HIPDNN_PLUGIN_INTERNAL_ERROR,
+        throw Hipdnn_plugin_exception(HIPDNN_PLUGIN_STATUS_INTERNAL_ERROR,
                                       "Invalid buffer: unable to unpack the flatbuffer schema.");
     }
 
