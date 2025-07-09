@@ -287,6 +287,26 @@ hipdnnPluginStatus_t
                                        const hipdnnPluginConstData_t* op_graph,
                                        size_t* workspace_size)
 {
+    LOG_API_ENTRY("handle={:p}, engine_details={:p}, op_graph={:p}, workspace_size={:p}",
+                  static_cast<void*>(handle),
+                  static_cast<const void*>(engine_config),
+                  static_cast<const void*>(op_graph),
+                  static_cast<void*>(workspace_size));
+
+    return hipdnn_plugin::try_catch([&, api_name = __func__]() {
+        throw_if_null(handle);
+        throw_if_null(engine_config);
+        throw_if_null(op_graph);
+        throw_if_null(workspace_size);
+
+        auto& engine_manager = handle->get_engine_manager();
+
+        //todo, deal with engine_config
+        *workspace_size = engine_manager.get_workspace_size(*handle, 1, op_graph);
+
+        LOG_API_SUCCESS(api_name, "workspace_size={}", *workspace_size);
+    });
+
     if(!handle || !engine_config || !op_graph || !workspace_size)
         return HIPDNN_PLUGIN_STATUS_BAD_PARAM;
 

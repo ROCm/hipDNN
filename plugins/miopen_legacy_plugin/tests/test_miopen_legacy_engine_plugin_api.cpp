@@ -203,8 +203,50 @@ TEST(MiopenLegacyEnginePluginApiTest, EnginePluginDestroyEngineDetailsNull)
 
 TEST(MiopenLegacyEnginePluginApiTest, EnginePluginGetWorkspaceSizeNull)
 {
-    EXPECT_EQ(hipdnnEnginePluginGetWorkspaceSize(nullptr, nullptr, nullptr, nullptr),
+    auto handle = reinterpret_cast<hipdnnEnginePluginHandle_t>(0x1234);
+    auto engine_config = reinterpret_cast<hipdnnPluginConstData_t*>(0x5678);
+    auto op_graph = reinterpret_cast<hipdnnPluginConstData_t*>(0x9abc);
+    size_t workspace_size = 123;
+
+    // Null handle
+    EXPECT_EQ(hipdnnEnginePluginGetWorkspaceSize(nullptr, engine_config, op_graph, &workspace_size),
               HIPDNN_PLUGIN_STATUS_BAD_PARAM);
+
+    // Null engine_config
+    EXPECT_EQ(hipdnnEnginePluginGetWorkspaceSize(handle, nullptr, op_graph, &workspace_size),
+              HIPDNN_PLUGIN_STATUS_BAD_PARAM);
+
+    // Null op_graph
+    EXPECT_EQ(hipdnnEnginePluginGetWorkspaceSize(handle, engine_config, nullptr, &workspace_size),
+              HIPDNN_PLUGIN_STATUS_BAD_PARAM);
+
+    // Null workspace_size
+    EXPECT_EQ(hipdnnEnginePluginGetWorkspaceSize(handle, engine_config, op_graph, nullptr),
+              HIPDNN_PLUGIN_STATUS_BAD_PARAM);
+}
+
+TEST(MiopenLegacyEnginePluginApiTest, EnginePluginGetWorkspaceSizeValid)
+{
+    hipdnnEnginePluginHandle_t handle = nullptr;
+    ASSERT_EQ(hipdnnEnginePluginCreate(&handle), HIPDNN_PLUGIN_STATUS_SUCCESS);
+
+    // Create a valid flatbuffer graph and engine config
+    auto builder = flatbuffer_test_utils::create_valid_graph();
+    auto serialized_graph = builder.Release();
+    hipdnnPluginConstData_t op_graph
+        = flatbuffer_test_utils::create_valid_const_data_graph(serialized_graph);
+
+    // For now, engine_config is not used, so we can pass op_graph as a placeholder
+    hipdnnPluginConstData_t* engine_config = &op_graph;
+
+    size_t workspace_size = 0;
+    auto status
+        = hipdnnEnginePluginGetWorkspaceSize(handle, engine_config, &op_graph, &workspace_size);
+
+    EXPECT_EQ(status, HIPDNN_PLUGIN_STATUS_SUCCESS);
+    EXPECT_GT(workspace_size, 0u);
+
+    EXPECT_EQ(hipdnnEnginePluginDestroy(handle), HIPDNN_PLUGIN_STATUS_SUCCESS);
 }
 
 TEST(MiopenLegacyEnginePluginApiTest, EnginePluginCreateExecutionContextNull)
