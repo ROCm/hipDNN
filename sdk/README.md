@@ -9,6 +9,7 @@ The plugin folder of the sdk contains the header file plugin_api.h that each plu
 
 ## Schema based data objects
 - The hipDNN sdk is using schema based https://flatbuffers.dev/ data objects for describing the graph, and operations.
+- Note: The attributes in the graph which are defined as long types are foreign keys to the uid in tensor_attributes
 
 ### How to change schema files
 - Adding, or updating the files inside schemas (*.fbs) requires regenerating the output files.
