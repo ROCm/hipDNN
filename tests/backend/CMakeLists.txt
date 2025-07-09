@@ -6,6 +6,7 @@ find_package(hip REQUIRED)
 
 add_executable(public_hipdnn_backend_tests 
     test_backend_public_functions.cpp
+    test_backend_execute_api.cpp
     test_engine_config_api.cpp
     test_engine_api.cpp
     test_execution_plan_api.cpp
@@ -22,7 +23,8 @@ target_link_libraries(public_hipdnn_backend_tests
     pthread 
     hipdnn_sdk
     hipdnn_backend
-    hip::device
+    hipdnn_frontend
+    hip::host
 )
 
 add_dependencies(check public_hipdnn_backend_tests)
@@ -31,4 +33,8 @@ gtest_discover_tests(
     public_hipdnn_backend_tests
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
     DISCOVERY_MODE PRE_TEST
+)
+target_include_directories(public_hipdnn_backend_tests
+    PRIVATE
+    ${HIPDNN_TEST_INCLUDE_DIRS}
 )

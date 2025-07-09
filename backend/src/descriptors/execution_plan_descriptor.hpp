@@ -27,6 +27,11 @@ private:
                            int64_t element_count,
                            const void* array_of_elements);
 
+    void get_engine_config(hipdnnBackendAttributeType_t attribute_type,
+                           int64_t requested_element_count,
+                           int64_t* element_count,
+                           void* array_of_elements);
+
 public:
     Execution_plan_descriptor();
     ~Execution_plan_descriptor() override = default;
