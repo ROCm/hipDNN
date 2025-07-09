@@ -224,7 +224,7 @@ hipdnnPluginStatus_t
             if(*num_engines == max_engines)
             {
                 *num_engines = applicable_engines.size();
-                HIPDNN_LOG_WARN("Maximum number of engines reached ({}), ignoring additional "
+                HIPDNN_LOG_INFO("Maximum number of engines reached ({}), ignoring additional "
                                 "engines, num_engines count: {}",
                                 max_engines,
                                 *num_engines);
