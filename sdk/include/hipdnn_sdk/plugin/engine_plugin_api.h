@@ -26,31 +26,6 @@ extern "C" {
  * @{
  */
 
-////////////////////////////////////////////////////////////////////////////////////////////
-// TODO Temporary functions, these are going to be removed soon.
-////////////////////////////////////////////////////////////////////////////////////////////
-/**
- * @brief Retrieves the number of engines available in the plugin.
- * @param[out] num_engines Pointer to an unsigned integer where the number of engines will be stored.
- * @return A value of type `hipdnnPluginStatus_t` indicating the status of the operation.
- */
-HIPDNN_PLUGIN_EXPORT hipdnnPluginStatus_t hipdnnPluginGetNumEngines(unsigned* num_engines);
-
-/**
- * @brief Runs the specified engine with the given input.
- * @param[in] engine_index The index of the engine to run.
- * @param[in] input Pointer to the input data to be processed by the engine.
- * @param[out] output Pointer to a buffer where the processed output data will be stored.
- * @param[in] size The size of the input data array.
- * @return A value of type `hipdnnPluginStatus_t` indicating the status of the operation.
- */
-HIPDNN_PLUGIN_EXPORT hipdnnPluginStatus_t hipdnnPluginRunEngine(unsigned engine_index,
-                                                                const uint32_t* input,
-                                                                uint32_t* output,
-                                                                uint32_t size);
-////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////
-
 /**
  * @brief Creates a new engine plugin handle.
  *
