@@ -15,7 +15,7 @@ namespace miopen_legacy_plugin
 
 Engine_manager::Engine_manager() {}
 
-void Engine_manager::add_engine(std::unique_ptr<Engine> engine)
+void Engine_manager::add_engine(std::unique_ptr<Engine_interface> engine)
 {
     _engines.emplace(engine->id(), std::move(engine));
 }

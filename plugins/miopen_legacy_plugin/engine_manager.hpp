@@ -9,7 +9,7 @@
 
 #include <hipdnn_sdk/plugin/plugin_api_data_types.h>
 
-#include "engines/engine.hpp"
+#include "engines/engine_interface.hpp"
 
 namespace miopen_legacy_plugin
 {
@@ -24,7 +24,7 @@ public:
     Engine_manager(const Engine_manager&) = delete;
     Engine_manager& operator=(const Engine_manager&) = delete;
 
-    void add_engine(std::unique_ptr<Engine> engine);
+    void add_engine(std::unique_ptr<Engine_interface> engine);
 
     std::set<int64_t> get_applicable_engine_ids(const hipdnnPluginConstData_t* op_graph);
 
@@ -37,7 +37,7 @@ public:
                               const hipdnnPluginConstData_t* op_graph) const;
 
 private:
-    std::unordered_map<int64_t, std::unique_ptr<Engine>> _engines;
+    std::unordered_map<int64_t, std::unique_ptr<Engine_interface>> _engines;
 };
 
 }

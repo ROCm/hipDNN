@@ -15,7 +15,7 @@ using ::testing::Return;
 
 TEST(Engine_managerTest, ReturnsApplicableEngineIds)
 {
-    std::set<std::unique_ptr<Engine>> engines;
+    std::set<std::unique_ptr<Engine_interface>> engines;
 
     auto mock_engine1 = std::make_unique<Mock_engine>();
     EXPECT_CALL(*mock_engine1, id()).WillRepeatedly(Return(1));
@@ -39,7 +39,7 @@ TEST(Engine_managerTest, ReturnsApplicableEngineIds)
 
 TEST(Engine_managerTest, ReturnsMultipleApplicableEngineIds)
 {
-    std::set<std::unique_ptr<Engine>> engines;
+    std::set<std::unique_ptr<Engine_interface>> engines;
 
     auto mock_engine1 = std::make_unique<Mock_engine>();
     EXPECT_CALL(*mock_engine1, id()).WillRepeatedly(Return(1));
@@ -63,7 +63,7 @@ TEST(Engine_managerTest, ReturnsMultipleApplicableEngineIds)
 
 TEST(Engine_managerTest, ReturnsNoApplicableEngineIds)
 {
-    std::set<std::unique_ptr<Engine>> engines;
+    std::set<std::unique_ptr<Engine_interface>> engines;
 
     auto mock_engine1 = std::make_unique<Mock_engine>();
     EXPECT_CALL(*mock_engine1, id()).WillRepeatedly(Return(1));

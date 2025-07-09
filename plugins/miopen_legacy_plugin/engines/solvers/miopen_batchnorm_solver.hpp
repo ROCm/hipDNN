@@ -3,13 +3,13 @@
 
 #pragma once
 
-#include "solver.hpp"
+#include "solver_interface.hpp"
 #include <hipdnn_sdk/plugin/plugin_api_data_types.h>
 
 namespace miopen_legacy_plugin
 {
 
-class Miopen_batchnorm_solver : public Solver
+class Miopen_batchnorm_solver : public Solver_interface
 {
 public:
     Miopen_batchnorm_solver() = default;

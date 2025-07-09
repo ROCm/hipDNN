@@ -5,14 +5,14 @@
 
 #pragma once
 
-#include "engines/engine.hpp"
+#include "engines/engine_interface.hpp"
 #include <gmock/gmock.h>
 #include <hipdnn_sdk/plugin/plugin_api_data_types.h>
 
 namespace miopen_legacy_plugin
 {
 
-class Mock_engine : public Engine
+class Mock_engine : public Engine_interface
 {
 public:
     MOCK_METHOD(int64_t, id, (), (const, override));

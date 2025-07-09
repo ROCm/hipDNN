@@ -69,7 +69,7 @@ size_t Miopen_engine::get_workspace_size(const hipdnnEnginePluginHandle& handle,
     return workspace_size;
 }
 
-void Miopen_engine::add_solver(std::unique_ptr<Solver> solver)
+void Miopen_engine::add_solver(std::unique_ptr<Solver_interface> solver)
 {
     _solvers.insert(std::move(solver));
 }

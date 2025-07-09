@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "engines/solvers/solver.hpp"
+#include "engines/solvers/solver_interface.hpp"
 
 #include <gmock/gmock.h>
 #include <hipdnn_sdk/data_objects/graph_generated.h>
@@ -11,7 +11,7 @@
 namespace miopen_legacy_plugin
 {
 
-class Mock_solver : public Solver
+class Mock_solver : public Solver_interface
 {
 public:
     MOCK_METHOD(bool,

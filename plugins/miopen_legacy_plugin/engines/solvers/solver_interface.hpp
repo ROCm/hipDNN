@@ -11,10 +11,10 @@
 namespace miopen_legacy_plugin
 {
 
-class Solver
+class Solver_interface
 {
 public:
-    virtual ~Solver() = default;
+    virtual ~Solver_interface() = default;
 
     virtual bool is_applicable(const hipdnn_sdk::data_objects::GraphT& op_graph) const = 0;
 
