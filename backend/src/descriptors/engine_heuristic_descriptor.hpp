@@ -18,10 +18,16 @@ private:
     const Graph_descriptor* _graph = nullptr;
     std::vector<int64_t> _engine_ids;
     bool _engine_ids_set = false;
+    hipdnnBackendHeurMode_t _heuristic_mode = HIPDNN_HEUR_MODE_FALLBACK;
+    bool _heuristic_mode_set = false;
 
     void set_graph(hipdnnBackendAttributeType_t attribute_type,
                    int64_t element_count,
                    const void* array_of_elements);
+
+    void set_heuristic_mode(hipdnnBackendAttributeType_t attribute_type,
+                            int64_t element_count,
+                            const void* array_of_elements);
 
     void get_graph(hipdnnBackendAttributeType_t attribute_type,
                    int64_t requested_element_count,
