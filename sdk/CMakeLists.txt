@@ -76,3 +76,5 @@ install(EXPORT hipdnn_sdk_targets
     DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/cmake/hipdnn_sdk
     FILE hipdnn_sdkConfig.cmake
 )
+
+add_subdirectory(tests)
