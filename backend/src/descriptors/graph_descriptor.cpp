@@ -22,6 +22,31 @@ void Graph_descriptor::finalize()
     hipdnnBackendDescriptor::finalize();
 }
 
+void Graph_descriptor::set_handle(hipdnnBackendAttributeType_t attribute_type,
+                                  int64_t element_count,
+                                  const void* array_of_elements)
+{
+    THROW_IF_NE(attribute_type,
+                HIPDNN_TYPE_HANDLE,
+                HIPDNN_STATUS_BAD_PARAM,
+                "Graph_descriptor failed to set handle: Invalid attribute type.");
+    THROW_IF_NE(element_count,
+                1,
+                HIPDNN_STATUS_BAD_PARAM,
+                "Graph_descriptor failed to set handle: Invalid element count.");
+    THROW_IF_NULL(array_of_elements,
+                  HIPDNN_STATUS_BAD_PARAM_NULL_POINTER,
+                  "Graph_descriptor failed to set handle: Null pointer.");
+
+    hipdnnHandle_t handle = *reinterpret_cast<const hipdnnHandle_t*>(array_of_elements);
+
+    THROW_IF_NULL(handle,
+                  HIPDNN_STATUS_BAD_PARAM_NULL_POINTER,
+                  "Graph_descriptor failed to set handle: Handle is null.");
+
+    _handle = handle;
+}
+
 void Graph_descriptor::get_attribute([[maybe_unused]] hipdnnBackendAttributeName_t attribute_name,
                                      [[maybe_unused]] hipdnnBackendAttributeType_t attribute_type,
                                      [[maybe_unused]] int64_t requested_element_count,
@@ -32,13 +57,26 @@ void Graph_descriptor::get_attribute([[maybe_unused]] hipdnnBackendAttributeName
                            "Graph_descriptor::get_attribute: not supported");
 }
 
-void Graph_descriptor::set_attribute([[maybe_unused]] hipdnnBackendAttributeName_t attribute_name,
-                                     [[maybe_unused]] hipdnnBackendAttributeType_t attribute_type,
-                                     [[maybe_unused]] int64_t element_count,
-                                     [[maybe_unused]] const void* array_of_elements)
+void Graph_descriptor::set_attribute(hipdnnBackendAttributeName_t attribute_name,
+                                     hipdnnBackendAttributeType_t attribute_type,
+                                     int64_t element_count,
+                                     const void* array_of_elements)
 {
-    throw Hipdnn_exception(HIPDNN_STATUS_NOT_SUPPORTED,
-                           "Graph_descriptor::set_attribute: not supported");
+    THROW_IF_TRUE(is_finalized(),
+                  HIPDNN_STATUS_NOT_INITIALIZED,
+                  "Graph_descriptor::set_attribute() failed: Already finalized.");
+
+    switch(attribute_name)
+    {
+    case HIPDNN_ATTR_OPERATIONGRAPH_HANDLE:
+        set_handle(attribute_type, element_count, array_of_elements);
+        break;
+    default:
+        throw Hipdnn_exception(
+            HIPDNN_STATUS_NOT_SUPPORTED,
+            std::string("Graph_descriptor::set_attribute() is not supported for attribute ")
+                + hipdnn_backend::hipdnn_get_attribute_name_string(attribute_name) + ".");
+    }
 }
 
 void Graph_descriptor::deserialize_graph(const uint8_t* serialized_graph, size_t graph_byte_size)
