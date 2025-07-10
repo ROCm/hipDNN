@@ -23,6 +23,15 @@ public:
                 (const hipdnnEnginePluginHandle& handle,
                  const hipdnn_sdk::data_objects::Graph& graph),
                 (const, override));
+
+    MOCK_METHOD(void,
+                execute_graph,
+                (const hipdnnEnginePluginHandle& handle,
+                 const hipdnnEnginePluginExecutionContext& execution_context,
+                 const hipdnnPluginDeviceBuffer_t* device_buffers,
+                 uint32_t num_device_buffers,
+                 void* workspace),
+                (const, override));
 };
 
 }

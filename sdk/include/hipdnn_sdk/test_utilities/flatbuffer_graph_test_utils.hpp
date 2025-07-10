@@ -13,11 +13,10 @@ namespace flatbuffer_test_utils
 
 using namespace hipdnn_sdk::data_objects;
 
-inline flatbuffers::FlatBufferBuilder create_valid_batchnorm_graph()
+inline flatbuffers::FlatBufferBuilder
+    create_valid_batchnorm_graph(std::vector<int64_t> strides = {1, 3, 224, 224},
+                                 std::vector<int64_t> dims = {1, 3, 224, 224})
 {
-    std::vector<int64_t> strides = {1, 3, 224, 224}; // always in nchw
-    std::vector<int64_t> dims = {1, 3, 224, 224};
-
     flatbuffers::FlatBufferBuilder builder;
     std::vector<::flatbuffers::Offset<hipdnn_sdk::data_objects::TensorAttributes>>
         tensor_attributes;

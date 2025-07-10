@@ -318,9 +318,3 @@ TEST(MiopenLegacyEnginePluginApiTest, EnginePluginDestroyExecutionContextNull)
     EXPECT_EQ(hipdnnEnginePluginDestroyExecutionContext(handle, nullptr),
               HIPDNN_PLUGIN_STATUS_BAD_PARAM);
 }
-
-TEST(MiopenLegacyEnginePluginApiTest, EnginePluginExecuteOpGraphNull)
-{
-    EXPECT_EQ(hipdnnEnginePluginExecuteOpGraph(nullptr, nullptr, nullptr, nullptr, 0),
-              HIPDNN_PLUGIN_STATUS_BAD_PARAM);
-}

@@ -47,21 +47,20 @@ size_t
     return 0u;
 }
 
-//todo, ensure stream is used.
-void Miopen_batchnorm_solver::execute_graph(const hipdnnEnginePluginHandle& handle,
-                                            const hipdnn_sdk::data_objects::GraphT& graph,
-                                            const hipdnnPluginDeviceBuffer_t* device_buffers,
-                                            uint32_t num_device_buffers,
-                                            void* workspace) const
+void Miopen_batchnorm_solver::execute_graph(
+    const hipdnnEnginePluginHandle& handle,
+    const hipdnnEnginePluginExecutionContext& execution_context,
+    const hipdnnPluginDeviceBuffer_t* device_buffers,
+    uint32_t num_device_buffers,
+    void* workspace) const
 {
-
-    const auto& node = graph.nodes[0];
+    const auto& node = execution_context.graph->nodes[0];
 
     switch(node->attributes.type)
     {
     case hipdnn_sdk::data_objects::NodeAttributes_BatchnormInferenceAttributes:
         execute_batchnorm_fwd_inference(handle,
-                                        graph,
+                                        *execution_context.graph,
                                         *node->attributes.AsBatchnormInferenceAttributes(),
                                         device_buffers,
                                         num_device_buffers);

@@ -372,11 +372,26 @@ hipdnnPluginStatus_t
                                      const hipdnnPluginDeviceBuffer_t* device_buffers,
                                      uint32_t num_device_buffers)
 {
-    if(!handle || !execution_context || !device_buffers)
-        return HIPDNN_PLUGIN_STATUS_BAD_PARAM;
+    LOG_API_ENTRY("handle={:p}, execution_context={:p}, workspace={:p}, device_buffers={:p}, "
+                  "num_device_buffers={}",
+                  static_cast<void*>(handle),
+                  static_cast<void*>(execution_context),
+                  workspace,
+                  static_cast<const void*>(device_buffers),
+                  num_device_buffers);
 
-    // TODO: Execute MIOpen operations using execution context and device buffers
-    return HIPDNN_PLUGIN_STATUS_INTERNAL_ERROR;
+    return hipdnn_plugin::try_catch([&, api_name = __func__]() {
+        throw_if_null(handle);
+        throw_if_null(execution_context);
+        throw_if_null(device_buffers);
+
+        auto& engine_manager = handle->get_engine_manager();
+
+        engine_manager.execute_graph(
+            *handle, *execution_context, device_buffers, num_device_buffers, workspace);
+
+        LOG_API_SUCCESS(api_name, "executed graph");
+    });
 }
 
 } // extern "C"

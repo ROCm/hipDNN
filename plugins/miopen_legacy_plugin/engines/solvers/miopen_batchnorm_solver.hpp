@@ -24,10 +24,10 @@ public:
                               const hipdnn_sdk::data_objects::Graph& graph) const override;
 
     void execute_graph(const hipdnnEnginePluginHandle& handle,
-                       const hipdnn_sdk::data_objects::GraphT& graph,
+                       const hipdnnEnginePluginExecutionContext& execution_context,
                        const hipdnnPluginDeviceBuffer_t* device_buffers,
                        uint32_t num_device_buffers,
-                       void* workspace = nullptr) const;
+                       void* workspace = nullptr) const override;
 
 private:
     void execute_batchnorm_fwd_inference(

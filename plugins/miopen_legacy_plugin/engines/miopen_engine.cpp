@@ -64,6 +64,25 @@ size_t Miopen_engine::get_workspace_size(const hipdnnEnginePluginHandle& handle,
     return workspace_size;
 }
 
+void Miopen_engine::execute_graph(const hipdnnEnginePluginHandle& handle,
+                                  const hipdnnEnginePluginExecutionContext& execution_context,
+                                  const hipdnnPluginDeviceBuffer_t* device_buffers,
+                                  uint32_t num_device_buffers,
+                                  void* workspace) const
+{
+
+    for(const auto& solver : _solvers)
+    {
+
+        //todo, add override for this kind of is applicable check
+        // if(solver->is_applicable(*graph_ptr))
+        // {
+        solver->execute_graph(
+            handle, execution_context, device_buffers, num_device_buffers, workspace);
+        //}
+    }
+}
+
 void Miopen_engine::add_solver(std::unique_ptr<Solver_interface> solver)
 {
     _solvers.insert(std::move(solver));

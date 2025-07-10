@@ -36,6 +36,12 @@ public:
                               int64_t engine_id,
                               const hipdnnPluginConstData_t* op_graph) const;
 
+    void execute_graph(const hipdnnEnginePluginHandle& handle,
+                               const hipdnnEnginePluginExecutionContext& execution_context,
+                               const hipdnnPluginDeviceBuffer_t* device_buffers,
+                               uint32_t num_device_buffers,
+                               void* workspace) const;
+
 private:
     std::unordered_map<int64_t, std::unique_ptr<Engine_interface>> _engines;
 };

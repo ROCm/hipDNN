@@ -126,3 +126,21 @@ TEST(Miopen_engineTest, GetDetailsReturnsSerializedEngineDetails)
 
     delete[] static_cast<const uint8_t*>(result.ptr);
 }
+
+TEST(Miopen_engineTest, ExecuteGraphCallsSolver)
+{
+    auto mock_solver = std::make_unique<Mock_solver>();
+    EXPECT_CALL(*mock_solver, execute_graph(::testing::_, ::testing::_, ::testing::_, ::testing::_, ::testing::_))
+        .Times(1);
+
+    Miopen_engine engine(1);
+    engine.add_solver(std::move(mock_solver));
+
+    hipdnnEnginePluginHandle dummy_handle = {};
+    hipdnnEnginePluginExecutionContext exec_ctx;
+    hipdnnPluginDeviceBuffer_t* device_buffers = nullptr;
+    uint32_t num_device_buffers = 0;
+    void* workspace = nullptr;
+
+    engine.execute_graph(dummy_handle, exec_ctx, device_buffers, num_device_buffers, workspace);
+}

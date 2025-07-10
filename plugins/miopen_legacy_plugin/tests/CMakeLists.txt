@@ -38,6 +38,7 @@ add_executable(miopen_legacy_plugin_tests
     engines/solvers/test_miopen_batchnorm_solver.cpp
     main.cpp
     test_miopen_legacy_engine_plugin_api.cpp
+    test_miopen_batchnorm_operations.cpp
     test_miopen_legacy_plugin_api.cpp
     test_miopen_handle_factory.cpp
     test_engine_manager.cpp

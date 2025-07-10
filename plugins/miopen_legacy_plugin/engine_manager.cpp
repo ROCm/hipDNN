@@ -63,4 +63,23 @@ size_t Engine_manager::get_workspace_size(const hipdnnEnginePluginHandle& handle
     }
     return it->second->get_workspace_size(handle, op_graph);
 }
+
+void Engine_manager::execute_graph(const hipdnnEnginePluginHandle& handle,
+                                   const hipdnnEnginePluginExecutionContext& execution_context,
+                                   const hipdnnPluginDeviceBuffer_t* device_buffers,
+                                   uint32_t num_device_buffers,
+                                   void* workspace) const
+{
+    auto it = _engines.find(execution_context.engine_config->engine_id);
+    if(it == _engines.end())
+    {
+        throw Hipdnn_plugin_exception(
+            HIPDNN_PLUGIN_STATUS_INVALID_VALUE,
+            "Engine with ID " + std::to_string(execution_context.engine_config->engine_id)
+                + " not found.");
+    }
+    it->second->execute_graph(
+        handle, execution_context, device_buffers, num_device_buffers, workspace);
+}
+
 }

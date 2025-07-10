@@ -23,6 +23,13 @@ public:
     virtual size_t get_workspace_size(const hipdnnEnginePluginHandle& handle,
                                       const hipdnnPluginConstData_t* op_graph) const
         = 0;
+
+    virtual void execute_graph(const hipdnnEnginePluginHandle& handle,
+                               const hipdnnEnginePluginExecutionContext& execution_context,
+                               const hipdnnPluginDeviceBuffer_t* device_buffers,
+                               uint32_t num_device_buffers,
+                               void* workspace) const
+        = 0;
 };
 
 }

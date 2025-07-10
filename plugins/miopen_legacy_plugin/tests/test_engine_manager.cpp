@@ -1,14 +1,16 @@
 // Copyright © Advanced Micro Devices, Inc., or its affiliates.
 // SPDX-License-Identifier:  MIT
 
-#include "engine_manager.hpp"
-
-#include "mocks/mock_engine.hpp"
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
-#include <hipdnn_sdk/plugin/plugin_exception.hpp>
 #include <memory>
 #include <set>
+
+#include "engine_manager.hpp"
+#include "hipdnn_engine_plugin_execution_context.hpp"
+#include "hipdnn_engine_plugin_handle.hpp"
+#include "mocks/mock_engine.hpp"
+#include <hipdnn_sdk/plugin/plugin_exception.hpp>
 
 using namespace miopen_legacy_plugin;
 using ::testing::Return;
@@ -115,5 +117,74 @@ TEST(Engine_managerTest, ThrowsOnInvalidEngineId)
     hipdnnPluginConstData_t engine_details;
 
     EXPECT_THROW(manager.get_engine_details(dummy_op_graph, 999, engine_details),
+                 hipdnn_plugin::Hipdnn_plugin_exception);
+}
+
+TEST(Engine_managerTest, GetWorkspaceSizeReturnsCorrectValue)
+{
+    Engine_manager manager;
+
+    auto mock_engine = std::make_unique<Mock_engine>();
+    EXPECT_CALL(*mock_engine, id()).WillRepeatedly(Return(42));
+    hipdnnEnginePluginHandle dummy_handle = {};
+    hipdnnPluginConstData_t* dummy_op_graph = nullptr;
+    EXPECT_CALL(*mock_engine, get_workspace_size(::testing::_, ::testing::_))
+        .WillOnce(Return(4096));
+
+    manager.add_engine(std::move(mock_engine));
+
+    size_t workspace_size = manager.get_workspace_size(dummy_handle, 42, dummy_op_graph);
+    EXPECT_EQ(workspace_size, 4096);
+}
+
+TEST(Engine_managerTest, GetWorkspaceSizeThrowsOnInvalidEngineId)
+{
+    Engine_manager manager;
+    hipdnnEnginePluginHandle dummy_handle = {};
+    hipdnnPluginConstData_t* dummy_op_graph = nullptr;
+
+    EXPECT_THROW(manager.get_workspace_size(dummy_handle, 999, dummy_op_graph),
+                 hipdnn_plugin::Hipdnn_plugin_exception);
+}
+
+TEST(Engine_managerTest, ExecuteGraphCallsEngine)
+{
+    Engine_manager manager;
+
+    auto mock_engine = std::make_unique<Mock_engine>();
+    EXPECT_CALL(*mock_engine, id()).WillRepeatedly(Return(7));
+    EXPECT_CALL(*mock_engine,
+                execute_graph(::testing::_, ::testing::_, ::testing::_, ::testing::_, ::testing::_))
+        .Times(1);
+
+    manager.add_engine(std::move(mock_engine));
+
+    auto engine_config = std::make_unique<hipdnn_sdk::data_objects::EngineConfigT>();
+    engine_config->engine_id = 7;
+    hipdnnEnginePluginHandle dummy_handle = {};
+    hipdnnEnginePluginExecutionContext exec_ctx;
+    exec_ctx.engine_config = std::move(engine_config);
+    hipdnnPluginDeviceBuffer_t* device_buffers = nullptr;
+    uint32_t num_device_buffers = 0;
+    void* workspace = nullptr;
+
+    manager.execute_graph(dummy_handle, exec_ctx, device_buffers, num_device_buffers, workspace);
+}
+
+TEST(Engine_managerTest, ExecuteGraphThrowsOnInvalidEngineId)
+{
+    Engine_manager manager;
+
+    auto engine_config = std::make_unique<hipdnn_sdk::data_objects::EngineConfigT>();
+    engine_config->engine_id = 1234;
+    hipdnnEnginePluginHandle dummy_handle = {};
+    hipdnnEnginePluginExecutionContext exec_ctx;
+    exec_ctx.engine_config = std::move(engine_config);
+    hipdnnPluginDeviceBuffer_t* device_buffers = nullptr;
+    uint32_t num_device_buffers = 0;
+    void* workspace = nullptr;
+
+    EXPECT_THROW(manager.execute_graph(
+                     dummy_handle, exec_ctx, device_buffers, num_device_buffers, workspace),
                  hipdnn_plugin::Hipdnn_plugin_exception);
 }
