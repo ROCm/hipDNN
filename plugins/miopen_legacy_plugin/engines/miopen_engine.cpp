@@ -20,13 +20,11 @@ int64_t Miopen_engine::id() const
     return _id;
 }
 
-bool Miopen_engine::is_applicable(const hipdnnPluginConstData_t* op_graph) const
+bool Miopen_engine::is_applicable(const hipdnn_plugin::Graph_interface& op_graph) const
 {
-    auto graph_ptr = hipdnn_sdk::data_objects::GetGraph(op_graph->ptr);
-
     for(const auto& solver : _solvers)
     {
-        if(solver->is_applicable(*graph_ptr))
+        if(solver->is_applicable(op_graph))
         {
             return true;
         }
@@ -49,16 +47,14 @@ void Miopen_engine::get_details(hipdnnPluginConstData_t& details_out) const
 }
 
 size_t Miopen_engine::get_workspace_size(const hipdnnEnginePluginHandle& handle,
-                                         const hipdnnPluginConstData_t* op_graph) const
+                                         const hipdnn_plugin::Graph_interface& op_graph) const
 {
-    auto graph_ptr = hipdnn_sdk::data_objects::GetGraph(op_graph->ptr);
-
     size_t workspace_size = 0;
     for(const auto& solver : _solvers)
     {
-        if(solver->is_applicable(*graph_ptr))
+        if(solver->is_applicable(op_graph))
         {
-            workspace_size = solver->get_workspace_size(handle, *graph_ptr);
+            workspace_size = solver->get_workspace_size(handle, op_graph);
         }
     }
     return workspace_size;

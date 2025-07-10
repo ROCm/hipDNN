@@ -11,10 +11,13 @@
 //remove this later
 #include "hipdnn_engine_plugin_handle.hpp"
 #include "miopen_handle_factory.hpp"
+
 #include <hipdnn_sdk/plugin/engine_plugin_api.h>
+#include <hipdnn_sdk/plugin/test_utils/mock_graph.hpp>
 #include <hipdnn_sdk/test_utilities/flatbuffer_graph_test_utils.hpp>
 
 using namespace miopen_legacy_plugin;
+using namespace hipdnn_plugin;
 
 class Test_miopen_batchnorm_solver : public ::testing::Test
 {
@@ -23,22 +26,45 @@ protected:
     hipdnnEnginePluginHandle dummy_handle;
 };
 
-TEST_F(Test_miopen_batchnorm_solver, IsApplicableReturnsTrue)
+TEST_F(Test_miopen_batchnorm_solver, IsApplicableReturnsFalseForMultiNodeGraph)
 {
-    auto builder = flatbuffer_test_utils::create_valid_batchnorm_graph();
-    auto graph_fb
-        = flatbuffers::GetRoot<hipdnn_sdk::data_objects::Graph>(builder.GetBufferPointer());
+    Mock_graph mock_graph;
+    EXPECT_CALL(mock_graph, node_count()).WillRepeatedly(::testing::Return(2));
 
-    EXPECT_TRUE(solver.is_applicable(*graph_fb));
+    bool applicable = solver.is_applicable(mock_graph);
+
+    EXPECT_FALSE(applicable);
+}
+
+TEST_F(Test_miopen_batchnorm_solver, IsApplicableReturnsFalseForUnsupportedAttributes)
+{
+    Mock_graph mock_graph;
+    EXPECT_CALL(mock_graph, node_count()).WillOnce(::testing::Return(1));
+    EXPECT_CALL(mock_graph, has_only_supported_attributes(::testing::_))
+        .WillOnce(::testing::Return(false));
+
+    bool applicable = solver.is_applicable(mock_graph);
+
+    EXPECT_FALSE(applicable);
+}
+
+TEST_F(Test_miopen_batchnorm_solver, IsApplicableReturnsTrueForSupportedSingleNodeGraph)
+{
+    Mock_graph mock_graph;
+    EXPECT_CALL(mock_graph, node_count()).WillOnce(::testing::Return(1));
+    EXPECT_CALL(mock_graph, has_only_supported_attributes(::testing::_))
+        .WillOnce(::testing::Return(true));
+
+    bool applicable = solver.is_applicable(mock_graph);
+
+    EXPECT_TRUE(applicable);
 }
 
 TEST_F(Test_miopen_batchnorm_solver, GetWorkspaceSizeReturnsExpectedValue)
 {
-    auto builder = flatbuffer_test_utils::create_valid_batchnorm_graph();
-    auto graph_fb
-        = flatbuffers::GetRoot<hipdnn_sdk::data_objects::Graph>(builder.GetBufferPointer());
+    Mock_graph mock_graph;
 
-    size_t workspace_size = solver.get_workspace_size(dummy_handle, *graph_fb);
+    size_t workspace_size = solver.get_workspace_size(dummy_handle, mock_graph);
 
     EXPECT_EQ(workspace_size, 0u);
 }

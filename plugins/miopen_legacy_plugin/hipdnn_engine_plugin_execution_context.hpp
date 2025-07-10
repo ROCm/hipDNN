@@ -12,4 +12,7 @@ struct hipdnnEnginePluginExecutionContext
 {
     std::unique_ptr<hipdnn_sdk::data_objects::GraphT> graph;
     std::unique_ptr<hipdnn_sdk::data_objects::EngineConfigT> engine_config;
+
+    // hipdnnPluginConstData_t* engine_config;
+    // hipdnnPluginConstData_t* op_graph;
 };

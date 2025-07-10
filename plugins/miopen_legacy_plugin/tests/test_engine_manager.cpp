@@ -11,8 +11,10 @@
 #include "hipdnn_engine_plugin_handle.hpp"
 #include "mocks/mock_engine.hpp"
 #include <hipdnn_sdk/plugin/plugin_exception.hpp>
+#include <hipdnn_sdk/plugin/test_utils/mock_graph.hpp>
 
 using namespace miopen_legacy_plugin;
+using namespace hipdnn_plugin;
 using ::testing::Return;
 
 TEST(Engine_managerTest, ReturnsApplicableEngineIds)
@@ -31,8 +33,8 @@ TEST(Engine_managerTest, ReturnsApplicableEngineIds)
     manager.add_engine(std::move(mock_engine1));
     manager.add_engine(std::move(mock_engine2));
 
-    hipdnnPluginConstData_t* dummy_op_graph = nullptr;
-    auto applicable = manager.get_applicable_engine_ids(dummy_op_graph);
+    Mock_graph mock_graph;
+    auto applicable = manager.get_applicable_engine_ids(mock_graph);
 
     EXPECT_EQ(applicable.size(), 1);
     EXPECT_EQ(applicable[0], 1);
@@ -42,6 +44,7 @@ TEST(Engine_managerTest, ReturnsMultipleApplicableEngineIds)
 {
     std::set<std::unique_ptr<Engine_interface>> engines;
 
+    Mock_graph mock_graph;
     auto mock_engine1 = std::make_unique<Mock_engine>();
     EXPECT_CALL(*mock_engine1, id()).WillRepeatedly(Return(1));
     EXPECT_CALL(*mock_engine1, is_applicable(::testing::_)).WillRepeatedly(Return(true));
@@ -54,8 +57,7 @@ TEST(Engine_managerTest, ReturnsMultipleApplicableEngineIds)
     manager.add_engine(std::move(mock_engine1));
     manager.add_engine(std::move(mock_engine2));
 
-    hipdnnPluginConstData_t* dummy_op_graph = nullptr;
-    auto applicable = manager.get_applicable_engine_ids(dummy_op_graph);
+    auto applicable = manager.get_applicable_engine_ids(mock_graph);
 
     EXPECT_EQ(applicable.size(), 2);
     EXPECT_TRUE(std::ranges::find(applicable, 1) != applicable.end());
@@ -78,8 +80,8 @@ TEST(Engine_managerTest, ReturnsNoApplicableEngineIds)
     manager.add_engine(std::move(mock_engine1));
     manager.add_engine(std::move(mock_engine2));
 
-    hipdnnPluginConstData_t* dummy_op_graph = nullptr;
-    auto applicable = manager.get_applicable_engine_ids(dummy_op_graph);
+    Mock_graph mock_graph;
+    auto applicable = manager.get_applicable_engine_ids(mock_graph);
 
     EXPECT_TRUE(applicable.empty());
 }
@@ -101,9 +103,9 @@ TEST(Engine_managerTest, ReturnsEngineDetails)
 
     manager.add_engine(std::move(mock_engine));
 
-    hipdnnPluginConstData_t* dummy_op_graph = nullptr;
+    Mock_graph mock_graph;
     hipdnnPluginConstData_t details;
-    manager.get_engine_details(dummy_op_graph, 1, details);
+    manager.get_engine_details(mock_graph, 1, details);
 
     EXPECT_EQ(details.ptr, engine_details.ptr);
     EXPECT_EQ(details.size, engine_details.size);
@@ -113,10 +115,10 @@ TEST(Engine_managerTest, ThrowsOnInvalidEngineId)
 {
     Engine_manager manager;
 
-    hipdnnPluginConstData_t* dummy_op_graph = nullptr;
+    Mock_graph mock_graph;
     hipdnnPluginConstData_t engine_details;
 
-    EXPECT_THROW(manager.get_engine_details(dummy_op_graph, 999, engine_details),
+    EXPECT_THROW(manager.get_engine_details(mock_graph, 999, engine_details),
                  hipdnn_plugin::Hipdnn_plugin_exception);
 }
 
@@ -127,13 +129,13 @@ TEST(Engine_managerTest, GetWorkspaceSizeReturnsCorrectValue)
     auto mock_engine = std::make_unique<Mock_engine>();
     EXPECT_CALL(*mock_engine, id()).WillRepeatedly(Return(42));
     hipdnnEnginePluginHandle dummy_handle = {};
-    hipdnnPluginConstData_t* dummy_op_graph = nullptr;
+    Mock_graph mock_graph;
     EXPECT_CALL(*mock_engine, get_workspace_size(::testing::_, ::testing::_))
         .WillOnce(Return(4096));
 
     manager.add_engine(std::move(mock_engine));
 
-    size_t workspace_size = manager.get_workspace_size(dummy_handle, 42, dummy_op_graph);
+    size_t workspace_size = manager.get_workspace_size(dummy_handle, 42, mock_graph);
     EXPECT_EQ(workspace_size, 4096);
 }
 
@@ -141,9 +143,9 @@ TEST(Engine_managerTest, GetWorkspaceSizeThrowsOnInvalidEngineId)
 {
     Engine_manager manager;
     hipdnnEnginePluginHandle dummy_handle = {};
-    hipdnnPluginConstData_t* dummy_op_graph = nullptr;
+    Mock_graph mock_graph;
 
-    EXPECT_THROW(manager.get_workspace_size(dummy_handle, 999, dummy_op_graph),
+    EXPECT_THROW(manager.get_workspace_size(dummy_handle, 999, mock_graph),
                  hipdnn_plugin::Hipdnn_plugin_exception);
 }
 

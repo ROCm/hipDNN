@@ -5,6 +5,7 @@
 
 #include <stdint.h>
 
+#include <hipdnn_sdk/plugin/flatbuffer_utilities/graph_wrapper.hpp>
 #include <hipdnn_sdk/plugin/plugin_api_data_types.h>
 
 namespace miopen_legacy_plugin
@@ -17,11 +18,11 @@ public:
 
     virtual int64_t id() const = 0;
 
-    virtual bool is_applicable(const hipdnnPluginConstData_t* op_graph) const = 0;
+    virtual bool is_applicable(const hipdnn_plugin::Graph_interface& op_graph) const = 0;
     virtual void get_details(hipdnnPluginConstData_t& details_out) const = 0;
 
     virtual size_t get_workspace_size(const hipdnnEnginePluginHandle& handle,
-                                      const hipdnnPluginConstData_t* op_graph) const
+                                      const hipdnn_plugin::Graph_interface& op_graph) const
         = 0;
 
     virtual void execute_graph(const hipdnnEnginePluginHandle& handle,

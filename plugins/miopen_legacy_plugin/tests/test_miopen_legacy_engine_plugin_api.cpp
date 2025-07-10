@@ -169,10 +169,13 @@ TEST(MiopenLegacyEnginePluginApiTest, EnginePluginGetEngineDetailsValid)
     hipdnnEnginePluginHandle_t handle = nullptr;
     ASSERT_EQ(hipdnnEnginePluginCreate(&handle), HIPDNN_PLUGIN_STATUS_SUCCESS);
 
-    auto op_graph = reinterpret_cast<hipdnnPluginConstData_t*>(0x5678);
+    auto builder = flatbuffer_test_utils::create_valid_batchnorm_graph();
+    auto serialized_graph = builder.Release();
+    hipdnnPluginConstData_t op_graph
+        = flatbuffer_test_utils::create_valid_const_data_graph(serialized_graph);
     hipdnnPluginConstData_t engine_details_out;
 
-    auto status = hipdnnEnginePluginGetEngineDetails(handle, 1, op_graph, &engine_details_out);
+    auto status = hipdnnEnginePluginGetEngineDetails(handle, 1, &op_graph, &engine_details_out);
 
     std::unique_ptr<hipdnn_sdk::data_objects::EngineDetailsT> unpacked_engine_details;
     hipdnn_plugin::flatbuffer_utilities::unpack_serialized_engine_details(

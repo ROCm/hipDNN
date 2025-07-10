@@ -7,14 +7,18 @@
 #include <hipdnn_sdk/data_objects/graph_generated.h>
 #include <memory>
 
+namespace hipdnn_plugin
+{
+
 class Graph_interface
 {
 public:
     virtual ~Graph_interface() = default;
 
+    virtual const hipdnn_sdk::data_objects::Graph& get_graph() const = 0;
     virtual bool is_valid() const = 0;
-    virtual int node_count() const = 0;
-    virtual bool has_supported_types(
+    virtual uint node_count() const = 0;
+    virtual bool has_only_supported_attributes(
         std::set<hipdnn_sdk::data_objects::NodeAttributes> supported_attributes) const
         = 0;
 };
@@ -22,11 +26,11 @@ public:
 class Graph_wrapper : public Graph_interface
 {
 public:
-    explicit Graph_wrapper(const uint8_t* buffer, size_t size)
+    explicit Graph_wrapper(const void* buffer, size_t size)
     {
         if(buffer)
         {
-            flatbuffers::Verifier verifier(buffer, size);
+            flatbuffers::Verifier verifier(static_cast<const uint8_t*>(buffer), size);
             if(verifier.VerifyBuffer<hipdnn_sdk::data_objects::Graph>())
             {
                 _graph = flatbuffers::GetRoot<hipdnn_sdk::data_objects::Graph>(buffer);
@@ -34,7 +38,7 @@ public:
         }
     }
 
-    const hipdnn_sdk::data_objects::Graph& get_graph() const
+    const hipdnn_sdk::data_objects::Graph& get_graph() const override
     {
         return *_graph;
     }
@@ -44,12 +48,12 @@ public:
         return _graph != nullptr;
     }
 
-    int node_count() const override
+    uint node_count() const override
     {
         return _graph ? _graph->nodes()->size() : 0;
     }
 
-    bool has_supported_types(
+    bool has_only_supported_attributes(
         std::set<hipdnn_sdk::data_objects::NodeAttributes> supported_attributes) const override
     {
         if(!_graph)
@@ -66,3 +70,5 @@ public:
 private:
     const hipdnn_sdk::data_objects::Graph* _graph = nullptr;
 };
+
+}

@@ -6,6 +6,7 @@
 
 #include <hipdnn_sdk/logging/logger.hpp>
 #include <hipdnn_sdk/plugin/engine_plugin_api.h>
+#include <hipdnn_sdk/plugin/flatbuffer_utilities/graph_wrapper.hpp>
 #include <hipdnn_sdk/plugin/plugin_api.h>
 #include <hipdnn_sdk/plugin/plugin_data_type_helpers.hpp>
 #include <hipdnn_sdk/plugin/plugin_flatbuffer_utilities.hpp>
@@ -218,8 +219,9 @@ hipdnnPluginStatus_t
         throw_if_null(num_engines);
 
         auto& engine_manager = handle->get_engine_manager();
+        Graph_wrapper op_graph_wrapper(op_graph->ptr, op_graph->size);
 
-        auto applicable_engines = engine_manager.get_applicable_engine_ids(op_graph);
+        auto applicable_engines = engine_manager.get_applicable_engine_ids(op_graph_wrapper);
 
         *num_engines = 0;
         for(auto& engine_id : applicable_engines)
@@ -259,8 +261,9 @@ hipdnnPluginStatus_t hipdnnEnginePluginGetEngineDetails(hipdnnEnginePluginHandle
         throw_if_null(engine_details);
 
         auto& engine_manager = handle->get_engine_manager();
+        Graph_wrapper op_graph_wrapper(op_graph->ptr, op_graph->size);
 
-        engine_manager.get_engine_details(op_graph, engine_id, *engine_details);
+        engine_manager.get_engine_details(op_graph_wrapper, engine_id, *engine_details);
 
         LOG_API_SUCCESS(api_name, "engine_details->ptr={:p}", engine_details->ptr);
     });
@@ -305,7 +308,8 @@ hipdnnPluginStatus_t
         auto& engine_manager = handle->get_engine_manager();
 
         //todo, use the engine_config
-        *workspace_size = engine_manager.get_workspace_size(*handle, 1, op_graph);
+        Graph_wrapper op_graph_wrapper(op_graph->ptr, op_graph->size);
+        *workspace_size = engine_manager.get_workspace_size(*handle, 1, op_graph_wrapper);
 
         LOG_API_SUCCESS(api_name, "workspace_size={}", *workspace_size);
     });

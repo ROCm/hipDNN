@@ -16,11 +16,15 @@ class Mock_engine : public Engine_interface
 {
 public:
     MOCK_METHOD(int64_t, id, (), (const, override));
-    MOCK_METHOD(bool, is_applicable, (const hipdnnPluginConstData_t* op_graph), (const, override));
+    MOCK_METHOD(bool,
+                is_applicable,
+                (const hipdnn_plugin::Graph_interface& op_graph),
+                (const, override));
     MOCK_METHOD(void, get_details, (hipdnnPluginConstData_t & details_out), (const, override));
     MOCK_METHOD(size_t,
                 get_workspace_size,
-                (const hipdnnEnginePluginHandle& handle, const hipdnnPluginConstData_t* op_graph),
+                (const hipdnnEnginePluginHandle& handle,
+                 const hipdnn_plugin::Graph_interface& op_graph),
                 (const, override));
 
     MOCK_METHOD(void,

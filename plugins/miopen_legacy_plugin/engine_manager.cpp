@@ -6,6 +6,7 @@
 
 #include <algorithm>
 #include <hipdnn_sdk/logging/logger.hpp>
+#include <hipdnn_sdk/plugin/flatbuffer_utilities/graph_wrapper.hpp>
 #include <hipdnn_sdk/plugin/plugin_exception.hpp>
 
 using namespace hipdnn_plugin;
@@ -21,7 +22,7 @@ void Engine_manager::add_engine(std::unique_ptr<Engine_interface> engine)
 }
 
 std::vector<int64_t>
-    Engine_manager::get_applicable_engine_ids(const hipdnnPluginConstData_t* op_graph)
+    Engine_manager::get_applicable_engine_ids(const hipdnn_plugin::Graph_interface& op_graph)
 {
     std::vector<int64_t> applicable;
     for(const auto& engine : _engines)
@@ -34,7 +35,7 @@ std::vector<int64_t>
     return applicable;
 }
 
-void Engine_manager::get_engine_details(const hipdnnPluginConstData_t* op_graph,
+void Engine_manager::get_engine_details(const hipdnn_plugin::Graph_interface& op_graph,
                                         int64_t engine_id,
                                         hipdnnPluginConstData_t& engine_details_out)
 {
@@ -52,7 +53,7 @@ void Engine_manager::get_engine_details(const hipdnnPluginConstData_t* op_graph,
 
 size_t Engine_manager::get_workspace_size(const hipdnnEnginePluginHandle& handle,
                                           int64_t engine_id,
-                                          const hipdnnPluginConstData_t* op_graph) const
+                                          const hipdnn_plugin::Graph_interface& op_graph) const
 {
     auto it = _engines.find(engine_id);
     if(it == _engines.end())

@@ -8,6 +8,8 @@
 #include <hipdnn_sdk/test_utilities/flatbuffer_graph_test_utils.hpp>
 #include <set>
 
+using namespace hipdnn_plugin;
+
 TEST(Graph_wrapperTest, NullBufferIsInvalid)
 {
     Graph_wrapper wrapper(nullptr, 0);
@@ -55,10 +57,10 @@ TEST(Graph_wrapperTest, HasSupportedTypesReturnsTrueIfAllSupported)
 
     std::set<hipdnn_sdk::data_objects::NodeAttributes> supported
         = {hipdnn_sdk::data_objects::NodeAttributes_BatchnormInferenceAttributes};
-    EXPECT_TRUE(wrapper.has_supported_types(supported));
+    EXPECT_TRUE(wrapper.has_only_supported_attributes(supported));
 
     supported.insert(hipdnn_sdk::data_objects::NodeAttributes_PointwiseAttributes);
-    EXPECT_TRUE(wrapper.has_supported_types(supported));
+    EXPECT_TRUE(wrapper.has_only_supported_attributes(supported));
 }
 
 TEST(Graph_wrapperTest, HasSupportedTypesReturnsFalseIfAnyUnsupported)
@@ -70,8 +72,8 @@ TEST(Graph_wrapperTest, HasSupportedTypesReturnsFalseIfAnyUnsupported)
 
     std::set<hipdnn_sdk::data_objects::NodeAttributes> supported
         = {hipdnn_sdk::data_objects::NodeAttributes_PointwiseAttributes};
-    EXPECT_FALSE(wrapper.has_supported_types(supported));
+    EXPECT_FALSE(wrapper.has_only_supported_attributes(supported));
 
     supported.insert(hipdnn_sdk::data_objects::NodeAttributes_BatchnormAttributes);
-    EXPECT_FALSE(wrapper.has_supported_types(supported));
+    EXPECT_FALSE(wrapper.has_only_supported_attributes(supported));
 }

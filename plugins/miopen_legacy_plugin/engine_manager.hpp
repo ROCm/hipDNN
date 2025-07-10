@@ -26,21 +26,21 @@ public:
 
     void add_engine(std::unique_ptr<Engine_interface> engine);
 
-    std::vector<int64_t> get_applicable_engine_ids(const hipdnnPluginConstData_t* op_graph);
+    std::vector<int64_t> get_applicable_engine_ids(const hipdnn_plugin::Graph_interface& op_graph);
 
-    void get_engine_details(const hipdnnPluginConstData_t* op_graph,
+    void get_engine_details(const hipdnn_plugin::Graph_interface& op_graph,
                             int64_t engine_id,
                             hipdnnPluginConstData_t& engine_details_out);
 
     size_t get_workspace_size(const hipdnnEnginePluginHandle& handle,
                               int64_t engine_id,
-                              const hipdnnPluginConstData_t* op_graph) const;
+                              const hipdnn_plugin::Graph_interface& op_graph) const;
 
     void execute_graph(const hipdnnEnginePluginHandle& handle,
-                               const hipdnnEnginePluginExecutionContext& execution_context,
-                               const hipdnnPluginDeviceBuffer_t* device_buffers,
-                               uint32_t num_device_buffers,
-                               void* workspace) const;
+                       const hipdnnEnginePluginExecutionContext& execution_context,
+                       const hipdnnPluginDeviceBuffer_t* device_buffers,
+                       uint32_t num_device_buffers,
+                       void* workspace) const;
 
 private:
     std::unordered_map<int64_t, std::unique_ptr<Engine_interface>> _engines;

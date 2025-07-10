@@ -20,10 +20,10 @@ public:
 
     int64_t id() const override;
 
-    bool is_applicable(const hipdnnPluginConstData_t* op_graph) const override;
+    bool is_applicable(const hipdnn_plugin::Graph_interface& op_graph) const override;
     void get_details(hipdnnPluginConstData_t& details_out) const override;
     size_t get_workspace_size(const hipdnnEnginePluginHandle& handle,
-                              const hipdnnPluginConstData_t* op_graph) const override;
+                              const hipdnn_plugin::Graph_interface& op_graph) const override;
 
     void execute_graph(const hipdnnEnginePluginHandle& handle,
                        const hipdnnEnginePluginExecutionContext& execution_context,

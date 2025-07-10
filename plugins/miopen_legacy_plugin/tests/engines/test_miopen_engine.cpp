@@ -5,13 +5,16 @@
 #include "mocks/mock_solver.hpp"
 
 #include <gtest/gtest.h>
-#include <hipdnn_sdk/data_objects/graph_generated.h>
-#include <hipdnn_sdk/plugin/plugin_flatbuffer_utilities.hpp>
-#include <hipdnn_sdk/test_utilities/flatbuffer_graph_test_utils.hpp>
 #include <memory>
 #include <set>
 
+#include <hipdnn_sdk/data_objects/graph_generated.h>
+#include <hipdnn_sdk/plugin/plugin_flatbuffer_utilities.hpp>
+#include <hipdnn_sdk/plugin/test_utils/mock_graph.hpp>
+#include <hipdnn_sdk/test_utilities/flatbuffer_graph_test_utils.hpp>
+
 using namespace miopen_legacy_plugin;
+using namespace hipdnn_plugin;
 
 TEST(Miopen_engineTest, ConstructorAndId)
 {
@@ -23,13 +26,10 @@ TEST(Miopen_engineTest, WorkspaceSizeReturnsZeroIfNoSolvers)
 {
     Miopen_engine engine(1);
 
-    auto builder = flatbuffer_test_utils::create_valid_batchnorm_graph();
-    auto serialized_graph = builder.Release();
-    hipdnnPluginConstData_t op_graph
-        = flatbuffer_test_utils::create_valid_const_data_graph(serialized_graph);
+    Mock_graph mock_graph;
 
     hipdnnEnginePluginHandle dummy_handle;
-    EXPECT_EQ(engine.get_workspace_size(dummy_handle, &op_graph), 0u);
+    EXPECT_EQ(engine.get_workspace_size(dummy_handle, mock_graph), 0u);
 }
 
 TEST(Miopen_engineTest, WorkspaceSizeReturnsSolverWorkspace)
@@ -42,13 +42,10 @@ TEST(Miopen_engineTest, WorkspaceSizeReturnsSolverWorkspace)
     Miopen_engine engine(1);
     engine.add_solver(std::move(mock_solver));
 
-    auto builder = flatbuffer_test_utils::create_valid_batchnorm_graph();
-    auto serialized_graph = builder.Release();
-    hipdnnPluginConstData_t op_graph
-        = flatbuffer_test_utils::create_valid_const_data_graph(serialized_graph);
+    Mock_graph mock_graph;
 
     hipdnnEnginePluginHandle dummy_handle;
-    EXPECT_EQ(engine.get_workspace_size(dummy_handle, &op_graph), 1337u);
+    EXPECT_EQ(engine.get_workspace_size(dummy_handle, mock_graph), 1337u);
 }
 
 TEST(Miopen_engineTest, WorkspaceSizeReturnsZeroIfNoSolverApplicable)
@@ -59,13 +56,10 @@ TEST(Miopen_engineTest, WorkspaceSizeReturnsZeroIfNoSolverApplicable)
     Miopen_engine engine(1);
     engine.add_solver(std::move(mock_solver));
 
-    auto builder = flatbuffer_test_utils::create_valid_batchnorm_graph();
-    auto serialized_graph = builder.Release();
-    hipdnnPluginConstData_t op_graph
-        = flatbuffer_test_utils::create_valid_const_data_graph(serialized_graph);
+    Mock_graph mock_graph;
 
     hipdnnEnginePluginHandle dummy_handle;
-    EXPECT_EQ(engine.get_workspace_size(dummy_handle, &op_graph), 0u);
+    EXPECT_EQ(engine.get_workspace_size(dummy_handle, mock_graph), 0u);
 }
 
 TEST(Miopen_engineTest, IsApplicableReturnsTrueIfAnySolverApplicable)
@@ -76,24 +70,18 @@ TEST(Miopen_engineTest, IsApplicableReturnsTrueIfAnySolverApplicable)
     Miopen_engine engine(0);
     engine.add_solver(std::move(mock_solver));
 
-    auto builder = flatbuffer_test_utils::create_valid_batchnorm_graph();
-    auto serialized_graph = builder.Release();
-    hipdnnPluginConstData_t op_graph
-        = flatbuffer_test_utils::create_valid_const_data_graph(serialized_graph);
+    Mock_graph mock_graph;
 
-    EXPECT_TRUE(engine.is_applicable(&op_graph));
+    EXPECT_TRUE(engine.is_applicable(mock_graph));
 }
 
 TEST(Miopen_engineTest, IsApplicableReturnsFalseIfNoSolvers)
 {
     Miopen_engine engine(0);
 
-    auto builder = flatbuffer_test_utils::create_valid_batchnorm_graph();
-    auto serialized_graph = builder.Release();
-    hipdnnPluginConstData_t op_graph
-        = flatbuffer_test_utils::create_valid_const_data_graph(serialized_graph);
+    Mock_graph mock_graph;
 
-    EXPECT_FALSE(engine.is_applicable(&op_graph));
+    EXPECT_FALSE(engine.is_applicable(mock_graph));
 }
 
 TEST(Miopen_engineTest, IsApplicableReturnsFalseIfNoSolverApplicable)
@@ -104,12 +92,9 @@ TEST(Miopen_engineTest, IsApplicableReturnsFalseIfNoSolverApplicable)
     Miopen_engine engine(0);
     engine.add_solver(std::move(mock_solver));
 
-    auto builder = flatbuffer_test_utils::create_valid_batchnorm_graph();
-    auto serialized_graph = builder.Release();
-    hipdnnPluginConstData_t op_graph
-        = flatbuffer_test_utils::create_valid_const_data_graph(serialized_graph);
+    Mock_graph mock_graph;
 
-    EXPECT_FALSE(engine.is_applicable(&op_graph));
+    EXPECT_FALSE(engine.is_applicable(mock_graph));
 }
 
 TEST(Miopen_engineTest, GetDetailsReturnsSerializedEngineDetails)
@@ -130,7 +115,8 @@ TEST(Miopen_engineTest, GetDetailsReturnsSerializedEngineDetails)
 TEST(Miopen_engineTest, ExecuteGraphCallsSolver)
 {
     auto mock_solver = std::make_unique<Mock_solver>();
-    EXPECT_CALL(*mock_solver, execute_graph(::testing::_, ::testing::_, ::testing::_, ::testing::_, ::testing::_))
+    EXPECT_CALL(*mock_solver,
+                execute_graph(::testing::_, ::testing::_, ::testing::_, ::testing::_, ::testing::_))
         .Times(1);
 
     Miopen_engine engine(1);
