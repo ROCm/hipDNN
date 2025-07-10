@@ -8,6 +8,7 @@ endif()
 
 add_executable(hipdnn_sdk_tests
     main.cpp
+    test_graph_wrapper.cpp
     test_plugin_flatbuffer_utilities.cpp
     test_plugin_exception.cpp
     test_plugin_helpers.cpp
