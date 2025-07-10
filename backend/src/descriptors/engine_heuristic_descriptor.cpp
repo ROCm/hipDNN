@@ -88,13 +88,15 @@ void Engine_heuristic_descriptor::set_attribute(hipdnnBackendAttributeName_t att
     }
 }
 
-void Engine_heuristic_descriptor::set_heuristic_mode(
-    hipdnnBackendAttributeType_t attribute_type, int64_t element_count, const void* array_of_elements)
+void Engine_heuristic_descriptor::set_heuristic_mode(hipdnnBackendAttributeType_t attribute_type,
+                                                     int64_t element_count,
+                                                     const void* array_of_elements)
 {
-    THROW_IF_NE(attribute_type,
-                HIPDNN_TYPE_HEUR_MODE,
-                HIPDNN_STATUS_BAD_PARAM,
-                "Engine_heuristic_descriptor failed to set heuristic mode: Invalid attribute type.");
+    THROW_IF_NE(
+        attribute_type,
+        HIPDNN_TYPE_HEUR_MODE,
+        HIPDNN_STATUS_BAD_PARAM,
+        "Engine_heuristic_descriptor failed to set heuristic mode: Invalid attribute type.");
 
     THROW_IF_NE(element_count,
                 1,
@@ -105,12 +107,12 @@ void Engine_heuristic_descriptor::set_heuristic_mode(
                   HIPDNN_STATUS_BAD_PARAM_NULL_POINTER,
                   "Engine_heuristic_descriptor failed to set heuristic mode: Null pointer.");
 
-    const hipdnnBackendHeurMode_t* heur_mode = static_cast<const hipdnnBackendHeurMode_t*>(
-        array_of_elements);
-    THROW_IF_NULL(heur_mode,
-                  HIPDNN_STATUS_BAD_PARAM_NULL_POINTER,
-                  "Engine_heuristic_descriptor failed to set heuristic mode: Heuristic mode is null.");
-    
+    auto heur_mode = static_cast<const hipdnnBackendHeurMode_t*>(array_of_elements);
+    THROW_IF_NULL(
+        heur_mode,
+        HIPDNN_STATUS_BAD_PARAM_NULL_POINTER,
+        "Engine_heuristic_descriptor failed to set heuristic mode: Heuristic mode is null.");
+
     auto heur_mode_value = *heur_mode;
     if(heur_mode_value != HIPDNN_HEUR_MODE_FALLBACK)
     {
