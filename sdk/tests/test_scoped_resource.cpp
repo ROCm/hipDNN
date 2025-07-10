@@ -6,7 +6,8 @@
 
 using namespace hipdnn::sdk;
 
-namespace {
+namespace
+{
 
 struct Resource
 {
@@ -54,10 +55,10 @@ TEST(ScopedResourceTest, CheckMoveAssign)
         utilities::Scoped_resource sr1(&r1, dtor);
         utilities::Scoped_resource sr2(&r2, dtor);
         sr2 = std::move(sr1);
-        
+
         ASSERT_FALSE(r1.released);
         ASSERT_TRUE(r2.released);
-    
+
         ASSERT_TRUE(sr1.is_empty());
         ASSERT_FALSE(sr2.is_empty());
     }
