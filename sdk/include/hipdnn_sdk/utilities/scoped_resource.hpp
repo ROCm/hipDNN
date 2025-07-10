@@ -33,7 +33,7 @@ public:
     Scoped_resource& operator=(const Scoped_resource&) = delete;
 
     // Allow moving
-    Scoped_resource(Scoped_resource&& other) noexcept
+    Scoped_resource(Scoped_resource&& other)
     {
         if(other._empty)
             return;
@@ -44,7 +44,7 @@ public:
         _empty = false;
     }
 
-    Scoped_resource& operator=(Scoped_resource&& other) noexcept
+    Scoped_resource& operator=(Scoped_resource&& other)
     {
         if(this != &other)
         {
