@@ -105,32 +105,6 @@ void hipdnnPluginGetLastErrorString(const char** error_str)
     });
 }
 
-// Implementation of Engine Plugin API
-
-////////////////////////////////////////////////////////////////////////////////////////////
-// TODO Temporary functions, these are going to be removed soon.
-////////////////////////////////////////////////////////////////////////////////////////////
-hipdnnPluginStatus_t hipdnnPluginGetNumEngines(unsigned* num_engines)
-{
-    if(!num_engines)
-        return HIPDNN_PLUGIN_STATUS_BAD_PARAM;
-
-    return HIPDNN_PLUGIN_STATUS_SUCCESS;
-}
-
-hipdnnPluginStatus_t hipdnnPluginRunEngine(unsigned engine_index,
-                                           const uint32_t* input,
-                                           uint32_t* output,
-                                           uint32_t size)
-{
-    if(!input || !output || size == 0)
-        return HIPDNN_PLUGIN_STATUS_BAD_PARAM;
-
-    return HIPDNN_PLUGIN_STATUS_INTERNAL_ERROR;
-}
-////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////
-
 hipdnnPluginStatus_t hipdnnEnginePluginCreate(hipdnnEnginePluginHandle_t* handle)
 {
     LOG_API_ENTRY("handle_ptr={:p}", static_cast<void*>(handle));
