@@ -42,6 +42,7 @@ add_executable(miopen_legacy_plugin_tests
     test_miopen_legacy_plugin_api.cpp
     test_miopen_handle_factory.cpp
     test_engine_manager.cpp
+    test_hipdnn_plugin_execution_context.cpp
 )
 
 target_link_libraries(miopen_legacy_plugin_tests PUBLIC 
