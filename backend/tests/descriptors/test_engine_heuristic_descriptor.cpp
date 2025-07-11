@@ -327,3 +327,81 @@ TEST_F(Engine_heuristic_descriptor_test, GetEngineConfigsWithNullConfig)
     delete configs[0];
     delete configs[2];
 }
+
+TEST_F(Engine_heuristic_descriptor_test, GetEngineConfigsWithNoEngineIds)
+{
+    set_graph();
+    set_heuristic_mode();
+    std::vector<int64_t> engine_ids = {};
+    ASSERT_NO_THROW(_engine_heuristic->set_engine_ids(engine_ids));
+
+    ASSERT_NO_THROW(_engine_heuristic->finalize());
+
+    EXPECT_CALL(*_mock_graph, is_finalized()).WillRepeatedly(Return(true));
+
+    std::vector<Engine_config_descriptor*> configs(3);
+    for(int i = 0; i < 3; ++i)
+    {
+        configs[i] = new Engine_config_descriptor();
+    }
+
+    int64_t count = 0;
+    ASSERT_NO_THROW(_engine_heuristic->get_attribute(HIPDNN_ATTR_ENGINEHEUR_RESULTS,
+                                                     HIPDNN_TYPE_BACKEND_DESCRIPTOR,
+                                                     3,
+                                                     &count,
+                                                     configs.data()));
+    ASSERT_EQ(count, 0);
+
+    for(auto* config : configs)
+    {
+        delete config;
+    }
+}
+
+TEST_F(Engine_heuristic_descriptor_test, GetEngineConfigsRequestMoreThanAvailable)
+{
+    set_graph();
+    set_heuristic_mode();
+    set_engine_ids(); // Sets 3 engine IDs {0, 1, 2}
+    ASSERT_NO_THROW(_engine_heuristic->finalize());
+
+    EXPECT_CALL(*_mock_graph, is_finalized()).WillRepeatedly(Return(true));
+
+    std::vector<Engine_config_descriptor*> configs(5);
+    for(int i = 0; i < 5; ++i)
+    {
+        configs[i] = new Engine_config_descriptor();
+    }
+
+    int64_t count = 0;
+    ASSERT_NO_THROW(_engine_heuristic->get_attribute(HIPDNN_ATTR_ENGINEHEUR_RESULTS,
+                                                     HIPDNN_TYPE_BACKEND_DESCRIPTOR,
+                                                     5,
+                                                     &count,
+                                                     configs.data()));
+    ASSERT_EQ(count, 3);
+
+    for(auto* config : configs)
+    {
+        delete config;
+    }
+}
+
+TEST_F(Engine_heuristic_descriptor_test, GetEngineConfigsCountOnly)
+{
+    set_graph();
+    set_heuristic_mode();
+    set_engine_ids();
+    ASSERT_NO_THROW(_engine_heuristic->finalize());
+
+    EXPECT_CALL(*_mock_graph, is_finalized()).WillRepeatedly(Return(true));
+
+    int64_t count = 0;
+    ASSERT_NO_THROW(_engine_heuristic->get_attribute(HIPDNN_ATTR_ENGINEHEUR_RESULTS,
+                                                     HIPDNN_TYPE_BACKEND_DESCRIPTOR,
+                                                     0,
+                                                     &count,
+                                                     nullptr));
+    ASSERT_EQ(count, 3);
+}
