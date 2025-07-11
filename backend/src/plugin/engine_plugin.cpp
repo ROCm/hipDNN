@@ -97,14 +97,26 @@ std::vector<int64_t>
     std::vector<int64_t> engine_ids(max_engines);
     uint32_t num_engines = 0;
 
-    invoke_plugin_function("get applicable engine IDs", _func_get_applicable_engine_ids, handle, op_graph, engine_ids.data(), max_engines, &num_engines);
+    invoke_plugin_function("get applicable engine IDs",
+                           _func_get_applicable_engine_ids,
+                           handle,
+                           op_graph,
+                           engine_ids.data(),
+                           max_engines,
+                           &num_engines);
 
     if(num_engines > max_engines)
     {
         // Dynamically resize the buffer and retry
         max_engines = num_engines;
         engine_ids.resize(max_engines);
-        invoke_plugin_function("get applicable engine IDs after resizing buffer", _func_get_applicable_engine_ids, handle, op_graph, engine_ids.data(), max_engines, &num_engines);
+        invoke_plugin_function("get applicable engine IDs after resizing buffer",
+                               _func_get_applicable_engine_ids,
+                               handle,
+                               op_graph,
+                               engine_ids.data(),
+                               max_engines,
+                               &num_engines);
     }
 
     engine_ids.resize(num_engines);
@@ -117,7 +129,12 @@ void Engine_plugin::get_engine_details(hipdnnEnginePluginHandle_t handle,
                                        hipdnnPluginConstData_t* engine_details) const
 {
     assert(_initialized);
-    invoke_plugin_function("get engine details", _func_get_engine_details, handle, engine_id, op_graph, engine_details);
+    invoke_plugin_function("get engine details",
+                           _func_get_engine_details,
+                           handle,
+                           engine_id,
+                           op_graph,
+                           engine_details);
 }
 
 void Engine_plugin::destroy_engine_details(hipdnnEnginePluginHandle_t handle,
@@ -125,7 +142,8 @@ void Engine_plugin::destroy_engine_details(hipdnnEnginePluginHandle_t handle,
 
 {
     assert(_initialized);
-    invoke_plugin_function("destroy engine details", _func_destroy_engine_details, handle, engine_details);
+    invoke_plugin_function(
+        "destroy engine details", _func_destroy_engine_details, handle, engine_details);
 }
 
 size_t Engine_plugin::get_workspace_size(hipdnnEnginePluginHandle_t handle,
@@ -134,7 +152,12 @@ size_t Engine_plugin::get_workspace_size(hipdnnEnginePluginHandle_t handle,
 {
     assert(_initialized);
     size_t workspace_size = 0;
-    invoke_plugin_function("get workspace size", _func_get_workspace_size, handle, engine_config, op_graph, &workspace_size);
+    invoke_plugin_function("get workspace size",
+                           _func_get_workspace_size,
+                           handle,
+                           engine_config,
+                           op_graph,
+                           &workspace_size);
     return workspace_size;
 }
 
@@ -145,7 +168,12 @@ hipdnnEnginePluginExecutionContext_t
 {
     assert(_initialized);
     hipdnnEnginePluginExecutionContext_t exec_context;
-    invoke_plugin_function("create execution context", _func_create_execution_context, handle, engine_config, op_graph, &exec_context);
+    invoke_plugin_function("create execution context",
+                           _func_create_execution_context,
+                           handle,
+                           engine_config,
+                           op_graph,
+                           &exec_context);
     return exec_context;
 }
 
@@ -153,7 +181,8 @@ void Engine_plugin::destroy_execution_context(
     hipdnnEnginePluginHandle_t handle, hipdnnEnginePluginExecutionContext_t execution_context) const
 {
     assert(_initialized);
-    invoke_plugin_function("destroy execution context", _func_destroy_execution_context, handle, execution_context);
+    invoke_plugin_function(
+        "destroy execution context", _func_destroy_execution_context, handle, execution_context);
 }
 
 void Engine_plugin::execute_op_graph(hipdnnEnginePluginHandle_t handle,
@@ -163,7 +192,13 @@ void Engine_plugin::execute_op_graph(hipdnnEnginePluginHandle_t handle,
                                      uint32_t num_device_buffers) const
 {
     assert(_initialized);
-    invoke_plugin_function("execute op graph", _func_execute_op_graph, handle, execution_context, workspace, device_buffers, num_device_buffers);
+    invoke_plugin_function("execute op graph",
+                           _func_execute_op_graph,
+                           handle,
+                           execution_context,
+                           workspace,
+                           device_buffers,
+                           num_device_buffers);
 }
 
 } // namespace plugin

@@ -45,12 +45,12 @@ protected:
     void invoke_plugin_function(const char* description, Callable&& func, Args&&... args) const
     {
         auto status = func(std::forward<Args>(args)...);
-        if (status != HIPDNN_PLUGIN_STATUS_SUCCESS)
+        if(status != HIPDNN_PLUGIN_STATUS_SUCCESS)
         {
             throw Hipdnn_exception(HIPDNN_STATUS_PLUGIN_ERROR,
                                    std::string("Failed to ") + description + ". Status: "
-                                   + to_string(status) + "(" + std::to_string(status) + ")"
-                                   + ", Error: " + std::string(get_last_error_string()));
+                                       + to_string(status) + "(" + std::to_string(status) + ")"
+                                       + ", Error: " + std::string(get_last_error_string()));
         }
     }
 
