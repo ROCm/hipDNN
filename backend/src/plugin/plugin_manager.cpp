@@ -49,7 +49,7 @@ std::shared_ptr<Hipdnn_plugin_base> Plugin_manager::get_plugin(int64_t engine_id
 void Plugin_manager::finalize_engine_heuristic(hipdnnBackendDescriptor_t desc)
 {
     assert(desc != nullptr);
-    assert(desc->type == HIPDNN_BACKEND_ENGINE_HEURISTIC_DESCRIPTOR);
+    assert(desc->type == HIPDNN_BACKEND_ENGINEHEUR_DESCRIPTOR);
     auto heuristic = static_cast<Engine_heuristic_descriptor*>(desc);
 
     hipdnnBackendDescriptor_t graph;
