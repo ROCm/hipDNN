@@ -112,8 +112,7 @@ public:
 
         for(auto& plugin : _plugins)
         {
-            auto status = plugin.set_logging_callback(callback);
-            if(status != HIPDNN_PLUGIN_STATUS_SUCCESS)
+            if(plugin.set_logging_callback(callback) != HIPDNN_PLUGIN_STATUS_SUCCESS)
             {
                 HIPDNN_LOG_WARN("Failed to set logging callback for plugin {}", plugin.name());
                 overall_status = HIPDNN_STATUS_PLUGIN_ERROR;
