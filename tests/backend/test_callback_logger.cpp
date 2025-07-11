@@ -2,6 +2,8 @@
 // SPDX-License-Identifier:  MIT
 
 #include "hipdnn_backend.h"
+#include <array>
+#include <fcntl.h>
 #include <filesystem>
 #include <fstream>
 #include <gtest/gtest.h>
@@ -10,6 +12,7 @@
 #include <spdlog/spdlog.h>
 #include <string>
 #include <thread>
+#include <unistd.h>
 
 #include <hipdnn_sdk/logging/callback_types.h>
 #include <hipdnn_sdk/logging/logger.hpp>
@@ -21,140 +24,98 @@
 class Callback_logger_test : public ::testing::Test
 {
 protected:
-    std::string _log_file_path;
     const std::string _test_logger_name = COMPONENT_NAME;
+    std::string _log_file_path;
+    std::array<int, 2> _stderr_pipe;
+    int _old_stderr;
 
     void SetUp() override
     {
-        _log_file_path = hipdnn::logging::generate_log_file_name();
-        _log_file_path = (std::filesystem::current_path() / _log_file_path).string();
+        // pipe stderr to capture log output
+        _old_stderr = dup(STDERR_FILENO);
+        ASSERT_NE(_old_stderr, -1);
+        ASSERT_EQ(pipe(_stderr_pipe.data()), 0);
+        ASSERT_NE(dup2(_stderr_pipe[1], STDERR_FILENO), -1);
+        ASSERT_EQ(close(_stderr_pipe[1]), 0);
 
-        setenv("HIPDNN_LOG_FILE", _log_file_path.c_str(), 1);
-        setenv("HIPDNN_LOG_LEVEL", "trace", 1);
+        unsetenv("HIPDNN_LOG_FILE");
+        setenv("HIPDNN_LOG_LEVEL", "info", 1);
+
+        spdlog::drop_all();
 
         hipdnn::logging::initialize_callback_logging(_test_logger_name, hipdnnLoggingCallback_ext);
 
         auto test_logger = spdlog::get(_test_logger_name);
         ASSERT_NE(test_logger, nullptr);
-        test_logger->set_level(spdlog::level::trace);
-        HIPDNN_LOG_INFO("");
-
-        auto file_writer_logger = spdlog::get("hipdnn");
-        if(file_writer_logger)
-        {
-            file_writer_logger->flush();
-        }
+        test_logger->set_level(spdlog::level::info);
     }
 
     void TearDown() override
     {
-        auto test_logger = spdlog::get(_test_logger_name);
-        if(test_logger)
-        {
-            test_logger->flush();
-        }
+        spdlog::apply_all([&](const std::shared_ptr<spdlog::logger>& l) { l->flush(); });
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
-        auto callback_receiver_log = spdlog::get("hipdnn");
-        if(callback_receiver_log)
-        {
-            callback_receiver_log->flush();
-        }
+        fflush(stderr);
+        dup2(_old_stderr, STDERR_FILENO);
+        close(_old_stderr);
+        close(_stderr_pipe[0]);
 
-        std::this_thread::sleep_for(std::chrono::milliseconds(50));
-
-        if(test_logger)
-        {
-            spdlog::drop(_test_logger_name);
-        }
-
+        spdlog::drop_all();
         unsetenv("HIPDNN_LOG_FILE");
         unsetenv("HIPDNN_LOG_LEVEL");
 
-        std::ifstream log_file_stream(_log_file_path);
-        if(log_file_stream.is_open())
+        if(!_log_file_path.empty())
         {
-            log_file_stream.close();
-            if(std::remove(_log_file_path.c_str()) != 0 && HasFailure())
-            {
-            }
-            else if(!HasFailure())
-            {
-            }
+            std::remove(_log_file_path.c_str());
         }
     }
 
-    std::string get_log_content() const
+    std::string get_stderr_content()
     {
-        auto component_logger = spdlog::get(_test_logger_name);
-        if(component_logger)
-        {
-            component_logger->flush();
-        }
+        spdlog::apply_all([&](const std::shared_ptr<spdlog::logger>& l) { l->flush(); });
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
-        auto file_writer_logger = spdlog::get("hipdnn");
-        if(file_writer_logger)
-        {
-            file_writer_logger->flush();
-        }
+        std::string content;
+        std::array<char, 4096> buffer;
+        ssize_t bytes_read;
 
-        std::this_thread::sleep_for(std::chrono::milliseconds(200));
+        // make read non-blocking
+        fcntl(_stderr_pipe[0], F_SETFL, O_NONBLOCK);
 
-        std::string log_content;
-        std::ifstream log_file_stream(_log_file_path);
-        if(log_file_stream.is_open())
+        while((bytes_read = read(_stderr_pipe[0], buffer.data(), buffer.size() - 1)) > 0)
         {
-            log_file_stream.seekg(0, std::ios::beg);
-            log_content.assign((std::istreambuf_iterator<char>(log_file_stream)),
-                               std::istreambuf_iterator<char>());
-            log_file_stream.close();
+            buffer[static_cast<size_t>(bytes_read)] = '\0';
+            content += buffer.data();
         }
-        else
-        {
-            ADD_FAILURE() << "Failed to open log file for reading: " << _log_file_path;
-        }
-
-        return log_content;
+        return content;
     }
 
-    void verify_log_contains(const std::string& expected_content) const
+    void verify_stderr_contains(const std::string& expected_content)
     {
-        std::string log_content = get_log_content();
+        std::string log_content = get_stderr_content();
         EXPECT_NE(log_content.find(expected_content), std::string::npos)
-            << "Expected to find: \"" << expected_content << "\" in log file " << _log_file_path
-            << "\nActual log content:\n"
+            << "Expected to find: \"" << expected_content << "\" in stderr."
+            << "\nActual stderr content:\n"
             << log_content;
     }
 
-    void verify_log_not_contains(const std::string& unexpected_content) const
+    void verify_stderr_not_contains(const std::string& unexpected_content)
     {
-        std::string log_content = get_log_content();
+        std::string log_content = get_stderr_content();
         EXPECT_EQ(log_content.find(unexpected_content), std::string::npos)
-            << "Expected NOT to find: \"" << unexpected_content << "\" in log file "
-            << _log_file_path << "\nActual log content:\n"
+            << "Expected NOT to find: \"" << unexpected_content << "\" in stderr."
+            << "\nActual stderr content:\n"
             << log_content;
     }
 
-    void verify_log_pattern(const std::string& message_text, const std::string& level) const
+    void verify_stderr_pattern(const std::string& log_content,
+                               const std::string& message_text,
+                               const std::string& level)
     {
-        std::string log_content = get_log_content();
-
         std::regex pattern(R"(\[\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{3}\] \[tid \d+\] \[)"
                            + level + R"(\] \[)" + _test_logger_name + R"(\] )" + message_text);
 
-        bool pattern_matched = false;
-        std::istringstream log_stream(log_content);
-        std::string line;
-
-        while(std::getline(log_stream, line))
-        {
-            if(std::regex_match(line, pattern))
-            {
-                pattern_matched = true;
-                break;
-            }
-        }
-
-        EXPECT_TRUE(pattern_matched)
+        EXPECT_TRUE(std::regex_search(log_content, pattern))
             << "Expected log pattern not found for message: " << message_text
             << "\nExpected pattern: [timestamp] [tid thread_id] [" << level << "] ["
             << _test_logger_name << "] " << message_text << "\nLog content:\n"
@@ -167,8 +128,9 @@ TEST_F(Callback_logger_test, InfoMessageIsCorrectlyLogged)
     std::string test_message = "Test info message";
     HIPDNN_LOG_INFO(test_message);
 
-    verify_log_contains(test_message);
-    verify_log_pattern(test_message, "info");
+    std::string log_content = get_stderr_content();
+    EXPECT_NE(log_content.find(test_message), std::string::npos);
+    verify_stderr_pattern(log_content, test_message, "info");
 }
 
 TEST_F(Callback_logger_test, WarnMessageIsCorrectlyLogged)
@@ -176,8 +138,9 @@ TEST_F(Callback_logger_test, WarnMessageIsCorrectlyLogged)
     std::string test_message = "Test warning message";
     HIPDNN_LOG_WARN(test_message);
 
-    verify_log_contains(test_message);
-    verify_log_pattern(test_message, "warning");
+    std::string log_content = get_stderr_content();
+    EXPECT_NE(log_content.find(test_message), std::string::npos);
+    verify_stderr_pattern(log_content, test_message, "warning");
 }
 
 TEST_F(Callback_logger_test, ErrorMessageIsCorrectlyLogged)
@@ -185,8 +148,9 @@ TEST_F(Callback_logger_test, ErrorMessageIsCorrectlyLogged)
     std::string test_message = "Test error message";
     HIPDNN_LOG_ERROR(test_message);
 
-    verify_log_contains(test_message);
-    verify_log_pattern(test_message, "error");
+    std::string log_content = get_stderr_content();
+    EXPECT_NE(log_content.find(test_message), std::string::npos);
+    verify_stderr_pattern(log_content, test_message, "error");
 }
 
 TEST_F(Callback_logger_test, FormattedMessagesAreCorrectlyLogged)
@@ -197,8 +161,9 @@ TEST_F(Callback_logger_test, FormattedMessagesAreCorrectlyLogged)
     HIPDNN_LOG_INFO("Test {} message with value {}", text, value);
 
     std::string expected_content = "Test formatted message with value 42";
-    verify_log_contains(expected_content);
-    verify_log_pattern(expected_content, "info");
+    std::string log_content = get_stderr_content();
+    EXPECT_NE(log_content.find(expected_content), std::string::npos);
+    verify_stderr_pattern(log_content, expected_content, "info");
 }
 
 TEST_F(Callback_logger_test, LogLevelsAreRespected)
@@ -207,26 +172,16 @@ TEST_F(Callback_logger_test, LogLevelsAreRespected)
     ASSERT_NE(test_logger, nullptr);
     test_logger->set_level(spdlog::level::err);
 
-    auto file_writer_logger = spdlog::get("hipdnn");
-    if(file_writer_logger)
-    {
-        file_writer_logger->set_level(spdlog::level::err);
-    }
-
     HIPDNN_LOG_INFO("This info should not appear");
     HIPDNN_LOG_WARN("This warning should not appear");
     HIPDNN_LOG_ERROR("This error should appear");
 
-    verify_log_not_contains("This info should not appear");
-    verify_log_not_contains("This warning should not appear");
-    verify_log_contains("This error should appear");
-    verify_log_pattern("This error should appear", "error");
+    std::string log_content = get_stderr_content();
+    EXPECT_EQ(log_content.find("This info should not appear"), std::string::npos);
+    EXPECT_EQ(log_content.find("This warning should not appear"), std::string::npos);
+    EXPECT_NE(log_content.find("This error should appear"), std::string::npos);
 
-    test_logger->set_level(spdlog::level::trace);
-    if(file_writer_logger)
-    {
-        file_writer_logger->set_level(spdlog::level::trace);
-    }
+    test_logger->set_level(spdlog::level::info);
 }
 
 TEST_F(Callback_logger_test, MultipleMessagesAreLogged)
@@ -235,45 +190,40 @@ TEST_F(Callback_logger_test, MultipleMessagesAreLogged)
     HIPDNN_LOG_INFO("Second message");
     HIPDNN_LOG_INFO("Third message");
 
-    verify_log_contains("First message");
-    verify_log_contains("Second message");
-    verify_log_contains("Third message");
-    verify_log_pattern("First message", "info");
-    verify_log_pattern("Second message", "info");
-    verify_log_pattern("Third message", "info");
+    std::string log_content = get_stderr_content();
+    EXPECT_NE(log_content.find("First message"), std::string::npos);
+    EXPECT_NE(log_content.find("Second message"), std::string::npos);
+    EXPECT_NE(log_content.find("Third message"), std::string::npos);
 }
 
-TEST_F(Callback_logger_test, VerifyLogPatternMatchesSpecification)
+TEST_F(Callback_logger_test, LoggingToFile)
 {
-    std::string test_message = "Pattern verification test message";
+    TearDown();
+    _log_file_path = "callback_test_file.log";
+    setenv("HIPDNN_LOG_FILE", _log_file_path.c_str(), 1);
+    setenv("HIPDNN_LOG_LEVEL", "info", 1);
+
+    spdlog::drop_all();
+    hipdnn::logging::initialize_callback_logging(_test_logger_name, hipdnnLoggingCallback_ext);
+    auto test_logger = spdlog::get(_test_logger_name);
+    ASSERT_NE(test_logger, nullptr);
+    test_logger->set_level(spdlog::level::info);
+
+    std::string test_message = "This message goes to the log file.";
     HIPDNN_LOG_INFO(test_message);
 
-    std::string log_content = get_log_content();
+    spdlog::apply_all([&](const std::shared_ptr<spdlog::logger>& l) { l->flush(); });
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
-    std::istringstream log_stream(log_content);
-    std::string line;
-    std::string matched_line;
+    std::string log_content;
+    std::ifstream log_file_stream(_log_file_path);
+    ASSERT_TRUE(log_file_stream.is_open()) << "Log file was not created: " << _log_file_path;
 
-    while(std::getline(log_stream, line))
-    {
-        if(line.find(test_message) != std::string::npos)
-        {
-            matched_line = line;
-            break;
-        }
-    }
+    log_content.assign((std::istreambuf_iterator<char>(log_file_stream)),
+                       std::istreambuf_iterator<char>());
+    log_file_stream.close();
 
-    ASSERT_FALSE(matched_line.empty())
-        << "Test message not found in log: " << test_message << "\nLog content:\n"
+    EXPECT_NE(log_content.find(test_message), std::string::npos)
+        << "Expected to find message in log file " << _log_file_path << "\nActual log content:\n"
         << log_content;
-
-    std::regex pattern_regex(
-        R"(\[\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{3}\] \[tid \d+\] \[info\] \[)"
-        + _test_logger_name + R"(\] )" + test_message);
-
-    EXPECT_TRUE(std::regex_match(matched_line, pattern_regex))
-        << "Log line doesn't match expected pattern from generate_pattern_string.\n"
-        << "Expected pattern: [timestamp] [tid thread_id] [level] [" << _test_logger_name
-        << "] message\n"
-        << "Actual line: " << matched_line;
 }
