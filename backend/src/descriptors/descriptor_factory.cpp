@@ -72,4 +72,13 @@ void Descriptor_factory::create_graph_ext(hipdnnBackendDescriptor_t* descriptor,
     *descriptor = graph_descriptor;
 }
 
+void Descriptor_factory::destroy(hipdnnBackendDescriptor_t descriptor)
+{
+    THROW_IF_NULL(descriptor, HIPDNN_STATUS_BAD_PARAM_NULL_POINTER, "hipdnnBackendDescriptor_t is null.");
+
+    HIPDNN_LOG_INFO("Destroying descriptor");
+
+    delete descriptor;
+}
+
 } // namespace hipdnn_backend

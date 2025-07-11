@@ -32,7 +32,6 @@ option(HIP_DNN_BUILD_FRONTEND "Build the frontend code" ON)
 option(HIP_DNN_SKIP_TESTS "Skips building all tests" OFF)
 option(HIP_DNN_BUILD_PLUGINS "Builds the plugins as part of the main cmake" OFF)
 
-
 option(CODE_COVERAGE "Build with code coverage flags" OFF)
 option(ENABLE_CLANG_TIDY "Enable Clang-Tidy checks" ON)
 option(BUILD_ADDRESS_SANITIZER "Build with Address Sanitizer enabled" OFF)
@@ -62,13 +61,39 @@ list(
 include(cmake/Dependencies.cmake)
 include(cmake/ClangCheck.cmake)
 include(cmake/ClangTidy.cmake)
+include(cmake/Sanitizers.cmake)
 
 hipdnn_add_dependency(GTest v1.16.0)
 
 enable_testing() # Cmake wont discover or run tests without this line
 
 # Add a check target which will run all tests discovered by gtest_discover_tests via ctest. 
-add_custom_target(check COMMAND ASAN_SYMBOLIZER_PATH=/opt/rocm/llvm/bin/llvm-symbolizer ${CMAKE_CTEST_COMMAND} --output-on-failure -C ${CMAKE_CFG_INTDIR})
+add_custom_target(check COMMAND ${TEST_ENVIRONMENT} ${CMAKE_CTEST_COMMAND} --output-on-failure -C ${CMAKE_CFG_INTDIR})
+
+# GPU Architecture targets
+if(NOT DEFINED GPU_TARGETS)
+    # Check if Address Sanitizer is enabled - use XNACK-enabled targets
+    if(BUILD_ADDRESS_SANITIZER)
+        set(GPU_TARGETS 
+            gfx906:xnack+    # Vega 20 (MI50, MI60)
+            gfx908:xnack+    # MI100 (Arcturus)
+            gfx90a:xnack+    # MI200 series (MI210, MI250, MI250X)
+            gfx940:xnack+    # MI300A (APU)
+            gfx941:xnack+    # MI300A (APU variant)
+            gfx942:xnack+    # MI300X (GPU)
+        )
+    else()
+        # Standard GPU targets without XNACK
+        set(GPU_TARGETS 
+            gfx90a
+            gfx942
+            gfx1100
+            gfx1151
+            gfx1201
+        )
+    endif()
+endif()
+message(STATUS "Using GPU targets: ${GPU_TARGETS}")
 
 # Add global compile options
 set(EXTRA_COMPILE_OPTIONS)
@@ -81,90 +106,6 @@ if(CODE_COVERAGE)
     list(PREPEND EXTRA_LINK_OPTIONS 
         -fprofile-instr-generate 
         -fcoverage-mapping)
-endif()
-
-# Function to detect GPU architecture and set appropriate flags
-function(configure_xnack_flags target_name)
-    # Get the current GPU architecture
-    execute_process(
-        COMMAND /opt/rocm/bin/rocm_agent_enumerator
-        OUTPUT_VARIABLE GPU_TARGETS
-        OUTPUT_STRIP_TRAILING_WHITESPACE
-    )
-    
-    # Parse GPU targets and set appropriate offload-arch flags
-    string(REPLACE "\n" ";" GPU_LIST ${GPU_TARGETS})
-    
-    foreach(GPU_TARGET ${GPU_LIST})
-        if(NOT ${GPU_TARGET} STREQUAL "gfx000")
-            # Check if this architecture supports XNACK
-            if(${GPU_TARGET} MATCHES "gfx90a|gfx908|gfx940|gfx942")
-                # Enable XNACK for supported architectures
-                target_compile_options(${target_name} PRIVATE 
-                    --offload-arch=${GPU_TARGET}:xnack+
-                )
-                message(STATUS "Enabling XNACK for ${GPU_TARGET}")
-            else()
-                # Standard compilation for non-XNACK architectures
-                target_compile_options(${target_name} PRIVATE 
-                    --offload-arch=${GPU_TARGET}
-                )
-                message(STATUS "Standard compilation for ${GPU_TARGET}")
-            endif()
-        endif()
-    endforeach()
-endfunction()
-
-# Enable Address Sanitizer and set linker flags for security
-message(STATUS "Building with Sanitizers: ${BUILD_ADDRESS_SANITIZER}")
-if (BUILD_ADDRESS_SANITIZER)
-    # if(NOT DEFINED GPU_TARGETS)
-    #     set(XNACK_PLUS_TARGETS
-    #         gfx90a:xnack+
-    #         #gfx908:xnack+
-    #         #gfx942:xnack+
-    #         #gfx950:xnack+
-    #     )
-    #     set(OPTIONAL_TARGETS ${XNACK_PLUS_TARGETS})
-    #     set(AMDGPU_TARGETS_INIT ${OPTIONAL_TARGETS} ${DEFAULT_TARGETS})
-
-    #     # Set this before finding hip so that hip::device has the required arch flags
-    #     # added as usage requirements on its interface
-    #     set(GPU_TARGETS "${AMDGPU_TARGETS_INIT}"
-    #         CACHE STRING "List of specific machine types for library to target")
-
-    #     set(CMAKE_HIP_ARCHITECTURES "${AMDGPU_TARGETS_INIT}"
-    #         CACHE STRING "HIP architectures")
-         set(CMAKE_HIP_ARCHITECTURES "${GPU_TARGETS}"
-             CACHE STRING "HIP architectures")
-    # endif()
-    
-    message(STATUS "GPU Targets: ${CMAKE_HIP_ARCHITECTURES}")
-
-    #link_directories(/opt/rocm/llvm/lib/19/lib/linux)
-    link_directories(/opt/rocm/llvm/lib/clang/19/lib/linux)
-
-    # find_library(UBSAN_LIBRARY ubsan PATHS /opt/rocm/llvm/lib/clang/19/lib/linux)
-    # if(UBSAN_LIBRARY)
-    #     list(APPEND EXTRA_LINK_OPTIONS ${UBSAN_LIBRARY})
-    #     message(STATUS "UBSAN LIB: ${UBSAN_LIBRARY}")
-    # endif()
-
-    set(ENV{ASAN_SYMBOLIZER_PATH} "/opt/rocm/llvm/bin/llvm-symbolizer")
-    set(ENV{HSA_XNACK} "1")
-
-    list(APPEND EXTRA_COMPILE_OPTIONS 
-        -fsanitize=address,leak
-        -fno-omit-frame-pointer
-        -fno-optimize-sibling-calls
-        -fno-inline
-    )
-
-    list(APPEND EXTRA_LINK_OPTIONS 
-        -fsanitize=address,leak
-        -shared-libasan
-        #-lubsan
-    ) 
 endif()
 
 list(PREPEND HIPDNN_WARNING_COMPILE_OPTIONS
