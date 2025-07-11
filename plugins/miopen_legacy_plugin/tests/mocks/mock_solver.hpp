@@ -32,7 +32,7 @@ public:
                  const hipdnnPluginDeviceBuffer_t* device_buffers,
                  uint32_t num_device_buffers,
                  void* workspace),
-                (override));
+                (const, override));
 };
 
 }

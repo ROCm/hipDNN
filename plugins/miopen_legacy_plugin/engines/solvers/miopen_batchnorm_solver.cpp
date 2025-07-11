@@ -48,7 +48,7 @@ void Miopen_batchnorm_solver::execute_graph(
     const hipdnnEnginePluginExecutionContext& execution_context,
     const hipdnnPluginDeviceBuffer_t* device_buffers,
     uint32_t num_device_buffers,
-    void* workspace)
+    void* workspace) const
 {
     const auto& node = execution_context.graph().get_node(0);
 
@@ -126,7 +126,7 @@ void Miopen_batchnorm_solver::execute_batchnorm_fwd_inference(
     hipdnn_plugin::Graph_interface& op_graph,
     const hipdnn_sdk::data_objects::BatchnormInferenceAttributes& attributes,
     const hipdnnPluginDeviceBuffer_t* device_buffers,
-    uint32_t num_device_buffers)
+    uint32_t num_device_buffers) const
 {
     float alpha = static_cast<float>(1), beta = static_cast<float>(0);
     double epsilon = 1e-3; // taken from bn driver, todo, figure out better way

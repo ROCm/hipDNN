@@ -27,7 +27,7 @@ public:
                        const hipdnnEnginePluginExecutionContext& execution_context,
                        const hipdnnPluginDeviceBuffer_t* device_buffers,
                        uint32_t num_device_buffers,
-                       void* workspace = nullptr) override;
+                       void* workspace = nullptr) const override;
 
 private:
     void execute_batchnorm_fwd_inference(
@@ -35,7 +35,7 @@ private:
         hipdnn_plugin::Graph_interface& graph,
         const hipdnn_sdk::data_objects::BatchnormInferenceAttributes& attributes,
         const hipdnnPluginDeviceBuffer_t* device_buffers,
-        uint32_t num_device_buffers);
+        uint32_t num_device_buffers) const;
 };
 
 }
