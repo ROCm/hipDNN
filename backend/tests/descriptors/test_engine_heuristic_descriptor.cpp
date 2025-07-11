@@ -260,6 +260,7 @@ TEST_F(Engine_heuristic_descriptor_test, GetEngineHeuristicDescriptorGraph)
 TEST_F(Engine_heuristic_descriptor_test, GetEngineHeuristicDescriptorEngineConfigs)
 {
     make_engine_heuristic_finalized();
+    EXPECT_CALL(*_mock_graph, is_finalized()).WillRepeatedly(Return(true));
 
     ASSERT_THROW_HIPDNN_STATUS(
         _engine_heuristic->get_attribute(
@@ -314,6 +315,7 @@ TEST_F(Engine_heuristic_descriptor_test, GetEngineConfigsWithNullConfig)
     configs[1] = nullptr;
     configs[2] = new Engine_config_descriptor();
 
+    EXPECT_CALL(*_mock_graph, is_finalized()).WillRepeatedly(Return(true));
     int64_t count = 0;
     ASSERT_THROW_HIPDNN_STATUS(_engine_heuristic->get_attribute(HIPDNN_ATTR_ENGINEHEUR_RESULTS,
                                                                 HIPDNN_TYPE_BACKEND_DESCRIPTOR,

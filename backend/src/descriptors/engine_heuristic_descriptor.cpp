@@ -236,10 +236,11 @@ void Engine_heuristic_descriptor::get_engine_configs(hipdnnBackendAttributeType_
             engine->set_attribute(
                 HIPDNN_ATTR_ENGINE_GLOBAL_INDEX, HIPDNN_TYPE_INT64, 1, &_engine_ids[i]);
             engine->set_attribute(
-                HIPDNN_ATTR_ENGINE_OPERATION_GRAPH, HIPDNN_TYPE_BACKEND_DESCRIPTOR, 1, _graph);
-
+                HIPDNN_ATTR_ENGINE_OPERATION_GRAPH, HIPDNN_TYPE_BACKEND_DESCRIPTOR, 1, &_graph);
+            engine->finalize();
+            
             config->set_attribute(
-                HIPDNN_ATTR_ENGINECFG_ENGINE, HIPDNN_TYPE_BACKEND_DESCRIPTOR, 1, engine);
+                HIPDNN_ATTR_ENGINECFG_ENGINE, HIPDNN_TYPE_BACKEND_DESCRIPTOR, 1, &engine);
         }
 
         *element_count = std::min(static_cast<size_t>(requested_element_count), _engine_ids.size());
