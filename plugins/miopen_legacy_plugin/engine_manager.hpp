@@ -43,6 +43,8 @@ public:
                        void* workspace) const;
 
 private:
+    Engine_interface& get_engine(int64_t engine_id) const;
+
     std::unordered_map<int64_t, std::unique_ptr<Engine_interface>> _engines;
 };
 

@@ -3,7 +3,6 @@
 
 #include <algorithm>
 
-#include <hipdnn_sdk/logging/logger.hpp>
 #include <hipdnn_sdk/plugin/flatbuffer_utilities/graph_wrapper.hpp>
 #include <hipdnn_sdk/plugin/plugin_exception.hpp>
 
@@ -42,28 +41,16 @@ void Engine_manager::get_engine_details(const hipdnn_plugin::Graph_interface& op
 {
     (void)op_graph; // Unused parameter
 
-    auto engine = _engines.find(engine_id);
-    if(engine == _engines.end())
-    {
-        throw Hipdnn_plugin_exception(HIPDNN_PLUGIN_STATUS_INVALID_VALUE,
-                                      "Engine with ID " + std::to_string(engine_id)
-                                          + " not found.");
-    }
-    engine->second->get_details(engine_details_out);
+    auto& engine = get_engine(engine_id);
+    engine.get_details(engine_details_out);
 }
 
 size_t Engine_manager::get_workspace_size(const hipdnnEnginePluginHandle& handle,
                                           int64_t engine_id,
                                           const hipdnn_plugin::Graph_interface& op_graph) const
 {
-    auto it = _engines.find(engine_id);
-    if(it == _engines.end())
-    {
-        throw Hipdnn_plugin_exception(HIPDNN_PLUGIN_STATUS_INVALID_VALUE,
-                                      "Engine with ID " + std::to_string(engine_id)
-                                          + " not found.");
-    }
-    return it->second->get_workspace_size(handle, op_graph);
+    auto& engine = get_engine(engine_id);
+    return engine.get_workspace_size(handle, op_graph);
 }
 
 void Engine_manager::execute_graph(const hipdnnEnginePluginHandle& handle,
@@ -72,16 +59,20 @@ void Engine_manager::execute_graph(const hipdnnEnginePluginHandle& handle,
                                    uint32_t num_device_buffers,
                                    void* workspace) const
 {
-    auto it = _engines.find(execution_context.engine_config().engine_id());
+    auto& engine = get_engine(execution_context.engine_config().engine_id());
+    engine.execute_graph(handle, execution_context, device_buffers, num_device_buffers, workspace);
+}
+
+Engine_interface& Engine_manager::get_engine(int64_t engine_id) const
+{
+    auto it = _engines.find(engine_id);
     if(it == _engines.end())
     {
-        throw Hipdnn_plugin_exception(
-            HIPDNN_PLUGIN_STATUS_INVALID_VALUE,
-            "Engine with ID " + std::to_string(execution_context.engine_config().engine_id())
-                + " not found.");
+        throw Hipdnn_plugin_exception(HIPDNN_PLUGIN_STATUS_INVALID_VALUE,
+                                      "Engine with ID " + std::to_string(engine_id)
+                                          + " not found.");
     }
-    it->second->execute_graph(
-        handle, execution_context, device_buffers, num_device_buffers, workspace);
+    return *it->second;
 }
 
 }

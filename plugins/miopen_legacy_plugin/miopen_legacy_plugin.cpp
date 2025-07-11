@@ -325,7 +325,6 @@ hipdnnPluginStatus_t hipdnnEnginePluginDestroyExecutionContext(
         throw_if_null(execution_context);
 
         delete execution_context;
-        execution_context = nullptr;
 
         LOG_API_SUCCESS(api_name, "destroyed execution_context");
     });
