@@ -40,13 +40,7 @@ std::string_view Plugin_base::name() const
 {
     assert(_initialized);
     const char* name;
-    auto status = _func_get_name(&name);
-    if(status != HIPDNN_PLUGIN_STATUS_SUCCESS)
-    {
-        throw Hipdnn_exception(HIPDNN_STATUS_PLUGIN_ERROR,
-                               "Failed to get plugin name. Status code: " + std::to_string(status)
-                                   + ", Error: " + std::string(get_last_error_string()));
-    }
+    invoke_plugin_function("get plugin name", _func_get_name, &name);
     return name;
 }
 
@@ -54,14 +48,7 @@ std::string_view Plugin_base::version() const
 {
     assert(_initialized);
     const char* version;
-    auto status = _func_get_version(&version);
-    if(status != HIPDNN_PLUGIN_STATUS_SUCCESS)
-    {
-        throw Hipdnn_exception(HIPDNN_STATUS_PLUGIN_ERROR,
-                               "Failed to get plugin version. Status code: "
-                                   + std::to_string(status)
-                                   + ", Error: " + std::string(get_last_error_string()));
-    }
+    invoke_plugin_function("get plugin version", _func_get_version, &version);
     return version;
 }
 
@@ -69,13 +56,7 @@ hipdnnPluginType_t Plugin_base::type() const
 {
     assert(_initialized);
     hipdnnPluginType_t type;
-    auto status = _func_get_type(&type);
-    if(status != HIPDNN_PLUGIN_STATUS_SUCCESS)
-    {
-        throw Hipdnn_exception(HIPDNN_STATUS_PLUGIN_ERROR,
-                               "Failed to get plugin type. Status code: " + std::to_string(status)
-                                   + ", Error: " + std::string(get_last_error_string()));
-    }
+    invoke_plugin_function("get plugin type", _func_get_type, &type);
     return type;
 }
 
