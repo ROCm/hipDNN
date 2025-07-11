@@ -3,10 +3,11 @@
 
 #include <flatbuffers/flatbuffers.h>
 #include <gtest/gtest.h>
+#include <set>
+
 #include <hipdnn_sdk/data_objects/graph_generated.h>
 #include <hipdnn_sdk/plugin/flatbuffer_utilities/graph_wrapper.hpp>
 #include <hipdnn_sdk/test_utilities/flatbuffer_graph_test_utils.hpp>
-#include <set>
 
 using namespace hipdnn_plugin;
 

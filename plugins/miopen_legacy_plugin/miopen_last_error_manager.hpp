@@ -3,12 +3,12 @@
 
 #pragma once
 
+#include <string>
+
 #include <hipdnn_sdk/logging/logger.hpp>
 #include <hipdnn_sdk/plugin/plugin_api_data_types.h>
 #include <hipdnn_sdk/plugin/plugin_data_type_helpers.hpp>
 #include <hipdnn_sdk/utilities/string_util.hpp>
-
-#include <string>
 
 namespace hipdnn_plugin
 {

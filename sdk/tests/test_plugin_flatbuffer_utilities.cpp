@@ -1,13 +1,14 @@
 // Copyright © Advanced Micro Devices, Inc., or its affiliates.
 // SPDX-License-Identifier: MIT
 
-#include "hipdnn_sdk/plugin/test_utils/test_macros.hpp"
 #include <flatbuffers/flatbuffers.h>
 #include <gtest/gtest.h>
+
 #include <hipdnn_sdk/data_objects/engine_details_generated.h>
 #include <hipdnn_sdk/data_objects/graph_generated.h>
 #include <hipdnn_sdk/plugin/plugin_exception.hpp>
 #include <hipdnn_sdk/plugin/plugin_flatbuffer_utilities.hpp>
+#include <hipdnn_sdk/plugin/test_utils/test_macros.hpp>
 #include <hipdnn_sdk/test_utilities/flatbuffer_graph_test_utils.hpp>
 
 namespace hipdnn_plugin

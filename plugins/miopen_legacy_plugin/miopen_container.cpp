@@ -3,11 +3,12 @@
 // SPDX-License-Identifier:  MIT
 */
 
-#include "miopen_container.hpp"
+#include <hipdnn_sdk/logging/logger.hpp>
+
 #include "engine_manager.hpp"
 #include "engines/miopen_engine.hpp"
 #include "engines/solvers/miopen_batchnorm_solver.hpp"
-#include <hipdnn_sdk/logging/logger.hpp>
+#include "miopen_container.hpp"
 
 namespace miopen_legacy_plugin
 {

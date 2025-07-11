@@ -3,9 +3,9 @@
 
 #pragma once
 
-#include "hipdnn_sdk/plugin/plugin_api_data_types.h"
-#include "hipdnn_sdk/plugin/plugin_exception.hpp"
-#include "hipdnn_sdk/plugin/plugin_last_error_manager.hpp"
+#include <hipdnn_sdk/plugin/plugin_api_data_types.h>
+#include <hipdnn_sdk/plugin/plugin_exception.hpp>
+#include <hipdnn_sdk/plugin/plugin_last_error_manager.hpp>
 
 #include <iostream>
 

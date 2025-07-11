@@ -3,9 +3,10 @@
 
 #pragma once
 
+#include <ostream>
+
 #include <hipdnn_sdk/logging/logger.hpp>
 #include <hipdnn_sdk/plugin/plugin_api_data_types.h>
-#include <ostream>
 
 inline const char* to_string(hipdnnPluginStatus_t status)
 {

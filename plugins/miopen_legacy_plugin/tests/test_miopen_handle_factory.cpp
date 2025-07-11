@@ -1,11 +1,13 @@
 // Copyright © Advanced Micro Devices, Inc., or its affiliates.
 // SPDX-License-Identifier:  MIT
 
+#include <gtest/gtest.h>
+#include <miopen/miopen.h>
+
+#include <hipdnn_sdk/plugin/plugin_exception.hpp>
+
 #include "hipdnn_engine_plugin_handle.hpp"
 #include "miopen_handle_factory.hpp"
-#include <gtest/gtest.h>
-#include <hipdnn_sdk/plugin/plugin_exception.hpp>
-#include <miopen/miopen.h>
 
 using namespace miopen_legacy_plugin;
 using namespace hipdnn_plugin;

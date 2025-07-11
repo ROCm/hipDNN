@@ -1,20 +1,16 @@
 /* Copyright © Advanced Micro Devices, Inc., or its affiliates. */
 /* SPDX-License-Identifier:  MIT */
 
-#include "engines/solvers/miopen_batchnorm_solver.hpp"
-
 #include <gtest/gtest.h>
 #include <numeric>
 
 #include <hipdnn_sdk/data_objects/graph_generated.h>
-
-//remove this later
-#include "hipdnn_engine_plugin_handle.hpp"
-#include "miopen_handle_factory.hpp"
-
 #include <hipdnn_sdk/plugin/engine_plugin_api.h>
 #include <hipdnn_sdk/plugin/test_utils/mock_graph.hpp>
 #include <hipdnn_sdk/test_utilities/flatbuffer_graph_test_utils.hpp>
+
+#include "engines/solvers/miopen_batchnorm_solver.hpp"
+#include "hipdnn_engine_plugin_handle.hpp"
 
 using namespace miopen_legacy_plugin;
 using namespace hipdnn_plugin;

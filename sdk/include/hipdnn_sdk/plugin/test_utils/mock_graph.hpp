@@ -4,6 +4,7 @@
 #pragma once
 
 #include <gmock/gmock.h>
+
 #include <hipdnn_sdk/plugin/flatbuffer_utilities/graph_wrapper.hpp>
 
 namespace hipdnn_plugin

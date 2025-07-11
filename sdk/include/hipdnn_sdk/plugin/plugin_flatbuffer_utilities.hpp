@@ -5,12 +5,12 @@
 
 #include <flatbuffers/flatbuffers.h>
 #include <flatbuffers/verifier.h>
+#include <memory>
+
 #include <hipdnn_sdk/data_objects/engine_config_generated.h>
 #include <hipdnn_sdk/data_objects/engine_details_generated.h>
 #include <hipdnn_sdk/data_objects/graph_generated.h>
 #include <hipdnn_sdk/plugin/plugin_exception.hpp>
-
-#include <memory>
 
 namespace hipdnn_plugin
 {

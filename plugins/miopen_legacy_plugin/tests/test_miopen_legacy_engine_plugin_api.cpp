@@ -3,14 +3,14 @@
 
 #include <gtest/gtest.h>
 
-#include "hipdnn_engine_plugin_execution_context.hpp"
-#include "hipdnn_engine_plugin_handle.hpp"
-#include "mocks/mock_hipdnn_engine_plugin_execution_context.hpp"
-
 #include <hipdnn_sdk/plugin/engine_plugin_api.h>
 #include <hipdnn_sdk/plugin/plugin_api_data_types.h>
 #include <hipdnn_sdk/plugin/plugin_flatbuffer_utilities.hpp>
 #include <hipdnn_sdk/test_utilities/flatbuffer_graph_test_utils.hpp>
+
+#include "hipdnn_engine_plugin_execution_context.hpp"
+#include "hipdnn_engine_plugin_handle.hpp"
+#include "mocks/mock_hipdnn_engine_plugin_execution_context.hpp"
 
 TEST(MiopenLegacyEnginePluginApiTest, EnginePluginCreateNullHandle)
 {

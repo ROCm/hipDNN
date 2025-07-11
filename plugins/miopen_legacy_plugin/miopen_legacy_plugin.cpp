@@ -16,7 +16,6 @@
 #include "engine_manager.hpp"
 #include "hipdnn_engine_plugin_execution_context.hpp"
 #include "hipdnn_engine_plugin_handle.hpp"
-
 #include "miopen_container.hpp"
 #include "miopen_handle_factory.hpp"
 

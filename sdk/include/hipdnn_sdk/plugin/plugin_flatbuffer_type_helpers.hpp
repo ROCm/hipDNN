@@ -3,9 +3,11 @@
 
 #pragma once
 
+#include <ostream>
+
 #include <hipdnn_sdk/data_objects/graph_generated.h>
 #include <hipdnn_sdk/logging/logger.hpp>
-#include <ostream>
+
 namespace hipdnn_sdk::data_objects
 {
 inline const char* to_string(hipdnn_sdk::data_objects::NodeAttributes attributes)

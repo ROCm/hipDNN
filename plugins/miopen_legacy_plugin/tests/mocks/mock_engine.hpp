@@ -5,9 +5,11 @@
 
 #pragma once
 
-#include "engines/engine_interface.hpp"
 #include <gmock/gmock.h>
+
 #include <hipdnn_sdk/plugin/plugin_api_data_types.h>
+
+#include "engines/engine_interface.hpp"
 
 namespace miopen_legacy_plugin
 {

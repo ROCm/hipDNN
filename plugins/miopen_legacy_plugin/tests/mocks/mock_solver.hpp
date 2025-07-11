@@ -3,10 +3,11 @@
 
 #pragma once
 
-#include "engines/solvers/solver_interface.hpp"
-
 #include <gmock/gmock.h>
+
 #include <hipdnn_sdk/data_objects/graph_generated.h>
+
+#include "engines/solvers/solver_interface.hpp"
 
 namespace miopen_legacy_plugin
 {

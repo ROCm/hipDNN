@@ -4,8 +4,9 @@
 #pragma once
 
 #include <flatbuffers/flatbuffers.h>
-#include <hipdnn_sdk/data_objects/graph_generated.h>
 #include <memory>
+
+#include <hipdnn_sdk/data_objects/graph_generated.h>
 
 namespace hipdnn_plugin
 {
