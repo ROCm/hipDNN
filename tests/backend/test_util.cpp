@@ -43,7 +43,7 @@ void populate_test_engine(hipdnnBackendDescriptor_t engine,
                           int64_t gidx,
                           bool finalize)
 {
-    if (*graph == nullptr)
+    if(*graph == nullptr)
     {
         create_test_graph(graph);
     }
@@ -78,7 +78,7 @@ void populate_test_engine_config(hipdnnBackendDescriptor_t* engine_config,
                                  int64_t gidx,
                                  bool finalize)
 {
-    if (*engine == nullptr)
+    if(*engine == nullptr)
     {
         create_test_engine(engine, graph, gidx);
     }
@@ -115,17 +115,17 @@ void populate_test_execution_plan(hipdnnBackendDescriptor_t* execution_plan,
                                   int64_t gidx,
                                   bool finalize)
 {
-    if (*handle == nullptr)
+    if(*handle == nullptr)
     {
         create_test_handle(handle);
     }
-    
+
     ASSERT_EQ(
         hipdnnBackendSetAttribute(
             *execution_plan, HIPDNN_ATTR_EXECUTION_PLAN_HANDLE, HIPDNN_TYPE_HANDLE, 1, handle),
         HIPDNN_STATUS_SUCCESS);
 
-    if (*engine_config == nullptr)
+    if(*engine_config == nullptr)
     {
         create_test_engine_config(engine_config, engine, graph, gidx, true);
     }

@@ -82,10 +82,10 @@ TEST_F(Execution_backend_end_api_tests, TestBackendExecuteWithNullDescriptors)
     test_util::create_test_engine_config(&_engine_config, &_engine, &_graph_descriptor, GIDX, true);
 
     EXPECT_EQ(hipdnnBackendCreateDescriptor(HIPDNN_BACKEND_EXECUTION_PLAN_DESCRIPTOR, &_plan),
-            HIPDNN_STATUS_SUCCESS);
+              HIPDNN_STATUS_SUCCESS);
 
     test_util::populate_test_execution_plan(
-         &_plan, &_handle, &_engine_config, &_engine, &_graph_descriptor, GIDX, true);
+        &_plan, &_handle, &_engine_config, &_engine, &_graph_descriptor, GIDX, true);
 
     ASSERT_EQ(hipdnnBackendExecute(_handle, nullptr, _variant_pack),
               HIPDNN_STATUS_BAD_PARAM_NULL_POINTER);
@@ -107,7 +107,7 @@ TEST_F(Execution_backend_end_api_tests, TestBackendExecuteWithUnfinalizedPlan)
     test_util::create_and_initialize_backend_descriptor(&_graph_descriptor, graph.serialized_graph);
 
     ASSERT_EQ(hipdnnBackendCreateDescriptor(HIPDNN_BACKEND_VARIANT_PACK_DESCRIPTOR, &_variant_pack),
-        HIPDNN_STATUS_SUCCESS);
+              HIPDNN_STATUS_SUCCESS);
 
     ASSERT_EQ(hipdnnBackendExecute(_handle, unfinalized_plan, _variant_pack),
               HIPDNN_STATUS_BAD_PARAM);
@@ -125,12 +125,12 @@ TEST_F(Execution_backend_end_api_tests, TestBackendExecuteWithWrongDescriptorTyp
     test_util::create_test_engine(&_engine, &_graph_descriptor, GIDX);
 
     ASSERT_EQ(hipdnnBackendCreateDescriptor(HIPDNN_BACKEND_VARIANT_PACK_DESCRIPTOR, &_variant_pack),
-        HIPDNN_STATUS_SUCCESS);
+              HIPDNN_STATUS_SUCCESS);
 
     ASSERT_EQ(hipdnnBackendExecute(_handle, _engine, _variant_pack), HIPDNN_STATUS_BAD_PARAM);
 
     EXPECT_EQ(hipdnnBackendCreateDescriptor(HIPDNN_BACKEND_EXECUTION_PLAN_DESCRIPTOR, &_plan),
-        HIPDNN_STATUS_SUCCESS);
+              HIPDNN_STATUS_SUCCESS);
 
     test_util::populate_test_execution_plan(
         &_plan, &_handle, &_engine_config, &_engine, &_graph_descriptor, GIDX, true);
@@ -155,7 +155,7 @@ TEST_F(Execution_backend_end_api_tests, TestBackendExecute)
     test_util::create_test_engine_config(&_engine_config, &_engine, &_graph_descriptor, GIDX, true);
 
     EXPECT_EQ(hipdnnBackendCreateDescriptor(HIPDNN_BACKEND_EXECUTION_PLAN_DESCRIPTOR, &_plan),
-        HIPDNN_STATUS_SUCCESS);
+              HIPDNN_STATUS_SUCCESS);
 
     test_util::populate_test_execution_plan(
         &_plan, &_handle, &_engine_config, &_engine, &_graph_descriptor, GIDX, true);

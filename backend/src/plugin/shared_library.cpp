@@ -107,12 +107,12 @@ void Shared_library::load(const std::filesystem::path& library_path)
     }
 #elif defined(__linux__)
 
-    #if __has_feature(address_sanitizer)
-        // Address Sanitizer does not support RTLD_DEEPBIND, so we use RTLD_NOW only
-        _library_handle = dlopen(modified_library_path.string().c_str(), RTLD_NOW);
-    #else
-        _library_handle = dlopen(modified_library_path.string().c_str(), RTLD_NOW | RTLD_DEEPBIND);
-    #endif
+#if __has_feature(address_sanitizer)
+    // Address Sanitizer does not support RTLD_DEEPBIND, so we use RTLD_NOW only
+    _library_handle = dlopen(modified_library_path.string().c_str(), RTLD_NOW);
+#else
+    _library_handle = dlopen(modified_library_path.string().c_str(), RTLD_NOW | RTLD_DEEPBIND);
+#endif
 
     if(_library_handle == nullptr)
     {

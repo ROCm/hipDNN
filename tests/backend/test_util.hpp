@@ -53,7 +53,7 @@ void* allocate_tensor_memory([[maybe_unused]] const int64_t* dims,
                              [[maybe_unused]] size_t dims_count,
                              [[maybe_unused]] hipdnnBackendAttributeType_t data_type,
                              [[maybe_unused]] bool initialize);
-                             
+
 void free_tensor_memory(void* data_ptr);
 
 void populate_variant_pack_with_mappings(
