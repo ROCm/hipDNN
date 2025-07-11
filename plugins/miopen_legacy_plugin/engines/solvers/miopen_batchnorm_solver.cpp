@@ -48,25 +48,25 @@ void Miopen_batchnorm_solver::execute_graph(
     const hipdnnEnginePluginExecutionContext& execution_context,
     const hipdnnPluginDeviceBuffer_t* device_buffers,
     uint32_t num_device_buffers,
-    void* workspace) const
+    void* workspace)
 {
-    //const auto& node = execution_context.graph->nodes[0];
+    const auto& node = execution_context.graph().get_node(0);
 
-    // switch(node->attributes.type)
-    // {
-    // case hipdnn_sdk::data_objects::NodeAttributes_BatchnormInferenceAttributes:
-    //     // execute_batchnorm_fwd_inference(handle,
-    //     //                                 *execution_context.graph,
-    //     //                                 *node->attributes.AsBatchnormInferenceAttributes(),
-    //     //                                 device_buffers,
-    //     //                                 num_device_buffers);
-    //     break;
-    // default:
-    //     throw hipdnn_plugin::Hipdnn_plugin_exception(
-    //         HIPDNN_PLUGIN_STATUS_BAD_PARAM,
-    //         "Unsupported node type for batchnorm solver: "
-    //             + std::string(hipdnn_sdk::data_objects::to_string(node->attributes.type)));
-    // }
+    switch(node.attributes_type())
+    {
+    case hipdnn_sdk::data_objects::NodeAttributes_BatchnormInferenceAttributes:
+        execute_batchnorm_fwd_inference(handle,
+                                        execution_context.graph(),
+                                        *node.attributes_as_BatchnormInferenceAttributes(),
+                                        device_buffers,
+                                        num_device_buffers);
+        break;
+    default:
+        throw hipdnn_plugin::Hipdnn_plugin_exception(
+            HIPDNN_PLUGIN_STATUS_BAD_PARAM,
+            "Unsupported node type for batchnorm solver: "
+                + std::string(hipdnn_sdk::data_objects::to_string(node.attributes_type())));
+    }
 }
 
 struct MiOpenTensorAndDeviceBufferPair
@@ -94,7 +94,7 @@ miopenDataType_t
     }
 }
 
-void create_tensor_and_device_buffer_pair(const hipdnn_sdk::data_objects::TensorAttributesT& tensor,
+void create_tensor_and_device_buffer_pair(const hipdnn_sdk::data_objects::TensorAttributes& tensor,
                                           const hipdnnPluginDeviceBuffer_t* device_buffers,
                                           uint32_t num_device_buffers,
                                           MiOpenTensorAndDeviceBufferPair& pair)
@@ -103,17 +103,17 @@ void create_tensor_and_device_buffer_pair(const hipdnn_sdk::data_objects::Tensor
 
     miopenCreateTensorDescriptor(&pair.tensor_desc);
 
-    std::vector<int> dims(tensor.dims.begin(), tensor.dims.end());
-    std::vector<int> strides(tensor.strides.begin(), tensor.strides.end());
+    std::vector<int> dims(tensor.dims()->begin(), tensor.dims()->end());
+    std::vector<int> strides(tensor.strides()->begin(), tensor.strides()->end());
     miopenSetTensorDescriptor(pair.tensor_desc,
-                              tensor_data_type_to_miopen_data_type(tensor.data_type),
+                              tensor_data_type_to_miopen_data_type(tensor.data_type()),
                               dims.size(),
                               dims.data(),
                               strides.data());
 
     for(uint32_t i = 0; i < num_device_buffers; i++)
     {
-        if(tensor.uid == device_buffers[i].uid)
+        if(tensor.uid() == device_buffers[i].uid)
         {
             pair.device_buffer = device_buffers[i];
             break;
@@ -123,21 +123,15 @@ void create_tensor_and_device_buffer_pair(const hipdnn_sdk::data_objects::Tensor
 
 void Miopen_batchnorm_solver::execute_batchnorm_fwd_inference(
     const hipdnnEnginePluginHandle& handle,
-    const hipdnn_sdk::data_objects::GraphT& graph,
-    const hipdnn_sdk::data_objects::BatchnormInferenceAttributesT& attributes,
+    hipdnn_plugin::Graph_interface& op_graph,
+    const hipdnn_sdk::data_objects::BatchnormInferenceAttributes& attributes,
     const hipdnnPluginDeviceBuffer_t* device_buffers,
-    uint32_t num_device_buffers) const
+    uint32_t num_device_buffers)
 {
     float alpha = static_cast<float>(1), beta = static_cast<float>(0);
     double epsilon = 1e-3; // taken from bn driver, todo, figure out better way
 
-    //Create a std::unordered_map<int64_t, TensorAttributesT*>
-    // to map tensor uid to tensor attributes
-    std::unordered_map<int64_t, hipdnn_sdk::data_objects::TensorAttributesT*> tensor_map;
-    for(const auto& tensor : graph.tensors)
-    {
-        tensor_map[tensor->uid] = tensor.get();
-    }
+    const auto& tensor_map = op_graph.get_tensor_map();
 
     MiOpenTensorAndDeviceBufferPair xDesc;
     MiOpenTensorAndDeviceBufferPair yDesc;
@@ -148,21 +142,22 @@ void Miopen_batchnorm_solver::execute_batchnorm_fwd_inference(
     MiOpenTensorAndDeviceBufferPair estVarianceDesc;
 
     create_tensor_and_device_buffer_pair(
-        *tensor_map[attributes.x], device_buffers, num_device_buffers, xDesc);
+        *tensor_map.at(attributes.x()), device_buffers, num_device_buffers, xDesc);
 
     create_tensor_and_device_buffer_pair(
-        *tensor_map[attributes.y], device_buffers, num_device_buffers, yDesc);
+        *tensor_map.at(attributes.y()), device_buffers, num_device_buffers, yDesc);
 
     create_tensor_and_device_buffer_pair(
-        *tensor_map[attributes.scale], device_buffers, num_device_buffers, scaleDesc);
+        *tensor_map.at(attributes.scale()), device_buffers, num_device_buffers, scaleDesc);
 
     create_tensor_and_device_buffer_pair(
-        *tensor_map[attributes.bias], device_buffers, num_device_buffers, biasDesc);
+        *tensor_map.at(attributes.bias()), device_buffers, num_device_buffers, biasDesc);
 
+    //todo, below are optional, need to check if they exist and only set then
     create_tensor_and_device_buffer_pair(
-        *tensor_map[attributes.mean.value()], device_buffers, num_device_buffers, estMeanDesc);
+        *tensor_map.at(attributes.mean().value()), device_buffers, num_device_buffers, estMeanDesc);
 
-    create_tensor_and_device_buffer_pair(*tensor_map[attributes.inv_variance.value()],
+    create_tensor_and_device_buffer_pair(*tensor_map.at(attributes.inv_variance().value()),
                                          device_buffers,
                                          num_device_buffers,
                                          estVarianceDesc);

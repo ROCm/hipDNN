@@ -22,6 +22,10 @@ public:
     virtual bool has_only_supported_attributes(
         std::set<hipdnn_sdk::data_objects::NodeAttributes> supported_attributes) const
         = 0;
+    virtual const hipdnn_sdk::data_objects::Node& get_node(uint index) const = 0;
+    virtual const std::unordered_map<int64_t, const hipdnn_sdk::data_objects::TensorAttributes*>&
+        get_tensor_map()
+        = 0;
 };
 
 class Graph_wrapper : public Graph_interface
@@ -68,8 +72,38 @@ public:
         return true;
     }
 
+    const hipdnn_sdk::data_objects::Node& get_node(uint index) const override
+    {
+        if(!_graph || index >= _graph->nodes()->size())
+            throw std::out_of_range("Index out of range for graph nodes");
+
+        return *_graph->nodes()->Get(index);
+    }
+
+    const std::unordered_map<int64_t, const hipdnn_sdk::data_objects::TensorAttributes*>&
+        get_tensor_map() override
+    {
+        if(!_graph)
+            throw std::runtime_error("Graph is not valid");
+
+        if(!_tensor_map.empty())
+        {
+            return _tensor_map;
+        }
+
+        for(const auto tensor : *_graph->tensors())
+        {
+            _tensor_map[tensor->uid()] = tensor;
+        }
+
+        return _tensor_map;
+    }
+
 private:
     const hipdnn_sdk::data_objects::Graph* _graph = nullptr;
+
+    //lazy init state;
+    std::unordered_map<int64_t, const hipdnn_sdk::data_objects::TensorAttributes*> _tensor_map;
 };
 
 }

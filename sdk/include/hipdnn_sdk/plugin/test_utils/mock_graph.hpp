@@ -20,6 +20,12 @@ public:
                 has_only_supported_attributes,
                 (std::set<hipdnn_sdk::data_objects::NodeAttributes> supported_attributes),
                 (const, override));
+    MOCK_METHOD(const hipdnn_sdk::data_objects::Node&, get_node, (uint index), (const, override));
+    MOCK_METHOD(
+        (const std::unordered_map<int64_t, const hipdnn_sdk::data_objects::TensorAttributes*>&),
+        get_tensor_map,
+        (),
+        (override));
 };
 
 }
