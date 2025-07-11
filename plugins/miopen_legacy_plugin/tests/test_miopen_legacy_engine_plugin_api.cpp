@@ -1,10 +1,12 @@
 // Copyright © Advanced Micro Devices, Inc., or its affiliates.
 // SPDX-License-Identifier:  MIT
 
+#include <gtest/gtest.h>
+
 #include "hipdnn_engine_plugin_execution_context.hpp"
 #include "hipdnn_engine_plugin_handle.hpp"
+#include "mocks/mock_hipdnn_engine_plugin_execution_context.hpp"
 
-#include <gtest/gtest.h>
 #include <hipdnn_sdk/plugin/engine_plugin_api.h>
 #include <hipdnn_sdk/plugin/plugin_api_data_types.h>
 #include <hipdnn_sdk/plugin/plugin_flatbuffer_utilities.hpp>
@@ -285,13 +287,11 @@ TEST(MiopenLegacyEnginePluginApiTest, EnginePluginCreateExecutionContextValid)
 {
     auto handle = reinterpret_cast<hipdnnEnginePluginHandle_t>(0x1234);
 
-    // Create a valid flatbuffer graph and engine config
     auto builder = flatbuffer_test_utils::create_valid_batchnorm_graph();
     auto serialized_graph = builder.Release();
     hipdnnPluginConstData_t op_graph
         = flatbuffer_test_utils::create_valid_const_data_graph(serialized_graph);
 
-    // For now, engine_config is not used, so we can pass op_graph as a placeholder
     auto engine_config_builder = flatbuffer_test_utils::create_valid_engine_config(123);
     auto serialized_engine_config = engine_config_builder.Release();
     hipdnnPluginConstData_t engine_config
@@ -311,7 +311,7 @@ TEST(MiopenLegacyEnginePluginApiTest, EnginePluginCreateExecutionContextValid)
 TEST(MiopenLegacyEnginePluginApiTest, EnginePluginDestroyExecutionContextNull)
 {
     auto handle = reinterpret_cast<hipdnnEnginePluginHandle_t>(0x1234);
-    hipdnnEnginePluginExecutionContext execution_context;
+    Mock_hipdnn_engine_plugin_execution_context execution_context;
 
     // Null handle
     EXPECT_EQ(hipdnnEnginePluginDestroyExecutionContext(nullptr, &execution_context),

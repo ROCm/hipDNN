@@ -69,13 +69,11 @@ void Miopen_engine::execute_graph(const hipdnnEnginePluginHandle& handle,
 
     for(const auto& solver : _solvers)
     {
-
-        //todo, add override for this kind of is applicable check
-        // if(solver->is_applicable(*graph_ptr))
-        // {
-        solver->execute_graph(
-            handle, execution_context, device_buffers, num_device_buffers, workspace);
-        //}
+        if(solver->is_applicable(execution_context.graph()))
+        {
+            solver->execute_graph(
+                handle, execution_context, device_buffers, num_device_buffers, workspace);
+        }
     }
 }
 

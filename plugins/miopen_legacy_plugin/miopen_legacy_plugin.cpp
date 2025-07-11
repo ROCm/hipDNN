@@ -333,18 +333,7 @@ hipdnnPluginStatus_t hipdnnEnginePluginCreateExecutionContext(
         throw_if_null(op_graph);
         throw_if_null(execution_context);
 
-        std::unique_ptr<hipdnn_sdk::data_objects::GraphT> graph_ptr;
-        hipdnn_plugin::flatbuffer_utilities::convert_serialized_plugin_graph_to_graph(
-            op_graph->ptr, op_graph->size, graph_ptr);
-
-        std::unique_ptr<hipdnn_sdk::data_objects::EngineConfigT> engine_config_ptr;
-        hipdnn_plugin::flatbuffer_utilities::unpack_serialized_engine_config(
-            engine_config->ptr, engine_config->size, engine_config_ptr);
-
-        hipdnnEnginePluginExecutionContext_t ctx = new hipdnnEnginePluginExecutionContext;
-        ctx->graph = std::move(graph_ptr);
-        ctx->engine_config = std::move(engine_config_ptr);
-        *execution_context = ctx;
+        *execution_context = new hipdnnEnginePluginExecutionContext(engine_config, op_graph);
 
         LOG_API_SUCCESS(
             api_name, "created_execution_context={:p}", static_cast<void*>(*execution_context));

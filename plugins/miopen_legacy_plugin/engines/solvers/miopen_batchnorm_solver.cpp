@@ -50,23 +50,23 @@ void Miopen_batchnorm_solver::execute_graph(
     uint32_t num_device_buffers,
     void* workspace) const
 {
-    const auto& node = execution_context.graph->nodes[0];
+    //const auto& node = execution_context.graph->nodes[0];
 
-    switch(node->attributes.type)
-    {
-    case hipdnn_sdk::data_objects::NodeAttributes_BatchnormInferenceAttributes:
-        execute_batchnorm_fwd_inference(handle,
-                                        *execution_context.graph,
-                                        *node->attributes.AsBatchnormInferenceAttributes(),
-                                        device_buffers,
-                                        num_device_buffers);
-        break;
-    default:
-        throw hipdnn_plugin::Hipdnn_plugin_exception(
-            HIPDNN_PLUGIN_STATUS_BAD_PARAM,
-            "Unsupported node type for batchnorm solver: "
-                + std::string(hipdnn_sdk::data_objects::to_string(node->attributes.type)));
-    }
+    // switch(node->attributes.type)
+    // {
+    // case hipdnn_sdk::data_objects::NodeAttributes_BatchnormInferenceAttributes:
+    //     // execute_batchnorm_fwd_inference(handle,
+    //     //                                 *execution_context.graph,
+    //     //                                 *node->attributes.AsBatchnormInferenceAttributes(),
+    //     //                                 device_buffers,
+    //     //                                 num_device_buffers);
+    //     break;
+    // default:
+    //     throw hipdnn_plugin::Hipdnn_plugin_exception(
+    //         HIPDNN_PLUGIN_STATUS_BAD_PARAM,
+    //         "Unsupported node type for batchnorm solver: "
+    //             + std::string(hipdnn_sdk::data_objects::to_string(node->attributes.type)));
+    // }
 }
 
 struct MiOpenTensorAndDeviceBufferPair

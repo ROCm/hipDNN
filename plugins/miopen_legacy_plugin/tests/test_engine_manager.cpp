@@ -6,12 +6,14 @@
 #include <memory>
 #include <set>
 
+#include <hipdnn_sdk/plugin/plugin_exception.hpp>
+#include <hipdnn_sdk/plugin/test_utils/mock_graph.hpp>
+
 #include "engine_manager.hpp"
 #include "hipdnn_engine_plugin_execution_context.hpp"
 #include "hipdnn_engine_plugin_handle.hpp"
 #include "mocks/mock_engine.hpp"
-#include <hipdnn_sdk/plugin/plugin_exception.hpp>
-#include <hipdnn_sdk/plugin/test_utils/mock_graph.hpp>
+#include "mocks/mock_hipdnn_engine_plugin_execution_context.hpp"
 
 using namespace miopen_legacy_plugin;
 using namespace hipdnn_plugin;
@@ -151,6 +153,9 @@ TEST(Engine_managerTest, GetWorkspaceSizeThrowsOnInvalidEngineId)
 
 TEST(Engine_managerTest, ExecuteGraphCallsEngine)
 {
+    Mock_hipdnn_engine_plugin_execution_context exec_ctx;
+    EXPECT_CALL(*exec_ctx.mock_engine_config, engine_id()).WillRepeatedly(Return(7));
+
     Engine_manager manager;
 
     auto mock_engine = std::make_unique<Mock_engine>();
@@ -161,11 +166,7 @@ TEST(Engine_managerTest, ExecuteGraphCallsEngine)
 
     manager.add_engine(std::move(mock_engine));
 
-    auto engine_config = std::make_unique<hipdnn_sdk::data_objects::EngineConfigT>();
-    engine_config->engine_id = 7;
     hipdnnEnginePluginHandle dummy_handle = {};
-    hipdnnEnginePluginExecutionContext exec_ctx;
-    exec_ctx.engine_config = std::move(engine_config);
     hipdnnPluginDeviceBuffer_t* device_buffers = nullptr;
     uint32_t num_device_buffers = 0;
     void* workspace = nullptr;
@@ -175,13 +176,12 @@ TEST(Engine_managerTest, ExecuteGraphCallsEngine)
 
 TEST(Engine_managerTest, ExecuteGraphThrowsOnInvalidEngineId)
 {
+    Mock_hipdnn_engine_plugin_execution_context exec_ctx;
+    EXPECT_CALL(*exec_ctx.mock_engine_config, engine_id()).WillRepeatedly(Return(1234));
+
     Engine_manager manager;
 
-    auto engine_config = std::make_unique<hipdnn_sdk::data_objects::EngineConfigT>();
-    engine_config->engine_id = 1234;
     hipdnnEnginePluginHandle dummy_handle = {};
-    hipdnnEnginePluginExecutionContext exec_ctx;
-    exec_ctx.engine_config = std::move(engine_config);
     hipdnnPluginDeviceBuffer_t* device_buffers = nullptr;
     uint32_t num_device_buffers = 0;
     void* workspace = nullptr;

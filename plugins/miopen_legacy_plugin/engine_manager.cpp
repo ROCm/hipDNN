@@ -1,13 +1,14 @@
 // Copyright © Advanced Micro Devices, Inc., or its affiliates.
 // SPDX-License-Identifier:  MIT
 
-#include "engine_manager.hpp"
-#include "engines/miopen_engine.hpp"
-
 #include <algorithm>
+
 #include <hipdnn_sdk/logging/logger.hpp>
 #include <hipdnn_sdk/plugin/flatbuffer_utilities/graph_wrapper.hpp>
 #include <hipdnn_sdk/plugin/plugin_exception.hpp>
+
+#include "engine_manager.hpp"
+#include "engines/miopen_engine.hpp"
 
 using namespace hipdnn_plugin;
 
@@ -71,12 +72,12 @@ void Engine_manager::execute_graph(const hipdnnEnginePluginHandle& handle,
                                    uint32_t num_device_buffers,
                                    void* workspace) const
 {
-    auto it = _engines.find(execution_context.engine_config->engine_id);
+    auto it = _engines.find(execution_context.engine_config().engine_id());
     if(it == _engines.end())
     {
         throw Hipdnn_plugin_exception(
             HIPDNN_PLUGIN_STATUS_INVALID_VALUE,
-            "Engine with ID " + std::to_string(execution_context.engine_config->engine_id)
+            "Engine with ID " + std::to_string(execution_context.engine_config().engine_id())
                 + " not found.");
     }
     it->second->execute_graph(
