@@ -55,9 +55,10 @@ hipdnnPluginStatus_t run_engine(const uint32_t* input, uint32_t* output, uint32_
     hipError_t error = hipGetLastError();
     if(error != hipSuccess)
     {
-        return Plugin_last_error_manager::set_last_error(HIPDNN_PLUGIN_STATUS_INTERNAL_ERROR, 
-                                                        "hipdnnPluginRunEngine: kernel launch failed, error: "
-                                                        + std::string(hipGetErrorString(error)));
+        return Plugin_last_error_manager::set_last_error(
+            HIPDNN_PLUGIN_STATUS_INTERNAL_ERROR,
+            "hipdnnPluginRunEngine: kernel launch failed, error: "
+                + std::string(hipGetErrorString(error)));
     }
     return HIPDNN_PLUGIN_STATUS_SUCCESS;
 }
@@ -192,7 +193,7 @@ hipdnnPluginStatus_t execute_op_graph(hipdnnEnginePluginHandle_t handle,
         return Plugin_last_error_manager::set_last_error(
             HIPDNN_PLUGIN_STATUS_INVALID_VALUE,
             "hipdnnEnginePluginExecuteOpGraph: expected 2 device buffers, got "
-            + std::to_string(num_device_buffers));
+                + std::to_string(num_device_buffers));
     }
 
     return run_engine(static_cast<const uint32_t*>(device_buffers[0].ptr),

@@ -19,7 +19,8 @@ hipdnnPluginStatus_t check_handle_validity(hipdnnEnginePluginHandle_t handle)
 {
     if(handle == nullptr)
     {
-        return Plugin_last_error_manager::set_last_error(HIPDNN_PLUGIN_STATUS_BAD_PARAM, "check_handle_validity: handle is null");
+        return Plugin_last_error_manager::set_last_error(HIPDNN_PLUGIN_STATUS_BAD_PARAM,
+                                                         "check_handle_validity: handle is null");
     }
 
     return HIPDNN_PLUGIN_STATUS_SUCCESS;
@@ -33,7 +34,8 @@ extern "C" hipdnnPluginStatus_t hipdnnEnginePluginCreate(hipdnnEnginePluginHandl
 {
     if(handle == nullptr)
     {
-        return Plugin_last_error_manager::set_last_error(HIPDNN_PLUGIN_STATUS_BAD_PARAM, "hipdnnEnginePluginCreate: handle is null");
+        return Plugin_last_error_manager::set_last_error(
+            HIPDNN_PLUGIN_STATUS_BAD_PARAM, "hipdnnEnginePluginCreate: handle is null");
     }
 
     try
@@ -42,7 +44,9 @@ extern "C" hipdnnPluginStatus_t hipdnnEnginePluginCreate(hipdnnEnginePluginHandl
     }
     catch(const std::bad_alloc&)
     {
-        return Plugin_last_error_manager::set_last_error(HIPDNN_PLUGIN_STATUS_ALLOC_FAILED, "hipdnnEnginePluginCreate: memory allocation failed");
+        return Plugin_last_error_manager::set_last_error(
+            HIPDNN_PLUGIN_STATUS_ALLOC_FAILED,
+            "hipdnnEnginePluginCreate: memory allocation failed");
     }
 
     return HIPDNN_PLUGIN_STATUS_SUCCESS;
@@ -88,22 +92,30 @@ extern "C" hipdnnPluginStatus_t
 
     if(op_graph == nullptr)
     {
-        return Plugin_last_error_manager::set_last_error(HIPDNN_PLUGIN_STATUS_BAD_PARAM, "hipdnnEnginePluginGetApplicableEngineIds: op_graph is null");
+        return Plugin_last_error_manager::set_last_error(
+            HIPDNN_PLUGIN_STATUS_BAD_PARAM,
+            "hipdnnEnginePluginGetApplicableEngineIds: op_graph is null");
     }
 
     if(engine_ids == nullptr)
     {
-        return Plugin_last_error_manager::set_last_error(HIPDNN_PLUGIN_STATUS_BAD_PARAM, "hipdnnEnginePluginGetApplicableEngineIds: engine_ids is null");
+        return Plugin_last_error_manager::set_last_error(
+            HIPDNN_PLUGIN_STATUS_BAD_PARAM,
+            "hipdnnEnginePluginGetApplicableEngineIds: engine_ids is null");
     }
 
     if(max_engines == 0)
     {
-        return Plugin_last_error_manager::set_last_error(HIPDNN_PLUGIN_STATUS_BAD_PARAM, "hipdnnEnginePluginGetApplicableEngineIds: max_engines is zero");
+        return Plugin_last_error_manager::set_last_error(
+            HIPDNN_PLUGIN_STATUS_BAD_PARAM,
+            "hipdnnEnginePluginGetApplicableEngineIds: max_engines is zero");
     }
 
     if(num_engines == nullptr)
     {
-        return Plugin_last_error_manager::set_last_error(HIPDNN_PLUGIN_STATUS_BAD_PARAM, "hipdnnEnginePluginGetApplicableEngineIds: num_engines is null");
+        return Plugin_last_error_manager::set_last_error(
+            HIPDNN_PLUGIN_STATUS_BAD_PARAM,
+            "hipdnnEnginePluginGetApplicableEngineIds: num_engines is null");
     }
 
     return get_applicable_engine_ids(handle, op_graph, engine_ids, max_engines, num_engines);
@@ -123,17 +135,22 @@ extern "C" hipdnnPluginStatus_t
 
     if(!check_engine_id_validity(engine_id))
     {
-        return Plugin_last_error_manager::set_last_error(HIPDNN_PLUGIN_STATUS_BAD_PARAM, "hipdnnEnginePluginGetEngineDetails: invalid engine_id");
+        return Plugin_last_error_manager::set_last_error(
+            HIPDNN_PLUGIN_STATUS_BAD_PARAM,
+            "hipdnnEnginePluginGetEngineDetails: invalid engine_id");
     }
 
     if(op_graph == nullptr)
     {
-        return Plugin_last_error_manager::set_last_error(HIPDNN_PLUGIN_STATUS_BAD_PARAM, "hipdnnEnginePluginGetEngineDetails: op_graph is null");
+        return Plugin_last_error_manager::set_last_error(
+            HIPDNN_PLUGIN_STATUS_BAD_PARAM, "hipdnnEnginePluginGetEngineDetails: op_graph is null");
     }
 
     if(engine_details == nullptr)
     {
-        return Plugin_last_error_manager::set_last_error(HIPDNN_PLUGIN_STATUS_BAD_PARAM, "hipdnnEnginePluginGetEngineDetails: engine_details is null");
+        return Plugin_last_error_manager::set_last_error(
+            HIPDNN_PLUGIN_STATUS_BAD_PARAM,
+            "hipdnnEnginePluginGetEngineDetails: engine_details is null");
     }
 
     return get_engine_details(handle, engine_id, op_graph, engine_details);
@@ -151,7 +168,9 @@ extern "C" hipdnnPluginStatus_t
 
     if(engine_details == nullptr)
     {
-        return Plugin_last_error_manager::set_last_error(HIPDNN_PLUGIN_STATUS_BAD_PARAM, "hipdnnEnginePluginDestroyEngineDetails: engine_details is null");
+        return Plugin_last_error_manager::set_last_error(
+            HIPDNN_PLUGIN_STATUS_BAD_PARAM,
+            "hipdnnEnginePluginDestroyEngineDetails: engine_details is null");
     }
 
     return destroy_engine_details(handle, engine_details);
@@ -171,17 +190,22 @@ extern "C" hipdnnPluginStatus_t
 
     if(engine_config == nullptr)
     {
-        return Plugin_last_error_manager::set_last_error(HIPDNN_PLUGIN_STATUS_BAD_PARAM, "hipdnnEnginePluginGetWorkspaceSize: engine_config is null");
+        return Plugin_last_error_manager::set_last_error(
+            HIPDNN_PLUGIN_STATUS_BAD_PARAM,
+            "hipdnnEnginePluginGetWorkspaceSize: engine_config is null");
     }
 
     if(op_graph == nullptr)
     {
-        return Plugin_last_error_manager::set_last_error(HIPDNN_PLUGIN_STATUS_BAD_PARAM, "hipdnnEnginePluginGetWorkspaceSize: op_graph is null");
+        return Plugin_last_error_manager::set_last_error(
+            HIPDNN_PLUGIN_STATUS_BAD_PARAM, "hipdnnEnginePluginGetWorkspaceSize: op_graph is null");
     }
 
     if(workspace_size == nullptr)
     {
-        return Plugin_last_error_manager::set_last_error(HIPDNN_PLUGIN_STATUS_BAD_PARAM, "hipdnnEnginePluginGetWorkspaceSize: workspace_size is null");
+        return Plugin_last_error_manager::set_last_error(
+            HIPDNN_PLUGIN_STATUS_BAD_PARAM,
+            "hipdnnEnginePluginGetWorkspaceSize: workspace_size is null");
     }
 
     return get_workspace_size(handle, engine_config, op_graph, workspace_size);
@@ -201,17 +225,23 @@ extern "C" hipdnnPluginStatus_t hipdnnEnginePluginCreateExecutionContext(
 
     if(engine_config == nullptr)
     {
-        return Plugin_last_error_manager::set_last_error(HIPDNN_PLUGIN_STATUS_BAD_PARAM, "hipdnnEnginePluginCreateExecutionContext: engine_config is null");
+        return Plugin_last_error_manager::set_last_error(
+            HIPDNN_PLUGIN_STATUS_BAD_PARAM,
+            "hipdnnEnginePluginCreateExecutionContext: engine_config is null");
     }
 
     if(op_graph == nullptr)
     {
-        return Plugin_last_error_manager::set_last_error(HIPDNN_PLUGIN_STATUS_BAD_PARAM, "hipdnnEnginePluginCreateExecutionContext: op_graph is null");
+        return Plugin_last_error_manager::set_last_error(
+            HIPDNN_PLUGIN_STATUS_BAD_PARAM,
+            "hipdnnEnginePluginCreateExecutionContext: op_graph is null");
     }
 
     if(execution_context == nullptr)
     {
-        return Plugin_last_error_manager::set_last_error(HIPDNN_PLUGIN_STATUS_BAD_PARAM, "hipdnnEnginePluginCreateExecutionContext: execution_context is null");
+        return Plugin_last_error_manager::set_last_error(
+            HIPDNN_PLUGIN_STATUS_BAD_PARAM,
+            "hipdnnEnginePluginCreateExecutionContext: execution_context is null");
     }
 
     return create_execution_context(handle, engine_config, op_graph, execution_context);
@@ -228,7 +258,9 @@ extern "C" hipdnnPluginStatus_t hipdnnEnginePluginDestroyExecutionContext(
 
     if(execution_context == nullptr)
     {
-        return Plugin_last_error_manager::set_last_error(HIPDNN_PLUGIN_STATUS_BAD_PARAM, "hipdnnEnginePluginDestroyExecutionContext: execution_context is null");
+        return Plugin_last_error_manager::set_last_error(
+            HIPDNN_PLUGIN_STATUS_BAD_PARAM,
+            "hipdnnEnginePluginDestroyExecutionContext: execution_context is null");
     }
 
     return destroy_execution_context(handle, execution_context);
@@ -249,19 +281,25 @@ extern "C" hipdnnPluginStatus_t
 
     if(execution_context == nullptr)
     {
-        return Plugin_last_error_manager::set_last_error(HIPDNN_PLUGIN_STATUS_BAD_PARAM, "hipdnnEnginePluginExecuteOpGraph: execution_context is null");
+        return Plugin_last_error_manager::set_last_error(
+            HIPDNN_PLUGIN_STATUS_BAD_PARAM,
+            "hipdnnEnginePluginExecuteOpGraph: execution_context is null");
     }
 
     // Workspace can be null if the workspace size is zero.
 
     if(device_buffers == nullptr)
     {
-        return Plugin_last_error_manager::set_last_error(HIPDNN_PLUGIN_STATUS_BAD_PARAM, "hipdnnEnginePluginExecuteOpGraph: device_buffers is null");
+        return Plugin_last_error_manager::set_last_error(
+            HIPDNN_PLUGIN_STATUS_BAD_PARAM,
+            "hipdnnEnginePluginExecuteOpGraph: device_buffers is null");
     }
 
     if(num_device_buffers == 0)
     {
-        return Plugin_last_error_manager::set_last_error(HIPDNN_PLUGIN_STATUS_BAD_PARAM, "hipdnnEnginePluginExecuteOpGraph: num_device_buffers is zero");
+        return Plugin_last_error_manager::set_last_error(
+            HIPDNN_PLUGIN_STATUS_BAD_PARAM,
+            "hipdnnEnginePluginExecuteOpGraph: num_device_buffers is zero");
     }
 
     return execute_op_graph(
