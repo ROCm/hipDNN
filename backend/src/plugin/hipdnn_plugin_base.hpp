@@ -18,6 +18,7 @@ struct Hipdnn_plugin_base
         execute(Graph_descriptor* graphdesc, Variant_descriptor* vpack, hipdnnHandle* handle)
         = 0;
     virtual std::set<int64_t> get_applicable_engines(Graph_descriptor* graphdesc) = 0;
+    virtual std::set<int64_t> get_engines() = 0;
     virtual int64_t get_max_workspace_size(Graph_descriptor* graphdesc, int64_t engine_id) = 0;
 
     // Placeholder for additional plugin functionality.
