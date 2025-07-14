@@ -6,6 +6,8 @@ if(HIP_DNN_SKIP_TESTS)
     return()
 endif()
 
+find_package(hip REQUIRED)
+
 add_executable(hipdnn_sdk_tests
     main.cpp
     plugin/test_plugin_exception.cpp
@@ -15,11 +17,13 @@ add_executable(hipdnn_sdk_tests
     plugin/flatbuffer_utilities/test_graph_wrapper.cpp
     plugin/flatbuffer_utilities/test_engine_config_wrapper.cpp
     plugin/flatbuffer_utilities/test_engine_details_wrapper.cpp
+    utilities/test_gpu_memory.cpp
 )
 
 target_link_libraries(hipdnn_sdk_tests 
     GTest::gtest
     pthread
+    hip::host
     hipdnn_sdk
     ${CMAKE_DL_LIBS}
 )

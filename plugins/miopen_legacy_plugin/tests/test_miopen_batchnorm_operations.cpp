@@ -7,20 +7,12 @@
 #include <hipdnn_sdk/plugin/engine_plugin_api.h>
 #include <hipdnn_sdk/plugin/plugin_api_data_types.h>
 #include <hipdnn_sdk/test_utilities/flatbuffer_graph_test_utils.hpp>
+#include <hipdnn_sdk/utilities/gpu_memory.hpp>
 
 #include "hipdnn_engine_plugin_execution_context.hpp"
 #include "hipdnn_engine_plugin_handle.hpp"
 
-#define HIP_CHECK(status)                                                                      \
-    do                                                                                         \
-    {                                                                                          \
-        if(status != hipSuccess)                                                               \
-        {                                                                                      \
-            std::cerr << "HIP Error: " << hipGetErrorString(status) << " in file " << __FILE__ \
-                      << " at line " << __LINE__ << "\n";                                      \
-            exit(EXIT_FAILURE);                                                                \
-        }                                                                                      \
-    } while(0)
+using namespace hipdnn::sdk::utilities;
 
 class Batchnorm_execute_graph_test : public ::testing::Test
 {
@@ -42,8 +34,7 @@ protected:
     hipdnnEnginePluginHandle_t _handle = nullptr;
 };
 
-//todo fix complexity of test...
-TEST_F(Batchnorm_execute_graph_test, RunBatchnormGraph) // NOLINT
+TEST_F(Batchnorm_execute_graph_test, RunBatchnormGraph)
 {
     std::vector<int64_t> strides = {1, 3, 224, 224}; // always in nchw
     std::vector<int64_t> dims = {1, 3, 224, 224};
@@ -51,46 +42,40 @@ TEST_F(Batchnorm_execute_graph_test, RunBatchnormGraph) // NOLINT
 
     std::vector<hipdnnPluginDeviceBuffer_t> device_buffers;
 
+    Gpu_memory<float> gpu_mem_x(dims);
     hipdnnPluginDeviceBuffer_t x_buffer;
     x_buffer.uid = 1;
-    size_t x_buffer_size
-        = std::accumulate(dims.begin(), dims.end(), size_t{1}, std::multiplies<>());
-    HIP_CHECK(hipMalloc(&x_buffer.ptr, static_cast<size_t>(x_buffer_size * sizeof(float))));
+    x_buffer.ptr = gpu_mem_x.data();
     device_buffers.push_back(x_buffer);
 
+    Gpu_memory<float> gpu_mem_y(dims);
     hipdnnPluginDeviceBuffer_t y_buffer;
     y_buffer.uid = 2;
-    size_t y_buffer_size
-        = std::accumulate(dims.begin(), dims.end(), size_t{1}, std::multiplies<>());
-    HIP_CHECK(hipMalloc(&y_buffer.ptr, y_buffer_size * sizeof(float)));
+    y_buffer.ptr = gpu_mem_y.data();
     device_buffers.push_back(y_buffer);
 
+    Gpu_memory<float> gpu_mem_scale(dims);
     hipdnnPluginDeviceBuffer_t scale_buffer;
     scale_buffer.uid = 3;
-    size_t scale_buffer_size
-        = std::accumulate(dims.begin(), dims.end(), size_t{1}, std::multiplies<>());
-    HIP_CHECK(hipMalloc(&scale_buffer.ptr, scale_buffer_size * sizeof(float)));
+    scale_buffer.ptr = gpu_mem_scale.data();
     device_buffers.push_back(scale_buffer);
 
+    Gpu_memory<float> gpu_mem_bias(dims);
     hipdnnPluginDeviceBuffer_t bias_buffer;
     bias_buffer.uid = 4;
-    size_t bias_buffer_size
-        = std::accumulate(dims.begin(), dims.end(), size_t{1}, std::multiplies<>());
-    HIP_CHECK(hipMalloc(&bias_buffer.ptr, bias_buffer_size * sizeof(float)));
+    bias_buffer.ptr = gpu_mem_bias.data();
     device_buffers.push_back(bias_buffer);
 
+    Gpu_memory<float> gpu_mem_mean(dims);
     hipdnnPluginDeviceBuffer_t mean_buffer;
     mean_buffer.uid = 5;
-    size_t mean_buffer_size
-        = std::accumulate(dims.begin(), dims.end(), size_t{1}, std::multiplies<>());
-    HIP_CHECK(hipMalloc(&mean_buffer.ptr, mean_buffer_size * sizeof(float)));
+    mean_buffer.ptr = gpu_mem_mean.data();
     device_buffers.push_back(mean_buffer);
 
+    Gpu_memory<float> gpu_mem_variance(dims);
     hipdnnPluginDeviceBuffer_t variance_buffer;
     variance_buffer.uid = 6;
-    size_t variance_buffer_size
-        = std::accumulate(dims.begin(), dims.end(), size_t{1}, std::multiplies<>());
-    HIP_CHECK(hipMalloc(&variance_buffer.ptr, variance_buffer_size * sizeof(float)));
+    variance_buffer.ptr = gpu_mem_variance.data();
     device_buffers.push_back(variance_buffer);
 
     hipdnnPluginConstData_t op_graph;
@@ -115,9 +100,4 @@ TEST_F(Batchnorm_execute_graph_test, RunBatchnormGraph) // NOLINT
     EXPECT_EQ(status, HIPDNN_PLUGIN_STATUS_SUCCESS);
 
     hipdnnEnginePluginDestroyExecutionContext(_handle, execution_context);
-
-    for(auto& buffer : device_buffers)
-    {
-        HIP_CHECK(hipFree(buffer.ptr));
-    }
 }
