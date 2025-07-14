@@ -28,3 +28,9 @@ TEST(MiopenHandleFactoryTest, CreatesAndDestroysHandle)
     miopenDestroy(handle->miopen_handle);
     delete handle;
 }
+
+TEST(MiopenHandleFactoryTest, ThrowsOnDestroyNullHandle)
+{
+    hipdnnEnginePluginHandle_t handle = nullptr;
+    EXPECT_THROW(Miopen_handle_factory::destroy_miopen_handle(handle), Hipdnn_plugin_exception);
+}
