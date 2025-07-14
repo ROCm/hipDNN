@@ -10,6 +10,7 @@
 #include <hipdnn_sdk/test_utilities/flatbuffer_graph_test_utils.hpp>
 
 using namespace hipdnn_plugin;
+using namespace hipdnn_sdk::data_objects;
 
 TEST(Graph_wrapperTest, NullBufferIsInvalid)
 {
@@ -77,4 +78,52 @@ TEST(Graph_wrapperTest, HasSupportedTypesReturnsFalseIfAnyUnsupported)
 
     supported.insert(hipdnn_sdk::data_objects::NodeAttributes_BatchnormAttributes);
     EXPECT_FALSE(wrapper.has_only_supported_attributes(supported));
+}
+
+TEST(Graph_wrapperTest, GetTensorMapEmptyGraph)
+{
+    flatbuffers::FlatBufferBuilder builder = flatbuffer_test_utils::create_empty_valid_graph();
+    auto serialized_graph = builder.Release();
+
+    Graph_wrapper wrapper(serialized_graph.data(), serialized_graph.size());
+    ASSERT_TRUE(wrapper.is_valid());
+
+    const auto& tensor_map = wrapper.get_tensor_map();
+    EXPECT_TRUE(tensor_map.empty());
+}
+
+TEST(Graph_wrapperTest, GetTensorMapReturnsCorrectTensors)
+{
+    // Create a graph with two tensors with known UIDs
+    flatbuffers::FlatBufferBuilder builder;
+    std::vector<::flatbuffers::Offset<hipdnn_sdk::data_objects::Node>> nodes;
+
+    std::vector<int64_t> strides = {1, 1, 1, 1};
+    std::vector<int64_t> dims = {1, 1, 1, 1};
+    std::vector<::flatbuffers::Offset<hipdnn_sdk::data_objects::TensorAttributes>>
+        tensor_attributes;
+    tensor_attributes.push_back(hipdnn_sdk::data_objects::CreateTensorAttributesDirect(
+        builder, 1, "x", hipdnn_sdk::data_objects::DataType_FLOAT, &strides, &dims));
+    tensor_attributes.push_back(hipdnn_sdk::data_objects::CreateTensorAttributesDirect(
+        builder, 2, "y", hipdnn_sdk::data_objects::DataType_FLOAT, &strides, &dims));
+
+    auto graph = hipdnn_sdk::data_objects::CreateGraphDirect(builder,
+                                                             "test",
+                                                             DataType_FLOAT,
+                                                             DataType_HALF,
+                                                             DataType_BFLOAT16,
+                                                             &tensor_attributes,
+                                                             &nodes);
+    builder.Finish(graph);
+
+    auto serialized_graph = builder.Release();
+    Graph_wrapper wrapper(serialized_graph.data(), serialized_graph.size());
+    ASSERT_TRUE(wrapper.is_valid());
+
+    const auto& tensor_map = wrapper.get_tensor_map();
+    EXPECT_EQ(tensor_map.size(), 2);
+    EXPECT_NE(tensor_map.find(1), tensor_map.end());
+    EXPECT_NE(tensor_map.find(2), tensor_map.end());
+    EXPECT_EQ(tensor_map.at(1)->uid(), 1);
+    EXPECT_EQ(tensor_map.at(2)->uid(), 2);
 }
