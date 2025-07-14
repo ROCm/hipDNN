@@ -18,7 +18,7 @@ public:
     hipdnnEnginePluginExecutionContext(const hipdnnPluginConstData_t* engine_config_ptr,
                                        const hipdnnPluginConstData_t* op_graph_ptr)
     {
-        if(!engine_config_ptr || !op_graph_ptr)
+        if(engine_config_ptr == nullptr || op_graph_ptr == nullptr)
         {
             _engine_config.ptr = nullptr;
             _engine_config.size = 0;
@@ -35,17 +35,17 @@ public:
         std::memcpy(temp_buffer, op_graph_ptr->ptr, op_graph_ptr->size);
         _op_graph = hipdnnPluginConstData_t{temp_buffer, op_graph_ptr->size};
 
-        graph_interface
+        _graph_interface
             = std::make_unique<hipdnn_plugin::Graph_wrapper>(_op_graph.ptr, _op_graph.size);
 
-        engine_config_interface = std::make_unique<hipdnn_plugin::Engine_config_wrapper>(
+        _engine_config_interface = std::make_unique<hipdnn_plugin::Engine_config_wrapper>(
             _engine_config.ptr, _engine_config.size);
     }
 
     virtual ~hipdnnEnginePluginExecutionContext()
     {
-        graph_interface.reset();
-        engine_config_interface.reset();
+        _graph_interface.reset();
+        _engine_config_interface.reset();
 
         if(_engine_config.ptr != nullptr)
         {
@@ -59,18 +59,18 @@ public:
 
     virtual hipdnn_plugin::Graph_interface& graph() const
     {
-        return *graph_interface;
+        return *_graph_interface;
     }
 
     virtual hipdnn_plugin::Engine_config_interface& engine_config() const
     {
-        return *engine_config_interface;
+        return *_engine_config_interface;
     }
 
 private:
     hipdnnPluginConstData_t _engine_config;
     hipdnnPluginConstData_t _op_graph;
 
-    std::unique_ptr<hipdnn_plugin::Graph_wrapper> graph_interface;
-    std::unique_ptr<hipdnn_plugin::Engine_config_wrapper> engine_config_interface;
+    std::unique_ptr<hipdnn_plugin::Graph_wrapper> _graph_interface;
+    std::unique_ptr<hipdnn_plugin::Engine_config_wrapper> _engine_config_interface;
 };

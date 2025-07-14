@@ -21,6 +21,7 @@
  * The API allows users to create and manage custom plugins for hipDNN.
  */
 
+// NOLINTBEGIN
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -86,3 +87,4 @@ HIPDNN_PLUGIN_EXPORT void hipdnnPluginGetLastErrorString(const char** error_str)
 #ifdef __cplusplus
 }
 #endif
+// NOLINTEND

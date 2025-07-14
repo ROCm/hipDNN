@@ -34,7 +34,7 @@ class Graph_wrapper : public Graph_interface
 public:
     explicit Graph_wrapper(const void* buffer, size_t size)
     {
-        if(buffer)
+        if(buffer != nullptr)
         {
             flatbuffers::Verifier verifier(static_cast<const uint8_t*>(buffer), size);
             if(verifier.VerifyBuffer<hipdnn_sdk::data_objects::Graph>())
@@ -58,7 +58,7 @@ public:
     uint node_count() const override
     {
         throw_if_not_valid();
-        return _graph ? _graph->nodes()->size() : 0;
+        return _graph->nodes()->size();
     }
 
     bool has_only_supported_attributes(
@@ -69,7 +69,9 @@ public:
         for(const auto node : *_graph->nodes())
         {
             if(supported_attributes.find(node->attributes_type()) == supported_attributes.end())
+            {
                 return false;
+            }
         }
         return true;
     }
@@ -79,7 +81,9 @@ public:
         throw_if_not_valid();
 
         if(index >= _graph->nodes()->size())
+        {
             throw std::out_of_range("Index out of range for graph nodes");
+        }
 
         return *_graph->nodes()->Get(index);
     }

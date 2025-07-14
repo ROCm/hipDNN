@@ -19,7 +19,7 @@ struct Mock_hipdnn_engine_plugin_execution_context : public hipdnnEnginePluginEx
     {
     }
 
-    virtual ~Mock_hipdnn_engine_plugin_execution_context() {}
+    ~Mock_hipdnn_engine_plugin_execution_context() override = default;
 
     hipdnn_plugin::Graph_interface& graph() const override
     {

@@ -27,7 +27,7 @@ class Engine_details_wrapper : public Engine_details_interface
 public:
     explicit Engine_details_wrapper(const void* buffer, size_t size)
     {
-        if(buffer)
+        if(buffer != nullptr)
         {
             flatbuffers::Verifier verifier(static_cast<const uint8_t*>(buffer), size);
             if(verifier.VerifyBuffer<hipdnn_sdk::data_objects::EngineDetails>())
