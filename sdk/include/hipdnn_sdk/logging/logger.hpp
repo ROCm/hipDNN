@@ -81,7 +81,7 @@
 
 namespace hipdnn::logging
 {
-#ifdef ENABLE_BACKEND_LOGGING
+#ifdef ENABLE_BACKEND_LOGGING // The backend configures all logging
 inline std::string output_file;
 inline bool g_logging_initialized = false;
 inline std::mutex g_logging_init_mutex;
@@ -109,6 +109,8 @@ inline void set_log_level(const std::string& level)
     }
 }
 
+// TODO: add shutdown and make visible to frontend and plugins.
+// The desired functionality is that plugins can cleanup logging so plugin can be unloaded without spdlog impeding.
 inline void cleanup_logging()
 {
     if(g_backend_logger)

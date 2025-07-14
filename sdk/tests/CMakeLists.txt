@@ -13,6 +13,7 @@ add_executable(hipdnn_sdk_tests
     test_plugin_helpers.cpp
     test_plugin_last_error_manager.cpp
     test_plugin_data_type_helpers.cpp
+    test_callback_logger.cpp
 )
 
 target_link_libraries(hipdnn_sdk_tests 
