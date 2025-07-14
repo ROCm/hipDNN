@@ -8,12 +8,13 @@ endif()
 
 add_executable(hipdnn_sdk_tests
     main.cpp
-    test_graph_wrapper.cpp
-    test_plugin_flatbuffer_utilities.cpp
-    test_plugin_exception.cpp
-    test_plugin_helpers.cpp
-    test_plugin_last_error_manager.cpp
-    test_plugin_data_type_helpers.cpp
+    plugin/test_plugin_exception.cpp
+    plugin/test_plugin_helpers.cpp
+    plugin/test_plugin_last_error_manager.cpp
+    plugin/test_plugin_data_type_helpers.cpp
+    plugin/flatbuffer_utilities/test_graph_wrapper.cpp
+    plugin/flatbuffer_utilities/test_engine_config_wrapper.cpp
+    plugin/flatbuffer_utilities/test_engine_details_wrapper.cpp
 )
 
 target_link_libraries(hipdnn_sdk_tests 

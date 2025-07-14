@@ -9,7 +9,6 @@
 #include <hipdnn_sdk/plugin/flatbuffer_utilities/graph_wrapper.hpp>
 #include <hipdnn_sdk/plugin/plugin_api.h>
 #include <hipdnn_sdk/plugin/plugin_data_type_helpers.hpp>
-#include <hipdnn_sdk/plugin/plugin_flatbuffer_utilities.hpp>
 #include <hipdnn_sdk/plugin/plugin_helpers.hpp>
 #include <hipdnn_sdk/plugin/plugin_last_error_manager.hpp>
 

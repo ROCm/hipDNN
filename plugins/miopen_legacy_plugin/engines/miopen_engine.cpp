@@ -5,7 +5,6 @@
 #include "solvers/miopen_batchnorm_solver.hpp"
 
 #include <hipdnn_sdk/data_objects/engine_details_generated.h>
-#include <hipdnn_sdk/plugin/plugin_flatbuffer_utilities.hpp>
 
 namespace miopen_legacy_plugin
 {

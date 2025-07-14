@@ -4,8 +4,8 @@
 #include <gtest/gtest.h>
 
 #include <hipdnn_sdk/plugin/engine_plugin_api.h>
+#include <hipdnn_sdk/plugin/flatbuffer_utilities/engine_details_wrapper.hpp>
 #include <hipdnn_sdk/plugin/plugin_api_data_types.h>
-#include <hipdnn_sdk/plugin/plugin_flatbuffer_utilities.hpp>
 #include <hipdnn_sdk/test_utilities/flatbuffer_graph_test_utils.hpp>
 
 #include "hipdnn_engine_plugin_execution_context.hpp"
@@ -179,12 +179,11 @@ TEST(MiopenLegacyEnginePluginApiTest, EnginePluginGetEngineDetailsValid)
 
     auto status = hipdnnEnginePluginGetEngineDetails(handle, 1, &op_graph, &engine_details_out);
 
-    std::unique_ptr<hipdnn_sdk::data_objects::EngineDetailsT> unpacked_engine_details;
-    hipdnn_plugin::flatbuffer_utilities::unpack_serialized_engine_details(
-        engine_details_out.ptr, engine_details_out.size, unpacked_engine_details);
+    hipdnn_plugin::Engine_details_wrapper engine_details(engine_details_out.ptr,
+                                                         engine_details_out.size);
 
     EXPECT_EQ(status, HIPDNN_PLUGIN_STATUS_SUCCESS);
-    EXPECT_EQ(unpacked_engine_details->engine_id, 1);
+    EXPECT_EQ(engine_details.engine_id(), 1);
 
     // Clean up
     EXPECT_EQ(hipdnnEnginePluginDestroyEngineDetails(handle, &engine_details_out),

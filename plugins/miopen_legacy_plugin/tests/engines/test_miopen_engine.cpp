@@ -6,7 +6,7 @@
 #include <set>
 
 #include <hipdnn_sdk/data_objects/graph_generated.h>
-#include <hipdnn_sdk/plugin/plugin_flatbuffer_utilities.hpp>
+#include <hipdnn_sdk/plugin/flatbuffer_utilities/engine_details_wrapper.hpp>
 #include <hipdnn_sdk/plugin/test_utils/mock_graph.hpp>
 #include <hipdnn_sdk/test_utilities/flatbuffer_graph_test_utils.hpp>
 
@@ -105,10 +105,8 @@ TEST(Miopen_engineTest, GetDetailsReturnsSerializedEngineDetails)
     hipdnnPluginConstData_t result;
     engine.get_details(result);
 
-    std::unique_ptr<hipdnn_sdk::data_objects::EngineDetailsT> unpacked_engine_details;
-    hipdnn_plugin::flatbuffer_utilities::unpack_serialized_engine_details(
-        result.ptr, result.size, unpacked_engine_details);
-    EXPECT_EQ(unpacked_engine_details->engine_id, 1);
+    hipdnn_plugin::Engine_details_wrapper engine_details(result.ptr, result.size);
+    EXPECT_EQ(engine_details.engine_id(), 1);
 
     delete[] static_cast<const uint8_t*>(result.ptr);
 }

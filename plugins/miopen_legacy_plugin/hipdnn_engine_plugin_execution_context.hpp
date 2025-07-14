@@ -11,7 +11,6 @@
 #include <hipdnn_sdk/plugin/flatbuffer_utilities/engine_config_wrapper.hpp>
 #include <hipdnn_sdk/plugin/flatbuffer_utilities/graph_wrapper.hpp>
 #include <hipdnn_sdk/plugin/plugin_api_data_types.h>
-#include <hipdnn_sdk/plugin/plugin_flatbuffer_utilities.hpp>
 
 struct hipdnnEnginePluginExecutionContext
 {

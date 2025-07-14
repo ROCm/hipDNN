@@ -7,6 +7,7 @@
 #include <memory>
 
 #include <hipdnn_sdk/data_objects/engine_config_generated.h>
+#include <hipdnn_sdk/plugin/plugin_exception.hpp>
 
 namespace hipdnn_plugin
 {
@@ -39,6 +40,8 @@ public:
 
     const hipdnn_sdk::data_objects::EngineConfig& get_engine_config() const override
     {
+        throw_if_not_valid();
+
         return *_engine_config;
     }
 
@@ -49,10 +52,21 @@ public:
 
     int64_t engine_id() const override
     {
-        return _engine_config ? _engine_config->engine_id() : -1;
+        throw_if_not_valid();
+
+        return _engine_config->engine_id();
     }
 
 private:
+    void throw_if_not_valid() const
+    {
+        if(!is_valid())
+        {
+            throw hipdnn_plugin::Hipdnn_plugin_exception(HIPDNN_PLUGIN_STATUS_INTERNAL_ERROR,
+                                                         "Engine config is not valid");
+        }
+    }
+
     const hipdnn_sdk::data_objects::EngineConfig* _engine_config = nullptr;
 };
 
