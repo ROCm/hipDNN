@@ -49,6 +49,28 @@ TEST(Miopen_engineTest, WorkspaceSizeReturnsSolverWorkspace)
     EXPECT_EQ(engine.get_workspace_size(dummy_handle, mock_graph), 1337u);
 }
 
+TEST(Miopen_engineTest, WorkspaceSizeReturnsMaxSolverWorkspace)
+{
+    auto mock_solver = std::make_unique<Mock_solver>();
+    auto mock_solver2 = std::make_unique<Mock_solver>();
+
+    EXPECT_CALL(*mock_solver, is_applicable(::testing::_)).WillOnce(::testing::Return(true));
+    EXPECT_CALL(*mock_solver, get_workspace_size(::testing::_, ::testing::_))
+        .WillOnce(::testing::Return(1337u));
+    EXPECT_CALL(*mock_solver2, is_applicable(::testing::_)).WillOnce(::testing::Return(true));
+    EXPECT_CALL(*mock_solver2, get_workspace_size(::testing::_, ::testing::_))
+        .WillOnce(::testing::Return(45000u));
+
+    Miopen_engine engine(1);
+    engine.add_solver(std::move(mock_solver));
+    engine.add_solver(std::move(mock_solver2));
+
+    Mock_graph mock_graph;
+
+    hipdnnEnginePluginHandle dummy_handle;
+    EXPECT_EQ(engine.get_workspace_size(dummy_handle, mock_graph), 45000u);
+}
+
 TEST(Miopen_engineTest, WorkspaceSizeReturnsZeroIfNoSolverApplicable)
 {
     auto mock_solver = std::make_unique<Mock_solver>();

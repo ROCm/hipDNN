@@ -53,7 +53,11 @@ size_t Miopen_engine::get_workspace_size(const hipdnnEnginePluginHandle& handle,
     {
         if(solver->is_applicable(op_graph))
         {
-            workspace_size = solver->get_workspace_size(handle, op_graph);
+            size_t solver_workspace = solver->get_workspace_size(handle, op_graph);
+            if(solver_workspace > workspace_size)
+            {
+                workspace_size = solver_workspace;
+            }
         }
     }
     return workspace_size;
