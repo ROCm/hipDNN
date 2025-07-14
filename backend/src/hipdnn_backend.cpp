@@ -289,25 +289,26 @@ HIPDNN_BACKEND_EXPORT void hipdnnLoggingCallback_ext(hipdnnSeverity_t severity, 
             hipdnn::logging::G_LOGGING_AREA);
     }
 
-    // Send pre-formatted logs to output file
-    if(hipdnn::logging::g_callback_receiver_logger)
+    if(!hipdnn::logging::g_callback_receiver_logger)
     {
-        switch(severity)
-        {
-        case HIPDNN_SEV_FATAL:
-            hipdnn::logging::g_callback_receiver_logger->critical(msg);
-            break;
-        case HIPDNN_SEV_ERROR:
-            hipdnn::logging::g_callback_receiver_logger->error(msg);
-            break;
-        case HIPDNN_SEV_WARN:
-            hipdnn::logging::g_callback_receiver_logger->warn(msg);
-            break;
-        case HIPDNN_SEV_OFF:
-            break;
-        default:
-            hipdnn::logging::g_callback_receiver_logger->info(msg);
-            break;
-        }
+        return;
+    }
+    // Send pre-formatted logs to output file
+    switch(severity)
+    {
+    case HIPDNN_SEV_FATAL:
+        hipdnn::logging::g_callback_receiver_logger->critical(msg);
+        break;
+    case HIPDNN_SEV_ERROR:
+        hipdnn::logging::g_callback_receiver_logger->error(msg);
+        break;
+    case HIPDNN_SEV_WARN:
+        hipdnn::logging::g_callback_receiver_logger->warn(msg);
+        break;
+    case HIPDNN_SEV_OFF:
+        break;
+    default:
+        hipdnn::logging::g_callback_receiver_logger->info(msg);
+        break;
     }
 }

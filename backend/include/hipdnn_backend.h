@@ -288,7 +288,7 @@ HIPDNN_BACKEND_EXPORT hipdnnStatus_t hipdnnBackendCreateAndDeserializeGraph_ext(
  * @brief Callback function for logging messages.
  *
  * This function is called by the hipDNN library to log messages. The severity level of the message
- * is provided, along with the message itself and user-defined data.
+ * is provided along with the message itself.
  * 
  * @param [in] severity  The severity level of the message.
  * @param [in] msg        The message to be logged.

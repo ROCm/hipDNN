@@ -25,7 +25,6 @@ private:
 
 void dummy_callback(hipdnnSeverity_t severity, const char* msg)
 {
-    // Intentionally empty - just testing the mechanism
     (void)severity;
     (void)msg;
 }
