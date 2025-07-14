@@ -94,7 +94,6 @@ TEST(Graph_wrapperTest, GetTensorMapEmptyGraph)
 
 TEST(Graph_wrapperTest, GetTensorMapReturnsCorrectTensors)
 {
-    // Create a graph with two tensors with known UIDs
     flatbuffers::FlatBufferBuilder builder;
     std::vector<::flatbuffers::Offset<hipdnn_sdk::data_objects::Node>> nodes;
 
