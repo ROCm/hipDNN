@@ -66,7 +66,7 @@ TEST_F(Execution_backend_end_api_tests, TestBackendExecuteWithNullHandle)
     test_util::create_test_engine_config(&_engine_config, &_engine, &_graph_descriptor, GIDX, true);
 
     EXPECT_EQ(hipdnnBackendCreateDescriptor(HIPDNN_BACKEND_EXECUTION_PLAN_DESCRIPTOR, &_plan),
-            HIPDNN_STATUS_SUCCESS);
+              HIPDNN_STATUS_SUCCESS);
 
     test_util::populate_test_execution_plan(
         &_plan, &_handle, &_engine_config, &_engine, &_graph_descriptor, GIDX, true);

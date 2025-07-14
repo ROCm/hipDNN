@@ -70,31 +70,6 @@ enable_testing() # Cmake wont discover or run tests without this line
 # Add a check target which will run all tests discovered by gtest_discover_tests via ctest. 
 add_custom_target(check COMMAND ${TEST_ENVIRONMENT} ${CMAKE_CTEST_COMMAND} --output-on-failure -C ${CMAKE_CFG_INTDIR})
 
-# GPU Architecture targets
-if(NOT DEFINED GPU_TARGETS)
-    # Check if Address Sanitizer is enabled - use XNACK-enabled targets
-    if(BUILD_ADDRESS_SANITIZER)
-        set(GPU_TARGETS 
-            gfx906:xnack+    # Vega 20 (MI50, MI60)
-            gfx908:xnack+    # MI100 (Arcturus)
-            gfx90a:xnack+    # MI200 series (MI210, MI250, MI250X)
-            gfx940:xnack+    # MI300A (APU)
-            gfx941:xnack+    # MI300A (APU variant)
-            gfx942:xnack+    # MI300X (GPU)
-        )
-    else()
-        # Standard GPU targets without XNACK
-        set(GPU_TARGETS 
-            gfx90a
-            gfx942
-            gfx1100
-            gfx1151
-            gfx1201
-        )
-    endif()
-endif()
-message(STATUS "Using GPU targets: ${GPU_TARGETS}")
-
 # Add global compile options
 set(EXTRA_COMPILE_OPTIONS)
 set(EXTRA_LINK_OPTIONS)
