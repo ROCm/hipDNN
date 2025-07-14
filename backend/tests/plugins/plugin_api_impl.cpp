@@ -11,13 +11,8 @@
 
 using namespace hipdnn_plugin;
 
-// TODO Remove this when HIPDNN_MAX_ERROR_STRING_SIZE is replaced with HIPDNN_PLUGIN_ERROR_STRING_MAX_LENGTH and removed from the SDK.
-static_assert(
-    HIPDNN_MAX_ERROR_STRING_SIZE == HIPDNN_PLUGIN_ERROR_STRING_MAX_LENGTH,
-    "HIPDNN_MAX_ERROR_STRING_SIZE must be equal to HIPDNN_PLUGIN_ERROR_STRING_MAX_LENGTH");
-
 // NOLINTNEXTLINE(modernize-avoid-c-arrays)
-thread_local char Plugin_last_error_manager::last_error[HIPDNN_MAX_ERROR_STRING_SIZE] = "";
+thread_local char Plugin_last_error_manager::last_error[HIPDNN_PLUGIN_ERROR_STRING_MAX_LENGTH] = "";
 
 // Exported functions:
 
