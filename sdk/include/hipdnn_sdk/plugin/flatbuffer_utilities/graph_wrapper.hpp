@@ -7,6 +7,7 @@
 #include <memory>
 
 #include <hipdnn_sdk/data_objects/graph_generated.h>
+#include <hipdnn_sdk/plugin/plugin_exception.hpp>
 
 namespace hipdnn_plugin
 {
@@ -45,6 +46,7 @@ public:
 
     const hipdnn_sdk::data_objects::Graph& get_graph() const override
     {
+        throw_if_not_valid();
         return *_graph;
     }
 
@@ -55,14 +57,14 @@ public:
 
     uint node_count() const override
     {
+        throw_if_not_valid();
         return _graph ? _graph->nodes()->size() : 0;
     }
 
     bool has_only_supported_attributes(
         std::set<hipdnn_sdk::data_objects::NodeAttributes> supported_attributes) const override
     {
-        if(!_graph)
-            return false;
+        throw_if_not_valid();
 
         for(const auto node : *_graph->nodes())
         {
@@ -74,7 +76,9 @@ public:
 
     const hipdnn_sdk::data_objects::Node& get_node(uint index) const override
     {
-        if(!_graph || index >= _graph->nodes()->size())
+        throw_if_not_valid();
+
+        if(index >= _graph->nodes()->size())
             throw std::out_of_range("Index out of range for graph nodes");
 
         return *_graph->nodes()->Get(index);
@@ -83,8 +87,7 @@ public:
     const std::unordered_map<int64_t, const hipdnn_sdk::data_objects::TensorAttributes*>&
         get_tensor_map() override
     {
-        if(!_graph)
-            throw std::runtime_error("Graph is not valid");
+        throw_if_not_valid();
 
         if(!_tensor_map.empty())
         {
@@ -100,6 +103,15 @@ public:
     }
 
 private:
+    void throw_if_not_valid() const
+    {
+        if(!is_valid())
+        {
+            throw hipdnn_plugin::Hipdnn_plugin_exception(HIPDNN_PLUGIN_STATUS_INTERNAL_ERROR,
+                                                         "Graph is not valid");
+        }
+    }
+
     const hipdnn_sdk::data_objects::Graph* _graph = nullptr;
 
     //lazy init state;
