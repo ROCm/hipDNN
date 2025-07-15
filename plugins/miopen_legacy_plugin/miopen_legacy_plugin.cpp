@@ -23,7 +23,7 @@ using namespace hipdnn_plugin;
 using namespace miopen_legacy_plugin;
 
 // NOLINTNEXTLINE(modernize-avoid-c-arrays)
-thread_local char Plugin_last_error_manager::last_error[HIPDNN_MAX_ERROR_STRING_SIZE] = "";
+thread_local char Plugin_last_error_manager::last_error[HIPDNN_PLUGIN_ERROR_STRING_MAX_LENGTH] = "";
 
 #define LOG_API_ENTRY(format, ...) \
     HIPDNN_LOG_INFO("API called: [{}] " format, __func__ __VA_OPT__(, ) __VA_ARGS__)

@@ -22,7 +22,7 @@ TEST(DescriptorFactoryTest, CreateEngineConfigDescriptor)
     ASSERT_NO_THROW(Descriptor_factory::create(HIPDNN_BACKEND_ENGINECFG_DESCRIPTOR, &descriptor));
     EXPECT_NE(descriptor, nullptr);
 
-    delete descriptor;
+    ASSERT_NO_THROW(Descriptor_factory::destroy(descriptor));
 }
 
 TEST(DescriptorFactoryTest, CreateEngineDescriptor)
@@ -31,7 +31,7 @@ TEST(DescriptorFactoryTest, CreateEngineDescriptor)
     ASSERT_NO_THROW(Descriptor_factory::create(HIPDNN_BACKEND_ENGINE_DESCRIPTOR, &descriptor));
     EXPECT_NE(descriptor, nullptr);
 
-    delete descriptor;
+    ASSERT_NO_THROW(Descriptor_factory::destroy(descriptor));
 }
 
 TEST(DescriptorFactoryTest, CreateExecutionPlanDescriptor)
@@ -41,7 +41,7 @@ TEST(DescriptorFactoryTest, CreateExecutionPlanDescriptor)
         Descriptor_factory::create(HIPDNN_BACKEND_EXECUTION_PLAN_DESCRIPTOR, &descriptor));
     EXPECT_NE(descriptor, nullptr);
 
-    delete descriptor;
+    ASSERT_NO_THROW(Descriptor_factory::destroy(descriptor));
 }
 
 TEST(DescriptorFactoryTest, CreateGraphDescriptor)
@@ -52,7 +52,7 @@ TEST(DescriptorFactoryTest, CreateGraphDescriptor)
 
     EXPECT_NE(descriptor, nullptr);
 
-    delete descriptor;
+    ASSERT_NO_THROW(Descriptor_factory::destroy(descriptor));
 }
 
 TEST(DescriptorFactoryTest, CreateUnsupportedDescriptor)
@@ -82,7 +82,7 @@ TEST(DescriptorFactoryTest, CreateGraphExtValidInput)
 
     EXPECT_NE(descriptor, nullptr);
 
-    delete descriptor;
+    ASSERT_NO_THROW(Descriptor_factory::destroy(descriptor));
 }
 
 TEST(DescriptorFactoryTest, CreateGraphExtNullDescriptorPointer)
@@ -137,6 +137,12 @@ TEST(DescriptorFactoryTest, TestHandleFactory)
     ASSERT_NO_THROW(hipdnn_backend::Handle_factory::create_handle(&handle_t));
     EXPECT_NE(handle_t, nullptr);
 
+    hipdnn_backend::Handle_factory::destroy_handle(handle_t);
+    handle_t = nullptr;
+
+    ASSERT_THROW_HIPDNN_STATUS(hipdnn_backend::Handle_factory::destroy_handle(nullptr),
+                               HIPDNN_STATUS_BAD_PARAM_NULL_POINTER);
+
     ASSERT_THROW_HIPDNN_STATUS(hipdnn_backend::Handle_factory::create_handle(nullptr),
                                HIPDNN_STATUS_BAD_PARAM_NULL_POINTER);
 }
@@ -154,7 +160,7 @@ TEST(Descriptor_Factory_Test, Create_Variant_Descriptor)
 
     EXPECT_FALSE(variant_descriptor->is_finalized());
 
-    delete variant_descriptor;
+    ASSERT_NO_THROW(Descriptor_factory::destroy(descriptor));
 }
 
 TEST(Descriptor_Factory_Test, Create_Variant_Pack_With_Null_Descriptor)
@@ -173,4 +179,10 @@ TEST(Descriptor_Factory_Test, Create_Variant_Pack_With_Unsupported_Type)
         HIPDNN_STATUS_NOT_SUPPORTED);
 
     EXPECT_EQ(descriptor, nullptr);
+}
+
+TEST(Descriptor_Factory_Test, Destroy_Null)
+{
+    ASSERT_THROW_HIPDNN_STATUS(Descriptor_factory::destroy(nullptr),
+                               HIPDNN_STATUS_BAD_PARAM_NULL_POINTER);
 }

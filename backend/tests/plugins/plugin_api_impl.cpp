@@ -5,21 +5,15 @@
 // It contains the API functions for the test plugin.
 
 #include <hipdnn_sdk/plugin/plugin_api.h>
-#include <hipdnn_sdk/utilities/string_util.hpp>
+#include <hipdnn_sdk/plugin/plugin_last_error_manager.hpp>
 
 #include "plugin_api_impl.hpp"
 
-// We cannot use std::string in thread-local storage here because it requires a thread-local storage destructor.
-// This prevents the shared object (plugin) from being unloaded until the program terminates.
-// NOLINTNEXTLINE(modernize-avoid-c-arrays)
-thread_local static char last_error_string[HIPDNN_PLUGIN_ERROR_STRING_MAX_LENGTH] = "";
-static hipdnnCallback_t logging_callback = nullptr;
+using namespace hipdnn_plugin;
 
-void set_last_error_string(const std::string& error)
-{
-    hipdnn::sdk::utilities::copy_max_size_with_null_terminator(
-        last_error_string, error.c_str(), sizeof(last_error_string));
-}
+// NOLINTNEXTLINE(modernize-avoid-c-arrays)
+thread_local char Plugin_last_error_manager::last_error[HIPDNN_PLUGIN_ERROR_STRING_MAX_LENGTH] = "";
+static hipdnnCallback_t logging_callback = nullptr; // make it a member?
 
 // Exported functions:
 
@@ -27,8 +21,8 @@ extern "C" hipdnnPluginStatus_t hipdnnPluginGetName(const char** name)
 {
     if(name == nullptr)
     {
-        set_last_error_string("hipdnnPluginGetName: name is null");
-        return HIPDNN_PLUGIN_STATUS_BAD_PARAM;
+        return Plugin_last_error_manager::set_last_error(HIPDNN_PLUGIN_STATUS_BAD_PARAM,
+                                                         "hipdnnPluginGetName: name is null");
     }
     *name = PLUGIN_NAME;
     return HIPDNN_PLUGIN_STATUS_SUCCESS;
@@ -38,8 +32,8 @@ extern "C" hipdnnPluginStatus_t hipdnnPluginGetVersion(const char** version)
 {
     if(version == nullptr)
     {
-        set_last_error_string("hipdnnPluginGetVersion: version is null");
-        return HIPDNN_PLUGIN_STATUS_BAD_PARAM;
+        return Plugin_last_error_manager::set_last_error(HIPDNN_PLUGIN_STATUS_BAD_PARAM,
+                                                         "hipdnnPluginGetVersion: version is null");
     }
     *version = PLUGIN_VERSION;
     return HIPDNN_PLUGIN_STATUS_SUCCESS;
@@ -49,8 +43,8 @@ extern "C" hipdnnPluginStatus_t hipdnnPluginGetType(hipdnnPluginType_t* type)
 {
     if(type == nullptr)
     {
-        set_last_error_string("hipdnnPluginGetType: type is null");
-        return HIPDNN_PLUGIN_STATUS_BAD_PARAM;
+        return Plugin_last_error_manager::set_last_error(HIPDNN_PLUGIN_STATUS_BAD_PARAM,
+                                                         "hipdnnPluginGetType: type is null");
     }
     *type = PLUGIN_TYPE;
     return HIPDNN_PLUGIN_STATUS_SUCCESS;
@@ -74,5 +68,5 @@ extern "C" void hipdnnPluginGetLastErrorString(const char** error_str)
     {
         return;
     }
-    *error_str = last_error_string;
+    *error_str = Plugin_last_error_manager::get_last_error();
 }

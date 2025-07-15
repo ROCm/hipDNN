@@ -18,6 +18,8 @@ public:
     static void create_graph_ext(hipdnnBackendDescriptor_t* descriptor,
                                  const uint8_t* serialized_graph,
                                  size_t graph_byte_size);
+
+    static void destroy(hipdnnBackendDescriptor_t descriptor);
 };
 
 } // namespace hipdnn_backend
