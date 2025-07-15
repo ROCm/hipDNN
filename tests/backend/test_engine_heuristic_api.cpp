@@ -20,9 +20,11 @@ class Engine_heuristic_api_tests : public ::testing::Test
 protected:
     hipdnnBackendDescriptor_t _engine_heuristic = nullptr;
     hipdnnBackendDescriptor_t _graph = nullptr;
+    hipdnnHandle_t _handle = nullptr;
 
     void SetUp() override
     {
+        ASSERT_EQ(hipdnnCreate(&_handle), HIPDNN_STATUS_SUCCESS);
         EXPECT_EQ(
             hipdnnBackendCreateDescriptor(HIPDNN_BACKEND_ENGINEHEUR_DESCRIPTOR, &_engine_heuristic),
             HIPDNN_STATUS_SUCCESS);
@@ -39,6 +41,11 @@ protected:
         {
             EXPECT_EQ(hipdnnBackendDestroyDescriptor(_graph), HIPDNN_STATUS_SUCCESS);
         }
+        if(_handle != nullptr)
+        {
+            EXPECT_EQ(hipdnnDestroy(_handle), HIPDNN_STATUS_SUCCESS);
+            _handle = nullptr;
+        }
     }
 
     void set_heuristic_mode()
@@ -53,7 +60,7 @@ protected:
 
     void set_operation_graph()
     {
-        test_util::create_test_graph(&_graph);
+        test_util::create_test_graph(&_graph, _handle);
         ASSERT_EQ(hipdnnBackendFinalize(_graph), HIPDNN_STATUS_SUCCESS);
         ASSERT_EQ(hipdnnBackendSetAttribute(_engine_heuristic,
                                             HIPDNN_ATTR_ENGINEHEUR_OPERATION_GRAPH,
@@ -85,7 +92,7 @@ TEST_F(Engine_heuristic_api_tests, SetEngineHeuristicOperationGraph)
                                         &null_graph),
               HIPDNN_STATUS_BAD_PARAM_NULL_POINTER);
 
-    test_util::create_test_graph(&_graph);
+    test_util::create_test_graph(&_graph, _handle);
     ASSERT_EQ(hipdnnBackendFinalize(_graph), HIPDNN_STATUS_SUCCESS);
     EXPECT_EQ(hipdnnBackendSetAttribute(_engine_heuristic,
                                         HIPDNN_ATTR_ENGINEHEUR_OPERATION_GRAPH,
@@ -175,7 +182,7 @@ TEST_F(Engine_heuristic_api_tests, GetAttributeOnUnfinalizedDescriptor)
                                         1,
                                         nullptr,
                                         &dummy_graph),
-              HIPDNN_STATUS_NOT_INITIALIZED);
+              HIPDNN_STATUS_BAD_PARAM_NOT_FINALIZED);
 }
 
 TEST_F(Engine_heuristic_api_tests, GetOperationGraph)
@@ -184,7 +191,6 @@ TEST_F(Engine_heuristic_api_tests, GetOperationGraph)
 
     hipdnnBackendDescriptor_t retrieved_graph = nullptr;
 
-    // Test with invalid attribute type
     EXPECT_EQ(hipdnnBackendGetAttribute(_engine_heuristic,
                                         HIPDNN_ATTR_ENGINEHEUR_OPERATION_GRAPH,
                                         HIPDNN_TYPE_INT64,
@@ -193,7 +199,6 @@ TEST_F(Engine_heuristic_api_tests, GetOperationGraph)
                                         &retrieved_graph),
               HIPDNN_STATUS_BAD_PARAM);
 
-    // Test with invalid element count
     EXPECT_EQ(hipdnnBackendGetAttribute(_engine_heuristic,
                                         HIPDNN_ATTR_ENGINEHEUR_OPERATION_GRAPH,
                                         HIPDNN_TYPE_BACKEND_DESCRIPTOR,
@@ -202,7 +207,6 @@ TEST_F(Engine_heuristic_api_tests, GetOperationGraph)
                                         &retrieved_graph),
               HIPDNN_STATUS_BAD_PARAM);
 
-    // Test with null output
     EXPECT_EQ(hipdnnBackendGetAttribute(_engine_heuristic,
                                         HIPDNN_ATTR_ENGINEHEUR_OPERATION_GRAPH,
                                         HIPDNN_TYPE_BACKEND_DESCRIPTOR,
@@ -211,7 +215,6 @@ TEST_F(Engine_heuristic_api_tests, GetOperationGraph)
                                         nullptr),
               HIPDNN_STATUS_BAD_PARAM_NULL_POINTER);
 
-    // Test successful get
     EXPECT_EQ(hipdnnBackendGetAttribute(_engine_heuristic,
                                         HIPDNN_ATTR_ENGINEHEUR_OPERATION_GRAPH,
                                         HIPDNN_TYPE_BACKEND_DESCRIPTOR,
@@ -221,7 +224,6 @@ TEST_F(Engine_heuristic_api_tests, GetOperationGraph)
               HIPDNN_STATUS_SUCCESS);
     EXPECT_EQ(retrieved_graph, _graph);
 
-    // Test with element count
     int64_t count = 0;
     EXPECT_EQ(hipdnnBackendGetAttribute(_engine_heuristic,
                                         HIPDNN_ATTR_ENGINEHEUR_OPERATION_GRAPH,
@@ -300,7 +302,6 @@ TEST_F(Engine_heuristic_api_tests, GetEngineConfigs)
                                         nullptr),
               HIPDNN_STATUS_SUCCESS);
 
-    // Test successful get with exact count
     for(int i = 0; i < count; ++i)
     {
         EXPECT_EQ(hipdnnBackendCreateDescriptor(HIPDNN_BACKEND_ENGINECFG_DESCRIPTOR, &configs[i]),
@@ -317,7 +318,28 @@ TEST_F(Engine_heuristic_api_tests, GetEngineConfigs)
               HIPDNN_STATUS_SUCCESS);
     EXPECT_EQ(count, 1);
 
-    // Clean up (TODO: known leak due to internal objects)
+    EXPECT_EQ(hipdnnBackendFinalize(configs[0]), HIPDNN_STATUS_SUCCESS);
+
+    hipdnnBackendDescriptor_t engine = nullptr;
+    EXPECT_EQ(hipdnnBackendGetAttribute(configs[0],
+                                        HIPDNN_ATTR_ENGINECFG_ENGINE,
+                                        HIPDNN_TYPE_BACKEND_DESCRIPTOR,
+                                        1,
+                                        nullptr,
+                                        &engine),
+              HIPDNN_STATUS_SUCCESS);
+    ASSERT_NE(engine, nullptr);
+
+    int64_t engine_id = 0;
+    EXPECT_EQ(hipdnnBackendGetAttribute(engine,
+                                        HIPDNN_ATTR_ENGINE_GLOBAL_INDEX,
+                                        HIPDNN_TYPE_INT64,
+                                        1,
+                                        nullptr,
+                                        &engine_id),
+              HIPDNN_STATUS_SUCCESS);
+    EXPECT_EQ(engine_id, -1);
+
     for(auto config : configs)
     {
         if(config != nullptr)
@@ -325,6 +347,8 @@ TEST_F(Engine_heuristic_api_tests, GetEngineConfigs)
             EXPECT_EQ(hipdnnBackendDestroyDescriptor(config), HIPDNN_STATUS_SUCCESS);
         }
     }
+
+    EXPECT_EQ(hipdnnBackendDestroyDescriptor(engine), HIPDNN_STATUS_SUCCESS);
 }
 
 TEST_F(Engine_heuristic_api_tests, GetEngineConfigsRequestMoreThanAvailable)

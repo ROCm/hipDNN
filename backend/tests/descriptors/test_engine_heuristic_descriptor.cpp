@@ -219,7 +219,7 @@ TEST_F(Engine_heuristic_descriptor_test, GetAttrOnUnfinalizedEngineHeuristicDesc
                                          1,
                                          nullptr,
                                          &dummy_graph),
-        HIPDNN_STATUS_NOT_INITIALIZED);
+        HIPDNN_STATUS_BAD_PARAM_NOT_FINALIZED);
 }
 
 TEST_F(Engine_heuristic_descriptor_test, GetEngineHeuristicDescriptorUnsupportedAttr)

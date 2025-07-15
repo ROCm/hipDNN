@@ -41,7 +41,7 @@ void Engine_heuristic_descriptor::get_attribute(hipdnnBackendAttributeName_t att
                                                 void* array_of_elements)
 {
     THROW_IF_FALSE(is_finalized(),
-                   HIPDNN_STATUS_NOT_INITIALIZED,
+                   HIPDNN_STATUS_BAD_PARAM_NOT_FINALIZED,
                    "Engine_heuristic_descriptor::get_attribute() failed: Not finalized.");
 
     switch(attribute_name)

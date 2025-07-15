@@ -40,6 +40,28 @@ TEST_F(Graph_descriptor_test, WillCorrectlySetGraph)
 
     Graph_descriptor descriptor;
     ASSERT_NO_THROW(descriptor.deserialize_graph(serialized_graph.data(), serialized_graph.size()));
+
+    ASSERT_THROW_HIPDNN_STATUS(descriptor.finalize(), HIPDNN_STATUS_BAD_PARAM);
+
+    auto handle = reinterpret_cast<hipdnnHandle_t>(0x12345678);
+    ASSERT_NO_THROW(descriptor.set_attribute(
+        HIPDNN_ATTR_OPERATIONGRAPH_HANDLE, HIPDNN_TYPE_HANDLE, 1, &handle));
+    ASSERT_NO_THROW(descriptor.finalize());
+}
+
+TEST_F(Graph_descriptor_test, WillCorrectlySetGraphReverseOrder)
+{
+    auto builder = create_valid_graph();
+    auto serialized_graph = builder.Release();
+
+    Graph_descriptor descriptor;
+    auto handle = reinterpret_cast<hipdnnHandle_t>(0x12345678);
+    ASSERT_NO_THROW(descriptor.set_attribute(
+        HIPDNN_ATTR_OPERATIONGRAPH_HANDLE, HIPDNN_TYPE_HANDLE, 1, &handle));
+
+    ASSERT_THROW_HIPDNN_STATUS(descriptor.finalize(), HIPDNN_STATUS_BAD_PARAM);
+
+    ASSERT_NO_THROW(descriptor.deserialize_graph(serialized_graph.data(), serialized_graph.size()));
     ASSERT_NO_THROW(descriptor.finalize());
 }
 

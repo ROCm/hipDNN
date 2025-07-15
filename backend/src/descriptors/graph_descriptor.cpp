@@ -19,6 +19,7 @@ Graph_descriptor::Graph_descriptor()
 void Graph_descriptor::finalize()
 {
     THROW_IF_NULL(_graph, HIPDNN_STATUS_BAD_PARAM, "Graph_descriptor::finalize: graph is null");
+    THROW_IF_NULL(_handle, HIPDNN_STATUS_BAD_PARAM, "Graph_descriptor::finalize: handle is null");
     hipdnnBackendDescriptor::finalize();
 }
 
