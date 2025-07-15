@@ -71,41 +71,20 @@ hipdnnEnginePluginHandle_t Engine_plugin::create_handle() const
 {
     assert(_initialized);
     hipdnnEnginePluginHandle_t handle;
-    auto status = _func_create_handle(&handle);
-    if(status != HIPDNN_PLUGIN_STATUS_SUCCESS)
-    {
-        throw Hipdnn_exception(HIPDNN_STATUS_PLUGIN_ERROR,
-                               "Failed to create engine plugin handle. Status code: "
-                                   + std::to_string(status)
-                                   + ", Error: " + std::string(get_last_error_string()));
-    }
+    invoke_plugin_function("create engine plugin handle", _func_create_handle, &handle);
     return handle;
 }
 
 void Engine_plugin::destroy_handle(hipdnnEnginePluginHandle_t handle) const
 {
     assert(_initialized);
-    auto status = _func_destroy_handle(handle);
-    if(status != HIPDNN_PLUGIN_STATUS_SUCCESS)
-    {
-        throw Hipdnn_exception(HIPDNN_STATUS_PLUGIN_ERROR,
-                               "Failed to destroy engine plugin handle. Status code: "
-                                   + std::to_string(status)
-                                   + ", Error: " + std::string(get_last_error_string()));
-    }
+    invoke_plugin_function("destroy engine plugin handle", _func_destroy_handle, handle);
 }
 
 void Engine_plugin::set_stream(hipdnnEnginePluginHandle_t handle, hipStream_t stream) const
 {
     assert(_initialized);
-    auto status = _func_set_stream(handle, stream);
-    if(status != HIPDNN_PLUGIN_STATUS_SUCCESS)
-    {
-        throw Hipdnn_exception(HIPDNN_STATUS_PLUGIN_ERROR,
-                               "Failed to set stream for engine plugin handle. Status code: "
-                                   + std::to_string(status)
-                                   + ", Error: " + std::string(get_last_error_string()));
-    }
+    invoke_plugin_function("set stream for engine plugin handle", _func_set_stream, handle, stream);
 }
 
 std::vector<int64_t>
@@ -118,30 +97,26 @@ std::vector<int64_t>
     std::vector<int64_t> engine_ids(max_engines);
     uint32_t num_engines = 0;
 
-    auto status = _func_get_applicable_engine_ids(
-        handle, op_graph, engine_ids.data(), max_engines, &num_engines);
-    if(status != HIPDNN_PLUGIN_STATUS_SUCCESS)
-    {
-        throw Hipdnn_exception(HIPDNN_STATUS_PLUGIN_ERROR,
-                               "Failed to get applicable engine IDs. Status code: "
-                                   + std::to_string(status)
-                                   + ", Error: " + std::string(get_last_error_string()));
-    }
+    invoke_plugin_function("get applicable engine IDs",
+                           _func_get_applicable_engine_ids,
+                           handle,
+                           op_graph,
+                           engine_ids.data(),
+                           max_engines,
+                           &num_engines);
 
     if(num_engines > max_engines)
     {
         // Dynamically resize the buffer and retry
         max_engines = num_engines;
         engine_ids.resize(max_engines);
-        status = _func_get_applicable_engine_ids(
-            handle, op_graph, engine_ids.data(), max_engines, &num_engines);
-        if(status != HIPDNN_PLUGIN_STATUS_SUCCESS)
-        {
-            throw Hipdnn_exception(
-                HIPDNN_STATUS_PLUGIN_ERROR,
-                "Failed to get applicable engine IDs after resizing buffer. Status code: "
-                    + std::to_string(status) + ", Error: " + std::string(get_last_error_string()));
-        }
+        invoke_plugin_function("get applicable engine IDs after resizing buffer",
+                               _func_get_applicable_engine_ids,
+                               handle,
+                               op_graph,
+                               engine_ids.data(),
+                               max_engines,
+                               &num_engines);
     }
 
     engine_ids.resize(num_engines);
@@ -154,14 +129,12 @@ void Engine_plugin::get_engine_details(hipdnnEnginePluginHandle_t handle,
                                        hipdnnPluginConstData_t* engine_details) const
 {
     assert(_initialized);
-    auto status = _func_get_engine_details(handle, engine_id, op_graph, engine_details);
-    if(status != HIPDNN_PLUGIN_STATUS_SUCCESS)
-    {
-        throw Hipdnn_exception(HIPDNN_STATUS_PLUGIN_ERROR,
-                               "Failed to get engine details. Status code: "
-                                   + std::to_string(status)
-                                   + ", Error: " + std::string(get_last_error_string()));
-    }
+    invoke_plugin_function("get engine details",
+                           _func_get_engine_details,
+                           handle,
+                           engine_id,
+                           op_graph,
+                           engine_details);
 }
 
 void Engine_plugin::destroy_engine_details(hipdnnEnginePluginHandle_t handle,
@@ -169,14 +142,8 @@ void Engine_plugin::destroy_engine_details(hipdnnEnginePluginHandle_t handle,
 
 {
     assert(_initialized);
-    auto status = _func_destroy_engine_details(handle, engine_details);
-    if(status != HIPDNN_PLUGIN_STATUS_SUCCESS)
-    {
-        throw Hipdnn_exception(HIPDNN_STATUS_PLUGIN_ERROR,
-                               "Failed to destroy engine details. Status code: "
-                                   + std::to_string(status)
-                                   + ", Error: " + std::string(get_last_error_string()));
-    }
+    invoke_plugin_function(
+        "destroy engine details", _func_destroy_engine_details, handle, engine_details);
 }
 
 size_t Engine_plugin::get_workspace_size(hipdnnEnginePluginHandle_t handle,
@@ -185,14 +152,12 @@ size_t Engine_plugin::get_workspace_size(hipdnnEnginePluginHandle_t handle,
 {
     assert(_initialized);
     size_t workspace_size = 0;
-    auto status = _func_get_workspace_size(handle, engine_config, op_graph, &workspace_size);
-    if(status != HIPDNN_PLUGIN_STATUS_SUCCESS)
-    {
-        throw Hipdnn_exception(HIPDNN_STATUS_PLUGIN_ERROR,
-                               "Failed to get workspace size. Status code: "
-                                   + std::to_string(status)
-                                   + ", Error: " + std::string(get_last_error_string()));
-    }
+    invoke_plugin_function("get workspace size",
+                           _func_get_workspace_size,
+                           handle,
+                           engine_config,
+                           op_graph,
+                           &workspace_size);
     return workspace_size;
 }
 
@@ -203,14 +168,12 @@ hipdnnEnginePluginExecutionContext_t
 {
     assert(_initialized);
     hipdnnEnginePluginExecutionContext_t exec_context;
-    auto status = _func_create_execution_context(handle, engine_config, op_graph, &exec_context);
-    if(status != HIPDNN_PLUGIN_STATUS_SUCCESS)
-    {
-        throw Hipdnn_exception(HIPDNN_STATUS_PLUGIN_ERROR,
-                               "Failed to create execution context. Status code: "
-                                   + std::to_string(status)
-                                   + ", Error: " + std::string(get_last_error_string()));
-    }
+    invoke_plugin_function("create execution context",
+                           _func_create_execution_context,
+                           handle,
+                           engine_config,
+                           op_graph,
+                           &exec_context);
     return exec_context;
 }
 
@@ -218,14 +181,8 @@ void Engine_plugin::destroy_execution_context(
     hipdnnEnginePluginHandle_t handle, hipdnnEnginePluginExecutionContext_t execution_context) const
 {
     assert(_initialized);
-    auto status = _func_destroy_execution_context(handle, execution_context);
-    if(status != HIPDNN_PLUGIN_STATUS_SUCCESS)
-    {
-        throw Hipdnn_exception(HIPDNN_STATUS_PLUGIN_ERROR,
-                               "Failed to destroy execution context. Status code: "
-                                   + std::to_string(status)
-                                   + ", Error: " + std::string(get_last_error_string()));
-    }
+    invoke_plugin_function(
+        "destroy execution context", _func_destroy_execution_context, handle, execution_context);
 }
 
 void Engine_plugin::execute_op_graph(hipdnnEnginePluginHandle_t handle,
@@ -235,14 +192,13 @@ void Engine_plugin::execute_op_graph(hipdnnEnginePluginHandle_t handle,
                                      uint32_t num_device_buffers) const
 {
     assert(_initialized);
-    auto status = _func_execute_op_graph(
-        handle, execution_context, workspace, device_buffers, num_device_buffers);
-    if(status != HIPDNN_PLUGIN_STATUS_SUCCESS)
-    {
-        throw Hipdnn_exception(HIPDNN_STATUS_PLUGIN_ERROR,
-                               "Failed to execute op graph. Status code: " + std::to_string(status)
-                                   + ", Error: " + std::string(get_last_error_string()));
-    }
+    invoke_plugin_function("execute op graph",
+                           _func_execute_op_graph,
+                           handle,
+                           execution_context,
+                           workspace,
+                           device_buffers,
+                           num_device_buffers);
 }
 
 } // namespace plugin

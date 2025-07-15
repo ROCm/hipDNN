@@ -9,40 +9,14 @@
 #include <gtest/gtest.h>
 #include <hip/hip_runtime.h>
 #include <hipdnn_sdk/test_utilities/test_utilities.hpp>
+#include <hipdnn_sdk/utilities/scoped_resource.hpp>
 
 #include "plugin/engine_plugin.hpp"
 
 using namespace hipdnn_backend;
 
-namespace
-{
-
 template <typename T, typename Destructor>
-class Scoped_resource
-{
-public:
-    Scoped_resource(T resource, Destructor destructor)
-        : _resource(resource)
-        , _destructor(destructor)
-    {
-    }
-
-    ~Scoped_resource()
-    {
-        _destructor(_resource);
-    }
-
-    T get() const
-    {
-        return _resource;
-    }
-
-private:
-    T _resource;
-    Destructor _destructor;
-};
-
-} // namespace
+using Scoped_resource = hipdnn::sdk::utilities::Scoped_resource<T, Destructor>;
 
 // NOLINTBEGIN(readability-function-cognitive-complexity)
 TEST(GPU_EnginePluginManagerTest, LoadPluginsAndExecuteOpGraph)
