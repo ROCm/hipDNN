@@ -17,8 +17,9 @@ TEST(PluginHelpersTest, TryCatchReturnsSuccessOnNoException)
 
 TEST(PluginHelpersTest, TryCatchHandlesHipdnnException)
 {
-    auto lambda
-        = []() { throw Hipdnn_plugin_exception(HIPDNN_PLUGIN_STATUS_INTERNAL_ERROR, "internal error"); };
+    auto lambda = []() {
+        throw Hipdnn_plugin_exception(HIPDNN_PLUGIN_STATUS_INTERNAL_ERROR, "internal error");
+    };
     auto status = try_catch(lambda);
     EXPECT_EQ(status, HIPDNN_PLUGIN_STATUS_INTERNAL_ERROR);
     EXPECT_STREQ(Plugin_last_error_manager::get_last_error(), "internal error");
