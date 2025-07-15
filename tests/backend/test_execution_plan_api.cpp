@@ -111,7 +111,6 @@ TEST_F(Execution_plan_api_tests, FinalizeExecutionPlan)
 {
     EXPECT_EQ(hipdnnBackendFinalize(_plan), HIPDNN_STATUS_BAD_PARAM);
 
-    ASSERT_EQ(hipdnnCreate(&_handle), HIPDNN_STATUS_SUCCESS);
     ASSERT_EQ(hipdnnBackendSetAttribute(
                   _plan, HIPDNN_ATTR_EXECUTION_PLAN_HANDLE, HIPDNN_TYPE_HANDLE, 1, &_handle),
               HIPDNN_STATUS_SUCCESS);

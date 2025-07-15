@@ -61,9 +61,11 @@ TEST_F(Execution_backend_end_api_tests, TestBackendExecuteWithNullHandle)
     graph.set_name("BatchnormInferenceGraph");
     test_util::create_and_populate_batchnorm_node(graph);
 
-    test_util::create_and_initialize_backend_descriptor(&_graph_descriptor, graph.serialized_graph, _handle);
+    test_util::create_and_initialize_backend_descriptor(
+        &_graph_descriptor, graph.serialized_graph, _handle);
     test_util::create_test_engine(&_engine, &_graph_descriptor, _handle, GIDX);
-    test_util::create_test_engine_config(&_engine_config, &_engine, &_graph_descriptor, _handle, GIDX, true);
+    test_util::create_test_engine_config(
+        &_engine_config, &_engine, &_graph_descriptor, _handle, GIDX, true);
 
     EXPECT_EQ(hipdnnBackendCreateDescriptor(HIPDNN_BACKEND_EXECUTION_PLAN_DESCRIPTOR, &_plan),
               HIPDNN_STATUS_SUCCESS);
@@ -81,9 +83,11 @@ TEST_F(Execution_backend_end_api_tests, TestBackendExecuteWithNullDescriptors)
     graph.set_name("BatchnormInferenceGraph");
     test_util::create_and_populate_batchnorm_node(graph);
 
-    test_util::create_and_initialize_backend_descriptor(&_graph_descriptor, graph.serialized_graph, _handle);
+    test_util::create_and_initialize_backend_descriptor(
+        &_graph_descriptor, graph.serialized_graph, _handle);
     test_util::create_test_engine(&_engine, &_graph_descriptor, _handle, GIDX);
-    test_util::create_test_engine_config(&_engine_config, &_engine, &_graph_descriptor, _handle, GIDX, true);
+    test_util::create_test_engine_config(
+        &_engine_config, &_engine, &_graph_descriptor, _handle, GIDX, true);
 
     EXPECT_EQ(hipdnnBackendCreateDescriptor(HIPDNN_BACKEND_EXECUTION_PLAN_DESCRIPTOR, &_plan),
               HIPDNN_STATUS_SUCCESS);
@@ -108,7 +112,8 @@ TEST_F(Execution_backend_end_api_tests, TestBackendExecuteWithUnfinalizedPlan)
     graph.set_name("BatchnormInferenceGraph");
     test_util::create_and_populate_batchnorm_node(graph);
 
-    test_util::create_and_initialize_backend_descriptor(&_graph_descriptor, graph.serialized_graph, _handle);
+    test_util::create_and_initialize_backend_descriptor(
+        &_graph_descriptor, graph.serialized_graph, _handle);
 
     ASSERT_EQ(hipdnnBackendCreateDescriptor(HIPDNN_BACKEND_VARIANT_PACK_DESCRIPTOR, &_variant_pack),
               HIPDNN_STATUS_SUCCESS);
@@ -125,7 +130,8 @@ TEST_F(Execution_backend_end_api_tests, TestBackendExecuteWithWrongDescriptorTyp
     graph.set_name("BatchnormInferenceGraph");
     test_util::create_and_populate_batchnorm_node(graph);
 
-    test_util::create_and_initialize_backend_descriptor(&_graph_descriptor, graph.serialized_graph, _handle);
+    test_util::create_and_initialize_backend_descriptor(
+        &_graph_descriptor, graph.serialized_graph, _handle);
     test_util::create_test_engine(&_engine, &_graph_descriptor, _handle, GIDX);
 
     ASSERT_EQ(hipdnnBackendCreateDescriptor(HIPDNN_BACKEND_VARIANT_PACK_DESCRIPTOR, &_variant_pack),
@@ -154,9 +160,11 @@ TEST_F(Execution_backend_end_api_tests, TestBackendExecute)
     test_util::extract_tensor_info_from_graph(
         graph.serialized_graph, uid_to_name_map, name_to_uid_map, uid_to_dims_map);
 
-    test_util::create_and_initialize_backend_descriptor(&_graph_descriptor, graph.serialized_graph, _handle);
+    test_util::create_and_initialize_backend_descriptor(
+        &_graph_descriptor, graph.serialized_graph, _handle);
     test_util::create_test_engine(&_engine, &_graph_descriptor, _handle, GIDX);
-    test_util::create_test_engine_config(&_engine_config, &_engine, &_graph_descriptor, _handle, GIDX, true);
+    test_util::create_test_engine_config(
+        &_engine_config, &_engine, &_graph_descriptor, _handle, GIDX, true);
 
     EXPECT_EQ(hipdnnBackendCreateDescriptor(HIPDNN_BACKEND_EXECUTION_PLAN_DESCRIPTOR, &_plan),
               HIPDNN_STATUS_SUCCESS);

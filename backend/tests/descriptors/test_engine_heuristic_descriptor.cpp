@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 #include "descriptors/engine_config_descriptor.hpp"
+#include "descriptors/engine_descriptor.hpp"
 #include "descriptors/engine_heuristic_descriptor.hpp"
 #include "hipdnn_backend.h"
 #include "hipdnn_exception.hpp"
@@ -63,6 +64,20 @@ protected:
 
         _mock_graph = std::make_unique<Mock_descriptor>(HIPDNN_BACKEND_OPERATIONGRAPH_DESCRIPTOR);
         _mock_graph_bad_type = std::make_unique<Mock_descriptor>();
+    }
+
+    static void destroy_config(Engine_config_descriptor* config)
+    {
+        if(config != nullptr)
+        {
+            // TODO - fix needing to delete internal engine descriptor to prevent leaks
+            config->finalize();
+            Engine_descriptor* engine = nullptr;
+            config->get_attribute(
+                HIPDNN_ATTR_ENGINECFG_ENGINE, HIPDNN_TYPE_BACKEND_DESCRIPTOR, 1, nullptr, &engine);
+            delete engine;
+            delete config;
+        }
     }
 };
 
@@ -312,15 +327,19 @@ TEST_F(Engine_heuristic_descriptor_test, GetEngineHeuristicDescriptorEngineConfi
         HIPDNN_ATTR_ENGINEHEUR_RESULTS, HIPDNN_TYPE_BACKEND_DESCRIPTOR, 3, &count, configs.data()));
     ASSERT_EQ(count, 3);
 
-    count = 0;
-    ASSERT_NO_THROW(_engine_heuristic->get_attribute(
-        HIPDNN_ATTR_ENGINEHEUR_RESULTS, HIPDNN_TYPE_BACKEND_DESCRIPTOR, 2, &count, configs.data()));
-    ASSERT_EQ(count, 2);
-
     for(auto* config : configs)
     {
-        delete config;
+        destroy_config(config);
     }
+
+    auto* single_config = new Engine_config_descriptor();
+
+    count = 0;
+    ASSERT_NO_THROW(_engine_heuristic->get_attribute(
+        HIPDNN_ATTR_ENGINEHEUR_RESULTS, HIPDNN_TYPE_BACKEND_DESCRIPTOR, 1, &count, &single_config));
+    ASSERT_EQ(count, 1);
+
+    destroy_config(single_config);
 }
 
 TEST_F(Engine_heuristic_descriptor_test, GetEngineConfigsWithNullConfig)
@@ -341,7 +360,9 @@ TEST_F(Engine_heuristic_descriptor_test, GetEngineConfigsWithNullConfig)
                                                                 configs.data()),
                                HIPDNN_STATUS_BAD_PARAM_NULL_POINTER);
 
-    delete configs[0];
+    // TODO: Since we partially populate due to the nullptr in the array, only the first config has internal state set.
+    //       Need to properly clean-up internal state without shenanigans.
+    destroy_config(configs[0]);
     delete configs[2];
 }
 
@@ -391,9 +412,17 @@ TEST_F(Engine_heuristic_descriptor_test, GetEngineConfigsRequestMoreThanAvailabl
         HIPDNN_ATTR_ENGINEHEUR_RESULTS, HIPDNN_TYPE_BACKEND_DESCRIPTOR, 5, &count, configs.data()));
     ASSERT_EQ(count, 3);
 
-    for(auto* config : configs)
+    for(int i = 0; i < 5; ++i)
     {
-        delete config;
+        // TODO: Internal memory not being tracked properly, and we need to manually free.
+        if(i < count)
+        {
+            destroy_config(configs[i]);
+        }
+        else
+        {
+            delete configs[i];
+        }
     }
 }
 

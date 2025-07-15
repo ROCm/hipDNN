@@ -352,6 +352,7 @@ TEST_F(Engine_heuristic_api_tests, GetEngineConfigs)
                                         &count,
                                         nullptr),
               HIPDNN_STATUS_SUCCESS);
+    EXPECT_EQ(count, 1);
 
     for(int i = 0; i < count; ++i)
     {
@@ -363,11 +364,11 @@ TEST_F(Engine_heuristic_api_tests, GetEngineConfigs)
     EXPECT_EQ(hipdnnBackendGetAttribute(_engine_heuristic,
                                         HIPDNN_ATTR_ENGINEHEUR_RESULTS,
                                         HIPDNN_TYPE_BACKEND_DESCRIPTOR,
-                                        3,
+                                        3, // Ask for 3, but only one engine avaliable.
                                         &count,
                                         configs.data()),
               HIPDNN_STATUS_SUCCESS);
-    EXPECT_EQ(count, 1);
+    EXPECT_EQ(count, 1); // Only one returned since there isn't more than that.
 
     EXPECT_EQ(hipdnnBackendFinalize(configs[0]), HIPDNN_STATUS_SUCCESS);
 
@@ -388,6 +389,7 @@ TEST_F(Engine_heuristic_api_tests, GetEngineConfigs)
         HIPDNN_STATUS_SUCCESS);
     EXPECT_EQ(engine_id, -1);
 
+    // Expecting to only need to clean-up 1 engine config, since we only requested 1.
     for(auto config : configs)
     {
         if(config != nullptr)
@@ -420,12 +422,24 @@ TEST_F(Engine_heuristic_api_tests, GetEngineConfigsRequestMoreThanAvailable)
               HIPDNN_STATUS_SUCCESS);
     EXPECT_EQ(count, 1);
 
-    for(auto config : configs)
+    for(int i = 0; i < 5; ++i)
     {
-        if(config != nullptr)
+        // TODO: Internal memory not being tracked properly, and we need to manually free.
+        if(i < count)
         {
-            EXPECT_EQ(hipdnnBackendDestroyDescriptor(config), HIPDNN_STATUS_SUCCESS);
+            EXPECT_EQ(hipdnnBackendFinalize(configs[i]), HIPDNN_STATUS_SUCCESS);
+            hipdnnBackendDescriptor_t engine = nullptr;
+            EXPECT_EQ(hipdnnBackendGetAttribute(configs[i],
+                                                HIPDNN_ATTR_ENGINECFG_ENGINE,
+                                                HIPDNN_TYPE_BACKEND_DESCRIPTOR,
+                                                1,
+                                                nullptr,
+                                                &engine),
+                      HIPDNN_STATUS_SUCCESS);
+            ASSERT_NE(engine, nullptr);
+            EXPECT_EQ(hipdnnBackendDestroyDescriptor(engine), HIPDNN_STATUS_SUCCESS);
         }
+        EXPECT_EQ(hipdnnBackendDestroyDescriptor(configs[i]), HIPDNN_STATUS_SUCCESS);
     }
 }
 // NOLINTEND(readability-function-cognitive-complexity)
