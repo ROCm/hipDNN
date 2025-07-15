@@ -1,15 +1,14 @@
 // Copyright © Advanced Micro Devices, Inc., or its affiliates.
 // SPDX-License-Identifier: MIT
 
-#include <iostream>
-#include <miopen/miopen.h>
-
 #include <hipdnn_sdk/logging/logger.hpp>
 #include <hipdnn_sdk/plugin/engine_plugin_api.h>
 #include <hipdnn_sdk/plugin/plugin_api.h>
 #include <hipdnn_sdk/plugin/plugin_data_type_helpers.hpp>
 #include <hipdnn_sdk/plugin/plugin_helpers.hpp>
 #include <hipdnn_sdk/plugin/plugin_last_error_manager.hpp>
+#include <iostream>
+#include <miopen/miopen.h>
 
 #include "engine_manager.hpp"
 #include "hipdnn_engine_plugin_handle.hpp"
@@ -99,6 +98,15 @@ void hipdnnPluginGetLastErrorString(const char** error_str)
         *error_str = Plugin_last_error_manager::get_last_error();
 
         LOG_API_SUCCESS(api_name, "error_str={:p}", static_cast<void*>(error_str));
+    });
+}
+
+hipdnnPluginStatus_t hipdnnPluginSetLoggingCallback(hipdnnCallback_t callback)
+{
+    return hipdnn_plugin::try_catch([&, api_name = __func__]() {
+        throw_if_null(callback);
+        hipdnn::logging::initialize_callback_logging(_plugin_name, callback);
+        LOG_API_SUCCESS(api_name, "");
     });
 }
 

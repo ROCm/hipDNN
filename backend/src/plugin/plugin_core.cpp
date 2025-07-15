@@ -101,17 +101,11 @@ std::string_view Plugin_base::get_last_error_string() const noexcept
 
 hipdnnPluginStatus_t Plugin_base::set_logging_callback(hipdnnCallback_t callback)
 {
-    // todo: change this
     assert(_initialized);
     if(_func_set_logging_callback == nullptr)
     {
         // Plugin does not support logging callback, so we vacuously return success
         return HIPDNN_PLUGIN_STATUS_SUCCESS;
-    }
-
-    if(callback == nullptr)
-    {
-        return HIPDNN_PLUGIN_STATUS_BAD_PARAM;
     }
 
     return _func_set_logging_callback(callback);

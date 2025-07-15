@@ -150,7 +150,6 @@ TEST(PluginManagerTest, LastErrorOnSecondLoad)
     }
 }
 
-// Simple test to check that the callback is set appropriately
 TEST(PluginManagerTest, SetCallbackForPlugins)
 {
     plugin::Plugin_manager_base<Plugin> plugin_manager;
@@ -168,9 +167,5 @@ TEST(PluginManagerTest, SetCallbackForPlugins)
     }
 
     auto status = plugin_manager.set_callback_for_all_plugins(dummy_callback);
-
     EXPECT_EQ(status, HIPDNN_STATUS_SUCCESS);
-
-    // status = plugin_manager.set_callback_for_all_plugins(nullptr);
-    // EXPECT_NE(status, HIPDNN_STATUS_SUCCESS);
 }
