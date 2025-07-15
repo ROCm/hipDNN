@@ -92,7 +92,7 @@ TEST(Flatbuffer_invalid_tests, WillNotUnpackInvalidNullBuffer)
 TEST(Flatbuffer_invalid_tests, WillNotUnpackInvalidTrashBuffer)
 {
     auto arr = std::array<uint8_t, 10>{0};
-    
+
     auto [buffer, size] = std::make_pair(arr.data(), size_t(10));
 
     std::unique_ptr<hipdnn_sdk::data_objects::GraphT> graph;
