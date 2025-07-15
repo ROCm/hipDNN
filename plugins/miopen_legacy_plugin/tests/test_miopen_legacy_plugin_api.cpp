@@ -11,7 +11,9 @@ namespace
 void test_logging_callback(hipdnnSeverity_t severity, const char* msg)
 {
     (void)severity;
-    std::cout << msg << "\n";
+    // std::cout << msg << "\n"; // uncomment to see formatted log messages during tests.
+    // It does not use the true callback yet since the plugin is not yet loaded.
+    (void)msg;
 }
 
 class Miopen_legacy_plugin_api_test : public ::testing::Test

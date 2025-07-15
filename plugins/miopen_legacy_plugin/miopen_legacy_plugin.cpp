@@ -7,8 +7,6 @@
 #include <hipdnn_sdk/plugin/plugin_data_type_helpers.hpp>
 #include <hipdnn_sdk/plugin/plugin_helpers.hpp>
 #include <hipdnn_sdk/plugin/plugin_last_error_manager.hpp>
-#include <iostream>
-#include <miopen/miopen.h>
 
 #include "engine_manager.hpp"
 #include "hipdnn_engine_plugin_handle.hpp"
