@@ -10,7 +10,6 @@ find_package(hipdnn_frontend CONFIG REQUIRED)
 find_package(hipdnn_backend CONFIG REQUIRED)
 find_package(hipdnn_sdk CONFIG REQUIRED)
 
-add_compile_definitions(__HIP_PLATFORM_AMD__)
 add_executable(hipdnn_samples 
     main.cpp
 )
