@@ -331,13 +331,10 @@ TEST_F(Engine_heuristic_api_tests, GetEngineConfigs)
     ASSERT_NE(engine, nullptr);
 
     int64_t engine_id = 0;
-    EXPECT_EQ(hipdnnBackendGetAttribute(engine,
-                                        HIPDNN_ATTR_ENGINE_GLOBAL_INDEX,
-                                        HIPDNN_TYPE_INT64,
-                                        1,
-                                        nullptr,
-                                        &engine_id),
-              HIPDNN_STATUS_SUCCESS);
+    EXPECT_EQ(
+        hipdnnBackendGetAttribute(
+            engine, HIPDNN_ATTR_ENGINE_GLOBAL_INDEX, HIPDNN_TYPE_INT64, 1, nullptr, &engine_id),
+        HIPDNN_STATUS_SUCCESS);
     EXPECT_EQ(engine_id, -1);
 
     for(auto config : configs)
