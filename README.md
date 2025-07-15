@@ -1,7 +1,7 @@
 # hipDNN
 
 # EARLY ADOPTER WARNING
-**Hipdnn is in the early stages of development, there is currently very limitied or no functionality available to solve problems**
+**Hipdnn is in the early stages of development, there is currently very limited or no functionality available to solve problems**
 
 ## Getting Started
 The fastest way to get started with hipdnn is to follow the [quick start steps in the build guide](./docs/Building.md#quickstart-building-and-installing-hipdnn)
