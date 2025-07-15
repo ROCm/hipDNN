@@ -230,7 +230,7 @@ TEST_F(Engine_heuristic_descriptor_test, GetEngineHeuristicDescriptorUnsupported
 
     ASSERT_THROW_HIPDNN_STATUS(
         _engine_heuristic->get_attribute(
-            HIPDNN_ATTR_ENGINEHEUR_MODE, HIPDNN_TYPE_HEUR_MODE, 1, nullptr, &dummy),
+            HIPDNN_ATTR_ENGINECFG_ENGINE, HIPDNN_TYPE_HEUR_MODE, 1, nullptr, &dummy),
         HIPDNN_STATUS_NOT_SUPPORTED);
 }
 
@@ -407,4 +407,36 @@ TEST_F(Engine_heuristic_descriptor_test, GetEngineConfigsCountOnly)
     ASSERT_NO_THROW(_engine_heuristic->get_attribute(
         HIPDNN_ATTR_ENGINEHEUR_RESULTS, HIPDNN_TYPE_BACKEND_DESCRIPTOR, 0, &count, nullptr));
     ASSERT_EQ(count, 3);
+}
+
+TEST_F(Engine_heuristic_descriptor_test, GetEngineHeuristicDescriptorHeurMode)
+{
+    hipdnnBackendHeurMode_t mode = HIPDNN_HEUR_MODE_FALLBACK;
+
+    make_engine_heuristic_finalized();
+
+    ASSERT_THROW_HIPDNN_STATUS(
+        _engine_heuristic->get_attribute(
+            HIPDNN_ATTR_ENGINEHEUR_MODE, HIPDNN_TYPE_BACKEND_DESCRIPTOR, 1, nullptr, &mode),
+        HIPDNN_STATUS_BAD_PARAM);
+
+    ASSERT_THROW_HIPDNN_STATUS(
+        _engine_heuristic->get_attribute(
+            HIPDNN_ATTR_ENGINEHEUR_MODE, HIPDNN_TYPE_HEUR_MODE, 2, nullptr, &mode),
+        HIPDNN_STATUS_BAD_PARAM);
+
+    ASSERT_THROW_HIPDNN_STATUS(
+        _engine_heuristic->get_attribute(
+            HIPDNN_ATTR_ENGINEHEUR_MODE, HIPDNN_TYPE_HEUR_MODE, 1, nullptr, nullptr),
+        HIPDNN_STATUS_BAD_PARAM_NULL_POINTER);
+
+    ASSERT_NO_THROW(_engine_heuristic->get_attribute(
+        HIPDNN_ATTR_ENGINEHEUR_MODE, HIPDNN_TYPE_HEUR_MODE, 1, nullptr, &mode));
+    ASSERT_EQ(mode, HIPDNN_HEUR_MODE_FALLBACK);
+
+    int64_t count = 0;
+    ASSERT_NO_THROW(_engine_heuristic->get_attribute(
+        HIPDNN_ATTR_ENGINEHEUR_MODE, HIPDNN_TYPE_HEUR_MODE, 1, &count, &mode));
+    ASSERT_EQ(count, 1);
+    ASSERT_EQ(mode, HIPDNN_HEUR_MODE_FALLBACK);
 }

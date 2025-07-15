@@ -39,6 +39,11 @@ private:
                             int64_t* element_count,
                             void* array_of_elements);
 
+    void get_heuristic_mode(hipdnnBackendAttributeType_t attribute_type,
+                            int64_t requested_element_count,
+                            int64_t* element_count,
+                            void* array_of_elements);
+
 public:
     Engine_heuristic_descriptor();
     ~Engine_heuristic_descriptor() override = default;

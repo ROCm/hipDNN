@@ -49,6 +49,10 @@ void Engine_heuristic_descriptor::get_attribute(hipdnnBackendAttributeName_t att
     case HIPDNN_ATTR_ENGINEHEUR_OPERATION_GRAPH:
         get_graph(attribute_type, requested_element_count, element_count, array_of_elements);
         break;
+    case HIPDNN_ATTR_ENGINEHEUR_MODE:
+        get_heuristic_mode(
+            attribute_type, requested_element_count, element_count, array_of_elements);
+        break;
     case HIPDNN_ATTR_ENGINEHEUR_RESULTS:
         get_engine_configs(
             attribute_type, requested_element_count, element_count, array_of_elements);
@@ -256,6 +260,35 @@ void Engine_heuristic_descriptor::set_engine_ids(const std::vector<int64_t>& eng
 
     _engine_ids = engine_ids;
     _engine_ids_set = true;
+}
+
+void Engine_heuristic_descriptor::get_heuristic_mode(hipdnnBackendAttributeType_t attribute_type,
+                                                     int64_t requested_element_count,
+                                                     int64_t* element_count,
+                                                     void* array_of_elements)
+{
+    THROW_IF_NE(
+        attribute_type,
+        HIPDNN_TYPE_HEUR_MODE,
+        HIPDNN_STATUS_BAD_PARAM,
+        "Engine_heuristic_descriptor failed to get heuristic mode: Invalid attribute type.");
+
+    THROW_IF_NE(requested_element_count,
+                1,
+                HIPDNN_STATUS_BAD_PARAM,
+                "Engine_heuristic_descriptor failed to get heuristic mode: Invalid element count.");
+
+    THROW_IF_NULL(array_of_elements,
+                  HIPDNN_STATUS_BAD_PARAM_NULL_POINTER,
+                  "Engine_heuristic_descriptor failed to get heuristic mode: Null pointer.");
+
+    if(element_count != nullptr)
+    {
+        *element_count = 1;
+    }
+
+    auto heur_mode_out = static_cast<hipdnnBackendHeurMode_t*>(array_of_elements);
+    *heur_mode_out = _heuristic_mode;
 }
 
 } // namespace hipdnn_backend
