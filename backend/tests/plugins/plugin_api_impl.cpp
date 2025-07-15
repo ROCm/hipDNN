@@ -18,8 +18,7 @@ thread_local char Plugin_last_error_manager::last_error[HIPDNN_PLUGIN_ERROR_STRI
 #error "THROW_IF_NULL is already defined"
 #endif
 #define THROW_IF_NULL(value) \
-    PLUGIN_THROW_IF_NULL(value, HIPDNN_PLUGIN_STATUS_BAD_PARAM, \
-    #value " is null")
+    PLUGIN_THROW_IF_NULL(value, HIPDNN_PLUGIN_STATUS_BAD_PARAM, #value " is null")
 
 // Exported functions:
 

@@ -6,8 +6,8 @@
 
 #include <tuple>
 
-#include <hip/hip_runtime.h>
 #include "hipdnn_sdk/plugin/plugin_exception.hpp"
+#include <hip/hip_runtime.h>
 
 #include "engine_plugin_api_impl.hpp"
 #include "plugin_api_impl.hpp"
@@ -55,20 +55,19 @@ void run_engine(const uint32_t* input, uint32_t* output, uint32_t size)
     hipError_t error = hipGetLastError();
     if(error != hipSuccess)
     {
-        throw Hipdnn_plugin_exception(
-            HIPDNN_PLUGIN_STATUS_INTERNAL_ERROR,
-            "kernel launch failed, error: "
-                + std::string(hipGetErrorString(error)));
+        throw Hipdnn_plugin_exception(HIPDNN_PLUGIN_STATUS_INTERNAL_ERROR,
+                                      "kernel launch failed, error: "
+                                          + std::string(hipGetErrorString(error)));
     }
 }
 
 } // namespace
 
 void get_applicable_engine_ids(hipdnnEnginePluginHandle_t handle,
-                                               const hipdnnPluginConstData_t* op_graph,
-                                               int64_t* engine_ids,
-                                               uint32_t max_engines,
-                                               uint32_t* num_engines)
+                               const hipdnnPluginConstData_t* op_graph,
+                               int64_t* engine_ids,
+                               uint32_t max_engines,
+                               uint32_t* num_engines)
 {
     std::ignore = handle;
     std::ignore = op_graph;
@@ -85,18 +84,17 @@ void get_applicable_engine_ids(hipdnnEnginePluginHandle_t handle,
 void check_engine_id_validity(int64_t engine_id)
 {
     // Check if the engine_id is within the valid range.
-    if(engine_id < PLUGIN_FIRST_ENGINE_ID || engine_id >= PLUGIN_FIRST_ENGINE_ID + PLUGIN_NUM_ENGINES)
+    if(engine_id < PLUGIN_FIRST_ENGINE_ID
+       || engine_id >= PLUGIN_FIRST_ENGINE_ID + PLUGIN_NUM_ENGINES)
     {
-        throw Hipdnn_plugin_exception(
-            HIPDNN_PLUGIN_STATUS_INVALID_VALUE,
-            "invalid engine_id");
+        throw Hipdnn_plugin_exception(HIPDNN_PLUGIN_STATUS_INVALID_VALUE, "invalid engine_id");
     }
 }
 
 void get_engine_details(hipdnnEnginePluginHandle_t handle,
-                                        int64_t engine_id,
-                                        const hipdnnPluginConstData_t* op_graph,
-                                        hipdnnPluginConstData_t* engine_details)
+                        int64_t engine_id,
+                        const hipdnnPluginConstData_t* op_graph,
+                        hipdnnPluginConstData_t* engine_details)
 {
     std::ignore = handle;
     std::ignore = engine_id;
@@ -110,7 +108,7 @@ void get_engine_details(hipdnnEnginePluginHandle_t handle,
 }
 
 void destroy_engine_details(hipdnnEnginePluginHandle_t handle,
-                                            hipdnnPluginConstData_t* engine_details)
+                            hipdnnPluginConstData_t* engine_details)
 {
     std::ignore = handle;
 
@@ -120,8 +118,8 @@ void destroy_engine_details(hipdnnEnginePluginHandle_t handle,
 }
 
 size_t get_workspace_size(hipdnnEnginePluginHandle_t handle,
-                                        const hipdnnPluginConstData_t* engine_config,
-                                        const hipdnnPluginConstData_t* op_graph)
+                          const hipdnnPluginConstData_t* engine_config,
+                          const hipdnnPluginConstData_t* op_graph)
 {
     std::ignore = handle;
     std::ignore = engine_config;
@@ -145,9 +143,8 @@ hipdnnEnginePluginExecutionContext_t
     return execution_context;
 }
 
-void
-    destroy_execution_context(hipdnnEnginePluginHandle_t handle,
-                              hipdnnEnginePluginExecutionContext_t execution_context)
+void destroy_execution_context(hipdnnEnginePluginHandle_t handle,
+                               hipdnnEnginePluginExecutionContext_t execution_context)
 {
     std::ignore = handle;
 
@@ -156,10 +153,10 @@ void
 }
 
 void execute_op_graph(hipdnnEnginePluginHandle_t handle,
-                                      hipdnnEnginePluginExecutionContext_t execution_context,
-                                      void* workspace,
-                                      const hipdnnPluginDeviceBuffer_t* device_buffers,
-                                      uint32_t num_device_buffers)
+                      hipdnnEnginePluginExecutionContext_t execution_context,
+                      void* workspace,
+                      const hipdnnPluginDeviceBuffer_t* device_buffers,
+                      uint32_t num_device_buffers)
 {
     std::ignore = handle;
     std::ignore = execution_context;
@@ -167,13 +164,12 @@ void execute_op_graph(hipdnnEnginePluginHandle_t handle,
 
     if(num_device_buffers != 2)
     {
-        throw Hipdnn_plugin_exception(
-            HIPDNN_PLUGIN_STATUS_INVALID_VALUE,
-            "expected 2 device buffers, got "
-                + std::to_string(num_device_buffers));
+        throw Hipdnn_plugin_exception(HIPDNN_PLUGIN_STATUS_INVALID_VALUE,
+                                      "expected 2 device buffers, got "
+                                          + std::to_string(num_device_buffers));
     }
 
     run_engine(static_cast<const uint32_t*>(device_buffers[0].ptr),
-                      static_cast<uint32_t*>(device_buffers[1].ptr),
-                      GPU_DATA_SIZE);
+               static_cast<uint32_t*>(device_buffers[1].ptr),
+               GPU_DATA_SIZE);
 }

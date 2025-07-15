@@ -16,15 +16,13 @@ using namespace hipdnn_plugin;
 #error "THROW_IF_NULL is already defined"
 #endif
 #define THROW_IF_NULL(value) \
-    PLUGIN_THROW_IF_NULL(value, HIPDNN_PLUGIN_STATUS_BAD_PARAM, \
-    #value " is null")
+    PLUGIN_THROW_IF_NULL(value, HIPDNN_PLUGIN_STATUS_BAD_PARAM, #value " is null")
 
 #ifdef THROW_IF_EQ
 #error "THROW_IF_EQ is already defined"
 #endif
 #define THROW_IF_EQ(value, expected) \
-    PLUGIN_THROW_IF_EQ(value, expected, HIPDNN_PLUGIN_STATUS_INVALID_VALUE, \
-    #value " is " #expected)
+    PLUGIN_THROW_IF_EQ(value, expected, HIPDNN_PLUGIN_STATUS_INVALID_VALUE, #value " is " #expected)
 
 namespace
 {
