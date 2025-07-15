@@ -13,7 +13,7 @@ hipdnn_add_dependency(flatbuffers VERSION 23.1.21)
 # INTERFACE_INCLUDE_DIRECTORIES to be the correct value required for the hipdnn_sdk
 get_target_property(current_includes FlatBuffers INTERFACE_INCLUDE_DIRECTORIES)
 list(REMOVE_ITEM current_includes "$<INSTALL_INTERFACE:include/include>")
-list(APPEND current_includes "$<INSTALL_INTERFACE:${HIP_DNN_SDK_INSTALL_INCLUDE_DIR}/include>")
+list(APPEND current_includes "$<INSTALL_INTERFACE:${HIP_DNN_SDK_INSTALL_INCLUDE_DIR}>")
 set_target_properties(FlatBuffers PROPERTIES
     INTERFACE_INCLUDE_DIRECTORIES "${current_includes}"
 )
