@@ -142,6 +142,9 @@ TEST(HipDNNBackendTest, WillFailToFinalizeInvalidGraph)
 
     status = hipdnnBackendFinalize(descriptor);
     EXPECT_EQ(status, HIPDNN_STATUS_BAD_PARAM);
+
+    status = hipdnnBackendDestroyDescriptor(descriptor);
+    EXPECT_EQ(status, HIPDNN_STATUS_SUCCESS);
 }
 
 TEST(HipDNNBackendTest, WillFailToCreateGraphIfGraphIsNull)

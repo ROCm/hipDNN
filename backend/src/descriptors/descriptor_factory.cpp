@@ -46,6 +46,8 @@ void Descriptor_factory::create(hipdnnBackendDescriptorType_t descriptor_type,
                                    + hipdnn_get_backend_descriptor_type_name(descriptor_type)
                                    + " is not supported.");
     }
+
+    HIPDNN_LOG_INFO("Created descriptor: {:p}", static_cast<void*>(*descriptor));
 }
 
 void Descriptor_factory::create_graph_ext(hipdnnBackendDescriptor_t* descriptor,
@@ -70,6 +72,18 @@ void Descriptor_factory::create_graph_ext(hipdnnBackendDescriptor_t* descriptor,
     }
 
     *descriptor = graph_descriptor;
+
+    HIPDNN_LOG_INFO("Created graph descriptor: {:p}", static_cast<void*>(*descriptor));
+}
+
+void Descriptor_factory::destroy(hipdnnBackendDescriptor_t descriptor)
+{
+    THROW_IF_NULL(
+        descriptor, HIPDNN_STATUS_BAD_PARAM_NULL_POINTER, "hipdnnBackendDescriptor_t is null.");
+
+    delete descriptor;
+
+    HIPDNN_LOG_INFO("Destroyed descriptor: {:p}", static_cast<void*>(descriptor));
 }
 
 } // namespace hipdnn_backend
