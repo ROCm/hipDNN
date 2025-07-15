@@ -6,11 +6,6 @@ project(hipdnn_samples VERSION 0.0.1 LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 20)
 
 find_package(hip REQUIRED)
-
-# enable_language(HIP
-
-set(CMAKE_CXX_COMPILER /opt/rocm/bin/amdclang++)
-
 find_package(hipdnn_frontend CONFIG REQUIRED)
 find_package(hipdnn_backend CONFIG REQUIRED)
 find_package(hipdnn_sdk CONFIG REQUIRED)
