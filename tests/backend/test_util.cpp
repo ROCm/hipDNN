@@ -48,7 +48,11 @@ void populate_test_engine(hipdnnBackendDescriptor_t engine,
                           int64_t gidx,
                           bool finalize)
 {
-    create_test_graph(graph, handle);
+    if(*graph == nullptr)
+    {
+        create_test_graph(graph, handle);
+    }
+
     ASSERT_EQ(hipdnnBackendFinalize(*graph), HIPDNN_STATUS_SUCCESS);
     ASSERT_EQ(
         hipdnnBackendSetAttribute(
@@ -81,7 +85,11 @@ void populate_test_engine_config(hipdnnBackendDescriptor_t* engine_config,
                                  int64_t gidx,
                                  bool finalize)
 {
-    create_test_engine(engine, graph, handle, gidx);
+    if(*engine == nullptr)
+    {
+        create_test_engine(engine, graph, handle, gidx);
+    }
+
     ASSERT_EQ(hipdnnBackendSetAttribute(*engine_config,
                                         HIPDNN_ATTR_ENGINECFG_ENGINE,
                                         HIPDNN_TYPE_BACKEND_DESCRIPTOR,
@@ -120,7 +128,11 @@ void populate_test_execution_plan(hipdnnBackendDescriptor_t* execution_plan,
             *execution_plan, HIPDNN_ATTR_EXECUTION_PLAN_HANDLE, HIPDNN_TYPE_HANDLE, 1, &handle),
         HIPDNN_STATUS_SUCCESS);
 
-    create_test_engine_config(engine_config, engine, graph, handle, gidx, true);
+    if(*engine_config == nullptr)
+    {
+        create_test_engine_config(engine_config, engine, graph, handle, gidx, true);
+    }
+
     ASSERT_EQ(hipdnnBackendSetAttribute(*execution_plan,
                                         HIPDNN_ATTR_EXECUTION_PLAN_ENGINE_CONFIG,
                                         HIPDNN_TYPE_BACKEND_DESCRIPTOR,
@@ -143,6 +155,14 @@ void* allocate_tensor_memory([[maybe_unused]] const int64_t* dims,
     // For now, just return a dummy pointer
     void* memory = malloc(0);
     return memory;
+}
+
+void free_tensor_memory(void* data_ptr)
+{
+    if(data_ptr != nullptr)
+    {
+        free(data_ptr);
+    }
 }
 
 void set_tensor_mappings_in_variant_pack(hipdnnBackendDescriptor_t variant_pack,
@@ -223,22 +243,22 @@ DataType_t convert_backend_attribute_to_data_type(hipdnnBackendAttributeType_t b
     }
 }
 
-void create_and_initialize_backend_descriptor(hipdnnBackendDescriptor_t backend_descriptor,
+void create_and_initialize_backend_descriptor(hipdnnBackendDescriptor_t* backend_descriptor,
                                               const flatbuffers::DetachedBuffer& serialized_graph,
                                               hipdnnHandle_t handle)
 {
-    ASSERT_NE(backend_descriptor, nullptr);
+    ASSERT_EQ(*backend_descriptor, nullptr);
 
     auto status = hipdnnBackendCreateAndDeserializeGraph_ext(
-        &backend_descriptor, serialized_graph.data(), serialized_graph.size());
+        backend_descriptor, serialized_graph.data(), serialized_graph.size());
     ASSERT_EQ(status, HIPDNN_STATUS_SUCCESS);
 
     ASSERT_EQ(
         hipdnnBackendSetAttribute(
-            backend_descriptor, HIPDNN_ATTR_OPERATIONGRAPH_HANDLE, HIPDNN_TYPE_HANDLE, 1, &handle),
+            *backend_descriptor, HIPDNN_ATTR_OPERATIONGRAPH_HANDLE, HIPDNN_TYPE_HANDLE, 1, &handle),
         HIPDNN_STATUS_SUCCESS);
 
-    status = hipdnnBackendFinalize(backend_descriptor);
+    status = hipdnnBackendFinalize(*backend_descriptor);
     ASSERT_EQ(status, HIPDNN_STATUS_SUCCESS);
 }
 
