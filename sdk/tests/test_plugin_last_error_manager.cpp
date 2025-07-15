@@ -8,7 +8,7 @@
 using namespace hipdnn_plugin;
 
 // NOLINTNEXTLINE(modernize-avoid-c-arrays)
-thread_local char Plugin_last_error_manager::last_error[HIPDNN_MAX_ERROR_STRING_SIZE] = "";
+thread_local char Plugin_last_error_manager::last_error[HIPDNN_PLUGIN_ERROR_STRING_MAX_LENGTH] = "";
 
 TEST(PluginLastErrorManagerTest, SetAndGetLastErrorString)
 {

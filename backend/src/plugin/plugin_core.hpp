@@ -7,10 +7,12 @@
 #include <functional>
 #include <string_view>
 #include <type_traits>
+#include <utility>
 #include <vector>
 
 #include <hipdnn_sdk/logging/logger.hpp>
 #include <hipdnn_sdk/plugin/plugin_api_data_types.h>
+#include <hipdnn_sdk/plugin/plugin_data_type_helpers.hpp>
 
 #include "hipdnn_exception.hpp"
 #include "shared_library.hpp"
@@ -38,6 +40,19 @@ public:
 protected:
     // This function must not throw as it is used during error handling.
     std::string_view get_last_error_string() const noexcept;
+
+    template <typename Callable, typename... Args>
+    void invoke_plugin_function(const char* description, Callable&& func, Args&&... args) const
+    {
+        auto status = func(std::forward<Args>(args)...);
+        if(status != HIPDNN_PLUGIN_STATUS_SUCCESS)
+        {
+            throw Hipdnn_exception(HIPDNN_STATUS_PLUGIN_ERROR,
+                                   std::string("Failed to ") + description + ". Status: "
+                                       + to_string(status) + "(" + std::to_string(status) + ")"
+                                       + ", Error: " + std::string(get_last_error_string()));
+        }
+    }
 
     Shared_library _lib;
 
@@ -84,9 +99,10 @@ public:
 
                 HIPDNN_LOG_INFO("Plugin loaded successfully: {}", path.string());
                 // Print plugin name, version and type
-                HIPDNN_LOG_INFO("Plugin info: name={}, version={}, type={}",
+                HIPDNN_LOG_INFO("Plugin info: name={}, version={}, type={}({})",
                                 name,
                                 version,
+                                type,
                                 static_cast<int>(type));
             }
             catch(const Hipdnn_exception& e)
