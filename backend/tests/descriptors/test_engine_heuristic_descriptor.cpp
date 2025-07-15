@@ -50,8 +50,10 @@ public:
     {
         set_graph();
         set_heuristic_mode();
-        set_engine_ids();
         ASSERT_NO_THROW(_engine_heuristic->finalize());
+
+        // Engine Ids are set after finalization, and aren't set through the API.
+        set_engine_ids();
     }
 
 protected:
@@ -154,14 +156,15 @@ TEST_F(Engine_heuristic_descriptor_test, SetEngineHeuristicDescriptorUnsupported
 
 TEST_F(Engine_heuristic_descriptor_test, SetEngineIds)
 {
+    // Engine Ids get set after finalization of the heuristic, and aren't set through the API.
     std::vector<int64_t> engine_ids = {0, 1, 2};
 
-    ASSERT_NO_THROW(_engine_heuristic->set_engine_ids(engine_ids));
+    ASSERT_THROW_HIPDNN_STATUS(_engine_heuristic->set_engine_ids(engine_ids),
+                               HIPDNN_STATUS_INTERNAL_ERROR);
 
     make_engine_heuristic_finalized();
 
-    ASSERT_THROW_HIPDNN_STATUS(_engine_heuristic->set_engine_ids(engine_ids),
-                               HIPDNN_STATUS_NOT_INITIALIZED);
+    ASSERT_NO_THROW(_engine_heuristic->set_engine_ids(engine_ids));
 }
 
 TEST_F(Engine_heuristic_descriptor_test, SetAttrOnFinalizedEngineHeuristicDescriptor)
@@ -184,10 +187,24 @@ TEST_F(Engine_heuristic_descriptor_test, FinalizeEngineHeuristicDescriptor)
     ASSERT_THROW_HIPDNN_STATUS(_engine_heuristic->finalize(), HIPDNN_STATUS_BAD_PARAM);
 
     set_heuristic_mode();
-    ASSERT_THROW_HIPDNN_STATUS(_engine_heuristic->finalize(), HIPDNN_STATUS_BAD_PARAM);
+    ASSERT_NO_THROW(_engine_heuristic->finalize());
 
     set_engine_ids();
+
+    ASSERT_THROW_HIPDNN_STATUS(_engine_heuristic->finalize(), HIPDNN_STATUS_BAD_PARAM);
+}
+
+TEST_F(Engine_heuristic_descriptor_test, FinalizeEngineHeuristicDescriptorReverseOrder)
+{
+    ASSERT_THROW_HIPDNN_STATUS(_engine_heuristic->finalize(), HIPDNN_STATUS_BAD_PARAM);
+
+    set_heuristic_mode();
+    ASSERT_THROW_HIPDNN_STATUS(_engine_heuristic->finalize(), HIPDNN_STATUS_BAD_PARAM);
+
+    set_graph();
     ASSERT_NO_THROW(_engine_heuristic->finalize());
+
+    set_engine_ids();
 
     ASSERT_THROW_HIPDNN_STATUS(_engine_heuristic->finalize(), HIPDNN_STATUS_BAD_PARAM);
 }
@@ -332,10 +349,11 @@ TEST_F(Engine_heuristic_descriptor_test, GetEngineConfigsWithNoEngineIds)
 {
     set_graph();
     set_heuristic_mode();
-    std::vector<int64_t> engine_ids = {};
-    ASSERT_NO_THROW(_engine_heuristic->set_engine_ids(engine_ids));
 
     ASSERT_NO_THROW(_engine_heuristic->finalize());
+
+    std::vector<int64_t> engine_ids = {};
+    ASSERT_NO_THROW(_engine_heuristic->set_engine_ids(engine_ids));
 
     EXPECT_CALL(*_mock_graph, is_finalized()).WillRepeatedly(Return(true));
 
@@ -346,11 +364,8 @@ TEST_F(Engine_heuristic_descriptor_test, GetEngineConfigsWithNoEngineIds)
     }
 
     int64_t count = 0;
-    ASSERT_NO_THROW(_engine_heuristic->get_attribute(HIPDNN_ATTR_ENGINEHEUR_RESULTS,
-                                                     HIPDNN_TYPE_BACKEND_DESCRIPTOR,
-                                                     3,
-                                                     &count,
-                                                     configs.data()));
+    ASSERT_NO_THROW(_engine_heuristic->get_attribute(
+        HIPDNN_ATTR_ENGINEHEUR_RESULTS, HIPDNN_TYPE_BACKEND_DESCRIPTOR, 3, &count, configs.data()));
     ASSERT_EQ(count, 0);
 
     for(auto* config : configs)
@@ -361,10 +376,7 @@ TEST_F(Engine_heuristic_descriptor_test, GetEngineConfigsWithNoEngineIds)
 
 TEST_F(Engine_heuristic_descriptor_test, GetEngineConfigsRequestMoreThanAvailable)
 {
-    set_graph();
-    set_heuristic_mode();
-    set_engine_ids(); // Sets 3 engine IDs {0, 1, 2}
-    ASSERT_NO_THROW(_engine_heuristic->finalize());
+    make_engine_heuristic_finalized();
 
     EXPECT_CALL(*_mock_graph, is_finalized()).WillRepeatedly(Return(true));
 
@@ -375,11 +387,8 @@ TEST_F(Engine_heuristic_descriptor_test, GetEngineConfigsRequestMoreThanAvailabl
     }
 
     int64_t count = 0;
-    ASSERT_NO_THROW(_engine_heuristic->get_attribute(HIPDNN_ATTR_ENGINEHEUR_RESULTS,
-                                                     HIPDNN_TYPE_BACKEND_DESCRIPTOR,
-                                                     5,
-                                                     &count,
-                                                     configs.data()));
+    ASSERT_NO_THROW(_engine_heuristic->get_attribute(
+        HIPDNN_ATTR_ENGINEHEUR_RESULTS, HIPDNN_TYPE_BACKEND_DESCRIPTOR, 5, &count, configs.data()));
     ASSERT_EQ(count, 3);
 
     for(auto* config : configs)
@@ -390,18 +399,12 @@ TEST_F(Engine_heuristic_descriptor_test, GetEngineConfigsRequestMoreThanAvailabl
 
 TEST_F(Engine_heuristic_descriptor_test, GetEngineConfigsCountOnly)
 {
-    set_graph();
-    set_heuristic_mode();
-    set_engine_ids();
-    ASSERT_NO_THROW(_engine_heuristic->finalize());
+    make_engine_heuristic_finalized();
 
     EXPECT_CALL(*_mock_graph, is_finalized()).WillRepeatedly(Return(true));
 
     int64_t count = 0;
-    ASSERT_NO_THROW(_engine_heuristic->get_attribute(HIPDNN_ATTR_ENGINEHEUR_RESULTS,
-                                                     HIPDNN_TYPE_BACKEND_DESCRIPTOR,
-                                                     0,
-                                                     &count,
-                                                     nullptr));
+    ASSERT_NO_THROW(_engine_heuristic->get_attribute(
+        HIPDNN_ATTR_ENGINEHEUR_RESULTS, HIPDNN_TYPE_BACKEND_DESCRIPTOR, 0, &count, nullptr));
     ASSERT_EQ(count, 3);
 }

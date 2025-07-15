@@ -173,6 +173,12 @@ HIPDNN_BACKEND_EXPORT hipdnnStatus_t hipdnnBackendFinalize(hipdnnBackendDescript
             plugin_manager.initialize();
             plugin_manager.finalize_engine_config(descriptor);
         }
+        else if(descriptor->type == HIPDNN_BACKEND_ENGINEHEUR_DESCRIPTOR)
+        {
+            Plugin_manager plugin_manager;
+            plugin_manager.initialize();
+            plugin_manager.finalize_engine_heuristic(descriptor);
+        }
 
         LOG_API_SUCCESS(api_name, "");
     });

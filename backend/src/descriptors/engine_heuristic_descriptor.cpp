@@ -27,9 +27,9 @@ void Engine_heuristic_descriptor::finalize()
                   HIPDNN_STATUS_BAD_PARAM,
                   "Engine_heuristic_descriptor::finalize() failed: Graph is not set.");
 
-    THROW_IF_FALSE(_engine_ids_set,
+    THROW_IF_FALSE(_heuristic_mode_set,
                    HIPDNN_STATUS_BAD_PARAM,
-                   "Engine_heuristic_descriptor::finalize() failed: Engine IDs are not set.");
+                   "Engine_heuristic_descriptor::finalize() failed: Heuristic mode is not set.");
 
     hipdnnBackendDescriptor::finalize();
 }
@@ -238,7 +238,7 @@ void Engine_heuristic_descriptor::get_engine_configs(hipdnnBackendAttributeType_
             engine->set_attribute(
                 HIPDNN_ATTR_ENGINE_OPERATION_GRAPH, HIPDNN_TYPE_BACKEND_DESCRIPTOR, 1, &_graph);
             engine->finalize();
-            
+
             config->set_attribute(
                 HIPDNN_ATTR_ENGINECFG_ENGINE, HIPDNN_TYPE_BACKEND_DESCRIPTOR, 1, &engine);
         }
@@ -249,9 +249,10 @@ void Engine_heuristic_descriptor::get_engine_configs(hipdnnBackendAttributeType_
 
 void Engine_heuristic_descriptor::set_engine_ids(const std::vector<int64_t>& engine_ids)
 {
-    THROW_IF_TRUE(is_finalized(),
-                  HIPDNN_STATUS_NOT_INITIALIZED,
-                  "Engine_heuristic_descriptor::set_engine_ids() failed: Already finalized.");
+    THROW_IF_FALSE(is_finalized(),
+                   HIPDNN_STATUS_INTERNAL_ERROR,
+                   "Engine_heuristic_descriptor::set_engine_ids() failed: Not finalized before "
+                   "setting the applicable engine Ids.");
 
     _engine_ids = engine_ids;
     _engine_ids_set = true;

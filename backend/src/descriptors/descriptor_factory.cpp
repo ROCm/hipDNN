@@ -4,6 +4,7 @@
 #include "descriptor_factory.hpp"
 #include "engine_config_descriptor.hpp"
 #include "engine_descriptor.hpp"
+#include "engine_heuristic_descriptor.hpp"
 #include "error.hpp"
 #include "execution_plan_descriptor.hpp"
 #include "graph_descriptor.hpp"
@@ -39,6 +40,9 @@ void Descriptor_factory::create(hipdnnBackendDescriptorType_t descriptor_type,
         break;
     case HIPDNN_BACKEND_VARIANT_PACK_DESCRIPTOR:
         *descriptor = new Variant_descriptor();
+        break;
+    case HIPDNN_BACKEND_ENGINEHEUR_DESCRIPTOR:
+        *descriptor = new Engine_heuristic_descriptor();
         break;
     default:
         throw Hipdnn_exception(HIPDNN_STATUS_NOT_SUPPORTED,
