@@ -12,5 +12,3 @@
 extern const char* const PLUGIN_NAME;
 extern const char* const PLUGIN_VERSION;
 extern const hipdnnPluginType_t PLUGIN_TYPE;
-
-void set_last_error_string(const std::string& error);

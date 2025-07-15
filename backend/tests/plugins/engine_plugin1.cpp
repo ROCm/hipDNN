@@ -7,9 +7,12 @@
 #include <tuple>
 
 #include <hip/hip_runtime.h>
+#include <hipdnn_sdk/plugin/plugin_last_error_manager.hpp>
 
 #include "engine_plugin_api_impl.hpp"
 #include "plugin_api_impl.hpp"
+
+using namespace hipdnn_plugin;
 
 const char* const PLUGIN_NAME = "EnginePlugin1";
 const char* const PLUGIN_VERSION = "1.0";
@@ -52,9 +55,10 @@ hipdnnPluginStatus_t run_engine(const uint32_t* input, uint32_t* output, uint32_
     hipError_t error = hipGetLastError();
     if(error != hipSuccess)
     {
-        set_last_error_string("hipdnnPluginRunEngine: kernel launch failed, error: "
-                              + std::string(hipGetErrorString(error)));
-        return HIPDNN_PLUGIN_STATUS_INTERNAL_ERROR;
+        return Plugin_last_error_manager::set_last_error(
+            HIPDNN_PLUGIN_STATUS_INTERNAL_ERROR,
+            "hipdnnPluginRunEngine: kernel launch failed, error: "
+                + std::string(hipGetErrorString(error)));
     }
     return HIPDNN_PLUGIN_STATUS_SUCCESS;
 }
@@ -105,8 +109,9 @@ hipdnnPluginStatus_t get_engine_details(hipdnnEnginePluginHandle_t handle,
     }
     catch(const std::bad_alloc&)
     {
-        set_last_error_string("hipdnnEnginePluginGetEngineDetails: memory allocation failed");
-        return HIPDNN_PLUGIN_STATUS_ALLOC_FAILED;
+        return Plugin_last_error_manager::set_last_error(
+            HIPDNN_PLUGIN_STATUS_ALLOC_FAILED,
+            "hipdnnEnginePluginGetEngineDetails: memory allocation failed");
     }
     engine_details->size = size;
     return HIPDNN_PLUGIN_STATUS_SUCCESS;
@@ -155,8 +160,9 @@ hipdnnPluginStatus_t
     }
     catch(const std::bad_alloc&)
     {
-        set_last_error_string("hipdnnEnginePluginCreateExecutionContext: memory allocation failed");
-        return HIPDNN_PLUGIN_STATUS_ALLOC_FAILED;
+        return Plugin_last_error_manager::set_last_error(
+            HIPDNN_PLUGIN_STATUS_ALLOC_FAILED,
+            "hipdnnEnginePluginCreateExecutionContext: memory allocation failed");
     }
     return HIPDNN_PLUGIN_STATUS_SUCCESS;
 }
@@ -184,9 +190,10 @@ hipdnnPluginStatus_t execute_op_graph(hipdnnEnginePluginHandle_t handle,
 
     if(num_device_buffers != 2)
     {
-        set_last_error_string("hipdnnEnginePluginExecuteOpGraph: expected 2 device buffers, got "
-                              + std::to_string(num_device_buffers));
-        return HIPDNN_PLUGIN_STATUS_INVALID_VALUE;
+        return Plugin_last_error_manager::set_last_error(
+            HIPDNN_PLUGIN_STATUS_INVALID_VALUE,
+            "hipdnnEnginePluginExecuteOpGraph: expected 2 device buffers, got "
+                + std::to_string(num_device_buffers));
     }
 
     return run_engine(static_cast<const uint32_t*>(device_buffers[0].ptr),
