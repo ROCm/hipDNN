@@ -293,7 +293,7 @@ HIPDNN_BACKEND_EXPORT void hipdnnLoggingCallback_ext(hipdnnSeverity_t severity, 
     {
         return;
     }
-    // Send pre-formatted logs to output file
+
     switch(severity)
     {
     case HIPDNN_SEV_FATAL:

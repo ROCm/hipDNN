@@ -1,7 +1,6 @@
 // Copyright © Advanced Micro Devices, Inc., or its affiliates.
 // SPDX-License-Identifier:  MIT
 
-#include <chrono>
 #include <hipdnn_backend/hipdnn_backend.h>
 #include <hipdnn_frontend/attributes/batchnorm_inference_attributes.hpp>
 #include <hipdnn_frontend/attributes/pointwise_attributes.hpp>
@@ -11,7 +10,6 @@
 #include <hipdnn_sdk/logging/logger.hpp>
 #include <iostream>
 #include <memory>
-#include <thread>
 
 using namespace hipdnn_frontend;
 using namespace hipdnn_frontend::graph;

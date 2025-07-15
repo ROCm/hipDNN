@@ -10,8 +10,5 @@ int main(int argc, char** argv)
 {
     ::testing::InitGoogleTest(&argc, argv);
 
-    // hipdnn::logging::initialize_logger_to_std_out("miopen_legacy_plugin");
-    // hipdnn::logging::set_log_level("info");
-
     return RUN_ALL_TESTS();
 }

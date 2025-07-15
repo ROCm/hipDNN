@@ -10,8 +10,5 @@ int main(int argc, char** argv)
 {
     ::testing::InitGoogleTest(&argc, argv);
 
-    // hipdnn::logging::initialize_logging_based_on_environment_variables("backend_tests");
-    // hipdnn::logging::set_log_level("info");
-
     return RUN_ALL_TESTS();
 }

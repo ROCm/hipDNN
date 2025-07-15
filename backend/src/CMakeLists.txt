@@ -39,12 +39,10 @@ add_library(hipdnn_backend SHARED
     hipdnn_backend.cpp
 )
 
-
 target_include_directories(hipdnn_backend 
     SYSTEM PUBLIC 
         ${HIP_INCLUDE_DIRS}
     PUBLIC 
-        # System library for now
         $<BUILD_INTERFACE:${HIP_DNN_BACKEND_INCLUDE_DIR}>
         $<BUILD_INTERFACE:${HIP_DNN_BACKEND_EXPORT_INCLUDE_DIR}>
         $<INSTALL_INTERFACE:include/hipdnn_backend>

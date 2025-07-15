@@ -158,7 +158,7 @@ TEST(PluginManagerTest, SetLoggingCallback)
     std::vector<std::filesystem::path> plugin_paths = {"./hipdnn_test_plugin1"};
     plugin_manager.load_plugins(plugin_paths);
 
-    // This is bad but necessary unless we overload `get_plugins` to return a non-const vector
+    // This is bad but necessary unless we overload `get_plugins` to return a non-const vector.
     // The purpose of this test is only to check the setter functionality.
     auto& plugins = const_cast<std::vector<Plugin>&>(plugin_manager.get_plugins());
     ASSERT_EQ(plugins.size(), 1);
