@@ -1,0 +1,70 @@
+// Copyright © Advanced Micro Devices, Inc., or its affiliates.
+// SPDX-License-Identifier:  MIT
+
+#pragma once
+
+#include <hipdnn_sdk/logging/logger.hpp>
+#include <hipdnn_sdk/plugin/plugin_api_data_types.h>
+#include <ostream>
+
+inline const char* to_string(hipdnnPluginStatus_t status)
+{
+    switch(status)
+    {
+    case HIPDNN_PLUGIN_STATUS_SUCCESS:
+        return "HIPDNN_PLUGIN_STATUS_SUCCESS";
+    case HIPDNN_PLUGIN_STATUS_BAD_PARAM:
+        return "HIPDNN_PLUGIN_STATUS_BAD_PARAM";
+    case HIPDNN_PLUGIN_STATUS_INVALID_VALUE:
+        return "HIPDNN_PLUGIN_STATUS_INVALID_VALUE";
+    case HIPDNN_PLUGIN_STATUS_INTERNAL_ERROR:
+        return "HIPDNN_PLUGIN_STATUS_INTERNAL_ERROR";
+    case HIPDNN_PLUGIN_STATUS_ALLOC_FAILED:
+        return "HIPDNN_PLUGIN_STATUS_ALLOC_FAILED";
+    default:
+        return "HIPDNN_PLUGIN_STATUS_UNKNOWN";
+    }
+}
+
+inline std::ostream& operator<<(std::ostream& os, hipdnnPluginStatus_t status)
+{
+    return os << to_string(status);
+}
+
+template <>
+struct fmt::formatter<hipdnnPluginStatus_t> : fmt::formatter<const char*>
+{
+    template <typename FormatContext>
+    auto format(hipdnnPluginStatus_t status, FormatContext& ctx) const
+    {
+        return fmt::formatter<const char*>::format(to_string(status), ctx);
+    }
+};
+
+inline const char* to_string(hipdnnPluginType_t type)
+{
+    switch(type)
+    {
+    case HIPDNN_PLUGIN_TYPE_UNSPECIFIED:
+        return "HIPDNN_PLUGIN_TYPE_UNSPECIFIED";
+    case HIPDNN_PLUGIN_TYPE_ENGINE:
+        return "HIPDNN_PLUGIN_TYPE_ENGINE";
+    default:
+        return "HIPDNN_PLUGIN_TYPE_UNKNOWN";
+    }
+}
+
+inline std::ostream& operator<<(std::ostream& os, hipdnnPluginType_t type)
+{
+    return os << to_string(type);
+}
+
+template <>
+struct fmt::formatter<hipdnnPluginType_t> : fmt::formatter<const char*>
+{
+    template <typename FormatContext>
+    auto format(hipdnnPluginType_t type, FormatContext& ctx) const
+    {
+        return fmt::formatter<const char*>::format(to_string(type), ctx);
+    }
+};
