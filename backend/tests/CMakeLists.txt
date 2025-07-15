@@ -65,10 +65,16 @@ add_dependencies(hipdnn_backend_tests hipdnn_test_plugin2)
 add_library(hipdnn_test_engine_plugin1 SHARED plugins/plugin_api_impl.cpp plugins/engine_plugin_api_impl.cpp plugins/engine_plugin1.cpp)
 # TODO Use HIP RTC
 set_source_files_properties(plugins/engine_plugin1.cpp PROPERTIES LANGUAGE HIP)
-set_source_files_properties(plugins/engine_plugin1.cpp PROPERTIES COMPILE_FLAGS --offload-arch=gfx90a --offload-arch=gfx942 --offload-arch=gfx1100 --offload-arch=gfx1151 --offload-arch=gfx1201)
+if (DEFINED GPU_TARGETS)
+    set_property(TARGET hipdnn_test_engine_plugin1 PROPERTY HIP_ARCHITECTURES ${GPU_TARGETS})
+else()
+    get_property(GPU_TARGETS GLOBAL PROPERTY HIP_ARCHITECTURES)
+endif()
+message(STATUS "Architectures for hipdnn_test_engine_plugin1: ${GPU_TARGETS}")
 target_link_libraries(hipdnn_test_engine_plugin1 PRIVATE hipdnn_sdk hip::host)
 set_target_properties(hipdnn_test_engine_plugin1 PROPERTIES CXX_VISIBILITY_PRESET hidden)
 target_compile_options(hipdnn_test_engine_plugin1 PRIVATE ${HIPDNN_WARNING_COMPILE_OPTIONS})
+
 clang_tidy_check(hipdnn_test_engine_plugin1)
 add_dependencies(hipdnn_backend_tests hipdnn_test_engine_plugin1)
 

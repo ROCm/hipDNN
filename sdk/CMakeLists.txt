@@ -1,6 +1,7 @@
 # Copyright © Advanced Micro Devices, Inc., or its affiliates.
 # SPDX-License-Identifier: MIT
 
+include(GNUInstallDirs)
 SET(HIP_DNN_SDK_INSTALL_INCLUDE_DIR "${CMAKE_INSTALL_INCLUDEDIR}/hipdnn/sdk")
 
 hipdnn_add_dependency(flatbuffers VERSION 23.1.21)
@@ -12,7 +13,7 @@ hipdnn_add_dependency(flatbuffers VERSION 23.1.21)
 # INTERFACE_INCLUDE_DIRECTORIES to be the correct value required for the hipdnn_sdk
 get_target_property(current_includes FlatBuffers INTERFACE_INCLUDE_DIRECTORIES)
 list(REMOVE_ITEM current_includes "$<INSTALL_INTERFACE:include/include>")
-list(APPEND current_includes "$<INSTALL_INTERFACE:${HIP_DNN_SDK_INSTALL_INCLUDE_DIR}/include>")
+list(APPEND current_includes "$<INSTALL_INTERFACE:${HIP_DNN_SDK_INSTALL_INCLUDE_DIR}>")
 set_target_properties(FlatBuffers PROPERTIES
     INTERFACE_INCLUDE_DIRECTORIES "${current_includes}"
 )
@@ -58,7 +59,7 @@ target_link_libraries(hipdnn_sdk INTERFACE FlatBuffers spdlog_header_only)
 
 target_include_directories(hipdnn_sdk INTERFACE
     $<BUILD_INTERFACE:${HIP_DNN_SDK_INCLUDE_DIR}>
-    $<INSTALL_INTERFACE:${HIP_DNN_SDK_INSTALL_INCLUDE_DIR}/include>
+    $<INSTALL_INTERFACE:${HIP_DNN_SDK_INSTALL_INCLUDE_DIR}>
 )
 
 install( 
@@ -68,7 +69,7 @@ install(
 
 #todo, get spdlog to install its headers
 install(
-    DIRECTORY ${HIP_DNN_SDK_INCLUDE_DIR} ${HIP_DNN_FLATBUFFERS_INCLUDE_DIR} ${HIP_DNN_SPDLOG_INCLUDE_DIR}
+    DIRECTORY ${HIP_DNN_SDK_INCLUDE_DIR}/ ${HIP_DNN_FLATBUFFERS_INCLUDE_DIR}/ ${HIP_DNN_SPDLOG_INCLUDE_DIR}/
     DESTINATION ${HIP_DNN_SDK_INSTALL_INCLUDE_DIR}
 )
 

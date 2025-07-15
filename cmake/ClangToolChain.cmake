@@ -5,11 +5,13 @@
 
 if(UNIX)
     set(ROCM_LLVM_BIN_DIR /opt/rocm/llvm/bin)
+    set(ROCM_LLVM_LIB_DIR /opt/rocm/llvm/lib)
 
     if(EXISTS ${ROCM_LLVM_BIN_DIR})
         # Set the C and C++ compilers to clang and clang++ with a specific directory hint
         set(CMAKE_C_COMPILER ${ROCM_LLVM_BIN_DIR}/clang)
         set(CMAKE_CXX_COMPILER ${ROCM_LLVM_BIN_DIR}/clang++)
+        set(CMAKE_SYMBOLIZER ${ROCM_LLVM_BIN_DIR}/llvm-symbolizer)
     else()
         message(WARNING "The directory /opt/rocm/llvm/bin does not exist. Cannot auto select clang compilers.")
     endif()

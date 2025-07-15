@@ -32,9 +32,9 @@ option(HIP_DNN_BUILD_FRONTEND "Build the frontend code" ON)
 option(HIP_DNN_SKIP_TESTS "Skips building all tests" OFF)
 option(HIP_DNN_BUILD_PLUGINS "Builds the plugins as part of the main cmake" OFF)
 
-
 option(CODE_COVERAGE "Build with code coverage flags" OFF)
 option(ENABLE_CLANG_TIDY "Enable Clang-Tidy checks" ON)
+option(BUILD_ADDRESS_SANITIZER "Build with Address Sanitizer enabled" OFF)
 
 list(
     APPEND
@@ -61,13 +61,14 @@ list(
 include(cmake/Dependencies.cmake)
 include(cmake/ClangCheck.cmake)
 include(cmake/ClangTidy.cmake)
+include(cmake/Sanitizers.cmake)
 
 hipdnn_add_dependency(GTest v1.16.0)
 
 enable_testing() # Cmake wont discover or run tests without this line
 
 # Add a check target which will run all tests discovered by gtest_discover_tests via ctest. 
-add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND} --output-on-failure -C ${CMAKE_CFG_INTDIR})
+add_custom_target(check COMMAND ${TEST_ENVIRONMENT} ${CMAKE_CTEST_COMMAND} --output-on-failure -C ${CMAKE_CFG_INTDIR})
 
 # Add global compile options
 set(EXTRA_COMPILE_OPTIONS)

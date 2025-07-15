@@ -4,6 +4,6 @@
 - Once those are installed, inside the samples directory, run the following commands:
     - `mkdir build`
     - `cd build`
-    - `cmake ..`
+    - `cmake -DCMAKE_CXX_COMPILER=/opt/rocm/bin/amdclang++ ..`
     - `make -j`
 - inside the build folder will be hipdnn_samples which can now be ran

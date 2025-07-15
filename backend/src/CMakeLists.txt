@@ -4,6 +4,7 @@
 find_package(hip REQUIRED)
 
 set(HIP_DNN_BACKEND_EXPORT_INCLUDE_DIR "${PROJECT_BINARY_DIR}/backend/include/")
+set(HIP_DNN_BACKEND_INSTALL_INCLUDE_DIR "${CMAKE_INSTALL_INCLUDEDIR}/hipdnn/backend")
 set(HIP_DNN_BACKEND_SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 
 add_library(hipdnn_backend_private
@@ -42,8 +43,10 @@ target_include_directories(hipdnn_backend
     SYSTEM PUBLIC 
         ${HIP_INCLUDE_DIRS}
     PUBLIC 
-        ${HIP_DNN_BACKEND_INCLUDE_DIR}
-        ${HIP_DNN_BACKEND_EXPORT_INCLUDE_DIR})
+        $<BUILD_INTERFACE:${HIP_DNN_BACKEND_INCLUDE_DIR}>
+        $<INSTALL_INTERFACE:${HIP_DNN_BACKEND_INSTALL_INCLUDE_DIR}>
+        $<BUILD_INTERFACE:${HIP_DNN_BACKEND_EXPORT_INCLUDE_DIR}>
+    )
 
 target_compile_options(hipdnn_backend PRIVATE ${HIPDNN_WARNING_COMPILE_OPTIONS})
 # This definition is used to enable logging in the backend.  It is #ifdef'ed in the backend code.
@@ -60,3 +63,24 @@ include( GenerateExportHeader )
 generate_export_header( hipdnn_backend 
                         EXPORT_FILE_NAME 
                         ${HIP_DNN_BACKEND_EXPORT_INCLUDE_DIR}/hipdnn_backend_export.h )
+
+install( 
+    TARGETS hipdnn_backend
+    EXPORT hipdnn_backend_targets
+)
+
+install(
+    DIRECTORY ${HIP_DNN_BACKEND_INCLUDE_DIR}/
+    DESTINATION ${HIP_DNN_BACKEND_INSTALL_INCLUDE_DIR}
+)
+
+install(
+    FILES ${HIP_DNN_BACKEND_EXPORT_INCLUDE_DIR}/hipdnn_backend_export.h
+    DESTINATION ${HIP_DNN_BACKEND_INSTALL_INCLUDE_DIR}
+)
+
+install(
+    EXPORT hipdnn_backend_targets
+    DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/cmake/hipdnn_backend
+    FILE hipdnn_backendConfig.cmake
+)

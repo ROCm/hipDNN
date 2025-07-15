@@ -129,7 +129,7 @@ HIPDNN_BACKEND_EXPORT hipdnnStatus_t
     return hipdnn_backend::try_catch([&, api_name = __func__]() {
         throw_if_invalid_descriptor(descriptor);
 
-        delete descriptor;
+        hipdnn_backend::Descriptor_factory::destroy(descriptor);
 
         LOG_API_SUCCESS(api_name, "");
     });
