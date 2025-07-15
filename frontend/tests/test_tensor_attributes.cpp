@@ -115,7 +115,8 @@ TEST(TensorAttributesTests, PackAttributes)
     auto buffer_pointer = builder.GetBufferPointer();
     auto tensor_attributes_flatbuffer
         = flatbuffers::GetRoot<hipdnn_sdk::data_objects::TensorAttributes>(buffer_pointer);
-    auto unpacked = tensor_attributes_flatbuffer->UnPack();
+    auto unpacked = std::unique_ptr<hipdnn_sdk::data_objects::TensorAttributesT>(
+        tensor_attributes_flatbuffer->UnPack());
 
     EXPECT_EQ(unpacked->uid, 1);
     EXPECT_EQ(unpacked->name, "PackedTensor");

@@ -23,24 +23,6 @@ protected:
     void SetUp() override
     {
         ASSERT_EQ(hipdnnCreate(&_handle), HIPDNN_STATUS_SUCCESS);
-
-        EXPECT_EQ(hipdnnBackendCreateDescriptor(HIPDNN_BACKEND_ENGINE_DESCRIPTOR, &_engine),
-                  HIPDNN_STATUS_SUCCESS);
-
-        EXPECT_EQ(
-            hipdnnBackendCreateDescriptor(HIPDNN_BACKEND_ENGINECFG_DESCRIPTOR, &_engine_config),
-            HIPDNN_STATUS_SUCCESS);
-
-        EXPECT_EQ(hipdnnBackendCreateDescriptor(HIPDNN_BACKEND_EXECUTION_PLAN_DESCRIPTOR, &_plan),
-                  HIPDNN_STATUS_SUCCESS);
-
-        EXPECT_EQ(
-            hipdnnBackendCreateDescriptor(HIPDNN_BACKEND_VARIANT_PACK_DESCRIPTOR, &_variant_pack),
-            HIPDNN_STATUS_SUCCESS);
-
-        EXPECT_EQ(hipdnnBackendCreateDescriptor(HIPDNN_BACKEND_OPERATIONGRAPH_DESCRIPTOR,
-                                                &_graph_descriptor),
-                  HIPDNN_STATUS_SUCCESS);
     }
 
     void TearDown() override
@@ -79,9 +61,13 @@ TEST_F(Execution_backend_end_api_tests, TestBackendExecuteWithNullHandle)
     graph.set_name("BatchnormInferenceGraph");
     test_util::create_and_populate_batchnorm_node(graph);
 
-    test_util::create_and_initialize_backend_descriptor(_graph_descriptor, graph.serialized_graph);
+    test_util::create_and_initialize_backend_descriptor(&_graph_descriptor, graph.serialized_graph);
     test_util::create_test_engine(&_engine, &_graph_descriptor, GIDX);
     test_util::create_test_engine_config(&_engine_config, &_engine, &_graph_descriptor, GIDX, true);
+
+    EXPECT_EQ(hipdnnBackendCreateDescriptor(HIPDNN_BACKEND_EXECUTION_PLAN_DESCRIPTOR, &_plan),
+              HIPDNN_STATUS_SUCCESS);
+
     test_util::populate_test_execution_plan(
         &_plan, &_handle, &_engine_config, &_engine, &_graph_descriptor, GIDX, true);
 
@@ -95,9 +81,13 @@ TEST_F(Execution_backend_end_api_tests, TestBackendExecuteWithNullDescriptors)
     graph.set_name("BatchnormInferenceGraph");
     test_util::create_and_populate_batchnorm_node(graph);
 
-    test_util::create_and_initialize_backend_descriptor(_graph_descriptor, graph.serialized_graph);
+    test_util::create_and_initialize_backend_descriptor(&_graph_descriptor, graph.serialized_graph);
     test_util::create_test_engine(&_engine, &_graph_descriptor, GIDX);
     test_util::create_test_engine_config(&_engine_config, &_engine, &_graph_descriptor, GIDX, true);
+
+    EXPECT_EQ(hipdnnBackendCreateDescriptor(HIPDNN_BACKEND_EXECUTION_PLAN_DESCRIPTOR, &_plan),
+              HIPDNN_STATUS_SUCCESS);
+
     test_util::populate_test_execution_plan(
         &_plan, &_handle, &_engine_config, &_engine, &_graph_descriptor, GIDX, true);
 
@@ -118,7 +108,11 @@ TEST_F(Execution_backend_end_api_tests, TestBackendExecuteWithUnfinalizedPlan)
     graph.set_name("BatchnormInferenceGraph");
     test_util::create_and_populate_batchnorm_node(graph);
 
-    test_util::create_and_initialize_backend_descriptor(_graph_descriptor, graph.serialized_graph);
+    test_util::create_and_initialize_backend_descriptor(&_graph_descriptor, graph.serialized_graph);
+
+    ASSERT_EQ(hipdnnBackendCreateDescriptor(HIPDNN_BACKEND_VARIANT_PACK_DESCRIPTOR, &_variant_pack),
+              HIPDNN_STATUS_SUCCESS);
+
     ASSERT_EQ(hipdnnBackendExecute(_handle, unfinalized_plan, _variant_pack),
               HIPDNN_STATUS_BAD_PARAM);
 
@@ -131,9 +125,16 @@ TEST_F(Execution_backend_end_api_tests, TestBackendExecuteWithWrongDescriptorTyp
     graph.set_name("BatchnormInferenceGraph");
     test_util::create_and_populate_batchnorm_node(graph);
 
-    test_util::create_and_initialize_backend_descriptor(_graph_descriptor, graph.serialized_graph);
+    test_util::create_and_initialize_backend_descriptor(&_graph_descriptor, graph.serialized_graph);
+    test_util::create_test_engine(&_engine, &_graph_descriptor, GIDX);
+
+    ASSERT_EQ(hipdnnBackendCreateDescriptor(HIPDNN_BACKEND_VARIANT_PACK_DESCRIPTOR, &_variant_pack),
+              HIPDNN_STATUS_SUCCESS);
 
     ASSERT_EQ(hipdnnBackendExecute(_handle, _engine, _variant_pack), HIPDNN_STATUS_BAD_PARAM);
+
+    EXPECT_EQ(hipdnnBackendCreateDescriptor(HIPDNN_BACKEND_EXECUTION_PLAN_DESCRIPTOR, &_plan),
+              HIPDNN_STATUS_SUCCESS);
 
     test_util::populate_test_execution_plan(
         &_plan, &_handle, &_engine_config, &_engine, &_graph_descriptor, GIDX, true);
@@ -153,9 +154,13 @@ TEST_F(Execution_backend_end_api_tests, TestBackendExecute)
     test_util::extract_tensor_info_from_graph(
         graph.serialized_graph, uid_to_name_map, name_to_uid_map, uid_to_dims_map);
 
-    test_util::create_and_initialize_backend_descriptor(_graph_descriptor, graph.serialized_graph);
+    test_util::create_and_initialize_backend_descriptor(&_graph_descriptor, graph.serialized_graph);
     test_util::create_test_engine(&_engine, &_graph_descriptor, GIDX);
     test_util::create_test_engine_config(&_engine_config, &_engine, &_graph_descriptor, GIDX, true);
+
+    EXPECT_EQ(hipdnnBackendCreateDescriptor(HIPDNN_BACKEND_EXECUTION_PLAN_DESCRIPTOR, &_plan),
+              HIPDNN_STATUS_SUCCESS);
+
     test_util::populate_test_execution_plan(
         &_plan, &_handle, &_engine_config, &_engine, &_graph_descriptor, GIDX, true);
 
@@ -178,4 +183,9 @@ TEST_F(Execution_backend_end_api_tests, TestBackendExecute)
     test_util::populate_variant_pack_with_mappings(_variant_pack, data_ptr_mappings, nullptr);
 
     ASSERT_EQ(hipdnnBackendExecute(_handle, _plan, _variant_pack), HIPDNN_STATUS_SUCCESS);
+
+    for(const auto& [uid, data_ptr] : data_ptr_mappings)
+    {
+        test_util::free_tensor_memory(data_ptr);
+    }
 }

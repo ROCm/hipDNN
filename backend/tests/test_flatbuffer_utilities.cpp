@@ -72,15 +72,9 @@ TEST_F(Flatbuffer_utilities_test, WillStillHaveValidGraphAfterBuilderDestructs)
     verify_graph(*graph);
 }
 
-class Flatbuffer_invalid_tests
-    : public Flatbuffer_utilities_test,
-      public ::testing::WithParamInterface<std::pair<const uint8_t*, size_t>>
+TEST(Flatbuffer_invalid_tests, WillNotUnpackNullBuffer)
 {
-};
-
-TEST_P(Flatbuffer_invalid_tests, WillNotUnpackInvalidBuffer)
-{
-    auto [buffer, size] = GetParam();
+    auto [buffer, size] = std::make_pair(static_cast<const uint8_t*>(nullptr), size_t(10));
 
     std::unique_ptr<hipdnn_sdk::data_objects::GraphT> graph;
     ASSERT_THROW_HIPDNN_STATUS(
@@ -89,17 +83,30 @@ TEST_P(Flatbuffer_invalid_tests, WillNotUnpackInvalidBuffer)
     ASSERT_EQ(graph, nullptr);
 }
 
-INSTANTIATE_TEST_SUITE_P(
-    InvalidBufferTests,
-    Flatbuffer_invalid_tests,
-    ::testing::Values(std::make_pair(static_cast<const uint8_t*>(nullptr), size_t(10)),
-                      std::make_pair(std::array<uint8_t, 10>{0}.data(), size_t(10)),
-                      []() { //Valid graph but incorrect data size
-                          auto builder = Flatbuffer_utilities_test::create_valid_graph();
-                          auto serialized_graph = builder.Release();
-                          return std::make_pair(serialized_graph.data(),
-                                                serialized_graph.size() - 20);
-                      }()));
+TEST(Flatbuffer_invalid_tests, WillNotUnpackInvalidBuffer)
+{
+    auto arr = std::array<uint8_t, 10>{0};
+    auto [buffer, size] = std::make_pair(arr.data(), size_t(10));
+
+    std::unique_ptr<hipdnn_sdk::data_objects::GraphT> graph;
+    ASSERT_THROW_HIPDNN_STATUS(
+        flatbuffer_utilities::convert_serialized_graph_to_graph(buffer, size, graph),
+        HIPDNN_STATUS_BAD_PARAM);
+    ASSERT_EQ(graph, nullptr);
+}
+
+TEST(Flatbuffer_invalid_tests, WillNotUnpackWrongSizeBuffer)
+{
+    auto builder = Flatbuffer_utilities_test::create_valid_graph();
+    auto serialized_graph = builder.Release();
+    auto [buffer, size] = std::make_pair(serialized_graph.data(), serialized_graph.size() - 20);
+
+    std::unique_ptr<hipdnn_sdk::data_objects::GraphT> graph;
+    ASSERT_THROW_HIPDNN_STATUS(
+        flatbuffer_utilities::convert_serialized_graph_to_graph(buffer, size, graph),
+        HIPDNN_STATUS_BAD_PARAM);
+    ASSERT_EQ(graph, nullptr);
+}
 
 } // namespace testing
 } // namespace hipdnn_backend
