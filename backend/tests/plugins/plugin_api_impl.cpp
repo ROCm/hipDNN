@@ -13,6 +13,7 @@
 // This prevents the shared object (plugin) from being unloaded until the program terminates.
 // NOLINTNEXTLINE(modernize-avoid-c-arrays)
 thread_local static char last_error_string[HIPDNN_PLUGIN_ERROR_STRING_MAX_LENGTH] = "";
+static hipdnnCallback_t logging_callback = nullptr;
 
 void set_last_error_string(const std::string& error)
 {
@@ -52,6 +53,18 @@ extern "C" hipdnnPluginStatus_t hipdnnPluginGetType(hipdnnPluginType_t* type)
         return HIPDNN_PLUGIN_STATUS_BAD_PARAM;
     }
     *type = PLUGIN_TYPE;
+    return HIPDNN_PLUGIN_STATUS_SUCCESS;
+}
+
+extern "C" hipdnnPluginStatus_t hipdnnPluginSetLoggingCallback(hipdnnCallback_t callback)
+{
+    if(callback == nullptr)
+    {
+        set_last_error_string("hipdnnPluginSetLoggingCallback: callback is null");
+        return HIPDNN_PLUGIN_STATUS_BAD_PARAM;
+    }
+    logging_callback = callback;
+    logging_callback(HIPDNN_SEV_INFO, "Logging callback successfully set for test plugin.");
     return HIPDNN_PLUGIN_STATUS_SUCCESS;
 }
 

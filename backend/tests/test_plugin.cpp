@@ -23,10 +23,12 @@ private:
     friend class plugin::Plugin_manager_base<Plugin>;
 };
 
-void dummy_callback(hipdnnSeverity_t severity, const char* msg)
+bool g_callback_was_called = false;
+void dummy_callback(hipdnnSeverity_t sev, const char* msg)
 {
-    (void)severity;
+    (void)sev;
     (void)msg;
+    g_callback_was_called = true;
 }
 
 } // namespace
@@ -150,22 +152,18 @@ TEST(PluginManagerTest, LastErrorOnSecondLoad)
     }
 }
 
-TEST(PluginManagerTest, SetCallbackForPlugins)
+TEST(PluginManagerTest, SetLoggingCallback)
 {
     plugin::Plugin_manager_base<Plugin> plugin_manager;
-
-    std::vector<std::filesystem::path> plugin_paths
-        = {"./hipdnn_test_plugin1", "./hipdnn_test_plugin2"};
-
+    std::vector<std::filesystem::path> plugin_paths = {"./hipdnn_test_plugin1"};
     plugin_manager.load_plugins(plugin_paths);
 
-    const auto& plugins = plugin_manager.get_plugins();
-    if(plugins.empty())
-    {
-        GTEST_SKIP() << "No test plugins available";
-        return;
-    }
+    // This is bad but necessary unless we overload `get_plugins` to return a non-const vector
+    // The purpose of this test is only to check the setter functionality.
+    auto& plugins = const_cast<std::vector<Plugin>&>(plugin_manager.get_plugins());
+    ASSERT_EQ(plugins.size(), 1);
 
-    auto status = plugin_manager.set_callback_for_all_plugins(dummy_callback);
-    EXPECT_EQ(status, HIPDNN_STATUS_SUCCESS);
+    EXPECT_EQ(plugins[0].set_logging_callback(dummy_callback), HIPDNN_PLUGIN_STATUS_SUCCESS);
+    EXPECT_TRUE(g_callback_was_called);
+    EXPECT_EQ(plugins[0].set_logging_callback(nullptr), HIPDNN_PLUGIN_STATUS_BAD_PARAM);
 }

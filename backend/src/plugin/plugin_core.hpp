@@ -106,22 +106,6 @@ public:
         return _plugins;
     }
 
-    hipdnnStatus_t set_callback_for_all_plugins(hipdnnCallback_t callback)
-    {
-        hipdnnStatus_t overall_status = HIPDNN_STATUS_SUCCESS;
-
-        for(auto& plugin : _plugins)
-        {
-            if(plugin.set_logging_callback(callback) != HIPDNN_PLUGIN_STATUS_SUCCESS)
-            {
-                HIPDNN_LOG_WARN("Failed to set logging callback for plugin {}", plugin.name());
-                overall_status = HIPDNN_STATUS_PLUGIN_ERROR;
-            }
-        }
-
-        return overall_status;
-    }
-
 private:
     std::vector<Plugin> _plugins;
 };
