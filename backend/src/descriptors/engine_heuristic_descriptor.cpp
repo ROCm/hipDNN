@@ -209,7 +209,7 @@ void Engine_heuristic_descriptor::get_engine_configs(hipdnnBackendAttributeType_
                       HIPDNN_STATUS_BAD_PARAM_NULL_POINTER,
                       "Engine_heuristic_descriptor failed to get engine config count: Null pointer "
                       "for element count.");
-        *element_count = _engine_ids.size();
+        *element_count = static_cast<int64_t>(_engine_ids.size());
     }
     else
     {
@@ -247,7 +247,7 @@ void Engine_heuristic_descriptor::get_engine_configs(hipdnnBackendAttributeType_
                 HIPDNN_ATTR_ENGINECFG_ENGINE, HIPDNN_TYPE_BACKEND_DESCRIPTOR, 1, &engine);
         }
 
-        *element_count = std::min(static_cast<size_t>(requested_element_count), _engine_ids.size());
+        *element_count = std::min(requested_element_count, static_cast<int64_t>(_engine_ids.size()));
     }
 }
 
