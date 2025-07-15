@@ -21,6 +21,8 @@ int64_t Miopen_engine::id() const
 
 bool Miopen_engine::is_applicable(const hipdnn_plugin::Graph_interface& op_graph) const
 {
+    // This is wrong if we ever have more than 1 solver thats applicable.
+    // If this is the case, we should split plan builders accross multiple engines.
     for(const auto& solver : _solvers)
     {
         if(solver->is_applicable(op_graph))
@@ -72,6 +74,7 @@ void Miopen_engine::execute_graph(const hipdnnEnginePluginHandle& handle,
         {
             solver->execute_graph(
                 handle, execution_context, device_buffers, num_device_buffers, workspace);
+            break;
         }
     }
 }

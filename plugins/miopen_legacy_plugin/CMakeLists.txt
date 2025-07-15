@@ -42,10 +42,13 @@ find_package(miopen CONFIG REQUIRED)
 add_library(miopen_legacy_plugin SHARED
     engines/miopen_engine.cpp
     engines/solvers/miopen_batchnorm_solver.cpp
+    engines/solvers/miopen_batchnorm_fwd_inference_plan.cpp
     engine_manager.cpp
     miopen_legacy_plugin.cpp
     miopen_handle_factory.cpp
     miopen_container.cpp
+    miopen_utils.cpp
+    miopen_tensor.cpp
 )
 
 target_include_directories(miopen_legacy_plugin 
