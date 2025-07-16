@@ -1,6 +1,8 @@
 // Copyright © Advanced Micro Devices, Inc., or its affiliates.
 // SPDX-License-Identifier:  MIT
 
+#include <hipdnn_backend.h>
+#include <hipdnn_frontend.hpp>
 #include <hipdnn_frontend/attributes/batchnorm_inference_attributes.hpp>
 #include <hipdnn_frontend/attributes/pointwise_attributes.hpp>
 #include <hipdnn_frontend/graph.hpp>
@@ -290,6 +292,23 @@ int main()
                     next_running_variance->get_uid()))
     {
         std::cout << "Batchnorm attribute mismatch: next_running_variance" << std::endl;
+        return EXIT_FAILURE;
+    }
+
+    hipdnnHandle_t handle;
+    hipdnnStatus_t status = hipdnnCreate(&handle);
+    if(status != HIPDNN_STATUS_SUCCESS)
+    {
+        std::cout << "Failed to create hipDNN handle: " << hipdnnGetErrorString(status)
+                  << std::endl;
+        return EXIT_FAILURE;
+    }
+
+    status = hipdnnDestroy(handle);
+    if(status != HIPDNN_STATUS_SUCCESS)
+    {
+        std::cout << "Failed to destroy hipDNN handle: " << hipdnnGetErrorString(status)
+                  << std::endl;
         return EXIT_FAILURE;
     }
 

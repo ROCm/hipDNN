@@ -13,6 +13,7 @@ class Handle_factory
 {
 public:
     static void create_handle(hipdnnHandle_t* handle);
+    static void destroy_handle(hipdnnHandle_t handle);
 };
 
 } // namespace hipdnn_backend
