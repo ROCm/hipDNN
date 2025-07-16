@@ -310,7 +310,7 @@ TEST_F(Engine_heuristic_descriptor_test, GetEngineHeuristicDescriptorEngineConfi
         HIPDNN_STATUS_BAD_PARAM_NULL_POINTER);
 
     std::vector<Engine_config_descriptor*> configs(3);
-    for(int i = 0; i < 3; ++i)
+    for(size_t i = 0; i < 3; ++i)
     {
         configs[i] = new Engine_config_descriptor();
     }
@@ -379,7 +379,7 @@ TEST_F(Engine_heuristic_descriptor_test, GetEngineConfigsWithNoEngineIds)
     EXPECT_CALL(*_mock_graph, is_finalized()).WillRepeatedly(Return(true));
 
     std::vector<Engine_config_descriptor*> configs(3);
-    for(int i = 0; i < 3; ++i)
+    for(size_t i = 0; i < 3; ++i)
     {
         configs[i] = new Engine_config_descriptor();
     }
@@ -402,7 +402,7 @@ TEST_F(Engine_heuristic_descriptor_test, GetEngineConfigsRequestMoreThanAvailabl
     EXPECT_CALL(*_mock_graph, is_finalized()).WillRepeatedly(Return(true));
 
     std::vector<Engine_config_descriptor*> configs(5);
-    for(int i = 0; i < 5; ++i)
+    for(size_t i = 0; i < 5; ++i)
     {
         configs[i] = new Engine_config_descriptor();
     }
@@ -412,10 +412,10 @@ TEST_F(Engine_heuristic_descriptor_test, GetEngineConfigsRequestMoreThanAvailabl
         HIPDNN_ATTR_ENGINEHEUR_RESULTS, HIPDNN_TYPE_BACKEND_DESCRIPTOR, 5, &count, configs.data()));
     ASSERT_EQ(count, 3);
 
-    for(int i = 0; i < 5; ++i)
+    for(size_t i = 0; i < 5; ++i)
     {
         // TODO: Internal memory not being tracked properly, and we need to manually free.
-        if(i < count)
+        if(i < static_cast<size_t>(count))
         {
             destroy_config(configs[i]);
         }

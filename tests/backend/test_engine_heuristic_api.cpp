@@ -354,7 +354,7 @@ TEST_F(Engine_heuristic_api_tests, GetEngineConfigs)
               HIPDNN_STATUS_SUCCESS);
     EXPECT_EQ(count, 1);
 
-    for(int i = 0; i < count; ++i)
+    for(size_t i = 0; i < static_cast<size_t>(count); ++i)
     {
         EXPECT_EQ(hipdnnBackendCreateDescriptor(HIPDNN_BACKEND_ENGINECFG_DESCRIPTOR, &configs[i]),
                   HIPDNN_STATUS_SUCCESS);
@@ -406,7 +406,7 @@ TEST_F(Engine_heuristic_api_tests, GetEngineConfigsRequestMoreThanAvailable)
     populate_engine_heuristic(true);
 
     std::vector<hipdnnBackendDescriptor_t> configs(5);
-    for(int i = 0; i < 5; ++i)
+    for(size_t i = 0; i < 5; ++i)
     {
         EXPECT_EQ(hipdnnBackendCreateDescriptor(HIPDNN_BACKEND_ENGINECFG_DESCRIPTOR, &configs[i]),
                   HIPDNN_STATUS_SUCCESS);
@@ -422,10 +422,10 @@ TEST_F(Engine_heuristic_api_tests, GetEngineConfigsRequestMoreThanAvailable)
               HIPDNN_STATUS_SUCCESS);
     EXPECT_EQ(count, 1);
 
-    for(int i = 0; i < 5; ++i)
+    for(size_t i = 0; i < 5; ++i)
     {
         // TODO: Internal memory not being tracked properly, and we need to manually free.
-        if(i < count)
+        if(i < static_cast<size_t>(count))
         {
             EXPECT_EQ(hipdnnBackendFinalize(configs[i]), HIPDNN_STATUS_SUCCESS);
             hipdnnBackendDescriptor_t engine = nullptr;
