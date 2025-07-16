@@ -56,19 +56,31 @@ void Miopen_batchnorm_plan_builder::build_plan(
        == hipdnn_sdk::data_objects::NodeAttributes_BatchnormInferenceAttributes)
     {
         //HIPDNN_LOG_INFO("Building batchnorm fwd inference plan for node: {}", node.name());
-        // I am d refing ptrs here. should check not null first.
-        auto fwd_inference_params = std::make_unique<Batchnorm_fwd_inference_params>(
-            *node.attributes_as_BatchnormInferenceAttributes(), op_graph.get_tensor_map());
 
-        auto batchnorm_fwd_plan
-            = std::make_unique<Batchnorm_fwd_inference_plan>(std::move(fwd_inference_params));
-        execution_context.set_plan(std::move(batchnorm_fwd_plan));
+        if(const auto* batchnorm_inference_attr = node.attributes_as_BatchnormInferenceAttributes();
+           batchnorm_inference_attr != nullptr)
+        {
+            auto fwd_inference_params = std::make_unique<Batchnorm_fwd_inference_params>(
+                *batchnorm_inference_attr, op_graph.get_tensor_map());
+
+            auto batchnorm_fwd_plan
+                = std::make_unique<Batchnorm_fwd_inference_plan>(std::move(fwd_inference_params));
+            execution_context.set_plan(std::move(batchnorm_fwd_plan));
+        }
+        else
+        {
+            throw hipdnn_plugin::Hipdnn_plugin_exception(
+                HIPDNN_PLUGIN_STATUS_BAD_PARAM,
+                "Failed to convert node attributes to BatchnormInferenceAttributes for node: "
+                    + node.name()->str());
+        }
     }
-
-    throw hipdnn_plugin::Hipdnn_plugin_exception(
-        HIPDNN_PLUGIN_STATUS_BAD_PARAM,
-        "Unsupported node type for batchnorm solver: "
-            + std::string(hipdnn_sdk::data_objects::to_string(node.attributes_type())));
+    else
+    {
+        throw hipdnn_plugin::Hipdnn_plugin_exception(
+            HIPDNN_PLUGIN_STATUS_BAD_PARAM,
+            "Unsupported node type for batchnorm solver: "
+                + std::string(hipdnn_sdk::data_objects::to_string(node.attributes_type())));
+    }
 }
-
 }

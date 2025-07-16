@@ -34,7 +34,7 @@ protected:
     hipdnnEnginePluginHandle_t _handle = nullptr;
 };
 
-TEST_F(Batchnorm_execute_graph_test, RunBatchnormGraph)
+TEST_F(Batchnorm_execute_graph_test, RunFwdbatchnormGraph)
 {
     std::vector<int64_t> strides = {1, 3, 224, 224}; // always in nchw
     std::vector<int64_t> dims = {1, 3, 224, 224};

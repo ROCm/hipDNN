@@ -19,6 +19,11 @@ struct hipdnnEnginePluginExecutionContext
 public:
     virtual ~hipdnnEnginePluginExecutionContext() = default;
 
+    bool has_valid_plan()
+    {
+        return _plan != nullptr;
+    }
+
     void set_plan(std::unique_ptr<miopen_legacy_plugin::Plan_interface> plan)
     {
         _plan = std::move(plan);

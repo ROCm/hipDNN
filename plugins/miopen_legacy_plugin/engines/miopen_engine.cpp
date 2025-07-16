@@ -71,7 +71,7 @@ void Miopen_engine::initialize_execution_context(
         if(solver->is_applicable(op_graph))
         {
             solver->build_plan(handle, op_graph, execution_context);
-            break; //todo, ensure this is tested
+            break;
         }
     }
 }

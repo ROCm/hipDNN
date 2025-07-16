@@ -284,14 +284,15 @@ TEST(MiopenLegacyEnginePluginApiTest, EnginePluginCreateExecutionContextNull)
 
 TEST(MiopenLegacyEnginePluginApiTest, EnginePluginCreateExecutionContextValid)
 {
-    auto handle = reinterpret_cast<hipdnnEnginePluginHandle_t>(0x1234);
+    hipdnnEnginePluginHandle_t handle = nullptr;
+    ASSERT_EQ(hipdnnEnginePluginCreate(&handle), HIPDNN_PLUGIN_STATUS_SUCCESS);
 
     auto builder = flatbuffer_test_utils::create_valid_batchnorm_graph();
     auto serialized_graph = builder.Release();
     hipdnnPluginConstData_t op_graph
         = flatbuffer_test_utils::create_valid_const_data_graph(serialized_graph);
 
-    auto engine_config_builder = flatbuffer_test_utils::create_valid_engine_config(123);
+    auto engine_config_builder = flatbuffer_test_utils::create_valid_engine_config(1);
     auto serialized_engine_config = engine_config_builder.Release();
     hipdnnPluginConstData_t engine_config
         = flatbuffer_test_utils::create_valid_const_data_engine_config(serialized_engine_config);
@@ -305,6 +306,7 @@ TEST(MiopenLegacyEnginePluginApiTest, EnginePluginCreateExecutionContextValid)
 
     EXPECT_EQ(hipdnnEnginePluginDestroyExecutionContext(handle, execution_context),
               HIPDNN_PLUGIN_STATUS_SUCCESS);
+    EXPECT_EQ(hipdnnEnginePluginDestroy(handle), HIPDNN_PLUGIN_STATUS_SUCCESS);
 }
 
 TEST(MiopenLegacyEnginePluginApiTest, EnginePluginDestroyExecutionContextNull)
@@ -312,11 +314,9 @@ TEST(MiopenLegacyEnginePluginApiTest, EnginePluginDestroyExecutionContextNull)
     auto handle = reinterpret_cast<hipdnnEnginePluginHandle_t>(0x1234);
     Mock_hipdnn_engine_plugin_execution_context execution_context;
 
-    // Null handle
     EXPECT_EQ(hipdnnEnginePluginDestroyExecutionContext(nullptr, &execution_context),
               HIPDNN_PLUGIN_STATUS_BAD_PARAM);
 
-    // Null execution_context
     EXPECT_EQ(hipdnnEnginePluginDestroyExecutionContext(handle, nullptr),
               HIPDNN_PLUGIN_STATUS_BAD_PARAM);
 }

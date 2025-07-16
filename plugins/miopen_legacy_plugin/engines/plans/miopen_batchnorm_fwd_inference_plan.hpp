@@ -24,8 +24,8 @@ public:
     const Miopen_tensor& y() const;
     const Miopen_tensor& scale() const;
     const Miopen_tensor& bias() const;
-    const Miopen_tensor& est_mean() const;
-    const Miopen_tensor& est_variance() const;
+    const std::optional<const Miopen_tensor*> est_mean() const;
+    const std::optional<const Miopen_tensor*> est_variance() const;
 
 private:
     void initialize_tensors(

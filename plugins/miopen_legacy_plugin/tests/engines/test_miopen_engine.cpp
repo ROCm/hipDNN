@@ -98,6 +98,23 @@ TEST(Miopen_engineTest, IsApplicableReturnsTrueIfAnySolverApplicable)
     EXPECT_TRUE(engine.is_applicable(mock_graph));
 }
 
+TEST(Miopen_engineTest, IsApplicableReturnsAfterTheFirstApplicableSolver)
+{
+    auto mock_solver1 = std::make_unique<Mock_plan_builder>();
+    auto mock_solver2 = std::make_unique<Mock_plan_builder>();
+
+    EXPECT_CALL(*mock_solver1, is_applicable(::testing::_)).WillOnce(::testing::Return(true));
+    EXPECT_CALL(*mock_solver2, is_applicable(::testing::_)).Times(0);
+
+    Miopen_engine engine(0);
+    engine.add_plan_builder(std::move(mock_solver1));
+    engine.add_plan_builder(std::move(mock_solver2));
+
+    Mock_graph mock_graph;
+
+    EXPECT_TRUE(engine.is_applicable(mock_graph));
+}
+
 TEST(Miopen_engineTest, IsApplicableReturnsFalseIfNoPlanBuilders)
 {
     Miopen_engine engine(0);
@@ -133,47 +150,67 @@ TEST(Miopen_engineTest, GetDetailsReturnsSerializedEngineDetails)
     delete[] static_cast<const uint8_t*>(result.ptr);
 }
 
-// TEST(Miopen_engineTest, ExecuteGraphCallsSolverIfApplicable)
-// {
-//     auto mock_solver = std::make_unique<Mock_plan_builder>();
-//     // Solver is applicable, so execute_graph should be called
-//     EXPECT_CALL(*mock_solver, is_applicable(::testing::_)).WillOnce(::testing::Return(true));
-//     EXPECT_CALL(*mock_solver,
-//                 execute_graph(::testing::_, ::testing::_, ::testing::_, ::testing::_, ::testing::_))
-//         .Times(1);
+TEST(Miopen_engineTest, InitializeExecutionContextInvokesFirstApplicablePlanBuilder)
+{
+    auto mock_solver1 = std::make_unique<Mock_plan_builder>();
+    auto mock_solver2 = std::make_unique<Mock_plan_builder>();
 
-//     Miopen_engine engine(1);
-//     engine.add_plan_builder(std::move(mock_solver));
+    // Only the first solver is applicable
+    EXPECT_CALL(*mock_solver1, is_applicable(::testing::_)).WillOnce(::testing::Return(true));
+    EXPECT_CALL(*mock_solver1, build_plan(::testing::_, ::testing::_, ::testing::_)).Times(1);
+    EXPECT_CALL(*mock_solver2, is_applicable(::testing::_)).Times(0);
+    EXPECT_CALL(*mock_solver2, build_plan(::testing::_, ::testing::_, ::testing::_)).Times(0);
 
-//     hipdnnEnginePluginHandle dummy_handle = {};
-//     Mock_hipdnn_engine_plugin_execution_context exec_ctx;
+    Miopen_engine engine(1);
+    engine.add_plan_builder(std::move(mock_solver1));
+    engine.add_plan_builder(std::move(mock_solver2));
 
-//     hipdnnPluginDeviceBuffer_t* device_buffers = nullptr;
-//     uint32_t num_device_buffers = 0;
-//     void* workspace = nullptr;
+    Mock_graph mock_graph;
+    hipdnnEnginePluginHandle dummy_handle;
+    Mock_hipdnn_engine_plugin_execution_context ctx;
 
-//     engine.initialize_execution_context(
-//         dummy_handle, exec_ctx, device_buffers, num_device_buffers, workspace);
-// }
+    engine.initialize_execution_context(dummy_handle, mock_graph, ctx);
+}
 
-// TEST(Miopen_engineTest, ExecuteGraphDoesNotCallSolverIfNotApplicable)
-// {
-//     auto mock_solver = std::make_unique<Mock_plan_builder>();
-//     // Solver is not applicable, so execute_graph should not be called
-//     EXPECT_CALL(*mock_solver, is_applicable(::testing::_)).WillOnce(::testing::Return(false));
-//     EXPECT_CALL(*mock_solver,
-//                 execute_graph(::testing::_, ::testing::_, ::testing::_, ::testing::_, ::testing::_))
-//         .Times(0);
+TEST(Miopen_engineTest, InitializeExecutionContextSkipsNonApplicableBuilders)
+{
+    auto mock_solver1 = std::make_unique<Mock_plan_builder>();
+    auto mock_solver2 = std::make_unique<Mock_plan_builder>();
 
-//     Miopen_engine engine(1);
-//     engine.add_plan_builder(std::move(mock_solver));
+    // First solver not applicable, second is
+    EXPECT_CALL(*mock_solver1, is_applicable(::testing::_)).WillOnce(::testing::Return(false));
+    EXPECT_CALL(*mock_solver1, build_plan(::testing::_, ::testing::_, ::testing::_)).Times(0);
+    EXPECT_CALL(*mock_solver2, is_applicable(::testing::_)).WillOnce(::testing::Return(true));
+    EXPECT_CALL(*mock_solver2, build_plan(::testing::_, ::testing::_, ::testing::_)).Times(1);
 
-//     hipdnnEnginePluginHandle dummy_handle = {};
-//     Mock_hipdnn_engine_plugin_execution_context exec_ctx;
-//     hipdnnPluginDeviceBuffer_t* device_buffers = nullptr;
-//     uint32_t num_device_buffers = 0;
-//     void* workspace = nullptr;
+    Miopen_engine engine(1);
+    engine.add_plan_builder(std::move(mock_solver1));
+    engine.add_plan_builder(std::move(mock_solver2));
 
-//     engine.initialize_execution_context(
-//         dummy_handle, exec_ctx, device_buffers, num_device_buffers, workspace);
-// }
+    Mock_graph mock_graph;
+    hipdnnEnginePluginHandle dummy_handle;
+    Mock_hipdnn_engine_plugin_execution_context ctx;
+
+    engine.initialize_execution_context(dummy_handle, mock_graph, ctx);
+}
+
+TEST(Miopen_engineTest, InitializeExecutionContextDoesNotCallBuildPlanIfNoApplicableBuilders)
+{
+    auto mock_solver1 = std::make_unique<Mock_plan_builder>();
+    auto mock_solver2 = std::make_unique<Mock_plan_builder>();
+
+    EXPECT_CALL(*mock_solver1, is_applicable(::testing::_)).WillOnce(::testing::Return(false));
+    EXPECT_CALL(*mock_solver1, build_plan(::testing::_, ::testing::_, ::testing::_)).Times(0);
+    EXPECT_CALL(*mock_solver2, is_applicable(::testing::_)).WillOnce(::testing::Return(false));
+    EXPECT_CALL(*mock_solver2, build_plan(::testing::_, ::testing::_, ::testing::_)).Times(0);
+
+    Miopen_engine engine(1);
+    engine.add_plan_builder(std::move(mock_solver1));
+    engine.add_plan_builder(std::move(mock_solver2));
+
+    Mock_graph mock_graph;
+    hipdnnEnginePluginHandle dummy_handle;
+    Mock_hipdnn_engine_plugin_execution_context ctx;
+
+    engine.initialize_execution_context(dummy_handle, mock_graph, ctx);
+}

@@ -36,6 +36,7 @@ endif()
 add_executable(miopen_legacy_plugin_tests
     engines/test_miopen_engine.cpp
     engines/plans/test_miopen_batchnorm_plan_builder.cpp
+    engines/plans/test_batchnorm_fwd_inference_plan.cpp
     main.cpp
     test_miopen_legacy_engine_plugin_api.cpp
     test_miopen_batchnorm_operations.cpp

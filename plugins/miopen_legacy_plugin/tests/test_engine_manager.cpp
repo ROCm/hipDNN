@@ -7,6 +7,7 @@
 #include <set>
 
 #include <hipdnn_sdk/plugin/plugin_exception.hpp>
+#include <hipdnn_sdk/plugin/test_utils/mock_engine_config.hpp>
 #include <hipdnn_sdk/plugin/test_utils/mock_graph.hpp>
 
 #include "engine_manager.hpp"
@@ -151,43 +152,34 @@ TEST(Engine_managerTest, GetWorkspaceSizeThrowsOnInvalidEngineId)
                  hipdnn_plugin::Hipdnn_plugin_exception);
 }
 
-// TEST(Engine_managerTest, ExecuteGraphCallsEngine)
-// {
-//     Mock_hipdnn_engine_plugin_execution_context exec_ctx;
-//     EXPECT_CALL(*exec_ctx.mock_engine_config, engine_id()).WillRepeatedly(Return(7));
+TEST(Engine_managerTest, InitializeExecutionContextCallsEngine)
+{
+    auto mock_engine = std::make_unique<Mock_engine>();
+    EXPECT_CALL(*mock_engine, id()).WillRepeatedly(Return(7));
+    EXPECT_CALL(*mock_engine,
+                initialize_execution_context(::testing::_, ::testing::_, ::testing::_))
+        .Times(1);
 
-//     Engine_manager manager;
+    Engine_manager manager;
+    manager.add_engine(std::move(mock_engine));
+    hipdnnEnginePluginHandle dummy_handle = {};
+    Mock_graph mock_graph;
+    Mock_engine_config mock_engine_config;
+    EXPECT_CALL(mock_engine_config, engine_id()).WillRepeatedly(Return(7));
+    Mock_hipdnn_engine_plugin_execution_context exec_ctx;
 
-//     auto mock_engine = std::make_unique<Mock_engine>();
-//     EXPECT_CALL(*mock_engine, id()).WillRepeatedly(Return(7));
-//     EXPECT_CALL(*mock_engine,
-//                 execute_graph(::testing::_, ::testing::_, ::testing::_, ::testing::_, ::testing::_))
-//         .Times(1);
+    manager.initialize_execution_context(dummy_handle, mock_graph, mock_engine_config, exec_ctx);
+}
 
-//     manager.add_engine(std::move(mock_engine));
+TEST(Engine_managerTest, InitializeExecutionContextThrowsOnInvalidEngineId)
+{
+    Mock_hipdnn_engine_plugin_execution_context exec_ctx;
+    Engine_manager manager;
+    hipdnnEnginePluginHandle dummy_handle = {};
+    Mock_graph mock_graph;
+    Mock_engine_config mock_engine_config;
 
-//     hipdnnEnginePluginHandle dummy_handle = {};
-//     hipdnnPluginDeviceBuffer_t* device_buffers = nullptr;
-//     uint32_t num_device_buffers = 0;
-//     void* workspace = nullptr;
-
-//     manager.initialize_execution_context(
-//         dummy_handle, exec_ctx, device_buffers, num_device_buffers, workspace);
-// }
-
-// TEST(Engine_managerTest, ExecuteGraphThrowsOnInvalidEngineId)
-// {
-//     Mock_hipdnn_engine_plugin_execution_context exec_ctx;
-//     EXPECT_CALL(*exec_ctx.mock_engine_config, engine_id()).WillRepeatedly(Return(1234));
-
-//     Engine_manager manager;
-
-//     hipdnnEnginePluginHandle dummy_handle = {};
-//     hipdnnPluginDeviceBuffer_t* device_buffers = nullptr;
-//     uint32_t num_device_buffers = 0;
-//     void* workspace = nullptr;
-
-//     EXPECT_THROW(manager.initialize_execution_context(
-//                      dummy_handle, exec_ctx, device_buffers, num_device_buffers, workspace),
-//                  hipdnn_plugin::Hipdnn_plugin_exception);
-// }
+    EXPECT_THROW(manager.initialize_execution_context(
+                     dummy_handle, mock_graph, mock_engine_config, exec_ctx),
+                 hipdnn_plugin::Hipdnn_plugin_exception);
+}

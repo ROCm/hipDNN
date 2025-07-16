@@ -368,8 +368,6 @@ hipdnnPluginStatus_t
         throw_if_null(execution_context);
         throw_if_null(device_buffers);
 
-        auto& engine_manager = handle->get_engine_manager();
-
         execution_context->plan().execute(*handle, device_buffers, num_device_buffers, workspace);
 
         LOG_API_SUCCESS(api_name, "executed graph");

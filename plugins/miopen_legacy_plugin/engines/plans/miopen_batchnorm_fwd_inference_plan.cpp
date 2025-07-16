@@ -34,14 +34,22 @@ const Miopen_tensor& Batchnorm_fwd_inference_params::bias() const
     return *_bias_pair;
 }
 
-const Miopen_tensor& Batchnorm_fwd_inference_params::est_mean() const
+const std::optional<const Miopen_tensor*> Batchnorm_fwd_inference_params::est_mean() const
 {
-    return *_est_mean_tensor_descriptor;
+    if(_est_mean_tensor_descriptor)
+    {
+        return std::optional<const Miopen_tensor*>(_est_mean_tensor_descriptor.get());
+    }
+    return std::optional<const Miopen_tensor*>();
 }
 
-const Miopen_tensor& Batchnorm_fwd_inference_params::est_variance() const
+const std::optional<const Miopen_tensor*> Batchnorm_fwd_inference_params::est_variance() const
 {
-    return *_est_variance_tensor_descriptor;
+    if(_est_variance_tensor_descriptor)
+    {
+        return std::optional<const Miopen_tensor*>(_est_variance_tensor_descriptor.get());
+    }
+    return std::optional<const Miopen_tensor*>();
 }
 
 void Batchnorm_fwd_inference_params::initialize_tensors(
@@ -68,16 +76,24 @@ void Batchnorm_fwd_inference_params::initialize_tensors(
         _bias_pair = std::make_unique<Miopen_tensor>(*bias_tensor_attr->second);
     }
 
-    // if(attributes.mean() && tensor_map.find(attributes.mean().value()) != tensor_map.end())
-    // {
-    //     _est_mean_tensor_descriptor = std::make_unique<Miopen_tensor>(attributes.mean().value());
-    // }
-    // if(attributes.inv_variance()
-    //    && tensor_map.find(attributes.inv_variance().value()) != tensor_map.end())
-    // {
-    //     _est_variance_tensor_descriptor
-    //         = std::make_unique<Miopen_tensor>(attributes.inv_variance().value());
-    // }
+    if(attributes.mean().has_value())
+    {
+        if(auto est_mean_attr = tensor_map.find(attributes.mean().value());
+           est_mean_attr != tensor_map.end())
+        {
+            _est_mean_tensor_descriptor = std::make_unique<Miopen_tensor>(*est_mean_attr->second);
+        }
+    }
+
+    if(attributes.inv_variance().has_value())
+    {
+        if(auto inv_variance_attr = tensor_map.find(attributes.inv_variance().value());
+           inv_variance_attr != tensor_map.end())
+        {
+            _est_variance_tensor_descriptor
+                = std::make_unique<Miopen_tensor>(*inv_variance_attr->second);
+        }
+    }
 }
 
 Batchnorm_fwd_inference_plan::Batchnorm_fwd_inference_plan(
@@ -91,7 +107,8 @@ void Batchnorm_fwd_inference_plan::execute(const hipdnnEnginePluginHandle& handl
                                            uint32_t num_device_buffers,
                                            void* workspace) const
 {
-    float alpha = static_cast<float>(1), beta = static_cast<float>(0);
+    float alpha = static_cast<float>(1);
+    float beta = static_cast<float>(0);
     double epsilon = 1e-3; // taken from bn driver, todo, figure out better way
 
     auto x_buffer = miopen_utils::find_device_buffer(
@@ -103,11 +120,19 @@ void Batchnorm_fwd_inference_plan::execute(const hipdnnEnginePluginHandle& handl
     auto bias_buffer = miopen_utils::find_device_buffer(
         _inference_params->bias().uid(), device_buffers, num_device_buffers);
 
-    //todo these can be optional...
-    auto est_mean_buffer = miopen_utils::find_device_buffer(
-        _inference_params->est_mean().uid(), device_buffers, num_device_buffers);
-    auto est_variance_buffer = miopen_utils::find_device_buffer(
-        _inference_params->est_variance().uid(), device_buffers, num_device_buffers);
+    hipdnnPluginDeviceBuffer_t est_mean_buffer = {0, nullptr};
+    if(auto est_mean = _inference_params->est_mean(); est_mean.has_value())
+    {
+        est_mean_buffer = miopen_utils::find_device_buffer(
+            est_mean.value()->uid(), device_buffers, num_device_buffers);
+    }
+
+    hipdnnPluginDeviceBuffer_t est_variance_buffer = {0, nullptr};
+    if(auto est_variance = _inference_params->est_variance(); est_variance.has_value())
+    {
+        est_variance_buffer = miopen_utils::find_device_buffer(
+            est_variance.value()->uid(), device_buffers, num_device_buffers);
+    }
 
     auto miopen_status = miopenBatchNormalizationForwardInference_V2(
         handle.miopen_handle,
@@ -120,8 +145,12 @@ void Batchnorm_fwd_inference_plan::execute(const hipdnnEnginePluginHandle& handl
         y_buffer.ptr,
         _inference_params->scale().tensor_descriptor(),
         _inference_params->bias().tensor_descriptor(),
-        _inference_params->est_mean().tensor_descriptor(),
-        _inference_params->est_variance().tensor_descriptor(),
+        _inference_params->est_mean().has_value()
+            ? _inference_params->est_mean().value()->tensor_descriptor()
+            : nullptr,
+        _inference_params->est_variance().has_value()
+            ? _inference_params->est_variance().value()->tensor_descriptor()
+            : nullptr,
         scale_buffer.ptr,
         bias_buffer.ptr,
         est_mean_buffer.ptr,
