@@ -247,7 +247,8 @@ void Engine_heuristic_descriptor::get_engine_configs(hipdnnBackendAttributeType_
                 HIPDNN_ATTR_ENGINECFG_ENGINE, HIPDNN_TYPE_BACKEND_DESCRIPTOR, 1, &engine);
         }
 
-        *element_count = std::min(requested_element_count, static_cast<int64_t>(_engine_ids.size()));
+        *element_count
+            = std::min(requested_element_count, static_cast<int64_t>(_engine_ids.size()));
     }
 }
 
