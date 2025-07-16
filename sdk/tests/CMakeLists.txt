@@ -19,6 +19,10 @@ add_executable(hipdnn_sdk_tests
     test_scoped_resource.cpp
 )
 
+target_compile_definitions(hipdnn_sdk_tests PRIVATE
+    COMPONENT_NAME="sdk_tests"
+)
+
 target_link_libraries(hipdnn_sdk_tests 
     GTest::gtest
     pthread

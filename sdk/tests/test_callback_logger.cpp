@@ -12,10 +12,6 @@
 #include <hipdnn_sdk/logging/callback_types.h>
 #include <hipdnn_sdk/logging/logger.hpp>
 
-#ifndef COMPONENT_NAME
-#define COMPONENT_NAME "sdk_tests"
-#endif
-
 static std::vector<std::string> g_captured_logs;
 static std::mutex g_log_mutex;
 
@@ -55,7 +51,7 @@ protected:
 
     std::vector<std::string> get_captured_logs()
     {
-        spdlog::shutdown();
+        spdlog::shutdown(); // block until async queue is fully processed
         return g_captured_logs;
     }
 };
