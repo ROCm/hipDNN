@@ -20,7 +20,6 @@ namespace logging
 namespace
 {
 
-// Anonymous namespace to encapsulate all state, keeping it private to this file.
 std::mutex s_logging_init_mutex;
 bool s_logging_initialized = false;
 const std::string S_BACKEND_LOGGER_NAME = "hipdnn_backend";
@@ -30,8 +29,6 @@ const std::string S_CALLBACK_RECEIVER_LOGGER_NAME = "hipdnn_callback_receiver";
 
 void initialize()
 {
-    // The lock guard ensures that even if multiple threads call the callback
-    // simultaneously, the initialization logic only runs once.
     std::lock_guard<std::mutex> lock(s_logging_init_mutex);
     if(s_logging_initialized)
     {
@@ -43,7 +40,7 @@ void initialize()
 
     if(log_level != nullptr && std::string(log_level) == "off")
     {
-        s_logging_initialized = true; // Mark as initialized to prevent re-entry
+        s_logging_initialized = true;
         return;
     }
 
@@ -92,24 +89,21 @@ void initialize()
     }
     s_logging_initialized = true;
 }
+void cleanup()
+{
+    std::lock_guard<std::mutex> lock(s_logging_init_mutex);
+    spdlog::shutdown();
+    s_logging_initialized = false;
+}
 
 std::shared_ptr<spdlog::logger> get_callback_receiver_logger()
 {
-    // This function simply retrieves the logger. It assumes initialize() has been called.
     return spdlog::get(S_CALLBACK_RECEIVER_LOGGER_NAME);
 }
 
 std::shared_ptr<spdlog::logger> get_logger()
 {
-    // This function simply retrieves the logger. It assumes initialize() has been called.
     return spdlog::get(S_BACKEND_LOGGER_NAME);
-}
-
-void cleanup()
-{
-    std::lock_guard<std::mutex> lock(s_logging_init_mutex);
-    spdlog::shutdown(); // Flushes, stops thread pool, and drops all loggers.
-    s_logging_initialized = false;
 }
 
 } // namespace logging
