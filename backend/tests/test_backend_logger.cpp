@@ -1,17 +1,17 @@
 // Copyright © Advanced Micro Devices, Inc., or its affiliates.
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier:  MIT
 
 #include <fcntl.h>
 #include <fstream>
 #include <gtest/gtest.h>
-#include <hipdnn_sdk/logging/logger.hpp>
 #include <iostream>
 #include <regex>
-#include <spdlog/spdlog.h>
 #include <string>
 #include <thread>
 #include <unistd.h>
 #include <vector>
+
+#include <logging/logging.hpp>
 
 class Backend_logging_test : public ::testing::Test
 {
@@ -22,22 +22,21 @@ public:
 
     void SetUp() override
     {
+        hipdnn_backend::logging::cleanup();
+
         // pipe stderr to capture log output
         _old_stderr = dup(STDERR_FILENO);
         ASSERT_NE(_old_stderr, -1);
         ASSERT_EQ(pipe(_stderr_pipe.data()), 0);
         ASSERT_NE(dup2(_stderr_pipe[1], STDERR_FILENO), -1);
         ASSERT_EQ(close(_stderr_pipe[1]), 0);
-
-        hipdnn::logging::cleanup_logging();
-
         setenv("HIPDNN_LOG_LEVEL", "off", 1);
         unsetenv("HIPDNN_LOG_FILE");
     }
 
     void TearDown() override
     {
-        hipdnn::logging::cleanup_logging();
+        hipdnn_backend::logging::cleanup();
 
         unsetenv("HIPDNN_LOG_LEVEL");
         unsetenv("HIPDNN_LOG_FILE");
@@ -55,10 +54,6 @@ public:
 
     std::string get_stderr_content()
     {
-        if(hipdnn::logging::g_backend_logger)
-        {
-            hipdnn::logging::g_backend_logger->flush();
-        }
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
         std::string content;
@@ -94,14 +89,11 @@ public:
     }
 };
 
-TEST_F(Backend_logging_test, MacrosDontInitializeLoggingWhenOff)
+TEST_F(Backend_logging_test, MacrosDontLogWhenOff)
 {
     HIPDNN_LOG_INFO("Initializing with info message");
     HIPDNN_LOG_WARN("Initializing with warn message");
     HIPDNN_LOG_ERROR("Initializing with error message");
-
-    EXPECT_FALSE(hipdnn::logging::g_logging_initialized);
-    EXPECT_EQ(hipdnn::logging::g_backend_logger, nullptr);
 
     std::string log_content = get_stderr_content();
     EXPECT_TRUE(log_content.empty()) << "Expected stderr to be empty, but it contained:\n"
@@ -157,8 +149,7 @@ TEST_F(Backend_logging_test, LoggingCanBeReinitialized)
 
     verify_stderr_not_contains("This should not appear");
 
-    hipdnn::logging::cleanup_logging();
-    EXPECT_FALSE(hipdnn::logging::g_logging_initialized);
+    hipdnn_backend::logging::cleanup();
 
     setenv("HIPDNN_LOG_LEVEL", "info", 1);
     HIPDNN_LOG_INFO("This should appear after reinitialization");
@@ -212,11 +203,8 @@ TEST_F(Backend_logging_test, LogFileCanBeSpecifiedByEnvVar)
 
     HIPDNN_LOG_INFO("Logging to custom file");
 
-    if(hipdnn::logging::g_backend_logger)
-    {
-        hipdnn::logging::g_backend_logger->flush();
-    }
-    std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    hipdnn_backend::logging::cleanup();
 
     std::string log_content;
     std::ifstream log_file_stream(_log_file);

@@ -3,8 +3,8 @@ Copyright © Advanced Micro Devices, Inc., or its affiliates.
 SPDX-License-Identifier: MIT
 */
 
+#include "logging/logging.hpp"
 #include <gtest/gtest.h>
-#include <hipdnn_sdk/logging/logger.hpp>
 
 int main(int argc, char** argv)
 {

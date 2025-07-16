@@ -10,7 +10,7 @@
 #include <utility>
 #include <vector>
 
-#include <hipdnn_sdk/logging/logger.hpp>
+#include "logging/logging.hpp"
 #include <hipdnn_sdk/plugin/plugin_api_data_types.h>
 #include <hipdnn_sdk/plugin/plugin_data_type_helpers.hpp>
 

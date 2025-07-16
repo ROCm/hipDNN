@@ -101,7 +101,7 @@ inline std::vector<int64_t> stride_order_nhwc(size_t num_dims)
     return stride_order;
 }
 
-inline int initialize_frontend_logging(hipdnnCallback_t fn)
+inline int32_t initialize_frontend_logging(hipdnnCallback_t fn)
 {
     if(fn == nullptr)
     {
