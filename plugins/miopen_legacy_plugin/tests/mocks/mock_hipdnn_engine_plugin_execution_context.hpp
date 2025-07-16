@@ -5,32 +5,21 @@
 
 #include <memory>
 
-#include <hipdnn_sdk/plugin/test_utils/mock_engine_config.hpp>
-#include <hipdnn_sdk/plugin/test_utils/mock_graph.hpp>
+#include "mocks/mock_plan.hpp"
 
 #include "hipdnn_engine_plugin_execution_context.hpp"
 
 struct Mock_hipdnn_engine_plugin_execution_context : public hipdnnEnginePluginExecutionContext
 {
     Mock_hipdnn_engine_plugin_execution_context()
-        : hipdnnEnginePluginExecutionContext(nullptr, nullptr)
-        , mock_graph(std::make_unique<hipdnn_plugin::Mock_graph>())
-        , mock_engine_config(std::make_unique<hipdnn_plugin::Mock_engine_config>())
+        : _mock_plan(std::make_unique<miopen_legacy_plugin::Mock_plan>())
     {
     }
 
-    ~Mock_hipdnn_engine_plugin_execution_context() override = default;
-
-    hipdnn_plugin::Graph_interface& graph() const override
+    miopen_legacy_plugin::Plan_interface& plan() const override
     {
-        return *mock_graph;
+        return *_mock_plan;
     }
 
-    hipdnn_plugin::Engine_config_interface& engine_config() const override
-    {
-        return *mock_engine_config;
-    }
-
-    std::unique_ptr<hipdnn_plugin::Mock_graph> mock_graph;
-    std::unique_ptr<hipdnn_plugin::Mock_engine_config> mock_engine_config;
+    std::unique_ptr<miopen_legacy_plugin::Mock_plan> _mock_plan;
 };

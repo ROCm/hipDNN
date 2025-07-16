@@ -25,7 +25,7 @@ public:
         (const std::unordered_map<int64_t, const hipdnn_sdk::data_objects::TensorAttributes*>&),
         get_tensor_map,
         (),
-        (override));
+        (const, override));
 };
 
 }

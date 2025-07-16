@@ -7,12 +7,12 @@
 
 #include <hipdnn_sdk/data_objects/graph_generated.h>
 
-#include "engines/solvers/solver_interface.hpp"
+#include "engines/plans/plan_builder_interface.hpp"
 
 namespace miopen_legacy_plugin
 {
 
-class Mock_solver : public Solver_interface
+class Mock_plan_builder : public Plan_builder_interface
 {
 public:
     MOCK_METHOD(bool,
@@ -26,12 +26,10 @@ public:
                 (const, override));
 
     MOCK_METHOD(void,
-                execute_graph,
+                build_plan,
                 (const hipdnnEnginePluginHandle& handle,
-                 const hipdnnEnginePluginExecutionContext& execution_context,
-                 const hipdnnPluginDeviceBuffer_t* device_buffers,
-                 uint32_t num_device_buffers,
-                 void* workspace),
+                 const hipdnn_plugin::Graph_interface& op_graph,
+                 hipdnnEnginePluginExecutionContext& execution_context),
                 (const, override));
 };
 

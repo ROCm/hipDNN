@@ -7,7 +7,7 @@
 #include <set>
 
 #include "engine_interface.hpp"
-#include "solvers/solver_interface.hpp"
+#include "plans/plan_builder_interface.hpp"
 #include <hipdnn_sdk/plugin/plugin_api_data_types.h>
 
 namespace miopen_legacy_plugin
@@ -25,17 +25,16 @@ public:
     size_t get_workspace_size(const hipdnnEnginePluginHandle& handle,
                               const hipdnn_plugin::Graph_interface& op_graph) const override;
 
-    void execute_graph(const hipdnnEnginePluginHandle& handle,
-                       const hipdnnEnginePluginExecutionContext& execution_context,
-                       const hipdnnPluginDeviceBuffer_t* device_buffers,
-                       uint32_t num_device_buffers,
-                       void* workspace) const override;
+    void initialize_execution_context(
+        const hipdnnEnginePluginHandle& handle,
+        const hipdnn_plugin::Graph_interface& op_graph,
+        hipdnnEnginePluginExecutionContext& execution_context) const override;
 
-    void add_solver(std::unique_ptr<Solver_interface> solver);
+    void add_plan_builder(std::unique_ptr<Plan_builder_interface> plan_builder);
 
 private:
     int64_t _id;
-    std::set<std::unique_ptr<Solver_interface>> _solvers;
+    std::set<std::unique_ptr<Plan_builder_interface>> _plan_builders;
 };
 
 }

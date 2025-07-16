@@ -5,8 +5,8 @@
 
 #include "miopen_tensor.hpp"
 #include "miopen_utils.hpp"
+#include "plan_builder_interface.hpp" //temporary
 #include "plan_interface.hpp"
-#include "solver_interface.hpp" //temporary
 #include <hipdnn_sdk/plugin/plugin_api_data_types.h>
 
 namespace miopen_legacy_plugin
@@ -45,6 +45,7 @@ private:
 
 class Batchnorm_fwd_inference_plan : public Plan_interface
 {
+public:
     const miopenBatchNormMode_t MIOPEN_BATCHNORM_MODE = miopenBNSpatial;
 
     Batchnorm_fwd_inference_plan(std::unique_ptr<Batchnorm_fwd_inference_params> inference_params);

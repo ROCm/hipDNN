@@ -2,7 +2,7 @@
 // SPDX-License-Identifier:  MIT
 
 #include "miopen_engine.hpp"
-#include "solvers/miopen_batchnorm_solver.hpp"
+#include "plans/miopen_batchnorm_plan_builder.hpp"
 
 #include <hipdnn_sdk/data_objects/engine_details_generated.h>
 
@@ -23,7 +23,7 @@ bool Miopen_engine::is_applicable(const hipdnn_plugin::Graph_interface& op_graph
 {
     // This is wrong if we ever have more than 1 solver thats applicable.
     // If this is the case, we should split plan builders accross multiple engines.
-    for(const auto& solver : _solvers)
+    for(const auto& solver : _plan_builders)
     {
         if(solver->is_applicable(op_graph))
         {
@@ -51,7 +51,7 @@ size_t Miopen_engine::get_workspace_size(const hipdnnEnginePluginHandle& handle,
                                          const hipdnn_plugin::Graph_interface& op_graph) const
 {
     size_t workspace_size = 0;
-    for(const auto& solver : _solvers)
+    for(const auto& solver : _plan_builders)
     {
         if(solver->is_applicable(op_graph))
         {
@@ -61,27 +61,24 @@ size_t Miopen_engine::get_workspace_size(const hipdnnEnginePluginHandle& handle,
     return workspace_size;
 }
 
-void Miopen_engine::execute_graph(const hipdnnEnginePluginHandle& handle,
-                                  const hipdnnEnginePluginExecutionContext& execution_context,
-                                  const hipdnnPluginDeviceBuffer_t* device_buffers,
-                                  uint32_t num_device_buffers,
-                                  void* workspace) const
+void Miopen_engine::initialize_execution_context(
+    const hipdnnEnginePluginHandle& handle,
+    const hipdnn_plugin::Graph_interface& op_graph,
+    hipdnnEnginePluginExecutionContext& execution_context) const
 {
-
-    for(const auto& solver : _solvers)
+    for(const auto& solver : _plan_builders)
     {
-        if(solver->is_applicable(execution_context.graph()))
+        if(solver->is_applicable(op_graph))
         {
-            solver->execute_graph(
-                handle, execution_context, device_buffers, num_device_buffers, workspace);
-            break;
+            solver->build_plan(handle, op_graph, execution_context);
+            break; //todo, ensure this is tested
         }
     }
 }
 
-void Miopen_engine::add_solver(std::unique_ptr<Solver_interface> solver)
+void Miopen_engine::add_plan_builder(std::unique_ptr<Plan_builder_interface> plan_builder)
 {
-    _solvers.insert(std::move(solver));
+    _plan_builders.insert(std::move(plan_builder));
 }
 
 }

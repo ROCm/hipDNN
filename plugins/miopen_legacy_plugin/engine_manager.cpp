@@ -53,14 +53,14 @@ size_t Engine_manager::get_workspace_size(const hipdnnEnginePluginHandle& handle
     return engine.get_workspace_size(handle, op_graph);
 }
 
-void Engine_manager::execute_graph(const hipdnnEnginePluginHandle& handle,
-                                   const hipdnnEnginePluginExecutionContext& execution_context,
-                                   const hipdnnPluginDeviceBuffer_t* device_buffers,
-                                   uint32_t num_device_buffers,
-                                   void* workspace) const
+void Engine_manager::initialize_execution_context(
+    const hipdnnEnginePluginHandle& handle,
+    const hipdnn_plugin::Graph_interface& op_graph,
+    const hipdnn_plugin::Engine_config_interface& engine_config,
+    hipdnnEnginePluginExecutionContext& execution_context) const
 {
-    auto& engine = get_engine(execution_context.engine_config().engine_id());
-    engine.execute_graph(handle, execution_context, device_buffers, num_device_buffers, workspace);
+    auto& engine = get_engine(engine_config.engine_id());
+    engine.initialize_execution_context(handle, op_graph, execution_context);
 }
 
 Engine_interface& Engine_manager::get_engine(int64_t engine_id) const

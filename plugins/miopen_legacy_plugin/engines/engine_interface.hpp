@@ -6,6 +6,7 @@
 #include <stdint.h>
 
 #include <hipdnn_sdk/plugin/flatbuffer_utilities/graph_wrapper.hpp>
+
 #include <hipdnn_sdk/plugin/plugin_api_data_types.h>
 
 namespace miopen_legacy_plugin
@@ -25,11 +26,10 @@ public:
                                       const hipdnn_plugin::Graph_interface& op_graph) const
         = 0;
 
-    virtual void execute_graph(const hipdnnEnginePluginHandle& handle,
-                               const hipdnnEnginePluginExecutionContext& execution_context,
-                               const hipdnnPluginDeviceBuffer_t* device_buffers,
-                               uint32_t num_device_buffers,
-                               void* workspace) const
+    virtual void
+        initialize_execution_context(const hipdnnEnginePluginHandle& handle,
+                                     const hipdnn_plugin::Graph_interface& op_graph,
+                                     hipdnnEnginePluginExecutionContext& execution_context) const
         = 0;
 };
 

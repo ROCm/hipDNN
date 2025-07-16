@@ -30,12 +30,10 @@ public:
                 (const, override));
 
     MOCK_METHOD(void,
-                execute_graph,
+                initialize_execution_context,
                 (const hipdnnEnginePluginHandle& handle,
-                 const hipdnnEnginePluginExecutionContext& execution_context,
-                 const hipdnnPluginDeviceBuffer_t* device_buffers,
-                 uint32_t num_device_buffers,
-                 void* workspace),
+                 const hipdnn_plugin::Graph_interface& op_graph,
+                 hipdnnEnginePluginExecutionContext& execution_context),
                 (const, override));
 };
 

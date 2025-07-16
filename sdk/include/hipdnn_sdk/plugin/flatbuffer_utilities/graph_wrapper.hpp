@@ -25,7 +25,7 @@ public:
         = 0;
     virtual const hipdnn_sdk::data_objects::Node& get_node(uint index) const = 0;
     virtual const std::unordered_map<int64_t, const hipdnn_sdk::data_objects::TensorAttributes*>&
-        get_tensor_map()
+        get_tensor_map() const
         = 0;
 };
 
@@ -89,7 +89,7 @@ public:
     }
 
     const std::unordered_map<int64_t, const hipdnn_sdk::data_objects::TensorAttributes*>&
-        get_tensor_map() override
+        get_tensor_map() const override
     {
         throw_if_not_valid();
 
@@ -119,7 +119,8 @@ private:
     const hipdnn_sdk::data_objects::Graph* _graph = nullptr;
 
     //lazy init state;
-    std::unordered_map<int64_t, const hipdnn_sdk::data_objects::TensorAttributes*> _tensor_map;
+    mutable std::unordered_map<int64_t, const hipdnn_sdk::data_objects::TensorAttributes*>
+        _tensor_map;
 };
 
 }

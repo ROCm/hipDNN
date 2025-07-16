@@ -9,7 +9,7 @@
 #include <hipdnn_sdk/plugin/test_utils/mock_graph.hpp>
 #include <hipdnn_sdk/test_utilities/flatbuffer_graph_test_utils.hpp>
 
-#include "engines/solvers/miopen_batchnorm_solver.hpp"
+#include "engines/plans/miopen_batchnorm_plan_builder.hpp"
 #include "hipdnn_engine_plugin_handle.hpp"
 
 using namespace miopen_legacy_plugin;
@@ -18,7 +18,7 @@ using namespace hipdnn_plugin;
 class Test_miopen_batchnorm_solver : public ::testing::Test
 {
 protected:
-    Miopen_batchnorm_solver solver;
+    Miopen_batchnorm_plan_builder solver;
     hipdnnEnginePluginHandle dummy_handle;
 };
 

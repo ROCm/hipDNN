@@ -6,6 +6,7 @@
 
 #include <hipdnn_sdk/logging/logger.hpp>
 #include <hipdnn_sdk/plugin/engine_plugin_api.h>
+#include <hipdnn_sdk/plugin/flatbuffer_utilities/engine_config_wrapper.hpp>
 #include <hipdnn_sdk/plugin/flatbuffer_utilities/graph_wrapper.hpp>
 #include <hipdnn_sdk/plugin/plugin_api.h>
 #include <hipdnn_sdk/plugin/plugin_data_type_helpers.hpp>
@@ -305,7 +306,25 @@ hipdnnPluginStatus_t hipdnnEnginePluginCreateExecutionContext(
         throw_if_null(op_graph);
         throw_if_null(execution_context);
 
-        *execution_context = new hipdnnEnginePluginExecutionContext(engine_config, op_graph);
+        Graph_wrapper op_graph_wrapper(op_graph->ptr, op_graph->size);
+        Engine_config_wrapper engine_config_wrapper(engine_config->ptr, engine_config->size);
+
+        auto& engine_manager = handle->get_engine_manager();
+
+        auto context = new hipdnnEnginePluginExecutionContext;
+
+        try
+        {
+            engine_manager.initialize_execution_context(
+                *handle, op_graph_wrapper, engine_config_wrapper, *context);
+        }
+        catch(...)
+        {
+            delete context;
+            throw;
+        }
+
+        *execution_context = context;
 
         LOG_API_SUCCESS(
             api_name, "created_execution_context={:p}", static_cast<void*>(*execution_context));
@@ -351,8 +370,7 @@ hipdnnPluginStatus_t
 
         auto& engine_manager = handle->get_engine_manager();
 
-        engine_manager.execute_graph(
-            *handle, *execution_context, device_buffers, num_device_buffers, workspace);
+        execution_context->plan().execute(*handle, device_buffers, num_device_buffers, workspace);
 
         LOG_API_SUCCESS(api_name, "executed graph");
     });

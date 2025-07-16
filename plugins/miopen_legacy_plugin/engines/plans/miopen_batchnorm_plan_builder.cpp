@@ -1,0 +1,74 @@
+/* Copyright © Advanced Micro Devices, Inc., or its affiliates. */
+/* SPDX-License-Identifier:  MIT */
+
+#include <hipdnn_sdk/logging/logger.hpp>
+#include <hipdnn_sdk/plugin/plugin_exception.hpp>
+#include <hipdnn_sdk/plugin/plugin_flatbuffer_type_helpers.hpp>
+#include <miopen/miopen.h>
+
+#include "engines/plans/miopen_batchnorm_fwd_inference_plan.hpp"
+#include "miopen_batchnorm_plan_builder.hpp"
+
+namespace miopen_legacy_plugin
+{
+
+// We have made the intentional decision to hardcode the batchnorm mode to miopenBNSpatial
+// rather than making it configurable and adding extra complexity.
+const miopenBatchNormMode_t miopen_batchnorm_mode = miopenBNSpatial;
+
+bool Miopen_batchnorm_plan_builder::is_applicable(
+    const hipdnn_plugin::Graph_interface& op_graph) const
+{
+
+    if(op_graph.node_count() != 1)
+    {
+        HIPDNN_LOG_INFO(
+            "Batchnorm solver is applicable only for single node graphs. Graph has {} nodes",
+            op_graph.node_count());
+        return false;
+    }
+
+    if(!op_graph.has_only_supported_attributes(std::set<hipdnn_sdk::data_objects::NodeAttributes>{
+           hipdnn_sdk::data_objects::NodeAttributes_BatchnormInferenceAttributes}))
+    {
+        HIPDNN_LOG_INFO("Batchnorm solver is not applicable for this graph");
+        return false;
+    }
+
+    return true;
+}
+
+size_t Miopen_batchnorm_plan_builder::get_workspace_size(
+    const hipdnnEnginePluginHandle& handle, const hipdnn_plugin::Graph_interface& op_graph) const
+{
+    //batchnorm solver does not require workspace size
+    return 0u;
+}
+
+void Miopen_batchnorm_plan_builder::build_plan(
+    const hipdnnEnginePluginHandle& handle,
+    const hipdnn_plugin::Graph_interface& op_graph,
+    hipdnnEnginePluginExecutionContext& execution_context) const
+{
+    const auto& node = op_graph.get_node(0);
+
+    if(node.attributes_type()
+       == hipdnn_sdk::data_objects::NodeAttributes_BatchnormInferenceAttributes)
+    {
+        //HIPDNN_LOG_INFO("Building batchnorm fwd inference plan for node: {}", node.name());
+        // I am d refing ptrs here. should check not null first.
+        auto fwd_inference_params = std::make_unique<Batchnorm_fwd_inference_params>(
+            *node.attributes_as_BatchnormInferenceAttributes(), op_graph.get_tensor_map());
+
+        auto batchnorm_fwd_plan
+            = std::make_unique<Batchnorm_fwd_inference_plan>(std::move(fwd_inference_params));
+        execution_context.set_plan(std::move(batchnorm_fwd_plan));
+    }
+
+    throw hipdnn_plugin::Hipdnn_plugin_exception(
+        HIPDNN_PLUGIN_STATUS_BAD_PARAM,
+        "Unsupported node type for batchnorm solver: "
+            + std::string(hipdnn_sdk::data_objects::to_string(node.attributes_type())));
+}
+
+}

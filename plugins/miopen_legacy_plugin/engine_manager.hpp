@@ -7,6 +7,7 @@
 #include <unordered_map>
 #include <vector>
 
+#include <hipdnn_sdk/plugin/flatbuffer_utilities/engine_config_wrapper.hpp>
 #include <hipdnn_sdk/plugin/plugin_api_data_types.h>
 
 #include "engines/engine_interface.hpp"
@@ -36,11 +37,10 @@ public:
                               int64_t engine_id,
                               const hipdnn_plugin::Graph_interface& op_graph) const;
 
-    void execute_graph(const hipdnnEnginePluginHandle& handle,
-                       const hipdnnEnginePluginExecutionContext& execution_context,
-                       const hipdnnPluginDeviceBuffer_t* device_buffers,
-                       uint32_t num_device_buffers,
-                       void* workspace) const;
+    void initialize_execution_context(const hipdnnEnginePluginHandle& handle,
+                                      const hipdnn_plugin::Graph_interface& op_graph,
+                                      const hipdnn_plugin::Engine_config_interface& engine_config,
+                                      hipdnnEnginePluginExecutionContext& execution_context) const;
 
 private:
     Engine_interface& get_engine(int64_t engine_id) const;
