@@ -78,9 +78,9 @@ class Flatbuffer_invalid_tests
 {
 };
 
-TEST_P(Flatbuffer_invalid_tests, WillNotUnpackInvalidBuffer)
+TEST(Flatbuffer_invalid_tests, WillNotUnpackInvalidNullBuffer)
 {
-    auto [buffer, size] = GetParam();
+    auto [buffer, size] = std::make_pair(static_cast<const uint8_t*>(nullptr), size_t(10));
 
     std::unique_ptr<hipdnn_sdk::data_objects::GraphT> graph;
     ASSERT_THROW_HIPDNN_PLUGIN_STATUS(
@@ -89,17 +89,32 @@ TEST_P(Flatbuffer_invalid_tests, WillNotUnpackInvalidBuffer)
     ASSERT_EQ(graph, nullptr);
 }
 
-INSTANTIATE_TEST_SUITE_P(
-    InvalidBufferTests,
-    Flatbuffer_invalid_tests,
-    ::testing::Values(std::make_pair(static_cast<const uint8_t*>(nullptr), size_t(10)),
-                      std::make_pair(std::array<uint8_t, 10>{0}.data(), size_t(10)),
-                      []() { //Valid graph but incorrect data size
-                          auto builder = Plugin_flatbuffer_utilities_test::create_valid_graph();
-                          auto serialized_graph = builder.Release();
-                          return std::make_pair(serialized_graph.data(),
-                                                serialized_graph.size() - 20);
-                      }()));
+TEST(Flatbuffer_invalid_tests, WillNotUnpackInvalidTrashBuffer)
+{
+    auto arr = std::array<uint8_t, 10>{0};
+
+    auto [buffer, size] = std::make_pair(arr.data(), size_t(10));
+
+    std::unique_ptr<hipdnn_sdk::data_objects::GraphT> graph;
+    ASSERT_THROW_HIPDNN_PLUGIN_STATUS(
+        flatbuffer_utilities::convert_serialized_plugin_graph_to_graph(buffer, size, graph),
+        HIPDNN_PLUGIN_STATUS_BAD_PARAM);
+    ASSERT_EQ(graph, nullptr);
+}
+
+TEST(Flatbuffer_invalid_tests, WillNotUnpackInvalidWrongSizeBuffer)
+{
+    auto builder = Plugin_flatbuffer_utilities_test::create_valid_graph();
+    auto serialized_graph = builder.Release();
+
+    auto [buffer, size] = std::make_pair(serialized_graph.data(), serialized_graph.size() - 20);
+
+    std::unique_ptr<hipdnn_sdk::data_objects::GraphT> graph;
+    ASSERT_THROW_HIPDNN_PLUGIN_STATUS(
+        flatbuffer_utilities::convert_serialized_plugin_graph_to_graph(buffer, size, graph),
+        HIPDNN_PLUGIN_STATUS_BAD_PARAM);
+    ASSERT_EQ(graph, nullptr);
+}
 
 } // namespace testing
 } // namespace hipdnn_plugin
