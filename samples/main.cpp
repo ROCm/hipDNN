@@ -33,11 +33,7 @@ static bool not_equal(const Tensor_attributes& tensor,
 
 int main()
 {
-#ifdef COMPONENT_NAME
-    hipdnn::logging::initialize_callback_logging(COMPONENT_NAME, hipdnnLoggingCallback_ext);
-#endif
-
-    HIPDNN_LOG_INFO("HipDNN SDK Sample: Graph Serialization and Deserialization");
+    initialize_frontend_logging(hipdnnLoggingCallback_ext);
 
     Graph graph;
 
@@ -316,7 +312,7 @@ int main()
         return EXIT_FAILURE;
     }
 
-    HIPDNN_LOG_INFO("Graph serialization and deserialization successful!");
+    std::cout << "Graph serialization and deserialization successful!" << std::endl;
 
     return EXIT_SUCCESS;
 }
