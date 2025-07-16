@@ -9,7 +9,6 @@ namespace miopen_legacy_plugin
 namespace miopen_utils
 {
 
-//might make more sense in plan utils
 hipdnnPluginDeviceBuffer_t find_device_buffer(int uid,
                                               const hipdnnPluginDeviceBuffer_t* device_buffers,
                                               uint32_t num_device_buffers)

@@ -42,6 +42,8 @@ add_executable(miopen_legacy_plugin_tests
     test_miopen_batchnorm_operations.cpp
     test_miopen_legacy_plugin_api.cpp
     test_miopen_handle_factory.cpp
+    test_miopen_tensor.cpp
+    test_miopen_utils.cpp
     test_engine_manager.cpp
     test_hipdnn_plugin_execution_context.cpp
 )

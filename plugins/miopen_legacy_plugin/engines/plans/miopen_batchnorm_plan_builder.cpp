@@ -12,10 +12,6 @@
 namespace miopen_legacy_plugin
 {
 
-// We have made the intentional decision to hardcode the batchnorm mode to miopenBNSpatial
-// rather than making it configurable and adding extra complexity.
-const miopenBatchNormMode_t miopen_batchnorm_mode = miopenBNSpatial;
-
 bool Miopen_batchnorm_plan_builder::is_applicable(
     const hipdnn_plugin::Graph_interface& op_graph) const
 {
@@ -55,8 +51,7 @@ void Miopen_batchnorm_plan_builder::build_plan(
     if(node.attributes_type()
        == hipdnn_sdk::data_objects::NodeAttributes_BatchnormInferenceAttributes)
     {
-        //HIPDNN_LOG_INFO("Building batchnorm fwd inference plan for node: {}", node.name());
-
+        HIPDNN_LOG_INFO("Building batchnorm fwd inference plan for node: {}", node.name()->str());
         if(const auto* batchnorm_inference_attr = node.attributes_as_BatchnormInferenceAttributes();
            batchnorm_inference_attr != nullptr)
         {

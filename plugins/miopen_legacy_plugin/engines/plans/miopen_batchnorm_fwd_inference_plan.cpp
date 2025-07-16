@@ -6,6 +6,10 @@
 namespace miopen_legacy_plugin
 {
 
+// We have made the intentional decision to hardcode the batchnorm mode to miopenBNSpatial
+// rather than making it configurable and adding extra complexity.
+const miopenBatchNormMode_t MIOPEN_BATCHNORM_MODE = miopenBNSpatial;
+
 Batchnorm_fwd_inference_params::Batchnorm_fwd_inference_params(
     const hipdnn_sdk::data_objects::BatchnormInferenceAttributes& attributes,
     const std::unordered_map<int64_t, const hipdnn_sdk::data_objects::TensorAttributes*>&

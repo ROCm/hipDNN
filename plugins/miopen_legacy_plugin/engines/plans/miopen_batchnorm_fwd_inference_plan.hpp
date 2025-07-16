@@ -46,8 +46,6 @@ private:
 class Batchnorm_fwd_inference_plan : public Plan_interface
 {
 public:
-    const miopenBatchNormMode_t MIOPEN_BATCHNORM_MODE = miopenBNSpatial;
-
     Batchnorm_fwd_inference_plan(std::unique_ptr<Batchnorm_fwd_inference_params> inference_params);
 
     void execute(const hipdnnEnginePluginHandle& handle,
