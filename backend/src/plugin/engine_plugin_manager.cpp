@@ -8,7 +8,5 @@ namespace hipdnn_backend
 namespace plugin
 {
 
-
-
 } // namespace plugin
 } // hipdnn_backend

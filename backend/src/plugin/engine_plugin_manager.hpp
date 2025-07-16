@@ -11,7 +11,7 @@ namespace hipdnn_backend
 namespace plugin
 {
 
-class Engine_plugin_manager: public Plugin_manager_base<Engine_plugin>
+class Engine_plugin_manager : public Plugin_manager_base<Engine_plugin>
 {
 protected:
     const std::vector<Engine_plugin>& get_plugins() const;
