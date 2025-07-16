@@ -41,6 +41,9 @@ void Plugin_base::resolve_symbols()
     catch(const Hipdnn_exception&)
     {
         _func_set_logging_callback = nullptr;
+
+        // Add name of plugin if ever possible
+        HIPDNN_LOG_INFO("Plugin does not support logging callback");
     }
 
 #ifndef NDEBUG

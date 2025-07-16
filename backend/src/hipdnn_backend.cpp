@@ -11,6 +11,7 @@
 #include "helpers.hpp"
 #include "hipdnn_exception.hpp"
 #include "plugin/plugin_manager.hpp"
+#include <spdlog/spdlog.h>
 
 #include <hipdnn_sdk/logging/logger.hpp>
 #include <hipdnn_sdk/utilities/string_util.hpp>
