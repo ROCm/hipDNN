@@ -116,6 +116,10 @@ void set_log_level(const std::string& level)
     {
         spdlog::set_level(spdlog::level::err);
     }
+    else if(level == "fatal")
+    {
+        spdlog::set_level(spdlog::level::critical);
+    }
 }
 
 std::shared_ptr<spdlog::logger> get_callback_receiver_logger()

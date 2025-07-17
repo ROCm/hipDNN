@@ -4,6 +4,7 @@
 #include <thread>
 
 #include <gtest/gtest.h>
+#include <utility>
 
 #include "plugin/plugin_core.hpp"
 
@@ -15,11 +16,16 @@ namespace
 class Plugin : public plugin::Plugin_base
 {
 public:
+    // Forward constructor to base class
+    explicit Plugin(plugin::Shared_library&& lib)
+        : Plugin_base(std::move(lib))
+    {
+    }
+
     using Plugin_base::_lib;
     using Plugin_base::get_last_error_string;
 
 private:
-    using Plugin_base::Plugin_base;
     friend class plugin::Plugin_manager_base<Plugin>;
 };
 
@@ -152,18 +158,15 @@ TEST(PluginManagerTest, LastErrorOnSecondLoad)
     }
 }
 
-TEST(PluginManagerTest, SetLoggingCallback)
+TEST(PluginTest, SetLoggingCallback)
 {
-    plugin::Plugin_manager_base<Plugin> plugin_manager;
-    std::vector<std::filesystem::path> plugin_paths = {"./hipdnn_test_plugin1"};
-    plugin_manager.load_plugins(plugin_paths);
+    g_callback_was_called = false;
 
-    // This is bad but necessary unless we overload `get_plugins` to return a non-const vector.
-    // The purpose of this test is only to check the setter functionality.
-    auto& plugins = const_cast<std::vector<Plugin>&>(plugin_manager.get_plugins());
-    ASSERT_EQ(plugins.size(), 1);
+    plugin::Shared_library lib("./hipdnn_test_plugin1");
 
-    EXPECT_EQ(plugins[0].set_logging_callback(dummy_callback), HIPDNN_PLUGIN_STATUS_SUCCESS);
+    Plugin plugin(std::move(lib));
+
+    EXPECT_EQ(plugin.set_logging_callback(dummy_callback), HIPDNN_PLUGIN_STATUS_SUCCESS);
     EXPECT_TRUE(g_callback_was_called);
-    EXPECT_EQ(plugins[0].set_logging_callback(nullptr), HIPDNN_PLUGIN_STATUS_BAD_PARAM);
+    EXPECT_EQ(plugin.set_logging_callback(nullptr), HIPDNN_PLUGIN_STATUS_BAD_PARAM);
 }
