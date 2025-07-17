@@ -1,9 +1,14 @@
 // Copyright © Advanced Micro Devices, Inc., or its affiliates.
 // SPDX-License-Identifier:  MIT
 
+
 #pragma once
 
+
 #include <miopen/miopen.h>
+#include <unordered_map>
+#include <memory>
+#include <flatbuffers/flatbuffers.h>
 
 #include "miopen_container.hpp"
 
@@ -20,4 +25,7 @@ public:
     {
         return miopen_container->get_engine_manager();
     }
+
+    // Map shallow pointer (const void*) to its corresponding DetachedBuffer for engine details
+    std::unordered_map<const void*, std::unique_ptr<flatbuffers::DetachedBuffer>> engine_details_buffers;
 };
