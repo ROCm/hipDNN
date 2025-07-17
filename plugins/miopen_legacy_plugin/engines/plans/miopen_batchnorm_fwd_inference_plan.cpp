@@ -50,47 +50,39 @@ const std::optional<std::unique_ptr<Miopen_tensor>>&
     return _est_variance_tensor_descriptor;
 }
 
+std::unique_ptr<Miopen_tensor> create_tensor(
+    const std::unordered_map<int64_t, const hipdnn_sdk::data_objects::TensorAttributes*>&
+        tensor_map,
+    int64_t uid)
+{
+    if(auto tensor_attr = tensor_map.find(uid); tensor_attr != tensor_map.end())
+    {
+        return std::make_unique<Miopen_tensor>(*tensor_attr->second);
+    }
+
+    throw hipdnn_plugin::Hipdnn_plugin_exception(HIPDNN_PLUGIN_STATUS_INTERNAL_ERROR,
+                                                 "Failed to find tensor with UID in tensor_map: "
+                                                     + std::to_string(uid));
+}
+
 void Batchnorm_fwd_inference_params::initialize_tensors(
     const hipdnn_sdk::data_objects::BatchnormInferenceAttributes& attributes,
     const std::unordered_map<int64_t, const hipdnn_sdk::data_objects::TensorAttributes*>&
         tensor_map)
 {
-    if(auto x_tensor_attr = tensor_map.find(attributes.x()); x_tensor_attr != tensor_map.end())
-    {
-        _x_pair = std::make_unique<Miopen_tensor>(*x_tensor_attr->second);
-    }
-    if(auto y_tensor_attr = tensor_map.find(attributes.y()); y_tensor_attr != tensor_map.end())
-    {
-        _y_pair = std::make_unique<Miopen_tensor>(*y_tensor_attr->second);
-    }
-    if(auto scale_tensor_attr = tensor_map.find(attributes.scale());
-       scale_tensor_attr != tensor_map.end())
-    {
-        _scale_pair = std::make_unique<Miopen_tensor>(*scale_tensor_attr->second);
-    }
-    if(auto bias_tensor_attr = tensor_map.find(attributes.bias());
-       bias_tensor_attr != tensor_map.end())
-    {
-        _bias_pair = std::make_unique<Miopen_tensor>(*bias_tensor_attr->second);
-    }
+    _x_pair = create_tensor(tensor_map, attributes.x());
+    _y_pair = create_tensor(tensor_map, attributes.y());
+    _scale_pair = create_tensor(tensor_map, attributes.scale());
+    _bias_pair = create_tensor(tensor_map, attributes.bias());
 
     if(attributes.mean().has_value())
     {
-        if(auto est_mean_attr = tensor_map.find(attributes.mean().value());
-           est_mean_attr != tensor_map.end())
-        {
-            _est_mean_tensor_descriptor = std::make_unique<Miopen_tensor>(*est_mean_attr->second);
-        }
+        _est_mean_tensor_descriptor = create_tensor(tensor_map, attributes.mean().value());
     }
-
     if(attributes.inv_variance().has_value())
     {
-        if(auto inv_variance_attr = tensor_map.find(attributes.inv_variance().value());
-           inv_variance_attr != tensor_map.end())
-        {
-            _est_variance_tensor_descriptor
-                = std::make_unique<Miopen_tensor>(*inv_variance_attr->second);
-        }
+        _est_variance_tensor_descriptor
+            = create_tensor(tensor_map, attributes.inv_variance().value());
     }
 }
 

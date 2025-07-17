@@ -32,7 +32,8 @@ inline flatbuffers::FlatBufferBuilder create_empty_valid_graph()
 
 inline flatbuffers::FlatBufferBuilder
     create_valid_batchnorm_graph(std::vector<int64_t> strides = {1, 3, 224, 224},
-                                 std::vector<int64_t> dims = {1, 3, 224, 224})
+                                 std::vector<int64_t> dims = {1, 3, 224, 224},
+                                 bool has_optional_attributes = true)
 {
     flatbuffers::FlatBufferBuilder builder;
     std::vector<::flatbuffers::Offset<hipdnn_sdk::data_objects::TensorAttributes>>
@@ -50,21 +51,26 @@ inline flatbuffers::FlatBufferBuilder
     tensor_attributes.push_back(hipdnn_sdk::data_objects::CreateTensorAttributesDirect(
         builder, 4, "bias", hipdnn_sdk::data_objects::DataType_FLOAT, &strides, &dims));
 
-    tensor_attributes.push_back(hipdnn_sdk::data_objects::CreateTensorAttributesDirect(
-        builder, 5, "est_mean", hipdnn_sdk::data_objects::DataType_FLOAT, &strides, &dims));
+    if(has_optional_attributes)
+    {
+        tensor_attributes.push_back(hipdnn_sdk::data_objects::CreateTensorAttributesDirect(
+            builder, 5, "est_mean", hipdnn_sdk::data_objects::DataType_FLOAT, &strides, &dims));
 
-    tensor_attributes.push_back(hipdnn_sdk::data_objects::CreateTensorAttributesDirect(
-        builder, 6, "est_variance", hipdnn_sdk::data_objects::DataType_FLOAT, &strides, &dims));
+        tensor_attributes.push_back(hipdnn_sdk::data_objects::CreateTensorAttributesDirect(
+            builder, 6, "est_variance", hipdnn_sdk::data_objects::DataType_FLOAT, &strides, &dims));
+    }
 
-    auto bnorm_attributes
-        = hipdnn_sdk::data_objects::CreateBatchnormInferenceAttributes(builder,
-                                                                       1, // x uid
-                                                                       5, // mean uid
-                                                                       6, // inv_variance uid
-                                                                       3, // scale uid
-                                                                       4, // bias uid
-                                                                       2 // y uid
-        );
+    auto bnorm_attributes = hipdnn_sdk::data_objects::CreateBatchnormInferenceAttributes(
+        builder,
+        1, // x uid
+        has_optional_attributes ? flatbuffers::Optional<int64_t>(5)
+                                : flatbuffers::nullopt, // mean uid
+        has_optional_attributes ? flatbuffers::Optional<int64_t>(6)
+                                : flatbuffers::nullopt, // inv_variance uid
+        3, // scale uid
+        4, // bias uid
+        2 // y uid
+    );
 
     std::vector<::flatbuffers::Offset<hipdnn_sdk::data_objects::Node>> nodes;
     auto node = hipdnn_sdk::data_objects::CreateNodeDirect(

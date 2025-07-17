@@ -40,7 +40,9 @@ TEST(BatchnormFwdInferenceParamsTest, InitializesAllTensorsFromValidGraph)
 TEST(BatchnormFwdInferenceParamsTest, HandlesMissingOptionalTensors)
 {
     // Create a valid batchnorm graph and remove mean/variance from tensor map
-    auto builder = flatbuffer_test_utils::create_valid_batchnorm_graph();
+    auto builder = flatbuffer_test_utils::create_valid_batchnorm_graph(
+        {1, 1, 1, 1}, {1, 1, 1, 1}, false // Set has_optional_attributes to false
+    );
     hipdnn_plugin::Graph_wrapper graph(builder.GetBufferPointer(), builder.GetSize());
 
     // Get the batchnorm node and attributes
@@ -48,11 +50,7 @@ TEST(BatchnormFwdInferenceParamsTest, HandlesMissingOptionalTensors)
     auto* attrs = node.attributes_as_BatchnormInferenceAttributes();
     ASSERT_NE(attrs, nullptr);
 
-    // Create a tensor map missing mean/variance
-    auto tensor_map = graph.get_tensor_map();
-    tensor_map.erase(attrs->mean().value());
-    tensor_map.erase(attrs->inv_variance().value());
-
+    const auto& tensor_map = graph.get_tensor_map();
     Batchnorm_fwd_inference_params params(*attrs, tensor_map);
 
     // Optional tensors should not be present
