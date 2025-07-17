@@ -12,9 +12,11 @@ protected:
     hipdnnBackendDescriptor_t _engine_config;
     hipdnnBackendDescriptor_t _engine = nullptr;
     hipdnnBackendDescriptor_t _graph = nullptr;
+    hipdnnHandle_t _handle = nullptr;
 
     void SetUp() override
     {
+        ASSERT_EQ(hipdnnCreate(&_handle), HIPDNN_STATUS_SUCCESS);
         EXPECT_EQ(
             hipdnnBackendCreateDescriptor(HIPDNN_BACKEND_ENGINECFG_DESCRIPTOR, &_engine_config),
             HIPDNN_STATUS_SUCCESS);
@@ -32,6 +34,11 @@ protected:
         {
             EXPECT_EQ(hipdnnBackendDestroyDescriptor(_graph), HIPDNN_STATUS_SUCCESS);
         }
+        if(_handle != nullptr)
+        {
+            EXPECT_EQ(hipdnnDestroy(_handle), HIPDNN_STATUS_SUCCESS);
+            _handle = nullptr;
+        }
     }
 };
 
@@ -46,7 +53,7 @@ TEST_F(Engine_config_api_tests, SetEngineConfigEngine)
                                         &_engine),
               HIPDNN_STATUS_BAD_PARAM_NULL_POINTER);
 
-    test_util::create_test_engine(&_engine, &_graph, gidx);
+    test_util::create_test_engine(&_engine, &_graph, _handle, gidx);
     EXPECT_EQ(hipdnnBackendSetAttribute(_engine_config,
                                         HIPDNN_ATTR_ENGINECFG_ENGINE,
                                         HIPDNN_TYPE_BACKEND_DESCRIPTOR,
@@ -60,7 +67,7 @@ TEST_F(Engine_config_api_tests, FinalizeEngineConfig)
     int64_t gidx = -1; // TODO hardcode for now
 
     EXPECT_EQ(hipdnnBackendFinalize(_engine_config), HIPDNN_STATUS_BAD_PARAM);
-    test_util::populate_test_engine_config(&_engine_config, &_engine, &_graph, gidx);
+    test_util::populate_test_engine_config(&_engine_config, &_engine, &_graph, _handle, gidx);
     EXPECT_EQ(hipdnnBackendFinalize(_engine_config), HIPDNN_STATUS_SUCCESS);
 }
 
@@ -69,7 +76,7 @@ TEST_F(Engine_config_api_tests, GetMaxWorkspaceSizeFromEngineConfig)
     int64_t gidx = -1; // TODO hardcode for now
     int64_t max_workspace_size = 0;
 
-    test_util::populate_test_engine_config(&_engine_config, &_engine, &_graph, gidx, true);
+    test_util::populate_test_engine_config(&_engine_config, &_engine, &_graph, _handle, gidx, true);
     EXPECT_EQ(hipdnnBackendGetAttribute(_engine_config,
                                         HIPDNN_ATTR_ENGINECFG_WORKSPACE_SIZE,
                                         HIPDNN_TYPE_INT64,

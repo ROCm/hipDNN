@@ -11,6 +11,7 @@
 #include "hipdnn_backend_attribute_name.h"
 #include "hipdnn_backend_attribute_type.h"
 #include "hipdnn_backend_descriptor_type.h"
+#include "hipdnn_backend_heuristic_type.h"
 #include "hipdnn_status.h"
 
 // NOLINTBEGIN

@@ -131,7 +131,7 @@ void Execution_plan_descriptor::set_handle(hipdnnBackendAttributeType_t attribut
                   HIPDNN_STATUS_BAD_PARAM_NULL_POINTER,
                   "Execution_plan_descriptor failed to set handle: Null pointer.");
 
-    hipdnnHandle_t handle = *reinterpret_cast<const hipdnnHandle_t*>(array_of_elements);
+    hipdnnHandle_t handle = *static_cast<const hipdnnHandle_t*>(array_of_elements);
 
     THROW_IF_NULL(handle,
                   HIPDNN_STATUS_BAD_PARAM_NULL_POINTER,
@@ -159,7 +159,7 @@ void Execution_plan_descriptor::set_engine_config(hipdnnBackendAttributeType_t a
                   "Execution_plan_descriptor failed to set engine config: Null pointer.");
 
     hipdnnBackendDescriptor_t engine_config
-        = *reinterpret_cast<const hipdnnBackendDescriptor_t*>(array_of_elements);
+        = *static_cast<const hipdnnBackendDescriptor_t*>(array_of_elements);
 
     THROW_IF_NULL(engine_config,
                   HIPDNN_STATUS_BAD_PARAM_NULL_POINTER,

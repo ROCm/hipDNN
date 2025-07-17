@@ -8,6 +8,7 @@ add_executable(public_hipdnn_backend_tests
     test_backend_public_functions.cpp
     test_backend_execute_api.cpp
     test_engine_config_api.cpp
+    test_engine_heuristic_api.cpp
     test_engine_api.cpp
     test_execution_plan_api.cpp
     test_get_error_api.cpp

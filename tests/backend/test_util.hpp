@@ -16,34 +16,38 @@ namespace test_util
 
 void create_test_handle(hipdnnHandle_t* handle);
 
-void create_test_graph(hipdnnBackendDescriptor_t* descriptor);
+void create_test_graph(hipdnnBackendDescriptor_t* descriptor, hipdnnHandle_t handle);
 
 void populate_test_engine(hipdnnBackendDescriptor_t engine,
                           hipdnnBackendDescriptor_t* graph,
+                          hipdnnHandle_t handle,
                           int64_t gidx,
                           bool finalize = false);
 
 void create_test_engine(hipdnnBackendDescriptor_t* engine,
                         hipdnnBackendDescriptor_t* graph,
+                        hipdnnHandle_t handle,
                         int64_t gidx);
 
 void populate_test_engine_config(hipdnnBackendDescriptor_t* engine_config,
                                  hipdnnBackendDescriptor_t* engine,
                                  hipdnnBackendDescriptor_t* graph,
+                                 hipdnnHandle_t handle,
                                  int64_t gidx,
                                  bool finalize = false);
 
 void create_test_engine_config(hipdnnBackendDescriptor_t* engine_config,
                                hipdnnBackendDescriptor_t* engine,
                                hipdnnBackendDescriptor_t* graph,
+                               hipdnnHandle_t handle,
                                int64_t gidx,
                                bool finalize = false);
 
 void populate_test_execution_plan(hipdnnBackendDescriptor_t* execution_plan,
-                                  hipdnnHandle_t* handle,
                                   hipdnnBackendDescriptor_t* engine_config,
                                   hipdnnBackendDescriptor_t* engine,
                                   hipdnnBackendDescriptor_t* graph,
+                                  hipdnnHandle_t handle,
                                   int64_t gidx,
                                   bool finalize = false);
 
@@ -62,7 +66,8 @@ void populate_variant_pack_with_mappings(
     void* workspace = nullptr);
 
 void create_and_initialize_backend_descriptor(hipdnnBackendDescriptor_t* backend_descriptor,
-                                              const flatbuffers::DetachedBuffer& serialized_graph);
+                                              const flatbuffers::DetachedBuffer& serialized_graph,
+                                              hipdnnHandle_t handle);
 
 void extract_tensor_info_from_graph(
     const flatbuffers::DetachedBuffer& serialized_graph,
