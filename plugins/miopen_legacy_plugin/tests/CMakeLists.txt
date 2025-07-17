@@ -28,6 +28,8 @@ add_executable(miopen_legacy_plugin_tests
     test_hipdnn_plugin_execution_context.cpp
 )
 
+target_compile_options(miopen_legacy_plugin_tests PRIVATE ${HIPDNN_WARNING_COMPILE_OPTIONS})
+
 target_link_libraries(miopen_legacy_plugin_tests PUBLIC 
     GTest::gtest
     GTest::gmock
@@ -40,7 +42,6 @@ target_include_directories(miopen_legacy_plugin_tests PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
-target_compile_options(miopen_legacy_plugin_tests PRIVATE ${HIPDNN_WARNING_COMPILE_OPTIONS})
 
 if(BUILD_PLUGIN_AS_DEPENDENCY)
     clang_tidy_check(miopen_legacy_plugin_tests)
