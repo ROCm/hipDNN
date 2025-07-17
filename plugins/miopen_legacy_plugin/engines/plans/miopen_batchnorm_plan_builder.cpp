@@ -19,7 +19,7 @@ bool Miopen_batchnorm_plan_builder::is_applicable(
     if(op_graph.node_count() != 1)
     {
         HIPDNN_LOG_INFO(
-            "Batchnorm solver is applicable only for single node graphs. Graph has {} nodes",
+            "Batchnorm plan builder is applicable only for single node graphs. Graph has {} nodes",
             op_graph.node_count());
         return false;
     }
@@ -27,7 +27,7 @@ bool Miopen_batchnorm_plan_builder::is_applicable(
     if(!op_graph.has_only_supported_attributes(std::set<hipdnn_sdk::data_objects::NodeAttributes>{
            hipdnn_sdk::data_objects::NodeAttributes_BatchnormInferenceAttributes}))
     {
-        HIPDNN_LOG_INFO("Batchnorm solver is not applicable for this graph");
+        HIPDNN_LOG_INFO("Batchnorm plan builder is not applicable for this graph");
         return false;
     }
 
@@ -39,7 +39,7 @@ size_t Miopen_batchnorm_plan_builder::get_workspace_size(
 {
     std::ignore = handle;
     std::ignore = op_graph;
-    //batchnorm solver does not require workspace size
+    //batchnorm plan builder does not require workspace size
     return 0u;
 }
 
@@ -78,7 +78,7 @@ void Miopen_batchnorm_plan_builder::build_plan(
     {
         throw hipdnn_plugin::Hipdnn_plugin_exception(
             HIPDNN_PLUGIN_STATUS_BAD_PARAM,
-            "Unsupported node type for batchnorm solver: "
+            "Unsupported node type for batchnorm plan builder: "
                 + std::string(hipdnn_sdk::data_objects::to_string(node.attributes_type())));
     }
 }
