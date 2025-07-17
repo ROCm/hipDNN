@@ -41,12 +41,24 @@ public:
     // MT-unsafe instance methods
     void set_stream(hipStream_t stream) const;
     std::vector<int64_t> get_applicable_engine_ids(const hipdnnPluginConstData_t* op_graph) const;
-    void get_engine_details(int64_t engine_id, const hipdnnPluginConstData_t* op_graph, hipdnnPluginConstData_t* engine_details) const;
+    void get_engine_details(int64_t engine_id,
+                            const hipdnnPluginConstData_t* op_graph,
+                            hipdnnPluginConstData_t* engine_details) const;
     void destroy_engine_details(int64_t engine_id, hipdnnPluginConstData_t* engine_details) const;
-    size_t get_workspace_size(int64_t engine_id, const hipdnnPluginConstData_t* engine_config, const hipdnnPluginConstData_t* op_graph) const;
-    hipdnnEnginePluginExecutionContext_t create_execution_context(int64_t engine_id, const hipdnnPluginConstData_t* engine_config, const hipdnnPluginConstData_t* op_graph) const;
-    void destroy_execution_context(int64_t engine_id, hipdnnEnginePluginExecutionContext_t execution_context) const;
-    void execute_op_graph(int64_t engine_id, hipdnnEnginePluginExecutionContext_t execution_context, void* workspace, const hipdnnPluginDeviceBuffer_t* device_buffers, uint32_t num_device_buffers) const;
+    size_t get_workspace_size(int64_t engine_id,
+                              const hipdnnPluginConstData_t* engine_config,
+                              const hipdnnPluginConstData_t* op_graph) const;
+    hipdnnEnginePluginExecutionContext_t
+        create_execution_context(int64_t engine_id,
+                                 const hipdnnPluginConstData_t* engine_config,
+                                 const hipdnnPluginConstData_t* op_graph) const;
+    void destroy_execution_context(int64_t engine_id,
+                                   hipdnnEnginePluginExecutionContext_t execution_context) const;
+    void execute_op_graph(int64_t engine_id,
+                          hipdnnEnginePluginExecutionContext_t execution_context,
+                          void* workspace,
+                          const hipdnnPluginDeviceBuffer_t* device_buffers,
+                          uint32_t num_device_buffers) const;
 
 private:
     std::shared_ptr<Root_engine_plugin_manager> _root_pm;

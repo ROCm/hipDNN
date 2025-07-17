@@ -137,7 +137,8 @@ void Engine_plugin_manager::set_stream(hipStream_t stream) const
 
 // TODO: Pack op_graph
 // TODO: Combine with get_engine_details()
-std::vector<int64_t> Engine_plugin_manager::get_applicable_engine_ids(const hipdnnPluginConstData_t* op_graph) const
+std::vector<int64_t>
+    Engine_plugin_manager::get_applicable_engine_ids(const hipdnnPluginConstData_t* op_graph) const
 {
     std::vector<int64_t> engine_ids;
 
@@ -152,7 +153,8 @@ std::vector<int64_t> Engine_plugin_manager::get_applicable_engine_ids(const hipd
             if(it != _engine_id_to_handle.end() && it->second != handle)
             {
                 throw Hipdnn_exception(HIPDNN_STATUS_PLUGIN_ERROR,
-                    "Engine ID " + std::to_string(id) + " is already associated with a different plugin");
+                                       "Engine ID " + std::to_string(id)
+                                           + " is already associated with a different plugin");
             }
             _engine_id_to_handle[id] = handle;
         }
@@ -164,7 +166,9 @@ std::vector<int64_t> Engine_plugin_manager::get_applicable_engine_ids(const hipd
 // TODO: Pack op_graph
 // TODO: Return a smart pointer to the engine details
 // TODO: Combine with get_applicable_engine_ids()
-void Engine_plugin_manager::get_engine_details(int64_t engine_id, const hipdnnPluginConstData_t* op_graph, hipdnnPluginConstData_t* engine_details) const
+void Engine_plugin_manager::get_engine_details(int64_t engine_id,
+                                               const hipdnnPluginConstData_t* op_graph,
+                                               hipdnnPluginConstData_t* engine_details) const
 {
     auto handle = _engine_id_to_handle.at(engine_id);
     auto plugin = _handle_to_plugin.at(handle);
@@ -173,7 +177,8 @@ void Engine_plugin_manager::get_engine_details(int64_t engine_id, const hipdnnPl
 }
 
 // TODO: Get engine_id from engine_details
-void Engine_plugin_manager::destroy_engine_details(int64_t engine_id, hipdnnPluginConstData_t* engine_details) const
+void Engine_plugin_manager::destroy_engine_details(int64_t engine_id,
+                                                   hipdnnPluginConstData_t* engine_details) const
 {
     auto handle = _engine_id_to_handle.at(engine_id);
     auto plugin = _handle_to_plugin.at(handle);
@@ -184,7 +189,9 @@ void Engine_plugin_manager::destroy_engine_details(int64_t engine_id, hipdnnPlug
 // TODO: Pack op_graph
 // TODO: Pack engine_config
 // TODO: Get engine_id from engine_config
-size_t Engine_plugin_manager::get_workspace_size(int64_t engine_id, const hipdnnPluginConstData_t* engine_config, const hipdnnPluginConstData_t* op_graph) const
+size_t Engine_plugin_manager::get_workspace_size(int64_t engine_id,
+                                                 const hipdnnPluginConstData_t* engine_config,
+                                                 const hipdnnPluginConstData_t* op_graph) const
 {
     auto handle = _engine_id_to_handle.at(engine_id);
     auto plugin = _handle_to_plugin.at(handle);
@@ -196,7 +203,10 @@ size_t Engine_plugin_manager::get_workspace_size(int64_t engine_id, const hipdnn
 // TODO: Pack engine_config
 // TODO: Get engine_id from engine_config
 // TODO: Return a smart pointer to the execution context
-hipdnnEnginePluginExecutionContext_t Engine_plugin_manager::create_execution_context(int64_t engine_id, const hipdnnPluginConstData_t* engine_config, const hipdnnPluginConstData_t* op_graph) const
+hipdnnEnginePluginExecutionContext_t
+    Engine_plugin_manager::create_execution_context(int64_t engine_id,
+                                                    const hipdnnPluginConstData_t* engine_config,
+                                                    const hipdnnPluginConstData_t* op_graph) const
 {
     auto handle = _engine_id_to_handle.at(engine_id);
     auto plugin = _handle_to_plugin.at(handle);
@@ -204,7 +214,8 @@ hipdnnEnginePluginExecutionContext_t Engine_plugin_manager::create_execution_con
     return plugin->create_execution_context(handle, engine_config, op_graph);
 }
 
-void Engine_plugin_manager::destroy_execution_context(int64_t engine_id, hipdnnEnginePluginExecutionContext_t execution_context) const
+void Engine_plugin_manager::destroy_execution_context(
+    int64_t engine_id, hipdnnEnginePluginExecutionContext_t execution_context) const
 {
     auto handle = _engine_id_to_handle.at(engine_id);
     auto plugin = _handle_to_plugin.at(handle);
@@ -212,12 +223,17 @@ void Engine_plugin_manager::destroy_execution_context(int64_t engine_id, hipdnnE
     plugin->destroy_execution_context(handle, execution_context);
 }
 
-void Engine_plugin_manager::execute_op_graph(int64_t engine_id, hipdnnEnginePluginExecutionContext_t execution_context, void* workspace, const hipdnnPluginDeviceBuffer_t* device_buffers, uint32_t num_device_buffers) const
+void Engine_plugin_manager::execute_op_graph(int64_t engine_id,
+                                             hipdnnEnginePluginExecutionContext_t execution_context,
+                                             void* workspace,
+                                             const hipdnnPluginDeviceBuffer_t* device_buffers,
+                                             uint32_t num_device_buffers) const
 {
     auto handle = _engine_id_to_handle.at(engine_id);
     auto plugin = _handle_to_plugin.at(handle);
 
-    plugin->execute_op_graph(handle, execution_context, workspace, device_buffers, num_device_buffers);
+    plugin->execute_op_graph(
+        handle, execution_context, workspace, device_buffers, num_device_buffers);
 }
 
 } // namespace plugin
