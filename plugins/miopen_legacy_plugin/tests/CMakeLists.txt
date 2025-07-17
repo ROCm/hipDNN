@@ -42,11 +42,14 @@ add_executable(miopen_legacy_plugin_tests
     test_miopen_engine.cpp
 )
 
+find_package(hipdnn_backend CONFIG REQUIRED)
+
 target_link_libraries(miopen_legacy_plugin_tests PUBLIC 
     GTest::gtest
     GTest::gmock
     miopen_legacy_plugin
     pthread
+    hipdnn_backend
 )
 
 target_compile_options(miopen_legacy_plugin_tests PRIVATE ${HIPDNN_WARNING_COMPILE_OPTIONS})
