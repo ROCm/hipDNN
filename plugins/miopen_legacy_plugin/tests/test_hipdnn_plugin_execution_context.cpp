@@ -22,3 +22,22 @@ TEST(HipdnnEnginePluginExecutionContextTest, SetAndGetPlan)
 
     EXPECT_EQ(&plan_ref, plan_ptr);
 }
+
+TEST(HipdnnEnginePluginExecutionContextTest, HasValidPlan)
+{
+    hipdnnEnginePluginExecutionContext ctx;
+
+    EXPECT_FALSE(ctx.has_valid_plan());
+
+    auto mock_plan = std::make_unique<miopen_legacy_plugin::Mock_plan>();
+    ctx.set_plan(std::move(mock_plan));
+
+    EXPECT_TRUE(ctx.has_valid_plan());
+}
+
+TEST(HipdnnEnginePluginExecutionContextTest, GetPlanThrowsIfNotSet)
+{
+    hipdnnEnginePluginExecutionContext ctx;
+
+    EXPECT_THROW(ctx.plan(), hipdnn_plugin::Hipdnn_plugin_exception);
+}

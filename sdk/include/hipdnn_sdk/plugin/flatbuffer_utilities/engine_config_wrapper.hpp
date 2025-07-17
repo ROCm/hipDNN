@@ -32,7 +32,7 @@ public:
             flatbuffers::Verifier verifier(static_cast<const uint8_t*>(buffer), size);
             if(verifier.VerifyBuffer<hipdnn_sdk::data_objects::EngineConfig>())
             {
-                _engine_config
+                _shallow_engine_config
                     = flatbuffers::GetRoot<hipdnn_sdk::data_objects::EngineConfig>(buffer);
             }
         }
@@ -42,19 +42,19 @@ public:
     {
         throw_if_not_valid();
 
-        return *_engine_config;
+        return *_shallow_engine_config;
     }
 
     bool is_valid() const override
     {
-        return _engine_config != nullptr;
+        return _shallow_engine_config != nullptr;
     }
 
     int64_t engine_id() const override
     {
         throw_if_not_valid();
 
-        return _engine_config->engine_id();
+        return _shallow_engine_config->engine_id();
     }
 
 private:
@@ -67,7 +67,9 @@ private:
         }
     }
 
-    const hipdnn_sdk::data_objects::EngineConfig* _engine_config = nullptr;
+    // Pointer to the flatbuffer representation of the engine config. We do not own this memory
+    // as were just reading from the buffer passed during construction.
+    const hipdnn_sdk::data_objects::EngineConfig* _shallow_engine_config = nullptr;
 };
 
 }

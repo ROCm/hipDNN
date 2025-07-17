@@ -38,22 +38,16 @@ const Miopen_tensor& Batchnorm_fwd_inference_params::bias() const
     return *_bias_pair;
 }
 
-const std::optional<const Miopen_tensor*> Batchnorm_fwd_inference_params::est_mean() const
+const std::optional<std::unique_ptr<Miopen_tensor>>&
+    Batchnorm_fwd_inference_params::est_mean() const
 {
-    if(_est_mean_tensor_descriptor)
-    {
-        return std::optional<const Miopen_tensor*>(_est_mean_tensor_descriptor.get());
-    }
-    return std::optional<const Miopen_tensor*>();
+    return _est_mean_tensor_descriptor;
 }
 
-const std::optional<const Miopen_tensor*> Batchnorm_fwd_inference_params::est_variance() const
+const std::optional<std::unique_ptr<Miopen_tensor>>&
+    Batchnorm_fwd_inference_params::est_variance() const
 {
-    if(_est_variance_tensor_descriptor)
-    {
-        return std::optional<const Miopen_tensor*>(_est_variance_tensor_descriptor.get());
-    }
-    return std::optional<const Miopen_tensor*>();
+    return _est_variance_tensor_descriptor;
 }
 
 void Batchnorm_fwd_inference_params::initialize_tensors(
@@ -111,9 +105,10 @@ void Batchnorm_fwd_inference_plan::execute(const hipdnnEnginePluginHandle& handl
                                            uint32_t num_device_buffers,
                                            void* workspace) const
 {
+    // Hardcoded values from bn_driver in miopen
     float alpha = static_cast<float>(1);
     float beta = static_cast<float>(0);
-    double epsilon = 1e-3; // taken from bn driver, todo, figure out better way
+    double epsilon = 1e-3;
 
     auto x_buffer = miopen_utils::find_device_buffer(
         _inference_params->x().uid(), device_buffers, num_device_buffers);
@@ -125,17 +120,17 @@ void Batchnorm_fwd_inference_plan::execute(const hipdnnEnginePluginHandle& handl
         _inference_params->bias().uid(), device_buffers, num_device_buffers);
 
     hipdnnPluginDeviceBuffer_t est_mean_buffer = {0, nullptr};
-    if(auto est_mean = _inference_params->est_mean(); est_mean.has_value())
+    if(_inference_params->est_mean().has_value())
     {
         est_mean_buffer = miopen_utils::find_device_buffer(
-            est_mean.value()->uid(), device_buffers, num_device_buffers);
+            _inference_params->est_mean().value()->uid(), device_buffers, num_device_buffers);
     }
 
     hipdnnPluginDeviceBuffer_t est_variance_buffer = {0, nullptr};
-    if(auto est_variance = _inference_params->est_variance(); est_variance.has_value())
+    if(_inference_params->est_variance().has_value())
     {
         est_variance_buffer = miopen_utils::find_device_buffer(
-            est_variance.value()->uid(), device_buffers, num_device_buffers);
+            _inference_params->est_variance().value()->uid(), device_buffers, num_device_buffers);
     }
 
     auto miopen_status = miopenBatchNormalizationForwardInference_V2(

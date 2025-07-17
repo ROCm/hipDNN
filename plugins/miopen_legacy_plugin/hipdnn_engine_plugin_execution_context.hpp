@@ -19,18 +19,25 @@ struct hipdnnEnginePluginExecutionContext
 public:
     virtual ~hipdnnEnginePluginExecutionContext() = default;
 
-    bool has_valid_plan()
+    bool has_valid_plan() const
     {
         return _plan != nullptr;
     }
 
     void set_plan(std::unique_ptr<miopen_legacy_plugin::Plan_interface> plan)
     {
+
         _plan = std::move(plan);
     }
 
     virtual miopen_legacy_plugin::Plan_interface& plan() const
     {
+        if(!has_valid_plan())
+        {
+            throw hipdnn_plugin::Hipdnn_plugin_exception(
+                HIPDNN_PLUGIN_STATUS_INTERNAL_ERROR,
+                "Cannot get plan in execution context, its not set");
+        }
         return *_plan;
     }
 

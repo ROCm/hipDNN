@@ -29,8 +29,8 @@ TEST(BatchnormFwdInferenceParamsTest, InitializesAllTensorsFromValidGraph)
     EXPECT_NO_THROW(params.bias());
 
     // Optional tensors should be present
-    auto mean_opt = params.est_mean();
-    auto var_opt = params.est_variance();
+    auto& mean_opt = params.est_mean();
+    auto& var_opt = params.est_variance();
     EXPECT_TRUE(mean_opt.has_value());
     EXPECT_TRUE(var_opt.has_value());
     EXPECT_NE(mean_opt.value(), nullptr);
