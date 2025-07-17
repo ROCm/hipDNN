@@ -127,7 +127,7 @@ void Batchnorm_fwd_inference_plan::execute(const hipdnnEnginePluginHandle& handl
             _inference_params->est_variance().value()->uid(), device_buffers, num_device_buffers);
     }
 
-    auto miopen_status = miopenBatchNormalizationForwardInference_V2(
+    THROW_ON_MIOPEN_FAILURE(miopenBatchNormalizationForwardInference_V2(
         handle.miopen_handle,
         MIOPEN_BATCHNORM_MODE,
         &alpha,
@@ -148,10 +148,7 @@ void Batchnorm_fwd_inference_plan::execute(const hipdnnEnginePluginHandle& handl
         bias_buffer.ptr,
         est_mean_buffer.ptr,
         est_variance_buffer.ptr,
-        epsilon);
-
-    HIPDNN_LOG_INFO("MIOpen batchnorm forward inference status: {}",
-                    miopenGetErrorString(miopen_status));
+        epsilon));
 }
 
 }

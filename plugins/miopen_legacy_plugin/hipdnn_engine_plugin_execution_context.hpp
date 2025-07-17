@@ -26,7 +26,6 @@ public:
 
     void set_plan(std::unique_ptr<miopen_legacy_plugin::Plan_interface> plan)
     {
-
         _plan = std::move(plan);
     }
 
