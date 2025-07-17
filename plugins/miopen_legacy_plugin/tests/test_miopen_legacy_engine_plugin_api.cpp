@@ -7,6 +7,7 @@
 #include <hipdnn_sdk/plugin/flatbuffer_utilities/engine_details_wrapper.hpp>
 #include <hipdnn_sdk/plugin/plugin_api_data_types.h>
 #include <hipdnn_sdk/test_utilities/flatbuffer_graph_test_utils.hpp>
+#include <hipdnn_sdk/test_utilities/test_utilities.hpp>
 
 #include "hipdnn_engine_plugin_execution_context.hpp"
 #include "hipdnn_engine_plugin_handle.hpp"
@@ -19,6 +20,7 @@ TEST(MiopenLegacyEnginePluginApiTest, EnginePluginCreateNullHandle)
 
 TEST(MiopenLegacyEnginePluginApiTest, EnginePluginCreateAlsoCreatesMIOpenHandleOnSuccess)
 {
+    SKIP_IF_NO_DEVICES();
     hipdnnEnginePluginHandle_t handle = nullptr;
 
     auto status = hipdnnEnginePluginCreate(&handle);
@@ -32,6 +34,7 @@ TEST(MiopenLegacyEnginePluginApiTest, EnginePluginCreateAlsoCreatesMIOpenHandleO
 
 TEST(MiopenLegacyEnginePluginApiTest, EnginePluginCreateTwiceGivesTheSameContainerHandle)
 {
+    SKIP_IF_NO_DEVICES();
     hipdnnEnginePluginHandle_t handle1 = nullptr;
     auto status1 = hipdnnEnginePluginCreate(&handle1);
 
@@ -49,6 +52,7 @@ TEST(MiopenLegacyEnginePluginApiTest, EnginePluginCreateTwiceGivesTheSameContain
 
 TEST(MiopenLegacyEnginePluginApiTest, EnginePluginCreateNonNullHandlePointer)
 {
+    SKIP_IF_NO_DEVICES();
     auto handle = reinterpret_cast<hipdnnEnginePluginHandle_t>(0x1234);
     auto status = hipdnnEnginePluginCreate(&handle);
     EXPECT_EQ(status, HIPDNN_PLUGIN_STATUS_SUCCESS);
@@ -69,6 +73,7 @@ TEST(MiopenLegacyEnginePluginApiTest, EnginePluginSetStreamNullHandle)
 
 TEST(MiopenLegacyEnginePluginApiTest, EnginePluginSetStreamNullStream)
 {
+    SKIP_IF_NO_DEVICES();
     hipdnnEnginePluginHandle_t handle = nullptr;
     EXPECT_EQ(hipdnnEnginePluginCreate(&handle), HIPDNN_PLUGIN_STATUS_SUCCESS);
 
@@ -79,6 +84,7 @@ TEST(MiopenLegacyEnginePluginApiTest, EnginePluginSetStreamNullStream)
 
 TEST(MiopenLegacyEnginePluginApiTest, EnginePluginSetStreamValidStream)
 {
+    SKIP_IF_NO_DEVICES();
     hipdnnEnginePluginHandle_t handle = nullptr;
     EXPECT_EQ(hipdnnEnginePluginCreate(&handle), HIPDNN_PLUGIN_STATUS_SUCCESS);
 
@@ -117,6 +123,7 @@ TEST(MiopenLegacyEnginePluginApiTest, EnginePluginGetApplicableEngineIdsNull)
 
 TEST(MiopenLegacyEnginePluginApiTest, EnginePluginGetApplicableEngineIdsValid)
 {
+    SKIP_IF_NO_DEVICES();
     hipdnnEnginePluginHandle_t handle = nullptr;
     ASSERT_EQ(hipdnnEnginePluginCreate(&handle), HIPDNN_PLUGIN_STATUS_SUCCESS);
 
@@ -168,6 +175,7 @@ TEST(MiopenLegacyEnginePluginApiTest, EnginePluginGetEngineDetailsNull)
 
 TEST(MiopenLegacyEnginePluginApiTest, EnginePluginGetEngineDetailsValid)
 {
+    SKIP_IF_NO_DEVICES();
     hipdnnEnginePluginHandle_t handle = nullptr;
     ASSERT_EQ(hipdnnEnginePluginCreate(&handle), HIPDNN_PLUGIN_STATUS_SUCCESS);
 
@@ -233,6 +241,7 @@ TEST(MiopenLegacyEnginePluginApiTest, EnginePluginGetWorkspaceSizeNull)
 
 TEST(MiopenLegacyEnginePluginApiTest, EnginePluginGetWorkspaceSizeValid)
 {
+    SKIP_IF_NO_DEVICES();
     hipdnnEnginePluginHandle_t handle = nullptr;
     ASSERT_EQ(hipdnnEnginePluginCreate(&handle), HIPDNN_PLUGIN_STATUS_SUCCESS);
 
@@ -284,6 +293,7 @@ TEST(MiopenLegacyEnginePluginApiTest, EnginePluginCreateExecutionContextNull)
 
 TEST(MiopenLegacyEnginePluginApiTest, EnginePluginCreateExecutionContextValid)
 {
+    SKIP_IF_NO_DEVICES();
     hipdnnEnginePluginHandle_t handle = nullptr;
     ASSERT_EQ(hipdnnEnginePluginCreate(&handle), HIPDNN_PLUGIN_STATUS_SUCCESS);
 

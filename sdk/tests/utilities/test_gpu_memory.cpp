@@ -3,12 +3,23 @@
 
 #include <gtest/gtest.h>
 #include <hip/hip_runtime.h>
-#include <hipdnn_sdk/utilities/gpu_memory.hpp>
 #include <vector>
+
+#include <hipdnn_sdk/test_utilities/test_utilities.hpp>
+#include <hipdnn_sdk/utilities/gpu_memory.hpp>
 
 using namespace hipdnn::sdk::utilities;
 
-TEST(GpuMemoryTest, AllocationAndDeallocation)
+class GpuMemoryTest : public ::testing::Test
+{
+protected:
+    void SetUp() override
+    {
+        SKIP_IF_NO_DEVICES();
+    }
+};
+
+TEST_F(GpuMemoryTest, AllocationAndDeallocation)
 {
     constexpr size_t num_elements = 10;
     Gpu_memory<float> gpu_mem(num_elements);
@@ -16,14 +27,14 @@ TEST(GpuMemoryTest, AllocationAndDeallocation)
     EXPECT_EQ(gpu_mem.size(), num_elements);
 }
 
-TEST(GpuMemoryTest, ZeroElements)
+TEST_F(GpuMemoryTest, ZeroElements)
 {
     Gpu_memory<double> gpu_mem(0);
     EXPECT_EQ(gpu_mem.data(), nullptr);
     EXPECT_EQ(gpu_mem.size(), 0);
 }
 
-TEST(GpuMemoryTest, WriteAndReadBack)
+TEST_F(GpuMemoryTest, WriteAndReadBack)
 {
     constexpr size_t num_elements = 4;
     Gpu_memory<int> gpu_mem(num_elements);
@@ -47,7 +58,7 @@ TEST(GpuMemoryTest, WriteAndReadBack)
     EXPECT_EQ(host_data, host_out);
 }
 
-TEST(GpuMemoryTest, DimsConstructor1D)
+TEST_F(GpuMemoryTest, DimsConstructor1D)
 {
     std::vector<int64_t> dims = {7};
     Gpu_memory<float> gpu_mem(dims);
@@ -55,7 +66,7 @@ TEST(GpuMemoryTest, DimsConstructor1D)
     EXPECT_EQ(gpu_mem.size(), 7);
 }
 
-TEST(GpuMemoryTest, DimsConstructor2D)
+TEST_F(GpuMemoryTest, DimsConstructor2D)
 {
     std::vector<int64_t> dims = {3, 5};
     Gpu_memory<int> gpu_mem(dims);
@@ -63,7 +74,7 @@ TEST(GpuMemoryTest, DimsConstructor2D)
     EXPECT_EQ(gpu_mem.size(), 15);
 }
 
-TEST(GpuMemoryTest, DimsConstructor3D)
+TEST_F(GpuMemoryTest, DimsConstructor3D)
 {
     std::vector<int64_t> dims = {2, 3, 4};
     Gpu_memory<double> gpu_mem(dims);
@@ -71,7 +82,7 @@ TEST(GpuMemoryTest, DimsConstructor3D)
     EXPECT_EQ(gpu_mem.size(), 24);
 }
 
-TEST(GpuMemoryTest, DimsConstructorZeroDim)
+TEST_F(GpuMemoryTest, DimsConstructorZeroDim)
 {
     std::vector<int64_t> dims = {};
     Gpu_memory<float> gpu_mem(dims);
@@ -79,7 +90,7 @@ TEST(GpuMemoryTest, DimsConstructorZeroDim)
     EXPECT_EQ(gpu_mem.size(), 1);
 }
 
-TEST(GpuMemoryTest, DimsConstructorZeroInDims)
+TEST_F(GpuMemoryTest, DimsConstructorZeroInDims)
 {
     std::vector<int64_t> dims = {2, 0, 4};
     Gpu_memory<float> gpu_mem(dims);

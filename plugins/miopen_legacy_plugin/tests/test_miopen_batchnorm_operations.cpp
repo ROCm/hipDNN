@@ -7,6 +7,7 @@
 #include <hipdnn_sdk/plugin/engine_plugin_api.h>
 #include <hipdnn_sdk/plugin/plugin_api_data_types.h>
 #include <hipdnn_sdk/test_utilities/flatbuffer_graph_test_utils.hpp>
+#include <hipdnn_sdk/test_utilities/test_utilities.hpp>
 #include <hipdnn_sdk/utilities/gpu_memory.hpp>
 
 #include "hipdnn_engine_plugin_execution_context.hpp"
@@ -19,6 +20,7 @@ class Batchnorm_execute_graph_test : public ::testing::Test
 protected:
     void SetUp() override
     {
+        SKIP_IF_NO_DEVICES();
         hipdnnPluginStatus_t status = hipdnnEnginePluginCreate(&_handle);
         ASSERT_EQ(status, HIPDNN_PLUGIN_STATUS_SUCCESS);
     }

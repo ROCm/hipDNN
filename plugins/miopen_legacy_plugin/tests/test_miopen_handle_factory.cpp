@@ -5,6 +5,7 @@
 #include <miopen/miopen.h>
 
 #include <hipdnn_sdk/plugin/plugin_exception.hpp>
+#include <hipdnn_sdk/test_utilities/test_utilities.hpp>
 
 #include "hipdnn_engine_plugin_handle.hpp"
 #include "miopen_handle_factory.hpp"
@@ -19,6 +20,8 @@ TEST(MiopenHandleFactoryTest, ThrowsOnNullHandle)
 
 TEST(MiopenHandleFactoryTest, CreatesAndDestroysHandle)
 {
+    SKIP_IF_NO_DEVICES();
+
     hipdnnEnginePluginHandle_t handle = nullptr;
     EXPECT_NO_THROW(Miopen_handle_factory::create_miopen_handle(&handle));
     ASSERT_NE(handle, nullptr);

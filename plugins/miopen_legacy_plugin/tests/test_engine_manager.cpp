@@ -165,7 +165,7 @@ TEST(Engine_managerTest, InitializeExecutionContextCallsEngine)
     hipdnnEnginePluginHandle dummy_handle = {};
     Mock_graph mock_graph;
     Mock_engine_config mock_engine_config;
-    EXPECT_CALL(mock_engine_config, engine_id()).WillRepeatedly(Return(7));
+    ON_CALL(mock_engine_config, engine_id()).WillByDefault(Return(7));
     Mock_hipdnn_engine_plugin_execution_context exec_ctx;
 
     manager.initialize_execution_context(dummy_handle, mock_graph, mock_engine_config, exec_ctx);
