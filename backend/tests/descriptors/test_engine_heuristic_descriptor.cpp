@@ -171,7 +171,6 @@ TEST_F(Engine_heuristic_descriptor_test, SetEngineHeuristicDescriptorUnsupported
 
 TEST_F(Engine_heuristic_descriptor_test, SetEngineIds)
 {
-    // Engine Ids get set after finalization of the heuristic, and aren't set through the API.
     std::vector<int64_t> engine_ids = {0, 1, 2};
 
     ASSERT_THROW_HIPDNN_STATUS(_engine_heuristic->set_engine_ids(engine_ids),
