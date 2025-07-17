@@ -3,14 +3,7 @@
 
 #pragma once
 
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wsign-conversion"
-#pragma clang diagnostic ignored "-Wold-style-cast"
-#pragma clang diagnostic ignored "-Wgnu-anonymous-struct"
-#pragma clang diagnostic ignored "-Wnested-anon-types"
-
 #include <hip/hip_runtime_api.h>
-#pragma clang diagnostic pop
 
 // Cmake Generated export header.
 #include "hipdnn_backend_export.h"
