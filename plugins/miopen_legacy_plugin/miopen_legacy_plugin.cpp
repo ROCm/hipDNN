@@ -282,9 +282,10 @@ hipdnnPluginStatus_t
 
         auto& engine_manager = handle->get_engine_manager();
 
-        //todo, use the engine_config
+        Engine_config_wrapper engine_config_wrapper(engine_config->ptr, engine_config->size);
         Graph_wrapper op_graph_wrapper(op_graph->ptr, op_graph->size);
-        *workspace_size = engine_manager.get_workspace_size(*handle, 1, op_graph_wrapper);
+        *workspace_size = engine_manager.get_workspace_size(
+            *handle, engine_config_wrapper.engine_id(), op_graph_wrapper);
 
         LOG_API_SUCCESS(api_name, "workspace_size={}", *workspace_size);
     });

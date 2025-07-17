@@ -251,12 +251,14 @@ TEST(MiopenLegacyEnginePluginApiTest, EnginePluginGetWorkspaceSizeValid)
     hipdnnPluginConstData_t op_graph
         = flatbuffer_test_utils::create_valid_const_data_graph(serialized_graph);
 
-    // For now, engine_config is not used, so we can pass op_graph as a placeholder
-    hipdnnPluginConstData_t* engine_config = &op_graph;
+    auto engine_config_builder = flatbuffer_test_utils::create_valid_engine_config(1);
+    auto serialized_engine_config = engine_config_builder.Release();
+    hipdnnPluginConstData_t engine_config
+        = flatbuffer_test_utils::create_valid_const_data_engine_config(serialized_engine_config);
 
     size_t workspace_size = 0;
     auto status
-        = hipdnnEnginePluginGetWorkspaceSize(handle, engine_config, &op_graph, &workspace_size);
+        = hipdnnEnginePluginGetWorkspaceSize(handle, &engine_config, &op_graph, &workspace_size);
 
     EXPECT_EQ(status, HIPDNN_PLUGIN_STATUS_SUCCESS);
     EXPECT_EQ(workspace_size, 0u); // batchnorm workspace size is always 0
