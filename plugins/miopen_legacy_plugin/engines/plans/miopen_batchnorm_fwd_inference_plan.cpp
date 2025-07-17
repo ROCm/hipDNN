@@ -105,6 +105,8 @@ void Batchnorm_fwd_inference_plan::execute(const hipdnnEnginePluginHandle& handl
                                            uint32_t num_device_buffers,
                                            void* workspace) const
 {
+    std::ignore = workspace;
+
     // Hardcoded values from bn_driver in miopen
     float alpha = static_cast<float>(1);
     float beta = static_cast<float>(0);

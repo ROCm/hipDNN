@@ -37,6 +37,8 @@ bool Miopen_batchnorm_plan_builder::is_applicable(
 size_t Miopen_batchnorm_plan_builder::get_workspace_size(
     const hipdnnEnginePluginHandle& handle, const hipdnn_plugin::Graph_interface& op_graph) const
 {
+    std::ignore = handle;
+    std::ignore = op_graph;
     //batchnorm solver does not require workspace size
     return 0u;
 }
@@ -46,6 +48,8 @@ void Miopen_batchnorm_plan_builder::build_plan(
     const hipdnn_plugin::Graph_interface& op_graph,
     hipdnnEnginePluginExecutionContext& execution_context) const
 {
+    std::ignore = handle;
+
     const auto& node = op_graph.get_node(0);
 
     if(node.attributes_type()

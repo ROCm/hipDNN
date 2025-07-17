@@ -18,9 +18,9 @@ Miopen_tensor::Miopen_tensor(const hipdnn_sdk::data_objects::TensorAttributes& t
     THROW_ON_MIOPEN_FAILURE(miopenSetTensorDescriptor(
         _descriptor,
         miopen_utils::tensor_data_type_to_miopen_data_type(tensor.data_type()),
-        dims.size(),
-        dims.data(),
-        strides.data()));
+        static_cast<int>(dims.size()),
+        reinterpret_cast<int*>(dims.data()),
+        reinterpret_cast<int*>(strides.data())));
 }
 
 Miopen_tensor::~Miopen_tensor()

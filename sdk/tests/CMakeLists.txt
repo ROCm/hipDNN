@@ -23,6 +23,7 @@ add_executable(hipdnn_sdk_tests
     utilities/test_gpu_memory.cpp
 )
 
+target_compile_options(hipdnn_sdk_tests PRIVATE ${HIPDNN_WARNING_COMPILE_OPTIONS})
 target_link_libraries(hipdnn_sdk_tests 
     GTest::gtest
     pthread

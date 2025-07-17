@@ -114,7 +114,8 @@ hipdnnPluginStatus_t hipdnnEnginePluginCreate(hipdnnEnginePluginHandle_t* handle
 
         miopen_legacy_plugin::Miopen_handle_factory::create_miopen_handle(handle);
 
-        if(auto miopen_container_ptr = miopen_container_lifecycle_ptr.lock())
+        auto miopen_container_ptr = miopen_container_lifecycle_ptr.lock();
+        if(miopen_container_ptr != nullptr)
         {
             (*handle)->miopen_container = miopen_container_ptr;
         }
@@ -126,7 +127,8 @@ hipdnnPluginStatus_t hipdnnEnginePluginCreate(hipdnnEnginePluginHandle_t* handle
             // if we do have a race condition that results in threads getting locked, we want to
             // ensure that we only create one instance.  Therefore, the second thread to get
             // through will just read from the weak pointer rather than create a new instance.
-            if(auto miopen_container_ptr = miopen_container_lifecycle_ptr.lock())
+            miopen_container_ptr = miopen_container_lifecycle_ptr.lock();
+            if(miopen_container_ptr != nullptr)
             {
                 (*handle)->miopen_container = miopen_container_ptr;
             }
@@ -201,7 +203,7 @@ hipdnnPluginStatus_t
         {
             if(*num_engines == max_engines)
             {
-                *num_engines = applicable_engines.size();
+                *num_engines = static_cast<uint32_t>(applicable_engines.size());
                 HIPDNN_LOG_INFO("Maximum number of engines reached ({}), ignoring additional "
                                 "engines, num_engines count: {}",
                                 max_engines,
