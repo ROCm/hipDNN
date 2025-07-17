@@ -39,7 +39,7 @@ void Graph_descriptor::set_handle(hipdnnBackendAttributeType_t attribute_type,
                   HIPDNN_STATUS_BAD_PARAM_NULL_POINTER,
                   "Graph_descriptor failed to set handle: Null pointer.");
 
-    hipdnnHandle_t handle = *reinterpret_cast<const hipdnnHandle_t*>(array_of_elements);
+    hipdnnHandle_t handle = *static_cast<const hipdnnHandle_t*>(array_of_elements);
 
     THROW_IF_NULL(handle,
                   HIPDNN_STATUS_BAD_PARAM_NULL_POINTER,
