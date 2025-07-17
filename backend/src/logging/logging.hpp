@@ -7,20 +7,21 @@
 #include <spdlog/spdlog.h>
 
 #ifdef HIPDNN_BACKEND_COMPILATION
-#define _HIPDNN_BACKEND_LOG_ACTION(level, ...)                   \
-    do                                                           \
-    {                                                            \
-        hipdnn_backend::logging::initialize();                   \
-        if(auto _logger = hipdnn_backend::logging::get_logger()) \
-        {                                                        \
-            _logger->level(__VA_ARGS__);                         \
-        }                                                        \
+#define _HIPDNN_BACKEND_LOG_ACTION(level, ...)                           \
+    do                                                                   \
+    {                                                                    \
+        hipdnn_backend::logging::initialize();                           \
+        if(auto _logger = hipdnn_backend::logging::get_backend_logger()) \
+        {                                                                \
+            _logger->level(__VA_ARGS__);                                 \
+        }                                                                \
     } while(0)
 
 #define HIPDNN_LOG_INFO(...) _HIPDNN_BACKEND_LOG_ACTION(info, __VA_ARGS__)
 #define HIPDNN_LOG_WARN(...) _HIPDNN_BACKEND_LOG_ACTION(warn, __VA_ARGS__)
 #define HIPDNN_LOG_ERROR(...) _HIPDNN_BACKEND_LOG_ACTION(error, __VA_ARGS__)
-#endif
+#define HIPDNN_LOG_FATAL(...) _HIPDNN_BACKEND_LOG_ACTION(critical, __VA_ARGS__)
+#endif // HIPDNN_BACKEND_COMPILATION
 
 namespace hipdnn_backend
 {
@@ -29,10 +30,11 @@ namespace logging
 
 void initialize();
 
-// maybe just make a constructor and destructor
 void cleanup();
 
-std::shared_ptr<spdlog::logger> get_logger();
+void set_log_level(const std::string& level);
+
+std::shared_ptr<spdlog::logger> get_backend_logger();
 
 std::shared_ptr<spdlog::logger> get_callback_receiver_logger();
 
