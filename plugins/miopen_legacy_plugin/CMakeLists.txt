@@ -38,6 +38,7 @@ else()
 endif()
 
 find_package(miopen CONFIG REQUIRED)
+find_package(hipdnn_backend CONFIG REQUIRED)
 
 add_library(miopen_legacy_plugin SHARED
     engines/miopen_engine.cpp
@@ -57,7 +58,7 @@ target_include_directories(miopen_legacy_plugin
         ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
-target_link_libraries(miopen_legacy_plugin PUBLIC MIOpen hipdnn_sdk)
+target_link_libraries(miopen_legacy_plugin PUBLIC MIOpen hipdnn_sdk hipdnn_backend)
 
 add_subdirectory(tests)
 
