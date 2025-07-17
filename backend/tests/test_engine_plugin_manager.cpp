@@ -2,22 +2,33 @@
 // SPDX-License-Identifier:  MIT
 
 #include <gtest/gtest.h>
+#include <hip/hip_runtime.h>
 #include <hipdnn_sdk/test_utilities/test_utilities.hpp>
+#include <hipdnn_sdk/utilities/scoped_resource.hpp>
 
 #include "plugin/engine_plugin_manager.hpp"
 
 using namespace hipdnn_backend;
 
+template <typename T, typename Destructor>
+using Scoped_resource = hipdnn::sdk::utilities::Scoped_resource<T, Destructor>;
+
 TEST(GPU_EnginePluginManagerTest, LoadPluginsAndExecuteOpGraph)
 {
     SKIP_IF_NO_DEVICES();
 
-    // Create an EngienPluginManager instance
-    plugin::Engine_plugin_manager plugin_manager;
-
     // Create a list of paths to plugins
     std::vector<std::filesystem::path> plugin_paths = {"./hipdnn_test_engine_plugin1"};
 
-    // Load the plugins
-    plugin_manager.load_plugins(plugin_paths);
+    // Set the plugin paths
+    plugin::Engine_plugin_manager::set_plugin_paths(plugin_paths);
+
+    // Create an EnginePluginManager instance
+    auto plugin_manager = plugin::Engine_plugin_manager::create();
+
+    hipStream_t stream;
+    ASSERT_EQ(hipStreamCreate(&stream), hipSuccess);
+    Scoped_resource stream_res(stream, [](hipStream_t s) { std::ignore = hipStreamDestroy(s); });
+
+    plugin_manager->set_stream(stream);
 }
