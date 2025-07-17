@@ -39,7 +39,7 @@ void Engine_plugin_manager::set_plugin_paths(const std::vector<std::filesystem::
     std::lock_guard<std::mutex> lock(plugin_mutex);
 
     // Check if the plugin paths are already saved, if so, do nothing.
-    if (!override_plugin_paths.empty())
+    if(!override_plugin_paths.empty())
     {
         return;
     }
@@ -59,7 +59,8 @@ std::unique_ptr<Engine_plugin_manager> Engine_plugin_manager::create()
 
         if(!root_pm)
         {
-            auto paths = override_plugin_paths.empty() ? get_default_plugin_paths() : override_plugin_paths;
+            auto paths = override_plugin_paths.empty() ? get_default_plugin_paths()
+                                                       : override_plugin_paths;
             root_pm = std::make_shared<Root_engine_plugin_manager>();
             root_pm->load_plugins(paths);
             root_pm_ptr = root_pm;
@@ -85,8 +86,7 @@ Engine_plugin_manager::Engine_plugin_manager(std::shared_ptr<Root_engine_plugin_
 
         if(_plugin_handles.find(handle) != _plugin_handles.end())
         {
-            throw Hipdnn_exception(HIPDNN_STATUS_PLUGIN_ERROR,
-                                   "Plugin handle already exists");
+            throw Hipdnn_exception(HIPDNN_STATUS_PLUGIN_ERROR, "Plugin handle already exists");
         }
 
         _plugin_handles[handle] = &plugin;
@@ -96,7 +96,7 @@ Engine_plugin_manager::Engine_plugin_manager(std::shared_ptr<Root_engine_plugin_
 Engine_plugin_manager::~Engine_plugin_manager()
 {
     // Destroy plugin handles
-    for (const auto& [handle, plugin] : _plugin_handles)
+    for(const auto& [handle, plugin] : _plugin_handles)
     {
         try
         {
@@ -110,13 +110,14 @@ Engine_plugin_manager::~Engine_plugin_manager()
 }
 
 Engine_plugin_manager::Engine_plugin_manager(Engine_plugin_manager&& other) noexcept
-    : _root_pm(std::move(other._root_pm)), _plugin_handles(std::move(other._plugin_handles))
+    : _root_pm(std::move(other._root_pm))
+    , _plugin_handles(std::move(other._plugin_handles))
 {
 }
 
 Engine_plugin_manager& Engine_plugin_manager::operator=(Engine_plugin_manager&& other) noexcept
 {
-    if (this != &other)
+    if(this != &other)
     {
         _root_pm = std::move(other._root_pm);
         _plugin_handles = std::move(other._plugin_handles);
@@ -126,7 +127,7 @@ Engine_plugin_manager& Engine_plugin_manager::operator=(Engine_plugin_manager&& 
 
 void Engine_plugin_manager::set_stream(hipStream_t stream) const
 {
-    for (const auto& [handle, plugin] : _plugin_handles)
+    for(const auto& [handle, plugin] : _plugin_handles)
     {
         plugin->set_stream(handle, stream);
     }
