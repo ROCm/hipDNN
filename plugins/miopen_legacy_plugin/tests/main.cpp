@@ -4,14 +4,17 @@ SPDX-License-Identifier: MIT
 */
 
 #include <gtest/gtest.h>
-#include <hipdnn_backend.h>
 #include <hipdnn_sdk/logging/logger.hpp>
+#include <hipdnn_sdk/test_utilities/logging_callback.hpp>
+
+#define COMPONENT_NAME "miopen_legacy_plugin"
 
 int main(int argc, char** argv)
 {
     ::testing::InitGoogleTest(&argc, argv);
 
-    hipdnn::logging::initialize_callback_logging("miopen_legacy_plugin", hipdnnLoggingCallback_ext);
+    hipdnn::logging::initialize_callback_logging(COMPONENT_NAME,
+                                                 logging_test_utils::test_logging_callback);
 
     return RUN_ALL_TESTS();
 }
