@@ -33,6 +33,19 @@ public:
     }
 };
 
+TEST_F(Graph_descriptor_test, SerializeDeserializeGraph)
+{
+    auto builder = create_valid_graph();
+    auto serialized_graph = builder.Release();
+
+    Graph_descriptor descriptor;
+    descriptor.deserialize_graph(serialized_graph.data(), serialized_graph.size());
+
+    const auto& output = descriptor.get_serialized_graph();
+    flatbuffers::Verifier verifier(output.data(), output.size());
+    ASSERT_TRUE(verifier.VerifyBuffer<hipdnn_sdk::data_objects::Graph>());
+}
+
 TEST_F(Graph_descriptor_test, WillCorrectlySetGraph)
 {
     auto builder = create_valid_graph();
