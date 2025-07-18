@@ -107,7 +107,9 @@ const std::vector<uint8_t>& Graph_descriptor::get_serialized_graph()
 {
     if(_serialized_graph.empty())
     {
-        THROW_IF_NULL(_graph, HIPDNN_STATUS_INTERNAL_ERROR, "Graph_descriptor::get_serialized_graph: graph is null");
+        THROW_IF_NULL(_graph,
+                      HIPDNN_STATUS_INTERNAL_ERROR,
+                      "Graph_descriptor::get_serialized_graph: graph is null");
 
         flatbuffers::FlatBufferBuilder builder;
         builder.Finish(hipdnn_sdk::data_objects::Graph::Pack(builder, _graph.get()));

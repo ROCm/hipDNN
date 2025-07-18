@@ -165,8 +165,8 @@ std::vector<int64_t>
     Engine_plugin_manager::get_applicable_engine_ids(Graph_descriptor* graph_descr) const
 {
     const auto& serialized_graph = graph_descr->get_serialized_graph();
-    const hipdnnPluginConstData_t serialized_graph_data{
-        serialized_graph.data(), serialized_graph.size()};
+    const hipdnnPluginConstData_t serialized_graph_data{serialized_graph.data(),
+                                                        serialized_graph.size()};
     return get_applicable_engine_ids(&serialized_graph_data);
 }
 
@@ -186,8 +186,8 @@ void Engine_plugin_manager::get_engine_details(int64_t engine_id,
                                                hipdnnPluginConstData_t* engine_details) const
 {
     const auto& serialized_graph = graph_descr->get_serialized_graph();
-    const hipdnnPluginConstData_t serialized_graph_data{
-        serialized_graph.data(), serialized_graph.size()};
+    const hipdnnPluginConstData_t serialized_graph_data{serialized_graph.data(),
+                                                        serialized_graph.size()};
     get_engine_details(engine_id, &serialized_graph_data, engine_details);
 }
 
@@ -217,8 +217,8 @@ size_t Engine_plugin_manager::get_workspace_size(int64_t engine_id,
                                                  Graph_descriptor* graph_descr) const
 {
     const auto& serialized_graph = graph_descr->get_serialized_graph();
-    const hipdnnPluginConstData_t serialized_graph_data{
-        serialized_graph.data(), serialized_graph.size()};
+    const hipdnnPluginConstData_t serialized_graph_data{serialized_graph.data(),
+                                                        serialized_graph.size()};
     return get_workspace_size(engine_id, engine_config, &serialized_graph_data);
 }
 
@@ -242,8 +242,8 @@ hipdnnEnginePluginExecutionContext_t
                                                     Graph_descriptor* graph_descr) const
 {
     const auto& serialized_graph = graph_descr->get_serialized_graph();
-    const hipdnnPluginConstData_t serialized_graph_data{
-        serialized_graph.data(), serialized_graph.size()};
+    const hipdnnPluginConstData_t serialized_graph_data{serialized_graph.data(),
+                                                        serialized_graph.size()};
     return create_execution_context(engine_id, engine_config, &serialized_graph_data);
 }
 
