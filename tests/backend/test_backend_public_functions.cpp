@@ -127,10 +127,19 @@ TEST(HipDNNBackendTest, WillSetBackendGraphCorrectly)
 
     EXPECT_EQ(status, HIPDNN_STATUS_SUCCESS);
 
+    hipdnnHandle_t handle = nullptr;
+    status = hipdnnCreate(&handle);
+    EXPECT_EQ(status, HIPDNN_STATUS_SUCCESS);
+
+    status = hipdnnBackendSetAttribute(
+        descriptor, HIPDNN_ATTR_OPERATIONGRAPH_HANDLE, HIPDNN_TYPE_HANDLE, 1, &handle);
+    EXPECT_EQ(status, HIPDNN_STATUS_SUCCESS);
+
     status = hipdnnBackendFinalize(descriptor);
     EXPECT_EQ(status, HIPDNN_STATUS_SUCCESS);
 
     hipdnnBackendDestroyDescriptor(descriptor);
+    EXPECT_EQ(hipdnnDestroy(handle), HIPDNN_STATUS_SUCCESS);
 }
 
 TEST(HipDNNBackendTest, WillFailToFinalizeInvalidGraph)
