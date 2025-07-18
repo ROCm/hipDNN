@@ -10,6 +10,8 @@
 #include <hip/hip_runtime.h>
 #include <hipdnn_sdk/plugin/plugin_api_data_types.h>
 
+#include "descriptors/graph_descriptor.hpp"
+
 namespace hipdnn_backend
 {
 namespace plugin
@@ -40,27 +42,44 @@ public:
 
     // MT-unsafe instance methods
     void set_stream(hipStream_t stream) const;
+
+private:
+    // MT-unsafe instance methods
     std::vector<int64_t> get_applicable_engine_ids(const hipdnnPluginConstData_t* op_graph) const;
+    std::vector<int64_t> get_applicable_engine_ids(Graph_descriptor* graph_descr) const;
+
     void get_engine_details(int64_t engine_id,
                             const hipdnnPluginConstData_t* op_graph,
                             hipdnnPluginConstData_t* engine_details) const;
+    void get_engine_details(int64_t engine_id,
+                            Graph_descriptor* graph_descr,
+                            hipdnnPluginConstData_t* engine_details) const;
     void destroy_engine_details(int64_t engine_id, hipdnnPluginConstData_t* engine_details) const;
+
     size_t get_workspace_size(int64_t engine_id,
                               const hipdnnPluginConstData_t* engine_config,
                               const hipdnnPluginConstData_t* op_graph) const;
+    size_t get_workspace_size(int64_t engine_id,
+                              const hipdnnPluginConstData_t* engine_config,
+                              Graph_descriptor* graph_descr) const;
+
     hipdnnEnginePluginExecutionContext_t
         create_execution_context(int64_t engine_id,
                                  const hipdnnPluginConstData_t* engine_config,
                                  const hipdnnPluginConstData_t* op_graph) const;
+    hipdnnEnginePluginExecutionContext_t
+        create_execution_context(int64_t engine_id,
+                                 const hipdnnPluginConstData_t* engine_config,
+                                 Graph_descriptor* graph_descr) const;
     void destroy_execution_context(int64_t engine_id,
                                    hipdnnEnginePluginExecutionContext_t execution_context) const;
+
     void execute_op_graph(int64_t engine_id,
                           hipdnnEnginePluginExecutionContext_t execution_context,
                           void* workspace,
                           const hipdnnPluginDeviceBuffer_t* device_buffers,
                           uint32_t num_device_buffers) const;
 
-private:
     std::shared_ptr<Root_engine_plugin_manager> _root_pm;
     std::unordered_map<hipdnnEnginePluginHandle_t, const Engine_plugin*> _handle_to_plugin;
     mutable std::unordered_map<int64_t, hipdnnEnginePluginHandle_t> _engine_id_to_handle;

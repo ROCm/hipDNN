@@ -31,4 +31,6 @@ TEST(GPU_EnginePluginManagerTest, LoadPluginsAndExecuteOpGraph)
     Scoped_resource stream_res(stream, [](hipStream_t s) { std::ignore = hipStreamDestroy(s); });
 
     plugin_manager->set_stream(stream);
+
+    // TODO: Implement a test for executing an operation graph
 }

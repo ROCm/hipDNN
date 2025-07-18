@@ -135,8 +135,6 @@ void Engine_plugin_manager::set_stream(hipStream_t stream) const
     }
 }
 
-// TODO: Pack op_graph
-// TODO: Combine with get_engine_details()
 std::vector<int64_t>
     Engine_plugin_manager::get_applicable_engine_ids(const hipdnnPluginConstData_t* op_graph) const
 {
@@ -163,9 +161,15 @@ std::vector<int64_t>
     return engine_ids;
 }
 
-// TODO: Pack op_graph
-// TODO: Return a smart pointer to the engine details
-// TODO: Combine with get_applicable_engine_ids()
+std::vector<int64_t>
+    Engine_plugin_manager::get_applicable_engine_ids(Graph_descriptor* graph_descr) const
+{
+    const auto& serialized_graph = graph_descr->get_serialized_graph();
+    const hipdnnPluginConstData_t serialized_graph_data{
+        serialized_graph.data(), serialized_graph.size()};
+    return get_applicable_engine_ids(&serialized_graph_data);
+}
+
 void Engine_plugin_manager::get_engine_details(int64_t engine_id,
                                                const hipdnnPluginConstData_t* op_graph,
                                                hipdnnPluginConstData_t* engine_details) const
@@ -176,7 +180,17 @@ void Engine_plugin_manager::get_engine_details(int64_t engine_id,
     plugin->get_engine_details(handle, engine_id, op_graph, engine_details);
 }
 
-// TODO: Get engine_id from engine_details
+// TODO: Return a smart pointer to the engine details
+void Engine_plugin_manager::get_engine_details(int64_t engine_id,
+                                               Graph_descriptor* graph_descr,
+                                               hipdnnPluginConstData_t* engine_details) const
+{
+    const auto& serialized_graph = graph_descr->get_serialized_graph();
+    const hipdnnPluginConstData_t serialized_graph_data{
+        serialized_graph.data(), serialized_graph.size()};
+    get_engine_details(engine_id, &serialized_graph_data, engine_details);
+}
+
 void Engine_plugin_manager::destroy_engine_details(int64_t engine_id,
                                                    hipdnnPluginConstData_t* engine_details) const
 {
@@ -186,9 +200,6 @@ void Engine_plugin_manager::destroy_engine_details(int64_t engine_id,
     plugin->destroy_engine_details(handle, engine_details);
 }
 
-// TODO: Pack op_graph
-// TODO: Pack engine_config
-// TODO: Get engine_id from engine_config
 size_t Engine_plugin_manager::get_workspace_size(int64_t engine_id,
                                                  const hipdnnPluginConstData_t* engine_config,
                                                  const hipdnnPluginConstData_t* op_graph) const
@@ -199,10 +210,18 @@ size_t Engine_plugin_manager::get_workspace_size(int64_t engine_id,
     return plugin->get_workspace_size(handle, engine_config, op_graph);
 }
 
-// TODO: Pack op_graph
 // TODO: Pack engine_config
 // TODO: Get engine_id from engine_config
-// TODO: Return a smart pointer to the execution context
+size_t Engine_plugin_manager::get_workspace_size(int64_t engine_id,
+                                                 const hipdnnPluginConstData_t* engine_config,
+                                                 Graph_descriptor* graph_descr) const
+{
+    const auto& serialized_graph = graph_descr->get_serialized_graph();
+    const hipdnnPluginConstData_t serialized_graph_data{
+        serialized_graph.data(), serialized_graph.size()};
+    return get_workspace_size(engine_id, engine_config, &serialized_graph_data);
+}
+
 hipdnnEnginePluginExecutionContext_t
     Engine_plugin_manager::create_execution_context(int64_t engine_id,
                                                     const hipdnnPluginConstData_t* engine_config,
@@ -212,6 +231,20 @@ hipdnnEnginePluginExecutionContext_t
     auto plugin = _handle_to_plugin.at(handle);
 
     return plugin->create_execution_context(handle, engine_config, op_graph);
+}
+
+// TODO: Pack engine_config
+// TODO: Get engine_id from engine_config
+// TODO: Return a smart pointer to the execution context
+hipdnnEnginePluginExecutionContext_t
+    Engine_plugin_manager::create_execution_context(int64_t engine_id,
+                                                    const hipdnnPluginConstData_t* engine_config,
+                                                    Graph_descriptor* graph_descr) const
+{
+    const auto& serialized_graph = graph_descr->get_serialized_graph();
+    const hipdnnPluginConstData_t serialized_graph_data{
+        serialized_graph.data(), serialized_graph.size()};
+    return create_execution_context(engine_id, engine_config, &serialized_graph_data);
 }
 
 void Engine_plugin_manager::destroy_execution_context(
