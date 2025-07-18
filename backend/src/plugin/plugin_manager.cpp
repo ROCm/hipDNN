@@ -5,6 +5,7 @@
 
 #include "descriptors/engine_config_descriptor.hpp"
 #include "descriptors/engine_descriptor.hpp"
+#include "descriptors/engine_heuristic_descriptor.hpp"
 #include "fake_plugin.hpp"
 #include "hipdnn_exception.hpp"
 #include "plugin_manager.hpp"
@@ -45,6 +46,24 @@ std::shared_ptr<Hipdnn_plugin_base> Plugin_manager::get_plugin(int64_t engine_id
     return plugin_iter->second;
 }
 
+void Plugin_manager::finalize_engine_heuristic(hipdnnBackendDescriptor_t desc)
+{
+    assert(desc != nullptr);
+    assert(desc->type == HIPDNN_BACKEND_ENGINEHEUR_DESCRIPTOR);
+    auto heuristic = static_cast<Engine_heuristic_descriptor*>(desc);
+
+    hipdnnBackendDescriptor_t graph;
+    heuristic->get_attribute(
+        HIPDNN_ATTR_ENGINEHEUR_OPERATION_GRAPH, HIPDNN_TYPE_BACKEND_DESCRIPTOR, 1, nullptr, &graph);
+    assert(graph != nullptr);
+    auto graph_desc = static_cast<Graph_descriptor*>(graph);
+
+    auto applicable_engines = get_applicable_engines(graph_desc);
+    std::vector<int64_t> engine_ids(applicable_engines.begin(), applicable_engines.end());
+
+    heuristic->set_engine_ids(engine_ids);
+}
+
 void Plugin_manager::finalize_engine_config(hipdnnBackendDescriptor_t desc)
 {
     assert(desc != nullptr);
@@ -82,11 +101,8 @@ void Plugin_manager::finalize_engine_config(hipdnnBackendDescriptor_t desc)
     config->set_max_workspace_size(plugin->get_max_workspace_size(graph_desc, engine_id));
 }
 
-std::set<int64_t>
-    Plugin_manager::get_applicable_engines(Graph_descriptor* graph,
-                                           hipdnnHandle* handle /*, Heuristic_Details*/)
+std::set<int64_t> Plugin_manager::get_applicable_engines(Graph_descriptor* graph)
 {
-    (void)handle;
     std::set<int64_t> applicable_engines;
     for(const auto& plugin : _plugins)
     {

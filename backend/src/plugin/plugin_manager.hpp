@@ -26,11 +26,13 @@ struct Plugin_manager
     // config.
     void finalize_engine_config(hipdnnBackendDescriptor_t desc);
 
+    // This populates the ordered results of the applicable engines inside the heuristic descriptor.
+    void finalize_engine_heuristic(hipdnnBackendDescriptor_t desc);
+
     // Note: Heuristic details is a future thing, for now we can ignore
     // 		 Heuristic details is used to determine sort order on the returned graphs.
 
-    std::set<int64_t> get_applicable_engines(Graph_descriptor* graph,
-                                             hipdnnHandle* handle /*, Heuristic_Details*/);
+    std::set<int64_t> get_applicable_engines(Graph_descriptor* graph);
 
     // This will redirect the execute to the plugin that owns the engine selected inside the ExecutionPlan
     // Throws if invalid stuff is provided, and later is wrapped with a status + provides message
