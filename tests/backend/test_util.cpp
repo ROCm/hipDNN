@@ -16,7 +16,7 @@ void create_test_handle(hipdnnHandle_t* handle)
     ASSERT_EQ(hipdnnCreate(handle), HIPDNN_STATUS_SUCCESS);
 }
 
-void create_test_graph(hipdnnBackendDescriptor_t* descriptor)
+void create_test_graph(hipdnnBackendDescriptor_t* descriptor, hipdnnHandle_t handle)
 {
     flatbuffers::FlatBufferBuilder builder;
     std::vector<::flatbuffers::Offset<hipdnn_sdk::data_objects::TensorAttributes>>
@@ -36,16 +36,21 @@ void create_test_graph(hipdnnBackendDescriptor_t* descriptor)
     ASSERT_EQ(hipdnnBackendCreateAndDeserializeGraph_ext(
                   descriptor, serialized_graph.data(), serialized_graph.size()),
               HIPDNN_STATUS_SUCCESS);
+
+    ASSERT_EQ(hipdnnBackendSetAttribute(
+                  *descriptor, HIPDNN_ATTR_OPERATIONGRAPH_HANDLE, HIPDNN_TYPE_HANDLE, 1, &handle),
+              HIPDNN_STATUS_SUCCESS);
 }
 
 void populate_test_engine(hipdnnBackendDescriptor_t engine,
                           hipdnnBackendDescriptor_t* graph,
+                          hipdnnHandle_t handle,
                           int64_t gidx,
                           bool finalize)
 {
     if(*graph == nullptr)
     {
-        create_test_graph(graph);
+        create_test_graph(graph, handle);
     }
 
     ASSERT_EQ(hipdnnBackendFinalize(*graph), HIPDNN_STATUS_SUCCESS);
@@ -65,22 +70,24 @@ void populate_test_engine(hipdnnBackendDescriptor_t engine,
 
 void create_test_engine(hipdnnBackendDescriptor_t* engine,
                         hipdnnBackendDescriptor_t* graph,
+                        hipdnnHandle_t handle,
                         int64_t gidx)
 {
     ASSERT_EQ(hipdnnBackendCreateDescriptor(HIPDNN_BACKEND_ENGINE_DESCRIPTOR, engine),
               HIPDNN_STATUS_SUCCESS);
-    populate_test_engine(*engine, graph, gidx, true);
+    populate_test_engine(*engine, graph, handle, gidx, true);
 }
 
 void populate_test_engine_config(hipdnnBackendDescriptor_t* engine_config,
                                  hipdnnBackendDescriptor_t* engine,
                                  hipdnnBackendDescriptor_t* graph,
+                                 hipdnnHandle_t handle,
                                  int64_t gidx,
                                  bool finalize)
 {
     if(*engine == nullptr)
     {
-        create_test_engine(engine, graph, gidx);
+        create_test_engine(engine, graph, handle, gidx);
     }
 
     ASSERT_EQ(hipdnnBackendSetAttribute(*engine_config,
@@ -99,35 +106,31 @@ void populate_test_engine_config(hipdnnBackendDescriptor_t* engine_config,
 void create_test_engine_config(hipdnnBackendDescriptor_t* engine_config,
                                hipdnnBackendDescriptor_t* engine,
                                hipdnnBackendDescriptor_t* graph,
+                               hipdnnHandle_t handle,
                                int64_t gidx,
                                bool finalize)
 {
     ASSERT_EQ(hipdnnBackendCreateDescriptor(HIPDNN_BACKEND_ENGINECFG_DESCRIPTOR, engine_config),
               HIPDNN_STATUS_SUCCESS);
-    populate_test_engine_config(engine_config, engine, graph, gidx, finalize);
+    populate_test_engine_config(engine_config, engine, graph, handle, gidx, finalize);
 }
 
 void populate_test_execution_plan(hipdnnBackendDescriptor_t* execution_plan,
-                                  hipdnnHandle_t* handle,
                                   hipdnnBackendDescriptor_t* engine_config,
                                   hipdnnBackendDescriptor_t* engine,
                                   hipdnnBackendDescriptor_t* graph,
+                                  hipdnnHandle_t handle,
                                   int64_t gidx,
                                   bool finalize)
 {
-    if(*handle == nullptr)
-    {
-        create_test_handle(handle);
-    }
-
     ASSERT_EQ(
         hipdnnBackendSetAttribute(
-            *execution_plan, HIPDNN_ATTR_EXECUTION_PLAN_HANDLE, HIPDNN_TYPE_HANDLE, 1, handle),
+            *execution_plan, HIPDNN_ATTR_EXECUTION_PLAN_HANDLE, HIPDNN_TYPE_HANDLE, 1, &handle),
         HIPDNN_STATUS_SUCCESS);
 
     if(*engine_config == nullptr)
     {
-        create_test_engine_config(engine_config, engine, graph, gidx, true);
+        create_test_engine_config(engine_config, engine, graph, handle, gidx, true);
     }
 
     ASSERT_EQ(hipdnnBackendSetAttribute(*execution_plan,
@@ -241,13 +244,19 @@ DataType_t convert_backend_attribute_to_data_type(hipdnnBackendAttributeType_t b
 }
 
 void create_and_initialize_backend_descriptor(hipdnnBackendDescriptor_t* backend_descriptor,
-                                              const flatbuffers::DetachedBuffer& serialized_graph)
+                                              const flatbuffers::DetachedBuffer& serialized_graph,
+                                              hipdnnHandle_t handle)
 {
     ASSERT_EQ(*backend_descriptor, nullptr);
 
     auto status = hipdnnBackendCreateAndDeserializeGraph_ext(
         backend_descriptor, serialized_graph.data(), serialized_graph.size());
     ASSERT_EQ(status, HIPDNN_STATUS_SUCCESS);
+
+    ASSERT_EQ(
+        hipdnnBackendSetAttribute(
+            *backend_descriptor, HIPDNN_ATTR_OPERATIONGRAPH_HANDLE, HIPDNN_TYPE_HANDLE, 1, &handle),
+        HIPDNN_STATUS_SUCCESS);
 
     status = hipdnnBackendFinalize(*backend_descriptor);
     ASSERT_EQ(status, HIPDNN_STATUS_SUCCESS);
