@@ -105,6 +105,16 @@ void hipdnnPluginGetLastErrorString(const char** error_str)
     });
 }
 
+// Once plugins are loaded via plugin manager then logging will work for them
+hipdnnPluginStatus_t hipdnnPluginSetLoggingCallback(hipdnnCallback_t callback)
+{
+    return hipdnn_plugin::try_catch([&, api_name = __func__]() {
+        throw_if_null(callback);
+        hipdnn::logging::initialize_callback_logging(_plugin_name, callback);
+        LOG_API_SUCCESS(api_name, "");
+    });
+}
+
 hipdnnPluginStatus_t hipdnnEnginePluginCreate(hipdnnEnginePluginHandle_t* handle)
 {
     LOG_API_ENTRY("handle_ptr={:p}", static_cast<void*>(handle));

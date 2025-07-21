@@ -17,6 +17,7 @@ add_library(hipdnn_backend_private
     descriptors/descriptor_factory.cpp
     handle/handle_factory.cpp
     handle/handle.cpp
+    logging/logging.cpp
     flatbuffer_utilities.cpp
     plugin/plugin_manager.cpp
     plugin/engine_plugin.cpp
@@ -34,6 +35,8 @@ target_include_directories(hipdnn_backend_private
 
 target_compile_options(hipdnn_backend_private PRIVATE ${HIPDNN_WARNING_COMPILE_OPTIONS})
 target_link_libraries(hipdnn_backend_private PUBLIC hip::host hipdnn_sdk)
+target_compile_definitions(hipdnn_backend_private PRIVATE HIPDNN_BACKEND_COMPILATION)
+
 clang_tidy_check(hipdnn_backend_private)
 
 add_library(hipdnn_backend SHARED 
@@ -53,7 +56,7 @@ target_compile_options(hipdnn_backend PRIVATE ${HIPDNN_WARNING_COMPILE_OPTIONS})
 # This definition is used to enable logging in the backend.  It is #ifdef'ed in the backend code.
 # This is to stop the frontend/plugin from having lazy log initialization which will end up with the same
 # logger name. Frontend/plugin code will need to init the logger themselves so they have a different name.
-target_compile_definitions(hipdnn_backend PRIVATE ENABLE_BACKEND_LOGGING)
+target_compile_definitions(hipdnn_backend PRIVATE HIPDNN_BACKEND_COMPILATION)
 target_link_libraries(hipdnn_backend PRIVATE hipdnn_backend_private)
 target_link_libraries(hipdnn_backend PRIVATE "-Xlinker --exclude-libs=ALL" ) # HIDE symbols from linked static libs
 set_target_properties(hipdnn_backend PROPERTIES CXX_VISIBILITY_PRESET hidden)

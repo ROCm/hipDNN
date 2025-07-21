@@ -9,8 +9,8 @@
 #include "execution_plan_descriptor.hpp"
 #include "graph_descriptor.hpp"
 #include "hipdnn_exception.hpp"
+#include "logging/logging.hpp"
 #include "variant_descriptor.hpp"
-#include <hipdnn_sdk/logging/logger.hpp>
 
 namespace hipdnn_backend
 {

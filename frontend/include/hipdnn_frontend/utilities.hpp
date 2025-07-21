@@ -4,6 +4,8 @@
 
 #include "error.hpp"
 #include <algorithm>
+#include <hipdnn_sdk/logging/callback_types.h>
+#include <hipdnn_sdk/logging/logger.hpp>
 #include <numeric>
 #include <ranges>
 #include <vector>
@@ -97,6 +99,24 @@ inline std::vector<int64_t> stride_order_nhwc(size_t num_dims)
     stride_order[0] = order;
 
     return stride_order;
+}
+
+inline int32_t initialize_frontend_logging(hipdnnCallback_t fn)
+{
+    if(fn == nullptr)
+    {
+        return -1;
+    }
+
+#ifdef COMPONENT_NAME
+    hipdnn::logging::initialize_callback_logging(COMPONENT_NAME, fn);
+#else
+    return -1;
+#endif
+
+    HIPDNN_LOG_INFO("Frontend logging initialized via callback.");
+
+    return 0;
 }
 }
 }

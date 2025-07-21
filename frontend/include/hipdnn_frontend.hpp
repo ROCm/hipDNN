@@ -3,6 +3,8 @@
 
 #pragma once
 
+#define COMPONENT_NAME "hipdnn_frontend"
+
 #include <hipdnn_frontend/attributes/batchnorm_inference_attributes.hpp>
 #include <hipdnn_frontend/attributes/pointwise_attributes.hpp>
 #include <hipdnn_frontend/attributes/tensor_attributes.hpp>

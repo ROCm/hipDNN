@@ -4,6 +4,7 @@
 #include <thread>
 
 #include <gtest/gtest.h>
+#include <utility>
 
 #include "plugin/plugin_core.hpp"
 
@@ -15,13 +16,26 @@ namespace
 class Plugin : public plugin::Plugin_base
 {
 public:
+    // Forward constructor to base class
+    explicit Plugin(plugin::Shared_library&& lib)
+        : Plugin_base(std::move(lib))
+    {
+    }
+
     using Plugin_base::_lib;
     using Plugin_base::get_last_error_string;
 
 private:
-    using Plugin_base::Plugin_base;
     friend class plugin::Plugin_manager_base<Plugin>;
 };
+
+bool g_callback_was_called = false;
+void dummy_callback(hipdnnSeverity_t sev, const char* msg)
+{
+    (void)sev;
+    (void)msg;
+    g_callback_was_called = true;
+}
 
 } // namespace
 
@@ -142,4 +156,17 @@ TEST(PluginManagerTest, LastErrorOnSecondLoad)
         ASSERT_NE(func_get_name(nullptr), HIPDNN_PLUGIN_STATUS_SUCCESS);
         ASSERT_EQ(plugins[0].get_last_error_string(), "hipdnnPluginGetName: name is null");
     }
+}
+
+TEST(PluginTest, SetLoggingCallback)
+{
+    g_callback_was_called = false;
+
+    plugin::Shared_library lib("./hipdnn_test_plugin1");
+
+    Plugin plugin(std::move(lib));
+
+    EXPECT_EQ(plugin.set_logging_callback(dummy_callback), HIPDNN_PLUGIN_STATUS_SUCCESS);
+    EXPECT_TRUE(g_callback_was_called);
+    EXPECT_EQ(plugin.set_logging_callback(nullptr), HIPDNN_PLUGIN_STATUS_BAD_PARAM);
 }

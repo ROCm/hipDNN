@@ -11,7 +11,8 @@ endif()
 add_subdirectory(tests)
 
 add_library(hipdnn_frontend INTERFACE)
-target_link_libraries(hipdnn_frontend INTERFACE hipdnn_sdk)
+
+target_link_libraries(hipdnn_frontend INTERFACE hipdnn_sdk hipdnn_backend)
 
 SET(HIP_DNN_FRONTEND_INSTALL_INCLUDE_DIR "${CMAKE_INSTALL_INCLUDEDIR}/hipdnn/frontend")
 
@@ -21,7 +22,7 @@ target_include_directories(hipdnn_frontend INTERFACE
 )
 
 install( 
-    TARGETS hipdnn_frontend hipdnn_sdk FlatBuffers spdlog_header_only
+    TARGETS hipdnn_frontend hipdnn_sdk hipdnn_backend FlatBuffers spdlog_header_only
     EXPORT hipdnn-frontend
 )
 

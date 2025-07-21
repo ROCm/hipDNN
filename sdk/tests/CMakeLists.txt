@@ -21,6 +21,11 @@ add_executable(hipdnn_sdk_tests
     plugin/flatbuffer_utilities/test_engine_details_wrapper.cpp
     utilities/test_scoped_resource.cpp
     utilities/test_gpu_memory.cpp
+    utilities/test_callback_logger.cpp
+)
+
+target_compile_definitions(hipdnn_sdk_tests PRIVATE
+    COMPONENT_NAME="sdk_tests"
 )
 
 target_compile_options(hipdnn_sdk_tests PRIVATE ${HIPDNN_WARNING_COMPILE_OPTIONS})
