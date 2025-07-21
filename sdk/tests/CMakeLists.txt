@@ -15,20 +15,30 @@ enable_language(HIP)
 
 add_executable(hipdnn_sdk_tests
     main.cpp
-    test_plugin_flatbuffer_utilities.cpp
-    test_plugin_exception.cpp
-    test_plugin_helpers.cpp
-    test_plugin_last_error_manager.cpp
-    test_plugin_data_type_helpers.cpp
-    test_scoped_resource.cpp
+    plugin/test_plugin_exception.cpp
+    plugin/test_plugin_helpers.cpp
+    plugin/test_plugin_last_error_manager.cpp
+    plugin/test_plugin_data_type_helpers.cpp
+    plugin/flatbuffer_utilities/test_graph_wrapper.cpp
+    plugin/flatbuffer_utilities/test_engine_config_wrapper.cpp
+    plugin/flatbuffer_utilities/test_engine_details_wrapper.cpp
+    utilities/test_scoped_resource.cpp
+    utilities/test_gpu_memory.cpp
+    utilities/test_callback_logger.cpp
     test_cpu_fp_reference_implementation.cpp
     test_cpu_fp_reference_validation.cpp
     test_migratable_memory.cpp
 )
 
+target_compile_definitions(hipdnn_sdk_tests PRIVATE
+    COMPONENT_NAME="sdk_tests"
+)
+
+target_compile_options(hipdnn_sdk_tests PRIVATE ${HIPDNN_WARNING_COMPILE_OPTIONS})
 target_link_libraries(hipdnn_sdk_tests 
     GTest::gtest
     pthread
+    hip::host
     hipdnn_sdk
     hip::host
     hip::device

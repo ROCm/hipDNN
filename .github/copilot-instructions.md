@@ -9,3 +9,5 @@ We use CMake for managing our c/c++ dependencies.  When talking about dependenci
 We use Flatbuffers for serialization, if possible, please respond with flatbuffer relevent responses.
 
 Use gtest when creating C/C++ tests. Dont generate a main function.
+
+Use auto when initializing with a cast to avoid duplicating the type name.

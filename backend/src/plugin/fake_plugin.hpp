@@ -45,6 +45,11 @@ struct Fake_plugin : Hipdnn_plugin_base
         (void)engine_id;
         return 1024;
     }
+
+    void set_logging_callback(hipdnnCallback_t callback) override
+    {
+        (void)callback;
+    }
 };
 
 }

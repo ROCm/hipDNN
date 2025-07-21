@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 #include "error.hpp"
-#include <hipdnn_sdk/logging/logger.hpp>
+#include "logging/logging.hpp"
 #include <hipdnn_sdk/utilities/string_util.hpp>
 
 // NOLINTNEXTLINE(modernize-avoid-c-arrays)

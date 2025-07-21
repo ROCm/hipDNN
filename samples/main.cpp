@@ -7,8 +7,8 @@
 #include <hipdnn_frontend/attributes/pointwise_attributes.hpp>
 #include <hipdnn_frontend/graph.hpp>
 #include <hipdnn_sdk/data_objects/graph_generated.h>
+#include <hipdnn_sdk/logging/callback_types.h>
 #include <hipdnn_sdk/logging/logger.hpp>
-
 #include <iostream>
 #include <memory>
 
@@ -33,7 +33,7 @@ static bool not_equal(const Tensor_attributes& tensor,
 
 int main()
 {
-    hipdnn::logging::initialize_logger_to_std_out("hipdnn_sample");
+    initialize_frontend_logging(hipdnnLoggingCallback_ext);
 
     Graph graph;
 
