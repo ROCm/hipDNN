@@ -52,7 +52,8 @@ std::shared_ptr<Hipdnn_plugin_base> Plugin_manager::get_plugin(int64_t engine_id
 void Plugin_manager::finalize_engine_heuristic(hipdnnBackendDescriptor_t desc)
 {
     assert(desc != nullptr);
-    assert(desc->type == HIPDNN_BACKEND_ENGINEHEUR_DESCRIPTOR);
+    assert(desc->private_descriptor != nullptr);
+    assert(desc->private_descriptor->type == HIPDNN_BACKEND_ENGINEHEUR_DESCRIPTOR);
     
     auto heuristic = hipdnnPrivateBackendDescriptor::unpack_descriptor<Engine_heuristic_descriptor>(desc);
 
@@ -71,7 +72,9 @@ void Plugin_manager::finalize_engine_heuristic(hipdnnBackendDescriptor_t desc)
 void Plugin_manager::finalize_engine_config(hipdnnBackendDescriptor_t desc)
 {
     assert(desc != nullptr);
-    assert(desc->type == HIPDNN_BACKEND_ENGINECFG_DESCRIPTOR);
+    assert(desc->private_descriptor != nullptr);
+    assert(desc->private_descriptor->type == HIPDNN_BACKEND_ENGINEHEUR_DESCRIPTOR);
+    
     auto config_desc = hipdnnPrivateBackendDescriptor::unpack_descriptor<Engine_config_descriptor>(desc);
 
     hipdnnBackendDescriptor_t engine;

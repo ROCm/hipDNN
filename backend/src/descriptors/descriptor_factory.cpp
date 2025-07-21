@@ -45,9 +45,6 @@ void Descriptor_factory::create(hipdnnBackendDescriptorType_t descriptor_type,
     case HIPDNN_BACKEND_ENGINEHEUR_DESCRIPTOR:
         (*descriptor)->private_descriptor = std::make_shared<Engine_heuristic_descriptor>();
         break;
-    case HIPDNN_BACKEND_ENGINEHEUR_DESCRIPTOR:
-        *descriptor = new Engine_heuristic_descriptor();
-        break;
     default:
         throw Hipdnn_exception(HIPDNN_STATUS_NOT_SUPPORTED,
                                std::string("Descriptor type ")
