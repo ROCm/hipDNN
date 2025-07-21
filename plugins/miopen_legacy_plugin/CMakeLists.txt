@@ -71,6 +71,10 @@ add_library(miopen_legacy_plugin SHARED
     miopen_tensor.cpp
 )
 
+target_compile_definitions(miopen_legacy_plugin PRIVATE 
+    COMPONENT_NAME="miopen_legacy_plugin"
+)
+
 target_include_directories(miopen_legacy_plugin 
     PUBLIC 
         ${CMAKE_CURRENT_SOURCE_DIR}

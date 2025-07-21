@@ -13,6 +13,7 @@
 #include "hipdnn_backend_descriptor_type.h"
 #include "hipdnn_backend_heuristic_type.h"
 #include "hipdnn_status.h"
+#include <hipdnn_sdk/logging/callback_types.h>
 
 // NOLINTBEGIN
 #ifdef __cplusplus
@@ -276,6 +277,17 @@ HIPDNN_BACKEND_EXPORT void hipdnnGetLastErrorString(char* message, size_t max_si
  */
 HIPDNN_BACKEND_EXPORT hipdnnStatus_t hipdnnBackendCreateAndDeserializeGraph_ext(
     hipdnnBackendDescriptor_t* descriptor, const uint8_t* serialized_graph, size_t graph_byte_size);
+
+/*!
+ * @brief Callback function for logging messages.
+ *
+ * This function is called by the hipDNN library to log messages. The severity level of the message
+ * is provided along with the message itself.
+ * 
+ * @param [in] severity  The severity level of the message.
+ * @param [in] msg        The message to be logged.
+ */
+HIPDNN_BACKEND_EXPORT void hipdnnLoggingCallback_ext(hipdnnSeverity_t severity, const char* msg);
 
 #ifdef __cplusplus
 }

@@ -10,9 +10,11 @@
 #include "handle/handle_factory.hpp"
 #include "helpers.hpp"
 #include "hipdnn_exception.hpp"
+#include "logging/logging.hpp"
 #include "plugin/plugin_manager.hpp"
+#include <hipdnn_sdk/logging/callback_types.h>
+#include <spdlog/spdlog.h>
 
-#include <hipdnn_sdk/logging/logger.hpp>
 #include <hipdnn_sdk/utilities/string_util.hpp>
 
 using namespace hipdnn_backend;
@@ -268,7 +270,6 @@ HIPDNN_BACKEND_EXPORT const char* hipdnnGetErrorString(hipdnnStatus_t status)
 HIPDNN_BACKEND_EXPORT void hipdnnGetLastErrorString(char* message, size_t max_size)
 {
     LOG_API_ENTRY("message_ptr={:p}, max_size={}", static_cast<void*>(message), max_size);
-
     // Ignore status since API doesn't return it.
     // We still want to catch and log if the user provides incorrect parameters.
     auto _ = hipdnn_backend::try_catch([&, api_name = __func__] {
@@ -284,4 +285,30 @@ HIPDNN_BACKEND_EXPORT void hipdnnGetLastErrorString(char* message, size_t max_si
 
         LOG_API_SUCCESS(api_name, "set_error_message={:p}", static_cast<void*>(message));
     });
+}
+
+HIPDNN_BACKEND_EXPORT void hipdnnLoggingCallback_ext(hipdnnSeverity_t severity, const char* msg)
+{
+    hipdnn_backend::logging::initialize();
+
+    if(auto logger = hipdnn_backend::logging::get_callback_receiver_logger())
+    {
+        switch(severity)
+        {
+        case HIPDNN_SEV_FATAL:
+            logger->critical(msg);
+            break;
+        case HIPDNN_SEV_ERROR:
+            logger->error(msg);
+            break;
+        case HIPDNN_SEV_WARN:
+            logger->warn(msg);
+            break;
+        case HIPDNN_SEV_OFF:
+            break;
+        default:
+            logger->info(msg);
+            break;
+        }
+    }
 }

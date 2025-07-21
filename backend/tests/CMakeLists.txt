@@ -30,7 +30,7 @@ add_executable(hipdnn_backend_tests
     test_flatbuffer_utilities.cpp
     test_handle.cpp
     test_helpers.cpp
-    test_logger.cpp
+    test_backend_logger.cpp
     test_plugin.cpp
     test_shared_library.cpp
 )
@@ -44,6 +44,7 @@ target_link_libraries(hipdnn_backend_tests
     ${CMAKE_DL_LIBS}
 )
 
+target_compile_definitions(hipdnn_backend_tests PRIVATE HIPDNN_BACKEND_COMPILATION)
 target_compile_options(hipdnn_backend_tests PRIVATE ${HIPDNN_WARNING_COMPILE_OPTIONS})
 clang_tidy_check(hipdnn_backend_tests)
 
@@ -52,6 +53,7 @@ add_library(hipdnn_test_plugin1 SHARED plugins/plugin_api_impl.cpp plugins/plugi
 target_link_libraries(hipdnn_test_plugin1 PRIVATE hipdnn_sdk)
 set_target_properties(hipdnn_test_plugin1 PROPERTIES CXX_VISIBILITY_PRESET hidden)
 target_compile_options(hipdnn_test_plugin1 PRIVATE ${HIPDNN_WARNING_COMPILE_OPTIONS})
+target_compile_definitions(hipdnn_test_plugin1 PRIVATE COMPONENT_NAME="plugin1")
 clang_tidy_check(hipdnn_test_plugin1)
 add_dependencies(hipdnn_backend_tests hipdnn_test_plugin1)
 
@@ -60,6 +62,7 @@ add_library(hipdnn_test_plugin2 SHARED plugins/plugin_api_impl.cpp plugins/plugi
 target_link_libraries(hipdnn_test_plugin2 PRIVATE hipdnn_sdk)
 set_target_properties(hipdnn_test_plugin2 PROPERTIES CXX_VISIBILITY_PRESET hidden)
 target_compile_options(hipdnn_test_plugin2 PRIVATE ${HIPDNN_WARNING_COMPILE_OPTIONS})
+target_compile_definitions(hipdnn_test_plugin2 PRIVATE COMPONENT_NAME="plugin2")
 clang_tidy_check(hipdnn_test_plugin2)
 add_dependencies(hipdnn_backend_tests hipdnn_test_plugin2)
 

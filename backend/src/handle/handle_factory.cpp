@@ -4,7 +4,7 @@
 #include "handle/handle_factory.hpp"
 #include "handle/handle.hpp"
 #include "hipdnn_exception.hpp"
-#include <hipdnn_sdk/logging/logger.hpp>
+#include "logging/logging.hpp"
 
 namespace hipdnn_backend
 {

@@ -14,6 +14,7 @@ using namespace hipdnn_plugin;
 
 // NOLINTNEXTLINE(modernize-avoid-c-arrays)
 thread_local char Plugin_last_error_manager::last_error[HIPDNN_PLUGIN_ERROR_STRING_MAX_LENGTH] = "";
+static hipdnnCallback_t logging_callback = nullptr;
 
 #ifdef THROW_IF_NULL
 #error "THROW_IF_NULL is already defined"
@@ -45,6 +46,18 @@ extern "C" hipdnnPluginStatus_t hipdnnPluginGetType(hipdnnPluginType_t* type)
         THROW_IF_NULL(type);
         *type = PLUGIN_TYPE;
     });
+}
+
+extern "C" hipdnnPluginStatus_t hipdnnPluginSetLoggingCallback(hipdnnCallback_t callback)
+{
+    if(callback == nullptr)
+    {
+        return Plugin_last_error_manager::set_last_error(HIPDNN_PLUGIN_STATUS_BAD_PARAM,
+                                                         "hipdnnPluginGetType: type is null");
+    }
+    logging_callback = callback;
+    logging_callback(HIPDNN_SEV_INFO, "Logging callback successfully set for test plugin.");
+    return HIPDNN_PLUGIN_STATUS_SUCCESS;
 }
 
 extern "C" void hipdnnPluginGetLastErrorString(const char** error_str)

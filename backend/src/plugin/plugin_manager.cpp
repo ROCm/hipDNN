@@ -1,12 +1,13 @@
 // Copyright © Advanced Micro Devices, Inc., or its affiliates.
 // SPDX-License-Identifier:  MIT
 
-#include <hipdnn_sdk/logging/logger.hpp>
+#include "logging/logging.hpp"
 
 #include "descriptors/engine_config_descriptor.hpp"
 #include "descriptors/engine_descriptor.hpp"
 #include "descriptors/engine_heuristic_descriptor.hpp"
 #include "fake_plugin.hpp"
+#include "hipdnn_backend.h"
 #include "hipdnn_exception.hpp"
 #include "plugin_manager.hpp"
 
@@ -21,6 +22,8 @@ void Plugin_manager::initialize()
 
     for(const auto& plugin : _plugins)
     {
+        plugin->set_logging_callback(hipdnnLoggingCallback_ext);
+
         for(const auto& engine_id : plugin->get_engines())
         {
             if(_engine_id_plugin_lookup.find(engine_id) != _engine_id_plugin_lookup.end())

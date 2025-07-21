@@ -24,10 +24,11 @@ There are two environment variables that control the logging in hipDNN.
 - `info`: info level logging
 - `warn`: warning level logging
 - `error`: error level logging
+- `fatal`: fatal level logging
 
-If the log level is not set, then the default log level is off.
+If the log level is not set, then the default log level is `off`.
 
-`HIPDNN_LOG_DIR`: this controls the directory where log files will be written.  If this is not set, log files will be written to stdout.  The backend log file will have the name `hipdnn_timestamp.log` when written to the directory.
+`HIPDNN_LOG_FILE`: this controls the path to the file where logs will be **appended**.  If this is not set, logs will go to `stderr`.
 
 ### Frontend and Plugin Logging.
-Currently the frontend and plugin can use the same logging system as hipdnn backend but they will have to setup the logger themselves.  They will also currently have their own individual log file as there is no callback mechanism in place yet to send the logs to be written by the backend logger.
+The frontend and plugins log to the same file as the backend but they will have to setup the logger themselves via the `initialize_callback_logging` function. The user should pass the backend API call `hipdnnLoggingCallback_ext` as the callback function to have the logs all output to the same destination.
