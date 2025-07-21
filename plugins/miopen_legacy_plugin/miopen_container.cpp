@@ -3,11 +3,12 @@
 // SPDX-License-Identifier:  MIT
 */
 
-#include "miopen_container.hpp"
+#include <hipdnn_sdk/logging/logger.hpp>
+
 #include "engine_manager.hpp"
 #include "engines/miopen_engine.hpp"
-#include "engines/solvers/miopen_batchnorm_solver.hpp"
-#include <hipdnn_sdk/logging/logger.hpp>
+#include "engines/plans/miopen_batchnorm_plan_builder.hpp"
+#include "miopen_container.hpp"
 
 namespace miopen_legacy_plugin
 {
@@ -19,8 +20,8 @@ Miopen_container::Miopen_container()
     int64_t engine_id = 1;
     auto miopen_engine = std::make_unique<Miopen_engine>(engine_id++);
 
-    auto batchnorm_solver = std::make_unique<Miopen_batchnorm_solver>();
-    miopen_engine->add_solver(std::move(batchnorm_solver));
+    auto batchnorm_plan_builder = std::make_unique<Miopen_batchnorm_plan_builder>();
+    miopen_engine->add_plan_builder(std::move(batchnorm_plan_builder));
 
     _engine_manager = std::make_unique<Engine_manager>();
     _engine_manager->add_engine(std::move(miopen_engine));

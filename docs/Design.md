@@ -6,7 +6,7 @@ hipDNN is a multi-operation fusion engine, these fusions are to provide improved
 
 ## High-Level Architecture 
 
-hipDNN has a plugin-based architecture in order to provide many different solvers. This enables users to extend hipDNN to support new routines/algorithms without modifying the core library.
+hipDNN has a plugin-based architecture in order to allow users to extend hipDNN to support new routines/algorithms without modifying the core library.
 
 ![hipDNN Architecture](./images/hipDNN_Architecture.png)
 
@@ -22,6 +22,6 @@ hipDNN has a plugin-based architecture in order to provide many different solver
 
 **Plugin SDK**: A headery-only library that plugins will integrate against in order to be used by hipDNN.
 
-**MIOpen Legacy Plugin**: A plugin that wraps MIOpen and provides solvers for Convolution and BatchNorm graphs. This is meant to support all existing MIOpen capabilities.
+**MIOpen Legacy Plugin**: A plugin that wraps MIOpen and provides plan builders and plans for Convolution/BatchNorm graphs. This is meant to support all existing MIOpen capabilities.
 
-**Other Plugins**: Eventually there will be other plugins available that provide different solvers than MIOpen.  Each additional plugin will enable hipDNN to solve a greater set of problems or solve current problems faster.
+**Other Plugins**: Eventually there will be other plugins available that provide different plan builders than MIOpen.  Each additional plugin will enable hipDNN to solve a greater set of problems or solve current problems faster.

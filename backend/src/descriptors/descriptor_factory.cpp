@@ -9,8 +9,8 @@
 #include "execution_plan_descriptor.hpp"
 #include "graph_descriptor.hpp"
 #include "hipdnn_exception.hpp"
+#include "logging/logging.hpp"
 #include "variant_descriptor.hpp"
-#include <hipdnn_sdk/logging/logger.hpp>
 
 namespace hipdnn_backend
 {
@@ -44,6 +44,9 @@ void Descriptor_factory::create(hipdnnBackendDescriptorType_t descriptor_type,
         break;
     case HIPDNN_BACKEND_ENGINEHEUR_DESCRIPTOR:
         (*descriptor)->private_descriptor = std::make_shared<Engine_heuristic_descriptor>();
+        break;
+    case HIPDNN_BACKEND_ENGINEHEUR_DESCRIPTOR:
+        *descriptor = new Engine_heuristic_descriptor();
         break;
     default:
         throw Hipdnn_exception(HIPDNN_STATUS_NOT_SUPPORTED,

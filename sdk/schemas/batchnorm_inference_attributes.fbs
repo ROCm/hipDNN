@@ -3,6 +3,7 @@
 
 namespace hipdnn_sdk.data_objects;
 
+// The long attributes are keys to the tensor_attributes->uid 
 table BatchnormInferenceAttributes {
     x: long;
     mean: long = null;

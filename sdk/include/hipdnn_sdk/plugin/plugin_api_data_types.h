@@ -13,8 +13,8 @@
 #include <stddef.h>
 #include <stdint.h>
 
+// NOLINTBEGIN
 #ifdef __cplusplus
-
 extern "C" {
 #endif
 
@@ -92,3 +92,4 @@ typedef struct hipdnnEnginePluginExecutionContext* hipdnnEnginePluginExecutionCo
 #ifdef __cplusplus
 }
 #endif
+// NOLINTEND
