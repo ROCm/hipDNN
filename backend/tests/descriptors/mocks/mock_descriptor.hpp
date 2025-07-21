@@ -10,7 +10,7 @@
 namespace hipdnn_backend
 {
 
-class Mock_descriptor : public hipdnnBackendDescriptor
+class Mock_descriptor : public hipdnnPrivateBackendDescriptor
 {
 public:
     Mock_descriptor(hipdnnBackendDescriptorType_t desc_type = HIPDNN_INVALID_TYPE)
@@ -35,7 +35,7 @@ public:
                  int64_t requested_element_count,
                  int64_t* element_count,
                  void* array_of_elements),
-                (override));
+                (const, override));
 };
 
 ACTION_P(SetArg4ToInt64, value) // NOLINT

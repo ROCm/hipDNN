@@ -24,14 +24,14 @@ void Variant_descriptor::finalize()
     THROW_IF_TRUE(
         _data_pointers.empty(), HIPDNN_STATUS_BAD_PARAM, "Data pointers and unique ids are empty");
 
-    hipdnnBackendDescriptor::finalize();
+    hipdnnPrivateBackendDescriptor::finalize();
 }
 
 void Variant_descriptor::get_attribute(hipdnnBackendAttributeName_t attribute_name,
                                        hipdnnBackendAttributeType_t attribute_type,
                                        int64_t requested_element_count,
                                        int64_t* element_count,
-                                       void* array_of_elements)
+                                       void* array_of_elements) const
 {
     THROW_IF_FALSE(is_finalized(),
                    HIPDNN_STATUS_NOT_INITIALIZED,

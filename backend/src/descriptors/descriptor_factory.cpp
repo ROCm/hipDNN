@@ -24,25 +24,26 @@ void Descriptor_factory::create(hipdnnBackendDescriptorType_t descriptor_type,
     HIPDNN_LOG_INFO("Creating descriptor of type: {}",
                     hipdnn_get_backend_descriptor_type_name(descriptor_type));
 
+    *descriptor = new hipdnnBackendDescriptor();
     switch(descriptor_type)
     {
     case HIPDNN_BACKEND_ENGINECFG_DESCRIPTOR:
-        *descriptor = new Engine_config_descriptor();
+        (*descriptor)->private_descriptor = std::make_shared<Engine_config_descriptor>();
         break;
     case HIPDNN_BACKEND_ENGINE_DESCRIPTOR:
-        *descriptor = new Engine_descriptor();
+        (*descriptor)->private_descriptor = std::make_shared<Engine_descriptor>();
         break;
     case HIPDNN_BACKEND_EXECUTION_PLAN_DESCRIPTOR:
-        *descriptor = new Execution_plan_descriptor();
+        (*descriptor)->private_descriptor = std::make_shared<Execution_plan_descriptor>();
         break;
     case HIPDNN_BACKEND_OPERATIONGRAPH_DESCRIPTOR:
-        *descriptor = new Graph_descriptor();
+        (*descriptor)->private_descriptor = std::make_shared<Graph_descriptor>();
         break;
     case HIPDNN_BACKEND_VARIANT_PACK_DESCRIPTOR:
-        *descriptor = new Variant_descriptor();
+        (*descriptor)->private_descriptor = std::make_shared<Variant_descriptor>();
         break;
     case HIPDNN_BACKEND_ENGINEHEUR_DESCRIPTOR:
-        *descriptor = new Engine_heuristic_descriptor();
+        (*descriptor)->private_descriptor = std::make_shared<Engine_heuristic_descriptor>();
         break;
     default:
         throw Hipdnn_exception(HIPDNN_STATUS_NOT_SUPPORTED,
@@ -75,7 +76,8 @@ void Descriptor_factory::create_graph_ext(hipdnnBackendDescriptor_t* descriptor,
         throw;
     }
 
-    *descriptor = graph_descriptor;
+    *descriptor = new hipdnnBackendDescriptor();
+    (*descriptor)->private_descriptor.reset(graph_descriptor);
 
     HIPDNN_LOG_INFO("Created graph descriptor: {:p}", static_cast<void*>(*descriptor));
 }

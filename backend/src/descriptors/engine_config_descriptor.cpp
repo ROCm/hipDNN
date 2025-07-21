@@ -25,14 +25,14 @@ void Engine_config_descriptor::finalize()
                   HIPDNN_STATUS_BAD_PARAM,
                   "Engine_config_descriptor::finalize() failed: Engine is not set.");
 
-    hipdnnBackendDescriptor::finalize();
+    hipdnnPrivateBackendDescriptor::finalize();
 }
 
 void Engine_config_descriptor::get_attribute(hipdnnBackendAttributeName_t attribute_name,
                                              hipdnnBackendAttributeType_t attribute_type,
                                              int64_t requested_element_count,
                                              int64_t* element_count,
-                                             void* array_of_elements)
+                                             void* array_of_elements) const
 {
     THROW_IF_FALSE(is_finalized(),
                    HIPDNN_STATUS_NOT_INITIALIZED,
@@ -60,7 +60,7 @@ void Engine_config_descriptor::get_attribute(hipdnnBackendAttributeName_t attrib
 void Engine_config_descriptor::get_engine(hipdnnBackendAttributeType_t attribute_type,
                                           int64_t requested_element_count,
                                           int64_t* element_count,
-                                          void* array_of_elements)
+                                          void* array_of_elements) const
 {
     THROW_IF_NE(attribute_type,
                 HIPDNN_TYPE_BACKEND_DESCRIPTOR,
@@ -161,10 +161,10 @@ void Engine_config_descriptor::set_engine(hipdnnBackendAttributeType_t attribute
                   HIPDNN_STATUS_BAD_PARAM_NULL_POINTER,
                   "Engine_config_descriptor failed to set engine: "
                   "Null pointer.");
+         
+    auto engine = unpack_descriptor<const Engine_descriptor>(array_of_elements);
 
-    const Engine_descriptor* engine = *static_cast<Engine_descriptor* const*>(array_of_elements);
-
-    THROW_IF_NULL(engine,
+    THROW_IF_NULL(engine,     
                   HIPDNN_STATUS_BAD_PARAM_NULL_POINTER,
                   "Engine_config_descriptor failed to set engine: "
                   "Engine is null.");
