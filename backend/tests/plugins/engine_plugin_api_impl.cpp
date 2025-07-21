@@ -5,6 +5,7 @@
 // It contains the API functions for the test engine plugin.
 
 #include <hipdnn_sdk/plugin/engine_plugin_api.h>
+#include <hipdnn_sdk/plugin/plugin_exception.hpp>
 #include <hipdnn_sdk/plugin/plugin_helpers.hpp>
 
 #include "engine_plugin_api_impl.hpp"
