@@ -34,9 +34,7 @@ public:
             return status;
         }
 
-        // TODO spdlog prevents the library from being unloaded (PluginManagerTest.LastErrorOnSecondLoad is failing).
-        // This line can be uncommented once the root cause is identified and fixed.
-        //HIPDNN_LOG_ERROR("Error occured in status:{} message:{}", status, message);
+        HIPDNN_LOG_ERROR("Error occured in status:{} message:{}", status, message);
 
         hipdnn::sdk::utilities::copy_max_size_with_null_terminator(
             last_error, message, sizeof(last_error));
