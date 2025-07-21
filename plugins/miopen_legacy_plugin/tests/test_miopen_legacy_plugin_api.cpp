@@ -1,9 +1,10 @@
 // Copyright © Advanced Micro Devices, Inc., or its affiliates.
 // SPDX-License-Identifier: MIT
 
-#include "hipdnn_sdk/plugin/plugin_api.h"
 #include <array>
 #include <gtest/gtest.h>
+
+#include "hipdnn_sdk/plugin/plugin_api.h"
 
 TEST(MiopenLegacyPluginApiTest, GetNameSuccess)
 {

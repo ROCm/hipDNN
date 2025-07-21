@@ -3,9 +3,10 @@
 
 #pragma once
 
-#include "hipdnn_sdk/plugin/plugin_api_data_types.h"
 #include <exception>
 #include <string>
+
+#include <hipdnn_sdk/plugin/plugin_api_data_types.h>
 
 namespace hipdnn_plugin
 {

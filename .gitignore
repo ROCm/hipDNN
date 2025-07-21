@@ -68,3 +68,5 @@ __pycache__/
 
 # Python egg
 *.egg-info/
+
+*.profraw
