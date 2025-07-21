@@ -37,17 +37,14 @@ public:
 
         for (size_t i = 0; i < element_count; ++i) {
 
-            // Convert to double for comparison
-            // This is necessary for types like hip_bfloat16 and half which may not support direct
-            // arithmetic operations in a straightforward way.
-            double ref_value = ref_data[i];
-            double impl_value = impl_data[i];
+            T ref_value = ref_data[i];
+            T impl_value = impl_data[i];
 
-            double abs_diff = std::abs(ref_value - impl_value);
+            T abs_diff = std::fabs(ref_value - impl_value);
 
             // Based this on: https://realtimecollisiondetection.net/blog/?p=89
             if (abs_diff > _absolute_tolerance &&
-                abs_diff > _relative_tolerance * std::max(std::abs(ref_value), std::abs(impl_value))) {
+                abs_diff > _relative_tolerance * std::max(std::fabs(ref_value), std::fabs(impl_value))) {
                 
                 return false;
             }
@@ -58,8 +55,8 @@ public:
     
 private:
     // Tolerances for comparison
-    double _absolute_tolerance = std::numeric_limits<double>::epsilon();
-    double _relative_tolerance = std::numeric_limits<double>::epsilon();
+    T _absolute_tolerance = std::numeric_limits<T>::epsilon();
+    T _relative_tolerance = std::numeric_limits<T>::epsilon();
 };
 
 } // namespace reference_test_utilities

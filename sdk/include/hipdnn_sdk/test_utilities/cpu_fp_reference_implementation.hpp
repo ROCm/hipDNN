@@ -26,11 +26,15 @@ public:
             throw std::runtime_error("Batchnorm inference requires a 4D tensor.");
         }
 
-        int n_batches = tensor_attributes.dims[0];
-        std::vector<int> channels(tensor_attributes.dims[1]);
+        int64_t n_batches = tensor_attributes.dims[0];
+        std::vector<int64_t> channels(static_cast<size_t>(tensor_attributes.dims[1]));
         std::iota(channels.begin(), channels.end(), 0);
-        int height    = tensor_attributes.dims[2];
-        int width     = tensor_attributes.dims[3];
+        int64_t height    = tensor_attributes.dims[2];
+        int64_t width     = tensor_attributes.dims[3];
+
+        (void)n_batches; // Suppress unused variable warning
+        (void)height;    // Suppress unused variable warning
+        (void)width;     // Suppress unused variable warning
 
         // Migratable_memory<T> input = buffers.at(batchnorm_attributes.input_id);
         // Migratable_memory<T> output = buffers.at(batchnorm_attributes.output_id);
@@ -40,7 +44,14 @@ public:
         const Migratable_memory<V>& estimatedMean = buffers.at(batchnorm_attributes.mean.value());
         const Migratable_memory<V>& estimatedVariance = buffers.at(batchnorm_attributes.inv_variance.value());
 
+        (void)scale;  // Suppress unused variable warning
+        (void)bias;   // Suppress unused variable warning
+        (void)estimatedMean;  // Suppress unused variable warning
+        (void)estimatedVariance;  // Suppress unused variable warning
+
         std::for_each(channels.begin(), channels.end(), [&](int cidx) {
+            (void) cidx; // Suppress unused variable warning
+
         //     V mean           = estimatedMean(0, cidx, 0, 0);
         //     V variance       = estimatedVariance(0, cidx, 0, 0);
         //     double invertVar = 1.0 / sqrt(variance + epsilon);
@@ -60,7 +71,7 @@ public:
         //         }
         //     }
         });
-        
+
     }
 
 private:

@@ -2,15 +2,15 @@
 // SPDX-License-Identifier:  MIT
 
 #include <gtest/gtest.h>
+#include <hipdnn_sdk/utilities/half_utils.hpp>
+#include <hipdnn_sdk/utilities/hip_bfloat16_utils.hpp>
 #include <hipdnn_sdk/test_utilities/cpu_fp_reference_validation.hpp>
-#include <hip/amd_detail/amd_hip_bfloat16.h>
-#include <hip/amd_detail/amd_hip_fp16.h>
 
 using namespace hipdnn_sdk::reference_test_utilities;
 using namespace hipdnn_sdk::utilities;
 
 template <typename T>
-Migratable_memory<T> create_buffer(size_t size, double mult = 1.0)
+Migratable_memory<T> create_buffer(size_t size, T mult)
 {
     Migratable_memory<T> buffer(size);
 
@@ -18,7 +18,7 @@ Migratable_memory<T> create_buffer(size_t size, double mult = 1.0)
 
     for (size_t i = 0; i < size; ++i)
     {
-        data[i] = static_cast<T>((double)i * mult);
+        data[i] = static_cast<T>(static_cast<float>(i)) * mult;
     }
 
     return buffer;
@@ -28,8 +28,8 @@ TEST(CpuFpReferenceValidation, BasicBFloat16Usage)
 {
     Cpu_fp_reference_validation<hip_bfloat16> ref_validation;
 
-    auto buffer1 = create_buffer<hip_bfloat16>(100);
-    auto buffer2 = create_buffer<hip_bfloat16>(100);
+    auto buffer1 = create_buffer<hip_bfloat16>(100, 1.0_bf);
+    auto buffer2 = create_buffer<hip_bfloat16>(100, 1.0_bf);
 
     EXPECT_TRUE(ref_validation.compare_buffers(buffer1, buffer2));
 }
@@ -38,8 +38,8 @@ TEST(CpuFpReferenceValidation, BasicHalfUsage)
 {
     Cpu_fp_reference_validation<half> ref_validation;
 
-    auto buffer1 = create_buffer<half>(100);
-    auto buffer2 = create_buffer<half>(100);
+    auto buffer1 = create_buffer<half>(100, 1.0_h);
+    auto buffer2 = create_buffer<half>(100, 1.0_h);
 
     EXPECT_TRUE(ref_validation.compare_buffers(buffer1, buffer2));
 }
@@ -48,8 +48,8 @@ TEST(CpuFpReferenceValidation, BasicFloatUsage)
 {
     Cpu_fp_reference_validation<float> ref_validation;
 
-    auto buffer1 = create_buffer<float>(100);
-    auto buffer2 = create_buffer<float>(100);
+    auto buffer1 = create_buffer<float>(100, 1.0f);
+    auto buffer2 = create_buffer<float>(100, 1.0f);
 
     EXPECT_TRUE(ref_validation.compare_buffers(buffer1, buffer2));
 }
@@ -68,8 +68,8 @@ TEST(CpuFpReferenceValidation, BFloat16NotComparable)
 {
     Cpu_fp_reference_validation<hip_bfloat16> ref_validation;
 
-    auto buffer1 = create_buffer<hip_bfloat16>(100, 1.0);
-    auto buffer2 = create_buffer<hip_bfloat16>(100, 2.0);
+    auto buffer1 = create_buffer<hip_bfloat16>(100, 1.0_bf);
+    auto buffer2 = create_buffer<hip_bfloat16>(100, 2.0_bf);
 
     EXPECT_FALSE(ref_validation.compare_buffers(buffer1, buffer2));
 }
@@ -78,8 +78,8 @@ TEST(CpuFpReferenceValidation, HalfNotComparable)
 {
     Cpu_fp_reference_validation<half> ref_validation;
 
-    auto buffer1 = create_buffer<half>(100, 1.0f);
-    auto buffer2 = create_buffer<half>(100, 2.0f);
+    auto buffer1 = create_buffer<half>(100, 1.0_h);
+    auto buffer2 = create_buffer<half>(100, 2.0_h);
 
     EXPECT_FALSE(ref_validation.compare_buffers(buffer1, buffer2));
 }
