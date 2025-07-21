@@ -1,11 +1,17 @@
 // Copyright © Advanced Micro Devices, Inc., or its affiliates.
 // SPDX-License-Identifier:  MIT
 
-#include "hipdnn_engine_plugin_handle.hpp"
 #include <gtest/gtest.h>
+
 #include <hipdnn_sdk/plugin/engine_plugin_api.h>
+#include <hipdnn_sdk/plugin/flatbuffer_utilities/engine_details_wrapper.hpp>
 #include <hipdnn_sdk/plugin/plugin_api_data_types.h>
 #include <hipdnn_sdk/test_utilities/flatbuffer_graph_test_utils.hpp>
+#include <hipdnn_sdk/test_utilities/test_utilities.hpp>
+
+#include "hipdnn_engine_plugin_execution_context.hpp"
+#include "hipdnn_engine_plugin_handle.hpp"
+#include "mocks/mock_hipdnn_engine_plugin_execution_context.hpp"
 
 TEST(MiopenLegacyEnginePluginApiTest, EnginePluginCreateNullHandle)
 {
@@ -14,6 +20,7 @@ TEST(MiopenLegacyEnginePluginApiTest, EnginePluginCreateNullHandle)
 
 TEST(MiopenLegacyEnginePluginApiTest, EnginePluginCreateAlsoCreatesMIOpenHandleOnSuccess)
 {
+    SKIP_IF_NO_DEVICES();
     hipdnnEnginePluginHandle_t handle = nullptr;
 
     auto status = hipdnnEnginePluginCreate(&handle);
@@ -27,6 +34,7 @@ TEST(MiopenLegacyEnginePluginApiTest, EnginePluginCreateAlsoCreatesMIOpenHandleO
 
 TEST(MiopenLegacyEnginePluginApiTest, EnginePluginCreateTwiceGivesTheSameContainerHandle)
 {
+    SKIP_IF_NO_DEVICES();
     hipdnnEnginePluginHandle_t handle1 = nullptr;
     auto status1 = hipdnnEnginePluginCreate(&handle1);
 
@@ -44,6 +52,7 @@ TEST(MiopenLegacyEnginePluginApiTest, EnginePluginCreateTwiceGivesTheSameContain
 
 TEST(MiopenLegacyEnginePluginApiTest, EnginePluginCreateNonNullHandlePointer)
 {
+    SKIP_IF_NO_DEVICES();
     auto handle = reinterpret_cast<hipdnnEnginePluginHandle_t>(0x1234);
     auto status = hipdnnEnginePluginCreate(&handle);
     EXPECT_EQ(status, HIPDNN_PLUGIN_STATUS_SUCCESS);
@@ -64,6 +73,7 @@ TEST(MiopenLegacyEnginePluginApiTest, EnginePluginSetStreamNullHandle)
 
 TEST(MiopenLegacyEnginePluginApiTest, EnginePluginSetStreamNullStream)
 {
+    SKIP_IF_NO_DEVICES();
     hipdnnEnginePluginHandle_t handle = nullptr;
     EXPECT_EQ(hipdnnEnginePluginCreate(&handle), HIPDNN_PLUGIN_STATUS_SUCCESS);
 
@@ -74,6 +84,7 @@ TEST(MiopenLegacyEnginePluginApiTest, EnginePluginSetStreamNullStream)
 
 TEST(MiopenLegacyEnginePluginApiTest, EnginePluginSetStreamValidStream)
 {
+    SKIP_IF_NO_DEVICES();
     hipdnnEnginePluginHandle_t handle = nullptr;
     EXPECT_EQ(hipdnnEnginePluginCreate(&handle), HIPDNN_PLUGIN_STATUS_SUCCESS);
 
@@ -112,10 +123,11 @@ TEST(MiopenLegacyEnginePluginApiTest, EnginePluginGetApplicableEngineIdsNull)
 
 TEST(MiopenLegacyEnginePluginApiTest, EnginePluginGetApplicableEngineIdsValid)
 {
+    SKIP_IF_NO_DEVICES();
     hipdnnEnginePluginHandle_t handle = nullptr;
     ASSERT_EQ(hipdnnEnginePluginCreate(&handle), HIPDNN_PLUGIN_STATUS_SUCCESS);
 
-    auto builder = flatbuffer_test_utils::create_valid_graph();
+    auto builder = flatbuffer_test_utils::create_valid_batchnorm_graph();
     auto serialized_graph = builder.Release();
     hipdnnPluginConstData_t op_graph
         = flatbuffer_test_utils::create_valid_const_data_graph(serialized_graph);
@@ -144,36 +156,179 @@ TEST(MiopenLegacyEnginePluginApiTest, EnginePluginGetApplicableEngineIdsValid)
 
 TEST(MiopenLegacyEnginePluginApiTest, EnginePluginGetEngineDetailsNull)
 {
-    EXPECT_EQ(hipdnnEnginePluginGetEngineDetails(nullptr, 0, nullptr, nullptr),
+    auto handle = reinterpret_cast<hipdnnEnginePluginHandle_t>(0x1234);
+    auto op_graph = reinterpret_cast<hipdnnPluginConstData_t*>(0x5678);
+    hipdnnPluginConstData_t engine_details_out;
+
+    EXPECT_EQ(hipdnnEnginePluginGetEngineDetails(nullptr, 1, nullptr, nullptr),
               HIPDNN_PLUGIN_STATUS_BAD_PARAM);
+
+    EXPECT_EQ(hipdnnEnginePluginGetEngineDetails(nullptr, 1, op_graph, &engine_details_out),
+              HIPDNN_PLUGIN_STATUS_BAD_PARAM);
+
+    EXPECT_EQ(hipdnnEnginePluginGetEngineDetails(handle, 1, nullptr, &engine_details_out),
+              HIPDNN_PLUGIN_STATUS_BAD_PARAM);
+
+    EXPECT_EQ(hipdnnEnginePluginGetEngineDetails(handle, 1, op_graph, nullptr),
+              HIPDNN_PLUGIN_STATUS_BAD_PARAM);
+}
+
+TEST(MiopenLegacyEnginePluginApiTest, EnginePluginGetEngineDetailsValid)
+{
+    SKIP_IF_NO_DEVICES();
+    hipdnnEnginePluginHandle_t handle = nullptr;
+    ASSERT_EQ(hipdnnEnginePluginCreate(&handle), HIPDNN_PLUGIN_STATUS_SUCCESS);
+
+    auto builder = flatbuffer_test_utils::create_valid_batchnorm_graph();
+    auto serialized_graph = builder.Release();
+    hipdnnPluginConstData_t op_graph
+        = flatbuffer_test_utils::create_valid_const_data_graph(serialized_graph);
+    hipdnnPluginConstData_t engine_details_out;
+
+    auto status = hipdnnEnginePluginGetEngineDetails(handle, 1, &op_graph, &engine_details_out);
+
+    hipdnn_plugin::Engine_details_wrapper engine_details(engine_details_out.ptr,
+                                                         engine_details_out.size);
+
+    EXPECT_EQ(status, HIPDNN_PLUGIN_STATUS_SUCCESS);
+    EXPECT_EQ(engine_details.engine_id(), 1);
+
+    // Clean up
+    EXPECT_EQ(hipdnnEnginePluginDestroyEngineDetails(handle, &engine_details_out),
+              HIPDNN_PLUGIN_STATUS_SUCCESS);
+    EXPECT_EQ(hipdnnEnginePluginDestroy(handle), HIPDNN_PLUGIN_STATUS_SUCCESS);
 }
 
 TEST(MiopenLegacyEnginePluginApiTest, EnginePluginDestroyEngineDetailsNull)
 {
-    EXPECT_EQ(hipdnnEnginePluginDestroyEngineDetails(nullptr, nullptr),
+    auto handle = reinterpret_cast<hipdnnEnginePluginHandle_t>(0x1234);
+    hipdnnPluginConstData_t engine_details_out;
+
+    EXPECT_EQ(hipdnnEnginePluginDestroyEngineDetails(nullptr, &engine_details_out),
+              HIPDNN_PLUGIN_STATUS_BAD_PARAM);
+
+    EXPECT_EQ(hipdnnEnginePluginDestroyEngineDetails(handle, nullptr),
+              HIPDNN_PLUGIN_STATUS_BAD_PARAM);
+
+    engine_details_out.ptr = nullptr;
+    EXPECT_EQ(hipdnnEnginePluginDestroyEngineDetails(handle, nullptr),
               HIPDNN_PLUGIN_STATUS_BAD_PARAM);
 }
 
 TEST(MiopenLegacyEnginePluginApiTest, EnginePluginGetWorkspaceSizeNull)
 {
-    EXPECT_EQ(hipdnnEnginePluginGetWorkspaceSize(nullptr, nullptr, nullptr, nullptr),
+    auto handle = reinterpret_cast<hipdnnEnginePluginHandle_t>(0x1234);
+    auto engine_config = reinterpret_cast<hipdnnPluginConstData_t*>(0x5678);
+    auto op_graph = reinterpret_cast<hipdnnPluginConstData_t*>(0x9abc);
+    size_t workspace_size = 123;
+
+    // Null handle
+    EXPECT_EQ(hipdnnEnginePluginGetWorkspaceSize(nullptr, engine_config, op_graph, &workspace_size),
               HIPDNN_PLUGIN_STATUS_BAD_PARAM);
+
+    // Null engine_config
+    EXPECT_EQ(hipdnnEnginePluginGetWorkspaceSize(handle, nullptr, op_graph, &workspace_size),
+              HIPDNN_PLUGIN_STATUS_BAD_PARAM);
+
+    // Null op_graph
+    EXPECT_EQ(hipdnnEnginePluginGetWorkspaceSize(handle, engine_config, nullptr, &workspace_size),
+              HIPDNN_PLUGIN_STATUS_BAD_PARAM);
+
+    // Null workspace_size
+    EXPECT_EQ(hipdnnEnginePluginGetWorkspaceSize(handle, engine_config, op_graph, nullptr),
+              HIPDNN_PLUGIN_STATUS_BAD_PARAM);
+}
+
+TEST(MiopenLegacyEnginePluginApiTest, EnginePluginGetWorkspaceSizeValid)
+{
+    SKIP_IF_NO_DEVICES();
+    hipdnnEnginePluginHandle_t handle = nullptr;
+    ASSERT_EQ(hipdnnEnginePluginCreate(&handle), HIPDNN_PLUGIN_STATUS_SUCCESS);
+
+    // Create a valid flatbuffer graph and engine config
+    auto builder = flatbuffer_test_utils::create_valid_batchnorm_graph();
+    auto serialized_graph = builder.Release();
+    hipdnnPluginConstData_t op_graph
+        = flatbuffer_test_utils::create_valid_const_data_graph(serialized_graph);
+
+    auto engine_config_builder = flatbuffer_test_utils::create_valid_engine_config(1);
+    auto serialized_engine_config = engine_config_builder.Release();
+    hipdnnPluginConstData_t engine_config
+        = flatbuffer_test_utils::create_valid_const_data_engine_config(serialized_engine_config);
+
+    size_t workspace_size = 0;
+    auto status
+        = hipdnnEnginePluginGetWorkspaceSize(handle, &engine_config, &op_graph, &workspace_size);
+
+    EXPECT_EQ(status, HIPDNN_PLUGIN_STATUS_SUCCESS);
+    EXPECT_EQ(workspace_size, 0u); // batchnorm workspace size is always 0
+
+    EXPECT_EQ(hipdnnEnginePluginDestroy(handle), HIPDNN_PLUGIN_STATUS_SUCCESS);
 }
 
 TEST(MiopenLegacyEnginePluginApiTest, EnginePluginCreateExecutionContextNull)
 {
-    EXPECT_EQ(hipdnnEnginePluginCreateExecutionContext(nullptr, nullptr, nullptr, nullptr),
+    auto handle = reinterpret_cast<hipdnnEnginePluginHandle_t>(0x1234);
+    auto engine_config = reinterpret_cast<hipdnnPluginConstData_t*>(0x5678);
+    auto op_graph = reinterpret_cast<hipdnnPluginConstData_t*>(0x9abc);
+    hipdnnEnginePluginExecutionContext_t execution_context;
+
+    // Null handle
+    EXPECT_EQ(hipdnnEnginePluginCreateExecutionContext(
+                  nullptr, engine_config, op_graph, &execution_context),
               HIPDNN_PLUGIN_STATUS_BAD_PARAM);
+
+    // Null engine_config
+    EXPECT_EQ(
+        hipdnnEnginePluginCreateExecutionContext(handle, nullptr, op_graph, &execution_context),
+        HIPDNN_PLUGIN_STATUS_BAD_PARAM);
+
+    // Null op_graph
+    EXPECT_EQ(hipdnnEnginePluginCreateExecutionContext(
+                  handle, engine_config, nullptr, &execution_context),
+              HIPDNN_PLUGIN_STATUS_BAD_PARAM);
+
+    // Null execution_context
+    EXPECT_EQ(hipdnnEnginePluginCreateExecutionContext(handle, engine_config, op_graph, nullptr),
+              HIPDNN_PLUGIN_STATUS_BAD_PARAM);
+}
+
+TEST(MiopenLegacyEnginePluginApiTest, EnginePluginCreateExecutionContextValid)
+{
+    SKIP_IF_NO_DEVICES();
+    hipdnnEnginePluginHandle_t handle = nullptr;
+    ASSERT_EQ(hipdnnEnginePluginCreate(&handle), HIPDNN_PLUGIN_STATUS_SUCCESS);
+
+    auto builder = flatbuffer_test_utils::create_valid_batchnorm_graph();
+    auto serialized_graph = builder.Release();
+    hipdnnPluginConstData_t op_graph
+        = flatbuffer_test_utils::create_valid_const_data_graph(serialized_graph);
+
+    auto engine_config_builder = flatbuffer_test_utils::create_valid_engine_config(1);
+    auto serialized_engine_config = engine_config_builder.Release();
+    hipdnnPluginConstData_t engine_config
+        = flatbuffer_test_utils::create_valid_const_data_engine_config(serialized_engine_config);
+
+    hipdnnEnginePluginExecutionContext_t execution_context = nullptr;
+    auto status = hipdnnEnginePluginCreateExecutionContext(
+        handle, &engine_config, &op_graph, &execution_context);
+
+    EXPECT_EQ(status, HIPDNN_PLUGIN_STATUS_SUCCESS);
+    ASSERT_NE(execution_context, nullptr);
+
+    EXPECT_EQ(hipdnnEnginePluginDestroyExecutionContext(handle, execution_context),
+              HIPDNN_PLUGIN_STATUS_SUCCESS);
+    EXPECT_EQ(hipdnnEnginePluginDestroy(handle), HIPDNN_PLUGIN_STATUS_SUCCESS);
 }
 
 TEST(MiopenLegacyEnginePluginApiTest, EnginePluginDestroyExecutionContextNull)
 {
-    EXPECT_EQ(hipdnnEnginePluginDestroyExecutionContext(nullptr, nullptr),
-              HIPDNN_PLUGIN_STATUS_BAD_PARAM);
-}
+    auto handle = reinterpret_cast<hipdnnEnginePluginHandle_t>(0x1234);
+    Mock_hipdnn_engine_plugin_execution_context execution_context;
 
-TEST(MiopenLegacyEnginePluginApiTest, EnginePluginExecuteOpGraphNull)
-{
-    EXPECT_EQ(hipdnnEnginePluginExecuteOpGraph(nullptr, nullptr, nullptr, nullptr, 0),
+    EXPECT_EQ(hipdnnEnginePluginDestroyExecutionContext(nullptr, &execution_context),
+              HIPDNN_PLUGIN_STATUS_BAD_PARAM);
+
+    EXPECT_EQ(hipdnnEnginePluginDestroyExecutionContext(handle, nullptr),
               HIPDNN_PLUGIN_STATUS_BAD_PARAM);
 }

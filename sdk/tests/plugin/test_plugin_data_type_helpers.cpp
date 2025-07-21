@@ -2,9 +2,10 @@
 // SPDX-License-Identifier:  MIT
 
 #include <gtest/gtest.h>
+#include <sstream>
+
 #include <hipdnn_sdk/plugin/plugin_api_data_types.h>
 #include <hipdnn_sdk/plugin/plugin_data_type_helpers.hpp>
-#include <sstream>
 
 TEST(PluginDataTypeHelpersTest, ToStringPluginStatus)
 {

@@ -6,12 +6,15 @@
 
 #include <hipdnn_sdk/logging/logger.hpp>
 #include <hipdnn_sdk/plugin/engine_plugin_api.h>
+#include <hipdnn_sdk/plugin/flatbuffer_utilities/engine_config_wrapper.hpp>
+#include <hipdnn_sdk/plugin/flatbuffer_utilities/graph_wrapper.hpp>
 #include <hipdnn_sdk/plugin/plugin_api.h>
 #include <hipdnn_sdk/plugin/plugin_data_type_helpers.hpp>
 #include <hipdnn_sdk/plugin/plugin_helpers.hpp>
 #include <hipdnn_sdk/plugin/plugin_last_error_manager.hpp>
 
 #include "engine_manager.hpp"
+#include "hipdnn_engine_plugin_execution_context.hpp"
 #include "hipdnn_engine_plugin_handle.hpp"
 #include "miopen_container.hpp"
 #include "miopen_handle_factory.hpp"
@@ -102,32 +105,6 @@ void hipdnnPluginGetLastErrorString(const char** error_str)
     });
 }
 
-// Implementation of Engine Plugin API
-
-////////////////////////////////////////////////////////////////////////////////////////////
-// TODO Temporary functions, these are going to be removed soon.
-////////////////////////////////////////////////////////////////////////////////////////////
-hipdnnPluginStatus_t hipdnnPluginGetNumEngines(unsigned* num_engines)
-{
-    if(!num_engines)
-        return HIPDNN_PLUGIN_STATUS_BAD_PARAM;
-
-    return HIPDNN_PLUGIN_STATUS_SUCCESS;
-}
-
-hipdnnPluginStatus_t hipdnnPluginRunEngine(unsigned engine_index,
-                                           const uint32_t* input,
-                                           uint32_t* output,
-                                           uint32_t size)
-{
-    if(!input || !output || size == 0)
-        return HIPDNN_PLUGIN_STATUS_BAD_PARAM;
-
-    return HIPDNN_PLUGIN_STATUS_INTERNAL_ERROR;
-}
-////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////
-
 hipdnnPluginStatus_t hipdnnEnginePluginCreate(hipdnnEnginePluginHandle_t* handle)
 {
     LOG_API_ENTRY("handle_ptr={:p}", static_cast<void*>(handle));
@@ -137,7 +114,8 @@ hipdnnPluginStatus_t hipdnnEnginePluginCreate(hipdnnEnginePluginHandle_t* handle
 
         miopen_legacy_plugin::Miopen_handle_factory::create_miopen_handle(handle);
 
-        if(auto miopen_container_ptr = miopen_container_lifecycle_ptr.lock())
+        auto miopen_container_ptr = miopen_container_lifecycle_ptr.lock();
+        if(miopen_container_ptr != nullptr)
         {
             (*handle)->miopen_container = miopen_container_ptr;
         }
@@ -149,7 +127,8 @@ hipdnnPluginStatus_t hipdnnEnginePluginCreate(hipdnnEnginePluginHandle_t* handle
             // if we do have a race condition that results in threads getting locked, we want to
             // ensure that we only create one instance.  Therefore, the second thread to get
             // through will just read from the weak pointer rather than create a new instance.
-            if(auto miopen_container_ptr = miopen_container_lifecycle_ptr.lock())
+            miopen_container_ptr = miopen_container_lifecycle_ptr.lock();
+            if(miopen_container_ptr != nullptr)
             {
                 (*handle)->miopen_container = miopen_container_ptr;
             }
@@ -215,15 +194,16 @@ hipdnnPluginStatus_t
         throw_if_null(num_engines);
 
         auto& engine_manager = handle->get_engine_manager();
+        Graph_wrapper op_graph_wrapper(op_graph->ptr, op_graph->size);
 
-        auto applicable_engines = engine_manager.get_applicable_engine_ids(op_graph);
+        auto applicable_engines = engine_manager.get_applicable_engine_ids(op_graph_wrapper);
 
         *num_engines = 0;
         for(auto& engine_id : applicable_engines)
         {
             if(*num_engines == max_engines)
             {
-                *num_engines = applicable_engines.size();
+                *num_engines = static_cast<uint32_t>(applicable_engines.size());
                 HIPDNN_LOG_INFO("Maximum number of engines reached ({}), ignoring additional "
                                 "engines, num_engines count: {}",
                                 max_engines,
@@ -244,19 +224,42 @@ hipdnnPluginStatus_t hipdnnEnginePluginGetEngineDetails(hipdnnEnginePluginHandle
                                                         const hipdnnPluginConstData_t* op_graph,
                                                         hipdnnPluginConstData_t* engine_details)
 {
-    if(!handle || !op_graph || !engine_details)
-        return HIPDNN_PLUGIN_STATUS_BAD_PARAM;
+    LOG_API_ENTRY("handle={:p}, engine_id={}, op_graph={:p}, engine_details={:p}",
+                  static_cast<void*>(handle),
+                  engine_id,
+                  static_cast<const void*>(op_graph),
+                  static_cast<void*>(engine_details));
 
-    return HIPDNN_PLUGIN_STATUS_INTERNAL_ERROR;
+    return hipdnn_plugin::try_catch([&, api_name = __func__]() {
+        throw_if_null(handle);
+        throw_if_null(op_graph);
+        throw_if_null(engine_details);
+
+        auto& engine_manager = handle->get_engine_manager();
+        Graph_wrapper op_graph_wrapper(op_graph->ptr, op_graph->size);
+
+        engine_manager.get_engine_details(op_graph_wrapper, engine_id, *engine_details);
+
+        LOG_API_SUCCESS(api_name, "engine_details->ptr={:p}", engine_details->ptr);
+    });
 }
 
 hipdnnPluginStatus_t hipdnnEnginePluginDestroyEngineDetails(hipdnnEnginePluginHandle_t handle,
                                                             hipdnnPluginConstData_t* engine_details)
 {
-    if(!handle || !engine_details)
-        return HIPDNN_PLUGIN_STATUS_BAD_PARAM;
+    LOG_API_ENTRY("handle={:p}, engine_details={}",
+                  static_cast<void*>(handle),
+                  static_cast<void*>(engine_details));
 
-    return HIPDNN_PLUGIN_STATUS_INTERNAL_ERROR;
+    return hipdnn_plugin::try_catch([&, api_name = __func__]() {
+        throw_if_null(handle);
+        throw_if_null(engine_details);
+        throw_if_null(engine_details->ptr);
+
+        delete[] static_cast<const uint8_t*>(engine_details->ptr);
+
+        LOG_API_SUCCESS(api_name, "engine_details->ptr={:p}", engine_details->ptr);
+    });
 }
 
 hipdnnPluginStatus_t
@@ -265,12 +268,27 @@ hipdnnPluginStatus_t
                                        const hipdnnPluginConstData_t* op_graph,
                                        size_t* workspace_size)
 {
-    if(!handle || !engine_config || !op_graph || !workspace_size)
-        return HIPDNN_PLUGIN_STATUS_BAD_PARAM;
+    LOG_API_ENTRY("handle={:p}, engine_config={:p}, op_graph={:p}, workspace_size={:p}",
+                  static_cast<void*>(handle),
+                  static_cast<const void*>(engine_config),
+                  static_cast<const void*>(op_graph),
+                  static_cast<void*>(workspace_size));
 
-    // TODO: Calculate MIOpen workspace size from flatbuffer config and graph
-    *workspace_size = 0;
-    return HIPDNN_PLUGIN_STATUS_INTERNAL_ERROR;
+    return hipdnn_plugin::try_catch([&, api_name = __func__]() {
+        throw_if_null(handle);
+        throw_if_null(engine_config);
+        throw_if_null(op_graph);
+        throw_if_null(workspace_size);
+
+        auto& engine_manager = handle->get_engine_manager();
+
+        Engine_config_wrapper engine_config_wrapper(engine_config->ptr, engine_config->size);
+        Graph_wrapper op_graph_wrapper(op_graph->ptr, op_graph->size);
+        *workspace_size = engine_manager.get_workspace_size(
+            *handle, engine_config_wrapper.engine_id(), op_graph_wrapper);
+
+        LOG_API_SUCCESS(api_name, "workspace_size={}", *workspace_size);
+    });
 }
 
 hipdnnPluginStatus_t hipdnnEnginePluginCreateExecutionContext(
@@ -279,22 +297,58 @@ hipdnnPluginStatus_t hipdnnEnginePluginCreateExecutionContext(
     const hipdnnPluginConstData_t* op_graph,
     hipdnnEnginePluginExecutionContext_t* execution_context)
 {
-    if(!handle || !engine_config || !op_graph || !execution_context)
-        return HIPDNN_PLUGIN_STATUS_BAD_PARAM;
+    LOG_API_ENTRY("handle={:p}, engine_config={:p}, op_graph={:p}, execution_context={:p}",
+                  static_cast<void*>(handle),
+                  static_cast<const void*>(engine_config),
+                  static_cast<const void*>(op_graph),
+                  static_cast<void*>(execution_context));
 
-    // TODO: Parse flatbuffer config and graph to create MIOpen execution context
-    *execution_context = nullptr;
-    return HIPDNN_PLUGIN_STATUS_INTERNAL_ERROR;
+    return hipdnn_plugin::try_catch([&, api_name = __func__]() {
+        throw_if_null(handle);
+        throw_if_null(engine_config);
+        throw_if_null(op_graph);
+        throw_if_null(execution_context);
+
+        Graph_wrapper op_graph_wrapper(op_graph->ptr, op_graph->size);
+        Engine_config_wrapper engine_config_wrapper(engine_config->ptr, engine_config->size);
+
+        auto& engine_manager = handle->get_engine_manager();
+
+        auto context = new hipdnnEnginePluginExecutionContext;
+
+        try
+        {
+            engine_manager.initialize_execution_context(
+                *handle, op_graph_wrapper, engine_config_wrapper, *context);
+        }
+        catch(...)
+        {
+            delete context;
+            throw;
+        }
+
+        *execution_context = context;
+
+        LOG_API_SUCCESS(
+            api_name, "created_execution_context={:p}", static_cast<void*>(*execution_context));
+    });
 }
 
 hipdnnPluginStatus_t hipdnnEnginePluginDestroyExecutionContext(
     hipdnnEnginePluginHandle_t handle, hipdnnEnginePluginExecutionContext_t execution_context)
 {
-    if(!handle || !execution_context)
-        return HIPDNN_PLUGIN_STATUS_BAD_PARAM;
+    LOG_API_ENTRY("handle={:p}, execution_context={:p}",
+                  static_cast<void*>(handle),
+                  static_cast<void*>(execution_context));
 
-    // TODO: Destroy MIOpen execution context and free resources
-    return HIPDNN_PLUGIN_STATUS_INTERNAL_ERROR;
+    return hipdnn_plugin::try_catch([&, api_name = __func__]() {
+        throw_if_null(handle);
+        throw_if_null(execution_context);
+
+        delete execution_context;
+
+        LOG_API_SUCCESS(api_name, "destroyed execution_context");
+    });
 }
 
 hipdnnPluginStatus_t
@@ -304,11 +358,23 @@ hipdnnPluginStatus_t
                                      const hipdnnPluginDeviceBuffer_t* device_buffers,
                                      uint32_t num_device_buffers)
 {
-    if(!handle || !execution_context || !device_buffers)
-        return HIPDNN_PLUGIN_STATUS_BAD_PARAM;
+    LOG_API_ENTRY("handle={:p}, execution_context={:p}, workspace={:p}, device_buffers={:p}, "
+                  "num_device_buffers={}",
+                  static_cast<void*>(handle),
+                  static_cast<void*>(execution_context),
+                  workspace,
+                  static_cast<const void*>(device_buffers),
+                  num_device_buffers);
 
-    // TODO: Execute MIOpen operations using execution context and device buffers
-    return HIPDNN_PLUGIN_STATUS_INTERNAL_ERROR;
+    return hipdnn_plugin::try_catch([&, api_name = __func__]() {
+        throw_if_null(handle);
+        throw_if_null(execution_context);
+        throw_if_null(device_buffers);
+
+        execution_context->plan().execute(*handle, device_buffers, num_device_buffers, workspace);
+
+        LOG_API_SUCCESS(api_name, "executed graph");
+    });
 }
 
 } // extern "C"

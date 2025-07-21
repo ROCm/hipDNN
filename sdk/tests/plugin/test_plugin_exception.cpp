@@ -2,6 +2,7 @@
 // SPDX-License-Identifier:  MIT
 
 #include <gtest/gtest.h>
+
 #include <hipdnn_sdk/plugin/plugin_exception.hpp>
 
 using namespace hipdnn_plugin;
