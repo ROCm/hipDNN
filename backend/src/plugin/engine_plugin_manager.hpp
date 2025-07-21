@@ -60,7 +60,10 @@ private:
                             Graph_descriptor* graph_desc,
                             hipdnnPluginConstData_t* engine_details) const;
     void destroy_engine_details(int64_t engine_id, hipdnnPluginConstData_t* engine_details) const;
-    static std::unique_ptr<Engine_details_wrapper> get_engine_details(const std::shared_ptr<Engine_plugin_manager>& pm, int64_t engine_id, Graph_descriptor* graph_desc);
+    static std::unique_ptr<Engine_details_wrapper>
+        get_engine_details(const std::shared_ptr<Engine_plugin_manager>& pm,
+                           int64_t engine_id,
+                           Graph_descriptor* graph_desc);
 
     size_t get_workspace_size(int64_t engine_id,
                               const hipdnnPluginConstData_t* engine_config,
@@ -97,7 +100,9 @@ private:
 class Engine_details_wrapper
 {
 public:
-    Engine_details_wrapper(const std::shared_ptr<Engine_plugin_manager>& pm, int64_t engine_id, Graph_descriptor* graph_desc);
+    Engine_details_wrapper(const std::shared_ptr<Engine_plugin_manager>& pm,
+                           int64_t engine_id,
+                           Graph_descriptor* graph_desc);
     ~Engine_details_wrapper();
 
     // Prevent copying
@@ -108,7 +113,7 @@ public:
     Engine_details_wrapper(Engine_details_wrapper&& other) noexcept;
     Engine_details_wrapper& operator=(Engine_details_wrapper&& other) noexcept;
 
-    const hipdnn_sdk::data_objects::EngineDetails * get() const;
+    const hipdnn_sdk::data_objects::EngineDetails* get() const;
 
 private:
     std::shared_ptr<Engine_plugin_manager> _pm;

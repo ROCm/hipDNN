@@ -1,8 +1,8 @@
 // Copyright © Advanced Micro Devices, Inc., or its affiliates.
 // SPDX-License-Identifier:  MIT
 
-#include <mutex>
 #include <algorithm>
+#include <mutex>
 #include <vector>
 
 #include "descriptors/engine_config_descriptor.hpp"
@@ -195,7 +195,10 @@ void Engine_plugin_manager::destroy_engine_details(int64_t engine_id,
     plugin->destroy_engine_details(handle, engine_details);
 }
 
-std::unique_ptr<Engine_details_wrapper> get_engine_details(const std::shared_ptr<Engine_plugin_manager>& pm, int64_t engine_id, Graph_descriptor* graph_desc)
+std::unique_ptr<Engine_details_wrapper>
+    get_engine_details(const std::shared_ptr<Engine_plugin_manager>& pm,
+                       int64_t engine_id,
+                       Graph_descriptor* graph_desc)
 {
     return std::make_unique<Engine_details_wrapper>(pm, engine_id, graph_desc);
 }
@@ -277,11 +280,8 @@ void Engine_plugin_manager::finalize_engine(hipdnnBackendDescriptor_t desc) cons
     engine_desc->finalize();
 
     hipdnnBackendDescriptor_t graph;
-    engine_desc->get_attribute(HIPDNN_ATTR_ENGINE_OPERATION_GRAPH,
-                              HIPDNN_TYPE_BACKEND_DESCRIPTOR,
-                              1,
-                              nullptr,
-                              &graph);
+    engine_desc->get_attribute(
+        HIPDNN_ATTR_ENGINE_OPERATION_GRAPH, HIPDNN_TYPE_BACKEND_DESCRIPTOR, 1, nullptr, &graph);
     auto graph_desc = static_cast<Graph_descriptor*>(graph);
 
     int64_t engine_id;
@@ -289,7 +289,7 @@ void Engine_plugin_manager::finalize_engine(hipdnnBackendDescriptor_t desc) cons
         HIPDNN_ATTR_ENGINE_GLOBAL_INDEX, HIPDNN_TYPE_INT64, 1, nullptr, &engine_id);
 
     auto engine_ids = get_applicable_engine_ids(graph_desc);
-    if (std::ranges::find(engine_ids, engine_id) == engine_ids.end())
+    if(std::ranges::find(engine_ids, engine_id) == engine_ids.end())
     {
         throw Hipdnn_exception(HIPDNN_STATUS_BAD_PARAM,
                                "Engine ID " + std::to_string(engine_id)
@@ -328,11 +328,14 @@ void Engine_plugin_manager::execute_op_graph(hipdnnBackendDescriptor_t execution
 }
 #endif
 
-Engine_details_wrapper::Engine_details_wrapper(const std::shared_ptr<Engine_plugin_manager>& pm, int64_t engine_id, Graph_descriptor* graph_desc)
-        : _pm(pm)
+Engine_details_wrapper::Engine_details_wrapper(const std::shared_ptr<Engine_plugin_manager>& pm,
+                                               int64_t engine_id,
+                                               Graph_descriptor* graph_desc)
+    : _pm(pm)
 {
     _pm->get_engine_details(engine_id, graph_desc, &_engine_details_data);
-    flatbuffers::Verifier verifier(static_cast<const uint8_t*>(_engine_details_data.ptr), _engine_details_data.size);
+    flatbuffers::Verifier verifier(static_cast<const uint8_t*>(_engine_details_data.ptr),
+                                   _engine_details_data.size);
 }
 
 Engine_details_wrapper::~Engine_details_wrapper()
@@ -373,12 +376,13 @@ Engine_details_wrapper& Engine_details_wrapper::operator=(Engine_details_wrapper
     return *this;
 }
 
-const hipdnn_sdk::data_objects::EngineDetails * Engine_details_wrapper::get() const
+const hipdnn_sdk::data_objects::EngineDetails* Engine_details_wrapper::get() const
 {
     if(_engine_details_data.ptr == nullptr)
     {
-        throw Hipdnn_exception(HIPDNN_STATUS_INTERNAL_ERROR, "Wrong Engine_details_wrapper usage: "
-                                                           "get() called on an empty object");
+        throw Hipdnn_exception(HIPDNN_STATUS_INTERNAL_ERROR,
+                               "Wrong Engine_details_wrapper usage: "
+                               "get() called on an empty object");
     }
 
     return hipdnn_sdk::data_objects::GetEngineDetails(_engine_details_data.ptr);
