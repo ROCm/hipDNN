@@ -1,11 +1,11 @@
 // Copyright © Advanced Micro Devices, Inc., or its affiliates.
 // SPDX-License-Identifier:  MIT
 
-#include "miopen_handle_factory.hpp"
-#include "hipdnn_engine_plugin_handle.hpp"
-
 #include <hipdnn_sdk/plugin/plugin_api_data_types.h>
 #include <hipdnn_sdk/plugin/plugin_exception.hpp>
+
+#include "hipdnn_engine_plugin_handle.hpp"
+#include "miopen_handle_factory.hpp"
 
 using namespace hipdnn_plugin;
 

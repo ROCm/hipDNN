@@ -12,7 +12,7 @@ namespace miopen_legacy_plugin
 class Engine_manager;
 
 /*
- * Container class to manage the intantiation and ownership of all MIOpen solvers and engines.
+ * Container class to manage the intantiation and ownership of all MIOpen plan builders and engines.
  * The class designs use dependency injection to get the components they need in order to function.
  * This makes it easier to test and maintain the code as you can swap out implementations.
  * 

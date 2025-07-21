@@ -3,26 +3,6 @@
 
 if(NOT BUILD_PLUGIN_AS_DEPENDENCY)
     find_package(GTest CONFIG REQUIRED)
-
-list(PREPEND HIPDNN_WARNING_COMPILE_OPTIONS
-    -Werror                                  # Treat all warnings as errors
-    -Wall                                    # Enable most common warnings
-    -Wextra                                  # Enable additional warnings not covered by -Wall
-    -Wpedantic                               # Enforce strict ISO C++ compliance
-    -Wshadow                                 # Warn about variable shadowing
-    -Wnon-virtual-dtor                       # Warn if a class with virtual functions has a non-virtual destructor
-    -Wold-style-cast                         # Warn about C-style casts
-    -Wcast-align                             # Warn about potential performance issues with misaligned casts
-    -Woverloaded-virtual                     # Warn if a base class function is hidden by a derived class function with the same name
-    -Wconversion                             # Warn about implicit type conversions that may alter a value
-    -Wsign-conversion                        # Warn about implicit conversions between signed and unsigned types
-    -Wnull-dereference                       # Warn about dereferencing null pointers
-    -Wdouble-promotion                       # Warn when a float is implicitly promoted to a double
-    -Wformat=2                               # Enable stricter format string checks
-    -Winit-self                              # Warn about variables initialized with itself
-    -Wunreachable-code                       # Warn about unreachable code
-    -Wno-error=unused-command-line-argument  # Disable error for unused command line arguments
-)
 endif()
 
 include(GoogleTest)
@@ -34,13 +14,21 @@ if(HIP_DNN_SKIP_TESTS)
 endif()
 
 add_executable(miopen_legacy_plugin_tests
+    engines/test_miopen_engine.cpp
+    engines/plans/test_miopen_batchnorm_plan_builder.cpp
+    engines/plans/test_batchnorm_fwd_inference_plan.cpp
     main.cpp
     test_miopen_legacy_engine_plugin_api.cpp
+    test_miopen_batchnorm_operations.cpp
     test_miopen_legacy_plugin_api.cpp
     test_miopen_handle_factory.cpp
+    test_miopen_tensor.cpp
+    test_miopen_utils.cpp
     test_engine_manager.cpp
-    test_miopen_engine.cpp
+    test_hipdnn_plugin_execution_context.cpp
 )
+
+target_compile_options(miopen_legacy_plugin_tests PRIVATE ${HIPDNN_WARNING_COMPILE_OPTIONS})
 
 target_link_libraries(miopen_legacy_plugin_tests PUBLIC 
     GTest::gtest
@@ -49,7 +37,11 @@ target_link_libraries(miopen_legacy_plugin_tests PUBLIC
     pthread
 )
 
-target_compile_options(miopen_legacy_plugin_tests PRIVATE ${HIPDNN_WARNING_COMPILE_OPTIONS})
+# make it so tests inside folders can find the mocks folder without having to use a relative path.
+target_include_directories(miopen_legacy_plugin_tests PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}
+)
+
 
 if(BUILD_PLUGIN_AS_DEPENDENCY)
     clang_tidy_check(miopen_legacy_plugin_tests)
