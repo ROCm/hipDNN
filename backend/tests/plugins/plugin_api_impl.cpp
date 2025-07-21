@@ -13,7 +13,7 @@ using namespace hipdnn_plugin;
 
 // NOLINTNEXTLINE(modernize-avoid-c-arrays)
 thread_local char Plugin_last_error_manager::last_error[HIPDNN_PLUGIN_ERROR_STRING_MAX_LENGTH] = "";
-static hipdnnCallback_t logging_callback = nullptr; // make it a member?
+static hipdnnCallback_t logging_callback = nullptr;
 
 // Exported functions:
 
