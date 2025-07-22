@@ -289,26 +289,5 @@ HIPDNN_BACKEND_EXPORT void hipdnnGetLastErrorString(char* message, size_t max_si
 
 HIPDNN_BACKEND_EXPORT void hipdnnLoggingCallback_ext(hipdnnSeverity_t severity, const char* msg)
 {
-    hipdnn_backend::logging::initialize();
-
-    if(auto logger = hipdnn_backend::logging::get_callback_receiver_logger())
-    {
-        switch(severity)
-        {
-        case HIPDNN_SEV_FATAL:
-            logger->critical(msg);
-            break;
-        case HIPDNN_SEV_ERROR:
-            logger->error(msg);
-            break;
-        case HIPDNN_SEV_WARN:
-            logger->warn(msg);
-            break;
-        case HIPDNN_SEV_OFF:
-            break;
-        default:
-            logger->info(msg);
-            break;
-        }
-    }
+    hipdnn_backend::logging::hipdnn_logging_callback(severity, msg);
 }
