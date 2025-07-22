@@ -21,6 +21,7 @@ namespace plugin
 class Engine_plugin;
 class Root_engine_plugin_manager;
 class Engine_details_wrapper;
+class Engine_execution_context_wrapper;
 
 class Engine_plugin_manager
 {
@@ -72,13 +73,14 @@ private:
     hipdnnEnginePluginExecutionContext_t
         create_execution_context(int64_t engine_id,
                                  const hipdnnPluginConstData_t* engine_config,
-                                 const hipdnnPluginConstData_t* op_graph) const;
-    hipdnnEnginePluginExecutionContext_t
-        create_execution_context(int64_t engine_id,
-                                 const hipdnnPluginConstData_t* engine_config,
                                  Graph_descriptor* graph_desc) const;
     void destroy_execution_context(int64_t engine_id,
                                    hipdnnEnginePluginExecutionContext_t execution_context) const;
+    static std::unique_ptr<Engine_execution_context_wrapper>
+        create_execution_context(const std::shared_ptr<Engine_plugin_manager>& pm,
+                                 int64_t engine_id,
+                                 const hipdnnPluginConstData_t* engine_config,
+                                 Graph_descriptor* graph_desc);
 
     void execute_op_graph(int64_t engine_id,
                           hipdnnEnginePluginExecutionContext_t execution_context,
@@ -91,6 +93,7 @@ private:
     mutable std::unordered_map<int64_t, hipdnnEnginePluginHandle_t> _engine_id_to_handle;
 
     friend class Engine_details_wrapper;
+    friend class Engine_execution_context_wrapper;
 };
 
 // A class to manage engine details lifecycle
@@ -115,6 +118,32 @@ public:
 private:
     std::shared_ptr<Engine_plugin_manager> _pm;
     hipdnnPluginConstData_t _engine_details_data;
+};
+
+// A class to manage engine execution context lifecycle
+class Engine_execution_context_wrapper
+{
+public:
+    Engine_execution_context_wrapper(const std::shared_ptr<Engine_plugin_manager>& pm,
+                                   int64_t engine_id,
+                                   const hipdnnPluginConstData_t* engine_config,
+                                   Graph_descriptor* graph_desc);
+    ~Engine_execution_context_wrapper();
+
+    // Prevent copying
+    Engine_execution_context_wrapper(const Engine_execution_context_wrapper&) = delete;
+    Engine_execution_context_wrapper& operator=(const Engine_execution_context_wrapper&) = delete;
+
+    // Allow moving
+    Engine_execution_context_wrapper(Engine_execution_context_wrapper&& other) noexcept;
+    Engine_execution_context_wrapper& operator=(Engine_execution_context_wrapper&& other) noexcept;
+
+    hipdnnEnginePluginExecutionContext_t get() const;
+
+private:
+    std::shared_ptr<Engine_plugin_manager> _pm;
+    int64_t _engine_id;
+    hipdnnEnginePluginExecutionContext_t _execution_context;
 };
 
 } // namespace plugin

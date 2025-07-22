@@ -221,20 +221,8 @@ size_t Engine_plugin_manager::get_workspace_size(int64_t engine_id,
     return plugin->get_workspace_size(handle, engine_config, &serialized_graph_data);
 }
 
-hipdnnEnginePluginExecutionContext_t
-    Engine_plugin_manager::create_execution_context(int64_t engine_id,
-                                                    const hipdnnPluginConstData_t* engine_config,
-                                                    const hipdnnPluginConstData_t* op_graph) const
-{
-    auto handle = _engine_id_to_handle.at(engine_id);
-    auto plugin = _handle_to_plugin.at(handle);
-
-    return plugin->create_execution_context(handle, engine_config, op_graph);
-}
-
 // TODO: Pack engine_config
 // TODO: Get engine_id from engine_config
-// TODO: Return a smart pointer to the execution context
 hipdnnEnginePluginExecutionContext_t
     Engine_plugin_manager::create_execution_context(int64_t engine_id,
                                                     const hipdnnPluginConstData_t* engine_config,
@@ -243,7 +231,11 @@ hipdnnEnginePluginExecutionContext_t
     const auto& serialized_graph = graph_desc->get_serialized_graph();
     const hipdnnPluginConstData_t serialized_graph_data{serialized_graph.data(),
                                                         serialized_graph.size()};
-    return create_execution_context(engine_id, engine_config, &serialized_graph_data);
+
+    auto handle = _engine_id_to_handle.at(engine_id);
+    auto plugin = _handle_to_plugin.at(handle);
+
+    return plugin->create_execution_context(handle, engine_config, &serialized_graph_data);
 }
 
 void Engine_plugin_manager::destroy_execution_context(
@@ -253,6 +245,15 @@ void Engine_plugin_manager::destroy_execution_context(
     auto plugin = _handle_to_plugin.at(handle);
 
     plugin->destroy_execution_context(handle, execution_context);
+}
+
+std::unique_ptr<Engine_execution_context_wrapper>
+        Engine_plugin_manager::create_execution_context(const std::shared_ptr<Engine_plugin_manager>& pm,
+                                 int64_t engine_id,
+                                 const hipdnnPluginConstData_t* engine_config,
+                                 Graph_descriptor* graph_desc)
+{
+    return std::make_unique<Engine_execution_context_wrapper>(pm, engine_id, engine_config, graph_desc);
 }
 
 void Engine_plugin_manager::execute_op_graph(int64_t engine_id,
@@ -343,6 +344,8 @@ void Engine_plugin_manager::finalize_engine_heuristic(hipdnnBackendDescriptor_t 
 
     auto engine_ids = get_applicable_engine_ids(graph_desc);
     heur_desc->set_engine_ids(engine_ids);
+
+    // TODO Implement getting engine details
 }
 
 #if 0
@@ -417,6 +420,57 @@ const hipdnn_sdk::data_objects::EngineDetails* Engine_details_wrapper::get() con
     }
 
     return hipdnn_sdk::data_objects::GetEngineDetails(_engine_details_data.ptr);
+}
+
+// TODO: Use engine_id from engine_config
+Engine_execution_context_wrapper::Engine_execution_context_wrapper(const std::shared_ptr<Engine_plugin_manager>& pm,
+                                   int64_t engine_id,
+                                   const hipdnnPluginConstData_t* engine_config,
+                                   Graph_descriptor* graph_desc)
+    : _pm(pm),
+      _engine_id(engine_id)
+{
+    _execution_context = _pm->create_execution_context(engine_id, engine_config, graph_desc);
+}
+
+Engine_execution_context_wrapper::~Engine_execution_context_wrapper()
+{
+    if(_execution_context == nullptr)
+    {
+        return;
+    }
+
+    try
+    {
+        _pm->destroy_execution_context(_engine_id, _execution_context);
+    }
+    catch(const Hipdnn_exception& e)
+    {
+        HIPDNN_LOG_ERROR(e.get_message());
+    }
+}
+
+Engine_execution_context_wrapper::Engine_execution_context_wrapper(Engine_execution_context_wrapper&& other) noexcept
+    : _pm(std::move(other._pm)),
+      _engine_id(other._engine_id),
+      _execution_context(other._execution_context)
+{
+    other._pm = nullptr;
+    other._execution_context = nullptr;
+}
+
+Engine_execution_context_wrapper& Engine_execution_context_wrapper::operator=(Engine_execution_context_wrapper&& other) noexcept
+{
+    if(this != &other)
+    {
+        _pm = std::move(other._pm);
+        _engine_id = other._engine_id;
+        _execution_context = other._execution_context;
+
+        other._pm = nullptr;
+        other._execution_context = nullptr;
+    }
+    return *this;
 }
 
 } // namespace plugin
