@@ -10,11 +10,11 @@ using namespace hipdnn_sdk::reference_test_utilities;
 using namespace hipdnn_sdk::utilities;
 
 template <typename T>
-Migratable_memory<T> create_buffer(size_t size, T mult)
+Migratable_memory create_buffer(size_t size, T mult)
 {
-    Migratable_memory<T> buffer(size);
+    Migratable_memory buffer(size, sizeof(T));
 
-    T* data = buffer.host_data();
+    T* data = buffer.host_data<T>();
 
     for (size_t i = 0; i < size; ++i)
     {

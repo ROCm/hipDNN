@@ -16,7 +16,7 @@ class Reference_validation_interface {
 public:
     virtual ~Reference_validation_interface() = default;
     
-    virtual bool compare_buffers(const Migratable_memory<T>& reference, const Migratable_memory<T>& implementation) = 0;
+    virtual bool compare_buffers(const Migratable_memory& reference, const Migratable_memory& implementation) = 0;
 };
 
 } // namespace reference_test_utilities

@@ -12,103 +12,74 @@ namespace reference_test_utilities {
 
 using namespace hipdnn_sdk::utilities;
 
-template<class T, class V = T>
-class Cpu_fp_reference_implementation : public Reference_implementation_interface<T> {
+template<class T, class U, class V = U>
+class Cpu_fp_reference_implementation : public Reference_implementation_interface<T,U,V> {
 public:
 
     Cpu_fp_reference_implementation() = default;
     ~Cpu_fp_reference_implementation() override = default;
     
-    void execute(const std::map<int64_t, Migratable_memory<T>>& buffers, const TensorAttributesT& tensor_attributes, const BatchnormInferenceAttributesT& batchnorm_attributes) override
+    void execute(std::map<int64_t, Test_tensor>& tensors, const BatchnormInferenceAttributes& batchnorm_attributes, V epsilon) override
     {
-        if (tensor_attributes.dims.size() != 4)
+        const Test_tensor& input  = tensors.at(batchnorm_attributes.x());
+        const Test_tensor& scale  = tensors.at(batchnorm_attributes.scale());
+        const Test_tensor& bias   = tensors.at(batchnorm_attributes.bias());
+        const Test_tensor& estimatedMean = tensors.at(batchnorm_attributes.mean().value());
+        const Test_tensor& estimatedVariance = tensors.at(batchnorm_attributes.inv_variance().value());
+        Test_tensor& output = tensors.at(batchnorm_attributes.y());
+
+        if (input.dims().size() != 4)
         {
             throw std::runtime_error("Batchnorm inference requires a 4D tensor.");
         }
 
-        int64_t n_batches = tensor_attributes.dims[0];
-        std::vector<int64_t> channels(static_cast<size_t>(tensor_attributes.dims[1]));
+        int64_t n_batches = input.dims().at(0);
+        std::vector<int64_t> channels(static_cast<size_t>(input.dims().at(1)));
         std::iota(channels.begin(), channels.end(), 0);
-        int64_t height    = tensor_attributes.dims[2];
-        int64_t width     = tensor_attributes.dims[3];
+        int64_t height    = input.dims().at(2);
+        int64_t width     = input.dims().at(3);
 
-        (void)n_batches; // Suppress unused variable warning
-        (void)height;    // Suppress unused variable warning
-        (void)width;     // Suppress unused variable warning
-
-        // Migratable_memory<T> input = buffers.at(batchnorm_attributes.input_id);
-        // Migratable_memory<T> output = buffers.at(batchnorm_attributes.output_id);
-
-        const Migratable_memory<T>& scale  = buffers.at(batchnorm_attributes.scale);
-        const Migratable_memory<T>& bias   = buffers.at(batchnorm_attributes.bias);
-        const Migratable_memory<V>& estimatedMean = buffers.at(batchnorm_attributes.mean.value());
-        const Migratable_memory<V>& estimatedVariance = buffers.at(batchnorm_attributes.inv_variance.value());
-
-        (void)scale;  // Suppress unused variable warning
-        (void)bias;   // Suppress unused variable warning
-        (void)estimatedMean;  // Suppress unused variable warning
-        (void)estimatedVariance;  // Suppress unused variable warning
-
-        std::for_each(channels.begin(), channels.end(), [&](int cidx) {
-            (void) cidx; // Suppress unused variable warning
-
-        //     V mean           = estimatedMean(0, cidx, 0, 0);
-        //     V variance       = estimatedVariance(0, cidx, 0, 0);
-        //     double invertVar = 1.0 / sqrt(variance + epsilon);
-        //     // process the batch per channel
-        //     for(int row = 0; row < height; row++)
-        //     { // via rows
-        //         for(int column = 0; column < width; column++)
-        //         { // via columns
-        //             for(int bidx = 0; bidx < n_batches; bidx++)
-        //             { // via mini_batch
-        //                 double elemStd = static_cast<double>(input(bidx, cidx, row, column)) - mean;
-        //                 double inhat   = elemStd * invertVar;
-        //                 output(bidx, cidx, row, column) =
-        //                     static_cast<T>(scale(0, cidx, 0, 0) * inhat + bias(0, cidx, 0, 0));
-        //                 // printf("output: %f\n",scale(0, cidx, 0, 0) * inhat + bias(0, cidx, 0, 0));
-        //             }
-        //         }
-        //     }
+        std::for_each(channels.begin(), channels.end(), [&](int64_t cidx) {
+            V mean           = getValue<V>(estimatedMean, 0, cidx, 0, 0);
+            V variance       = getValue<V>(estimatedVariance, 0, cidx, 0, 0);
+            double invertVar = 1.0 / static_cast<double>(sqrt(static_cast<double>(variance) + static_cast<double>(epsilon)));
+            // process the batch per channel
+            for(int row = 0; row < height; row++)
+            { // via rows
+                for(int column = 0; column < width; column++)
+                { // via columns
+                    for(int bidx = 0; bidx < n_batches; bidx++)
+                    { // via mini_batch
+                        double elemStd = static_cast<double>(getValue<T>(input,bidx, cidx, row, column)) - static_cast<double>(mean);
+                        double inhat   = elemStd * invertVar;
+                        setValue<T>(output,bidx, cidx, row, column,
+                            static_cast<T>(static_cast<double>(getValue<U>(scale, 0, cidx, 0, 0)) * inhat + static_cast<double>(getValue<U>(bias,0, cidx, 0, 0))));
+                    }
+                }
+            }
         });
 
+        output.memory().mark_host_modified(); // Mark output memory as modified on host
     }
 
 private:
+    template <typename TUV>
+    TUV getValue(const Test_tensor& tensor, int64_t bidx, int64_t cidx, int64_t row, int64_t column) const
+    {
+        const auto& strides = tensor.strides();
+        int64_t index = bidx * strides[0] + cidx * strides[1] + row * strides[2] + column * strides[3];
+        const auto* data = tensor.memory().host_data<TUV>();
+        return data[index];
+    }
 
-    // template <class T, class Tref, class U, class V = U>
-    // void batchNormSpatialHostInference(const tensor<T>& input,
-    //                                 tensor<Tref>& output,
-    //                                 const tensor<U>& scale,
-    //                                 const tensor<U>& bias,
-    //                                 double epsilon,
-    //                                 const tensor<V>& estimatedMean,
-    //                                 const tensor<V>& estimatedVariance)
-    // {
-
-    //     int n_batches, channels, height, width;
-    //     std::tie(n_batches, channels, height, width) = miopen::tien<4>(input.desc.GetLengths());
-    //     par_for(channels, 1, [&](int cidx) { // via channel
-    //         V mean           = estimatedMean(0, cidx, 0, 0);
-    //         V variance       = estimatedVariance(0, cidx, 0, 0);
-    //         double invertVar = 1.0 / sqrt(variance + epsilon);
-    //         // process the batch per channel
-    //         for(int row = 0; row < height; row++)
-    //         { // via rows
-    //             for(int column = 0; column < width; column++)
-    //             { // via columns
-    //                 for(int bidx = 0; bidx < n_batches; bidx++)
-    //                 { // via mini_batch
-    //                     double elemStd = static_cast<double>(input(bidx, cidx, row, column)) - mean;
-    //                     double inhat   = elemStd * invertVar;
-    //                     output(bidx, cidx, row, column) =
-    //                         static_cast<T>(scale(0, cidx, 0, 0) * inhat + bias(0, cidx, 0, 0));
-    //                     // printf("output: %f\n",scale(0, cidx, 0, 0) * inhat + bias(0, cidx, 0, 0));
-    //                 }
-    //             }
-    //         }
-    //     });
-    // }
+    template <typename TUV>
+    void setValue(Test_tensor& tensor, int64_t bidx, int64_t cidx, int64_t row, int64_t column, TUV value) const
+    {
+        const auto& strides = tensor.strides();
+        int64_t index = bidx * strides[0] + cidx * strides[1] + row * strides[2] + column * strides[3];
+        auto* data = tensor.memory().host_data<TUV>();
+        data[index] = value;
+    }
 };
 
 } // namespace reference_test_utilities

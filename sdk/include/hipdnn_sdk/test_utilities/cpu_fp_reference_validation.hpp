@@ -25,15 +25,15 @@ public:
     
     ~Cpu_fp_reference_validation() override = default;
     
-    bool compare_buffers(const Migratable_memory<T>& reference, const Migratable_memory<T>& implementation) override
+    bool compare_buffers(const Migratable_memory& reference, const Migratable_memory& implementation) override
     {
-        if (reference.size() != implementation.size()) {
+        if (reference.count() != implementation.count()) {
             return false;
         }
 
-        size_t element_count = reference.size();
-        const T* ref_data = reference.host_data();
-        const T* impl_data = implementation.host_data();
+        size_t element_count = reference.count();
+        const T* ref_data = reference.host_data<T>();
+        const T* impl_data = implementation.host_data<T>();
 
         for (size_t i = 0; i < element_count; ++i) {
 

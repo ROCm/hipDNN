@@ -10,6 +10,6 @@ using namespace hipdnn_sdk::utilities;
 
 TEST(CpuFpReferenceImplementation, BasicFloatUsage)
 {
-    Cpu_fp_reference_implementation<float, float> ref_impl;
+    Cpu_fp_reference_implementation<float, float, float> ref_impl;
 }
 
