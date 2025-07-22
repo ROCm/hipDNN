@@ -62,21 +62,7 @@ int main()
     Surface<float> saved_inv_var_surface(get_tensor_element_count(saved_inv_variance));
 
     /*
-    auto variant_pack_result = graph->create_variant_pack({
-        {x, x_surface.devPtr},
-        {scale, scale_surface.devPtr},
-        {bias, bias_surface.devPtr},
-        {prev_running_mean, prev_mean_surface.devPtr},
-        {prev_running_var, prev_var_surface.devPtr},
-        {momentum, momentum_surface.devPtr}, // FIXED: Add momentum to variant pack
-        {y, y_surface.devPtr},
-        {next_running_mean, next_mean_surface.devPtr},
-        {next_running_var, next_var_surface.devPtr},
-        {saved_mean, saved_mean_surface.devPtr},
-        {saved_inv_variance, saved_inv_var_surface.devPtr}
-    });
-    HIPDNN_FE_CHECK(variant_pack_result);
-    auto variant_pack = variant_pack_result.get_data();
+    // need to properly create a variant pack with the input tensors
 
     auto execution_result = graph->execute(variant_pack);
     HIPDNN_FE_CHECK(execution_result);

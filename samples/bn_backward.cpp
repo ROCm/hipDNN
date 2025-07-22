@@ -53,19 +53,8 @@ int main()
     Surface<float> dbias_surface(get_tensor_element_count(dbias));
 
     /*
-    auto variant_pack_result = graph->create_variant_pack({
-        {dy, dy_surface.devPtr},
-        {x, x_surface.devPtr},
-        {scale, scale_surface.devPtr},
-        {saved_mean, saved_mean_surface.devPtr},
-        {saved_inv_variance, saved_inv_var_surface.devPtr},
-        {dx, dx_surface.devPtr},
-        {dscale, dscale_surface.devPtr},
-        {dbias, dbias_surface.devPtr}
-    });
-    HIPDNN_FE_CHECK(variant_pack_result);
-    auto variant_pack = variant_pack_result.get_data();
-
+    // need to properly create a variant pack with the input tensors
+    
     auto execution_result = graph->execute(variant_pack);
     HIPDNN_FE_CHECK(execution_result);
     */

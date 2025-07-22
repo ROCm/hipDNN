@@ -1,9 +1,20 @@
 # hipDNN-samples
+
 ## How to build
-- Follow the hipdnn build and install instructions in the [Building readme](../docs/Building.md).
-- Once those are installed, inside the samples directory, run the following commands:
+
+1.  **Install hipDNN:** Follow the hipDNN build and install instructions in the [Building readme](../docs/Building.md).
+
+2.  **Configure and Build:** Once hipDNN is installed, run the following commands from this `samples` directory:
     - `mkdir build`
     - `cd build`
     - `cmake -DCMAKE_CXX_COMPILER=/opt/rocm/bin/amdclang++ ..`
     - `make -j`
-- inside the build folder will be hipdnn_samples which can now be ran
+    
+3.  **Run Samples:** The `build` folder will now contain the sample executables.
+
+## Available Samples
+
+* `hipdnn_samples`: main.cpp - Basic demonstration of hipDNN
+* `bn_infer`: (`bn_infer.cpp`) - Demonstrates a Batch Normalization inference graph.
+* `bn_training`: (`bn_training.cpp`) - Demonstrates the forward pass of Batch Normalization training.
+* `bn_backward`: (`bn_backward.cpp`) - Demonstrates the backward pass of Batch Normalization training.

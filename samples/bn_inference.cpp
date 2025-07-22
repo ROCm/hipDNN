@@ -46,17 +46,10 @@ int main()
     Surface<float> inv_variance_surface(get_tensor_element_count(inv_variance), 1.0f);
     Surface<float> y_surface(get_tensor_element_count(y));
 
+    // provide example with workspace
+
     /*
-    auto variant_pack_result = graph->create_variant_pack({
-        {x, x_surface.devPtr},
-        {scale, scale_surface.devPtr},
-        {bias, bias_surface.devPtr},
-        {mean, mean_surface.devPtr},
-        {inv_variance, inv_variance_surface.devPtr},
-        {y, y_surface.devPtr}
-    });
-    HIPDNN_FE_CHECK(variant_pack_result);
-    auto variant_pack = variant_pack_result.get_data();
+    // need to properly create a variant pack with the input tensors
 
     auto execution_result = graph->execute(variant_pack);
     HIPDNN_FE_CHECK(execution_result);
