@@ -135,9 +135,9 @@ std::shared_ptr<spdlog::logger> get_backend_logger()
 
 void hipdnn_logging_callback(hipdnnSeverity_t severity, const char* msg)
 {
-    hipdnn_backend::logging::initialize();
+    initialize();
 
-    if(auto logger = hipdnn_backend::logging::get_callback_receiver_logger())
+    if(auto logger = get_callback_receiver_logger())
     {
         switch(severity)
         {
