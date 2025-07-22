@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include <hipdnn_sdk/logging/callback_types.h>
 #include <memory>
 #include <spdlog/spdlog.h>
 
@@ -37,6 +38,8 @@ void set_log_level(const std::string& level);
 std::shared_ptr<spdlog::logger> get_backend_logger();
 
 std::shared_ptr<spdlog::logger> get_callback_receiver_logger();
+
+void hipdnn_logging_callback(hipdnnSeverity_t severity, const char* msg);
 
 } // namespace logging
 } // namespace hipdnn_backend
