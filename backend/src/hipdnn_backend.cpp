@@ -13,7 +13,6 @@
 #include "logging/logging.hpp"
 #include "plugin/plugin_manager.hpp"
 #include <hipdnn_sdk/logging/callback_types.h>
-#include <spdlog/spdlog.h>
 
 #include <hipdnn_sdk/utilities/string_util.hpp>
 
