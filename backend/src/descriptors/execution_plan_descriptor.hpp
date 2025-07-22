@@ -49,6 +49,9 @@ public:
                        hipdnnBackendAttributeType_t attribute_type,
                        int64_t element_count,
                        const void* array_of_elements) override;
+
+    // Throws an exception if the descriptor is not finalized.
+    std::shared_ptr<const Engine_config_descriptor> get_engine_config() const;
 };
 
 } // namespace hipdnn_backend

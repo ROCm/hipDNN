@@ -195,4 +195,12 @@ void Engine_config_descriptor::set_max_workspace_size(int64_t workspace_size)
     _max_workspace_size = workspace_size;
 }
 
+std::shared_ptr<const Engine_descriptor> Engine_config_descriptor::get_engine() const
+{
+    THROW_IF_FALSE(is_finalized(),
+                   HIPDNN_STATUS_INTERNAL_ERROR,
+                   "Engine_config_descriptor::get_engine() failed: Not finalized.");
+    return _engine;
+}
+
 } // namespace hipdnn_backend

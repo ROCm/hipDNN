@@ -62,6 +62,9 @@ public:
                        const void* array_of_elements) override;
 
     void set_engine_ids(const std::vector<int64_t>& engine_ids);
+
+    // Throws an exception if the descriptor is not finalized.
+    std::shared_ptr<const Graph_descriptor> get_graph() const;
 };
 
 } // namespace hipdnn_backend

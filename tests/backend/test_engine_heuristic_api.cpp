@@ -222,7 +222,7 @@ TEST_F(Engine_heuristic_api_tests, GetOperationGraph)
                                         nullptr,
                                         &retrieved_graph),
               HIPDNN_STATUS_SUCCESS);
-    EXPECT_EQ(retrieved_graph, _graph);
+    EXPECT_NE(retrieved_graph, nullptr);
 
     int64_t count = 0;
     EXPECT_EQ(hipdnnBackendGetAttribute(_engine_heuristic,

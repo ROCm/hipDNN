@@ -208,4 +208,13 @@ void Execution_plan_descriptor::get_engine_config(hipdnnBackendAttributeType_t a
     pack_descriptor(_engine_config, array_of_elements);
 }
 
+std::shared_ptr<const Engine_config_descriptor> Execution_plan_descriptor::get_engine_config() const
+{
+    THROW_IF_FALSE(is_finalized(),
+                   HIPDNN_STATUS_INTERNAL_ERROR,
+                   "Execution_plan_descriptor::get_engine_config() failed: Not finalized.");
+
+    return _engine_config;
+}
+
 } // namespace hipdnn_backend

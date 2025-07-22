@@ -17,7 +17,7 @@ struct Fake_plugin : Hipdnn_plugin_base
 {
     ~Fake_plugin() override = default;
 
-    std::set<int64_t> get_applicable_engines(Graph_descriptor* graphdesc) override
+    std::set<int64_t> get_applicable_engines(const Graph_descriptor* graphdesc) override
     {
         (void)graphdesc;
 
@@ -29,8 +29,8 @@ struct Fake_plugin : Hipdnn_plugin_base
         return {HIPDNN_ENGINE_ID_FAKE};
     }
 
-    void execute(Graph_descriptor* graphdesc,
-                 Variant_descriptor* vpack,
+    void execute(const Graph_descriptor* graphdesc,
+                 const Variant_descriptor* vpack,
                  hipdnnHandle* handle) override
     {
         // calls gpu kernel to execute the graph using C API?
@@ -39,7 +39,7 @@ struct Fake_plugin : Hipdnn_plugin_base
         (void)handle;
     }
 
-    int64_t get_max_workspace_size(Graph_descriptor* graphdesc, int64_t engine_id) override
+    int64_t get_max_workspace_size(const Graph_descriptor* graphdesc, int64_t engine_id) override
     {
         (void)graphdesc;
         (void)engine_id;

@@ -51,6 +51,10 @@ public:
                        hipdnnBackendAttributeType_t attribute_type,
                        int64_t element_count,
                        const void* array_of_elements) override;
+
+    // These getters throw an exception if the descriptor is not finalized.
+    std::shared_ptr<const Graph_descriptor> get_graph() const;
+    int64_t get_engine_id() const;
 };
 
 } // namespace hipdnn_backend

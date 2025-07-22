@@ -5,6 +5,7 @@
 #include "hipdnn_backend.h"
 #include "hipdnn_exception.hpp"
 #include "mocks/mock_descriptor.hpp"
+#include "test_descriptor_utils.hpp"
 #include "test_macros.hpp"
 
 #include <gtest/gtest.h>
@@ -13,6 +14,7 @@
 #include <memory>
 
 using namespace hipdnn_backend;
+using namespace test_descriptor_utils;
 
 using ::testing::_;
 using ::testing::Return;
@@ -43,12 +45,10 @@ public:
 
     void SetUp() override
     {
-        _plan_wrapper = std::make_unique<hipdnnBackendDescriptor>();
-        _plan_wrapper->private_descriptor = std::make_shared<Execution_plan_descriptor>();
-
-        _mock_engine_config_wrapper.reset(
-            make_mock_descriptor_wrapper(HIPDNN_BACKEND_ENGINECFG_DESCRIPTOR));
-        _mock_engine_config_bad_type_wrapper.reset(make_mock_descriptor_wrapper());
+        _plan_wrapper = create_descriptor<Execution_plan_descriptor>();
+        _mock_engine_config_wrapper
+            = make_mock_descriptor_wrapper(HIPDNN_BACKEND_ENGINECFG_DESCRIPTOR);
+        _mock_engine_config_bad_type_wrapper = make_mock_descriptor_wrapper();
     }
 
     void TearDown() override
@@ -227,8 +227,9 @@ TEST_F(Execution_plan_descriptor_test, GetExecutionPlanDescriptorWorkspaceSize)
 TEST_F(Execution_plan_descriptor_test, GetExecutionPlanDescriptorEngineConfig)
 {
     auto plan = get_execution_plan_descriptor();
-    hipdnnBackendDescriptor_t returned_engine_config = nullptr;
-    hipdnnBackendDescriptor_t null_count_engine_config = nullptr;
+
+    Scoped_descriptor returned_engine_config;
+    Scoped_descriptor null_count_engine_config;
     int64_t count = 0;
 
     make_execution_plan_finalized();
@@ -237,21 +238,20 @@ TEST_F(Execution_plan_descriptor_test, GetExecutionPlanDescriptorEngineConfig)
                                         HIPDNN_TYPE_BACKEND_DESCRIPTOR,
                                         1,
                                         &count,
-                                        &returned_engine_config));
+                                        returned_engine_config.get_ptr()));
 
     ASSERT_EQ(count, 1);
-    ASSERT_EQ(returned_engine_config->private_descriptor, _mock_engine_config_wrapper->private_descriptor);
+    ASSERT_EQ(returned_engine_config.get()->private_descriptor,
+              _mock_engine_config_wrapper->private_descriptor);
 
     ASSERT_NO_THROW(plan->get_attribute(HIPDNN_ATTR_EXECUTION_PLAN_ENGINE_CONFIG,
                                         HIPDNN_TYPE_BACKEND_DESCRIPTOR,
                                         1,
                                         nullptr,
-                                        &null_count_engine_config));
+                                        null_count_engine_config.get_ptr()));
 
-    ASSERT_EQ(null_count_engine_config->private_descriptor, _mock_engine_config_wrapper->private_descriptor);
-
-    delete returned_engine_config;
-    delete null_count_engine_config;
+    ASSERT_EQ(null_count_engine_config.get()->private_descriptor,
+              _mock_engine_config_wrapper->private_descriptor);
 }
 
 TEST_F(Execution_plan_descriptor_test, GetExecutionPlanDescriptorEngineConfigErrors)

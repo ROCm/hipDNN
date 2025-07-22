@@ -238,18 +238,23 @@ void Engine_heuristic_descriptor::get_engine_configs(hipdnnBackendAttributeType_
                         "Engine_heuristic_descriptor failed to get engine config: Invalid "
                         "config descriptor type.");
 
-            auto engine = new Engine_descriptor();
+            auto engine = std::make_shared<Engine_descriptor>();
+
             engine->set_attribute(
                 HIPDNN_ATTR_ENGINE_GLOBAL_INDEX, HIPDNN_TYPE_INT64, 1, &_engine_ids[i]);
-            engine->set_attribute(
-                HIPDNN_ATTR_ENGINE_OPERATION_GRAPH, HIPDNN_TYPE_BACKEND_DESCRIPTOR, 1, &_graph);
+
+            Scoped_descriptor graph_desc(pack_descriptor(_graph));
+            engine->set_attribute(HIPDNN_ATTR_ENGINE_OPERATION_GRAPH,
+                                  HIPDNN_TYPE_BACKEND_DESCRIPTOR,
+                                  1,
+                                  graph_desc.get_ptr());
             engine->finalize();
 
-            hipdnnBackendDescriptor wrapper;
-            wrapper.private_descriptor.reset(engine);
-
-            config->set_attribute(
-                HIPDNN_ATTR_ENGINECFG_ENGINE, HIPDNN_TYPE_BACKEND_DESCRIPTOR, 1, &wrapper);
+            Scoped_descriptor engine_desc(pack_descriptor(engine));
+            config->set_attribute(HIPDNN_ATTR_ENGINECFG_ENGINE,
+                                  HIPDNN_TYPE_BACKEND_DESCRIPTOR,
+                                  1,
+                                  engine_desc.get_ptr());
         }
 
         *element_count
@@ -295,6 +300,15 @@ void Engine_heuristic_descriptor::get_heuristic_mode(hipdnnBackendAttributeType_
 
     auto heur_mode_out = static_cast<hipdnnBackendHeurMode_t*>(array_of_elements);
     *heur_mode_out = _heuristic_mode;
+}
+
+std::shared_ptr<const Graph_descriptor> Engine_heuristic_descriptor::get_graph() const
+{
+    THROW_IF_FALSE(is_finalized(),
+                   HIPDNN_STATUS_INTERNAL_ERROR,
+                   "Engine_heuristic_descriptor::get_graph() failed: Not finalized.");
+
+    return _graph;
 }
 
 } // namespace hipdnn_backend

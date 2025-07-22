@@ -50,6 +50,9 @@ public:
                        const void* array_of_elements) override;
 
     void set_max_workspace_size(int64_t max_workspace_size);
+
+    // Throws an exception if the descriptor is not finalized.
+    std::shared_ptr<const Engine_descriptor> get_engine() const;
 };
 
 } // namespace hipdnn_backend

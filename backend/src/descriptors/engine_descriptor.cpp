@@ -202,4 +202,22 @@ void Engine_descriptor::set_global_id(hipdnnBackendAttributeType_t attribute_typ
     _engine_id_set = true;
 }
 
+std::shared_ptr<const Graph_descriptor> Engine_descriptor::get_graph() const
+{
+    THROW_IF_FALSE(is_finalized(),
+                   HIPDNN_STATUS_NOT_INITIALIZED,
+                   "Engine_descriptor::get_graph() failed: Not finalized.");
+
+    return _graph;
+}
+
+int64_t Engine_descriptor::get_engine_id() const
+{
+    THROW_IF_FALSE(is_finalized(),
+                   HIPDNN_STATUS_NOT_INITIALIZED,
+                   "Engine_descriptor::get_engine_id() failed: Not finalized.");
+
+    return _engine_id;
+}
+
 } // namespace hipdnn_backend
