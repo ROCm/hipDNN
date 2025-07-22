@@ -46,7 +46,7 @@ public:
 
     void finalize_engine(hipdnnBackendDescriptor_t desc) const;
     void finalize_engine_config(hipdnnBackendDescriptor_t desc) const;
-    //void finalize_engine_heuristic(hipdnnBackendDescriptor_t desc) const;
+    void finalize_engine_heuristic(hipdnnBackendDescriptor_t desc) const;
     //void finalize_execution_plan(hipdnnBackendDescriptor_t desc) const;
 
     //void execute_op_graph(hipdnnBackendDescriptor_t execution_plan,

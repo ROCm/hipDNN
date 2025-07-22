@@ -328,12 +328,22 @@ void Engine_plugin_manager::finalize_engine_config(hipdnnBackendDescriptor_t des
     config_desc->set_max_workspace_size(static_cast<int64_t>(workspace_size));
 }
 
-#if 0
 void Engine_plugin_manager::finalize_engine_heuristic(hipdnnBackendDescriptor_t desc) const
 {
-    // TODO: Implement finalize_engine_heuristic
+    assert(desc->type == HIPDNN_BACKEND_ENGINEHEUR_DESCRIPTOR);
+    auto heur_desc = static_cast<Engine_heuristic_descriptor*>(desc);
+
+    heur_desc->finalize();
+
+    hipdnnBackendDescriptor_t graph;
+    heur_desc->get_attribute(
+        HIPDNN_ATTR_ENGINEHEUR_OPERATION_GRAPH, HIPDNN_TYPE_BACKEND_DESCRIPTOR, 1, nullptr, &graph);
+    assert(graph != nullptr);
+    auto graph_desc = static_cast<Graph_descriptor*>(graph);
+
+    auto engine_ids = get_applicable_engine_ids(graph_desc);
+    heur_desc->set_engine_ids(engine_ids);
 }
-#endif
 
 #if 0
 void Engine_plugin_manager::finalize_execution_plan(hipdnnBackendDescriptor_t desc) const
