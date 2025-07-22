@@ -34,6 +34,18 @@
         }                                                                                \
     } while(0)
 
+#define HIPDNN_FE_CHECK(status_obj)                                                       \
+    do                                                                                    \
+    {                                                                                     \
+        auto const& status = status_obj;                                                  \
+        if(!status.is_good())                                                             \
+        {                                                                                 \
+            std::cerr << "hipDNN Frontend Error: " << status.get_message() << " in file " \
+                      << __FILE__ << " at line " << __LINE__ << std::endl;                \
+            exit(EXIT_FAILURE);                                                           \
+        }                                                                                 \
+    } while(0)
+
 inline std::shared_ptr<hipdnn_frontend::graph::Tensor_attributes>
     create_tensor(const std::vector<int64_t>& dims, hipdnn_frontend::DataType_t data_type)
 {
@@ -118,10 +130,11 @@ public:
         copy_to_device();
     }
 
-    explicit Surface(int64_t num_elements, T_ELEM fill_value) : n_elems(num_elements)
+    explicit Surface(int64_t num_elements, T_ELEM fill_value)
+        : n_elems(num_elements)
     {
         allocate();
-        for (int64_t i = 0; i < n_elems; i++)
+        for(int64_t i = 0; i < n_elems; i++)
         {
             hostPtr[i] = fill_value;
         }
