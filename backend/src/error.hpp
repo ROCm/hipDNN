@@ -258,6 +258,9 @@ inline const char* hipdnn_get_attribute_name_string(hipdnnBackendAttributeName_t
         return "HIPDNN_ATTR_DEVICEPROP_HANDLE";
     case HIPDNN_ATTR_DEVICEPROP_JSON_REPRESENTATION:
         return "HIPDNN_ATTR_DEVICEPROP_JSON_REPRESENTATION";
+
+    default:
+        return "HIPDNN_ATTR_UNKNOWN";
     }
 }
 class Last_error_manager
