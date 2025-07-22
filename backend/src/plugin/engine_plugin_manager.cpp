@@ -384,12 +384,51 @@ void Engine_plugin_manager::finalize_execution_plan(hipdnnBackendDescriptor_t de
     std::ignore = engine_config_data;
 }
 
-#if 0
 void Engine_plugin_manager::execute_op_graph(hipdnnBackendDescriptor_t execution_plan, hipdnnBackendDescriptor_t variant_pack) const
 {
-    // TODO: Implement execute_op_graph
+    THROW_IF_NE(execution_plan->type,
+                HIPDNN_BACKEND_EXECUTION_PLAN_DESCRIPTOR,
+                HIPDNN_STATUS_BAD_PARAM,
+                "Engine_plugin_manager::execute_op_graph failed: Invalid execution plan descriptor type");
+
+    THROW_IF_FALSE(execution_plan->is_finalized(),
+                   HIPDNN_STATUS_BAD_PARAM,
+                   "Engine_plugin_manager::execute_op_graph failed: execution_plan_desc is not finalized");
+
+    THROW_IF_NE(variant_pack->type,
+                HIPDNN_BACKEND_VARIANT_PACK_DESCRIPTOR,
+                HIPDNN_STATUS_BAD_PARAM,
+                "Engine_plugin_manager::execute_op_graph failed: Invalid variant pack descriptor type");
+
+    THROW_IF_FALSE(variant_pack->is_finalized(),
+                   HIPDNN_STATUS_BAD_PARAM,
+                   "Engine_plugin_manager::execute_op_graph failed: variant_pack_desc is not finalized");
+
+    hipdnnBackendDescriptor_t config;
+    execution_plan->get_attribute(
+        HIPDNN_ATTR_EXECUTION_PLAN_ENGINE_CONFIG, HIPDNN_TYPE_BACKEND_DESCRIPTOR, 1, nullptr, &config);
+
+    hipdnnBackendDescriptor_t engine;
+    config->get_attribute(HIPDNN_ATTR_ENGINECFG_ENGINE, HIPDNN_TYPE_BACKEND_DESCRIPTOR, 1, nullptr, &engine);
+
+    int64_t engine_id;
+    engine->get_attribute(HIPDNN_ATTR_ENGINE_GLOBAL_INDEX, HIPDNN_TYPE_INT64, 1, nullptr, &engine_id);
+
+    // TODO: Get execution context from the execution plan
+    // This will be implemented at the integration stage
+    hipdnnEnginePluginExecutionContext_t execution_context = nullptr;
+
+    void* workspace;
+    variant_pack->get_attribute(
+        HIPDNN_ATTR_VARIANT_PACK_WORKSPACE, HIPDNN_TYPE_VOID_PTR, 1, nullptr, &workspace);
+
+    // TODO: Get device buffers from the variant pack
+    // This will be implemented at the integration stage
+    const hipdnnPluginDeviceBuffer_t* device_buffers = nullptr;
+    uint32_t num_device_buffers = 0;
+
+    execute_op_graph(engine_id, execution_context, workspace, device_buffers, num_device_buffers);
 }
-#endif
 
 Engine_details_wrapper::Engine_details_wrapper(const std::shared_ptr<Engine_plugin_manager>& pm,
                                                int64_t engine_id,
