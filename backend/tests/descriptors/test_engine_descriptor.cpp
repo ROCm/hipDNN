@@ -5,8 +5,8 @@
 #include "hipdnn_backend.h"
 #include "hipdnn_exception.hpp"
 #include "mocks/mock_descriptor.hpp"
-#include "test_macros.hpp"
 #include "test_descriptor_utils.hpp"
+#include "test_macros.hpp"
 
 #include <gtest/gtest.h>
 
@@ -42,15 +42,17 @@ public:
     void set_graph() const
     {
         EXPECT_CALL(*get_mock_graph(), is_finalized()).WillOnce(Return(true));
-        ASSERT_NO_THROW(get_engine_descriptor()->set_attribute(
-            HIPDNN_ATTR_ENGINE_OPERATION_GRAPH, HIPDNN_TYPE_BACKEND_DESCRIPTOR, 1, &_mock_graph_wrapper));
+        ASSERT_NO_THROW(get_engine_descriptor()->set_attribute(HIPDNN_ATTR_ENGINE_OPERATION_GRAPH,
+                                                               HIPDNN_TYPE_BACKEND_DESCRIPTOR,
+                                                               1,
+                                                               &_mock_graph_wrapper));
     }
 
     void set_global_index() const
     {
         int64_t gidx = 0;
-        ASSERT_NO_THROW(
-            get_engine_descriptor()->set_attribute(HIPDNN_ATTR_ENGINE_GLOBAL_INDEX, HIPDNN_TYPE_INT64, 1, &gidx));
+        ASSERT_NO_THROW(get_engine_descriptor()->set_attribute(
+            HIPDNN_ATTR_ENGINE_GLOBAL_INDEX, HIPDNN_TYPE_INT64, 1, &gidx));
     }
 
     void make_engine_finalized() const
@@ -64,7 +66,8 @@ protected:
     void SetUp() override
     {
         _engine_wrapper = create_descriptor<Engine_descriptor>();
-        _mock_graph_wrapper = make_mock_descriptor_wrapper(HIPDNN_BACKEND_OPERATIONGRAPH_DESCRIPTOR);
+        _mock_graph_wrapper
+            = make_mock_descriptor_wrapper(HIPDNN_BACKEND_OPERATIONGRAPH_DESCRIPTOR);
         _mock_graph_bad_type_wrapper = make_mock_descriptor_wrapper();
     }
 };
@@ -86,10 +89,11 @@ TEST_F(Engine_descriptor_test, SetEngineDescriptorGraph)
             HIPDNN_ATTR_ENGINE_OPERATION_GRAPH, HIPDNN_TYPE_INT64, 1, &_mock_graph_wrapper),
         HIPDNN_STATUS_BAD_PARAM);
 
-    ASSERT_THROW_HIPDNN_STATUS(
-        engine->set_attribute(
-            HIPDNN_ATTR_ENGINE_OPERATION_GRAPH, HIPDNN_TYPE_BACKEND_DESCRIPTOR, 2, &_mock_graph_wrapper),
-        HIPDNN_STATUS_BAD_PARAM);
+    ASSERT_THROW_HIPDNN_STATUS(engine->set_attribute(HIPDNN_ATTR_ENGINE_OPERATION_GRAPH,
+                                                     HIPDNN_TYPE_BACKEND_DESCRIPTOR,
+                                                     2,
+                                                     &_mock_graph_wrapper),
+                               HIPDNN_STATUS_BAD_PARAM);
 
     ASSERT_THROW_HIPDNN_STATUS(
         engine->set_attribute(
@@ -109,14 +113,17 @@ TEST_F(Engine_descriptor_test, SetEngineDescriptorGraph)
                                HIPDNN_STATUS_BAD_PARAM);
 
     EXPECT_CALL(*get_mock_graph(), is_finalized()).WillOnce(Return(false));
-    ASSERT_THROW_HIPDNN_STATUS(
-        engine->set_attribute(
-            HIPDNN_ATTR_ENGINE_OPERATION_GRAPH, HIPDNN_TYPE_BACKEND_DESCRIPTOR, 1, &_mock_graph_wrapper),
-        HIPDNN_STATUS_BAD_PARAM_NOT_FINALIZED);
+    ASSERT_THROW_HIPDNN_STATUS(engine->set_attribute(HIPDNN_ATTR_ENGINE_OPERATION_GRAPH,
+                                                     HIPDNN_TYPE_BACKEND_DESCRIPTOR,
+                                                     1,
+                                                     &_mock_graph_wrapper),
+                               HIPDNN_STATUS_BAD_PARAM_NOT_FINALIZED);
 
     EXPECT_CALL(*get_mock_graph(), is_finalized()).WillOnce(Return(true));
-    ASSERT_NO_THROW(engine->set_attribute(
-        HIPDNN_ATTR_ENGINE_OPERATION_GRAPH, HIPDNN_TYPE_BACKEND_DESCRIPTOR, 1, &_mock_graph_wrapper));
+    ASSERT_NO_THROW(engine->set_attribute(HIPDNN_ATTR_ENGINE_OPERATION_GRAPH,
+                                          HIPDNN_TYPE_BACKEND_DESCRIPTOR,
+                                          1,
+                                          &_mock_graph_wrapper));
 }
 
 TEST_F(Engine_descriptor_test, SetEngineDescriptorGlobalId)
@@ -146,10 +153,11 @@ TEST_F(Engine_descriptor_test, SetAttrOnFinalizedEngineDescriptor)
     auto engine = get_engine_descriptor();
     make_engine_finalized();
 
-    ASSERT_THROW_HIPDNN_STATUS(
-        engine->set_attribute(
-            HIPDNN_ATTR_ENGINE_OPERATION_GRAPH, HIPDNN_TYPE_BACKEND_DESCRIPTOR, 1, &_mock_graph_wrapper),
-        HIPDNN_STATUS_NOT_INITIALIZED);
+    ASSERT_THROW_HIPDNN_STATUS(engine->set_attribute(HIPDNN_ATTR_ENGINE_OPERATION_GRAPH,
+                                                     HIPDNN_TYPE_BACKEND_DESCRIPTOR,
+                                                     1,
+                                                     &_mock_graph_wrapper),
+                               HIPDNN_STATUS_NOT_INITIALIZED);
 }
 
 TEST_F(Engine_descriptor_test, FinalizeEngineDescriptor)
@@ -204,10 +212,12 @@ TEST_F(Engine_descriptor_test, GetEngineDescriptorGraph)
             HIPDNN_ATTR_ENGINE_OPERATION_GRAPH, HIPDNN_TYPE_INT64, 1, nullptr, graph.get_ptr()),
         HIPDNN_STATUS_BAD_PARAM);
 
-    ASSERT_THROW_HIPDNN_STATUS(
-        engine->get_attribute(
-            HIPDNN_ATTR_ENGINE_OPERATION_GRAPH, HIPDNN_TYPE_BACKEND_DESCRIPTOR, 2, nullptr, graph.get_ptr()),
-        HIPDNN_STATUS_BAD_PARAM);
+    ASSERT_THROW_HIPDNN_STATUS(engine->get_attribute(HIPDNN_ATTR_ENGINE_OPERATION_GRAPH,
+                                                     HIPDNN_TYPE_BACKEND_DESCRIPTOR,
+                                                     2,
+                                                     nullptr,
+                                                     graph.get_ptr()),
+                               HIPDNN_STATUS_BAD_PARAM);
 
     ASSERT_THROW_HIPDNN_STATUS(engine->get_attribute(HIPDNN_ATTR_ENGINE_OPERATION_GRAPH,
                                                      HIPDNN_TYPE_BACKEND_DESCRIPTOR,
@@ -216,13 +226,19 @@ TEST_F(Engine_descriptor_test, GetEngineDescriptorGraph)
                                                      nullptr),
                                HIPDNN_STATUS_BAD_PARAM_NULL_POINTER);
 
-    ASSERT_NO_THROW(engine->get_attribute(
-        HIPDNN_ATTR_ENGINE_OPERATION_GRAPH, HIPDNN_TYPE_BACKEND_DESCRIPTOR, 1, nullptr, graph.get_ptr()));
+    ASSERT_NO_THROW(engine->get_attribute(HIPDNN_ATTR_ENGINE_OPERATION_GRAPH,
+                                          HIPDNN_TYPE_BACKEND_DESCRIPTOR,
+                                          1,
+                                          nullptr,
+                                          graph.get_ptr()));
     ASSERT_EQ(graph.get()->private_descriptor, _mock_graph_wrapper->private_descriptor);
 
     int64_t count;
-    ASSERT_NO_THROW(engine->get_attribute(
-        HIPDNN_ATTR_ENGINE_OPERATION_GRAPH, HIPDNN_TYPE_BACKEND_DESCRIPTOR, 1, &count, graph_2.get_ptr()));
+    ASSERT_NO_THROW(engine->get_attribute(HIPDNN_ATTR_ENGINE_OPERATION_GRAPH,
+                                          HIPDNN_TYPE_BACKEND_DESCRIPTOR,
+                                          1,
+                                          &count,
+                                          graph_2.get_ptr()));
     ASSERT_EQ(count, 1);
 }
 

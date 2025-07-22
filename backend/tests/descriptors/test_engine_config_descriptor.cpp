@@ -4,8 +4,8 @@
 #include "descriptors/engine_config_descriptor.hpp"
 #include "hipdnn_backend.h"
 #include "mocks/mock_descriptor.hpp"
-#include "test_macros.hpp"
 #include "test_descriptor_utils.hpp"
+#include "test_macros.hpp"
 
 #include <gtest/gtest.h>
 
@@ -25,7 +25,8 @@ public:
 
     Engine_config_descriptor* get_engine_config_descriptor() const
     {
-        return dynamic_cast<Engine_config_descriptor*>(_engine_config_wrapper->private_descriptor.get());
+        return dynamic_cast<Engine_config_descriptor*>(
+            _engine_config_wrapper->private_descriptor.get());
     }
 
     Mock_descriptor* get_mock_engine() const
@@ -41,8 +42,11 @@ public:
     void set_engine() const
     {
         EXPECT_CALL(*get_mock_engine(), is_finalized()).WillOnce(Return(true));
-        ASSERT_NO_THROW(get_engine_config_descriptor()->set_attribute(
-            HIPDNN_ATTR_ENGINECFG_ENGINE, HIPDNN_TYPE_BACKEND_DESCRIPTOR, 1, &_mock_engine_wrapper));
+        ASSERT_NO_THROW(
+            get_engine_config_descriptor()->set_attribute(HIPDNN_ATTR_ENGINECFG_ENGINE,
+                                                          HIPDNN_TYPE_BACKEND_DESCRIPTOR,
+                                                          1,
+                                                          &_mock_engine_wrapper));
     }
 
     void set_max_workspace_size() const
@@ -174,13 +178,12 @@ TEST_F(Engine_config_descriptor_test, GetEngineConfigDescriptorUnsupportedAttr)
 
     make_engine_config_finalized();
 
-    ASSERT_THROW_HIPDNN_STATUS(
-        engine_config->get_attribute(HIPDNN_ATTR_ENGINECFG_INTERMEDIATE_INFO,
-                                     HIPDNN_TYPE_BACKEND_DESCRIPTOR,
-                                     1,
-                                     nullptr,
-                                     &dummy),
-        HIPDNN_STATUS_NOT_SUPPORTED);
+    ASSERT_THROW_HIPDNN_STATUS(engine_config->get_attribute(HIPDNN_ATTR_ENGINECFG_INTERMEDIATE_INFO,
+                                                            HIPDNN_TYPE_BACKEND_DESCRIPTOR,
+                                                            1,
+                                                            nullptr,
+                                                            &dummy),
+                               HIPDNN_STATUS_NOT_SUPPORTED);
 }
 
 TEST_F(Engine_config_descriptor_test, GetEngineConfigDescriptorEngine)
@@ -195,23 +198,31 @@ TEST_F(Engine_config_descriptor_test, GetEngineConfigDescriptorEngine)
             HIPDNN_ATTR_ENGINECFG_ENGINE, HIPDNN_TYPE_INT64, 1, nullptr, engine.get_ptr()),
         HIPDNN_STATUS_BAD_PARAM);
 
-    ASSERT_THROW_HIPDNN_STATUS(
-        engine_config->get_attribute(
-            HIPDNN_ATTR_ENGINECFG_ENGINE, HIPDNN_TYPE_BACKEND_DESCRIPTOR, 2, nullptr, engine.get_ptr()),
-        HIPDNN_STATUS_BAD_PARAM);
+    ASSERT_THROW_HIPDNN_STATUS(engine_config->get_attribute(HIPDNN_ATTR_ENGINECFG_ENGINE,
+                                                            HIPDNN_TYPE_BACKEND_DESCRIPTOR,
+                                                            2,
+                                                            nullptr,
+                                                            engine.get_ptr()),
+                               HIPDNN_STATUS_BAD_PARAM);
 
     ASSERT_THROW_HIPDNN_STATUS(
         engine_config->get_attribute(
             HIPDNN_ATTR_ENGINECFG_ENGINE, HIPDNN_TYPE_BACKEND_DESCRIPTOR, 1, nullptr, nullptr),
         HIPDNN_STATUS_BAD_PARAM_NULL_POINTER);
 
-    ASSERT_NO_THROW(engine_config->get_attribute(
-        HIPDNN_ATTR_ENGINECFG_ENGINE, HIPDNN_TYPE_BACKEND_DESCRIPTOR, 1, nullptr, engine.get_ptr()));
+    ASSERT_NO_THROW(engine_config->get_attribute(HIPDNN_ATTR_ENGINECFG_ENGINE,
+                                                 HIPDNN_TYPE_BACKEND_DESCRIPTOR,
+                                                 1,
+                                                 nullptr,
+                                                 engine.get_ptr()));
     ASSERT_EQ(engine.get()->private_descriptor, _mock_engine_wrapper->private_descriptor);
 
     int64_t count;
-    ASSERT_NO_THROW(engine_config->get_attribute(
-        HIPDNN_ATTR_ENGINECFG_ENGINE, HIPDNN_TYPE_BACKEND_DESCRIPTOR, 1, &count, engine_2.get_ptr()));
+    ASSERT_NO_THROW(engine_config->get_attribute(HIPDNN_ATTR_ENGINECFG_ENGINE,
+                                                 HIPDNN_TYPE_BACKEND_DESCRIPTOR,
+                                                 1,
+                                                 &count,
+                                                 engine_2.get_ptr()));
     ASSERT_EQ(count, 1);
 }
 

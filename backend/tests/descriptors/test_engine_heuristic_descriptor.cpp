@@ -7,8 +7,8 @@
 #include "hipdnn_backend.h"
 #include "hipdnn_exception.hpp"
 #include "mocks/mock_descriptor.hpp"
-#include "test_macros.hpp"
 #include "test_descriptor_utils.hpp"
+#include "test_macros.hpp"
 
 #include <gtest/gtest.h>
 
@@ -29,7 +29,8 @@ public:
 
     Engine_heuristic_descriptor* get_engine_heuristic_descriptor() const
     {
-        return dynamic_cast<Engine_heuristic_descriptor*>(_engine_heuristic_wrapper->private_descriptor.get());
+        return dynamic_cast<Engine_heuristic_descriptor*>(
+            _engine_heuristic_wrapper->private_descriptor.get());
     }
 
     Mock_descriptor* get_mock_graph() const
@@ -45,8 +46,11 @@ public:
     void set_graph() const
     {
         EXPECT_CALL(*get_mock_graph(), is_finalized()).WillOnce(Return(true));
-        ASSERT_NO_THROW(get_engine_heuristic_descriptor()->set_attribute(
-            HIPDNN_ATTR_ENGINEHEUR_OPERATION_GRAPH, HIPDNN_TYPE_BACKEND_DESCRIPTOR, 1, &_mock_graph_wrapper));
+        ASSERT_NO_THROW(
+            get_engine_heuristic_descriptor()->set_attribute(HIPDNN_ATTR_ENGINEHEUR_OPERATION_GRAPH,
+                                                             HIPDNN_TYPE_BACKEND_DESCRIPTOR,
+                                                             1,
+                                                             &_mock_graph_wrapper));
     }
 
     void set_heuristic_mode() const
@@ -74,7 +78,8 @@ protected:
     void SetUp() override
     {
         _engine_heuristic_wrapper = create_descriptor<Engine_heuristic_descriptor>();
-        _mock_graph_wrapper = make_mock_descriptor_wrapper(HIPDNN_BACKEND_OPERATIONGRAPH_DESCRIPTOR);
+        _mock_graph_wrapper
+            = make_mock_descriptor_wrapper(HIPDNN_BACKEND_OPERATIONGRAPH_DESCRIPTOR);
         _mock_graph_bad_type_wrapper = make_mock_descriptor_wrapper();
     }
 };
@@ -96,12 +101,11 @@ TEST_F(Engine_heuristic_descriptor_test, SetEngineHeuristicDescriptorGraph)
             HIPDNN_ATTR_ENGINEHEUR_OPERATION_GRAPH, HIPDNN_TYPE_INT64, 1, &_mock_graph_wrapper),
         HIPDNN_STATUS_BAD_PARAM);
 
-    ASSERT_THROW_HIPDNN_STATUS(
-        heur->set_attribute(HIPDNN_ATTR_ENGINEHEUR_OPERATION_GRAPH,
-                            HIPDNN_TYPE_BACKEND_DESCRIPTOR,
-                            2,
-                            &_mock_graph_wrapper),
-        HIPDNN_STATUS_BAD_PARAM);
+    ASSERT_THROW_HIPDNN_STATUS(heur->set_attribute(HIPDNN_ATTR_ENGINEHEUR_OPERATION_GRAPH,
+                                                   HIPDNN_TYPE_BACKEND_DESCRIPTOR,
+                                                   2,
+                                                   &_mock_graph_wrapper),
+                               HIPDNN_STATUS_BAD_PARAM);
 
     ASSERT_THROW_HIPDNN_STATUS(
         heur->set_attribute(
@@ -114,24 +118,24 @@ TEST_F(Engine_heuristic_descriptor_test, SetEngineHeuristicDescriptorGraph)
             HIPDNN_ATTR_ENGINEHEUR_OPERATION_GRAPH, HIPDNN_TYPE_BACKEND_DESCRIPTOR, 1, &graph),
         HIPDNN_STATUS_BAD_PARAM_NULL_POINTER);
 
-    ASSERT_THROW_HIPDNN_STATUS(
-        heur->set_attribute(HIPDNN_ATTR_ENGINEHEUR_OPERATION_GRAPH,
-                            HIPDNN_TYPE_BACKEND_DESCRIPTOR,
-                            1,
-                            &_mock_graph_bad_type_wrapper),
-        HIPDNN_STATUS_BAD_PARAM);
+    ASSERT_THROW_HIPDNN_STATUS(heur->set_attribute(HIPDNN_ATTR_ENGINEHEUR_OPERATION_GRAPH,
+                                                   HIPDNN_TYPE_BACKEND_DESCRIPTOR,
+                                                   1,
+                                                   &_mock_graph_bad_type_wrapper),
+                               HIPDNN_STATUS_BAD_PARAM);
 
     EXPECT_CALL(*get_mock_graph(), is_finalized()).WillOnce(Return(false));
-    ASSERT_THROW_HIPDNN_STATUS(
-        heur->set_attribute(HIPDNN_ATTR_ENGINEHEUR_OPERATION_GRAPH,
-                            HIPDNN_TYPE_BACKEND_DESCRIPTOR,
-                            1,
-                            &_mock_graph_wrapper),
-        HIPDNN_STATUS_BAD_PARAM_NOT_FINALIZED);
+    ASSERT_THROW_HIPDNN_STATUS(heur->set_attribute(HIPDNN_ATTR_ENGINEHEUR_OPERATION_GRAPH,
+                                                   HIPDNN_TYPE_BACKEND_DESCRIPTOR,
+                                                   1,
+                                                   &_mock_graph_wrapper),
+                               HIPDNN_STATUS_BAD_PARAM_NOT_FINALIZED);
 
     EXPECT_CALL(*get_mock_graph(), is_finalized()).WillOnce(Return(true));
-    ASSERT_NO_THROW(heur->set_attribute(
-        HIPDNN_ATTR_ENGINEHEUR_OPERATION_GRAPH, HIPDNN_TYPE_BACKEND_DESCRIPTOR, 1, &_mock_graph_wrapper));
+    ASSERT_NO_THROW(heur->set_attribute(HIPDNN_ATTR_ENGINEHEUR_OPERATION_GRAPH,
+                                        HIPDNN_TYPE_BACKEND_DESCRIPTOR,
+                                        1,
+                                        &_mock_graph_wrapper));
 }
 
 TEST_F(Engine_heuristic_descriptor_test, SetEngineHeuristicDescriptorHeurMode)
@@ -141,25 +145,24 @@ TEST_F(Engine_heuristic_descriptor_test, SetEngineHeuristicDescriptorHeurMode)
     auto unsupported_mode = static_cast<hipdnnBackendHeurMode_t>(999);
 
     ASSERT_THROW_HIPDNN_STATUS(
-        heur->set_attribute(
-            HIPDNN_ATTR_ENGINEHEUR_MODE, HIPDNN_TYPE_BACKEND_DESCRIPTOR, 1, &mode),
+        heur->set_attribute(HIPDNN_ATTR_ENGINEHEUR_MODE, HIPDNN_TYPE_BACKEND_DESCRIPTOR, 1, &mode),
         HIPDNN_STATUS_BAD_PARAM);
 
-    ASSERT_THROW_HIPDNN_STATUS(heur->set_attribute(
-                                   HIPDNN_ATTR_ENGINEHEUR_MODE, HIPDNN_TYPE_HEUR_MODE, 2, &mode),
-                               HIPDNN_STATUS_BAD_PARAM);
+    ASSERT_THROW_HIPDNN_STATUS(
+        heur->set_attribute(HIPDNN_ATTR_ENGINEHEUR_MODE, HIPDNN_TYPE_HEUR_MODE, 2, &mode),
+        HIPDNN_STATUS_BAD_PARAM);
 
-    ASSERT_THROW_HIPDNN_STATUS(heur->set_attribute(
-                                   HIPDNN_ATTR_ENGINEHEUR_MODE, HIPDNN_TYPE_HEUR_MODE, 1, nullptr),
-                               HIPDNN_STATUS_BAD_PARAM_NULL_POINTER);
+    ASSERT_THROW_HIPDNN_STATUS(
+        heur->set_attribute(HIPDNN_ATTR_ENGINEHEUR_MODE, HIPDNN_TYPE_HEUR_MODE, 1, nullptr),
+        HIPDNN_STATUS_BAD_PARAM_NULL_POINTER);
 
     ASSERT_THROW_HIPDNN_STATUS(
         heur->set_attribute(
             HIPDNN_ATTR_ENGINEHEUR_MODE, HIPDNN_TYPE_HEUR_MODE, 1, &unsupported_mode),
         HIPDNN_STATUS_NOT_SUPPORTED);
 
-    ASSERT_NO_THROW(heur->set_attribute(
-        HIPDNN_ATTR_ENGINEHEUR_MODE, HIPDNN_TYPE_HEUR_MODE, 1, &mode));
+    ASSERT_NO_THROW(
+        heur->set_attribute(HIPDNN_ATTR_ENGINEHEUR_MODE, HIPDNN_TYPE_HEUR_MODE, 1, &mode));
 }
 
 TEST_F(Engine_heuristic_descriptor_test, SetEngineHeuristicDescriptorUnsupportedAttr)
@@ -167,9 +170,9 @@ TEST_F(Engine_heuristic_descriptor_test, SetEngineHeuristicDescriptorUnsupported
     auto heur = get_engine_heuristic_descriptor();
     int32_t dummy = 0;
 
-    ASSERT_THROW_HIPDNN_STATUS(heur->set_attribute(
-                                   HIPDNN_ATTR_ENGINEHEUR_RESULTS, HIPDNN_TYPE_INT32, 1, &dummy),
-                               HIPDNN_STATUS_NOT_SUPPORTED);
+    ASSERT_THROW_HIPDNN_STATUS(
+        heur->set_attribute(HIPDNN_ATTR_ENGINEHEUR_RESULTS, HIPDNN_TYPE_INT32, 1, &dummy),
+        HIPDNN_STATUS_NOT_SUPPORTED);
 }
 
 TEST_F(Engine_heuristic_descriptor_test, SetEngineIds)
@@ -177,8 +180,7 @@ TEST_F(Engine_heuristic_descriptor_test, SetEngineIds)
     auto heur = get_engine_heuristic_descriptor();
     std::vector<int64_t> engine_ids = {0, 1, 2};
 
-    ASSERT_THROW_HIPDNN_STATUS(heur->set_engine_ids(engine_ids),
-                               HIPDNN_STATUS_INTERNAL_ERROR);
+    ASSERT_THROW_HIPDNN_STATUS(heur->set_engine_ids(engine_ids), HIPDNN_STATUS_INTERNAL_ERROR);
 
     make_engine_heuristic_finalized();
 
@@ -190,12 +192,11 @@ TEST_F(Engine_heuristic_descriptor_test, SetAttrOnFinalizedEngineHeuristicDescri
     auto heur = get_engine_heuristic_descriptor();
     make_engine_heuristic_finalized();
 
-    ASSERT_THROW_HIPDNN_STATUS(
-        heur->set_attribute(HIPDNN_ATTR_ENGINEHEUR_OPERATION_GRAPH,
-                            HIPDNN_TYPE_BACKEND_DESCRIPTOR,
-                            1,
-                            &_mock_graph_wrapper),
-        HIPDNN_STATUS_NOT_INITIALIZED);
+    ASSERT_THROW_HIPDNN_STATUS(heur->set_attribute(HIPDNN_ATTR_ENGINEHEUR_OPERATION_GRAPH,
+                                                   HIPDNN_TYPE_BACKEND_DESCRIPTOR,
+                                                   1,
+                                                   &_mock_graph_wrapper),
+                               HIPDNN_STATUS_NOT_INITIALIZED);
 }
 
 TEST_F(Engine_heuristic_descriptor_test, FinalizeEngineHeuristicDescriptor)
@@ -235,13 +236,12 @@ TEST_F(Engine_heuristic_descriptor_test, GetAttrOnUnfinalizedEngineHeuristicDesc
     auto heur = get_engine_heuristic_descriptor();
     hipdnnBackendDescriptor_t dummy_graph = nullptr;
 
-    ASSERT_THROW_HIPDNN_STATUS(
-        heur->get_attribute(HIPDNN_ATTR_ENGINEHEUR_OPERATION_GRAPH,
-                            HIPDNN_TYPE_BACKEND_DESCRIPTOR,
-                            1,
-                            nullptr,
-                            &dummy_graph),
-        HIPDNN_STATUS_BAD_PARAM_NOT_FINALIZED);
+    ASSERT_THROW_HIPDNN_STATUS(heur->get_attribute(HIPDNN_ATTR_ENGINEHEUR_OPERATION_GRAPH,
+                                                   HIPDNN_TYPE_BACKEND_DESCRIPTOR,
+                                                   1,
+                                                   nullptr,
+                                                   &dummy_graph),
+                               HIPDNN_STATUS_BAD_PARAM_NOT_FINALIZED);
 }
 
 TEST_F(Engine_heuristic_descriptor_test, GetEngineHeuristicDescriptorUnsupportedAttr)
@@ -270,21 +270,19 @@ TEST_F(Engine_heuristic_descriptor_test, GetEngineHeuristicDescriptorGraph)
             HIPDNN_ATTR_ENGINEHEUR_OPERATION_GRAPH, HIPDNN_TYPE_INT64, 1, nullptr, graph.get_ptr()),
         HIPDNN_STATUS_BAD_PARAM);
 
-    ASSERT_THROW_HIPDNN_STATUS(
-        heur->get_attribute(HIPDNN_ATTR_ENGINEHEUR_OPERATION_GRAPH,
-                            HIPDNN_TYPE_BACKEND_DESCRIPTOR,
-                            2,
-                            nullptr,
-                            graph.get_ptr()),
-        HIPDNN_STATUS_BAD_PARAM);
+    ASSERT_THROW_HIPDNN_STATUS(heur->get_attribute(HIPDNN_ATTR_ENGINEHEUR_OPERATION_GRAPH,
+                                                   HIPDNN_TYPE_BACKEND_DESCRIPTOR,
+                                                   2,
+                                                   nullptr,
+                                                   graph.get_ptr()),
+                               HIPDNN_STATUS_BAD_PARAM);
 
-    ASSERT_THROW_HIPDNN_STATUS(
-        heur->get_attribute(HIPDNN_ATTR_ENGINEHEUR_OPERATION_GRAPH,
-                            HIPDNN_TYPE_BACKEND_DESCRIPTOR,
-                            1,
-                            nullptr,
-                            nullptr),
-        HIPDNN_STATUS_BAD_PARAM_NULL_POINTER);
+    ASSERT_THROW_HIPDNN_STATUS(heur->get_attribute(HIPDNN_ATTR_ENGINEHEUR_OPERATION_GRAPH,
+                                                   HIPDNN_TYPE_BACKEND_DESCRIPTOR,
+                                                   1,
+                                                   nullptr,
+                                                   nullptr),
+                               HIPDNN_STATUS_BAD_PARAM_NULL_POINTER);
 
     ASSERT_NO_THROW(heur->get_attribute(HIPDNN_ATTR_ENGINEHEUR_OPERATION_GRAPH,
                                         HIPDNN_TYPE_BACKEND_DESCRIPTOR,
@@ -294,8 +292,11 @@ TEST_F(Engine_heuristic_descriptor_test, GetEngineHeuristicDescriptorGraph)
     ASSERT_EQ(graph.get()->private_descriptor, _mock_graph_wrapper->private_descriptor);
 
     int64_t count;
-    ASSERT_NO_THROW(heur->get_attribute(
-        HIPDNN_ATTR_ENGINEHEUR_OPERATION_GRAPH, HIPDNN_TYPE_BACKEND_DESCRIPTOR, 1, &count, graph2.get_ptr()));
+    ASSERT_NO_THROW(heur->get_attribute(HIPDNN_ATTR_ENGINEHEUR_OPERATION_GRAPH,
+                                        HIPDNN_TYPE_BACKEND_DESCRIPTOR,
+                                        1,
+                                        &count,
+                                        graph2.get_ptr()));
     ASSERT_EQ(count, 1);
 }
 
@@ -306,8 +307,7 @@ TEST_F(Engine_heuristic_descriptor_test, GetEngineHeuristicDescriptorEngineConfi
     EXPECT_CALL(*get_mock_graph(), is_finalized()).WillRepeatedly(Return(true));
 
     ASSERT_THROW_HIPDNN_STATUS(
-        heur->get_attribute(
-            HIPDNN_ATTR_ENGINEHEUR_RESULTS, HIPDNN_TYPE_INT64, 0, nullptr, nullptr),
+        heur->get_attribute(HIPDNN_ATTR_ENGINEHEUR_RESULTS, HIPDNN_TYPE_INT64, 0, nullptr, nullptr),
         HIPDNN_STATUS_BAD_PARAM);
 
     int64_t count = 0;
@@ -458,8 +458,7 @@ TEST_F(Engine_heuristic_descriptor_test, GetEngineHeuristicDescriptorHeurMode)
         HIPDNN_STATUS_BAD_PARAM);
 
     ASSERT_THROW_HIPDNN_STATUS(
-        heur->get_attribute(
-            HIPDNN_ATTR_ENGINEHEUR_MODE, HIPDNN_TYPE_HEUR_MODE, 2, nullptr, &mode),
+        heur->get_attribute(HIPDNN_ATTR_ENGINEHEUR_MODE, HIPDNN_TYPE_HEUR_MODE, 2, nullptr, &mode),
         HIPDNN_STATUS_BAD_PARAM);
 
     ASSERT_THROW_HIPDNN_STATUS(
@@ -467,13 +466,13 @@ TEST_F(Engine_heuristic_descriptor_test, GetEngineHeuristicDescriptorHeurMode)
             HIPDNN_ATTR_ENGINEHEUR_MODE, HIPDNN_TYPE_HEUR_MODE, 1, nullptr, nullptr),
         HIPDNN_STATUS_BAD_PARAM_NULL_POINTER);
 
-    ASSERT_NO_THROW(heur->get_attribute(
-        HIPDNN_ATTR_ENGINEHEUR_MODE, HIPDNN_TYPE_HEUR_MODE, 1, nullptr, &mode));
+    ASSERT_NO_THROW(
+        heur->get_attribute(HIPDNN_ATTR_ENGINEHEUR_MODE, HIPDNN_TYPE_HEUR_MODE, 1, nullptr, &mode));
     ASSERT_EQ(mode, HIPDNN_HEUR_MODE_FALLBACK);
 
     int64_t count = 0;
-    ASSERT_NO_THROW(heur->get_attribute(
-        HIPDNN_ATTR_ENGINEHEUR_MODE, HIPDNN_TYPE_HEUR_MODE, 1, &count, &mode));
+    ASSERT_NO_THROW(
+        heur->get_attribute(HIPDNN_ATTR_ENGINEHEUR_MODE, HIPDNN_TYPE_HEUR_MODE, 1, &count, &mode));
     ASSERT_EQ(count, 1);
     ASSERT_EQ(mode, HIPDNN_HEUR_MODE_FALLBACK);
 }
