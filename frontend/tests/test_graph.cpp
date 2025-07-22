@@ -7,10 +7,44 @@
 #include <hipdnn_frontend/graph.hpp>
 #include <hipdnn_sdk/data_objects/graph_generated.h>
 
+#include "fake_backend/fake_hipdnn_backend.hpp"
+#include "fake_backend/mock_hipdnn_backend.hpp"
+
 using namespace hipdnn_frontend;
 using namespace hipdnn_frontend::graph;
 
-TEST(GraphTests, SetAndGetAttributes)
+class Graph_test_fixture : public ::testing::Test
+{
+protected:
+    std::shared_ptr<Mock_hipdnn_backend> _mock_backend;
+
+    void SetUp() override
+    {
+        _mock_backend = std::make_shared<Mock_hipdnn_backend>();
+
+        set_mock_hipdnn_backend(_mock_backend);
+    }
+    void TearDown() override {}
+
+    void expect_graph_serialized_to_backend_descriptor(
+        std::unique_ptr<hipdnn_sdk::data_objects::GraphT>& deserialized_graph)
+    {
+        EXPECT_CALL(
+            *_mock_backend,
+            hipdnnBackendCreateAndDeserializeGraph_ext(::testing::_, ::testing::_, ::testing::_))
+            .WillOnce([&deserialized_graph](hipdnnBackendDescriptor_t* descriptor,
+                                            const uint8_t* serialized_graph,
+                                            size_t graph_byte_size) {
+                std::ignore = descriptor;
+                deserialized_graph = hipdnn_sdk::data_objects::UnPackGraph(serialized_graph);
+                EXPECT_NE(deserialized_graph, nullptr);
+                EXPECT_GE(graph_byte_size, 0);
+                return HIPDNN_STATUS_SUCCESS;
+            });
+    }
+};
+
+TEST_F(Graph_test_fixture, SetAndGetAttributes)
 {
     Graph graph;
 
@@ -28,7 +62,7 @@ TEST(GraphTests, SetAndGetAttributes)
     EXPECT_TRUE(validation_result.is_good()) << validation_result.get_message();
 }
 
-TEST(GraphTests, BatchnormNodeCreation)
+TEST_F(Graph_test_fixture, BatchnormNodeCreation)
 {
     Graph graph;
 
@@ -61,7 +95,7 @@ TEST(GraphTests, BatchnormNodeCreation)
     EXPECT_TRUE(validation_result.is_good()) << validation_result.get_message();
 }
 
-TEST(GraphTests, BatchnormBackwardNodeCreation)
+TEST_F(Graph_test_fixture, BatchnormBackwardNodeCreation)
 {
     Graph graph;
 
@@ -90,7 +124,7 @@ TEST(GraphTests, BatchnormBackwardNodeCreation)
     EXPECT_TRUE(validation_result.is_good()) << validation_result.get_message();
 }
 
-TEST(GraphTests, BatchnormInferenceNodeCreation)
+TEST_F(Graph_test_fixture, BatchnormInferenceNodeCreation)
 {
     Graph graph;
 
@@ -114,7 +148,7 @@ TEST(GraphTests, BatchnormInferenceNodeCreation)
     EXPECT_TRUE(validation_result.is_good()) << validation_result.get_message();
 }
 
-TEST(GraphTests, PointwiseNodeCreationSingleInput)
+TEST_F(Graph_test_fixture, PointwiseNodeCreationSingleInput)
 {
     Graph graph;
 
@@ -134,7 +168,7 @@ TEST(GraphTests, PointwiseNodeCreationSingleInput)
     EXPECT_TRUE(validation_result.is_good()) << validation_result.get_message();
 }
 
-TEST(GraphTests, PointwiseNodeCreationTwoInputs)
+TEST_F(Graph_test_fixture, PointwiseNodeCreationTwoInputs)
 {
     Graph graph;
 
@@ -157,7 +191,7 @@ TEST(GraphTests, PointwiseNodeCreationTwoInputs)
     EXPECT_TRUE(validation_result.is_good()) << validation_result.get_message();
 }
 
-TEST(GraphTests, PointwiseNodeCreationThreeInputs)
+TEST_F(Graph_test_fixture, PointwiseNodeCreationThreeInputs)
 {
     Graph graph;
 
@@ -193,7 +227,7 @@ static void validate_tensor(const Tensor_attributes& tensor,
 }
 
 // NOLINTBEGIN
-TEST(GraphTests, BuildAndSerializeBatchnormInferenceGraph)
+TEST_F(Graph_test_fixture, BuildAndSerializeBatchnormInferenceGraph)
 {
     Graph graph;
 
@@ -229,11 +263,11 @@ TEST(GraphTests, BuildAndSerializeBatchnormInferenceGraph)
     auto validation_result = graph.validate();
     EXPECT_TRUE(validation_result.is_good()) << validation_result.get_message();
 
+    std::unique_ptr<hipdnn_sdk::data_objects::GraphT> deserialized_graph;
+    expect_graph_serialized_to_backend_descriptor(deserialized_graph);
+
     auto build_result = graph.build_operation_graph();
     EXPECT_TRUE(build_result.is_good()) << build_result.get_message();
-
-    auto deserialized_graph = hipdnn_sdk::data_objects::UnPackGraph(graph.serialized_graph.data());
-    ASSERT_NE(deserialized_graph, nullptr);
 
     EXPECT_EQ(deserialized_graph->name, "SerializedGraphTest");
     EXPECT_EQ(deserialized_graph->compute_type, hipdnn_sdk::data_objects::DataType_FLOAT);
@@ -269,7 +303,7 @@ TEST(GraphTests, BuildAndSerializeBatchnormInferenceGraph)
     EXPECT_EQ(deserialized_batchnorm_attributes->y, y->get_uid());
 }
 
-TEST(GraphTests, BuildAndSerializeBatchnormGraph)
+TEST_F(Graph_test_fixture, BuildAndSerializeBatchnormGraph)
 {
     Graph graph;
 
@@ -317,11 +351,11 @@ TEST(GraphTests, BuildAndSerializeBatchnormGraph)
     auto validation_result = graph.validate();
     EXPECT_TRUE(validation_result.is_good()) << validation_result.get_message();
 
+    std::unique_ptr<hipdnn_sdk::data_objects::GraphT> deserialized_graph;
+    expect_graph_serialized_to_backend_descriptor(deserialized_graph);
+
     auto build_result = graph.build_operation_graph();
     EXPECT_TRUE(build_result.is_good()) << build_result.get_message();
-
-    auto deserialized_graph = hipdnn_sdk::data_objects::UnPackGraph(graph.serialized_graph.data());
-    ASSERT_NE(deserialized_graph, nullptr);
 
     EXPECT_EQ(deserialized_graph->name, "SerializedBatchnormGraph");
     EXPECT_EQ(deserialized_graph->compute_type, hipdnn_sdk::data_objects::DataType_FLOAT);
@@ -370,7 +404,7 @@ TEST(GraphTests, BuildAndSerializeBatchnormGraph)
               next_running_variance->get_uid());
 }
 
-TEST(GraphTests, BuildAndSerializeBatchnormAndPointwiseGraph)
+TEST_F(Graph_test_fixture, BuildAndSerializeBatchnormAndPointwiseGraph)
 {
     Graph graph;
 
@@ -424,11 +458,11 @@ TEST(GraphTests, BuildAndSerializeBatchnormAndPointwiseGraph)
     auto validation_result = graph.validate();
     EXPECT_TRUE(validation_result.is_good()) << validation_result.get_message();
 
+    std::unique_ptr<hipdnn_sdk::data_objects::GraphT> deserialized_graph;
+    expect_graph_serialized_to_backend_descriptor(deserialized_graph);
+
     auto build_result = graph.build_operation_graph();
     EXPECT_TRUE(build_result.is_good()) << build_result.get_message();
-
-    auto deserialized_graph = hipdnn_sdk::data_objects::UnPackGraph(graph.serialized_graph.data());
-    ASSERT_NE(deserialized_graph, nullptr);
 
     EXPECT_EQ(deserialized_graph->name, "SerializedBatchnormAndPointwiseGraph");
     EXPECT_EQ(deserialized_graph->compute_type, hipdnn_sdk::data_objects::DataType_FLOAT);
@@ -488,7 +522,7 @@ TEST(GraphTests, BuildAndSerializeBatchnormAndPointwiseGraph)
               hipdnn_sdk::data_objects::PointwiseMode_RELU_FWD);
 }
 
-TEST(GraphTests, BuildAndSerializePointwiseGraph)
+TEST_F(Graph_test_fixture, BuildAndSerializePointwiseGraph)
 {
     Graph graph;
 
@@ -513,11 +547,11 @@ TEST(GraphTests, BuildAndSerializePointwiseGraph)
     auto validation_result = graph.validate();
     EXPECT_TRUE(validation_result.is_good()) << validation_result.get_message();
 
+    std::unique_ptr<hipdnn_sdk::data_objects::GraphT> deserialized_graph;
+    expect_graph_serialized_to_backend_descriptor(deserialized_graph);
+
     auto build_result = graph.build_operation_graph();
     EXPECT_TRUE(build_result.is_good()) << build_result.get_message();
-
-    auto deserialized_graph = hipdnn_sdk::data_objects::UnPackGraph(graph.serialized_graph.data());
-    ASSERT_NE(deserialized_graph, nullptr);
 
     EXPECT_EQ(deserialized_graph->name, "SerializedGraphTest");
     EXPECT_EQ(deserialized_graph->compute_type, hipdnn_sdk::data_objects::DataType_FLOAT);
@@ -546,7 +580,7 @@ TEST(GraphTests, BuildAndSerializePointwiseGraph)
               hipdnn_sdk::data_objects::PointwiseMode_RELU_FWD);
 }
 
-TEST(GraphTests, BuildAndSerializePointwiseAndBatchnormInferenceGraph)
+TEST_F(Graph_test_fixture, BuildAndSerializePointwiseAndBatchnormInferenceGraph)
 {
     Graph graph;
 
@@ -588,11 +622,11 @@ TEST(GraphTests, BuildAndSerializePointwiseAndBatchnormInferenceGraph)
     auto validation_result = graph.validate();
     EXPECT_TRUE(validation_result.is_good()) << validation_result.get_message();
 
+    std::unique_ptr<hipdnn_sdk::data_objects::GraphT> deserialized_graph;
+    expect_graph_serialized_to_backend_descriptor(deserialized_graph);
+
     auto build_result = graph.build_operation_graph();
     EXPECT_TRUE(build_result.is_good()) << build_result.get_message();
-
-    auto deserialized_graph = hipdnn_sdk::data_objects::UnPackGraph(graph.serialized_graph.data());
-    ASSERT_NE(deserialized_graph, nullptr);
 
     EXPECT_EQ(deserialized_graph->name, "SerializedGraphTest");
     EXPECT_EQ(deserialized_graph->compute_type, hipdnn_sdk::data_objects::DataType_FLOAT);
@@ -639,7 +673,7 @@ TEST(GraphTests, BuildAndSerializePointwiseAndBatchnormInferenceGraph)
               hipdnn_sdk::data_objects::PointwiseMode_RELU_FWD);
 }
 
-TEST(GraphTests, BuildAndSerializeBatchnormBackwardGraph)
+TEST_F(Graph_test_fixture, BuildAndSerializeBatchnormBackwardGraph)
 {
     Graph graph;
 
@@ -680,11 +714,11 @@ TEST(GraphTests, BuildAndSerializeBatchnormBackwardGraph)
     auto validation_result = graph.validate();
     EXPECT_TRUE(validation_result.is_good()) << validation_result.get_message();
 
+    std::unique_ptr<hipdnn_sdk::data_objects::GraphT> deserialized_graph;
+    expect_graph_serialized_to_backend_descriptor(deserialized_graph);
+
     auto build_result = graph.build_operation_graph();
     EXPECT_TRUE(build_result.is_good()) << build_result.get_message();
-
-    auto deserialized_graph = hipdnn_sdk::data_objects::UnPackGraph(graph.serialized_graph.data());
-    ASSERT_NE(deserialized_graph, nullptr);
 
     EXPECT_EQ(deserialized_graph->name, "SerializedGraphTest");
     EXPECT_EQ(deserialized_graph->compute_type, hipdnn_sdk::data_objects::DataType_FLOAT);
@@ -723,7 +757,7 @@ TEST(GraphTests, BuildAndSerializeBatchnormBackwardGraph)
     EXPECT_EQ(deserialized_batchnorm_attributes->dbias, dbias->get_uid());
 }
 
-TEST(GraphTests, BuildAndSerializePointwiseAndBatchnormBackwardGraph)
+TEST_F(Graph_test_fixture, BuildAndSerializePointwiseAndBatchnormBackwardGraph)
 {
     Graph graph;
 
@@ -770,11 +804,11 @@ TEST(GraphTests, BuildAndSerializePointwiseAndBatchnormBackwardGraph)
     auto validation_result = graph.validate();
     EXPECT_TRUE(validation_result.is_good()) << validation_result.get_message();
 
+    std::unique_ptr<hipdnn_sdk::data_objects::GraphT> deserialized_graph;
+    expect_graph_serialized_to_backend_descriptor(deserialized_graph);
+
     auto build_result = graph.build_operation_graph();
     EXPECT_TRUE(build_result.is_good()) << build_result.get_message();
-
-    auto deserialized_graph = hipdnn_sdk::data_objects::UnPackGraph(graph.serialized_graph.data());
-    ASSERT_NE(deserialized_graph, nullptr);
 
     EXPECT_EQ(deserialized_graph->name, "SerializedGraphTest");
     EXPECT_EQ(deserialized_graph->compute_type, hipdnn_sdk::data_objects::DataType_FLOAT);
@@ -825,7 +859,7 @@ TEST(GraphTests, BuildAndSerializePointwiseAndBatchnormBackwardGraph)
 }
 
 // Test graph.tensor()
-TEST(GraphTests, TensorGraphAttributes)
+TEST_F(Graph_test_fixture, TensorGraphAttributes)
 {
     auto tensor = Graph::tensor(Tensor_attributes()
                                     .set_name("TestTensor")
@@ -844,7 +878,7 @@ TEST(GraphTests, TensorGraphAttributes)
 }
 
 // Test graph.tensor_like()
-TEST(GraphTests, TensorLikeGraphAttributes)
+TEST_F(Graph_test_fixture, TensorLikeGraphAttributes)
 {
     auto tensor = Graph::tensor(Tensor_attributes()
                                     .set_name("TestTensor")

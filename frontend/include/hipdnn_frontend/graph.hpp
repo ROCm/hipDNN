@@ -6,6 +6,8 @@
 #include <hipdnn_frontend/attributes/batchnorm_attributes.hpp>
 #include <hipdnn_frontend/attributes/batchnorm_inference_attributes.hpp>
 #include <hipdnn_frontend/attributes/pointwise_attributes.hpp>
+#include <hipdnn_frontend/backend/backend_wrapper.hpp>
+#include <hipdnn_frontend/backend/hipdnn_backend_descriptor.hpp>
 #include <hipdnn_frontend/node/batchnorm_backward_node.hpp>
 #include <hipdnn_frontend/node/batchnorm_inference_node.hpp>
 #include <hipdnn_frontend/node/batchnorm_node.hpp>
@@ -19,6 +21,8 @@ namespace graph
 class Graph : public INode
 {
 private:
+    std::unique_ptr<Hipdnn_backend_descriptor> _graph_desc;
+
     static std::shared_ptr<Tensor_attributes> output_tensor(const std::string& name)
     {
         auto tensor = std::make_shared<Tensor_attributes>();
@@ -27,10 +31,6 @@ private:
     }
 
 public:
-    // Will be set after building the operation graph.
-    // Once we integrate the backend, then we will instead hold onto the descriptor associated with it after building.
-    flatbuffers::DetachedBuffer serialized_graph;
-
     Graph()
         : INode(Graph_attributes{})
     {
@@ -41,8 +41,10 @@ public:
         return validate_subtree();
     }
 
-    error_t build_operation_graph()
+    error_t build_operation_graph(hipdnnHandle_t handle = nullptr)
     {
+        std::ignore = handle;
+
         std::unordered_set<int64_t> used_tensor_uids;
         gather_hipdnn_tensor_ids_subtree(used_tensor_uids);
 
@@ -80,11 +82,18 @@ public:
             &nodes);
 
         builder.Finish(graph);
-        serialized_graph = builder.Release();
-        // TODO - Lower graph to the backend.
-        //        For now we will hold onto the graph, and make it accessible.
+        auto serialized_graph = builder.Release();
+        _graph_desc = std::make_unique<Hipdnn_backend_descriptor>(serialized_graph.data(),
+                                                                  serialized_graph.size());
 
-        return {};
+        error_t status;
+        if(!_graph_desc->valid())
+        {
+            status = error_t(error_code_t::INVALID_VALUE,
+                             "Failed to create backend descriptor for the graph.");
+        }
+
+        return status;
     }
 
     const std::string& get_name() const

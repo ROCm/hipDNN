@@ -8,7 +8,10 @@ if(HIP_DNN_SKIP_TESTS)
     return()
 endif()
 
+find_package(hip REQUIRED)
+
 add_executable(hipdnn_frontend_tests 
+    fake_backend/fake_hipdnn_backend.cpp
     test_batchnorm_attributes.cpp
     test_batchnorm_backward_attributes.cpp
     test_batchnorm_backward_node.cpp
@@ -28,7 +31,9 @@ add_executable(hipdnn_frontend_tests
 target_compile_options(hipdnn_frontend_tests PRIVATE ${HIPDNN_WARNING_COMPILE_OPTIONS})
 target_link_libraries(hipdnn_frontend_tests 
     GTest::gtest 
+    GTest::gmock
     GTest::gtest_main 
+    hip::host
     pthread 
     hipdnn_sdk 
     hipdnn_frontend
