@@ -15,6 +15,10 @@
 
 // NOLINTBEGIN
 
+// We store a weak pointer here so that every test that needs a Mock_hipdnn_backend has to
+// create its own copy of one.  Once a test finishes, its shared ptr should go out of scope
+// and invalidate the weak pointer.  Not doing this could end up having a mock set here that
+// has expectations/returns which could cause side effects in other tests.
 std::weak_ptr<Mock_hipdnn_backend> mock_hipdnn_backend;
 
 std::shared_ptr<Mock_hipdnn_backend> backend()
