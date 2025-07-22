@@ -192,7 +192,7 @@
 
 //     ASSERT_NO_THROW(_engine->get_attribute(
 //         HIPDNN_ATTR_ENGINE_OPERATION_GRAPH, HIPDNN_TYPE_BACKEND_DESCRIPTOR, 1, nullptr, &graph));
-//     ASSERT_EQ(graph->private_descriptor, _mock_graph.get());
+//     ASSERT_EQ(graph, _mock_graph.get());
 
 //     int64_t count;
 //     ASSERT_NO_THROW(_engine->get_attribute(

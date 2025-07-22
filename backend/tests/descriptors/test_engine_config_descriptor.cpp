@@ -182,7 +182,7 @@
 
 //     ASSERT_NO_THROW(_engine_config->get_attribute(
 //         HIPDNN_ATTR_ENGINECFG_ENGINE, HIPDNN_TYPE_BACKEND_DESCRIPTOR, 1, nullptr, &engine));
-//     ASSERT_EQ(engine->private_descriptor, _mock_engine.get());
+//     ASSERT_EQ(engine, _mock_engine.get());
 
 //     int64_t count;
 //     ASSERT_NO_THROW(_engine_config->get_attribute(

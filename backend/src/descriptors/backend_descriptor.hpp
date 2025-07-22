@@ -4,6 +4,7 @@
 #pragma once
 
 #include "hipdnn_backend.h"
+#include "hipdnn_exception.hpp"
 #include <memory>
 
 //NOLINTBEGIN(readability-identifier-naming)
@@ -45,35 +46,49 @@ public:
         = 0;
 
     template <typename Child_descriptor>
-    static std::shared_ptr<Child_descriptor> unpack_descriptor(const hipdnnBackendDescriptor* wrapper)
-    {
-        return std::static_pointer_cast<Child_descriptor>(wrapper->private_descriptor);
-    }
-
-    template <typename Child_descriptor>
-    static std::shared_ptr<Child_descriptor> unpack_descriptor(const void* array_of_elements)
+    static std::shared_ptr<Child_descriptor> unpack_descriptor(
+        const hipdnnBackendDescriptor* wrapper, hipdnnStatus_t status, const std::string& message)
     {
         static_assert(std::is_base_of_v<hipdnnPrivateBackendDescriptor, Child_descriptor>,
                       "Child_descriptor must inherit from hipdnnPrivateBackendDescriptor");
-        
-        const auto wrapper = *static_cast<hipdnnBackendDescriptor* const*>(array_of_elements);
-        return unpack_descriptor<Child_descriptor>(wrapper);
+
+        THROW_IF_NULL(wrapper, status, message);
+
+        auto child_descriptor
+            = std::static_pointer_cast<Child_descriptor>(wrapper->private_descriptor);
+
+        THROW_IF_NULL(child_descriptor, status, message);
+
+        return child_descriptor;
     }
 
     template <typename Child_descriptor>
-    static void pack_descriptor(const std::shared_ptr<const Child_descriptor>& private_descriptor, void*& array_of_elements)
+    static std::shared_ptr<Child_descriptor> unpack_descriptor(const void* array_of_elements,
+                                                               hipdnnStatus_t status,
+                                                               const std::string& message)
+    {
+        static_assert(std::is_base_of_v<hipdnnPrivateBackendDescriptor, Child_descriptor>,
+                      "Child_descriptor must inherit from hipdnnPrivateBackendDescriptor");
+
+        THROW_IF_NULL(array_of_elements, status, message);
+
+        return unpack_descriptor<Child_descriptor>(
+            *static_cast<hipdnnBackendDescriptor* const*>(array_of_elements), status, message);
+    }
+
+    template <typename Child_descriptor>
+    static void pack_descriptor(const std::shared_ptr<const Child_descriptor>& private_descriptor,
+                                void*& array_of_elements)
     {
         static_assert(std::is_base_of_v<hipdnnPrivateBackendDescriptor, Child_descriptor>,
                       "Child_descriptor must inherit from hipdnnPrivateBackendDescriptor");
 
         // Since we return a wrapper to the users, we need to cast the private_descriptor to a shared_ptr of hipdnnPrivateBackendDescriptor
         // and assign it to the backend descriptor's private_descriptor.
-        // Due to the C API semantics, we need to const cast in order to return this to the user.
-        // Since the backend descriptor is finalized it's expected to be read-only at this point, and still considered const.
         auto descriptor = new hipdnnBackendDescriptor();
         descriptor->private_descriptor = std::const_pointer_cast<hipdnnPrivateBackendDescriptor>(
             std::static_pointer_cast<const hipdnnPrivateBackendDescriptor>(private_descriptor));
-        array_of_elements = static_cast<void*>(descriptor);
+        *static_cast<hipdnnBackendDescriptor**>(array_of_elements) = descriptor;
     }
 };
 //NOLINTEND(readability-identifier-naming)

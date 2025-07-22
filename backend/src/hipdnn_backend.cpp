@@ -37,8 +37,9 @@ void throw_if_invalid_descriptor(hipdnnBackendDescriptor_t descriptor)
 
     if(descriptor->private_descriptor == nullptr)
     {
-        throw hipdnn_backend::Hipdnn_exception(HIPDNN_STATUS_BAD_PARAM_NULL_POINTER,
-                                               "hipdnnBackendDescriptor_t private_descriptor is nullptr");
+        throw hipdnn_backend::Hipdnn_exception(
+            HIPDNN_STATUS_BAD_PARAM_NULL_POINTER,
+            "hipdnnBackendDescriptor_t private_descriptor is nullptr");
     }
 
     if(descriptor->private_descriptor->type == HIPDNN_INVALID_TYPE)
@@ -214,10 +215,10 @@ HIPDNN_BACKEND_EXPORT hipdnnStatus_t
         throw_if_invalid_descriptor(descriptor);
 
         descriptor->private_descriptor->get_attribute(attribute_name,
-                                  attribute_type,
-                                  requested_element_count,
-                                  element_count,
-                                  array_of_elements);
+                                                      attribute_type,
+                                                      requested_element_count,
+                                                      element_count,
+                                                      array_of_elements);
 
         LOG_API_SUCCESS(api_name,
                         "status={}, retrieved_element_count={}",
@@ -244,7 +245,8 @@ HIPDNN_BACKEND_EXPORT hipdnnStatus_t
     return hipdnn_backend::try_catch([&, api_name = __func__]() {
         throw_if_invalid_descriptor(descriptor);
 
-        descriptor->private_descriptor->set_attribute(attribute_name, attribute_type, element_count, array_of_elements);
+        descriptor->private_descriptor->set_attribute(
+            attribute_name, attribute_type, element_count, array_of_elements);
 
         LOG_API_SUCCESS(
             api_name, "status={}", hipdnn_backend::hipdnn_get_status_string(HIPDNN_STATUS_SUCCESS));

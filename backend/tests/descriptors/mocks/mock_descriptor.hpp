@@ -43,4 +43,21 @@ ACTION_P(SetArg4ToInt64, value) // NOLINT
     *static_cast<int64_t*>(arg4) = value;
 }
 
+static hipdnnBackendDescriptor* make_mock_descriptor_wrapper(hipdnnBackendDescriptorType_t desc_type
+                                                             = HIPDNN_INVALID_TYPE)
+{
+    auto mock_descriptor_wrapper = new hipdnnBackendDescriptor();
+    mock_descriptor_wrapper->private_descriptor = std::make_shared<Mock_descriptor>(desc_type);
+    return mock_descriptor_wrapper;
+}
+
+static Mock_descriptor* unpack_mock_descriptor(hipdnnBackendDescriptor* descriptor)
+{
+    if(descriptor == nullptr || descriptor->private_descriptor == nullptr)
+    {
+        return nullptr;
+    }
+    return dynamic_cast<Mock_descriptor*>(descriptor->private_descriptor.get());
+}
+
 } // namespace hipdnn_backend

@@ -2,8 +2,8 @@
 // SPDX-License-Identifier:  MIT
 
 #include "execution_plan_descriptor.hpp"
-#include "error.hpp"
 #include "engine_config_descriptor.hpp"
+#include "error.hpp"
 #include "hipdnn_backend_descriptor_type.h"
 #include "hipdnn_exception.hpp"
 
@@ -155,15 +155,10 @@ void Execution_plan_descriptor::set_engine_config(hipdnnBackendAttributeType_t a
                 HIPDNN_STATUS_BAD_PARAM,
                 "Execution_plan_descriptor failed to set engine config: Invalid element count.");
 
-    THROW_IF_NULL(array_of_elements,
-                  HIPDNN_STATUS_BAD_PARAM_NULL_POINTER,
-                  "Execution_plan_descriptor failed to set engine config: Null pointer.");
-
-    auto engine_config = unpack_descriptor<const Engine_config_descriptor>(array_of_elements);
-
-    THROW_IF_NULL(engine_config,
-                  HIPDNN_STATUS_BAD_PARAM_NULL_POINTER,
-                  "Execution_plan_descriptor failed to set engine config: Engine config is null.");
+    auto engine_config = unpack_descriptor<const Engine_config_descriptor>(
+        array_of_elements,
+        HIPDNN_STATUS_BAD_PARAM_NULL_POINTER,
+        "Execution_plan_descriptor failed to set engine config: Null pointer.");
 
     THROW_IF_NE(engine_config->type,
                 HIPDNN_BACKEND_ENGINECFG_DESCRIPTOR,

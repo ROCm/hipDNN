@@ -143,14 +143,10 @@ void Engine_heuristic_descriptor::set_graph(hipdnnBackendAttributeType_t attribu
                 HIPDNN_STATUS_BAD_PARAM,
                 "Engine_heuristic_descriptor failed to set graph: Invalid element count.");
 
-    THROW_IF_NULL(array_of_elements,
-                  HIPDNN_STATUS_BAD_PARAM_NULL_POINTER,
-                  "Engine_heuristic_descriptor failed to set graph: Null pointer.");
-
-    auto graph = unpack_descriptor<const Graph_descriptor>(array_of_elements);
-    THROW_IF_NULL(graph,
-                  HIPDNN_STATUS_BAD_PARAM_NULL_POINTER,
-                  "Engine_heuristic_descriptor failed to set graph: Graph is null.");
+    auto graph = unpack_descriptor<const Graph_descriptor>(
+        array_of_elements,
+        HIPDNN_STATUS_BAD_PARAM_NULL_POINTER,
+        "Engine_heuristic_descriptor failed to set graph: Null pointer.");
 
     THROW_IF_NE(graph->type,
                 HIPDNN_BACKEND_OPERATIONGRAPH_DESCRIPTOR,
@@ -229,22 +225,18 @@ void Engine_heuristic_descriptor::get_engine_configs(hipdnnBackendAttributeType_
             ++i)
         {
             auto backend_wrapper = output_array[i];
-            THROW_IF_NULL(backend_wrapper,
-                          HIPDNN_STATUS_BAD_PARAM_NULL_POINTER,
-                          "Engine_heuristic_descriptor failed to get engine config: Config "
-                          "descriptor is null."); 
 
-            auto config = unpack_descriptor<Engine_config_descriptor>(backend_wrapper);
-            THROW_IF_NULL(config,
-                          HIPDNN_STATUS_BAD_PARAM_NULL_POINTER,
-                          "Engine_heuristic_descriptor failed to get engine config: Unpacked config "
-                          "descriptor is null.");
+            auto config = unpack_descriptor<Engine_config_descriptor>(
+                backend_wrapper,
+                HIPDNN_STATUS_BAD_PARAM_NULL_POINTER,
+                "Engine_heuristic_descriptor failed to get engine config: Config "
+                "descriptor is null.");
 
             THROW_IF_NE(config->type,
-                          HIPDNN_BACKEND_ENGINECFG_DESCRIPTOR,
-                          HIPDNN_STATUS_BAD_PARAM,
-                          "Engine_heuristic_descriptor failed to get engine config: Invalid "
-                          "config descriptor type.");
+                        HIPDNN_BACKEND_ENGINECFG_DESCRIPTOR,
+                        HIPDNN_STATUS_BAD_PARAM,
+                        "Engine_heuristic_descriptor failed to get engine config: Invalid "
+                        "config descriptor type.");
 
             auto engine = new Engine_descriptor();
             engine->set_attribute(

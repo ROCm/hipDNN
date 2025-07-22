@@ -163,14 +163,10 @@ void Engine_descriptor::set_graph(hipdnnBackendAttributeType_t attribute_type,
                 HIPDNN_STATUS_BAD_PARAM,
                 "Engine_descriptor failed to set graph: Invalid element count.");
 
-    THROW_IF_NULL(array_of_elements,
-                  HIPDNN_STATUS_BAD_PARAM_NULL_POINTER,
-                  "Engine_descriptor failed to set graph: Null pointer.");
-
-    auto graph = unpack_descriptor<const Graph_descriptor>(array_of_elements);
-    THROW_IF_NULL(graph,
-                  HIPDNN_STATUS_BAD_PARAM_NULL_POINTER,
-                  "Engine_descriptor failed to set graph: Graph is null.");
+    auto graph = unpack_descriptor<const Graph_descriptor>(
+        array_of_elements,
+        HIPDNN_STATUS_BAD_PARAM_NULL_POINTER,
+        "Engine_descriptor failed to set graph: Graph is null.");
 
     THROW_IF_NE(graph->type,
                 HIPDNN_BACKEND_OPERATIONGRAPH_DESCRIPTOR,

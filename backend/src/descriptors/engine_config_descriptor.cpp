@@ -157,17 +157,10 @@ void Engine_config_descriptor::set_engine(hipdnnBackendAttributeType_t attribute
                 "Engine_config_descriptor failed to set engine: "
                 "Invalid element count.");
 
-    THROW_IF_NULL(array_of_elements,
-                  HIPDNN_STATUS_BAD_PARAM_NULL_POINTER,
-                  "Engine_config_descriptor failed to set engine: "
-                  "Null pointer.");
-         
-    auto engine = unpack_descriptor<const Engine_descriptor>(array_of_elements);
-
-    THROW_IF_NULL(engine,     
-                  HIPDNN_STATUS_BAD_PARAM_NULL_POINTER,
-                  "Engine_config_descriptor failed to set engine: "
-                  "Engine is null.");
+    auto engine = unpack_descriptor<const Engine_descriptor>(
+        array_of_elements,
+        HIPDNN_STATUS_BAD_PARAM_NULL_POINTER,
+        "Engine_config_descriptor failed to set engine: Engine is null.");
 
     THROW_IF_NE(engine->type,
                 HIPDNN_BACKEND_ENGINE_DESCRIPTOR,

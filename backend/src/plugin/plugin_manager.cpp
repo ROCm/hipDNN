@@ -51,17 +51,19 @@ std::shared_ptr<Hipdnn_plugin_base> Plugin_manager::get_plugin(int64_t engine_id
 
 void Plugin_manager::finalize_engine_heuristic(hipdnnBackendDescriptor_t desc)
 {
-    assert(desc != nullptr);
-    assert(desc->private_descriptor != nullptr);
-    assert(desc->private_descriptor->type == HIPDNN_BACKEND_ENGINEHEUR_DESCRIPTOR);
-    
-    auto heuristic = hipdnnPrivateBackendDescriptor::unpack_descriptor<Engine_heuristic_descriptor>(desc);
+    auto heuristic = hipdnnPrivateBackendDescriptor::unpack_descriptor<Engine_heuristic_descriptor>(
+        desc,
+        HIPDNN_STATUS_INTERNAL_ERROR,
+        "Plugin_manager finalize_engine_heuristic failed: Null heuristic descriptor.");
 
     hipdnnBackendDescriptor_t graph;
     heuristic->get_attribute(
         HIPDNN_ATTR_ENGINEHEUR_OPERATION_GRAPH, HIPDNN_TYPE_BACKEND_DESCRIPTOR, 1, nullptr, &graph);
-    assert(graph != nullptr);
-    auto graph_desc = hipdnnPrivateBackendDescriptor::unpack_descriptor<Graph_descriptor>(graph);
+
+    auto graph_desc = hipdnnPrivateBackendDescriptor::unpack_descriptor<Graph_descriptor>(
+        graph,
+        HIPDNN_STATUS_INTERNAL_ERROR,
+        "Plugin_manager finalize_engine_heuristic failed: Null graph descriptor.");
 
     auto applicable_engines = get_applicable_engines(graph_desc.get());
     std::vector<int64_t> engine_ids(applicable_engines.begin(), applicable_engines.end());
@@ -71,29 +73,32 @@ void Plugin_manager::finalize_engine_heuristic(hipdnnBackendDescriptor_t desc)
 
 void Plugin_manager::finalize_engine_config(hipdnnBackendDescriptor_t desc)
 {
-    assert(desc != nullptr);
-    assert(desc->private_descriptor != nullptr);
-    assert(desc->private_descriptor->type == HIPDNN_BACKEND_ENGINEHEUR_DESCRIPTOR);
-    
-    auto config_desc = hipdnnPrivateBackendDescriptor::unpack_descriptor<Engine_config_descriptor>(desc);
+    auto config_desc = hipdnnPrivateBackendDescriptor::unpack_descriptor<Engine_config_descriptor>(
+        desc,
+        HIPDNN_STATUS_INTERNAL_ERROR,
+        "Plugin_manager finalize_engine_config failed: Null engine config descriptor.");
 
     hipdnnBackendDescriptor_t engine;
     config_desc->get_attribute(
         HIPDNN_ATTR_ENGINECFG_ENGINE, HIPDNN_TYPE_BACKEND_DESCRIPTOR, 1, nullptr, &engine);
-    assert(engine != nullptr);
 
-    auto engine_desc = hipdnnPrivateBackendDescriptor::unpack_descriptor<Engine_descriptor>(engine);
+    auto engine_desc = hipdnnPrivateBackendDescriptor::unpack_descriptor<Engine_descriptor>(
+        engine,
+        HIPDNN_STATUS_INTERNAL_ERROR,
+        "Plugin_manager finalize_engine_config failed: Null engine descriptor.");
+
     hipdnnBackendDescriptor_t graph;
-    engine_desc->get_attribute(HIPDNN_ATTR_ENGINE_OPERATION_GRAPH,
-                              HIPDNN_TYPE_BACKEND_DESCRIPTOR,
-                              1,
-                              nullptr,
-                              &graph);
-    assert(graph != nullptr);
+    engine_desc->get_attribute(
+        HIPDNN_ATTR_ENGINE_OPERATION_GRAPH, HIPDNN_TYPE_BACKEND_DESCRIPTOR, 1, nullptr, &graph);
 
-    auto graph_desc = hipdnnPrivateBackendDescriptor::unpack_descriptor<Graph_descriptor>(graph);
+    auto graph_desc = hipdnnPrivateBackendDescriptor::unpack_descriptor<Graph_descriptor>(
+        graph,
+        HIPDNN_STATUS_INTERNAL_ERROR,
+        "Plugin_manager finalize_engine_config failed: Null graph descriptor.");
+
     int64_t engine_id;
-    engine_desc->get_attribute(HIPDNN_ATTR_ENGINE_GLOBAL_INDEX, HIPDNN_TYPE_INT64, 1, nullptr, &engine_id);
+    engine_desc->get_attribute(
+        HIPDNN_ATTR_ENGINE_GLOBAL_INDEX, HIPDNN_TYPE_INT64, 1, nullptr, &engine_id);
 
     auto plugin = get_plugin(engine_id);
 
@@ -105,7 +110,8 @@ void Plugin_manager::finalize_engine_config(hipdnnBackendDescriptor_t desc)
                 HIPDNN_STATUS_BAD_PARAM,
                 std::string("Plugin does not support engine id: ") + std::to_string(engine_id));
 
-    config_desc->set_max_workspace_size(plugin->get_max_workspace_size(graph_desc.get(), engine_id));
+    config_desc->set_max_workspace_size(
+        plugin->get_max_workspace_size(graph_desc.get(), engine_id));
 }
 
 std::set<int64_t> Plugin_manager::get_applicable_engines(Graph_descriptor* graph)
@@ -126,9 +132,17 @@ void Plugin_manager::execute(hipdnnHandle* handle,
                              hipdnnBackendDescriptor_t execution_plan,
                              hipdnnBackendDescriptor_t variant_pack)
 {
-    auto execution_plan_desc = hipdnnPrivateBackendDescriptor::unpack_descriptor<Execution_plan_descriptor>(execution_plan);
-    auto variant_desc = hipdnnPrivateBackendDescriptor::unpack_descriptor<Variant_descriptor>(variant_pack);
-    
+    auto execution_plan_desc
+        = hipdnnPrivateBackendDescriptor::unpack_descriptor<Execution_plan_descriptor>(
+            execution_plan,
+            HIPDNN_STATUS_INTERNAL_ERROR,
+            "Plugin_manager execute failed: Null execution plan descriptor.");
+
+    auto variant_desc = hipdnnPrivateBackendDescriptor::unpack_descriptor<Variant_descriptor>(
+        variant_pack,
+        HIPDNN_STATUS_INTERNAL_ERROR,
+        "Plugin_manager execute failed: Null variant pack descriptor.");
+
     THROW_IF_NE(execution_plan_desc->type,
                 HIPDNN_BACKEND_EXECUTION_PLAN_DESCRIPTOR,
                 HIPDNN_STATUS_BAD_PARAM,
@@ -146,21 +160,26 @@ void Plugin_manager::execute(hipdnnHandle* handle,
     hipdnnBackendDescriptor_t engine_config = nullptr;
 
     execution_plan_desc->get_attribute(HIPDNN_ATTR_EXECUTION_PLAN_ENGINE_CONFIG,
-                             HIPDNN_TYPE_BACKEND_DESCRIPTOR,
-                             1,
-                             nullptr,
-                             &engine_config);
-    assert(engine_config != nullptr);
+                                       HIPDNN_TYPE_BACKEND_DESCRIPTOR,
+                                       1,
+                                       nullptr,
+                                       &engine_config);
 
-    auto engine_config_desc = hipdnnPrivateBackendDescriptor::unpack_descriptor<Engine_config_descriptor>(engine_config);
+    auto engine_config_desc
+        = hipdnnPrivateBackendDescriptor::unpack_descriptor<Engine_config_descriptor>(
+            engine_config,
+            HIPDNN_STATUS_INTERNAL_ERROR,
+            "Plugin_manager execute failed: Null engine config descriptor.");
 
     // Get engine directly from engine config
     hipdnnBackendDescriptor_t engine = nullptr;
     engine_config_desc->get_attribute(
         HIPDNN_ATTR_ENGINECFG_ENGINE, HIPDNN_TYPE_BACKEND_DESCRIPTOR, 1, nullptr, &engine);
-    assert(engine != nullptr);
 
-    auto engine_desc = hipdnnPrivateBackendDescriptor::unpack_descriptor<Engine_descriptor>(engine);
+    auto engine_desc = hipdnnPrivateBackendDescriptor::unpack_descriptor<Engine_descriptor>(
+        engine,
+        HIPDNN_STATUS_INTERNAL_ERROR,
+        "Plugin_manager execute failed: Null engine descriptor.");
 
     int64_t engine_id = 0;
     engine_desc->get_attribute(
@@ -172,9 +191,11 @@ void Plugin_manager::execute(hipdnnHandle* handle,
     hipdnnBackendDescriptor_t graph = nullptr;
     engine_desc->get_attribute(
         HIPDNN_ATTR_ENGINE_OPERATION_GRAPH, HIPDNN_TYPE_BACKEND_DESCRIPTOR, 1, nullptr, &graph);
-    assert(graph != nullptr);
 
-    auto graph_desc = hipdnnPrivateBackendDescriptor::unpack_descriptor<Graph_descriptor>(graph);
+    auto graph_desc = hipdnnPrivateBackendDescriptor::unpack_descriptor<Graph_descriptor>(
+        graph,
+        HIPDNN_STATUS_INTERNAL_ERROR,
+        "Plugin_manager execute failed: Null graph descriptor.");
 
     plugin->execute(graph_desc.get(), variant_desc.get(), handle);
 }
