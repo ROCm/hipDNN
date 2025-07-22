@@ -125,9 +125,9 @@ class Engine_execution_context_wrapper
 {
 public:
     Engine_execution_context_wrapper(const std::shared_ptr<Engine_plugin_manager>& pm,
-                                   int64_t engine_id,
-                                   const hipdnnPluginConstData_t* engine_config,
-                                   Graph_descriptor* graph_desc);
+                                     int64_t engine_id,
+                                     const hipdnnPluginConstData_t* engine_config,
+                                     Graph_descriptor* graph_desc);
     ~Engine_execution_context_wrapper();
 
     // Prevent copying

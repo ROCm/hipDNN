@@ -247,13 +247,14 @@ void Engine_plugin_manager::destroy_execution_context(
     plugin->destroy_execution_context(handle, execution_context);
 }
 
-std::unique_ptr<Engine_execution_context_wrapper>
-        Engine_plugin_manager::create_execution_context(const std::shared_ptr<Engine_plugin_manager>& pm,
-                                 int64_t engine_id,
-                                 const hipdnnPluginConstData_t* engine_config,
-                                 Graph_descriptor* graph_desc)
+std::unique_ptr<Engine_execution_context_wrapper> Engine_plugin_manager::create_execution_context(
+    const std::shared_ptr<Engine_plugin_manager>& pm,
+    int64_t engine_id,
+    const hipdnnPluginConstData_t* engine_config,
+    Graph_descriptor* graph_desc)
 {
-    return std::make_unique<Engine_execution_context_wrapper>(pm, engine_id, engine_config, graph_desc);
+    return std::make_unique<Engine_execution_context_wrapper>(
+        pm, engine_id, engine_config, graph_desc);
 }
 
 void Engine_plugin_manager::execute_op_graph(int64_t engine_id,
@@ -305,10 +306,12 @@ void Engine_plugin_manager::finalize_engine_config(hipdnnBackendDescriptor_t des
     config_desc->finalize();
 
     hipdnnBackendDescriptor_t engine;
-    config_desc->get_attribute(HIPDNN_ATTR_ENGINECFG_ENGINE, HIPDNN_TYPE_BACKEND_DESCRIPTOR, 1, nullptr, &engine);
+    config_desc->get_attribute(
+        HIPDNN_ATTR_ENGINECFG_ENGINE, HIPDNN_TYPE_BACKEND_DESCRIPTOR, 1, nullptr, &engine);
 
     int64_t engine_id;
-    engine->get_attribute(HIPDNN_ATTR_ENGINE_GLOBAL_INDEX, HIPDNN_TYPE_INT64, 1, nullptr, &engine_id);
+    engine->get_attribute(
+        HIPDNN_ATTR_ENGINE_GLOBAL_INDEX, HIPDNN_TYPE_INT64, 1, nullptr, &engine_id);
 
     hipdnnBackendDescriptor_t graph;
     engine->get_attribute(
@@ -357,14 +360,19 @@ void Engine_plugin_manager::finalize_execution_plan(hipdnnBackendDescriptor_t de
     exec_plan_desc->finalize();
 
     hipdnnBackendDescriptor_t config;
-    exec_plan_desc->get_attribute(
-        HIPDNN_ATTR_EXECUTION_PLAN_ENGINE_CONFIG, HIPDNN_TYPE_BACKEND_DESCRIPTOR, 1, nullptr, &config);
+    exec_plan_desc->get_attribute(HIPDNN_ATTR_EXECUTION_PLAN_ENGINE_CONFIG,
+                                  HIPDNN_TYPE_BACKEND_DESCRIPTOR,
+                                  1,
+                                  nullptr,
+                                  &config);
 
     hipdnnBackendDescriptor_t engine;
-    config->get_attribute(HIPDNN_ATTR_ENGINECFG_ENGINE, HIPDNN_TYPE_BACKEND_DESCRIPTOR, 1, nullptr, &engine);
+    config->get_attribute(
+        HIPDNN_ATTR_ENGINECFG_ENGINE, HIPDNN_TYPE_BACKEND_DESCRIPTOR, 1, nullptr, &engine);
 
     int64_t engine_id;
-    engine->get_attribute(HIPDNN_ATTR_ENGINE_GLOBAL_INDEX, HIPDNN_TYPE_INT64, 1, nullptr, &engine_id);
+    engine->get_attribute(
+        HIPDNN_ATTR_ENGINE_GLOBAL_INDEX, HIPDNN_TYPE_INT64, 1, nullptr, &engine_id);
 
     hipdnnBackendDescriptor_t graph;
     engine->get_attribute(
@@ -384,35 +392,45 @@ void Engine_plugin_manager::finalize_execution_plan(hipdnnBackendDescriptor_t de
     std::ignore = engine_config_data;
 }
 
-void Engine_plugin_manager::execute_op_graph(hipdnnBackendDescriptor_t execution_plan, hipdnnBackendDescriptor_t variant_pack) const
+void Engine_plugin_manager::execute_op_graph(hipdnnBackendDescriptor_t execution_plan,
+                                             hipdnnBackendDescriptor_t variant_pack) const
 {
-    THROW_IF_NE(execution_plan->type,
-                HIPDNN_BACKEND_EXECUTION_PLAN_DESCRIPTOR,
-                HIPDNN_STATUS_BAD_PARAM,
-                "Engine_plugin_manager::execute_op_graph failed: Invalid execution plan descriptor type");
+    THROW_IF_NE(
+        execution_plan->type,
+        HIPDNN_BACKEND_EXECUTION_PLAN_DESCRIPTOR,
+        HIPDNN_STATUS_BAD_PARAM,
+        "Engine_plugin_manager::execute_op_graph failed: Invalid execution plan descriptor type");
 
-    THROW_IF_FALSE(execution_plan->is_finalized(),
-                   HIPDNN_STATUS_BAD_PARAM,
-                   "Engine_plugin_manager::execute_op_graph failed: execution_plan_desc is not finalized");
+    THROW_IF_FALSE(
+        execution_plan->is_finalized(),
+        HIPDNN_STATUS_BAD_PARAM,
+        "Engine_plugin_manager::execute_op_graph failed: execution_plan_desc is not finalized");
 
-    THROW_IF_NE(variant_pack->type,
-                HIPDNN_BACKEND_VARIANT_PACK_DESCRIPTOR,
-                HIPDNN_STATUS_BAD_PARAM,
-                "Engine_plugin_manager::execute_op_graph failed: Invalid variant pack descriptor type");
+    THROW_IF_NE(
+        variant_pack->type,
+        HIPDNN_BACKEND_VARIANT_PACK_DESCRIPTOR,
+        HIPDNN_STATUS_BAD_PARAM,
+        "Engine_plugin_manager::execute_op_graph failed: Invalid variant pack descriptor type");
 
-    THROW_IF_FALSE(variant_pack->is_finalized(),
-                   HIPDNN_STATUS_BAD_PARAM,
-                   "Engine_plugin_manager::execute_op_graph failed: variant_pack_desc is not finalized");
+    THROW_IF_FALSE(
+        variant_pack->is_finalized(),
+        HIPDNN_STATUS_BAD_PARAM,
+        "Engine_plugin_manager::execute_op_graph failed: variant_pack_desc is not finalized");
 
     hipdnnBackendDescriptor_t config;
-    execution_plan->get_attribute(
-        HIPDNN_ATTR_EXECUTION_PLAN_ENGINE_CONFIG, HIPDNN_TYPE_BACKEND_DESCRIPTOR, 1, nullptr, &config);
+    execution_plan->get_attribute(HIPDNN_ATTR_EXECUTION_PLAN_ENGINE_CONFIG,
+                                  HIPDNN_TYPE_BACKEND_DESCRIPTOR,
+                                  1,
+                                  nullptr,
+                                  &config);
 
     hipdnnBackendDescriptor_t engine;
-    config->get_attribute(HIPDNN_ATTR_ENGINECFG_ENGINE, HIPDNN_TYPE_BACKEND_DESCRIPTOR, 1, nullptr, &engine);
+    config->get_attribute(
+        HIPDNN_ATTR_ENGINECFG_ENGINE, HIPDNN_TYPE_BACKEND_DESCRIPTOR, 1, nullptr, &engine);
 
     int64_t engine_id;
-    engine->get_attribute(HIPDNN_ATTR_ENGINE_GLOBAL_INDEX, HIPDNN_TYPE_INT64, 1, nullptr, &engine_id);
+    engine->get_attribute(
+        HIPDNN_ATTR_ENGINE_GLOBAL_INDEX, HIPDNN_TYPE_INT64, 1, nullptr, &engine_id);
 
     // TODO: Get execution context from the execution plan
     // This will be implemented at the integration stage
@@ -491,12 +509,13 @@ const hipdnn_sdk::data_objects::EngineDetails* Engine_details_wrapper::get() con
 }
 
 // TODO: Use engine_id from engine_config
-Engine_execution_context_wrapper::Engine_execution_context_wrapper(const std::shared_ptr<Engine_plugin_manager>& pm,
-                                   int64_t engine_id,
-                                   const hipdnnPluginConstData_t* engine_config,
-                                   Graph_descriptor* graph_desc)
-    : _pm(pm),
-      _engine_id(engine_id)
+Engine_execution_context_wrapper::Engine_execution_context_wrapper(
+    const std::shared_ptr<Engine_plugin_manager>& pm,
+    int64_t engine_id,
+    const hipdnnPluginConstData_t* engine_config,
+    Graph_descriptor* graph_desc)
+    : _pm(pm)
+    , _engine_id(engine_id)
 {
     _execution_context = _pm->create_execution_context(engine_id, engine_config, graph_desc);
 }
@@ -518,16 +537,18 @@ Engine_execution_context_wrapper::~Engine_execution_context_wrapper()
     }
 }
 
-Engine_execution_context_wrapper::Engine_execution_context_wrapper(Engine_execution_context_wrapper&& other) noexcept
-    : _pm(std::move(other._pm)),
-      _engine_id(other._engine_id),
-      _execution_context(other._execution_context)
+Engine_execution_context_wrapper::Engine_execution_context_wrapper(
+    Engine_execution_context_wrapper&& other) noexcept
+    : _pm(std::move(other._pm))
+    , _engine_id(other._engine_id)
+    , _execution_context(other._execution_context)
 {
     other._pm = nullptr;
     other._execution_context = nullptr;
 }
 
-Engine_execution_context_wrapper& Engine_execution_context_wrapper::operator=(Engine_execution_context_wrapper&& other) noexcept
+Engine_execution_context_wrapper&
+    Engine_execution_context_wrapper::operator=(Engine_execution_context_wrapper&& other) noexcept
 {
     if(this != &other)
     {
