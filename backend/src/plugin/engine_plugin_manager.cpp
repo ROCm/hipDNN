@@ -5,6 +5,8 @@
 #include <mutex>
 #include <vector>
 
+#include <hipdnn_sdk/data_objects/engine_config_generated.h>
+
 #include "descriptors/engine_config_descriptor.hpp"
 #include "descriptors/engine_descriptor.hpp"
 #include "descriptors/engine_heuristic_descriptor.hpp"
@@ -203,16 +205,6 @@ std::unique_ptr<Engine_details_wrapper>
     return std::make_unique<Engine_details_wrapper>(pm, engine_id, graph_desc);
 }
 
-size_t Engine_plugin_manager::get_workspace_size(int64_t engine_id,
-                                                 const hipdnnPluginConstData_t* engine_config,
-                                                 const hipdnnPluginConstData_t* op_graph) const
-{
-    auto handle = _engine_id_to_handle.at(engine_id);
-    auto plugin = _handle_to_plugin.at(handle);
-
-    return plugin->get_workspace_size(handle, engine_config, op_graph);
-}
-
 // TODO: Pack engine_config
 // TODO: Get engine_id from engine_config
 size_t Engine_plugin_manager::get_workspace_size(int64_t engine_id,
@@ -222,7 +214,11 @@ size_t Engine_plugin_manager::get_workspace_size(int64_t engine_id,
     const auto& serialized_graph = graph_desc->get_serialized_graph();
     const hipdnnPluginConstData_t serialized_graph_data{serialized_graph.data(),
                                                         serialized_graph.size()};
-    return get_workspace_size(engine_id, engine_config, &serialized_graph_data);
+
+    auto handle = _engine_id_to_handle.at(engine_id);
+    auto plugin = _handle_to_plugin.at(handle);
+
+    return plugin->get_workspace_size(handle, engine_config, &serialized_graph_data);
 }
 
 hipdnnEnginePluginExecutionContext_t
@@ -300,12 +296,37 @@ void Engine_plugin_manager::finalize_engine(hipdnnBackendDescriptor_t desc) cons
     // This will be implemented at the integration stage
 }
 
-#if 0
 void Engine_plugin_manager::finalize_engine_config(hipdnnBackendDescriptor_t desc) const
 {
-    // TODO: Implement finalize_engine_config
+    assert(desc->type == HIPDNN_BACKEND_ENGINECFG_DESCRIPTOR);
+    auto config_desc = static_cast<Engine_config_descriptor*>(desc);
+
+    config_desc->finalize();
+
+    hipdnnBackendDescriptor_t engine;
+    config_desc->get_attribute(HIPDNN_ATTR_ENGINECFG_ENGINE, HIPDNN_TYPE_BACKEND_DESCRIPTOR, 1, nullptr, &engine);
+
+    int64_t engine_id;
+    engine->get_attribute(HIPDNN_ATTR_ENGINE_GLOBAL_INDEX, HIPDNN_TYPE_INT64, 1, nullptr, &engine_id);
+
+    hipdnnBackendDescriptor_t graph;
+    engine->get_attribute(
+        HIPDNN_ATTR_ENGINE_OPERATION_GRAPH, HIPDNN_TYPE_BACKEND_DESCRIPTOR, 1, nullptr, &graph);
+    auto graph_desc = static_cast<Graph_descriptor*>(graph);
+
+    // TODO: Move to the engine config descriptor
+    // Now we have only one parameter in the engine config, but we will add more parameters later.
+    flatbuffers::FlatBufferBuilder builder;
+    auto engine_config = hipdnn_sdk::data_objects::CreateEngineConfig(builder, engine_id);
+    builder.Finish(engine_config);
+    hipdnnPluginConstData_t engine_config_data{builder.GetBufferPointer(), builder.GetSize()};
+
+    auto workspace_size = get_workspace_size(engine_id, &engine_config_data, graph_desc);
+    // TODO: Rename set_max_workspace_size() to set_workspace_size()
+    // TODO: Use size_t instead of int64_t for workspace size
+    // This will be implemented at the integration stage
+    config_desc->set_max_workspace_size(static_cast<int64_t>(workspace_size));
 }
-#endif
 
 #if 0
 void Engine_plugin_manager::finalize_engine_heuristic(hipdnnBackendDescriptor_t desc) const

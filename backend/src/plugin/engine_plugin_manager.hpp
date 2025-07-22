@@ -45,7 +45,7 @@ public:
     void set_stream(hipStream_t stream) const;
 
     void finalize_engine(hipdnnBackendDescriptor_t desc) const;
-    //void finalize_engine_config(hipdnnBackendDescriptor_t desc) const;
+    void finalize_engine_config(hipdnnBackendDescriptor_t desc) const;
     //void finalize_engine_heuristic(hipdnnBackendDescriptor_t desc) const;
     //void finalize_execution_plan(hipdnnBackendDescriptor_t desc) const;
 
@@ -65,9 +65,6 @@ private:
                            int64_t engine_id,
                            Graph_descriptor* graph_desc);
 
-    size_t get_workspace_size(int64_t engine_id,
-                              const hipdnnPluginConstData_t* engine_config,
-                              const hipdnnPluginConstData_t* op_graph) const;
     size_t get_workspace_size(int64_t engine_id,
                               const hipdnnPluginConstData_t* engine_config,
                               Graph_descriptor* graph_desc) const;
