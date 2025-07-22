@@ -22,6 +22,13 @@ enum class DataType_t
     BFLOAT16 = 3,
 };
 
+enum class HeurMode_t
+{
+    A,
+    B,
+    FALLBACK,
+};
+
 [[maybe_unused]] static hipdnn_sdk::data_objects::DataType to_sdk_type(const DataType_t& type)
 {
     switch(type)

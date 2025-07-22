@@ -24,6 +24,12 @@ public:
     {
     }
 
+    Hipdnn_backend_descriptor(hipdnnBackendDescriptor_t descriptor)
+        : _descriptor(descriptor)
+        , _valid(false)
+    {
+    }
+
     explicit Hipdnn_backend_descriptor(hipdnnBackendDescriptorType_t descriptor_type)
     {
         auto status = hipdnn_backend().backend_create_descriptor(descriptor_type, &_descriptor);
