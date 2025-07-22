@@ -108,6 +108,8 @@ TEST_F(Engine_api_tests, GetEngineGraph)
                                         &graph),
               HIPDNN_STATUS_SUCCESS);
     EXPECT_NE(graph, nullptr);
+
+    hipdnnBackendDestroyDescriptor(graph);
 }
 
 TEST_F(Engine_api_tests, GetEngineGlobalIndex)

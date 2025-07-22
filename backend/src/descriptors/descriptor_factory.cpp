@@ -24,26 +24,26 @@ void Descriptor_factory::create(hipdnnBackendDescriptorType_t descriptor_type,
     HIPDNN_LOG_INFO("Creating descriptor of type: {}",
                     hipdnn_get_backend_descriptor_type_name(descriptor_type));
 
-    *descriptor = new hipdnnBackendDescriptor();
+    std::shared_ptr<hipdnnPrivateBackendDescriptor> private_desc;
     switch(descriptor_type)
     {
     case HIPDNN_BACKEND_ENGINECFG_DESCRIPTOR:
-        (*descriptor)->private_descriptor = std::make_shared<Engine_config_descriptor>();
+        private_desc = std::make_shared<Engine_config_descriptor>();
         break;
     case HIPDNN_BACKEND_ENGINE_DESCRIPTOR:
-        (*descriptor)->private_descriptor = std::make_shared<Engine_descriptor>();
+        private_desc = std::make_shared<Engine_descriptor>();
         break;
     case HIPDNN_BACKEND_EXECUTION_PLAN_DESCRIPTOR:
-        (*descriptor)->private_descriptor = std::make_shared<Execution_plan_descriptor>();
+        private_desc = std::make_shared<Execution_plan_descriptor>();
         break;
     case HIPDNN_BACKEND_OPERATIONGRAPH_DESCRIPTOR:
-        (*descriptor)->private_descriptor = std::make_shared<Graph_descriptor>();
+        private_desc = std::make_shared<Graph_descriptor>();
         break;
     case HIPDNN_BACKEND_VARIANT_PACK_DESCRIPTOR:
-        (*descriptor)->private_descriptor = std::make_shared<Variant_descriptor>();
+        private_desc = std::make_shared<Variant_descriptor>();
         break;
     case HIPDNN_BACKEND_ENGINEHEUR_DESCRIPTOR:
-        (*descriptor)->private_descriptor = std::make_shared<Engine_heuristic_descriptor>();
+        private_desc = std::make_shared<Engine_heuristic_descriptor>();
         break;
     default:
         throw Hipdnn_exception(HIPDNN_STATUS_NOT_SUPPORTED,
@@ -51,6 +51,9 @@ void Descriptor_factory::create(hipdnnBackendDescriptorType_t descriptor_type,
                                    + hipdnn_get_backend_descriptor_type_name(descriptor_type)
                                    + " is not supported.");
     }
+
+    *descriptor = new hipdnnBackendDescriptor();
+    (*descriptor)->private_descriptor = private_desc;
 
     HIPDNN_LOG_INFO("Created descriptor: {:p}", static_cast<void*>(*descriptor));
 }
