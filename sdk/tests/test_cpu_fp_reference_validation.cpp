@@ -2,9 +2,9 @@
 // SPDX-License-Identifier:  MIT
 
 #include <gtest/gtest.h>
+#include <hipdnn_sdk/test_utilities/cpu_fp_reference_validation.hpp>
 #include <hipdnn_sdk/utilities/half_utils.hpp>
 #include <hipdnn_sdk/utilities/hip_bfloat16_utils.hpp>
-#include <hipdnn_sdk/test_utilities/cpu_fp_reference_validation.hpp>
 
 using namespace hipdnn_sdk::reference_test_utilities;
 using namespace hipdnn_sdk::utilities;
@@ -16,7 +16,7 @@ Migratable_memory create_buffer(size_t size, T mult)
 
     T* data = buffer.host_data<T>();
 
-    for (size_t i = 0; i < size; ++i)
+    for(size_t i = 0; i < size; ++i)
     {
         data[i] = static_cast<T>(static_cast<float>(i)) * mult;
     }
@@ -118,4 +118,3 @@ TEST(CpuFpReferenceValidation, ToleranceComparison)
     // Change the tolerance to a larger value
     EXPECT_FALSE(ref_validation_low_tolerance.compare_buffers(buffer1, buffer2));
 }
-

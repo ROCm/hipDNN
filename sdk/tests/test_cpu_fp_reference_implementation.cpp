@@ -12,4 +12,3 @@ TEST(CpuFpReferenceImplementation, BasicFloatUsage)
 {
     Cpu_fp_reference_implementation<float, float, float> ref_impl;
 }
-

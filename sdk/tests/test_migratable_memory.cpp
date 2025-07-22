@@ -6,18 +6,20 @@
 
 using namespace hipdnn_sdk::utilities;
 
-template<typename T>
-void init_buffer(T * buffer, size_t size, T mult = 1)
+template <typename T>
+void init_buffer(T* buffer, size_t size, T mult = 1)
 {
-    for (size_t i = 0; i < size; ++i) {
+    for(size_t i = 0; i < size; ++i)
+    {
         buffer[i] = static_cast<T>(i) * mult;
     }
 }
 
-template<typename T>
-void check_buffer(const T * buffer, size_t size, T mult = 1)
+template <typename T>
+void check_buffer(const T* buffer, size_t size, T mult = 1)
 {
-    for (size_t i = 0; i < size; ++i) {
+    for(size_t i = 0; i < size; ++i)
+    {
         EXPECT_EQ(buffer[i], static_cast<T>(i) * mult);
     }
 }
@@ -45,7 +47,7 @@ TEST(MigratableMemory, InitializeWithSize)
 TEST(MigratableMemory, MoveConstructor)
 {
     Migratable_memory memory1(10, sizeof(float));
-    float * old_host_data = memory1.host_data<float>();
+    float* old_host_data = memory1.host_data<float>();
 
     Migratable_memory memory2(std::move(memory1));
 
@@ -64,7 +66,7 @@ TEST(MigratableMemory, MoveConstructor)
 TEST(MigratableMemory, MoveAssignment)
 {
     Migratable_memory memory1(10, sizeof(float));
-    float * old_host_data = memory1.host_data<float>();
+    float* old_host_data = memory1.host_data<float>();
 
     Migratable_memory memory2;
     memory2 = std::move(memory1);
@@ -123,7 +125,8 @@ TEST(MigratableMemory, MigrateToHost)
 
     float array[10];
     init_buffer(array, 10, 2.0f);
-    hipError_t err = hipMemcpy(memory.device_data<float>(), array, memory.count() * sizeof(float), hipMemcpyHostToDevice);
+    hipError_t err = hipMemcpy(
+        memory.device_data<float>(), array, memory.count() * sizeof(float), hipMemcpyHostToDevice);
     EXPECT_EQ(err, hipSuccess);
     memory.mark_device_modified();
     EXPECT_EQ(memory.location(), Migratable_memory::Location::DEVICE);
@@ -143,4 +146,3 @@ TEST(MigratableMemory, Clear)
     EXPECT_EQ(memory.host_data<float>(), nullptr);
     EXPECT_EQ(memory.device_data<float>(), nullptr);
 }
-
