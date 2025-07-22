@@ -2,9 +2,11 @@
 // SPDX-License-Identifier:  MIT
 
 #include <gtest/gtest.h>
-#include <hipdnn_sdk/test_utilities/cpu_fp_reference_validation.hpp>
+
 #include <hipdnn_sdk/utilities/half_utils.hpp>
 #include <hipdnn_sdk/utilities/hip_bfloat16_utils.hpp>
+
+#include <hipdnn_sdk/test_utilities/cpu_fp_reference_validation.hpp>
 
 using namespace hipdnn_sdk::reference_test_utilities;
 using namespace hipdnn_sdk::utilities;
