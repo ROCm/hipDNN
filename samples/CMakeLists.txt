@@ -11,7 +11,8 @@ find_package(hipdnn_backend CONFIG REQUIRED)
 find_package(hipdnn_sdk CONFIG REQUIRED)
 
 add_executable(hipdnn_samples 
-    main.cpp
+    # main.cpp
+    bn_infer.cpp
 )
 
 target_compile_definitions(hipdnn_samples PUBLIC
