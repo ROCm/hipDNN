@@ -55,6 +55,7 @@ public:
     // MT-unsafe instance methods
     void set_stream(hipStream_t stream) const;
 
+    // TODO: Move to the descriptors
     void finalize_engine(hipdnnBackendDescriptor_t desc) const;
     void finalize_engine_config(hipdnnBackendDescriptor_t desc) const;
     void finalize_engine_heuristic(hipdnnBackendDescriptor_t desc) const;
