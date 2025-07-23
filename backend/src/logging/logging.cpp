@@ -7,6 +7,7 @@
 #include <hipdnn_sdk/logging/formatting.hpp>
 #include <iostream>
 
+#include <hipdnn_sdk/logging/callback_types.h>
 #include <spdlog/async.h>
 #include <spdlog/sinks/basic_file_sink.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
@@ -130,6 +131,32 @@ std::shared_ptr<spdlog::logger> get_callback_receiver_logger()
 std::shared_ptr<spdlog::logger> get_backend_logger()
 {
     return spdlog::get(S_BACKEND_LOGGER_NAME);
+}
+
+void hipdnn_logging_callback(hipdnnSeverity_t severity, const char* msg)
+{
+    initialize();
+
+    if(auto logger = get_callback_receiver_logger())
+    {
+        switch(severity)
+        {
+        case HIPDNN_SEV_FATAL:
+            logger->critical(msg);
+            break;
+        case HIPDNN_SEV_ERROR:
+            logger->error(msg);
+            break;
+        case HIPDNN_SEV_WARN:
+            logger->warn(msg);
+            break;
+        case HIPDNN_SEV_OFF:
+            break;
+        default:
+            logger->info(msg);
+            break;
+        }
+    }
 }
 
 } // namespace logging

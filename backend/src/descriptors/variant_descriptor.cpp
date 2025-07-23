@@ -52,7 +52,7 @@ void Variant_descriptor::get_attribute(hipdnnBackendAttributeName_t attribute_na
                       "Variant_descriptor::get_attribute(): element_count is null");
         *element_count = std::min<int64_t>(requested_element_count,
                                            static_cast<int64_t>(_data_pointers.size()));
-        for(size_t i = 0; i < static_cast<size_t>(*element_count); ++i)
+        for(size_t i = 0; std::cmp_less(i, *element_count); ++i)
         {
             static_cast<void**>(array_of_elements)[i] = const_cast<void*>(_data_pointers[i]);
         }
@@ -68,7 +68,7 @@ void Variant_descriptor::get_attribute(hipdnnBackendAttributeName_t attribute_na
                       "Variant_descriptor::get_attribute(): element_count is null");
         *element_count
             = std::min<int64_t>(requested_element_count, static_cast<int64_t>(_unique_ids.size()));
-        for(size_t i = 0; i < static_cast<size_t>(*element_count); ++i)
+        for(size_t i = 0; std::cmp_less(i, *element_count); ++i)
         {
             static_cast<int64_t*>(array_of_elements)[i] = _unique_ids[i];
         }

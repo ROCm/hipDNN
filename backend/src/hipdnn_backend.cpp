@@ -13,7 +13,6 @@
 #include "logging/logging.hpp"
 #include "plugin/plugin_manager.hpp"
 #include <hipdnn_sdk/logging/callback_types.h>
-#include <spdlog/spdlog.h>
 
 #include <hipdnn_sdk/utilities/string_util.hpp>
 
@@ -220,10 +219,19 @@ HIPDNN_BACKEND_EXPORT hipdnnStatus_t
                                                       element_count,
                                                       array_of_elements);
 
-        LOG_API_SUCCESS(api_name,
-                        "status={}, retrieved_element_count={}",
-                        hipdnn_backend::hipdnn_get_status_string(HIPDNN_STATUS_SUCCESS),
-                        *element_count);
+        if(element_count == nullptr)
+        {
+            LOG_API_SUCCESS(api_name,
+                            "status={}, element_count_ptr=nullptr",
+                            hipdnn_backend::hipdnn_get_status_string(HIPDNN_STATUS_SUCCESS));
+        }
+        else
+        {
+            LOG_API_SUCCESS(api_name,
+                            "status={}, retrieved_element_count={}",
+                            hipdnn_backend::hipdnn_get_status_string(HIPDNN_STATUS_SUCCESS),
+                            *element_count);
+        }
     });
 }
 
@@ -298,26 +306,5 @@ HIPDNN_BACKEND_EXPORT void hipdnnGetLastErrorString(char* message, size_t max_si
 
 HIPDNN_BACKEND_EXPORT void hipdnnLoggingCallback_ext(hipdnnSeverity_t severity, const char* msg)
 {
-    hipdnn_backend::logging::initialize();
-
-    if(auto logger = hipdnn_backend::logging::get_callback_receiver_logger())
-    {
-        switch(severity)
-        {
-        case HIPDNN_SEV_FATAL:
-            logger->critical(msg);
-            break;
-        case HIPDNN_SEV_ERROR:
-            logger->error(msg);
-            break;
-        case HIPDNN_SEV_WARN:
-            logger->warn(msg);
-            break;
-        case HIPDNN_SEV_OFF:
-            break;
-        default:
-            logger->info(msg);
-            break;
-        }
-    }
+    hipdnn_backend::logging::hipdnn_logging_callback(severity, msg);
 }

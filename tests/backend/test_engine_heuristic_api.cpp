@@ -361,7 +361,7 @@ TEST_F(Engine_heuristic_api_tests, GetEngineConfigs)
               HIPDNN_STATUS_SUCCESS);
     EXPECT_EQ(count, 1);
 
-    for(size_t i = 0; i < static_cast<size_t>(count); ++i)
+    for(size_t i = 0; std::cmp_less(i, count); ++i)
     {
         EXPECT_EQ(hipdnnBackendCreateDescriptor(HIPDNN_BACKEND_ENGINECFG_DESCRIPTOR, &configs[i]),
                   HIPDNN_STATUS_SUCCESS);
