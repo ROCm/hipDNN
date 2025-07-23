@@ -18,12 +18,435 @@ static_assert(FLATBUFFERS_VERSION_MAJOR == 23 &&
 namespace hipdnn_sdk {
 namespace data_objects {
 
+struct FValue;
+struct FValueBuilder;
+struct FValueT;
+
+struct HValue;
+struct HValueBuilder;
+struct HValueT;
+
+struct UValue;
+struct UValueBuilder;
+struct UValueT;
+
+struct IValue;
+struct IValueBuilder;
+struct IValueT;
+
 struct TensorAttributes;
 struct TensorAttributesBuilder;
 struct TensorAttributesT;
 
+bool operator==(const FValueT &lhs, const FValueT &rhs);
+bool operator!=(const FValueT &lhs, const FValueT &rhs);
+bool operator==(const HValueT &lhs, const HValueT &rhs);
+bool operator!=(const HValueT &lhs, const HValueT &rhs);
+bool operator==(const UValueT &lhs, const UValueT &rhs);
+bool operator!=(const UValueT &lhs, const UValueT &rhs);
+bool operator==(const IValueT &lhs, const IValueT &rhs);
+bool operator!=(const IValueT &lhs, const IValueT &rhs);
 bool operator==(const TensorAttributesT &lhs, const TensorAttributesT &rhs);
 bool operator!=(const TensorAttributesT &lhs, const TensorAttributesT &rhs);
+
+enum Tensor_Value : uint8_t {
+  Tensor_Value_NONE = 0,
+  Tensor_Value_FValue = 1,
+  Tensor_Value_HValue = 2,
+  Tensor_Value_UValue = 3,
+  Tensor_Value_IValue = 4,
+  Tensor_Value_MIN = Tensor_Value_NONE,
+  Tensor_Value_MAX = Tensor_Value_IValue
+};
+
+inline const Tensor_Value (&EnumValuesTensor_Value())[5] {
+  static const Tensor_Value values[] = {
+    Tensor_Value_NONE,
+    Tensor_Value_FValue,
+    Tensor_Value_HValue,
+    Tensor_Value_UValue,
+    Tensor_Value_IValue
+  };
+  return values;
+}
+
+inline const char * const *EnumNamesTensor_Value() {
+  static const char * const names[6] = {
+    "NONE",
+    "FValue",
+    "HValue",
+    "UValue",
+    "IValue",
+    nullptr
+  };
+  return names;
+}
+
+inline const char *EnumNameTensor_Value(Tensor_Value e) {
+  if (::flatbuffers::IsOutRange(e, Tensor_Value_NONE, Tensor_Value_IValue)) return "";
+  const size_t index = static_cast<size_t>(e);
+  return EnumNamesTensor_Value()[index];
+}
+
+template<typename T> struct Tensor_ValueTraits {
+  static const Tensor_Value enum_value = Tensor_Value_NONE;
+};
+
+template<> struct Tensor_ValueTraits<hipdnn_sdk::data_objects::FValue> {
+  static const Tensor_Value enum_value = Tensor_Value_FValue;
+};
+
+template<> struct Tensor_ValueTraits<hipdnn_sdk::data_objects::HValue> {
+  static const Tensor_Value enum_value = Tensor_Value_HValue;
+};
+
+template<> struct Tensor_ValueTraits<hipdnn_sdk::data_objects::UValue> {
+  static const Tensor_Value enum_value = Tensor_Value_UValue;
+};
+
+template<> struct Tensor_ValueTraits<hipdnn_sdk::data_objects::IValue> {
+  static const Tensor_Value enum_value = Tensor_Value_IValue;
+};
+
+template<typename T> struct Tensor_ValueUnionTraits {
+  static const Tensor_Value enum_value = Tensor_Value_NONE;
+};
+
+template<> struct Tensor_ValueUnionTraits<hipdnn_sdk::data_objects::FValueT> {
+  static const Tensor_Value enum_value = Tensor_Value_FValue;
+};
+
+template<> struct Tensor_ValueUnionTraits<hipdnn_sdk::data_objects::HValueT> {
+  static const Tensor_Value enum_value = Tensor_Value_HValue;
+};
+
+template<> struct Tensor_ValueUnionTraits<hipdnn_sdk::data_objects::UValueT> {
+  static const Tensor_Value enum_value = Tensor_Value_UValue;
+};
+
+template<> struct Tensor_ValueUnionTraits<hipdnn_sdk::data_objects::IValueT> {
+  static const Tensor_Value enum_value = Tensor_Value_IValue;
+};
+
+struct Tensor_ValueUnion {
+  Tensor_Value type;
+  void *value;
+
+  Tensor_ValueUnion() : type(Tensor_Value_NONE), value(nullptr) {}
+  Tensor_ValueUnion(Tensor_ValueUnion&& u) FLATBUFFERS_NOEXCEPT :
+    type(Tensor_Value_NONE), value(nullptr)
+    { std::swap(type, u.type); std::swap(value, u.value); }
+  Tensor_ValueUnion(const Tensor_ValueUnion &);
+  Tensor_ValueUnion &operator=(const Tensor_ValueUnion &u)
+    { Tensor_ValueUnion t(u); std::swap(type, t.type); std::swap(value, t.value); return *this; }
+  Tensor_ValueUnion &operator=(Tensor_ValueUnion &&u) FLATBUFFERS_NOEXCEPT
+    { std::swap(type, u.type); std::swap(value, u.value); return *this; }
+  ~Tensor_ValueUnion() { Reset(); }
+
+  void Reset();
+
+  template <typename T>
+  void Set(T&& val) {
+    typedef typename std::remove_reference<T>::type RT;
+    Reset();
+    type = Tensor_ValueUnionTraits<RT>::enum_value;
+    if (type != Tensor_Value_NONE) {
+      value = new RT(std::forward<T>(val));
+    }
+  }
+
+  static void *UnPack(const void *obj, Tensor_Value type, const ::flatbuffers::resolver_function_t *resolver);
+  ::flatbuffers::Offset<void> Pack(::flatbuffers::FlatBufferBuilder &_fbb, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr) const;
+
+  hipdnn_sdk::data_objects::FValueT *AsFValue() {
+    return type == Tensor_Value_FValue ?
+      reinterpret_cast<hipdnn_sdk::data_objects::FValueT *>(value) : nullptr;
+  }
+  const hipdnn_sdk::data_objects::FValueT *AsFValue() const {
+    return type == Tensor_Value_FValue ?
+      reinterpret_cast<const hipdnn_sdk::data_objects::FValueT *>(value) : nullptr;
+  }
+  hipdnn_sdk::data_objects::HValueT *AsHValue() {
+    return type == Tensor_Value_HValue ?
+      reinterpret_cast<hipdnn_sdk::data_objects::HValueT *>(value) : nullptr;
+  }
+  const hipdnn_sdk::data_objects::HValueT *AsHValue() const {
+    return type == Tensor_Value_HValue ?
+      reinterpret_cast<const hipdnn_sdk::data_objects::HValueT *>(value) : nullptr;
+  }
+  hipdnn_sdk::data_objects::UValueT *AsUValue() {
+    return type == Tensor_Value_UValue ?
+      reinterpret_cast<hipdnn_sdk::data_objects::UValueT *>(value) : nullptr;
+  }
+  const hipdnn_sdk::data_objects::UValueT *AsUValue() const {
+    return type == Tensor_Value_UValue ?
+      reinterpret_cast<const hipdnn_sdk::data_objects::UValueT *>(value) : nullptr;
+  }
+  hipdnn_sdk::data_objects::IValueT *AsIValue() {
+    return type == Tensor_Value_IValue ?
+      reinterpret_cast<hipdnn_sdk::data_objects::IValueT *>(value) : nullptr;
+  }
+  const hipdnn_sdk::data_objects::IValueT *AsIValue() const {
+    return type == Tensor_Value_IValue ?
+      reinterpret_cast<const hipdnn_sdk::data_objects::IValueT *>(value) : nullptr;
+  }
+};
+
+
+inline bool operator==(const Tensor_ValueUnion &lhs, const Tensor_ValueUnion &rhs) {
+  if (lhs.type != rhs.type) return false;
+  switch (lhs.type) {
+    case Tensor_Value_NONE: {
+      return true;
+    }
+    case Tensor_Value_FValue: {
+      return *(reinterpret_cast<const hipdnn_sdk::data_objects::FValueT *>(lhs.value)) ==
+             *(reinterpret_cast<const hipdnn_sdk::data_objects::FValueT *>(rhs.value));
+    }
+    case Tensor_Value_HValue: {
+      return *(reinterpret_cast<const hipdnn_sdk::data_objects::HValueT *>(lhs.value)) ==
+             *(reinterpret_cast<const hipdnn_sdk::data_objects::HValueT *>(rhs.value));
+    }
+    case Tensor_Value_UValue: {
+      return *(reinterpret_cast<const hipdnn_sdk::data_objects::UValueT *>(lhs.value)) ==
+             *(reinterpret_cast<const hipdnn_sdk::data_objects::UValueT *>(rhs.value));
+    }
+    case Tensor_Value_IValue: {
+      return *(reinterpret_cast<const hipdnn_sdk::data_objects::IValueT *>(lhs.value)) ==
+             *(reinterpret_cast<const hipdnn_sdk::data_objects::IValueT *>(rhs.value));
+    }
+    default: {
+      return false;
+    }
+  }
+}
+
+inline bool operator!=(const Tensor_ValueUnion &lhs, const Tensor_ValueUnion &rhs) {
+    return !(lhs == rhs);
+}
+
+bool VerifyTensor_Value(::flatbuffers::Verifier &verifier, const void *obj, Tensor_Value type);
+bool VerifyTensor_ValueVector(::flatbuffers::Verifier &verifier, const ::flatbuffers::Vector<::flatbuffers::Offset<void>> *values, const ::flatbuffers::Vector<uint8_t> *types);
+
+struct FValueT : public ::flatbuffers::NativeTable {
+  typedef FValue TableType;
+  float value = 0.0f;
+};
+
+struct FValue FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef FValueT NativeTableType;
+  typedef FValueBuilder Builder;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_VALUE = 4
+  };
+  float value() const {
+    return GetField<float>(VT_VALUE, 0.0f);
+  }
+  bool mutate_value(float _value = 0.0f) {
+    return SetField<float>(VT_VALUE, _value, 0.0f);
+  }
+  bool Verify(::flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<float>(verifier, VT_VALUE, 4) &&
+           verifier.EndTable();
+  }
+  FValueT *UnPack(const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(FValueT *_o, const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static ::flatbuffers::Offset<FValue> Pack(::flatbuffers::FlatBufferBuilder &_fbb, const FValueT* _o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
+};
+
+struct FValueBuilder {
+  typedef FValue Table;
+  ::flatbuffers::FlatBufferBuilder &fbb_;
+  ::flatbuffers::uoffset_t start_;
+  void add_value(float value) {
+    fbb_.AddElement<float>(FValue::VT_VALUE, value, 0.0f);
+  }
+  explicit FValueBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  ::flatbuffers::Offset<FValue> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = ::flatbuffers::Offset<FValue>(end);
+    return o;
+  }
+};
+
+inline ::flatbuffers::Offset<FValue> CreateFValue(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    float value = 0.0f) {
+  FValueBuilder builder_(_fbb);
+  builder_.add_value(value);
+  return builder_.Finish();
+}
+
+::flatbuffers::Offset<FValue> CreateFValue(::flatbuffers::FlatBufferBuilder &_fbb, const FValueT *_o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
+struct HValueT : public ::flatbuffers::NativeTable {
+  typedef HValue TableType;
+  uint16_t value = 0;
+};
+
+struct HValue FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef HValueT NativeTableType;
+  typedef HValueBuilder Builder;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_VALUE = 4
+  };
+  uint16_t value() const {
+    return GetField<uint16_t>(VT_VALUE, 0);
+  }
+  bool mutate_value(uint16_t _value = 0) {
+    return SetField<uint16_t>(VT_VALUE, _value, 0);
+  }
+  bool Verify(::flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<uint16_t>(verifier, VT_VALUE, 2) &&
+           verifier.EndTable();
+  }
+  HValueT *UnPack(const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(HValueT *_o, const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static ::flatbuffers::Offset<HValue> Pack(::flatbuffers::FlatBufferBuilder &_fbb, const HValueT* _o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
+};
+
+struct HValueBuilder {
+  typedef HValue Table;
+  ::flatbuffers::FlatBufferBuilder &fbb_;
+  ::flatbuffers::uoffset_t start_;
+  void add_value(uint16_t value) {
+    fbb_.AddElement<uint16_t>(HValue::VT_VALUE, value, 0);
+  }
+  explicit HValueBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  ::flatbuffers::Offset<HValue> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = ::flatbuffers::Offset<HValue>(end);
+    return o;
+  }
+};
+
+inline ::flatbuffers::Offset<HValue> CreateHValue(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    uint16_t value = 0) {
+  HValueBuilder builder_(_fbb);
+  builder_.add_value(value);
+  return builder_.Finish();
+}
+
+::flatbuffers::Offset<HValue> CreateHValue(::flatbuffers::FlatBufferBuilder &_fbb, const HValueT *_o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
+struct UValueT : public ::flatbuffers::NativeTable {
+  typedef UValue TableType;
+  uint8_t value = 0;
+};
+
+struct UValue FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef UValueT NativeTableType;
+  typedef UValueBuilder Builder;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_VALUE = 4
+  };
+  uint8_t value() const {
+    return GetField<uint8_t>(VT_VALUE, 0);
+  }
+  bool mutate_value(uint8_t _value = 0) {
+    return SetField<uint8_t>(VT_VALUE, _value, 0);
+  }
+  bool Verify(::flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<uint8_t>(verifier, VT_VALUE, 1) &&
+           verifier.EndTable();
+  }
+  UValueT *UnPack(const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(UValueT *_o, const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static ::flatbuffers::Offset<UValue> Pack(::flatbuffers::FlatBufferBuilder &_fbb, const UValueT* _o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
+};
+
+struct UValueBuilder {
+  typedef UValue Table;
+  ::flatbuffers::FlatBufferBuilder &fbb_;
+  ::flatbuffers::uoffset_t start_;
+  void add_value(uint8_t value) {
+    fbb_.AddElement<uint8_t>(UValue::VT_VALUE, value, 0);
+  }
+  explicit UValueBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  ::flatbuffers::Offset<UValue> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = ::flatbuffers::Offset<UValue>(end);
+    return o;
+  }
+};
+
+inline ::flatbuffers::Offset<UValue> CreateUValue(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    uint8_t value = 0) {
+  UValueBuilder builder_(_fbb);
+  builder_.add_value(value);
+  return builder_.Finish();
+}
+
+::flatbuffers::Offset<UValue> CreateUValue(::flatbuffers::FlatBufferBuilder &_fbb, const UValueT *_o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
+struct IValueT : public ::flatbuffers::NativeTable {
+  typedef IValue TableType;
+  int32_t value = 0;
+};
+
+struct IValue FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef IValueT NativeTableType;
+  typedef IValueBuilder Builder;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_VALUE = 4
+  };
+  int32_t value() const {
+    return GetField<int32_t>(VT_VALUE, 0);
+  }
+  bool mutate_value(int32_t _value = 0) {
+    return SetField<int32_t>(VT_VALUE, _value, 0);
+  }
+  bool Verify(::flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<int32_t>(verifier, VT_VALUE, 4) &&
+           verifier.EndTable();
+  }
+  IValueT *UnPack(const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(IValueT *_o, const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static ::flatbuffers::Offset<IValue> Pack(::flatbuffers::FlatBufferBuilder &_fbb, const IValueT* _o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
+};
+
+struct IValueBuilder {
+  typedef IValue Table;
+  ::flatbuffers::FlatBufferBuilder &fbb_;
+  ::flatbuffers::uoffset_t start_;
+  void add_value(int32_t value) {
+    fbb_.AddElement<int32_t>(IValue::VT_VALUE, value, 0);
+  }
+  explicit IValueBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  ::flatbuffers::Offset<IValue> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = ::flatbuffers::Offset<IValue>(end);
+    return o;
+  }
+};
+
+inline ::flatbuffers::Offset<IValue> CreateIValue(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    int32_t value = 0) {
+  IValueBuilder builder_(_fbb);
+  builder_.add_value(value);
+  return builder_.Finish();
+}
+
+::flatbuffers::Offset<IValue> CreateIValue(::flatbuffers::FlatBufferBuilder &_fbb, const IValueT *_o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
 
 struct TensorAttributesT : public ::flatbuffers::NativeTable {
   typedef TensorAttributes TableType;
@@ -33,6 +456,7 @@ struct TensorAttributesT : public ::flatbuffers::NativeTable {
   std::vector<int64_t> strides{};
   std::vector<int64_t> dims{};
   bool virtual_ = false;
+  hipdnn_sdk::data_objects::Tensor_ValueUnion value{};
 };
 
 struct TensorAttributes FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
@@ -44,7 +468,9 @@ struct TensorAttributes FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
     VT_DATA_TYPE = 8,
     VT_STRIDES = 10,
     VT_DIMS = 12,
-    VT_VIRTUAL_ = 14
+    VT_VIRTUAL_ = 14,
+    VT_VALUE_TYPE = 16,
+    VT_VALUE = 18
   };
   int64_t uid() const {
     return GetField<int64_t>(VT_UID, 0);
@@ -82,6 +508,28 @@ struct TensorAttributes FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   bool mutate_virtual_(bool _virtual_ = 0) {
     return SetField<uint8_t>(VT_VIRTUAL_, static_cast<uint8_t>(_virtual_), 0);
   }
+  hipdnn_sdk::data_objects::Tensor_Value value_type() const {
+    return static_cast<hipdnn_sdk::data_objects::Tensor_Value>(GetField<uint8_t>(VT_VALUE_TYPE, 0));
+  }
+  const void *value() const {
+    return GetPointer<const void *>(VT_VALUE);
+  }
+  template<typename T> const T *value_as() const;
+  const hipdnn_sdk::data_objects::FValue *value_as_FValue() const {
+    return value_type() == hipdnn_sdk::data_objects::Tensor_Value_FValue ? static_cast<const hipdnn_sdk::data_objects::FValue *>(value()) : nullptr;
+  }
+  const hipdnn_sdk::data_objects::HValue *value_as_HValue() const {
+    return value_type() == hipdnn_sdk::data_objects::Tensor_Value_HValue ? static_cast<const hipdnn_sdk::data_objects::HValue *>(value()) : nullptr;
+  }
+  const hipdnn_sdk::data_objects::UValue *value_as_UValue() const {
+    return value_type() == hipdnn_sdk::data_objects::Tensor_Value_UValue ? static_cast<const hipdnn_sdk::data_objects::UValue *>(value()) : nullptr;
+  }
+  const hipdnn_sdk::data_objects::IValue *value_as_IValue() const {
+    return value_type() == hipdnn_sdk::data_objects::Tensor_Value_IValue ? static_cast<const hipdnn_sdk::data_objects::IValue *>(value()) : nullptr;
+  }
+  void *mutable_value() {
+    return GetPointer<void *>(VT_VALUE);
+  }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyField<int64_t>(verifier, VT_UID, 8) &&
@@ -93,12 +541,31 @@ struct TensorAttributes FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
            VerifyOffset(verifier, VT_DIMS) &&
            verifier.VerifyVector(dims()) &&
            VerifyField<uint8_t>(verifier, VT_VIRTUAL_, 1) &&
+           VerifyField<uint8_t>(verifier, VT_VALUE_TYPE, 1) &&
+           VerifyOffset(verifier, VT_VALUE) &&
+           VerifyTensor_Value(verifier, value(), value_type()) &&
            verifier.EndTable();
   }
   TensorAttributesT *UnPack(const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
   void UnPackTo(TensorAttributesT *_o, const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
   static ::flatbuffers::Offset<TensorAttributes> Pack(::flatbuffers::FlatBufferBuilder &_fbb, const TensorAttributesT* _o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
 };
+
+template<> inline const hipdnn_sdk::data_objects::FValue *TensorAttributes::value_as<hipdnn_sdk::data_objects::FValue>() const {
+  return value_as_FValue();
+}
+
+template<> inline const hipdnn_sdk::data_objects::HValue *TensorAttributes::value_as<hipdnn_sdk::data_objects::HValue>() const {
+  return value_as_HValue();
+}
+
+template<> inline const hipdnn_sdk::data_objects::UValue *TensorAttributes::value_as<hipdnn_sdk::data_objects::UValue>() const {
+  return value_as_UValue();
+}
+
+template<> inline const hipdnn_sdk::data_objects::IValue *TensorAttributes::value_as<hipdnn_sdk::data_objects::IValue>() const {
+  return value_as_IValue();
+}
 
 struct TensorAttributesBuilder {
   typedef TensorAttributes Table;
@@ -122,6 +589,12 @@ struct TensorAttributesBuilder {
   void add_virtual_(bool virtual_) {
     fbb_.AddElement<uint8_t>(TensorAttributes::VT_VIRTUAL_, static_cast<uint8_t>(virtual_), 0);
   }
+  void add_value_type(hipdnn_sdk::data_objects::Tensor_Value value_type) {
+    fbb_.AddElement<uint8_t>(TensorAttributes::VT_VALUE_TYPE, static_cast<uint8_t>(value_type), 0);
+  }
+  void add_value(::flatbuffers::Offset<void> value) {
+    fbb_.AddOffset(TensorAttributes::VT_VALUE, value);
+  }
   explicit TensorAttributesBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
@@ -140,12 +613,16 @@ inline ::flatbuffers::Offset<TensorAttributes> CreateTensorAttributes(
     hipdnn_sdk::data_objects::DataType data_type = hipdnn_sdk::data_objects::DataType_UNSET,
     ::flatbuffers::Offset<::flatbuffers::Vector<int64_t>> strides = 0,
     ::flatbuffers::Offset<::flatbuffers::Vector<int64_t>> dims = 0,
-    bool virtual_ = false) {
+    bool virtual_ = false,
+    hipdnn_sdk::data_objects::Tensor_Value value_type = hipdnn_sdk::data_objects::Tensor_Value_NONE,
+    ::flatbuffers::Offset<void> value = 0) {
   TensorAttributesBuilder builder_(_fbb);
   builder_.add_uid(uid);
+  builder_.add_value(value);
   builder_.add_dims(dims);
   builder_.add_strides(strides);
   builder_.add_name(name);
+  builder_.add_value_type(value_type);
   builder_.add_virtual_(virtual_);
   builder_.add_data_type(data_type);
   return builder_.Finish();
@@ -158,7 +635,9 @@ inline ::flatbuffers::Offset<TensorAttributes> CreateTensorAttributesDirect(
     hipdnn_sdk::data_objects::DataType data_type = hipdnn_sdk::data_objects::DataType_UNSET,
     const std::vector<int64_t> *strides = nullptr,
     const std::vector<int64_t> *dims = nullptr,
-    bool virtual_ = false) {
+    bool virtual_ = false,
+    hipdnn_sdk::data_objects::Tensor_Value value_type = hipdnn_sdk::data_objects::Tensor_Value_NONE,
+    ::flatbuffers::Offset<void> value = 0) {
   auto name__ = name ? _fbb.CreateString(name) : 0;
   auto strides__ = strides ? _fbb.CreateVector<int64_t>(*strides) : 0;
   auto dims__ = dims ? _fbb.CreateVector<int64_t>(*dims) : 0;
@@ -169,10 +648,160 @@ inline ::flatbuffers::Offset<TensorAttributes> CreateTensorAttributesDirect(
       data_type,
       strides__,
       dims__,
-      virtual_);
+      virtual_,
+      value_type,
+      value);
 }
 
 ::flatbuffers::Offset<TensorAttributes> CreateTensorAttributes(::flatbuffers::FlatBufferBuilder &_fbb, const TensorAttributesT *_o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
+
+inline bool operator==(const FValueT &lhs, const FValueT &rhs) {
+  return
+      (lhs.value == rhs.value);
+}
+
+inline bool operator!=(const FValueT &lhs, const FValueT &rhs) {
+    return !(lhs == rhs);
+}
+
+
+inline FValueT *FValue::UnPack(const ::flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = std::unique_ptr<FValueT>(new FValueT());
+  UnPackTo(_o.get(), _resolver);
+  return _o.release();
+}
+
+inline void FValue::UnPackTo(FValueT *_o, const ::flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = value(); _o->value = _e; }
+}
+
+inline ::flatbuffers::Offset<FValue> FValue::Pack(::flatbuffers::FlatBufferBuilder &_fbb, const FValueT* _o, const ::flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateFValue(_fbb, _o, _rehasher);
+}
+
+inline ::flatbuffers::Offset<FValue> CreateFValue(::flatbuffers::FlatBufferBuilder &_fbb, const FValueT *_o, const ::flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { ::flatbuffers::FlatBufferBuilder *__fbb; const FValueT* __o; const ::flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _value = _o->value;
+  return hipdnn_sdk::data_objects::CreateFValue(
+      _fbb,
+      _value);
+}
+
+
+inline bool operator==(const HValueT &lhs, const HValueT &rhs) {
+  return
+      (lhs.value == rhs.value);
+}
+
+inline bool operator!=(const HValueT &lhs, const HValueT &rhs) {
+    return !(lhs == rhs);
+}
+
+
+inline HValueT *HValue::UnPack(const ::flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = std::unique_ptr<HValueT>(new HValueT());
+  UnPackTo(_o.get(), _resolver);
+  return _o.release();
+}
+
+inline void HValue::UnPackTo(HValueT *_o, const ::flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = value(); _o->value = _e; }
+}
+
+inline ::flatbuffers::Offset<HValue> HValue::Pack(::flatbuffers::FlatBufferBuilder &_fbb, const HValueT* _o, const ::flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateHValue(_fbb, _o, _rehasher);
+}
+
+inline ::flatbuffers::Offset<HValue> CreateHValue(::flatbuffers::FlatBufferBuilder &_fbb, const HValueT *_o, const ::flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { ::flatbuffers::FlatBufferBuilder *__fbb; const HValueT* __o; const ::flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _value = _o->value;
+  return hipdnn_sdk::data_objects::CreateHValue(
+      _fbb,
+      _value);
+}
+
+
+inline bool operator==(const UValueT &lhs, const UValueT &rhs) {
+  return
+      (lhs.value == rhs.value);
+}
+
+inline bool operator!=(const UValueT &lhs, const UValueT &rhs) {
+    return !(lhs == rhs);
+}
+
+
+inline UValueT *UValue::UnPack(const ::flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = std::unique_ptr<UValueT>(new UValueT());
+  UnPackTo(_o.get(), _resolver);
+  return _o.release();
+}
+
+inline void UValue::UnPackTo(UValueT *_o, const ::flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = value(); _o->value = _e; }
+}
+
+inline ::flatbuffers::Offset<UValue> UValue::Pack(::flatbuffers::FlatBufferBuilder &_fbb, const UValueT* _o, const ::flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateUValue(_fbb, _o, _rehasher);
+}
+
+inline ::flatbuffers::Offset<UValue> CreateUValue(::flatbuffers::FlatBufferBuilder &_fbb, const UValueT *_o, const ::flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { ::flatbuffers::FlatBufferBuilder *__fbb; const UValueT* __o; const ::flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _value = _o->value;
+  return hipdnn_sdk::data_objects::CreateUValue(
+      _fbb,
+      _value);
+}
+
+
+inline bool operator==(const IValueT &lhs, const IValueT &rhs) {
+  return
+      (lhs.value == rhs.value);
+}
+
+inline bool operator!=(const IValueT &lhs, const IValueT &rhs) {
+    return !(lhs == rhs);
+}
+
+
+inline IValueT *IValue::UnPack(const ::flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = std::unique_ptr<IValueT>(new IValueT());
+  UnPackTo(_o.get(), _resolver);
+  return _o.release();
+}
+
+inline void IValue::UnPackTo(IValueT *_o, const ::flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = value(); _o->value = _e; }
+}
+
+inline ::flatbuffers::Offset<IValue> IValue::Pack(::flatbuffers::FlatBufferBuilder &_fbb, const IValueT* _o, const ::flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateIValue(_fbb, _o, _rehasher);
+}
+
+inline ::flatbuffers::Offset<IValue> CreateIValue(::flatbuffers::FlatBufferBuilder &_fbb, const IValueT *_o, const ::flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { ::flatbuffers::FlatBufferBuilder *__fbb; const IValueT* __o; const ::flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _value = _o->value;
+  return hipdnn_sdk::data_objects::CreateIValue(
+      _fbb,
+      _value);
+}
 
 
 inline bool operator==(const TensorAttributesT &lhs, const TensorAttributesT &rhs) {
@@ -182,7 +811,8 @@ inline bool operator==(const TensorAttributesT &lhs, const TensorAttributesT &rh
       (lhs.data_type == rhs.data_type) &&
       (lhs.strides == rhs.strides) &&
       (lhs.dims == rhs.dims) &&
-      (lhs.virtual_ == rhs.virtual_);
+      (lhs.virtual_ == rhs.virtual_) &&
+      (lhs.value == rhs.value);
 }
 
 inline bool operator!=(const TensorAttributesT &lhs, const TensorAttributesT &rhs) {
@@ -205,6 +835,8 @@ inline void TensorAttributes::UnPackTo(TensorAttributesT *_o, const ::flatbuffer
   { auto _e = strides(); if (_e) { _o->strides.resize(_e->size()); for (::flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->strides[_i] = _e->Get(_i); } } else { _o->strides.resize(0); } }
   { auto _e = dims(); if (_e) { _o->dims.resize(_e->size()); for (::flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->dims[_i] = _e->Get(_i); } } else { _o->dims.resize(0); } }
   { auto _e = virtual_(); _o->virtual_ = _e; }
+  { auto _e = value_type(); _o->value.type = _e; }
+  { auto _e = value(); if (_e) _o->value.value = hipdnn_sdk::data_objects::Tensor_ValueUnion::UnPack(_e, value_type(), _resolver); }
 }
 
 inline ::flatbuffers::Offset<TensorAttributes> TensorAttributes::Pack(::flatbuffers::FlatBufferBuilder &_fbb, const TensorAttributesT* _o, const ::flatbuffers::rehasher_function_t *_rehasher) {
@@ -221,6 +853,8 @@ inline ::flatbuffers::Offset<TensorAttributes> CreateTensorAttributes(::flatbuff
   auto _strides = _o->strides.size() ? _fbb.CreateVector(_o->strides) : 0;
   auto _dims = _o->dims.size() ? _fbb.CreateVector(_o->dims) : 0;
   auto _virtual_ = _o->virtual_;
+  auto _value_type = _o->value.type;
+  auto _value = _o->value.Pack(_fbb);
   return hipdnn_sdk::data_objects::CreateTensorAttributes(
       _fbb,
       _uid,
@@ -228,7 +862,143 @@ inline ::flatbuffers::Offset<TensorAttributes> CreateTensorAttributes(::flatbuff
       _data_type,
       _strides,
       _dims,
-      _virtual_);
+      _virtual_,
+      _value_type,
+      _value);
+}
+
+inline bool VerifyTensor_Value(::flatbuffers::Verifier &verifier, const void *obj, Tensor_Value type) {
+  switch (type) {
+    case Tensor_Value_NONE: {
+      return true;
+    }
+    case Tensor_Value_FValue: {
+      auto ptr = reinterpret_cast<const hipdnn_sdk::data_objects::FValue *>(obj);
+      return verifier.VerifyTable(ptr);
+    }
+    case Tensor_Value_HValue: {
+      auto ptr = reinterpret_cast<const hipdnn_sdk::data_objects::HValue *>(obj);
+      return verifier.VerifyTable(ptr);
+    }
+    case Tensor_Value_UValue: {
+      auto ptr = reinterpret_cast<const hipdnn_sdk::data_objects::UValue *>(obj);
+      return verifier.VerifyTable(ptr);
+    }
+    case Tensor_Value_IValue: {
+      auto ptr = reinterpret_cast<const hipdnn_sdk::data_objects::IValue *>(obj);
+      return verifier.VerifyTable(ptr);
+    }
+    default: return true;
+  }
+}
+
+inline bool VerifyTensor_ValueVector(::flatbuffers::Verifier &verifier, const ::flatbuffers::Vector<::flatbuffers::Offset<void>> *values, const ::flatbuffers::Vector<uint8_t> *types) {
+  if (!values || !types) return !values && !types;
+  if (values->size() != types->size()) return false;
+  for (::flatbuffers::uoffset_t i = 0; i < values->size(); ++i) {
+    if (!VerifyTensor_Value(
+        verifier,  values->Get(i), types->GetEnum<Tensor_Value>(i))) {
+      return false;
+    }
+  }
+  return true;
+}
+
+inline void *Tensor_ValueUnion::UnPack(const void *obj, Tensor_Value type, const ::flatbuffers::resolver_function_t *resolver) {
+  (void)resolver;
+  switch (type) {
+    case Tensor_Value_FValue: {
+      auto ptr = reinterpret_cast<const hipdnn_sdk::data_objects::FValue *>(obj);
+      return ptr->UnPack(resolver);
+    }
+    case Tensor_Value_HValue: {
+      auto ptr = reinterpret_cast<const hipdnn_sdk::data_objects::HValue *>(obj);
+      return ptr->UnPack(resolver);
+    }
+    case Tensor_Value_UValue: {
+      auto ptr = reinterpret_cast<const hipdnn_sdk::data_objects::UValue *>(obj);
+      return ptr->UnPack(resolver);
+    }
+    case Tensor_Value_IValue: {
+      auto ptr = reinterpret_cast<const hipdnn_sdk::data_objects::IValue *>(obj);
+      return ptr->UnPack(resolver);
+    }
+    default: return nullptr;
+  }
+}
+
+inline ::flatbuffers::Offset<void> Tensor_ValueUnion::Pack(::flatbuffers::FlatBufferBuilder &_fbb, const ::flatbuffers::rehasher_function_t *_rehasher) const {
+  (void)_rehasher;
+  switch (type) {
+    case Tensor_Value_FValue: {
+      auto ptr = reinterpret_cast<const hipdnn_sdk::data_objects::FValueT *>(value);
+      return CreateFValue(_fbb, ptr, _rehasher).Union();
+    }
+    case Tensor_Value_HValue: {
+      auto ptr = reinterpret_cast<const hipdnn_sdk::data_objects::HValueT *>(value);
+      return CreateHValue(_fbb, ptr, _rehasher).Union();
+    }
+    case Tensor_Value_UValue: {
+      auto ptr = reinterpret_cast<const hipdnn_sdk::data_objects::UValueT *>(value);
+      return CreateUValue(_fbb, ptr, _rehasher).Union();
+    }
+    case Tensor_Value_IValue: {
+      auto ptr = reinterpret_cast<const hipdnn_sdk::data_objects::IValueT *>(value);
+      return CreateIValue(_fbb, ptr, _rehasher).Union();
+    }
+    default: return 0;
+  }
+}
+
+inline Tensor_ValueUnion::Tensor_ValueUnion(const Tensor_ValueUnion &u) : type(u.type), value(nullptr) {
+  switch (type) {
+    case Tensor_Value_FValue: {
+      value = new hipdnn_sdk::data_objects::FValueT(*reinterpret_cast<hipdnn_sdk::data_objects::FValueT *>(u.value));
+      break;
+    }
+    case Tensor_Value_HValue: {
+      value = new hipdnn_sdk::data_objects::HValueT(*reinterpret_cast<hipdnn_sdk::data_objects::HValueT *>(u.value));
+      break;
+    }
+    case Tensor_Value_UValue: {
+      value = new hipdnn_sdk::data_objects::UValueT(*reinterpret_cast<hipdnn_sdk::data_objects::UValueT *>(u.value));
+      break;
+    }
+    case Tensor_Value_IValue: {
+      value = new hipdnn_sdk::data_objects::IValueT(*reinterpret_cast<hipdnn_sdk::data_objects::IValueT *>(u.value));
+      break;
+    }
+    default:
+      break;
+  }
+}
+
+inline void Tensor_ValueUnion::Reset() {
+  switch (type) {
+    case Tensor_Value_FValue: {
+      auto ptr = reinterpret_cast<hipdnn_sdk::data_objects::FValueT *>(value);
+      delete ptr;
+      break;
+    }
+    case Tensor_Value_HValue: {
+      auto ptr = reinterpret_cast<hipdnn_sdk::data_objects::HValueT *>(value);
+      delete ptr;
+      break;
+    }
+    case Tensor_Value_UValue: {
+      auto ptr = reinterpret_cast<hipdnn_sdk::data_objects::UValueT *>(value);
+      delete ptr;
+      break;
+    }
+    case Tensor_Value_IValue: {
+      auto ptr = reinterpret_cast<hipdnn_sdk::data_objects::IValueT *>(value);
+      delete ptr;
+      break;
+    }
+    default: break;
+  }
+  value = nullptr;
+  type = Tensor_Value_NONE;
 }
 
 }  // namespace data_objects

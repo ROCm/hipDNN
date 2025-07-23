@@ -5,6 +5,29 @@ include "data_types.fbs";
 
 namespace hipdnn_sdk.data_objects;
 
+table FValue {
+  value: float;
+}
+
+table HValue {
+  value: ushort;
+}
+
+table UValue {
+  value: ubyte;
+}
+
+table IValue {
+  value: int;
+}
+
+union Tensor_Value {
+  FValue,
+  HValue,
+  UValue,
+  IValue
+}
+
 table TensorAttributes {
     uid: long;
     name: string;
@@ -12,4 +35,5 @@ table TensorAttributes {
     strides: [long];
     dims: [long];
     virtual: bool;
+    value: Tensor_Value;
 }
