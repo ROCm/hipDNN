@@ -43,7 +43,7 @@ ACTION_P(SetArg4ToInt64, value) // NOLINT
     *static_cast<int64_t*>(arg4) = value;
 }
 
-static std::unique_ptr<hipdnnBackendDescriptor>
+inline std::unique_ptr<hipdnnBackendDescriptor>
     make_mock_descriptor_wrapper(hipdnnBackendDescriptorType_t desc_type = HIPDNN_INVALID_TYPE)
 {
     auto mock_wrapper = std::make_unique<hipdnnBackendDescriptor>();
@@ -51,7 +51,7 @@ static std::unique_ptr<hipdnnBackendDescriptor>
     return mock_wrapper;
 }
 
-static Mock_descriptor* unpack_mock_descriptor(hipdnnBackendDescriptor* descriptor)
+inline Mock_descriptor* unpack_mock_descriptor(hipdnnBackendDescriptor* descriptor)
 {
     if(descriptor == nullptr || descriptor->private_descriptor == nullptr)
     {

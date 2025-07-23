@@ -4,6 +4,7 @@
 #include "descriptors/engine_config_descriptor.hpp"
 #include "descriptors/engine_descriptor.hpp"
 #include "descriptors/engine_heuristic_descriptor.hpp"
+#include "descriptors/scoped_descriptor.hpp"
 #include "hipdnn_backend.h"
 #include "hipdnn_exception.hpp"
 #include "mocks/mock_descriptor.hpp"

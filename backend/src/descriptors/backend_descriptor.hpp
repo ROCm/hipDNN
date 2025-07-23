@@ -8,28 +8,33 @@
 #include <memory>
 
 //NOLINTBEGIN(readability-identifier-naming)
+
+namespace hipdnn_backend
+{
 struct hipdnnPrivateBackendDescriptor;
 
 template <typename Child_descriptor>
-static std::shared_ptr<Child_descriptor>
-    unpack_descriptor(const hipdnnBackendDescriptor* descriptor,
-                      hipdnnStatus_t error_status,
-                      const std::string& error_message);
+std::shared_ptr<Child_descriptor> unpack_descriptor(const hipdnnBackendDescriptor* descriptor,
+                                                    hipdnnStatus_t error_status,
+                                                    const std::string& error_message);
+}
 
 struct hipdnnBackendDescriptor
 {
-    std::shared_ptr<hipdnnPrivateBackendDescriptor> private_descriptor;
+    std::shared_ptr<hipdnn_backend::hipdnnPrivateBackendDescriptor> private_descriptor;
 
     template <typename Child_descriptor>
     std::shared_ptr<Child_descriptor> as_descriptor() const
     {
-        return unpack_descriptor<Child_descriptor>(
+        return hipdnn_backend::unpack_descriptor<Child_descriptor>(
             this,
             HIPDNN_STATUS_INTERNAL_ERROR,
             "Failed to cast backend descriptor: Null descriptor provided.");
     }
 };
 
+namespace hipdnn_backend
+{
 struct hipdnnPrivateBackendDescriptor
 {
 private:
@@ -61,49 +66,10 @@ public:
         = 0;
 };
 
-struct Scoped_descriptor
-{
-    hipdnnBackendDescriptor_t descriptor = nullptr;
-    Scoped_descriptor() = default;
-    explicit Scoped_descriptor(hipdnnBackendDescriptor_t desc)
-        : descriptor(desc)
-    {
-    }
-    ~Scoped_descriptor()
-    {
-        delete descriptor;
-    }
-    Scoped_descriptor(const Scoped_descriptor&) = delete;
-    Scoped_descriptor& operator=(const Scoped_descriptor&) = delete;
-    Scoped_descriptor(Scoped_descriptor&& other) noexcept
-    {
-        descriptor = other.descriptor;
-        other.descriptor = nullptr;
-    }
-    Scoped_descriptor& operator=(Scoped_descriptor&& other) noexcept
-    {
-        if(this != &other)
-        {
-            delete descriptor;
-            descriptor = other.descriptor;
-            other.descriptor = nullptr;
-        }
-        return *this;
-    }
-    hipdnnBackendDescriptor_t get() const
-    {
-        return descriptor;
-    }
-    hipdnnBackendDescriptor_t* get_ptr()
-    {
-        return &descriptor;
-    }
-};
-
 // Unpacks a hipdnnBackendDescriptor into a shared_ptr of the specified type.
 // Throws an exception if the descriptor is null.
 template <typename Child_descriptor>
-static std::shared_ptr<Child_descriptor> unpack_descriptor(
+inline std::shared_ptr<Child_descriptor> unpack_descriptor(
     const hipdnnBackendDescriptor* descriptor, hipdnnStatus_t status, const std::string& message)
 {
     static_assert(std::is_base_of_v<hipdnnPrivateBackendDescriptor, Child_descriptor>,
@@ -122,7 +88,7 @@ static std::shared_ptr<Child_descriptor> unpack_descriptor(
 // The array of elements is expected to be a pointer to a hipdnnBackendDescriptor.
 // Throws an exception if the array of elements is null or if the descriptor cannot be unpacked.
 template <typename Child_descriptor>
-static std::shared_ptr<Child_descriptor> unpack_descriptor(const void* array_of_elements,
+inline std::shared_ptr<Child_descriptor> unpack_descriptor(const void* array_of_elements,
                                                            hipdnnStatus_t status,
                                                            const std::string& message)
 {
@@ -140,7 +106,7 @@ static std::shared_ptr<Child_descriptor> unpack_descriptor(const void* array_of_
 //       and it is the caller's responsibility to delete it.
 //       You can use Scoped_descriptor to manage the lifetime of the descriptor automatically.
 template <typename Child_descriptor>
-static hipdnnBackendDescriptor*
+inline hipdnnBackendDescriptor*
     pack_descriptor(const std::shared_ptr<const Child_descriptor>& private_descriptor)
 {
     static_assert(std::is_base_of_v<hipdnnPrivateBackendDescriptor, Child_descriptor>,
@@ -157,7 +123,7 @@ static hipdnnBackendDescriptor*
 //       and it is the caller's responsibility to delete it.
 //       You can use Scoped_descriptor to manage the lifetime of the descriptor automatically.
 template <typename Child_descriptor>
-static hipdnnBackendDescriptor*
+inline hipdnnBackendDescriptor*
     pack_descriptor(const std::shared_ptr<Child_descriptor>& private_descriptor)
 {
     static_assert(std::is_base_of_v<hipdnnPrivateBackendDescriptor, Child_descriptor>,
@@ -173,7 +139,7 @@ static hipdnnBackendDescriptor*
 // Note: Ownership of the descriptor is transferred to the public API caller.
 //       It is the caller's responsibility to delete it.
 template <typename Child_descriptor>
-static void pack_descriptor(const std::shared_ptr<const Child_descriptor>& private_descriptor,
+inline void pack_descriptor(const std::shared_ptr<const Child_descriptor>& private_descriptor,
                             void*& array_of_elements)
 {
     static_assert(std::is_base_of_v<hipdnnPrivateBackendDescriptor, Child_descriptor>,
@@ -181,5 +147,6 @@ static void pack_descriptor(const std::shared_ptr<const Child_descriptor>& priva
 
     *static_cast<hipdnnBackendDescriptor**>(array_of_elements)
         = pack_descriptor(private_descriptor);
+}
 }
 //NOLINTEND(readability-identifier-naming)

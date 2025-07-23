@@ -8,6 +8,7 @@
 #include "graph_descriptor.hpp"
 #include "hipdnn_backend_descriptor_type.h"
 #include "hipdnn_exception.hpp"
+#include "scoped_descriptor.hpp"
 
 namespace hipdnn_backend
 {

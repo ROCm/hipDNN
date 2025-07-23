@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 #include "descriptors/engine_config_descriptor.hpp"
+#include "descriptors/scoped_descriptor.hpp"
 #include "hipdnn_backend.h"
 #include "mocks/mock_descriptor.hpp"
 #include "test_descriptor_utils.hpp"
