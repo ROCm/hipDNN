@@ -20,7 +20,13 @@ class Reference_implementation_interface {
 public:
     virtual ~Reference_implementation_interface() = default;
     
-    virtual void execute(std::map<int64_t, Test_tensor>& tensors, const BatchnormInferenceAttributes& batchnorm_attributes, V epsilon) = 0;
+    virtual void execute(const Test_tensor& input,
+        const Test_tensor& scale,
+        const Test_tensor& bias,
+        const Test_tensor& estimatedMean,
+        const Test_tensor& estimatedVariance,
+        Test_tensor& output, 
+        V epsilon) = 0;
 };
 
 } // namespace reference_test_utilities

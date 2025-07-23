@@ -19,15 +19,14 @@ public:
     Cpu_fp_reference_implementation() = default;
     ~Cpu_fp_reference_implementation() override = default;
     
-    void execute(std::map<int64_t, Test_tensor>& tensors, const BatchnormInferenceAttributes& batchnorm_attributes, V epsilon) override
+    void execute(const Test_tensor& input,
+        const Test_tensor& scale,
+        const Test_tensor& bias,
+        const Test_tensor& estimatedMean,
+        const Test_tensor& estimatedVariance,
+        Test_tensor& output, 
+        V epsilon) override
     {
-        const Test_tensor& input  = tensors.at(batchnorm_attributes.x());
-        const Test_tensor& scale  = tensors.at(batchnorm_attributes.scale());
-        const Test_tensor& bias   = tensors.at(batchnorm_attributes.bias());
-        const Test_tensor& estimatedMean = tensors.at(batchnorm_attributes.mean().value());
-        const Test_tensor& estimatedVariance = tensors.at(batchnorm_attributes.inv_variance().value());
-        Test_tensor& output = tensors.at(batchnorm_attributes.y());
-
         if (input.dims().size() != 4)
         {
             throw std::runtime_error("Batchnorm inference requires a 4D tensor.");
