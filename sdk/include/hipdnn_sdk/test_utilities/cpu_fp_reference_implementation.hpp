@@ -65,8 +65,7 @@ private:
     template <typename TUV>
     TUV getValue(const Test_tensor& tensor, int64_t bidx, int64_t cidx, int64_t row, int64_t column) const
     {
-        const auto& strides = tensor.strides();
-        int64_t index = bidx * strides[0] + cidx * strides[1] + row * strides[2] + column * strides[3];
+        int64_t index = getIndex(tensor, bidx, cidx, row, column);
         const auto* data = tensor.memory().host_data<TUV>();
         return data[index];
     }
@@ -74,11 +73,16 @@ private:
     template <typename TUV>
     void setValue(Test_tensor& tensor, int64_t bidx, int64_t cidx, int64_t row, int64_t column, TUV value) const
     {
-        const auto& strides = tensor.strides();
-        int64_t index = bidx * strides[0] + cidx * strides[1] + row * strides[2] + column * strides[3];
+        int64_t index = getIndex(tensor, bidx, cidx, row, column);
         auto* data = tensor.memory().host_data<TUV>();
         data[index] = value;
     }
+
+    int64_t getIndex(const Test_tensor& tensor, int64_t bidx, int64_t cidx, int64_t row, int64_t column) const
+    {
+        const auto& strides = tensor.strides();
+        return bidx * strides[0] + cidx * strides[1] + row * strides[2] + column * strides[3];
+    }   
 };
 
 } // namespace reference_test_utilities
