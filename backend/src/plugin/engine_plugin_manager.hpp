@@ -12,8 +12,10 @@
 
 #include "hipdnn_backend.h"
 
-namespace hipdnn_sdk {
-namespace data_objects {
+namespace hipdnn_sdk
+{
+namespace data_objects
+{
 struct EngineDetails;
 }
 }
