@@ -25,7 +25,7 @@ add_executable(hipdnn_sdk_tests
 )
 
 target_compile_definitions(hipdnn_sdk_tests PRIVATE
-    COMPONENT_NAME="sdk_tests"
+    COMPONENT_NAME="hipdnn_sdk_tests"
 )
 
 target_compile_options(hipdnn_sdk_tests PRIVATE ${HIPDNN_WARNING_COMPILE_OPTIONS})
