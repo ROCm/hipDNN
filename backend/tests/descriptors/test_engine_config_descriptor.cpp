@@ -240,10 +240,8 @@ TEST_F(Engine_config_descriptor_test, GetEngineReturnsPointerIfFinalized)
     make_engine_config_finalized();
     auto engine_ptr = engine_config->get_engine();
     ASSERT_NE(engine_ptr, nullptr);
-    ASSERT_EQ(
-        static_cast<const hipdnnPrivateBackendDescriptor*>(engine_ptr.get()),
-        static_cast<const hipdnnPrivateBackendDescriptor*>(get_mock_engine())
-    );
+    ASSERT_EQ(static_cast<const hipdnnPrivateBackendDescriptor*>(engine_ptr.get()),
+              static_cast<const hipdnnPrivateBackendDescriptor*>(get_mock_engine()));
 }
 
 TEST_F(Engine_config_descriptor_test, GetEngineDescriptorMaxWorkspaceSize)

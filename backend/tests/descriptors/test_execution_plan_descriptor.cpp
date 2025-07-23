@@ -306,9 +306,7 @@ TEST_F(Execution_plan_descriptor_test, GetEngineConfigReturnsPointerIfFinalized)
     make_execution_plan_finalized();
     auto engine_config_ptr = plan->get_engine_config();
     ASSERT_NE(engine_config_ptr, nullptr);
-    ASSERT_EQ(
-        static_cast<const hipdnnPrivateBackendDescriptor*>(engine_config_ptr.get()),
-        static_cast<const hipdnnPrivateBackendDescriptor*>(get_mock_engine_config())
-    );
+    ASSERT_EQ(static_cast<const hipdnnPrivateBackendDescriptor*>(engine_config_ptr.get()),
+              static_cast<const hipdnnPrivateBackendDescriptor*>(get_mock_engine_config()));
 }
 // NOLINTEND(readability-function-cognitive-complexity)

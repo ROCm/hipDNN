@@ -1,10 +1,10 @@
 // Copyright © Advanced Micro Devices, Inc., or its affiliates.
 // SPDX-License-Identifier: MIT
 
-#include "descriptors/graph_descriptor.hpp"
 #include "descriptors/engine_config_descriptor.hpp"
 #include "descriptors/engine_descriptor.hpp"
 #include "descriptors/engine_heuristic_descriptor.hpp"
+#include "descriptors/graph_descriptor.hpp"
 #include "descriptors/scoped_descriptor.hpp"
 #include "hipdnn_backend.h"
 #include "hipdnn_exception.hpp"
@@ -491,8 +491,6 @@ TEST_F(Engine_heuristic_descriptor_test, GetGraphReturnsPointerIfFinalized)
     make_engine_heuristic_finalized();
     auto graph_ptr = heur->get_graph();
     ASSERT_NE(graph_ptr, nullptr);
-    ASSERT_EQ(
-        static_cast<const hipdnnPrivateBackendDescriptor*>(graph_ptr.get()),
-        static_cast<const hipdnnPrivateBackendDescriptor*>(get_mock_graph())
-    );
+    ASSERT_EQ(static_cast<const hipdnnPrivateBackendDescriptor*>(graph_ptr.get()),
+              static_cast<const hipdnnPrivateBackendDescriptor*>(get_mock_graph()));
 }

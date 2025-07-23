@@ -288,10 +288,8 @@ TEST_F(Engine_descriptor_test, GetGraphReturnsPointerIfFinalized)
     make_engine_finalized();
     auto graph_ptr = engine->get_graph();
     ASSERT_NE(graph_ptr, nullptr);
-    ASSERT_EQ(
-        static_cast<const hipdnnPrivateBackendDescriptor*>(graph_ptr.get()),
-        static_cast<const hipdnnPrivateBackendDescriptor*>(get_mock_graph())
-    );
+    ASSERT_EQ(static_cast<const hipdnnPrivateBackendDescriptor*>(graph_ptr.get()),
+              static_cast<const hipdnnPrivateBackendDescriptor*>(get_mock_graph()));
 }
 
 TEST_F(Engine_descriptor_test, GetEngineIdThrowsIfNotFinalized)
