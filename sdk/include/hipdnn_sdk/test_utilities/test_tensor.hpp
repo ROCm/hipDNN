@@ -63,6 +63,13 @@ public:
         return _memory;
     }
 
+    template<typename T>
+    void fill_with_value(T value)
+    {
+        T* data = _memory.host_data<T>();
+        std::fill(data, data + _memory.count(), value);
+    }
+
 private:
     static size_t calculateItemCount(const std::vector<int64_t>& dims)
     {
