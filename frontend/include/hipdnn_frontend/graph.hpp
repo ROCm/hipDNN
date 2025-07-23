@@ -18,6 +18,8 @@ namespace hipdnn_frontend
 {
 namespace graph
 {
+//I wonder if I should instead make this not take in an error message and instead, grab
+//the error message from the backend and use that.
 #define RETURN_ON_FAILURE(backend_status, error_message)                   \
     if((backend_status) != HIPDNN_STATUS_SUCCESS)                          \
     {                                                                      \
@@ -132,7 +134,7 @@ public:
         return validate_subtree();
     }
 
-    error_t build_operation_graph(hipdnnHandle_t handle = nullptr) //todo, remove nullptr default
+    error_t build_operation_graph(hipdnnHandle_t handle)
     {
         std::ignore = handle;
 
@@ -177,33 +179,34 @@ public:
         _graph_desc = std::make_unique<Hipdnn_backend_descriptor>(serialized_graph.data(),
                                                                   serialized_graph.size());
 
-        error_t status;
         if(!_graph_desc->valid())
         {
-            status = error_t(error_code_t::HIPDNN_BACKEND_ERROR,
-                             "Failed to create backend graph descriptor for the graph.");
+            return {error_code_t::HIPDNN_BACKEND_ERROR,
+                    "Failed to create backend graph descriptor for the graph."};
         }
 
-        auto backend_status = hipdnn_backend().backend_set_attribute(
-            _graph_desc->get(), HIPDNN_ATTR_OPERATIONGRAPH_HANDLE, HIPDNN_TYPE_HANDLE, 1, &handle);
-        if(backend_status != HIPDNN_STATUS_SUCCESS)
-        {
-            status
-                = error_t(error_code_t::HIPDNN_BACKEND_ERROR, "Failed to set handle on the graph.");
-        }
+        RETURN_ON_FAILURE(hipdnn_backend().backend_set_attribute(_graph_desc->get(),
+                                                                 HIPDNN_ATTR_OPERATIONGRAPH_HANDLE,
+                                                                 HIPDNN_TYPE_HANDLE,
+                                                                 1,
+                                                                 &handle),
+                          "Failed to set handle on the graph.");
 
-        backend_status = hipdnn_backend().backend_finalize(_graph_desc->get());
-        if(backend_status != HIPDNN_STATUS_SUCCESS)
-        {
-            status = error_t(error_code_t::HIPDNN_BACKEND_ERROR,
-                             "Failed to finalize backend descriptor for the graph.");
-        }
+        RETURN_ON_FAILURE(hipdnn_backend().backend_finalize(_graph_desc->get()),
+                          "Failed to finalize backend descriptor for the graph");
 
-        return status;
+        return {error_code_t::OK, ""};
     }
 
     error_t create_execution_plans(hipdnnHandle_t handle, std::vector<HeurMode_t> const& mode)
     {
+        if(!_graph_desc || !_graph_desc->valid())
+        {
+            return {error_code_t::HIPDNN_BACKEND_ERROR,
+                    "Graph has not been built, build the operation graph first. Cannot create "
+                    "execution plan."};
+        }
+
         error_t status = initialize_heuristic_descriptor(mode);
         if(status.code != error_code_t::OK)
         {
@@ -218,6 +221,12 @@ public:
 
         _execution_plan_desc
             = std::make_unique<Hipdnn_backend_descriptor>(HIPDNN_BACKEND_EXECUTION_PLAN_DESCRIPTOR);
+
+        if(!_execution_plan_desc->valid())
+        {
+            return {error_code_t::HIPDNN_BACKEND_ERROR,
+                    "Failed to create backend execution descriptor."};
+        }
 
         RETURN_ON_FAILURE(hipdnn_backend().backend_set_attribute(_execution_plan_desc->get(),
                                                                  HIPDNN_ATTR_EXECUTION_PLAN_HANDLE,

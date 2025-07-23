@@ -293,7 +293,7 @@ void create_and_populate_batchnorm_node(Graph& graph)
     [[maybe_unused]] auto y = graph.batchnorm_inference(x, mean, inv_variance, scale, bias, attrs);
 
     // Build the operation graph
-    auto build_result = graph.build_operation_graph();
+    auto build_result = graph.build_operation_graph(nullptr); //todo, fix
     EXPECT_TRUE(build_result.is_good()) << build_result.get_message();
 }
 
