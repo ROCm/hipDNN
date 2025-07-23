@@ -15,7 +15,7 @@ class Cpu_fp_reference_validation : public Reference_validation_interface<T> {
 public:
     
     Cpu_fp_reference_validation() = default;
-    Cpu_fp_reference_validation(double absolute_tolerance, double relative_tolerance)
+    Cpu_fp_reference_validation(T absolute_tolerance, T relative_tolerance)
         : _absolute_tolerance(absolute_tolerance), _relative_tolerance(relative_tolerance)
     {
         if (absolute_tolerance < 0 || relative_tolerance < 0) {

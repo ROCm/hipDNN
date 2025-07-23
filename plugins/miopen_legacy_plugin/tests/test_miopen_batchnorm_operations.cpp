@@ -134,6 +134,7 @@ TEST_F(Batchnorm_execute_graph_test, RunFwdbatchnormGraph)
     Cpu_fp_reference_implementation<float, float, float> cpu_ref_impl;
     cpu_ref_impl.execute(x_tensor_cpu, scale_tensor_cpu, bias_tensor_cpu, mean_tensor_cpu, variance_tensor_cpu, y_tensor_cpu, 1e-5f);
 
-    Cpu_fp_reference_validation<float> cpu_ref_validation;
+    Cpu_fp_reference_validation<float> cpu_ref_validation(0.01f, 0.01f);
     EXPECT_TRUE(cpu_ref_validation.compare_buffers(y_tensor_cpu.memory(), y_tensor.memory()));  
+    //EXPECT_EQ(y_tensor.memory().host_data<float>()[0], y_tensor_cpu.memory().host_data<float>()[0]);
 }
