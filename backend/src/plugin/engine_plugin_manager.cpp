@@ -6,11 +6,13 @@
 #include <vector>
 
 #include <hipdnn_sdk/data_objects/engine_config_generated.h>
+#include <hipdnn_sdk/data_objects/engine_details_generated.h>
 
 #include "descriptors/engine_config_descriptor.hpp"
 #include "descriptors/engine_descriptor.hpp"
 #include "descriptors/engine_heuristic_descriptor.hpp"
 #include "descriptors/execution_plan_descriptor.hpp"
+#include "descriptors/graph_descriptor.hpp"
 #include "engine_plugin.hpp"
 #include "engine_plugin_manager.hpp"
 #include "hipdnn_exception.hpp"
@@ -560,6 +562,18 @@ Engine_execution_context_wrapper&
         other._execution_context = nullptr;
     }
     return *this;
+}
+
+hipdnnEnginePluginExecutionContext_t Engine_execution_context_wrapper::get() const
+{
+    if(_execution_context == nullptr)
+    {
+        throw Hipdnn_exception(HIPDNN_STATUS_INTERNAL_ERROR,
+                               "Wrong Engine_execution_context_wrapper usage: "
+                               "get() called on an empty object");
+    }
+
+    return _execution_context;
 }
 
 } // namespace plugin

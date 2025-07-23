@@ -8,13 +8,21 @@
 #include <unordered_map>
 
 #include <hip/hip_runtime.h>
-#include <hipdnn_sdk/data_objects/engine_details_generated.h>
 #include <hipdnn_sdk/plugin/plugin_api_data_types.h>
 
-#include "descriptors/graph_descriptor.hpp"
+#include "hipdnn_backend.h"
+
+namespace hipdnn_sdk {
+namespace data_objects {
+struct EngineDetails;
+}
+}
 
 namespace hipdnn_backend
 {
+
+class Graph_descriptor;
+
 namespace plugin
 {
 
