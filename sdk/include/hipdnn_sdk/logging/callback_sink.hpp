@@ -33,6 +33,9 @@ inline hipdnnSeverity_t spdlog_to_hipdnn_severity(spdlog::level::level_enum leve
     }
 }
 
+// This warning is for cross-compiler compatibility, so it's safe to ignore since we only use Clang.
+// Moreover, MSVC is likely the incompatible compiler here.
+// NOLINTBEGIN(portability-template-virtual-member-function)
 template <typename Mutex>
 class Callback_sink final : public spdlog::sinks::base_sink<Mutex>
 {
@@ -41,6 +44,7 @@ public:
         : _callback_fn{callback}
     {
     }
+    ~Callback_sink() override = default;
 
 protected:
     void sink_it_(const spdlog::details::log_msg& msg) override
@@ -70,6 +74,7 @@ protected:
 private:
     hipdnnCallback_t _callback_fn;
 };
+// NOLINTEND(portability-template-virtual-member-function)
 
 using callback_sink_mt = Callback_sink<std::mutex>;
 
