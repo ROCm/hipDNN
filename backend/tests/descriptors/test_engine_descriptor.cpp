@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 #include "descriptors/engine_descriptor.hpp"
+#include "descriptors/graph_descriptor.hpp"
 #include "descriptors/scoped_descriptor.hpp"
 #include "hipdnn_backend.h"
 #include "hipdnn_exception.hpp"
@@ -273,4 +274,36 @@ TEST_F(Engine_descriptor_test, GetEngineDescriptorGlobalId)
     ASSERT_NO_THROW(engine->get_attribute(
         HIPDNN_ATTR_ENGINE_GLOBAL_INDEX, HIPDNN_TYPE_INT64, 1, &count, &gidx));
     ASSERT_EQ(count, 1);
+}
+
+TEST_F(Engine_descriptor_test, GetGraphThrowsIfNotFinalized)
+{
+    auto engine = get_engine_descriptor();
+    ASSERT_THROW_HIPDNN_STATUS(engine->get_graph(), HIPDNN_STATUS_INTERNAL_ERROR);
+}
+
+TEST_F(Engine_descriptor_test, GetGraphReturnsPointerIfFinalized)
+{
+    auto engine = get_engine_descriptor();
+    make_engine_finalized();
+    auto graph_ptr = engine->get_graph();
+    ASSERT_NE(graph_ptr, nullptr);
+    ASSERT_EQ(
+        static_cast<const hipdnnPrivateBackendDescriptor*>(graph_ptr.get()),
+        static_cast<const hipdnnPrivateBackendDescriptor*>(get_mock_graph())
+    );
+}
+
+TEST_F(Engine_descriptor_test, GetEngineIdThrowsIfNotFinalized)
+{
+    auto engine = get_engine_descriptor();
+    ASSERT_THROW_HIPDNN_STATUS(engine->get_engine_id(), HIPDNN_STATUS_INTERNAL_ERROR);
+}
+
+TEST_F(Engine_descriptor_test, GetEngineIdReturnsValueIfFinalized)
+{
+    auto engine = get_engine_descriptor();
+    make_engine_finalized();
+    auto engine_id = engine->get_engine_id();
+    ASSERT_EQ(engine_id, 0);
 }

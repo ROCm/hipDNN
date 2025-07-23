@@ -205,7 +205,7 @@ void Engine_descriptor::set_global_id(hipdnnBackendAttributeType_t attribute_typ
 std::shared_ptr<const Graph_descriptor> Engine_descriptor::get_graph() const
 {
     THROW_IF_FALSE(is_finalized(),
-                   HIPDNN_STATUS_NOT_INITIALIZED,
+                   HIPDNN_STATUS_INTERNAL_ERROR,
                    "Engine_descriptor::get_graph() failed: Not finalized.");
 
     return _graph;
@@ -214,7 +214,7 @@ std::shared_ptr<const Graph_descriptor> Engine_descriptor::get_graph() const
 int64_t Engine_descriptor::get_engine_id() const
 {
     THROW_IF_FALSE(is_finalized(),
-                   HIPDNN_STATUS_NOT_INITIALIZED,
+                   HIPDNN_STATUS_INTERNAL_ERROR,
                    "Engine_descriptor::get_engine_id() failed: Not finalized.");
 
     return _engine_id;

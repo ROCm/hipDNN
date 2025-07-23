@@ -1,6 +1,7 @@
 // Copyright © Advanced Micro Devices, Inc., or its affiliates.
 // SPDX-License-Identifier: MIT
 
+#include "descriptors/engine_config_descriptor.hpp"
 #include "descriptors/execution_plan_descriptor.hpp"
 #include "descriptors/scoped_descriptor.hpp"
 #include "hipdnn_backend.h"
@@ -291,5 +292,23 @@ TEST_F(Execution_plan_descriptor_test, GetExecutionPlanDescriptorUnsupportedAttr
                                                    &count,
                                                    dummy_buffer.data()),
                                HIPDNN_STATUS_NOT_SUPPORTED);
+}
+
+TEST_F(Execution_plan_descriptor_test, GetEngineConfigThrowsIfNotFinalized)
+{
+    auto plan = get_execution_plan_descriptor();
+    ASSERT_THROW_HIPDNN_STATUS(plan->get_engine_config(), HIPDNN_STATUS_INTERNAL_ERROR);
+}
+
+TEST_F(Execution_plan_descriptor_test, GetEngineConfigReturnsPointerIfFinalized)
+{
+    auto plan = get_execution_plan_descriptor();
+    make_execution_plan_finalized();
+    auto engine_config_ptr = plan->get_engine_config();
+    ASSERT_NE(engine_config_ptr, nullptr);
+    ASSERT_EQ(
+        static_cast<const hipdnnPrivateBackendDescriptor*>(engine_config_ptr.get()),
+        static_cast<const hipdnnPrivateBackendDescriptor*>(get_mock_engine_config())
+    );
 }
 // NOLINTEND(readability-function-cognitive-complexity)

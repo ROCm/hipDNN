@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 #include "descriptors/engine_config_descriptor.hpp"
+#include "descriptors/engine_descriptor.hpp"
 #include "descriptors/scoped_descriptor.hpp"
 #include "hipdnn_backend.h"
 #include "mocks/mock_descriptor.hpp"
@@ -225,6 +226,24 @@ TEST_F(Engine_config_descriptor_test, GetEngineConfigDescriptorEngine)
                                                  &count,
                                                  engine_2.get_ptr()));
     ASSERT_EQ(count, 1);
+}
+
+TEST_F(Engine_config_descriptor_test, GetEngineThrowsIfNotFinalized)
+{
+    auto engine_config = get_engine_config_descriptor();
+    ASSERT_THROW_HIPDNN_STATUS(engine_config->get_engine(), HIPDNN_STATUS_INTERNAL_ERROR);
+}
+
+TEST_F(Engine_config_descriptor_test, GetEngineReturnsPointerIfFinalized)
+{
+    auto engine_config = get_engine_config_descriptor();
+    make_engine_config_finalized();
+    auto engine_ptr = engine_config->get_engine();
+    ASSERT_NE(engine_ptr, nullptr);
+    ASSERT_EQ(
+        static_cast<const hipdnnPrivateBackendDescriptor*>(engine_ptr.get()),
+        static_cast<const hipdnnPrivateBackendDescriptor*>(get_mock_engine())
+    );
 }
 
 TEST_F(Engine_config_descriptor_test, GetEngineDescriptorMaxWorkspaceSize)
