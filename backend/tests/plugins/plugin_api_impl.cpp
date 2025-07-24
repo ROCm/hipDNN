@@ -5,7 +5,8 @@
 // It contains the API functions for the test plugin.
 
 #include <hipdnn_sdk/plugin/plugin_api.h>
-#include <hipdnn_sdk/plugin/plugin_last_error_manager.hpp>
+#include <hipdnn_sdk/plugin/plugin_exception.hpp>
+#include <hipdnn_sdk/plugin/plugin_helpers.hpp>
 
 #include "plugin_api_impl.hpp"
 
@@ -15,39 +16,36 @@ using namespace hipdnn_plugin;
 thread_local char Plugin_last_error_manager::last_error[HIPDNN_PLUGIN_ERROR_STRING_MAX_LENGTH] = "";
 static hipdnnCallback_t logging_callback = nullptr;
 
+#ifdef THROW_IF_NULL
+#error "THROW_IF_NULL is already defined"
+#endif
+#define THROW_IF_NULL(value) \
+    PLUGIN_THROW_IF_NULL(value, HIPDNN_PLUGIN_STATUS_BAD_PARAM, #value " is null")
+
 // Exported functions:
 
 extern "C" hipdnnPluginStatus_t hipdnnPluginGetName(const char** name)
 {
-    if(name == nullptr)
-    {
-        return Plugin_last_error_manager::set_last_error(HIPDNN_PLUGIN_STATUS_BAD_PARAM,
-                                                         "hipdnnPluginGetName: name is null");
-    }
-    *name = PLUGIN_NAME;
-    return HIPDNN_PLUGIN_STATUS_SUCCESS;
+    return hipdnn_plugin::try_catch([&]() {
+        THROW_IF_NULL(name);
+        *name = PLUGIN_NAME;
+    });
 }
 
 extern "C" hipdnnPluginStatus_t hipdnnPluginGetVersion(const char** version)
 {
-    if(version == nullptr)
-    {
-        return Plugin_last_error_manager::set_last_error(HIPDNN_PLUGIN_STATUS_BAD_PARAM,
-                                                         "hipdnnPluginGetVersion: version is null");
-    }
-    *version = PLUGIN_VERSION;
-    return HIPDNN_PLUGIN_STATUS_SUCCESS;
+    return hipdnn_plugin::try_catch([&]() {
+        THROW_IF_NULL(version);
+        *version = PLUGIN_VERSION;
+    });
 }
 
 extern "C" hipdnnPluginStatus_t hipdnnPluginGetType(hipdnnPluginType_t* type)
 {
-    if(type == nullptr)
-    {
-        return Plugin_last_error_manager::set_last_error(HIPDNN_PLUGIN_STATUS_BAD_PARAM,
-                                                         "hipdnnPluginGetType: type is null");
-    }
-    *type = PLUGIN_TYPE;
-    return HIPDNN_PLUGIN_STATUS_SUCCESS;
+    return hipdnn_plugin::try_catch([&]() {
+        THROW_IF_NULL(type);
+        *type = PLUGIN_TYPE;
+    });
 }
 
 extern "C" hipdnnPluginStatus_t hipdnnPluginSetLoggingCallback(hipdnnCallback_t callback)

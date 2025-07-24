@@ -78,6 +78,12 @@ void Graph_descriptor::set_attribute(hipdnnBackendAttributeName_t attribute_name
             std::string("Graph_descriptor::set_attribute() is not supported for attribute ")
                 + hipdnn_backend::hipdnn_get_attribute_name_string(attribute_name) + ".");
     }
+
+    if(attribute_name != HIPDNN_ATTR_OPERATIONGRAPH_HANDLE)
+    {
+        // Clear the serialized graph when the graph is modified
+        _serialized_graph.clear();
+    }
 }
 
 void Graph_descriptor::deserialize_graph(const uint8_t* serialized_graph, size_t graph_byte_size)
@@ -89,7 +95,32 @@ void Graph_descriptor::deserialize_graph(const uint8_t* serialized_graph, size_t
                   HIPDNN_STATUS_BAD_PARAM,
                   "Graph_descriptor::deserialize_graph: graph_byte_size is 0");
 
+    // TODO: Consider lazy graph deserialization
     flatbuffer_utilities::convert_serialized_graph_to_graph(
         serialized_graph, graph_byte_size, _graph);
+
+    // Save the serialized graph for later use
+    _serialized_graph.assign(serialized_graph, serialized_graph + graph_byte_size);
 }
+
+const std::vector<uint8_t>& Graph_descriptor::get_serialized_graph()
+{
+    if(_serialized_graph.empty())
+    {
+        THROW_IF_NULL(_graph,
+                      HIPDNN_STATUS_INTERNAL_ERROR,
+                      "Graph_descriptor::get_serialized_graph: graph is null");
+
+        flatbuffers::FlatBufferBuilder builder;
+        builder.Finish(hipdnn_sdk::data_objects::Graph::Pack(builder, _graph.get()));
+
+        const uint8_t* serialized_graph = builder.GetBufferPointer();
+        size_t graph_byte_size = builder.GetSize();
+
+        _serialized_graph.assign(serialized_graph, serialized_graph + graph_byte_size);
+    }
+
+    return _serialized_graph;
 }
+
+} // namespace hipdnn_backend

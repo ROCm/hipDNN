@@ -25,6 +25,7 @@ add_executable(hipdnn_backend_tests
     descriptors/test_variant_pack.cpp
     main.cpp
     test_engine_plugin.cpp
+    test_engine_plugin_resource_manager.cpp
     test_error.cpp
     test_flatbuffer_utilities.cpp
     test_handle.cpp
