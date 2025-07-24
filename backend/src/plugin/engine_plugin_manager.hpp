@@ -29,7 +29,7 @@ namespace plugin
 {
 
 class Engine_plugin;
-class Root_engine_plugin_manager;
+class Engine_plugin_manager;
 class Engine_details_wrapper;
 class Engine_execution_context_wrapper;
 
@@ -41,7 +41,7 @@ public:
     static void set_plugin_paths(const std::vector<std::filesystem::path>& plugin_paths);
     static std::shared_ptr<Engine_plugin_handle_manager> create();
 
-    Engine_plugin_handle_manager(std::shared_ptr<Root_engine_plugin_manager>& root_pm);
+    Engine_plugin_handle_manager(std::shared_ptr<Engine_plugin_manager>& pm);
     ~Engine_plugin_handle_manager();
 
     // Prevent copying
@@ -102,7 +102,7 @@ private:
                           const hipdnnPluginDeviceBuffer_t* device_buffers,
                           uint32_t num_device_buffers) const;
 
-    std::shared_ptr<Root_engine_plugin_manager> _root_pm;
+    std::shared_ptr<Engine_plugin_manager> _pm;
     std::unordered_map<hipdnnEnginePluginHandle_t, const Engine_plugin*> _handle_to_plugin;
     mutable std::unordered_map<int64_t, hipdnnEnginePluginHandle_t> _engine_id_to_handle;
 

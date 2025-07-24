@@ -22,7 +22,7 @@ namespace hipdnn_backend
 namespace plugin
 {
 
-class Root_engine_plugin_manager : public Plugin_manager_base<Engine_plugin>
+class Engine_plugin_manager : public Plugin_manager_base<Engine_plugin>
 {
 };
 
@@ -31,7 +31,7 @@ namespace
 
 std::mutex plugin_mutex;
 std::vector<std::filesystem::path> override_plugin_paths;
-std::weak_ptr<Root_engine_plugin_manager> root_pm_ptr;
+std::weak_ptr<Engine_plugin_manager> pm_ptr;
 
 std::vector<std::filesystem::path> get_default_plugin_paths()
 {
@@ -58,32 +58,32 @@ void Engine_plugin_handle_manager::set_plugin_paths(const std::vector<std::files
 
 std::shared_ptr<Engine_plugin_handle_manager> Engine_plugin_handle_manager::create()
 {
-    auto root_pm = root_pm_ptr.lock();
+    auto pm = pm_ptr.lock();
 
-    if(!root_pm)
+    if(!pm)
     {
         std::lock_guard<std::mutex> lock(plugin_mutex);
 
-        root_pm = root_pm_ptr.lock();
+        pm = pm_ptr.lock();
 
-        if(!root_pm)
+        if(!pm)
         {
             auto paths = override_plugin_paths.empty() ? get_default_plugin_paths()
                                                        : override_plugin_paths;
-            root_pm = std::make_shared<Root_engine_plugin_manager>();
-            root_pm->load_plugins(paths);
-            root_pm_ptr = root_pm;
+            pm = std::make_shared<Engine_plugin_manager>();
+            pm->load_plugins(paths);
+            pm_ptr = pm;
         }
     }
 
-    return std::make_shared<Engine_plugin_handle_manager>(root_pm);
+    return std::make_shared<Engine_plugin_handle_manager>(pm);
 }
 
-Engine_plugin_handle_manager::Engine_plugin_handle_manager(std::shared_ptr<Root_engine_plugin_manager>& root_pm)
-    : _root_pm(root_pm)
+Engine_plugin_handle_manager::Engine_plugin_handle_manager(std::shared_ptr<Engine_plugin_manager>& pm)
+    : _pm(pm)
 {
     // Create plugin handles
-    const auto& plugins = _root_pm->get_plugins();
+    const auto& plugins = _pm->get_plugins();
     for(const auto& plugin : plugins)
     {
         auto handle = plugin.create_handle();
@@ -114,7 +114,7 @@ Engine_plugin_handle_manager::~Engine_plugin_handle_manager()
 }
 
 Engine_plugin_handle_manager::Engine_plugin_handle_manager(Engine_plugin_handle_manager&& other) noexcept
-    : _root_pm(std::move(other._root_pm))
+    : _pm(std::move(other._pm))
     , _handle_to_plugin(std::move(other._handle_to_plugin))
     , _engine_id_to_handle(std::move(other._engine_id_to_handle))
 {
@@ -124,7 +124,7 @@ Engine_plugin_handle_manager& Engine_plugin_handle_manager::operator=(Engine_plu
 {
     if(this != &other)
     {
-        _root_pm = std::move(other._root_pm);
+        _pm = std::move(other._pm);
         _handle_to_plugin = std::move(other._handle_to_plugin);
         _engine_id_to_handle = std::move(other._engine_id_to_handle);
     }
