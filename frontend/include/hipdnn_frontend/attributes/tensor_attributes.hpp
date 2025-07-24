@@ -171,8 +171,8 @@ public:
         pack_attributes(flatbuffers::FlatBufferBuilder& builder) const
     {
         auto result = std::visit(
-            [&](auto&& arg) -> std::pair<hipdnn_sdk::data_objects::TensorValue,
-                                         flatbuffers::Offset<void>> {
+            [&](auto&& arg)
+                -> std::pair<hipdnn_sdk::data_objects::TensorValue, flatbuffers::Offset<void>> {
                 using T = std::decay_t<decltype(arg)>;
                 if constexpr(std::is_same_v<T, float>)
                 {
@@ -211,17 +211,16 @@ public:
                 }
             },
             _value);
-    
-        return hipdnn_sdk::data_objects::CreateTensorAttributesDirect(
-            builder,
-            _uid,
-            _name.c_str(),
-            to_sdk_type(_data_type),
-            &_stride,
-            &_dim,
-            _is_virtual,
-            result.first,
-            result.second);
+
+        return hipdnn_sdk::data_objects::CreateTensorAttributesDirect(builder,
+                                                                      _uid,
+                                                                      _name.c_str(),
+                                                                      to_sdk_type(_data_type),
+                                                                      &_stride,
+                                                                      &_dim,
+                                                                      _is_virtual,
+                                                                      result.first,
+                                                                      result.second);
     }
 
 private:
