@@ -258,13 +258,13 @@ TEST(BatchnormNodeTests, GatherhipdnnTensorIds)
     std::unordered_set<int64_t> used_ids;
     node.gather_hipdnn_tensor_ids(used_ids);
 
-    EXPECT_TRUE(used_ids.find(1) != used_ids.end());
-    EXPECT_TRUE(used_ids.find(2) != used_ids.end());
-    EXPECT_TRUE(used_ids.find(3) != used_ids.end());
-    EXPECT_TRUE(used_ids.find(4) != used_ids.end());
-    EXPECT_TRUE(used_ids.find(5) != used_ids.end());
-    EXPECT_TRUE(used_ids.find(9) != used_ids.end());
-    EXPECT_TRUE(used_ids.find(10) != used_ids.end());
+    EXPECT_TRUE(used_ids.contains(1));
+    EXPECT_TRUE(used_ids.contains(2));
+    EXPECT_TRUE(used_ids.contains(3));
+    EXPECT_TRUE(used_ids.contains(4));
+    EXPECT_TRUE(used_ids.contains(5));
+    EXPECT_TRUE(used_ids.contains(9));
+    EXPECT_TRUE(used_ids.contains(10));
 }
 
 TEST(BatchnormNodeTests, PopulatehipdnnTensorIds)
