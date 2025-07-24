@@ -25,7 +25,7 @@ protected:
         _mock_backend = std::make_shared<Mock_hipdnn_backend>();
         _handle = reinterpret_cast<hipdnnHandle_t>(0x12345678);
 
-        set_mock_hipdnn_backend(_mock_backend);
+        fake_hipdnn_backend::set_mock_hipdnn_backend(_mock_backend);
     }
     void TearDown() override {}
 
@@ -966,14 +966,15 @@ TEST_F(Graph_test_fixture, WillCorrectlyBuildOperationGraphDescriptor)
             return HIPDNN_STATUS_SUCCESS;
         });
 
-    graph.build_operation_graph(_handle);
+    auto result = graph.build_operation_graph(_handle);
+    EXPECT_TRUE(result.is_good());
 }
 
 TEST_F(Graph_test_fixture, CreatingExecutionPlansFailsWithNoGraph)
 {
     Graph graph;
 
-    auto result = graph.create_execution_plans(_handle, {HeurMode_t::A});
+    auto result = graph.create_execution_plans(_handle, {HeurMode_t::FALLBACK});
     EXPECT_FALSE(result.is_good());
     EXPECT_EQ(result.get_message(),
               "Graph has not been built, build the operation graph first. Cannot create "
@@ -983,7 +984,7 @@ TEST_F(Graph_test_fixture, CreatingExecutionPlansFailsWithNoGraph)
 TEST_F(Graph_test_fixture, CanSuccessfullyCreateExecutionPlans)
 {
     Graph graph;
-    const std::vector<HeurMode_t> heurModes = {HeurMode_t::A};
+    const std::vector<HeurMode_t> heurModes = {HeurMode_t::FALLBACK};
     auto tensor_attributes = create_basic_batchnorm_graph(graph);
 
     hipdnnBackendDescriptor_t graph_desc = reinterpret_cast<hipdnnBackendDescriptor_t>(0x1234);
@@ -1086,7 +1087,8 @@ TEST_F(Graph_test_fixture, CanSuccessfullyCreateExecutionPlans)
             return HIPDNN_STATUS_SUCCESS;
         });
 
-    graph.create_execution_plans(_handle, heurModes);
+    auto exec_plan_result = graph.create_execution_plans(_handle, heurModes);
+    EXPECT_TRUE(exec_plan_result.is_good());
 }
 
 TEST_F(Graph_test_fixture, CheckSupportFailsIfNoExecutionPlanCreated)
@@ -1104,7 +1106,7 @@ TEST_F(Graph_test_fixture, CheckSupportFailsIfNoExecutionPlanCreated)
 TEST_F(Graph_test_fixture, CheckSupportSucceedsWhenExecutionPlanCreated)
 {
     Graph graph;
-    const std::vector<HeurMode_t> heur_modes = {HeurMode_t::A};
+    const std::vector<HeurMode_t> heur_modes = {HeurMode_t::FALLBACK};
     auto tensor_attributes = create_basic_batchnorm_graph(graph);
     graph.build_operation_graph(_handle);
 
@@ -1135,7 +1137,7 @@ TEST_F(Graph_test_fixture, CheckSupportSucceedsWhenExecutionPlanCreated)
 TEST_F(Graph_test_fixture, EngineConfigAndExecutionPlanAreFinalizedAfterBuildPlans)
 {
     Graph graph;
-    const std::vector<HeurMode_t> heur_modes = {HeurMode_t::A};
+    const std::vector<HeurMode_t> heur_modes = {HeurMode_t::FALLBACK};
     auto tensor_attributes = create_basic_batchnorm_graph(graph);
 
     ON_CALL(*_mock_backend, hipdnnBackendCreateAndDeserializeGraph_ext(_, _, _))
@@ -1206,7 +1208,7 @@ TEST_F(Graph_test_fixture, EngineConfigAndExecutionPlanAreFinalizedAfterBuildPla
 TEST_F(Graph_test_fixture, WorkspaceSizeIsRetrievedFromExecutionPlan)
 {
     Graph graph;
-    const std::vector<HeurMode_t> heur_modes = {HeurMode_t::A};
+    const std::vector<HeurMode_t> heur_modes = {HeurMode_t::FALLBACK};
     auto tensor_attributes = create_basic_batchnorm_graph(graph);
     graph.build_operation_graph(_handle);
 
@@ -1489,7 +1491,7 @@ TEST_F(Graph_test_fixture, ExecutePacksVariantPackAndPassesTheCorrectArguments)
     auto build_result = graph.build_operation_graph(_handle);
     EXPECT_TRUE(build_result.is_good());
 
-    std::vector<HeurMode_t> heur_modes = {HeurMode_t::A};
+    std::vector<HeurMode_t> heur_modes = {HeurMode_t::FALLBACK};
     auto plan_result = graph.create_execution_plans(_handle, heur_modes);
     EXPECT_TRUE(plan_result.is_good());
 

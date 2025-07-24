@@ -15,6 +15,9 @@
 
 // NOLINTBEGIN
 
+namespace fake_hipdnn_backend
+{
+
 // We store a weak pointer here so that every test that needs a Mock_hipdnn_backend has to
 // create its own copy of one.  Once a test finishes, its shared ptr should go out of scope
 // and invalidate the weak pointer.  Not doing this could end up having a mock set here that
@@ -42,48 +45,51 @@ void set_mock_hipdnn_backend(std::weak_ptr<Mock_hipdnn_backend> backend)
 
     mock_hipdnn_backend = std::move(backend);
 }
+}
 
 hipdnnStatus_t hipdnnCreate(hipdnnHandle_t* handle)
 {
-    return backend()->hipdnnCreate(handle);
+    return fake_hipdnn_backend::backend()->hipdnnCreate(handle);
 }
 
 hipdnnStatus_t hipdnnDestroy(hipdnnHandle_t handle)
 {
-    return backend()->hipdnnDestroy(handle);
+    return fake_hipdnn_backend::backend()->hipdnnDestroy(handle);
 }
 
 hipdnnStatus_t hipdnnSetStream(hipdnnHandle_t handle, hipStream_t streamId)
 {
-    return backend()->hipdnnSetStream(handle, streamId);
+    return fake_hipdnn_backend::backend()->hipdnnSetStream(handle, streamId);
 }
 
 hipdnnStatus_t hipdnnGetStream(hipdnnHandle_t handle, hipStream_t* streamId)
 {
-    return backend()->hipdnnGetStream(handle, streamId);
+    return fake_hipdnn_backend::backend()->hipdnnGetStream(handle, streamId);
 }
 
 hipdnnStatus_t hipdnnBackendCreateDescriptor(hipdnnBackendDescriptorType_t descriptor_type,
                                              hipdnnBackendDescriptor_t* descriptor)
 {
-    return backend()->hipdnnBackendCreateDescriptor(descriptor_type, descriptor);
+    return fake_hipdnn_backend::backend()->hipdnnBackendCreateDescriptor(descriptor_type,
+                                                                         descriptor);
 }
 
 hipdnnStatus_t hipdnnBackendDestroyDescriptor(hipdnnBackendDescriptor_t descriptor)
 {
-    return backend()->hipdnnBackendDestroyDescriptor(descriptor);
+    return fake_hipdnn_backend::backend()->hipdnnBackendDestroyDescriptor(descriptor);
 }
 
 hipdnnStatus_t hipdnnBackendExecute(hipdnnHandle_t handle,
                                     hipdnnBackendDescriptor_t execution_plan,
                                     hipdnnBackendDescriptor_t variant_pack)
 {
-    return backend()->hipdnnBackendExecute(handle, execution_plan, variant_pack);
+    return fake_hipdnn_backend::backend()->hipdnnBackendExecute(
+        handle, execution_plan, variant_pack);
 }
 
 hipdnnStatus_t hipdnnBackendFinalize(hipdnnBackendDescriptor_t descriptor)
 {
-    return backend()->hipdnnBackendFinalize(descriptor);
+    return fake_hipdnn_backend::backend()->hipdnnBackendFinalize(descriptor);
 }
 
 hipdnnStatus_t hipdnnBackendGetAttribute(hipdnnBackendDescriptor_t descriptor,
@@ -93,12 +99,12 @@ hipdnnStatus_t hipdnnBackendGetAttribute(hipdnnBackendDescriptor_t descriptor,
                                          int64_t* element_count,
                                          void* array_of_elements)
 {
-    return backend()->hipdnnBackendGetAttribute(descriptor,
-                                                attribute_name,
-                                                attribute_type,
-                                                requested_element_count,
-                                                element_count,
-                                                array_of_elements);
+    return fake_hipdnn_backend::backend()->hipdnnBackendGetAttribute(descriptor,
+                                                                     attribute_name,
+                                                                     attribute_type,
+                                                                     requested_element_count,
+                                                                     element_count,
+                                                                     array_of_elements);
 }
 
 hipdnnStatus_t hipdnnBackendSetAttribute(hipdnnBackendDescriptor_t descriptor,
@@ -107,25 +113,25 @@ hipdnnStatus_t hipdnnBackendSetAttribute(hipdnnBackendDescriptor_t descriptor,
                                          int64_t element_count,
                                          const void* array_of_elements)
 {
-    return backend()->hipdnnBackendSetAttribute(
+    return fake_hipdnn_backend::backend()->hipdnnBackendSetAttribute(
         descriptor, attribute_name, attribute_type, element_count, array_of_elements);
 }
 
 const char* hipdnnGetErrorString(hipdnnStatus_t status)
 {
-    return backend()->hipdnnGetErrorString(status);
+    return fake_hipdnn_backend::backend()->hipdnnGetErrorString(status);
 }
 
 void hipdnnGetLastErrorString(char* message, size_t max_size)
 {
-    backend()->hipdnnGetLastErrorString(message, max_size);
+    fake_hipdnn_backend::backend()->hipdnnGetLastErrorString(message, max_size);
 }
 
 hipdnnStatus_t hipdnnBackendCreateAndDeserializeGraph_ext(hipdnnBackendDescriptor_t* descriptor,
                                                           const uint8_t* serialized_graph,
                                                           size_t graph_byte_size)
 {
-    return backend()->hipdnnBackendCreateAndDeserializeGraph_ext(
+    return fake_hipdnn_backend::backend()->hipdnnBackendCreateAndDeserializeGraph_ext(
         descriptor, serialized_graph, graph_byte_size);
 }
 

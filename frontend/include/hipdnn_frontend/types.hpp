@@ -24,8 +24,6 @@ enum class DataType_t
 
 enum class HeurMode_t
 {
-    A,
-    B,
     FALLBACK,
 };
 
