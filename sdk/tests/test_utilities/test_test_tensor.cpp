@@ -10,7 +10,7 @@ using namespace hipdnn_sdk::utilities;
 
 TEST(TestTensor, BasicRowMajorUsage)
 {
-    Test_tensor tensor = Test_tensor::make_test_tensor<float>({1,2,3,4});
+    Test_tensor tensor = Test_tensor::make_test_tensor<float>({1, 2, 3, 4});
 
     EXPECT_EQ(tensor.memory().count(), 24);
     EXPECT_EQ(tensor.strides()[0], 24);
@@ -21,11 +21,38 @@ TEST(TestTensor, BasicRowMajorUsage)
 
 TEST(TestTensor, BasicColumnMajorUsage)
 {
-    Test_tensor tensor = Test_tensor::make_test_tensor<float>({1,2,3,4}, false);
+    Test_tensor tensor = Test_tensor::make_test_tensor<float>({1, 2, 3, 4}, false);
 
     EXPECT_EQ(tensor.memory().count(), 24);
     EXPECT_EQ(tensor.strides()[0], 1);
     EXPECT_EQ(tensor.strides()[1], 1);
     EXPECT_EQ(tensor.strides()[2], 2);
     EXPECT_EQ(tensor.strides()[3], 6);
+}
+
+TEST(TestTensor, FillWithValuesUsage)
+{
+    Test_tensor tensor = Test_tensor::make_test_tensor<float>({1, 2, 3, 4}, false);
+
+    tensor.fill_with_value(1.0f);
+    float* buffer = tensor.memory().host_data<float>();
+
+    for(size_t i = 0; i < tensor.memory().count(); i++)
+    {
+        EXPECT_FLOAT_EQ(1.0f, buffer[i]);
+    }
+}
+
+TEST(TestTensor, FillWithRandomValuesUsage)
+{
+    Test_tensor tensor = Test_tensor::make_test_tensor<float>({1, 2, 3, 4}, false);
+
+    tensor.fill_with_random_values(1.0f, 3.0f);
+    float* buffer = tensor.memory().host_data<float>();
+
+    for(size_t i = 0; i < tensor.memory().count(); i++)
+    {
+        EXPECT_GE(buffer[i], 1.0f);
+        EXPECT_LE(buffer[i], 3.0f);
+    }
 }

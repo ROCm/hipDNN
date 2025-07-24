@@ -6,6 +6,7 @@
 #include <hipdnn_sdk/utilities/migratable_memory.hpp>
 #include <numeric>
 #include <vector>
+#include <random>
 
 namespace hipdnn_sdk {
 namespace reference_test_utilities {
@@ -68,6 +69,18 @@ public:
     {
         T* data = _memory.host_data<T>();
         std::fill(data, data + _memory.count(), value);
+    }
+
+    template<typename T>
+    void fill_with_random_values(T min, T max, unsigned int seed = 0)
+    {
+        std::mt19937 generator(seed);
+        std::uniform_real_distribution<T> distribution(min, max);
+
+        T* data = _memory.host_data<T>();
+        for (size_t i = 0; i < _memory.count(); ++i) {
+            data[i] = distribution(generator);
+        }
     }
 
 private:

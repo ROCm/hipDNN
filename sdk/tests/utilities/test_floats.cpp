@@ -45,4 +45,3 @@ TEST(TestBFloat16, Max)
     EXPECT_EQ(std::max(a, b), 2.0_bf);
     EXPECT_EQ(std::max(b, a), 2.0_bf);
 }
-

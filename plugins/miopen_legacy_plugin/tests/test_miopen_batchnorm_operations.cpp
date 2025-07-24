@@ -6,12 +6,12 @@
 
 #include <hipdnn_sdk/plugin/engine_plugin_api.h>
 #include <hipdnn_sdk/plugin/plugin_api_data_types.h>
-#include <hipdnn_sdk/test_utilities/flatbuffer_graph_test_utils.hpp>
-#include <hipdnn_sdk/test_utilities/test_utilities.hpp>
-#include <hipdnn_sdk/utilities/gpu_memory.hpp>
-#include <hipdnn_sdk/test_utilities/test_tensor.hpp>
 #include <hipdnn_sdk/test_utilities/cpu_fp_reference_implementation.hpp>
 #include <hipdnn_sdk/test_utilities/cpu_fp_reference_validation.hpp>
+#include <hipdnn_sdk/test_utilities/flatbuffer_graph_test_utils.hpp>
+#include <hipdnn_sdk/test_utilities/test_tensor.hpp>
+#include <hipdnn_sdk/test_utilities/test_utilities.hpp>
+#include <hipdnn_sdk/utilities/gpu_memory.hpp>
 
 #include "hipdnn_engine_plugin_execution_context.hpp"
 #include "hipdnn_engine_plugin_handle.hpp"
@@ -19,7 +19,25 @@
 using namespace hipdnn::sdk::utilities;
 using namespace hipdnn_sdk::reference_test_utilities;
 
-class Batchnorm_execute_graph_test : public ::testing::Test
+struct Bn_2d_test_case
+{
+    int64_t n;
+    int64_t c;
+    int64_t h;
+    int64_t w;
+
+    friend std::ostream& operator<<(std::ostream& ss, const Bn_2d_test_case& tc)
+    {
+        return ss << "(n: " << tc.n << " c:" << tc.c << " h:" << tc.h << " w:" << tc.w << ")";
+    }
+
+    std::vector<int64_t> get_dims() const
+    {
+        return {n, c, h, w};
+    }
+};
+
+class Batchnorm_execute_graph_test : public ::testing::TestWithParam<Bn_2d_test_case>
 {
 protected:
     void SetUp() override
@@ -40,58 +58,76 @@ protected:
     hipdnnEnginePluginHandle_t _handle = nullptr;
 };
 
-TEST_F(Batchnorm_execute_graph_test, RunFwdbatchnormGraph)
+std::vector<Bn_2d_test_case> get_bn_fwd_inference_test_cases()
 {
-    std::vector<int64_t> dims = {1, 3, 224, 224};
+    return {
+        {.n = 1, .c = 3, .h = 14, .w = 14},
+        {.n = 2, .c = 3, .h = 14, .w = 14},
+        {.n = 64, .c = 3, .h = 14, .w = 14},
+        {.n = 64, .c = 256, .h = 14, .w = 14},
+        {.n = 64, .c = 256, .h = 28, .w = 28},
+        {.n = 64, .c = 256, .h = 56, .w = 56},
+        {.n = 64, .c = 512, .h = 14, .w = 14},
+        {.n = 64, .c = 512, .h = 28, .w = 28},
+        {.n = 64, .c = 512, .h = 7, .w = 7},
+        {.n = 64, .c = 64, .h = 112, .w = 112},
+        {.n = 64, .c = 64, .h = 56, .w = 56},
+    };
+}
+
+template <typename T>
+hipdnnPluginDeviceBuffer_t
+    generate_random_device_buffer(Test_tensor& tensor, int uid, T min, T max, unsigned int seed = 0)
+{
+    tensor.fill_with_random_values<T>(min, max, seed);
+    hipdnnPluginDeviceBuffer_t buffer;
+    buffer.uid = uid;
+    buffer.ptr = tensor.memory().device_data<T>();
+    return buffer;
+}
+
+template <typename T>
+hipdnnPluginDeviceBuffer_t generate_static_device_buffer(Test_tensor& tensor, int uid, T value)
+{
+    tensor.fill_with_value<T>(value);
+    hipdnnPluginDeviceBuffer_t buffer;
+    buffer.uid = uid;
+    buffer.ptr = tensor.memory().device_data<T>();
+    return buffer;
+}
+
+TEST_P(Batchnorm_execute_graph_test, RunFwdbatchnormGraph)
+{
+    Bn_2d_test_case test_case = GetParam();
+
+    std::vector<int64_t> dims = {test_case.n, test_case.c, test_case.h, test_case.w};
+
+    // Based on miopen::DeriveBNTensorDescriptor(), the strides for the derived tensors are
+    // {1, C, 1, 1} for mean, variance, scale, and bias tensors.
+    std::vector<int64_t> derived_dims = {1, dims[1], 1, 1};
 
     std::vector<hipdnnPluginDeviceBuffer_t> device_buffers;
 
     Test_tensor x_tensor = Test_tensor::make_test_tensor<float>(dims);
-    x_tensor.fill_with_value(1.0f); // Fill with a constant value for testing
-    auto batchnorm_builder = flatbuffer_test_utils::create_valid_batchnorm_graph(x_tensor.strides(), x_tensor.dims());
-
-    hipdnnPluginDeviceBuffer_t x_buffer;
-    x_buffer.uid = 1;
-    x_buffer.ptr = x_tensor.memory().device_data<float>();
-    device_buffers.push_back(x_buffer);
+    device_buffers.push_back(generate_random_device_buffer(x_tensor, 1, 0.0f, 1.0f));
 
     Test_tensor y_tensor = Test_tensor::make_test_tensor<float>(dims);
-    y_tensor.fill_with_value(0.0f); // Initialize output tensor with zeros
-    hipdnnPluginDeviceBuffer_t y_buffer;
-    y_buffer.uid = 2;
-    y_buffer.ptr = y_tensor.memory().device_data<float>();
-    device_buffers.push_back(y_buffer);
+    device_buffers.push_back(generate_static_device_buffer(y_tensor, 2, 0.0f));
 
-    // Based on miopen::DeriveBNTensorDescriptor(), the strides for the derived tensors are
-    // {1, C, 1, 1} for mean, variance, scale, and bias tensors.
+    Test_tensor scale_tensor = Test_tensor::make_test_tensor<float>(derived_dims);
+    device_buffers.push_back(generate_random_device_buffer(scale_tensor, 3, 0.0f, 1.0f));
 
-    Test_tensor scale_tensor = Test_tensor::make_test_tensor<float>({1, dims[1], 1, 1});
-    scale_tensor.fill_with_value(1.0f); 
-    hipdnnPluginDeviceBuffer_t scale_buffer;
-    scale_buffer.uid = 3;
-    scale_buffer.ptr = scale_tensor.memory().device_data<float>();
-    device_buffers.push_back(scale_buffer);
+    Test_tensor bias_tensor = Test_tensor::make_test_tensor<float>(derived_dims);
+    device_buffers.push_back(generate_random_device_buffer(bias_tensor, 4, 0.0f, 0.1f));
 
-    Test_tensor bias_tensor = Test_tensor::make_test_tensor<float>({1, dims[1], 1, 1});
-    bias_tensor.fill_with_value(0.1f);
-    hipdnnPluginDeviceBuffer_t bias_buffer;
-    bias_buffer.uid = 4;
-    bias_buffer.ptr = bias_tensor.memory().device_data<float>();
-    device_buffers.push_back(bias_buffer);
+    Test_tensor mean_tensor = Test_tensor::make_test_tensor<float>(derived_dims);
+    device_buffers.push_back(generate_random_device_buffer(mean_tensor, 5, 0.0f, 0.5f));
 
-    Test_tensor mean_tensor = Test_tensor::make_test_tensor<float>({1, dims[1], 1, 1});
-    mean_tensor.fill_with_value(0.5f); 
-    hipdnnPluginDeviceBuffer_t mean_buffer;
-    mean_buffer.uid = 5;
-    mean_buffer.ptr = mean_tensor.memory().device_data<float>();
-    device_buffers.push_back(mean_buffer);
+    Test_tensor variance_tensor = Test_tensor::make_test_tensor<float>(derived_dims);
+    device_buffers.push_back(generate_random_device_buffer(variance_tensor, 6, 0.1f, 0.3f));
 
-    Test_tensor variance_tensor = Test_tensor::make_test_tensor<float>({1, dims[1], 1, 1});
-    variance_tensor.fill_with_value(0.1f);
-    hipdnnPluginDeviceBuffer_t variance_buffer;
-    variance_buffer.uid = 6;
-    variance_buffer.ptr = variance_tensor.memory().device_data<float>();
-    device_buffers.push_back(variance_buffer);
+    auto batchnorm_builder
+        = flatbuffer_test_utils::create_valid_batchnorm_graph(x_tensor.strides(), x_tensor.dims());
 
     hipdnnPluginConstData_t op_graph;
     op_graph.ptr = batchnorm_builder.GetBufferPointer();
@@ -119,22 +155,31 @@ TEST_F(Batchnorm_execute_graph_test, RunFwdbatchnormGraph)
     hipdnnEnginePluginDestroyExecutionContext(_handle, execution_context);
 
     Test_tensor x_tensor_cpu = Test_tensor::make_test_tensor<float>(dims);
-    x_tensor_cpu.fill_with_value(1.0f);
+    x_tensor_cpu.fill_with_random_values(0.0f, 1.0f);
     Test_tensor y_tensor_cpu = Test_tensor::make_test_tensor<float>(dims);
     y_tensor_cpu.fill_with_value(0.0f);
-    Test_tensor scale_tensor_cpu = Test_tensor::make_test_tensor<float>({1, dims[1], 1, 1});
-    scale_tensor_cpu.fill_with_value(1.0f);
-    Test_tensor bias_tensor_cpu = Test_tensor::make_test_tensor<float>({1, dims[1], 1, 1});
-    bias_tensor_cpu.fill_with_value(0.1f);
-    Test_tensor mean_tensor_cpu = Test_tensor::make_test_tensor<float>({1, dims[1], 1, 1});
-    mean_tensor_cpu.fill_with_value(0.5f);
-    Test_tensor variance_tensor_cpu = Test_tensor::make_test_tensor<float>({1, dims[1], 1, 1});
-    variance_tensor_cpu.fill_with_value(0.1f);
+    Test_tensor scale_tensor_cpu = Test_tensor::make_test_tensor<float>(derived_dims);
+    scale_tensor_cpu.fill_with_random_values(0.0f, 1.0f);
+    Test_tensor bias_tensor_cpu = Test_tensor::make_test_tensor<float>(derived_dims);
+    bias_tensor_cpu.fill_with_random_values(0.0f, 0.1f);
+    Test_tensor mean_tensor_cpu = Test_tensor::make_test_tensor<float>(derived_dims);
+    mean_tensor_cpu.fill_with_random_values(0.0f, 0.5f);
+    Test_tensor variance_tensor_cpu = Test_tensor::make_test_tensor<float>(derived_dims);
+    variance_tensor_cpu.fill_with_random_values(0.1f, 0.3f);
 
     Cpu_fp_reference_implementation<float, float, float> cpu_ref_impl;
-    cpu_ref_impl.execute(x_tensor_cpu, scale_tensor_cpu, bias_tensor_cpu, mean_tensor_cpu, variance_tensor_cpu, y_tensor_cpu, 1e-5f);
+    cpu_ref_impl.execute(x_tensor_cpu,
+                         scale_tensor_cpu,
+                         bias_tensor_cpu,
+                         mean_tensor_cpu,
+                         variance_tensor_cpu,
+                         y_tensor_cpu,
+                         1e-3f);
 
-    Cpu_fp_reference_validation<float> cpu_ref_validation(0.01f, 0.01f);
-    EXPECT_TRUE(cpu_ref_validation.compare_buffers(y_tensor_cpu.memory(), y_tensor.memory()));  
-    //EXPECT_EQ(y_tensor.memory().host_data<float>()[0], y_tensor_cpu.memory().host_data<float>()[0]);
+    Cpu_fp_reference_validation<float> cpu_ref_validation(1e-6f, 1e-6f);
+    EXPECT_TRUE(cpu_ref_validation.compare_buffers(y_tensor_cpu.memory(), y_tensor.memory()));
 }
+
+INSTANTIATE_TEST_SUITE_P(RunFwdbatchnormGraphWithParams,
+                         Batchnorm_execute_graph_test,
+                         testing::ValuesIn(get_bn_fwd_inference_test_cases()));

@@ -4,8 +4,8 @@
 #include <gtest/gtest.h>
 #include <hipdnn_sdk/test_utilities/cpu_fp_reference_implementation.hpp>
 #include <hipdnn_sdk/test_utilities/flatbuffer_graph_test_utils.hpp>
-#include <hipdnn_sdk/test_utilities/test_utilities.hpp>
 #include <hipdnn_sdk/test_utilities/test_tensor.hpp>
+#include <hipdnn_sdk/test_utilities/test_utilities.hpp>
 
 using namespace hipdnn_sdk::reference_test_utilities;
 using namespace hipdnn_sdk::data_objects;
@@ -22,5 +22,11 @@ TEST(CpuFpReferenceImplementation, BasicFloatUsage)
 
     Cpu_fp_reference_implementation<float, float, float> ref_impl;
 
-    ref_impl.execute(input_tensor, scale_tensor, bias_tensor, mean_tensor, variance_tensor, output_tensor, 1e-5f);
+    ref_impl.execute(input_tensor,
+                     scale_tensor,
+                     bias_tensor,
+                     mean_tensor,
+                     variance_tensor,
+                     output_tensor,
+                     1e-5f);
 }
