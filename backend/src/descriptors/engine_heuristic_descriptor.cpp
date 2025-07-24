@@ -225,10 +225,8 @@ void Engine_heuristic_descriptor::get_engine_configs(hipdnnBackendAttributeType_
             std::cmp_less(i, _engine_ids.size()) && std::cmp_less(i, requested_element_count);
             ++i)
         {
-            auto backend_wrapper = output_array[i];
-
             auto config = unpack_descriptor<Engine_config_descriptor>(
-                backend_wrapper,
+                output_array[i],
                 HIPDNN_STATUS_BAD_PARAM_NULL_POINTER,
                 "Engine_heuristic_descriptor failed to get engine config: Config "
                 "descriptor is null.");
