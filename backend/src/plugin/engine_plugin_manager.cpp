@@ -43,7 +43,7 @@ std::vector<std::filesystem::path> get_default_plugin_paths()
 
 } // namespace
 
-void Engine_plugin_manager::set_plugin_paths(const std::vector<std::filesystem::path>& plugin_paths)
+void Engine_plugin_handle_manager::set_plugin_paths(const std::vector<std::filesystem::path>& plugin_paths)
 {
     std::lock_guard<std::mutex> lock(plugin_mutex);
 
@@ -56,7 +56,7 @@ void Engine_plugin_manager::set_plugin_paths(const std::vector<std::filesystem::
     override_plugin_paths = plugin_paths;
 }
 
-std::shared_ptr<Engine_plugin_manager> Engine_plugin_manager::create()
+std::shared_ptr<Engine_plugin_handle_manager> Engine_plugin_handle_manager::create()
 {
     auto root_pm = root_pm_ptr.lock();
 
@@ -76,10 +76,10 @@ std::shared_ptr<Engine_plugin_manager> Engine_plugin_manager::create()
         }
     }
 
-    return std::make_shared<Engine_plugin_manager>(root_pm);
+    return std::make_shared<Engine_plugin_handle_manager>(root_pm);
 }
 
-Engine_plugin_manager::Engine_plugin_manager(std::shared_ptr<Root_engine_plugin_manager>& root_pm)
+Engine_plugin_handle_manager::Engine_plugin_handle_manager(std::shared_ptr<Root_engine_plugin_manager>& root_pm)
     : _root_pm(root_pm)
 {
     // Create plugin handles
@@ -97,7 +97,7 @@ Engine_plugin_manager::Engine_plugin_manager(std::shared_ptr<Root_engine_plugin_
     }
 }
 
-Engine_plugin_manager::~Engine_plugin_manager()
+Engine_plugin_handle_manager::~Engine_plugin_handle_manager()
 {
     // Destroy plugin handles
     for(const auto& [handle, plugin] : _handle_to_plugin)
@@ -113,14 +113,14 @@ Engine_plugin_manager::~Engine_plugin_manager()
     }
 }
 
-Engine_plugin_manager::Engine_plugin_manager(Engine_plugin_manager&& other) noexcept
+Engine_plugin_handle_manager::Engine_plugin_handle_manager(Engine_plugin_handle_manager&& other) noexcept
     : _root_pm(std::move(other._root_pm))
     , _handle_to_plugin(std::move(other._handle_to_plugin))
     , _engine_id_to_handle(std::move(other._engine_id_to_handle))
 {
 }
 
-Engine_plugin_manager& Engine_plugin_manager::operator=(Engine_plugin_manager&& other) noexcept
+Engine_plugin_handle_manager& Engine_plugin_handle_manager::operator=(Engine_plugin_handle_manager&& other) noexcept
 {
     if(this != &other)
     {
@@ -131,7 +131,7 @@ Engine_plugin_manager& Engine_plugin_manager::operator=(Engine_plugin_manager&& 
     return *this;
 }
 
-void Engine_plugin_manager::set_stream(hipStream_t stream) const
+void Engine_plugin_handle_manager::set_stream(hipStream_t stream) const
 {
     for(const auto& [handle, plugin] : _handle_to_plugin)
     {
@@ -140,7 +140,7 @@ void Engine_plugin_manager::set_stream(hipStream_t stream) const
 }
 
 std::vector<int64_t>
-    Engine_plugin_manager::get_applicable_engine_ids(Graph_descriptor* graph_desc) const
+    Engine_plugin_handle_manager::get_applicable_engine_ids(Graph_descriptor* graph_desc) const
 {
     const auto& serialized_graph = graph_desc->get_serialized_graph();
     const hipdnnPluginConstData_t serialized_graph_data{serialized_graph.data(),
@@ -169,7 +169,7 @@ std::vector<int64_t>
     return engine_ids;
 }
 
-void Engine_plugin_manager::get_engine_details(int64_t engine_id,
+void Engine_plugin_handle_manager::get_engine_details(int64_t engine_id,
                                                Graph_descriptor* graph_desc,
                                                hipdnnPluginConstData_t* engine_details) const
 {
@@ -190,7 +190,7 @@ void Engine_plugin_manager::get_engine_details(int64_t engine_id,
     }
 }
 
-void Engine_plugin_manager::destroy_engine_details(int64_t engine_id,
+void Engine_plugin_handle_manager::destroy_engine_details(int64_t engine_id,
                                                    hipdnnPluginConstData_t* engine_details) const
 {
     auto handle = _engine_id_to_handle.at(engine_id);
@@ -200,16 +200,16 @@ void Engine_plugin_manager::destroy_engine_details(int64_t engine_id,
 }
 
 std::unique_ptr<Engine_details_wrapper>
-    get_engine_details(const std::shared_ptr<Engine_plugin_manager>& pm,
+    get_engine_details(const std::shared_ptr<Engine_plugin_handle_manager>& hm,
                        int64_t engine_id,
                        Graph_descriptor* graph_desc)
 {
-    return std::make_unique<Engine_details_wrapper>(pm, engine_id, graph_desc);
+    return std::make_unique<Engine_details_wrapper>(hm, engine_id, graph_desc);
 }
 
 // TODO: Pack engine_config
 // TODO: Get engine_id from engine_config
-size_t Engine_plugin_manager::get_workspace_size(int64_t engine_id,
+size_t Engine_plugin_handle_manager::get_workspace_size(int64_t engine_id,
                                                  const hipdnnPluginConstData_t* engine_config,
                                                  Graph_descriptor* graph_desc) const
 {
@@ -226,7 +226,7 @@ size_t Engine_plugin_manager::get_workspace_size(int64_t engine_id,
 // TODO: Pack engine_config
 // TODO: Get engine_id from engine_config
 hipdnnEnginePluginExecutionContext_t
-    Engine_plugin_manager::create_execution_context(int64_t engine_id,
+    Engine_plugin_handle_manager::create_execution_context(int64_t engine_id,
                                                     const hipdnnPluginConstData_t* engine_config,
                                                     Graph_descriptor* graph_desc) const
 {
@@ -240,7 +240,7 @@ hipdnnEnginePluginExecutionContext_t
     return plugin->create_execution_context(handle, engine_config, &serialized_graph_data);
 }
 
-void Engine_plugin_manager::destroy_execution_context(
+void Engine_plugin_handle_manager::destroy_execution_context(
     int64_t engine_id, hipdnnEnginePluginExecutionContext_t execution_context) const
 {
     auto handle = _engine_id_to_handle.at(engine_id);
@@ -249,17 +249,17 @@ void Engine_plugin_manager::destroy_execution_context(
     plugin->destroy_execution_context(handle, execution_context);
 }
 
-std::unique_ptr<Engine_execution_context_wrapper> Engine_plugin_manager::create_execution_context(
-    const std::shared_ptr<Engine_plugin_manager>& pm,
+std::unique_ptr<Engine_execution_context_wrapper> Engine_plugin_handle_manager::create_execution_context(
+    const std::shared_ptr<Engine_plugin_handle_manager>& hm,
     int64_t engine_id,
     const hipdnnPluginConstData_t* engine_config,
     Graph_descriptor* graph_desc)
 {
     return std::make_unique<Engine_execution_context_wrapper>(
-        pm, engine_id, engine_config, graph_desc);
+        hm, engine_id, engine_config, graph_desc);
 }
 
-void Engine_plugin_manager::execute_op_graph(int64_t engine_id,
+void Engine_plugin_handle_manager::execute_op_graph(int64_t engine_id,
                                              hipdnnEnginePluginExecutionContext_t execution_context,
                                              void* workspace,
                                              const hipdnnPluginDeviceBuffer_t* device_buffers,
@@ -272,7 +272,8 @@ void Engine_plugin_manager::execute_op_graph(int64_t engine_id,
         handle, execution_context, workspace, device_buffers, num_device_buffers);
 }
 
-void Engine_plugin_manager::finalize_engine(hipdnnBackendDescriptor_t desc) const
+#if 0
+void Engine_plugin_handle_manager::finalize_engine(hipdnnBackendDescriptor_t desc) const
 {
     assert(desc->type == HIPDNN_BACKEND_ENGINE_DESCRIPTOR);
     auto engine_desc = static_cast<Engine_descriptor*>(desc);
@@ -299,8 +300,10 @@ void Engine_plugin_manager::finalize_engine(hipdnnBackendDescriptor_t desc) cons
     // TODO: Get engine details
     // This will be implemented at the integration stage
 }
+#endif
 
-void Engine_plugin_manager::finalize_engine_config(hipdnnBackendDescriptor_t desc) const
+#if 0
+void Engine_plugin_handle_manager::finalize_engine_config(hipdnnBackendDescriptor_t desc) const
 {
     assert(desc->type == HIPDNN_BACKEND_ENGINECFG_DESCRIPTOR);
     auto config_desc = static_cast<Engine_config_descriptor*>(desc);
@@ -333,8 +336,10 @@ void Engine_plugin_manager::finalize_engine_config(hipdnnBackendDescriptor_t des
     // This will be implemented at the integration stage
     config_desc->set_max_workspace_size(static_cast<int64_t>(workspace_size));
 }
+#endif
 
-void Engine_plugin_manager::finalize_engine_heuristic(hipdnnBackendDescriptor_t desc) const
+#if 0
+void Engine_plugin_handle_manager::finalize_engine_heuristic(hipdnnBackendDescriptor_t desc) const
 {
     assert(desc->type == HIPDNN_BACKEND_ENGINEHEUR_DESCRIPTOR);
     auto heur_desc = static_cast<Engine_heuristic_descriptor*>(desc);
@@ -352,9 +357,11 @@ void Engine_plugin_manager::finalize_engine_heuristic(hipdnnBackendDescriptor_t 
 
     // TODO: Get engine details
 }
+#endif
 
+#if 0
 // NOLINTNEXTLINE (readability-convert-member-functions-to-static)
-void Engine_plugin_manager::finalize_execution_plan(hipdnnBackendDescriptor_t desc) const
+void Engine_plugin_handle_manager::finalize_execution_plan(hipdnnBackendDescriptor_t desc) const
 {
     assert(desc->type == HIPDNN_BACKEND_EXECUTION_PLAN_DESCRIPTOR);
     auto exec_plan_desc = static_cast<Execution_plan_descriptor*>(desc);
@@ -393,31 +400,32 @@ void Engine_plugin_manager::finalize_execution_plan(hipdnnBackendDescriptor_t de
     std::ignore = graph_desc;
     std::ignore = engine_config_data;
 }
+#endif
 
-void Engine_plugin_manager::execute_op_graph(hipdnnBackendDescriptor_t execution_plan,
+void Engine_plugin_handle_manager::execute_op_graph(hipdnnBackendDescriptor_t execution_plan,
                                              hipdnnBackendDescriptor_t variant_pack) const
 {
     THROW_IF_NE(
         execution_plan->type,
         HIPDNN_BACKEND_EXECUTION_PLAN_DESCRIPTOR,
         HIPDNN_STATUS_BAD_PARAM,
-        "Engine_plugin_manager::execute_op_graph failed: Invalid execution plan descriptor type");
+        "Engine_plugin_handle_manager::execute_op_graph failed: Invalid execution plan descriptor type");
 
     THROW_IF_FALSE(
         execution_plan->is_finalized(),
         HIPDNN_STATUS_BAD_PARAM,
-        "Engine_plugin_manager::execute_op_graph failed: execution_plan_desc is not finalized");
+        "Engine_plugin_handle_manager::execute_op_graph failed: execution_plan_desc is not finalized");
 
     THROW_IF_NE(
         variant_pack->type,
         HIPDNN_BACKEND_VARIANT_PACK_DESCRIPTOR,
         HIPDNN_STATUS_BAD_PARAM,
-        "Engine_plugin_manager::execute_op_graph failed: Invalid variant pack descriptor type");
+        "Engine_plugin_handle_manager::execute_op_graph failed: Invalid variant pack descriptor type");
 
     THROW_IF_FALSE(
         variant_pack->is_finalized(),
         HIPDNN_STATUS_BAD_PARAM,
-        "Engine_plugin_manager::execute_op_graph failed: variant_pack_desc is not finalized");
+        "Engine_plugin_handle_manager::execute_op_graph failed: variant_pack_desc is not finalized");
 
     hipdnnBackendDescriptor_t config;
     execution_plan->get_attribute(HIPDNN_ATTR_EXECUTION_PLAN_ENGINE_CONFIG,
@@ -450,12 +458,12 @@ void Engine_plugin_manager::execute_op_graph(hipdnnBackendDescriptor_t execution
     execute_op_graph(engine_id, execution_context, workspace, device_buffers, num_device_buffers);
 }
 
-Engine_details_wrapper::Engine_details_wrapper(const std::shared_ptr<Engine_plugin_manager>& pm,
+Engine_details_wrapper::Engine_details_wrapper(const std::shared_ptr<Engine_plugin_handle_manager>& hm,
                                                int64_t engine_id,
                                                Graph_descriptor* graph_desc)
-    : _pm(pm)
+    : _hm(hm)
 {
-    _pm->get_engine_details(engine_id, graph_desc, &_engine_details_data);
+    _hm->get_engine_details(engine_id, graph_desc, &_engine_details_data);
     flatbuffers::Verifier verifier(static_cast<const uint8_t*>(_engine_details_data.ptr),
                                    _engine_details_data.size);
 }
@@ -469,7 +477,7 @@ Engine_details_wrapper::~Engine_details_wrapper()
 
     try
     {
-        _pm->destroy_engine_details(get()->engine_id(), &_engine_details_data);
+        _hm->destroy_engine_details(get()->engine_id(), &_engine_details_data);
     }
     catch(const Hipdnn_exception& e)
     {
@@ -478,10 +486,10 @@ Engine_details_wrapper::~Engine_details_wrapper()
 }
 
 Engine_details_wrapper::Engine_details_wrapper(Engine_details_wrapper&& other) noexcept
-    : _pm(std::move(other._pm))
+    : _hm(std::move(other._hm))
     , _engine_details_data(other._engine_details_data)
 {
-    other._pm = nullptr;
+    other._hm = nullptr;
     other._engine_details_data.ptr = nullptr;
 }
 
@@ -489,10 +497,10 @@ Engine_details_wrapper& Engine_details_wrapper::operator=(Engine_details_wrapper
 {
     if(this != &other)
     {
-        _pm = std::move(other._pm);
+        _hm = std::move(other._hm);
         _engine_details_data = other._engine_details_data;
 
-        other._pm = nullptr;
+        other._hm = nullptr;
         other._engine_details_data.ptr = nullptr;
     }
     return *this;
@@ -512,14 +520,14 @@ const hipdnn_sdk::data_objects::EngineDetails* Engine_details_wrapper::get() con
 
 // TODO: Use engine_id from engine_config
 Engine_execution_context_wrapper::Engine_execution_context_wrapper(
-    const std::shared_ptr<Engine_plugin_manager>& pm,
+    const std::shared_ptr<Engine_plugin_handle_manager>& hm,
     int64_t engine_id,
     const hipdnnPluginConstData_t* engine_config,
     Graph_descriptor* graph_desc)
-    : _pm(pm)
+    : _hm(hm)
     , _engine_id(engine_id)
 {
-    _execution_context = _pm->create_execution_context(engine_id, engine_config, graph_desc);
+    _execution_context = _hm->create_execution_context(engine_id, engine_config, graph_desc);
 }
 
 Engine_execution_context_wrapper::~Engine_execution_context_wrapper()
@@ -531,7 +539,7 @@ Engine_execution_context_wrapper::~Engine_execution_context_wrapper()
 
     try
     {
-        _pm->destroy_execution_context(_engine_id, _execution_context);
+        _hm->destroy_execution_context(_engine_id, _execution_context);
     }
     catch(const Hipdnn_exception& e)
     {
@@ -541,11 +549,11 @@ Engine_execution_context_wrapper::~Engine_execution_context_wrapper()
 
 Engine_execution_context_wrapper::Engine_execution_context_wrapper(
     Engine_execution_context_wrapper&& other) noexcept
-    : _pm(std::move(other._pm))
+    : _hm(std::move(other._hm))
     , _engine_id(other._engine_id)
     , _execution_context(other._execution_context)
 {
-    other._pm = nullptr;
+    other._hm = nullptr;
     other._execution_context = nullptr;
 }
 
@@ -554,11 +562,11 @@ Engine_execution_context_wrapper&
 {
     if(this != &other)
     {
-        _pm = std::move(other._pm);
+        _hm = std::move(other._hm);
         _engine_id = other._engine_id;
         _execution_context = other._execution_context;
 
-        other._pm = nullptr;
+        other._hm = nullptr;
         other._execution_context = nullptr;
     }
     return *this;

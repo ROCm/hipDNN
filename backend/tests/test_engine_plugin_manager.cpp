@@ -21,10 +21,10 @@ TEST(GPU_EnginePluginManagerTest, LoadPluginsAndExecuteOpGraph)
     std::vector<std::filesystem::path> plugin_paths = {"./hipdnn_test_engine_plugin1"};
 
     // Set the plugin paths
-    plugin::Engine_plugin_manager::set_plugin_paths(plugin_paths);
+    plugin::Engine_plugin_handle_manager::set_plugin_paths(plugin_paths);
 
     // Create an EnginePluginManager instance
-    auto plugin_manager = plugin::Engine_plugin_manager::create();
+    auto plugin_manager = plugin::Engine_plugin_handle_manager::create();
 
     hipStream_t stream;
     ASSERT_EQ(hipStreamCreate(&stream), hipSuccess);
