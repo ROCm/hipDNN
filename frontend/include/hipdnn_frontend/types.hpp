@@ -20,6 +20,9 @@ enum class DataType_t
     FLOAT = 1,
     HALF = 2,
     BFLOAT16 = 3,
+    DOUBLE = 4,
+    UINT8 = 5,
+    INT32 = 6,
 };
 
 [[maybe_unused]] static hipdnn_sdk::data_objects::DataType to_sdk_type(const DataType_t& type)
@@ -32,6 +35,12 @@ enum class DataType_t
         return hipdnn_sdk::data_objects::DataType::DataType_HALF;
     case DataType_t::BFLOAT16:
         return hipdnn_sdk::data_objects::DataType::DataType_BFLOAT16;
+    case DataType_t::DOUBLE:
+        return hipdnn_sdk::data_objects::DataType::DataType_DOUBLE;
+    case DataType_t::UINT8:
+        return hipdnn_sdk::data_objects::DataType::DataType_UINT8;
+    case DataType_t::INT32:
+        return hipdnn_sdk::data_objects::DataType::DataType_INT32;
     default:
         return hipdnn_sdk::data_objects::DataType::DataType_UNSET;
     }

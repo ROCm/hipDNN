@@ -21,6 +21,7 @@ add_executable(hipdnn_frontend_tests
     test_pointwise_attributes.cpp
     test_pointwise_node.cpp
     test_tensor_attributes.cpp
+    test_tensor_value_attributes.cpp
     test_types.cpp
     test_utilities.cpp
 )
