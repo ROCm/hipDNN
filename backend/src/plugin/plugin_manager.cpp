@@ -25,7 +25,7 @@ void Plugin_manager::initialize()
 
         for(const auto& engine_id : plugin->get_engines())
         {
-            if(_engine_id_plugin_lookup.find(engine_id) != _engine_id_plugin_lookup.end())
+            if(_engine_id_plugin_lookup.contains(engine_id))
             {
                 HIPDNN_LOG_ERROR("Plugin_manager::initialize: Duplicate engine_id found: "
                                  + std::to_string(engine_id) + ". Skipping this engine.");
@@ -95,10 +95,9 @@ void Plugin_manager::finalize_engine_config(hipdnnBackendDescriptor_t desc)
     // TODO - We need to construct + store the engine config fbs with the properties that the user of the API set for the engine config,
     // and then pass that to the plugin as well here.
     auto applicable_engines = plugin->get_applicable_engines(graph_desc);
-    THROW_IF_EQ(applicable_engines.find(engine_id),
-                applicable_engines.end(),
-                HIPDNN_STATUS_BAD_PARAM,
-                std::string("Plugin does not support engine id: ") + std::to_string(engine_id));
+    THROW_IF_FALSE(applicable_engines.contains(engine_id),
+                   HIPDNN_STATUS_BAD_PARAM,
+                   std::string("Plugin does not support engine id: ") + std::to_string(engine_id));
 
     config->set_max_workspace_size(plugin->get_max_workspace_size(graph_desc, engine_id));
 }

@@ -414,7 +414,7 @@ TEST_F(Engine_heuristic_descriptor_test, GetEngineConfigsRequestMoreThanAvailabl
     for(size_t i = 0; i < 5; ++i)
     {
         // TODO: Internal memory not being tracked properly, and we need to manually free.
-        if(i < static_cast<size_t>(count))
+        if(std::cmp_less(i, count))
         {
             destroy_config(configs[i]);
         }
