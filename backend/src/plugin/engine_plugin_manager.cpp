@@ -43,7 +43,8 @@ std::vector<std::filesystem::path> get_default_plugin_paths()
 
 } // namespace
 
-void Engine_plugin_resource_manager::set_plugin_paths(const std::vector<std::filesystem::path>& plugin_paths)
+void Engine_plugin_resource_manager::set_plugin_paths(
+    const std::vector<std::filesystem::path>& plugin_paths)
 {
     std::lock_guard<std::mutex> lock(plugin_mutex);
 
@@ -79,7 +80,8 @@ std::shared_ptr<Engine_plugin_resource_manager> Engine_plugin_resource_manager::
     return std::make_shared<Engine_plugin_resource_manager>(pm);
 }
 
-Engine_plugin_resource_manager::Engine_plugin_resource_manager(std::shared_ptr<Engine_plugin_manager>& pm)
+Engine_plugin_resource_manager::Engine_plugin_resource_manager(
+    std::shared_ptr<Engine_plugin_manager>& pm)
     : _pm(pm)
 {
     // Create plugin handles
@@ -113,14 +115,16 @@ Engine_plugin_resource_manager::~Engine_plugin_resource_manager()
     }
 }
 
-Engine_plugin_resource_manager::Engine_plugin_resource_manager(Engine_plugin_resource_manager&& other) noexcept
+Engine_plugin_resource_manager::Engine_plugin_resource_manager(
+    Engine_plugin_resource_manager&& other) noexcept
     : _pm(std::move(other._pm))
     , _handle_to_plugin(std::move(other._handle_to_plugin))
     , _engine_id_to_handle(std::move(other._engine_id_to_handle))
 {
 }
 
-Engine_plugin_resource_manager& Engine_plugin_resource_manager::operator=(Engine_plugin_resource_manager&& other) noexcept
+Engine_plugin_resource_manager&
+    Engine_plugin_resource_manager::operator=(Engine_plugin_resource_manager&& other) noexcept
 {
     if(this != &other)
     {
@@ -169,9 +173,8 @@ std::vector<int64_t>
     return engine_ids;
 }
 
-void Engine_plugin_resource_manager::get_engine_details(int64_t engine_id,
-                                               Graph_descriptor* graph_desc,
-                                               hipdnnPluginConstData_t* engine_details) const
+void Engine_plugin_resource_manager::get_engine_details(
+    int64_t engine_id, Graph_descriptor* graph_desc, hipdnnPluginConstData_t* engine_details) const
 {
     const auto& serialized_graph = graph_desc->get_serialized_graph();
     const hipdnnPluginConstData_t serialized_graph_data{serialized_graph.data(),
@@ -190,8 +193,8 @@ void Engine_plugin_resource_manager::get_engine_details(int64_t engine_id,
     }
 }
 
-void Engine_plugin_resource_manager::destroy_engine_details(int64_t engine_id,
-                                                   hipdnnPluginConstData_t* engine_details) const
+void Engine_plugin_resource_manager::destroy_engine_details(
+    int64_t engine_id, hipdnnPluginConstData_t* engine_details) const
 {
     auto handle = _engine_id_to_handle.at(engine_id);
     auto plugin = _handle_to_plugin.at(handle);
@@ -209,9 +212,10 @@ std::unique_ptr<Engine_details_wrapper>
 
 // TODO: Pack engine_config
 // TODO: Get engine_id from engine_config
-size_t Engine_plugin_resource_manager::get_workspace_size(int64_t engine_id,
-                                                 const hipdnnPluginConstData_t* engine_config,
-                                                 Graph_descriptor* graph_desc) const
+size_t
+    Engine_plugin_resource_manager::get_workspace_size(int64_t engine_id,
+                                                       const hipdnnPluginConstData_t* engine_config,
+                                                       Graph_descriptor* graph_desc) const
 {
     const auto& serialized_graph = graph_desc->get_serialized_graph();
     const hipdnnPluginConstData_t serialized_graph_data{serialized_graph.data(),
@@ -225,10 +229,10 @@ size_t Engine_plugin_resource_manager::get_workspace_size(int64_t engine_id,
 
 // TODO: Pack engine_config
 // TODO: Get engine_id from engine_config
-hipdnnEnginePluginExecutionContext_t
-    Engine_plugin_resource_manager::create_execution_context(int64_t engine_id,
-                                                    const hipdnnPluginConstData_t* engine_config,
-                                                    Graph_descriptor* graph_desc) const
+hipdnnEnginePluginExecutionContext_t Engine_plugin_resource_manager::create_execution_context(
+    int64_t engine_id,
+    const hipdnnPluginConstData_t* engine_config,
+    Graph_descriptor* graph_desc) const
 {
     const auto& serialized_graph = graph_desc->get_serialized_graph();
     const hipdnnPluginConstData_t serialized_graph_data{serialized_graph.data(),
@@ -249,21 +253,23 @@ void Engine_plugin_resource_manager::destroy_execution_context(
     plugin->destroy_execution_context(handle, execution_context);
 }
 
-std::unique_ptr<Engine_execution_context_wrapper> Engine_plugin_resource_manager::create_execution_context(
-    const std::shared_ptr<Engine_plugin_resource_manager>& rm,
-    int64_t engine_id,
-    const hipdnnPluginConstData_t* engine_config,
-    Graph_descriptor* graph_desc)
+std::unique_ptr<Engine_execution_context_wrapper>
+    Engine_plugin_resource_manager::create_execution_context(
+        const std::shared_ptr<Engine_plugin_resource_manager>& rm,
+        int64_t engine_id,
+        const hipdnnPluginConstData_t* engine_config,
+        Graph_descriptor* graph_desc)
 {
     return std::make_unique<Engine_execution_context_wrapper>(
         rm, engine_id, engine_config, graph_desc);
 }
 
-void Engine_plugin_resource_manager::execute_op_graph(int64_t engine_id,
-                                             hipdnnEnginePluginExecutionContext_t execution_context,
-                                             void* workspace,
-                                             const hipdnnPluginDeviceBuffer_t* device_buffers,
-                                             uint32_t num_device_buffers) const
+void Engine_plugin_resource_manager::execute_op_graph(
+    int64_t engine_id,
+    hipdnnEnginePluginExecutionContext_t execution_context,
+    void* workspace,
+    const hipdnnPluginDeviceBuffer_t* device_buffers,
+    uint32_t num_device_buffers) const
 {
     auto handle = _engine_id_to_handle.at(engine_id);
     auto plugin = _handle_to_plugin.at(handle);
@@ -403,29 +409,29 @@ void Engine_plugin_resource_manager::finalize_execution_plan(hipdnnBackendDescri
 #endif
 
 void Engine_plugin_resource_manager::execute_op_graph(hipdnnBackendDescriptor_t execution_plan,
-                                             hipdnnBackendDescriptor_t variant_pack) const
+                                                      hipdnnBackendDescriptor_t variant_pack) const
 {
-    THROW_IF_NE(
-        execution_plan->type,
-        HIPDNN_BACKEND_EXECUTION_PLAN_DESCRIPTOR,
-        HIPDNN_STATUS_BAD_PARAM,
-        "Engine_plugin_resource_manager::execute_op_graph failed: Invalid execution plan descriptor type");
+    THROW_IF_NE(execution_plan->type,
+                HIPDNN_BACKEND_EXECUTION_PLAN_DESCRIPTOR,
+                HIPDNN_STATUS_BAD_PARAM,
+                "Engine_plugin_resource_manager::execute_op_graph failed: Invalid execution plan "
+                "descriptor type");
 
-    THROW_IF_FALSE(
-        execution_plan->is_finalized(),
-        HIPDNN_STATUS_BAD_PARAM,
-        "Engine_plugin_resource_manager::execute_op_graph failed: execution_plan_desc is not finalized");
+    THROW_IF_FALSE(execution_plan->is_finalized(),
+                   HIPDNN_STATUS_BAD_PARAM,
+                   "Engine_plugin_resource_manager::execute_op_graph failed: execution_plan_desc "
+                   "is not finalized");
 
-    THROW_IF_NE(
-        variant_pack->type,
-        HIPDNN_BACKEND_VARIANT_PACK_DESCRIPTOR,
-        HIPDNN_STATUS_BAD_PARAM,
-        "Engine_plugin_resource_manager::execute_op_graph failed: Invalid variant pack descriptor type");
+    THROW_IF_NE(variant_pack->type,
+                HIPDNN_BACKEND_VARIANT_PACK_DESCRIPTOR,
+                HIPDNN_STATUS_BAD_PARAM,
+                "Engine_plugin_resource_manager::execute_op_graph failed: Invalid variant pack "
+                "descriptor type");
 
-    THROW_IF_FALSE(
-        variant_pack->is_finalized(),
-        HIPDNN_STATUS_BAD_PARAM,
-        "Engine_plugin_resource_manager::execute_op_graph failed: variant_pack_desc is not finalized");
+    THROW_IF_FALSE(variant_pack->is_finalized(),
+                   HIPDNN_STATUS_BAD_PARAM,
+                   "Engine_plugin_resource_manager::execute_op_graph failed: variant_pack_desc is "
+                   "not finalized");
 
     hipdnnBackendDescriptor_t config;
     execution_plan->get_attribute(HIPDNN_ATTR_EXECUTION_PLAN_ENGINE_CONFIG,
@@ -458,9 +464,10 @@ void Engine_plugin_resource_manager::execute_op_graph(hipdnnBackendDescriptor_t 
     execute_op_graph(engine_id, execution_context, workspace, device_buffers, num_device_buffers);
 }
 
-Engine_details_wrapper::Engine_details_wrapper(const std::shared_ptr<Engine_plugin_resource_manager>& rm,
-                                               int64_t engine_id,
-                                               Graph_descriptor* graph_desc)
+Engine_details_wrapper::Engine_details_wrapper(
+    const std::shared_ptr<Engine_plugin_resource_manager>& rm,
+    int64_t engine_id,
+    Graph_descriptor* graph_desc)
     : _rm(rm)
 {
     _rm->get_engine_details(engine_id, graph_desc, &_engine_details_data);
