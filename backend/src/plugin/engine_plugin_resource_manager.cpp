@@ -14,7 +14,7 @@
 #include "descriptors/execution_plan_descriptor.hpp"
 #include "descriptors/graph_descriptor.hpp"
 #include "engine_plugin.hpp"
-#include "engine_plugin_manager.hpp"
+#include "engine_plugin_resource_manager.hpp"
 #include "hipdnn_exception.hpp"
 
 namespace hipdnn_backend

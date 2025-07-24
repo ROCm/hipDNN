@@ -6,14 +6,14 @@
 #include <hipdnn_sdk/test_utilities/test_utilities.hpp>
 #include <hipdnn_sdk/utilities/scoped_resource.hpp>
 
-#include "plugin/engine_plugin_manager.hpp"
+#include "plugin/engine_plugin_resource_manager.hpp"
 
 using namespace hipdnn_backend;
 
 template <typename T, typename Destructor>
 using Scoped_resource = hipdnn::sdk::utilities::Scoped_resource<T, Destructor>;
 
-TEST(GPU_EnginePluginManagerTest, LoadPluginsAndExecuteOpGraph)
+TEST(GPU_EnginePluginResourceManagerTest, LoadPluginsAndExecuteOpGraph)
 {
     SKIP_IF_NO_DEVICES();
 
@@ -23,7 +23,7 @@ TEST(GPU_EnginePluginManagerTest, LoadPluginsAndExecuteOpGraph)
     // Set the plugin paths
     plugin::Engine_plugin_resource_manager::set_plugin_paths(plugin_paths);
 
-    // Create an EnginePluginManager instance
+    // Create an Engine_plugin_resource_manager instance
     auto resource_manager = plugin::Engine_plugin_resource_manager::create();
 
     hipStream_t stream;
