@@ -298,8 +298,42 @@ public:
                     "Failed to create variant pack descriptor."};
         }
 
-        //populate the variant pack descriptor with the data
-        //todo,....
+        //split variant_pack into vector of keys and vector of values
+        std::vector<int64_t> variant_pack_keys;
+        std::vector<void*> variant_pack_values;
+        variant_pack_keys.reserve(variant_pack.size());
+        variant_pack_values.reserve(variant_pack.size());
+        for(const auto& [key, value] : variant_pack)
+        {
+            variant_pack_keys.push_back(key);
+            variant_pack_values.push_back(value);
+        }
+
+        RETURN_ON_FAILURE(
+            hipdnn_backend().backend_set_attribute(variant_pack_desc->get(),
+                                                   HIPDNN_ATTR_VARIANT_PACK_DATA_POINTERS,
+                                                   HIPDNN_TYPE_VOID_PTR,
+                                                   static_cast<int64_t>(variant_pack_values.size()),
+                                                   variant_pack_values.data()),
+            "failed to set the variant pack data pointers.");
+
+        RETURN_ON_FAILURE(
+            hipdnn_backend().backend_set_attribute(variant_pack_desc->get(),
+                                                   HIPDNN_ATTR_VARIANT_PACK_UNIQUE_IDS,
+                                                   HIPDNN_TYPE_INT64,
+                                                   static_cast<int64_t>(variant_pack_keys.size()),
+                                                   variant_pack_keys.data()),
+            "failed to set the variant pack unique ids.");
+
+        RETURN_ON_FAILURE(hipdnn_backend().backend_set_attribute(variant_pack_desc->get(),
+                                                                 HIPDNN_ATTR_VARIANT_PACK_WORKSPACE,
+                                                                 HIPDNN_TYPE_VOID_PTR,
+                                                                 1,
+                                                                 &workspace),
+                          "failed to set the variant pack unique ids.");
+
+        RETURN_ON_FAILURE(hipdnn_backend().backend_finalize(variant_pack_desc->get()),
+                          "Failed to finalize variant pack descriptor");
 
         hipdnn_backend().backend_execute(
             handle, _execution_plan_desc->get(), variant_pack_desc->get());

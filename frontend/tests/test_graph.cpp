@@ -1263,9 +1263,249 @@ TEST_F(Graph_test_fixture, WorkspaceSizeIsRetrievedFromExecutionPlan)
     EXPECT_EQ(workspace_size_result, workspace_size);
 }
 
-TEST_F(Graph_test_fixture, ExecutePassesTheCorrectArguments)
+TEST_F(Graph_test_fixture, ExecutePacksVariantPackAndPassesTheCorrectArguments)
 {
-    //todo, variant packing incomplete.
+    using ::testing::_;
+    using ::testing::Invoke;
+    using ::testing::NotNull;
+    using ::testing::Return;
+
+    Graph graph;
+    auto tensor = std::make_shared<Tensor_attributes>();
+    tensor->set_uid(42)
+        .set_name("InputTensor")
+        .set_dim({1, 2, 3, 4})
+        .set_stride({5, 6, 7, 8})
+        .set_data_type(DataType_t::FLOAT);
+
+    Pointwise_attributes pointwise_attributes;
+    pointwise_attributes.name = "PointwiseNode";
+    pointwise_attributes.set_mode(PointwiseMode_t::RELU_FWD);
+    auto out_tensor = graph.pointwise(tensor, pointwise_attributes);
+
+    // build_operation_graph mocks
+    hipdnnBackendDescriptor_t graph_desc = reinterpret_cast<hipdnnBackendDescriptor_t>(0x1000);
+    EXPECT_CALL(*_mock_backend, hipdnnBackendCreateAndDeserializeGraph_ext(_, _, _))
+        .WillOnce([&graph_desc](hipdnnBackendDescriptor_t* desc, const uint8_t*, size_t) {
+            *desc = graph_desc;
+            return HIPDNN_STATUS_SUCCESS;
+        });
+    EXPECT_CALL(*_mock_backend,
+                hipdnnBackendSetAttribute(
+                    graph_desc, HIPDNN_ATTR_OPERATIONGRAPH_HANDLE, HIPDNN_TYPE_HANDLE, 1, _))
+        .WillOnce(Return(HIPDNN_STATUS_SUCCESS));
+    EXPECT_CALL(*_mock_backend, hipdnnBackendFinalize(graph_desc))
+        .WillOnce(Return(HIPDNN_STATUS_SUCCESS));
+
+    // create_execution_plans mocks
+    hipdnnBackendDescriptor_t heur_desc = reinterpret_cast<hipdnnBackendDescriptor_t>(0x2000);
+    hipdnnBackendDescriptor_t engine_cfg_desc = reinterpret_cast<hipdnnBackendDescriptor_t>(0x3000);
+    hipdnnBackendDescriptor_t exec_plan_desc = reinterpret_cast<hipdnnBackendDescriptor_t>(0x4000);
+
+    EXPECT_CALL(*_mock_backend,
+                hipdnnBackendCreateDescriptor(HIPDNN_BACKEND_ENGINEHEUR_DESCRIPTOR, _))
+        .WillOnce([&heur_desc](hipdnnBackendDescriptorType_t, hipdnnBackendDescriptor_t* desc) {
+            *desc = heur_desc;
+            return HIPDNN_STATUS_SUCCESS;
+        });
+    EXPECT_CALL(*_mock_backend,
+                hipdnnBackendSetAttribute(heur_desc,
+                                          HIPDNN_ATTR_ENGINEHEUR_OPERATION_GRAPH,
+                                          HIPDNN_TYPE_BACKEND_DESCRIPTOR,
+                                          1,
+                                          _))
+        .WillOnce(Return(HIPDNN_STATUS_SUCCESS));
+    EXPECT_CALL(*_mock_backend,
+                hipdnnBackendSetAttribute(
+                    heur_desc, HIPDNN_ATTR_ENGINEHEUR_MODE, HIPDNN_TYPE_HEUR_MODE, 1, _))
+        .WillOnce(Return(HIPDNN_STATUS_SUCCESS));
+    EXPECT_CALL(*_mock_backend, hipdnnBackendFinalize(heur_desc))
+        .WillOnce(Return(HIPDNN_STATUS_SUCCESS));
+    EXPECT_CALL(*_mock_backend,
+                hipdnnBackendGetAttribute(heur_desc,
+                                          HIPDNN_ATTR_ENGINEHEUR_RESULTS,
+                                          HIPDNN_TYPE_BACKEND_DESCRIPTOR,
+                                          0,
+                                          _,
+                                          nullptr))
+        .WillOnce([](hipdnnBackendDescriptor_t,
+                     hipdnnBackendAttributeName_t,
+                     hipdnnBackendAttributeType_t,
+                     int64_t,
+                     int64_t* count,
+                     void*) {
+            *count = 1;
+            return HIPDNN_STATUS_SUCCESS;
+        });
+    EXPECT_CALL(*_mock_backend,
+                hipdnnBackendCreateDescriptor(HIPDNN_BACKEND_ENGINECFG_DESCRIPTOR, _))
+        .WillOnce(
+            [&engine_cfg_desc](hipdnnBackendDescriptorType_t, hipdnnBackendDescriptor_t* desc) {
+                *desc = engine_cfg_desc;
+                return HIPDNN_STATUS_SUCCESS;
+            });
+    EXPECT_CALL(*_mock_backend,
+                hipdnnBackendGetAttribute(heur_desc,
+                                          HIPDNN_ATTR_ENGINEHEUR_RESULTS,
+                                          HIPDNN_TYPE_BACKEND_DESCRIPTOR,
+                                          1,
+                                          _,
+                                          NotNull()))
+        .WillOnce([](hipdnnBackendDescriptor_t,
+                     hipdnnBackendAttributeName_t,
+                     hipdnnBackendAttributeType_t,
+                     int64_t,
+                     int64_t* count,
+                     void*) {
+            *count = 1;
+            return HIPDNN_STATUS_SUCCESS;
+        });
+    EXPECT_CALL(*_mock_backend,
+                hipdnnBackendCreateDescriptor(HIPDNN_BACKEND_EXECUTION_PLAN_DESCRIPTOR, _))
+        .WillOnce(
+            [&exec_plan_desc](hipdnnBackendDescriptorType_t, hipdnnBackendDescriptor_t* desc) {
+                *desc = exec_plan_desc;
+                return HIPDNN_STATUS_SUCCESS;
+            });
+    EXPECT_CALL(*_mock_backend,
+                hipdnnBackendSetAttribute(
+                    exec_plan_desc, HIPDNN_ATTR_EXECUTION_PLAN_HANDLE, HIPDNN_TYPE_HANDLE, 1, _))
+        .WillOnce(Return(HIPDNN_STATUS_SUCCESS));
+
+    // build_plans mocks
+    EXPECT_CALL(*_mock_backend, hipdnnBackendFinalize(engine_cfg_desc))
+        .WillOnce(Return(HIPDNN_STATUS_SUCCESS));
+    EXPECT_CALL(*_mock_backend,
+                hipdnnBackendSetAttribute(exec_plan_desc,
+                                          HIPDNN_ATTR_EXECUTION_PLAN_ENGINE_CONFIG,
+                                          HIPDNN_TYPE_BACKEND_DESCRIPTOR,
+                                          1,
+                                          engine_cfg_desc))
+        .WillOnce(Return(HIPDNN_STATUS_SUCCESS));
+    EXPECT_CALL(*_mock_backend, hipdnnBackendFinalize(exec_plan_desc))
+        .WillOnce(Return(HIPDNN_STATUS_SUCCESS));
+
+    // get_workspace_size mock
+    int64_t expected_workspace_size = 12345;
+    EXPECT_CALL(*_mock_backend,
+                hipdnnBackendGetAttribute(exec_plan_desc,
+                                          HIPDNN_ATTR_EXECUTION_PLAN_WORKSPACE_SIZE,
+                                          HIPDNN_TYPE_INT64,
+                                          1,
+                                          nullptr,
+                                          _))
+        .WillOnce([expected_workspace_size](hipdnnBackendDescriptor_t,
+                                            hipdnnBackendAttributeName_t,
+                                            hipdnnBackendAttributeType_t,
+                                            int64_t,
+                                            int64_t*,
+                                            void* ptr) {
+            *reinterpret_cast<int64_t*>(ptr) = expected_workspace_size;
+            return HIPDNN_STATUS_SUCCESS;
+        });
+
+    // Prepare variant pack and workspace
+    std::unordered_map<int64_t, void*> variant_pack;
+    variant_pack[42] = reinterpret_cast<void*>(0xDEADBEEF);
+    variant_pack[22] = reinterpret_cast<void*>(0xBEEFBEEF);
+    variant_pack[33] = reinterpret_cast<void*>(0xBEEFDEAD);
+    variant_pack[1] = reinterpret_cast<void*>(0xDEADBEE);
+
+    void* workspace = reinterpret_cast<void*>(0xCAFEBABE);
+
+    hipdnnBackendDescriptor_t variant_pack_desc
+        = reinterpret_cast<hipdnnBackendDescriptor_t>(0x5000);
+    EXPECT_CALL(*_mock_backend,
+                hipdnnBackendCreateDescriptor(HIPDNN_BACKEND_VARIANT_PACK_DESCRIPTOR, _))
+        .WillOnce(
+            [&variant_pack_desc](hipdnnBackendDescriptorType_t, hipdnnBackendDescriptor_t* desc) {
+                *desc = variant_pack_desc;
+                return HIPDNN_STATUS_SUCCESS;
+            });
+
+    EXPECT_CALL(*_mock_backend,
+                hipdnnBackendSetAttribute(variant_pack_desc,
+                                          HIPDNN_ATTR_VARIANT_PACK_DATA_POINTERS,
+                                          HIPDNN_TYPE_VOID_PTR,
+                                          static_cast<int64_t>(variant_pack.size()),
+                                          NotNull()))
+        .WillOnce(Invoke([variant_pack](hipdnnBackendDescriptor_t,
+                                        hipdnnBackendAttributeName_t,
+                                        hipdnnBackendAttributeType_t,
+                                        int64_t count,
+                                        const void* ptr) {
+            EXPECT_EQ(count, 4);
+            auto data_ptrs = static_cast<void* const*>(ptr);
+            int i = 0;
+            for(const auto& value : std::views::values(variant_pack))
+            {
+                EXPECT_EQ(data_ptrs[i++], value);
+            }
+
+            return HIPDNN_STATUS_SUCCESS;
+        }));
+    EXPECT_CALL(*_mock_backend,
+                hipdnnBackendSetAttribute(variant_pack_desc,
+                                          HIPDNN_ATTR_VARIANT_PACK_UNIQUE_IDS,
+                                          HIPDNN_TYPE_INT64,
+                                          static_cast<int64_t>(variant_pack.size()),
+                                          NotNull()))
+        .WillOnce(Invoke([variant_pack](hipdnnBackendDescriptor_t,
+                                        hipdnnBackendAttributeName_t,
+                                        hipdnnBackendAttributeType_t,
+                                        int64_t count,
+                                        const void* ptr) {
+            EXPECT_EQ(count, 4);
+            auto keys = static_cast<const int64_t*>(ptr);
+            int i = 0;
+            for(const auto& key : std::views::keys(variant_pack))
+            {
+                EXPECT_EQ(keys[i++], key);
+            }
+            return HIPDNN_STATUS_SUCCESS;
+        }));
+    EXPECT_CALL(*_mock_backend,
+                hipdnnBackendSetAttribute(variant_pack_desc,
+                                          HIPDNN_ATTR_VARIANT_PACK_WORKSPACE,
+                                          HIPDNN_TYPE_VOID_PTR,
+                                          1,
+                                          NotNull()))
+        .WillOnce(Invoke([workspace](hipdnnBackendDescriptor_t,
+                                     hipdnnBackendAttributeName_t,
+                                     hipdnnBackendAttributeType_t,
+                                     int64_t count,
+                                     const void* ptr) {
+            EXPECT_EQ(count, 1);
+            auto workspace_ptr = *static_cast<void* const*>(ptr);
+            EXPECT_EQ(workspace_ptr, workspace);
+            return HIPDNN_STATUS_SUCCESS;
+        }));
+    EXPECT_CALL(*_mock_backend, hipdnnBackendFinalize(variant_pack_desc))
+        .WillOnce(Return(HIPDNN_STATUS_SUCCESS));
+    EXPECT_CALL(*_mock_backend, hipdnnBackendExecute(_handle, exec_plan_desc, variant_pack_desc))
+        .WillOnce(Return(HIPDNN_STATUS_SUCCESS));
+
+    // Run the full sequence
+    auto build_result = graph.build_operation_graph(_handle);
+    EXPECT_TRUE(build_result.is_good());
+
+    std::vector<HeurMode_t> heur_modes = {HeurMode_t::A};
+    auto plan_result = graph.create_execution_plans(_handle, heur_modes);
+    EXPECT_TRUE(plan_result.is_good());
+
+    auto support_result = graph.check_support();
+    EXPECT_TRUE(support_result.is_good());
+
+    auto build_plans_result = graph.build_plans();
+    EXPECT_TRUE(build_plans_result.is_good());
+
+    int64_t workspace_size = 0;
+    auto ws_result = graph.get_workspace_size(workspace_size);
+    EXPECT_TRUE(ws_result.is_good());
+    EXPECT_EQ(workspace_size, expected_workspace_size);
+
+    auto exec_result = graph.execute(_handle, variant_pack, workspace);
+    EXPECT_TRUE(exec_result.is_good());
 }
 
 // NOLINTEND
