@@ -5,7 +5,7 @@
 
 #include <hip/amd_detail/amd_hip_bfloat16.h>
 
-inline __HOST_DEVICE__ hip_bfloat16 operator"" _bf(long double value)
+inline __HOST_DEVICE__ hip_bfloat16 operator""_bf(long double value)
 {
     return hip_bfloat16(static_cast<float>(value));
 }

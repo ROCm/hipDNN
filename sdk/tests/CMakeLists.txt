@@ -23,7 +23,6 @@ add_executable(hipdnn_sdk_tests
     plugin/flatbuffer_utilities/test_engine_config_wrapper.cpp
     plugin/flatbuffer_utilities/test_engine_details_wrapper.cpp
     utilities/test_scoped_resource.cpp
-    utilities/test_gpu_memory.cpp
     utilities/test_callback_logger.cpp
     utilities/test_migratable_memory.cpp
     utilities/test_floats.cpp

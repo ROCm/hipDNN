@@ -11,12 +11,10 @@
 #include <hipdnn_sdk/test_utilities/flatbuffer_graph_test_utils.hpp>
 #include <hipdnn_sdk/test_utilities/test_tensor.hpp>
 #include <hipdnn_sdk/test_utilities/test_utilities.hpp>
-#include <hipdnn_sdk/utilities/gpu_memory.hpp>
 
 #include "hipdnn_engine_plugin_execution_context.hpp"
 #include "hipdnn_engine_plugin_handle.hpp"
 
-using namespace hipdnn::sdk::utilities;
 using namespace hipdnn_sdk::reference_test_utilities;
 
 struct Bn_2d_test_case

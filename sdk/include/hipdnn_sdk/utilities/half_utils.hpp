@@ -5,7 +5,7 @@
 
 #include <hip/amd_detail/amd_hip_fp16.h>
 
-inline __HOST_DEVICE__ half operator"" _h(long double value)
+inline __HOST_DEVICE__ half operator""_h(long double value)
 {
     return half(static_cast<float>(value));
 }
