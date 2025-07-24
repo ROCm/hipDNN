@@ -33,24 +33,24 @@ class Engine_plugin_manager;
 class Engine_details_wrapper;
 class Engine_execution_context_wrapper;
 
-class Engine_plugin_handle_manager
+class Engine_plugin_resource_manager
 {
 public:
     // MT-safe static functions
     // Load plugins from a specific path, for testing purposes
     static void set_plugin_paths(const std::vector<std::filesystem::path>& plugin_paths);
-    static std::shared_ptr<Engine_plugin_handle_manager> create();
+    static std::shared_ptr<Engine_plugin_resource_manager> create();
 
-    Engine_plugin_handle_manager(std::shared_ptr<Engine_plugin_manager>& pm);
-    ~Engine_plugin_handle_manager();
+    Engine_plugin_resource_manager(std::shared_ptr<Engine_plugin_manager>& pm);
+    ~Engine_plugin_resource_manager();
 
     // Prevent copying
-    Engine_plugin_handle_manager(const Engine_plugin_handle_manager&) = delete;
-    Engine_plugin_handle_manager& operator=(const Engine_plugin_handle_manager&) = delete;
+    Engine_plugin_resource_manager(const Engine_plugin_resource_manager&) = delete;
+    Engine_plugin_resource_manager& operator=(const Engine_plugin_resource_manager&) = delete;
 
     // Allow moving
-    Engine_plugin_handle_manager(Engine_plugin_handle_manager&& other) noexcept;
-    Engine_plugin_handle_manager& operator=(Engine_plugin_handle_manager&& other) noexcept;
+    Engine_plugin_resource_manager(Engine_plugin_resource_manager&& other) noexcept;
+    Engine_plugin_resource_manager& operator=(Engine_plugin_resource_manager&& other) noexcept;
 
     // MT-unsafe instance methods
     void set_stream(hipStream_t stream) const;
@@ -76,7 +76,7 @@ private:
                             hipdnnPluginConstData_t* engine_details) const;
     void destroy_engine_details(int64_t engine_id, hipdnnPluginConstData_t* engine_details) const;
     static std::unique_ptr<Engine_details_wrapper>
-        get_engine_details(const std::shared_ptr<Engine_plugin_handle_manager>& hm,
+        get_engine_details(const std::shared_ptr<Engine_plugin_resource_manager>& rm,
                            int64_t engine_id,
                            Graph_descriptor* graph_desc);
 
@@ -91,7 +91,7 @@ private:
     void destroy_execution_context(int64_t engine_id,
                                    hipdnnEnginePluginExecutionContext_t execution_context) const;
     static std::unique_ptr<Engine_execution_context_wrapper>
-        create_execution_context(const std::shared_ptr<Engine_plugin_handle_manager>& hm,
+        create_execution_context(const std::shared_ptr<Engine_plugin_resource_manager>& rm,
                                  int64_t engine_id,
                                  const hipdnnPluginConstData_t* engine_config,
                                  Graph_descriptor* graph_desc);
@@ -114,7 +114,7 @@ private:
 class Engine_details_wrapper
 {
 public:
-    Engine_details_wrapper(const std::shared_ptr<Engine_plugin_handle_manager>& hm,
+    Engine_details_wrapper(const std::shared_ptr<Engine_plugin_resource_manager>& rm,
                            int64_t engine_id,
                            Graph_descriptor* graph_desc);
     ~Engine_details_wrapper();
@@ -130,7 +130,7 @@ public:
     const hipdnn_sdk::data_objects::EngineDetails* get() const;
 
 private:
-    std::shared_ptr<Engine_plugin_handle_manager> _hm;
+    std::shared_ptr<Engine_plugin_resource_manager> _rm;
     hipdnnPluginConstData_t _engine_details_data;
 };
 
@@ -138,7 +138,7 @@ private:
 class Engine_execution_context_wrapper
 {
 public:
-    Engine_execution_context_wrapper(const std::shared_ptr<Engine_plugin_handle_manager>& hm,
+    Engine_execution_context_wrapper(const std::shared_ptr<Engine_plugin_resource_manager>& rm,
                                      int64_t engine_id,
                                      const hipdnnPluginConstData_t* engine_config,
                                      Graph_descriptor* graph_desc);
@@ -155,7 +155,7 @@ public:
     hipdnnEnginePluginExecutionContext_t get() const;
 
 private:
-    std::shared_ptr<Engine_plugin_handle_manager> _hm;
+    std::shared_ptr<Engine_plugin_resource_manager> _rm;
     int64_t _engine_id;
     hipdnnEnginePluginExecutionContext_t _execution_context;
 };
