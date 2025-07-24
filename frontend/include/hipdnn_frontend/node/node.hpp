@@ -132,7 +132,7 @@ public:
     static int64_t get_unused_tensor_uid(int64_t& current_tensor_id,
                                          std::unordered_set<int64_t>& used_ids)
     {
-        while(used_ids.find(current_tensor_id) != used_ids.end())
+        while(used_ids.contains(current_tensor_id))
         {
             ++current_tensor_id;
         }

@@ -211,10 +211,19 @@ HIPDNN_BACKEND_EXPORT hipdnnStatus_t
                                   element_count,
                                   array_of_elements);
 
-        LOG_API_SUCCESS(api_name,
-                        "status={}, retrieved_element_count={}",
-                        hipdnn_backend::hipdnn_get_status_string(HIPDNN_STATUS_SUCCESS),
-                        *element_count);
+        if(element_count == nullptr)
+        {
+            LOG_API_SUCCESS(api_name,
+                            "status={}, element_count_ptr=nullptr",
+                            hipdnn_backend::hipdnn_get_status_string(HIPDNN_STATUS_SUCCESS));
+        }
+        else
+        {
+            LOG_API_SUCCESS(api_name,
+                            "status={}, retrieved_element_count={}",
+                            hipdnn_backend::hipdnn_get_status_string(HIPDNN_STATUS_SUCCESS),
+                            *element_count);
+        }
     });
 }
 

@@ -148,8 +148,8 @@ TEST(DBNNodeTests, GatherhipdnnTensorIds)
     std::unordered_set<int64_t> used_ids;
     node.gather_hipdnn_tensor_ids(used_ids);
 
-    EXPECT_TRUE(used_ids.find(9) != used_ids.end());
-    EXPECT_TRUE(used_ids.find(10) != used_ids.end());
+    EXPECT_TRUE(used_ids.contains(9));
+    EXPECT_TRUE(used_ids.contains(10));
 }
 
 TEST(DBNNodeTests, PopulatehipdnnTensorIds)

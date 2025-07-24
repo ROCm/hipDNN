@@ -38,8 +38,14 @@ protected:
 
 TEST_F(Batchnorm_execute_graph_test, RunFwdbatchnormGraph)
 {
-    std::vector<int64_t> strides = {1, 3, 224, 224}; // always in nchw
-    std::vector<int64_t> dims = {1, 3, 224, 224};
+    std::vector<int64_t> dims = {1, 3, 224, 224}; // nchw
+
+    std::vector<int64_t> strides(4);
+    strides[3] = 1; // 1
+    strides[2] = dims[3]; // W
+    strides[1] = dims[2] * dims[3]; // H * W
+    strides[0] = dims[1] * strides[1]; // C * H * W
+
     auto batchnorm_builder = flatbuffer_test_utils::create_valid_batchnorm_graph(strides, dims);
 
     std::vector<hipdnnPluginDeviceBuffer_t> device_buffers;
