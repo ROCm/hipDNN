@@ -20,7 +20,7 @@ namespace graph
 class Tensor_attributes
 {
 public:
-    using ValueVariant = std::variant<std::monostate, float, uint16_t, uint8_t, int32_t>;
+    using ValueVariant = std::variant<std::monostate, double, float, uint16_t, uint8_t, int32_t>;
 
     bool has_value() const
     {
@@ -41,6 +41,7 @@ public:
     Tensor_attributes& set_value(T v)
     {
         static_assert(std::disjunction_v<std::is_same<T, float>,
+                                         std::is_same<T, double>,
                                          std::is_same<T, uint16_t>,
                                          std::is_same<T, uint8_t>,
                                          std::is_same<T, int32_t>>,
@@ -169,50 +170,58 @@ public:
     flatbuffers::Offset<hipdnn_sdk::data_objects::TensorAttributes>
         pack_attributes(flatbuffers::FlatBufferBuilder& builder) const
     {
-        // using FB = hipdnn_sdk::data_objects;
-
-        auto [value_type, value_offset] = [&]() {
-            return std::visit(
-                [&](auto&& arg) -> std::pair<hipdnn_sdk::data_objects::Tensor_Value,
-                                             flatbuffers::Offset<void>> {
-                    using T = std::decay_t<decltype(arg)>;
-                    if constexpr(std::is_same_v<T, float>)
-                    {
-                        return {hipdnn_sdk::data_objects::Tensor_Value_FValue,
-                                hipdnn_sdk::data_objects::CreateFValue(builder, arg).Union()};
-                    }
-                    else if constexpr(std::is_same_v<T, uint16_t>)
-                    {
-                        return {hipdnn_sdk::data_objects::Tensor_Value_HValue,
-                                hipdnn_sdk::data_objects::CreateHValue(builder, arg).Union()};
-                    }
-                    else if constexpr(std::is_same_v<T, uint8_t>)
-                    {
-                        return {hipdnn_sdk::data_objects::Tensor_Value_UValue,
-                                hipdnn_sdk::data_objects::CreateUValue(builder, arg).Union()};
-                    }
-                    else if constexpr(std::is_same_v<T, int32_t>)
-                    {
-                        return {hipdnn_sdk::data_objects::Tensor_Value_IValue,
-                                hipdnn_sdk::data_objects::CreateIValue(builder, arg).Union()};
-                    }
-                    else
-                    {
-                        return {hipdnn_sdk::data_objects::Tensor_Value_NONE, 0};
-                    }
-                },
-                _value);
-        }();
-
-        return CreateTensorAttributesDirect(builder,
-                                            _uid,
-                                            _name.c_str(),
-                                            to_sdk_type(_data_type),
-                                            &_stride,
-                                            &_dim,
-                                            _is_virtual,
-                                            value_type,
-                                            value_offset);
+        auto result = std::visit(
+            [&](auto&& arg) -> std::pair<hipdnn_sdk::data_objects::TensorValue,
+                                         flatbuffers::Offset<void>> {
+                using T = std::decay_t<decltype(arg)>;
+                if constexpr(std::is_same_v<T, float>)
+                {
+                    hipdnn_sdk::data_objects::Float32Value float_val(arg);
+                    return {hipdnn_sdk::data_objects::TensorValue_Float32Value,
+                            builder.CreateStruct(float_val).Union()};
+                }
+                else if constexpr(std::is_same_v<T, double>)
+                {
+                    hipdnn_sdk::data_objects::Float64Value double_val(arg);
+                    return {hipdnn_sdk::data_objects::TensorValue_Float64Value,
+                            builder.CreateStruct(double_val).Union()};
+                }
+                else if constexpr(std::is_same_v<T, uint16_t>)
+                {
+                    hipdnn_sdk::data_objects::Float16Value half_val(arg);
+                    return {hipdnn_sdk::data_objects::TensorValue_Float16Value,
+                            builder.CreateStruct(half_val).Union()};
+                }
+                else if constexpr(std::is_same_v<T, uint8_t>)
+                {
+                    hipdnn_sdk::data_objects::Float8Value uint8_val(arg);
+                    return {hipdnn_sdk::data_objects::TensorValue_Float8Value,
+                            builder.CreateStruct(uint8_val).Union()};
+                }
+                else if constexpr(std::is_same_v<T, int32_t>)
+                {
+                    hipdnn_sdk::data_objects::Int32Value int32_val(arg);
+                    return {hipdnn_sdk::data_objects::TensorValue_Int32Value,
+                            builder.CreateStruct(int32_val).Union()};
+                }
+                else
+                {
+                    // For std::monostate case
+                    return {hipdnn_sdk::data_objects::TensorValue_NONE, 0};
+                }
+            },
+            _value);
+    
+        return hipdnn_sdk::data_objects::CreateTensorAttributesDirect(
+            builder,
+            _uid,
+            _name.c_str(),
+            to_sdk_type(_data_type),
+            &_stride,
+            &_dim,
+            _is_virtual,
+            result.first,
+            result.second);
     }
 
 private:
