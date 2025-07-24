@@ -28,7 +28,7 @@ struct Bn_2d_test_case
 
     friend std::ostream& operator<<(std::ostream& ss, const Bn_2d_test_case& tc)
     {
-        return ss << "(n: " << tc.n << " c:" << tc.c << " h:" << tc.h << " w:" << tc.w << ")";
+        return ss << "(n:" << tc.n << " c:" << tc.c << " h:" << tc.h << " w:" << tc.w << ")";
     }
 
     std::vector<int64_t> get_dims() const
