@@ -28,7 +28,7 @@ public:
                  const Test_tensor& estimatedMean,
                  const Test_tensor& estimatedVariance,
                  Test_tensor& output,
-                 double epsilon) override
+                 float epsilon) override
     {
         if(input.dims().size() != 4)
         {
@@ -44,8 +44,7 @@ public:
         std::for_each(std::execution::par, channels.begin(), channels.end(), [&](int64_t cidx) {
             auto mean = get_value<Mean_variance_data_type>(estimatedMean, 0, cidx, 0, 0);
             auto variance = get_value<Mean_variance_data_type>(estimatedVariance, 0, cidx, 0, 0);
-            double invert_var
-                = 1.0 / sqrt(static_cast<double>(variance) + epsilon);
+            Mean_variance_data_type invert_var = static_cast<Mean_variance_data_type>(1.0f) / sqrtf(variance + epsilon);
             // process the batch per channel
             for(int row = 0; row < height; row++)
             { // via rows
@@ -53,10 +52,9 @@ public:
                 { // via columns
                     for(int bidx = 0; bidx < n_batches; bidx++)
                     { // via mini_batch
-                        double elem_std
-                            = static_cast<double>(get_value<Input_data_type>(input, bidx, cidx, row, column))
-                              - static_cast<double>(mean);
-                        double inhat = elem_std * invert_var;
+                        auto in = static_cast<Mean_variance_data_type>(get_value<Input_data_type>(input, bidx, cidx, row, column));
+                        Mean_variance_data_type elem_std = in - mean;
+                        Mean_variance_data_type inhat = elem_std * invert_var;
                         set_value<Input_data_type>(
                             output,
                             bidx,
@@ -64,8 +62,8 @@ public:
                             row,
                             column,
                             static_cast<Input_data_type>(
-                                (static_cast<double>(get_value<Scale_bias_data_type>(scale, 0, cidx, 0, 0)) * inhat)
-                                + static_cast<double>(get_value<Scale_bias_data_type>(bias, 0, cidx, 0, 0))));
+                                (get_value<Scale_bias_data_type>(scale, 0, cidx, 0, 0) * static_cast<Scale_bias_data_type>(inhat))
+                                + get_value<Scale_bias_data_type>(bias, 0, cidx, 0, 0)));
                     }
                 }
             }

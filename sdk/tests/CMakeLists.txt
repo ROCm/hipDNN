@@ -39,7 +39,6 @@ target_compile_options(hipdnn_sdk_tests PRIVATE ${HIPDNN_WARNING_COMPILE_OPTIONS
 target_link_libraries(hipdnn_sdk_tests 
     GTest::gtest
     pthread
-    hip::host
     hipdnn_sdk
     hip::host
     hip::device

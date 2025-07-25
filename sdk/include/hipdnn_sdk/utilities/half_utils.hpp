@@ -7,7 +7,7 @@
 
 inline __HOST_DEVICE__ half operator""_h(long double value)
 {
-    return half(static_cast<float>(value));
+    return {static_cast<float>(value)};
 }
 
 namespace std

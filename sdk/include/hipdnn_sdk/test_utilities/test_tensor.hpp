@@ -85,12 +85,12 @@ public:
     void fill_with_random_values(T min, T max, unsigned int seed = std::random_device{}())
     {
         std::mt19937 generator(seed);
-        std::uniform_real_distribution<T> distribution(min, max);
+        std::uniform_real_distribution<float> distribution(static_cast<float>(min), static_cast<float>(max));
 
         auto* data = _memory.host_data<T>();
         for(size_t i = 0; i < _memory.count(); ++i)
         {
-            data[i] = distribution(generator);
+            data[i] = static_cast<T>(distribution(generator));
         }
     }
 

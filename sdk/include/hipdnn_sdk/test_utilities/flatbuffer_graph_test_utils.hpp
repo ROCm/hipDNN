@@ -33,7 +33,8 @@ inline flatbuffers::FlatBufferBuilder create_empty_valid_graph()
 inline flatbuffers::FlatBufferBuilder
     create_valid_batchnorm_graph(std::vector<int64_t> strides = {1, 3, 224, 224},
                                  std::vector<int64_t> dims = {1, 3, 224, 224},
-                                 bool has_optional_attributes = true)
+                                 bool has_optional_attributes = true,
+                                 hipdnn_sdk::data_objects::DataType input_data_type = DataType_FLOAT)
 {
     flatbuffers::FlatBufferBuilder builder;
     std::vector<::flatbuffers::Offset<hipdnn_sdk::data_objects::TensorAttributes>>
@@ -43,10 +44,10 @@ inline flatbuffers::FlatBufferBuilder
     std::vector<int64_t> derived_dims = {1, dims[1], 1, 1};
 
     tensor_attributes.push_back(hipdnn_sdk::data_objects::CreateTensorAttributesDirect(
-        builder, 1, "x", hipdnn_sdk::data_objects::DataType_FLOAT, &strides, &dims));
+        builder, 1, "x", input_data_type, &strides, &dims));
 
     tensor_attributes.push_back(hipdnn_sdk::data_objects::CreateTensorAttributesDirect(
-        builder, 2, "y", hipdnn_sdk::data_objects::DataType_FLOAT, &strides, &dims));
+        builder, 2, "y", input_data_type, &strides, &dims));
 
     tensor_attributes.push_back(hipdnn_sdk::data_objects::CreateTensorAttributesDirect(
         builder,

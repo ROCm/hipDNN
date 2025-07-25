@@ -2,6 +2,8 @@
 // SPDX-License-Identifier:  MIT
 
 #include <gtest/gtest.h>
+#include <hipdnn_sdk/utilities/half_utils.hpp>
+#include <hipdnn_sdk/utilities/hip_bfloat16_utils.hpp>
 #include <hipdnn_sdk/test_utilities/cpu_fp_reference_implementation.hpp>
 #include <hipdnn_sdk/test_utilities/flatbuffer_graph_test_utils.hpp>
 #include <hipdnn_sdk/test_utilities/test_tensor.hpp>
@@ -28,5 +30,45 @@ TEST(CpuFpReferenceImplementation, BasicFloatUsage)
                      mean_tensor,
                      variance_tensor,
                      output_tensor,
-                     1e-5);
+                     1e-5f);
+}
+
+TEST(CpuFpReferenceImplementation, BasicBFloat16Usage)
+{
+    Test_tensor input_tensor = Test_tensor::make_test_tensor<hip_bfloat16>({1, 3, 224, 224});
+    Test_tensor output_tensor = Test_tensor::make_test_tensor<hip_bfloat16>({1, 3, 224, 224});
+    Test_tensor bias_tensor = Test_tensor::make_test_tensor<float>({1, 3});
+    Test_tensor scale_tensor = Test_tensor::make_test_tensor<float>({1, 3});
+    Test_tensor mean_tensor = Test_tensor::make_test_tensor<float>({1, 3});
+    Test_tensor variance_tensor = Test_tensor::make_test_tensor<float>({1, 3});
+
+    Cpu_fp_reference_implementation<hip_bfloat16, float, float> ref_impl;
+
+    ref_impl.batchnorm_fwd_inference(input_tensor,
+                     scale_tensor,
+                     bias_tensor,
+                     mean_tensor,
+                     variance_tensor,
+                     output_tensor,
+                     1e-5f);
+}
+
+TEST(CpuFpReferenceImplementation, BasicHalfUsage)
+{
+    Test_tensor input_tensor = Test_tensor::make_test_tensor<half>({1, 3, 224, 224});
+    Test_tensor output_tensor = Test_tensor::make_test_tensor<half>({1, 3, 224, 224});
+    Test_tensor bias_tensor = Test_tensor::make_test_tensor<float>({1, 3});
+    Test_tensor scale_tensor = Test_tensor::make_test_tensor<float>({1, 3});
+    Test_tensor mean_tensor = Test_tensor::make_test_tensor<float>({1, 3});
+    Test_tensor variance_tensor = Test_tensor::make_test_tensor<float>({1, 3});
+
+    Cpu_fp_reference_implementation<half, float, float> ref_impl;
+
+    ref_impl.batchnorm_fwd_inference(input_tensor,
+                     scale_tensor,
+                     bias_tensor,
+                     mean_tensor,
+                     variance_tensor,
+                     output_tensor,
+                     1e-5f);
 }
