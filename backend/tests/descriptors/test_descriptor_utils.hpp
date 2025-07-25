@@ -12,7 +12,7 @@ template <typename T>
 hipdnnBackendDescriptor* create_descriptor_ptr()
 {
     auto desc_wrapper = new hipdnnBackendDescriptor();
-    desc_wrapper->private_descriptor = std::make_shared<T>();
+    desc_wrapper->impl = std::make_shared<T>();
 
     return desc_wrapper;
 }

@@ -10,11 +10,6 @@
 namespace hipdnn_backend
 {
 
-Engine_descriptor::Engine_descriptor()
-{
-    type = HIPDNN_BACKEND_ENGINE_DESCRIPTOR;
-}
-
 void Engine_descriptor::finalize()
 {
     THROW_IF_TRUE(is_finalized(),
@@ -28,7 +23,7 @@ void Engine_descriptor::finalize()
                    HIPDNN_STATUS_BAD_PARAM,
                    "Engine_descriptor::finalize() failed: Engine id is not set.");
 
-    hipdnnPrivateBackendDescriptor::finalize();
+    hipdnnBackendDescriptorImpl<Engine_descriptor>::finalize();
 }
 
 void Engine_descriptor::get_attribute(hipdnnBackendAttributeName_t attribute_name,
@@ -168,11 +163,6 @@ void Engine_descriptor::set_graph(hipdnnBackendAttributeType_t attribute_type,
         HIPDNN_STATUS_BAD_PARAM_NULL_POINTER,
         "Engine_descriptor failed to set graph: Graph is null.");
 
-    THROW_IF_NE(graph->type,
-                HIPDNN_BACKEND_OPERATIONGRAPH_DESCRIPTOR,
-                HIPDNN_STATUS_BAD_PARAM,
-                "Engine_descriptor failed to set graph: Invalid graph type.");
-
     THROW_IF_FALSE(graph->is_finalized(),
                    HIPDNN_STATUS_BAD_PARAM_NOT_FINALIZED,
                    "Engine_descriptor failed to set graph: Graph is not finalized.");
@@ -218,6 +208,11 @@ int64_t Engine_descriptor::get_engine_id() const
                    "Engine_descriptor::get_engine_id() failed: Not finalized.");
 
     return _engine_id;
+}
+
+hipdnnBackendDescriptorType_t Engine_descriptor::get_static_type()
+{
+    return HIPDNN_BACKEND_ENGINE_DESCRIPTOR;
 }
 
 } // namespace hipdnn_backend

@@ -156,7 +156,7 @@ TEST(Descriptor_Factory_Test, Create_Variant_Descriptor)
     EXPECT_NE(descriptor, nullptr);
 
     auto variant_descriptor
-        = dynamic_cast<Variant_descriptor*>(descriptor->private_descriptor.get());
+        = dynamic_cast<Variant_descriptor*>(descriptor->impl.get());
     EXPECT_NE(variant_descriptor, nullptr);
 
     EXPECT_FALSE(variant_descriptor->is_finalized());

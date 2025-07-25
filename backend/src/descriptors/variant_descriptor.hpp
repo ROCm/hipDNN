@@ -11,7 +11,7 @@
 namespace hipdnn_backend
 {
 
-class Variant_descriptor : public hipdnnPrivateBackendDescriptor
+class Variant_descriptor : public hipdnnBackendDescriptorImpl<Variant_descriptor>
 {
 private:
     std::vector<const void*> _data_pointers;
@@ -19,8 +19,6 @@ private:
     void* _workspace = nullptr;
 
 public:
-    Variant_descriptor();
-    ~Variant_descriptor() override = default;
 
     void finalize() override;
 
@@ -39,5 +37,7 @@ public:
     void* get_workspace() const;
     const std::vector<const void*>& get_data_pointers() const;
     const std::vector<int64_t>& get_tensor_ids() const;
+
+    static hipdnnBackendDescriptorType_t get_static_type();
 };
 }

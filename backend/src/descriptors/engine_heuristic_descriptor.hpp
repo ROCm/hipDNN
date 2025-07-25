@@ -12,7 +12,7 @@ namespace hipdnn_backend
 
 class Graph_descriptor;
 
-class Engine_heuristic_descriptor : public hipdnnPrivateBackendDescriptor
+class Engine_heuristic_descriptor : public hipdnnBackendDescriptorImpl<Engine_heuristic_descriptor>
 {
 private:
     std::shared_ptr<const Graph_descriptor> _graph;
@@ -45,8 +45,6 @@ private:
                             void* array_of_elements) const;
 
 public:
-    Engine_heuristic_descriptor();
-    ~Engine_heuristic_descriptor() override = default;
 
     void finalize() override;
 
@@ -65,6 +63,8 @@ public:
 
     // Throws an exception if the descriptor is not finalized.
     std::shared_ptr<const Graph_descriptor> get_graph() const;
+
+    static hipdnnBackendDescriptorType_t get_static_type();
 };
 
 } // namespace hipdnn_backend

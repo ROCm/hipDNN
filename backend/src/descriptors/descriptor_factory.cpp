@@ -24,7 +24,7 @@ void Descriptor_factory::create(hipdnnBackendDescriptorType_t descriptor_type,
     HIPDNN_LOG_INFO("Creating descriptor of type: {}",
                     hipdnn_get_backend_descriptor_type_name(descriptor_type));
 
-    std::shared_ptr<hipdnnPrivateBackendDescriptor> private_desc;
+    std::shared_ptr<Backend_descriptor_interface> private_desc;
     switch(descriptor_type)
     {
     case HIPDNN_BACKEND_ENGINECFG_DESCRIPTOR:

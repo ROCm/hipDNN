@@ -13,11 +13,6 @@
 namespace hipdnn_backend
 {
 
-Engine_heuristic_descriptor::Engine_heuristic_descriptor()
-{
-    type = HIPDNN_BACKEND_ENGINEHEUR_DESCRIPTOR;
-}
-
 void Engine_heuristic_descriptor::finalize()
 {
     THROW_IF_TRUE(is_finalized(),
@@ -32,7 +27,7 @@ void Engine_heuristic_descriptor::finalize()
                    HIPDNN_STATUS_BAD_PARAM,
                    "Engine_heuristic_descriptor::finalize() failed: Heuristic mode is not set.");
 
-    hipdnnPrivateBackendDescriptor::finalize();
+    hipdnnBackendDescriptorImpl<Engine_heuristic_descriptor>::finalize();
 }
 
 void Engine_heuristic_descriptor::get_attribute(hipdnnBackendAttributeName_t attribute_name,
@@ -149,11 +144,6 @@ void Engine_heuristic_descriptor::set_graph(hipdnnBackendAttributeType_t attribu
         HIPDNN_STATUS_BAD_PARAM_NULL_POINTER,
         "Engine_heuristic_descriptor failed to set graph: Null pointer.");
 
-    THROW_IF_NE(graph->type,
-                HIPDNN_BACKEND_OPERATIONGRAPH_DESCRIPTOR,
-                HIPDNN_STATUS_BAD_PARAM,
-                "Engine_heuristic_descriptor failed to set graph: Invalid graph type.");
-
     THROW_IF_FALSE(graph->is_finalized(),
                    HIPDNN_STATUS_BAD_PARAM_NOT_FINALIZED,
                    "Engine_heuristic_descriptor failed to set graph: Graph is not finalized.");
@@ -231,12 +221,6 @@ void Engine_heuristic_descriptor::get_engine_configs(hipdnnBackendAttributeType_
                 "Engine_heuristic_descriptor failed to get engine config: Config "
                 "descriptor is null.");
 
-            THROW_IF_NE(config->type,
-                        HIPDNN_BACKEND_ENGINECFG_DESCRIPTOR,
-                        HIPDNN_STATUS_BAD_PARAM,
-                        "Engine_heuristic_descriptor failed to get engine config: Invalid "
-                        "config descriptor type.");
-
             auto engine = std::make_shared<Engine_descriptor>();
 
             engine->set_attribute(
@@ -308,6 +292,11 @@ std::shared_ptr<const Graph_descriptor> Engine_heuristic_descriptor::get_graph()
                    "Engine_heuristic_descriptor::get_graph() failed: Not finalized.");
 
     return _graph;
+}
+
+hipdnnBackendDescriptorType_t Engine_heuristic_descriptor::get_static_type()
+{
+    return HIPDNN_BACKEND_ENGINEHEUR_DESCRIPTOR;
 }
 
 } // namespace hipdnn_backend
