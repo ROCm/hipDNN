@@ -6,6 +6,7 @@
 #include <hipdnn_sdk/test_utilities/reference_implementation_interface.hpp>
 #include <numeric>
 #include <vector>
+#include <execution>
 
 namespace hipdnn_sdk
 {
@@ -40,7 +41,7 @@ public:
         int64_t height = input.dims().at(2);
         int64_t width = input.dims().at(3);
 
-        std::for_each(channels.begin(), channels.end(), [&](int64_t cidx) {
+        std::for_each(std::execution::par, channels.begin(), channels.end(), [&](int64_t cidx) {
             V mean = get_value<V>(estimatedMean, 0, cidx, 0, 0);
             V variance = get_value<V>(estimatedVariance, 0, cidx, 0, 0);
             double invert_var
