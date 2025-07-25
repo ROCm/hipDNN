@@ -20,6 +20,7 @@ Checks: >
   -readability-qualified-auto,
   -readability-uppercase-literal-suffix,
   -readability-avoid-unconditional-preprocessor-if,
+  -readability-use-anyofallof
 
 WarningsAsErrors: "*"
 HeaderFileExtensions: ['h','hpp']
