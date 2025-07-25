@@ -16,7 +16,8 @@ template <class T>
 class Cpu_fp_reference_validation : public Reference_validation_interface
 {
 public:
-    Cpu_fp_reference_validation(T absolute_tolerance = std::numeric_limits<T>::epsilon(), T relative_tolerance = std::numeric_limits<T>::epsilon())
+    Cpu_fp_reference_validation(T absolute_tolerance = std::numeric_limits<T>::epsilon(),
+                                T relative_tolerance = std::numeric_limits<T>::epsilon())
         : _absolute_tolerance(absolute_tolerance)
         , _relative_tolerance(relative_tolerance)
     {

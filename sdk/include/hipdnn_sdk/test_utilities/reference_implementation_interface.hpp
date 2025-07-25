@@ -23,12 +23,12 @@ public:
     virtual ~Reference_implementation_interface() = default;
 
     virtual void batchnorm_fwd_inference(const Tensor& input,
-                         const Tensor& scale,
-                         const Tensor& bias,
-                         const Tensor& estimatedMean,
-                         const Tensor& estimatedVariance,
-                         Tensor& output,
-                         float epsilon)
+                                         const Tensor& scale,
+                                         const Tensor& bias,
+                                         const Tensor& estimatedMean,
+                                         const Tensor& estimatedVariance,
+                                         Tensor& output,
+                                         float epsilon)
         = 0;
 };
 

@@ -130,8 +130,10 @@ TEST(MigratableMemory, MigrateToHost)
 
     std::array<float, 10> array;
     init_buffer(array.data(), 10, 2.0f);
-    hipError_t err = hipMemcpy(
-        memory.device_data<float>(), array.data(), memory.count() * sizeof(float), hipMemcpyHostToDevice);
+    hipError_t err = hipMemcpy(memory.device_data<float>(),
+                               array.data(),
+                               memory.count() * sizeof(float),
+                               hipMemcpyHostToDevice);
     EXPECT_EQ(err, hipSuccess);
     memory.mark_device_modified();
     EXPECT_EQ(memory.location(), Migratable_memory::Location::DEVICE);

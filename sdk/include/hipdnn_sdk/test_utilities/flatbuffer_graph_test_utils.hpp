@@ -34,7 +34,8 @@ inline flatbuffers::FlatBufferBuilder
     create_valid_batchnorm_graph(std::vector<int64_t> strides = {1, 3, 224, 224},
                                  std::vector<int64_t> dims = {1, 3, 224, 224},
                                  bool has_optional_attributes = true,
-                                 hipdnn_sdk::data_objects::DataType input_data_type = DataType_FLOAT)
+                                 hipdnn_sdk::data_objects::DataType input_data_type
+                                 = DataType_FLOAT)
 {
     flatbuffers::FlatBufferBuilder builder;
     std::vector<::flatbuffers::Offset<hipdnn_sdk::data_objects::TensorAttributes>>

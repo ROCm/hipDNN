@@ -26,6 +26,7 @@ add_executable(hipdnn_sdk_tests
     utilities/test_callback_logger.cpp
     utilities/test_migratable_memory.cpp
     utilities/test_floats.cpp
+    utilities/test_shape_utilities.cpp
     utilities/test_tensor.cpp
     test_utilities/test_cpu_fp_reference_implementation.cpp
     test_utilities/test_cpu_fp_reference_validation.cpp

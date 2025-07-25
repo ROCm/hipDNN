@@ -4,9 +4,9 @@
 #pragma once
 
 #include <hip/hip_runtime.h>
+#include <hipdnn_sdk/logging/logger.hpp>
 #include <memory>
 #include <stdexcept>
-#include <hipdnn_sdk/logging/logger.hpp>
 
 namespace hipdnn_sdk
 {
@@ -25,8 +25,7 @@ public:
     };
 
     explicit Migratable_memory(size_t count = 0, size_t item_size = 0)
-        :
-        _count(count)
+        : _count(count)
         , _item_size(item_size)
         , _total_size(count * item_size)
     {
@@ -188,7 +187,7 @@ private:
     static void log_on_error(hipError_t err, const char* msg)
     {
         std::ignore = msg;
-        
+
         if(err != hipSuccess)
         {
             HIPDNN_LOG_ERROR("{}: HIP error: {}", msg, hipGetErrorString(err));

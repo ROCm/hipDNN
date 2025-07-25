@@ -8,6 +8,7 @@
 #include <hipdnn_frontend/error.hpp>
 #include <hipdnn_frontend/utilities.hpp>
 #include <hipdnn_sdk/data_objects/graph_generated.h>
+#include <hipdnn_sdk/utilities/shape_utils.hpp>
 
 namespace hipdnn_frontend::graph
 {
@@ -90,8 +91,10 @@ public:
 
             if(tensorToInfer->get_stride().empty())
             {
-                auto stride_order = stride_order_nhwc(tensorToInfer->get_dim().size());
-                tensorToInfer->set_stride(generate_strides(tensorToInfer->get_dim(), stride_order));
+                auto stride_order
+                    = hipdnn_sdk::utilities::stride_order_nhwc(tensorToInfer->get_dim().size());
+                tensorToInfer->set_stride(hipdnn_sdk::utilities::generate_strides(
+                    tensorToInfer->get_dim(), stride_order));
             }
         };
 
