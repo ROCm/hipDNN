@@ -11,7 +11,7 @@
 #include <hipdnn_sdk/test_utilities/cpu_fp_reference_implementation.hpp>
 #include <hipdnn_sdk/test_utilities/cpu_fp_reference_validation.hpp>
 #include <hipdnn_sdk/test_utilities/flatbuffer_graph_test_utils.hpp>
-#include <hipdnn_sdk/test_utilities/test_tensor.hpp>
+#include <hipdnn_sdk/utilities/tensor.hpp>
 #include <hipdnn_sdk/test_utilities/test_utilities.hpp>
 
 #include "hipdnn_engine_plugin_execution_context.hpp"
@@ -83,7 +83,7 @@ std::vector<Bn_2d_test_case> get_bn_fwd_inference_test_cases()
 
 template <typename T>
 hipdnnPluginDeviceBuffer_t
-    generate_random_device_buffer(Test_tensor& tensor, int uid, T min, T max, unsigned int seed = 0)
+    generate_random_device_buffer(Tensor& tensor, int uid, T min, T max, unsigned int seed = 0)
 {
     tensor.fill_with_random_values<T>(min, max, seed);
     hipdnnPluginDeviceBuffer_t buffer;
@@ -93,7 +93,7 @@ hipdnnPluginDeviceBuffer_t
 }
 
 template <typename T>
-hipdnnPluginDeviceBuffer_t generate_static_device_buffer(Test_tensor& tensor, int uid, T value)
+hipdnnPluginDeviceBuffer_t generate_static_device_buffer(Tensor& tensor, int uid, T value)
 {
     tensor.fill_with_value<T>(value);
     hipdnnPluginDeviceBuffer_t buffer;
@@ -133,22 +133,22 @@ void Batchnorm_execute_graph_test::RunFwdbatchnormGraph(Bn_2d_test_case test_cas
 
     std::vector<hipdnnPluginDeviceBuffer_t> device_buffers;
 
-    Test_tensor x_tensor = Test_tensor::make_test_tensor<Input_type>(dims);
+    Tensor x_tensor = Tensor::make_test_tensor<Input_type>(dims);
     device_buffers.push_back(generate_random_device_buffer(x_tensor, 1, static_cast<Input_type>(0.0f), static_cast<Input_type>(1.0f), seed));
 
-    Test_tensor y_tensor = Test_tensor::make_test_tensor<Input_type>(dims);
+    Tensor y_tensor = Tensor::make_test_tensor<Input_type>(dims);
     device_buffers.push_back(generate_static_device_buffer(y_tensor, 2, static_cast<Input_type>(0.0f)));
 
-    Test_tensor scale_tensor = Test_tensor::make_test_tensor<float>(derived_dims);
+    Tensor scale_tensor = Tensor::make_test_tensor<float>(derived_dims);
     device_buffers.push_back(generate_random_device_buffer(scale_tensor, 3, 0.0f, 1.0f, seed));
 
-    Test_tensor bias_tensor = Test_tensor::make_test_tensor<float>(derived_dims);
+    Tensor bias_tensor = Tensor::make_test_tensor<float>(derived_dims);
     device_buffers.push_back(generate_random_device_buffer(bias_tensor, 4, 0.0f, 0.1f, seed));
 
-    Test_tensor mean_tensor = Test_tensor::make_test_tensor<float>(derived_dims);
+    Tensor mean_tensor = Tensor::make_test_tensor<float>(derived_dims);
     device_buffers.push_back(generate_random_device_buffer(mean_tensor, 5, 0.0f, 0.5f, seed));
 
-    Test_tensor variance_tensor = Test_tensor::make_test_tensor<float>(derived_dims);
+    Tensor variance_tensor = Tensor::make_test_tensor<float>(derived_dims);
     device_buffers.push_back(generate_random_device_buffer(variance_tensor, 6, 0.1f, 0.3f, seed));
 
     auto batchnorm_builder
@@ -179,17 +179,17 @@ void Batchnorm_execute_graph_test::RunFwdbatchnormGraph(Bn_2d_test_case test_cas
 
     hipdnnEnginePluginDestroyExecutionContext(_handle, execution_context);
 
-    Test_tensor x_tensor_cpu = Test_tensor::make_test_tensor<Input_type>(dims);
+    Tensor x_tensor_cpu = Tensor::make_test_tensor<Input_type>(dims);
     x_tensor_cpu.fill_with_random_values(static_cast<Input_type>(0.0f), static_cast<Input_type>(1.0f), seed);
-    Test_tensor y_tensor_cpu = Test_tensor::make_test_tensor<Input_type>(dims);
+    Tensor y_tensor_cpu = Tensor::make_test_tensor<Input_type>(dims);
     y_tensor_cpu.fill_with_value(static_cast<Input_type>(0.0f));
-    Test_tensor scale_tensor_cpu = Test_tensor::make_test_tensor<float>(derived_dims);
+    Tensor scale_tensor_cpu = Tensor::make_test_tensor<float>(derived_dims);
     scale_tensor_cpu.fill_with_random_values(0.0f, 1.0f, seed);
-    Test_tensor bias_tensor_cpu = Test_tensor::make_test_tensor<float>(derived_dims);
+    Tensor bias_tensor_cpu = Tensor::make_test_tensor<float>(derived_dims);
     bias_tensor_cpu.fill_with_random_values(0.0f, 0.1f, seed);
-    Test_tensor mean_tensor_cpu = Test_tensor::make_test_tensor<float>(derived_dims);
+    Tensor mean_tensor_cpu = Tensor::make_test_tensor<float>(derived_dims);
     mean_tensor_cpu.fill_with_random_values(0.0f, 0.5f, seed);
-    Test_tensor variance_tensor_cpu = Test_tensor::make_test_tensor<float>(derived_dims);
+    Tensor variance_tensor_cpu = Tensor::make_test_tensor<float>(derived_dims);
     variance_tensor_cpu.fill_with_random_values(0.1f, 0.3f, seed);
 
     Cpu_fp_reference_implementation<Input_type, float, float> cpu_ref_impl;

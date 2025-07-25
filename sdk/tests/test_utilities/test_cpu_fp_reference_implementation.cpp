@@ -6,7 +6,7 @@
 #include <hipdnn_sdk/utilities/hip_bfloat16_utils.hpp>
 #include <hipdnn_sdk/test_utilities/cpu_fp_reference_implementation.hpp>
 #include <hipdnn_sdk/test_utilities/flatbuffer_graph_test_utils.hpp>
-#include <hipdnn_sdk/test_utilities/test_tensor.hpp>
+#include <hipdnn_sdk/utilities/tensor.hpp>
 #include <hipdnn_sdk/test_utilities/test_utilities.hpp>
 
 using namespace hipdnn_sdk::reference_test_utilities;
@@ -15,12 +15,12 @@ using namespace hipdnn_sdk::utilities;
 
 TEST(CpuFpReferenceImplementation, BasicFloatUsage)
 {
-    Test_tensor input_tensor = Test_tensor::make_test_tensor<float>({1, 3, 224, 224});
-    Test_tensor output_tensor = Test_tensor::make_test_tensor<float>({1, 3, 224, 224});
-    Test_tensor bias_tensor = Test_tensor::make_test_tensor<float>({1, 3});
-    Test_tensor scale_tensor = Test_tensor::make_test_tensor<float>({1, 3});
-    Test_tensor mean_tensor = Test_tensor::make_test_tensor<float>({1, 3});
-    Test_tensor variance_tensor = Test_tensor::make_test_tensor<float>({1, 3});
+    Tensor input_tensor = Tensor::make_test_tensor<float>({1, 3, 224, 224});
+    Tensor output_tensor = Tensor::make_test_tensor<float>({1, 3, 224, 224});
+    Tensor bias_tensor = Tensor::make_test_tensor<float>({1, 3});
+    Tensor scale_tensor = Tensor::make_test_tensor<float>({1, 3});
+    Tensor mean_tensor = Tensor::make_test_tensor<float>({1, 3});
+    Tensor variance_tensor = Tensor::make_test_tensor<float>({1, 3});
 
     Cpu_fp_reference_implementation<float, float, float> ref_impl;
 
@@ -35,12 +35,12 @@ TEST(CpuFpReferenceImplementation, BasicFloatUsage)
 
 TEST(CpuFpReferenceImplementation, BasicBFloat16Usage)
 {
-    Test_tensor input_tensor = Test_tensor::make_test_tensor<hip_bfloat16>({1, 3, 224, 224});
-    Test_tensor output_tensor = Test_tensor::make_test_tensor<hip_bfloat16>({1, 3, 224, 224});
-    Test_tensor bias_tensor = Test_tensor::make_test_tensor<float>({1, 3});
-    Test_tensor scale_tensor = Test_tensor::make_test_tensor<float>({1, 3});
-    Test_tensor mean_tensor = Test_tensor::make_test_tensor<float>({1, 3});
-    Test_tensor variance_tensor = Test_tensor::make_test_tensor<float>({1, 3});
+    Tensor input_tensor = Tensor::make_test_tensor<hip_bfloat16>({1, 3, 224, 224});
+    Tensor output_tensor = Tensor::make_test_tensor<hip_bfloat16>({1, 3, 224, 224});
+    Tensor bias_tensor = Tensor::make_test_tensor<float>({1, 3});
+    Tensor scale_tensor = Tensor::make_test_tensor<float>({1, 3});
+    Tensor mean_tensor = Tensor::make_test_tensor<float>({1, 3});
+    Tensor variance_tensor = Tensor::make_test_tensor<float>({1, 3});
 
     Cpu_fp_reference_implementation<hip_bfloat16, float, float> ref_impl;
 
@@ -55,12 +55,12 @@ TEST(CpuFpReferenceImplementation, BasicBFloat16Usage)
 
 TEST(CpuFpReferenceImplementation, BasicHalfUsage)
 {
-    Test_tensor input_tensor = Test_tensor::make_test_tensor<half>({1, 3, 224, 224});
-    Test_tensor output_tensor = Test_tensor::make_test_tensor<half>({1, 3, 224, 224});
-    Test_tensor bias_tensor = Test_tensor::make_test_tensor<float>({1, 3});
-    Test_tensor scale_tensor = Test_tensor::make_test_tensor<float>({1, 3});
-    Test_tensor mean_tensor = Test_tensor::make_test_tensor<float>({1, 3});
-    Test_tensor variance_tensor = Test_tensor::make_test_tensor<float>({1, 3});
+    Tensor input_tensor = Tensor::make_test_tensor<half>({1, 3, 224, 224});
+    Tensor output_tensor = Tensor::make_test_tensor<half>({1, 3, 224, 224});
+    Tensor bias_tensor = Tensor::make_test_tensor<float>({1, 3});
+    Tensor scale_tensor = Tensor::make_test_tensor<float>({1, 3});
+    Tensor mean_tensor = Tensor::make_test_tensor<float>({1, 3});
+    Tensor variance_tensor = Tensor::make_test_tensor<float>({1, 3});
 
     Cpu_fp_reference_implementation<half, float, float> ref_impl;
 

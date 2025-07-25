@@ -10,16 +10,14 @@
 
 namespace hipdnn_sdk
 {
-namespace reference_test_utilities
+namespace utilities
 {
-
-using namespace hipdnn_sdk::utilities;
 
 // Wraps vectors of dims/strides and Migratable_memory<T> to provide a common interface for testing
-class Test_tensor
+class Tensor
 {
 private:
-    Test_tensor(const std::vector<int64_t>& dims,
+    Tensor(const std::vector<int64_t>& dims,
                 const std::vector<int64_t>& strides,
                 size_t item_size)
         : _memory(calculate_item_count(dims), item_size)
@@ -30,16 +28,16 @@ private:
 
 public:
     // Delete copy constructor and copy assignment operator
-    Test_tensor(const Test_tensor&) = delete;
-    Test_tensor& operator=(const Test_tensor&) = delete;
+    Tensor(const Tensor&) = delete;
+    Tensor& operator=(const Tensor&) = delete;
 
     // Default move constructor and move assignment operator
     // These will automatically move _memory, _dims, and _strides
-    Test_tensor(Test_tensor&&) = default;
-    Test_tensor& operator=(Test_tensor&&) = default;
+    Tensor(Tensor&&) = default;
+    Tensor& operator=(Tensor&&) = default;
 
     template <typename T>
-    static Test_tensor make_test_tensor(const std::vector<int64_t>& dims, bool row_major = true)
+    static Tensor make_test_tensor(const std::vector<int64_t>& dims, bool row_major = true)
     {
         return {dims,
                            row_major ? calculate_row_major_strides(dims)
@@ -48,7 +46,7 @@ public:
     }
 
     template <typename T>
-    static Test_tensor make_test_tensor(const std::vector<int64_t>& dims,
+    static Tensor make_test_tensor(const std::vector<int64_t>& dims,
                                         const std::vector<int64_t>& strides)
     {
         return {dims, strides, sizeof(T)};
@@ -73,6 +71,29 @@ public:
     {
         return _memory;
     }
+
+    template <typename T>
+    T get_host_value(int64_t nidx, int64_t cidx, int64_t hidx, int64_t widx) const
+    {
+        int64_t index = get_index(nidx, cidx, hidx, widx);
+        const auto* data = memory().host_data<T>();
+        return data[index];
+    }
+
+    template <typename T>
+    void set_host_value(int64_t nidx, int64_t cidx, int64_t hidx, int64_t widx, T value)
+    {
+        int64_t index = get_index(nidx, cidx, hidx, widx);
+        auto* data = memory().host_data<T>();
+        data[index] = value;
+    }
+
+    int64_t get_index(int64_t nidx, int64_t cidx, int64_t hidx, int64_t widx) const
+    {
+        return (nidx * _strides[0]) + (cidx * _strides[1]) + (hidx * _strides[2])
+               + (widx * _strides[3]);
+    }
+
 
     template <typename T>
     void fill_with_value(T value)

@@ -3,14 +3,13 @@
 
 #include <gtest/gtest.h>
 
-#include <hipdnn_sdk/test_utilities/test_tensor.hpp>
+#include <hipdnn_sdk/utilities/tensor.hpp>
 
-using namespace hipdnn_sdk::reference_test_utilities;
 using namespace hipdnn_sdk::utilities;
 
 TEST(TestTensor, BasicRowMajorUsage)
 {
-    Test_tensor tensor = Test_tensor::make_test_tensor<float>({1, 2, 3, 4});
+    Tensor tensor = Tensor::make_test_tensor<float>({1, 2, 3, 4});
 
     EXPECT_EQ(tensor.memory().count(), 24);
     EXPECT_EQ(tensor.strides()[0], 24);
@@ -21,7 +20,7 @@ TEST(TestTensor, BasicRowMajorUsage)
 
 TEST(TestTensor, BasicColumnMajorUsage)
 {
-    Test_tensor tensor = Test_tensor::make_test_tensor<float>({1, 2, 3, 4}, false);
+    Tensor tensor = Tensor::make_test_tensor<float>({1, 2, 3, 4}, false);
 
     EXPECT_EQ(tensor.memory().count(), 24);
     EXPECT_EQ(tensor.strides()[0], 1);
@@ -32,7 +31,7 @@ TEST(TestTensor, BasicColumnMajorUsage)
 
 TEST(TestTensor, FillWithValuesUsage)
 {
-    Test_tensor tensor = Test_tensor::make_test_tensor<float>({1, 2, 3, 4}, false);
+    Tensor tensor = Tensor::make_test_tensor<float>({1, 2, 3, 4}, false);
 
     tensor.fill_with_value(1.0f);
     float* buffer = tensor.memory().host_data<float>();
@@ -45,7 +44,7 @@ TEST(TestTensor, FillWithValuesUsage)
 
 TEST(TestTensor, FillWithRandomValuesUsage)
 {
-    Test_tensor tensor = Test_tensor::make_test_tensor<float>({1, 2, 3, 4}, false);
+    Tensor tensor = Tensor::make_test_tensor<float>({1, 2, 3, 4}, false);
 
     tensor.fill_with_random_values(1.0f, 3.0f);
     float* buffer = tensor.memory().host_data<float>();
