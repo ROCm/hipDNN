@@ -5,6 +5,34 @@ include "data_types.fbs";
 
 namespace hipdnn_sdk.data_objects;
 
+struct Float32Value {
+  value: float;
+}
+
+struct Float16Value {
+  value: ushort;
+}
+
+struct Float8Value {
+  value: ubyte;
+}
+
+struct Int32Value {
+  value: int;
+}
+
+struct Float64Value {
+  value: double;
+}
+
+union TensorValue {
+  Float32Value,
+  Float16Value,
+  Float8Value,
+  Int32Value,
+  Float64Value
+}
+
 table TensorAttributes {
     uid: long;
     name: string;
@@ -12,4 +40,5 @@ table TensorAttributes {
     strides: [long];
     dims: [long];
     virtual: bool;
+    value: TensorValue;
 }

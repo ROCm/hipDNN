@@ -24,14 +24,14 @@ void Variant_descriptor::finalize()
     THROW_IF_TRUE(
         _data_pointers.empty(), HIPDNN_STATUS_BAD_PARAM, "Data pointers and unique ids are empty");
 
-    hipdnnBackendDescriptor::finalize();
+    hipdnnPrivateBackendDescriptor::finalize();
 }
 
 void Variant_descriptor::get_attribute(hipdnnBackendAttributeName_t attribute_name,
                                        hipdnnBackendAttributeType_t attribute_type,
                                        int64_t requested_element_count,
                                        int64_t* element_count,
-                                       void* array_of_elements)
+                                       void* array_of_elements) const
 {
     THROW_IF_FALSE(is_finalized(),
                    HIPDNN_STATUS_NOT_INITIALIZED,
@@ -145,6 +145,30 @@ void Variant_descriptor::set_attribute(hipdnnBackendAttributeName_t attribute_na
         throw Hipdnn_exception(HIPDNN_STATUS_NOT_SUPPORTED,
                                "Variant_descriptor::set_attribute: attribute_name not supported");
     }
+}
+
+void* Variant_descriptor::get_workspace() const
+{
+    THROW_IF_FALSE(is_finalized(),
+                   HIPDNN_STATUS_INTERNAL_ERROR,
+                   "Variant_descriptor::get_workspace() failed: Not finalized.");
+    return _workspace;
+}
+
+const std::vector<const void*>& Variant_descriptor::get_data_pointers() const
+{
+    THROW_IF_FALSE(is_finalized(),
+                   HIPDNN_STATUS_INTERNAL_ERROR,
+                   "Variant_descriptor::get_data_pointers() failed: Not finalized.");
+    return _data_pointers;
+}
+
+const std::vector<int64_t>& Variant_descriptor::get_tensor_ids() const
+{
+    THROW_IF_FALSE(is_finalized(),
+                   HIPDNN_STATUS_INTERNAL_ERROR,
+                   "Variant_descriptor::get_unique_ids() failed: Not finalized.");
+    return _unique_ids;
 }
 
 }

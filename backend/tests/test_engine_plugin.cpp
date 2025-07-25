@@ -18,13 +18,15 @@ using namespace hipdnn_backend;
 template <typename T, typename Destructor>
 using Scoped_resource = hipdnn::sdk::utilities::Scoped_resource<T, Destructor>;
 
+using Test_engine_plugin_manager = plugin::Plugin_manager_base<plugin::Engine_plugin>;
+
 // NOLINTBEGIN(readability-function-cognitive-complexity)
-TEST(GPU_EnginePluginManagerTest, LoadPluginsAndExecuteOpGraph)
+TEST(GPU_EnginePluginTest, LoadPluginsAndExecuteOpGraph)
 {
     SKIP_IF_NO_DEVICES();
 
     // Create an EngienPluginManager instance
-    plugin::Engine_plugin_manager plugin_manager;
+    Test_engine_plugin_manager plugin_manager;
 
     // Create a list of paths to plugins
     std::vector<std::filesystem::path> plugin_paths = {"./hipdnn_test_engine_plugin1"};

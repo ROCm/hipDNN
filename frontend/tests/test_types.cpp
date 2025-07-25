@@ -24,3 +24,11 @@ TEST(TestTypes, PointwiseModeConversion)
     EXPECT_EQ(to_sdk_type(PointwiseMode_t::NOT_SET),
               hipdnn_sdk::data_objects::PointwiseMode::PointwiseMode_UNSET);
 }
+
+TEST(TestTypes, HeuristicModeConversion)
+{
+    using namespace hipdnn_frontend;
+
+    EXPECT_EQ(to_backend_type(HeurMode_t::FALLBACK),
+              hipdnnBackendHeurMode_t::HIPDNN_HEUR_MODE_FALLBACK);
+}

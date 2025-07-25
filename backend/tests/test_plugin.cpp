@@ -83,7 +83,7 @@ TEST(PluginManagerTest, LastError)
     ASSERT_TRUE(plugins[0].get_last_error_string().empty());
 
     ASSERT_NE(func_get_name(nullptr), HIPDNN_PLUGIN_STATUS_SUCCESS);
-    ASSERT_EQ(plugins[0].get_last_error_string(), "hipdnnPluginGetName: name is null");
+    ASSERT_EQ(plugins[0].get_last_error_string(), "name is null");
 }
 
 TEST(PluginManagerTest, LastErrorMultithreaded)
@@ -106,7 +106,7 @@ TEST(PluginManagerTest, LastErrorMultithreaded)
         }
 
         return func_get_name(nullptr) != HIPDNN_PLUGIN_STATUS_SUCCESS
-               && plugins[0].get_last_error_string() == "hipdnnPluginGetName: name is null";
+               && plugins[0].get_last_error_string() == "name is null";
     };
 
     ASSERT_EQ(check_get_name(), true);
@@ -154,7 +154,7 @@ TEST(PluginManagerTest, LastErrorOnSecondLoad)
 
         ASSERT_TRUE(plugins[0].get_last_error_string().empty());
         ASSERT_NE(func_get_name(nullptr), HIPDNN_PLUGIN_STATUS_SUCCESS);
-        ASSERT_EQ(plugins[0].get_last_error_string(), "hipdnnPluginGetName: name is null");
+        ASSERT_EQ(plugins[0].get_last_error_string(), "name is null");
     }
 }
 

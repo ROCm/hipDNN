@@ -16,6 +16,7 @@ if(HIP_DNN_SKIP_TESTS)
 endif()
 
 add_executable(hipdnn_backend_tests
+    descriptors/test_backend_descriptor.cpp
     descriptors/test_descriptor_factory.cpp
     descriptors/test_engine_config_descriptor.cpp
     descriptors/test_engine_descriptor.cpp
@@ -25,6 +26,7 @@ add_executable(hipdnn_backend_tests
     descriptors/test_variant_pack.cpp
     main.cpp
     test_engine_plugin.cpp
+    test_engine_plugin_resource_manager.cpp
     test_error.cpp
     test_flatbuffer_utilities.cpp
     test_handle.cpp

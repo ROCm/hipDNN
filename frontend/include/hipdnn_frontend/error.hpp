@@ -22,6 +22,7 @@ enum class error_code_t
 {
     OK,
     INVALID_VALUE,
+    HIPDNN_BACKEND_ERROR,
     ATTRIBUTE_NOT_SET
 };
 

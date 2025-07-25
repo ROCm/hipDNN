@@ -28,14 +28,14 @@ void Engine_descriptor::finalize()
                    HIPDNN_STATUS_BAD_PARAM,
                    "Engine_descriptor::finalize() failed: Engine id is not set.");
 
-    hipdnnBackendDescriptor::finalize();
+    hipdnnPrivateBackendDescriptor::finalize();
 }
 
 void Engine_descriptor::get_attribute(hipdnnBackendAttributeName_t attribute_name,
                                       [[maybe_unused]] hipdnnBackendAttributeType_t attribute_type,
                                       [[maybe_unused]] int64_t requested_element_count,
                                       [[maybe_unused]] int64_t* element_count,
-                                      [[maybe_unused]] void* array_of_elements)
+                                      [[maybe_unused]] void* array_of_elements) const
 {
     THROW_IF_FALSE(is_finalized(),
                    HIPDNN_STATUS_NOT_INITIALIZED,
@@ -66,7 +66,7 @@ void Engine_descriptor::get_attribute(hipdnnBackendAttributeName_t attribute_nam
 void Engine_descriptor::get_graph(hipdnnBackendAttributeType_t attribute_type,
                                   int64_t requested_element_count,
                                   int64_t* element_count,
-                                  void* array_of_elements)
+                                  void* array_of_elements) const
 {
 
     THROW_IF_NE(attribute_type,
@@ -163,14 +163,10 @@ void Engine_descriptor::set_graph(hipdnnBackendAttributeType_t attribute_type,
                 HIPDNN_STATUS_BAD_PARAM,
                 "Engine_descriptor failed to set graph: Invalid element count.");
 
-    THROW_IF_NULL(array_of_elements,
-                  HIPDNN_STATUS_BAD_PARAM_NULL_POINTER,
-                  "Engine_descriptor failed to set graph: Null pointer.");
-
-    const Graph_descriptor* graph = *static_cast<Graph_descriptor* const*>(array_of_elements);
-    THROW_IF_NULL(graph,
-                  HIPDNN_STATUS_BAD_PARAM_NULL_POINTER,
-                  "Engine_descriptor failed to set graph: Graph is null.");
+    auto graph = unpack_descriptor<const Graph_descriptor>(
+        array_of_elements,
+        HIPDNN_STATUS_BAD_PARAM_NULL_POINTER,
+        "Engine_descriptor failed to set graph: Graph is null.");
 
     THROW_IF_NE(graph->type,
                 HIPDNN_BACKEND_OPERATIONGRAPH_DESCRIPTOR,
@@ -204,6 +200,24 @@ void Engine_descriptor::set_global_id(hipdnnBackendAttributeType_t attribute_typ
 
     _engine_id = *static_cast<const int64_t*>(array_of_elements);
     _engine_id_set = true;
+}
+
+std::shared_ptr<const Graph_descriptor> Engine_descriptor::get_graph() const
+{
+    THROW_IF_FALSE(is_finalized(),
+                   HIPDNN_STATUS_INTERNAL_ERROR,
+                   "Engine_descriptor::get_graph() failed: Not finalized.");
+
+    return _graph;
+}
+
+int64_t Engine_descriptor::get_engine_id() const
+{
+    THROW_IF_FALSE(is_finalized(),
+                   HIPDNN_STATUS_INTERNAL_ERROR,
+                   "Engine_descriptor::get_engine_id() failed: Not finalized.");
+
+    return _engine_id;
 }
 
 } // namespace hipdnn_backend

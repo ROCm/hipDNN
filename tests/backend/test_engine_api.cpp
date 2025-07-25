@@ -96,7 +96,7 @@ TEST_F(Engine_api_tests, FinalizeEngine)
 
 TEST_F(Engine_api_tests, GetEngineGraph)
 {
-    hipdnnBackendDescriptor_t graph;
+    hipdnnBackendDescriptor_t graph = nullptr;
     int64_t gidx = 0;
 
     test_util::populate_test_engine(_engine, &_graph, _handle, gidx, true);
@@ -107,7 +107,9 @@ TEST_F(Engine_api_tests, GetEngineGraph)
                                         nullptr,
                                         &graph),
               HIPDNN_STATUS_SUCCESS);
-    EXPECT_EQ(graph, _graph);
+    EXPECT_NE(graph, nullptr);
+
+    hipdnnBackendDestroyDescriptor(graph);
 }
 
 TEST_F(Engine_api_tests, GetEngineGlobalIndex)

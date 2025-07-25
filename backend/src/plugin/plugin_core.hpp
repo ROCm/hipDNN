@@ -30,7 +30,14 @@ protected:
     Plugin_base(Shared_library&& lib);
 
 public:
+    // Prevent copying
+    Plugin_base(const Plugin_base&) = delete;
+    Plugin_base& operator=(const Plugin_base&) = delete;
+
+    // Allow moving
     Plugin_base(Plugin_base&& other) = default;
+    Plugin_base& operator=(Plugin_base&& other) = default;
+
     virtual ~Plugin_base() = default;
 
     std::string_view name() const;

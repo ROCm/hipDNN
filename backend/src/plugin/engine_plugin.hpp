@@ -85,7 +85,5 @@ private:
     friend class Plugin_manager_base<Engine_plugin>;
 };
 
-using Engine_plugin_manager = Plugin_manager_base<Engine_plugin>;
-
 } // namespace plugin
 } // hipdnn_backend

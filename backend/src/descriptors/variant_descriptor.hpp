@@ -11,7 +11,7 @@
 namespace hipdnn_backend
 {
 
-class Variant_descriptor : public hipdnnBackendDescriptor
+class Variant_descriptor : public hipdnnPrivateBackendDescriptor
 {
 private:
     std::vector<const void*> _data_pointers;
@@ -28,11 +28,16 @@ public:
                        hipdnnBackendAttributeType_t attribute_type,
                        int64_t requested_element_count,
                        int64_t* element_count,
-                       void* array_of_elements) override;
+                       void* array_of_elements) const override;
 
     void set_attribute(hipdnnBackendAttributeName_t attribute_name,
                        hipdnnBackendAttributeType_t attribute_type,
                        int64_t element_count,
                        const void* array_of_elements) override;
+
+    // throws if the variant descriptor is not finalized
+    void* get_workspace() const;
+    const std::vector<const void*>& get_data_pointers() const;
+    const std::vector<int64_t>& get_tensor_ids() const;
 };
 }
