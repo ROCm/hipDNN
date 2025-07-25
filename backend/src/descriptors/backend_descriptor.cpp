@@ -25,7 +25,8 @@ void hipdnnBackendDescriptor::get_attribute(hipdnnBackendAttributeName_t attribu
                                             void* array_of_elements) const
 {
     THROW_IF_TRUE(!impl, HIPDNN_STATUS_INTERNAL_ERROR, "Null impl in get_attribute.");
-    impl->get_attribute(attribute_name, attribute_type, requested_element_count, element_count, array_of_elements);
+    impl->get_attribute(
+        attribute_name, attribute_type, requested_element_count, element_count, array_of_elements);
 }
 
 void hipdnnBackendDescriptor::set_attribute(hipdnnBackendAttributeName_t attribute_name,

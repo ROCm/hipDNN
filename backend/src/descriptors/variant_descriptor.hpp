@@ -19,7 +19,6 @@ private:
     void* _workspace = nullptr;
 
 public:
-
     void finalize() override;
 
     void get_attribute(hipdnnBackendAttributeName_t attribute_name,

@@ -24,7 +24,6 @@ private:
                     const void* array_of_elements);
 
 public:
-
     void finalize() override;
 
     void get_attribute([[maybe_unused]] hipdnnBackendAttributeName_t attribute_name,

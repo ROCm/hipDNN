@@ -28,8 +28,7 @@ public:
 
     Engine_config_descriptor* get_engine_config_descriptor() const
     {
-        return dynamic_cast<Engine_config_descriptor*>(
-            _engine_config_wrapper->impl.get());
+        return dynamic_cast<Engine_config_descriptor*>(_engine_config_wrapper->impl.get());
     }
 
     Mock_descriptor<Engine_descriptor>* get_mock_engine() const

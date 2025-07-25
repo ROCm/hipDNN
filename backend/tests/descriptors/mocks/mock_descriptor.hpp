@@ -14,7 +14,6 @@ template <typename Desc_type>
 class Mock_descriptor : public hipdnnBackendDescriptorImpl<Mock_descriptor<Desc_type>>
 {
 public:
-
     MOCK_METHOD(void, finalize, (), (override));
     MOCK_METHOD(bool, is_finalized, (), (const, override));
     MOCK_METHOD(void,
@@ -45,8 +44,7 @@ ACTION_P(SetArg4ToInt64, value) // NOLINT
 }
 
 template <typename Desc_type>
-inline std::unique_ptr<hipdnnBackendDescriptor>
-    make_mock_descriptor_wrapper()
+inline std::unique_ptr<hipdnnBackendDescriptor> make_mock_descriptor_wrapper()
 {
     auto mock_wrapper = std::make_unique<hipdnnBackendDescriptor>();
     mock_wrapper->impl = std::make_shared<Mock_descriptor<Desc_type>>();

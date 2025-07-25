@@ -36,7 +36,6 @@ private:
                        void* array_of_elements) const;
 
 public:
-
     void finalize() override;
 
     void get_attribute(hipdnnBackendAttributeName_t attribute_name,

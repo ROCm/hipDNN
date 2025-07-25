@@ -27,11 +27,13 @@ struct Backend_descriptor_interface
                                hipdnnBackendAttributeType_t attribute_type,
                                int64_t requested_element_count,
                                int64_t* element_count,
-                               void* array_of_elements) const = 0;
+                               void* array_of_elements) const
+        = 0;
     virtual void set_attribute(hipdnnBackendAttributeName_t attribute_name,
                                hipdnnBackendAttributeType_t attribute_type,
                                int64_t element_count,
-                               const void* array_of_elements) = 0;
+                               const void* array_of_elements)
+        = 0;
 
     virtual hipdnnBackendDescriptorType_t get_type() const = 0;
 };
@@ -77,24 +79,35 @@ private:
 
 public:
     hipdnnBackendDescriptorImpl()
-    : _type(get_static_type())
+        : _type(get_static_type())
     {
     }
 
-    void finalize() override { _finalized = true; }
-    bool is_finalized() const override { return _finalized; }
+    void finalize() override
+    {
+        _finalized = true;
+    }
+    bool is_finalized() const override
+    {
+        return _finalized;
+    }
 
     void get_attribute(hipdnnBackendAttributeName_t attribute_name,
                        hipdnnBackendAttributeType_t attribute_type,
                        int64_t requested_element_count,
                        int64_t* element_count,
-                       void* array_of_elements) const override = 0;
+                       void* array_of_elements) const override
+        = 0;
     void set_attribute(hipdnnBackendAttributeName_t attribute_name,
                        hipdnnBackendAttributeType_t attribute_type,
                        int64_t element_count,
-                       const void* array_of_elements) override = 0;
+                       const void* array_of_elements) override
+        = 0;
 
-    hipdnnBackendDescriptorType_t get_type() const override { return _type; }
+    hipdnnBackendDescriptorType_t get_type() const override
+    {
+        return _type;
+    }
 
     static hipdnnBackendDescriptorType_t get_static_type()
     {
@@ -104,11 +117,9 @@ public:
 
 // Helper trait for static_assert
 template <typename Child_descriptor>
-constexpr bool is_valid_backend_child_descriptor_v =
-    std::is_base_of_v<
-        hipdnnBackendDescriptorImpl<std::remove_const_t<Child_descriptor>>,
-        std::remove_const_t<Child_descriptor>
-    >;
+constexpr bool is_valid_backend_child_descriptor_v
+    = std::is_base_of_v<hipdnnBackendDescriptorImpl<std::remove_const_t<Child_descriptor>>,
+                        std::remove_const_t<Child_descriptor>>;
 
 // Unpacks a hipdnnBackendDescriptor into a shared_ptr of the specified type.
 // Throws an exception if the descriptor is null.
@@ -126,8 +137,7 @@ inline std::shared_ptr<Child_descriptor> unpack_descriptor(
                 hipdnnStatus_t::HIPDNN_STATUS_BAD_PARAM,
                 "Unpacking hipdnnBackendDescriptor failed: Descriptor type mismatch.");
 
-    auto child_descriptor
-        = std::static_pointer_cast<Child_descriptor>(descriptor->impl);
+    auto child_descriptor = std::static_pointer_cast<Child_descriptor>(descriptor->impl);
 
     return child_descriptor;
 }
@@ -167,8 +177,7 @@ inline hipdnnBackendDescriptor*
 inline void pack_descriptor(const std::shared_ptr<const Backend_descriptor_interface>& impl,
                             void*& array_of_elements)
 {
-    *static_cast<hipdnnBackendDescriptor**>(array_of_elements)
-        = pack_descriptor(impl);
+    *static_cast<hipdnnBackendDescriptor**>(array_of_elements) = pack_descriptor(impl);
 }
 }
 //NOLINTEND(readability-identifier-naming)

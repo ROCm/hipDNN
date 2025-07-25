@@ -10,7 +10,7 @@
 
 namespace hipdnn_backend
 {
-    
+
 void Graph_descriptor::finalize()
 {
     THROW_IF_NULL(_graph, HIPDNN_STATUS_BAD_PARAM, "Graph_descriptor::finalize: graph is null");

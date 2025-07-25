@@ -20,8 +20,8 @@ TEST(BackendDescriptorTest, PackAndUnpackDescriptorWorks)
     ASSERT_NE(packed.get(), nullptr);
     ASSERT_NE(packed.get()->impl, nullptr);
 
-    auto unpacked
-        = unpack_descriptor<Mock_descriptor<Engine_descriptor>>(packed.get(), HIPDNN_STATUS_INTERNAL_ERROR, "fail");
+    auto unpacked = unpack_descriptor<Mock_descriptor<Engine_descriptor>>(
+        packed.get(), HIPDNN_STATUS_INTERNAL_ERROR, "fail");
     ASSERT_EQ(unpacked.get(), mock_ptr.get());
     ASSERT_EQ(unpacked->get_type(), HIPDNN_BACKEND_ENGINE_DESCRIPTOR);
 }
@@ -62,9 +62,10 @@ TEST(BackendDescriptorTest, UnpackDescriptorThrowsOnNullDescriptor)
 {
     EXPECT_THROW(
         {
-            unpack_descriptor<Mock_descriptor<Engine_descriptor>>(static_cast<hipdnnBackendDescriptor*>(nullptr),
-                                               HIPDNN_STATUS_INTERNAL_ERROR,
-                                               "fail");
+            unpack_descriptor<Mock_descriptor<Engine_descriptor>>(
+                static_cast<hipdnnBackendDescriptor*>(nullptr),
+                HIPDNN_STATUS_INTERNAL_ERROR,
+                "fail");
         },
         Hipdnn_exception);
 }
@@ -75,7 +76,10 @@ TEST(BackendDescriptorTest, UnpackDescriptorThrowsOnNullPrivateDescriptor)
     packed.get()->impl = nullptr;
 
     EXPECT_THROW(
-        { unpack_descriptor<Mock_descriptor<Engine_descriptor>>(packed.get(), HIPDNN_STATUS_INTERNAL_ERROR, "fail"); },
+        {
+            unpack_descriptor<Mock_descriptor<Engine_descriptor>>(
+                packed.get(), HIPDNN_STATUS_INTERNAL_ERROR, "fail");
+        },
         Hipdnn_exception);
 }
 
