@@ -36,7 +36,7 @@ inline hipdnnSeverity_t string_to_severity(const std::string& level_str)
 inline void test_logging_callback(hipdnnSeverity_t severity, const char* message)
 {
     const char* log_level_env = std::getenv("HIPDNN_LOG_LEVEL");
-    std::string log_level_str = log_level_env ? log_level_env : "off";
+    std::string log_level_str = log_level_env != nullptr ? log_level_env : "off";
 
     if(log_level_str == "off")
     {
@@ -47,7 +47,7 @@ inline void test_logging_callback(hipdnnSeverity_t severity, const char* message
 
     if(severity >= configured_level)
     {
-        std::cerr << message << std::endl;
+        std::cerr << message << '\n';
     }
 }
 

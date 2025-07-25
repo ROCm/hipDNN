@@ -13,7 +13,6 @@ namespace reference_test_utilities
 
 using namespace hipdnn_sdk::utilities;
 
-template <class T>
 class Reference_validation_interface
 {
 public:

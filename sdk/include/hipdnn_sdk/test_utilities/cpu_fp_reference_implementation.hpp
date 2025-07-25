@@ -15,19 +15,19 @@ namespace reference_test_utilities
 using namespace hipdnn_sdk::utilities;
 
 template <class T, class U, class V = U>
-class Cpu_fp_reference_implementation : public Reference_implementation_interface<T, U, V>
+class Cpu_fp_reference_implementation : public Reference_implementation_interface
 {
 public:
     Cpu_fp_reference_implementation() = default;
     ~Cpu_fp_reference_implementation() override = default;
 
-    void execute(const Test_tensor& input,
+    void batchnorm_fwd_inference(const Test_tensor& input,
                  const Test_tensor& scale,
                  const Test_tensor& bias,
                  const Test_tensor& estimatedMean,
                  const Test_tensor& estimatedVariance,
                  Test_tensor& output,
-                 V epsilon) override
+                 double epsilon) override
     {
         if(input.dims().size() != 4)
         {
@@ -41,11 +41,10 @@ public:
         int64_t width = input.dims().at(3);
 
         std::for_each(channels.begin(), channels.end(), [&](int64_t cidx) {
-            V mean = getValue<V>(estimatedMean, 0, cidx, 0, 0);
-            V variance = getValue<V>(estimatedVariance, 0, cidx, 0, 0);
-            double invertVar = 1.0
-                               / static_cast<double>(sqrt(static_cast<double>(variance)
-                                                          + static_cast<double>(epsilon)));
+            V mean = get_value<V>(estimatedMean, 0, cidx, 0, 0);
+            V variance = get_value<V>(estimatedVariance, 0, cidx, 0, 0);
+            double invert_var
+                = 1.0 / sqrt(static_cast<double>(variance) + epsilon);
             // process the batch per channel
             for(int row = 0; row < height; row++)
             { // via rows
@@ -53,19 +52,19 @@ public:
                 { // via columns
                     for(int bidx = 0; bidx < n_batches; bidx++)
                     { // via mini_batch
-                        double elemStd
-                            = static_cast<double>(getValue<T>(input, bidx, cidx, row, column))
+                        double elem_std
+                            = static_cast<double>(get_value<T>(input, bidx, cidx, row, column))
                               - static_cast<double>(mean);
-                        double inhat = elemStd * invertVar;
-                        setValue<T>(
+                        double inhat = elem_std * invert_var;
+                        set_value<T>(
                             output,
                             bidx,
                             cidx,
                             row,
                             column,
                             static_cast<T>(
-                                static_cast<double>(getValue<U>(scale, 0, cidx, 0, 0)) * inhat
-                                + static_cast<double>(getValue<U>(bias, 0, cidx, 0, 0))));
+                                (static_cast<double>(get_value<U>(scale, 0, cidx, 0, 0)) * inhat)
+                                + static_cast<double>(get_value<U>(bias, 0, cidx, 0, 0))));
                     }
                 }
             }
@@ -76,32 +75,33 @@ public:
 
 private:
     template <typename TUV>
-    TUV getValue(
+    TUV get_value(
         const Test_tensor& tensor, int64_t bidx, int64_t cidx, int64_t row, int64_t column) const
     {
-        int64_t index = getIndex(tensor, bidx, cidx, row, column);
+        int64_t index = get_index(tensor, bidx, cidx, row, column);
         const auto* data = tensor.memory().host_data<TUV>();
         return data[index];
     }
 
     template <typename TUV>
-    void setValue(Test_tensor& tensor,
-                  int64_t bidx,
-                  int64_t cidx,
-                  int64_t row,
-                  int64_t column,
-                  TUV value) const
+    void set_value(Test_tensor& tensor,
+                   int64_t bidx,
+                   int64_t cidx,
+                   int64_t row,
+                   int64_t column,
+                   TUV value) const
     {
-        int64_t index = getIndex(tensor, bidx, cidx, row, column);
+        int64_t index = get_index(tensor, bidx, cidx, row, column);
         auto* data = tensor.memory().host_data<TUV>();
         data[index] = value;
     }
 
-    int64_t getIndex(
+    int64_t get_index(
         const Test_tensor& tensor, int64_t bidx, int64_t cidx, int64_t row, int64_t column) const
     {
         const auto& strides = tensor.strides();
-        return bidx * strides[0] + cidx * strides[1] + row * strides[2] + column * strides[3];
+        return (bidx * strides[0]) + (cidx * strides[1]) + (row * strides[2])
+               + (column * strides[3]);
     }
 };
 

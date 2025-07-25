@@ -13,7 +13,7 @@ namespace reference_test_utilities
 using namespace hipdnn_sdk::utilities;
 
 template <class T>
-class Cpu_fp_reference_validation : public Reference_validation_interface<T>
+class Cpu_fp_reference_validation : public Reference_validation_interface
 {
 public:
     Cpu_fp_reference_validation() = default;

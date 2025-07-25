@@ -11,7 +11,7 @@ namespace hipdnn::sdk::utilities
 static void
     copy_max_size_with_null_terminator(char* destination, const char* source, size_t max_size)
 {
-    if(!source || !destination || max_size == 0)
+    if(source == nullptr || destination == nullptr || max_size == 0)
     {
         return;
     }

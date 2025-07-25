@@ -22,7 +22,7 @@ private:
     Test_tensor(const std::vector<int64_t>& dims,
                 const std::vector<int64_t>& strides,
                 size_t item_size)
-        : _memory(calculateItemCount(dims), item_size)
+        : _memory(calculate_item_count(dims), item_size)
         , _dims(dims)
         , _strides(strides)
     {
@@ -41,17 +41,17 @@ public:
     template <typename T>
     static Test_tensor make_test_tensor(const std::vector<int64_t>& dims, bool row_major = true)
     {
-        return Test_tensor(dims,
-                           row_major ? calculateRowMajorStrides(dims)
-                                     : calculateColumnMajorStrides(dims),
-                           sizeof(T));
+        return {dims,
+                           row_major ? calculate_row_major_strides(dims)
+                                     : calculate_column_major_strides(dims),
+                           sizeof(T)};
     }
 
     template <typename T>
     static Test_tensor make_test_tensor(const std::vector<int64_t>& dims,
                                         const std::vector<int64_t>& strides)
     {
-        return Test_tensor(dims, strides, sizeof(T));
+        return {dims, strides, sizeof(T)};
     }
 
     const std::vector<int64_t>& dims() const
@@ -95,7 +95,7 @@ public:
     }
 
 private:
-    static size_t calculateItemCount(const std::vector<int64_t>& dims)
+    static size_t calculate_item_count(const std::vector<int64_t>& dims)
     {
         if(dims.empty())
         {
@@ -103,15 +103,17 @@ private:
         }
 
         return static_cast<size_t>(
-            std::accumulate(dims.begin(), dims.end(), 1, std::multiplies<int64_t>()));
+            std::accumulate(dims.begin(), dims.end(), 1, std::multiplies<>()));
     }
 
-    static std::vector<int64_t> calculateRowMajorStrides(const std::vector<int64_t>& dims)
+    static std::vector<int64_t> calculate_row_major_strides(const std::vector<int64_t>& dims)
     {
         size_t n = dims.size();
         std::vector<int64_t> strides(n, 1);
         if(n == 0)
+        {
             return strides;
+        }
 
         // Starting from the second-to-last dimension down to the first
         for(size_t i = n - 1; i-- > 0;)
@@ -122,12 +124,14 @@ private:
         return strides;
     }
 
-    static std::vector<int64_t> calculateColumnMajorStrides(const std::vector<int64_t>& dims)
+    static std::vector<int64_t> calculate_column_major_strides(const std::vector<int64_t>& dims)
     {
         size_t n = dims.size();
         std::vector<int64_t> strides(n, 1);
         if(n == 0)
+        {
             return strides;
+        }
 
         // For column-major, we start from the second dimension and multiply by the size of the previous one.
         for(size_t i = 1; i < n; ++i)

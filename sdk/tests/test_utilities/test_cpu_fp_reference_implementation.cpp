@@ -22,11 +22,11 @@ TEST(CpuFpReferenceImplementation, BasicFloatUsage)
 
     Cpu_fp_reference_implementation<float, float, float> ref_impl;
 
-    ref_impl.execute(input_tensor,
+    ref_impl.batchnorm_fwd_inference(input_tensor,
                      scale_tensor,
                      bias_tensor,
                      mean_tensor,
                      variance_tensor,
                      output_tensor,
-                     1e-5f);
+                     1e-5);
 }

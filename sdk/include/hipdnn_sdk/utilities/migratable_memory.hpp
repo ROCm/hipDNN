@@ -24,14 +24,10 @@ public:
     };
 
     explicit Migratable_memory(size_t count = 0, size_t item_size = 0)
-        : _host_ptr(nullptr)
-        , _device_ptr(nullptr)
-        , _count(count)
+        :
+        _count(count)
         , _item_size(item_size)
         , _total_size(count * item_size)
-        , _current_location(Location::NONE)
-        , _host_valid(false)
-        , _device_valid(false)
     {
         if(count > 0)
         {
@@ -180,7 +176,7 @@ public:
     }
 
 private:
-    void throw_on_error(hipError_t err, const char* msg)
+    static void throw_on_error(hipError_t err, const char* msg)
     {
         if(err != hipSuccess)
         {
@@ -194,7 +190,7 @@ private:
 
     void allocate_host()
     {
-        if(!_host_ptr && _total_size > 0)
+        if((_host_ptr == nullptr) && _total_size > 0)
         {
             throw_on_error(hipHostMalloc(&_host_ptr, _total_size),
                            "Failed to allocate host memory");
@@ -205,7 +201,7 @@ private:
 
     void allocate_device()
     {
-        if(!_device_ptr && _total_size > 0)
+        if((_device_ptr == nullptr) && _total_size > 0)
         {
             throw_on_error(hipMalloc(&_device_ptr, _total_size),
                            "Failed to allocate device memory");
@@ -215,11 +211,13 @@ private:
     void ensure_host_valid()
     {
         if(_count == 0)
+        {
             return;
+        }
 
         allocate_host();
 
-        if(!_host_valid && _device_valid && _device_ptr)
+        if(!_host_valid && _device_valid && (_device_ptr != nullptr))
         {
             throw_on_error(hipMemcpy(_host_ptr, _device_ptr, _total_size, hipMemcpyDeviceToHost),
                            "Failed to copy from device to host");
@@ -231,11 +229,13 @@ private:
     void ensure_device_valid()
     {
         if(_count == 0)
+        {
             return;
+        }
 
         allocate_device();
 
-        if(!_device_valid && _host_valid && _host_ptr)
+        if(!_device_valid && _host_valid && (_host_ptr != nullptr))
         {
             throw_on_error(hipMemcpy(_device_ptr, _host_ptr, _total_size, hipMemcpyHostToDevice),
                            "Failed to copy from host to device");
@@ -246,12 +246,12 @@ private:
 
     void cleanup()
     {
-        if(_host_ptr)
+        if(_host_ptr != nullptr)
         {
             throw_on_error(hipHostFree(_host_ptr), "Failed to free host memory");
             _host_ptr = nullptr;
         }
-        if(_device_ptr)
+        if(_device_ptr != nullptr)
         {
             throw_on_error(hipFree(_device_ptr), "Failed to free device memory");
             _device_ptr = nullptr;
@@ -261,14 +261,14 @@ private:
         _current_location = Location::NONE;
     }
 
-    void* _host_ptr;
-    void* _device_ptr;
+    void* _host_ptr{nullptr};
+    void* _device_ptr{nullptr};
     size_t _count;
     size_t _item_size;
     size_t _total_size;
-    Location _current_location;
-    bool _host_valid;
-    bool _device_valid;
+    Location _current_location{Location::NONE};
+    bool _host_valid{false};
+    bool _device_valid{false};
 };
 
 } // namespace utilities

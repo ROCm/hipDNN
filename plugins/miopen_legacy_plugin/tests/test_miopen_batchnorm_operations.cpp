@@ -166,13 +166,13 @@ TEST_P(Batchnorm_execute_graph_test, RunFwdbatchnormGraph)
     variance_tensor_cpu.fill_with_random_values(0.1f, 0.3f);
 
     Cpu_fp_reference_implementation<float, float, float> cpu_ref_impl;
-    cpu_ref_impl.execute(x_tensor_cpu,
+    cpu_ref_impl.batchnorm_fwd_inference(x_tensor_cpu,
                          scale_tensor_cpu,
                          bias_tensor_cpu,
                          mean_tensor_cpu,
                          variance_tensor_cpu,
                          y_tensor_cpu,
-                         1e-3f);
+                         1e-3);
 
     Cpu_fp_reference_validation<float> cpu_ref_validation(1e-6f, 1e-6f);
     EXPECT_TRUE(cpu_ref_validation.compare_buffers(y_tensor_cpu.memory(), y_tensor.memory()));
@@ -180,4 +180,5 @@ TEST_P(Batchnorm_execute_graph_test, RunFwdbatchnormGraph)
 
 INSTANTIATE_TEST_SUITE_P(RunFwdbatchnormGraphWithParams,
                          Batchnorm_execute_graph_test,
+                         
                          testing::ValuesIn(get_bn_fwd_inference_test_cases()));
