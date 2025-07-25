@@ -2,6 +2,7 @@
 // SPDX-License-Identifier:  MIT
 #pragma once
 
+#include <hipdnn_backend_heuristic_type.h>
 #include <hipdnn_sdk/data_objects/data_types_generated.h>
 #include <hipdnn_sdk/data_objects/pointwise_attributes_generated.h>
 
@@ -62,4 +63,16 @@ enum class HeurMode_t
         return hipdnn_sdk::data_objects::PointwiseMode::PointwiseMode_UNSET;
     }
 }
+
+[[maybe_unused]] static hipdnnBackendHeurMode_t to_backend_type(const HeurMode_t& type)
+{
+    switch(type)
+    {
+    case HeurMode_t::FALLBACK:
+        return hipdnnBackendHeurMode_t::HIPDNN_HEUR_MODE_FALLBACK;
+    default:
+        return hipdnnBackendHeurMode_t::HIPDNN_HEUR_MODE_FALLBACK;
+    }
+}
+
 }

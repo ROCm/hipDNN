@@ -62,12 +62,19 @@ private:
         // Currently we only handle the first mode in the vector.  Once we add heuristics we will need
         // to handle using all modes that are passed in.  We currently only have 1 mode so there
         // is only 1 possibility.
+        std::vector<hipdnnBackendHeurMode_t> backend_modes;
+        backend_modes.reserve(modes.size());
+        for(const auto& mode : modes)
+        {
+            backend_modes.push_back(to_backend_type(mode));
+        }
+
         RETURN_ON_BACKEND_FAILURE(
             hipdnn_backend().backend_set_attribute(_engine_heuristic_desc->get(),
                                                    HIPDNN_ATTR_ENGINEHEUR_MODE,
                                                    HIPDNN_TYPE_HEUR_MODE,
                                                    1,
-                                                   modes.data()),
+                                                   backend_modes.data()),
             "Failed to set mode on the engine heuristic descriptor.");
 
         RETURN_ON_BACKEND_FAILURE(hipdnn_backend().backend_finalize(_engine_heuristic_desc->get()),

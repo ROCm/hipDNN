@@ -985,6 +985,11 @@ TEST_F(Graph_test_fixture, CanSuccessfullyCreateExecutionPlans)
 {
     Graph graph;
     const std::vector<HeurMode_t> heurModes = {HeurMode_t::FALLBACK};
+    std::vector<hipdnnBackendHeurMode_t> backend_modes;
+    for(const auto& mode : heurModes)
+    {
+        backend_modes.push_back(to_backend_type(mode));
+    }
     auto tensor_attributes = create_basic_batchnorm_graph(graph);
 
     hipdnnBackendDescriptor_t graph_desc = reinterpret_cast<hipdnnBackendDescriptor_t>(0x1234);
@@ -1009,10 +1014,22 @@ TEST_F(Graph_test_fixture, CanSuccessfullyCreateExecutionPlans)
                                           HIPDNN_TYPE_BACKEND_DESCRIPTOR,
                                           1,
                                           graph_desc));
-    EXPECT_CALL(
-        *_mock_backend,
-        hipdnnBackendSetAttribute(
-            heur_desc, HIPDNN_ATTR_ENGINEHEUR_MODE, HIPDNN_TYPE_HEUR_MODE, 1, heurModes.data()));
+    EXPECT_CALL(*_mock_backend,
+                hipdnnBackendSetAttribute(
+                    heur_desc, HIPDNN_ATTR_ENGINEHEUR_MODE, HIPDNN_TYPE_HEUR_MODE, 1, _))
+        .WillOnce([&backend_modes](hipdnnBackendDescriptor_t,
+                                   hipdnnBackendAttributeName_t,
+                                   hipdnnBackendAttributeType_t,
+                                   int64_t count,
+                                   const void* array_of_elements) {
+            EXPECT_EQ(count, static_cast<int64_t>(backend_modes.size()));
+            auto modes_ptr = static_cast<const hipdnnBackendHeurMode_t*>(array_of_elements);
+            for(size_t i = 0; i < backend_modes.size(); ++i)
+            {
+                EXPECT_EQ(modes_ptr[i], backend_modes[i]);
+            }
+            return HIPDNN_STATUS_SUCCESS;
+        });
 
     EXPECT_CALL(*_mock_backend, hipdnnBackendFinalize(heur_desc));
 
