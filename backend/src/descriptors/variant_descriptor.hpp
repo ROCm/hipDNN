@@ -34,5 +34,10 @@ public:
                        hipdnnBackendAttributeType_t attribute_type,
                        int64_t element_count,
                        const void* array_of_elements) override;
+
+    // throws if the variant descriptor is not finalized
+    void* get_workspace() const;
+    const std::vector<const void*>& get_data_pointers() const;
+    const std::vector<int64_t>& get_tensor_ids() const;
 };
 }

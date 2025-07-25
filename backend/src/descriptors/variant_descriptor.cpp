@@ -147,4 +147,28 @@ void Variant_descriptor::set_attribute(hipdnnBackendAttributeName_t attribute_na
     }
 }
 
+void* Variant_descriptor::get_workspace() const
+{
+    THROW_IF_FALSE(is_finalized(),
+                   HIPDNN_STATUS_INTERNAL_ERROR,
+                   "Variant_descriptor::get_workspace() failed: Not finalized.");
+    return _workspace;
+}
+
+const std::vector<const void*>& Variant_descriptor::get_data_pointers() const
+{
+    THROW_IF_FALSE(is_finalized(),
+                   HIPDNN_STATUS_INTERNAL_ERROR,
+                   "Variant_descriptor::get_data_pointers() failed: Not finalized.");
+    return _data_pointers;
+}
+
+const std::vector<int64_t>& Variant_descriptor::get_tensor_ids() const
+{
+    THROW_IF_FALSE(is_finalized(),
+                   HIPDNN_STATUS_INTERNAL_ERROR,
+                   "Variant_descriptor::get_unique_ids() failed: Not finalized.");
+    return _unique_ids;
+}
+
 }
