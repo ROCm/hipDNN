@@ -465,7 +465,11 @@ void Engine_plugin_resource_manager::execute_op_graph(hipdnnBackendDescriptor_t 
     // This will be implemented at the integration stage
     hipdnnEnginePluginExecutionContext_t execution_context = nullptr;
 
-    execute_op_graph(engine_id, execution_context, workspace, device_buffers.data(), static_cast<uint32_t>(tensor_ids.size()));
+    execute_op_graph(engine_id,
+                     execution_context,
+                     workspace,
+                     device_buffers.data(),
+                     static_cast<uint32_t>(tensor_ids.size()));
 }
 
 Engine_details_wrapper::Engine_details_wrapper(
