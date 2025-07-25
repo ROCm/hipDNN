@@ -21,6 +21,7 @@ add_library(hipdnn_backend_private
     flatbuffer_utilities.cpp
     plugin/plugin_manager.cpp
     plugin/engine_plugin.cpp
+    plugin/engine_plugin_resource_manager.cpp
     plugin/plugin_core.cpp
     plugin/shared_library.cpp
     error.cpp

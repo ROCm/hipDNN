@@ -2,6 +2,7 @@
 // SPDX-License-Identifier:  MIT
 
 #include "execution_plan_descriptor.hpp"
+#include "engine_config_descriptor.hpp"
 #include "error.hpp"
 #include "hipdnn_backend_descriptor_type.h"
 #include "hipdnn_exception.hpp"
@@ -28,14 +29,14 @@ void Execution_plan_descriptor::finalize()
                   HIPDNN_STATUS_BAD_PARAM,
                   "Execution_plan_descriptor::finalize() failed: Engine was not set.");
 
-    hipdnnBackendDescriptor::finalize();
+    hipdnnPrivateBackendDescriptor::finalize();
 }
 
 void Execution_plan_descriptor::get_attribute(hipdnnBackendAttributeName_t attribute_name,
                                               hipdnnBackendAttributeType_t attribute_type,
                                               int64_t requested_element_count,
                                               int64_t* element_count,
-                                              void* array_of_elements)
+                                              void* array_of_elements) const
 {
     THROW_IF_FALSE(is_finalized(),
                    HIPDNN_STATUS_NOT_INITIALIZED,
@@ -69,7 +70,7 @@ void Execution_plan_descriptor::get_attribute(hipdnnBackendAttributeName_t attri
 void Execution_plan_descriptor::get_workspace_size(hipdnnBackendAttributeType_t attribute_type,
                                                    int64_t requested_element_count,
                                                    int64_t* element_count,
-                                                   void* array_of_elements)
+                                                   void* array_of_elements) const
 {
     THROW_IF_NULL(_engine_config,
                   HIPDNN_STATUS_INTERNAL_ERROR,
@@ -154,16 +155,10 @@ void Execution_plan_descriptor::set_engine_config(hipdnnBackendAttributeType_t a
                 HIPDNN_STATUS_BAD_PARAM,
                 "Execution_plan_descriptor failed to set engine config: Invalid element count.");
 
-    THROW_IF_NULL(array_of_elements,
-                  HIPDNN_STATUS_BAD_PARAM_NULL_POINTER,
-                  "Execution_plan_descriptor failed to set engine config: Null pointer.");
-
-    hipdnnBackendDescriptor_t engine_config
-        = *static_cast<const hipdnnBackendDescriptor_t*>(array_of_elements);
-
-    THROW_IF_NULL(engine_config,
-                  HIPDNN_STATUS_BAD_PARAM_NULL_POINTER,
-                  "Execution_plan_descriptor failed to set engine config: Engine config is null.");
+    auto engine_config = unpack_descriptor<const Engine_config_descriptor>(
+        array_of_elements,
+        HIPDNN_STATUS_BAD_PARAM_NULL_POINTER,
+        "Execution_plan_descriptor failed to set engine config: Null pointer.");
 
     THROW_IF_NE(engine_config->type,
                 HIPDNN_BACKEND_ENGINECFG_DESCRIPTOR,
@@ -182,7 +177,7 @@ void Execution_plan_descriptor::set_engine_config(hipdnnBackendAttributeType_t a
 void Execution_plan_descriptor::get_engine_config(hipdnnBackendAttributeType_t attribute_type,
                                                   int64_t requested_element_count,
                                                   int64_t* element_count,
-                                                  void* array_of_elements)
+                                                  void* array_of_elements) const
 {
     THROW_IF_NE(attribute_type,
                 HIPDNN_TYPE_BACKEND_DESCRIPTOR,
@@ -210,8 +205,16 @@ void Execution_plan_descriptor::get_engine_config(hipdnnBackendAttributeType_t a
                   "Execution_plan_descriptor failed to get engine config: Engine config is null. "
                   "Engine config was not set.");
 
-    auto* output = static_cast<hipdnnBackendDescriptor_t*>(array_of_elements);
-    *output = _engine_config;
+    pack_descriptor(_engine_config, array_of_elements);
+}
+
+std::shared_ptr<const Engine_config_descriptor> Execution_plan_descriptor::get_engine_config() const
+{
+    THROW_IF_FALSE(is_finalized(),
+                   HIPDNN_STATUS_INTERNAL_ERROR,
+                   "Execution_plan_descriptor::get_engine_config() failed: Not finalized.");
+
+    return _engine_config;
 }
 
 } // namespace hipdnn_backend

@@ -8,16 +8,17 @@
 namespace hipdnn_backend
 {
 
-class Execution_plan_descriptor : public hipdnnBackendDescriptor
+class Engine_config_descriptor;
+class Execution_plan_descriptor : public hipdnnPrivateBackendDescriptor
 {
 private:
     hipdnnHandle_t _handle = nullptr;
-    hipdnnBackendDescriptor_t _engine_config = nullptr;
+    std::shared_ptr<const Engine_config_descriptor> _engine_config;
 
     void get_workspace_size(hipdnnBackendAttributeType_t attribute_type,
                             int64_t requested_element_count,
                             int64_t* element_count,
-                            void* array_of_elements);
+                            void* array_of_elements) const;
 
     void set_handle(hipdnnBackendAttributeType_t attribute_type,
                     int64_t element_count,
@@ -30,7 +31,7 @@ private:
     void get_engine_config(hipdnnBackendAttributeType_t attribute_type,
                            int64_t requested_element_count,
                            int64_t* element_count,
-                           void* array_of_elements);
+                           void* array_of_elements) const;
 
 public:
     Execution_plan_descriptor();
@@ -42,12 +43,15 @@ public:
                        hipdnnBackendAttributeType_t attribute_type,
                        int64_t requested_element_count,
                        int64_t* element_count,
-                       void* array_of_elements) override;
+                       void* array_of_elements) const override;
 
     void set_attribute(hipdnnBackendAttributeName_t attribute_name,
                        hipdnnBackendAttributeType_t attribute_type,
                        int64_t element_count,
                        const void* array_of_elements) override;
+
+    // Throws an exception if the descriptor is not finalized.
+    std::shared_ptr<const Engine_config_descriptor> get_engine_config() const;
 };
 
 } // namespace hipdnn_backend

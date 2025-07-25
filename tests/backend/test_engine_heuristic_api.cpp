@@ -190,6 +190,7 @@ TEST_F(Engine_heuristic_api_tests, GetOperationGraph)
     populate_engine_heuristic(true);
 
     hipdnnBackendDescriptor_t retrieved_graph = nullptr;
+    hipdnnBackendDescriptor_t retrieved_graph2 = nullptr;
 
     EXPECT_EQ(hipdnnBackendGetAttribute(_engine_heuristic,
                                         HIPDNN_ATTR_ENGINEHEUR_OPERATION_GRAPH,
@@ -222,7 +223,10 @@ TEST_F(Engine_heuristic_api_tests, GetOperationGraph)
                                         nullptr,
                                         &retrieved_graph),
               HIPDNN_STATUS_SUCCESS);
-    EXPECT_EQ(retrieved_graph, _graph);
+    EXPECT_NE(retrieved_graph, nullptr);
+
+    hipdnnBackendDestroyDescriptor(retrieved_graph);
+    retrieved_graph = nullptr;
 
     int64_t count = 0;
     EXPECT_EQ(hipdnnBackendGetAttribute(_engine_heuristic,
@@ -230,9 +234,12 @@ TEST_F(Engine_heuristic_api_tests, GetOperationGraph)
                                         HIPDNN_TYPE_BACKEND_DESCRIPTOR,
                                         1,
                                         &count,
-                                        &retrieved_graph),
+                                        &retrieved_graph2),
               HIPDNN_STATUS_SUCCESS);
     EXPECT_EQ(count, 1);
+
+    hipdnnBackendDestroyDescriptor(retrieved_graph2);
+    retrieved_graph2 = nullptr;
 }
 
 TEST_F(Engine_heuristic_api_tests, GetHeuristicMode)
@@ -389,7 +396,7 @@ TEST_F(Engine_heuristic_api_tests, GetEngineConfigs)
         HIPDNN_STATUS_SUCCESS);
     EXPECT_EQ(engine_id, -1);
 
-    // Expecting to only need to clean-up 1 engine config, since we only requested 1.
+    // Expecting to only need to clean-up 1 engine config, since we only created & requested 1.
     for(auto config : configs)
     {
         if(config != nullptr)
@@ -422,24 +429,9 @@ TEST_F(Engine_heuristic_api_tests, GetEngineConfigsRequestMoreThanAvailable)
               HIPDNN_STATUS_SUCCESS);
     EXPECT_EQ(count, 1);
 
-    for(size_t i = 0; i < 5; ++i)
+    for(auto& config : configs)
     {
-        // TODO: Internal memory not being tracked properly, and we need to manually free.
-        if(std::cmp_less(i, count))
-        {
-            EXPECT_EQ(hipdnnBackendFinalize(configs[i]), HIPDNN_STATUS_SUCCESS);
-            hipdnnBackendDescriptor_t engine = nullptr;
-            EXPECT_EQ(hipdnnBackendGetAttribute(configs[i],
-                                                HIPDNN_ATTR_ENGINECFG_ENGINE,
-                                                HIPDNN_TYPE_BACKEND_DESCRIPTOR,
-                                                1,
-                                                nullptr,
-                                                &engine),
-                      HIPDNN_STATUS_SUCCESS);
-            ASSERT_NE(engine, nullptr);
-            EXPECT_EQ(hipdnnBackendDestroyDescriptor(engine), HIPDNN_STATUS_SUCCESS);
-        }
-        EXPECT_EQ(hipdnnBackendDestroyDescriptor(configs[i]), HIPDNN_STATUS_SUCCESS);
+        EXPECT_EQ(hipdnnBackendDestroyDescriptor(config), HIPDNN_STATUS_SUCCESS);
     }
 }
 // NOLINTEND(readability-function-cognitive-complexity)

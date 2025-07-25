@@ -32,7 +32,7 @@ struct Plugin_manager
     // Note: Heuristic details is a future thing, for now we can ignore
     // 		 Heuristic details is used to determine sort order on the returned graphs.
 
-    std::set<int64_t> get_applicable_engines(Graph_descriptor* graph);
+    std::set<int64_t> get_applicable_engines(const Graph_descriptor* graph);
 
     // This will redirect the execute to the plugin that owns the engine selected inside the ExecutionPlan
     // Throws if invalid stuff is provided, and later is wrapped with a status + provides message

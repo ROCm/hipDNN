@@ -3,9 +3,14 @@
 #pragma once
 
 #include "graph_attributes.hpp"
+#include <flatbuffers/flatbuffers.h>
 #include <hipdnn_frontend/types.hpp>
+#include <hipdnn_sdk/data_objects/graph_generated.h>
 #include <hipdnn_sdk/data_objects/tensor_attributes_generated.h>
+#include <optional>
 #include <string>
+#include <type_traits>
+#include <variant>
 #include <vector>
 
 namespace hipdnn_frontend
@@ -15,6 +20,42 @@ namespace graph
 class Tensor_attributes
 {
 public:
+    using ValueVariant = std::variant<std::monostate, double, float, uint16_t, uint8_t, int32_t>;
+
+    bool has_value() const
+    {
+        return !std::holds_alternative<std::monostate>(_value);
+    }
+
+    template <typename T>
+    std::optional<T> get_value() const
+    {
+        if(auto p = std::get_if<T>(&_value))
+        {
+            return *p;
+        }
+        return std::nullopt;
+    }
+
+    template <typename T>
+    Tensor_attributes& set_value(T v)
+    {
+        static_assert(std::disjunction_v<std::is_same<T, float>,
+                                         std::is_same<T, double>,
+                                         std::is_same<T, uint16_t>,
+                                         std::is_same<T, uint8_t>,
+                                         std::is_same<T, int32_t>>,
+                      "Unsupported type for Tensor_attributes::set_value");
+        _value = v;
+        return *this;
+    }
+
+    Tensor_attributes& clear_value()
+    {
+        _value = {};
+        return *this;
+    }
+
     int64_t get_uid() const
     {
         return _uid;
@@ -129,8 +170,57 @@ public:
     flatbuffers::Offset<hipdnn_sdk::data_objects::TensorAttributes>
         pack_attributes(flatbuffers::FlatBufferBuilder& builder) const
     {
-        return CreateTensorAttributesDirect(
-            builder, _uid, _name.c_str(), to_sdk_type(_data_type), &_stride, &_dim, _is_virtual);
+        auto result = std::visit(
+            [&](auto&& arg)
+                -> std::pair<hipdnn_sdk::data_objects::TensorValue, flatbuffers::Offset<void>> {
+                using T = std::decay_t<decltype(arg)>;
+                if constexpr(std::is_same_v<T, float>)
+                {
+                    hipdnn_sdk::data_objects::Float32Value float_val(arg);
+                    return {hipdnn_sdk::data_objects::TensorValue_Float32Value,
+                            builder.CreateStruct(float_val).Union()};
+                }
+                else if constexpr(std::is_same_v<T, double>)
+                {
+                    hipdnn_sdk::data_objects::Float64Value double_val(arg);
+                    return {hipdnn_sdk::data_objects::TensorValue_Float64Value,
+                            builder.CreateStruct(double_val).Union()};
+                }
+                else if constexpr(std::is_same_v<T, uint16_t>)
+                {
+                    hipdnn_sdk::data_objects::Float16Value half_val(arg);
+                    return {hipdnn_sdk::data_objects::TensorValue_Float16Value,
+                            builder.CreateStruct(half_val).Union()};
+                }
+                else if constexpr(std::is_same_v<T, uint8_t>)
+                {
+                    hipdnn_sdk::data_objects::Float8Value uint8_val(arg);
+                    return {hipdnn_sdk::data_objects::TensorValue_Float8Value,
+                            builder.CreateStruct(uint8_val).Union()};
+                }
+                else if constexpr(std::is_same_v<T, int32_t>)
+                {
+                    hipdnn_sdk::data_objects::Int32Value int32_val(arg);
+                    return {hipdnn_sdk::data_objects::TensorValue_Int32Value,
+                            builder.CreateStruct(int32_val).Union()};
+                }
+                else
+                {
+                    // For std::monostate case
+                    return {hipdnn_sdk::data_objects::TensorValue_NONE, 0};
+                }
+            },
+            _value);
+
+        return hipdnn_sdk::data_objects::CreateTensorAttributesDirect(builder,
+                                                                      _uid,
+                                                                      _name.c_str(),
+                                                                      to_sdk_type(_data_type),
+                                                                      &_stride,
+                                                                      &_dim,
+                                                                      _is_virtual,
+                                                                      result.first,
+                                                                      result.second);
     }
 
 private:
@@ -141,6 +231,7 @@ private:
     std::vector<int64_t> _stride;
     std::vector<int64_t> _dim;
     bool _is_virtual = false;
+    ValueVariant _value;
 };
 
 }
