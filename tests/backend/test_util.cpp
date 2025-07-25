@@ -5,6 +5,7 @@
 #include "hipdnn_backend.h"
 #include <hipdnn_sdk/data_objects/graph_generated.h>
 #include <hipdnn_sdk/logging/logger.hpp>
+#include <hipdnn_sdk/test_utilities/flatbuffer_graph_test_utils.hpp>
 
 #include <gtest/gtest.h>
 
@@ -262,39 +263,9 @@ void create_and_initialize_backend_descriptor(hipdnnBackendDescriptor_t* backend
     ASSERT_EQ(status, HIPDNN_STATUS_SUCCESS);
 }
 
-void create_and_populate_batchnorm_node(Graph& graph)
+flatbuffers::FlatBufferBuilder create_and_populate_batchnorm_node()
 {
-    auto x = std::make_shared<Tensor_attributes>();
-    x->set_uid(1)
-        .set_name("Input")
-        .set_data_type(DataType_t::FLOAT)
-        .set_dim({1, 64, 28, 28}); // NCHW format
-
-    auto scale = std::make_shared<Tensor_attributes>();
-    scale->set_uid(2).set_name("Scale").set_data_type(DataType_t::FLOAT).set_dim({1, 64, 1, 1});
-
-    auto bias = std::make_shared<Tensor_attributes>();
-    bias->set_uid(3).set_name("Bias").set_data_type(DataType_t::FLOAT).set_dim({1, 64, 1, 1});
-
-    auto mean = std::make_shared<Tensor_attributes>();
-    mean->set_uid(4).set_name("Mean").set_data_type(DataType_t::FLOAT).set_dim({1, 64, 1, 1});
-
-    auto inv_variance = std::make_shared<Tensor_attributes>();
-    inv_variance->set_uid(5)
-        .set_name("InvVariance")
-        .set_data_type(DataType_t::FLOAT)
-        .set_dim({1, 64, 1, 1});
-
-    // Create BatchnormInference node
-    Batchnorm_inference_attributes attrs;
-
-    // TODO: add epsilon
-
-    [[maybe_unused]] auto y = graph.batchnorm_inference(x, mean, inv_variance, scale, bias, attrs);
-
-    // Build the operation graph
-    auto build_result = graph.build_operation_graph();
-    EXPECT_TRUE(build_result.is_good()) << build_result.get_message();
+    return flatbuffer_test_utils::create_valid_batchnorm_graph();
 }
 
 void extract_tensor_info_from_graph(

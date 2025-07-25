@@ -4,17 +4,15 @@ SPDX-License-Identifier: MIT
 */
 
 #include <gtest/gtest.h>
-#include <hipdnn_sdk/logging/logger.hpp>
 #include <hipdnn_sdk/test_utilities/logging_utils.hpp>
 
-#define HIPDNN_SDK_TESTS "hipdnn_sdk_tests"
+#define HIPDNN_FRONTEND_TESTS "hipdnn_frontend_tests"
 
 int main(int argc, char** argv)
 {
     ::testing::InitGoogleTest(&argc, argv);
 
-    hipdnn::logging::initialize_callback_logging(HIPDNN_SDK_TESTS,
-                                                 logging_test_utils::test_logging_callback);
+    logging_test_utils::initialize_spdlog_default_logger(HIPDNN_FRONTEND_TESTS);
 
     return RUN_ALL_TESTS();
 }

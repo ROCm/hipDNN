@@ -51,7 +51,7 @@ void populate_test_execution_plan(hipdnnBackendDescriptor_t* execution_plan,
                                   int64_t gidx,
                                   bool finalize = false);
 
-void create_and_populate_batchnorm_node(Graph& graph);
+flatbuffers::FlatBufferBuilder create_and_populate_batchnorm_node();
 
 void* allocate_tensor_memory([[maybe_unused]] const int64_t* dims,
                              [[maybe_unused]] size_t dims_count,
