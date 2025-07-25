@@ -86,7 +86,7 @@ private:
                                                    0,
                                                    &available_engine_count,
                                                    nullptr),
-            "Failed to set mode on the engine heuristic descriptor.");
+            "Failed to get attribue from the engine heuristic descriptor.");
 
         if(available_engine_count == 0)
         {
