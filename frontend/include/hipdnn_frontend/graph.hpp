@@ -115,7 +115,7 @@ private:
                         "Failed to create engine configuration descriptor."};
             }
             engine_configs.push_back(std::move(engine_cfg_desc));
-            engine_configs_shallow.push_back(engine_cfg_desc->get());
+            engine_configs_shallow.push_back(engine_configs.back()->get());
         }
 
         int64_t count = 0;
