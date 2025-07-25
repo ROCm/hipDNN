@@ -13,6 +13,7 @@ find_package(hip REQUIRED)
 add_executable(hipdnn_frontend_tests 
     main.cpp
     fake_backend/fake_hipdnn_backend.cpp
+    test_backend_logging_helpers.cpp
     test_batchnorm_attributes.cpp
     test_batchnorm_backward_attributes.cpp
     test_batchnorm_backward_node.cpp
