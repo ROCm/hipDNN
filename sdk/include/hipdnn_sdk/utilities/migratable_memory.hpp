@@ -6,6 +6,7 @@
 #include <hip/hip_runtime.h>
 #include <memory>
 #include <stdexcept>
+#include <hipdnn_sdk/logging/logger.hpp>
 
 namespace hipdnn_sdk
 {
@@ -184,6 +185,16 @@ private:
         }
     }
 
+    static void log_on_error(hipError_t err, const char* msg)
+    {
+        std::ignore = msg;
+        
+        if(err != hipSuccess)
+        {
+            HIPDNN_LOG_ERROR("{}: HIP error: {}", msg, hipGetErrorString(err));
+        }
+    }
+
     // TODO - Consider different allocation strategies, such as unified memory, host pinned memory, etc.
     // For now, we will use hipHostMalloc for host memory and hipMalloc for device
     // memory. This can be extended based on specific requirements.
@@ -248,12 +259,12 @@ private:
     {
         if(_host_ptr != nullptr)
         {
-            throw_on_error(hipHostFree(_host_ptr), "Failed to free host memory");
+            log_on_error(hipHostFree(_host_ptr), "Failed to free host memory");
             _host_ptr = nullptr;
         }
         if(_device_ptr != nullptr)
         {
-            throw_on_error(hipFree(_device_ptr), "Failed to free device memory");
+            log_on_error(hipFree(_device_ptr), "Failed to free device memory");
             _device_ptr = nullptr;
         }
         _host_valid = false;

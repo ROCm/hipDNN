@@ -16,12 +16,11 @@ template <class T>
 class Cpu_fp_reference_validation : public Reference_validation_interface
 {
 public:
-    Cpu_fp_reference_validation() = default;
-    Cpu_fp_reference_validation(T absolute_tolerance, T relative_tolerance)
+    Cpu_fp_reference_validation(T absolute_tolerance = std::numeric_limits<T>::epsilon(), T relative_tolerance = std::numeric_limits<T>::epsilon())
         : _absolute_tolerance(absolute_tolerance)
         , _relative_tolerance(relative_tolerance)
     {
-        if(absolute_tolerance < 0 || relative_tolerance < 0)
+        if(absolute_tolerance < static_cast<T>(0.0f) || relative_tolerance < static_cast<T>(0.0f))
         {
             throw std::invalid_argument("Tolerances must be non-negative");
         }
@@ -49,7 +48,6 @@ public:
 
             T abs_diff = std::fabs(ref_value - impl_value);
 
-            // Based this on: https://realtimecollisiondetection.net/blog/?p=89
             if(abs_diff > _absolute_tolerance
                && abs_diff
                       > _relative_tolerance * std::max(std::fabs(ref_value), std::fabs(impl_value)))
@@ -64,8 +62,8 @@ public:
 
 private:
     // Tolerances for comparison
-    T _absolute_tolerance = std::numeric_limits<T>::epsilon();
-    T _relative_tolerance = std::numeric_limits<T>::epsilon();
+    T _absolute_tolerance;
+    T _relative_tolerance;
 };
 
 } // namespace reference_test_utilities

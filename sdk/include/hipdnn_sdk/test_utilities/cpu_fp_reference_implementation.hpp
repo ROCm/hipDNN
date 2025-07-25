@@ -15,7 +15,7 @@ namespace reference_test_utilities
 
 using namespace hipdnn_sdk::utilities;
 
-template <class T, class U, class V = U>
+template <class Input_data_type, class Scale_bias_data_type, class Mean_variance_data_type = Scale_bias_data_type>
 class Cpu_fp_reference_implementation : public Reference_implementation_interface
 {
 public:
@@ -42,8 +42,8 @@ public:
         int64_t width = input.dims().at(3);
 
         std::for_each(std::execution::par, channels.begin(), channels.end(), [&](int64_t cidx) {
-            V mean = get_value<V>(estimatedMean, 0, cidx, 0, 0);
-            V variance = get_value<V>(estimatedVariance, 0, cidx, 0, 0);
+            auto mean = get_value<Mean_variance_data_type>(estimatedMean, 0, cidx, 0, 0);
+            auto variance = get_value<Mean_variance_data_type>(estimatedVariance, 0, cidx, 0, 0);
             double invert_var
                 = 1.0 / sqrt(static_cast<double>(variance) + epsilon);
             // process the batch per channel
@@ -54,18 +54,18 @@ public:
                     for(int bidx = 0; bidx < n_batches; bidx++)
                     { // via mini_batch
                         double elem_std
-                            = static_cast<double>(get_value<T>(input, bidx, cidx, row, column))
+                            = static_cast<double>(get_value<Input_data_type>(input, bidx, cidx, row, column))
                               - static_cast<double>(mean);
                         double inhat = elem_std * invert_var;
-                        set_value<T>(
+                        set_value<Input_data_type>(
                             output,
                             bidx,
                             cidx,
                             row,
                             column,
-                            static_cast<T>(
-                                (static_cast<double>(get_value<U>(scale, 0, cidx, 0, 0)) * inhat)
-                                + static_cast<double>(get_value<U>(bias, 0, cidx, 0, 0))));
+                            static_cast<Input_data_type>(
+                                (static_cast<double>(get_value<Scale_bias_data_type>(scale, 0, cidx, 0, 0)) * inhat)
+                                + static_cast<double>(get_value<Scale_bias_data_type>(bias, 0, cidx, 0, 0))));
                     }
                 }
             }

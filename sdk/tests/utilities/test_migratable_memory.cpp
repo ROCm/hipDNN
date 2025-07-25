@@ -2,6 +2,7 @@
 // SPDX-License-Identifier:  MIT
 
 #include <gtest/gtest.h>
+#include <hipdnn_sdk/test_utilities/test_utilities.hpp>
 #include <hipdnn_sdk/utilities/migratable_memory.hpp>
 
 using namespace hipdnn_sdk::utilities;
@@ -47,7 +48,7 @@ TEST(MigratableMemory, InitializeWithSize)
 TEST(MigratableMemory, MoveConstructor)
 {
     Migratable_memory memory1(10, sizeof(float));
-    float* old_host_data = memory1.host_data<float>();
+    auto* old_host_data = memory1.host_data<float>();
 
     Migratable_memory memory2(std::move(memory1));
 
@@ -66,7 +67,7 @@ TEST(MigratableMemory, MoveConstructor)
 TEST(MigratableMemory, MoveAssignment)
 {
     Migratable_memory memory1(10, sizeof(float));
-    float* old_host_data = memory1.host_data<float>();
+    auto* old_host_data = memory1.host_data<float>();
 
     Migratable_memory memory2;
     memory2 = std::move(memory1);
@@ -96,6 +97,8 @@ TEST(MigratableMemory, Resize)
 
 TEST(MigratableMemory, MigrateToDevice)
 {
+    SKIP_IF_NO_DEVICES();
+
     Migratable_memory memory(10, sizeof(float));
 
     EXPECT_FALSE(memory.empty());
@@ -112,6 +115,8 @@ TEST(MigratableMemory, MigrateToDevice)
 
 TEST(MigratableMemory, MigrateToHost)
 {
+    SKIP_IF_NO_DEVICES();
+
     Migratable_memory memory(10, sizeof(float));
 
     EXPECT_FALSE(memory.empty());
@@ -123,10 +128,10 @@ TEST(MigratableMemory, MigrateToHost)
     check_buffer(memory.device_data<float>(), memory.count());
     EXPECT_EQ(memory.location(), Migratable_memory::Location::BOTH);
 
-    float array[10];
-    init_buffer(array, 10, 2.0f);
+    std::array<float, 10> array;
+    init_buffer(array.data(), 10, 2.0f);
     hipError_t err = hipMemcpy(
-        memory.device_data<float>(), array, memory.count() * sizeof(float), hipMemcpyHostToDevice);
+        memory.device_data<float>(), array.data(), memory.count() * sizeof(float), hipMemcpyHostToDevice);
     EXPECT_EQ(err, hipSuccess);
     memory.mark_device_modified();
     EXPECT_EQ(memory.location(), Migratable_memory::Location::DEVICE);
@@ -137,6 +142,8 @@ TEST(MigratableMemory, MigrateToHost)
 
 TEST(MigratableMemory, Clear)
 {
+    SKIP_IF_NO_DEVICES();
+
     Migratable_memory memory(10, sizeof(float));
     memory.clear();
 
