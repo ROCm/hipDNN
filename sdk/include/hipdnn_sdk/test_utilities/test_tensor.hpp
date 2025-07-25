@@ -5,20 +5,26 @@
 
 #include <hipdnn_sdk/utilities/migratable_memory.hpp>
 #include <numeric>
-#include <vector>
 #include <random>
+#include <vector>
 
-namespace hipdnn_sdk {
-namespace reference_test_utilities {
+namespace hipdnn_sdk
+{
+namespace reference_test_utilities
+{
 
 using namespace hipdnn_sdk::utilities;
 
 // Wraps vectors of dims/strides and Migratable_memory<T> to provide a common interface for testing
 class Test_tensor
 {
-    private:
-    Test_tensor(const std::vector<int64_t>& dims, const std::vector<int64_t>& strides, size_t item_size)
-        : _memory(calculateItemCount(dims), item_size), _dims(dims), _strides(strides)
+private:
+    Test_tensor(const std::vector<int64_t>& dims,
+                const std::vector<int64_t>& strides,
+                size_t item_size)
+        : _memory(calculateItemCount(dims), item_size)
+        , _dims(dims)
+        , _strides(strides)
     {
     }
 
@@ -26,20 +32,24 @@ public:
     // Delete copy constructor and copy assignment operator
     Test_tensor(const Test_tensor&) = delete;
     Test_tensor& operator=(const Test_tensor&) = delete;
-    
+
     // Default move constructor and move assignment operator
     // These will automatically move _memory, _dims, and _strides
     Test_tensor(Test_tensor&&) = default;
     Test_tensor& operator=(Test_tensor&&) = default;
 
-    template<typename T>
+    template <typename T>
     static Test_tensor make_test_tensor(const std::vector<int64_t>& dims, bool row_major = true)
     {
-        return Test_tensor(dims, row_major ? calculateRowMajorStrides(dims) : calculateColumnMajorStrides(dims), sizeof(T));
+        return Test_tensor(dims,
+                           row_major ? calculateRowMajorStrides(dims)
+                                     : calculateColumnMajorStrides(dims),
+                           sizeof(T));
     }
 
-    template<typename T>
-    static Test_tensor make_test_tensor(const std::vector<int64_t>& dims, const std::vector<int64_t>& strides)
+    template <typename T>
+    static Test_tensor make_test_tensor(const std::vector<int64_t>& dims,
+                                        const std::vector<int64_t>& strides)
     {
         return Test_tensor(dims, strides, sizeof(T));
     }
@@ -64,21 +74,22 @@ public:
         return _memory;
     }
 
-    template<typename T>
+    template <typename T>
     void fill_with_value(T value)
     {
         T* data = _memory.host_data<T>();
         std::fill(data, data + _memory.count(), value);
     }
 
-    template<typename T>
+    template <typename T>
     void fill_with_random_values(T min, T max, unsigned int seed = 0)
     {
         std::mt19937 generator(seed);
         std::uniform_real_distribution<T> distribution(min, max);
 
         T* data = _memory.host_data<T>();
-        for (size_t i = 0; i < _memory.count(); ++i) {
+        for(size_t i = 0; i < _memory.count(); ++i)
+        {
             data[i] = distribution(generator);
         }
     }
@@ -86,36 +97,44 @@ public:
 private:
     static size_t calculateItemCount(const std::vector<int64_t>& dims)
     {
-        if (dims.empty()) {
+        if(dims.empty())
+        {
             return 0;
         }
 
-        return static_cast<size_t>(std::accumulate(dims.begin(), dims.end(), 1, std::multiplies<int64_t>()));
+        return static_cast<size_t>(
+            std::accumulate(dims.begin(), dims.end(), 1, std::multiplies<int64_t>()));
     }
 
-    static std::vector<int64_t> calculateRowMajorStrides(const std::vector<int64_t>& dims) {
+    static std::vector<int64_t> calculateRowMajorStrides(const std::vector<int64_t>& dims)
+    {
         size_t n = dims.size();
         std::vector<int64_t> strides(n, 1);
-        if (n == 0) return strides;
-        
+        if(n == 0)
+            return strides;
+
         // Starting from the second-to-last dimension down to the first
-        for (size_t i = n - 1; i-- > 0; ) {
+        for(size_t i = n - 1; i-- > 0;)
+        {
             strides[i] = dims[i + 1] * strides[i + 1];
         }
-        
+
         return strides;
     }
 
-    static std::vector<int64_t> calculateColumnMajorStrides(const std::vector<int64_t>& dims) {
+    static std::vector<int64_t> calculateColumnMajorStrides(const std::vector<int64_t>& dims)
+    {
         size_t n = dims.size();
         std::vector<int64_t> strides(n, 1);
-        if (n == 0) return strides;
-        
+        if(n == 0)
+            return strides;
+
         // For column-major, we start from the second dimension and multiply by the size of the previous one.
-        for (size_t i = 1; i < n; ++i) {
+        for(size_t i = 1; i < n; ++i)
+        {
             strides[i] = dims[i - 1] * strides[i - 1];
         }
-        
+
         return strides;
     }
 

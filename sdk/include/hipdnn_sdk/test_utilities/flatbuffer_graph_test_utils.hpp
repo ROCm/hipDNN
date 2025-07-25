@@ -49,18 +49,38 @@ inline flatbuffers::FlatBufferBuilder
         builder, 2, "y", hipdnn_sdk::data_objects::DataType_FLOAT, &strides, &dims));
 
     tensor_attributes.push_back(hipdnn_sdk::data_objects::CreateTensorAttributesDirect(
-        builder, 3, "scale", hipdnn_sdk::data_objects::DataType_FLOAT, &derived_strides, &derived_dims));
+        builder,
+        3,
+        "scale",
+        hipdnn_sdk::data_objects::DataType_FLOAT,
+        &derived_strides,
+        &derived_dims));
 
     tensor_attributes.push_back(hipdnn_sdk::data_objects::CreateTensorAttributesDirect(
-        builder, 4, "bias", hipdnn_sdk::data_objects::DataType_FLOAT, &derived_strides, &derived_dims));
+        builder,
+        4,
+        "bias",
+        hipdnn_sdk::data_objects::DataType_FLOAT,
+        &derived_strides,
+        &derived_dims));
 
     if(has_optional_attributes)
     {
         tensor_attributes.push_back(hipdnn_sdk::data_objects::CreateTensorAttributesDirect(
-            builder, 5, "est_mean", hipdnn_sdk::data_objects::DataType_FLOAT, &derived_strides, &derived_dims));
+            builder,
+            5,
+            "est_mean",
+            hipdnn_sdk::data_objects::DataType_FLOAT,
+            &derived_strides,
+            &derived_dims));
 
         tensor_attributes.push_back(hipdnn_sdk::data_objects::CreateTensorAttributesDirect(
-            builder, 6, "est_variance", hipdnn_sdk::data_objects::DataType_FLOAT, &derived_strides, &derived_dims));
+            builder,
+            6,
+            "est_variance",
+            hipdnn_sdk::data_objects::DataType_FLOAT,
+            &derived_strides,
+            &derived_dims));
     }
 
     auto bnorm_attributes = hipdnn_sdk::data_objects::CreateBatchnormInferenceAttributes(

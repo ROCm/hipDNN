@@ -3,8 +3,8 @@
 
 #pragma once
 
-#include <hipdnn_sdk/plugin/plugin_api_data_types.h>
 #include <hipdnn_sdk/logging/callback_types.h>
+#include <hipdnn_sdk/plugin/plugin_api_data_types.h>
 
 #ifdef _WIN32
 #define HIPDNN_PLUGIN_EXPORT __declspec(dllexport)
@@ -90,8 +90,7 @@ HIPDNN_PLUGIN_EXPORT void hipdnnPluginGetLastErrorString(const char** error_str)
  *
  * @return A value of type `hipdnnPluginStatus_t` indicating the status of the operation.
  */
-HIPDNN_PLUGIN_EXPORT hipdnnPluginStatus_t hipdnnPluginSetLoggingCallback(
-    hipdnnCallback_t callback);
+HIPDNN_PLUGIN_EXPORT hipdnnPluginStatus_t hipdnnPluginSetLoggingCallback(hipdnnCallback_t callback);
 
 /** @} */ // End of PluginFunctions group
 

@@ -12,13 +12,13 @@ inline __HOST_DEVICE__ hip_bfloat16 operator""_bf(long double value)
 
 namespace std
 {
-    inline __HOST_DEVICE__ hip_bfloat16 fabs(hip_bfloat16 num)
-    {
-        return num > 0.0_bf ? num : num * -1.0_bf;
-    }
+inline __HOST_DEVICE__ hip_bfloat16 fabs(hip_bfloat16 num)
+{
+    return num > 0.0_bf ? num : num * -1.0_bf;
+}
 
-    inline __HOST_DEVICE__ hip_bfloat16 max(hip_bfloat16 a, hip_bfloat16 b)
-    {
-        return a > b ? a : b;
-    }
+inline __HOST_DEVICE__ hip_bfloat16 max(hip_bfloat16 a, hip_bfloat16 b)
+{
+    return a > b ? a : b;
+}
 }

@@ -12,15 +12,14 @@ inline __HOST_DEVICE__ half operator""_h(long double value)
 
 namespace std
 {
-    inline __HOST_DEVICE__ half fabs(half num)
-    {
-        return num > 0.0_h ? num : num * -1.0_h;
-    }
-
-    inline __HOST_DEVICE__ half max(half a, half b)
-    {
-        return a > b ? a : b;
-    }
-
+inline __HOST_DEVICE__ half fabs(half num)
+{
+    return num > 0.0_h ? num : num * -1.0_h;
 }
 
+inline __HOST_DEVICE__ half max(half a, half b)
+{
+    return a > b ? a : b;
+}
+
+}
