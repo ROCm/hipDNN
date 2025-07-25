@@ -12,7 +12,7 @@
 namespace hipdnn_backend
 {
 
-class Graph_descriptor : public hipdnnBackendDescriptor
+class Graph_descriptor : public hipdnnPrivateBackendDescriptor
 {
 private:
     std::unique_ptr<hipdnn_sdk::data_objects::GraphT> _graph;
@@ -33,7 +33,7 @@ public:
                        [[maybe_unused]] hipdnnBackendAttributeType_t attribute_type,
                        [[maybe_unused]] int64_t requested_element_count,
                        [[maybe_unused]] int64_t* element_count,
-                       [[maybe_unused]] void* array_of_elements) override;
+                       [[maybe_unused]] void* array_of_elements) const override;
 
     void set_attribute([[maybe_unused]] hipdnnBackendAttributeName_t attribute_name,
                        [[maybe_unused]] hipdnnBackendAttributeType_t attribute_type,

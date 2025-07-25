@@ -24,25 +24,26 @@ void Descriptor_factory::create(hipdnnBackendDescriptorType_t descriptor_type,
     HIPDNN_LOG_INFO("Creating descriptor of type: {}",
                     hipdnn_get_backend_descriptor_type_name(descriptor_type));
 
+    std::shared_ptr<hipdnnPrivateBackendDescriptor> private_desc;
     switch(descriptor_type)
     {
     case HIPDNN_BACKEND_ENGINECFG_DESCRIPTOR:
-        *descriptor = new Engine_config_descriptor();
+        private_desc = std::make_shared<Engine_config_descriptor>();
         break;
     case HIPDNN_BACKEND_ENGINE_DESCRIPTOR:
-        *descriptor = new Engine_descriptor();
+        private_desc = std::make_shared<Engine_descriptor>();
         break;
     case HIPDNN_BACKEND_EXECUTION_PLAN_DESCRIPTOR:
-        *descriptor = new Execution_plan_descriptor();
+        private_desc = std::make_shared<Execution_plan_descriptor>();
         break;
     case HIPDNN_BACKEND_OPERATIONGRAPH_DESCRIPTOR:
-        *descriptor = new Graph_descriptor();
+        private_desc = std::make_shared<Graph_descriptor>();
         break;
     case HIPDNN_BACKEND_VARIANT_PACK_DESCRIPTOR:
-        *descriptor = new Variant_descriptor();
+        private_desc = std::make_shared<Variant_descriptor>();
         break;
     case HIPDNN_BACKEND_ENGINEHEUR_DESCRIPTOR:
-        *descriptor = new Engine_heuristic_descriptor();
+        private_desc = std::make_shared<Engine_heuristic_descriptor>();
         break;
     default:
         throw Hipdnn_exception(HIPDNN_STATUS_NOT_SUPPORTED,
@@ -50,6 +51,8 @@ void Descriptor_factory::create(hipdnnBackendDescriptorType_t descriptor_type,
                                    + hipdnn_get_backend_descriptor_type_name(descriptor_type)
                                    + " is not supported.");
     }
+
+    *descriptor = pack_descriptor(private_desc);
 
     HIPDNN_LOG_INFO("Created descriptor: {:p}", static_cast<void*>(*descriptor));
 }
@@ -64,18 +67,9 @@ void Descriptor_factory::create_graph_ext(hipdnnBackendDescriptor_t* descriptor,
         serialized_graph, HIPDNN_STATUS_BAD_PARAM_NULL_POINTER, "serialized_graph is null.");
     THROW_IF_TRUE(graph_byte_size == 0, HIPDNN_STATUS_BAD_PARAM, "graph_byte_size is 0.");
 
-    auto graph_descriptor = new Graph_descriptor();
-    try
-    {
-        graph_descriptor->deserialize_graph(serialized_graph, graph_byte_size);
-    }
-    catch(const std::exception& e)
-    {
-        delete graph_descriptor;
-        throw;
-    }
-
-    *descriptor = graph_descriptor;
+    auto graph_descriptor = std::make_shared<Graph_descriptor>();
+    graph_descriptor->deserialize_graph(serialized_graph, graph_byte_size);
+    *descriptor = pack_descriptor(graph_descriptor);
 
     HIPDNN_LOG_INFO("Created graph descriptor: {:p}", static_cast<void*>(*descriptor));
 }

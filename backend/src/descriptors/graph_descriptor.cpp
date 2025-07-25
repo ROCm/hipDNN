@@ -20,7 +20,7 @@ void Graph_descriptor::finalize()
 {
     THROW_IF_NULL(_graph, HIPDNN_STATUS_BAD_PARAM, "Graph_descriptor::finalize: graph is null");
     THROW_IF_NULL(_handle, HIPDNN_STATUS_BAD_PARAM, "Graph_descriptor::finalize: handle is null");
-    hipdnnBackendDescriptor::finalize();
+    hipdnnPrivateBackendDescriptor::finalize();
 }
 
 void Graph_descriptor::set_handle(hipdnnBackendAttributeType_t attribute_type,
@@ -52,7 +52,7 @@ void Graph_descriptor::get_attribute([[maybe_unused]] hipdnnBackendAttributeName
                                      [[maybe_unused]] hipdnnBackendAttributeType_t attribute_type,
                                      [[maybe_unused]] int64_t requested_element_count,
                                      [[maybe_unused]] int64_t* element_count,
-                                     [[maybe_unused]] void* array_of_elements)
+                                     [[maybe_unused]] void* array_of_elements) const
 {
     throw Hipdnn_exception(HIPDNN_STATUS_NOT_SUPPORTED,
                            "Graph_descriptor::get_attribute: not supported");

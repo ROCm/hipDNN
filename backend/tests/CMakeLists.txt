@@ -16,6 +16,7 @@ if(HIP_DNN_SKIP_TESTS)
 endif()
 
 add_executable(hipdnn_backend_tests
+    descriptors/test_backend_descriptor.cpp
     descriptors/test_descriptor_factory.cpp
     descriptors/test_engine_config_descriptor.cpp
     descriptors/test_engine_descriptor.cpp

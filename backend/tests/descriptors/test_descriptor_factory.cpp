@@ -155,7 +155,8 @@ TEST(Descriptor_Factory_Test, Create_Variant_Descriptor)
         Descriptor_factory::create(HIPDNN_BACKEND_VARIANT_PACK_DESCRIPTOR, &descriptor));
     EXPECT_NE(descriptor, nullptr);
 
-    auto variant_descriptor = dynamic_cast<Variant_descriptor*>(descriptor);
+    auto variant_descriptor
+        = dynamic_cast<Variant_descriptor*>(descriptor->private_descriptor.get());
     EXPECT_NE(variant_descriptor, nullptr);
 
     EXPECT_FALSE(variant_descriptor->is_finalized());

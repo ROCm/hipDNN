@@ -13,6 +13,7 @@
 #include "descriptors/engine_heuristic_descriptor.hpp"
 #include "descriptors/execution_plan_descriptor.hpp"
 #include "descriptors/graph_descriptor.hpp"
+#include "descriptors/variant_descriptor.hpp"
 #include "engine_plugin.hpp"
 #include "engine_plugin_resource_manager.hpp"
 #include "hipdnn_exception.hpp"
@@ -411,57 +412,64 @@ void Engine_plugin_resource_manager::finalize_execution_plan(hipdnnBackendDescri
 void Engine_plugin_resource_manager::execute_op_graph(hipdnnBackendDescriptor_t execution_plan,
                                                       hipdnnBackendDescriptor_t variant_pack) const
 {
-    THROW_IF_NE(execution_plan->type,
+    auto execution_plan_desc = execution_plan->as_descriptor<Execution_plan_descriptor>();
+    auto variant_pack_desc = variant_pack->as_descriptor<Variant_descriptor>();
+
+    THROW_IF_NE(execution_plan_desc->type,
                 HIPDNN_BACKEND_EXECUTION_PLAN_DESCRIPTOR,
                 HIPDNN_STATUS_BAD_PARAM,
                 "Engine_plugin_resource_manager::execute_op_graph failed: Invalid execution plan "
                 "descriptor type");
 
-    THROW_IF_FALSE(execution_plan->is_finalized(),
+    THROW_IF_FALSE(execution_plan_desc->is_finalized(),
                    HIPDNN_STATUS_BAD_PARAM,
                    "Engine_plugin_resource_manager::execute_op_graph failed: execution_plan_desc "
                    "is not finalized");
 
-    THROW_IF_NE(variant_pack->type,
+    THROW_IF_NE(variant_pack_desc->type,
                 HIPDNN_BACKEND_VARIANT_PACK_DESCRIPTOR,
                 HIPDNN_STATUS_BAD_PARAM,
                 "Engine_plugin_resource_manager::execute_op_graph failed: Invalid variant pack "
                 "descriptor type");
 
-    THROW_IF_FALSE(variant_pack->is_finalized(),
+    THROW_IF_FALSE(variant_pack_desc->is_finalized(),
                    HIPDNN_STATUS_BAD_PARAM,
                    "Engine_plugin_resource_manager::execute_op_graph failed: variant_pack_desc is "
                    "not finalized");
 
-    hipdnnBackendDescriptor_t config;
-    execution_plan->get_attribute(HIPDNN_ATTR_EXECUTION_PLAN_ENGINE_CONFIG,
-                                  HIPDNN_TYPE_BACKEND_DESCRIPTOR,
-                                  1,
-                                  nullptr,
-                                  &config);
+    auto config = execution_plan_desc->get_engine_config();
+    auto engine = config->get_engine();
+    auto engine_id = engine->get_engine_id();
+    void* workspace = variant_pack_desc->get_workspace();
 
-    hipdnnBackendDescriptor_t engine;
-    config->get_attribute(
-        HIPDNN_ATTR_ENGINECFG_ENGINE, HIPDNN_TYPE_BACKEND_DESCRIPTOR, 1, nullptr, &engine);
+    auto& tensor_ids = variant_pack_desc->get_tensor_ids();
+    auto& tensor_pointers = variant_pack_desc->get_data_pointers();
 
-    int64_t engine_id;
-    engine->get_attribute(
-        HIPDNN_ATTR_ENGINE_GLOBAL_INDEX, HIPDNN_TYPE_INT64, 1, nullptr, &engine_id);
+    THROW_IF_NE(tensor_ids.size(),
+                tensor_pointers.size(),
+                HIPDNN_STATUS_BAD_PARAM,
+                "Engine_plugin_resource_manager::execute_op_graph failed: "
+                "tensor_ids and tensor_pointers must have the same size");
+
+    std::vector<hipdnnPluginDeviceBuffer_t> device_buffers;
+    device_buffers.reserve(tensor_ids.size());
+    for(size_t i = 0; i < tensor_ids.size(); ++i)
+    {
+        hipdnnPluginDeviceBuffer_t buffer;
+        buffer.uid = tensor_ids[i];
+        buffer.ptr = const_cast<void*>(tensor_pointers[i]);
+        device_buffers.push_back(buffer);
+    }
 
     // TODO: Get execution context from the execution plan
     // This will be implemented at the integration stage
     hipdnnEnginePluginExecutionContext_t execution_context = nullptr;
 
-    void* workspace;
-    variant_pack->get_attribute(
-        HIPDNN_ATTR_VARIANT_PACK_WORKSPACE, HIPDNN_TYPE_VOID_PTR, 1, nullptr, &workspace);
-
-    // TODO: Get device buffers from the variant pack
-    // This will be implemented at the integration stage
-    const hipdnnPluginDeviceBuffer_t* device_buffers = nullptr;
-    uint32_t num_device_buffers = 0;
-
-    execute_op_graph(engine_id, execution_context, workspace, device_buffers, num_device_buffers);
+    execute_op_graph(engine_id,
+                     execution_context,
+                     workspace,
+                     device_buffers.data(),
+                     static_cast<uint32_t>(tensor_ids.size()));
 }
 
 Engine_details_wrapper::Engine_details_wrapper(

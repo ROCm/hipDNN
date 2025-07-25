@@ -25,14 +25,14 @@ void Engine_config_descriptor::finalize()
                   HIPDNN_STATUS_BAD_PARAM,
                   "Engine_config_descriptor::finalize() failed: Engine is not set.");
 
-    hipdnnBackendDescriptor::finalize();
+    hipdnnPrivateBackendDescriptor::finalize();
 }
 
 void Engine_config_descriptor::get_attribute(hipdnnBackendAttributeName_t attribute_name,
                                              hipdnnBackendAttributeType_t attribute_type,
                                              int64_t requested_element_count,
                                              int64_t* element_count,
-                                             void* array_of_elements)
+                                             void* array_of_elements) const
 {
     THROW_IF_FALSE(is_finalized(),
                    HIPDNN_STATUS_NOT_INITIALIZED,
@@ -60,7 +60,7 @@ void Engine_config_descriptor::get_attribute(hipdnnBackendAttributeName_t attrib
 void Engine_config_descriptor::get_engine(hipdnnBackendAttributeType_t attribute_type,
                                           int64_t requested_element_count,
                                           int64_t* element_count,
-                                          void* array_of_elements)
+                                          void* array_of_elements) const
 {
     THROW_IF_NE(attribute_type,
                 HIPDNN_TYPE_BACKEND_DESCRIPTOR,
@@ -157,17 +157,10 @@ void Engine_config_descriptor::set_engine(hipdnnBackendAttributeType_t attribute
                 "Engine_config_descriptor failed to set engine: "
                 "Invalid element count.");
 
-    THROW_IF_NULL(array_of_elements,
-                  HIPDNN_STATUS_BAD_PARAM_NULL_POINTER,
-                  "Engine_config_descriptor failed to set engine: "
-                  "Null pointer.");
-
-    const Engine_descriptor* engine = *static_cast<Engine_descriptor* const*>(array_of_elements);
-
-    THROW_IF_NULL(engine,
-                  HIPDNN_STATUS_BAD_PARAM_NULL_POINTER,
-                  "Engine_config_descriptor failed to set engine: "
-                  "Engine is null.");
+    auto engine = unpack_descriptor<const Engine_descriptor>(
+        array_of_elements,
+        HIPDNN_STATUS_BAD_PARAM_NULL_POINTER,
+        "Engine_config_descriptor failed to set engine: Engine is null.");
 
     THROW_IF_NE(engine->type,
                 HIPDNN_BACKEND_ENGINE_DESCRIPTOR,
@@ -200,6 +193,14 @@ void Engine_config_descriptor::set_max_workspace_size(int64_t workspace_size)
                 "Max workspace size cannot be negative.");
 
     _max_workspace_size = workspace_size;
+}
+
+std::shared_ptr<const Engine_descriptor> Engine_config_descriptor::get_engine() const
+{
+    THROW_IF_FALSE(is_finalized(),
+                   HIPDNN_STATUS_INTERNAL_ERROR,
+                   "Engine_config_descriptor::get_engine() failed: Not finalized.");
+    return _engine;
 }
 
 } // namespace hipdnn_backend

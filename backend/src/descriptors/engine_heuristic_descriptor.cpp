@@ -8,6 +8,7 @@
 #include "graph_descriptor.hpp"
 #include "hipdnn_backend_descriptor_type.h"
 #include "hipdnn_exception.hpp"
+#include "scoped_descriptor.hpp"
 
 namespace hipdnn_backend
 {
@@ -31,14 +32,14 @@ void Engine_heuristic_descriptor::finalize()
                    HIPDNN_STATUS_BAD_PARAM,
                    "Engine_heuristic_descriptor::finalize() failed: Heuristic mode is not set.");
 
-    hipdnnBackendDescriptor::finalize();
+    hipdnnPrivateBackendDescriptor::finalize();
 }
 
 void Engine_heuristic_descriptor::get_attribute(hipdnnBackendAttributeName_t attribute_name,
                                                 hipdnnBackendAttributeType_t attribute_type,
                                                 int64_t requested_element_count,
                                                 int64_t* element_count,
-                                                void* array_of_elements)
+                                                void* array_of_elements) const
 {
     THROW_IF_FALSE(is_finalized(),
                    HIPDNN_STATUS_BAD_PARAM_NOT_FINALIZED,
@@ -143,14 +144,10 @@ void Engine_heuristic_descriptor::set_graph(hipdnnBackendAttributeType_t attribu
                 HIPDNN_STATUS_BAD_PARAM,
                 "Engine_heuristic_descriptor failed to set graph: Invalid element count.");
 
-    THROW_IF_NULL(array_of_elements,
-                  HIPDNN_STATUS_BAD_PARAM_NULL_POINTER,
-                  "Engine_heuristic_descriptor failed to set graph: Null pointer.");
-
-    const Graph_descriptor* graph = *static_cast<Graph_descriptor* const*>(array_of_elements);
-    THROW_IF_NULL(graph,
-                  HIPDNN_STATUS_BAD_PARAM_NULL_POINTER,
-                  "Engine_heuristic_descriptor failed to set graph: Graph is null.");
+    auto graph = unpack_descriptor<const Graph_descriptor>(
+        array_of_elements,
+        HIPDNN_STATUS_BAD_PARAM_NULL_POINTER,
+        "Engine_heuristic_descriptor failed to set graph: Null pointer.");
 
     THROW_IF_NE(graph->type,
                 HIPDNN_BACKEND_OPERATIONGRAPH_DESCRIPTOR,
@@ -167,7 +164,7 @@ void Engine_heuristic_descriptor::set_graph(hipdnnBackendAttributeType_t attribu
 void Engine_heuristic_descriptor::get_graph(hipdnnBackendAttributeType_t attribute_type,
                                             int64_t requested_element_count,
                                             int64_t* element_count,
-                                            void* array_of_elements)
+                                            void* array_of_elements) const
 {
     THROW_IF_NE(attribute_type,
                 HIPDNN_TYPE_BACKEND_DESCRIPTOR,
@@ -194,7 +191,7 @@ void Engine_heuristic_descriptor::get_graph(hipdnnBackendAttributeType_t attribu
 void Engine_heuristic_descriptor::get_engine_configs(hipdnnBackendAttributeType_t attribute_type,
                                                      int64_t requested_element_count,
                                                      int64_t* element_count,
-                                                     void* array_of_elements)
+                                                     void* array_of_elements) const
 {
     THROW_IF_NE(
         attribute_type,
@@ -223,28 +220,40 @@ void Engine_heuristic_descriptor::get_engine_configs(hipdnnBackendAttributeType_
                       "element count.");
 
         // Create engine config descriptors for each engine ID
-        auto output_array = static_cast<Engine_config_descriptor**>(array_of_elements);
+        auto output_array = static_cast<hipdnnBackendDescriptor_t*>(array_of_elements);
         for(size_t i = 0;
             std::cmp_less(i, _engine_ids.size()) && std::cmp_less(i, requested_element_count);
             ++i)
         {
-            Engine_config_descriptor* config = output_array[i];
-            THROW_IF_NULL(config,
-                          HIPDNN_STATUS_BAD_PARAM_NULL_POINTER,
-                          "Engine_heuristic_descriptor failed to get engine config: Config "
-                          "descriptor is null.");
+            auto config = unpack_descriptor<Engine_config_descriptor>(
+                output_array[i],
+                HIPDNN_STATUS_BAD_PARAM_NULL_POINTER,
+                "Engine_heuristic_descriptor failed to get engine config: Config "
+                "descriptor is null.");
 
-            // TODO - Likely leaking returned descriptors unless caller gets and frees Engine_descriptor inside the engine_config_descriptor when destroying.
-            //        Need to add tracking, and cleaning up of these descriptors in a more user friendly way.
-            auto engine = new Engine_descriptor();
+            THROW_IF_NE(config->type,
+                        HIPDNN_BACKEND_ENGINECFG_DESCRIPTOR,
+                        HIPDNN_STATUS_BAD_PARAM,
+                        "Engine_heuristic_descriptor failed to get engine config: Invalid "
+                        "config descriptor type.");
+
+            auto engine = std::make_shared<Engine_descriptor>();
+
             engine->set_attribute(
                 HIPDNN_ATTR_ENGINE_GLOBAL_INDEX, HIPDNN_TYPE_INT64, 1, &_engine_ids[i]);
-            engine->set_attribute(
-                HIPDNN_ATTR_ENGINE_OPERATION_GRAPH, HIPDNN_TYPE_BACKEND_DESCRIPTOR, 1, &_graph);
+
+            Scoped_descriptor graph_desc(pack_descriptor(_graph));
+            engine->set_attribute(HIPDNN_ATTR_ENGINE_OPERATION_GRAPH,
+                                  HIPDNN_TYPE_BACKEND_DESCRIPTOR,
+                                  1,
+                                  graph_desc.get_ptr());
             engine->finalize();
 
-            config->set_attribute(
-                HIPDNN_ATTR_ENGINECFG_ENGINE, HIPDNN_TYPE_BACKEND_DESCRIPTOR, 1, &engine);
+            Scoped_descriptor engine_desc(pack_descriptor(engine));
+            config->set_attribute(HIPDNN_ATTR_ENGINECFG_ENGINE,
+                                  HIPDNN_TYPE_BACKEND_DESCRIPTOR,
+                                  1,
+                                  engine_desc.get_ptr());
         }
 
         *element_count
@@ -266,7 +275,7 @@ void Engine_heuristic_descriptor::set_engine_ids(const std::vector<int64_t>& eng
 void Engine_heuristic_descriptor::get_heuristic_mode(hipdnnBackendAttributeType_t attribute_type,
                                                      int64_t requested_element_count,
                                                      int64_t* element_count,
-                                                     void* array_of_elements)
+                                                     void* array_of_elements) const
 {
     THROW_IF_NE(
         attribute_type,
@@ -290,6 +299,15 @@ void Engine_heuristic_descriptor::get_heuristic_mode(hipdnnBackendAttributeType_
 
     auto heur_mode_out = static_cast<hipdnnBackendHeurMode_t*>(array_of_elements);
     *heur_mode_out = _heuristic_mode;
+}
+
+std::shared_ptr<const Graph_descriptor> Engine_heuristic_descriptor::get_graph() const
+{
+    THROW_IF_FALSE(is_finalized(),
+                   HIPDNN_STATUS_INTERNAL_ERROR,
+                   "Engine_heuristic_descriptor::get_graph() failed: Not finalized.");
+
+    return _graph;
 }
 
 } // namespace hipdnn_backend
