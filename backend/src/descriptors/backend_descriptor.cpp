@@ -4,8 +4,6 @@
 #include "backend_descriptor.hpp"
 #include "error.hpp"
 
-using namespace hipdnn_backend;
-
 void hipdnnBackendDescriptor::finalize()
 {
     THROW_IF_TRUE(!_impl, HIPDNN_STATUS_INTERNAL_ERROR, "Null _impl in finalize.");
