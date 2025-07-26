@@ -31,32 +31,38 @@ public:
     std::unique_ptr<hipdnnBackendDescriptor> _mock_engine_config_bad_type_wrapper = nullptr;
     std::unique_ptr<hipdnnBackendDescriptor> _mock_wrong_type_wrapper = nullptr;
 
-    Execution_plan_descriptor* get_execution_plan_descriptor() const
+    std::shared_ptr<Execution_plan_descriptor> get_execution_plan_descriptor() const
     {
-        return dynamic_cast<Execution_plan_descriptor*>(_plan_wrapper->impl.get());
+        return _plan_wrapper->as_descriptor<Execution_plan_descriptor>();
     }
 
-    Mock_descriptor<Engine_config_descriptor>* get_mock_engine_config() const
+    std::shared_ptr<Mock_descriptor<Engine_config_descriptor>> get_mock_engine_config() const
     {
-        return unpack_mock_descriptor<Engine_config_descriptor>(_mock_engine_config_wrapper.get());
+        return _mock_engine_config_wrapper
+            ->as_descriptor<Mock_descriptor<Engine_config_descriptor>>();
     }
 
-    Mock_descriptor<Engine_config_descriptor>* get_mock_engine_config_bad_type() const
+    std::shared_ptr<Mock_descriptor<Engine_config_descriptor>>
+        get_mock_engine_config_bad_type() const
     {
-        return unpack_mock_descriptor<Engine_config_descriptor>(_mock_engine_config_bad_type_wrapper.get());
+        return _mock_engine_config_bad_type_wrapper
+            ->as_descriptor<Mock_descriptor<Engine_config_descriptor>>();
     }
 
-    Mock_descriptor<Execution_plan_descriptor>* get_mock_wrong_type() const
+    std::shared_ptr<Mock_descriptor<Execution_plan_descriptor>> get_mock_wrong_type() const
     {
-        return unpack_mock_descriptor<Execution_plan_descriptor>(_mock_wrong_type_wrapper.get());
+        return _mock_wrong_type_wrapper
+            ->as_descriptor<Mock_descriptor<Execution_plan_descriptor>>();
     }
 
     void SetUp() override
     {
         _plan_wrapper = create_descriptor<Execution_plan_descriptor>();
-        _mock_engine_config_wrapper = make_mock_descriptor_wrapper<Engine_config_descriptor>();
-        _mock_engine_config_bad_type_wrapper = make_mock_descriptor_wrapper<Engine_config_descriptor>();
-        _mock_wrong_type_wrapper = make_mock_descriptor_wrapper<Execution_plan_descriptor>();
+        _mock_engine_config_wrapper
+            = create_descriptor<Mock_descriptor<Engine_config_descriptor>>();
+        _mock_engine_config_bad_type_wrapper
+            = create_descriptor<Mock_descriptor<Engine_config_descriptor>>();
+        _mock_wrong_type_wrapper = create_descriptor<Mock_descriptor<Execution_plan_descriptor>>();
     }
 
     void TearDown() override
@@ -256,7 +262,7 @@ TEST_F(Execution_plan_descriptor_test, GetExecutionPlanDescriptorEngineConfig)
                                         returned_engine_config.get_ptr()));
 
     ASSERT_EQ(count, 1);
-    ASSERT_EQ(returned_engine_config.get()->impl, _mock_engine_config_wrapper->impl);
+    ASSERT_EQ(*returned_engine_config.get(), *(_mock_engine_config_wrapper.get()));
 
     ASSERT_NO_THROW(plan->get_attribute(HIPDNN_ATTR_EXECUTION_PLAN_ENGINE_CONFIG,
                                         HIPDNN_TYPE_BACKEND_DESCRIPTOR,
@@ -264,7 +270,7 @@ TEST_F(Execution_plan_descriptor_test, GetExecutionPlanDescriptorEngineConfig)
                                         nullptr,
                                         null_count_engine_config.get_ptr()));
 
-    ASSERT_EQ(null_count_engine_config.get()->impl, _mock_engine_config_wrapper->impl);
+    ASSERT_EQ(*null_count_engine_config.get(), *(_mock_engine_config_wrapper.get()));
 }
 
 TEST_F(Execution_plan_descriptor_test, GetExecutionPlanDescriptorEngineConfigErrors)
@@ -318,6 +324,6 @@ TEST_F(Execution_plan_descriptor_test, GetEngineConfigReturnsPointerIfFinalized)
     auto engine_config_ptr = plan->get_engine_config();
     ASSERT_NE(engine_config_ptr, nullptr);
     ASSERT_EQ(static_cast<const Backend_descriptor_interface*>(engine_config_ptr.get()),
-              static_cast<const Backend_descriptor_interface*>(get_mock_engine_config()));
+              static_cast<const Backend_descriptor_interface*>(get_mock_engine_config().get()));
 }
 // NOLINTEND(readability-function-cognitive-complexity)

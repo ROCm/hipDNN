@@ -34,17 +34,11 @@ void throw_if_invalid_descriptor(hipdnnBackendDescriptor_t descriptor)
                                                "hipdnnBackendDescriptor_t is nullptr");
     }
 
-    if(!descriptor->impl)
+    if(!descriptor->is_valid())
     {
         throw hipdnn_backend::Hipdnn_exception(
             HIPDNN_STATUS_BAD_PARAM_NULL_POINTER,
             "hipdnnBackendDescriptor_t private_descriptor is nullptr");
-    }
-
-    if(descriptor->get_type() == HIPDNN_INVALID_TYPE)
-    {
-        throw hipdnn_backend::Hipdnn_exception(HIPDNN_STATUS_BAD_PARAM,
-                                               "hipdnnBackendDescriptor_t is invalid type");
     }
 }
 

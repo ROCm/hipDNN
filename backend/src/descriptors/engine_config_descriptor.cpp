@@ -79,7 +79,7 @@ void Engine_config_descriptor::get_engine(hipdnnBackendAttributeType_t attribute
         *element_count = 1;
     }
 
-    pack_descriptor(_engine, array_of_elements);
+    hipdnnBackendDescriptor::pack_descriptor(_engine, array_of_elements);
 }
 
 void Engine_config_descriptor::get_max_workspace_size(hipdnnBackendAttributeType_t attribute_type,
@@ -152,7 +152,7 @@ void Engine_config_descriptor::set_engine(hipdnnBackendAttributeType_t attribute
                 "Engine_config_descriptor failed to set engine: "
                 "Invalid element count.");
 
-    auto engine = unpack_descriptor<const Engine_descriptor>(
+    auto engine = hipdnnBackendDescriptor::unpack_descriptor<const Engine_descriptor>(
         array_of_elements,
         HIPDNN_STATUS_BAD_PARAM_NULL_POINTER,
         "Engine_config_descriptor failed to set engine: Engine is null.");

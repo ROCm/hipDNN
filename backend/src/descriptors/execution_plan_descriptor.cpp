@@ -150,7 +150,7 @@ void Execution_plan_descriptor::set_engine_config(hipdnnBackendAttributeType_t a
                 HIPDNN_STATUS_BAD_PARAM,
                 "Execution_plan_descriptor failed to set engine config: Invalid element count.");
 
-    auto engine_config = unpack_descriptor<const Engine_config_descriptor>(
+    auto engine_config = hipdnnBackendDescriptor::unpack_descriptor<const Engine_config_descriptor>(
         array_of_elements,
         HIPDNN_STATUS_BAD_PARAM_NULL_POINTER,
         "Execution_plan_descriptor failed to set engine config: Null pointer.");
@@ -194,7 +194,7 @@ void Execution_plan_descriptor::get_engine_config(hipdnnBackendAttributeType_t a
                   "Execution_plan_descriptor failed to get engine config: Engine config is null. "
                   "Engine config was not set.");
 
-    pack_descriptor(_engine_config, array_of_elements);
+    hipdnnBackendDescriptor::pack_descriptor(_engine_config, array_of_elements);
 }
 
 std::shared_ptr<const Engine_config_descriptor> Execution_plan_descriptor::get_engine_config() const

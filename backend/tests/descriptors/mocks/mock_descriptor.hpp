@@ -43,22 +43,4 @@ ACTION_P(SetArg4ToInt64, value) // NOLINT
     *static_cast<int64_t*>(arg4) = value;
 }
 
-template <typename Desc_type>
-inline std::unique_ptr<hipdnnBackendDescriptor> make_mock_descriptor_wrapper()
-{
-    auto mock_wrapper = std::make_unique<hipdnnBackendDescriptor>();
-    mock_wrapper->impl = std::make_shared<Mock_descriptor<Desc_type>>();
-    return mock_wrapper;
-}
-
-template <typename Desc_type>
-inline Mock_descriptor<Desc_type>* unpack_mock_descriptor(hipdnnBackendDescriptor* descriptor)
-{
-    if(descriptor == nullptr || descriptor->impl == nullptr)
-    {
-        return nullptr;
-    }
-    return dynamic_cast<Mock_descriptor<Desc_type>*>(descriptor->impl.get());
-}
-
 } // namespace hipdnn_backend

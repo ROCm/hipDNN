@@ -15,7 +15,6 @@
 #include <memory>
 
 using namespace hipdnn_backend;
-using namespace test_descriptor_utils;
 
 using ::testing::Return;
 
@@ -29,17 +28,18 @@ public:
 
     Engine_descriptor* get_engine_descriptor() const
     {
-        return dynamic_cast<Engine_descriptor*>(_engine_wrapper->impl.get());
+        return _engine_wrapper->as_descriptor<Engine_descriptor>().get();
     }
 
     Mock_descriptor<Graph_descriptor>* get_mock_graph() const
     {
-        return unpack_mock_descriptor<Graph_descriptor>(_mock_graph_wrapper.get());
+        return _mock_graph_wrapper->as_descriptor<Mock_descriptor<Graph_descriptor>>().get();
     }
 
     Mock_descriptor<Graph_descriptor>* get_mock_graph_bad_type() const
     {
-        return unpack_mock_descriptor<Graph_descriptor>(_mock_graph_bad_type_wrapper.get());
+        return _mock_graph_bad_type_wrapper->as_descriptor<Mock_descriptor<Graph_descriptor>>()
+            .get();
     }
 
     void set_graph() const
@@ -68,11 +68,13 @@ public:
 protected:
     void SetUp() override
     {
-        _engine_wrapper = create_descriptor<Engine_descriptor>();
+        _engine_wrapper = test_descriptor_utils::create_descriptor<Engine_descriptor>();
         _mock_graph_wrapper
-            = make_mock_descriptor_wrapper<Graph_descriptor>();
-        _mock_graph_bad_type_wrapper = make_mock_descriptor_wrapper<Graph_descriptor>();
-        _mock_wrong_type_wrapper = make_mock_descriptor_wrapper<Engine_descriptor>();
+            = test_descriptor_utils::create_descriptor<Mock_descriptor<Graph_descriptor>>();
+        _mock_graph_bad_type_wrapper
+            = test_descriptor_utils::create_descriptor<Mock_descriptor<Graph_descriptor>>();
+        _mock_wrong_type_wrapper
+            = test_descriptor_utils::create_descriptor<Mock_descriptor<Engine_descriptor>>();
     }
 };
 
@@ -115,12 +117,12 @@ TEST_F(Engine_descriptor_test, SetEngineDescriptorGraph)
                                                      1,
                                                      &_mock_graph_bad_type_wrapper),
                                HIPDNN_STATUS_BAD_PARAM_NOT_FINALIZED);
-    
+
     ASSERT_THROW_HIPDNN_STATUS(engine->set_attribute(HIPDNN_ATTR_ENGINE_OPERATION_GRAPH,
-                                                    HIPDNN_TYPE_BACKEND_DESCRIPTOR,
-                                                    1,
-                                                    &_mock_wrong_type_wrapper),
-                            HIPDNN_STATUS_BAD_PARAM);
+                                                     HIPDNN_TYPE_BACKEND_DESCRIPTOR,
+                                                     1,
+                                                     &_mock_wrong_type_wrapper),
+                               HIPDNN_STATUS_BAD_PARAM);
 
     EXPECT_CALL(*get_mock_graph(), is_finalized()).WillOnce(Return(false));
     ASSERT_THROW_HIPDNN_STATUS(engine->set_attribute(HIPDNN_ATTR_ENGINE_OPERATION_GRAPH,
@@ -241,7 +243,7 @@ TEST_F(Engine_descriptor_test, GetEngineDescriptorGraph)
                                           1,
                                           nullptr,
                                           graph.get_ptr()));
-    ASSERT_EQ(graph.get()->impl, _mock_graph_wrapper->impl);
+    ASSERT_EQ(*graph.get(), *(_mock_graph_wrapper.get()));
 
     int64_t count;
     ASSERT_NO_THROW(engine->get_attribute(HIPDNN_ATTR_ENGINE_OPERATION_GRAPH,
