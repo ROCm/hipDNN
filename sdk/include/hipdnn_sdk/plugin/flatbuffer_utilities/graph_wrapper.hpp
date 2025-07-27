@@ -68,7 +68,7 @@ public:
 
         for(const auto node : *_shallow_graph->nodes())
         {
-            if(supported_attributes.find(node->attributes_type()) == supported_attributes.end())
+            if(!supported_attributes.contains(node->attributes_type()))
             {
                 return false;
             }

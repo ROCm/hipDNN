@@ -6,6 +6,8 @@
 #include "test_macros.hpp"
 #include "test_util.hpp"
 
+#include <hipdnn_sdk/test_utilities/flatbuffer_graph_test_utils.hpp>
+
 #include <gtest/gtest.h>
 
 class Execution_backend_end_api_tests : public ::testing::Test
@@ -57,12 +59,11 @@ private:
 
 TEST_F(Execution_backend_end_api_tests, TestBackendExecuteWithNullHandle)
 {
-    Graph graph;
-    graph.set_name("BatchnormInferenceGraph");
-    test_util::create_and_populate_batchnorm_node(graph);
+    auto batchnorm_builder = test_util::create_and_populate_batchnorm_node();
+    auto serialized_graph = batchnorm_builder.Release();
 
     test_util::create_and_initialize_backend_descriptor(
-        &_graph_descriptor, graph.serialized_graph, _handle);
+        &_graph_descriptor, serialized_graph, _handle);
     test_util::create_test_engine(&_engine, &_graph_descriptor, _handle, GIDX);
     test_util::create_test_engine_config(
         &_engine_config, &_engine, &_graph_descriptor, _handle, GIDX, true);
@@ -79,12 +80,11 @@ TEST_F(Execution_backend_end_api_tests, TestBackendExecuteWithNullHandle)
 
 TEST_F(Execution_backend_end_api_tests, TestBackendExecuteWithNullDescriptors)
 {
-    Graph graph;
-    graph.set_name("BatchnormInferenceGraph");
-    test_util::create_and_populate_batchnorm_node(graph);
+    auto batchnorm_builder = test_util::create_and_populate_batchnorm_node();
+    auto serialized_graph = batchnorm_builder.Release();
 
     test_util::create_and_initialize_backend_descriptor(
-        &_graph_descriptor, graph.serialized_graph, _handle);
+        &_graph_descriptor, serialized_graph, _handle);
     test_util::create_test_engine(&_engine, &_graph_descriptor, _handle, GIDX);
     test_util::create_test_engine_config(
         &_engine_config, &_engine, &_graph_descriptor, _handle, GIDX, true);
@@ -108,12 +108,11 @@ TEST_F(Execution_backend_end_api_tests, TestBackendExecuteWithUnfinalizedPlan)
         hipdnnBackendCreateDescriptor(HIPDNN_BACKEND_EXECUTION_PLAN_DESCRIPTOR, &unfinalized_plan),
         HIPDNN_STATUS_SUCCESS);
 
-    Graph graph;
-    graph.set_name("BatchnormInferenceGraph");
-    test_util::create_and_populate_batchnorm_node(graph);
+    auto batchnorm_builder = test_util::create_and_populate_batchnorm_node();
+    auto serialized_graph = batchnorm_builder.Release();
 
     test_util::create_and_initialize_backend_descriptor(
-        &_graph_descriptor, graph.serialized_graph, _handle);
+        &_graph_descriptor, serialized_graph, _handle);
 
     ASSERT_EQ(hipdnnBackendCreateDescriptor(HIPDNN_BACKEND_VARIANT_PACK_DESCRIPTOR, &_variant_pack),
               HIPDNN_STATUS_SUCCESS);
@@ -126,12 +125,11 @@ TEST_F(Execution_backend_end_api_tests, TestBackendExecuteWithUnfinalizedPlan)
 
 TEST_F(Execution_backend_end_api_tests, TestBackendExecuteWithWrongDescriptorTypes)
 {
-    Graph graph;
-    graph.set_name("BatchnormInferenceGraph");
-    test_util::create_and_populate_batchnorm_node(graph);
+    auto batchnorm_builder = test_util::create_and_populate_batchnorm_node();
+    auto serialized_graph = batchnorm_builder.Release();
 
     test_util::create_and_initialize_backend_descriptor(
-        &_graph_descriptor, graph.serialized_graph, _handle);
+        &_graph_descriptor, serialized_graph, _handle);
     test_util::create_test_engine(&_engine, &_graph_descriptor, _handle, GIDX);
 
     ASSERT_EQ(hipdnnBackendCreateDescriptor(HIPDNN_BACKEND_VARIANT_PACK_DESCRIPTOR, &_variant_pack),
@@ -149,19 +147,18 @@ TEST_F(Execution_backend_end_api_tests, TestBackendExecuteWithWrongDescriptorTyp
 
 TEST_F(Execution_backend_end_api_tests, TestBackendExecute)
 {
-    Graph graph;
-    graph.set_name("BatchnormInferenceGraph");
-    test_util::create_and_populate_batchnorm_node(graph);
+    auto batchnorm_builder = test_util::create_and_populate_batchnorm_node();
+    auto serialized_graph = batchnorm_builder.Release();
 
     std::unordered_map<int64_t, std::string> uid_to_name_map;
     std::unordered_map<std::string, int64_t> name_to_uid_map;
     std::unordered_map<int64_t, std::vector<int64_t>> uid_to_dims_map;
 
     test_util::extract_tensor_info_from_graph(
-        graph.serialized_graph, uid_to_name_map, name_to_uid_map, uid_to_dims_map);
+        serialized_graph, uid_to_name_map, name_to_uid_map, uid_to_dims_map);
 
     test_util::create_and_initialize_backend_descriptor(
-        &_graph_descriptor, graph.serialized_graph, _handle);
+        &_graph_descriptor, serialized_graph, _handle);
     test_util::create_test_engine(&_engine, &_graph_descriptor, _handle, GIDX);
     test_util::create_test_engine_config(
         &_engine_config, &_engine, &_graph_descriptor, _handle, GIDX, true);
