@@ -50,8 +50,8 @@ public:
                        const void* array_of_elements) override;
 
     // These getters throw an exception if the descriptor is not finalized.
-    std::shared_ptr<const Graph_descriptor> get_graph() const;
-    int64_t get_engine_id() const;
+    virtual std::shared_ptr<const Graph_descriptor> get_graph() const;
+    virtual int64_t get_engine_id() const;
 
     static hipdnnBackendDescriptorType_t get_static_type();
 };
