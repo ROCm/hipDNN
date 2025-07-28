@@ -300,7 +300,6 @@ HIPDNN_BACKEND_EXPORT void hipdnnLoggingCallback_ext(hipdnnSeverity_t severity, 
  *
  * @retval HIPDNN_STATUS_SUCCESS           All specified plugins were loaded successfully.
  * @retval HIPDNN_STATUS_BAD_PARAM         Invalid parameter values (e.g., null pointer, zero paths).
- * @retval HIPDNN_STATUS_ALLOC_FAILED      Memory allocation failed during plugin loading.
  * @retval HIPDNN_STATUS_INTERNAL_ERROR    An internal error occurred during plugin loading.
  */
 HIPDNN_BACKEND_EXPORT hipdnnStatus_t hipdnnSetPluginPaths_ext(

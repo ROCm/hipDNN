@@ -24,12 +24,9 @@ TEST(GPU_EnginePluginResourceManagerTest, LoadPluginsAndExecuteOpGraph)
     plugin::Engine_plugin_resource_manager::set_plugin_paths(plugin_paths,
                                                              HIPDNN_PLUGIN_LOADING_ADDITIVE_UNIQUE);
 
-    // auto paths = plugin::Engine_plugin_resource_manager::();
-    // ASSERT_EQ(paths.size(), plugin_paths.size());
-    // for(size_t i = 0; i < paths.size(); ++i)
-    // {
-    //     ASSERT_EQ(paths[i], plugin_paths[i]);
-    // }
+    auto retrieved_paths = plugin::Engine_plugin_resource_manager::get_plugin_paths();
+    ASSERT_EQ(retrieved_paths.size(), plugin_paths.size());
+    EXPECT_EQ(retrieved_paths[0], plugin_paths[0]);
 
     // Create an Engine_plugin_resource_manager instance
     auto resource_manager = plugin::Engine_plugin_resource_manager::create();

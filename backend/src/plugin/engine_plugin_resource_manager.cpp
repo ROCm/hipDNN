@@ -42,7 +42,7 @@ std::weak_ptr<Engine_plugin_manager> pm_ptr;
 
 std::vector<std::filesystem::path> get_default_plugin_paths()
 {
-    return {"/opt/rocm/hipdnn/plugins/"};
+    return {"/opt/rocm/lib/hipdnn_plugins/"};
 }
 
 } // namespace
@@ -71,16 +71,15 @@ void Engine_plugin_resource_manager::set_plugin_paths(
     plugin_config.mode = loading_mode;
 }
 
-// std::vector<std::filesystem::path> Engine_plugin_resource_manager::get_plugin_paths()
-// {
-//     std::lock_guard<std::mutex> lock(plugin_mutex);
-
-//     if(override_plugin_paths.empty())
-//     {
-//         return get_default_plugin_paths();
-//     }
-//     return override_plugin_paths;
-// }
+std::vector<std::filesystem::path> Engine_plugin_resource_manager::get_plugin_paths()
+{
+    std::lock_guard<std::mutex> lock(plugin_mutex);
+    if(plugin_config.paths.empty())
+    {
+        return get_default_plugin_paths();
+    }
+    return plugin_config.paths;
+}
 
 std::shared_ptr<Engine_plugin_resource_manager> Engine_plugin_resource_manager::create()
 {

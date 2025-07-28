@@ -37,8 +37,14 @@ void dummy_callback(hipdnnSeverity_t sev, const char* msg)
     g_callback_was_called = true;
 }
 
-const std::string PLUGIN_PATH1 = "./libhipdnn_test_plugin1.so";
-const std::string PLUGIN_PATH2 = "./libhipdnn_test_plugin2.so";
+#if defined(_WIN32)
+constexpr const char* SHARED_LIB_EXT = ".dll";
+#else
+constexpr const char* SHARED_LIB_EXT = ".so";
+#endif
+
+const std::string PLUGIN_PATH1 = "./libhipdnn_test_plugin1" + std::string(SHARED_LIB_EXT);
+const std::string PLUGIN_PATH2 = "./libhipdnn_test_plugin2" + std::string(SHARED_LIB_EXT);
 
 } // namespace
 
