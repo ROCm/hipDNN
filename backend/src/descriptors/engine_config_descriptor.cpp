@@ -4,8 +4,11 @@
 #include "engine_config_descriptor.hpp"
 #include "engine_descriptor.hpp"
 #include "error.hpp"
+#include "graph_descriptor.hpp"
 #include "hipdnn_backend_descriptor_type.h"
 #include "hipdnn_exception.hpp"
+#include <handle/handle.hpp>
+#include <hipdnn_sdk/data_objects/engine_config_generated.h>
 
 namespace hipdnn_backend
 {
@@ -20,6 +23,23 @@ void Engine_config_descriptor::finalize()
                   HIPDNN_STATUS_BAD_PARAM,
                   "Engine_config_descriptor::finalize() failed: Engine is not set.");
 
+    auto graph = _engine->get_graph();
+    auto handle = graph->get_handle();
+    auto plugin_resource_manager = handle->get_plugin_resource_manager();
+
+    auto engine_id = _engine->get_engine_id();
+
+    auto engine_config_plugin_data = get_serialized_engine_config();
+    auto workspace_size = static_cast<int64_t>(plugin_resource_manager->get_workspace_size(
+        engine_id, &engine_config_plugin_data, graph.get()));
+
+    THROW_IF_LT(workspace_size,
+                0,
+                HIPDNN_STATUS_INTERNAL_ERROR,
+                "Engine_config_descriptor::set_max_workspace_size() failed: "
+                "Max workspace size cannot be negative.");
+
+    _max_workspace_size = workspace_size;
     hipdnnBackendDescriptorImpl<Engine_config_descriptor>::finalize();
 }
 
@@ -165,25 +185,6 @@ void Engine_config_descriptor::set_engine(hipdnnBackendAttributeType_t attribute
     _engine = engine;
 }
 
-void Engine_config_descriptor::set_max_workspace_size(int64_t workspace_size)
-{
-    // This should only be called from the plugin manager, so all errors should be
-    // internal errors rather than user errors.
-
-    THROW_IF_FALSE(is_finalized(),
-                   HIPDNN_STATUS_INTERNAL_ERROR,
-                   "Engine_config_descriptor::set_max_workspace_size() failed: "
-                   "Not finalized.");
-
-    THROW_IF_LT(workspace_size,
-                0,
-                HIPDNN_STATUS_INTERNAL_ERROR,
-                "Engine_config_descriptor::set_max_workspace_size() failed: "
-                "Max workspace size cannot be negative.");
-
-    _max_workspace_size = workspace_size;
-}
-
 std::shared_ptr<const Engine_descriptor> Engine_config_descriptor::get_engine() const
 {
     THROW_IF_FALSE(is_finalized(),
@@ -196,4 +197,25 @@ hipdnnBackendDescriptorType_t Engine_config_descriptor::get_static_type()
 {
     return HIPDNN_BACKEND_ENGINECFG_DESCRIPTOR;
 }
+
+const hipdnnPluginConstData_t& Engine_config_descriptor::get_serialized_engine_config()
+{
+    if(_engine_config_buffer.size() == 0)
+    {
+        THROW_IF_NULL(_engine,
+                      HIPDNN_STATUS_INTERNAL_ERROR,
+                      "Graph_descriptor::get_serialized_graph: graph is null");
+
+        flatbuffers::FlatBufferBuilder builder;
+        hipdnn_sdk::data_objects::EngineConfigBuilder engine_config_builder(builder);
+        engine_config_builder.add_engine_id(_engine->get_engine_id());
+        builder.Finish(engine_config_builder.Finish());
+        _engine_config_buffer = builder.Release();
+        _serialized_engine_config
+            = {.ptr = _engine_config_buffer.data(), .size = _engine_config_buffer.size()};
+    }
+
+    return _serialized_engine_config;
+}
+
 } // namespace hipdnn_backend

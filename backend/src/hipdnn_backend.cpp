@@ -169,13 +169,7 @@ HIPDNN_BACKEND_EXPORT hipdnnStatus_t hipdnnBackendFinalize(hipdnnBackendDescript
 
         descriptor->finalize();
 
-        if(descriptor->get_type() == HIPDNN_BACKEND_ENGINECFG_DESCRIPTOR)
-        {
-            Plugin_manager plugin_manager;
-            plugin_manager.initialize();
-            plugin_manager.finalize_engine_config(descriptor);
-        }
-        else if(descriptor->get_type() == HIPDNN_BACKEND_ENGINEHEUR_DESCRIPTOR)
+        if(descriptor->get_type() == HIPDNN_BACKEND_ENGINEHEUR_DESCRIPTOR)
         {
             Plugin_manager plugin_manager;
             plugin_manager.initialize();
