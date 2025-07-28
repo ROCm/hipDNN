@@ -10,11 +10,6 @@
 namespace hipdnn_backend
 {
 
-Execution_plan_descriptor::Execution_plan_descriptor()
-{
-    type = HIPDNN_BACKEND_EXECUTION_PLAN_DESCRIPTOR;
-}
-
 void Execution_plan_descriptor::finalize()
 {
     THROW_IF_TRUE(is_finalized(),
@@ -29,7 +24,7 @@ void Execution_plan_descriptor::finalize()
                   HIPDNN_STATUS_BAD_PARAM,
                   "Execution_plan_descriptor::finalize() failed: Engine was not set.");
 
-    hipdnnPrivateBackendDescriptor::finalize();
+    hipdnnBackendDescriptorImpl<Execution_plan_descriptor>::finalize();
 }
 
 void Execution_plan_descriptor::get_attribute(hipdnnBackendAttributeName_t attribute_name,
@@ -155,16 +150,10 @@ void Execution_plan_descriptor::set_engine_config(hipdnnBackendAttributeType_t a
                 HIPDNN_STATUS_BAD_PARAM,
                 "Execution_plan_descriptor failed to set engine config: Invalid element count.");
 
-    auto engine_config = unpack_descriptor<const Engine_config_descriptor>(
+    auto engine_config = hipdnnBackendDescriptor::unpack_descriptor<const Engine_config_descriptor>(
         array_of_elements,
         HIPDNN_STATUS_BAD_PARAM_NULL_POINTER,
         "Execution_plan_descriptor failed to set engine config: Null pointer.");
-
-    THROW_IF_NE(engine_config->type,
-                HIPDNN_BACKEND_ENGINECFG_DESCRIPTOR,
-                HIPDNN_STATUS_BAD_PARAM,
-                "Execution_plan_descriptor failed to set engine config: Invalid engine config "
-                "descriptor type.");
 
     THROW_IF_FALSE(engine_config->is_finalized(),
                    HIPDNN_STATUS_BAD_PARAM_NOT_FINALIZED,
@@ -205,7 +194,7 @@ void Execution_plan_descriptor::get_engine_config(hipdnnBackendAttributeType_t a
                   "Execution_plan_descriptor failed to get engine config: Engine config is null. "
                   "Engine config was not set.");
 
-    pack_descriptor(_engine_config, array_of_elements);
+    hipdnnBackendDescriptor::pack_descriptor(_engine_config, array_of_elements);
 }
 
 std::shared_ptr<const Engine_config_descriptor> Execution_plan_descriptor::get_engine_config() const
@@ -215,6 +204,11 @@ std::shared_ptr<const Engine_config_descriptor> Execution_plan_descriptor::get_e
                    "Execution_plan_descriptor::get_engine_config() failed: Not finalized.");
 
     return _engine_config;
+}
+
+hipdnnBackendDescriptorType_t Execution_plan_descriptor::get_static_type()
+{
+    return HIPDNN_BACKEND_EXECUTION_PLAN_DESCRIPTOR;
 }
 
 } // namespace hipdnn_backend

@@ -6,6 +6,7 @@
 #include <filesystem>
 #include <memory>
 #include <unordered_map>
+#include <vector>
 
 #include <hip/hip_runtime.h>
 #include <hipdnn_sdk/plugin/plugin_api_data_types.h>
@@ -35,6 +36,10 @@ class Engine_execution_context_wrapper;
 
 class Engine_plugin_resource_manager
 {
+protected:
+    // Protected constructor for mock testing
+    Engine_plugin_resource_manager();
+
 public:
     // MT-safe static functions
     // Load plugins from a specific path, for testing purposes
@@ -44,7 +49,7 @@ public:
     static std::shared_ptr<Engine_plugin_resource_manager> create();
 
     Engine_plugin_resource_manager(std::shared_ptr<Engine_plugin_manager>& pm);
-    ~Engine_plugin_resource_manager();
+    virtual ~Engine_plugin_resource_manager();
 
     // Prevent copying
     Engine_plugin_resource_manager(const Engine_plugin_resource_manager&) = delete;
@@ -55,19 +60,14 @@ public:
     Engine_plugin_resource_manager& operator=(Engine_plugin_resource_manager&& other) noexcept;
 
     // MT-unsafe instance methods
-    void set_stream(hipStream_t stream) const;
+    virtual void set_stream(hipStream_t stream) const;
 
-    // TODO: Move to the descriptors
-    // This will be moved to the descriptors in the integration stage
-#if 0
-    void finalize_engine(hipdnnBackendDescriptor_t desc) const;
-    void finalize_engine_config(hipdnnBackendDescriptor_t desc) const;
-    void finalize_engine_heuristic(hipdnnBackendDescriptor_t desc) const;
-    void finalize_execution_plan(hipdnnBackendDescriptor_t desc) const;
-#endif
+    virtual void execute_op_graph(hipdnnBackendDescriptor_t execution_plan,
+                                  hipdnnBackendDescriptor_t variant_pack) const;
 
-    void execute_op_graph(hipdnnBackendDescriptor_t execution_plan,
-                          hipdnnBackendDescriptor_t variant_pack) const;
+    virtual size_t get_workspace_size(int64_t engine_id,
+                                      const hipdnnPluginConstData_t* engine_config,
+                                      const Graph_descriptor* graph_desc) const;
 
 private:
     // MT-unsafe instance methods
@@ -81,10 +81,6 @@ private:
         get_engine_details(const std::shared_ptr<Engine_plugin_resource_manager>& rm,
                            int64_t engine_id,
                            Graph_descriptor* graph_desc);
-
-    size_t get_workspace_size(int64_t engine_id,
-                              const hipdnnPluginConstData_t* engine_config,
-                              Graph_descriptor* graph_desc) const;
 
     hipdnnEnginePluginExecutionContext_t
         create_execution_context(int64_t engine_id,

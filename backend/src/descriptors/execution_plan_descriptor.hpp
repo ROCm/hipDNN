@@ -9,7 +9,7 @@ namespace hipdnn_backend
 {
 
 class Engine_config_descriptor;
-class Execution_plan_descriptor : public hipdnnPrivateBackendDescriptor
+class Execution_plan_descriptor : public hipdnnBackendDescriptorImpl<Execution_plan_descriptor>
 {
 private:
     hipdnnHandle_t _handle = nullptr;
@@ -34,9 +34,6 @@ private:
                            void* array_of_elements) const;
 
 public:
-    Execution_plan_descriptor();
-    ~Execution_plan_descriptor() override = default;
-
     void finalize() override;
 
     void get_attribute(hipdnnBackendAttributeName_t attribute_name,
@@ -52,6 +49,8 @@ public:
 
     // Throws an exception if the descriptor is not finalized.
     std::shared_ptr<const Engine_config_descriptor> get_engine_config() const;
+
+    static hipdnnBackendDescriptorType_t get_static_type();
 };
 
 } // namespace hipdnn_backend

@@ -3,9 +3,12 @@
 
 #include "descriptors/engine_config_descriptor.hpp"
 #include "descriptors/engine_descriptor.hpp"
+#include "descriptors/graph_descriptor.hpp"
 #include "descriptors/scoped_descriptor.hpp"
 #include "hipdnn_backend.h"
 #include "mocks/mock_descriptor.hpp"
+#include "mocks/mock_engine_plugin_resource_manager.hpp"
+#include "mocks/mock_handle.hpp"
 #include "test_descriptor_utils.hpp"
 #include "test_macros.hpp"
 
@@ -14,7 +17,8 @@
 #include <memory>
 
 using namespace hipdnn_backend;
-using namespace test_descriptor_utils;
+using namespace plugin;
+using namespace ::testing;
 
 using ::testing::Return;
 
@@ -24,21 +28,30 @@ public:
     std::unique_ptr<hipdnnBackendDescriptor> _engine_config_wrapper = nullptr;
     std::unique_ptr<hipdnnBackendDescriptor> _mock_engine_wrapper = nullptr;
     std::unique_ptr<hipdnnBackendDescriptor> _mock_engine_bad_type_wrapper = nullptr;
+    std::unique_ptr<hipdnnBackendDescriptor> _mock_wrong_type_wrapper = nullptr;
+    std::unique_ptr<hipdnnBackendDescriptor> _mock_graph_wrapper = nullptr;
+    std::unique_ptr<Mock_handle> _mock_handle = nullptr;
+    std::shared_ptr<Mock_engine_plugin_resource_manager> _mock_engine_plugin_resource_manager
+        = nullptr;
 
-    Engine_config_descriptor* get_engine_config_descriptor() const
+    std::shared_ptr<Engine_config_descriptor> get_engine_config_descriptor() const
     {
-        return dynamic_cast<Engine_config_descriptor*>(
-            _engine_config_wrapper->private_descriptor.get());
+        return _engine_config_wrapper->as_descriptor_unsafe<Engine_config_descriptor>();
     }
 
-    Mock_descriptor* get_mock_engine() const
+    std::shared_ptr<Mock_engine_descriptor> get_mock_engine() const
     {
-        return unpack_mock_descriptor(_mock_engine_wrapper.get());
+        return _mock_engine_wrapper->as_descriptor_unsafe<Mock_engine_descriptor>();
     }
 
-    Mock_descriptor* get_mock_engine_bad_type() const
+    std::shared_ptr<Mock_engine_descriptor> get_mock_engine_bad_type() const
     {
-        return unpack_mock_descriptor(_mock_engine_bad_type_wrapper.get());
+        return _mock_engine_bad_type_wrapper->as_descriptor_unsafe<Mock_engine_descriptor>();
+    }
+
+    std::shared_ptr<Mock_graph_descriptor> get_mock_graph_descriptor() const
+    {
+        return _mock_graph_wrapper->as_descriptor_unsafe<Mock_graph_descriptor>();
     }
 
     void set_engine() const
@@ -51,24 +64,36 @@ public:
                                                           &_mock_engine_wrapper));
     }
 
-    void set_max_workspace_size() const
-    {
-        ASSERT_NO_THROW(get_engine_config_descriptor()->set_max_workspace_size(1024));
-    }
-
     void make_engine_config_finalized() const
     {
         set_engine();
+        EXPECT_CALL(*get_mock_engine(), is_finalized()).WillRepeatedly(Return(true));
+        EXPECT_CALL(*get_mock_engine(), get_engine_id()).WillRepeatedly(Return(1));
+        EXPECT_CALL(*get_mock_engine(), get_graph())
+            .WillRepeatedly(Return(get_mock_graph_descriptor()));
+        EXPECT_CALL(*get_mock_graph_descriptor(), get_handle())
+            .WillOnce(Return(_mock_handle.get()));
+        EXPECT_CALL(*_mock_handle, get_plugin_resource_manager())
+            .WillOnce(Return(_mock_engine_plugin_resource_manager));
+        EXPECT_CALL(*_mock_engine_plugin_resource_manager, get_workspace_size(_, _, _))
+            .WillOnce(Return(1024));
         ASSERT_NO_THROW(get_engine_config_descriptor()->finalize());
-        set_max_workspace_size();
     }
 
 protected:
     void SetUp() override
     {
-        _engine_config_wrapper = create_descriptor<Engine_config_descriptor>();
-        _mock_engine_wrapper = make_mock_descriptor_wrapper(HIPDNN_BACKEND_ENGINE_DESCRIPTOR);
-        _mock_engine_bad_type_wrapper = make_mock_descriptor_wrapper();
+        _engine_config_wrapper
+            = test_descriptor_utils::create_descriptor<Engine_config_descriptor>();
+        _mock_engine_wrapper = test_descriptor_utils::create_descriptor<Mock_engine_descriptor>();
+        _mock_engine_bad_type_wrapper
+            = test_descriptor_utils::create_descriptor<Mock_engine_descriptor>();
+        _mock_wrong_type_wrapper
+            = test_descriptor_utils::create_descriptor<Mock_descriptor<Engine_config_descriptor>>();
+        _mock_graph_wrapper = test_descriptor_utils::create_descriptor<Mock_graph_descriptor>();
+        _mock_handle = std::make_unique<Mock_handle>();
+        _mock_engine_plugin_resource_manager
+            = std::make_shared<Mock_engine_plugin_resource_manager>();
     }
 };
 
@@ -77,7 +102,7 @@ TEST_F(Engine_config_descriptor_test, CreateEngineConfigDescriptor)
     auto engine_config = get_engine_config_descriptor();
     ASSERT_NE(engine_config, nullptr);
     ASSERT_FALSE(engine_config->is_finalized());
-    ASSERT_EQ(engine_config->type, HIPDNN_BACKEND_ENGINECFG_DESCRIPTOR);
+    ASSERT_EQ(engine_config->get_type(), HIPDNN_BACKEND_ENGINECFG_DESCRIPTOR);
 }
 
 TEST_F(Engine_config_descriptor_test, SetEngineConfigDescriptorEngine)
@@ -109,6 +134,12 @@ TEST_F(Engine_config_descriptor_test, SetEngineConfigDescriptorEngine)
                                                             HIPDNN_TYPE_BACKEND_DESCRIPTOR,
                                                             1,
                                                             &_mock_engine_bad_type_wrapper),
+                               HIPDNN_STATUS_BAD_PARAM_NOT_FINALIZED);
+
+    ASSERT_THROW_HIPDNN_STATUS(engine_config->set_attribute(HIPDNN_ATTR_ENGINECFG_ENGINE,
+                                                            HIPDNN_TYPE_BACKEND_DESCRIPTOR,
+                                                            1,
+                                                            &_mock_wrong_type_wrapper),
                                HIPDNN_STATUS_BAD_PARAM);
 
     EXPECT_CALL(*get_mock_engine(), is_finalized()).WillOnce(Return(false));
@@ -120,22 +151,6 @@ TEST_F(Engine_config_descriptor_test, SetEngineConfigDescriptorEngine)
     EXPECT_CALL(*get_mock_engine(), is_finalized()).WillOnce(Return(true));
     ASSERT_NO_THROW(engine_config->set_attribute(
         HIPDNN_ATTR_ENGINECFG_ENGINE, HIPDNN_TYPE_BACKEND_DESCRIPTOR, 1, &_mock_engine_wrapper));
-}
-
-TEST_F(Engine_config_descriptor_test, SetEngineConfigDescriptorMaxWorkspaceSize)
-{
-    auto engine_config = get_engine_config_descriptor();
-    int64_t workspace_size = 1024;
-    int64_t bad_workspace_size = -1024;
-
-    ASSERT_THROW_HIPDNN_STATUS(engine_config->set_max_workspace_size(bad_workspace_size),
-                               HIPDNN_STATUS_INTERNAL_ERROR);
-
-    ASSERT_THROW_HIPDNN_STATUS(engine_config->set_max_workspace_size(workspace_size),
-                               HIPDNN_STATUS_INTERNAL_ERROR);
-
-    make_engine_config_finalized();
-    ASSERT_NO_THROW(engine_config->set_max_workspace_size(workspace_size));
 }
 
 TEST_F(Engine_config_descriptor_test, SetAttrOnFinalizedEngineConfigDescriptor)
@@ -154,10 +169,7 @@ TEST_F(Engine_config_descriptor_test, FinalizeEngineConfigDescriptor)
     auto engine_config = get_engine_config_descriptor();
     ASSERT_THROW_HIPDNN_STATUS(engine_config->finalize(), HIPDNN_STATUS_BAD_PARAM);
 
-    set_engine();
-
-    ASSERT_NO_THROW(engine_config->finalize());
-    set_max_workspace_size();
+    make_engine_config_finalized();
 }
 
 TEST_F(Engine_config_descriptor_test, GetAttrOnUnfinalizedEngineConfigDescriptor)
@@ -217,7 +229,7 @@ TEST_F(Engine_config_descriptor_test, GetEngineConfigDescriptorEngine)
                                                  1,
                                                  nullptr,
                                                  engine.get_ptr()));
-    ASSERT_EQ(engine.get()->private_descriptor, _mock_engine_wrapper->private_descriptor);
+    ASSERT_EQ(*engine.get(), *(_mock_engine_wrapper.get()));
 
     int64_t count;
     ASSERT_NO_THROW(engine_config->get_attribute(HIPDNN_ATTR_ENGINECFG_ENGINE,
@@ -240,8 +252,8 @@ TEST_F(Engine_config_descriptor_test, GetEngineReturnsPointerIfFinalized)
     make_engine_config_finalized();
     auto engine_ptr = engine_config->get_engine();
     ASSERT_NE(engine_ptr, nullptr);
-    ASSERT_EQ(static_cast<const hipdnnPrivateBackendDescriptor*>(engine_ptr.get()),
-              static_cast<const hipdnnPrivateBackendDescriptor*>(get_mock_engine()));
+    ASSERT_EQ(static_cast<const Backend_descriptor_interface*>(engine_ptr.get()),
+              static_cast<const Backend_descriptor_interface*>(get_mock_engine().get()));
 }
 
 TEST_F(Engine_config_descriptor_test, GetEngineDescriptorMaxWorkspaceSize)

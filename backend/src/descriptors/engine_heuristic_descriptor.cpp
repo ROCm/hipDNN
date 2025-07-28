@@ -13,11 +13,6 @@
 namespace hipdnn_backend
 {
 
-Engine_heuristic_descriptor::Engine_heuristic_descriptor()
-{
-    type = HIPDNN_BACKEND_ENGINEHEUR_DESCRIPTOR;
-}
-
 void Engine_heuristic_descriptor::finalize()
 {
     THROW_IF_TRUE(is_finalized(),
@@ -32,7 +27,7 @@ void Engine_heuristic_descriptor::finalize()
                    HIPDNN_STATUS_BAD_PARAM,
                    "Engine_heuristic_descriptor::finalize() failed: Heuristic mode is not set.");
 
-    hipdnnPrivateBackendDescriptor::finalize();
+    hipdnnBackendDescriptorImpl<Engine_heuristic_descriptor>::finalize();
 }
 
 void Engine_heuristic_descriptor::get_attribute(hipdnnBackendAttributeName_t attribute_name,
@@ -144,15 +139,10 @@ void Engine_heuristic_descriptor::set_graph(hipdnnBackendAttributeType_t attribu
                 HIPDNN_STATUS_BAD_PARAM,
                 "Engine_heuristic_descriptor failed to set graph: Invalid element count.");
 
-    auto graph = unpack_descriptor<const Graph_descriptor>(
+    auto graph = hipdnnBackendDescriptor::unpack_descriptor<const Graph_descriptor>(
         array_of_elements,
         HIPDNN_STATUS_BAD_PARAM_NULL_POINTER,
         "Engine_heuristic_descriptor failed to set graph: Null pointer.");
-
-    THROW_IF_NE(graph->type,
-                HIPDNN_BACKEND_OPERATIONGRAPH_DESCRIPTOR,
-                HIPDNN_STATUS_BAD_PARAM,
-                "Engine_heuristic_descriptor failed to set graph: Invalid graph type.");
 
     THROW_IF_FALSE(graph->is_finalized(),
                    HIPDNN_STATUS_BAD_PARAM_NOT_FINALIZED,
@@ -185,7 +175,7 @@ void Engine_heuristic_descriptor::get_graph(hipdnnBackendAttributeType_t attribu
         *element_count = 1;
     }
 
-    pack_descriptor(_graph, array_of_elements);
+    hipdnnBackendDescriptor::pack_descriptor(_graph, array_of_elements);
 }
 
 void Engine_heuristic_descriptor::get_engine_configs(hipdnnBackendAttributeType_t attribute_type,
@@ -225,31 +215,25 @@ void Engine_heuristic_descriptor::get_engine_configs(hipdnnBackendAttributeType_
             std::cmp_less(i, _engine_ids.size()) && std::cmp_less(i, requested_element_count);
             ++i)
         {
-            auto config = unpack_descriptor<Engine_config_descriptor>(
+            auto config = hipdnnBackendDescriptor::unpack_descriptor<Engine_config_descriptor>(
                 output_array[i],
                 HIPDNN_STATUS_BAD_PARAM_NULL_POINTER,
                 "Engine_heuristic_descriptor failed to get engine config: Config "
                 "descriptor is null.");
-
-            THROW_IF_NE(config->type,
-                        HIPDNN_BACKEND_ENGINECFG_DESCRIPTOR,
-                        HIPDNN_STATUS_BAD_PARAM,
-                        "Engine_heuristic_descriptor failed to get engine config: Invalid "
-                        "config descriptor type.");
 
             auto engine = std::make_shared<Engine_descriptor>();
 
             engine->set_attribute(
                 HIPDNN_ATTR_ENGINE_GLOBAL_INDEX, HIPDNN_TYPE_INT64, 1, &_engine_ids[i]);
 
-            Scoped_descriptor graph_desc(pack_descriptor(_graph));
+            Scoped_descriptor graph_desc(hipdnnBackendDescriptor::pack_descriptor(_graph));
             engine->set_attribute(HIPDNN_ATTR_ENGINE_OPERATION_GRAPH,
                                   HIPDNN_TYPE_BACKEND_DESCRIPTOR,
                                   1,
                                   graph_desc.get_ptr());
             engine->finalize();
 
-            Scoped_descriptor engine_desc(pack_descriptor(engine));
+            Scoped_descriptor engine_desc(hipdnnBackendDescriptor::pack_descriptor(engine));
             config->set_attribute(HIPDNN_ATTR_ENGINECFG_ENGINE,
                                   HIPDNN_TYPE_BACKEND_DESCRIPTOR,
                                   1,
@@ -308,6 +292,11 @@ std::shared_ptr<const Graph_descriptor> Engine_heuristic_descriptor::get_graph()
                    "Engine_heuristic_descriptor::get_graph() failed: Not finalized.");
 
     return _graph;
+}
+
+hipdnnBackendDescriptorType_t Engine_heuristic_descriptor::get_static_type()
+{
+    return HIPDNN_BACKEND_ENGINEHEUR_DESCRIPTOR;
 }
 
 } // namespace hipdnn_backend

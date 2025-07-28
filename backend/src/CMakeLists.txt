@@ -8,6 +8,7 @@ set(HIP_DNN_BACKEND_INSTALL_INCLUDE_DIR "${CMAKE_INSTALL_INCLUDEDIR}/hipdnn/back
 set(HIP_DNN_BACKEND_SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 
 add_library(hipdnn_backend_private
+    descriptors/backend_descriptor.cpp
     descriptors/engine_config_descriptor.cpp
     descriptors/engine_descriptor.cpp
     descriptors/engine_heuristic_descriptor.cpp

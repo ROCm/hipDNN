@@ -60,29 +60,6 @@ void Plugin_manager::finalize_engine_heuristic(hipdnnBackendDescriptor_t desc)
     heuristic->set_engine_ids(engine_ids);
 }
 
-void Plugin_manager::finalize_engine_config(hipdnnBackendDescriptor_t desc)
-{
-    auto config_desc = desc->as_descriptor<Engine_config_descriptor>();
-
-    auto engine_desc = config_desc->get_engine();
-
-    auto graph_desc = engine_desc->get_graph();
-
-    int64_t engine_id = engine_desc->get_engine_id();
-
-    auto plugin = get_plugin(engine_id);
-
-    // TODO - We need to construct + store the engine config fbs with the properties that the user of the API set for the engine config,
-    // and then pass that to the plugin as well here.
-    auto applicable_engines = plugin->get_applicable_engines(graph_desc.get());
-    THROW_IF_FALSE(applicable_engines.contains(engine_id),
-                   HIPDNN_STATUS_BAD_PARAM,
-                   std::string("Plugin does not support engine id: ") + std::to_string(engine_id));
-
-    config_desc->set_max_workspace_size(
-        plugin->get_max_workspace_size(graph_desc.get(), engine_id));
-}
-
 std::set<int64_t> Plugin_manager::get_applicable_engines(const Graph_descriptor* graph)
 {
     std::set<int64_t> applicable_engines;
@@ -103,16 +80,6 @@ void Plugin_manager::execute(hipdnnHandle* handle,
 {
     auto execution_plan_desc = execution_plan->as_descriptor<Execution_plan_descriptor>();
     auto variant_desc = variant_pack->as_descriptor<Variant_descriptor>();
-
-    THROW_IF_NE(execution_plan_desc->type,
-                HIPDNN_BACKEND_EXECUTION_PLAN_DESCRIPTOR,
-                HIPDNN_STATUS_BAD_PARAM,
-                "Plugin_manager::execute failed: Invalid execution plan descriptor type");
-
-    THROW_IF_NE(variant_desc->type,
-                HIPDNN_BACKEND_VARIANT_PACK_DESCRIPTOR,
-                HIPDNN_STATUS_BAD_PARAM,
-                "Plugin_manager::execute failed: Invalid variant pack descriptor type");
 
     THROW_IF_FALSE(execution_plan_desc->is_finalized(),
                    HIPDNN_STATUS_BAD_PARAM,
