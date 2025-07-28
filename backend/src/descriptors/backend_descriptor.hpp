@@ -99,6 +99,15 @@ struct hipdnnBackendDescriptor : public Backend_descriptor_interface
             "Failed to cast backend descriptor: Null descriptor provided.");
     }
 
+    // Unsafe version of as_descriptor that does not perform type checks.
+    // Use with caution, as it can lead to undefined behavior if the types do not match
+    // This is intended for internal mock usage, and not anywhere esle in the codebase.
+    template <typename Child_descriptor>
+    std::shared_ptr<Child_descriptor> as_descriptor_unsafe()
+    {
+        return std::static_pointer_cast<Child_descriptor>(_impl);
+    }
+
     bool is_valid();
 
     hipdnnBackendDescriptorType_t get_type() const override;

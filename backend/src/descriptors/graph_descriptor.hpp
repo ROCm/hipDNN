@@ -17,7 +17,7 @@ class Graph_descriptor : public hipdnnBackendDescriptorImpl<Graph_descriptor>
 private:
     std::unique_ptr<hipdnn_sdk::data_objects::GraphT> _graph;
     hipdnnHandle_t _handle = nullptr;
-    std::vector<uint8_t> _serialized_graph;
+    mutable std::vector<uint8_t> _serialized_graph;
 
     void set_handle(hipdnnBackendAttributeType_t attribute_type,
                     int64_t element_count,
@@ -39,7 +39,8 @@ public:
 
     void deserialize_graph(const uint8_t* serialized_graph, size_t graph_byte_size);
 
-    const std::vector<uint8_t>& get_serialized_graph();
+    const std::vector<uint8_t>& get_serialized_graph() const;
+    virtual hipdnnHandle_t get_handle() const;
 
     static hipdnnBackendDescriptorType_t get_static_type();
 };

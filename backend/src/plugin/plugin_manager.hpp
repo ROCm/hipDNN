@@ -20,12 +20,6 @@ struct Plugin_manager
     // the wrapper hipDNNPlugin objects
     void initialize(/* heuristics */);
 
-    // This queries the workspace details for the given engine config, and then sets the
-    // workspace in the Engine_config_descriptor.  This should throw if
-    // an error occurs that prevents the workspace size from being set on the engine
-    // config.
-    void finalize_engine_config(hipdnnBackendDescriptor_t desc);
-
     // This populates the ordered results of the applicable engines inside the heuristic descriptor.
     void finalize_engine_heuristic(hipdnnBackendDescriptor_t desc);
 

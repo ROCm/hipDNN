@@ -98,7 +98,7 @@ void Graph_descriptor::deserialize_graph(const uint8_t* serialized_graph, size_t
     _serialized_graph.assign(serialized_graph, serialized_graph + graph_byte_size);
 }
 
-const std::vector<uint8_t>& Graph_descriptor::get_serialized_graph()
+const std::vector<uint8_t>& Graph_descriptor::get_serialized_graph() const
 {
     if(_serialized_graph.empty())
     {
@@ -121,6 +121,12 @@ const std::vector<uint8_t>& Graph_descriptor::get_serialized_graph()
 hipdnnBackendDescriptorType_t Graph_descriptor::get_static_type()
 {
     return HIPDNN_BACKEND_OPERATIONGRAPH_DESCRIPTOR;
+}
+
+hipdnnHandle_t Graph_descriptor::get_handle() const
+{
+    THROW_IF_NULL(_handle, HIPDNN_STATUS_BAD_PARAM, "Graph_descriptor::get_handle: handle is null");
+    return _handle;
 }
 
 } // namespace hipdnn_backend
