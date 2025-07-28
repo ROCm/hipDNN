@@ -23,6 +23,7 @@ add_executable(hipdnn_frontend_tests
     test_error.cpp
     test_graph.cpp
     test_graph_generated.cpp
+    test_plugin_paths.cpp
     test_pointwise_attributes.cpp
     test_pointwise_node.cpp
     test_scoped_hipdnn_backend_descriptor.cpp
