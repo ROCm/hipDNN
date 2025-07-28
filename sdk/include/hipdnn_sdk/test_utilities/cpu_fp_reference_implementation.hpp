@@ -15,8 +15,8 @@ namespace reference_test_utilities
 using namespace hipdnn_sdk::utilities;
 
 template <class Input_data_type,
-          class Scale_bias_data_type,
-          class Mean_variance_data_type = Scale_bias_data_type>
+        class Scale_bias_data_type,
+        class Mean_variance_data_type = Scale_bias_data_type>
 class Cpu_fp_reference_implementation : public Reference_implementation_interface
 {
 public:
@@ -29,7 +29,7 @@ public:
                                  const Tensor& estimatedMean,
                                  const Tensor& estimatedVariance,
                                  Tensor& output,
-                                 float epsilon) override
+                                 double  epsilon) override
     {
         if(input.dims().size() != 4)
         {
@@ -47,7 +47,7 @@ public:
             auto variance
                 = estimatedVariance.get_host_value<Mean_variance_data_type>(0, cidx, 0, 0);
             Mean_variance_data_type invert_var
-                = static_cast<Mean_variance_data_type>(1.0f) / sqrtf(variance + epsilon);
+                = static_cast<Mean_variance_data_type>(1.0f) / sqrt_internal(variance + static_cast<Mean_variance_data_type>(epsilon));
             // process the batch per channel
             for(int row = 0; row < height; row++)
             { // via rows
@@ -77,6 +77,15 @@ public:
     }
 
 private:
+    double sqrt_internal(double value) const
+    {
+        return std::sqrt(value);
+    }
+
+    float sqrt_internal(float value) const
+    {
+        return std::sqrtf(value);
+    }
 };
 
 } // namespace reference_test_utilities

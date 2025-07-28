@@ -28,7 +28,7 @@ public:
                                          const Tensor& estimatedMean,
                                          const Tensor& estimatedVariance,
                                          Tensor& output,
-                                         float epsilon)
+                                         double epsilon)
         = 0;
 };
 

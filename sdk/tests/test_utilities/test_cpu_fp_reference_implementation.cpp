@@ -30,7 +30,7 @@ TEST(CpuFpReferenceImplementation, BasicFloatUsage)
                                      mean_tensor,
                                      variance_tensor,
                                      output_tensor,
-                                     1e-5f);
+                                     1e-5);
 }
 
 TEST(CpuFpReferenceImplementation, BasicBFloat16Usage)
@@ -50,7 +50,7 @@ TEST(CpuFpReferenceImplementation, BasicBFloat16Usage)
                                      mean_tensor,
                                      variance_tensor,
                                      output_tensor,
-                                     1e-5f);
+                                     1e-5);
 }
 
 TEST(CpuFpReferenceImplementation, BasicHalfUsage)
@@ -70,5 +70,25 @@ TEST(CpuFpReferenceImplementation, BasicHalfUsage)
                                      mean_tensor,
                                      variance_tensor,
                                      output_tensor,
-                                     1e-5f);
+                                     1e-5);
+}
+
+TEST(CpuFpReferenceImplementaion, BasicDoubleUsage)
+{
+    Tensor input_tensor = Tensor::make_nchw_tensor<double>({1, 3, 224, 224});
+    Tensor output_tensor = Tensor::make_nchw_tensor<double>({1, 3, 224, 224});
+    Tensor bias_tensor = Tensor::make_nchw_tensor<double>({1, 3});
+    Tensor scale_tensor = Tensor::make_nchw_tensor<double>({1, 3});
+    Tensor mean_tensor = Tensor::make_nchw_tensor<double>({1, 3});
+    Tensor variance_tensor = Tensor::make_nchw_tensor<double>({1, 3});
+
+    Cpu_fp_reference_implementation<double, double, double> ref_impl;
+
+    ref_impl.batchnorm_fwd_inference(input_tensor,
+                                     scale_tensor,
+                                     bias_tensor,
+                                     mean_tensor,
+                                     variance_tensor,
+                                     output_tensor,
+                                     1e-5);
 }

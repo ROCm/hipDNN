@@ -13,6 +13,10 @@ namespace hipdnn_sdk
 namespace utilities
 {
 
+/// @brief A class that manages memory that can be migrated between host and device.
+/// It provides functionality to allocate, resize, and access memory on both host and device,
+/// while ensuring that data is synchronized as needed.  This class is not thread safe.
+///
 class Migratable_memory
 {
 public:
@@ -44,6 +48,8 @@ public:
         : _host_ptr(other._host_ptr)
         , _device_ptr(other._device_ptr)
         , _count(other._count)
+        , _item_size(other._item_size)
+        , _total_size(other._total_size)
         , _current_location(other._current_location)
         , _host_valid(other._host_valid)
         , _device_valid(other._device_valid)
@@ -117,6 +123,14 @@ public:
         return static_cast<T*>(_device_ptr);
     }
 
+    // Get device pointer (migrates if needed)
+    template <typename T>
+    T* device_data(hipStream_t stream)
+    {
+        ensure_device_valid(stream);
+        return static_cast<T*>(_device_ptr);
+    }
+
     // Get const host pointer (migrates if needed)
     template <typename T>
     const T* host_data() const
@@ -130,6 +144,14 @@ public:
     const T* device_data() const
     {
         const_cast<Migratable_memory*>(this)->ensure_device_valid();
+        return static_cast<T*>(_device_ptr);
+    }
+
+    // Get const device pointer (migrates if needed)
+    template <typename T>
+    const T* device_data(hipStream_t stream) const
+    {
+        const_cast<Migratable_memory*>(this)->ensure_device_valid(stream);
         return static_cast<T*>(_device_ptr);
     }
 
@@ -248,6 +270,24 @@ private:
         if(!_device_valid && _host_valid && (_host_ptr != nullptr))
         {
             throw_on_error(hipMemcpy(_device_ptr, _host_ptr, _total_size, hipMemcpyHostToDevice),
+                           "Failed to copy from host to device");
+            _device_valid = true;
+            _current_location = Location::BOTH;
+        }
+    }
+
+    void ensure_device_valid(hipStream_t stream)
+    {
+        if(_count == 0)
+        {
+            return;
+        }
+
+        allocate_device();
+
+        if(!_device_valid && _host_valid && (_host_ptr != nullptr))
+        {
+            throw_on_error(hipMemcpyWithStream(_device_ptr, _host_ptr, _total_size, hipMemcpyHostToDevice, stream),
                            "Failed to copy from host to device");
             _device_valid = true;
             _current_location = Location::BOTH;

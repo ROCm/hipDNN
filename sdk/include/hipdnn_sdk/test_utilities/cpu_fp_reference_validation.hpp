@@ -4,6 +4,7 @@
 #pragma once
 
 #include <hipdnn_sdk/test_utilities/reference_validation_interface.hpp>
+#include <hipdnn_sdk/logging/logger.hpp>
 
 namespace hipdnn_sdk
 {
@@ -53,7 +54,11 @@ public:
                && abs_diff
                       > _relative_tolerance * std::max(std::fabs(ref_value), std::fabs(impl_value)))
             {
-
+                HIPDNN_LOG_ERROR(
+                    "Validation failed at index {}: reference value = {}, implementation value = {}, "
+                    "absolute difference = {}, relative difference = {}",
+                    i, ref_value, impl_value, abs_diff,
+                    _relative_tolerance * std::max(std::fabs(ref_value), std::fabs(impl_value)));
                 return false;
             }
         }
