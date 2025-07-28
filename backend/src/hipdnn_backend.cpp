@@ -338,12 +338,12 @@ HIPDNN_BACKEND_EXPORT hipdnnStatus_t hipdnnSetPluginPaths_ext(int64_t num_paths,
     }
     catch(const hipdnn_backend::Hipdnn_exception& e)
     {
-        // HIPDNN_LOG_ERROR(e.get_message()); // Optional: log error message
+        HIPDNN_LOG_ERROR(e.get_message());
         return e.get_status();
     }
     catch(...)
     {
-        // HIPDNN_LOG_ERROR("Unknown error in hipdnnSetPluginPaths"); // Optional: log error
+        HIPDNN_LOG_ERROR("Unknown error in hipdnnSetPluginPaths");
         return HIPDNN_STATUS_INTERNAL_ERROR;
     }
 }

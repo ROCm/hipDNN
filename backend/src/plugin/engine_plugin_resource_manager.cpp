@@ -18,9 +18,6 @@
 #include "engine_plugin_resource_manager.hpp"
 #include "hipdnn_exception.hpp"
 
-// Include the new C API header
-// #include "hipdnn_v2.h"
-
 namespace hipdnn_backend
 {
 namespace plugin
@@ -39,7 +36,6 @@ std::weak_ptr<Engine_plugin_manager> pm_ptr;
 
 std::vector<std::filesystem::path> get_default_plugin_paths()
 {
-    // Return the default path for hipDNN plugins.
     return {"/opt/rocm/hipdnn/plugins/"};
 }
 
@@ -50,7 +46,6 @@ void Engine_plugin_resource_manager::set_plugin_paths(
 {
     std::lock_guard<std::mutex> lock(plugin_mutex);
 
-    // Check if the plugin paths are already saved, if so, do nothing.
     if(!override_plugin_paths.empty())
     {
         return;
