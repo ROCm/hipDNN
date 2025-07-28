@@ -297,19 +297,20 @@ HIPDNN_BACKEND_EXPORT void hipdnnLoggingCallback_ext(hipdnnSeverity_t severity, 
 }
 
 HIPDNN_BACKEND_EXPORT hipdnnStatus_t hipdnnSetPluginPaths_ext(
-    int64_t num_paths, const char* const plugin_paths[], hipdnnPluginLoadingMode_t loading_mode)
+    size_t num_paths, const char* const plugin_paths[], hipdnnPluginLoadingMode_t loading_mode)
 {
-    try
-    {
-        if(num_paths < 0 || (num_paths > 0 && plugin_paths == nullptr))
-        {
-            return HIPDNN_STATUS_BAD_PARAM;
-        }
+    LOG_API_ENTRY("num_paths={}, plugin_paths_ptr={:p}, loading_mode={}",
+                  num_paths,
+                  static_cast<const void*>(plugin_paths),
+                  hipdnn_backend::hipdnn_get_plugin_loading_mode_string(loading_mode));
+
+    return hipdnn_backend::try_catch([&, api_name = __func__] {
+        throw_if_null(plugin_paths);
 
         std::vector<std::filesystem::path> paths_vec;
-        paths_vec.reserve(static_cast<size_t>(num_paths));
+        paths_vec.reserve(num_paths);
 
-        for(int32_t i = 0; i < num_paths; ++i)
+        for(size_t i = 0; i < num_paths; ++i)
         {
             if(plugin_paths[i] == nullptr)
             {
@@ -321,16 +322,9 @@ HIPDNN_BACKEND_EXPORT hipdnnStatus_t hipdnnSetPluginPaths_ext(
         hipdnn_backend::plugin::Engine_plugin_resource_manager::set_plugin_paths(paths_vec,
                                                                                  loading_mode);
 
+        LOG_API_SUCCESS(api_name,
+                        "set_plugin_paths={}",
+                        hipdnn_backend::hipdnn_get_plugin_loading_mode_string(loading_mode));
         return HIPDNN_STATUS_SUCCESS;
-    }
-    catch(const hipdnn_backend::Hipdnn_exception& e)
-    {
-        HIPDNN_LOG_ERROR(e.get_message());
-        return e.get_status();
-    }
-    catch(...)
-    {
-        HIPDNN_LOG_ERROR("Unknown error in hipdnnSetPluginPaths");
-        return HIPDNN_STATUS_INTERNAL_ERROR;
-    }
+    });
 }

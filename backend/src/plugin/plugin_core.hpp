@@ -200,7 +200,6 @@ private:
     }
 
     std::vector<Plugin> _plugins;
-    // hipdnnPluginLoadingMode_t _loading_mode;
     std::set<std::filesystem::path> _loaded_plugin_files;
 };
 

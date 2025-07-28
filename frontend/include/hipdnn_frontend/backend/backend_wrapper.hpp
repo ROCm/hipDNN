@@ -103,7 +103,7 @@ public:
     }
 
     // NOLINTBEGIN
-    hipdnnStatus_t set_plugin_paths_ext(int64_t num_paths,
+    hipdnnStatus_t set_plugin_paths_ext(size_t num_paths,
                                         const char* const plugin_paths[],
                                         hipdnnPluginLoadingMode_t mode) override
     {
