@@ -39,6 +39,7 @@ public:
     // MT-safe static functions
     // Load plugins from a specific path, for testing purposes
     static void set_plugin_paths(const std::vector<std::filesystem::path>& plugin_paths);
+    static std::vector<std::filesystem::path> get_plugin_paths();
     static std::shared_ptr<Engine_plugin_resource_manager> create();
 
     Engine_plugin_resource_manager(std::shared_ptr<Engine_plugin_manager>& pm);

@@ -23,6 +23,15 @@ TEST(GPU_EnginePluginResourceManagerTest, LoadPluginsAndExecuteOpGraph)
     // Set the plugin paths
     plugin::Engine_plugin_resource_manager::set_plugin_paths(plugin_paths);
 
+    // check plugin paths from override_plugin_paths array
+
+    auto paths = plugin::Engine_plugin_resource_manager::get_plugin_paths();
+    ASSERT_EQ(paths.size(), plugin_paths.size());
+    for(size_t i = 0; i < paths.size(); ++i)
+    {
+        ASSERT_EQ(paths[i], plugin_paths[i]);
+    }
+
     // Create an Engine_plugin_resource_manager instance
     auto resource_manager = plugin::Engine_plugin_resource_manager::create();
 

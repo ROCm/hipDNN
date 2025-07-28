@@ -18,6 +18,9 @@
 #include "engine_plugin_resource_manager.hpp"
 #include "hipdnn_exception.hpp"
 
+// Include the new C API header
+// #include "hipdnn_v2.h"
+
 namespace hipdnn_backend
 {
 namespace plugin
@@ -36,10 +39,8 @@ std::weak_ptr<Engine_plugin_manager> pm_ptr;
 
 std::vector<std::filesystem::path> get_default_plugin_paths()
 {
-    // This function should return the default plugin paths.
-    // For now, we return an empty vector.
-    // TODO: Implement logic to retrieve default plugin paths.
-    return {};
+    // Return the default path for hipDNN plugins.
+    return {"/opt/rocm/hipdnn/plugins/"};
 }
 
 } // namespace
@@ -56,6 +57,17 @@ void Engine_plugin_resource_manager::set_plugin_paths(
     }
 
     override_plugin_paths = plugin_paths;
+}
+
+std::vector<std::filesystem::path> Engine_plugin_resource_manager::get_plugin_paths()
+{
+    std::lock_guard<std::mutex> lock(plugin_mutex);
+
+    if(override_plugin_paths.empty())
+    {
+        return get_default_plugin_paths();
+    }
+    return override_plugin_paths;
 }
 
 std::shared_ptr<Engine_plugin_resource_manager> Engine_plugin_resource_manager::create()
@@ -600,4 +612,4 @@ hipdnnEnginePluginExecutionContext_t Engine_execution_context_wrapper::get() con
 }
 
 } // namespace plugin
-} // hipdnn_backend
+} // namespace hipdnn_backend

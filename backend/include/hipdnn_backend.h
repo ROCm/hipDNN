@@ -289,6 +289,9 @@ HIPDNN_BACKEND_EXPORT hipdnnStatus_t hipdnnBackendCreateAndDeserializeGraph_ext(
  */
 HIPDNN_BACKEND_EXPORT void hipdnnLoggingCallback_ext(hipdnnSeverity_t severity, const char* msg);
 
+HIPDNN_BACKEND_EXPORT hipdnnStatus_t hipdnnSetPluginPaths(int64_t num_paths,
+                                                          const char* const plugin_paths[]);
+
 #ifdef __cplusplus
 }
 #endif

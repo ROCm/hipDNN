@@ -11,6 +11,7 @@
 #include "helpers.hpp"
 #include "hipdnn_exception.hpp"
 #include "logging/logging.hpp"
+#include "plugin/engine_plugin_resource_manager.hpp"
 #include "plugin/plugin_manager.hpp"
 #include <hipdnn_sdk/logging/callback_types.h>
 
@@ -307,4 +308,42 @@ HIPDNN_BACKEND_EXPORT void hipdnnGetLastErrorString(char* message, size_t max_si
 HIPDNN_BACKEND_EXPORT void hipdnnLoggingCallback_ext(hipdnnSeverity_t severity, const char* msg)
 {
     hipdnn_backend::logging::hipdnn_logging_callback(severity, msg);
+}
+
+HIPDNN_BACKEND_EXPORT hipdnnStatus_t hipdnnSetPluginPaths(int64_t num_paths,
+                                                          const char* const plugin_paths[])
+{
+    try
+    {
+        if(num_paths < 0 || (num_paths > 0 && plugin_paths == nullptr))
+        {
+            return HIPDNN_STATUS_BAD_PARAM;
+        }
+
+        std::vector<std::filesystem::path> paths_vec;
+        paths_vec.reserve(static_cast<size_t>(num_paths));
+
+        for(int32_t i = 0; i < num_paths; ++i)
+        {
+            if(plugin_paths[i] == nullptr)
+            {
+                return HIPDNN_STATUS_BAD_PARAM;
+            }
+            paths_vec.emplace_back(plugin_paths[i]);
+        }
+
+        hipdnn_backend::plugin::Engine_plugin_resource_manager::set_plugin_paths(paths_vec);
+
+        return HIPDNN_STATUS_SUCCESS;
+    }
+    catch(const hipdnn_backend::Hipdnn_exception& e)
+    {
+        // HIPDNN_LOG_ERROR(e.get_message()); // Optional: log error message
+        return e.get_status();
+    }
+    catch(...)
+    {
+        // HIPDNN_LOG_ERROR("Unknown error in hipdnnSetPluginPaths"); // Optional: log error
+        return HIPDNN_STATUS_INTERNAL_ERROR;
+    }
 }
