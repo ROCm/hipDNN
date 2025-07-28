@@ -20,7 +20,9 @@ public:
     virtual int64_t id() const = 0;
 
     virtual bool is_applicable(const hipdnn_plugin::Graph_interface& op_graph) const = 0;
-    virtual void get_details(hipdnnPluginConstData_t& details_out) const = 0;
+    virtual void get_details(hipdnnEnginePluginHandle& handle,
+                             hipdnnPluginConstData_t& details_out) const
+        = 0;
 
     virtual size_t get_workspace_size(const hipdnnEnginePluginHandle& handle,
                                       const hipdnn_plugin::Graph_interface& op_graph) const

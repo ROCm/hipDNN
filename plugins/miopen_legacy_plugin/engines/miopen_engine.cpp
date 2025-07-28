@@ -33,7 +33,8 @@ bool Miopen_engine::is_applicable(const hipdnn_plugin::Graph_interface& op_graph
     return false;
 }
 
-void Miopen_engine::get_details(hipdnnEnginePluginHandle& handle, hipdnnPluginConstData_t& details_out) const
+void Miopen_engine::get_details(hipdnnEnginePluginHandle& handle,
+                                hipdnnPluginConstData_t& details_out) const
 {
     flatbuffers::FlatBufferBuilder builder;
     auto engine_details = hipdnn_sdk::data_objects::CreateEngineDetails(builder, _id);
@@ -41,6 +42,7 @@ void Miopen_engine::get_details(hipdnnEnginePluginHandle& handle, hipdnnPluginCo
     auto detached_buffer = std::make_unique<flatbuffers::DetachedBuffer>(builder.Release());
     details_out.ptr = detached_buffer->data();
     details_out.size = detached_buffer->size();
+
     // Store the buffer in the handle's map for later destruction
     handle.engine_details_buffers[details_out.ptr] = std::move(detached_buffer);
 }

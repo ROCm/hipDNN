@@ -1,14 +1,12 @@
 // Copyright © Advanced Micro Devices, Inc., or its affiliates.
 // SPDX-License-Identifier:  MIT
 
-
 #pragma once
 
-
+#include <flatbuffers/flatbuffers.h>
+#include <memory>
 #include <miopen/miopen.h>
 #include <unordered_map>
-#include <memory>
-#include <flatbuffers/flatbuffers.h>
 
 #include "miopen_container.hpp"
 
@@ -27,5 +25,6 @@ public:
     }
 
     // Map shallow pointer (const void*) to its corresponding DetachedBuffer for engine details
-    std::unordered_map<const void*, std::unique_ptr<flatbuffers::DetachedBuffer>> engine_details_buffers;
+    std::unordered_map<const void*, std::unique_ptr<flatbuffers::DetachedBuffer>>
+        engine_details_buffers;
 };
