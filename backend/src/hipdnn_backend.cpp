@@ -310,8 +310,8 @@ HIPDNN_BACKEND_EXPORT void hipdnnLoggingCallback_ext(hipdnnSeverity_t severity, 
     hipdnn_backend::logging::hipdnn_logging_callback(severity, msg);
 }
 
-HIPDNN_BACKEND_EXPORT hipdnnStatus_t hipdnnSetPluginPaths(int64_t num_paths,
-                                                          const char* const plugin_paths[])
+HIPDNN_BACKEND_EXPORT hipdnnStatus_t hipdnnSetPluginPaths_ext(int64_t num_paths,
+                                                              const char* const plugin_paths[])
 {
     try
     {

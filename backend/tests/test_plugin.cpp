@@ -37,6 +37,9 @@ void dummy_callback(hipdnnSeverity_t sev, const char* msg)
     g_callback_was_called = true;
 }
 
+const std::string PLUGIN_PATH1 = "./libhipdnn_test_plugin1.so";
+const std::string PLUGIN_PATH2 = "./libhipdnn_test_plugin2.so";
+
 } // namespace
 
 TEST(PluginManagerTest, LoadPlugins)
@@ -45,8 +48,7 @@ TEST(PluginManagerTest, LoadPlugins)
     plugin::Plugin_manager_base<Plugin> plugin_manager;
 
     // Create a list of paths to plugins
-    std::vector<std::filesystem::path> plugin_paths
-        = {"./hipdnn_test_plugin1", "./hipdnn_test_plugin2"};
+    std::vector<std::filesystem::path> plugin_paths = {PLUGIN_PATH1, PLUGIN_PATH2};
 
     // Load the plugins
     plugin_manager.load_plugins(plugin_paths);
@@ -71,7 +73,7 @@ TEST(PluginManagerTest, LastError)
 {
     plugin::Plugin_manager_base<Plugin> plugin_manager;
 
-    std::vector<std::filesystem::path> plugin_paths = {"./hipdnn_test_plugin1"};
+    std::vector<std::filesystem::path> plugin_paths = {PLUGIN_PATH1};
     plugin_manager.load_plugins(plugin_paths);
 
     const auto& plugins = plugin_manager.get_plugins();
@@ -90,7 +92,7 @@ TEST(PluginManagerTest, LastErrorMultithreaded)
 {
     plugin::Plugin_manager_base<Plugin> plugin_manager;
 
-    std::vector<std::filesystem::path> plugin_paths = {"./hipdnn_test_plugin1"};
+    std::vector<std::filesystem::path> plugin_paths = {PLUGIN_PATH1};
     plugin_manager.load_plugins(plugin_paths);
 
     const auto& plugins = plugin_manager.get_plugins();
@@ -130,7 +132,7 @@ TEST(PluginManagerTest, LastErrorOnSecondLoad)
     using Func_type = hipdnnPluginStatus_t (*)(const char**);
     const auto func_name = "hipdnnPluginGetName";
 
-    std::vector<std::filesystem::path> plugin_paths = {"./hipdnn_test_plugin1"};
+    std::vector<std::filesystem::path> plugin_paths = {PLUGIN_PATH1};
 
     {
         plugin::Plugin_manager_base<Plugin> plugin_manager;
@@ -162,7 +164,7 @@ TEST(PluginTest, SetLoggingCallback)
 {
     g_callback_was_called = false;
 
-    plugin::Shared_library lib("./hipdnn_test_plugin1");
+    plugin::Shared_library lib(PLUGIN_PATH1);
 
     Plugin plugin(std::move(lib));
 

@@ -29,7 +29,7 @@ TEST(GPU_EnginePluginTest, LoadPluginsAndExecuteOpGraph)
     Test_engine_plugin_manager plugin_manager;
 
     // Create a list of paths to plugins
-    std::vector<std::filesystem::path> plugin_paths = {"./hipdnn_test_engine_plugin1"};
+    std::vector<std::filesystem::path> plugin_paths = {"./libhipdnn_test_engine_plugin1.so"};
 
     // Load the plugins
     plugin_manager.load_plugins(plugin_paths);

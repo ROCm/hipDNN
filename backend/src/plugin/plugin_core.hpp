@@ -5,6 +5,7 @@
 
 #include <filesystem>
 #include <functional>
+#include <set>
 #include <string_view>
 #include <type_traits>
 #include <utility>
@@ -88,38 +89,30 @@ class Plugin_manager_base
 public:
     virtual ~Plugin_manager_base() = default;
 
-    void load_plugins(const std::vector<std::filesystem::path>& plugin_paths)
+    void load_plugins(const std::vector<std::filesystem::path>& search_paths)
     {
-        // Load plugins from the specified paths
-        for(const auto& path : plugin_paths)
+        for(const auto& path : search_paths)
         {
-            // TODO Check if the plugin with the same path is already loaded
-
             try
             {
-                Shared_library lib(path);
-                Plugin plugin(std::move(lib));
-
-                // Get the plugin name, version and type before we move it
-                const auto name = plugin.name();
-                const auto version = plugin.version();
-                const auto type = plugin.type();
-
-                _plugins.emplace_back(std::move(plugin));
-
-                HIPDNN_LOG_INFO("Plugin loaded successfully: {}", path.string());
-                // Print plugin name, version and type
-                HIPDNN_LOG_INFO("Plugin info: name={}, version={}, type={}({})",
-                                name,
-                                version,
-                                type,
-                                static_cast<int>(type));
+                if(std::filesystem::is_directory(path))
+                {
+                    scan_directory_for_plugins(path);
+                }
+                else if(std::filesystem::is_regular_file(path))
+                {
+                    load_plugin_from_file(path);
+                }
+                else
+                {
+                    HIPDNN_LOG_WARN("Plugin path is not a file or directory, skipping: {}",
+                                    path.string());
+                }
             }
-            catch(const Hipdnn_exception& e)
+            catch(const std::filesystem::filesystem_error& e)
             {
-                HIPDNN_LOG_ERROR("Error loading plugin: {}. {}", path.string(), e.get_message());
-                // TODO For now we just print the error message and continue
-                continue;
+                HIPDNN_LOG_WARN(
+                    "Error accessing plugin path: {}. Reason: {}", path.string(), e.what());
             }
         }
     }
@@ -130,8 +123,68 @@ public:
     }
 
 private:
+    void load_plugin_from_file(const std::filesystem::path& file_path)
+    {
+        try
+        {
+            const auto canonical_path = std::filesystem::canonical(file_path);
+            if(_loaded_plugin_files.contains(canonical_path))
+            {
+                return;
+            }
+
+            Shared_library lib(canonical_path);
+            Plugin plugin(std::move(lib));
+
+            const auto name = plugin.name();
+            const auto version = plugin.version();
+            const auto type = plugin.type();
+
+            _plugins.emplace_back(std::move(plugin));
+            _loaded_plugin_files.insert(canonical_path);
+
+            HIPDNN_LOG_INFO("Plugin loaded successfully: {}", canonical_path.string());
+            HIPDNN_LOG_INFO("Plugin info: name={}, version={}, type={}({})",
+                            name,
+                            version,
+                            type,
+                            static_cast<int>(type));
+        }
+        catch(const std::filesystem::filesystem_error& e)
+        {
+            HIPDNN_LOG_WARN(
+                "Could not process plugin path: {}. Reason: {}", file_path.string(), e.what());
+        }
+        catch(const Hipdnn_exception& e)
+        {
+            HIPDNN_LOG_WARN(
+                "Could not load plugin: {}. Reason: {}", file_path.string(), e.get_message());
+        }
+    }
+
+    void scan_directory_for_plugins(const std::filesystem::path& dir_path)
+    {
+        HIPDNN_LOG_INFO("Scanning for plugins in directory: {}", dir_path.string());
+        try
+        {
+            for(const auto& entry : std::filesystem::directory_iterator(dir_path))
+            {
+                if(entry.is_regular_file())
+                {
+                    load_plugin_from_file(entry.path());
+                }
+            }
+        }
+        catch(const std::filesystem::filesystem_error& e)
+        {
+            HIPDNN_LOG_WARN(
+                "Error scanning plugin directory: {}. Reason: {}", dir_path.string(), e.what());
+        }
+    }
+
     std::vector<Plugin> _plugins;
+    std::set<std::filesystem::path> _loaded_plugin_files;
 };
 
 } // namespace plugin
-} // hipdnn_backend
+} // namespace hipdnn_backend
