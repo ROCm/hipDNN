@@ -32,7 +32,7 @@ TEST(GPU_EnginePluginTest, LoadPluginsAndExecuteOpGraph)
     std::vector<std::filesystem::path> plugin_paths = {"./libhipdnn_test_engine_plugin1.so"};
 
     // Load the plugins
-    plugin_manager.load_plugins(plugin_paths);
+    plugin_manager.load_plugins(plugin_paths, HIPDNN_PLUGIN_LOADING_ABSOLUTE);
 
     const auto& plugins = plugin_manager.get_plugins();
     ASSERT_EQ(plugins.size(), 1); // Ensure one plugin is loaded

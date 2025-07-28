@@ -11,6 +11,7 @@
 #include <utility>
 #include <vector>
 
+#include "hipdnn_backend_plugin_loading_mode.h"
 #include "logging/logging.hpp"
 #include <hipdnn_sdk/plugin/plugin_api_data_types.h>
 #include <hipdnn_sdk/plugin/plugin_data_type_helpers.hpp>
@@ -89,19 +90,25 @@ class Plugin_manager_base
 public:
     virtual ~Plugin_manager_base() = default;
 
-    void load_plugins(const std::vector<std::filesystem::path>& search_paths)
+    void load_plugins(const std::vector<std::filesystem::path>& search_paths,
+                      hipdnnPluginLoadingMode_t mode)
     {
+        if(mode == HIPDNN_PLUGIN_LOADING_ABSOLUTE)
+        {
+            clear_plugins();
+        }
+
         for(const auto& path : search_paths)
         {
             try
             {
                 if(std::filesystem::is_directory(path))
                 {
-                    scan_directory_for_plugins(path);
+                    scan_directory_for_plugins(path, mode);
                 }
                 else if(std::filesystem::is_regular_file(path))
                 {
-                    load_plugin_from_file(path);
+                    load_plugin_from_file(path, mode);
                 }
                 else
                 {
@@ -123,12 +130,21 @@ public:
     }
 
 private:
-    void load_plugin_from_file(const std::filesystem::path& file_path)
+    void clear_plugins()
+    {
+        _plugins.clear();
+        _loaded_plugin_files.clear();
+    }
+
+    void load_plugin_from_file(const std::filesystem::path& file_path,
+                               hipdnnPluginLoadingMode_t mode)
     {
         try
         {
             const auto canonical_path = std::filesystem::canonical(file_path);
-            if(_loaded_plugin_files.contains(canonical_path))
+
+            if(mode != HIPDNN_PLUGIN_LOADING_ADDITIVE
+               && _loaded_plugin_files.contains(canonical_path))
             {
                 return;
             }
@@ -162,7 +178,8 @@ private:
         }
     }
 
-    void scan_directory_for_plugins(const std::filesystem::path& dir_path)
+    void scan_directory_for_plugins(const std::filesystem::path& dir_path,
+                                    hipdnnPluginLoadingMode_t mode)
     {
         HIPDNN_LOG_INFO("Scanning for plugins in directory: {}", dir_path.string());
         try
@@ -171,7 +188,7 @@ private:
             {
                 if(entry.is_regular_file())
                 {
-                    load_plugin_from_file(entry.path());
+                    load_plugin_from_file(entry.path(), mode);
                 }
             }
         }
@@ -183,6 +200,7 @@ private:
     }
 
     std::vector<Plugin> _plugins;
+    // hipdnnPluginLoadingMode_t _loading_mode;
     std::set<std::filesystem::path> _loaded_plugin_files;
 };
 

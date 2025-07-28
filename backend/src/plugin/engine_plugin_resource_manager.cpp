@@ -30,8 +30,14 @@ class Engine_plugin_manager : public Plugin_manager_base<Engine_plugin>
 namespace
 {
 
+struct Plugin_loading_config
+{
+    std::vector<std::filesystem::path> paths;
+    hipdnnPluginLoadingMode_t mode = HIPDNN_PLUGIN_LOADING_ADDITIVE_UNIQUE;
+};
+
 std::mutex plugin_mutex;
-std::vector<std::filesystem::path> override_plugin_paths;
+Plugin_loading_config plugin_config;
 std::weak_ptr<Engine_plugin_manager> pm_ptr;
 
 std::vector<std::filesystem::path> get_default_plugin_paths()
@@ -42,28 +48,39 @@ std::vector<std::filesystem::path> get_default_plugin_paths()
 } // namespace
 
 void Engine_plugin_resource_manager::set_plugin_paths(
-    const std::vector<std::filesystem::path>& plugin_paths)
+    const std::vector<std::filesystem::path>& plugin_paths, hipdnnPluginLoadingMode_t loading_mode)
 {
     std::lock_guard<std::mutex> lock(plugin_mutex);
 
-    if(!override_plugin_paths.empty())
+    if(!pm_ptr.expired())
     {
+        HIPDNN_LOG_ERROR("hipdnnSetPluginPaths_ext called after hipDNN handle was created.");
         return;
     }
 
-    override_plugin_paths = plugin_paths;
-}
-
-std::vector<std::filesystem::path> Engine_plugin_resource_manager::get_plugin_paths()
-{
-    std::lock_guard<std::mutex> lock(plugin_mutex);
-
-    if(override_plugin_paths.empty())
+    if(loading_mode == HIPDNN_PLUGIN_LOADING_ABSOLUTE)
     {
-        return get_default_plugin_paths();
+        plugin_config.paths = plugin_paths;
     }
-    return override_plugin_paths;
+    else
+    {
+        plugin_config.paths.insert(
+            plugin_config.paths.end(), plugin_paths.begin(), plugin_paths.end());
+    }
+
+    plugin_config.mode = loading_mode;
 }
+
+// std::vector<std::filesystem::path> Engine_plugin_resource_manager::get_plugin_paths()
+// {
+//     std::lock_guard<std::mutex> lock(plugin_mutex);
+
+//     if(override_plugin_paths.empty())
+//     {
+//         return get_default_plugin_paths();
+//     }
+//     return override_plugin_paths;
+// }
 
 std::shared_ptr<Engine_plugin_resource_manager> Engine_plugin_resource_manager::create()
 {
@@ -77,10 +94,11 @@ std::shared_ptr<Engine_plugin_resource_manager> Engine_plugin_resource_manager::
 
         if(!pm)
         {
-            auto paths = override_plugin_paths.empty() ? get_default_plugin_paths()
-                                                       : override_plugin_paths;
+            const auto& paths_to_load
+                = plugin_config.paths.empty() ? get_default_plugin_paths() : plugin_config.paths;
+
             pm = std::make_shared<Engine_plugin_manager>();
-            pm->load_plugins(paths);
+            pm->load_plugins(paths_to_load, plugin_config.mode);
             pm_ptr = pm;
         }
     }

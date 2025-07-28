@@ -310,8 +310,8 @@ HIPDNN_BACKEND_EXPORT void hipdnnLoggingCallback_ext(hipdnnSeverity_t severity, 
     hipdnn_backend::logging::hipdnn_logging_callback(severity, msg);
 }
 
-HIPDNN_BACKEND_EXPORT hipdnnStatus_t hipdnnSetPluginPaths_ext(int64_t num_paths,
-                                                              const char* const plugin_paths[])
+HIPDNN_BACKEND_EXPORT hipdnnStatus_t hipdnnSetPluginPaths_ext(
+    int64_t num_paths, const char* const plugin_paths[], hipdnnPluginLoadingMode_t loading_mode)
 {
     try
     {
@@ -332,7 +332,8 @@ HIPDNN_BACKEND_EXPORT hipdnnStatus_t hipdnnSetPluginPaths_ext(int64_t num_paths,
             paths_vec.emplace_back(plugin_paths[i]);
         }
 
-        hipdnn_backend::plugin::Engine_plugin_resource_manager::set_plugin_paths(paths_vec);
+        hipdnn_backend::plugin::Engine_plugin_resource_manager::set_plugin_paths(paths_vec,
+                                                                                 loading_mode);
 
         return HIPDNN_STATUS_SUCCESS;
     }

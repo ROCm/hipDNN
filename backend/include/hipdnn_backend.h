@@ -12,6 +12,7 @@
 #include "hipdnn_backend_attribute_type.h"
 #include "hipdnn_backend_descriptor_type.h"
 #include "hipdnn_backend_heuristic_type.h"
+#include "hipdnn_backend_plugin_loading_mode.h"
 #include "hipdnn_status.h"
 #include <hipdnn_sdk/logging/callback_types.h>
 
@@ -289,8 +290,21 @@ HIPDNN_BACKEND_EXPORT hipdnnStatus_t hipdnnBackendCreateAndDeserializeGraph_ext(
  */
 HIPDNN_BACKEND_EXPORT void hipdnnLoggingCallback_ext(hipdnnSeverity_t severity, const char* msg);
 
-HIPDNN_BACKEND_EXPORT hipdnnStatus_t hipdnnSetPluginPaths_ext(int64_t num_paths,
-                                                              const char* const plugin_paths[]);
+/**
+ * @brief Sets the plugin search paths for the hipDNN backend and loads plugins.
+ *
+ * This function specifies the set of paths to search for hipDNN plugins.
+ *
+ * @param[in] num_paths      The number of paths provided in the plugin_paths array.
+ * @param[in] plugin_paths   An array of C-string paths, each specifying either a directory to search or a plugin file.
+ *
+ * @retval HIPDNN_STATUS_SUCCESS           All specified plugins were loaded successfully.
+ * @retval HIPDNN_STATUS_BAD_PARAM         Invalid parameter values (e.g., null pointer, zero paths).
+ * @retval HIPDNN_STATUS_ALLOC_FAILED      Memory allocation failed during plugin loading.
+ * @retval HIPDNN_STATUS_INTERNAL_ERROR    An internal error occurred during plugin loading.
+ */
+HIPDNN_BACKEND_EXPORT hipdnnStatus_t hipdnnSetPluginPaths_ext(
+    int64_t num_paths, const char* const plugin_paths[], hipdnnPluginLoadingMode_t loading_mode);
 
 #ifdef __cplusplus
 }

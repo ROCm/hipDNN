@@ -51,7 +51,7 @@ TEST(PluginManagerTest, LoadPlugins)
     std::vector<std::filesystem::path> plugin_paths = {PLUGIN_PATH1, PLUGIN_PATH2};
 
     // Load the plugins
-    plugin_manager.load_plugins(plugin_paths);
+    plugin_manager.load_plugins(plugin_paths, HIPDNN_PLUGIN_LOADING_ABSOLUTE);
 
     const auto& plugins = plugin_manager.get_plugins();
     ASSERT_EQ(plugins.size(), 2); // Ensure two plugins are loaded
@@ -74,7 +74,7 @@ TEST(PluginManagerTest, LastError)
     plugin::Plugin_manager_base<Plugin> plugin_manager;
 
     std::vector<std::filesystem::path> plugin_paths = {PLUGIN_PATH1};
-    plugin_manager.load_plugins(plugin_paths);
+    plugin_manager.load_plugins(plugin_paths, HIPDNN_PLUGIN_LOADING_ABSOLUTE);
 
     const auto& plugins = plugin_manager.get_plugins();
     ASSERT_EQ(plugins.size(), 1);
@@ -93,7 +93,7 @@ TEST(PluginManagerTest, LastErrorMultithreaded)
     plugin::Plugin_manager_base<Plugin> plugin_manager;
 
     std::vector<std::filesystem::path> plugin_paths = {PLUGIN_PATH1};
-    plugin_manager.load_plugins(plugin_paths);
+    plugin_manager.load_plugins(plugin_paths, HIPDNN_PLUGIN_LOADING_ABSOLUTE);
 
     const auto& plugins = plugin_manager.get_plugins();
     ASSERT_EQ(plugins.size(), 1);
@@ -136,7 +136,7 @@ TEST(PluginManagerTest, LastErrorOnSecondLoad)
 
     {
         plugin::Plugin_manager_base<Plugin> plugin_manager;
-        plugin_manager.load_plugins(plugin_paths);
+        plugin_manager.load_plugins(plugin_paths, HIPDNN_PLUGIN_LOADING_ABSOLUTE);
 
         const auto& plugins = plugin_manager.get_plugins();
         ASSERT_EQ(plugins.size(), 1);
@@ -147,7 +147,7 @@ TEST(PluginManagerTest, LastErrorOnSecondLoad)
 
     {
         plugin::Plugin_manager_base<Plugin> plugin_manager;
-        plugin_manager.load_plugins(plugin_paths);
+        plugin_manager.load_plugins(plugin_paths, HIPDNN_PLUGIN_LOADING_ABSOLUTE);
 
         const auto& plugins = plugin_manager.get_plugins();
         ASSERT_EQ(plugins.size(), 1);
