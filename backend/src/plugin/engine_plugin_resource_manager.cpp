@@ -415,22 +415,10 @@ void Engine_plugin_resource_manager::execute_op_graph(hipdnnBackendDescriptor_t 
     auto execution_plan_desc = execution_plan->as_descriptor<Execution_plan_descriptor>();
     auto variant_pack_desc = variant_pack->as_descriptor<Variant_descriptor>();
 
-    THROW_IF_NE(execution_plan_desc->type,
-                HIPDNN_BACKEND_EXECUTION_PLAN_DESCRIPTOR,
-                HIPDNN_STATUS_BAD_PARAM,
-                "Engine_plugin_resource_manager::execute_op_graph failed: Invalid execution plan "
-                "descriptor type");
-
     THROW_IF_FALSE(execution_plan_desc->is_finalized(),
                    HIPDNN_STATUS_BAD_PARAM,
                    "Engine_plugin_resource_manager::execute_op_graph failed: execution_plan_desc "
                    "is not finalized");
-
-    THROW_IF_NE(variant_pack_desc->type,
-                HIPDNN_BACKEND_VARIANT_PACK_DESCRIPTOR,
-                HIPDNN_STATUS_BAD_PARAM,
-                "Engine_plugin_resource_manager::execute_op_graph failed: Invalid variant pack "
-                "descriptor type");
 
     THROW_IF_FALSE(variant_pack_desc->is_finalized(),
                    HIPDNN_STATUS_BAD_PARAM,

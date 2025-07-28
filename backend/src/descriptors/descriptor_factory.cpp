@@ -24,7 +24,7 @@ void Descriptor_factory::create(hipdnnBackendDescriptorType_t descriptor_type,
     HIPDNN_LOG_INFO("Creating descriptor of type: {}",
                     hipdnn_get_backend_descriptor_type_name(descriptor_type));
 
-    std::shared_ptr<hipdnnPrivateBackendDescriptor> private_desc;
+    std::shared_ptr<Backend_descriptor_interface> private_desc;
     switch(descriptor_type)
     {
     case HIPDNN_BACKEND_ENGINECFG_DESCRIPTOR:
@@ -52,7 +52,7 @@ void Descriptor_factory::create(hipdnnBackendDescriptorType_t descriptor_type,
                                    + " is not supported.");
     }
 
-    *descriptor = pack_descriptor(private_desc);
+    *descriptor = hipdnnBackendDescriptor::pack_descriptor(private_desc);
 
     HIPDNN_LOG_INFO("Created descriptor: {:p}", static_cast<void*>(*descriptor));
 }
@@ -69,7 +69,7 @@ void Descriptor_factory::create_graph_ext(hipdnnBackendDescriptor_t* descriptor,
 
     auto graph_descriptor = std::make_shared<Graph_descriptor>();
     graph_descriptor->deserialize_graph(serialized_graph, graph_byte_size);
-    *descriptor = pack_descriptor(graph_descriptor);
+    *descriptor = hipdnnBackendDescriptor::pack_descriptor(graph_descriptor);
 
     HIPDNN_LOG_INFO("Created graph descriptor: {:p}", static_cast<void*>(*descriptor));
 }

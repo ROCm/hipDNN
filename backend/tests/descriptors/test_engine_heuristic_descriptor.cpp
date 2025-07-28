@@ -28,21 +28,27 @@ public:
     std::unique_ptr<hipdnnBackendDescriptor> _engine_heuristic_wrapper = nullptr;
     std::unique_ptr<hipdnnBackendDescriptor> _mock_graph_wrapper = nullptr;
     std::unique_ptr<hipdnnBackendDescriptor> _mock_graph_bad_type_wrapper = nullptr;
+    std::unique_ptr<hipdnnBackendDescriptor> _mock_wrong_type_wrapper = nullptr;
 
-    Engine_heuristic_descriptor* get_engine_heuristic_descriptor() const
+    std::shared_ptr<Engine_heuristic_descriptor> get_engine_heuristic_descriptor() const
     {
-        return dynamic_cast<Engine_heuristic_descriptor*>(
-            _engine_heuristic_wrapper->private_descriptor.get());
+        return _engine_heuristic_wrapper->as_descriptor<Engine_heuristic_descriptor>();
     }
 
-    Mock_descriptor* get_mock_graph() const
+    std::shared_ptr<Mock_descriptor<Graph_descriptor>> get_mock_graph() const
     {
-        return unpack_mock_descriptor(_mock_graph_wrapper.get());
+        return _mock_graph_wrapper->as_descriptor<Mock_descriptor<Graph_descriptor>>();
     }
 
-    Mock_descriptor* get_mock_graph_bad_type() const
+    std::shared_ptr<Mock_descriptor<Graph_descriptor>> get_mock_graph_bad_type() const
     {
-        return unpack_mock_descriptor(_mock_graph_bad_type_wrapper.get());
+        return _mock_graph_bad_type_wrapper->as_descriptor<Mock_descriptor<Graph_descriptor>>();
+    }
+
+    std::shared_ptr<Mock_descriptor<Engine_heuristic_descriptor>> get_mock_wrong_type() const
+    {
+        return _mock_wrong_type_wrapper
+            ->as_descriptor<Mock_descriptor<Engine_heuristic_descriptor>>();
     }
 
     void set_graph() const
@@ -80,9 +86,10 @@ protected:
     void SetUp() override
     {
         _engine_heuristic_wrapper = create_descriptor<Engine_heuristic_descriptor>();
-        _mock_graph_wrapper
-            = make_mock_descriptor_wrapper(HIPDNN_BACKEND_OPERATIONGRAPH_DESCRIPTOR);
-        _mock_graph_bad_type_wrapper = make_mock_descriptor_wrapper();
+        _mock_graph_wrapper = create_descriptor<Mock_descriptor<Graph_descriptor>>();
+        _mock_graph_bad_type_wrapper = create_descriptor<Mock_descriptor<Graph_descriptor>>();
+        _mock_wrong_type_wrapper
+            = create_descriptor<Mock_descriptor<Engine_heuristic_descriptor>>();
     }
 };
 
@@ -91,7 +98,7 @@ TEST_F(Engine_heuristic_descriptor_test, CreateEngineHeuristicDescriptor)
     auto heur = get_engine_heuristic_descriptor();
     ASSERT_NE(heur, nullptr);
     ASSERT_FALSE(heur->is_finalized());
-    ASSERT_EQ(heur->type, HIPDNN_BACKEND_ENGINEHEUR_DESCRIPTOR);
+    ASSERT_EQ(heur->get_type(), HIPDNN_BACKEND_ENGINEHEUR_DESCRIPTOR);
 }
 
 TEST_F(Engine_heuristic_descriptor_test, SetEngineHeuristicDescriptorGraph)
@@ -124,6 +131,12 @@ TEST_F(Engine_heuristic_descriptor_test, SetEngineHeuristicDescriptorGraph)
                                                    HIPDNN_TYPE_BACKEND_DESCRIPTOR,
                                                    1,
                                                    &_mock_graph_bad_type_wrapper),
+                               HIPDNN_STATUS_BAD_PARAM_NOT_FINALIZED);
+
+    ASSERT_THROW_HIPDNN_STATUS(heur->set_attribute(HIPDNN_ATTR_ENGINEHEUR_OPERATION_GRAPH,
+                                                   HIPDNN_TYPE_BACKEND_DESCRIPTOR,
+                                                   1,
+                                                   &_mock_wrong_type_wrapper),
                                HIPDNN_STATUS_BAD_PARAM);
 
     EXPECT_CALL(*get_mock_graph(), is_finalized()).WillOnce(Return(false));
@@ -291,7 +304,7 @@ TEST_F(Engine_heuristic_descriptor_test, GetEngineHeuristicDescriptorGraph)
                                         1,
                                         nullptr,
                                         graph.get_ptr()));
-    ASSERT_EQ(graph.get()->private_descriptor, _mock_graph_wrapper->private_descriptor);
+    ASSERT_EQ(*graph.get(), *(_mock_graph_wrapper.get()));
 
     int64_t count;
     ASSERT_NO_THROW(heur->get_attribute(HIPDNN_ATTR_ENGINEHEUR_OPERATION_GRAPH,
@@ -491,6 +504,6 @@ TEST_F(Engine_heuristic_descriptor_test, GetGraphReturnsPointerIfFinalized)
     make_engine_heuristic_finalized();
     auto graph_ptr = heur->get_graph();
     ASSERT_NE(graph_ptr, nullptr);
-    ASSERT_EQ(static_cast<const hipdnnPrivateBackendDescriptor*>(graph_ptr.get()),
-              static_cast<const hipdnnPrivateBackendDescriptor*>(get_mock_graph()));
+    ASSERT_EQ(static_cast<const Backend_descriptor_interface*>(graph_ptr.get()),
+              static_cast<const Backend_descriptor_interface*>(get_mock_graph().get()));
 }

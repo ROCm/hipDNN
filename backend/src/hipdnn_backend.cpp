@@ -34,17 +34,11 @@ void throw_if_invalid_descriptor(hipdnnBackendDescriptor_t descriptor)
                                                "hipdnnBackendDescriptor_t is nullptr");
     }
 
-    if(descriptor->private_descriptor == nullptr)
+    if(!descriptor->is_valid())
     {
         throw hipdnn_backend::Hipdnn_exception(
             HIPDNN_STATUS_BAD_PARAM_NULL_POINTER,
             "hipdnnBackendDescriptor_t private_descriptor is nullptr");
-    }
-
-    if(descriptor->private_descriptor->type == HIPDNN_INVALID_TYPE)
-    {
-        throw hipdnn_backend::Hipdnn_exception(HIPDNN_STATUS_BAD_PARAM,
-                                               "hipdnnBackendDescriptor_t is invalid type");
     }
 }
 
@@ -173,16 +167,15 @@ HIPDNN_BACKEND_EXPORT hipdnnStatus_t hipdnnBackendFinalize(hipdnnBackendDescript
     return hipdnn_backend::try_catch([&, api_name = __func__]() {
         throw_if_invalid_descriptor(descriptor);
 
-        auto& private_descriptor = descriptor->private_descriptor;
-        private_descriptor->finalize();
+        descriptor->finalize();
 
-        if(private_descriptor->type == HIPDNN_BACKEND_ENGINECFG_DESCRIPTOR)
+        if(descriptor->get_type() == HIPDNN_BACKEND_ENGINECFG_DESCRIPTOR)
         {
             Plugin_manager plugin_manager;
             plugin_manager.initialize();
             plugin_manager.finalize_engine_config(descriptor);
         }
-        else if(private_descriptor->type == HIPDNN_BACKEND_ENGINEHEUR_DESCRIPTOR)
+        else if(descriptor->get_type() == HIPDNN_BACKEND_ENGINEHEUR_DESCRIPTOR)
         {
             Plugin_manager plugin_manager;
             plugin_manager.initialize();
@@ -213,11 +206,11 @@ HIPDNN_BACKEND_EXPORT hipdnnStatus_t
     return hipdnn_backend::try_catch([&, api_name = __func__]() {
         throw_if_invalid_descriptor(descriptor);
 
-        descriptor->private_descriptor->get_attribute(attribute_name,
-                                                      attribute_type,
-                                                      requested_element_count,
-                                                      element_count,
-                                                      array_of_elements);
+        descriptor->get_attribute(attribute_name,
+                                  attribute_type,
+                                  requested_element_count,
+                                  element_count,
+                                  array_of_elements);
 
         if(element_count == nullptr)
         {
@@ -253,8 +246,7 @@ HIPDNN_BACKEND_EXPORT hipdnnStatus_t
     return hipdnn_backend::try_catch([&, api_name = __func__]() {
         throw_if_invalid_descriptor(descriptor);
 
-        descriptor->private_descriptor->set_attribute(
-            attribute_name, attribute_type, element_count, array_of_elements);
+        descriptor->set_attribute(attribute_name, attribute_type, element_count, array_of_elements);
 
         LOG_API_SUCCESS(
             api_name, "status={}", hipdnn_backend::hipdnn_get_status_string(HIPDNN_STATUS_SUCCESS));

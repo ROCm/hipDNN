@@ -11,16 +11,11 @@
 namespace hipdnn_backend
 {
 
-Graph_descriptor::Graph_descriptor()
-{
-    type = HIPDNN_BACKEND_OPERATIONGRAPH_DESCRIPTOR;
-}
-
 void Graph_descriptor::finalize()
 {
     THROW_IF_NULL(_graph, HIPDNN_STATUS_BAD_PARAM, "Graph_descriptor::finalize: graph is null");
     THROW_IF_NULL(_handle, HIPDNN_STATUS_BAD_PARAM, "Graph_descriptor::finalize: handle is null");
-    hipdnnPrivateBackendDescriptor::finalize();
+    hipdnnBackendDescriptorImpl<Graph_descriptor>::finalize();
 }
 
 void Graph_descriptor::set_handle(hipdnnBackendAttributeType_t attribute_type,
@@ -121,6 +116,11 @@ const std::vector<uint8_t>& Graph_descriptor::get_serialized_graph()
     }
 
     return _serialized_graph;
+}
+
+hipdnnBackendDescriptorType_t Graph_descriptor::get_static_type()
+{
+    return HIPDNN_BACKEND_OPERATIONGRAPH_DESCRIPTOR;
 }
 
 } // namespace hipdnn_backend

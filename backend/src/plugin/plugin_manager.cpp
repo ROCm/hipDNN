@@ -104,16 +104,6 @@ void Plugin_manager::execute(hipdnnHandle* handle,
     auto execution_plan_desc = execution_plan->as_descriptor<Execution_plan_descriptor>();
     auto variant_desc = variant_pack->as_descriptor<Variant_descriptor>();
 
-    THROW_IF_NE(execution_plan_desc->type,
-                HIPDNN_BACKEND_EXECUTION_PLAN_DESCRIPTOR,
-                HIPDNN_STATUS_BAD_PARAM,
-                "Plugin_manager::execute failed: Invalid execution plan descriptor type");
-
-    THROW_IF_NE(variant_desc->type,
-                HIPDNN_BACKEND_VARIANT_PACK_DESCRIPTOR,
-                HIPDNN_STATUS_BAD_PARAM,
-                "Plugin_manager::execute failed: Invalid variant pack descriptor type");
-
     THROW_IF_FALSE(execution_plan_desc->is_finalized(),
                    HIPDNN_STATUS_BAD_PARAM,
                    "Plugin_manager::execute failed: execution_plan_desc is not finalized");

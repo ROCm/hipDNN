@@ -11,10 +11,7 @@ namespace test_descriptor_utils
 template <typename T>
 hipdnnBackendDescriptor* create_descriptor_ptr()
 {
-    auto desc_wrapper = new hipdnnBackendDescriptor();
-    desc_wrapper->private_descriptor = std::make_shared<T>();
-
-    return desc_wrapper;
+    return hipdnnBackendDescriptor::pack_descriptor(std::make_shared<T>());
 }
 
 template <typename T>

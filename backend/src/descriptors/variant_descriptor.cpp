@@ -10,11 +10,6 @@
 namespace hipdnn_backend
 {
 
-Variant_descriptor::Variant_descriptor()
-{
-    type = HIPDNN_BACKEND_VARIANT_PACK_DESCRIPTOR;
-}
-
 void Variant_descriptor::finalize()
 {
     THROW_IF_NE(_data_pointers.size(),
@@ -24,7 +19,7 @@ void Variant_descriptor::finalize()
     THROW_IF_TRUE(
         _data_pointers.empty(), HIPDNN_STATUS_BAD_PARAM, "Data pointers and unique ids are empty");
 
-    hipdnnPrivateBackendDescriptor::finalize();
+    hipdnnBackendDescriptorImpl<Variant_descriptor>::finalize();
 }
 
 void Variant_descriptor::get_attribute(hipdnnBackendAttributeName_t attribute_name,
@@ -169,6 +164,11 @@ const std::vector<int64_t>& Variant_descriptor::get_tensor_ids() const
                    HIPDNN_STATUS_INTERNAL_ERROR,
                    "Variant_descriptor::get_unique_ids() failed: Not finalized.");
     return _unique_ids;
+}
+
+hipdnnBackendDescriptorType_t Variant_descriptor::get_static_type()
+{
+    return HIPDNN_BACKEND_VARIANT_PACK_DESCRIPTOR;
 }
 
 }

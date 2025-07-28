@@ -10,11 +10,6 @@
 namespace hipdnn_backend
 {
 
-Engine_config_descriptor::Engine_config_descriptor()
-{
-    type = HIPDNN_BACKEND_ENGINECFG_DESCRIPTOR;
-}
-
 void Engine_config_descriptor::finalize()
 {
     THROW_IF_TRUE(is_finalized(),
@@ -25,7 +20,7 @@ void Engine_config_descriptor::finalize()
                   HIPDNN_STATUS_BAD_PARAM,
                   "Engine_config_descriptor::finalize() failed: Engine is not set.");
 
-    hipdnnPrivateBackendDescriptor::finalize();
+    hipdnnBackendDescriptorImpl<Engine_config_descriptor>::finalize();
 }
 
 void Engine_config_descriptor::get_attribute(hipdnnBackendAttributeName_t attribute_name,
@@ -84,7 +79,7 @@ void Engine_config_descriptor::get_engine(hipdnnBackendAttributeType_t attribute
         *element_count = 1;
     }
 
-    pack_descriptor(_engine, array_of_elements);
+    hipdnnBackendDescriptor::pack_descriptor(_engine, array_of_elements);
 }
 
 void Engine_config_descriptor::get_max_workspace_size(hipdnnBackendAttributeType_t attribute_type,
@@ -157,16 +152,10 @@ void Engine_config_descriptor::set_engine(hipdnnBackendAttributeType_t attribute
                 "Engine_config_descriptor failed to set engine: "
                 "Invalid element count.");
 
-    auto engine = unpack_descriptor<const Engine_descriptor>(
+    auto engine = hipdnnBackendDescriptor::unpack_descriptor<const Engine_descriptor>(
         array_of_elements,
         HIPDNN_STATUS_BAD_PARAM_NULL_POINTER,
         "Engine_config_descriptor failed to set engine: Engine is null.");
-
-    THROW_IF_NE(engine->type,
-                HIPDNN_BACKEND_ENGINE_DESCRIPTOR,
-                HIPDNN_STATUS_BAD_PARAM,
-                "Engine_config_descriptor failed to set engine: "
-                "Invalid engine descriptor type.");
 
     THROW_IF_FALSE(engine->is_finalized(),
                    HIPDNN_STATUS_BAD_PARAM_NOT_FINALIZED,
@@ -203,4 +192,8 @@ std::shared_ptr<const Engine_descriptor> Engine_config_descriptor::get_engine() 
     return _engine;
 }
 
+hipdnnBackendDescriptorType_t Engine_config_descriptor::get_static_type()
+{
+    return HIPDNN_BACKEND_ENGINECFG_DESCRIPTOR;
+}
 } // namespace hipdnn_backend

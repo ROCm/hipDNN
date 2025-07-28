@@ -10,7 +10,7 @@ namespace hipdnn_backend
 
 class Engine_descriptor;
 
-class Engine_config_descriptor : public hipdnnPrivateBackendDescriptor
+class Engine_config_descriptor : public hipdnnBackendDescriptorImpl<Engine_config_descriptor>
 {
 private:
     std::shared_ptr<const Engine_descriptor> _engine;
@@ -33,9 +33,6 @@ private:
 public:
     static constexpr int64_t INVALID_WORKSPACE_SIZE = -1;
 
-    Engine_config_descriptor();
-    ~Engine_config_descriptor() override = default;
-
     void finalize() override;
 
     void get_attribute(hipdnnBackendAttributeName_t attribute_name,
@@ -53,6 +50,8 @@ public:
 
     // Throws an exception if the descriptor is not finalized.
     std::shared_ptr<const Engine_descriptor> get_engine() const;
+
+    static hipdnnBackendDescriptorType_t get_static_type();
 };
 
 } // namespace hipdnn_backend
