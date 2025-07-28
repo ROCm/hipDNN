@@ -296,13 +296,13 @@ HIPDNN_BACKEND_EXPORT void hipdnnLoggingCallback_ext(hipdnnSeverity_t severity, 
  * This function specifies the set of paths to search for hipDNN plugins.
  *
  * @param[in] num_paths      The number of paths provided in the plugin_paths array.
- * @param[in] plugin_paths   An array of C-string paths, each specifying either a directory to search or a plugin file.
+ * @param[in] plugin_paths   An array of path strings, each specifying either a directory to search or a plugin file.
  *
  * @retval HIPDNN_STATUS_SUCCESS           All specified plugins were loaded successfully.
  * @retval HIPDNN_STATUS_BAD_PARAM_NULL_POINTER         Invalid parameter values.
  * @retval HIPDNN_STATUS_INTERNAL_ERROR    An internal error occurred during plugin loading.
  */
-HIPDNN_BACKEND_EXPORT hipdnnStatus_t hipdnnSetPluginPaths_ext(
+HIPDNN_BACKEND_EXPORT hipdnnStatus_t hipdnnSetEnginePluginPaths_ext(
     size_t num_paths, const char* const plugin_paths[], hipdnnPluginLoadingMode_t loading_mode);
 
 #ifdef __cplusplus

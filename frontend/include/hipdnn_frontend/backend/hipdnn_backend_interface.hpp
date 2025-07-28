@@ -52,9 +52,9 @@ public:
     virtual void logging_callback_ext(hipdnnSeverity_t severity, const char* msg) = 0;
 
     // NOLINTBEGIN
-    virtual hipdnnStatus_t set_plugin_paths_ext(size_t num_paths,
-                                                const char* const plugin_paths[],
-                                                hipdnnPluginLoadingMode_t mode)
+    virtual hipdnnStatus_t set_engine_plugin_paths_ext(size_t num_paths,
+                                                       const char* const plugin_paths[],
+                                                       hipdnnPluginLoadingMode_t mode)
         = 0;
     // NOLINTEND
 };

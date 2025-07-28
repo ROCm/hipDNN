@@ -42,7 +42,7 @@ std::weak_ptr<Engine_plugin_manager> pm_ptr;
 
 std::vector<std::filesystem::path> get_default_plugin_paths()
 {
-    return {"/opt/rocm/lib/hipdnn_plugins/"};
+    return {"/opt/rocm/lib/hipdnn_plugins/engine/"};
 }
 
 } // namespace
@@ -51,22 +51,27 @@ void Engine_plugin_resource_manager::set_plugin_paths(
     const std::vector<std::filesystem::path>& plugin_paths, hipdnnPluginLoadingMode_t loading_mode)
 {
     std::lock_guard<std::mutex> lock(plugin_mutex);
+    plugin_config.mode = loading_mode;
 
     THROW_IF_FALSE(pm_ptr.expired(),
                    HIPDNN_STATUS_NOT_SUPPORTED,
-                   "hipdnnSetPluginPaths_ext cannot be called with an active handle.");
+                   "hipdnnSetEnginePluginPaths_ext cannot be called with an active handle.");
 
-    if(loading_mode == HIPDNN_PLUGIN_LOADING_ABSOLUTE)
+    if(plugin_config.mode == HIPDNN_PLUGIN_LOADING_ABSOLUTE)
     {
         plugin_config.paths = plugin_paths;
+        return;
     }
-    else
-    {
-        plugin_config.paths.insert(
-            plugin_config.paths.end(), plugin_paths.begin(), plugin_paths.end());
-    }
+    plugin_config.paths.insert(plugin_config.paths.end(), plugin_paths.begin(), plugin_paths.end());
 
-    plugin_config.mode = loading_mode;
+    for(const auto& path : get_default_plugin_paths())
+    {
+        if(std::ranges::find(plugin_config.paths, path) == plugin_config.paths.end()
+           || plugin_config.mode == HIPDNN_PLUGIN_LOADING_ADDITIVE)
+        {
+            plugin_config.paths.push_back(path);
+        }
+    }
 }
 
 std::vector<std::filesystem::path> Engine_plugin_resource_manager::get_plugin_paths()

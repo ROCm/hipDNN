@@ -296,7 +296,7 @@ HIPDNN_BACKEND_EXPORT void hipdnnLoggingCallback_ext(hipdnnSeverity_t severity, 
     hipdnn_backend::logging::hipdnn_logging_callback(severity, msg);
 }
 
-HIPDNN_BACKEND_EXPORT hipdnnStatus_t hipdnnSetPluginPaths_ext(
+HIPDNN_BACKEND_EXPORT hipdnnStatus_t hipdnnSetEnginePluginPaths_ext(
     size_t num_paths, const char* const plugin_paths[], hipdnnPluginLoadingMode_t loading_mode)
 {
     LOG_API_ENTRY("num_paths={}, plugin_paths_ptr={:p}, loading_mode={}",

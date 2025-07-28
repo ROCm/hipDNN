@@ -22,7 +22,7 @@ TEST(GPU_EnginePluginResourceManagerTest, LoadPluginsAndExecuteOpGraph)
 
     // Set the plugin paths
     plugin::Engine_plugin_resource_manager::set_plugin_paths(plugin_paths,
-                                                             HIPDNN_PLUGIN_LOADING_ADDITIVE_UNIQUE);
+                                                             HIPDNN_PLUGIN_LOADING_ABSOLUTE);
 
     auto retrieved_paths = plugin::Engine_plugin_resource_manager::get_plugin_paths();
     ASSERT_EQ(retrieved_paths.size(), plugin_paths.size());

@@ -165,10 +165,6 @@ private:
                             type,
                             static_cast<int>(type));
         }
-        catch(const std::filesystem::filesystem_error& e)
-        {
-            HIPDNN_LOG_WARN("Could not process plugin path: {}. {}", file_path.string(), e.what());
-        }
         catch(const Hipdnn_exception& e)
         {
             HIPDNN_LOG_WARN("Error loading plugin: {}. {}", file_path.string(), e.get_message());
@@ -179,20 +175,12 @@ private:
                                     hipdnnPluginLoadingMode_t mode)
     {
         HIPDNN_LOG_INFO("Scanning for plugins in directory: {}", dir_path.string());
-        try
+        for(const auto& entry : std::filesystem::directory_iterator(dir_path))
         {
-            for(const auto& entry : std::filesystem::directory_iterator(dir_path))
+            if(entry.is_regular_file())
             {
-                if(entry.is_regular_file())
-                {
-                    load_plugin_from_file(entry.path(), mode);
-                }
+                load_plugin_from_file(entry.path(), mode);
             }
-        }
-        catch(const std::filesystem::filesystem_error& e)
-        {
-            HIPDNN_LOG_WARN(
-                "Error scanning plugin directory: {}. Reason: {}", dir_path.string(), e.what());
         }
     }
 

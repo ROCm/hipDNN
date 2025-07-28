@@ -103,11 +103,11 @@ public:
     }
 
     // NOLINTBEGIN
-    hipdnnStatus_t set_plugin_paths_ext(size_t num_paths,
-                                        const char* const plugin_paths[],
-                                        hipdnnPluginLoadingMode_t mode) override
+    hipdnnStatus_t set_engine_plugin_paths_ext(size_t num_paths,
+                                               const char* const plugin_paths[],
+                                               hipdnnPluginLoadingMode_t mode) override
     {
-        return hipdnnSetPluginPaths_ext(num_paths, plugin_paths, mode);
+        return hipdnnSetEnginePluginPaths_ext(num_paths, plugin_paths, mode);
     }
     // NOLINTEND
 };
