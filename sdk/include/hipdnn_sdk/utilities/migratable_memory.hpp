@@ -287,7 +287,8 @@ private:
 
         if(!_device_valid && _host_valid && (_host_ptr != nullptr))
         {
-            throw_on_error(hipMemcpyWithStream(_device_ptr, _host_ptr, _total_size, hipMemcpyHostToDevice, stream),
+            throw_on_error(hipMemcpyWithStream(
+                               _device_ptr, _host_ptr, _total_size, hipMemcpyHostToDevice, stream),
                            "Failed to copy from host to device");
             _device_valid = true;
             _current_location = Location::BOTH;

@@ -24,13 +24,8 @@ TEST(CpuFpReferenceImplementation, BasicFloatUsage)
 
     Cpu_fp_reference_implementation<float, float, float> ref_impl;
 
-    ref_impl.batchnorm_fwd_inference(input_tensor,
-                                     scale_tensor,
-                                     bias_tensor,
-                                     mean_tensor,
-                                     variance_tensor,
-                                     output_tensor,
-                                     1e-5);
+    ref_impl.batchnorm_fwd_inference(
+        input_tensor, scale_tensor, bias_tensor, mean_tensor, variance_tensor, output_tensor, 1e-5);
 }
 
 TEST(CpuFpReferenceImplementation, BasicBFloat16Usage)
@@ -44,13 +39,8 @@ TEST(CpuFpReferenceImplementation, BasicBFloat16Usage)
 
     Cpu_fp_reference_implementation<hip_bfloat16, float, float> ref_impl;
 
-    ref_impl.batchnorm_fwd_inference(input_tensor,
-                                     scale_tensor,
-                                     bias_tensor,
-                                     mean_tensor,
-                                     variance_tensor,
-                                     output_tensor,
-                                     1e-5);
+    ref_impl.batchnorm_fwd_inference(
+        input_tensor, scale_tensor, bias_tensor, mean_tensor, variance_tensor, output_tensor, 1e-5);
 }
 
 TEST(CpuFpReferenceImplementation, BasicHalfUsage)
@@ -64,13 +54,8 @@ TEST(CpuFpReferenceImplementation, BasicHalfUsage)
 
     Cpu_fp_reference_implementation<half, float, float> ref_impl;
 
-    ref_impl.batchnorm_fwd_inference(input_tensor,
-                                     scale_tensor,
-                                     bias_tensor,
-                                     mean_tensor,
-                                     variance_tensor,
-                                     output_tensor,
-                                     1e-5);
+    ref_impl.batchnorm_fwd_inference(
+        input_tensor, scale_tensor, bias_tensor, mean_tensor, variance_tensor, output_tensor, 1e-5);
 }
 
 TEST(CpuFpReferenceImplementaion, BasicDoubleUsage)
@@ -84,11 +69,6 @@ TEST(CpuFpReferenceImplementaion, BasicDoubleUsage)
 
     Cpu_fp_reference_implementation<double, double, double> ref_impl;
 
-    ref_impl.batchnorm_fwd_inference(input_tensor,
-                                     scale_tensor,
-                                     bias_tensor,
-                                     mean_tensor,
-                                     variance_tensor,
-                                     output_tensor,
-                                     1e-5);
+    ref_impl.batchnorm_fwd_inference(
+        input_tensor, scale_tensor, bias_tensor, mean_tensor, variance_tensor, output_tensor, 1e-5);
 }

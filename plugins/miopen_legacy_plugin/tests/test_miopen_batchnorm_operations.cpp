@@ -156,20 +156,36 @@ void Batchnorm_execute_graph_test::RunFwdbatchnormGraph(
         x_tensor, 1, static_cast<Input_type>(0.0f), static_cast<Input_type>(1.0f), seed));
 
     Tensor y_tensor = Tensor::make_nchw_tensor<Input_type>(dims);
-    device_buffers.push_back(
-        generate_random_device_buffer(y_tensor, 2, static_cast<Input_type>(-100.0f), static_cast<Input_type>(100.0f), seed));
+    device_buffers.push_back(generate_random_device_buffer(
+        y_tensor, 2, static_cast<Input_type>(-100.0f), static_cast<Input_type>(100.0f), seed));
 
     Tensor scale_tensor = Tensor::make_nchw_tensor<Intermediate_type>(derived_dims);
-    device_buffers.push_back(generate_random_device_buffer(scale_tensor, 3, static_cast<Intermediate_type>(0.0f), static_cast<Intermediate_type>(1.0f), seed));
+    device_buffers.push_back(generate_random_device_buffer(scale_tensor,
+                                                           3,
+                                                           static_cast<Intermediate_type>(0.0f),
+                                                           static_cast<Intermediate_type>(1.0f),
+                                                           seed));
 
     Tensor bias_tensor = Tensor::make_nchw_tensor<Intermediate_type>(derived_dims);
-    device_buffers.push_back(generate_random_device_buffer(bias_tensor, 4, static_cast<Intermediate_type>(0.0f), static_cast<Intermediate_type>(1.0f), seed));
+    device_buffers.push_back(generate_random_device_buffer(bias_tensor,
+                                                           4,
+                                                           static_cast<Intermediate_type>(0.0f),
+                                                           static_cast<Intermediate_type>(1.0f),
+                                                           seed));
 
     Tensor mean_tensor = Tensor::make_nchw_tensor<Intermediate_type>(derived_dims);
-    device_buffers.push_back(generate_random_device_buffer(mean_tensor, 5, static_cast<Intermediate_type>(0.0f), static_cast<Intermediate_type>(1.0f), seed));
+    device_buffers.push_back(generate_random_device_buffer(mean_tensor,
+                                                           5,
+                                                           static_cast<Intermediate_type>(0.0f),
+                                                           static_cast<Intermediate_type>(1.0f),
+                                                           seed));
 
     Tensor variance_tensor = Tensor::make_nchw_tensor<Intermediate_type>(derived_dims);
-    device_buffers.push_back(generate_random_device_buffer(variance_tensor, 6, static_cast<Intermediate_type>(0.1f), static_cast<Intermediate_type>(1.0f), seed));
+    device_buffers.push_back(generate_random_device_buffer(variance_tensor,
+                                                           6,
+                                                           static_cast<Intermediate_type>(0.1f),
+                                                           static_cast<Intermediate_type>(1.0f),
+                                                           seed));
 
     auto batchnorm_builder = flatbuffer_test_utils::create_valid_batchnorm_graph(
         x_tensor.strides(), x_tensor.dims(), true, input_data_type);
@@ -203,15 +219,20 @@ void Batchnorm_execute_graph_test::RunFwdbatchnormGraph(
     x_tensor_cpu.fill_with_random_values(
         static_cast<Input_type>(0.0f), static_cast<Input_type>(1.0f), seed);
     Tensor y_tensor_cpu = Tensor::make_nchw_tensor<Input_type>(dims);
-    y_tensor_cpu.fill_with_random_values(static_cast<Input_type>(-100.0f), static_cast<Input_type>(100.0f), seed);
+    y_tensor_cpu.fill_with_random_values(
+        static_cast<Input_type>(-100.0f), static_cast<Input_type>(100.0f), seed);
     Tensor scale_tensor_cpu = Tensor::make_nchw_tensor<Intermediate_type>(derived_dims);
-    scale_tensor_cpu.fill_with_random_values(static_cast<Intermediate_type>(0.0f), static_cast<Intermediate_type>(1.0f), seed);
+    scale_tensor_cpu.fill_with_random_values(
+        static_cast<Intermediate_type>(0.0f), static_cast<Intermediate_type>(1.0f), seed);
     Tensor bias_tensor_cpu = Tensor::make_nchw_tensor<Intermediate_type>(derived_dims);
-    bias_tensor_cpu.fill_with_random_values(static_cast<Intermediate_type>(0.0f), static_cast<Intermediate_type>(1.0f), seed);
+    bias_tensor_cpu.fill_with_random_values(
+        static_cast<Intermediate_type>(0.0f), static_cast<Intermediate_type>(1.0f), seed);
     Tensor mean_tensor_cpu = Tensor::make_nchw_tensor<Intermediate_type>(derived_dims);
-    mean_tensor_cpu.fill_with_random_values(static_cast<Intermediate_type>(0.0f), static_cast<Intermediate_type>(1.0f), seed);
+    mean_tensor_cpu.fill_with_random_values(
+        static_cast<Intermediate_type>(0.0f), static_cast<Intermediate_type>(1.0f), seed);
     Tensor variance_tensor_cpu = Tensor::make_nchw_tensor<Intermediate_type>(derived_dims);
-    variance_tensor_cpu.fill_with_random_values(static_cast<Intermediate_type>(0.1f), static_cast<Intermediate_type>(1.0f), seed);
+    variance_tensor_cpu.fill_with_random_values(
+        static_cast<Intermediate_type>(0.1f), static_cast<Intermediate_type>(1.0f), seed);
 
     Cpu_fp_reference_implementation<Input_type, Intermediate_type, Intermediate_type> cpu_ref_impl;
     cpu_ref_impl.batchnorm_fwd_inference(x_tensor_cpu,
