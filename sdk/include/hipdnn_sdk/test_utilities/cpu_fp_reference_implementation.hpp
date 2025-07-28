@@ -3,7 +3,6 @@
 
 #pragma once
 
-#include <execution>
 #include <hipdnn_sdk/test_utilities/reference_implementation_interface.hpp>
 #include <numeric>
 #include <vector>
@@ -43,7 +42,7 @@ public:
         int64_t height = input.dims().at(2);
         int64_t width = input.dims().at(3);
 
-        std::for_each(std::execution::par, channels.begin(), channels.end(), [&](int64_t cidx) {
+        std::for_each(channels.begin(), channels.end(), [&](int64_t cidx) {
             auto mean = estimatedMean.get_host_value<Mean_variance_data_type>(0, cidx, 0, 0);
             auto variance
                 = estimatedVariance.get_host_value<Mean_variance_data_type>(0, cidx, 0, 0);
