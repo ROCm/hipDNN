@@ -52,11 +52,9 @@ void Engine_plugin_resource_manager::set_plugin_paths(
 {
     std::lock_guard<std::mutex> lock(plugin_mutex);
 
-    if(!pm_ptr.expired())
-    {
-        HIPDNN_LOG_ERROR("hipdnnSetPluginPaths_ext called after hipDNN handle was created.");
-        return;
-    }
+    THROW_IF_FALSE(pm_ptr.expired(),
+                   HIPDNN_STATUS_NOT_SUPPORTED,
+                   "hipdnnSetPluginPaths_ext cannot be called with an active handle.");
 
     if(loading_mode == HIPDNN_PLUGIN_LOADING_ABSOLUTE)
     {

@@ -1,6 +1,9 @@
 // Copyright © Advanced Micro Devices, Inc., or its affiliates.
 // SPDX-License-Identifier:  MIT
 
+#include <filesystem>
+#include <set>
+#include <string>
 #include <thread>
 
 #include <gtest/gtest.h>
@@ -73,6 +76,107 @@ TEST(PluginManagerTest, LoadPlugins)
     // Check that the plugins have the correct types
     ASSERT_EQ(plugins[0].type(), HIPDNN_PLUGIN_TYPE_UNSPECIFIED);
     ASSERT_EQ(plugins[1].type(), HIPDNN_PLUGIN_TYPE_UNSPECIFIED);
+}
+
+TEST(PluginManagerTest, LoadPluginsFromDirectory)
+{
+    const std::filesystem::path temp_dir = "./temp_plugin_dir";
+    std::filesystem::create_directory(temp_dir);
+
+    try
+    {
+        std::filesystem::copy_file(PLUGIN_PATH1,
+                                   temp_dir / std::filesystem::path(PLUGIN_PATH1).filename());
+        std::filesystem::copy_file(PLUGIN_PATH2,
+                                   temp_dir / std::filesystem::path(PLUGIN_PATH2).filename());
+
+        plugin::Plugin_manager_base<Plugin> plugin_manager;
+        plugin_manager.load_plugins({temp_dir}, HIPDNN_PLUGIN_LOADING_ABSOLUTE);
+
+        const auto& plugins = plugin_manager.get_plugins();
+        ASSERT_EQ(plugins.size(), 2);
+
+        std::set<std::string_view> plugin_names;
+        for(const auto& p : plugins)
+        {
+            plugin_names.insert(p.name());
+        }
+        EXPECT_TRUE(plugin_names.contains("Plugin1"));
+        EXPECT_TRUE(plugin_names.contains("Plugin2"));
+    }
+    catch(...)
+    {
+        std::filesystem::remove_all(temp_dir);
+        FAIL();
+    }
+    std::filesystem::remove_all(temp_dir);
+}
+
+TEST(PluginManagerTest, LoadPluginsAbsolute)
+{
+    plugin::Plugin_manager_base<Plugin> plugin_manager;
+    plugin_manager.load_plugins({PLUGIN_PATH1}, HIPDNN_PLUGIN_LOADING_ABSOLUTE);
+    ASSERT_EQ(plugin_manager.get_plugins().size(), 1);
+
+    plugin_manager.load_plugins({PLUGIN_PATH2}, HIPDNN_PLUGIN_LOADING_ABSOLUTE);
+    const auto& plugins = plugin_manager.get_plugins();
+    ASSERT_EQ(plugins.size(), 1);
+    EXPECT_EQ(plugins[0].name(), "Plugin2");
+}
+
+TEST(PluginManagerTest, LoadPluginsAdditive)
+{
+    plugin::Plugin_manager_base<Plugin> plugin_manager;
+    plugin_manager.load_plugins({PLUGIN_PATH1}, HIPDNN_PLUGIN_LOADING_ABSOLUTE);
+    ASSERT_EQ(plugin_manager.get_plugins().size(), 1);
+
+    plugin_manager.load_plugins({PLUGIN_PATH1, PLUGIN_PATH2}, HIPDNN_PLUGIN_LOADING_ADDITIVE);
+    const auto& plugins = plugin_manager.get_plugins();
+    EXPECT_EQ(plugins.size(), 3);
+}
+
+TEST(PluginManagerTest, LoadPluginsAdditiveUnique)
+{
+    plugin::Plugin_manager_base<Plugin> plugin_manager;
+    plugin_manager.load_plugins({PLUGIN_PATH1}, HIPDNN_PLUGIN_LOADING_ABSOLUTE);
+    ASSERT_EQ(plugin_manager.get_plugins().size(), 1);
+
+    plugin_manager.load_plugins({PLUGIN_PATH1, PLUGIN_PATH2},
+                                HIPDNN_PLUGIN_LOADING_ADDITIVE_UNIQUE);
+    const auto& plugins = plugin_manager.get_plugins();
+    EXPECT_EQ(plugins.size(), 2);
+}
+
+TEST(PluginManagerTest, LoadPluginsCombinedFileAndDirectory)
+{
+    const std::filesystem::path temp_dir = "./temp_plugin_dir_combined";
+    std::filesystem::create_directory(temp_dir);
+
+    try
+    {
+        std::filesystem::copy_file(PLUGIN_PATH1,
+                                   temp_dir / std::filesystem::path(PLUGIN_PATH1).filename());
+
+        plugin::Plugin_manager_base<Plugin> plugin_manager;
+        plugin_manager.load_plugins({temp_dir, PLUGIN_PATH2}, HIPDNN_PLUGIN_LOADING_ABSOLUTE);
+
+        const auto& plugins = plugin_manager.get_plugins();
+        ASSERT_EQ(plugins.size(), 2);
+
+        std::set<std::string_view> plugin_names;
+        for(const auto& p : plugins)
+        {
+            plugin_names.insert(p.name());
+        }
+        EXPECT_TRUE(plugin_names.contains("Plugin1"));
+        EXPECT_TRUE(plugin_names.contains("Plugin2"));
+    }
+    catch(...)
+    {
+        std::filesystem::remove_all(temp_dir);
+        FAIL();
+    }
+    std::filesystem::remove_all(temp_dir);
 }
 
 TEST(PluginManagerTest, LastError)

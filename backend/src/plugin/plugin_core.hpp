@@ -118,8 +118,7 @@ public:
             }
             catch(const std::filesystem::filesystem_error& e)
             {
-                HIPDNN_LOG_WARN(
-                    "Error accessing plugin path: {}. Reason: {}", path.string(), e.what());
+                HIPDNN_LOG_WARN("Error accessing plugin path: {}. {}", path.string(), e.what());
             }
         }
     }
@@ -168,13 +167,11 @@ private:
         }
         catch(const std::filesystem::filesystem_error& e)
         {
-            HIPDNN_LOG_WARN(
-                "Could not process plugin path: {}. Reason: {}", file_path.string(), e.what());
+            HIPDNN_LOG_WARN("Could not process plugin path: {}. {}", file_path.string(), e.what());
         }
         catch(const Hipdnn_exception& e)
         {
-            HIPDNN_LOG_WARN(
-                "Could not load plugin: {}. Reason: {}", file_path.string(), e.get_message());
+            HIPDNN_LOG_WARN("Error loading plugin: {}. {}", file_path.string(), e.get_message());
         }
     }
 

@@ -2,6 +2,7 @@
 // SPDX-License-Identifier:  MIT
 
 #include "hipdnn_backend.h"
+#include <array>
 #include <gtest/gtest.h>
 #include <hipdnn_sdk/data_objects/graph_generated.h>
 
@@ -164,4 +165,33 @@ TEST(HipDNNBackendTest, WillFailToCreateGraphIfGraphIsNull)
 
     EXPECT_EQ(status, HIPDNN_STATUS_BAD_PARAM_NULL_POINTER);
     EXPECT_EQ(descriptor, nullptr);
+}
+
+TEST(HipDNNBackendTest, SetPluginPathsExt_Success)
+{
+    std::array<const char*, 3> paths = {"./imaginary_plugin.so", "./", "../directory/"};
+
+    hipdnnStatus_t status
+        = hipdnnSetPluginPaths_ext(paths.size(), paths.data(), HIPDNN_PLUGIN_LOADING_ABSOLUTE);
+
+    EXPECT_EQ(status, HIPDNN_STATUS_SUCCESS);
+}
+
+TEST(HipDNNBackendTest, SetPluginPathsExt_FailsOnNullPointer)
+{
+    hipdnnStatus_t status = hipdnnSetPluginPaths_ext(1, nullptr, HIPDNN_PLUGIN_LOADING_ABSOLUTE);
+    EXPECT_EQ(status, HIPDNN_STATUS_BAD_PARAM_NULL_POINTER);
+
+    status = hipdnnSetPluginPaths_ext(0, nullptr, HIPDNN_PLUGIN_LOADING_ABSOLUTE);
+    EXPECT_EQ(status, HIPDNN_STATUS_BAD_PARAM_NULL_POINTER);
+}
+
+TEST(HipDNNBackendTest, SetPluginPathsExt_FailsOnNullStringInList)
+{
+    std::array<const char*, 2> paths = {"./valid/path.so", nullptr};
+
+    hipdnnStatus_t status
+        = hipdnnSetPluginPaths_ext(paths.size(), paths.data(), HIPDNN_PLUGIN_LOADING_ABSOLUTE);
+
+    EXPECT_EQ(status, HIPDNN_STATUS_BAD_PARAM_NULL_POINTER);
 }

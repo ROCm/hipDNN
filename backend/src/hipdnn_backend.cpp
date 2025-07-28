@@ -312,10 +312,7 @@ HIPDNN_BACKEND_EXPORT hipdnnStatus_t hipdnnSetPluginPaths_ext(
 
         for(size_t i = 0; i < num_paths; ++i)
         {
-            if(plugin_paths[i] == nullptr)
-            {
-                return HIPDNN_STATUS_BAD_PARAM;
-            }
+            throw_if_null(plugin_paths[i]);
             paths_vec.emplace_back(plugin_paths[i]);
         }
 
