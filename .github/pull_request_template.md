@@ -9,6 +9,7 @@ Please put an `x` into the boxes that apply. You can also fill these out after c
 - [ ] I have added automated tests relevant to the introduced functionality
 - [ ] I have sufficient test coverage for the changes, and code coverage hasn't decreased as a result of my PR
 - [ ] I have ran the tests, and they are all passing locally
+- [ ] I have ran the tests with ASAN, and they are all passing locally
 - [ ] I have added relevant documentation for the changes
 - [ ] I have removed the stale documentation which is no longer relevant after this pull request
 - [ ] I have ran `make format` & `make check_format` to ensure the changes have been formatted
