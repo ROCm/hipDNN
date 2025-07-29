@@ -47,7 +47,9 @@ target_link_libraries(hipdnn_sdk_tests
     ${CMAKE_DL_LIBS}
 )
 
-add_dependencies(check hipdnn_sdk_tests)
+
+append_check_target(hipdnn_sdk_tests ${CMAKE_CURRENT_BINARY_DIR})
+add_dependencies(check_ctest hipdnn_sdk_tests)
 gtest_discover_tests(
     hipdnn_sdk_tests
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}

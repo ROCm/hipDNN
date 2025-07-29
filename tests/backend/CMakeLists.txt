@@ -28,8 +28,9 @@ target_link_libraries(public_hipdnn_backend_tests
     hip::host
 )
 
-add_dependencies(check public_hipdnn_backend_tests)
+append_check_target(public_hipdnn_backend_tests ${CMAKE_CURRENT_BINARY_DIR})
 clang_tidy_check(public_hipdnn_backend_tests)
+add_dependencies(check_ctest public_hipdnn_backend_tests)
 gtest_discover_tests(
     public_hipdnn_backend_tests
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}

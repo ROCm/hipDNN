@@ -67,8 +67,28 @@ hipdnn_add_dependency(GTest v1.16.0)
 
 enable_testing() # Cmake wont discover or run tests without this line
 
+
+set(CHECK_COMMAND_GLOBAL "ls" CACHE INTERNAL "Accumulated check commands" FORCE)
+set(CHECK_DEPENDS_GLOBAL "" CACHE INTERNAL "Accumulated check depends" FORCE)
+function(append_check_target TARGET WORKING_DIR)
+    message(STATUS "Appending check target: ${TARGET} in working directory: ${WORKING_DIR}")
+
+    set(CHECK_COMMAND_GLOBAL ${CHECK_COMMAND_GLOBAL} && cd ${WORKING_DIR} && ./${TARGET} CACHE INTERNAL "Accumulated check targets" FORCE)
+    set(CHECK_DEPENDS_GLOBAL ${CHECK_DEPENDS_GLOBAL} ${TARGET} CACHE INTERNAL "Accumulated check depends" FORCE)    
+endfunction()
+
+function(create_custom_check_target)
+    add_custom_target(
+        check
+        COMMAND ${CHECK_COMMAND_GLOBAL}
+        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+        DEPENDS ${CHECK_DEPENDS_GLOBAL}
+        VERBATIM)
+endfunction()
+
 # Add a check target which will run all tests discovered by gtest_discover_tests via ctest. 
-add_custom_target(check COMMAND ${TEST_ENVIRONMENT} ${CMAKE_CTEST_COMMAND} --output-on-failure -C ${CMAKE_CFG_INTDIR})
+add_custom_target(check_ctest COMMAND ${TEST_ENVIRONMENT} ${CMAKE_CTEST_COMMAND} --output-on-failure -C ${CMAKE_CFG_INTDIR})
+
 
 # Add global compile options
 set(EXTRA_COMPILE_OPTIONS)
@@ -124,6 +144,16 @@ add_subdirectory(tests)
 if(HIP_DNN_BUILD_PLUGINS)
     add_subdirectory(plugins)
 endif()
+
+# keep this after all build folder have been added so they have a chance to register their tests
+# using append_check_target
+create_custom_check_target()
+#add_custom_target(
+#    check2 
+#    COMMAND ${CHECK_COMMAND_GLOBAL}
+#    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+#    DEPENDS ${CHECK_DEPENDS_GLOBAL}
+#    VERBATIM)
 
 if(CODE_COVERAGE)
     set(PLUGINS_COMMAND "")
