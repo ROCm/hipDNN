@@ -4,7 +4,8 @@
 #pragma once
 
 #include <hip/amd_detail/amd_hip_fp16.h>
-#include <spdlog/fmt/bundled/format.h>
+#include <hipdnn_sdk/logging/logger.hpp>
+#include <string>
 
 inline __HOST_DEVICE__ half operator""_h(long double value)
 {
@@ -26,17 +27,11 @@ inline __HOST_DEVICE__ half max(half a, half b)
 }
 
 template <>
-struct fmt::formatter<half>
+struct fmt::formatter<half> : fmt::formatter<float>
 {
-    // NOLINTNEXTLINE(readability-convert-member-functions-to-static)
-    constexpr auto parse(format_parse_context& ctx)
+    template <typename FormatContext>
+    auto format(half h, FormatContext& ctx) const
     {
-        return ctx.end();
-    }
-
-    // NOLINTNEXTLINE(readability-convert-member-functions-to-static)
-    auto format(const half& h, format_context& ctx) const
-    {
-        return format_to(ctx.out(), "{}", static_cast<float>(h));
+        return fmt::formatter<float>::format(static_cast<float>(h), ctx);
     }
 };
