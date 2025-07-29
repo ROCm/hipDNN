@@ -15,6 +15,8 @@ using namespace hipdnn_sdk::utilities;
 
 TEST(CpuFpReferenceImplementation, BasicFloatUsage)
 {
+    SKIP_IF_NO_DEVICES();
+
     Tensor input_tensor = Tensor::make_nchw_tensor<float>({1, 3, 224, 224});
     Tensor output_tensor = Tensor::make_nchw_tensor<float>({1, 3, 224, 224});
     Tensor bias_tensor = Tensor::make_nchw_tensor<float>({1, 3});
@@ -30,6 +32,8 @@ TEST(CpuFpReferenceImplementation, BasicFloatUsage)
 
 TEST(CpuFpReferenceImplementation, BasicBFloat16Usage)
 {
+    SKIP_IF_NO_DEVICES();
+
     Tensor input_tensor = Tensor::make_nchw_tensor<hip_bfloat16>({1, 3, 224, 224});
     Tensor output_tensor = Tensor::make_nchw_tensor<hip_bfloat16>({1, 3, 224, 224});
     Tensor bias_tensor = Tensor::make_nchw_tensor<float>({1, 3});
@@ -45,6 +49,8 @@ TEST(CpuFpReferenceImplementation, BasicBFloat16Usage)
 
 TEST(CpuFpReferenceImplementation, BasicHalfUsage)
 {
+    SKIP_IF_NO_DEVICES();
+
     Tensor input_tensor = Tensor::make_nchw_tensor<half>({1, 3, 224, 224});
     Tensor output_tensor = Tensor::make_nchw_tensor<half>({1, 3, 224, 224});
     Tensor bias_tensor = Tensor::make_nchw_tensor<float>({1, 3});
@@ -60,6 +66,8 @@ TEST(CpuFpReferenceImplementation, BasicHalfUsage)
 
 TEST(CpuFpReferenceImplementaion, BasicDoubleUsage)
 {
+    SKIP_IF_NO_DEVICES();
+
     Tensor input_tensor = Tensor::make_nchw_tensor<double>({1, 3, 224, 224});
     Tensor output_tensor = Tensor::make_nchw_tensor<double>({1, 3, 224, 224});
     Tensor bias_tensor = Tensor::make_nchw_tensor<double>({1, 3});

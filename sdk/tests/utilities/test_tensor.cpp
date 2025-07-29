@@ -3,12 +3,15 @@
 
 #include <gtest/gtest.h>
 
+#include <hipdnn_sdk/test_utilities/test_utilities.hpp>
 #include <hipdnn_sdk/utilities/tensor.hpp>
 
 using namespace hipdnn_sdk::utilities;
 
 TEST(TestTensor, BasicRowMajorUsage)
 {
+    SKIP_IF_NO_DEVICES();
+
     Tensor tensor = Tensor::make_nchw_tensor<float>({1, 2, 3, 4});
 
     EXPECT_EQ(tensor.memory().count(), 24);
@@ -20,6 +23,8 @@ TEST(TestTensor, BasicRowMajorUsage)
 
 TEST(TestTensor, FillWithValuesUsage)
 {
+    SKIP_IF_NO_DEVICES();
+
     Tensor tensor = Tensor::make_nchw_tensor<float>({1, 2, 3, 4});
 
     tensor.fill_with_value(1.0f);
@@ -33,6 +38,8 @@ TEST(TestTensor, FillWithValuesUsage)
 
 TEST(TestTensor, FillWithRandomValuesUsage)
 {
+    SKIP_IF_NO_DEVICES();
+
     Tensor tensor = Tensor::make_nchw_tensor<float>({1, 2, 3, 4});
 
     tensor.fill_with_random_values(1.0f, 3.0f);

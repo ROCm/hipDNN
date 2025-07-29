@@ -7,6 +7,7 @@
 #include <hipdnn_sdk/utilities/hip_bfloat16_utils.hpp>
 
 #include <hipdnn_sdk/test_utilities/cpu_fp_reference_validation.hpp>
+#include <hipdnn_sdk/test_utilities/test_utilities.hpp>
 
 using namespace hipdnn_sdk::reference_test_utilities;
 using namespace hipdnn_sdk::utilities;
@@ -28,6 +29,7 @@ Migratable_memory create_buffer(size_t size, T mult)
 
 TEST(CpuFpReferenceValidation, BasicBFloat16Usage)
 {
+    SKIP_IF_NO_DEVICES();
     Cpu_fp_reference_validation<hip_bfloat16> ref_validation;
 
     auto buffer1 = create_buffer<hip_bfloat16>(100, 1.0_bf);
@@ -38,6 +40,7 @@ TEST(CpuFpReferenceValidation, BasicBFloat16Usage)
 
 TEST(CpuFpReferenceValidation, BasicHalfUsage)
 {
+    SKIP_IF_NO_DEVICES();
     Cpu_fp_reference_validation<half> ref_validation;
 
     auto buffer1 = create_buffer<half>(100, 1.0_h);
@@ -48,6 +51,7 @@ TEST(CpuFpReferenceValidation, BasicHalfUsage)
 
 TEST(CpuFpReferenceValidation, BasicFloatUsage)
 {
+    SKIP_IF_NO_DEVICES();
     Cpu_fp_reference_validation<float> ref_validation;
 
     auto buffer1 = create_buffer<float>(100, 1.0f);
@@ -58,6 +62,7 @@ TEST(CpuFpReferenceValidation, BasicFloatUsage)
 
 TEST(CpuFpReferenceValidation, BasicDoubleUsage)
 {
+    SKIP_IF_NO_DEVICES();
     Cpu_fp_reference_validation<double> ref_validation;
 
     auto buffer1 = create_buffer<double>(100, 1.0);
@@ -68,6 +73,7 @@ TEST(CpuFpReferenceValidation, BasicDoubleUsage)
 
 TEST(CpuFpReferenceValidation, BFloat16NotComparable)
 {
+    SKIP_IF_NO_DEVICES();
     Cpu_fp_reference_validation<hip_bfloat16> ref_validation;
 
     auto buffer1 = create_buffer<hip_bfloat16>(100, 1.0_bf);
@@ -78,6 +84,7 @@ TEST(CpuFpReferenceValidation, BFloat16NotComparable)
 
 TEST(CpuFpReferenceValidation, HalfNotComparable)
 {
+    SKIP_IF_NO_DEVICES();
     Cpu_fp_reference_validation<half> ref_validation;
 
     auto buffer1 = create_buffer<half>(100, 1.0_h);
@@ -88,6 +95,7 @@ TEST(CpuFpReferenceValidation, HalfNotComparable)
 
 TEST(CpuFpReferenceValidation, FloatNotComparable)
 {
+    SKIP_IF_NO_DEVICES();
     Cpu_fp_reference_validation<float> ref_validation;
 
     auto buffer1 = create_buffer<float>(100, 1.0f);
@@ -98,6 +106,7 @@ TEST(CpuFpReferenceValidation, FloatNotComparable)
 
 TEST(CpuFpReferenceValidation, DoubleNotComparable)
 {
+    SKIP_IF_NO_DEVICES();
     Cpu_fp_reference_validation<double> ref_validation;
 
     auto buffer1 = create_buffer<double>(100, 1.0);
@@ -108,6 +117,7 @@ TEST(CpuFpReferenceValidation, DoubleNotComparable)
 
 TEST(CpuFpReferenceValidation, ToleranceComparison)
 {
+    SKIP_IF_NO_DEVICES();
     Cpu_fp_reference_validation<double> ref_validation_low_tolerance(1e-7, 1e-7);
     Cpu_fp_reference_validation<double> ref_validation_high_tolerance(1e-5, 1e-5);
 
