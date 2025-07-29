@@ -35,14 +35,14 @@ std::vector<int64_t>
     return applicable;
 }
 
-void Engine_manager::get_engine_details(const hipdnn_plugin::Graph_interface& op_graph,
+void Engine_manager::get_engine_details(hipdnnEnginePluginHandle& handle,
+                                        const hipdnn_plugin::Graph_interface& op_graph,
                                         int64_t engine_id,
                                         hipdnnPluginConstData_t& engine_details_out)
 {
     (void)op_graph; // Unused parameter
-
     auto& engine = get_engine(engine_id);
-    engine.get_details(engine_details_out);
+    engine.get_details(handle, engine_details_out);
 }
 
 size_t Engine_manager::get_workspace_size(const hipdnnEnginePluginHandle& handle,

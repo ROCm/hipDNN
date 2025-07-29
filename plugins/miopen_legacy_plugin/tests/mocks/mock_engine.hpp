@@ -22,7 +22,10 @@ public:
                 is_applicable,
                 (const hipdnn_plugin::Graph_interface& op_graph),
                 (const, override));
-    MOCK_METHOD(void, get_details, (hipdnnPluginConstData_t & details_out), (const, override));
+    MOCK_METHOD(void,
+                get_details,
+                (hipdnnEnginePluginHandle & handle, hipdnnPluginConstData_t& details_out),
+                (const, override));
     MOCK_METHOD(size_t,
                 get_workspace_size,
                 (const hipdnnEnginePluginHandle& handle,

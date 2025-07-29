@@ -8,14 +8,15 @@
 namespace hipdnn::sdk::utilities
 {
 
-    static void copy_max_size_with_null_terminator(char* destination, const char* source, size_t max_size)
+static void
+    copy_max_size_with_null_terminator(char* destination, const char* source, size_t max_size)
+{
+    if(source == nullptr || destination == nullptr || max_size == 0)
     {
-        if(!source || !destination || max_size == 0)
-        {
-            return;
-        }
-
-        std::strncpy(destination, source, max_size - 1);
-        destination[max_size - 1] = '\0';
+        return;
     }
+
+    std::strncpy(destination, source, max_size - 1);
+    destination[max_size - 1] = '\0';
+}
 }

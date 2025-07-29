@@ -98,17 +98,20 @@ TEST(Engine_managerTest, ReturnsEngineDetails)
     engine_details.size = 200;
     auto mock_engine = std::make_unique<Mock_engine>();
     EXPECT_CALL(*mock_engine, id()).WillRepeatedly(Return(1));
-    EXPECT_CALL(*mock_engine, get_details(::testing::_))
-        .WillOnce([&engine_details](hipdnnPluginConstData_t& out) {
-            out.ptr = engine_details.ptr;
-            out.size = engine_details.size;
-        });
+    EXPECT_CALL(*mock_engine, get_details(::testing::_, ::testing::_))
+        .WillOnce(
+            [&engine_details](hipdnnEnginePluginHandle& handle, hipdnnPluginConstData_t& out) {
+                (void)handle;
+                out.ptr = engine_details.ptr;
+                out.size = engine_details.size;
+            });
 
     manager.add_engine(std::move(mock_engine));
 
     Mock_graph mock_graph;
+    hipdnnEnginePluginHandle dummy_handle = {};
     hipdnnPluginConstData_t details;
-    manager.get_engine_details(mock_graph, 1, details);
+    manager.get_engine_details(dummy_handle, mock_graph, 1, details);
 
     EXPECT_EQ(details.ptr, engine_details.ptr);
     EXPECT_EQ(details.size, engine_details.size);
@@ -121,7 +124,8 @@ TEST(Engine_managerTest, ThrowsOnInvalidEngineId)
     Mock_graph mock_graph;
     hipdnnPluginConstData_t engine_details;
 
-    EXPECT_THROW(manager.get_engine_details(mock_graph, 999, engine_details),
+    hipdnnEnginePluginHandle dummy_handle = {};
+    EXPECT_THROW(manager.get_engine_details(dummy_handle, mock_graph, 999, engine_details),
                  hipdnn_plugin::Hipdnn_plugin_exception);
 }
 

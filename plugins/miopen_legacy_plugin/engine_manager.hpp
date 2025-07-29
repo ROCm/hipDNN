@@ -29,7 +29,8 @@ public:
 
     std::vector<int64_t> get_applicable_engine_ids(const hipdnn_plugin::Graph_interface& op_graph);
 
-    void get_engine_details(const hipdnn_plugin::Graph_interface& op_graph,
+    void get_engine_details(hipdnnEnginePluginHandle& handle,
+                            const hipdnn_plugin::Graph_interface& op_graph,
                             int64_t engine_id,
                             hipdnnPluginConstData_t& engine_details_out);
 
