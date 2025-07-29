@@ -62,13 +62,7 @@ include(cmake/Dependencies.cmake)
 include(cmake/ClangCheck.cmake)
 include(cmake/ClangTidy.cmake)
 include(cmake/Sanitizers.cmake)
-
-hipdnn_add_dependency(GTest v1.16.0)
-
-enable_testing() # Cmake wont discover or run tests without this line
-
-# Add a check target which will run all tests discovered by gtest_discover_tests via ctest. 
-add_custom_target(check COMMAND ${TEST_ENVIRONMENT} ${CMAKE_CTEST_COMMAND} --output-on-failure -C ${CMAKE_CFG_INTDIR})
+include(cmake/Tests.cmake)
 
 # Add global compile options
 set(EXTRA_COMPILE_OPTIONS)
@@ -125,37 +119,24 @@ if(HIP_DNN_BUILD_PLUGINS)
     add_subdirectory(plugins)
 endif()
 
+# keep this after all build folder have been added so they have a chance to register their tests
+# using append_test_to_check_target
+finalize_custom_check_target()
+
 if(CODE_COVERAGE)
-    set(PLUGINS_COMMAND "")
     if(HIP_DNN_BUILD_PLUGINS)
-        set(PLUGIN_CODE_COVERAGE_DEPENDS miopen_legacy_plugin_tests)
         set(MIOPEN_PLUGIN_CODE_COVERAGE_OBJECT -object ./plugins/miopen_legacy_plugin/libmiopen_legacy_plugin.so -object ./plugins/miopen_legacy_plugin/tests/miopen_legacy_plugin_tests)
-        set(PLUGINS_COMMAND cd ${CMAKE_BINARY_DIR}/plugins/miopen_legacy_plugin/tests && ./miopen_legacy_plugin_tests)
     endif()
 
     set(CODE_COVERAGE_IGNORE_REGEX "\(.*deps.*\)|\(.*tests.*\)|\(.*sdk/include/hipdnn_sdk/data_objects.*\)|\(.*sdk/include/hipdnn_sdk/test_utilities.*\)|\(.*sdk/include/hipdnn_sdk/plugin/test_utils.*\)")
     set(CODE_COVERAGE_OBJECTS -object ./backend/src/libhipdnn_backend.so -object ./backend/tests/hipdnn_backend_tests -object ./frontend/tests/hipdnn_frontend_tests -object ./tests/backend/public_hipdnn_backend_tests -object ./sdk/tests/hipdnn_sdk_tests ${MIOPEN_PLUGIN_CODE_COVERAGE_OBJECT})
     
-    set(CODE_COVERAGE_DEPENDS hipdnn_backend_tests hipdnn_frontend_tests public_hipdnn_backend_tests hipdnn_sdk_tests ${PLUGIN_CODE_COVERAGE_DEPENDS})
-
     add_custom_target(
         code_coverage
-        # Use absolute paths for each cd command, since Make and Ninja execute from different directories
-        COMMAND cd ${CMAKE_BINARY_DIR}/backend/tests && ./hipdnn_backend_tests
-        COMMAND cd ${CMAKE_BINARY_DIR}/frontend/tests && ./hipdnn_frontend_tests
-        COMMAND cd ${CMAKE_BINARY_DIR}/tests/backend && ./public_hipdnn_backend_tests
-        COMMAND cd ${CMAKE_BINARY_DIR}/sdk/tests && ./hipdnn_sdk_tests
-        COMMAND ${PLUGINS_COMMAND}
-
         COMMAND cd ${CMAKE_BINARY_DIR} && find . -name "*.profraw" -print0 | xargs -0 /opt/rocm/llvm/bin/llvm-profdata merge -sparse -o ./hipdnn.profdata
         COMMAND /opt/rocm/llvm/bin/llvm-cov report ${CODE_COVERAGE_OBJECTS} -instr-profile=./hipdnn.profdata -ignore-filename-regex=\"${CODE_COVERAGE_IGNORE_REGEX}\" > ./code_cov_hipdnn.report
         COMMAND /opt/rocm/llvm/bin/llvm-cov show -Xdemangler=/opt/rocm/llvm/bin/llvm-cxxfilt ${CODE_COVERAGE_OBJECTS} -instr-profile=./hipdnn.profdata -ignore-filename-regex=\"${CODE_COVERAGE_IGNORE_REGEX}\" --format=html --output-dir=./hipdnn_coverage_html
-        # We cant depend on the make check target due to the fact that ctest runs each test in a separate process
-        # this causes the .profraw file to get rewritten every time a test executes.  This means we only get coverage
-        # for the test that runs last.  The current workaround is to simply invoke the gtests directly.
-        # This is not ideal but it works for now.
-        #DEPENDS check
-        DEPENDS ${CODE_COVERAGE_DEPENDS}
+        DEPENDS check
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
         COMMENT "Generating code coverage report"
     )
