@@ -90,7 +90,7 @@ TEST(MiopenLegacyEnginePluginApiTest, EnginePluginSetStreamValidStream)
 
     auto stream = reinterpret_cast<hipStream_t>(0x1234);
     EXPECT_EQ(hipdnnEnginePluginSetStream(handle, stream), HIPDNN_PLUGIN_STATUS_SUCCESS);
-    EXPECT_EQ(handle->stream, stream);
+    EXPECT_EQ(handle->get_stream(), stream);
 
     EXPECT_EQ(hipdnnEnginePluginDestroy(handle), HIPDNN_PLUGIN_STATUS_SUCCESS);
 }
