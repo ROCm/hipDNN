@@ -149,8 +149,8 @@ void Engine_plugin_resource_manager::set_stream(hipStream_t stream) const
     }
 }
 
-std::vector<int64_t> Engine_plugin_resource_manager::get_applicable_engine_ids(
-    const Graph_descriptor* graph_desc) const
+std::vector<int64_t>
+    Engine_plugin_resource_manager::get_applicable_engine_ids(const Graph_descriptor* graph_desc) const
 {
     const auto& serialized_graph = graph_desc->get_serialized_graph();
     const hipdnnPluginConstData_t serialized_graph_data{serialized_graph.data(),
@@ -180,9 +180,7 @@ std::vector<int64_t> Engine_plugin_resource_manager::get_applicable_engine_ids(
 }
 
 void Engine_plugin_resource_manager::get_engine_details(
-    int64_t engine_id,
-    const Graph_descriptor* graph_desc,
-    hipdnnPluginConstData_t* engine_details) const
+    int64_t engine_id, const Graph_descriptor* graph_desc, hipdnnPluginConstData_t* engine_details) const
 {
     const auto& serialized_graph = graph_desc->get_serialized_graph();
     const hipdnnPluginConstData_t serialized_graph_data{serialized_graph.data(),
@@ -210,10 +208,10 @@ void Engine_plugin_resource_manager::destroy_engine_details(
     plugin->destroy_engine_details(handle, engine_details);
 }
 
-std::shared_ptr<const Engine_details_wrapper> Engine_plugin_resource_manager::get_engine_details(
-    const std::shared_ptr<Engine_plugin_resource_manager>& rm,
-    int64_t engine_id,
-    const Graph_descriptor* graph_desc)
+std::shared_ptr<const Engine_details_wrapper>
+    Engine_plugin_resource_manager::get_engine_details(const std::shared_ptr<Engine_plugin_resource_manager>& rm,
+                       int64_t engine_id,
+                       const Graph_descriptor* graph_desc)
 {
     return std::make_shared<Engine_details_wrapper>(rm, engine_id, graph_desc);
 }

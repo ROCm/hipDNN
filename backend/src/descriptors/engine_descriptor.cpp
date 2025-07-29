@@ -30,13 +30,10 @@ void Engine_descriptor::finalize()
     auto engine_ids = plugin_resource_manager->get_applicable_engine_ids(_graph.get());
     if(std::ranges::find(engine_ids, _engine_id) == engine_ids.end())
     {
-        throw Hipdnn_exception(HIPDNN_STATUS_BAD_PARAM,
-                               "Engine_descriptor::finalize() failed: Engine id is not in a valid "
-                               "range of engine IDs");
+        throw Hipdnn_exception(HIPDNN_STATUS_BAD_PARAM, "Engine_descriptor::finalize() failed: Engine id is not in a valid range of engine IDs");
     }
 
-    _engine_details = plugin::Engine_plugin_resource_manager::get_engine_details(
-        plugin_resource_manager, _engine_id, _graph.get());
+    _engine_details = plugin::Engine_plugin_resource_manager::get_engine_details(plugin_resource_manager, _engine_id, _graph.get());
 
     hipdnnBackendDescriptorImpl<Engine_descriptor>::finalize();
 }
