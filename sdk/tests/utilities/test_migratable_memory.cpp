@@ -27,6 +27,8 @@ void check_buffer(const T* buffer, size_t size, T mult = 1)
 
 TEST(MigratableMemory, NotInitialized)
 {
+    SKIP_IF_NO_DEVICES();
+
     Migratable_memory memory;
 
     EXPECT_TRUE(memory.empty());
@@ -37,6 +39,8 @@ TEST(MigratableMemory, NotInitialized)
 
 TEST(MigratableMemory, InitializeWithSize)
 {
+    SKIP_IF_NO_DEVICES();
+
     Migratable_memory memory(10, sizeof(float));
 
     EXPECT_FALSE(memory.empty());
@@ -47,6 +51,8 @@ TEST(MigratableMemory, InitializeWithSize)
 
 TEST(MigratableMemory, MoveConstructor)
 {
+    SKIP_IF_NO_DEVICES();
+
     Migratable_memory memory1(10, sizeof(float));
     auto* old_host_data = memory1.host_data<float>();
 
@@ -66,6 +72,8 @@ TEST(MigratableMemory, MoveConstructor)
 
 TEST(MigratableMemory, MoveAssignment)
 {
+    SKIP_IF_NO_DEVICES();
+
     Migratable_memory memory1(10, sizeof(float));
     auto* old_host_data = memory1.host_data<float>();
 
@@ -86,6 +94,8 @@ TEST(MigratableMemory, MoveAssignment)
 
 TEST(MigratableMemory, Resize)
 {
+    SKIP_IF_NO_DEVICES();
+
     Migratable_memory memory(10, sizeof(float));
     memory.resize(20);
 

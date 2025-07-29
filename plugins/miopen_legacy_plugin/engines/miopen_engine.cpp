@@ -33,18 +33,17 @@ bool Miopen_engine::is_applicable(const hipdnn_plugin::Graph_interface& op_graph
     return false;
 }
 
-void Miopen_engine::get_details(hipdnnPluginConstData_t& details_out) const
+void Miopen_engine::get_details(hipdnnEnginePluginHandle& handle,
+                                hipdnnPluginConstData_t& details_out) const
 {
     flatbuffers::FlatBufferBuilder builder;
     auto engine_details = hipdnn_sdk::data_objects::CreateEngineDetails(builder, _id);
     builder.Finish(engine_details);
-    auto serialized_details = builder.Release();
+    auto detached_buffer = std::make_unique<flatbuffers::DetachedBuffer>(builder.Release());
+    details_out.ptr = detached_buffer->data();
+    details_out.size = detached_buffer->size();
 
-    auto* temp_buffer = new uint8_t[serialized_details.size()];
-    std::memcpy(temp_buffer, serialized_details.data(), serialized_details.size());
-
-    details_out.ptr = temp_buffer;
-    details_out.size = serialized_details.size();
+    handle.store_engine_details_detached_buffer(details_out.ptr, std::move(detached_buffer));
 }
 
 size_t Miopen_engine::get_workspace_size(const hipdnnEnginePluginHandle& handle,

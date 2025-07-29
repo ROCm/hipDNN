@@ -23,6 +23,7 @@ add_executable(miopen_legacy_plugin_tests
     engines/plans/test_miopen_batchnorm_plan_builder.cpp
     engines/plans/test_batchnorm_fwd_inference_plan.cpp
     main.cpp
+    test_hipdnn_engine_plugin_handle.cpp
     test_miopen_legacy_engine_plugin_api.cpp
     test_miopen_batchnorm_operations.cpp
     test_miopen_legacy_plugin_api.cpp
@@ -34,6 +35,9 @@ add_executable(miopen_legacy_plugin_tests
 )
 
 target_compile_options(miopen_legacy_plugin_tests PRIVATE ${HIPDNN_WARNING_COMPILE_OPTIONS})
+target_compile_definitions(miopen_legacy_plugin_tests PRIVATE
+    COMPONENT_NAME="miopen_legacy_plugin_tests"
+)
 
 target_link_libraries(miopen_legacy_plugin_tests PUBLIC 
     GTest::gtest
