@@ -177,7 +177,7 @@ hipdnnPluginStatus_t hipdnnEnginePluginSetStream(hipdnnEnginePluginHandle_t hand
     return hipdnn_plugin::try_catch([&, api_name = __func__]() {
         throw_if_null(handle);
 
-        handle->stream = stream;
+        handle->set_stream(stream);
 
         LOG_API_SUCCESS(api_name, "");
     });

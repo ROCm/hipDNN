@@ -8,7 +8,10 @@ if(HIP_DNN_SKIP_TESTS)
     return()
 endif()
 
+add_compile_definitions(__HIP_PLATFORM_AMD__)
+add_compile_definitions(__HIPCC__)
 find_package(hip REQUIRED)
+enable_language(HIP)
 
 add_executable(hipdnn_sdk_tests
     main.cpp
@@ -20,8 +23,13 @@ add_executable(hipdnn_sdk_tests
     plugin/flatbuffer_utilities/test_engine_config_wrapper.cpp
     plugin/flatbuffer_utilities/test_engine_details_wrapper.cpp
     utilities/test_scoped_resource.cpp
-    utilities/test_gpu_memory.cpp
     utilities/test_callback_logger.cpp
+    utilities/test_migratable_memory.cpp
+    utilities/test_floats.cpp
+    utilities/test_shape_utilities.cpp
+    utilities/test_tensor.cpp
+    test_utilities/test_cpu_fp_reference_implementation.cpp
+    test_utilities/test_cpu_fp_reference_validation.cpp
 )
 
 target_compile_definitions(hipdnn_sdk_tests PRIVATE
@@ -32,8 +40,10 @@ target_compile_options(hipdnn_sdk_tests PRIVATE ${HIPDNN_WARNING_COMPILE_OPTIONS
 target_link_libraries(hipdnn_sdk_tests 
     GTest::gtest
     pthread
-    hip::host
     hipdnn_sdk
+    hip::host
+    hip::device
+    spdlog_header_only
     ${CMAKE_DL_LIBS}
 )
 
