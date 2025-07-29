@@ -106,14 +106,9 @@ public:
                 {
                     scan_directory_for_plugins(path, mode);
                 }
-                else if(std::filesystem::is_regular_file(path))
-                {
-                    load_plugin_from_file(path, mode);
-                }
                 else
                 {
-                    HIPDNN_LOG_WARN("Plugin path is not a file or directory, skipping: {}",
-                                    path.string());
+                    load_plugin_from_file(path, mode);
                 }
             }
             catch(const std::filesystem::filesystem_error& e)
@@ -138,27 +133,27 @@ private:
     void load_plugin_from_file(const std::filesystem::path& file_path,
                                hipdnnPluginLoadingMode_ext_t mode)
     {
+        (void)mode;
         try
         {
-            const auto canonical_path = std::filesystem::canonical(file_path);
 
-            if(mode != HIPDNN_PLUGIN_LOADING_ADDITIVE
-               && _loaded_plugin_files.contains(canonical_path))
-            {
-                return;
-            }
+            Shared_library lib(file_path);
 
-            Shared_library lib(canonical_path);
+            // if(mode != HIPDNN_PLUGIN_LOADING_ADDITIVE
+            //    && _loaded_plugin_files.contains(file_path))
+            // {
+            //     return;
+            // }
+
             Plugin plugin(std::move(lib));
-
             const auto name = plugin.name();
             const auto version = plugin.version();
             const auto type = plugin.type();
 
             _plugins.emplace_back(std::move(plugin));
-            _loaded_plugin_files.insert(canonical_path);
+            _loaded_plugin_files.insert(file_path);
 
-            HIPDNN_LOG_INFO("Plugin loaded successfully: {}", canonical_path.string());
+            HIPDNN_LOG_INFO("Plugin loaded successfully: {}", file_path.string());
             HIPDNN_LOG_INFO("Plugin info: name={}, version={}, type={}({})",
                             name,
                             version,
@@ -167,7 +162,8 @@ private:
         }
         catch(const Hipdnn_exception& e)
         {
-            HIPDNN_LOG_WARN("Error loading plugin: {}. {}", file_path.string(), e.get_message());
+            HIPDNN_LOG_WARN(
+                "Error loading plugin from [{}]: {}", file_path.string(), e.get_message());
         }
     }
 

@@ -169,7 +169,7 @@ TEST(HipDNNBackendTest, WillFailToCreateGraphIfGraphIsNull)
 
 TEST(HipDNNBackendTest, SetPluginPathsExt_Success)
 {
-    std::array<const char*, 3> paths = {"./imaginary_plugin.so", "./", "../directory/"};
+    std::array<const char*, 3> paths = {"./imaginary_plugin", "./", "../directory/"};
 
     hipdnnStatus_t status = hipdnnSetEnginePluginPaths_ext(
         paths.size(), paths.data(), HIPDNN_PLUGIN_LOADING_ABSOLUTE);

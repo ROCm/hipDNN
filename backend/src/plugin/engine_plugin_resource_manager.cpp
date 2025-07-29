@@ -48,14 +48,15 @@ std::vector<std::filesystem::path> get_default_plugin_paths()
 } // namespace
 
 void Engine_plugin_resource_manager::set_plugin_paths(
-    const std::vector<std::filesystem::path>& plugin_paths, hipdnnPluginLoadingMode_ext_t loading_mode)
+    const std::vector<std::filesystem::path>& plugin_paths,
+    hipdnnPluginLoadingMode_ext_t loading_mode)
 {
     std::lock_guard<std::mutex> lock(plugin_mutex);
 
     THROW_IF_FALSE(pm_ptr.expired(),
                    HIPDNN_STATUS_NOT_SUPPORTED,
                    "hipdnnSetEnginePluginPaths_ext cannot be called with an active handle.");
-                   
+
     plugin_config.mode = loading_mode;
 
     if(plugin_config.mode == HIPDNN_PLUGIN_LOADING_ABSOLUTE)

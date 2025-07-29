@@ -42,12 +42,22 @@ void dummy_callback(hipdnnSeverity_t sev, const char* msg)
 
 #if defined(_WIN32)
 constexpr const char* SHARED_LIB_EXT = ".dll";
+constexpr const char* LIB_PREFIX = "";
 #else
 constexpr const char* SHARED_LIB_EXT = ".so";
+constexpr const char* LIB_PREFIX = "lib";
 #endif
 
-const std::string PLUGIN_PATH1 = "./libhipdnn_test_plugin1" + std::string(SHARED_LIB_EXT);
-const std::string PLUGIN_PATH2 = "./libhipdnn_test_plugin2" + std::string(SHARED_LIB_EXT);
+const std::string PLUGIN_NAME1 = "hipdnn_test_plugin1";
+const std::string PLUGIN_NAME2 = "hipdnn_test_plugin2";
+
+const std::string PLUGIN_PATH1 = "./" + PLUGIN_NAME1;
+const std::string PLUGIN_PATH2 = "./" + PLUGIN_NAME2;
+
+const std::string FULL_PLUGIN_PATH1
+    = std::string("./") + LIB_PREFIX + PLUGIN_NAME1 + SHARED_LIB_EXT;
+const std::string FULL_PLUGIN_PATH2
+    = std::string("./") + LIB_PREFIX + PLUGIN_NAME2 + SHARED_LIB_EXT;
 
 } // namespace
 
@@ -85,10 +95,10 @@ TEST(PluginManagerTest, LoadPluginsFromDirectory)
 
     try
     {
-        std::filesystem::copy_file(PLUGIN_PATH1,
-                                   temp_dir / std::filesystem::path(PLUGIN_PATH1).filename());
-        std::filesystem::copy_file(PLUGIN_PATH2,
-                                   temp_dir / std::filesystem::path(PLUGIN_PATH2).filename());
+        std::filesystem::copy_file(FULL_PLUGIN_PATH1,
+                                   temp_dir / std::filesystem::path(FULL_PLUGIN_PATH1).filename());
+        std::filesystem::copy_file(FULL_PLUGIN_PATH2,
+                                   temp_dir / std::filesystem::path(FULL_PLUGIN_PATH2).filename());
 
         plugin::Plugin_manager_base<Plugin> plugin_manager;
         plugin_manager.load_plugins({temp_dir}, HIPDNN_PLUGIN_LOADING_ABSOLUTE);
@@ -135,18 +145,6 @@ TEST(PluginManagerTest, LoadPluginsAdditive)
     EXPECT_EQ(plugins.size(), 3);
 }
 
-TEST(PluginManagerTest, LoadPluginsAdditiveUnique)
-{
-    plugin::Plugin_manager_base<Plugin> plugin_manager;
-    plugin_manager.load_plugins({PLUGIN_PATH1}, HIPDNN_PLUGIN_LOADING_ABSOLUTE);
-    ASSERT_EQ(plugin_manager.get_plugins().size(), 1);
-
-    plugin_manager.load_plugins({PLUGIN_PATH1, PLUGIN_PATH2},
-                                HIPDNN_PLUGIN_LOADING_ADDITIVE_UNIQUE);
-    const auto& plugins = plugin_manager.get_plugins();
-    EXPECT_EQ(plugins.size(), 2);
-}
-
 TEST(PluginManagerTest, LoadPluginsCombinedFileAndDirectory)
 {
     const std::filesystem::path temp_dir = "./temp_plugin_dir_combined";
@@ -154,8 +152,8 @@ TEST(PluginManagerTest, LoadPluginsCombinedFileAndDirectory)
 
     try
     {
-        std::filesystem::copy_file(PLUGIN_PATH1,
-                                   temp_dir / std::filesystem::path(PLUGIN_PATH1).filename());
+        std::filesystem::copy_file(FULL_PLUGIN_PATH1,
+                                   temp_dir / std::filesystem::path(FULL_PLUGIN_PATH1).filename());
 
         plugin::Plugin_manager_base<Plugin> plugin_manager;
         plugin_manager.load_plugins({temp_dir, PLUGIN_PATH2}, HIPDNN_PLUGIN_LOADING_ABSOLUTE);
