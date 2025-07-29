@@ -58,8 +58,9 @@ public:
     Engine_plugin_resource_manager& operator=(Engine_plugin_resource_manager&& other) noexcept;
 
     // MT-unsafe instance methods
+    // virtual for gMock testing
     virtual void set_stream(hipStream_t stream) const;
-    std::vector<int64_t> get_applicable_engine_ids(const Graph_descriptor* graph_desc) const;
+    virtual std::vector<int64_t> get_applicable_engine_ids(const Graph_descriptor* graph_desc) const;
     virtual size_t get_workspace_size(int64_t engine_id,
                                       const hipdnnPluginConstData_t* engine_config,
                                       const Graph_descriptor* graph_desc) const;
@@ -77,13 +78,16 @@ public:
                                  const hipdnnPluginConstData_t* engine_config,
                                  const Graph_descriptor* graph_desc);
 
-private:
+protected:
     // MT-unsafe instance methods
-    void get_engine_details(int64_t engine_id,
+    // protected virtual for gMock testing
+    virtual void get_engine_details(int64_t engine_id,
                             const Graph_descriptor* graph_desc,
                             hipdnnPluginConstData_t* engine_details) const;
-    void destroy_engine_details(int64_t engine_id, hipdnnPluginConstData_t* engine_details) const;
+    virtual void destroy_engine_details(int64_t engine_id, hipdnnPluginConstData_t* engine_details) const;
 
+private:
+    // MT-unsafe instance methods
     hipdnnEnginePluginExecutionContext_t
         create_execution_context(int64_t engine_id,
                                  const hipdnnPluginConstData_t* engine_config,

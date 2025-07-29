@@ -10,12 +10,18 @@ namespace hipdnn_backend
 {
 namespace plugin
 {
-struct Mock_engine_plugin_resource_manager : Engine_plugin_resource_manager
+
+class Mock_engine_plugin_resource_manager : public Engine_plugin_resource_manager
 {
+public:
     MOCK_METHOD(void, set_stream, (hipStream_t stream), (const, override));
     MOCK_METHOD(void,
                 execute_op_graph,
                 (hipdnnBackendDescriptor_t execution_plan, hipdnnBackendDescriptor_t variant_pack),
+                (const, override));
+    MOCK_METHOD(std::vector<int64_t>,
+                get_applicable_engine_ids,
+                (const hipdnn_backend::Graph_descriptor* graph_desc),
                 (const, override));
     MOCK_METHOD(size_t,
                 get_workspace_size,
@@ -23,6 +29,17 @@ struct Mock_engine_plugin_resource_manager : Engine_plugin_resource_manager
                  const hipdnnPluginConstData_t* engine_config,
                  const hipdnn_backend::Graph_descriptor* graph_desc),
                 (const, override));
+
+protected:
+    MOCK_METHOD(void,
+                get_engine_details,
+                (int64_t engine_id, const hipdnn_backend::Graph_descriptor* graph_desc, hipdnnPluginConstData_t* engine_details),
+                (const, override));
+    MOCK_METHOD(void,
+                destroy_engine_details,
+                (int64_t engine_id, hipdnnPluginConstData_t* engine_details),
+                (const, override));
 };
+
 }
 }

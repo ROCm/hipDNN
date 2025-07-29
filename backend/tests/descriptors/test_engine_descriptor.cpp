@@ -7,6 +7,8 @@
 #include "hipdnn_backend.h"
 #include "hipdnn_exception.hpp"
 #include "mocks/mock_descriptor.hpp"
+#include "mocks/mock_engine_plugin_resource_manager.hpp"
+#include "mocks/mock_handle.hpp"
 #include "test_descriptor_utils.hpp"
 #include "test_macros.hpp"
 
@@ -15,6 +17,8 @@
 #include <memory>
 
 using namespace hipdnn_backend;
+using namespace plugin;
+using namespace ::testing;
 
 using ::testing::Return;
 
@@ -25,21 +29,23 @@ public:
     std::unique_ptr<hipdnnBackendDescriptor> _mock_graph_wrapper = nullptr;
     std::unique_ptr<hipdnnBackendDescriptor> _mock_graph_bad_type_wrapper = nullptr;
     std::unique_ptr<hipdnnBackendDescriptor> _mock_wrong_type_wrapper = nullptr;
+    std::unique_ptr<Mock_handle> _mock_handle = nullptr;
+    std::shared_ptr<Mock_engine_plugin_resource_manager> _mock_engine_plugin_resource_manager
+        = nullptr;
 
-    Engine_descriptor* get_engine_descriptor() const
+    std::shared_ptr<Engine_descriptor> get_engine_descriptor() const
     {
-        return _engine_wrapper->as_descriptor<Engine_descriptor>().get();
+        return _engine_wrapper->as_descriptor_unsafe<Engine_descriptor>();
     }
 
-    Mock_descriptor<Graph_descriptor>* get_mock_graph() const
+    std::shared_ptr<Mock_graph_descriptor> get_mock_graph() const
     {
-        return _mock_graph_wrapper->as_descriptor<Mock_descriptor<Graph_descriptor>>().get();
+        return _mock_graph_wrapper->as_descriptor_unsafe<Mock_graph_descriptor>();
     }
 
-    Mock_descriptor<Graph_descriptor>* get_mock_graph_bad_type() const
+    std::shared_ptr<Mock_graph_descriptor> get_mock_graph_bad_type() const
     {
-        return _mock_graph_bad_type_wrapper->as_descriptor<Mock_descriptor<Graph_descriptor>>()
-            .get();
+        return _mock_graph_bad_type_wrapper->as_descriptor_unsafe<Mock_graph_descriptor>();
     }
 
     void set_graph() const
@@ -62,6 +68,12 @@ public:
     {
         set_graph();
         set_global_index();
+        EXPECT_CALL(*get_mock_graph(), get_handle())
+            .WillOnce(Return(_mock_handle.get()));
+        EXPECT_CALL(*_mock_handle, get_plugin_resource_manager())
+            .WillOnce(Return(_mock_engine_plugin_resource_manager));
+        EXPECT_CALL(*_mock_engine_plugin_resource_manager, get_applicable_engine_ids(_))
+            .WillOnce(Return(std::vector<int64_t>{0}));
         ASSERT_NO_THROW(get_engine_descriptor()->finalize());
     }
 
@@ -70,11 +82,14 @@ protected:
     {
         _engine_wrapper = test_descriptor_utils::create_descriptor<Engine_descriptor>();
         _mock_graph_wrapper
-            = test_descriptor_utils::create_descriptor<Mock_descriptor<Graph_descriptor>>();
+            = test_descriptor_utils::create_descriptor<Mock_graph_descriptor>();
         _mock_graph_bad_type_wrapper
-            = test_descriptor_utils::create_descriptor<Mock_descriptor<Graph_descriptor>>();
+            = test_descriptor_utils::create_descriptor<Mock_graph_descriptor>();
         _mock_wrong_type_wrapper
-            = test_descriptor_utils::create_descriptor<Mock_descriptor<Engine_descriptor>>();
+            = test_descriptor_utils::create_descriptor<Mock_engine_descriptor>();
+        _mock_handle = std::make_unique<Mock_handle>();
+        _mock_engine_plugin_resource_manager
+            = std::make_shared<Mock_engine_plugin_resource_manager>();
     }
 };
 
@@ -177,10 +192,7 @@ TEST_F(Engine_descriptor_test, FinalizeEngineDescriptor)
     auto engine = get_engine_descriptor();
     ASSERT_THROW_HIPDNN_STATUS(engine->finalize(), HIPDNN_STATUS_BAD_PARAM);
 
-    set_graph();
-    set_global_index();
-
-    ASSERT_NO_THROW(engine->finalize());
+    make_engine_finalized();
 
     ASSERT_THROW_HIPDNN_STATUS(engine->finalize(), HIPDNN_STATUS_BAD_PARAM);
 }
@@ -299,7 +311,7 @@ TEST_F(Engine_descriptor_test, GetGraphReturnsPointerIfFinalized)
     auto graph_ptr = engine->get_graph();
     ASSERT_NE(graph_ptr, nullptr);
     ASSERT_EQ(static_cast<const Backend_descriptor_interface*>(graph_ptr.get()),
-              static_cast<const Backend_descriptor_interface*>(get_mock_graph()));
+              static_cast<const Backend_descriptor_interface*>(get_mock_graph().get()));
 }
 
 TEST_F(Engine_descriptor_test, GetEngineIdThrowsIfNotFinalized)
