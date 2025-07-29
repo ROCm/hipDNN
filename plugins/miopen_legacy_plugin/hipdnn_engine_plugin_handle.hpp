@@ -8,8 +8,11 @@
 #include <miopen/miopen.h>
 #include <unordered_map>
 
+#include <hipdnn_sdk/logging/logger.hpp>
+
 #include "miopen_container.hpp"
 
+// NOLINTBEGIN
 struct hipdnnEnginePluginHandle
 {
 public:
@@ -24,7 +27,25 @@ public:
         return miopen_container->get_engine_manager();
     }
 
-    // Map shallow pointer (const void*) to its corresponding DetachedBuffer for engine details
+    void store_detached_buffer(const void* ptr, std::unique_ptr<flatbuffers::DetachedBuffer> buffer)
+    {
+        HIPDNN_LOG_INFO("Storing detached buffer at address: {:p}", ptr);
+        _engine_details_buffers[ptr] = std::move(buffer);
+    }
+
+    void remove_detached_buffer(const void* ptr)
+    {
+        HIPDNN_LOG_INFO("Removing detached buffer at address: {:p}", ptr);
+
+        if(_engine_details_buffers.contains(ptr))
+        {
+            _engine_details_buffers.erase(ptr);
+        }
+    }
+
+private:
     std::unordered_map<const void*, std::unique_ptr<flatbuffers::DetachedBuffer>>
-        engine_details_buffers;
+        _engine_details_buffers;
 };
+
+// NOLINTEND

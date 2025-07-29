@@ -266,12 +266,7 @@ hipdnnPluginStatus_t hipdnnEnginePluginDestroyEngineDetails(hipdnnEnginePluginHa
         throw_if_null(engine_details);
         throw_if_null(engine_details->ptr);
 
-
-        // Remove and delete the buffer from the handle's map
-        auto it = handle->engine_details_buffers.find(engine_details->ptr);
-        if(it != handle->engine_details_buffers.end()) {
-            handle->engine_details_buffers.erase(it);
-        }
+        handle->remove_detached_buffer(engine_details->ptr);
 
         LOG_API_SUCCESS(api_name, "engine_details->ptr={:p}", engine_details->ptr);
     });
