@@ -3,9 +3,16 @@
 
 #pragma once
 
+/**
+ * @enum hipdnnPluginLoadingMode_ext_t
+ * @brief Specifies the plugin loading mode for hipDNN.
+ *
+ * This enumeration defines how plugins are loaded into hipDNN:
+ * - HIPDNN_PLUGIN_LOADING_ADDITIVE: Loads user-specified plugins in addition to the default plugins.
+ * - HIPDNN_PLUGIN_LOADING_ABSOLUTE: Loads only the user-specified plugins, ignoring the defaults.
+ */
 typedef enum
 {
-    HIPDNN_PLUGIN_LOADING_ADDITIVE_UNIQUE = 0,
     HIPDNN_PLUGIN_LOADING_ADDITIVE,
     HIPDNN_PLUGIN_LOADING_ABSOLUTE,
-} hipdnnPluginLoadingMode_t;
+} hipdnnPluginLoadingMode_ext_t;

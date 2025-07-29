@@ -53,8 +53,8 @@ public:
 
     // NOLINTBEGIN
     virtual hipdnnStatus_t set_engine_plugin_paths_ext(size_t num_paths,
-                                                       const char* const plugin_paths[],
-                                                       hipdnnPluginLoadingMode_t mode)
+                                                       const char* const* plugin_paths,
+                                                       hipdnnPluginLoadingMode_ext_t mode)
         = 0;
     // NOLINTEND
 };

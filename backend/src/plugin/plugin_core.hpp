@@ -91,7 +91,7 @@ public:
     virtual ~Plugin_manager_base() = default;
 
     void load_plugins(const std::vector<std::filesystem::path>& search_paths,
-                      hipdnnPluginLoadingMode_t mode)
+                      hipdnnPluginLoadingMode_ext_t mode)
     {
         if(mode == HIPDNN_PLUGIN_LOADING_ABSOLUTE)
         {
@@ -136,7 +136,7 @@ private:
     }
 
     void load_plugin_from_file(const std::filesystem::path& file_path,
-                               hipdnnPluginLoadingMode_t mode)
+                               hipdnnPluginLoadingMode_ext_t mode)
     {
         try
         {
@@ -172,7 +172,7 @@ private:
     }
 
     void scan_directory_for_plugins(const std::filesystem::path& dir_path,
-                                    hipdnnPluginLoadingMode_t mode)
+                                    hipdnnPluginLoadingMode_ext_t mode)
     {
         HIPDNN_LOG_INFO("Scanning for plugins in directory: {}", dir_path.string());
         for(const auto& entry : std::filesystem::directory_iterator(dir_path))

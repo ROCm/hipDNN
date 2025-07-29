@@ -104,8 +104,8 @@ public:
 
     // NOLINTBEGIN
     hipdnnStatus_t set_engine_plugin_paths_ext(size_t num_paths,
-                                               const char* const plugin_paths[],
-                                               hipdnnPluginLoadingMode_t mode) override
+                                               const char* const* plugin_paths,
+                                               hipdnnPluginLoadingMode_ext_t mode) override
     {
         return hipdnnSetEnginePluginPaths_ext(num_paths, plugin_paths, mode);
     }

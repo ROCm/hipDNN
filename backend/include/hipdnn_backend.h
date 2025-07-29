@@ -303,7 +303,7 @@ HIPDNN_BACKEND_EXPORT void hipdnnLoggingCallback_ext(hipdnnSeverity_t severity, 
  * @retval HIPDNN_STATUS_INTERNAL_ERROR    An internal error occurred during plugin loading.
  */
 HIPDNN_BACKEND_EXPORT hipdnnStatus_t hipdnnSetEnginePluginPaths_ext(
-    size_t num_paths, const char* const plugin_paths[], hipdnnPluginLoadingMode_t loading_mode);
+    size_t num_paths, const char* const* plugin_paths, hipdnnPluginLoadingMode_ext_t loading_mode);
 
 #ifdef __cplusplus
 }

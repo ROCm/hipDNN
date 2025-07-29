@@ -8,7 +8,6 @@
 #include <spdlog/spdlog.h>
 
 #ifdef HIPDNN_BACKEND_COMPILATION
-// NOLINTBEGIN
 #define _HIPDNN_BACKEND_LOG_ACTION(level, ...)                           \
     do                                                                   \
     {                                                                    \
@@ -23,7 +22,6 @@
 #define HIPDNN_LOG_WARN(...) _HIPDNN_BACKEND_LOG_ACTION(warn, __VA_ARGS__)
 #define HIPDNN_LOG_ERROR(...) _HIPDNN_BACKEND_LOG_ACTION(error, __VA_ARGS__)
 #define HIPDNN_LOG_FATAL(...) _HIPDNN_BACKEND_LOG_ACTION(critical, __VA_ARGS__)
-// NOLINTEND
 #endif // HIPDNN_BACKEND_COMPILATION
 
 namespace hipdnn_backend

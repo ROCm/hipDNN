@@ -33,7 +33,7 @@ namespace
 struct Plugin_loading_config
 {
     std::vector<std::filesystem::path> paths;
-    hipdnnPluginLoadingMode_t mode = HIPDNN_PLUGIN_LOADING_ADDITIVE_UNIQUE;
+    hipdnnPluginLoadingMode_ext_t mode = HIPDNN_PLUGIN_LOADING_ADDITIVE;
 };
 
 std::mutex plugin_mutex;
@@ -48,7 +48,7 @@ std::vector<std::filesystem::path> get_default_plugin_paths()
 } // namespace
 
 void Engine_plugin_resource_manager::set_plugin_paths(
-    const std::vector<std::filesystem::path>& plugin_paths, hipdnnPluginLoadingMode_t loading_mode)
+    const std::vector<std::filesystem::path>& plugin_paths, hipdnnPluginLoadingMode_ext_t loading_mode)
 {
     std::lock_guard<std::mutex> lock(plugin_mutex);
 
