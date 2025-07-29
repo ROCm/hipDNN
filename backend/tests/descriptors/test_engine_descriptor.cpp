@@ -68,8 +68,7 @@ public:
     {
         set_graph();
         set_global_index();
-        EXPECT_CALL(*get_mock_graph(), get_handle())
-            .WillOnce(Return(_mock_handle.get()));
+        EXPECT_CALL(*get_mock_graph(), get_handle()).WillOnce(Return(_mock_handle.get()));
         EXPECT_CALL(*_mock_handle, get_plugin_resource_manager())
             .WillOnce(Return(_mock_engine_plugin_resource_manager));
         EXPECT_CALL(*_mock_engine_plugin_resource_manager, get_applicable_engine_ids(_))
@@ -81,8 +80,7 @@ protected:
     void SetUp() override
     {
         _engine_wrapper = test_descriptor_utils::create_descriptor<Engine_descriptor>();
-        _mock_graph_wrapper
-            = test_descriptor_utils::create_descriptor<Mock_graph_descriptor>();
+        _mock_graph_wrapper = test_descriptor_utils::create_descriptor<Mock_graph_descriptor>();
         _mock_graph_bad_type_wrapper
             = test_descriptor_utils::create_descriptor<Mock_graph_descriptor>();
         _mock_wrong_type_wrapper

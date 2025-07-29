@@ -33,7 +33,9 @@ public:
 protected:
     MOCK_METHOD(void,
                 get_engine_details,
-                (int64_t engine_id, const hipdnn_backend::Graph_descriptor* graph_desc, hipdnnPluginConstData_t* engine_details),
+                (int64_t engine_id,
+                 const hipdnn_backend::Graph_descriptor* graph_desc,
+                 hipdnnPluginConstData_t* engine_details),
                 (const, override));
     MOCK_METHOD(void,
                 destroy_engine_details,
