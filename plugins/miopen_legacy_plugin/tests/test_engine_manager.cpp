@@ -99,11 +99,12 @@ TEST(Engine_managerTest, ReturnsEngineDetails)
     auto mock_engine = std::make_unique<Mock_engine>();
     EXPECT_CALL(*mock_engine, id()).WillRepeatedly(Return(1));
     EXPECT_CALL(*mock_engine, get_details(::testing::_, ::testing::_))
-        .WillOnce([&engine_details](hipdnnEnginePluginHandle& handle, hipdnnPluginConstData_t& out) {
-            (void)handle;
-            out.ptr = engine_details.ptr;
-            out.size = engine_details.size;
-        });
+        .WillOnce(
+            [&engine_details](hipdnnEnginePluginHandle& handle, hipdnnPluginConstData_t& out) {
+                (void)handle;
+                out.ptr = engine_details.ptr;
+                out.size = engine_details.size;
+            });
 
     manager.add_engine(std::move(mock_engine));
 
