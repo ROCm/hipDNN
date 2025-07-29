@@ -43,7 +43,7 @@ void Miopen_engine::get_details(hipdnnEnginePluginHandle& handle,
     details_out.ptr = detached_buffer->data();
     details_out.size = detached_buffer->size();
 
-    handle.store_detached_buffer(details_out.ptr, std::move(detached_buffer));
+    handle.store_engine_details_detached_buffer(details_out.ptr, std::move(detached_buffer));
 }
 
 size_t Miopen_engine::get_workspace_size(const hipdnnEnginePluginHandle& handle,

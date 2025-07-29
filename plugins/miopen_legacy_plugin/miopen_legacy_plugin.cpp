@@ -266,7 +266,7 @@ hipdnnPluginStatus_t hipdnnEnginePluginDestroyEngineDetails(hipdnnEnginePluginHa
         throw_if_null(engine_details);
         throw_if_null(engine_details->ptr);
 
-        handle->remove_detached_buffer(engine_details->ptr);
+        handle->remove_engine_details_detached_buffer(engine_details->ptr);
 
         LOG_API_SUCCESS(api_name, "engine_details->ptr={:p}", engine_details->ptr);
     });
