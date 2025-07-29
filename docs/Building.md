@@ -58,6 +58,11 @@ mkdir build
 cd build
 cmake -DCODE_COVERAGE=ON ..
 
+# address sanitizer
+mkdir build
+cd build
+cmake -DBUILD_ADDRESS_SANITIZER=ON ..
+
 # python frontend api (requires pybind11 preinstallation)
 mkdir build
 cd build
