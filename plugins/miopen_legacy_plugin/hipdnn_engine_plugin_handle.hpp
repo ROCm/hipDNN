@@ -8,6 +8,7 @@
 #include <hipdnn_sdk/plugin/plugin_exception.hpp>
 
 #include "miopen_container.hpp"
+#include "miopen_utils.hpp"
 
 struct hipdnnEnginePluginHandle
 {
@@ -18,14 +19,8 @@ public:
 
     void set_stream(hipStream_t stream)
     {
+        THROW_ON_MIOPEN_FAILURE(miopenSetStream(miopen_handle, stream));
         _stream = stream;
-        miopenStatus_t status = miopenSetStream(miopen_handle, stream);
-        if(status != miopenStatusSuccess)
-        {
-            _stream = nullptr;
-            throw hipdnn_plugin::Hipdnn_plugin_exception(
-                HIPDNN_PLUGIN_STATUS_INTERNAL_ERROR, "Failed set the stream on the MIOpen handle");
-        }
     }
 
     hipStream_t get_stream() const
