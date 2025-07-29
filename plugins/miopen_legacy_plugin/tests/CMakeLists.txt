@@ -57,7 +57,7 @@ target_include_directories(miopen_legacy_plugin_tests PRIVATE
 if(BUILD_PLUGIN_AS_DEPENDENCY)
     clang_tidy_check(miopen_legacy_plugin_tests)
     
-    append_check_target(miopen_legacy_plugin_tests ${CMAKE_CURRENT_BINARY_DIR})
+    append_test_to_check_target(miopen_legacy_plugin_tests ${CMAKE_CURRENT_BINARY_DIR})
     add_dependencies(check_ctest miopen_legacy_plugin_tests)
     gtest_discover_tests(
         miopen_legacy_plugin_tests

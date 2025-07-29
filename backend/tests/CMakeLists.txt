@@ -84,7 +84,7 @@ target_compile_options(hipdnn_test_engine_plugin1 PRIVATE ${HIPDNN_WARNING_COMPI
 clang_tidy_check(hipdnn_test_engine_plugin1)
 add_dependencies(hipdnn_backend_tests hipdnn_test_engine_plugin1)
 
-append_check_target(hipdnn_backend_tests ${CMAKE_CURRENT_BINARY_DIR})
+append_test_to_check_target(hipdnn_backend_tests ${CMAKE_CURRENT_BINARY_DIR})
 add_dependencies(check_ctest hipdnn_backend_tests)
 gtest_discover_tests(
     hipdnn_backend_tests
