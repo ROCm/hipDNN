@@ -5,17 +5,20 @@
 
 #include "callback_sink.hpp"
 #include "callback_types.h"
-#include <spdlog/spdlog.h>
+#include <iostream>
+#include <memory>
+#include <mutex>
 #include <spdlog/async.h>
 #include <spdlog/sinks/basic_file_sink.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
-#include <memory>
-#include <mutex>
-#include <iostream>
+#include <spdlog/spdlog.h>
 
 #ifndef HIPDNN_BACKEND_COMPILATION
 #ifndef COMPONENT_NAME
-#define _HIPDNN_INTERNAL_LOG_ACTION(level, ...) do {} while(0)
+#define _HIPDNN_INTERNAL_LOG_ACTION(level, ...) \
+    do                                          \
+    {                                           \
+    } while(0)
 #else
 #define _HIPDNN_INTERNAL_LOG_ACTION(level, ...)       \
     do                                                \

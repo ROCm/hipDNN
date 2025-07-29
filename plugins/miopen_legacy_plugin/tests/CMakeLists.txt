@@ -13,6 +13,11 @@ if(HIP_DNN_SKIP_TESTS)
     return()
 endif()
 
+add_compile_definitions(__HIP_PLATFORM_AMD__)
+add_compile_definitions(__HIPCC__)
+find_package(hip REQUIRED)
+enable_language(HIP)
+
 add_executable(miopen_legacy_plugin_tests
     engines/test_miopen_engine.cpp
     engines/plans/test_miopen_batchnorm_plan_builder.cpp
@@ -33,6 +38,8 @@ target_compile_options(miopen_legacy_plugin_tests PRIVATE ${HIPDNN_WARNING_COMPI
 target_link_libraries(miopen_legacy_plugin_tests PUBLIC 
     GTest::gtest
     GTest::gmock
+    hip::host
+    hip::device
     miopen_legacy_plugin
     pthread
 )

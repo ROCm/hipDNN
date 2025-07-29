@@ -66,6 +66,7 @@ public:
     {
         throw_if_not_valid();
 
+        // NOLINTNEXTLINE(readability-use-anyofallof)
         for(const auto node : *_shallow_graph->nodes())
         {
             if(!supported_attributes.contains(node->attributes_type()))

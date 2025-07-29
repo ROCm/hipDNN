@@ -25,7 +25,9 @@ public:
     ~Scoped_resource()
     {
         if(!_empty)
+        {
             _destructor(_resource);
+        }
     }
 
     // Prevent copying
@@ -33,10 +35,12 @@ public:
     Scoped_resource& operator=(const Scoped_resource&) = delete;
 
     // Allow moving
-    Scoped_resource(Scoped_resource&& other)
+    Scoped_resource(Scoped_resource&& other) noexcept
     {
         if(other._empty)
+        {
             return;
+        }
 
         _resource = std::move(other._resource);
         _destructor = std::move(other._destructor);
@@ -44,12 +48,14 @@ public:
         _empty = false;
     }
 
-    Scoped_resource& operator=(Scoped_resource&& other)
+    Scoped_resource& operator=(Scoped_resource&& other) noexcept
     {
         if(this != &other)
         {
             if(!_empty)
+            {
                 _destructor(_resource);
+            }
 
             _empty = other._empty;
             if(!other._empty)
