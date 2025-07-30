@@ -121,7 +121,7 @@ public:
         return _valid;
     }
 
-    hipdnnBackendDescriptor_t get() const
+    const hipdnnBackendDescriptor_t& get() const
     {
         return _descriptor;
     }

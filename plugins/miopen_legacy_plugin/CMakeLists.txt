@@ -84,6 +84,7 @@ target_link_libraries(miopen_legacy_plugin PUBLIC MIOpen hipdnn_sdk)
 target_compile_options(miopen_legacy_plugin PRIVATE ${HIPDNN_WARNING_COMPILE_OPTIONS})
 
 add_subdirectory(tests)
+add_subdirectory(integration_tests)
 
 install(
     TARGETS miopen_legacy_plugin
