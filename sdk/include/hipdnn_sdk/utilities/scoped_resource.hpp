@@ -17,7 +17,7 @@ public:
     Scoped_resource() = default;
     Scoped_resource(T resource, Destructor destructor)
         : _resource(resource)
-        , _destructor(destructor)
+        , _destructor(std::move(destructor))
         , _empty(false)
     {
     }

@@ -48,6 +48,16 @@ target_link_libraries(hipdnn_backend_tests
 
 target_compile_definitions(hipdnn_backend_tests PRIVATE HIPDNN_BACKEND_COMPILATION)
 target_compile_options(hipdnn_backend_tests PRIVATE ${HIPDNN_WARNING_COMPILE_OPTIONS})
+target_include_directories(hipdnn_backend_tests 
+    PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}
+)
+
+target_compile_definitions(hipdnn_backend_tests
+    PRIVATE
+    HIPDNN_BUILD_DIR="${CMAKE_BINARY_DIR}"
+)
+
 clang_tidy_check(hipdnn_backend_tests)
 
 # libhipdnn_test_plugin1.so or hipdnn_test_plugin1.dll (used by test_plugin.cpp and test_shared_library.cpp)
