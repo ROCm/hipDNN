@@ -13,6 +13,7 @@
 #include "test_macros.hpp"
 
 #include <gtest/gtest.h>
+#include <hipdnn_sdk/data_objects/engine_details_generated.h>
 
 #include <memory>
 
@@ -73,6 +74,8 @@ public:
             .WillOnce(Return(_mock_engine_plugin_resource_manager));
         EXPECT_CALL(*_mock_engine_plugin_resource_manager, get_applicable_engine_ids(_))
             .WillOnce(Return(std::vector<int64_t>{0}));
+        EXPECT_CALL(*_mock_engine_plugin_resource_manager, get_engine_details(_,_,_)).WillOnce(Invoke([this](int64_t, const Graph_descriptor*, hipdnnPluginConstData_t* d){ *d = this->_serialized_engine_details; }));
+        EXPECT_CALL(*_mock_engine_plugin_resource_manager, destroy_engine_details(_,_));
         ASSERT_NO_THROW(get_engine_descriptor()->finalize());
     }
 
@@ -88,7 +91,26 @@ protected:
         _mock_handle = std::make_unique<Mock_handle>();
         _mock_engine_plugin_resource_manager
             = std::make_shared<Mock_engine_plugin_resource_manager>();
+
+        serialize_engine_details();
     }
+
+private:
+    void serialize_engine_details()
+    {
+        int64_t gidx = 0;
+
+        flatbuffers::FlatBufferBuilder builder;
+        hipdnn_sdk::data_objects::EngineDetailsBuilder engine_details_builder(builder);
+        engine_details_builder.add_engine_id(gidx);
+        builder.Finish(engine_details_builder.Finish());
+        _engine_details_buffer = builder.Release();
+        _serialized_engine_details
+            = {.ptr = _engine_details_buffer.data(), .size = _engine_details_buffer.size()};
+    }
+
+    flatbuffers::DetachedBuffer _engine_details_buffer;
+    hipdnnPluginConstData_t _serialized_engine_details;
 };
 
 TEST_F(Engine_descriptor_test, CreateEngineDescriptor)
