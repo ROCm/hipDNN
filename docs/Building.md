@@ -58,6 +58,11 @@ mkdir build
 cd build
 cmake -DCODE_COVERAGE=ON ..
 
+# address sanitizer
+mkdir build
+cd build
+cmake -DBUILD_ADDRESS_SANITIZER=ON ..
+
 # python frontend api (requires pybind11 preinstallation)
 mkdir build
 cd build
@@ -69,6 +74,8 @@ When building with ninja dont forget to add the -jnproc flag for using additiona
   - `ninja`: default build
   - `ninja install`: installs the library to the default location (/opt/rocm)
   - `ninja check`: Builds everything and automatically runs the tests via the ctest runner.
+    - Can add `-DBUILD_ADDRESS_SANITIZER` to initial cmake command if you want memory violation checks to occur
+    - Due to an incompatibility between HIP and AddressSanitizer, some tests will be skipped in AddressSanitizer builds
   - `ninja check_format`: checks the format of all c/c++ files in the repository and issues a warning
   - `ninja format`: formats any files in the repository which are not correctly formatted.
   - `ninja code_coverage`: builds, runs tests, and generates code coverage reports

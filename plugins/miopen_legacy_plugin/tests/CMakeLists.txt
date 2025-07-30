@@ -13,11 +13,17 @@ if(HIP_DNN_SKIP_TESTS)
     return()
 endif()
 
+add_compile_definitions(__HIP_PLATFORM_AMD__)
+add_compile_definitions(__HIPCC__)
+find_package(hip REQUIRED)
+enable_language(HIP)
+
 add_executable(miopen_legacy_plugin_tests
     engines/test_miopen_engine.cpp
     engines/plans/test_miopen_batchnorm_plan_builder.cpp
     engines/plans/test_batchnorm_fwd_inference_plan.cpp
     main.cpp
+    test_hipdnn_engine_plugin_handle.cpp
     test_miopen_legacy_engine_plugin_api.cpp
     test_miopen_batchnorm_operations.cpp
     test_miopen_legacy_plugin_api.cpp
@@ -29,10 +35,15 @@ add_executable(miopen_legacy_plugin_tests
 )
 
 target_compile_options(miopen_legacy_plugin_tests PRIVATE ${HIPDNN_WARNING_COMPILE_OPTIONS})
+target_compile_definitions(miopen_legacy_plugin_tests PRIVATE
+    COMPONENT_NAME="miopen_legacy_plugin_tests"
+)
 
 target_link_libraries(miopen_legacy_plugin_tests PUBLIC 
     GTest::gtest
     GTest::gmock
+    hip::host
+    hip::device
     miopen_legacy_plugin
     pthread
 )
@@ -46,10 +57,5 @@ target_include_directories(miopen_legacy_plugin_tests PRIVATE
 if(BUILD_PLUGIN_AS_DEPENDENCY)
     clang_tidy_check(miopen_legacy_plugin_tests)
     
-    add_dependencies(check miopen_legacy_plugin_tests)
-    gtest_discover_tests(
-        miopen_legacy_plugin_tests
-        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-        DISCOVERY_MODE PRE_TEST
-    )
+    add_target_to_check_targets(miopen_legacy_plugin_tests ${CMAKE_CURRENT_BINARY_DIR})
 endif()

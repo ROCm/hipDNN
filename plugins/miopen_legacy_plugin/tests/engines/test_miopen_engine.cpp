@@ -140,14 +140,13 @@ TEST(Miopen_engineTest, IsApplicableReturnsFalseIfNoPlanBuilderApplicable)
 TEST(Miopen_engineTest, GetDetailsReturnsSerializedEngineDetails)
 {
     Miopen_engine engine(1);
+    hipdnnEnginePluginHandle dummy_handle;
 
     hipdnnPluginConstData_t result;
-    engine.get_details(result);
+    engine.get_details(dummy_handle, result);
 
     hipdnn_plugin::Engine_details_wrapper engine_details(result.ptr, result.size);
     EXPECT_EQ(engine_details.engine_id(), 1);
-
-    delete[] static_cast<const uint8_t*>(result.ptr);
 }
 
 TEST(Miopen_engineTest, InitializeExecutionContextInvokesFirstApplicablePlanBuilder)
