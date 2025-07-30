@@ -81,13 +81,13 @@ __global__ void engine_kernel(const uint32_t* input, uint32_t* output, uint32_t 
 }
 
 // Run the kernel
-void run_engine(const uint32_t* input, uint32_t* output, uint32_t size)
+void run_engine(const uint32_t* input, uint32_t* output, uint32_t size, hipStream_t stream)
 {
     const auto block_size = 256U;
     const auto grid_size = (size + block_size - 1) / block_size;
 
     // Launch the kernel on the default stream.
-    engine_kernel<<<dim3(grid_size), dim3(block_size), 0, hipStreamDefault>>>(input, output, size);
+    engine_kernel<<<dim3(grid_size), dim3(block_size), 0, stream>>>(input, output, size);
 
     // Check if the kernel launch was successful.
     hipError_t error = hipGetLastError();
@@ -173,7 +173,7 @@ hipdnnPluginStatus_t hipdnnEnginePluginCreate(hipdnnEnginePluginHandle_t* handle
 
         *handle = new hipdnnEnginePluginHandle();
 
-        (*handle)->stream = nullptr;
+        (*handle)->stream = hipStreamDefault;
 
         auto test_container_ptr = test_container_lifecycle_ptr.lock();
         if(test_container_ptr != nullptr)
@@ -412,7 +412,8 @@ hipdnnPluginStatus_t
 
         run_engine(static_cast<const uint32_t*>(device_buffers[0].ptr),
                    static_cast<uint32_t*>(device_buffers[1].ptr),
-                   GPU_DATA_SIZE);
+                   GPU_DATA_SIZE,
+                   handle->stream);
 
         LOG_API_SUCCESS(api_name, "executed graph");
     });
