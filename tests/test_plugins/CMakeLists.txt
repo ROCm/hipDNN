@@ -39,7 +39,7 @@ function(add_test_plugin target_name)
             ${HIPDNN_WARNING_COMPILE_OPTIONS}
     )
 
-    add_dependencies(check ${target_name})
+    add_dependencies(public_hipdnn_backend_tests ${target_name})
 endfunction()
 
 # test_good_plugin is a well-behaved plugin that returns a happy path
