@@ -37,6 +37,9 @@ target_include_directories(hipdnn_backend_private
 
 target_compile_options(hipdnn_backend_private PRIVATE ${HIPDNN_WARNING_COMPILE_OPTIONS})
 target_link_libraries(hipdnn_backend_private PUBLIC hip::host hipdnn_sdk)
+if(NOT WIN32)
+target_link_libraries(hipdnn_backend_private PRIVATE dl)
+endif()
 target_compile_definitions(hipdnn_backend_private PRIVATE HIPDNN_BACKEND_COMPILATION)
 
 clang_tidy_check(hipdnn_backend_private)
