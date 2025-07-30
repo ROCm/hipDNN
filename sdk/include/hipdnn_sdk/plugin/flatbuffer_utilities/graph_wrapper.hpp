@@ -100,7 +100,7 @@ public:
 
         for(const auto tensor : *_shallow_graph->tensors())
         {
-            _tensor_map[tensor->uid()] = tensor;
+            _tensor_map[tensor->id()->value()] = tensor;
         }
 
         return _tensor_map;

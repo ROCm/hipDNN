@@ -13,6 +13,8 @@ static_assert(FLATBUFFERS_VERSION_MAJOR == 23 &&
               FLATBUFFERS_VERSION_REVISION == 21,
              "Non-compatible flatbuffers version included");
 
+#include "tensor_attributes_generated.h"
+
 namespace hipdnn_sdk {
 namespace data_objects {
 
@@ -25,19 +27,23 @@ bool operator!=(const BatchnormAttributesT &lhs, const BatchnormAttributesT &rhs
 
 struct BatchnormAttributesT : public ::flatbuffers::NativeTable {
   typedef BatchnormAttributes TableType;
-  int64_t x = 0;
-  int64_t scale = 0;
-  int64_t bias = 0;
-  int64_t epsilon = 0;
-  std::vector<int64_t> peer_stats{};
-  ::flatbuffers::Optional<int64_t> prev_running_mean = ::flatbuffers::nullopt;
-  ::flatbuffers::Optional<int64_t> prev_running_variance = ::flatbuffers::nullopt;
-  ::flatbuffers::Optional<int64_t> momentum = ::flatbuffers::nullopt;
-  int64_t y = 0;
-  ::flatbuffers::Optional<int64_t> mean = ::flatbuffers::nullopt;
-  ::flatbuffers::Optional<int64_t> inv_variance = ::flatbuffers::nullopt;
-  ::flatbuffers::Optional<int64_t> next_running_mean = ::flatbuffers::nullopt;
-  ::flatbuffers::Optional<int64_t> next_running_variance = ::flatbuffers::nullopt;
+  std::unique_ptr<hipdnn_sdk::data_objects::TensorID> x{};
+  std::unique_ptr<hipdnn_sdk::data_objects::TensorID> scale{};
+  std::unique_ptr<hipdnn_sdk::data_objects::TensorID> bias{};
+  std::unique_ptr<hipdnn_sdk::data_objects::TensorID> epsilon{};
+  std::vector<hipdnn_sdk::data_objects::TensorID> peer_stats{};
+  std::unique_ptr<hipdnn_sdk::data_objects::TensorID> prev_running_mean{};
+  std::unique_ptr<hipdnn_sdk::data_objects::TensorID> prev_running_variance{};
+  std::unique_ptr<hipdnn_sdk::data_objects::TensorID> momentum{};
+  std::unique_ptr<hipdnn_sdk::data_objects::TensorID> y{};
+  std::unique_ptr<hipdnn_sdk::data_objects::TensorID> mean{};
+  std::unique_ptr<hipdnn_sdk::data_objects::TensorID> inv_variance{};
+  std::unique_ptr<hipdnn_sdk::data_objects::TensorID> next_running_mean{};
+  std::unique_ptr<hipdnn_sdk::data_objects::TensorID> next_running_variance{};
+  BatchnormAttributesT() = default;
+  BatchnormAttributesT(const BatchnormAttributesT &o);
+  BatchnormAttributesT(BatchnormAttributesT&&) FLATBUFFERS_NOEXCEPT = default;
+  BatchnormAttributesT &operator=(BatchnormAttributesT o) FLATBUFFERS_NOEXCEPT;
 };
 
 struct BatchnormAttributes FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
@@ -58,100 +64,100 @@ struct BatchnormAttributes FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Tabl
     VT_NEXT_RUNNING_MEAN = 26,
     VT_NEXT_RUNNING_VARIANCE = 28
   };
-  int64_t x() const {
-    return GetField<int64_t>(VT_X, 0);
+  const hipdnn_sdk::data_objects::TensorID *x() const {
+    return GetStruct<const hipdnn_sdk::data_objects::TensorID *>(VT_X);
   }
-  bool mutate_x(int64_t _x = 0) {
-    return SetField<int64_t>(VT_X, _x, 0);
+  hipdnn_sdk::data_objects::TensorID *mutable_x() {
+    return GetStruct<hipdnn_sdk::data_objects::TensorID *>(VT_X);
   }
-  int64_t scale() const {
-    return GetField<int64_t>(VT_SCALE, 0);
+  const hipdnn_sdk::data_objects::TensorID *scale() const {
+    return GetStruct<const hipdnn_sdk::data_objects::TensorID *>(VT_SCALE);
   }
-  bool mutate_scale(int64_t _scale = 0) {
-    return SetField<int64_t>(VT_SCALE, _scale, 0);
+  hipdnn_sdk::data_objects::TensorID *mutable_scale() {
+    return GetStruct<hipdnn_sdk::data_objects::TensorID *>(VT_SCALE);
   }
-  int64_t bias() const {
-    return GetField<int64_t>(VT_BIAS, 0);
+  const hipdnn_sdk::data_objects::TensorID *bias() const {
+    return GetStruct<const hipdnn_sdk::data_objects::TensorID *>(VT_BIAS);
   }
-  bool mutate_bias(int64_t _bias = 0) {
-    return SetField<int64_t>(VT_BIAS, _bias, 0);
+  hipdnn_sdk::data_objects::TensorID *mutable_bias() {
+    return GetStruct<hipdnn_sdk::data_objects::TensorID *>(VT_BIAS);
   }
-  int64_t epsilon() const {
-    return GetField<int64_t>(VT_EPSILON, 0);
+  const hipdnn_sdk::data_objects::TensorID *epsilon() const {
+    return GetStruct<const hipdnn_sdk::data_objects::TensorID *>(VT_EPSILON);
   }
-  bool mutate_epsilon(int64_t _epsilon = 0) {
-    return SetField<int64_t>(VT_EPSILON, _epsilon, 0);
+  hipdnn_sdk::data_objects::TensorID *mutable_epsilon() {
+    return GetStruct<hipdnn_sdk::data_objects::TensorID *>(VT_EPSILON);
   }
-  const ::flatbuffers::Vector<int64_t> *peer_stats() const {
-    return GetPointer<const ::flatbuffers::Vector<int64_t> *>(VT_PEER_STATS);
+  const ::flatbuffers::Vector<const hipdnn_sdk::data_objects::TensorID *> *peer_stats() const {
+    return GetPointer<const ::flatbuffers::Vector<const hipdnn_sdk::data_objects::TensorID *> *>(VT_PEER_STATS);
   }
-  ::flatbuffers::Vector<int64_t> *mutable_peer_stats() {
-    return GetPointer<::flatbuffers::Vector<int64_t> *>(VT_PEER_STATS);
+  ::flatbuffers::Vector<const hipdnn_sdk::data_objects::TensorID *> *mutable_peer_stats() {
+    return GetPointer<::flatbuffers::Vector<const hipdnn_sdk::data_objects::TensorID *> *>(VT_PEER_STATS);
   }
-  ::flatbuffers::Optional<int64_t> prev_running_mean() const {
-    return GetOptional<int64_t, int64_t>(VT_PREV_RUNNING_MEAN);
+  const hipdnn_sdk::data_objects::TensorID *prev_running_mean() const {
+    return GetStruct<const hipdnn_sdk::data_objects::TensorID *>(VT_PREV_RUNNING_MEAN);
   }
-  bool mutate_prev_running_mean(int64_t _prev_running_mean) {
-    return SetField<int64_t>(VT_PREV_RUNNING_MEAN, _prev_running_mean);
+  hipdnn_sdk::data_objects::TensorID *mutable_prev_running_mean() {
+    return GetStruct<hipdnn_sdk::data_objects::TensorID *>(VT_PREV_RUNNING_MEAN);
   }
-  ::flatbuffers::Optional<int64_t> prev_running_variance() const {
-    return GetOptional<int64_t, int64_t>(VT_PREV_RUNNING_VARIANCE);
+  const hipdnn_sdk::data_objects::TensorID *prev_running_variance() const {
+    return GetStruct<const hipdnn_sdk::data_objects::TensorID *>(VT_PREV_RUNNING_VARIANCE);
   }
-  bool mutate_prev_running_variance(int64_t _prev_running_variance) {
-    return SetField<int64_t>(VT_PREV_RUNNING_VARIANCE, _prev_running_variance);
+  hipdnn_sdk::data_objects::TensorID *mutable_prev_running_variance() {
+    return GetStruct<hipdnn_sdk::data_objects::TensorID *>(VT_PREV_RUNNING_VARIANCE);
   }
-  ::flatbuffers::Optional<int64_t> momentum() const {
-    return GetOptional<int64_t, int64_t>(VT_MOMENTUM);
+  const hipdnn_sdk::data_objects::TensorID *momentum() const {
+    return GetStruct<const hipdnn_sdk::data_objects::TensorID *>(VT_MOMENTUM);
   }
-  bool mutate_momentum(int64_t _momentum) {
-    return SetField<int64_t>(VT_MOMENTUM, _momentum);
+  hipdnn_sdk::data_objects::TensorID *mutable_momentum() {
+    return GetStruct<hipdnn_sdk::data_objects::TensorID *>(VT_MOMENTUM);
   }
-  int64_t y() const {
-    return GetField<int64_t>(VT_Y, 0);
+  const hipdnn_sdk::data_objects::TensorID *y() const {
+    return GetStruct<const hipdnn_sdk::data_objects::TensorID *>(VT_Y);
   }
-  bool mutate_y(int64_t _y = 0) {
-    return SetField<int64_t>(VT_Y, _y, 0);
+  hipdnn_sdk::data_objects::TensorID *mutable_y() {
+    return GetStruct<hipdnn_sdk::data_objects::TensorID *>(VT_Y);
   }
-  ::flatbuffers::Optional<int64_t> mean() const {
-    return GetOptional<int64_t, int64_t>(VT_MEAN);
+  const hipdnn_sdk::data_objects::TensorID *mean() const {
+    return GetStruct<const hipdnn_sdk::data_objects::TensorID *>(VT_MEAN);
   }
-  bool mutate_mean(int64_t _mean) {
-    return SetField<int64_t>(VT_MEAN, _mean);
+  hipdnn_sdk::data_objects::TensorID *mutable_mean() {
+    return GetStruct<hipdnn_sdk::data_objects::TensorID *>(VT_MEAN);
   }
-  ::flatbuffers::Optional<int64_t> inv_variance() const {
-    return GetOptional<int64_t, int64_t>(VT_INV_VARIANCE);
+  const hipdnn_sdk::data_objects::TensorID *inv_variance() const {
+    return GetStruct<const hipdnn_sdk::data_objects::TensorID *>(VT_INV_VARIANCE);
   }
-  bool mutate_inv_variance(int64_t _inv_variance) {
-    return SetField<int64_t>(VT_INV_VARIANCE, _inv_variance);
+  hipdnn_sdk::data_objects::TensorID *mutable_inv_variance() {
+    return GetStruct<hipdnn_sdk::data_objects::TensorID *>(VT_INV_VARIANCE);
   }
-  ::flatbuffers::Optional<int64_t> next_running_mean() const {
-    return GetOptional<int64_t, int64_t>(VT_NEXT_RUNNING_MEAN);
+  const hipdnn_sdk::data_objects::TensorID *next_running_mean() const {
+    return GetStruct<const hipdnn_sdk::data_objects::TensorID *>(VT_NEXT_RUNNING_MEAN);
   }
-  bool mutate_next_running_mean(int64_t _next_running_mean) {
-    return SetField<int64_t>(VT_NEXT_RUNNING_MEAN, _next_running_mean);
+  hipdnn_sdk::data_objects::TensorID *mutable_next_running_mean() {
+    return GetStruct<hipdnn_sdk::data_objects::TensorID *>(VT_NEXT_RUNNING_MEAN);
   }
-  ::flatbuffers::Optional<int64_t> next_running_variance() const {
-    return GetOptional<int64_t, int64_t>(VT_NEXT_RUNNING_VARIANCE);
+  const hipdnn_sdk::data_objects::TensorID *next_running_variance() const {
+    return GetStruct<const hipdnn_sdk::data_objects::TensorID *>(VT_NEXT_RUNNING_VARIANCE);
   }
-  bool mutate_next_running_variance(int64_t _next_running_variance) {
-    return SetField<int64_t>(VT_NEXT_RUNNING_VARIANCE, _next_running_variance);
+  hipdnn_sdk::data_objects::TensorID *mutable_next_running_variance() {
+    return GetStruct<hipdnn_sdk::data_objects::TensorID *>(VT_NEXT_RUNNING_VARIANCE);
   }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
-           VerifyField<int64_t>(verifier, VT_X, 8) &&
-           VerifyField<int64_t>(verifier, VT_SCALE, 8) &&
-           VerifyField<int64_t>(verifier, VT_BIAS, 8) &&
-           VerifyField<int64_t>(verifier, VT_EPSILON, 8) &&
+           VerifyField<hipdnn_sdk::data_objects::TensorID>(verifier, VT_X, 8) &&
+           VerifyField<hipdnn_sdk::data_objects::TensorID>(verifier, VT_SCALE, 8) &&
+           VerifyField<hipdnn_sdk::data_objects::TensorID>(verifier, VT_BIAS, 8) &&
+           VerifyField<hipdnn_sdk::data_objects::TensorID>(verifier, VT_EPSILON, 8) &&
            VerifyOffset(verifier, VT_PEER_STATS) &&
            verifier.VerifyVector(peer_stats()) &&
-           VerifyField<int64_t>(verifier, VT_PREV_RUNNING_MEAN, 8) &&
-           VerifyField<int64_t>(verifier, VT_PREV_RUNNING_VARIANCE, 8) &&
-           VerifyField<int64_t>(verifier, VT_MOMENTUM, 8) &&
-           VerifyField<int64_t>(verifier, VT_Y, 8) &&
-           VerifyField<int64_t>(verifier, VT_MEAN, 8) &&
-           VerifyField<int64_t>(verifier, VT_INV_VARIANCE, 8) &&
-           VerifyField<int64_t>(verifier, VT_NEXT_RUNNING_MEAN, 8) &&
-           VerifyField<int64_t>(verifier, VT_NEXT_RUNNING_VARIANCE, 8) &&
+           VerifyField<hipdnn_sdk::data_objects::TensorID>(verifier, VT_PREV_RUNNING_MEAN, 8) &&
+           VerifyField<hipdnn_sdk::data_objects::TensorID>(verifier, VT_PREV_RUNNING_VARIANCE, 8) &&
+           VerifyField<hipdnn_sdk::data_objects::TensorID>(verifier, VT_MOMENTUM, 8) &&
+           VerifyField<hipdnn_sdk::data_objects::TensorID>(verifier, VT_Y, 8) &&
+           VerifyField<hipdnn_sdk::data_objects::TensorID>(verifier, VT_MEAN, 8) &&
+           VerifyField<hipdnn_sdk::data_objects::TensorID>(verifier, VT_INV_VARIANCE, 8) &&
+           VerifyField<hipdnn_sdk::data_objects::TensorID>(verifier, VT_NEXT_RUNNING_MEAN, 8) &&
+           VerifyField<hipdnn_sdk::data_objects::TensorID>(verifier, VT_NEXT_RUNNING_VARIANCE, 8) &&
            verifier.EndTable();
   }
   BatchnormAttributesT *UnPack(const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
@@ -163,44 +169,44 @@ struct BatchnormAttributesBuilder {
   typedef BatchnormAttributes Table;
   ::flatbuffers::FlatBufferBuilder &fbb_;
   ::flatbuffers::uoffset_t start_;
-  void add_x(int64_t x) {
-    fbb_.AddElement<int64_t>(BatchnormAttributes::VT_X, x, 0);
+  void add_x(const hipdnn_sdk::data_objects::TensorID *x) {
+    fbb_.AddStruct(BatchnormAttributes::VT_X, x);
   }
-  void add_scale(int64_t scale) {
-    fbb_.AddElement<int64_t>(BatchnormAttributes::VT_SCALE, scale, 0);
+  void add_scale(const hipdnn_sdk::data_objects::TensorID *scale) {
+    fbb_.AddStruct(BatchnormAttributes::VT_SCALE, scale);
   }
-  void add_bias(int64_t bias) {
-    fbb_.AddElement<int64_t>(BatchnormAttributes::VT_BIAS, bias, 0);
+  void add_bias(const hipdnn_sdk::data_objects::TensorID *bias) {
+    fbb_.AddStruct(BatchnormAttributes::VT_BIAS, bias);
   }
-  void add_epsilon(int64_t epsilon) {
-    fbb_.AddElement<int64_t>(BatchnormAttributes::VT_EPSILON, epsilon, 0);
+  void add_epsilon(const hipdnn_sdk::data_objects::TensorID *epsilon) {
+    fbb_.AddStruct(BatchnormAttributes::VT_EPSILON, epsilon);
   }
-  void add_peer_stats(::flatbuffers::Offset<::flatbuffers::Vector<int64_t>> peer_stats) {
+  void add_peer_stats(::flatbuffers::Offset<::flatbuffers::Vector<const hipdnn_sdk::data_objects::TensorID *>> peer_stats) {
     fbb_.AddOffset(BatchnormAttributes::VT_PEER_STATS, peer_stats);
   }
-  void add_prev_running_mean(int64_t prev_running_mean) {
-    fbb_.AddElement<int64_t>(BatchnormAttributes::VT_PREV_RUNNING_MEAN, prev_running_mean);
+  void add_prev_running_mean(const hipdnn_sdk::data_objects::TensorID *prev_running_mean) {
+    fbb_.AddStruct(BatchnormAttributes::VT_PREV_RUNNING_MEAN, prev_running_mean);
   }
-  void add_prev_running_variance(int64_t prev_running_variance) {
-    fbb_.AddElement<int64_t>(BatchnormAttributes::VT_PREV_RUNNING_VARIANCE, prev_running_variance);
+  void add_prev_running_variance(const hipdnn_sdk::data_objects::TensorID *prev_running_variance) {
+    fbb_.AddStruct(BatchnormAttributes::VT_PREV_RUNNING_VARIANCE, prev_running_variance);
   }
-  void add_momentum(int64_t momentum) {
-    fbb_.AddElement<int64_t>(BatchnormAttributes::VT_MOMENTUM, momentum);
+  void add_momentum(const hipdnn_sdk::data_objects::TensorID *momentum) {
+    fbb_.AddStruct(BatchnormAttributes::VT_MOMENTUM, momentum);
   }
-  void add_y(int64_t y) {
-    fbb_.AddElement<int64_t>(BatchnormAttributes::VT_Y, y, 0);
+  void add_y(const hipdnn_sdk::data_objects::TensorID *y) {
+    fbb_.AddStruct(BatchnormAttributes::VT_Y, y);
   }
-  void add_mean(int64_t mean) {
-    fbb_.AddElement<int64_t>(BatchnormAttributes::VT_MEAN, mean);
+  void add_mean(const hipdnn_sdk::data_objects::TensorID *mean) {
+    fbb_.AddStruct(BatchnormAttributes::VT_MEAN, mean);
   }
-  void add_inv_variance(int64_t inv_variance) {
-    fbb_.AddElement<int64_t>(BatchnormAttributes::VT_INV_VARIANCE, inv_variance);
+  void add_inv_variance(const hipdnn_sdk::data_objects::TensorID *inv_variance) {
+    fbb_.AddStruct(BatchnormAttributes::VT_INV_VARIANCE, inv_variance);
   }
-  void add_next_running_mean(int64_t next_running_mean) {
-    fbb_.AddElement<int64_t>(BatchnormAttributes::VT_NEXT_RUNNING_MEAN, next_running_mean);
+  void add_next_running_mean(const hipdnn_sdk::data_objects::TensorID *next_running_mean) {
+    fbb_.AddStruct(BatchnormAttributes::VT_NEXT_RUNNING_MEAN, next_running_mean);
   }
-  void add_next_running_variance(int64_t next_running_variance) {
-    fbb_.AddElement<int64_t>(BatchnormAttributes::VT_NEXT_RUNNING_VARIANCE, next_running_variance);
+  void add_next_running_variance(const hipdnn_sdk::data_objects::TensorID *next_running_variance) {
+    fbb_.AddStruct(BatchnormAttributes::VT_NEXT_RUNNING_VARIANCE, next_running_variance);
   }
   explicit BatchnormAttributesBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
@@ -215,52 +221,52 @@ struct BatchnormAttributesBuilder {
 
 inline ::flatbuffers::Offset<BatchnormAttributes> CreateBatchnormAttributes(
     ::flatbuffers::FlatBufferBuilder &_fbb,
-    int64_t x = 0,
-    int64_t scale = 0,
-    int64_t bias = 0,
-    int64_t epsilon = 0,
-    ::flatbuffers::Offset<::flatbuffers::Vector<int64_t>> peer_stats = 0,
-    ::flatbuffers::Optional<int64_t> prev_running_mean = ::flatbuffers::nullopt,
-    ::flatbuffers::Optional<int64_t> prev_running_variance = ::flatbuffers::nullopt,
-    ::flatbuffers::Optional<int64_t> momentum = ::flatbuffers::nullopt,
-    int64_t y = 0,
-    ::flatbuffers::Optional<int64_t> mean = ::flatbuffers::nullopt,
-    ::flatbuffers::Optional<int64_t> inv_variance = ::flatbuffers::nullopt,
-    ::flatbuffers::Optional<int64_t> next_running_mean = ::flatbuffers::nullopt,
-    ::flatbuffers::Optional<int64_t> next_running_variance = ::flatbuffers::nullopt) {
+    const hipdnn_sdk::data_objects::TensorID *x = nullptr,
+    const hipdnn_sdk::data_objects::TensorID *scale = nullptr,
+    const hipdnn_sdk::data_objects::TensorID *bias = nullptr,
+    const hipdnn_sdk::data_objects::TensorID *epsilon = nullptr,
+    ::flatbuffers::Offset<::flatbuffers::Vector<const hipdnn_sdk::data_objects::TensorID *>> peer_stats = 0,
+    const hipdnn_sdk::data_objects::TensorID *prev_running_mean = nullptr,
+    const hipdnn_sdk::data_objects::TensorID *prev_running_variance = nullptr,
+    const hipdnn_sdk::data_objects::TensorID *momentum = nullptr,
+    const hipdnn_sdk::data_objects::TensorID *y = nullptr,
+    const hipdnn_sdk::data_objects::TensorID *mean = nullptr,
+    const hipdnn_sdk::data_objects::TensorID *inv_variance = nullptr,
+    const hipdnn_sdk::data_objects::TensorID *next_running_mean = nullptr,
+    const hipdnn_sdk::data_objects::TensorID *next_running_variance = nullptr) {
   BatchnormAttributesBuilder builder_(_fbb);
-  if(next_running_variance) { builder_.add_next_running_variance(*next_running_variance); }
-  if(next_running_mean) { builder_.add_next_running_mean(*next_running_mean); }
-  if(inv_variance) { builder_.add_inv_variance(*inv_variance); }
-  if(mean) { builder_.add_mean(*mean); }
+  builder_.add_next_running_variance(next_running_variance);
+  builder_.add_next_running_mean(next_running_mean);
+  builder_.add_inv_variance(inv_variance);
+  builder_.add_mean(mean);
   builder_.add_y(y);
-  if(momentum) { builder_.add_momentum(*momentum); }
-  if(prev_running_variance) { builder_.add_prev_running_variance(*prev_running_variance); }
-  if(prev_running_mean) { builder_.add_prev_running_mean(*prev_running_mean); }
+  builder_.add_momentum(momentum);
+  builder_.add_prev_running_variance(prev_running_variance);
+  builder_.add_prev_running_mean(prev_running_mean);
+  builder_.add_peer_stats(peer_stats);
   builder_.add_epsilon(epsilon);
   builder_.add_bias(bias);
   builder_.add_scale(scale);
   builder_.add_x(x);
-  builder_.add_peer_stats(peer_stats);
   return builder_.Finish();
 }
 
 inline ::flatbuffers::Offset<BatchnormAttributes> CreateBatchnormAttributesDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
-    int64_t x = 0,
-    int64_t scale = 0,
-    int64_t bias = 0,
-    int64_t epsilon = 0,
-    const std::vector<int64_t> *peer_stats = nullptr,
-    ::flatbuffers::Optional<int64_t> prev_running_mean = ::flatbuffers::nullopt,
-    ::flatbuffers::Optional<int64_t> prev_running_variance = ::flatbuffers::nullopt,
-    ::flatbuffers::Optional<int64_t> momentum = ::flatbuffers::nullopt,
-    int64_t y = 0,
-    ::flatbuffers::Optional<int64_t> mean = ::flatbuffers::nullopt,
-    ::flatbuffers::Optional<int64_t> inv_variance = ::flatbuffers::nullopt,
-    ::flatbuffers::Optional<int64_t> next_running_mean = ::flatbuffers::nullopt,
-    ::flatbuffers::Optional<int64_t> next_running_variance = ::flatbuffers::nullopt) {
-  auto peer_stats__ = peer_stats ? _fbb.CreateVector<int64_t>(*peer_stats) : 0;
+    const hipdnn_sdk::data_objects::TensorID *x = nullptr,
+    const hipdnn_sdk::data_objects::TensorID *scale = nullptr,
+    const hipdnn_sdk::data_objects::TensorID *bias = nullptr,
+    const hipdnn_sdk::data_objects::TensorID *epsilon = nullptr,
+    const std::vector<hipdnn_sdk::data_objects::TensorID> *peer_stats = nullptr,
+    const hipdnn_sdk::data_objects::TensorID *prev_running_mean = nullptr,
+    const hipdnn_sdk::data_objects::TensorID *prev_running_variance = nullptr,
+    const hipdnn_sdk::data_objects::TensorID *momentum = nullptr,
+    const hipdnn_sdk::data_objects::TensorID *y = nullptr,
+    const hipdnn_sdk::data_objects::TensorID *mean = nullptr,
+    const hipdnn_sdk::data_objects::TensorID *inv_variance = nullptr,
+    const hipdnn_sdk::data_objects::TensorID *next_running_mean = nullptr,
+    const hipdnn_sdk::data_objects::TensorID *next_running_variance = nullptr) {
+  auto peer_stats__ = peer_stats ? _fbb.CreateVectorOfStructs<hipdnn_sdk::data_objects::TensorID>(*peer_stats) : 0;
   return hipdnn_sdk::data_objects::CreateBatchnormAttributes(
       _fbb,
       x,
@@ -283,25 +289,58 @@ inline ::flatbuffers::Offset<BatchnormAttributes> CreateBatchnormAttributesDirec
 
 inline bool operator==(const BatchnormAttributesT &lhs, const BatchnormAttributesT &rhs) {
   return
-      (lhs.x == rhs.x) &&
-      (lhs.scale == rhs.scale) &&
-      (lhs.bias == rhs.bias) &&
-      (lhs.epsilon == rhs.epsilon) &&
+      ((lhs.x == rhs.x) || (lhs.x && rhs.x && *lhs.x == *rhs.x)) &&
+      ((lhs.scale == rhs.scale) || (lhs.scale && rhs.scale && *lhs.scale == *rhs.scale)) &&
+      ((lhs.bias == rhs.bias) || (lhs.bias && rhs.bias && *lhs.bias == *rhs.bias)) &&
+      ((lhs.epsilon == rhs.epsilon) || (lhs.epsilon && rhs.epsilon && *lhs.epsilon == *rhs.epsilon)) &&
       (lhs.peer_stats == rhs.peer_stats) &&
-      (lhs.prev_running_mean == rhs.prev_running_mean) &&
-      (lhs.prev_running_variance == rhs.prev_running_variance) &&
-      (lhs.momentum == rhs.momentum) &&
-      (lhs.y == rhs.y) &&
-      (lhs.mean == rhs.mean) &&
-      (lhs.inv_variance == rhs.inv_variance) &&
-      (lhs.next_running_mean == rhs.next_running_mean) &&
-      (lhs.next_running_variance == rhs.next_running_variance);
+      ((lhs.prev_running_mean == rhs.prev_running_mean) || (lhs.prev_running_mean && rhs.prev_running_mean && *lhs.prev_running_mean == *rhs.prev_running_mean)) &&
+      ((lhs.prev_running_variance == rhs.prev_running_variance) || (lhs.prev_running_variance && rhs.prev_running_variance && *lhs.prev_running_variance == *rhs.prev_running_variance)) &&
+      ((lhs.momentum == rhs.momentum) || (lhs.momentum && rhs.momentum && *lhs.momentum == *rhs.momentum)) &&
+      ((lhs.y == rhs.y) || (lhs.y && rhs.y && *lhs.y == *rhs.y)) &&
+      ((lhs.mean == rhs.mean) || (lhs.mean && rhs.mean && *lhs.mean == *rhs.mean)) &&
+      ((lhs.inv_variance == rhs.inv_variance) || (lhs.inv_variance && rhs.inv_variance && *lhs.inv_variance == *rhs.inv_variance)) &&
+      ((lhs.next_running_mean == rhs.next_running_mean) || (lhs.next_running_mean && rhs.next_running_mean && *lhs.next_running_mean == *rhs.next_running_mean)) &&
+      ((lhs.next_running_variance == rhs.next_running_variance) || (lhs.next_running_variance && rhs.next_running_variance && *lhs.next_running_variance == *rhs.next_running_variance));
 }
 
 inline bool operator!=(const BatchnormAttributesT &lhs, const BatchnormAttributesT &rhs) {
     return !(lhs == rhs);
 }
 
+
+inline BatchnormAttributesT::BatchnormAttributesT(const BatchnormAttributesT &o)
+      : x((o.x) ? new hipdnn_sdk::data_objects::TensorID(*o.x) : nullptr),
+        scale((o.scale) ? new hipdnn_sdk::data_objects::TensorID(*o.scale) : nullptr),
+        bias((o.bias) ? new hipdnn_sdk::data_objects::TensorID(*o.bias) : nullptr),
+        epsilon((o.epsilon) ? new hipdnn_sdk::data_objects::TensorID(*o.epsilon) : nullptr),
+        peer_stats(o.peer_stats),
+        prev_running_mean((o.prev_running_mean) ? new hipdnn_sdk::data_objects::TensorID(*o.prev_running_mean) : nullptr),
+        prev_running_variance((o.prev_running_variance) ? new hipdnn_sdk::data_objects::TensorID(*o.prev_running_variance) : nullptr),
+        momentum((o.momentum) ? new hipdnn_sdk::data_objects::TensorID(*o.momentum) : nullptr),
+        y((o.y) ? new hipdnn_sdk::data_objects::TensorID(*o.y) : nullptr),
+        mean((o.mean) ? new hipdnn_sdk::data_objects::TensorID(*o.mean) : nullptr),
+        inv_variance((o.inv_variance) ? new hipdnn_sdk::data_objects::TensorID(*o.inv_variance) : nullptr),
+        next_running_mean((o.next_running_mean) ? new hipdnn_sdk::data_objects::TensorID(*o.next_running_mean) : nullptr),
+        next_running_variance((o.next_running_variance) ? new hipdnn_sdk::data_objects::TensorID(*o.next_running_variance) : nullptr) {
+}
+
+inline BatchnormAttributesT &BatchnormAttributesT::operator=(BatchnormAttributesT o) FLATBUFFERS_NOEXCEPT {
+  std::swap(x, o.x);
+  std::swap(scale, o.scale);
+  std::swap(bias, o.bias);
+  std::swap(epsilon, o.epsilon);
+  std::swap(peer_stats, o.peer_stats);
+  std::swap(prev_running_mean, o.prev_running_mean);
+  std::swap(prev_running_variance, o.prev_running_variance);
+  std::swap(momentum, o.momentum);
+  std::swap(y, o.y);
+  std::swap(mean, o.mean);
+  std::swap(inv_variance, o.inv_variance);
+  std::swap(next_running_mean, o.next_running_mean);
+  std::swap(next_running_variance, o.next_running_variance);
+  return *this;
+}
 
 inline BatchnormAttributesT *BatchnormAttributes::UnPack(const ::flatbuffers::resolver_function_t *_resolver) const {
   auto _o = std::unique_ptr<BatchnormAttributesT>(new BatchnormAttributesT());
@@ -312,19 +351,19 @@ inline BatchnormAttributesT *BatchnormAttributes::UnPack(const ::flatbuffers::re
 inline void BatchnormAttributes::UnPackTo(BatchnormAttributesT *_o, const ::flatbuffers::resolver_function_t *_resolver) const {
   (void)_o;
   (void)_resolver;
-  { auto _e = x(); _o->x = _e; }
-  { auto _e = scale(); _o->scale = _e; }
-  { auto _e = bias(); _o->bias = _e; }
-  { auto _e = epsilon(); _o->epsilon = _e; }
-  { auto _e = peer_stats(); if (_e) { _o->peer_stats.resize(_e->size()); for (::flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->peer_stats[_i] = _e->Get(_i); } } else { _o->peer_stats.resize(0); } }
-  { auto _e = prev_running_mean(); _o->prev_running_mean = _e; }
-  { auto _e = prev_running_variance(); _o->prev_running_variance = _e; }
-  { auto _e = momentum(); _o->momentum = _e; }
-  { auto _e = y(); _o->y = _e; }
-  { auto _e = mean(); _o->mean = _e; }
-  { auto _e = inv_variance(); _o->inv_variance = _e; }
-  { auto _e = next_running_mean(); _o->next_running_mean = _e; }
-  { auto _e = next_running_variance(); _o->next_running_variance = _e; }
+  { auto _e = x(); if (_e) _o->x = std::unique_ptr<hipdnn_sdk::data_objects::TensorID>(new hipdnn_sdk::data_objects::TensorID(*_e)); }
+  { auto _e = scale(); if (_e) _o->scale = std::unique_ptr<hipdnn_sdk::data_objects::TensorID>(new hipdnn_sdk::data_objects::TensorID(*_e)); }
+  { auto _e = bias(); if (_e) _o->bias = std::unique_ptr<hipdnn_sdk::data_objects::TensorID>(new hipdnn_sdk::data_objects::TensorID(*_e)); }
+  { auto _e = epsilon(); if (_e) _o->epsilon = std::unique_ptr<hipdnn_sdk::data_objects::TensorID>(new hipdnn_sdk::data_objects::TensorID(*_e)); }
+  { auto _e = peer_stats(); if (_e) { _o->peer_stats.resize(_e->size()); for (::flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->peer_stats[_i] = *_e->Get(_i); } } else { _o->peer_stats.resize(0); } }
+  { auto _e = prev_running_mean(); if (_e) _o->prev_running_mean = std::unique_ptr<hipdnn_sdk::data_objects::TensorID>(new hipdnn_sdk::data_objects::TensorID(*_e)); }
+  { auto _e = prev_running_variance(); if (_e) _o->prev_running_variance = std::unique_ptr<hipdnn_sdk::data_objects::TensorID>(new hipdnn_sdk::data_objects::TensorID(*_e)); }
+  { auto _e = momentum(); if (_e) _o->momentum = std::unique_ptr<hipdnn_sdk::data_objects::TensorID>(new hipdnn_sdk::data_objects::TensorID(*_e)); }
+  { auto _e = y(); if (_e) _o->y = std::unique_ptr<hipdnn_sdk::data_objects::TensorID>(new hipdnn_sdk::data_objects::TensorID(*_e)); }
+  { auto _e = mean(); if (_e) _o->mean = std::unique_ptr<hipdnn_sdk::data_objects::TensorID>(new hipdnn_sdk::data_objects::TensorID(*_e)); }
+  { auto _e = inv_variance(); if (_e) _o->inv_variance = std::unique_ptr<hipdnn_sdk::data_objects::TensorID>(new hipdnn_sdk::data_objects::TensorID(*_e)); }
+  { auto _e = next_running_mean(); if (_e) _o->next_running_mean = std::unique_ptr<hipdnn_sdk::data_objects::TensorID>(new hipdnn_sdk::data_objects::TensorID(*_e)); }
+  { auto _e = next_running_variance(); if (_e) _o->next_running_variance = std::unique_ptr<hipdnn_sdk::data_objects::TensorID>(new hipdnn_sdk::data_objects::TensorID(*_e)); }
 }
 
 inline ::flatbuffers::Offset<BatchnormAttributes> BatchnormAttributes::Pack(::flatbuffers::FlatBufferBuilder &_fbb, const BatchnormAttributesT* _o, const ::flatbuffers::rehasher_function_t *_rehasher) {
@@ -335,19 +374,19 @@ inline ::flatbuffers::Offset<BatchnormAttributes> CreateBatchnormAttributes(::fl
   (void)_rehasher;
   (void)_o;
   struct _VectorArgs { ::flatbuffers::FlatBufferBuilder *__fbb; const BatchnormAttributesT* __o; const ::flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
-  auto _x = _o->x;
-  auto _scale = _o->scale;
-  auto _bias = _o->bias;
-  auto _epsilon = _o->epsilon;
-  auto _peer_stats = _o->peer_stats.size() ? _fbb.CreateVector(_o->peer_stats) : 0;
-  auto _prev_running_mean = _o->prev_running_mean;
-  auto _prev_running_variance = _o->prev_running_variance;
-  auto _momentum = _o->momentum;
-  auto _y = _o->y;
-  auto _mean = _o->mean;
-  auto _inv_variance = _o->inv_variance;
-  auto _next_running_mean = _o->next_running_mean;
-  auto _next_running_variance = _o->next_running_variance;
+  auto _x = _o->x ? _o->x.get() : nullptr;
+  auto _scale = _o->scale ? _o->scale.get() : nullptr;
+  auto _bias = _o->bias ? _o->bias.get() : nullptr;
+  auto _epsilon = _o->epsilon ? _o->epsilon.get() : nullptr;
+  auto _peer_stats = _o->peer_stats.size() ? _fbb.CreateVectorOfStructs(_o->peer_stats) : 0;
+  auto _prev_running_mean = _o->prev_running_mean ? _o->prev_running_mean.get() : nullptr;
+  auto _prev_running_variance = _o->prev_running_variance ? _o->prev_running_variance.get() : nullptr;
+  auto _momentum = _o->momentum ? _o->momentum.get() : nullptr;
+  auto _y = _o->y ? _o->y.get() : nullptr;
+  auto _mean = _o->mean ? _o->mean.get() : nullptr;
+  auto _inv_variance = _o->inv_variance ? _o->inv_variance.get() : nullptr;
+  auto _next_running_mean = _o->next_running_mean ? _o->next_running_mean.get() : nullptr;
+  auto _next_running_variance = _o->next_running_variance ? _o->next_running_variance.get() : nullptr;
   return hipdnn_sdk::data_objects::CreateBatchnormAttributes(
       _fbb,
       _x,

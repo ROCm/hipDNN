@@ -284,7 +284,7 @@ void extract_tensor_info_from_graph(
     // Extract all tensor information from the deserialized graph
     for(const auto& tensor : deserialized_graph->tensors)
     {
-        int64_t uid = tensor->uid;
+        int64_t uid = tensor->id->value();
         std::string name = tensor->name;
 
         uid_to_name_map[uid] = name;

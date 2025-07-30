@@ -118,7 +118,7 @@ TEST(TensorAttributesTests, PackAttributes)
     auto unpacked = std::unique_ptr<hipdnn_sdk::data_objects::TensorAttributesT>(
         tensor_attributes_flatbuffer->UnPack());
 
-    EXPECT_EQ(unpacked->uid, 1);
+    EXPECT_EQ(unpacked->id->value(), 1);
     EXPECT_EQ(unpacked->name, "PackedTensor");
     EXPECT_EQ(unpacked->data_type, hipdnn_sdk::data_objects::DataType_FLOAT);
     EXPECT_EQ(unpacked->strides, std::vector<int64_t>({1, 2, 3}));

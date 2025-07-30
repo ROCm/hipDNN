@@ -50,7 +50,7 @@ TEST(TensorValueAttributesTests, PackUnpackFloat)
     auto buffer_pointer = builder.GetBufferPointer();
     auto fb_tensor = flatbuffers::GetRoot<TensorAttributes>(buffer_pointer);
 
-    EXPECT_EQ(fb_tensor->uid(), 7);
+    EXPECT_EQ(fb_tensor->id()->value(), 7);
     EXPECT_STREQ(fb_tensor->name()->c_str(), "value_tensor");
     EXPECT_EQ(fb_tensor->data_type(), DataType_FLOAT);
     EXPECT_EQ(fb_tensor->strides()->size(), 2u);
@@ -63,7 +63,7 @@ TEST(TensorValueAttributesTests, PackUnpackFloat)
     EXPECT_FLOAT_EQ(fval->value(), std::numbers::e_v<float>);
 
     auto unpacked = std::unique_ptr<TensorAttributesT>(fb_tensor->UnPack());
-    EXPECT_EQ(unpacked->uid, 7);
+    EXPECT_EQ(unpacked->id->value(), 7);
     EXPECT_EQ(unpacked->name, "value_tensor");
     EXPECT_EQ(unpacked->data_type, DataType_FLOAT);
 

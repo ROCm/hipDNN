@@ -13,6 +13,11 @@ namespace flatbuffer_test_utils
 
 using namespace hipdnn_sdk::data_objects;
 
+
+inline std::unique_ptr<hipdnn_sdk::data_objects::TensorID> make_tensor_id(int64_t value){ 
+        return std::make_unique<hipdnn_sdk::data_objects::TensorID>(value);
+}
+
 inline flatbuffers::FlatBufferBuilder create_empty_valid_graph()
 {
     std::vector<::flatbuffers::Offset<hipdnn_sdk::data_objects::TensorAttributes>>
@@ -40,24 +45,24 @@ inline flatbuffers::FlatBufferBuilder
         tensor_attributes;
 
     tensor_attributes.push_back(hipdnn_sdk::data_objects::CreateTensorAttributesDirect(
-        builder, 1, "x", hipdnn_sdk::data_objects::DataType_FLOAT, &strides, &dims));
+        builder, make_tensor_id(1).get(), "x", hipdnn_sdk::data_objects::DataType_FLOAT, &strides, &dims));
 
     tensor_attributes.push_back(hipdnn_sdk::data_objects::CreateTensorAttributesDirect(
-        builder, 2, "y", hipdnn_sdk::data_objects::DataType_FLOAT, &strides, &dims));
+        builder, make_tensor_id(2).get(), "y", hipdnn_sdk::data_objects::DataType_FLOAT, &strides, &dims));
 
     tensor_attributes.push_back(hipdnn_sdk::data_objects::CreateTensorAttributesDirect(
-        builder, 3, "scale", hipdnn_sdk::data_objects::DataType_FLOAT, &strides, &dims));
+        builder, make_tensor_id(3).get(), "scale", hipdnn_sdk::data_objects::DataType_FLOAT, &strides, &dims));
 
     tensor_attributes.push_back(hipdnn_sdk::data_objects::CreateTensorAttributesDirect(
-        builder, 4, "bias", hipdnn_sdk::data_objects::DataType_FLOAT, &strides, &dims));
+        builder, make_tensor_id(4).get(), "bias", hipdnn_sdk::data_objects::DataType_FLOAT, &strides, &dims));
 
     if(has_optional_attributes)
     {
         tensor_attributes.push_back(hipdnn_sdk::data_objects::CreateTensorAttributesDirect(
-            builder, 5, "est_mean", hipdnn_sdk::data_objects::DataType_FLOAT, &strides, &dims));
+            builder, make_tensor_id(5).get(), "est_mean", hipdnn_sdk::data_objects::DataType_FLOAT, &strides, &dims));
 
         tensor_attributes.push_back(hipdnn_sdk::data_objects::CreateTensorAttributesDirect(
-            builder, 6, "est_variance", hipdnn_sdk::data_objects::DataType_FLOAT, &strides, &dims));
+            builder, make_tensor_id(6).get(), "est_variance", hipdnn_sdk::data_objects::DataType_FLOAT, &strides, &dims));
     }
 
     auto bnorm_attributes = hipdnn_sdk::data_objects::CreateBatchnormInferenceAttributes(

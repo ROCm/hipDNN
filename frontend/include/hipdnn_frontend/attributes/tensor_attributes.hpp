@@ -58,7 +58,12 @@ public:
 
     int64_t get_uid() const
     {
-        return _uid;
+        return _id.value();
+    }
+
+    const hipdnn_sdk::data_objects::TensorID& get_id() const
+    {
+        return _id;
     }
 
     const std::string& get_name() const
@@ -98,13 +103,13 @@ public:
 
     bool has_uid() const
     {
-        return _uid_set;
+        return _id_set;
     }
 
     Tensor_attributes& set_uid(int64_t uid)
     {
-        _uid = uid;
-        _uid_set = true;
+        _id = uid;
+        _id_set = true;
         return *this;
     }
 
@@ -145,8 +150,8 @@ public:
 
     Tensor_attributes& clear_uid()
     {
-        _uid = 0;
-        _uid_set = false;
+        _id = 0;
+        _id_set = false;
         return *this;
     }
 
@@ -213,7 +218,7 @@ public:
             _value);
 
         return hipdnn_sdk::data_objects::CreateTensorAttributesDirect(builder,
-                                                                      _uid,
+                                                                      &_id,
                                                                       _name.c_str(),
                                                                       to_sdk_type(_data_type),
                                                                       &_stride,
@@ -224,8 +229,8 @@ public:
     }
 
 private:
-    int64_t _uid = 0;
-    bool _uid_set = false;
+    hipdnn_sdk::data_objects::TensorID _id;
+    bool _id_set = false;   // TODO: Can this be an optional instead?
     std::string _name;
     DataType_t _data_type = DataType_t::NOT_SET;
     std::vector<int64_t> _stride;

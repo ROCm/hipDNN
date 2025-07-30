@@ -36,6 +36,7 @@ public:
         next_running_variance = 4
     };
 
+    // TODO: This can just be an array, right?
     std::unordered_map<input_names, std::shared_ptr<Tensor_attributes>> inputs;
     std::unordered_map<output_names, std::shared_ptr<Tensor_attributes>> outputs;
     std::vector<std::shared_ptr<Tensor_attributes>> peer_stats;
@@ -159,12 +160,12 @@ public:
     flatbuffers::Offset<hipdnn_sdk::data_objects::BatchnormAttributes>
         pack_attributes(flatbuffers::FlatBufferBuilder& builder) const
     {
-        auto peer_stats_vector = std::vector<int64_t>{};
+        auto peer_stats_vector = std::vector<hipdnn_sdk::data_objects::TensorID>{};
         for(const auto& peer_stat : peer_stats)
         {
             if(peer_stat)
             {
-                peer_stats_vector.emplace_back(peer_stat->get_uid());
+                peer_stats_vector.emplace_back(peer_stat->get_id());
             }
         }
 
@@ -178,24 +179,19 @@ public:
 
         return hipdnn_sdk::data_objects::CreateBatchnormAttributesDirect(
             builder,
-            get_x()->get_uid(),
-            get_scale()->get_uid(),
-            get_bias()->get_uid(),
-            get_epsilon()->get_uid(),
+            &get_x()->get_id(),
+            &get_scale()->get_id(),
+            &get_bias()->get_id(),
+            &get_epsilon()->get_id(),
             &peer_stats_vector,
-            prev_running_mean ? flatbuffers::Optional<int64_t>(prev_running_mean->get_uid())
-                              : flatbuffers::nullopt,
-            prev_running_variance ? flatbuffers::Optional<int64_t>(prev_running_variance->get_uid())
-                                  : flatbuffers::nullopt,
-            momentum ? flatbuffers::Optional<int64_t>(momentum->get_uid()) : flatbuffers::nullopt,
-            get_y()->get_uid(),
-            mean ? flatbuffers::Optional<int64_t>(mean->get_uid()) : flatbuffers::nullopt,
-            inv_variance ? flatbuffers::Optional<int64_t>(inv_variance->get_uid())
-                         : flatbuffers::nullopt,
-            next_running_mean ? flatbuffers::Optional<int64_t>(next_running_mean->get_uid())
-                              : flatbuffers::nullopt,
-            next_running_variance ? flatbuffers::Optional<int64_t>(next_running_variance->get_uid())
-                                  : flatbuffers::nullopt);
+            &prev_running_mean->get_id(),
+            &prev_running_variance->get_id(),
+            &momentum->get_id(),
+            &get_y()->get_id(),
+            &mean->get_id(),
+            &inv_variance->get_id(),
+            &next_running_mean->get_id(),
+            &next_running_variance->get_id());
     }
 
 private:

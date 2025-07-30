@@ -283,22 +283,22 @@ TEST(BatchnormAttributesTests, PackAttributes)
     auto batchnorm_attributes_fb
         = flatbuffers::GetRoot<hipdnn_sdk::data_objects::BatchnormAttributes>(buffer);
 
-    EXPECT_EQ(batchnorm_attributes_fb->x(), 1);
-    EXPECT_EQ(batchnorm_attributes_fb->y(), 2);
-    EXPECT_EQ(batchnorm_attributes_fb->scale(), 3);
-    EXPECT_EQ(batchnorm_attributes_fb->bias(), 4);
-    EXPECT_EQ(batchnorm_attributes_fb->prev_running_mean(), 5);
-    EXPECT_EQ(batchnorm_attributes_fb->prev_running_variance(), 6);
-    EXPECT_EQ(batchnorm_attributes_fb->momentum(), 7);
-    EXPECT_EQ(batchnorm_attributes_fb->mean(), 8);
-    EXPECT_EQ(batchnorm_attributes_fb->inv_variance(), 9);
-    EXPECT_EQ(batchnorm_attributes_fb->next_running_mean(), 10);
-    EXPECT_EQ(batchnorm_attributes_fb->next_running_variance(), 11);
-    EXPECT_EQ(batchnorm_attributes_fb->epsilon(), 14);
+    EXPECT_EQ(batchnorm_attributes_fb->x()->value(), 1);
+    EXPECT_EQ(batchnorm_attributes_fb->y()->value(), 2);
+    EXPECT_EQ(batchnorm_attributes_fb->scale()->value(), 3);
+    EXPECT_EQ(batchnorm_attributes_fb->bias()->value(), 4);
+    EXPECT_EQ(batchnorm_attributes_fb->prev_running_mean()->value(), 5);
+    EXPECT_EQ(batchnorm_attributes_fb->prev_running_variance()->value(), 6);
+    EXPECT_EQ(batchnorm_attributes_fb->momentum()->value(), 7);
+    EXPECT_EQ(batchnorm_attributes_fb->mean()->value(), 8);
+    EXPECT_EQ(batchnorm_attributes_fb->inv_variance()->value(), 9);
+    EXPECT_EQ(batchnorm_attributes_fb->next_running_mean()->value(), 10);
+    EXPECT_EQ(batchnorm_attributes_fb->next_running_variance()->value(), 11);
+    EXPECT_EQ(batchnorm_attributes_fb->epsilon()->value(), 14);
 
     ASSERT_EQ(batchnorm_attributes_fb->peer_stats()->size(), 2);
-    EXPECT_EQ(batchnorm_attributes_fb->peer_stats()->Get(0), 12);
-    EXPECT_EQ(batchnorm_attributes_fb->peer_stats()->Get(1), 13);
+    EXPECT_EQ(batchnorm_attributes_fb->peer_stats()->Get(0)->value(), 12);
+    EXPECT_EQ(batchnorm_attributes_fb->peer_stats()->Get(1)->value(), 13);
 }
 
 TEST(BatchnormAttributesTests, PackAttributesWithoutOptionalValues)
@@ -333,19 +333,19 @@ TEST(BatchnormAttributesTests, PackAttributesWithoutOptionalValues)
     auto batchnorm_attributes_fb
         = flatbuffers::GetRoot<hipdnn_sdk::data_objects::BatchnormAttributes>(buffer);
 
-    EXPECT_EQ(batchnorm_attributes_fb->x(), 1);
-    EXPECT_EQ(batchnorm_attributes_fb->y(), 2);
-    EXPECT_EQ(batchnorm_attributes_fb->scale(), 3);
-    EXPECT_EQ(batchnorm_attributes_fb->bias(), 4);
-    EXPECT_EQ(batchnorm_attributes_fb->epsilon(), 5);
+    EXPECT_EQ(batchnorm_attributes_fb->x()->value(), 1);
+    EXPECT_EQ(batchnorm_attributes_fb->y()->value(), 2);
+    EXPECT_EQ(batchnorm_attributes_fb->scale()->value(), 3);
+    EXPECT_EQ(batchnorm_attributes_fb->bias()->value(), 4);
+    EXPECT_EQ(batchnorm_attributes_fb->epsilon()->value(), 5);
 
-    EXPECT_EQ(batchnorm_attributes_fb->prev_running_mean(), flatbuffers::nullopt);
-    EXPECT_EQ(batchnorm_attributes_fb->prev_running_variance(), flatbuffers::nullopt);
-    EXPECT_EQ(batchnorm_attributes_fb->momentum(), flatbuffers::nullopt);
-    EXPECT_EQ(batchnorm_attributes_fb->mean(), flatbuffers::nullopt);
-    EXPECT_EQ(batchnorm_attributes_fb->inv_variance(), flatbuffers::nullopt);
-    EXPECT_EQ(batchnorm_attributes_fb->next_running_mean(), flatbuffers::nullopt);
-    EXPECT_EQ(batchnorm_attributes_fb->next_running_variance(), flatbuffers::nullopt);
+    EXPECT_EQ(batchnorm_attributes_fb->prev_running_mean(), nullptr);
+    EXPECT_EQ(batchnorm_attributes_fb->prev_running_variance(), nullptr);
+    EXPECT_EQ(batchnorm_attributes_fb->momentum(), nullptr);
+    EXPECT_EQ(batchnorm_attributes_fb->mean(), nullptr);
+    EXPECT_EQ(batchnorm_attributes_fb->inv_variance(), nullptr);
+    EXPECT_EQ(batchnorm_attributes_fb->next_running_mean(), nullptr);
+    EXPECT_EQ(batchnorm_attributes_fb->next_running_variance(), nullptr);
 
     ASSERT_EQ(batchnorm_attributes_fb->peer_stats()->size(), 0);
 }

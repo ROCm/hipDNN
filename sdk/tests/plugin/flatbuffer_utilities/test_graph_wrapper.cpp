@@ -95,6 +95,7 @@ TEST(Graph_wrapperTest, GetTensorMapEmptyGraph)
 
 TEST(Graph_wrapperTest, GetTensorMapReturnsCorrectTensors)
 {
+    using flatbuffer_test_utils::make_tensor_id;
     flatbuffers::FlatBufferBuilder builder;
     std::vector<::flatbuffers::Offset<hipdnn_sdk::data_objects::Node>> nodes;
 
@@ -103,9 +104,9 @@ TEST(Graph_wrapperTest, GetTensorMapReturnsCorrectTensors)
     std::vector<::flatbuffers::Offset<hipdnn_sdk::data_objects::TensorAttributes>>
         tensor_attributes;
     tensor_attributes.push_back(hipdnn_sdk::data_objects::CreateTensorAttributesDirect(
-        builder, 1, "x", hipdnn_sdk::data_objects::DataType_FLOAT, &strides, &dims));
+        builder, make_tensor_id(1).get(), "x", hipdnn_sdk::data_objects::DataType_FLOAT, &strides, &dims));
     tensor_attributes.push_back(hipdnn_sdk::data_objects::CreateTensorAttributesDirect(
-        builder, 2, "y", hipdnn_sdk::data_objects::DataType_FLOAT, &strides, &dims));
+        builder, make_tensor_id(2).get(), "y", hipdnn_sdk::data_objects::DataType_FLOAT, &strides, &dims));
 
     auto graph = hipdnn_sdk::data_objects::CreateGraphDirect(builder,
                                                              "test",
@@ -124,6 +125,6 @@ TEST(Graph_wrapperTest, GetTensorMapReturnsCorrectTensors)
     EXPECT_EQ(tensor_map.size(), 2);
     EXPECT_NE(tensor_map.find(1), tensor_map.end());
     EXPECT_NE(tensor_map.find(2), tensor_map.end());
-    EXPECT_EQ(tensor_map.at(1)->uid(), 1);
-    EXPECT_EQ(tensor_map.at(2)->uid(), 2);
+    EXPECT_EQ(tensor_map.at(1)->id()->value(), 1);
+    EXPECT_EQ(tensor_map.at(2)->id()->value(), 2);
 }

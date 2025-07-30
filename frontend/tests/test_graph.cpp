@@ -255,7 +255,7 @@ static void validate_tensor(const Tensor_attributes& tensor,
                             const hipdnn_sdk::data_objects::TensorAttributesT& serialized_tensor)
 {
     EXPECT_EQ(tensor.get_name(), serialized_tensor.name);
-    EXPECT_EQ(tensor.get_uid(), serialized_tensor.uid);
+    EXPECT_EQ(tensor.get_uid(), serialized_tensor.id->value());
     EXPECT_EQ(to_sdk_type(tensor.get_data_type()), serialized_tensor.data_type);
     EXPECT_EQ(tensor.get_dim(), serialized_tensor.dims);
     EXPECT_EQ(tensor.get_stride(), serialized_tensor.strides);
@@ -314,7 +314,7 @@ TEST_F(Graph_test_fixture, BuildAndSerializeBatchnormInferenceGraph)
     std::unordered_map<int64_t, hipdnn_sdk::data_objects::TensorAttributesT> tensor_lookup;
     for(auto& tensor : deserialized_graph->tensors)
     {
-        tensor_lookup[tensor->uid] = *tensor;
+        tensor_lookup[tensor->id->value()] = *tensor;
     }
 
     validate_tensor(*x, tensor_lookup[x->get_uid()]);
@@ -402,7 +402,7 @@ TEST_F(Graph_test_fixture, BuildAndSerializeBatchnormGraph)
     std::unordered_map<int64_t, hipdnn_sdk::data_objects::TensorAttributesT> tensor_lookup;
     for(auto& tensor : deserialized_graph->tensors)
     {
-        tensor_lookup[tensor->uid] = *tensor;
+        tensor_lookup[tensor->id->value()] = *tensor;
     }
 
     validate_tensor(*x, tensor_lookup[x->get_uid()]);
@@ -423,19 +423,19 @@ TEST_F(Graph_test_fixture, BuildAndSerializeBatchnormGraph)
               hipdnn_sdk::data_objects::NodeAttributes::NodeAttributes_BatchnormAttributes);
     auto deserialized_batchnorm_attributes
         = deserialized_graph->nodes[0]->attributes.AsBatchnormAttributes();
-    EXPECT_EQ(deserialized_batchnorm_attributes->x, x->get_uid());
-    EXPECT_EQ(deserialized_batchnorm_attributes->scale, scale->get_uid());
-    EXPECT_EQ(deserialized_batchnorm_attributes->bias, bias->get_uid());
-    EXPECT_EQ(deserialized_batchnorm_attributes->epsilon, epsilon->get_uid());
-    EXPECT_EQ(deserialized_batchnorm_attributes->prev_running_mean, prev_running_mean->get_uid());
-    EXPECT_EQ(deserialized_batchnorm_attributes->prev_running_variance,
+    EXPECT_EQ(deserialized_batchnorm_attributes->x->value(), x->get_uid());
+    EXPECT_EQ(deserialized_batchnorm_attributes->scale->value(), scale->get_uid());
+    EXPECT_EQ(deserialized_batchnorm_attributes->bias->value(), bias->get_uid());
+    EXPECT_EQ(deserialized_batchnorm_attributes->epsilon->value(), epsilon->get_uid());
+    EXPECT_EQ(deserialized_batchnorm_attributes->prev_running_mean->value(), prev_running_mean->get_uid());
+    EXPECT_EQ(deserialized_batchnorm_attributes->prev_running_variance->value(),
               prev_running_variance->get_uid());
-    EXPECT_EQ(deserialized_batchnorm_attributes->momentum, momentum->get_uid());
-    EXPECT_EQ(deserialized_batchnorm_attributes->y, y->get_uid());
-    EXPECT_EQ(deserialized_batchnorm_attributes->mean, mean->get_uid());
-    EXPECT_EQ(deserialized_batchnorm_attributes->inv_variance, inv_variance->get_uid());
-    EXPECT_EQ(deserialized_batchnorm_attributes->next_running_mean, next_running_mean->get_uid());
-    EXPECT_EQ(deserialized_batchnorm_attributes->next_running_variance,
+    EXPECT_EQ(deserialized_batchnorm_attributes->momentum->value(), momentum->get_uid());
+    EXPECT_EQ(deserialized_batchnorm_attributes->y->value(), y->get_uid());
+    EXPECT_EQ(deserialized_batchnorm_attributes->mean->value(), mean->get_uid());
+    EXPECT_EQ(deserialized_batchnorm_attributes->inv_variance->value(), inv_variance->get_uid());
+    EXPECT_EQ(deserialized_batchnorm_attributes->next_running_mean->value(), next_running_mean->get_uid());
+    EXPECT_EQ(deserialized_batchnorm_attributes->next_running_variance->value(),
               next_running_variance->get_uid());
 }
 
@@ -509,7 +509,7 @@ TEST_F(Graph_test_fixture, BuildAndSerializeBatchnormAndPointwiseGraph)
     std::unordered_map<int64_t, hipdnn_sdk::data_objects::TensorAttributesT> tensor_lookup;
     for(auto& tensor : deserialized_graph->tensors)
     {
-        tensor_lookup[tensor->uid] = *tensor;
+        tensor_lookup[tensor->id->value()] = *tensor;
     }
 
     validate_tensor(*x, tensor_lookup[x->get_uid()]);
@@ -531,19 +531,19 @@ TEST_F(Graph_test_fixture, BuildAndSerializeBatchnormAndPointwiseGraph)
               hipdnn_sdk::data_objects::NodeAttributes::NodeAttributes_BatchnormAttributes);
     auto deserialized_batchnorm_attributes
         = deserialized_graph->nodes[0]->attributes.AsBatchnormAttributes();
-    EXPECT_EQ(deserialized_batchnorm_attributes->x, x->get_uid());
-    EXPECT_EQ(deserialized_batchnorm_attributes->scale, scale->get_uid());
-    EXPECT_EQ(deserialized_batchnorm_attributes->bias, bias->get_uid());
-    EXPECT_EQ(deserialized_batchnorm_attributes->epsilon, epsilon->get_uid());
-    EXPECT_EQ(deserialized_batchnorm_attributes->prev_running_mean, prev_running_mean->get_uid());
-    EXPECT_EQ(deserialized_batchnorm_attributes->prev_running_variance,
+    EXPECT_EQ(deserialized_batchnorm_attributes->x->value(), x->get_uid());
+    EXPECT_EQ(deserialized_batchnorm_attributes->scale->value(), scale->get_uid());
+    EXPECT_EQ(deserialized_batchnorm_attributes->bias->value(), bias->get_uid());
+    EXPECT_EQ(deserialized_batchnorm_attributes->epsilon->value(), epsilon->get_uid());
+    EXPECT_EQ(deserialized_batchnorm_attributes->prev_running_mean->value(), prev_running_mean->get_uid());
+    EXPECT_EQ(deserialized_batchnorm_attributes->prev_running_variance->value(),
               prev_running_variance->get_uid());
-    EXPECT_EQ(deserialized_batchnorm_attributes->momentum, momentum->get_uid());
-    EXPECT_EQ(deserialized_batchnorm_attributes->y, y->get_uid());
-    EXPECT_EQ(deserialized_batchnorm_attributes->mean, mean->get_uid());
-    EXPECT_EQ(deserialized_batchnorm_attributes->inv_variance, inv_variance->get_uid());
-    EXPECT_EQ(deserialized_batchnorm_attributes->next_running_mean, next_running_mean->get_uid());
-    EXPECT_EQ(deserialized_batchnorm_attributes->next_running_variance,
+    EXPECT_EQ(deserialized_batchnorm_attributes->momentum->value(), momentum->get_uid());
+    EXPECT_EQ(deserialized_batchnorm_attributes->y->value(), y->get_uid());
+    EXPECT_EQ(deserialized_batchnorm_attributes->mean->value(), mean->get_uid());
+    EXPECT_EQ(deserialized_batchnorm_attributes->inv_variance->value(), inv_variance->get_uid());
+    EXPECT_EQ(deserialized_batchnorm_attributes->next_running_mean->value(), next_running_mean->get_uid());
+    EXPECT_EQ(deserialized_batchnorm_attributes->next_running_variance->value(),
               next_running_variance->get_uid());
 
     EXPECT_EQ(deserialized_graph->nodes[1]->name, "PointwiseNode");
@@ -598,7 +598,7 @@ TEST_F(Graph_test_fixture, BuildAndSerializePointwiseGraph)
     std::unordered_map<int64_t, hipdnn_sdk::data_objects::TensorAttributesT> tensor_lookup;
     for(auto& tensor : deserialized_graph->tensors)
     {
-        tensor_lookup[tensor->uid] = *tensor;
+        tensor_lookup[tensor->id->value()] = *tensor;
     }
 
     validate_tensor(*in_0, tensor_lookup[in_0->get_uid()]);
@@ -673,7 +673,7 @@ TEST_F(Graph_test_fixture, BuildAndSerializePointwiseAndBatchnormInferenceGraph)
     std::unordered_map<int64_t, hipdnn_sdk::data_objects::TensorAttributesT> tensor_lookup;
     for(auto& tensor : deserialized_graph->tensors)
     {
-        tensor_lookup[tensor->uid] = *tensor;
+        tensor_lookup[tensor->id->value()] = *tensor;
     }
 
     validate_tensor(*x, tensor_lookup[x->get_uid()]);
@@ -765,7 +765,7 @@ TEST_F(Graph_test_fixture, BuildAndSerializeBatchnormBackwardGraph)
     std::unordered_map<int64_t, hipdnn_sdk::data_objects::TensorAttributesT> tensor_lookup;
     for(auto& tensor : deserialized_graph->tensors)
     {
-        tensor_lookup[tensor->uid] = *tensor;
+        tensor_lookup[tensor->id->value()] = *tensor;
     }
 
     validate_tensor(*dy, tensor_lookup[dy->get_uid()]);
@@ -855,7 +855,7 @@ TEST_F(Graph_test_fixture, BuildAndSerializePointwiseAndBatchnormBackwardGraph)
     std::unordered_map<int64_t, hipdnn_sdk::data_objects::TensorAttributesT> tensor_lookup;
     for(auto& tensor : deserialized_graph->tensors)
     {
-        tensor_lookup[tensor->uid] = *tensor;
+        tensor_lookup[tensor->id->value()] = *tensor;
     }
 
     validate_tensor(*x_pointwise, tensor_lookup[x_pointwise->get_uid()]);
