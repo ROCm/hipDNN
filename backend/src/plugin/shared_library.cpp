@@ -156,14 +156,7 @@ void Shared_library::load(const std::filesystem::path& library_path)
 #endif
     }
 
-    // If the path is relative, resolve it relative to the current module's location to avoid using unsafe relative paths
-    if(modified_library_path.is_relative())
-    {
-        modified_library_path = get_current_module_directory() / modified_library_path;
-    }
-
-    modified_library_path = std::filesystem::weakly_canonical(modified_library_path);
-
+    // The plugin manager is responsible for resolving paths, including with the get_current_module_directory function. It should be a fully resolved path at this point.
     if(!std::filesystem::exists(modified_library_path))
     {
         throw Hipdnn_exception(HIPDNN_STATUS_PLUGIN_ERROR,

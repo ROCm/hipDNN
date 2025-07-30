@@ -117,7 +117,7 @@ protected:
             HIPDNN_LOG_WARN(
                 "Failed to resolve module directory, will use unresolved default paths: {}",
                 e.get_message());
-            // Fallback to using original, unresolved paths
+            // Fallback to using original, unresolved paths. TODO: possibly remove.
             return _default_plugin_paths;
         }
 
@@ -157,16 +157,30 @@ public:
         if(mode == HIPDNN_PLUGIN_LOADING_ABSOLUTE)
         {
             clear_plugins();
-            load_paths(custom_paths);
         }
-        else
-        {
-            load_paths(custom_paths);
 
+        for(const auto& path : custom_paths)
+        {
+            try
+            {
+                auto resolved_path = std::filesystem::weakly_canonical(path);
+                load_from_resolved_path(resolved_path);
+            }
+            catch(const std::filesystem::filesystem_error& e)
+            {
+                HIPDNN_LOG_WARN(
+                    "Error resolving custom plugin path '{}': {}", path.string(), e.what());
+            }
+        }
+
+        if(mode == HIPDNN_PLUGIN_LOADING_ADDITIVE)
+        {
+            // Default paths are resolved relative to the shared libary path
             auto default_paths = resolve_default_paths();
             for(const auto& path : default_paths)
             {
-                if(std::filesystem::exists(path))
+                // Expect default paths to be directories
+                if(std::filesystem::is_directory(path))
                 {
                     scan_directory_for_plugins(path);
                 }
@@ -186,17 +200,9 @@ private:
         _loaded_plugin_files.clear();
     }
 
-    void load_paths(const std::vector<std::filesystem::path>& paths)
+    void load_from_resolved_path(const std::filesystem::path& path)
     {
-        for(const auto& path : paths)
-        {
-            try_load_plugin_path(path);
-        }
-    }
-
-    void try_load_plugin_path(const std::filesystem::path& path)
-    {
-        HIPDNN_LOG_INFO("Plugin manager: Trying to load plugin path: {}", path.string());
+        HIPDNN_LOG_INFO("Plugin manager: Trying to load from resolved path: {}", path.string());
         try
         {
             if(std::filesystem::is_directory(path))
