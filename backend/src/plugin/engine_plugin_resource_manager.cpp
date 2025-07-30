@@ -2,11 +2,10 @@
 // SPDX-License-Identifier:  MIT
 
 #include <algorithm>
-#include <mutex>
-#include <vector>
-
 #include <hipdnn_sdk/data_objects/engine_config_generated.h>
 #include <hipdnn_sdk/data_objects/engine_details_generated.h>
+#include <mutex>
+#include <vector>
 
 #include "descriptors/engine_config_descriptor.hpp"
 #include "descriptors/engine_descriptor.hpp"
@@ -25,6 +24,11 @@ namespace plugin
 
 class Engine_plugin_manager : public Plugin_manager_base<Engine_plugin>
 {
+public:
+    Engine_plugin_manager()
+        : Plugin_manager_base<Engine_plugin>({"hipdnn_plugins/engines/"})
+    {
+    }
 };
 
 namespace
@@ -40,11 +44,6 @@ std::mutex plugin_mutex;
 Plugin_loading_config plugin_config;
 std::weak_ptr<Engine_plugin_manager> pm_ptr;
 
-std::vector<std::filesystem::path> get_default_plugin_paths()
-{
-    return {"/opt/rocm/lib/hipdnn_plugins/engine/"};
-}
-
 } // namespace
 
 void Engine_plugin_resource_manager::set_plugin_paths(
@@ -58,31 +57,12 @@ void Engine_plugin_resource_manager::set_plugin_paths(
                    "hipdnnSetEnginePluginPaths_ext cannot be called with an active handle.");
 
     plugin_config.mode = loading_mode;
-
-    if(plugin_config.mode == HIPDNN_PLUGIN_LOADING_ABSOLUTE)
-    {
-        plugin_config.paths = plugin_paths;
-        return;
-    }
     plugin_config.paths.insert(plugin_config.paths.end(), plugin_paths.begin(), plugin_paths.end());
-
-    for(const auto& path : get_default_plugin_paths())
-    {
-        if(std::ranges::find(plugin_config.paths, path) == plugin_config.paths.end()
-           || plugin_config.mode == HIPDNN_PLUGIN_LOADING_ADDITIVE)
-        {
-            plugin_config.paths.push_back(path);
-        }
-    }
 }
 
 std::vector<std::filesystem::path> Engine_plugin_resource_manager::get_plugin_paths()
 {
     std::lock_guard<std::mutex> lock(plugin_mutex);
-    if(plugin_config.paths.empty())
-    {
-        return get_default_plugin_paths();
-    }
     return plugin_config.paths;
 }
 
@@ -98,11 +78,8 @@ std::shared_ptr<Engine_plugin_resource_manager> Engine_plugin_resource_manager::
 
         if(!pm)
         {
-            const auto& paths_to_load
-                = plugin_config.paths.empty() ? get_default_plugin_paths() : plugin_config.paths;
-
             pm = std::make_shared<Engine_plugin_manager>();
-            pm->load_plugins(paths_to_load, plugin_config.mode);
+            pm->load_plugins(plugin_config.paths, plugin_config.mode);
             pm_ptr = pm;
         }
     }

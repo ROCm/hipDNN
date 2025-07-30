@@ -17,6 +17,8 @@ namespace plugin
 class Shared_library
 {
 public:
+    static std::filesystem::path get_current_module_directory();
+
     Shared_library();
     explicit Shared_library(const std::filesystem::path& library_path);
     Shared_library(Shared_library&& other) noexcept;

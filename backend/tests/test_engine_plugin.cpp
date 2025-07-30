@@ -18,8 +18,14 @@ using namespace hipdnn_backend;
 template <typename T, typename Destructor>
 using Scoped_resource = hipdnn::sdk::utilities::Scoped_resource<T, Destructor>;
 
-using Test_engine_plugin_manager = plugin::Plugin_manager_base<plugin::Engine_plugin>;
-
+class Test_engine_plugin_manager : public plugin::Plugin_manager_base<plugin::Engine_plugin>
+{
+public:
+    Test_engine_plugin_manager()
+        : plugin::Plugin_manager_base<plugin::Engine_plugin>({"./"})
+    {
+    }
+};
 // NOLINTBEGIN(readability-function-cognitive-complexity)
 TEST(GPU_EnginePluginTest, LoadPluginsAndExecuteOpGraph)
 {

@@ -6,6 +6,7 @@
 #include <filesystem>
 #include <functional>
 #include <set>
+#include <string>
 #include <string_view>
 #include <type_traits>
 #include <utility>
@@ -45,6 +46,8 @@ public:
     std::string_view name() const;
     std::string_view version() const;
     hipdnnPluginType_t type() const;
+
+    static hipdnnPluginType_t get_class_type();
 
     hipdnnPluginStatus_t set_logging_callback(hipdnnCallback_t callback);
 
@@ -87,33 +90,65 @@ class Plugin_manager_base
     static_assert(std::is_base_of_v<Plugin_base, Plugin>,
                   "Plugin must be derived from Plugin_base");
 
+protected:
+    explicit Plugin_manager_base(std::vector<std::filesystem::path> default_paths)
+        : _default_plugin_paths(std::move(default_paths))
+    {
+    }
+
+    std::vector<std::filesystem::path> resolve_default_paths() const
+    {
+        auto paths = _default_plugin_paths;
+        std::vector<std::filesystem::path> resolved_paths;
+        resolved_paths.reserve(paths.size());
+
+        try
+        {
+            auto base_dir = plugin::Shared_library::get_current_module_directory();
+
+            for(const auto& path : paths)
+            {
+                if(path.is_relative())
+                {
+                    resolved_paths.push_back(base_dir / path);
+                }
+                else
+                {
+                    resolved_paths.push_back(path);
+                }
+            }
+        }
+        catch(const Hipdnn_exception& e)
+        {
+            HIPDNN_LOG_WARN("Failed to resolve module path: {}", e.get_message());
+            resolved_paths = std::move(paths);
+        }
+
+        return resolved_paths;
+    }
+
 public:
     virtual ~Plugin_manager_base() = default;
 
-    void load_plugins(const std::vector<std::filesystem::path>& search_paths,
+    void load_plugins(const std::vector<std::filesystem::path>& custom_paths,
                       hipdnnPluginLoadingMode_ext_t mode)
     {
         if(mode == HIPDNN_PLUGIN_LOADING_ABSOLUTE)
         {
             clear_plugins();
+            load_paths(custom_paths);
         }
-
-        for(const auto& path : search_paths)
+        else
         {
-            try
+            load_paths(custom_paths);
+
+            auto default_paths = resolve_default_paths();
+            for(const auto& path : default_paths)
             {
-                if(std::filesystem::is_directory(path))
+                if(!_loaded_plugin_files.contains(path))
                 {
-                    scan_directory_for_plugins(path, mode);
+                    try_load_plugin_path(path);
                 }
-                else
-                {
-                    load_plugin_from_file(path, mode);
-                }
-            }
-            catch(const std::filesystem::filesystem_error& e)
-            {
-                HIPDNN_LOG_WARN("Error accessing plugin path: {}. {}", path.string(), e.what());
             }
         }
     }
@@ -130,25 +165,49 @@ private:
         _loaded_plugin_files.clear();
     }
 
-    void load_plugin_from_file(const std::filesystem::path& file_path,
-                               hipdnnPluginLoadingMode_ext_t mode)
+    void load_paths(const std::vector<std::filesystem::path>& paths)
     {
-        (void)mode;
+        for(const auto& path : paths)
+        {
+            try_load_plugin_path(path);
+        }
+    }
+
+    void try_load_plugin_path(const std::filesystem::path& path)
+    {
+        if(std::filesystem::is_directory(path))
+        {
+            scan_directory_for_plugins(path);
+        }
+        else
+        {
+            load_plugin_from_file(path);
+        }
+    }
+
+    void load_plugin_from_file(const std::filesystem::path& file_path)
+    {
+        if(_loaded_plugin_files.contains(file_path))
+        {
+            return;
+        }
+
         try
         {
-
             Shared_library lib(file_path);
-
-            // if(mode != HIPDNN_PLUGIN_LOADING_ADDITIVE
-            //    && _loaded_plugin_files.contains(file_path))
-            // {
-            //     return;
-            // }
-
             Plugin plugin(std::move(lib));
+
             const auto name = plugin.name();
             const auto version = plugin.version();
             const auto type = plugin.type();
+
+            if(type != Plugin::get_class_type())
+            {
+                throw Hipdnn_exception(HIPDNN_STATUS_PLUGIN_ERROR,
+                                       std::string("Plugin type mismatch: expected ")
+                                           + to_string(Plugin::get_class_type()) + ", got "
+                                           + to_string(type));
+            }
 
             _plugins.emplace_back(std::move(plugin));
             _loaded_plugin_files.insert(file_path);
@@ -167,21 +226,22 @@ private:
         }
     }
 
-    void scan_directory_for_plugins(const std::filesystem::path& dir_path,
-                                    hipdnnPluginLoadingMode_ext_t mode)
+    void scan_directory_for_plugins(const std::filesystem::path& dir_path)
     {
+        // todo: catch errors here and only load correct file type
         HIPDNN_LOG_INFO("Scanning for plugins in directory: {}", dir_path.string());
         for(const auto& entry : std::filesystem::directory_iterator(dir_path))
         {
             if(entry.is_regular_file())
             {
-                load_plugin_from_file(entry.path(), mode);
+                load_plugin_from_file(entry.path());
             }
         }
     }
 
     std::vector<Plugin> _plugins;
     std::set<std::filesystem::path> _loaded_plugin_files;
+    std::vector<std::filesystem::path> _default_plugin_paths;
 };
 
 } // namespace plugin

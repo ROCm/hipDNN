@@ -8,10 +8,58 @@
 #include "hipdnn_exception.hpp"
 #include "shared_library.hpp"
 
+// This function is for querying the address of this library
+static void shared_library_anchor() {}
+
 namespace hipdnn_backend
 {
 namespace plugin
 {
+
+std::filesystem::path Shared_library::get_current_module_directory()
+{
+    std::filesystem::path module_path;
+
+#ifdef _WIN32
+    HMODULE hModule = nullptr;
+    if(GetModuleHandleExA(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS
+                              | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
+                          reinterpret_cast<LPCSTR>(&shared_library_anchor),
+                          &hModule))
+    {
+        char path_buffer[MAX_PATH];
+        DWORD len = GetModuleFileNameA(hModule, path_buffer, sizeof(path_buffer));
+        if(len > 0 && len < MAX_PATH)
+        {
+            module_path = std::filesystem::path(path_buffer).parent_path();
+        }
+        else
+        {
+            throw Hipdnn_exception(HIPDNN_STATUS_INTERNAL_ERROR, "Failed to get module file name.");
+        }
+    }
+    else
+    {
+        throw Hipdnn_exception(HIPDNN_STATUS_INTERNAL_ERROR, "Failed to get module handle.");
+    }
+#elif defined(__linux__)
+    Dl_info info;
+    if(dladdr(reinterpret_cast<void const*>(&shared_library_anchor), &info) != 0
+       && info.dli_fname != nullptr)
+    {
+        module_path = std::filesystem::path(info.dli_fname).parent_path();
+    }
+    else
+    {
+        throw Hipdnn_exception(HIPDNN_STATUS_INTERNAL_ERROR,
+                               "Failed to get module path using dladdr.");
+    }
+#else
+#error "Unsupported platform"
+#endif
+
+    return module_path;
+}
 
 Shared_library::Shared_library()
     : _library_handle(nullptr)
@@ -62,7 +110,7 @@ void Shared_library::load(const std::filesystem::path& library_path)
 
     auto modified_library_path = library_path;
 
-    // Check file extension
+    // Check file extension and add prefix/suffix if needed
     if(modified_library_path.has_extension())
     {
 #ifdef _WIN32
@@ -94,6 +142,12 @@ void Shared_library::load(const std::filesystem::path& library_path)
 #else
 #error "Unsupported platform"
 #endif
+    }
+
+    // If the path is relative, resolve it relative to the current module's location to avoid using unsafe relative paths
+    if(modified_library_path.is_relative())
+    {
+        modified_library_path = get_current_module_directory() / modified_library_path;
     }
 
 #ifdef _WIN32
