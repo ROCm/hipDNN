@@ -198,11 +198,11 @@ private:
         HIPDNN_LOG_INFO("Plugin manager: Trying to load plugin path: {}", path.string());
         try
         {
-            if(std::filesystem::exists(path) && std::filesystem::is_directory(path))
+            if(std::filesystem::is_directory(path))
             {
                 scan_directory_for_plugins(path);
             }
-            else
+            else if(path.has_filename())
             {
                 load_plugin_from_file(path);
             }

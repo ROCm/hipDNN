@@ -14,6 +14,8 @@ namespace hipdnn_backend
 namespace plugin
 {
 
+void shared_library_anchor();
+
 class Shared_library
 {
 public:

@@ -9,13 +9,13 @@
 #include "logging/logging.hpp"
 #include "shared_library.hpp"
 
-// This function is for querying the address of this library
-static void shared_library_anchor() {}
-
 namespace hipdnn_backend
 {
 namespace plugin
 {
+
+// This function is for querying the address of this library
+void shared_library_anchor() {}
 
 std::filesystem::path Shared_library::get_current_module_directory()
 {
@@ -69,8 +69,7 @@ std::filesystem::path Shared_library::get_current_module_directory()
 #else
 #error "Unsupported platform"
 #endif
-
-    return module_path;
+    return std::filesystem::weakly_canonical(std::filesystem::absolute(module_path));
 }
 
 Shared_library::Shared_library()
