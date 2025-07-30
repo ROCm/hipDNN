@@ -306,6 +306,7 @@ HIPDNN_BACKEND_EXPORT hipdnnStatus_t hipdnnSetEnginePluginPaths_ext(
         hipdnn_backend::plugin::Engine_plugin_resource_manager::set_plugin_paths(paths_vec,
                                                                                  loading_mode);
 
+        // TODO: automatic formatting loading mode to string
         LOG_API_SUCCESS(api_name,
                         "set_plugin_paths={}",
                         hipdnn_backend::hipdnn_get_plugin_loading_mode_string(loading_mode));

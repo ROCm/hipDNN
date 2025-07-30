@@ -25,6 +25,7 @@ namespace hipdnn_backend
 namespace plugin
 {
 
+// TODO: add platform_utils.hpp in sdk perhaps. For these-types of utilities.
 #if defined(_WIN32)
 constexpr const char* SHARED_LIB_EXT = ".dll";
 #else
@@ -229,6 +230,7 @@ private:
             const auto version = plugin.version();
             const auto type = plugin.type();
 
+            // For now only use engine or unspecified plugin types
             if(type != Plugin::get_class_type() && type != HIPDNN_PLUGIN_TYPE_UNSPECIFIED)
             {
                 throw Hipdnn_exception(HIPDNN_STATUS_PLUGIN_ERROR,

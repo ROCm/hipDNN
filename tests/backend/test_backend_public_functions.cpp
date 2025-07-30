@@ -196,3 +196,23 @@ TEST(HipDNNBackendTest, SetPluginPathsExt_FailsOnNullStringInList)
 
     EXPECT_EQ(status, HIPDNN_STATUS_BAD_PARAM_NULL_POINTER);
 }
+
+// Uncomment this test and observe logs to see the plugin is loaded
+// TEST(HipDNNBackendTest, SetPluginPathAndCreateHandle_LoadsPlugins)
+// {
+//     const std::array<const char*, 1> paths = {"../tests/hipdnn_test_engine_plugin1"};
+
+//     hipdnnStatus_t status = hipdnnSetEnginePluginPaths_ext(
+//         paths.size(), paths.data(), HIPDNN_PLUGIN_LOADING_ABSOLUTE);
+//     EXPECT_EQ(status, HIPDNN_STATUS_SUCCESS);
+
+//     hipdnnHandle_t handle = nullptr;
+//     status = hipdnnCreate(&handle);
+//     EXPECT_EQ(status, HIPDNN_STATUS_SUCCESS);
+//     EXPECT_NE(handle, nullptr);
+
+//     status = hipdnnDestroy(handle);
+//     EXPECT_EQ(status, HIPDNN_STATUS_SUCCESS);
+
+//     EXPECT_TRUE(false);
+// }
