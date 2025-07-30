@@ -5,12 +5,10 @@
 #include <mutex>
 #include <vector>
 
-#include <hipdnn_sdk/data_objects/engine_config_generated.h>
 #include <hipdnn_sdk/data_objects/engine_details_generated.h>
 
 #include "descriptors/engine_config_descriptor.hpp"
 #include "descriptors/engine_descriptor.hpp"
-#include "descriptors/engine_heuristic_descriptor.hpp"
 #include "descriptors/execution_plan_descriptor.hpp"
 #include "descriptors/graph_descriptor.hpp"
 #include "descriptors/variant_descriptor.hpp"
@@ -345,6 +343,11 @@ Engine_details_wrapper::Engine_details_wrapper(
     _rm->get_engine_details(engine_id, graph_desc, &_engine_details_data);
     flatbuffers::Verifier verifier(static_cast<const uint8_t*>(_engine_details_data.ptr),
                                    _engine_details_data.size);
+    if(!verifier.VerifyBuffer<hipdnn_sdk::data_objects::EngineDetails>())
+    {
+        throw Hipdnn_exception(HIPDNN_STATUS_BAD_PARAM,
+                               "Engine_details_wrapper: unable to verify the flatbuffer schema.");
+    }
 }
 
 Engine_details_wrapper::~Engine_details_wrapper()
@@ -390,7 +393,7 @@ const hipdnn_sdk::data_objects::EngineDetails* Engine_details_wrapper::get() con
     if(_engine_details_data.ptr == nullptr)
     {
         throw Hipdnn_exception(HIPDNN_STATUS_INTERNAL_ERROR,
-                               "Wrong Engine_details_wrapper usage: "
+                               "Engine_details_wrapper: wrong usage: "
                                "get() called on an empty object");
     }
 
@@ -456,7 +459,7 @@ hipdnnEnginePluginExecutionContext_t Engine_execution_context_wrapper::get() con
     if(_execution_context == nullptr)
     {
         throw Hipdnn_exception(HIPDNN_STATUS_INTERNAL_ERROR,
-                               "Wrong Engine_execution_context_wrapper usage: "
+                               "Engine_execution_context_wrapper: wrong usage: "
                                "get() called on an empty object");
     }
 

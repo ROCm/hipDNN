@@ -17,6 +17,7 @@ namespace hipdnn_sdk
 {
 namespace data_objects
 {
+// NOLINTNEXTLINE(readability-identifier-naming)
 struct EngineDetails;
 }
 }
@@ -79,23 +80,22 @@ public:
                                  const hipdnnPluginConstData_t* engine_config,
                                  const Graph_descriptor* graph_desc);
 
-protected:
+private:
     // MT-unsafe instance methods
-    // protected virtual for gMock testing
+    // virtual for gMock testing
     virtual void get_engine_details(int64_t engine_id,
                                     const Graph_descriptor* graph_desc,
                                     hipdnnPluginConstData_t* engine_details) const;
     virtual void destroy_engine_details(int64_t engine_id,
                                         hipdnnPluginConstData_t* engine_details) const;
 
-private:
-    // MT-unsafe instance methods
-    hipdnnEnginePluginExecutionContext_t
+    virtual hipdnnEnginePluginExecutionContext_t
         create_execution_context(int64_t engine_id,
                                  const hipdnnPluginConstData_t* engine_config,
                                  const Graph_descriptor* graph_desc) const;
-    void destroy_execution_context(int64_t engine_id,
-                                   hipdnnEnginePluginExecutionContext_t execution_context) const;
+    virtual void
+        destroy_execution_context(int64_t engine_id,
+                                  hipdnnEnginePluginExecutionContext_t execution_context) const;
 
     void execute_op_graph(int64_t engine_id,
                           hipdnnEnginePluginExecutionContext_t execution_context,
