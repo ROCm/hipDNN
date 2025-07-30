@@ -93,8 +93,9 @@ private:
         create_execution_context(int64_t engine_id,
                                  const hipdnnPluginConstData_t* engine_config,
                                  const Graph_descriptor* graph_desc) const;
-    virtual void destroy_execution_context(int64_t engine_id,
-                                   hipdnnEnginePluginExecutionContext_t execution_context) const;
+    virtual void
+        destroy_execution_context(int64_t engine_id,
+                                  hipdnnEnginePluginExecutionContext_t execution_context) const;
 
     void execute_op_graph(int64_t engine_id,
                           hipdnnEnginePluginExecutionContext_t execution_context,

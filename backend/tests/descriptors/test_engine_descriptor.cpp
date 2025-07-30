@@ -74,8 +74,11 @@ public:
             .WillOnce(Return(_mock_engine_plugin_resource_manager));
         EXPECT_CALL(*_mock_engine_plugin_resource_manager, get_applicable_engine_ids(_))
             .WillOnce(Return(std::vector<int64_t>{0}));
-        EXPECT_CALL(*_mock_engine_plugin_resource_manager, get_engine_details(_,_,_)).WillOnce(Invoke([this](int64_t, const Graph_descriptor*, hipdnnPluginConstData_t* d){ *d = this->_serialized_engine_details; }));
-        EXPECT_CALL(*_mock_engine_plugin_resource_manager, destroy_engine_details(_,_));
+        EXPECT_CALL(*_mock_engine_plugin_resource_manager, get_engine_details(_, _, _))
+            .WillOnce(Invoke([this](int64_t, const Graph_descriptor*, hipdnnPluginConstData_t* d) {
+                *d = this->_serialized_engine_details;
+            }));
+        EXPECT_CALL(*_mock_engine_plugin_resource_manager, destroy_engine_details(_, _));
         ASSERT_NO_THROW(get_engine_descriptor()->finalize());
     }
 
