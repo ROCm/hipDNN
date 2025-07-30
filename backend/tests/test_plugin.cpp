@@ -77,9 +77,8 @@ const std::string FULL_PLUGIN_PATH2
 
 TEST(PluginManagerTest, LoadPlugins)
 {
-    Test_plugin_manager plugin_manager;
     // Create a PluginManager instance
-    // plugin::Plugin_manager_base<Plugin> plugin_manager;
+    Test_plugin_manager plugin_manager;
 
     // Create a list of paths to plugins
     std::vector<std::filesystem::path> plugin_paths = {PLUGIN_PATH1, PLUGIN_PATH2};

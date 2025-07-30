@@ -52,7 +52,8 @@ std::filesystem::path Shared_library::get_current_module_directory()
     }
     else
     {
-        // Less-safe fallback for tests where dladdr might not work as expected.
+        // Less-safe fallback for tests where dladdr won't work.
+        // In prod, it should not reach this.
         std::array<char, PATH_MAX> result{};
         ssize_t count = readlink("/proc/self/exe", result.data(), result.size() - 1);
         if(count > 0)
@@ -163,8 +164,6 @@ void Shared_library::load(const std::filesystem::path& library_path)
 
     modified_library_path = std::filesystem::weakly_canonical(modified_library_path);
 
-    // This check is needed because the plugin manager may mistake a directory that does not exist for a plugin file.
-    // It's because the plugin path is not fully known by the plugin manager until the platform specific path is constructed here.
     if(!std::filesystem::exists(modified_library_path))
     {
         throw Hipdnn_exception(HIPDNN_STATUS_PLUGIN_ERROR,

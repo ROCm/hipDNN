@@ -98,7 +98,7 @@ TEST(Shared_Library_Test, get_current_module_directory_from_executable)
     EXPECT_TRUE(std::filesystem::is_directory(path));
 
 #ifdef __linux__
-    // It would be best to check it gets right path of a shared library too, but the tests are statitcally linked binary
+    // Only tests that it works from a statically linked binary
     EXPECT_TRUE(std::filesystem::exists(path / "hipdnn_backend_tests"));
 #endif
 }
