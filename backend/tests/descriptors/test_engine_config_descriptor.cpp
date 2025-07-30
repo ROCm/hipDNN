@@ -36,22 +36,25 @@ public:
 
     std::shared_ptr<Engine_config_descriptor> get_engine_config_descriptor() const
     {
-        return _engine_config_wrapper->as_descriptor_unsafe<Engine_config_descriptor>();
+        return _engine_config_wrapper->as_descriptor<Engine_config_descriptor>();
     }
 
     std::shared_ptr<Mock_engine_descriptor> get_mock_engine() const
     {
-        return _mock_engine_wrapper->as_descriptor_unsafe<Mock_engine_descriptor>();
+        return Mock_descriptor_utility::as_descriptor_unsafe<Mock_engine_descriptor>(
+            _mock_engine_wrapper.get());
     }
 
     std::shared_ptr<Mock_engine_descriptor> get_mock_engine_bad_type() const
     {
-        return _mock_engine_bad_type_wrapper->as_descriptor_unsafe<Mock_engine_descriptor>();
+        return Mock_descriptor_utility::as_descriptor_unsafe<Mock_engine_descriptor>(
+            _mock_engine_bad_type_wrapper.get());
     }
 
     std::shared_ptr<Mock_graph_descriptor> get_mock_graph_descriptor() const
     {
-        return _mock_graph_wrapper->as_descriptor_unsafe<Mock_graph_descriptor>();
+        return Mock_descriptor_utility::as_descriptor_unsafe<Mock_graph_descriptor>(
+            _mock_graph_wrapper.get());
     }
 
     void set_engine() const

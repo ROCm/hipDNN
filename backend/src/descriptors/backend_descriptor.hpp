@@ -31,6 +31,9 @@ struct Backend_descriptor_interface
 //NOLINTBEGIN(readability-identifier-naming)
 namespace hipdnn_backend
 {
+
+class Mock_descriptor_utility;
+
 template <typename T>
 class hipdnnBackendDescriptorImpl : public Backend_descriptor_interface
 {
@@ -97,15 +100,6 @@ struct hipdnnBackendDescriptor : public Backend_descriptor_interface
             this,
             HIPDNN_STATUS_INTERNAL_ERROR,
             "Failed to cast backend descriptor: Null descriptor provided.");
-    }
-
-    // Unsafe version of as_descriptor that does not perform type checks.
-    // Use with caution, as it can lead to undefined behavior if the types do not match
-    // This is intended for internal mock usage, and not anywhere esle in the codebase.
-    template <typename Child_descriptor>
-    std::shared_ptr<Child_descriptor> as_descriptor_unsafe()
-    {
-        return std::static_pointer_cast<Child_descriptor>(_impl);
     }
 
     bool is_valid();
@@ -177,5 +171,8 @@ struct hipdnnBackendDescriptor : public Backend_descriptor_interface
 
 private:
     std::shared_ptr<Backend_descriptor_interface> _impl;
+
+    // Give access to mock classes for testing purposes only.
+    friend class hipdnn_backend::Mock_descriptor_utility;
 };
 //NOLINTEND(readability-identifier-naming)

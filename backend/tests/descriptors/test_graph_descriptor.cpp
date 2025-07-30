@@ -41,8 +41,8 @@ TEST_F(Graph_descriptor_test, SerializeDeserializeGraph)
     Graph_descriptor descriptor;
     descriptor.deserialize_graph(serialized_graph.data(), serialized_graph.size());
 
-    const auto& output = descriptor.get_serialized_graph();
-    flatbuffers::Verifier verifier(output.data(), output.size());
+    auto output = descriptor.get_serialized_graph();
+    flatbuffers::Verifier verifier(static_cast<const uint8_t*>(output.ptr), output.size);
     ASSERT_TRUE(verifier.VerifyBuffer<hipdnn_sdk::data_objects::Graph>());
 }
 
