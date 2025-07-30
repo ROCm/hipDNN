@@ -15,4 +15,5 @@ set(HIPDNN_TEST_INCLUDE_DIRS
 
 if(HIP_DNN_BUILD_BACKEND)
     add_subdirectory(backend)
+    add_subdirectory(test_plugins)
 endif()
