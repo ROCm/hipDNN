@@ -20,7 +20,6 @@ add_library(hipdnn_backend_private
     handle/handle.cpp
     logging/logging.cpp
     flatbuffer_utilities.cpp
-    plugin/plugin_manager.cpp
     plugin/engine_plugin.cpp
     plugin/engine_plugin_resource_manager.cpp
     plugin/plugin_core.cpp
