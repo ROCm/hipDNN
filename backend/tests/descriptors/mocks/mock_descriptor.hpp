@@ -12,6 +12,22 @@
 namespace hipdnn_backend
 {
 
+class Mock_descriptor_utility
+{
+public:
+    template <typename Child_descriptor>
+    static std::shared_ptr<Child_descriptor>
+        as_descriptor_unsafe(hipdnnBackendDescriptor_t descriptor)
+    {
+        if(!descriptor)
+        {
+            return nullptr;
+        }
+
+        return std::static_pointer_cast<Child_descriptor>(descriptor->_impl);
+    }
+};
+
 template <typename Desc_type>
 class Mock_descriptor : public hipdnnBackendDescriptorImpl<Mock_descriptor<Desc_type>>
 {

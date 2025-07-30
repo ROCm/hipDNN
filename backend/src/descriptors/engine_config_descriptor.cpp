@@ -5,13 +5,18 @@
 #include "engine_descriptor.hpp"
 #include "error.hpp"
 #include "graph_descriptor.hpp"
+#include "handle/handle.hpp"
 #include "hipdnn_backend_descriptor_type.h"
 #include "hipdnn_exception.hpp"
-#include <handle/handle.hpp>
 #include <hipdnn_sdk/data_objects/engine_config_generated.h>
 
 namespace hipdnn_backend
 {
+
+Engine_config_descriptor::Engine_config_descriptor()
+{
+    _engine_config_data = std::make_unique<hipdnn_sdk::data_objects::EngineConfigT>();
+}
 
 void Engine_config_descriptor::finalize()
 {
@@ -154,6 +159,9 @@ void Engine_config_descriptor::set_attribute(hipdnnBackendAttributeName_t attrib
             std::string("Engine_config_descriptor::set_attribute() is not supported for attribute ")
                 + hipdnn_backend::hipdnn_get_attribute_name_string(attribute_name) + ".");
     }
+
+    // reset the serialized buffer when an attribute is set to ensure it's not cached out of date.
+    _engine_config_serialized_buffer = flatbuffers::DetachedBuffer();
 }
 
 void Engine_config_descriptor::set_engine(hipdnnBackendAttributeType_t attribute_type,
@@ -183,6 +191,7 @@ void Engine_config_descriptor::set_engine(hipdnnBackendAttributeType_t attribute
                    "Engine is not finalized.");
 
     _engine = engine;
+    _engine_config_data->engine_id = _engine->get_engine_id();
 }
 
 std::shared_ptr<const Engine_descriptor> Engine_config_descriptor::get_engine() const
@@ -198,24 +207,22 @@ hipdnnBackendDescriptorType_t Engine_config_descriptor::get_static_type()
     return HIPDNN_BACKEND_ENGINECFG_DESCRIPTOR;
 }
 
-const hipdnnPluginConstData_t& Engine_config_descriptor::get_serialized_engine_config()
+hipdnnPluginConstData_t Engine_config_descriptor::get_serialized_engine_config() const
 {
-    if(_engine_config_buffer.size() == 0)
+    if(_engine_config_serialized_buffer.size() == 0)
     {
         THROW_IF_NULL(_engine,
                       HIPDNN_STATUS_INTERNAL_ERROR,
-                      "Graph_descriptor::get_serialized_graph: graph is null");
+                      "Engine_config_descriptor::get_serialized_engine_config: engine is null");
 
         flatbuffers::FlatBufferBuilder builder;
-        hipdnn_sdk::data_objects::EngineConfigBuilder engine_config_builder(builder);
-        engine_config_builder.add_engine_id(_engine->get_engine_id());
-        builder.Finish(engine_config_builder.Finish());
-        _engine_config_buffer = builder.Release();
-        _serialized_engine_config
-            = {.ptr = _engine_config_buffer.data(), .size = _engine_config_buffer.size()};
+        builder.Finish(
+            hipdnn_sdk::data_objects::EngineConfig::Pack(builder, _engine_config_data.get()));
+        _engine_config_serialized_buffer = builder.Release();
     }
 
-    return _serialized_engine_config;
+    return {.ptr = _engine_config_serialized_buffer.data(),
+            .size = _engine_config_serialized_buffer.size()};
 }
 
 } // namespace hipdnn_backend

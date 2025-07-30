@@ -4,6 +4,7 @@
 #include "engine_descriptor.hpp"
 #include "error.hpp"
 #include "graph_descriptor.hpp"
+#include "handle/handle.hpp"
 #include "hipdnn_backend_descriptor_type.h"
 #include "hipdnn_exception.hpp"
 
@@ -22,6 +23,20 @@ void Engine_descriptor::finalize()
     THROW_IF_FALSE(_engine_id_set,
                    HIPDNN_STATUS_BAD_PARAM,
                    "Engine_descriptor::finalize() failed: Engine id is not set.");
+
+    auto handle = _graph->get_handle();
+    auto plugin_resource_manager = handle->get_plugin_resource_manager();
+
+    auto engine_ids = plugin_resource_manager->get_applicable_engine_ids(_graph.get());
+    if(std::ranges::find(engine_ids, _engine_id) == engine_ids.end())
+    {
+        throw Hipdnn_exception(HIPDNN_STATUS_BAD_PARAM,
+                               "Engine_descriptor::finalize() failed: Engine id is not in a valid "
+                               "range of engine IDs");
+    }
+
+    _engine_details = plugin::Engine_plugin_resource_manager::get_engine_details(
+        plugin_resource_manager, _engine_id, _graph.get());
 
     hipdnnBackendDescriptorImpl<Engine_descriptor>::finalize();
 }
