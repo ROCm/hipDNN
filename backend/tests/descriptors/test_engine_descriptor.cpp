@@ -36,17 +36,19 @@ public:
 
     std::shared_ptr<Engine_descriptor> get_engine_descriptor() const
     {
-        return _engine_wrapper->as_descriptor_unsafe<Engine_descriptor>();
+        return _engine_wrapper->as_descriptor<Engine_descriptor>();
     }
 
     std::shared_ptr<Mock_graph_descriptor> get_mock_graph() const
     {
-        return _mock_graph_wrapper->as_descriptor_unsafe<Mock_graph_descriptor>();
+        return Mock_descriptor_utility::as_descriptor_unsafe<Mock_graph_descriptor>(
+            _mock_graph_wrapper.get());
     }
 
     std::shared_ptr<Mock_graph_descriptor> get_mock_graph_bad_type() const
     {
-        return _mock_graph_bad_type_wrapper->as_descriptor_unsafe<Mock_graph_descriptor>();
+        return Mock_descriptor_utility::as_descriptor_unsafe<Mock_graph_descriptor>(
+            _mock_graph_bad_type_wrapper.get());
     }
 
     void set_graph() const

@@ -150,9 +150,7 @@ void Engine_plugin_resource_manager::set_stream(hipStream_t stream) const
 std::vector<int64_t> Engine_plugin_resource_manager::get_applicable_engine_ids(
     const Graph_descriptor* graph_desc) const
 {
-    const auto& serialized_graph = graph_desc->get_serialized_graph();
-    const hipdnnPluginConstData_t serialized_graph_data{serialized_graph.data(),
-                                                        serialized_graph.size()};
+    auto serialized_graph_data = graph_desc->get_serialized_graph();
 
     std::vector<int64_t> engine_ids;
 
@@ -182,9 +180,7 @@ void Engine_plugin_resource_manager::get_engine_details(
     const Graph_descriptor* graph_desc,
     hipdnnPluginConstData_t* engine_details) const
 {
-    const auto& serialized_graph = graph_desc->get_serialized_graph();
-    const hipdnnPluginConstData_t serialized_graph_data{serialized_graph.data(),
-                                                        serialized_graph.size()};
+    auto serialized_graph_data = graph_desc->get_serialized_graph();
 
     auto handle = _engine_id_to_handle.at(engine_id);
     auto plugin = _handle_to_plugin.at(handle);
@@ -221,10 +217,7 @@ size_t
                                                        const hipdnnPluginConstData_t* engine_config,
                                                        const Graph_descriptor* graph_desc) const
 {
-    // TODO : swap the serialized type to be hipdnnPluginConstData_t.
-    const auto& serialized_graph = graph_desc->get_serialized_graph();
-    const hipdnnPluginConstData_t serialized_graph_data{serialized_graph.data(),
-                                                        serialized_graph.size()};
+    auto serialized_graph_data = graph_desc->get_serialized_graph();
 
     auto handle = _engine_id_to_handle.at(engine_id);
     auto plugin = _handle_to_plugin.at(handle);
@@ -239,9 +232,7 @@ hipdnnEnginePluginExecutionContext_t Engine_plugin_resource_manager::create_exec
     const hipdnnPluginConstData_t* engine_config,
     const Graph_descriptor* graph_desc) const
 {
-    const auto& serialized_graph = graph_desc->get_serialized_graph();
-    const hipdnnPluginConstData_t serialized_graph_data{serialized_graph.data(),
-                                                        serialized_graph.size()};
+    auto serialized_graph_data = graph_desc->get_serialized_graph();
 
     auto handle = _engine_id_to_handle.at(engine_id);
     auto plugin = _handle_to_plugin.at(handle);
