@@ -48,9 +48,5 @@ target_link_libraries(hipdnn_frontend_tests
 clang_tidy_check(hipdnn_frontend_tests)
 
 add_dependencies(hipdnn_frontend_tests generate_hipdnn_sdk_headers)
-add_dependencies(check hipdnn_frontend_tests)
-gtest_discover_tests(
-    hipdnn_frontend_tests
-    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-    DISCOVERY_MODE PRE_TEST
-)
+
+add_target_to_check_targets(hipdnn_frontend_tests ${CMAKE_CURRENT_BINARY_DIR})
