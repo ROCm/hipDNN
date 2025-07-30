@@ -16,7 +16,8 @@ class Mock_descriptor_utility
 {
 public:
     template <typename Child_descriptor>
-    static std::shared_ptr<Child_descriptor> as_descriptor_unsafe(hipdnnBackendDescriptor_t descriptor)
+    static std::shared_ptr<Child_descriptor>
+        as_descriptor_unsafe(hipdnnBackendDescriptor_t descriptor)
     {
         if(!descriptor)
         {

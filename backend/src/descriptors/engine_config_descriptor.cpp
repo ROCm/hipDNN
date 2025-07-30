@@ -13,7 +13,7 @@
 namespace hipdnn_backend
 {
 
-Engine_config_descriptor::Engine_config_descriptor() 
+Engine_config_descriptor::Engine_config_descriptor()
 {
     _engine_config_data = std::make_unique<hipdnn_sdk::data_objects::EngineConfigT>();
 }
@@ -216,7 +216,8 @@ hipdnnPluginConstData_t Engine_config_descriptor::get_serialized_engine_config()
                       "Engine_config_descriptor::get_serialized_engine_config: engine is null");
 
         flatbuffers::FlatBufferBuilder builder;
-        builder.Finish(hipdnn_sdk::data_objects::EngineConfig::Pack(builder, _engine_config_data.get()));
+        builder.Finish(
+            hipdnn_sdk::data_objects::EngineConfig::Pack(builder, _engine_config_data.get()));
         _engine_config_serialized_buffer = builder.Release();
     }
 

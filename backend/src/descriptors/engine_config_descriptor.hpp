@@ -3,10 +3,10 @@
 
 #pragma once
 
+#include "backend_descriptor.hpp"
 #include <flatbuffers/detached_buffer.h>
 #include <hipdnn_sdk/data_objects/engine_config_generated.h>
 #include <hipdnn_sdk/plugin/plugin_api_data_types.h>
-#include "backend_descriptor.hpp"
 
 namespace hipdnn_backend
 {

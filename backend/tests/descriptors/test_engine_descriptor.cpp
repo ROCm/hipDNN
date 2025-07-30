@@ -41,12 +41,14 @@ public:
 
     std::shared_ptr<Mock_graph_descriptor> get_mock_graph() const
     {
-        return Mock_descriptor_utility::as_descriptor_unsafe<Mock_graph_descriptor>(_mock_graph_wrapper.get());
+        return Mock_descriptor_utility::as_descriptor_unsafe<Mock_graph_descriptor>(
+            _mock_graph_wrapper.get());
     }
 
     std::shared_ptr<Mock_graph_descriptor> get_mock_graph_bad_type() const
     {
-        return Mock_descriptor_utility::as_descriptor_unsafe<Mock_graph_descriptor>(_mock_graph_bad_type_wrapper.get());
+        return Mock_descriptor_utility::as_descriptor_unsafe<Mock_graph_descriptor>(
+            _mock_graph_bad_type_wrapper.get());
     }
 
     void set_graph() const
