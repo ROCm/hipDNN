@@ -1,10 +1,10 @@
 // Copyright © Advanced Micro Devices, Inc., or its affiliates.
 // SPDX-License-Identifier:  MIT
 
+#include "execution_plan_descriptor.hpp"
 #include "engine_config_descriptor.hpp"
 #include "engine_descriptor.hpp"
 #include "error.hpp"
-#include "execution_plan_descriptor.hpp"
 #include "handle/handle.hpp"
 #include "hipdnn_backend_descriptor_type.h"
 #include "hipdnn_exception.hpp"
@@ -31,7 +31,10 @@ void Execution_plan_descriptor::finalize()
     auto engine = _engine_config->get_engine();
 
     _execution_context = plugin::Engine_plugin_resource_manager::create_execution_context(
-        plugin_resource_manager, engine->get_engine_id(), &engine_config_plugin_data, engine->get_graph().get());
+        plugin_resource_manager,
+        engine->get_engine_id(),
+        &engine_config_plugin_data,
+        engine->get_graph().get());
 
     hipdnnBackendDescriptorImpl<Execution_plan_descriptor>::finalize();
 }
