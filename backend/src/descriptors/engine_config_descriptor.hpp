@@ -35,8 +35,6 @@ private:
                                 int64_t* element_count,
                                 void* array_of_elements) const;
 
-    hipdnnPluginConstData_t get_serialized_engine_config() const;
-
 public:
     Engine_config_descriptor();
     static constexpr int64_t INVALID_WORKSPACE_SIZE = -1;
@@ -57,7 +55,9 @@ public:
     static hipdnnBackendDescriptorType_t get_static_type();
 
     // Throws an exception if the descriptor is not finalized before calling these.
-    std::shared_ptr<const Engine_descriptor> get_engine() const;
+    virtual std::shared_ptr<const Engine_descriptor> get_engine() const;
+
+    virtual hipdnnPluginConstData_t get_serialized_engine_config() const;
 };
 
 } // namespace hipdnn_backend
