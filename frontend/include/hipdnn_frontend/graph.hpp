@@ -175,6 +175,8 @@ public:
             }
         }
 
+        //TODO, SLAM the data types into the Y_tensor.
+
         std::vector<::flatbuffers::Offset<hipdnn_sdk::data_objects::Node>> nodes;
         for(auto& node : _sub_nodes)
         {
