@@ -350,8 +350,7 @@ hipdnnPluginStatus_t hipdnnEnginePluginDestroyExecutionContext(
 
     return hipdnn_plugin::try_catch([&, api_name = __func__]() {
         throw_if_null(handle);
-        // TODO - add check once the execution_plan integration is complete.
-        // throw_if_null(execution_context);
+        throw_if_null(execution_context);
 
         delete execution_context;
 
@@ -376,9 +375,8 @@ hipdnnPluginStatus_t
 
     return hipdnn_plugin::try_catch([&, api_name = __func__]() {
         throw_if_null(handle);
+        throw_if_null(execution_context);
         throw_if_null(device_buffers);
-        // TODO - add check once the execution_plan integration is complete.
-        // throw_if_null(execution_context);
 
         run_engine();
 
