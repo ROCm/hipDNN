@@ -6,6 +6,7 @@
 #include "engine_descriptor.hpp"
 #include "error.hpp"
 #include "graph_descriptor.hpp"
+#include "handle/handle.hpp"
 #include "hipdnn_backend_descriptor_type.h"
 #include "hipdnn_exception.hpp"
 #include "scoped_descriptor.hpp"
@@ -28,6 +29,14 @@ void Engine_heuristic_descriptor::finalize()
                    "Engine_heuristic_descriptor::finalize() failed: Heuristic mode is not set.");
 
     hipdnnBackendDescriptorImpl<Engine_heuristic_descriptor>::finalize();
+
+    //todo, remove once brians pr is merged.
+    auto handle = _graph->get_handle();
+    auto plugin_resource_manager = handle->get_plugin_resource_manager();
+
+    auto engine_ids = plugin_resource_manager->get_applicable_engine_ids(_graph.get());
+
+    set_engine_ids(engine_ids);
 }
 
 void Engine_heuristic_descriptor::get_attribute(hipdnnBackendAttributeName_t attribute_name,

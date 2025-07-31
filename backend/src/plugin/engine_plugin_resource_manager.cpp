@@ -37,7 +37,7 @@ std::vector<std::filesystem::path> get_default_plugin_paths()
     // This function should return the default plugin paths.
     // For now, we return an empty vector.
     // TODO: Implement logic to retrieve default plugin paths.
-    return {};
+    return {"/data/hipDNN/build/plugins/miopen_legacy_plugin/libmiopen_legacy_plugin.so"};
 }
 
 } // namespace

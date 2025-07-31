@@ -26,6 +26,8 @@ class BatchnormForwardInferenceIntegrationTest : public ::testing::Test
 protected:
     void SetUp() override
     {
+        setenv("HIPDNN_LOG_LEVEL", "info", 1);
+        //setenv("HIPDNN_LOG_FILE", "off", 1);
         // Initialize HIP
         ASSERT_EQ(hipInit(0), hipSuccess);
         ASSERT_EQ(hipGetDevice(&device_id), hipSuccess);
@@ -124,16 +126,23 @@ protected:
                                                         bn_attrs);
 
         // Validate and build graph
-        ASSERT_EQ(graph->validate().code, error_code_t::OK);
-        ASSERT_EQ(graph->build_operation_graph(handle).code, error_code_t::OK);
-        ASSERT_EQ(graph->create_execution_plans(handle).code, error_code_t::OK);
-        ASSERT_EQ(graph->check_support().code, error_code_t::OK);
+        auto result = graph->validate();
+        ASSERT_EQ(result.code, error_code_t::OK) << result.err_msg;
+
+        result = graph->build_operation_graph(handle);
+        ASSERT_EQ(result.code, error_code_t::OK) << result.err_msg;
+
+        result = graph->create_execution_plans(handle); //no engines found now.
+        ASSERT_EQ(result.code, error_code_t::OK) << result.err_msg;
+
+        result = graph->check_support();
+        ASSERT_EQ(result.code, error_code_t::OK) << result.err_msg;
 
         //I cant build plans yet because I cant finalize the engine config descriptor due to
         // not getting the workspace size from the plugin resource manager.  Getting backend error
         // Failed to finalize engine config descriptor Backend error: _Map_base::at
-        auto build_result = graph->build_plans();
-        ASSERT_EQ(build_result.code, error_code_t::OK) << build_result.err_msg;
+        result = graph->build_plans();
+        ASSERT_EQ(result.code, error_code_t::OK) << result.err_msg;
 
         Tensor x_tensor = Tensor::make_nchw_tensor<Input_type>(input_shape.dims);
         Tensor y_tensor = Tensor::make_nchw_tensor<Input_type>(input_shape.dims);
@@ -160,7 +169,8 @@ protected:
 
         variant_pack[y_tensor_attr->get_uid()] = y_tensor.memory().device_data<void>();
 
-        //graph->execute(handle, variant_pack, nullptr);
+        result = graph->execute(handle, variant_pack, nullptr);
+        ASSERT_EQ(result.code, error_code_t::OK) << result.err_msg;
     }
 
 private:
