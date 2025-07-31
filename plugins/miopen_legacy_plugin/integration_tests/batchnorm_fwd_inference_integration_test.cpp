@@ -42,7 +42,7 @@ struct Bn_2d_test_case
 template <typename Input_type, typename Intermediate_type>
 struct Batchnorm_2d_tensor_bundle
 {
-    Batchnorm_2d_tensor_bundle(const std::vector<int64_t>& dims)
+    Batchnorm_2d_tensor_bundle(const std::vector<int64_t>& dims, unsigned int seed = 1)
         : derived_dims({1, dims[1], 1, 1})
         , x_tensor(Tensor::make_nchw_tensor<Input_type>(dims))
         , y_tensor(Tensor::make_nchw_tensor<Input_type>(dims))
@@ -51,6 +51,22 @@ struct Batchnorm_2d_tensor_bundle
         , mean_tensor(Tensor::make_nchw_tensor<Intermediate_type>(derived_dims))
         , variance_tensor(Tensor::make_nchw_tensor<Intermediate_type>(derived_dims))
     {
+        x_tensor.fill_with_random_values<Input_type>(
+            static_cast<Input_type>(0.0f), static_cast<Input_type>(1.0f), seed);
+        y_tensor.fill_with_random_values<Input_type>(
+            static_cast<Input_type>(-100.0f), static_cast<Input_type>(100.0f), seed);
+
+        scale_tensor.fill_with_random_values<Intermediate_type>(
+            static_cast<Intermediate_type>(0.0f), static_cast<Intermediate_type>(1.0f), seed);
+
+        bias_tensor.fill_with_random_values<Intermediate_type>(
+            static_cast<Intermediate_type>(0.0f), static_cast<Intermediate_type>(1.0f), seed);
+
+        mean_tensor.fill_with_random_values<Intermediate_type>(
+            static_cast<Intermediate_type>(0.0f), static_cast<Intermediate_type>(1.0f), seed);
+
+        variance_tensor.fill_with_random_values<Intermediate_type>(
+            static_cast<Intermediate_type>(0.1f), static_cast<Intermediate_type>(1.0f), seed);
     }
 
     std::vector<int64_t> derived_dims;
@@ -62,7 +78,8 @@ struct Batchnorm_2d_tensor_bundle
     Tensor variance_tensor;
 };
 // NOLINTBEGIN(readability-function-cognitive-complexity)
-class Batchnorm_forward_inference_integration_test : public ::testing::Test
+class Batchnorm_forward_inference_integration_test
+    : public ::testing::TestWithParam<Bn_2d_test_case>
 {
 protected:
     void SetUp() override
@@ -76,6 +93,9 @@ protected:
         // Create handle
         ASSERT_EQ(hipdnnCreate(&_handle), HIPDNN_STATUS_SUCCESS);
         ASSERT_EQ(hipdnnSetStream(_handle, _stream), HIPDNN_STATUS_SUCCESS);
+
+        // todo
+        // Call new backend api to set the plugin paths.
     }
 
     void TearDown() override
@@ -160,36 +180,37 @@ protected:
 
         graph->set_name("BatchnormInferenceTest");
 
+        int64_t uid = 1;
         auto x_tensor_attr = std::make_shared<Tensor_attributes>();
-        x_tensor_attr->set_uid(1)
+        x_tensor_attr->set_uid(uid++)
             .set_name("X")
             .set_data_type(input_data_type)
             .set_dim(graph_tensor_bundle.x_tensor.dims())
             .set_stride(graph_tensor_bundle.x_tensor.strides());
 
         auto mean_tensor_attr = std::make_shared<Tensor_attributes>();
-        mean_tensor_attr->set_uid(2)
+        mean_tensor_attr->set_uid(uid++)
             .set_name("mean")
             .set_data_type(intermediate_data_type)
             .set_dim(graph_tensor_bundle.mean_tensor.dims())
             .set_stride(graph_tensor_bundle.mean_tensor.strides());
 
         auto inv_variance_tensor_attr = std::make_shared<Tensor_attributes>();
-        inv_variance_tensor_attr->set_uid(3)
+        inv_variance_tensor_attr->set_uid(uid++)
             .set_name("inv_variance")
             .set_data_type(intermediate_data_type)
             .set_dim(graph_tensor_bundle.variance_tensor.dims())
             .set_stride(graph_tensor_bundle.variance_tensor.strides());
 
         auto scale_tensor_attr = std::make_shared<Tensor_attributes>();
-        scale_tensor_attr->set_uid(4)
+        scale_tensor_attr->set_uid(uid++)
             .set_name("scale")
             .set_data_type(intermediate_data_type)
             .set_dim(graph_tensor_bundle.scale_tensor.dims())
             .set_stride(graph_tensor_bundle.scale_tensor.strides());
 
         auto bias_tensor_attr = std::make_shared<Tensor_attributes>();
-        bias_tensor_attr->set_uid(5)
+        bias_tensor_attr->set_uid(uid++)
             .set_name("bias")
             .set_data_type(intermediate_data_type)
             .set_dim(graph_tensor_bundle.bias_tensor.dims())
@@ -207,8 +228,8 @@ protected:
 
         if(!y_tensor_attr->has_uid())
         {
-            HIPDNN_LOG_INFO("y_tensor_attr does not have a UID, creating a new one.");
-            y_tensor_attr->set_uid(6);
+            HIPDNN_LOG_INFO("y_tensor_attr does not have a UID, giving it a UID");
+            y_tensor_attr->set_uid(uid++);
         }
 
         // Validate and build graph
@@ -241,7 +262,8 @@ protected:
     }
 
     template <typename Input_type, typename Intermediate_type>
-    void run_cpu_batchnorm_fwd(Batchnorm_2d_tensor_bundle<float, float>& cpu_tensor_bundle)
+    void run_cpu_batchnorm_fwd(
+        Batchnorm_2d_tensor_bundle<Input_type, Intermediate_type>& cpu_tensor_bundle)
     {
         Cpu_fp_reference_implementation<Input_type, Intermediate_type, Intermediate_type>
             cpu_ref_impl;
@@ -255,16 +277,20 @@ protected:
     }
 
     template <typename Input_type, typename Intermediate_type>
-    void run_batchnorm_test(const Bn_2d_test_case& test_case, float tolerance = 1e-4f)
+    void run_batchnorm_test(const Bn_2d_test_case& test_case, Input_type tolerance = 1e-4f)
     {
         auto input_data_type = get_data_type_from_type<Input_type>();
         auto intermediate_data_type = get_data_type_from_type<Intermediate_type>();
 
+        unsigned int seed = std::random_device{}();
+        //log the random seed in case we need to reproduce the test
+        HIPDNN_LOG_INFO("Test is using {} for its random seed", seed);
+
         Batchnorm_2d_tensor_bundle<Input_type, Intermediate_type> graph_tensor_bundle(
-            test_case.get_dims());
+            test_case.get_dims(), seed);
 
         Batchnorm_2d_tensor_bundle<Input_type, Intermediate_type> cpu_tensor_bundle(
-            test_case.get_dims());
+            test_case.get_dims(), seed);
 
         run_miopen_batchnorm_fwd<Input_type, Intermediate_type>(
             graph_tensor_bundle, input_data_type, intermediate_data_type);
@@ -282,10 +308,52 @@ private:
     int _device_id = 0;
 };
 
-// Test cases with various tensor shapes
-TEST_F(Batchnorm_forward_inference_integration_test, SmallTensor_NCHW)
+std::vector<Bn_2d_test_case> get_bn_fwd_inference_test_cases()
 {
-    Bn_2d_test_case test_case = {.n = 1, .c = 3, .h = 14, .w = 14};
-    run_batchnorm_test<float, float>(test_case);
+    return {
+        {.n = 1, .c = 3, .h = 14, .w = 14},
+        // TODO: uncomment these once the first test passes
+        // {.n = 2, .c = 3, .h = 14, .w = 14},
+        // {.n = 64, .c = 3, .h = 14, .w = 14},
+        // {.n = 64, .c = 256, .h = 14, .w = 14},
+        // {.n = 64, .c = 256, .h = 28, .w = 28},
+        // {.n = 64, .c = 256, .h = 56, .w = 56},
+        // {.n = 64, .c = 512, .h = 14, .w = 14},
+        // {.n = 64, .c = 512, .h = 28, .w = 28},
+        // {.n = 64, .c = 512, .h = 7, .w = 7},
+        // {.n = 64, .c = 64, .h = 112, .w = 112},
+        // {.n = 64, .c = 64, .h = 56, .w = 56},
+    };
 }
+
+TEST_P(Batchnorm_forward_inference_integration_test, RunFloatFwdBatchnormGraph)
+{
+    Bn_2d_test_case test_case = GetParam();
+    run_batchnorm_test<float, float>(test_case, 1e-6f);
+}
+
+INSTANTIATE_TEST_SUITE_P(RunFloatFwdBatchnormGraph,
+                         Batchnorm_forward_inference_integration_test,
+                         testing::ValuesIn(get_bn_fwd_inference_test_cases()));
+
+TEST_P(Batchnorm_forward_inference_integration_test, RunBfloat16FwdBatchnormGraph)
+{
+    Bn_2d_test_case test_case = GetParam();
+    run_batchnorm_test<hip_bfloat16, float>(test_case, 1e-2_bf);
+}
+
+INSTANTIATE_TEST_SUITE_P(RunBfloat16FwdBatchnormGraph,
+                         Batchnorm_forward_inference_integration_test,
+                         testing::ValuesIn(get_bn_fwd_inference_test_cases()));
+
+TEST_P(Batchnorm_forward_inference_integration_test, RunHalfFwdbatchnormGraph)
+{
+    Bn_2d_test_case test_case = GetParam();
+    run_batchnorm_test<half, float>(test_case, 1e-2_h);
+}
+
+INSTANTIATE_TEST_SUITE_P(RunHalfFwdbatchnormGraph,
+                         Batchnorm_forward_inference_integration_test,
+                         testing::ValuesIn(get_bn_fwd_inference_test_cases()));
+
 // NOLINTEND(readability-function-cognitive-complexity)
