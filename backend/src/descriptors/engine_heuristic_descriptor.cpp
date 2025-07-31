@@ -28,15 +28,14 @@ void Engine_heuristic_descriptor::finalize()
                    HIPDNN_STATUS_BAD_PARAM,
                    "Engine_heuristic_descriptor::finalize() failed: Heuristic mode is not set.");
 
-    hipdnnBackendDescriptorImpl<Engine_heuristic_descriptor>::finalize();
-
-    //todo, remove once brians pr is merged.
     auto handle = _graph->get_handle();
     auto plugin_resource_manager = handle->get_plugin_resource_manager();
 
-    auto engine_ids = plugin_resource_manager->get_applicable_engine_ids(_graph.get());
+    // TODO - For now we are going to return the engine IDs we get from the plugin resource manager.
+    // In the future, we will need to implement a plugin system for engine heuristics that allows plugins to determine sort order of the returned engines.
+    _engine_ids = plugin_resource_manager->get_applicable_engine_ids(_graph.get());
 
-    set_engine_ids(engine_ids);
+    hipdnnBackendDescriptorImpl<Engine_heuristic_descriptor>::finalize();
 }
 
 void Engine_heuristic_descriptor::get_attribute(hipdnnBackendAttributeName_t attribute_name,
@@ -252,17 +251,6 @@ void Engine_heuristic_descriptor::get_engine_configs(hipdnnBackendAttributeType_
         *element_count
             = std::min(requested_element_count, static_cast<int64_t>(_engine_ids.size()));
     }
-}
-
-void Engine_heuristic_descriptor::set_engine_ids(const std::vector<int64_t>& engine_ids)
-{
-    THROW_IF_FALSE(is_finalized(),
-                   HIPDNN_STATUS_INTERNAL_ERROR,
-                   "Engine_heuristic_descriptor::set_engine_ids() failed: Not finalized before "
-                   "setting the applicable engine Ids.");
-
-    _engine_ids = engine_ids;
-    _engine_ids_set = true;
 }
 
 void Engine_heuristic_descriptor::get_heuristic_mode(hipdnnBackendAttributeType_t attribute_type,
