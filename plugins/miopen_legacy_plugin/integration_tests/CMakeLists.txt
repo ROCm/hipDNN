@@ -13,11 +13,6 @@ if(HIP_DNN_SKIP_TESTS)
     return()
 endif()
 
-add_compile_definitions(__HIP_PLATFORM_AMD__)
-add_compile_definitions(__HIPCC__)
-find_package(hip REQUIRED)
-enable_language(HIP)
-
 add_executable(miopen_plugin_integration_test
     main.cpp
     batchnorm_fwd_inference_integration_test.cpp
