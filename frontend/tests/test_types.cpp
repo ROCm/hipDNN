@@ -46,5 +46,5 @@ TEST(TestTypes, GetDataTypeEnumFromType)
     EXPECT_EQ(get_data_type_enum_from_type<int32_t>(), DataType_t::INT32);
 
     // Test with an unsupported type (e.g., int)
-    EXPECT_EQ(get_data_type_enum_from_type<int>(), DataType_t::NOT_SET);
+    EXPECT_EQ(get_data_type_enum_from_type<int64_t>(), DataType_t::NOT_SET);
 }
