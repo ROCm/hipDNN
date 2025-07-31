@@ -14,9 +14,6 @@ namespace hipdnn_backend
 namespace plugin
 {
 
-// This function is for querying the address of this library
-void shared_library_anchor() {}
-
 std::filesystem::path Shared_library::get_current_module_directory()
 {
     std::filesystem::path module_path;
@@ -25,7 +22,7 @@ std::filesystem::path Shared_library::get_current_module_directory()
     HMODULE hModule = nullptr;
     if(GetModuleHandleExA(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS
                               | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
-                          reinterpret_cast<LPCSTR>(&shared_library_anchor),
+                          reinterpret_cast<LPCSTR>(&get_current_module_directory),
                           &hModule))
     {
         char path_buffer[MAX_PATH];
@@ -45,7 +42,7 @@ std::filesystem::path Shared_library::get_current_module_directory()
     }
 #elif defined(__linux__)
     Dl_info info;
-    if(dladdr(reinterpret_cast<void const*>(&shared_library_anchor), &info) != 0
+    if(dladdr(reinterpret_cast<void const*>(&get_current_module_directory), &info) != 0
        && info.dli_fname != nullptr && info.dli_fname[0] != '\0')
     {
         module_path = std::filesystem::path(info.dli_fname).parent_path();
