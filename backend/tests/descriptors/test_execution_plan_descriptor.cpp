@@ -91,9 +91,7 @@ public:
         EXPECT_CALL(*get_mock_engine_config(), is_finalized()).WillOnce(Return(true));
         EXPECT_CALL(*get_mock_engine_config(), get_engine()).WillOnce(Return(get_mock_engine()));
         EXPECT_CALL(*get_mock_engine_config(), get_serialized_engine_config())
-            .WillOnce(Invoke([]() {
-                return hipdnnPluginConstData_t{nullptr, 0};
-            }));
+            .WillOnce(Invoke([]() { return hipdnnPluginConstData_t{nullptr, 0}; }));
 
         get_execution_plan_descriptor()->set_attribute(HIPDNN_ATTR_EXECUTION_PLAN_ENGINE_CONFIG,
                                                        HIPDNN_TYPE_BACKEND_DESCRIPTOR,
