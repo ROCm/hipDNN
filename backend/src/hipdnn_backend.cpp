@@ -153,8 +153,6 @@ HIPDNN_BACKEND_EXPORT hipdnnStatus_t hipdnnBackendExecute(hipdnnHandle_t handle,
         
         handle->get_plugin_resource_manager()->execute_op_graph(execution_plan, variant_pack);
 
-        handle->get_plugin_resource_manager()->execute_op_graph(execution_plan, variant_pack);
-
         LOG_API_SUCCESS(api_name, "");
     });
 }
