@@ -101,6 +101,13 @@ public:
     {
         hipdnnLoggingCallback_ext(severity, msg);
     }
+
+    hipdnnStatus_t set_engine_plugin_paths_ext(size_t num_paths,
+                                               const char* const* plugin_paths,
+                                               hipdnnPluginLoadingMode_ext_t mode) override
+    {
+        return hipdnnSetEnginePluginPaths_ext(num_paths, plugin_paths, mode);
+    }
 };
 
 static std::unique_ptr<Hipdnn_backend_interface> backend_wrapper;

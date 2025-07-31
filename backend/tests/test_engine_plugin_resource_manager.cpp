@@ -21,7 +21,13 @@ TEST(GPU_EnginePluginResourceManagerTest, LoadPluginsAndExecuteOpGraph)
     std::vector<std::filesystem::path> plugin_paths = {"./hipdnn_test_engine_plugin1"};
 
     // Set the plugin paths
-    plugin::Engine_plugin_resource_manager::set_plugin_paths(plugin_paths);
+    plugin::Engine_plugin_resource_manager::set_plugin_paths(plugin_paths,
+                                                             HIPDNN_PLUGIN_LOADING_ABSOLUTE);
+
+    auto retrieved_paths = plugin::Engine_plugin_resource_manager::get_plugin_paths();
+    std::set<std::filesystem::path> expected_paths(plugin_paths.begin(), plugin_paths.end());
+
+    EXPECT_EQ(retrieved_paths, expected_paths);
 
     // Create an Engine_plugin_resource_manager instance
     auto resource_manager = plugin::Engine_plugin_resource_manager::create();

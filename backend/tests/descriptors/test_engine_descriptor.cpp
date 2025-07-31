@@ -99,6 +99,11 @@ protected:
         serialize_engine_details(ENGINE_ID);
     }
 
+    void TearDown() override
+    {
+        _engine_wrapper.reset();
+    }
+
 private:
     void serialize_engine_details(int64_t engine_id)
     {

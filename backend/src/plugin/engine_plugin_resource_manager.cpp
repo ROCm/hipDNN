@@ -2,10 +2,9 @@
 // SPDX-License-Identifier:  MIT
 
 #include <algorithm>
+#include <hipdnn_sdk/data_objects/engine_details_generated.h>
 #include <mutex>
 #include <vector>
-
-#include <hipdnn_sdk/data_objects/engine_details_generated.h>
 
 #include "descriptors/engine_config_descriptor.hpp"
 #include "descriptors/engine_descriptor.hpp"
@@ -15,6 +14,7 @@
 #include "engine_plugin.hpp"
 #include "engine_plugin_resource_manager.hpp"
 #include "hipdnn_exception.hpp"
+#include "logging/logging.hpp"
 
 namespace hipdnn_backend
 {
@@ -23,37 +23,54 @@ namespace plugin
 
 class Engine_plugin_manager : public Plugin_manager_base<Engine_plugin>
 {
+public:
+    Engine_plugin_manager()
+        : Plugin_manager_base<Engine_plugin>({"hipdnn_plugins/engines/"})
+    {
+    }
 };
 
 namespace
 {
 
-std::mutex plugin_mutex;
-std::vector<std::filesystem::path> override_plugin_paths;
-std::weak_ptr<Engine_plugin_manager> pm_ptr;
-
-std::vector<std::filesystem::path> get_default_plugin_paths()
+struct Plugin_loading_config
 {
-    // This function should return the default plugin paths.
-    // For now, we return an empty vector.
-    // TODO: Implement logic to retrieve default plugin paths.
-    return {"/data/hipDNN/build/plugins/miopen_legacy_plugin/libmiopen_legacy_plugin.so"};
-}
+    std::set<std::filesystem::path> paths;
+    hipdnnPluginLoadingMode_ext_t mode = HIPDNN_PLUGIN_LOADING_ADDITIVE;
+};
+
+std::mutex plugin_mutex;
+Plugin_loading_config plugin_config;
+std::weak_ptr<Engine_plugin_manager> pm_ptr;
 
 } // namespace
 
 void Engine_plugin_resource_manager::set_plugin_paths(
-    const std::vector<std::filesystem::path>& plugin_paths)
+    const std::vector<std::filesystem::path>& plugin_paths,
+    hipdnnPluginLoadingMode_ext_t loading_mode)
 {
     std::lock_guard<std::mutex> lock(plugin_mutex);
 
-    // Check if the plugin paths are already saved, if so, do nothing.
-    if(!override_plugin_paths.empty())
-    {
-        return;
-    }
+    THROW_IF_FALSE(pm_ptr.expired(),
+                   HIPDNN_STATUS_NOT_SUPPORTED,
+                   "hipdnnSetEnginePluginPaths_ext cannot be called with an active handle.");
 
-    override_plugin_paths = plugin_paths;
+    plugin_config.mode = loading_mode;
+
+    if(loading_mode == HIPDNN_PLUGIN_LOADING_ABSOLUTE)
+    {
+        plugin_config.paths = {plugin_paths.begin(), plugin_paths.end()};
+    }
+    else
+    {
+        plugin_config.paths.insert(plugin_paths.begin(), plugin_paths.end());
+    }
+}
+
+std::set<std::filesystem::path> Engine_plugin_resource_manager::get_plugin_paths()
+{
+    std::lock_guard<std::mutex> lock(plugin_mutex);
+    return plugin_config.paths;
 }
 
 std::shared_ptr<Engine_plugin_resource_manager> Engine_plugin_resource_manager::create()
@@ -68,10 +85,8 @@ std::shared_ptr<Engine_plugin_resource_manager> Engine_plugin_resource_manager::
 
         if(!pm)
         {
-            auto paths = override_plugin_paths.empty() ? get_default_plugin_paths()
-                                                       : override_plugin_paths;
             pm = std::make_shared<Engine_plugin_manager>();
-            pm->load_plugins(paths);
+            pm->load_plugins(plugin_config.paths, plugin_config.mode);
             pm_ptr = pm;
         }
     }
@@ -93,6 +108,8 @@ Engine_plugin_resource_manager::Engine_plugin_resource_manager(
     for(const auto& plugin : plugins)
     {
         auto handle = plugin.create_handle();
+
+        plugin.set_logging_callback(logging::hipdnn_logging_callback);
 
         if(_handle_to_plugin.contains(handle))
         {
@@ -314,12 +331,8 @@ void Engine_plugin_resource_manager::execute_op_graph(hipdnnBackendDescriptor_t 
         device_buffers.push_back(buffer);
     }
 
-    // TODO: Get execution context from the execution plan
-    // This will be implemented at the integration stage
-    hipdnnEnginePluginExecutionContext_t execution_context = nullptr;
-
     execute_op_graph(engine_id,
-                     execution_context,
+                     execution_plan_desc->get_execution_context(),
                      workspace,
                      device_buffers.data(),
                      static_cast<uint32_t>(tensor_ids.size()));
@@ -458,4 +471,4 @@ hipdnnEnginePluginExecutionContext_t Engine_execution_context_wrapper::get() con
 }
 
 } // namespace plugin
-} // hipdnn_backend
+} // namespace hipdnn_backend

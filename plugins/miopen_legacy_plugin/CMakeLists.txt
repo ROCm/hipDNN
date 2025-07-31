@@ -91,5 +91,5 @@ add_subdirectory(integration_tests)
 install(
     TARGETS miopen_legacy_plugin
     EXPORT miopen-legacy-plugin
-    LIBRARY DESTINATION lib/hipdnn_plugins
+    LIBRARY DESTINATION lib/hipdnn_plugins/engines
 )

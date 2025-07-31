@@ -83,7 +83,7 @@ std::string_view Plugin_base::get_last_error_string() const noexcept
     return error_str;
 }
 
-hipdnnPluginStatus_t Plugin_base::set_logging_callback(hipdnnCallback_t callback)
+hipdnnPluginStatus_t Plugin_base::set_logging_callback(hipdnnCallback_t callback) const
 {
     assert(_initialized);
     if(_func_set_logging_callback == nullptr)
