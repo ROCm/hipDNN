@@ -83,6 +83,8 @@ target_include_directories(miopen_legacy_plugin
 target_link_libraries(miopen_legacy_plugin PUBLIC MIOpen hipdnn_sdk)
 target_compile_options(miopen_legacy_plugin PRIVATE ${HIPDNN_WARNING_COMPILE_OPTIONS})
 
+set(MIOPEN_LEGACY_PLUGIN_DIR ${CMAKE_CURRENT_BINARY_DIR} CACHE INTERNAL "miopen legacy plugin dir" FORCE)
+
 add_subdirectory(tests)
 add_subdirectory(integration_tests)
 

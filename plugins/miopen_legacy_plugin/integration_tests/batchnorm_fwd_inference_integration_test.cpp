@@ -95,7 +95,11 @@ protected:
         ASSERT_EQ(hipdnnSetStream(_handle, _stream), HIPDNN_STATUS_SUCCESS);
 
         // todo
-        // Call new backend api to set the plugin paths.
+        // uncomment once we have this functionality
+        // const std::array<const char*, 1> paths = {PLUGIN_DIR};
+        // ASSERT_EQ(hipdnnSetEnginePluginPaths_ext(
+        //               paths.size(), paths.data(), HIPDNN_PLUGIN_LOADING_ABSOLUTE),
+        //           HIPDNN_STATUS_SUCCESS);
     }
 
     void TearDown() override
