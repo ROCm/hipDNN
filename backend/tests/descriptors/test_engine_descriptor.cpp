@@ -60,22 +60,21 @@ public:
                                                                &_mock_graph_wrapper));
     }
 
-    void set_global_index() const
+    void set_global_index(int64_t engine_id) const
     {
-        int64_t gidx = 0;
         ASSERT_NO_THROW(get_engine_descriptor()->set_attribute(
-            HIPDNN_ATTR_ENGINE_GLOBAL_INDEX, HIPDNN_TYPE_INT64, 1, &gidx));
+            HIPDNN_ATTR_ENGINE_GLOBAL_INDEX, HIPDNN_TYPE_INT64, 1, &engine_id));
     }
 
     void make_engine_finalized() const
     {
         set_graph();
-        set_global_index();
+        set_global_index(ENGINE_ID);
         EXPECT_CALL(*get_mock_graph(), get_handle()).WillOnce(Return(_mock_handle.get()));
         EXPECT_CALL(*_mock_handle, get_plugin_resource_manager())
             .WillOnce(Return(_mock_engine_plugin_resource_manager));
         EXPECT_CALL(*_mock_engine_plugin_resource_manager, get_applicable_engine_ids(_))
-            .WillOnce(Return(std::vector<int64_t>{0}));
+            .WillOnce(Return(std::vector<int64_t>{ENGINE_ID}));
         EXPECT_CALL(*_mock_engine_plugin_resource_manager, get_engine_details(_, _, _))
             .WillOnce(Invoke([this](int64_t, const Graph_descriptor*, hipdnnPluginConstData_t* d) {
                 *d = this->_serialized_engine_details;
@@ -97,7 +96,7 @@ protected:
         _mock_engine_plugin_resource_manager
             = std::make_shared<Mock_engine_plugin_resource_manager>();
 
-        serialize_engine_details();
+        serialize_engine_details(ENGINE_ID);
     }
 
     void TearDown() override
@@ -106,19 +105,18 @@ protected:
     }
 
 private:
-    void serialize_engine_details()
+    void serialize_engine_details(int64_t engine_id)
     {
-        int64_t gidx = 0;
-
         flatbuffers::FlatBufferBuilder builder;
         hipdnn_sdk::data_objects::EngineDetailsBuilder engine_details_builder(builder);
-        engine_details_builder.add_engine_id(gidx);
+        engine_details_builder.add_engine_id(engine_id);
         builder.Finish(engine_details_builder.Finish());
         _engine_details_buffer = builder.Release();
         _serialized_engine_details
             = {.ptr = _engine_details_buffer.data(), .size = _engine_details_buffer.size()};
     }
 
+    static constexpr int64_t ENGINE_ID = 0;
     flatbuffers::DetachedBuffer _engine_details_buffer;
     hipdnnPluginConstData_t _serialized_engine_details;
 };

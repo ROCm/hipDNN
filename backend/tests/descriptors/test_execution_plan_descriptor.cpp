@@ -7,6 +7,8 @@
 #include "hipdnn_backend.h"
 #include "hipdnn_exception.hpp"
 #include "mocks/mock_descriptor.hpp"
+#include "mocks/mock_engine_plugin_resource_manager.hpp"
+#include "mocks/mock_handle.hpp"
 #include "test_descriptor_utils.hpp"
 #include "test_macros.hpp"
 
@@ -16,88 +18,112 @@
 #include <memory>
 
 using namespace hipdnn_backend;
+using namespace plugin;
 using namespace test_descriptor_utils;
+using namespace ::testing;
 
-using ::testing::_;
 using ::testing::Return;
 
-// NOLINTBEGIN(readability-function-cognitive-complexity)
 class Execution_plan_descriptor_test : public ::testing::Test
 {
 public:
     std::unique_ptr<hipdnnBackendDescriptor> _plan_wrapper = nullptr;
-    hipdnnHandle_t _handle = reinterpret_cast<hipdnnHandle_t>(0x12345678);
+    std::unique_ptr<hipdnnBackendDescriptor> _mock_graph_wrapper = nullptr;
+    std::unique_ptr<hipdnnBackendDescriptor> _mock_engine_wrapper = nullptr;
     std::unique_ptr<hipdnnBackendDescriptor> _mock_engine_config_wrapper = nullptr;
     std::unique_ptr<hipdnnBackendDescriptor> _mock_engine_config_bad_type_wrapper = nullptr;
     std::unique_ptr<hipdnnBackendDescriptor> _mock_wrong_type_wrapper = nullptr;
+    std::unique_ptr<Mock_handle> _mock_handle = nullptr;
+    std::shared_ptr<Mock_engine_plugin_resource_manager> _mock_engine_plugin_resource_manager
+        = nullptr;
 
     std::shared_ptr<Execution_plan_descriptor> get_execution_plan_descriptor() const
     {
         return _plan_wrapper->as_descriptor<Execution_plan_descriptor>();
     }
 
-    std::shared_ptr<Mock_descriptor<Engine_config_descriptor>> get_mock_engine_config() const
+    std::shared_ptr<Mock_graph_descriptor> get_mock_graph() const
     {
-        return _mock_engine_config_wrapper
-            ->as_descriptor<Mock_descriptor<Engine_config_descriptor>>();
+        return Mock_descriptor_utility::as_descriptor_unsafe<Mock_graph_descriptor>(
+            _mock_graph_wrapper.get());
     }
 
-    std::shared_ptr<Mock_descriptor<Engine_config_descriptor>>
-        get_mock_engine_config_bad_type() const
+    std::shared_ptr<Mock_engine_descriptor> get_mock_engine() const
     {
-        return _mock_engine_config_bad_type_wrapper
-            ->as_descriptor<Mock_descriptor<Engine_config_descriptor>>();
+        return Mock_descriptor_utility::as_descriptor_unsafe<Mock_engine_descriptor>(
+            _mock_engine_wrapper.get());
     }
 
-    std::shared_ptr<Mock_descriptor<Execution_plan_descriptor>> get_mock_wrong_type() const
+    std::shared_ptr<Mock_engine_config_descriptor> get_mock_engine_config() const
     {
-        return _mock_wrong_type_wrapper
-            ->as_descriptor<Mock_descriptor<Execution_plan_descriptor>>();
+        return Mock_descriptor_utility::as_descriptor_unsafe<Mock_engine_config_descriptor>(
+            _mock_engine_config_wrapper.get());
     }
 
-    void SetUp() override
+    std::shared_ptr<Mock_engine_config_descriptor> get_mock_engine_config_bad_type() const
     {
-        _plan_wrapper = create_descriptor<Execution_plan_descriptor>();
-        _mock_engine_config_wrapper
-            = create_descriptor<Mock_descriptor<Engine_config_descriptor>>();
-        _mock_engine_config_bad_type_wrapper
-            = create_descriptor<Mock_descriptor<Engine_config_descriptor>>();
-        _mock_wrong_type_wrapper = create_descriptor<Mock_descriptor<Execution_plan_descriptor>>();
+        return Mock_descriptor_utility::as_descriptor_unsafe<Mock_engine_config_descriptor>(
+            _mock_engine_config_bad_type_wrapper.get());
     }
 
-    void TearDown() override
+    static hipdnnEnginePluginExecutionContext_t get_execution_context()
     {
-        _plan_wrapper.reset();
-        _mock_engine_config_wrapper.reset();
-        _mock_engine_config_bad_type_wrapper.reset();
-        _mock_wrong_type_wrapper.reset();
-    }
-
-    void make_execution_plan_finalized()
-    {
-        ASSERT_NO_THROW(set_handle());
-        ASSERT_NO_THROW(set_engine_config());
-
-        auto plan = get_execution_plan_descriptor();
-        ASSERT_NO_THROW(plan->finalize());
+        return reinterpret_cast<hipdnnEnginePluginExecutionContext_t>(0xFFFFFFFF);
     }
 
     void set_handle()
     {
-        auto plan = get_execution_plan_descriptor();
-        plan->set_attribute(HIPDNN_ATTR_EXECUTION_PLAN_HANDLE, HIPDNN_TYPE_HANDLE, 1, &_handle);
+        EXPECT_CALL(*_mock_engine_plugin_resource_manager, create_execution_context(_, _, _))
+            .WillOnce(Return(get_execution_context()));
+        EXPECT_CALL(*_mock_engine_plugin_resource_manager, destroy_execution_context(_, _));
+
+        EXPECT_CALL(*_mock_handle, get_plugin_resource_manager())
+            .WillOnce(Return(_mock_engine_plugin_resource_manager));
+        get_execution_plan_descriptor()->set_attribute(
+            HIPDNN_ATTR_EXECUTION_PLAN_HANDLE, HIPDNN_TYPE_HANDLE, 1, &_mock_handle);
     }
 
     void set_engine_config()
     {
-        auto plan = get_execution_plan_descriptor();
-        auto mock_engine_config = get_mock_engine_config();
-        EXPECT_CALL(*mock_engine_config, is_finalized()).WillOnce(Return(true));
-        plan->set_attribute(HIPDNN_ATTR_EXECUTION_PLAN_ENGINE_CONFIG,
-                            HIPDNN_TYPE_BACKEND_DESCRIPTOR,
-                            1,
-                            &_mock_engine_config_wrapper);
+        EXPECT_CALL(*get_mock_engine(), get_engine_id()).WillOnce(Return(ENGINE_ID));
+        EXPECT_CALL(*get_mock_engine(), get_graph()).WillOnce(Return(get_mock_graph()));
+
+        EXPECT_CALL(*get_mock_engine_config(), is_finalized()).WillOnce(Return(true));
+        EXPECT_CALL(*get_mock_engine_config(), get_engine()).WillOnce(Return(get_mock_engine()));
+        EXPECT_CALL(*get_mock_engine_config(), get_serialized_engine_config())
+            .WillOnce(Invoke([]() { return hipdnnPluginConstData_t{nullptr, 0}; }));
+
+        get_execution_plan_descriptor()->set_attribute(HIPDNN_ATTR_EXECUTION_PLAN_ENGINE_CONFIG,
+                                                       HIPDNN_TYPE_BACKEND_DESCRIPTOR,
+                                                       1,
+                                                       &_mock_engine_config_wrapper);
     }
+
+    void make_execution_plan_finalized()
+    {
+        set_handle();
+        set_engine_config();
+        ASSERT_NO_THROW(get_execution_plan_descriptor()->finalize());
+    }
+
+protected:
+    void SetUp() override
+    {
+        _plan_wrapper = create_descriptor<Execution_plan_descriptor>();
+        _mock_graph_wrapper = test_descriptor_utils::create_descriptor<Mock_graph_descriptor>();
+        _mock_engine_wrapper = create_descriptor<Mock_engine_descriptor>();
+        _mock_engine_config_wrapper = create_descriptor<Mock_engine_config_descriptor>();
+        _mock_engine_config_bad_type_wrapper = create_descriptor<Mock_engine_config_descriptor>();
+        _mock_wrong_type_wrapper = create_descriptor<Mock_engine_descriptor>();
+        _mock_handle = std::make_unique<Mock_handle>();
+        _mock_engine_plugin_resource_manager
+            = std::make_shared<Mock_engine_plugin_resource_manager>();
+    }
+
+    void TearDown() override {}
+
+private:
+    static constexpr int64_t ENGINE_ID = 0;
 };
 
 TEST_F(Execution_plan_descriptor_test, CreateExecutionPlanDescriptor)
@@ -326,4 +352,12 @@ TEST_F(Execution_plan_descriptor_test, GetEngineConfigReturnsPointerIfFinalized)
     ASSERT_EQ(static_cast<const Backend_descriptor_interface*>(engine_config_ptr.get()),
               static_cast<const Backend_descriptor_interface*>(get_mock_engine_config().get()));
 }
-// NOLINTEND(readability-function-cognitive-complexity)
+
+TEST_F(Execution_plan_descriptor_test, ExecutionPlanDescriptorGetExecutionContext)
+{
+    auto plan = get_execution_plan_descriptor();
+    make_execution_plan_finalized();
+    auto context = plan->get_execution_context();
+    ASSERT_NE(context, nullptr);
+    ASSERT_EQ(context, get_execution_context());
+}

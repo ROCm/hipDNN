@@ -4,16 +4,24 @@
 #pragma once
 
 #include "backend_descriptor.hpp"
+#include <hipdnn_sdk/plugin/plugin_api_data_types.h>
 
 namespace hipdnn_backend
 {
 
 class Engine_config_descriptor;
+
+namespace plugin
+{
+class Engine_execution_context_wrapper;
+}
+
 class Execution_plan_descriptor : public hipdnnBackendDescriptorImpl<Execution_plan_descriptor>
 {
 private:
     hipdnnHandle_t _handle = nullptr;
     std::shared_ptr<const Engine_config_descriptor> _engine_config;
+    std::shared_ptr<const plugin::Engine_execution_context_wrapper> _execution_context;
 
     void get_workspace_size(hipdnnBackendAttributeType_t attribute_type,
                             int64_t requested_element_count,
@@ -49,6 +57,7 @@ public:
 
     // Throws an exception if the descriptor is not finalized.
     std::shared_ptr<const Engine_config_descriptor> get_engine_config() const;
+    hipdnnEnginePluginExecutionContext_t get_execution_context() const;
 
     static hipdnnBackendDescriptorType_t get_static_type();
 };
