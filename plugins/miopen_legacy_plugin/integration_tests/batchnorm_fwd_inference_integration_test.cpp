@@ -112,39 +112,6 @@ protected:
         }
     }
 
-    template <typename T>
-    DataType_t get_data_type_from_type()
-    {
-        if constexpr(std::is_same_v<T, float>)
-        {
-            return DataType_t::FLOAT;
-        }
-        else if constexpr(std::is_same_v<T, half>)
-        {
-            return DataType_t::HALF;
-        }
-        else if constexpr(std::is_same_v<T, hip_bfloat16>)
-        {
-            return DataType_t::BFLOAT16;
-        }
-        else if constexpr(std::is_same_v<T, double>)
-        {
-            return DataType_t::DOUBLE;
-        }
-        else if constexpr(std::is_same_v<T, uint8_t>)
-        {
-            return DataType_t::UINT8;
-        }
-        else if constexpr(std::is_same_v<T, int32_t>)
-        {
-            return DataType_t::INT32;
-        }
-        else
-        {
-            return DataType_t::NOT_SET;
-        }
-    }
-
     template <typename Input_type, typename Intermediate_type>
     std::unordered_map<int64_t, void*> create_variant_pack(
         const Tensor_attributes& x_tensor_attr,
@@ -283,8 +250,8 @@ protected:
     template <typename Input_type, typename Intermediate_type>
     void run_batchnorm_test(const Bn_2d_test_case& test_case, Input_type tolerance = 1e-4f)
     {
-        auto input_data_type = get_data_type_from_type<Input_type>();
-        auto intermediate_data_type = get_data_type_from_type<Intermediate_type>();
+        auto input_data_type = get_data_type_enum_from_type<Input_type>();
+        auto intermediate_data_type = get_data_type_enum_from_type<Intermediate_type>();
 
         unsigned int seed = std::random_device{}();
         //log the random seed in case we need to reproduce the test
