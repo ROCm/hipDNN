@@ -48,7 +48,7 @@ public:
                           const hipdnnPluginDeviceBuffer_t* device_buffers,
                           uint32_t num_device_buffers) const;
 
-    static hipdnnPluginType_t get_class_type()
+    static hipdnnPluginType_t get_plugin_type()
     {
         return HIPDNN_PLUGIN_TYPE_ENGINE;
     }

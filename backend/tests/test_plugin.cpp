@@ -25,7 +25,7 @@ public:
     {
     }
 
-    static hipdnnPluginType_t get_class_type()
+    static hipdnnPluginType_t get_plugin_type()
     {
         return HIPDNN_PLUGIN_TYPE_UNSPECIFIED;
     }
@@ -81,7 +81,7 @@ TEST(PluginManagerTest, LoadPlugins)
     Test_plugin_manager plugin_manager;
 
     // Create a list of paths to plugins
-    std::vector<std::filesystem::path> plugin_paths = {PLUGIN_PATH1, PLUGIN_PATH2};
+    std::set<std::filesystem::path> plugin_paths = {PLUGIN_PATH1, PLUGIN_PATH2};
 
     // Load the plugins
     plugin_manager.load_plugins(plugin_paths, HIPDNN_PLUGIN_LOADING_ABSOLUTE);
@@ -159,6 +159,37 @@ TEST(PluginManagerTest, LoadPluginsAdditive)
     EXPECT_EQ(plugins.size(), 2);
 }
 
+TEST(PluginManagerTest, LoadPlugins_AdditiveAccumulates)
+{
+    Test_plugin_manager plugin_manager;
+    plugin_manager.load_plugins({PLUGIN_PATH1}, HIPDNN_PLUGIN_LOADING_ADDITIVE);
+    ASSERT_EQ(plugin_manager.get_plugins().size(), 1);
+
+    plugin_manager.load_plugins({PLUGIN_PATH2}, HIPDNN_PLUGIN_LOADING_ADDITIVE);
+    const auto& plugins = plugin_manager.get_plugins();
+    ASSERT_EQ(plugins.size(), 2);
+
+    std::set<std::string_view> plugin_names;
+    for(const auto& p : plugins)
+    {
+        plugin_names.insert(p.name());
+    }
+    EXPECT_TRUE(plugin_names.contains("Plugin1"));
+    EXPECT_TRUE(plugin_names.contains("Plugin2"));
+}
+
+TEST(PluginManagerTest, LoadPlugins_AbsoluteReplaces)
+{
+    Test_plugin_manager plugin_manager;
+    plugin_manager.load_plugins({PLUGIN_PATH1}, HIPDNN_PLUGIN_LOADING_ADDITIVE);
+    ASSERT_EQ(plugin_manager.get_plugins().size(), 1);
+
+    plugin_manager.load_plugins({PLUGIN_PATH2}, HIPDNN_PLUGIN_LOADING_ABSOLUTE);
+    const auto& plugins = plugin_manager.get_plugins();
+    ASSERT_EQ(plugins.size(), 1);
+    EXPECT_EQ(plugins[0].name(), "Plugin2");
+}
+
 TEST(PluginManagerTest, LoadPluginsAdditiveWithDefault)
 {
     const std::filesystem::path default_dir = "test_plugins_dir";
@@ -229,7 +260,7 @@ TEST(PluginManagerTest, LastError)
 {
     Test_plugin_manager plugin_manager;
 
-    std::vector<std::filesystem::path> plugin_paths = {PLUGIN_PATH1};
+    std::set<std::filesystem::path> plugin_paths = {PLUGIN_PATH1};
     plugin_manager.load_plugins(plugin_paths, HIPDNN_PLUGIN_LOADING_ABSOLUTE);
 
     const auto& plugins = plugin_manager.get_plugins();
@@ -248,7 +279,7 @@ TEST(PluginManagerTest, LastErrorMultithreaded)
 {
     Test_plugin_manager plugin_manager;
 
-    std::vector<std::filesystem::path> plugin_paths = {PLUGIN_PATH1};
+    std::set<std::filesystem::path> plugin_paths = {PLUGIN_PATH1};
     plugin_manager.load_plugins(plugin_paths, HIPDNN_PLUGIN_LOADING_ABSOLUTE);
 
     const auto& plugins = plugin_manager.get_plugins();
@@ -288,7 +319,7 @@ TEST(PluginManagerTest, LastErrorOnSecondLoad)
     using Func_type = hipdnnPluginStatus_t (*)(const char**);
     const auto func_name = "hipdnnPluginGetName";
 
-    std::vector<std::filesystem::path> plugin_paths = {PLUGIN_PATH1};
+    std::set<std::filesystem::path> plugin_paths = {PLUGIN_PATH1};
 
     {
         Test_plugin_manager plugin_manager;
