@@ -35,7 +35,7 @@ namespace
 
 struct Plugin_loading_config
 {
-    std::vector<std::filesystem::path> paths;
+    std::set<std::filesystem::path> paths;
     hipdnnPluginLoadingMode_ext_t mode = HIPDNN_PLUGIN_LOADING_ADDITIVE;
 };
 
@@ -57,16 +57,17 @@ void Engine_plugin_resource_manager::set_plugin_paths(
 
     plugin_config.mode = loading_mode;
 
-    for(const auto& path : plugin_paths)
+    if(loading_mode == HIPDNN_PLUGIN_LOADING_ABSOLUTE)
     {
-        if(std::ranges::find(plugin_config.paths, path) == plugin_config.paths.end())
-        {
-            plugin_config.paths.push_back(path);
-        }
+        plugin_config.paths = {plugin_paths.begin(), plugin_paths.end()};
+    }
+    else
+    {
+        plugin_config.paths.insert(plugin_paths.begin(), plugin_paths.end());
     }
 }
 
-std::vector<std::filesystem::path> Engine_plugin_resource_manager::get_plugin_paths()
+std::set<std::filesystem::path> Engine_plugin_resource_manager::get_plugin_paths()
 {
     std::lock_guard<std::mutex> lock(plugin_mutex);
     return plugin_config.paths;

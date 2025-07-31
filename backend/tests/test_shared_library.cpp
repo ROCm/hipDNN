@@ -97,10 +97,8 @@ TEST(Shared_Library_Test, get_current_module_directory_from_executable)
     EXPECT_TRUE(path.is_absolute());
     EXPECT_TRUE(std::filesystem::is_directory(path));
 
-#ifdef __linux__
     // Only tests that it works from a statically linked binary
     EXPECT_TRUE(std::filesystem::exists(path / "hipdnn_backend_tests"));
-#endif
 }
 
 class Shared_library_path_test : public ::testing::TestWithParam<std::string>

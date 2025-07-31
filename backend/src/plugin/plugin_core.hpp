@@ -54,7 +54,7 @@ public:
     std::string_view version() const;
     hipdnnPluginType_t type() const;
 
-    static hipdnnPluginType_t get_class_type();
+    static hipdnnPluginType_t get_plugin_type();
 
     hipdnnPluginStatus_t set_logging_callback(hipdnnCallback_t callback) const;
 
@@ -98,14 +98,14 @@ class Plugin_manager_base
                   "Plugin must be derived from Plugin_base");
 
 protected:
-    explicit Plugin_manager_base(std::vector<std::filesystem::path> default_paths)
+    explicit Plugin_manager_base(std::set<std::filesystem::path> default_paths)
         : _default_plugin_paths(std::move(default_paths))
     {
     }
 
     // TODO: figure out how to ignore cognitive complexity warnings induced by logging macros
     // NOLINTBEGIN(readability-function-cognitive-complexity)
-    std::vector<std::filesystem::path> resolve_default_paths() const
+    std::set<std::filesystem::path> resolve_default_paths() const
     {
         std::filesystem::path base_dir;
         try
@@ -121,19 +121,17 @@ protected:
             return _default_plugin_paths;
         }
 
-        std::vector<std::filesystem::path> resolved_paths;
-        resolved_paths.reserve(_default_plugin_paths.size());
+        std::set<std::filesystem::path> resolved_paths;
 
         for(const auto& path : _default_plugin_paths)
         {
             if(path.is_relative())
             {
-                auto resolved = base_dir / path;
-                resolved_paths.push_back(resolved);
+                resolved_paths.insert(base_dir / path);
             }
             else
             {
-                resolved_paths.push_back(path);
+                resolved_paths.insert(path);
             }
         }
 
@@ -144,12 +142,25 @@ protected:
 public:
     virtual ~Plugin_manager_base() = default;
 
-    void load_plugins(const std::vector<std::filesystem::path>& custom_paths,
+    // NOLINTBEGIN(readability-function-cognitive-complexity)
+    void load_plugins(const std::set<std::filesystem::path>& custom_paths,
                       hipdnnPluginLoadingMode_ext_t mode)
     {
-        if(mode == HIPDNN_PLUGIN_LOADING_ABSOLUTE)
+        std::set<std::filesystem::path> paths_to_load;
+
+        if(mode == HIPDNN_PLUGIN_LOADING_ADDITIVE)
         {
-            clear_plugins();
+            // Default paths are resolved relative to the shared libary path, and are therefore handled separately.
+            auto default_paths = resolve_default_paths();
+            for(const auto& path : default_paths)
+            {
+                HIPDNN_LOG_INFO("Scanning default plugin path: {}", path.string());
+
+                if(std::filesystem::is_directory(path))
+                {
+                    scan_directory_for_plugins(path, paths_to_load);
+                }
+            }
         }
 
         for(const auto& path : custom_paths)
@@ -157,31 +168,35 @@ public:
             try
             {
                 auto resolved_path = std::filesystem::weakly_canonical(path);
-                load_from_resolved_path(resolved_path);
+                if(std::filesystem::is_directory(resolved_path))
+                {
+                    scan_directory_for_plugins(resolved_path, paths_to_load);
+                }
+                // Cannot necessarily check that a custom file path exists, because it can be platform opaque
+                else if(!resolved_path.filename().empty())
+                {
+                    paths_to_load.insert(resolved_path);
+                }
+                // Consider logging `else` here once cognitive complexity is resolved
             }
             catch(const std::filesystem::filesystem_error& e)
             {
-                HIPDNN_LOG_WARN(
+                HIPDNN_LOG_ERROR(
                     "Error resolving custom plugin path '{}': {}", path.string(), e.what());
             }
         }
 
-        if(mode == HIPDNN_PLUGIN_LOADING_ADDITIVE)
+        if(mode == HIPDNN_PLUGIN_LOADING_ABSOLUTE)
         {
-            // Default paths are resolved relative to the shared libary path
-            auto default_paths = resolve_default_paths();
+            clear_plugins();
+        }
 
-            for(const auto& path : default_paths)
-            {
-                HIPDNN_LOG_INFO("Plugin manager: loading from default path [{}]", path.string());
-                // Expect default paths to be directories
-                if(std::filesystem::is_directory(path))
-                {
-                    scan_directory_for_plugins(path);
-                }
-            }
+        for(const auto& path : paths_to_load)
+        {
+            load_plugin_from_file(path);
         }
     }
+    // NOLINTEND(readability-function-cognitive-complexity)
 
     const std::vector<Plugin>& get_plugins() const
     {
@@ -195,22 +210,23 @@ private:
         _loaded_plugin_files.clear();
     }
 
-    void load_from_resolved_path(const std::filesystem::path& path)
+    void scan_directory_for_plugins(const std::filesystem::path& dir_path,
+                                    std::set<std::filesystem::path>& paths_to_load) const
     {
         try
         {
-            if(std::filesystem::is_directory(path))
+            for(const auto& entry : std::filesystem::directory_iterator(dir_path))
             {
-                scan_directory_for_plugins(path);
-            }
-            else if(path.has_filename())
-            {
-                load_plugin_from_file(path);
+                const auto& path = entry.path();
+                if(entry.is_regular_file() && path.extension() == SHARED_LIB_EXT)
+                {
+                    paths_to_load.insert(std::filesystem::weakly_canonical(path));
+                }
             }
         }
         catch(const std::filesystem::filesystem_error& e)
         {
-            HIPDNN_LOG_WARN("Error accessing plugin path: {}. {}", path.string(), e.what());
+            HIPDNN_LOG_WARN("Error scanning plugin directory {}: {}", dir_path.string(), e.what());
         }
     }
 
@@ -222,10 +238,10 @@ private:
         try
         {
             Shared_library lib(file_path);
-            const auto final_path = lib.final_path();
+            const auto library_path = lib.library_path();
 
             // Shared library ensures an injective, weakly canonical mapping to a path
-            if(_loaded_plugin_files.contains(final_path))
+            if(_loaded_plugin_files.contains(library_path))
             {
                 return;
             }
@@ -237,16 +253,16 @@ private:
             const auto type = plugin.type();
 
             // For now only use engine or unspecified plugin types
-            if(type != Plugin::get_class_type() && type != HIPDNN_PLUGIN_TYPE_UNSPECIFIED)
+            if(type != Plugin::get_plugin_type())
             {
                 throw Hipdnn_exception(HIPDNN_STATUS_PLUGIN_ERROR,
                                        std::string("Plugin type mismatch: expected ")
-                                           + to_string(Plugin::get_class_type()) + ", got "
+                                           + to_string(Plugin::get_plugin_type()) + ", got "
                                            + to_string(type));
             }
 
             _plugins.emplace_back(std::move(plugin));
-            _loaded_plugin_files.insert(final_path);
+            _loaded_plugin_files.insert(library_path);
 
             HIPDNN_LOG_INFO("Plugin loaded successfully: {}", file_path.string());
             HIPDNN_LOG_INFO("Plugin info: name={}, version={}, type={}({})",
@@ -262,28 +278,9 @@ private:
         }
     }
 
-    void scan_directory_for_plugins(const std::filesystem::path& dir_path)
-    {
-        try
-        {
-            for(const auto& entry : std::filesystem::directory_iterator(dir_path))
-            {
-                const auto& path = entry.path();
-                if(entry.is_regular_file() && path.extension() == SHARED_LIB_EXT)
-                {
-                    load_plugin_from_file(path);
-                }
-            }
-        }
-        catch(const std::filesystem::filesystem_error& e)
-        {
-            HIPDNN_LOG_WARN("Error scanning plugin directory {}: {}", dir_path.string(), e.what());
-        }
-    }
-
     std::vector<Plugin> _plugins;
     std::set<std::filesystem::path> _loaded_plugin_files;
-    std::vector<std::filesystem::path> _default_plugin_paths;
+    std::set<std::filesystem::path> _default_plugin_paths;
 };
 
 } // namespace plugin

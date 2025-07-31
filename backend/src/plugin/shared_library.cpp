@@ -52,20 +52,7 @@ std::filesystem::path Shared_library::get_current_module_directory()
     }
     else
     {
-        // Less-safe fallback for tests where dladdr won't work.
-        // In prod, it should not reach this.
-        std::array<char, PATH_MAX> result{};
-        ssize_t count = readlink("/proc/self/exe", result.data(), result.size() - 1);
-        if(count > 0)
-        {
-            result[static_cast<size_t>(count)] = '\0';
-            module_path = std::filesystem::path(result.data()).parent_path();
-        }
-        else
-        {
-            throw Hipdnn_exception(HIPDNN_STATUS_INTERNAL_ERROR,
-                                   "Failed to get module path using dladdr and readlink.");
-        }
+        throw Hipdnn_exception(HIPDNN_STATUS_INTERNAL_ERROR, "Failed to get module file name.");
     }
 #else
 #error "Unsupported platform"
@@ -155,43 +142,43 @@ void Shared_library::load(const std::filesystem::path& library_path)
 #error "Unsupported platform"
 #endif
     }
-    _final_path = std::filesystem::weakly_canonical(modified_library_path);
+    _library_path = std::filesystem::weakly_canonical(modified_library_path);
 
     // Needs to be a resolved, weakly canonical path at this point
-    if(!std::filesystem::exists(_final_path))
+    if(!std::filesystem::exists(_library_path))
     {
         throw Hipdnn_exception(HIPDNN_STATUS_PLUGIN_ERROR,
                                "Shared libary: plugin file does not exist: "
-                                   + _final_path.string());
+                                   + _library_path.string());
     }
 
     HIPDNN_LOG_INFO(
         "Shared_library: Attempting to load shared library from final absolute path: {}",
-        _final_path.string());
+        _library_path.string());
 
 #ifdef _WIN32
-    _library_handle = LoadLibraryW(_final_path.wstring().c_str());
+    _library_handle = LoadLibraryW(_library_path.wstring().c_str());
     if(_library_handle == nullptr)
     {
         auto errorCode = GetLastError();
         throw Hipdnn_exception(HIPDNN_STATUS_PLUGIN_ERROR,
-                               "Failed to load library: " + _final_path.string()
+                               "Failed to load library: " + _library_path.string()
                                    + " (Error Code: " + std::to_string(errorCode) + ")");
     }
 #elif defined(__linux__)
 
 #if __has_feature(address_sanitizer)
     // Address Sanitizer does not support RTLD_DEEPBIND, so we use RTLD_NOW only
-    _library_handle = dlopen(_final_path.string().c_str(), RTLD_NOW);
+    _library_handle = dlopen(_library_path.string().c_str(), RTLD_NOW);
 #else
-    _library_handle = dlopen(_final_path.string().c_str(), RTLD_NOW | RTLD_DEEPBIND);
+    _library_handle = dlopen(_library_path.string().c_str(), RTLD_NOW | RTLD_DEEPBIND);
 #endif
 
     if(_library_handle == nullptr)
     {
         const char* error = dlerror();
         throw Hipdnn_exception(HIPDNN_STATUS_PLUGIN_ERROR,
-                               "Failed to load library: " + _final_path.string() + " (Error: "
+                               "Failed to load library: " + _library_path.string() + " (Error: "
                                    + (error != nullptr ? std::string(error) : "Unknown error")
                                    + ")");
     }
@@ -248,9 +235,9 @@ void* Shared_library::get_symbol(std::string_view symbol_name) const
     return symbol;
 }
 
-const std::filesystem::path& Shared_library::final_path() const
+const std::filesystem::path& Shared_library::library_path() const
 {
-    return _final_path;
+    return _library_path;
 }
 
 } // namespace plugin
