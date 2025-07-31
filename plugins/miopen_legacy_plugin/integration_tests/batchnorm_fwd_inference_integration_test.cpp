@@ -88,18 +88,17 @@ protected:
         // Initialize HIP
         ASSERT_EQ(hipInit(0), hipSuccess);
         ASSERT_EQ(hipGetDevice(&_device_id), hipSuccess);
-        ASSERT_EQ(hipStreamCreate(&_stream), hipSuccess);
+        //ASSERT_EQ(hipStreamCreate(&_stream), hipSuccess);
+
+        //MUST SET BEFORE CREATING THE HANDLE
+        const std::array<const char*, 1> paths = {PLUGIN_DIR};
+        ASSERT_EQ(hipdnnSetEnginePluginPaths_ext(
+                      paths.size(), paths.data(), HIPDNN_PLUGIN_LOADING_ABSOLUTE),
+                  HIPDNN_STATUS_SUCCESS);
 
         // Create handle
         ASSERT_EQ(hipdnnCreate(&_handle), HIPDNN_STATUS_SUCCESS);
-        ASSERT_EQ(hipdnnSetStream(_handle, _stream), HIPDNN_STATUS_SUCCESS);
-
-        // todo
-        // uncomment once we have this functionality
-        // const std::array<const char*, 1> paths = {PLUGIN_DIR};
-        // ASSERT_EQ(hipdnnSetEnginePluginPaths_ext(
-        //               paths.size(), paths.data(), HIPDNN_PLUGIN_LOADING_ABSOLUTE),
-        //           HIPDNN_STATUS_SUCCESS);
+        //ASSERT_EQ(hipdnnSetStream(_handle, _stream), HIPDNN_STATUS_SUCCESS);
     }
 
     void TearDown() override
@@ -300,6 +299,7 @@ protected:
 
         run_miopen_batchnorm_fwd<Input_type, Intermediate_type>(
             graph_tensor_bundle, input_data_type, intermediate_data_type);
+        graph_tensor_bundle.y_tensor.memory().mark_device_modified();
 
         run_cpu_batchnorm_fwd<Input_type, Intermediate_type>(cpu_tensor_bundle);
 
@@ -318,17 +318,16 @@ std::vector<Bn_2d_test_case> get_bn_fwd_inference_test_cases()
 {
     return {
         {.n = 1, .c = 3, .h = 14, .w = 14},
-        // TODO: uncomment these once the first test passes
-        // {.n = 2, .c = 3, .h = 14, .w = 14},
-        // {.n = 64, .c = 3, .h = 14, .w = 14},
-        // {.n = 64, .c = 256, .h = 14, .w = 14},
-        // {.n = 64, .c = 256, .h = 28, .w = 28},
-        // {.n = 64, .c = 256, .h = 56, .w = 56},
-        // {.n = 64, .c = 512, .h = 14, .w = 14},
-        // {.n = 64, .c = 512, .h = 28, .w = 28},
-        // {.n = 64, .c = 512, .h = 7, .w = 7},
-        // {.n = 64, .c = 64, .h = 112, .w = 112},
-        // {.n = 64, .c = 64, .h = 56, .w = 56},
+        {.n = 2, .c = 3, .h = 14, .w = 14},
+        {.n = 64, .c = 3, .h = 14, .w = 14},
+        {.n = 64, .c = 256, .h = 14, .w = 14},
+        {.n = 64, .c = 256, .h = 28, .w = 28},
+        {.n = 64, .c = 256, .h = 56, .w = 56},
+        {.n = 64, .c = 512, .h = 14, .w = 14},
+        {.n = 64, .c = 512, .h = 28, .w = 28},
+        {.n = 64, .c = 512, .h = 7, .w = 7},
+        {.n = 64, .c = 64, .h = 112, .w = 112},
+        {.n = 64, .c = 64, .h = 56, .w = 56},
     };
 }
 
@@ -342,24 +341,33 @@ INSTANTIATE_TEST_SUITE_P(RunFloatFwdBatchnormGraph,
                          Batchnorm_forward_inference_integration_test,
                          testing::ValuesIn(get_bn_fwd_inference_test_cases()));
 
-// TEST_P(Batchnorm_forward_inference_integration_test, RunBfloat16FwdBatchnormGraph)
-// {
-//     Bn_2d_test_case test_case = GetParam();
-//     run_batchnorm_test<hip_bfloat16, float>(test_case, 1e-2_bf);
-// }
+class Batchnorm_forward_inference_integration_test_bfloat16
+    : public Batchnorm_forward_inference_integration_test
+{
+};
 
-// INSTANTIATE_TEST_SUITE_P(RunBfloat16FwdBatchnormGraph,
-//                          Batchnorm_forward_inference_integration_test,
-//                          testing::ValuesIn(get_bn_fwd_inference_test_cases()));
+TEST_P(Batchnorm_forward_inference_integration_test_bfloat16, RunBfloat16FwdBatchnormGraph)
+{
+    Bn_2d_test_case test_case = GetParam();
+    run_batchnorm_test<hip_bfloat16, float>(test_case, 1e-2_bf);
+}
 
-// TEST_P(Batchnorm_forward_inference_integration_test, RunHalfFwdbatchnormGraph)
-// {
-//     Bn_2d_test_case test_case = GetParam();
-//     run_batchnorm_test<half, float>(test_case, 1e-2_h);
-// }
+INSTANTIATE_TEST_SUITE_P(RunBfloat16FwdBatchnormGraph,
+                         Batchnorm_forward_inference_integration_test_bfloat16,
+                         testing::ValuesIn(get_bn_fwd_inference_test_cases()));
 
-// INSTANTIATE_TEST_SUITE_P(RunHalfFwdbatchnormGraph,
-//                          Batchnorm_forward_inference_integration_test,
-//                          testing::ValuesIn(get_bn_fwd_inference_test_cases()));
+class Batchnorm_forward_inference_integration_test_half
+    : public Batchnorm_forward_inference_integration_test
+{
+};
+TEST_P(Batchnorm_forward_inference_integration_test_half, RunHalfFwdbatchnormGraph)
+{
+    Bn_2d_test_case test_case = GetParam();
+    run_batchnorm_test<half, float>(test_case, 1e-2_h);
+}
+
+INSTANTIATE_TEST_SUITE_P(RunHalfFwdbatchnormGraph,
+                         Batchnorm_forward_inference_integration_test_half,
+                         testing::ValuesIn(get_bn_fwd_inference_test_cases()));
 
 // NOLINTEND(readability-function-cognitive-complexity)
