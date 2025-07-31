@@ -100,6 +100,11 @@ protected:
         serialize_engine_details();
     }
 
+    void TearDown() override
+    {
+        _engine_wrapper.reset();
+    }
+
 private:
     void serialize_engine_details()
     {
