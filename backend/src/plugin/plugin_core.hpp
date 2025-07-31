@@ -56,7 +56,7 @@ public:
 
     static hipdnnPluginType_t get_class_type();
 
-    hipdnnPluginStatus_t set_logging_callback(hipdnnCallback_t callback);
+    hipdnnPluginStatus_t set_logging_callback(hipdnnCallback_t callback) const;
 
 protected:
     // This function must not throw as it is used during error handling.
@@ -121,9 +121,6 @@ protected:
             return _default_plugin_paths;
         }
 
-        HIPDNN_LOG_INFO("Plugin manager: Resolving default paths relative to module directory: {}",
-                        base_dir.string());
-
         std::vector<std::filesystem::path> resolved_paths;
         resolved_paths.reserve(_default_plugin_paths.size());
 
@@ -133,13 +130,9 @@ protected:
             {
                 auto resolved = base_dir / path;
                 resolved_paths.push_back(resolved);
-                HIPDNN_LOG_INFO("Plugin manager: Resolved default path '{}' to '{}'",
-                                path.string(),
-                                resolved.string());
             }
             else
             {
-                HIPDNN_LOG_INFO("Plugin manager: Using absolute default path '{}'", path.string());
                 resolved_paths.push_back(path);
             }
         }
@@ -177,8 +170,10 @@ public:
         {
             // Default paths are resolved relative to the shared libary path
             auto default_paths = resolve_default_paths();
+
             for(const auto& path : default_paths)
             {
+                HIPDNN_LOG_INFO("Plugin manager: loading from default path [{}]", path.string());
                 // Expect default paths to be directories
                 if(std::filesystem::is_directory(path))
                 {
@@ -202,7 +197,6 @@ private:
 
     void load_from_resolved_path(const std::filesystem::path& path)
     {
-        HIPDNN_LOG_INFO("Plugin manager: Trying to load from resolved path: {}", path.string());
         try
         {
             if(std::filesystem::is_directory(path))
@@ -222,14 +216,20 @@ private:
 
     void load_plugin_from_file(const std::filesystem::path& file_path)
     {
-        if(_loaded_plugin_files.contains(file_path))
-        {
-            return;
-        }
+
+        HIPDNN_LOG_INFO("Attempting to load plugin from [{}]", file_path.string());
 
         try
         {
             Shared_library lib(file_path);
+            const auto final_path = lib.final_path();
+
+            // Shared library ensures an injective, weakly canonical mapping to a path
+            if(_loaded_plugin_files.contains(final_path))
+            {
+                return;
+            }
+
             Plugin plugin(std::move(lib));
 
             const auto name = plugin.name();
@@ -246,7 +246,7 @@ private:
             }
 
             _plugins.emplace_back(std::move(plugin));
-            _loaded_plugin_files.insert(file_path);
+            _loaded_plugin_files.insert(final_path);
 
             HIPDNN_LOG_INFO("Plugin loaded successfully: {}", file_path.string());
             HIPDNN_LOG_INFO("Plugin info: name={}, version={}, type={}({})",
@@ -264,7 +264,6 @@ private:
 
     void scan_directory_for_plugins(const std::filesystem::path& dir_path)
     {
-        HIPDNN_LOG_INFO("Scanning for plugins in directory: {}", dir_path.string());
         try
         {
             for(const auto& entry : std::filesystem::directory_iterator(dir_path))
@@ -272,8 +271,6 @@ private:
                 const auto& path = entry.path();
                 if(entry.is_regular_file() && path.extension() == SHARED_LIB_EXT)
                 {
-                    HIPDNN_LOG_INFO("Plugin manager: Found potential plugin file: {}",
-                                    path.string());
                     load_plugin_from_file(path);
                 }
             }

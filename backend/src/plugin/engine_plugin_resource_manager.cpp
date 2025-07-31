@@ -14,6 +14,7 @@
 #include "engine_plugin.hpp"
 #include "engine_plugin_resource_manager.hpp"
 #include "hipdnn_exception.hpp"
+#include "logging/logging.hpp"
 
 namespace hipdnn_backend
 {
@@ -55,7 +56,14 @@ void Engine_plugin_resource_manager::set_plugin_paths(
                    "hipdnnSetEnginePluginPaths_ext cannot be called with an active handle.");
 
     plugin_config.mode = loading_mode;
-    plugin_config.paths.insert(plugin_config.paths.end(), plugin_paths.begin(), plugin_paths.end());
+
+    for(const auto& path : plugin_paths)
+    {
+        if(std::ranges::find(plugin_config.paths, path) == plugin_config.paths.end())
+        {
+            plugin_config.paths.push_back(path);
+        }
+    }
 }
 
 std::vector<std::filesystem::path> Engine_plugin_resource_manager::get_plugin_paths()
@@ -99,6 +107,8 @@ Engine_plugin_resource_manager::Engine_plugin_resource_manager(
     for(const auto& plugin : plugins)
     {
         auto handle = plugin.create_handle();
+
+        plugin.set_logging_callback(logging::hipdnn_logging_callback);
 
         if(_handle_to_plugin.contains(handle))
         {

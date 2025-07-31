@@ -48,7 +48,10 @@ public:
         return reinterpret_cast<T>(symbol);
     }
 
+    const std::filesystem::path& final_path() const;
+
 private:
+    std::filesystem::path _final_path;
 #ifdef _WIN32
     HMODULE _library_handle;
 #elif defined(__linux__)

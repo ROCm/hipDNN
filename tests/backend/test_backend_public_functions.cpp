@@ -169,7 +169,7 @@ TEST(HipDNNBackendTest, WillFailToCreateGraphIfGraphIsNull)
 
 TEST(HipDNNBackendTest, SetPluginPathsExt_Success)
 {
-    std::array<const char*, 3> paths = {"./imaginary_plugin", "./", "../directory/"};
+    std::array<const char*, 3> paths = {"../test_plugins/test_good_plugin", "./", "../directory/"};
 
     hipdnnStatus_t status = hipdnnSetEnginePluginPaths_ext(
         paths.size(), paths.data(), HIPDNN_PLUGIN_LOADING_ABSOLUTE);
@@ -200,19 +200,20 @@ TEST(HipDNNBackendTest, SetPluginPathsExt_FailsOnNullStringInList)
 // Uncomment this test and observe logs to see the plugin is loaded
 // TEST(HipDNNBackendTest, SetPluginPathAndCreateHandle_LoadsPlugins)
 // {
-//     const std::array<const char*, 1> paths = {"../tests/hipdnn_test_engine_plugin1"};
+//     // Can also test by manually changing default path
+//     const std::array<const char*, 1> paths = {"../../tests/test_plugins/"};
 
 //     hipdnnStatus_t status = hipdnnSetEnginePluginPaths_ext(
-//         paths.size(), paths.data(), HIPDNN_PLUGIN_LOADING_ABSOLUTE);
+//         paths.size(), paths.data(), HIPDNN_PLUGIN_LOADING_ADDITIVE);
 //     EXPECT_EQ(status, HIPDNN_STATUS_SUCCESS);
 
 //     hipdnnHandle_t handle = nullptr;
-//     status = hipdnnCreate(&handle);
+//     hipdnnStatus_t status = hipdnnCreate(&handle);
 //     EXPECT_EQ(status, HIPDNN_STATUS_SUCCESS);
 //     EXPECT_NE(handle, nullptr);
 
 //     status = hipdnnDestroy(handle);
 //     EXPECT_EQ(status, HIPDNN_STATUS_SUCCESS);
 
-//     EXPECT_TRUE(false);
+//     EXPECT_TRUE(false); // for visibility
 // }
