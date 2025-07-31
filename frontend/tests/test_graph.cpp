@@ -1008,12 +1008,23 @@ TEST_F(Graph_test_fixture, CanSuccessfullyCreateExecutionPlans)
                 *descriptor = heur_desc;
                 return HIPDNN_STATUS_SUCCESS;
             });
+
     EXPECT_CALL(*_mock_backend,
                 hipdnnBackendSetAttribute(heur_desc,
                                           HIPDNN_ATTR_ENGINEHEUR_OPERATION_GRAPH,
                                           HIPDNN_TYPE_BACKEND_DESCRIPTOR,
                                           1,
-                                          graph_desc));
+                                          _))
+        .WillOnce([&graph_desc](hipdnnBackendDescriptor_t,
+                                hipdnnBackendAttributeName_t,
+                                hipdnnBackendAttributeType_t,
+                                int64_t,
+                                const void* array_of_elements) {
+            EXPECT_EQ(graph_desc,
+                      *static_cast<const hipdnnBackendDescriptor_t*>(array_of_elements));
+            return HIPDNN_STATUS_SUCCESS;
+        });
+
     EXPECT_CALL(*_mock_backend,
                 hipdnnBackendSetAttribute(
                     heur_desc, HIPDNN_ATTR_ENGINEHEUR_MODE, HIPDNN_TYPE_HEUR_MODE, 1, _))
@@ -1212,7 +1223,16 @@ TEST_F(Graph_test_fixture, EngineConfigAndExecutionPlanAreFinalizedAfterBuildPla
                                           HIPDNN_ATTR_EXECUTION_PLAN_ENGINE_CONFIG,
                                           HIPDNN_TYPE_BACKEND_DESCRIPTOR,
                                           1,
-                                          engine_config_desc));
+                                          _))
+        .WillOnce([&engine_config_desc](hipdnnBackendDescriptor_t,
+                                        hipdnnBackendAttributeName_t,
+                                        hipdnnBackendAttributeType_t,
+                                        int64_t,
+                                        const void* array_of_elements) {
+            EXPECT_EQ(engine_config_desc,
+                      *static_cast<const hipdnnBackendDescriptor_t*>(array_of_elements));
+            return HIPDNN_STATUS_SUCCESS;
+        });
 
     EXPECT_CALL(*_mock_backend, hipdnnBackendFinalize(execution_plan_desc))
         .WillOnce(Return(HIPDNN_STATUS_SUCCESS));
@@ -1399,7 +1419,7 @@ TEST_F(Graph_test_fixture, ExecutePacksVariantPackAndPassesTheCorrectArguments)
                                           HIPDNN_ATTR_EXECUTION_PLAN_ENGINE_CONFIG,
                                           HIPDNN_TYPE_BACKEND_DESCRIPTOR,
                                           1,
-                                          engine_cfg_desc))
+                                          _))
         .WillOnce(Return(HIPDNN_STATUS_SUCCESS));
     EXPECT_CALL(*_mock_backend, hipdnnBackendFinalize(exec_plan_desc))
         .WillOnce(Return(HIPDNN_STATUS_SUCCESS));
