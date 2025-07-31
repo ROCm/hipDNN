@@ -17,6 +17,8 @@ namespace plugin
 class Shared_library
 {
 public:
+    static std::filesystem::path get_current_module_directory();
+
     Shared_library();
     explicit Shared_library(const std::filesystem::path& library_path);
     Shared_library(Shared_library&& other) noexcept;
@@ -44,7 +46,10 @@ public:
         return reinterpret_cast<T>(symbol);
     }
 
+    const std::filesystem::path& library_path() const;
+
 private:
+    std::filesystem::path _library_path;
 #ifdef _WIN32
     HMODULE _library_handle;
 #elif defined(__linux__)

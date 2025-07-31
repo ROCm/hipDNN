@@ -19,6 +19,12 @@ const char* const WRONG_LIBRARY_PATH = "./wrong_path";
 const char* const SYMBOL_NAME = "hipdnnPluginGetName";
 const char* const WRONG_SYMBOL_NAME = "wrong_symbol_name";
 
+#if defined(_WIN32)
+const char* const FULL_LIBRARY_PATH = "./hipdnn_test_plugin1.dll";
+#else
+const char* const FULL_LIBRARY_PATH = "./libhipdnn_test_plugin1.so";
+#endif
+
 }
 
 TEST(SharedLibraryTest, LoadLibrary)
@@ -81,3 +87,37 @@ TEST(SharedLibraryTest, CallFunction)
     ASSERT_NE(name, nullptr);
     ASSERT_STREQ(name, "Plugin1");
 }
+
+TEST(Shared_Library_Test, get_current_module_directory_from_executable)
+{
+    std::filesystem::path path;
+    ASSERT_NO_THROW(path = plugin::Shared_library::get_current_module_directory());
+
+    EXPECT_FALSE(path.empty());
+    EXPECT_TRUE(path.is_absolute());
+    EXPECT_TRUE(std::filesystem::is_directory(path));
+
+    // Only tests that it works from a statically linked binary
+    EXPECT_TRUE(std::filesystem::exists(path / "hipdnn_backend_tests"));
+}
+
+class Shared_library_path_test : public ::testing::TestWithParam<std::string>
+{
+};
+
+TEST_P(Shared_library_path_test, LoadWithValidPathFormats)
+{
+    const auto& path_param = GetParam();
+    plugin::Shared_library library;
+    ASSERT_NO_THROW(library.load(path_param));
+}
+
+INSTANTIATE_TEST_SUITE_P(PathVariations,
+                         Shared_library_path_test,
+                         ::testing::Values(
+                             // Path without extension
+                             std::string(LIBRARY_PATH),
+                             // Path with full filename
+                             std::string(FULL_LIBRARY_PATH),
+                             // Absolute path
+                             std::filesystem::absolute(FULL_LIBRARY_PATH).string()));

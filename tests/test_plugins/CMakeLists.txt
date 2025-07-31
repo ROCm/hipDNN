@@ -30,7 +30,6 @@ function(add_test_plugin target_name)
     target_link_libraries(${target_name} 
         PUBLIC 
             hipdnn_sdk
-            hip::device
             hip::host
     )
 

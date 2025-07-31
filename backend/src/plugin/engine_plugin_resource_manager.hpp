@@ -5,6 +5,7 @@
 
 #include <filesystem>
 #include <memory>
+#include <set>
 #include <unordered_map>
 #include <vector>
 
@@ -44,7 +45,9 @@ protected:
 public:
     // MT-safe static functions
     // Load plugins from a specific path, for testing purposes
-    static void set_plugin_paths(const std::vector<std::filesystem::path>& plugin_paths);
+    static void set_plugin_paths(const std::vector<std::filesystem::path>& plugin_paths,
+                                 hipdnnPluginLoadingMode_ext_t loading_mode);
+    static std::set<std::filesystem::path> get_plugin_paths();
     static std::shared_ptr<Engine_plugin_resource_manager> create();
 
     Engine_plugin_resource_manager(std::shared_ptr<Engine_plugin_manager>& pm);

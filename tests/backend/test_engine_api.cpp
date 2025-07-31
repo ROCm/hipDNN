@@ -15,6 +15,11 @@ protected:
 
     void SetUp() override
     {
+        const std::array<const char*, 1> paths = {"../test_plugins/"};
+        ASSERT_EQ(hipdnnSetEnginePluginPaths_ext(
+                      paths.size(), paths.data(), HIPDNN_PLUGIN_LOADING_ABSOLUTE),
+                  HIPDNN_STATUS_SUCCESS);
+
         ASSERT_EQ(hipdnnCreate(&_handle), HIPDNN_STATUS_SUCCESS);
         EXPECT_EQ(hipdnnBackendCreateDescriptor(HIPDNN_BACKEND_ENGINE_DESCRIPTOR, &_engine),
                   HIPDNN_STATUS_SUCCESS);
@@ -57,7 +62,7 @@ TEST_F(Engine_api_tests, SetEngineGraph)
 
 TEST_F(Engine_api_tests, SetEngineGlobalIndex)
 {
-    int64_t gidx = 0;
+    int64_t gidx = HIPDNN_TEST_PLUGIN_ID;
 
     EXPECT_EQ(hipdnnBackendSetAttribute(
                   _engine, HIPDNN_ATTR_ENGINE_GLOBAL_INDEX, HIPDNN_TYPE_INT64, 1, nullptr),
@@ -77,7 +82,7 @@ TEST_F(Engine_api_tests, SetEngineAttrNotSupported)
 
 TEST_F(Engine_api_tests, SetEngineAttrAlreadyFinalized)
 {
-    int64_t gidx = 0;
+    int64_t gidx = HIPDNN_TEST_PLUGIN_ID;
 
     test_util::populate_test_engine(_engine, &_graph, _handle, gidx, true);
     EXPECT_EQ(hipdnnBackendSetAttribute(
@@ -87,7 +92,7 @@ TEST_F(Engine_api_tests, SetEngineAttrAlreadyFinalized)
 
 TEST_F(Engine_api_tests, FinalizeEngine)
 {
-    int64_t gidx = 0;
+    int64_t gidx = HIPDNN_TEST_PLUGIN_ID;
 
     EXPECT_EQ(hipdnnBackendFinalize(_engine), HIPDNN_STATUS_BAD_PARAM);
     test_util::populate_test_engine(_engine, &_graph, _handle, gidx);
@@ -97,7 +102,7 @@ TEST_F(Engine_api_tests, FinalizeEngine)
 TEST_F(Engine_api_tests, GetEngineGraph)
 {
     hipdnnBackendDescriptor_t graph = nullptr;
-    int64_t gidx = 0;
+    int64_t gidx = HIPDNN_TEST_PLUGIN_ID;
 
     test_util::populate_test_engine(_engine, &_graph, _handle, gidx, true);
     EXPECT_EQ(hipdnnBackendGetAttribute(_engine,
@@ -114,7 +119,7 @@ TEST_F(Engine_api_tests, GetEngineGraph)
 
 TEST_F(Engine_api_tests, GetEngineGlobalIndex)
 {
-    int64_t gidx = 1;
+    int64_t gidx = HIPDNN_TEST_PLUGIN_ID;
     int64_t gidx_out;
 
     test_util::populate_test_engine(_engine, &_graph, _handle, gidx, true);

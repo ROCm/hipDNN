@@ -67,36 +67,11 @@ struct hipdnnEnginePluginExecutionContext
 
 namespace
 {
-// TODO Use op_graph instead of hardcoded value
-const unsigned GPU_DATA_SIZE = 512;
-
-// TODO Use HIP RTC to compile the kernel at runtime
-__global__ void engine_kernel(const uint32_t* input, uint32_t* output, uint32_t size)
-{
-    const auto tid = blockIdx.x * blockDim.x + threadIdx.x;
-    if(tid < size)
-    {
-        output[tid] = input[tid];
-    }
-}
 
 // Run the kernel
-void run_engine(const uint32_t* input, uint32_t* output, uint32_t size, hipStream_t stream)
+void run_engine()
 {
-    const auto block_size = 256U;
-    const auto grid_size = (size + block_size - 1) / block_size;
-
-    // Launch the kernel on the default stream.
-    engine_kernel<<<dim3(grid_size), dim3(block_size), 0, stream>>>(input, output, size);
-
-    // Check if the kernel launch was successful.
-    hipError_t error = hipGetLastError();
-    if(error != hipSuccess)
-    {
-        throw Hipdnn_plugin_exception(HIPDNN_PLUGIN_STATUS_INTERNAL_ERROR,
-                                      "kernel launch failed, error: "
-                                          + std::string(hipGetErrorString(error)));
-    }
+    HIPDNN_LOG_INFO("run_engine called");
 }
 } // namespace
 
@@ -403,17 +378,7 @@ hipdnnPluginStatus_t
         throw_if_null(execution_context);
         throw_if_null(device_buffers);
 
-        if(num_device_buffers != 2)
-        {
-            throw Hipdnn_plugin_exception(HIPDNN_PLUGIN_STATUS_INVALID_VALUE,
-                                          "expected 2 device buffers, got "
-                                              + std::to_string(num_device_buffers));
-        }
-
-        run_engine(static_cast<const uint32_t*>(device_buffers[0].ptr),
-                   static_cast<uint32_t*>(device_buffers[1].ptr),
-                   GPU_DATA_SIZE,
-                   handle->stream);
+        run_engine();
 
         LOG_API_SUCCESS(api_name, "executed graph");
     });

@@ -6,6 +6,7 @@
 #include "hipdnn_backend_attribute_name.h"
 #include "hipdnn_backend_attribute_type.h"
 #include "hipdnn_backend_descriptor_type.h"
+#include "hipdnn_backend_plugin_loading_mode.h"
 #include "hipdnn_status.h"
 #include <sstream>
 #include <thread>
@@ -263,6 +264,20 @@ inline const char* hipdnn_get_attribute_name_string(hipdnnBackendAttributeName_t
         return "HIPDNN_ATTR_UNKNOWN";
     }
 }
+
+inline const char* hipdnn_get_plugin_loading_mode_string(hipdnnPluginLoadingMode_ext_t mode)
+{
+    switch(mode)
+    {
+    case HIPDNN_PLUGIN_LOADING_ADDITIVE:
+        return "HIPDNN_PLUGIN_LOADING_ADDITIVE";
+    case HIPDNN_PLUGIN_LOADING_ABSOLUTE:
+        return "HIPDNN_PLUGIN_LOADING_ABSOLUTE";
+    default:
+        return "HIPDNN_PLUGIN_LOADING_UNKNOWN";
+    }
+}
+
 class Last_error_manager
 {
 private:
