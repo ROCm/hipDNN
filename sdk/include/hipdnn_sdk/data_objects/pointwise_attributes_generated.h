@@ -61,11 +61,11 @@ struct PointwiseAttributesT : public ::flatbuffers::NativeTable {
   ::flatbuffers::Optional<float> relu_lower_clip = ::flatbuffers::nullopt;
   ::flatbuffers::Optional<float> relu_upper_clip = ::flatbuffers::nullopt;
   ::flatbuffers::Optional<float> relu_lower_slope = ::flatbuffers::nullopt;
-  ::flatbuffers::Optional<int64_t> axis = ::flatbuffers::nullopt;
-  int64_t in_0 = 0;
-  ::flatbuffers::Optional<int64_t> in_1 = ::flatbuffers::nullopt;
-  ::flatbuffers::Optional<int64_t> in_2 = ::flatbuffers::nullopt;
-  int64_t out_0 = 0;
+  ::flatbuffers::Optional<int64_t> axis_tid = ::flatbuffers::nullopt;
+  int64_t in_0_tid = 0;
+  ::flatbuffers::Optional<int64_t> in_1_tid = ::flatbuffers::nullopt;
+  ::flatbuffers::Optional<int64_t> in_2_tid = ::flatbuffers::nullopt;
+  int64_t out_0_tid = 0;
 };
 
 struct PointwiseAttributes FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
@@ -76,11 +76,11 @@ struct PointwiseAttributes FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Tabl
     VT_RELU_LOWER_CLIP = 6,
     VT_RELU_UPPER_CLIP = 8,
     VT_RELU_LOWER_SLOPE = 10,
-    VT_AXIS = 12,
-    VT_IN_0 = 14,
-    VT_IN_1 = 16,
-    VT_IN_2 = 18,
-    VT_OUT_0 = 20
+    VT_AXIS_TID = 12,
+    VT_IN_0_TID = 14,
+    VT_IN_1_TID = 16,
+    VT_IN_2_TID = 18,
+    VT_OUT_0_TID = 20
   };
   hipdnn_sdk::data_objects::PointwiseMode operation() const {
     return static_cast<hipdnn_sdk::data_objects::PointwiseMode>(GetField<int8_t>(VT_OPERATION, 0));
@@ -106,35 +106,35 @@ struct PointwiseAttributes FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Tabl
   bool mutate_relu_lower_slope(float _relu_lower_slope) {
     return SetField<float>(VT_RELU_LOWER_SLOPE, _relu_lower_slope);
   }
-  ::flatbuffers::Optional<int64_t> axis() const {
-    return GetOptional<int64_t, int64_t>(VT_AXIS);
+  ::flatbuffers::Optional<int64_t> axis_tid() const {
+    return GetOptional<int64_t, int64_t>(VT_AXIS_TID);
   }
-  bool mutate_axis(int64_t _axis) {
-    return SetField<int64_t>(VT_AXIS, _axis);
+  bool mutate_axis_tid(int64_t _axis_tid) {
+    return SetField<int64_t>(VT_AXIS_TID, _axis_tid);
   }
-  int64_t in_0() const {
-    return GetField<int64_t>(VT_IN_0, 0);
+  int64_t in_0_tid() const {
+    return GetField<int64_t>(VT_IN_0_TID, 0);
   }
-  bool mutate_in_0(int64_t _in_0 = 0) {
-    return SetField<int64_t>(VT_IN_0, _in_0, 0);
+  bool mutate_in_0_tid(int64_t _in_0_tid = 0) {
+    return SetField<int64_t>(VT_IN_0_TID, _in_0_tid, 0);
   }
-  ::flatbuffers::Optional<int64_t> in_1() const {
-    return GetOptional<int64_t, int64_t>(VT_IN_1);
+  ::flatbuffers::Optional<int64_t> in_1_tid() const {
+    return GetOptional<int64_t, int64_t>(VT_IN_1_TID);
   }
-  bool mutate_in_1(int64_t _in_1) {
-    return SetField<int64_t>(VT_IN_1, _in_1);
+  bool mutate_in_1_tid(int64_t _in_1_tid) {
+    return SetField<int64_t>(VT_IN_1_TID, _in_1_tid);
   }
-  ::flatbuffers::Optional<int64_t> in_2() const {
-    return GetOptional<int64_t, int64_t>(VT_IN_2);
+  ::flatbuffers::Optional<int64_t> in_2_tid() const {
+    return GetOptional<int64_t, int64_t>(VT_IN_2_TID);
   }
-  bool mutate_in_2(int64_t _in_2) {
-    return SetField<int64_t>(VT_IN_2, _in_2);
+  bool mutate_in_2_tid(int64_t _in_2_tid) {
+    return SetField<int64_t>(VT_IN_2_TID, _in_2_tid);
   }
-  int64_t out_0() const {
-    return GetField<int64_t>(VT_OUT_0, 0);
+  int64_t out_0_tid() const {
+    return GetField<int64_t>(VT_OUT_0_TID, 0);
   }
-  bool mutate_out_0(int64_t _out_0 = 0) {
-    return SetField<int64_t>(VT_OUT_0, _out_0, 0);
+  bool mutate_out_0_tid(int64_t _out_0_tid = 0) {
+    return SetField<int64_t>(VT_OUT_0_TID, _out_0_tid, 0);
   }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
@@ -142,11 +142,11 @@ struct PointwiseAttributes FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Tabl
            VerifyField<float>(verifier, VT_RELU_LOWER_CLIP, 4) &&
            VerifyField<float>(verifier, VT_RELU_UPPER_CLIP, 4) &&
            VerifyField<float>(verifier, VT_RELU_LOWER_SLOPE, 4) &&
-           VerifyField<int64_t>(verifier, VT_AXIS, 8) &&
-           VerifyField<int64_t>(verifier, VT_IN_0, 8) &&
-           VerifyField<int64_t>(verifier, VT_IN_1, 8) &&
-           VerifyField<int64_t>(verifier, VT_IN_2, 8) &&
-           VerifyField<int64_t>(verifier, VT_OUT_0, 8) &&
+           VerifyField<int64_t>(verifier, VT_AXIS_TID, 8) &&
+           VerifyField<int64_t>(verifier, VT_IN_0_TID, 8) &&
+           VerifyField<int64_t>(verifier, VT_IN_1_TID, 8) &&
+           VerifyField<int64_t>(verifier, VT_IN_2_TID, 8) &&
+           VerifyField<int64_t>(verifier, VT_OUT_0_TID, 8) &&
            verifier.EndTable();
   }
   PointwiseAttributesT *UnPack(const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
@@ -170,20 +170,20 @@ struct PointwiseAttributesBuilder {
   void add_relu_lower_slope(float relu_lower_slope) {
     fbb_.AddElement<float>(PointwiseAttributes::VT_RELU_LOWER_SLOPE, relu_lower_slope);
   }
-  void add_axis(int64_t axis) {
-    fbb_.AddElement<int64_t>(PointwiseAttributes::VT_AXIS, axis);
+  void add_axis_tid(int64_t axis_tid) {
+    fbb_.AddElement<int64_t>(PointwiseAttributes::VT_AXIS_TID, axis_tid);
   }
-  void add_in_0(int64_t in_0) {
-    fbb_.AddElement<int64_t>(PointwiseAttributes::VT_IN_0, in_0, 0);
+  void add_in_0_tid(int64_t in_0_tid) {
+    fbb_.AddElement<int64_t>(PointwiseAttributes::VT_IN_0_TID, in_0_tid, 0);
   }
-  void add_in_1(int64_t in_1) {
-    fbb_.AddElement<int64_t>(PointwiseAttributes::VT_IN_1, in_1);
+  void add_in_1_tid(int64_t in_1_tid) {
+    fbb_.AddElement<int64_t>(PointwiseAttributes::VT_IN_1_TID, in_1_tid);
   }
-  void add_in_2(int64_t in_2) {
-    fbb_.AddElement<int64_t>(PointwiseAttributes::VT_IN_2, in_2);
+  void add_in_2_tid(int64_t in_2_tid) {
+    fbb_.AddElement<int64_t>(PointwiseAttributes::VT_IN_2_TID, in_2_tid);
   }
-  void add_out_0(int64_t out_0) {
-    fbb_.AddElement<int64_t>(PointwiseAttributes::VT_OUT_0, out_0, 0);
+  void add_out_0_tid(int64_t out_0_tid) {
+    fbb_.AddElement<int64_t>(PointwiseAttributes::VT_OUT_0_TID, out_0_tid, 0);
   }
   explicit PointwiseAttributesBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
@@ -202,17 +202,17 @@ inline ::flatbuffers::Offset<PointwiseAttributes> CreatePointwiseAttributes(
     ::flatbuffers::Optional<float> relu_lower_clip = ::flatbuffers::nullopt,
     ::flatbuffers::Optional<float> relu_upper_clip = ::flatbuffers::nullopt,
     ::flatbuffers::Optional<float> relu_lower_slope = ::flatbuffers::nullopt,
-    ::flatbuffers::Optional<int64_t> axis = ::flatbuffers::nullopt,
-    int64_t in_0 = 0,
-    ::flatbuffers::Optional<int64_t> in_1 = ::flatbuffers::nullopt,
-    ::flatbuffers::Optional<int64_t> in_2 = ::flatbuffers::nullopt,
-    int64_t out_0 = 0) {
+    ::flatbuffers::Optional<int64_t> axis_tid = ::flatbuffers::nullopt,
+    int64_t in_0_tid = 0,
+    ::flatbuffers::Optional<int64_t> in_1_tid = ::flatbuffers::nullopt,
+    ::flatbuffers::Optional<int64_t> in_2_tid = ::flatbuffers::nullopt,
+    int64_t out_0_tid = 0) {
   PointwiseAttributesBuilder builder_(_fbb);
-  builder_.add_out_0(out_0);
-  if(in_2) { builder_.add_in_2(*in_2); }
-  if(in_1) { builder_.add_in_1(*in_1); }
-  builder_.add_in_0(in_0);
-  if(axis) { builder_.add_axis(*axis); }
+  builder_.add_out_0_tid(out_0_tid);
+  if(in_2_tid) { builder_.add_in_2_tid(*in_2_tid); }
+  if(in_1_tid) { builder_.add_in_1_tid(*in_1_tid); }
+  builder_.add_in_0_tid(in_0_tid);
+  if(axis_tid) { builder_.add_axis_tid(*axis_tid); }
   if(relu_lower_slope) { builder_.add_relu_lower_slope(*relu_lower_slope); }
   if(relu_upper_clip) { builder_.add_relu_upper_clip(*relu_upper_clip); }
   if(relu_lower_clip) { builder_.add_relu_lower_clip(*relu_lower_clip); }
@@ -229,11 +229,11 @@ inline bool operator==(const PointwiseAttributesT &lhs, const PointwiseAttribute
       (lhs.relu_lower_clip == rhs.relu_lower_clip) &&
       (lhs.relu_upper_clip == rhs.relu_upper_clip) &&
       (lhs.relu_lower_slope == rhs.relu_lower_slope) &&
-      (lhs.axis == rhs.axis) &&
-      (lhs.in_0 == rhs.in_0) &&
-      (lhs.in_1 == rhs.in_1) &&
-      (lhs.in_2 == rhs.in_2) &&
-      (lhs.out_0 == rhs.out_0);
+      (lhs.axis_tid == rhs.axis_tid) &&
+      (lhs.in_0_tid == rhs.in_0_tid) &&
+      (lhs.in_1_tid == rhs.in_1_tid) &&
+      (lhs.in_2_tid == rhs.in_2_tid) &&
+      (lhs.out_0_tid == rhs.out_0_tid);
 }
 
 inline bool operator!=(const PointwiseAttributesT &lhs, const PointwiseAttributesT &rhs) {
@@ -254,11 +254,11 @@ inline void PointwiseAttributes::UnPackTo(PointwiseAttributesT *_o, const ::flat
   { auto _e = relu_lower_clip(); _o->relu_lower_clip = _e; }
   { auto _e = relu_upper_clip(); _o->relu_upper_clip = _e; }
   { auto _e = relu_lower_slope(); _o->relu_lower_slope = _e; }
-  { auto _e = axis(); _o->axis = _e; }
-  { auto _e = in_0(); _o->in_0 = _e; }
-  { auto _e = in_1(); _o->in_1 = _e; }
-  { auto _e = in_2(); _o->in_2 = _e; }
-  { auto _e = out_0(); _o->out_0 = _e; }
+  { auto _e = axis_tid(); _o->axis_tid = _e; }
+  { auto _e = in_0_tid(); _o->in_0_tid = _e; }
+  { auto _e = in_1_tid(); _o->in_1_tid = _e; }
+  { auto _e = in_2_tid(); _o->in_2_tid = _e; }
+  { auto _e = out_0_tid(); _o->out_0_tid = _e; }
 }
 
 inline ::flatbuffers::Offset<PointwiseAttributes> PointwiseAttributes::Pack(::flatbuffers::FlatBufferBuilder &_fbb, const PointwiseAttributesT* _o, const ::flatbuffers::rehasher_function_t *_rehasher) {
@@ -273,22 +273,22 @@ inline ::flatbuffers::Offset<PointwiseAttributes> CreatePointwiseAttributes(::fl
   auto _relu_lower_clip = _o->relu_lower_clip;
   auto _relu_upper_clip = _o->relu_upper_clip;
   auto _relu_lower_slope = _o->relu_lower_slope;
-  auto _axis = _o->axis;
-  auto _in_0 = _o->in_0;
-  auto _in_1 = _o->in_1;
-  auto _in_2 = _o->in_2;
-  auto _out_0 = _o->out_0;
+  auto _axis_tid = _o->axis_tid;
+  auto _in_0_tid = _o->in_0_tid;
+  auto _in_1_tid = _o->in_1_tid;
+  auto _in_2_tid = _o->in_2_tid;
+  auto _out_0_tid = _o->out_0_tid;
   return hipdnn_sdk::data_objects::CreatePointwiseAttributes(
       _fbb,
       _operation,
       _relu_lower_clip,
       _relu_upper_clip,
       _relu_lower_slope,
-      _axis,
-      _in_0,
-      _in_1,
-      _in_2,
-      _out_0);
+      _axis_tid,
+      _in_0_tid,
+      _in_1_tid,
+      _in_2_tid,
+      _out_0_tid);
 }
 
 }  // namespace data_objects

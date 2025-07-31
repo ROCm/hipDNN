@@ -191,12 +191,12 @@ TEST(BatchnormInferenceNodeTests, PackNode)
     auto packed_attributes = node_flatbuffer->attributes_as_BatchnormInferenceAttributes();
     ASSERT_NE(packed_attributes, nullptr);
 
-    EXPECT_EQ(packed_attributes->x(), x_tensor->get_uid());
-    EXPECT_EQ(packed_attributes->y(), y_tensor->get_uid());
-    EXPECT_EQ(packed_attributes->mean(), mean_tensor->get_uid());
-    EXPECT_EQ(packed_attributes->inv_variance(), inv_variance_tensor->get_uid());
-    EXPECT_EQ(packed_attributes->scale(), scale_tensor->get_uid());
-    EXPECT_EQ(packed_attributes->bias(), bias_tensor->get_uid());
+    EXPECT_EQ(packed_attributes->x_tid(), x_tensor->get_uid());
+    EXPECT_EQ(packed_attributes->y_tid(), y_tensor->get_uid());
+    EXPECT_EQ(packed_attributes->mean_tid(), mean_tensor->get_uid());
+    EXPECT_EQ(packed_attributes->inv_variance_tid(), inv_variance_tensor->get_uid());
+    EXPECT_EQ(packed_attributes->scale_tid(), scale_tensor->get_uid());
+    EXPECT_EQ(packed_attributes->bias_tid(), bias_tensor->get_uid());
 }
 
 TEST(BatchnormInferenceNodeTests, PackNodeWithoutMeanAndInvVariance)
@@ -256,11 +256,11 @@ TEST(BatchnormInferenceNodeTests, PackNodeWithoutMeanAndInvVariance)
     auto packed_attributes = node_flatbuffer->attributes_as_BatchnormInferenceAttributes();
     ASSERT_NE(packed_attributes, nullptr);
 
-    EXPECT_EQ(packed_attributes->x(), x_tensor->get_uid());
-    EXPECT_EQ(packed_attributes->y(), y_tensor->get_uid());
-    EXPECT_EQ(packed_attributes->mean(), flatbuffers::nullopt); // Verify mean is null
-    EXPECT_EQ(packed_attributes->inv_variance(),
+    EXPECT_EQ(packed_attributes->x_tid(), x_tensor->get_uid());
+    EXPECT_EQ(packed_attributes->y_tid(), y_tensor->get_uid());
+    EXPECT_EQ(packed_attributes->mean_tid(), flatbuffers::nullopt); // Verify mean is null
+    EXPECT_EQ(packed_attributes->inv_variance_tid(),
               flatbuffers::nullopt); // Verify inv_variance is null
-    EXPECT_EQ(packed_attributes->scale(), scale_tensor->get_uid());
-    EXPECT_EQ(packed_attributes->bias(), bias_tensor->get_uid());
+    EXPECT_EQ(packed_attributes->scale_tid(), scale_tensor->get_uid());
+    EXPECT_EQ(packed_attributes->bias_tid(), bias_tensor->get_uid());
 }

@@ -25,133 +25,133 @@ bool operator!=(const BatchnormAttributesT &lhs, const BatchnormAttributesT &rhs
 
 struct BatchnormAttributesT : public ::flatbuffers::NativeTable {
   typedef BatchnormAttributes TableType;
-  int64_t x = 0;
-  int64_t scale = 0;
-  int64_t bias = 0;
-  int64_t epsilon = 0;
-  std::vector<int64_t> peer_stats{};
-  ::flatbuffers::Optional<int64_t> prev_running_mean = ::flatbuffers::nullopt;
-  ::flatbuffers::Optional<int64_t> prev_running_variance = ::flatbuffers::nullopt;
-  ::flatbuffers::Optional<int64_t> momentum = ::flatbuffers::nullopt;
-  int64_t y = 0;
-  ::flatbuffers::Optional<int64_t> mean = ::flatbuffers::nullopt;
-  ::flatbuffers::Optional<int64_t> inv_variance = ::flatbuffers::nullopt;
-  ::flatbuffers::Optional<int64_t> next_running_mean = ::flatbuffers::nullopt;
-  ::flatbuffers::Optional<int64_t> next_running_variance = ::flatbuffers::nullopt;
+  int64_t x_tid = 0;
+  int64_t scale_tid = 0;
+  int64_t bias_tid = 0;
+  int64_t epsilon_tid = 0;
+  std::vector<int64_t> peer_stats_tid{};
+  ::flatbuffers::Optional<int64_t> prev_running_mean_tid = ::flatbuffers::nullopt;
+  ::flatbuffers::Optional<int64_t> prev_running_variance_tid = ::flatbuffers::nullopt;
+  ::flatbuffers::Optional<int64_t> momentum_tid = ::flatbuffers::nullopt;
+  int64_t y_tid = 0;
+  ::flatbuffers::Optional<int64_t> mean_tid = ::flatbuffers::nullopt;
+  ::flatbuffers::Optional<int64_t> inv_variance_tid = ::flatbuffers::nullopt;
+  ::flatbuffers::Optional<int64_t> next_running_mean_tid = ::flatbuffers::nullopt;
+  ::flatbuffers::Optional<int64_t> next_running_variance_tid = ::flatbuffers::nullopt;
 };
 
 struct BatchnormAttributes FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef BatchnormAttributesT NativeTableType;
   typedef BatchnormAttributesBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
-    VT_X = 4,
-    VT_SCALE = 6,
-    VT_BIAS = 8,
-    VT_EPSILON = 10,
-    VT_PEER_STATS = 12,
-    VT_PREV_RUNNING_MEAN = 14,
-    VT_PREV_RUNNING_VARIANCE = 16,
-    VT_MOMENTUM = 18,
-    VT_Y = 20,
-    VT_MEAN = 22,
-    VT_INV_VARIANCE = 24,
-    VT_NEXT_RUNNING_MEAN = 26,
-    VT_NEXT_RUNNING_VARIANCE = 28
+    VT_X_TID = 4,
+    VT_SCALE_TID = 6,
+    VT_BIAS_TID = 8,
+    VT_EPSILON_TID = 10,
+    VT_PEER_STATS_TID = 12,
+    VT_PREV_RUNNING_MEAN_TID = 14,
+    VT_PREV_RUNNING_VARIANCE_TID = 16,
+    VT_MOMENTUM_TID = 18,
+    VT_Y_TID = 20,
+    VT_MEAN_TID = 22,
+    VT_INV_VARIANCE_TID = 24,
+    VT_NEXT_RUNNING_MEAN_TID = 26,
+    VT_NEXT_RUNNING_VARIANCE_TID = 28
   };
-  int64_t x() const {
-    return GetField<int64_t>(VT_X, 0);
+  int64_t x_tid() const {
+    return GetField<int64_t>(VT_X_TID, 0);
   }
-  bool mutate_x(int64_t _x = 0) {
-    return SetField<int64_t>(VT_X, _x, 0);
+  bool mutate_x_tid(int64_t _x_tid = 0) {
+    return SetField<int64_t>(VT_X_TID, _x_tid, 0);
   }
-  int64_t scale() const {
-    return GetField<int64_t>(VT_SCALE, 0);
+  int64_t scale_tid() const {
+    return GetField<int64_t>(VT_SCALE_TID, 0);
   }
-  bool mutate_scale(int64_t _scale = 0) {
-    return SetField<int64_t>(VT_SCALE, _scale, 0);
+  bool mutate_scale_tid(int64_t _scale_tid = 0) {
+    return SetField<int64_t>(VT_SCALE_TID, _scale_tid, 0);
   }
-  int64_t bias() const {
-    return GetField<int64_t>(VT_BIAS, 0);
+  int64_t bias_tid() const {
+    return GetField<int64_t>(VT_BIAS_TID, 0);
   }
-  bool mutate_bias(int64_t _bias = 0) {
-    return SetField<int64_t>(VT_BIAS, _bias, 0);
+  bool mutate_bias_tid(int64_t _bias_tid = 0) {
+    return SetField<int64_t>(VT_BIAS_TID, _bias_tid, 0);
   }
-  int64_t epsilon() const {
-    return GetField<int64_t>(VT_EPSILON, 0);
+  int64_t epsilon_tid() const {
+    return GetField<int64_t>(VT_EPSILON_TID, 0);
   }
-  bool mutate_epsilon(int64_t _epsilon = 0) {
-    return SetField<int64_t>(VT_EPSILON, _epsilon, 0);
+  bool mutate_epsilon_tid(int64_t _epsilon_tid = 0) {
+    return SetField<int64_t>(VT_EPSILON_TID, _epsilon_tid, 0);
   }
-  const ::flatbuffers::Vector<int64_t> *peer_stats() const {
-    return GetPointer<const ::flatbuffers::Vector<int64_t> *>(VT_PEER_STATS);
+  const ::flatbuffers::Vector<int64_t> *peer_stats_tid() const {
+    return GetPointer<const ::flatbuffers::Vector<int64_t> *>(VT_PEER_STATS_TID);
   }
-  ::flatbuffers::Vector<int64_t> *mutable_peer_stats() {
-    return GetPointer<::flatbuffers::Vector<int64_t> *>(VT_PEER_STATS);
+  ::flatbuffers::Vector<int64_t> *mutable_peer_stats_tid() {
+    return GetPointer<::flatbuffers::Vector<int64_t> *>(VT_PEER_STATS_TID);
   }
-  ::flatbuffers::Optional<int64_t> prev_running_mean() const {
-    return GetOptional<int64_t, int64_t>(VT_PREV_RUNNING_MEAN);
+  ::flatbuffers::Optional<int64_t> prev_running_mean_tid() const {
+    return GetOptional<int64_t, int64_t>(VT_PREV_RUNNING_MEAN_TID);
   }
-  bool mutate_prev_running_mean(int64_t _prev_running_mean) {
-    return SetField<int64_t>(VT_PREV_RUNNING_MEAN, _prev_running_mean);
+  bool mutate_prev_running_mean_tid(int64_t _prev_running_mean_tid) {
+    return SetField<int64_t>(VT_PREV_RUNNING_MEAN_TID, _prev_running_mean_tid);
   }
-  ::flatbuffers::Optional<int64_t> prev_running_variance() const {
-    return GetOptional<int64_t, int64_t>(VT_PREV_RUNNING_VARIANCE);
+  ::flatbuffers::Optional<int64_t> prev_running_variance_tid() const {
+    return GetOptional<int64_t, int64_t>(VT_PREV_RUNNING_VARIANCE_TID);
   }
-  bool mutate_prev_running_variance(int64_t _prev_running_variance) {
-    return SetField<int64_t>(VT_PREV_RUNNING_VARIANCE, _prev_running_variance);
+  bool mutate_prev_running_variance_tid(int64_t _prev_running_variance_tid) {
+    return SetField<int64_t>(VT_PREV_RUNNING_VARIANCE_TID, _prev_running_variance_tid);
   }
-  ::flatbuffers::Optional<int64_t> momentum() const {
-    return GetOptional<int64_t, int64_t>(VT_MOMENTUM);
+  ::flatbuffers::Optional<int64_t> momentum_tid() const {
+    return GetOptional<int64_t, int64_t>(VT_MOMENTUM_TID);
   }
-  bool mutate_momentum(int64_t _momentum) {
-    return SetField<int64_t>(VT_MOMENTUM, _momentum);
+  bool mutate_momentum_tid(int64_t _momentum_tid) {
+    return SetField<int64_t>(VT_MOMENTUM_TID, _momentum_tid);
   }
-  int64_t y() const {
-    return GetField<int64_t>(VT_Y, 0);
+  int64_t y_tid() const {
+    return GetField<int64_t>(VT_Y_TID, 0);
   }
-  bool mutate_y(int64_t _y = 0) {
-    return SetField<int64_t>(VT_Y, _y, 0);
+  bool mutate_y_tid(int64_t _y_tid = 0) {
+    return SetField<int64_t>(VT_Y_TID, _y_tid, 0);
   }
-  ::flatbuffers::Optional<int64_t> mean() const {
-    return GetOptional<int64_t, int64_t>(VT_MEAN);
+  ::flatbuffers::Optional<int64_t> mean_tid() const {
+    return GetOptional<int64_t, int64_t>(VT_MEAN_TID);
   }
-  bool mutate_mean(int64_t _mean) {
-    return SetField<int64_t>(VT_MEAN, _mean);
+  bool mutate_mean_tid(int64_t _mean_tid) {
+    return SetField<int64_t>(VT_MEAN_TID, _mean_tid);
   }
-  ::flatbuffers::Optional<int64_t> inv_variance() const {
-    return GetOptional<int64_t, int64_t>(VT_INV_VARIANCE);
+  ::flatbuffers::Optional<int64_t> inv_variance_tid() const {
+    return GetOptional<int64_t, int64_t>(VT_INV_VARIANCE_TID);
   }
-  bool mutate_inv_variance(int64_t _inv_variance) {
-    return SetField<int64_t>(VT_INV_VARIANCE, _inv_variance);
+  bool mutate_inv_variance_tid(int64_t _inv_variance_tid) {
+    return SetField<int64_t>(VT_INV_VARIANCE_TID, _inv_variance_tid);
   }
-  ::flatbuffers::Optional<int64_t> next_running_mean() const {
-    return GetOptional<int64_t, int64_t>(VT_NEXT_RUNNING_MEAN);
+  ::flatbuffers::Optional<int64_t> next_running_mean_tid() const {
+    return GetOptional<int64_t, int64_t>(VT_NEXT_RUNNING_MEAN_TID);
   }
-  bool mutate_next_running_mean(int64_t _next_running_mean) {
-    return SetField<int64_t>(VT_NEXT_RUNNING_MEAN, _next_running_mean);
+  bool mutate_next_running_mean_tid(int64_t _next_running_mean_tid) {
+    return SetField<int64_t>(VT_NEXT_RUNNING_MEAN_TID, _next_running_mean_tid);
   }
-  ::flatbuffers::Optional<int64_t> next_running_variance() const {
-    return GetOptional<int64_t, int64_t>(VT_NEXT_RUNNING_VARIANCE);
+  ::flatbuffers::Optional<int64_t> next_running_variance_tid() const {
+    return GetOptional<int64_t, int64_t>(VT_NEXT_RUNNING_VARIANCE_TID);
   }
-  bool mutate_next_running_variance(int64_t _next_running_variance) {
-    return SetField<int64_t>(VT_NEXT_RUNNING_VARIANCE, _next_running_variance);
+  bool mutate_next_running_variance_tid(int64_t _next_running_variance_tid) {
+    return SetField<int64_t>(VT_NEXT_RUNNING_VARIANCE_TID, _next_running_variance_tid);
   }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
-           VerifyField<int64_t>(verifier, VT_X, 8) &&
-           VerifyField<int64_t>(verifier, VT_SCALE, 8) &&
-           VerifyField<int64_t>(verifier, VT_BIAS, 8) &&
-           VerifyField<int64_t>(verifier, VT_EPSILON, 8) &&
-           VerifyOffset(verifier, VT_PEER_STATS) &&
-           verifier.VerifyVector(peer_stats()) &&
-           VerifyField<int64_t>(verifier, VT_PREV_RUNNING_MEAN, 8) &&
-           VerifyField<int64_t>(verifier, VT_PREV_RUNNING_VARIANCE, 8) &&
-           VerifyField<int64_t>(verifier, VT_MOMENTUM, 8) &&
-           VerifyField<int64_t>(verifier, VT_Y, 8) &&
-           VerifyField<int64_t>(verifier, VT_MEAN, 8) &&
-           VerifyField<int64_t>(verifier, VT_INV_VARIANCE, 8) &&
-           VerifyField<int64_t>(verifier, VT_NEXT_RUNNING_MEAN, 8) &&
-           VerifyField<int64_t>(verifier, VT_NEXT_RUNNING_VARIANCE, 8) &&
+           VerifyField<int64_t>(verifier, VT_X_TID, 8) &&
+           VerifyField<int64_t>(verifier, VT_SCALE_TID, 8) &&
+           VerifyField<int64_t>(verifier, VT_BIAS_TID, 8) &&
+           VerifyField<int64_t>(verifier, VT_EPSILON_TID, 8) &&
+           VerifyOffset(verifier, VT_PEER_STATS_TID) &&
+           verifier.VerifyVector(peer_stats_tid()) &&
+           VerifyField<int64_t>(verifier, VT_PREV_RUNNING_MEAN_TID, 8) &&
+           VerifyField<int64_t>(verifier, VT_PREV_RUNNING_VARIANCE_TID, 8) &&
+           VerifyField<int64_t>(verifier, VT_MOMENTUM_TID, 8) &&
+           VerifyField<int64_t>(verifier, VT_Y_TID, 8) &&
+           VerifyField<int64_t>(verifier, VT_MEAN_TID, 8) &&
+           VerifyField<int64_t>(verifier, VT_INV_VARIANCE_TID, 8) &&
+           VerifyField<int64_t>(verifier, VT_NEXT_RUNNING_MEAN_TID, 8) &&
+           VerifyField<int64_t>(verifier, VT_NEXT_RUNNING_VARIANCE_TID, 8) &&
            verifier.EndTable();
   }
   BatchnormAttributesT *UnPack(const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
@@ -163,44 +163,44 @@ struct BatchnormAttributesBuilder {
   typedef BatchnormAttributes Table;
   ::flatbuffers::FlatBufferBuilder &fbb_;
   ::flatbuffers::uoffset_t start_;
-  void add_x(int64_t x) {
-    fbb_.AddElement<int64_t>(BatchnormAttributes::VT_X, x, 0);
+  void add_x_tid(int64_t x_tid) {
+    fbb_.AddElement<int64_t>(BatchnormAttributes::VT_X_TID, x_tid, 0);
   }
-  void add_scale(int64_t scale) {
-    fbb_.AddElement<int64_t>(BatchnormAttributes::VT_SCALE, scale, 0);
+  void add_scale_tid(int64_t scale_tid) {
+    fbb_.AddElement<int64_t>(BatchnormAttributes::VT_SCALE_TID, scale_tid, 0);
   }
-  void add_bias(int64_t bias) {
-    fbb_.AddElement<int64_t>(BatchnormAttributes::VT_BIAS, bias, 0);
+  void add_bias_tid(int64_t bias_tid) {
+    fbb_.AddElement<int64_t>(BatchnormAttributes::VT_BIAS_TID, bias_tid, 0);
   }
-  void add_epsilon(int64_t epsilon) {
-    fbb_.AddElement<int64_t>(BatchnormAttributes::VT_EPSILON, epsilon, 0);
+  void add_epsilon_tid(int64_t epsilon_tid) {
+    fbb_.AddElement<int64_t>(BatchnormAttributes::VT_EPSILON_TID, epsilon_tid, 0);
   }
-  void add_peer_stats(::flatbuffers::Offset<::flatbuffers::Vector<int64_t>> peer_stats) {
-    fbb_.AddOffset(BatchnormAttributes::VT_PEER_STATS, peer_stats);
+  void add_peer_stats_tid(::flatbuffers::Offset<::flatbuffers::Vector<int64_t>> peer_stats_tid) {
+    fbb_.AddOffset(BatchnormAttributes::VT_PEER_STATS_TID, peer_stats_tid);
   }
-  void add_prev_running_mean(int64_t prev_running_mean) {
-    fbb_.AddElement<int64_t>(BatchnormAttributes::VT_PREV_RUNNING_MEAN, prev_running_mean);
+  void add_prev_running_mean_tid(int64_t prev_running_mean_tid) {
+    fbb_.AddElement<int64_t>(BatchnormAttributes::VT_PREV_RUNNING_MEAN_TID, prev_running_mean_tid);
   }
-  void add_prev_running_variance(int64_t prev_running_variance) {
-    fbb_.AddElement<int64_t>(BatchnormAttributes::VT_PREV_RUNNING_VARIANCE, prev_running_variance);
+  void add_prev_running_variance_tid(int64_t prev_running_variance_tid) {
+    fbb_.AddElement<int64_t>(BatchnormAttributes::VT_PREV_RUNNING_VARIANCE_TID, prev_running_variance_tid);
   }
-  void add_momentum(int64_t momentum) {
-    fbb_.AddElement<int64_t>(BatchnormAttributes::VT_MOMENTUM, momentum);
+  void add_momentum_tid(int64_t momentum_tid) {
+    fbb_.AddElement<int64_t>(BatchnormAttributes::VT_MOMENTUM_TID, momentum_tid);
   }
-  void add_y(int64_t y) {
-    fbb_.AddElement<int64_t>(BatchnormAttributes::VT_Y, y, 0);
+  void add_y_tid(int64_t y_tid) {
+    fbb_.AddElement<int64_t>(BatchnormAttributes::VT_Y_TID, y_tid, 0);
   }
-  void add_mean(int64_t mean) {
-    fbb_.AddElement<int64_t>(BatchnormAttributes::VT_MEAN, mean);
+  void add_mean_tid(int64_t mean_tid) {
+    fbb_.AddElement<int64_t>(BatchnormAttributes::VT_MEAN_TID, mean_tid);
   }
-  void add_inv_variance(int64_t inv_variance) {
-    fbb_.AddElement<int64_t>(BatchnormAttributes::VT_INV_VARIANCE, inv_variance);
+  void add_inv_variance_tid(int64_t inv_variance_tid) {
+    fbb_.AddElement<int64_t>(BatchnormAttributes::VT_INV_VARIANCE_TID, inv_variance_tid);
   }
-  void add_next_running_mean(int64_t next_running_mean) {
-    fbb_.AddElement<int64_t>(BatchnormAttributes::VT_NEXT_RUNNING_MEAN, next_running_mean);
+  void add_next_running_mean_tid(int64_t next_running_mean_tid) {
+    fbb_.AddElement<int64_t>(BatchnormAttributes::VT_NEXT_RUNNING_MEAN_TID, next_running_mean_tid);
   }
-  void add_next_running_variance(int64_t next_running_variance) {
-    fbb_.AddElement<int64_t>(BatchnormAttributes::VT_NEXT_RUNNING_VARIANCE, next_running_variance);
+  void add_next_running_variance_tid(int64_t next_running_variance_tid) {
+    fbb_.AddElement<int64_t>(BatchnormAttributes::VT_NEXT_RUNNING_VARIANCE_TID, next_running_variance_tid);
   }
   explicit BatchnormAttributesBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
@@ -215,67 +215,67 @@ struct BatchnormAttributesBuilder {
 
 inline ::flatbuffers::Offset<BatchnormAttributes> CreateBatchnormAttributes(
     ::flatbuffers::FlatBufferBuilder &_fbb,
-    int64_t x = 0,
-    int64_t scale = 0,
-    int64_t bias = 0,
-    int64_t epsilon = 0,
-    ::flatbuffers::Offset<::flatbuffers::Vector<int64_t>> peer_stats = 0,
-    ::flatbuffers::Optional<int64_t> prev_running_mean = ::flatbuffers::nullopt,
-    ::flatbuffers::Optional<int64_t> prev_running_variance = ::flatbuffers::nullopt,
-    ::flatbuffers::Optional<int64_t> momentum = ::flatbuffers::nullopt,
-    int64_t y = 0,
-    ::flatbuffers::Optional<int64_t> mean = ::flatbuffers::nullopt,
-    ::flatbuffers::Optional<int64_t> inv_variance = ::flatbuffers::nullopt,
-    ::flatbuffers::Optional<int64_t> next_running_mean = ::flatbuffers::nullopt,
-    ::flatbuffers::Optional<int64_t> next_running_variance = ::flatbuffers::nullopt) {
+    int64_t x_tid = 0,
+    int64_t scale_tid = 0,
+    int64_t bias_tid = 0,
+    int64_t epsilon_tid = 0,
+    ::flatbuffers::Offset<::flatbuffers::Vector<int64_t>> peer_stats_tid = 0,
+    ::flatbuffers::Optional<int64_t> prev_running_mean_tid = ::flatbuffers::nullopt,
+    ::flatbuffers::Optional<int64_t> prev_running_variance_tid = ::flatbuffers::nullopt,
+    ::flatbuffers::Optional<int64_t> momentum_tid = ::flatbuffers::nullopt,
+    int64_t y_tid = 0,
+    ::flatbuffers::Optional<int64_t> mean_tid = ::flatbuffers::nullopt,
+    ::flatbuffers::Optional<int64_t> inv_variance_tid = ::flatbuffers::nullopt,
+    ::flatbuffers::Optional<int64_t> next_running_mean_tid = ::flatbuffers::nullopt,
+    ::flatbuffers::Optional<int64_t> next_running_variance_tid = ::flatbuffers::nullopt) {
   BatchnormAttributesBuilder builder_(_fbb);
-  if(next_running_variance) { builder_.add_next_running_variance(*next_running_variance); }
-  if(next_running_mean) { builder_.add_next_running_mean(*next_running_mean); }
-  if(inv_variance) { builder_.add_inv_variance(*inv_variance); }
-  if(mean) { builder_.add_mean(*mean); }
-  builder_.add_y(y);
-  if(momentum) { builder_.add_momentum(*momentum); }
-  if(prev_running_variance) { builder_.add_prev_running_variance(*prev_running_variance); }
-  if(prev_running_mean) { builder_.add_prev_running_mean(*prev_running_mean); }
-  builder_.add_epsilon(epsilon);
-  builder_.add_bias(bias);
-  builder_.add_scale(scale);
-  builder_.add_x(x);
-  builder_.add_peer_stats(peer_stats);
+  if(next_running_variance_tid) { builder_.add_next_running_variance_tid(*next_running_variance_tid); }
+  if(next_running_mean_tid) { builder_.add_next_running_mean_tid(*next_running_mean_tid); }
+  if(inv_variance_tid) { builder_.add_inv_variance_tid(*inv_variance_tid); }
+  if(mean_tid) { builder_.add_mean_tid(*mean_tid); }
+  builder_.add_y_tid(y_tid);
+  if(momentum_tid) { builder_.add_momentum_tid(*momentum_tid); }
+  if(prev_running_variance_tid) { builder_.add_prev_running_variance_tid(*prev_running_variance_tid); }
+  if(prev_running_mean_tid) { builder_.add_prev_running_mean_tid(*prev_running_mean_tid); }
+  builder_.add_epsilon_tid(epsilon_tid);
+  builder_.add_bias_tid(bias_tid);
+  builder_.add_scale_tid(scale_tid);
+  builder_.add_x_tid(x_tid);
+  builder_.add_peer_stats_tid(peer_stats_tid);
   return builder_.Finish();
 }
 
 inline ::flatbuffers::Offset<BatchnormAttributes> CreateBatchnormAttributesDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
-    int64_t x = 0,
-    int64_t scale = 0,
-    int64_t bias = 0,
-    int64_t epsilon = 0,
-    const std::vector<int64_t> *peer_stats = nullptr,
-    ::flatbuffers::Optional<int64_t> prev_running_mean = ::flatbuffers::nullopt,
-    ::flatbuffers::Optional<int64_t> prev_running_variance = ::flatbuffers::nullopt,
-    ::flatbuffers::Optional<int64_t> momentum = ::flatbuffers::nullopt,
-    int64_t y = 0,
-    ::flatbuffers::Optional<int64_t> mean = ::flatbuffers::nullopt,
-    ::flatbuffers::Optional<int64_t> inv_variance = ::flatbuffers::nullopt,
-    ::flatbuffers::Optional<int64_t> next_running_mean = ::flatbuffers::nullopt,
-    ::flatbuffers::Optional<int64_t> next_running_variance = ::flatbuffers::nullopt) {
-  auto peer_stats__ = peer_stats ? _fbb.CreateVector<int64_t>(*peer_stats) : 0;
+    int64_t x_tid = 0,
+    int64_t scale_tid = 0,
+    int64_t bias_tid = 0,
+    int64_t epsilon_tid = 0,
+    const std::vector<int64_t> *peer_stats_tid = nullptr,
+    ::flatbuffers::Optional<int64_t> prev_running_mean_tid = ::flatbuffers::nullopt,
+    ::flatbuffers::Optional<int64_t> prev_running_variance_tid = ::flatbuffers::nullopt,
+    ::flatbuffers::Optional<int64_t> momentum_tid = ::flatbuffers::nullopt,
+    int64_t y_tid = 0,
+    ::flatbuffers::Optional<int64_t> mean_tid = ::flatbuffers::nullopt,
+    ::flatbuffers::Optional<int64_t> inv_variance_tid = ::flatbuffers::nullopt,
+    ::flatbuffers::Optional<int64_t> next_running_mean_tid = ::flatbuffers::nullopt,
+    ::flatbuffers::Optional<int64_t> next_running_variance_tid = ::flatbuffers::nullopt) {
+  auto peer_stats_tid__ = peer_stats_tid ? _fbb.CreateVector<int64_t>(*peer_stats_tid) : 0;
   return hipdnn_sdk::data_objects::CreateBatchnormAttributes(
       _fbb,
-      x,
-      scale,
-      bias,
-      epsilon,
-      peer_stats__,
-      prev_running_mean,
-      prev_running_variance,
-      momentum,
-      y,
-      mean,
-      inv_variance,
-      next_running_mean,
-      next_running_variance);
+      x_tid,
+      scale_tid,
+      bias_tid,
+      epsilon_tid,
+      peer_stats_tid__,
+      prev_running_mean_tid,
+      prev_running_variance_tid,
+      momentum_tid,
+      y_tid,
+      mean_tid,
+      inv_variance_tid,
+      next_running_mean_tid,
+      next_running_variance_tid);
 }
 
 ::flatbuffers::Offset<BatchnormAttributes> CreateBatchnormAttributes(::flatbuffers::FlatBufferBuilder &_fbb, const BatchnormAttributesT *_o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
@@ -283,19 +283,19 @@ inline ::flatbuffers::Offset<BatchnormAttributes> CreateBatchnormAttributesDirec
 
 inline bool operator==(const BatchnormAttributesT &lhs, const BatchnormAttributesT &rhs) {
   return
-      (lhs.x == rhs.x) &&
-      (lhs.scale == rhs.scale) &&
-      (lhs.bias == rhs.bias) &&
-      (lhs.epsilon == rhs.epsilon) &&
-      (lhs.peer_stats == rhs.peer_stats) &&
-      (lhs.prev_running_mean == rhs.prev_running_mean) &&
-      (lhs.prev_running_variance == rhs.prev_running_variance) &&
-      (lhs.momentum == rhs.momentum) &&
-      (lhs.y == rhs.y) &&
-      (lhs.mean == rhs.mean) &&
-      (lhs.inv_variance == rhs.inv_variance) &&
-      (lhs.next_running_mean == rhs.next_running_mean) &&
-      (lhs.next_running_variance == rhs.next_running_variance);
+      (lhs.x_tid == rhs.x_tid) &&
+      (lhs.scale_tid == rhs.scale_tid) &&
+      (lhs.bias_tid == rhs.bias_tid) &&
+      (lhs.epsilon_tid == rhs.epsilon_tid) &&
+      (lhs.peer_stats_tid == rhs.peer_stats_tid) &&
+      (lhs.prev_running_mean_tid == rhs.prev_running_mean_tid) &&
+      (lhs.prev_running_variance_tid == rhs.prev_running_variance_tid) &&
+      (lhs.momentum_tid == rhs.momentum_tid) &&
+      (lhs.y_tid == rhs.y_tid) &&
+      (lhs.mean_tid == rhs.mean_tid) &&
+      (lhs.inv_variance_tid == rhs.inv_variance_tid) &&
+      (lhs.next_running_mean_tid == rhs.next_running_mean_tid) &&
+      (lhs.next_running_variance_tid == rhs.next_running_variance_tid);
 }
 
 inline bool operator!=(const BatchnormAttributesT &lhs, const BatchnormAttributesT &rhs) {
@@ -312,19 +312,19 @@ inline BatchnormAttributesT *BatchnormAttributes::UnPack(const ::flatbuffers::re
 inline void BatchnormAttributes::UnPackTo(BatchnormAttributesT *_o, const ::flatbuffers::resolver_function_t *_resolver) const {
   (void)_o;
   (void)_resolver;
-  { auto _e = x(); _o->x = _e; }
-  { auto _e = scale(); _o->scale = _e; }
-  { auto _e = bias(); _o->bias = _e; }
-  { auto _e = epsilon(); _o->epsilon = _e; }
-  { auto _e = peer_stats(); if (_e) { _o->peer_stats.resize(_e->size()); for (::flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->peer_stats[_i] = _e->Get(_i); } } else { _o->peer_stats.resize(0); } }
-  { auto _e = prev_running_mean(); _o->prev_running_mean = _e; }
-  { auto _e = prev_running_variance(); _o->prev_running_variance = _e; }
-  { auto _e = momentum(); _o->momentum = _e; }
-  { auto _e = y(); _o->y = _e; }
-  { auto _e = mean(); _o->mean = _e; }
-  { auto _e = inv_variance(); _o->inv_variance = _e; }
-  { auto _e = next_running_mean(); _o->next_running_mean = _e; }
-  { auto _e = next_running_variance(); _o->next_running_variance = _e; }
+  { auto _e = x_tid(); _o->x_tid = _e; }
+  { auto _e = scale_tid(); _o->scale_tid = _e; }
+  { auto _e = bias_tid(); _o->bias_tid = _e; }
+  { auto _e = epsilon_tid(); _o->epsilon_tid = _e; }
+  { auto _e = peer_stats_tid(); if (_e) { _o->peer_stats_tid.resize(_e->size()); for (::flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->peer_stats_tid[_i] = _e->Get(_i); } } else { _o->peer_stats_tid.resize(0); } }
+  { auto _e = prev_running_mean_tid(); _o->prev_running_mean_tid = _e; }
+  { auto _e = prev_running_variance_tid(); _o->prev_running_variance_tid = _e; }
+  { auto _e = momentum_tid(); _o->momentum_tid = _e; }
+  { auto _e = y_tid(); _o->y_tid = _e; }
+  { auto _e = mean_tid(); _o->mean_tid = _e; }
+  { auto _e = inv_variance_tid(); _o->inv_variance_tid = _e; }
+  { auto _e = next_running_mean_tid(); _o->next_running_mean_tid = _e; }
+  { auto _e = next_running_variance_tid(); _o->next_running_variance_tid = _e; }
 }
 
 inline ::flatbuffers::Offset<BatchnormAttributes> BatchnormAttributes::Pack(::flatbuffers::FlatBufferBuilder &_fbb, const BatchnormAttributesT* _o, const ::flatbuffers::rehasher_function_t *_rehasher) {
@@ -335,34 +335,34 @@ inline ::flatbuffers::Offset<BatchnormAttributes> CreateBatchnormAttributes(::fl
   (void)_rehasher;
   (void)_o;
   struct _VectorArgs { ::flatbuffers::FlatBufferBuilder *__fbb; const BatchnormAttributesT* __o; const ::flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
-  auto _x = _o->x;
-  auto _scale = _o->scale;
-  auto _bias = _o->bias;
-  auto _epsilon = _o->epsilon;
-  auto _peer_stats = _o->peer_stats.size() ? _fbb.CreateVector(_o->peer_stats) : 0;
-  auto _prev_running_mean = _o->prev_running_mean;
-  auto _prev_running_variance = _o->prev_running_variance;
-  auto _momentum = _o->momentum;
-  auto _y = _o->y;
-  auto _mean = _o->mean;
-  auto _inv_variance = _o->inv_variance;
-  auto _next_running_mean = _o->next_running_mean;
-  auto _next_running_variance = _o->next_running_variance;
+  auto _x_tid = _o->x_tid;
+  auto _scale_tid = _o->scale_tid;
+  auto _bias_tid = _o->bias_tid;
+  auto _epsilon_tid = _o->epsilon_tid;
+  auto _peer_stats_tid = _o->peer_stats_tid.size() ? _fbb.CreateVector(_o->peer_stats_tid) : 0;
+  auto _prev_running_mean_tid = _o->prev_running_mean_tid;
+  auto _prev_running_variance_tid = _o->prev_running_variance_tid;
+  auto _momentum_tid = _o->momentum_tid;
+  auto _y_tid = _o->y_tid;
+  auto _mean_tid = _o->mean_tid;
+  auto _inv_variance_tid = _o->inv_variance_tid;
+  auto _next_running_mean_tid = _o->next_running_mean_tid;
+  auto _next_running_variance_tid = _o->next_running_variance_tid;
   return hipdnn_sdk::data_objects::CreateBatchnormAttributes(
       _fbb,
-      _x,
-      _scale,
-      _bias,
-      _epsilon,
-      _peer_stats,
-      _prev_running_mean,
-      _prev_running_variance,
-      _momentum,
-      _y,
-      _mean,
-      _inv_variance,
-      _next_running_mean,
-      _next_running_variance);
+      _x_tid,
+      _scale_tid,
+      _bias_tid,
+      _epsilon_tid,
+      _peer_stats_tid,
+      _prev_running_mean_tid,
+      _prev_running_variance_tid,
+      _momentum_tid,
+      _y_tid,
+      _mean_tid,
+      _inv_variance_tid,
+      _next_running_mean_tid,
+      _next_running_variance_tid);
 }
 
 }  // namespace data_objects

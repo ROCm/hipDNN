@@ -25,97 +25,97 @@ bool operator!=(const BatchnormBackwardAttributesT &lhs, const BatchnormBackward
 
 struct BatchnormBackwardAttributesT : public ::flatbuffers::NativeTable {
   typedef BatchnormBackwardAttributes TableType;
-  int64_t dy = 0;
-  int64_t x = 0;
-  ::flatbuffers::Optional<int64_t> mean = ::flatbuffers::nullopt;
-  ::flatbuffers::Optional<int64_t> inv_variance = ::flatbuffers::nullopt;
-  int64_t scale = 0;
-  std::vector<int64_t> peer_stats{};
-  int64_t dx = 0;
-  int64_t dscale = 0;
-  int64_t dbias = 0;
+  int64_t dy_tid = 0;
+  int64_t x_tid = 0;
+  ::flatbuffers::Optional<int64_t> mean_tid = ::flatbuffers::nullopt;
+  ::flatbuffers::Optional<int64_t> inv_variance_tid = ::flatbuffers::nullopt;
+  int64_t scale_tid = 0;
+  std::vector<int64_t> peer_stats_tid{};
+  int64_t dx_tid = 0;
+  int64_t dscale_tid = 0;
+  int64_t dbias_tid = 0;
 };
 
 struct BatchnormBackwardAttributes FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef BatchnormBackwardAttributesT NativeTableType;
   typedef BatchnormBackwardAttributesBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
-    VT_DY = 4,
-    VT_X = 6,
-    VT_MEAN = 8,
-    VT_INV_VARIANCE = 10,
-    VT_SCALE = 12,
-    VT_PEER_STATS = 14,
-    VT_DX = 16,
-    VT_DSCALE = 18,
-    VT_DBIAS = 20
+    VT_DY_TID = 4,
+    VT_X_TID = 6,
+    VT_MEAN_TID = 8,
+    VT_INV_VARIANCE_TID = 10,
+    VT_SCALE_TID = 12,
+    VT_PEER_STATS_TID = 14,
+    VT_DX_TID = 16,
+    VT_DSCALE_TID = 18,
+    VT_DBIAS_TID = 20
   };
-  int64_t dy() const {
-    return GetField<int64_t>(VT_DY, 0);
+  int64_t dy_tid() const {
+    return GetField<int64_t>(VT_DY_TID, 0);
   }
-  bool mutate_dy(int64_t _dy = 0) {
-    return SetField<int64_t>(VT_DY, _dy, 0);
+  bool mutate_dy_tid(int64_t _dy_tid = 0) {
+    return SetField<int64_t>(VT_DY_TID, _dy_tid, 0);
   }
-  int64_t x() const {
-    return GetField<int64_t>(VT_X, 0);
+  int64_t x_tid() const {
+    return GetField<int64_t>(VT_X_TID, 0);
   }
-  bool mutate_x(int64_t _x = 0) {
-    return SetField<int64_t>(VT_X, _x, 0);
+  bool mutate_x_tid(int64_t _x_tid = 0) {
+    return SetField<int64_t>(VT_X_TID, _x_tid, 0);
   }
-  ::flatbuffers::Optional<int64_t> mean() const {
-    return GetOptional<int64_t, int64_t>(VT_MEAN);
+  ::flatbuffers::Optional<int64_t> mean_tid() const {
+    return GetOptional<int64_t, int64_t>(VT_MEAN_TID);
   }
-  bool mutate_mean(int64_t _mean) {
-    return SetField<int64_t>(VT_MEAN, _mean);
+  bool mutate_mean_tid(int64_t _mean_tid) {
+    return SetField<int64_t>(VT_MEAN_TID, _mean_tid);
   }
-  ::flatbuffers::Optional<int64_t> inv_variance() const {
-    return GetOptional<int64_t, int64_t>(VT_INV_VARIANCE);
+  ::flatbuffers::Optional<int64_t> inv_variance_tid() const {
+    return GetOptional<int64_t, int64_t>(VT_INV_VARIANCE_TID);
   }
-  bool mutate_inv_variance(int64_t _inv_variance) {
-    return SetField<int64_t>(VT_INV_VARIANCE, _inv_variance);
+  bool mutate_inv_variance_tid(int64_t _inv_variance_tid) {
+    return SetField<int64_t>(VT_INV_VARIANCE_TID, _inv_variance_tid);
   }
-  int64_t scale() const {
-    return GetField<int64_t>(VT_SCALE, 0);
+  int64_t scale_tid() const {
+    return GetField<int64_t>(VT_SCALE_TID, 0);
   }
-  bool mutate_scale(int64_t _scale = 0) {
-    return SetField<int64_t>(VT_SCALE, _scale, 0);
+  bool mutate_scale_tid(int64_t _scale_tid = 0) {
+    return SetField<int64_t>(VT_SCALE_TID, _scale_tid, 0);
   }
-  const ::flatbuffers::Vector<int64_t> *peer_stats() const {
-    return GetPointer<const ::flatbuffers::Vector<int64_t> *>(VT_PEER_STATS);
+  const ::flatbuffers::Vector<int64_t> *peer_stats_tid() const {
+    return GetPointer<const ::flatbuffers::Vector<int64_t> *>(VT_PEER_STATS_TID);
   }
-  ::flatbuffers::Vector<int64_t> *mutable_peer_stats() {
-    return GetPointer<::flatbuffers::Vector<int64_t> *>(VT_PEER_STATS);
+  ::flatbuffers::Vector<int64_t> *mutable_peer_stats_tid() {
+    return GetPointer<::flatbuffers::Vector<int64_t> *>(VT_PEER_STATS_TID);
   }
-  int64_t dx() const {
-    return GetField<int64_t>(VT_DX, 0);
+  int64_t dx_tid() const {
+    return GetField<int64_t>(VT_DX_TID, 0);
   }
-  bool mutate_dx(int64_t _dx = 0) {
-    return SetField<int64_t>(VT_DX, _dx, 0);
+  bool mutate_dx_tid(int64_t _dx_tid = 0) {
+    return SetField<int64_t>(VT_DX_TID, _dx_tid, 0);
   }
-  int64_t dscale() const {
-    return GetField<int64_t>(VT_DSCALE, 0);
+  int64_t dscale_tid() const {
+    return GetField<int64_t>(VT_DSCALE_TID, 0);
   }
-  bool mutate_dscale(int64_t _dscale = 0) {
-    return SetField<int64_t>(VT_DSCALE, _dscale, 0);
+  bool mutate_dscale_tid(int64_t _dscale_tid = 0) {
+    return SetField<int64_t>(VT_DSCALE_TID, _dscale_tid, 0);
   }
-  int64_t dbias() const {
-    return GetField<int64_t>(VT_DBIAS, 0);
+  int64_t dbias_tid() const {
+    return GetField<int64_t>(VT_DBIAS_TID, 0);
   }
-  bool mutate_dbias(int64_t _dbias = 0) {
-    return SetField<int64_t>(VT_DBIAS, _dbias, 0);
+  bool mutate_dbias_tid(int64_t _dbias_tid = 0) {
+    return SetField<int64_t>(VT_DBIAS_TID, _dbias_tid, 0);
   }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
-           VerifyField<int64_t>(verifier, VT_DY, 8) &&
-           VerifyField<int64_t>(verifier, VT_X, 8) &&
-           VerifyField<int64_t>(verifier, VT_MEAN, 8) &&
-           VerifyField<int64_t>(verifier, VT_INV_VARIANCE, 8) &&
-           VerifyField<int64_t>(verifier, VT_SCALE, 8) &&
-           VerifyOffset(verifier, VT_PEER_STATS) &&
-           verifier.VerifyVector(peer_stats()) &&
-           VerifyField<int64_t>(verifier, VT_DX, 8) &&
-           VerifyField<int64_t>(verifier, VT_DSCALE, 8) &&
-           VerifyField<int64_t>(verifier, VT_DBIAS, 8) &&
+           VerifyField<int64_t>(verifier, VT_DY_TID, 8) &&
+           VerifyField<int64_t>(verifier, VT_X_TID, 8) &&
+           VerifyField<int64_t>(verifier, VT_MEAN_TID, 8) &&
+           VerifyField<int64_t>(verifier, VT_INV_VARIANCE_TID, 8) &&
+           VerifyField<int64_t>(verifier, VT_SCALE_TID, 8) &&
+           VerifyOffset(verifier, VT_PEER_STATS_TID) &&
+           verifier.VerifyVector(peer_stats_tid()) &&
+           VerifyField<int64_t>(verifier, VT_DX_TID, 8) &&
+           VerifyField<int64_t>(verifier, VT_DSCALE_TID, 8) &&
+           VerifyField<int64_t>(verifier, VT_DBIAS_TID, 8) &&
            verifier.EndTable();
   }
   BatchnormBackwardAttributesT *UnPack(const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
@@ -127,32 +127,32 @@ struct BatchnormBackwardAttributesBuilder {
   typedef BatchnormBackwardAttributes Table;
   ::flatbuffers::FlatBufferBuilder &fbb_;
   ::flatbuffers::uoffset_t start_;
-  void add_dy(int64_t dy) {
-    fbb_.AddElement<int64_t>(BatchnormBackwardAttributes::VT_DY, dy, 0);
+  void add_dy_tid(int64_t dy_tid) {
+    fbb_.AddElement<int64_t>(BatchnormBackwardAttributes::VT_DY_TID, dy_tid, 0);
   }
-  void add_x(int64_t x) {
-    fbb_.AddElement<int64_t>(BatchnormBackwardAttributes::VT_X, x, 0);
+  void add_x_tid(int64_t x_tid) {
+    fbb_.AddElement<int64_t>(BatchnormBackwardAttributes::VT_X_TID, x_tid, 0);
   }
-  void add_mean(int64_t mean) {
-    fbb_.AddElement<int64_t>(BatchnormBackwardAttributes::VT_MEAN, mean);
+  void add_mean_tid(int64_t mean_tid) {
+    fbb_.AddElement<int64_t>(BatchnormBackwardAttributes::VT_MEAN_TID, mean_tid);
   }
-  void add_inv_variance(int64_t inv_variance) {
-    fbb_.AddElement<int64_t>(BatchnormBackwardAttributes::VT_INV_VARIANCE, inv_variance);
+  void add_inv_variance_tid(int64_t inv_variance_tid) {
+    fbb_.AddElement<int64_t>(BatchnormBackwardAttributes::VT_INV_VARIANCE_TID, inv_variance_tid);
   }
-  void add_scale(int64_t scale) {
-    fbb_.AddElement<int64_t>(BatchnormBackwardAttributes::VT_SCALE, scale, 0);
+  void add_scale_tid(int64_t scale_tid) {
+    fbb_.AddElement<int64_t>(BatchnormBackwardAttributes::VT_SCALE_TID, scale_tid, 0);
   }
-  void add_peer_stats(::flatbuffers::Offset<::flatbuffers::Vector<int64_t>> peer_stats) {
-    fbb_.AddOffset(BatchnormBackwardAttributes::VT_PEER_STATS, peer_stats);
+  void add_peer_stats_tid(::flatbuffers::Offset<::flatbuffers::Vector<int64_t>> peer_stats_tid) {
+    fbb_.AddOffset(BatchnormBackwardAttributes::VT_PEER_STATS_TID, peer_stats_tid);
   }
-  void add_dx(int64_t dx) {
-    fbb_.AddElement<int64_t>(BatchnormBackwardAttributes::VT_DX, dx, 0);
+  void add_dx_tid(int64_t dx_tid) {
+    fbb_.AddElement<int64_t>(BatchnormBackwardAttributes::VT_DX_TID, dx_tid, 0);
   }
-  void add_dscale(int64_t dscale) {
-    fbb_.AddElement<int64_t>(BatchnormBackwardAttributes::VT_DSCALE, dscale, 0);
+  void add_dscale_tid(int64_t dscale_tid) {
+    fbb_.AddElement<int64_t>(BatchnormBackwardAttributes::VT_DSCALE_TID, dscale_tid, 0);
   }
-  void add_dbias(int64_t dbias) {
-    fbb_.AddElement<int64_t>(BatchnormBackwardAttributes::VT_DBIAS, dbias, 0);
+  void add_dbias_tid(int64_t dbias_tid) {
+    fbb_.AddElement<int64_t>(BatchnormBackwardAttributes::VT_DBIAS_TID, dbias_tid, 0);
   }
   explicit BatchnormBackwardAttributesBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
@@ -167,51 +167,51 @@ struct BatchnormBackwardAttributesBuilder {
 
 inline ::flatbuffers::Offset<BatchnormBackwardAttributes> CreateBatchnormBackwardAttributes(
     ::flatbuffers::FlatBufferBuilder &_fbb,
-    int64_t dy = 0,
-    int64_t x = 0,
-    ::flatbuffers::Optional<int64_t> mean = ::flatbuffers::nullopt,
-    ::flatbuffers::Optional<int64_t> inv_variance = ::flatbuffers::nullopt,
-    int64_t scale = 0,
-    ::flatbuffers::Offset<::flatbuffers::Vector<int64_t>> peer_stats = 0,
-    int64_t dx = 0,
-    int64_t dscale = 0,
-    int64_t dbias = 0) {
+    int64_t dy_tid = 0,
+    int64_t x_tid = 0,
+    ::flatbuffers::Optional<int64_t> mean_tid = ::flatbuffers::nullopt,
+    ::flatbuffers::Optional<int64_t> inv_variance_tid = ::flatbuffers::nullopt,
+    int64_t scale_tid = 0,
+    ::flatbuffers::Offset<::flatbuffers::Vector<int64_t>> peer_stats_tid = 0,
+    int64_t dx_tid = 0,
+    int64_t dscale_tid = 0,
+    int64_t dbias_tid = 0) {
   BatchnormBackwardAttributesBuilder builder_(_fbb);
-  builder_.add_dbias(dbias);
-  builder_.add_dscale(dscale);
-  builder_.add_dx(dx);
-  builder_.add_scale(scale);
-  if(inv_variance) { builder_.add_inv_variance(*inv_variance); }
-  if(mean) { builder_.add_mean(*mean); }
-  builder_.add_x(x);
-  builder_.add_dy(dy);
-  builder_.add_peer_stats(peer_stats);
+  builder_.add_dbias_tid(dbias_tid);
+  builder_.add_dscale_tid(dscale_tid);
+  builder_.add_dx_tid(dx_tid);
+  builder_.add_scale_tid(scale_tid);
+  if(inv_variance_tid) { builder_.add_inv_variance_tid(*inv_variance_tid); }
+  if(mean_tid) { builder_.add_mean_tid(*mean_tid); }
+  builder_.add_x_tid(x_tid);
+  builder_.add_dy_tid(dy_tid);
+  builder_.add_peer_stats_tid(peer_stats_tid);
   return builder_.Finish();
 }
 
 inline ::flatbuffers::Offset<BatchnormBackwardAttributes> CreateBatchnormBackwardAttributesDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
-    int64_t dy = 0,
-    int64_t x = 0,
-    ::flatbuffers::Optional<int64_t> mean = ::flatbuffers::nullopt,
-    ::flatbuffers::Optional<int64_t> inv_variance = ::flatbuffers::nullopt,
-    int64_t scale = 0,
-    const std::vector<int64_t> *peer_stats = nullptr,
-    int64_t dx = 0,
-    int64_t dscale = 0,
-    int64_t dbias = 0) {
-  auto peer_stats__ = peer_stats ? _fbb.CreateVector<int64_t>(*peer_stats) : 0;
+    int64_t dy_tid = 0,
+    int64_t x_tid = 0,
+    ::flatbuffers::Optional<int64_t> mean_tid = ::flatbuffers::nullopt,
+    ::flatbuffers::Optional<int64_t> inv_variance_tid = ::flatbuffers::nullopt,
+    int64_t scale_tid = 0,
+    const std::vector<int64_t> *peer_stats_tid = nullptr,
+    int64_t dx_tid = 0,
+    int64_t dscale_tid = 0,
+    int64_t dbias_tid = 0) {
+  auto peer_stats_tid__ = peer_stats_tid ? _fbb.CreateVector<int64_t>(*peer_stats_tid) : 0;
   return hipdnn_sdk::data_objects::CreateBatchnormBackwardAttributes(
       _fbb,
-      dy,
-      x,
-      mean,
-      inv_variance,
-      scale,
-      peer_stats__,
-      dx,
-      dscale,
-      dbias);
+      dy_tid,
+      x_tid,
+      mean_tid,
+      inv_variance_tid,
+      scale_tid,
+      peer_stats_tid__,
+      dx_tid,
+      dscale_tid,
+      dbias_tid);
 }
 
 ::flatbuffers::Offset<BatchnormBackwardAttributes> CreateBatchnormBackwardAttributes(::flatbuffers::FlatBufferBuilder &_fbb, const BatchnormBackwardAttributesT *_o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
@@ -219,15 +219,15 @@ inline ::flatbuffers::Offset<BatchnormBackwardAttributes> CreateBatchnormBackwar
 
 inline bool operator==(const BatchnormBackwardAttributesT &lhs, const BatchnormBackwardAttributesT &rhs) {
   return
-      (lhs.dy == rhs.dy) &&
-      (lhs.x == rhs.x) &&
-      (lhs.mean == rhs.mean) &&
-      (lhs.inv_variance == rhs.inv_variance) &&
-      (lhs.scale == rhs.scale) &&
-      (lhs.peer_stats == rhs.peer_stats) &&
-      (lhs.dx == rhs.dx) &&
-      (lhs.dscale == rhs.dscale) &&
-      (lhs.dbias == rhs.dbias);
+      (lhs.dy_tid == rhs.dy_tid) &&
+      (lhs.x_tid == rhs.x_tid) &&
+      (lhs.mean_tid == rhs.mean_tid) &&
+      (lhs.inv_variance_tid == rhs.inv_variance_tid) &&
+      (lhs.scale_tid == rhs.scale_tid) &&
+      (lhs.peer_stats_tid == rhs.peer_stats_tid) &&
+      (lhs.dx_tid == rhs.dx_tid) &&
+      (lhs.dscale_tid == rhs.dscale_tid) &&
+      (lhs.dbias_tid == rhs.dbias_tid);
 }
 
 inline bool operator!=(const BatchnormBackwardAttributesT &lhs, const BatchnormBackwardAttributesT &rhs) {
@@ -244,15 +244,15 @@ inline BatchnormBackwardAttributesT *BatchnormBackwardAttributes::UnPack(const :
 inline void BatchnormBackwardAttributes::UnPackTo(BatchnormBackwardAttributesT *_o, const ::flatbuffers::resolver_function_t *_resolver) const {
   (void)_o;
   (void)_resolver;
-  { auto _e = dy(); _o->dy = _e; }
-  { auto _e = x(); _o->x = _e; }
-  { auto _e = mean(); _o->mean = _e; }
-  { auto _e = inv_variance(); _o->inv_variance = _e; }
-  { auto _e = scale(); _o->scale = _e; }
-  { auto _e = peer_stats(); if (_e) { _o->peer_stats.resize(_e->size()); for (::flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->peer_stats[_i] = _e->Get(_i); } } else { _o->peer_stats.resize(0); } }
-  { auto _e = dx(); _o->dx = _e; }
-  { auto _e = dscale(); _o->dscale = _e; }
-  { auto _e = dbias(); _o->dbias = _e; }
+  { auto _e = dy_tid(); _o->dy_tid = _e; }
+  { auto _e = x_tid(); _o->x_tid = _e; }
+  { auto _e = mean_tid(); _o->mean_tid = _e; }
+  { auto _e = inv_variance_tid(); _o->inv_variance_tid = _e; }
+  { auto _e = scale_tid(); _o->scale_tid = _e; }
+  { auto _e = peer_stats_tid(); if (_e) { _o->peer_stats_tid.resize(_e->size()); for (::flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->peer_stats_tid[_i] = _e->Get(_i); } } else { _o->peer_stats_tid.resize(0); } }
+  { auto _e = dx_tid(); _o->dx_tid = _e; }
+  { auto _e = dscale_tid(); _o->dscale_tid = _e; }
+  { auto _e = dbias_tid(); _o->dbias_tid = _e; }
 }
 
 inline ::flatbuffers::Offset<BatchnormBackwardAttributes> BatchnormBackwardAttributes::Pack(::flatbuffers::FlatBufferBuilder &_fbb, const BatchnormBackwardAttributesT* _o, const ::flatbuffers::rehasher_function_t *_rehasher) {
@@ -263,26 +263,26 @@ inline ::flatbuffers::Offset<BatchnormBackwardAttributes> CreateBatchnormBackwar
   (void)_rehasher;
   (void)_o;
   struct _VectorArgs { ::flatbuffers::FlatBufferBuilder *__fbb; const BatchnormBackwardAttributesT* __o; const ::flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
-  auto _dy = _o->dy;
-  auto _x = _o->x;
-  auto _mean = _o->mean;
-  auto _inv_variance = _o->inv_variance;
-  auto _scale = _o->scale;
-  auto _peer_stats = _o->peer_stats.size() ? _fbb.CreateVector(_o->peer_stats) : 0;
-  auto _dx = _o->dx;
-  auto _dscale = _o->dscale;
-  auto _dbias = _o->dbias;
+  auto _dy_tid = _o->dy_tid;
+  auto _x_tid = _o->x_tid;
+  auto _mean_tid = _o->mean_tid;
+  auto _inv_variance_tid = _o->inv_variance_tid;
+  auto _scale_tid = _o->scale_tid;
+  auto _peer_stats_tid = _o->peer_stats_tid.size() ? _fbb.CreateVector(_o->peer_stats_tid) : 0;
+  auto _dx_tid = _o->dx_tid;
+  auto _dscale_tid = _o->dscale_tid;
+  auto _dbias_tid = _o->dbias_tid;
   return hipdnn_sdk::data_objects::CreateBatchnormBackwardAttributes(
       _fbb,
-      _dy,
-      _x,
-      _mean,
-      _inv_variance,
-      _scale,
-      _peer_stats,
-      _dx,
-      _dscale,
-      _dbias);
+      _dy_tid,
+      _x_tid,
+      _mean_tid,
+      _inv_variance_tid,
+      _scale_tid,
+      _peer_stats_tid,
+      _dx_tid,
+      _dscale_tid,
+      _dbias_tid);
 }
 
 }  // namespace data_objects

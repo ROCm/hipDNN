@@ -4,13 +4,13 @@
 namespace hipdnn_sdk.data_objects;
 
 table BatchnormBackwardAttributes {
-    dy: long;
-    x: long;
-    mean: long = null;
-    inv_variance: long = null;
-    scale: long;
-    peer_stats: [long];
-    dx: long;
-    dscale: long;
-    dbias: long;
+    dy_tid: long;
+    x_tid: long;
+    mean_tid: long = null;
+    inv_variance_tid: long = null;
+    scale_tid: long;
+    peer_stats_tid: [long];
+    dx_tid: long;
+    dscale_tid: long;
+    dbias_tid: long;
 }

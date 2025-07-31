@@ -330,12 +330,12 @@ TEST_F(Graph_test_fixture, BuildAndSerializeBatchnormInferenceGraph)
         hipdnn_sdk::data_objects::NodeAttributes::NodeAttributes_BatchnormInferenceAttributes);
     auto deserialized_batchnorm_attributes
         = deserialized_graph->nodes[0]->attributes.AsBatchnormInferenceAttributes();
-    EXPECT_EQ(deserialized_batchnorm_attributes->x, x->get_uid());
-    EXPECT_EQ(deserialized_batchnorm_attributes->mean, mean->get_uid());
-    EXPECT_EQ(deserialized_batchnorm_attributes->inv_variance, inv_variance->get_uid());
-    EXPECT_EQ(deserialized_batchnorm_attributes->scale, scale->get_uid());
-    EXPECT_EQ(deserialized_batchnorm_attributes->bias, bias->get_uid());
-    EXPECT_EQ(deserialized_batchnorm_attributes->y, y->get_uid());
+    EXPECT_EQ(deserialized_batchnorm_attributes->x_tid, x->get_uid());
+    EXPECT_EQ(deserialized_batchnorm_attributes->mean_tid, mean->get_uid());
+    EXPECT_EQ(deserialized_batchnorm_attributes->inv_variance_tid, inv_variance->get_uid());
+    EXPECT_EQ(deserialized_batchnorm_attributes->scale_tid, scale->get_uid());
+    EXPECT_EQ(deserialized_batchnorm_attributes->bias_tid, bias->get_uid());
+    EXPECT_EQ(deserialized_batchnorm_attributes->y_tid, y->get_uid());
 }
 
 TEST_F(Graph_test_fixture, BuildAndSerializeBatchnormGraph)
@@ -423,19 +423,19 @@ TEST_F(Graph_test_fixture, BuildAndSerializeBatchnormGraph)
               hipdnn_sdk::data_objects::NodeAttributes::NodeAttributes_BatchnormAttributes);
     auto deserialized_batchnorm_attributes
         = deserialized_graph->nodes[0]->attributes.AsBatchnormAttributes();
-    EXPECT_EQ(deserialized_batchnorm_attributes->x, x->get_uid());
-    EXPECT_EQ(deserialized_batchnorm_attributes->scale, scale->get_uid());
-    EXPECT_EQ(deserialized_batchnorm_attributes->bias, bias->get_uid());
-    EXPECT_EQ(deserialized_batchnorm_attributes->epsilon, epsilon->get_uid());
-    EXPECT_EQ(deserialized_batchnorm_attributes->prev_running_mean, prev_running_mean->get_uid());
-    EXPECT_EQ(deserialized_batchnorm_attributes->prev_running_variance,
+    EXPECT_EQ(deserialized_batchnorm_attributes->x_tid, x->get_uid());
+    EXPECT_EQ(deserialized_batchnorm_attributes->scale_tid, scale->get_uid());
+    EXPECT_EQ(deserialized_batchnorm_attributes->bias_tid, bias->get_uid());
+    EXPECT_EQ(deserialized_batchnorm_attributes->epsilon_tid, epsilon->get_uid());
+    EXPECT_EQ(deserialized_batchnorm_attributes->prev_running_mean_tid, prev_running_mean->get_uid());
+    EXPECT_EQ(deserialized_batchnorm_attributes->prev_running_variance_tid,
               prev_running_variance->get_uid());
-    EXPECT_EQ(deserialized_batchnorm_attributes->momentum, momentum->get_uid());
-    EXPECT_EQ(deserialized_batchnorm_attributes->y, y->get_uid());
-    EXPECT_EQ(deserialized_batchnorm_attributes->mean, mean->get_uid());
-    EXPECT_EQ(deserialized_batchnorm_attributes->inv_variance, inv_variance->get_uid());
-    EXPECT_EQ(deserialized_batchnorm_attributes->next_running_mean, next_running_mean->get_uid());
-    EXPECT_EQ(deserialized_batchnorm_attributes->next_running_variance,
+    EXPECT_EQ(deserialized_batchnorm_attributes->momentum_tid, momentum->get_uid());
+    EXPECT_EQ(deserialized_batchnorm_attributes->y_tid, y->get_uid());
+    EXPECT_EQ(deserialized_batchnorm_attributes->mean_tid, mean->get_uid());
+    EXPECT_EQ(deserialized_batchnorm_attributes->inv_variance_tid, inv_variance->get_uid());
+    EXPECT_EQ(deserialized_batchnorm_attributes->next_running_mean_tid, next_running_mean->get_uid());
+    EXPECT_EQ(deserialized_batchnorm_attributes->next_running_variance_tid,
               next_running_variance->get_uid());
 }
 
@@ -531,19 +531,19 @@ TEST_F(Graph_test_fixture, BuildAndSerializeBatchnormAndPointwiseGraph)
               hipdnn_sdk::data_objects::NodeAttributes::NodeAttributes_BatchnormAttributes);
     auto deserialized_batchnorm_attributes
         = deserialized_graph->nodes[0]->attributes.AsBatchnormAttributes();
-    EXPECT_EQ(deserialized_batchnorm_attributes->x, x->get_uid());
-    EXPECT_EQ(deserialized_batchnorm_attributes->scale, scale->get_uid());
-    EXPECT_EQ(deserialized_batchnorm_attributes->bias, bias->get_uid());
-    EXPECT_EQ(deserialized_batchnorm_attributes->epsilon, epsilon->get_uid());
-    EXPECT_EQ(deserialized_batchnorm_attributes->prev_running_mean, prev_running_mean->get_uid());
-    EXPECT_EQ(deserialized_batchnorm_attributes->prev_running_variance,
+    EXPECT_EQ(deserialized_batchnorm_attributes->x_tid, x->get_uid());
+    EXPECT_EQ(deserialized_batchnorm_attributes->scale_tid, scale->get_uid());
+    EXPECT_EQ(deserialized_batchnorm_attributes->bias_tid, bias->get_uid());
+    EXPECT_EQ(deserialized_batchnorm_attributes->epsilon_tid, epsilon->get_uid());
+    EXPECT_EQ(deserialized_batchnorm_attributes->prev_running_mean_tid, prev_running_mean->get_uid());
+    EXPECT_EQ(deserialized_batchnorm_attributes->prev_running_variance_tid,
               prev_running_variance->get_uid());
-    EXPECT_EQ(deserialized_batchnorm_attributes->momentum, momentum->get_uid());
-    EXPECT_EQ(deserialized_batchnorm_attributes->y, y->get_uid());
-    EXPECT_EQ(deserialized_batchnorm_attributes->mean, mean->get_uid());
-    EXPECT_EQ(deserialized_batchnorm_attributes->inv_variance, inv_variance->get_uid());
-    EXPECT_EQ(deserialized_batchnorm_attributes->next_running_mean, next_running_mean->get_uid());
-    EXPECT_EQ(deserialized_batchnorm_attributes->next_running_variance,
+    EXPECT_EQ(deserialized_batchnorm_attributes->momentum_tid, momentum->get_uid());
+    EXPECT_EQ(deserialized_batchnorm_attributes->y_tid, y->get_uid());
+    EXPECT_EQ(deserialized_batchnorm_attributes->mean_tid, mean->get_uid());
+    EXPECT_EQ(deserialized_batchnorm_attributes->inv_variance_tid, inv_variance->get_uid());
+    EXPECT_EQ(deserialized_batchnorm_attributes->next_running_mean_tid, next_running_mean->get_uid());
+    EXPECT_EQ(deserialized_batchnorm_attributes->next_running_variance_tid,
               next_running_variance->get_uid());
 
     EXPECT_EQ(deserialized_graph->nodes[1]->name, "PointwiseNode");
@@ -551,8 +551,8 @@ TEST_F(Graph_test_fixture, BuildAndSerializeBatchnormAndPointwiseGraph)
               hipdnn_sdk::data_objects::NodeAttributes::NodeAttributes_PointwiseAttributes);
     auto deserialized_pointwise_attributes
         = deserialized_graph->nodes[1]->attributes.AsPointwiseAttributes();
-    EXPECT_EQ(deserialized_pointwise_attributes->in_0, y->get_uid());
-    EXPECT_EQ(deserialized_pointwise_attributes->out_0, out_0->get_uid());
+    EXPECT_EQ(deserialized_pointwise_attributes->in_0_tid, y->get_uid());
+    EXPECT_EQ(deserialized_pointwise_attributes->out_0_tid, out_0->get_uid());
     EXPECT_EQ(deserialized_pointwise_attributes->operation,
               hipdnn_sdk::data_objects::PointwiseMode_RELU_FWD);
 }
@@ -609,8 +609,8 @@ TEST_F(Graph_test_fixture, BuildAndSerializePointwiseGraph)
               hipdnn_sdk::data_objects::NodeAttributes::NodeAttributes_PointwiseAttributes);
     auto deserialized_pointwise_attributes
         = deserialized_graph->nodes[0]->attributes.AsPointwiseAttributes();
-    EXPECT_EQ(deserialized_pointwise_attributes->in_0, in_0->get_uid());
-    EXPECT_EQ(deserialized_pointwise_attributes->out_0, out_0->get_uid());
+    EXPECT_EQ(deserialized_pointwise_attributes->in_0_tid, in_0->get_uid());
+    EXPECT_EQ(deserialized_pointwise_attributes->out_0_tid, out_0->get_uid());
     EXPECT_EQ(deserialized_pointwise_attributes->operation,
               hipdnn_sdk::data_objects::PointwiseMode_RELU_FWD);
 }
@@ -690,20 +690,20 @@ TEST_F(Graph_test_fixture, BuildAndSerializePointwiseAndBatchnormInferenceGraph)
         hipdnn_sdk::data_objects::NodeAttributes::NodeAttributes_BatchnormInferenceAttributes);
     auto deserialized_batchnorm_attributes
         = deserialized_graph->nodes[0]->attributes.AsBatchnormInferenceAttributes();
-    EXPECT_EQ(deserialized_batchnorm_attributes->x, x->get_uid());
-    EXPECT_EQ(deserialized_batchnorm_attributes->mean, mean->get_uid());
-    EXPECT_EQ(deserialized_batchnorm_attributes->inv_variance, inv_variance->get_uid());
-    EXPECT_EQ(deserialized_batchnorm_attributes->scale, scale->get_uid());
-    EXPECT_EQ(deserialized_batchnorm_attributes->bias, bias->get_uid());
-    EXPECT_EQ(deserialized_batchnorm_attributes->y, y->get_uid());
+    EXPECT_EQ(deserialized_batchnorm_attributes->x_tid, x->get_uid());
+    EXPECT_EQ(deserialized_batchnorm_attributes->mean_tid, mean->get_uid());
+    EXPECT_EQ(deserialized_batchnorm_attributes->inv_variance_tid, inv_variance->get_uid());
+    EXPECT_EQ(deserialized_batchnorm_attributes->scale_tid, scale->get_uid());
+    EXPECT_EQ(deserialized_batchnorm_attributes->bias_tid, bias->get_uid());
+    EXPECT_EQ(deserialized_batchnorm_attributes->y_tid, y->get_uid());
 
     EXPECT_EQ(deserialized_graph->nodes[1]->name, "PointwiseNode");
     EXPECT_EQ(deserialized_graph->nodes[1]->attributes.type,
               hipdnn_sdk::data_objects::NodeAttributes::NodeAttributes_PointwiseAttributes);
     auto deserialized_pointwise_attributes
         = deserialized_graph->nodes[1]->attributes.AsPointwiseAttributes();
-    EXPECT_EQ(deserialized_pointwise_attributes->in_0, y->get_uid());
-    EXPECT_EQ(deserialized_pointwise_attributes->out_0, out_0->get_uid());
+    EXPECT_EQ(deserialized_pointwise_attributes->in_0_tid, y->get_uid());
+    EXPECT_EQ(deserialized_pointwise_attributes->out_0_tid, out_0->get_uid());
     EXPECT_EQ(deserialized_pointwise_attributes->operation,
               hipdnn_sdk::data_objects::PointwiseMode_RELU_FWD);
 }
@@ -782,14 +782,14 @@ TEST_F(Graph_test_fixture, BuildAndSerializeBatchnormBackwardGraph)
               hipdnn_sdk::data_objects::NodeAttributes::NodeAttributes_BatchnormBackwardAttributes);
     auto deserialized_batchnorm_attributes
         = deserialized_graph->nodes[0]->attributes.AsBatchnormBackwardAttributes();
-    EXPECT_EQ(deserialized_batchnorm_attributes->dy, dy->get_uid());
-    EXPECT_EQ(deserialized_batchnorm_attributes->x, x->get_uid());
-    EXPECT_EQ(deserialized_batchnorm_attributes->scale, scale->get_uid());
-    EXPECT_EQ(deserialized_batchnorm_attributes->mean, mean->get_uid());
-    EXPECT_EQ(deserialized_batchnorm_attributes->inv_variance, inv_variance->get_uid());
-    EXPECT_EQ(deserialized_batchnorm_attributes->dx, dx->get_uid());
-    EXPECT_EQ(deserialized_batchnorm_attributes->dscale, dscale->get_uid());
-    EXPECT_EQ(deserialized_batchnorm_attributes->dbias, dbias->get_uid());
+    EXPECT_EQ(deserialized_batchnorm_attributes->dy_tid, dy->get_uid());
+    EXPECT_EQ(deserialized_batchnorm_attributes->x_tid, x->get_uid());
+    EXPECT_EQ(deserialized_batchnorm_attributes->scale_tid, scale->get_uid());
+    EXPECT_EQ(deserialized_batchnorm_attributes->mean_tid, mean->get_uid());
+    EXPECT_EQ(deserialized_batchnorm_attributes->inv_variance_tid, inv_variance->get_uid());
+    EXPECT_EQ(deserialized_batchnorm_attributes->dx_tid, dx->get_uid());
+    EXPECT_EQ(deserialized_batchnorm_attributes->dscale_tid, dscale->get_uid());
+    EXPECT_EQ(deserialized_batchnorm_attributes->dbias_tid, dbias->get_uid());
 }
 
 TEST_F(Graph_test_fixture, BuildAndSerializePointwiseAndBatchnormBackwardGraph)
@@ -873,8 +873,8 @@ TEST_F(Graph_test_fixture, BuildAndSerializePointwiseAndBatchnormBackwardGraph)
               hipdnn_sdk::data_objects::NodeAttributes::NodeAttributes_PointwiseAttributes);
     auto deserialized_pointwise_attributes
         = deserialized_graph->nodes[0]->attributes.AsPointwiseAttributes();
-    EXPECT_EQ(deserialized_pointwise_attributes->in_0, x_pointwise->get_uid());
-    EXPECT_EQ(deserialized_pointwise_attributes->out_0, dy->get_uid());
+    EXPECT_EQ(deserialized_pointwise_attributes->in_0_tid, x_pointwise->get_uid());
+    EXPECT_EQ(deserialized_pointwise_attributes->out_0_tid, dy->get_uid());
     EXPECT_EQ(deserialized_pointwise_attributes->operation,
               hipdnn_sdk::data_objects::PointwiseMode_RELU_FWD);
 
@@ -883,14 +883,14 @@ TEST_F(Graph_test_fixture, BuildAndSerializePointwiseAndBatchnormBackwardGraph)
               hipdnn_sdk::data_objects::NodeAttributes::NodeAttributes_BatchnormBackwardAttributes);
     auto deserialized_batchnorm_attributes
         = deserialized_graph->nodes[1]->attributes.AsBatchnormBackwardAttributes();
-    EXPECT_EQ(deserialized_batchnorm_attributes->dy, dy->get_uid());
-    EXPECT_EQ(deserialized_batchnorm_attributes->x, x->get_uid());
-    EXPECT_EQ(deserialized_batchnorm_attributes->scale, scale->get_uid());
-    EXPECT_EQ(deserialized_batchnorm_attributes->mean, mean->get_uid());
-    EXPECT_EQ(deserialized_batchnorm_attributes->inv_variance, inv_variance->get_uid());
-    EXPECT_EQ(deserialized_batchnorm_attributes->dx, dx->get_uid());
-    EXPECT_EQ(deserialized_batchnorm_attributes->dscale, dscale->get_uid());
-    EXPECT_EQ(deserialized_batchnorm_attributes->dbias, dbias->get_uid());
+    EXPECT_EQ(deserialized_batchnorm_attributes->dy_tid, dy->get_uid());
+    EXPECT_EQ(deserialized_batchnorm_attributes->x_tid, x->get_uid());
+    EXPECT_EQ(deserialized_batchnorm_attributes->scale_tid, scale->get_uid());
+    EXPECT_EQ(deserialized_batchnorm_attributes->mean_tid, mean->get_uid());
+    EXPECT_EQ(deserialized_batchnorm_attributes->inv_variance_tid, inv_variance->get_uid());
+    EXPECT_EQ(deserialized_batchnorm_attributes->dx_tid, dx->get_uid());
+    EXPECT_EQ(deserialized_batchnorm_attributes->dscale_tid, dscale->get_uid());
+    EXPECT_EQ(deserialized_batchnorm_attributes->dbias_tid, dbias->get_uid());
 }
 
 // Test graph.tensor()
