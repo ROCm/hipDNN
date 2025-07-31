@@ -87,9 +87,10 @@ protected:
         // Initialize HIP
         ASSERT_EQ(hipInit(0), hipSuccess);
         ASSERT_EQ(hipGetDevice(&_device_id), hipSuccess);
+        //todo: bring back stream support once MigratableMemory supports it
         //ASSERT_EQ(hipStreamCreate(&_stream), hipSuccess);
 
-        //MUST SET BEFORE CREATING THE HANDLE
+        //Note: The plugin paths has to be set before we create the hipdnn handle.
         const std::array<const char*, 1> paths = {PLUGIN_DIR};
         ASSERT_EQ(hipdnnSetEnginePluginPaths_ext(
                       paths.size(), paths.data(), HIPDNN_PLUGIN_LOADING_ABSOLUTE),
