@@ -3,7 +3,9 @@
 
 #include "execution_plan_descriptor.hpp"
 #include "engine_config_descriptor.hpp"
+#include "engine_descriptor.hpp"
 #include "error.hpp"
+#include "handle/handle.hpp"
 #include "hipdnn_backend_descriptor_type.h"
 #include "hipdnn_exception.hpp"
 
@@ -23,6 +25,16 @@ void Execution_plan_descriptor::finalize()
     THROW_IF_NULL(_engine_config,
                   HIPDNN_STATUS_BAD_PARAM,
                   "Execution_plan_descriptor::finalize() failed: Engine was not set.");
+
+    auto plugin_resource_manager = _handle->get_plugin_resource_manager();
+    auto engine_config_plugin_data = _engine_config->get_serialized_engine_config();
+    auto engine = _engine_config->get_engine();
+
+    _execution_context = plugin::Engine_plugin_resource_manager::create_execution_context(
+        plugin_resource_manager,
+        engine->get_engine_id(),
+        &engine_config_plugin_data,
+        engine->get_graph().get());
 
     hipdnnBackendDescriptorImpl<Execution_plan_descriptor>::finalize();
 }
@@ -204,6 +216,15 @@ std::shared_ptr<const Engine_config_descriptor> Execution_plan_descriptor::get_e
                    "Execution_plan_descriptor::get_engine_config() failed: Not finalized.");
 
     return _engine_config;
+}
+
+hipdnnEnginePluginExecutionContext_t Execution_plan_descriptor::get_execution_context() const
+{
+    THROW_IF_FALSE(is_finalized(),
+                   HIPDNN_STATUS_INTERNAL_ERROR,
+                   "Execution_plan_descriptor::get_execution_context() failed: Not finalized.");
+
+    return _execution_context->get();
 }
 
 hipdnnBackendDescriptorType_t Execution_plan_descriptor::get_static_type()
