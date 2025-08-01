@@ -261,6 +261,8 @@ private:
                                            + to_string(type));
             }
 
+            plugin.set_logging_callback(logging::hipdnn_logging_callback);
+
             _plugins.emplace_back(std::move(plugin));
             _loaded_plugin_files.insert(library_path);
 

@@ -109,8 +109,6 @@ Engine_plugin_resource_manager::Engine_plugin_resource_manager(
     {
         auto handle = plugin.create_handle();
 
-        plugin.set_logging_callback(logging::hipdnn_logging_callback);
-
         if(_handle_to_plugin.contains(handle))
         {
             throw Hipdnn_exception(HIPDNN_STATUS_PLUGIN_ERROR, "Plugin handle already exists");
