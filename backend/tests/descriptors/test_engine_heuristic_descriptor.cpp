@@ -86,7 +86,7 @@ public:
     {
         set_graph();
         set_heuristic_mode();
-        EXPECT_CALL(*_mock_engine_plugin_resource_manager, get_applicable_engine_ids(_, ))
+        EXPECT_CALL(*_mock_engine_plugin_resource_manager, get_applicable_engine_ids(_))
             .WillRepeatedly(Return(std::vector<int64_t>{0, 1, 2}));
         ASSERT_NO_THROW(get_engine_heuristic_descriptor()->finalize());
     }
@@ -432,7 +432,7 @@ TEST_F(Engine_heuristic_descriptor_test, GetEngineConfigsWithNoEngineIds)
     set_graph();
     set_heuristic_mode();
 
-    EXPECT_CALL(*_mock_engine_plugin_resource_manager, get_applicable_engine_ids(_, ))
+    EXPECT_CALL(*_mock_engine_plugin_resource_manager, get_applicable_engine_ids(_))
         .WillRepeatedly(Return(std::vector<int64_t>{}));
 
     ASSERT_NO_THROW(heur->finalize());
