@@ -30,7 +30,7 @@ set(CMAKE_CXX_STANDARD 20)
 option(HIP_DNN_BUILD_BACKEND "Build the backend code" ON)
 option(HIP_DNN_BUILD_FRONTEND "Build the frontend code" ON)
 option(HIP_DNN_SKIP_TESTS "Skips building all tests" OFF)
-option(HIP_DNN_BUILD_PLUGINS "Builds the plugins as part of the main cmake" OFF)
+option(HIP_DNN_BUILD_PLUGINS "Builds the plugins as part of the main cmake" ON)
 
 option(CODE_COVERAGE "Build with code coverage flags" OFF)
 option(ENABLE_CLANG_TIDY "Enable Clang-Tidy checks" ON)
