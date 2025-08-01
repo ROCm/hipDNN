@@ -83,12 +83,12 @@ class Batchnorm_forward_inference_integration_test
 protected:
     void SetUp() override
     {
-        setenv("HIPDNN_LOG_LEVEL", "info", 1);
+        // Uncomment if you want debug logging info.
+        // setenv("HIPDNN_LOG_LEVEL", "info", 1);
+
         // Initialize HIP
         ASSERT_EQ(hipInit(0), hipSuccess);
         ASSERT_EQ(hipGetDevice(&_device_id), hipSuccess);
-        //todo: bring back stream support once MigratableMemory supports it
-        //ASSERT_EQ(hipStreamCreate(&_stream), hipSuccess);
 
         //Note: The plugin paths has to be set before we create the hipdnn handle.
         const std::array<const char*, 1> paths = {PLUGIN_DIR};
@@ -98,6 +98,9 @@ protected:
 
         // Create handle
         ASSERT_EQ(hipdnnCreate(&_handle), HIPDNN_STATUS_SUCCESS);
+        
+        //todo: bring back stream support once MigratableMemory supports it
+        //ASSERT_EQ(hipStreamCreate(&_stream), hipSuccess);
         //ASSERT_EQ(hipdnnSetStream(_handle, _stream), HIPDNN_STATUS_SUCCESS);
     }
 
