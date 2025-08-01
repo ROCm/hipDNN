@@ -51,7 +51,7 @@ typedef enum
 } hipdnnPluginType_t;
 
 /**
- * @brief Structure for describing a constant data buffer. 
+ * @brief Structure for describing a constant data buffer.
  *
  * This structure provides a way to pass buffer information (a pointer and a size) into and out of functions.
  */
