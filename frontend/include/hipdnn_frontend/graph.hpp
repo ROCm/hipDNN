@@ -55,7 +55,7 @@ private:
                                                    HIPDNN_ATTR_ENGINEHEUR_OPERATION_GRAPH,
                                                    HIPDNN_TYPE_BACKEND_DESCRIPTOR,
                                                    1,
-                                                   _graph_desc->get()),
+                                                   &_graph_desc->get()),
             "Failed to set operation graph on the engine heuristic descriptor.");
 
         // TODO
@@ -274,7 +274,7 @@ public:
                                                    HIPDNN_ATTR_EXECUTION_PLAN_ENGINE_CONFIG,
                                                    HIPDNN_TYPE_BACKEND_DESCRIPTOR,
                                                    1,
-                                                   _engine_config_desc->get()),
+                                                   &_engine_config_desc->get()),
             "Failed to set the engine config on execution plan.");
 
         RETURN_ON_BACKEND_FAILURE(hipdnn_backend().backend_finalize(_execution_plan_desc->get()),

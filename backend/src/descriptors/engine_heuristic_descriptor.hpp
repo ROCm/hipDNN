@@ -17,7 +17,6 @@ class Engine_heuristic_descriptor : public hipdnnBackendDescriptorImpl<Engine_he
 private:
     std::shared_ptr<const Graph_descriptor> _graph;
     std::vector<int64_t> _engine_ids;
-    bool _engine_ids_set = false;
     hipdnnBackendHeurMode_t _heuristic_mode = HIPDNN_HEUR_MODE_FALLBACK;
     bool _heuristic_mode_set = false;
 
@@ -57,8 +56,6 @@ public:
                        hipdnnBackendAttributeType_t attribute_type,
                        int64_t element_count,
                        const void* array_of_elements) override;
-
-    void set_engine_ids(const std::vector<int64_t>& engine_ids);
 
     // Throws an exception if the descriptor is not finalized.
     std::shared_ptr<const Graph_descriptor> get_graph() const;

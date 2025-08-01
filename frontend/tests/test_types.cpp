@@ -32,3 +32,19 @@ TEST(TestTypes, HeuristicModeConversion)
     EXPECT_EQ(to_backend_type(HeurMode_t::FALLBACK),
               hipdnnBackendHeurMode_t::HIPDNN_HEUR_MODE_FALLBACK);
 }
+
+TEST(TestTypes, GetDataTypeEnumFromType)
+{
+    using namespace hipdnn_frontend;
+
+    EXPECT_EQ(get_data_type_enum_from_type<float>(), DataType_t::FLOAT);
+    EXPECT_EQ(get_data_type_enum_from_type<half>(), DataType_t::HALF);
+    EXPECT_EQ(get_data_type_enum_from_type<hip_bfloat16>(), DataType_t::BFLOAT16);
+    EXPECT_EQ(get_data_type_enum_from_type<double>(), DataType_t::DOUBLE);
+
+    EXPECT_EQ(get_data_type_enum_from_type<uint8_t>(), DataType_t::UINT8);
+    EXPECT_EQ(get_data_type_enum_from_type<int32_t>(), DataType_t::INT32);
+
+    // Test with an unsupported type (e.g., int)
+    EXPECT_EQ(get_data_type_enum_from_type<int64_t>(), DataType_t::NOT_SET);
+}

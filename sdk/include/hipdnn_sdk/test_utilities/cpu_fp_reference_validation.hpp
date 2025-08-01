@@ -3,6 +3,9 @@
 
 #pragma once
 
+#include <hipdnn_sdk/utilities/half_utils.hpp>
+#include <hipdnn_sdk/utilities/hip_bfloat16_utils.hpp>
+
 #include <hipdnn_sdk/logging/logger.hpp>
 #include <hipdnn_sdk/test_utilities/reference_validation_interface.hpp>
 

@@ -14,6 +14,8 @@ using namespace hipdnn_frontend::graph;
 namespace test_util
 {
 
+#define HIPDNN_TEST_PLUGIN_ID -1
+
 void create_test_handle(hipdnnHandle_t* handle);
 
 void create_test_graph(hipdnnBackendDescriptor_t* descriptor, hipdnnHandle_t handle);

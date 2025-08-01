@@ -7,14 +7,19 @@
 #include "hipdnn_backend.h"
 #include "hipdnn_exception.hpp"
 #include "mocks/mock_descriptor.hpp"
+#include "mocks/mock_engine_plugin_resource_manager.hpp"
+#include "mocks/mock_handle.hpp"
 #include "test_descriptor_utils.hpp"
 #include "test_macros.hpp"
 
 #include <gtest/gtest.h>
+#include <hipdnn_sdk/data_objects/engine_details_generated.h>
 
 #include <memory>
 
 using namespace hipdnn_backend;
+using namespace plugin;
+using namespace ::testing;
 
 using ::testing::Return;
 
@@ -25,21 +30,25 @@ public:
     std::unique_ptr<hipdnnBackendDescriptor> _mock_graph_wrapper = nullptr;
     std::unique_ptr<hipdnnBackendDescriptor> _mock_graph_bad_type_wrapper = nullptr;
     std::unique_ptr<hipdnnBackendDescriptor> _mock_wrong_type_wrapper = nullptr;
+    std::unique_ptr<Mock_handle> _mock_handle = nullptr;
+    std::shared_ptr<Mock_engine_plugin_resource_manager> _mock_engine_plugin_resource_manager
+        = nullptr;
 
-    Engine_descriptor* get_engine_descriptor() const
+    std::shared_ptr<Engine_descriptor> get_engine_descriptor() const
     {
-        return _engine_wrapper->as_descriptor<Engine_descriptor>().get();
+        return _engine_wrapper->as_descriptor<Engine_descriptor>();
     }
 
-    Mock_descriptor<Graph_descriptor>* get_mock_graph() const
+    std::shared_ptr<Mock_graph_descriptor> get_mock_graph() const
     {
-        return _mock_graph_wrapper->as_descriptor<Mock_descriptor<Graph_descriptor>>().get();
+        return Mock_descriptor_utility::as_descriptor_unsafe<Mock_graph_descriptor>(
+            _mock_graph_wrapper.get());
     }
 
-    Mock_descriptor<Graph_descriptor>* get_mock_graph_bad_type() const
+    std::shared_ptr<Mock_graph_descriptor> get_mock_graph_bad_type() const
     {
-        return _mock_graph_bad_type_wrapper->as_descriptor<Mock_descriptor<Graph_descriptor>>()
-            .get();
+        return Mock_descriptor_utility::as_descriptor_unsafe<Mock_graph_descriptor>(
+            _mock_graph_bad_type_wrapper.get());
     }
 
     void set_graph() const
@@ -51,17 +60,26 @@ public:
                                                                &_mock_graph_wrapper));
     }
 
-    void set_global_index() const
+    void set_global_index(int64_t engine_id) const
     {
-        int64_t gidx = 0;
         ASSERT_NO_THROW(get_engine_descriptor()->set_attribute(
-            HIPDNN_ATTR_ENGINE_GLOBAL_INDEX, HIPDNN_TYPE_INT64, 1, &gidx));
+            HIPDNN_ATTR_ENGINE_GLOBAL_INDEX, HIPDNN_TYPE_INT64, 1, &engine_id));
     }
 
     void make_engine_finalized() const
     {
         set_graph();
-        set_global_index();
+        set_global_index(ENGINE_ID);
+        EXPECT_CALL(*get_mock_graph(), get_handle()).WillOnce(Return(_mock_handle.get()));
+        EXPECT_CALL(*_mock_handle, get_plugin_resource_manager())
+            .WillOnce(Return(_mock_engine_plugin_resource_manager));
+        EXPECT_CALL(*_mock_engine_plugin_resource_manager, get_applicable_engine_ids(_))
+            .WillOnce(Return(std::vector<int64_t>{ENGINE_ID}));
+        EXPECT_CALL(*_mock_engine_plugin_resource_manager, get_engine_details(_, _, _))
+            .WillOnce(Invoke([this](int64_t, const Graph_descriptor*, hipdnnPluginConstData_t* d) {
+                *d = this->_serialized_engine_details;
+            }));
+        EXPECT_CALL(*_mock_engine_plugin_resource_manager, destroy_engine_details(_, _));
         ASSERT_NO_THROW(get_engine_descriptor()->finalize());
     }
 
@@ -69,13 +87,38 @@ protected:
     void SetUp() override
     {
         _engine_wrapper = test_descriptor_utils::create_descriptor<Engine_descriptor>();
-        _mock_graph_wrapper
-            = test_descriptor_utils::create_descriptor<Mock_descriptor<Graph_descriptor>>();
+        _mock_graph_wrapper = test_descriptor_utils::create_descriptor<Mock_graph_descriptor>();
         _mock_graph_bad_type_wrapper
-            = test_descriptor_utils::create_descriptor<Mock_descriptor<Graph_descriptor>>();
+            = test_descriptor_utils::create_descriptor<Mock_graph_descriptor>();
         _mock_wrong_type_wrapper
-            = test_descriptor_utils::create_descriptor<Mock_descriptor<Engine_descriptor>>();
+            = test_descriptor_utils::create_descriptor<Mock_engine_descriptor>();
+        _mock_handle = std::make_unique<Mock_handle>();
+        _mock_engine_plugin_resource_manager
+            = std::make_shared<Mock_engine_plugin_resource_manager>();
+
+        serialize_engine_details(ENGINE_ID);
     }
+
+    void TearDown() override
+    {
+        _engine_wrapper.reset();
+    }
+
+private:
+    void serialize_engine_details(int64_t engine_id)
+    {
+        flatbuffers::FlatBufferBuilder builder;
+        hipdnn_sdk::data_objects::EngineDetailsBuilder engine_details_builder(builder);
+        engine_details_builder.add_engine_id(engine_id);
+        builder.Finish(engine_details_builder.Finish());
+        _engine_details_buffer = builder.Release();
+        _serialized_engine_details
+            = {.ptr = _engine_details_buffer.data(), .size = _engine_details_buffer.size()};
+    }
+
+    static constexpr int64_t ENGINE_ID = 0;
+    flatbuffers::DetachedBuffer _engine_details_buffer;
+    hipdnnPluginConstData_t _serialized_engine_details;
 };
 
 TEST_F(Engine_descriptor_test, CreateEngineDescriptor)
@@ -177,10 +220,7 @@ TEST_F(Engine_descriptor_test, FinalizeEngineDescriptor)
     auto engine = get_engine_descriptor();
     ASSERT_THROW_HIPDNN_STATUS(engine->finalize(), HIPDNN_STATUS_BAD_PARAM);
 
-    set_graph();
-    set_global_index();
-
-    ASSERT_NO_THROW(engine->finalize());
+    make_engine_finalized();
 
     ASSERT_THROW_HIPDNN_STATUS(engine->finalize(), HIPDNN_STATUS_BAD_PARAM);
 }
@@ -299,7 +339,7 @@ TEST_F(Engine_descriptor_test, GetGraphReturnsPointerIfFinalized)
     auto graph_ptr = engine->get_graph();
     ASSERT_NE(graph_ptr, nullptr);
     ASSERT_EQ(static_cast<const Backend_descriptor_interface*>(graph_ptr.get()),
-              static_cast<const Backend_descriptor_interface*>(get_mock_graph()));
+              static_cast<const Backend_descriptor_interface*>(get_mock_graph().get()));
 }
 
 TEST_F(Engine_descriptor_test, GetEngineIdThrowsIfNotFinalized)

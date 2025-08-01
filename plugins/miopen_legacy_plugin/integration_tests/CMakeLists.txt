@@ -1,0 +1,42 @@
+# Copyright © Advanced Micro Devices, Inc., or its affiliates.
+# SPDX-License-Identifier:  MIT
+
+if(NOT BUILD_PLUGIN_AS_DEPENDENCY)
+    find_package(GTest CONFIG REQUIRED)
+endif()
+
+include(GoogleTest)
+
+
+if(HIP_DNN_SKIP_TESTS)
+    message(STATUS "Skipping MIOpen plugin integration tests.")
+    return()
+endif()
+
+add_executable(miopen_plugin_integration_test
+    main.cpp
+    batchnorm_fwd_inference_integration_test.cpp
+)
+
+target_compile_options(miopen_plugin_integration_test PRIVATE ${HIPDNN_WARNING_COMPILE_OPTIONS})
+target_compile_definitions(miopen_plugin_integration_test PRIVATE
+    COMPONENT_NAME="miopen_plugin_integration_test"
+    PLUGIN_DIR="${MIOPEN_LEGACY_PLUGIN_DIR}/"
+)
+
+target_link_libraries(miopen_plugin_integration_test PUBLIC 
+    GTest::gtest
+    hip::host
+    hip::device
+    miopen_legacy_plugin
+    hipdnn_frontend
+    hipdnn_sdk
+    pthread
+)
+
+
+if(BUILD_PLUGIN_AS_DEPENDENCY)
+    clang_tidy_check(miopen_plugin_integration_test)
+    
+    add_target_to_check_targets(miopen_plugin_integration_test ${CMAKE_CURRENT_BINARY_DIR})
+endif()

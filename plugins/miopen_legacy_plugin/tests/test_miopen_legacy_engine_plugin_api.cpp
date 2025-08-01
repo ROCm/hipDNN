@@ -88,11 +88,13 @@ TEST(MiopenLegacyEnginePluginApiTest, EnginePluginSetStreamValidStream)
     hipdnnEnginePluginHandle_t handle = nullptr;
     EXPECT_EQ(hipdnnEnginePluginCreate(&handle), HIPDNN_PLUGIN_STATUS_SUCCESS);
 
-    auto stream = reinterpret_cast<hipStream_t>(0x1234);
+    hipStream_t stream = nullptr;
+    EXPECT_EQ(hipStreamCreate(&stream), hipSuccess);
     EXPECT_EQ(hipdnnEnginePluginSetStream(handle, stream), HIPDNN_PLUGIN_STATUS_SUCCESS);
     EXPECT_EQ(handle->get_stream(), stream);
 
     EXPECT_EQ(hipdnnEnginePluginDestroy(handle), HIPDNN_PLUGIN_STATUS_SUCCESS);
+    EXPECT_EQ(hipStreamDestroy(stream), hipSuccess);
 }
 
 TEST(MiopenLegacyEnginePluginApiTest, EnginePluginGetApplicableEngineIdsNull)

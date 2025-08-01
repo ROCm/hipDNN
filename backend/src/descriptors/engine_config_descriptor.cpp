@@ -4,11 +4,19 @@
 #include "engine_config_descriptor.hpp"
 #include "engine_descriptor.hpp"
 #include "error.hpp"
+#include "graph_descriptor.hpp"
+#include "handle/handle.hpp"
 #include "hipdnn_backend_descriptor_type.h"
 #include "hipdnn_exception.hpp"
+#include <hipdnn_sdk/data_objects/engine_config_generated.h>
 
 namespace hipdnn_backend
 {
+
+Engine_config_descriptor::Engine_config_descriptor()
+{
+    _engine_config_data = std::make_unique<hipdnn_sdk::data_objects::EngineConfigT>();
+}
 
 void Engine_config_descriptor::finalize()
 {
@@ -20,6 +28,23 @@ void Engine_config_descriptor::finalize()
                   HIPDNN_STATUS_BAD_PARAM,
                   "Engine_config_descriptor::finalize() failed: Engine is not set.");
 
+    auto graph = _engine->get_graph();
+    auto handle = graph->get_handle();
+    auto plugin_resource_manager = handle->get_plugin_resource_manager();
+
+    auto engine_id = _engine->get_engine_id();
+
+    auto engine_config_plugin_data = get_serialized_engine_config();
+    auto workspace_size = static_cast<int64_t>(plugin_resource_manager->get_workspace_size(
+        engine_id, &engine_config_plugin_data, graph.get()));
+
+    THROW_IF_LT(workspace_size,
+                0,
+                HIPDNN_STATUS_INTERNAL_ERROR,
+                "Engine_config_descriptor::set_max_workspace_size() failed: "
+                "Max workspace size cannot be negative.");
+
+    _max_workspace_size = workspace_size;
     hipdnnBackendDescriptorImpl<Engine_config_descriptor>::finalize();
 }
 
@@ -134,6 +159,9 @@ void Engine_config_descriptor::set_attribute(hipdnnBackendAttributeName_t attrib
             std::string("Engine_config_descriptor::set_attribute() is not supported for attribute ")
                 + hipdnn_backend::hipdnn_get_attribute_name_string(attribute_name) + ".");
     }
+
+    // reset the serialized buffer when an attribute is set to ensure it's not cached out of date.
+    _engine_config_serialized_buffer = flatbuffers::DetachedBuffer();
 }
 
 void Engine_config_descriptor::set_engine(hipdnnBackendAttributeType_t attribute_type,
@@ -163,25 +191,7 @@ void Engine_config_descriptor::set_engine(hipdnnBackendAttributeType_t attribute
                    "Engine is not finalized.");
 
     _engine = engine;
-}
-
-void Engine_config_descriptor::set_max_workspace_size(int64_t workspace_size)
-{
-    // This should only be called from the plugin manager, so all errors should be
-    // internal errors rather than user errors.
-
-    THROW_IF_FALSE(is_finalized(),
-                   HIPDNN_STATUS_INTERNAL_ERROR,
-                   "Engine_config_descriptor::set_max_workspace_size() failed: "
-                   "Not finalized.");
-
-    THROW_IF_LT(workspace_size,
-                0,
-                HIPDNN_STATUS_INTERNAL_ERROR,
-                "Engine_config_descriptor::set_max_workspace_size() failed: "
-                "Max workspace size cannot be negative.");
-
-    _max_workspace_size = workspace_size;
+    _engine_config_data->engine_id = _engine->get_engine_id();
 }
 
 std::shared_ptr<const Engine_descriptor> Engine_config_descriptor::get_engine() const
@@ -196,4 +206,23 @@ hipdnnBackendDescriptorType_t Engine_config_descriptor::get_static_type()
 {
     return HIPDNN_BACKEND_ENGINECFG_DESCRIPTOR;
 }
+
+hipdnnPluginConstData_t Engine_config_descriptor::get_serialized_engine_config() const
+{
+    if(_engine_config_serialized_buffer.size() == 0)
+    {
+        THROW_IF_NULL(_engine,
+                      HIPDNN_STATUS_INTERNAL_ERROR,
+                      "Engine_config_descriptor::get_serialized_engine_config: engine is null");
+
+        flatbuffers::FlatBufferBuilder builder;
+        builder.Finish(
+            hipdnn_sdk::data_objects::EngineConfig::Pack(builder, _engine_config_data.get()));
+        _engine_config_serialized_buffer = builder.Release();
+    }
+
+    return {.ptr = _engine_config_serialized_buffer.data(),
+            .size = _engine_config_serialized_buffer.size()};
+}
+
 } // namespace hipdnn_backend
