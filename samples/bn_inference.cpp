@@ -4,13 +4,11 @@
 #include "utils/helpers.hpp"
 
 #include <hip/hip_runtime.h>
+#include <hipdnn_backend.h>
 #include <hipdnn_frontend.hpp>
 #include <hipdnn_frontend/attributes/batchnorm_inference_attributes.hpp>
 #include <hipdnn_frontend/graph.hpp>
-#include <hipdnn_sdk/utilities/migratable_memory.hpp>
-#include <hipdnn_backend.h>
 #include <hipdnn_sdk/utilities/tensor.hpp>
-
 
 #include <iostream>
 #include <random>
@@ -21,33 +19,28 @@ using namespace hipdnn_frontend;
 using namespace hipdnn_sdk::utilities;
 
 template <typename T>
-inline DataType_t
-get_data_type();
+inline DataType_t get_data_type();
 
 template <>
-inline DataType_t
-get_data_type<float>()
+inline DataType_t get_data_type<float>()
 {
     return DataType_t::FLOAT;
 }
 
 template <>
-inline DataType_t
-get_data_type<half>()
+inline DataType_t get_data_type<half>()
 {
     return DataType_t::HALF;
 }
 
 template <>
-inline DataType_t
-get_data_type<hip_bfloat16>()
+inline DataType_t get_data_type<hip_bfloat16>()
 {
     return DataType_t::BFLOAT16;
 }
 
 template <typename InputType, typename IntermediateType>
-void
-run_bn_inference(hipdnnHandle_t handle, const std::string& type_string)
+void run_bn_inference(hipdnnHandle_t handle, const std::string& type_string)
 {
     std::cout << "Running bnorm infer " << type_string << std::endl;
 
@@ -98,61 +91,44 @@ run_bn_inference(hipdnnHandle_t handle, const std::string& type_string)
     HIPDNN_FE_CHECK(graph->build_plans());
     std::cout << "Plans build successful." << std::endl;
 
-    auto x_memory = Migratable_memory(4 * 32 * 16 * 16, sizeof(InputType));
-    auto scale_memory = Migratable_memory(32, sizeof(IntermediateType));
-    auto bias_memory = Migratable_memory(32, sizeof(IntermediateType));
-    auto mean_memory = Migratable_memory(32, sizeof(IntermediateType));
-    auto inv_variance_memory = Migratable_memory(32, sizeof(IntermediateType));
-    auto y_memory = Migratable_memory(4 * 32 * 16 * 16, sizeof(InputType));
+    auto x_tensor = Tensor::make_nchw_tensor<InputType>({4, 32, 16, 16});
+    auto scale_tensor = Tensor::make_nchw_tensor<IntermediateType>({1, 32, 1, 1});
+    auto bias_tensor = Tensor::make_nchw_tensor<IntermediateType>({1, 32, 1, 1});
+    auto mean_tensor = Tensor::make_nchw_tensor<IntermediateType>({1, 32, 1, 1});
+    auto inv_variance_tensor = Tensor::make_nchw_tensor<IntermediateType>({1, 32, 1, 1});
+    auto y_tensor = Tensor::make_nchw_tensor<InputType>({4, 32, 16, 16});
 
-    auto x_host_ptr = x_memory.host_data<InputType>();
-    for(size_t i = 0; i < x_memory.count(); ++i)
-    {
-        x_host_ptr[i] = static_cast<InputType>(static_cast<float>(i % 100) / 100.0f);
-    }
-    x_memory.mark_host_modified();
+    x_tensor.template fill_with_random_values<InputType>(static_cast<InputType>(0.0f),
+                                                         static_cast<InputType>(1.0f));
+    x_tensor.memory().mark_host_modified();
 
-    auto scale_host_ptr = scale_memory.host_data<IntermediateType>();
-    for(size_t i = 0; i < scale_memory.count(); ++i)
-    {
-        scale_host_ptr[i] = static_cast<IntermediateType>(1.0f);
-    }
-    scale_memory.mark_host_modified();
+    scale_tensor.template fill_with_value<IntermediateType>(static_cast<IntermediateType>(1.0f));
+    scale_tensor.memory().mark_host_modified();
 
-    auto bias_host_ptr = bias_memory.host_data<IntermediateType>();
-    for(size_t i = 0; i < bias_memory.count(); ++i)
-    {
-        bias_host_ptr[i] = static_cast<IntermediateType>(0.0f);
-    }
-    bias_memory.mark_host_modified();
+    bias_tensor.template fill_with_value<IntermediateType>(static_cast<IntermediateType>(0.0f));
+    bias_tensor.memory().mark_host_modified();
 
-    auto mean_host_ptr = mean_memory.host_data<IntermediateType>();
-    for(size_t i = 0; i < mean_memory.count(); ++i)
-    {
-        mean_host_ptr[i] = static_cast<IntermediateType>(0.5f);
-    }
-    mean_memory.mark_host_modified();
+    mean_tensor.template fill_with_value<IntermediateType>(static_cast<IntermediateType>(0.5f));
+    mean_tensor.memory().mark_host_modified();
 
-    auto inv_variance_host_ptr = inv_variance_memory.host_data<IntermediateType>();
-    for(size_t i = 0; i < inv_variance_memory.count(); ++i)
-    {
-        inv_variance_host_ptr[i] = static_cast<IntermediateType>(1.0f);
-    }
-    inv_variance_memory.mark_host_modified();
+    inv_variance_tensor.template fill_with_value<IntermediateType>(
+        static_cast<IntermediateType>(1.0f));
+    inv_variance_tensor.memory().mark_host_modified();
 
     std::unordered_map<int64_t, void*> variant_pack;
-    variant_pack[x->get_uid()] = x_memory.device_data<void>();
-    variant_pack[scale->get_uid()] = scale_memory.device_data<void>();
-    variant_pack[bias->get_uid()] = bias_memory.device_data<void>();
-    variant_pack[mean->get_uid()] = mean_memory.device_data<void>();
-    variant_pack[inv_variance->get_uid()] = inv_variance_memory.device_data<void>();
-    variant_pack[y->get_uid()] = y_memory.device_data<void>();
+    variant_pack[x->get_uid()] = x_tensor.memory().template device_data<void>();
+    variant_pack[scale->get_uid()] = scale_tensor.memory().template device_data<void>();
+    variant_pack[bias->get_uid()] = bias_tensor.memory().template device_data<void>();
+    variant_pack[mean->get_uid()] = mean_tensor.memory().template device_data<void>();
+    variant_pack[inv_variance->get_uid()]
+        = inv_variance_tensor.memory().template device_data<void>();
+    variant_pack[y->get_uid()] = y_tensor.memory().template device_data<void>();
 
     HIPDNN_FE_CHECK(graph->execute(handle, variant_pack, nullptr));
     std::cout << "Graph execution successful." << std::endl;
 
-    y_memory.mark_device_modified();
-    auto y_host_ptr = y_memory.host_data<InputType>();
+    y_tensor.memory().mark_device_modified();
+    auto y_host_ptr = y_tensor.memory().template host_data<InputType>();
 
     std::cout << "First 10 output values: ";
     for(int i = 0; i < 10; ++i)
@@ -165,34 +141,18 @@ run_bn_inference(hipdnnHandle_t handle, const std::string& type_string)
               << std::endl;
 }
 
-
-int
-main()
+int main()
 {
-    hipdnn_frontend::graph::initialize_frontend_logging(hipdnnLoggingCallback_ext);
-
-    if(hipInit(0) != hipSuccess)
-    {
-        std::cerr << "Failed to initialize HIP" << std::endl;
-        return -1;
-    }
+    hipdnn_frontend::initialize_frontend_logging(hipdnnLoggingCallback_ext);
 
     hipdnnHandle_t handle;
-    if(hipdnnCreate(&handle) != HIPDNN_STATUS_SUCCESS)
-    {
-        std::cerr << "Failed to create hipdnn handle" << std::endl;
-        return -1;
-    }
+    HIPDNN_CHECK(hipdnnCreate(&handle));
 
     run_bn_inference<float, float>(handle, "fp32");
     run_bn_inference<half, float>(handle, "fp16");
     run_bn_inference<hip_bfloat16, float>(handle, "bf16");
 
-    if(hipdnnDestroy(handle) != HIPDNN_STATUS_SUCCESS)
-    {
-        std::cerr << "Failed to destroy hipdnn handle" << std::endl;
-        return -1;
-    }
+    HIPDNN_CHECK(hipdnnDestroy(handle));
     std::cout << "All tests completed successfully." << std::endl;
     return 0;
 }
