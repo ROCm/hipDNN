@@ -7,55 +7,192 @@
 #include <hipdnn_frontend.hpp>
 #include <hipdnn_frontend/attributes/batchnorm_inference_attributes.hpp>
 #include <hipdnn_frontend/graph.hpp>
+#include <hipdnn_sdk/utilities/migratable_memory.hpp>
+#include <hipdnn_backend.h>
+#include <hipdnn_sdk/utilities/tensor.hpp>
+
 
 #include <iostream>
+#include <random>
+#include <string>
+#include <unordered_map>
 
-int main()
+using namespace hipdnn_frontend;
+using namespace hipdnn_sdk::utilities;
+
+template <typename T>
+inline DataType_t
+get_data_type();
+
+template <>
+inline DataType_t
+get_data_type<float>()
 {
-    std::cout << "Running bnorm infer fp32" << std::endl;
+    return DataType_t::FLOAT;
+}
 
-    using namespace hipdnn_frontend;
+template <>
+inline DataType_t
+get_data_type<half>()
+{
+    return DataType_t::HALF;
+}
+
+template <>
+inline DataType_t
+get_data_type<hip_bfloat16>()
+{
+    return DataType_t::BFLOAT16;
+}
+
+template <typename InputType, typename IntermediateType>
+void
+run_bn_inference(hipdnnHandle_t handle, const std::string& type_string)
+{
+    std::cout << "Running bnorm infer " << type_string << std::endl;
 
     auto graph = std::make_shared<graph::Graph>();
-    graph->set_io_data_type(DataType_t::FLOAT)
-        .set_intermediate_data_type(DataType_t::FLOAT)
-        .set_compute_data_type(DataType_t::FLOAT);
+    graph->set_io_data_type(get_data_type<InputType>())
+        .set_intermediate_data_type(get_data_type<IntermediateType>())
+        .set_compute_data_type(get_data_type<IntermediateType>());
 
-    auto x = create_tensor({4, 32, 16, 16}, DataType_t::FLOAT);
-    auto scale = create_tensor({1, 32, 1, 1}, DataType_t::FLOAT);
-    auto bias = create_tensor({1, 32, 1, 1}, DataType_t::FLOAT);
-    auto mean = create_tensor({1, 32, 1, 1}, DataType_t::FLOAT);
-    auto inv_variance = create_tensor({1, 32, 1, 1}, DataType_t::FLOAT);
+    int64_t uid = 1;
+    auto x = create_tensor({4, 32, 16, 16}, get_data_type<InputType>());
+    x->set_uid(uid++);
+
+    auto scale = create_tensor({1, 32, 1, 1}, get_data_type<IntermediateType>());
+    scale->set_uid(uid++);
+
+    auto bias = create_tensor({1, 32, 1, 1}, get_data_type<IntermediateType>());
+    bias->set_uid(uid++);
+
+    auto mean = create_tensor({1, 32, 1, 1}, get_data_type<IntermediateType>());
+    mean->set_uid(uid++);
+
+    auto inv_variance = create_tensor({1, 32, 1, 1}, get_data_type<IntermediateType>());
+    inv_variance->set_uid(uid++);
 
     auto bn_attributes = graph::Batchnorm_inference_attributes();
     bn_attributes.name = "bn_inference_node";
 
     auto y = graph->batchnorm_inference(x, mean, inv_variance, scale, bias, bn_attributes);
-    y->set_output(true).set_data_type(DataType_t::FLOAT);
+    y->set_output(true).set_data_type(get_data_type<InputType>());
+
+    if(!y->has_uid())
+    {
+        y->set_uid(uid++);
+    }
 
     HIPDNN_FE_CHECK(graph->validate());
     std::cout << "Graph validation successful." << std::endl;
 
-    HIPDNN_FE_CHECK(graph->build_operation_graph());
+    HIPDNN_FE_CHECK(graph->build_operation_graph(handle));
     std::cout << "Operation graph build successful." << std::endl;
 
-    Surface<float> x_surface(get_tensor_element_count(x));
-    Surface<float> scale_surface(get_tensor_element_count(scale), 1.0f);
-    Surface<float> bias_surface(get_tensor_element_count(bias), 0.0f);
-    Surface<float> mean_surface(get_tensor_element_count(mean), 0.5f);
-    Surface<float> inv_variance_surface(get_tensor_element_count(inv_variance), 1.0f);
-    Surface<float> y_surface(get_tensor_element_count(y));
+    HIPDNN_FE_CHECK(graph->create_execution_plans(handle));
+    std::cout << "Execution plans created successfully." << std::endl;
 
-    // provide example with workspace
+    HIPDNN_FE_CHECK(graph->check_support());
+    std::cout << "Graph support check successful." << std::endl;
 
-    /*
-    // need to properly create a variant pack with the input tensors
+    HIPDNN_FE_CHECK(graph->build_plans());
+    std::cout << "Plans build successful." << std::endl;
 
-    auto execution_result = graph->execute(variant_pack);
-    HIPDNN_FE_CHECK(execution_result);
-    */
+    auto x_memory = Migratable_memory(4 * 32 * 16 * 16, sizeof(InputType));
+    auto scale_memory = Migratable_memory(32, sizeof(IntermediateType));
+    auto bias_memory = Migratable_memory(32, sizeof(IntermediateType));
+    auto mean_memory = Migratable_memory(32, sizeof(IntermediateType));
+    auto inv_variance_memory = Migratable_memory(32, sizeof(IntermediateType));
+    auto y_memory = Migratable_memory(4 * 32 * 16 * 16, sizeof(InputType));
 
-    std::cout << "Bnorm infer graph execution complete." << std::endl;
+    auto x_host_ptr = x_memory.host_data<InputType>();
+    for(size_t i = 0; i < x_memory.count(); ++i)
+    {
+        x_host_ptr[i] = static_cast<InputType>(static_cast<float>(i % 100) / 100.0f);
+    }
+    x_memory.mark_host_modified();
 
+    auto scale_host_ptr = scale_memory.host_data<IntermediateType>();
+    for(size_t i = 0; i < scale_memory.count(); ++i)
+    {
+        scale_host_ptr[i] = static_cast<IntermediateType>(1.0f);
+    }
+    scale_memory.mark_host_modified();
+
+    auto bias_host_ptr = bias_memory.host_data<IntermediateType>();
+    for(size_t i = 0; i < bias_memory.count(); ++i)
+    {
+        bias_host_ptr[i] = static_cast<IntermediateType>(0.0f);
+    }
+    bias_memory.mark_host_modified();
+
+    auto mean_host_ptr = mean_memory.host_data<IntermediateType>();
+    for(size_t i = 0; i < mean_memory.count(); ++i)
+    {
+        mean_host_ptr[i] = static_cast<IntermediateType>(0.5f);
+    }
+    mean_memory.mark_host_modified();
+
+    auto inv_variance_host_ptr = inv_variance_memory.host_data<IntermediateType>();
+    for(size_t i = 0; i < inv_variance_memory.count(); ++i)
+    {
+        inv_variance_host_ptr[i] = static_cast<IntermediateType>(1.0f);
+    }
+    inv_variance_memory.mark_host_modified();
+
+    std::unordered_map<int64_t, void*> variant_pack;
+    variant_pack[x->get_uid()] = x_memory.device_data<void>();
+    variant_pack[scale->get_uid()] = scale_memory.device_data<void>();
+    variant_pack[bias->get_uid()] = bias_memory.device_data<void>();
+    variant_pack[mean->get_uid()] = mean_memory.device_data<void>();
+    variant_pack[inv_variance->get_uid()] = inv_variance_memory.device_data<void>();
+    variant_pack[y->get_uid()] = y_memory.device_data<void>();
+
+    HIPDNN_FE_CHECK(graph->execute(handle, variant_pack, nullptr));
+    std::cout << "Graph execution successful." << std::endl;
+
+    y_memory.mark_device_modified();
+    auto y_host_ptr = y_memory.host_data<InputType>();
+
+    std::cout << "First 10 output values: ";
+    for(int i = 0; i < 10; ++i)
+    {
+        std::cout << static_cast<float>(y_host_ptr[i]) << " ";
+    }
+    std::cout << std::endl;
+
+    std::cout << "Bnorm infer graph execution complete for " << type_string << "." << std::endl
+              << std::endl;
+}
+
+
+int
+main()
+{
+    hipdnn_frontend::graph::initialize_frontend_logging(hipdnnLoggingCallback_ext);
+
+    if(hipInit(0) != hipSuccess)
+    {
+        std::cerr << "Failed to initialize HIP" << std::endl;
+        return -1;
+    }
+
+    hipdnnHandle_t handle;
+    if(hipdnnCreate(&handle) != HIPDNN_STATUS_SUCCESS)
+    {
+        std::cerr << "Failed to create hipdnn handle" << std::endl;
+        return -1;
+    }
+
+    run_bn_inference<float, float>(handle, "fp32");
+    run_bn_inference<half, float>(handle, "fp16");
+    run_bn_inference<hip_bfloat16, float>(handle, "bf16");
+
+    if(hipdnnDestroy(handle) != HIPDNN_STATUS_SUCCESS)
+    {
+        std::cerr << "Failed to destroy hipdnn handle" << std::endl;
+        return -1;
+    }
+    std::cout << "All tests completed successfully." << std::endl;
     return 0;
 }
