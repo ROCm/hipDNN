@@ -98,24 +98,17 @@ void run_bn_training(hipdnnHandle_t handle)
 
     x_tensor.template fill_with_random_values<InputType>(static_cast<InputType>(0.0f),
                                                          static_cast<InputType>(1.0f));
-    x_tensor.memory().mark_host_modified();
     gamma_tensor.template fill_with_random_values<IntermediateType>(
         static_cast<IntermediateType>(0.0f), static_cast<IntermediateType>(1.0f));
-    gamma_tensor.memory().mark_host_modified();
     beta_tensor.template fill_with_random_values<IntermediateType>(
         static_cast<IntermediateType>(0.0f), static_cast<IntermediateType>(1.0f));
-    beta_tensor.memory().mark_host_modified();
     prev_mean_tensor.template fill_with_random_values<IntermediateType>(
         static_cast<IntermediateType>(0.0f), static_cast<IntermediateType>(1.0f));
-    prev_mean_tensor.memory().mark_host_modified();
     prev_var_tensor.template fill_with_random_values<IntermediateType>(
         static_cast<IntermediateType>(0.1f), static_cast<IntermediateType>(1.0f));
-    prev_var_tensor.memory().mark_host_modified();
 
     momentum_tensor.memory().template host_data<IntermediateType>()[0] = 0.1f;
-    momentum_tensor.memory().mark_host_modified();
     epsilon_tensor.memory().template host_data<IntermediateType>()[0] = 1e-5f;
-    epsilon_tensor.memory().mark_host_modified();
 
     std::unordered_map<int64_t, void*> variant_pack;
     variant_pack[x->get_uid()] = x_tensor.memory().template device_data<void>();

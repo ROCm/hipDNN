@@ -82,19 +82,14 @@ void run_bn_backward(hipdnnHandle_t handle)
 
     dy_tensor.template fill_with_random_values<InputType>(static_cast<InputType>(0.0f),
                                                           static_cast<InputType>(1.0f));
-    dy_tensor.memory().mark_host_modified();
     x_tensor.template fill_with_random_values<InputType>(static_cast<InputType>(0.0f),
                                                          static_cast<InputType>(1.0f));
-    x_tensor.memory().mark_host_modified();
     gamma_tensor.template fill_with_random_values<IntermediateType>(
         static_cast<IntermediateType>(0.0f), static_cast<IntermediateType>(1.0f));
-    gamma_tensor.memory().mark_host_modified();
     saved_mean_tensor.template fill_with_random_values<IntermediateType>(
         static_cast<IntermediateType>(0.0f), static_cast<IntermediateType>(1.0f));
-    saved_mean_tensor.memory().mark_host_modified();
     saved_inv_var_tensor.template fill_with_random_values<IntermediateType>(
         static_cast<IntermediateType>(0.1f), static_cast<IntermediateType>(1.0f));
-    saved_inv_var_tensor.memory().mark_host_modified();
 
     std::unordered_map<int64_t, void*> variant_pack;
     variant_pack[dy->get_uid()] = dy_tensor.memory().template device_data<void>();

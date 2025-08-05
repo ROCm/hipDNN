@@ -80,20 +80,15 @@ void run_bn_inference(hipdnnHandle_t handle)
 
     x_tensor.template fill_with_random_values<InputType>(static_cast<InputType>(0.0f),
                                                          static_cast<InputType>(1.0f));
-    x_tensor.memory().mark_host_modified();
 
     gamma_tensor.template fill_with_value<IntermediateType>(static_cast<IntermediateType>(1.0f));
-    gamma_tensor.memory().mark_host_modified();
 
     beta_tensor.template fill_with_value<IntermediateType>(static_cast<IntermediateType>(0.0f));
-    beta_tensor.memory().mark_host_modified();
 
     mean_tensor.template fill_with_value<IntermediateType>(static_cast<IntermediateType>(0.5f));
-    mean_tensor.memory().mark_host_modified();
 
     inv_variance_tensor.template fill_with_value<IntermediateType>(
         static_cast<IntermediateType>(1.0f));
-    inv_variance_tensor.memory().mark_host_modified();
 
     std::unordered_map<int64_t, void*> variant_pack;
     variant_pack[x->get_uid()] = x_tensor.memory().template device_data<void>();
