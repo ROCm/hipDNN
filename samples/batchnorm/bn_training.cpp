@@ -1,9 +1,8 @@
 // Copyright © Advanced Micro Devices, Inc., or its affiliates.
 // SPDX-License-Identifier:  MIT
 
-#include "utils/helpers.hpp"
+#include "../utils/helpers.hpp"
 
-#include <hip/hip_runtime.h>
 #include <hipdnn_backend.h>
 #include <hipdnn_frontend.hpp>
 #include <hipdnn_frontend/attributes/batchnorm_attributes.hpp>
@@ -11,58 +10,39 @@
 #include <hipdnn_sdk/utilities/tensor.hpp>
 
 #include <iostream>
-#include <random>
 #include <string>
 #include <unordered_map>
 
 using namespace hipdnn_frontend;
 using namespace hipdnn_sdk::utilities;
 
-template <typename T>
-inline DataType_t get_data_type();
-
-template <>
-inline DataType_t get_data_type<float>()
-{
-    return DataType_t::FLOAT;
-}
-
-template <>
-inline DataType_t get_data_type<half>()
-{
-    return DataType_t::HALF;
-}
-
-template <>
-inline DataType_t get_data_type<hip_bfloat16>()
-{
-    return DataType_t::BFLOAT16;
-}
-
 template <typename InputType, typename IntermediateType>
-void run_bn_training(hipdnnHandle_t handle, const std::string& type_string)
+void run_bn_training(hipdnnHandle_t handle)
 {
-    std::cout << "Running Batch Norm Training " << type_string << "..." << std::endl;
+    auto input_type = get_data_type_enum_from_type<InputType>();
+    auto intermediate_type = get_data_type_enum_from_type<IntermediateType>();
+
+    std::cout << "Running batch normalization training graph " << input_type << "...\n";
 
     auto graph = std::make_shared<graph::Graph>();
-    graph->set_io_data_type(get_data_type<InputType>())
-        .set_intermediate_data_type(get_data_type<IntermediateType>())
-        .set_compute_data_type(get_data_type<IntermediateType>());
+    graph->set_io_data_type(input_type)
+        .set_intermediate_data_type(intermediate_type)
+        .set_compute_data_type(intermediate_type);
 
     int64_t uid = 1;
-    auto x = create_tensor({4, 32, 16, 16}, get_data_type<InputType>());
+    auto x = create_tensor({4, 32, 16, 16}, input_type);
     x->set_uid(uid++);
-    auto scale = create_tensor({1, 32, 1, 1}, get_data_type<IntermediateType>());
+    auto scale = create_tensor({1, 32, 1, 1}, intermediate_type);
     scale->set_uid(uid++);
-    auto bias = create_tensor({1, 32, 1, 1}, get_data_type<IntermediateType>());
+    auto bias = create_tensor({1, 32, 1, 1}, intermediate_type);
     bias->set_uid(uid++);
-    auto prev_running_mean = create_tensor({1, 32, 1, 1}, get_data_type<IntermediateType>());
+    auto prev_running_mean = create_tensor({1, 32, 1, 1}, intermediate_type);
     prev_running_mean->set_uid(uid++);
-    auto prev_running_var = create_tensor({1, 32, 1, 1}, get_data_type<IntermediateType>());
+    auto prev_running_var = create_tensor({1, 32, 1, 1}, intermediate_type);
     prev_running_var->set_uid(uid++);
-    auto momentum = create_tensor({1, 1, 1, 1}, get_data_type<IntermediateType>());
+    auto momentum = create_tensor({1, 1, 1, 1}, intermediate_type);
     momentum->set_uid(uid++);
-    auto epsilon = create_tensor({1, 1, 1, 1}, get_data_type<IntermediateType>());
+    auto epsilon = create_tensor({1, 1, 1, 1}, intermediate_type);
     epsilon->set_uid(uid++);
 
     auto bn_attributes = graph::Batchnorm_attributes();
@@ -79,19 +59,19 @@ void run_bn_training(hipdnnHandle_t handle, const std::string& type_string)
     saved_inv_variance->set_output(true).set_uid(uid++);
 
     HIPDNN_FE_CHECK(graph->validate());
-    std::cout << "Graph validation successful." << std::endl;
+    std::cout << "Graph validation successful.\n";
 
     HIPDNN_FE_CHECK(graph->build_operation_graph(handle));
-    std::cout << "Operation graph build successful." << std::endl;
+    std::cout << "Operation graph build successful.\n";
 
     HIPDNN_FE_CHECK(graph->create_execution_plans(handle));
-    std::cout << "Execution plans created successfully." << std::endl;
+    std::cout << "Execution plans created successfully.\n";
 
     HIPDNN_FE_CHECK(graph->check_support());
-    std::cout << "Graph support check successful." << std::endl;
+    std::cout << "Graph support check successful.\n";
 
     HIPDNN_FE_CHECK(graph->build_plans());
-    std::cout << "Plans build successful." << std::endl;
+    std::cout << "Plans build successful.\n";
 
     auto x_tensor = Tensor::make_nchw_tensor<InputType>(x->get_dim());
     auto scale_tensor = Tensor::make_nchw_tensor<IntermediateType>(scale->get_dim());
@@ -151,7 +131,6 @@ void run_bn_training(hipdnnHandle_t handle, const std::string& type_string)
         = saved_inv_var_tensor.memory().template device_data<void>();
 
     HIPDNN_FE_CHECK(graph->execute(handle, variant_pack, nullptr));
-    std::cout << "Graph execution successful." << std::endl;
 
     y_tensor.memory().mark_device_modified();
     auto y_host_ptr = y_tensor.memory().template host_data<InputType>();
@@ -160,11 +139,9 @@ void run_bn_training(hipdnnHandle_t handle, const std::string& type_string)
     {
         std::cout << static_cast<float>(y_host_ptr[i]) << " ";
     }
-    std::cout << std::endl;
 
-    std::cout << "Batch Norm Training graph execution complete for " << type_string << "."
-              << std::endl
-              << std::endl;
+    std::cout << "\nBatch normalization training graph execution complete for " << input_type
+              << ".\n\n";
 }
 
 int main()
@@ -174,11 +151,11 @@ int main()
     hipdnnHandle_t handle;
     HIPDNN_CHECK(hipdnnCreate(&handle));
 
-    run_bn_training<float, float>(handle, "fp32");
-    run_bn_training<half, float>(handle, "fp16");
-    run_bn_training<hip_bfloat16, float>(handle, "bf16");
+    run_bn_training<float, float>(handle);
+    run_bn_training<half, float>(handle);
+    run_bn_training<hip_bfloat16, float>(handle);
 
     HIPDNN_CHECK(hipdnnDestroy(handle));
-    std::cout << "All tests completed successfully." << std::endl;
+    std::cout << "All batch normalization training runs completed successfully.\n";
     return 0;
 }
