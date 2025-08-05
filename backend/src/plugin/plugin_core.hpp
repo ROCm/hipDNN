@@ -104,7 +104,6 @@ protected:
     }
 
     // TODO: figure out how to ignore cognitive complexity warnings induced by logging macros
-    // NOLINTBEGIN(readability-function-cognitive-complexity)
     std::set<std::filesystem::path> resolve_default_paths() const
     {
         std::filesystem::path base_dir;
@@ -137,12 +136,10 @@ protected:
 
         return resolved_paths;
     }
-    // NOLINTEND(readability-function-cognitive-complexity)
 
 public:
     virtual ~Plugin_manager_base() = default;
 
-    // NOLINTBEGIN(readability-function-cognitive-complexity)
     void load_plugins(const std::set<std::filesystem::path>& custom_paths,
                       hipdnnPluginLoadingMode_ext_t mode)
     {
@@ -196,7 +193,6 @@ public:
             load_plugin_from_file(path);
         }
     }
-    // NOLINTEND(readability-function-cognitive-complexity)
 
     const std::vector<Plugin>& get_plugins() const
     {
