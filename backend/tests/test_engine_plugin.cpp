@@ -17,9 +17,14 @@ using namespace hipdnn_backend;
 
 template <typename T, typename Destructor>
 using Scoped_resource = hipdnn::sdk::utilities::Scoped_resource<T, Destructor>;
-
-using Test_engine_plugin_manager = plugin::Plugin_manager_base<plugin::Engine_plugin>;
-
+class Test_engine_plugin_manager : public plugin::Plugin_manager_base<plugin::Engine_plugin>
+{
+public:
+    Test_engine_plugin_manager()
+        : plugin::Plugin_manager_base<plugin::Engine_plugin>({"./"})
+    {
+    }
+};
 // NOLINTBEGIN(readability-function-cognitive-complexity)
 TEST(GPU_EnginePluginTest, LoadPluginsAndExecuteOpGraph)
 {
@@ -29,10 +34,10 @@ TEST(GPU_EnginePluginTest, LoadPluginsAndExecuteOpGraph)
     Test_engine_plugin_manager plugin_manager;
 
     // Create a list of paths to plugins
-    std::vector<std::filesystem::path> plugin_paths = {"./hipdnn_test_engine_plugin1"};
+    std::set<std::filesystem::path> plugin_paths = {"./hipdnn_test_engine_plugin1"};
 
     // Load the plugins
-    plugin_manager.load_plugins(plugin_paths);
+    plugin_manager.load_plugins(plugin_paths, HIPDNN_PLUGIN_LOADING_ABSOLUTE);
 
     const auto& plugins = plugin_manager.get_plugins();
     ASSERT_EQ(plugins.size(), 1); // Ensure one plugin is loaded

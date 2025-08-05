@@ -6,7 +6,6 @@
 #include "flatbuffer_utilities.hpp"
 #include "hipdnn_backend_descriptor_type.h"
 #include "hipdnn_exception.hpp"
-#include <hipdnn_sdk/data_objects/graph_generated.h>
 
 namespace hipdnn_backend
 {
@@ -77,7 +76,7 @@ void Graph_descriptor::set_attribute(hipdnnBackendAttributeName_t attribute_name
     if(attribute_name != HIPDNN_ATTR_OPERATIONGRAPH_HANDLE)
     {
         // Clear the serialized graph when the graph is modified
-        _serialized_graph.clear();
+        _graph_serialized_buffer = flatbuffers::DetachedBuffer();
     }
 }
 
@@ -90,17 +89,14 @@ void Graph_descriptor::deserialize_graph(const uint8_t* serialized_graph, size_t
                   HIPDNN_STATUS_BAD_PARAM,
                   "Graph_descriptor::deserialize_graph: graph_byte_size is 0");
 
-    // TODO: Consider lazy graph deserialization
+    // TODO: Consider skipping validation entirely, or maybe add an API option to skip it for schema extension cases.
     flatbuffer_utilities::convert_serialized_graph_to_graph(
         serialized_graph, graph_byte_size, _graph);
-
-    // Save the serialized graph for later use
-    _serialized_graph.assign(serialized_graph, serialized_graph + graph_byte_size);
 }
 
-const std::vector<uint8_t>& Graph_descriptor::get_serialized_graph()
+hipdnnPluginConstData_t Graph_descriptor::get_serialized_graph() const
 {
-    if(_serialized_graph.empty())
+    if(_graph_serialized_buffer.size() == 0)
     {
         THROW_IF_NULL(_graph,
                       HIPDNN_STATUS_INTERNAL_ERROR,
@@ -109,18 +105,21 @@ const std::vector<uint8_t>& Graph_descriptor::get_serialized_graph()
         flatbuffers::FlatBufferBuilder builder;
         builder.Finish(hipdnn_sdk::data_objects::Graph::Pack(builder, _graph.get()));
 
-        const uint8_t* serialized_graph = builder.GetBufferPointer();
-        size_t graph_byte_size = builder.GetSize();
-
-        _serialized_graph.assign(serialized_graph, serialized_graph + graph_byte_size);
+        _graph_serialized_buffer = builder.Release();
     }
 
-    return _serialized_graph;
+    return {.ptr = _graph_serialized_buffer.data(), .size = _graph_serialized_buffer.size()};
 }
 
 hipdnnBackendDescriptorType_t Graph_descriptor::get_static_type()
 {
     return HIPDNN_BACKEND_OPERATIONGRAPH_DESCRIPTOR;
+}
+
+hipdnnHandle_t Graph_descriptor::get_handle() const
+{
+    THROW_IF_NULL(_handle, HIPDNN_STATUS_BAD_PARAM, "Graph_descriptor::get_handle: handle is null");
+    return _handle;
 }
 
 } // namespace hipdnn_backend

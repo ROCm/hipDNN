@@ -2,6 +2,7 @@
 // SPDX-License-Identifier:  MIT
 
 #include "hipdnn_backend.h"
+#include <array>
 #include <gtest/gtest.h>
 #include <hipdnn_sdk/data_objects/graph_generated.h>
 
@@ -165,3 +166,54 @@ TEST(HipDNNBackendTest, WillFailToCreateGraphIfGraphIsNull)
     EXPECT_EQ(status, HIPDNN_STATUS_BAD_PARAM_NULL_POINTER);
     EXPECT_EQ(descriptor, nullptr);
 }
+
+TEST(HipDNNBackendTest, SetPluginPathsExt_Success)
+{
+    std::array<const char*, 3> paths = {"../test_plugins/test_good_plugin", "./", "../directory/"};
+
+    hipdnnStatus_t status = hipdnnSetEnginePluginPaths_ext(
+        paths.size(), paths.data(), HIPDNN_PLUGIN_LOADING_ABSOLUTE);
+
+    EXPECT_EQ(status, HIPDNN_STATUS_SUCCESS);
+}
+
+TEST(HipDNNBackendTest, SetPluginPathsExt_FailsOnNullPointer)
+{
+    hipdnnStatus_t status
+        = hipdnnSetEnginePluginPaths_ext(1, nullptr, HIPDNN_PLUGIN_LOADING_ABSOLUTE);
+    EXPECT_EQ(status, HIPDNN_STATUS_BAD_PARAM_NULL_POINTER);
+
+    status = hipdnnSetEnginePluginPaths_ext(0, nullptr, HIPDNN_PLUGIN_LOADING_ABSOLUTE);
+    EXPECT_EQ(status, HIPDNN_STATUS_BAD_PARAM_NULL_POINTER);
+}
+
+TEST(HipDNNBackendTest, SetPluginPathsExt_FailsOnNullStringInList)
+{
+    std::array<const char*, 2> paths = {"./valid/path.so", nullptr};
+
+    hipdnnStatus_t status = hipdnnSetEnginePluginPaths_ext(
+        paths.size(), paths.data(), HIPDNN_PLUGIN_LOADING_ABSOLUTE);
+
+    EXPECT_EQ(status, HIPDNN_STATUS_BAD_PARAM_NULL_POINTER);
+}
+
+// Uncomment this test and observe logs to see the plugin is loaded
+// TEST(HipDNNBackendTest, SetPluginPathAndCreateHandle_LoadsPlugins)
+// {
+//     // Can also test by manually changing default path
+//     const std::array<const char*, 1> paths = {"../../tests/test_plugins/"};
+
+//     hipdnnStatus_t status = hipdnnSetEnginePluginPaths_ext(
+//         paths.size(), paths.data(), HIPDNN_PLUGIN_LOADING_ADDITIVE);
+//     EXPECT_EQ(status, HIPDNN_STATUS_SUCCESS);
+
+//     hipdnnHandle_t handle = nullptr;
+//     hipdnnStatus_t status = hipdnnCreate(&handle);
+//     EXPECT_EQ(status, HIPDNN_STATUS_SUCCESS);
+//     EXPECT_NE(handle, nullptr);
+
+//     status = hipdnnDestroy(handle);
+//     EXPECT_EQ(status, HIPDNN_STATUS_SUCCESS);
+
+//     EXPECT_TRUE(false); // for visibility
+// }

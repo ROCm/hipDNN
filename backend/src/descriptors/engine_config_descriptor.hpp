@@ -4,6 +4,9 @@
 #pragma once
 
 #include "backend_descriptor.hpp"
+#include <flatbuffers/detached_buffer.h>
+#include <hipdnn_sdk/data_objects/engine_config_generated.h>
+#include <hipdnn_sdk/plugin/plugin_api_data_types.h>
 
 namespace hipdnn_backend
 {
@@ -14,6 +17,8 @@ class Engine_config_descriptor : public hipdnnBackendDescriptorImpl<Engine_confi
 {
 private:
     std::shared_ptr<const Engine_descriptor> _engine;
+    std::unique_ptr<hipdnn_sdk::data_objects::EngineConfigT> _engine_config_data;
+    mutable flatbuffers::DetachedBuffer _engine_config_serialized_buffer;
     int64_t _max_workspace_size = INVALID_WORKSPACE_SIZE;
 
     void set_engine(hipdnnBackendAttributeType_t attribute_type,
@@ -31,6 +36,7 @@ private:
                                 void* array_of_elements) const;
 
 public:
+    Engine_config_descriptor();
     static constexpr int64_t INVALID_WORKSPACE_SIZE = -1;
 
     void finalize() override;
@@ -46,12 +52,12 @@ public:
                        int64_t element_count,
                        const void* array_of_elements) override;
 
-    void set_max_workspace_size(int64_t max_workspace_size);
-
-    // Throws an exception if the descriptor is not finalized.
-    std::shared_ptr<const Engine_descriptor> get_engine() const;
-
     static hipdnnBackendDescriptorType_t get_static_type();
+
+    // Throws an exception if the descriptor is not finalized before calling these.
+    virtual std::shared_ptr<const Engine_descriptor> get_engine() const;
+
+    virtual hipdnnPluginConstData_t get_serialized_engine_config() const;
 };
 
 } // namespace hipdnn_backend

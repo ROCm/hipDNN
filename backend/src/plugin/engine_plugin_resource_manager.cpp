@@ -2,21 +2,19 @@
 // SPDX-License-Identifier:  MIT
 
 #include <algorithm>
+#include <hipdnn_sdk/data_objects/engine_details_generated.h>
 #include <mutex>
 #include <vector>
 
-#include <hipdnn_sdk/data_objects/engine_config_generated.h>
-#include <hipdnn_sdk/data_objects/engine_details_generated.h>
-
 #include "descriptors/engine_config_descriptor.hpp"
 #include "descriptors/engine_descriptor.hpp"
-#include "descriptors/engine_heuristic_descriptor.hpp"
 #include "descriptors/execution_plan_descriptor.hpp"
 #include "descriptors/graph_descriptor.hpp"
 #include "descriptors/variant_descriptor.hpp"
 #include "engine_plugin.hpp"
 #include "engine_plugin_resource_manager.hpp"
 #include "hipdnn_exception.hpp"
+#include "logging/logging.hpp"
 
 namespace hipdnn_backend
 {
@@ -25,37 +23,54 @@ namespace plugin
 
 class Engine_plugin_manager : public Plugin_manager_base<Engine_plugin>
 {
+public:
+    Engine_plugin_manager()
+        : Plugin_manager_base<Engine_plugin>({"hipdnn_plugins/engines/"})
+    {
+    }
 };
 
 namespace
 {
 
-std::mutex plugin_mutex;
-std::vector<std::filesystem::path> override_plugin_paths;
-std::weak_ptr<Engine_plugin_manager> pm_ptr;
-
-std::vector<std::filesystem::path> get_default_plugin_paths()
+struct Plugin_loading_config
 {
-    // This function should return the default plugin paths.
-    // For now, we return an empty vector.
-    // TODO: Implement logic to retrieve default plugin paths.
-    return {};
-}
+    std::set<std::filesystem::path> paths;
+    hipdnnPluginLoadingMode_ext_t mode = HIPDNN_PLUGIN_LOADING_ADDITIVE;
+};
+
+std::mutex plugin_mutex;
+Plugin_loading_config plugin_config;
+std::weak_ptr<Engine_plugin_manager> pm_ptr;
 
 } // namespace
 
 void Engine_plugin_resource_manager::set_plugin_paths(
-    const std::vector<std::filesystem::path>& plugin_paths)
+    const std::vector<std::filesystem::path>& plugin_paths,
+    hipdnnPluginLoadingMode_ext_t loading_mode)
 {
     std::lock_guard<std::mutex> lock(plugin_mutex);
 
-    // Check if the plugin paths are already saved, if so, do nothing.
-    if(!override_plugin_paths.empty())
-    {
-        return;
-    }
+    THROW_IF_FALSE(pm_ptr.expired(),
+                   HIPDNN_STATUS_NOT_SUPPORTED,
+                   "hipdnnSetEnginePluginPaths_ext cannot be called with an active handle.");
 
-    override_plugin_paths = plugin_paths;
+    plugin_config.mode = loading_mode;
+
+    if(loading_mode == HIPDNN_PLUGIN_LOADING_ABSOLUTE)
+    {
+        plugin_config.paths = {plugin_paths.begin(), plugin_paths.end()};
+    }
+    else
+    {
+        plugin_config.paths.insert(plugin_paths.begin(), plugin_paths.end());
+    }
+}
+
+std::set<std::filesystem::path> Engine_plugin_resource_manager::get_plugin_paths()
+{
+    std::lock_guard<std::mutex> lock(plugin_mutex);
+    return plugin_config.paths;
 }
 
 std::shared_ptr<Engine_plugin_resource_manager> Engine_plugin_resource_manager::create()
@@ -70,15 +85,18 @@ std::shared_ptr<Engine_plugin_resource_manager> Engine_plugin_resource_manager::
 
         if(!pm)
         {
-            auto paths = override_plugin_paths.empty() ? get_default_plugin_paths()
-                                                       : override_plugin_paths;
             pm = std::make_shared<Engine_plugin_manager>();
-            pm->load_plugins(paths);
+            pm->load_plugins(plugin_config.paths, plugin_config.mode);
             pm_ptr = pm;
         }
     }
 
     return std::make_shared<Engine_plugin_resource_manager>(pm);
+}
+
+Engine_plugin_resource_manager::Engine_plugin_resource_manager()
+    : _pm(std::make_shared<Engine_plugin_manager>())
+{
 }
 
 Engine_plugin_resource_manager::Engine_plugin_resource_manager(
@@ -144,12 +162,10 @@ void Engine_plugin_resource_manager::set_stream(hipStream_t stream) const
     }
 }
 
-std::vector<int64_t>
-    Engine_plugin_resource_manager::get_applicable_engine_ids(Graph_descriptor* graph_desc) const
+std::vector<int64_t> Engine_plugin_resource_manager::get_applicable_engine_ids(
+    const Graph_descriptor* graph_desc) const
 {
-    const auto& serialized_graph = graph_desc->get_serialized_graph();
-    const hipdnnPluginConstData_t serialized_graph_data{serialized_graph.data(),
-                                                        serialized_graph.size()};
+    auto serialized_graph_data = graph_desc->get_serialized_graph();
 
     std::vector<int64_t> engine_ids;
 
@@ -175,11 +191,11 @@ std::vector<int64_t>
 }
 
 void Engine_plugin_resource_manager::get_engine_details(
-    int64_t engine_id, Graph_descriptor* graph_desc, hipdnnPluginConstData_t* engine_details) const
+    int64_t engine_id,
+    const Graph_descriptor* graph_desc,
+    hipdnnPluginConstData_t* engine_details) const
 {
-    const auto& serialized_graph = graph_desc->get_serialized_graph();
-    const hipdnnPluginConstData_t serialized_graph_data{serialized_graph.data(),
-                                                        serialized_graph.size()};
+    auto serialized_graph_data = graph_desc->get_serialized_graph();
 
     auto handle = _engine_id_to_handle.at(engine_id);
     auto plugin = _handle_to_plugin.at(handle);
@@ -203,24 +219,20 @@ void Engine_plugin_resource_manager::destroy_engine_details(
     plugin->destroy_engine_details(handle, engine_details);
 }
 
-std::unique_ptr<Engine_details_wrapper>
-    get_engine_details(const std::shared_ptr<Engine_plugin_resource_manager>& rm,
-                       int64_t engine_id,
-                       Graph_descriptor* graph_desc)
+std::shared_ptr<const Engine_details_wrapper> Engine_plugin_resource_manager::get_engine_details(
+    const std::shared_ptr<Engine_plugin_resource_manager>& rm,
+    int64_t engine_id,
+    const Graph_descriptor* graph_desc)
 {
-    return std::make_unique<Engine_details_wrapper>(rm, engine_id, graph_desc);
+    return std::make_shared<Engine_details_wrapper>(rm, engine_id, graph_desc);
 }
 
-// TODO: Pack engine_config
-// TODO: Get engine_id from engine_config
 size_t
     Engine_plugin_resource_manager::get_workspace_size(int64_t engine_id,
                                                        const hipdnnPluginConstData_t* engine_config,
-                                                       Graph_descriptor* graph_desc) const
+                                                       const Graph_descriptor* graph_desc) const
 {
-    const auto& serialized_graph = graph_desc->get_serialized_graph();
-    const hipdnnPluginConstData_t serialized_graph_data{serialized_graph.data(),
-                                                        serialized_graph.size()};
+    auto serialized_graph_data = graph_desc->get_serialized_graph();
 
     auto handle = _engine_id_to_handle.at(engine_id);
     auto plugin = _handle_to_plugin.at(handle);
@@ -233,11 +245,9 @@ size_t
 hipdnnEnginePluginExecutionContext_t Engine_plugin_resource_manager::create_execution_context(
     int64_t engine_id,
     const hipdnnPluginConstData_t* engine_config,
-    Graph_descriptor* graph_desc) const
+    const Graph_descriptor* graph_desc) const
 {
-    const auto& serialized_graph = graph_desc->get_serialized_graph();
-    const hipdnnPluginConstData_t serialized_graph_data{serialized_graph.data(),
-                                                        serialized_graph.size()};
+    auto serialized_graph_data = graph_desc->get_serialized_graph();
 
     auto handle = _engine_id_to_handle.at(engine_id);
     auto plugin = _handle_to_plugin.at(handle);
@@ -254,14 +264,14 @@ void Engine_plugin_resource_manager::destroy_execution_context(
     plugin->destroy_execution_context(handle, execution_context);
 }
 
-std::unique_ptr<Engine_execution_context_wrapper>
+std::shared_ptr<const Engine_execution_context_wrapper>
     Engine_plugin_resource_manager::create_execution_context(
         const std::shared_ptr<Engine_plugin_resource_manager>& rm,
         int64_t engine_id,
         const hipdnnPluginConstData_t* engine_config,
-        Graph_descriptor* graph_desc)
+        const Graph_descriptor* graph_desc)
 {
-    return std::make_unique<Engine_execution_context_wrapper>(
+    return std::make_shared<Engine_execution_context_wrapper>(
         rm, engine_id, engine_config, graph_desc);
 }
 
@@ -278,136 +288,6 @@ void Engine_plugin_resource_manager::execute_op_graph(
     plugin->execute_op_graph(
         handle, execution_context, workspace, device_buffers, num_device_buffers);
 }
-
-#if 0
-void Engine_plugin_resource_manager::finalize_engine(hipdnnBackendDescriptor_t desc) const
-{
-    assert(desc->type == HIPDNN_BACKEND_ENGINE_DESCRIPTOR);
-    auto engine_desc = static_cast<Engine_descriptor*>(desc);
-
-    engine_desc->finalize();
-
-    hipdnnBackendDescriptor_t graph;
-    engine_desc->get_attribute(
-        HIPDNN_ATTR_ENGINE_OPERATION_GRAPH, HIPDNN_TYPE_BACKEND_DESCRIPTOR, 1, nullptr, &graph);
-    auto graph_desc = static_cast<Graph_descriptor*>(graph);
-
-    int64_t engine_id;
-    engine_desc->get_attribute(
-        HIPDNN_ATTR_ENGINE_GLOBAL_INDEX, HIPDNN_TYPE_INT64, 1, nullptr, &engine_id);
-
-    auto engine_ids = get_applicable_engine_ids(graph_desc);
-    if(std::ranges::find(engine_ids, engine_id) == engine_ids.end())
-    {
-        throw Hipdnn_exception(HIPDNN_STATUS_BAD_PARAM,
-                               "Engine ID " + std::to_string(engine_id)
-                                   + " is not in a valid range of engine IDs");
-    }
-
-    // TODO: Get engine details
-    // This will be implemented at the integration stage
-}
-#endif
-
-#if 0
-void Engine_plugin_resource_manager::finalize_engine_config(hipdnnBackendDescriptor_t desc) const
-{
-    assert(desc->type == HIPDNN_BACKEND_ENGINECFG_DESCRIPTOR);
-    auto config_desc = static_cast<Engine_config_descriptor*>(desc);
-
-    config_desc->finalize();
-
-    hipdnnBackendDescriptor_t engine;
-    config_desc->get_attribute(
-        HIPDNN_ATTR_ENGINECFG_ENGINE, HIPDNN_TYPE_BACKEND_DESCRIPTOR, 1, nullptr, &engine);
-
-    int64_t engine_id;
-    engine->get_attribute(
-        HIPDNN_ATTR_ENGINE_GLOBAL_INDEX, HIPDNN_TYPE_INT64, 1, nullptr, &engine_id);
-
-    hipdnnBackendDescriptor_t graph;
-    engine->get_attribute(
-        HIPDNN_ATTR_ENGINE_OPERATION_GRAPH, HIPDNN_TYPE_BACKEND_DESCRIPTOR, 1, nullptr, &graph);
-    auto graph_desc = static_cast<Graph_descriptor*>(graph);
-
-    // TODO: Move to the engine config descriptor
-    // Now we have only one parameter in the engine config, but we will add more parameters later.
-    flatbuffers::FlatBufferBuilder builder;
-    auto engine_config = hipdnn_sdk::data_objects::CreateEngineConfig(builder, engine_id);
-    builder.Finish(engine_config);
-    hipdnnPluginConstData_t engine_config_data{builder.GetBufferPointer(), builder.GetSize()};
-
-    auto workspace_size = get_workspace_size(engine_id, &engine_config_data, graph_desc);
-    // TODO: Rename set_max_workspace_size() to set_workspace_size()
-    // TODO: Use size_t instead of int64_t for workspace size
-    // This will be implemented at the integration stage
-    config_desc->set_max_workspace_size(static_cast<int64_t>(workspace_size));
-}
-#endif
-
-#if 0
-void Engine_plugin_resource_manager::finalize_engine_heuristic(hipdnnBackendDescriptor_t desc) const
-{
-    assert(desc->type == HIPDNN_BACKEND_ENGINEHEUR_DESCRIPTOR);
-    auto heur_desc = static_cast<Engine_heuristic_descriptor*>(desc);
-
-    heur_desc->finalize();
-
-    hipdnnBackendDescriptor_t graph;
-    heur_desc->get_attribute(
-        HIPDNN_ATTR_ENGINEHEUR_OPERATION_GRAPH, HIPDNN_TYPE_BACKEND_DESCRIPTOR, 1, nullptr, &graph);
-    assert(graph != nullptr);
-    auto graph_desc = static_cast<Graph_descriptor*>(graph);
-
-    auto engine_ids = get_applicable_engine_ids(graph_desc);
-    heur_desc->set_engine_ids(engine_ids);
-
-    // TODO: Get engine details
-}
-#endif
-
-#if 0
-// NOLINTNEXTLINE (readability-convert-member-functions-to-static)
-void Engine_plugin_resource_manager::finalize_execution_plan(hipdnnBackendDescriptor_t desc) const
-{
-    assert(desc->type == HIPDNN_BACKEND_EXECUTION_PLAN_DESCRIPTOR);
-    auto exec_plan_desc = static_cast<Execution_plan_descriptor*>(desc);
-
-    exec_plan_desc->finalize();
-
-    hipdnnBackendDescriptor_t config;
-    exec_plan_desc->get_attribute(HIPDNN_ATTR_EXECUTION_PLAN_ENGINE_CONFIG,
-                                  HIPDNN_TYPE_BACKEND_DESCRIPTOR,
-                                  1,
-                                  nullptr,
-                                  &config);
-
-    hipdnnBackendDescriptor_t engine;
-    config->get_attribute(
-        HIPDNN_ATTR_ENGINECFG_ENGINE, HIPDNN_TYPE_BACKEND_DESCRIPTOR, 1, nullptr, &engine);
-
-    int64_t engine_id;
-    engine->get_attribute(
-        HIPDNN_ATTR_ENGINE_GLOBAL_INDEX, HIPDNN_TYPE_INT64, 1, nullptr, &engine_id);
-
-    hipdnnBackendDescriptor_t graph;
-    engine->get_attribute(
-        HIPDNN_ATTR_ENGINE_OPERATION_GRAPH, HIPDNN_TYPE_BACKEND_DESCRIPTOR, 1, nullptr, &graph);
-    auto graph_desc = static_cast<Graph_descriptor*>(graph);
-
-    // TODO: Move to the engine config descriptor
-    // Now we have only one parameter in the engine config, but we will add more parameters later.
-    flatbuffers::FlatBufferBuilder builder;
-    auto engine_config = hipdnn_sdk::data_objects::CreateEngineConfig(builder, engine_id);
-    builder.Finish(engine_config);
-    hipdnnPluginConstData_t engine_config_data{builder.GetBufferPointer(), builder.GetSize()};
-
-    // TODO: Get execution context
-    // This will be implemented at the integration stage
-    std::ignore = graph_desc;
-    std::ignore = engine_config_data;
-}
-#endif
 
 void Engine_plugin_resource_manager::execute_op_graph(hipdnnBackendDescriptor_t execution_plan,
                                                       hipdnnBackendDescriptor_t variant_pack) const
@@ -449,12 +329,8 @@ void Engine_plugin_resource_manager::execute_op_graph(hipdnnBackendDescriptor_t 
         device_buffers.push_back(buffer);
     }
 
-    // TODO: Get execution context from the execution plan
-    // This will be implemented at the integration stage
-    hipdnnEnginePluginExecutionContext_t execution_context = nullptr;
-
     execute_op_graph(engine_id,
-                     execution_context,
+                     execution_plan_desc->get_execution_context(),
                      workspace,
                      device_buffers.data(),
                      static_cast<uint32_t>(tensor_ids.size()));
@@ -463,12 +339,17 @@ void Engine_plugin_resource_manager::execute_op_graph(hipdnnBackendDescriptor_t 
 Engine_details_wrapper::Engine_details_wrapper(
     const std::shared_ptr<Engine_plugin_resource_manager>& rm,
     int64_t engine_id,
-    Graph_descriptor* graph_desc)
+    const Graph_descriptor* graph_desc)
     : _rm(rm)
 {
     _rm->get_engine_details(engine_id, graph_desc, &_engine_details_data);
     flatbuffers::Verifier verifier(static_cast<const uint8_t*>(_engine_details_data.ptr),
                                    _engine_details_data.size);
+    if(!verifier.VerifyBuffer<hipdnn_sdk::data_objects::EngineDetails>())
+    {
+        throw Hipdnn_exception(HIPDNN_STATUS_BAD_PARAM,
+                               "Engine_details_wrapper: unable to verify the flatbuffer schema.");
+    }
 }
 
 Engine_details_wrapper::~Engine_details_wrapper()
@@ -514,7 +395,7 @@ const hipdnn_sdk::data_objects::EngineDetails* Engine_details_wrapper::get() con
     if(_engine_details_data.ptr == nullptr)
     {
         throw Hipdnn_exception(HIPDNN_STATUS_INTERNAL_ERROR,
-                               "Wrong Engine_details_wrapper usage: "
+                               "Engine_details_wrapper: wrong usage: "
                                "get() called on an empty object");
     }
 
@@ -526,7 +407,7 @@ Engine_execution_context_wrapper::Engine_execution_context_wrapper(
     const std::shared_ptr<Engine_plugin_resource_manager>& rm,
     int64_t engine_id,
     const hipdnnPluginConstData_t* engine_config,
-    Graph_descriptor* graph_desc)
+    const Graph_descriptor* graph_desc)
     : _rm(rm)
     , _engine_id(engine_id)
 {
@@ -580,7 +461,7 @@ hipdnnEnginePluginExecutionContext_t Engine_execution_context_wrapper::get() con
     if(_execution_context == nullptr)
     {
         throw Hipdnn_exception(HIPDNN_STATUS_INTERNAL_ERROR,
-                               "Wrong Engine_execution_context_wrapper usage: "
+                               "Engine_execution_context_wrapper: wrong usage: "
                                "get() called on an empty object");
     }
 
@@ -588,4 +469,4 @@ hipdnnEnginePluginExecutionContext_t Engine_execution_context_wrapper::get() con
 }
 
 } // namespace plugin
-} // hipdnn_backend
+} // namespace hipdnn_backend

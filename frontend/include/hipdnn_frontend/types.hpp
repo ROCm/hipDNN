@@ -5,6 +5,8 @@
 #include <hipdnn_backend_heuristic_type.h>
 #include <hipdnn_sdk/data_objects/data_types_generated.h>
 #include <hipdnn_sdk/data_objects/pointwise_attributes_generated.h>
+#include <hipdnn_sdk/utilities/half_utils.hpp>
+#include <hipdnn_sdk/utilities/hip_bfloat16_utils.hpp>
 
 namespace hipdnn_frontend
 {
@@ -30,6 +32,39 @@ enum class HeurMode_t
 {
     FALLBACK,
 };
+
+template <typename T>
+DataType_t get_data_type_enum_from_type()
+{
+    if constexpr(std::is_same_v<T, float>)
+    {
+        return DataType_t::FLOAT;
+    }
+    else if constexpr(std::is_same_v<T, half>)
+    {
+        return DataType_t::HALF;
+    }
+    else if constexpr(std::is_same_v<T, hip_bfloat16>)
+    {
+        return DataType_t::BFLOAT16;
+    }
+    else if constexpr(std::is_same_v<T, double>)
+    {
+        return DataType_t::DOUBLE;
+    }
+    else if constexpr(std::is_same_v<T, uint8_t>)
+    {
+        return DataType_t::UINT8;
+    }
+    else if constexpr(std::is_same_v<T, int32_t>)
+    {
+        return DataType_t::INT32;
+    }
+    else
+    {
+        return DataType_t::NOT_SET;
+    }
+}
 
 [[maybe_unused]] static hipdnn_sdk::data_objects::DataType to_sdk_type(const DataType_t& type)
 {

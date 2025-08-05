@@ -14,7 +14,7 @@ if (BUILD_ADDRESS_SANITIZER)
         gfx942:xnack+    # MI300X (GPU)
     )
 
-    link_directories(${ROCM_LLVM_LIB_DIR}/clang/19/lib/linux)
+    link_directories(${ROCM_LLVM_LIB_DIR}/clang/20/lib/linux)
 
     # Define sanitizer flags as variables for reuse
     set(SANITIZER_COMPILE_FLAGS 

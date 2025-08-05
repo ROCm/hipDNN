@@ -31,6 +31,9 @@ struct Backend_descriptor_interface
 //NOLINTBEGIN(readability-identifier-naming)
 namespace hipdnn_backend
 {
+
+class Mock_descriptor_utility;
+
 template <typename T>
 class hipdnnBackendDescriptorImpl : public Backend_descriptor_interface
 {
@@ -168,5 +171,8 @@ struct hipdnnBackendDescriptor : public Backend_descriptor_interface
 
 private:
     std::shared_ptr<Backend_descriptor_interface> _impl;
+
+    // Give access to mock classes for testing purposes only.
+    friend class hipdnn_backend::Mock_descriptor_utility;
 };
 //NOLINTEND(readability-identifier-naming)

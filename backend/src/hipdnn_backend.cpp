@@ -11,7 +11,7 @@
 #include "helpers.hpp"
 #include "hipdnn_exception.hpp"
 #include "logging/logging.hpp"
-#include "plugin/plugin_manager.hpp"
+#include "plugin/engine_plugin_resource_manager.hpp"
 #include <hipdnn_sdk/logging/callback_types.h>
 
 #include <hipdnn_sdk/utilities/string_util.hpp>
@@ -151,10 +151,7 @@ HIPDNN_BACKEND_EXPORT hipdnnStatus_t hipdnnBackendExecute(hipdnnHandle_t handle,
         throw_if_invalid_descriptor(execution_plan);
         throw_if_invalid_descriptor(variant_pack);
 
-        // TODO : will change later
-        Plugin_manager plugin_manager;
-        plugin_manager.initialize();
-        plugin_manager.execute(handle, execution_plan, variant_pack);
+        handle->get_plugin_resource_manager()->execute_op_graph(execution_plan, variant_pack);
 
         LOG_API_SUCCESS(api_name, "");
     });
@@ -168,19 +165,6 @@ HIPDNN_BACKEND_EXPORT hipdnnStatus_t hipdnnBackendFinalize(hipdnnBackendDescript
         throw_if_invalid_descriptor(descriptor);
 
         descriptor->finalize();
-
-        if(descriptor->get_type() == HIPDNN_BACKEND_ENGINECFG_DESCRIPTOR)
-        {
-            Plugin_manager plugin_manager;
-            plugin_manager.initialize();
-            plugin_manager.finalize_engine_config(descriptor);
-        }
-        else if(descriptor->get_type() == HIPDNN_BACKEND_ENGINEHEUR_DESCRIPTOR)
-        {
-            Plugin_manager plugin_manager;
-            plugin_manager.initialize();
-            plugin_manager.finalize_engine_heuristic(descriptor);
-        }
 
         LOG_API_SUCCESS(api_name, "");
     });
@@ -299,4 +283,35 @@ HIPDNN_BACKEND_EXPORT void hipdnnGetLastErrorString(char* message, size_t max_si
 HIPDNN_BACKEND_EXPORT void hipdnnLoggingCallback_ext(hipdnnSeverity_t severity, const char* msg)
 {
     hipdnn_backend::logging::hipdnn_logging_callback(severity, msg);
+}
+
+HIPDNN_BACKEND_EXPORT hipdnnStatus_t hipdnnSetEnginePluginPaths_ext(
+    size_t num_paths, const char* const* plugin_paths, hipdnnPluginLoadingMode_ext_t loading_mode)
+{
+    LOG_API_ENTRY("num_paths={}, plugin_paths_ptr={:p}, loading_mode={}",
+                  num_paths,
+                  static_cast<const void*>(plugin_paths),
+                  hipdnn_backend::hipdnn_get_plugin_loading_mode_string(loading_mode));
+
+    return hipdnn_backend::try_catch([&, api_name = __func__] {
+        throw_if_null(plugin_paths);
+
+        std::vector<std::filesystem::path> paths_vec;
+        paths_vec.reserve(num_paths);
+
+        for(size_t i = 0; i < num_paths; ++i)
+        {
+            throw_if_null(plugin_paths[i]);
+            paths_vec.emplace_back(plugin_paths[i]);
+        }
+
+        hipdnn_backend::plugin::Engine_plugin_resource_manager::set_plugin_paths(paths_vec,
+                                                                                 loading_mode);
+
+        // TODO: automatic formatting loading mode to string
+        LOG_API_SUCCESS(api_name,
+                        "set_plugin_paths={}",
+                        hipdnn_backend::hipdnn_get_plugin_loading_mode_string(loading_mode));
+        return HIPDNN_STATUS_SUCCESS;
+    });
 }
