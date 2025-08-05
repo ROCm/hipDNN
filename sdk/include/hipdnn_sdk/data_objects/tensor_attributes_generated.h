@@ -18,6 +18,8 @@ static_assert(FLATBUFFERS_VERSION_MAJOR == 23 &&
 namespace hipdnn_sdk {
 namespace data_objects {
 
+struct TensorID;
+
 struct Float32Value;
 
 struct Float16Value;
@@ -32,6 +34,8 @@ struct TensorAttributes;
 struct TensorAttributesBuilder;
 struct TensorAttributesT;
 
+bool operator==(const TensorID &lhs, const TensorID &rhs);
+bool operator!=(const TensorID &lhs, const TensorID &rhs);
 bool operator==(const Float32Value &lhs, const Float32Value &rhs);
 bool operator!=(const Float32Value &lhs, const Float32Value &rhs);
 bool operator==(const Float16Value &lhs, const Float16Value &rhs);
@@ -247,6 +251,36 @@ inline bool operator!=(const TensorValueUnion &lhs, const TensorValueUnion &rhs)
 bool VerifyTensorValue(::flatbuffers::Verifier &verifier, const void *obj, TensorValue type);
 bool VerifyTensorValueVector(::flatbuffers::Verifier &verifier, const ::flatbuffers::Vector<::flatbuffers::Offset<void>> *values, const ::flatbuffers::Vector<uint8_t> *types);
 
+FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(8) TensorID FLATBUFFERS_FINAL_CLASS {
+ private:
+  int64_t value_;
+
+ public:
+  TensorID()
+      : value_(0) {
+  }
+  TensorID(int64_t _value)
+      : value_(::flatbuffers::EndianScalar(_value)) {
+  }
+  int64_t value() const {
+    return ::flatbuffers::EndianScalar(value_);
+  }
+  void mutate_value(int64_t _value) {
+    ::flatbuffers::WriteScalar(&value_, _value);
+  }
+};
+FLATBUFFERS_STRUCT_END(TensorID, 8);
+
+inline bool operator==(const TensorID &lhs, const TensorID &rhs) {
+  return
+      (lhs.value() == rhs.value());
+}
+
+inline bool operator!=(const TensorID &lhs, const TensorID &rhs) {
+    return !(lhs == rhs);
+}
+
+
 FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(4) Float32Value FLATBUFFERS_FINAL_CLASS {
  private:
   float value_;
@@ -399,7 +433,7 @@ inline bool operator!=(const Float64Value &lhs, const Float64Value &rhs) {
 
 struct TensorAttributesT : public ::flatbuffers::NativeTable {
   typedef TensorAttributes TableType;
-  int64_t uid = 0;
+  hipdnn_sdk::data_objects::TensorID uid{};
   std::string name{};
   hipdnn_sdk::data_objects::DataType data_type = hipdnn_sdk::data_objects::DataType_UNSET;
   std::vector<int64_t> strides{};
@@ -421,11 +455,11 @@ struct TensorAttributes FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
     VT_VALUE_TYPE = 16,
     VT_VALUE = 18
   };
-  int64_t uid() const {
-    return GetField<int64_t>(VT_UID, 0);
+  const hipdnn_sdk::data_objects::TensorID *uid() const {
+    return GetStruct<const hipdnn_sdk::data_objects::TensorID *>(VT_UID);
   }
-  bool mutate_uid(int64_t _uid = 0) {
-    return SetField<int64_t>(VT_UID, _uid, 0);
+  hipdnn_sdk::data_objects::TensorID *mutable_uid() {
+    return GetStruct<hipdnn_sdk::data_objects::TensorID *>(VT_UID);
   }
   const ::flatbuffers::String *name() const {
     return GetPointer<const ::flatbuffers::String *>(VT_NAME);
@@ -484,7 +518,7 @@ struct TensorAttributes FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
-           VerifyField<int64_t>(verifier, VT_UID, 8) &&
+           VerifyField<hipdnn_sdk::data_objects::TensorID>(verifier, VT_UID, 8) &&
            VerifyOffset(verifier, VT_NAME) &&
            verifier.VerifyString(name()) &&
            VerifyField<int8_t>(verifier, VT_DATA_TYPE, 1) &&
@@ -527,8 +561,8 @@ struct TensorAttributesBuilder {
   typedef TensorAttributes Table;
   ::flatbuffers::FlatBufferBuilder &fbb_;
   ::flatbuffers::uoffset_t start_;
-  void add_uid(int64_t uid) {
-    fbb_.AddElement<int64_t>(TensorAttributes::VT_UID, uid, 0);
+  void add_uid(const hipdnn_sdk::data_objects::TensorID *uid) {
+    fbb_.AddStruct(TensorAttributes::VT_UID, uid);
   }
   void add_name(::flatbuffers::Offset<::flatbuffers::String> name) {
     fbb_.AddOffset(TensorAttributes::VT_NAME, name);
@@ -564,7 +598,7 @@ struct TensorAttributesBuilder {
 
 inline ::flatbuffers::Offset<TensorAttributes> CreateTensorAttributes(
     ::flatbuffers::FlatBufferBuilder &_fbb,
-    int64_t uid = 0,
+    const hipdnn_sdk::data_objects::TensorID *uid = nullptr,
     ::flatbuffers::Offset<::flatbuffers::String> name = 0,
     hipdnn_sdk::data_objects::DataType data_type = hipdnn_sdk::data_objects::DataType_UNSET,
     ::flatbuffers::Offset<::flatbuffers::Vector<int64_t>> strides = 0,
@@ -573,11 +607,11 @@ inline ::flatbuffers::Offset<TensorAttributes> CreateTensorAttributes(
     hipdnn_sdk::data_objects::TensorValue value_type = hipdnn_sdk::data_objects::TensorValue_NONE,
     ::flatbuffers::Offset<void> value = 0) {
   TensorAttributesBuilder builder_(_fbb);
-  builder_.add_uid(uid);
   builder_.add_value(value);
   builder_.add_dims(dims);
   builder_.add_strides(strides);
   builder_.add_name(name);
+  builder_.add_uid(uid);
   builder_.add_value_type(value_type);
   builder_.add_virtual_(virtual_);
   builder_.add_data_type(data_type);
@@ -586,7 +620,7 @@ inline ::flatbuffers::Offset<TensorAttributes> CreateTensorAttributes(
 
 inline ::flatbuffers::Offset<TensorAttributes> CreateTensorAttributesDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
-    int64_t uid = 0,
+    const hipdnn_sdk::data_objects::TensorID *uid = nullptr,
     const char *name = nullptr,
     hipdnn_sdk::data_objects::DataType data_type = hipdnn_sdk::data_objects::DataType_UNSET,
     const std::vector<int64_t> *strides = nullptr,
@@ -637,7 +671,7 @@ inline TensorAttributesT *TensorAttributes::UnPack(const ::flatbuffers::resolver
 inline void TensorAttributes::UnPackTo(TensorAttributesT *_o, const ::flatbuffers::resolver_function_t *_resolver) const {
   (void)_o;
   (void)_resolver;
-  { auto _e = uid(); _o->uid = _e; }
+  { auto _e = uid(); if (_e) _o->uid = *_e; }
   { auto _e = name(); if (_e) _o->name = _e->str(); }
   { auto _e = data_type(); _o->data_type = _e; }
   { auto _e = strides(); if (_e) { _o->strides.resize(_e->size()); for (::flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->strides[_i] = _e->Get(_i); } } else { _o->strides.resize(0); } }
@@ -655,7 +689,7 @@ inline ::flatbuffers::Offset<TensorAttributes> CreateTensorAttributes(::flatbuff
   (void)_rehasher;
   (void)_o;
   struct _VectorArgs { ::flatbuffers::FlatBufferBuilder *__fbb; const TensorAttributesT* __o; const ::flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
-  auto _uid = _o->uid;
+  auto _uid = &_o->uid;
   auto _name = _o->name.empty() ? 0 : _fbb.CreateString(_o->name);
   auto _data_type = _o->data_type;
   auto _strides = _o->strides.size() ? _fbb.CreateVector(_o->strides) : 0;

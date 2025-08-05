@@ -3,15 +3,74 @@
 
 #pragma once
 
+#include "hipdnn_sdk/utilities/tensor.hpp"
+#include "tensor_attributes_generated.h"
 #include <hipdnn_sdk/data_objects/engine_config_generated.h>
 #include <hipdnn_sdk/data_objects/engine_details_generated.h>
 #include <hipdnn_sdk/data_objects/graph_generated.h>
 #include <hipdnn_sdk/plugin/plugin_api_data_types.h>
+#include <type_traits>
 
 namespace flatbuffer_test_utils
 {
 
 using namespace hipdnn_sdk::data_objects;
+namespace detail{
+
+    template<class T>
+    struct Tensor_id_ptr_to_value_impl{
+        using type = T;
+    };
+
+    template<class T>
+    using Tensor_id_ptr_to_value_t = typename Tensor_id_ptr_to_value_impl<T>::type; 
+
+    template<class T> requires (std::is_pointer_v<T> && 
+                                std::is_same_v<
+                                    std::remove_cvref_t<std::remove_pointer_t<T>>, 
+                                    TensorID>)
+    struct Tensor_id_ptr_to_value_impl<T>{                            
+        using type = hipdnn_sdk::data_objects::TensorID;
+    };    
+
+    using Type = Tensor_id_ptr_to_value_t<const TensorID*>;
+    using Type2 = std::remove_cv_t<std::remove_pointer_t<const TensorID*>>;
+
+    constexpr bool v = std::is_pointer_v<const TensorID*>;
+
+    template<class T>
+    auto& ptr_if_tensor_id(T& val){
+        return val;
+    }
+
+    template<class T> requires (std::is_same_v<std::remove_cv_t<T>, hipdnn_sdk::data_objects::TensorID>)
+    T* ptr_if_tensor_id<T>(T& val){
+        return val;
+    }
+
+    TensorID id = 1;
+    int v = 1;
+    auto ptr = ptr_if_tensor_id(id);
+    auto ptr2 = ptr_if_tensor_id(v);
+
+    template<class Ret, class ...Args>
+    auto call_with_tensor_ids(Ret (*func)(Args...),  Tensor_id_ptr_to_value_t<Args>... args){
+        return func(ptr_if_tensor_id(args)...);
+    }
+
+    template<class Ret, class ...Args>
+    class Call_with_tensor_ids{
+        Ret (*_f)(Args...);
+    public:
+        Call_with_tensor_ids(Ret (*f)(Args...)):_f(f){}
+
+        Ret operator()(Tensor_id_ptr_to_value_t<Args>... args){
+            return _f(ptr_if_tensor_id(args)...);
+        }
+    };
+}
+
+#define TEMP_TENSOR_ID_PTR(x) static_cast<hipdnn_sdk::data_objects::TensorID*>(detail::TempTensorIDPtr{x});
 
 inline flatbuffers::FlatBufferBuilder create_empty_valid_graph()
 {
@@ -37,15 +96,22 @@ inline flatbuffers::FlatBufferBuilder
                                  hipdnn_sdk::data_objects::DataType input_data_type
                                  = DataType_FLOAT)
 {
+    using hipdnn_sdk::data_objects::TensorID;
+
     flatbuffers::FlatBufferBuilder builder;
     std::vector<::flatbuffers::Offset<hipdnn_sdk::data_objects::TensorAttributes>>
         tensor_attributes;
 
     std::vector<int64_t> derived_strides = {1, strides[1], 1, 1};
     std::vector<int64_t> derived_dims = {1, dims[1], 1, 1};
+    TensorID tensor_id;
 
+    tensor_id.mutate_value(1);
     tensor_attributes.push_back(hipdnn_sdk::data_objects::CreateTensorAttributesDirect(
-        builder, 1, "x", input_data_type, &strides, &dims));
+        builder, &tensor_id, "x", input_data_type, &strides, &dims, false, hipdnn_sdk::data_objects::TensorValue_NONE, 0));
+
+    tensor_attributes.push_back(detail::Call_with_tensor_ids{hipdnn_sdk::data_objects::CreateTensorAttributesDirect}(
+        builder, TensorID{1}, "x", input_data_type, &strides, &dims, false, hipdnn_sdk::data_objects::TensorValue_NONE, 0));
 
     tensor_attributes.push_back(hipdnn_sdk::data_objects::CreateTensorAttributesDirect(
         builder, 2, "y", input_data_type, &strides, &dims));
