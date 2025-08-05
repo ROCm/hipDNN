@@ -3,11 +3,9 @@
 
 #pragma once
 
+#include "platform_utils.hpp"
 #include <filesystem>
 #include <string_view>
-#ifdef _WIN32
-#include <windows.h>
-#endif
 
 namespace hipdnn_backend
 {
@@ -17,8 +15,6 @@ namespace plugin
 class Shared_library
 {
 public:
-    static std::filesystem::path get_current_module_directory();
-
     Shared_library();
     explicit Shared_library(const std::filesystem::path& library_path);
     Shared_library(Shared_library&& other) noexcept;
@@ -50,11 +46,8 @@ public:
 
 private:
     std::filesystem::path _library_path;
-#ifdef _WIN32
-    HMODULE _library_handle;
-#elif defined(__linux__)
-    void* _library_handle;
-#endif
+
+    hipdnn_backend::platform_utils::Plugin_lib_handle _library_handle;
 };
 
 } // namespace plugin
