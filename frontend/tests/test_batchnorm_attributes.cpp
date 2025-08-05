@@ -283,22 +283,22 @@ TEST(BatchnormAttributesTests, PackAttributes)
     auto batchnorm_attributes_fb
         = flatbuffers::GetRoot<hipdnn_sdk::data_objects::BatchnormAttributes>(buffer);
 
-    EXPECT_EQ(batchnorm_attributes_fb->x_tid(), 1);
-    EXPECT_EQ(batchnorm_attributes_fb->y_tid(), 2);
-    EXPECT_EQ(batchnorm_attributes_fb->scale_tid(), 3);
-    EXPECT_EQ(batchnorm_attributes_fb->bias_tid(), 4);
-    EXPECT_EQ(batchnorm_attributes_fb->prev_running_mean_tid(), 5);
-    EXPECT_EQ(batchnorm_attributes_fb->prev_running_variance_tid(), 6);
-    EXPECT_EQ(batchnorm_attributes_fb->momentum_tid(), 7);
-    EXPECT_EQ(batchnorm_attributes_fb->mean_tid(), 8);
-    EXPECT_EQ(batchnorm_attributes_fb->inv_variance_tid(), 9);
-    EXPECT_EQ(batchnorm_attributes_fb->next_running_mean_tid(), 10);
-    EXPECT_EQ(batchnorm_attributes_fb->next_running_variance_tid(), 11);
-    EXPECT_EQ(batchnorm_attributes_fb->epsilon_tid(), 14);
+    EXPECT_EQ(batchnorm_attributes_fb->x_tensor_uid(), 1);
+    EXPECT_EQ(batchnorm_attributes_fb->y_tensor_uid(), 2);
+    EXPECT_EQ(batchnorm_attributes_fb->scale_tensor_uid(), 3);
+    EXPECT_EQ(batchnorm_attributes_fb->bias_tensor_uid(), 4);
+    EXPECT_EQ(batchnorm_attributes_fb->prev_running_mean_tensor_uid(), 5);
+    EXPECT_EQ(batchnorm_attributes_fb->prev_running_variance_tensor_uid(), 6);
+    EXPECT_EQ(batchnorm_attributes_fb->momentum_tensor_uid(), 7);
+    EXPECT_EQ(batchnorm_attributes_fb->mean_tensor_uid(), 8);
+    EXPECT_EQ(batchnorm_attributes_fb->inv_variance_tensor_uid(), 9);
+    EXPECT_EQ(batchnorm_attributes_fb->next_running_mean_tensor_uid(), 10);
+    EXPECT_EQ(batchnorm_attributes_fb->next_running_variance_tensor_uid(), 11);
+    EXPECT_EQ(batchnorm_attributes_fb->epsilon_tensor_uid(), 14);
 
-    ASSERT_EQ(batchnorm_attributes_fb->peer_stats_tid()->size(), 2);
-    EXPECT_EQ(batchnorm_attributes_fb->peer_stats_tid()->Get(0), 12);
-    EXPECT_EQ(batchnorm_attributes_fb->peer_stats_tid()->Get(1), 13);
+    ASSERT_EQ(batchnorm_attributes_fb->peer_stats_tensor_uid()->size(), 2);
+    EXPECT_EQ(batchnorm_attributes_fb->peer_stats_tensor_uid()->Get(0), 12);
+    EXPECT_EQ(batchnorm_attributes_fb->peer_stats_tensor_uid()->Get(1), 13);
 }
 
 TEST(BatchnormAttributesTests, PackAttributesWithoutOptionalValues)
@@ -333,19 +333,19 @@ TEST(BatchnormAttributesTests, PackAttributesWithoutOptionalValues)
     auto batchnorm_attributes_fb
         = flatbuffers::GetRoot<hipdnn_sdk::data_objects::BatchnormAttributes>(buffer);
 
-    EXPECT_EQ(batchnorm_attributes_fb->x_tid(), 1);
-    EXPECT_EQ(batchnorm_attributes_fb->y_tid(), 2);
-    EXPECT_EQ(batchnorm_attributes_fb->scale_tid(), 3);
-    EXPECT_EQ(batchnorm_attributes_fb->bias_tid(), 4);
-    EXPECT_EQ(batchnorm_attributes_fb->epsilon_tid(), 5);
+    EXPECT_EQ(batchnorm_attributes_fb->x_tensor_uid(), 1);
+    EXPECT_EQ(batchnorm_attributes_fb->y_tensor_uid(), 2);
+    EXPECT_EQ(batchnorm_attributes_fb->scale_tensor_uid(), 3);
+    EXPECT_EQ(batchnorm_attributes_fb->bias_tensor_uid(), 4);
+    EXPECT_EQ(batchnorm_attributes_fb->epsilon_tensor_uid(), 5);
 
-    EXPECT_EQ(batchnorm_attributes_fb->prev_running_mean_tid(), flatbuffers::nullopt);
-    EXPECT_EQ(batchnorm_attributes_fb->prev_running_variance_tid(), flatbuffers::nullopt);
-    EXPECT_EQ(batchnorm_attributes_fb->momentum_tid(), flatbuffers::nullopt);
-    EXPECT_EQ(batchnorm_attributes_fb->mean_tid(), flatbuffers::nullopt);
-    EXPECT_EQ(batchnorm_attributes_fb->inv_variance_tid(), flatbuffers::nullopt);
-    EXPECT_EQ(batchnorm_attributes_fb->next_running_mean_tid(), flatbuffers::nullopt);
-    EXPECT_EQ(batchnorm_attributes_fb->next_running_variance_tid(), flatbuffers::nullopt);
+    EXPECT_EQ(batchnorm_attributes_fb->prev_running_mean_tensor_uid(), flatbuffers::nullopt);
+    EXPECT_EQ(batchnorm_attributes_fb->prev_running_variance_tensor_uid(), flatbuffers::nullopt);
+    EXPECT_EQ(batchnorm_attributes_fb->momentum_tensor_uid(), flatbuffers::nullopt);
+    EXPECT_EQ(batchnorm_attributes_fb->mean_tensor_uid(), flatbuffers::nullopt);
+    EXPECT_EQ(batchnorm_attributes_fb->inv_variance_tensor_uid(), flatbuffers::nullopt);
+    EXPECT_EQ(batchnorm_attributes_fb->next_running_mean_tensor_uid(), flatbuffers::nullopt);
+    EXPECT_EQ(batchnorm_attributes_fb->next_running_variance_tensor_uid(), flatbuffers::nullopt);
 
-    ASSERT_EQ(batchnorm_attributes_fb->peer_stats_tid()->size(), 0);
+    ASSERT_EQ(batchnorm_attributes_fb->peer_stats_tensor_uid()->size(), 0);
 }

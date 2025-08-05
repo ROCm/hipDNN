@@ -12,9 +12,9 @@ table PointwiseAttributes {
     relu_lower_clip: float = null;
     relu_upper_clip: float = null;
     relu_lower_slope: float = null;
-    axis_tid: long = null;
-    in_0_tid: long;
-    in_1_tid: long = null;
-    in_2_tid: long = null;
-    out_0_tid: long;
+    axis_tensor_uid: long = null;
+    in_0_tensor_uid: long;
+    in_1_tensor_uid: long = null;
+    in_2_tensor_uid: long = null;
+    out_0_tensor_uid: long;
 }
