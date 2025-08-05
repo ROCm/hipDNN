@@ -10,9 +10,9 @@
 
 #include <hipdnn_frontend/attributes/tensor_attributes.hpp>
 #include <hipdnn_frontend/graph.hpp>
-#include <hipdnn_sdk/test_utilities/test_utilities.hpp>
 #include <hipdnn_sdk/test_utilities/cpu_fp_reference_implementation.hpp>
 #include <hipdnn_sdk/test_utilities/cpu_fp_reference_validation.hpp>
+#include <hipdnn_sdk/test_utilities/test_utilities.hpp>
 #include <hipdnn_sdk/utilities/migratable_memory.hpp>
 #include <hipdnn_sdk/utilities/tensor.hpp>
 
@@ -85,7 +85,7 @@ protected:
     void SetUp() override
     {
         SKIP_IF_NO_DEVICES();
-        
+
         // Uncomment if you want debug logging info.
         // setenv("HIPDNN_LOG_LEVEL", "info", 1);
 
