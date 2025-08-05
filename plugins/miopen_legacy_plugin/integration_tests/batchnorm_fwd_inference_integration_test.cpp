@@ -98,7 +98,7 @@ protected:
 
         // Create handle
         ASSERT_EQ(hipdnnCreate(&_handle), HIPDNN_STATUS_SUCCESS);
-        
+
         //todo: bring back stream support once MigratableMemory supports it
         //ASSERT_EQ(hipStreamCreate(&_stream), hipSuccess);
         //ASSERT_EQ(hipdnnSetStream(_handle, _stream), HIPDNN_STATUS_SUCCESS);

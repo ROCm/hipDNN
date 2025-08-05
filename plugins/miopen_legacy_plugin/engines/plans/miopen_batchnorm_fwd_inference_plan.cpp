@@ -77,7 +77,8 @@ void Batchnorm_fwd_inference_params::initialize_tensors(
 
     if(attributes.mean_tensor_uid().has_value())
     {
-        _est_mean_tensor_descriptor = create_tensor(tensor_map, attributes.mean_tensor_uid().value());
+        _est_mean_tensor_descriptor
+            = create_tensor(tensor_map, attributes.mean_tensor_uid().value());
     }
     if(attributes.inv_variance_tensor_uid().has_value())
     {

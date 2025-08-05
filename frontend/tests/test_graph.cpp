@@ -427,14 +427,16 @@ TEST_F(Graph_test_fixture, BuildAndSerializeBatchnormGraph)
     EXPECT_EQ(deserialized_batchnorm_attributes->scale_tensor_uid, scale->get_uid());
     EXPECT_EQ(deserialized_batchnorm_attributes->bias_tensor_uid, bias->get_uid());
     EXPECT_EQ(deserialized_batchnorm_attributes->epsilon_tensor_uid, epsilon->get_uid());
-    EXPECT_EQ(deserialized_batchnorm_attributes->prev_running_mean_tensor_uid, prev_running_mean->get_uid());
+    EXPECT_EQ(deserialized_batchnorm_attributes->prev_running_mean_tensor_uid,
+              prev_running_mean->get_uid());
     EXPECT_EQ(deserialized_batchnorm_attributes->prev_running_variance_tensor_uid,
               prev_running_variance->get_uid());
     EXPECT_EQ(deserialized_batchnorm_attributes->momentum_tensor_uid, momentum->get_uid());
     EXPECT_EQ(deserialized_batchnorm_attributes->y_tensor_uid, y->get_uid());
     EXPECT_EQ(deserialized_batchnorm_attributes->mean_tensor_uid, mean->get_uid());
     EXPECT_EQ(deserialized_batchnorm_attributes->inv_variance_tensor_uid, inv_variance->get_uid());
-    EXPECT_EQ(deserialized_batchnorm_attributes->next_running_mean_tensor_uid, next_running_mean->get_uid());
+    EXPECT_EQ(deserialized_batchnorm_attributes->next_running_mean_tensor_uid,
+              next_running_mean->get_uid());
     EXPECT_EQ(deserialized_batchnorm_attributes->next_running_variance_tensor_uid,
               next_running_variance->get_uid());
 }
@@ -535,14 +537,16 @@ TEST_F(Graph_test_fixture, BuildAndSerializeBatchnormAndPointwiseGraph)
     EXPECT_EQ(deserialized_batchnorm_attributes->scale_tensor_uid, scale->get_uid());
     EXPECT_EQ(deserialized_batchnorm_attributes->bias_tensor_uid, bias->get_uid());
     EXPECT_EQ(deserialized_batchnorm_attributes->epsilon_tensor_uid, epsilon->get_uid());
-    EXPECT_EQ(deserialized_batchnorm_attributes->prev_running_mean_tensor_uid, prev_running_mean->get_uid());
+    EXPECT_EQ(deserialized_batchnorm_attributes->prev_running_mean_tensor_uid,
+              prev_running_mean->get_uid());
     EXPECT_EQ(deserialized_batchnorm_attributes->prev_running_variance_tensor_uid,
               prev_running_variance->get_uid());
     EXPECT_EQ(deserialized_batchnorm_attributes->momentum_tensor_uid, momentum->get_uid());
     EXPECT_EQ(deserialized_batchnorm_attributes->y_tensor_uid, y->get_uid());
     EXPECT_EQ(deserialized_batchnorm_attributes->mean_tensor_uid, mean->get_uid());
     EXPECT_EQ(deserialized_batchnorm_attributes->inv_variance_tensor_uid, inv_variance->get_uid());
-    EXPECT_EQ(deserialized_batchnorm_attributes->next_running_mean_tensor_uid, next_running_mean->get_uid());
+    EXPECT_EQ(deserialized_batchnorm_attributes->next_running_mean_tensor_uid,
+              next_running_mean->get_uid());
     EXPECT_EQ(deserialized_batchnorm_attributes->next_running_variance_tensor_uid,
               next_running_variance->get_uid());
 
