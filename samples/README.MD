@@ -24,7 +24,7 @@ All samples are templated for mixed-precision execution with fp32, fp16, and bfp
         where `y` would then be propogated as input to the subsequent layer.
 *   **`bn_training`** (`batchnorm/bn_training.cpp`): Executes the forward pass of a batch normalization training graph on a 4D input tensor.
     *   For an input `x` of shape `(N, C, H, W)`, the mean and variance are calculated over the `N`, `H`, and `W` dimensions for each of the `C` channels or mini-batches, resulting in a `batch_mean` and `batch_variance` of shape `(1, C, 1, 1)`. It then transforms the input and updates the running statistics:
-        ```python3
+        ```
         y = gamma * (x - batch_mean) / sqrt(batch_variance + eps) + beta
         running_mean = (1 - momentum) * running_mean + momentum * batch_mean
         running_variance = (1 - momentum) * running_variance + momentum * batch_variance
