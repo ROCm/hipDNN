@@ -10,10 +10,9 @@ hipDNN.  At the time of writing this readme, the following bare minimum system d
     - hip-devel
 - Python3
 - Cmake 3.25.2 or later
-- Ninja 1.12.1 or later
-    - Ninja is the default build system for hipDNN.
-    - If you dont set the environment variable `CMAKE_GENERATOR` to `Ninja`, cmake will default to using make.
-- 
+- Ninja 1.12.1 or later (Optional)
+    - Ninja is the preferred build system for hipDNN
+    - Cmake will default to using make unless you set CMAKE_GENERATOR to Ninja. This environment variable is already set in the development docker containers
 
 
 ## 3rdParty Dependencies

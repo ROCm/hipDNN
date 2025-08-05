@@ -70,19 +70,19 @@ void Batchnorm_fwd_inference_params::initialize_tensors(
     const std::unordered_map<int64_t, const hipdnn_sdk::data_objects::TensorAttributes*>&
         tensor_map)
 {
-    _x_pair = create_tensor(tensor_map, attributes.x());
-    _y_pair = create_tensor(tensor_map, attributes.y());
-    _scale_pair = create_tensor(tensor_map, attributes.scale());
-    _bias_pair = create_tensor(tensor_map, attributes.bias());
+    _x_pair = create_tensor(tensor_map, attributes.x_tid());
+    _y_pair = create_tensor(tensor_map, attributes.y_tid());
+    _scale_pair = create_tensor(tensor_map, attributes.scale_tid());
+    _bias_pair = create_tensor(tensor_map, attributes.bias_tid());
 
-    if(attributes.mean().has_value())
+    if(attributes.mean_tid().has_value())
     {
-        _est_mean_tensor_descriptor = create_tensor(tensor_map, attributes.mean().value());
+        _est_mean_tensor_descriptor = create_tensor(tensor_map, attributes.mean_tid().value());
     }
-    if(attributes.inv_variance().has_value())
+    if(attributes.inv_variance_tid().has_value())
     {
         _est_variance_tensor_descriptor
-            = create_tensor(tensor_map, attributes.inv_variance().value());
+            = create_tensor(tensor_map, attributes.inv_variance_tid().value());
     }
 }
 
