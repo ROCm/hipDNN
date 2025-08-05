@@ -34,7 +34,7 @@ void run_bn_backward(hipdnnHandle_t handle)
     dy->set_uid(uid++);
     auto x = create_tensor({4, 32, 16, 16}, input_type);
     x->set_uid(uid++);
-    auto scale = create_tensor({1, 32, 1, 1}, intermediate_type);
+    auto scale = create_tensor({4, 32, 16, 16}, intermediate_type);
     scale->set_uid(uid++);
     auto saved_mean = create_tensor({1, 32, 1, 1}, intermediate_type);
     saved_mean->set_uid(uid++);

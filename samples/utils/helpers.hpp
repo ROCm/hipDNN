@@ -2,10 +2,12 @@
 // SPDX-License-Identifier:  MIT
 #pragma once
 
-#include <algorithm>
 #include <hip/hip_runtime.h>
 #include <hipdnn_backend.h>
 #include <hipdnn_frontend.hpp>
+#include <hipdnn_sdk/utilities/shape_utils.hpp>
+
+#include <algorithm>
 #include <iostream>
 #include <memory>
 #include <numeric>
@@ -52,16 +54,10 @@ inline std::shared_ptr<hipdnn_frontend::graph::Tensor_attributes>
     auto tensor = std::make_shared<hipdnn_frontend::graph::Tensor_attributes>();
     tensor->set_dim(dims).set_data_type(data_type);
 
-    std::vector<int64_t> strides(dims.size());
-    if(!dims.empty())
-    {
-        strides.back() = 1;
-        for(int i = dims.size() - 2; i >= 0; --i)
-        {
-            strides[i] = strides[i + 1] * dims[i + 1];
-        }
-    }
-    tensor->set_stride(strides);
+    std::vector<int64_t> stride_order(dims.size());
+    std::iota(stride_order.rbegin(), stride_order.rend(), 0);
+
+    tensor->set_stride(hipdnn_sdk::utilities::generate_strides(dims, stride_order));
     return tensor;
 }
 
