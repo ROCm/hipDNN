@@ -30,25 +30,25 @@ void run_bn_inference(hipdnnHandle_t handle)
         .set_compute_data_type(intermediate_type);
 
     int64_t uid = 1;
-    auto x = create_tensor({4, 32, 16, 16}, input_type);
+    auto x = create_tensor({16, 16, 16, 16}, input_type);
     x->set_uid(uid++);
 
-    auto scale = create_tensor({1, 32, 1, 1}, intermediate_type);
-    scale->set_uid(uid++);
+    auto gamma = create_tensor({1, 16, 1, 1}, intermediate_type);
+    gamma->set_uid(uid++);
 
-    auto bias = create_tensor({1, 32, 1, 1}, intermediate_type);
-    bias->set_uid(uid++);
+    auto beta = create_tensor({1, 16, 1, 1}, intermediate_type);
+    beta->set_uid(uid++);
 
-    auto mean = create_tensor({1, 32, 1, 1}, intermediate_type);
+    auto mean = create_tensor({1, 16, 1, 1}, intermediate_type);
     mean->set_uid(uid++);
 
-    auto inv_variance = create_tensor({1, 32, 1, 1}, intermediate_type);
+    auto inv_variance = create_tensor({1, 16, 1, 1}, intermediate_type);
     inv_variance->set_uid(uid++);
 
     auto bn_attributes = graph::Batchnorm_inference_attributes();
     bn_attributes.name = "bn_inference_node";
 
-    auto y = graph->batchnorm_inference(x, mean, inv_variance, scale, bias, bn_attributes);
+    auto y = graph->batchnorm_inference(x, mean, inv_variance, gamma, beta, bn_attributes);
     y->set_output(true).set_data_type(input_type);
 
     if(!y->has_uid())
@@ -72,8 +72,8 @@ void run_bn_inference(hipdnnHandle_t handle)
     std::cout << "Plans build successful.\n";
 
     auto x_tensor = Tensor::make_nchw_tensor<InputType>({4, 32, 16, 16});
-    auto scale_tensor = Tensor::make_nchw_tensor<IntermediateType>({1, 32, 1, 1});
-    auto bias_tensor = Tensor::make_nchw_tensor<IntermediateType>({1, 32, 1, 1});
+    auto gamma_tensor = Tensor::make_nchw_tensor<IntermediateType>({1, 32, 1, 1});
+    auto beta_tensor = Tensor::make_nchw_tensor<IntermediateType>({1, 32, 1, 1});
     auto mean_tensor = Tensor::make_nchw_tensor<IntermediateType>({1, 32, 1, 1});
     auto inv_variance_tensor = Tensor::make_nchw_tensor<IntermediateType>({1, 32, 1, 1});
     auto y_tensor = Tensor::make_nchw_tensor<InputType>({4, 32, 16, 16});
@@ -82,11 +82,11 @@ void run_bn_inference(hipdnnHandle_t handle)
                                                          static_cast<InputType>(1.0f));
     x_tensor.memory().mark_host_modified();
 
-    scale_tensor.template fill_with_value<IntermediateType>(static_cast<IntermediateType>(1.0f));
-    scale_tensor.memory().mark_host_modified();
+    gamma_tensor.template fill_with_value<IntermediateType>(static_cast<IntermediateType>(1.0f));
+    gamma_tensor.memory().mark_host_modified();
 
-    bias_tensor.template fill_with_value<IntermediateType>(static_cast<IntermediateType>(0.0f));
-    bias_tensor.memory().mark_host_modified();
+    beta_tensor.template fill_with_value<IntermediateType>(static_cast<IntermediateType>(0.0f));
+    beta_tensor.memory().mark_host_modified();
 
     mean_tensor.template fill_with_value<IntermediateType>(static_cast<IntermediateType>(0.5f));
     mean_tensor.memory().mark_host_modified();
@@ -97,8 +97,8 @@ void run_bn_inference(hipdnnHandle_t handle)
 
     std::unordered_map<int64_t, void*> variant_pack;
     variant_pack[x->get_uid()] = x_tensor.memory().template device_data<void>();
-    variant_pack[scale->get_uid()] = scale_tensor.memory().template device_data<void>();
-    variant_pack[bias->get_uid()] = bias_tensor.memory().template device_data<void>();
+    variant_pack[gamma->get_uid()] = gamma_tensor.memory().template device_data<void>();
+    variant_pack[beta->get_uid()] = beta_tensor.memory().template device_data<void>();
     variant_pack[mean->get_uid()] = mean_tensor.memory().template device_data<void>();
     variant_pack[inv_variance->get_uid()]
         = inv_variance_tensor.memory().template device_data<void>();
@@ -121,7 +121,7 @@ void run_bn_inference(hipdnnHandle_t handle)
 
 int main()
 {
-    hipdnn_frontend::initialize_frontend_logging(hipdnnLoggingCallback_ext);
+    initialize_frontend_logging(hipdnnLoggingCallback_ext);
 
     hipdnnHandle_t handle;
     HIPDNN_CHECK(hipdnnCreate(&handle));

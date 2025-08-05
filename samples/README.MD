@@ -17,13 +17,13 @@
 All samples are templated for mixed-precision execution with fp32, fp16, and bfp16 input/output data types, with fp32 intermediate accumulation. If desired, set `HIPDNN_LOG_LEVEL=info` environment variable to observe the detailed logs from the samples. The sample operations are:
 
 *   **`bn_inference`** (`batchnorm/bn_inference.cpp`): Executes a single-node batch normalization inference graph.
-    *   It normalizes each dimension of the input tensor `x` using the mean and inv_variance **population** statistics, and then scales the result by learned gamma and beta parameters. At a high-level, it computes the following linear transformation:
+    *   It normalizes each dimension of the input tensor `x` using the mean and inv_variance population statistics, and then scales the result by learned gamma and beta parameters. At a high-level, it computes the following linear transformation:
         ```
         y = gamma * (x - mean) * inv_variance + beta
         ```
-        where `y` is propogated to the subsequent layer.
+        where `y` would then be propogated to the subsequent layer.
 *   **`bn_training`** (`batchnorm/bn_training.cpp`): Executes the forward pass of a batch normalization training graph.
-    *   For each input dimension, it computes the mean and inverse variance of the **mini-batch**. It then transforms the input and updates the running statistics:
+    *   For each input dimension, it computes the mean and inverse variance of the mini-batch. It then transforms the input and updates the running statistics:
         ```
         y = gamma * (x - mean) * inv_variance + beta
         running_mean = (1 - momentum) * running_mean + momentum * mean
@@ -39,4 +39,4 @@ All samples are templated for mixed-precision execution with fp32, fp16, and bfp
         d_scale = sum(dy * x_hat)
         d_x = gamma * saved_inv_variance * (dy - (d_bias / m) - (x_hat * d_scale / m))
         ```
-        where `m` is the size of the mini-batch, `d_x` is outputted and passed to the preceding layer, and `d_scale` and `d_bias` and a learning rate are used to update the learnable parameters `gamma` and `beta`.
+        where `m` is the size of the mini-batch, `d_x` would be passed to the preceding layer, and `d_scale` and `d_bias` can be used by an optimizer to update the learnable parameters `gamma` and `beta`.

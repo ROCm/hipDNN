@@ -30,25 +30,25 @@ void run_bn_backward(hipdnnHandle_t handle)
         .set_compute_data_type(intermediate_type);
 
     int64_t uid = 1;
-    auto dy = create_tensor({4, 32, 16, 16}, input_type);
+    auto dy = create_tensor({16, 16, 16, 16}, input_type);
     dy->set_uid(uid++);
-    auto x = create_tensor({4, 32, 16, 16}, input_type);
+    auto x = create_tensor({16, 16, 16, 16}, input_type);
     x->set_uid(uid++);
-    auto scale = create_tensor({4, 32, 16, 16}, intermediate_type);
-    scale->set_uid(uid++);
-    auto saved_mean = create_tensor({1, 32, 1, 1}, intermediate_type);
+    auto gamma = create_tensor({1, 16, 1, 1}, intermediate_type);
+    gamma->set_uid(uid++);
+    auto saved_mean = create_tensor({1, 16, 1, 1}, intermediate_type);
     saved_mean->set_uid(uid++);
-    auto saved_inv_variance = create_tensor({1, 32, 1, 1}, intermediate_type);
+    auto saved_inv_variance = create_tensor({1, 16, 1, 1}, intermediate_type);
     saved_inv_variance->set_uid(uid++);
 
     auto bn_bwd_attributes = graph::Batchnorm_backward_attributes();
     bn_bwd_attributes.set_saved_mean_and_inv_variance(saved_mean, saved_inv_variance);
 
-    auto [dx, dscale, dbias] = graph->batchnorm_backward(dy, x, scale, bn_bwd_attributes);
+    auto [dx, dgamma, dbeta] = graph->batchnorm_backward(dy, x, gamma, bn_bwd_attributes);
 
     dx->set_output(true).set_uid(uid++);
-    dscale->set_output(true).set_uid(uid++);
-    dbias->set_output(true).set_uid(uid++);
+    dgamma->set_output(true).set_uid(uid++);
+    dbeta->set_output(true).set_uid(uid++);
 
     HIPDNN_FE_CHECK(graph->validate());
     std::cout << "Graph validation successful.\n";
@@ -67,14 +67,14 @@ void run_bn_backward(hipdnnHandle_t handle)
 
     auto dy_tensor = Tensor::make_nchw_tensor<InputType>(dy->get_dim());
     auto x_tensor = Tensor::make_nchw_tensor<InputType>(x->get_dim());
-    auto scale_tensor = Tensor::make_nchw_tensor<IntermediateType>(scale->get_dim());
+    auto gamma_tensor = Tensor::make_nchw_tensor<IntermediateType>(gamma->get_dim());
     auto saved_mean_tensor = Tensor::make_nchw_tensor<IntermediateType>(saved_mean->get_dim());
     auto saved_inv_var_tensor
         = Tensor::make_nchw_tensor<IntermediateType>(saved_inv_variance->get_dim());
 
     auto dx_tensor = Tensor::make_nchw_tensor<InputType>(dx->get_dim());
-    auto dscale_tensor = Tensor::make_nchw_tensor<IntermediateType>(dscale->get_dim());
-    auto dbias_tensor = Tensor::make_nchw_tensor<IntermediateType>(dbias->get_dim());
+    auto dgamma_tensor = Tensor::make_nchw_tensor<IntermediateType>(dgamma->get_dim());
+    auto dbeta_tensor = Tensor::make_nchw_tensor<IntermediateType>(dbeta->get_dim());
 
     dy_tensor.template fill_with_random_values<InputType>(static_cast<InputType>(0.0f),
                                                           static_cast<InputType>(1.0f));
@@ -82,9 +82,9 @@ void run_bn_backward(hipdnnHandle_t handle)
     x_tensor.template fill_with_random_values<InputType>(static_cast<InputType>(0.0f),
                                                          static_cast<InputType>(1.0f));
     x_tensor.memory().mark_host_modified();
-    scale_tensor.template fill_with_random_values<IntermediateType>(
+    gamma_tensor.template fill_with_random_values<IntermediateType>(
         static_cast<IntermediateType>(0.0f), static_cast<IntermediateType>(1.0f));
-    scale_tensor.memory().mark_host_modified();
+    gamma_tensor.memory().mark_host_modified();
     saved_mean_tensor.template fill_with_random_values<IntermediateType>(
         static_cast<IntermediateType>(0.0f), static_cast<IntermediateType>(1.0f));
     saved_mean_tensor.memory().mark_host_modified();
@@ -95,13 +95,13 @@ void run_bn_backward(hipdnnHandle_t handle)
     std::unordered_map<int64_t, void*> variant_pack;
     variant_pack[dy->get_uid()] = dy_tensor.memory().template device_data<void>();
     variant_pack[x->get_uid()] = x_tensor.memory().template device_data<void>();
-    variant_pack[scale->get_uid()] = scale_tensor.memory().template device_data<void>();
+    variant_pack[gamma->get_uid()] = gamma_tensor.memory().template device_data<void>();
     variant_pack[saved_mean->get_uid()] = saved_mean_tensor.memory().template device_data<void>();
     variant_pack[saved_inv_variance->get_uid()]
         = saved_inv_var_tensor.memory().template device_data<void>();
     variant_pack[dx->get_uid()] = dx_tensor.memory().template device_data<void>();
-    variant_pack[dscale->get_uid()] = dscale_tensor.memory().template device_data<void>();
-    variant_pack[dbias->get_uid()] = dbias_tensor.memory().template device_data<void>();
+    variant_pack[dgamma->get_uid()] = dgamma_tensor.memory().template device_data<void>();
+    variant_pack[dbeta->get_uid()] = dbeta_tensor.memory().template device_data<void>();
 
     HIPDNN_FE_CHECK(graph->execute(handle, variant_pack, nullptr));
 
@@ -119,7 +119,7 @@ void run_bn_backward(hipdnnHandle_t handle)
 
 int main()
 {
-    hipdnn_frontend::initialize_frontend_logging(hipdnnLoggingCallback_ext);
+    initialize_frontend_logging(hipdnnLoggingCallback_ext);
 
     hipdnnHandle_t handle;
     HIPDNN_CHECK(hipdnnCreate(&handle));

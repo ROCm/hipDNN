@@ -30,15 +30,15 @@ void run_bn_training(hipdnnHandle_t handle)
         .set_compute_data_type(intermediate_type);
 
     int64_t uid = 1;
-    auto x = create_tensor({4, 32, 16, 16}, input_type);
+    auto x = create_tensor({16, 16, 16, 16}, input_type);
     x->set_uid(uid++);
-    auto scale = create_tensor({1, 32, 1, 1}, intermediate_type);
-    scale->set_uid(uid++);
-    auto bias = create_tensor({1, 32, 1, 1}, intermediate_type);
-    bias->set_uid(uid++);
-    auto prev_running_mean = create_tensor({1, 32, 1, 1}, intermediate_type);
+    auto gamma = create_tensor({1, 16, 1, 1}, intermediate_type);
+    gamma->set_uid(uid++);
+    auto beta = create_tensor({1, 16, 1, 1}, intermediate_type);
+    beta->set_uid(uid++);
+    auto prev_running_mean = create_tensor({1, 16, 1, 1}, intermediate_type);
     prev_running_mean->set_uid(uid++);
-    auto prev_running_var = create_tensor({1, 32, 1, 1}, intermediate_type);
+    auto prev_running_var = create_tensor({1, 16, 1, 1}, intermediate_type);
     prev_running_var->set_uid(uid++);
     auto momentum = create_tensor({1, 1, 1, 1}, intermediate_type);
     momentum->set_uid(uid++);
@@ -50,7 +50,7 @@ void run_bn_training(hipdnnHandle_t handle)
         .set_epsilon(epsilon);
 
     auto [y, next_running_mean, next_running_var, saved_mean, saved_inv_variance]
-        = graph->batchnorm(x, scale, bias, bn_attributes);
+        = graph->batchnorm(x, gamma, beta, bn_attributes);
 
     y->set_output(true).set_uid(uid++);
     next_running_mean->set_output(true).set_uid(uid++);
@@ -74,8 +74,8 @@ void run_bn_training(hipdnnHandle_t handle)
     std::cout << "Plans build successful.\n";
 
     auto x_tensor = Tensor::make_nchw_tensor<InputType>(x->get_dim());
-    auto scale_tensor = Tensor::make_nchw_tensor<IntermediateType>(scale->get_dim());
-    auto bias_tensor = Tensor::make_nchw_tensor<IntermediateType>(bias->get_dim());
+    auto gamma_tensor = Tensor::make_nchw_tensor<IntermediateType>(gamma->get_dim());
+    auto beta_tensor = Tensor::make_nchw_tensor<IntermediateType>(beta->get_dim());
     auto prev_mean_tensor
         = Tensor::make_nchw_tensor<IntermediateType>(prev_running_mean->get_dim());
     auto prev_var_tensor = Tensor::make_nchw_tensor<IntermediateType>(prev_running_var->get_dim());
@@ -93,12 +93,12 @@ void run_bn_training(hipdnnHandle_t handle)
     x_tensor.template fill_with_random_values<InputType>(static_cast<InputType>(0.0f),
                                                          static_cast<InputType>(1.0f));
     x_tensor.memory().mark_host_modified();
-    scale_tensor.template fill_with_random_values<IntermediateType>(
+    gamma_tensor.template fill_with_random_values<IntermediateType>(
         static_cast<IntermediateType>(0.0f), static_cast<IntermediateType>(1.0f));
-    scale_tensor.memory().mark_host_modified();
-    bias_tensor.template fill_with_random_values<IntermediateType>(
+    gamma_tensor.memory().mark_host_modified();
+    beta_tensor.template fill_with_random_values<IntermediateType>(
         static_cast<IntermediateType>(0.0f), static_cast<IntermediateType>(1.0f));
-    bias_tensor.memory().mark_host_modified();
+    beta_tensor.memory().mark_host_modified();
     prev_mean_tensor.template fill_with_random_values<IntermediateType>(
         static_cast<IntermediateType>(0.0f), static_cast<IntermediateType>(1.0f));
     prev_mean_tensor.memory().mark_host_modified();
@@ -113,8 +113,8 @@ void run_bn_training(hipdnnHandle_t handle)
 
     std::unordered_map<int64_t, void*> variant_pack;
     variant_pack[x->get_uid()] = x_tensor.memory().template device_data<void>();
-    variant_pack[scale->get_uid()] = scale_tensor.memory().template device_data<void>();
-    variant_pack[bias->get_uid()] = bias_tensor.memory().template device_data<void>();
+    variant_pack[gamma->get_uid()] = gamma_tensor.memory().template device_data<void>();
+    variant_pack[beta->get_uid()] = beta_tensor.memory().template device_data<void>();
     variant_pack[prev_running_mean->get_uid()]
         = prev_mean_tensor.memory().template device_data<void>();
     variant_pack[prev_running_var->get_uid()]
@@ -146,7 +146,7 @@ void run_bn_training(hipdnnHandle_t handle)
 
 int main()
 {
-    hipdnn_frontend::initialize_frontend_logging(hipdnnLoggingCallback_ext);
+    initialize_frontend_logging(hipdnnLoggingCallback_ext);
 
     hipdnnHandle_t handle;
     HIPDNN_CHECK(hipdnnCreate(&handle));
