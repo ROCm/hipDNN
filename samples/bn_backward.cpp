@@ -4,61 +4,154 @@
 #include "utils/helpers.hpp"
 
 #include <hip/hip_runtime.h>
+#include <hipdnn_backend.h>
 #include <hipdnn_frontend.hpp>
 #include <hipdnn_frontend/attributes/batchnorm_backward_attributes.hpp>
 #include <hipdnn_frontend/graph.hpp>
+#include <hipdnn_sdk/utilities/tensor.hpp>
 
 #include <iostream>
+#include <random>
+#include <string>
+#include <unordered_map>
 
-int main()
+using namespace hipdnn_frontend;
+using namespace hipdnn_sdk::utilities;
+
+template <typename T>
+inline DataType_t get_data_type();
+
+template <>
+inline DataType_t get_data_type<float>()
 {
-    std::cout << "Running Batch Norm Backward fp32..." << std::endl;
+    return DataType_t::FLOAT;
+}
 
-    using namespace hipdnn_frontend;
+template <>
+inline DataType_t get_data_type<half>()
+{
+    return DataType_t::HALF;
+}
+
+template <>
+inline DataType_t get_data_type<hip_bfloat16>()
+{
+    return DataType_t::BFLOAT16;
+}
+
+template <typename InputType, typename IntermediateType>
+void run_bn_backward(hipdnnHandle_t handle, const std::string& type_string)
+{
+    std::cout << "Running Batch Norm Backward " << type_string << "..." << std::endl;
 
     auto graph = std::make_shared<graph::Graph>();
-    graph->set_io_data_type(DataType_t::FLOAT)
-        .set_intermediate_data_type(DataType_t::FLOAT)
-        .set_compute_data_type(DataType_t::FLOAT);
+    graph->set_io_data_type(get_data_type<InputType>())
+        .set_intermediate_data_type(get_data_type<IntermediateType>())
+        .set_compute_data_type(get_data_type<IntermediateType>());
 
-    auto dy = create_tensor({4, 32, 16, 16}, DataType_t::FLOAT);
-    auto x = create_tensor({4, 32, 16, 16}, DataType_t::FLOAT);
-    auto scale = create_tensor({1, 32, 1, 1}, DataType_t::FLOAT);
-    auto saved_mean = create_tensor({1, 32, 1, 1}, DataType_t::FLOAT);
-    auto saved_inv_variance = create_tensor({1, 32, 1, 1}, DataType_t::FLOAT);
+    int64_t uid = 1;
+    auto dy = create_tensor({4, 32, 16, 16}, get_data_type<InputType>());
+    dy->set_uid(uid++);
+    auto x = create_tensor({4, 32, 16, 16}, get_data_type<InputType>());
+    x->set_uid(uid++);
+    auto scale = create_tensor({1, 32, 1, 1}, get_data_type<IntermediateType>());
+    scale->set_uid(uid++);
+    auto saved_mean = create_tensor({1, 32, 1, 1}, get_data_type<IntermediateType>());
+    saved_mean->set_uid(uid++);
+    auto saved_inv_variance = create_tensor({1, 32, 1, 1}, get_data_type<IntermediateType>());
+    saved_inv_variance->set_uid(uid++);
 
     auto bn_bwd_attributes = graph::Batchnorm_backward_attributes();
     bn_bwd_attributes.set_saved_mean_and_inv_variance(saved_mean, saved_inv_variance);
 
     auto [dx, dscale, dbias] = graph->batchnorm_backward(dy, x, scale, bn_bwd_attributes);
 
-    dx->set_output(true);
-    dscale->set_output(true);
-    dbias->set_output(true);
+    dx->set_output(true).set_uid(uid++);
+    dscale->set_output(true).set_uid(uid++);
+    dbias->set_output(true).set_uid(uid++);
 
     HIPDNN_FE_CHECK(graph->validate());
     std::cout << "Graph validation successful." << std::endl;
 
-    HIPDNN_FE_CHECK(graph->build_operation_graph());
+    HIPDNN_FE_CHECK(graph->build_operation_graph(handle));
     std::cout << "Operation graph build successful." << std::endl;
 
-    Surface<float> dy_surface(get_tensor_element_count(dy));
-    Surface<float> x_surface(get_tensor_element_count(x));
-    Surface<float> scale_surface(get_tensor_element_count(scale), 1.0f);
-    Surface<float> saved_mean_surface(get_tensor_element_count(saved_mean));
-    Surface<float> saved_inv_var_surface(get_tensor_element_count(saved_inv_variance));
+    HIPDNN_FE_CHECK(graph->create_execution_plans(handle));
+    std::cout << "Execution plans created successfully." << std::endl;
 
-    Surface<float> dx_surface(get_tensor_element_count(dx));
-    Surface<float> dscale_surface(get_tensor_element_count(dscale));
-    Surface<float> dbias_surface(get_tensor_element_count(dbias));
+    HIPDNN_FE_CHECK(graph->check_support());
+    std::cout << "Graph support check successful." << std::endl;
 
-    /*
-    // need to properly create a variant pack with the input tensors
-    
-    auto execution_result = graph->execute(variant_pack);
-    HIPDNN_FE_CHECK(execution_result);
-    */
-    std::cout << "Batch Norm Backward graph execution complete." << std::endl;
+    HIPDNN_FE_CHECK(graph->build_plans());
+    std::cout << "Plans build successful." << std::endl;
 
+    auto dy_tensor = Tensor::make_nchw_tensor<InputType>(dy->get_dim());
+    auto x_tensor = Tensor::make_nchw_tensor<InputType>(x->get_dim());
+    auto scale_tensor = Tensor::make_nchw_tensor<IntermediateType>(scale->get_dim());
+    auto saved_mean_tensor = Tensor::make_nchw_tensor<IntermediateType>(saved_mean->get_dim());
+    auto saved_inv_var_tensor
+        = Tensor::make_nchw_tensor<IntermediateType>(saved_inv_variance->get_dim());
+
+    auto dx_tensor = Tensor::make_nchw_tensor<InputType>(dx->get_dim());
+    auto dscale_tensor = Tensor::make_nchw_tensor<IntermediateType>(dscale->get_dim());
+    auto dbias_tensor = Tensor::make_nchw_tensor<IntermediateType>(dbias->get_dim());
+
+    dy_tensor.template fill_with_random_values<InputType>(static_cast<InputType>(0.0f),
+                                                          static_cast<InputType>(1.0f));
+    dy_tensor.memory().mark_host_modified();
+    x_tensor.template fill_with_random_values<InputType>(static_cast<InputType>(0.0f),
+                                                         static_cast<InputType>(1.0f));
+    x_tensor.memory().mark_host_modified();
+    scale_tensor.template fill_with_random_values<IntermediateType>(
+        static_cast<IntermediateType>(0.0f), static_cast<IntermediateType>(1.0f));
+    scale_tensor.memory().mark_host_modified();
+    saved_mean_tensor.template fill_with_random_values<IntermediateType>(
+        static_cast<IntermediateType>(0.0f), static_cast<IntermediateType>(1.0f));
+    saved_mean_tensor.memory().mark_host_modified();
+    saved_inv_var_tensor.template fill_with_random_values<IntermediateType>(
+        static_cast<IntermediateType>(0.1f), static_cast<IntermediateType>(1.0f));
+    saved_inv_var_tensor.memory().mark_host_modified();
+
+    std::unordered_map<int64_t, void*> variant_pack;
+    variant_pack[dy->get_uid()] = dy_tensor.memory().template device_data<void>();
+    variant_pack[x->get_uid()] = x_tensor.memory().template device_data<void>();
+    variant_pack[scale->get_uid()] = scale_tensor.memory().template device_data<void>();
+    variant_pack[saved_mean->get_uid()] = saved_mean_tensor.memory().template device_data<void>();
+    variant_pack[saved_inv_variance->get_uid()]
+        = saved_inv_var_tensor.memory().template device_data<void>();
+    variant_pack[dx->get_uid()] = dx_tensor.memory().template device_data<void>();
+    variant_pack[dscale->get_uid()] = dscale_tensor.memory().template device_data<void>();
+    variant_pack[dbias->get_uid()] = dbias_tensor.memory().template device_data<void>();
+
+    HIPDNN_FE_CHECK(graph->execute(handle, variant_pack, nullptr));
+    std::cout << "Graph execution successful." << std::endl;
+
+    dx_tensor.memory().mark_device_modified();
+    auto dx_host_ptr = dx_tensor.memory().template host_data<InputType>();
+    std::cout << "First 10 dx values: ";
+    for(int i = 0; i < 10; ++i)
+    {
+        std::cout << static_cast<float>(dx_host_ptr[i]) << " ";
+    }
+    std::cout << std::endl;
+
+    std::cout << "Batch Norm Backward graph execution complete for " << type_string << "."
+              << std::endl
+              << std::endl;
+}
+
+int main()
+{
+    hipdnn_frontend::initialize_frontend_logging(hipdnnLoggingCallback_ext);
+
+    hipdnnHandle_t handle;
+    HIPDNN_CHECK(hipdnnCreate(&handle));
+
+    run_bn_backward<float, float>(handle, "fp32");
+    run_bn_backward<half, float>(handle, "fp16");
+    run_bn_backward<hip_bfloat16, float>(handle, "bf16");
+
+    HIPDNN_CHECK(hipdnnDestroy(handle));
+    std::cout << "All tests completed successfully." << std::endl;
     return 0;
 }
