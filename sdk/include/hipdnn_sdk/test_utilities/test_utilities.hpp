@@ -4,16 +4,13 @@
 #pragma once
 
 #ifdef ADDRESS_SANITIZER
-// NOLINTBEGIN(readability-function-cognitive-complexity)
 #define SKIP_IF_NO_DEVICES()                              \
     do                                                    \
     {                                                     \
         GTEST_SKIP() << "Disable device tests with ASAN"; \
     } while(0)
-// NOLINTEND(readability-function-cognitive-complexity)
 
 #else
-// NOLINTBEGIN(readability-function-cognitive-complexity)
 #define SKIP_IF_NO_DEVICES()                                        \
     do                                                              \
     {                                                               \
@@ -24,5 +21,4 @@
             GTEST_SKIP() << "No devices available. Skipping test."; \
         }                                                           \
     } while(0)
-// NOLINTEND(readability-function-cognitive-complexity)
 #endif
