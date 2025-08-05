@@ -32,12 +32,16 @@ void run_bn_backward(hipdnnHandle_t handle)
     int64_t uid = 1;
     auto dy = create_tensor({16, 16, 16, 16}, input_type);
     dy->set_uid(uid++);
+
     auto x = create_tensor({16, 16, 16, 16}, input_type);
     x->set_uid(uid++);
+
     auto gamma = create_tensor({1, 16, 1, 1}, intermediate_type);
     gamma->set_uid(uid++);
+
     auto saved_mean = create_tensor({1, 16, 1, 1}, intermediate_type);
     saved_mean->set_uid(uid++);
+
     auto saved_inv_variance = create_tensor({1, 16, 1, 1}, intermediate_type);
     saved_inv_variance->set_uid(uid++);
 

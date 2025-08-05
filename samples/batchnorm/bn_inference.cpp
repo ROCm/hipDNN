@@ -71,12 +71,12 @@ void run_bn_inference(hipdnnHandle_t handle)
     HIPDNN_FE_CHECK(graph->build_plans());
     std::cout << "Plans build successful.\n";
 
-    auto x_tensor = Tensor::make_nchw_tensor<InputType>({4, 32, 16, 16});
-    auto gamma_tensor = Tensor::make_nchw_tensor<IntermediateType>({1, 32, 1, 1});
-    auto beta_tensor = Tensor::make_nchw_tensor<IntermediateType>({1, 32, 1, 1});
-    auto mean_tensor = Tensor::make_nchw_tensor<IntermediateType>({1, 32, 1, 1});
-    auto inv_variance_tensor = Tensor::make_nchw_tensor<IntermediateType>({1, 32, 1, 1});
-    auto y_tensor = Tensor::make_nchw_tensor<InputType>({4, 32, 16, 16});
+    auto x_tensor = Tensor::make_nchw_tensor<InputType>(x->get_dim());
+    auto gamma_tensor = Tensor::make_nchw_tensor<IntermediateType>(gamma->get_dim());
+    auto beta_tensor = Tensor::make_nchw_tensor<IntermediateType>(beta->get_dim());
+    auto mean_tensor = Tensor::make_nchw_tensor<IntermediateType>(mean->get_dim());
+    auto inv_variance_tensor = Tensor::make_nchw_tensor<IntermediateType>(inv_variance->get_dim());
+    auto y_tensor = Tensor::make_nchw_tensor<InputType>(y->get_dim());
 
     x_tensor.template fill_with_random_values<InputType>(static_cast<InputType>(0.0f),
                                                          static_cast<InputType>(1.0f));

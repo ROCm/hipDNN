@@ -32,16 +32,22 @@ void run_bn_training(hipdnnHandle_t handle)
     int64_t uid = 1;
     auto x = create_tensor({16, 16, 16, 16}, input_type);
     x->set_uid(uid++);
+
     auto gamma = create_tensor({1, 16, 1, 1}, intermediate_type);
     gamma->set_uid(uid++);
+
     auto beta = create_tensor({1, 16, 1, 1}, intermediate_type);
     beta->set_uid(uid++);
+
     auto prev_running_mean = create_tensor({1, 16, 1, 1}, intermediate_type);
     prev_running_mean->set_uid(uid++);
+
     auto prev_running_var = create_tensor({1, 16, 1, 1}, intermediate_type);
     prev_running_var->set_uid(uid++);
+
     auto momentum = create_tensor({1, 1, 1, 1}, intermediate_type);
     momentum->set_uid(uid++);
+
     auto epsilon = create_tensor({1, 1, 1, 1}, intermediate_type);
     epsilon->set_uid(uid++);
 
