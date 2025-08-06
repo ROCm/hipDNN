@@ -104,7 +104,7 @@ protected:
     }
 
     // TODO: figure out how to ignore cognitive complexity warnings induced by logging macros
-        std::set<std::filesystem::path> resolve_default_paths() const
+    std::set<std::filesystem::path> resolve_default_paths() const
     {
         std::filesystem::path base_dir;
         try
@@ -136,11 +136,11 @@ protected:
 
         return resolved_paths;
     }
-    
+
 public:
     virtual ~Plugin_manager_base() = default;
 
-        void load_plugins(const std::set<std::filesystem::path>& custom_paths,
+    void load_plugins(const std::set<std::filesystem::path>& custom_paths,
                       hipdnnPluginLoadingMode_ext_t mode)
     {
         std::set<std::filesystem::path> paths_to_load;
@@ -193,7 +193,7 @@ public:
             load_plugin_from_file(path);
         }
     }
-    
+
     const std::vector<Plugin>& get_plugins() const
     {
         return _plugins;

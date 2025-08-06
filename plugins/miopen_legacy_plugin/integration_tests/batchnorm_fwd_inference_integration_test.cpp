@@ -341,4 +341,3 @@ TEST_P(Batchnorm_forward_inference_integration_test_half, RunHalfFwdbatchnormGra
 INSTANTIATE_TEST_SUITE_P(RunHalfFwdbatchnormGraph,
                          Batchnorm_forward_inference_integration_test_half,
                          testing::ValuesIn(get_bn_fwd_inference_test_cases()));
-
