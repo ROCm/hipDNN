@@ -25,69 +25,69 @@ bool operator!=(const BatchnormInferenceAttributesT &lhs, const BatchnormInferen
 
 struct BatchnormInferenceAttributesT : public ::flatbuffers::NativeTable {
   typedef BatchnormInferenceAttributes TableType;
-  int64_t x = 0;
-  ::flatbuffers::Optional<int64_t> mean = ::flatbuffers::nullopt;
-  ::flatbuffers::Optional<int64_t> inv_variance = ::flatbuffers::nullopt;
-  int64_t scale = 0;
-  int64_t bias = 0;
-  int64_t y = 0;
+  int64_t x_tensor_uid = 0;
+  ::flatbuffers::Optional<int64_t> mean_tensor_uid = ::flatbuffers::nullopt;
+  ::flatbuffers::Optional<int64_t> inv_variance_tensor_uid = ::flatbuffers::nullopt;
+  int64_t scale_tensor_uid = 0;
+  int64_t bias_tensor_uid = 0;
+  int64_t y_tensor_uid = 0;
 };
 
 struct BatchnormInferenceAttributes FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef BatchnormInferenceAttributesT NativeTableType;
   typedef BatchnormInferenceAttributesBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
-    VT_X = 4,
-    VT_MEAN = 6,
-    VT_INV_VARIANCE = 8,
-    VT_SCALE = 10,
-    VT_BIAS = 12,
-    VT_Y = 14
+    VT_X_TENSOR_UID = 4,
+    VT_MEAN_TENSOR_UID = 6,
+    VT_INV_VARIANCE_TENSOR_UID = 8,
+    VT_SCALE_TENSOR_UID = 10,
+    VT_BIAS_TENSOR_UID = 12,
+    VT_Y_TENSOR_UID = 14
   };
-  int64_t x() const {
-    return GetField<int64_t>(VT_X, 0);
+  int64_t x_tensor_uid() const {
+    return GetField<int64_t>(VT_X_TENSOR_UID, 0);
   }
-  bool mutate_x(int64_t _x = 0) {
-    return SetField<int64_t>(VT_X, _x, 0);
+  bool mutate_x_tensor_uid(int64_t _x_tensor_uid = 0) {
+    return SetField<int64_t>(VT_X_TENSOR_UID, _x_tensor_uid, 0);
   }
-  ::flatbuffers::Optional<int64_t> mean() const {
-    return GetOptional<int64_t, int64_t>(VT_MEAN);
+  ::flatbuffers::Optional<int64_t> mean_tensor_uid() const {
+    return GetOptional<int64_t, int64_t>(VT_MEAN_TENSOR_UID);
   }
-  bool mutate_mean(int64_t _mean) {
-    return SetField<int64_t>(VT_MEAN, _mean);
+  bool mutate_mean_tensor_uid(int64_t _mean_tensor_uid) {
+    return SetField<int64_t>(VT_MEAN_TENSOR_UID, _mean_tensor_uid);
   }
-  ::flatbuffers::Optional<int64_t> inv_variance() const {
-    return GetOptional<int64_t, int64_t>(VT_INV_VARIANCE);
+  ::flatbuffers::Optional<int64_t> inv_variance_tensor_uid() const {
+    return GetOptional<int64_t, int64_t>(VT_INV_VARIANCE_TENSOR_UID);
   }
-  bool mutate_inv_variance(int64_t _inv_variance) {
-    return SetField<int64_t>(VT_INV_VARIANCE, _inv_variance);
+  bool mutate_inv_variance_tensor_uid(int64_t _inv_variance_tensor_uid) {
+    return SetField<int64_t>(VT_INV_VARIANCE_TENSOR_UID, _inv_variance_tensor_uid);
   }
-  int64_t scale() const {
-    return GetField<int64_t>(VT_SCALE, 0);
+  int64_t scale_tensor_uid() const {
+    return GetField<int64_t>(VT_SCALE_TENSOR_UID, 0);
   }
-  bool mutate_scale(int64_t _scale = 0) {
-    return SetField<int64_t>(VT_SCALE, _scale, 0);
+  bool mutate_scale_tensor_uid(int64_t _scale_tensor_uid = 0) {
+    return SetField<int64_t>(VT_SCALE_TENSOR_UID, _scale_tensor_uid, 0);
   }
-  int64_t bias() const {
-    return GetField<int64_t>(VT_BIAS, 0);
+  int64_t bias_tensor_uid() const {
+    return GetField<int64_t>(VT_BIAS_TENSOR_UID, 0);
   }
-  bool mutate_bias(int64_t _bias = 0) {
-    return SetField<int64_t>(VT_BIAS, _bias, 0);
+  bool mutate_bias_tensor_uid(int64_t _bias_tensor_uid = 0) {
+    return SetField<int64_t>(VT_BIAS_TENSOR_UID, _bias_tensor_uid, 0);
   }
-  int64_t y() const {
-    return GetField<int64_t>(VT_Y, 0);
+  int64_t y_tensor_uid() const {
+    return GetField<int64_t>(VT_Y_TENSOR_UID, 0);
   }
-  bool mutate_y(int64_t _y = 0) {
-    return SetField<int64_t>(VT_Y, _y, 0);
+  bool mutate_y_tensor_uid(int64_t _y_tensor_uid = 0) {
+    return SetField<int64_t>(VT_Y_TENSOR_UID, _y_tensor_uid, 0);
   }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
-           VerifyField<int64_t>(verifier, VT_X, 8) &&
-           VerifyField<int64_t>(verifier, VT_MEAN, 8) &&
-           VerifyField<int64_t>(verifier, VT_INV_VARIANCE, 8) &&
-           VerifyField<int64_t>(verifier, VT_SCALE, 8) &&
-           VerifyField<int64_t>(verifier, VT_BIAS, 8) &&
-           VerifyField<int64_t>(verifier, VT_Y, 8) &&
+           VerifyField<int64_t>(verifier, VT_X_TENSOR_UID, 8) &&
+           VerifyField<int64_t>(verifier, VT_MEAN_TENSOR_UID, 8) &&
+           VerifyField<int64_t>(verifier, VT_INV_VARIANCE_TENSOR_UID, 8) &&
+           VerifyField<int64_t>(verifier, VT_SCALE_TENSOR_UID, 8) &&
+           VerifyField<int64_t>(verifier, VT_BIAS_TENSOR_UID, 8) &&
+           VerifyField<int64_t>(verifier, VT_Y_TENSOR_UID, 8) &&
            verifier.EndTable();
   }
   BatchnormInferenceAttributesT *UnPack(const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
@@ -99,23 +99,23 @@ struct BatchnormInferenceAttributesBuilder {
   typedef BatchnormInferenceAttributes Table;
   ::flatbuffers::FlatBufferBuilder &fbb_;
   ::flatbuffers::uoffset_t start_;
-  void add_x(int64_t x) {
-    fbb_.AddElement<int64_t>(BatchnormInferenceAttributes::VT_X, x, 0);
+  void add_x_tensor_uid(int64_t x_tensor_uid) {
+    fbb_.AddElement<int64_t>(BatchnormInferenceAttributes::VT_X_TENSOR_UID, x_tensor_uid, 0);
   }
-  void add_mean(int64_t mean) {
-    fbb_.AddElement<int64_t>(BatchnormInferenceAttributes::VT_MEAN, mean);
+  void add_mean_tensor_uid(int64_t mean_tensor_uid) {
+    fbb_.AddElement<int64_t>(BatchnormInferenceAttributes::VT_MEAN_TENSOR_UID, mean_tensor_uid);
   }
-  void add_inv_variance(int64_t inv_variance) {
-    fbb_.AddElement<int64_t>(BatchnormInferenceAttributes::VT_INV_VARIANCE, inv_variance);
+  void add_inv_variance_tensor_uid(int64_t inv_variance_tensor_uid) {
+    fbb_.AddElement<int64_t>(BatchnormInferenceAttributes::VT_INV_VARIANCE_TENSOR_UID, inv_variance_tensor_uid);
   }
-  void add_scale(int64_t scale) {
-    fbb_.AddElement<int64_t>(BatchnormInferenceAttributes::VT_SCALE, scale, 0);
+  void add_scale_tensor_uid(int64_t scale_tensor_uid) {
+    fbb_.AddElement<int64_t>(BatchnormInferenceAttributes::VT_SCALE_TENSOR_UID, scale_tensor_uid, 0);
   }
-  void add_bias(int64_t bias) {
-    fbb_.AddElement<int64_t>(BatchnormInferenceAttributes::VT_BIAS, bias, 0);
+  void add_bias_tensor_uid(int64_t bias_tensor_uid) {
+    fbb_.AddElement<int64_t>(BatchnormInferenceAttributes::VT_BIAS_TENSOR_UID, bias_tensor_uid, 0);
   }
-  void add_y(int64_t y) {
-    fbb_.AddElement<int64_t>(BatchnormInferenceAttributes::VT_Y, y, 0);
+  void add_y_tensor_uid(int64_t y_tensor_uid) {
+    fbb_.AddElement<int64_t>(BatchnormInferenceAttributes::VT_Y_TENSOR_UID, y_tensor_uid, 0);
   }
   explicit BatchnormInferenceAttributesBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
@@ -130,19 +130,19 @@ struct BatchnormInferenceAttributesBuilder {
 
 inline ::flatbuffers::Offset<BatchnormInferenceAttributes> CreateBatchnormInferenceAttributes(
     ::flatbuffers::FlatBufferBuilder &_fbb,
-    int64_t x = 0,
-    ::flatbuffers::Optional<int64_t> mean = ::flatbuffers::nullopt,
-    ::flatbuffers::Optional<int64_t> inv_variance = ::flatbuffers::nullopt,
-    int64_t scale = 0,
-    int64_t bias = 0,
-    int64_t y = 0) {
+    int64_t x_tensor_uid = 0,
+    ::flatbuffers::Optional<int64_t> mean_tensor_uid = ::flatbuffers::nullopt,
+    ::flatbuffers::Optional<int64_t> inv_variance_tensor_uid = ::flatbuffers::nullopt,
+    int64_t scale_tensor_uid = 0,
+    int64_t bias_tensor_uid = 0,
+    int64_t y_tensor_uid = 0) {
   BatchnormInferenceAttributesBuilder builder_(_fbb);
-  builder_.add_y(y);
-  builder_.add_bias(bias);
-  builder_.add_scale(scale);
-  if(inv_variance) { builder_.add_inv_variance(*inv_variance); }
-  if(mean) { builder_.add_mean(*mean); }
-  builder_.add_x(x);
+  builder_.add_y_tensor_uid(y_tensor_uid);
+  builder_.add_bias_tensor_uid(bias_tensor_uid);
+  builder_.add_scale_tensor_uid(scale_tensor_uid);
+  if(inv_variance_tensor_uid) { builder_.add_inv_variance_tensor_uid(*inv_variance_tensor_uid); }
+  if(mean_tensor_uid) { builder_.add_mean_tensor_uid(*mean_tensor_uid); }
+  builder_.add_x_tensor_uid(x_tensor_uid);
   return builder_.Finish();
 }
 
@@ -151,12 +151,12 @@ inline ::flatbuffers::Offset<BatchnormInferenceAttributes> CreateBatchnormInfere
 
 inline bool operator==(const BatchnormInferenceAttributesT &lhs, const BatchnormInferenceAttributesT &rhs) {
   return
-      (lhs.x == rhs.x) &&
-      (lhs.mean == rhs.mean) &&
-      (lhs.inv_variance == rhs.inv_variance) &&
-      (lhs.scale == rhs.scale) &&
-      (lhs.bias == rhs.bias) &&
-      (lhs.y == rhs.y);
+      (lhs.x_tensor_uid == rhs.x_tensor_uid) &&
+      (lhs.mean_tensor_uid == rhs.mean_tensor_uid) &&
+      (lhs.inv_variance_tensor_uid == rhs.inv_variance_tensor_uid) &&
+      (lhs.scale_tensor_uid == rhs.scale_tensor_uid) &&
+      (lhs.bias_tensor_uid == rhs.bias_tensor_uid) &&
+      (lhs.y_tensor_uid == rhs.y_tensor_uid);
 }
 
 inline bool operator!=(const BatchnormInferenceAttributesT &lhs, const BatchnormInferenceAttributesT &rhs) {
@@ -173,12 +173,12 @@ inline BatchnormInferenceAttributesT *BatchnormInferenceAttributes::UnPack(const
 inline void BatchnormInferenceAttributes::UnPackTo(BatchnormInferenceAttributesT *_o, const ::flatbuffers::resolver_function_t *_resolver) const {
   (void)_o;
   (void)_resolver;
-  { auto _e = x(); _o->x = _e; }
-  { auto _e = mean(); _o->mean = _e; }
-  { auto _e = inv_variance(); _o->inv_variance = _e; }
-  { auto _e = scale(); _o->scale = _e; }
-  { auto _e = bias(); _o->bias = _e; }
-  { auto _e = y(); _o->y = _e; }
+  { auto _e = x_tensor_uid(); _o->x_tensor_uid = _e; }
+  { auto _e = mean_tensor_uid(); _o->mean_tensor_uid = _e; }
+  { auto _e = inv_variance_tensor_uid(); _o->inv_variance_tensor_uid = _e; }
+  { auto _e = scale_tensor_uid(); _o->scale_tensor_uid = _e; }
+  { auto _e = bias_tensor_uid(); _o->bias_tensor_uid = _e; }
+  { auto _e = y_tensor_uid(); _o->y_tensor_uid = _e; }
 }
 
 inline ::flatbuffers::Offset<BatchnormInferenceAttributes> BatchnormInferenceAttributes::Pack(::flatbuffers::FlatBufferBuilder &_fbb, const BatchnormInferenceAttributesT* _o, const ::flatbuffers::rehasher_function_t *_rehasher) {
@@ -189,20 +189,20 @@ inline ::flatbuffers::Offset<BatchnormInferenceAttributes> CreateBatchnormInfere
   (void)_rehasher;
   (void)_o;
   struct _VectorArgs { ::flatbuffers::FlatBufferBuilder *__fbb; const BatchnormInferenceAttributesT* __o; const ::flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
-  auto _x = _o->x;
-  auto _mean = _o->mean;
-  auto _inv_variance = _o->inv_variance;
-  auto _scale = _o->scale;
-  auto _bias = _o->bias;
-  auto _y = _o->y;
+  auto _x_tensor_uid = _o->x_tensor_uid;
+  auto _mean_tensor_uid = _o->mean_tensor_uid;
+  auto _inv_variance_tensor_uid = _o->inv_variance_tensor_uid;
+  auto _scale_tensor_uid = _o->scale_tensor_uid;
+  auto _bias_tensor_uid = _o->bias_tensor_uid;
+  auto _y_tensor_uid = _o->y_tensor_uid;
   return hipdnn_sdk::data_objects::CreateBatchnormInferenceAttributes(
       _fbb,
-      _x,
-      _mean,
-      _inv_variance,
-      _scale,
-      _bias,
-      _y);
+      _x_tensor_uid,
+      _mean_tensor_uid,
+      _inv_variance_tensor_uid,
+      _scale_tensor_uid,
+      _bias_tensor_uid,
+      _y_tensor_uid);
 }
 
 }  // namespace data_objects

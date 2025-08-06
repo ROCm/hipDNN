@@ -301,14 +301,14 @@ TEST(DBNNodeTests, PackNode)
     auto packed_attributes = node_flatbuffer->attributes_as_BatchnormBackwardAttributes();
     ASSERT_NE(packed_attributes, nullptr);
 
-    EXPECT_EQ(packed_attributes->dy(), dy_tensor->get_uid());
-    EXPECT_EQ(packed_attributes->x(), x_tensor->get_uid());
-    EXPECT_EQ(packed_attributes->scale(), scale_tensor->get_uid());
-    EXPECT_EQ(packed_attributes->mean(), mean_tensor->get_uid());
-    EXPECT_EQ(packed_attributes->inv_variance(), inv_variance_tensor->get_uid());
-    EXPECT_EQ(packed_attributes->dx(), dx_tensor->get_uid());
-    EXPECT_EQ(packed_attributes->dscale(), dscale_tensor->get_uid());
-    EXPECT_EQ(packed_attributes->dbias(), dbias_tensor->get_uid());
+    EXPECT_EQ(packed_attributes->dy_tensor_uid(), dy_tensor->get_uid());
+    EXPECT_EQ(packed_attributes->x_tensor_uid(), x_tensor->get_uid());
+    EXPECT_EQ(packed_attributes->scale_tensor_uid(), scale_tensor->get_uid());
+    EXPECT_EQ(packed_attributes->mean_tensor_uid(), mean_tensor->get_uid());
+    EXPECT_EQ(packed_attributes->inv_variance_tensor_uid(), inv_variance_tensor->get_uid());
+    EXPECT_EQ(packed_attributes->dx_tensor_uid(), dx_tensor->get_uid());
+    EXPECT_EQ(packed_attributes->dscale_tensor_uid(), dscale_tensor->get_uid());
+    EXPECT_EQ(packed_attributes->dbias_tensor_uid(), dbias_tensor->get_uid());
 }
 
 TEST(DBNNodeTests, PackNodeWithoutMeanAndInvVariance)
@@ -383,12 +383,12 @@ TEST(DBNNodeTests, PackNodeWithoutMeanAndInvVariance)
     auto packed_attributes = node_flatbuffer->attributes_as_BatchnormBackwardAttributes();
     ASSERT_NE(packed_attributes, nullptr);
 
-    EXPECT_EQ(packed_attributes->dy(), dy_tensor->get_uid());
-    EXPECT_EQ(packed_attributes->x(), x_tensor->get_uid());
-    EXPECT_EQ(packed_attributes->scale(), scale_tensor->get_uid());
-    EXPECT_EQ(packed_attributes->mean(), flatbuffers::nullopt);
-    EXPECT_EQ(packed_attributes->inv_variance(), flatbuffers::nullopt);
-    EXPECT_EQ(packed_attributes->dx(), dx_tensor->get_uid());
-    EXPECT_EQ(packed_attributes->dscale(), dscale_tensor->get_uid());
-    EXPECT_EQ(packed_attributes->dbias(), dbias_tensor->get_uid());
+    EXPECT_EQ(packed_attributes->dy_tensor_uid(), dy_tensor->get_uid());
+    EXPECT_EQ(packed_attributes->x_tensor_uid(), x_tensor->get_uid());
+    EXPECT_EQ(packed_attributes->scale_tensor_uid(), scale_tensor->get_uid());
+    EXPECT_EQ(packed_attributes->mean_tensor_uid(), flatbuffers::nullopt);
+    EXPECT_EQ(packed_attributes->inv_variance_tensor_uid(), flatbuffers::nullopt);
+    EXPECT_EQ(packed_attributes->dx_tensor_uid(), dx_tensor->get_uid());
+    EXPECT_EQ(packed_attributes->dscale_tensor_uid(), dscale_tensor->get_uid());
+    EXPECT_EQ(packed_attributes->dbias_tensor_uid(), dbias_tensor->get_uid());
 }
