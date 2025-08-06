@@ -145,7 +145,6 @@ TEST_F(Initialize_variant_pack_descriptor_tests, InvalidGetAttributeNotFinalized
                                HIPDNN_STATUS_NOT_INITIALIZED);
 }
 
-// NOLINTBEGIN(readability-function-cognitive-complexity)
 class Finalized_variant_pack_descriptor_tests : public ::testing::Test
 {
 protected:
@@ -261,7 +260,5 @@ TEST_F(Finalized_variant_pack_descriptor_tests, InvalidGetAttributes)
                                                         retrieved_dev_ptrs.data()),
                                HIPDNN_STATUS_BAD_PARAM_NULL_POINTER);
 }
-
-// NOLINTEND(readability-function-cognitive-complexity)
 
 } // namespace hipdnn_backend

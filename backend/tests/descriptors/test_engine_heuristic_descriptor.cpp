@@ -27,7 +27,6 @@ using namespace ::testing;
 
 using ::testing::Return;
 
-// NOLINTBEGIN(readability-function-cognitive-complexity)
 class Engine_heuristic_descriptor_test : public ::testing::Test
 {
 public:
@@ -545,4 +544,3 @@ TEST_F(Engine_heuristic_descriptor_test, GetGraphReturnsPointerIfFinalized)
     ASSERT_EQ(static_cast<const Backend_descriptor_interface*>(graph_ptr.get()),
               static_cast<const Backend_descriptor_interface*>(get_mock_graph().get()));
 }
-// NOLINTEND(readability-function-cognitive-complexity)
