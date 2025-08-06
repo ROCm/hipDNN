@@ -106,11 +106,11 @@ protected:
         {
             base_dir = hipdnn_backend::platform_utils::get_current_module_directory();
         }
-        catch(const std::runtime_error& e)
+        catch(const Hipdnn_exception& e)
         {
             HIPDNN_LOG_WARN(
                 "Failed to resolve module directory, will use unresolved default paths: {}",
-                e.what());
+                e.get_message());
             // Fallback to using original, unresolved paths. TODO: possibly remove.
             return _default_plugin_paths;
         }
