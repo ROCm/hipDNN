@@ -25,7 +25,6 @@ public:
     {
     }
 };
-// NOLINTBEGIN(readability-function-cognitive-complexity)
 TEST(GPU_EnginePluginTest, LoadPluginsAndExecuteOpGraph)
 {
     SKIP_IF_NO_DEVICES();
@@ -151,4 +150,3 @@ TEST(GPU_EnginePluginTest, LoadPluginsAndExecuteOpGraph)
         }
     }
 }
-// NOLINTEND(readability-function-cognitive-complexity)

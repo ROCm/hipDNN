@@ -5,10 +5,10 @@ namespace hipdnn_sdk.data_objects;
 
 // The long attributes are keys to the tensor_attributes->uid 
 table BatchnormInferenceAttributes {
-    x: long;
-    mean: long = null;
-    inv_variance: long = null;
-    scale: long;
-    bias: long;
-    y: long;
+    x_tensor_uid: long;
+    mean_tensor_uid: long = null;
+    inv_variance_tensor_uid: long = null;
+    scale_tensor_uid: long;
+    bias_tensor_uid: long;
+    y_tensor_uid: long;
 }

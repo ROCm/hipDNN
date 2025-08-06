@@ -230,7 +230,7 @@ TEST(PointwiseNodeTests, PackNode)
     auto packed_attributes = node_flatbuffer->attributes_as_PointwiseAttributes();
     ASSERT_NE(packed_attributes, nullptr);
 
-    EXPECT_EQ(packed_attributes->in_0(), input_tensor->get_uid());
-    EXPECT_EQ(packed_attributes->out_0(), output_tensor->get_uid());
+    EXPECT_EQ(packed_attributes->in_0_tensor_uid(), input_tensor->get_uid());
+    EXPECT_EQ(packed_attributes->out_0_tensor_uid(), output_tensor->get_uid());
     EXPECT_EQ(packed_attributes->operation(), static_cast<int>(PointwiseMode_t::RELU_FWD));
 }
