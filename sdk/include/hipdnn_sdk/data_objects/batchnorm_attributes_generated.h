@@ -25,133 +25,133 @@ bool operator!=(const BatchnormAttributesT &lhs, const BatchnormAttributesT &rhs
 
 struct BatchnormAttributesT : public ::flatbuffers::NativeTable {
   typedef BatchnormAttributes TableType;
-  int64_t x_tid = 0;
-  int64_t scale_tid = 0;
-  int64_t bias_tid = 0;
-  int64_t epsilon_tid = 0;
-  std::vector<int64_t> peer_stats_tid{};
-  ::flatbuffers::Optional<int64_t> prev_running_mean_tid = ::flatbuffers::nullopt;
-  ::flatbuffers::Optional<int64_t> prev_running_variance_tid = ::flatbuffers::nullopt;
-  ::flatbuffers::Optional<int64_t> momentum_tid = ::flatbuffers::nullopt;
-  int64_t y_tid = 0;
-  ::flatbuffers::Optional<int64_t> mean_tid = ::flatbuffers::nullopt;
-  ::flatbuffers::Optional<int64_t> inv_variance_tid = ::flatbuffers::nullopt;
-  ::flatbuffers::Optional<int64_t> next_running_mean_tid = ::flatbuffers::nullopt;
-  ::flatbuffers::Optional<int64_t> next_running_variance_tid = ::flatbuffers::nullopt;
+  int64_t x_tensor_uid = 0;
+  int64_t scale_tensor_uid = 0;
+  int64_t bias_tensor_uid = 0;
+  int64_t epsilon_tensor_uid = 0;
+  std::vector<int64_t> peer_stats_tensor_uid{};
+  ::flatbuffers::Optional<int64_t> prev_running_mean_tensor_uid = ::flatbuffers::nullopt;
+  ::flatbuffers::Optional<int64_t> prev_running_variance_tensor_uid = ::flatbuffers::nullopt;
+  ::flatbuffers::Optional<int64_t> momentum_tensor_uid = ::flatbuffers::nullopt;
+  int64_t y_tensor_uid = 0;
+  ::flatbuffers::Optional<int64_t> mean_tensor_uid = ::flatbuffers::nullopt;
+  ::flatbuffers::Optional<int64_t> inv_variance_tensor_uid = ::flatbuffers::nullopt;
+  ::flatbuffers::Optional<int64_t> next_running_mean_tensor_uid = ::flatbuffers::nullopt;
+  ::flatbuffers::Optional<int64_t> next_running_variance_tensor_uid = ::flatbuffers::nullopt;
 };
 
 struct BatchnormAttributes FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef BatchnormAttributesT NativeTableType;
   typedef BatchnormAttributesBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
-    VT_X_TID = 4,
-    VT_SCALE_TID = 6,
-    VT_BIAS_TID = 8,
-    VT_EPSILON_TID = 10,
-    VT_PEER_STATS_TID = 12,
-    VT_PREV_RUNNING_MEAN_TID = 14,
-    VT_PREV_RUNNING_VARIANCE_TID = 16,
-    VT_MOMENTUM_TID = 18,
-    VT_Y_TID = 20,
-    VT_MEAN_TID = 22,
-    VT_INV_VARIANCE_TID = 24,
-    VT_NEXT_RUNNING_MEAN_TID = 26,
-    VT_NEXT_RUNNING_VARIANCE_TID = 28
+    VT_X_TENSOR_UID = 4,
+    VT_SCALE_TENSOR_UID = 6,
+    VT_BIAS_TENSOR_UID = 8,
+    VT_EPSILON_TENSOR_UID = 10,
+    VT_PEER_STATS_TENSOR_UID = 12,
+    VT_PREV_RUNNING_MEAN_TENSOR_UID = 14,
+    VT_PREV_RUNNING_VARIANCE_TENSOR_UID = 16,
+    VT_MOMENTUM_TENSOR_UID = 18,
+    VT_Y_TENSOR_UID = 20,
+    VT_MEAN_TENSOR_UID = 22,
+    VT_INV_VARIANCE_TENSOR_UID = 24,
+    VT_NEXT_RUNNING_MEAN_TENSOR_UID = 26,
+    VT_NEXT_RUNNING_VARIANCE_TENSOR_UID = 28
   };
   int64_t x_tensor_uid() const {
-    return GetField<int64_t>(VT_X_TID, 0);
+    return GetField<int64_t>(VT_X_TENSOR_UID, 0);
   }
-  bool mutate_x_tensor_uid(int64_t _x_tid = 0) {
-    return SetField<int64_t>(VT_X_TID, _x_tid, 0);
+  bool mutate_x_tensor_uid(int64_t _x_tensor_uid = 0) {
+    return SetField<int64_t>(VT_X_TENSOR_UID, _x_tensor_uid, 0);
   }
   int64_t scale_tensor_uid() const {
-    return GetField<int64_t>(VT_SCALE_TID, 0);
+    return GetField<int64_t>(VT_SCALE_TENSOR_UID, 0);
   }
-  bool mutate_scale_tensor_uid(int64_t _scale_tid = 0) {
-    return SetField<int64_t>(VT_SCALE_TID, _scale_tid, 0);
+  bool mutate_scale_tensor_uid(int64_t _scale_tensor_uid = 0) {
+    return SetField<int64_t>(VT_SCALE_TENSOR_UID, _scale_tensor_uid, 0);
   }
   int64_t bias_tensor_uid() const {
-    return GetField<int64_t>(VT_BIAS_TID, 0);
+    return GetField<int64_t>(VT_BIAS_TENSOR_UID, 0);
   }
-  bool mutate_bias_tensor_uid(int64_t _bias_tid = 0) {
-    return SetField<int64_t>(VT_BIAS_TID, _bias_tid, 0);
+  bool mutate_bias_tensor_uid(int64_t _bias_tensor_uid = 0) {
+    return SetField<int64_t>(VT_BIAS_TENSOR_UID, _bias_tensor_uid, 0);
   }
   int64_t epsilon_tensor_uid() const {
-    return GetField<int64_t>(VT_EPSILON_TID, 0);
+    return GetField<int64_t>(VT_EPSILON_TENSOR_UID, 0);
   }
-  bool mutate_epsilon_tensor_uid(int64_t _epsilon_tid = 0) {
-    return SetField<int64_t>(VT_EPSILON_TID, _epsilon_tid, 0);
+  bool mutate_epsilon_tensor_uid(int64_t _epsilon_tensor_uid = 0) {
+    return SetField<int64_t>(VT_EPSILON_TENSOR_UID, _epsilon_tensor_uid, 0);
   }
   const ::flatbuffers::Vector<int64_t> *peer_stats_tensor_uid() const {
-    return GetPointer<const ::flatbuffers::Vector<int64_t> *>(VT_PEER_STATS_TID);
+    return GetPointer<const ::flatbuffers::Vector<int64_t> *>(VT_PEER_STATS_TENSOR_UID);
   }
   ::flatbuffers::Vector<int64_t> *mutable_peer_stats_tensor_uid() {
-    return GetPointer<::flatbuffers::Vector<int64_t> *>(VT_PEER_STATS_TID);
+    return GetPointer<::flatbuffers::Vector<int64_t> *>(VT_PEER_STATS_TENSOR_UID);
   }
   ::flatbuffers::Optional<int64_t> prev_running_mean_tensor_uid() const {
-    return GetOptional<int64_t, int64_t>(VT_PREV_RUNNING_MEAN_TID);
+    return GetOptional<int64_t, int64_t>(VT_PREV_RUNNING_MEAN_TENSOR_UID);
   }
-  bool mutate_prev_running_mean_tensor_uid(int64_t _prev_running_mean_tid) {
-    return SetField<int64_t>(VT_PREV_RUNNING_MEAN_TID, _prev_running_mean_tid);
+  bool mutate_prev_running_mean_tensor_uid(int64_t _prev_running_mean_tensor_uid) {
+    return SetField<int64_t>(VT_PREV_RUNNING_MEAN_TENSOR_UID, _prev_running_mean_tensor_uid);
   }
   ::flatbuffers::Optional<int64_t> prev_running_variance_tensor_uid() const {
-    return GetOptional<int64_t, int64_t>(VT_PREV_RUNNING_VARIANCE_TID);
+    return GetOptional<int64_t, int64_t>(VT_PREV_RUNNING_VARIANCE_TENSOR_UID);
   }
-  bool mutate_prev_running_variance_tensor_uid(int64_t _prev_running_variance_tid) {
-    return SetField<int64_t>(VT_PREV_RUNNING_VARIANCE_TID, _prev_running_variance_tid);
+  bool mutate_prev_running_variance_tensor_uid(int64_t _prev_running_variance_tensor_uid) {
+    return SetField<int64_t>(VT_PREV_RUNNING_VARIANCE_TENSOR_UID, _prev_running_variance_tensor_uid);
   }
   ::flatbuffers::Optional<int64_t> momentum_tensor_uid() const {
-    return GetOptional<int64_t, int64_t>(VT_MOMENTUM_TID);
+    return GetOptional<int64_t, int64_t>(VT_MOMENTUM_TENSOR_UID);
   }
-  bool mutate_momentum_tensor_uid(int64_t _momentum_tid) {
-    return SetField<int64_t>(VT_MOMENTUM_TID, _momentum_tid);
+  bool mutate_momentum_tensor_uid(int64_t _momentum_tensor_uid) {
+    return SetField<int64_t>(VT_MOMENTUM_TENSOR_UID, _momentum_tensor_uid);
   }
   int64_t y_tensor_uid() const {
-    return GetField<int64_t>(VT_Y_TID, 0);
+    return GetField<int64_t>(VT_Y_TENSOR_UID, 0);
   }
-  bool mutate_y_tensor_uid(int64_t _y_tid = 0) {
-    return SetField<int64_t>(VT_Y_TID, _y_tid, 0);
+  bool mutate_y_tensor_uid(int64_t _y_tensor_uid = 0) {
+    return SetField<int64_t>(VT_Y_TENSOR_UID, _y_tensor_uid, 0);
   }
   ::flatbuffers::Optional<int64_t> mean_tensor_uid() const {
-    return GetOptional<int64_t, int64_t>(VT_MEAN_TID);
+    return GetOptional<int64_t, int64_t>(VT_MEAN_TENSOR_UID);
   }
-  bool mutate_mean_tensor_uid(int64_t _mean_tid) {
-    return SetField<int64_t>(VT_MEAN_TID, _mean_tid);
+  bool mutate_mean_tensor_uid(int64_t _mean_tensor_uid) {
+    return SetField<int64_t>(VT_MEAN_TENSOR_UID, _mean_tensor_uid);
   }
   ::flatbuffers::Optional<int64_t> inv_variance_tensor_uid() const {
-    return GetOptional<int64_t, int64_t>(VT_INV_VARIANCE_TID);
+    return GetOptional<int64_t, int64_t>(VT_INV_VARIANCE_TENSOR_UID);
   }
-  bool mutate_inv_variance_tensor_uid(int64_t _inv_variance_tid) {
-    return SetField<int64_t>(VT_INV_VARIANCE_TID, _inv_variance_tid);
+  bool mutate_inv_variance_tensor_uid(int64_t _inv_variance_tensor_uid) {
+    return SetField<int64_t>(VT_INV_VARIANCE_TENSOR_UID, _inv_variance_tensor_uid);
   }
   ::flatbuffers::Optional<int64_t> next_running_mean_tensor_uid() const {
-    return GetOptional<int64_t, int64_t>(VT_NEXT_RUNNING_MEAN_TID);
+    return GetOptional<int64_t, int64_t>(VT_NEXT_RUNNING_MEAN_TENSOR_UID);
   }
-  bool mutate_next_running_mean_tensor_uid(int64_t _next_running_mean_tid) {
-    return SetField<int64_t>(VT_NEXT_RUNNING_MEAN_TID, _next_running_mean_tid);
+  bool mutate_next_running_mean_tensor_uid(int64_t _next_running_mean_tensor_uid) {
+    return SetField<int64_t>(VT_NEXT_RUNNING_MEAN_TENSOR_UID, _next_running_mean_tensor_uid);
   }
   ::flatbuffers::Optional<int64_t> next_running_variance_tensor_uid() const {
-    return GetOptional<int64_t, int64_t>(VT_NEXT_RUNNING_VARIANCE_TID);
+    return GetOptional<int64_t, int64_t>(VT_NEXT_RUNNING_VARIANCE_TENSOR_UID);
   }
-  bool mutate_next_running_variance_tensor_uid(int64_t _next_running_variance_tid) {
-    return SetField<int64_t>(VT_NEXT_RUNNING_VARIANCE_TID, _next_running_variance_tid);
+  bool mutate_next_running_variance_tensor_uid(int64_t _next_running_variance_tensor_uid) {
+    return SetField<int64_t>(VT_NEXT_RUNNING_VARIANCE_TENSOR_UID, _next_running_variance_tensor_uid);
   }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
-           VerifyField<int64_t>(verifier, VT_X_TID, 8) &&
-           VerifyField<int64_t>(verifier, VT_SCALE_TID, 8) &&
-           VerifyField<int64_t>(verifier, VT_BIAS_TID, 8) &&
-           VerifyField<int64_t>(verifier, VT_EPSILON_TID, 8) &&
-           VerifyOffset(verifier, VT_PEER_STATS_TID) &&
+           VerifyField<int64_t>(verifier, VT_X_TENSOR_UID, 8) &&
+           VerifyField<int64_t>(verifier, VT_SCALE_TENSOR_UID, 8) &&
+           VerifyField<int64_t>(verifier, VT_BIAS_TENSOR_UID, 8) &&
+           VerifyField<int64_t>(verifier, VT_EPSILON_TENSOR_UID, 8) &&
+           VerifyOffset(verifier, VT_PEER_STATS_TENSOR_UID) &&
            verifier.VerifyVector(peer_stats_tensor_uid()) &&
-           VerifyField<int64_t>(verifier, VT_PREV_RUNNING_MEAN_TID, 8) &&
-           VerifyField<int64_t>(verifier, VT_PREV_RUNNING_VARIANCE_TID, 8) &&
-           VerifyField<int64_t>(verifier, VT_MOMENTUM_TID, 8) &&
-           VerifyField<int64_t>(verifier, VT_Y_TID, 8) &&
-           VerifyField<int64_t>(verifier, VT_MEAN_TID, 8) &&
-           VerifyField<int64_t>(verifier, VT_INV_VARIANCE_TID, 8) &&
-           VerifyField<int64_t>(verifier, VT_NEXT_RUNNING_MEAN_TID, 8) &&
-           VerifyField<int64_t>(verifier, VT_NEXT_RUNNING_VARIANCE_TID, 8) &&
+           VerifyField<int64_t>(verifier, VT_PREV_RUNNING_MEAN_TENSOR_UID, 8) &&
+           VerifyField<int64_t>(verifier, VT_PREV_RUNNING_VARIANCE_TENSOR_UID, 8) &&
+           VerifyField<int64_t>(verifier, VT_MOMENTUM_TENSOR_UID, 8) &&
+           VerifyField<int64_t>(verifier, VT_Y_TENSOR_UID, 8) &&
+           VerifyField<int64_t>(verifier, VT_MEAN_TENSOR_UID, 8) &&
+           VerifyField<int64_t>(verifier, VT_INV_VARIANCE_TENSOR_UID, 8) &&
+           VerifyField<int64_t>(verifier, VT_NEXT_RUNNING_MEAN_TENSOR_UID, 8) &&
+           VerifyField<int64_t>(verifier, VT_NEXT_RUNNING_VARIANCE_TENSOR_UID, 8) &&
            verifier.EndTable();
   }
   BatchnormAttributesT *UnPack(const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
@@ -163,44 +163,44 @@ struct BatchnormAttributesBuilder {
   typedef BatchnormAttributes Table;
   ::flatbuffers::FlatBufferBuilder &fbb_;
   ::flatbuffers::uoffset_t start_;
-  void add_x_tensor_uid(int64_t x_tid) {
-    fbb_.AddElement<int64_t>(BatchnormAttributes::VT_X_TID, x_tid, 0);
+  void add_x_tensor_uid(int64_t x_tensor_uid) {
+    fbb_.AddElement<int64_t>(BatchnormAttributes::VT_X_TENSOR_UID, x_tensor_uid, 0);
   }
-  void add_scale_tensor_uid(int64_t scale_tid) {
-    fbb_.AddElement<int64_t>(BatchnormAttributes::VT_SCALE_TID, scale_tid, 0);
+  void add_scale_tensor_uid(int64_t scale_tensor_uid) {
+    fbb_.AddElement<int64_t>(BatchnormAttributes::VT_SCALE_TENSOR_UID, scale_tensor_uid, 0);
   }
-  void add_bias_tensor_uid(int64_t bias_tid) {
-    fbb_.AddElement<int64_t>(BatchnormAttributes::VT_BIAS_TID, bias_tid, 0);
+  void add_bias_tensor_uid(int64_t bias_tensor_uid) {
+    fbb_.AddElement<int64_t>(BatchnormAttributes::VT_BIAS_TENSOR_UID, bias_tensor_uid, 0);
   }
-  void add_epsilon_tensor_uid(int64_t epsilon_tid) {
-    fbb_.AddElement<int64_t>(BatchnormAttributes::VT_EPSILON_TID, epsilon_tid, 0);
+  void add_epsilon_tensor_uid(int64_t epsilon_tensor_uid) {
+    fbb_.AddElement<int64_t>(BatchnormAttributes::VT_EPSILON_TENSOR_UID, epsilon_tensor_uid, 0);
   }
-  void add_peer_stats_tensor_uid(::flatbuffers::Offset<::flatbuffers::Vector<int64_t>> peer_stats_tid) {
-    fbb_.AddOffset(BatchnormAttributes::VT_PEER_STATS_TID, peer_stats_tid);
+  void add_peer_stats_tensor_uid(::flatbuffers::Offset<::flatbuffers::Vector<int64_t>> peer_stats_tensor_uid) {
+    fbb_.AddOffset(BatchnormAttributes::VT_PEER_STATS_TENSOR_UID, peer_stats_tensor_uid);
   }
-  void add_prev_running_mean_tensor_uid(int64_t prev_running_mean_tid) {
-    fbb_.AddElement<int64_t>(BatchnormAttributes::VT_PREV_RUNNING_MEAN_TID, prev_running_mean_tid);
+  void add_prev_running_mean_tensor_uid(int64_t prev_running_mean_tensor_uid) {
+    fbb_.AddElement<int64_t>(BatchnormAttributes::VT_PREV_RUNNING_MEAN_TENSOR_UID, prev_running_mean_tensor_uid);
   }
-  void add_prev_running_variance_tensor_uid(int64_t prev_running_variance_tid) {
-    fbb_.AddElement<int64_t>(BatchnormAttributes::VT_PREV_RUNNING_VARIANCE_TID, prev_running_variance_tid);
+  void add_prev_running_variance_tensor_uid(int64_t prev_running_variance_tensor_uid) {
+    fbb_.AddElement<int64_t>(BatchnormAttributes::VT_PREV_RUNNING_VARIANCE_TENSOR_UID, prev_running_variance_tensor_uid);
   }
-  void add_momentum_tensor_uid(int64_t momentum_tid) {
-    fbb_.AddElement<int64_t>(BatchnormAttributes::VT_MOMENTUM_TID, momentum_tid);
+  void add_momentum_tensor_uid(int64_t momentum_tensor_uid) {
+    fbb_.AddElement<int64_t>(BatchnormAttributes::VT_MOMENTUM_TENSOR_UID, momentum_tensor_uid);
   }
-  void add_y_tensor_uid(int64_t y_tid) {
-    fbb_.AddElement<int64_t>(BatchnormAttributes::VT_Y_TID, y_tid, 0);
+  void add_y_tensor_uid(int64_t y_tensor_uid) {
+    fbb_.AddElement<int64_t>(BatchnormAttributes::VT_Y_TENSOR_UID, y_tensor_uid, 0);
   }
-  void add_mean_tensor_uid(int64_t mean_tid) {
-    fbb_.AddElement<int64_t>(BatchnormAttributes::VT_MEAN_TID, mean_tid);
+  void add_mean_tensor_uid(int64_t mean_tensor_uid) {
+    fbb_.AddElement<int64_t>(BatchnormAttributes::VT_MEAN_TENSOR_UID, mean_tensor_uid);
   }
-  void add_inv_variance_tensor_uid(int64_t inv_variance_tid) {
-    fbb_.AddElement<int64_t>(BatchnormAttributes::VT_INV_VARIANCE_TID, inv_variance_tid);
+  void add_inv_variance_tensor_uid(int64_t inv_variance_tensor_uid) {
+    fbb_.AddElement<int64_t>(BatchnormAttributes::VT_INV_VARIANCE_TENSOR_UID, inv_variance_tensor_uid);
   }
-  void add_next_running_mean_tensor_uid(int64_t next_running_mean_tid) {
-    fbb_.AddElement<int64_t>(BatchnormAttributes::VT_NEXT_RUNNING_MEAN_TID, next_running_mean_tid);
+  void add_next_running_mean_tensor_uid(int64_t next_running_mean_tensor_uid) {
+    fbb_.AddElement<int64_t>(BatchnormAttributes::VT_NEXT_RUNNING_MEAN_TENSOR_UID, next_running_mean_tensor_uid);
   }
-  void add_next_running_variance_tensor_uid(int64_t next_running_variance_tid) {
-    fbb_.AddElement<int64_t>(BatchnormAttributes::VT_NEXT_RUNNING_VARIANCE_TID, next_running_variance_tid);
+  void add_next_running_variance_tensor_uid(int64_t next_running_variance_tensor_uid) {
+    fbb_.AddElement<int64_t>(BatchnormAttributes::VT_NEXT_RUNNING_VARIANCE_TENSOR_UID, next_running_variance_tensor_uid);
   }
   explicit BatchnormAttributesBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
@@ -215,67 +215,67 @@ struct BatchnormAttributesBuilder {
 
 inline ::flatbuffers::Offset<BatchnormAttributes> CreateBatchnormAttributes(
     ::flatbuffers::FlatBufferBuilder &_fbb,
-    int64_t x_tid = 0,
-    int64_t scale_tid = 0,
-    int64_t bias_tid = 0,
-    int64_t epsilon_tid = 0,
-    ::flatbuffers::Offset<::flatbuffers::Vector<int64_t>> peer_stats_tid = 0,
-    ::flatbuffers::Optional<int64_t> prev_running_mean_tid = ::flatbuffers::nullopt,
-    ::flatbuffers::Optional<int64_t> prev_running_variance_tid = ::flatbuffers::nullopt,
-    ::flatbuffers::Optional<int64_t> momentum_tid = ::flatbuffers::nullopt,
-    int64_t y_tid = 0,
-    ::flatbuffers::Optional<int64_t> mean_tid = ::flatbuffers::nullopt,
-    ::flatbuffers::Optional<int64_t> inv_variance_tid = ::flatbuffers::nullopt,
-    ::flatbuffers::Optional<int64_t> next_running_mean_tid = ::flatbuffers::nullopt,
-    ::flatbuffers::Optional<int64_t> next_running_variance_tid = ::flatbuffers::nullopt) {
+    int64_t x_tensor_uid = 0,
+    int64_t scale_tensor_uid = 0,
+    int64_t bias_tensor_uid = 0,
+    int64_t epsilon_tensor_uid = 0,
+    ::flatbuffers::Offset<::flatbuffers::Vector<int64_t>> peer_stats_tensor_uid = 0,
+    ::flatbuffers::Optional<int64_t> prev_running_mean_tensor_uid = ::flatbuffers::nullopt,
+    ::flatbuffers::Optional<int64_t> prev_running_variance_tensor_uid = ::flatbuffers::nullopt,
+    ::flatbuffers::Optional<int64_t> momentum_tensor_uid = ::flatbuffers::nullopt,
+    int64_t y_tensor_uid = 0,
+    ::flatbuffers::Optional<int64_t> mean_tensor_uid = ::flatbuffers::nullopt,
+    ::flatbuffers::Optional<int64_t> inv_variance_tensor_uid = ::flatbuffers::nullopt,
+    ::flatbuffers::Optional<int64_t> next_running_mean_tensor_uid = ::flatbuffers::nullopt,
+    ::flatbuffers::Optional<int64_t> next_running_variance_tensor_uid = ::flatbuffers::nullopt) {
   BatchnormAttributesBuilder builder_(_fbb);
-  if(next_running_variance_tid) { builder_.add_next_running_variance_tensor_uid(*next_running_variance_tid); }
-  if(next_running_mean_tid) { builder_.add_next_running_mean_tensor_uid(*next_running_mean_tid); }
-  if(inv_variance_tid) { builder_.add_inv_variance_tensor_uid(*inv_variance_tid); }
-  if(mean_tid) { builder_.add_mean_tensor_uid(*mean_tid); }
-  builder_.add_y_tensor_uid(y_tid);
-  if(momentum_tid) { builder_.add_momentum_tensor_uid(*momentum_tid); }
-  if(prev_running_variance_tid) { builder_.add_prev_running_variance_tensor_uid(*prev_running_variance_tid); }
-  if(prev_running_mean_tid) { builder_.add_prev_running_mean_tensor_uid(*prev_running_mean_tid); }
-  builder_.add_epsilon_tensor_uid(epsilon_tid);
-  builder_.add_bias_tensor_uid(bias_tid);
-  builder_.add_scale_tensor_uid(scale_tid);
-  builder_.add_x_tensor_uid(x_tid);
-  builder_.add_peer_stats_tensor_uid(peer_stats_tid);
+  if(next_running_variance_tensor_uid) { builder_.add_next_running_variance_tensor_uid(*next_running_variance_tensor_uid); }
+  if(next_running_mean_tensor_uid) { builder_.add_next_running_mean_tensor_uid(*next_running_mean_tensor_uid); }
+  if(inv_variance_tensor_uid) { builder_.add_inv_variance_tensor_uid(*inv_variance_tensor_uid); }
+  if(mean_tensor_uid) { builder_.add_mean_tensor_uid(*mean_tensor_uid); }
+  builder_.add_y_tensor_uid(y_tensor_uid);
+  if(momentum_tensor_uid) { builder_.add_momentum_tensor_uid(*momentum_tensor_uid); }
+  if(prev_running_variance_tensor_uid) { builder_.add_prev_running_variance_tensor_uid(*prev_running_variance_tensor_uid); }
+  if(prev_running_mean_tensor_uid) { builder_.add_prev_running_mean_tensor_uid(*prev_running_mean_tensor_uid); }
+  builder_.add_epsilon_tensor_uid(epsilon_tensor_uid);
+  builder_.add_bias_tensor_uid(bias_tensor_uid);
+  builder_.add_scale_tensor_uid(scale_tensor_uid);
+  builder_.add_x_tensor_uid(x_tensor_uid);
+  builder_.add_peer_stats_tensor_uid(peer_stats_tensor_uid);
   return builder_.Finish();
 }
 
 inline ::flatbuffers::Offset<BatchnormAttributes> CreateBatchnormAttributesDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
-    int64_t x_tid = 0,
-    int64_t scale_tid = 0,
-    int64_t bias_tid = 0,
-    int64_t epsilon_tid = 0,
-    const std::vector<int64_t> *peer_stats_tid = nullptr,
-    ::flatbuffers::Optional<int64_t> prev_running_mean_tid = ::flatbuffers::nullopt,
-    ::flatbuffers::Optional<int64_t> prev_running_variance_tid = ::flatbuffers::nullopt,
-    ::flatbuffers::Optional<int64_t> momentum_tid = ::flatbuffers::nullopt,
-    int64_t y_tid = 0,
-    ::flatbuffers::Optional<int64_t> mean_tid = ::flatbuffers::nullopt,
-    ::flatbuffers::Optional<int64_t> inv_variance_tid = ::flatbuffers::nullopt,
-    ::flatbuffers::Optional<int64_t> next_running_mean_tid = ::flatbuffers::nullopt,
-    ::flatbuffers::Optional<int64_t> next_running_variance_tid = ::flatbuffers::nullopt) {
-  auto peer_stats_tid__ = peer_stats_tid ? _fbb.CreateVector<int64_t>(*peer_stats_tid) : 0;
+    int64_t x_tensor_uid = 0,
+    int64_t scale_tensor_uid = 0,
+    int64_t bias_tensor_uid = 0,
+    int64_t epsilon_tensor_uid = 0,
+    const std::vector<int64_t> *peer_stats_tensor_uid = nullptr,
+    ::flatbuffers::Optional<int64_t> prev_running_mean_tensor_uid = ::flatbuffers::nullopt,
+    ::flatbuffers::Optional<int64_t> prev_running_variance_tensor_uid = ::flatbuffers::nullopt,
+    ::flatbuffers::Optional<int64_t> momentum_tensor_uid = ::flatbuffers::nullopt,
+    int64_t y_tensor_uid = 0,
+    ::flatbuffers::Optional<int64_t> mean_tensor_uid = ::flatbuffers::nullopt,
+    ::flatbuffers::Optional<int64_t> inv_variance_tensor_uid = ::flatbuffers::nullopt,
+    ::flatbuffers::Optional<int64_t> next_running_mean_tensor_uid = ::flatbuffers::nullopt,
+    ::flatbuffers::Optional<int64_t> next_running_variance_tensor_uid = ::flatbuffers::nullopt) {
+  auto peer_stats_tensor_uid__ = peer_stats_tensor_uid ? _fbb.CreateVector<int64_t>(*peer_stats_tensor_uid) : 0;
   return hipdnn_sdk::data_objects::CreateBatchnormAttributes(
       _fbb,
-      x_tid,
-      scale_tid,
-      bias_tid,
-      epsilon_tid,
-      peer_stats_tid__,
-      prev_running_mean_tid,
-      prev_running_variance_tid,
-      momentum_tid,
-      y_tid,
-      mean_tid,
-      inv_variance_tid,
-      next_running_mean_tid,
-      next_running_variance_tid);
+      x_tensor_uid,
+      scale_tensor_uid,
+      bias_tensor_uid,
+      epsilon_tensor_uid,
+      peer_stats_tensor_uid__,
+      prev_running_mean_tensor_uid,
+      prev_running_variance_tensor_uid,
+      momentum_tensor_uid,
+      y_tensor_uid,
+      mean_tensor_uid,
+      inv_variance_tensor_uid,
+      next_running_mean_tensor_uid,
+      next_running_variance_tensor_uid);
 }
 
 ::flatbuffers::Offset<BatchnormAttributes> CreateBatchnormAttributes(::flatbuffers::FlatBufferBuilder &_fbb, const BatchnormAttributesT *_o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
@@ -283,19 +283,19 @@ inline ::flatbuffers::Offset<BatchnormAttributes> CreateBatchnormAttributesDirec
 
 inline bool operator==(const BatchnormAttributesT &lhs, const BatchnormAttributesT &rhs) {
   return
-      (lhs.x_tid == rhs.x_tid) &&
-      (lhs.scale_tid == rhs.scale_tid) &&
-      (lhs.bias_tid == rhs.bias_tid) &&
-      (lhs.epsilon_tid == rhs.epsilon_tid) &&
-      (lhs.peer_stats_tid == rhs.peer_stats_tid) &&
-      (lhs.prev_running_mean_tid == rhs.prev_running_mean_tid) &&
-      (lhs.prev_running_variance_tid == rhs.prev_running_variance_tid) &&
-      (lhs.momentum_tid == rhs.momentum_tid) &&
-      (lhs.y_tid == rhs.y_tid) &&
-      (lhs.mean_tid == rhs.mean_tid) &&
-      (lhs.inv_variance_tid == rhs.inv_variance_tid) &&
-      (lhs.next_running_mean_tid == rhs.next_running_mean_tid) &&
-      (lhs.next_running_variance_tid == rhs.next_running_variance_tid);
+      (lhs.x_tensor_uid == rhs.x_tensor_uid) &&
+      (lhs.scale_tensor_uid == rhs.scale_tensor_uid) &&
+      (lhs.bias_tensor_uid == rhs.bias_tensor_uid) &&
+      (lhs.epsilon_tensor_uid == rhs.epsilon_tensor_uid) &&
+      (lhs.peer_stats_tensor_uid == rhs.peer_stats_tensor_uid) &&
+      (lhs.prev_running_mean_tensor_uid == rhs.prev_running_mean_tensor_uid) &&
+      (lhs.prev_running_variance_tensor_uid == rhs.prev_running_variance_tensor_uid) &&
+      (lhs.momentum_tensor_uid == rhs.momentum_tensor_uid) &&
+      (lhs.y_tensor_uid == rhs.y_tensor_uid) &&
+      (lhs.mean_tensor_uid == rhs.mean_tensor_uid) &&
+      (lhs.inv_variance_tensor_uid == rhs.inv_variance_tensor_uid) &&
+      (lhs.next_running_mean_tensor_uid == rhs.next_running_mean_tensor_uid) &&
+      (lhs.next_running_variance_tensor_uid == rhs.next_running_variance_tensor_uid);
 }
 
 inline bool operator!=(const BatchnormAttributesT &lhs, const BatchnormAttributesT &rhs) {
@@ -312,19 +312,19 @@ inline BatchnormAttributesT *BatchnormAttributes::UnPack(const ::flatbuffers::re
 inline void BatchnormAttributes::UnPackTo(BatchnormAttributesT *_o, const ::flatbuffers::resolver_function_t *_resolver) const {
   (void)_o;
   (void)_resolver;
-  { auto _e = x_tensor_uid(); _o->x_tid = _e; }
-  { auto _e = scale_tensor_uid(); _o->scale_tid = _e; }
-  { auto _e = bias_tensor_uid(); _o->bias_tid = _e; }
-  { auto _e = epsilon_tensor_uid(); _o->epsilon_tid = _e; }
-  { auto _e = peer_stats_tensor_uid(); if (_e) { _o->peer_stats_tid.resize(_e->size()); for (::flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->peer_stats_tid[_i] = _e->Get(_i); } } else { _o->peer_stats_tid.resize(0); } }
-  { auto _e = prev_running_mean_tensor_uid(); _o->prev_running_mean_tid = _e; }
-  { auto _e = prev_running_variance_tensor_uid(); _o->prev_running_variance_tid = _e; }
-  { auto _e = momentum_tensor_uid(); _o->momentum_tid = _e; }
-  { auto _e = y_tensor_uid(); _o->y_tid = _e; }
-  { auto _e = mean_tensor_uid(); _o->mean_tid = _e; }
-  { auto _e = inv_variance_tensor_uid(); _o->inv_variance_tid = _e; }
-  { auto _e = next_running_mean_tensor_uid(); _o->next_running_mean_tid = _e; }
-  { auto _e = next_running_variance_tensor_uid(); _o->next_running_variance_tid = _e; }
+  { auto _e = x_tensor_uid(); _o->x_tensor_uid = _e; }
+  { auto _e = scale_tensor_uid(); _o->scale_tensor_uid = _e; }
+  { auto _e = bias_tensor_uid(); _o->bias_tensor_uid = _e; }
+  { auto _e = epsilon_tensor_uid(); _o->epsilon_tensor_uid = _e; }
+  { auto _e = peer_stats_tensor_uid(); if (_e) { _o->peer_stats_tensor_uid.resize(_e->size()); for (::flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->peer_stats_tensor_uid[_i] = _e->Get(_i); } } else { _o->peer_stats_tensor_uid.resize(0); } }
+  { auto _e = prev_running_mean_tensor_uid(); _o->prev_running_mean_tensor_uid = _e; }
+  { auto _e = prev_running_variance_tensor_uid(); _o->prev_running_variance_tensor_uid = _e; }
+  { auto _e = momentum_tensor_uid(); _o->momentum_tensor_uid = _e; }
+  { auto _e = y_tensor_uid(); _o->y_tensor_uid = _e; }
+  { auto _e = mean_tensor_uid(); _o->mean_tensor_uid = _e; }
+  { auto _e = inv_variance_tensor_uid(); _o->inv_variance_tensor_uid = _e; }
+  { auto _e = next_running_mean_tensor_uid(); _o->next_running_mean_tensor_uid = _e; }
+  { auto _e = next_running_variance_tensor_uid(); _o->next_running_variance_tensor_uid = _e; }
 }
 
 inline ::flatbuffers::Offset<BatchnormAttributes> BatchnormAttributes::Pack(::flatbuffers::FlatBufferBuilder &_fbb, const BatchnormAttributesT* _o, const ::flatbuffers::rehasher_function_t *_rehasher) {
@@ -335,34 +335,34 @@ inline ::flatbuffers::Offset<BatchnormAttributes> CreateBatchnormAttributes(::fl
   (void)_rehasher;
   (void)_o;
   struct _VectorArgs { ::flatbuffers::FlatBufferBuilder *__fbb; const BatchnormAttributesT* __o; const ::flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
-  auto _x_tid = _o->x_tid;
-  auto _scale_tid = _o->scale_tid;
-  auto _bias_tid = _o->bias_tid;
-  auto _epsilon_tid = _o->epsilon_tid;
-  auto _peer_stats_tid = _o->peer_stats_tid.size() ? _fbb.CreateVector(_o->peer_stats_tid) : 0;
-  auto _prev_running_mean_tid = _o->prev_running_mean_tid;
-  auto _prev_running_variance_tid = _o->prev_running_variance_tid;
-  auto _momentum_tid = _o->momentum_tid;
-  auto _y_tid = _o->y_tid;
-  auto _mean_tid = _o->mean_tid;
-  auto _inv_variance_tid = _o->inv_variance_tid;
-  auto _next_running_mean_tid = _o->next_running_mean_tid;
-  auto _next_running_variance_tid = _o->next_running_variance_tid;
+  auto _x_tensor_uid = _o->x_tensor_uid;
+  auto _scale_tensor_uid = _o->scale_tensor_uid;
+  auto _bias_tensor_uid = _o->bias_tensor_uid;
+  auto _epsilon_tensor_uid = _o->epsilon_tensor_uid;
+  auto _peer_stats_tensor_uid = _o->peer_stats_tensor_uid.size() ? _fbb.CreateVector(_o->peer_stats_tensor_uid) : 0;
+  auto _prev_running_mean_tensor_uid = _o->prev_running_mean_tensor_uid;
+  auto _prev_running_variance_tensor_uid = _o->prev_running_variance_tensor_uid;
+  auto _momentum_tensor_uid = _o->momentum_tensor_uid;
+  auto _y_tensor_uid = _o->y_tensor_uid;
+  auto _mean_tensor_uid = _o->mean_tensor_uid;
+  auto _inv_variance_tensor_uid = _o->inv_variance_tensor_uid;
+  auto _next_running_mean_tensor_uid = _o->next_running_mean_tensor_uid;
+  auto _next_running_variance_tensor_uid = _o->next_running_variance_tensor_uid;
   return hipdnn_sdk::data_objects::CreateBatchnormAttributes(
       _fbb,
-      _x_tid,
-      _scale_tid,
-      _bias_tid,
-      _epsilon_tid,
-      _peer_stats_tid,
-      _prev_running_mean_tid,
-      _prev_running_variance_tid,
-      _momentum_tid,
-      _y_tid,
-      _mean_tid,
-      _inv_variance_tid,
-      _next_running_mean_tid,
-      _next_running_variance_tid);
+      _x_tensor_uid,
+      _scale_tensor_uid,
+      _bias_tensor_uid,
+      _epsilon_tensor_uid,
+      _peer_stats_tensor_uid,
+      _prev_running_mean_tensor_uid,
+      _prev_running_variance_tensor_uid,
+      _momentum_tensor_uid,
+      _y_tensor_uid,
+      _mean_tensor_uid,
+      _inv_variance_tensor_uid,
+      _next_running_mean_tensor_uid,
+      _next_running_variance_tensor_uid);
 }
 
 }  // namespace data_objects
