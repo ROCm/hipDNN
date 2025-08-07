@@ -9,7 +9,6 @@
 #include <vector>
 
 // TODO - Once PluginManager is implemented, we will need to add a testing plugin for this API.
-// NOLINTBEGIN(readability-function-cognitive-complexity)
 namespace
 {
 constexpr hipdnnBackendHeurMode_t FALLBACK_MODE = HIPDNN_HEUR_MODE_FALLBACK;
@@ -439,4 +438,3 @@ TEST_F(Engine_heuristic_api_tests, GetEngineConfigsRequestMoreThanAvailable)
         EXPECT_EQ(hipdnnBackendDestroyDescriptor(config), HIPDNN_STATUS_SUCCESS);
     }
 }
-// NOLINTEND(readability-function-cognitive-complexity)

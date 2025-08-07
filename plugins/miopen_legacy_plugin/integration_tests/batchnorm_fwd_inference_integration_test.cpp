@@ -12,6 +12,7 @@
 #include <hipdnn_frontend/graph.hpp>
 #include <hipdnn_sdk/test_utilities/cpu_fp_reference_implementation.hpp>
 #include <hipdnn_sdk/test_utilities/cpu_fp_reference_validation.hpp>
+#include <hipdnn_sdk/test_utilities/test_utilities.hpp>
 #include <hipdnn_sdk/utilities/migratable_memory.hpp>
 #include <hipdnn_sdk/utilities/tensor.hpp>
 
@@ -76,13 +77,14 @@ struct Batchnorm_2d_tensor_bundle
     Tensor mean_tensor;
     Tensor variance_tensor;
 };
-// NOLINTBEGIN(readability-function-cognitive-complexity)
 class Batchnorm_forward_inference_integration_test
     : public ::testing::TestWithParam<Bn_2d_test_case>
 {
 protected:
     void SetUp() override
     {
+        SKIP_IF_NO_DEVICES();
+
         // Uncomment if you want debug logging info.
         // setenv("HIPDNN_LOG_LEVEL", "info", 1);
 
@@ -339,5 +341,3 @@ TEST_P(Batchnorm_forward_inference_integration_test_half, RunHalfFwdbatchnormGra
 INSTANTIATE_TEST_SUITE_P(RunHalfFwdbatchnormGraph,
                          Batchnorm_forward_inference_integration_test_half,
                          testing::ValuesIn(get_bn_fwd_inference_test_cases()));
-
-// NOLINTEND(readability-function-cognitive-complexity)

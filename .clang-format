@@ -83,6 +83,7 @@ IndentCaseLabels: false
 IndentPPDirectives: None
 #FixNamespaceComments: true
 IndentWrappedFunctionNames: true
+InsertNewlineAtEOF: true
 KeepEmptyLinesAtTheStartOfBlocks: true
 MacroBlockBegin: ''
 MacroBlockEnd:   ''
