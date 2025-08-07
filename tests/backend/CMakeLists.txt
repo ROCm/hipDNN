@@ -24,7 +24,6 @@ target_link_libraries(public_hipdnn_backend_tests
     pthread 
     hipdnn_sdk
     hipdnn_backend
-    hipdnn_frontend
     hip::host
     hip::device
 )

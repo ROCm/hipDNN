@@ -4,13 +4,8 @@
 #pragma once
 
 #include "hipdnn_backend.h"
-#include <hipdnn_frontend/attributes/batchnorm_inference_attributes.hpp>
-#include <hipdnn_frontend/attributes/pointwise_attributes.hpp>
-#include <hipdnn_frontend/graph.hpp>
 #include <hipdnn_sdk/data_objects/graph_generated.h>
 
-using namespace hipdnn_frontend;
-using namespace hipdnn_frontend::graph;
 namespace test_util
 {
 
