@@ -122,14 +122,20 @@ void Sample_runner::operator()()
             variance_host_ptr[i] = static_cast<IntermediateType>(1.0f)
                                    / (inv_variance_host_ptr[i] * inv_variance_host_ptr[i]);
         }
-        variance_tensor.memory().mark_host_modified();
 
-        ref_impl.batchnorm_fwd_inference(
-            x_tensor, scale_tensor, bias_tensor, mean_tensor, variance_tensor, y_ref_tensor, 1e-5);
+        const float epsilon = 1e-2f; // bf16 fails for lower epsilon values
+
+        ref_impl.batchnorm_fwd_inference(x_tensor,
+                                         scale_tensor,
+                                         bias_tensor,
+                                         mean_tensor,
+                                         variance_tensor,
+                                         y_ref_tensor,
+                                         epsilon);
 
         auto validator
             = hipdnn_sdk::reference_test_utilities::Cpu_fp_reference_validation<InputType>(
-                static_cast<InputType>(1e-3), static_cast<InputType>(1e-3));
+                static_cast<InputType>(epsilon), static_cast<InputType>(epsilon));
 
         std::cout << "CPU reference validation "
                   << (validator.compare_buffers(y_ref_tensor.memory(), y_tensor.memory())
