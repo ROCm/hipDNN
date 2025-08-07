@@ -15,6 +15,7 @@
 #include "engine_plugin_resource_manager.hpp"
 #include "hipdnn_exception.hpp"
 #include "logging/logging.hpp"
+#include <hipdnn_sdk/utilities/string_util.hpp>
 
 namespace hipdnn_backend
 {
@@ -71,6 +72,51 @@ std::set<std::filesystem::path> Engine_plugin_resource_manager::get_plugin_paths
 {
     std::lock_guard<std::mutex> lock(plugin_mutex);
     return plugin_config.paths;
+}
+
+void Engine_plugin_resource_manager::get_loaded_plugin_files(size_t* num_plugins,
+                                                             char** plugin_paths,
+                                                             size_t* max_string_size)
+{
+    auto pm = pm_ptr.lock();
+    if(!pm)
+    {
+        *num_plugins = 0;
+        *max_string_size = 0;
+        return;
+    }
+
+    const auto& path_set = pm->get_loaded_plugin_files();
+
+    size_t required_path_len = 0;
+    for(const auto& path : path_set)
+    {
+        required_path_len = std::max(required_path_len, path.string().length() + 1);
+    }
+
+    if(plugin_paths == nullptr)
+    {
+        *num_plugins = path_set.size();
+        *max_string_size = required_path_len;
+        return;
+    }
+
+    if(*num_plugins < path_set.size() || *max_string_size < required_path_len)
+    {
+        throw Hipdnn_exception(HIPDNN_STATUS_BAD_PARAM, "Insufficient buffer space provided.");
+    }
+
+    std::vector<std::string> paths_vec(path_set.begin(), path_set.end());
+    for(size_t i = 0; i < paths_vec.size(); ++i)
+    {
+        if(plugin_paths[i] == nullptr)
+        {
+            throw Hipdnn_exception(HIPDNN_STATUS_BAD_PARAM, "A plugin path string buffer is null.");
+        }
+        hipdnn::sdk::utilities::copy_max_size_with_null_terminator(
+            plugin_paths[i], paths_vec[i].c_str(), *max_string_size);
+    }
+    *num_plugins = paths_vec.size();
 }
 
 std::shared_ptr<Engine_plugin_resource_manager> Engine_plugin_resource_manager::create()

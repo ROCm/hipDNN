@@ -299,4 +299,46 @@ void extract_tensor_info_from_graph(
     ASSERT_FALSE(uid_to_name_map.empty());
 }
 
+std::vector<std::string> get_loaded_plugins()
+{
+    size_t num_plugins = 0;
+    size_t max_path_length = 0;
+    auto status = hipdnnGetLoadedEnginePlugins_ext(&num_plugins, nullptr, &max_path_length);
+    if(status != HIPDNN_STATUS_SUCCESS || num_plugins == 0)
+    {
+        return {};
+    }
+
+    std::vector<std::vector<char>> path_buffers(num_plugins, std::vector<char>(max_path_length));
+    std::vector<char*> plugin_paths_c(num_plugins);
+    for(size_t i = 0; i < num_plugins; ++i)
+    {
+        plugin_paths_c[i] = path_buffers[i].data();
+    }
+
+    status
+        = hipdnnGetLoadedEnginePlugins_ext(&num_plugins, plugin_paths_c.data(), &max_path_length);
+    if(status != HIPDNN_STATUS_SUCCESS)
+    {
+        return {};
+    }
+
+    std::vector<std::string> plugin_paths;
+    plugin_paths.reserve(num_plugins);
+    for(size_t i = 0; i < num_plugins; ++i)
+    {
+        plugin_paths.emplace_back(plugin_paths_c[i]);
+    }
+    return plugin_paths;
+}
+
+bool is_plugin_loaded(const std::vector<std::string>& loaded_plugins,
+                      const std::string& plugin_name)
+{
+    return std::ranges::any_of(
+        loaded_plugins.begin(), loaded_plugins.end(), [&](const std::string& path) {
+            return path.find(plugin_name) != std::string::npos;
+        });
+}
+
 } // namespace test_util

@@ -307,6 +307,25 @@ HIPDNN_BACKEND_EXPORT void hipdnnLoggingCallback_ext(hipdnnSeverity_t severity, 
 HIPDNN_BACKEND_EXPORT hipdnnStatus_t hipdnnSetEnginePluginPaths_ext(
     size_t num_paths, const char* const* plugin_paths, hipdnnPluginLoadingMode_ext_t loading_mode);
 
+/**
+ * @brief Gets file paths of loaded engine plugins.
+ *
+ * Call once with `plugin_paths` as `NULL` to query the number of plugins (`num_plugins`) and the
+ * required buffer size for each path (`max_string_size`). Allocate buffers, then call again with
+ * `plugin_paths` and `max_string_size` set to retrieve the paths.
+ *
+ * @param[in,out] num_plugins      Pointer to number of plugins; updated with actual count.
+ * @param[out]    plugin_paths     Array of character pointers for plugin paths, or `NULL` to query sizes.
+ * @param[in,out] max_string_size  Pointer to buffer size; updated with required size.
+ *
+ * @retval HIPDNN_STATUS_SUCCESS           Success.
+ * @retval HIPDNN_STATUS_BAD_PARAM         Null pointers or insufficient buffer sizes.
+ * @retval HIPDNN_STATUS_INTERNAL_ERROR    Internal error.
+ */
+HIPDNN_BACKEND_EXPORT hipdnnStatus_t hipdnnGetLoadedEnginePlugins_ext(size_t* num_plugins,
+                                                                      char** plugin_paths,
+                                                                      size_t* max_string_size);
+
 #ifdef __cplusplus
 }
 #endif

@@ -2,9 +2,12 @@
 // SPDX-License-Identifier:  MIT
 
 #include "hipdnn_backend.h"
+#include "test_util.hpp"
 #include <array>
+#include <filesystem>
 #include <gtest/gtest.h>
 #include <hipdnn_sdk/data_objects/graph_generated.h>
+#include <vector>
 
 TEST(HipDNNBackendTest, WillCreateDestroyGraphDescriptorSuccessfully)
 {
@@ -184,7 +187,7 @@ TEST(HipDNNBackendTest, SetPluginPathsExt_FailsOnNullPointer)
     EXPECT_EQ(status, HIPDNN_STATUS_BAD_PARAM_NULL_POINTER);
 
     status = hipdnnSetEnginePluginPaths_ext(0, nullptr, HIPDNN_PLUGIN_LOADING_ABSOLUTE);
-    EXPECT_EQ(status, HIPDNN_STATUS_BAD_PARAM_NULL_POINTER);
+    EXPECT_EQ(status, HIPDNN_STATUS_SUCCESS);
 }
 
 TEST(HipDNNBackendTest, SetPluginPathsExt_FailsOnNullStringInList)
@@ -197,23 +200,80 @@ TEST(HipDNNBackendTest, SetPluginPathsExt_FailsOnNullStringInList)
     EXPECT_EQ(status, HIPDNN_STATUS_BAD_PARAM_NULL_POINTER);
 }
 
-// Uncomment this test and observe logs to see the plugin is loaded
-// TEST(HipDNNBackendTest, SetPluginPathAndCreateHandle_LoadsPlugins)
-// {
-//     // Can also test by manually changing default path
-//     const std::array<const char*, 1> paths = {"../../tests/test_plugins/"};
+class Hipdnn_backend_plugin_test : public ::testing::Test
+{
+protected:
+    void SetUp() override
+    {
+        const std::array<const char*, 0> paths = {};
+        hipdnnSetEnginePluginPaths_ext(paths.size(), paths.data(), HIPDNN_PLUGIN_LOADING_ADDITIVE);
+        const std::filesystem::path dest_dir = "../../backend/src/hipdnn_plugins/engines/";
+        const std::filesystem::path source_file = "../test_plugins/libtest_good_plugin.so";
+        const std::filesystem::path dest_file_with_new_name
+            = dest_dir / "libtest_good_default_plugin.so";
 
-//     hipdnnStatus_t status = hipdnnSetEnginePluginPaths_ext(
-//         paths.size(), paths.data(), HIPDNN_PLUGIN_LOADING_ADDITIVE);
-//     EXPECT_EQ(status, HIPDNN_STATUS_SUCCESS);
+        std::filesystem::create_directories(dest_dir);
+        std::filesystem::copy(source_file,
+                              dest_file_with_new_name,
+                              std::filesystem::copy_options::overwrite_existing);
+    }
+    void TearDown() override
+    {
+        hipdnnSetEnginePluginPaths_ext(0, nullptr, HIPDNN_PLUGIN_LOADING_ABSOLUTE);
+        std::filesystem::remove_all("hipdnn_plugins");
+    }
+};
 
-//     hipdnnHandle_t handle = nullptr;
-//     hipdnnStatus_t status = hipdnnCreate(&handle);
-//     EXPECT_EQ(status, HIPDNN_STATUS_SUCCESS);
-//     EXPECT_NE(handle, nullptr);
+TEST_F(Hipdnn_backend_plugin_test, GetLoadedPluginPaths_LoadsDefault)
+{
+    hipdnnHandle_t handle = nullptr;
+    auto status = hipdnnCreate(&handle);
+    ASSERT_EQ(status, HIPDNN_STATUS_SUCCESS);
+    ASSERT_NE(handle, nullptr);
 
-//     status = hipdnnDestroy(handle);
-//     EXPECT_EQ(status, HIPDNN_STATUS_SUCCESS);
+    const auto loaded_plugins = test_util::get_loaded_plugins();
+    EXPECT_TRUE(test_util::is_plugin_loaded(loaded_plugins, "libtest_good_default_plugin.so"))
+        << "The default plugin was not loaded.";
 
-//     EXPECT_TRUE(false); // for visibility
-// }
+    EXPECT_EQ(hipdnnDestroy(handle), HIPDNN_STATUS_SUCCESS);
+}
+
+TEST_F(Hipdnn_backend_plugin_test, GetLoadedPluginPaths_AdditiveLoadsBothDefaultAndCustom)
+{
+    const std::array<const char*, 1> paths = {"../../tests/test_plugins/"};
+    auto status = hipdnnSetEnginePluginPaths_ext(
+        paths.size(), paths.data(), HIPDNN_PLUGIN_LOADING_ADDITIVE);
+    EXPECT_EQ(status, HIPDNN_STATUS_SUCCESS);
+
+    hipdnnHandle_t handle = nullptr;
+    status = hipdnnCreate(&handle);
+    ASSERT_EQ(status, HIPDNN_STATUS_SUCCESS);
+    ASSERT_NE(handle, nullptr);
+
+    const auto loaded_plugins = test_util::get_loaded_plugins();
+    EXPECT_GE(loaded_plugins.size(), 2);
+    EXPECT_TRUE(test_util::is_plugin_loaded(loaded_plugins, "libtest_good_default_plugin.so"));
+    EXPECT_TRUE(test_util::is_plugin_loaded(loaded_plugins, "libtest_good_plugin.so"));
+
+    EXPECT_EQ(hipdnnDestroy(handle), HIPDNN_STATUS_SUCCESS);
+}
+
+TEST_F(Hipdnn_backend_plugin_test, GetLoadedPluginPaths_AbsoluteLoadsOnlyCustom)
+{
+    const std::array<const char*, 1> paths = {"../../tests/test_plugins/"};
+    auto status = hipdnnSetEnginePluginPaths_ext(
+        paths.size(), paths.data(), HIPDNN_PLUGIN_LOADING_ABSOLUTE);
+    EXPECT_EQ(status, HIPDNN_STATUS_SUCCESS);
+
+    hipdnnHandle_t handle = nullptr;
+    status = hipdnnCreate(&handle);
+    ASSERT_EQ(status, HIPDNN_STATUS_SUCCESS);
+    ASSERT_NE(handle, nullptr);
+
+    const auto loaded_plugins = test_util::get_loaded_plugins();
+    EXPECT_EQ(loaded_plugins.size(), 1);
+    EXPECT_FALSE(test_util::is_plugin_loaded(loaded_plugins, "libtest_good_default_plugin.so"));
+    EXPECT_TRUE(test_util::is_plugin_loaded(loaded_plugins, "libtest_good_plugin.so"));
+
+    EXPECT_EQ(hipdnnDestroy(handle), HIPDNN_STATUS_SUCCESS);
+}

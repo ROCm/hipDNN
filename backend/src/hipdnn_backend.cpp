@@ -294,7 +294,10 @@ HIPDNN_BACKEND_EXPORT hipdnnStatus_t hipdnnSetEnginePluginPaths_ext(
                   hipdnn_backend::hipdnn_get_plugin_loading_mode_string(loading_mode));
 
     return hipdnn_backend::try_catch([&, api_name = __func__] {
-        throw_if_null(plugin_paths);
+        if(num_paths > 0)
+        {
+            throw_if_null(plugin_paths);
+        }
 
         std::vector<std::filesystem::path> paths_vec;
         paths_vec.reserve(num_paths);
@@ -307,11 +310,30 @@ HIPDNN_BACKEND_EXPORT hipdnnStatus_t hipdnnSetEnginePluginPaths_ext(
 
         hipdnn_backend::plugin::Engine_plugin_resource_manager::set_plugin_paths(paths_vec,
                                                                                  loading_mode);
-
         // TODO: automatic formatting loading mode to string
         LOG_API_SUCCESS(api_name,
                         "set_plugin_paths={}",
                         hipdnn_backend::hipdnn_get_plugin_loading_mode_string(loading_mode));
         return HIPDNN_STATUS_SUCCESS;
+    });
+}
+
+HIPDNN_BACKEND_EXPORT hipdnnStatus_t hipdnnGetLoadedEnginePlugins_ext(size_t* num_plugins,
+                                                                      char** plugin_paths,
+                                                                      size_t* max_string_size)
+{
+    LOG_API_ENTRY("num_plugins_ptr={:p}, plugin_paths_ptr={:p}, max_string_size={:p}",
+                  static_cast<void*>(num_plugins),
+                  static_cast<const void*>(plugin_paths),
+                  static_cast<void*>(max_string_size));
+
+    return hipdnn_backend::try_catch([&, api_name = __func__] {
+        throw_if_null(num_plugins);
+        throw_if_null(max_string_size);
+
+        plugin::Engine_plugin_resource_manager::get_loaded_plugin_files(
+            num_plugins, plugin_paths, max_string_size);
+
+        LOG_API_SUCCESS(api_name, "retrieved_num_plugins={}", *num_plugins);
     });
 }
