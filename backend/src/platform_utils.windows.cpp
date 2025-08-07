@@ -11,7 +11,7 @@
 namespace hipdnn_backend::platform_utils
 {
 
-inline std::filesystem::path get_current_module_directory()
+std::filesystem::path get_current_module_directory()
 {
     std::filesystem::path module_path;
 
@@ -40,7 +40,7 @@ inline std::filesystem::path get_current_module_directory()
     return std::filesystem::weakly_canonical(std::filesystem::absolute(module_path));
 }
 
-inline Plugin_lib_handle open_library(const std::filesystem::path& library_path)
+Plugin_lib_handle open_library(const std::filesystem::path& library_path)
 {
     PLUGIN_LIB_HANDLE handle = LoadLibraryW(library_path.wstring().c_str());
     if(handle == nullptr)
@@ -54,12 +54,12 @@ inline Plugin_lib_handle open_library(const std::filesystem::path& library_path)
     return handle;
 }
 
-inline void close_library(Plugin_lib_handle handle)
+void close_library(Plugin_lib_handle handle)
 {
     FreeLibrary(handle);
 }
 
-inline void* get_symbol(Plugin_lib_handle handle, const char* symbol_name)
+void* get_symbol(Plugin_lib_handle handle, const char* symbol_name)
 {
     void* symbol = GetProcAddress(handle, symbol_name);
     if(symbol == nullptr)
