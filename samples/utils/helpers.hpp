@@ -30,7 +30,7 @@
     {                                                                                    \
         if(status != HIPDNN_STATUS_SUCCESS)                                              \
         {                                                                                \
-            std::cerr << "MIOpen Error: " << hipdnnGetErrorString(status) << " in file " \
+            std::cerr << "hipDNN Error: " << hipdnnGetErrorString(status) << " in file " \
                       << __FILE__ << " at line " << __LINE__ << std::endl;               \
             exit(EXIT_FAILURE);                                                          \
         }                                                                                \
@@ -47,6 +47,62 @@
             exit(EXIT_FAILURE);                                                           \
         }                                                                                 \
     } while(0)
+
+enum class Tensor_layout
+{
+    NCHW,
+    NHWC
+};
+
+inline void print_sample_help(const std::string& sample_name)
+{
+    std::cout << "Usage: " << sample_name << " [OPTIONS]\n"
+              << "Options:\n"
+              << "  --verify, -v    Enable CPU reference validation\n"
+              << "  --help, -h      Show this help message\n"
+              << std::endl;
+}
+
+struct Config
+{
+    bool cpu_validation = false;
+};
+
+inline Config parse_command_line_args(int argc, char* argv[])
+{
+    auto config = Config{};
+
+    for(int i = 1; i < argc; ++i)
+    {
+        auto arg = std::string(argv[i]);
+
+        if(arg == "--verify-cpu" || arg == "-vc")
+        {
+            config.cpu_validation = true;
+        }
+        else if(arg == "--help" || arg == "-h")
+        {
+            print_sample_help(argv[0]);
+            exit(EXIT_SUCCESS);
+        }
+        else
+        {
+            std::cerr << "Unknown argument: " << arg << std::endl;
+            print_sample_help(argv[0]);
+            exit(EXIT_FAILURE);
+        }
+    }
+
+    return config;
+}
+
+template <typename F>
+void run(F&& f)
+{
+    f.template operator()<float, float, Tensor_layout::NCHW>();
+    f.template operator()<half, float, Tensor_layout::NCHW>();
+    f.template operator()<hip_bfloat16, float, Tensor_layout::NCHW>();
+}
 
 inline std::shared_ptr<hipdnn_frontend::graph::Tensor_attributes>
     create_tensor(const std::vector<int64_t>& dims, hipdnn_frontend::DataType_t data_type)
@@ -71,3 +127,12 @@ inline int64_t get_tensor_element_count(
     }
     return count;
 }
+
+struct Sample_runner
+{
+    hipdnnHandle_t handle;
+    Config config;
+
+    template <typename InputType, typename IntermediateType, Tensor_layout Layout>
+    void operator()();
+};
