@@ -43,3 +43,9 @@ endfunction()
 
 # test_good_plugin is a well-behaved plugin that returns a happy path
 add_test_plugin(test_good_plugin test_good_plugin.cpp)
+
+# test_execute_fails_plugin is a plugin that fails during execution
+add_test_plugin(test_execute_fails_plugin test_execute_fails_plugin.cpp)
+
+# test_no_applicable_engines_plugin is a plugin that reports no applicable engines
+add_test_plugin(test_no_applicable_engines_plugin test_no_applicable_engines_plugin.cpp)
