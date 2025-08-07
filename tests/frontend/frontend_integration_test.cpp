@@ -19,12 +19,10 @@ using namespace hipdnn_frontend;
 using namespace hipdnn_frontend::graph;
 using namespace hipdnn_sdk::utilities;
 
-// Plugin name constants
 const char* const TEST_GOOD_PLUGIN = "libtest_good_plugin.so";
 const char* const TEST_EXECUTE_FAILS_PLUGIN = "libtest_execute_fails_plugin.so";
 const char* const TEST_NO_APPLICABLE_ENGINES_PLUGIN = "libtest_no_applicable_engines_plugin.so";
 
-// Helper function to build and execute graph pipeline
 enum class FailurePoint
 {
     NONE, // No failure expected
@@ -32,7 +30,6 @@ enum class FailurePoint
     EXECUTE // Expect failure at execute
 };
 
-// Test case structure for parameterized tests
 struct Integration_test_case
 {
     const char* plugin_name;
@@ -41,7 +38,6 @@ struct Integration_test_case
     FailurePoint expected_failure;
     bool use_manual_uids;
 
-    // operator<< for debugging - prints test case details when test fails
     friend std::ostream& operator<<(std::ostream& os, const Integration_test_case& tc)
     {
         os << "BatchnormTestCase{"
@@ -111,7 +107,6 @@ protected:
         Tensor variance_tensor;
     };
 
-    // Helper structure to hold test tensor attributes
     struct Batchnorm_test_tensors
     {
         std::shared_ptr<Tensor_attributes> x;
@@ -155,7 +150,6 @@ protected:
         return handle;
     }
 
-    // Helper function to create a batchnorm graph setup with optional manual UIDs
     static std::pair<std::shared_ptr<Graph>, Batchnorm_test_tensors>
         create_batchnorm_test_graph_with_uids(
             const std::string& graph_name,
