@@ -16,7 +16,7 @@ protected:
 
     void SetUp() override
     {
-        const std::array<const char*, 1> paths = {"../test_plugins/"};
+        const std::array<const char*, 1> paths = {"../test_plugins/libtest_good_plugin.so"};
         ASSERT_EQ(hipdnnSetEnginePluginPaths_ext(
                       paths.size(), paths.data(), HIPDNN_PLUGIN_LOADING_ABSOLUTE),
                   HIPDNN_STATUS_SUCCESS);
