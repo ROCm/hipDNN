@@ -12,6 +12,7 @@
 #include <hipdnn_frontend/graph.hpp>
 #include <hipdnn_sdk/test_utilities/cpu_fp_reference_implementation.hpp>
 #include <hipdnn_sdk/test_utilities/cpu_fp_reference_validation.hpp>
+#include <hipdnn_sdk/test_utilities/test_utilities.hpp>
 #include <hipdnn_sdk/utilities/migratable_memory.hpp>
 #include <hipdnn_sdk/utilities/tensor.hpp>
 
@@ -82,6 +83,8 @@ class Batchnorm_forward_inference_integration_test
 protected:
     void SetUp() override
     {
+        SKIP_IF_NO_DEVICES();
+
         // Uncomment if you want debug logging info.
         // setenv("HIPDNN_LOG_LEVEL", "info", 1);
 

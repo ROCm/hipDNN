@@ -261,5 +261,4 @@ TEST_F(Finalized_variant_pack_descriptor_tests, InvalidGetAttributes)
                                HIPDNN_STATUS_BAD_PARAM_NULL_POINTER);
 }
 
-
 } // namespace hipdnn_backend

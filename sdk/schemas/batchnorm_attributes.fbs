@@ -4,17 +4,17 @@
 namespace hipdnn_sdk.data_objects;
 
 table BatchnormAttributes {
-    x: long;
-    scale: long;
-    bias: long;
-    epsilon: long;
-    peer_stats: [long];
-    prev_running_mean: long = null;
-    prev_running_variance: long = null;
-    momentum: long = null;
-    y: long;
-    mean: long = null;
-    inv_variance: long = null;
-    next_running_mean: long = null;
-    next_running_variance: long = null;
+    x_tensor_uid: long;
+    scale_tensor_uid: long;
+    bias_tensor_uid: long;
+    epsilon_tensor_uid: long;
+    peer_stats_tensor_uid: [long];
+    prev_running_mean_tensor_uid: long = null;
+    prev_running_variance_tensor_uid: long = null;
+    momentum_tensor_uid: long = null;
+    y_tensor_uid: long;
+    mean_tensor_uid: long = null;
+    inv_variance_tensor_uid: long = null;
+    next_running_mean_tensor_uid: long = null;
+    next_running_variance_tensor_uid: long = null;
 }
