@@ -124,14 +124,7 @@ protected:
 
         for(const auto& path : _default_plugin_paths)
         {
-            if(path.is_relative())
-            {
-                resolved_paths.insert(base_dir / path);
-            }
-            else
-            {
-                resolved_paths.insert(path);
-            }
+            resolved_paths.insert(path.is_relative() ? base_dir / path : path);
         }
 
         return resolved_paths;
