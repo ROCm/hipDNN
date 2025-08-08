@@ -8,6 +8,8 @@
 #include "hipdnn_exception.hpp"
 #include <windows.h>
 
+using hipdnn_sdk::utilities::Plugin_lib_handle;
+
 namespace hipdnn_backend::platform_utils
 {
 

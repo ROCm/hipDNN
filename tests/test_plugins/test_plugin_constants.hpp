@@ -6,6 +6,7 @@
 #include <filesystem>
 #include <stdexcept>
 #include <string>
+#include <hipdnn_sdk/utilities/platform_path_utils.hpp>
 
 namespace hipdnn_tests
 {
@@ -18,22 +19,12 @@ namespace plugin_constants
     inline const char* test_execute_fails_plugin_name = TEST_EXECUTE_FAILS_PLUGIN_NAME;
     inline const char* test_no_applicable_engines_plugin_name = TEST_NO_APPLICABLE_ENGINES_PLUGIN_NAME;
 
-    // Platform-specific shared library naming
-    inline std::string get_plugin_filename(const char* plugin_name)
-    {
-#ifdef _WIN32
-        return std::string(plugin_name) + ".dll";
-#else
-        return std::string("lib") + plugin_name + ".so";
-#endif
-    }
-
     // Compose full plugin path with existence checking
     inline std::string get_plugin_path(const char* plugin_name)
     {
         namespace fs = std::filesystem;
         
-        fs::path plugin_file = PLUGIN_DIR / get_plugin_filename(plugin_name);
+        fs::path plugin_file = PLUGIN_DIR / hipdnn_sdk::utilities::get_library_name(plugin_name);
         
         // Check if the file exists
         if (!fs::exists(plugin_file))
