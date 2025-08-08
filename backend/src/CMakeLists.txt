@@ -25,6 +25,8 @@ add_library(hipdnn_backend_private
     plugin/plugin_core.cpp
     plugin/shared_library.cpp
     error.cpp
+    $<$<BOOL:WIN32>:platform_utils.windows.cpp>
+    $<$<BOOL:LINUX>:platform_utils.linux.cpp>
 )
 
 target_include_directories(hipdnn_backend_private 
