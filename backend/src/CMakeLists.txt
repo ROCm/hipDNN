@@ -3,12 +3,7 @@
 
 find_package(hip REQUIRED)
 
-<<<<<<< Updated upstream
-set(HIP_DNN_BACKEND_EXPORT_INCLUDE_DIR "${PROJECT_BINARY_DIR}/backend/include/")
 set(HIP_DNN_BACKEND_INSTALL_INCLUDE_DIR "${CMAKE_INSTALL_INCLUDEDIR}/hipdnn/backend")
-=======
-#set(HIP_DNN_BACKEND_EXPORT_INCLUDE_DIR "${PROJECT_BINARY_DIR}/backend/include/")
->>>>>>> Stashed changes
 set(HIP_DNN_BACKEND_SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 
 add_library(hipdnn_backend_private
@@ -35,7 +30,6 @@ target_include_directories(hipdnn_backend_private
     PUBLIC 
         ${HIP_DNN_BACKEND_INCLUDE_DIR}
         ${HIP_DNN_BACKEND_SRC_DIR}
-#        ${HIP_DNN_BACKEND_EXPORT_INCLUDE_DIR}
 )
 
 target_compile_options(hipdnn_backend_private PRIVATE ${HIPDNN_WARNING_COMPILE_OPTIONS})
@@ -57,7 +51,6 @@ target_include_directories(hipdnn_backend
     PUBLIC 
         $<BUILD_INTERFACE:${HIP_DNN_BACKEND_INCLUDE_DIR}>
         $<INSTALL_INTERFACE:${HIP_DNN_BACKEND_INSTALL_INCLUDE_DIR}>
-#        $<BUILD_INTERFACE:${HIP_DNN_BACKEND_EXPORT_INCLUDE_DIR}>
     )
 
 target_compile_options(hipdnn_backend PRIVATE ${HIPDNN_WARNING_COMPILE_OPTIONS})
@@ -70,11 +63,6 @@ target_link_libraries(hipdnn_backend PRIVATE "-Xlinker --exclude-libs=ALL" ) # H
 set_target_properties(hipdnn_backend PROPERTIES CXX_VISIBILITY_PRESET hidden)
 
 clang_tidy_check(hipdnn_backend)
-
-# include( GenerateExportHeader )
-# generate_export_header( hipdnn_backend 
-#                         EXPORT_FILE_NAME 
-#                         ${HIP_DNN_BACKEND_EXPORT_INCLUDE_DIR}/hipdnn_backend_export.h )
 
 install( 
     TARGETS hipdnn_backend
