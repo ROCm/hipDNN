@@ -47,6 +47,11 @@ TEST(GPU_EnginePluginTest, LoadPluginsAndExecuteOpGraph)
     // Check that the plugins have the correct versions
     ASSERT_EQ(plugins[0].version(), "1.0");
 
+    // Check all engine IDs
+    std::vector<int64_t> expected_engine_ids0 = {100, 101, 102};
+    const auto& engine_ids0 = plugins[0].get_all_engine_ids();
+    ASSERT_EQ(engine_ids0, expected_engine_ids0);
+
     hipStream_t stream;
     ASSERT_EQ(hipStreamCreate(&stream), hipSuccess);
     Scoped_resource stream_res(stream, [](hipStream_t s) { std::ignore = hipStreamDestroy(s); });
