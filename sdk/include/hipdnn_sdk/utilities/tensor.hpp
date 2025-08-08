@@ -42,6 +42,13 @@ public:
     }
 
     template <typename T>
+    static Tensor make_nhwc_tensor(const std::vector<int64_t>& dims)
+    {
+        // dims are still specified in NCHW, but strides are calculated for NHWC layout
+        return {dims, generate_strides(dims, stride_order_nhwc(dims.size())), sizeof(T)};
+    }
+
+    template <typename T>
     static Tensor make_tensor(const std::vector<int64_t>& dims, const std::vector<int64_t>& strides)
     {
         return {dims, strides, sizeof(T)};

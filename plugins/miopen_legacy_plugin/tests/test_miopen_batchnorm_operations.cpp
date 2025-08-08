@@ -61,7 +61,8 @@ protected:
     // NOLINTNEXTLINE(readability-identifier-naming)
     void RunFwdbatchnormGraph(Bn_2d_test_case test_case,
                               hipdnn_sdk::data_objects::DataType input_data_type,
-                              Input_type epsilon);
+                              Input_type epsilon,
+                              bool use_nhwc = false);
 
     hipdnnEnginePluginHandle_t _handle = nullptr;
 };
@@ -105,11 +106,18 @@ hipdnnPluginDeviceBuffer_t generate_static_device_buffer(Tensor& tensor, int uid
     return buffer;
 }
 
-TEST_P(Batchnorm_execute_graph_test, RunFloatFwdbatchnormGraph)
+TEST_P(Batchnorm_execute_graph_test, RunFloatFwdbatchnormGraphNCHW)
 {
     Bn_2d_test_case test_case = GetParam();
     RunFwdbatchnormGraph<float, float>(
-        test_case, hipdnn_sdk::data_objects::DataType::DataType_FLOAT, 1e-6f);
+        test_case, hipdnn_sdk::data_objects::DataType::DataType_FLOAT, 1e-6f, false);
+}
+
+TEST_P(Batchnorm_execute_graph_test, RunFloatFwdbatchnormGraphNHWC)
+{
+    Bn_2d_test_case test_case = GetParam();
+    RunFwdbatchnormGraph<float, float>(
+        test_case, hipdnn_sdk::data_objects::DataType::DataType_FLOAT, 1e-6f, true);
 }
 
 TEST_F(Batchnorm_execute_graph_test, RunBfloat16FwdbatchnormGraph)
@@ -126,6 +134,20 @@ TEST_F(Batchnorm_execute_graph_test, RunHalfFwdbatchnormGraph)
         test_case, hipdnn_sdk::data_objects::DataType::DataType_HALF, 1e-2_h);
 }
 
+TEST_F(Batchnorm_execute_graph_test, RunBfloat16FwdbatchnormGraphNHWC)
+{
+    Bn_2d_test_case test_case = {.n = 1, .c = 3, .h = 14, .w = 14};
+    RunFwdbatchnormGraph<hip_bfloat16, float>(
+        test_case, hipdnn_sdk::data_objects::DataType::DataType_BFLOAT16, 1e-2_bf, true);
+}
+
+TEST_F(Batchnorm_execute_graph_test, RunHalfFwdbatchnormGraphNHWC)
+{
+    Bn_2d_test_case test_case = {.n = 1, .c = 3, .h = 14, .w = 14};
+    RunFwdbatchnormGraph<half, float>(
+        test_case, hipdnn_sdk::data_objects::DataType::DataType_HALF, 1e-2_h, true);
+}
+
 // TODO: Re-enable when double support is added to MIOpen plugin
 // TEST_F(Batchnorm_execute_graph_test, RunDoubleFwdbatchnormGraph)
 // {
@@ -138,7 +160,8 @@ template <typename Input_type, typename Intermediate_type>
 void Batchnorm_execute_graph_test::RunFwdbatchnormGraph(
     Bn_2d_test_case test_case,
     hipdnn_sdk::data_objects::DataType input_data_type,
-    Input_type epsilon)
+    Input_type epsilon,
+    bool use_nhwc)
 {
     unsigned int seed = std::random_device{}();
 
@@ -150,11 +173,13 @@ void Batchnorm_execute_graph_test::RunFwdbatchnormGraph(
 
     std::vector<hipdnnPluginDeviceBuffer_t> device_buffers;
 
-    Tensor x_tensor = Tensor::make_nchw_tensor<Input_type>(dims);
+    Tensor x_tensor = use_nhwc ? Tensor::make_nhwc_tensor<Input_type>(dims)
+                               : Tensor::make_nchw_tensor<Input_type>(dims);
     device_buffers.push_back(generate_random_device_buffer(
         x_tensor, 1, static_cast<Input_type>(0.0f), static_cast<Input_type>(1.0f), seed));
 
-    Tensor y_tensor = Tensor::make_nchw_tensor<Input_type>(dims);
+    Tensor y_tensor = use_nhwc ? Tensor::make_nhwc_tensor<Input_type>(dims)
+                               : Tensor::make_nchw_tensor<Input_type>(dims);
     device_buffers.push_back(generate_random_device_buffer(
         y_tensor, 2, static_cast<Input_type>(-100.0f), static_cast<Input_type>(100.0f), seed));
 
@@ -214,10 +239,12 @@ void Batchnorm_execute_graph_test::RunFwdbatchnormGraph(
 
     hipdnnEnginePluginDestroyExecutionContext(_handle, execution_context);
 
-    Tensor x_tensor_cpu = Tensor::make_nchw_tensor<Input_type>(dims);
+    Tensor x_tensor_cpu = use_nhwc ? Tensor::make_nhwc_tensor<Input_type>(dims)
+                                   : Tensor::make_nchw_tensor<Input_type>(dims);
     x_tensor_cpu.fill_with_random_values(
         static_cast<Input_type>(0.0f), static_cast<Input_type>(1.0f), seed);
-    Tensor y_tensor_cpu = Tensor::make_nchw_tensor<Input_type>(dims);
+    Tensor y_tensor_cpu = use_nhwc ? Tensor::make_nhwc_tensor<Input_type>(dims)
+                                   : Tensor::make_nchw_tensor<Input_type>(dims);
     y_tensor_cpu.fill_with_random_values(
         static_cast<Input_type>(-100.0f), static_cast<Input_type>(100.0f), seed);
     Tensor scale_tensor_cpu = Tensor::make_nchw_tensor<Intermediate_type>(derived_dims);
