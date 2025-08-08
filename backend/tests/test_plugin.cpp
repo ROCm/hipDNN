@@ -6,6 +6,7 @@
 #include <string>
 #include <thread>
 
+#include "platform_utils.hpp"
 #include <gtest/gtest.h>
 #include <utility>
 
@@ -54,24 +55,16 @@ void dummy_callback(hipdnnSeverity_t sev, const char* msg)
     g_callback_was_called = true;
 }
 
-#if defined(_WIN32)
-constexpr const char* SHARED_LIB_EXT = ".dll";
-constexpr const char* LIB_PREFIX = "";
-#else
-constexpr const char* SHARED_LIB_EXT = ".so";
-constexpr const char* LIB_PREFIX = "lib";
-#endif
-
 const std::string PLUGIN_NAME1 = "hipdnn_test_plugin1";
 const std::string PLUGIN_NAME2 = "hipdnn_test_plugin2";
 
-const std::string PLUGIN_PATH1 = "./" + PLUGIN_NAME1;
-const std::string PLUGIN_PATH2 = "./" + PLUGIN_NAME2;
+const std::filesystem::path PLUGIN_PATH1 = std::filesystem::path(".") /= PLUGIN_NAME1;
+const std::filesystem::path PLUGIN_PATH2 = std::filesystem::path(".") /= PLUGIN_NAME2;
 
-const std::string FULL_PLUGIN_PATH1
-    = std::string("./") + LIB_PREFIX + PLUGIN_NAME1 + SHARED_LIB_EXT;
-const std::string FULL_PLUGIN_PATH2
-    = std::string("./") + LIB_PREFIX + PLUGIN_NAME2 + SHARED_LIB_EXT;
+const std::filesystem::path FULL_PLUGIN_PATH1 = std::filesystem::path(".")
+    /= platform_utils::get_library_name(PLUGIN_NAME1.c_str());
+const std::filesystem::path FULL_PLUGIN_PATH2 = std::filesystem::path(".")
+    /= platform_utils::get_library_name(PLUGIN_NAME2.c_str());
 
 } // namespace
 
@@ -104,7 +97,7 @@ TEST(PluginManagerTest, LoadPlugins)
 
 TEST(PluginManagerTest, LoadPluginsFromDirectory)
 {
-    const std::filesystem::path temp_dir = "./temp_plugin_dir";
+    const std::filesystem::path temp_dir = std::filesystem::path(".") /= "temp_plugin_dir";
     std::filesystem::create_directory(temp_dir);
 
     try
@@ -226,7 +219,7 @@ TEST(PluginManagerTest, LoadPluginsAdditiveWithDefault)
 
 TEST(PluginManagerTest, LoadPluginsCombinedFileAndDirectory)
 {
-    const std::filesystem::path temp_dir = "./temp_plugin_dir_combined";
+    const std::filesystem::path temp_dir = std::filesystem::path(".") /= "temp_plugin_dir_combined";
     std::filesystem::create_directory(temp_dir);
 
     try

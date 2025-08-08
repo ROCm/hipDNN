@@ -7,6 +7,7 @@
 
 #include "descriptors/test_macros.hpp"
 #include "hipdnn_exception.hpp"
+#include "platform_utils.hpp"
 #include "plugin/shared_library.hpp"
 
 using namespace hipdnn_backend;
@@ -19,11 +20,8 @@ const char* const WRONG_LIBRARY_PATH = "./wrong_path";
 const char* const SYMBOL_NAME = "hipdnnPluginGetName";
 const char* const WRONG_SYMBOL_NAME = "wrong_symbol_name";
 
-#if defined(_WIN32)
-const char* const FULL_LIBRARY_PATH = "./hipdnn_test_plugin1.dll";
-#else
-const char* const FULL_LIBRARY_PATH = "./libhipdnn_test_plugin1.so";
-#endif
+const std::string FULL_LIBRARY_PATH = std::filesystem::path(".")
+    /= platform_utils::get_library_name("hipdnn_test_plugin1");
 
 }
 
@@ -91,7 +89,7 @@ TEST(SharedLibraryTest, CallFunction)
 TEST(Shared_Library_Test, get_current_module_directory_from_executable)
 {
     std::filesystem::path path;
-    ASSERT_NO_THROW(path = plugin::Shared_library::get_current_module_directory());
+    ASSERT_NO_THROW(path = platform_utils::get_current_module_directory());
 
     EXPECT_FALSE(path.empty());
     EXPECT_TRUE(path.is_absolute());
