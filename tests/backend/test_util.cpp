@@ -303,7 +303,7 @@ std::vector<std::string> get_loaded_plugins()
 {
     size_t num_plugins = 0;
     size_t max_path_length = 0;
-    auto status = hipdnnGetLoadedEnginePlugins_ext(&num_plugins, nullptr, &max_path_length);
+    auto status = hipdnnGetLoadedEnginePluginPaths_ext(&num_plugins, nullptr, &max_path_length);
     if(status != HIPDNN_STATUS_SUCCESS || num_plugins == 0)
     {
         return {};
@@ -316,8 +316,8 @@ std::vector<std::string> get_loaded_plugins()
         plugin_paths_c[i] = path_buffers[i].data();
     }
 
-    status
-        = hipdnnGetLoadedEnginePlugins_ext(&num_plugins, plugin_paths_c.data(), &max_path_length);
+    status = hipdnnGetLoadedEnginePluginPaths_ext(
+        &num_plugins, plugin_paths_c.data(), &max_path_length);
     if(status != HIPDNN_STATUS_SUCCESS)
     {
         return {};

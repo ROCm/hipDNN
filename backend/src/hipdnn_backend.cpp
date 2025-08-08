@@ -318,22 +318,25 @@ HIPDNN_BACKEND_EXPORT hipdnnStatus_t hipdnnSetEnginePluginPaths_ext(
     });
 }
 
-HIPDNN_BACKEND_EXPORT hipdnnStatus_t hipdnnGetLoadedEnginePlugins_ext(size_t* num_plugins,
-                                                                      char** plugin_paths,
-                                                                      size_t* max_string_size)
+HIPDNN_BACKEND_EXPORT hipdnnStatus_t hipdnnGetLoadedEnginePluginPaths_ext(size_t* num_plugin_paths,
+                                                                          char** plugin_paths,
+                                                                          size_t* max_string_size)
 {
-    LOG_API_ENTRY("num_plugins_ptr={:p}, plugin_paths_ptr={:p}, max_string_size={:p}",
-                  static_cast<void*>(num_plugins),
+    LOG_API_ENTRY("num_plugin_paths_ptr={:p}, plugin_paths_ptr={:p}, max_string_size_ptr={:p}",
+                  static_cast<void*>(num_plugin_paths),
                   static_cast<const void*>(plugin_paths),
                   static_cast<void*>(max_string_size));
 
     return hipdnn_backend::try_catch([&, api_name = __func__] {
-        throw_if_null(num_plugins);
+        throw_if_null(num_plugin_paths);
         throw_if_null(max_string_size);
 
         plugin::Engine_plugin_resource_manager::get_loaded_plugin_files(
-            num_plugins, plugin_paths, max_string_size);
+            num_plugin_paths, plugin_paths, max_string_size);
 
-        LOG_API_SUCCESS(api_name, "retrieved_num_plugins={}", *num_plugins);
+        LOG_API_SUCCESS(api_name,
+                        "retrieved_num_plugin_paths={}, retrieved_max_string_size={}",
+                        *num_plugin_paths,
+                        *max_string_size);
     });
 }

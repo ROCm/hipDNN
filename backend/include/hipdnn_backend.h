@@ -314,7 +314,7 @@ HIPDNN_BACKEND_EXPORT hipdnnStatus_t hipdnnSetEnginePluginPaths_ext(
  * required buffer size for each path (`max_string_size`). Allocate buffers, then call again with
  * `plugin_paths` and `max_string_size` set to retrieve the paths.
  *
- * @param[in,out] num_plugins      Pointer to number of plugins; updated with actual count.
+ * @param[in,out] num_plugin_paths      Pointer to number of plugins; updated with actual count.
  * @param[out]    plugin_paths     Array of character pointers for plugin paths, or `NULL` to query sizes.
  * @param[in,out] max_string_size  Pointer to buffer size; updated with required size.
  *
@@ -322,9 +322,9 @@ HIPDNN_BACKEND_EXPORT hipdnnStatus_t hipdnnSetEnginePluginPaths_ext(
  * @retval HIPDNN_STATUS_BAD_PARAM         Null pointers or insufficient buffer sizes.
  * @retval HIPDNN_STATUS_INTERNAL_ERROR    Internal error.
  */
-HIPDNN_BACKEND_EXPORT hipdnnStatus_t hipdnnGetLoadedEnginePlugins_ext(size_t* num_plugins,
-                                                                      char** plugin_paths,
-                                                                      size_t* max_string_size);
+HIPDNN_BACKEND_EXPORT hipdnnStatus_t hipdnnGetLoadedEnginePluginPaths_ext(size_t* num_plugin_paths,
+                                                                          char** plugin_paths,
+                                                                          size_t* max_string_size);
 
 #ifdef __cplusplus
 }
