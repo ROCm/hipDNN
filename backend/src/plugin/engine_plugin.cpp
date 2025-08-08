@@ -24,6 +24,10 @@ void Engine_plugin::resolve_symbols()
         throw Hipdnn_exception(HIPDNN_STATUS_PLUGIN_ERROR, "Wrong plugin type");
     }
 
+    const auto func_name_get_all_engine_ids = "hipdnnEnginePluginGetAllEngineIds";
+    _func_get_all_engine_ids
+        = _lib.get_symbol<decltype(_func_get_all_engine_ids)>(func_name_get_all_engine_ids);
+
     const auto func_name_create_handle = "hipdnnEnginePluginCreate";
     _func_create_handle = _lib.get_symbol<decltype(_func_create_handle)>(func_name_create_handle);
 
@@ -65,6 +69,36 @@ void Engine_plugin::resolve_symbols()
 #ifndef NDEBUG
     _initialized = true;
 #endif
+}
+
+std::vector<int64_t> Engine_plugin::get_all_engine_ids() const
+{
+    assert(_initialized);
+
+    uint32_t max_engines = 64;
+    std::vector<int64_t> engine_ids(max_engines);
+    uint32_t num_engines = 0;
+
+    invoke_plugin_function("get all engine IDs",
+                           _func_get_all_engine_ids,
+                           engine_ids.data(),
+                           max_engines,
+                           &num_engines);
+
+    if(num_engines > max_engines)
+    {
+        // Dynamically resize the buffer and retry
+        max_engines = num_engines;
+        engine_ids.resize(max_engines);
+        invoke_plugin_function("get all engine IDs after resizing the buffer",
+                               _func_get_all_engine_ids,
+                               engine_ids.data(),
+                               max_engines,
+                               &num_engines);
+    }
+
+    engine_ids.resize(num_engines);
+    return engine_ids;
 }
 
 hipdnnEnginePluginHandle_t Engine_plugin::create_handle() const
@@ -110,7 +144,7 @@ std::vector<int64_t>
         // Dynamically resize the buffer and retry
         max_engines = num_engines;
         engine_ids.resize(max_engines);
-        invoke_plugin_function("get applicable engine IDs after resizing buffer",
+        invoke_plugin_function("get applicable engine IDs after resizing the buffer",
                                _func_get_applicable_engine_ids,
                                handle,
                                op_graph,

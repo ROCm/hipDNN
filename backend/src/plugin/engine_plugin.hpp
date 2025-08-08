@@ -22,6 +22,7 @@ protected:
     Engine_plugin(Shared_library&& lib);
 
 public:
+    std::vector<int64_t> get_all_engine_ids() const;
     hipdnnEnginePluginHandle_t create_handle() const;
     void destroy_handle(hipdnnEnginePluginHandle_t handle) const;
     void set_stream(hipdnnEnginePluginHandle_t handle, hipStream_t stream) const;
@@ -60,6 +61,7 @@ private:
     bool _initialized = false;
 #endif
 
+    hipdnnPluginStatus_t (*_func_get_all_engine_ids)(int64_t*, uint32_t, uint32_t*);
     hipdnnPluginStatus_t (*_func_create_handle)(hipdnnEnginePluginHandle_t*);
     hipdnnPluginStatus_t (*_func_destroy_handle)(hipdnnEnginePluginHandle_t);
     hipdnnPluginStatus_t (*_func_set_stream)(hipdnnEnginePluginHandle_t, hipStream_t);
