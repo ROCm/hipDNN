@@ -139,6 +139,30 @@ hipdnnPluginStatus_t hipdnnPluginSetLoggingCallback(hipdnnCallback_t callback)
     });
 }
 
+hipdnnPluginStatus_t hipdnnEnginePluginGetAllEngineIds(int64_t* engine_ids,
+                                                       uint32_t max_engines,
+                                                       uint32_t* num_engines)
+{
+    LOG_API_ENTRY("engine_ids={:p}, max_engines={}, num_engines={:p}",
+                  static_cast<void*>(engine_ids),
+                  max_engines,
+                  static_cast<void*>(num_engines));
+
+    return hipdnn_plugin::try_catch([&, api_name = __func__]() {
+        throw_if_null(engine_ids);
+        throw_if_null(num_engines);
+
+        *num_engines = 1;
+
+        if(max_engines >= 1)
+        {
+            engine_ids[0] = TEST_ENGINE_ID;
+        }
+
+        LOG_API_SUCCESS(api_name, "num_engines={}", *num_engines);
+    });
+}
+
 hipdnnPluginStatus_t hipdnnEnginePluginCreate(hipdnnEnginePluginHandle_t* handle)
 {
     LOG_API_ENTRY("handle_ptr={:p}", static_cast<void*>(handle));
