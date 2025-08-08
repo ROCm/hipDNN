@@ -43,10 +43,14 @@ struct Bn_2d_test_case
 template <typename Input_type, typename Intermediate_type>
 struct Batchnorm_2d_tensor_bundle
 {
-    Batchnorm_2d_tensor_bundle(const std::vector<int64_t>& dims, unsigned int seed = 1)
+    Batchnorm_2d_tensor_bundle(const std::vector<int64_t>& dims,
+                               unsigned int seed = 1,
+                               bool use_nhwc = false)
         : derived_dims({1, dims[1], 1, 1})
-        , x_tensor(Tensor::make_nchw_tensor<Input_type>(dims))
-        , y_tensor(Tensor::make_nchw_tensor<Input_type>(dims))
+        , x_tensor(use_nhwc ? Tensor::make_nhwc_tensor<Input_type>(dims)
+                            : Tensor::make_nchw_tensor<Input_type>(dims))
+        , y_tensor(use_nhwc ? Tensor::make_nhwc_tensor<Input_type>(dims)
+                            : Tensor::make_nchw_tensor<Input_type>(dims))
         , scale_tensor(Tensor::make_nchw_tensor<Intermediate_type>(derived_dims))
         , bias_tensor(Tensor::make_nchw_tensor<Intermediate_type>(derived_dims))
         , mean_tensor(Tensor::make_nchw_tensor<Intermediate_type>(derived_dims))
@@ -245,7 +249,9 @@ protected:
     }
 
     template <typename Input_type, typename Intermediate_type>
-    void run_batchnorm_test(const Bn_2d_test_case& test_case, Input_type tolerance = 1e-4f)
+    void run_batchnorm_test(const Bn_2d_test_case& test_case,
+                            Input_type tolerance = 1e-4f,
+                            bool use_nhwc = false)
     {
         auto input_data_type = get_data_type_enum_from_type<Input_type>();
         auto intermediate_data_type = get_data_type_enum_from_type<Intermediate_type>();
@@ -255,10 +261,10 @@ protected:
         HIPDNN_LOG_INFO("Test is using {} for its random seed", seed);
 
         Batchnorm_2d_tensor_bundle<Input_type, Intermediate_type> graph_tensor_bundle(
-            test_case.get_dims(), seed);
+            test_case.get_dims(), seed, use_nhwc);
 
         Batchnorm_2d_tensor_bundle<Input_type, Intermediate_type> cpu_tensor_bundle(
-            test_case.get_dims(), seed);
+            test_case.get_dims(), seed, use_nhwc);
 
         run_miopen_batchnorm_fwd<Input_type, Intermediate_type>(
             graph_tensor_bundle, input_data_type, intermediate_data_type);
@@ -331,4 +337,21 @@ TEST_P(Batchnorm_forward_inference_integration_test_half, RunHalfFwdbatchnormGra
 
 INSTANTIATE_TEST_SUITE_P(RunHalfFwdbatchnormGraph,
                          Batchnorm_forward_inference_integration_test_half,
+                         testing::ValuesIn(get_bn_fwd_inference_test_cases()));
+
+// Basic NHWC float test case
+class Batchnorm_forward_inference_integration_test_nhwc
+    : public Batchnorm_forward_inference_integration_test
+{
+};
+
+TEST_P(Batchnorm_forward_inference_integration_test_nhwc, RunFloatFwdBatchnormGraphNHWC)
+{
+    Bn_2d_test_case test_case = GetParam();
+    run_batchnorm_test<float, float>(test_case, 1e-6f, true);
+}
+
+// Could consider using fewer/smaller test cases
+INSTANTIATE_TEST_SUITE_P(RunFloatFwdBatchnormGraphNHWC,
+                         Batchnorm_forward_inference_integration_test_nhwc,
                          testing::ValuesIn(get_bn_fwd_inference_test_cases()));

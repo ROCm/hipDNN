@@ -80,3 +80,20 @@ TEST(CpuFpReferenceImplementaion, BasicDoubleUsage)
     ref_impl.batchnorm_fwd_inference(
         input_tensor, scale_tensor, bias_tensor, mean_tensor, variance_tensor, output_tensor, 1e-5);
 }
+
+TEST(CpuFpReferenceImplementation, BasicFloatUsageNHWC)
+{
+    SKIP_IF_NO_DEVICES();
+
+    Tensor input_tensor = Tensor::make_nhwc_tensor<float>({1, 3, 224, 224});
+    Tensor output_tensor = Tensor::make_nhwc_tensor<float>({1, 3, 224, 224});
+    Tensor bias_tensor = Tensor::make_nchw_tensor<float>({1, 3, 1, 1});
+    Tensor scale_tensor = Tensor::make_nchw_tensor<float>({1, 3, 1, 1});
+    Tensor mean_tensor = Tensor::make_nchw_tensor<float>({1, 3, 1, 1});
+    Tensor variance_tensor = Tensor::make_nchw_tensor<float>({1, 3, 1, 1});
+
+    Cpu_fp_reference_implementation<float, float, float> ref_impl;
+
+    ref_impl.batchnorm_fwd_inference(
+        input_tensor, scale_tensor, bias_tensor, mean_tensor, variance_tensor, output_tensor, 1e-5);
+}

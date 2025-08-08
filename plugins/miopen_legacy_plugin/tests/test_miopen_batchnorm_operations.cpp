@@ -110,7 +110,7 @@ TEST_P(Batchnorm_execute_graph_test, RunFloatFwdbatchnormGraphNCHW)
 {
     Bn_2d_test_case test_case = GetParam();
     RunFwdbatchnormGraph<float, float>(
-        test_case, hipdnn_sdk::data_objects::DataType::DataType_FLOAT, 1e-6f, false);
+        test_case, hipdnn_sdk::data_objects::DataType::DataType_FLOAT, 1e-6f);
 }
 
 TEST_P(Batchnorm_execute_graph_test, RunFloatFwdbatchnormGraphNHWC)
