@@ -88,25 +88,28 @@ void Engine_plugin_resource_manager::get_loaded_plugin_files(size_t* num_plugins
 
     const auto& path_set = pm->get_loaded_plugin_files();
 
-    size_t required_path_len = 0;
+    size_t required_len = 0;
     for(const auto& path : path_set)
     {
-        required_path_len = std::max(required_path_len, path.string().length() + 1);
+        required_len = std::max(required_len, path.string().length() + 1);
     }
 
     if(plugin_paths == nullptr)
     {
         *num_plugins = path_set.size();
-        *max_string_size = required_path_len;
+        *max_string_size = required_len;
         return;
     }
 
-    if(*num_plugins < path_set.size() || *max_string_size < required_path_len)
+    if(*num_plugins < path_set.size() || *max_string_size < required_len)
     {
         throw Hipdnn_exception(HIPDNN_STATUS_BAD_PARAM, "Insufficient buffer space provided.");
     }
 
-    std::vector<std::string> paths_vec(path_set.begin(), path_set.end());
+    std::vector<std::string> paths_vec;
+    paths_vec.reserve(path_set.size());
+    paths_vec.assign(path_set.begin(), path_set.end());
+
     for(size_t i = 0; i < paths_vec.size(); ++i)
     {
         if(plugin_paths[i] == nullptr)
