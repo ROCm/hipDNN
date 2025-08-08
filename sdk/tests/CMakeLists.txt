@@ -47,5 +47,4 @@ target_link_libraries(hipdnn_sdk_tests
     ${CMAKE_DL_LIBS}
 )
 
-add_target_to_check_targets(hipdnn_sdk_tests ${CMAKE_CURRENT_BINARY_DIR})
-
+add_unit_test_target(hipdnn_sdk_tests ${CMAKE_CURRENT_BINARY_DIR})

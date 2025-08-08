@@ -50,4 +50,4 @@ clang_tidy_check(hipdnn_frontend_tests)
 
 add_dependencies(hipdnn_frontend_tests generate_hipdnn_sdk_headers)
 
-add_target_to_check_targets(hipdnn_frontend_tests ${CMAKE_CURRENT_BINARY_DIR})
+add_unit_test_target(hipdnn_frontend_tests ${CMAKE_CURRENT_BINARY_DIR})

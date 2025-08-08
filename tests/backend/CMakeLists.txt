@@ -35,4 +35,4 @@ target_include_directories(public_hipdnn_backend_tests
 )
 
 clang_tidy_check(public_hipdnn_backend_tests)
-add_target_to_check_targets(public_hipdnn_backend_tests ${CMAKE_CURRENT_BINARY_DIR})
+add_unit_test_target(public_hipdnn_backend_tests ${CMAKE_CURRENT_BINARY_DIR})
