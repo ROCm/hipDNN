@@ -317,7 +317,6 @@ private:
     hipdnnHandle_t _handle = nullptr;
 };
 
-// Instantiate test cases
 INSTANTIATE_TEST_SUITE_P(
     IntegrationTests,
     Frontend_e2e_integration_test,
@@ -341,15 +340,13 @@ INSTANTIATE_TEST_SUITE_P(
                                             "NoEnginesPluginBatchnormTest",
                                             FailurePoint::CREATE_EXECUTION_PLAN,
                                             true}),
-    // This lambda provides a custom name for each test instance
+    // Provide a custom name for each test instance
     [](const ::testing::TestParamInfo<Integration_test_case>& info) {
         std::string name = info.param.description;
-        // Replace spaces and special characters with underscores for valid test names using ranges
         std::ranges::replace_if(name, [](char c) { return !std::isalnum(c); }, '_');
         return name;
     });
 
-// The actual test that runs for each test case
 TEST_P(Frontend_e2e_integration_test, IntegrationTest)
 {
     run_test();
