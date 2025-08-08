@@ -11,6 +11,7 @@
 
 #include <hipdnn_frontend/attributes/tensor_attributes.hpp>
 #include <hipdnn_frontend/graph.hpp>
+#include <hipdnn_frontend/utilities.hpp>
 #include <hipdnn_sdk/test_utilities/test_utilities.hpp>
 #include <hipdnn_sdk/utilities/migratable_memory.hpp>
 #include <hipdnn_sdk/utilities/tensor.hpp>
@@ -159,55 +160,40 @@ protected:
         int64_t uid = 1;
         Batchnorm_test_tensors tensors;
 
-        tensors.x = std::make_shared<Tensor_attributes>();
+        auto x_attr = make_tensor_attributes("X", DataType_t::FLOAT, tensor_bundle.x_tensor);
         if(use_manual_uids)
         {
-            tensors.x->set_uid(uid++);
+            x_attr.set_uid(uid++);
         }
-        tensors.x->set_name("X")
-            .set_data_type(DataType_t::FLOAT)
-            .set_dim(tensor_bundle.x_tensor.dims())
-            .set_stride(tensor_bundle.x_tensor.strides());
+        tensors.x = std::make_shared<Tensor_attributes>(std::move(x_attr));
 
-        tensors.mean = std::make_shared<Tensor_attributes>();
+        auto mean_attr = make_tensor_attributes("mean", DataType_t::FLOAT, tensor_bundle.mean_tensor);
         if(use_manual_uids)
         {
-            tensors.mean->set_uid(uid++);
+            mean_attr.set_uid(uid++);
         }
-        tensors.mean->set_name("mean")
-            .set_data_type(DataType_t::FLOAT)
-            .set_dim(tensor_bundle.mean_tensor.dims())
-            .set_stride(tensor_bundle.mean_tensor.strides());
+        tensors.mean = std::make_shared<Tensor_attributes>(std::move(mean_attr));
 
-        tensors.inv_variance = std::make_shared<Tensor_attributes>();
+        auto inv_variance_attr = make_tensor_attributes("inv_variance", DataType_t::FLOAT, tensor_bundle.variance_tensor);
         if(use_manual_uids)
         {
-            tensors.inv_variance->set_uid(uid++);
+            inv_variance_attr.set_uid(uid++);
         }
-        tensors.inv_variance->set_name("inv_variance")
-            .set_data_type(DataType_t::FLOAT)
-            .set_dim(tensor_bundle.variance_tensor.dims())
-            .set_stride(tensor_bundle.variance_tensor.strides());
+        tensors.inv_variance = std::make_shared<Tensor_attributes>(std::move(inv_variance_attr));
 
-        tensors.scale = std::make_shared<Tensor_attributes>();
+        auto scale_attr = make_tensor_attributes("scale", DataType_t::FLOAT, tensor_bundle.scale_tensor);
         if(use_manual_uids)
         {
-            tensors.scale->set_uid(uid++);
+            scale_attr.set_uid(uid++);
         }
-        tensors.scale->set_name("scale")
-            .set_data_type(DataType_t::FLOAT)
-            .set_dim(tensor_bundle.scale_tensor.dims())
-            .set_stride(tensor_bundle.scale_tensor.strides());
+        tensors.scale = std::make_shared<Tensor_attributes>(std::move(scale_attr));
 
-        tensors.bias = std::make_shared<Tensor_attributes>();
+        auto bias_attr = make_tensor_attributes("bias", DataType_t::FLOAT, tensor_bundle.bias_tensor);
         if(use_manual_uids)
         {
-            tensors.bias->set_uid(uid++);
+            bias_attr.set_uid(uid++);
         }
-        tensors.bias->set_name("bias")
-            .set_data_type(DataType_t::FLOAT)
-            .set_dim(tensor_bundle.bias_tensor.dims())
-            .set_stride(tensor_bundle.bias_tensor.strides());
+        tensors.bias = std::make_shared<Tensor_attributes>(std::move(bias_attr));
 
         Batchnorm_inference_attributes bn_attrs;
         bn_attrs.set_name("batchnorm_inference");
