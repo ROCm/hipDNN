@@ -26,13 +26,14 @@ target_include_directories(public_hipdnn_frontend_tests
     ${HIPDNN_TEST_INCLUDE_DIRS}
 )
 
-# Define test plugin directory
 target_compile_definitions(public_hipdnn_frontend_tests
     PRIVATE
-    TEST_PLUGIN_DIR="${CMAKE_BINARY_DIR}/tests/test_plugins"
+    TEST_GOOD_PLUGIN_NAME="${TEST_GOOD_PLUGIN_NAME}"
+    TEST_EXECUTE_FAILS_PLUGIN_NAME="${TEST_EXECUTE_FAILS_PLUGIN_NAME}"
+    TEST_NO_APPLICABLE_ENGINES_PLUGIN_NAME="${TEST_NO_APPLICABLE_ENGINES_PLUGIN_NAME}"
 )
 
-# Ensure test_good_plugin is built before frontend tests
+# Ensure test plugins are built before tests
 add_dependencies(public_hipdnn_frontend_tests test_good_plugin test_execute_fails_plugin test_no_applicable_engines_plugin)
 
 clang_tidy_check(public_hipdnn_frontend_tests)

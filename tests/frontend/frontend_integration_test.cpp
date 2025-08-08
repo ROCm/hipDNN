@@ -14,14 +14,12 @@
 #include <hipdnn_sdk/test_utilities/test_utilities.hpp>
 #include <hipdnn_sdk/utilities/migratable_memory.hpp>
 #include <hipdnn_sdk/utilities/tensor.hpp>
+#include <test_plugins/test_plugin_constants.hpp>
 
 using namespace hipdnn_frontend;
 using namespace hipdnn_frontend::graph;
 using namespace hipdnn_sdk::utilities;
 
-const char* const TEST_GOOD_PLUGIN = "libtest_good_plugin.so";
-const char* const TEST_EXECUTE_FAILS_PLUGIN = "libtest_execute_fails_plugin.so";
-const char* const TEST_NO_APPLICABLE_ENGINES_PLUGIN = "libtest_no_applicable_engines_plugin.so";
 
 enum class FailurePoint
 {
@@ -32,7 +30,7 @@ enum class FailurePoint
 
 struct Integration_test_case
 {
-    const char* plugin_name;
+    std::string plugin_path;
     std::string description;
     std::string graph_name;
     FailurePoint expected_failure;
@@ -41,7 +39,7 @@ struct Integration_test_case
     friend std::ostream& operator<<(std::ostream& os, const Integration_test_case& tc)
     {
         os << "BatchnormTestCase{"
-           << "plugin: " << tc.plugin_name << ", description: " << tc.description
+           << "plugin_path: " << tc.plugin_path << ", description: " << tc.description
            << ", graph_name: " << tc.graph_name << ", expected_failure: ";
 
         switch(tc.expected_failure)
@@ -130,14 +128,13 @@ protected:
         }
     }
 
-    static hipdnnHandle_t setup_test_environment_with_plugin(const char* plugin_name)
+    static hipdnnHandle_t setup_test_environment_with_plugin(const std::string& plugin_path)
     {
         EXPECT_EQ(hipInit(0), hipSuccess);
         int device_id = 0;
         EXPECT_EQ(hipGetDevice(&device_id), hipSuccess);
 
         // Set up plugin path - load specific plugin by absolute path
-        std::string plugin_path = std::string(TEST_PLUGIN_DIR) + "/" + plugin_name;
         const std::array<const char*, 1> paths = {plugin_path.c_str()};
         EXPECT_EQ(hipdnnSetEnginePluginPaths_ext(
                       paths.size(), paths.data(), HIPDNN_PLUGIN_LOADING_ABSOLUTE),
@@ -300,7 +297,7 @@ protected:
         const auto& test_case = GetParam();
 
         // Setup environment with specified plugin
-        _handle = setup_test_environment_with_plugin(test_case.plugin_name);
+        _handle = setup_test_environment_with_plugin(test_case.plugin_path);
 
         // Create tensor bundle
         std::vector<int64_t> dims = {2, 3, 14, 14}; // n=2, c=3, h=14, w=14
@@ -320,22 +317,22 @@ private:
 INSTANTIATE_TEST_SUITE_P(
     IntegrationTests,
     Frontend_e2e_integration_test,
-    ::testing::Values(Integration_test_case{TEST_GOOD_PLUGIN,
+    ::testing::Values(Integration_test_case{hipdnn_tests::plugin_constants::test_good_plugin_path(),
                                             "Default plugin with manual UIDs",
                                             "DefaultPluginBatchnormTest",
                                             FailurePoint::NONE,
                                             true},
-                      Integration_test_case{TEST_GOOD_PLUGIN,
+                      Integration_test_case{hipdnn_tests::plugin_constants::test_good_plugin_path(),
                                             "Default plugin with auto UIDs",
                                             "DefaultPluginBatchnormTestAutoUID",
                                             FailurePoint::NONE,
                                             false},
-                      Integration_test_case{TEST_EXECUTE_FAILS_PLUGIN,
+                      Integration_test_case{hipdnn_tests::plugin_constants::test_execute_fails_plugin_path(),
                                             "Execute fails plugin",
                                             "ExecuteFailsPluginBatchnormTest",
                                             FailurePoint::EXECUTE,
                                             true},
-                      Integration_test_case{TEST_NO_APPLICABLE_ENGINES_PLUGIN,
+                      Integration_test_case{hipdnn_tests::plugin_constants::test_no_applicable_engines_plugin_path(),
                                             "No applicable engines plugin",
                                             "NoEnginesPluginBatchnormTest",
                                             FailurePoint::CREATE_EXECUTION_PLAN,
