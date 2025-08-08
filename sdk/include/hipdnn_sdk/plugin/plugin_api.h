@@ -6,9 +6,7 @@
 #include <hipdnn_sdk/logging/callback_types.h>
 #include <hipdnn_sdk/plugin/plugin_api_data_types.h>
 
-#ifdef _WIN32
-#define HIPDNN_PLUGIN_EXPORT __declspec(dllexport)
-#elif defined(__GNUC__) || defined(__clang__)
+#if defined(__GNUC__) || defined(__clang__)
 #define HIPDNN_PLUGIN_EXPORT __attribute__((visibility("default")))
 #else
 #error "Unsupported platform or compiler"
