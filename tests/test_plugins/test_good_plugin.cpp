@@ -3,6 +3,7 @@
 
 #include <iostream>
 
+#include "test_plugin_common.hpp"
 #include <hipdnn_sdk/data_objects/engine_details_generated.h>
 #include <hipdnn_sdk/logging/logger.hpp>
 #include <hipdnn_sdk/plugin/engine_plugin_api.h>
@@ -25,45 +26,6 @@ using namespace hipdnn_plugin;
 
 // NOLINTNEXTLINE(modernize-avoid-c-arrays)
 thread_local char Plugin_last_error_manager::last_error[HIPDNN_PLUGIN_ERROR_STRING_MAX_LENGTH] = "";
-
-#define LOG_API_ENTRY(format, ...) \
-    HIPDNN_LOG_INFO("API called: [{}] " format, __func__ __VA_OPT__(, ) __VA_ARGS__)
-
-#define LOG_API_SUCCESS(func_name, format, ...) \
-    HIPDNN_LOG_INFO("API success: [{}] " format, func_name __VA_OPT__(, ) __VA_ARGS__)
-
-template <typename T>
-void throw_if_null(T* value)
-{
-    if(value == nullptr)
-    {
-        throw hipdnn_plugin::Hipdnn_plugin_exception(HIPDNN_PLUGIN_STATUS_BAD_PARAM,
-                                                     std::string(typeid(T).name()) + " is nullptr");
-    }
-}
-
-class Test_container
-{
-};
-
-// Holds a weak pointer so subsequent calls to hipdnnEnginePluginCreate
-// can reuse the same instance of Test_container if it exists.
-std::weak_ptr<Test_container> test_container_lifecycle_ptr;
-
-struct hipdnnEnginePluginHandle
-{
-public:
-    virtual ~hipdnnEnginePluginHandle() = default;
-
-    hipStream_t stream = nullptr;
-
-    std::shared_ptr<Test_container> test_container;
-};
-
-struct hipdnnEnginePluginExecutionContext
-{
-    uint64_t dummy; // Placeholder
-};
 
 namespace
 {
@@ -148,33 +110,6 @@ hipdnnPluginStatus_t hipdnnEnginePluginCreate(hipdnnEnginePluginHandle_t* handle
 
         *handle = new hipdnnEnginePluginHandle();
 
-        (*handle)->stream = hipStreamDefault;
-
-        auto test_container_ptr = test_container_lifecycle_ptr.lock();
-        if(test_container_ptr != nullptr)
-        {
-            (*handle)->test_container = test_container_ptr;
-        }
-        else
-        {
-            static std::mutex test_container_mutex;
-            std::lock_guard<std::mutex> lock(test_container_mutex);
-
-            // if we do have a race condition that results in threads getting locked, we want to
-            // ensure that we only create one instance.  Therefore, the second thread to get
-            // through will just read from the weak pointer rather than create a new instance.
-            test_container_ptr = test_container_lifecycle_ptr.lock();
-            if(test_container_ptr != nullptr)
-            {
-                (*handle)->test_container = test_container_ptr;
-            }
-            else
-            {
-                (*handle)->test_container = std::make_shared<Test_container>();
-                test_container_lifecycle_ptr = (*handle)->test_container;
-            }
-        }
-
         LOG_API_SUCCESS(api_name, "created_handle={:p}", static_cast<void*>(*handle));
     });
 }
@@ -201,8 +136,6 @@ hipdnnPluginStatus_t hipdnnEnginePluginSetStream(hipdnnEnginePluginHandle_t hand
 
     return hipdnn_plugin::try_catch([&, api_name = __func__]() {
         throw_if_null(handle);
-
-        handle->stream = stream;
 
         LOG_API_SUCCESS(api_name, "");
     });
