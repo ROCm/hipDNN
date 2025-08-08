@@ -24,14 +24,16 @@ bool operator==(const ConvolutionFwdAttributesT &lhs, const ConvolutionFwdAttrib
 bool operator!=(const ConvolutionFwdAttributesT &lhs, const ConvolutionFwdAttributesT &rhs);
 
 enum ConvMode : int8_t {
-  ConvMode_CONVOLUTION = 0,
-  ConvMode_CROSS_CORRELATION = 1,
-  ConvMode_MIN = ConvMode_CONVOLUTION,
+  ConvMode_UNSET = 0,
+  ConvMode_CONVOLUTION = 1,
+  ConvMode_CROSS_CORRELATION = 2,
+  ConvMode_MIN = ConvMode_UNSET,
   ConvMode_MAX = ConvMode_CROSS_CORRELATION
 };
 
-inline const ConvMode (&EnumValuesConvMode())[2] {
+inline const ConvMode (&EnumValuesConvMode())[3] {
   static const ConvMode values[] = {
+    ConvMode_UNSET,
     ConvMode_CONVOLUTION,
     ConvMode_CROSS_CORRELATION
   };
@@ -39,7 +41,8 @@ inline const ConvMode (&EnumValuesConvMode())[2] {
 }
 
 inline const char * const *EnumNamesConvMode() {
-  static const char * const names[3] = {
+  static const char * const names[4] = {
+    "UNSET",
     "CONVOLUTION",
     "CROSS_CORRELATION",
     nullptr
@@ -48,7 +51,7 @@ inline const char * const *EnumNamesConvMode() {
 }
 
 inline const char *EnumNameConvMode(ConvMode e) {
-  if (::flatbuffers::IsOutRange(e, ConvMode_CONVOLUTION, ConvMode_CROSS_CORRELATION)) return "";
+  if (::flatbuffers::IsOutRange(e, ConvMode_UNSET, ConvMode_CROSS_CORRELATION)) return "";
   const size_t index = static_cast<size_t>(e);
   return EnumNamesConvMode()[index];
 }
@@ -62,7 +65,7 @@ struct ConvolutionFwdAttributesT : public ::flatbuffers::NativeTable {
   std::vector<int64_t> post_padding{};
   std::vector<int64_t> stride{};
   std::vector<int64_t> dilation{};
-  hipdnn_sdk::data_objects::ConvMode conv_mode = hipdnn_sdk::data_objects::ConvMode_CROSS_CORRELATION;
+  hipdnn_sdk::data_objects::ConvMode conv_mode = hipdnn_sdk::data_objects::ConvMode_UNSET;
 };
 
 struct ConvolutionFwdAttributes FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
@@ -121,10 +124,10 @@ struct ConvolutionFwdAttributes FLATBUFFERS_FINAL_CLASS : private ::flatbuffers:
     return GetPointer<::flatbuffers::Vector<int64_t> *>(VT_DILATION);
   }
   hipdnn_sdk::data_objects::ConvMode conv_mode() const {
-    return static_cast<hipdnn_sdk::data_objects::ConvMode>(GetField<int8_t>(VT_CONV_MODE, 1));
+    return static_cast<hipdnn_sdk::data_objects::ConvMode>(GetField<int8_t>(VT_CONV_MODE, 0));
   }
-  bool mutate_conv_mode(hipdnn_sdk::data_objects::ConvMode _conv_mode = static_cast<hipdnn_sdk::data_objects::ConvMode>(1)) {
-    return SetField<int8_t>(VT_CONV_MODE, static_cast<int8_t>(_conv_mode), 1);
+  bool mutate_conv_mode(hipdnn_sdk::data_objects::ConvMode _conv_mode = static_cast<hipdnn_sdk::data_objects::ConvMode>(0)) {
+    return SetField<int8_t>(VT_CONV_MODE, static_cast<int8_t>(_conv_mode), 0);
   }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
@@ -173,7 +176,7 @@ struct ConvolutionFwdAttributesBuilder {
     fbb_.AddOffset(ConvolutionFwdAttributes::VT_DILATION, dilation);
   }
   void add_conv_mode(hipdnn_sdk::data_objects::ConvMode conv_mode) {
-    fbb_.AddElement<int8_t>(ConvolutionFwdAttributes::VT_CONV_MODE, static_cast<int8_t>(conv_mode), 1);
+    fbb_.AddElement<int8_t>(ConvolutionFwdAttributes::VT_CONV_MODE, static_cast<int8_t>(conv_mode), 0);
   }
   explicit ConvolutionFwdAttributesBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
@@ -195,7 +198,7 @@ inline ::flatbuffers::Offset<ConvolutionFwdAttributes> CreateConvolutionFwdAttri
     ::flatbuffers::Offset<::flatbuffers::Vector<int64_t>> post_padding = 0,
     ::flatbuffers::Offset<::flatbuffers::Vector<int64_t>> stride = 0,
     ::flatbuffers::Offset<::flatbuffers::Vector<int64_t>> dilation = 0,
-    hipdnn_sdk::data_objects::ConvMode conv_mode = hipdnn_sdk::data_objects::ConvMode_CROSS_CORRELATION) {
+    hipdnn_sdk::data_objects::ConvMode conv_mode = hipdnn_sdk::data_objects::ConvMode_UNSET) {
   ConvolutionFwdAttributesBuilder builder_(_fbb);
   builder_.add_y_tensor_uid(y_tensor_uid);
   builder_.add_w_tensor_uid(w_tensor_uid);
@@ -217,7 +220,7 @@ inline ::flatbuffers::Offset<ConvolutionFwdAttributes> CreateConvolutionFwdAttri
     const std::vector<int64_t> *post_padding = nullptr,
     const std::vector<int64_t> *stride = nullptr,
     const std::vector<int64_t> *dilation = nullptr,
-    hipdnn_sdk::data_objects::ConvMode conv_mode = hipdnn_sdk::data_objects::ConvMode_CROSS_CORRELATION) {
+    hipdnn_sdk::data_objects::ConvMode conv_mode = hipdnn_sdk::data_objects::ConvMode_UNSET) {
   auto pre_padding__ = pre_padding ? _fbb.CreateVector<int64_t>(*pre_padding) : 0;
   auto post_padding__ = post_padding ? _fbb.CreateVector<int64_t>(*post_padding) : 0;
   auto stride__ = stride ? _fbb.CreateVector<int64_t>(*stride) : 0;

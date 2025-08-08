@@ -5,12 +5,14 @@
 #include "flatbuffers/detached_buffer.h"
 #include <hipdnn_frontend/attributes/batchnorm_attributes.hpp>
 #include <hipdnn_frontend/attributes/batchnorm_inference_attributes.hpp>
+#include <hipdnn_frontend/attributes/convolution_fwd_attributes.hpp>
 #include <hipdnn_frontend/attributes/pointwise_attributes.hpp>
 #include <hipdnn_frontend/backend/backend_wrapper.hpp>
 #include <hipdnn_frontend/backend/scoped_hipdnn_backend_descriptor.hpp>
 #include <hipdnn_frontend/node/batchnorm_backward_node.hpp>
 #include <hipdnn_frontend/node/batchnorm_inference_node.hpp>
 #include <hipdnn_frontend/node/batchnorm_node.hpp>
+#include <hipdnn_frontend/node/convolution_fprop.hpp>
 #include <hipdnn_frontend/node/node.hpp>
 #include <hipdnn_frontend/node/pointwise_node.hpp>
 
@@ -558,6 +560,36 @@ public:
             std::make_shared<PointwiseNode>(std::move(attributes), graph_attributes));
 
         return out_0;
+    }
+
+    std::shared_ptr<Tensor_attributes>
+        convolution_fprop(const std::shared_ptr<Tensor_attributes>& x,
+                           const std::shared_ptr<Tensor_attributes>& w,
+                           Convolution_fprop_attributes attributes)
+    {
+        if(attributes.name.empty())
+        {
+            attributes.name = "Convolution_" + std::to_string(_sub_nodes.size());
+        }
+        if(x->get_name().empty())
+        {
+            x->set_name(attributes.name + "::X");
+        }
+        if(w->get_name().empty())
+        {
+            w->set_name(attributes.name + "::W");
+        }
+        
+        auto y = output_tensor(attributes.name + "::Y");
+        
+        attributes.set_x(x);
+        attributes.set_w(w);
+        attributes.set_y(y);
+
+        _sub_nodes.emplace_back(
+            std::make_shared<ConvolutionNode>(std::move(attributes), graph_attributes));
+
+        return y;
     }
 
     static std::shared_ptr<Tensor_attributes>

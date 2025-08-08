@@ -4,8 +4,9 @@
 namespace hipdnn_sdk.data_objects;
 
 enum ConvMode : byte { 
-    CONVOLUTION = 0, 
-    CROSS_CORRELATION = 1 
+    UNSET = 0,
+    CONVOLUTION = 1, 
+    CROSS_CORRELATION = 2 
 }
 
 table ConvolutionFwdAttributes {
@@ -21,5 +22,5 @@ table ConvolutionFwdAttributes {
     dilation: [long];            // Dilation for each dimension
     
     // Algorithm/mode selection
-    conv_mode: ConvMode = CROSS_CORRELATION;
+    conv_mode: ConvMode;
 }
