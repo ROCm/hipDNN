@@ -107,6 +107,8 @@ void Sample_runner::operator()()
     epsilon_tensor.memory().template host_data<IntermediateType>()[0] = 1e-5f;
 
     std::unordered_map<int64_t, void*> variant_pack;
+
+    // TODO: Cleanup syntax when there is a better way to grab these pointers.
     variant_pack[x->get_uid()] = x_tensor.memory().template device_data<void>();
     variant_pack[scale->get_uid()] = scale_tensor.memory().template device_data<void>();
     variant_pack[bias->get_uid()] = bias_tensor.memory().template device_data<void>();

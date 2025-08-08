@@ -93,6 +93,8 @@ void Sample_runner::operator()()
         static_cast<IntermediateType>(0.1f), static_cast<IntermediateType>(1.0f));
 
     std::unordered_map<int64_t, void*> variant_pack;
+
+    // TODO: Cleanup syntax when there is a better way to grab these pointers.
     variant_pack[dy->get_uid()] = dy_tensor.memory().template device_data<void>();
     variant_pack[x->get_uid()] = x_tensor.memory().template device_data<void>();
     variant_pack[scale->get_uid()] = scale_tensor.memory().template device_data<void>();
