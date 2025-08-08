@@ -123,7 +123,7 @@ void Sample_runner::operator()()
                                    / (inv_variance_host_ptr[i] * inv_variance_host_ptr[i]);
         }
 
-        const float epsilon = 1e-2f; // bf16 fails for lower epsilon values
+        auto epsilon = 1e-2f; // bf16 fails for lower epsilon values
 
         ref_impl.batchnorm_fwd_inference(x_tensor,
                                          scale_tensor,
