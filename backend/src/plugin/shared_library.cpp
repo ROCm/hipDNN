@@ -72,8 +72,8 @@ void Shared_library::load(const std::filesystem::path& library_path)
     }
     else
     {
-        auto library_name
-            = hipdnn_sdk::utilities::get_library_name(modified_library_path.filename().string().c_str());
+        auto library_name = hipdnn_sdk::utilities::get_library_name(
+            modified_library_path.filename().string().c_str());
         modified_library_path = modified_library_path.parent_path() / library_name;
     }
 
