@@ -209,7 +209,7 @@ private:
             {
                 const auto& path = entry.path();
                 if(entry.is_regular_file()
-                   && path.extension() == hipdnn_backend::platform_utils::SHARED_LIB_EXT)
+                   && path.extension() == hipdnn_sdk::utilities::SHARED_LIB_EXT)
                 {
                     paths_to_load.insert(std::filesystem::weakly_canonical(path));
                 }

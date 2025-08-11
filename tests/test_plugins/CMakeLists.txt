@@ -7,6 +7,11 @@ set(CMAKE_CXX_STANDARD 20)
 
 find_package(hip REQUIRED)
 
+# Define plugin names as variables
+set(TEST_GOOD_PLUGIN_NAME "test_good_plugin")
+set(TEST_EXECUTE_FAILS_PLUGIN_NAME "test_execute_fails_plugin")
+set(TEST_NO_APPLICABLE_ENGINES_PLUGIN_NAME "test_no_applicable_engines_plugin")
+
 # Function to create a test plugin with common configuration
 function(add_test_plugin target_name)
     set(source_files ${ARGN})
@@ -37,9 +42,21 @@ function(add_test_plugin target_name)
         PRIVATE 
             ${HIPDNN_WARNING_COMPILE_OPTIONS}
     )
-
-    add_dependencies(public_hipdnn_backend_tests ${target_name})
 endfunction()
 
+#NOTE: If you add a new test plugin, then ensure it is listed in the frontend and backend
+#      CMakeLists.txt files as a dependency, and add the plugin name define.
+
 # test_good_plugin is a well-behaved plugin that returns a happy path
-add_test_plugin(test_good_plugin test_good_plugin.cpp)
+add_test_plugin(${TEST_GOOD_PLUGIN_NAME} test_good_plugin.cpp)
+
+# test_execute_fails_plugin is a plugin that fails during execution
+add_test_plugin(${TEST_EXECUTE_FAILS_PLUGIN_NAME} test_execute_fails_plugin.cpp)
+
+# test_no_applicable_engines_plugin is a plugin that reports no applicable engines
+add_test_plugin(${TEST_NO_APPLICABLE_ENGINES_PLUGIN_NAME} test_no_applicable_engines_plugin.cpp)
+
+# Export plugin names to parent scope for use in test compilation
+set(TEST_GOOD_PLUGIN_NAME "${TEST_GOOD_PLUGIN_NAME}" PARENT_SCOPE)
+set(TEST_EXECUTE_FAILS_PLUGIN_NAME "${TEST_EXECUTE_FAILS_PLUGIN_NAME}" PARENT_SCOPE)
+set(TEST_NO_APPLICABLE_ENGINES_PLUGIN_NAME "${TEST_NO_APPLICABLE_ENGINES_PLUGIN_NAME}" PARENT_SCOPE)

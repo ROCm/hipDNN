@@ -5,6 +5,7 @@
 #include "hipdnn_status.h"
 #include "test_macros.hpp"
 #include "test_util.hpp"
+#include <test_plugins/test_plugin_constants.hpp>
 
 #include <hipdnn_sdk/test_utilities/flatbuffer_graph_test_utils.hpp>
 
@@ -24,7 +25,7 @@ protected:
 
     void SetUp() override
     {
-        const std::array<const char*, 1> paths = {"../test_plugins/"};
+        const std::array<const char*, 1> paths = {hipdnn_tests::plugin_constants::test_good_plugin_path().c_str()};
         ASSERT_EQ(hipdnnSetEnginePluginPaths_ext(
                       paths.size(), paths.data(), HIPDNN_PLUGIN_LOADING_ABSOLUTE),
                   HIPDNN_STATUS_SUCCESS);
