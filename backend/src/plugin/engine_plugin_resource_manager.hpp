@@ -50,7 +50,7 @@ public:
     static std::set<std::filesystem::path> get_plugin_paths();
     void get_loaded_plugin_files(size_t* num_plugins,
                                  char** plugin_paths,
-                                 size_t* max_string_size) const;
+                                 size_t* max_string_len) const;
     static std::shared_ptr<Engine_plugin_resource_manager> create();
 
     Engine_plugin_resource_manager(std::shared_ptr<Engine_plugin_manager>& pm);

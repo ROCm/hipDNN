@@ -76,12 +76,12 @@ std::set<std::filesystem::path> Engine_plugin_resource_manager::get_plugin_paths
 
 void Engine_plugin_resource_manager::get_loaded_plugin_files(size_t* num_plugins,
                                                              char** plugin_paths,
-                                                             size_t* max_string_size) const
+                                                             size_t* max_string_len) const
 {
     if(!_pm)
     {
         *num_plugins = 0;
-        *max_string_size = 0;
+        *max_string_len = 0;
         return;
     }
 
@@ -96,11 +96,11 @@ void Engine_plugin_resource_manager::get_loaded_plugin_files(size_t* num_plugins
     if(plugin_paths == nullptr)
     {
         *num_plugins = path_set.size();
-        *max_string_size = required_len;
+        *max_string_len = required_len;
         return;
     }
 
-    if(*num_plugins < path_set.size() || *max_string_size < required_len)
+    if(*num_plugins < path_set.size() || *max_string_len < required_len)
     {
         throw Hipdnn_exception(HIPDNN_STATUS_BAD_PARAM, "Insufficient buffer space provided.");
     }
@@ -116,7 +116,7 @@ void Engine_plugin_resource_manager::get_loaded_plugin_files(size_t* num_plugins
             throw Hipdnn_exception(HIPDNN_STATUS_BAD_PARAM, "A plugin path string buffer is null.");
         }
         hipdnn::sdk::utilities::copy_max_size_with_null_terminator(
-            plugin_paths[i], paths_vec[i].c_str(), *max_string_size);
+            plugin_paths[i], paths_vec[i].c_str(), *max_string_len);
     }
 }
 

@@ -305,7 +305,7 @@ HIPDNN_BACKEND_EXPORT void hipdnnLoggingCallback_ext(hipdnnSeverity_t severity, 
  * @param[in] loading_mode   Specifies whether to add paths to or replace the default search paths.
  *
  * @retval HIPDNN_STATUS_SUCCESS           The operation was successful.
- * @retval HIPDNN_STATUS_BAD_PARAM         `plugin_paths` is null when `num_paths` is greater than 0.
+ * @retval HIPDNN_STATUS_BAD_PARAM_NULL_POINTER         `plugin_paths` is nullptr when `num_paths` is greater than 0.
  * @retval HIPDNN_STATUS_INTERNAL_ERROR    An internal error occurred.
  */
 HIPDNN_BACKEND_EXPORT hipdnnStatus_t hipdnnSetEnginePluginPaths_ext(
@@ -315,19 +315,19 @@ HIPDNN_BACKEND_EXPORT hipdnnStatus_t hipdnnSetEnginePluginPaths_ext(
  * @brief Gets file paths of loaded engine plugins for a given handle.
  *
  * This function must be called twice:
- * 1. First call: Pass `plugin_paths` as `NULL` to query the number of plugins and required buffer size.
+ * 1. First call: Pass `plugin_paths` as `nullptr` to query the number of plugins and required buffer size.
  *    - Sets `num_plugin_paths` to the total number of loaded plugins
- *    - Sets `max_string_size` to the maximum string length needed (including null terminator)
+ *    - Sets `max_string_len` to the maximum string length needed (including null terminator)
  * 
  * 2. Second call: Pass allocated buffers to retrieve the actual plugin paths.
  *    - Allocate an array of `num_plugin_paths` char pointers
- *    - Each char pointer should point to a buffer of at least `max_string_size` bytes
+ *    - Each char pointer should point to a buffer of at least `max_string_len` characters
  *    - The function will populate these buffers with the plugin paths
  *
  * @param[in]     handle           A valid hipDNN handle
  * @param[in,out] num_plugin_paths Pointer to number of plugins; updated with actual count.
- * @param[out]    plugin_paths     Array of character pointers for plugin paths, or `NULL` to query sizes.
- * @param[in,out] max_string_size  Pointer to buffer size; updated with required size.
+ * @param[out]    plugin_paths     Array of character pointers for plugin paths, or `nullptr` to query sizes.
+ * @param[in,out] max_string_len   Pointer to max string length; updated with required length.
  *
  * @retval HIPDNN_STATUS_SUCCESS           Success.
  * @retval HIPDNN_STATUS_BAD_PARAM         Invalid handle, null pointers, or insufficient buffer sizes.
@@ -336,7 +336,7 @@ HIPDNN_BACKEND_EXPORT hipdnnStatus_t hipdnnSetEnginePluginPaths_ext(
 HIPDNN_BACKEND_EXPORT hipdnnStatus_t hipdnnGetLoadedEnginePluginPaths_ext(hipdnnHandle_t handle,
                                                                           size_t* num_plugin_paths,
                                                                           char** plugin_paths,
-                                                                          size_t* max_string_size);
+                                                                          size_t* max_string_len);
 
 #ifdef __cplusplus
 }
