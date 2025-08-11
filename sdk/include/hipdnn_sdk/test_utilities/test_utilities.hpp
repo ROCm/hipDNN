@@ -14,7 +14,7 @@
 #define SKIP_IF_NO_DEVICES()                                        \
     do                                                    \
     {                                                     \
-        GTEST_SKIP() << "Disable device tests with ASAN"; \
+        GTEST_SKIP() << "Disable device tests with WIN32"; \
     } while(0)
     
 #else
