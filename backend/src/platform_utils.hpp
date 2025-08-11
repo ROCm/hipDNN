@@ -5,7 +5,7 @@
 
 #include <filesystem>
 #include <string>
-#include <hipdnn_sdk/utilities/platform_path_utils.hpp>
+#include <hipdnn_sdk/utilities/platform_utils.hpp>
 
 #ifdef _WIN32
 

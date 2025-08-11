@@ -6,7 +6,7 @@
 #include <filesystem>
 #include <stdexcept>
 #include <string>
-#include <hipdnn_sdk/utilities/platform_path_utils.hpp>
+#include <hipdnn_sdk/utilities/platform_utils.hpp>
 
 namespace hipdnn_tests
 {

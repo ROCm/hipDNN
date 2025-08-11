@@ -26,6 +26,9 @@ elseif(WIN32)
     set(WINDOWS_ROCM_LLVM_BIN_DIR "${WINDOWS_ROCM_DIR}/lib/llvm/bin")
     set(WINDOWS_ROCM_CMAKE_DIR "${WINDOWS_ROCM_DIR}/lib/cmake")
 
+    # Enable exporting all symbols for Windows
+    set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS TRUE)
+
     if(EXISTS ${WINDOWS_ROCM_LLVM_BIN_DIR})
         # Set the C and C++ compilers to clang and clang++ for Windows
         set(CMAKE_RC_COMPILER rc.exe)

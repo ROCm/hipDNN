@@ -9,6 +9,7 @@ if(HIP_DNN_SKIP_TESTS)
 endif()
 
 find_package(hip REQUIRED)
+find_package(Threads REQUIRED)
 
 add_executable(hipdnn_frontend_tests 
     main.cpp
@@ -42,7 +43,7 @@ target_link_libraries(hipdnn_frontend_tests
     GTest::gmock
     hip::host
     hip::device
-    pthread 
+    Threads::Threads 
     hipdnn_sdk 
     hipdnn_frontend
 )

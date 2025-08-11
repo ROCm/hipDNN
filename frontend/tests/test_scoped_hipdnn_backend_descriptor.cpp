@@ -4,6 +4,7 @@
 #include <gtest/gtest.h>
 
 #include <hipdnn_frontend/backend/scoped_hipdnn_backend_descriptor.hpp>
+#include <hipdnn_sdk/utilities/string_util.hpp>
 
 #include "fake_backend/fake_hipdnn_backend.hpp"
 #include "fake_backend/mock_hipdnn_backend.hpp"
@@ -23,8 +24,7 @@ protected:
         ON_CALL(*_mock_backend, hipdnnGetLastErrorString(_, _))
             .WillByDefault([](char* error_string, size_t size) {
                 std::string fake_error = "Fake backend error";
-                strncpy(error_string, fake_error.c_str(), size - 1);
-                error_string[size - 1] = '\0'; // Ensure null termination
+                hipdnn::sdk::utilities::copy_max_size_with_null_terminator(error_string, fake_error.c_str(), size - 1);
             });
 
         fake_hipdnn_backend::set_mock_hipdnn_backend(_mock_backend);

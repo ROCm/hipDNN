@@ -20,12 +20,14 @@ std::filesystem::path get_current_module_directory()
                           reinterpret_cast<LPCSTR>(&get_current_module_directory),
                           &module_handle) == TRUE)
     {
-        std::array<char, MAX_PATH> path_buffer = {0};
+        char* dst = new char[MAX_PATH];
+        DWORD len = GetModuleFileNameA(module_handle, dst, MAX_PATH);
+        std::string module_path_str(dst);
+        delete[] dst;
 
-        DWORD len = GetModuleFileNameA(module_handle, path_buffer.data(), path_buffer.size());
         if(len > 0 && len < MAX_PATH)
         {
-            module_path = std::filesystem::path(path_buffer).parent_path();
+            module_path = std::filesystem::path(module_path_str).parent_path();
         }
         else
         {
@@ -61,7 +63,7 @@ void close_library(Plugin_lib_handle handle)
 
 void* get_symbol(Plugin_lib_handle handle, const char* symbol_name)
 {
-    void* symbol = GetProcAddress(handle, symbol_name);
+    void* symbol = reinterpret_cast<void*>(GetProcAddress(handle, symbol_name));
     if(symbol == nullptr)
     {
         auto error_code = GetLastError();
