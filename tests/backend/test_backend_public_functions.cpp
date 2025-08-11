@@ -1,12 +1,10 @@
 // Copyright © Advanced Micro Devices, Inc., or its affiliates.
 // SPDX-License-Identifier:  MIT
 
-#include "../../backend/src/platform_utils.hpp"
 #include "../test_plugins/test_plugin_constants.hpp"
 #include "hipdnn_backend.h"
 #include "test_util.hpp"
 #include <array>
-#include <filesystem>
 #include <gtest/gtest.h>
 #include <hipdnn_sdk/data_objects/graph_generated.h>
 #include <hipdnn_sdk/utilities/platform_path_utils.hpp>
