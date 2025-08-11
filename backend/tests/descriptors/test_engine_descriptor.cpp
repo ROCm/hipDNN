@@ -132,6 +132,7 @@ TEST_F(Engine_descriptor_test, CreateEngineDescriptor)
 TEST_F(Engine_descriptor_test, SetEngineDescriptorGraph)
 {
     auto engine = get_engine_descriptor();
+    EXPECT_CALL(*get_mock_graph_bad_type(), is_finalized()).Times(1);
 
     ASSERT_THROW_HIPDNN_STATUS(
         engine->set_attribute(

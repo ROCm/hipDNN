@@ -69,7 +69,7 @@ public:
 
     void make_engine_config_finalized() const
     {
-        set_engine();
+        // TODO: With the call to finalize and get_mock_engine this makes it likely that we're interweaving EXPECTs and function calls
         EXPECT_CALL(*get_mock_engine(), is_finalized()).WillRepeatedly(Return(true));
         EXPECT_CALL(*get_mock_engine(), get_engine_id()).WillRepeatedly(Return(1));
         EXPECT_CALL(*get_mock_engine(), get_graph())
@@ -80,6 +80,8 @@ public:
             .WillOnce(Return(_mock_engine_plugin_resource_manager));
         EXPECT_CALL(*_mock_engine_plugin_resource_manager, get_workspace_size(_, _, _))
             .WillOnce(Return(1024));
+
+        set_engine();
         ASSERT_NO_THROW(get_engine_config_descriptor()->finalize());
     }
 
@@ -111,6 +113,18 @@ TEST_F(Engine_config_descriptor_test, CreateEngineConfigDescriptor)
 TEST_F(Engine_config_descriptor_test, SetEngineConfigDescriptorEngine)
 {
     auto engine_config = get_engine_config_descriptor();
+
+    EXPECT_CALL(*get_mock_engine_bad_type(), is_finalized()).Times(1);
+    EXPECT_CALL(*get_mock_engine(), get_engine_id()).Times(AnyNumber());
+    EXPECT_CALL(*get_mock_engine(), is_finalized()).WillOnce(Return(false)).WillOnce(Return(true));
+
+    ASSERT_THROW_HIPDNN_STATUS(
+        engine_config->set_attribute(
+            HIPDNN_ATTR_ENGINECFG_ENGINE, HIPDNN_TYPE_BACKEND_DESCRIPTOR, 1, &_mock_engine_wrapper),
+        HIPDNN_STATUS_BAD_PARAM_NOT_FINALIZED);
+
+    ASSERT_NO_THROW(engine_config->set_attribute(
+        HIPDNN_ATTR_ENGINECFG_ENGINE, HIPDNN_TYPE_BACKEND_DESCRIPTOR, 1, &_mock_engine_wrapper));
 
     ASSERT_THROW_HIPDNN_STATUS(
         engine_config->set_attribute(
@@ -144,16 +158,6 @@ TEST_F(Engine_config_descriptor_test, SetEngineConfigDescriptorEngine)
                                                             1,
                                                             &_mock_wrong_type_wrapper),
                                HIPDNN_STATUS_BAD_PARAM);
-
-    EXPECT_CALL(*get_mock_engine(), is_finalized()).WillOnce(Return(false));
-    ASSERT_THROW_HIPDNN_STATUS(
-        engine_config->set_attribute(
-            HIPDNN_ATTR_ENGINECFG_ENGINE, HIPDNN_TYPE_BACKEND_DESCRIPTOR, 1, &_mock_engine_wrapper),
-        HIPDNN_STATUS_BAD_PARAM_NOT_FINALIZED);
-
-    EXPECT_CALL(*get_mock_engine(), is_finalized()).WillOnce(Return(true));
-    ASSERT_NO_THROW(engine_config->set_attribute(
-        HIPDNN_ATTR_ENGINECFG_ENGINE, HIPDNN_TYPE_BACKEND_DESCRIPTOR, 1, &_mock_engine_wrapper));
 }
 
 TEST_F(Engine_config_descriptor_test, SetAttrOnFinalizedEngineConfigDescriptor)
