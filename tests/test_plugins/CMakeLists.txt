@@ -59,8 +59,8 @@ add_test_plugin(${TEST_NO_APPLICABLE_ENGINES_PLUGIN_NAME} test_no_applicable_eng
 # Create a duplicated default plugin that gets installed to the default plugin directory
 add_test_plugin(test_good_default_plugin test_good_plugin.cpp)
 
-# Create the default plugin directory in the build folder
-set(DEFAULT_PLUGIN_DIR "${CMAKE_BINARY_DIR}/hipdnn_plugins/engines")
+# Create the default plugin directory relative to where the .so is located (backend/src)
+set(DEFAULT_PLUGIN_DIR "${CMAKE_BINARY_DIR}/backend/src/hipdnn_plugins/engines")
 file(MAKE_DIRECTORY ${DEFAULT_PLUGIN_DIR})
 
 # Install the default plugin to the default plugin directory
@@ -68,7 +68,6 @@ add_custom_command(TARGET test_good_default_plugin POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy 
         $<TARGET_FILE:test_good_default_plugin>
         ${DEFAULT_PLUGIN_DIR}/$<TARGET_FILE_NAME:test_good_default_plugin>
-    COMMENT "Installing test_good_default_plugin to default plugin directory"
 )
 
 # Export plugin names to parent scope for use in test compilation
