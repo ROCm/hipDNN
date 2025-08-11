@@ -1,61 +1,15 @@
 // Copyright © Advanced Micro Devices, Inc., or its affiliates.
 // SPDX-License-Identifier:  MIT
 
-#ifndef _WIN32
-#include <dlfcn.h>
-#endif
-
+#include "shared_library.hpp"
 #include "hipdnn_exception.hpp"
 #include "logging/logging.hpp"
-#include "shared_library.hpp"
+#include "platform_utils.hpp"
 
 namespace hipdnn_backend
 {
 namespace plugin
 {
-
-std::filesystem::path Shared_library::get_current_module_directory()
-{
-    std::filesystem::path module_path;
-
-#ifdef _WIN32
-    HMODULE hModule = nullptr;
-    if(GetModuleHandleExA(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS
-                              | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
-                          reinterpret_cast<LPCSTR>(&get_current_module_directory),
-                          &hModule))
-    {
-        char path_buffer[MAX_PATH];
-        DWORD len = GetModuleFileNameA(hModule, path_buffer, sizeof(path_buffer));
-        if(len > 0 && len < MAX_PATH)
-        {
-            module_path = std::filesystem::path(path_buffer).parent_path();
-        }
-        else
-        {
-            throw Hipdnn_exception(HIPDNN_STATUS_INTERNAL_ERROR, "Failed to get module file name.");
-        }
-    }
-    else
-    {
-        throw Hipdnn_exception(HIPDNN_STATUS_INTERNAL_ERROR, "Failed to get module handle.");
-    }
-#elif defined(__linux__)
-    Dl_info info;
-    if(dladdr(reinterpret_cast<void const*>(&get_current_module_directory), &info) != 0
-       && info.dli_fname != nullptr && info.dli_fname[0] != '\0')
-    {
-        module_path = std::filesystem::path(info.dli_fname).parent_path();
-    }
-    else
-    {
-        throw Hipdnn_exception(HIPDNN_STATUS_INTERNAL_ERROR, "Failed to get module file name.");
-    }
-#else
-#error "Unsupported platform"
-#endif
-    return std::filesystem::weakly_canonical(std::filesystem::absolute(module_path));
-}
 
 Shared_library::Shared_library()
     : _library_handle(nullptr)
@@ -109,36 +63,20 @@ void Shared_library::load(const std::filesystem::path& library_path)
     // Check file extension and add prefix/suffix if needed
     if(modified_library_path.has_extension())
     {
-#ifdef _WIN32
-        if(modified_library_path.extension() != ".dll")
+        if(modified_library_path.extension() != platform_utils::SHARED_LIB_EXT)
         {
             throw Hipdnn_exception(HIPDNN_STATUS_BAD_PARAM,
-                                   "Invalid file extension. Expected '.dll'.");
+                                   std::string("Invalid file extension. Expected ")
+                                       + platform_utils::SHARED_LIB_EXT);
         }
-#elif defined(__linux__)
-        if(modified_library_path.extension() != ".so")
-        {
-            throw Hipdnn_exception(HIPDNN_STATUS_BAD_PARAM,
-                                   "Invalid file extension. Expected '.so'.");
-        }
-#else
-#error "Unsupported platform"
-#endif
     }
     else
     {
-#ifdef _WIN32
-        // Add ".dll" extension if no extension exists
-        modified_library_path.replace_extension(".dll");
-#elif defined(__linux__)
-        // Add "lib" prefix to the filename and ".so" extension if no extension exists
-        auto filename = std::filesystem::path("lib") += modified_library_path.filename();
-        modified_library_path = modified_library_path.parent_path() / filename;
-        modified_library_path.replace_extension(".so");
-#else
-#error "Unsupported platform"
-#endif
+        auto library_name
+            = platform_utils::get_library_name(modified_library_path.filename().string().c_str());
+        modified_library_path = modified_library_path.parent_path() / library_name;
     }
+
     _library_path = std::filesystem::weakly_canonical(modified_library_path);
 
     // Needs to be a resolved, weakly canonical path at this point
@@ -153,48 +91,14 @@ void Shared_library::load(const std::filesystem::path& library_path)
         "Shared_library: Attempting to load shared library from final absolute path: {}",
         _library_path.string());
 
-#ifdef _WIN32
-    _library_handle = LoadLibraryW(_library_path.wstring().c_str());
-    if(_library_handle == nullptr)
-    {
-        auto errorCode = GetLastError();
-        throw Hipdnn_exception(HIPDNN_STATUS_PLUGIN_ERROR,
-                               "Failed to load library: " + _library_path.string()
-                                   + " (Error Code: " + std::to_string(errorCode) + ")");
-    }
-#elif defined(__linux__)
-
-#if __has_feature(address_sanitizer)
-    // Address Sanitizer does not support RTLD_DEEPBIND, so we use RTLD_NOW only
-    _library_handle = dlopen(_library_path.string().c_str(), RTLD_NOW);
-#else
-    _library_handle = dlopen(_library_path.string().c_str(), RTLD_NOW | RTLD_DEEPBIND);
-#endif
-
-    if(_library_handle == nullptr)
-    {
-        const char* error = dlerror();
-        throw Hipdnn_exception(HIPDNN_STATUS_PLUGIN_ERROR,
-                               "Failed to load library: " + _library_path.string() + " (Error: "
-                                   + (error != nullptr ? std::string(error) : "Unknown error")
-                                   + ")");
-    }
-#else
-#error "Unsupported platform"
-#endif
+    _library_handle = platform_utils::open_library(_library_path);
 }
 
 void Shared_library::unload() noexcept
 {
     if(_library_handle != nullptr)
     {
-#ifdef _WIN32
-        FreeLibrary(_library_handle);
-#elif defined(__linux__)
-        dlclose(_library_handle);
-#else
-#error "Unsupported platform"
-#endif
+        platform_utils::close_library(_library_handle);
         _library_handle = nullptr;
     }
 }
@@ -208,28 +112,7 @@ void* Shared_library::get_symbol(std::string_view symbol_name) const
                                    + std::string(symbol_name));
     }
 
-#ifdef _WIN32
-    void* symbol = GetProcAddress(_library_handle, symbol_name.data());
-    if(symbol == nullptr)
-    {
-        auto errorCode = GetLastError();
-        throw Hipdnn_exception(HIPDNN_STATUS_PLUGIN_ERROR,
-                               "Failed to get symbol: " + std::string(symbol_name)
-                                   + " (Error Code: " + std::to_string(errorCode) + ")");
-    }
-#elif defined(__linux__)
-    void* symbol = dlsym(_library_handle, symbol_name.data());
-    if(symbol == nullptr)
-    {
-        const char* error = dlerror();
-        throw Hipdnn_exception(HIPDNN_STATUS_PLUGIN_ERROR,
-                               "Failed to get symbol: " + std::string(symbol_name) + " (Error: "
-                                   + (error != nullptr ? error : "Unknown error") + ")");
-    }
-#else
-#error "Unsupported platform"
-#endif
-    return symbol;
+    return platform_utils::get_symbol(_library_handle, symbol_name.data());
 }
 
 const std::filesystem::path& Shared_library::library_path() const
