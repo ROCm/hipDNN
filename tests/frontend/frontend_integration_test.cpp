@@ -21,7 +21,6 @@ using namespace hipdnn_frontend;
 using namespace hipdnn_frontend::graph;
 using namespace hipdnn_sdk::utilities;
 
-
 enum class FailurePoint
 {
     NONE, // No failure expected
@@ -167,28 +166,32 @@ protected:
         }
         tensors.x = std::make_shared<Tensor_attributes>(std::move(x_attr));
 
-        auto mean_attr = make_tensor_attributes("mean", DataType_t::FLOAT, tensor_bundle.mean_tensor);
+        auto mean_attr
+            = make_tensor_attributes("mean", DataType_t::FLOAT, tensor_bundle.mean_tensor);
         if(use_manual_uids)
         {
             mean_attr.set_uid(uid++);
         }
         tensors.mean = std::make_shared<Tensor_attributes>(std::move(mean_attr));
 
-        auto inv_variance_attr = make_tensor_attributes("inv_variance", DataType_t::FLOAT, tensor_bundle.variance_tensor);
+        auto inv_variance_attr = make_tensor_attributes(
+            "inv_variance", DataType_t::FLOAT, tensor_bundle.variance_tensor);
         if(use_manual_uids)
         {
             inv_variance_attr.set_uid(uid++);
         }
         tensors.inv_variance = std::make_shared<Tensor_attributes>(std::move(inv_variance_attr));
 
-        auto scale_attr = make_tensor_attributes("scale", DataType_t::FLOAT, tensor_bundle.scale_tensor);
+        auto scale_attr
+            = make_tensor_attributes("scale", DataType_t::FLOAT, tensor_bundle.scale_tensor);
         if(use_manual_uids)
         {
             scale_attr.set_uid(uid++);
         }
         tensors.scale = std::make_shared<Tensor_attributes>(std::move(scale_attr));
 
-        auto bias_attr = make_tensor_attributes("bias", DataType_t::FLOAT, tensor_bundle.bias_tensor);
+        auto bias_attr
+            = make_tensor_attributes("bias", DataType_t::FLOAT, tensor_bundle.bias_tensor);
         if(use_manual_uids)
         {
             bias_attr.set_uid(uid++);
@@ -313,16 +316,18 @@ INSTANTIATE_TEST_SUITE_P(
                                             "DefaultPluginBatchnormTestAutoUID",
                                             FailurePoint::NONE,
                                             false},
-                      Integration_test_case{hipdnn_tests::plugin_constants::test_execute_fails_plugin_path(),
-                                            "Execute fails plugin",
-                                            "ExecuteFailsPluginBatchnormTest",
-                                            FailurePoint::EXECUTE,
-                                            true},
-                      Integration_test_case{hipdnn_tests::plugin_constants::test_no_applicable_engines_plugin_path(),
-                                            "No applicable engines plugin",
-                                            "NoEnginesPluginBatchnormTest",
-                                            FailurePoint::CREATE_EXECUTION_PLAN,
-                                            true}),
+                      Integration_test_case{
+                          hipdnn_tests::plugin_constants::test_execute_fails_plugin_path(),
+                          "Execute fails plugin",
+                          "ExecuteFailsPluginBatchnormTest",
+                          FailurePoint::EXECUTE,
+                          true},
+                      Integration_test_case{
+                          hipdnn_tests::plugin_constants::test_no_applicable_engines_plugin_path(),
+                          "No applicable engines plugin",
+                          "NoEnginesPluginBatchnormTest",
+                          FailurePoint::CREATE_EXECUTION_PLAN,
+                          true}),
     // Provide a custom name for each test instance
     [](const ::testing::TestParamInfo<Integration_test_case>& info) {
         std::string name = info.param.description;

@@ -4,8 +4,8 @@
 #pragma once
 
 #include <filesystem>
-#include <string>
 #include <hipdnn_sdk/utilities/platform_path_utils.hpp>
+#include <string>
 
 namespace hipdnn_backend::platform_utils
 {
