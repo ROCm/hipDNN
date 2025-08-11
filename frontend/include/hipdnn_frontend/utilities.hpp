@@ -2,10 +2,12 @@
 // SPDX-License-Identifier:  MIT
 #pragma once
 
+#include "attributes/tensor_attributes.hpp"
 #include "error.hpp"
 #include <algorithm>
 #include <hipdnn_sdk/logging/callback_types.h>
 #include <hipdnn_sdk/logging/logger.hpp>
+#include <hipdnn_sdk/utilities/tensor.hpp>
 #include <numeric>
 #include <ranges>
 #include <vector>
@@ -51,6 +53,18 @@ inline error_t find_common_shape(const std::vector<std::vector<int64_t>>& input_
     }
 
     return {};
+}
+
+// Utility function to create Tensor_attributes from a Tensor
+inline Tensor_attributes make_tensor_attributes(const std::string& name,
+                                                DataType_t data_type,
+                                                const hipdnn_sdk::utilities::Tensor& tensor)
+{
+    return Tensor_attributes()
+        .set_name(name)
+        .set_data_type(data_type)
+        .set_dim(tensor.dims())
+        .set_stride(tensor.strides());
 }
 
 }

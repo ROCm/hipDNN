@@ -4,15 +4,14 @@
 #include <gtest/gtest.h>
 #include <numeric>
 
-#include <hipdnn_sdk/utilities/half_utils.hpp>
-#include <hipdnn_sdk/utilities/hip_bfloat16_utils.hpp>
-
 #include <hipdnn_sdk/plugin/engine_plugin_api.h>
 #include <hipdnn_sdk/plugin/plugin_api_data_types.h>
 #include <hipdnn_sdk/test_utilities/cpu_fp_reference_implementation.hpp>
 #include <hipdnn_sdk/test_utilities/cpu_fp_reference_validation.hpp>
 #include <hipdnn_sdk/test_utilities/flatbuffer_graph_test_utils.hpp>
 #include <hipdnn_sdk/test_utilities/test_utilities.hpp>
+#include <hipdnn_sdk/utilities/half_utils.hpp>
+#include <hipdnn_sdk/utilities/hip_bfloat16_utils.hpp>
 #include <hipdnn_sdk/utilities/tensor.hpp>
 
 #include "hipdnn_engine_plugin_execution_context.hpp"
