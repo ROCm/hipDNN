@@ -21,16 +21,11 @@ using namespace hipdnn_sdk::utilities;
 template <typename InputType, typename IntermediateType, Tensor_layout Layout>
 void Sample_runner::operator()()
 {
-    if constexpr(Layout == Tensor_layout::NHWC)
-    {
-        std::cout << "NHWC not supported yet\n";
-        return;
-    }
-
     auto input_type = get_data_type_enum_from_type<InputType>();
     auto intermediate_type = get_data_type_enum_from_type<IntermediateType>();
 
-    std::cout << "Running batch normalization inference graph " << input_type
+    std::cout << "Running batch normalization inference graph " << input_type << " ["
+              << (Layout == Tensor_layout::NHWC ? "NHWC" : "NCHW") << "]"
               << (config.cpu_validation ? " (with CPU validation)" : "") << "...\n";
 
     int64_t N = 16; // BATCH SIZE
@@ -70,12 +65,12 @@ void Sample_runner::operator()()
     HIPDNN_FE_CHECK(graph->build_plans());
     std::cout << "Plans build successful.\n";
 
-    auto x_tensor = Tensor::make_nchw_tensor<InputType>(x->get_dim());
+    auto x_tensor = create_tensor_with_layout<InputType>(x->get_dim(), Layout);
     auto scale_tensor = Tensor::make_nchw_tensor<IntermediateType>(scale->get_dim());
     auto bias_tensor = Tensor::make_nchw_tensor<IntermediateType>(bias->get_dim());
     auto mean_tensor = Tensor::make_nchw_tensor<IntermediateType>(mean->get_dim());
     auto inv_variance_tensor = Tensor::make_nchw_tensor<IntermediateType>(inv_variance->get_dim());
-    auto y_tensor = Tensor::make_nchw_tensor<InputType>(y->get_dim());
+    auto y_tensor = create_tensor_with_layout<InputType>(y->get_dim(), Layout);
 
     x_tensor.template fill_with_random_values<InputType>(static_cast<InputType>(0.0f),
                                                          static_cast<InputType>(1.0f));
@@ -111,7 +106,7 @@ void Sample_runner::operator()()
 
         auto ref_impl = hipdnn_sdk::reference_test_utilities::
             Cpu_fp_reference_implementation<InputType, IntermediateType>();
-        auto y_ref_tensor = Tensor::make_nchw_tensor<InputType>(y->get_dim());
+        auto y_ref_tensor = create_tensor_with_layout<InputType>(y->get_dim(), Layout);
 
         // Convert inverse variance to variance for CPU reference
         auto variance_tensor = Tensor::make_nchw_tensor<IntermediateType>(inv_variance->get_dim());

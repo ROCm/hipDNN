@@ -19,16 +19,11 @@ using namespace hipdnn_sdk::utilities;
 template <typename InputType, typename IntermediateType, Tensor_layout Layout>
 void Sample_runner::operator()()
 {
-    if constexpr(Layout == Tensor_layout::NHWC)
-    {
-        std::cout << "NHWC not supported yet\n";
-        return;
-    }
-
     auto input_type = get_data_type_enum_from_type<InputType>();
     auto intermediate_type = get_data_type_enum_from_type<IntermediateType>();
 
-    std::cout << "Running batch normalization backwards graph " << input_type << "...\n";
+    std::cout << "Running batch normalization backwards graph " << input_type << " ["
+              << (Layout == Tensor_layout::NHWC ? "NHWC" : "NCHW") << "]...\n";
 
     int64_t N = 16; // BATCH SIZE
     int64_t C = 16; // CHANNELS (FEATURES)
@@ -70,14 +65,14 @@ void Sample_runner::operator()()
     HIPDNN_FE_CHECK(graph->build_plans());
     std::cout << "Plans build successful.\n";
 
-    auto dy_tensor = Tensor::make_nchw_tensor<InputType>(dy->get_dim());
-    auto x_tensor = Tensor::make_nchw_tensor<InputType>(x->get_dim());
+    auto dy_tensor = create_tensor_with_layout<InputType>(dy->get_dim(), Layout);
+    auto x_tensor = create_tensor_with_layout<InputType>(x->get_dim(), Layout);
     auto scale_tensor = Tensor::make_nchw_tensor<IntermediateType>(scale->get_dim());
     auto saved_mean_tensor = Tensor::make_nchw_tensor<IntermediateType>(saved_mean->get_dim());
     auto saved_inv_var_tensor
         = Tensor::make_nchw_tensor<IntermediateType>(saved_inv_variance->get_dim());
 
-    auto dx_tensor = Tensor::make_nchw_tensor<InputType>(dx->get_dim());
+    auto dx_tensor = create_tensor_with_layout<InputType>(dx->get_dim(), Layout);
     auto dscale_tensor = Tensor::make_nchw_tensor<IntermediateType>(dscale->get_dim());
     auto dbias_tensor = Tensor::make_nchw_tensor<IntermediateType>(dbias->get_dim());
 

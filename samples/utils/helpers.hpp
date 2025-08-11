@@ -6,6 +6,7 @@
 #include <hipdnn_backend.h>
 #include <hipdnn_frontend.hpp>
 #include <hipdnn_sdk/utilities/shape_utils.hpp>
+#include <hipdnn_sdk/utilities/tensor.hpp>
 
 #include <algorithm>
 #include <iostream>
@@ -102,6 +103,9 @@ void run(F&& f)
     f.template operator()<float, float, Tensor_layout::NCHW>();
     f.template operator()<half, float, Tensor_layout::NCHW>();
     f.template operator()<hip_bfloat16, float, Tensor_layout::NCHW>();
+    f.template operator()<float, float, Tensor_layout::NHWC>();
+    f.template operator()<half, float, Tensor_layout::NHWC>();
+    f.template operator()<hip_bfloat16, float, Tensor_layout::NHWC>();
 }
 
 inline std::shared_ptr<hipdnn_frontend::graph::Tensor_attributes>
@@ -126,6 +130,20 @@ inline int64_t get_tensor_element_count(
         count *= dim;
     }
     return count;
+}
+
+template <typename DataType>
+inline hipdnn_sdk::utilities::Tensor create_tensor_with_layout(const std::vector<int64_t>& dims,
+                                                               Tensor_layout layout)
+{
+    if(layout == Tensor_layout::NHWC)
+    {
+        return hipdnn_sdk::utilities::Tensor::make_nhwc_tensor<DataType>(dims);
+    }
+    else
+    {
+        return hipdnn_sdk::utilities::Tensor::make_nchw_tensor<DataType>(dims);
+    }
 }
 
 struct Sample_runner
