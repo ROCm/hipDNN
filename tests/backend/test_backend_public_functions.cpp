@@ -192,6 +192,16 @@ TEST(HipDNNBackendTest, SetPluginPathsExt_InvalidAndValidNullPointerCorrectness)
 
     status = hipdnnSetEnginePluginPaths_ext(0, nullptr, HIPDNN_PLUGIN_LOADING_ABSOLUTE);
     EXPECT_EQ(status, HIPDNN_STATUS_SUCCESS);
+
+    hipdnnHandle_t handle = nullptr;
+    status = hipdnnCreate(&handle);
+    ASSERT_EQ(status, HIPDNN_STATUS_SUCCESS);
+    ASSERT_NE(handle, nullptr);
+
+    auto loaded_plugins = test_util::get_loaded_plugins(handle);
+    EXPECT_EQ(loaded_plugins.size(), 0);
+
+    EXPECT_EQ(hipdnnDestroy(handle), HIPDNN_STATUS_SUCCESS);
 }
 
 TEST(HipDNNBackendTest, SetPluginPathsExt_FailsOnNullStringInList)
