@@ -56,6 +56,22 @@ add_test_plugin(${TEST_EXECUTE_FAILS_PLUGIN_NAME} test_execute_fails_plugin.cpp)
 # test_no_applicable_engines_plugin is a plugin that reports no applicable engines
 add_test_plugin(${TEST_NO_APPLICABLE_ENGINES_PLUGIN_NAME} test_no_applicable_engines_plugin.cpp)
 
+# Create a default plugin that gets installed to the default plugin directory
+# This is the same as test_good_plugin but renamed for testing default plugin loading
+add_test_plugin(test_good_default_plugin test_good_plugin.cpp)
+
+# Create the default plugin directory in the build folder
+set(DEFAULT_PLUGIN_DIR "${CMAKE_BINARY_DIR}/hipdnn_plugins/engines")
+file(MAKE_DIRECTORY ${DEFAULT_PLUGIN_DIR})
+
+# Install the default plugin to the default plugin directory
+add_custom_command(TARGET test_good_default_plugin POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy 
+        $<TARGET_FILE:test_good_default_plugin>
+        ${DEFAULT_PLUGIN_DIR}/$<TARGET_FILE_NAME:test_good_default_plugin>
+    COMMENT "Installing test_good_default_plugin to default plugin directory"
+)
+
 # Export plugin names to parent scope for use in test compilation
 set(TEST_GOOD_PLUGIN_NAME "${TEST_GOOD_PLUGIN_NAME}" PARENT_SCOPE)
 set(TEST_EXECUTE_FAILS_PLUGIN_NAME "${TEST_EXECUTE_FAILS_PLUGIN_NAME}" PARENT_SCOPE)

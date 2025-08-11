@@ -287,11 +287,12 @@ void extract_tensor_info_from_graph(
     ASSERT_FALSE(uid_to_name_map.empty());
 }
 
-std::vector<std::string> get_loaded_plugins()
+std::vector<std::string> get_loaded_plugins(hipdnnHandle_t handle)
 {
     size_t num_plugins = 0;
     size_t max_path_length = 0;
-    auto status = hipdnnGetLoadedEnginePluginPaths_ext(&num_plugins, nullptr, &max_path_length);
+    auto status
+        = hipdnnGetLoadedEnginePluginPaths_ext(handle, &num_plugins, nullptr, &max_path_length);
     if(status != HIPDNN_STATUS_SUCCESS || num_plugins == 0)
     {
         return {};
@@ -305,7 +306,7 @@ std::vector<std::string> get_loaded_plugins()
     }
 
     status = hipdnnGetLoadedEnginePluginPaths_ext(
-        &num_plugins, plugin_paths_c.data(), &max_path_length);
+        handle, &num_plugins, plugin_paths_c.data(), &max_path_length);
     if(status != HIPDNN_STATUS_SUCCESS)
     {
         return {};

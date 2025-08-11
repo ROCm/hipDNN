@@ -48,8 +48,9 @@ public:
     static void set_plugin_paths(const std::vector<std::filesystem::path>& plugin_paths,
                                  hipdnnPluginLoadingMode_ext_t loading_mode);
     static std::set<std::filesystem::path> get_plugin_paths();
-    static void
-        get_loaded_plugin_files(size_t* num_plugins, char** plugin_paths, size_t* max_string_size);
+    void get_loaded_plugin_files(size_t* num_plugins,
+                                 char** plugin_paths,
+                                 size_t* max_string_size) const;
     static std::shared_ptr<Engine_plugin_resource_manager> create();
 
     Engine_plugin_resource_manager(std::shared_ptr<Engine_plugin_manager>& pm);

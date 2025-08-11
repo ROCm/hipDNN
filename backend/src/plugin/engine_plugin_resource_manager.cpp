@@ -76,17 +76,16 @@ std::set<std::filesystem::path> Engine_plugin_resource_manager::get_plugin_paths
 
 void Engine_plugin_resource_manager::get_loaded_plugin_files(size_t* num_plugins,
                                                              char** plugin_paths,
-                                                             size_t* max_string_size)
+                                                             size_t* max_string_size) const
 {
-    auto pm = pm_ptr.lock();
-    if(!pm)
+    if(!_pm)
     {
         *num_plugins = 0;
         *max_string_size = 0;
         return;
     }
 
-    const auto& path_set = pm->get_loaded_plugin_files();
+    const auto& path_set = _pm->get_loaded_plugin_files();
 
     size_t required_len = 0;
     for(const auto& path : path_set)
@@ -119,7 +118,6 @@ void Engine_plugin_resource_manager::get_loaded_plugin_files(size_t* num_plugins
         hipdnn::sdk::utilities::copy_max_size_with_null_terminator(
             plugin_paths[i], paths_vec[i].c_str(), *max_string_size);
     }
-    *num_plugins = paths_vec.size();
 }
 
 std::shared_ptr<Engine_plugin_resource_manager> Engine_plugin_resource_manager::create()
