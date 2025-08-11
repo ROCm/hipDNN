@@ -20,8 +20,8 @@ const char* const WRONG_LIBRARY_PATH = "./wrong_path";
 const char* const SYMBOL_NAME = "hipdnnPluginGetName";
 const char* const WRONG_SYMBOL_NAME = "wrong_symbol_name";
 
-const std::string FULL_LIBRARY_PATH = std::filesystem::path(".")
-    /= platform_utils::get_library_name("hipdnn_test_plugin1");
+const std::string FULL_LIBRARY_PATH = (std::filesystem::path(".")
+    /= platform_utils::get_library_name("hipdnn_test_plugin1")).string();
 
 }
 

@@ -6,26 +6,38 @@
 #include <filesystem>
 #include <string>
 
+#ifdef _WIN32
+
+#include <windows.h>
+
 namespace hipdnn_backend::platform_utils
 {
-
-#ifdef _WIN32
 
 typedef HMODULE Plugin_lib_handle;
 constexpr const char* SHARED_LIB_EXT = ".dll";
 constexpr const char* LIB_PREFIX = "";
 
+}
+
 #elif defined(__linux__)
+
+namespace hipdnn_backend::platform_utils
+{
 
 typedef void* Plugin_lib_handle;
 constexpr const char* SHARED_LIB_EXT = ".so";
 constexpr const char* LIB_PREFIX = "lib";
+
+}
 
 #else
 
 #error "Unsupported platform"
 
 #endif
+
+namespace hipdnn_backend::platform_utils
+{
 
 inline std::string get_library_name(const char* library_base_name)
 {

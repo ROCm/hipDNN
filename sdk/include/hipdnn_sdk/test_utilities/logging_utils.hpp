@@ -7,6 +7,7 @@
 #include <hipdnn_sdk/logging/component_formatter.hpp>
 
 #include <cstdlib>
+//#include <stdlib.h>
 #include <iostream>
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/spdlog.h>
@@ -40,8 +41,15 @@ inline void test_logging_callback(hipdnnSeverity_t severity, const char* message
 {
 #ifndef DISABLE_TEST_LOGGING
 
+#ifdef WIN32
+    size_t size = 0;
+    std::array<char, 256> log_level_env = {0};
+    getenv_s(&size, log_level_env.data(), log_level_env.size(), "HIPDNN_LOG_LEVEL");
+    std::string log_level_str = size != 0 ? log_level_env.data() : "off";
+#else
     const char* log_level_env = std::getenv("HIPDNN_LOG_LEVEL");
     std::string log_level_str = log_level_env != nullptr ? log_level_env : "off";
+#endif
 
     if(log_level_str == "off")
     {
