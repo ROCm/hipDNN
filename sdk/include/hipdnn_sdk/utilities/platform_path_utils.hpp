@@ -12,13 +12,11 @@ namespace utilities
 
 #ifdef _WIN32
 
-typedef HMODULE Plugin_lib_handle;
 constexpr const char* SHARED_LIB_EXT = ".dll";
 constexpr const char* LIB_PREFIX = "";
 
 #elif defined(__linux__)
 
-typedef void* Plugin_lib_handle;
 constexpr const char* SHARED_LIB_EXT = ".so";
 constexpr const char* LIB_PREFIX = "lib";
 
