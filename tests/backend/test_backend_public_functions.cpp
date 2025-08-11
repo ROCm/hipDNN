@@ -184,7 +184,7 @@ TEST(HipDNNBackendTest, SetPluginPathsExt_Success)
     EXPECT_EQ(status, HIPDNN_STATUS_SUCCESS);
 }
 
-TEST(HipDNNBackendTest, SetPluginPathsExt_FailsOnNullPointer)
+TEST(HipDNNBackendTest, SetPluginPathsExt_InvalidAndValidNullPointerCorrectness)
 {
     hipdnnStatus_t status
         = hipdnnSetEnginePluginPaths_ext(1, nullptr, HIPDNN_PLUGIN_LOADING_ABSOLUTE);
