@@ -28,22 +28,6 @@ using namespace miopen_legacy_plugin;
 // NOLINTNEXTLINE(modernize-avoid-c-arrays)
 thread_local char Plugin_last_error_manager::last_error[HIPDNN_PLUGIN_ERROR_STRING_MAX_LENGTH] = "";
 
-#define LOG_API_ENTRY(format, ...) \
-    HIPDNN_LOG_INFO("API called: [{}] " format, __func__ __VA_OPT__(, ) __VA_ARGS__)
-
-#define LOG_API_SUCCESS(func_name, format, ...) \
-    HIPDNN_LOG_INFO("API success: [{}] " format, func_name __VA_OPT__(, ) __VA_ARGS__)
-
-template <typename T>
-void throw_if_null(T* value)
-{
-    if(value == nullptr)
-    {
-        throw hipdnn_plugin::Hipdnn_plugin_exception(HIPDNN_PLUGIN_STATUS_BAD_PARAM,
-                                                     std::string(typeid(T).name()) + " is nullptr");
-    }
-}
-
 // Keep a weak pointer to the Miopen_container thats made when we create a plugin handle.
 // The original shared_ptr is then stored on the handle so that it can be used for the lifecycle
 // of the handle.  If we create another handle, then we can use the weak pointer to get access

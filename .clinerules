@@ -1,0 +1,92 @@
+# Cline Rules for hipDNN Project
+
+## C++ Code Style
+
+### Naming Conventions
+- Use Leading_upper_snake_case for class and struct names (e.g., `Batch_norm_test_case`, `Simple_tensor_bundle`)
+- Use lower_case for functions, variables, and private members (e.g., `setup_environment()`, `tensor_data`)
+- Prefix private members with underscore (e.g., `_handle`, `_test_data`)
+
+### File Headers
+- Always add copyright header to all source files:
+  ```cpp
+  // Copyright © Advanced Micro Devices, Inc., or its affiliates.
+  // SPDX-License-Identifier:  MIT
+  ```
+- For header files (.h, .hpp), add `#pragma once` immediately after copyright
+
+### Code Practices
+- Use `auto` when initializing with a cast to avoid duplicating the type name
+  ```cpp
+  // Good
+  auto tensor = static_cast<float*>(data);
+  // Avoid
+  float* tensor = static_cast<float*>(data);
+  ```
+
+### Build System
+- Always use CMake for managing C/C++ dependencies
+- When discussing dependencies or build configuration, provide CMake-based solutions
+
+### Serialization
+- Use Flatbuffers for serialization needs
+- Provide Flatbuffer schema definitions when creating serializable data structures
+
+### Testing
+- Use Google Test (gtest) framework for all C/C++ tests
+- Never generate a main() function in test files - gtest provides its own
+- Use TEST(), TEST_F(), or TEST_P() macros as appropriate
+
+## Example Code Structure
+
+```cpp
+// Copyright © Advanced Micro Devices, Inc., or its affiliates.
+// SPDX-License-Identifier:  MIT
+
+#pragma once  // For header files only
+
+#include <memory>
+#include <vector>
+
+// Class with Leading_upper_snake_case
+class My_test_class
+{
+public:
+    // Public methods in lower_case
+    void setup_test();
+    int get_value() const;
+
+private:
+    // Private members prefixed with _
+    int _test_value;
+    std::vector<float> _data;
+};
+
+// Functions in lower_case
+void process_data(const My_test_class& obj);
+```
+
+## Test File Example
+
+```cpp
+// Copyright © Advanced Micro Devices, Inc., or its affiliates.
+// SPDX-License-Identifier:  MIT
+
+#include <gtest/gtest.h>
+
+class My_test_fixture : public ::testing::Test
+{
+protected:
+    void SetUp() override
+    {
+        // Setup code
+    }
+
+private:
+    int _test_data;
+};
+
+TEST_F(My_test_fixture, test_something)
+{
+    // Test implementation
+}

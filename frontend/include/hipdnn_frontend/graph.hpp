@@ -347,8 +347,10 @@ public:
         RETURN_ON_BACKEND_FAILURE(hipdnn_backend().backend_finalize(variant_pack_desc->get()),
                                   "Failed to finalize variant pack descriptor");
 
-        hipdnn_backend().backend_execute(
-            handle, _execution_plan_desc->get(), variant_pack_desc->get());
+        RETURN_ON_BACKEND_FAILURE(hipdnn_backend().backend_execute(handle,
+                                                                   _execution_plan_desc->get(),
+                                                                   variant_pack_desc->get()),
+                                  "Execute failed.");
 
         return {error_code_t::OK, ""};
     }

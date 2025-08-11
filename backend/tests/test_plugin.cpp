@@ -62,9 +62,9 @@ const std::filesystem::path PLUGIN_PATH1 = std::filesystem::path(".") /= PLUGIN_
 const std::filesystem::path PLUGIN_PATH2 = std::filesystem::path(".") /= PLUGIN_NAME2;
 
 const std::filesystem::path FULL_PLUGIN_PATH1 = std::filesystem::path(".")
-    /= platform_utils::get_library_name(PLUGIN_NAME1.c_str());
+    /= hipdnn_sdk::utilities::get_library_name(PLUGIN_NAME1.c_str());
 const std::filesystem::path FULL_PLUGIN_PATH2 = std::filesystem::path(".")
-    /= platform_utils::get_library_name(PLUGIN_NAME2.c_str());
+    /= hipdnn_sdk::utilities::get_library_name(PLUGIN_NAME2.c_str());
 
 } // namespace
 
