@@ -232,18 +232,6 @@ void populate_variant_pack_with_mappings(
     finalize_variant_pack(variant_pack);
 }
 
-DataType_t convert_backend_attribute_to_data_type(hipdnnBackendAttributeType_t backend_type)
-{
-    switch(backend_type)
-    {
-    case HIPDNN_TYPE_FLOAT:
-        return DataType_t::FLOAT;
-    default:
-        HIPDNN_LOG_WARN("Unsupported backend attribute type");
-        return DataType_t::FLOAT;
-    }
-}
-
 void create_and_initialize_backend_descriptor(hipdnnBackendDescriptor_t* backend_descriptor,
                                               const flatbuffers::DetachedBuffer& serialized_graph,
                                               hipdnnHandle_t handle)

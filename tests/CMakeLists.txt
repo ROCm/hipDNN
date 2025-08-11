@@ -10,10 +10,12 @@ set(HIPDNN_TEST_INCLUDE_DIRS
     ${CMAKE_SOURCE_DIR}/backend/tests/descriptors
     ${CMAKE_SOURCE_DIR}/tests/backend
     ${CMAKE_SOURCE_DIR}/backend/src
+    ${CMAKE_SOURCE_DIR}/tests
     CACHE INTERNAL "Common test include directories"
 )
 
 if(HIP_DNN_BUILD_BACKEND)
-    add_subdirectory(backend)
     add_subdirectory(test_plugins)
+    add_subdirectory(backend)
+    add_subdirectory(frontend)
 endif()

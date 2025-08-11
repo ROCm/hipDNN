@@ -10,6 +10,7 @@
 
 #include <hipdnn_frontend/attributes/tensor_attributes.hpp>
 #include <hipdnn_frontend/graph.hpp>
+#include <hipdnn_frontend/utilities.hpp>
 #include <hipdnn_sdk/test_utilities/cpu_fp_reference_implementation.hpp>
 #include <hipdnn_sdk/test_utilities/cpu_fp_reference_validation.hpp>
 #include <hipdnn_sdk/test_utilities/test_utilities.hpp>
@@ -156,40 +157,25 @@ protected:
         graph->set_name("BatchnormInferenceTest");
 
         int64_t uid = 1;
-        auto x_tensor_attr = std::make_shared<Tensor_attributes>();
-        x_tensor_attr->set_uid(uid++)
-            .set_name("X")
-            .set_data_type(input_data_type)
-            .set_dim(graph_tensor_bundle.x_tensor.dims())
-            .set_stride(graph_tensor_bundle.x_tensor.strides());
+        auto x_attr = make_tensor_attributes("X", input_data_type, graph_tensor_bundle.x_tensor);
+        x_attr.set_uid(uid++);
+        auto x_tensor_attr = std::make_shared<Tensor_attributes>(std::move(x_attr));
 
-        auto mean_tensor_attr = std::make_shared<Tensor_attributes>();
-        mean_tensor_attr->set_uid(uid++)
-            .set_name("mean")
-            .set_data_type(intermediate_data_type)
-            .set_dim(graph_tensor_bundle.mean_tensor.dims())
-            .set_stride(graph_tensor_bundle.mean_tensor.strides());
+        auto mean_attr = make_tensor_attributes("mean", intermediate_data_type, graph_tensor_bundle.mean_tensor);
+        mean_attr.set_uid(uid++);
+        auto mean_tensor_attr = std::make_shared<Tensor_attributes>(std::move(mean_attr));
 
-        auto inv_variance_tensor_attr = std::make_shared<Tensor_attributes>();
-        inv_variance_tensor_attr->set_uid(uid++)
-            .set_name("inv_variance")
-            .set_data_type(intermediate_data_type)
-            .set_dim(graph_tensor_bundle.variance_tensor.dims())
-            .set_stride(graph_tensor_bundle.variance_tensor.strides());
+        auto inv_variance_attr = make_tensor_attributes("inv_variance", intermediate_data_type, graph_tensor_bundle.variance_tensor);
+        inv_variance_attr.set_uid(uid++);
+        auto inv_variance_tensor_attr = std::make_shared<Tensor_attributes>(std::move(inv_variance_attr));
 
-        auto scale_tensor_attr = std::make_shared<Tensor_attributes>();
-        scale_tensor_attr->set_uid(uid++)
-            .set_name("scale")
-            .set_data_type(intermediate_data_type)
-            .set_dim(graph_tensor_bundle.scale_tensor.dims())
-            .set_stride(graph_tensor_bundle.scale_tensor.strides());
+        auto scale_attr = make_tensor_attributes("scale", intermediate_data_type, graph_tensor_bundle.scale_tensor);
+        scale_attr.set_uid(uid++);
+        auto scale_tensor_attr = std::make_shared<Tensor_attributes>(std::move(scale_attr));
 
-        auto bias_tensor_attr = std::make_shared<Tensor_attributes>();
-        bias_tensor_attr->set_uid(uid++)
-            .set_name("bias")
-            .set_data_type(intermediate_data_type)
-            .set_dim(graph_tensor_bundle.bias_tensor.dims())
-            .set_stride(graph_tensor_bundle.bias_tensor.strides());
+        auto bias_attr = make_tensor_attributes("bias", intermediate_data_type, graph_tensor_bundle.bias_tensor);
+        bias_attr.set_uid(uid++);
+        auto bias_tensor_attr = std::make_shared<Tensor_attributes>(std::move(bias_attr));
 
         Batchnorm_inference_attributes bn_attrs;
         bn_attrs.set_name("batchnorm_inference");
