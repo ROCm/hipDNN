@@ -349,7 +349,7 @@ TEST_P(Batchnorm_forward_inference_integration_test_nhwc, RunFloatFwdBatchnormGr
     run_batchnorm_test<float, float>(test_case, 1e-6f, TensorLayout::NHWC);
 }
 
-// Could consider using fewer/smaller test cases
+// Consider using fewer/smaller test cases to reduce test time
 INSTANTIATE_TEST_SUITE_P(RunFloatFwdBatchnormGraphNHWC,
                          Batchnorm_forward_inference_integration_test_nhwc,
                          testing::ValuesIn(get_bn_fwd_inference_test_cases()));

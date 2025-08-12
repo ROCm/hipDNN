@@ -14,6 +14,11 @@ TEST(TestTensor, BasicRowMajorUsage)
 
     auto tensor = Tensor::make_tensor<float>({1, 2, 3, 4});
 
+    // NCHW (row-major) strides with dims {N=1, C=2, H=3, W=4}:
+    // N stride = C*H*W = 2*3*4 = 24
+    // C stride = H*W = 3*4 = 12
+    // H stride = W = 4
+    // W stride = 1 (innermost dimension)
     EXPECT_EQ(tensor.memory().count(), 24);
     EXPECT_EQ(tensor.strides()[0], 24);
     EXPECT_EQ(tensor.strides()[1], 12);

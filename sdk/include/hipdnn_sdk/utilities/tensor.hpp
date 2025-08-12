@@ -60,20 +60,14 @@ public:
     Tensor(Tensor&&) = default;
     Tensor& operator=(Tensor&&) = default;
 
-    // Default NCHW tensor creation
     template <typename T>
-    static Tensor make_tensor(const std::vector<int64_t>& dims)
-    {
-        return {dims, generate_strides(dims, {3, 2, 1, 0}), sizeof(T)};
-    }
-
-    template <typename T>
-    static Tensor make_tensor(const std::vector<int64_t>& dims, const TensorLayout layout)
+    static Tensor make_tensor(const std::vector<int64_t>& dims,
+                              const TensorLayout layout = TensorLayout::NCHW)
     {
         switch(layout)
         {
         case TensorLayout::NCHW:
-            return make_tensor<T>(dims);
+            return {dims, generate_strides(dims, {3, 2, 1, 0}), sizeof(T)};
         case TensorLayout::NHWC:
             return {dims, generate_strides(dims, stride_order_nhwc(dims.size())), sizeof(T)};
         default:
