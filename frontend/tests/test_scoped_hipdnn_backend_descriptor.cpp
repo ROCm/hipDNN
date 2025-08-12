@@ -44,6 +44,9 @@ TEST_F(Hipdnn_backend_descriptor_test_fixture, ConstructWithRawDescriptorIsValid
 {
     auto fake_desc = reinterpret_cast<hipdnnBackendDescriptor_t>(0x1234);
     auto desc = Scoped_hipdnn_backend_descriptor(fake_desc);
+
+    EXPECT_CALL(*_mock_backend, hipdnnBackendDestroyDescriptor(fake_desc))
+        .WillOnce(Return(HIPDNN_STATUS_SUCCESS));
     EXPECT_TRUE(desc.valid());
     EXPECT_EQ(desc.get(), fake_desc);
 }
@@ -57,6 +60,8 @@ TEST_F(Hipdnn_backend_descriptor_test_fixture, ConstructWithTypeSuccess)
             *out = fake_desc;
             return HIPDNN_STATUS_SUCCESS;
         });
+    EXPECT_CALL(*_mock_backend, hipdnnBackendDestroyDescriptor(fake_desc))
+        .WillOnce(Return(HIPDNN_STATUS_SUCCESS));
 
     auto desc = Scoped_hipdnn_backend_descriptor(HIPDNN_BACKEND_ENGINECFG_DESCRIPTOR);
     EXPECT_TRUE(desc.valid());
@@ -70,6 +75,7 @@ TEST_F(Hipdnn_backend_descriptor_test_fixture, ConstructWithTypeFailure)
         .WillOnce([](hipdnnBackendDescriptorType_t, hipdnnBackendDescriptor_t*) {
             return HIPDNN_STATUS_BAD_PARAM;
         });
+    EXPECT_CALL(*_mock_backend, hipdnnGetLastErrorString).Times(AnyNumber()); // Uninteresting call
 
     auto desc = Scoped_hipdnn_backend_descriptor(HIPDNN_BACKEND_ENGINEHEUR_DESCRIPTOR);
     EXPECT_FALSE(desc.valid());
@@ -85,6 +91,8 @@ TEST_F(Hipdnn_backend_descriptor_test_fixture, ConstructWithSerializedGraphSucce
             *out = fake_desc;
             return HIPDNN_STATUS_SUCCESS;
         });
+    EXPECT_CALL(*_mock_backend, hipdnnBackendDestroyDescriptor(fake_desc))
+        .WillOnce(Return(HIPDNN_STATUS_SUCCESS));
 
     auto desc = Scoped_hipdnn_backend_descriptor(fake_graph.data(), fake_graph.size());
     EXPECT_TRUE(desc.valid());
@@ -98,6 +106,7 @@ TEST_F(Hipdnn_backend_descriptor_test_fixture, ConstructWithSerializedGraphFailu
         .WillOnce([](hipdnnBackendDescriptor_t*, const uint8_t*, size_t) {
             return HIPDNN_STATUS_BAD_PARAM;
         });
+    EXPECT_CALL(*_mock_backend, hipdnnGetLastErrorString).Times(AnyNumber()); // Uninteresting call
 
     auto desc = Scoped_hipdnn_backend_descriptor(fake_graph.data(), fake_graph.size());
     EXPECT_FALSE(desc.valid());
@@ -133,6 +142,7 @@ TEST_F(Hipdnn_backend_descriptor_test_fixture, DestructorHandlesDestroyFailure)
         });
     EXPECT_CALL(*_mock_backend, hipdnnBackendDestroyDescriptor(fake_desc))
         .WillOnce(Return(HIPDNN_STATUS_BAD_PARAM));
+    EXPECT_CALL(*_mock_backend, hipdnnGetLastErrorString).Times(AnyNumber()); // Uninteresting call
 
     {
         auto desc = Scoped_hipdnn_backend_descriptor(HIPDNN_BACKEND_ENGINECFG_DESCRIPTOR);

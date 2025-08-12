@@ -7,6 +7,12 @@
 #include <numeric>
 #include <vector>
 
+#if defined(__HIP_PLATFORM_AMD__)
+// Need these for the half and bfloat16 types
+#include <hipdnn_sdk/utilities/half_utils.hpp>
+#include <hipdnn_sdk/utilities/hip_bfloat16_utils.hpp>
+#endif
+
 namespace hipdnn_sdk
 {
 namespace reference_test_utilities
