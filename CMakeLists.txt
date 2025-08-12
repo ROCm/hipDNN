@@ -5,13 +5,7 @@ cmake_minimum_required(VERSION 3.25.2)
 
 add_compile_definitions(__HIP_PLATFORM_AMD__)
 
-# if(UNIX)
-    set(CMAKE_TOOLCHAIN_FILE "${CMAKE_SOURCE_DIR}/cmake/ClangToolChain.cmake" CACHE STRING "Toolchain file")
-# elseif(WIN32)
-#     set(CMAKE_TOOLCHAIN_FILE "${CMAKE_SOURCE_DIR}/cmake/MSVCToolChain.cmake" CACHE STRING "Toolchain file")
-# else()
-#    message(FATAL_ERROR "Unsupported platform")
-# endif()
+set(CMAKE_TOOLCHAIN_FILE "${CMAKE_SOURCE_DIR}/cmake/ClangToolChain.cmake" CACHE STRING "Toolchain file")
 
 set(HIPDNN_VERSION "0.0.1")
 
@@ -105,10 +99,6 @@ list(PREPEND HIPDNN_WARNING_COMPILE_OPTIONS
     -Wswitch-default                         # Warn if a switch statement does not have a default case
 )
 
-# Platform-specific compile options
-# if(NOT WIN32)
-# else()
-# endif()
 add_compile_options(${EXTRA_COMPILE_OPTIONS})
 add_link_options(${EXTRA_LINK_OPTIONS})
 
