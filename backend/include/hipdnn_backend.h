@@ -306,6 +306,7 @@ HIPDNN_BACKEND_EXPORT void hipdnnLoggingCallback_ext(hipdnnSeverity_t severity, 
  *
  * @retval HIPDNN_STATUS_SUCCESS           The operation was successful.
  * @retval HIPDNN_STATUS_BAD_PARAM_NULL_POINTER         `plugin_paths` is nullptr when `num_paths` is greater than 0.
+ * @retval HIPDNN_STATUS_NOT_SUPPORTED         Called with active handle.
  * @retval HIPDNN_STATUS_INTERNAL_ERROR    An internal error occurred.
  */
 HIPDNN_BACKEND_EXPORT hipdnnStatus_t hipdnnSetEnginePluginPaths_ext(
