@@ -30,7 +30,17 @@ public:
                                          Tensor& output,
                                          double epsilon)
         = 0;
-};
+
+    // Could call this bwd_training or bwd_propagation
+    virtual void batchnorm_bwd(const Tensor& dy,
+                               const Tensor& x,
+                               const Tensor& mean,
+                               const Tensor& invVariance,
+                               const Tensor& scale,
+                               Tensor& dx,
+                               Tensor& dscale,
+                               Tensor& bias)
+        = 0;
 
 } // namespace reference_test_utilities
 } // namespace hipdnn_sdk

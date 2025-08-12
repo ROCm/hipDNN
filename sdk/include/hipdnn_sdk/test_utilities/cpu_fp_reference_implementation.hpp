@@ -83,6 +83,28 @@ public:
         output.memory().mark_host_modified(); // Mark output memory as modified on host
     }
 
+    void batchnorm_bwd(const Tensor& dy,
+                       const Tensor& x,
+                       const Tensor& mean,
+                       const Tensor& invVariance,
+                       const Tensor& scale,
+                       Tensor& dx,
+                       Tensor& dscale,
+                       Tensor& bias) override
+    {
+        // todo: check for correct dims of each tensor
+        int64_t n_batches = input.dims().at(0);
+        std::vector<int64_t> channels(static_cast<size_t>(input.dims().at(1)));
+        std::iota(channels.begin(), channels.end(), 0);
+        int64_t height = input.dims().at(2);
+        int64_t width = input.dims().at(3);
+
+        // aalsdjlasjkdkjlasdjlkaljksdjlkas alsdjlasjkdkjlasdjlkaljksdjlkas alsdjlasjkdkjlasdjlkaljksdjlkas alsdjlasjkdkjlasdjlkaljksdjlkas alsdjlasjkdkjlasdjlkaljksdjlkas alsdjlasjkdkjlasdjlkaljksdjlkaslsdjlasjkdkjlasdjlkaljksdjlkas
+        // std::for_each(channels.begin(), channels.end(), [&](int64_t cidx) {
+
+        // }
+    }
+
 private:
     double sqrt_internal(double value) const
     {
