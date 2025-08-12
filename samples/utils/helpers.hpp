@@ -58,7 +58,7 @@ inline void print_sample_help(const std::string& sample_name)
 {
     std::cout << "Usage: " << sample_name << " [OPTIONS]\n"
               << "Options:\n"
-              << "  --verify, -v    Enable CPU reference validation\n"
+              << "  --verify-cpu, -vc    Enable CPU reference validation\n"
               << "  --help, -h      Show this help message\n"
               << std::endl;
 }
