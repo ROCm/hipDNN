@@ -4,6 +4,7 @@
 #include <gtest/gtest.h>
 
 #include <hipdnn_sdk/plugin/plugin_api_data_types.h>
+#include <hipdnn_sdk/utilities/platform_utils.hpp>
 
 #include "descriptors/test_macros.hpp"
 #include "hipdnn_exception.hpp"
@@ -96,7 +97,7 @@ TEST(Shared_Library_Test, get_current_module_directory_from_executable)
     EXPECT_TRUE(std::filesystem::is_directory(path));
 
     // Only tests that it works from a statically linked binary
-    EXPECT_TRUE(std::filesystem::exists(path / "hipdnn_backend_tests"));
+    EXPECT_TRUE(std::filesystem::exists(path / hipdnn_sdk::utilities::get_executable_name("hipdnn_backend_tests")));
 }
 
 class Shared_library_path_test : public ::testing::TestWithParam<std::string>

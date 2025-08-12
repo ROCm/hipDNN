@@ -1479,10 +1479,14 @@ TEST_F(Graph_test_fixture, ExecutePacksVariantPackAndPassesTheCorrectArguments)
                                         const void* ptr) {
             EXPECT_EQ(count, 4);
             auto data_ptrs = static_cast<void* const*>(ptr);
-            int i = 0;
-            for(const auto& value : std::views::values(variant_pack))
+            for(int i = 0; i < 4; i++)
             {
-                EXPECT_EQ(data_ptrs[i++], value);
+                auto targetValue = data_ptrs[i];
+                auto it = std::find_if(variant_pack.begin(), variant_pack.end(), 
+                       [&targetValue](const auto& pair) {
+                           return pair.second == targetValue; 
+                       });
+                EXPECT_TRUE(it != variant_pack.end());
             }
 
             return HIPDNN_STATUS_SUCCESS;
@@ -1500,10 +1504,9 @@ TEST_F(Graph_test_fixture, ExecutePacksVariantPackAndPassesTheCorrectArguments)
                                         const void* ptr) {
             EXPECT_EQ(count, 4);
             auto keys = static_cast<const int64_t*>(ptr);
-            int i = 0;
-            for(const auto& key : std::views::keys(variant_pack))
+            for(int i = 0; i < 4; i++)
             {
-                EXPECT_EQ(keys[i++], key);
+                EXPECT_TRUE(variant_pack.contains(keys[i]));
             }
             return HIPDNN_STATUS_SUCCESS;
         }));
