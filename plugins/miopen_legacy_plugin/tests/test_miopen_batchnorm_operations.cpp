@@ -113,14 +113,7 @@ TEST_P(Batchnorm_execute_graph_test, RunFloatFwdbatchnormGraphNCHW)
         test_case, hipdnn_sdk::data_objects::DataType::DataType_FLOAT, 1e-6f, TensorLayout::NCHW);
 }
 
-TEST_P(Batchnorm_execute_graph_test, RunFloatFwdbatchnormGraphNHWC)
-{
-    Bn_2d_test_case test_case = GetParam();
-    RunFwdbatchnormGraph<float, float>(
-        test_case, hipdnn_sdk::data_objects::DataType::DataType_FLOAT, 1e-6f, TensorLayout::NHWC);
-}
-
-TEST_F(Batchnorm_execute_graph_test, RunBfloat16FwdbatchnormGraph)
+TEST_F(Batchnorm_execute_graph_test, RunBfloat16FwdbatchnormGraphNCHW)
 {
     Bn_2d_test_case test_case = {.n = 1, .c = 3, .h = 14, .w = 14};
     RunFwdbatchnormGraph<hip_bfloat16, float>(test_case,
@@ -129,11 +122,18 @@ TEST_F(Batchnorm_execute_graph_test, RunBfloat16FwdbatchnormGraph)
                                               TensorLayout::NCHW);
 }
 
-TEST_F(Batchnorm_execute_graph_test, RunHalfFwdbatchnormGraph)
+TEST_F(Batchnorm_execute_graph_test, RunHalfFwdbatchnormGraphNCHW)
 {
     Bn_2d_test_case test_case = {.n = 1, .c = 3, .h = 14, .w = 14};
     RunFwdbatchnormGraph<half, float>(
         test_case, hipdnn_sdk::data_objects::DataType::DataType_HALF, 1e-2_h, TensorLayout::NCHW);
+}
+
+TEST_P(Batchnorm_execute_graph_test, RunFloatFwdbatchnormGraphNHWC)
+{
+    Bn_2d_test_case test_case = GetParam();
+    RunFwdbatchnormGraph<float, float>(
+        test_case, hipdnn_sdk::data_objects::DataType::DataType_FLOAT, 1e-6f, TensorLayout::NHWC);
 }
 
 TEST_F(Batchnorm_execute_graph_test, RunBfloat16FwdbatchnormGraphNHWC)
