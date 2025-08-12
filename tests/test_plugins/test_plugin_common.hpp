@@ -133,9 +133,9 @@ public:
                                                                  uint32_t* num_engines)
     {
         LOG_API_ENTRY("engine_ids={:p}, max_engines={}, num_engines={:p}",
-            static_cast<void*>(engine_ids),
-            max_engines,
-            static_cast<void*>(num_engines));
+                      static_cast<void*>(engine_ids),
+                      max_engines,
+                      static_cast<void*>(num_engines));
 
         return hipdnn_plugin::try_catch([&, api_name = __func__]() {
             hipdnn_plugin::throw_if_null(engine_ids);
