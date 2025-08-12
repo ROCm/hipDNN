@@ -182,6 +182,22 @@ TEST_F(Execution_plan_descriptor_test, SetExecutionPlanDescriptorEngineConfig)
     auto plan = get_execution_plan_descriptor();
     auto mock_engine_config = get_mock_engine_config();
 
+    EXPECT_CALL(*get_mock_engine_config_bad_type(), is_finalized()).Times(1);
+    EXPECT_CALL(*mock_engine_config, is_finalized()).WillOnce(Return(false)).WillOnce(Return(true));
+
+    // is_finalized()->false
+    ASSERT_THROW_HIPDNN_STATUS(plan->set_attribute(HIPDNN_ATTR_EXECUTION_PLAN_ENGINE_CONFIG,
+                                                   HIPDNN_TYPE_BACKEND_DESCRIPTOR,
+                                                   1,
+                                                   &_mock_engine_config_wrapper),
+                               HIPDNN_STATUS_BAD_PARAM_NOT_FINALIZED);
+
+    // is_finalized()->true
+    plan->set_attribute(HIPDNN_ATTR_EXECUTION_PLAN_ENGINE_CONFIG,
+                        HIPDNN_TYPE_BACKEND_DESCRIPTOR,
+                        1,
+                        &_mock_engine_config_wrapper);
+
     ASSERT_THROW_HIPDNN_STATUS(plan->set_attribute(HIPDNN_ATTR_EXECUTION_PLAN_ENGINE_CONFIG,
                                                    HIPDNN_TYPE_HANDLE,
                                                    1,
@@ -217,19 +233,6 @@ TEST_F(Execution_plan_descriptor_test, SetExecutionPlanDescriptorEngineConfig)
                                                    1,
                                                    &_mock_wrong_type_wrapper),
                                HIPDNN_STATUS_BAD_PARAM);
-
-    EXPECT_CALL(*mock_engine_config, is_finalized()).WillOnce(Return(false));
-    ASSERT_THROW_HIPDNN_STATUS(plan->set_attribute(HIPDNN_ATTR_EXECUTION_PLAN_ENGINE_CONFIG,
-                                                   HIPDNN_TYPE_BACKEND_DESCRIPTOR,
-                                                   1,
-                                                   &_mock_engine_config_wrapper),
-                               HIPDNN_STATUS_BAD_PARAM_NOT_FINALIZED);
-
-    EXPECT_CALL(*mock_engine_config, is_finalized()).WillOnce(Return(true));
-    plan->set_attribute(HIPDNN_ATTR_EXECUTION_PLAN_ENGINE_CONFIG,
-                        HIPDNN_TYPE_BACKEND_DESCRIPTOR,
-                        1,
-                        &_mock_engine_config_wrapper);
 }
 
 TEST_F(Execution_plan_descriptor_test, FinalizeExecutionPlanDescriptor)

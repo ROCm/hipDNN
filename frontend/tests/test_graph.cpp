@@ -264,6 +264,7 @@ static void validate_tensor(const Tensor_attributes& tensor,
 // NOLINTBEGIN
 TEST_F(Graph_test_fixture, BuildAndSerializeBatchnormInferenceGraph)
 {
+    ::testing::FLAGS_gmock_verbose = "error";
     Graph graph;
 
     graph.set_name("SerializedGraphTest")
@@ -340,6 +341,7 @@ TEST_F(Graph_test_fixture, BuildAndSerializeBatchnormInferenceGraph)
 
 TEST_F(Graph_test_fixture, BuildAndSerializeBatchnormGraph)
 {
+    ::testing::FLAGS_gmock_verbose = "error";
     Graph graph;
 
     graph.set_name("SerializedBatchnormGraph")
@@ -443,6 +445,7 @@ TEST_F(Graph_test_fixture, BuildAndSerializeBatchnormGraph)
 
 TEST_F(Graph_test_fixture, BuildAndSerializeBatchnormAndPointwiseGraph)
 {
+    ::testing::FLAGS_gmock_verbose = "error";
     Graph graph;
 
     graph.set_name("SerializedBatchnormAndPointwiseGraph")
@@ -563,6 +566,7 @@ TEST_F(Graph_test_fixture, BuildAndSerializeBatchnormAndPointwiseGraph)
 
 TEST_F(Graph_test_fixture, BuildAndSerializePointwiseGraph)
 {
+    ::testing::FLAGS_gmock_verbose = "error";
     Graph graph;
 
     graph.set_name("SerializedGraphTest")
@@ -621,6 +625,7 @@ TEST_F(Graph_test_fixture, BuildAndSerializePointwiseGraph)
 
 TEST_F(Graph_test_fixture, BuildAndSerializePointwiseAndBatchnormInferenceGraph)
 {
+    ::testing::FLAGS_gmock_verbose = "error";
     Graph graph;
 
     graph.set_name("SerializedGraphTest")
@@ -714,6 +719,7 @@ TEST_F(Graph_test_fixture, BuildAndSerializePointwiseAndBatchnormInferenceGraph)
 
 TEST_F(Graph_test_fixture, BuildAndSerializeBatchnormBackwardGraph)
 {
+    ::testing::FLAGS_gmock_verbose = "error";
     Graph graph;
 
     graph.set_name("SerializedGraphTest")
@@ -798,6 +804,7 @@ TEST_F(Graph_test_fixture, BuildAndSerializeBatchnormBackwardGraph)
 
 TEST_F(Graph_test_fixture, BuildAndSerializePointwiseAndBatchnormBackwardGraph)
 {
+    ::testing::FLAGS_gmock_verbose = "error";
     Graph graph;
 
     graph.set_name("SerializedGraphTest")
@@ -948,6 +955,7 @@ TEST_F(Graph_test_fixture, TensorLikeGraphAttributes)
 
 TEST_F(Graph_test_fixture, WillCorrectlyBuildOperationGraphDescriptor)
 {
+    ::testing::FLAGS_gmock_verbose = "error";
     Graph graph;
     auto tensor_attributes = create_basic_batchnorm_graph(graph);
 
@@ -987,6 +995,7 @@ TEST_F(Graph_test_fixture, CreatingExecutionPlansFailsWithNoGraph)
 
 TEST_F(Graph_test_fixture, CanSuccessfullyCreateExecutionPlans)
 {
+    ::testing::FLAGS_gmock_verbose = "error";
     Graph graph;
     const std::vector<HeurMode_t> heurModes = {HeurMode_t::FALLBACK};
     std::vector<hipdnnBackendHeurMode_t> backend_modes;
@@ -1125,6 +1134,7 @@ TEST_F(Graph_test_fixture, CanSuccessfullyCreateExecutionPlans)
 
 TEST_F(Graph_test_fixture, CheckSupportFailsIfNoExecutionPlanCreated)
 {
+    ::testing::FLAGS_gmock_verbose = "error";
     Graph graph;
     auto tensor_attributes = create_basic_batchnorm_graph(graph);
 
@@ -1137,6 +1147,7 @@ TEST_F(Graph_test_fixture, CheckSupportFailsIfNoExecutionPlanCreated)
 
 TEST_F(Graph_test_fixture, CheckSupportSucceedsWhenExecutionPlanCreated)
 {
+    ::testing::FLAGS_gmock_verbose = "error";
     Graph graph;
     const std::vector<HeurMode_t> heur_modes = {HeurMode_t::FALLBACK};
     auto tensor_attributes = create_basic_batchnorm_graph(graph);
@@ -1168,6 +1179,7 @@ TEST_F(Graph_test_fixture, CheckSupportSucceedsWhenExecutionPlanCreated)
 
 TEST_F(Graph_test_fixture, EngineConfigAndExecutionPlanAreFinalizedAfterBuildPlans)
 {
+    ::testing::FLAGS_gmock_verbose = "error";
     Graph graph;
     const std::vector<HeurMode_t> heur_modes = {HeurMode_t::FALLBACK};
     auto tensor_attributes = create_basic_batchnorm_graph(graph);
@@ -1248,6 +1260,7 @@ TEST_F(Graph_test_fixture, EngineConfigAndExecutionPlanAreFinalizedAfterBuildPla
 
 TEST_F(Graph_test_fixture, WorkspaceSizeIsRetrievedFromExecutionPlan)
 {
+    ::testing::FLAGS_gmock_verbose = "error";
     Graph graph;
     const std::vector<HeurMode_t> heur_modes = {HeurMode_t::FALLBACK};
     auto tensor_attributes = create_basic_batchnorm_graph(graph);
@@ -1308,6 +1321,7 @@ TEST_F(Graph_test_fixture, WorkspaceSizeIsRetrievedFromExecutionPlan)
 
 TEST_F(Graph_test_fixture, ExecutePacksVariantPackAndPassesTheCorrectArguments)
 {
+    ::testing::FLAGS_gmock_verbose = "error";
     using ::testing::_;
     using ::testing::Invoke;
     using ::testing::NotNull;
