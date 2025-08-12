@@ -131,6 +131,19 @@ protected:
         return resolved_paths;
     }
 
+    // This function is called before adding a plugin to the plugin list.
+    // The function must throw Hipdnn_exception if the plugin is not valid.
+    virtual void validate_before_adding(const Plugin& plugin)
+    {
+        std::ignore = plugin;
+    }
+
+    // This function is called after the plugin is added to the plugin list.
+    virtual void action_after_adding(const Plugin& plugin)
+    {
+        std::ignore = plugin;
+    }
+
 public:
     virtual ~Plugin_manager_base() = default;
 
@@ -254,6 +267,8 @@ private:
 
             plugin.set_logging_callback(logging::hipdnn_logging_callback);
 
+            validate_before_adding(plugin);
+
             _plugins.emplace_back(std::move(plugin));
             _loaded_plugin_files.insert(library_path);
 
@@ -269,6 +284,8 @@ private:
             HIPDNN_LOG_WARN(
                 "Error loading plugin from [{}]: {}", file_path.string(), e.get_message());
         }
+
+        action_after_adding(_plugins.back());
     }
 
     std::vector<Plugin> _plugins;
