@@ -68,13 +68,12 @@ public:
     }
 
     template <typename T>
-    static Tensor make_tensor(const std::vector<int64_t>& dims, TensorLayout layout)
+    static Tensor make_tensor(const std::vector<int64_t>& dims, const TensorLayout layout)
     {
-        // test
         switch(layout)
         {
         case TensorLayout::NCHW:
-            return {dims, generate_strides(dims, {3, 2, 1, 0}), sizeof(T)};
+            return make_tensor<T>(dims);
         case TensorLayout::NHWC:
             return {dims, generate_strides(dims, stride_order_nhwc(dims.size())), sizeof(T)};
         default:
