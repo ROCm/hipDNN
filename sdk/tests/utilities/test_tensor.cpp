@@ -12,7 +12,7 @@ TEST(TestTensor, BasicRowMajorUsage)
 {
     SKIP_IF_NO_DEVICES();
 
-    Tensor tensor = Tensor::make_nchw_tensor<float>({1, 2, 3, 4});
+    Tensor tensor = Tensor::make_tensor<float>({1, 2, 3, 4}, TensorLayout::NCHW);
 
     EXPECT_EQ(tensor.memory().count(), 24);
     EXPECT_EQ(tensor.strides()[0], 24);
@@ -25,7 +25,7 @@ TEST(TestTensor, FillWithValuesUsage)
 {
     SKIP_IF_NO_DEVICES();
 
-    Tensor tensor = Tensor::make_nchw_tensor<float>({1, 2, 3, 4});
+    Tensor tensor = Tensor::make_tensor<float>({1, 2, 3, 4}, TensorLayout::NCHW);
 
     tensor.fill_with_value(1.0f);
     float* buffer = tensor.memory().host_data<float>();
@@ -40,7 +40,7 @@ TEST(TestTensor, FillWithRandomValuesUsage)
 {
     SKIP_IF_NO_DEVICES();
 
-    Tensor tensor = Tensor::make_nchw_tensor<float>({1, 2, 3, 4});
+    Tensor tensor = Tensor::make_tensor<float>({1, 2, 3, 4}, TensorLayout::NCHW);
 
     tensor.fill_with_random_values(1.0f, 3.0f);
     float* buffer = tensor.memory().host_data<float>();

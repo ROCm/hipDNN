@@ -5,6 +5,7 @@
 
 #include <hipdnn_sdk/utilities/migratable_memory.hpp>
 #include <hipdnn_sdk/utilities/shape_utils.hpp>
+#include <iostream>
 #include <numeric>
 #include <random>
 #include <vector>
@@ -13,6 +14,30 @@ namespace hipdnn_sdk
 {
 namespace utilities
 {
+
+enum class TensorLayout
+{
+    NCHW,
+    NHWC
+};
+
+inline const char* to_string(TensorLayout layout)
+{
+    switch(layout)
+    {
+    case TensorLayout::NCHW:
+        return "NCHW";
+    case TensorLayout::NHWC:
+        return "NHWC";
+    default:
+        return "Unknown";
+    }
+}
+
+inline std::ostream& operator<<(std::ostream& os, TensorLayout layout)
+{
+    return os << to_string(layout);
+}
 
 // Wraps vectors of dims/strides and Migratable_memory<T> to provide a common interface for testing
 class Tensor
@@ -35,17 +60,26 @@ public:
     Tensor(Tensor&&) = default;
     Tensor& operator=(Tensor&&) = default;
 
+    // Default NCHW tensor creation
     template <typename T>
-    static Tensor make_nchw_tensor(const std::vector<int64_t>& dims)
+    static Tensor make_tensor(const std::vector<int64_t>& dims)
     {
         return {dims, generate_strides(dims, {3, 2, 1, 0}), sizeof(T)};
     }
 
     template <typename T>
-    static Tensor make_nhwc_tensor(const std::vector<int64_t>& dims)
+    static Tensor make_tensor(const std::vector<int64_t>& dims, TensorLayout layout)
     {
-        // dims are still specified in NCHW, but strides are calculated for NHWC layout
-        return {dims, generate_strides(dims, stride_order_nhwc(dims.size())), sizeof(T)};
+        // test
+        switch(layout)
+        {
+        case TensorLayout::NCHW:
+            return {dims, generate_strides(dims, {3, 2, 1, 0}), sizeof(T)};
+        case TensorLayout::NHWC:
+            return {dims, generate_strides(dims, stride_order_nhwc(dims.size())), sizeof(T)};
+        default:
+            throw std::invalid_argument("Unsupported tensor layout");
+        }
     }
 
     template <typename T>
@@ -134,5 +168,5 @@ private:
     std::vector<int64_t> _strides;
 };
 
-} // namespace reference_test_utilities
+} // namespace utilities
 } // namespace hipdnn_sdk

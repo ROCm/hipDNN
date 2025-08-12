@@ -45,16 +45,14 @@ struct Batchnorm_2d_tensor_bundle
 {
     Batchnorm_2d_tensor_bundle(const std::vector<int64_t>& dims,
                                unsigned int seed = 1,
-                               bool use_nhwc = false)
+                               TensorLayout layout = TensorLayout::NCHW)
         : derived_dims({1, dims[1], 1, 1})
-        , x_tensor(use_nhwc ? Tensor::make_nhwc_tensor<Input_type>(dims)
-                            : Tensor::make_nchw_tensor<Input_type>(dims))
-        , y_tensor(use_nhwc ? Tensor::make_nhwc_tensor<Input_type>(dims)
-                            : Tensor::make_nchw_tensor<Input_type>(dims))
-        , scale_tensor(Tensor::make_nchw_tensor<Intermediate_type>(derived_dims))
-        , bias_tensor(Tensor::make_nchw_tensor<Intermediate_type>(derived_dims))
-        , mean_tensor(Tensor::make_nchw_tensor<Intermediate_type>(derived_dims))
-        , variance_tensor(Tensor::make_nchw_tensor<Intermediate_type>(derived_dims))
+        , x_tensor(Tensor::make_tensor<Input_type>(dims, layout))
+        , y_tensor(Tensor::make_tensor<Input_type>(dims, layout))
+        , scale_tensor(Tensor::make_tensor<Intermediate_type>(derived_dims, layout))
+        , bias_tensor(Tensor::make_tensor<Intermediate_type>(derived_dims, layout))
+        , mean_tensor(Tensor::make_tensor<Intermediate_type>(derived_dims, layout))
+        , variance_tensor(Tensor::make_tensor<Intermediate_type>(derived_dims, layout))
     {
         x_tensor.fill_with_random_values<Input_type>(
             static_cast<Input_type>(0.0f), static_cast<Input_type>(1.0f), seed);
@@ -251,7 +249,7 @@ protected:
     template <typename Input_type, typename Intermediate_type>
     void run_batchnorm_test(const Bn_2d_test_case& test_case,
                             Input_type tolerance = 1e-4f,
-                            bool use_nhwc = false)
+                            TensorLayout layout = TensorLayout::NCHW)
     {
         auto input_data_type = get_data_type_enum_from_type<Input_type>();
         auto intermediate_data_type = get_data_type_enum_from_type<Intermediate_type>();
@@ -261,10 +259,10 @@ protected:
         HIPDNN_LOG_INFO("Test is using {} for its random seed", seed);
 
         Batchnorm_2d_tensor_bundle<Input_type, Intermediate_type> graph_tensor_bundle(
-            test_case.get_dims(), seed, use_nhwc);
+            test_case.get_dims(), seed, layout);
 
         Batchnorm_2d_tensor_bundle<Input_type, Intermediate_type> cpu_tensor_bundle(
-            test_case.get_dims(), seed, use_nhwc);
+            test_case.get_dims(), seed, layout);
 
         run_miopen_batchnorm_fwd<Input_type, Intermediate_type>(
             graph_tensor_bundle, input_data_type, intermediate_data_type);
@@ -348,7 +346,7 @@ class Batchnorm_forward_inference_integration_test_nhwc
 TEST_P(Batchnorm_forward_inference_integration_test_nhwc, RunFloatFwdBatchnormGraphNHWC)
 {
     Bn_2d_test_case test_case = GetParam();
-    run_batchnorm_test<float, float>(test_case, 1e-6f, true);
+    run_batchnorm_test<float, float>(test_case, 1e-6f, TensorLayout::NHWC);
 }
 
 // Could consider using fewer/smaller test cases

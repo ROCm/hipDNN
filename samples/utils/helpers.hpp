@@ -15,6 +15,8 @@
 #include <random>
 #include <vector>
 
+using hipdnn_sdk::utilities::TensorLayout;
+
 #define HIP_CHECK(status)                                                                      \
     do                                                                                         \
     {                                                                                          \
@@ -48,12 +50,6 @@
             exit(EXIT_FAILURE);                                                           \
         }                                                                                 \
     } while(0)
-
-enum class Tensor_layout
-{
-    NCHW,
-    NHWC
-};
 
 inline void print_sample_help(const std::string& sample_name)
 {
@@ -100,12 +96,12 @@ inline Config parse_command_line_args(int argc, char* argv[])
 template <typename F>
 void run(F&& f)
 {
-    f.template operator()<float, float, Tensor_layout::NCHW>();
-    f.template operator()<half, float, Tensor_layout::NCHW>();
-    f.template operator()<hip_bfloat16, float, Tensor_layout::NCHW>();
-    f.template operator()<float, float, Tensor_layout::NHWC>();
-    f.template operator()<half, float, Tensor_layout::NHWC>();
-    f.template operator()<hip_bfloat16, float, Tensor_layout::NHWC>();
+    f.template operator()<float, float, TensorLayout::NCHW>();
+    f.template operator()<half, float, TensorLayout::NCHW>();
+    f.template operator()<hip_bfloat16, float, TensorLayout::NCHW>();
+    f.template operator()<float, float, TensorLayout::NHWC>();
+    f.template operator()<half, float, TensorLayout::NHWC>();
+    f.template operator()<hip_bfloat16, float, TensorLayout::NHWC>();
 }
 
 inline std::shared_ptr<hipdnn_frontend::graph::Tensor_attributes>
@@ -132,25 +128,11 @@ inline int64_t get_tensor_element_count(
     return count;
 }
 
-template <typename DataType>
-inline hipdnn_sdk::utilities::Tensor create_tensor_with_layout(const std::vector<int64_t>& dims,
-                                                               Tensor_layout layout)
-{
-    if(layout == Tensor_layout::NHWC)
-    {
-        return hipdnn_sdk::utilities::Tensor::make_nhwc_tensor<DataType>(dims);
-    }
-    else
-    {
-        return hipdnn_sdk::utilities::Tensor::make_nchw_tensor<DataType>(dims);
-    }
-}
-
 struct Sample_runner
 {
     hipdnnHandle_t handle;
     Config config;
 
-    template <typename InputType, typename IntermediateType, Tensor_layout Layout>
+    template <typename InputType, typename IntermediateType, TensorLayout Layout>
     void operator()();
 };
