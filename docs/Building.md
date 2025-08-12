@@ -86,3 +86,25 @@ Our development dockerfiles are located in the `dockerfiles` directory.  See the
 
 ## Building Samples
 See the samples [readme](../samples/README.MD) for how to build and run the samples.
+
+## Building on Windows
+1. Disconnect from any VPN that might interfere with downloading the below packages
+2. From an administrator-mode PowerShell prompt:
+```
+Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+choco install visualstudio2022buildtools -y --params "--add Microsoft.VisualStudio.Component.VC.Tools.x86.x64 --add Microsoft.VisualStudio.Component.VC.CMake.Project --add Microsoft.VisualStudio.Component.VC.ATL --add Microsoft.VisualStudio.Component.Windows11SDK.22621"
+choco install git.install -y --params "'/GitAndUnixToolsOnPath'"
+choco install cmake --version=3.31.0 -y
+choco install ninja -y
+choco install ccache -y
+choco install python -y
+choco install strawberryperl -y
+```
+3. Open up a "x64 Native Tools Command Prompt for VS 2022" command shell from the start menu
+4. From the native tools prompt, clone and build TheRock
+5. Set your HIP_PLATFORM: `set HIP_PLATFORM=amd`
+6. Set your TheRock dist location: `set PATH=C:\src\hipDNN\build\backend\src;C:\src\TheRock\build\dist\rocm\bin;%PATH%`
+    - If your locations differ, you may need to edit \<src\>/cmake/ClangToolChain.cmake
+5. From the native tools prompt, clone and build hipDNN
+    - `cmake -GNinja -DHIP_DNN_BUILD_PLUGINS=OFF ..`
+    - `ninja check`
