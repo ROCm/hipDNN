@@ -88,10 +88,6 @@ add_library(miopen_legacy_plugin SHARED
 target_compile_definitions(miopen_legacy_plugin PRIVATE 
     COMPONENT_NAME="miopen_legacy_plugin"
 )
-# target_include_directories(miopen_legacy_plugin 
-#     PUBLIC 
-#         ${CMAKE_CURRENT_SOURCE_DIR}
-# )
 target_link_libraries(miopen_legacy_plugin PRIVATE miopen_legacy_plugin_private)
 target_link_libraries(miopen_legacy_plugin PRIVATE "-Xlinker --exclude-libs=ALL") # Hide symbols from linked static libs
 target_compile_options(miopen_legacy_plugin PRIVATE ${HIPDNN_WARNING_COMPILE_OPTIONS})
