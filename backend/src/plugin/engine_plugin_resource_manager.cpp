@@ -33,9 +33,9 @@ private:
     void validate_before_adding(const Engine_plugin& plugin) override
     {
         auto engine_ids = plugin.get_all_engine_ids();
-        for(const auto& id : engine_ids)
+        for(const auto id : engine_ids)
         {
-            if(_engine_id_to_plugin.contains(id))
+            if(_engine_ids.contains(id))
             {
                 throw Hipdnn_exception(HIPDNN_STATUS_PLUGIN_ERROR,
                                        "Engine ID " + std::to_string(id)
@@ -47,19 +47,18 @@ private:
     void action_after_adding(const Engine_plugin& plugin) override
     {
         auto engine_ids = plugin.get_all_engine_ids();
-        for(const auto& id : engine_ids)
+        for(const auto id : engine_ids)
         {
-            if(_engine_id_to_plugin.contains(id))
+            if(_engine_ids.contains(id))
             {
-                throw Hipdnn_exception(HIPDNN_STATUS_INTERNAL_ERROR,
-                                       "Engine ID " + std::to_string(id)
-                                           + " already exists in the list");
+                throw Hipdnn_exception(HIPDNN_STATUS_PLUGIN_ERROR,
+                                       "Broken plugin: inconsistent engine IDs");
             }
-            _engine_id_to_plugin[id] = &plugin;
+            _engine_ids.insert(id);
         }
     }
 
-    std::unordered_map<int64_t, const Engine_plugin*> _engine_id_to_plugin;
+    std::set<int64_t> _engine_ids;
 };
 
 namespace
@@ -147,6 +146,18 @@ Engine_plugin_resource_manager::Engine_plugin_resource_manager(
         }
 
         _handle_to_plugin[handle] = &plugin;
+
+        auto engine_ids = plugin.get_all_engine_ids();
+        for(const auto id : engine_ids)
+        {
+            if(_engine_id_to_handle.contains(id))
+            {
+                throw Hipdnn_exception(HIPDNN_STATUS_PLUGIN_ERROR,
+                                       "Engine ID " + std::to_string(id)
+                                           + " already exists in the resource manager");
+            }
+            _engine_id_to_handle[id] = handle;
+        }
     }
 }
 
@@ -208,14 +219,18 @@ std::vector<int64_t> Engine_plugin_resource_manager::get_applicable_engine_ids(
 
         for(const auto& id : ids)
         {
-            auto it = _engine_id_to_handle.find(id);
-            if(it != _engine_id_to_handle.end() && it->second != handle)
+            if(!_engine_id_to_handle.contains(id))
+            {
+                throw Hipdnn_exception(HIPDNN_STATUS_PLUGIN_ERROR, "Unknown engine ID");
+            }
+
+            auto existing_handle = _engine_id_to_handle.at(id);
+            if(existing_handle != handle)
             {
                 throw Hipdnn_exception(HIPDNN_STATUS_PLUGIN_ERROR,
                                        "Engine ID " + std::to_string(id)
                                            + " is already associated with a different plugin");
             }
-            _engine_id_to_handle[id] = handle;
         }
     }
 

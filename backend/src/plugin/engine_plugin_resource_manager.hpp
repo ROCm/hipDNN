@@ -108,7 +108,7 @@ private:
 
     std::shared_ptr<Engine_plugin_manager> _pm;
     std::unordered_map<hipdnnEnginePluginHandle_t, const Engine_plugin*> _handle_to_plugin;
-    mutable std::unordered_map<int64_t, hipdnnEnginePluginHandle_t> _engine_id_to_handle;
+    std::unordered_map<int64_t, hipdnnEnginePluginHandle_t> _engine_id_to_handle;
 
     friend class Engine_details_wrapper;
     friend class Engine_execution_context_wrapper;
