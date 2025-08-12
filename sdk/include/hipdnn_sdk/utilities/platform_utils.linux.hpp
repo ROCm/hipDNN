@@ -19,7 +19,7 @@ inline std::string get_env(const char* var, const char* default_value = nullptr)
 
     const char* value = std::getenv(var);
 
-    if (value != nullptr)
+    if(value != nullptr)
     {
         result = value;
     }
@@ -29,7 +29,7 @@ inline std::string get_env(const char* var, const char* default_value = nullptr)
 
 inline void set_env(const char* var, const char* value)
 {
-    if (value != nullptr)
+    if(value != nullptr)
     {
         setenv(var, value, 1);
     }

@@ -4,8 +4,8 @@
 #pragma once
 
 #include <filesystem>
-#include <string>
 #include <hipdnn_sdk/utilities/platform_utils.hpp>
+#include <string>
 
 #ifdef _WIN32
 

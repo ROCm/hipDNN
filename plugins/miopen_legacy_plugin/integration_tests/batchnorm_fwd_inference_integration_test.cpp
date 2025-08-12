@@ -161,19 +161,24 @@ protected:
         x_attr.set_uid(uid++);
         auto x_tensor_attr = std::make_shared<Tensor_attributes>(std::move(x_attr));
 
-        auto mean_attr = make_tensor_attributes("mean", intermediate_data_type, graph_tensor_bundle.mean_tensor);
+        auto mean_attr = make_tensor_attributes(
+            "mean", intermediate_data_type, graph_tensor_bundle.mean_tensor);
         mean_attr.set_uid(uid++);
         auto mean_tensor_attr = std::make_shared<Tensor_attributes>(std::move(mean_attr));
 
-        auto inv_variance_attr = make_tensor_attributes("inv_variance", intermediate_data_type, graph_tensor_bundle.variance_tensor);
+        auto inv_variance_attr = make_tensor_attributes(
+            "inv_variance", intermediate_data_type, graph_tensor_bundle.variance_tensor);
         inv_variance_attr.set_uid(uid++);
-        auto inv_variance_tensor_attr = std::make_shared<Tensor_attributes>(std::move(inv_variance_attr));
+        auto inv_variance_tensor_attr
+            = std::make_shared<Tensor_attributes>(std::move(inv_variance_attr));
 
-        auto scale_attr = make_tensor_attributes("scale", intermediate_data_type, graph_tensor_bundle.scale_tensor);
+        auto scale_attr = make_tensor_attributes(
+            "scale", intermediate_data_type, graph_tensor_bundle.scale_tensor);
         scale_attr.set_uid(uid++);
         auto scale_tensor_attr = std::make_shared<Tensor_attributes>(std::move(scale_attr));
 
-        auto bias_attr = make_tensor_attributes("bias", intermediate_data_type, graph_tensor_bundle.bias_tensor);
+        auto bias_attr = make_tensor_attributes(
+            "bias", intermediate_data_type, graph_tensor_bundle.bias_tensor);
         bias_attr.set_uid(uid++);
         auto bias_tensor_attr = std::make_shared<Tensor_attributes>(std::move(bias_attr));
 

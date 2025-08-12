@@ -1482,10 +1482,10 @@ TEST_F(Graph_test_fixture, ExecutePacksVariantPackAndPassesTheCorrectArguments)
             for(int i = 0; i < 4; i++)
             {
                 auto targetValue = data_ptrs[i];
-                auto it = std::find_if(variant_pack.begin(), variant_pack.end(), 
-                       [&targetValue](const auto& pair) {
-                           return pair.second == targetValue; 
-                       });
+                auto it = std::find_if(
+                    variant_pack.begin(), variant_pack.end(), [&targetValue](const auto& pair) {
+                        return pair.second == targetValue;
+                    });
                 EXPECT_TRUE(it != variant_pack.end());
             }
 

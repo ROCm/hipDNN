@@ -18,7 +18,8 @@ std::filesystem::path get_current_module_directory()
     if(GetModuleHandleExA(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS
                               | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
                           reinterpret_cast<LPCSTR>(&get_current_module_directory),
-                          &module_handle) == TRUE)
+                          &module_handle)
+       == TRUE)
     {
         char* dst = new char[MAX_PATH];
         DWORD len = GetModuleFileNameA(module_handle, dst, MAX_PATH);
