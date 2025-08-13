@@ -25,7 +25,7 @@ private:
     {
         std::array<char, 256> backend_err_msg;
         hipdnn_frontend::hipdnn_backend()->get_last_error_string(backend_err_msg.data(),
-                                                                backend_err_msg.size());
+                                                                 backend_err_msg.size());
         HIPDNN_LOG_ERROR(
             "{}: {}. Backend error string: {}", error_string, status, backend_err_msg.data());
     }

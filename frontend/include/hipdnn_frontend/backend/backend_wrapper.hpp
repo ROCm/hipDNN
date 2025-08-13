@@ -113,7 +113,7 @@ public:
 // Allow overriding the backend implementation by setting a custom backend instance.
 inline static std::shared_ptr<Hipdnn_backend_interface> hipdnn_backend()
 {
-    if (!Hipdnn_backend_interface::get_instance())
+    if(!Hipdnn_backend_interface::get_instance())
     {
         Hipdnn_backend_interface::set_instance(std::make_shared<Hipdnn_backend_wrapper>());
     }

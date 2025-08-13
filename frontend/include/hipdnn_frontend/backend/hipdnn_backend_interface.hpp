@@ -71,7 +71,6 @@ public:
     {
         backend_instance.reset();
     }
-
 };
 
 }
