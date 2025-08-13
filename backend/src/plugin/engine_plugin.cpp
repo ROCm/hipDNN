@@ -1,6 +1,7 @@
 // Copyright © Advanced Micro Devices, Inc., or its affiliates.
 // SPDX-License-Identifier:  MIT
 
+#include <algorithm>
 #include <cassert>
 #include <limits>
 
@@ -73,12 +74,12 @@ void Engine_plugin::resolve_symbols()
 
 std::vector<int64_t> Engine_plugin::get_all_engine_ids() const
 {
-    if(!_engine_ids.empty())
-    {
-        return _engine_ids;
-    }
-
     assert(_initialized);
+
+    if(!_all_engine_ids.empty())
+    {
+        return _all_engine_ids;
+    }
 
     uint32_t max_engines = 64;
     std::vector<int64_t> engine_ids(max_engines);
@@ -104,12 +105,12 @@ std::vector<int64_t> Engine_plugin::get_all_engine_ids() const
 
     engine_ids.resize(num_engines);
 
-    std::set<int64_t> unique_ids(engine_ids.begin(), engine_ids.end());
-    if(unique_ids.size() != engine_ids.size())
+    std::ranges::sort(engine_ids);
+    if (std::ranges::adjacent_find(engine_ids) != engine_ids.end())
     {
         throw Hipdnn_exception(HIPDNN_STATUS_PLUGIN_ERROR, "Duplicate engine IDs found");
     }
-    _engine_ids = engine_ids;
+    _all_engine_ids = engine_ids;
 
     return engine_ids;
 }
@@ -167,6 +168,22 @@ std::vector<int64_t>
     }
 
     engine_ids.resize(num_engines);
+
+    std::ranges::sort(engine_ids);
+    if (std::ranges::adjacent_find(engine_ids) != engine_ids.end())
+    {
+        throw Hipdnn_exception(HIPDNN_STATUS_PLUGIN_ERROR, "Duplicate engine IDs found");
+    }
+
+    for(const auto engine_id : engine_ids)
+    {
+        if(std::ranges::find(_all_engine_ids, engine_id) == _all_engine_ids.end())
+        {
+            throw Hipdnn_exception(HIPDNN_STATUS_PLUGIN_ERROR,
+                                   "Engine ID not found in the plugin's known IDs");
+        }
+    }
+
     return engine_ids;
 }
 

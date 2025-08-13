@@ -142,12 +142,6 @@ Engine_plugin_resource_manager::Engine_plugin_resource_manager(
         auto engine_ids = plugin.get_all_engine_ids();
         for(const auto id : engine_ids)
         {
-            if(_engine_id_to_handle.contains(id))
-            {
-                throw Hipdnn_exception(HIPDNN_STATUS_PLUGIN_ERROR,
-                                       "Engine ID " + std::to_string(id)
-                                           + " already exists in the resource manager");
-            }
             _engine_id_to_handle[id] = handle;
         }
     }
