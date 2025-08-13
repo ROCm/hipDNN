@@ -111,7 +111,7 @@ std::vector<int64_t> Engine_plugin::get_all_engine_ids() const
     engine_ids.resize(num_engines);
 
     std::ranges::sort(engine_ids);
-    if (std::ranges::adjacent_find(engine_ids) != engine_ids.end())
+    if(std::ranges::adjacent_find(engine_ids) != engine_ids.end())
     {
         throw Hipdnn_exception(HIPDNN_STATUS_PLUGIN_ERROR, "Duplicate engine IDs found");
     }
@@ -176,7 +176,7 @@ std::vector<int64_t>
     engine_ids.resize(num_engines);
 
     std::ranges::sort(engine_ids);
-    if (std::ranges::adjacent_find(engine_ids) != engine_ids.end())
+    if(std::ranges::adjacent_find(engine_ids) != engine_ids.end())
     {
         throw Hipdnn_exception(HIPDNN_STATUS_PLUGIN_ERROR, "Duplicate engine IDs found");
     }
@@ -185,7 +185,8 @@ std::vector<int64_t>
     {
         if(std::ranges::find(_all_engine_ids, engine_id) == _all_engine_ids.end())
         {
-            throw Hipdnn_exception(HIPDNN_STATUS_PLUGIN_ERROR, "Engine ID not found in the plugin's known IDs");
+            throw Hipdnn_exception(HIPDNN_STATUS_PLUGIN_ERROR,
+                                   "Engine ID not found in the plugin's known IDs");
         }
     }
 
