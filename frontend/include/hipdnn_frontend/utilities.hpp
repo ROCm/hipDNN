@@ -55,6 +55,20 @@ inline error_t find_common_shape(const std::vector<std::vector<int64_t>>& input_
     return {};
 }
 
+// Utility function to create Tensor_attributes from a Tensor
+inline Tensor_attributes make_tensor_attributes(const std::string& name,
+                                                DataType_t data_type,
+                                                const hipdnn_sdk::utilities::Tensor& tensor)
+{
+    return Tensor_attributes()
+        .set_name(name)
+        .set_data_type(data_type)
+        .set_dim(tensor.dims())
+        .set_stride(tensor.strides());
+}
+
+}
+
 inline int32_t initialize_frontend_logging(hipdnnCallback_t fn)
 {
     if(fn == nullptr)
@@ -73,17 +87,4 @@ inline int32_t initialize_frontend_logging(hipdnnCallback_t fn)
     return 0;
 }
 
-// Utility function to create Tensor_attributes from a Tensor
-inline Tensor_attributes make_tensor_attributes(const std::string& name,
-                                                DataType_t data_type,
-                                                const hipdnn_sdk::utilities::Tensor& tensor)
-{
-    return Tensor_attributes()
-        .set_name(name)
-        .set_data_type(data_type)
-        .set_dim(tensor.dims())
-        .set_stride(tensor.strides());
-}
-
-}
 }
