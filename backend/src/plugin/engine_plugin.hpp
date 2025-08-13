@@ -23,7 +23,7 @@ protected:
 
 public:
     std::vector<int64_t> get_all_engine_ids() const;
-    hipdnnEnginePluginHandle_t create_handle() const;
+    [[nodiscard]] hipdnnEnginePluginHandle_t create_handle() const;
     void destroy_handle(hipdnnEnginePluginHandle_t handle) const;
     void set_stream(hipdnnEnginePluginHandle_t handle, hipStream_t stream) const;
     std::vector<int64_t> get_applicable_engine_ids(hipdnnEnginePluginHandle_t handle,
@@ -37,7 +37,7 @@ public:
     size_t get_workspace_size(hipdnnEnginePluginHandle_t handle,
                               const hipdnnPluginConstData_t* engine_config,
                               const hipdnnPluginConstData_t* op_graph) const;
-    hipdnnEnginePluginExecutionContext_t
+    [[nodiscard]] hipdnnEnginePluginExecutionContext_t
         create_execution_context(hipdnnEnginePluginHandle_t handle,
                                  const hipdnnPluginConstData_t* engine_config,
                                  const hipdnnPluginConstData_t* op_graph) const;

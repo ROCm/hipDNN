@@ -92,7 +92,7 @@ private:
     virtual void destroy_engine_details(int64_t engine_id,
                                         hipdnnPluginConstData_t* engine_details) const;
 
-    virtual hipdnnEnginePluginExecutionContext_t
+    [[nodiscard]] virtual hipdnnEnginePluginExecutionContext_t
         create_execution_context(int64_t engine_id,
                                  const hipdnnPluginConstData_t* engine_config,
                                  const Graph_descriptor* graph_desc) const;

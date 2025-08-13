@@ -81,7 +81,7 @@ std::vector<int64_t> Engine_plugin::get_all_engine_ids() const
         return _all_engine_ids;
     }
 
-    uint32_t max_engines = 64;
+    uint32_t max_engines = 64; // Initial guess for the maximum number of engines
     std::vector<int64_t> engine_ids(max_engines);
     uint32_t num_engines = 0;
 
@@ -101,6 +101,11 @@ std::vector<int64_t> Engine_plugin::get_all_engine_ids() const
                                engine_ids.data(),
                                max_engines,
                                &num_engines);
+    }
+
+    if(num_engines == 0)
+    {
+        throw Hipdnn_exception(HIPDNN_STATUS_PLUGIN_ERROR, "No engines found in the plugin");
     }
 
     engine_ids.resize(num_engines);
@@ -141,7 +146,12 @@ std::vector<int64_t>
 {
     assert(_initialized);
 
-    uint32_t max_engines = 64;
+    if(_all_engine_ids.empty())
+    {
+        get_all_engine_ids();
+    }
+
+    const auto max_engines = static_cast<uint32_t>(_all_engine_ids.size());
     std::vector<int64_t> engine_ids(max_engines);
     uint32_t num_engines = 0;
 
@@ -153,18 +163,14 @@ std::vector<int64_t>
                            max_engines,
                            &num_engines);
 
+    if(num_engines == 0)
+    {
+        return {}; // No applicable engines found
+    }
+
     if(num_engines > max_engines)
     {
-        // Dynamically resize the buffer and retry
-        max_engines = num_engines;
-        engine_ids.resize(max_engines);
-        invoke_plugin_function("get applicable engine IDs after resizing the buffer",
-                               _func_get_applicable_engine_ids,
-                               handle,
-                               op_graph,
-                               engine_ids.data(),
-                               max_engines,
-                               &num_engines);
+        throw Hipdnn_exception(HIPDNN_STATUS_PLUGIN_ERROR, "More applicable engines than expected");
     }
 
     engine_ids.resize(num_engines);
@@ -179,8 +185,7 @@ std::vector<int64_t>
     {
         if(std::ranges::find(_all_engine_ids, engine_id) == _all_engine_ids.end())
         {
-            throw Hipdnn_exception(HIPDNN_STATUS_PLUGIN_ERROR,
-                                   "Engine ID not found in the plugin's known IDs");
+            throw Hipdnn_exception(HIPDNN_STATUS_PLUGIN_ERROR, "Engine ID not found in the plugin's known IDs");
         }
     }
 
