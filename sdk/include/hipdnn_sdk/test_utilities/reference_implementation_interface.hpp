@@ -39,8 +39,9 @@ public:
                                const Tensor& scale,
                                Tensor& dx,
                                Tensor& dscale,
-                               Tensor& bias)
+                               Tensor& dbias)
         = 0;
+};
 
 } // namespace reference_test_utilities
 } // namespace hipdnn_sdk

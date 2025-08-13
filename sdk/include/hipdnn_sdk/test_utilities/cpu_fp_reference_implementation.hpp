@@ -90,19 +90,87 @@ public:
                        const Tensor& scale,
                        Tensor& dx,
                        Tensor& dscale,
-                       Tensor& bias) override
+                       Tensor& dbias) override
     {
-        // todo: check for correct dims of each tensor
-        int64_t n_batches = input.dims().at(0);
-        std::vector<int64_t> channels(static_cast<size_t>(input.dims().at(1)));
+        if(x.dims().size() != 4)
+        {
+            throw std::runtime_error("Batchnorm backward requires a 4D tensor.");
+        }
+
+        int64_t n_batches = x.dims().at(0);
+        std::vector<int64_t> channels(static_cast<size_t>(x.dims().at(1)));
         std::iota(channels.begin(), channels.end(), 0);
-        int64_t height = input.dims().at(2);
-        int64_t width = input.dims().at(3);
+        int64_t height = x.dims().at(2);
+        int64_t width = x.dims().at(3);
+        int64_t n = n_batches * height * width; // Total elements per channel
 
-        // aalsdjlasjkdkjlasdjlkaljksdjlkas alsdjlasjkdkjlasdjlkaljksdjlkas alsdjlasjkdkjlasdjlkaljksdjlkas alsdjlasjkdkjlasdjlkaljksdjlkas alsdjlasjkdkjlasdjlkaljksdjlkas alsdjlasjkdkjlasdjlkaljksdjlkaslsdjlasjkdkjlasdjlkaljksdjlkas
-        // std::for_each(channels.begin(), channels.end(), [&](int64_t cidx) {
+        std::for_each(channels.begin(), channels.end(), [&](int64_t cidx) {
+            auto channel_mean = mean.get_host_value<Mean_variance_data_type>(0, cidx, 0, 0);
+            auto channel_inv_variance = invVariance.get_host_value<Mean_variance_data_type>(0, cidx, 0, 0);
+            auto channel_scale = scale.get_host_value<Scale_bias_data_type>(0, cidx, 0, 0);
 
-        // }
+            Mean_variance_data_type dot_product = 0;
+            Mean_variance_data_type dy_sum = 0;
+
+            for(int row = 0; row < height; row++)
+            {
+                for(int column = 0; column < width; column++)
+                {
+                    for(int bidx = 0; bidx < n_batches; bidx++)
+                    {
+                        auto x_val = static_cast<Mean_variance_data_type>(
+                            x.get_host_value<Input_data_type>(bidx, cidx, row, column));
+                        auto dy_val = static_cast<Mean_variance_data_type>(
+                            dy.get_host_value<Input_data_type>(bidx, cidx, row, column));
+                        
+                        Mean_variance_data_type x_centered = x_val - channel_mean;
+                        dot_product += x_centered * dy_val;
+                        dy_sum += dy_val;
+                    }
+                }
+            }
+
+            // Calculate dscale and dbias for this channel
+            dscale.set_host_value<Scale_bias_data_type>(
+                0, cidx, 0, 0, 
+                static_cast<Scale_bias_data_type>(dot_product * channel_inv_variance));
+            
+            dbias.set_host_value<Scale_bias_data_type>(
+                0, cidx, 0, 0, 
+                static_cast<Scale_bias_data_type>(dy_sum));
+
+            // Calculate dx for this channel
+            // training: dx = (dy - mean(dy) - (x - mean) * mean((x - mean) * dy)) * inv_variance * scale
+            Mean_variance_data_type dy_mean = dy_sum / static_cast<Mean_variance_data_type>(n);
+            Mean_variance_data_type k = dot_product * channel_inv_variance * channel_inv_variance / static_cast<Mean_variance_data_type>(n);
+
+            for(int row = 0; row < height; row++)
+            {
+                for(int column = 0; column < width; column++)
+                {
+                    for(int bidx = 0; bidx < n_batches; bidx++)
+                    {
+                        auto x_val = static_cast<Mean_variance_data_type>(
+                            x.get_host_value<Input_data_type>(bidx, cidx, row, column));
+                        auto dy_val = static_cast<Mean_variance_data_type>(
+                            dy.get_host_value<Input_data_type>(bidx, cidx, row, column));
+                        
+                        Mean_variance_data_type x_centered = x_val - channel_mean;
+                        Mean_variance_data_type dx_val = (dy_val - dy_mean - x_centered * k) 
+                                                       * channel_inv_variance 
+                                                       * static_cast<Mean_variance_data_type>(channel_scale);
+                        
+                        dx.set_host_value<Input_data_type>(
+                            bidx, cidx, row, column, 
+                            static_cast<Input_data_type>(dx_val));
+                    }
+                }
+            }
+        });
+
+        dx.memory().mark_host_modified();
+        dscale.memory().mark_host_modified();
+        dbias.memory().mark_host_modified();
     }
 
 private:
