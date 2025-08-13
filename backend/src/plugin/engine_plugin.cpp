@@ -73,6 +73,11 @@ void Engine_plugin::resolve_symbols()
 
 std::vector<int64_t> Engine_plugin::get_all_engine_ids() const
 {
+    if(!_engine_ids.empty())
+    {
+        return _engine_ids;
+    }
+
     assert(_initialized);
 
     uint32_t max_engines = 64;
@@ -98,6 +103,14 @@ std::vector<int64_t> Engine_plugin::get_all_engine_ids() const
     }
 
     engine_ids.resize(num_engines);
+
+    std::set<int64_t> unique_ids(engine_ids.begin(), engine_ids.end());
+    if(unique_ids.size() != engine_ids.size())
+    {
+        throw Hipdnn_exception(HIPDNN_STATUS_PLUGIN_ERROR, "Duplicate engine IDs found");
+    }
+    _engine_ids = engine_ids;
+
     return engine_ids;
 }
 

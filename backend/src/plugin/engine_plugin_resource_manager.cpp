@@ -47,15 +47,7 @@ private:
     void action_after_adding(const Engine_plugin& plugin) override
     {
         auto engine_ids = plugin.get_all_engine_ids();
-        for(const auto id : engine_ids)
-        {
-            if(_engine_ids.contains(id))
-            {
-                throw Hipdnn_exception(HIPDNN_STATUS_PLUGIN_ERROR,
-                                       "Broken plugin: inconsistent engine IDs");
-            }
-            _engine_ids.insert(id);
-        }
+        _engine_ids.insert(engine_ids.begin(), engine_ids.end());
     }
 
     std::set<int64_t> _engine_ids;

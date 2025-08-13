@@ -61,6 +61,8 @@ private:
     bool _initialized = false;
 #endif
 
+    mutable std::vector<int64_t> _engine_ids;
+
     hipdnnPluginStatus_t (*_func_get_all_engine_ids)(int64_t*, uint32_t, uint32_t*);
     hipdnnPluginStatus_t (*_func_create_handle)(hipdnnEnginePluginHandle_t*);
     hipdnnPluginStatus_t (*_func_destroy_handle)(hipdnnEnginePluginHandle_t);
