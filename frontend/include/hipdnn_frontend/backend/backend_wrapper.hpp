@@ -110,20 +110,17 @@ public:
     }
 };
 
-static std::unique_ptr<Hipdnn_backend_interface> backend_wrapper;
-static std::mutex backend_wrapper_mutex;
-
-static Hipdnn_backend_interface& hipdnn_backend()
+// Allow overriding the backend implementation by setting a custom backend instance.
+inline std::shared_ptr<Hipdnn_backend_interface>& get_backend_instance()
 {
-    if(!backend_wrapper)
-    {
-        std::lock_guard<std::mutex> lock(backend_wrapper_mutex);
-        if(!backend_wrapper)
-        {
-            backend_wrapper = std::make_unique<Hipdnn_backend_wrapper>();
-        }
-    }
-    return *backend_wrapper;
+    static std::shared_ptr<Hipdnn_backend_interface> backend_instance
+        = std::make_shared<Hipdnn_backend_wrapper>();
+    return backend_instance;
+}
+
+inline Hipdnn_backend_interface& hipdnn_backend()
+{
+    return *get_backend_instance();
 }
 
 }

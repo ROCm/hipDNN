@@ -11,26 +11,13 @@
 
 // NOLINTBEGIN
 
-class Mock_hipdnn_backend: public hipdnn_frontend::Hipdnn_backend_interface
+class Mock_hipdnn_backend : public hipdnn_frontend::Hipdnn_backend_interface
 {
 public:
-    Mock_hipdnn_backend()
-    {
-        hipdnn_frontend::backend_wrapper = std::unique_ptr<hipdnn_frontend::Hipdnn_backend_interface>(this);
-    }
-
-    ~Mock_hipdnn_backend()
-    {
-        hipdnn_frontend::backend_wrapper.release();
-    }
-
     MOCK_METHOD(hipdnnStatus_t, create, (hipdnnHandle_t * handle), ());
     MOCK_METHOD(hipdnnStatus_t, destroy, (hipdnnHandle_t handle), ());
     MOCK_METHOD(hipdnnStatus_t, set_stream, (hipdnnHandle_t handle, hipStream_t streamId), ());
-    MOCK_METHOD(hipdnnStatus_t,
-                get_stream,
-                (hipdnnHandle_t handle, hipStream_t* streamId),
-                ());
+    MOCK_METHOD(hipdnnStatus_t, get_stream, (hipdnnHandle_t handle, hipStream_t* streamId), ());
     MOCK_METHOD(hipdnnStatus_t,
                 backend_create_descriptor,
                 (hipdnnBackendDescriptorType_t descriptor_type,
