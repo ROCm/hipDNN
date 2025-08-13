@@ -22,12 +22,12 @@ protected:
     void SetUp() override
     {
         _mock_backend = std::make_shared<Mock_hipdnn_backend>();
-        hipdnn_frontend::get_backend_instance() = _mock_backend;
+        Hipdnn_backend_interface::set_instance(_mock_backend);
         _handle = reinterpret_cast<hipdnnHandle_t>(0x12345678);
     }
     void TearDown() override
     {
-        hipdnn_frontend::get_backend_instance().reset();
+        Hipdnn_backend_interface::reset_instance();
         _mock_backend.reset();
     }
 

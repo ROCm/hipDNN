@@ -111,16 +111,14 @@ public:
 };
 
 // Allow overriding the backend implementation by setting a custom backend instance.
-inline std::shared_ptr<Hipdnn_backend_interface>& get_backend_instance()
+inline static std::shared_ptr<Hipdnn_backend_interface> hipdnn_backend()
 {
-    static std::shared_ptr<Hipdnn_backend_interface> backend_instance
-        = std::make_shared<Hipdnn_backend_wrapper>();
-    return backend_instance;
-}
+    if (!Hipdnn_backend_interface::get_instance())
+    {
+        Hipdnn_backend_interface::set_instance(std::make_shared<Hipdnn_backend_wrapper>());
+    }
 
-inline Hipdnn_backend_interface& hipdnn_backend()
-{
-    return *get_backend_instance();
+    return Hipdnn_backend_interface::get_instance();
 }
 
 }

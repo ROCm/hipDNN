@@ -88,7 +88,9 @@ Our development dockerfiles are located in the `dockerfiles` directory.  See the
 See the samples [readme](../samples/README.MD) for how to build and run the samples.
 
 ## Building on Windows
-1. Follow the instructions for building TheRock
+
+*Note - HIP & GPU related tests are not currently working*
+1. Follow the instructions for preparing for and cloning TheRock
 2. Open up a "x64 Native Tools Command Prompt for VS 2022" command shell from the start menu
 3. From the native tools prompt, clone and build TheRock
 4. Set your HIP_PLATFORM: `set HIP_PLATFORM=amd`
@@ -98,3 +100,4 @@ See the samples [readme](../samples/README.MD) for how to build and run the samp
 6. From the native tools prompt, clone and build hipDNN
     - `cmake -GNinja -DHIP_DNN_BUILD_PLUGINS=OFF ..`
     - `ninja check`
+
