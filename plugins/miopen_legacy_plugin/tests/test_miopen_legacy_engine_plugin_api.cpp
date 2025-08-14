@@ -39,6 +39,11 @@ TEST(MiopenLegacyEnginePluginApiTest, EnginePluginGetAllEngineIdsValid)
     EXPECT_EQ(status, HIPDNN_PLUGIN_STATUS_SUCCESS);
     EXPECT_EQ(num_engines, 1u);
     EXPECT_EQ(engine_ids[0], 1u);
+
+    status = hipdnnEnginePluginGetAllEngineIds(nullptr, 0, &num_engines);
+
+    EXPECT_EQ(status, HIPDNN_PLUGIN_STATUS_SUCCESS);
+    EXPECT_EQ(num_engines, 1u);
 }
 
 TEST(MiopenLegacyEnginePluginApiTest, EnginePluginCreateNullHandle)
