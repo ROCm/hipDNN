@@ -18,13 +18,13 @@
 using namespace hipdnn_frontend;
 using namespace hipdnn_sdk::utilities;
 
-template <typename InputType, typename IntermediateType, TensorLayout Layout>
-void Sample_runner::operator()()
+template <typename InputType, typename IntermediateType>
+void Sample_runner::operator()(const Tensor_layout& layout)
 {
     auto input_type = get_data_type_enum_from_type<InputType>();
     auto intermediate_type = get_data_type_enum_from_type<IntermediateType>();
 
-    std::cout << "Running batch normalization inference graph " << input_type << " [" << Layout
+    std::cout << "Running batch normalization inference graph " << input_type << " [" << layout
               << "]" << (config.cpu_validation ? " (with CPU validation)" : "") << "...\n";
 
     int64_t N = 16; // BATCH SIZE
@@ -64,12 +64,12 @@ void Sample_runner::operator()()
     HIPDNN_FE_CHECK(graph->build_plans());
     std::cout << "Plans build successful.\n";
 
-    auto x_tensor = Tensor::make_tensor<InputType>(x->get_dim(), Layout);
+    auto x_tensor = Tensor::make_tensor<InputType>(x->get_dim(), layout);
     auto scale_tensor = Tensor::make_tensor<IntermediateType>(scale->get_dim());
     auto bias_tensor = Tensor::make_tensor<IntermediateType>(bias->get_dim());
     auto mean_tensor = Tensor::make_tensor<IntermediateType>(mean->get_dim());
     auto inv_variance_tensor = Tensor::make_tensor<IntermediateType>(inv_variance->get_dim());
-    auto y_tensor = Tensor::make_tensor<InputType>(y->get_dim(), Layout);
+    auto y_tensor = Tensor::make_tensor<InputType>(y->get_dim(), layout);
 
     x_tensor.template fill_with_random_values<InputType>(static_cast<InputType>(0.0f),
                                                          static_cast<InputType>(1.0f));
@@ -105,7 +105,7 @@ void Sample_runner::operator()()
 
         auto ref_impl = hipdnn_sdk::reference_test_utilities::
             Cpu_fp_reference_implementation<InputType, IntermediateType>();
-        auto y_ref_tensor = Tensor::make_tensor<InputType>(y->get_dim(), Layout);
+        auto y_ref_tensor = Tensor::make_tensor<InputType>(y->get_dim(), layout);
 
         // Convert inverse variance to variance for CPU reference
         auto variance_tensor = Tensor::make_tensor<IntermediateType>(inv_variance->get_dim());

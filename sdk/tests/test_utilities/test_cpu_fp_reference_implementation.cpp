@@ -85,8 +85,8 @@ TEST(CpuFpReferenceImplementation, BasicFloatUsageNHWC)
 {
     SKIP_IF_NO_DEVICES();
 
-    Tensor input_tensor = Tensor::make_tensor<float>({1, 3, 224, 224}, TensorLayout::NHWC);
-    Tensor output_tensor = Tensor::make_tensor<float>({1, 3, 224, 224}, TensorLayout::NHWC);
+    Tensor input_tensor = Tensor::make_tensor<float>({1, 3, 224, 224}, Tensor_layout::NHWC);
+    Tensor output_tensor = Tensor::make_tensor<float>({1, 3, 224, 224}, Tensor_layout::NHWC);
     Tensor bias_tensor = Tensor::make_tensor<float>({1, 3, 1, 1});
     Tensor scale_tensor = Tensor::make_tensor<float>({1, 3, 1, 1});
     Tensor mean_tensor = Tensor::make_tensor<float>({1, 3, 1, 1});

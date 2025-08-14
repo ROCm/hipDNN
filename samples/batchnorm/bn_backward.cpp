@@ -16,13 +16,13 @@
 using namespace hipdnn_frontend;
 using namespace hipdnn_sdk::utilities;
 
-template <typename InputType, typename IntermediateType, TensorLayout Layout>
-void Sample_runner::operator()()
+template <typename InputType, typename IntermediateType>
+void Sample_runner::operator()(const Tensor_layout& layout)
 {
     auto input_type = get_data_type_enum_from_type<InputType>();
     auto intermediate_type = get_data_type_enum_from_type<IntermediateType>();
 
-    std::cout << "Running batch normalization backwards graph " << input_type << " [" << Layout
+    std::cout << "Running batch normalization backwards graph " << input_type << " [" << layout
               << "]...\n";
 
     int64_t N = 16; // BATCH SIZE
@@ -65,14 +65,14 @@ void Sample_runner::operator()()
     HIPDNN_FE_CHECK(graph->build_plans());
     std::cout << "Plans build successful.\n";
 
-    auto dy_tensor = Tensor::make_tensor<InputType>(dy->get_dim(), Layout);
-    auto x_tensor = Tensor::make_tensor<InputType>(x->get_dim(), Layout);
+    auto dy_tensor = Tensor::make_tensor<InputType>(dy->get_dim(), layout);
+    auto x_tensor = Tensor::make_tensor<InputType>(x->get_dim(), layout);
     auto scale_tensor = Tensor::make_tensor<IntermediateType>(scale->get_dim());
     auto saved_mean_tensor = Tensor::make_tensor<IntermediateType>(saved_mean->get_dim());
     auto saved_inv_var_tensor
         = Tensor::make_tensor<IntermediateType>(saved_inv_variance->get_dim());
 
-    auto dx_tensor = Tensor::make_tensor<InputType>(dx->get_dim(), Layout);
+    auto dx_tensor = Tensor::make_tensor<InputType>(dx->get_dim(), layout);
     auto dscale_tensor = Tensor::make_tensor<IntermediateType>(dscale->get_dim());
     auto dbias_tensor = Tensor::make_tensor<IntermediateType>(dbias->get_dim());
 

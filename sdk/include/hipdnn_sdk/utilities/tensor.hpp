@@ -15,28 +15,22 @@ namespace hipdnn_sdk
 namespace utilities
 {
 
-enum class TensorLayout
+struct Tensor_layout
 {
-    NCHW,
-    NHWC
+    std::string name;
+    std::vector<int64_t> stride_order;
+
+    static const Tensor_layout NCHW;
+    static const Tensor_layout NHWC;
 };
 
-inline const char* to_string(TensorLayout layout)
-{
-    switch(layout)
-    {
-    case TensorLayout::NCHW:
-        return "NCHW";
-    case TensorLayout::NHWC:
-        return "NHWC";
-    default:
-        return "Unknown";
-    }
-}
+inline const Tensor_layout Tensor_layout::NCHW{.name = "NCHW", .stride_order = {3, 2, 1, 0}};
+inline const Tensor_layout Tensor_layout::NHWC{.name = "NHWC",
+                                               .stride_order = stride_order_nhwc(4)};
 
-inline std::ostream& operator<<(std::ostream& os, TensorLayout layout)
+inline std::ostream& operator<<(std::ostream& os, const Tensor_layout& layout)
 {
-    return os << to_string(layout);
+    return os << layout.name;
 }
 
 // Wraps vectors of dims/strides and Migratable_memory<T> to provide a common interface for testing
@@ -62,17 +56,9 @@ public:
 
     template <typename T>
     static Tensor make_tensor(const std::vector<int64_t>& dims,
-                              const TensorLayout layout = TensorLayout::NCHW)
+                              const Tensor_layout& layout = Tensor_layout::NCHW)
     {
-        switch(layout)
-        {
-        case TensorLayout::NCHW:
-            return {dims, generate_strides(dims, {3, 2, 1, 0}), sizeof(T)};
-        case TensorLayout::NHWC:
-            return {dims, generate_strides(dims, stride_order_nhwc(dims.size())), sizeof(T)};
-        default:
-            throw std::invalid_argument("Unsupported tensor layout");
-        }
+        return {dims, generate_strides(dims, layout.stride_order), sizeof(T)};
     }
 
     template <typename T>

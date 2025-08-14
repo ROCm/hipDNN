@@ -45,7 +45,7 @@ struct Batchnorm_2d_tensor_bundle
 {
     Batchnorm_2d_tensor_bundle(const std::vector<int64_t>& dims,
                                unsigned int seed = 1,
-                               TensorLayout layout = TensorLayout::NCHW)
+                               const Tensor_layout& layout = Tensor_layout::NCHW)
         : derived_dims({1, dims[1], 1, 1})
         , x_tensor(Tensor::make_tensor<Input_type>(dims, layout))
         , y_tensor(Tensor::make_tensor<Input_type>(dims, layout))
@@ -249,7 +249,7 @@ protected:
     template <typename Input_type, typename Intermediate_type>
     void run_batchnorm_test(const Bn_2d_test_case& test_case,
                             Input_type tolerance = 1e-4f,
-                            TensorLayout layout = TensorLayout::NCHW)
+                            const Tensor_layout& layout = Tensor_layout::NCHW)
     {
         auto input_data_type = get_data_type_enum_from_type<Input_type>();
         auto intermediate_data_type = get_data_type_enum_from_type<Intermediate_type>();
@@ -346,7 +346,7 @@ class Batchnorm_forward_inference_integration_test_nhwc
 TEST_P(Batchnorm_forward_inference_integration_test_nhwc, RunFloatFwdBatchnormGraphNHWC)
 {
     Bn_2d_test_case test_case = GetParam();
-    run_batchnorm_test<float, float>(test_case, 1e-6f, TensorLayout::NHWC);
+    run_batchnorm_test<float, float>(test_case, 1e-6f, Tensor_layout::NHWC);
 }
 
 // Consider using fewer/smaller test cases to reduce test time

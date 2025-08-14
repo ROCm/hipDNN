@@ -15,7 +15,7 @@
 #include <random>
 #include <vector>
 
-using hipdnn_sdk::utilities::TensorLayout;
+using hipdnn_sdk::utilities::Tensor_layout;
 
 #define HIP_CHECK(status)                                                                      \
     do                                                                                         \
@@ -96,12 +96,12 @@ inline Config parse_command_line_args(int argc, char* argv[])
 template <typename F>
 void run(F&& f)
 {
-    f.template operator()<float, float, TensorLayout::NCHW>();
-    f.template operator()<half, float, TensorLayout::NCHW>();
-    f.template operator()<hip_bfloat16, float, TensorLayout::NCHW>();
-    f.template operator()<float, float, TensorLayout::NHWC>();
-    f.template operator()<half, float, TensorLayout::NHWC>();
-    f.template operator()<hip_bfloat16, float, TensorLayout::NHWC>();
+    f.template operator()<float, float>(Tensor_layout::NCHW);
+    f.template operator()<half, float>(Tensor_layout::NCHW);
+    f.template operator()<hip_bfloat16, float>(Tensor_layout::NCHW);
+    f.template operator()<float, float>(Tensor_layout::NHWC);
+    f.template operator()<half, float>(Tensor_layout::NHWC);
+    f.template operator()<hip_bfloat16, float>(Tensor_layout::NHWC);
 }
 
 inline std::shared_ptr<hipdnn_frontend::graph::Tensor_attributes>
@@ -133,6 +133,6 @@ struct Sample_runner
     hipdnnHandle_t handle;
     Config config;
 
-    template <typename InputType, typename IntermediateType, TensorLayout Layout>
-    void operator()();
+    template <typename InputType, typename IntermediateType>
+    void operator()(const Tensor_layout& layout);
 };

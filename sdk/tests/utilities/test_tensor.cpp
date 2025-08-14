@@ -61,7 +61,7 @@ TEST(TestTensor, BasicNHWCUsage)
 {
     SKIP_IF_NO_DEVICES();
 
-    auto tensor = Tensor::make_tensor<float>({1, 2, 3, 4}, TensorLayout::NHWC);
+    auto tensor = Tensor::make_tensor<float>({1, 2, 3, 4}, Tensor_layout::NHWC);
 
     EXPECT_EQ(tensor.memory().count(), 24);
     // NHWC strides with dims {N=1, C=2, H=3, W=4}:
@@ -90,7 +90,7 @@ TEST(TestTensor, GetAndSetHostValueNHWC)
 {
     SKIP_IF_NO_DEVICES();
 
-    auto tensor = Tensor::make_tensor<float>({1, 2, 3, 4}, TensorLayout::NHWC);
+    auto tensor = Tensor::make_tensor<float>({1, 2, 3, 4}, Tensor_layout::NHWC);
     tensor.fill_with_value(0.0f);
     tensor.set_host_value<float>(0, 1, 1, 2, 99.0f);
 

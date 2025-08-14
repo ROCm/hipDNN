@@ -62,7 +62,7 @@ protected:
     void RunFwdbatchnormGraph(Bn_2d_test_case test_case,
                               hipdnn_sdk::data_objects::DataType input_data_type,
                               Input_type epsilon,
-                              TensorLayout layout);
+                              const Tensor_layout& layout);
 
     hipdnnEnginePluginHandle_t _handle = nullptr;
 };
@@ -110,7 +110,7 @@ TEST_P(Batchnorm_execute_graph_test, RunFloatFwdbatchnormGraphNCHW)
 {
     Bn_2d_test_case test_case = GetParam();
     RunFwdbatchnormGraph<float, float>(
-        test_case, hipdnn_sdk::data_objects::DataType::DataType_FLOAT, 1e-6f, TensorLayout::NCHW);
+        test_case, hipdnn_sdk::data_objects::DataType::DataType_FLOAT, 1e-6f, Tensor_layout::NCHW);
 }
 
 TEST_F(Batchnorm_execute_graph_test, RunBfloat16FwdbatchnormGraphNCHW)
@@ -119,21 +119,21 @@ TEST_F(Batchnorm_execute_graph_test, RunBfloat16FwdbatchnormGraphNCHW)
     RunFwdbatchnormGraph<hip_bfloat16, float>(test_case,
                                               hipdnn_sdk::data_objects::DataType::DataType_BFLOAT16,
                                               1e-2_bf,
-                                              TensorLayout::NCHW);
+                                              Tensor_layout::NCHW);
 }
 
 TEST_F(Batchnorm_execute_graph_test, RunHalfFwdbatchnormGraphNCHW)
 {
     Bn_2d_test_case test_case = {.n = 1, .c = 3, .h = 14, .w = 14};
     RunFwdbatchnormGraph<half, float>(
-        test_case, hipdnn_sdk::data_objects::DataType::DataType_HALF, 1e-2_h, TensorLayout::NCHW);
+        test_case, hipdnn_sdk::data_objects::DataType::DataType_HALF, 1e-2_h, Tensor_layout::NCHW);
 }
 
 TEST_P(Batchnorm_execute_graph_test, RunFloatFwdbatchnormGraphNHWC)
 {
     Bn_2d_test_case test_case = GetParam();
     RunFwdbatchnormGraph<float, float>(
-        test_case, hipdnn_sdk::data_objects::DataType::DataType_FLOAT, 1e-6f, TensorLayout::NHWC);
+        test_case, hipdnn_sdk::data_objects::DataType::DataType_FLOAT, 1e-6f, Tensor_layout::NHWC);
 }
 
 TEST_F(Batchnorm_execute_graph_test, RunBfloat16FwdbatchnormGraphNHWC)
@@ -142,14 +142,14 @@ TEST_F(Batchnorm_execute_graph_test, RunBfloat16FwdbatchnormGraphNHWC)
     RunFwdbatchnormGraph<hip_bfloat16, float>(test_case,
                                               hipdnn_sdk::data_objects::DataType::DataType_BFLOAT16,
                                               1e-2_bf,
-                                              TensorLayout::NHWC);
+                                              Tensor_layout::NHWC);
 }
 
 TEST_F(Batchnorm_execute_graph_test, RunHalfFwdbatchnormGraphNHWC)
 {
     Bn_2d_test_case test_case = {.n = 1, .c = 3, .h = 14, .w = 14};
     RunFwdbatchnormGraph<half, float>(
-        test_case, hipdnn_sdk::data_objects::DataType::DataType_HALF, 1e-2_h, TensorLayout::NHWC);
+        test_case, hipdnn_sdk::data_objects::DataType::DataType_HALF, 1e-2_h, Tensor_layout::NHWC);
 }
 
 // TODO: Re-enable when double support is added to MIOpen plugin
@@ -165,7 +165,7 @@ void Batchnorm_execute_graph_test::RunFwdbatchnormGraph(
     Bn_2d_test_case test_case,
     hipdnn_sdk::data_objects::DataType input_data_type,
     Input_type epsilon,
-    TensorLayout layout)
+    const Tensor_layout& layout)
 {
     unsigned int seed = std::random_device{}();
 
