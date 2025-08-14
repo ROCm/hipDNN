@@ -278,14 +278,14 @@ private:
                             version,
                             type,
                             static_cast<int>(type));
+
+            action_after_adding(_plugins.back());
         }
         catch(const Hipdnn_exception& e)
         {
             HIPDNN_LOG_WARN(
                 "Error loading plugin from [{}]: {}", file_path.string(), e.get_message());
         }
-
-        action_after_adding(_plugins.back());
     }
 
     std::vector<Plugin> _plugins;
