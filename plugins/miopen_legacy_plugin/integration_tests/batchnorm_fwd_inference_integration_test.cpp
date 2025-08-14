@@ -284,8 +284,7 @@ private:
 std::vector<Bn_2d_test_case> get_bn_fwd_inference_test_cases()
 {
     return {
-        {.n = 1, .c = 3, .h = 14, .w = 14}
-        // {.n = 2, .c = 3, .h = 14, .w = 14},
+        {.n = 1, .c = 3, .h = 14, .w = 14} // {.n = 2, .c = 3, .h = 14, .w = 14},
         // {.n = 64, .c = 3, .h = 14, .w = 14},
         // {.n = 64, .c = 256, .h = 14, .w = 14},
         // {.n = 64, .c = 256, .h = 28, .w = 28},
