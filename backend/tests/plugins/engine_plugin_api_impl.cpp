@@ -42,8 +42,10 @@ extern "C" hipdnnPluginStatus_t hipdnnEnginePluginGetAllEngineIds(int64_t* engin
                                                                   uint32_t* num_engines)
 {
     return hipdnn_plugin::try_catch([&]() {
-        THROW_IF_NULL(engine_ids);
-        THROW_IF_EQ(max_engines, 0);
+        if(max_engines != 0)
+        {
+            THROW_IF_NULL(engine_ids);
+        }
         THROW_IF_NULL(num_engines);
 
         get_all_engine_ids(engine_ids, max_engines, num_engines);

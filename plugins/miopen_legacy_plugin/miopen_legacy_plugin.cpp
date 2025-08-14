@@ -109,27 +109,42 @@ hipdnnPluginStatus_t hipdnnEnginePluginGetAllEngineIds(int64_t* engine_ids,
                   static_cast<void*>(num_engines));
 
     return hipdnn_plugin::try_catch([&, api_name = __func__]() {
-        throw_if_null(engine_ids);
+        if(max_engines != 0)
+        {
+            throw_if_null(engine_ids);
+        }
         throw_if_null(num_engines);
 
         // For now, we will just return a single engine ID.
         auto all_engine_ids = std::vector<int64_t>({1});
-
-        *num_engines = 0;
-        for(auto engine_id : all_engine_ids)
+        if(all_engine_ids.size() > std::numeric_limits<uint32_t>::max())
         {
-            if(*num_engines == max_engines)
-            {
-                *num_engines = static_cast<uint32_t>(all_engine_ids.size());
-                HIPDNN_LOG_INFO("Maximum number of engines reached ({}), ignoring additional "
-                                "engines, num_engines count: {}",
-                                max_engines,
-                                *num_engines);
-                break;
-            }
+            throw Hipdnn_plugin_exception(HIPDNN_PLUGIN_STATUS_INTERNAL_ERROR,
+                                          "Number of engines exceeds maximum uint32_t value.");
+        }
 
-            engine_ids[*num_engines] = engine_id;
-            (*num_engines)++;
+        if(max_engines == 0)
+        {
+            *num_engines = static_cast<uint32_t>(all_engine_ids.size());
+        }
+        else
+        {
+            *num_engines = 0;
+            for(auto engine_id : all_engine_ids)
+            {
+                if(*num_engines == max_engines)
+                {
+                    *num_engines = static_cast<uint32_t>(all_engine_ids.size());
+                    HIPDNN_LOG_INFO("Maximum number of engines reached ({}), ignoring additional "
+                                    "engines, num_engines count: {}",
+                                    max_engines,
+                                    *num_engines);
+                    break;
+                }
+
+                engine_ids[*num_engines] = engine_id;
+                (*num_engines)++;
+            }
         }
 
         LOG_API_SUCCESS(api_name, "num_engines={}", *num_engines);

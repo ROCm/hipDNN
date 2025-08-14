@@ -81,9 +81,20 @@ std::vector<int64_t> Engine_plugin::get_all_engine_ids() const
         return _all_engine_ids;
     }
 
-    uint32_t max_engines = 64; // Initial guess for the maximum number of engines
-    std::vector<int64_t> engine_ids(max_engines);
     uint32_t num_engines = 0;
+    invoke_plugin_function("get number of engines",
+                           _func_get_all_engine_ids,
+                           nullptr,
+                           0u,
+                           &num_engines);
+
+    if(num_engines == 0)
+    {
+        throw Hipdnn_exception(HIPDNN_STATUS_PLUGIN_ERROR, "No engines found in the plugin");
+    }
+
+    const uint32_t max_engines = num_engines;
+    std::vector<int64_t> engine_ids(max_engines);
 
     invoke_plugin_function("get all engine IDs",
                            _func_get_all_engine_ids,
@@ -91,21 +102,10 @@ std::vector<int64_t> Engine_plugin::get_all_engine_ids() const
                            max_engines,
                            &num_engines);
 
-    if(num_engines > max_engines)
+    if(num_engines != max_engines)
     {
-        // Dynamically resize the buffer and retry
-        max_engines = num_engines;
-        engine_ids.resize(max_engines);
-        invoke_plugin_function("get all engine IDs after resizing the buffer",
-                               _func_get_all_engine_ids,
-                               engine_ids.data(),
-                               max_engines,
-                               &num_engines);
-    }
-
-    if(num_engines == 0)
-    {
-        throw Hipdnn_exception(HIPDNN_STATUS_PLUGIN_ERROR, "No engines found in the plugin");
+        throw Hipdnn_exception(HIPDNN_STATUS_PLUGIN_ERROR,
+                               "Number of engines returned does not match expected count");
     }
 
     engine_ids.resize(num_engines);

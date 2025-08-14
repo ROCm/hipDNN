@@ -138,7 +138,10 @@ public:
                       static_cast<void*>(num_engines));
 
         return hipdnn_plugin::try_catch([&, api_name = __func__]() {
-            hipdnn_plugin::throw_if_null(engine_ids);
+            if(max_engines != 0)
+            {
+                hipdnn_plugin::throw_if_null(engine_ids);
+            }
             hipdnn_plugin::throw_if_null(num_engines);
             hipdnn_plugin::throw_if_null(get_instance());
 
