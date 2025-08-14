@@ -82,11 +82,8 @@ std::vector<int64_t> Engine_plugin::get_all_engine_ids() const
     }
 
     uint32_t num_engines = 0;
-    invoke_plugin_function("get number of engines",
-                           _func_get_all_engine_ids,
-                           nullptr,
-                           0u,
-                           &num_engines);
+    invoke_plugin_function(
+        "get number of engines", _func_get_all_engine_ids, nullptr, 0u, &num_engines);
 
     if(num_engines == 0)
     {
