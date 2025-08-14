@@ -19,11 +19,11 @@ public:
 
     virtual const hipdnn_sdk::data_objects::Graph& get_graph() const = 0;
     virtual bool is_valid() const = 0;
-    virtual uint node_count() const = 0;
+    virtual uint32_t node_count() const = 0;
     virtual bool has_only_supported_attributes(
         std::set<hipdnn_sdk::data_objects::NodeAttributes> supported_attributes) const
         = 0;
-    virtual const hipdnn_sdk::data_objects::Node& get_node(uint index) const = 0;
+    virtual const hipdnn_sdk::data_objects::Node& get_node(uint32_t index) const = 0;
     virtual const std::unordered_map<int64_t, const hipdnn_sdk::data_objects::TensorAttributes*>&
         get_tensor_map() const
         = 0;
@@ -55,7 +55,7 @@ public:
         return _shallow_graph != nullptr;
     }
 
-    uint node_count() const override
+    uint32_t node_count() const override
     {
         throw_if_not_valid();
         return _shallow_graph->nodes()->size();
@@ -77,7 +77,7 @@ public:
         return true;
     }
 
-    const hipdnn_sdk::data_objects::Node& get_node(uint index) const override
+    const hipdnn_sdk::data_objects::Node& get_node(uint32_t index) const override
     {
         throw_if_not_valid();
 

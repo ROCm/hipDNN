@@ -6,7 +6,6 @@
 #ifdef _WIN32
 
 #include "hipdnn_exception.hpp"
-#include <windows.h>
 
 namespace hipdnn_backend::platform_utils
 {
@@ -15,17 +14,21 @@ std::filesystem::path get_current_module_directory()
 {
     std::filesystem::path module_path;
 
-    HMODULE hModule = nullptr;
+    HMODULE module_handle = nullptr;
     if(GetModuleHandleExA(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS
                               | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
                           reinterpret_cast<LPCSTR>(&get_current_module_directory),
-                          &hModule))
+                          &module_handle)
+       == TRUE)
     {
-        char path_buffer[MAX_PATH];
-        DWORD len = GetModuleFileNameA(hModule, path_buffer, sizeof(path_buffer));
+        char* dst = new char[MAX_PATH];
+        DWORD len = GetModuleFileNameA(module_handle, dst, MAX_PATH);
+        std::string module_path_str(dst);
+        delete[] dst;
+
         if(len > 0 && len < MAX_PATH)
         {
-            module_path = std::filesystem::path(path_buffer).parent_path();
+            module_path = std::filesystem::path(module_path_str).parent_path();
         }
         else
         {
@@ -42,13 +45,13 @@ std::filesystem::path get_current_module_directory()
 
 Plugin_lib_handle open_library(const std::filesystem::path& library_path)
 {
-    PLUGIN_LIB_HANDLE handle = LoadLibraryW(library_path.wstring().c_str());
+    Plugin_lib_handle handle = LoadLibraryW(library_path.wstring().c_str());
     if(handle == nullptr)
     {
-        auto errorCode = GetLastError();
+        auto error_code = GetLastError();
         throw Hipdnn_exception(HIPDNN_STATUS_BAD_PARAM,
                                "Failed to load library: " + library_path.string()
-                                   + " (Error Code: " + std::to_string(errorCode) + ")");
+                                   + " (Error Code: " + std::to_string(error_code) + ")");
     }
 
     return handle;
@@ -61,13 +64,13 @@ void close_library(Plugin_lib_handle handle)
 
 void* get_symbol(Plugin_lib_handle handle, const char* symbol_name)
 {
-    void* symbol = GetProcAddress(handle, symbol_name);
+    void* symbol = reinterpret_cast<void*>(GetProcAddress(handle, symbol_name));
     if(symbol == nullptr)
     {
-        auto errorCode = GetLastError();
+        auto error_code = GetLastError();
         throw Hipdnn_exception(HIPDNN_STATUS_PLUGIN_ERROR,
                                "Failed to get symbol: " + std::string(symbol_name)
-                                   + " (Error Code: " + std::to_string(errorCode) + ")");
+                                   + " (Error Code: " + std::to_string(error_code) + ")");
     }
 
     return symbol;

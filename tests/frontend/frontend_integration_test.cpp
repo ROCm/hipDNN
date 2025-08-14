@@ -79,12 +79,12 @@ protected:
     {
         Simple_batchnorm_2d_tensor_bundle(const std::vector<int64_t>& dims)
             : derived_dims({1, dims[1], 1, 1})
-            , x_tensor(Tensor::make_nchw_tensor<Input_type>(dims))
-            , y_tensor(Tensor::make_nchw_tensor<Input_type>(dims))
-            , scale_tensor(Tensor::make_nchw_tensor<Intermediate_type>(derived_dims))
-            , bias_tensor(Tensor::make_nchw_tensor<Intermediate_type>(derived_dims))
-            , mean_tensor(Tensor::make_nchw_tensor<Intermediate_type>(derived_dims))
-            , variance_tensor(Tensor::make_nchw_tensor<Intermediate_type>(derived_dims))
+            , x_tensor(Tensor::make_tensor<Input_type>(dims))
+            , y_tensor(Tensor::make_tensor<Input_type>(dims))
+            , scale_tensor(Tensor::make_tensor<Intermediate_type>(derived_dims))
+            , bias_tensor(Tensor::make_tensor<Intermediate_type>(derived_dims))
+            , mean_tensor(Tensor::make_tensor<Intermediate_type>(derived_dims))
+            , variance_tensor(Tensor::make_tensor<Intermediate_type>(derived_dims))
         {
             // Initialize with simple constant values
             x_tensor.fill_with_value<Input_type>(static_cast<Input_type>(1.0f));

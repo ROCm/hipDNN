@@ -55,6 +55,22 @@ public:
                                                        const char* const* plugin_paths,
                                                        hipdnnPluginLoadingMode_ext_t mode)
         = 0;
+
+    static inline std::shared_ptr<Hipdnn_backend_interface> backend_instance;
+    static std::shared_ptr<Hipdnn_backend_interface> get_instance()
+    {
+        return backend_instance;
+    }
+
+    static void set_instance(std::shared_ptr<Hipdnn_backend_interface> instance)
+    {
+        backend_instance = std::move(instance);
+    }
+
+    static void reset_instance()
+    {
+        backend_instance.reset();
+    }
 };
 
 }
