@@ -98,20 +98,24 @@ public:
         }
 
         int64_t n_batches = x.dims().at(0);
-        std::vector<int64_t> channels(static_cast<size_t>(x.dims().at(1)));
-        std::iota(channels.begin(), channels.end(), 0);
+        int64_t n_channels = x.dims().at(1);
         int64_t height = x.dims().at(2);
         int64_t width = x.dims().at(3);
         int64_t nhw = n_batches * height * width; // Total elements per channel
+        auto nhw_f = static_cast<Mean_variance_data_type>(nhw);
+
+        std::vector<int64_t> channels(static_cast<size_t>(n_channels));
+        std::iota(channels.begin(), channels.end(), 0);
 
         std::for_each(channels.begin(), channels.end(), [&](int64_t cidx) {
+
             auto channel_mean = mean.get_host_value<Mean_variance_data_type>(0, cidx, 0, 0);
-            auto channel_inv_variance = invVariance.get_host_value<Mean_variance_data_type>(0, cidx, 0, 0);
+            auto channel_inv_variance = invVariance.get_host_value<Mean_variance_data_type>(0, cidx, 0, 0); // 1 / sqrt(var + eps)
             auto channel_scale = scale.get_host_value<Scale_bias_data_type>(0, cidx, 0, 0);
 
-            // Calculate dot product of (x - mean) * dy and sum of dy for this channel
+            // Calculate dot product of (x - mean) * channel_inv_variance * dy and ∑ dy for this channel
             Mean_variance_data_type dot_product = 0;
-            Mean_variance_data_type dy_sum = 0;
+            Mean_variance_data_type sum_dy = 0;
 
             for(int row = 0; row < height; row++)
             {
@@ -124,29 +128,29 @@ public:
                         auto dy_val = static_cast<Mean_variance_data_type>(
                             dy.get_host_value<Input_data_type>(bidx, cidx, row, column));
                         
-                        Mean_variance_data_type x_hat = x_val - channel_mean;
+                        Mean_variance_data_type x_hat = (x_val - channel_mean) * channel_inv_variance;
                         dot_product += x_hat * dy_val;
-                        dy_sum += dy_val;
+                        sum_dy += dy_val;
                     }
                 }
             }
 
             // Per channel:
-            // - dscale = invVariance * ∑ (x_hat * dy)  
+            // - dscale = ∑ (x_hat * dy)  
             // - dbias = ∑ dy
+            // - dx = scale * inv_variance * (dy - mean(dy) - x_hat * mean(dy * x_hat))
 
             dscale.set_host_value<Scale_bias_data_type>(
                 0, cidx, 0, 0, 
-                static_cast<Scale_bias_data_type>(dot_product * channel_inv_variance));
+                static_cast<Scale_bias_data_type>(dot_product));
             
             dbias.set_host_value<Scale_bias_data_type>(
                 0, cidx, 0, 0, 
-                static_cast<Scale_bias_data_type>(dy_sum));
+                static_cast<Scale_bias_data_type>(sum_dy));
 
-            // Calculate dx for this channel
-            // training: dx = scale * inv_variance * (dy - (dbias / nhw) - (x_hat) * mean((x - mean) * dy))
-            Mean_variance_data_type dy_mean = dy_sum / static_cast<Mean_variance_data_type>(nhw);
-            Mean_variance_data_type k = dot_product * channel_inv_variance * channel_inv_variance / static_cast<Mean_variance_data_type>(nhw);
+            Mean_variance_data_type mean_dy = sum_dy / nhw_f;
+            Mean_variance_data_type mean_dy_xhat = dot_product / nhw_f;
+            Mean_variance_data_type scalar_coef = static_cast<Mean_variance_data_type>(channel_scale) * channel_inv_variance;
 
             for(int row = 0; row < height; row++)
             {
@@ -159,10 +163,8 @@ public:
                         auto dy_val = static_cast<Mean_variance_data_type>(
                             dy.get_host_value<Input_data_type>(bidx, cidx, row, column));
                         
-                        Mean_variance_data_type x_hat = x_val - channel_mean;
-                        Mean_variance_data_type dx_val = (dy_val - dy_mean - x_hat * k) 
-                                                       * channel_inv_variance 
-                                                       * static_cast<Mean_variance_data_type>(channel_scale);
+                        Mean_variance_data_type x_hat = (x_val - channel_mean) * channel_inv_variance;
+                        Mean_variance_data_type dx_val = (dy_val - mean_dy - x_hat * mean_dy_xhat) * scalar_coef;
                         
                         dx.set_host_value<Input_data_type>(
                             bidx, cidx, row, column, 
