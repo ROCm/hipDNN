@@ -165,7 +165,7 @@ void Engine_plugin_resource_manager::set_stream(hipStream_t stream) const
 std::vector<int64_t> Engine_plugin_resource_manager::get_applicable_engine_ids(
     const Graph_descriptor* graph_desc) const
 {
-    if (graph_desc == nullptr)
+    if(graph_desc == nullptr)
     {
         throw Hipdnn_exception(HIPDNN_STATUS_BAD_PARAM, "Graph descriptor cannot be null");
     }
@@ -200,20 +200,20 @@ void Engine_plugin_resource_manager::get_engine_details(
     const Graph_descriptor* graph_desc,
     hipdnnPluginConstData_t* engine_details) const
 {
-    if (graph_desc == nullptr)
+    if(graph_desc == nullptr)
     {
         throw Hipdnn_exception(HIPDNN_STATUS_BAD_PARAM, "Graph descriptor cannot be null");
     }
 
-    if (engine_details == nullptr)
+    if(engine_details == nullptr)
     {
         throw Hipdnn_exception(HIPDNN_STATUS_BAD_PARAM, "Engine details cannot be null");
     }
 
     auto it = _engine_id_to_handle.find(engine_id);
-    if (it == _engine_id_to_handle.end())
+    if(it == _engine_id_to_handle.end())
     {
-        throw Hipdnn_exception(HIPDNN_STATUS_BAD_PARAM, 
+        throw Hipdnn_exception(HIPDNN_STATUS_BAD_PARAM,
                                "Invalid engine ID: " + std::to_string(engine_id));
     }
 
@@ -254,20 +254,20 @@ size_t
                                                        const hipdnnPluginConstData_t* engine_config,
                                                        const Graph_descriptor* graph_desc) const
 {
-    if (engine_config == nullptr)
+    if(engine_config == nullptr)
     {
         throw Hipdnn_exception(HIPDNN_STATUS_BAD_PARAM, "Engine config cannot be null");
     }
 
-    if (graph_desc == nullptr)
+    if(graph_desc == nullptr)
     {
         throw Hipdnn_exception(HIPDNN_STATUS_BAD_PARAM, "Graph descriptor cannot be null");
     }
 
     auto it = _engine_id_to_handle.find(engine_id);
-    if (it == _engine_id_to_handle.end())
+    if(it == _engine_id_to_handle.end())
     {
-        throw Hipdnn_exception(HIPDNN_STATUS_BAD_PARAM, 
+        throw Hipdnn_exception(HIPDNN_STATUS_BAD_PARAM,
                                "Invalid engine ID: " + std::to_string(engine_id));
     }
 
@@ -286,20 +286,20 @@ hipdnnEnginePluginExecutionContext_t Engine_plugin_resource_manager::create_exec
     const hipdnnPluginConstData_t* engine_config,
     const Graph_descriptor* graph_desc) const
 {
-    if (engine_config == nullptr)
+    if(engine_config == nullptr)
     {
         throw Hipdnn_exception(HIPDNN_STATUS_BAD_PARAM, "Engine config cannot be null");
     }
 
-    if (graph_desc == nullptr)
+    if(graph_desc == nullptr)
     {
         throw Hipdnn_exception(HIPDNN_STATUS_BAD_PARAM, "Graph descriptor cannot be null");
     }
 
     auto it = _engine_id_to_handle.find(engine_id);
-    if (it == _engine_id_to_handle.end())
+    if(it == _engine_id_to_handle.end())
     {
-        throw Hipdnn_exception(HIPDNN_STATUS_BAD_PARAM, 
+        throw Hipdnn_exception(HIPDNN_STATUS_BAD_PARAM,
                                "Invalid engine ID: " + std::to_string(engine_id));
     }
 

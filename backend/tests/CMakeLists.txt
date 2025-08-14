@@ -41,6 +41,7 @@ target_link_libraries(hipdnn_backend_tests
     GTest::gmock
     pthread
     hipdnn_backend_private
+    hipdnn_backend
     hipdnn_sdk
     ${CMAKE_DL_LIBS}
 )
