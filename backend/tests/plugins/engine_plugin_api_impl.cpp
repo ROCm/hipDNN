@@ -87,8 +87,10 @@ extern "C" hipdnnPluginStatus_t
     return hipdnn_plugin::try_catch([&]() {
         check_handle_validity(handle);
         THROW_IF_NULL(op_graph);
-        THROW_IF_NULL(engine_ids);
-        THROW_IF_EQ(max_engines, 0);
+        if(max_engines != 0)
+        {
+            THROW_IF_NULL(engine_ids);
+        }
         THROW_IF_NULL(num_engines);
 
         get_applicable_engine_ids(handle, op_graph, engine_ids, max_engines, num_engines);

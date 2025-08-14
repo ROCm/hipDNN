@@ -236,7 +236,10 @@ hipdnnPluginStatus_t
     return hipdnn_plugin::try_catch([&, api_name = __func__]() {
         throw_if_null(handle);
         throw_if_null(op_graph);
-        throw_if_null(engine_ids);
+        if(max_engines != 0)
+        {
+            throw_if_null(engine_ids);
+        }
         throw_if_null(num_engines);
 
         auto& engine_manager = handle->get_engine_manager();
