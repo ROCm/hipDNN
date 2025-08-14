@@ -5,6 +5,7 @@
 
 #include <hipdnn_sdk/logging/component_formatter.hpp>
 #include <hipdnn_sdk/logging/formatting.hpp>
+#include <hipdnn_sdk/utilities/platform_utils.hpp>
 #include <iostream>
 
 #include <hipdnn_sdk/logging/callback_types.h>
@@ -41,11 +42,11 @@ void initialize()
             return;
         }
 
-        const char* log_level = std::getenv("HIPDNN_LOG_LEVEL");
-        const char* log_file_path = std::getenv("HIPDNN_LOG_FILE");
+        std::string log_level = hipdnn_sdk::utilities::get_env("HIPDNN_LOG_LEVEL", "off");
+        std::string log_file_path = hipdnn_sdk::utilities::get_env("HIPDNN_LOG_FILE");
 
         // It doesn't need to return if log_level == off, but it avoids unnecessary initialization
-        if(log_level == nullptr || std::string(log_level) == "off")
+        if(log_level == "off")
         {
             s_logging_initialized = true;
             return;
@@ -57,7 +58,7 @@ void initialize()
         }
 
         std::shared_ptr<spdlog::sinks::sink> shared_sink;
-        if(log_file_path != nullptr && !std::string(log_file_path).empty())
+        if(!log_file_path.empty())
         {
             shared_sink = std::make_shared<spdlog::sinks::basic_file_sink_mt>(log_file_path, false);
         }

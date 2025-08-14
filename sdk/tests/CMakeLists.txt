@@ -11,6 +11,7 @@ endif()
 add_compile_definitions(__HIP_PLATFORM_AMD__)
 add_compile_definitions(__HIPCC__)
 find_package(hip REQUIRED)
+find_package(Threads REQUIRED)
 enable_language(HIP)
 
 add_executable(hipdnn_sdk_tests
@@ -39,7 +40,7 @@ target_compile_definitions(hipdnn_sdk_tests PRIVATE
 target_compile_options(hipdnn_sdk_tests PRIVATE ${HIPDNN_WARNING_COMPILE_OPTIONS})
 target_link_libraries(hipdnn_sdk_tests 
     GTest::gtest
-    pthread
+    Threads::Threads
     hipdnn_sdk
     hip::host
     hip::device
@@ -48,4 +49,3 @@ target_link_libraries(hipdnn_sdk_tests
 )
 
 add_target_to_check_targets(hipdnn_sdk_tests ${CMAKE_CURRENT_BINARY_DIR})
-

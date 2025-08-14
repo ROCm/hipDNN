@@ -4,6 +4,13 @@
 hipdnn_add_dependency(GTest v1.16.0)
 include(GoogleTest)
 
+# Set executable prefix based on platform
+if(WIN32)
+    set(EXEC_PREFIX "")
+else()
+    set(EXEC_PREFIX "./")
+endif()
+
 set(CHECK_COMMAND_GLOBAL "" CACHE INTERNAL "Accumulated check commands" FORCE)
 set(CHECK_DEPENDS_GLOBAL "" CACHE INTERNAL "Accumulated check depends" FORCE)
 function(append_test_to_check_target TARGET WORKING_DIR)
@@ -11,9 +18,9 @@ function(append_test_to_check_target TARGET WORKING_DIR)
 
     set(NEW_COMMAND "")
     if("${CHECK_COMMAND_GLOBAL}" STREQUAL "")
-    set(NEW_COMMAND cd ${WORKING_DIR} && ${TEST_ENVIRONMENT} ./${TARGET})
+    set(NEW_COMMAND cd ${WORKING_DIR} && ${TEST_ENVIRONMENT} ${EXEC_PREFIX}${TARGET})
     else()
-    set(NEW_COMMAND && cd ${WORKING_DIR} && ${TEST_ENVIRONMENT} ./${TARGET})
+    set(NEW_COMMAND && cd ${WORKING_DIR} && ${TEST_ENVIRONMENT} ${EXEC_PREFIX}${TARGET})
     endif()
     set(CHECK_COMMAND_GLOBAL ${CHECK_COMMAND_GLOBAL} ${NEW_COMMAND} CACHE INTERNAL "Accumulated check targets" FORCE)
     set(CHECK_DEPENDS_GLOBAL ${CHECK_DEPENDS_GLOBAL} ${TARGET} CACHE INTERNAL "Accumulated check depends" FORCE)    
