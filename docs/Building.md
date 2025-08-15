@@ -62,10 +62,6 @@ mkdir build
 cd build
 cmake -DBUILD_ADDRESS_SANITIZER=ON ..
 
-# python frontend api (requires pybind11 preinstallation)
-mkdir build
-cd build
-cmake -DHIP_DNN_FRONTEND_BUILD_PYTHON_BINDINGS=ON ..
 ```
 
 #### Ninja Targets
