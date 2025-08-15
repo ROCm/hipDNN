@@ -32,8 +32,8 @@ public:
     void batchnorm_fwd_inference(const Tensor& input,
                                  const Tensor& scale,
                                  const Tensor& bias,
-                                 const Tensor& estimatedMean,
-                                 const Tensor& estimatedVariance,
+                                 const Tensor& estimated_mean,
+                                 const Tensor& estimated_variance,
                                  Tensor& output,
                                  double epsilon) override
     {
@@ -49,19 +49,20 @@ public:
         int64_t width = input.dims().at(3);
 
         std::for_each(channels.begin(), channels.end(), [&](int64_t cidx) {
-            auto mean = estimatedMean.get_host_value<Mean_variance_data_type>(0, cidx, 0, 0);
+            auto mean = estimated_mean.get_host_value<Mean_variance_data_type>(0, cidx, 0, 0);
             auto variance
-                = estimatedVariance.get_host_value<Mean_variance_data_type>(0, cidx, 0, 0);
+                = estimated_variance.get_host_value<Mean_variance_data_type>(0, cidx, 0, 0);
             Mean_variance_data_type invert_var
                 = static_cast<Mean_variance_data_type>(1.0f)
                   / sqrt_internal(variance + static_cast<Mean_variance_data_type>(epsilon));
+
             // process the batch per channel
-            for(int row = 0; row < height; row++)
-            { // via rows
-                for(int column = 0; column < width; column++)
-                { // via columns
-                    for(int bidx = 0; bidx < n_batches; bidx++)
-                    { // via mini_batch
+            for(int bidx = 0; bidx < n_batches; bidx++)
+            {
+                for(int row = 0; row < height; row++)
+                {
+                    for(int column = 0; column < width; column++)
+                    {
                         auto in = static_cast<Mean_variance_data_type>(
                             input.get_host_value<Input_data_type>(bidx, cidx, row, column));
                         Mean_variance_data_type elem_std = in - mean;
@@ -86,7 +87,7 @@ public:
     void batchnorm_bwd(const Tensor& dy,
                        const Tensor& x,
                        const Tensor& mean,
-                       const Tensor& invVariance,
+                       const Tensor& inv_variance,
                        const Tensor& scale,
                        Tensor& dx,
                        Tensor& dscale,
@@ -109,7 +110,7 @@ public:
 
         std::for_each(channels.begin(), channels.end(), [&](int64_t cidx) {
             auto channel_mean = mean.get_host_value<Mean_variance_data_type>(0, cidx, 0, 0);
-            auto channel_inv_variance = invVariance.get_host_value<Mean_variance_data_type>(
+            auto channel_inv_variance = inv_variance.get_host_value<Mean_variance_data_type>(
                 0, cidx, 0, 0); // 1 / sqrt(var + eps)
             auto channel_scale = scale.get_host_value<Scale_bias_data_type>(0, cidx, 0, 0);
 
@@ -117,11 +118,11 @@ public:
             Mean_variance_data_type dot_product = 0;
             Mean_variance_data_type sum_dy = 0;
 
-            for(int row = 0; row < height; row++)
+            for(int bidx = 0; bidx < n_batches; bidx++)
             {
-                for(int column = 0; column < width; column++)
+                for(int row = 0; row < height; row++)
                 {
-                    for(int bidx = 0; bidx < n_batches; bidx++)
+                    for(int column = 0; column < width; column++)
                     {
                         auto x_val = static_cast<Mean_variance_data_type>(
                             x.get_host_value<Input_data_type>(bidx, cidx, row, column));
@@ -152,11 +153,11 @@ public:
             Mean_variance_data_type scalar_coef
                 = static_cast<Mean_variance_data_type>(channel_scale) * channel_inv_variance;
 
-            for(int row = 0; row < height; row++)
+            for(int bidx = 0; bidx < n_batches; bidx++)
             {
-                for(int column = 0; column < width; column++)
+                for(int row = 0; row < height; row++)
                 {
-                    for(int bidx = 0; bidx < n_batches; bidx++)
+                    for(int column = 0; column < width; column++)
                     {
                         auto x_val = static_cast<Mean_variance_data_type>(
                             x.get_host_value<Input_data_type>(bidx, cidx, row, column));
