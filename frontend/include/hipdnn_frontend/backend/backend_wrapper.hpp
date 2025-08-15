@@ -21,14 +21,14 @@ public:
         return hipdnnDestroy(handle);
     }
 
-    hipdnnStatus_t set_stream(hipdnnHandle_t handle, hipStream_t streamId) override
+    hipdnnStatus_t set_stream(hipdnnHandle_t handle, hipStream_t stream_id) override
     {
-        return hipdnnSetStream(handle, streamId);
+        return hipdnnSetStream(handle, stream_id);
     }
 
-    hipdnnStatus_t get_stream(hipdnnHandle_t handle, hipStream_t* streamId) override
+    hipdnnStatus_t get_stream(hipdnnHandle_t handle, hipStream_t* stream_id) override
     {
-        return hipdnnGetStream(handle, streamId);
+        return hipdnnGetStream(handle, stream_id);
     }
 
     hipdnnStatus_t backend_create_descriptor(hipdnnBackendDescriptorType_t descriptor_type,

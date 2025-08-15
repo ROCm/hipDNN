@@ -37,6 +37,7 @@ CheckOptions:
   - { key: readability-identifier-naming.StructCase,              value: Leading_upper_snake_case }
   - { key: readability-identifier-naming.FunctionCase,            value: lower_case }
   - { key: readability-identifier-naming.VariableCase,            value: lower_case }
+  - { key: readability-identifier-naming.ParameterCase,           value: lower_case }
   - { key: readability-identifier-naming.PrivateMemberCase,       value: lower_case }
   - { key: readability-identifier-naming.PrivateMemberPrefix,     value: _ }
 #  - { key: readability-identifier-naming.EnumCase,                value: Leading_upper_snake_case  }
