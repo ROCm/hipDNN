@@ -31,9 +31,9 @@ private:
 public:
     std::string name;
 
-    DerivedT& set_name(const std::string& name_)
+    DerivedT& set_name(const std::string& name_value)
     {
-        name = name_;
+        name = name_value;
         return self();
     }
 

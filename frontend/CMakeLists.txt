@@ -3,11 +3,6 @@
 
 set(HIP_DNN_FRONTEND_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include")
 
-option(HIP_DNN_FRONTEND_BUILD_PYTHON_BINDINGS "Defines if python bindings are built or not." OFF)
-
-if (HIP_DNN_FRONTEND_BUILD_PYTHON_BINDINGS)
-    add_subdirectory(python)
-endif()
 add_subdirectory(tests)
 
 add_library(hipdnn_frontend INTERFACE)
