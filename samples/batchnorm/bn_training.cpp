@@ -7,6 +7,8 @@
 #include <hipdnn_frontend.hpp>
 #include <hipdnn_frontend/attributes/batchnorm_attributes.hpp>
 #include <hipdnn_frontend/graph.hpp>
+#include <hipdnn_sdk/test_utilities/cpu_fp_reference_implementation.hpp>
+#include <hipdnn_sdk/test_utilities/cpu_fp_reference_validation.hpp>
 #include <hipdnn_sdk/utilities/tensor.hpp>
 
 #include <iostream>
@@ -16,6 +18,7 @@
 using namespace hipdnn_frontend;
 using namespace hipdnn_sdk::utilities;
 
+// TODO: verify this sample when applicable engines are added
 template <typename InputType, typename IntermediateType>
 void Sample_runner::operator()(const Tensor_layout& layout)
 {
@@ -23,7 +26,7 @@ void Sample_runner::operator()(const Tensor_layout& layout)
     auto intermediate_type = get_data_type_enum_from_type<IntermediateType>();
 
     std::cout << "Running batch normalization training graph " << input_type << " [" << layout
-              << "]...\n";
+              << "]" << (config.cpu_validation ? " (with CPU validation)" : "") << "...\n";
 
     int64_t N = 16; // BATCH SIZE
     int64_t C = 16; // CHANNELS (FEATURES)
@@ -97,7 +100,7 @@ void Sample_runner::operator()(const Tensor_layout& layout)
         static_cast<IntermediateType>(0.1f), static_cast<IntermediateType>(1.0f));
 
     momentum_tensor.memory().template host_data<IntermediateType>()[0] = 0.1f;
-    epsilon_tensor.memory().template host_data<IntermediateType>()[0] = 1e-5f;
+    epsilon_tensor.memory().template host_data<IntermediateType>()[0] = get_epsilon<InputType>();
 
     std::unordered_map<int64_t, void*> variant_pack;
 
@@ -123,10 +126,54 @@ void Sample_runner::operator()(const Tensor_layout& layout)
     HIPDNN_FE_CHECK(graph->execute(handle, variant_pack, nullptr));
 
     y_tensor.memory().mark_device_modified();
+    next_mean_tensor.memory().mark_device_modified();
+    next_var_tensor.memory().mark_device_modified();
+    saved_mean_tensor.memory().mark_device_modified();
+    saved_inv_var_tensor.memory().mark_device_modified();
+
     auto y_host_ptr = y_tensor.memory().template host_data<InputType>();
 
-    // TODO: Add CPU reference when available.
-    // Example in bn_inference.cpp.
+    if(config.cpu_validation)
+    {
+        std::cout << "Running CPU reference validation...\n";
+
+        auto ref_impl = hipdnn_sdk::reference_test_utilities::
+            Cpu_fp_reference_implementation<InputType, IntermediateType>();
+        
+        auto y_ref_tensor = Tensor::make_tensor<InputType>(y->get_dim(), layout);
+        auto next_mean_ref_tensor = Tensor::make_tensor<IntermediateType>(next_running_mean->get_dim());
+        auto next_var_ref_tensor = Tensor::make_tensor<IntermediateType>(next_running_var->get_dim());
+        auto saved_mean_ref_tensor = Tensor::make_tensor<IntermediateType>(saved_mean->get_dim());
+        auto saved_inv_var_ref_tensor = Tensor::make_tensor<IntermediateType>(saved_inv_variance->get_dim());
+
+        // TODO: Uncomment when CPU reference implemented
+        // ref_impl.batchnorm_fwd_training(x_tensor,
+        //                                scale_tensor,
+        //                                bias_tensor,
+        //                                prev_mean_tensor,
+        //                                prev_var_tensor,
+        //                                momentum_tensor.memory().template host_data<IntermediateType>()[0],
+        //                                epsilon_tensor.memory().template host_data<IntermediateType>()[0],
+        //                                y_ref_tensor,
+        //                                next_mean_ref_tensor,
+        //                                next_var_ref_tensor,
+        //                                saved_mean_ref_tensor,
+        //                                saved_inv_var_ref_tensor);
+
+        // auto epsilon_val = get_epsilon_for_type<InputType>();
+        // 
+        // auto validator
+        //     = hipdnn_sdk::reference_test_utilities::Cpu_fp_reference_validation<InputType>(
+        //         static_cast<InputType>(epsilon_val), static_cast<InputType>(epsilon_val));
+        //
+        // std::cout << "CPU reference validation "
+        //           << (validator.compare_buffers(y_ref_tensor.memory(), y_tensor.memory())
+        //                   ? "successful"
+        //                   : "failed")
+        //           << ".\n";
+        
+        std::cout << "CPU reference validation skipped - batchnorm training forward not yet implemented.\n";
+    }
 
     std::cout << "First 10 y values: ";
     for(int i = 0; i < 10; ++i)

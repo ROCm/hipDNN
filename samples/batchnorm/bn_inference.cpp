@@ -119,7 +119,7 @@ void Sample_runner::operator()(const Tensor_layout& layout)
                                    / (inv_variance_host_ptr[i] * inv_variance_host_ptr[i]);
         }
 
-        auto epsilon = 1e-2f; // bf16 fails for lower epsilon values
+        auto epsilon = get_epsilon<InputType>();
 
         ref_impl.batchnorm_fwd_inference(x_tensor,
                                          scale_tensor,
