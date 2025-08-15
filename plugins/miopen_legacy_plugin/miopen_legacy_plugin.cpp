@@ -99,6 +99,58 @@ hipdnnPluginStatus_t hipdnnPluginSetLoggingCallback(hipdnnCallback_t callback)
     });
 }
 
+hipdnnPluginStatus_t hipdnnEnginePluginGetAllEngineIds(int64_t* engine_ids,
+                                                       uint32_t max_engines,
+                                                       uint32_t* num_engines)
+{
+    LOG_API_ENTRY("engine_ids={:p}, max_engines={}, num_engines={:p}",
+                  static_cast<void*>(engine_ids),
+                  max_engines,
+                  static_cast<void*>(num_engines));
+
+    return hipdnn_plugin::try_catch([&, api_name = __func__]() {
+        if(max_engines != 0)
+        {
+            throw_if_null(engine_ids);
+        }
+        throw_if_null(num_engines);
+
+        // For now, we will just return a single engine ID.
+        auto all_engine_ids = std::vector<int64_t>({1});
+        if(all_engine_ids.size() > std::numeric_limits<uint32_t>::max())
+        {
+            throw Hipdnn_plugin_exception(HIPDNN_PLUGIN_STATUS_INTERNAL_ERROR,
+                                          "Number of engines exceeds maximum uint32_t value.");
+        }
+
+        if(max_engines == 0)
+        {
+            *num_engines = static_cast<uint32_t>(all_engine_ids.size());
+        }
+        else
+        {
+            *num_engines = 0;
+            for(auto engine_id : all_engine_ids)
+            {
+                if(*num_engines == max_engines)
+                {
+                    *num_engines = static_cast<uint32_t>(all_engine_ids.size());
+                    HIPDNN_LOG_INFO("Maximum number of engines reached ({}), ignoring additional "
+                                    "engines, num_engines count: {}",
+                                    max_engines,
+                                    *num_engines);
+                    break;
+                }
+
+                engine_ids[*num_engines] = engine_id;
+                (*num_engines)++;
+            }
+        }
+
+        LOG_API_SUCCESS(api_name, "num_engines={}", *num_engines);
+    });
+}
+
 hipdnnPluginStatus_t hipdnnEnginePluginCreate(hipdnnEnginePluginHandle_t* handle)
 {
     LOG_API_ENTRY("handle_ptr={:p}", static_cast<void*>(handle));
@@ -184,7 +236,10 @@ hipdnnPluginStatus_t
     return hipdnn_plugin::try_catch([&, api_name = __func__]() {
         throw_if_null(handle);
         throw_if_null(op_graph);
-        throw_if_null(engine_ids);
+        if(max_engines != 0)
+        {
+            throw_if_null(engine_ids);
+        }
         throw_if_null(num_engines);
 
         auto& engine_manager = handle->get_engine_manager();

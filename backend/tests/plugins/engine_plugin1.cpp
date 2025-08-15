@@ -63,6 +63,15 @@ void run_engine(const uint32_t* input, uint32_t* output, uint32_t size)
 
 } // namespace
 
+void get_all_engine_ids(int64_t* engine_ids, uint32_t max_engines, uint32_t* num_engines)
+{
+    for(uint32_t i = 0; i < max_engines && i < PLUGIN_NUM_ENGINES; ++i)
+    {
+        engine_ids[i] = PLUGIN_FIRST_ENGINE_ID + i;
+    }
+    *num_engines = PLUGIN_NUM_ENGINES;
+}
+
 void get_applicable_engine_ids(hipdnnEnginePluginHandle_t handle,
                                const hipdnnPluginConstData_t* op_graph,
                                int64_t* engine_ids,
