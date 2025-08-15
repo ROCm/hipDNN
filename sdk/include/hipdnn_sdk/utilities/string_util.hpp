@@ -16,7 +16,11 @@ static void
         return;
     }
 
+#ifdef _WIN32
+    strncpy_s(destination, max_size, source, max_size - 1);
+#else
     std::strncpy(destination, source, max_size - 1);
+#endif
     destination[max_size - 1] = '\0';
 }
 }
