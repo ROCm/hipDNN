@@ -85,10 +85,7 @@ std::vector<int64_t> Engine_plugin::get_all_engine_ids() const
     invoke_plugin_function(
         "get number of engines", _func_get_all_engine_ids, nullptr, 0u, &num_engines);
 
-    if(num_engines == 0)
-    {
-        throw Hipdnn_exception(HIPDNN_STATUS_PLUGIN_ERROR, "No engines found in the plugin");
-    }
+    THROW_IF_EQ(num_engines, 0, HIPDNN_STATUS_PLUGIN_ERROR, "No engines found in the plugin");
 
     const uint32_t max_engines = num_engines;
     std::vector<int64_t> engine_ids(max_engines);
@@ -99,13 +96,10 @@ std::vector<int64_t> Engine_plugin::get_all_engine_ids() const
                            max_engines,
                            &num_engines);
 
-    if(num_engines != max_engines)
-    {
-        throw Hipdnn_exception(HIPDNN_STATUS_PLUGIN_ERROR,
-                               "Number of engines returned does not match expected count");
-    }
-
-    engine_ids.resize(num_engines);
+    THROW_IF_NE(num_engines,
+                max_engines,
+                HIPDNN_STATUS_PLUGIN_ERROR,
+                "Number of engines returned does not match expected count");
 
     std::ranges::sort(engine_ids);
     if(std::ranges::adjacent_find(engine_ids) != engine_ids.end())
@@ -165,10 +159,10 @@ std::vector<int64_t>
         return {}; // No applicable engines found
     }
 
-    if(num_engines > max_engines)
-    {
-        throw Hipdnn_exception(HIPDNN_STATUS_PLUGIN_ERROR, "More applicable engines than expected");
-    }
+    THROW_IF_LT(max_engines,
+                num_engines,
+                HIPDNN_STATUS_PLUGIN_ERROR,
+                "More applicable engines than expected");
 
     engine_ids.resize(num_engines);
 
