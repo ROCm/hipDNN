@@ -25,10 +25,21 @@ public:
     virtual void batchnorm_fwd_inference(const Tensor& input,
                                          const Tensor& scale,
                                          const Tensor& bias,
-                                         const Tensor& estimatedMean,
-                                         const Tensor& estimatedVariance,
+                                         const Tensor& estimated_mean,
+                                         const Tensor& estimated_variance,
                                          Tensor& output,
                                          double epsilon)
+        = 0;
+
+    // Could call this bwd_training or bwd_propagation
+    virtual void batchnorm_bwd(const Tensor& dy,
+                               const Tensor& x,
+                               const Tensor& mean,
+                               const Tensor& inv_variance,
+                               const Tensor& scale,
+                               Tensor& dx,
+                               Tensor& dscale,
+                               Tensor& dbias)
         = 0;
 };
 
