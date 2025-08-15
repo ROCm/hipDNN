@@ -9,7 +9,6 @@ namespace miopen_legacy_plugin
 
 Miopen_tensor::Miopen_tensor(const hipdnn_sdk::data_objects::TensorAttributes& tensor)
     : _uid(tensor.uid())
-    , _descriptor(nullptr)
 {
     THROW_ON_MIOPEN_FAILURE(miopenCreateTensorDescriptor(&_descriptor));
 

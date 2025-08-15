@@ -22,7 +22,7 @@ public:
 
 private:
     int64_t _uid;
-    miopenTensorDescriptor_t _descriptor;
+    miopenTensorDescriptor_t _descriptor{nullptr};
 };
 
 }

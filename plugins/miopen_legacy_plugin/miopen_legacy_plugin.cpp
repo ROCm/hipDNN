@@ -19,8 +19,8 @@
 #include "miopen_container.hpp"
 #include "miopen_handle_factory.hpp"
 
-static const char* _plugin_name = "miopen_legacy_plugin";
-static const char* _plugin_version = "1.0.0";
+static const char* plugin_name = "miopen_legacy_plugin";
+static const char* plugin_version = "1.0.0";
 
 using namespace hipdnn_plugin;
 using namespace miopen_legacy_plugin;
@@ -44,7 +44,7 @@ hipdnnPluginStatus_t hipdnnPluginGetName(const char** name)
     return hipdnn_plugin::try_catch([&, api_name = __func__]() {
         throw_if_null(name);
 
-        *name = _plugin_name;
+        *name = plugin_name;
 
         LOG_API_SUCCESS(api_name, "plugin_name={:p}", static_cast<void*>(name));
     });
@@ -57,7 +57,7 @@ hipdnnPluginStatus_t hipdnnPluginGetVersion(const char** version)
     return hipdnn_plugin::try_catch([&, api_name = __func__]() {
         throw_if_null(version);
 
-        *version = _plugin_version;
+        *version = plugin_version;
 
         LOG_API_SUCCESS(api_name, "version={:p}", static_cast<void*>(version));
     });
@@ -94,7 +94,7 @@ hipdnnPluginStatus_t hipdnnPluginSetLoggingCallback(hipdnnCallback_t callback)
 {
     return hipdnn_plugin::try_catch([&, api_name = __func__]() {
         throw_if_null(callback);
-        hipdnn::logging::initialize_callback_logging(_plugin_name, callback);
+        hipdnn::logging::initialize_callback_logging(plugin_name, callback);
         LOG_API_SUCCESS(api_name, "");
     });
 }

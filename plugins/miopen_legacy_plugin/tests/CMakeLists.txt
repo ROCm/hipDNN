@@ -46,6 +46,7 @@ target_link_libraries(miopen_legacy_plugin_tests PUBLIC
     hip::host
     hip::device
     miopen_legacy_plugin
+    miopen_legacy_plugin_private
     Threads::Threads
 )
 
