@@ -25,8 +25,8 @@ public:
     virtual void batchnorm_fwd_inference(const Tensor& input,
                                          const Tensor& scale,
                                          const Tensor& bias,
-                                         const Tensor& estimatedMean,
-                                         const Tensor& estimatedVariance,
+                                         const Tensor& estimated_mean,
+                                         const Tensor& estimated_variance,
                                          Tensor& output,
                                          double epsilon)
         = 0;

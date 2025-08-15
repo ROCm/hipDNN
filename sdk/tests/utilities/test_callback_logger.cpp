@@ -17,10 +17,10 @@ static std::mutex g_log_mutex;
 
 // Custom callback for testing. It doesn't fully simulate the real logging behavior,
 // but the backend tests use the true callback function. The test could use the backend callback, but then it has to link against the backend.
-void test_logging_callback(hipdnnSeverity_t, const char* msg)
+void test_logging_callback(hipdnnSeverity_t severity [[maybe_unused]], const char* msg)
 {
     std::lock_guard<std::mutex> lock(g_log_mutex);
-    if(msg)
+    if(msg != nullptr)
     {
         g_captured_logs.emplace_back(msg);
     }
@@ -49,7 +49,7 @@ protected:
         spdlog::shutdown();
     }
 
-    std::vector<std::string> get_captured_logs()
+    static std::vector<std::string> get_captured_logs()
     {
         spdlog::shutdown(); // block until async queue is fully processed
         return g_captured_logs;

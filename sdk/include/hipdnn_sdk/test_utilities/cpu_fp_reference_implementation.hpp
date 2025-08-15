@@ -32,8 +32,8 @@ public:
     void batchnorm_fwd_inference(const Tensor& input,
                                  const Tensor& scale,
                                  const Tensor& bias,
-                                 const Tensor& estimatedMean,
-                                 const Tensor& estimatedVariance,
+                                 const Tensor& estimated_mean,
+                                 const Tensor& estimated_variance,
                                  Tensor& output,
                                  double epsilon) override
     {
@@ -49,9 +49,9 @@ public:
         int64_t width = input.dims().at(3);
 
         std::for_each(channels.begin(), channels.end(), [&](int64_t cidx) {
-            auto mean = estimatedMean.get_host_value<Mean_variance_data_type>(0, cidx, 0, 0);
+            auto mean = estimated_mean.get_host_value<Mean_variance_data_type>(0, cidx, 0, 0);
             auto variance
-                = estimatedVariance.get_host_value<Mean_variance_data_type>(0, cidx, 0, 0);
+                = estimated_variance.get_host_value<Mean_variance_data_type>(0, cidx, 0, 0);
             Mean_variance_data_type invert_var
                 = static_cast<Mean_variance_data_type>(1.0f)
                   / sqrt_internal(variance + static_cast<Mean_variance_data_type>(epsilon));

@@ -18,8 +18,8 @@ public:
 
     virtual hipdnnStatus_t create(hipdnnHandle_t* handle) = 0;
     virtual hipdnnStatus_t destroy(hipdnnHandle_t handle) = 0;
-    virtual hipdnnStatus_t set_stream(hipdnnHandle_t handle, hipStream_t streamId) = 0;
-    virtual hipdnnStatus_t get_stream(hipdnnHandle_t handle, hipStream_t* streamId) = 0;
+    virtual hipdnnStatus_t set_stream(hipdnnHandle_t handle, hipStream_t stream_id) = 0;
+    virtual hipdnnStatus_t get_stream(hipdnnHandle_t handle, hipStream_t* stream_id) = 0;
     virtual hipdnnStatus_t backend_create_descriptor(hipdnnBackendDescriptorType_t descriptor_type,
                                                      hipdnnBackendDescriptor_t* descriptor)
         = 0;

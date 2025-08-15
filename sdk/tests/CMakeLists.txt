@@ -48,4 +48,5 @@ target_link_libraries(hipdnn_sdk_tests
     ${CMAKE_DL_LIBS}
 )
 
+clang_tidy_check(hipdnn_sdk_tests)
 add_target_to_check_targets(hipdnn_sdk_tests ${CMAKE_CURRENT_BINARY_DIR})
