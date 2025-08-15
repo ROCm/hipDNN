@@ -98,7 +98,7 @@ TEST(CpuFpReferenceImplementation, BatchnormInferFloatUsageNHWC)
         input_tensor, scale_tensor, bias_tensor, mean_tensor, variance_tensor, output_tensor, 1e-5);
 }
 
-TEST(CpuFpReferenceImplementation, BatchnormFwdInferenceValidation)
+TEST(CpuFpReferenceImplementation, BatchnormInferSanityValidation)
 {
     SKIP_IF_NO_DEVICES();
 
