@@ -13,6 +13,39 @@
 #include "hipdnn_engine_plugin_handle.hpp"
 #include "mocks/mock_hipdnn_engine_plugin_execution_context.hpp"
 
+TEST(MiopenLegacyEnginePluginApiTest, EnginePluginGetAllEngineIdsNull)
+{
+    std::array<int64_t, 1> engine_ids = {0};
+    uint32_t num_engines = 0;
+
+    EXPECT_EQ(hipdnnEnginePluginGetAllEngineIds(nullptr, 0, nullptr),
+              HIPDNN_PLUGIN_STATUS_BAD_PARAM);
+
+    EXPECT_EQ(hipdnnEnginePluginGetAllEngineIds(nullptr, 1, &num_engines),
+              HIPDNN_PLUGIN_STATUS_BAD_PARAM);
+
+    EXPECT_EQ(hipdnnEnginePluginGetAllEngineIds(engine_ids.data(), 1, nullptr),
+              HIPDNN_PLUGIN_STATUS_BAD_PARAM);
+}
+
+TEST(MiopenLegacyEnginePluginApiTest, EnginePluginGetAllEngineIdsValid)
+{
+    std::array<int64_t, 1> engine_ids = {0};
+    uint32_t num_engines = 0;
+
+    //get max 1 engine
+    auto status = hipdnnEnginePluginGetAllEngineIds(engine_ids.data(), 1, &num_engines);
+
+    EXPECT_EQ(status, HIPDNN_PLUGIN_STATUS_SUCCESS);
+    EXPECT_EQ(num_engines, 1u);
+    EXPECT_EQ(engine_ids[0], 1u);
+
+    status = hipdnnEnginePluginGetAllEngineIds(nullptr, 0, &num_engines);
+
+    EXPECT_EQ(status, HIPDNN_PLUGIN_STATUS_SUCCESS);
+    EXPECT_EQ(num_engines, 1u);
+}
+
 TEST(MiopenLegacyEnginePluginApiTest, EnginePluginCreateNullHandle)
 {
     EXPECT_EQ(hipdnnEnginePluginCreate(nullptr), HIPDNN_PLUGIN_STATUS_BAD_PARAM);

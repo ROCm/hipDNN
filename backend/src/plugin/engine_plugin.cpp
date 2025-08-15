@@ -1,6 +1,7 @@
 // Copyright © Advanced Micro Devices, Inc., or its affiliates.
 // SPDX-License-Identifier:  MIT
 
+#include <algorithm>
 #include <cassert>
 #include <limits>
 
@@ -23,6 +24,10 @@ void Engine_plugin::resolve_symbols()
     {
         throw Hipdnn_exception(HIPDNN_STATUS_PLUGIN_ERROR, "Wrong plugin type");
     }
+
+    const auto func_name_get_all_engine_ids = "hipdnnEnginePluginGetAllEngineIds";
+    _func_get_all_engine_ids
+        = _lib.get_symbol<decltype(_func_get_all_engine_ids)>(func_name_get_all_engine_ids);
 
     const auto func_name_create_handle = "hipdnnEnginePluginCreate";
     _func_create_handle = _lib.get_symbol<decltype(_func_create_handle)>(func_name_create_handle);
@@ -67,6 +72,45 @@ void Engine_plugin::resolve_symbols()
 #endif
 }
 
+std::vector<int64_t> Engine_plugin::get_all_engine_ids() const
+{
+    assert(_initialized);
+
+    if(!_all_engine_ids.empty())
+    {
+        return _all_engine_ids;
+    }
+
+    uint32_t num_engines = 0;
+    invoke_plugin_function(
+        "get number of engines", _func_get_all_engine_ids, nullptr, 0u, &num_engines);
+
+    THROW_IF_EQ(num_engines, 0, HIPDNN_STATUS_PLUGIN_ERROR, "No engines found in the plugin");
+
+    const uint32_t max_engines = num_engines;
+    std::vector<int64_t> engine_ids(max_engines);
+
+    invoke_plugin_function("get all engine IDs",
+                           _func_get_all_engine_ids,
+                           engine_ids.data(),
+                           max_engines,
+                           &num_engines);
+
+    THROW_IF_NE(num_engines,
+                max_engines,
+                HIPDNN_STATUS_PLUGIN_ERROR,
+                "Number of engines returned does not match expected count");
+
+    std::ranges::sort(engine_ids);
+    if(std::ranges::adjacent_find(engine_ids) != engine_ids.end())
+    {
+        throw Hipdnn_exception(HIPDNN_STATUS_PLUGIN_ERROR, "Duplicate engine IDs found");
+    }
+    _all_engine_ids = engine_ids;
+
+    return engine_ids;
+}
+
 hipdnnEnginePluginHandle_t Engine_plugin::create_handle() const
 {
     assert(_initialized);
@@ -93,7 +137,12 @@ std::vector<int64_t>
 {
     assert(_initialized);
 
-    uint32_t max_engines = 64;
+    if(_all_engine_ids.empty())
+    {
+        get_all_engine_ids();
+    }
+
+    const auto max_engines = static_cast<uint32_t>(_all_engine_ids.size());
     std::vector<int64_t> engine_ids(max_engines);
     uint32_t num_engines = 0;
 
@@ -105,21 +154,33 @@ std::vector<int64_t>
                            max_engines,
                            &num_engines);
 
-    if(num_engines > max_engines)
+    if(num_engines == 0)
     {
-        // Dynamically resize the buffer and retry
-        max_engines = num_engines;
-        engine_ids.resize(max_engines);
-        invoke_plugin_function("get applicable engine IDs after resizing buffer",
-                               _func_get_applicable_engine_ids,
-                               handle,
-                               op_graph,
-                               engine_ids.data(),
-                               max_engines,
-                               &num_engines);
+        return {}; // No applicable engines found
     }
 
+    THROW_IF_LT(max_engines,
+                num_engines,
+                HIPDNN_STATUS_PLUGIN_ERROR,
+                "More applicable engines than expected");
+
     engine_ids.resize(num_engines);
+
+    std::ranges::sort(engine_ids);
+    if(std::ranges::adjacent_find(engine_ids) != engine_ids.end())
+    {
+        throw Hipdnn_exception(HIPDNN_STATUS_PLUGIN_ERROR, "Duplicate engine IDs found");
+    }
+
+    for(const auto engine_id : engine_ids)
+    {
+        if(std::ranges::find(_all_engine_ids, engine_id) == _all_engine_ids.end())
+        {
+            throw Hipdnn_exception(HIPDNN_STATUS_PLUGIN_ERROR,
+                                   "Engine ID not found in the plugin's known IDs");
+        }
+    }
+
     return engine_ids;
 }
 

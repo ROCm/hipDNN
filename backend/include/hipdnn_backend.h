@@ -40,7 +40,7 @@ typedef struct hipdnnBackendDescriptor* hipdnnBackendDescriptor_t;
  * @retval HIPDNN_STATUS_ALLOC_FAILED       The memory allocation failed when creating handle object.
  * 
  */
-hipdnnStatus_t hipdnnCreate(hipdnnHandle_t* handle);
+HIPDNN_BACKEND_EXPORT hipdnnStatus_t hipdnnCreate(hipdnnHandle_t* handle);
 
 /*! @brief Destroyes hipdnnHandle_t
  *
@@ -50,7 +50,7 @@ hipdnnStatus_t hipdnnCreate(hipdnnHandle_t* handle);
  * @retval HIPDNN_STATUS_SUCCESS            The destruction was successful
  * 
  */
-hipdnnStatus_t hipdnnDestroy(hipdnnHandle_t handle);
+HIPDNN_BACKEND_EXPORT hipdnnStatus_t hipdnnDestroy(hipdnnHandle_t handle);
 
 /*! @brief Sets the stream for the hipdnnHandle_t
  *
@@ -61,7 +61,7 @@ hipdnnStatus_t hipdnnDestroy(hipdnnHandle_t handle);
  * @retval HIPDNN_STATUS_SUCCESS                    The creation was successful
  * 
  */
-hipdnnStatus_t hipdnnSetStream(hipdnnHandle_t handle, hipStream_t streamId);
+HIPDNN_BACKEND_EXPORT hipdnnStatus_t hipdnnSetStream(hipdnnHandle_t handle, hipStream_t streamId);
 
 /**
  * @brief Retrieves the HIP stream associated with the specified hipDNN handle.
@@ -78,7 +78,7 @@ hipdnnStatus_t hipdnnSetStream(hipdnnHandle_t handle, hipStream_t streamId);
  * - The streamId pointer must not be null.
  * - This function uses a try-catch mechanism to handle exceptions internally.
  */
-hipdnnStatus_t hipdnnGetStream(hipdnnHandle_t handle, hipStream_t* streamId);
+HIPDNN_BACKEND_EXPORT hipdnnStatus_t hipdnnGetStream(hipdnnHandle_t handle, hipStream_t* streamId);
 
 /*! @brief Creates a backend descriptor
  *

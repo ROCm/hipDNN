@@ -4,7 +4,7 @@
 #pragma once
 
 #include <filesystem>
-#include <hipdnn_sdk/utilities/platform_path_utils.hpp>
+#include <hipdnn_sdk/utilities/platform_utils.hpp>
 #include <stdexcept>
 #include <string>
 

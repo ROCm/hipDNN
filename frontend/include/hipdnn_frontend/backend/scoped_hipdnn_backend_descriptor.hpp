@@ -24,8 +24,8 @@ private:
                                   [[maybe_unused]] const hipdnnStatus_t status)
     {
         std::array<char, 256> backend_err_msg;
-        hipdnn_frontend::hipdnn_backend().get_last_error_string(backend_err_msg.data(),
-                                                                backend_err_msg.size());
+        hipdnn_frontend::hipdnn_backend()->get_last_error_string(backend_err_msg.data(),
+                                                                 backend_err_msg.size());
         HIPDNN_LOG_ERROR(
             "{}: {}. Backend error string: {}", error_string, status, backend_err_msg.data());
     }
@@ -45,7 +45,7 @@ public:
 
     explicit Scoped_hipdnn_backend_descriptor(hipdnnBackendDescriptorType_t descriptor_type)
     {
-        auto status = hipdnn_backend().backend_create_descriptor(descriptor_type, &_descriptor);
+        auto status = hipdnn_backend()->backend_create_descriptor(descriptor_type, &_descriptor);
 
         _valid = (status == HIPDNN_STATUS_SUCCESS);
 
@@ -59,7 +59,7 @@ public:
     explicit Scoped_hipdnn_backend_descriptor(const uint8_t* serialized_graph,
                                               size_t graph_byte_size)
     {
-        auto status = hipdnn_backend().backend_create_and_deserialize_graph_ext(
+        auto status = hipdnn_backend()->backend_create_and_deserialize_graph_ext(
             &_descriptor, serialized_graph, graph_byte_size);
 
         _valid = (status == HIPDNN_STATUS_SUCCESS);
@@ -75,7 +75,7 @@ public:
     {
         if(_valid && _descriptor != nullptr)
         {
-            auto status = hipdnn_backend().backend_destroy_descriptor(_descriptor);
+            auto status = hipdnn_backend()->backend_destroy_descriptor(_descriptor);
 
             if(status != HIPDNN_STATUS_SUCCESS)
             {
@@ -101,7 +101,7 @@ public:
         {
             if(_valid && _descriptor != nullptr)
             {
-                auto status = hipdnn_backend().backend_destroy_descriptor(_descriptor);
+                auto status = hipdnn_backend()->backend_destroy_descriptor(_descriptor);
                 if(status != HIPDNN_STATUS_SUCCESS)
                 {
                     log_backend_error("Failed to destroy backend descriptor during move assignment",

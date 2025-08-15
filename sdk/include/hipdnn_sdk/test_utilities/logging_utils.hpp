@@ -5,6 +5,7 @@
 
 #include <hipdnn_sdk/logging/callback_types.h>
 #include <hipdnn_sdk/logging/component_formatter.hpp>
+#include <hipdnn_sdk/utilities/platform_utils.hpp>
 
 #include <cstdlib>
 #include <iostream>
@@ -39,9 +40,7 @@ inline hipdnnSeverity_t string_to_severity(const std::string& level_str)
 inline void test_logging_callback(hipdnnSeverity_t severity, const char* message)
 {
 #ifndef DISABLE_TEST_LOGGING
-
-    const char* log_level_env = std::getenv("HIPDNN_LOG_LEVEL");
-    std::string log_level_str = log_level_env != nullptr ? log_level_env : "off";
+    std::string log_level_str = hipdnn_sdk::utilities::get_env("HIPDNN_LOG_LEVEL", "off");
 
     if(log_level_str == "off")
     {

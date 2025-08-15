@@ -37,6 +37,21 @@ void check_handle_validity(hipdnnEnginePluginHandle_t handle)
 
 // Exported functions:
 
+extern "C" hipdnnPluginStatus_t hipdnnEnginePluginGetAllEngineIds(int64_t* engine_ids,
+                                                                  uint32_t max_engines,
+                                                                  uint32_t* num_engines)
+{
+    return hipdnn_plugin::try_catch([&]() {
+        if(max_engines != 0)
+        {
+            THROW_IF_NULL(engine_ids);
+        }
+        THROW_IF_NULL(num_engines);
+
+        get_all_engine_ids(engine_ids, max_engines, num_engines);
+    });
+}
+
 extern "C" hipdnnPluginStatus_t hipdnnEnginePluginCreate(hipdnnEnginePluginHandle_t* handle)
 {
     return hipdnn_plugin::try_catch([&]() {
@@ -72,8 +87,10 @@ extern "C" hipdnnPluginStatus_t
     return hipdnn_plugin::try_catch([&]() {
         check_handle_validity(handle);
         THROW_IF_NULL(op_graph);
-        THROW_IF_NULL(engine_ids);
-        THROW_IF_EQ(max_engines, 0);
+        if(max_engines != 0)
+        {
+            THROW_IF_NULL(engine_ids);
+        }
         THROW_IF_NULL(num_engines);
 
         get_applicable_engine_ids(handle, op_graph, engine_ids, max_engines, num_engines);

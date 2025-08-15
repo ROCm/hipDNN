@@ -16,6 +16,7 @@ endif()
 add_compile_definitions(__HIP_PLATFORM_AMD__)
 add_compile_definitions(__HIPCC__)
 find_package(hip REQUIRED)
+find_package(Threads REQUIRED)
 enable_language(HIP)
 
 add_executable(miopen_legacy_plugin_tests
@@ -46,7 +47,7 @@ target_link_libraries(miopen_legacy_plugin_tests PUBLIC
     hip::device
     miopen_legacy_plugin
     miopen_legacy_plugin_private
-    pthread
+    Threads::Threads
 )
 
 # make it so tests inside folders can find the mocks folder without having to use a relative path.
