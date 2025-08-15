@@ -8,7 +8,6 @@ hipDNN.  At the time of writing this readme, the following bare minimum system d
 - Package Repository: ROCm 6.4 or later
     - rocm-llvm-devel (amd clang compiler is included with this.)
     - hip-devel
-- Python3
 - Cmake 3.25.2 or later
 - Ninja 1.12.1 or later (Optional)
     - Ninja is the preferred build system for hipDNN
