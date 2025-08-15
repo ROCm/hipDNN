@@ -155,25 +155,33 @@ void Sample_runner::operator()(const Tensor_layout& layout)
         //                                bias_tensor,
         //                                prev_mean_tensor,
         //                                prev_var_tensor,
-        //                                momentum_tensor.memory().template host_data<IntermediateType>()[0],
-        //                                epsilon_tensor.memory().template host_data<IntermediateType>()[0],
+        //                                momentum_tensor,
+        //                                epsilon_tensor,
         //                                y_ref_tensor,
         //                                next_mean_ref_tensor,
         //                                next_var_ref_tensor,
         //                                saved_mean_ref_tensor,
         //                                saved_inv_var_ref_tensor);
 
-        // auto epsilon_val = get_epsilon_for_type<InputType>();
+        // auto epsilon = get_epsilon<InputType>();
         //
-        // auto validator
+        // auto y_validator
         //     = hipdnn_sdk::reference_test_utilities::Cpu_fp_reference_validation<InputType>(
-        //         static_cast<InputType>(epsilon_val), static_cast<InputType>(epsilon_val));
+        //         static_cast<InputType>(epsilon), static_cast<InputType>(epsilon));
         //
-        // std::cout << "CPU reference validation "
-        //           << (validator.compare_buffers(y_ref_tensor.memory(), y_tensor.memory())
-        //                   ? "successful"
-        //                   : "failed")
-        //           << ".\n";
+        // auto stats_validator
+        //     = hipdnn_sdk::reference_test_utilities::Cpu_fp_reference_validation<IntermediateType>(
+        //         static_cast<IntermediateType>(epsilon), static_cast<IntermediateType>(epsilon));
+        // bool y_valid = y_validator.compare_buffers(y_ref_tensor.memory(), y_tensor.memory());
+        // bool next_mean_valid = stats_validator.compare_buffers(next_mean_ref_tensor.memory(),
+        //                                                        next_mean_tensor.memory());
+        // bool next_var_valid = stats_validator.compare_buffers(next_var_ref_tensor.memory(),
+        //                                                       next_var_tensor.memory());
+        // TODO: consider adding validation for other output buffers, but they are verified indirectly by y
+        // std::cout << "CPU reference validation:\n";
+        // std::cout << "  y: " << (y_valid ? "successful" : "failed") << "\n";
+        // std::cout << "  next_running_mean: " << (next_mean_valid ? "successful" : "failed") << "\n";
+        // std::cout << "  next_running_var: " << (next_var_valid ? "successful" : "failed") << "\n";
 
         std::cout << "CPU reference validation skipped - batchnorm training forward not yet "
                      "implemented.\n";
