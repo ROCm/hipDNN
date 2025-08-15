@@ -139,12 +139,15 @@ void Sample_runner::operator()(const Tensor_layout& layout)
 
         auto ref_impl = hipdnn_sdk::reference_test_utilities::
             Cpu_fp_reference_implementation<InputType, IntermediateType>();
-        
+
         auto y_ref_tensor = Tensor::make_tensor<InputType>(y->get_dim(), layout);
-        auto next_mean_ref_tensor = Tensor::make_tensor<IntermediateType>(next_running_mean->get_dim());
-        auto next_var_ref_tensor = Tensor::make_tensor<IntermediateType>(next_running_var->get_dim());
+        auto next_mean_ref_tensor
+            = Tensor::make_tensor<IntermediateType>(next_running_mean->get_dim());
+        auto next_var_ref_tensor
+            = Tensor::make_tensor<IntermediateType>(next_running_var->get_dim());
         auto saved_mean_ref_tensor = Tensor::make_tensor<IntermediateType>(saved_mean->get_dim());
-        auto saved_inv_var_ref_tensor = Tensor::make_tensor<IntermediateType>(saved_inv_variance->get_dim());
+        auto saved_inv_var_ref_tensor
+            = Tensor::make_tensor<IntermediateType>(saved_inv_variance->get_dim());
 
         // TODO: Uncomment when CPU reference implemented
         // ref_impl.batchnorm_fwd_training(x_tensor,
@@ -161,7 +164,7 @@ void Sample_runner::operator()(const Tensor_layout& layout)
         //                                saved_inv_var_ref_tensor);
 
         // auto epsilon_val = get_epsilon_for_type<InputType>();
-        // 
+        //
         // auto validator
         //     = hipdnn_sdk::reference_test_utilities::Cpu_fp_reference_validation<InputType>(
         //         static_cast<InputType>(epsilon_val), static_cast<InputType>(epsilon_val));
@@ -171,8 +174,9 @@ void Sample_runner::operator()(const Tensor_layout& layout)
         //                   ? "successful"
         //                   : "failed")
         //           << ".\n";
-        
-        std::cout << "CPU reference validation skipped - batchnorm training forward not yet implemented.\n";
+
+        std::cout << "CPU reference validation skipped - batchnorm training forward not yet "
+                     "implemented.\n";
     }
 
     std::cout << "First 10 y values: ";

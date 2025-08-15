@@ -119,7 +119,7 @@ void Sample_runner::operator()(const Tensor_layout& layout)
 
         auto ref_impl = hipdnn_sdk::reference_test_utilities::
             Cpu_fp_reference_implementation<InputType, IntermediateType>();
-        
+
         auto dx_ref_tensor = Tensor::make_tensor<InputType>(dx->get_dim(), layout);
         auto dscale_ref_tensor = Tensor::make_tensor<IntermediateType>(dscale->get_dim());
         auto dbias_ref_tensor = Tensor::make_tensor<IntermediateType>(dbias->get_dim());
@@ -134,7 +134,7 @@ void Sample_runner::operator()(const Tensor_layout& layout)
                                dbias_ref_tensor);
 
         auto epsilon = get_epsilon<InputType>();
-        
+
         auto dx_validator
             = hipdnn_sdk::reference_test_utilities::Cpu_fp_reference_validation<InputType>(
                 static_cast<InputType>(epsilon), static_cast<InputType>(epsilon));
@@ -143,9 +143,9 @@ void Sample_runner::operator()(const Tensor_layout& layout)
                 static_cast<IntermediateType>(epsilon), static_cast<IntermediateType>(epsilon));
 
         bool dx_valid = dx_validator.compare_buffers(dx_ref_tensor.memory(), dx_tensor.memory());
-        bool dscale_valid = dscale_dbias_validator.compare_buffers(dscale_ref_tensor.memory(), 
+        bool dscale_valid = dscale_dbias_validator.compare_buffers(dscale_ref_tensor.memory(),
                                                                    dscale_tensor.memory());
-        bool dbias_valid = dscale_dbias_validator.compare_buffers(dbias_ref_tensor.memory(), 
+        bool dbias_valid = dscale_dbias_validator.compare_buffers(dbias_ref_tensor.memory(),
                                                                   dbias_tensor.memory());
 
         std::cout << "CPU reference validation:\n";
