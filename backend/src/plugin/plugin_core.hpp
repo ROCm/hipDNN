@@ -33,6 +33,9 @@ protected:
     // The constructor is protected to prevent direct instantiation of the class.
     Plugin_base(Shared_library&& lib);
 
+    // This constructor is used for mocking purposes in tests.
+    Plugin_base();
+
 public:
     // Prevent copying
     Plugin_base(const Plugin_base&) = delete;
@@ -134,7 +137,7 @@ protected:
 public:
     virtual ~Plugin_manager_base() = default;
 
-    void load_plugins(const std::set<std::filesystem::path>& custom_paths,
+    virtual void load_plugins(const std::set<std::filesystem::path>& custom_paths,
                       hipdnnPluginLoadingMode_ext_t mode)
     {
         std::set<std::filesystem::path> paths_to_load;
@@ -188,7 +191,7 @@ public:
         }
     }
 
-    const std::vector<Plugin>& get_plugins() const
+    virtual const std::vector<std::shared_ptr<Plugin>>& get_plugins() const
     {
         return _plugins;
     }
@@ -237,11 +240,11 @@ private:
                 return;
             }
 
-            Plugin plugin(std::move(lib));
+            std::shared_ptr<Plugin> plugin = std::shared_ptr<Plugin>(new Plugin(std::move(lib)));
 
-            const auto name = plugin.name();
-            const auto version = plugin.version();
-            const auto type = plugin.type();
+            const auto name = plugin->name();
+            const auto version = plugin->version();
+            const auto type = plugin->type();
 
             // For now only use engine or unspecified plugin types
             if(type != Plugin::get_plugin_type())
@@ -252,7 +255,7 @@ private:
                                            + to_string(type));
             }
 
-            plugin.set_logging_callback(logging::hipdnn_logging_callback);
+            plugin->set_logging_callback(logging::hipdnn_logging_callback);
 
             _plugins.emplace_back(std::move(plugin));
             _loaded_plugin_files.insert(library_path);
@@ -271,7 +274,7 @@ private:
         }
     }
 
-    std::vector<Plugin> _plugins;
+    std::vector<std::shared_ptr<Plugin>> _plugins;
     std::set<std::filesystem::path> _loaded_plugin_files;
     std::set<std::filesystem::path> _default_plugin_paths;
 };

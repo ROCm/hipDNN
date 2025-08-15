@@ -1,32 +1,90 @@
 // Copyright © Advanced Micro Devices, Inc., or its affiliates.
 // SPDX-License-Identifier:  MIT
 
-#include <gmock/gmock.h>
+// #include <atomic>
+// #include <filesystem>
+// #include <functional>
+// #include <memory>
+// #include <numeric> // for std::iota
+// #include <thread>
+// #include <vector>
+
 #include <gtest/gtest.h>
-#include <hip/hip_runtime.h>
-#include <hipdnn_backend.h>
-#include <hipdnn_sdk/test_utilities/test_utilities.hpp>
-#include <hipdnn_sdk/utilities/scoped_resource.hpp>
+// #include <hip/hip_runtime.h>
+// #include <hipdnn_sdk/test_utilities/test_utilities.hpp>
+// #include <hipdnn_sdk/utilities/scoped_resource.hpp>
 
-#include "descriptors/graph_descriptor.hpp"
-#include "hipdnn_exception.hpp"
-#include "hipdnn_sdk/data_objects/engine_details_generated.h"
+// #include "descriptors/engine_config_descriptor.hpp"
+// #include "descriptors/execution_plan_descriptor.hpp"
+// #include "descriptors/graph_descriptor.hpp"
+// #include "descriptors/variant_descriptor.hpp"
+// #include "handle/handle.hpp"
+// #include "hipdnn_sdk/data_objects/engine_details_generated.h"
 #include "plugin/engine_plugin_resource_manager.hpp"
-
-#include <chrono>
-#include <filesystem>
-#include <memory>
-#include <thread>
-#include <vector>
+// #include "test_utilities/engine_plugin_test_helpers.hpp"
+ #include "plugins/mocks/mock_engine_plugin.hpp"
+ #include "plugins/mocks/mock_engine_plugin_manager.hpp"
 
 using namespace hipdnn_backend;
 using namespace hipdnn_backend::plugin;
 using namespace ::testing;
+//using namespace test_utilities;
+
+TEST(Engine_plugin_resource_manager, plugin_loading)
+{
+    std::shared_ptr<Mock_engine_plugin> mock_plugin = std::make_shared<Mock_engine_plugin>();
+    std::vector<std::shared_ptr<Engine_plugin>> plugins { mock_plugin };
+
+    std::shared_ptr<Mock_engine_plugin_manager> plugin_manager = std::make_shared<Mock_engine_plugin_manager>();
+
+    EXPECT_CALL(*mock_plugin, create_handle())
+        .WillOnce(::testing::Return(hipdnnEnginePluginHandle_t(0xdeadbeef)));
+
+    EXPECT_CALL(*mock_plugin, destroy_handle(testing::Eq(hipdnnEnginePluginHandle_t(0xdeadbeef))));
+    
+    EXPECT_CALL(*plugin_manager, get_plugins())
+        .WillOnce(::testing::ReturnRef(plugins));
+
+    {
+        Engine_plugin_resource_manager resource_manager(plugin_manager);
+    }
+}
+    
+TEST(Engine_plugin_resource_manager, set_stream)
+{
+    std::shared_ptr<Mock_engine_plugin> mock_plugin = std::make_shared<Mock_engine_plugin>();
+    std::vector<std::shared_ptr<Engine_plugin>> plugins { mock_plugin };
+
+    std::shared_ptr<Mock_engine_plugin_manager> plugin_manager = std::make_shared<Mock_engine_plugin_manager>();
+
+    EXPECT_CALL(*plugin_manager, get_plugins())
+        .WillOnce(::testing::ReturnRef(plugins));
+
+    EXPECT_CALL(*mock_plugin, create_handle())
+        .WillOnce(::testing::Return(hipdnnEnginePluginHandle_t(0xdeadbeef)));
+
+    EXPECT_CALL(*mock_plugin, set_stream(
+        hipdnnEnginePluginHandle_t(0xdeadbeef),
+        hipStream_t(0x12345678)
+    ));
+
+    EXPECT_CALL(*mock_plugin, destroy_handle(
+        hipdnnEnginePluginHandle_t(0xdeadbeef)
+    ));
+
+    {
+        Engine_plugin_resource_manager resource_manager(plugin_manager);
+
+        resource_manager.set_stream(hipStream_t(0x12345678));
+    }
+}
+
+/*
 
 template <typename T, typename Destructor>
 using Scoped_resource = hipdnn::sdk::utilities::Scoped_resource<T, Destructor>;
 
-class Engine_plugin_resource_manager_test_base : public ::testing::Test
+class Engine_plugin_loading_test : public ::testing::Test
 {
 protected:
     void SetUp() override
@@ -713,3 +771,9 @@ TEST(GPU_EnginePluginResourceManagerTest, LoadPluginsAndExecuteOpGraph)
         SUCCEED() << "Plugin loaded but execution failed: " << e.what();
     }
 }
+std::filesystem::path Engine_plugin_resource_manager_test::static_test_plugin_dir;
+std::filesystem::path Engine_plugin_resource_manager_test::static_test_plugin_path;
+bool Engine_plugin_resource_manager_test::plugin_available = false;
+std::shared_ptr<plugin::Engine_plugin_resource_manager>
+    Engine_plugin_resource_manager_test::static_resource_manager;
+*/

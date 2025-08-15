@@ -11,7 +11,6 @@
 #include "descriptors/execution_plan_descriptor.hpp"
 #include "descriptors/graph_descriptor.hpp"
 #include "descriptors/variant_descriptor.hpp"
-#include "engine_plugin.hpp"
 #include "engine_plugin_resource_manager.hpp"
 #include "hipdnn_exception.hpp"
 #include "logging/logging.hpp"
@@ -21,14 +20,6 @@ namespace hipdnn_backend
 namespace plugin
 {
 
-class Engine_plugin_manager : public Plugin_manager_base<Engine_plugin>
-{
-public:
-    Engine_plugin_manager()
-        : Plugin_manager_base<Engine_plugin>({"hipdnn_plugins/engines/"})
-    {
-    }
-};
 
 namespace
 {
@@ -100,21 +91,22 @@ Engine_plugin_resource_manager::Engine_plugin_resource_manager()
 }
 
 Engine_plugin_resource_manager::Engine_plugin_resource_manager(
-    std::shared_ptr<Engine_plugin_manager>& pm)
-    : _pm(pm)
+    std::shared_ptr<Engine_plugin_manager> pm)
 {
+    _pm = std::move(pm);
+
     // Create plugin handles
     const auto& plugins = _pm->get_plugins();
     for(const auto& plugin : plugins)
     {
-        auto handle = plugin.create_handle();
+        auto handle = plugin->create_handle();
 
         if(_handle_to_plugin.contains(handle))
         {
             throw Hipdnn_exception(HIPDNN_STATUS_PLUGIN_ERROR, "Plugin handle already exists");
         }
 
-        _handle_to_plugin[handle] = &plugin;
+        _handle_to_plugin.insert({handle, plugin});
     }
 }
 

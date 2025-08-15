@@ -13,6 +13,7 @@
 #include <hipdnn_sdk/plugin/plugin_api_data_types.h>
 
 #include "hipdnn_backend.h"
+#include "engine_plugin.hpp"
 
 namespace hipdnn_sdk
 {
@@ -31,10 +32,18 @@ class Graph_descriptor;
 namespace plugin
 {
 
-class Engine_plugin;
-class Engine_plugin_manager;
 class Engine_details_wrapper;
 class Engine_execution_context_wrapper;
+
+class Engine_plugin_manager : public Plugin_manager_base<Engine_plugin>
+{
+public:
+    Engine_plugin_manager()
+        : Plugin_manager_base<Engine_plugin>({"hipdnn_plugins/engines/"})
+    {
+    }
+};
+
 
 class Engine_plugin_resource_manager
 {
@@ -50,7 +59,7 @@ public:
     static std::set<std::filesystem::path> get_plugin_paths();
     static std::shared_ptr<Engine_plugin_resource_manager> create();
 
-    Engine_plugin_resource_manager(std::shared_ptr<Engine_plugin_manager>& pm);
+    Engine_plugin_resource_manager(std::shared_ptr<Engine_plugin_manager> pm);
     virtual ~Engine_plugin_resource_manager();
 
     // Prevent copying
@@ -107,7 +116,7 @@ private:
                           uint32_t num_device_buffers) const;
 
     std::shared_ptr<Engine_plugin_manager> _pm;
-    std::unordered_map<hipdnnEnginePluginHandle_t, const Engine_plugin*> _handle_to_plugin;
+    std::unordered_map<hipdnnEnginePluginHandle_t, const std::shared_ptr<Engine_plugin>> _handle_to_plugin;
     mutable std::unordered_map<int64_t, hipdnnEnginePluginHandle_t> _engine_id_to_handle;
 
     friend class Engine_details_wrapper;

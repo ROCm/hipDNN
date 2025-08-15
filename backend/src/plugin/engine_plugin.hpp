@@ -21,28 +21,31 @@ protected:
     // The constructor is protected to prevent direct instantiation of the class.
     Engine_plugin(Shared_library&& lib);
 
+    // We need this to allow mocking this class
+    Engine_plugin();
+
 public:
-    hipdnnEnginePluginHandle_t create_handle() const;
-    void destroy_handle(hipdnnEnginePluginHandle_t handle) const;
-    void set_stream(hipdnnEnginePluginHandle_t handle, hipStream_t stream) const;
-    std::vector<int64_t> get_applicable_engine_ids(hipdnnEnginePluginHandle_t handle,
+    virtual hipdnnEnginePluginHandle_t create_handle() const;
+    virtual void destroy_handle(hipdnnEnginePluginHandle_t handle) const;
+    virtual void set_stream(hipdnnEnginePluginHandle_t handle, hipStream_t stream) const;
+    virtual std::vector<int64_t> get_applicable_engine_ids(hipdnnEnginePluginHandle_t handle,
                                                    const hipdnnPluginConstData_t* op_graph) const;
-    void get_engine_details(hipdnnEnginePluginHandle_t handle,
+    virtual void get_engine_details(hipdnnEnginePluginHandle_t handle,
                             int64_t engine_id,
                             const hipdnnPluginConstData_t* op_graph,
                             hipdnnPluginConstData_t* engine_details) const;
-    void destroy_engine_details(hipdnnEnginePluginHandle_t handle,
+    virtual void destroy_engine_details(hipdnnEnginePluginHandle_t handle,
                                 hipdnnPluginConstData_t* engine_details) const;
-    size_t get_workspace_size(hipdnnEnginePluginHandle_t handle,
+    virtual size_t get_workspace_size(hipdnnEnginePluginHandle_t handle,
                               const hipdnnPluginConstData_t* engine_config,
                               const hipdnnPluginConstData_t* op_graph) const;
-    hipdnnEnginePluginExecutionContext_t
+    virtual hipdnnEnginePluginExecutionContext_t
         create_execution_context(hipdnnEnginePluginHandle_t handle,
                                  const hipdnnPluginConstData_t* engine_config,
                                  const hipdnnPluginConstData_t* op_graph) const;
-    void destroy_execution_context(hipdnnEnginePluginHandle_t handle,
+    virtual void destroy_execution_context(hipdnnEnginePluginHandle_t handle,
                                    hipdnnEnginePluginExecutionContext_t execution_context) const;
-    void execute_op_graph(hipdnnEnginePluginHandle_t handle,
+    virtual void execute_op_graph(hipdnnEnginePluginHandle_t handle,
                           hipdnnEnginePluginExecutionContext_t execution_context,
                           void* workspace,
                           const hipdnnPluginDeviceBuffer_t* device_buffers,
