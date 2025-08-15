@@ -61,7 +61,6 @@ cmake -DCODE_COVERAGE=ON ..
 mkdir build
 cd build
 cmake -DBUILD_ADDRESS_SANITIZER=ON ..
-
 ```
 
 #### Ninja Targets
