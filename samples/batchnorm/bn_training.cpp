@@ -100,7 +100,7 @@ void Sample_runner::operator()(const Tensor_layout& layout)
         static_cast<IntermediateType>(0.1f), static_cast<IntermediateType>(1.0f));
 
     momentum_tensor.memory().template host_data<IntermediateType>()[0] = 0.1f;
-    epsilon_tensor.memory().template host_data<IntermediateType>()[0] = get_epsilon<InputType>();
+    epsilon_tensor.memory().template host_data<IntermediateType>()[0] = 1e-5f;
 
     std::unordered_map<int64_t, void*> variant_pack;
 
