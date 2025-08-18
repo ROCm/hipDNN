@@ -39,5 +39,5 @@ target_link_libraries(miopen_plugin_integration_test PUBLIC
 if(BUILD_PLUGIN_AS_DEPENDENCY)
     clang_tidy_check(miopen_plugin_integration_test)
     
-    add_target_to_check_targets(miopen_plugin_integration_test ${CMAKE_CURRENT_BINARY_DIR})
+    add_integration_test_target(miopen_plugin_integration_test ${CMAKE_CURRENT_BINARY_DIR})
 endif()

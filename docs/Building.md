@@ -66,9 +66,11 @@ cmake -DBUILD_ADDRESS_SANITIZER=ON ..
 When building with ninja dont forget to add the -jnproc flag for using additional cores
   - `ninja`: default build
   - `ninja install`: installs the library to the default location (/opt/rocm)
-  - `ninja check`: Builds everything and automatically runs the tests via the ctest runner.
+  - `ninja check`: Builds everything and automatically runs the unit tests and integration tests via the ctest runner.
     - Can add `-DBUILD_ADDRESS_SANITIZER` to initial cmake command if you want memory violation checks to occur
     - Due to an incompatibility between HIP and AddressSanitizer, some tests will be skipped in AddressSanitizer builds
+  - `ninja unit-check`: Minimal version of `ninja check` that only runs the unit tests.
+  - `ninja integration-check`: Version of `ninja check` that only runs the integration tests (this is the bulk of the testing time).
   - `ninja check_format`: checks the format of all c/c++ files in the repository and issues a warning
   - `ninja format`: formats any files in the repository which are not correctly formatted.
   - `ninja code_coverage`: builds, runs tests, and generates code coverage reports

@@ -13,26 +13,67 @@ endif()
 
 set(CHECK_COMMAND_GLOBAL "" CACHE INTERNAL "Accumulated check commands" FORCE)
 set(CHECK_DEPENDS_GLOBAL "" CACHE INTERNAL "Accumulated check depends" FORCE)
-function(append_test_to_check_target TARGET WORKING_DIR)
-    message(STATUS "Appending check target: ${TARGET} in working directory: ${WORKING_DIR}")
 
-    set(NEW_COMMAND "")
-    if("${CHECK_COMMAND_GLOBAL}" STREQUAL "")
-    set(NEW_COMMAND cd ${WORKING_DIR} && ${TEST_ENVIRONMENT} ${EXEC_PREFIX}${TARGET})
-    else()
-    set(NEW_COMMAND && cd ${WORKING_DIR} && ${TEST_ENVIRONMENT} ${EXEC_PREFIX}${TARGET})
+# Global collections for unit tests
+set(UNIT_CHECK_COMMAND_GLOBAL "" CACHE INTERNAL "Accumulated unit check commands" FORCE)
+set(UNIT_CHECK_DEPENDS_GLOBAL "" CACHE INTERNAL "Accumulated unit check depends" FORCE)
+
+# Global collections for integration tests
+set(INTEGRATION_CHECK_COMMAND_GLOBAL "" CACHE INTERNAL "Accumulated integration check commands" FORCE)
+set(INTEGRATION_CHECK_DEPENDS_GLOBAL "" CACHE INTERNAL "Accumulated integration check depends" FORCE)
+
+# Generic internal function to append tests to check targets
+function(_append_test_to_check_target_internal TARGET WORKING_DIR TEST_TYPE STATUS_MESSAGE)
+    if(STATUS_MESSAGE)
+        message(STATUS "${STATUS_MESSAGE}: ${TARGET} in working directory: ${WORKING_DIR}")
     endif()
-    set(CHECK_COMMAND_GLOBAL ${CHECK_COMMAND_GLOBAL} ${NEW_COMMAND} CACHE INTERNAL "Accumulated check targets" FORCE)
-    set(CHECK_DEPENDS_GLOBAL ${CHECK_DEPENDS_GLOBAL} ${TARGET} CACHE INTERNAL "Accumulated check depends" FORCE)    
+    
+    if("${TEST_TYPE}" STREQUAL "UNIT")
+        set(COMMAND_VAR "UNIT_CHECK_COMMAND_GLOBAL")
+        set(DEPENDS_VAR "UNIT_CHECK_DEPENDS_GLOBAL")
+        set(CACHE_DESC "Accumulated unit check targets")
+    elseif("${TEST_TYPE}" STREQUAL "INTEGRATION")
+        set(COMMAND_VAR "INTEGRATION_CHECK_COMMAND_GLOBAL")
+        set(DEPENDS_VAR "INTEGRATION_CHECK_DEPENDS_GLOBAL")
+        set(CACHE_DESC "Accumulated integration check targets")
+    else()
+        set(COMMAND_VAR "CHECK_COMMAND_GLOBAL")
+        set(DEPENDS_VAR "CHECK_DEPENDS_GLOBAL")
+        set(CACHE_DESC "Accumulated check targets")
+    endif()
+    
+    set(NEW_COMMAND "")
+    if("${${COMMAND_VAR}}" STREQUAL "")
+        set(NEW_COMMAND cd ${WORKING_DIR} && ${TEST_ENVIRONMENT} ${EXEC_PREFIX}${TARGET})
+    else()
+        set(NEW_COMMAND && cd ${WORKING_DIR} && ${TEST_ENVIRONMENT} ${EXEC_PREFIX}${TARGET})
+    endif()
+    
+    set(${COMMAND_VAR} ${${COMMAND_VAR}} ${NEW_COMMAND} CACHE INTERNAL "${CACHE_DESC}" FORCE)
+    set(${DEPENDS_VAR} ${${DEPENDS_VAR}} ${TARGET} CACHE INTERNAL "Accumulated ${TEST_TYPE} check depends" FORCE)
+endfunction()
+
+# Generic internal function to finalize check targets
+function(_finalize_check_target_internal TARGET_NAME COMMAND_VAR DEPENDS_VAR)
+    add_custom_target(
+        ${TARGET_NAME}
+        COMMAND ${${COMMAND_VAR}}
+        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+        DEPENDS ${${DEPENDS_VAR}}
+        VERBATIM)
+    message(STATUS "Created ${TARGET_NAME} target")
 endfunction()
 
 function(finalize_custom_check_target)
-add_custom_target(
-    check
-    COMMAND ${CHECK_COMMAND_GLOBAL}
-    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-    DEPENDS ${CHECK_DEPENDS_GLOBAL}
-    VERBATIM)
+    _finalize_check_target_internal("check" "CHECK_COMMAND_GLOBAL" "CHECK_DEPENDS_GLOBAL")
+endfunction()
+
+function(finalize_unit_check_target)
+    _finalize_check_target_internal("unit-check" "UNIT_CHECK_COMMAND_GLOBAL" "UNIT_CHECK_DEPENDS_GLOBAL")
+endfunction()
+
+function(finalize_integration_check_target)
+    _finalize_check_target_internal("integration-check" "INTEGRATION_CHECK_COMMAND_GLOBAL" "INTEGRATION_CHECK_DEPENDS_GLOBAL")
 endfunction()
 
 enable_testing() # Cmake wont discover or run tests without this line
@@ -40,12 +81,38 @@ enable_testing() # Cmake wont discover or run tests without this line
 # Add a check_ctest target which will run all tests discovered by gtest_discover_tests via ctest. 
 add_custom_target(check_ctest COMMAND ${TEST_ENVIRONMENT} ${CMAKE_CTEST_COMMAND} --output-on-failure -C ${CMAKE_CFG_INTDIR})
 
-function(add_target_to_check_targets TARGET WORKING_DIR)
-    append_test_to_check_target(${TARGET} ${WORKING_DIR})
+function(_add_gtest_target_internal APPEND_FUNCTION_SUFFIX TARGET WORKING_DIR)
+    if("${APPEND_FUNCTION_SUFFIX}" STREQUAL "test")
+        _append_test_to_check_target_internal(${TARGET} ${WORKING_DIR} "" "Appending check target")
+    elseif("${APPEND_FUNCTION_SUFFIX}" STREQUAL "unit_test")
+        _append_test_to_check_target_internal(${TARGET} ${WORKING_DIR} "UNIT" "Appending unit check target")
+        _append_test_to_check_target_internal(${TARGET} ${WORKING_DIR} "" "")
+    elseif("${APPEND_FUNCTION_SUFFIX}" STREQUAL "integration_test")
+        _append_test_to_check_target_internal(${TARGET} ${WORKING_DIR} "INTEGRATION" "Appending integration check target")
+        _append_test_to_check_target_internal(${TARGET} ${WORKING_DIR} "" "")
+    else()
+        message(FATAL_ERROR "Unknown test type suffix: ${APPEND_FUNCTION_SUFFIX}")
+    endif()
+    
     add_dependencies(check_ctest ${TARGET})
     gtest_discover_tests(
         ${TARGET}
         WORKING_DIRECTORY ${WORKING_DIR}
         DISCOVERY_MODE PRE_TEST
     )
+endfunction()
+
+# Adds a generic test target
+function(add_target_to_check_targets TARGET WORKING_DIR)
+    _add_gtest_target_internal(test ${TARGET} ${WORKING_DIR})
+endfunction()
+
+# Adds a unit test target
+function(add_unit_test_target TARGET WORKING_DIR)
+    _add_gtest_target_internal(unit_test ${TARGET} ${WORKING_DIR})
+endfunction()
+
+# Adds an integration test target
+function(add_integration_test_target TARGET WORKING_DIR)
+    _add_gtest_target_internal(integration_test ${TARGET} ${WORKING_DIR})
 endfunction()

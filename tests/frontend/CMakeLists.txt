@@ -38,4 +38,4 @@ target_compile_definitions(public_hipdnn_frontend_tests
 add_dependencies(public_hipdnn_frontend_tests test_good_plugin test_execute_fails_plugin test_no_applicable_engines_plugin)
 
 clang_tidy_check(public_hipdnn_frontend_tests)
-add_target_to_check_targets(public_hipdnn_frontend_tests ${CMAKE_CURRENT_BINARY_DIR})
+add_integration_test_target(public_hipdnn_frontend_tests ${CMAKE_CURRENT_BINARY_DIR})

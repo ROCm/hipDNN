@@ -291,21 +291,53 @@ HIPDNN_BACKEND_EXPORT hipdnnStatus_t hipdnnBackendCreateAndDeserializeGraph_ext(
 HIPDNN_BACKEND_EXPORT void hipdnnLoggingCallback_ext(hipdnnSeverity_t severity, const char* msg);
 
 /**
- * @brief Sets the plugin search paths for the hipDNN backend and loads plugins.
+ * @brief Sets the search paths for hipDNN engine plugins.
  *
- * This function specifies the set of paths to search for hipDNN plugins.
+ * This function configures the search paths for engine plugins and must be called before 
+ * creating a hipDNN handle, as plugins are loaded during handle creation.
  *
- * @param[in] num_paths      The number of paths provided in the plugin_paths array.
- * @param[in] plugin_paths   An array of path strings, each specifying either a directory to search or a plugin file.
- * @param[in] loading_mode   A hipdnnPluginLoadingMode_ext_t value that specifies whether to load the
- *                           given plugins additively or to replace the default paths.
+ * Paths can be either directories or specific plugin files. The backend can resolve 
+ * platform-agnostic names, allowing users to omit prefixes like `lib` and extensions 
+ * like `.so` or `.dll`.
+ *
+ * @param[in] num_paths      The number of paths in the `plugin_paths` array.
+ * @param[in] plugin_paths   An array of relative or absolute path strings.
+ * @param[in] loading_mode   Specifies whether to add paths to or replace the default search paths.
  *
  * @retval HIPDNN_STATUS_SUCCESS           The operation was successful.
- * @retval HIPDNN_STATUS_BAD_PARAM_NULL_POINTER         `plugin_paths` is null when `num_paths` is greater than 0.
- * @retval HIPDNN_STATUS_INTERNAL_ERROR    An internal error occurred during plugin loading.
+ * @retval HIPDNN_STATUS_BAD_PARAM_NULL_POINTER         `plugin_paths` is nullptr when `num_paths` is greater than 0.
+ * @retval HIPDNN_STATUS_NOT_SUPPORTED         Called with active handle.
+ * @retval HIPDNN_STATUS_INTERNAL_ERROR    An internal error occurred.
  */
 HIPDNN_BACKEND_EXPORT hipdnnStatus_t hipdnnSetEnginePluginPaths_ext(
     size_t num_paths, const char* const* plugin_paths, hipdnnPluginLoadingMode_ext_t loading_mode);
+
+/**
+ * @brief Gets file paths of loaded engine plugins for a given handle.
+ *
+ * This function must be called twice:
+ * 1. First call: Pass `plugin_paths` as `nullptr` to query the number of plugins and required buffer size.
+ *    - Sets `num_plugin_paths` to the total number of loaded plugins
+ *    - Sets `max_string_len` to the maximum string length needed (including null terminator)
+ * 
+ * 2. Second call: Pass allocated buffers to retrieve the actual plugin paths.
+ *    - Allocate an array of `num_plugin_paths` char pointers
+ *    - Each char pointer should point to a buffer of at least `max_string_len` characters
+ *    - The function will populate these buffers with the plugin paths
+ *
+ * @param[in]     handle           A valid hipDNN handle
+ * @param[in,out] num_plugin_paths Pointer to number of plugins; updated with actual count.
+ * @param[out]    plugin_paths     Array of character pointers for plugin paths, or `nullptr` to query sizes.
+ * @param[in,out] max_string_len   Pointer to max string length; updated with required length.
+ *
+ * @retval HIPDNN_STATUS_SUCCESS           Success.
+ * @retval HIPDNN_STATUS_BAD_PARAM         Invalid handle, null pointers, or insufficient buffer sizes.
+ * @retval HIPDNN_STATUS_INTERNAL_ERROR    Internal error.
+ */
+HIPDNN_BACKEND_EXPORT hipdnnStatus_t hipdnnGetLoadedEnginePluginPaths_ext(hipdnnHandle_t handle,
+                                                                          size_t* num_plugin_paths,
+                                                                          char** plugin_paths,
+                                                                          size_t* max_string_len);
 
 #ifdef __cplusplus
 }

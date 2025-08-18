@@ -118,14 +118,7 @@ protected:
 
         for(const auto& path : _default_plugin_paths)
         {
-            if(path.is_relative())
-            {
-                resolved_paths.insert(base_dir / path);
-            }
-            else
-            {
-                resolved_paths.insert(path);
-            }
+            resolved_paths.insert(path.is_relative() ? base_dir / path : path);
         }
 
         return resolved_paths;
@@ -204,6 +197,11 @@ public:
     const std::vector<Plugin>& get_plugins() const
     {
         return _plugins;
+    }
+
+    const std::set<std::filesystem::path>& get_loaded_plugin_files() const
+    {
+        return _loaded_plugin_files;
     }
 
 private:
