@@ -7,8 +7,12 @@
 #include <array>
 #include <gtest/gtest.h>
 #include <hipdnn_sdk/data_objects/graph_generated.h>
-#include <hipdnn_sdk/utilities/platform_path_utils.hpp>
+#include <hipdnn_sdk/utilities/platform_utils.hpp>
 #include <vector>
+
+using namespace hipdnn_tests::plugin_constants;
+using namespace hipdnn_sdk::utilities;
+namespace fs = std::filesystem;
 
 TEST(HipDNNBackendTest, WillCreateDestroyGraphDescriptorSuccessfully)
 {
@@ -235,9 +239,6 @@ TEST(HipDNNBackendTest, PluginPathsExt_FailsWithIneligibleHandle)
 
 TEST(HipDNNBackendTest, GetLoadedPluginPaths_LoadsDefault)
 {
-    using namespace hipdnn_sdk::utilities;
-    namespace fs = std::filesystem;
-
     hipdnnStatus_t status
         = hipdnnSetEnginePluginPaths_ext(0, nullptr, HIPDNN_PLUGIN_LOADING_ADDITIVE);
     ASSERT_EQ(status, HIPDNN_STATUS_SUCCESS);
@@ -258,10 +259,6 @@ TEST(HipDNNBackendTest, GetLoadedPluginPaths_LoadsDefault)
 
 TEST(HipDNNBackendTest, GetLoadedPluginPaths_AdditiveLoadsBothDefaultAndCustom)
 {
-    using namespace hipdnn_tests::plugin_constants;
-    using namespace hipdnn_sdk::utilities;
-    namespace fs = std::filesystem;
-
     const std::array<const char*, 1> paths = {PLUGIN_DIR.c_str()};
     hipdnnStatus_t status = hipdnnSetEnginePluginPaths_ext(
         paths.size(), paths.data(), HIPDNN_PLUGIN_LOADING_ADDITIVE);
@@ -287,10 +284,6 @@ TEST(HipDNNBackendTest, GetLoadedPluginPaths_AdditiveLoadsBothDefaultAndCustom)
 
 TEST(HipDNNBackendTest, GetLoadedPluginPaths_AbsoluteLoadsOnlyCustom)
 {
-    using namespace hipdnn_tests::plugin_constants;
-    using namespace hipdnn_sdk::utilities;
-    namespace fs = std::filesystem;
-
     auto& plugin_file_path = test_good_plugin_path();
     const std::array<const char*, 1> paths = {plugin_file_path.c_str()};
     hipdnnStatus_t status = hipdnnSetEnginePluginPaths_ext(
