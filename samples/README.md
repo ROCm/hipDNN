@@ -2,13 +2,15 @@
 
 ## How to Build
 
-1.  **Install hipDNN:** Follow the hipDNN build and install instructions in the [Building readme](../docs/Building.md).
+1.  **Install hipDNN:** Follow the hipDNN build and install instructions in the [Building docs](../docs/Building.md).
 
 2.  **Configure and Build:** Once hipDNN is installed, run the following commands from this `samples` directory:
-    *   `mkdir build`
-    *   `cd build`
-    *   `cmake -DCMAKE_CXX_COMPILER=/opt/rocm/bin/amdclang++ ..`
-    *   `make -j`
+    ```bash
+    mkdir build
+    cd build
+    cmake -DCMAKE_CXX_COMPILER=/opt/rocm/bin/amdclang++ ..
+    ninja
+    ```
 
 3.  **Run Samples:** The `build` folder will now contain the sample executables.
 
