@@ -564,8 +564,8 @@ public:
 
     std::shared_ptr<Tensor_attributes>
         convolution_fprop(const std::shared_ptr<Tensor_attributes>& x,
-                           const std::shared_ptr<Tensor_attributes>& w,
-                           Convolution_fprop_attributes attributes)
+                          const std::shared_ptr<Tensor_attributes>& w,
+                          Convolution_fprop_attributes attributes)
     {
         if(attributes.name.empty())
         {
@@ -579,9 +579,9 @@ public:
         {
             w->set_name(attributes.name + "::W");
         }
-        
+
         auto y = output_tensor(attributes.name + "::Y");
-        
+
         attributes.set_x(x);
         attributes.set_w(w);
         attributes.set_y(y);

@@ -24,7 +24,7 @@ TEST(ConvolutionFwdAttributesTests, CreateConvolutionFwdAttributes)
     x_tensor->set_uid(1)
         .set_name("InputTensor")
         .set_data_type(hipdnn_frontend::DataType_t::FLOAT)
-        .set_dim({1, 3, 32, 32})   // NCHW format
+        .set_dim({1, 3, 32, 32}) // NCHW format
         .set_stride({3072, 1024, 32, 1});
 
     // Configure weights tensor
@@ -32,7 +32,7 @@ TEST(ConvolutionFwdAttributesTests, CreateConvolutionFwdAttributes)
     w_tensor->set_uid(2)
         .set_name("WeightsTensor")
         .set_data_type(hipdnn_frontend::DataType_t::FLOAT)
-        .set_dim({64, 3, 3, 3})    // KCHW format
+        .set_dim({64, 3, 3, 3}) // KCHW format
         .set_stride({27, 9, 3, 1});
 
     // Configure output tensor
@@ -40,7 +40,7 @@ TEST(ConvolutionFwdAttributesTests, CreateConvolutionFwdAttributes)
     y_tensor->set_uid(3)
         .set_name("OutputTensor")
         .set_data_type(hipdnn_frontend::DataType_t::FLOAT)
-        .set_dim({1, 64, 32, 32})   // NCHW format
+        .set_dim({1, 64, 32, 32}) // NCHW format
         .set_stride({65536, 1024, 32, 1});
 
     // Verify tensor attributes
@@ -67,7 +67,8 @@ TEST(ConvolutionFwdAttributesTests, CreateConvolutionFwdAttributes)
     EXPECT_EQ(conv_attributes.get_post_padding(), (std::vector<int64_t>{1, 1}));
     EXPECT_EQ(conv_attributes.get_stride(), (std::vector<int64_t>{1, 1}));
     EXPECT_EQ(conv_attributes.get_dilation(), (std::vector<int64_t>{1, 1}));
-    EXPECT_EQ(conv_attributes.get_conv_mode(), hipdnn_frontend::ConvolutionMode_t::CROSS_CORRELATION);
+    EXPECT_EQ(conv_attributes.get_conv_mode(),
+              hipdnn_frontend::ConvolutionMode_t::CROSS_CORRELATION);
 }
 
 TEST(ConvolutionFwdAttributesTests, PackAttributes)
@@ -125,7 +126,8 @@ TEST(ConvolutionFwdAttributesTests, PackAttributes)
     EXPECT_EQ(conv_attributes_fb->dilation()->Get(0), 1);
     EXPECT_EQ(conv_attributes_fb->dilation()->Get(1), 1);
 
-    EXPECT_EQ(conv_attributes_fb->conv_mode(), hipdnn_sdk::data_objects::ConvMode_CROSS_CORRELATION);
+    EXPECT_EQ(conv_attributes_fb->conv_mode(),
+              hipdnn_sdk::data_objects::ConvMode_CROSS_CORRELATION);
 }
 
 TEST(ConvolutionFwdAttributesTests, DefaultValues)
@@ -133,7 +135,8 @@ TEST(ConvolutionFwdAttributesTests, DefaultValues)
     hipdnn_frontend::graph::Convolution_fprop_attributes conv_attributes;
 
     // Check default convolution mode
-    EXPECT_EQ(conv_attributes.get_conv_mode(), hipdnn_frontend::ConvolutionMode_t::CROSS_CORRELATION);
+    EXPECT_EQ(conv_attributes.get_conv_mode(),
+              hipdnn_frontend::ConvolutionMode_t::CROSS_CORRELATION);
 
     // Check that parameters are empty by default
     EXPECT_TRUE(conv_attributes.get_pre_padding().empty());

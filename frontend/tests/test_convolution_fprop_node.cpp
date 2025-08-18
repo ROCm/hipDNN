@@ -115,14 +115,14 @@ TEST(ConvolutionFwdNodeTests, InferPropertiesNode)
     input_tensor->set_uid(1)
         .set_name("InputTensor")
         .set_data_type(DataType_t::FLOAT)
-        .set_dim({1, 3, 32, 32})    // NCHW format
+        .set_dim({1, 3, 32, 32}) // NCHW format
         .set_stride({3072, 1024, 32, 1});
 
     auto weights_tensor = conv_attributes.get_w();
     weights_tensor->set_uid(2)
         .set_name("WeightsTensor")
         .set_data_type(DataType_t::FLOAT)
-        .set_dim({64, 3, 3, 3})     // KCHW format
+        .set_dim({64, 3, 3, 3}) // KCHW format
         .set_stride({27, 9, 3, 1});
 
     auto output_tensor = conv_attributes.get_y();
@@ -154,14 +154,14 @@ TEST(ConvolutionFwdNodeTests, InferPropertiesNodeWithStrideAndPadding)
     input_tensor->set_uid(1)
         .set_name("InputTensor")
         .set_data_type(DataType_t::FLOAT)
-        .set_dim({1, 3, 32, 32})    // NCHW format
+        .set_dim({1, 3, 32, 32}) // NCHW format
         .set_stride({3072, 1024, 32, 1});
 
     auto weights_tensor = conv_attributes.get_w();
     weights_tensor->set_uid(2)
         .set_name("WeightsTensor")
         .set_data_type(DataType_t::FLOAT)
-        .set_dim({64, 3, 5, 5})     // KCHW format
+        .set_dim({64, 3, 5, 5}) // KCHW format
         .set_stride({75, 25, 5, 1});
 
     auto output_tensor = conv_attributes.get_y();

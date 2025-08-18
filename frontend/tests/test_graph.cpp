@@ -882,9 +882,8 @@ TEST_F(Graph_test_fixture, BuildAndSerializeConvolutionFwdGraph)
     validate_tensor(*y, tensor_lookup[y->get_uid()]);
 
     EXPECT_EQ(deserialized_graph->nodes[0]->name, "ConvolutionNode");
-    EXPECT_EQ(
-        deserialized_graph->nodes[0]->attributes.type,
-        hipdnn_sdk::data_objects::NodeAttributes::NodeAttributes_ConvolutionFwdAttributes);
+    EXPECT_EQ(deserialized_graph->nodes[0]->attributes.type,
+              hipdnn_sdk::data_objects::NodeAttributes::NodeAttributes_ConvolutionFwdAttributes);
     auto deserialized_convolution_attributes
         = deserialized_graph->nodes[0]->attributes.AsConvolutionFwdAttributes();
     EXPECT_EQ(deserialized_convolution_attributes->x_tensor_uid, x->get_uid());

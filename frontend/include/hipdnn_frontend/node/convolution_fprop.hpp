@@ -27,33 +27,40 @@ public:
     {
         if(!attributes.get_x())
         {
-            return {error_code_t::ATTRIBUTE_NOT_SET, "ConvolutionNode missing x (input) for pre-validation"};
+            return {error_code_t::ATTRIBUTE_NOT_SET,
+                    "ConvolutionNode missing x (input) for pre-validation"};
         }
         if(!attributes.get_w())
         {
-            return {error_code_t::ATTRIBUTE_NOT_SET, "ConvolutionNode missing w (weights) for pre-validation"};
+            return {error_code_t::ATTRIBUTE_NOT_SET,
+                    "ConvolutionNode missing w (weights) for pre-validation"};
         }
         if(!attributes.get_y())
         {
-            return {error_code_t::ATTRIBUTE_NOT_SET, "ConvolutionNode missing y (output) for pre-validation"};
+            return {error_code_t::ATTRIBUTE_NOT_SET,
+                    "ConvolutionNode missing y (output) for pre-validation"};
         }
 
         // Validate convolution parameters
         if(attributes.get_pre_padding().empty())
         {
-            return {error_code_t::ATTRIBUTE_NOT_SET, "ConvolutionNode missing pre_padding for pre-validation"};
+            return {error_code_t::ATTRIBUTE_NOT_SET,
+                    "ConvolutionNode missing pre_padding for pre-validation"};
         }
         if(attributes.get_post_padding().empty())
         {
-            return {error_code_t::ATTRIBUTE_NOT_SET, "ConvolutionNode missing post_padding for pre-validation"};
+            return {error_code_t::ATTRIBUTE_NOT_SET,
+                    "ConvolutionNode missing post_padding for pre-validation"};
         }
         if(attributes.get_stride().empty())
         {
-            return {error_code_t::ATTRIBUTE_NOT_SET, "ConvolutionNode missing stride for pre-validation"};
+            return {error_code_t::ATTRIBUTE_NOT_SET,
+                    "ConvolutionNode missing stride for pre-validation"};
         }
         if(attributes.get_dilation().empty())
         {
-            return {error_code_t::ATTRIBUTE_NOT_SET, "ConvolutionNode missing dilation for pre-validation"};
+            return {error_code_t::ATTRIBUTE_NOT_SET,
+                    "ConvolutionNode missing dilation for pre-validation"};
         }
 
         return {};
