@@ -136,6 +136,22 @@ TEST_F(Engine_heuristic_descriptor_test, SetEngineHeuristicDescriptorGraph)
 {
     auto heur = get_engine_heuristic_descriptor();
 
+    EXPECT_CALL(*get_mock_graph_bad_type(), is_finalized()).Times(1);
+    EXPECT_CALL(*get_mock_graph(), is_finalized()).WillOnce(Return(false)).WillOnce(Return(true));
+
+    // is_finalized->false
+    ASSERT_THROW_HIPDNN_STATUS(heur->set_attribute(HIPDNN_ATTR_ENGINEHEUR_OPERATION_GRAPH,
+                                                   HIPDNN_TYPE_BACKEND_DESCRIPTOR,
+                                                   1,
+                                                   &_mock_graph_wrapper),
+                               HIPDNN_STATUS_BAD_PARAM_NOT_FINALIZED);
+
+    // is_finalized()->true
+    ASSERT_NO_THROW(heur->set_attribute(HIPDNN_ATTR_ENGINEHEUR_OPERATION_GRAPH,
+                                        HIPDNN_TYPE_BACKEND_DESCRIPTOR,
+                                        1,
+                                        &_mock_graph_wrapper));
+
     ASSERT_THROW_HIPDNN_STATUS(
         heur->set_attribute(
             HIPDNN_ATTR_ENGINEHEUR_OPERATION_GRAPH, HIPDNN_TYPE_INT64, 1, &_mock_graph_wrapper),
@@ -169,19 +185,6 @@ TEST_F(Engine_heuristic_descriptor_test, SetEngineHeuristicDescriptorGraph)
                                                    1,
                                                    &_mock_wrong_type_wrapper),
                                HIPDNN_STATUS_BAD_PARAM);
-
-    EXPECT_CALL(*get_mock_graph(), is_finalized()).WillOnce(Return(false));
-    ASSERT_THROW_HIPDNN_STATUS(heur->set_attribute(HIPDNN_ATTR_ENGINEHEUR_OPERATION_GRAPH,
-                                                   HIPDNN_TYPE_BACKEND_DESCRIPTOR,
-                                                   1,
-                                                   &_mock_graph_wrapper),
-                               HIPDNN_STATUS_BAD_PARAM_NOT_FINALIZED);
-
-    EXPECT_CALL(*get_mock_graph(), is_finalized()).WillOnce(Return(true));
-    ASSERT_NO_THROW(heur->set_attribute(HIPDNN_ATTR_ENGINEHEUR_OPERATION_GRAPH,
-                                        HIPDNN_TYPE_BACKEND_DESCRIPTOR,
-                                        1,
-                                        &_mock_graph_wrapper));
 }
 
 TEST_F(Engine_heuristic_descriptor_test, SetEngineHeuristicDescriptorHeurMode)
@@ -236,6 +239,9 @@ TEST_F(Engine_heuristic_descriptor_test, SetAttrOnFinalizedEngineHeuristicDescri
 TEST_F(Engine_heuristic_descriptor_test, FinalizeEngineHeuristicDescriptor)
 {
     auto heur = get_engine_heuristic_descriptor();
+    EXPECT_CALL(*_mock_engine_plugin_resource_manager, get_applicable_engine_ids)
+        .Times(AnyNumber()); //Uninteresting call
+
     ASSERT_THROW_HIPDNN_STATUS(heur->finalize(), HIPDNN_STATUS_BAD_PARAM);
 
     set_graph();
@@ -250,6 +256,9 @@ TEST_F(Engine_heuristic_descriptor_test, FinalizeEngineHeuristicDescriptor)
 TEST_F(Engine_heuristic_descriptor_test, FinalizeEngineHeuristicDescriptorReverseOrder)
 {
     auto heur = get_engine_heuristic_descriptor();
+    EXPECT_CALL(*_mock_engine_plugin_resource_manager, get_applicable_engine_ids)
+        .Times(AnyNumber()); //Uninteresting call
+
     ASSERT_THROW_HIPDNN_STATUS(heur->finalize(), HIPDNN_STATUS_BAD_PARAM);
 
     set_heuristic_mode();

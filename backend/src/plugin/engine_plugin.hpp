@@ -22,7 +22,8 @@ protected:
     Engine_plugin(Shared_library&& lib);
 
 public:
-    hipdnnEnginePluginHandle_t create_handle() const;
+    std::vector<int64_t> get_all_engine_ids() const;
+    [[nodiscard]] hipdnnEnginePluginHandle_t create_handle() const;
     void destroy_handle(hipdnnEnginePluginHandle_t handle) const;
     void set_stream(hipdnnEnginePluginHandle_t handle, hipStream_t stream) const;
     std::vector<int64_t> get_applicable_engine_ids(hipdnnEnginePluginHandle_t handle,
@@ -36,7 +37,7 @@ public:
     size_t get_workspace_size(hipdnnEnginePluginHandle_t handle,
                               const hipdnnPluginConstData_t* engine_config,
                               const hipdnnPluginConstData_t* op_graph) const;
-    hipdnnEnginePluginExecutionContext_t
+    [[nodiscard]] hipdnnEnginePluginExecutionContext_t
         create_execution_context(hipdnnEnginePluginHandle_t handle,
                                  const hipdnnPluginConstData_t* engine_config,
                                  const hipdnnPluginConstData_t* op_graph) const;
@@ -60,6 +61,9 @@ private:
     bool _initialized = false;
 #endif
 
+    mutable std::vector<int64_t> _all_engine_ids;
+
+    hipdnnPluginStatus_t (*_func_get_all_engine_ids)(int64_t*, uint32_t, uint32_t*);
     hipdnnPluginStatus_t (*_func_create_handle)(hipdnnEnginePluginHandle_t*);
     hipdnnPluginStatus_t (*_func_destroy_handle)(hipdnnEnginePluginHandle_t);
     hipdnnPluginStatus_t (*_func_set_stream)(hipdnnEnginePluginHandle_t, hipStream_t);

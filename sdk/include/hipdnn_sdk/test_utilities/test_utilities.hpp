@@ -10,6 +10,13 @@
         GTEST_SKIP() << "Disable device tests with ASAN"; \
     } while(0)
 
+#elif _WIN32
+#define SKIP_IF_NO_DEVICES()                               \
+    do                                                     \
+    {                                                      \
+        GTEST_SKIP() << "Disable device tests with WIN32"; \
+    } while(0)
+
 #else
 #define SKIP_IF_NO_DEVICES()                                        \
     do                                                              \

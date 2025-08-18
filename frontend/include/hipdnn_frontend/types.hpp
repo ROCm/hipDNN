@@ -110,4 +110,30 @@ DataType_t get_data_type_enum_from_type()
     }
 }
 
+[[maybe_unused]] static const char* to_string(const DataType_t& type)
+{
+    switch(type)
+    {
+    case DataType_t::FLOAT:
+        return "fp32";
+    case DataType_t::HALF:
+        return "fp16";
+    case DataType_t::BFLOAT16:
+        return "bf16";
+    case DataType_t::DOUBLE:
+        return "fp64";
+    case DataType_t::UINT8:
+        return "uint8";
+    case DataType_t::INT32:
+        return "int32";
+    default:
+        return "unknown";
+    }
+}
+
+[[maybe_unused]] static std::ostream& operator<<(std::ostream& os, const DataType_t& type)
+{
+    return os << to_string(type);
+}
+
 }

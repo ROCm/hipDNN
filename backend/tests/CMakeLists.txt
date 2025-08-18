@@ -4,6 +4,7 @@
 include(GoogleTest)
 
 find_package(hip REQUIRED)
+find_package(Threads REQUIRED)
 
 # TODO Do not enable HIP language globally, use HIP RTC instead.
 # The library does not contain any HIP code (or any other device code).
@@ -39,7 +40,7 @@ add_executable(hipdnn_backend_tests
 target_link_libraries(hipdnn_backend_tests 
     GTest::gtest
     GTest::gmock
-    pthread
+    Threads::Threads
     hipdnn_backend_private
     hipdnn_sdk
     ${CMAKE_DL_LIBS}

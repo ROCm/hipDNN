@@ -3,6 +3,8 @@
 
 #include <gtest/gtest.h>
 
+#define HIPDNN_BACKEND_STATIC_DEFINE
+
 #include <hipdnn_sdk/plugin/plugin_exception.hpp>
 #include <hipdnn_sdk/plugin/plugin_helpers.hpp>
 #include <hipdnn_sdk/plugin/plugin_last_error_manager.hpp>

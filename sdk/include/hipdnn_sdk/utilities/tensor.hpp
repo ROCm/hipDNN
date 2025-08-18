@@ -5,6 +5,7 @@
 
 #include <hipdnn_sdk/utilities/migratable_memory.hpp>
 #include <hipdnn_sdk/utilities/shape_utils.hpp>
+#include <iostream>
 #include <numeric>
 #include <random>
 #include <vector>
@@ -13,6 +14,24 @@ namespace hipdnn_sdk
 {
 namespace utilities
 {
+
+struct Tensor_layout
+{
+    std::string name;
+    std::vector<int64_t> stride_order;
+
+    static const Tensor_layout NCHW;
+    static const Tensor_layout NHWC;
+};
+
+inline const Tensor_layout Tensor_layout::NCHW{.name = "NCHW", .stride_order = {3, 2, 1, 0}};
+inline const Tensor_layout Tensor_layout::NHWC{.name = "NHWC",
+                                               .stride_order = stride_order_nhwc(4)};
+
+inline std::ostream& operator<<(std::ostream& os, const Tensor_layout& layout)
+{
+    return os << layout.name;
+}
 
 // Wraps vectors of dims/strides and Migratable_memory<T> to provide a common interface for testing
 class Tensor
@@ -36,9 +55,10 @@ public:
     Tensor& operator=(Tensor&&) = default;
 
     template <typename T>
-    static Tensor make_nchw_tensor(const std::vector<int64_t>& dims)
+    static Tensor make_tensor(const std::vector<int64_t>& dims,
+                              const Tensor_layout& layout = Tensor_layout::NCHW)
     {
-        return {dims, generate_strides(dims, {3, 2, 1, 0}), sizeof(T)};
+        return {dims, generate_strides(dims, layout.stride_order), sizeof(T)};
     }
 
     template <typename T>
@@ -127,5 +147,5 @@ private:
     std::vector<int64_t> _strides;
 };
 
-} // namespace reference_test_utilities
+} // namespace utilities
 } // namespace hipdnn_sdk

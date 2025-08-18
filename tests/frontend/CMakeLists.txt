@@ -3,6 +3,7 @@
 
 include(GoogleTest)
 find_package(hip REQUIRED)
+find_package(Threads REQUIRED)
 
 add_executable(public_hipdnn_frontend_tests 
     main.cpp
@@ -13,7 +14,7 @@ target_compile_options(public_hipdnn_frontend_tests PRIVATE ${HIPDNN_WARNING_COM
 target_link_libraries(public_hipdnn_frontend_tests
     GTest::gtest 
     GTest::gtest_main 
-    pthread 
+    Threads::Threads 
     hipdnn_sdk
     hipdnn_backend
     hipdnn_frontend
