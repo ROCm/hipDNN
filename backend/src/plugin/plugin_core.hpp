@@ -14,6 +14,7 @@
 
 #include "hipdnn_backend_plugin_loading_mode.h"
 #include "logging/logging.hpp"
+#include "platform_utils.hpp"
 #include <hipdnn_sdk/plugin/plugin_api_data_types.h>
 #include <hipdnn_sdk/plugin/plugin_data_type_helpers.hpp>
 
@@ -24,13 +25,6 @@ namespace hipdnn_backend
 {
 namespace plugin
 {
-
-// TODO: add platform_utils.hpp in sdk perhaps. For these-types of utilities.
-#if defined(_WIN32)
-constexpr const char* SHARED_LIB_EXT = ".dll";
-#else
-constexpr const char* SHARED_LIB_EXT = ".so";
-#endif
 
 // The Plugin_base is the base class for all plugins.
 class Plugin_base
@@ -109,7 +103,7 @@ protected:
         std::filesystem::path base_dir;
         try
         {
-            base_dir = plugin::Shared_library::get_current_module_directory();
+            base_dir = hipdnn_backend::platform_utils::get_current_module_directory();
         }
         catch(const Hipdnn_exception& e)
         {
@@ -135,6 +129,19 @@ protected:
         }
 
         return resolved_paths;
+    }
+
+    // This function is called before adding a plugin to the plugin list.
+    // The function must throw Hipdnn_exception if the plugin is not valid.
+    virtual void validate_before_adding(const Plugin& plugin)
+    {
+        std::ignore = plugin;
+    }
+
+    // This function is called after the plugin is added to the plugin list.
+    virtual void action_after_adding(const Plugin& plugin)
+    {
+        std::ignore = plugin;
     }
 
 public:
@@ -214,7 +221,8 @@ private:
             for(const auto& entry : std::filesystem::directory_iterator(dir_path))
             {
                 const auto& path = entry.path();
-                if(entry.is_regular_file() && path.extension() == SHARED_LIB_EXT)
+                if(entry.is_regular_file()
+                   && path.extension() == hipdnn_sdk::utilities::SHARED_LIB_EXT)
                 {
                     paths_to_load.insert(std::filesystem::weakly_canonical(path));
                 }
@@ -259,6 +267,8 @@ private:
 
             plugin.set_logging_callback(logging::hipdnn_logging_callback);
 
+            validate_before_adding(plugin);
+
             _plugins.emplace_back(std::move(plugin));
             _loaded_plugin_files.insert(library_path);
 
@@ -268,6 +278,8 @@ private:
                             version,
                             type,
                             static_cast<int>(type));
+
+            action_after_adding(_plugins.back());
         }
         catch(const Hipdnn_exception& e)
         {

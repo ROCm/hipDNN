@@ -28,6 +28,28 @@ extern "C" {
  */
 
 /**
+ * @brief Retrieves the IDs of all engines available in the engine plugin.
+ *
+ * @param[out] engine_ids A pointer to an array where the IDs of available engines will be stored. The array must
+ *                        have a size of at least `max_engines`.
+ * @param[in] max_engines The maximum number of engine IDs that can be stored in the `engine_ids` array.
+ * @param[out] num_engines A pointer to a variable where the total number of available engines will be stored.
+ *                         This value may exceed `max_engines` if more engines are available than the array can
+ *                         accommodate.
+ *
+ * @return A value of type `hipdnnPluginStatus_t` indicating the status of the operation.
+ *
+ * @note The caller is responsible for ensuring that the `engine_ids` array is large enough to hold up to
+ *       `max_engines` IDs. If the number of available engines exceeds `max_engines`, only the first
+ *       `max_engines` IDs will be returned, and the total count will be stored in `num_engines`.
+ *       The function can be called with `max_engines = 0` (in this case, `engine_ids` may be `NULL`)
+ *       to retrieve the total count of available engines without returning their IDs.
+ */
+HIPDNN_PLUGIN_EXPORT hipdnnPluginStatus_t hipdnnEnginePluginGetAllEngineIds(int64_t* engine_ids,
+                                                                            uint32_t max_engines,
+                                                                            uint32_t* num_engines);
+
+/**
  * @brief Creates a new engine plugin handle.
  *
  * @param[out] handle A pointer to a variable where the created engine plugin handle will be stored. The handle is
@@ -83,6 +105,8 @@ HIPDNN_PLUGIN_EXPORT hipdnnPluginStatus_t
  * @note The caller is responsible for ensuring that the `engine_ids` array is large enough to hold up to
  *       `max_engines` IDs. If the number of applicable engines exceeds `max_engines`, only the first
  *       `max_engines` IDs will be returned, and the total count will be stored in `num_engines`.
+ *       The function can be called with `max_engines = 0` (in this case `engine_ids` may be `NULL`)
+ *       to retrieve the total count of applicable engines without returning their IDs.
  */
 HIPDNN_PLUGIN_EXPORT hipdnnPluginStatus_t
     hipdnnEnginePluginGetApplicableEngineIds(hipdnnEnginePluginHandle_t handle,

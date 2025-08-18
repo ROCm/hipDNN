@@ -81,20 +81,20 @@ public:
             y->set_stride(x->get_stride());
         }
 
-        auto infer_c_tensor = [&](std::shared_ptr<Tensor_attributes>& tensorToInfer) {
-            if(tensorToInfer->get_dim().empty())
+        auto infer_c_tensor = [&](std::shared_ptr<Tensor_attributes>& tensor_to_infer) {
+            if(tensor_to_infer->get_dim().empty())
             {
                 std::vector<int64_t> tensor_dims(x->get_dim().size(), 1);
                 tensor_dims[1] = x->get_dim()[1];
-                tensorToInfer->set_dim(tensor_dims);
+                tensor_to_infer->set_dim(tensor_dims);
             }
 
-            if(tensorToInfer->get_stride().empty())
+            if(tensor_to_infer->get_stride().empty())
             {
                 auto stride_order
-                    = hipdnn_sdk::utilities::stride_order_nhwc(tensorToInfer->get_dim().size());
-                tensorToInfer->set_stride(hipdnn_sdk::utilities::generate_strides(
-                    tensorToInfer->get_dim(), stride_order));
+                    = hipdnn_sdk::utilities::stride_order_nhwc(tensor_to_infer->get_dim().size());
+                tensor_to_infer->set_stride(hipdnn_sdk::utilities::generate_strides(
+                    tensor_to_infer->get_dim(), stride_order));
             }
         };
 

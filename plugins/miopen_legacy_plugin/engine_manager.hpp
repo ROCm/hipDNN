@@ -18,7 +18,7 @@ namespace miopen_legacy_plugin
 class Engine_manager
 {
 public:
-    Engine_manager();
+    Engine_manager() = default;
     ~Engine_manager() = default;
 
     //disallow copy and assignment

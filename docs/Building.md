@@ -8,7 +8,6 @@ hipDNN.  At the time of writing this readme, the following bare minimum system d
 - Package Repository: ROCm 6.4 or later
     - rocm-llvm-devel (amd clang compiler is included with this.)
     - hip-devel
-- Python3
 - Cmake 3.25.2 or later
 - Ninja 1.12.1 or later (Optional)
     - Ninja is the preferred build system for hipDNN
@@ -61,11 +60,6 @@ cmake -DCODE_COVERAGE=ON ..
 mkdir build
 cd build
 cmake -DBUILD_ADDRESS_SANITIZER=ON ..
-
-# python frontend api (requires pybind11 preinstallation)
-mkdir build
-cd build
-cmake -DHIP_DNN_FRONTEND_BUILD_PYTHON_BINDINGS=ON ..
 ```
 
 #### Ninja Targets
@@ -86,3 +80,18 @@ Our development dockerfiles are located in the `dockerfiles` directory.  See the
 
 ## Building Samples
 See the samples [readme](../samples/README.MD) for how to build and run the samples.
+
+## Building on Windows
+
+*Note - HIP & GPU related tests are not currently working*
+1. Follow the instructions for preparing for and cloning TheRock
+2. Open up a "x64 Native Tools Command Prompt for VS 2022" command shell from the start menu
+3. From the native tools prompt, clone and build TheRock
+4. Set your HIP_PLATFORM: `set HIP_PLATFORM=amd`
+5. Set your TheRock dist location: `set PATH=C:\src\hipDNN\build\backend\src;C:\src\TheRock\build\dist\rocm\bin;%PATH%`
+    - If your locations differ, you may need to edit \<src\>/cmake/ClangToolChain.cmake
+    - This is done so that the executables / dlls can find their dependency dlls.
+6. From the native tools prompt, clone and build hipDNN
+    - `cmake -GNinja -DHIP_DNN_BUILD_PLUGINS=OFF ..`
+    - `ninja check`
+

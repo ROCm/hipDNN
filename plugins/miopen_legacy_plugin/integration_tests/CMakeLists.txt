@@ -6,6 +6,7 @@ if(NOT BUILD_PLUGIN_AS_DEPENDENCY)
 endif()
 
 include(GoogleTest)
+find_package(Threads REQUIRED)
 
 
 if(HIP_DNN_SKIP_TESTS)
@@ -31,7 +32,7 @@ target_link_libraries(miopen_plugin_integration_test PUBLIC
     miopen_legacy_plugin
     hipdnn_frontend
     hipdnn_sdk
-    pthread
+    Threads::Threads
 )
 
 

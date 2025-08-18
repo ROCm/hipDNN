@@ -10,6 +10,7 @@
 
 #include <hipdnn_frontend/attributes/tensor_attributes.hpp>
 #include <hipdnn_frontend/graph.hpp>
+#include <hipdnn_frontend/utilities.hpp>
 #include <hipdnn_sdk/test_utilities/cpu_fp_reference_implementation.hpp>
 #include <hipdnn_sdk/test_utilities/cpu_fp_reference_validation.hpp>
 #include <hipdnn_sdk/test_utilities/test_utilities.hpp>
@@ -42,14 +43,16 @@ struct Bn_2d_test_case
 template <typename Input_type, typename Intermediate_type>
 struct Batchnorm_2d_tensor_bundle
 {
-    Batchnorm_2d_tensor_bundle(const std::vector<int64_t>& dims, unsigned int seed = 1)
+    Batchnorm_2d_tensor_bundle(const std::vector<int64_t>& dims,
+                               unsigned int seed = 1,
+                               const Tensor_layout& layout = Tensor_layout::NCHW)
         : derived_dims({1, dims[1], 1, 1})
-        , x_tensor(Tensor::make_nchw_tensor<Input_type>(dims))
-        , y_tensor(Tensor::make_nchw_tensor<Input_type>(dims))
-        , scale_tensor(Tensor::make_nchw_tensor<Intermediate_type>(derived_dims))
-        , bias_tensor(Tensor::make_nchw_tensor<Intermediate_type>(derived_dims))
-        , mean_tensor(Tensor::make_nchw_tensor<Intermediate_type>(derived_dims))
-        , variance_tensor(Tensor::make_nchw_tensor<Intermediate_type>(derived_dims))
+        , x_tensor(Tensor::make_tensor<Input_type>(dims, layout))
+        , y_tensor(Tensor::make_tensor<Input_type>(dims, layout))
+        , scale_tensor(Tensor::make_tensor<Intermediate_type>(derived_dims))
+        , bias_tensor(Tensor::make_tensor<Intermediate_type>(derived_dims))
+        , mean_tensor(Tensor::make_tensor<Intermediate_type>(derived_dims))
+        , variance_tensor(Tensor::make_tensor<Intermediate_type>(derived_dims))
     {
         x_tensor.fill_with_random_values<Input_type>(
             static_cast<Input_type>(0.0f), static_cast<Input_type>(1.0f), seed);
@@ -156,40 +159,30 @@ protected:
         graph->set_name("BatchnormInferenceTest");
 
         int64_t uid = 1;
-        auto x_tensor_attr = std::make_shared<Tensor_attributes>();
-        x_tensor_attr->set_uid(uid++)
-            .set_name("X")
-            .set_data_type(input_data_type)
-            .set_dim(graph_tensor_bundle.x_tensor.dims())
-            .set_stride(graph_tensor_bundle.x_tensor.strides());
+        auto x_attr = make_tensor_attributes("X", input_data_type, graph_tensor_bundle.x_tensor);
+        x_attr.set_uid(uid++);
+        auto x_tensor_attr = std::make_shared<Tensor_attributes>(std::move(x_attr));
 
-        auto mean_tensor_attr = std::make_shared<Tensor_attributes>();
-        mean_tensor_attr->set_uid(uid++)
-            .set_name("mean")
-            .set_data_type(intermediate_data_type)
-            .set_dim(graph_tensor_bundle.mean_tensor.dims())
-            .set_stride(graph_tensor_bundle.mean_tensor.strides());
+        auto mean_attr = make_tensor_attributes(
+            "mean", intermediate_data_type, graph_tensor_bundle.mean_tensor);
+        mean_attr.set_uid(uid++);
+        auto mean_tensor_attr = std::make_shared<Tensor_attributes>(std::move(mean_attr));
 
-        auto inv_variance_tensor_attr = std::make_shared<Tensor_attributes>();
-        inv_variance_tensor_attr->set_uid(uid++)
-            .set_name("inv_variance")
-            .set_data_type(intermediate_data_type)
-            .set_dim(graph_tensor_bundle.variance_tensor.dims())
-            .set_stride(graph_tensor_bundle.variance_tensor.strides());
+        auto inv_variance_attr = make_tensor_attributes(
+            "inv_variance", intermediate_data_type, graph_tensor_bundle.variance_tensor);
+        inv_variance_attr.set_uid(uid++);
+        auto inv_variance_tensor_attr
+            = std::make_shared<Tensor_attributes>(std::move(inv_variance_attr));
 
-        auto scale_tensor_attr = std::make_shared<Tensor_attributes>();
-        scale_tensor_attr->set_uid(uid++)
-            .set_name("scale")
-            .set_data_type(intermediate_data_type)
-            .set_dim(graph_tensor_bundle.scale_tensor.dims())
-            .set_stride(graph_tensor_bundle.scale_tensor.strides());
+        auto scale_attr = make_tensor_attributes(
+            "scale", intermediate_data_type, graph_tensor_bundle.scale_tensor);
+        scale_attr.set_uid(uid++);
+        auto scale_tensor_attr = std::make_shared<Tensor_attributes>(std::move(scale_attr));
 
-        auto bias_tensor_attr = std::make_shared<Tensor_attributes>();
-        bias_tensor_attr->set_uid(uid++)
-            .set_name("bias")
-            .set_data_type(intermediate_data_type)
-            .set_dim(graph_tensor_bundle.bias_tensor.dims())
-            .set_stride(graph_tensor_bundle.bias_tensor.strides());
+        auto bias_attr = make_tensor_attributes(
+            "bias", intermediate_data_type, graph_tensor_bundle.bias_tensor);
+        bias_attr.set_uid(uid++);
+        auto bias_tensor_attr = std::make_shared<Tensor_attributes>(std::move(bias_attr));
 
         Batchnorm_inference_attributes bn_attrs;
         bn_attrs.set_name("batchnorm_inference");
@@ -254,7 +247,9 @@ protected:
     }
 
     template <typename Input_type, typename Intermediate_type>
-    void run_batchnorm_test(const Bn_2d_test_case& test_case, Input_type tolerance = 1e-4f)
+    void run_batchnorm_test(const Bn_2d_test_case& test_case,
+                            Input_type tolerance = 1e-4f,
+                            const Tensor_layout& layout = Tensor_layout::NCHW)
     {
         auto input_data_type = get_data_type_enum_from_type<Input_type>();
         auto intermediate_data_type = get_data_type_enum_from_type<Intermediate_type>();
@@ -264,10 +259,10 @@ protected:
         HIPDNN_LOG_INFO("Test is using {} for its random seed", seed);
 
         Batchnorm_2d_tensor_bundle<Input_type, Intermediate_type> graph_tensor_bundle(
-            test_case.get_dims(), seed);
+            test_case.get_dims(), seed, layout);
 
         Batchnorm_2d_tensor_bundle<Input_type, Intermediate_type> cpu_tensor_bundle(
-            test_case.get_dims(), seed);
+            test_case.get_dims(), seed, layout);
 
         run_miopen_batchnorm_fwd<Input_type, Intermediate_type>(
             graph_tensor_bundle, input_data_type, intermediate_data_type);
@@ -340,4 +335,21 @@ TEST_P(Batchnorm_forward_inference_integration_test_half, RunHalfFwdbatchnormGra
 
 INSTANTIATE_TEST_SUITE_P(RunHalfFwdbatchnormGraph,
                          Batchnorm_forward_inference_integration_test_half,
+                         testing::ValuesIn(get_bn_fwd_inference_test_cases()));
+
+// Basic NHWC float test case
+class Batchnorm_forward_inference_integration_test_nhwc
+    : public Batchnorm_forward_inference_integration_test
+{
+};
+
+TEST_P(Batchnorm_forward_inference_integration_test_nhwc, RunFloatFwdBatchnormGraphNHWC)
+{
+    Bn_2d_test_case test_case = GetParam();
+    run_batchnorm_test<float, float>(test_case, 1e-6f, Tensor_layout::NHWC);
+}
+
+// Consider using fewer/smaller test cases to reduce test time
+INSTANTIATE_TEST_SUITE_P(RunFloatFwdBatchnormGraphNHWC,
+                         Batchnorm_forward_inference_integration_test_nhwc,
                          testing::ValuesIn(get_bn_fwd_inference_test_cases()));

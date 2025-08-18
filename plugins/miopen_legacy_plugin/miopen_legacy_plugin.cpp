@@ -19,30 +19,14 @@
 #include "miopen_container.hpp"
 #include "miopen_handle_factory.hpp"
 
-static const char* _plugin_name = "miopen_legacy_plugin";
-static const char* _plugin_version = "1.0.0";
+static const char* plugin_name = "miopen_legacy_plugin";
+static const char* plugin_version = "1.0.0";
 
 using namespace hipdnn_plugin;
 using namespace miopen_legacy_plugin;
 
 // NOLINTNEXTLINE(modernize-avoid-c-arrays)
 thread_local char Plugin_last_error_manager::last_error[HIPDNN_PLUGIN_ERROR_STRING_MAX_LENGTH] = "";
-
-#define LOG_API_ENTRY(format, ...) \
-    HIPDNN_LOG_INFO("API called: [{}] " format, __func__ __VA_OPT__(, ) __VA_ARGS__)
-
-#define LOG_API_SUCCESS(func_name, format, ...) \
-    HIPDNN_LOG_INFO("API success: [{}] " format, func_name __VA_OPT__(, ) __VA_ARGS__)
-
-template <typename T>
-void throw_if_null(T* value)
-{
-    if(value == nullptr)
-    {
-        throw hipdnn_plugin::Hipdnn_plugin_exception(HIPDNN_PLUGIN_STATUS_BAD_PARAM,
-                                                     std::string(typeid(T).name()) + " is nullptr");
-    }
-}
 
 // Keep a weak pointer to the Miopen_container thats made when we create a plugin handle.
 // The original shared_ptr is then stored on the handle so that it can be used for the lifecycle
@@ -60,7 +44,7 @@ hipdnnPluginStatus_t hipdnnPluginGetName(const char** name)
     return hipdnn_plugin::try_catch([&, api_name = __func__]() {
         throw_if_null(name);
 
-        *name = _plugin_name;
+        *name = plugin_name;
 
         LOG_API_SUCCESS(api_name, "plugin_name={:p}", static_cast<void*>(name));
     });
@@ -73,7 +57,7 @@ hipdnnPluginStatus_t hipdnnPluginGetVersion(const char** version)
     return hipdnn_plugin::try_catch([&, api_name = __func__]() {
         throw_if_null(version);
 
-        *version = _plugin_version;
+        *version = plugin_version;
 
         LOG_API_SUCCESS(api_name, "version={:p}", static_cast<void*>(version));
     });
@@ -110,8 +94,60 @@ hipdnnPluginStatus_t hipdnnPluginSetLoggingCallback(hipdnnCallback_t callback)
 {
     return hipdnn_plugin::try_catch([&, api_name = __func__]() {
         throw_if_null(callback);
-        hipdnn::logging::initialize_callback_logging(_plugin_name, callback);
+        hipdnn::logging::initialize_callback_logging(plugin_name, callback);
         LOG_API_SUCCESS(api_name, "");
+    });
+}
+
+hipdnnPluginStatus_t hipdnnEnginePluginGetAllEngineIds(int64_t* engine_ids,
+                                                       uint32_t max_engines,
+                                                       uint32_t* num_engines)
+{
+    LOG_API_ENTRY("engine_ids={:p}, max_engines={}, num_engines={:p}",
+                  static_cast<void*>(engine_ids),
+                  max_engines,
+                  static_cast<void*>(num_engines));
+
+    return hipdnn_plugin::try_catch([&, api_name = __func__]() {
+        if(max_engines != 0)
+        {
+            throw_if_null(engine_ids);
+        }
+        throw_if_null(num_engines);
+
+        // For now, we will just return a single engine ID.
+        auto all_engine_ids = std::vector<int64_t>({1});
+        if(all_engine_ids.size() > std::numeric_limits<uint32_t>::max())
+        {
+            throw Hipdnn_plugin_exception(HIPDNN_PLUGIN_STATUS_INTERNAL_ERROR,
+                                          "Number of engines exceeds maximum uint32_t value.");
+        }
+
+        if(max_engines == 0)
+        {
+            *num_engines = static_cast<uint32_t>(all_engine_ids.size());
+        }
+        else
+        {
+            *num_engines = 0;
+            for(auto engine_id : all_engine_ids)
+            {
+                if(*num_engines == max_engines)
+                {
+                    *num_engines = static_cast<uint32_t>(all_engine_ids.size());
+                    HIPDNN_LOG_INFO("Maximum number of engines reached ({}), ignoring additional "
+                                    "engines, num_engines count: {}",
+                                    max_engines,
+                                    *num_engines);
+                    break;
+                }
+
+                engine_ids[*num_engines] = engine_id;
+                (*num_engines)++;
+            }
+        }
+
+        LOG_API_SUCCESS(api_name, "num_engines={}", *num_engines);
     });
 }
 
@@ -200,7 +236,10 @@ hipdnnPluginStatus_t
     return hipdnn_plugin::try_catch([&, api_name = __func__]() {
         throw_if_null(handle);
         throw_if_null(op_graph);
-        throw_if_null(engine_ids);
+        if(max_engines != 0)
+        {
+            throw_if_null(engine_ids);
+        }
         throw_if_null(num_engines);
 
         auto& engine_manager = handle->get_engine_manager();
