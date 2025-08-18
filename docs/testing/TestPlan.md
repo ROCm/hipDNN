@@ -1,14 +1,7 @@
 # hipDNN Test Plan
 
-## Table of Contents
-
-- [Prerequisites](#prerequisites)
-  - [Test Case 1: CI Is Green](#test-case-1-ci-is-green)
-  - [Test Case 2: Documentation is Current](#test-case-2-documentation-is-current)
-- [Regular Tests](#regular-tests)
-  - [Test Case 1: Run the Automated Tests](#test-case-1-run-the-automated-tests)
-- [ASAN Enabled Tests](#asan-enabled-tests)
-  - [Test Case 1: Run the Automated Tests with ASAN Enabled](#test-case-1-run-the-automated-tests-with-asan-enabled)
+> [!IMPORTANT]
+> All prerequisites and tests in this document must pass for a successful release.
 
 ---
 
@@ -16,16 +9,24 @@
 
 ### Test Case 1: CI Is Green
 
-All existing test plan checks should be running automatically on all PRs against the hipDNN Repo & Develop after merging a PR:
-- Pre-checkin does unit & integration tests
-- Codecov stage checks code coverage
-- Debug runs pre-checkin checks in a debug build
+Existing checks should be running automatically on all PRs pre-merge and on `develop` branch post-merge.
+
+| CI Stage | Description |
+|----------|-------------|
+| `static-analysis` | Runs linting and static analysis tools to detect code issues early |
+| `precheckin` | Runs unit & integration tests |
+| `codecov` | Checks code coverage requirements |
+| `debug` | Runs pre-checkin checks in a debug build |
 
 ### Test Case 2: Documentation is Current
 
-- Check versions
-- Do a light pass on wording etc.
-- Changelog is correct
+Verify that all documentation is up to date:
+
+1. Check version numbers throughout the documentation
+2. Review instructions, explanations, and wording for clarity and accuracy
+4. Verify changelog is complete and correct
+
+> See the [main README](../../README.md) table of contents to identify relevant areas of documentation
 
 ---
 
@@ -33,33 +34,45 @@ All existing test plan checks should be running automatically on all PRs against
 
 ### Test Case 1: Run the Automated Tests
 
-**Steps**:
-1. Clone repo
-2. Create build directory:
+#### Steps
+
+1. **Clone the repository**
+   ```bash
+   git clone git@github.com:ROCm/hipDNN.git
+   cd hipDNN
+   ```
+
+2. **Create and enter build directory**
    ```bash
    mkdir build
    cd build
    ```
-3. Configure with CMake:
+
+3. **Configure the project with CMake**
    ```bash
    cmake ..
    ```
-   > **Note**: Add `-DBUILD_ADDRESS_SANITIZER=ON` to cmake command if you want to check with address sanitizer. Running with address sanitizer will disable GPU tests.
+   
+   > **Optional**: Add `-DBUILD_ADDRESS_SANITIZER=ON` to enable address sanitizer (see below)
 
-4. Run tests:
+4. **Run the test suite**
    ```bash
    ninja check_ctest
-   # or
-   make check_ctest
+   ```
+   
+   Alternatively, if using make:
+   ```bash
+   make -j$(nproc) check_ctest
    ```
 
-**Expected Results**:
-- All tests pass
-- Depending on the environment being ran, some GPU tests may be skipped
-- For environments without a GPU: all GPU tests should be skipped, but none of them should be failing
-- For environments with a GPU: the plugin integration tests will potentially skip if support does not exist for that GPU. However, it's expected that they should provide a skipped message indicating it was skipped due to lacking support for that ASIC
+#### Expected Results
 
-> **Note**: ASIC specific coverage will be determined by the plugin, and is not a global requirement for hipDNN. I.E You can have a plugin that is only expected to support some ASICs.
+- **Test Status**: All tests should pass
+- **GPU Test Behavior**:
+  - **Without GPU**: All GPU tests should skip gracefully without failures
+  - **With GPU**: Plugin integration tests may skip if the GPU is not supported
+    - Skipped tests should provide clear messages indicating lack of ASIC support
+- **Plugin Support**: ASIC-specific coverage is determined by individual plugins and is not a global hipDNN requirement
 
 ---
 
@@ -67,24 +80,37 @@ All existing test plan checks should be running automatically on all PRs against
 
 ### Test Case 1: Run the Automated Tests with ASAN Enabled
 
-**Steps**:
-1. Clone repo
-2. Create build directory:
+#### Steps
+
+1. **Clone the repository**
+   ```bash
+   git clone git@github.com:ROCm/hipDNN.git
+   cd hipDNN
+   ```
+
+2. **Create and enter build directory**
    ```bash
    mkdir build
    cd build
    ```
-3. Configure with ASAN:
+
+3. **Configure with Address Sanitizer enabled**
    ```bash
    cmake .. -DBUILD_ADDRESS_SANITIZER=ON
    ```
-4. Run tests:
+
+4. **Run the test suite**
    ```bash
    ninja check_ctest
-   # or
-   make check_ctest
+   ```
+   
+   Alternatively, if using make:
+   ```bash
+   make -j$(nproc) check_ctest
    ```
 
-**Expected Results**:
-- All tests pass
-- All GPU tests are expected to be skipped since ASAN disables GPU related tests
+#### Expected Results
+
+- **Test Status**: All tests should pass
+- **GPU Test Behavior**: All GPU tests will be skipped due to ASAN being enabled
+- **Memory Safety**: No memory leaks or violations should be detected

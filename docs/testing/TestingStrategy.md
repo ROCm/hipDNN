@@ -1,20 +1,27 @@
 # hipDNN Testing Strategy
 
-## Overview
-
 This document outlines the comprehensive testing strategy for hipDNN, covering white box testing (unit tests), black box testing (API tests), integration testing, and performance/benchmarking.
 
 ---
 
 ## 1. White Box Testing (Unit Tests)
 
-### Backend Component Unit Tests
+White box tests focus on internal implementation details of hipDNN components. All white box tests should run on each PR.
 
-**Location**: `backend/tests/`
+### Component Comparison
 
-**Purpose**: Test internal implementation details of hipDNN backend
+| Component | Location | Purpose | GPU Testing | Environments |
+|-----------|----------|---------|-------------|--------------|
+| **Backend** | `backend/tests/` | Test internal implementation of hipDNN backend | Minimal/None - mark with `SKIP_IF_NO_DEVICE()` | Windows & Linux |
+| **Frontend** | `frontend/tests/` | Test internal implementation of hipDNN frontend | Minimal/None - mark with `SKIP_IF_NO_DEVICE()` | Windows & Linux |
+| **SDK** | `sdk/tests/` | Test internal implementation of hipDNN SDK | Minimal/None expected | Windows & Linux |
+| **Plugin** | `plugins/<name>/tests/` | Test internal implementation of specific plugin | Minimal & fast - skippable if CPU only | Windows & Linux |
 
-**Test Categories**:
+---
+
+### Test Categories by Component
+
+#### Backend
 - Descriptors
 - Plugin system
 - Error handling
@@ -22,233 +29,130 @@ This document outlines the comprehensive testing strategy for hipDNN, covering w
 - Handle
 - Graph extensions
 
-**Requirements**:
-- Use GMOCK for mocking dependencies
-- Use stubbed plugin implementations for plugin testing
-- Fast execution
-- No GPU testing, or very minimal GPU testing for APIs that require device handles
-- GPU operations must be marked with `SKIP_IF_NO_DEVICE()`
-
-**Applicable testing environments**:
-- Windows & supported Linux distros
-- GPU hardware shouldn't impact these tests
-
-**Frequency of tests**: Run on each PR
-
-### Frontend Component Unit Tests
-
-**Location**: `frontend/tests/`
-
-**Purpose**: Test internal implementation details of hipDNN frontend
-
-**Test Categories**:
+#### Frontend
 - Attribute
 - Node
 - Graph construction & flow
 - Utilities
 
-**Requirements**:
-- Use mocked backend for isolation
-- Use GMOCK for mocking dependencies
-- Fast execution
-- No GPU testing, or very minimal GPU testing for APIs that require device handles (hipStreams etc.)
-- GPU operations must be marked with `SKIP_IF_NO_DEVICE()`
-
-**Applicable testing environments**:
-- Windows & supported Linux distros
-- GPU hardware shouldn't impact these tests
-
-**Frequency of tests**: Run on each PR
-
-### SDK Component Unit Tests
-
-**Location**: `sdk/tests/`
-
-**Purpose**: Test internal implementation details of hipDNN SDK
-
-**Test Categories**:
+#### SDK
 - Plugins
 - Data objects
 - Logging
 - Utilities
 
-**Requirements**:
-- Use GMOCK for mocking dependencies
-- Fast execution
-- No GPU testing, or very minimal GPU testing is expected for the SDK
-- Note: This may change in the future if/when GPU reference implementations are added
+#### Plugin
+- TBD based on plugin implementation
 
-**Applicable testing environments**:
-- Windows & supported Linux distros
-- GPU hardware shouldn't impact these tests
+### Common Requirements
 
-**Frequency of tests**: Run on each PR
-
-### Plugin Unit Tests
-
-**Location**: Each plugin's directory (e.g., `plugins/miopen_legacy_plugin/tests/`)
-
-**Purpose**: Test internal implementation details of plugin
-
-**Test Categories**: TBD based on plugin implementation
-
-**Requirements**:
-- Use GMOCK for mocking dependencies
-- Fast execution
-- Minimal & fast GPU testing
-- GPU operations should be skippable if machine is CPU only
-- Ideally uses small shapes, or reference golden data to do a quick validation of graph executions
-
-**Applicable testing environments**:
-- Windows & supported Linux distros
-- Test on all ASICs supported by the plugin
-
-**Frequency of tests**: Run on each PR
+- **Mocking**: Use GMOCK for mocking dependencies
+- **Execution**: Fast execution required
+- **Isolation**: Use stubbed/mocked implementations for dependencies
+- **GPU Operations**: Must be marked with `SKIP_IF_NO_DEVICE()`
+- **Coverage**: Each component should maintain >80% code coverage
 
 ---
 
 ## 2. Black Box Testing (API Tests)
 
+Black box tests validate the public API without knowledge of internal implementation.
+
 ### Backend API Tests
 
-**Location**: `tests/backend/`
+| Attribute | Details |
+|-----------|---------|
+| **Location** | `tests/backend/` |
+| **Purpose** | Validate API of hipDNN backend works as expected |
+| **Requirements** | • Test only public interfaces from `backend/include/`<br>• Use stubbed plugins for controlled testing<br>• Fast running<br>• GPU operations marked with `SKIP_IF_NO_DEVICE()` |
+| **Environments** | Windows & supported Linux distros |
+| **Frequency** | Run on each PR |
 
-**Purpose**: Validate API of hipDNN backend works as expected
-
-**Test Categories**:
-- Descriptor create, get/set properties, and destroy for:
-  - Engine API
+#### Test Categories
+- Descriptor APIs (create, get/set properties, destroy)
+  <!-- - Engine API
   - Engine config API
   - Engine heuristic API
   - Execution plan API
   - Handle API
   - Variant pack API
   - Graph API
-  - Graph extension API for serialized graph structures
+  - Graph extension API for serialized graph structures -->
 - Backend execute API
 - Plugin management extension API
-
-**Requirements**:
-- Test only public interfaces from `backend/include/`
-- Use stubbed plugins for controlled testing
-- Fast running
-- No GPU testing, or very minimal GPU testing for APIs that require device handles
-- GPU operations must be marked with `SKIP_IF_NO_DEVICE()`
-
-**Applicable testing environments**:
-- Windows & supported Linux distros
-- GPU hardware shouldn't impact these tests
-
-**Frequency of tests**: Run on each PR
 
 ---
 
 ## 3. Integration Testing
 
-### Frontend-Backend Integration
+Integration tests validate end-to-end functionality across components.
 
-**Location**: `tests/frontend/`
+### Integration Test Comparison
 
-**Purpose**: Validate end-to-end hipDNN works as expected
+| Test Type | Location | Purpose | GPU Required | Test Speed |
+|-----------|----------|---------|--------------|------------|
+| **Frontend-Backend** | `tests/frontend/` | Validate end-to-end hipDNN functionality | No - mark GPU ops with `SKIP_IF_NO_DEVICE()` | Fast |
+| **Plugin Integration** | `plugins/<name>/integration_tests/` | Validate end-to-end graph support for plugin | Yes - required for validation | Can be slower |
 
-**Test Categories**:
-- Graph creation & execution API
-- Backend descriptor creation from frontend
-- Execution flow validation
+### Test Requirements by Type
 
-**Requirements**:
-- Use fake plugins for controlled behavior
-- No accuracy or solution validation (stubbed behavior)
-- Fast running
-- No GPU testing, or very minimal GPU testing for APIs that require device handles
-- GPU operations must be marked with `SKIP_IF_NO_DEVICE()`
-
-**Applicable testing environments**:
-- Windows & supported Linux distros
-- GPU hardware shouldn't impact these tests
-
-**Frequency of tests**: Run on each PR
-
-### Plugin Integration Tests
-
-**Location**: Each plugin's directory (e.g., `plugins/miopen_legacy_plugin/integration_tests/`)
-
-**Purpose**: Validate end-to-end graph support for plugin implementation
-
-**Test Categories**: TBD based on plugin implementation
-
-**Requirements**:
-- Can be slower running
-- Will require GPU
-- Should validate correctness and graph support
-- Each plugin maintains its own test suite
-
-**Applicable testing environments**:
-- Windows & supported Linux distros
-- Test on all ASICs supported by the plugin
-
-**Frequency of tests**: Run on each PR
-
----
-
-## 4. Performance/Benchmarking
-
-**Location**: Separate project for benchmarking full hipDNN install (To be determined once made)
-
-**Purpose**:
-- Track performance of hipDNN & installed plugins across a broad set of graphs
-- Track accuracy of hipDNN & installed plugins across a broad set of graphs
-
-> **Note**: Each plugin will have integration tests for functionality that it supports, and this suite will be the full integration set of shapes that runs across plugins.
-
-**Test categories**:
-- A quick running set of graphs to run per PRs to flag severe regressions
-- A long running set of graphs to run on demand to flag broad regressions
-
-**Requirements**:
-- Minimal set of graphs are maintained to be used as pre-checkin performance check
-- Full set of graphs are maintained to be used for on-demand performance & accuracy checks
-- Requires GPU
-- Validates correctness and performance of graphs
-
-**Applicable testing environments**:
-- Windows & supported Linux distros
-- Test on all ASICs supported by hipDNN
-- Note: Certain plugins/graphs may have ASIC restrictions
-
-**Frequency of tests**:
-- Minimal graph suite will run on each PR to catch obvious regressions
-- Full graph suite will be runnable on demand, and run nightly or weekly to catch regressions (running frequency TBD)
+| Test Type | Key Requirements |
+|-----------|-----------------|
+| **Frontend-Backend** | • Use fake plugins for controlled behavior<br>• No accuracy/solution validation (stubbed)<br>• Test graph creation & execution API<br>• Test backend descriptor creation from frontend<br>• Test execution flow validation |
+| **Plugin Integration** | • Validate correctness and graph support<br>• Each plugin maintains its own test suite<br>• Test on all ASICs supported by the plugin<br>• Can include performance validation |
 
 ---
 
 ## General Testing Requirements
 
 ### Code Coverage
-- hipDNN has a code coverage target of **80% overall**
-- Each sub-section should be above 80% individually
-- The overall target needs to remain above 80%
+- **Target**: 80% overall coverage
+- **Component Target**: Each sub-section should be above 80% individually
+- **Enforcement**: Coverage must remain above 80% for PRs to be accepted
 
 ### Test Environment Compatibility
-Tests need to work in the following environments:
-- CLI in a build environment via `make check`, `ninja check`, `make check_ctest`, `ninja check_ctest`
-- Visual Studio Code and extensions like TestMate
-- Installed testing artifacts
-- Running the built test executables
+
+Tests must work in the following environments:
+
+| Environment Type | Supported Methods |
+|-----------------|-------------------|
+| **CLI Build Environment** | `make check`, `ninja check`, `make check_ctest`, `ninja check_ctest` |
+| **IDE** | Visual Studio Code and extensions like TestMate |
+| **Artifacts** | • Installed testing artifacts<br>• Running built test executables |
 
 ### GPU Requirements
-- Without a GPU: All tests requiring a GPU should be skippable if a GPU is not present, and not cause errors to be displayed (warnings instead)
-- Windows & supported Linux distros
+- **Without GPU**: All GPU tests must be skippable (warnings, not errors)
+- **With GPU**: Tests should detect and utilize available GPU resources
+- **Platform Support**: Windows & supported Linux distributions
 
 ---
 
+<!-- 
+## 4. Performance/Benchmarking (Future Work)
+
+**Status**: Not yet implemented - planned for future development
+
+**Location**: Separate project for benchmarking full hipDNN install (TBD)
+
+**Purpose**:
+- Track performance of hipDNN & installed plugins across a broad set of graphs
+- Track accuracy of hipDNN & installed plugins across a broad set of graphs
+
+**Test categories**:
+- Quick running set of graphs per PR (severe regression detection)
+- Long running set of graphs on demand (broad regression detection)
+
+**Frequency**:
+- Minimal suite: Per PR
+- Full suite: On demand, nightly or weekly (TBD)
+-->
+
+<!--
 ## Current Testing Status
 
 - Frontend, SDK, backend, and MIOpen plugin all have full Whitebox, Blackbox, and integration testing with code coverage above 80% target
 - Currently missing golden data tests to verify reference implementations
 - Benchmarking & performance testing project does not exist yet
-
----
 
 ## Future Improvement Roadmap
 
@@ -259,3 +163,4 @@ Tests need to work in the following environments:
 5. Swap to leverage TheRock for CI
 6. Add installable testing artifacts
 7. Create a benchmarking and performance project for capturing performance and accuracy for full hipDNN graphs
+-->

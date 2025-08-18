@@ -1,7 +1,7 @@
 # hipDNN
 
-## ⚠️ EARLY ADOPTER WARNING
-**hipDNN is in the early stages of development. There is currently very limited or no functionality available to solve problems.**
+> [!CAUTION]
+> hipDNN is in the early stages of development. There is currently very limited or no functionality available to solve problems.
 
 ---
 
@@ -11,8 +11,6 @@
 - [Building](#building)
 - [Design](#design)
 - [Plugin Development](#plugin-development)
-- [Logging](#logging)
-  - [Frontend and Plugin Logging](#frontend-and-plugin-logging)
 - [Project Components](#project-components)
   - [Backend](./backend/README.md)
   - [Frontend](./frontend/README.md)
