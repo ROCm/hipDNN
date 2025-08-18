@@ -1,7 +1,5 @@
 # hipDNN Test Run Template
 
-## Overview
-
 This document provides a template for recording hipDNN test results. Use this template to document test execution details and results for tracking purposes.
 
 ---
@@ -25,24 +23,28 @@ Test results:
 
 ### Field Descriptions
 
-- **Name**: Runner's name
+- **Name**: Runner's name or identifier
 - **Operating System**: OS details (Windows/Linux, and distro or version of Windows)
 - **Has GPU**: Yes/No
-- **ASIC**: Name of device after running `rocminfo`
+- **ASIC**: Name of device after running `rocminfo` (or "N/A" if no GPU)
 - **MIOpen hash**: Hash of installed MIOpen, can be found by running:
   ```bash
   cat /opt/rocm/include/miopen/version.h
   ```
-- **ROCm version**: AMD-SMI ROCm version info
+  Or "N/A" if MIOpen is not installed
+- **ROCm version**: AMD-SMI ROCm version info (or "N/A" if not applicable)
 - **Run environment**: One of:
-  - `ninja check`
+  - `ninja check_ctest`
+  - `make check_ctest`
   - Running installed test artifacts
-  - Running built executables
-- **Test results**: Tests ran, skipped, and passed/failed
+  - Running built executables directly
+- **Test results**: Summary of tests ran, skipped, and passed/failed
 
 ---
 
 ## Example Test Run
+
+### Successful Run Example
 
 ```
 Name: John Doe
@@ -50,8 +52,7 @@ Operating System: Linux Ubuntu 22.04
 Has GPU: Yes
 ASIC: gfx90a
 MIOpen hash: 7ae16d1b5
-ROCm version: 
-AMD-SMI 26.0.0+842b9680      amdgpu version: 6.8.5    ROCm version: 7.1.0
+ROCm version: AMD-SMI 26.0.0+842b9680 amdgpu version: 6.8.5 ROCm version: 7.1.0
 Run environment: ninja check_ctest
 
 Test results:  
@@ -71,6 +72,35 @@ Section: Regular Tests:
 Section: ASAN Enabled Tests:
     Test Case 1: Passed
         ASAN test results 100% passed.
+```
+
+### CPU-Only Environment Example
+
+```
+Name: Jane Smith
+Operating System: Windows 11
+Has GPU: No
+ASIC: N/A
+MIOpen hash: N/A
+ROCm version: N/A
+Run environment: ninja check_ctest
+
+Test results:
+    (4 / 4) Test Cases Passed
+    (0 / 4) Test Cases Failed
+    (0 / 4) Test Cases did not run
+
+Section: Prerequisites:
+    Test Case 1: Passed
+    Test Case 2: Passed
+
+Section: Regular Tests:
+    Test Case 1: Passed
+        Regular test results 100/519 tests passed, 0 failed, 419 skipped (GPU tests)
+
+Section: ASAN Enabled Tests:
+    Test Case 1: Passed
+        ASAN test results 100/519 tests passed, 0 failed, 419 skipped (GPU tests)
 ```
 
 ### Skipped Tests Example
