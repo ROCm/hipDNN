@@ -178,7 +178,8 @@ TEST(HipDNNBackendTest, WillFailToCreateGraphIfGraphIsNull)
 TEST(HipDNNBackendTest, SetPluginPathsExt_Success)
 {
     using namespace hipdnn_tests::plugin_constants;
-    std::array<const char*, 3> paths = {PLUGIN_DIR.c_str(), "./", "../directory/"};
+    std::string plugin_dir_str = PLUGIN_DIR.string();
+    std::array<const char*, 3> paths = {plugin_dir_str.c_str(), "./", "../directory/"};
 
     hipdnnStatus_t status = hipdnnSetEnginePluginPaths_ext(
         paths.size(), paths.data(), HIPDNN_PLUGIN_LOADING_ABSOLUTE);
@@ -259,7 +260,8 @@ TEST(HipDNNBackendTest, GetLoadedPluginPaths_LoadsDefault)
 
 TEST(HipDNNBackendTest, GetLoadedPluginPaths_AdditiveLoadsBothDefaultAndCustom)
 {
-    const std::array<const char*, 1> paths = {PLUGIN_DIR.c_str()};
+    std::string plugin_dir_str = PLUGIN_DIR.string();
+    const std::array<const char*, 1> paths = {plugin_dir_str.c_str()};
     hipdnnStatus_t status = hipdnnSetEnginePluginPaths_ext(
         paths.size(), paths.data(), HIPDNN_PLUGIN_LOADING_ADDITIVE);
     EXPECT_EQ(status, HIPDNN_STATUS_SUCCESS);
