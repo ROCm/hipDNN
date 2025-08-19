@@ -129,7 +129,7 @@ public:
                 // where dilated_kernel_size = dilation * (kernel_size - 1) + 1
 
                 auto input_size = x_dims[i];
-                auto kernel_size = w_dims[i]; // Weight spatial dimensions start from index 2
+                auto kernel_size = w_dims[i];
                 auto pre_pad = pre_padding[spatial_idx];
                 auto post_pad = post_padding[spatial_idx];
                 auto stride_val = stride[spatial_idx];
