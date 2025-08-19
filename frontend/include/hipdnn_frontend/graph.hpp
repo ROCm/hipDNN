@@ -12,7 +12,7 @@
 #include <hipdnn_frontend/node/batchnorm_backward_node.hpp>
 #include <hipdnn_frontend/node/batchnorm_inference_node.hpp>
 #include <hipdnn_frontend/node/batchnorm_node.hpp>
-#include <hipdnn_frontend/node/convolution_fprop.hpp>
+#include <hipdnn_frontend/node/convolution_fprop_node.hpp>
 #include <hipdnn_frontend/node/node.hpp>
 #include <hipdnn_frontend/node/pointwise_node.hpp>
 
@@ -564,10 +564,9 @@ public:
         return out_0;
     }
 
-    std::shared_ptr<Tensor_attributes>
-        convolution_fprop(const std::shared_ptr<Tensor_attributes>& x,
-                          const std::shared_ptr<Tensor_attributes>& w,
-                          Convolution_fprop_attributes attributes)
+    std::shared_ptr<Tensor_attributes> conv_fprop(const std::shared_ptr<Tensor_attributes>& x,
+                                                  const std::shared_ptr<Tensor_attributes>& w,
+                                                  Conv_fprop_attributes attributes)
     {
         if(attributes.name.empty())
         {

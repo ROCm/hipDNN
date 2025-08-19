@@ -15,7 +15,7 @@ namespace hipdnn_frontend
 
 namespace graph
 {
-class Convolution_fprop_attributes : public AttributesCRTP<Convolution_fprop_attributes>
+class Conv_fprop_attributes : public AttributesCRTP<Conv_fprop_attributes>
 {
 public:
     enum class input_names
@@ -56,54 +56,54 @@ public:
     }
 
     // Setters for tensors
-    Convolution_fprop_attributes& set_x(const std::shared_ptr<Tensor_attributes>& value)
+    Conv_fprop_attributes& set_x(const std::shared_ptr<Tensor_attributes>& value)
     {
         return set_input(input_names::X, value);
     }
 
-    Convolution_fprop_attributes& set_w(const std::shared_ptr<Tensor_attributes>& value)
+    Conv_fprop_attributes& set_w(const std::shared_ptr<Tensor_attributes>& value)
     {
         return set_input(input_names::W, value);
     }
 
-    Convolution_fprop_attributes& set_y(const std::shared_ptr<Tensor_attributes>& value)
+    Conv_fprop_attributes& set_y(const std::shared_ptr<Tensor_attributes>& value)
     {
         return set_output(output_names::Y, value);
     }
 
     // Setters for convolution parameters
-    Convolution_fprop_attributes& set_padding(const std::vector<int64_t>& padding)
+    Conv_fprop_attributes& set_padding(const std::vector<int64_t>& padding)
     {
         pre_padding = padding;
         post_padding = padding;
         return *this;
     }
 
-    Convolution_fprop_attributes& set_pre_padding(const std::vector<int64_t>& padding)
+    Conv_fprop_attributes& set_pre_padding(const std::vector<int64_t>& padding)
     {
         pre_padding = padding;
         return *this;
     }
 
-    Convolution_fprop_attributes& set_post_padding(const std::vector<int64_t>& padding)
+    Conv_fprop_attributes& set_post_padding(const std::vector<int64_t>& padding)
     {
         post_padding = padding;
         return *this;
     }
 
-    Convolution_fprop_attributes& set_stride(const std::vector<int64_t>& stride_vals)
+    Conv_fprop_attributes& set_stride(const std::vector<int64_t>& stride_vals)
     {
         stride = stride_vals;
         return *this;
     }
 
-    Convolution_fprop_attributes& set_dilation(const std::vector<int64_t>& dilation_vals)
+    Conv_fprop_attributes& set_dilation(const std::vector<int64_t>& dilation_vals)
     {
         dilation = dilation_vals;
         return *this;
     }
 
-    Convolution_fprop_attributes& set_conv_mode(ConvolutionMode_t mode)
+    Conv_fprop_attributes& set_conv_mode(ConvolutionMode_t mode)
     {
         conv_mode = mode;
         return *this;
@@ -167,15 +167,15 @@ private:
         return nullptr;
     }
 
-    Convolution_fprop_attributes& set_input(input_names name,
-                                            const std::shared_ptr<Tensor_attributes>& value)
+    Conv_fprop_attributes& set_input(input_names name,
+                                     const std::shared_ptr<Tensor_attributes>& value)
     {
         inputs[name] = value;
         return *this;
     }
 
-    Convolution_fprop_attributes& set_output(output_names name,
-                                             const std::shared_ptr<Tensor_attributes>& value)
+    Conv_fprop_attributes& set_output(output_names name,
+                                      const std::shared_ptr<Tensor_attributes>& value)
     {
         outputs[name] = value;
         return *this;

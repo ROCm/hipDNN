@@ -5,7 +5,7 @@
 
 TEST(ConvolutionFwdAttributesTests, CreateConvolutionFwdAttributes)
 {
-    hipdnn_frontend::graph::Convolution_fprop_attributes conv_attributes;
+    hipdnn_frontend::graph::Conv_fprop_attributes conv_attributes;
 
     // Set tensors
     conv_attributes.set_x(std::make_shared<hipdnn_frontend::graph::Tensor_attributes>());
@@ -73,7 +73,7 @@ TEST(ConvolutionFwdAttributesTests, CreateConvolutionFwdAttributes)
 
 TEST(ConvolutionFwdAttributesTests, PackAttributes)
 {
-    hipdnn_frontend::graph::Convolution_fprop_attributes conv_attributes;
+    hipdnn_frontend::graph::Conv_fprop_attributes conv_attributes;
 
     // Set tensors
     auto x_tensor = std::make_shared<hipdnn_frontend::graph::Tensor_attributes>();
@@ -132,7 +132,7 @@ TEST(ConvolutionFwdAttributesTests, PackAttributes)
 
 TEST(ConvolutionFwdAttributesTests, DefaultValues)
 {
-    hipdnn_frontend::graph::Convolution_fprop_attributes conv_attributes;
+    hipdnn_frontend::graph::Conv_fprop_attributes conv_attributes;
 
     // Check default convolution mode
     EXPECT_EQ(conv_attributes.get_conv_mode(),
@@ -152,7 +152,7 @@ TEST(ConvolutionFwdAttributesTests, DefaultValues)
 
 TEST(ConvolutionFwdAttributesTests, SetAndGetConvParameters3D)
 {
-    hipdnn_frontend::graph::Convolution_fprop_attributes conv_attributes;
+    hipdnn_frontend::graph::Conv_fprop_attributes conv_attributes;
 
     // Test 3D convolution parameters
     std::vector<int64_t> pre_padding_3d = {1, 2, 3};

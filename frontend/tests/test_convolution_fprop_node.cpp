@@ -10,7 +10,7 @@ using namespace hipdnn_frontend::graph;
 
 TEST(ConvolutionFwdNodeTests, PreValidateNode)
 {
-    Convolution_fprop_attributes conv_attributes;
+    Conv_fprop_attributes conv_attributes;
     conv_attributes.set_x(std::make_shared<Tensor_attributes>());
     conv_attributes.set_w(std::make_shared<Tensor_attributes>());
     conv_attributes.set_y(std::make_shared<Tensor_attributes>());
@@ -28,7 +28,7 @@ TEST(ConvolutionFwdNodeTests, PreValidateNode)
 
 TEST(ConvolutionFwdNodeTests, PreValidateNodeMissingValues)
 {
-    Convolution_fprop_attributes conv_attributes;
+    Conv_fprop_attributes conv_attributes;
 
     Graph_attributes graph_attributes;
     ConvolutionNode node(std::move(conv_attributes), graph_attributes);
@@ -50,7 +50,7 @@ TEST(ConvolutionFwdNodeTests, PreValidateNodeMissingValues)
     EXPECT_EQ(error.code, error_code_t::ATTRIBUTE_NOT_SET);
 
     // Test missing w tensor
-    Convolution_fprop_attributes conv_attributes2;
+    Conv_fprop_attributes conv_attributes2;
     conv_attributes2.set_x(std::make_shared<Tensor_attributes>());
     conv_attributes2.set_y(std::make_shared<Tensor_attributes>());
     conv_attributes2.set_pre_padding({1, 1});
@@ -63,7 +63,7 @@ TEST(ConvolutionFwdNodeTests, PreValidateNodeMissingValues)
     EXPECT_EQ(error.code, error_code_t::ATTRIBUTE_NOT_SET);
 
     // Test missing y tensor
-    Convolution_fprop_attributes conv_attributes3;
+    Conv_fprop_attributes conv_attributes3;
     conv_attributes3.set_x(std::make_shared<Tensor_attributes>());
     conv_attributes3.set_w(std::make_shared<Tensor_attributes>());
     conv_attributes3.set_pre_padding({1, 1});
@@ -76,7 +76,7 @@ TEST(ConvolutionFwdNodeTests, PreValidateNodeMissingValues)
     EXPECT_EQ(error.code, error_code_t::ATTRIBUTE_NOT_SET);
 
     // Test missing convolution parameters
-    Convolution_fprop_attributes conv_attributes4;
+    Conv_fprop_attributes conv_attributes4;
     conv_attributes4.set_x(std::make_shared<Tensor_attributes>());
     conv_attributes4.set_w(std::make_shared<Tensor_attributes>());
     conv_attributes4.set_y(std::make_shared<Tensor_attributes>());
@@ -86,7 +86,7 @@ TEST(ConvolutionFwdNodeTests, PreValidateNodeMissingValues)
     EXPECT_EQ(error.code, error_code_t::ATTRIBUTE_NOT_SET);
 
     // Test with all values
-    Convolution_fprop_attributes conv_attributes5;
+    Conv_fprop_attributes conv_attributes5;
     conv_attributes5.set_x(std::make_shared<Tensor_attributes>());
     conv_attributes5.set_w(std::make_shared<Tensor_attributes>());
     conv_attributes5.set_y(std::make_shared<Tensor_attributes>());
@@ -102,7 +102,7 @@ TEST(ConvolutionFwdNodeTests, PreValidateNodeMissingValues)
 
 TEST(ConvolutionFwdNodeTests, InferPropertiesNode)
 {
-    Convolution_fprop_attributes conv_attributes;
+    Conv_fprop_attributes conv_attributes;
     conv_attributes.set_x(std::make_shared<Tensor_attributes>());
     conv_attributes.set_w(std::make_shared<Tensor_attributes>());
     conv_attributes.set_y(std::make_shared<Tensor_attributes>());
@@ -141,7 +141,7 @@ TEST(ConvolutionFwdNodeTests, InferPropertiesNode)
 
 TEST(ConvolutionFwdNodeTests, InferPropertiesNodeWithStrideAndPadding)
 {
-    Convolution_fprop_attributes conv_attributes;
+    Conv_fprop_attributes conv_attributes;
     conv_attributes.set_x(std::make_shared<Tensor_attributes>());
     conv_attributes.set_w(std::make_shared<Tensor_attributes>());
     conv_attributes.set_y(std::make_shared<Tensor_attributes>());
@@ -180,7 +180,7 @@ TEST(ConvolutionFwdNodeTests, InferPropertiesNodeWithStrideAndPadding)
 
 TEST(ConvolutionFwdNodeTests, PackNode)
 {
-    Convolution_fprop_attributes conv_attributes;
+    Conv_fprop_attributes conv_attributes;
     conv_attributes.name = "Convolution";
 
     auto x_tensor = std::make_shared<Tensor_attributes>();
@@ -256,7 +256,7 @@ TEST(ConvolutionFwdNodeTests, PackNode)
 
 TEST(ConvolutionFwdNodeTests, GatherHipdnnTensorIds)
 {
-    Convolution_fprop_attributes conv_attributes;
+    Conv_fprop_attributes conv_attributes;
     auto x_tensor = std::make_shared<Tensor_attributes>();
     x_tensor->set_uid(1).set_name("XTensor");
     conv_attributes.set_x(x_tensor);
@@ -287,7 +287,7 @@ TEST(ConvolutionFwdNodeTests, GatherHipdnnTensorIds)
 
 TEST(ConvolutionFwdNodeTests, PopulateHipdnnTensorIds)
 {
-    Convolution_fprop_attributes conv_attributes;
+    Conv_fprop_attributes conv_attributes;
     conv_attributes.set_x(std::make_shared<Tensor_attributes>());
     conv_attributes.set_w(std::make_shared<Tensor_attributes>());
     conv_attributes.set_y(std::make_shared<Tensor_attributes>());

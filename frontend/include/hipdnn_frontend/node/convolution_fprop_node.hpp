@@ -15,9 +15,9 @@ namespace hipdnn_frontend::graph
 class ConvolutionNode : public NodeCRTP<ConvolutionNode> //NOLINT
 {
 public:
-    Convolution_fprop_attributes attributes;
+    Conv_fprop_attributes attributes;
 
-    ConvolutionNode(Convolution_fprop_attributes&& conv_attrs, const Graph_attributes& graph_attrs)
+    ConvolutionNode(Conv_fprop_attributes&& conv_attrs, const Graph_attributes& graph_attrs)
         : NodeCRTP(graph_attrs)
         , attributes(std::move(conv_attrs))
     {

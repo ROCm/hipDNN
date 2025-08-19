@@ -264,14 +264,14 @@ TEST_F(Graph_test_fixture, ConvolutionFwdNodeCreation)
     auto w = std::make_shared<Tensor_attributes>();
     w->set_dim({64, 3, 3, 3}).set_stride({27, 9, 3, 1}).set_data_type(DataType_t::FLOAT);
 
-    Convolution_fprop_attributes attributes;
+    Conv_fprop_attributes attributes;
     attributes.name = "ConvolutionNode";
     attributes.set_pre_padding({1, 1});
     attributes.set_post_padding({1, 1});
     attributes.set_stride({1, 1});
     attributes.set_dilation({1, 1});
 
-    auto y = graph.convolution_fprop(x, w, attributes);
+    auto y = graph.conv_fprop(x, w, attributes);
 
     EXPECT_EQ(y->get_name(), "ConvolutionNode::Y");
     EXPECT_TRUE(y->get_is_virtual());
@@ -854,14 +854,14 @@ TEST_F(Graph_test_fixture, BuildAndSerializeConvolutionFwdGraph)
         .set_stride({27, 9, 3, 1})
         .set_data_type(DataType_t::FLOAT);
 
-    Convolution_fprop_attributes convolution_attributes;
+    Conv_fprop_attributes convolution_attributes;
     convolution_attributes.name = "ConvolutionNode";
     convolution_attributes.set_pre_padding({1, 1});
     convolution_attributes.set_post_padding({1, 1});
     convolution_attributes.set_stride({1, 1});
     convolution_attributes.set_dilation({1, 1});
 
-    auto y = graph.convolution_fprop(x, w, convolution_attributes);
+    auto y = graph.conv_fprop(x, w, convolution_attributes);
 
     auto validation_result = graph.validate();
     EXPECT_TRUE(validation_result.is_good()) << validation_result.get_message();
