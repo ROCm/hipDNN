@@ -98,6 +98,53 @@ TEST(CpuFpReferenceImplementation, BatchnormInferFloatUsageNHWC)
         input_tensor, scale_tensor, bias_tensor, mean_tensor, variance_tensor, output_tensor, 1e-5);
 }
 
+TEST(CpuFpReferenceImplementation, BatchnormInferSanityValidation)
+{
+    SKIP_IF_NO_DEVICES();
+
+    const std::vector<int64_t> dims = {1, 1, 2, 2};
+
+    auto input_tensor = Tensor::make_tensor<double>(dims);
+    auto output_tensor = Tensor::make_tensor<double>(dims);
+    auto scale_tensor = Tensor::make_tensor<double>({1, 1, 1, 1});
+    auto bias_tensor = Tensor::make_tensor<double>({1, 1, 1, 1});
+    auto mean_tensor = Tensor::make_tensor<double>({1, 1, 1, 1});
+    auto variance_tensor = Tensor::make_tensor<double>({1, 1, 1, 1});
+
+    // x = [1, 2, 3, 4]
+    input_tensor.set_host_value<double>(0, 0, 0, 0, 1.0);
+    input_tensor.set_host_value<double>(0, 0, 0, 1, 2.0);
+    input_tensor.set_host_value<double>(0, 0, 1, 0, 3.0);
+    input_tensor.set_host_value<double>(0, 0, 1, 1, 4.0);
+
+    // fixed scale and bias parameters (one channel)
+    scale_tensor.set_host_value<double>(0, 0, 0, 0, 2.0);
+    bias_tensor.set_host_value<double>(0, 0, 0, 0, 0.5);
+
+    // inference uses population statistics per channel:
+    // mean = (1+2+3+4)/4 = 2.5
+    // variance = [(-1.5)^2 + (-0.5)^2 + (0.5)^2 + (1.5)^2] / 4 = 5.0 / 4 = 1.25
+    // (in practice, computed during training)
+    mean_tensor.set_host_value<double>(0, 0, 0, 0, 2.5);
+    variance_tensor.set_host_value<double>(0, 0, 0, 0, 1.25);
+
+    // output is calculated via a pointwise linear transform on x:
+    // y = scale * (x - mean) * inv_variance + bias = 2 * (x - 2.5) * inv_variance + 0.5
+    // where inv_variance (named by convention) = 1 / sqrt(1.25 + 1e-5) = 0.894423613312618
+    const std::vector<double> expected_output = {-2.18327084, -0.39442361, 1.39442361, 3.18327084};
+
+    Cpu_fp_reference_implementation<double, double, double> ref_impl;
+    ref_impl.batchnorm_fwd_inference(
+        input_tensor, scale_tensor, bias_tensor, mean_tensor, variance_tensor, output_tensor, 1e-5);
+
+    auto tolerance = 1e-6;
+
+    EXPECT_NEAR(output_tensor.get_host_value<double>(0, 0, 0, 0), expected_output[0], tolerance);
+    EXPECT_NEAR(output_tensor.get_host_value<double>(0, 0, 0, 1), expected_output[1], tolerance);
+    EXPECT_NEAR(output_tensor.get_host_value<double>(0, 0, 1, 0), expected_output[2], tolerance);
+    EXPECT_NEAR(output_tensor.get_host_value<double>(0, 0, 1, 1), expected_output[3], tolerance);
+}
+
 TEST(CpuFpReferenceImplementation, BatchnormBwdFloatUsage)
 {
     SKIP_IF_NO_DEVICES();
