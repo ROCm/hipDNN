@@ -13,25 +13,26 @@ namespace hipdnn_sdk
 namespace utilities
 {
 
+enum class Memory_location
+{
+    HOST,
+    DEVICE,
+    BOTH,
+    NONE
+};
+
 /// @brief A class that manages memory that can be migrated between host and device.
 /// It provides functionality to allocate, resize, and access memory on both host and device,
 /// while ensuring that data is synchronized as needed.  This class is not thread safe.
 ///
+template <class T>
 class Migratable_memory
 {
 public:
-    enum class Location
-    {
-        HOST,
-        DEVICE,
-        BOTH,
-        NONE
-    };
-
-    explicit Migratable_memory(size_t count = 0, size_t item_size = 0)
+    explicit Migratable_memory(size_t count = 0)
         : _count(count)
-        , _item_size(item_size)
-        , _total_size(count * item_size)
+        , _item_size(sizeof(T))
+        , _total_size(count * _item_size)
     {
         if(count > 0)
         {
@@ -59,7 +60,7 @@ public:
         other._count = 0;
         other._item_size = 0;
         other._total_size = 0;
-        other._current_location = Location::NONE;
+        other._current_location = Memory_location::NONE;
         other._host_valid = false;
         other._device_valid = false;
     }
@@ -83,7 +84,7 @@ public:
             other._count = 0;
             other._item_size = 0;
             other._total_size = 0;
-            other._current_location = Location::NONE;
+            other._current_location = Memory_location::NONE;
             other._host_valid = false;
             other._device_valid = false;
         }
@@ -98,7 +99,7 @@ public:
         cleanup();
         _count = new_count;
         _total_size = new_count * _item_size;
-        _current_location = Location::NONE;
+        _current_location = Memory_location::NONE;
         _host_valid = false;
         _device_valid = false;
         if(new_count > 0)
@@ -108,48 +109,27 @@ public:
     }
 
     // Get host pointer (migrates if needed)
-    template <typename T>
-    T* host_data()
+    T* host_data(hipStream_t stream = nullptr)
     {
-        ensure_host_valid();
+        ensure_host_valid(stream);
+        return static_cast<T*>(_host_ptr);
+    }
+
+    const T* host_data(hipStream_t stream = nullptr) const
+    {
+        const_cast<Migratable_memory*>(this)->ensure_host_valid(stream);
         return static_cast<T*>(_host_ptr);
     }
 
     // Get device pointer (migrates if needed)
-    template <typename T>
-    T* device_data()
-    {
-        ensure_device_valid();
-        return static_cast<T*>(_device_ptr);
-    }
-
-    // Get device pointer (migrates if needed)
-    template <typename T>
-    T* device_data(hipStream_t stream)
+    void* device_data(hipStream_t stream = nullptr)
     {
         ensure_device_valid(stream);
         return static_cast<T*>(_device_ptr);
     }
 
-    // Get const host pointer (migrates if needed)
-    template <typename T>
-    const T* host_data() const
-    {
-        const_cast<Migratable_memory*>(this)->ensure_host_valid();
-        return static_cast<T*>(_host_ptr);
-    }
-
     // Get const device pointer (migrates if needed)
-    template <typename T>
-    const T* device_data() const
-    {
-        const_cast<Migratable_memory*>(this)->ensure_device_valid();
-        return static_cast<T*>(_device_ptr);
-    }
-
-    // Get const device pointer (migrates if needed)
-    template <typename T>
-    const T* device_data(hipStream_t stream) const
+    void* device_data(hipStream_t stream = nullptr) const
     {
         const_cast<Migratable_memory*>(this)->ensure_device_valid(stream);
         return static_cast<T*>(_device_ptr);
@@ -160,7 +140,7 @@ public:
     {
         _host_valid = true;
         _device_valid = false;
-        _current_location = Location::HOST;
+        _current_location = Memory_location::HOST;
     }
 
     // Mark memory as modified on device
@@ -168,7 +148,7 @@ public:
     {
         _device_valid = true;
         _host_valid = false;
-        _current_location = Location::DEVICE;
+        _current_location = Memory_location::DEVICE;
     }
 
     size_t count() const
@@ -181,7 +161,7 @@ public:
         return _count == 0;
     }
 
-    Location location() const
+    Memory_location location() const
     {
         return _current_location;
     }
@@ -192,7 +172,7 @@ public:
         _count = 0;
         _item_size = 0;
         _total_size = 0;
-        _current_location = Location::NONE;
+        _current_location = Memory_location::NONE;
         _host_valid = false;
         _device_valid = false;
     }
@@ -227,7 +207,7 @@ private:
             throw_on_error(hipHostMalloc(&_host_ptr, _total_size),
                            "Failed to allocate host memory");
             _host_valid = true;
-            _current_location = Location::HOST;
+            _current_location = Memory_location::HOST;
         }
     }
 
@@ -240,7 +220,7 @@ private:
         }
     }
 
-    void ensure_host_valid()
+    void ensure_host_valid(hipStream_t stream = nullptr)
     {
         if(_count == 0)
         {
@@ -251,14 +231,15 @@ private:
 
         if(!_host_valid && _device_valid && (_device_ptr != nullptr))
         {
-            throw_on_error(hipMemcpy(_host_ptr, _device_ptr, _total_size, hipMemcpyDeviceToHost),
-                           "Failed to copy from device to host");
+            throw_on_error(
+                hipMemcpyAsync(_host_ptr, _device_ptr, _total_size, hipMemcpyDeviceToHost, stream),
+                "Failed to copy from device to host");
             _host_valid = true;
-            _current_location = Location::BOTH;
+            _current_location = Memory_location::BOTH;
         }
     }
 
-    void ensure_device_valid()
+    void ensure_device_valid(hipStream_t stream = nullptr)
     {
         if(_count == 0)
         {
@@ -269,29 +250,11 @@ private:
 
         if(!_device_valid && _host_valid && (_host_ptr != nullptr))
         {
-            throw_on_error(hipMemcpy(_device_ptr, _host_ptr, _total_size, hipMemcpyHostToDevice),
-                           "Failed to copy from host to device");
+            throw_on_error(
+                hipMemcpyAsync(_device_ptr, _host_ptr, _total_size, hipMemcpyHostToDevice, stream),
+                "Failed to copy from host to device");
             _device_valid = true;
-            _current_location = Location::BOTH;
-        }
-    }
-
-    void ensure_device_valid(hipStream_t stream)
-    {
-        if(_count == 0)
-        {
-            return;
-        }
-
-        allocate_device();
-
-        if(!_device_valid && _host_valid && (_host_ptr != nullptr))
-        {
-            throw_on_error(hipMemcpyWithStream(
-                               _device_ptr, _host_ptr, _total_size, hipMemcpyHostToDevice, stream),
-                           "Failed to copy from host to device");
-            _device_valid = true;
-            _current_location = Location::BOTH;
+            _current_location = Memory_location::BOTH;
         }
     }
 
@@ -309,7 +272,7 @@ private:
         }
         _host_valid = false;
         _device_valid = false;
-        _current_location = Location::NONE;
+        _current_location = Memory_location::NONE;
     }
 
     void* _host_ptr{nullptr};
@@ -317,7 +280,7 @@ private:
     size_t _count;
     size_t _item_size;
     size_t _total_size;
-    Location _current_location{Location::NONE};
+    Memory_location _current_location{Memory_location::NONE};
     bool _host_valid{false};
     bool _device_valid{false};
 };

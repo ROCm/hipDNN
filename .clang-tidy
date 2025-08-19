@@ -21,7 +21,8 @@ Checks: >
   -readability-uppercase-literal-suffix,
   -readability-avoid-unconditional-preprocessor-if,
   -readability-use-anyofallof,
-  -readability-function-cognitive-complexity
+  -readability-function-cognitive-complexity,
+  -portability-template-virtual-member-function
 
 WarningsAsErrors: "*"
 HeaderFileExtensions: ['h','hpp']

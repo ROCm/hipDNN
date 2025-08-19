@@ -13,13 +13,15 @@ namespace reference_test_utilities
 
 using namespace hipdnn_sdk::utilities;
 
+template <class T>
 class Reference_validation_interface
 {
 public:
     virtual ~Reference_validation_interface() = default;
 
-    virtual bool compare_buffers(const Migratable_memory& reference,
-                                 const Migratable_memory& implementation)
+    virtual bool compare_buffers(const Migratable_memory<T>& reference,
+                                 const Migratable_memory<T>& implementation,
+                                 hipStream_t stream = nullptr)
         = 0;
 };
 

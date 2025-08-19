@@ -20,7 +20,7 @@ namespace reference_test_utilities
 using namespace hipdnn_sdk::utilities;
 
 template <class T>
-class Cpu_fp_reference_validation : public Reference_validation_interface
+class Cpu_fp_reference_validation : public Reference_validation_interface<T>
 {
 public:
     Cpu_fp_reference_validation(T absolute_tolerance = std::numeric_limits<T>::epsilon(),
@@ -36,8 +36,9 @@ public:
 
     ~Cpu_fp_reference_validation() override = default;
 
-    bool compare_buffers(const Migratable_memory& reference,
-                         const Migratable_memory& implementation) override
+    bool compare_buffers(const Migratable_memory<T>& reference,
+                         const Migratable_memory<T>& implementation,
+                         hipStream_t stream = nullptr) override
     {
         if(reference.count() != implementation.count())
         {
@@ -45,8 +46,16 @@ public:
         }
 
         size_t element_count = reference.count();
-        const T* ref_data = reference.host_data<T>();
-        const T* impl_data = implementation.host_data<T>();
+
+        hipError_t error = hipDeviceSynchronize();
+        if(error != hipSuccess)
+        {
+            HIPDNN_LOG_ERROR("Error synchronizing stream: {}", hipGetErrorString(error));
+            return false;
+        }
+
+        const T* ref_data = reference.host_data(stream);
+        const T* impl_data = implementation.host_data(stream);
 
         for(size_t i = 0; i < element_count; ++i)
         {

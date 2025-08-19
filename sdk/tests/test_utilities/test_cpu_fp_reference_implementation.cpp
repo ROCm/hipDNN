@@ -17,12 +17,12 @@ TEST(CpuFpReferenceImplementation, BatchnormInferFloatUsage)
 {
     SKIP_IF_NO_DEVICES();
 
-    auto input_tensor = Tensor::make_tensor<float>({1, 3, 224, 224});
-    auto output_tensor = Tensor::make_tensor<float>({1, 3, 224, 224});
-    auto bias_tensor = Tensor::make_tensor<float>({1, 3});
-    auto scale_tensor = Tensor::make_tensor<float>({1, 3});
-    auto mean_tensor = Tensor::make_tensor<float>({1, 3});
-    auto variance_tensor = Tensor::make_tensor<float>({1, 3});
+    Tensor<float> input_tensor({1, 3, 224, 224});
+    Tensor<float> output_tensor({1, 3, 224, 224});
+    Tensor<float> bias_tensor({1, 3});
+    Tensor<float> scale_tensor({1, 3});
+    Tensor<float> mean_tensor({1, 3});
+    Tensor<float> variance_tensor({1, 3});
 
     Cpu_fp_reference_implementation<float, float, float> ref_impl;
 
@@ -34,12 +34,12 @@ TEST(CpuFpReferenceImplementation, BatchnormInferBFloat16Usage)
 {
     SKIP_IF_NO_DEVICES();
 
-    auto input_tensor = Tensor::make_tensor<hip_bfloat16>({1, 3, 224, 224});
-    auto output_tensor = Tensor::make_tensor<hip_bfloat16>({1, 3, 224, 224});
-    auto bias_tensor = Tensor::make_tensor<float>({1, 3});
-    auto scale_tensor = Tensor::make_tensor<float>({1, 3});
-    auto mean_tensor = Tensor::make_tensor<float>({1, 3});
-    auto variance_tensor = Tensor::make_tensor<float>({1, 3});
+    Tensor<hip_bfloat16> input_tensor({1, 3, 224, 224});
+    Tensor<hip_bfloat16> output_tensor({1, 3, 224, 224});
+    Tensor<float> bias_tensor({1, 3});
+    Tensor<float> scale_tensor({1, 3});
+    Tensor<float> mean_tensor({1, 3});
+    Tensor<float> variance_tensor({1, 3});
 
     Cpu_fp_reference_implementation<hip_bfloat16, float, float> ref_impl;
 
@@ -51,12 +51,12 @@ TEST(CpuFpReferenceImplementation, BatchnormInferHalfUsage)
 {
     SKIP_IF_NO_DEVICES();
 
-    auto input_tensor = Tensor::make_tensor<half>({1, 3, 224, 224});
-    auto output_tensor = Tensor::make_tensor<half>({1, 3, 224, 224});
-    auto bias_tensor = Tensor::make_tensor<float>({1, 3});
-    auto scale_tensor = Tensor::make_tensor<float>({1, 3});
-    auto mean_tensor = Tensor::make_tensor<float>({1, 3});
-    auto variance_tensor = Tensor::make_tensor<float>({1, 3});
+    Tensor<half> input_tensor({1, 3, 224, 224});
+    Tensor<half> output_tensor({1, 3, 224, 224});
+    Tensor<float> bias_tensor({1, 3});
+    Tensor<float> scale_tensor({1, 3});
+    Tensor<float> mean_tensor({1, 3});
+    Tensor<float> variance_tensor({1, 3});
 
     Cpu_fp_reference_implementation<half, float, float> ref_impl;
 
@@ -68,12 +68,12 @@ TEST(CpuFpReferenceImplementaion, BatchnormInferDoubleUsage)
 {
     SKIP_IF_NO_DEVICES();
 
-    auto input_tensor = Tensor::make_tensor<double>({1, 3, 224, 224});
-    auto output_tensor = Tensor::make_tensor<double>({1, 3, 224, 224});
-    auto bias_tensor = Tensor::make_tensor<double>({1, 3});
-    auto scale_tensor = Tensor::make_tensor<double>({1, 3});
-    auto mean_tensor = Tensor::make_tensor<double>({1, 3});
-    auto variance_tensor = Tensor::make_tensor<double>({1, 3});
+    Tensor<double> input_tensor({1, 3, 224, 224});
+    Tensor<double> output_tensor({1, 3, 224, 224});
+    Tensor<double> bias_tensor({1, 3});
+    Tensor<double> scale_tensor({1, 3});
+    Tensor<double> mean_tensor({1, 3});
+    Tensor<double> variance_tensor({1, 3});
 
     Cpu_fp_reference_implementation<double, double, double> ref_impl;
 
@@ -85,12 +85,12 @@ TEST(CpuFpReferenceImplementation, BatchnormInferFloatUsageNHWC)
 {
     SKIP_IF_NO_DEVICES();
 
-    auto input_tensor = Tensor::make_tensor<float>({6, 3, 32, 32}, Tensor_layout::NHWC);
-    auto output_tensor = Tensor::make_tensor<float>({6, 3, 32, 32}, Tensor_layout::NHWC);
-    auto bias_tensor = Tensor::make_tensor<float>({1, 3, 1, 1});
-    auto scale_tensor = Tensor::make_tensor<float>({1, 3, 1, 1});
-    auto mean_tensor = Tensor::make_tensor<float>({1, 3, 1, 1});
-    auto variance_tensor = Tensor::make_tensor<float>({1, 3, 1, 1});
+    Tensor<float> input_tensor({6, 3, 32, 32}, Tensor_layout::NHWC);
+    Tensor<float> output_tensor({6, 3, 32, 32}, Tensor_layout::NHWC);
+    Tensor<float> bias_tensor({1, 3, 1, 1});
+    Tensor<float> scale_tensor({1, 3, 1, 1});
+    Tensor<float> mean_tensor({1, 3, 1, 1});
+    Tensor<float> variance_tensor({1, 3, 1, 1});
 
     Cpu_fp_reference_implementation<float, float, float> ref_impl;
 
@@ -102,14 +102,14 @@ TEST(CpuFpReferenceImplementation, BatchnormBwdFloatUsage)
 {
     SKIP_IF_NO_DEVICES();
 
-    auto x_tensor = Tensor::make_tensor<float>({6, 3, 32, 32});
-    auto dy_tensor = Tensor::make_tensor<float>({6, 3, 32, 32});
-    auto dx_tensor = Tensor::make_tensor<float>({6, 3, 32, 32});
-    auto scale_tensor = Tensor::make_tensor<float>({1, 3});
-    auto mean_tensor = Tensor::make_tensor<float>({1, 3});
-    auto inv_variance_tensor = Tensor::make_tensor<float>({1, 3});
-    auto dscale_tensor = Tensor::make_tensor<float>({1, 3});
-    auto dbias_tensor = Tensor::make_tensor<float>({1, 3});
+    Tensor<float> x_tensor({6, 3, 32, 32});
+    Tensor<float> dy_tensor({6, 3, 32, 32});
+    Tensor<float> dx_tensor({6, 3, 32, 32});
+    Tensor<float> scale_tensor({1, 3});
+    Tensor<float> mean_tensor({1, 3});
+    Tensor<float> inv_variance_tensor({1, 3});
+    Tensor<float> dscale_tensor({1, 3});
+    Tensor<float> dbias_tensor({1, 3});
 
     Cpu_fp_reference_implementation<float, float, float> ref_impl;
 
@@ -127,14 +127,14 @@ TEST(CpuFpReferenceImplementation, BatchnormBwdBFloat16Usage)
 {
     SKIP_IF_NO_DEVICES();
 
-    auto x_tensor = Tensor::make_tensor<hip_bfloat16>({6, 3, 32, 32});
-    auto dy_tensor = Tensor::make_tensor<hip_bfloat16>({6, 3, 32, 32});
-    auto dx_tensor = Tensor::make_tensor<hip_bfloat16>({6, 3, 32, 32});
-    auto scale_tensor = Tensor::make_tensor<float>({1, 3});
-    auto mean_tensor = Tensor::make_tensor<float>({1, 3});
-    auto inv_variance_tensor = Tensor::make_tensor<float>({1, 3});
-    auto dscale_tensor = Tensor::make_tensor<float>({1, 3});
-    auto dbias_tensor = Tensor::make_tensor<float>({1, 3});
+    Tensor<hip_bfloat16> x_tensor({6, 3, 32, 32});
+    Tensor<hip_bfloat16> dy_tensor({6, 3, 32, 32});
+    Tensor<hip_bfloat16> dx_tensor({6, 3, 32, 32});
+    Tensor<float> scale_tensor({1, 3});
+    Tensor<float> mean_tensor({1, 3});
+    Tensor<float> inv_variance_tensor({1, 3});
+    Tensor<float> dscale_tensor({1, 3});
+    Tensor<float> dbias_tensor({1, 3});
 
     Cpu_fp_reference_implementation<hip_bfloat16, float, float> ref_impl;
 
@@ -152,14 +152,14 @@ TEST(CpuFpReferenceImplementation, BatchnormBwdHalfUsage)
 {
     SKIP_IF_NO_DEVICES();
 
-    auto x_tensor = Tensor::make_tensor<half>({6, 3, 32, 32});
-    auto dy_tensor = Tensor::make_tensor<half>({6, 3, 32, 32});
-    auto dx_tensor = Tensor::make_tensor<half>({6, 3, 32, 32});
-    auto scale_tensor = Tensor::make_tensor<float>({1, 3});
-    auto mean_tensor = Tensor::make_tensor<float>({1, 3});
-    auto inv_variance_tensor = Tensor::make_tensor<float>({1, 3});
-    auto dscale_tensor = Tensor::make_tensor<float>({1, 3});
-    auto dbias_tensor = Tensor::make_tensor<float>({1, 3});
+    Tensor<half> x_tensor({6, 3, 32, 32});
+    Tensor<half> dy_tensor({6, 3, 32, 32});
+    Tensor<half> dx_tensor({6, 3, 32, 32});
+    Tensor<float> scale_tensor({1, 3});
+    Tensor<float> mean_tensor({1, 3});
+    Tensor<float> inv_variance_tensor({1, 3});
+    Tensor<float> dscale_tensor({1, 3});
+    Tensor<float> dbias_tensor({1, 3});
 
     Cpu_fp_reference_implementation<half, float, float> ref_impl;
 
@@ -177,14 +177,14 @@ TEST(CpuFpReferenceImplementation, BatchnormBwdDoubleUsage)
 {
     SKIP_IF_NO_DEVICES();
 
-    auto x_tensor = Tensor::make_tensor<double>({6, 3, 32, 32});
-    auto dy_tensor = Tensor::make_tensor<double>({6, 3, 32, 32});
-    auto dx_tensor = Tensor::make_tensor<double>({6, 3, 32, 32});
-    auto scale_tensor = Tensor::make_tensor<double>({1, 3});
-    auto mean_tensor = Tensor::make_tensor<double>({1, 3});
-    auto inv_variance_tensor = Tensor::make_tensor<double>({1, 3});
-    auto dscale_tensor = Tensor::make_tensor<double>({1, 3});
-    auto dbias_tensor = Tensor::make_tensor<double>({1, 3});
+    Tensor<double> x_tensor({6, 3, 32, 32});
+    Tensor<double> dy_tensor({6, 3, 32, 32});
+    Tensor<double> dx_tensor({6, 3, 32, 32});
+    Tensor<double> scale_tensor({1, 3});
+    Tensor<double> mean_tensor({1, 3});
+    Tensor<double> inv_variance_tensor({1, 3});
+    Tensor<double> dscale_tensor({1, 3});
+    Tensor<double> dbias_tensor({1, 3});
 
     Cpu_fp_reference_implementation<double, double, double> ref_impl;
 
@@ -202,14 +202,14 @@ TEST(CpuFpReferenceImplementation, BatchnormBwdFloatUsageNHWC)
 {
     SKIP_IF_NO_DEVICES();
 
-    auto x_tensor = Tensor::make_tensor<float>({6, 3, 32, 32}, Tensor_layout::NHWC);
-    auto dy_tensor = Tensor::make_tensor<float>({6, 3, 32, 32}, Tensor_layout::NHWC);
-    auto dx_tensor = Tensor::make_tensor<float>({6, 3, 32, 32});
-    auto scale_tensor = Tensor::make_tensor<float>({1, 3});
-    auto mean_tensor = Tensor::make_tensor<float>({1, 3});
-    auto inv_variance_tensor = Tensor::make_tensor<float>({1, 3});
-    auto dscale_tensor = Tensor::make_tensor<float>({1, 3});
-    auto dbias_tensor = Tensor::make_tensor<float>({1, 3});
+    Tensor<float> x_tensor({6, 3, 32, 32}, Tensor_layout::NHWC);
+    Tensor<float> dy_tensor({6, 3, 32, 32}, Tensor_layout::NHWC);
+    Tensor<float> dx_tensor({6, 3, 32, 32});
+    Tensor<float> scale_tensor({1, 3});
+    Tensor<float> mean_tensor({1, 3});
+    Tensor<float> inv_variance_tensor({1, 3});
+    Tensor<float> dscale_tensor({1, 3});
+    Tensor<float> dbias_tensor({1, 3});
 
     Cpu_fp_reference_implementation<float, float, float> ref_impl;
 
@@ -229,36 +229,36 @@ TEST(CpuFpReferenceImplementation, BatchnormBwdSanityValidation)
 
     const std::vector<int64_t> dims = {1, 1, 2, 2};
 
-    auto x_tensor = Tensor::make_tensor<double>(dims);
-    auto dy_tensor = Tensor::make_tensor<double>(dims);
-    auto dx_tensor = Tensor::make_tensor<double>(dims);
-    auto scale_tensor = Tensor::make_tensor<double>({1, 1, 1, 1});
-    auto mean_tensor = Tensor::make_tensor<double>({1, 1, 1, 1});
-    auto inv_variance_tensor = Tensor::make_tensor<double>({1, 1, 1, 1});
-    auto dscale_tensor = Tensor::make_tensor<double>({1, 1, 1, 1});
-    auto dbias_tensor = Tensor::make_tensor<double>({1, 1, 1, 1});
+    Tensor<double> x_tensor(dims);
+    Tensor<double> dy_tensor(dims);
+    Tensor<double> dx_tensor(dims);
+    Tensor<double> scale_tensor({1, 1, 1, 1});
+    Tensor<double> mean_tensor({1, 1, 1, 1});
+    Tensor<double> inv_variance_tensor({1, 1, 1, 1});
+    Tensor<double> dscale_tensor({1, 1, 1, 1});
+    Tensor<double> dbias_tensor({1, 1, 1, 1});
 
     // x = [1, 2, 3, 4]
-    x_tensor.set_host_value<double>(0, 0, 0, 0, 1.0);
-    x_tensor.set_host_value<double>(0, 0, 0, 1, 2.0);
-    x_tensor.set_host_value<double>(0, 0, 1, 0, 3.0);
-    x_tensor.set_host_value<double>(0, 0, 1, 1, 4.0);
+    x_tensor.set_host_value(0, 0, 0, 0, 1.0);
+    x_tensor.set_host_value(0, 0, 0, 1, 2.0);
+    x_tensor.set_host_value(0, 0, 1, 0, 3.0);
+    x_tensor.set_host_value(0, 0, 1, 1, 4.0);
 
     // gradient dy = [0.1, 0.2, 0.3, 0.4]
-    dy_tensor.set_host_value<double>(0, 0, 0, 0, 0.1);
-    dy_tensor.set_host_value<double>(0, 0, 0, 1, 0.2);
-    dy_tensor.set_host_value<double>(0, 0, 1, 0, 0.3);
-    dy_tensor.set_host_value<double>(0, 0, 1, 1, 0.4);
+    dy_tensor.set_host_value(0, 0, 0, 0, 0.1);
+    dy_tensor.set_host_value(0, 0, 0, 1, 0.2);
+    dy_tensor.set_host_value(0, 0, 1, 0, 0.3);
+    dy_tensor.set_host_value(0, 0, 1, 1, 0.4);
 
     // scale (one channel) = 2.0
-    scale_tensor.set_host_value<double>(0, 0, 0, 0, 2.0);
+    scale_tensor.set_host_value(0, 0, 0, 0, 2.0);
 
     // 1 batch, so compute mean and variance over all elements
     // mean = (1+2+3+4)/4 = 2.5
     // variance = [(-1.5)^2 + (-0.5)^2 + (0.5)^2 + (1.5)^2] / 4 = 5.0 / 4 = 1.25
     // inv_variance = 1 / sqrt(1.25 + 1e-5) = 0.894423613312618
-    mean_tensor.set_host_value<double>(0, 0, 0, 0, 2.5);
-    inv_variance_tensor.set_host_value<double>(0, 0, 0, 0, 0.894423613312618);
+    mean_tensor.set_host_value(0, 0, 0, 0, 2.5);
+    inv_variance_tensor.set_host_value(0, 0, 0, 0, 0.894423613312618);
 
     // dbias = sum(dy) = 0.1 + 0.2 + 0.3 + 0.4 = 1.0
     auto expected_dbias = 1.0;
@@ -284,10 +284,10 @@ TEST(CpuFpReferenceImplementation, BatchnormBwdSanityValidation)
 
     auto tolerance = 1e-6;
 
-    EXPECT_NEAR(dbias_tensor.get_host_value<double>(0, 0, 0, 0), expected_dbias, tolerance);
-    EXPECT_NEAR(dscale_tensor.get_host_value<double>(0, 0, 0, 0), expected_dscale, tolerance);
-    EXPECT_NEAR(dx_tensor.get_host_value<double>(0, 0, 0, 0), expected_dx[0], tolerance);
-    EXPECT_NEAR(dx_tensor.get_host_value<double>(0, 0, 0, 1), expected_dx[1], tolerance);
-    EXPECT_NEAR(dx_tensor.get_host_value<double>(0, 0, 1, 0), expected_dx[2], tolerance);
-    EXPECT_NEAR(dx_tensor.get_host_value<double>(0, 0, 1, 1), expected_dx[3], tolerance);
+    EXPECT_NEAR(dbias_tensor.get_host_value(0, 0, 0, 0), expected_dbias, tolerance);
+    EXPECT_NEAR(dscale_tensor.get_host_value(0, 0, 0, 0), expected_dscale, tolerance);
+    EXPECT_NEAR(dx_tensor.get_host_value(0, 0, 0, 0), expected_dx[0], tolerance);
+    EXPECT_NEAR(dx_tensor.get_host_value(0, 0, 0, 1), expected_dx[1], tolerance);
+    EXPECT_NEAR(dx_tensor.get_host_value(0, 0, 1, 0), expected_dx[2], tolerance);
+    EXPECT_NEAR(dx_tensor.get_host_value(0, 0, 1, 1), expected_dx[3], tolerance);
 }
