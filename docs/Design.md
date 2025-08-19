@@ -218,7 +218,7 @@ hipdnnEnginePluginCreateExecutionContext(handle, config, graph, context);
 hipdnnEnginePluginExecuteOpGraph(handle, context, workspace, buffers, num_buffers);
 ```
 
-#### Plugin Types
+#### Engine Plugin Types
 
 ##### 1. Static Kernel Engines
 - Provide pre-compiled kernels for specific operations

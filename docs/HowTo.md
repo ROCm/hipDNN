@@ -183,8 +183,7 @@ Refer to the [Plugin Development Guide](./PluginDevelopment.md) to implement the
 
 3. **Test Your Implementation**:
    - Unit tests for individual components
-   - Integration tests for end-to-end functionality
-   - See [Testing Documentation](../tests/README.md)
+   - Integration tests for new and untested end-to-end functionality
 
 ### Important Considerations
 
@@ -199,13 +198,3 @@ Refer to the [Plugin Development Guide](./PluginDevelopment.md) to implement the
 - Use integration tests to verify operation behavior
 - Check plugin loading with `HIPDNN_LOG_LEVEL=info`
 - For plugin issues, check the default plugin path or use custom paths with `hipdnnSetEnginePluginPaths_ext`
-
----
-
-## Additional Resources
-
-- [Plugin Development Guide](./PluginDevelopment.md) - Detailed plugin architecture
-- [Design Overview](./Design.md) - hipDNN architecture and design principles
-- [Building Guide](./Building.md) - Build configuration and options
-- [Environment Configuration](./Environment.md) - Runtime configuration and logging
-- [Testing Documentation](../tests/README.md) - Testing guidelines

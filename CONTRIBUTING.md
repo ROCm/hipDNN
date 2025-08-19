@@ -49,6 +49,8 @@ All contributions must meet the following requirements before they can be merged
   - New code should not decrease existing coverage
   - Each component should maintain >80% coverage individually
 
+See [Testing Strategy](./docs/testing/TestingStrategy.md) for further details.
+
 ### Documentation Requirements
 
 - **Update Documentation**: Update all relevant documentation to reflect your changes

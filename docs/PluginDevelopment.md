@@ -127,10 +127,9 @@ your_kernel_plugin_project/
 ├── engines/
 │   ├── engine_interface.hpp  # Engine interface
 │   ├── your_engine.cpp       # Engine implementation
-│   └── kernels/              # Kernel implementations
-│       ├── operation1.cpp
-│       └── operation2.cpp
-└── tests/                    # Plugin-specific tests
+│   └── plans/                # Internal plans
+├── tests/                    # Plugin-specific tests
+└── integration_tests/        # End-to-end integration tests
 ```
 
 ### Build Configuration
@@ -145,6 +144,54 @@ Plugins are discovered and loaded from:
 - Default path: `hipdnn_plugins/<plugin-type>/` relative to the backend library
 - Custom paths can be configured using environment variables
 - See [Environment Configuration](./Environment.md) for details
+
+## How to Test Plugins
+
+Testing is crucial for ensuring plugin reliability and correctness. Plugins should include both unit tests and integration tests to validate their functionality.
+
+### Test Structure
+
+Following the [Testing Strategy](./testing/TestingStrategy.md), plugins should organize tests as follows:
+
+```
+your_kernel_plugin_project/
+├── tests/                    # Unit tests
+│   ├── test_engine.cpp
+│   ├── test_kernels.cpp
+│   └── test_utilities.cpp
+└── integration_tests/        # End-to-end integration tests
+    ├── operation1_test.cpp
+    └── operation2_test.cpp
+```
+
+### Unit Tests
+
+Unit tests focus on the internal implementation of your plugin components:
+
+- **Location**: `plugins/<plugin_name>/tests/`
+- **Purpose**: Test individual components in isolation (engines, utilities, kernel logic)
+- **Requirements**:
+  - Must be fast-running
+  - GPU operations must be marked with `SKIP_IF_NO_DEVICE()` macro
+  - Use mocking/stubbing for dependencies where appropriate
+  - Should work on both Windows and Linux
+
+### Integration Tests
+
+Integration tests validate end-to-end functionality of your plugin:
+
+- **Location**: `plugins/<plugin_name>/integration_tests/`
+- **Purpose**: Validate correctness of graph execution and accuracy of results
+- **Requirements**:
+  - Test complete operation graphs
+  - Validate against reference implementations
+  - Test different data types, layouts, dimensions, and edge-cases for each
+  - Enable tests for all supported ASICs
+  - GPU typically required for meaningful validation
+
+For a comprehensive example of an integration test, see: [`plugins/miopen_legacy_plugin/integration_tests/batchnorm_fwd_inference_integration_test.cpp`](../plugins/miopen_legacy_plugin/integration_tests/batchnorm_fwd_inference_integration_test.cpp)
+
+Moreover, see our [general testing requirements](./testing/TestingStrategy.md#general-testing-requirements).
 
 ## Example: MIOpen Legacy Plugin
 
@@ -180,9 +227,3 @@ While kernel engine plugins are the focus of current development, future release
 - **Benchmarking plugins** for automated performance tuning
 
 These plugin types will follow similar development patterns but with specialized interfaces tailored to their specific purposes.
-
-## Additional Resources
-
-- [How-To Guide](./HowTo.md) - Adding new operations and SDK changes
-- [Design Overview](./Design.md) - hipDNN architecture
-- [Testing Documentation](../tests/README.md) - Testing guidelines
