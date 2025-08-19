@@ -294,7 +294,10 @@ HIPDNN_BACKEND_EXPORT hipdnnStatus_t hipdnnSetEnginePluginPaths_ext(
                   hipdnn_backend::hipdnn_get_plugin_loading_mode_string(loading_mode));
 
     return hipdnn_backend::try_catch([&, api_name = __func__] {
-        throw_if_null(plugin_paths);
+        if(num_paths > 0)
+        {
+            throw_if_null(plugin_paths);
+        }
 
         std::vector<std::filesystem::path> paths_vec;
         paths_vec.reserve(num_paths);
@@ -307,11 +310,37 @@ HIPDNN_BACKEND_EXPORT hipdnnStatus_t hipdnnSetEnginePluginPaths_ext(
 
         hipdnn_backend::plugin::Engine_plugin_resource_manager::set_plugin_paths(paths_vec,
                                                                                  loading_mode);
-
         // TODO: automatic formatting loading mode to string
         LOG_API_SUCCESS(api_name,
                         "set_plugin_paths={}",
                         hipdnn_backend::hipdnn_get_plugin_loading_mode_string(loading_mode));
         return HIPDNN_STATUS_SUCCESS;
+    });
+}
+
+HIPDNN_BACKEND_EXPORT hipdnnStatus_t hipdnnGetLoadedEnginePluginPaths_ext(hipdnnHandle_t handle,
+                                                                          size_t* num_plugin_paths,
+                                                                          char** plugin_paths,
+                                                                          size_t* max_string_len)
+{
+    LOG_API_ENTRY(
+        "handle={:p}, num_plugin_paths_ptr={:p}, plugin_paths_ptr={:p}, max_string_len_ptr={:p}",
+        static_cast<void*>(handle),
+        static_cast<void*>(num_plugin_paths),
+        static_cast<const void*>(plugin_paths),
+        static_cast<void*>(max_string_len));
+
+    return hipdnn_backend::try_catch([&, api_name = __func__] {
+        throw_if_null(handle);
+        throw_if_null(num_plugin_paths);
+        throw_if_null(max_string_len);
+
+        handle->get_plugin_resource_manager()->get_loaded_plugin_files(
+            num_plugin_paths, plugin_paths, max_string_len);
+
+        LOG_API_SUCCESS(api_name,
+                        "retrieved_num_plugin_paths={}, retrieved_max_string_len={}",
+                        *num_plugin_paths,
+                        *max_string_len);
     });
 }
