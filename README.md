@@ -11,7 +11,9 @@
 - [Building](#building)
 - [Design](#design)
 - [Plugin Development](#plugin-development)
-- [Roadmap](./docs/Roadmap.md)
+- [Operation support](#operation-support)
+- [Roadmap](#roadmap)
+- [Contributing](#contributing)
 - [Project Components](#project-components)
   - [Backend](./backend/README.md)
   - [Frontend](./frontend/README.md)
@@ -44,9 +46,17 @@ The overall design of hipDNN is documented in the [Design.md](./docs/Design.md) 
 
 If you are interested in writing a plugin for hipDNN, please see the [Plugin Development](./docs/PluginDevelopment.md) document.
 
+## Operation Support
+
+To see the current operation support for hipDNN, please see the [Operation Support](./docs/OperationSupport.md) document.
+
 ## Roadmap
 
 For details on the feature priorities of hipDNN development, please see the [Roadmap](./docs/Roadmap.md) document.
+
+## Contributing
+
+For information about contributing to the hipDNN project, please see the [Contributing](./CONTRIBUTING.md) document.
 
 ---
 
