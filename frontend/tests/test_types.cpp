@@ -82,31 +82,31 @@ TEST(TestTypes, DataTypeStreamOperator)
     using namespace hipdnn_frontend;
 
     std::ostringstream oss;
-    
+
     oss << DataType_t::FLOAT;
     EXPECT_EQ(oss.str(), "fp32");
     oss.str("");
-    
+
     oss << DataType_t::HALF;
     EXPECT_EQ(oss.str(), "fp16");
     oss.str("");
-    
+
     oss << DataType_t::BFLOAT16;
     EXPECT_EQ(oss.str(), "bf16");
     oss.str("");
-    
+
     oss << DataType_t::DOUBLE;
     EXPECT_EQ(oss.str(), "fp64");
     oss.str("");
-    
+
     oss << DataType_t::UINT8;
     EXPECT_EQ(oss.str(), "uint8");
     oss.str("");
-    
+
     oss << DataType_t::INT32;
     EXPECT_EQ(oss.str(), "int32");
     oss.str("");
-    
+
     oss << DataType_t::NOT_SET;
     EXPECT_EQ(oss.str(), "unknown");
 }
