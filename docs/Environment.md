@@ -56,7 +56,10 @@ The frontend and plugins can be configured to use the same logging destination a
 
 ### MIOpen Plugin Logging
 
-When using the MIOpen legacy plugin, additional MIOpen-specific environment variables control the underlying MIOpen library's logging behavior. For more details about MIOpen logging, see the latest [MIOpen Debug and Logging documentation](https://rocm.docs.amd.com/projects/MIOpen/en/develop/how-to/debug-log.html). All MIOpen environment variables remain compatible with hipDNN's MIOpen legacy plugin.
+> [!TIP]
+> When using the MIOpen legacy plugin, you can use MIOpen-specific environment variables to control the underlying library's logging behavior.
+
+For more details about MIOpen logging, see the latest [MIOpen Debug and Logging documentation](https://rocm.docs.amd.com/projects/MIOpen/en/develop/how-to/debug-log.html). All MIOpen environment variables remain compatible with hipDNN's MIOpen legacy plugin.
 
 ---
 
@@ -128,7 +131,7 @@ hipdnnSetEnginePluginPaths_ext(
 );
 ```
 
-Plugins are loaded according to the selected path schema during hipDNN handle creation. 
+Plugins are loaded according to the selected path schema during hipDNN handle creation. Changing paths after handle creation has no effect until another handle is created.
 
 ---
 
@@ -143,11 +146,9 @@ hipDNN provides functions for retrieving error information:
 const char* error_str = hipdnnGetErrorString(status);
 
 // Get detailed error message for the current thread
-char message[256];
+char message[256]; // The maximum error message size is 256 characters
 hipdnnGetLastErrorString(message, sizeof(message));
 ```
-
-**Note:** The maximum error message size is 256 characters.
 
 ### Best Practices
 

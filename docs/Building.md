@@ -49,6 +49,9 @@ The following libraries are automatically managed by CMake (see [Dependencies.cm
 
 ### Using Docker (Recommended)
 
+> [!TIP]
+> Docker provides a consistent development environment with all dependencies pre-installed. This is the recommended approach for most users.
+
 1. **Build the Development Container**
    ```bash
    cd <path/to/hipDNN/dockerfiles>
@@ -178,7 +181,8 @@ The standard build instructions above work for all supported Linux distributions
 
 ### Windows
 
-**⚠️ Important: GPU functionality and HIP-related tests are not currently supported on Windows.**
+> [!WARNING]
+> GPU functionality and HIP-related tests are not currently supported on Windows. Only CPU tests can be run.
 
 1. **Prerequisites**
    - Visual Studio 2022 with C++ workload

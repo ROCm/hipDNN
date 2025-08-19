@@ -12,7 +12,8 @@ The following table lists all operations currently supported in hipDNN, along wi
 
 ## Notes
 
-**hipDNN is in the early phase of development.** The operation support table above reflects the current state of the library. We are actively working on expanding support for additional operations and features.
+> [!IMPORTANT]
+> **hipDNN is in the early phase of development.** The operation support table above reflects the current state of the library. We are actively working on expanding support for additional operations and features.
 
 For information about upcoming operations and features, please refer to the [Roadmap.md](./Roadmap.md) document.
 
@@ -34,5 +35,6 @@ For information about upcoming operations and features, please refer to the [Roa
 
 ## Contributing
 
-As hipDNN evolves, this document will be updated to reflect new operation support.\
+As hipDNN evolves, this document will be updated to reflect new operation support.
+
 If you're interested in contributing to expand operation support, please see our [CONTRIBUTING.md](../CONTRIBUTING.md) guide.

@@ -81,7 +81,8 @@ find_package(hipdnn_sdk REQUIRED)
 target_link_libraries(your_plugin PRIVATE hipdnn::sdk)
 ```
 
-**Note**: If CMake cannot find the packages after installation, ensure your `CMAKE_PREFIX_PATH` includes the install location. By default on Linux systems, hipDNN CMake files are installed to `/opt/rocm/lib/cmake`.
+> [!NOTE]
+> If CMake cannot find the packages after installation, ensure your `CMAKE_PREFIX_PATH` includes the install location. By default on Linux systems, hipDNN CMake files are installed to `/opt/rocm/lib/cmake`.
 
 ### Logging Setup
 
@@ -216,6 +217,7 @@ Refer to the [Plugin Development Guide](./PluginDevelopment.md) to implement the
 - Enable logging with environment variables (see [Environment Configuration](./Environment.md))
 - Use integration tests to verify operation behavior
 - Check plugin loading with `HIPDNN_LOG_LEVEL=info`
+- For plugin issues, check the default plugin path or use custom paths with `hipdnnSetEnginePluginPaths_ext`
 
 ---
 

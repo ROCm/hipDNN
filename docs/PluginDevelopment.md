@@ -68,10 +68,8 @@ This section focuses on developing kernel engine plugins, which are currently th
    - See [MIOpen Legacy Plugin](../plugins/miopen_legacy_plugin/) as a reference implementation
 
 2. **Implement Plugin API Functions**
-    > [!NOTE]
-    > The underlying implementation below the plugin API level is entirely at the developer's discretion. While the following architectural components are recommended for code organization and maintainability; the only true requirement is to correctly implement the exported API functions defined in `engine_plugin_api.h`.
    
-   Common architectural patterns include:
+   The underlying implementation below the plugin API level is entirely at the developer's discretion. While the following architectural components are recommended for code organization and maintainability; the only true requirement is to correctly implement the exported API functions defined in `engine_plugin_api.h`. However, the common architectural pattern consists of:
    - **Engine Manager**: Manages available engines and their capabilities
    - **Engine**: Implements graph execution for specific operations (each engine must have a globally unique `int64_t` ID)
    - **Execution Plans**: Define how operations are executed

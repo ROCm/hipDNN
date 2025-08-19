@@ -1,6 +1,7 @@
 # hipDNN Design
 
-Note: We are in an early stage of development for hipDNN. This design is subject to change.
+> [!NOTE]
+> We are in an early stage of development for hipDNN. This design is subject to change.
 
 hipDNN is a graph-based deep learning library that enables multi-operation fusion for improved performance on AMD GPUs. It uses operation graphs as an intermediate representation to describe computations, allowing different backend engines to optimize and execute these graphs efficiently.
 
@@ -235,7 +236,7 @@ hipdnnEnginePluginExecuteOpGraph(handle, context, workspace, buffers, num_buffer
 - Provide pre-compiled kernels for specific operations
 - Narrow support: Only handle specific configurations
 - Example: MIOpen Legacy Plugin
-- Advantages:
+- **Advantages:**
   - Highly optimized for supported cases
   - Predictable performance
   - Lower compilation overhead
@@ -244,7 +245,7 @@ hipdnnEnginePluginExecuteOpGraph(handle, context, workspace, buffers, num_buffer
 - Generate kernels at runtime based on graph structure
 - Broad support: Handle general graph patterns
 - Example: Future JIT-compilation plugins
-- Advantages:
+- **Advantages:**
   - Flexible operation fusion
   - Support for novel graph patterns
   - Adaptable to hardware capabilities

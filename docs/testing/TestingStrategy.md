@@ -6,7 +6,10 @@ This document outlines the comprehensive testing strategy for hipDNN, covering w
 
 ## 1. White Box Testing (Unit Tests)
 
-White box tests focus on internal implementation details of hipDNN components. All white box tests should run on each PR.
+White box tests focus on internal implementation details of hipDNN components.
+
+> [!IMPORTANT]
+> All white box tests must run on each PR and maintain fast execution times.
 
 ### Component Comparison
 
@@ -45,7 +48,6 @@ White box tests focus on internal implementation details of hipDNN components. A
 - TBD based on plugin implementation
 
 ### Common Requirements
-
 - **Mocking**: Use GMOCK for mocking dependencies
 - **Execution**: Fast execution required
 - **Isolation**: Use stubbed/mocked implementations for dependencies
@@ -124,4 +126,3 @@ Tests must work in the following environments:
 - **Without GPU**: All GPU tests must be skippable (warnings, not errors)
 - **With GPU**: Tests should detect and utilize available GPU resources
 - **Platform Support**: Windows & supported Linux distributions
-

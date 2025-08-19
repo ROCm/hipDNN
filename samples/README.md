@@ -16,7 +16,12 @@
 
 ## Available Samples
 
-All samples are templated for mixed-precision execution with fp32, fp16, and bfp16 input/output data types, with fp32 intermediate accumulation. If desired, set `HIPDNN_LOG_LEVEL=info` to observe the detailed logs from the samples. The sample operations are:
+All samples are templated for mixed-precision execution with fp32, fp16, and bfp16 input/output data types, with fp32 intermediate accumulation.
+
+> [!TIP]
+> Set `HIPDNN_LOG_LEVEL=info` to observe detailed logs from the samples.
+
+The sample operations are:
 
 *   **`bn_inference`** (`batchnorm/bn_inference.cpp`): Executes a single-node batch normalization inference graph on a 4D input tensor.
     *   It normalizes each dimension of the input tensor `x` of shape `(N, C, H, W)`, using pre-calculated population statistics. The result is then transformed by the learned parameters `scale` and `bias`, each with shape `(1, C, 1, 1)`. At a high-level, the following element-wise linear transformation is broadcast over the batch and spatial dimensions (`N, H, W`):
