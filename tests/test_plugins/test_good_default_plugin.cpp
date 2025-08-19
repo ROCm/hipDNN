@@ -13,7 +13,7 @@ class Good_plugin : public Test_plugin_base
 public:
     const char* get_plugin_name() const override
     {
-        return "test_good_plugin";
+        return "test_good_default_plugin";
     }
     const char* get_plugin_version() const override
     {
@@ -21,7 +21,7 @@ public:
     }
     int64_t get_engine_id() const override
     {
-        return -1;
+        return -4;
     }
     uint32_t get_num_engines() const override
     {

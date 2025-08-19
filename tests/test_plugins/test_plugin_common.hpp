@@ -37,6 +37,7 @@ public:
     virtual const char* get_plugin_name() const = 0;
     virtual const char* get_plugin_version() const = 0;
     virtual int64_t get_engine_id() const = 0;
+    virtual uint32_t get_num_engines() const = 0;
     virtual uint32_t get_num_applicable_engines() const = 0;
     virtual bool supports_engine_operations() const
     {
@@ -127,6 +128,35 @@ public:
         });
     }
 
+    static hipdnnPluginStatus_t engine_plugin_get_all_engine_ids(int64_t* engine_ids,
+                                                                 uint32_t max_engines,
+                                                                 uint32_t* num_engines)
+    {
+        LOG_API_ENTRY("engine_ids={:p}, max_engines={}, num_engines={:p}",
+                      static_cast<void*>(engine_ids),
+                      max_engines,
+                      static_cast<void*>(num_engines));
+
+        return hipdnn_plugin::try_catch([&, api_name = __func__]() {
+            if(max_engines != 0)
+            {
+                hipdnn_plugin::throw_if_null(engine_ids);
+            }
+            hipdnn_plugin::throw_if_null(num_engines);
+            hipdnn_plugin::throw_if_null(get_instance());
+
+            *num_engines = get_instance()->get_num_engines();
+
+            if(max_engines >= 1 && *num_engines > 0)
+            {
+                assert(*num_engines == 1);
+                engine_ids[0] = get_instance()->get_engine_id();
+            }
+
+            LOG_API_SUCCESS(api_name, "num_engines={}", *num_engines);
+        });
+    }
+
     static hipdnnPluginStatus_t engine_plugin_create(hipdnnEnginePluginHandle_t* handle)
     {
         LOG_API_ENTRY("handle_ptr={:p}", static_cast<void*>(handle));
@@ -185,7 +215,10 @@ public:
         return hipdnn_plugin::try_catch([&, api_name = __func__]() {
             hipdnn_plugin::throw_if_null(handle);
             hipdnn_plugin::throw_if_null(op_graph);
-            hipdnn_plugin::throw_if_null(engine_ids);
+            if(max_engines != 0)
+            {
+                hipdnn_plugin::throw_if_null(engine_ids);
+            }
             hipdnn_plugin::throw_if_null(num_engines);
             hipdnn_plugin::throw_if_null(get_instance());
 
@@ -424,6 +457,14 @@ private:
     hipdnnPluginStatus_t hipdnnPluginSetLoggingCallback(hipdnnCallback_t callback)                 \
     {                                                                                              \
         return Test_plugin_base::plugin_set_logging_callback(callback);                            \
+    }                                                                                              \
+                                                                                                   \
+    hipdnnPluginStatus_t hipdnnEnginePluginGetAllEngineIds(int64_t* engine_ids,                    \
+                                                           uint32_t max_engines,                   \
+                                                           uint32_t* num_engines)                  \
+    {                                                                                              \
+        return Test_plugin_base::engine_plugin_get_all_engine_ids(                                 \
+            engine_ids, max_engines, num_engines);                                                 \
     }                                                                                              \
                                                                                                    \
     hipdnnPluginStatus_t hipdnnEnginePluginCreate(hipdnnEnginePluginHandle_t* handle)              \

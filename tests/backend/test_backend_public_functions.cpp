@@ -1,10 +1,18 @@
 // Copyright © Advanced Micro Devices, Inc., or its affiliates.
 // SPDX-License-Identifier:  MIT
 
+#include "../test_plugins/test_plugin_constants.hpp"
 #include "hipdnn_backend.h"
+#include "test_util.hpp"
 #include <array>
 #include <gtest/gtest.h>
 #include <hipdnn_sdk/data_objects/graph_generated.h>
+#include <hipdnn_sdk/utilities/platform_utils.hpp>
+#include <vector>
+
+using namespace hipdnn_tests::plugin_constants;
+using namespace hipdnn_sdk::utilities;
+namespace fs = std::filesystem;
 
 TEST(HipDNNBackendTest, WillCreateDestroyGraphDescriptorSuccessfully)
 {
@@ -169,7 +177,9 @@ TEST(HipDNNBackendTest, WillFailToCreateGraphIfGraphIsNull)
 
 TEST(HipDNNBackendTest, SetPluginPathsExt_Success)
 {
-    std::array<const char*, 3> paths = {"../test_plugins/test_good_plugin", "./", "../directory/"};
+    using namespace hipdnn_tests::plugin_constants;
+    std::string plugin_dir_str = PLUGIN_DIR.string();
+    std::array<const char*, 3> paths = {plugin_dir_str.c_str(), "./", "../directory/"};
 
     hipdnnStatus_t status = hipdnnSetEnginePluginPaths_ext(
         paths.size(), paths.data(), HIPDNN_PLUGIN_LOADING_ABSOLUTE);
@@ -177,14 +187,24 @@ TEST(HipDNNBackendTest, SetPluginPathsExt_Success)
     EXPECT_EQ(status, HIPDNN_STATUS_SUCCESS);
 }
 
-TEST(HipDNNBackendTest, SetPluginPathsExt_FailsOnNullPointer)
+TEST(HipDNNBackendTest, SetPluginPathsExt_InvalidAndValidNullPointerCorrectness)
 {
     hipdnnStatus_t status
         = hipdnnSetEnginePluginPaths_ext(1, nullptr, HIPDNN_PLUGIN_LOADING_ABSOLUTE);
     EXPECT_EQ(status, HIPDNN_STATUS_BAD_PARAM_NULL_POINTER);
 
     status = hipdnnSetEnginePluginPaths_ext(0, nullptr, HIPDNN_PLUGIN_LOADING_ABSOLUTE);
-    EXPECT_EQ(status, HIPDNN_STATUS_BAD_PARAM_NULL_POINTER);
+    EXPECT_EQ(status, HIPDNN_STATUS_SUCCESS);
+
+    hipdnnHandle_t handle = nullptr;
+    status = hipdnnCreate(&handle);
+    ASSERT_EQ(status, HIPDNN_STATUS_SUCCESS);
+    ASSERT_NE(handle, nullptr);
+
+    auto loaded_plugins = test_util::get_loaded_plugins(handle);
+    EXPECT_EQ(loaded_plugins.size(), 0);
+
+    EXPECT_EQ(hipdnnDestroy(handle), HIPDNN_STATUS_SUCCESS);
 }
 
 TEST(HipDNNBackendTest, SetPluginPathsExt_FailsOnNullStringInList)
@@ -197,23 +217,94 @@ TEST(HipDNNBackendTest, SetPluginPathsExt_FailsOnNullStringInList)
     EXPECT_EQ(status, HIPDNN_STATUS_BAD_PARAM_NULL_POINTER);
 }
 
-// Uncomment this test and observe logs to see the plugin is loaded
-// TEST(HipDNNBackendTest, SetPluginPathAndCreateHandle_LoadsPlugins)
-// {
-//     // Can also test by manually changing default path
-//     const std::array<const char*, 1> paths = {"../../tests/test_plugins/"};
+TEST(HipDNNBackendTest, PluginPathsExt_FailsWithIneligibleHandle)
+{
+    hipdnnHandle_t handle = nullptr;
+    hipdnnStatus_t status = hipdnnCreate(&handle);
+    ASSERT_EQ(status, HIPDNN_STATUS_SUCCESS);
+    ASSERT_NE(handle, nullptr);
 
-//     hipdnnStatus_t status = hipdnnSetEnginePluginPaths_ext(
-//         paths.size(), paths.data(), HIPDNN_PLUGIN_LOADING_ADDITIVE);
-//     EXPECT_EQ(status, HIPDNN_STATUS_SUCCESS);
+    const std::array<const char*, 1> paths = {"./fake/path"};
+    status = hipdnnSetEnginePluginPaths_ext(
+        paths.size(), paths.data(), HIPDNN_PLUGIN_LOADING_ABSOLUTE);
 
-//     hipdnnHandle_t handle = nullptr;
-//     hipdnnStatus_t status = hipdnnCreate(&handle);
-//     EXPECT_EQ(status, HIPDNN_STATUS_SUCCESS);
-//     EXPECT_NE(handle, nullptr);
+    EXPECT_EQ(status, HIPDNN_STATUS_NOT_SUPPORTED);
 
-//     status = hipdnnDestroy(handle);
-//     EXPECT_EQ(status, HIPDNN_STATUS_SUCCESS);
+    EXPECT_EQ(hipdnnDestroy(handle), HIPDNN_STATUS_SUCCESS);
 
-//     EXPECT_TRUE(false); // for visibility
-// }
+    size_t num_plugins = 0;
+    size_t max_path_length = 0;
+    status = hipdnnGetLoadedEnginePluginPaths_ext(nullptr, &num_plugins, nullptr, &max_path_length);
+    EXPECT_EQ(status, HIPDNN_STATUS_BAD_PARAM_NULL_POINTER);
+}
+
+TEST(HipDNNBackendTest, GetLoadedPluginPaths_LoadsDefault)
+{
+    hipdnnStatus_t status
+        = hipdnnSetEnginePluginPaths_ext(0, nullptr, HIPDNN_PLUGIN_LOADING_ADDITIVE);
+    ASSERT_EQ(status, HIPDNN_STATUS_SUCCESS);
+
+    hipdnnHandle_t handle = nullptr;
+    status = hipdnnCreate(&handle);
+    ASSERT_EQ(status, HIPDNN_STATUS_SUCCESS);
+    ASSERT_NE(handle, nullptr);
+
+    auto loaded_plugins = test_util::get_loaded_plugins(handle);
+
+    fs::path expected_plugin_path = fs::path("../../backend/src/hipdnn_plugins/engines")
+                                    / get_library_name("test_good_default_plugin");
+
+    EXPECT_TRUE(test_util::is_plugin_loaded(loaded_plugins, expected_plugin_path.string()));
+    EXPECT_EQ(hipdnnDestroy(handle), HIPDNN_STATUS_SUCCESS);
+}
+
+TEST(HipDNNBackendTest, GetLoadedPluginPaths_AdditiveLoadsBothDefaultAndCustom)
+{
+    std::string plugin_dir_str = PLUGIN_DIR.string();
+    const std::array<const char*, 1> paths = {plugin_dir_str.c_str()};
+    hipdnnStatus_t status = hipdnnSetEnginePluginPaths_ext(
+        paths.size(), paths.data(), HIPDNN_PLUGIN_LOADING_ADDITIVE);
+    EXPECT_EQ(status, HIPDNN_STATUS_SUCCESS);
+
+    hipdnnHandle_t handle = nullptr;
+    status = hipdnnCreate(&handle);
+    ASSERT_EQ(status, HIPDNN_STATUS_SUCCESS);
+    ASSERT_NE(handle, nullptr);
+
+    auto loaded_plugins = test_util::get_loaded_plugins(handle);
+    EXPECT_GE(loaded_plugins.size(), 2);
+
+    auto default_plugin_path = fs::path("../../backend/src/hipdnn_plugins/engines")
+                               / get_library_name("test_good_default_plugin");
+    auto test_plugin_path = PLUGIN_DIR / get_library_name(test_good_plugin_name);
+
+    EXPECT_TRUE(test_util::is_plugin_loaded(loaded_plugins, default_plugin_path.string()));
+    EXPECT_TRUE(test_util::is_plugin_loaded(loaded_plugins, test_plugin_path.string()));
+
+    EXPECT_EQ(hipdnnDestroy(handle), HIPDNN_STATUS_SUCCESS);
+}
+
+TEST(HipDNNBackendTest, GetLoadedPluginPaths_AbsoluteLoadsOnlyCustom)
+{
+    auto& plugin_file_path = test_good_plugin_path();
+    const std::array<const char*, 1> paths = {plugin_file_path.c_str()};
+    hipdnnStatus_t status = hipdnnSetEnginePluginPaths_ext(
+        paths.size(), paths.data(), HIPDNN_PLUGIN_LOADING_ABSOLUTE);
+    EXPECT_EQ(status, HIPDNN_STATUS_SUCCESS);
+
+    hipdnnHandle_t handle = nullptr;
+    status = hipdnnCreate(&handle);
+    ASSERT_EQ(status, HIPDNN_STATUS_SUCCESS);
+    ASSERT_NE(handle, nullptr);
+
+    auto loaded_plugins = test_util::get_loaded_plugins(handle);
+    EXPECT_EQ(loaded_plugins.size(), 1);
+
+    auto default_plugin_path = fs::path("backend/src/hipdnn_plugins/engines")
+                               / get_library_name("test_good_default_plugin");
+
+    EXPECT_FALSE(test_util::is_plugin_loaded(loaded_plugins, default_plugin_path.string()));
+    EXPECT_TRUE(test_util::is_plugin_loaded(loaded_plugins, plugin_file_path));
+
+    EXPECT_EQ(hipdnnDestroy(handle), HIPDNN_STATUS_SUCCESS);
+}

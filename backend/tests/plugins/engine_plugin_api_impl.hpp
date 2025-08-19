@@ -7,6 +7,7 @@
 
 #include <hipdnn_sdk/plugin/plugin_api_data_types.h>
 
+void get_all_engine_ids(int64_t* engine_ids, uint32_t max_engines, uint32_t* num_engines);
 void get_applicable_engine_ids(hipdnnEnginePluginHandle_t handle,
                                const hipdnnPluginConstData_t* op_graph,
                                int64_t* engine_ids,

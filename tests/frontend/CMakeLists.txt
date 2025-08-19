@@ -3,6 +3,7 @@
 
 include(GoogleTest)
 find_package(hip REQUIRED)
+find_package(Threads REQUIRED)
 
 add_executable(public_hipdnn_frontend_tests 
     main.cpp
@@ -13,7 +14,7 @@ target_compile_options(public_hipdnn_frontend_tests PRIVATE ${HIPDNN_WARNING_COM
 target_link_libraries(public_hipdnn_frontend_tests
     GTest::gtest 
     GTest::gtest_main 
-    pthread 
+    Threads::Threads 
     hipdnn_sdk
     hipdnn_backend
     hipdnn_frontend
@@ -37,4 +38,4 @@ target_compile_definitions(public_hipdnn_frontend_tests
 add_dependencies(public_hipdnn_frontend_tests test_good_plugin test_execute_fails_plugin test_no_applicable_engines_plugin)
 
 clang_tidy_check(public_hipdnn_frontend_tests)
-add_target_to_check_targets(public_hipdnn_frontend_tests ${CMAKE_CURRENT_BINARY_DIR})
+add_integration_test_target(public_hipdnn_frontend_tests ${CMAKE_CURRENT_BINARY_DIR})

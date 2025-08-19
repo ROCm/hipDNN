@@ -23,6 +23,10 @@ public:
     {
         return -3;
     }
+    uint32_t get_num_engines() const override
+    {
+        return 0;
+    }
     uint32_t get_num_applicable_engines() const override
     {
         return 0;

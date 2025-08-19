@@ -6,6 +6,7 @@ cmake_minimum_required(VERSION 3.25.2)
 add_compile_definitions(__HIP_PLATFORM_AMD__)
 
 set(CMAKE_TOOLCHAIN_FILE "${CMAKE_SOURCE_DIR}/cmake/ClangToolChain.cmake" CACHE STRING "Toolchain file")
+
 set(HIPDNN_VERSION "0.0.1")
 
 if(NOT WIN32)
@@ -98,9 +99,7 @@ list(PREPEND HIPDNN_WARNING_COMPILE_OPTIONS
     -Wswitch-default                         # Warn if a switch statement does not have a default case
 )
 
-add_compile_options(
-    -fPIC # Position Independent Code
-    ${EXTRA_COMPILE_OPTIONS})
+add_compile_options(${EXTRA_COMPILE_OPTIONS})
 add_link_options(${EXTRA_LINK_OPTIONS})
 
 add_subdirectory(sdk)
@@ -122,6 +121,8 @@ endif()
 # keep this after all build folder have been added so they have a chance to register their tests
 # using append_test_to_check_target
 finalize_custom_check_target()
+finalize_unit_check_target()
+finalize_integration_check_target()
 
 if(CODE_COVERAGE)
     if(HIP_DNN_BUILD_PLUGINS)
@@ -141,4 +142,3 @@ if(CODE_COVERAGE)
         COMMENT "Generating code coverage report"
     )
 endif()
-

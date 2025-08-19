@@ -7,8 +7,8 @@
 #include "plugin/engine_plugin_manager.hpp"
 #include "plugin/plugin_core.hpp"
 
-#include <gmock/gmock.h>
 #include <filesystem>
+#include <gmock/gmock.h>
 #include <set>
 #include <vector>
 
@@ -26,7 +26,10 @@ public:
                  hipdnnPluginLoadingMode_ext_t mode),
                 (override));
 
-    MOCK_METHOD(const std::vector<std::shared_ptr<Engine_plugin>>&, get_plugins, (), (const, override));
+    MOCK_METHOD(const std::vector<std::shared_ptr<Engine_plugin>>&,
+                get_plugins,
+                (),
+                (const, override));
 };
 
 } // namespace plugin

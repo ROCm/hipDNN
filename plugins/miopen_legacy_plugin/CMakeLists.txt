@@ -59,29 +59,41 @@ endif()
 
 find_package(miopen CONFIG REQUIRED)
 
-add_library(miopen_legacy_plugin SHARED
+add_library(miopen_legacy_plugin_private
     engines/miopen_engine.cpp
     engines/plans/miopen_batchnorm_plan_builder.cpp
     engines/plans/miopen_batchnorm_fwd_inference_plan.cpp
     engine_manager.cpp
-    miopen_legacy_plugin.cpp
     miopen_handle_factory.cpp
     miopen_container.cpp
     miopen_utils.cpp
     miopen_tensor.cpp
 )
-
-target_compile_definitions(miopen_legacy_plugin PRIVATE 
+target_compile_definitions(miopen_legacy_plugin_private PRIVATE 
     COMPONENT_NAME="miopen_legacy_plugin"
 )
-
-target_include_directories(miopen_legacy_plugin 
+target_include_directories(miopen_legacy_plugin_private 
     PUBLIC 
         ${CMAKE_CURRENT_SOURCE_DIR}
 )
+target_link_libraries(miopen_legacy_plugin_private PUBLIC MIOpen hipdnn_sdk)
+target_compile_options(miopen_legacy_plugin_private PRIVATE ${HIPDNN_WARNING_COMPILE_OPTIONS})
 
-target_link_libraries(miopen_legacy_plugin PUBLIC MIOpen hipdnn_sdk)
+clang_tidy_check(miopen_legacy_plugin_private)
+
+
+add_library(miopen_legacy_plugin SHARED
+    miopen_legacy_plugin.cpp
+)
+target_compile_definitions(miopen_legacy_plugin PRIVATE 
+    COMPONENT_NAME="miopen_legacy_plugin"
+)
+target_link_libraries(miopen_legacy_plugin PRIVATE miopen_legacy_plugin_private)
+target_link_libraries(miopen_legacy_plugin PRIVATE "-Xlinker --exclude-libs=ALL") # Hide symbols from linked static libs
 target_compile_options(miopen_legacy_plugin PRIVATE ${HIPDNN_WARNING_COMPILE_OPTIONS})
+set_target_properties(miopen_legacy_plugin PROPERTIES CXX_VISIBILITY_PRESET hidden)
+
+clang_tidy_check(miopen_legacy_plugin)
 
 set(MIOPEN_LEGACY_PLUGIN_DIR ${CMAKE_CURRENT_BINARY_DIR} CACHE INTERNAL "miopen legacy plugin dir" FORCE)
 

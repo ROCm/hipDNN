@@ -3,6 +3,7 @@
 
 include(GoogleTest)
 find_package(hip REQUIRED)
+find_package(Threads REQUIRED)
 
 add_executable(public_hipdnn_backend_tests 
     test_backend_public_functions.cpp
@@ -21,7 +22,7 @@ target_compile_options(public_hipdnn_backend_tests PRIVATE ${HIPDNN_WARNING_COMP
 target_link_libraries(public_hipdnn_backend_tests
     GTest::gtest 
     GTest::gtest_main 
-    pthread 
+    Threads::Threads 
     hipdnn_sdk
     hipdnn_backend
     hip::host
@@ -41,7 +42,7 @@ target_compile_definitions(public_hipdnn_backend_tests
 )
 
 # Ensure test plugins are built before tests
-add_dependencies(public_hipdnn_backend_tests test_good_plugin test_execute_fails_plugin test_no_applicable_engines_plugin)
+add_dependencies(public_hipdnn_backend_tests test_good_plugin test_execute_fails_plugin test_no_applicable_engines_plugin test_good_default_plugin)
 
 clang_tidy_check(public_hipdnn_backend_tests)
-add_target_to_check_targets(public_hipdnn_backend_tests ${CMAKE_CURRENT_BINARY_DIR})
+add_unit_test_target(public_hipdnn_backend_tests ${CMAKE_CURRENT_BINARY_DIR})

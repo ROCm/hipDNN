@@ -12,8 +12,8 @@
 #include <hip/hip_runtime.h>
 #include <hipdnn_sdk/plugin/plugin_api_data_types.h>
 
-#include "hipdnn_backend.h"
 #include "engine_plugin.hpp"
+#include "hipdnn_backend.h"
 
 namespace hipdnn_sdk
 {
@@ -48,6 +48,7 @@ public:
     static void set_plugin_paths(const std::vector<std::filesystem::path>& plugin_paths,
                                  hipdnnPluginLoadingMode_ext_t loading_mode);
     static std::set<std::filesystem::path> get_plugin_paths();
+
     static std::shared_ptr<Engine_plugin_resource_manager> create();
 
     Engine_plugin_resource_manager(std::shared_ptr<Engine_plugin_manager> pm);
@@ -83,6 +84,10 @@ public:
                                  const hipdnnPluginConstData_t* engine_config,
                                  const Graph_descriptor* graph_desc);
 
+    void get_loaded_plugin_files(size_t* num_plugins,
+                                 char** plugin_paths,
+                                 size_t* max_string_len) const;
+
 private:
     // MT-unsafe instance methods
     // virtual for gMock testing
@@ -92,7 +97,7 @@ private:
     virtual void destroy_engine_details(int64_t engine_id,
                                         hipdnnPluginConstData_t* engine_details) const;
 
-    virtual hipdnnEnginePluginExecutionContext_t
+    [[nodiscard]] virtual hipdnnEnginePluginExecutionContext_t
         create_execution_context(int64_t engine_id,
                                  const hipdnnPluginConstData_t* engine_config,
                                  const Graph_descriptor* graph_desc) const;
@@ -107,8 +112,8 @@ private:
                           uint32_t num_device_buffers) const;
 
     std::shared_ptr<Engine_plugin_manager> _pm;
-    std::unordered_map<hipdnnEnginePluginHandle_t, const std::shared_ptr<Engine_plugin>> _handle_to_plugin;
-    mutable std::unordered_map<int64_t, hipdnnEnginePluginHandle_t> _engine_id_to_handle;
+    std::unordered_map<hipdnnEnginePluginHandle_t, const Engine_plugin*> _handle_to_plugin;
+    std::unordered_map<int64_t, hipdnnEnginePluginHandle_t> _engine_id_to_handle;
 
     friend class Engine_details_wrapper;
     friend class Engine_execution_context_wrapper;

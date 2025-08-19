@@ -7,9 +7,9 @@
 #include "plugin/shared_library.hpp"
 
 #include <cstdint>
+#include <gmock/gmock.h>
 #include <string_view>
 #include <vector>
-#include <gmock/gmock.h>
 
 namespace hipdnn_backend
 {
@@ -21,6 +21,7 @@ class Mock_engine_plugin : public Engine_plugin
 public:
     // Mock all public methods from Engine_plugin
     MOCK_METHOD(hipdnnEnginePluginHandle_t, create_handle, (), (const));
+    MOCK_METHOD(std::vector<int64_t>, get_all_engine_ids, (), (const));
     MOCK_METHOD(void, destroy_handle, (hipdnnEnginePluginHandle_t handle), (const));
     MOCK_METHOD(void, set_stream, (hipdnnEnginePluginHandle_t handle, hipStream_t stream), (const));
     MOCK_METHOD(std::vector<int64_t>,

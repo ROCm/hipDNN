@@ -11,10 +11,11 @@
 #include "descriptors/execution_plan_descriptor.hpp"
 #include "descriptors/graph_descriptor.hpp"
 #include "descriptors/variant_descriptor.hpp"
-#include "engine_plugin_resource_manager.hpp"
 #include "engine_plugin_manager.hpp"
+#include "engine_plugin_resource_manager.hpp"
 #include "hipdnn_exception.hpp"
 #include "logging/logging.hpp"
+#include <hipdnn_sdk/utilities/string_util.hpp>
 
 namespace hipdnn_backend
 {
@@ -64,6 +65,52 @@ std::set<std::filesystem::path> Engine_plugin_resource_manager::get_plugin_paths
     return plugin_config.paths;
 }
 
+void Engine_plugin_resource_manager::get_loaded_plugin_files(size_t* num_plugins,
+                                                             char** plugin_paths,
+                                                             size_t* max_string_len) const
+{
+    if(!_pm)
+    {
+        *num_plugins = 0;
+        *max_string_len = 0;
+        return;
+    }
+
+    const auto& path_set = _pm->get_loaded_plugin_files();
+
+    size_t required_len = 0;
+    for(const auto& path : path_set)
+    {
+        required_len = std::max(required_len, path.string().length() + 1);
+    }
+
+    if(plugin_paths == nullptr)
+    {
+        *num_plugins = path_set.size();
+        *max_string_len = required_len;
+        return;
+    }
+
+    if(*num_plugins < path_set.size() || *max_string_len < required_len)
+    {
+        throw Hipdnn_exception(HIPDNN_STATUS_BAD_PARAM, "Insufficient buffer space provided.");
+    }
+
+    std::vector<std::string> paths_vec;
+    paths_vec.reserve(path_set.size());
+    paths_vec.assign(path_set.begin(), path_set.end());
+
+    for(size_t i = 0; i < paths_vec.size(); ++i)
+    {
+        if(plugin_paths[i] == nullptr)
+        {
+            throw Hipdnn_exception(HIPDNN_STATUS_BAD_PARAM, "A plugin path string buffer is null.");
+        }
+        hipdnn::sdk::utilities::copy_max_size_with_null_terminator(
+            plugin_paths[i], paths_vec[i].c_str(), *max_string_len);
+    }
+}
+
 std::shared_ptr<Engine_plugin_resource_manager> Engine_plugin_resource_manager::create()
 {
     auto pm = pm_ptr.lock();
@@ -106,7 +153,13 @@ Engine_plugin_resource_manager::Engine_plugin_resource_manager(
             throw Hipdnn_exception(HIPDNN_STATUS_PLUGIN_ERROR, "Plugin handle already exists");
         }
 
-        _handle_to_plugin.insert({handle, plugin});
+        _handle_to_plugin[handle] = plugin.get();
+
+        auto engine_ids = plugin->get_all_engine_ids();
+        for(const auto id : engine_ids)
+        {
+            _engine_id_to_handle[id] = handle;
+        }
     }
 }
 
@@ -173,14 +226,18 @@ std::vector<int64_t> Engine_plugin_resource_manager::get_applicable_engine_ids(
 
         for(const auto& id : ids)
         {
-            auto it = _engine_id_to_handle.find(id);
-            if(it != _engine_id_to_handle.end() && it->second != handle)
+            if(!_engine_id_to_handle.contains(id))
+            {
+                throw Hipdnn_exception(HIPDNN_STATUS_PLUGIN_ERROR, "Unknown engine ID");
+            }
+
+            auto existing_handle = _engine_id_to_handle.at(id);
+            if(existing_handle != handle)
             {
                 throw Hipdnn_exception(HIPDNN_STATUS_PLUGIN_ERROR,
                                        "Engine ID " + std::to_string(id)
                                            + " is already associated with a different plugin");
             }
-            _engine_id_to_handle[id] = handle;
         }
     }
 
@@ -198,7 +255,8 @@ void Engine_plugin_resource_manager::get_engine_details(
     auto it = _engine_id_to_handle.find(engine_id);
     if(it == _engine_id_to_handle.end())
     {
-        throw Hipdnn_exception(HIPDNN_STATUS_INTERNAL_ERROR, "Invalid engine ID: " + std::to_string(engine_id));
+        throw Hipdnn_exception(HIPDNN_STATUS_INTERNAL_ERROR,
+                               "Invalid engine ID: " + std::to_string(engine_id));
     }
 
     auto serialized_graph_data = graph_desc->get_serialized_graph();

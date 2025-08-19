@@ -3,11 +3,12 @@
 
 #include "test_util.hpp"
 #include "hipdnn_backend.h"
+#include <filesystem>
+#include <gtest/gtest.h>
 #include <hipdnn_sdk/data_objects/graph_generated.h>
 #include <hipdnn_sdk/logging/logger.hpp>
 #include <hipdnn_sdk/test_utilities/flatbuffer_graph_test_utils.hpp>
-
-#include <gtest/gtest.h>
+#include <stdexcept>
 
 namespace test_util
 {
@@ -285,6 +286,63 @@ void extract_tensor_info_from_graph(
     }
 
     ASSERT_FALSE(uid_to_name_map.empty());
+}
+
+std::vector<std::string> get_loaded_plugins(hipdnnHandle_t handle)
+{
+    size_t num_plugins = 0;
+    size_t max_path_length = 0;
+    auto status
+        = hipdnnGetLoadedEnginePluginPaths_ext(handle, &num_plugins, nullptr, &max_path_length);
+
+    if(status != HIPDNN_STATUS_SUCCESS)
+    {
+        throw std::runtime_error("Failed to get loaded plugin paths");
+    }
+
+    if(num_plugins == 0)
+    {
+        return {};
+    }
+
+    std::vector<std::vector<char>> path_buffers(num_plugins, std::vector<char>(max_path_length));
+    std::vector<char*> plugin_paths_c(num_plugins);
+    for(size_t i = 0; i < num_plugins; ++i)
+    {
+        plugin_paths_c[i] = path_buffers[i].data();
+    }
+
+    status = hipdnnGetLoadedEnginePluginPaths_ext(
+        handle, &num_plugins, plugin_paths_c.data(), &max_path_length);
+    if(status != HIPDNN_STATUS_SUCCESS)
+    {
+        throw std::runtime_error("Failed to get loaded plugin paths");
+    }
+
+    std::vector<std::string> plugin_paths;
+    plugin_paths.reserve(num_plugins);
+    for(size_t i = 0; i < num_plugins; ++i)
+    {
+        plugin_paths.emplace_back(plugin_paths_c[i]);
+    }
+    return plugin_paths;
+}
+
+bool is_plugin_loaded(const std::vector<std::string>& loaded_plugins,
+                      const std::string& plugin_name)
+{
+    namespace fs = std::filesystem;
+
+    return std::ranges::any_of(loaded_plugins, [&](const std::string& loaded_path_str) {
+        try
+        {
+            return fs::canonical(loaded_path_str) == fs::canonical(plugin_name);
+        }
+        catch(const fs::filesystem_error&)
+        {
+            return false;
+        }
+    });
 }
 
 } // namespace test_util

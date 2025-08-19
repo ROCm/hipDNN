@@ -121,24 +121,30 @@ protected:
 
         for(const auto& path : _default_plugin_paths)
         {
-            if(path.is_relative())
-            {
-                resolved_paths.insert(base_dir / path);
-            }
-            else
-            {
-                resolved_paths.insert(path);
-            }
+            resolved_paths.insert(path.is_relative() ? base_dir / path : path);
         }
 
         return resolved_paths;
+    }
+
+    // This function is called before adding a plugin to the plugin list.
+    // The function must throw Hipdnn_exception if the plugin is not valid.
+    virtual void validate_before_adding(const Plugin& plugin)
+    {
+        std::ignore = plugin;
+    }
+
+    // This function is called after the plugin is added to the plugin list.
+    virtual void action_after_adding(const Plugin& plugin)
+    {
+        std::ignore = plugin;
     }
 
 public:
     virtual ~Plugin_manager_base() = default;
 
     virtual void load_plugins(const std::set<std::filesystem::path>& custom_paths,
-                      hipdnnPluginLoadingMode_ext_t mode)
+                              hipdnnPluginLoadingMode_ext_t mode)
     {
         std::set<std::filesystem::path> paths_to_load;
 
@@ -194,6 +200,11 @@ public:
     virtual const std::vector<std::shared_ptr<Plugin>>& get_plugins() const
     {
         return _plugins;
+    }
+
+    const std::set<std::filesystem::path>& get_loaded_plugin_files() const
+    {
+        return _loaded_plugin_files;
     }
 
 private:
@@ -257,6 +268,8 @@ private:
 
             plugin->set_logging_callback(logging::hipdnn_logging_callback);
 
+            validate_before_adding(*plugin);
+
             _plugins.emplace_back(std::move(plugin));
             _loaded_plugin_files.insert(library_path);
 
@@ -266,6 +279,8 @@ private:
                             version,
                             type,
                             static_cast<int>(type));
+
+            action_after_adding(*_plugins.back());
         }
         catch(const Hipdnn_exception& e)
         {

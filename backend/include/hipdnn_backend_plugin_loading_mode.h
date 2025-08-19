@@ -8,8 +8,8 @@
  * @brief Specifies the plugin loading mode for hipDNN.
  *
  * This enumeration defines how plugins are loaded into hipDNN:
- * - HIPDNN_PLUGIN_LOADING_ADDITIVE: Loads user-specified plugins in addition to the default plugins.
- * - HIPDNN_PLUGIN_LOADING_ABSOLUTE: Loads only the user-specified plugins, ignoring the defaults.
+ * - HIPDNN_PLUGIN_LOADING_ADDITIVE: Loads all user-specified plugins in addition to the default plugins.
+ * - HIPDNN_PLUGIN_LOADING_ABSOLUTE: Loads only the user-specified plugin from the most-recent function call, ignoring the defaults.
  */
 typedef enum
 {

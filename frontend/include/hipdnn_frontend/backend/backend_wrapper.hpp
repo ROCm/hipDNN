@@ -21,14 +21,14 @@ public:
         return hipdnnDestroy(handle);
     }
 
-    hipdnnStatus_t set_stream(hipdnnHandle_t handle, hipStream_t streamId) override
+    hipdnnStatus_t set_stream(hipdnnHandle_t handle, hipStream_t stream_id) override
     {
-        return hipdnnSetStream(handle, streamId);
+        return hipdnnSetStream(handle, stream_id);
     }
 
-    hipdnnStatus_t get_stream(hipdnnHandle_t handle, hipStream_t* streamId) override
+    hipdnnStatus_t get_stream(hipdnnHandle_t handle, hipStream_t* stream_id) override
     {
-        return hipdnnGetStream(handle, streamId);
+        return hipdnnGetStream(handle, stream_id);
     }
 
     hipdnnStatus_t backend_create_descriptor(hipdnnBackendDescriptorType_t descriptor_type,
@@ -110,20 +110,15 @@ public:
     }
 };
 
-static std::unique_ptr<Hipdnn_backend_interface> backend_wrapper;
-static std::mutex backend_wrapper_mutex;
-
-static Hipdnn_backend_interface& hipdnn_backend()
+// Allow overriding the backend implementation by setting a custom backend instance.
+inline static std::shared_ptr<Hipdnn_backend_interface> hipdnn_backend()
 {
-    if(!backend_wrapper)
+    if(!Hipdnn_backend_interface::get_instance())
     {
-        std::lock_guard<std::mutex> lock(backend_wrapper_mutex);
-        if(!backend_wrapper)
-        {
-            backend_wrapper = std::make_unique<Hipdnn_backend_wrapper>();
-        }
+        Hipdnn_backend_interface::set_instance(std::make_shared<Hipdnn_backend_wrapper>());
     }
-    return *backend_wrapper;
+
+    return Hipdnn_backend_interface::get_instance();
 }
 
 }
