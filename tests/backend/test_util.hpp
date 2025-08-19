@@ -71,4 +71,10 @@ void extract_tensor_info_from_graph(
     std::unordered_map<int64_t, std::string>& uid_to_name_map,
     std::unordered_map<std::string, int64_t>& name_to_uid_map,
     std::unordered_map<int64_t, std::vector<int64_t>>& uid_to_dims_map);
+
+std::vector<std::string> get_loaded_plugins(hipdnnHandle_t handle);
+
+bool is_plugin_loaded(const std::vector<std::string>& loaded_plugins,
+                      const std::string& plugin_name);
+
 } // namespace test_util
