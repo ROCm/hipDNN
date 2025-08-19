@@ -19,11 +19,11 @@ This guide provides comprehensive information for developing plugins for hipDNN.
 
 ## Overview
 
-hipDNN supports a plugin architecture that allows for modular extensions to the framework. The backend manages these plugins and leverages them for different aspects of deep learning computation. This architecture provides flexibility in implementation choices and enables optimizations for specific hardware or use cases.
+hipDNN supports a plugin architecture that allows for modular extensions to the framework. Plugins are designed to be separate projects that extend hipDNN's capabilities without being part of the core repository. The backend discovers and manages these plugins, leveraging them for different aspects of deep learning computation. This architecture provides flexibility in implementation choices and enables optimizations for specific hardware or use cases.
 
 ## Plugin Types
 
-hipDNN defines three types of plugins, each serving a specific purpose:
+hipDNN will support three types of plugins, each serving a specific purpose:
 
 ### 1. Engine Heuristic and Selection Plugins (`hipdnn_plugins/heuristics/`)
 These plugins help determine the best execution strategy for a given operation or graph. They analyze the computation requirements and available resources to select optimal implementations.
@@ -34,7 +34,8 @@ These plugins focus on performance optimization by benchmarking different implem
 ### 3. Kernel Engine Plugins (`hipdnn_plugins/engines/`)
 These plugins provide the actual kernel implementations for operations. They contain the compute kernels that execute on the target hardware (GPUs, accelerators, etc.).
 
-> **Current Status**: Only kernel engine plugins are currently supported in hipDNN. The MIOpen Legacy Plugin is an example of a kernel engine plugin. Support for engine heuristic/selection and benchmarking/tuning plugins will be added in future releases.
+> [!IMPORTANT]
+> **Current Status**: Only kernel engine plugins are presently supported in hipDNN. The MIOpen Legacy Plugin is currently included as a reference implementation but will be migrated to its own separate project in the future. Support for engine heuristic/selection and benchmarking/tuning plugins will be added in future releases. See the [Roadmap](./Roadmap.md#plugins) for future development plans.
 
 ## hipDNN-SDK Library
 
@@ -63,9 +64,9 @@ This section focuses on developing kernel engine plugins, which are currently th
 ### Steps Overview
 
 1. **Create Plugin Structure**
-   - Create a new directory under [`plugins/`](../plugins/)
+   - Create a new project/repository for your plugin
    - Implement the plugin interface defined in [`sdk/include/hipdnn_sdk/plugin/engine_plugin_api.h`](../sdk/include/hipdnn_sdk/plugin/engine_plugin_api.h)
-   - See [MIOpen Legacy Plugin](../plugins/miopen_legacy_plugin/) as a reference implementation
+   - See [MIOpen Legacy Plugin](../plugins/miopen_legacy_plugin/) as a reference implementation (currently included but will become a separate project)
 
 2. **Implement Plugin API Functions**
    
@@ -74,9 +75,9 @@ This section focuses on developing kernel engine plugins, which are currently th
    - **Engine**: Implements graph execution for specific operations (each engine must have a globally unique `int64_t` ID)
    - **Execution Plans**: Define how operations are executed
 
-3. **Register Plugin**
-   - Add CMake configuration to build the plugin as a shared library
-   - The plugin will be automatically loaded from the plugin directory at runtime
+3. **Build and Deploy Plugin**
+   - Configure CMake to build the plugin as a shared library
+   - Install to the appropriate plugin directory where hipDNN can discover it at runtime
 
 ### Implementation Details
 
@@ -95,8 +96,8 @@ When implementing engines (if following this pattern):
 - Handle operation-specific kernel launches
 - Manage memory transfers and synchronization
 
-> [!IMPORTANT]
-> Engine IDs must be unique integers within a plugin. These IDs are used by the backend to identify and select specific engines for execution.
+> [!TIP]
+> An engine ID is an integer unique to all loaded plugins. These IDs are used by the backend to identify and select specific engines for execution. You may want to reference other loaded plugins to accrue a set of unused engine IDs.
 
 #### Execution Plans
 Execution plans for kernel engines:
@@ -115,8 +116,11 @@ Execution plans for kernel engines:
 ## Plugin Architecture
 
 ### Directory Structure for Kernel Engine Plugins
+
+Your plugin should be structured as an independent project:
+
 ```
-your_kernel_plugin/
+your_kernel_plugin_project/
 ├── CMakeLists.txt
 ├── your_plugin.cpp           # Main plugin entry point
 ├── engine_manager.cpp        # Engine management

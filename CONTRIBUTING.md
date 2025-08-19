@@ -1,10 +1,11 @@
 # Contributing to hipDNN
 
-Thank you for your interest in contributing to hipDNN!\
-We welcome contributions from the community to help make hipDNN better.\
-This guide will help you understand the contribution process and requirements.
+Thank you for your interest in contributing to hipDNN!
 
-hipDNN is a graph-based deep learning library that enables multi-operation fusion for improved performance on AMD GPUs.\
+ We welcome contributions from the community to help make hipDNN better. This guide will help you understand the contribution process and requirements.
+
+> hipDNN is a graph-based deep learning library that enables multi-operation fusion for improved performance on AMD GPUs.
+
 We're excited to have you join our community of contributors!
 
 ## Before You Start
@@ -13,6 +14,7 @@ Before contributing, please review these essential documents to understand the p
 
 - **[Design.md](./docs/Design.md)** - Understand hipDNN's architecture and component design
 - **[Building.md](./docs/Building.md)** - Learn how to build hipDNN on your system
+- **[How-To](./docs/HowTo.md)** - Using hipDNN components and common approaches for extending functionality
 - **[TestingStrategy.md](./docs/testing/TestingStrategy.md)** - Understand our testing approach and requirements
 - **[Roadmap.md](./docs/Roadmap.md)** - Check planned features and find contribution opportunities
 

@@ -24,12 +24,7 @@ This section covers how to use the various components of hipDNN in your applicat
 
 ### Using the Frontend
 
-The hipDNN frontend provides a C++ header-only API to describe and execute operation graphs. The C++ frontend API uses the backend C API to handle requests (workspace, applicability, executing graphs, etc.).
-
-#### Key Features
-- Header-only C++ API
-- High-level interface for graph construction
-- Automatic backend integration
+The hipDNN frontend provides a C++ header-only API for building and executing operation graphs. For detailed architecture and design information, see the [Frontend section in the Design Guide](./Design.md#frontend).
 
 #### File Structure
 - Library includes: [`frontend/include/`](../frontend/include/)
@@ -38,12 +33,7 @@ The hipDNN frontend provides a C++ header-only API to describe and execute opera
 
 ### Using the Backend
 
-The hipDNN backend is a shared library that provides a C API to describe and execute operation graphs. It is the main component of hipDNN as it provides the capability to use plugins which can solve graphs.
-
-#### Key Features
-- C API for cross-language compatibility
-- Plugin management and loading
-- Graph execution orchestration
+The hipDNN backend is a shared library that provides the core C API for graph execution and plugin management. For comprehensive details about the backend architecture, descriptor types, and workflow, see the [Backend section in the Design Guide](./Design.md#backend).
 
 #### File Structure
 - Public includes: [`backend/include/`](../backend/include/)
@@ -51,15 +41,13 @@ The hipDNN backend is a shared library that provides a C API to describe and exe
 
 ### Using the SDK
 
-The hipDNN SDK is a header-only C++ library that, among other utilities, provides the interface for creating plugins.
+The hipDNN SDK is a header-only C++ library that provides utilities and interfaces for plugin development. For complete SDK functionality and future roadmap, see the [SDK section in the Design Guide](./Design.md#sdk).
 
-#### Key Features
-- Plugin interface definitions (`plugin_api.h`)
-- Schema-based data objects using FlatBuffers
-- Test utilities for hipDNN components
-- Logging utilities using spdlog
-- Tensors with ingrained memory management
-- HIP datatype utilities
+#### Key Components
+- Plugin interface definitions: [`sdk/include/hipdnn_sdk/plugin/engine_plugin_api.h`](../sdk/include/hipdnn_sdk/plugin/engine_plugin_api.h)
+- Schema files: [`sdk/schemas/`](../sdk/schemas/)
+- Test utilities (incl. reference implementations): [`sdk/tests/test_utilities/`](../sdk/tests/test_utilities/)
+- Logging [`sdk/include/hipdnn_sdk/logging/logger.hpp`](../sdk/include/hipdnn_sdk/logging/logger.hpp)
 
 ### CMake Integration
 

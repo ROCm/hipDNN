@@ -50,7 +50,7 @@ The following libraries are automatically managed by CMake (see [Dependencies.cm
 ### Using Docker (Recommended)
 
 > [!TIP]
-> Docker provides a consistent development environment with all dependencies pre-installed. This is the recommended approach for most users.
+> Docker provides a consistent development environment with all dependencies pre-installed. This is the recommended approach for most users. For more details about Docker images, see the [Docker README](../dockerfiles/README.md).
 
 1. **Build the Development Container**
    ```bash
@@ -167,7 +167,7 @@ All targets support parallel builds with `-j$(nproc)`:
 | Target | Description |
 |--------|-------------|
 | `ninja` | Build all components |
-| `ninja check` | Build and run all tests |
+| `ninja check` | Build and run all tests (see [Testing Strategy](./testing/TestingStrategy.md)) |
 | `ninja unit-check` | Build and run only the unit tests (minimal version of `ninja check`) |
 | `ninja integration-check` | Build and run only the integration tests (this is the bulk of the testing time) |
 | `ninja install` | Install libraries and headers |

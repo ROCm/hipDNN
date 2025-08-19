@@ -1,6 +1,6 @@
 # hipDNN Roadmap
 
-This document outlines the development roadmap for hipDNN, including near-term priorities and future goals for each component. hipDNN is actively evolving to provide a comprehensive graph-based deep learning library for AMD GPUs.
+This document outlines the development roadmap for hipDNN, including near-term priorities and future goals for each component. hipDNN is actively evolving to provide a comprehensive graph-based deep learning library for AMD GPUs. For a table of active operation support, see the [Operation Support doc](./OperationSupport.md).
 
 > [!NOTE]
 > This roadmap is subject to change based on project priorities, community feedback, and technical requirements.
@@ -80,11 +80,17 @@ The SDK provides shared utilities and interfaces that ensure compatibility betwe
 ### Future Roadmap
 *The following items are longer-term goals that are not yet scheduled:*
 
-- **Plugin utility Libraries**:
-  - Caching
+The SDK may be split into more focused sub-projects:
+  - Core plugin interfaces
+  - Graph manipulation utilities
+  - Reference implementations
+  - Performance utilities
+
+With extended support for:
+  - Caching mechanisms
   - Graph matching and manipulation
-  - Performance capturing
-- **Extended Operations**: Extending data objects to include additional operation types
+  - Additional operation schemas
+  - Benchmarking and tuning utilities
 
 ## Plugins
 

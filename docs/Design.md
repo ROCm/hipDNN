@@ -49,17 +49,7 @@ The SDK is a header-only library that serves as the foundation for communication
 - **Logging Utilities**: Consistent logging infrastructure across all components
 - **Type Helpers**: Utilities for working with different data types (half, bfloat16, etc.)
 
-#### Future Roadmap
-- The SDK may be split into more focused sub-projects:
-  - Core plugin interfaces
-  - Graph manipulation utilities
-  - Reference implementations
-  - Performance utilities
-- Extended support for:
-  - Caching mechanisms
-  - Graph matching and manipulation
-  - Additional operation schemas
-  - Benchmarking and tuning utilities
+For the SDK development roadmap and planned features, see the [SDK section in the Roadmap](./Roadmap.md#sdk).
 
 ### Frontend
 
@@ -91,7 +81,7 @@ Attributes configure the behavior of nodes:
 - Attributes include operation-specific parameters like epsilon, momentum, etc.
 - Support builder pattern for easy configuration
 
-#### Workflow Example
+#### Simplified Workflow Example
 ```cpp
 // Create a graph
 Graph graph;
@@ -111,6 +101,8 @@ graph.create_execution_plans(handle);
 graph.build_plans();
 graph.execute(handle, variant_pack, workspace);
 ```
+
+For complete working examples, see the official [E2E samples](../samples/).
 
 ### Backend
 
@@ -188,11 +180,7 @@ hipdnnBackendFinalize(plan_desc);
 hipdnnBackendExecute(handle, plan_desc, variant_desc);
 ```
 
-#### Future Roadmap
-- **Heuristic Plugins**: Add plugin API & support to allow for different heuristic implementations
-- **Tuning/Benchmarking Plugins**: Add plugin API & support to allow for different tuning and benchmarking implementations
-- **Engine behavorial notes and tunable knobs support**: Allow engines to return behavioral notes, and tunable knob definitions for configuring engine parameters
-- **Engine Config tunable knobs support**: Allow engine configurations to have tunable knobs set on them for configuring engine behavior 
+For the backend development roadmap and planned features, see the [Backend section in the Roadmap](./Roadmap.md#backend).
 
 ### Engine Plugins
 

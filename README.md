@@ -1,7 +1,7 @@
 # hipDNN
 
 > [!CAUTION]
-> hipDNN is in the early stages of development. There is currently very limited or no functionality available to solve problems.
+> hipDNN is in the early stages of development. There is currently very limited or no functionality available to solve problems. See the [Operation Support documentation](./docs/OperationSupport.md) for currently supported operations.
 
 ## Overview
 
@@ -37,7 +37,7 @@ The fastest way to get started with hipDNN is to follow the [quick start steps i
 - **[Samples](./samples/README.md)** - Frontend usage examples
 
 ### Developer Guides
-- **[Design Overview](./docs/Design.md)** - Architecture and design principles
+- **[Design Overview](./docs/Design.md)** - Architecture and design descriptions and diagrams
 - **[Extending hipDNN](./docs/HowTo.md#extending-hipdnn)** - How to extend hipDNN functionality
 - **[Plugin Development](./docs/PluginDevelopment.md)** - Creating custom plugins for hipDNN
 - **[Roadmap](./docs/Roadmap.md)** - Feature priorities and development plans
@@ -51,7 +51,7 @@ The fastest way to get started with hipDNN is to follow the [quick start steps i
 
 ## Project Structure
 
-hipDNN is organized into several key components:
+hipDNN is organized into several key components. For detailed architecture descriptions, see the [Design Overview](./docs/Design.md).
 
 | Component | Description |
 |-----------|-------------|
