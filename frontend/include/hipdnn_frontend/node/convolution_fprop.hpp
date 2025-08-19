@@ -172,7 +172,6 @@ public:
             auto& x_strides = x->get_stride();
             auto& y_dims_final = y->get_dim();
 
-            // Consolidate all validation checks upfront
             if(x_strides.empty())
             {
                 return {error_code_t::ATTRIBUTE_NOT_SET,
