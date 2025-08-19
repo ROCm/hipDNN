@@ -1,28 +1,156 @@
 # Contributing to hipDNN
-## Overview
-All changes to the hipDNN codebase will need the following before they will be accepted:
-- All code must follow the format as specified by the clang-format file.
-- All code must be covered by unit tests.
-- If applicable, integration tests should be added to verify the full solution.
-- Code must be warning free and free of any clang-tidy errors.
-- Relevent documentation must be updated to reflect the changes.
 
-### Example of adding or extending functionality
-- Add new schema for the attributes that represent the operation being added to hipDNN into sdk/schemas
-- Update the NodeAttributes union inside graph.fbs to have the new attributes.
-- Add new node and attributes to hipDNN frontend
-- Add a method to the frontend graph for adding the new node.
-- Add a new plugin, or extend an existing plugin to implement handling the newly added operation.
-    - Note:
-        - Some plugins will dynamically generate kernels, and will be able to handle patterns
-            e.g. PointwiseOp* -> conv -> PointwiseOp*
-        - Some plugins will have high performance static kernels, and will be handling only specific graphs
-            e.g. Single ops like conv, batchnorm, etc.
-- Add a new sample to the samples folder to cover the new functionality.
+Thank you for your interest in contributing to hipDNN!\
+We welcome contributions from the community to help make hipDNN better.\
+This guide will help you understand the contribution process and requirements.
 
-**Dont forget to ensure you have met all base repository requirements before submitting a pull request. See [Overview](#overview)**
+hipDNN is a graph-based deep learning library that enables multi-operation fusion for improved performance on AMD GPUs.\
+We're excited to have you join our community of contributors!
 
-### Adding/Modifying a Plugin
-See [Plugin Development](./docs/PluginDevelopment.md) for more information on how to add a new plugin or modify an existing one.
+## Before You Start
 
+Before contributing, please review these essential documents to understand the project structure and goals:
 
+- **[Design.md](./docs/Design.md)** - Understand hipDNN's architecture and component design
+- **[Building.md](./docs/Building.md)** - Learn how to build hipDNN on your system
+- **[TestingStrategy.md](./docs/testing/TestingStrategy.md)** - Understand our testing approach and requirements
+- **[Roadmap.md](./docs/Roadmap.md)** - Check planned features and find contribution opportunities
+
+We encourage you to open a GitHub issue to discuss your planned contribution before starting work.\
+This helps ensure your efforts align with project goals and prevents duplicate work.
+
+## Contribution Requirements
+
+All contributions must meet the following requirements before they can be merged:
+
+### Code Quality Standards
+
+- **Code Formatting**: All code must follow the format specified by the `.clang-format` file
+  - Run `make format` or `ninja format` to auto-format your code
+  - Run `make check_format` or `ninja check_format` to verify formatting compliance
+- **Compiler Warnings**: Code must compile without warnings
+- **Clang-tidy Compliance**: Code must be free of clang-tidy errors
+
+### Testing Requirements
+
+- **Unit Tests**: All new code must be covered by unit tests
+- **Integration Tests**: Add integration tests where applicable to verify end-to-end functionality
+- **ASAN Compliance**: All tests must run cleanly with AddressSanitizer enabled
+  - Build with `cmake -DBUILD_ADDRESS_SANITIZER=ON ..`
+  - Run tests with `ninja check` to verify ASAN compliance
+  - Note: Some HIP-related tests may be skipped due to AddressSanitizer incompatibility
+- **GPU Test Handling**:
+  - Mark GPU-dependent tests with `SKIP_IF_NO_DEVICE()`
+  - Tests must be skippable without GPU (warnings, not errors)
+- **Test Coverage**:
+  - Maintain overall 80% code coverage target
+  - New code should not decrease existing coverage
+  - Each component should maintain >80% coverage individually
+
+### Documentation Requirements
+
+- **Update Documentation**: Update all relevant documentation to reflect your changes
+- **Remove Stale Documentation**: Remove any documentation that becomes obsolete due to your changes
+- **Clear PR details**: Write clear and descriptive pull request details to help reviewers understand the changes
+
+## Architecture Considerations
+
+When contributing to hipDNN, please keep these architectural principles in mind:
+
+### Dependency Management
+
+- **hipDNN Core**: The core library (backend, SDK, frontend) should remain very light on dependencies
+  - Avoid adding new library dependencies to the backend if possible
+  - No compiled libraries required for the frontend or SDK (should remain header-only projects)
+  - Any new dependencies require discussion and strong justification
+
+### Plugin Development
+
+- **Separate Projects**: Plugins are separate projects from hipDNN core
+  - Plugins do not need to be contributed to this repository
+  - Plugins can have their own dependencies as needed
+  - See [PluginDevelopment.md](./docs/PluginDevelopment.md) for plugin development guidance
+
+## Development Workflow
+
+### 1. Fork and Clone
+
+```bash
+# Fork the repository on GitHub, then:
+git clone https://github.com/YOUR_USERNAME/hipDNN.git
+cd hipDNN
+git remote add upstream https://github.com/ROCm/hipDNN.git
+```
+
+### 2. Create a Feature Branch
+
+```bash
+git checkout -b feature/your-feature-name
+```
+
+### 3. Build and Test Locally
+
+Follow the instructions in [Building.md](./docs/Building.md) to build hipDNN:
+
+```bash
+mkdir build && cd build
+cmake -GNinja ..
+ninja check -j$(nproc)
+```
+
+### 4. Run All Required Checks
+
+Before submitting your PR, ensure all checks pass:
+
+```bash
+# Format code
+ninja format
+
+# Check formatting
+ninja check_format
+
+# Run all tests
+ninja check
+
+# Run tests with ASAN
+cmake -DBUILD_ADDRESS_SANITIZER=ON ..
+ninja check
+
+# Check code coverage (optional but recommended)
+cmake -DCODE_COVERAGE=ON ..
+ninja code_coverage
+```
+
+### 5. Create a Pull Request
+
+- Push your changes to your fork
+- Create a pull request against the main hipDNN repository
+- Fill out the pull request template completely
+- Ensure all CI checks pass
+
+## Pull Request Checklist
+
+When creating a pull request, ensure you can check all these boxes:
+
+- [ ] I have added automated tests relevant to the introduced functionality
+- [ ] I have sufficient test coverage for the changes, and code coverage hasn't decreased
+- [ ] I have run the tests, and they are all passing locally
+- [ ] I have run the tests with ASAN, and they are all passing locally
+- [ ] I have added relevant documentation for the changes
+- [ ] I have removed stale documentation that is no longer relevant
+- [ ] I have run `make format` & `make check_format` to ensure proper formatting
+
+## Getting Help
+
+- **Questions**: Open a GitHub issue with your question
+- **Discussion**: For design discussions or feature proposals, open an issue before starting work
+- **Draft PRs**: Feel free to open a draft PR early to get feedback on your approach
+- **Code Reviews**: Be responsive to code review feedback and make requested changes promptly
+
+## Community Guidelines
+
+- Be respectful and constructive in all interactions
+- Help review other contributors' PRs when possible
+- Share knowledge and help newcomers get started
+
+Thank you for contributing to hipDNN!
