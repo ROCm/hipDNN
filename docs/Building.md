@@ -168,6 +168,8 @@ All targets support parallel builds with `-j$(nproc)`:
 |--------|-------------|
 | `ninja` | Build all components |
 | `ninja check` | Build and run all tests |
+| `ninja unit-check` | Build and run only the unit tests (minimal version of `ninja check`) |
+| `ninja integration-check` | Build and run only the integration tests (this is the bulk of the testing time) |
 | `ninja install` | Install libraries and headers |
 | `ninja format` | Auto-format all C++ source files |
 | `ninja check_format` | Check code formatting compliance |

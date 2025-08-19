@@ -51,13 +51,15 @@ The hipDNN backend is a shared library that provides a C API to describe and exe
 
 ### Using the SDK
 
-The hipDNN SDK is a header-only C++ library that provides the requirements needed to create plugins that hipDNN can consume, alongside other utilities for hipDNN such as logging and schema definitions.
+The hipDNN SDK is a header-only C++ library that, among other utilities, provides the interface for creating plugins.
 
 #### Key Features
 - Plugin interface definitions (`plugin_api.h`)
 - Schema-based data objects using FlatBuffers
 - Test utilities for hipDNN components
 - Logging utilities using spdlog
+- Tensors with ingrained memory management
+- HIP datatype utilities
 
 ### CMake Integration
 
@@ -189,16 +191,7 @@ Refer to the [Plugin Development Guide](./PluginDevelopment.md) to implement the
 
 ### Building and Testing
 
-1. **Rebuild SDK** after schema changes:
-   ```bash
-   cd build
-   ninja hipdnn_sdk
-   ```
-
-2. **Rebuild Frontend** after adding new classes:
-   ```bash
-   ninja hipdnn_frontend
-   ```
+1. **Rebuild hipDNN**: After changing hipDNN, you will need to rebuild. See the [quick start steps in the build guide](./Building.md#quick-start-guide), or rebuild the specific targets.
 
 3. **Test Your Implementation**:
    - Unit tests for individual components

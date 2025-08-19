@@ -3,70 +3,70 @@
 > [!CAUTION]
 > hipDNN is in the early stages of development. There is currently very limited or no functionality available to solve problems.
 
+## Overview
+
+hipDNN is a graph-based deep learning library for AMD GPUs that leverages a flexible plugin architecture to provide optimized implementations and utilities for various deep learning operations. 
+
 ---
 
 ## Table of Contents
 
 - [Getting Started](#getting-started)
-- [Building](#building)
-- [Design](#design)
-- [Plugin Development](#plugin-development)
-- [Operation support](#operation-support)
-- [Roadmap](#roadmap)
-- [Contributing](#contributing)
-- [Project Components](#project-components)
-  - [Backend](./backend/README.md)
-  - [Frontend](./frontend/README.md)
-  - [SDK](./sdk/README.md)
-  - [Samples](./samples/README.md)
-  - [Tests](./tests/README.md)
-  - [Plugins](./plugins/miopen_legacy_plugin/README.md)
 - [Documentation](#documentation)
-  - [Building Guide](./docs/Building.md)
-  - [Design Overview](./docs/Design.md)
-  - [Plugin Development Guide](./docs/PluginDevelopment.md)
-  - [Environment Configuration](./docs/Environment.md)
-- [Docker Support](./dockerfiles/README.md)
+  - [User Guides](#user-guides)
+  - [Developer Guides](#developer-guides)
+  - [Testing](#testing)
+- [Project Structure](#project-structure)
+- [Contributing](#contributing)
 
 ---
 
 ## Getting Started
 
-The fastest way to get started with hipDNN is to follow the [quick start steps in the build guide](./docs/Building.md#quickstart-building-and-installing-hipdnn).
-
-## Building
-
-The full build steps are documented in the [Building.md](./docs/Building.md) file.
-
-## Design
-
-The overall design of hipDNN is documented in the [Design.md](./docs/Design.md) file. This document includes the overall architecture of the library.
-
-## Plugin Development
-
-If you are interested in writing a plugin for hipDNN, please see the [Plugin Development](./docs/PluginDevelopment.md) document.
-
-## Operation Support
-
-To see the current operation support for hipDNN, please see the [Operation Support](./docs/OperationSupport.md) document.
-
-## Roadmap
-
-For details on the feature priorities of hipDNN development, please see the [Roadmap](./docs/Roadmap.md) document.
-
-## Contributing
-
-For information about contributing to the hipDNN project, please see the [Contributing](./CONTRIBUTING.md) document.
+The fastest way to get started with hipDNN is to follow the [quick start steps in the build guide](./docs/Building.md#quick-start-guide).
 
 ---
 
-## Project Components
+## Documentation
+
+### User Guides
+- **[Building](./docs/Building.md)** - Prerequisites, build configurations, and platform-specific instructions
+- **[How-To](./docs/HowTo.md)** - Using hipDNN components and extending the framework
+- **[Environment Configuration](./docs/Environment.md)** - Runtime configuration and logging setup
+- **[Operation Support](./docs/OperationSupport.md)** - Currently supported operations and their status
+- **[Samples](./samples/README.md)** - Frontend usage examples
+
+### Developer Guides
+- **[Design Overview](./docs/Design.md)** - Architecture and design principles
+- **[Extending hipDNN](./docs/HowTo.md#extending-hipdnn)** - How to extend hipDNN functionality
+- **[Plugin Development](./docs/PluginDevelopment.md)** - Creating custom plugins for hipDNN
+- **[Roadmap](./docs/Roadmap.md)** - Feature priorities and development plans
+
+### Testing
+- **[Testing Strategy](./docs/testing/TestingStrategy.md)** - Overall testing approach
+- **[Test Plan](./docs/testing/TestPlan.md)** - Detailed test planning
+- **[Test Run Template](./docs/testing/TestRunTemplate.md)** - Guidelines for test execution
+
+---
+
+## Project Structure
 
 hipDNN is organized into several key components:
 
-- **[Backend](./backend/README.md)**: The core shared library providing a C API for operation graphs
-- **[Frontend](./frontend/README.md)**: A header-only C++ API wrapper around the backend
-- **[SDK](./sdk/README.md)**: Header-only library for plugin development
-- **[Samples](./samples/README.md)**: Example implementations showing how to use hipDNN
-- **[Tests](./tests/README.md)**: Integration tests for the public API
-- **[Plugins](./plugins/)**: Extensions to hipDNN, including the [MIOpen Legacy Plugin](./plugins/miopen_legacy_plugin/README.md)
+| Component | Description |
+|-----------|-------------|
+| **[Backend](./backend/)** | Core shared library providing C API for operation graphs and managing plugins |
+| **[Frontend](./frontend/)** | Header-only C++ API wrapper around the backend |
+| **[SDK](./sdk/)** | Header-only library for plugin development and utilities |
+| **[Plugins](./plugins/)** | Plugin implementations, including [MIOpen Legacy Plugin](./plugins/miopen_legacy_plugin/) |
+| **[Samples](./samples/)** | Example implementations demonstrating hipDNN usage |
+| **[Tests](./tests/)** | Tests for the public API (incl. frontend integration tests) |
+
+### Docker Support
+See [Docker README](./dockerfiles/README.md) for containerized development environments.
+
+---
+
+## Contributing
+
+For information about contributing to the hipDNN project, please see the [Contributing Guide](./CONTRIBUTING.md).

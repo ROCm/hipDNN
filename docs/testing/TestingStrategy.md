@@ -9,7 +9,7 @@ This document outlines the comprehensive testing strategy for hipDNN, covering w
 White box tests focus on internal implementation details of hipDNN components.
 
 > [!IMPORTANT]
-> All white box tests must run on each PR and maintain fast execution times.
+> All white box tests must run on each PR and exhibit fast execution times.
 
 ### Component Comparison
 
