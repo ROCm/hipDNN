@@ -196,7 +196,6 @@ TEST(ConvolutionFwdNodeTests, InferPropertiesNode3DConvolutionSuccess)
 
     auto error = node.infer_properties_node();
     EXPECT_EQ(error.code, error_code_t::OK) << error.err_msg;
-    ;
 
     auto inferred_dims = y_tensor->get_dim();
     EXPECT_EQ(inferred_dims.size(), 5);
@@ -513,6 +512,53 @@ TEST(ConvolutionFwdNodeTests, StrideInferencePreExistingStridesNotOverwritten)
     EXPECT_EQ(final_strides[1], 1024);
     EXPECT_EQ(final_strides[2], 32);
     EXPECT_EQ(final_strides[3], 1);
+}
+
+TEST(ConvolutionFwdNodeTests, StrideInferenceWithStride2x2)
+{
+    Conv_fprop_attributes conv_attributes;
+
+    auto x_tensor = std::make_shared<Tensor_attributes>();
+    x_tensor->set_dim({1, 3, 32, 32});
+    x_tensor->set_stride({3072, 1024, 32, 1}); // NCHW layout
+    conv_attributes.set_x(x_tensor);
+
+    auto w_tensor = std::make_shared<Tensor_attributes>();
+    w_tensor->set_dim({64, 3, 3, 3});
+    conv_attributes.set_w(w_tensor);
+
+    auto y_tensor = std::make_shared<Tensor_attributes>();
+    // No dimensions or strides set - should be inferred
+    conv_attributes.set_y(y_tensor);
+
+    conv_attributes.set_pre_padding({1, 1});
+    conv_attributes.set_post_padding({1, 1});
+    conv_attributes.set_stride({2, 2}); // 2x2 stride
+    conv_attributes.set_dilation({1, 1});
+
+    Graph_attributes graph_attributes;
+    ConvolutionNode node(std::move(conv_attributes), graph_attributes);
+
+    auto error = node.infer_properties_node();
+    EXPECT_EQ(error.code, error_code_t::OK) << error.err_msg;
+
+    // Check inferred dimensions
+    auto inferred_dims = y_tensor->get_dim();
+    EXPECT_EQ(inferred_dims.size(), 4);
+    EXPECT_EQ(inferred_dims[0], 1);  // Batch size
+    EXPECT_EQ(inferred_dims[1], 64); // Output channels
+    EXPECT_EQ(inferred_dims[2], 16); // Height: (32 + 1 + 1 - 3) / 2 + 1 = 16
+    EXPECT_EQ(inferred_dims[3], 16); // Width: (32 + 1 + 1 - 3) / 2 + 1 = 16
+
+    // Check inferred strides
+    auto inferred_strides = y_tensor->get_stride();
+    EXPECT_EQ(inferred_strides.size(), 4);
+    
+    // Expected strides for 16x16 output with NCHW layout
+    EXPECT_EQ(inferred_strides[0], 16384); // N stride: 64 * 16 * 16 = 16384
+    EXPECT_EQ(inferred_strides[1], 256);   // C stride: 16 * 16 = 256
+    EXPECT_EQ(inferred_strides[2], 16);    // H stride: 16
+    EXPECT_EQ(inferred_strides[3], 1);     // W stride: 1
 }
 
 TEST(ConvolutionFwdNodeTests, PackNode)
