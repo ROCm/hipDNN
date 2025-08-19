@@ -23,6 +23,7 @@
   - [Building Guide](./docs/Building.md)
   - [Design Overview](./docs/Design.md)
   - [Plugin Development Guide](./docs/PluginDevelopment.md)
+  - [Environment Configuration](./docs/Environment.md)
 - [Docker Support](./dockerfiles/README.md)
 
 ---
