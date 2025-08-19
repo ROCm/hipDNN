@@ -4,7 +4,7 @@
 #pragma once
 
 #include "plugin/engine_plugin.hpp"
-#include "plugin/engine_plugin_resource_manager.hpp"
+#include "plugin/engine_plugin_manager.hpp"
 #include "plugin/plugin_core.hpp"
 
 #include <gmock/gmock.h>

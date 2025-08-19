@@ -34,16 +34,7 @@ namespace plugin
 
 class Engine_details_wrapper;
 class Engine_execution_context_wrapper;
-
-class Engine_plugin_manager : public Plugin_manager_base<Engine_plugin>
-{
-public:
-    Engine_plugin_manager()
-        : Plugin_manager_base<Engine_plugin>({"hipdnn_plugins/engines/"})
-    {
-    }
-};
-
+class Engine_plugin_manager;
 
 class Engine_plugin_resource_manager
 {
