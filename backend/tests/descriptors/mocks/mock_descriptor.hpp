@@ -139,6 +139,7 @@ public:
                 (const, override));
 
     MOCK_METHOD(hipdnnHandle_t, get_handle, (), (const, override));
+    MOCK_METHOD(hipdnnPluginConstData_t, get_serialized_graph, (), (const, override));
 
     static hipdnnBackendDescriptorType_t get_static_type()
     {

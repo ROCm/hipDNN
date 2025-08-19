@@ -202,7 +202,7 @@ public:
         return _plugins;
     }
 
-    const std::set<std::filesystem::path>& get_loaded_plugin_files() const
+    virtual const std::set<std::filesystem::path>& get_loaded_plugin_files() const
     {
         return _loaded_plugin_files;
     }

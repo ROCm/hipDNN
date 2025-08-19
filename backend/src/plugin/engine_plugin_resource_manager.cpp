@@ -210,10 +210,7 @@ void Engine_plugin_resource_manager::set_stream(hipStream_t stream) const
 std::vector<int64_t> Engine_plugin_resource_manager::get_applicable_engine_ids(
     const Graph_descriptor* graph_desc) const
 {
-    if(graph_desc == nullptr)
-    {
-        throw Hipdnn_exception(HIPDNN_STATUS_BAD_PARAM, "Graph descriptor cannot be null");
-    }
+    THROW_IF_NULL(graph_desc, HIPDNN_STATUS_BAD_PARAM, "Graph descriptor cannot be null");
 
     auto serialized_graph_data = graph_desc->get_serialized_graph();
 

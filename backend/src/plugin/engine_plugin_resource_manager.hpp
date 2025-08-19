@@ -84,7 +84,7 @@ public:
                                  const hipdnnPluginConstData_t* engine_config,
                                  const Graph_descriptor* graph_desc);
 
-    void get_loaded_plugin_files(size_t* num_plugins,
+    virtual void get_loaded_plugin_files(size_t* num_plugins,
                                  char** plugin_paths,
                                  size_t* max_string_len) const;
 

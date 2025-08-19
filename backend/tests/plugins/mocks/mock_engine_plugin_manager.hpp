@@ -30,6 +30,11 @@ public:
                 get_plugins,
                 (),
                 (const, override));
+
+    MOCK_METHOD(const std::set<std::filesystem::path>&,
+                get_loaded_plugin_files,
+                (),
+                (const, override));
 };
 
 } // namespace plugin
