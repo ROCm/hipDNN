@@ -253,7 +253,7 @@ TEST(Allocators, AllocatorTraitsCompatibility)
 // Test exception handling
 TEST(Allocators, AllocationFailure)
 {
-    Host_allocator<char> alloc;
+    Host_allocator<int> alloc;
 
     // Try to allocate an impossibly large amount of memory
     EXPECT_THROW(std::ignore = alloc.allocate(std::numeric_limits<std::size_t>::max()),
@@ -264,7 +264,7 @@ TEST(Allocators, PinnedAllocationFailure)
 {
     SKIP_IF_NO_DEVICES();
 
-    Pinned_host_allocator<char> alloc;
+    Pinned_host_allocator<int> alloc;
 
     // Try to allocate an impossibly large amount of memory
     EXPECT_THROW(std::ignore = alloc.allocate(std::numeric_limits<std::size_t>::max()),
@@ -275,7 +275,7 @@ TEST(Allocators, DeviceAllocationFailure)
 {
     SKIP_IF_NO_DEVICES();
 
-    Device_allocator<char> alloc;
+    Device_allocator<int> alloc;
 
     // Try to allocate an impossibly large amount of memory
     EXPECT_THROW(std::ignore = alloc.allocate(std::numeric_limits<std::size_t>::max()),

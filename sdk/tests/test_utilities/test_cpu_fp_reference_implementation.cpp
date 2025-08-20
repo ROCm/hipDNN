@@ -15,8 +15,6 @@ using namespace hipdnn_sdk::utilities;
 
 TEST(CpuFpReferenceImplementation, BatchnormInferFloatUsage)
 {
-    SKIP_IF_NO_DEVICES();
-
     Tensor<float> input_tensor({1, 3, 224, 224});
     Tensor<float> output_tensor({1, 3, 224, 224});
     Tensor<float> bias_tensor({1, 3});
@@ -32,8 +30,6 @@ TEST(CpuFpReferenceImplementation, BatchnormInferFloatUsage)
 
 TEST(CpuFpReferenceImplementation, BatchnormInferBFloat16Usage)
 {
-    SKIP_IF_NO_DEVICES();
-
     Tensor<hip_bfloat16> input_tensor({1, 3, 224, 224});
     Tensor<hip_bfloat16> output_tensor({1, 3, 224, 224});
     Tensor<float> bias_tensor({1, 3});
@@ -49,8 +45,6 @@ TEST(CpuFpReferenceImplementation, BatchnormInferBFloat16Usage)
 
 TEST(CpuFpReferenceImplementation, BatchnormInferHalfUsage)
 {
-    SKIP_IF_NO_DEVICES();
-
     Tensor<half> input_tensor({1, 3, 224, 224});
     Tensor<half> output_tensor({1, 3, 224, 224});
     Tensor<float> bias_tensor({1, 3});
@@ -64,10 +58,8 @@ TEST(CpuFpReferenceImplementation, BatchnormInferHalfUsage)
         input_tensor, scale_tensor, bias_tensor, mean_tensor, variance_tensor, output_tensor, 1e-5);
 }
 
-TEST(CpuFpReferenceImplementaion, BatchnormInferDoubleUsage)
+TEST(CpuFpReferenceImplementation, BatchnormInferDoubleUsage)
 {
-    SKIP_IF_NO_DEVICES();
-
     Tensor<double> input_tensor({1, 3, 224, 224});
     Tensor<double> output_tensor({1, 3, 224, 224});
     Tensor<double> bias_tensor({1, 3});
@@ -83,8 +75,6 @@ TEST(CpuFpReferenceImplementaion, BatchnormInferDoubleUsage)
 
 TEST(CpuFpReferenceImplementation, BatchnormInferFloatUsageNHWC)
 {
-    SKIP_IF_NO_DEVICES();
-
     Tensor<float> input_tensor({6, 3, 32, 32}, Tensor_layout::NHWC);
     Tensor<float> output_tensor({6, 3, 32, 32}, Tensor_layout::NHWC);
     Tensor<float> bias_tensor({1, 3, 1, 1});
@@ -100,8 +90,6 @@ TEST(CpuFpReferenceImplementation, BatchnormInferFloatUsageNHWC)
 
 TEST(CpuFpReferenceImplementation, BatchnormBwdFloatUsage)
 {
-    SKIP_IF_NO_DEVICES();
-
     Tensor<float> x_tensor({6, 3, 32, 32});
     Tensor<float> dy_tensor({6, 3, 32, 32});
     Tensor<float> dx_tensor({6, 3, 32, 32});
@@ -125,8 +113,6 @@ TEST(CpuFpReferenceImplementation, BatchnormBwdFloatUsage)
 
 TEST(CpuFpReferenceImplementation, BatchnormBwdBFloat16Usage)
 {
-    SKIP_IF_NO_DEVICES();
-
     Tensor<hip_bfloat16> x_tensor({6, 3, 32, 32});
     Tensor<hip_bfloat16> dy_tensor({6, 3, 32, 32});
     Tensor<hip_bfloat16> dx_tensor({6, 3, 32, 32});
@@ -150,8 +136,6 @@ TEST(CpuFpReferenceImplementation, BatchnormBwdBFloat16Usage)
 
 TEST(CpuFpReferenceImplementation, BatchnormBwdHalfUsage)
 {
-    SKIP_IF_NO_DEVICES();
-
     Tensor<half> x_tensor({6, 3, 32, 32});
     Tensor<half> dy_tensor({6, 3, 32, 32});
     Tensor<half> dx_tensor({6, 3, 32, 32});
@@ -175,8 +159,6 @@ TEST(CpuFpReferenceImplementation, BatchnormBwdHalfUsage)
 
 TEST(CpuFpReferenceImplementation, BatchnormBwdDoubleUsage)
 {
-    SKIP_IF_NO_DEVICES();
-
     Tensor<double> x_tensor({6, 3, 32, 32});
     Tensor<double> dy_tensor({6, 3, 32, 32});
     Tensor<double> dx_tensor({6, 3, 32, 32});
@@ -200,8 +182,6 @@ TEST(CpuFpReferenceImplementation, BatchnormBwdDoubleUsage)
 
 TEST(CpuFpReferenceImplementation, BatchnormBwdFloatUsageNHWC)
 {
-    SKIP_IF_NO_DEVICES();
-
     Tensor<float> x_tensor({6, 3, 32, 32}, Tensor_layout::NHWC);
     Tensor<float> dy_tensor({6, 3, 32, 32}, Tensor_layout::NHWC);
     Tensor<float> dx_tensor({6, 3, 32, 32});
@@ -225,8 +205,6 @@ TEST(CpuFpReferenceImplementation, BatchnormBwdFloatUsageNHWC)
 
 TEST(CpuFpReferenceImplementation, BatchnormBwdSanityValidation)
 {
-    SKIP_IF_NO_DEVICES();
-
     const std::vector<int64_t> dims = {1, 1, 2, 2};
 
     Tensor<double> x_tensor(dims);
