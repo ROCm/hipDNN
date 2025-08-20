@@ -8,6 +8,7 @@
 #include <unordered_set>
 #include <vector>
 
+#include "descriptors/flatbuffer_test_utils.hpp"
 #include "descriptors/graph_descriptor.hpp"
 #include "descriptors/mocks/mock_descriptor.hpp"
 #include "descriptors/test_macros.hpp"
@@ -569,13 +570,13 @@ TEST(Engine_plugin_resource_manager, get_engine_details)
                     testing::_ // output engine_details
                     ))
         .WillOnce(testing::Invoke([](hipdnnEnginePluginHandle_t,
-                                     int64_t,
+                                     int64_t engine_id,
                                      const hipdnnPluginConstData_t*,
                                      hipdnnPluginConstData_t* output) {
-            // Set the output parameter to some fake data (we can't easily create a valid flatbuffer here)
-            static const char* fake_engine_details = "fake_engine_details_data";
-            output->ptr = fake_engine_details;
-            output->size = strlen(fake_engine_details) + 1;
+            // Create valid flatbuffer engine details
+            static auto builder = flatbuffer_test_utils::create_valid_engine_details(engine_id);
+            output->ptr = builder.GetBufferPointer();
+            output->size = builder.GetSize();
         }));
 
     EXPECT_CALL(*mock_plugin, destroy_handle(testing::Eq(hipdnnEnginePluginHandle_t(0xdeadbeef))));
@@ -583,27 +584,16 @@ TEST(Engine_plugin_resource_manager, get_engine_details)
     {
         Engine_plugin_resource_manager resource_manager(plugin_manager);
 
-        // Test get_engine_details functionality
-        // Note: This will throw because our mock data is not a valid flatbuffer
-        try
-        {
-            auto engine_details = Engine_plugin_resource_manager::get_engine_details(
-                std::make_shared<Engine_plugin_resource_manager>(std::move(resource_manager)),
-                100,
-                &mock_graph_desc);
+        // Test get_engine_details functionality with valid flatbuffer data
+        auto engine_details = Engine_plugin_resource_manager::get_engine_details(
+            std::make_shared<Engine_plugin_resource_manager>(std::move(resource_manager)),
+            100,
+            &mock_graph_desc);
 
-            // If we get here, the mock somehow provided valid flatbuffer data
-            FAIL() << "Expected Hipdnn_exception due to invalid flatbuffer data";
-        }
-        catch(const Hipdnn_exception& e)
-        {
-            // Expected to throw due to invalid flatbuffer data from mock
-            EXPECT_EQ(e.get_status(), HIPDNN_STATUS_BAD_PARAM);
-        }
-        catch(...)
-        {
-            FAIL() << "Expected Hipdnn_exception, but got different exception type";
-        }
+        // Verify that we got valid engine details
+        EXPECT_NE(engine_details, nullptr);
+        EXPECT_NE(engine_details->get(), nullptr);
+        EXPECT_EQ(engine_details->get()->engine_id(), 100);
     }
 }
 
