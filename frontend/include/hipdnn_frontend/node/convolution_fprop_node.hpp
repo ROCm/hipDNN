@@ -74,20 +74,20 @@ public:
 
         if(x_dims.empty())
         {
-            return {error_code_t::ATTRIBUTE_NOT_SET,
+            return {error_code_t::INVALID_VALUE,
                     "ConvolutionNode: Input tensor must have dimensions set"};
         }
 
         if(x_dims.size() < 3)
         {
             return {
-                error_code_t::ATTRIBUTE_NOT_SET,
+                error_code_t::INVALID_VALUE,
                 "ConvolutionNode: Input tensor must have at least 3 dimensions (N, C, spatial)"};
         }
 
         if(x_strides.size() != x_dims.size())
         {
-            return {error_code_t::ATTRIBUTE_NOT_SET,
+            return {error_code_t::INVALID_VALUE,
                     "ConvolutionNode: Input tensor stride count must match dimension count"};
         }
 
@@ -97,20 +97,20 @@ public:
 
         if(w_dims.empty())
         {
-            return {error_code_t::ATTRIBUTE_NOT_SET,
+            return {error_code_t::INVALID_VALUE,
                     "ConvolutionNode: Weight tensor must have dimensions set"};
         }
 
         if(w_dims.size() != x_dims.size())
         {
-            return {error_code_t::ATTRIBUTE_NOT_SET,
+            return {error_code_t::INVALID_VALUE,
                     "ConvolutionNode: Weight tensor dimension count must match input tensor "
                     "dimension count"};
         }
 
         if(w_strides.size() != w_dims.size())
         {
-            return {error_code_t::ATTRIBUTE_NOT_SET,
+            return {error_code_t::INVALID_VALUE,
                     "ConvolutionNode: Weight tensor stride count must match dimension count"};
         }
 
@@ -119,7 +119,7 @@ public:
         // For grouped convolution: x_dims[1] % w_dims[1] == 0
         if(x_dims[1] % w_dims[1] != 0)
         {
-            return {error_code_t::ATTRIBUTE_NOT_SET,
+            return {error_code_t::INVALID_VALUE,
                     "ConvolutionNode: Input tensor channels must match weight tensor input "
                     "channels or be divisible by them for grouped convolution"};
         }
@@ -132,7 +132,7 @@ public:
         {
             if(y_dims.size() != x_dims.size())
             {
-                return {error_code_t::ATTRIBUTE_NOT_SET,
+                return {error_code_t::INVALID_VALUE,
                         "ConvolutionNode: Output tensor dimension count must match input tensor "
                         "dimension count"};
             }
@@ -141,7 +141,7 @@ public:
             if(y_dims[0] != x_dims[0])
             {
                 return {
-                    error_code_t::ATTRIBUTE_NOT_SET,
+                    error_code_t::INVALID_VALUE,
                     "ConvolutionNode: Output tensor batch size must match input tensor batch size"};
             }
 
@@ -150,7 +150,7 @@ public:
             // For grouped convolution: y_dims[1] % w_dims[0] == 0
             if(y_dims[1] % w_dims[0] != 0)
             {
-                return {error_code_t::ATTRIBUTE_NOT_SET,
+                return {error_code_t::INVALID_VALUE,
                         "ConvolutionNode: Output tensor channels must match weight tensor output "
                         "channels or be a multiple of them for grouped convolution"};
             }
@@ -160,13 +160,13 @@ public:
         {
             if(y_dims.empty())
             {
-                return {error_code_t::ATTRIBUTE_NOT_SET,
+                return {error_code_t::INVALID_VALUE,
                         "ConvolutionNode: Output tensor strides cannot be set without dimensions"};
             }
 
             if(y_strides.size() != y_dims.size())
             {
-                return {error_code_t::ATTRIBUTE_NOT_SET,
+                return {error_code_t::INVALID_VALUE,
                         "ConvolutionNode: Output tensor stride count must match dimension count"};
             }
         }
@@ -181,27 +181,56 @@ public:
         if(pre_padding.size() != spatial_dims)
         {
             return {
-                error_code_t::ATTRIBUTE_NOT_SET,
+                error_code_t::INVALID_VALUE,
                 "ConvolutionNode: pre_padding parameter count must match spatial dimension count"};
         }
 
         if(post_padding.size() != spatial_dims)
         {
             return {
-                error_code_t::ATTRIBUTE_NOT_SET,
+                error_code_t::INVALID_VALUE,
                 "ConvolutionNode: post_padding parameter count must match spatial dimension count"};
         }
 
         if(stride.size() != spatial_dims)
         {
-            return {error_code_t::ATTRIBUTE_NOT_SET,
+            return {error_code_t::INVALID_VALUE,
                     "ConvolutionNode: stride parameter count must match spatial dimension count"};
         }
 
         if(dilation.size() != spatial_dims)
         {
-            return {error_code_t::ATTRIBUTE_NOT_SET,
+            return {error_code_t::INVALID_VALUE,
                     "ConvolutionNode: dilation parameter count must match spatial dimension count"};
+        }
+
+        // Check spatial parameters for each dimension
+        for(size_t i = 0; i < spatial_dims; ++i)
+        {
+            auto pre_pad = pre_padding[i];
+            auto post_pad = post_padding[i];
+            auto stride_val = stride[i];
+            auto dilation_val = dilation[i];
+
+            // Validate parameters
+            if(stride_val <= 0)
+            {
+                return {error_code_t::INVALID_VALUE, "ConvolutionNode: Stride must be > 0"};
+            }
+            if(dilation_val <= 0)
+            {
+                return {error_code_t::INVALID_VALUE, "ConvolutionNode: Dilation must > 0"};
+            }
+            if(pre_pad < 0)
+            {
+                return {error_code_t::INVALID_VALUE,
+                        "ConvolutionNode: Pre-padding must be non-negative"};
+            }
+            if(post_pad < 0)
+            {
+                return {error_code_t::INVALID_VALUE,
+                        "ConvolutionNode: Post-padding must be non-negative"};
+            }
         }
 
         return {};
@@ -262,7 +291,7 @@ public:
                 if(spatial_idx >= pre_padding.size() || spatial_idx >= post_padding.size()
                    || spatial_idx >= stride.size() || spatial_idx >= dilation.size())
                 {
-                    return {error_code_t::ATTRIBUTE_NOT_SET,
+                    return {error_code_t::INVALID_VALUE,
                             "ConvolutionNode: Insufficient padding/stride/dilation parameters for "
                             "spatial dimensions"};
                 }
@@ -281,22 +310,22 @@ public:
                 // Validate parameters
                 if(stride_val <= 0)
                 {
-                    return {error_code_t::ATTRIBUTE_NOT_SET,
+                    return {error_code_t::INVALID_VALUE,
                             "ConvolutionNode: Stride must be positive"};
                 }
                 if(dilation_val <= 0)
                 {
-                    return {error_code_t::ATTRIBUTE_NOT_SET,
+                    return {error_code_t::INVALID_VALUE,
                             "ConvolutionNode: Dilation must be positive"};
                 }
                 if(pre_pad < 0)
                 {
-                    return {error_code_t::ATTRIBUTE_NOT_SET,
+                    return {error_code_t::INVALID_VALUE,
                             "ConvolutionNode: Pre-padding must be non-negative"};
                 }
                 if(post_pad < 0)
                 {
-                    return {error_code_t::ATTRIBUTE_NOT_SET,
+                    return {error_code_t::INVALID_VALUE,
                             "ConvolutionNode: Post-padding must be non-negative"};
                 }
 
@@ -307,7 +336,7 @@ public:
                 auto numerator = input_size + pre_pad + post_pad - dilated_kernel_size;
                 if(numerator < 0)
                 {
-                    return {error_code_t::ATTRIBUTE_NOT_SET,
+                    return {error_code_t::INVALID_VALUE,
                             "ConvolutionNode: Invalid convolution parameters result in negative "
                             "output size"};
                 }
