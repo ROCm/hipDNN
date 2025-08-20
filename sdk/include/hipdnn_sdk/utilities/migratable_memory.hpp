@@ -5,6 +5,7 @@
 
 #include <hip/hip_runtime.h>
 #include <hipdnn_sdk/logging/logger.hpp>
+#include <hipdnn_sdk/utilities/allocators.hpp>
 #include <memory>
 #include <stdexcept>
 
@@ -25,9 +26,17 @@ enum class Memory_location
 /// It provides functionality to allocate, resize, and access memory on both host and device,
 /// while ensuring that data is synchronized as needed.  This class is not thread safe.
 ///
-template <class T>
+/// @tparam T The type of elements stored
+/// @tparam HostAlloc The host allocator type (defaults to Host_allocator<T>)
+/// @tparam DeviceAlloc The device allocator type (defaults to Device_allocator<T>)
+template <class T, class HostAlloc = Host_allocator<T>, class DeviceAlloc = Device_allocator<T>>
 class Migratable_memory
 {
+    static_assert(std::is_base_of_v<Host_allocator_interface<T>, HostAlloc>,
+                  "HostAlloc must derive from Host_allocator_interface<T>");
+    static_assert(std::is_base_of_v<Device_allocator_interface<T>, DeviceAlloc>,
+                  "DeviceAlloc must derive from Device_allocator_interface<T>");
+
 public:
     explicit Migratable_memory(size_t count = 0)
         : _count(count)
@@ -218,16 +227,11 @@ private:
         }
     }
 
-    // TODO - Consider different allocation strategies, such as unified memory, host pinned memory, etc.
-    // For now, we will use hipHostMalloc for host memory and hipMalloc for device
-    // memory. This can be extended based on specific requirements.
-
     void allocate_host()
     {
-        if((_host_ptr == nullptr) && _total_size > 0)
+        if((_host_ptr == nullptr) && _count > 0)
         {
-            throw_on_error(hipHostMalloc(&_host_ptr, _total_size),
-                           "Failed to allocate host memory");
+            _host_ptr = _host_allocator.allocate(_count);
             _host_valid = true;
             _current_location = Memory_location::HOST;
         }
@@ -235,10 +239,9 @@ private:
 
     void allocate_device()
     {
-        if((_device_ptr == nullptr) && _total_size > 0)
+        if((_device_ptr == nullptr) && _count > 0)
         {
-            throw_on_error(hipMalloc(&_device_ptr, _total_size),
-                           "Failed to allocate device memory");
+            _device_ptr = _device_allocator.allocate(_count);
         }
     }
 
@@ -306,12 +309,12 @@ private:
     {
         if(_host_ptr != nullptr)
         {
-            log_on_error(hipHostFree(_host_ptr), "Failed to free host memory");
+            _host_allocator.deallocate(static_cast<T*>(_host_ptr), _count);
             _host_ptr = nullptr;
         }
         if(_device_ptr != nullptr)
         {
-            log_on_error(hipFree(_device_ptr), "Failed to free device memory");
+            _device_allocator.deallocate(static_cast<T*>(_device_ptr), _count);
             _device_ptr = nullptr;
         }
         _host_valid = false;
@@ -327,6 +330,8 @@ private:
     Memory_location _current_location{Memory_location::NONE};
     bool _host_valid{false};
     bool _device_valid{false};
+    HostAlloc _host_allocator;
+    DeviceAlloc _device_allocator;
 };
 
 } // namespace utilities
