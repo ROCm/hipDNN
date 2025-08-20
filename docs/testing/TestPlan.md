@@ -36,26 +36,17 @@ Verify that all documentation is up to date:
 
 #### Steps
 
-1. **Clone the repository**
-   ```bash
-   git clone git@github.com:ROCm/hipDNN.git
-   cd hipDNN
-   ```
+<!-- 1. **Build hipDNN**
+   Follow the [Quick Start Guide](../Building.md#quick-start-guide) to clone hipDNN and prepare your environment. -->
 
-2. **Create and enter build directory**
-   ```bash
-   mkdir build
-   cd build
-   ```
-
-3. **Configure the project with CMake**
+1. **Configure the project with CMake**
    ```bash
    cmake ..
    ```
    
    > **Optional**: Add `-DBUILD_ADDRESS_SANITIZER=ON` to enable address sanitizer (see below)
 
-4. **Run the test suite**
+2. **Run the test suite**
    ```bash
    ninja check_ctest
    ```
@@ -82,24 +73,15 @@ Verify that all documentation is up to date:
 
 #### Steps
 
-1. **Clone the repository**
-   ```bash
-   git clone git@github.com:ROCm/hipDNN.git
-   cd hipDNN
-   ```
+<!-- 1. **Build hipDNN**
+   Follow the [Quick Start Guide](../Building.md#quick-start-guide) to clone hipDNN and prepare your environment. -->
 
-2. **Create and enter build directory**
-   ```bash
-   mkdir build
-   cd build
-   ```
-
-3. **Configure with Address Sanitizer enabled**
+1. **Configure with Address Sanitizer enabled**
    ```bash
    cmake .. -DBUILD_ADDRESS_SANITIZER=ON
    ```
 
-4. **Run the test suite**
+2. **Run the test suite**
    ```bash
    ninja check_ctest
    ```

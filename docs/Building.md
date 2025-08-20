@@ -52,9 +52,14 @@ The following libraries are automatically managed by CMake (see [Dependencies.cm
 > [!TIP]
 > Docker provides a consistent development environment with all dependencies pre-installed. This is the recommended approach for most users. For more details about Docker images, see the [Docker README](../dockerfiles/README.md).
 
-1. **Build the Development Container**
+1. **Clone hipDNN**
    ```bash
-   cd <path/to/hipDNN/dockerfiles>
+   git clone https://github.com/ROCm/hipDNN.git
+   ```
+
+2. **Build the Development Container**
+   ```bash
+   cd hipDNN/dockerfiles/
    
    # For Ubuntu 22.04 (recommended)
    docker build -f ./Dockerfile.ubuntu22 -t hipdnn-dev:ubuntu22 .
@@ -63,7 +68,7 @@ The following libraries are automatically managed by CMake (see [Dependencies.cm
    docker build -f ./Dockerfile.almalinux -t hipdnn-dev:almalinux .
    ```
 
-2. **Run the Container**
+3. **Run the Container**
    ```bash
    # Replace <path/to/hipDNN> with your hipDNN repository path
    docker run -it \
@@ -80,7 +85,7 @@ The following libraries are automatically managed by CMake (see [Dependencies.cm
      hipdnn-dev:ubuntu22
    ```
 
-3. **Build and Test**
+4. **Build and Test**
    ```bash
    cd /workspace/hipDNN
    mkdir build && cd build
@@ -88,7 +93,7 @@ The following libraries are automatically managed by CMake (see [Dependencies.cm
    ninja check -j$(nproc)
    ```
 
-4. **Install**
+5. **Install**
    ```bash
    # Default installation to /opt/rocm
    sudo ninja install

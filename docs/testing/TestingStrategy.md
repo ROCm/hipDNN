@@ -8,9 +8,6 @@ This document outlines the comprehensive testing strategy for hipDNN, covering w
 
 White box tests focus on internal implementation details of hipDNN components.
 
-> [!IMPORTANT]
-> All white box tests must run on each PR and exhibit fast execution times.
-
 ### Component Comparison
 
 | Component | Location | Purpose | GPU Testing | Environments |
@@ -128,6 +125,10 @@ Tests must work in the following environments:
 - **Without GPU**: All GPU tests must be skippable (warnings, not errors)
 - **With GPU**: Tests should detect and utilize available GPU resources
 - **Platform Support**: Windows & supported Linux distributions
+
+### Green CI
+
+For each PR, the latest commit must pass every CI pipeline listed in the [Test Plan](./TestPlan.md#prerequisites).
 
 ## 4. Performance Testing
 

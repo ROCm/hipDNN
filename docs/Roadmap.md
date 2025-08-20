@@ -54,6 +54,7 @@ The Backend serves as the core engine of hipDNN, managing plugins and orchestrat
 ### Future Roadmap
 *The following items are longer-term goals that are not yet scheduled:*
 
+- **Unique Engine IDs**: Mechanism to improve or ensure the global uniqueness of engine IDs 
 - **API Extensions**: Adding support for behavioral notes and tunable knobs
 - **Improved Logging**: Enhancing logging capabilities for better debugging and monitoring
 - **Plugin Systems**: 
@@ -121,44 +122,34 @@ Plugins extend hipDNN's capabilities by providing computational implementations.
 
 This section covers testing infrastructure improvements and performance benchmarking capabilities for hipDNN.
 
-### Performance/Benchmarking
-
-| Attribute | Details |
-|-----------|---------|
-| **Location** | Separate project for benchmarking full hipDNN install (TBD) |
-| **Purpose** | • Track performance of hipDNN & installed plugins across a broad set of graphs<br>• Track accuracy of hipDNN & installed plugins across a broad set of graphs |
-| **Note** | Each plugin will have integration tests for functionality that it supports. This suite will be the full integration set of shapes that runs across plugins. |
-
-#### Test Categories
-
-- **Quick Suite**: A quick running set of graphs to run per PR to flag severe regressions
-- **Full Suite**: A long running set of graphs to run on demand to flag broad regressions (probably run nightly or weekly)
-
-#### Requirements
-
-- Minimal set of graphs are maintained to be used as pre-checkin performance check
-- Full set of graphs are maintained to be used for on-demand performance & accuracy checks
-- Requires GPU
-- Validates correctness and performance of graphs
-
-#### Applicable Testing Environments
-
-- Windows & supported Linux distros
-- Test on all ASICs supported by hipDNN
-  - Note: Certain plugins/graphs may have ASIC restrictions
-
-### Testing Improvements
-
-#### Future Roadmap
-*The following testing improvements are planned but not yet scheduled:*
+### What's Next
+*The following items are current priorities but are subject to change:*
 
 - **Test Standardization**: Create standardized naming conventions for tests
-- **Documentation**: Document best practices, patterns, and requirements for new tests
-- **ASAN Integration**: Add ASAN as an automatic step to CI
 - **Golden Reference Data**: Add golden reference data to use for unit testing at plugin level & to verify reference implementations
+- **Documentation**: Document best practices, patterns, and requirements for new tests
 - **CI Platform**: Swap to leverage TheRock for CI
+- **ASAN Integration**: Add ASAN as an automatic step to CI
 - **Testing Artifacts**: Add installable testing artifacts
-- **Performance Project**: Create a benchmarking and performance project for capturing performance and accuracy for full hipDNN graphs
+
+### Future Roadmap
+*The following items are longer-term goals that are not yet scheduled:*
+
+
+- **Performance/Benchmarking Project**: Create a separate benchmarking and performance project for capturing performance and accuracy for full hipDNN graphs
+  - Track performance and accuracy of hipDNN & installed plugins across a broad set of graphs
+  - **Test Categories**:
+    - Quick Suite: A quick running set of graphs to run per PR to flag severe regressions
+    - Full Suite: A long running set of graphs to run on demand to flag broad regressions (nightly or weekly frequency)
+  - **Requirements**:
+    - Minimal set of graphs maintained for pre-checkin performance checks
+    - Full set of graphs maintained for on-demand performance & accuracy checks
+    - Requires GPU
+    - Validates correctness and performance of graphs
+  - **Testing Environments**:
+    - Windows & supported Linux distros
+    - Test on all ASICs supported by hipDNN
+    - Note: Certain plugins/graphs may have ASIC restrictions
 
 ## Contributing to the Roadmap
 

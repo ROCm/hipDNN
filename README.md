@@ -5,7 +5,7 @@
 
 ## Overview
 
-hipDNN is a graph-based deep learning library for AMD GPUs that leverages a flexible plugin architecture to provide optimized implementations and utilities for various operations. 
+hipDNN is a graph-based deep learning library for AMD GPUs that leverages a flexible plugin architecture to provide optimized implementations and utilities for various routines. 
 
 ---
 
@@ -43,7 +43,8 @@ The fastest way to get started with hipDNN is to follow the [quick start steps i
 - **[Roadmap](./docs/Roadmap.md)** - Feature priorities and development plans
 
 ### Testing
-- **[Testing Strategy](./docs/testing/TestingStrategy.md)** - Overall testing approach
+- **[Testing](./docs/Testing.md)** - Synopsis of testing information
+- **[Testing Strategy](./docs/testing/TestingStrategy.md)** - Specific testing approach
 - **[Test Plan](./docs/testing/TestPlan.md)** - Detailed test planning
 - **[Test Run Template](./docs/testing/TestRunTemplate.md)** - Guidelines for test execution
 
