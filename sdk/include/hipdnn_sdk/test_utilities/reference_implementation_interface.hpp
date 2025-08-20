@@ -3,6 +3,8 @@
 
 #pragma once
 
+// NOLINTBEGIN(portability-template-virtual-member-function)
+
 #include <cstdint>
 #include <hipdnn_sdk/data_objects/batchnorm_inference_attributes_generated.h>
 #include <hipdnn_sdk/data_objects/tensor_attributes_generated.h>
@@ -48,3 +50,5 @@ public:
 
 } // namespace reference_test_utilities
 } // namespace hipdnn_sdk
+
+// NOLINTEND(portability-template-virtual-member-function)

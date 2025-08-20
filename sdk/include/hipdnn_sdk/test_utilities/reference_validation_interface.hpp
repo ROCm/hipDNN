@@ -3,6 +3,8 @@
 
 #pragma once
 
+// NOLINTBEGIN(portability-template-virtual-member-function)
+
 #include <hipdnn_sdk/utilities/migratable_memory.hpp>
 #include <type_traits>
 
@@ -27,3 +29,5 @@ public:
 
 } // namespace reference_test_utilities
 } // namespace hipdnn_sdk
+
+// NOLINTEND(portability-template-virtual-member-function)

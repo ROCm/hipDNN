@@ -15,6 +15,8 @@ namespace hipdnn_sdk
 namespace utilities
 {
 
+// NOLINTBEGIN(portability-template-virtual-member-function)
+
 /// @brief Interface for host memory allocators
 template <typename T>
 class Host_allocator_interface
@@ -92,6 +94,8 @@ public:
     /// @param n Number of elements (may be used by some allocators)
     virtual void deallocate(T* p, std::size_t n) noexcept = 0;
 };
+
+// NOLINTEND(portability-template-virtual-member-function)
 
 /// @brief Standard host allocator using malloc/free
 template <typename T>
