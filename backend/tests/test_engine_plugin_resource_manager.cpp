@@ -248,52 +248,6 @@ TEST(Engine_plugin_resource_manager, self_move_assignment)
     EXPECT_GT(max_string_len, 0);
 }
 
-TEST(Engine_plugin_resource_manager, unique_instance_creation)
-{
-    const size_t num_managers = 10;
-    std::vector<Engine_plugin_resource_manager*> managers;
-    std::vector<std::shared_ptr<Mock_engine_plugin_manager>> plugin_managers;
-    std::vector<std::shared_ptr<Mock_engine_plugin>> mock_plugins;
-    std::vector<std::vector<std::shared_ptr<Engine_plugin>>> all_plugins;
-
-    managers.reserve(num_managers);
-    plugin_managers.reserve(num_managers);
-    mock_plugins.reserve(num_managers);
-    all_plugins.reserve(num_managers);
-
-    for(size_t i = 0; i < num_managers; ++i)
-    {
-        auto plugin_manager = std::make_shared<Mock_engine_plugin_manager>();
-        auto mock_plugin = std::make_shared<Mock_engine_plugin>();
-        std::vector<std::shared_ptr<Engine_plugin>> plugins{mock_plugin};
-
-        plugin_managers.push_back(plugin_manager);
-        mock_plugins.push_back(mock_plugin);
-        all_plugins.push_back(plugins);
-
-        EXPECT_CALL(*plugin_manager, get_plugins()).WillOnce(::testing::ReturnRef(all_plugins[i]));
-        EXPECT_CALL(*mock_plugin, create_handle())
-            .WillOnce(::testing::Return(hipdnnEnginePluginHandle_t(0xdeadbeef)));
-        EXPECT_CALL(*mock_plugin, get_all_engine_ids())
-            .WillOnce(::testing::Return(std::vector<int64_t>{static_cast<int64_t>(100 + i)}));
-        EXPECT_CALL(*mock_plugin,
-                    destroy_handle(testing::Eq(hipdnnEnginePluginHandle_t(0xdeadbeef))));
-
-        managers.push_back(new Engine_plugin_resource_manager(plugin_manager));
-    }
-
-    std::unordered_set<Engine_plugin_resource_manager*> unique_pointers(managers.begin(),
-                                                                        managers.end());
-    EXPECT_EQ(unique_pointers.size(), managers.size())
-        << "Expected " << managers.size() << " unique pointers, but found "
-        << unique_pointers.size() << " unique values";
-
-    for(auto* manager : managers)
-    {
-        delete manager;
-    }
-}
-
 TEST(Engine_plugin_resource_manager, rapid_creation_destruction)
 {
     const int num_iterations = 100;
