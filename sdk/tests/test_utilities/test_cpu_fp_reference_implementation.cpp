@@ -94,29 +94,29 @@ TEST(CpuFpReferenceImplementation, BatchnormInferSanityValidation)
 
     const std::vector<int64_t> dims = {1, 1, 2, 2};
 
-    auto input_tensor = Tensor::make_tensor<double>(dims);
-    auto output_tensor = Tensor::make_tensor<double>(dims);
-    auto scale_tensor = Tensor::make_tensor<double>({1, 1, 1, 1});
-    auto bias_tensor = Tensor::make_tensor<double>({1, 1, 1, 1});
-    auto mean_tensor = Tensor::make_tensor<double>({1, 1, 1, 1});
-    auto variance_tensor = Tensor::make_tensor<double>({1, 1, 1, 1});
+    Tensor<double> input_tensor(dims);
+    Tensor<double> output_tensor(dims);
+    Tensor<double> scale_tensor({1, 1, 1, 1});
+    Tensor<double> bias_tensor({1, 1, 1, 1});
+    Tensor<double> mean_tensor({1, 1, 1, 1});
+    Tensor<double> variance_tensor({1, 1, 1, 1});
 
     // x = [1, 2, 3, 4]
-    input_tensor.set_host_value<double>(0, 0, 0, 0, 1.0);
-    input_tensor.set_host_value<double>(0, 0, 0, 1, 2.0);
-    input_tensor.set_host_value<double>(0, 0, 1, 0, 3.0);
-    input_tensor.set_host_value<double>(0, 0, 1, 1, 4.0);
+    input_tensor.set_host_value(0, 0, 0, 0, 1.0);
+    input_tensor.set_host_value(0, 0, 0, 1, 2.0);
+    input_tensor.set_host_value(0, 0, 1, 0, 3.0);
+    input_tensor.set_host_value(0, 0, 1, 1, 4.0);
 
     // fixed scale and bias parameters (one channel)
-    scale_tensor.set_host_value<double>(0, 0, 0, 0, 2.0);
-    bias_tensor.set_host_value<double>(0, 0, 0, 0, 0.5);
+    scale_tensor.set_host_value(0, 0, 0, 0, 2.0);
+    bias_tensor.set_host_value(0, 0, 0, 0, 0.5);
 
     // inference uses population statistics per channel:
     // mean = (1+2+3+4)/4 = 2.5
     // variance = [(-1.5)^2 + (-0.5)^2 + (0.5)^2 + (1.5)^2] / 4 = 5.0 / 4 = 1.25
     // (in practice, computed during training)
-    mean_tensor.set_host_value<double>(0, 0, 0, 0, 2.5);
-    variance_tensor.set_host_value<double>(0, 0, 0, 0, 1.25);
+    mean_tensor.set_host_value(0, 0, 0, 0, 2.5);
+    variance_tensor.set_host_value(0, 0, 0, 0, 1.25);
 
     // output is calculated via a pointwise linear transform on x:
     // y = scale * (x - mean) * inv_variance + bias = 2 * (x - 2.5) * inv_variance + 0.5
@@ -129,10 +129,10 @@ TEST(CpuFpReferenceImplementation, BatchnormInferSanityValidation)
 
     auto tolerance = 1e-6;
 
-    EXPECT_NEAR(output_tensor.get_host_value<double>(0, 0, 0, 0), expected_output[0], tolerance);
-    EXPECT_NEAR(output_tensor.get_host_value<double>(0, 0, 0, 1), expected_output[1], tolerance);
-    EXPECT_NEAR(output_tensor.get_host_value<double>(0, 0, 1, 0), expected_output[2], tolerance);
-    EXPECT_NEAR(output_tensor.get_host_value<double>(0, 0, 1, 1), expected_output[3], tolerance);
+    EXPECT_NEAR(output_tensor.get_host_value(0, 0, 0, 0), expected_output[0], tolerance);
+    EXPECT_NEAR(output_tensor.get_host_value(0, 0, 0, 1), expected_output[1], tolerance);
+    EXPECT_NEAR(output_tensor.get_host_value(0, 0, 1, 0), expected_output[2], tolerance);
+    EXPECT_NEAR(output_tensor.get_host_value(0, 0, 1, 1), expected_output[3], tolerance);
 }
 
 TEST(CpuFpReferenceImplementation, BatchnormBwdFloatUsage)
