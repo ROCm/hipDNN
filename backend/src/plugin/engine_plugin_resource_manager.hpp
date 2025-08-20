@@ -85,8 +85,8 @@ public:
                                  const Graph_descriptor* graph_desc);
 
     virtual void get_loaded_plugin_files(size_t* num_plugins,
-                                 char** plugin_paths,
-                                 size_t* max_string_len) const;
+                                         char** plugin_paths,
+                                         size_t* max_string_len) const;
 
 private:
     // MT-unsafe instance methods

@@ -41,7 +41,7 @@ public:
     virtual size_t get_workspace_size(hipdnnEnginePluginHandle_t handle,
                                       const hipdnnPluginConstData_t* engine_config,
                                       const hipdnnPluginConstData_t* op_graph) const;
-    virtual hipdnnEnginePluginExecutionContext_t
+    [[nodiscard]] virtual hipdnnEnginePluginExecutionContext_t
         create_execution_context(hipdnnEnginePluginHandle_t handle,
                                  const hipdnnPluginConstData_t* engine_config,
                                  const hipdnnPluginConstData_t* op_graph) const;
