@@ -56,9 +56,19 @@ public:
     }
 
     // Setters for tensors
+    Conv_fprop_attributes& set_x(std::shared_ptr<Tensor_attributes>&& value)
+    {
+        return set_input(input_names::X, std::move(value));
+    }
+
     Conv_fprop_attributes& set_x(const std::shared_ptr<Tensor_attributes>& value)
     {
         return set_input(input_names::X, value);
+    }
+
+    Conv_fprop_attributes& set_w(std::shared_ptr<Tensor_attributes>&& value)
+    {
+        return set_input(input_names::W, std::move(value));
     }
 
     Conv_fprop_attributes& set_w(const std::shared_ptr<Tensor_attributes>& value)
@@ -66,16 +76,20 @@ public:
         return set_input(input_names::W, value);
     }
 
+    Conv_fprop_attributes& set_y(std::shared_ptr<Tensor_attributes>&& value)
+    {
+        return set_output(output_names::Y, std::move(value));
+    }
+
     Conv_fprop_attributes& set_y(const std::shared_ptr<Tensor_attributes>& value)
     {
         return set_output(output_names::Y, value);
     }
 
-    // Setters for convolution parameters
-    Conv_fprop_attributes& set_padding(const std::vector<int64_t>& padding)
+    Conv_fprop_attributes& set_padding(std::vector<int64_t> padding)
     {
         pre_padding = padding;
-        post_padding = padding;
+        post_padding = std::move(padding);
         return *this;
     }
 
@@ -85,9 +99,21 @@ public:
         return *this;
     }
 
+    Conv_fprop_attributes& set_pre_padding(std::vector<int64_t>&& padding)
+    {
+        pre_padding = std::move(padding);
+        return *this;
+    }
+
     Conv_fprop_attributes& set_post_padding(const std::vector<int64_t>& padding)
     {
         post_padding = padding;
+        return *this;
+    }
+
+    Conv_fprop_attributes& set_post_padding(std::vector<int64_t>&& padding)
+    {
+        post_padding = std::move(padding);
         return *this;
     }
 
@@ -97,9 +123,21 @@ public:
         return *this;
     }
 
+    Conv_fprop_attributes& set_stride(std::vector<int64_t>&& stride_vals)
+    {
+        stride = std::move(stride_vals);
+        return *this;
+    }
+
     Conv_fprop_attributes& set_dilation(const std::vector<int64_t>& dilation_vals)
     {
         dilation = dilation_vals;
+        return *this;
+    }
+
+    Conv_fprop_attributes& set_dilation(std::vector<int64_t>&& dilation_vals)
+    {
+        dilation = std::move(dilation_vals);
         return *this;
     }
 
@@ -174,10 +212,22 @@ private:
         return *this;
     }
 
+    Conv_fprop_attributes& set_input(input_names name, std::shared_ptr<Tensor_attributes>&& value)
+    {
+        inputs[name] = std::move(value);
+        return *this;
+    }
+
     Conv_fprop_attributes& set_output(output_names name,
                                       const std::shared_ptr<Tensor_attributes>& value)
     {
         outputs[name] = value;
+        return *this;
+    }
+
+    Conv_fprop_attributes& set_output(output_names name, std::shared_ptr<Tensor_attributes>&& value)
+    {
+        outputs[name] = std::move(value);
         return *this;
     }
 };

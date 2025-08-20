@@ -564,8 +564,8 @@ public:
         return out_0;
     }
 
-    std::shared_ptr<Tensor_attributes> conv_fprop(const std::shared_ptr<Tensor_attributes>& x,
-                                                  const std::shared_ptr<Tensor_attributes>& w,
+    std::shared_ptr<Tensor_attributes> conv_fprop(std::shared_ptr<Tensor_attributes> x,
+                                                  std::shared_ptr<Tensor_attributes> w,
                                                   Conv_fprop_attributes attributes)
     {
         if(attributes.name.empty())
@@ -583,8 +583,8 @@ public:
 
         auto y = output_tensor(attributes.name + "::Y");
 
-        attributes.set_x(x);
-        attributes.set_w(w);
+        attributes.set_x(std::move(x));
+        attributes.set_w(std::move(w));
         attributes.set_y(y);
 
         _sub_nodes.emplace_back(
