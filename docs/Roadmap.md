@@ -117,6 +117,49 @@ Plugins extend hipDNN's capabilities by providing computational implementations.
   - Implementing heuristic plugins (see [Design.md](./Design.md#high-level-architecture) for details)
   - Implementing tuning and benchmarking plugins (see [Design.md](./Design.md#high-level-architecture) for details)
 
+## Testing and Performance
+
+This section covers testing infrastructure improvements and performance benchmarking capabilities for hipDNN.
+
+### Performance/Benchmarking
+
+| Attribute | Details |
+|-----------|---------|
+| **Location** | Separate project for benchmarking full hipDNN install (TBD) |
+| **Purpose** | • Track performance of hipDNN & installed plugins across a broad set of graphs<br>• Track accuracy of hipDNN & installed plugins across a broad set of graphs |
+| **Note** | Each plugin will have integration tests for functionality that it supports. This suite will be the full integration set of shapes that runs across plugins. |
+
+#### Test Categories
+
+- **Quick Suite**: A quick running set of graphs to run per PR to flag severe regressions
+- **Full Suite**: A long running set of graphs to run on demand to flag broad regressions (probably run nightly or weekly)
+
+#### Requirements
+
+- Minimal set of graphs are maintained to be used as pre-checkin performance check
+- Full set of graphs are maintained to be used for on-demand performance & accuracy checks
+- Requires GPU
+- Validates correctness and performance of graphs
+
+#### Applicable Testing Environments
+
+- Windows & supported Linux distros
+- Test on all ASICs supported by hipDNN
+  - Note: Certain plugins/graphs may have ASIC restrictions
+
+### Testing Improvements
+
+#### Future Roadmap
+*The following testing improvements are planned but not yet scheduled:*
+
+- **Test Standardization**: Create standardized naming conventions for tests
+- **Documentation**: Document best practices, patterns, and requirements for new tests
+- **ASAN Integration**: Add ASAN as an automatic step to CI
+- **Golden Reference Data**: Add golden reference data to use for unit testing at plugin level & to verify reference implementations
+- **CI Platform**: Swap to leverage TheRock for CI
+- **Testing Artifacts**: Add installable testing artifacts
+- **Performance Project**: Create a benchmarking and performance project for capturing performance and accuracy for full hipDNN graphs
+
 ## Contributing to the Roadmap
 
 As an open-source project, hipDNN welcomes community input. Your feedback helps shape the future direction of the project.

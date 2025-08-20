@@ -1,11 +1,11 @@
 # hipDNN
 
 > [!CAUTION]
-> hipDNN is in the early stages of development. There is currently very limited or no functionality available to solve problems. See the [Operation Support documentation](./docs/OperationSupport.md) for currently supported operations.
+> hipDNN is in the early stages of development. There is currently very limited functionality available to solve problems. See the [Operation Support documentation](./docs/OperationSupport.md) for currently supported operations.
 
 ## Overview
 
-hipDNN is a graph-based deep learning library for AMD GPUs that leverages a flexible plugin architecture to provide optimized implementations and utilities for various deep learning operations. 
+hipDNN is a graph-based deep learning library for AMD GPUs that leverages a flexible plugin architecture to provide optimized implementations and utilities for various operations. 
 
 ---
 

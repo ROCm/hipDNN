@@ -26,7 +26,7 @@ Verify that all documentation is up to date:
 2. Review instructions, explanations, and wording for clarity and accuracy
 4. Verify changelog is complete and correct
 
-> See the [main README](../../README.md) table of contents to identify relevant areas of documentation
+> See the documentation listed in the [README](../../README.md#documentation) to identify relevant areas.
 
 ---
 

@@ -18,7 +18,7 @@ White box tests focus on internal implementation details of hipDNN components.
 | **Backend** | `backend/tests/` | Test internal implementation of hipDNN backend | Minimal/None - mark with `SKIP_IF_NO_DEVICE()` | Windows & Linux |
 | **Frontend** | `frontend/tests/` | Test internal implementation of hipDNN frontend | Minimal/None - mark with `SKIP_IF_NO_DEVICE()` | Windows & Linux |
 | **SDK** | `sdk/tests/` | Test internal implementation of hipDNN SDK | Minimal/None expected | Windows & Linux |
-| **Plugin** | `plugins/<name>/tests/` | Test internal implementation of specific plugin | Minimal & fast - skippable if CPU only | Windows & Linux |
+| **Plugin** | `plugins/<name>/tests/` | Test internal implementation of specific plugin | Minimal & fast - mark with `SKIP_IF_NO_DEVICE()` | Windows & Linux |
 
 ---
 
@@ -43,6 +43,7 @@ White box tests focus on internal implementation details of hipDNN components.
 - Data objects
 - Logging
 - Utilities
+- Reference implementations
 
 #### Plugin
 - TBD based on plugin implementation
@@ -91,17 +92,17 @@ Integration tests validate end-to-end functionality across components.
 
 ### Integration Test Comparison
 
-| Test Type | Location | Purpose | GPU Required | Test Speed |
-|-----------|----------|---------|--------------|------------|
-| **Frontend-Backend** | `tests/frontend/` | Validate end-to-end hipDNN functionality | No - mark GPU ops with `SKIP_IF_NO_DEVICE()` | Fast |
-| **Plugin Integration** | `plugins/<name>/integration_tests/` | Validate end-to-end graph support for plugin | Yes - required for validation | Can be slower |
+| Test Type | Location | Purpose | GPU Required | Test Speed | Environments |
+|-----------|----------|---------|--------------|------------|--------------|
+| **Frontend-Backend** | `tests/frontend/` | Validate end-to-end hipDNN functionality | No - mark GPU ops with `SKIP_IF_NO_DEVICE()` | Fast | Windows & Linux |
+| **Plugin Integration** | `plugins/<name>/integration_tests/` | Validate end-to-end graph support for plugin | Yes - required for validation | Can be slower | Windows & Linux |
 
 ### Test Requirements by Type
 
 | Test Type | Key Requirements |
 |-----------|-----------------|
 | **Frontend-Backend** | • Use fake plugins for controlled behavior<br>• No accuracy/solution validation (stubbed)<br>• Test graph creation & execution API<br>• Test backend descriptor creation from frontend<br>• Test execution flow validation |
-| **Plugin Integration** | • Validate correctness and graph support<br>• Each plugin maintains its own test suite<br>• Test on all ASICs supported by the plugin<br>• Can include performance validation |
+| **Plugin Integration** | • Validate correctness and graph support<br>• Each plugin maintains its own test suite<br>• Test on all ASICs supported by the plugin |
 
 ---
 
@@ -121,8 +122,13 @@ Tests must work in the following environments:
 | **CLI Build Environment** | `make check`, `ninja check`, `make check_ctest`, `ninja check_ctest` |
 | **IDE** | Visual Studio Code and extensions like TestMate |
 | **Artifacts** | • Installed testing artifacts<br>• Running built test executables |
+| **Operating System** | • Windows<br>• Supported Linux distros |
 
 ### GPU Requirements
 - **Without GPU**: All GPU tests must be skippable (warnings, not errors)
 - **With GPU**: Tests should detect and utilize available GPU resources
 - **Platform Support**: Windows & supported Linux distributions
+
+## 4. Performance Testing
+
+See the [Roadmap](../Roadmap.md#testing-and-performance) for status of the upcoming performance benchmarking project, which will track performance of hipDNN and installed plugins across a broad set of graphs.
