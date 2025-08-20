@@ -47,13 +47,6 @@ public:
 
         size_t element_count = reference.count();
 
-        hipError_t error = hipDeviceSynchronize();
-        if(error != hipSuccess)
-        {
-            HIPDNN_LOG_ERROR("Error synchronizing stream: {}", hipGetErrorString(error));
-            return false;
-        }
-
         const T* ref_data = reference.host_data(stream);
         const T* impl_data = implementation.host_data(stream);
 

@@ -115,23 +115,45 @@ public:
         return static_cast<T*>(_host_ptr);
     }
 
+    T* host_data_async(hipStream_t stream = nullptr)
+    {
+        ensure_host_valid(stream, true);
+        return static_cast<T*>(_host_ptr);
+    }
+
     const T* host_data(hipStream_t stream = nullptr) const
     {
         const_cast<Migratable_memory*>(this)->ensure_host_valid(stream);
         return static_cast<T*>(_host_ptr);
     }
 
-    // Get device pointer (migrates if needed)
+    const T* host_data_async(hipStream_t stream = nullptr) const
+    {
+        const_cast<Migratable_memory*>(this)->ensure_host_valid(stream, true);
+        return static_cast<T*>(_host_ptr);
+    }
+
     void* device_data(hipStream_t stream = nullptr)
     {
         ensure_device_valid(stream);
         return static_cast<T*>(_device_ptr);
     }
 
-    // Get const device pointer (migrates if needed)
+    void* device_data_async(hipStream_t stream = nullptr)
+    {
+        ensure_device_valid(stream, true);
+        return static_cast<T*>(_device_ptr);
+    }
+
     void* device_data(hipStream_t stream = nullptr) const
     {
         const_cast<Migratable_memory*>(this)->ensure_device_valid(stream);
+        return static_cast<T*>(_device_ptr);
+    }
+
+    void* device_data_async(hipStream_t stream = nullptr) const
+    {
+        const_cast<Migratable_memory*>(this)->ensure_device_valid(stream, true);
         return static_cast<T*>(_device_ptr);
     }
 
@@ -220,7 +242,7 @@ private:
         }
     }
 
-    void ensure_host_valid(hipStream_t stream = nullptr)
+    void ensure_host_valid(hipStream_t stream = nullptr, bool async = false)
     {
         if(_count == 0)
         {
@@ -231,15 +253,26 @@ private:
 
         if(!_host_valid && _device_valid && (_device_ptr != nullptr))
         {
-            throw_on_error(
-                hipMemcpyAsync(_host_ptr, _device_ptr, _total_size, hipMemcpyDeviceToHost, stream),
-                "Failed to copy from device to host");
+            if(async)
+            {
+                throw_on_error(
+                    hipMemcpyAsync(
+                        _host_ptr, _device_ptr, _total_size, hipMemcpyDeviceToHost, stream),
+                    "Failed to copy from device to host");
+            }
+            else
+            {
+                throw_on_error(
+                    hipMemcpyWithStream(
+                        _host_ptr, _device_ptr, _total_size, hipMemcpyDeviceToHost, stream),
+                    "Failed to copy from device to host");
+            }
             _host_valid = true;
             _current_location = Memory_location::BOTH;
         }
     }
 
-    void ensure_device_valid(hipStream_t stream = nullptr)
+    void ensure_device_valid(hipStream_t stream = nullptr, bool async = false)
     {
         if(_count == 0)
         {
@@ -250,9 +283,20 @@ private:
 
         if(!_device_valid && _host_valid && (_host_ptr != nullptr))
         {
-            throw_on_error(
-                hipMemcpyAsync(_device_ptr, _host_ptr, _total_size, hipMemcpyHostToDevice, stream),
-                "Failed to copy from host to device");
+            if(async)
+            {
+                throw_on_error(
+                    hipMemcpyAsync(
+                        _device_ptr, _host_ptr, _total_size, hipMemcpyHostToDevice, stream),
+                    "Failed to copy from host to device");
+            }
+            else
+            {
+                throw_on_error(
+                    hipMemcpyWithStream(
+                        _device_ptr, _host_ptr, _total_size, hipMemcpyHostToDevice, stream),
+                    "Failed to copy from host to device");
+            }
             _device_valid = true;
             _current_location = Memory_location::BOTH;
         }
