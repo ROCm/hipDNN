@@ -3,6 +3,7 @@
 #pragma once
 
 #include <hipdnn_backend_heuristic_type.h>
+#include <hipdnn_sdk/data_objects/convolution_fwd_attributes_generated.h>
 #include <hipdnn_sdk/data_objects/data_types_generated.h>
 #include <hipdnn_sdk/data_objects/pointwise_attributes_generated.h>
 #include <hipdnn_sdk/utilities/half_utils.hpp>
@@ -10,6 +11,13 @@
 
 namespace hipdnn_frontend
 {
+
+enum class ConvolutionMode_t
+{
+    NOT_SET = 0,
+    CROSS_CORRELATION = 1,
+    CONVOLUTION = 2
+};
 
 enum class PointwiseMode_t
 {
@@ -63,6 +71,20 @@ DataType_t get_data_type_enum_from_type()
     else
     {
         return DataType_t::NOT_SET;
+    }
+}
+
+[[maybe_unused]] static hipdnn_sdk::data_objects::ConvMode
+    to_sdk_type(const ConvolutionMode_t& type)
+{
+    switch(type)
+    {
+    case ConvolutionMode_t::CROSS_CORRELATION:
+        return hipdnn_sdk::data_objects::ConvMode::ConvMode_CROSS_CORRELATION;
+    case ConvolutionMode_t::CONVOLUTION:
+        return hipdnn_sdk::data_objects::ConvMode::ConvMode_CONVOLUTION;
+    default:
+        return hipdnn_sdk::data_objects::ConvMode::ConvMode_UNSET;
     }
 }
 
