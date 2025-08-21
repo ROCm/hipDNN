@@ -1,8 +1,8 @@
 // Copyright © Advanced Micro Devices, Inc., or its affiliates.
 // SPDX-License-Identifier:  MIT
 
-#include "hipdnn_engine_plugin_handle.hpp"
 #include "miopen_batchnorm_bwd_plan.hpp"
+#include "hipdnn_engine_plugin_handle.hpp"
 #include "miopen_tensor.hpp"
 
 namespace miopen_legacy_plugin
@@ -50,14 +50,12 @@ const Miopen_tensor& Batchnorm_bwd_params::dbias() const
     return *_dbias;
 }
 
-const std::optional<std::unique_ptr<Miopen_tensor>>&
-    Batchnorm_bwd_params::opt_mean() const
+const std::optional<std::unique_ptr<Miopen_tensor>>& Batchnorm_bwd_params::opt_mean() const
 {
     return _opt_mean;
 }
 
-const std::optional<std::unique_ptr<Miopen_tensor>>&
-    Batchnorm_bwd_params::opt_inv_variance() const
+const std::optional<std::unique_ptr<Miopen_tensor>>& Batchnorm_bwd_params::opt_inv_variance() const
 {
     return _opt_inv_variance;
 }
@@ -95,19 +93,16 @@ void Batchnorm_bwd_params::initialize_tensors(
 
     if(attributes.mean_tensor_uid().has_value())
     {
-        _opt_mean
-            = create_tensor(tensor_map, attributes.mean_tensor_uid().value());
+        _opt_mean = create_tensor(tensor_map, attributes.mean_tensor_uid().value());
     }
 
     if(attributes.inv_variance_tensor_uid().has_value())
     {
-        _opt_inv_variance
-            = create_tensor(tensor_map, attributes.inv_variance_tensor_uid().value());
+        _opt_inv_variance = create_tensor(tensor_map, attributes.inv_variance_tensor_uid().value());
     }
 }
 
-Batchnorm_bwd_plan::Batchnorm_bwd_plan(
-    std::unique_ptr<Batchnorm_bwd_params> params)
+Batchnorm_bwd_plan::Batchnorm_bwd_plan(std::unique_ptr<Batchnorm_bwd_params> params)
     : _params(std::move(params))
 {
 }
@@ -125,12 +120,12 @@ void Batchnorm_bwd_plan::execute(const hipdnnEnginePluginHandle& handle,
     float beta_param_diff = 0.0f;
     double epsilon = 1e-3;
 
-    auto x_buffer = miopen_utils::find_device_buffer(
-        _params->x().uid(), device_buffers, num_device_buffers);
-    auto dy_buffer = miopen_utils::find_device_buffer(
-        _params->dy().uid(), device_buffers, num_device_buffers);
-    auto dx_buffer = miopen_utils::find_device_buffer(
-        _params->dx().uid(), device_buffers, num_device_buffers);
+    auto x_buffer
+        = miopen_utils::find_device_buffer(_params->x().uid(), device_buffers, num_device_buffers);
+    auto dy_buffer
+        = miopen_utils::find_device_buffer(_params->dy().uid(), device_buffers, num_device_buffers);
+    auto dx_buffer
+        = miopen_utils::find_device_buffer(_params->dx().uid(), device_buffers, num_device_buffers);
     auto scale_buffer = miopen_utils::find_device_buffer(
         _params->scale().uid(), device_buffers, num_device_buffers);
     auto dscale_buffer = miopen_utils::find_device_buffer(
@@ -167,9 +162,8 @@ void Batchnorm_bwd_plan::execute(const hipdnnEnginePluginHandle& handle,
         dx_buffer.ptr,
         _params->scale().tensor_descriptor(),
         _params->scale().tensor_descriptor(),
-        _params->opt_mean().has_value()
-            ? _params->opt_mean().value()->tensor_descriptor()
-            : nullptr,
+        _params->opt_mean().has_value() ? _params->opt_mean().value()->tensor_descriptor()
+                                        : nullptr,
         _params->opt_inv_variance().has_value()
             ? _params->opt_inv_variance().value()->tensor_descriptor()
             : nullptr,
