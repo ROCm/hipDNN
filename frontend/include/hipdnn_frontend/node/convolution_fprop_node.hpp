@@ -98,6 +98,15 @@ public:
                             "ConvolutionNode: Input tensor channels must match weight tensor input "
                             "channels or be divisible by them for grouped convolution");
 
+        // For grouped convolution: x_dims[1] / w_dims[1] is group count.
+        // Output channels must be divisible by group count.
+        auto group_count = x_dims[1] / w_dims[1];
+        HIPDNN_RETURN_IF_NE(w_dims[0] % group_count,
+                            0,
+                            error_code_t::INVALID_VALUE,
+                            "ConvolutionNode: Weight tensor output channels must be divisible by "
+                            "the number of groups");
+
         // Validate output tensor dimensions and strides if they are set
         auto& y_dims = y->get_dim();
         auto& y_strides = y->get_stride();

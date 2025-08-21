@@ -2419,3 +2419,32 @@ TEST(ConvolutionFwdNodeTests, PreValidateNodeNegativeOutputStride)
     auto error = node.pre_validate_node();
     EXPECT_EQ(error.code, error_code_t::INVALID_VALUE);
 }
+
+TEST(ConvolutionFwdNodeTests, PreValidateGroupedConvInvalidOutputChannels)
+{
+    Conv_fprop_attributes conv_attributes;
+
+    auto x_tensor = std::make_shared<Tensor_attributes>();
+    x_tensor->set_dim({1, 64, 32, 32}); // 64 input channels
+    x_tensor->set_stride({65536, 1024, 32, 1});
+    conv_attributes.set_x(x_tensor);
+
+    auto w_tensor = std::make_shared<Tensor_attributes>();
+    w_tensor->set_dim({63, 32, 3, 3}); // 32 input channels per group, 2 groups, 63 output channels
+    w_tensor->set_stride({288, 9, 3, 1});
+    conv_attributes.set_w(w_tensor);
+
+    auto y_tensor = std::make_shared<Tensor_attributes>();
+    conv_attributes.set_y(y_tensor);
+
+    conv_attributes.set_pre_padding({1, 1});
+    conv_attributes.set_post_padding({1, 1});
+    conv_attributes.set_stride({1, 1});
+    conv_attributes.set_dilation({1, 1});
+
+    Graph_attributes graph_attributes;
+    ConvolutionNode node(std::move(conv_attributes), graph_attributes);
+
+    auto error = node.pre_validate_node();
+    EXPECT_EQ(error.code, error_code_t::INVALID_VALUE);
+}
