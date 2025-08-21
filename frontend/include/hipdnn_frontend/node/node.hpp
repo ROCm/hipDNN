@@ -59,13 +59,13 @@ protected:
 
     error_t validate_subtree()
     {
-        CHECK_HIPDNN_ERROR(pre_validate_node());
-        CHECK_HIPDNN_ERROR(infer_properties_node());
+        HIPDNN_CHECK_ERROR(pre_validate_node());
+        HIPDNN_CHECK_ERROR(infer_properties_node());
         for(const auto& node : _sub_nodes)
         {
-            CHECK_HIPDNN_ERROR(node->validate_subtree());
+            HIPDNN_CHECK_ERROR(node->validate_subtree());
         }
-        CHECK_HIPDNN_ERROR(post_validate_node());
+        HIPDNN_CHECK_ERROR(post_validate_node());
         return {};
     }
 
@@ -83,10 +83,10 @@ protected:
         int64_t& current_tensor_id,
         std::unordered_set<int64_t>& used_ids)
     {
-        CHECK_HIPDNN_ERROR(populate_hipdnn_tensor_ids(tensor_lookup, current_tensor_id, used_ids));
+        HIPDNN_CHECK_ERROR(populate_hipdnn_tensor_ids(tensor_lookup, current_tensor_id, used_ids));
         for(const auto& node : _sub_nodes)
         {
-            CHECK_HIPDNN_ERROR(
+            HIPDNN_CHECK_ERROR(
                 node->populate_hipdnn_tensor_ids(tensor_lookup, current_tensor_id, used_ids));
         }
         return {};
