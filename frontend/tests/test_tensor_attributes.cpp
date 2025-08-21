@@ -144,7 +144,7 @@ TEST(TensorAttributesTests, ValidateDimsAndStridesSetAndPositiveEmptyDims)
 TEST(TensorAttributesTests, ValidateDimsAndStridesSetAndPositiveZeroDimension)
 {
     Tensor_attributes tensor;
-    tensor.set_dim({4, 0, 6});  // Zero in middle dimension
+    tensor.set_dim({4, 0, 6}); // Zero in middle dimension
     tensor.set_stride({0, 6, 1});
     EXPECT_FALSE(tensor.validate_dims_and_strides_set_and_positive());
 }
@@ -152,7 +152,7 @@ TEST(TensorAttributesTests, ValidateDimsAndStridesSetAndPositiveZeroDimension)
 TEST(TensorAttributesTests, ValidateDimsAndStridesSetAndPositiveNegativeDimension)
 {
     Tensor_attributes tensor;
-    tensor.set_dim({4, -5, 6});  // Negative dimension
+    tensor.set_dim({4, -5, 6}); // Negative dimension
     tensor.set_stride({30, 6, 1});
     EXPECT_FALSE(tensor.validate_dims_and_strides_set_and_positive());
 }
@@ -161,7 +161,7 @@ TEST(TensorAttributesTests, ValidateDimsAndStridesSetAndPositiveZeroStride)
 {
     Tensor_attributes tensor;
     tensor.set_dim({4, 5, 6});
-    tensor.set_stride({30, 0, 1});  // Zero stride
+    tensor.set_stride({30, 0, 1}); // Zero stride
     EXPECT_FALSE(tensor.validate_dims_and_strides_set_and_positive());
 }
 
@@ -169,7 +169,7 @@ TEST(TensorAttributesTests, ValidateDimsAndStridesSetAndPositiveNegativeStride)
 {
     Tensor_attributes tensor;
     tensor.set_dim({4, 5, 6});
-    tensor.set_stride({30, -6, 1});  // Negative stride
+    tensor.set_stride({30, -6, 1}); // Negative stride
     EXPECT_FALSE(tensor.validate_dims_and_strides_set_and_positive());
 }
 
@@ -177,7 +177,7 @@ TEST(TensorAttributesTests, ValidateDimsAndStridesSetAndPositiveStrideSizeMismat
 {
     Tensor_attributes tensor;
     tensor.set_dim({4, 5, 6});
-    tensor.set_stride({30, 6});  // Only 2 strides for 3 dimensions
+    tensor.set_stride({30, 6}); // Only 2 strides for 3 dimensions
     EXPECT_FALSE(tensor.validate_dims_and_strides_set_and_positive());
 }
 
@@ -185,7 +185,7 @@ TEST(TensorAttributesTests, ValidateDimsAndStridesSetAndPositiveMoreStridesThanD
 {
     Tensor_attributes tensor;
     tensor.set_dim({4, 5});
-    tensor.set_stride({20, 5, 1});  // 3 strides for 2 dimensions
+    tensor.set_stride({20, 5, 1}); // 3 strides for 2 dimensions
     EXPECT_FALSE(tensor.validate_dims_and_strides_set_and_positive());
 }
 
@@ -208,8 +208,8 @@ TEST(TensorAttributesTests, ValidateDimsAndStridesSetAndPositiveAllNegativeDims)
 TEST(TensorAttributesTests, ValidateDimsAndStridesSetAndPositiveMixedInvalidValues)
 {
     Tensor_attributes tensor;
-    tensor.set_dim({4, 0, -6});  // Mix of valid, zero, and negative
-    tensor.set_stride({0, -6, 1});  // Mix of zero, negative, and valid
+    tensor.set_dim({4, 0, -6}); // Mix of valid, zero, and negative
+    tensor.set_stride({0, -6, 1}); // Mix of zero, negative, and valid
     EXPECT_FALSE(tensor.validate_dims_and_strides_set_and_positive());
 }
 
@@ -262,14 +262,14 @@ TEST(TensorAttributesTests, ValidateDimsSetAndPositiveEmptyDims)
 TEST(TensorAttributesTests, ValidateDimsSetAndPositiveZeroDimension)
 {
     Tensor_attributes tensor;
-    tensor.set_dim({4, 0, 6});  // Zero in middle dimension
+    tensor.set_dim({4, 0, 6}); // Zero in middle dimension
     EXPECT_FALSE(tensor.validate_dims_set_and_positive());
 }
 
 TEST(TensorAttributesTests, ValidateDimsSetAndPositiveNegativeDimension)
 {
     Tensor_attributes tensor;
-    tensor.set_dim({4, -5, 6});  // Negative dimension
+    tensor.set_dim({4, -5, 6}); // Negative dimension
     EXPECT_FALSE(tensor.validate_dims_set_and_positive());
 }
 
@@ -290,7 +290,7 @@ TEST(TensorAttributesTests, ValidateDimsSetAndPositiveAllNegativeDims)
 TEST(TensorAttributesTests, ValidateDimsSetAndPositiveMixedInvalidValues)
 {
     Tensor_attributes tensor;
-    tensor.set_dim({4, 0, -6});  // Mix of valid, zero, and negative
+    tensor.set_dim({4, 0, -6}); // Mix of valid, zero, and negative
     EXPECT_FALSE(tensor.validate_dims_set_and_positive());
 }
 
@@ -326,6 +326,6 @@ TEST(TensorAttributesTests, ValidateDimsSetAndPositiveWithStridesIgnored)
 {
     Tensor_attributes tensor;
     tensor.set_dim({4, 5, 6});
-    tensor.set_stride({0, -1, 2});  // Invalid strides should be ignored
+    tensor.set_stride({0, -1, 2}); // Invalid strides should be ignored
     EXPECT_TRUE(tensor.validate_dims_set_and_positive());
 }

@@ -1401,8 +1401,7 @@ TEST(ConvolutionFwdNodeTests, InferPropertiesGroupedConv2Groups)
     conv_attributes.set_x(x_tensor);
 
     auto w_tensor = std::make_shared<Tensor_attributes>();
-    w_tensor->set_dim(
-        {128, 32, 3, 3}); // 32 input channels per group, 128 output channels
+    w_tensor->set_dim({128, 32, 3, 3}); // 32 input channels per group, 128 output channels
     conv_attributes.set_w(w_tensor);
 
     auto y_tensor = std::make_shared<Tensor_attributes>();
@@ -1422,10 +1421,10 @@ TEST(ConvolutionFwdNodeTests, InferPropertiesGroupedConv2Groups)
     // Check inferred dimensions
     auto inferred_dims = y_tensor->get_dim();
     EXPECT_EQ(inferred_dims.size(), 4);
-    EXPECT_EQ(inferred_dims[0], 1);   // Batch size
+    EXPECT_EQ(inferred_dims[0], 1); // Batch size
     EXPECT_EQ(inferred_dims[1], 128); // Output channels
-    EXPECT_EQ(inferred_dims[2], 32);  // Height
-    EXPECT_EQ(inferred_dims[3], 32);  // Width
+    EXPECT_EQ(inferred_dims[2], 32); // Height
+    EXPECT_EQ(inferred_dims[3], 32); // Width
 
     // Check inferred strides
     auto inferred_strides = y_tensor->get_stride();

@@ -78,7 +78,6 @@ typedef struct error_object // NOLINT
     }
 } error_t;
 
-
 #define RETURN_IF_NE(x, y, error_status, message) \
     if(x != y)                                    \
     {                                             \
@@ -91,10 +90,10 @@ typedef struct error_object // NOLINT
         return {error_status, message};           \
     }
 
-#define RETURN_IF_TRUE(x, error_status, message)  \
-    if(x)                                         \
-    {                                             \
-        return {error_status, message};           \
+#define RETURN_IF_TRUE(x, error_status, message) \
+    if(x)                                        \
+    {                                            \
+        return {error_status, message};          \
     }
 
 #define RETURN_IF_FALSE(x, error_status, message) \
@@ -103,10 +102,10 @@ typedef struct error_object // NOLINT
         return {error_status, message};           \
     }
 
-#define RETURN_IF_NULL(x, error_status, message)  \
-    if(x == nullptr)                              \
-    {                                             \
-        return {error_status, message};           \
+#define RETURN_IF_NULL(x, error_status, message) \
+    if(x == nullptr)                             \
+    {                                            \
+        return {error_status, message};          \
     }
 
 #define RETURN_IF_LT(x, y, error_status, message) \
