@@ -34,7 +34,7 @@ inline std::ostream& operator<<(std::ostream& os, const Tensor_layout& layout)
 }
 
 // Wraps vectors of dims/strides and Migratable_memory<T> to provide a common interface for testing
-template <class T>
+template <class T, class HostAlloc = Host_allocator<T>, class DeviceAlloc = Device_allocator<T>>
 class Tensor
 {
 public:
@@ -132,7 +132,7 @@ private:
             std::accumulate(dims.begin(), dims.end(), 1, std::multiplies<>()));
     }
 
-    Migratable_memory<T> _memory;
+    Migratable_memory<T, HostAlloc, DeviceAlloc> _memory;
     std::vector<int64_t> _dims;
     std::vector<int64_t> _strides;
 };

@@ -63,6 +63,8 @@ public:
         , _current_location(other._current_location)
         , _host_valid(other._host_valid)
         , _device_valid(other._device_valid)
+        , _host_allocator(std::move(other._host_allocator))
+        , _device_allocator(std::move(other._device_allocator))
     {
         other._host_ptr = nullptr;
         other._device_ptr = nullptr;
@@ -87,6 +89,8 @@ public:
             _current_location = other._current_location;
             _host_valid = other._host_valid;
             _device_valid = other._device_valid;
+            _device_allocator = std::move(other._device_allocator);
+            _host_allocator = std::move(other._host_allocator);
 
             other._host_ptr = nullptr;
             other._device_ptr = nullptr;
