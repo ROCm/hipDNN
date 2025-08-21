@@ -6,16 +6,10 @@
 #include <memory>
 #include <optional>
 
-#include "plan_interface.hpp"
+#include <hipdnn_sdk/data_objects/batchnorm_backward_attributes_generated.h>
+#include <hipdnn_sdk/data_objects/tensor_attributes_generated.h>
 
-namespace hipdnn_sdk
-{
-namespace data_objects
-{
-struct BatchnormBackwardAttributes;
-struct TensorAttributes;
-}
-}
+#include "plan_interface.hpp"
 
 namespace miopen_legacy_plugin
 {
