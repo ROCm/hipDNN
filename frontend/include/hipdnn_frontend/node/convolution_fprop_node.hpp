@@ -55,32 +55,23 @@ public:
 
         // Validate input tensor dimensions and strides
         auto& x_dims = x->get_dim();
-        auto& x_strides = x->get_stride();
 
-        RETURN_IF_TRUE(x_dims.empty(), error_code_t::INVALID_VALUE,
-                       "ConvolutionNode: Input tensor must have dimensions set");
+        RETURN_IF_FALSE(x->validate_dims_and_strides_set_and_positive(),
+                        error_code_t::INVALID_VALUE,
+                        "ConvolutionNode: Input tensor dimensions and strides must be set and positive");
 
         RETURN_IF_LT(x_dims.size(), 3, error_code_t::INVALID_VALUE,
                      "ConvolutionNode: Input tensor must have at least 3 dimensions (N, C, spatial)");
 
-        RETURN_IF_NE(x_strides.size(), x_dims.size(), error_code_t::INVALID_VALUE,
-                     "ConvolutionNode: Input tensor stride count must match dimension count");
-
-        // Validate weight tensor dimensions
+        // Validate weight tensor dimensions and strides
         auto& w_dims = w->get_dim();
-        auto& w_strides = w->get_stride();
 
-        RETURN_IF_TRUE(w_dims.empty(), error_code_t::INVALID_VALUE,
-                       "ConvolutionNode: Weight tensor must have dimensions set");
+        RETURN_IF_FALSE(w->validate_dims_and_strides_set_and_positive(),
+                        error_code_t::INVALID_VALUE,
+                        "ConvolutionNode: Weight tensor dimensions and strides must be set and positive");
 
         RETURN_IF_NE(w_dims.size(), x_dims.size(), error_code_t::INVALID_VALUE,
                      "ConvolutionNode: Weight tensor dimension count must match input tensor dimension count");
-
-        RETURN_IF_NE(w_strides.size(), w_dims.size(), error_code_t::INVALID_VALUE,
-                     "ConvolutionNode: Weight tensor stride count must match dimension count");
-
-        RETURN_IF_EQ(w_dims[1], 0, error_code_t::INVALID_VALUE,
-                     "ConvolutionNode: Weight tensor input channels must be greater than 0");
                      
         // Validate input channels match between input and weight tensors
         // For regular convolution: x_dims[1] == w_dims[1]
@@ -104,16 +95,19 @@ public:
             // Validate output channels match weight output channels
             RETURN_IF_NE(y_dims[1], w_dims[0], error_code_t::INVALID_VALUE,
                          "ConvolutionNode: Output tensor channels must match weight tensor output channels");
+
+            RETURN_IF_FALSE(y->validate_dims_set_and_positive(),
+                            error_code_t::INVALID_VALUE,
+                            "ConvolutionNode: Output tensor dimensions must be set and positive");
         }
 
         if(!y_strides.empty())
         {
-            RETURN_IF_TRUE(y_dims.empty(), error_code_t::INVALID_VALUE,
-                           "ConvolutionNode: Output tensor strides cannot be set without dimensions");
-
-            RETURN_IF_NE(y_strides.size(), y_dims.size(), error_code_t::INVALID_VALUE,
-                         "ConvolutionNode: Output tensor stride count must match dimension count");
+            RETURN_IF_FALSE(y->validate_dims_and_strides_set_and_positive(),
+                            error_code_t::INVALID_VALUE,
+                            "ConvolutionNode: Output tensor dimensions and strides must be set and positive");
         }
+
 
         // Validate spatial parameter counts match spatial dimensions
         auto spatial_dims = x_dims.size() - 2; // Skip N and C dimensions

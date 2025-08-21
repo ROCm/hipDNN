@@ -1047,7 +1047,6 @@ TEST(ConvolutionFwdNodeTests, StrideInference3DConvolutionWithDilation)
     EXPECT_EQ(inferred_dims.size(), 5);
     EXPECT_EQ(inferred_dims[0], 1); // Batch size
     EXPECT_EQ(inferred_dims[1], 64); // Output channels
-    // Effective kernel size in depth with dilation: (3-1)*2 + 1 = 5
     EXPECT_EQ(inferred_dims[2], 14); // Depth: (16 + 1 + 1 - 5) / 1 + 1 = 14
     EXPECT_EQ(inferred_dims[3], 16); // Height: (16 + 1 + 1 - 3) / 1 + 1 = 16
     EXPECT_EQ(inferred_dims[4], 16); // Width: (16 + 1 + 1 - 3) / 1 + 1 = 16
@@ -1536,7 +1535,7 @@ TEST(ConvolutionFwdNodeTests, InferPropertiesGroupedConvNHWCLayout)
 
     auto w_tensor = std::make_shared<Tensor_attributes>();
     w_tensor->set_dim({128, 16, 28, 28}); // 16 input channels per group (4 groups)
-    w_tensor->set_stride({12544, 1, 448, 16}); // NHWC strides
+    w_tensor->set_stride({12544, 1, 448, 16}); // NHWC strides for weights
     conv_attributes.set_w(w_tensor);
 
     auto y_tensor = std::make_shared<Tensor_attributes>();
@@ -1611,9 +1610,9 @@ TEST(ConvolutionFwdNodeTests, InferPropertiesGroupedConv3D)
     EXPECT_EQ(inferred_strides.size(), 5);
     EXPECT_EQ(inferred_strides[0], 196608); // N stride: 96 * 8 * 16 * 16
     EXPECT_EQ(inferred_strides[1], 2048); // C stride: 8 * 16 * 16
-    EXPECT_EQ(inferred_strides[2], 256); // D stride: 16 * 16
-    EXPECT_EQ(inferred_strides[3], 16); // H stride
-    EXPECT_EQ(inferred_strides[4], 1); // W stride
+    EXPECT_EQ(inferred_strides[2], 256); // D stride: 16 * 16 = 256
+    EXPECT_EQ(inferred_strides[3], 16); // H stride: 16
+    EXPECT_EQ(inferred_strides[4], 1); // W stride: 1
 }
 
 TEST(ConvolutionFwdNodeTests, InferPropertiesGroupedConv3DNHWCLayout)
@@ -1824,7 +1823,7 @@ TEST(ConvolutionFwdNodeTests, InferPropertiesNodeNegativePostPaddingValues)
     conv_attributes.set_y(y_tensor);
 
     conv_attributes.set_pre_padding({1, 1});
-    conv_attributes.set_post_padding({1, -1}); // Negative post-padding in second dimension
+    conv_attributes.set_post_padding({1, -2}); // Negative post-padding
     conv_attributes.set_stride({1, 1});
     conv_attributes.set_dilation({1, 1});
 
@@ -2037,4 +2036,387 @@ TEST(ConvolutionFwdNodeTests, PreValidateNodeBoundaryValueZeroPadding)
 
     auto error = node.pre_validate_node();
     EXPECT_EQ(error.code, error_code_t::OK) << error.err_msg;
+}
+
+TEST(ConvolutionFwdNodeTests, PreValidateNodeZeroInputDimension)
+{
+    Conv_fprop_attributes conv_attributes;
+
+    auto x_tensor = std::make_shared<Tensor_attributes>();
+    x_tensor->set_dim({1, 0, 32, 32}); // Zero channel dimension
+    x_tensor->set_stride({0, 1024, 32, 1});
+    conv_attributes.set_x(x_tensor);
+
+    auto w_tensor = std::make_shared<Tensor_attributes>();
+    w_tensor->set_dim({64, 3, 3, 3});
+    w_tensor->set_stride({27, 9, 3, 1});
+    conv_attributes.set_w(w_tensor);
+
+    auto y_tensor = std::make_shared<Tensor_attributes>();
+    conv_attributes.set_y(y_tensor);
+
+    conv_attributes.set_pre_padding({1, 1});
+    conv_attributes.set_post_padding({1, 1});
+    conv_attributes.set_stride({1, 1});
+    conv_attributes.set_dilation({1, 1});
+
+    Graph_attributes graph_attributes;
+    ConvolutionNode node(std::move(conv_attributes), graph_attributes);
+
+    auto error = node.pre_validate_node();
+    EXPECT_EQ(error.code, error_code_t::INVALID_VALUE);
+}
+
+TEST(ConvolutionFwdNodeTests, PreValidateNodeNegativeInputDimension)
+{
+    Conv_fprop_attributes conv_attributes;
+
+    auto x_tensor = std::make_shared<Tensor_attributes>();
+    x_tensor->set_dim({1, 3, -32, 32}); // Negative height dimension
+    x_tensor->set_stride({3072, 1024, 32, 1});
+    conv_attributes.set_x(x_tensor);
+
+    auto w_tensor = std::make_shared<Tensor_attributes>();
+    w_tensor->set_dim({64, 3, 3, 3});
+    w_tensor->set_stride({27, 9, 3, 1});
+    conv_attributes.set_w(w_tensor);
+
+    auto y_tensor = std::make_shared<Tensor_attributes>();
+    conv_attributes.set_y(y_tensor);
+
+    conv_attributes.set_pre_padding({1, 1});
+    conv_attributes.set_post_padding({1, 1});
+    conv_attributes.set_stride({1, 1});
+    conv_attributes.set_dilation({1, 1});
+
+    Graph_attributes graph_attributes;
+    ConvolutionNode node(std::move(conv_attributes), graph_attributes);
+
+    auto error = node.pre_validate_node();
+    EXPECT_EQ(error.code, error_code_t::INVALID_VALUE);
+}
+
+TEST(ConvolutionFwdNodeTests, PreValidateNodeZeroInputStride)
+{
+    Conv_fprop_attributes conv_attributes;
+
+    auto x_tensor = std::make_shared<Tensor_attributes>();
+    x_tensor->set_dim({1, 3, 32, 32});
+    x_tensor->set_stride({3072, 0, 32, 1}); // Zero stride for channel dimension
+    conv_attributes.set_x(x_tensor);
+
+    auto w_tensor = std::make_shared<Tensor_attributes>();
+    w_tensor->set_dim({64, 3, 3, 3});
+    w_tensor->set_stride({27, 9, 3, 1});
+    conv_attributes.set_w(w_tensor);
+
+    auto y_tensor = std::make_shared<Tensor_attributes>();
+    conv_attributes.set_y(y_tensor);
+
+    conv_attributes.set_pre_padding({1, 1});
+    conv_attributes.set_post_padding({1, 1});
+    conv_attributes.set_stride({1, 1});
+    conv_attributes.set_dilation({1, 1});
+
+    Graph_attributes graph_attributes;
+    ConvolutionNode node(std::move(conv_attributes), graph_attributes);
+
+    auto error = node.pre_validate_node();
+    EXPECT_EQ(error.code, error_code_t::INVALID_VALUE);
+}
+
+TEST(ConvolutionFwdNodeTests, PreValidateNodeNegativeInputStride)
+{
+    Conv_fprop_attributes conv_attributes;
+
+    auto x_tensor = std::make_shared<Tensor_attributes>();
+    x_tensor->set_dim({1, 3, 32, 32});
+    x_tensor->set_stride({3072, 1024, -32, 1}); // Negative stride
+    conv_attributes.set_x(x_tensor);
+
+    auto w_tensor = std::make_shared<Tensor_attributes>();
+    w_tensor->set_dim({64, 3, 3, 3});
+    w_tensor->set_stride({27, 9, 3, 1});
+    conv_attributes.set_w(w_tensor);
+
+    auto y_tensor = std::make_shared<Tensor_attributes>();
+    conv_attributes.set_y(y_tensor);
+
+    conv_attributes.set_pre_padding({1, 1});
+    conv_attributes.set_post_padding({1, 1});
+    conv_attributes.set_stride({1, 1});
+    conv_attributes.set_dilation({1, 1});
+
+    Graph_attributes graph_attributes;
+    ConvolutionNode node(std::move(conv_attributes), graph_attributes);
+
+    auto error = node.pre_validate_node();
+    EXPECT_EQ(error.code, error_code_t::INVALID_VALUE);
+}
+
+TEST(ConvolutionFwdNodeTests, PreValidateNodeZeroWeightDimension)
+{
+    Conv_fprop_attributes conv_attributes;
+
+    auto x_tensor = std::make_shared<Tensor_attributes>();
+    x_tensor->set_dim({1, 3, 32, 32});
+    x_tensor->set_stride({3072, 1024, 32, 1});
+    conv_attributes.set_x(x_tensor);
+
+    auto w_tensor = std::make_shared<Tensor_attributes>();
+    w_tensor->set_dim({0, 3, 3, 3}); // Zero output channels
+    w_tensor->set_stride({27, 9, 3, 1});
+    conv_attributes.set_w(w_tensor);
+
+    auto y_tensor = std::make_shared<Tensor_attributes>();
+    conv_attributes.set_y(y_tensor);
+
+    conv_attributes.set_pre_padding({1, 1});
+    conv_attributes.set_post_padding({1, 1});
+    conv_attributes.set_stride({1, 1});
+    conv_attributes.set_dilation({1, 1});
+
+    Graph_attributes graph_attributes;
+    ConvolutionNode node(std::move(conv_attributes), graph_attributes);
+
+    auto error = node.pre_validate_node();
+    EXPECT_EQ(error.code, error_code_t::INVALID_VALUE);
+}
+
+TEST(ConvolutionFwdNodeTests, PreValidateNodeZeroWeightInputChannels)
+{
+    Conv_fprop_attributes conv_attributes;
+
+    auto x_tensor = std::make_shared<Tensor_attributes>();
+    x_tensor->set_dim({1, 64, 32, 32});
+    x_tensor->set_stride({65536, 1024, 32, 1});
+    conv_attributes.set_x(x_tensor);
+
+    auto w_tensor = std::make_shared<Tensor_attributes>();
+    w_tensor->set_dim({128, 0, 3, 3}); // Zero input channels - would cause division by zero
+    w_tensor->set_stride({0, 9, 3, 1});
+    conv_attributes.set_w(w_tensor);
+
+    auto y_tensor = std::make_shared<Tensor_attributes>();
+    conv_attributes.set_y(y_tensor);
+
+    conv_attributes.set_pre_padding({1, 1});
+    conv_attributes.set_post_padding({1, 1});
+    conv_attributes.set_stride({1, 1});
+    conv_attributes.set_dilation({1, 1});
+
+    Graph_attributes graph_attributes;
+    ConvolutionNode node(std::move(conv_attributes), graph_attributes);
+
+    auto error = node.pre_validate_node();
+    EXPECT_EQ(error.code, error_code_t::INVALID_VALUE);
+}
+
+TEST(ConvolutionFwdNodeTests, PreValidateNodeNegativeWeightDimension)
+{
+    Conv_fprop_attributes conv_attributes;
+
+    auto x_tensor = std::make_shared<Tensor_attributes>();
+    x_tensor->set_dim({1, 3, 32, 32});
+    x_tensor->set_stride({3072, 1024, 32, 1});
+    conv_attributes.set_x(x_tensor);
+
+    auto w_tensor = std::make_shared<Tensor_attributes>();
+    w_tensor->set_dim({64, 3, -3, 3}); // Negative kernel height
+    w_tensor->set_stride({27, 9, 3, 1});
+    conv_attributes.set_w(w_tensor);
+
+    auto y_tensor = std::make_shared<Tensor_attributes>();
+    conv_attributes.set_y(y_tensor);
+
+    conv_attributes.set_pre_padding({1, 1});
+    conv_attributes.set_post_padding({1, 1});
+    conv_attributes.set_stride({1, 1});
+    conv_attributes.set_dilation({1, 1});
+
+    Graph_attributes graph_attributes;
+    ConvolutionNode node(std::move(conv_attributes), graph_attributes);
+
+    auto error = node.pre_validate_node();
+    EXPECT_EQ(error.code, error_code_t::INVALID_VALUE);
+}
+
+TEST(ConvolutionFwdNodeTests, PreValidateNodeZeroWeightStride)
+{
+    Conv_fprop_attributes conv_attributes;
+
+    auto x_tensor = std::make_shared<Tensor_attributes>();
+    x_tensor->set_dim({1, 3, 32, 32});
+    x_tensor->set_stride({3072, 1024, 32, 1});
+    conv_attributes.set_x(x_tensor);
+
+    auto w_tensor = std::make_shared<Tensor_attributes>();
+    w_tensor->set_dim({64, 3, 3, 3});
+    w_tensor->set_stride({27, 9, 0, 1}); // Zero stride
+    conv_attributes.set_w(w_tensor);
+
+    auto y_tensor = std::make_shared<Tensor_attributes>();
+    conv_attributes.set_y(y_tensor);
+
+    conv_attributes.set_pre_padding({1, 1});
+    conv_attributes.set_post_padding({1, 1});
+    conv_attributes.set_stride({1, 1});
+    conv_attributes.set_dilation({1, 1});
+
+    Graph_attributes graph_attributes;
+    ConvolutionNode node(std::move(conv_attributes), graph_attributes);
+
+    auto error = node.pre_validate_node();
+    EXPECT_EQ(error.code, error_code_t::INVALID_VALUE);
+}
+
+TEST(ConvolutionFwdNodeTests, PreValidateNodeNegativeWeightStride)
+{
+    Conv_fprop_attributes conv_attributes;
+
+    auto x_tensor = std::make_shared<Tensor_attributes>();
+    x_tensor->set_dim({1, 3, 32, 32});
+    x_tensor->set_stride({3072, 1024, 32, 1});
+    conv_attributes.set_x(x_tensor);
+
+    auto w_tensor = std::make_shared<Tensor_attributes>();
+    w_tensor->set_dim({64, 3, 3, 3});
+    w_tensor->set_stride({-27, 9, 3, 1}); // Negative stride
+    conv_attributes.set_w(w_tensor);
+
+    auto y_tensor = std::make_shared<Tensor_attributes>();
+    conv_attributes.set_y(y_tensor);
+
+    conv_attributes.set_pre_padding({1, 1});
+    conv_attributes.set_post_padding({1, 1});
+    conv_attributes.set_stride({1, 1});
+    conv_attributes.set_dilation({1, 1});
+
+    Graph_attributes graph_attributes;
+    ConvolutionNode node(std::move(conv_attributes), graph_attributes);
+
+    auto error = node.pre_validate_node();
+    EXPECT_EQ(error.code, error_code_t::INVALID_VALUE);
+}
+
+TEST(ConvolutionFwdNodeTests, PreValidateNodeZeroOutputDimension)
+{
+    Conv_fprop_attributes conv_attributes;
+
+    auto x_tensor = std::make_shared<Tensor_attributes>();
+    x_tensor->set_dim({1, 3, 32, 32});
+    x_tensor->set_stride({3072, 1024, 32, 1});
+    conv_attributes.set_x(x_tensor);
+
+    auto w_tensor = std::make_shared<Tensor_attributes>();
+    w_tensor->set_dim({64, 3, 3, 3});
+    w_tensor->set_stride({27, 9, 3, 1});
+    conv_attributes.set_w(w_tensor);
+
+    auto y_tensor = std::make_shared<Tensor_attributes>();
+    y_tensor->set_dim({1, 64, 0, 32}); // Zero height dimension
+    conv_attributes.set_y(y_tensor);
+
+    conv_attributes.set_pre_padding({1, 1});
+    conv_attributes.set_post_padding({1, 1});
+    conv_attributes.set_stride({1, 1});
+    conv_attributes.set_dilation({1, 1});
+
+    Graph_attributes graph_attributes;
+    ConvolutionNode node(std::move(conv_attributes), graph_attributes);
+
+    auto error = node.pre_validate_node();
+    EXPECT_EQ(error.code, error_code_t::INVALID_VALUE);
+}
+
+TEST(ConvolutionFwdNodeTests, PreValidateNodeNegativeOutputDimension)
+{
+    Conv_fprop_attributes conv_attributes;
+
+    auto x_tensor = std::make_shared<Tensor_attributes>();
+    x_tensor->set_dim({1, 3, 32, 32});
+    x_tensor->set_stride({3072, 1024, 32, 1});
+    conv_attributes.set_x(x_tensor);
+
+    auto w_tensor = std::make_shared<Tensor_attributes>();
+    w_tensor->set_dim({64, 3, 3, 3});
+    w_tensor->set_stride({27, 9, 3, 1});
+    conv_attributes.set_w(w_tensor);
+
+    auto y_tensor = std::make_shared<Tensor_attributes>();
+    y_tensor->set_dim({-1, 64, 32, 32}); // Negative batch dimension
+    conv_attributes.set_y(y_tensor);
+
+    conv_attributes.set_pre_padding({1, 1});
+    conv_attributes.set_post_padding({1, 1});
+    conv_attributes.set_stride({1, 1});
+    conv_attributes.set_dilation({1, 1});
+
+    Graph_attributes graph_attributes;
+    ConvolutionNode node(std::move(conv_attributes), graph_attributes);
+
+    auto error = node.pre_validate_node();
+    EXPECT_EQ(error.code, error_code_t::INVALID_VALUE);
+}
+
+TEST(ConvolutionFwdNodeTests, PreValidateNodeZeroOutputStride)
+{
+    Conv_fprop_attributes conv_attributes;
+
+    auto x_tensor = std::make_shared<Tensor_attributes>();
+    x_tensor->set_dim({1, 3, 32, 32});
+    x_tensor->set_stride({3072, 1024, 32, 1});
+    conv_attributes.set_x(x_tensor);
+
+    auto w_tensor = std::make_shared<Tensor_attributes>();
+    w_tensor->set_dim({64, 3, 3, 3});
+    w_tensor->set_stride({27, 9, 3, 1});
+    conv_attributes.set_w(w_tensor);
+
+    auto y_tensor = std::make_shared<Tensor_attributes>();
+    y_tensor->set_dim({1, 64, 32, 32});
+    y_tensor->set_stride({0, 1024, 32, 1}); // Zero batch stride
+    conv_attributes.set_y(y_tensor);
+
+    conv_attributes.set_pre_padding({1, 1});
+    conv_attributes.set_post_padding({1, 1});
+    conv_attributes.set_stride({1, 1});
+    conv_attributes.set_dilation({1, 1});
+
+    Graph_attributes graph_attributes;
+    ConvolutionNode node(std::move(conv_attributes), graph_attributes);
+
+    auto error = node.pre_validate_node();
+    EXPECT_EQ(error.code, error_code_t::INVALID_VALUE);
+}
+
+TEST(ConvolutionFwdNodeTests, PreValidateNodeNegativeOutputStride)
+{
+    Conv_fprop_attributes conv_attributes;
+
+    auto x_tensor = std::make_shared<Tensor_attributes>();
+    x_tensor->set_dim({1, 3, 32, 32});
+    x_tensor->set_stride({3072, 1024, 32, 1});
+    conv_attributes.set_x(x_tensor);
+
+    auto w_tensor = std::make_shared<Tensor_attributes>();
+    w_tensor->set_dim({64, 3, 3, 3});
+    w_tensor->set_stride({27, 9, 3, 1});
+    conv_attributes.set_w(w_tensor);
+
+    auto y_tensor = std::make_shared<Tensor_attributes>();
+    y_tensor->set_dim({1, 64, 32, 32});
+    y_tensor->set_stride({65536, 1024, 32, -1}); // Negative width stride
+    conv_attributes.set_y(y_tensor);
+
+    conv_attributes.set_pre_padding({1, 1});
+    conv_attributes.set_post_padding({1, 1});
+    conv_attributes.set_stride({1, 1});
+    conv_attributes.set_dilation({1, 1});
+
+    Graph_attributes graph_attributes;
+    ConvolutionNode node(std::move(conv_attributes), graph_attributes);
+
+    auto error = node.pre_validate_node();
+    EXPECT_EQ(error.code, error_code_t::INVALID_VALUE);
 }
