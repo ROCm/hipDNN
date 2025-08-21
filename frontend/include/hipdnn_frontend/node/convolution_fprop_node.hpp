@@ -25,43 +25,28 @@ public:
 
     error_t pre_validate_node() const override
     {
-        if(!attributes.get_x())
-        {
-            return {error_code_t::ATTRIBUTE_NOT_SET,
-                    "ConvolutionNode missing x (input) for pre-validation"};
-        }
-        if(!attributes.get_w())
-        {
-            return {error_code_t::ATTRIBUTE_NOT_SET,
-                    "ConvolutionNode missing w (weights) for pre-validation"};
-        }
-        if(!attributes.get_y())
-        {
-            return {error_code_t::ATTRIBUTE_NOT_SET,
-                    "ConvolutionNode missing y (output) for pre-validation"};
-        }
+        // Validate tensor pointers
+        RETURN_IF_FALSE(attributes.get_x(), error_code_t::ATTRIBUTE_NOT_SET,
+                        "ConvolutionNode missing x (input) for pre-validation");
+        
+        RETURN_IF_FALSE(attributes.get_w(), error_code_t::ATTRIBUTE_NOT_SET,
+                        "ConvolutionNode missing w (weights) for pre-validation");
+        
+        RETURN_IF_FALSE(attributes.get_y(), error_code_t::ATTRIBUTE_NOT_SET,
+                        "ConvolutionNode missing y (output) for pre-validation");
 
         // Validate convolution parameters
-        if(attributes.get_pre_padding().empty())
-        {
-            return {error_code_t::ATTRIBUTE_NOT_SET,
-                    "ConvolutionNode missing pre_padding for pre-validation"};
-        }
-        if(attributes.get_post_padding().empty())
-        {
-            return {error_code_t::ATTRIBUTE_NOT_SET,
-                    "ConvolutionNode missing post_padding for pre-validation"};
-        }
-        if(attributes.get_stride().empty())
-        {
-            return {error_code_t::ATTRIBUTE_NOT_SET,
-                    "ConvolutionNode missing stride for pre-validation"};
-        }
-        if(attributes.get_dilation().empty())
-        {
-            return {error_code_t::ATTRIBUTE_NOT_SET,
-                    "ConvolutionNode missing dilation for pre-validation"};
-        }
+        RETURN_IF_TRUE(attributes.get_pre_padding().empty(), error_code_t::ATTRIBUTE_NOT_SET,
+                       "ConvolutionNode missing pre_padding for pre-validation");
+        
+        RETURN_IF_TRUE(attributes.get_post_padding().empty(), error_code_t::ATTRIBUTE_NOT_SET,
+                       "ConvolutionNode missing post_padding for pre-validation");
+        
+        RETURN_IF_TRUE(attributes.get_stride().empty(), error_code_t::ATTRIBUTE_NOT_SET,
+                       "ConvolutionNode missing stride for pre-validation");
+        
+        RETURN_IF_TRUE(attributes.get_dilation().empty(), error_code_t::ATTRIBUTE_NOT_SET,
+                       "ConvolutionNode missing dilation for pre-validation");
 
         // Get tensor references
         auto x = attributes.get_x();
@@ -72,57 +57,36 @@ public:
         auto& x_dims = x->get_dim();
         auto& x_strides = x->get_stride();
 
-        if(x_dims.empty())
-        {
-            return {error_code_t::INVALID_VALUE,
-                    "ConvolutionNode: Input tensor must have dimensions set"};
-        }
+        RETURN_IF_TRUE(x_dims.empty(), error_code_t::INVALID_VALUE,
+                       "ConvolutionNode: Input tensor must have dimensions set");
 
-        if(x_dims.size() < 3)
-        {
-            return {
-                error_code_t::INVALID_VALUE,
-                "ConvolutionNode: Input tensor must have at least 3 dimensions (N, C, spatial)"};
-        }
+        RETURN_IF_LT(x_dims.size(), 3, error_code_t::INVALID_VALUE,
+                     "ConvolutionNode: Input tensor must have at least 3 dimensions (N, C, spatial)");
 
-        if(x_strides.size() != x_dims.size())
-        {
-            return {error_code_t::INVALID_VALUE,
-                    "ConvolutionNode: Input tensor stride count must match dimension count"};
-        }
+        RETURN_IF_NE(x_strides.size(), x_dims.size(), error_code_t::INVALID_VALUE,
+                     "ConvolutionNode: Input tensor stride count must match dimension count");
 
         // Validate weight tensor dimensions
         auto& w_dims = w->get_dim();
         auto& w_strides = w->get_stride();
 
-        if(w_dims.empty())
-        {
-            return {error_code_t::INVALID_VALUE,
-                    "ConvolutionNode: Weight tensor must have dimensions set"};
-        }
+        RETURN_IF_TRUE(w_dims.empty(), error_code_t::INVALID_VALUE,
+                       "ConvolutionNode: Weight tensor must have dimensions set");
 
-        if(w_dims.size() != x_dims.size())
-        {
-            return {error_code_t::INVALID_VALUE,
-                    "ConvolutionNode: Weight tensor dimension count must match input tensor "
-                    "dimension count"};
-        }
+        RETURN_IF_NE(w_dims.size(), x_dims.size(), error_code_t::INVALID_VALUE,
+                     "ConvolutionNode: Weight tensor dimension count must match input tensor dimension count");
 
-        if(w_strides.size() != w_dims.size())
-        {
-            return {error_code_t::INVALID_VALUE,
-                    "ConvolutionNode: Weight tensor stride count must match dimension count"};
-        }
+        RETURN_IF_NE(w_strides.size(), w_dims.size(), error_code_t::INVALID_VALUE,
+                     "ConvolutionNode: Weight tensor stride count must match dimension count");
 
+        RETURN_IF_EQ(w_dims[1], 0, error_code_t::INVALID_VALUE,
+                     "ConvolutionNode: Weight tensor input channels must be greater than 0");
+                     
         // Validate input channels match between input and weight tensors
         // For regular convolution: x_dims[1] == w_dims[1]
         // For grouped convolution: x_dims[1] % w_dims[1] == 0
-        if(x_dims[1] % w_dims[1] != 0)
-        {
-            return {error_code_t::INVALID_VALUE,
-                    "ConvolutionNode: Input tensor channels must match weight tensor input "
-                    "channels or be divisible by them for grouped convolution"};
-        }
+        RETURN_IF_NE(x_dims[1] % w_dims[1], 0, error_code_t::INVALID_VALUE,
+                     "ConvolutionNode: Input tensor channels must match weight tensor input channels or be divisible by them for grouped convolution");
 
         // Validate output tensor dimensions and strides if they are set
         auto& y_dims = y->get_dim();
@@ -130,45 +94,25 @@ public:
 
         if(!y_dims.empty())
         {
-            if(y_dims.size() != x_dims.size())
-            {
-                return {error_code_t::INVALID_VALUE,
-                        "ConvolutionNode: Output tensor dimension count must match input tensor "
-                        "dimension count"};
-            }
+            RETURN_IF_NE(y_dims.size(), x_dims.size(), error_code_t::INVALID_VALUE,
+                         "ConvolutionNode: Output tensor dimension count must match input tensor dimension count");
 
             // Validate batch size matches
-            if(y_dims[0] != x_dims[0])
-            {
-                return {
-                    error_code_t::INVALID_VALUE,
-                    "ConvolutionNode: Output tensor batch size must match input tensor batch size"};
-            }
+            RETURN_IF_NE(y_dims[0], x_dims[0], error_code_t::INVALID_VALUE,
+                         "ConvolutionNode: Output tensor batch size must match input tensor batch size");
 
             // Validate output channels match weight output channels
-            // For regular convolution: y_dims[1] == w_dims[0]
-            // For grouped convolution: y_dims[1] % w_dims[0] == 0
-            if(y_dims[1] % w_dims[0] != 0)
-            {
-                return {error_code_t::INVALID_VALUE,
-                        "ConvolutionNode: Output tensor channels must match weight tensor output "
-                        "channels or be a multiple of them for grouped convolution"};
-            }
+            RETURN_IF_NE(y_dims[1], w_dims[0], error_code_t::INVALID_VALUE,
+                         "ConvolutionNode: Output tensor channels must match weight tensor output channels");
         }
 
         if(!y_strides.empty())
         {
-            if(y_dims.empty())
-            {
-                return {error_code_t::INVALID_VALUE,
-                        "ConvolutionNode: Output tensor strides cannot be set without dimensions"};
-            }
+            RETURN_IF_TRUE(y_dims.empty(), error_code_t::INVALID_VALUE,
+                           "ConvolutionNode: Output tensor strides cannot be set without dimensions");
 
-            if(y_strides.size() != y_dims.size())
-            {
-                return {error_code_t::INVALID_VALUE,
-                        "ConvolutionNode: Output tensor stride count must match dimension count"};
-            }
+            RETURN_IF_NE(y_strides.size(), y_dims.size(), error_code_t::INVALID_VALUE,
+                         "ConvolutionNode: Output tensor stride count must match dimension count");
         }
 
         // Validate spatial parameter counts match spatial dimensions
@@ -178,31 +122,17 @@ public:
         auto& stride = attributes.get_stride();
         auto& dilation = attributes.get_dilation();
 
-        if(pre_padding.size() != spatial_dims)
-        {
-            return {
-                error_code_t::INVALID_VALUE,
-                "ConvolutionNode: pre_padding parameter count must match spatial dimension count"};
-        }
+        RETURN_IF_NE(pre_padding.size(), spatial_dims, error_code_t::INVALID_VALUE,
+                     "ConvolutionNode: pre_padding parameter count must match spatial dimension count");
 
-        if(post_padding.size() != spatial_dims)
-        {
-            return {
-                error_code_t::INVALID_VALUE,
-                "ConvolutionNode: post_padding parameter count must match spatial dimension count"};
-        }
+        RETURN_IF_NE(post_padding.size(), spatial_dims, error_code_t::INVALID_VALUE,
+                     "ConvolutionNode: post_padding parameter count must match spatial dimension count");
 
-        if(stride.size() != spatial_dims)
-        {
-            return {error_code_t::INVALID_VALUE,
-                    "ConvolutionNode: stride parameter count must match spatial dimension count"};
-        }
+        RETURN_IF_NE(stride.size(), spatial_dims, error_code_t::INVALID_VALUE,
+                     "ConvolutionNode: stride parameter count must match spatial dimension count");
 
-        if(dilation.size() != spatial_dims)
-        {
-            return {error_code_t::INVALID_VALUE,
-                    "ConvolutionNode: dilation parameter count must match spatial dimension count"};
-        }
+        RETURN_IF_NE(dilation.size(), spatial_dims, error_code_t::INVALID_VALUE,
+                     "ConvolutionNode: dilation parameter count must match spatial dimension count");
 
         // Check spatial parameters for each dimension
         for(size_t i = 0; i < spatial_dims; ++i)
@@ -213,24 +143,17 @@ public:
             auto dilation_val = dilation[i];
 
             // Validate parameters
-            if(stride_val <= 0)
-            {
-                return {error_code_t::INVALID_VALUE, "ConvolutionNode: Stride must be > 0"};
-            }
-            if(dilation_val <= 0)
-            {
-                return {error_code_t::INVALID_VALUE, "ConvolutionNode: Dilation must > 0"};
-            }
-            if(pre_pad < 0)
-            {
-                return {error_code_t::INVALID_VALUE,
-                        "ConvolutionNode: Pre-padding must be non-negative"};
-            }
-            if(post_pad < 0)
-            {
-                return {error_code_t::INVALID_VALUE,
-                        "ConvolutionNode: Post-padding must be non-negative"};
-            }
+            RETURN_IF_LT(stride_val, 1, error_code_t::INVALID_VALUE,
+                         "ConvolutionNode: Stride must be > 0");
+            
+            RETURN_IF_LT(dilation_val, 1, error_code_t::INVALID_VALUE,
+                         "ConvolutionNode: Dilation must > 0");
+            
+            RETURN_IF_LT(pre_pad, 0, error_code_t::INVALID_VALUE,
+                         "ConvolutionNode: Pre-padding must be non-negative");
+            
+            RETURN_IF_LT(post_pad, 0, error_code_t::INVALID_VALUE,
+                         "ConvolutionNode: Post-padding must be non-negative");
         }
 
         return {};
@@ -242,23 +165,14 @@ public:
         auto w = attributes.get_w();
         auto y = attributes.get_y();
 
-        if(!x)
-        {
-            return {error_code_t::ATTRIBUTE_NOT_SET,
-                    "ConvolutionNode missing x for setting properties"};
-        }
+        RETURN_IF_FALSE(x, error_code_t::ATTRIBUTE_NOT_SET,
+                        "ConvolutionNode missing x for setting properties");
 
-        if(!w)
-        {
-            return {error_code_t::ATTRIBUTE_NOT_SET,
-                    "ConvolutionNode missing w for setting properties"};
-        }
+        RETURN_IF_FALSE(w, error_code_t::ATTRIBUTE_NOT_SET,
+                        "ConvolutionNode missing w for setting properties");
 
-        if(!y)
-        {
-            return {error_code_t::ATTRIBUTE_NOT_SET,
-                    "ConvolutionNode missing y for setting properties"};
-        }
+        RETURN_IF_FALSE(y, error_code_t::ATTRIBUTE_NOT_SET,
+                        "ConvolutionNode missing y for setting properties");
 
         CHECK_HIPDNN_ERROR(attributes.fill_from_graph_attributes(graph_attributes));
 
@@ -278,9 +192,7 @@ public:
             auto& dilation = attributes.get_dilation();
 
             y_dims[0] = x_dims[0]; // N (batch) matches input
-            y_dims[1]
-                = w_dims[0]
-                  * (x_dims[1] / w_dims[1]); // C (output channels) = weight_out_channels * groups
+            y_dims[1] = w_dims[0]; // C (output channels)
 
             // Calculate spatial dimensions (Optional D, H, W)
             // Starting from dim 2 (skip N and C)
@@ -288,13 +200,10 @@ public:
             {
                 auto spatial_idx = i - 2; // Index into spatial dimension arrays
 
-                if(spatial_idx >= pre_padding.size() || spatial_idx >= post_padding.size()
-                   || spatial_idx >= stride.size() || spatial_idx >= dilation.size())
-                {
-                    return {error_code_t::INVALID_VALUE,
-                            "ConvolutionNode: Insufficient padding/stride/dilation parameters for "
-                            "spatial dimensions"};
-                }
+                RETURN_IF_TRUE(spatial_idx >= pre_padding.size() || spatial_idx >= post_padding.size()
+                               || spatial_idx >= stride.size() || spatial_idx >= dilation.size(),
+                               error_code_t::INVALID_VALUE,
+                               "ConvolutionNode: Insufficient padding/stride/dilation parameters for spatial dimensions");
 
                 // Standard convolution output size formula:
                 // output_size = floor((input_size + pre_padding + post_padding - dilated_kernel_size) / stride) + 1
@@ -308,38 +217,25 @@ public:
                 auto dilation_val = dilation[spatial_idx];
 
                 // Validate parameters
-                if(stride_val <= 0)
-                {
-                    return {error_code_t::INVALID_VALUE,
-                            "ConvolutionNode: Stride must be positive"};
-                }
-                if(dilation_val <= 0)
-                {
-                    return {error_code_t::INVALID_VALUE,
-                            "ConvolutionNode: Dilation must be positive"};
-                }
-                if(pre_pad < 0)
-                {
-                    return {error_code_t::INVALID_VALUE,
-                            "ConvolutionNode: Pre-padding must be non-negative"};
-                }
-                if(post_pad < 0)
-                {
-                    return {error_code_t::INVALID_VALUE,
-                            "ConvolutionNode: Post-padding must be non-negative"};
-                }
+                RETURN_IF_LT(stride_val, 1, error_code_t::INVALID_VALUE,
+                             "ConvolutionNode: Stride must be positive");
+                
+                RETURN_IF_LT(dilation_val, 1, error_code_t::INVALID_VALUE,
+                             "ConvolutionNode: Dilation must be positive");
+                
+                RETURN_IF_LT(pre_pad, 0, error_code_t::INVALID_VALUE,
+                             "ConvolutionNode: Pre-padding must be non-negative");
+                
+                RETURN_IF_LT(post_pad, 0, error_code_t::INVALID_VALUE,
+                             "ConvolutionNode: Post-padding must be non-negative");
 
                 // Calculate dilated kernel size
                 auto dilated_kernel_size = (dilation_val * (kernel_size - 1)) + 1;
 
                 // Calculate output dimension
                 auto numerator = input_size + pre_pad + post_pad - dilated_kernel_size;
-                if(numerator < 0)
-                {
-                    return {error_code_t::INVALID_VALUE,
-                            "ConvolutionNode: Invalid convolution parameters result in negative "
-                            "output size"};
-                }
+                RETURN_IF_LT(numerator, 0, error_code_t::INVALID_VALUE,
+                             "ConvolutionNode: Invalid convolution parameters result in negative output size");
 
                 y_dims[i] = (numerator / stride_val) + 1;
             }
@@ -354,24 +250,14 @@ public:
             auto& x_strides = x->get_stride();
             auto& y_dims_final = y->get_dim();
 
-            if(x_strides.empty())
-            {
-                return {error_code_t::ATTRIBUTE_NOT_SET,
-                        "ConvolutionNode: Cannot infer output strides - missing input strides"};
-            }
+            RETURN_IF_TRUE(x_strides.empty(), error_code_t::ATTRIBUTE_NOT_SET,
+                           "ConvolutionNode: Cannot infer output strides - missing input strides");
 
-            if(y_dims_final.empty())
-            {
-                return {error_code_t::ATTRIBUTE_NOT_SET,
-                        "ConvolutionNode: Cannot infer output strides - missing output dimensions"};
-            }
+            RETURN_IF_TRUE(y_dims_final.empty(), error_code_t::ATTRIBUTE_NOT_SET,
+                           "ConvolutionNode: Cannot infer output strides - missing output dimensions");
 
-            if(x_strides.size() != y_dims_final.size())
-            {
-                return {
-                    error_code_t::ATTRIBUTE_NOT_SET,
-                    "ConvolutionNode: Stride dimension mismatch between input and output tensors"};
-            }
+            RETURN_IF_NE(x_strides.size(), y_dims_final.size(), error_code_t::ATTRIBUTE_NOT_SET,
+                         "ConvolutionNode: Stride dimension mismatch between input and output tensors");
 
             // All validations passed - perform stride generation
             std::vector<int64_t> stride_order(x_strides.size());

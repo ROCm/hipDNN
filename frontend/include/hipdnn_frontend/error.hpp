@@ -77,4 +77,41 @@ typedef struct error_object // NOLINT
         return code != other.code;
     }
 } error_t;
+
+
+#define RETURN_IF_NE(x, y, error_status, message) \
+    if(x != y)                                    \
+    {                                             \
+        return {error_status, message};           \
+    }
+
+#define RETURN_IF_EQ(x, y, error_status, message) \
+    if(x == y)                                    \
+    {                                             \
+        return {error_status, message};           \
+    }
+
+#define RETURN_IF_TRUE(x, error_status, message)  \
+    if(x)                                         \
+    {                                             \
+        return {error_status, message};           \
+    }
+
+#define RETURN_IF_FALSE(x, error_status, message) \
+    if(!(x))                                      \
+    {                                             \
+        return {error_status, message};           \
+    }
+
+#define RETURN_IF_NULL(x, error_status, message)  \
+    if(x == nullptr)                              \
+    {                                             \
+        return {error_status, message};           \
+    }
+
+#define RETURN_IF_LT(x, y, error_status, message) \
+    if(x < y)                                     \
+    {                                             \
+        return {error_status, message};           \
+    }
 }

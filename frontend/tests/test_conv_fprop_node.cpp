@@ -1403,7 +1403,7 @@ TEST(ConvolutionFwdNodeTests, InferPropertiesGroupedConv2Groups)
 
     auto w_tensor = std::make_shared<Tensor_attributes>();
     w_tensor->set_dim(
-        {128, 32, 3, 3}); // 32 input channels per group, 128 output channels per group
+        {128, 32, 3, 3}); // 32 input channels per group, 128 output channels
     conv_attributes.set_w(w_tensor);
 
     auto y_tensor = std::make_shared<Tensor_attributes>();
@@ -1423,15 +1423,15 @@ TEST(ConvolutionFwdNodeTests, InferPropertiesGroupedConv2Groups)
     // Check inferred dimensions
     auto inferred_dims = y_tensor->get_dim();
     EXPECT_EQ(inferred_dims.size(), 4);
-    EXPECT_EQ(inferred_dims[0], 1); // Batch size
-    EXPECT_EQ(inferred_dims[1], 256); // Output channels: 128 * (64/32) = 256
-    EXPECT_EQ(inferred_dims[2], 32); // Height
-    EXPECT_EQ(inferred_dims[3], 32); // Width
+    EXPECT_EQ(inferred_dims[0], 1);   // Batch size
+    EXPECT_EQ(inferred_dims[1], 128); // Output channels
+    EXPECT_EQ(inferred_dims[2], 32);  // Height
+    EXPECT_EQ(inferred_dims[3], 32);  // Width
 
     // Check inferred strides
     auto inferred_strides = y_tensor->get_stride();
     EXPECT_EQ(inferred_strides.size(), 4);
-    EXPECT_EQ(inferred_strides[0], 262144); // N stride: 256 * 32 * 32
+    EXPECT_EQ(inferred_strides[0], 131072); // N stride: 128 * 32 * 32
     EXPECT_EQ(inferred_strides[1], 1024); // C stride: 32 * 32
     EXPECT_EQ(inferred_strides[2], 32); // H stride 32
     EXPECT_EQ(inferred_strides[3], 1); // W stride 1
@@ -1468,14 +1468,14 @@ TEST(ConvolutionFwdNodeTests, InferPropertiesGroupedConv4Groups)
     auto inferred_dims = y_tensor->get_dim();
     EXPECT_EQ(inferred_dims.size(), 4);
     EXPECT_EQ(inferred_dims[0], 2); // Batch size
-    EXPECT_EQ(inferred_dims[1], 256); // Output channels: 64 * (128/32) = 256
+    EXPECT_EQ(inferred_dims[1], 64); // Output channels
     EXPECT_EQ(inferred_dims[2], 16); // Height
     EXPECT_EQ(inferred_dims[3], 16); // Width
 
     // Check inferred strides
     auto inferred_strides = y_tensor->get_stride();
     EXPECT_EQ(inferred_strides.size(), 4);
-    EXPECT_EQ(inferred_strides[0], 65536); // N stride: 256 * 16 * 16
+    EXPECT_EQ(inferred_strides[0], 16384); // N stride: 64 * 16 * 16
     EXPECT_EQ(inferred_strides[1], 256); // C stride: 16 * 16
     EXPECT_EQ(inferred_strides[2], 16); // H stride
     EXPECT_EQ(inferred_strides[3], 1); // W stride
@@ -1512,14 +1512,14 @@ TEST(ConvolutionFwdNodeTests, InferPropertiesGroupedConvWithStride)
     auto inferred_dims = y_tensor->get_dim();
     EXPECT_EQ(inferred_dims.size(), 4);
     EXPECT_EQ(inferred_dims[0], 1); // Batch size
-    EXPECT_EQ(inferred_dims[1], 512); // Output channels: 256 * (96/48) = 512
+    EXPECT_EQ(inferred_dims[1], 256); // Output channels: 256
     EXPECT_EQ(inferred_dims[2], 56); // Height: (112 + 1 + 1 - 3) / 2 + 1 = 56
     EXPECT_EQ(inferred_dims[3], 56); // Width
 
     // Check inferred strides
     auto inferred_strides = y_tensor->get_stride();
     EXPECT_EQ(inferred_strides.size(), 4);
-    EXPECT_EQ(inferred_strides[0], 1605632); // N stride: 512 * 56 * 56
+    EXPECT_EQ(inferred_strides[0], 802816); // N stride: 256 * 56 * 56
     EXPECT_EQ(inferred_strides[1], 3136); // C stride: 56 * 56
     EXPECT_EQ(inferred_strides[2], 56); // H stride
     EXPECT_EQ(inferred_strides[3], 1); // W stride
@@ -1557,7 +1557,7 @@ TEST(ConvolutionFwdNodeTests, InferPropertiesGroupedConvNHWCLayout)
     auto inferred_dims = y_tensor->get_dim();
     EXPECT_EQ(inferred_dims.size(), 4);
     EXPECT_EQ(inferred_dims[0], 1); // Batch size
-    EXPECT_EQ(inferred_dims[1], 512); // Output channels: 128 * (64/16) = 512
+    EXPECT_EQ(inferred_dims[1], 128); // Output channels
     EXPECT_EQ(inferred_dims[2], 3); // Height: (28 + 1 + 1 - 28) / 1 + 1 = 3
     EXPECT_EQ(inferred_dims[3], 3); // Width: (28 + 1 + 1 - 28) / 1 + 1 = 3
 
@@ -1601,7 +1601,7 @@ TEST(ConvolutionFwdNodeTests, InferPropertiesGroupedConv3D)
     auto inferred_dims = y_tensor->get_dim();
     EXPECT_EQ(inferred_dims.size(), 5);
     EXPECT_EQ(inferred_dims[0], 1); // Batch size
-    EXPECT_EQ(inferred_dims[1], 288); // Output channels: 96 * (48/16) = 288
+    EXPECT_EQ(inferred_dims[1], 96); // Output channels
     EXPECT_EQ(inferred_dims[2], 8); // Depth
     EXPECT_EQ(inferred_dims[3], 16); // Height
     EXPECT_EQ(inferred_dims[4], 16); // Width
@@ -1609,7 +1609,7 @@ TEST(ConvolutionFwdNodeTests, InferPropertiesGroupedConv3D)
     // Check inferred strides
     auto inferred_strides = y_tensor->get_stride();
     EXPECT_EQ(inferred_strides.size(), 5);
-    EXPECT_EQ(inferred_strides[0], 589824); // N stride: 288 * 8 * 16 * 16
+    EXPECT_EQ(inferred_strides[0], 196608); // N stride: 96 * 8 * 16 * 16
     EXPECT_EQ(inferred_strides[1], 2048); // C stride: 8 * 16 * 16
     EXPECT_EQ(inferred_strides[2], 256); // D stride: 16 * 16
     EXPECT_EQ(inferred_strides[3], 16); // H stride
@@ -1648,7 +1648,7 @@ TEST(ConvolutionFwdNodeTests, InferPropertiesGroupedConv3DNHWCLayout)
     auto inferred_dims = y_tensor->get_dim();
     EXPECT_EQ(inferred_dims.size(), 5);
     EXPECT_EQ(inferred_dims[0], 1); // Batch size
-    EXPECT_EQ(inferred_dims[1], 288); // Output channels: 96 * (48/16) = 288
+    EXPECT_EQ(inferred_dims[1], 96); // Output channels
     EXPECT_EQ(inferred_dims[2], 8); // Depth: (8 + 1 + 1 - 3) / 1 + 1 = 8
     EXPECT_EQ(inferred_dims[3], 16); // Height: (16 + 1 + 1 - 3) / 1 + 1 = 16
     EXPECT_EQ(inferred_dims[4], 16); // Width: (16 + 1 + 1 - 3) / 1 + 1 = 16
