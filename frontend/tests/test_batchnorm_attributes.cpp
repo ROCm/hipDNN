@@ -356,11 +356,16 @@ TEST(BatchnormAttributesTests, SetXWithMove)
 
     auto x_tensor = std::make_shared<hipdnn_frontend::graph::Tensor_attributes>();
     x_tensor->set_uid(1).set_name("XTensor");
+
+    auto raw_ptr = x_tensor.get();
+
     batchnorm_attributes.set_x(std::move(x_tensor));
 
     auto retrieved = batchnorm_attributes.get_x();
     EXPECT_EQ(retrieved->get_uid(), 1);
     EXPECT_EQ(retrieved->get_name(), "XTensor");
+    EXPECT_EQ(x_tensor, nullptr);
+    EXPECT_EQ(retrieved.get(), raw_ptr);
 }
 
 TEST(BatchnormAttributesTests, SetScaleWithMove)
@@ -369,11 +374,17 @@ TEST(BatchnormAttributesTests, SetScaleWithMove)
 
     auto scale_tensor = std::make_shared<hipdnn_frontend::graph::Tensor_attributes>();
     scale_tensor->set_uid(2).set_name("ScaleTensor");
+
+    auto raw_ptr = scale_tensor.get();
+
     batchnorm_attributes.set_scale(std::move(scale_tensor));
 
     auto retrieved = batchnorm_attributes.get_scale();
     EXPECT_EQ(retrieved->get_uid(), 2);
     EXPECT_EQ(retrieved->get_name(), "ScaleTensor");
+
+    EXPECT_EQ(scale_tensor, nullptr);
+    EXPECT_EQ(retrieved.get(), raw_ptr);
 }
 
 TEST(BatchnormAttributesTests, SetBiasWithMove)
@@ -382,11 +393,17 @@ TEST(BatchnormAttributesTests, SetBiasWithMove)
 
     auto bias_tensor = std::make_shared<hipdnn_frontend::graph::Tensor_attributes>();
     bias_tensor->set_uid(3).set_name("BiasTensor");
+
+    auto raw_ptr = bias_tensor.get();
+
     batchnorm_attributes.set_bias(std::move(bias_tensor));
 
     auto retrieved = batchnorm_attributes.get_bias();
     EXPECT_EQ(retrieved->get_uid(), 3);
     EXPECT_EQ(retrieved->get_name(), "BiasTensor");
+
+    EXPECT_EQ(bias_tensor, nullptr);
+    EXPECT_EQ(retrieved.get(), raw_ptr);
 }
 
 TEST(BatchnormAttributesTests, SetPeerStatsWithMove)
@@ -399,7 +416,12 @@ TEST(BatchnormAttributesTests, SetPeerStatsWithMove)
     auto peer_stat_2 = std::make_shared<hipdnn_frontend::graph::Tensor_attributes>();
     peer_stat_2->set_uid(11).set_name("PeerStat2");
 
-    std::vector<std::shared_ptr<hipdnn_frontend::graph::Tensor_attributes>> peer_stats_move = {peer_stat_1, peer_stat_2};
+    auto raw_ptr_1 = peer_stat_1.get();
+    auto raw_ptr_2 = peer_stat_2.get();
+
+    std::vector<std::shared_ptr<hipdnn_frontend::graph::Tensor_attributes>> peer_stats_move
+        = {peer_stat_1, peer_stat_2};
+
     batchnorm_attributes.set_peer_stats(std::move(peer_stats_move));
 
     const auto& peer_stats = batchnorm_attributes.get_peer_stats();
@@ -408,6 +430,10 @@ TEST(BatchnormAttributesTests, SetPeerStatsWithMove)
     EXPECT_EQ(peer_stats[0]->get_name(), "PeerStat1");
     EXPECT_EQ(peer_stats[1]->get_uid(), 11);
     EXPECT_EQ(peer_stats[1]->get_name(), "PeerStat2");
+
+    // Verify the raw pointers match (same objects were moved)
+    EXPECT_EQ(peer_stats[0].get(), raw_ptr_1);
+    EXPECT_EQ(peer_stats[1].get(), raw_ptr_2);
 }
 
 TEST(BatchnormAttributesTests, SetPreviousRunningStatsWithMove)
@@ -423,7 +449,12 @@ TEST(BatchnormAttributesTests, SetPreviousRunningStatsWithMove)
     auto momentum_tensor = std::make_shared<hipdnn_frontend::graph::Tensor_attributes>();
     momentum_tensor->set_uid(22).set_name("MomentumTensor");
 
-    batchnorm_attributes.set_previous_running_stats(std::move(mean_tensor), std::move(variance_tensor), std::move(momentum_tensor));
+    auto raw_mean_ptr = mean_tensor.get();
+    auto raw_variance_ptr = variance_tensor.get();
+    auto raw_momentum_ptr = momentum_tensor.get();
+
+    batchnorm_attributes.set_previous_running_stats(
+        std::move(mean_tensor), std::move(variance_tensor), std::move(momentum_tensor));
 
     auto retrieved_mean = batchnorm_attributes.get_prev_running_mean();
     EXPECT_EQ(retrieved_mean->get_uid(), 20);
@@ -436,6 +467,16 @@ TEST(BatchnormAttributesTests, SetPreviousRunningStatsWithMove)
     auto retrieved_momentum = batchnorm_attributes.get_momentum();
     EXPECT_EQ(retrieved_momentum->get_uid(), 22);
     EXPECT_EQ(retrieved_momentum->get_name(), "MomentumTensor");
+
+    // Verify the objects were moved
+    EXPECT_EQ(mean_tensor, nullptr);
+    EXPECT_EQ(variance_tensor, nullptr);
+    EXPECT_EQ(momentum_tensor, nullptr);
+
+    // Verify the raw pointers match
+    EXPECT_EQ(retrieved_mean.get(), raw_mean_ptr);
+    EXPECT_EQ(retrieved_variance.get(), raw_variance_ptr);
+    EXPECT_EQ(retrieved_momentum.get(), raw_momentum_ptr);
 }
 
 // Simplified move tests - testing move semantics without setting uid/name
@@ -458,7 +499,7 @@ TEST(BatchnormAttributesTests, SimplifiedSetPeerStatsWithMove)
     std::vector<std::shared_ptr<hipdnn_frontend::graph::Tensor_attributes>> peer_stats_move;
     peer_stats_move.push_back(std::make_shared<hipdnn_frontend::graph::Tensor_attributes>());
     peer_stats_move.push_back(std::make_shared<hipdnn_frontend::graph::Tensor_attributes>());
-    
+
     size_t original_size = peer_stats_move.size();
     batchnorm_attributes.set_peer_stats(std::move(peer_stats_move));
 
@@ -475,9 +516,8 @@ TEST(BatchnormAttributesTests, SimplifiedSetPreviousRunningStatsWithMove)
     auto variance_tensor = std::make_shared<hipdnn_frontend::graph::Tensor_attributes>();
     auto momentum_tensor = std::make_shared<hipdnn_frontend::graph::Tensor_attributes>();
 
-    batchnorm_attributes.set_previous_running_stats(std::move(mean_tensor), 
-                                                   std::move(variance_tensor), 
-                                                   std::move(momentum_tensor));
+    batchnorm_attributes.set_previous_running_stats(
+        std::move(mean_tensor), std::move(variance_tensor), std::move(momentum_tensor));
 
     // Just verify the tensors were set
     EXPECT_NE(batchnorm_attributes.get_prev_running_mean(), nullptr);

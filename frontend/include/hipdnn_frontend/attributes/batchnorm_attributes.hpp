@@ -131,8 +131,7 @@ public:
         peer_stats = value;
         return *this;
     }
-    Batchnorm_attributes&
-        set_peer_stats(std::vector<std::shared_ptr<Tensor_attributes>>&& value)
+    Batchnorm_attributes& set_peer_stats(std::vector<std::shared_ptr<Tensor_attributes>>&& value)
     {
         peer_stats = std::move(value);
         return *this;
@@ -201,13 +200,13 @@ public:
     {
         return set_output(output_names::next_running_variance, std::move(value));
     }
-    Batchnorm_attributes& set_previous_running_stats(const std::shared_ptr<Tensor_attributes>& mean,
-                                                     const std::shared_ptr<Tensor_attributes>& variance,
-                                                     const std::shared_ptr<Tensor_attributes>& momentum)
+    Batchnorm_attributes&
+        set_previous_running_stats(const std::shared_ptr<Tensor_attributes>& mean,
+                                   const std::shared_ptr<Tensor_attributes>& variance,
+                                   const std::shared_ptr<Tensor_attributes>& momentum)
     {
-        return set_prev_running_mean(mean)
-            .set_prev_running_variance(variance)
-            .set_momentum(momentum);
+        return set_prev_running_mean(mean).set_prev_running_variance(variance).set_momentum(
+            momentum);
     }
     Batchnorm_attributes& set_previous_running_stats(std::shared_ptr<Tensor_attributes>&& mean,
                                                      std::shared_ptr<Tensor_attributes>&& variance,
@@ -281,7 +280,8 @@ private:
         return nullptr;
     }
 
-    Batchnorm_attributes& set_input(input_names name, const std::shared_ptr<Tensor_attributes>& value)
+    Batchnorm_attributes& set_input(input_names name,
+                                    const std::shared_ptr<Tensor_attributes>& value)
     {
         inputs[name] = value;
         return *this;
@@ -292,7 +292,8 @@ private:
         return *this;
     }
 
-    Batchnorm_attributes& set_output(output_names name, const std::shared_ptr<Tensor_attributes>& value)
+    Batchnorm_attributes& set_output(output_names name,
+                                     const std::shared_ptr<Tensor_attributes>& value)
     {
         outputs[name] = value;
         return *this;

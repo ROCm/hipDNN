@@ -73,7 +73,8 @@ public:
     {
         return set_input(input_names::mean, std::move(value));
     }
-    Batchnorm_inference_attributes& set_inv_variance(const std::shared_ptr<Tensor_attributes>& value)
+    Batchnorm_inference_attributes&
+        set_inv_variance(const std::shared_ptr<Tensor_attributes>& value)
     {
         return set_input(input_names::inv_variance, value);
     }
