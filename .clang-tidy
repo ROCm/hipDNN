@@ -22,7 +22,7 @@ Checks: >
   -readability-avoid-unconditional-preprocessor-if,
   -readability-use-anyofallof,
   -readability-function-cognitive-complexity
-  
+
 WarningsAsErrors: "*"
 HeaderFileExtensions: ['h','hpp']
 

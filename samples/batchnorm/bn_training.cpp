@@ -102,7 +102,6 @@ void Sample_runner::operator()(const Tensor_layout& layout)
 
     std::unordered_map<int64_t, void*> variant_pack;
 
-    // TODO: Cleanup syntax when there is a better way to grab these pointers.
     variant_pack[x->get_uid()] = x_tensor.memory().device_data();
     variant_pack[scale->get_uid()] = scale_tensor.memory().device_data();
     variant_pack[bias->get_uid()] = bias_tensor.memory().device_data();

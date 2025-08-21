@@ -120,8 +120,9 @@ public:
     Host_allocator(const Host_allocator&) noexcept = default;
 
     template <typename U>
-    Host_allocator(const Host_allocator<U>& /*other*/) noexcept
+    Host_allocator(const Host_allocator<U>& other) noexcept
     {
+        std::ignore = other;
     }
 
     ~Host_allocator() override = default;
@@ -141,21 +142,26 @@ public:
         return ptr;
     }
 
-    void deallocate(T* p, std::size_t /*n*/) noexcept override
+    void deallocate(T* p, std::size_t n) noexcept override
     {
+        std::ignore = n;
         std::free(p);
     }
 };
 
 template <typename T, typename U>
-bool operator==(const Host_allocator<T>& /*lhs*/, const Host_allocator<U>& /*rhs*/) noexcept
+bool operator==(const Host_allocator<T>& lhs, const Host_allocator<U>& rhs) noexcept
 {
+    std::ignore = lhs;
+    std::ignore = rhs;
     return true;
 }
 
 template <typename T, typename U>
-bool operator!=(const Host_allocator<T>& /*lhs*/, const Host_allocator<U>& /*rhs*/) noexcept
+bool operator!=(const Host_allocator<T>& lhs, const Host_allocator<U>& rhs) noexcept
 {
+    std::ignore = lhs;
+    std::ignore = rhs;
     return false;
 }
 
@@ -182,8 +188,9 @@ public:
     Pinned_host_allocator(const Pinned_host_allocator&) noexcept = default;
 
     template <typename U>
-    Pinned_host_allocator(const Pinned_host_allocator<U>& /*other*/) noexcept
+    Pinned_host_allocator(const Pinned_host_allocator<U>& other) noexcept
     {
+        std::ignore = other;
     }
 
     ~Pinned_host_allocator() override = default;
@@ -204,23 +211,26 @@ public:
         return static_cast<T*>(ptr);
     }
 
-    void deallocate(T* p, std::size_t /*n*/) noexcept override
+    void deallocate(T* p, std::size_t n) noexcept override
     {
+        std::ignore = n;
         std::ignore = hipHostFree(p);
     }
 };
 
 template <typename T, typename U>
-bool operator==(const Pinned_host_allocator<T>& /*lhs*/,
-                const Pinned_host_allocator<U>& /*rhs*/) noexcept
+bool operator==(const Pinned_host_allocator<T>& lhs, const Pinned_host_allocator<U>& rhs) noexcept
 {
+    std::ignore = lhs;
+    std::ignore = rhs;
     return true;
 }
 
 template <typename T, typename U>
-bool operator!=(const Pinned_host_allocator<T>& /*lhs*/,
-                const Pinned_host_allocator<U>& /*rhs*/) noexcept
+bool operator!=(const Pinned_host_allocator<T>& lhs, const Pinned_host_allocator<U>& rhs) noexcept
 {
+    std::ignore = lhs;
+    std::ignore = rhs;
     return false;
 }
 
@@ -247,8 +257,9 @@ public:
     Device_allocator(const Device_allocator&) noexcept = default;
 
     template <typename U>
-    Device_allocator(const Device_allocator<U>& /*other*/) noexcept
+    Device_allocator(const Device_allocator<U>& other) noexcept
     {
+        std::ignore = other;
     }
 
     ~Device_allocator() override = default;
@@ -269,8 +280,9 @@ public:
         return static_cast<T*>(ptr);
     }
 
-    void deallocate(T* p, std::size_t /*n*/) noexcept override
+    void deallocate(T* p, std::size_t n) noexcept override
     {
+        std::ignore = n;
         std::ignore = hipFree(p);
     }
 
@@ -280,14 +292,18 @@ public:
 };
 
 template <typename T, typename U>
-bool operator==(const Device_allocator<T>& /*lhs*/, const Device_allocator<U>& /*rhs*/) noexcept
+bool operator==(const Device_allocator<T>& lhs, const Device_allocator<U>& rhs) noexcept
 {
+    std::ignore = lhs;
+    std::ignore = rhs;
     return true;
 }
 
 template <typename T, typename U>
-bool operator!=(const Device_allocator<T>& /*lhs*/, const Device_allocator<U>& /*rhs*/) noexcept
+bool operator!=(const Device_allocator<T>& lhs, const Device_allocator<U>& rhs) noexcept
 {
+    std::ignore = lhs;
+    std::ignore = rhs;
     return false;
 }
 
