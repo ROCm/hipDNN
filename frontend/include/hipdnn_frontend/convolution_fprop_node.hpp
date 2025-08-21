@@ -82,7 +82,7 @@ public:
             error_code_t::INVALID_VALUE,
             "ConvolutionNode: Weight tensor dimensions and strides must be set and positive");
 
-        HIPDNN_RETURN_IF_NE(
+        HIPDNN_RETURN_IF_NEW(
             w_dims.size(),
             x_dims.size(),
             error_code_t::INVALID_VALUE,
@@ -92,11 +92,12 @@ public:
         // Validate input channels match between input and weight tensors
         // For regular convolution: x_dims[1] == w_dims[1]
         // For grouped convolution: x_dims[1] % w_dims[1] == 0
-        HIPDNN_RETURN_IF_NE(x_dims[1] % w_dims[1],
-                            0,
-                            error_code_t::INVALID_VALUE,
-                            "ConvolutionNode: Input tensor channels must match weight tensor input "
-                            "channels or be divisible by them for grouped convolution");
+        HIPDNN_RETURN_IF_NEW(
+            x_dims[1] % w_dims[1],
+            0,
+            error_code_t::INVALID_VALUE,
+            "ConvolutionNode: Input tensor channels must match weight tensor input "
+            "channels or be divisible by them for grouped convolution");
 
         // Validate output tensor dimensions and strides if they are set
         auto& y_dims = y->get_dim();
@@ -104,7 +105,7 @@ public:
 
         if(!y_dims.empty())
         {
-            HIPDNN_RETURN_IF_NE(
+            HIPDNN_RETURN_IF_NEW(
                 y_dims.size(),
                 x_dims.size(),
                 error_code_t::INVALID_VALUE,
@@ -112,14 +113,14 @@ public:
                 "dimension count");
 
             // Validate batch size matches
-            HIPDNN_RETURN_IF_NE(
+            HIPDNN_RETURN_IF_NEW(
                 y_dims[0],
                 x_dims[0],
                 error_code_t::INVALID_VALUE,
                 "ConvolutionNode: Output tensor batch size must match input tensor batch size");
 
             // Validate output channels match weight output channels
-            HIPDNN_RETURN_IF_NE(
+            HIPDNN_RETURN_IF_NEW(
                 y_dims[1],
                 w_dims[0],
                 error_code_t::INVALID_VALUE,
@@ -146,25 +147,25 @@ public:
         auto& stride = attributes.get_stride();
         auto& dilation = attributes.get_dilation();
 
-        HIPDNN_RETURN_IF_NE(
+        HIPDNN_RETURN_IF_NEW(
             pre_padding.size(),
             spatial_dims,
             error_code_t::INVALID_VALUE,
             "ConvolutionNode: pre_padding parameter count must match spatial dimension count");
 
-        HIPDNN_RETURN_IF_NE(
+        HIPDNN_RETURN_IF_NEW(
             post_padding.size(),
             spatial_dims,
             error_code_t::INVALID_VALUE,
             "ConvolutionNode: post_padding parameter count must match spatial dimension count");
 
-        HIPDNN_RETURN_IF_NE(
+        HIPDNN_RETURN_IF_NEW(
             stride.size(),
             spatial_dims,
             error_code_t::INVALID_VALUE,
             "ConvolutionNode: stride parameter count must match spatial dimension count");
 
-        HIPDNN_RETURN_IF_NE(
+        HIPDNN_RETURN_IF_NEW(
             dilation.size(),
             spatial_dims,
             error_code_t::INVALID_VALUE,
@@ -314,7 +315,7 @@ public:
                 error_code_t::ATTRIBUTE_NOT_SET,
                 "ConvolutionNode: Cannot infer output strides - missing output dimensions");
 
-            HIPDNN_RETURN_IF_NE(
+            HIPDNN_RETURN_IF_NEW(
                 x_strides.size(),
                 y_dims_final.size(),
                 error_code_t::ATTRIBUTE_NOT_SET,

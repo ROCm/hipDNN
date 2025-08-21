@@ -230,10 +230,10 @@ public:
         }
 
         error_t status = initialize_heuristic_descriptor(modes);
-        CHECK_HIPDNN_ERROR(status);
+        HIPDNN_CHECK_ERROR(status);
 
         status = initialize_engine_config();
-        CHECK_HIPDNN_ERROR(status);
+        HIPDNN_CHECK_ERROR(status);
 
         _execution_plan_desc = std::make_unique<Scoped_hipdnn_backend_descriptor>(
             HIPDNN_BACKEND_EXECUTION_PLAN_DESCRIPTOR);
