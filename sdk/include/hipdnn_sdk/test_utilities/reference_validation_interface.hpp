@@ -21,9 +21,8 @@ class Reference_validation_interface
 public:
     virtual ~Reference_validation_interface() = default;
 
-    virtual bool compare_buffers(const Migratable_memory<T>& reference,
-                                 const Migratable_memory<T>& implementation,
-                                 hipStream_t stream = nullptr)
+    virtual bool compare_buffers(Migratable_memory_interface<T>& reference,
+                                 Migratable_memory_interface<T>& implementation)
         = 0;
 };
 

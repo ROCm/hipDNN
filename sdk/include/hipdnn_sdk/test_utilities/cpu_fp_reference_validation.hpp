@@ -36,9 +36,8 @@ public:
 
     ~Cpu_fp_reference_validation() override = default;
 
-    bool compare_buffers(const Migratable_memory<T>& reference,
-                         const Migratable_memory<T>& implementation,
-                         hipStream_t stream = nullptr) override
+    bool compare_buffers(Migratable_memory_interface<T>& reference,
+                         Migratable_memory_interface<T>& implementation) override
     {
         if(reference.count() != implementation.count())
         {
@@ -47,8 +46,8 @@ public:
 
         size_t element_count = reference.count();
 
-        const T* ref_data = reference.host_data(stream);
-        const T* impl_data = implementation.host_data(stream);
+        const T* ref_data = reference.host_data();
+        const T* impl_data = implementation.host_data();
 
         for(size_t i = 0; i < element_count; ++i)
         {

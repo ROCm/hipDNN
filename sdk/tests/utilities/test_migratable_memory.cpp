@@ -133,23 +133,22 @@ TEST(MigratableMemory, MigrateToDeviceNonDefaultStream)
     SKIP_IF_NO_DEVICES();
 
     hipStream_t stream;
-    hipError_t error = hipStreamCreate(&stream);
+    hipError_t error = hipStreamCreateWithFlags(&stream, hipStreamNonBlocking);
     EXPECT_EQ(error, hipSuccess) << "Failed to create HIP stream";
     ASSERT_NE(stream, nullptr) << "Failed to create HIP stream";
 
-    Migratable_memory<float> memory(10);
+    Migratable_memory<float> memory(10, stream);
 
     EXPECT_FALSE(memory.empty());
     EXPECT_EQ(memory.count(), 10);
     EXPECT_EQ(memory.location(), Memory_location::HOST);
 
-    init_buffer(memory.host_data(stream), memory.count());
+    init_buffer(memory.host_data(), memory.count());
 
-    EXPECT_NE(memory.device_data(stream), nullptr);
+    EXPECT_NE(memory.device_data(), nullptr);
     EXPECT_EQ(memory.location(), Memory_location::BOTH);
 
-    check_buffer_synchronized(
-        static_cast<float*>(memory.device_data(stream)), memory.count(), stream);
+    check_buffer_synchronized(static_cast<float*>(memory.device_data()), memory.count(), stream);
 
     error = hipStreamDestroy(stream);
     EXPECT_EQ(error, hipSuccess) << "Failed to destroy HIP stream";
@@ -160,23 +159,23 @@ TEST(MigratableMemory, MigrateToDeviceAsyncNonDefaultStream)
     SKIP_IF_NO_DEVICES();
 
     hipStream_t stream;
-    hipError_t error = hipStreamCreate(&stream);
+    hipError_t error = hipStreamCreateWithFlags(&stream, hipStreamNonBlocking);
     EXPECT_EQ(error, hipSuccess) << "Failed to create HIP stream";
     ASSERT_NE(stream, nullptr) << "Failed to create HIP stream";
 
-    Migratable_memory<float> memory(10);
+    Migratable_memory<float> memory(10, stream);
 
     EXPECT_FALSE(memory.empty());
     EXPECT_EQ(memory.count(), 10);
     EXPECT_EQ(memory.location(), Memory_location::HOST);
 
-    init_buffer(memory.host_data(stream), memory.count());
+    init_buffer(memory.host_data(), memory.count());
 
-    EXPECT_NE(memory.device_data(stream), nullptr);
+    EXPECT_NE(memory.device_data(), nullptr);
     EXPECT_EQ(memory.location(), Memory_location::BOTH);
 
     check_buffer_synchronized(
-        static_cast<float*>(memory.device_data_async(stream)), memory.count(), stream);
+        static_cast<float*>(memory.device_data_async()), memory.count(), stream);
 
     error = hipStreamDestroy(stream);
     EXPECT_EQ(error, hipSuccess) << "Failed to destroy HIP stream";
@@ -214,11 +213,11 @@ TEST(MigratableMemory, MigrateToHostNonDefaultStream)
     SKIP_IF_NO_DEVICES();
 
     hipStream_t stream;
-    hipError_t error = hipStreamCreate(&stream);
+    hipError_t error = hipStreamCreateWithFlags(&stream, hipStreamNonBlocking);
     EXPECT_EQ(error, hipSuccess) << "Failed to create HIP stream";
     ASSERT_NE(stream, nullptr) << "Failed to create HIP stream";
 
-    Migratable_memory<float> memory(10);
+    Migratable_memory<float> memory(10, stream);
 
     EXPECT_FALSE(memory.empty());
     EXPECT_EQ(memory.count(), 10);
@@ -226,13 +225,12 @@ TEST(MigratableMemory, MigrateToHostNonDefaultStream)
 
     init_buffer(memory.host_data(), memory.count());
 
-    check_buffer_synchronized(
-        static_cast<float*>(memory.device_data(stream)), memory.count(), stream);
+    check_buffer_synchronized(static_cast<float*>(memory.device_data()), memory.count(), stream);
     EXPECT_EQ(memory.location(), Memory_location::BOTH);
 
     std::array<float, 10> array;
     init_buffer(array.data(), 10, 2.0f);
-    hipError_t err = hipMemcpyWithStream(memory.device_data(stream),
+    hipError_t err = hipMemcpyWithStream(memory.device_data(),
                                          array.data(),
                                          memory.count() * sizeof(float),
                                          hipMemcpyHostToDevice,
@@ -241,7 +239,7 @@ TEST(MigratableMemory, MigrateToHostNonDefaultStream)
     memory.mark_device_modified();
     EXPECT_EQ(memory.location(), Memory_location::DEVICE);
 
-    check_buffer_synchronized(memory.host_data(stream), memory.count(), stream, 2.0f);
+    check_buffer_synchronized(memory.host_data(), memory.count(), stream, 2.0f);
     EXPECT_EQ(memory.location(), Memory_location::BOTH);
 
     error = hipStreamDestroy(stream);
@@ -253,11 +251,11 @@ TEST(MigratableMemory, MigrateToHostAsyncNonDefaultStream)
     SKIP_IF_NO_DEVICES();
 
     hipStream_t stream;
-    hipError_t error = hipStreamCreate(&stream);
+    hipError_t error = hipStreamCreateWithFlags(&stream, hipStreamNonBlocking);
     EXPECT_EQ(error, hipSuccess) << "Failed to create HIP stream";
     ASSERT_NE(stream, nullptr) << "Failed to create HIP stream";
 
-    Migratable_memory<float> memory(10);
+    Migratable_memory<float> memory(10, stream);
 
     EXPECT_FALSE(memory.empty());
     EXPECT_EQ(memory.count(), 10);
@@ -266,12 +264,12 @@ TEST(MigratableMemory, MigrateToHostAsyncNonDefaultStream)
     init_buffer(memory.host_data(), memory.count());
 
     check_buffer_synchronized(
-        static_cast<float*>(memory.device_data_async(stream)), memory.count(), stream);
+        static_cast<float*>(memory.device_data_async()), memory.count(), stream);
     EXPECT_EQ(memory.location(), Memory_location::BOTH);
 
     std::array<float, 10> array;
     init_buffer(array.data(), 10, 2.0f);
-    hipError_t err = hipMemcpyWithStream(memory.device_data(stream),
+    hipError_t err = hipMemcpyWithStream(memory.device_data(),
                                          array.data(),
                                          memory.count() * sizeof(float),
                                          hipMemcpyHostToDevice,
@@ -280,7 +278,7 @@ TEST(MigratableMemory, MigrateToHostAsyncNonDefaultStream)
     memory.mark_device_modified();
     EXPECT_EQ(memory.location(), Memory_location::DEVICE);
 
-    check_buffer_synchronized(memory.host_data_async(stream), memory.count(), stream, 2.0f);
+    check_buffer_synchronized(memory.host_data_async(), memory.count(), stream, 2.0f);
     EXPECT_EQ(memory.location(), Memory_location::BOTH);
 
     error = hipStreamDestroy(stream);

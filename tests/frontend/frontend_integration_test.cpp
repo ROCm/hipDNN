@@ -214,7 +214,7 @@ protected:
 
     static std::unordered_map<int64_t, void*>
         create_variant_pack(const Batchnorm_test_tensors& tensors,
-                            const Simple_batchnorm_2d_tensor_bundle<float, float>& tensor_bundle)
+                            Simple_batchnorm_2d_tensor_bundle<float, float>& tensor_bundle)
     {
         std::unordered_map<int64_t, void*> variant_pack;
         variant_pack[tensors.x->get_uid()] = tensor_bundle.x_tensor.memory().device_data();
@@ -228,12 +228,11 @@ protected:
         return variant_pack;
     }
 
-    static void
-        run_graph_pipeline(const std::shared_ptr<Graph>& graph,
-                           hipdnnHandle_t handle,
-                           const Batchnorm_test_tensors& tensors,
-                           const Simple_batchnorm_2d_tensor_bundle<float, float>& tensor_bundle,
-                           FailurePoint expected_failure = FailurePoint::NONE)
+    static void run_graph_pipeline(const std::shared_ptr<Graph>& graph,
+                                   hipdnnHandle_t handle,
+                                   const Batchnorm_test_tensors& tensors,
+                                   Simple_batchnorm_2d_tensor_bundle<float, float>& tensor_bundle,
+                                   FailurePoint expected_failure = FailurePoint::NONE)
     {
         auto result = graph->validate();
         ASSERT_EQ(result.code, error_code_t::OK) << result.err_msg;
