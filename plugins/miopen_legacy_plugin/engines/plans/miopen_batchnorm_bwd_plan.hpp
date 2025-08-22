@@ -61,7 +61,7 @@ public:
                  void* workspace = nullptr) const override;
 
 private:
-    std::unique_ptr<Batchnorm_bwd_params> _params; // TODO Rename to params
+    std::unique_ptr<Batchnorm_bwd_params> _params;
 };
 
 } // namespace miopen_legacy_plugin
