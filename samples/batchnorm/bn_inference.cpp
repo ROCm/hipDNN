@@ -64,40 +64,36 @@ void Sample_runner::operator()(const Tensor_layout& layout)
     HIPDNN_FE_CHECK(graph->build_plans());
     std::cout << "Plans build successful.\n";
 
-    auto x_tensor = Tensor::make_tensor<InputType>(x->get_dim(), layout);
-    auto scale_tensor = Tensor::make_tensor<IntermediateType>(scale->get_dim());
-    auto bias_tensor = Tensor::make_tensor<IntermediateType>(bias->get_dim());
-    auto mean_tensor = Tensor::make_tensor<IntermediateType>(mean->get_dim());
-    auto inv_variance_tensor = Tensor::make_tensor<IntermediateType>(inv_variance->get_dim());
-    auto y_tensor = Tensor::make_tensor<InputType>(y->get_dim(), layout);
+    Tensor<InputType> x_tensor(x->get_dim(), layout);
+    Tensor<IntermediateType> scale_tensor(scale->get_dim());
+    Tensor<IntermediateType> bias_tensor(bias->get_dim());
+    Tensor<IntermediateType> mean_tensor(mean->get_dim());
+    Tensor<IntermediateType> inv_variance_tensor(inv_variance->get_dim());
+    Tensor<InputType> y_tensor(y->get_dim(), layout);
 
-    x_tensor.template fill_with_random_values<InputType>(static_cast<InputType>(0.0f),
-                                                         static_cast<InputType>(1.0f));
+    x_tensor.fill_with_random_values(static_cast<InputType>(0.0f), static_cast<InputType>(1.0f));
 
-    scale_tensor.template fill_with_value<IntermediateType>(static_cast<IntermediateType>(1.0f));
+    scale_tensor.fill_with_value(static_cast<IntermediateType>(1.0f));
 
-    bias_tensor.template fill_with_value<IntermediateType>(static_cast<IntermediateType>(0.0f));
+    bias_tensor.fill_with_value(static_cast<IntermediateType>(0.0f));
 
-    mean_tensor.template fill_with_value<IntermediateType>(static_cast<IntermediateType>(0.5f));
+    mean_tensor.fill_with_value(static_cast<IntermediateType>(0.5f));
 
-    inv_variance_tensor.template fill_with_value<IntermediateType>(
-        static_cast<IntermediateType>(1.0f));
+    inv_variance_tensor.fill_with_value(static_cast<IntermediateType>(1.0f));
 
     std::unordered_map<int64_t, void*> variant_pack;
 
-    // TODO: Cleanup syntax when there is a better way to grab these pointers.
-    variant_pack[x->get_uid()] = x_tensor.memory().template device_data<void>();
-    variant_pack[scale->get_uid()] = scale_tensor.memory().template device_data<void>();
-    variant_pack[bias->get_uid()] = bias_tensor.memory().template device_data<void>();
-    variant_pack[mean->get_uid()] = mean_tensor.memory().template device_data<void>();
-    variant_pack[inv_variance->get_uid()]
-        = inv_variance_tensor.memory().template device_data<void>();
-    variant_pack[y->get_uid()] = y_tensor.memory().template device_data<void>();
+    variant_pack[x->get_uid()] = x_tensor.memory().device_data();
+    variant_pack[scale->get_uid()] = scale_tensor.memory().device_data();
+    variant_pack[bias->get_uid()] = bias_tensor.memory().device_data();
+    variant_pack[mean->get_uid()] = mean_tensor.memory().device_data();
+    variant_pack[inv_variance->get_uid()] = inv_variance_tensor.memory().device_data();
+    variant_pack[y->get_uid()] = y_tensor.memory().device_data();
 
     HIPDNN_FE_CHECK(graph->execute(handle, variant_pack, nullptr));
 
     y_tensor.memory().mark_device_modified();
-    auto y_host_ptr = y_tensor.memory().template host_data<InputType>();
+    auto y_host_ptr = y_tensor.memory().host_data();
 
     if(config.cpu_validation)
     {
@@ -105,13 +101,12 @@ void Sample_runner::operator()(const Tensor_layout& layout)
 
         auto ref_impl = hipdnn_sdk::reference_test_utilities::
             Cpu_fp_reference_implementation<InputType, IntermediateType>();
-        auto y_ref_tensor = Tensor::make_tensor<InputType>(y->get_dim(), layout);
+        Tensor<InputType> y_ref_tensor(y->get_dim(), layout);
 
         // Convert inverse variance to variance for CPU reference
-        auto variance_tensor = Tensor::make_tensor<IntermediateType>(inv_variance->get_dim());
-        auto inv_variance_host_ptr
-            = inv_variance_tensor.memory().template host_data<IntermediateType>();
-        auto variance_host_ptr = variance_tensor.memory().template host_data<IntermediateType>();
+        Tensor<IntermediateType> variance_tensor(inv_variance->get_dim());
+        auto inv_variance_host_ptr = inv_variance_tensor.memory().host_data();
+        auto variance_host_ptr = variance_tensor.memory().host_data();
 
         for(size_t i = 0; i < inv_variance_tensor.memory().count(); ++i)
         {

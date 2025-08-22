@@ -26,6 +26,7 @@ add_executable(hipdnn_sdk_tests
     utilities/test_scoped_resource.cpp
     utilities/test_callback_logger.cpp
     utilities/test_migratable_memory.cpp
+    utilities/test_allocators.cpp
     utilities/test_floats.cpp
     utilities/test_shape_utilities.cpp
     utilities/test_tensor.cpp
