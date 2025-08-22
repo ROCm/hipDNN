@@ -397,9 +397,9 @@ public:
     }
 
     std::array<std::shared_ptr<Tensor_attributes>, 5>
-        batchnorm(const std::shared_ptr<Tensor_attributes>& x,
-                  const std::shared_ptr<Tensor_attributes>& scale,
-                  const std::shared_ptr<Tensor_attributes>& bias,
+        batchnorm(std::shared_ptr<Tensor_attributes> x,
+                  std::shared_ptr<Tensor_attributes> scale,
+                  std::shared_ptr<Tensor_attributes> bias,
                   Batchnorm_attributes attributes)
     {
         auto y = output_tensor(attributes.name + "::Y");
@@ -418,9 +418,9 @@ public:
             next_running_variance = output_tensor(attributes.name + "::NEXT_RUNNING_VARIANCE");
         }
 
-        attributes.set_x(x);
-        attributes.set_scale(scale);
-        attributes.set_bias(bias);
+        attributes.set_x(std::move(x));
+        attributes.set_scale(std::move(scale));
+        attributes.set_bias(std::move(bias));
         attributes.set_y(y);
         attributes.set_mean(mean_out);
         attributes.set_inv_variance(inv_variance_out);
@@ -434,9 +434,9 @@ public:
     }
 
     std::array<std::shared_ptr<Tensor_attributes>, 3>
-        batchnorm_backward(const std::shared_ptr<Tensor_attributes>& dy,
-                           const std::shared_ptr<Tensor_attributes>& x,
-                           const std::shared_ptr<Tensor_attributes>& scale,
+        batchnorm_backward(std::shared_ptr<Tensor_attributes> dy,
+                           std::shared_ptr<Tensor_attributes> x,
+                           std::shared_ptr<Tensor_attributes> scale,
                            Batchnorm_backward_attributes attributes)
     {
         auto dx = output_tensor(attributes.name + "::DX");
@@ -448,9 +448,9 @@ public:
         auto dbias = output_tensor(attributes.name + "::DBIAS");
         attributes.set_dbias(dbias);
 
-        attributes.set_x(x);
-        attributes.set_dy(dy);
-        attributes.set_scale(scale);
+        attributes.set_x(std::move(x));
+        attributes.set_dy(std::move(dy));
+        attributes.set_scale(std::move(scale));
 
         _sub_nodes.emplace_back(
             std::make_shared<BatchnormBackwardNode>(std::move(attributes), graph_attributes));
@@ -459,20 +459,21 @@ public:
     }
 
     std::shared_ptr<Tensor_attributes>
-        batchnorm_inference(const std::shared_ptr<Tensor_attributes>& x,
-                            const std::shared_ptr<Tensor_attributes>& mean,
-                            const std::shared_ptr<Tensor_attributes>& inv_variance,
-                            const std::shared_ptr<Tensor_attributes>& scale,
-                            const std::shared_ptr<Tensor_attributes>& bias,
+        batchnorm_inference(std::shared_ptr<Tensor_attributes> x,
+                            std::shared_ptr<Tensor_attributes> mean,
+                            std::shared_ptr<Tensor_attributes> inv_variance,
+                            std::shared_ptr<Tensor_attributes> scale,
+                            std::shared_ptr<Tensor_attributes> bias,
                             Batchnorm_inference_attributes attributes)
     {
         auto y = attributes.outputs[Batchnorm_inference_attributes::output_names::y]
             = output_tensor(attributes.name + "::Y");
-        attributes.inputs[Batchnorm_inference_attributes::input_names::x] = x;
-        attributes.inputs[Batchnorm_inference_attributes::input_names::mean] = mean;
-        attributes.inputs[Batchnorm_inference_attributes::input_names::inv_variance] = inv_variance;
-        attributes.inputs[Batchnorm_inference_attributes::input_names::scale] = scale;
-        attributes.inputs[Batchnorm_inference_attributes::input_names::bias] = bias;
+        attributes.inputs[Batchnorm_inference_attributes::input_names::x] = std::move(x);
+        attributes.inputs[Batchnorm_inference_attributes::input_names::mean] = std::move(mean);
+        attributes.inputs[Batchnorm_inference_attributes::input_names::inv_variance]
+            = std::move(inv_variance);
+        attributes.inputs[Batchnorm_inference_attributes::input_names::scale] = std::move(scale);
+        attributes.inputs[Batchnorm_inference_attributes::input_names::bias] = std::move(bias);
 
         _sub_nodes.emplace_back(
             std::make_shared<BatchnormInferenceNode>(std::move(attributes), graph_attributes));
@@ -480,7 +481,7 @@ public:
         return y;
     }
 
-    std::shared_ptr<Tensor_attributes> pointwise(const std::shared_ptr<Tensor_attributes>& in_0,
+    std::shared_ptr<Tensor_attributes> pointwise(std::shared_ptr<Tensor_attributes> in_0,
                                                  Pointwise_attributes attributes)
 
     {
@@ -494,7 +495,7 @@ public:
         }
         auto out_0 = attributes.outputs[Pointwise_attributes::output_names::out_0]
             = output_tensor(attributes.name + "::OUT_0");
-        attributes.inputs[Pointwise_attributes::input_names::in_0] = in_0;
+        attributes.inputs[Pointwise_attributes::input_names::in_0] = std::move(in_0);
 
         _sub_nodes.emplace_back(
             std::make_shared<PointwiseNode>(std::move(attributes), graph_attributes));
@@ -502,8 +503,8 @@ public:
         return out_0;
     }
 
-    std::shared_ptr<Tensor_attributes> pointwise(const std::shared_ptr<Tensor_attributes>& in_0,
-                                                 const std::shared_ptr<Tensor_attributes>& in_1,
+    std::shared_ptr<Tensor_attributes> pointwise(std::shared_ptr<Tensor_attributes> in_0,
+                                                 std::shared_ptr<Tensor_attributes> in_1,
                                                  Pointwise_attributes attributes)
 
     {
@@ -521,8 +522,8 @@ public:
         }
         auto out_0 = attributes.outputs[Pointwise_attributes::output_names::out_0]
             = output_tensor(attributes.name + "::OUT_0");
-        attributes.inputs[Pointwise_attributes::input_names::in_0] = in_0;
-        attributes.inputs[Pointwise_attributes::input_names::in_1] = in_1;
+        attributes.inputs[Pointwise_attributes::input_names::in_0] = std::move(in_0);
+        attributes.inputs[Pointwise_attributes::input_names::in_1] = std::move(in_1);
 
         _sub_nodes.emplace_back(
             std::make_shared<PointwiseNode>(std::move(attributes), graph_attributes));
@@ -530,9 +531,9 @@ public:
         return out_0;
     }
 
-    std::shared_ptr<Tensor_attributes> pointwise(const std::shared_ptr<Tensor_attributes>& in_0,
-                                                 const std::shared_ptr<Tensor_attributes>& in_1,
-                                                 const std::shared_ptr<Tensor_attributes>& in_2,
+    std::shared_ptr<Tensor_attributes> pointwise(std::shared_ptr<Tensor_attributes> in_0,
+                                                 std::shared_ptr<Tensor_attributes> in_1,
+                                                 std::shared_ptr<Tensor_attributes> in_2,
                                                  Pointwise_attributes attributes)
 
     {
@@ -554,9 +555,9 @@ public:
         }
         auto out_0 = attributes.outputs[Pointwise_attributes::output_names::out_0]
             = output_tensor(attributes.name + "::OUT_0");
-        attributes.inputs[Pointwise_attributes::input_names::in_0] = in_0;
-        attributes.inputs[Pointwise_attributes::input_names::in_1] = in_1;
-        attributes.inputs[Pointwise_attributes::input_names::in_2] = in_2;
+        attributes.inputs[Pointwise_attributes::input_names::in_0] = std::move(in_0);
+        attributes.inputs[Pointwise_attributes::input_names::in_1] = std::move(in_1);
+        attributes.inputs[Pointwise_attributes::input_names::in_2] = std::move(in_2);
 
         _sub_nodes.emplace_back(
             std::make_shared<PointwiseNode>(std::move(attributes), graph_attributes));
