@@ -178,5 +178,8 @@ private:
     std::vector<int64_t> _strides;
 };
 
+template <typename T>
+using PinnedTensor = Tensor<T, Pinned_host_allocator<T>>;
+
 } // namespace utilities
 } // namespace hipdnn_sdk

@@ -73,12 +73,12 @@ struct Batchnorm_2d_tensor_bundle
     }
 
     std::vector<int64_t> derived_dims;
-    Tensor<Input_type, Pinned_host_allocator<Input_type>> x_tensor;
-    Tensor<Input_type, Pinned_host_allocator<Input_type>> y_tensor;
-    Tensor<Intermediate_type, Pinned_host_allocator<Intermediate_type>> scale_tensor;
-    Tensor<Intermediate_type, Pinned_host_allocator<Intermediate_type>> bias_tensor;
-    Tensor<Intermediate_type, Pinned_host_allocator<Intermediate_type>> mean_tensor;
-    Tensor<Intermediate_type, Pinned_host_allocator<Intermediate_type>> variance_tensor;
+    PinnedTensor<Input_type> x_tensor;
+    PinnedTensor<Input_type> y_tensor;
+    PinnedTensor<Intermediate_type> scale_tensor;
+    PinnedTensor<Intermediate_type> bias_tensor;
+    PinnedTensor<Intermediate_type> mean_tensor;
+    PinnedTensor<Intermediate_type> variance_tensor;
 };
 class Batchnorm_forward_inference_integration_test
     : public ::testing::TestWithParam<Bn_2d_test_case>

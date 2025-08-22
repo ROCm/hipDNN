@@ -97,7 +97,8 @@ hipdnnPluginDeviceBuffer_t generate_random_device_buffer(
 }
 
 template <typename T>
-hipdnnPluginDeviceBuffer_t generate_static_device_buffer(Tensor<T>& tensor, int uid, T value)
+hipdnnPluginDeviceBuffer_t
+    generate_static_device_buffer(Tensor_interface<T>& tensor, int uid, T value)
 {
     tensor.fill_with_value(value);
     hipdnnPluginDeviceBuffer_t buffer;
@@ -177,37 +178,36 @@ void Batchnorm_execute_graph_test::RunFwdbatchnormGraph(
 
     std::vector<hipdnnPluginDeviceBuffer_t> device_buffers;
 
-    Tensor<Input_type, Pinned_host_allocator<Input_type>> x_tensor(dims, layout);
+    PinnedTensor<Input_type> x_tensor(dims, layout);
     device_buffers.push_back(generate_random_device_buffer(
         x_tensor, 1, static_cast<Input_type>(0.0f), static_cast<Input_type>(1.0f), seed));
 
-    Tensor<Input_type, Pinned_host_allocator<Input_type>> y_tensor(dims, layout);
+    PinnedTensor<Input_type> y_tensor(dims, layout);
     device_buffers.push_back(generate_random_device_buffer(
         y_tensor, 2, static_cast<Input_type>(-100.0f), static_cast<Input_type>(100.0f), seed));
 
-    Tensor<Intermediate_type, Pinned_host_allocator<Intermediate_type>> scale_tensor(derived_dims);
+    PinnedTensor<Intermediate_type> scale_tensor(derived_dims);
     device_buffers.push_back(generate_random_device_buffer(scale_tensor,
                                                            3,
                                                            static_cast<Intermediate_type>(0.0f),
                                                            static_cast<Intermediate_type>(1.0f),
                                                            seed));
 
-    Tensor<Intermediate_type, Pinned_host_allocator<Intermediate_type>> bias_tensor(derived_dims);
+    PinnedTensor<Intermediate_type> bias_tensor(derived_dims);
     device_buffers.push_back(generate_random_device_buffer(bias_tensor,
                                                            4,
                                                            static_cast<Intermediate_type>(0.0f),
                                                            static_cast<Intermediate_type>(1.0f),
                                                            seed));
 
-    Tensor<Intermediate_type, Pinned_host_allocator<Intermediate_type>> mean_tensor(derived_dims);
+    PinnedTensor<Intermediate_type> mean_tensor(derived_dims);
     device_buffers.push_back(generate_random_device_buffer(mean_tensor,
                                                            5,
                                                            static_cast<Intermediate_type>(0.0f),
                                                            static_cast<Intermediate_type>(1.0f),
                                                            seed));
 
-    Tensor<Intermediate_type, Pinned_host_allocator<Intermediate_type>> variance_tensor(
-        derived_dims);
+    PinnedTensor<Intermediate_type> variance_tensor(derived_dims);
     device_buffers.push_back(generate_random_device_buffer(variance_tensor,
                                                            6,
                                                            static_cast<Intermediate_type>(0.1f),
