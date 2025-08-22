@@ -80,7 +80,7 @@ target_link_libraries(your_target hip::host hip::device)
 ```
 
 > [!NOTE]
-> If CMake cannot find the packages after installation, ensure your `CMAKE_PREFIX_PATH` includes the install location. By default on Linux systems, hipDNN CMake files are installed to `/opt/rocm/lib/cmake`.
+> 📝 If CMake cannot find the packages after installation, ensure your `CMAKE_PREFIX_PATH` includes the install location. By default on Linux systems, hipDNN CMake files are installed to `/opt/rocm/lib/cmake`.
 
 ### Logging Setup
 

@@ -4,9 +4,9 @@ This document provides an overview of hipDNN's testing approach and links to det
 
 ## Running Tests
 
-Before running tests, follow the [Quick Start Guide](../Building.md#quick-start-guide) to clone hipDNN and prepare your environment.
+Prior to running tests, follow the [Quick Start Guide](../Building.md#quick-start-guide) to clone hipDNN and prepare your environment.
 
-Afterwards, run the tests:
+Afterwards, proceed to run the tests:
 ```bash
 cmake -GNinja .. 
 

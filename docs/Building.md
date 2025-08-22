@@ -165,14 +165,14 @@ cmake -GNinja -DHIP_DNN_BUILD_SAMPLES=OFF ..
 ## Build Targets
 
 > [!NOTE]
-> Make is supported for all targets. Configure with `cmake -G "Unix Makefiles" ..` if it is not the default generator in your environment. For parallel builds, use `make -j$(nproc)` on Linux. Unlike `ninja`, `make` does not build in parallel by default.
+> 📝 Make is supported for all targets. Configure with `cmake -G "Unix Makefiles" ..` if it is not the default generator in your environment. For parallel builds, use `make -j$(nproc)` on Linux. Unlike `ninja`, `make` does not build in parallel by default.
 
 All targets support parallel builds with ninja:
 
 | Target | Description |
 |--------|-------------|
 | `ninja` | Build all components |
-| `ninja check` | Build and run all tests (see [Testing Strategy](./testing/TestingStrategy.md)) |
+| `ninja check` | Build and run all tests (see [Testing](./Testing.md)) |
 | `ninja unit-check` | Build and run only the unit tests (minimal version of `ninja check`) |
 | `ninja integration-check` | Build and run only the integration tests (this is the bulk of the testing time) |
 | `ninja install` | Install libraries and headers |

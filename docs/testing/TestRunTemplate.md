@@ -153,8 +153,8 @@ The following tests did not run:
 
 ## Best Practices
 
-1. **Be Specific**: Document exact error messages when tests fail
-2. **Include Context**: Note any environmental factors that might affect test results
-3. **Track Patterns**: If certain tests consistently skip or fail, document why
-4. **Version Information**: Always include accurate version information for reproducibility
+1. **Be Specific**: Document exact error messages when tests fail.
+2. **Include Context**: Note any environmental factors that might affect test results.
+3. **Track Patterns**: If certain tests consistently skip or fail, document why.
+4. **Version Information**: Always include accurate version information for reproducibility.
 5. **Save logs**: Saving and attaching logs lends critical insight into your run. See [Environment.md](../Environment.md#environment-variables) for details on enabling logging.

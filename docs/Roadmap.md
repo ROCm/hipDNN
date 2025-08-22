@@ -3,7 +3,7 @@
 This document outlines the development roadmap for hipDNN, including near-term priorities and future goals for each component. hipDNN is actively evolving to provide a comprehensive graph-based deep learning library for AMD GPUs. For a table of active operation support, see the [Operation Support doc](./OperationSupport.md).
 
 > [!NOTE]
-> This roadmap is subject to change based on project priorities, community feedback, and technical requirements.
+> 📝 This roadmap is subject to change based on project priorities, community feedback, and technical requirements.
 
 ## hipDNN Core
 
