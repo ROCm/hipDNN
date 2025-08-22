@@ -84,9 +84,19 @@ public:
         inputs[input_names::in_0] = input_0;
         return *this;
     }
+    Pointwise_attributes& set_input_0(std::shared_ptr<Tensor_attributes>&& input_0)
+    {
+        inputs[input_names::in_0] = std::move(input_0);
+        return *this;
+    }
     Pointwise_attributes& set_input_1(const std::shared_ptr<Tensor_attributes>& input_1)
     {
         inputs[input_names::in_1] = input_1;
+        return *this;
+    }
+    Pointwise_attributes& set_input_1(std::shared_ptr<Tensor_attributes>&& input_1)
+    {
+        inputs[input_names::in_1] = std::move(input_1);
         return *this;
     }
     Pointwise_attributes& set_input_2(const std::shared_ptr<Tensor_attributes>& input_2)
@@ -94,9 +104,19 @@ public:
         inputs[input_names::in_2] = input_2;
         return *this;
     }
+    Pointwise_attributes& set_input_2(std::shared_ptr<Tensor_attributes>&& input_2)
+    {
+        inputs[input_names::in_2] = std::move(input_2);
+        return *this;
+    }
     Pointwise_attributes& set_output_0(const std::shared_ptr<Tensor_attributes>& output_0)
     {
         outputs[output_names::out_0] = output_0;
+        return *this;
+    }
+    Pointwise_attributes& set_output_0(std::shared_ptr<Tensor_attributes>&& output_0)
+    {
+        outputs[output_names::out_0] = std::move(output_0);
         return *this;
     }
 

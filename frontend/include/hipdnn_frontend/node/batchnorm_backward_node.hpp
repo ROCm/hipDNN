@@ -88,7 +88,7 @@ public:
                     "BatchnormBackwardNode missing dbias for setting properties"};
         }
 
-        CHECK_HIPDNN_ERROR(attributes.fill_from_graph_attributes(graph_attributes));
+        HIPDNN_CHECK_ERROR(attributes.fill_from_graph_attributes(graph_attributes));
 
         if(dx->get_dim().empty())
         {

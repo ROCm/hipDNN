@@ -61,26 +61,50 @@ public:
     {
         return set_input(input_names::x, value);
     }
+    Batchnorm_inference_attributes& set_x(std::shared_ptr<Tensor_attributes>&& value)
+    {
+        return set_input(input_names::x, std::move(value));
+    }
     Batchnorm_inference_attributes& set_mean(const std::shared_ptr<Tensor_attributes>& value)
     {
         return set_input(input_names::mean, value);
+    }
+    Batchnorm_inference_attributes& set_mean(std::shared_ptr<Tensor_attributes>&& value)
+    {
+        return set_input(input_names::mean, std::move(value));
     }
     Batchnorm_inference_attributes&
         set_inv_variance(const std::shared_ptr<Tensor_attributes>& value)
     {
         return set_input(input_names::inv_variance, value);
     }
+    Batchnorm_inference_attributes& set_inv_variance(std::shared_ptr<Tensor_attributes>&& value)
+    {
+        return set_input(input_names::inv_variance, std::move(value));
+    }
     Batchnorm_inference_attributes& set_scale(const std::shared_ptr<Tensor_attributes>& value)
     {
         return set_input(input_names::scale, value);
+    }
+    Batchnorm_inference_attributes& set_scale(std::shared_ptr<Tensor_attributes>&& value)
+    {
+        return set_input(input_names::scale, std::move(value));
     }
     Batchnorm_inference_attributes& set_bias(const std::shared_ptr<Tensor_attributes>& value)
     {
         return set_input(input_names::bias, value);
     }
+    Batchnorm_inference_attributes& set_bias(std::shared_ptr<Tensor_attributes>&& value)
+    {
+        return set_input(input_names::bias, std::move(value));
+    }
     Batchnorm_inference_attributes& set_y(const std::shared_ptr<Tensor_attributes>& value)
     {
         return set_output(output_names::y, value);
+    }
+    Batchnorm_inference_attributes& set_y(std::shared_ptr<Tensor_attributes>&& value)
+    {
+        return set_output(output_names::y, std::move(value));
     }
 
     flatbuffers::Offset<hipdnn_sdk::data_objects::BatchnormInferenceAttributes>
@@ -127,11 +151,23 @@ private:
         inputs[name] = value;
         return *this;
     }
+    Batchnorm_inference_attributes& set_input(input_names name,
+                                              std::shared_ptr<Tensor_attributes>&& value)
+    {
+        inputs[name] = std::move(value);
+        return *this;
+    }
 
     Batchnorm_inference_attributes& set_output(output_names name,
                                                const std::shared_ptr<Tensor_attributes>& value)
     {
         outputs[name] = value;
+        return *this;
+    }
+    Batchnorm_inference_attributes& set_output(output_names name,
+                                               std::shared_ptr<Tensor_attributes>&& value)
+    {
+        outputs[name] = std::move(value);
         return *this;
     }
 };

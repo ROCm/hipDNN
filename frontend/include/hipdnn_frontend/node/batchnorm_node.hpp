@@ -69,7 +69,7 @@ public:
                     "BatchnormNode missing y for setting properties"};
         }
 
-        CHECK_HIPDNN_ERROR(attributes.fill_from_graph_attributes(graph_attributes));
+        HIPDNN_CHECK_ERROR(attributes.fill_from_graph_attributes(graph_attributes));
 
         if(y->get_dim().empty())
         {
