@@ -4,7 +4,7 @@ This document outlines the comprehensive testing strategy for hipDNN, covering w
 
 ---
 
-## 1. White Box Testing (Unit Tests)
+## 1. White Box Testing (Unit Tests) ⬜
 
 White box tests focus on internal implementation details of hipDNN components.
 
@@ -25,7 +25,7 @@ White box tests focus on internal implementation details of hipDNN components.
 - Descriptors
 - Plugin system
 - Error handling
-- Utilities
+- Backend utilities
 - Handle
 - Graph extensions
 
@@ -33,17 +33,18 @@ White box tests focus on internal implementation details of hipDNN components.
 - Attribute
 - Node
 - Graph construction & flow
-- Utilities
+- Frontend utilities
 
 #### SDK
 - Plugins
 - Data objects
 - Logging
-- Utilities
+- SDK utilities
 - Reference implementations
 
 #### Plugin
 - TBD based on plugin implementation
+- See the recommended implementation in [Plugin Development](../PluginDevelopment.md#implementation-details)
 
 ### Common Requirements
 - **Mocking**: Use GMOCK for mocking dependencies
@@ -54,7 +55,7 @@ White box tests focus on internal implementation details of hipDNN components.
 
 ---
 
-## 2. Black Box Testing (API Tests)
+## 2. Black Box Testing (API Tests) ⬛
 
 Black box tests validate the public API without knowledge of internal implementation.
 
@@ -70,20 +71,21 @@ Black box tests validate the public API without knowledge of internal implementa
 
 #### Test Categories
 - Descriptor APIs (create, get/set properties, destroy)
-  <!-- - Engine API
+  - Engine API
   - Engine config API
   - Engine heuristic API
   - Execution plan API
   - Handle API
   - Variant pack API
   - Graph API
-  - Graph extension API for serialized graph structures -->
+  - Graph extension API for serialized graph structures
 - Backend execute API
 - Plugin management extension API
+- Logging extension API
 
 ---
 
-## 3. Integration Testing
+## 3. Integration Testing 🧩
 
 Integration tests validate end-to-end functionality across components.
 
@@ -96,16 +98,23 @@ Integration tests validate end-to-end functionality across components.
 
 ### Test Requirements by Type
 
-| Test Type | Key Requirements |
-|-----------|-----------------|
-| **Frontend-Backend** | • Use fake plugins for controlled behavior<br>• No accuracy/solution validation (stubbed)<br>• Test graph creation & execution API<br>• Test backend descriptor creation from frontend<br>• Test execution flow validation |
-| **Plugin Integration** | • Validate correctness and graph support<br>• Each plugin maintains its own test suite<br>• Test on all ASICs supported by the plugin |
+#### Frontend-Backend
+- Use fake plugins for controlled behavior
+- No accuracy/solution validation (stubbed)
+- Test graph creation and execution API
+- Test backend descriptor creation from frontend
+- Test execution flow validation
+
+#### Plugin Integration
+- Validate correctness and graph support
+- Each plugin maintains its own test suite
+- Test on all ASICs supported by the plugin
 
 ---
 
 ## General Testing Requirements
 
-### Code Coverage
+### Code Coverage 
 - **Target**: 80% overall coverage
 - **Component Target**: Each sub-section should be above 80% individually
 - **Enforcement**: Coverage must remain above 80% for PRs to be accepted
@@ -116,17 +125,21 @@ Tests must work in the following environments:
 
 | Environment Type | Supported Methods |
 |-----------------|-------------------|
-| **CLI Build Environment** | `make check`, `ninja check`, `make check_ctest`, `ninja check_ctest` |
+| **CLI Build Environment** | `ninja check`, `ninja check_ctest` |
 | **IDE** | Visual Studio Code and extensions like TestMate |
 | **Artifacts** | • Installed testing artifacts<br>• Running built test executables |
 | **Operating System** | • Windows<br>• Supported Linux distros |
+
+> [!TIP]
+> `ninja unit-check` runs fast, isolated unit and API tests.
+> `ninja integration-check` runs slower, end-to-end integration tests.
 
 ### GPU Requirements
 - **Without GPU**: All GPU tests must be skippable (warnings, not errors)
 - **With GPU**: Tests should detect and utilize available GPU resources
 - **Platform Support**: Windows & supported Linux distributions
 
-### Green CI
+### Green CI 🟩
 
 For each PR, the latest commit must pass every CI pipeline listed in the [Test Plan](./TestPlan.md#prerequisites).
 

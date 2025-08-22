@@ -10,7 +10,7 @@ This guide provides comprehensive information for developing plugins for hipDNN.
 - [Plugin API](#plugin-api)
 - [Creating a Kernel Engine Plugin](#creating-a-kernel-engine-plugin)
   - [Steps Overview](#steps-overview)
-  - [Implementation Details](#implementation-details)
+  - [Implementation Details & Best Practices](#implementation-details)
   - [Key Files Reference](#key-files-reference)
 - [Plugin Architecture](#plugin-architecture)
 - [Example: MIOpen Legacy Plugin](#example-miopen-legacy-plugin)
@@ -63,8 +63,7 @@ This section focuses on developing kernel engine plugins, which are currently th
 
 ### Prerequisites
 
-Before creating a plugin, ensure you have:
-- **Built and installed hipDNN**: Plugins depend on the hipDNN SDK headers and libraries. See the [Quick Start Guide](./Building.md#quick-start-guide) for build and installation instructions.
+Before creating a plugin, ensure you have **built and installed hipDNN**. Plugins depend on the hipDNN SDK headers and libraries. See the [Quick Start Guide](./Building.md#quick-start-guide) for build and installation instructions.
 
 ### Steps Overview
 
@@ -75,7 +74,7 @@ Before creating a plugin, ensure you have:
 
 2. **Implement Plugin API Functions**
    
-   The underlying implementation below the plugin API level is entirely at the developer's discretion. While the following architectural components are recommended for code organization and maintainability; the only true requirement is to correctly implement the exported API functions defined in `engine_plugin_api.h`. However, the common architectural pattern consists of:
+   The underlying implementation below the plugin API level is entirely at the developer's discretion. While the following architectural components are recommended for code organization and maintainability; the only true requirement is to implement the exported API functions defined in `engine_plugin_api.h`. However, the common architectural pattern consists of:
    - **Engine Manager**: Manages available engines and their capabilities
    - **Engine**: Implements graph execution for specific operations (each engine must have a globally unique `int64_t` ID)
    - **Execution Plans**: Define how operations are executed
@@ -86,16 +85,14 @@ Before creating a plugin, ensure you have:
 
 ### Implementation Details
 
-#### Engine Manager
-The Engine Manager is responsible for:
+The **Engine Manager** is responsible for:
 - Creating and managing engine instances
 - Reporting supported operations
 - Handling resource allocation
 - Managing device-specific contexts
 
-#### Engine Implementation
-When implementing engines (if following this pattern):
-- Each engine must have a unique `int64_t` identifier within the plugin
+For **Engine Implementations**:
+- Each engine must have a unique inter-plugin `int64_t` identifier
 - Implement the `execute()` method for graph execution
 - Provide `get_supported_operations()` to report capabilities
 - Handle operation-specific kernel launches
@@ -104,12 +101,21 @@ When implementing engines (if following this pattern):
 > [!TIP]
 > 💡 An engine ID is an integer unique to all loaded plugins. These IDs are used by the backend to identify and select specific engines for execution. You may want to reference other loaded plugins to accrue a set of unused engine IDs.
 
-#### Execution Plans
-Execution plans for kernel engines:
+**Execution plans** for kernel engines:
 - Map hipDNN operations to backend-specific kernel implementations
 - Define memory layouts and data transformations
 - Specify kernel launch configurations
 - Handle device-specific optimizations
+
+In general, the **best practices** consist of:
+
+1. Organizing kernels by operation type
+2. Efficiently manage device memory allocations and transfers
+3. Validate inputs and provide meaningful error messages and logs via the sdk
+4. Properly manage compute streams for asynchronous execution
+5. Profile kernels and optimize for target hardware
+6. Validate and document supported operations, hardware requirements, and limitations
+7. Include unit tests and integration tests
 
 ### Key Files Reference
 
@@ -256,7 +262,8 @@ This function uses a two-call pattern:
 
 ## How to Test Plugins
 
-Testing is crucial for ensuring plugin reliability and correctness. Plugins should include both unit tests and integration tests to validate their functionality.
+> [!IMPORTANT]
+> Testing is crucial for ensuring plugin reliability and correctness. Plugins should include both unit tests and integration tests to validate their functionality.
 
 ### Test Structure
 
@@ -302,37 +309,17 @@ For a comprehensive example of an integration test, see: [`plugins/miopen_legacy
 
 Moreover, see our [general testing requirements](./testing/TestingStrategy.md#general-testing-requirements).
 
-## Example: MIOpen Legacy Plugin
+## Example: [MIOpen Legacy Plugin](../plugins/miopen_legacy_plugin/)
 
-The MIOpen Legacy Plugin demonstrates a complete kernel engine plugin implementation:
+The MIOpen Legacy Plugin is a complete example of a kernel engine plugin. It demonstrates how a plugin integrates with hipDNN and delegates execution to a backend. Furthermore, it incorporates the recommended structure and best practices for kernel engine plugins.
+
+At a high level, it:
+- Initializes and manages the GPU context using MIOpen handles
+- Translates hipDNN tensors into MIOpen tensor descriptors
+- Dispatches MIOpen kernels to execute operations
+- Coordinates streams and handles synchronization
 
 ### Structure
 - **Main Plugin**: [`miopen_legacy_plugin.cpp`](../plugins/miopen_legacy_plugin/miopen_legacy_plugin.cpp) - Entry point and plugin registration
 - **Engine Manager**: [`engine_manager.cpp`](../plugins/miopen_legacy_plugin/engine_manager.cpp) - Manages MIOpen engines
 - **MIOpen Engine**: [`engines/miopen_engine.cpp`](../plugins/miopen_legacy_plugin/engines/miopen_engine.cpp) - Implements graph execution using MIOpen kernels
-
-### Integration Points
-- Uses MIOpen handles for GPU context management
-- Converts hipDNN tensors to MIOpen tensor descriptors
-- Launches MIOpen kernels for computation
-- Handles stream synchronization
-
----
-
-## Best Practices for Kernel Engine Plugins
-
-1. **Kernel Management**: Organize kernels by operation type for maintainability
-2. **Memory Management**: Efficiently manage device memory allocations and transfers
-3. **Stream Handling**: Properly manage compute streams for asynchronous execution
-4. **Error Handling**: Validate inputs and provide meaningful error messages
-5. **Testing**: Include unit tests for kernels and integration tests for operations
-6. **Performance**: Profile kernels and optimize for target hardware
-7. **Documentation**: Document supported operations, hardware requirements, and limitations
-
-## Future Plugin Types
-
-While kernel engine plugins are the focus of current development, future releases will support:
-- **Engine heuristic plugins** for intelligent kernel selection
-- **Benchmarking plugins** for automated performance tuning
-
-These plugin types will follow similar development patterns but with specialized interfaces tailored to their specific purposes.

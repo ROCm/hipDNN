@@ -39,7 +39,7 @@ The fastest way to get started with hipDNN is to follow the [quick start steps i
 ### Developer Guides
 - **[Design Overview](./docs/Design.md)** - Architecture and design descriptions and diagrams
 - **[Extending hipDNN](./docs/HowTo.md#extending-hipdnn)** - How to extend hipDNN functionality
-- **[Plugin Development](./docs/PluginDevelopment.md)** - Creating custom plugins for hipDNN
+- **[Plugin Development](./docs/PluginDevelopment.md)** - Creating and using custom plugins for hipDNN
 - **[Roadmap](./docs/Roadmap.md)** - Feature priorities and development plans
 
 ### Testing

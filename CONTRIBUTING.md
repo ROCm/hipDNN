@@ -12,14 +12,13 @@ We're excited to have you join our community of contributors!
 
 Before contributing, please review these essential documents to understand the project structure and goals:
 
-- **[Design.md](./docs/Design.md)** - Understand hipDNN's architecture and component design
-- **[Building.md](./docs/Building.md)** - Learn how to build hipDNN on your system
+- **[Design](./docs/Design.md)** - Understand hipDNN's architecture and component design
+- **[Building](./docs/Building.md)** - Learn how to build hipDNN on your system
 - **[How-To](./docs/HowTo.md)** - Using hipDNN components and common approaches for extending functionality
-- **[TestingStrategy.md](./docs/testing/TestingStrategy.md)** - Understand our testing approach and requirements
-- **[Roadmap.md](./docs/Roadmap.md)** - Check planned features and find contribution opportunities
+- **[TestingStrategy](./docs/testing/TestingStrategy.md)** - Understand our testing approach and requirements
+- **[Roadmap](./docs/Roadmap.md)** - Check planned features and find contribution opportunities
 
-We encourage you to open a GitHub issue to discuss your planned contribution before starting work.\
-This helps ensure your efforts align with project goals and prevents duplicate work.
+We encourage you to open a GitHub issue to discuss your planned contribution before starting work. This helps ensure your efforts align with project goals and prevents duplicate work.
 
 ## Contribution Requirements
 
@@ -49,7 +48,7 @@ All contributions must meet the following requirements before they can be merged
   - New code should not decrease existing coverage
   - Each component should maintain >80% coverage individually
 
-See [Testing.md](./docs/Testing.md) for further details.
+See [Testing](./docs/Testing.md) for further details.
 
 ### Documentation Requirements
 
@@ -63,17 +62,19 @@ When contributing to hipDNN, please keep these architectural principles in mind:
 
 ### Dependency Management
 
-- **hipDNN Core**: The core library (backend, SDK, frontend) should remain very light on dependencies
+- **hipDNN Core** (backend, SDK, frontend) should remain very light on dependencies
   - Avoid adding new library dependencies to the backend if possible
   - No compiled libraries required for the frontend or SDK (should remain header-only projects)
   - Any new dependencies require discussion and strong justification
 
 ### Plugin Development
 
-- **Separate Projects**: Plugins are separate projects from hipDNN core
-  - Plugins do not need to be contributed to this repository
+- Plugins are **separate projects** from hipDNN core
   - Plugins can have their own dependencies as needed
-  - See [PluginDevelopment.md](./docs/PluginDevelopment.md) for plugin development guidance
+  - See [Plugin Development](./docs/PluginDevelopment.md) for further guidance
+
+> [!NOTE]
+> 📝 The MIOpen Legacy Plugin is currently an exception and will be migrated to its own repository in the future.
 
 ## Development Workflow
 
@@ -143,6 +144,7 @@ When creating a pull request, ensure you can check all these boxes:
 - **Questions**: Open a GitHub issue with your question
 - **Discussion**: For design discussions or feature proposals, open an issue before starting work
 - **Draft PRs**: Feel free to open a draft PR early to get feedback on your approach
+- **CI Pipelines**: In your PR, ask members of the hipDNN team to run CI on your branch
 - **Code Reviews**: Be responsive to code review feedback and make requested changes promptly
 
 ## Community Guidelines

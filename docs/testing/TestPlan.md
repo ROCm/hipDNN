@@ -1,5 +1,7 @@
 # hipDNN Test Plan
 
+This document outlines the test plan for hipDNN, covering prerequisites and test execution procedures to ensure a high-quality release.
+
 > [!IMPORTANT]
 > ⚠️ All prerequisites and tests in this document must pass for a successful release.
 
@@ -7,7 +9,7 @@
 
 ## Prerequisites
 
-### Test Case 1: CI Is Green
+### Test Case 1: CI Is Green 🟩
 
 Existing checks should be running automatically on all PRs pre-merge and on `develop` branch post-merge.
 
@@ -18,7 +20,7 @@ Existing checks should be running automatically on all PRs pre-merge and on `dev
 | `codecov` | Checks code coverage requirements |
 | `debug` | Runs pre-checkin checks in a debug build |
 
-### Test Case 2: Documentation is Current
+### Test Case 2: Documentation is Current 🕒
 
 Verify that all documentation is up to date:
 
@@ -32,7 +34,7 @@ Verify that all documentation is up to date:
 
 ## Regular Tests
 
-### Test Case 1: Run the Automated Tests
+### Test Case 1: Run the Automated Tests ⚙️
 
 Run as follows:
 ```bash
@@ -53,7 +55,7 @@ ninja check_ctest
 
 ## ASAN Enabled Tests
 
-### Test Case 1: Run the Automated Tests with ASAN Enabled
+### Test Case 1: Run the Automated Tests with ASAN Enabled 🚨
 
 Run as follows:
 ```bash

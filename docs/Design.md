@@ -237,3 +237,5 @@ hipdnnEnginePluginExecuteOpGraph(handle, context, workspace, buffers, num_buffer
   - Flexible operation fusion
   - Support for novel graph patterns
   - Adaptable to hardware capabilities
+
+See [Plugin Development](./PluginDevelopment.md) for advanced information on developing and using plugins.

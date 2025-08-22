@@ -13,7 +13,7 @@ The following table lists all operations currently supported in hipDNN, along wi
 ## Notes
 
 > [!IMPORTANT]
-> **hipDNN is in the early phase of development.** The operation support table above reflects the current state of the library. We are actively working on expanding support for additional operations and features.
+> ⚠️ **hipDNN is in the early phase of development.** The operation support table above reflects the current state of the library. We are actively working on expanding support for additional operations and features.
 
 For information about upcoming operations and features, please refer to the [Roadmap.md](./Roadmap.md) document.
 
