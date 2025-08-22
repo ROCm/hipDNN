@@ -51,43 +51,43 @@ struct Batchnorm_2d_tensor_bundle
                                const Tensor_layout& layout = Tensor_layout::NCHW)
         : derived_dims({1, dims[1], 1, 1})
         , x_tensor(Tensor::make_tensor<Input_type>(dims, layout))
-        , y_tensor(Tensor::make_tensor<Input_type>(dims, layout))
+        , dy_tensor(Tensor::make_tensor<Input_type>(dims, layout))
+        , dx_tensor(Tensor::make_tensor<Input_type>(dims, layout))
         , scale_tensor(Tensor::make_tensor<Intermediate_type>(derived_dims))
-        , bias_tensor(Tensor::make_tensor<Intermediate_type>(derived_dims))
+        , dscale_tensor(Tensor::make_tensor<Intermediate_type>(derived_dims))
+        , dbias_tensor(Tensor::make_tensor<Intermediate_type>(derived_dims))
         , mean_tensor(Tensor::make_tensor<Intermediate_type>(derived_dims))
-        , variance_tensor(Tensor::make_tensor<Intermediate_type>(derived_dims))
+        , inv_variance_tensor(Tensor::make_tensor<Intermediate_type>(derived_dims))
     {
         x_tensor.fill_with_random_values<Input_type>(
-            static_cast<Input_type>(0.0f), static_cast<Input_type>(1.0f), seed);
-        y_tensor.fill_with_random_values<Input_type>(
-            static_cast<Input_type>(-100.0f), static_cast<Input_type>(100.0f), seed);
+            static_cast<Input_type>(0.0f), static_cast<Input_type>(2.0f), seed);
+        dy_tensor.fill_with_random_values<Input_type>(
+            static_cast<Input_type>(-2.0f), static_cast<Input_type>(2.0f), seed);
 
         scale_tensor.fill_with_random_values<Intermediate_type>(
-            static_cast<Intermediate_type>(0.0f), static_cast<Intermediate_type>(1.0f), seed);
-
-        bias_tensor.fill_with_random_values<Intermediate_type>(
-            static_cast<Intermediate_type>(0.0f), static_cast<Intermediate_type>(1.0f), seed);
+            static_cast<Intermediate_type>(-2.0f), static_cast<Intermediate_type>(2.0f), seed);
 
         mean_tensor.fill_with_random_values<Intermediate_type>(
-            static_cast<Intermediate_type>(0.0f), static_cast<Intermediate_type>(1.0f), seed);
+            static_cast<Intermediate_type>(-2.0f), static_cast<Intermediate_type>(2.0f), seed);
 
-        variance_tensor.fill_with_random_values<Intermediate_type>(
-            static_cast<Intermediate_type>(0.1f), static_cast<Intermediate_type>(1.0f), seed);
+        inv_variance_tensor.fill_with_random_values<Intermediate_type>(
+            static_cast<Intermediate_type>(-2.0f), static_cast<Intermediate_type>(2.0f), seed);
     }
 
     std::vector<int64_t> derived_dims;
     Tensor x_tensor;
-    Tensor y_tensor;
+    Tensor dy_tensor;
+    Tensor dx_tensor;
     Tensor scale_tensor;
-    Tensor bias_tensor;
+    Tensor dscale_tensor;
+    Tensor dbias_tensor;
     Tensor mean_tensor;
-    Tensor variance_tensor;
+    Tensor inv_variance_tensor;
 };
 
 } // namespace
 
-class Batchnorm_forward_inference_integration_test
-    : public ::testing::TestWithParam<Bn_2d_test_case>
+class Batchnorm_backward_integration_test : public ::testing::TestWithParam<Bn_2d_test_case>
 {
 protected:
     void SetUp() override
@@ -130,44 +130,60 @@ protected:
     template <typename Input_type, typename Intermediate_type>
     std::unordered_map<int64_t, void*> create_variant_pack(
         const Tensor_attributes& x_tensor_attr,
-        const Tensor_attributes& y_tensor_attr,
+        const Tensor_attributes& dy_tensor_attr,
+        const Tensor_attributes& dx_tensor_attr,
+        const Tensor_attributes& scale_tensor_attr,
+        const Tensor_attributes& dscale_tensor_attr,
+        const Tensor_attributes& dbias_tensor_attr,
         const Tensor_attributes& mean_tensor_attr,
         const Tensor_attributes& inv_variance_tensor_attr,
-        const Tensor_attributes& scale_tensor_attr,
-        const Tensor_attributes& bias_tensor_attr,
         Batchnorm_2d_tensor_bundle<Input_type, Intermediate_type>& tensor_bundle)
     {
         std::unordered_map<int64_t, void*> variant_pack;
         variant_pack[x_tensor_attr.get_uid()]
             = tensor_bundle.x_tensor.memory().template device_data<void>();
+        variant_pack[dy_tensor_attr.get_uid()]
+            = tensor_bundle.dy_tensor.memory().template device_data<void>();
+        variant_pack[dx_tensor_attr.get_uid()]
+            = tensor_bundle.dx_tensor.memory().template device_data<void>();
+        variant_pack[scale_tensor_attr.get_uid()]
+            = tensor_bundle.scale_tensor.memory().template device_data<void>();
+        variant_pack[dscale_tensor_attr.get_uid()]
+            = tensor_bundle.dscale_tensor.memory().template device_data<void>();
+        variant_pack[dbias_tensor_attr.get_uid()]
+            = tensor_bundle.dbias_tensor.memory().template device_data<void>();
         variant_pack[mean_tensor_attr.get_uid()]
             = tensor_bundle.mean_tensor.memory().template device_data<void>();
         variant_pack[inv_variance_tensor_attr.get_uid()]
-            = tensor_bundle.variance_tensor.memory().template device_data<void>();
-        variant_pack[scale_tensor_attr.get_uid()]
-            = tensor_bundle.scale_tensor.memory().template device_data<void>();
-        variant_pack[bias_tensor_attr.get_uid()]
-            = tensor_bundle.bias_tensor.memory().template device_data<void>();
-        variant_pack[y_tensor_attr.get_uid()]
-            = tensor_bundle.y_tensor.memory().template device_data<void>();
+            = tensor_bundle.inv_variance_tensor.memory().template device_data<void>();
 
         return variant_pack;
     }
 
     template <typename Input_type, typename Intermediate_type>
-    void run_miopen_batchnorm_fwd(
+    void run_miopen_batchnorm_bwd(
         Batchnorm_2d_tensor_bundle<Input_type, Intermediate_type>& graph_tensor_bundle,
         DataType_t input_data_type,
         DataType_t intermediate_data_type)
     {
         auto graph = std::make_shared<hipdnn_frontend::graph::Graph>();
 
-        graph->set_name("BatchnormInferenceTest");
+        graph->set_name("BatchnormBackwardTest");
 
         int64_t uid = 1;
-        auto x_attr = make_tensor_attributes("X", input_data_type, graph_tensor_bundle.x_tensor);
+
+        auto x_attr = make_tensor_attributes("x", input_data_type, graph_tensor_bundle.x_tensor);
         x_attr.set_uid(uid++);
         auto x_tensor_attr = std::make_shared<Tensor_attributes>(std::move(x_attr));
+
+        auto dy_attr = make_tensor_attributes("dy", input_data_type, graph_tensor_bundle.dy_tensor);
+        dy_attr.set_uid(uid++);
+        auto dy_tensor_attr = std::make_shared<Tensor_attributes>(std::move(dy_attr));
+
+        auto scale_attr = make_tensor_attributes(
+            "scale", intermediate_data_type, graph_tensor_bundle.scale_tensor);
+        scale_attr.set_uid(uid++);
+        auto scale_tensor_attr = std::make_shared<Tensor_attributes>(std::move(scale_attr));
 
         auto mean_attr = make_tensor_attributes(
             "mean", intermediate_data_type, graph_tensor_bundle.mean_tensor);
@@ -175,38 +191,41 @@ protected:
         auto mean_tensor_attr = std::make_shared<Tensor_attributes>(std::move(mean_attr));
 
         auto inv_variance_attr = make_tensor_attributes(
-            "inv_variance", intermediate_data_type, graph_tensor_bundle.variance_tensor);
+            "inv_variance", intermediate_data_type, graph_tensor_bundle.inv_variance_tensor);
         inv_variance_attr.set_uid(uid++);
         auto inv_variance_tensor_attr
             = std::make_shared<Tensor_attributes>(std::move(inv_variance_attr));
 
-        auto scale_attr = make_tensor_attributes(
-            "scale", intermediate_data_type, graph_tensor_bundle.scale_tensor);
-        scale_attr.set_uid(uid++);
-        auto scale_tensor_attr = std::make_shared<Tensor_attributes>(std::move(scale_attr));
+        Batchnorm_backward_attributes bn_attrs;
+        bn_attrs.set_name("batchnorm_backward");
+        bn_attrs.set_saved_mean_and_inv_variance(mean_tensor_attr, inv_variance_tensor_attr);
 
-        auto bias_attr = make_tensor_attributes(
-            "bias", intermediate_data_type, graph_tensor_bundle.bias_tensor);
-        bias_attr.set_uid(uid++);
-        auto bias_tensor_attr = std::make_shared<Tensor_attributes>(std::move(bias_attr));
+        auto output_tensors_attr
+            = graph->batchnorm_backward(dy_tensor_attr, x_tensor_attr, scale_tensor_attr, bn_attrs);
 
-        Batchnorm_inference_attributes bn_attrs;
-        bn_attrs.set_name("batchnorm_inference");
-
-        auto y_tensor_attr = graph->batchnorm_inference(x_tensor_attr,
-                                                        mean_tensor_attr,
-                                                        inv_variance_tensor_attr,
-                                                        scale_tensor_attr,
-                                                        bias_tensor_attr,
-                                                        bn_attrs);
-
-        if(!y_tensor_attr->has_uid())
+        auto& dx_tensor_attr = output_tensors_attr[0];
+        if(!dx_tensor_attr->has_uid())
         {
-            HIPDNN_LOG_INFO("y_tensor_attr does not have a UID, giving it a UID");
-            y_tensor_attr->set_uid(uid++);
+            HIPDNN_LOG_INFO("dx_tensor_attr does not have a UID, giving it a UID");
+            dx_tensor_attr->set_uid(uid++);
         }
+        dx_tensor_attr->set_data_type(input_data_type);
 
-        y_tensor_attr->set_data_type(input_data_type);
+        auto& dscale_tensor_attr = output_tensors_attr[1];
+        if(!dscale_tensor_attr->has_uid())
+        {
+            HIPDNN_LOG_INFO("dscale_tensor_attr does not have a UID, giving it a UID");
+            dscale_tensor_attr->set_uid(uid++);
+        }
+        dscale_tensor_attr->set_data_type(intermediate_data_type);
+
+        auto& dbias_tensor_attr = output_tensors_attr[2];
+        if(!dbias_tensor_attr->has_uid())
+        {
+            HIPDNN_LOG_INFO("dbias_tensor_attr does not have a UID, giving it a UID");
+            dbias_tensor_attr->set_uid(uid++);
+        }
+        dbias_tensor_attr->set_data_type(intermediate_data_type);
 
         // Validate and build graph
         auto result = graph->validate();
@@ -226,11 +245,13 @@ protected:
 
         auto variant_pack
             = create_variant_pack<Input_type, Intermediate_type>(*x_tensor_attr,
-                                                                 *y_tensor_attr,
+                                                                 *dy_tensor_attr,
+                                                                 *dx_tensor_attr,
+                                                                 *scale_tensor_attr,
+                                                                 *dscale_tensor_attr,
+                                                                 *dbias_tensor_attr,
                                                                  *mean_tensor_attr,
                                                                  *inv_variance_tensor_attr,
-                                                                 *scale_tensor_attr,
-                                                                 *bias_tensor_attr,
                                                                  graph_tensor_bundle);
 
         result = graph->execute(_handle, variant_pack, nullptr);
@@ -238,18 +259,19 @@ protected:
     }
 
     template <typename Input_type, typename Intermediate_type>
-    void run_cpu_batchnorm_fwd(
+    void run_cpu_batchnorm_bwd(
         Batchnorm_2d_tensor_bundle<Input_type, Intermediate_type>& cpu_tensor_bundle)
     {
         Cpu_fp_reference_implementation<Input_type, Intermediate_type, Intermediate_type>
             cpu_ref_impl;
-        cpu_ref_impl.batchnorm_fwd_inference(cpu_tensor_bundle.x_tensor,
-                                             cpu_tensor_bundle.scale_tensor,
-                                             cpu_tensor_bundle.bias_tensor,
-                                             cpu_tensor_bundle.mean_tensor,
-                                             cpu_tensor_bundle.variance_tensor,
-                                             cpu_tensor_bundle.y_tensor,
-                                             1e-3);
+        cpu_ref_impl.batchnorm_bwd(cpu_tensor_bundle.dy_tensor,
+                                   cpu_tensor_bundle.x_tensor,
+                                   cpu_tensor_bundle.mean_tensor,
+                                   cpu_tensor_bundle.inv_variance_tensor,
+                                   cpu_tensor_bundle.scale_tensor,
+                                   cpu_tensor_bundle.dx_tensor,
+                                   cpu_tensor_bundle.dscale_tensor,
+                                   cpu_tensor_bundle.dbias_tensor);
     }
 
     template <typename Input_type, typename Intermediate_type>
@@ -270,15 +292,21 @@ protected:
         Batchnorm_2d_tensor_bundle<Input_type, Intermediate_type> cpu_tensor_bundle(
             test_case.get_dims(), seed, layout);
 
-        run_miopen_batchnorm_fwd<Input_type, Intermediate_type>(
+        run_miopen_batchnorm_bwd<Input_type, Intermediate_type>(
             graph_tensor_bundle, input_data_type, intermediate_data_type);
-        graph_tensor_bundle.y_tensor.memory().mark_device_modified();
+        graph_tensor_bundle.dx_tensor.memory().mark_device_modified();
+        graph_tensor_bundle.dscale_tensor.memory().mark_device_modified();
+        graph_tensor_bundle.dbias_tensor.memory().mark_device_modified();
 
-        run_cpu_batchnorm_fwd<Input_type, Intermediate_type>(cpu_tensor_bundle);
+        run_cpu_batchnorm_bwd<Input_type, Intermediate_type>(cpu_tensor_bundle);
 
         Cpu_fp_reference_validation<Input_type> cpu_ref_validation(tolerance, tolerance);
-        EXPECT_TRUE(cpu_ref_validation.compare_buffers(cpu_tensor_bundle.y_tensor.memory(),
-                                                       graph_tensor_bundle.y_tensor.memory()));
+        EXPECT_TRUE(cpu_ref_validation.compare_buffers(cpu_tensor_bundle.dx_tensor.memory(),
+                                                       graph_tensor_bundle.dx_tensor.memory()));
+        EXPECT_TRUE(cpu_ref_validation.compare_buffers(cpu_tensor_bundle.dscale_tensor.memory(),
+                                                       graph_tensor_bundle.dscale_tensor.memory()));
+        EXPECT_TRUE(cpu_ref_validation.compare_buffers(cpu_tensor_bundle.dbias_tensor.memory(),
+                                                       graph_tensor_bundle.dbias_tensor.memory()));
     }
 
 private:
@@ -287,10 +315,22 @@ private:
     int _device_id = 0;
 };
 
+class Batchnorm_backward_integration_test_bfloat16 : public Batchnorm_backward_integration_test
+{
+};
+
+class Batchnorm_backward_integration_test_half : public Batchnorm_backward_integration_test
+{
+};
+
+class Batchnorm_backward_integration_test_nhwc : public Batchnorm_backward_integration_test
+{
+};
+
 namespace
 {
 
-std::vector<Bn_2d_test_case> get_bn_fwd_inference_test_cases()
+std::vector<Bn_2d_test_case> get_bn_bwd_test_cases()
 {
     return {
         {.n = 1, .c = 3, .h = 14, .w = 14},
@@ -309,58 +349,42 @@ std::vector<Bn_2d_test_case> get_bn_fwd_inference_test_cases()
 
 } // namespace
 
-TEST_P(Batchnorm_forward_inference_integration_test, RunFloatFwdBatchnormGraph)
+TEST_P(Batchnorm_backward_integration_test, RunFloatBwdBatchnormGraph)
 {
     Bn_2d_test_case test_case = GetParam();
     run_batchnorm_test<float, float>(test_case, 1e-6f);
 }
 
-INSTANTIATE_TEST_SUITE_P(RunFloatFwdBatchnormGraph,
-                         Batchnorm_forward_inference_integration_test,
-                         testing::ValuesIn(get_bn_fwd_inference_test_cases()));
+INSTANTIATE_TEST_SUITE_P(RunFloatBwdBatchnormGraph,
+                         Batchnorm_backward_integration_test,
+                         testing::ValuesIn(get_bn_bwd_test_cases()));
 
-class Batchnorm_forward_inference_integration_test_bfloat16
-    : public Batchnorm_forward_inference_integration_test
-{
-};
-
-TEST_P(Batchnorm_forward_inference_integration_test_bfloat16, RunBfloat16FwdBatchnormGraph)
+TEST_P(Batchnorm_backward_integration_test_bfloat16, RunBfloat16BwdBatchnormGraph)
 {
     Bn_2d_test_case test_case = GetParam();
     run_batchnorm_test<hip_bfloat16, float>(test_case, 1e-2_bf);
 }
 
-INSTANTIATE_TEST_SUITE_P(RunBfloat16FwdBatchnormGraph,
-                         Batchnorm_forward_inference_integration_test_bfloat16,
-                         testing::ValuesIn(get_bn_fwd_inference_test_cases()));
+INSTANTIATE_TEST_SUITE_P(RunBfloat16BwdBatchnormGraph,
+                         Batchnorm_backward_integration_test_bfloat16,
+                         testing::ValuesIn(get_bn_bwd_test_cases()));
 
-class Batchnorm_forward_inference_integration_test_half
-    : public Batchnorm_forward_inference_integration_test
-{
-};
-TEST_P(Batchnorm_forward_inference_integration_test_half, RunHalfFwdbatchnormGraph)
+TEST_P(Batchnorm_backward_integration_test_half, RunHalfBwdBatchnormGraph)
 {
     Bn_2d_test_case test_case = GetParam();
     run_batchnorm_test<half, float>(test_case, 1e-2_h);
 }
 
-INSTANTIATE_TEST_SUITE_P(RunHalfFwdbatchnormGraph,
-                         Batchnorm_forward_inference_integration_test_half,
-                         testing::ValuesIn(get_bn_fwd_inference_test_cases()));
+INSTANTIATE_TEST_SUITE_P(RunHalfBwdBatchnormGraph,
+                         Batchnorm_backward_integration_test_half,
+                         testing::ValuesIn(get_bn_bwd_test_cases()));
 
-// Basic NHWC float test case
-class Batchnorm_forward_inference_integration_test_nhwc
-    : public Batchnorm_forward_inference_integration_test
-{
-};
-
-TEST_P(Batchnorm_forward_inference_integration_test_nhwc, RunFloatFwdBatchnormGraphNHWC)
+TEST_P(Batchnorm_backward_integration_test_nhwc, RunFloatBwdBatchnormGraphNHWC)
 {
     Bn_2d_test_case test_case = GetParam();
     run_batchnorm_test<float, float>(test_case, 1e-6f, Tensor_layout::NHWC);
 }
 
-// Consider using fewer/smaller test cases to reduce test time
-INSTANTIATE_TEST_SUITE_P(RunFloatFwdBatchnormGraphNHWC,
-                         Batchnorm_forward_inference_integration_test_nhwc,
-                         testing::ValuesIn(get_bn_fwd_inference_test_cases()));
+INSTANTIATE_TEST_SUITE_P(RunFloatBwdBatchnormGraphNHWC,
+                         Batchnorm_backward_integration_test_nhwc,
+                         testing::ValuesIn(get_bn_bwd_test_cases()));
