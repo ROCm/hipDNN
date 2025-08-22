@@ -170,7 +170,10 @@ public:
                  void* array_of_elements),
                 (const, override));
 
-    MOCK_METHOD(std::shared_ptr<const Engine_config_descriptor>, get_engine_config, (), (const, override));
+    MOCK_METHOD(std::shared_ptr<const Engine_config_descriptor>,
+                get_engine_config,
+                (),
+                (const, override));
     MOCK_METHOD(hipdnnEnginePluginExecutionContext_t, get_execution_context, (), (const, override));
 
     static hipdnnBackendDescriptorType_t get_static_type()
