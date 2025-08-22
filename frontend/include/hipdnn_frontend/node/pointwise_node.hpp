@@ -57,7 +57,7 @@ public:
                     "PointwiseNode missing output for setting properties"};
         }
 
-        CHECK_HIPDNN_ERROR(attributes.fill_from_graph_attributes(graph_attributes));
+        HIPDNN_CHECK_ERROR(attributes.fill_from_graph_attributes(graph_attributes));
 
         auto out = attributes.outputs[Pointwise_attributes::output_names::out_0];
 
@@ -73,7 +73,7 @@ public:
             }
 
             auto output_dims = out->get_dim();
-            CHECK_HIPDNN_ERROR(find_common_shape(input_shapes, output_dims));
+            HIPDNN_CHECK_ERROR(find_common_shape(input_shapes, output_dims));
             out->set_dim(output_dims);
         }
 

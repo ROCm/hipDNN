@@ -76,33 +76,65 @@ public:
     {
         return set_input(input_names::dy, value);
     }
+    Batchnorm_backward_attributes& set_dy(std::shared_ptr<Tensor_attributes>&& value)
+    {
+        return set_input(input_names::dy, std::move(value));
+    }
     Batchnorm_backward_attributes& set_x(const std::shared_ptr<Tensor_attributes>& value)
     {
         return set_input(input_names::x, value);
+    }
+    Batchnorm_backward_attributes& set_x(std::shared_ptr<Tensor_attributes>&& value)
+    {
+        return set_input(input_names::x, std::move(value));
     }
     Batchnorm_backward_attributes& set_scale(const std::shared_ptr<Tensor_attributes>& value)
     {
         return set_input(input_names::scale, value);
     }
+    Batchnorm_backward_attributes& set_scale(std::shared_ptr<Tensor_attributes>&& value)
+    {
+        return set_input(input_names::scale, std::move(value));
+    }
     Batchnorm_backward_attributes& set_mean(const std::shared_ptr<Tensor_attributes>& value)
     {
         return set_input(input_names::mean, value);
+    }
+    Batchnorm_backward_attributes& set_mean(std::shared_ptr<Tensor_attributes>&& value)
+    {
+        return set_input(input_names::mean, std::move(value));
     }
     Batchnorm_backward_attributes& set_inv_variance(const std::shared_ptr<Tensor_attributes>& value)
     {
         return set_input(input_names::inv_variance, value);
     }
+    Batchnorm_backward_attributes& set_inv_variance(std::shared_ptr<Tensor_attributes>&& value)
+    {
+        return set_input(input_names::inv_variance, std::move(value));
+    }
     Batchnorm_backward_attributes& set_dx(const std::shared_ptr<Tensor_attributes>& value)
     {
         return set_output(output_names::dx, value);
+    }
+    Batchnorm_backward_attributes& set_dx(std::shared_ptr<Tensor_attributes>&& value)
+    {
+        return set_output(output_names::dx, std::move(value));
     }
     Batchnorm_backward_attributes& set_dscale(const std::shared_ptr<Tensor_attributes>& value)
     {
         return set_output(output_names::dscale, value);
     }
+    Batchnorm_backward_attributes& set_dscale(std::shared_ptr<Tensor_attributes>&& value)
+    {
+        return set_output(output_names::dscale, std::move(value));
+    }
     Batchnorm_backward_attributes& set_dbias(const std::shared_ptr<Tensor_attributes>& value)
     {
         return set_output(output_names::dbias, value);
+    }
+    Batchnorm_backward_attributes& set_dbias(std::shared_ptr<Tensor_attributes>&& value)
+    {
+        return set_output(output_names::dbias, std::move(value));
     }
     Batchnorm_backward_attributes&
         set_peer_stats(const std::vector<std::shared_ptr<Tensor_attributes>>& value)
@@ -111,11 +143,22 @@ public:
         return *this;
     }
     Batchnorm_backward_attributes&
+        set_peer_stats(std::vector<std::shared_ptr<Tensor_attributes>>&& value)
+    {
+        peer_stats = std::move(value);
+        return *this;
+    }
+    Batchnorm_backward_attributes&
         set_saved_mean_and_inv_variance(const std::shared_ptr<Tensor_attributes>& mean,
                                         const std::shared_ptr<Tensor_attributes>& inv_variance)
     {
-
         return set_mean(mean).set_inv_variance(inv_variance);
+    }
+    Batchnorm_backward_attributes&
+        set_saved_mean_and_inv_variance(std::shared_ptr<Tensor_attributes>&& mean,
+                                        std::shared_ptr<Tensor_attributes>&& inv_variance)
+    {
+        return set_mean(std::move(mean)).set_inv_variance(std::move(inv_variance));
     }
 
     flatbuffers::Offset<hipdnn_sdk::data_objects::BatchnormBackwardAttributes>
@@ -174,11 +217,23 @@ private:
         inputs[name] = value;
         return *this;
     }
+    Batchnorm_backward_attributes& set_input(input_names name,
+                                             std::shared_ptr<Tensor_attributes>&& value)
+    {
+        inputs[name] = std::move(value);
+        return *this;
+    }
 
     Batchnorm_backward_attributes& set_output(output_names name,
                                               const std::shared_ptr<Tensor_attributes>& value)
     {
         outputs[name] = value;
+        return *this;
+    }
+    Batchnorm_backward_attributes& set_output(output_names name,
+                                              std::shared_ptr<Tensor_attributes>&& value)
+    {
+        outputs[name] = std::move(value);
         return *this;
     }
 };
