@@ -139,9 +139,8 @@ Engine_plugin_resource_manager::Engine_plugin_resource_manager()
 
 Engine_plugin_resource_manager::Engine_plugin_resource_manager(
     std::shared_ptr<Engine_plugin_manager> pm)
+    : _pm(std::move(pm))
 {
-    _pm = std::move(pm);
-
     // Create plugin handles
     const auto& plugins = _pm->get_plugins();
     for(const auto& plugin : plugins)
@@ -210,7 +209,7 @@ void Engine_plugin_resource_manager::set_stream(hipStream_t stream) const
 std::vector<int64_t> Engine_plugin_resource_manager::get_applicable_engine_ids(
     const Graph_descriptor* graph_desc) const
 {
-    THROW_IF_NULL(graph_desc, HIPDNN_STATUS_BAD_PARAM, "Graph descriptor cannot be null");
+    THROW_IF_NULL(graph_desc, HIPDNN_STATUS_INTERNAL_ERROR, "Graph descriptor cannot be null");
 
     auto serialized_graph_data = graph_desc->get_serialized_graph();
 
@@ -246,8 +245,8 @@ void Engine_plugin_resource_manager::get_engine_details(
     const Graph_descriptor* graph_desc,
     hipdnnPluginConstData_t* engine_details) const
 {
-    THROW_IF_NULL(graph_desc, HIPDNN_STATUS_BAD_PARAM, "Graph descriptor cannot be null");
-    THROW_IF_NULL(engine_details, HIPDNN_STATUS_BAD_PARAM, "Engine details cannot be null");
+    THROW_IF_NULL(graph_desc, HIPDNN_STATUS_INTERNAL_ERROR, "Graph descriptor cannot be null");
+    THROW_IF_NULL(engine_details, HIPDNN_STATUS_INTERNAL_ERROR, "Engine details cannot be null");
 
     auto it = _engine_id_to_handle.find(engine_id);
     if(it == _engine_id_to_handle.end())
@@ -293,8 +292,8 @@ size_t
                                                        const hipdnnPluginConstData_t* engine_config,
                                                        const Graph_descriptor* graph_desc) const
 {
-    THROW_IF_NULL(engine_config, HIPDNN_STATUS_BAD_PARAM, "Engine config cannot be null");
-    THROW_IF_NULL(graph_desc, HIPDNN_STATUS_BAD_PARAM, "Graph descriptor cannot be null");
+    THROW_IF_NULL(engine_config, HIPDNN_STATUS_INTERNAL_ERROR, "Engine config cannot be null");
+    THROW_IF_NULL(graph_desc, HIPDNN_STATUS_INTERNAL_ERROR, "Graph descriptor cannot be null");
 
     auto it = _engine_id_to_handle.find(engine_id);
     if(it == _engine_id_to_handle.end())

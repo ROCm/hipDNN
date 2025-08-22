@@ -12,7 +12,6 @@
 #include <hip/hip_runtime.h>
 #include <hipdnn_sdk/plugin/plugin_api_data_types.h>
 
-#include "engine_plugin.hpp"
 #include "hipdnn_backend.h"
 
 namespace hipdnn_sdk
@@ -34,6 +33,7 @@ namespace plugin
 
 class Engine_details_wrapper;
 class Engine_execution_context_wrapper;
+class Engine_plugin;
 class Engine_plugin_manager;
 
 class Engine_plugin_resource_manager

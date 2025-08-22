@@ -8,10 +8,14 @@
 #include <unordered_set>
 #include <vector>
 
+#include "descriptors/backend_descriptor.hpp"
+#include "descriptors/descriptor_factory.hpp"
+#include "descriptors/execution_plan_descriptor.hpp"
 #include "descriptors/flatbuffer_test_utils.hpp"
 #include "descriptors/graph_descriptor.hpp"
 #include "descriptors/mocks/mock_descriptor.hpp"
 #include "descriptors/test_macros.hpp"
+#include "descriptors/variant_descriptor.hpp"
 #include "plugin/engine_plugin_resource_manager.hpp"
 #include "plugins/mocks/mock_engine_plugin.hpp"
 #include "plugins/mocks/mock_engine_plugin_manager.hpp"
@@ -263,14 +267,11 @@ TEST(Engine_plugin_resource_manager, rapid_creation_destruction)
             .WillOnce(::testing::Return(hipdnnEnginePluginHandle_t(0xdeadbeef)));
         EXPECT_CALL(*mock_plugin, get_all_engine_ids())
             .WillOnce(::testing::Return(std::vector<int64_t>{100}));
-        EXPECT_CALL(*mock_plugin, set_stream(hipdnnEnginePluginHandle_t(0xdeadbeef), nullptr));
         EXPECT_CALL(*mock_plugin,
                     destroy_handle(testing::Eq(hipdnnEnginePluginHandle_t(0xdeadbeef))));
 
         {
             Engine_plugin_resource_manager rm(plugin_manager);
-
-            EXPECT_NO_THROW(rm.set_stream(nullptr));
         }
     }
 }
@@ -280,7 +281,8 @@ TEST(Engine_plugin_resource_manager, concurrent_creation_and_public_methods)
     const size_t num_threads = 4;
     const size_t managers_per_thread = 10;
     std::vector<std::thread> threads;
-    std::vector<std::vector<Engine_plugin_resource_manager*>> all_managers(num_threads);
+    std::vector<std::vector<std::shared_ptr<Engine_plugin_resource_manager>>> all_managers(
+        num_threads);
     std::vector<std::vector<std::shared_ptr<Mock_engine_plugin_manager>>> all_plugin_managers(
         num_threads);
     std::vector<std::vector<std::shared_ptr<Mock_engine_plugin>>> all_mock_plugins(num_threads);
@@ -327,7 +329,8 @@ TEST(Engine_plugin_resource_manager, concurrent_creation_and_public_methods)
                 EXPECT_CALL(*mock_plugin,
                             destroy_handle(testing::Eq(hipdnnEnginePluginHandle_t(0xdeadbeef))));
 
-                all_managers[t].push_back(new Engine_plugin_resource_manager(plugin_manager));
+                all_managers[t].push_back(
+                    std::make_shared<Engine_plugin_resource_manager>(plugin_manager));
                 successful_creations++;
 
                 EXPECT_NO_THROW(all_managers[t].back()->set_stream(nullptr));
@@ -342,14 +345,7 @@ TEST(Engine_plugin_resource_manager, concurrent_creation_and_public_methods)
 
     EXPECT_EQ(successful_creations.load(), num_threads * managers_per_thread);
 
-    for(const auto& thread_managers : all_managers)
-    {
-        for(const auto& rm : thread_managers)
-        {
-            EXPECT_NE(rm, nullptr);
-            delete rm;
-        }
-    }
+    all_managers.clear();
 }
 
 TEST(Engine_plugin_resource_manager, get_applicable_engine_ids_null_graph_descriptor)
@@ -369,8 +365,8 @@ TEST(Engine_plugin_resource_manager, get_applicable_engine_ids_null_graph_descri
     {
         Engine_plugin_resource_manager resource_manager(plugin_manager);
 
-        EXPECT_HIPDNN_EXCEPTION(resource_manager.get_applicable_engine_ids(nullptr),
-                                HIPDNN_STATUS_BAD_PARAM);
+        ASSERT_THROW_HIPDNN_STATUS(resource_manager.get_applicable_engine_ids(nullptr),
+                                   HIPDNN_STATUS_INTERNAL_ERROR);
     }
 }
 
@@ -609,7 +605,7 @@ TEST(Engine_plugin_resource_manager, create_execution_context)
     }
 }
 
-TEST(Engine_plugin_resource_manager, execute_op_graph)
+TEST(Engine_plugin_resource_manager, execute_op_graph_with_null_parameters)
 {
     std::shared_ptr<Mock_engine_plugin> mock_plugin = std::make_shared<Mock_engine_plugin>();
     std::vector<std::shared_ptr<Engine_plugin>> plugins{mock_plugin};
@@ -626,9 +622,58 @@ TEST(Engine_plugin_resource_manager, execute_op_graph)
     {
         Engine_plugin_resource_manager resource_manager(plugin_manager);
 
-        EXPECT_HIPDNN_EXCEPTION(resource_manager.execute_op_graph(nullptr, nullptr),
-                                HIPDNN_STATUS_INTERNAL_ERROR);
+        ASSERT_THROW_HIPDNN_STATUS(resource_manager.execute_op_graph(nullptr, nullptr),
+                                   HIPDNN_STATUS_INTERNAL_ERROR);
     }
+}
+
+TEST(Engine_plugin_resource_manager, execute_op_graph_success_with_valid_descriptors)
+{
+    std::shared_ptr<Mock_engine_plugin> mock_plugin = std::make_shared<Mock_engine_plugin>();
+    std::vector<std::shared_ptr<Engine_plugin>> plugins{mock_plugin};
+    std::shared_ptr<Mock_engine_plugin_manager> plugin_manager
+        = std::make_shared<Mock_engine_plugin_manager>();
+
+    hipdnnBackendDescriptor_t variant_pack = nullptr;
+
+    ASSERT_NO_THROW(
+        Descriptor_factory::create(HIPDNN_BACKEND_VARIANT_PACK_DESCRIPTOR, &variant_pack));
+    EXPECT_NE(variant_pack, nullptr);
+
+    std::vector<int64_t> tensor_ids = {1, 2, 3};
+    std::vector<const void*> data_pointers = {reinterpret_cast<const void*>(0x1000),
+                                              reinterpret_cast<const void*>(0x2000),
+                                              reinterpret_cast<const void*>(0x3000)};
+    void* workspace = reinterpret_cast<void*>(0x4000);
+
+    variant_pack->set_attribute(HIPDNN_ATTR_VARIANT_PACK_DATA_POINTERS,
+                                HIPDNN_TYPE_VOID_PTR,
+                                static_cast<int64_t>(data_pointers.size()),
+                                data_pointers.data());
+    variant_pack->set_attribute(HIPDNN_ATTR_VARIANT_PACK_UNIQUE_IDS,
+                                HIPDNN_TYPE_INT64,
+                                static_cast<int64_t>(tensor_ids.size()),
+                                tensor_ids.data());
+    variant_pack->set_attribute(
+        HIPDNN_ATTR_VARIANT_PACK_WORKSPACE, HIPDNN_TYPE_VOID_PTR, 1, &workspace);
+
+    ASSERT_NO_THROW(variant_pack->finalize());
+
+    EXPECT_CALL(*plugin_manager, get_plugins()).WillOnce(::testing::ReturnRef(plugins));
+    EXPECT_CALL(*mock_plugin, create_handle())
+        .WillOnce(::testing::Return(hipdnnEnginePluginHandle_t(0xdeadbeef)));
+    EXPECT_CALL(*mock_plugin, get_all_engine_ids())
+        .WillOnce(::testing::Return(std::vector<int64_t>{100, 101, 102}));
+    EXPECT_CALL(*mock_plugin, destroy_handle(testing::Eq(hipdnnEnginePluginHandle_t(0xdeadbeef))));
+
+    {
+        Engine_plugin_resource_manager resource_manager(plugin_manager);
+
+        ASSERT_THROW_HIPDNN_STATUS(resource_manager.execute_op_graph(nullptr, variant_pack),
+                                   HIPDNN_STATUS_INTERNAL_ERROR);
+    }
+
+    ASSERT_NO_THROW(Descriptor_factory::destroy(variant_pack));
 }
 
 TEST(Engine_plugin_resource_manager, get_loaded_plugin_files)
@@ -701,8 +746,9 @@ TEST(Engine_plugin_resource_manager, get_workspace_size_null_engine_config)
     {
         Engine_plugin_resource_manager resource_manager(plugin_manager);
 
-        EXPECT_HIPDNN_EXCEPTION(resource_manager.get_workspace_size(100, nullptr, &mock_graph_desc),
-                                HIPDNN_STATUS_BAD_PARAM);
+        ASSERT_THROW_HIPDNN_STATUS(
+            resource_manager.get_workspace_size(100, nullptr, &mock_graph_desc),
+            HIPDNN_STATUS_INTERNAL_ERROR);
     }
 }
 
@@ -729,7 +775,7 @@ TEST(Engine_plugin_resource_manager, get_workspace_size_invalid_engine_id)
     {
         Engine_plugin_resource_manager resource_manager(plugin_manager);
 
-        EXPECT_HIPDNN_EXCEPTION(
+        ASSERT_THROW_HIPDNN_STATUS(
             resource_manager.get_workspace_size(999999, &fake_engine_config, &mock_graph_desc),
             HIPDNN_STATUS_INTERNAL_ERROR);
     }

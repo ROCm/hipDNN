@@ -12,7 +12,7 @@
 namespace flatbuffer_test_utils
 {
 
-[[maybe_unused]] static flatbuffers::FlatBufferBuilder create_valid_graph()
+inline flatbuffers::FlatBufferBuilder create_valid_graph()
 {
     std::vector<::flatbuffers::Offset<hipdnn_sdk::data_objects::TensorAttributes>>
         tensor_attributes;
@@ -30,8 +30,7 @@ namespace flatbuffer_test_utils
     return builder;
 }
 
-[[maybe_unused]] static flatbuffers::FlatBufferBuilder
-    create_valid_engine_details(int64_t engine_id)
+inline flatbuffers::FlatBufferBuilder create_valid_engine_details(int64_t engine_id)
 {
     flatbuffers::FlatBufferBuilder builder;
     auto engine_details_offset = hipdnn_sdk::data_objects::CreateEngineDetails(builder, engine_id);

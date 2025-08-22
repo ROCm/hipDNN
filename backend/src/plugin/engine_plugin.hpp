@@ -25,10 +25,14 @@ protected:
     Engine_plugin();
 
 public:
-    virtual hipdnnEnginePluginHandle_t create_handle() const;
+    // Functions that don't require a handle (called first)
     virtual std::vector<int64_t> get_all_engine_ids() const;
-    virtual void destroy_handle(hipdnnEnginePluginHandle_t handle) const;
+
+    // Handle lifecycle functions
+    virtual hipdnnEnginePluginHandle_t create_handle() const;
     virtual void set_stream(hipdnnEnginePluginHandle_t handle, hipStream_t stream) const;
+
+    // Engine discovery and configuration functions
     virtual std::vector<int64_t>
         get_applicable_engine_ids(hipdnnEnginePluginHandle_t handle,
                                   const hipdnnPluginConstData_t* op_graph) const;
@@ -36,23 +40,28 @@ public:
                                     int64_t engine_id,
                                     const hipdnnPluginConstData_t* op_graph,
                                     hipdnnPluginConstData_t* engine_details) const;
-    virtual void destroy_engine_details(hipdnnEnginePluginHandle_t handle,
-                                        hipdnnPluginConstData_t* engine_details) const;
     virtual size_t get_workspace_size(hipdnnEnginePluginHandle_t handle,
                                       const hipdnnPluginConstData_t* engine_config,
                                       const hipdnnPluginConstData_t* op_graph) const;
+
+    // Execution functions
     [[nodiscard]] virtual hipdnnEnginePluginExecutionContext_t
         create_execution_context(hipdnnEnginePluginHandle_t handle,
                                  const hipdnnPluginConstData_t* engine_config,
                                  const hipdnnPluginConstData_t* op_graph) const;
-    virtual void
-        destroy_execution_context(hipdnnEnginePluginHandle_t handle,
-                                  hipdnnEnginePluginExecutionContext_t execution_context) const;
     virtual void execute_op_graph(hipdnnEnginePluginHandle_t handle,
                                   hipdnnEnginePluginExecutionContext_t execution_context,
                                   void* workspace,
                                   const hipdnnPluginDeviceBuffer_t* device_buffers,
                                   uint32_t num_device_buffers) const;
+
+    // Cleanup functions (called in reverse order)
+    virtual void
+        destroy_execution_context(hipdnnEnginePluginHandle_t handle,
+                                  hipdnnEnginePluginExecutionContext_t execution_context) const;
+    virtual void destroy_engine_details(hipdnnEnginePluginHandle_t handle,
+                                        hipdnnPluginConstData_t* engine_details) const;
+    virtual void destroy_handle(hipdnnEnginePluginHandle_t handle) const;
 
     static hipdnnPluginType_t get_plugin_type()
     {
