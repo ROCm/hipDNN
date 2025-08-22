@@ -3,7 +3,7 @@
 This document outlines the test plan for hipDNN, covering prerequisites and test execution procedures to ensure a high-quality release.
 
 > [!IMPORTANT]
-> ⚠️ All prerequisites and tests in this document must pass for a successful release.
+> ⚠️ **All prerequisites and tests in this document must pass for a successful release.**
 
 ---
 

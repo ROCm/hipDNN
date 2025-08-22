@@ -1,7 +1,5 @@
 # Plugin Development
 
-This guide provides comprehensive information for developing plugins for hipDNN. Plugins extend hipDNN's capabilities through different specialized implementations.
-
 ## Table of Contents
 
 - [Overview](#overview)
@@ -19,7 +17,7 @@ This guide provides comprehensive information for developing plugins for hipDNN.
 
 ## Overview
 
-hipDNN supports a plugin architecture that allows for modular extensions to the framework. Plugins are designed to be separate projects that extend hipDNN's capabilities without being part of the core repository. The backend discovers and manages these plugins, leveraging them for different aspects of deep learning computation. This architecture provides flexibility in implementation choices and enables optimizations for specific hardware or use cases.
+hipDNN supports a plugin architecture that allows for modular extensions to the framework. Plugins are designed to be separate projects that extend hipDNN's capabilities without being part of the core repository. The backend discovers and manages these plugins, leveraging them for different aspects of deep learning routines. This architecture provides flexibility in implementation choices and enables optimizations for specific hardware or use cases.
 
 ## Plugin Types
 
@@ -35,7 +33,7 @@ These plugins focus on performance optimization by benchmarking different implem
 These plugins provide the actual kernel implementations for operations. They contain the compute kernels that execute on the target hardware (GPUs, accelerators, etc.).
 
 > [!IMPORTANT]
-> ⚠️ **Current Status**: Only kernel engine plugins are presently supported in hipDNN. The MIOpen Legacy Plugin is currently included as a reference implementation but will be migrated to its own separate project in the future. Support for engine heuristic/selection and benchmarking/tuning plugins will be added in future releases. See the [Roadmap](./Roadmap.md#plugins) for future development plans.
+> **Current Status**: Only kernel engine plugins are presently supported in hipDNN. The MIOpen Legacy Plugin is currently included as a reference implementation but will be migrated to its own separate project in the future. Support for engine heuristic/selection and benchmarking/tuning plugins will be added in future releases. See the [Roadmap](./Roadmap.md#plugins) for future development plans.
 
 ## hipDNN-SDK Library
 
@@ -59,7 +57,7 @@ The plugin API defines how kernel engine plugins interact with hipDNN:
 
 ## Creating a Kernel Engine Plugin
 
-This section focuses on developing kernel engine plugins, which are currently the only supported plugin type.
+This section focuses on developing kernel engine plugins; currently the only supported plugin type.
 
 ### Prerequisites
 
