@@ -529,6 +529,9 @@ TEST(Engine_plugin_resource_manager, get_engine_details)
             output->size = builder.GetSize();
         }));
 
+    EXPECT_CALL(*mock_plugin,
+                destroy_engine_details(hipdnnEnginePluginHandle_t(0xdeadbeef), testing::_));
+
     EXPECT_CALL(*mock_plugin, destroy_handle(testing::Eq(hipdnnEnginePluginHandle_t(0xdeadbeef))));
 
     {
