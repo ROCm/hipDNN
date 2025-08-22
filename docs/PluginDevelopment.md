@@ -33,7 +33,7 @@ These plugins focus on performance optimization by benchmarking different implem
 These plugins provide the actual kernel implementations for operations. They contain the compute kernels that execute on the target hardware (GPUs, accelerators, etc.).
 
 > [!IMPORTANT]
-> **Current Status**: Only kernel engine plugins are presently supported in hipDNN. The MIOpen Legacy Plugin is currently included as a reference implementation but will be migrated to its own separate project in the future. Support for engine heuristic/selection and benchmarking/tuning plugins will be added in future releases. See the [Roadmap](./Roadmap.md#plugins) for future development plans.
+> 🕒 **Current Status**: Only kernel engine plugins are presently supported in hipDNN. Support for engine heuristic/selection and benchmarking/tuning plugins will be added in future releases. See the [Roadmap](./Roadmap.md#plugins) for future development plans.
 
 ## hipDNN-SDK Library
 

@@ -1,7 +1,7 @@
 # hipDNN
 
 > [!CAUTION]
-> **hipDNN is in the early stages of development. There is currently very limited functionality available to solve problems. See [Operation Support](./docs/OperationSupport.md) for reference.**
+> **hipDNN is in the early stages of development. There is currently limited functionality available to solve problems. See [Operation Support](./docs/OperationSupport.md) for reference.**
 
 ## Overview
 

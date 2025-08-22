@@ -26,9 +26,9 @@ hipDNN has a plugin-based architecture in order to allow contributors and users 
 
 **SDK**: A header-only library that provides shared utilities and interfaces that plugins, frontend, and backend depend on to ensure compatibility and communication.
 
-**MIOpen Legacy Plugin**: A plugin that wraps MIOpen and provides access to the existing API through hipDNN. In the future, the MIOpen Legacy Plugin will be it's own separate project separate from hipDNN. Plugins are expected to live separate from the core of hipDNN.
+**MIOpen Legacy Plugin**: A plugin that wraps MIOpen and provides access to the existing API through hipDNN. In the future, the MIOpen Legacy Plugin will be its own separate project separate from hipDNN.
 
-**Other Plugins**: Plugins will be added overtime to provide additional operational support, or performance improvements. Plugins should be external projects to hipDNN.
+**Other Plugins**: Plugins will be added over time to provide additional operational support, or performance improvements. Plugins should be external projects to hipDNN.
 
 ## Component Details
 

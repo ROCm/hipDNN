@@ -27,7 +27,7 @@ The current samples include:
         ```python 
         y = scale * (x - mean) * inv_variance + bias
         ```
-        where `y` would then be propogated as input to the subsequent layer.
+        where `y` would then be propagated as input to the subsequent layer.
 *   **`bn_training`** (`batchnorm/bn_training.cpp`): Executes the forward pass of a batch normalization training graph on a 4D input tensor.
     *   For an input `x` of shape `(N, C, H, W)`, the mean and variance are calculated over the `N`, `H`, and `W` dimensions for each of the `C` channels or mini-batches, resulting in a `mean` and `inv_variance` of shape `(1, C, 1, 1)`. It then transforms the input and updates the running statistics:
         ```python 
