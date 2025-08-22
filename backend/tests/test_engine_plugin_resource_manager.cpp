@@ -631,6 +631,136 @@ TEST(Engine_plugin_resource_manager, execute_op_graph_with_null_parameters)
     }
 }
 
+TEST(Engine_plugin_resource_manager, execute_op_graph_fail_non_finalized_plan)
+{
+    std::shared_ptr<Mock_engine_plugin> mock_plugin = std::make_shared<Mock_engine_plugin>();
+    std::vector<std::shared_ptr<Engine_plugin>> plugins{mock_plugin};
+    std::shared_ptr<Mock_engine_plugin_manager> plugin_manager
+        = std::make_shared<Mock_engine_plugin_manager>();
+
+    auto execution_plan_wrapper = test_descriptor_utils::create_descriptor<Mock_execution_plan_descriptor>();
+    auto variant_wrapper = test_descriptor_utils::create_descriptor<Mock_variant_descriptor>();
+
+    auto mock_execution_plan =  Mock_descriptor_utility::as_descriptor_unsafe<Mock_execution_plan_descriptor>(execution_plan_wrapper.get());
+    auto mock_variant_pack =  Mock_descriptor_utility::as_descriptor_unsafe<Mock_variant_descriptor>(variant_wrapper.get());
+
+    std::vector<int64_t> tensor_ids = {1, 2, 3};
+    std::vector<const void*> data_ptrs = {reinterpret_cast<void*>(0x1000),
+                               reinterpret_cast<void*>(0x2000),
+                               reinterpret_cast<void*>(0x3000)};
+
+    EXPECT_CALL(*plugin_manager, get_plugins()).WillOnce(::testing::ReturnRef(plugins));
+    EXPECT_CALL(*mock_plugin, create_handle())
+        .WillOnce(::testing::Return(hipdnnEnginePluginHandle_t(0xdeadbeef)));
+    EXPECT_CALL(*mock_plugin, get_all_engine_ids())
+        .WillOnce(::testing::Return(std::vector<int64_t>{100, 101, 102}));
+    EXPECT_CALL(*mock_plugin, destroy_handle(testing::Eq(hipdnnEnginePluginHandle_t(0xdeadbeef))));
+
+    EXPECT_CALL(*mock_execution_plan, is_finalized())
+        .WillOnce(::testing::Return(false));
+
+    {
+        Engine_plugin_resource_manager resource_manager(plugin_manager);
+
+        ASSERT_THROW_HIPDNN_STATUS(resource_manager.execute_op_graph(execution_plan_wrapper.get(), variant_wrapper.get()),
+                                   HIPDNN_STATUS_BAD_PARAM);
+    }
+}
+
+TEST(Engine_plugin_resource_manager, execute_op_graph_fail_non_finalized_variant)
+{
+    std::shared_ptr<Mock_engine_plugin> mock_plugin = std::make_shared<Mock_engine_plugin>();
+    std::vector<std::shared_ptr<Engine_plugin>> plugins{mock_plugin};
+    std::shared_ptr<Mock_engine_plugin_manager> plugin_manager
+        = std::make_shared<Mock_engine_plugin_manager>();
+
+    auto execution_plan_wrapper = test_descriptor_utils::create_descriptor<Mock_execution_plan_descriptor>();
+    auto variant_wrapper = test_descriptor_utils::create_descriptor<Mock_variant_descriptor>();
+
+    auto mock_execution_plan =  Mock_descriptor_utility::as_descriptor_unsafe<Mock_execution_plan_descriptor>(execution_plan_wrapper.get());
+    auto mock_variant_pack =  Mock_descriptor_utility::as_descriptor_unsafe<Mock_variant_descriptor>(variant_wrapper.get());
+
+    std::vector<int64_t> tensor_ids = {1, 2, 3};
+    std::vector<const void*> data_ptrs = {reinterpret_cast<void*>(0x1000),
+                               reinterpret_cast<void*>(0x2000),
+                               reinterpret_cast<void*>(0x3000)};
+
+    EXPECT_CALL(*plugin_manager, get_plugins()).WillOnce(::testing::ReturnRef(plugins));
+    EXPECT_CALL(*mock_plugin, create_handle())
+        .WillOnce(::testing::Return(hipdnnEnginePluginHandle_t(0xdeadbeef)));
+    EXPECT_CALL(*mock_plugin, get_all_engine_ids())
+        .WillOnce(::testing::Return(std::vector<int64_t>{100, 101, 102}));
+    EXPECT_CALL(*mock_plugin, destroy_handle(testing::Eq(hipdnnEnginePluginHandle_t(0xdeadbeef))));
+
+    EXPECT_CALL(*mock_execution_plan, is_finalized())
+        .WillOnce(::testing::Return(true));
+    EXPECT_CALL(*mock_variant_pack, is_finalized())
+        .WillOnce(::testing::Return(false));
+
+    {
+        Engine_plugin_resource_manager resource_manager(plugin_manager);
+
+        ASSERT_THROW_HIPDNN_STATUS(resource_manager.execute_op_graph(execution_plan_wrapper.get(), variant_wrapper.get()),
+                                   HIPDNN_STATUS_BAD_PARAM);
+    }
+}
+
+TEST(Engine_plugin_resource_manager, execute_op_graph_fail_tensor_mismatch)
+{
+    std::shared_ptr<Mock_engine_plugin> mock_plugin = std::make_shared<Mock_engine_plugin>();
+    std::vector<std::shared_ptr<Engine_plugin>> plugins{mock_plugin};
+    std::shared_ptr<Mock_engine_plugin_manager> plugin_manager
+        = std::make_shared<Mock_engine_plugin_manager>();
+
+    auto engine_config_wrapper = test_descriptor_utils::create_descriptor<Mock_engine_config_descriptor>();
+    auto engine_wrapper = test_descriptor_utils::create_descriptor<Mock_engine_descriptor>();
+    auto execution_plan_wrapper = test_descriptor_utils::create_descriptor<Mock_execution_plan_descriptor>();
+    auto variant_wrapper = test_descriptor_utils::create_descriptor<Mock_variant_descriptor>();
+
+    auto mock_engine_config =  Mock_descriptor_utility::as_descriptor_unsafe<Mock_engine_config_descriptor>(engine_config_wrapper.get());
+    auto mock_engine =  Mock_descriptor_utility::as_descriptor_unsafe<Mock_engine_descriptor>(engine_wrapper.get());
+    auto mock_execution_plan =  Mock_descriptor_utility::as_descriptor_unsafe<Mock_execution_plan_descriptor>(execution_plan_wrapper.get());
+    auto mock_variant_pack =  Mock_descriptor_utility::as_descriptor_unsafe<Mock_variant_descriptor>(variant_wrapper.get());
+
+    // More data ptrs than tensor ids
+    std::vector<int64_t> tensor_ids = {1};
+    std::vector<const void*> data_ptrs = {reinterpret_cast<void*>(0x1000),
+                               reinterpret_cast<void*>(0x2000),
+                               reinterpret_cast<void*>(0x3000)};
+
+    EXPECT_CALL(*plugin_manager, get_plugins()).WillOnce(::testing::ReturnRef(plugins));
+    EXPECT_CALL(*mock_plugin, create_handle())
+        .WillOnce(::testing::Return(hipdnnEnginePluginHandle_t(0xdeadbeef)));
+    EXPECT_CALL(*mock_plugin, get_all_engine_ids())
+        .WillOnce(::testing::Return(std::vector<int64_t>{100, 101, 102}));
+    EXPECT_CALL(*mock_plugin, destroy_handle(testing::Eq(hipdnnEnginePluginHandle_t(0xdeadbeef))));
+
+    EXPECT_CALL(*mock_execution_plan, is_finalized())
+        .WillOnce(::testing::Return(true));
+    EXPECT_CALL(*mock_variant_pack, is_finalized())
+        .WillOnce(::testing::Return(true));
+
+    EXPECT_CALL(*mock_execution_plan, get_engine_config())
+        .WillOnce(::testing::Return(mock_engine_config));
+    EXPECT_CALL(*mock_engine_config, get_engine())
+        .WillOnce(::testing::Return(mock_engine));
+    EXPECT_CALL(*mock_engine, get_engine_id())
+        .WillOnce(::testing::Return(int64_t(100)));
+    EXPECT_CALL(*mock_variant_pack, get_workspace())
+        .WillOnce(::testing::Return(reinterpret_cast<void*>(0x4000)));
+    EXPECT_CALL(*mock_variant_pack, get_tensor_ids())
+        .WillOnce(::testing::ReturnRef(tensor_ids));
+    EXPECT_CALL(*mock_variant_pack, get_data_pointers())
+        .WillOnce(::testing::ReturnRef(data_ptrs));
+
+    {
+        Engine_plugin_resource_manager resource_manager(plugin_manager);
+
+        ASSERT_THROW_HIPDNN_STATUS(resource_manager.execute_op_graph(execution_plan_wrapper.get(), variant_wrapper.get()),
+            HIPDNN_STATUS_BAD_PARAM);
+    }
+}
+
 // NOLINTNEXTLINE(readability-identifier-naming)
 MATCHER_P2(MatchesMemory, data, size, "") {
     return memcmp(arg, data, size) == 0;
