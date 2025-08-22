@@ -20,6 +20,8 @@ add_executable(hipdnn_frontend_tests
     test_batchnorm_inference_attributes.cpp
     test_batchnorm_inference_node.cpp
     test_batchnorm_node.cpp
+    test_convolution_fwd_attributes.cpp
+    test_conv_fprop_node.cpp
     test_error.cpp
     test_graph.cpp
     test_graph_generated.cpp

@@ -93,6 +93,24 @@ inline Config parse_command_line_args(int argc, char* argv[])
     return config;
 }
 
+template <typename T>
+constexpr float get_epsilon()
+{
+    return 1e-5f;
+}
+
+template <>
+constexpr float get_epsilon<half>()
+{
+    return 1e-3f;
+}
+
+template <>
+constexpr float get_epsilon<hip_bfloat16>()
+{
+    return 1e-2f;
+}
+
 template <typename F>
 void run(F&& f)
 {
