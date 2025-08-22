@@ -3,7 +3,6 @@
 
 #include "miopen_batchnorm_bwd_plan.hpp"
 #include "hipdnn_engine_plugin_handle.hpp"
-#include "miopen_tensor.hpp"
 
 namespace miopen_legacy_plugin
 {
@@ -87,6 +86,7 @@ void Batchnorm_bwd_params::initialize_tensors(
 {
     _x = create_tensor(tensor_map, attributes.x_tensor_uid());
     _dy = create_tensor(tensor_map, attributes.dy_tensor_uid());
+    _dx = create_tensor(tensor_map, attributes.dx_tensor_uid());
     _scale = create_tensor(tensor_map, attributes.scale_tensor_uid());
     _dscale = create_tensor(tensor_map, attributes.dscale_tensor_uid());
     _dbias = create_tensor(tensor_map, attributes.dbias_tensor_uid());

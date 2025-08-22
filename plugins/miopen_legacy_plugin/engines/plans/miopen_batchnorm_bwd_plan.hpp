@@ -9,12 +9,11 @@
 #include <hipdnn_sdk/data_objects/batchnorm_backward_attributes_generated.h>
 #include <hipdnn_sdk/data_objects/tensor_attributes_generated.h>
 
+#include "miopen_tensor.hpp"
 #include "plan_interface.hpp"
 
 namespace miopen_legacy_plugin
 {
-
-class Miopen_tensor;
 
 class Batchnorm_bwd_params
 {
