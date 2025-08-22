@@ -3,6 +3,7 @@
 
 #include <gtest/gtest.h>
 #include <hipdnn_frontend/attributes/batchnorm_inference_attributes.hpp>
+#include <hipdnn_frontend/attributes/convolution_fwd_attributes.hpp>
 #include <hipdnn_frontend/attributes/pointwise_attributes.hpp>
 #include <hipdnn_frontend/graph.hpp>
 #include <hipdnn_sdk/data_objects/graph_generated.h>
@@ -248,6 +249,32 @@ TEST_F(Graph_test_fixture, PointwiseNodeCreationThreeInputs)
 
     EXPECT_EQ(out_0->get_name(), "PointwiseNode::OUT_0");
     EXPECT_TRUE(out_0->get_is_virtual());
+
+    auto validation_result = graph.validate();
+    EXPECT_TRUE(validation_result.is_good()) << validation_result.get_message();
+}
+
+TEST_F(Graph_test_fixture, ConvolutionFwdNodeCreation)
+{
+    Graph graph;
+
+    auto x = std::make_shared<Tensor_attributes>();
+    x->set_dim({1, 3, 32, 32}).set_stride({3072, 1024, 32, 1}).set_data_type(DataType_t::FLOAT);
+
+    auto w = std::make_shared<Tensor_attributes>();
+    w->set_dim({64, 3, 3, 3}).set_stride({27, 9, 3, 1}).set_data_type(DataType_t::FLOAT);
+
+    Conv_fprop_attributes attributes;
+    attributes.name = "ConvolutionNode";
+    attributes.set_pre_padding({1, 1});
+    attributes.set_post_padding({1, 1});
+    attributes.set_stride({1, 1});
+    attributes.set_dilation({1, 1});
+
+    auto y = graph.conv_fprop(x, w, attributes);
+
+    EXPECT_EQ(y->get_name(), "ConvolutionNode::Y");
+    EXPECT_TRUE(y->get_is_virtual());
 
     auto validation_result = graph.validate();
     EXPECT_TRUE(validation_result.is_good()) << validation_result.get_message();
@@ -802,6 +829,78 @@ TEST_F(Graph_test_fixture, BuildAndSerializeBatchnormBackwardGraph)
     EXPECT_EQ(deserialized_batchnorm_attributes->dx_tensor_uid, dx->get_uid());
     EXPECT_EQ(deserialized_batchnorm_attributes->dscale_tensor_uid, dscale->get_uid());
     EXPECT_EQ(deserialized_batchnorm_attributes->dbias_tensor_uid, dbias->get_uid());
+}
+
+TEST_F(Graph_test_fixture, BuildAndSerializeConvolutionFwdGraph)
+{
+    Graph graph;
+
+    graph.set_name("SerializedConvolutionGraph")
+        .set_compute_data_type(DataType_t::FLOAT)
+        .set_intermediate_data_type(DataType_t::HALF)
+        .set_io_data_type(DataType_t::FLOAT);
+
+    auto x = std::make_shared<Tensor_attributes>();
+    x->set_uid(1)
+        .set_name("X")
+        .set_dim({1, 3, 32, 32})
+        .set_stride({3072, 1024, 32, 1})
+        .set_data_type(DataType_t::FLOAT);
+
+    auto w = std::make_shared<Tensor_attributes>();
+    w->set_uid(2)
+        .set_name("W")
+        .set_dim({64, 3, 3, 3})
+        .set_stride({27, 9, 3, 1})
+        .set_data_type(DataType_t::FLOAT);
+
+    Conv_fprop_attributes convolution_attributes;
+    convolution_attributes.name = "ConvolutionNode";
+    convolution_attributes.set_pre_padding({1, 1});
+    convolution_attributes.set_post_padding({1, 1});
+    convolution_attributes.set_stride({1, 1});
+    convolution_attributes.set_dilation({1, 1});
+
+    auto y = graph.conv_fprop(x, w, convolution_attributes);
+
+    auto validation_result = graph.validate();
+    EXPECT_TRUE(validation_result.is_good()) << validation_result.get_message();
+
+    std::unique_ptr<hipdnn_sdk::data_objects::GraphT> deserialized_graph;
+    expect_graph_serialized_to_backend_descriptor(deserialized_graph);
+
+    auto build_result = graph.build_operation_graph(_handle);
+    EXPECT_TRUE(build_result.is_good()) << build_result.get_message();
+
+    EXPECT_EQ(deserialized_graph->name, "SerializedConvolutionGraph");
+    EXPECT_EQ(deserialized_graph->compute_type, hipdnn_sdk::data_objects::DataType_FLOAT);
+    EXPECT_EQ(deserialized_graph->intermediate_type, hipdnn_sdk::data_objects::DataType_HALF);
+    EXPECT_EQ(deserialized_graph->io_type, hipdnn_sdk::data_objects::DataType_FLOAT);
+    EXPECT_EQ(deserialized_graph->tensors.size(), 3);
+    EXPECT_EQ(deserialized_graph->nodes.size(), 1);
+
+    std::unordered_map<int64_t, hipdnn_sdk::data_objects::TensorAttributesT> tensor_lookup;
+    for(auto& tensor : deserialized_graph->tensors)
+    {
+        tensor_lookup[tensor->uid] = *tensor;
+    }
+
+    validate_tensor(*x, tensor_lookup[x->get_uid()]);
+    validate_tensor(*w, tensor_lookup[w->get_uid()]);
+    validate_tensor(*y, tensor_lookup[y->get_uid()]);
+
+    EXPECT_EQ(deserialized_graph->nodes[0]->name, "ConvolutionNode");
+    EXPECT_EQ(deserialized_graph->nodes[0]->attributes.type,
+              hipdnn_sdk::data_objects::NodeAttributes::NodeAttributes_ConvolutionFwdAttributes);
+    auto deserialized_convolution_attributes
+        = deserialized_graph->nodes[0]->attributes.AsConvolutionFwdAttributes();
+    EXPECT_EQ(deserialized_convolution_attributes->x_tensor_uid, x->get_uid());
+    EXPECT_EQ(deserialized_convolution_attributes->w_tensor_uid, w->get_uid());
+    EXPECT_EQ(deserialized_convolution_attributes->y_tensor_uid, y->get_uid());
+    EXPECT_EQ(deserialized_convolution_attributes->pre_padding, std::vector<int64_t>({1, 1}));
+    EXPECT_EQ(deserialized_convolution_attributes->post_padding, std::vector<int64_t>({1, 1}));
+    EXPECT_EQ(deserialized_convolution_attributes->stride, std::vector<int64_t>({1, 1}));
+    EXPECT_EQ(deserialized_convolution_attributes->dilation, std::vector<int64_t>({1, 1}));
 }
 
 TEST_F(Graph_test_fixture, BuildAndSerializePointwiseAndBatchnormBackwardGraph)

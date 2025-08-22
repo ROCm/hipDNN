@@ -167,6 +167,19 @@ public:
         return *this;
     }
 
+    bool validate_dims_set_and_positive() const
+    {
+        constexpr auto is_positive = [](int64_t value) { return value > 0; };
+        return !_dim.empty() && std::ranges::all_of(_dim.begin(), _dim.end(), is_positive);
+    }
+
+    bool validate_dims_and_strides_set_and_positive() const
+    {
+        constexpr auto is_positive = [](int64_t value) { return value > 0; };
+        return validate_dims_set_and_positive() && _stride.size() == _dim.size()
+               && std::ranges::all_of(_stride.begin(), _stride.end(), is_positive);
+    }
+
     flatbuffers::Offset<hipdnn_sdk::data_objects::TensorAttributes>
         pack_attributes(flatbuffers::FlatBufferBuilder& builder) const
     {

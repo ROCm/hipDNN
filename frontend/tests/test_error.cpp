@@ -57,8 +57,8 @@ TEST(ErrorTests, CheckHipdnnErrorMacro)
     };
 
     auto test_function = [&]() -> hipdnn_frontend::error_t {
-        CHECK_HIPDNN_ERROR(success_function());
-        CHECK_HIPDNN_ERROR(failure_function());
+        HIPDNN_CHECK_ERROR(success_function());
+        HIPDNN_CHECK_ERROR(failure_function());
         return {hipdnn_frontend::error_code_t::OK, "Should not reach here"};
     };
 
