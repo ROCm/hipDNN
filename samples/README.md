@@ -18,7 +18,7 @@ The sample executables will be created in the `build` directory.
 All samples are templated for mixed-precision execution with fp32, fp16, and bfp16 input/output data types, with fp32 intermediate accumulation.
 
 > [!TIP]
-> Set `HIPDNN_LOG_LEVEL=info` to observe detailed logs from the samples.
+> 💡 Set `HIPDNN_LOG_LEVEL=info` to observe detailed logs from the samples.
 
 The current samples include:
 

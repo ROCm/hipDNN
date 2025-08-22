@@ -50,7 +50,7 @@ The following libraries are automatically managed by CMake (see [Dependencies.cm
 ### Using Docker (Recommended)
 
 > [!TIP]
-> Docker provides a consistent development environment with all dependencies pre-installed. This is the recommended approach for most users. For more details about Docker images, see the [Docker README](../dockerfiles/README.md).
+> 💡 Docker provides a consistent development environment with all dependencies pre-installed. This is the recommended approach for most users. For more details about Docker images, see the [Docker README](../dockerfiles/README.md).
 
 1. **Clone hipDNN**
    ```bash
@@ -90,7 +90,7 @@ The following libraries are automatically managed by CMake (see [Dependencies.cm
    cd /workspace/hipDNN
    mkdir build && cd build
    cmake -GNinja ..
-   ninja check -j$(nproc)
+   ninja check
    ```
 
 5. **Install**
@@ -112,14 +112,11 @@ The following libraries are automatically managed by CMake (see [Dependencies.cm
    # Configure with Ninja (recommended)
    cmake -GNinja ..
    
-   # Or configure with Make
-   cmake ..
-   
    # Build and run tests
-   ninja check -j$(nproc)  # or make check -j$(nproc)
-   
+   ninja check
+
    # Install
-   sudo ninja install      # or sudo make install
+   sudo ninja install
    ```
 
 ## Build Configurations
@@ -167,7 +164,10 @@ cmake -GNinja -DHIP_DNN_BUILD_SAMPLES=OFF ..
 
 ## Build Targets
 
-All targets support parallel builds with `-j$(nproc)`:
+> [!NOTE]
+> Make is supported for all targets. Configure with `cmake -G "Unix Makefiles" ..` if it is not the default generator in your environment. For parallel builds, use `make -j$(nproc)` on Linux. Unlike `ninja`, `make` does not build in parallel by default.
+
+All targets support parallel builds with ninja:
 
 | Target | Description |
 |--------|-------------|

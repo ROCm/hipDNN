@@ -9,7 +9,6 @@
 #include <vector>
 
 #include "hipdnn_backend.h"
-#include "hipdnn_status.h"
 
 // NOLINTBEGIN(modernize-avoid-c-arrays)
 TEST(GetErrorStringTest, AllStatusCodes)
@@ -42,7 +41,7 @@ TEST(GetErrorStringTest, AllStatusCodes)
 
 TEST(GetLastErrorStringTest, GetLastError)
 {
-    char buffer[256];
+    char buffer[HIPDNN_MAX_ERROR_STRING_SIZE];
     hipdnnStatus_t status = hipdnnDestroy(nullptr);
     ASSERT_EQ(status, HIPDNN_STATUS_BAD_PARAM_NULL_POINTER);
 
@@ -76,19 +75,19 @@ TEST(GetLastErrorStringTest, PerThreadErrorIsolation)
 {
     // Set error in main thread
     hipdnnDestroy(nullptr);
-    char main_buf[256];
+    char main_buf[HIPDNN_MAX_ERROR_STRING_SIZE];
     hipdnnGetLastErrorString(main_buf, sizeof(main_buf));
 
     std::string thread_error;
     std::thread t([&thread_error]() {
-        char buf[256];
+        char buf[HIPDNN_MAX_ERROR_STRING_SIZE];
         hipdnnGetLastErrorString(buf, sizeof(buf));
         thread_error = buf;
     });
     t.join();
 
     // Main thread error should be unchanged
-    char main_buf2[256];
+    char main_buf2[HIPDNN_MAX_ERROR_STRING_SIZE];
     hipdnnGetLastErrorString(main_buf2, sizeof(main_buf2));
     ASSERT_STREQ(main_buf, main_buf2);
     ASSERT_TRUE(thread_error.empty());
@@ -100,7 +99,7 @@ TEST(GetLastErrorStringTest, BufferLargerThanMax)
     char main_buf[1028];
     hipdnnGetLastErrorString(main_buf, sizeof(main_buf));
 
-    char main_buf2[256];
+    char main_buf2[HIPDNN_MAX_ERROR_STRING_SIZE];
     hipdnnGetLastErrorString(main_buf2, sizeof(main_buf2));
     ASSERT_STREQ(main_buf, main_buf2);
 }

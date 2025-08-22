@@ -28,8 +28,8 @@ All contributions must meet the following requirements before they can be merged
 ### Code Quality Standards
 
 - **Code Formatting**: All code must follow the format specified by the `.clang-format` file
-  - Run `make format` or `ninja format` to auto-format your code
-  - Run `make check_format` or `ninja check_format` to verify formatting compliance
+  - Run `ninja format` to auto-format your code
+  - Run `ninja check_format` to verify formatting compliance
 - **Compiler Warnings**: Code must compile without warnings
 - **Clang-tidy Compliance**: Code must be free of clang-tidy errors
 
@@ -92,15 +92,9 @@ git remote add upstream https://github.com/ROCm/hipDNN.git
 git checkout -b feature/your-feature-name
 ```
 
-### 3. Build and Test Locally
+### 3. Build Locally
 
-Follow the instructions in [Building.md](./docs/Building.md) to build hipDNN:
-
-```bash
-mkdir build && cd build
-cmake -GNinja ..
-ninja check -j$(nproc)
-```
+Follow the remaining instructions in the [Quick Start Guide](./docs/Building.md#quick-start-guide) to build hipDNN.
 
 ### 4. Run All Required Checks
 

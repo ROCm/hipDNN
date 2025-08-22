@@ -35,7 +35,7 @@ These plugins focus on performance optimization by benchmarking different implem
 These plugins provide the actual kernel implementations for operations. They contain the compute kernels that execute on the target hardware (GPUs, accelerators, etc.).
 
 > [!IMPORTANT]
-> **Current Status**: Only kernel engine plugins are presently supported in hipDNN. The MIOpen Legacy Plugin is currently included as a reference implementation but will be migrated to its own separate project in the future. Support for engine heuristic/selection and benchmarking/tuning plugins will be added in future releases. See the [Roadmap](./Roadmap.md#plugins) for future development plans.
+> ⚠️ **Current Status**: Only kernel engine plugins are presently supported in hipDNN. The MIOpen Legacy Plugin is currently included as a reference implementation but will be migrated to its own separate project in the future. Support for engine heuristic/selection and benchmarking/tuning plugins will be added in future releases. See the [Roadmap](./Roadmap.md#plugins) for future development plans.
 
 ## hipDNN-SDK Library
 
@@ -60,6 +60,11 @@ The plugin API defines how kernel engine plugins interact with hipDNN:
 ## Creating a Kernel Engine Plugin
 
 This section focuses on developing kernel engine plugins, which are currently the only supported plugin type.
+
+### Prerequisites
+
+Before creating a plugin, ensure you have:
+- **Built and installed hipDNN**: Plugins depend on the hipDNN SDK headers and libraries. See the [Quick Start Guide](./Building.md#quick-start-guide) for build and installation instructions.
 
 ### Steps Overview
 
@@ -97,7 +102,7 @@ When implementing engines (if following this pattern):
 - Manage memory transfers and synchronization
 
 > [!TIP]
-> An engine ID is an integer unique to all loaded plugins. These IDs are used by the backend to identify and select specific engines for execution. You may want to reference other loaded plugins to accrue a set of unused engine IDs.
+> 💡 An engine ID is an integer unique to all loaded plugins. These IDs are used by the backend to identify and select specific engines for execution. You may want to reference other loaded plugins to accrue a set of unused engine IDs.
 
 #### Execution Plans
 Execution plans for kernel engines:
@@ -139,11 +144,115 @@ Your plugin's CMakeLists.txt should:
 - Set appropriate install paths
 - Link to required compute libraries (ie. HIP)
 
-### Plugin Loading
-Plugins are discovered and loaded from:
-- Default path: `hipdnn_plugins/<plugin-type>/` relative to the backend library
-- Custom paths can be configured using environment variables
-- See [Environment Configuration](./Environment.md) for details
+## Plugin Loading
+
+hipDNN supports dynamic plugin loading with configurable search paths.
+
+### Default Plugin Loading
+
+By default, hipDNN loads plugins from:
+```
+./hipdnn_plugins/plugin_type/plugins
+```
+
+This path is relative to the backend shared library location, typically:
+```
+/opt/rocm/lib/hipdnn/
+```
+
+**Default structure example:**
+```
+/opt/rocm/lib/hipdnn/
+└── hipdnn_plugins/
+    └── engines/
+        └── plugins/
+            ├── miopen_legacy_plugin.so
+            └── other_plugin.so
+```
+
+### Custom Plugin Paths
+
+Prior to creating a hipDNN handle, you can specify custom plugin paths using the `hipdnnSetEnginePluginPaths_ext` function:
+
+```c
+hipdnnStatus_t hipdnnSetEnginePluginPaths_ext(
+    size_t num_paths,
+    const char* const* plugin_paths,
+    hipdnnPluginLoadingMode_ext_t loading_mode
+);
+```
+
+#### Path Resolution
+
+Custom paths can be:
+- **Relative paths**: Resolved from the current working directory
+- **Absolute paths**: Used as specified
+
+#### Loading Modes
+
+| Mode | Description |
+|------|-------------|
+| `HIPDNN_PLUGIN_LOADING_ADDITIVE` | Adds new paths to the existing plugin search paths |
+| `HIPDNN_PLUGIN_LOADING_ABSOLUTE` | Only loads from the specified paths |
+
+#### Example Usage
+
+```c
+// Add custom plugin directories
+const char* custom_paths[] = {
+    "/home/user/my_plugins",        // Absolute path
+    "./local_plugins",              // Relative to working directory
+    "/opt/custom/hipdnn/plugins"
+};
+
+hipdnnSetEnginePluginPaths_ext(
+    3,                              // Number of paths
+    custom_paths,                   // Array of path strings
+    HIPDNN_PLUGIN_LOADING_ADDITIVE  // Add to existing paths
+);
+```
+
+Plugins are loaded according to the selected path schema during hipDNN handle creation. Changing paths after handle creation has no effect until another handle is created.
+
+### Querying Loaded Plugins
+
+After creating a hipDNN handle, you can query which engine plugins were successfully loaded using the `hipdnnGetLoadedEnginePluginPaths_ext` function:
+
+```c
+hipdnnStatus_t hipdnnGetLoadedEnginePluginPaths_ext(
+    hipdnnHandle_t handle,
+    size_t* num_plugin_paths,
+    char** plugin_paths,
+    size_t* max_string_len
+);
+```
+
+This function uses a two-call pattern:
+
+1. **First call** - Query the number of plugins and required buffer size:
+    ```cpp
+    size_t num_plugins = 0;
+    size_t max_len = 0;
+
+    hipdnnGetLoadedEnginePluginPaths_ext(handle, &num_plugins, nullptr, &max_len);
+    ```
+
+2. **Second call** - Retrieve the actual plugin paths:
+    ```cpp
+    hipdnnGetLoadedEnginePluginPaths_ext(handle, &num_plugins, nullptr, &max_len);
+
+    std::vector<std::vector<char>> buffers(num_plugins, std::vector<char>(max_len));
+    std::vector<char*> ptrs;
+    ptrs.reserve(num_plugins);
+    for(size_t i = 0; i < num_plugins; ++i) ptrs.push_back(buffers[i].data());
+
+    hipdnnGetLoadedEnginePluginPaths_ext(handle, &num_plugins, ptrs.data(), &max_len);
+
+    for(size_t i = 0; i < num_plugins; ++i)
+    {
+        std::cout << "Loaded plugin: " << buffers[i].data() << '\n';
+    }
+    ```
 
 ## How to Test Plugins
 

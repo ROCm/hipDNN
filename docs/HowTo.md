@@ -71,6 +71,14 @@ find_package(hipdnn_sdk REQUIRED)
 target_link_libraries(your_plugin PRIVATE hipdnn::sdk)
 ```
 
+#### Using AMD Half or BFloat16 Types
+If you use AMD half or bfloat16 types (via the SDK's `half_utils.hpp` or `bfloat16_utils.hpp`), you need:
+```cmake
+find_package(hip REQUIRED)
+enable_language(HIP)
+target_link_libraries(your_target hip::host hip::device)
+```
+
 > [!NOTE]
 > If CMake cannot find the packages after installation, ensure your `CMAKE_PREFIX_PATH` includes the install location. By default on Linux systems, hipDNN CMake files are installed to `/opt/rocm/lib/cmake`.
 

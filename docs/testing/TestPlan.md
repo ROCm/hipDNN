@@ -1,7 +1,7 @@
 # hipDNN Test Plan
 
 > [!IMPORTANT]
-> All prerequisites and tests in this document must pass for a successful release.
+> ⚠️ All prerequisites and tests in this document must pass for a successful release.
 
 ---
 
@@ -34,27 +34,11 @@ Verify that all documentation is up to date:
 
 ### Test Case 1: Run the Automated Tests
 
-#### Steps
-
-<!-- 1. **Build hipDNN**
-   Follow the [Quick Start Guide](../Building.md#quick-start-guide) to clone hipDNN and prepare your environment. -->
-
-1. **Configure the project with CMake**
-   ```bash
-   cmake ..
-   ```
-   
-   > **Optional**: Add `-DBUILD_ADDRESS_SANITIZER=ON` to enable address sanitizer (see below)
-
-2. **Run the test suite**
-   ```bash
-   ninja check_ctest
-   ```
-   
-   Alternatively, if using make:
-   ```bash
-   make -j$(nproc) check_ctest
-   ```
+Run as follows:
+```bash
+cmake ..
+ninja check_ctest
+```   
 
 #### Expected Results
 
@@ -71,25 +55,11 @@ Verify that all documentation is up to date:
 
 ### Test Case 1: Run the Automated Tests with ASAN Enabled
 
-#### Steps
-
-<!-- 1. **Build hipDNN**
-   Follow the [Quick Start Guide](../Building.md#quick-start-guide) to clone hipDNN and prepare your environment. -->
-
-1. **Configure with Address Sanitizer enabled**
-   ```bash
-   cmake .. -DBUILD_ADDRESS_SANITIZER=ON
-   ```
-
-2. **Run the test suite**
-   ```bash
-   ninja check_ctest
-   ```
-   
-   Alternatively, if using make:
-   ```bash
-   make -j$(nproc) check_ctest
-   ```
+Run as follows:
+```bash
+cmake .. -DBUILD_ADDRESS_SANITIZER=ON
+ninja check_ctest
+```
 
 #### Expected Results
 
