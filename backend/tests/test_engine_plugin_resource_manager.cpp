@@ -994,6 +994,37 @@ TEST(Engine_plugin_resource_manager, get_workspace_size_invalid_engine_id)
     }
 }
 
+TEST(Engine_plugin_resource_manager, get_workspace_size_throws_exception_for_invalid_engine_id)
+{
+    std::shared_ptr<Mock_engine_plugin> mock_plugin = std::make_shared<Mock_engine_plugin>();
+    std::vector<std::shared_ptr<Engine_plugin>> plugins{mock_plugin};
+    std::shared_ptr<Mock_engine_plugin_manager> plugin_manager
+        = std::make_shared<Mock_engine_plugin_manager>();
+
+    Mock_graph_descriptor mock_graph_desc;
+    hipdnnPluginConstData_t fake_engine_config = {
+        reinterpret_cast<const void*>("fake_config"),
+        11 // length of "fake_config"
+    };
+
+    EXPECT_CALL(*plugin_manager, get_plugins()).WillOnce(::testing::ReturnRef(plugins));
+    EXPECT_CALL(*mock_plugin, create_handle())
+        .WillOnce(::testing::Return(hipdnnEnginePluginHandle_t(0xdeadbeef)));
+    EXPECT_CALL(*mock_plugin, get_all_engine_ids())
+        .WillOnce(::testing::Return(std::vector<int64_t>{100, 101, 102}));
+
+    EXPECT_CALL(*mock_plugin, destroy_handle(testing::Eq(hipdnnEnginePluginHandle_t(0xdeadbeef))));
+
+    {
+        Engine_plugin_resource_manager resource_manager(plugin_manager);
+
+        // Test with an engine ID that is not in the list of available engines
+        ASSERT_THROW_HIPDNN_STATUS(
+            resource_manager.get_workspace_size(200, &fake_engine_config, &mock_graph_desc),
+            HIPDNN_STATUS_INTERNAL_ERROR);
+    }
+}
+
 TEST(Engine_plugin_resource_manager, set_plugin_paths_with_active_resource_manager)
 {
     std::shared_ptr<Mock_engine_plugin> mock_plugin = std::make_shared<Mock_engine_plugin>();
