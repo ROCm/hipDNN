@@ -16,3 +16,6 @@ typedef enum
     HIPDNN_PLUGIN_LOADING_ADDITIVE,
     HIPDNN_PLUGIN_LOADING_ABSOLUTE,
 } hipdnnPluginLoadingMode_ext_t;
+
+constexpr hipdnnPluginLoadingMode_ext_t HIPDNN_DEFAULT_PLUGIN_LOADING_MODE
+    = HIPDNN_PLUGIN_LOADING_ADDITIVE;

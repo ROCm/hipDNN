@@ -174,7 +174,12 @@ public:
                 {
                     paths_to_load.insert(resolved_path);
                 }
-                // Consider logging `else` here once cognitive complexity is resolved
+                else
+                {
+                    HIPDNN_LOG_WARN(
+                        "Plugin path is not a directory and doesn't have a filepath component '{}'",
+                        path.string());
+                }
             }
             catch(const std::filesystem::filesystem_error& e)
             {

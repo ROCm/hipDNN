@@ -6,6 +6,7 @@ find_package(hip REQUIRED)
 find_package(Threads REQUIRED)
 
 add_executable(public_hipdnn_backend_tests 
+    integration_test_unhappy_plugin_path.cpp
     test_backend_public_functions.cpp
     test_backend_execute_api.cpp
     test_engine_config_api.cpp
