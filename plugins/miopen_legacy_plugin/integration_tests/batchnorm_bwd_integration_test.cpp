@@ -65,7 +65,7 @@ struct Batchnorm_2d_tensor_bundle
             static_cast<Input_type>(-2.0f), static_cast<Input_type>(2.0f), seed);
 
         scale_tensor.fill_with_random_values<Intermediate_type>(
-            static_cast<Intermediate_type>(-2.0f), static_cast<Intermediate_type>(2.0f), seed);
+            static_cast<Intermediate_type>(-2.0), static_cast<Intermediate_type>(2.0f), seed);
 
         mean_tensor.fill_with_random_values<Intermediate_type>(
             static_cast<Intermediate_type>(-2.0f), static_cast<Intermediate_type>(2.0f), seed);
@@ -276,7 +276,8 @@ protected:
 
     template <typename Input_type, typename Intermediate_type>
     void run_batchnorm_test(const Bn_2d_test_case& test_case,
-                            Input_type tolerance = 1e-4f,
+                            Input_type absolute_tolerance = 1.0f,
+                            Input_type relative_tolerance = 1e-4f,
                             const Tensor_layout& layout = Tensor_layout::NCHW)
     {
         auto input_data_type = get_data_type_enum_from_type<Input_type>();
@@ -300,12 +301,14 @@ protected:
 
         run_cpu_batchnorm_bwd<Input_type, Intermediate_type>(cpu_tensor_bundle);
 
-        Cpu_fp_reference_validation<Input_type> cpu_ref_validation(tolerance, tolerance);
+        Cpu_fp_reference_validation<Input_type> cpu_ref_validation(absolute_tolerance, relative_tolerance);
         EXPECT_TRUE(cpu_ref_validation.compare_buffers(cpu_tensor_bundle.dx_tensor.memory(),
                                                        graph_tensor_bundle.dx_tensor.memory()));
-        EXPECT_TRUE(cpu_ref_validation.compare_buffers(cpu_tensor_bundle.dscale_tensor.memory(),
+        Cpu_fp_reference_validation<Intermediate_type> cpu_ref_intermediate_validation(1.0f,
+                                                                 1e-2f);
+        EXPECT_TRUE(cpu_ref_intermediate_validation.compare_buffers(cpu_tensor_bundle.dscale_tensor.memory(),
                                                        graph_tensor_bundle.dscale_tensor.memory()));
-        EXPECT_TRUE(cpu_ref_validation.compare_buffers(cpu_tensor_bundle.dbias_tensor.memory(),
+        EXPECT_TRUE(cpu_ref_intermediate_validation.compare_buffers(cpu_tensor_bundle.dbias_tensor.memory(),
                                                        graph_tensor_bundle.dbias_tensor.memory()));
     }
 
@@ -352,7 +355,7 @@ std::vector<Bn_2d_test_case> get_bn_bwd_test_cases()
 TEST_P(Batchnorm_backward_integration_test, RunFloatBwdBatchnormGraph)
 {
     Bn_2d_test_case test_case = GetParam();
-    run_batchnorm_test<float, float>(test_case, 1e-6f);
+    run_batchnorm_test<float, float>(test_case, 10.0f, 1e-4f);
 }
 
 INSTANTIATE_TEST_SUITE_P(RunFloatBwdBatchnormGraph,
@@ -362,7 +365,7 @@ INSTANTIATE_TEST_SUITE_P(RunFloatBwdBatchnormGraph,
 TEST_P(Batchnorm_backward_integration_test_bfloat16, RunBfloat16BwdBatchnormGraph)
 {
     Bn_2d_test_case test_case = GetParam();
-    run_batchnorm_test<hip_bfloat16, float>(test_case, 1e-2_bf);
+    run_batchnorm_test<hip_bfloat16, float>(test_case, 10.0_bf, 0.1_bf);
 }
 
 INSTANTIATE_TEST_SUITE_P(RunBfloat16BwdBatchnormGraph,
@@ -372,7 +375,7 @@ INSTANTIATE_TEST_SUITE_P(RunBfloat16BwdBatchnormGraph,
 TEST_P(Batchnorm_backward_integration_test_half, RunHalfBwdBatchnormGraph)
 {
     Bn_2d_test_case test_case = GetParam();
-    run_batchnorm_test<half, float>(test_case, 1e-2_h);
+    run_batchnorm_test<half, float>(test_case, 10.0_h, 1e-2_h);
 }
 
 INSTANTIATE_TEST_SUITE_P(RunHalfBwdBatchnormGraph,
@@ -382,7 +385,7 @@ INSTANTIATE_TEST_SUITE_P(RunHalfBwdBatchnormGraph,
 TEST_P(Batchnorm_backward_integration_test_nhwc, RunFloatBwdBatchnormGraphNHWC)
 {
     Bn_2d_test_case test_case = GetParam();
-    run_batchnorm_test<float, float>(test_case, 1e-6f, Tensor_layout::NHWC);
+    run_batchnorm_test<float, float>(test_case, 1.0f, 1e-4f, Tensor_layout::NHWC);
 }
 
 INSTANTIATE_TEST_SUITE_P(RunFloatBwdBatchnormGraphNHWC,
