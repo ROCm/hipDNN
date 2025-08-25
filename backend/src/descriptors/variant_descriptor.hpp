@@ -33,9 +33,9 @@ public:
                        const void* array_of_elements) override;
 
     // throws if the variant descriptor is not finalized
-    void* get_workspace() const;
-    const std::vector<const void*>& get_data_pointers() const;
-    const std::vector<int64_t>& get_tensor_ids() const;
+    virtual void* get_workspace() const;
+    virtual const std::vector<const void*>& get_data_pointers() const;
+    virtual const std::vector<int64_t>& get_tensor_ids() const;
 
     static hipdnnBackendDescriptorType_t get_static_type();
 };

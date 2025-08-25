@@ -23,4 +23,5 @@
             FAIL() << "Expected hipdnn_backend::Hipdnn_exception"; \
         }                                                          \
     } while(0)
+
 // NOLINTEND

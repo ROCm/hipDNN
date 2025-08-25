@@ -16,6 +16,14 @@ Plugin_base::Plugin_base(Shared_library&& lib)
     resolve_symbols();
 }
 
+Plugin_base::Plugin_base()
+{
+    // This constructor is used for mocking purposes in tests.
+#ifndef NDEBUG
+    _initialized = false;
+#endif
+}
+
 void Plugin_base::resolve_symbols()
 {
     const auto func_name_get_name = "hipdnnPluginGetName";

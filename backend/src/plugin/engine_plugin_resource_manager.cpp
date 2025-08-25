@@ -11,7 +11,7 @@
 #include "descriptors/execution_plan_descriptor.hpp"
 #include "descriptors/graph_descriptor.hpp"
 #include "descriptors/variant_descriptor.hpp"
-#include "engine_plugin.hpp"
+#include "engine_plugin_manager.hpp"
 #include "engine_plugin_resource_manager.hpp"
 #include "hipdnn_exception.hpp"
 #include "logging/logging.hpp"
@@ -21,38 +21,6 @@ namespace hipdnn_backend
 {
 namespace plugin
 {
-
-class Engine_plugin_manager : public Plugin_manager_base<Engine_plugin>
-{
-public:
-    Engine_plugin_manager()
-        : Plugin_manager_base<Engine_plugin>({"hipdnn_plugins/engines/"})
-    {
-    }
-
-private:
-    void validate_before_adding(const Engine_plugin& plugin) override
-    {
-        auto engine_ids = plugin.get_all_engine_ids();
-        for(const auto id : engine_ids)
-        {
-            if(_engine_ids.contains(id))
-            {
-                throw Hipdnn_exception(HIPDNN_STATUS_PLUGIN_ERROR,
-                                       "Engine ID " + std::to_string(id)
-                                           + " already exists in the list");
-            }
-        }
-    }
-
-    void action_after_adding(const Engine_plugin& plugin) override
-    {
-        auto engine_ids = plugin.get_all_engine_ids();
-        _engine_ids.insert(engine_ids.begin(), engine_ids.end());
-    }
-
-    std::set<int64_t> _engine_ids;
-};
 
 namespace
 {
@@ -170,23 +138,23 @@ Engine_plugin_resource_manager::Engine_plugin_resource_manager()
 }
 
 Engine_plugin_resource_manager::Engine_plugin_resource_manager(
-    std::shared_ptr<Engine_plugin_manager>& pm)
-    : _pm(pm)
+    std::shared_ptr<Engine_plugin_manager> pm)
+    : _pm(std::move(pm))
 {
     // Create plugin handles
     const auto& plugins = _pm->get_plugins();
     for(const auto& plugin : plugins)
     {
-        auto handle = plugin.create_handle();
+        auto handle = plugin->create_handle();
 
         if(_handle_to_plugin.contains(handle))
         {
             throw Hipdnn_exception(HIPDNN_STATUS_PLUGIN_ERROR, "Plugin handle already exists");
         }
 
-        _handle_to_plugin[handle] = &plugin;
+        _handle_to_plugin[handle] = plugin.get();
 
-        auto engine_ids = plugin.get_all_engine_ids();
+        auto engine_ids = plugin->get_all_engine_ids();
         for(const auto id : engine_ids)
         {
             _engine_id_to_handle[id] = handle;
@@ -241,6 +209,8 @@ void Engine_plugin_resource_manager::set_stream(hipStream_t stream) const
 std::vector<int64_t> Engine_plugin_resource_manager::get_applicable_engine_ids(
     const Graph_descriptor* graph_desc) const
 {
+    THROW_IF_NULL(graph_desc, HIPDNN_STATUS_INTERNAL_ERROR, "Graph descriptor cannot be null");
+
     auto serialized_graph_data = graph_desc->get_serialized_graph();
 
     std::vector<int64_t> engine_ids;
@@ -275,9 +245,19 @@ void Engine_plugin_resource_manager::get_engine_details(
     const Graph_descriptor* graph_desc,
     hipdnnPluginConstData_t* engine_details) const
 {
+    THROW_IF_NULL(graph_desc, HIPDNN_STATUS_INTERNAL_ERROR, "Graph descriptor cannot be null");
+    THROW_IF_NULL(engine_details, HIPDNN_STATUS_INTERNAL_ERROR, "Engine details cannot be null");
+
+    auto it = _engine_id_to_handle.find(engine_id);
+    if(it == _engine_id_to_handle.end())
+    {
+        throw Hipdnn_exception(HIPDNN_STATUS_INTERNAL_ERROR,
+                               "Invalid engine ID: " + std::to_string(engine_id));
+    }
+
     auto serialized_graph_data = graph_desc->get_serialized_graph();
 
-    auto handle = _engine_id_to_handle.at(engine_id);
+    auto handle = it->second;
     auto plugin = _handle_to_plugin.at(handle);
 
     plugin->get_engine_details(handle, engine_id, &serialized_graph_data, engine_details);
@@ -312,9 +292,19 @@ size_t
                                                        const hipdnnPluginConstData_t* engine_config,
                                                        const Graph_descriptor* graph_desc) const
 {
+    THROW_IF_NULL(engine_config, HIPDNN_STATUS_INTERNAL_ERROR, "Engine config cannot be null");
+    THROW_IF_NULL(graph_desc, HIPDNN_STATUS_INTERNAL_ERROR, "Graph descriptor cannot be null");
+
+    auto it = _engine_id_to_handle.find(engine_id);
+    if(it == _engine_id_to_handle.end())
+    {
+        throw Hipdnn_exception(HIPDNN_STATUS_INTERNAL_ERROR,
+                               "Invalid engine ID: " + std::to_string(engine_id));
+    }
+
     auto serialized_graph_data = graph_desc->get_serialized_graph();
 
-    auto handle = _engine_id_to_handle.at(engine_id);
+    auto handle = it->second;
     auto plugin = _handle_to_plugin.at(handle);
 
     return plugin->get_workspace_size(handle, engine_config, &serialized_graph_data);
@@ -327,9 +317,19 @@ hipdnnEnginePluginExecutionContext_t Engine_plugin_resource_manager::create_exec
     const hipdnnPluginConstData_t* engine_config,
     const Graph_descriptor* graph_desc) const
 {
+    THROW_IF_NULL(engine_config, HIPDNN_STATUS_BAD_PARAM, "Engine config cannot be null");
+    THROW_IF_NULL(graph_desc, HIPDNN_STATUS_BAD_PARAM, "Graph descriptor cannot be null");
+
+    auto it = _engine_id_to_handle.find(engine_id);
+    if(it == _engine_id_to_handle.end())
+    {
+        throw Hipdnn_exception(HIPDNN_STATUS_INTERNAL_ERROR,
+                               "Invalid engine ID: " + std::to_string(engine_id));
+    }
+
     auto serialized_graph_data = graph_desc->get_serialized_graph();
 
-    auto handle = _engine_id_to_handle.at(engine_id);
+    auto handle = it->second;
     auto plugin = _handle_to_plugin.at(handle);
 
     return plugin->create_execution_context(handle, engine_config, &serialized_graph_data);
