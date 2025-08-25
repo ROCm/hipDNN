@@ -4,6 +4,8 @@
 #include "descriptors/backend_descriptor.hpp"
 #include "hipdnn_backend.h"
 #include "hipdnn_sdk/plugin/engine_plugin_api.h"
+#include "hipdnn_sdk/plugin/plugin_api.h"
+#include "hipdnn_sdk/utilities/platform_utils.hpp"
 #include "test_util.hpp"
 #include <hipdnn_backend_attribute_name.h>
 #include <hipdnn_backend_attribute_type.h>
@@ -182,15 +184,34 @@ TEST_F(Unhappy_plugin_path_tests, IncorrectEngineID)
 TEST_F(Unhappy_plugin_path_tests, DuplicateEngineIds)
 {
     const std::array<const char*, 2> paths
-        = {hipdnn_tests::plugin_constants::test_good_plugin_path().c_str(),
-           hipdnn_tests::plugin_constants::test_duplicate_ids_plugin_path().c_str()};
+        = {hipdnn_tests::plugin_constants::test_duplicate_id_a_plugin_path().c_str(),
+           hipdnn_tests::plugin_constants::test_duplicate_id_b_plugin_path().c_str()};
     ASSERT_EQ(
         hipdnnSetEnginePluginPaths_ext(paths.size(), paths.data(), HIPDNN_PLUGIN_LOADING_ABSOLUTE),
         HIPDNN_STATUS_SUCCESS);
 
-    ASSERT_NE(
-        hipdnnCreate(&_handle),
-        HIPDNN_STATUS_SUCCESS); // TODO: Test fails, hipdnn silently ignores conflicting engine ids
+    ASSERT_EQ(hipdnnCreate(&_handle), HIPDNN_STATUS_SUCCESS);
+
+    // TODO: Warning is logged, but we don't have means of querying the last warning
+
+    EXPECT_EQ(test_util::get_loaded_plugins(_handle).size(), 1);
+}
+
+TEST_F(Unhappy_plugin_path_tests, IncompleteAPI)
+{
+    using namespace hipdnn_sdk::utilities;
+    using namespace hipdnn_tests::plugin_constants;
+
+    const std::array<const char*, 1> paths = {test_incomplete_api_plugin_path().c_str()};
+    ASSERT_EQ(
+        hipdnnSetEnginePluginPaths_ext(paths.size(), paths.data(), HIPDNN_PLUGIN_LOADING_ABSOLUTE),
+        HIPDNN_STATUS_SUCCESS);
+
+    ASSERT_EQ(hipdnnCreate(&_handle), HIPDNN_STATUS_SUCCESS);
+
+    // TODO: Warning is logged, but we don't have means of querying the last warning
+
+    EXPECT_EQ(test_util::get_loaded_plugins(_handle).size(), 0);
 }
 
 TEST_F(Unhappy_plugin_path_tests, MultiplePluginsOneApplicableEngine)

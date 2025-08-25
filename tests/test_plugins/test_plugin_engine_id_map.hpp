@@ -23,4 +23,5 @@ HIPDNN_MAP_TO_ID(Good_plugin, -2);
 HIPDNN_MAP_TO_ID(Good_default_plugin, -3);
 HIPDNN_MAP_TO_ID(No_applicable_engines_plugin, -4);
 HIPDNN_MAP_TO_ID(Execute_fails_plugin, -5);
-HIPDNN_MAP_TO_ID(Duplicate_ids_plugin, -2);
+HIPDNN_MAP_TO_ID(Duplicate_id_a_plugin, -6);
+HIPDNN_MAP_TO_ID(Duplicate_id_b_plugin, -6);

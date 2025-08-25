@@ -2,6 +2,7 @@
 // SPDX-License-Identifier:  MIT
 
 #include <filesystem>
+#include <optional>
 #include <set>
 #include <string>
 #include <thread>
@@ -11,6 +12,7 @@
 #include <utility>
 
 #include "plugin/plugin_core.hpp"
+#include <hipdnn_sdk/test_utilities/temporary_directory.hpp>
 
 using namespace hipdnn_backend;
 
@@ -43,6 +45,10 @@ class Test_plugin_manager : public plugin::Plugin_manager_base<Plugin>
 public:
     Test_plugin_manager()
         : plugin::Plugin_manager_base<Plugin>({"test_plugins_dir"})
+    {
+    }
+    Test_plugin_manager(std::set<std::filesystem::path> paths)
+        : plugin::Plugin_manager_base<Plugin>(std::move(paths))
     {
     }
 };
@@ -97,18 +103,19 @@ TEST(PluginManagerTest, LoadPlugins)
 
 TEST(PluginManagerTest, LoadPluginsFromDirectory)
 {
-    const std::filesystem::path temp_dir = std::filesystem::path(".") /= "temp_plugin_dir";
-    std::filesystem::create_directory(temp_dir);
+    Temp_dir temp_dir("temp_plugin_dir");
 
     try
     {
         std::filesystem::copy_file(FULL_PLUGIN_PATH1,
-                                   temp_dir / std::filesystem::path(FULL_PLUGIN_PATH1).filename());
+                                   temp_dir.path()
+                                       / std::filesystem::path(FULL_PLUGIN_PATH1).filename());
         std::filesystem::copy_file(FULL_PLUGIN_PATH2,
-                                   temp_dir / std::filesystem::path(FULL_PLUGIN_PATH2).filename());
+                                   temp_dir.path()
+                                       / std::filesystem::path(FULL_PLUGIN_PATH2).filename());
 
         Test_plugin_manager plugin_manager;
-        plugin_manager.load_plugins({temp_dir}, HIPDNN_PLUGIN_LOADING_ABSOLUTE);
+        plugin_manager.load_plugins({temp_dir.path()}, HIPDNN_PLUGIN_LOADING_ABSOLUTE);
 
         const auto& plugins = plugin_manager.get_plugins();
         ASSERT_EQ(plugins.size(), 2);
@@ -123,10 +130,39 @@ TEST(PluginManagerTest, LoadPluginsFromDirectory)
     }
     catch(...)
     {
-        std::filesystem::remove_all(temp_dir);
         FAIL();
     }
-    std::filesystem::remove_all(temp_dir);
+}
+
+TEST(PluginManagerTest, LoadPluginsEmptyDir)
+{
+    try
+    {
+        Temp_dir temp_dir(std::filesystem::path(".") /= "empty_plugin_dir");
+        Test_plugin_manager plugin_manager({temp_dir.path()});
+        plugin_manager.load_plugins({}, HIPDNN_PLUGIN_LOADING_ADDITIVE);
+
+        ASSERT_TRUE(plugin_manager.get_loaded_plugin_files().empty());
+        ASSERT_TRUE(plugin_manager.get_plugins().empty());
+    }
+    catch(...)
+    {
+        FAIL();
+    }
+
+    try
+    {
+        Temp_dir temp_dir(std::filesystem::path(".") /= "empty_plugin_dir");
+        Test_plugin_manager plugin_manager;
+        plugin_manager.load_plugins({temp_dir.path()}, HIPDNN_PLUGIN_LOADING_ABSOLUTE);
+
+        ASSERT_TRUE(plugin_manager.get_loaded_plugin_files().empty());
+        ASSERT_TRUE(plugin_manager.get_plugins().empty());
+    }
+    catch(...)
+    {
+        FAIL();
+    }
 }
 
 TEST(PluginManagerTest, LoadPluginsAbsolute)
@@ -185,14 +221,14 @@ TEST(PluginManagerTest, LoadPlugins_AbsoluteReplaces)
 
 TEST(PluginManagerTest, LoadPluginsAdditiveWithDefault)
 {
-    const std::filesystem::path default_dir = "test_plugins_dir";
-    std::filesystem::create_directory(default_dir);
+    Temp_dir default_dir("test_plugins_dir");
 
     try
     {
         // Place a plugin in the default directory
-        std::filesystem::copy_file(
-            FULL_PLUGIN_PATH1, default_dir / std::filesystem::path(FULL_PLUGIN_PATH1).filename());
+        std::filesystem::copy_file(FULL_PLUGIN_PATH1,
+                                   default_dir.path()
+                                       / std::filesystem::path(FULL_PLUGIN_PATH1).filename());
 
         Test_plugin_manager plugin_manager;
         plugin_manager.load_plugins({PLUGIN_PATH2}, HIPDNN_PLUGIN_LOADING_ADDITIVE);
@@ -211,24 +247,23 @@ TEST(PluginManagerTest, LoadPluginsAdditiveWithDefault)
     }
     catch(...)
     {
-        std::filesystem::remove_all(default_dir);
         FAIL();
     }
-    std::filesystem::remove_all(default_dir);
 }
 
 TEST(PluginManagerTest, LoadPluginsCombinedFileAndDirectory)
 {
-    const std::filesystem::path temp_dir = std::filesystem::path(".") /= "temp_plugin_dir_combined";
-    std::filesystem::create_directory(temp_dir);
+    Temp_dir temp_dir("temp_plugin_dir_combined");
 
     try
     {
         std::filesystem::copy_file(FULL_PLUGIN_PATH1,
-                                   temp_dir / std::filesystem::path(FULL_PLUGIN_PATH1).filename());
+                                   temp_dir.path()
+                                       / std::filesystem::path(FULL_PLUGIN_PATH1).filename());
 
         Test_plugin_manager plugin_manager;
-        plugin_manager.load_plugins({temp_dir, PLUGIN_PATH2}, HIPDNN_PLUGIN_LOADING_ABSOLUTE);
+        plugin_manager.load_plugins({temp_dir.path(), PLUGIN_PATH2},
+                                    HIPDNN_PLUGIN_LOADING_ABSOLUTE);
 
         const auto& plugins = plugin_manager.get_plugins();
         ASSERT_EQ(plugins.size(), 2);
@@ -243,10 +278,8 @@ TEST(PluginManagerTest, LoadPluginsCombinedFileAndDirectory)
     }
     catch(...)
     {
-        std::filesystem::remove_all(temp_dir);
         FAIL();
     }
-    std::filesystem::remove_all(temp_dir);
 }
 
 TEST(PluginManagerTest, LastError)
