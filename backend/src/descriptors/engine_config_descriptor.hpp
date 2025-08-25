@@ -11,53 +11,53 @@
 namespace hipdnn_backend
 {
 
-class Engine_descriptor;
+class EngineDescriptor;
 
-class Engine_config_descriptor : public hipdnnBackendDescriptorImpl<Engine_config_descriptor>
+class EngineConfigDescriptor : public HipdnnBackendDescriptorImpl<EngineConfigDescriptor>
 {
 private:
-    std::shared_ptr<const Engine_descriptor> _engine;
-    std::unique_ptr<hipdnn_sdk::data_objects::EngineConfigT> _engine_config_data;
-    mutable flatbuffers::DetachedBuffer _engine_config_serialized_buffer;
-    int64_t _max_workspace_size = INVALID_WORKSPACE_SIZE;
+    std::shared_ptr<const EngineDescriptor> _engine;
+    std::unique_ptr<hipdnn_sdk::data_objects::EngineConfigT> _engineConfigData;
+    mutable flatbuffers::DetachedBuffer _engineConfigSerializedBuffer;
+    int64_t _maxWorkspaceSize = INVALID_WORKSPACE_SIZE;
 
-    void set_engine(hipdnnBackendAttributeType_t attribute_type,
-                    int64_t element_count,
-                    const void* array_of_elements);
+    void setEngine(hipdnnBackendAttributeType_t attributeType,
+                   int64_t elementCount,
+                   const void* arrayOfElements);
 
-    void get_engine(hipdnnBackendAttributeType_t attribute_type,
-                    int64_t requested_element_count,
-                    int64_t* element_count,
-                    void* array_of_elements) const;
+    void getEngine(hipdnnBackendAttributeType_t attributeType,
+                   int64_t requestedElementCount,
+                   int64_t* elementCount,
+                   void* arrayOfElements) const;
 
-    void get_max_workspace_size(hipdnnBackendAttributeType_t attribute_type,
-                                int64_t requested_element_count,
-                                int64_t* element_count,
-                                void* array_of_elements) const;
+    void getMaxWorkspaceSize(hipdnnBackendAttributeType_t attributeType,
+                             int64_t requestedElementCount,
+                             int64_t* elementCount,
+                             void* arrayOfElements) const;
 
 public:
-    Engine_config_descriptor();
+    EngineConfigDescriptor();
     static constexpr int64_t INVALID_WORKSPACE_SIZE = -1;
 
     void finalize() override;
 
-    void get_attribute(hipdnnBackendAttributeName_t attribute_name,
-                       hipdnnBackendAttributeType_t attribute_type,
-                       int64_t requested_element_count,
-                       int64_t* element_count,
-                       void* array_of_elements) const override;
+    void getAttribute(hipdnnBackendAttributeName_t attributeName,
+                      hipdnnBackendAttributeType_t attributeType,
+                      int64_t requestedElementCount,
+                      int64_t* elementCount,
+                      void* arrayOfElements) const override;
 
-    void set_attribute(hipdnnBackendAttributeName_t attribute_name,
-                       hipdnnBackendAttributeType_t attribute_type,
-                       int64_t element_count,
-                       const void* array_of_elements) override;
+    void setAttribute(hipdnnBackendAttributeName_t attributeName,
+                      hipdnnBackendAttributeType_t attributeType,
+                      int64_t elementCount,
+                      const void* arrayOfElements) override;
 
-    static hipdnnBackendDescriptorType_t get_static_type();
+    static hipdnnBackendDescriptorType_t getStaticType();
 
     // Throws an exception if the descriptor is not finalized before calling these.
-    virtual std::shared_ptr<const Engine_descriptor> get_engine() const;
+    virtual std::shared_ptr<const EngineDescriptor> getEngine() const;
 
-    virtual hipdnnPluginConstData_t get_serialized_engine_config() const;
+    virtual hipdnnPluginConstData_t getSerializedEngineConfig() const;
 };
 
 } // namespace hipdnn_backend

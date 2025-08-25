@@ -10,115 +10,115 @@
 namespace hipdnn_backend
 {
 
-void Graph_descriptor::finalize()
+void GraphDescriptor::finalize()
 {
-    THROW_IF_NULL(_graph, HIPDNN_STATUS_BAD_PARAM, "Graph_descriptor::finalize: graph is null");
-    THROW_IF_NULL(_handle, HIPDNN_STATUS_BAD_PARAM, "Graph_descriptor::finalize: handle is null");
-    hipdnnBackendDescriptorImpl<Graph_descriptor>::finalize();
+    THROW_IF_NULL(_graph, HIPDNN_STATUS_BAD_PARAM, "GraphDescriptor::finalize: graph is null");
+    THROW_IF_NULL(_handle, HIPDNN_STATUS_BAD_PARAM, "GraphDescriptor::finalize: handle is null");
+    HipdnnBackendDescriptorImpl<GraphDescriptor>::finalize();
 }
 
-void Graph_descriptor::set_handle(hipdnnBackendAttributeType_t attribute_type,
-                                  int64_t element_count,
-                                  const void* array_of_elements)
+void GraphDescriptor::setHandle(hipdnnBackendAttributeType_t attributeType,
+                                int64_t elementCount,
+                                const void* arrayOfElements)
 {
-    THROW_IF_NE(attribute_type,
+    THROW_IF_NE(attributeType,
                 HIPDNN_TYPE_HANDLE,
                 HIPDNN_STATUS_BAD_PARAM,
-                "Graph_descriptor failed to set handle: Invalid attribute type.");
-    THROW_IF_NE(element_count,
+                "GraphDescriptor failed to set handle: Invalid attribute type.");
+    THROW_IF_NE(elementCount,
                 1,
                 HIPDNN_STATUS_BAD_PARAM,
-                "Graph_descriptor failed to set handle: Invalid element count.");
-    THROW_IF_NULL(array_of_elements,
+                "GraphDescriptor failed to set handle: Invalid element count.");
+    THROW_IF_NULL(arrayOfElements,
                   HIPDNN_STATUS_BAD_PARAM_NULL_POINTER,
-                  "Graph_descriptor failed to set handle: Null pointer.");
+                  "GraphDescriptor failed to set handle: Null pointer.");
 
-    hipdnnHandle_t handle = *static_cast<const hipdnnHandle_t*>(array_of_elements);
+    hipdnnHandle_t handle = *static_cast<const hipdnnHandle_t*>(arrayOfElements);
 
     THROW_IF_NULL(handle,
                   HIPDNN_STATUS_BAD_PARAM_NULL_POINTER,
-                  "Graph_descriptor failed to set handle: Handle is null.");
+                  "GraphDescriptor failed to set handle: Handle is null.");
 
     _handle = handle;
 }
 
-void Graph_descriptor::get_attribute([[maybe_unused]] hipdnnBackendAttributeName_t attribute_name,
-                                     [[maybe_unused]] hipdnnBackendAttributeType_t attribute_type,
-                                     [[maybe_unused]] int64_t requested_element_count,
-                                     [[maybe_unused]] int64_t* element_count,
-                                     [[maybe_unused]] void* array_of_elements) const
+void GraphDescriptor::getAttribute([[maybe_unused]] hipdnnBackendAttributeName_t attributeName,
+                                   [[maybe_unused]] hipdnnBackendAttributeType_t attributeType,
+                                   [[maybe_unused]] int64_t requestedElementCount,
+                                   [[maybe_unused]] int64_t* elementCount,
+                                   [[maybe_unused]] void* arrayOfElements) const
 {
     throw Hipdnn_exception(HIPDNN_STATUS_NOT_SUPPORTED,
-                           "Graph_descriptor::get_attribute: not supported");
+                           "GraphDescriptor::getAttribute: not supported");
 }
 
-void Graph_descriptor::set_attribute(hipdnnBackendAttributeName_t attribute_name,
-                                     hipdnnBackendAttributeType_t attribute_type,
-                                     int64_t element_count,
-                                     const void* array_of_elements)
+void GraphDescriptor::setAttribute(hipdnnBackendAttributeName_t attributeName,
+                                   hipdnnBackendAttributeType_t attributeType,
+                                   int64_t elementCount,
+                                   const void* arrayOfElements)
 {
-    THROW_IF_TRUE(is_finalized(),
+    THROW_IF_TRUE(isFinalized(),
                   HIPDNN_STATUS_NOT_INITIALIZED,
-                  "Graph_descriptor::set_attribute() failed: Already finalized.");
+                  "GraphDescriptor::setAttribute() failed: Already finalized.");
 
-    switch(attribute_name)
+    switch(attributeName)
     {
     case HIPDNN_ATTR_OPERATIONGRAPH_HANDLE:
-        set_handle(attribute_type, element_count, array_of_elements);
+        setHandle(attributeType, elementCount, arrayOfElements);
         break;
     default:
         throw Hipdnn_exception(
             HIPDNN_STATUS_NOT_SUPPORTED,
-            std::string("Graph_descriptor::set_attribute() is not supported for attribute ")
-                + hipdnn_backend::hipdnn_get_attribute_name_string(attribute_name) + ".");
+            std::string("GraphDescriptor::setAttribute() is not supported for attribute ")
+                + hipdnn_backend::hipdnn_get_attribute_name_string(attributeName) + ".");
     }
 
-    if(attribute_name != HIPDNN_ATTR_OPERATIONGRAPH_HANDLE)
+    if(attributeName != HIPDNN_ATTR_OPERATIONGRAPH_HANDLE)
     {
         // Clear the serialized graph when the graph is modified
-        _graph_serialized_buffer = flatbuffers::DetachedBuffer();
+        _graphSerializedBuffer = flatbuffers::DetachedBuffer();
     }
 }
 
-void Graph_descriptor::deserialize_graph(const uint8_t* serialized_graph, size_t graph_byte_size)
+void GraphDescriptor::deserializeGraph(const uint8_t* serializedGraph, size_t graphByteSize)
 {
-    THROW_IF_NULL(serialized_graph,
+    THROW_IF_NULL(serializedGraph,
                   HIPDNN_STATUS_BAD_PARAM_NULL_POINTER,
-                  "Graph_descriptor::deserialize_graph: serialized_graph is null");
-    THROW_IF_TRUE(graph_byte_size == 0,
+                  "GraphDescriptor::deserializeGraph: serializedGraph is null");
+    THROW_IF_TRUE(graphByteSize == 0,
                   HIPDNN_STATUS_BAD_PARAM,
-                  "Graph_descriptor::deserialize_graph: graph_byte_size is 0");
+                  "GraphDescriptor::deserializeGraph: graphByteSize is 0");
 
     // TODO: Consider skipping validation entirely, or maybe add an API option to skip it for schema extension cases.
     flatbuffer_utilities::convert_serialized_graph_to_graph(
-        serialized_graph, graph_byte_size, _graph);
+        serializedGraph, graphByteSize, _graph);
 }
 
-hipdnnPluginConstData_t Graph_descriptor::get_serialized_graph() const
+hipdnnPluginConstData_t GraphDescriptor::getSerializedGraph() const
 {
-    if(_graph_serialized_buffer.size() == 0)
+    if(_graphSerializedBuffer.size() == 0)
     {
         THROW_IF_NULL(_graph,
                       HIPDNN_STATUS_INTERNAL_ERROR,
-                      "Graph_descriptor::get_serialized_graph: graph is null");
+                      "GraphDescriptor::getSerializedGraph: graph is null");
 
         flatbuffers::FlatBufferBuilder builder;
         builder.Finish(hipdnn_sdk::data_objects::Graph::Pack(builder, _graph.get()));
 
-        _graph_serialized_buffer = builder.Release();
+        _graphSerializedBuffer = builder.Release();
     }
 
-    return {.ptr = _graph_serialized_buffer.data(), .size = _graph_serialized_buffer.size()};
+    return {.ptr = _graphSerializedBuffer.data(), .size = _graphSerializedBuffer.size()};
 }
 
-hipdnnBackendDescriptorType_t Graph_descriptor::get_static_type()
+hipdnnBackendDescriptorType_t GraphDescriptor::getStaticType()
 {
     return HIPDNN_BACKEND_OPERATIONGRAPH_DESCRIPTOR;
 }
 
-hipdnnHandle_t Graph_descriptor::get_handle() const
+hipdnnHandle_t GraphDescriptor::getHandle() const
 {
-    THROW_IF_NULL(_handle, HIPDNN_STATUS_BAD_PARAM, "Graph_descriptor::get_handle: handle is null");
+    THROW_IF_NULL(_handle, HIPDNN_STATUS_BAD_PARAM, "GraphDescriptor::getHandle: handle is null");
     return _handle;
 }
 

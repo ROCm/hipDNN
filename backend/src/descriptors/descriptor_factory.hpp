@@ -9,15 +9,15 @@
 namespace hipdnn_backend
 {
 
-class Descriptor_factory
+class DescriptorFactory
 {
 public:
-    static void create(hipdnnBackendDescriptorType_t descriptor_type,
+    static void create(hipdnnBackendDescriptorType_t descriptorType,
                        hipdnnBackendDescriptor_t* descriptor);
 
-    static void create_graph_ext(hipdnnBackendDescriptor_t* descriptor,
-                                 const uint8_t* serialized_graph,
-                                 size_t graph_byte_size);
+    static void createGraphExt(hipdnnBackendDescriptor_t* descriptor,
+                               const uint8_t* serializedGraph,
+                               size_t graphByteSize);
 
     static void destroy(hipdnnBackendDescriptor_t descriptor);
 };

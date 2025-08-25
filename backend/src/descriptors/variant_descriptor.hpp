@@ -11,32 +11,32 @@
 namespace hipdnn_backend
 {
 
-class Variant_descriptor : public hipdnnBackendDescriptorImpl<Variant_descriptor>
+class VariantDescriptor : public HipdnnBackendDescriptorImpl<VariantDescriptor>
 {
 private:
-    std::vector<const void*> _data_pointers;
-    std::vector<int64_t> _unique_ids;
+    std::vector<const void*> _dataPointers;
+    std::vector<int64_t> _uniqueIds;
     void* _workspace = nullptr;
 
 public:
     void finalize() override;
 
-    void get_attribute(hipdnnBackendAttributeName_t attribute_name,
-                       hipdnnBackendAttributeType_t attribute_type,
-                       int64_t requested_element_count,
-                       int64_t* element_count,
-                       void* array_of_elements) const override;
+    void getAttribute(hipdnnBackendAttributeName_t attributeName,
+                      hipdnnBackendAttributeType_t attributeType,
+                      int64_t requestedElementCount,
+                      int64_t* elementCount,
+                      void* arrayOfElements) const override;
 
-    void set_attribute(hipdnnBackendAttributeName_t attribute_name,
-                       hipdnnBackendAttributeType_t attribute_type,
-                       int64_t element_count,
-                       const void* array_of_elements) override;
+    void setAttribute(hipdnnBackendAttributeName_t attributeName,
+                      hipdnnBackendAttributeType_t attributeType,
+                      int64_t elementCount,
+                      const void* arrayOfElements) override;
 
     // throws if the variant descriptor is not finalized
-    virtual void* get_workspace() const;
-    virtual const std::vector<const void*>& get_data_pointers() const;
-    virtual const std::vector<int64_t>& get_tensor_ids() const;
+    virtual void* getWorkspace() const;
+    virtual const std::vector<const void*>& getDataPointers() const;
+    virtual const std::vector<int64_t>& getTensorIds() const;
 
-    static hipdnnBackendDescriptorType_t get_static_type();
+    static hipdnnBackendDescriptorType_t getStaticType();
 };
 }
