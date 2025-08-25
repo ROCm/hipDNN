@@ -10,13 +10,12 @@
 #include <hipdnn_backend_attribute_name.h>
 #include <hipdnn_backend_attribute_type.h>
 #include <hipdnn_backend_heuristic_type.h>
-#include <hipdnn_sdk/test_utilities/temporary_directory.hpp>
-#include <iostream> // Don't forget to remove
+#include <hipdnn_sdk/test_utilities/temp_directory.hpp>
 #include <test_plugins/test_plugin_constants.hpp>
 
 #include <gtest/gtest.h>
 
-class Unhappy_plugin_path_tests : public ::testing::Test
+class Plugin_loading_tests : public ::testing::Test
 {
 protected:
     hipdnnBackendDescriptor_t _engine_config = nullptr;
@@ -87,9 +86,9 @@ void create_heuristic_descriptor(hipdnnBackendDescriptor_t* heuristic_descriptor
     }
 }
 
-TEST_F(Unhappy_plugin_path_tests, EmptyPluginPath)
+TEST_F(Plugin_loading_tests, EmptyPluginPath)
 {
-    Temp_dir plugin_dir("empty_plugins");
+    Temp_directory plugin_dir("empty_plugins");
     auto plugin_path = plugin_dir.path().string();
     const std::array<const char*, 1> paths = {plugin_path.c_str()};
     ASSERT_EQ(
@@ -118,7 +117,7 @@ TEST_F(Unhappy_plugin_path_tests, EmptyPluginPath)
     EXPECT_EQ(available_engine_count, 0);
 }
 
-TEST_F(Unhappy_plugin_path_tests, NoPluginsSupportGraph)
+TEST_F(Plugin_loading_tests, NoPluginsSupportGraph)
 {
     const std::array<const char*, 1> paths
         = {hipdnn_tests::plugin_constants::test_no_applicable_engines_plugin_path().c_str()};
@@ -148,7 +147,7 @@ TEST_F(Unhappy_plugin_path_tests, NoPluginsSupportGraph)
     EXPECT_EQ(available_engine_count, 0);
 }
 
-TEST_F(Unhappy_plugin_path_tests, IncorrectEngineID)
+TEST_F(Plugin_loading_tests, IncorrectEngineID)
 {
     const std::array<const char*, 1> paths
         = {hipdnn_tests::plugin_constants::test_no_applicable_engines_plugin_path().c_str()};
@@ -177,7 +176,7 @@ TEST_F(Unhappy_plugin_path_tests, IncorrectEngineID)
         "Engine_descriptor::finalize() failed: Engine id is not in a valid range of engine IDs");
 }
 
-TEST_F(Unhappy_plugin_path_tests, DuplicateEngineIds)
+TEST_F(Plugin_loading_tests, DuplicateEngineIds)
 {
     const std::array<const char*, 2> paths
         = {hipdnn_tests::plugin_constants::test_duplicate_id_a_plugin_path().c_str(),
@@ -193,7 +192,7 @@ TEST_F(Unhappy_plugin_path_tests, DuplicateEngineIds)
     EXPECT_EQ(test_util::get_loaded_plugins(_handle).size(), 1);
 }
 
-TEST_F(Unhappy_plugin_path_tests, IncompleteAPI)
+TEST_F(Plugin_loading_tests, IncompleteAPI)
 {
     using namespace hipdnn_sdk::utilities;
     using namespace hipdnn_tests::plugin_constants;
@@ -210,7 +209,7 @@ TEST_F(Unhappy_plugin_path_tests, IncompleteAPI)
     EXPECT_EQ(test_util::get_loaded_plugins(_handle).size(), 0);
 }
 
-TEST_F(Unhappy_plugin_path_tests, MultiplePluginsOneApplicableEngine)
+TEST_F(Plugin_loading_tests, MultiplePluginsOneApplicableEngine)
 {
     const std::array<const char*, 1> paths
         = {hipdnn_tests::plugin_constants::test_no_applicable_engines_plugin_path().c_str()};
@@ -240,7 +239,7 @@ TEST_F(Unhappy_plugin_path_tests, MultiplePluginsOneApplicableEngine)
     EXPECT_EQ(available_engine_count, 1);
 }
 
-TEST_F(Unhappy_plugin_path_tests, MultiplePluginsMultipleApplicableEngines)
+TEST_F(Plugin_loading_tests, MultiplePluginsMultipleApplicableEngines)
 {
     const std::array<const char*, 1> paths
         = {hipdnn_tests::plugin_constants::test_good_plugin_path().c_str()};

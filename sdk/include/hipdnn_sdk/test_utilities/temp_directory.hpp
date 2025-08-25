@@ -2,12 +2,12 @@
 
 #include <filesystem>
 
-class Temp_dir
+class Temp_directory
 {
     std::filesystem::path _path;
 
 public:
-    Temp_dir(std::filesystem::path path)
+    Temp_directory(std::filesystem::path path)
     {
         if(std::filesystem::create_directory(path))
         {
@@ -15,7 +15,7 @@ public:
         }
         else
         {
-            std::runtime_error("Temp_dir: Directory already exists");
+            throw std::runtime_error("Temp_directory: Directory already exists");
         }
     }
     const std::filesystem::path& path() const
@@ -23,11 +23,11 @@ public:
         return _path;
     }
 
-    Temp_dir(const Temp_dir&) = delete;
-    Temp_dir& operator=(const Temp_dir&) = delete;
-    Temp_dir(Temp_dir&&) = default;
-    Temp_dir& operator=(Temp_dir&&) = default;
-    ~Temp_dir()
+    Temp_directory(const Temp_directory&) = delete;
+    Temp_directory& operator=(const Temp_directory&) = delete;
+    Temp_directory(Temp_directory&&) = default;
+    Temp_directory& operator=(Temp_directory&&) = default;
+    ~Temp_directory()
     {
         if(!_path.empty())
         {

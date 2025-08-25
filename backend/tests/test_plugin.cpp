@@ -12,7 +12,7 @@
 #include <utility>
 
 #include "plugin/plugin_core.hpp"
-#include <hipdnn_sdk/test_utilities/temporary_directory.hpp>
+#include <hipdnn_sdk/test_utilities/temp_directory.hpp>
 
 using namespace hipdnn_backend;
 
@@ -103,35 +103,26 @@ TEST(PluginManagerTest, LoadPlugins)
 
 TEST(PluginManagerTest, LoadPluginsFromDirectory)
 {
-    Temp_dir temp_dir("temp_plugin_dir");
+    Temp_directory temp_dir("temp_plugin_dir");
 
-    try
+    std::filesystem::copy_file(
+        FULL_PLUGIN_PATH1, temp_dir.path() / std::filesystem::path(FULL_PLUGIN_PATH1).filename());
+    std::filesystem::copy_file(
+        FULL_PLUGIN_PATH2, temp_dir.path() / std::filesystem::path(FULL_PLUGIN_PATH2).filename());
+
+    Test_plugin_manager plugin_manager;
+    plugin_manager.load_plugins({temp_dir.path()}, HIPDNN_PLUGIN_LOADING_ABSOLUTE);
+
+    const auto& plugins = plugin_manager.get_plugins();
+    ASSERT_EQ(plugins.size(), 2);
+
+    std::set<std::string_view> plugin_names;
+    for(const auto& p : plugins)
     {
-        std::filesystem::copy_file(FULL_PLUGIN_PATH1,
-                                   temp_dir.path()
-                                       / std::filesystem::path(FULL_PLUGIN_PATH1).filename());
-        std::filesystem::copy_file(FULL_PLUGIN_PATH2,
-                                   temp_dir.path()
-                                       / std::filesystem::path(FULL_PLUGIN_PATH2).filename());
-
-        Test_plugin_manager plugin_manager;
-        plugin_manager.load_plugins({temp_dir.path()}, HIPDNN_PLUGIN_LOADING_ABSOLUTE);
-
-        const auto& plugins = plugin_manager.get_plugins();
-        ASSERT_EQ(plugins.size(), 2);
-
-        std::set<std::string_view> plugin_names;
-        for(const auto& p : plugins)
-        {
-            plugin_names.insert(p.name());
-        }
-        EXPECT_TRUE(plugin_names.contains("Plugin1"));
-        EXPECT_TRUE(plugin_names.contains("Plugin2"));
+        plugin_names.insert(p.name());
     }
-    catch(...)
-    {
-        FAIL();
-    }
+    EXPECT_TRUE(plugin_names.contains("Plugin1"));
+    EXPECT_TRUE(plugin_names.contains("Plugin2"));
 }
 
 TEST(PluginManagerTest, LoadPluginsAbsolute)
@@ -190,65 +181,49 @@ TEST(PluginManagerTest, LoadPlugins_AbsoluteReplaces)
 
 TEST(PluginManagerTest, LoadPluginsAdditiveWithDefault)
 {
-    Temp_dir default_dir("test_plugins_dir");
+    Temp_directory default_dir("test_plugins_dir");
 
-    try
+    // Place a plugin in the default directory
+    std::filesystem::copy_file(FULL_PLUGIN_PATH1,
+                               default_dir.path()
+                                   / std::filesystem::path(FULL_PLUGIN_PATH1).filename());
+
+    Test_plugin_manager plugin_manager;
+    plugin_manager.load_plugins({PLUGIN_PATH2}, HIPDNN_PLUGIN_LOADING_ADDITIVE);
+
+    const auto& plugins = plugin_manager.get_plugins();
+    ASSERT_EQ(plugins.size(), 2);
+
+    // Verify both plugins (default and custom) were loaded
+    std::set<std::string_view> plugin_names;
+    for(const auto& p : plugins)
     {
-        // Place a plugin in the default directory
-        std::filesystem::copy_file(FULL_PLUGIN_PATH1,
-                                   default_dir.path()
-                                       / std::filesystem::path(FULL_PLUGIN_PATH1).filename());
-
-        Test_plugin_manager plugin_manager;
-        plugin_manager.load_plugins({PLUGIN_PATH2}, HIPDNN_PLUGIN_LOADING_ADDITIVE);
-
-        const auto& plugins = plugin_manager.get_plugins();
-        ASSERT_EQ(plugins.size(), 2);
-
-        // Verify both plugins (default and custom) were loaded
-        std::set<std::string_view> plugin_names;
-        for(const auto& p : plugins)
-        {
-            plugin_names.insert(p.name());
-        }
-        EXPECT_TRUE(plugin_names.contains("Plugin1"));
-        EXPECT_TRUE(plugin_names.contains("Plugin2"));
+        plugin_names.insert(p.name());
     }
-    catch(...)
-    {
-        FAIL();
-    }
+    EXPECT_TRUE(plugin_names.contains("Plugin1"));
+    EXPECT_TRUE(plugin_names.contains("Plugin2"));
 }
 
 TEST(PluginManagerTest, LoadPluginsCombinedFileAndDirectory)
 {
-    Temp_dir temp_dir("temp_plugin_dir_combined");
+    Temp_directory temp_dir("temp_plugin_dir_combined");
 
-    try
+    std::filesystem::copy_file(
+        FULL_PLUGIN_PATH1, temp_dir.path() / std::filesystem::path(FULL_PLUGIN_PATH1).filename());
+
+    Test_plugin_manager plugin_manager;
+    plugin_manager.load_plugins({temp_dir.path(), PLUGIN_PATH2}, HIPDNN_PLUGIN_LOADING_ABSOLUTE);
+
+    const auto& plugins = plugin_manager.get_plugins();
+    ASSERT_EQ(plugins.size(), 2);
+
+    std::set<std::string_view> plugin_names;
+    for(const auto& p : plugins)
     {
-        std::filesystem::copy_file(FULL_PLUGIN_PATH1,
-                                   temp_dir.path()
-                                       / std::filesystem::path(FULL_PLUGIN_PATH1).filename());
-
-        Test_plugin_manager plugin_manager;
-        plugin_manager.load_plugins({temp_dir.path(), PLUGIN_PATH2},
-                                    HIPDNN_PLUGIN_LOADING_ABSOLUTE);
-
-        const auto& plugins = plugin_manager.get_plugins();
-        ASSERT_EQ(plugins.size(), 2);
-
-        std::set<std::string_view> plugin_names;
-        for(const auto& p : plugins)
-        {
-            plugin_names.insert(p.name());
-        }
-        EXPECT_TRUE(plugin_names.contains("Plugin1"));
-        EXPECT_TRUE(plugin_names.contains("Plugin2"));
+        plugin_names.insert(p.name());
     }
-    catch(...)
-    {
-        FAIL();
-    }
+    EXPECT_TRUE(plugin_names.contains("Plugin1"));
+    EXPECT_TRUE(plugin_names.contains("Plugin2"));
 }
 
 TEST(PluginManagerTest, LastError)

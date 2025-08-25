@@ -176,9 +176,9 @@ public:
                 }
                 else
                 {
-                    HIPDNN_LOG_WARN(
-                        "Plugin path is not a directory and doesn't have a filepath component '{}'",
-                        path.string());
+                    HIPDNN_LOG_WARN("Plugin path '{}' is invalid - expected either a directory "
+                                    "containing plugins or a path to a plugin file",
+                                    path.string());
                 }
             }
             catch(const std::filesystem::filesystem_error& e)
