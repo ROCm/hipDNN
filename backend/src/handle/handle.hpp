@@ -8,7 +8,7 @@
 #include <hip/hip_runtime.h>
 #include <memory>
 
-struct hipdnnHandle // NOLINT(readability-identifier-naming)
+struct hipdnnHandle
 {
 public:
     hipdnnHandle();
