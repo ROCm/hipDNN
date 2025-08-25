@@ -31,20 +31,23 @@ protected:
     {
         if(_engine_config != nullptr)
         {
-
             EXPECT_EQ(hipdnnBackendDestroyDescriptor(_engine_config), HIPDNN_STATUS_SUCCESS);
+            _engine_config = nullptr;
         }
         if(_engine != nullptr)
         {
             EXPECT_EQ(hipdnnBackendDestroyDescriptor(_engine), HIPDNN_STATUS_SUCCESS);
+            _engine = nullptr;
         }
         if(_graph != nullptr)
         {
             EXPECT_EQ(hipdnnBackendDestroyDescriptor(_graph), HIPDNN_STATUS_SUCCESS);
+            _graph = nullptr;
         }
         if(_heuristic_descriptor != nullptr)
         {
             EXPECT_EQ(hipdnnBackendDestroyDescriptor(_heuristic_descriptor), HIPDNN_STATUS_SUCCESS);
+            _heuristic_descriptor = nullptr;
         }
         if(_handle != nullptr)
         {

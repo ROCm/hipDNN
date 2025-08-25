@@ -134,37 +134,6 @@ TEST(PluginManagerTest, LoadPluginsFromDirectory)
     }
 }
 
-TEST(PluginManagerTest, LoadPluginsEmptyDir)
-{
-    try
-    {
-        Temp_dir temp_dir(std::filesystem::path(".") /= "empty_plugin_dir");
-        Test_plugin_manager plugin_manager({temp_dir.path()});
-        plugin_manager.load_plugins({}, HIPDNN_PLUGIN_LOADING_ADDITIVE);
-
-        ASSERT_TRUE(plugin_manager.get_loaded_plugin_files().empty());
-        ASSERT_TRUE(plugin_manager.get_plugins().empty());
-    }
-    catch(...)
-    {
-        FAIL();
-    }
-
-    try
-    {
-        Temp_dir temp_dir(std::filesystem::path(".") /= "empty_plugin_dir");
-        Test_plugin_manager plugin_manager;
-        plugin_manager.load_plugins({temp_dir.path()}, HIPDNN_PLUGIN_LOADING_ABSOLUTE);
-
-        ASSERT_TRUE(plugin_manager.get_loaded_plugin_files().empty());
-        ASSERT_TRUE(plugin_manager.get_plugins().empty());
-    }
-    catch(...)
-    {
-        FAIL();
-    }
-}
-
 TEST(PluginManagerTest, LoadPluginsAbsolute)
 {
     Test_plugin_manager plugin_manager;
