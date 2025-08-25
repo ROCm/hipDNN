@@ -231,8 +231,8 @@ std::vector<int64_t> Engine_plugin_resource_manager::get_applicable_engine_ids(
             if(existing_handle != handle)
             {
                 throw HipdnnException(HIPDNN_STATUS_PLUGIN_ERROR,
-                                       "Engine ID " + std::to_string(id)
-                                           + " is already associated with a different plugin");
+                                      "Engine ID " + std::to_string(id)
+                                          + " is already associated with a different plugin");
             }
         }
     }
@@ -252,7 +252,7 @@ void Engine_plugin_resource_manager::get_engine_details(
     if(it == _engine_id_to_handle.end())
     {
         throw HipdnnException(HIPDNN_STATUS_INTERNAL_ERROR,
-                               "Invalid engine ID: " + std::to_string(engine_id));
+                              "Invalid engine ID: " + std::to_string(engine_id));
     }
 
     auto serialized_graph_data = graph_desc->get_serialized_graph();
@@ -265,8 +265,8 @@ void Engine_plugin_resource_manager::get_engine_details(
     if(engine_details->ptr == nullptr || engine_details->size == 0)
     {
         throw HipdnnException(HIPDNN_STATUS_PLUGIN_ERROR,
-                               "Engine details for engine ID " + std::to_string(engine_id)
-                                   + " are empty or null");
+                              "Engine details for engine ID " + std::to_string(engine_id)
+                                  + " are empty or null");
     }
 }
 
@@ -299,7 +299,7 @@ size_t
     if(it == _engine_id_to_handle.end())
     {
         throw HipdnnException(HIPDNN_STATUS_INTERNAL_ERROR,
-                               "Invalid engine ID: " + std::to_string(engine_id));
+                              "Invalid engine ID: " + std::to_string(engine_id));
     }
 
     auto serialized_graph_data = graph_desc->get_serialized_graph();
@@ -324,7 +324,7 @@ hipdnnEnginePluginExecutionContext_t Engine_plugin_resource_manager::create_exec
     if(it == _engine_id_to_handle.end())
     {
         throw HipdnnException(HIPDNN_STATUS_INTERNAL_ERROR,
-                               "Invalid engine ID: " + std::to_string(engine_id));
+                              "Invalid engine ID: " + std::to_string(engine_id));
     }
 
     auto serialized_graph_data = graph_desc->get_serialized_graph();
@@ -428,7 +428,7 @@ Engine_details_wrapper::Engine_details_wrapper(
     if(!verifier.VerifyBuffer<hipdnn_sdk::data_objects::EngineDetails>())
     {
         throw HipdnnException(HIPDNN_STATUS_BAD_PARAM,
-                               "Engine_details_wrapper: unable to verify the flatbuffer schema.");
+                              "Engine_details_wrapper: unable to verify the flatbuffer schema.");
     }
 }
 
@@ -475,8 +475,8 @@ const hipdnn_sdk::data_objects::EngineDetails* Engine_details_wrapper::get() con
     if(_engine_details_data.ptr == nullptr)
     {
         throw HipdnnException(HIPDNN_STATUS_INTERNAL_ERROR,
-                               "Engine_details_wrapper: wrong usage: "
-                               "get() called on an empty object");
+                              "Engine_details_wrapper: wrong usage: "
+                              "get() called on an empty object");
     }
 
     return hipdnn_sdk::data_objects::GetEngineDetails(_engine_details_data.ptr);
@@ -541,8 +541,8 @@ hipdnnEnginePluginExecutionContext_t Engine_execution_context_wrapper::get() con
     if(_execution_context == nullptr)
     {
         throw HipdnnException(HIPDNN_STATUS_INTERNAL_ERROR,
-                               "Engine_execution_context_wrapper: wrong usage: "
-                               "get() called on an empty object");
+                              "Engine_execution_context_wrapper: wrong usage: "
+                              "get() called on an empty object");
     }
 
     return _execution_context;

@@ -66,8 +66,8 @@ void Shared_library::load(const std::filesystem::path& library_path)
         if(modified_library_path.extension() != hipdnn_sdk::utilities::SHARED_LIB_EXT)
         {
             throw HipdnnException(HIPDNN_STATUS_BAD_PARAM,
-                                   std::string("Invalid file extension. Expected ")
-                                       + hipdnn_sdk::utilities::SHARED_LIB_EXT);
+                                  std::string("Invalid file extension. Expected ")
+                                      + hipdnn_sdk::utilities::SHARED_LIB_EXT);
         }
     }
     else
@@ -83,8 +83,8 @@ void Shared_library::load(const std::filesystem::path& library_path)
     if(!std::filesystem::exists(_library_path))
     {
         throw HipdnnException(HIPDNN_STATUS_PLUGIN_ERROR,
-                               "Shared libary: plugin file does not exist: "
-                                   + _library_path.string());
+                              "Shared libary: plugin file does not exist: "
+                                  + _library_path.string());
     }
 
     HIPDNN_LOG_INFO(
@@ -108,8 +108,8 @@ void* Shared_library::get_symbol(std::string_view symbol_name) const
     if(_library_handle == nullptr)
     {
         throw HipdnnException(HIPDNN_STATUS_INTERNAL_ERROR,
-                               "Library is not loaded. Cannot get symbol: "
-                                   + std::string(symbol_name));
+                              "Library is not loaded. Cannot get symbol: "
+                                  + std::string(symbol_name));
     }
 
     return platform_utils::getSymbol(_library_handle, symbol_name.data());

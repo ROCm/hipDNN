@@ -31,8 +31,8 @@ void Engine_descriptor::finalize()
     if(std::ranges::find(engine_ids, _engine_id) == engine_ids.end())
     {
         throw HipdnnException(HIPDNN_STATUS_BAD_PARAM,
-                               "Engine_descriptor::finalize() failed: Engine id is not in a valid "
-                               "range of engine IDs");
+                              "Engine_descriptor::finalize() failed: Engine id is not in a valid "
+                              "range of engine IDs");
     }
 
     _engine_details = plugin::Engine_plugin_resource_manager::get_engine_details(

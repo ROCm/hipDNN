@@ -47,9 +47,9 @@ void Descriptor_factory::create(hipdnnBackendDescriptorType_t descriptor_type,
         break;
     default:
         throw HipdnnException(HIPDNN_STATUS_NOT_SUPPORTED,
-                               std::string("Descriptor type ")
-                                   + hipdnnGetBackendDescriptorTypeName(descriptor_type)
-                                   + " is not supported.");
+                              std::string("Descriptor type ")
+                                  + hipdnnGetBackendDescriptorTypeName(descriptor_type)
+                                  + " is not supported.");
     }
 
     *descriptor = hipdnnBackendDescriptor::pack_descriptor(private_desc);

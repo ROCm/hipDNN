@@ -9,7 +9,7 @@
 thread_local char hipdnn_backend::LastErrorManager::lastError[HIPDNN_MAX_ERROR_STRING_SIZE] = "";
 
 hipdnnStatus_t hipdnn_backend::LastErrorManager::setLastError(hipdnnStatus_t status,
-                                                                  const char* message)
+                                                              const char* message)
 {
     if(status == HIPDNN_STATUS_SUCCESS)
     {
@@ -26,7 +26,7 @@ hipdnnStatus_t hipdnn_backend::LastErrorManager::setLastError(hipdnnStatus_t sta
 }
 
 hipdnnStatus_t hipdnn_backend::LastErrorManager::setLastError(hipdnnStatus_t status,
-                                                                  const std::string& message)
+                                                              const std::string& message)
 {
     return setLastError(status, message.c_str());
 }

@@ -125,8 +125,8 @@ void Engine_heuristic_descriptor::set_heuristic_mode(hipdnnBackendAttributeType_
     if(heur_mode_value != HIPDNN_HEUR_MODE_FALLBACK)
     {
         throw HipdnnException(HIPDNN_STATUS_NOT_SUPPORTED,
-                               "Engine_heuristic_descriptor::set_heuristic_mode() is not "
-                               "supported for the given heuristic mode.");
+                              "Engine_heuristic_descriptor::set_heuristic_mode() is not "
+                              "supported for the given heuristic mode.");
     }
 
     _heuristic_mode = heur_mode_value;

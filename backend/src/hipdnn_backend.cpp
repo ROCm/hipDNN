@@ -31,7 +31,7 @@ void throwIfInvalidDescriptor(hipdnnBackendDescriptor_t descriptor)
     if(descriptor == nullptr)
     {
         throw hipdnn_backend::HipdnnException(HIPDNN_STATUS_BAD_PARAM_NULL_POINTER,
-                                               "hipdnnBackendDescriptor_t is nullptr");
+                                              "hipdnnBackendDescriptor_t is nullptr");
     }
 
     if(!descriptor->is_valid())
@@ -48,7 +48,7 @@ void throwIfNull(T* value)
     if(value == nullptr)
     {
         throw hipdnn_backend::HipdnnException(HIPDNN_STATUS_BAD_PARAM_NULL_POINTER,
-                                               std::string(typeid(T).name()) + " is nullptr");
+                                              std::string(typeid(T).name()) + " is nullptr");
     }
 }
 } // namespace
@@ -95,9 +95,8 @@ HIPDNN_BACKEND_EXPORT hipdnnStatus_t hipdnnSetStream(hipdnnHandle_t handle, hipS
 
 HIPDNN_BACKEND_EXPORT hipdnnStatus_t hipdnnGetStream(hipdnnHandle_t handle, hipStream_t* streamId)
 {
-    LOG_API_ENTRY("handle={:p}, streamId_ptr={:p}",
-                  static_cast<void*>(handle),
-                  static_cast<void*>(streamId));
+    LOG_API_ENTRY(
+        "handle={:p}, streamId_ptr={:p}", static_cast<void*>(handle), static_cast<void*>(streamId));
 
     return hipdnn_backend::tryCatch([&, apiName = __func__]() {
         throwIfNull(handle);
@@ -190,11 +189,8 @@ HIPDNN_BACKEND_EXPORT hipdnnStatus_t
     return hipdnn_backend::tryCatch([&, apiName = __func__]() {
         throwIfInvalidDescriptor(descriptor);
 
-        descriptor->get_attribute(attributeName,
-                                  attributeType,
-                                  requestedElementCount,
-                                  elementCount,
-                                  arrayOfElements);
+        descriptor->get_attribute(
+            attributeName, attributeType, requestedElementCount, elementCount, arrayOfElements);
 
         if(elementCount == nullptr)
         {

@@ -185,7 +185,7 @@ std::vector<int64_t>
         if(std::ranges::find(_all_engine_ids, engine_id) == _all_engine_ids.end())
         {
             throw HipdnnException(HIPDNN_STATUS_PLUGIN_ERROR,
-                                   "Engine ID not found in the plugin's known IDs");
+                                  "Engine ID not found in the plugin's known IDs");
         }
     }
 

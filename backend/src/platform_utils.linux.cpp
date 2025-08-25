@@ -42,9 +42,9 @@ PluginLibHandle openLibrary(const std::filesystem::path& libraryPath)
     {
         const char* error = dlerror();
         throw HipdnnException(HIPDNN_STATUS_BAD_PARAM,
-                               "Failed to load library: " + libraryPath.string() + " (Error: "
-                                   + (error != nullptr ? std::string(error) : "Unknown error")
-                                   + ")");
+                              "Failed to load library: " + libraryPath.string() + " (Error: "
+                                  + (error != nullptr ? std::string(error) : "Unknown error")
+                                  + ")");
     }
 
     return handle;
@@ -62,8 +62,8 @@ void* getSymbol(PluginLibHandle handle, const char* symbolName)
     {
         const char* error = dlerror();
         throw HipdnnException(HIPDNN_STATUS_PLUGIN_ERROR,
-                               "Failed to get symbol: " + std::string(symbolName) + " (Error: "
-                                   + (error != nullptr ? error : "Unknown error") + ")");
+                              "Failed to get symbol: " + std::string(symbolName) + " (Error: "
+                                  + (error != nullptr ? error : "Unknown error") + ")");
     }
     return symbol;
 }

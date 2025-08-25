@@ -57,8 +57,7 @@ TEST(ErrorTests, ErrorSTDStringMessagePerThread)
 TEST(ErrorTests, SetSuccessSTDStringDoesNotSetErrorMessage)
 {
     std::string error_message = "This message should not be set";
-    hipdnnStatus_t status
-        = LastErrorManager::setLastError(HIPDNN_STATUS_SUCCESS, error_message);
+    hipdnnStatus_t status = LastErrorManager::setLastError(HIPDNN_STATUS_SUCCESS, error_message);
     EXPECT_EQ(status, HIPDNN_STATUS_SUCCESS);
 
     EXPECT_NE(LastErrorManager::getLastError(), error_message);
@@ -84,32 +83,29 @@ TEST(ErrorTests, GetBackendDescriptorTypeName)
                  "HIPDNN_BACKEND_ENGINEHEUR_DESCRIPTOR");
     EXPECT_STREQ(hipdnnGetBackendDescriptorTypeName(HIPDNN_BACKEND_EXECUTION_PLAN_DESCRIPTOR),
                  "HIPDNN_BACKEND_EXECUTION_PLAN_DESCRIPTOR");
-    EXPECT_STREQ(
-        hipdnnGetBackendDescriptorTypeName(HIPDNN_BACKEND_INTERMEDIATE_INFO_DESCRIPTOR),
-        "HIPDNN_BACKEND_INTERMEDIATE_INFO_DESCRIPTOR");
+    EXPECT_STREQ(hipdnnGetBackendDescriptorTypeName(HIPDNN_BACKEND_INTERMEDIATE_INFO_DESCRIPTOR),
+                 "HIPDNN_BACKEND_INTERMEDIATE_INFO_DESCRIPTOR");
     EXPECT_STREQ(hipdnnGetBackendDescriptorTypeName(HIPDNN_BACKEND_KNOB_CHOICE_DESCRIPTOR),
                  "HIPDNN_BACKEND_KNOB_CHOICE_DESCRIPTOR");
     EXPECT_STREQ(hipdnnGetBackendDescriptorTypeName(HIPDNN_BACKEND_KNOB_INFO_DESCRIPTOR),
                  "HIPDNN_BACKEND_KNOB_INFO_DESCRIPTOR");
     EXPECT_STREQ(hipdnnGetBackendDescriptorTypeName(HIPDNN_BACKEND_LAYOUT_INFO_DESCRIPTOR),
                  "HIPDNN_BACKEND_LAYOUT_INFO_DESCRIPTOR");
-    EXPECT_STREQ(
-        hipdnnGetBackendDescriptorTypeName(HIPDNN_BACKEND_OPERATION_GEN_STATS_DESCRIPTOR),
-        "HIPDNN_BACKEND_OPERATION_GEN_STATS_DESCRIPTOR");
+    EXPECT_STREQ(hipdnnGetBackendDescriptorTypeName(HIPDNN_BACKEND_OPERATION_GEN_STATS_DESCRIPTOR),
+                 "HIPDNN_BACKEND_OPERATION_GEN_STATS_DESCRIPTOR");
     EXPECT_STREQ(hipdnnGetBackendDescriptorTypeName(HIPDNN_BACKEND_OPERATIONGRAPH_DESCRIPTOR),
                  "HIPDNN_BACKEND_OPERATIONGRAPH_DESCRIPTOR");
     EXPECT_STREQ(hipdnnGetBackendDescriptorTypeName(HIPDNN_BACKEND_VARIANT_PACK_DESCRIPTOR),
                  "HIPDNN_BACKEND_VARIANT_PACK_DESCRIPTOR");
     EXPECT_STREQ(hipdnnGetBackendDescriptorTypeName(HIPDNN_BACKEND_KERNEL_CACHE_DESCRIPTOR),
                  "HIPDNN_BACKEND_KERNEL_CACHE_DESCRIPTOR");
-    EXPECT_STREQ(hipdnnGetBackendDescriptorTypeName(
-                     HIPDNN_BACKEND_OPERATION_PAGED_CACHE_LOAD_DESCRIPTOR),
-                 "HIPDNN_BACKEND_OPERATION_PAGED_CACHE_LOAD_DESCRIPTOR");
+    EXPECT_STREQ(
+        hipdnnGetBackendDescriptorTypeName(HIPDNN_BACKEND_OPERATION_PAGED_CACHE_LOAD_DESCRIPTOR),
+        "HIPDNN_BACKEND_OPERATION_PAGED_CACHE_LOAD_DESCRIPTOR");
 
     // Test unknown type
-    EXPECT_STREQ(
-        hipdnnGetBackendDescriptorTypeName(static_cast<hipdnnBackendDescriptorType_t>(-1)),
-        "UNKNOWN_TYPE");
+    EXPECT_STREQ(hipdnnGetBackendDescriptorTypeName(static_cast<hipdnnBackendDescriptorType_t>(-1)),
+                 "UNKNOWN_TYPE");
 }
 
 TEST(ErrorTests, GetBackendAttributeName)
@@ -157,12 +153,10 @@ TEST(ErrorTests, GetBackendAttributeName)
                  "HIPDNN_ATTR_INTERMEDIATE_INFO_UNIQUE_ID");
     EXPECT_STREQ(hipdnnGetAttributeNameString(HIPDNN_ATTR_INTERMEDIATE_INFO_SIZE),
                  "HIPDNN_ATTR_INTERMEDIATE_INFO_SIZE");
-    EXPECT_STREQ(
-        hipdnnGetAttributeNameString(HIPDNN_ATTR_INTERMEDIATE_INFO_DEPENDENT_DATA_UIDS),
-        "HIPDNN_ATTR_INTERMEDIATE_INFO_DEPENDENT_DATA_UIDS");
-    EXPECT_STREQ(
-        hipdnnGetAttributeNameString(HIPDNN_ATTR_INTERMEDIATE_INFO_DEPENDENT_ATTRIBUTES),
-        "HIPDNN_ATTR_INTERMEDIATE_INFO_DEPENDENT_ATTRIBUTES");
+    EXPECT_STREQ(hipdnnGetAttributeNameString(HIPDNN_ATTR_INTERMEDIATE_INFO_DEPENDENT_DATA_UIDS),
+                 "HIPDNN_ATTR_INTERMEDIATE_INFO_DEPENDENT_DATA_UIDS");
+    EXPECT_STREQ(hipdnnGetAttributeNameString(HIPDNN_ATTR_INTERMEDIATE_INFO_DEPENDENT_ATTRIBUTES),
+                 "HIPDNN_ATTR_INTERMEDIATE_INFO_DEPENDENT_ATTRIBUTES");
 
     EXPECT_STREQ(hipdnnGetAttributeNameString(HIPDNN_ATTR_KNOB_CHOICE_KNOB_TYPE),
                  "HIPDNN_ATTR_KNOB_CHOICE_KNOB_TYPE");
@@ -175,9 +169,8 @@ TEST(ErrorTests, GetBackendAttributeName)
                  "HIPDNN_ATTR_OPERATIONGRAPH_OPS");
     EXPECT_STREQ(hipdnnGetAttributeNameString(HIPDNN_ATTR_OPERATIONGRAPH_ENGINE_GLOBAL_COUNT),
                  "HIPDNN_ATTR_OPERATIONGRAPH_ENGINE_GLOBAL_COUNT");
-    EXPECT_STREQ(
-        hipdnnGetAttributeNameString(HIPDNN_ATTR_OPERATIONGRAPH_IS_DYNAMIC_SHAPE_ENABLED),
-        "HIPDNN_ATTR_OPERATIONGRAPH_IS_DYNAMIC_SHAPE_ENABLED");
+    EXPECT_STREQ(hipdnnGetAttributeNameString(HIPDNN_ATTR_OPERATIONGRAPH_IS_DYNAMIC_SHAPE_ENABLED),
+                 "HIPDNN_ATTR_OPERATIONGRAPH_IS_DYNAMIC_SHAPE_ENABLED");
 
     EXPECT_STREQ(hipdnnGetAttributeNameString(HIPDNN_ATTR_VARIANT_PACK_UNIQUE_IDS),
                  "HIPDNN_ATTR_VARIANT_PACK_UNIQUE_IDS");
@@ -219,9 +212,8 @@ TEST(ErrorTests, GetBackendAttributeName)
     EXPECT_STREQ(hipdnnGetAttributeNameString(HIPDNN_ATTR_ENGINE_DEVICEPROP),
                  "HIPDNN_ATTR_ENGINE_DEVICEPROP");
 
-    EXPECT_STREQ(
-        hipdnnGetAttributeNameString(HIPDNN_ATTR_KERNEL_CACHE_IS_ENGINECFG_KERNEL_CACHED),
-        "HIPDNN_ATTR_KERNEL_CACHE_IS_ENGINECFG_KERNEL_CACHED");
+    EXPECT_STREQ(hipdnnGetAttributeNameString(HIPDNN_ATTR_KERNEL_CACHE_IS_ENGINECFG_KERNEL_CACHED),
+                 "HIPDNN_ATTR_KERNEL_CACHE_IS_ENGINECFG_KERNEL_CACHED");
 
     EXPECT_STREQ(hipdnnGetAttributeNameString(HIPDNN_ATTR_DEVICEPROP_DEVICE_ID),
                  "HIPDNN_ATTR_DEVICEPROP_DEVICE_ID");
@@ -247,12 +239,10 @@ TEST(ErrorTests, Get_Status_String)
                  "HIPDNN_STATUS_BAD_PARAM_SIZE_INSUFFICIENT");
     EXPECT_STREQ(hipdnnGetStatusString(HIPDNN_STATUS_BAD_PARAM_STREAM_MISMATCH),
                  "HIPDNN_STATUS_BAD_PARAM_STREAM_MISMATCH");
-    EXPECT_STREQ(hipdnnGetStatusString(HIPDNN_STATUS_NOT_SUPPORTED),
-                 "HIPDNN_STATUS_NOT_SUPPORTED");
+    EXPECT_STREQ(hipdnnGetStatusString(HIPDNN_STATUS_NOT_SUPPORTED), "HIPDNN_STATUS_NOT_SUPPORTED");
     EXPECT_STREQ(hipdnnGetStatusString(HIPDNN_STATUS_INTERNAL_ERROR),
                  "HIPDNN_STATUS_INTERNAL_ERROR");
-    EXPECT_STREQ(hipdnnGetStatusString(HIPDNN_STATUS_ALLOC_FAILED),
-                 "HIPDNN_STATUS_ALLOC_FAILED");
+    EXPECT_STREQ(hipdnnGetStatusString(HIPDNN_STATUS_ALLOC_FAILED), "HIPDNN_STATUS_ALLOC_FAILED");
     EXPECT_STREQ(hipdnnGetStatusString(HIPDNN_STATUS_INTERNAL_ERROR_HOST_ALLOCATION_FAILED),
                  "HIPDNN_STATUS_INTERNAL_ERROR_HOST_ALLOCATION_FAILED");
     EXPECT_STREQ(hipdnnGetStatusString(HIPDNN_STATUS_INTERNAL_ERROR_DEVICE_ALLOCATION_FAILED),
@@ -260,8 +250,7 @@ TEST(ErrorTests, Get_Status_String)
     EXPECT_STREQ(hipdnnGetStatusString(HIPDNN_STATUS_EXECUTION_FAILED),
                  "HIPDNN_STATUS_EXECUTION_FAILED");
 
-    EXPECT_STREQ(hipdnnGetStatusString(static_cast<hipdnnStatus_t>(-1)),
-                 "HIPDNN_STATUS_UNKNOWN");
+    EXPECT_STREQ(hipdnnGetStatusString(static_cast<hipdnnStatus_t>(-1)), "HIPDNN_STATUS_UNKNOWN");
 }
 
 TEST(ErrorTests, Get_Attribute_Type_String)
@@ -279,10 +268,8 @@ TEST(ErrorTests, Get_Attribute_Type_String)
                  "HIPDNN_TYPE_NAN_PROPOGATION");
     EXPECT_STREQ(hipdnnGetAttributeTypeString(HIPDNN_TYPE_NUMERICAL_NOTE),
                  "HIPDNN_TYPE_NUMERICAL_NOTE");
-    EXPECT_STREQ(hipdnnGetAttributeTypeString(HIPDNN_TYPE_LAYOUT_TYPE),
-                 "HIPDNN_TYPE_LAYOUT_TYPE");
-    EXPECT_STREQ(hipdnnGetAttributeTypeString(HIPDNN_TYPE_ATTRIB_NAME),
-                 "HIPDNN_TYPE_ATTRIB_NAME");
+    EXPECT_STREQ(hipdnnGetAttributeTypeString(HIPDNN_TYPE_LAYOUT_TYPE), "HIPDNN_TYPE_LAYOUT_TYPE");
+    EXPECT_STREQ(hipdnnGetAttributeTypeString(HIPDNN_TYPE_ATTRIB_NAME), "HIPDNN_TYPE_ATTRIB_NAME");
     EXPECT_STREQ(hipdnnGetAttributeTypeString(HIPDNN_TYPE_BACKEND_DESCRIPTOR),
                  "HIPDNN_TYPE_BACKEND_DESCRIPTOR");
     EXPECT_STREQ(hipdnnGetAttributeTypeString(HIPDNN_TYPE_GENSTATS_MODE),
@@ -295,8 +282,7 @@ TEST(ErrorTests, Get_Attribute_Type_String)
                  "HIPDNN_TYPE_TENSOR_REORDERING_MODE");
     EXPECT_STREQ(hipdnnGetAttributeTypeString(HIPDNN_TYPE_INT32), "HIPDNN_TYPE_INT32");
     EXPECT_STREQ(hipdnnGetAttributeTypeString(HIPDNN_TYPE_CHAR), "HIPDNN_TYPE_CHAR");
-    EXPECT_STREQ(hipdnnGetAttributeTypeString(HIPDNN_TYPE_SIGNAL_MODE),
-                 "HIPDNN_TYPE_SIGNAL_MODE");
+    EXPECT_STREQ(hipdnnGetAttributeTypeString(HIPDNN_TYPE_SIGNAL_MODE), "HIPDNN_TYPE_SIGNAL_MODE");
     EXPECT_STREQ(hipdnnGetAttributeTypeString(HIPDNN_TYPE_FRACTION), "HIPDNN_TYPE_FRACTION");
     EXPECT_STREQ(hipdnnGetAttributeTypeString(HIPDNN_TYPE_NORM_FWD_PHASE),
                  "HIPDNN_TYPE_NORM_FWD_PHASE");

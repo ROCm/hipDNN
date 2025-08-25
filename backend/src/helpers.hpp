@@ -29,7 +29,7 @@ hipdnnStatus_t tryCatch(F f)
     catch(...)
     {
         return LastErrorManager::setLastError(HIPDNN_STATUS_INTERNAL_ERROR,
-                                                  "Unknown exception occured");
+                                              "Unknown exception occured");
     }
     return HIPDNN_STATUS_SUCCESS;
 }

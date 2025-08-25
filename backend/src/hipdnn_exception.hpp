@@ -39,39 +39,39 @@ private:
     std::string _message;
 };
 
-#define THROW_IF_NE(x, y, failure_status, message)                       \
-    if(x != y)                                                           \
-    {                                                                    \
+#define THROW_IF_NE(x, y, failure_status, message)                      \
+    if(x != y)                                                          \
+    {                                                                   \
         throw hipdnn_backend::HipdnnException(failure_status, message); \
     }
 
-#define THROW_IF_EQ(x, y, failure_status, message)                       \
-    if(x == y)                                                           \
-    {                                                                    \
+#define THROW_IF_EQ(x, y, failure_status, message)                      \
+    if(x == y)                                                          \
+    {                                                                   \
         throw hipdnn_backend::HipdnnException(failure_status, message); \
     }
 
-#define THROW_IF_TRUE(x, failure_status, message)                        \
-    if(x)                                                                \
-    {                                                                    \
+#define THROW_IF_TRUE(x, failure_status, message)                       \
+    if(x)                                                               \
+    {                                                                   \
         throw hipdnn_backend::HipdnnException(failure_status, message); \
     }
 
-#define THROW_IF_FALSE(x, failure_status, message)                       \
-    if(!(x))                                                             \
-    {                                                                    \
+#define THROW_IF_FALSE(x, failure_status, message)                      \
+    if(!(x))                                                            \
+    {                                                                   \
         throw hipdnn_backend::HipdnnException(failure_status, message); \
     }
 
-#define THROW_IF_NULL(x, failure_status, message)                        \
-    if(x == nullptr)                                                     \
-    {                                                                    \
+#define THROW_IF_NULL(x, failure_status, message)                       \
+    if(x == nullptr)                                                    \
+    {                                                                   \
         throw hipdnn_backend::HipdnnException(failure_status, message); \
     }
 
-#define THROW_IF_LT(x, y, failure_status, message)                       \
-    if(x < y)                                                            \
-    {                                                                    \
+#define THROW_IF_LT(x, y, failure_status, message)                      \
+    if(x < y)                                                           \
+    {                                                                   \
         throw hipdnn_backend::HipdnnException(failure_status, message); \
     }
 
