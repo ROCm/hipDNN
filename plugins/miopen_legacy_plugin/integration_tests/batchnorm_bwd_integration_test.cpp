@@ -140,20 +140,16 @@ protected:
         Batchnorm_2d_tensor_bundle<Input_type, Intermediate_type>& tensor_bundle)
     {
         std::unordered_map<int64_t, void*> variant_pack;
-        variant_pack[x_tensor_attr.get_uid()]
-            = tensor_bundle.x_tensor.memory().device_data();
-        variant_pack[dy_tensor_attr.get_uid()]
-            = tensor_bundle.dy_tensor.memory().device_data();
-        variant_pack[dx_tensor_attr.get_uid()]
-            = tensor_bundle.dx_tensor.memory().device_data();
+        variant_pack[x_tensor_attr.get_uid()] = tensor_bundle.x_tensor.memory().device_data();
+        variant_pack[dy_tensor_attr.get_uid()] = tensor_bundle.dy_tensor.memory().device_data();
+        variant_pack[dx_tensor_attr.get_uid()] = tensor_bundle.dx_tensor.memory().device_data();
         variant_pack[scale_tensor_attr.get_uid()]
             = tensor_bundle.scale_tensor.memory().device_data();
         variant_pack[dscale_tensor_attr.get_uid()]
             = tensor_bundle.dscale_tensor.memory().device_data();
         variant_pack[dbias_tensor_attr.get_uid()]
             = tensor_bundle.dbias_tensor.memory().device_data();
-        variant_pack[mean_tensor_attr.get_uid()]
-            = tensor_bundle.mean_tensor.memory().device_data();
+        variant_pack[mean_tensor_attr.get_uid()] = tensor_bundle.mean_tensor.memory().device_data();
         variant_pack[inv_variance_tensor_attr.get_uid()]
             = tensor_bundle.inv_variance_tensor.memory().device_data();
 
@@ -301,15 +297,15 @@ protected:
 
         run_cpu_batchnorm_bwd<Input_type, Intermediate_type>(cpu_tensor_bundle);
 
-        Cpu_fp_reference_validation<Input_type> cpu_ref_validation(absolute_tolerance, relative_tolerance);
+        Cpu_fp_reference_validation<Input_type> cpu_ref_validation(absolute_tolerance,
+                                                                   relative_tolerance);
         EXPECT_TRUE(cpu_ref_validation.compare_buffers(cpu_tensor_bundle.dx_tensor.memory(),
                                                        graph_tensor_bundle.dx_tensor.memory()));
-        Cpu_fp_reference_validation<Intermediate_type> cpu_ref_intermediate_validation(1.0f,
-                                                                 1e-2f);
-        EXPECT_TRUE(cpu_ref_intermediate_validation.compare_buffers(cpu_tensor_bundle.dscale_tensor.memory(),
-                                                       graph_tensor_bundle.dscale_tensor.memory()));
-        EXPECT_TRUE(cpu_ref_intermediate_validation.compare_buffers(cpu_tensor_bundle.dbias_tensor.memory(),
-                                                       graph_tensor_bundle.dbias_tensor.memory()));
+        Cpu_fp_reference_validation<Intermediate_type> cpu_ref_intermediate_validation(1.0f, 1e-2f);
+        EXPECT_TRUE(cpu_ref_intermediate_validation.compare_buffers(
+            cpu_tensor_bundle.dscale_tensor.memory(), graph_tensor_bundle.dscale_tensor.memory()));
+        EXPECT_TRUE(cpu_ref_intermediate_validation.compare_buffers(
+            cpu_tensor_bundle.dbias_tensor.memory(), graph_tensor_bundle.dbias_tensor.memory()));
     }
 
 private:
