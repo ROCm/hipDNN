@@ -680,8 +680,8 @@ TEST(Engine_plugin_resource_manager, execute_op_graph_fail_non_finalized_plan)
     auto mock_execution_plan
         = MockDescriptorUtility::asDescriptorUnsafe<MockExecutionPlanDescriptor>(
             execution_plan_wrapper.get());
-    auto mock_variant_pack = MockDescriptorUtility::asDescriptorUnsafe<MockVariantDescriptor>(
-        variant_wrapper.get());
+    auto mock_variant_pack
+        = MockDescriptorUtility::asDescriptorUnsafe<MockVariantDescriptor>(variant_wrapper.get());
 
     std::vector<int64_t> tensor_ids = {1, 2, 3};
     std::vector<const void*> data_ptrs = {reinterpret_cast<void*>(0x1000),
@@ -720,8 +720,8 @@ TEST(Engine_plugin_resource_manager, execute_op_graph_fail_non_finalized_variant
     auto mock_execution_plan
         = MockDescriptorUtility::asDescriptorUnsafe<MockExecutionPlanDescriptor>(
             execution_plan_wrapper.get());
-    auto mock_variant_pack = MockDescriptorUtility::asDescriptorUnsafe<MockVariantDescriptor>(
-        variant_wrapper.get());
+    auto mock_variant_pack
+        = MockDescriptorUtility::asDescriptorUnsafe<MockVariantDescriptor>(variant_wrapper.get());
 
     std::vector<int64_t> tensor_ids = {1, 2, 3};
     std::vector<const void*> data_ptrs = {reinterpret_cast<void*>(0x1000),
@@ -761,16 +761,15 @@ TEST(Engine_plugin_resource_manager, execute_op_graph_fail_tensor_mismatch)
         = test_descriptor_utils::createDescriptor<MockExecutionPlanDescriptor>();
     auto variant_wrapper = test_descriptor_utils::createDescriptor<MockVariantDescriptor>();
 
-    auto mock_engine_config
-        = MockDescriptorUtility::asDescriptorUnsafe<MockEngineConfigDescriptor>(
-            engine_config_wrapper.get());
-    auto mock_engine = MockDescriptorUtility::asDescriptorUnsafe<MockEngineDescriptor>(
-        engine_wrapper.get());
+    auto mock_engine_config = MockDescriptorUtility::asDescriptorUnsafe<MockEngineConfigDescriptor>(
+        engine_config_wrapper.get());
+    auto mock_engine
+        = MockDescriptorUtility::asDescriptorUnsafe<MockEngineDescriptor>(engine_wrapper.get());
     auto mock_execution_plan
         = MockDescriptorUtility::asDescriptorUnsafe<MockExecutionPlanDescriptor>(
             execution_plan_wrapper.get());
-    auto mock_variant_pack = MockDescriptorUtility::asDescriptorUnsafe<MockVariantDescriptor>(
-        variant_wrapper.get());
+    auto mock_variant_pack
+        = MockDescriptorUtility::asDescriptorUnsafe<MockVariantDescriptor>(variant_wrapper.get());
 
     // More data ptrs than tensor ids
     std::vector<int64_t> tensor_ids = {1};
@@ -826,16 +825,15 @@ TEST(Engine_plugin_resource_manager, execute_op_graph_success_with_valid_descrip
         = test_descriptor_utils::createDescriptor<MockExecutionPlanDescriptor>();
     auto variant_wrapper = test_descriptor_utils::createDescriptor<MockVariantDescriptor>();
 
-    auto mock_engine_config
-        = MockDescriptorUtility::asDescriptorUnsafe<MockEngineConfigDescriptor>(
-            engine_config_wrapper.get());
-    auto mock_engine = MockDescriptorUtility::asDescriptorUnsafe<MockEngineDescriptor>(
-        engine_wrapper.get());
+    auto mock_engine_config = MockDescriptorUtility::asDescriptorUnsafe<MockEngineConfigDescriptor>(
+        engine_config_wrapper.get());
+    auto mock_engine
+        = MockDescriptorUtility::asDescriptorUnsafe<MockEngineDescriptor>(engine_wrapper.get());
     auto mock_execution_plan
         = MockDescriptorUtility::asDescriptorUnsafe<MockExecutionPlanDescriptor>(
             execution_plan_wrapper.get());
-    auto mock_variant_pack = MockDescriptorUtility::asDescriptorUnsafe<MockVariantDescriptor>(
-        variant_wrapper.get());
+    auto mock_variant_pack
+        = MockDescriptorUtility::asDescriptorUnsafe<MockVariantDescriptor>(variant_wrapper.get());
 
     std::vector<int64_t> tensor_ids = {1, 2, 3};
     std::vector<const void*> data_ptrs = {reinterpret_cast<void*>(0x1000),

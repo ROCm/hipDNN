@@ -90,8 +90,7 @@ void GraphDescriptor::deserializeGraph(const uint8_t* serializedGraph, size_t gr
                   "GraphDescriptor::deserializeGraph: graphByteSize is 0");
 
     // TODO: Consider skipping validation entirely, or maybe add an API option to skip it for schema extension cases.
-    flatbuffer_utilities::convert_serialized_graph_to_graph(
-        serializedGraph, graphByteSize, _graph);
+    flatbuffer_utilities::convert_serialized_graph_to_graph(serializedGraph, graphByteSize, _graph);
 }
 
 hipdnnPluginConstData_t GraphDescriptor::getSerializedGraph() const

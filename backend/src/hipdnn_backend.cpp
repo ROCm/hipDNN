@@ -191,10 +191,10 @@ HIPDNN_BACKEND_EXPORT hipdnnStatus_t
         throw_if_invalid_descriptor(descriptor);
 
         descriptor->getAttribute(attribute_name,
-                                  attribute_type,
-                                  requested_element_count,
-                                  element_count,
-                                  array_of_elements);
+                                 attribute_type,
+                                 requested_element_count,
+                                 element_count,
+                                 array_of_elements);
 
         if(element_count == nullptr)
         {

@@ -57,8 +57,8 @@ TEST_F(GraphDescriptorTest, WillCorrectlySetGraph)
     ASSERT_THROW_HIPDNN_STATUS(descriptor.finalize(), HIPDNN_STATUS_BAD_PARAM);
 
     auto handle = reinterpret_cast<hipdnnHandle_t>(0x12345678);
-    ASSERT_NO_THROW(descriptor.setAttribute(
-        HIPDNN_ATTR_OPERATIONGRAPH_HANDLE, HIPDNN_TYPE_HANDLE, 1, &handle));
+    ASSERT_NO_THROW(
+        descriptor.setAttribute(HIPDNN_ATTR_OPERATIONGRAPH_HANDLE, HIPDNN_TYPE_HANDLE, 1, &handle));
     ASSERT_NO_THROW(descriptor.finalize());
 }
 
@@ -69,8 +69,8 @@ TEST_F(GraphDescriptorTest, WillCorrectlySetGraphReverseOrder)
 
     GraphDescriptor descriptor;
     auto handle = reinterpret_cast<hipdnnHandle_t>(0x12345678);
-    ASSERT_NO_THROW(descriptor.setAttribute(
-        HIPDNN_ATTR_OPERATIONGRAPH_HANDLE, HIPDNN_TYPE_HANDLE, 1, &handle));
+    ASSERT_NO_THROW(
+        descriptor.setAttribute(HIPDNN_ATTR_OPERATIONGRAPH_HANDLE, HIPDNN_TYPE_HANDLE, 1, &handle));
 
     ASSERT_THROW_HIPDNN_STATUS(descriptor.finalize(), HIPDNN_STATUS_BAD_PARAM);
 

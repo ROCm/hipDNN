@@ -31,8 +31,7 @@ public:
     std::unique_ptr<HipdnnBackendDescriptor> _mockWrongTypeWrapper = nullptr;
     std::unique_ptr<HipdnnBackendDescriptor> _mockGraphWrapper = nullptr;
     std::unique_ptr<Mock_handle> _mockHandle = nullptr;
-    std::shared_ptr<Mock_engine_plugin_resource_manager> _mockEnginePluginResourceManager
-        = nullptr;
+    std::shared_ptr<Mock_engine_plugin_resource_manager> _mockEnginePluginResourceManager = nullptr;
 
     std::shared_ptr<EngineConfigDescriptor> getEngineConfigDescriptor() const
     {
@@ -60,11 +59,8 @@ public:
     void setEngine() const
     {
         EXPECT_CALL(*getMockEngine(), isFinalized()).WillOnce(Return(true));
-        ASSERT_NO_THROW(
-            getEngineConfigDescriptor()->setAttribute(HIPDNN_ATTR_ENGINECFG_ENGINE,
-                                                         HIPDNN_TYPE_BACKEND_DESCRIPTOR,
-                                                         1,
-                                                         &_mockEngineWrapper));
+        ASSERT_NO_THROW(getEngineConfigDescriptor()->setAttribute(
+            HIPDNN_ATTR_ENGINECFG_ENGINE, HIPDNN_TYPE_BACKEND_DESCRIPTOR, 1, &_mockEngineWrapper));
     }
 
     void makeEngineConfigFinalized() const
@@ -75,10 +71,8 @@ public:
         // "finalize" or "setup" made after calling this function are UB
         EXPECT_CALL(*getMockEngine(), isFinalized()).WillRepeatedly(Return(true));
         EXPECT_CALL(*getMockEngine(), getEngineId()).WillRepeatedly(Return(1));
-        EXPECT_CALL(*getMockEngine(), getGraph())
-            .WillRepeatedly(Return(getMockGraphDescriptor()));
-        EXPECT_CALL(*getMockGraphDescriptor(), getHandle())
-            .WillOnce(Return(_mockHandle.get()));
+        EXPECT_CALL(*getMockEngine(), getGraph()).WillRepeatedly(Return(getMockGraphDescriptor()));
+        EXPECT_CALL(*getMockGraphDescriptor(), getHandle()).WillOnce(Return(_mockHandle.get()));
         EXPECT_CALL(*_mockHandle, get_plugin_resource_manager())
             .WillOnce(Return(_mockEnginePluginResourceManager));
         EXPECT_CALL(*_mockEnginePluginResourceManager, get_workspace_size(_, _, _))
@@ -91,17 +85,14 @@ public:
 protected:
     void SetUp() override
     {
-        _engineConfigWrapper
-            = test_descriptor_utils::createDescriptor<EngineConfigDescriptor>();
+        _engineConfigWrapper = test_descriptor_utils::createDescriptor<EngineConfigDescriptor>();
         _mockEngineWrapper = test_descriptor_utils::createDescriptor<MockEngineDescriptor>();
-        _mockEngineBadTypeWrapper
-            = test_descriptor_utils::createDescriptor<MockEngineDescriptor>();
+        _mockEngineBadTypeWrapper = test_descriptor_utils::createDescriptor<MockEngineDescriptor>();
         _mockWrongTypeWrapper
             = test_descriptor_utils::createDescriptor<MockDescriptor<EngineConfigDescriptor>>();
         _mockGraphWrapper = test_descriptor_utils::createDescriptor<MockGraphDescriptor>();
         _mockHandle = std::make_unique<Mock_handle>();
-        _mockEnginePluginResourceManager
-            = std::make_shared<Mock_engine_plugin_resource_manager>();
+        _mockEnginePluginResourceManager = std::make_shared<Mock_engine_plugin_resource_manager>();
     }
 };
 
@@ -151,15 +142,15 @@ TEST_F(EngineConfigDescriptorTest, SetEngineConfigDescriptorEngine)
         HIPDNN_STATUS_BAD_PARAM_NULL_POINTER);
 
     ASSERT_THROW_HIPDNN_STATUS(engineConfig->setAttribute(HIPDNN_ATTR_ENGINECFG_ENGINE,
-                                                            HIPDNN_TYPE_BACKEND_DESCRIPTOR,
-                                                            1,
-                                                            &_mockEngineBadTypeWrapper),
+                                                          HIPDNN_TYPE_BACKEND_DESCRIPTOR,
+                                                          1,
+                                                          &_mockEngineBadTypeWrapper),
                                HIPDNN_STATUS_BAD_PARAM_NOT_FINALIZED);
 
     ASSERT_THROW_HIPDNN_STATUS(engineConfig->setAttribute(HIPDNN_ATTR_ENGINECFG_ENGINE,
-                                                            HIPDNN_TYPE_BACKEND_DESCRIPTOR,
-                                                            1,
-                                                            &_mockWrongTypeWrapper),
+                                                          HIPDNN_TYPE_BACKEND_DESCRIPTOR,
+                                                          1,
+                                                          &_mockWrongTypeWrapper),
                                HIPDNN_STATUS_BAD_PARAM);
 }
 
@@ -187,12 +178,10 @@ TEST_F(EngineConfigDescriptorTest, GetAttrOnUnfinalizedEngineConfigDescriptor)
     auto engineConfig = getEngineConfigDescriptor();
     hipdnnBackendDescriptor_t dummyEngine = nullptr;
 
-    ASSERT_THROW_HIPDNN_STATUS(engineConfig->getAttribute(HIPDNN_ATTR_ENGINECFG_ENGINE,
-                                                            HIPDNN_TYPE_BACKEND_DESCRIPTOR,
-                                                            1,
-                                                            nullptr,
-                                                            &dummyEngine),
-                               HIPDNN_STATUS_NOT_INITIALIZED);
+    ASSERT_THROW_HIPDNN_STATUS(
+        engineConfig->getAttribute(
+            HIPDNN_ATTR_ENGINECFG_ENGINE, HIPDNN_TYPE_BACKEND_DESCRIPTOR, 1, nullptr, &dummyEngine),
+        HIPDNN_STATUS_NOT_INITIALIZED);
 }
 
 TEST_F(EngineConfigDescriptorTest, GetEngineConfigDescriptorUnsupportedAttr)
@@ -203,10 +192,10 @@ TEST_F(EngineConfigDescriptorTest, GetEngineConfigDescriptorUnsupportedAttr)
     makeEngineConfigFinalized();
 
     ASSERT_THROW_HIPDNN_STATUS(engineConfig->getAttribute(HIPDNN_ATTR_ENGINECFG_INTERMEDIATE_INFO,
-                                                            HIPDNN_TYPE_BACKEND_DESCRIPTOR,
-                                                            1,
-                                                            nullptr,
-                                                            &dummy),
+                                                          HIPDNN_TYPE_BACKEND_DESCRIPTOR,
+                                                          1,
+                                                          nullptr,
+                                                          &dummy),
                                HIPDNN_STATUS_NOT_SUPPORTED);
 }
 
@@ -223,10 +212,10 @@ TEST_F(EngineConfigDescriptorTest, GetEngineConfigDescriptorEngine)
         HIPDNN_STATUS_BAD_PARAM);
 
     ASSERT_THROW_HIPDNN_STATUS(engineConfig->getAttribute(HIPDNN_ATTR_ENGINECFG_ENGINE,
-                                                            HIPDNN_TYPE_BACKEND_DESCRIPTOR,
-                                                            2,
-                                                            nullptr,
-                                                            engine.getPtr()),
+                                                          HIPDNN_TYPE_BACKEND_DESCRIPTOR,
+                                                          2,
+                                                          nullptr,
+                                                          engine.getPtr()),
                                HIPDNN_STATUS_BAD_PARAM);
 
     ASSERT_THROW_HIPDNN_STATUS(
@@ -234,19 +223,13 @@ TEST_F(EngineConfigDescriptorTest, GetEngineConfigDescriptorEngine)
             HIPDNN_ATTR_ENGINECFG_ENGINE, HIPDNN_TYPE_BACKEND_DESCRIPTOR, 1, nullptr, nullptr),
         HIPDNN_STATUS_BAD_PARAM_NULL_POINTER);
 
-    ASSERT_NO_THROW(engineConfig->getAttribute(HIPDNN_ATTR_ENGINECFG_ENGINE,
-                                                 HIPDNN_TYPE_BACKEND_DESCRIPTOR,
-                                                 1,
-                                                 nullptr,
-                                                 engine.getPtr()));
+    ASSERT_NO_THROW(engineConfig->getAttribute(
+        HIPDNN_ATTR_ENGINECFG_ENGINE, HIPDNN_TYPE_BACKEND_DESCRIPTOR, 1, nullptr, engine.getPtr()));
     ASSERT_EQ(*engine.get(), *(_mockEngineWrapper.get()));
 
     int64_t count;
-    ASSERT_NO_THROW(engineConfig->getAttribute(HIPDNN_ATTR_ENGINECFG_ENGINE,
-                                                 HIPDNN_TYPE_BACKEND_DESCRIPTOR,
-                                                 1,
-                                                 &count,
-                                                 engine2.getPtr()));
+    ASSERT_NO_THROW(engineConfig->getAttribute(
+        HIPDNN_ATTR_ENGINECFG_ENGINE, HIPDNN_TYPE_BACKEND_DESCRIPTOR, 1, &count, engine2.getPtr()));
     ASSERT_EQ(count, 1);
 }
 
@@ -274,10 +257,10 @@ TEST_F(EngineConfigDescriptorTest, GetEngineDescriptorMaxWorkspaceSize)
     makeEngineConfigFinalized();
 
     ASSERT_THROW_HIPDNN_STATUS(engineConfig->getAttribute(HIPDNN_ATTR_ENGINECFG_WORKSPACE_SIZE,
-                                                            HIPDNN_TYPE_BACKEND_DESCRIPTOR,
-                                                            1,
-                                                            nullptr,
-                                                            &workspaceSize),
+                                                          HIPDNN_TYPE_BACKEND_DESCRIPTOR,
+                                                          1,
+                                                          nullptr,
+                                                          &workspaceSize),
                                HIPDNN_STATUS_BAD_PARAM);
 
     ASSERT_THROW_HIPDNN_STATUS(

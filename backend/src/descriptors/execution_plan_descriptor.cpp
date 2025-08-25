@@ -52,12 +52,10 @@ void ExecutionPlanDescriptor::getAttribute(hipdnnBackendAttributeName_t attribut
     switch(attributeName)
     {
     case HIPDNN_ATTR_EXECUTION_PLAN_WORKSPACE_SIZE:
-        getWorkspaceSize(
-            attributeType, requestedElementCount, elementCount, arrayOfElements);
+        getWorkspaceSize(attributeType, requestedElementCount, elementCount, arrayOfElements);
         break;
     case HIPDNN_ATTR_EXECUTION_PLAN_ENGINE_CONFIG:
-        getEngineConfig(
-            attributeType, requestedElementCount, elementCount, arrayOfElements);
+        getEngineConfig(attributeType, requestedElementCount, elementCount, arrayOfElements);
         break;
     case HIPDNN_ATTR_EXECUTION_PLAN_HANDLE:
     case HIPDNN_ATTR_EXECUTION_PLAN_COMPUTED_INTERMEDIATE_UIDS:
@@ -68,8 +66,7 @@ void ExecutionPlanDescriptor::getAttribute(hipdnnBackendAttributeName_t attribut
     default:
         throw Hipdnn_exception(
             HIPDNN_STATUS_NOT_SUPPORTED,
-            std::string(
-                "ExecutionPlanDescriptor::getAttribute() is not supported for attribute ")
+            std::string("ExecutionPlanDescriptor::getAttribute() is not supported for attribute ")
                 + hipdnn_backend::hipdnn_get_attribute_name_string(attributeName) + ".");
     }
 }
@@ -85,10 +82,10 @@ void ExecutionPlanDescriptor::getWorkspaceSize(hipdnnBackendAttributeType_t attr
                   "(internal error).");
 
     _engineConfig->getAttribute(HIPDNN_ATTR_ENGINECFG_WORKSPACE_SIZE,
-                               attributeType,
-                               requestedElementCount,
-                               elementCount,
-                               arrayOfElements);
+                                attributeType,
+                                requestedElementCount,
+                                elementCount,
+                                arrayOfElements);
 }
 
 void ExecutionPlanDescriptor::setAttribute(hipdnnBackendAttributeName_t attributeName,
@@ -117,8 +114,7 @@ void ExecutionPlanDescriptor::setAttribute(hipdnnBackendAttributeName_t attribut
     default:
         throw Hipdnn_exception(
             HIPDNN_STATUS_NOT_SUPPORTED,
-            std::string(
-                "ExecutionPlanDescriptor::setAttribute() is not supported for attribute ")
+            std::string("ExecutionPlanDescriptor::setAttribute() is not supported for attribute ")
                 + hipdnn_backend::hipdnn_get_attribute_name_string(attributeName) + ".");
     }
 }

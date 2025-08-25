@@ -45,8 +45,8 @@ void VariantDescriptor::getAttribute(hipdnnBackendAttributeName_t attributeName,
         THROW_IF_NULL(elementCount,
                       HIPDNN_STATUS_BAD_PARAM_NULL_POINTER,
                       "VariantDescriptor::getAttribute(): elementCount is null");
-        *elementCount = std::min<int64_t>(requestedElementCount,
-                                          static_cast<int64_t>(_dataPointers.size()));
+        *elementCount
+            = std::min<int64_t>(requestedElementCount, static_cast<int64_t>(_dataPointers.size()));
         for(size_t i = 0; std::cmp_less(i, *elementCount); ++i)
         {
             static_cast<void**>(arrayOfElements)[i] = const_cast<void*>(_dataPointers[i]);

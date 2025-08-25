@@ -35,8 +35,8 @@ void EngineConfigDescriptor::finalize()
     auto engineId = _engine->getEngineId();
 
     auto engineConfigPluginData = getSerializedEngineConfig();
-    auto workspaceSize = static_cast<int64_t>(pluginResourceManager->get_workspace_size(
-        engineId, &engineConfigPluginData, graph.get()));
+    auto workspaceSize = static_cast<int64_t>(
+        pluginResourceManager->get_workspace_size(engineId, &engineConfigPluginData, graph.get()));
 
     THROW_IF_LT(workspaceSize,
                 0,
@@ -64,8 +64,7 @@ void EngineConfigDescriptor::getAttribute(hipdnnBackendAttributeName_t attribute
         getEngine(attributeType, requestedElementCount, elementCount, arrayOfElements);
         break;
     case HIPDNN_ATTR_ENGINECFG_WORKSPACE_SIZE:
-        getMaxWorkspaceSize(
-            attributeType, requestedElementCount, elementCount, arrayOfElements);
+        getMaxWorkspaceSize(attributeType, requestedElementCount, elementCount, arrayOfElements);
         break;
     case HIPDNN_ATTR_ENGINECFG_INTERMEDIATE_INFO:
     case HIPDNN_ATTR_ENGINECFG_KNOB_CHOICES:
@@ -112,17 +111,15 @@ void EngineConfigDescriptor::getMaxWorkspaceSize(hipdnnBackendAttributeType_t at
                                                  int64_t* elementCount,
                                                  void* arrayOfElements) const
 {
-    THROW_IF_NE(
-        attributeType,
-        HIPDNN_TYPE_INT64,
-        HIPDNN_STATUS_BAD_PARAM,
-        "EngineConfigDescriptor failed to get max workspace size: Invalid attribute type.");
+    THROW_IF_NE(attributeType,
+                HIPDNN_TYPE_INT64,
+                HIPDNN_STATUS_BAD_PARAM,
+                "EngineConfigDescriptor failed to get max workspace size: Invalid attribute type.");
 
-    THROW_IF_NE(
-        requestedElementCount,
-        1,
-        HIPDNN_STATUS_BAD_PARAM,
-        "EngineConfigDescriptor failed to get max workspace size: Invalid element count.");
+    THROW_IF_NE(requestedElementCount,
+                1,
+                HIPDNN_STATUS_BAD_PARAM,
+                "EngineConfigDescriptor failed to get max workspace size: Invalid element count.");
 
     THROW_IF_NULL(arrayOfElements,
                   HIPDNN_STATUS_BAD_PARAM_NULL_POINTER,

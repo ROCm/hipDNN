@@ -198,8 +198,7 @@ TEST_F(FinalizedVariantPackDescriptorTests, ValidGetAttributes)
                             retrievedDevPtrs.data());
     EXPECT_EQ(elementCount, _devPtrs.size());
     EXPECT_EQ(
-        std::memcmp(retrievedDevPtrs.data(), _devPtrs.data(), _devPtrs.size() * sizeof(void*)),
-        0);
+        std::memcmp(retrievedDevPtrs.data(), _devPtrs.data(), _devPtrs.size() * sizeof(void*)), 0);
 
     descriptor.getAttribute(HIPDNN_ATTR_VARIANT_PACK_UNIQUE_IDS,
                             HIPDNN_TYPE_INT64,

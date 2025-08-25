@@ -31,8 +31,7 @@ public:
     std::unique_ptr<HipdnnBackendDescriptor> _mockGraphBadTypeWrapper = nullptr;
     std::unique_ptr<HipdnnBackendDescriptor> _mockWrongTypeWrapper = nullptr;
     std::unique_ptr<Mock_handle> _mockHandle = nullptr;
-    std::shared_ptr<Mock_engine_plugin_resource_manager> _mockEnginePluginResourceManager
-        = nullptr;
+    std::shared_ptr<Mock_engine_plugin_resource_manager> _mockEnginePluginResourceManager = nullptr;
 
     std::shared_ptr<EngineDescriptor> getEngineDescriptor() const
     {
@@ -55,9 +54,9 @@ public:
     {
         EXPECT_CALL(*getMockGraph(), isFinalized()).WillOnce(Return(true));
         ASSERT_NO_THROW(getEngineDescriptor()->setAttribute(HIPDNN_ATTR_ENGINE_OPERATION_GRAPH,
-                                                               HIPDNN_TYPE_BACKEND_DESCRIPTOR,
-                                                               1,
-                                                               &_mockGraphWrapper));
+                                                            HIPDNN_TYPE_BACKEND_DESCRIPTOR,
+                                                            1,
+                                                            &_mockGraphWrapper));
     }
 
     void setGlobalIndex(int64_t engineId) const
@@ -88,13 +87,10 @@ protected:
     {
         _engineWrapper = test_descriptor_utils::createDescriptor<EngineDescriptor>();
         _mockGraphWrapper = test_descriptor_utils::createDescriptor<MockGraphDescriptor>();
-        _mockGraphBadTypeWrapper
-            = test_descriptor_utils::createDescriptor<MockGraphDescriptor>();
-        _mockWrongTypeWrapper
-            = test_descriptor_utils::createDescriptor<MockEngineDescriptor>();
+        _mockGraphBadTypeWrapper = test_descriptor_utils::createDescriptor<MockGraphDescriptor>();
+        _mockWrongTypeWrapper = test_descriptor_utils::createDescriptor<MockEngineDescriptor>();
         _mockHandle = std::make_unique<Mock_handle>();
-        _mockEnginePluginResourceManager
-            = std::make_shared<Mock_engine_plugin_resource_manager>();
+        _mockEnginePluginResourceManager = std::make_shared<Mock_engine_plugin_resource_manager>();
 
         serializeEngineDetails(ENGINE_ID);
     }
@@ -140,9 +136,9 @@ TEST_F(EngineDescriptorTest, SetEngineDescriptorGraph)
         HIPDNN_STATUS_BAD_PARAM);
 
     ASSERT_THROW_HIPDNN_STATUS(engine->setAttribute(HIPDNN_ATTR_ENGINE_OPERATION_GRAPH,
-                                                     HIPDNN_TYPE_BACKEND_DESCRIPTOR,
-                                                     2,
-                                                     &_mockGraphWrapper),
+                                                    HIPDNN_TYPE_BACKEND_DESCRIPTOR,
+                                                    2,
+                                                    &_mockGraphWrapper),
                                HIPDNN_STATUS_BAD_PARAM);
 
     ASSERT_THROW_HIPDNN_STATUS(
@@ -157,29 +153,27 @@ TEST_F(EngineDescriptorTest, SetEngineDescriptorGraph)
         HIPDNN_STATUS_BAD_PARAM_NULL_POINTER);
 
     ASSERT_THROW_HIPDNN_STATUS(engine->setAttribute(HIPDNN_ATTR_ENGINE_OPERATION_GRAPH,
-                                                     HIPDNN_TYPE_BACKEND_DESCRIPTOR,
-                                                     1,
-                                                     &_mockGraphBadTypeWrapper),
+                                                    HIPDNN_TYPE_BACKEND_DESCRIPTOR,
+                                                    1,
+                                                    &_mockGraphBadTypeWrapper),
                                HIPDNN_STATUS_BAD_PARAM_NOT_FINALIZED);
 
     ASSERT_THROW_HIPDNN_STATUS(engine->setAttribute(HIPDNN_ATTR_ENGINE_OPERATION_GRAPH,
-                                                     HIPDNN_TYPE_BACKEND_DESCRIPTOR,
-                                                     1,
-                                                     &_mockWrongTypeWrapper),
+                                                    HIPDNN_TYPE_BACKEND_DESCRIPTOR,
+                                                    1,
+                                                    &_mockWrongTypeWrapper),
                                HIPDNN_STATUS_BAD_PARAM);
 
     EXPECT_CALL(*getMockGraph(), isFinalized()).WillOnce(Return(false));
     ASSERT_THROW_HIPDNN_STATUS(engine->setAttribute(HIPDNN_ATTR_ENGINE_OPERATION_GRAPH,
-                                                     HIPDNN_TYPE_BACKEND_DESCRIPTOR,
-                                                     1,
-                                                     &_mockGraphWrapper),
+                                                    HIPDNN_TYPE_BACKEND_DESCRIPTOR,
+                                                    1,
+                                                    &_mockGraphWrapper),
                                HIPDNN_STATUS_BAD_PARAM_NOT_FINALIZED);
 
     EXPECT_CALL(*getMockGraph(), isFinalized()).WillOnce(Return(true));
-    ASSERT_NO_THROW(engine->setAttribute(HIPDNN_ATTR_ENGINE_OPERATION_GRAPH,
-                                          HIPDNN_TYPE_BACKEND_DESCRIPTOR,
-                                          1,
-                                          &_mockGraphWrapper));
+    ASSERT_NO_THROW(engine->setAttribute(
+        HIPDNN_ATTR_ENGINE_OPERATION_GRAPH, HIPDNN_TYPE_BACKEND_DESCRIPTOR, 1, &_mockGraphWrapper));
 }
 
 TEST_F(EngineDescriptorTest, SetEngineDescriptorGlobalId)
@@ -210,9 +204,9 @@ TEST_F(EngineDescriptorTest, SetAttrOnFinalizedEngineDescriptor)
     makeEngineFinalized();
 
     ASSERT_THROW_HIPDNN_STATUS(engine->setAttribute(HIPDNN_ATTR_ENGINE_OPERATION_GRAPH,
-                                                     HIPDNN_TYPE_BACKEND_DESCRIPTOR,
-                                                     1,
-                                                     &_mockGraphWrapper),
+                                                    HIPDNN_TYPE_BACKEND_DESCRIPTOR,
+                                                    1,
+                                                    &_mockGraphWrapper),
                                HIPDNN_STATUS_NOT_INITIALIZED);
 }
 
@@ -232,10 +226,10 @@ TEST_F(EngineDescriptorTest, GetAttrOnUnfinalizedEngineDescriptor)
     hipdnnBackendDescriptor_t dummyGraph = nullptr;
 
     ASSERT_THROW_HIPDNN_STATUS(engine->getAttribute(HIPDNN_ATTR_ENGINE_OPERATION_GRAPH,
-                                                     HIPDNN_TYPE_BACKEND_DESCRIPTOR,
-                                                     1,
-                                                     nullptr,
-                                                     &dummyGraph),
+                                                    HIPDNN_TYPE_BACKEND_DESCRIPTOR,
+                                                    1,
+                                                    nullptr,
+                                                    &dummyGraph),
                                HIPDNN_STATUS_NOT_INITIALIZED);
 }
 
@@ -266,32 +260,32 @@ TEST_F(EngineDescriptorTest, GetEngineDescriptorGraph)
         HIPDNN_STATUS_BAD_PARAM);
 
     ASSERT_THROW_HIPDNN_STATUS(engine->getAttribute(HIPDNN_ATTR_ENGINE_OPERATION_GRAPH,
-                                                     HIPDNN_TYPE_BACKEND_DESCRIPTOR,
-                                                     2,
-                                                     nullptr,
-                                                     graph.getPtr()),
+                                                    HIPDNN_TYPE_BACKEND_DESCRIPTOR,
+                                                    2,
+                                                    nullptr,
+                                                    graph.getPtr()),
                                HIPDNN_STATUS_BAD_PARAM);
 
     ASSERT_THROW_HIPDNN_STATUS(engine->getAttribute(HIPDNN_ATTR_ENGINE_OPERATION_GRAPH,
-                                                     HIPDNN_TYPE_BACKEND_DESCRIPTOR,
-                                                     1,
-                                                     nullptr,
-                                                     nullptr),
+                                                    HIPDNN_TYPE_BACKEND_DESCRIPTOR,
+                                                    1,
+                                                    nullptr,
+                                                    nullptr),
                                HIPDNN_STATUS_BAD_PARAM_NULL_POINTER);
 
     ASSERT_NO_THROW(engine->getAttribute(HIPDNN_ATTR_ENGINE_OPERATION_GRAPH,
-                                          HIPDNN_TYPE_BACKEND_DESCRIPTOR,
-                                          1,
-                                          nullptr,
-                                          graph.getPtr()));
+                                         HIPDNN_TYPE_BACKEND_DESCRIPTOR,
+                                         1,
+                                         nullptr,
+                                         graph.getPtr()));
     ASSERT_EQ(*graph.get(), *(_mockGraphWrapper.get()));
 
     int64_t count;
     ASSERT_NO_THROW(engine->getAttribute(HIPDNN_ATTR_ENGINE_OPERATION_GRAPH,
-                                          HIPDNN_TYPE_BACKEND_DESCRIPTOR,
-                                          1,
-                                          &count,
-                                          graph2.getPtr()));
+                                         HIPDNN_TYPE_BACKEND_DESCRIPTOR,
+                                         1,
+                                         &count,
+                                         graph2.getPtr()));
     ASSERT_EQ(count, 1);
 }
 
@@ -308,8 +302,7 @@ TEST_F(EngineDescriptorTest, GetEngineDescriptorGlobalId)
         HIPDNN_STATUS_BAD_PARAM);
 
     ASSERT_THROW_HIPDNN_STATUS(
-        engine->getAttribute(
-            HIPDNN_ATTR_ENGINE_GLOBAL_INDEX, HIPDNN_TYPE_INT64, 2, nullptr, &gidx),
+        engine->getAttribute(HIPDNN_ATTR_ENGINE_GLOBAL_INDEX, HIPDNN_TYPE_INT64, 2, nullptr, &gidx),
         HIPDNN_STATUS_BAD_PARAM);
 
     ASSERT_THROW_HIPDNN_STATUS(
@@ -322,8 +315,8 @@ TEST_F(EngineDescriptorTest, GetEngineDescriptorGlobalId)
     ASSERT_EQ(gidx, 0);
 
     int64_t count;
-    ASSERT_NO_THROW(engine->getAttribute(
-        HIPDNN_ATTR_ENGINE_GLOBAL_INDEX, HIPDNN_TYPE_INT64, 1, &count, &gidx));
+    ASSERT_NO_THROW(
+        engine->getAttribute(HIPDNN_ATTR_ENGINE_GLOBAL_INDEX, HIPDNN_TYPE_INT64, 1, &count, &gidx));
     ASSERT_EQ(count, 1);
 }
 

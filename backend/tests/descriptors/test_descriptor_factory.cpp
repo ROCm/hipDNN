@@ -90,9 +90,9 @@ TEST(DescriptorFactoryTest, CreateGraphExtNullDescriptorPointer)
     auto builder = flatbuffer_test_utils::createValidGraph();
     auto serializedGraph = builder.Release();
 
-    ASSERT_THROW_HIPDNN_STATUS(DescriptorFactory::createGraphExt(
-                                   nullptr, serializedGraph.data(), serializedGraph.size()),
-                               HIPDNN_STATUS_BAD_PARAM_NULL_POINTER);
+    ASSERT_THROW_HIPDNN_STATUS(
+        DescriptorFactory::createGraphExt(nullptr, serializedGraph.data(), serializedGraph.size()),
+        HIPDNN_STATUS_BAD_PARAM_NULL_POINTER);
 }
 
 TEST(DescriptorFactoryTest, CreateGraphExtNullSerializedGraph)
@@ -151,8 +151,7 @@ TEST(DescriptorFactoryTest, CreateVariantDescriptor)
 {
     hipdnnBackendDescriptor_t descriptor = nullptr;
 
-    ASSERT_NO_THROW(
-        DescriptorFactory::create(HIPDNN_BACKEND_VARIANT_PACK_DESCRIPTOR, &descriptor));
+    ASSERT_NO_THROW(DescriptorFactory::create(HIPDNN_BACKEND_VARIANT_PACK_DESCRIPTOR, &descriptor));
     EXPECT_NE(descriptor, nullptr);
 
     auto variantDescriptor = descriptor->asDescriptor<VariantDescriptor>();

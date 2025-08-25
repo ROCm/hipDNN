@@ -54,18 +54,15 @@ void EngineHeuristicDescriptor::getAttribute(hipdnnBackendAttributeName_t attrib
         getGraph(attributeType, requestedElementCount, elementCount, arrayOfElements);
         break;
     case HIPDNN_ATTR_ENGINEHEUR_MODE:
-        getHeuristicMode(
-            attributeType, requestedElementCount, elementCount, arrayOfElements);
+        getHeuristicMode(attributeType, requestedElementCount, elementCount, arrayOfElements);
         break;
     case HIPDNN_ATTR_ENGINEHEUR_RESULTS:
-        getEngineConfigs(
-            attributeType, requestedElementCount, elementCount, arrayOfElements);
+        getEngineConfigs(attributeType, requestedElementCount, elementCount, arrayOfElements);
         break;
     default:
         throw Hipdnn_exception(
             HIPDNN_STATUS_NOT_SUPPORTED,
-            std::string(
-                "EngineHeuristicDescriptor::getAttribute() is not supported for attribute ")
+            std::string("EngineHeuristicDescriptor::getAttribute() is not supported for attribute ")
                 + hipdnn_backend::hipdnn_get_attribute_name_string(attributeName) + ".");
     }
 }
@@ -90,21 +87,19 @@ void EngineHeuristicDescriptor::setAttribute(hipdnnBackendAttributeName_t attrib
     default:
         throw Hipdnn_exception(
             HIPDNN_STATUS_NOT_SUPPORTED,
-            std::string(
-                "EngineHeuristicDescriptor::setAttribute() is not supported for attribute ")
+            std::string("EngineHeuristicDescriptor::setAttribute() is not supported for attribute ")
                 + hipdnn_backend::hipdnn_get_attribute_name_string(attributeName) + ".");
     }
 }
 
 void EngineHeuristicDescriptor::setHeuristicMode(hipdnnBackendAttributeType_t attributeType,
-                                                  int64_t elementCount,
-                                                  const void* arrayOfElements)
+                                                 int64_t elementCount,
+                                                 const void* arrayOfElements)
 {
-    THROW_IF_NE(
-        attributeType,
-        HIPDNN_TYPE_HEUR_MODE,
-        HIPDNN_STATUS_BAD_PARAM,
-        "EngineHeuristicDescriptor failed to set heuristic mode: Invalid attribute type.");
+    THROW_IF_NE(attributeType,
+                HIPDNN_TYPE_HEUR_MODE,
+                HIPDNN_STATUS_BAD_PARAM,
+                "EngineHeuristicDescriptor failed to set heuristic mode: Invalid attribute type.");
 
     THROW_IF_NE(elementCount,
                 1,
@@ -187,15 +182,14 @@ void EngineHeuristicDescriptor::getGraph(hipdnnBackendAttributeType_t attributeT
 }
 
 void EngineHeuristicDescriptor::getEngineConfigs(hipdnnBackendAttributeType_t attributeType,
-                                                  int64_t requestedElementCount,
-                                                  int64_t* elementCount,
-                                                  void* arrayOfElements) const
+                                                 int64_t requestedElementCount,
+                                                 int64_t* elementCount,
+                                                 void* arrayOfElements) const
 {
-    THROW_IF_NE(
-        attributeType,
-        HIPDNN_TYPE_BACKEND_DESCRIPTOR,
-        HIPDNN_STATUS_BAD_PARAM,
-        "EngineHeuristicDescriptor failed to get engine configs: Invalid attribute type.");
+    THROW_IF_NE(attributeType,
+                HIPDNN_TYPE_BACKEND_DESCRIPTOR,
+                HIPDNN_STATUS_BAD_PARAM,
+                "EngineHeuristicDescriptor failed to get engine configs: Invalid attribute type.");
 
     // Return the number of engine configs if they aren't requesting any.
     if(requestedElementCount == 0)
@@ -248,21 +242,19 @@ void EngineHeuristicDescriptor::getEngineConfigs(hipdnnBackendAttributeType_t at
                                  engineDesc.getPtr());
         }
 
-        *elementCount
-            = std::min(requestedElementCount, static_cast<int64_t>(_engineIds.size()));
+        *elementCount = std::min(requestedElementCount, static_cast<int64_t>(_engineIds.size()));
     }
 }
 
 void EngineHeuristicDescriptor::getHeuristicMode(hipdnnBackendAttributeType_t attributeType,
-                                                  int64_t requestedElementCount,
-                                                  int64_t* elementCount,
-                                                  void* arrayOfElements) const
+                                                 int64_t requestedElementCount,
+                                                 int64_t* elementCount,
+                                                 void* arrayOfElements) const
 {
-    THROW_IF_NE(
-        attributeType,
-        HIPDNN_TYPE_HEUR_MODE,
-        HIPDNN_STATUS_BAD_PARAM,
-        "EngineHeuristicDescriptor failed to get heuristic mode: Invalid attribute type.");
+    THROW_IF_NE(attributeType,
+                HIPDNN_TYPE_HEUR_MODE,
+                HIPDNN_STATUS_BAD_PARAM,
+                "EngineHeuristicDescriptor failed to get heuristic mode: Invalid attribute type.");
 
     THROW_IF_NE(requestedElementCount,
                 1,
