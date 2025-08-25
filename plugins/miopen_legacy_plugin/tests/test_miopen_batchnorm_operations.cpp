@@ -271,7 +271,7 @@ void Batchnorm_execute_graph_test::RunFwdbatchnormGraph(
                                          1e-3);
 
     Cpu_fp_reference_validation<Input_type> cpu_ref_validation(epsilon, epsilon);
-    EXPECT_TRUE(cpu_ref_validation.compare_buffers(y_tensor_cpu.memory(), y_tensor.memory()));
+    EXPECT_TRUE(cpu_ref_validation.all_close(y_tensor_cpu.memory(), y_tensor.memory()));
 }
 
 INSTANTIATE_TEST_SUITE_P(RunFwdbatchnormGraphWithParams,

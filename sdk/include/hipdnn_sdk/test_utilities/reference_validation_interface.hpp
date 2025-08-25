@@ -21,7 +21,7 @@ class Reference_validation_interface
 public:
     virtual ~Reference_validation_interface() = default;
 
-    virtual bool compare_buffers(Migratable_memory_interface<T>& reference,
+    virtual bool all_close(Migratable_memory_interface<T>& reference,
                                  Migratable_memory_interface<T>& implementation)
         = 0;
 };
