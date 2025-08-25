@@ -50,39 +50,39 @@ struct Batchnorm_2d_tensor_bundle
                                unsigned int seed = 1,
                                const Tensor_layout& layout = Tensor_layout::NCHW)
         : derived_dims({1, dims[1], 1, 1})
-        , x_tensor(Tensor::make_tensor<Input_type>(dims, layout))
-        , dy_tensor(Tensor::make_tensor<Input_type>(dims, layout))
-        , dx_tensor(Tensor::make_tensor<Input_type>(dims, layout))
-        , scale_tensor(Tensor::make_tensor<Intermediate_type>(derived_dims))
-        , dscale_tensor(Tensor::make_tensor<Intermediate_type>(derived_dims))
-        , dbias_tensor(Tensor::make_tensor<Intermediate_type>(derived_dims))
-        , mean_tensor(Tensor::make_tensor<Intermediate_type>(derived_dims))
-        , inv_variance_tensor(Tensor::make_tensor<Intermediate_type>(derived_dims))
+        , x_tensor(dims, layout)
+        , dy_tensor(dims, layout)
+        , dx_tensor(dims, layout)
+        , scale_tensor(derived_dims)
+        , dscale_tensor(derived_dims)
+        , dbias_tensor(derived_dims)
+        , mean_tensor(derived_dims)
+        , inv_variance_tensor(derived_dims)
     {
-        x_tensor.fill_with_random_values<Input_type>(
+        x_tensor.fill_with_random_values(
             static_cast<Input_type>(0.0f), static_cast<Input_type>(2.0f), seed);
-        dy_tensor.fill_with_random_values<Input_type>(
+        dy_tensor.fill_with_random_values(
             static_cast<Input_type>(-2.0f), static_cast<Input_type>(2.0f), seed);
 
-        scale_tensor.fill_with_random_values<Intermediate_type>(
+        scale_tensor.fill_with_random_values(
             static_cast<Intermediate_type>(-2.0), static_cast<Intermediate_type>(2.0f), seed);
 
-        mean_tensor.fill_with_random_values<Intermediate_type>(
+        mean_tensor.fill_with_random_values(
             static_cast<Intermediate_type>(-2.0f), static_cast<Intermediate_type>(2.0f), seed);
 
-        inv_variance_tensor.fill_with_random_values<Intermediate_type>(
+        inv_variance_tensor.fill_with_random_values(
             static_cast<Intermediate_type>(-2.0f), static_cast<Intermediate_type>(2.0f), seed);
     }
 
     std::vector<int64_t> derived_dims;
-    Tensor x_tensor;
-    Tensor dy_tensor;
-    Tensor dx_tensor;
-    Tensor scale_tensor;
-    Tensor dscale_tensor;
-    Tensor dbias_tensor;
-    Tensor mean_tensor;
-    Tensor inv_variance_tensor;
+    PinnedTensor<Input_type> x_tensor;
+    PinnedTensor<Input_type> dy_tensor;
+    PinnedTensor<Input_type> dx_tensor;
+    PinnedTensor<Intermediate_type> scale_tensor;
+    PinnedTensor<Intermediate_type> dscale_tensor;
+    PinnedTensor<Intermediate_type> dbias_tensor;
+    PinnedTensor<Intermediate_type> mean_tensor;
+    PinnedTensor<Intermediate_type> inv_variance_tensor;
 };
 
 } // namespace
@@ -141,21 +141,21 @@ protected:
     {
         std::unordered_map<int64_t, void*> variant_pack;
         variant_pack[x_tensor_attr.get_uid()]
-            = tensor_bundle.x_tensor.memory().template device_data<void>();
+            = tensor_bundle.x_tensor.memory().device_data();
         variant_pack[dy_tensor_attr.get_uid()]
-            = tensor_bundle.dy_tensor.memory().template device_data<void>();
+            = tensor_bundle.dy_tensor.memory().device_data();
         variant_pack[dx_tensor_attr.get_uid()]
-            = tensor_bundle.dx_tensor.memory().template device_data<void>();
+            = tensor_bundle.dx_tensor.memory().device_data();
         variant_pack[scale_tensor_attr.get_uid()]
-            = tensor_bundle.scale_tensor.memory().template device_data<void>();
+            = tensor_bundle.scale_tensor.memory().device_data();
         variant_pack[dscale_tensor_attr.get_uid()]
-            = tensor_bundle.dscale_tensor.memory().template device_data<void>();
+            = tensor_bundle.dscale_tensor.memory().device_data();
         variant_pack[dbias_tensor_attr.get_uid()]
-            = tensor_bundle.dbias_tensor.memory().template device_data<void>();
+            = tensor_bundle.dbias_tensor.memory().device_data();
         variant_pack[mean_tensor_attr.get_uid()]
-            = tensor_bundle.mean_tensor.memory().template device_data<void>();
+            = tensor_bundle.mean_tensor.memory().device_data();
         variant_pack[inv_variance_tensor_attr.get_uid()]
-            = tensor_bundle.inv_variance_tensor.memory().template device_data<void>();
+            = tensor_bundle.inv_variance_tensor.memory().device_data();
 
         return variant_pack;
     }
