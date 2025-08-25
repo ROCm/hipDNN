@@ -125,3 +125,207 @@ TEST(TensorAttributesTests, PackAttributes)
     EXPECT_EQ(unpacked->dims, std::vector<int64_t>({4, 5, 6}));
     EXPECT_TRUE(unpacked->virtual_);
 }
+
+TEST(TensorAttributesTests, ValidateDimsAndStridesSetAndPositiveValidCase)
+{
+    Tensor_attributes tensor;
+    tensor.set_dim({4, 5, 6});
+    tensor.set_stride({30, 6, 1});
+    EXPECT_TRUE(tensor.validate_dims_and_strides_set_and_positive());
+}
+
+TEST(TensorAttributesTests, ValidateDimsAndStridesSetAndPositiveEmptyDims)
+{
+    Tensor_attributes tensor;
+    // No dimensions set
+    EXPECT_FALSE(tensor.validate_dims_and_strides_set_and_positive());
+}
+
+TEST(TensorAttributesTests, ValidateDimsAndStridesSetAndPositiveZeroDimension)
+{
+    Tensor_attributes tensor;
+    tensor.set_dim({4, 0, 6}); // Zero in middle dimension
+    tensor.set_stride({0, 6, 1});
+    EXPECT_FALSE(tensor.validate_dims_and_strides_set_and_positive());
+}
+
+TEST(TensorAttributesTests, ValidateDimsAndStridesSetAndPositiveNegativeDimension)
+{
+    Tensor_attributes tensor;
+    tensor.set_dim({4, -5, 6}); // Negative dimension
+    tensor.set_stride({30, 6, 1});
+    EXPECT_FALSE(tensor.validate_dims_and_strides_set_and_positive());
+}
+
+TEST(TensorAttributesTests, ValidateDimsAndStridesSetAndPositiveZeroStride)
+{
+    Tensor_attributes tensor;
+    tensor.set_dim({4, 5, 6});
+    tensor.set_stride({30, 0, 1}); // Zero stride
+    EXPECT_FALSE(tensor.validate_dims_and_strides_set_and_positive());
+}
+
+TEST(TensorAttributesTests, ValidateDimsAndStridesSetAndPositiveNegativeStride)
+{
+    Tensor_attributes tensor;
+    tensor.set_dim({4, 5, 6});
+    tensor.set_stride({30, -6, 1}); // Negative stride
+    EXPECT_FALSE(tensor.validate_dims_and_strides_set_and_positive());
+}
+
+TEST(TensorAttributesTests, ValidateDimsAndStridesSetAndPositiveStrideSizeMismatch)
+{
+    Tensor_attributes tensor;
+    tensor.set_dim({4, 5, 6});
+    tensor.set_stride({30, 6}); // Only 2 strides for 3 dimensions
+    EXPECT_FALSE(tensor.validate_dims_and_strides_set_and_positive());
+}
+
+TEST(TensorAttributesTests, ValidateDimsAndStridesSetAndPositiveMoreStridesThanDims)
+{
+    Tensor_attributes tensor;
+    tensor.set_dim({4, 5});
+    tensor.set_stride({20, 5, 1}); // 3 strides for 2 dimensions
+    EXPECT_FALSE(tensor.validate_dims_and_strides_set_and_positive());
+}
+
+TEST(TensorAttributesTests, ValidateDimsAndStridesSetAndPositiveAllZeroDims)
+{
+    Tensor_attributes tensor;
+    tensor.set_dim({0, 0, 0});
+    tensor.set_stride({0, 0, 0});
+    EXPECT_FALSE(tensor.validate_dims_and_strides_set_and_positive());
+}
+
+TEST(TensorAttributesTests, ValidateDimsAndStridesSetAndPositiveAllNegativeDims)
+{
+    Tensor_attributes tensor;
+    tensor.set_dim({-1, -2, -3});
+    tensor.set_stride({6, 3, 1});
+    EXPECT_FALSE(tensor.validate_dims_and_strides_set_and_positive());
+}
+
+TEST(TensorAttributesTests, ValidateDimsAndStridesSetAndPositiveMixedInvalidValues)
+{
+    Tensor_attributes tensor;
+    tensor.set_dim({4, 0, -6}); // Mix of valid, zero, and negative
+    tensor.set_stride({0, -6, 1}); // Mix of zero, negative, and valid
+    EXPECT_FALSE(tensor.validate_dims_and_strides_set_and_positive());
+}
+
+TEST(TensorAttributesTests, ValidateDimsAndStridesSetAndPositiveSingleDimension)
+{
+    Tensor_attributes tensor;
+    tensor.set_dim({10});
+    tensor.set_stride({1});
+    EXPECT_TRUE(tensor.validate_dims_and_strides_set_and_positive());
+}
+
+TEST(TensorAttributesTests, ValidateDimsAndStridesSetAndPositiveSingleZeroDimension)
+{
+    Tensor_attributes tensor;
+    tensor.set_dim({0});
+    tensor.set_stride({1});
+    EXPECT_FALSE(tensor.validate_dims_and_strides_set_and_positive());
+}
+
+TEST(TensorAttributesTests, ValidateDimsAndStridesSetAndPositiveLargeDimensions)
+{
+    Tensor_attributes tensor;
+    tensor.set_dim({1024, 2048, 4096});
+    tensor.set_stride({8388608, 4096, 1});
+    EXPECT_TRUE(tensor.validate_dims_and_strides_set_and_positive());
+}
+
+TEST(TensorAttributesTests, ValidateDimsAndStridesSetAndPositive5DValidCase)
+{
+    Tensor_attributes tensor;
+    tensor.set_dim({2, 3, 4, 5, 6});
+    tensor.set_stride({360, 120, 30, 6, 1});
+    EXPECT_TRUE(tensor.validate_dims_and_strides_set_and_positive());
+}
+
+TEST(TensorAttributesTests, ValidateDimsSetAndPositiveValidCase)
+{
+    Tensor_attributes tensor;
+    tensor.set_dim({4, 5, 6});
+    EXPECT_TRUE(tensor.validate_dims_set_and_positive());
+}
+
+TEST(TensorAttributesTests, ValidateDimsSetAndPositiveEmptyDims)
+{
+    Tensor_attributes tensor;
+    // No dimensions set
+    EXPECT_FALSE(tensor.validate_dims_set_and_positive());
+}
+
+TEST(TensorAttributesTests, ValidateDimsSetAndPositiveZeroDimension)
+{
+    Tensor_attributes tensor;
+    tensor.set_dim({4, 0, 6}); // Zero in middle dimension
+    EXPECT_FALSE(tensor.validate_dims_set_and_positive());
+}
+
+TEST(TensorAttributesTests, ValidateDimsSetAndPositiveNegativeDimension)
+{
+    Tensor_attributes tensor;
+    tensor.set_dim({4, -5, 6}); // Negative dimension
+    EXPECT_FALSE(tensor.validate_dims_set_and_positive());
+}
+
+TEST(TensorAttributesTests, ValidateDimsSetAndPositiveAllZeroDims)
+{
+    Tensor_attributes tensor;
+    tensor.set_dim({0, 0, 0});
+    EXPECT_FALSE(tensor.validate_dims_set_and_positive());
+}
+
+TEST(TensorAttributesTests, ValidateDimsSetAndPositiveAllNegativeDims)
+{
+    Tensor_attributes tensor;
+    tensor.set_dim({-1, -2, -3});
+    EXPECT_FALSE(tensor.validate_dims_set_and_positive());
+}
+
+TEST(TensorAttributesTests, ValidateDimsSetAndPositiveMixedInvalidValues)
+{
+    Tensor_attributes tensor;
+    tensor.set_dim({4, 0, -6}); // Mix of valid, zero, and negative
+    EXPECT_FALSE(tensor.validate_dims_set_and_positive());
+}
+
+TEST(TensorAttributesTests, ValidateDimsSetAndPositiveSingleDimension)
+{
+    Tensor_attributes tensor;
+    tensor.set_dim({10});
+    EXPECT_TRUE(tensor.validate_dims_set_and_positive());
+}
+
+TEST(TensorAttributesTests, ValidateDimsSetAndPositiveSingleZeroDimension)
+{
+    Tensor_attributes tensor;
+    tensor.set_dim({0});
+    EXPECT_FALSE(tensor.validate_dims_set_and_positive());
+}
+
+TEST(TensorAttributesTests, ValidateDimsSetAndPositiveLargeDimensions)
+{
+    Tensor_attributes tensor;
+    tensor.set_dim({1024, 2048, 4096});
+    EXPECT_TRUE(tensor.validate_dims_set_and_positive());
+}
+
+TEST(TensorAttributesTests, ValidateDimsSetAndPositive5DValidCase)
+{
+    Tensor_attributes tensor;
+    tensor.set_dim({2, 3, 4, 5, 6});
+    EXPECT_TRUE(tensor.validate_dims_set_and_positive());
+}
+
+TEST(TensorAttributesTests, ValidateDimsSetAndPositiveWithStridesIgnored)
+{
+    Tensor_attributes tensor;
+    tensor.set_dim({4, 5, 6});
+    tensor.set_stride({0, -1, 2}); // Invalid strides should be ignored
+    EXPECT_TRUE(tensor.validate_dims_set_and_positive());
+}

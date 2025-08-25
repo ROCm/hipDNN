@@ -24,6 +24,7 @@ set(SCHEMA_FILES
     schemas/batchnorm_attributes.fbs
     schemas/batchnorm_backward_attributes.fbs
     schemas/batchnorm_inference_attributes.fbs
+    schemas/convolution_fwd_attributes.fbs
     schemas/data_types.fbs
     schemas/engine_config.fbs
     schemas/engine_details.fbs

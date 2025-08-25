@@ -47,38 +47,38 @@ struct Batchnorm_2d_tensor_bundle
                                unsigned int seed = 1,
                                const Tensor_layout& layout = Tensor_layout::NCHW)
         : derived_dims({1, dims[1], 1, 1})
-        , x_tensor(Tensor::make_tensor<Input_type>(dims, layout))
-        , y_tensor(Tensor::make_tensor<Input_type>(dims, layout))
-        , scale_tensor(Tensor::make_tensor<Intermediate_type>(derived_dims))
-        , bias_tensor(Tensor::make_tensor<Intermediate_type>(derived_dims))
-        , mean_tensor(Tensor::make_tensor<Intermediate_type>(derived_dims))
-        , variance_tensor(Tensor::make_tensor<Intermediate_type>(derived_dims))
+        , x_tensor(dims, layout)
+        , y_tensor(dims, layout)
+        , scale_tensor(derived_dims)
+        , bias_tensor(derived_dims)
+        , mean_tensor(derived_dims)
+        , variance_tensor(derived_dims)
     {
-        x_tensor.fill_with_random_values<Input_type>(
+        x_tensor.fill_with_random_values(
             static_cast<Input_type>(0.0f), static_cast<Input_type>(1.0f), seed);
-        y_tensor.fill_with_random_values<Input_type>(
+        y_tensor.fill_with_random_values(
             static_cast<Input_type>(-100.0f), static_cast<Input_type>(100.0f), seed);
 
-        scale_tensor.fill_with_random_values<Intermediate_type>(
+        scale_tensor.fill_with_random_values(
             static_cast<Intermediate_type>(0.0f), static_cast<Intermediate_type>(1.0f), seed);
 
-        bias_tensor.fill_with_random_values<Intermediate_type>(
+        bias_tensor.fill_with_random_values(
             static_cast<Intermediate_type>(0.0f), static_cast<Intermediate_type>(1.0f), seed);
 
-        mean_tensor.fill_with_random_values<Intermediate_type>(
+        mean_tensor.fill_with_random_values(
             static_cast<Intermediate_type>(0.0f), static_cast<Intermediate_type>(1.0f), seed);
 
-        variance_tensor.fill_with_random_values<Intermediate_type>(
+        variance_tensor.fill_with_random_values(
             static_cast<Intermediate_type>(0.1f), static_cast<Intermediate_type>(1.0f), seed);
     }
 
     std::vector<int64_t> derived_dims;
-    Tensor x_tensor;
-    Tensor y_tensor;
-    Tensor scale_tensor;
-    Tensor bias_tensor;
-    Tensor mean_tensor;
-    Tensor variance_tensor;
+    PinnedTensor<Input_type> x_tensor;
+    PinnedTensor<Input_type> y_tensor;
+    PinnedTensor<Intermediate_type> scale_tensor;
+    PinnedTensor<Intermediate_type> bias_tensor;
+    PinnedTensor<Intermediate_type> mean_tensor;
+    PinnedTensor<Intermediate_type> variance_tensor;
 };
 class Batchnorm_forward_inference_integration_test
     : public ::testing::TestWithParam<Bn_2d_test_case>
@@ -132,18 +132,14 @@ protected:
         Batchnorm_2d_tensor_bundle<Input_type, Intermediate_type>& tensor_bundle)
     {
         std::unordered_map<int64_t, void*> variant_pack;
-        variant_pack[x_tensor_attr.get_uid()]
-            = tensor_bundle.x_tensor.memory().template device_data<void>();
-        variant_pack[mean_tensor_attr.get_uid()]
-            = tensor_bundle.mean_tensor.memory().template device_data<void>();
+        variant_pack[x_tensor_attr.get_uid()] = tensor_bundle.x_tensor.memory().device_data();
+        variant_pack[mean_tensor_attr.get_uid()] = tensor_bundle.mean_tensor.memory().device_data();
         variant_pack[inv_variance_tensor_attr.get_uid()]
-            = tensor_bundle.variance_tensor.memory().template device_data<void>();
+            = tensor_bundle.variance_tensor.memory().device_data();
         variant_pack[scale_tensor_attr.get_uid()]
-            = tensor_bundle.scale_tensor.memory().template device_data<void>();
-        variant_pack[bias_tensor_attr.get_uid()]
-            = tensor_bundle.bias_tensor.memory().template device_data<void>();
-        variant_pack[y_tensor_attr.get_uid()]
-            = tensor_bundle.y_tensor.memory().template device_data<void>();
+            = tensor_bundle.scale_tensor.memory().device_data();
+        variant_pack[bias_tensor_attr.get_uid()] = tensor_bundle.bias_tensor.memory().device_data();
+        variant_pack[y_tensor_attr.get_uid()] = tensor_bundle.y_tensor.memory().device_data();
 
         return variant_pack;
     }

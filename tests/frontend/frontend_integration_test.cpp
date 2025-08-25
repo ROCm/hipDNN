@@ -79,30 +79,29 @@ protected:
     {
         Simple_batchnorm_2d_tensor_bundle(const std::vector<int64_t>& dims)
             : derived_dims({1, dims[1], 1, 1})
-            , x_tensor(Tensor::make_tensor<Input_type>(dims))
-            , y_tensor(Tensor::make_tensor<Input_type>(dims))
-            , scale_tensor(Tensor::make_tensor<Intermediate_type>(derived_dims))
-            , bias_tensor(Tensor::make_tensor<Intermediate_type>(derived_dims))
-            , mean_tensor(Tensor::make_tensor<Intermediate_type>(derived_dims))
-            , variance_tensor(Tensor::make_tensor<Intermediate_type>(derived_dims))
+            , x_tensor(Tensor<Input_type>(dims))
+            , y_tensor(Tensor<Input_type>(dims))
+            , scale_tensor(Tensor<Intermediate_type>(derived_dims))
+            , bias_tensor(Tensor<Intermediate_type>(derived_dims))
+            , mean_tensor(Tensor<Intermediate_type>(derived_dims))
+            , variance_tensor(Tensor<Intermediate_type>(derived_dims))
         {
             // Initialize with simple constant values
-            x_tensor.fill_with_value<Input_type>(static_cast<Input_type>(1.0f));
-            y_tensor.fill_with_value<Input_type>(static_cast<Input_type>(0.0f));
-            scale_tensor.fill_with_value<Intermediate_type>(static_cast<Intermediate_type>(1.0f));
-            bias_tensor.fill_with_value<Intermediate_type>(static_cast<Intermediate_type>(0.0f));
-            mean_tensor.fill_with_value<Intermediate_type>(static_cast<Intermediate_type>(0.0f));
-            variance_tensor.fill_with_value<Intermediate_type>(
-                static_cast<Intermediate_type>(1.0f));
+            x_tensor.fill_with_value(static_cast<Input_type>(1.0f));
+            y_tensor.fill_with_value(static_cast<Input_type>(0.0f));
+            scale_tensor.fill_with_value(static_cast<Intermediate_type>(1.0f));
+            bias_tensor.fill_with_value(static_cast<Intermediate_type>(0.0f));
+            mean_tensor.fill_with_value(static_cast<Intermediate_type>(0.0f));
+            variance_tensor.fill_with_value(static_cast<Intermediate_type>(1.0f));
         }
 
         std::vector<int64_t> derived_dims;
-        Tensor x_tensor;
-        Tensor y_tensor;
-        Tensor scale_tensor;
-        Tensor bias_tensor;
-        Tensor mean_tensor;
-        Tensor variance_tensor;
+        Tensor<Input_type> x_tensor;
+        Tensor<Input_type> y_tensor;
+        Tensor<Intermediate_type> scale_tensor;
+        Tensor<Intermediate_type> bias_tensor;
+        Tensor<Intermediate_type> mean_tensor;
+        Tensor<Intermediate_type> variance_tensor;
     };
 
     struct Batchnorm_test_tensors
@@ -215,31 +214,25 @@ protected:
 
     static std::unordered_map<int64_t, void*>
         create_variant_pack(const Batchnorm_test_tensors& tensors,
-                            const Simple_batchnorm_2d_tensor_bundle<float, float>& tensor_bundle)
+                            Simple_batchnorm_2d_tensor_bundle<float, float>& tensor_bundle)
     {
         std::unordered_map<int64_t, void*> variant_pack;
-        variant_pack[tensors.x->get_uid()]
-            = const_cast<void*>(tensor_bundle.x_tensor.memory().template device_data<void>());
-        variant_pack[tensors.mean->get_uid()]
-            = const_cast<void*>(tensor_bundle.mean_tensor.memory().template device_data<void>());
-        variant_pack[tensors.inv_variance->get_uid()] = const_cast<void*>(
-            tensor_bundle.variance_tensor.memory().template device_data<void>());
-        variant_pack[tensors.scale->get_uid()]
-            = const_cast<void*>(tensor_bundle.scale_tensor.memory().template device_data<void>());
-        variant_pack[tensors.bias->get_uid()]
-            = const_cast<void*>(tensor_bundle.bias_tensor.memory().template device_data<void>());
-        variant_pack[tensors.y->get_uid()]
-            = const_cast<void*>(tensor_bundle.y_tensor.memory().template device_data<void>());
+        variant_pack[tensors.x->get_uid()] = tensor_bundle.x_tensor.memory().device_data();
+        variant_pack[tensors.mean->get_uid()] = tensor_bundle.mean_tensor.memory().device_data();
+        variant_pack[tensors.inv_variance->get_uid()]
+            = tensor_bundle.variance_tensor.memory().device_data();
+        variant_pack[tensors.scale->get_uid()] = tensor_bundle.scale_tensor.memory().device_data();
+        variant_pack[tensors.bias->get_uid()] = tensor_bundle.bias_tensor.memory().device_data();
+        variant_pack[tensors.y->get_uid()] = tensor_bundle.y_tensor.memory().device_data();
 
         return variant_pack;
     }
 
-    static void
-        run_graph_pipeline(const std::shared_ptr<Graph>& graph,
-                           hipdnnHandle_t handle,
-                           const Batchnorm_test_tensors& tensors,
-                           const Simple_batchnorm_2d_tensor_bundle<float, float>& tensor_bundle,
-                           FailurePoint expected_failure = FailurePoint::NONE)
+    static void run_graph_pipeline(const std::shared_ptr<Graph>& graph,
+                                   hipdnnHandle_t handle,
+                                   const Batchnorm_test_tensors& tensors,
+                                   Simple_batchnorm_2d_tensor_bundle<float, float>& tensor_bundle,
+                                   FailurePoint expected_failure = FailurePoint::NONE)
     {
         auto result = graph->validate();
         ASSERT_EQ(result.code, error_code_t::OK) << result.err_msg;
