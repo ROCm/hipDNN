@@ -22,6 +22,7 @@ protected:
     hipdnnBackendDescriptor_t _engine_config = nullptr;
     hipdnnBackendDescriptor_t _engine = nullptr;
     hipdnnBackendDescriptor_t _graph = nullptr;
+    hipdnnBackendDescriptor_t _heuristic_descriptor = nullptr;
     hipdnnHandle_t _handle = nullptr;
 
     void SetUp() override {}
@@ -41,6 +42,10 @@ protected:
         {
             EXPECT_EQ(hipdnnBackendDestroyDescriptor(_graph), HIPDNN_STATUS_SUCCESS);
         }
+        if(_heuristic_descriptor != nullptr)
+        {
+            EXPECT_EQ(hipdnnBackendDestroyDescriptor(_heuristic_descriptor), HIPDNN_STATUS_SUCCESS);
+        }
         if(_handle != nullptr)
         {
             EXPECT_EQ(hipdnnDestroy(_handle), HIPDNN_STATUS_SUCCESS);
@@ -48,6 +53,36 @@ protected:
         }
     }
 };
+
+void create_heuristic_descriptor(hipdnnBackendDescriptor_t* heuristic_descriptor,
+                                 hipdnnBackendDescriptor_t* graph,
+                                 bool finalize = false)
+{
+    EXPECT_EQ(
+        hipdnnBackendCreateDescriptor(HIPDNN_BACKEND_ENGINEHEUR_DESCRIPTOR, heuristic_descriptor),
+        HIPDNN_STATUS_SUCCESS);
+
+    EXPECT_EQ(hipdnnBackendSetAttribute(*heuristic_descriptor,
+                                        HIPDNN_ATTR_ENGINEHEUR_OPERATION_GRAPH,
+                                        HIPDNN_TYPE_BACKEND_DESCRIPTOR,
+                                        1,
+                                        graph),
+              HIPDNN_STATUS_SUCCESS);
+
+    hipdnnBackendHeurMode_t backend_modes = HIPDNN_HEUR_MODE_FALLBACK;
+
+    EXPECT_EQ(hipdnnBackendSetAttribute(*heuristic_descriptor,
+                                        HIPDNN_ATTR_ENGINEHEUR_MODE,
+                                        HIPDNN_TYPE_HEUR_MODE,
+                                        1,
+                                        &backend_modes),
+              HIPDNN_STATUS_SUCCESS);
+
+    if(finalize)
+    {
+        EXPECT_EQ(hipdnnBackendFinalize(*heuristic_descriptor), HIPDNN_STATUS_SUCCESS);
+    }
+}
 
 TEST_F(Unhappy_plugin_path_tests, EmptyPluginPath)
 {
@@ -66,31 +101,10 @@ TEST_F(Unhappy_plugin_path_tests, EmptyPluginPath)
     test_util::create_test_graph(&_graph, _handle);
     hipdnnBackendFinalize(_graph);
 
-    hipdnnBackendDescriptor_t heuristic_descriptor;
-    EXPECT_EQ(
-        hipdnnBackendCreateDescriptor(HIPDNN_BACKEND_ENGINEHEUR_DESCRIPTOR, &heuristic_descriptor),
-        HIPDNN_STATUS_SUCCESS);
-
-    EXPECT_EQ(hipdnnBackendSetAttribute(heuristic_descriptor,
-                                        HIPDNN_ATTR_ENGINEHEUR_OPERATION_GRAPH,
-                                        HIPDNN_TYPE_BACKEND_DESCRIPTOR,
-                                        1,
-                                        &_graph),
-              HIPDNN_STATUS_SUCCESS);
-
-    hipdnnBackendHeurMode_t backend_modes = HIPDNN_HEUR_MODE_FALLBACK;
-
-    EXPECT_EQ(hipdnnBackendSetAttribute(heuristic_descriptor,
-                                        HIPDNN_ATTR_ENGINEHEUR_MODE,
-                                        HIPDNN_TYPE_HEUR_MODE,
-                                        1,
-                                        &backend_modes),
-              HIPDNN_STATUS_SUCCESS);
-
-    EXPECT_EQ(hipdnnBackendFinalize(heuristic_descriptor), HIPDNN_STATUS_SUCCESS);
+    create_heuristic_descriptor(&_heuristic_descriptor, &_graph, true);
 
     int64_t available_engine_count = -1;
-    EXPECT_EQ(hipdnnBackendGetAttribute(heuristic_descriptor,
+    EXPECT_EQ(hipdnnBackendGetAttribute(_heuristic_descriptor,
                                         HIPDNN_ATTR_ENGINEHEUR_RESULTS,
                                         HIPDNN_TYPE_BACKEND_DESCRIPTOR,
                                         0,
@@ -117,31 +131,10 @@ TEST_F(Unhappy_plugin_path_tests, NoPluginsSupportGraph)
     test_util::create_test_graph(&_graph, _handle);
     hipdnnBackendFinalize(_graph);
 
-    hipdnnBackendDescriptor_t heuristic_descriptor;
-    EXPECT_EQ(
-        hipdnnBackendCreateDescriptor(HIPDNN_BACKEND_ENGINEHEUR_DESCRIPTOR, &heuristic_descriptor),
-        HIPDNN_STATUS_SUCCESS);
-
-    EXPECT_EQ(hipdnnBackendSetAttribute(heuristic_descriptor,
-                                        HIPDNN_ATTR_ENGINEHEUR_OPERATION_GRAPH,
-                                        HIPDNN_TYPE_BACKEND_DESCRIPTOR,
-                                        1,
-                                        &_graph),
-              HIPDNN_STATUS_SUCCESS);
-
-    hipdnnBackendHeurMode_t backend_modes = HIPDNN_HEUR_MODE_FALLBACK;
-
-    EXPECT_EQ(hipdnnBackendSetAttribute(heuristic_descriptor,
-                                        HIPDNN_ATTR_ENGINEHEUR_MODE,
-                                        HIPDNN_TYPE_HEUR_MODE,
-                                        1,
-                                        &backend_modes),
-              HIPDNN_STATUS_SUCCESS);
-
-    EXPECT_EQ(hipdnnBackendFinalize(heuristic_descriptor), HIPDNN_STATUS_SUCCESS);
+    create_heuristic_descriptor(&_heuristic_descriptor, &_graph, true);
 
     int64_t available_engine_count = -1;
-    EXPECT_EQ(hipdnnBackendGetAttribute(heuristic_descriptor,
+    EXPECT_EQ(hipdnnBackendGetAttribute(_heuristic_descriptor,
                                         HIPDNN_ATTR_ENGINEHEUR_RESULTS,
                                         HIPDNN_TYPE_BACKEND_DESCRIPTOR,
                                         0,
@@ -230,31 +223,10 @@ TEST_F(Unhappy_plugin_path_tests, MultiplePluginsOneApplicableEngine)
     test_util::create_test_graph(&_graph, _handle);
     hipdnnBackendFinalize(_graph);
 
-    hipdnnBackendDescriptor_t heuristic_descriptor;
-    EXPECT_EQ(
-        hipdnnBackendCreateDescriptor(HIPDNN_BACKEND_ENGINEHEUR_DESCRIPTOR, &heuristic_descriptor),
-        HIPDNN_STATUS_SUCCESS);
-
-    EXPECT_EQ(hipdnnBackendSetAttribute(heuristic_descriptor,
-                                        HIPDNN_ATTR_ENGINEHEUR_OPERATION_GRAPH,
-                                        HIPDNN_TYPE_BACKEND_DESCRIPTOR,
-                                        1,
-                                        &_graph),
-              HIPDNN_STATUS_SUCCESS);
-
-    hipdnnBackendHeurMode_t backend_modes = HIPDNN_HEUR_MODE_FALLBACK;
-
-    EXPECT_EQ(hipdnnBackendSetAttribute(heuristic_descriptor,
-                                        HIPDNN_ATTR_ENGINEHEUR_MODE,
-                                        HIPDNN_TYPE_HEUR_MODE,
-                                        1,
-                                        &backend_modes),
-              HIPDNN_STATUS_SUCCESS);
-
-    EXPECT_EQ(hipdnnBackendFinalize(heuristic_descriptor), HIPDNN_STATUS_SUCCESS);
+    create_heuristic_descriptor(&_heuristic_descriptor, &_graph, true);
 
     int64_t available_engine_count = -1;
-    EXPECT_EQ(hipdnnBackendGetAttribute(heuristic_descriptor,
+    EXPECT_EQ(hipdnnBackendGetAttribute(_heuristic_descriptor,
                                         HIPDNN_ATTR_ENGINEHEUR_RESULTS,
                                         HIPDNN_TYPE_BACKEND_DESCRIPTOR,
                                         0,
@@ -281,31 +253,10 @@ TEST_F(Unhappy_plugin_path_tests, MultiplePluginsMultipleApplicableEngines)
     test_util::create_test_graph(&_graph, _handle);
     hipdnnBackendFinalize(_graph);
 
-    hipdnnBackendDescriptor_t heuristic_descriptor;
-    EXPECT_EQ(
-        hipdnnBackendCreateDescriptor(HIPDNN_BACKEND_ENGINEHEUR_DESCRIPTOR, &heuristic_descriptor),
-        HIPDNN_STATUS_SUCCESS);
-
-    EXPECT_EQ(hipdnnBackendSetAttribute(heuristic_descriptor,
-                                        HIPDNN_ATTR_ENGINEHEUR_OPERATION_GRAPH,
-                                        HIPDNN_TYPE_BACKEND_DESCRIPTOR,
-                                        1,
-                                        &_graph),
-              HIPDNN_STATUS_SUCCESS);
-
-    hipdnnBackendHeurMode_t backend_modes = HIPDNN_HEUR_MODE_FALLBACK;
-
-    EXPECT_EQ(hipdnnBackendSetAttribute(heuristic_descriptor,
-                                        HIPDNN_ATTR_ENGINEHEUR_MODE,
-                                        HIPDNN_TYPE_HEUR_MODE,
-                                        1,
-                                        &backend_modes),
-              HIPDNN_STATUS_SUCCESS);
-
-    EXPECT_EQ(hipdnnBackendFinalize(heuristic_descriptor), HIPDNN_STATUS_SUCCESS);
+    create_heuristic_descriptor(&_heuristic_descriptor, &_graph, true);
 
     int64_t available_engine_count = -1;
-    EXPECT_EQ(hipdnnBackendGetAttribute(heuristic_descriptor,
+    EXPECT_EQ(hipdnnBackendGetAttribute(_heuristic_descriptor,
                                         HIPDNN_ATTR_ENGINEHEUR_RESULTS,
                                         HIPDNN_TYPE_BACKEND_DESCRIPTOR,
                                         0,
