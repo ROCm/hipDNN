@@ -29,8 +29,7 @@ class Cpu_fp_reference_miopen_rms_validation : public Reference_validation_inter
 {
 public:
     Cpu_fp_reference_miopen_rms_validation(T relative_tolerance = std::numeric_limits<T>::epsilon())
-        // Add explicit conversion path to ensure half & bfloat16 are converting without implicit cast.
-        : _relative_tolerance(static_cast<double>(static_cast<float>(relative_tolerance)))
+        : _relative_tolerance(static_cast<double>(relative_tolerance))
     {
         if(relative_tolerance < T{0})
         {
@@ -65,9 +64,8 @@ public:
         // Iterate through all elements to calculate square differences and find max magnitudes
         for(size_t i = 0; i < element_count; ++i)
         {
-            // Add explicit conversion path to ensure half & bfloat16 are converting without implicit cast.
-            auto ref_value = static_cast<double>(static_cast<float>(ref_data[i]));
-            auto impl_value = static_cast<double>(static_cast<float>(impl_data[i]));
+            auto ref_value = static_cast<double>(ref_data[i]);
+            auto impl_value = static_cast<double>(impl_data[i]);
 
             // Accumulate square differences
             auto diff = ref_value - impl_value;
