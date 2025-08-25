@@ -14,7 +14,7 @@
 class Execution_backend_end_api_tests : public ::testing::Test
 {
 protected:
-    static constexpr int64_t GIDX = -1; // TODO hardcode for now
+    static constexpr int64_t GIDX = hipdnn_tests::plugin_constants::engine_id<Good_plugin>();
     hipdnnBackendDescriptor_t _plan = nullptr;
     hipdnnHandle_t _handle = nullptr;
     hipdnnBackendDescriptor_t _engine_config = nullptr;
@@ -71,7 +71,7 @@ TEST_F(Execution_backend_end_api_tests, TestBackendExecuteWithNullHandle)
 
     test_util::create_and_initialize_backend_descriptor(
         &_graph_descriptor, serialized_graph, _handle);
-    test_util::create_test_engine(&_engine, &_graph_descriptor, _handle, GIDX);
+    test_util::create_test_engine(&_engine, &_graph_descriptor, _handle, GIDX, true);
     test_util::create_test_engine_config(
         &_engine_config, &_engine, &_graph_descriptor, _handle, GIDX, true);
 
@@ -92,7 +92,7 @@ TEST_F(Execution_backend_end_api_tests, TestBackendExecuteWithNullDescriptors)
 
     test_util::create_and_initialize_backend_descriptor(
         &_graph_descriptor, serialized_graph, _handle);
-    test_util::create_test_engine(&_engine, &_graph_descriptor, _handle, GIDX);
+    test_util::create_test_engine(&_engine, &_graph_descriptor, _handle, GIDX, true);
     test_util::create_test_engine_config(
         &_engine_config, &_engine, &_graph_descriptor, _handle, GIDX, true);
 
@@ -137,7 +137,7 @@ TEST_F(Execution_backend_end_api_tests, TestBackendExecuteWithWrongDescriptorTyp
 
     test_util::create_and_initialize_backend_descriptor(
         &_graph_descriptor, serialized_graph, _handle);
-    test_util::create_test_engine(&_engine, &_graph_descriptor, _handle, GIDX);
+    test_util::create_test_engine(&_engine, &_graph_descriptor, _handle, GIDX, true);
 
     ASSERT_EQ(hipdnnBackendCreateDescriptor(HIPDNN_BACKEND_VARIANT_PACK_DESCRIPTOR, &_variant_pack),
               HIPDNN_STATUS_SUCCESS);
@@ -166,7 +166,7 @@ TEST_F(Execution_backend_end_api_tests, TestBackendExecute)
 
     test_util::create_and_initialize_backend_descriptor(
         &_graph_descriptor, serialized_graph, _handle);
-    test_util::create_test_engine(&_engine, &_graph_descriptor, _handle, GIDX);
+    test_util::create_test_engine(&_engine, &_graph_descriptor, _handle, GIDX, true);
     test_util::create_test_engine_config(
         &_engine_config, &_engine, &_graph_descriptor, _handle, GIDX, true);
 
