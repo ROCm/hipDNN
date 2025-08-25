@@ -45,7 +45,9 @@ void Sample_runner::operator()(const Tensor_layout& layout)
     auto prev_running_var = create_tensor({1, C, 1, 1}, intermediate_type);
     auto momentum = create_tensor({1, 1, 1, 1}, intermediate_type);
     auto epsilon = create_tensor({1, 1, 1, 1}, intermediate_type);
+
     auto bn_attributes = graph::Batchnorm_attributes();
+    bn_attributes.set_name("bn_training_node");
     bn_attributes.set_previous_running_stats(prev_running_mean, prev_running_var, momentum)
         .set_epsilon(epsilon);
 

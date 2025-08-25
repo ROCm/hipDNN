@@ -402,6 +402,11 @@ public:
                   std::shared_ptr<Tensor_attributes> bias,
                   Batchnorm_attributes attributes)
     {
+        if(attributes.name.empty())
+        {
+            attributes.name = "Batchnorm_" + std::to_string(_sub_nodes.size());
+        }
+
         auto y = output_tensor(attributes.name + "::Y");
         auto mean_out = output_tensor(attributes.name + "::MEAN");
         auto inv_variance_out = output_tensor(attributes.name + "::INV_VARIANCE");
@@ -439,6 +444,11 @@ public:
                            std::shared_ptr<Tensor_attributes> scale,
                            Batchnorm_backward_attributes attributes)
     {
+        if(attributes.name.empty())
+        {
+            attributes.name = "BatchnormBackward_" + std::to_string(_sub_nodes.size());
+        }
+
         auto dx = output_tensor(attributes.name + "::DX");
         attributes.set_dx(dx);
 
@@ -466,6 +476,11 @@ public:
                             std::shared_ptr<Tensor_attributes> bias,
                             Batchnorm_inference_attributes attributes)
     {
+        if(attributes.name.empty())
+        {
+            attributes.name = "BatchnormInference_" + std::to_string(_sub_nodes.size());
+        }
+
         auto y = attributes.outputs[Batchnorm_inference_attributes::output_names::y]
             = output_tensor(attributes.name + "::Y");
         attributes.inputs[Batchnorm_inference_attributes::input_names::x] = std::move(x);
