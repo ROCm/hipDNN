@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 #include "test_plugin_common.hpp"
-
+#include "test_plugin_engine_id_map.hpp"
 // NOLINTNEXTLINE(modernize-avoid-c-arrays)
 thread_local char
     hipdnn_plugin::Plugin_last_error_manager::last_error[HIPDNN_PLUGIN_ERROR_STRING_MAX_LENGTH]
@@ -21,7 +21,7 @@ public:
     }
     int64_t get_engine_id() const override
     {
-        return -2;
+        return hipdnn_tests::plugin_constants::engine_id<Execute_fails_plugin>();
     }
     uint32_t get_num_engines() const override
     {

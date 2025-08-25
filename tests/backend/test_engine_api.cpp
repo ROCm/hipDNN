@@ -2,6 +2,7 @@
 // SPDX-License-Identifier:  MIT
 
 #include "hipdnn_backend.h"
+#include "test_plugins/test_plugin_engine_id_map.hpp"
 #include "test_util.hpp"
 #include <test_plugins/test_plugin_constants.hpp>
 
@@ -64,7 +65,7 @@ TEST_F(Engine_api_tests, SetEngineGraph)
 
 TEST_F(Engine_api_tests, SetEngineGlobalIndex)
 {
-    int64_t gidx = HIPDNN_TEST_PLUGIN_ID;
+    int64_t gidx = hipdnn_tests::plugin_constants::engine_id<Good_plugin>();
 
     EXPECT_EQ(hipdnnBackendSetAttribute(
                   _engine, HIPDNN_ATTR_ENGINE_GLOBAL_INDEX, HIPDNN_TYPE_INT64, 1, nullptr),
@@ -84,7 +85,7 @@ TEST_F(Engine_api_tests, SetEngineAttrNotSupported)
 
 TEST_F(Engine_api_tests, SetEngineAttrAlreadyFinalized)
 {
-    int64_t gidx = HIPDNN_TEST_PLUGIN_ID;
+    int64_t gidx = hipdnn_tests::plugin_constants::engine_id<Good_plugin>();
 
     test_util::populate_test_engine(_engine, &_graph, _handle, gidx, true);
     EXPECT_EQ(hipdnnBackendSetAttribute(
@@ -94,7 +95,7 @@ TEST_F(Engine_api_tests, SetEngineAttrAlreadyFinalized)
 
 TEST_F(Engine_api_tests, FinalizeEngine)
 {
-    int64_t gidx = HIPDNN_TEST_PLUGIN_ID;
+    int64_t gidx = hipdnn_tests::plugin_constants::engine_id<Good_plugin>();
 
     EXPECT_EQ(hipdnnBackendFinalize(_engine), HIPDNN_STATUS_BAD_PARAM);
     test_util::populate_test_engine(_engine, &_graph, _handle, gidx);
@@ -104,7 +105,7 @@ TEST_F(Engine_api_tests, FinalizeEngine)
 TEST_F(Engine_api_tests, GetEngineGraph)
 {
     hipdnnBackendDescriptor_t graph = nullptr;
-    int64_t gidx = HIPDNN_TEST_PLUGIN_ID;
+    int64_t gidx = hipdnn_tests::plugin_constants::engine_id<Good_plugin>();
 
     test_util::populate_test_engine(_engine, &_graph, _handle, gidx, true);
     EXPECT_EQ(hipdnnBackendGetAttribute(_engine,
@@ -121,7 +122,7 @@ TEST_F(Engine_api_tests, GetEngineGraph)
 
 TEST_F(Engine_api_tests, GetEngineGlobalIndex)
 {
-    int64_t gidx = HIPDNN_TEST_PLUGIN_ID;
+    int64_t gidx = hipdnn_tests::plugin_constants::engine_id<Good_plugin>();
     int64_t gidx_out;
 
     test_util::populate_test_engine(_engine, &_graph, _handle, gidx, true);
