@@ -66,11 +66,11 @@ void Execution_plan_descriptor::get_attribute(hipdnnBackendAttributeName_t attri
     case HIPDNN_ATTR_EXECUTION_PLAN_KERNEL_CACHE:
     case HIPDNN_ATTR_EXECUTION_PLAN_DEVICEPROP:
     default:
-        throw Hipdnn_exception(
+        throw HipdnnException(
             HIPDNN_STATUS_NOT_SUPPORTED,
             std::string(
                 "Execution_plan_descriptor::get_attribute() is not supported for attribute ")
-                + hipdnn_backend::hipdnn_get_attribute_name_string(attribute_name) + ".");
+                + hipdnn_backend::hipdnnGetAttributeNameString(attribute_name) + ".");
     }
 }
 
@@ -115,11 +115,11 @@ void Execution_plan_descriptor::set_attribute(hipdnnBackendAttributeName_t attri
     case HIPDNN_ATTR_EXECUTION_PLAN_KERNEL_CACHE:
     case HIPDNN_ATTR_EXECUTION_PLAN_DEVICEPROP:
     default:
-        throw Hipdnn_exception(
+        throw HipdnnException(
             HIPDNN_STATUS_NOT_SUPPORTED,
             std::string(
                 "Execution_plan_descriptor::set_attribute() is not supported for attribute ")
-                + hipdnn_backend::hipdnn_get_attribute_name_string(attribute_name) + ".");
+                + hipdnn_backend::hipdnnGetAttributeNameString(attribute_name) + ".");
     }
 }
 

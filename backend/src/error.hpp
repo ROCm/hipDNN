@@ -17,7 +17,7 @@ namespace hipdnn_backend
 // TODO replace with using the define from a common SDK header.
 static const size_t HIPDNN_MAX_ERROR_STRING_SIZE = 256;
 
-inline const char* hipdnn_get_status_string(hipdnnStatus_t status)
+inline const char* hipdnnGetStatusString(hipdnnStatus_t status)
 {
     switch(status)
     {
@@ -54,7 +54,7 @@ inline const char* hipdnn_get_status_string(hipdnnStatus_t status)
     }
 }
 
-inline const char* hipdnn_get_attribute_type_string(hipdnnBackendAttributeType_t type)
+inline const char* hipdnnGetAttributeTypeString(hipdnnBackendAttributeType_t type)
 {
     switch(type)
     {
@@ -111,7 +111,7 @@ inline const char* hipdnn_get_attribute_type_string(hipdnnBackendAttributeType_t
     }
 }
 
-inline const char* hipdnn_get_backend_descriptor_type_name(hipdnnBackendDescriptorType_t type)
+inline const char* hipdnnGetBackendDescriptorTypeName(hipdnnBackendDescriptorType_t type)
 {
     switch(type)
     {
@@ -146,7 +146,7 @@ inline const char* hipdnn_get_backend_descriptor_type_name(hipdnnBackendDescript
     }
 }
 
-inline const char* hipdnn_get_attribute_name_string(hipdnnBackendAttributeName_t attr)
+inline const char* hipdnnGetAttributeNameString(hipdnnBackendAttributeName_t attr)
 {
     switch(attr)
     {
@@ -264,7 +264,7 @@ inline const char* hipdnn_get_attribute_name_string(hipdnnBackendAttributeName_t
     }
 }
 
-inline const char* hipdnn_get_plugin_loading_mode_string(hipdnnPluginLoadingMode_ext_t mode)
+inline const char* hipdnnGetPluginLoadingModeString(hipdnnPluginLoadingMode_ext_t mode)
 {
     switch(mode)
     {
@@ -277,18 +277,18 @@ inline const char* hipdnn_get_plugin_loading_mode_string(hipdnnPluginLoadingMode
     }
 }
 
-class Last_error_manager
+class LastErrorManager
 {
 private:
     // We cannot use std::string in thread-local storage here because it requires a thread-local storage destructor.
     // This prevents the shared object (plugin) from being unloaded until the program terminates.
     // NOLINTNEXTLINE(modernize-avoid-c-arrays)
-    thread_local static char last_error[HIPDNN_MAX_ERROR_STRING_SIZE];
+    thread_local static char lastError[HIPDNN_MAX_ERROR_STRING_SIZE];
 
 public:
-    static hipdnnStatus_t set_last_error(hipdnnStatus_t status, const char* message);
-    static hipdnnStatus_t set_last_error(hipdnnStatus_t status, const std::string& message);
-    static const char* get_last_error();
+    static hipdnnStatus_t setLastError(hipdnnStatus_t status, const char* message);
+    static hipdnnStatus_t setLastError(hipdnnStatus_t status, const std::string& message);
+    static const char* getLastError();
 };
 
 } // namespace hipdnn_backend

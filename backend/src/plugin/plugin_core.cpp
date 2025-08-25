@@ -46,7 +46,7 @@ void Plugin_base::resolve_symbols()
         _func_set_logging_callback
             = _lib.get_symbol<decltype(_func_set_logging_callback)>(func_name_set_logging_callback);
     }
-    catch(const Hipdnn_exception&)
+    catch(const HipdnnException&)
     {
         _func_set_logging_callback = nullptr;
 

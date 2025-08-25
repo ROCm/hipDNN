@@ -31,7 +31,7 @@ private:
         {
             if(_engine_ids.contains(id))
             {
-                throw Hipdnn_exception(HIPDNN_STATUS_PLUGIN_ERROR,
+                throw HipdnnException(HIPDNN_STATUS_PLUGIN_ERROR,
                                        "Engine ID " + std::to_string(id)
                                            + " already exists in the list");
             }

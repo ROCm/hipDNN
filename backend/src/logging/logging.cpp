@@ -25,8 +25,8 @@ namespace
 
 // Could refactor this to a class with a single static instance.
 // The benefit would be a destructor to cleanup logging.
-std::mutex s_logging_init_mutex;
-bool s_logging_initialized = false;
+std::mutex s_loggingInitMutex;
+bool s_loggingInitialized = false;
 const std::string S_BACKEND_LOGGER_NAME = "hipdnn_backend";
 const std::string S_CALLBACK_RECEIVER_LOGGER_NAME = "hipdnn_callback_receiver";
 
@@ -36,19 +36,19 @@ void initialize()
 {
     try
     {
-        std::lock_guard<std::mutex> lock(s_logging_init_mutex);
-        if(s_logging_initialized)
+        std::lock_guard<std::mutex> lock(s_loggingInitMutex);
+        if(s_loggingInitialized)
         {
             return;
         }
 
-        std::string log_level = hipdnn_sdk::utilities::get_env("HIPDNN_LOG_LEVEL", "off");
-        std::string log_file_path = hipdnn_sdk::utilities::get_env("HIPDNN_LOG_FILE");
+        std::string logLevel = hipdnn_sdk::utilities::get_env("HIPDNN_LOG_LEVEL", "off");
+        std::string logFilePath = hipdnn_sdk::utilities::get_env("HIPDNN_LOG_FILE");
 
-        // It doesn't need to return if log_level == off, but it avoids unnecessary initialization
-        if(log_level == "off")
+        // It doesn't need to return if logLevel == off, but it avoids unnecessary initialization
+        if(logLevel == "off")
         {
-            s_logging_initialized = true;
+            s_loggingInitialized = true;
             return;
         }
 
@@ -57,32 +57,32 @@ void initialize()
             spdlog::init_thread_pool(8192, 1);
         }
 
-        std::shared_ptr<spdlog::sinks::sink> shared_sink;
-        if(!log_file_path.empty())
+        std::shared_ptr<spdlog::sinks::sink> sharedSink;
+        if(!logFilePath.empty())
         {
-            shared_sink = std::make_shared<spdlog::sinks::basic_file_sink_mt>(log_file_path, false);
+            sharedSink = std::make_shared<spdlog::sinks::basic_file_sink_mt>(logFilePath, false);
         }
         else
         {
-            shared_sink = std::make_shared<spdlog::sinks::stderr_color_sink_mt>();
+            sharedSink = std::make_shared<spdlog::sinks::stderr_color_sink_mt>();
         }
 
-        auto backend_logger = std::make_shared<spdlog::async_logger>(
-            S_BACKEND_LOGGER_NAME, shared_sink, spdlog::thread_pool());
+        auto backendLogger = std::make_shared<spdlog::async_logger>(
+            S_BACKEND_LOGGER_NAME, sharedSink, spdlog::thread_pool());
 
         // In spdlog, the formatting is a property of the underlying sink, not the logger.
         // However, we need one destination sink for thread safety because the mutex is attached to the sink.
         // Therefore, we implement a custom formatter to have distinct formatting for the backend, which does not use a callback sink.
-        backend_logger->set_formatter(std::make_unique<hipdnn::logging::Component_formatter>());
-        spdlog::register_logger(backend_logger);
+        backendLogger->set_formatter(std::make_unique<hipdnn::logging::Component_formatter>());
+        spdlog::register_logger(backendLogger);
 
-        auto callback_receiver_logger = std::make_shared<spdlog::async_logger>(
-            S_CALLBACK_RECEIVER_LOGGER_NAME, shared_sink, spdlog::thread_pool());
-        spdlog::register_logger(callback_receiver_logger);
+        auto callbackReceiverLogger = std::make_shared<spdlog::async_logger>(
+            S_CALLBACK_RECEIVER_LOGGER_NAME, sharedSink, spdlog::thread_pool());
+        spdlog::register_logger(callbackReceiverLogger);
 
-        set_log_level(log_level);
+        setLogLevel(logLevel);
 
-        s_logging_initialized = true;
+        s_loggingInitialized = true;
 
         return;
     }
@@ -95,12 +95,12 @@ void initialize()
 
 void cleanup()
 {
-    std::lock_guard<std::mutex> lock(s_logging_init_mutex);
+    std::lock_guard<std::mutex> lock(s_loggingInitMutex);
     spdlog::shutdown();
-    s_logging_initialized = false;
+    s_loggingInitialized = false;
 }
 
-void set_log_level(const std::string& level)
+void setLogLevel(const std::string& level)
 {
     if(level == "off")
     {
@@ -124,21 +124,21 @@ void set_log_level(const std::string& level)
     }
 }
 
-std::shared_ptr<spdlog::logger> get_callback_receiver_logger()
+std::shared_ptr<spdlog::logger> getCallbackReceiverLogger()
 {
     return spdlog::get(S_CALLBACK_RECEIVER_LOGGER_NAME);
 }
 
-std::shared_ptr<spdlog::logger> get_backend_logger()
+std::shared_ptr<spdlog::logger> getBackendLogger()
 {
     return spdlog::get(S_BACKEND_LOGGER_NAME);
 }
 
-void hipdnn_logging_callback(hipdnnSeverity_t severity, const char* msg)
+void hipdnnLoggingCallback(hipdnnSeverity_t severity, const char* msg)
 {
     initialize();
 
-    if(auto logger = get_callback_receiver_logger())
+    if(auto logger = getCallbackReceiverLogger())
     {
         switch(severity)
         {

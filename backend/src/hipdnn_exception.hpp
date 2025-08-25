@@ -10,10 +10,10 @@
 namespace hipdnn_backend
 {
 
-class Hipdnn_exception : public std::exception
+class HipdnnException : public std::exception
 {
 public:
-    explicit Hipdnn_exception(hipdnnStatus_t status, std::string message)
+    explicit HipdnnException(hipdnnStatus_t status, std::string message)
         : _status(status)
         , _message(std::move(message))
     {
@@ -24,12 +24,12 @@ public:
         return _message.c_str();
     }
 
-    std::string get_message() const noexcept
+    std::string getMessage() const noexcept
     {
         return _message;
     }
 
-    hipdnnStatus_t get_status() const noexcept
+    hipdnnStatus_t getStatus() const noexcept
     {
         return _status;
     }
@@ -42,37 +42,37 @@ private:
 #define THROW_IF_NE(x, y, failure_status, message)                       \
     if(x != y)                                                           \
     {                                                                    \
-        throw hipdnn_backend::Hipdnn_exception(failure_status, message); \
+        throw hipdnn_backend::HipdnnException(failure_status, message); \
     }
 
 #define THROW_IF_EQ(x, y, failure_status, message)                       \
     if(x == y)                                                           \
     {                                                                    \
-        throw hipdnn_backend::Hipdnn_exception(failure_status, message); \
+        throw hipdnn_backend::HipdnnException(failure_status, message); \
     }
 
 #define THROW_IF_TRUE(x, failure_status, message)                        \
     if(x)                                                                \
     {                                                                    \
-        throw hipdnn_backend::Hipdnn_exception(failure_status, message); \
+        throw hipdnn_backend::HipdnnException(failure_status, message); \
     }
 
 #define THROW_IF_FALSE(x, failure_status, message)                       \
     if(!(x))                                                             \
     {                                                                    \
-        throw hipdnn_backend::Hipdnn_exception(failure_status, message); \
+        throw hipdnn_backend::HipdnnException(failure_status, message); \
     }
 
 #define THROW_IF_NULL(x, failure_status, message)                        \
     if(x == nullptr)                                                     \
     {                                                                    \
-        throw hipdnn_backend::Hipdnn_exception(failure_status, message); \
+        throw hipdnn_backend::HipdnnException(failure_status, message); \
     }
 
 #define THROW_IF_LT(x, y, failure_status, message)                       \
     if(x < y)                                                            \
     {                                                                    \
-        throw hipdnn_backend::Hipdnn_exception(failure_status, message); \
+        throw hipdnn_backend::HipdnnException(failure_status, message); \
     }
 
 } // namespace hipdnn_backend

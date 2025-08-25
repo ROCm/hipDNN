@@ -14,7 +14,7 @@
 namespace hipdnn_backend::platform_utils
 {
 
-typedef HMODULE Plugin_lib_handle;
+typedef HMODULE PluginLibHandle;
 
 }
 
@@ -23,7 +23,7 @@ typedef HMODULE Plugin_lib_handle;
 namespace hipdnn_backend::platform_utils
 {
 
-typedef void* Plugin_lib_handle;
+typedef void* PluginLibHandle;
 
 }
 
@@ -36,10 +36,10 @@ typedef void* Plugin_lib_handle;
 namespace hipdnn_backend::platform_utils
 {
 
-std::filesystem::path get_current_module_directory();
+std::filesystem::path getCurrentModuleDirectory();
 
-Plugin_lib_handle open_library(const std::filesystem::path& library_path);
-void close_library(Plugin_lib_handle handle);
-void* get_symbol(Plugin_lib_handle handle, const char* symbol_name);
+PluginLibHandle openLibrary(const std::filesystem::path& libraryPath);
+void closeLibrary(PluginLibHandle handle);
+void* getSymbol(PluginLibHandle handle, const char* symbolName);
 
 }

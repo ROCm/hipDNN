@@ -93,7 +93,7 @@ void Engine_plugin_resource_manager::get_loaded_plugin_files(size_t* num_plugins
 
     if(*num_plugins < path_set.size() || *max_string_len < required_len)
     {
-        throw Hipdnn_exception(HIPDNN_STATUS_BAD_PARAM, "Insufficient buffer space provided.");
+        throw HipdnnException(HIPDNN_STATUS_BAD_PARAM, "Insufficient buffer space provided.");
     }
 
     std::vector<std::string> paths_vec;
@@ -104,7 +104,7 @@ void Engine_plugin_resource_manager::get_loaded_plugin_files(size_t* num_plugins
     {
         if(plugin_paths[i] == nullptr)
         {
-            throw Hipdnn_exception(HIPDNN_STATUS_BAD_PARAM, "A plugin path string buffer is null.");
+            throw HipdnnException(HIPDNN_STATUS_BAD_PARAM, "A plugin path string buffer is null.");
         }
         hipdnn::sdk::utilities::copy_max_size_with_null_terminator(
             plugin_paths[i], paths_vec[i].c_str(), *max_string_len);
@@ -149,7 +149,7 @@ Engine_plugin_resource_manager::Engine_plugin_resource_manager(
 
         if(_handle_to_plugin.contains(handle))
         {
-            throw Hipdnn_exception(HIPDNN_STATUS_PLUGIN_ERROR, "Plugin handle already exists");
+            throw HipdnnException(HIPDNN_STATUS_PLUGIN_ERROR, "Plugin handle already exists");
         }
 
         _handle_to_plugin[handle] = plugin.get();
@@ -171,9 +171,9 @@ Engine_plugin_resource_manager::~Engine_plugin_resource_manager()
         {
             plugin->destroy_handle(handle);
         }
-        catch(const Hipdnn_exception& e)
+        catch(const HipdnnException& e)
         {
-            HIPDNN_LOG_ERROR(e.get_message());
+            HIPDNN_LOG_ERROR(e.getMessage());
         }
     }
 }
@@ -224,13 +224,13 @@ std::vector<int64_t> Engine_plugin_resource_manager::get_applicable_engine_ids(
         {
             if(!_engine_id_to_handle.contains(id))
             {
-                throw Hipdnn_exception(HIPDNN_STATUS_PLUGIN_ERROR, "Unknown engine ID");
+                throw HipdnnException(HIPDNN_STATUS_PLUGIN_ERROR, "Unknown engine ID");
             }
 
             auto existing_handle = _engine_id_to_handle.at(id);
             if(existing_handle != handle)
             {
-                throw Hipdnn_exception(HIPDNN_STATUS_PLUGIN_ERROR,
+                throw HipdnnException(HIPDNN_STATUS_PLUGIN_ERROR,
                                        "Engine ID " + std::to_string(id)
                                            + " is already associated with a different plugin");
             }
@@ -251,7 +251,7 @@ void Engine_plugin_resource_manager::get_engine_details(
     auto it = _engine_id_to_handle.find(engine_id);
     if(it == _engine_id_to_handle.end())
     {
-        throw Hipdnn_exception(HIPDNN_STATUS_INTERNAL_ERROR,
+        throw HipdnnException(HIPDNN_STATUS_INTERNAL_ERROR,
                                "Invalid engine ID: " + std::to_string(engine_id));
     }
 
@@ -264,7 +264,7 @@ void Engine_plugin_resource_manager::get_engine_details(
 
     if(engine_details->ptr == nullptr || engine_details->size == 0)
     {
-        throw Hipdnn_exception(HIPDNN_STATUS_PLUGIN_ERROR,
+        throw HipdnnException(HIPDNN_STATUS_PLUGIN_ERROR,
                                "Engine details for engine ID " + std::to_string(engine_id)
                                    + " are empty or null");
     }
@@ -298,7 +298,7 @@ size_t
     auto it = _engine_id_to_handle.find(engine_id);
     if(it == _engine_id_to_handle.end())
     {
-        throw Hipdnn_exception(HIPDNN_STATUS_INTERNAL_ERROR,
+        throw HipdnnException(HIPDNN_STATUS_INTERNAL_ERROR,
                                "Invalid engine ID: " + std::to_string(engine_id));
     }
 
@@ -323,7 +323,7 @@ hipdnnEnginePluginExecutionContext_t Engine_plugin_resource_manager::create_exec
     auto it = _engine_id_to_handle.find(engine_id);
     if(it == _engine_id_to_handle.end())
     {
-        throw Hipdnn_exception(HIPDNN_STATUS_INTERNAL_ERROR,
+        throw HipdnnException(HIPDNN_STATUS_INTERNAL_ERROR,
                                "Invalid engine ID: " + std::to_string(engine_id));
     }
 
@@ -427,7 +427,7 @@ Engine_details_wrapper::Engine_details_wrapper(
                                    _engine_details_data.size);
     if(!verifier.VerifyBuffer<hipdnn_sdk::data_objects::EngineDetails>())
     {
-        throw Hipdnn_exception(HIPDNN_STATUS_BAD_PARAM,
+        throw HipdnnException(HIPDNN_STATUS_BAD_PARAM,
                                "Engine_details_wrapper: unable to verify the flatbuffer schema.");
     }
 }
@@ -443,9 +443,9 @@ Engine_details_wrapper::~Engine_details_wrapper()
     {
         _rm->destroy_engine_details(get()->engine_id(), &_engine_details_data);
     }
-    catch(const Hipdnn_exception& e)
+    catch(const HipdnnException& e)
     {
-        HIPDNN_LOG_ERROR(e.get_message());
+        HIPDNN_LOG_ERROR(e.getMessage());
     }
 }
 
@@ -474,7 +474,7 @@ const hipdnn_sdk::data_objects::EngineDetails* Engine_details_wrapper::get() con
 {
     if(_engine_details_data.ptr == nullptr)
     {
-        throw Hipdnn_exception(HIPDNN_STATUS_INTERNAL_ERROR,
+        throw HipdnnException(HIPDNN_STATUS_INTERNAL_ERROR,
                                "Engine_details_wrapper: wrong usage: "
                                "get() called on an empty object");
     }
@@ -505,9 +505,9 @@ Engine_execution_context_wrapper::~Engine_execution_context_wrapper()
     {
         _rm->destroy_execution_context(_engine_id, _execution_context);
     }
-    catch(const Hipdnn_exception& e)
+    catch(const HipdnnException& e)
     {
-        HIPDNN_LOG_ERROR(e.get_message());
+        HIPDNN_LOG_ERROR(e.getMessage());
     }
 }
 
@@ -540,7 +540,7 @@ hipdnnEnginePluginExecutionContext_t Engine_execution_context_wrapper::get() con
 {
     if(_execution_context == nullptr)
     {
-        throw Hipdnn_exception(HIPDNN_STATUS_INTERNAL_ERROR,
+        throw HipdnnException(HIPDNN_STATUS_INTERNAL_ERROR,
                                "Engine_execution_context_wrapper: wrong usage: "
                                "get() called on an empty object");
     }

@@ -65,7 +65,7 @@ protected:
         auto status = func(std::forward<Args>(args)...);
         if(status != HIPDNN_PLUGIN_STATUS_SUCCESS)
         {
-            throw Hipdnn_exception(HIPDNN_STATUS_PLUGIN_ERROR,
+            throw HipdnnException(HIPDNN_STATUS_PLUGIN_ERROR,
                                    std::string("Failed to ") + description + ". Status: "
                                        + to_string(status) + "(" + std::to_string(status) + ")"
                                        + ", Error: " + std::string(get_last_error_string()));
@@ -106,13 +106,13 @@ protected:
         std::filesystem::path base_dir;
         try
         {
-            base_dir = hipdnn_backend::platform_utils::get_current_module_directory();
+            base_dir = hipdnn_backend::platform_utils::getCurrentModuleDirectory();
         }
-        catch(const Hipdnn_exception& e)
+        catch(const HipdnnException& e)
         {
             HIPDNN_LOG_WARN(
                 "Failed to resolve module directory, will use unresolved default paths: {}",
-                e.get_message());
+                e.getMessage());
             // Fallback to using original, unresolved paths. TODO: possibly remove.
             return _default_plugin_paths;
         }
@@ -265,13 +265,13 @@ private:
             // For now only use engine or unspecified plugin types
             if(type != Plugin::get_plugin_type())
             {
-                throw Hipdnn_exception(HIPDNN_STATUS_PLUGIN_ERROR,
+                throw HipdnnException(HIPDNN_STATUS_PLUGIN_ERROR,
                                        std::string("Plugin type mismatch: expected ")
                                            + to_string(Plugin::get_plugin_type()) + ", got "
                                            + to_string(type));
             }
 
-            plugin->set_logging_callback(logging::hipdnn_logging_callback);
+            plugin->set_logging_callback(logging::hipdnnLoggingCallback);
 
             validate_before_adding(*plugin);
 
@@ -287,10 +287,10 @@ private:
 
             action_after_adding(*_plugins.back());
         }
-        catch(const Hipdnn_exception& e)
+        catch(const HipdnnException& e)
         {
             HIPDNN_LOG_WARN(
-                "Error loading plugin from [{}]: {}", file_path.string(), e.get_message());
+                "Error loading plugin from [{}]: {}", file_path.string(), e.getMessage());
         }
     }
 

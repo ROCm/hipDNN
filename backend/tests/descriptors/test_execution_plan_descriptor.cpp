@@ -245,7 +245,7 @@ TEST_F(Execution_plan_descriptor_test, FinalizeExecutionPlanDescriptor)
 
     ASSERT_NO_THROW(plan->finalize());
 
-    ASSERT_THROW(plan->finalize(), hipdnn_backend::Hipdnn_exception);
+    ASSERT_THROW(plan->finalize(), hipdnn_backend::HipdnnException);
 }
 
 TEST_F(Execution_plan_descriptor_test, GetAttrOnUnfinalizedExecutionPlanDescriptor)

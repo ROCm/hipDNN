@@ -62,11 +62,11 @@ void Engine_heuristic_descriptor::get_attribute(hipdnnBackendAttributeName_t att
             attribute_type, requested_element_count, element_count, array_of_elements);
         break;
     default:
-        throw Hipdnn_exception(
+        throw HipdnnException(
             HIPDNN_STATUS_NOT_SUPPORTED,
             std::string(
                 "Engine_heuristic_descriptor::get_attribute() is not supported for attribute ")
-                + hipdnn_backend::hipdnn_get_attribute_name_string(attribute_name) + ".");
+                + hipdnn_backend::hipdnnGetAttributeNameString(attribute_name) + ".");
     }
 }
 
@@ -88,11 +88,11 @@ void Engine_heuristic_descriptor::set_attribute(hipdnnBackendAttributeName_t att
         set_graph(attribute_type, element_count, array_of_elements);
         break;
     default:
-        throw Hipdnn_exception(
+        throw HipdnnException(
             HIPDNN_STATUS_NOT_SUPPORTED,
             std::string(
                 "Engine_heuristic_descriptor::set_attribute() is not supported for attribute ")
-                + hipdnn_backend::hipdnn_get_attribute_name_string(attribute_name) + ".");
+                + hipdnn_backend::hipdnnGetAttributeNameString(attribute_name) + ".");
     }
 }
 
@@ -124,7 +124,7 @@ void Engine_heuristic_descriptor::set_heuristic_mode(hipdnnBackendAttributeType_
     auto heur_mode_value = *heur_mode;
     if(heur_mode_value != HIPDNN_HEUR_MODE_FALLBACK)
     {
-        throw Hipdnn_exception(HIPDNN_STATUS_NOT_SUPPORTED,
+        throw HipdnnException(HIPDNN_STATUS_NOT_SUPPORTED,
                                "Engine_heuristic_descriptor::set_heuristic_mode() is not "
                                "supported for the given heuristic mode.");
     }

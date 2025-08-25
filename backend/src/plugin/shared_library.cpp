@@ -55,7 +55,7 @@ void Shared_library::load(const std::filesystem::path& library_path)
 {
     if(_library_handle != nullptr)
     {
-        throw Hipdnn_exception(HIPDNN_STATUS_INTERNAL_ERROR, "Library is already loaded.");
+        throw HipdnnException(HIPDNN_STATUS_INTERNAL_ERROR, "Library is already loaded.");
     }
 
     auto modified_library_path = library_path;
@@ -65,7 +65,7 @@ void Shared_library::load(const std::filesystem::path& library_path)
     {
         if(modified_library_path.extension() != hipdnn_sdk::utilities::SHARED_LIB_EXT)
         {
-            throw Hipdnn_exception(HIPDNN_STATUS_BAD_PARAM,
+            throw HipdnnException(HIPDNN_STATUS_BAD_PARAM,
                                    std::string("Invalid file extension. Expected ")
                                        + hipdnn_sdk::utilities::SHARED_LIB_EXT);
         }
@@ -82,7 +82,7 @@ void Shared_library::load(const std::filesystem::path& library_path)
     // Needs to be a resolved, weakly canonical path at this point
     if(!std::filesystem::exists(_library_path))
     {
-        throw Hipdnn_exception(HIPDNN_STATUS_PLUGIN_ERROR,
+        throw HipdnnException(HIPDNN_STATUS_PLUGIN_ERROR,
                                "Shared libary: plugin file does not exist: "
                                    + _library_path.string());
     }
@@ -91,14 +91,14 @@ void Shared_library::load(const std::filesystem::path& library_path)
         "Shared_library: Attempting to load shared library from final absolute path: {}",
         _library_path.string());
 
-    _library_handle = platform_utils::open_library(_library_path);
+    _library_handle = platform_utils::openLibrary(_library_path);
 }
 
 void Shared_library::unload() noexcept
 {
     if(_library_handle != nullptr)
     {
-        platform_utils::close_library(_library_handle);
+        platform_utils::closeLibrary(_library_handle);
         _library_handle = nullptr;
     }
 }
@@ -107,12 +107,12 @@ void* Shared_library::get_symbol(std::string_view symbol_name) const
 {
     if(_library_handle == nullptr)
     {
-        throw Hipdnn_exception(HIPDNN_STATUS_INTERNAL_ERROR,
+        throw HipdnnException(HIPDNN_STATUS_INTERNAL_ERROR,
                                "Library is not loaded. Cannot get symbol: "
                                    + std::string(symbol_name));
     }
 
-    return platform_utils::get_symbol(_library_handle, symbol_name.data());
+    return platform_utils::getSymbol(_library_handle, symbol_name.data());
 }
 
 const std::filesystem::path& Shared_library::library_path() const

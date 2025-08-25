@@ -87,7 +87,7 @@ void Variant_descriptor::get_attribute(hipdnnBackendAttributeName_t attribute_na
         break;
 
     default:
-        throw Hipdnn_exception(HIPDNN_STATUS_NOT_SUPPORTED,
+        throw HipdnnException(HIPDNN_STATUS_NOT_SUPPORTED,
                                "Variant_descriptor::get_attribute: attribute_name not supported");
     }
 }
@@ -137,7 +137,7 @@ void Variant_descriptor::set_attribute(hipdnnBackendAttributeName_t attribute_na
         break;
 
     default:
-        throw Hipdnn_exception(HIPDNN_STATUS_NOT_SUPPORTED,
+        throw HipdnnException(HIPDNN_STATUS_NOT_SUPPORTED,
                                "Variant_descriptor::set_attribute: attribute_name not supported");
     }
 }

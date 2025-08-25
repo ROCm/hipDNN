@@ -12,7 +12,7 @@
     do                                                                   \
     {                                                                    \
         hipdnn_backend::logging::initialize();                           \
-        if(auto _logger = hipdnn_backend::logging::get_backend_logger()) \
+        if(auto _logger = hipdnn_backend::logging::getBackendLogger()) \
         {                                                                \
             _logger->level(__VA_ARGS__);                                 \
         }                                                                \
@@ -33,13 +33,13 @@ void initialize();
 
 void cleanup();
 
-void set_log_level(const std::string& level);
+void setLogLevel(const std::string& level);
 
-std::shared_ptr<spdlog::logger> get_backend_logger();
+std::shared_ptr<spdlog::logger> getBackendLogger();
 
-std::shared_ptr<spdlog::logger> get_callback_receiver_logger();
+std::shared_ptr<spdlog::logger> getCallbackReceiverLogger();
 
-void hipdnn_logging_callback(hipdnnSeverity_t severity, const char* msg);
+void hipdnnLoggingCallback(hipdnnSeverity_t severity, const char* msg);
 
 } // namespace logging
 } // namespace hipdnn_backend
