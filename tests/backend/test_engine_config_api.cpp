@@ -51,7 +51,7 @@ protected:
 
 TEST_F(Engine_config_api_tests, SetEngineConfigEngine)
 {
-    int64_t gidx = -1; // TODO hardcode for now
+    int64_t gidx = hipdnn_tests::plugin_constants::engine_id<Good_plugin>();
 
     EXPECT_EQ(hipdnnBackendSetAttribute(_engine_config,
                                         HIPDNN_ATTR_ENGINECFG_ENGINE,
@@ -60,7 +60,7 @@ TEST_F(Engine_config_api_tests, SetEngineConfigEngine)
                                         &_engine),
               HIPDNN_STATUS_BAD_PARAM_NULL_POINTER);
 
-    test_util::create_test_engine(&_engine, &_graph, _handle, gidx);
+    test_util::create_test_engine(&_engine, &_graph, _handle, gidx, true);
     EXPECT_EQ(hipdnnBackendSetAttribute(_engine_config,
                                         HIPDNN_ATTR_ENGINECFG_ENGINE,
                                         HIPDNN_TYPE_BACKEND_DESCRIPTOR,
@@ -71,7 +71,7 @@ TEST_F(Engine_config_api_tests, SetEngineConfigEngine)
 
 TEST_F(Engine_config_api_tests, FinalizeEngineConfig)
 {
-    int64_t gidx = -1; // TODO hardcode for now
+    int64_t gidx = hipdnn_tests::plugin_constants::engine_id<Good_plugin>();
 
     EXPECT_EQ(hipdnnBackendFinalize(_engine_config), HIPDNN_STATUS_BAD_PARAM);
     test_util::populate_test_engine_config(&_engine_config, &_engine, &_graph, _handle, gidx);
@@ -80,7 +80,7 @@ TEST_F(Engine_config_api_tests, FinalizeEngineConfig)
 
 TEST_F(Engine_config_api_tests, GetMaxWorkspaceSizeFromEngineConfig)
 {
-    int64_t gidx = -1; // TODO hardcode for now
+    int64_t gidx = hipdnn_tests::plugin_constants::engine_id<Good_plugin>();
     int64_t max_workspace_size = 0;
 
     test_util::populate_test_engine_config(&_engine_config, &_engine, &_graph, _handle, gidx, true);

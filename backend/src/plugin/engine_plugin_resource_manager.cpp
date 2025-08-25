@@ -28,7 +28,7 @@ namespace
 struct Plugin_loading_config
 {
     std::set<std::filesystem::path> paths;
-    hipdnnPluginLoadingMode_ext_t mode = HIPDNN_PLUGIN_LOADING_ADDITIVE;
+    hipdnnPluginLoadingMode_ext_t mode = HIPDNN_DEFAULT_PLUGIN_LOADING_MODE;
 };
 
 std::mutex plugin_mutex;

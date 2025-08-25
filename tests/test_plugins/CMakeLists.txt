@@ -11,6 +11,10 @@ find_package(hip REQUIRED)
 set(TEST_GOOD_PLUGIN_NAME "test_good_plugin")
 set(TEST_EXECUTE_FAILS_PLUGIN_NAME "test_execute_fails_plugin")
 set(TEST_NO_APPLICABLE_ENGINES_PLUGIN_NAME "test_no_applicable_engines_plugin")
+set(TEST_DUPLICATE_ID_A_PLUGIN_NAME "test_duplicate_id_a_plugin")
+set(TEST_DUPLICATE_ID_B_PLUGIN_NAME "test_duplicate_id_b_plugin")
+set(TEST_INCOMPLETE_API_PLUGIN_NAME "test_incomplete_api_plugin")
+
 
 # Function to create a test plugin with common configuration
 function(add_test_plugin target_name)
@@ -56,6 +60,14 @@ add_test_plugin(${TEST_EXECUTE_FAILS_PLUGIN_NAME} test_execute_fails_plugin.cpp)
 # test_no_applicable_engines_plugin is a plugin that reports no applicable engines
 add_test_plugin(${TEST_NO_APPLICABLE_ENGINES_PLUGIN_NAME} test_no_applicable_engines_plugin.cpp)
 
+# test_good_plugin_duplicate_id_a/b shares an engine id with each other
+add_test_plugin(${TEST_DUPLICATE_ID_A_PLUGIN_NAME} test_duplicate_id_a_plugin.cpp)
+add_test_plugin(${TEST_DUPLICATE_ID_B_PLUGIN_NAME} test_duplicate_id_b_plugin.cpp)
+
+# test_incomplete_api_plugin only implements part of the plugin API
+add_test_plugin(${TEST_INCOMPLETE_API_PLUGIN_NAME} test_incomplete_api_plugin.cpp)
+
+
 # Create a duplicated default plugin that gets installed to the default plugin directory
 add_test_plugin(test_good_default_plugin test_good_default_plugin.cpp)
 
@@ -74,3 +86,6 @@ add_custom_command(TARGET test_good_default_plugin POST_BUILD
 set(TEST_GOOD_PLUGIN_NAME "${TEST_GOOD_PLUGIN_NAME}" PARENT_SCOPE)
 set(TEST_EXECUTE_FAILS_PLUGIN_NAME "${TEST_EXECUTE_FAILS_PLUGIN_NAME}" PARENT_SCOPE)
 set(TEST_NO_APPLICABLE_ENGINES_PLUGIN_NAME "${TEST_NO_APPLICABLE_ENGINES_PLUGIN_NAME}" PARENT_SCOPE)
+set(TEST_DUPLICATE_ID_A_PLUGIN_NAME "${TEST_DUPLICATE_ID_A_PLUGIN_NAME}" PARENT_SCOPE)
+set(TEST_DUPLICATE_ID_B_PLUGIN_NAME "${TEST_DUPLICATE_ID_B_PLUGIN_NAME}" PARENT_SCOPE)
+set(TEST_INCOMPLETE_API_PLUGIN_NAME "${TEST_INCOMPLETE_API_PLUGIN_NAME}" PARENT_SCOPE)

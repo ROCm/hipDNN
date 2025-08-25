@@ -10,7 +10,7 @@
 class Execution_plan_api_tests : public ::testing::Test
 {
 protected:
-    static constexpr int64_t GIDX = -1; // TODO hardcode for now
+    static constexpr int64_t GIDX = hipdnn_tests::plugin_constants::engine_id<Good_plugin>();
     hipdnnBackendDescriptor_t _plan;
     hipdnnHandle_t _handle = nullptr;
     hipdnnBackendDescriptor_t _engine_config = nullptr;

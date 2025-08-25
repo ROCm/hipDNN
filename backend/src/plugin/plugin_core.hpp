@@ -177,7 +177,12 @@ public:
                 {
                     paths_to_load.insert(resolved_path);
                 }
-                // Consider logging `else` here once cognitive complexity is resolved
+                else
+                {
+                    HIPDNN_LOG_WARN("Plugin path '{}' is invalid - expected either a directory "
+                                    "containing plugins or a path to a plugin file",
+                                    path.string());
+                }
             }
             catch(const std::filesystem::filesystem_error& e)
             {

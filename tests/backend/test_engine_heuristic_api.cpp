@@ -400,7 +400,7 @@ TEST_F(Engine_heuristic_api_tests, GetEngineConfigs)
         hipdnnBackendGetAttribute(
             engine, HIPDNN_ATTR_ENGINE_GLOBAL_INDEX, HIPDNN_TYPE_INT64, 1, nullptr, &engine_id),
         HIPDNN_STATUS_SUCCESS);
-    EXPECT_EQ(engine_id, -1);
+    EXPECT_EQ(engine_id, hipdnn_tests::plugin_constants::engine_id<Good_plugin>());
 
     // Expecting to only need to clean-up 1 engine config, since we only created & requested 1.
     for(auto config : configs)

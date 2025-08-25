@@ -73,11 +73,12 @@ void populate_test_engine(hipdnnBackendDescriptor_t engine,
 void create_test_engine(hipdnnBackendDescriptor_t* engine,
                         hipdnnBackendDescriptor_t* graph,
                         hipdnnHandle_t handle,
-                        int64_t gidx)
+                        int64_t gidx,
+                        bool finalize)
 {
     ASSERT_EQ(hipdnnBackendCreateDescriptor(HIPDNN_BACKEND_ENGINE_DESCRIPTOR, engine),
               HIPDNN_STATUS_SUCCESS);
-    populate_test_engine(*engine, graph, handle, gidx, true);
+    populate_test_engine(*engine, graph, handle, gidx, finalize);
 }
 
 void populate_test_engine_config(hipdnnBackendDescriptor_t* engine_config,
@@ -89,7 +90,7 @@ void populate_test_engine_config(hipdnnBackendDescriptor_t* engine_config,
 {
     if(*engine == nullptr)
     {
-        create_test_engine(engine, graph, handle, gidx);
+        create_test_engine(engine, graph, handle, gidx, true);
     }
 
     ASSERT_EQ(hipdnnBackendSetAttribute(*engine_config,
