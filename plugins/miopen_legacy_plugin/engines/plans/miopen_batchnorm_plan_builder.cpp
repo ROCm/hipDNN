@@ -51,7 +51,7 @@ namespace
 
 std::string get_node_name(const hipdnn_sdk::data_objects::Node& node)
 {
-    return node.name() ? node.name()->str() : "";
+    return node.name() != nullptr ? node.name()->str() : "";
 }
 
 void build_plan_inference_single_node(const hipdnnEnginePluginHandle& handle,
