@@ -41,7 +41,7 @@ public:
     ~Cpu_fp_reference_miopen_rms_validation() override = default;
 
     bool all_close(Migratable_memory_interface<T>& reference,
-                 Migratable_memory_interface<T>& implementation) override
+                   Migratable_memory_interface<T>& implementation) override
     {
         if(reference.count() != implementation.count())
         {
@@ -49,7 +49,7 @@ public:
         }
 
         size_t element_count = reference.count();
-        
+
         if(element_count == 0)
         {
             return true;
@@ -68,21 +68,24 @@ public:
             // Add explicit conversion path to ensure half & bfloat16 are converting without implicit cast.
             auto ref_value = static_cast<double>(static_cast<float>(ref_data[i]));
             auto impl_value = static_cast<double>(static_cast<float>(impl_data[i]));
-            
+
             // Accumulate square differences
             auto diff = ref_value - impl_value;
             square_difference += diff * diff;
-            
+
             // Track maximum magnitudes
             max_ref_magnitude = std::max(max_ref_magnitude, std::fabs(ref_value));
             max_impl_magnitude = std::max(max_impl_magnitude, std::fabs(impl_value));
         }
 
         // Find the maximum magnitude between reference and implementation
-        double max_magnitude = std::max({max_ref_magnitude, max_impl_magnitude, std::numeric_limits<double>::min()});
+        double max_magnitude
+            = std::max({max_ref_magnitude, max_impl_magnitude, std::numeric_limits<double>::min()});
 
-        double relative_rms_error = std::sqrt(square_difference) / (std::sqrt(static_cast<double>(element_count)) * max_magnitude);
-        
+        double relative_rms_error
+            = std::sqrt(square_difference)
+              / (std::sqrt(static_cast<double>(element_count)) * max_magnitude);
+
         return relative_rms_error <= _relative_tolerance;
     }
 

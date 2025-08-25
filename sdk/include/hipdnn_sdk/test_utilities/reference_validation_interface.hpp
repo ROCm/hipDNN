@@ -22,7 +22,7 @@ public:
     virtual ~Reference_validation_interface() = default;
 
     virtual bool all_close(Migratable_memory_interface<T>& reference,
-                                 Migratable_memory_interface<T>& implementation)
+                           Migratable_memory_interface<T>& implementation)
         = 0;
 };
 

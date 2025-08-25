@@ -139,10 +139,10 @@ void Sample_runner::operator()(const Tensor_layout& layout)
                 static_cast<IntermediateType>(epsilon), static_cast<IntermediateType>(epsilon));
 
         bool dx_valid = dx_validator.all_close(dx_ref_tensor.memory(), dx_tensor.memory());
-        bool dscale_valid = dscale_dbias_validator.all_close(dscale_ref_tensor.memory(),
-                                                                   dscale_tensor.memory());
-        bool dbias_valid = dscale_dbias_validator.all_close(dbias_ref_tensor.memory(),
-                                                                  dbias_tensor.memory());
+        bool dscale_valid
+            = dscale_dbias_validator.all_close(dscale_ref_tensor.memory(), dscale_tensor.memory());
+        bool dbias_valid
+            = dscale_dbias_validator.all_close(dbias_ref_tensor.memory(), dbias_tensor.memory());
 
         std::cout << "CPU reference validation:\n";
         std::cout << "  dx: " << (dx_valid ? "successful" : "failed") << "\n";

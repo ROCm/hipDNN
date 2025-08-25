@@ -274,7 +274,7 @@ protected:
 
         Cpu_fp_reference_validation<Input_type> cpu_ref_validation(tolerance, tolerance);
         EXPECT_TRUE(cpu_ref_validation.all_close(cpu_tensor_bundle.y_tensor.memory(),
-                                                       graph_tensor_bundle.y_tensor.memory()));
+                                                 graph_tensor_bundle.y_tensor.memory()));
     }
 
 private:

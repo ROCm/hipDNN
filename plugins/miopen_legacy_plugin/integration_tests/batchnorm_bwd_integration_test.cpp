@@ -301,12 +301,12 @@ protected:
 
         run_cpu_batchnorm_bwd<Input_type, Intermediate_type>(cpu_tensor_bundle);
 
-        Cpu_fp_reference_validation<Input_type> cpu_ref_validation(tolerance,
-                                                                   tolerance);
+        Cpu_fp_reference_validation<Input_type> cpu_ref_validation(tolerance, tolerance);
         EXPECT_TRUE(cpu_ref_validation.all_close(cpu_tensor_bundle.dx_tensor.memory(),
-                                                       graph_tensor_bundle.dx_tensor.memory()));
-                                                       
-        Cpu_fp_reference_validation<Intermediate_type> cpu_ref_intermediate_validation(tolerance, tolerance);
+                                                 graph_tensor_bundle.dx_tensor.memory()));
+
+        Cpu_fp_reference_validation<Intermediate_type> cpu_ref_intermediate_validation(tolerance,
+                                                                                       tolerance);
         EXPECT_TRUE(cpu_ref_intermediate_validation.all_close(
             cpu_tensor_bundle.dscale_tensor.memory(), graph_tensor_bundle.dscale_tensor.memory()));
         EXPECT_TRUE(cpu_ref_intermediate_validation.all_close(

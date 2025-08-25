@@ -129,9 +129,8 @@ void Sample_runner::operator()(const Tensor_layout& layout)
                 static_cast<InputType>(epsilon), static_cast<InputType>(epsilon));
 
         std::cout << "CPU reference validation "
-                  << (validator.all_close(y_ref_tensor.memory(), y_tensor.memory())
-                          ? "successful"
-                          : "failed")
+                  << (validator.all_close(y_ref_tensor.memory(), y_tensor.memory()) ? "successful"
+                                                                                    : "failed")
                   << ".\n";
     }
 

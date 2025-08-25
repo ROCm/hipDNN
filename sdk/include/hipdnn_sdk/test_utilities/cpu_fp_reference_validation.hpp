@@ -37,7 +37,7 @@ public:
     ~Cpu_fp_reference_validation() override = default;
 
     bool all_close(Migratable_memory_interface<T>& reference,
-                         Migratable_memory_interface<T>& implementation) override
+                   Migratable_memory_interface<T>& implementation) override
     {
         if(reference.count() != implementation.count())
         {
