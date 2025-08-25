@@ -12,13 +12,13 @@ namespace hipdnn_backend
 namespace plugin
 {
 
-Engine_plugin::Engine_plugin(Shared_library&& lib)
-    : Plugin_base(std::move(lib))
+EnginePlugin::EnginePlugin(Shared_library&& lib)
+    : PluginBase(std::move(lib))
 {
-    resolve_symbols();
+    resolveSymbols();
 }
 
-Engine_plugin::Engine_plugin()
+EnginePlugin::EnginePlugin()
 {
     // This constructor is used for mocking purposes in tests.
 #ifndef NDEBUG
@@ -26,248 +26,233 @@ Engine_plugin::Engine_plugin()
 #endif
 }
 
-void Engine_plugin::resolve_symbols()
+void EnginePlugin::resolveSymbols()
 {
     if(type() != HIPDNN_PLUGIN_TYPE_ENGINE)
     {
         throw Hipdnn_exception(HIPDNN_STATUS_PLUGIN_ERROR, "Wrong plugin type");
     }
 
-    const auto func_name_get_all_engine_ids = "hipdnnEnginePluginGetAllEngineIds";
-    _func_get_all_engine_ids
-        = _lib.get_symbol<decltype(_func_get_all_engine_ids)>(func_name_get_all_engine_ids);
+    const auto funcNameGetAllEngineIds = "hipdnnEnginePluginGetAllEngineIds";
+    _funcGetAllEngineIds = _lib.get_symbol<decltype(_funcGetAllEngineIds)>(funcNameGetAllEngineIds);
 
-    const auto func_name_create_handle = "hipdnnEnginePluginCreate";
-    _func_create_handle = _lib.get_symbol<decltype(_func_create_handle)>(func_name_create_handle);
+    const auto funcNameCreateHandle = "hipdnnEnginePluginCreate";
+    _funcCreateHandle = _lib.get_symbol<decltype(_funcCreateHandle)>(funcNameCreateHandle);
 
-    const auto func_name_destroy_handle = "hipdnnEnginePluginDestroy";
-    _func_destroy_handle
-        = _lib.get_symbol<decltype(_func_destroy_handle)>(func_name_destroy_handle);
+    const auto funcNameDestroyHandle = "hipdnnEnginePluginDestroy";
+    _funcDestroyHandle = _lib.get_symbol<decltype(_funcDestroyHandle)>(funcNameDestroyHandle);
 
-    const auto func_name_set_stream = "hipdnnEnginePluginSetStream";
-    _func_set_stream = _lib.get_symbol<decltype(_func_set_stream)>(func_name_set_stream);
+    const auto funcNameSetStream = "hipdnnEnginePluginSetStream";
+    _funcSetStream = _lib.get_symbol<decltype(_funcSetStream)>(funcNameSetStream);
 
-    const auto func_name_get_applicable_engine_ids = "hipdnnEnginePluginGetApplicableEngineIds";
-    _func_get_applicable_engine_ids = _lib.get_symbol<decltype(_func_get_applicable_engine_ids)>(
-        func_name_get_applicable_engine_ids);
+    const auto funcNameGetApplicableEngineIds = "hipdnnEnginePluginGetApplicableEngineIds";
+    _funcGetApplicableEngineIds
+        = _lib.get_symbol<decltype(_funcGetApplicableEngineIds)>(funcNameGetApplicableEngineIds);
 
-    const auto func_name_get_engine_details = "hipdnnEnginePluginGetEngineDetails";
-    _func_get_engine_details
-        = _lib.get_symbol<decltype(_func_get_engine_details)>(func_name_get_engine_details);
+    const auto funcNameGetEngineDetails = "hipdnnEnginePluginGetEngineDetails";
+    _funcGetEngineDetails
+        = _lib.get_symbol<decltype(_funcGetEngineDetails)>(funcNameGetEngineDetails);
 
-    const auto func_name_destroy_engine_details = "hipdnnEnginePluginDestroyEngineDetails";
-    _func_destroy_engine_details
-        = _lib.get_symbol<decltype(_func_destroy_engine_details)>(func_name_destroy_engine_details);
+    const auto funcNameDestroyEngineDetails = "hipdnnEnginePluginDestroyEngineDetails";
+    _funcDestroyEngineDetails
+        = _lib.get_symbol<decltype(_funcDestroyEngineDetails)>(funcNameDestroyEngineDetails);
 
-    const auto func_name_get_workspace_size = "hipdnnEnginePluginGetWorkspaceSize";
-    _func_get_workspace_size
-        = _lib.get_symbol<decltype(_func_get_workspace_size)>(func_name_get_workspace_size);
+    const auto funcNameGetWorkspaceSize = "hipdnnEnginePluginGetWorkspaceSize";
+    _funcGetWorkspaceSize
+        = _lib.get_symbol<decltype(_funcGetWorkspaceSize)>(funcNameGetWorkspaceSize);
 
-    const auto func_name_create_execution_context = "hipdnnEnginePluginCreateExecutionContext";
-    _func_create_execution_context = _lib.get_symbol<decltype(_func_create_execution_context)>(
-        func_name_create_execution_context);
+    const auto funcNameCreateExecutionContext = "hipdnnEnginePluginCreateExecutionContext";
+    _funcCreateExecutionContext
+        = _lib.get_symbol<decltype(_funcCreateExecutionContext)>(funcNameCreateExecutionContext);
 
-    const auto func_name_destroy_execution_context = "hipdnnEnginePluginDestroyExecutionContext";
-    _func_destroy_execution_context = _lib.get_symbol<decltype(_func_destroy_execution_context)>(
-        func_name_destroy_execution_context);
+    const auto funcNameDestroyExecutionContext = "hipdnnEnginePluginDestroyExecutionContext";
+    _funcDestroyExecutionContext
+        = _lib.get_symbol<decltype(_funcDestroyExecutionContext)>(funcNameDestroyExecutionContext);
 
-    const auto func_name_execute_op_graph = "hipdnnEnginePluginExecuteOpGraph";
-    _func_execute_op_graph
-        = _lib.get_symbol<decltype(_func_execute_op_graph)>(func_name_execute_op_graph);
+    const auto funcNameExecuteOpGraph = "hipdnnEnginePluginExecuteOpGraph";
+    _funcExecuteOpGraph = _lib.get_symbol<decltype(_funcExecuteOpGraph)>(funcNameExecuteOpGraph);
 
 #ifndef NDEBUG
     _initialized = true;
 #endif
 }
 
-std::vector<int64_t> Engine_plugin::get_all_engine_ids() const
+std::vector<int64_t> EnginePlugin::getAllEngineIds() const
 {
     assert(_initialized);
 
-    if(!_all_engine_ids.empty())
+    if(!_allEngineIds.empty())
     {
-        return _all_engine_ids;
+        return _allEngineIds;
     }
 
-    uint32_t num_engines = 0;
-    invoke_plugin_function(
-        "get number of engines", _func_get_all_engine_ids, nullptr, 0u, &num_engines);
+    uint32_t numEngines = 0;
+    invokePluginFunction("get number of engines", _funcGetAllEngineIds, nullptr, 0u, &numEngines);
 
-    THROW_IF_EQ(num_engines, 0, HIPDNN_STATUS_PLUGIN_ERROR, "No engines found in the plugin");
+    THROW_IF_EQ(numEngines, 0, HIPDNN_STATUS_PLUGIN_ERROR, "No engines found in the plugin");
 
-    const uint32_t max_engines = num_engines;
-    std::vector<int64_t> engine_ids(max_engines);
+    const uint32_t maxEngines = numEngines;
+    std::vector<int64_t> engineIds(maxEngines);
 
-    invoke_plugin_function("get all engine IDs",
-                           _func_get_all_engine_ids,
-                           engine_ids.data(),
-                           max_engines,
-                           &num_engines);
+    invokePluginFunction(
+        "get all engine IDs", _funcGetAllEngineIds, engineIds.data(), maxEngines, &numEngines);
 
-    THROW_IF_NE(num_engines,
-                max_engines,
+    THROW_IF_NE(numEngines,
+                maxEngines,
                 HIPDNN_STATUS_PLUGIN_ERROR,
                 "Number of engines returned does not match expected count");
 
-    std::ranges::sort(engine_ids);
-    if(std::ranges::adjacent_find(engine_ids) != engine_ids.end())
+    std::ranges::sort(engineIds);
+    if(std::ranges::adjacent_find(engineIds) != engineIds.end())
     {
         throw Hipdnn_exception(HIPDNN_STATUS_PLUGIN_ERROR, "Duplicate engine IDs found");
     }
-    _all_engine_ids = engine_ids;
+    _allEngineIds = engineIds;
 
-    return engine_ids;
+    return engineIds;
 }
 
-hipdnnEnginePluginHandle_t Engine_plugin::create_handle() const
+hipdnnEnginePluginHandle_t EnginePlugin::createHandle() const
 {
     assert(_initialized);
     hipdnnEnginePluginHandle_t handle;
-    invoke_plugin_function("create engine plugin handle", _func_create_handle, &handle);
+    invokePluginFunction("create engine plugin handle", _funcCreateHandle, &handle);
     return handle;
 }
 
-void Engine_plugin::destroy_handle(hipdnnEnginePluginHandle_t handle) const
+void EnginePlugin::destroyHandle(hipdnnEnginePluginHandle_t handle) const
 {
     assert(_initialized);
-    invoke_plugin_function("destroy engine plugin handle", _func_destroy_handle, handle);
+    invokePluginFunction("destroy engine plugin handle", _funcDestroyHandle, handle);
 }
 
-void Engine_plugin::set_stream(hipdnnEnginePluginHandle_t handle, hipStream_t stream) const
+void EnginePlugin::setStream(hipdnnEnginePluginHandle_t handle, hipStream_t stream) const
 {
     assert(_initialized);
-    invoke_plugin_function("set stream for engine plugin handle", _func_set_stream, handle, stream);
+    invokePluginFunction("set stream for engine plugin handle", _funcSetStream, handle, stream);
 }
 
 std::vector<int64_t>
-    Engine_plugin::get_applicable_engine_ids(hipdnnEnginePluginHandle_t handle,
-                                             const hipdnnPluginConstData_t* op_graph) const
+    EnginePlugin::getApplicableEngineIds(hipdnnEnginePluginHandle_t handle,
+                                         const hipdnnPluginConstData_t* opGraph) const
 {
     assert(_initialized);
 
-    if(_all_engine_ids.empty())
+    if(_allEngineIds.empty())
     {
-        get_all_engine_ids();
+        getAllEngineIds();
     }
 
-    const auto max_engines = static_cast<uint32_t>(_all_engine_ids.size());
-    std::vector<int64_t> engine_ids(max_engines);
-    uint32_t num_engines = 0;
+    const auto maxEngines = static_cast<uint32_t>(_allEngineIds.size());
+    std::vector<int64_t> engineIds(maxEngines);
+    uint32_t numEngines = 0;
 
-    invoke_plugin_function("get applicable engine IDs",
-                           _func_get_applicable_engine_ids,
+    invokePluginFunction("get applicable engine IDs",
+                           _funcGetApplicableEngineIds,
                            handle,
-                           op_graph,
-                           engine_ids.data(),
-                           max_engines,
-                           &num_engines);
+                           opGraph,
+                           engineIds.data(),
+                           maxEngines,
+                           &numEngines);
 
-    if(num_engines == 0)
+    if(numEngines == 0)
     {
         return {}; // No applicable engines found
     }
 
-    THROW_IF_LT(max_engines,
-                num_engines,
+    THROW_IF_LT(maxEngines,
+                numEngines,
                 HIPDNN_STATUS_PLUGIN_ERROR,
                 "More applicable engines than expected");
 
-    engine_ids.resize(num_engines);
+    engineIds.resize(numEngines);
 
-    std::ranges::sort(engine_ids);
-    if(std::ranges::adjacent_find(engine_ids) != engine_ids.end())
+    std::ranges::sort(engineIds);
+    if(std::ranges::adjacent_find(engineIds) != engineIds.end())
     {
         throw Hipdnn_exception(HIPDNN_STATUS_PLUGIN_ERROR, "Duplicate engine IDs found");
     }
 
-    for(const auto engine_id : engine_ids)
+    for(const auto engineId : engineIds)
     {
-        if(std::ranges::find(_all_engine_ids, engine_id) == _all_engine_ids.end())
+        if(std::ranges::find(_allEngineIds, engineId) == _allEngineIds.end())
         {
             throw Hipdnn_exception(HIPDNN_STATUS_PLUGIN_ERROR,
                                    "Engine ID not found in the plugin's known IDs");
         }
     }
 
-    return engine_ids;
+    return engineIds;
 }
 
-void Engine_plugin::get_engine_details(hipdnnEnginePluginHandle_t handle,
-                                       int64_t engine_id,
-                                       const hipdnnPluginConstData_t* op_graph,
-                                       hipdnnPluginConstData_t* engine_details) const
+void EnginePlugin::getEngineDetails(hipdnnEnginePluginHandle_t handle,
+                                    int64_t engineId,
+                                    const hipdnnPluginConstData_t* opGraph,
+                                    hipdnnPluginConstData_t* engineDetails) const
 {
     assert(_initialized);
-    invoke_plugin_function("get engine details",
-                           _func_get_engine_details,
-                           handle,
-                           engine_id,
-                           op_graph,
-                           engine_details);
+    invokePluginFunction(
+        "get engine details", _funcGetEngineDetails, handle, engineId, opGraph, engineDetails);
 }
 
-void Engine_plugin::destroy_engine_details(hipdnnEnginePluginHandle_t handle,
-                                           hipdnnPluginConstData_t* engine_details) const
+void EnginePlugin::destroyEngineDetails(hipdnnEnginePluginHandle_t handle,
+                                        hipdnnPluginConstData_t* engineDetails) const
 
 {
     assert(_initialized);
-    invoke_plugin_function(
-        "destroy engine details", _func_destroy_engine_details, handle, engine_details);
+    invokePluginFunction(
+        "destroy engine details", _funcDestroyEngineDetails, handle, engineDetails);
 }
 
-size_t Engine_plugin::get_workspace_size(hipdnnEnginePluginHandle_t handle,
-                                         const hipdnnPluginConstData_t* engine_config,
-                                         const hipdnnPluginConstData_t* op_graph) const
+size_t EnginePlugin::getWorkspaceSize(hipdnnEnginePluginHandle_t handle,
+                                      const hipdnnPluginConstData_t* engineConfig,
+                                      const hipdnnPluginConstData_t* opGraph) const
 {
     assert(_initialized);
-    size_t workspace_size = 0;
-    invoke_plugin_function("get workspace size",
-                           _func_get_workspace_size,
-                           handle,
-                           engine_config,
-                           op_graph,
-                           &workspace_size);
-    return workspace_size;
+    size_t workspaceSize = 0;
+    invokePluginFunction(
+        "get workspace size", _funcGetWorkspaceSize, handle, engineConfig, opGraph, &workspaceSize);
+    return workspaceSize;
 }
 
 hipdnnEnginePluginExecutionContext_t
-    Engine_plugin::create_execution_context(hipdnnEnginePluginHandle_t handle,
-                                            const hipdnnPluginConstData_t* engine_config,
-                                            const hipdnnPluginConstData_t* op_graph) const
+    EnginePlugin::createExecutionContext(hipdnnEnginePluginHandle_t handle,
+                                         const hipdnnPluginConstData_t* engineConfig,
+                                         const hipdnnPluginConstData_t* opGraph) const
 {
     assert(_initialized);
     hipdnnEnginePluginExecutionContext_t exec_context;
-    invoke_plugin_function("create execution context",
-                           _func_create_execution_context,
+    invokePluginFunction("create execution context",
+                           _funcCreateExecutionContext,
                            handle,
-                           engine_config,
-                           op_graph,
+                           engineConfig,
+                           opGraph,
                            &exec_context);
     return exec_context;
 }
 
-void Engine_plugin::destroy_execution_context(
-    hipdnnEnginePluginHandle_t handle, hipdnnEnginePluginExecutionContext_t execution_context) const
+void EnginePlugin::destroyExecutionContext(
+    hipdnnEnginePluginHandle_t handle, hipdnnEnginePluginExecutionContext_t executionContext) const
 {
     assert(_initialized);
-    invoke_plugin_function(
-        "destroy execution context", _func_destroy_execution_context, handle, execution_context);
+    invokePluginFunction(
+        "destroy execution context", _funcDestroyExecutionContext, handle, executionContext);
 }
 
-void Engine_plugin::execute_op_graph(hipdnnEnginePluginHandle_t handle,
-                                     hipdnnEnginePluginExecutionContext_t execution_context,
-                                     void* workspace,
-                                     const hipdnnPluginDeviceBuffer_t* device_buffers,
-                                     uint32_t num_device_buffers) const
+void EnginePlugin::executeOpGraph(hipdnnEnginePluginHandle_t handle,
+                                  hipdnnEnginePluginExecutionContext_t executionContext,
+                                  void* workspace,
+                                  const hipdnnPluginDeviceBuffer_t* deviceBuffers,
+                                  uint32_t numDeviceBuffers) const
 {
     assert(_initialized);
-    invoke_plugin_function("execute op graph",
-                           _func_execute_op_graph,
+    invokePluginFunction("execute op graph",
+                           _funcExecuteOpGraph,
                            handle,
-                           execution_context,
+                           executionContext,
                            workspace,
-                           device_buffers,
-                           num_device_buffers);
+                           deviceBuffers,
+                           numDeviceBuffers);
 }
 
 } // namespace plugin

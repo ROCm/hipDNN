@@ -85,7 +85,7 @@ public:
     {
         set_graph();
         set_heuristic_mode();
-        EXPECT_CALL(*_mock_engine_plugin_resource_manager, get_applicable_engine_ids(_))
+        EXPECT_CALL(*_mock_engine_plugin_resource_manager, getApplicableEngineIds(_))
             .WillRepeatedly(Return(std::vector<int64_t>{0, 1, 2}));
         ASSERT_NO_THROW(get_engine_heuristic_descriptor()->finalize());
     }
@@ -239,7 +239,7 @@ TEST_F(Engine_heuristic_descriptor_test, SetAttrOnFinalizedEngineHeuristicDescri
 TEST_F(Engine_heuristic_descriptor_test, FinalizeEngineHeuristicDescriptor)
 {
     auto heur = get_engine_heuristic_descriptor();
-    EXPECT_CALL(*_mock_engine_plugin_resource_manager, get_applicable_engine_ids)
+    EXPECT_CALL(*_mock_engine_plugin_resource_manager, getApplicableEngineIds)
         .Times(AnyNumber()); //Uninteresting call
 
     ASSERT_THROW_HIPDNN_STATUS(heur->finalize(), HIPDNN_STATUS_BAD_PARAM);
@@ -256,7 +256,7 @@ TEST_F(Engine_heuristic_descriptor_test, FinalizeEngineHeuristicDescriptor)
 TEST_F(Engine_heuristic_descriptor_test, FinalizeEngineHeuristicDescriptorReverseOrder)
 {
     auto heur = get_engine_heuristic_descriptor();
-    EXPECT_CALL(*_mock_engine_plugin_resource_manager, get_applicable_engine_ids)
+    EXPECT_CALL(*_mock_engine_plugin_resource_manager, getApplicableEngineIds)
         .Times(AnyNumber()); //Uninteresting call
 
     ASSERT_THROW_HIPDNN_STATUS(heur->finalize(), HIPDNN_STATUS_BAD_PARAM);
@@ -345,12 +345,12 @@ TEST_F(Engine_heuristic_descriptor_test, GetEngineHeuristicDescriptorEngineConfi
     make_engine_heuristic_finalized();
 
     EXPECT_CALL(*get_mock_graph(), is_finalized()).WillRepeatedly(Return(true));
-    EXPECT_CALL(*_mock_engine_plugin_resource_manager, get_engine_details(_, _, _))
+    EXPECT_CALL(*_mock_engine_plugin_resource_manager, getEngineDetails(_, _, _))
         .WillRepeatedly(
             Invoke([this](int64_t engine_id, const Graph_descriptor*, hipdnnPluginConstData_t* d) {
                 *d = this->serialize_engine_details(engine_id);
             }));
-    EXPECT_CALL(*_mock_engine_plugin_resource_manager, destroy_engine_details(_, _))
+    EXPECT_CALL(*_mock_engine_plugin_resource_manager, destroyEngineDetails(_, _))
         .WillRepeatedly(Return());
 
     ASSERT_THROW_HIPDNN_STATUS(
@@ -406,12 +406,12 @@ TEST_F(Engine_heuristic_descriptor_test, GetEngineConfigsWithNullConfig)
     make_engine_heuristic_finalized();
 
     EXPECT_CALL(*get_mock_graph(), is_finalized()).WillRepeatedly(Return(true));
-    EXPECT_CALL(*_mock_engine_plugin_resource_manager, get_engine_details(_, _, _))
+    EXPECT_CALL(*_mock_engine_plugin_resource_manager, getEngineDetails(_, _, _))
         .WillRepeatedly(
             Invoke([this](int64_t engine_id, const Graph_descriptor*, hipdnnPluginConstData_t* d) {
                 *d = this->serialize_engine_details(engine_id);
             }));
-    EXPECT_CALL(*_mock_engine_plugin_resource_manager, destroy_engine_details(_, _))
+    EXPECT_CALL(*_mock_engine_plugin_resource_manager, destroyEngineDetails(_, _))
         .WillRepeatedly(Return());
 
     std::vector<hipdnnBackendDescriptor_t> configs(3);
@@ -440,7 +440,7 @@ TEST_F(Engine_heuristic_descriptor_test, GetEngineConfigsWithNoEngineIds)
     set_graph();
     set_heuristic_mode();
 
-    EXPECT_CALL(*_mock_engine_plugin_resource_manager, get_applicable_engine_ids(_))
+    EXPECT_CALL(*_mock_engine_plugin_resource_manager, getApplicableEngineIds(_))
         .WillRepeatedly(Return(std::vector<int64_t>{}));
 
     ASSERT_NO_THROW(heur->finalize());
@@ -468,12 +468,12 @@ TEST_F(Engine_heuristic_descriptor_test, GetEngineConfigsRequestMoreThanAvailabl
     make_engine_heuristic_finalized();
 
     EXPECT_CALL(*get_mock_graph(), is_finalized()).WillRepeatedly(Return(true));
-    EXPECT_CALL(*_mock_engine_plugin_resource_manager, get_engine_details(_, _, _))
+    EXPECT_CALL(*_mock_engine_plugin_resource_manager, getEngineDetails(_, _, _))
         .WillRepeatedly(
             Invoke([this](int64_t engine_id, const Graph_descriptor*, hipdnnPluginConstData_t* d) {
                 *d = this->serialize_engine_details(engine_id);
             }));
-    EXPECT_CALL(*_mock_engine_plugin_resource_manager, destroy_engine_details(_, _))
+    EXPECT_CALL(*_mock_engine_plugin_resource_manager, destroyEngineDetails(_, _))
         .WillRepeatedly(Return());
 
     std::vector<hipdnnBackendDescriptor_t> configs(5);

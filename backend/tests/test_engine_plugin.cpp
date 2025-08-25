@@ -17,11 +17,11 @@ using namespace hipdnn_backend;
 
 template <typename T, typename Destructor>
 using Scoped_resource = hipdnn::sdk::utilities::Scoped_resource<T, Destructor>;
-class Test_engine_plugin_manager : public plugin::Plugin_manager_base<plugin::Engine_plugin>
+class Test_engine_plugin_manager : public plugin::PluginManagerBase<plugin::EnginePlugin>
 {
 public:
     Test_engine_plugin_manager()
-        : plugin::Plugin_manager_base<plugin::Engine_plugin>({"./"})
+        : plugin::PluginManagerBase<plugin::EnginePlugin>({"./"})
     {
     }
 };
@@ -36,9 +36,9 @@ TEST(GPU_EnginePluginTest, LoadPluginsAndExecuteOpGraph)
     std::set<std::filesystem::path> plugin_paths = {"./hipdnn_test_engine_plugin1"};
 
     // Load the plugins
-    plugin_manager.load_plugins(plugin_paths, HIPDNN_PLUGIN_LOADING_ABSOLUTE);
+    plugin_manager.loadPlugins(plugin_paths, HIPDNN_PLUGIN_LOADING_ABSOLUTE);
 
-    const auto& plugins = plugin_manager.get_plugins();
+    const auto& plugins = plugin_manager.getPlugins();
     ASSERT_EQ(plugins.size(), 1); // Ensure one plugin is loaded
 
     // Check that the plugins have the correct names
@@ -49,7 +49,7 @@ TEST(GPU_EnginePluginTest, LoadPluginsAndExecuteOpGraph)
 
     // Check all engine IDs
     std::vector<int64_t> expected_engine_ids0 = {100, 101, 102};
-    const auto& engine_ids0 = plugins[0]->get_all_engine_ids();
+    const auto& engine_ids0 = plugins[0]->getAllEngineIds();
     ASSERT_EQ(engine_ids0, expected_engine_ids0);
 
     hipStream_t stream;
@@ -91,22 +91,22 @@ TEST(GPU_EnginePluginTest, LoadPluginsAndExecuteOpGraph)
 
     for(const auto& plugin : plugins)
     {
-        auto handle = plugin->create_handle();
-        Scoped_resource handle_res(handle, [&plugin](auto h) { plugin->destroy_handle(h); });
+        auto handle = plugin->createHandle();
+        Scoped_resource handle_res(handle, [&plugin](auto h) { plugin->destroyHandle(h); });
 
-        plugin->set_stream(handle, stream);
+        plugin->setStream(handle, stream);
 
-        const auto engine_ids = plugin->get_applicable_engine_ids(handle, &op_graph);
+        const auto engine_ids = plugin->getApplicableEngineIds(handle, &op_graph);
         ASSERT_GT(engine_ids.size(), 0); // Ensure at least one engine is applicable
 
         for(const auto engine_id : engine_ids)
         {
             // Get engine details
             hipdnnPluginConstData_t engine_details;
-            plugin->get_engine_details(handle, engine_id, &op_graph, &engine_details);
+            plugin->getEngineDetails(handle, engine_id, &op_graph, &engine_details);
             Scoped_resource engine_details_res(&engine_details,
                                                [handle, &plugin](hipdnnPluginConstData_t* ed) {
-                                                   plugin->destroy_engine_details(handle, ed);
+                                                   plugin->destroyEngineDetails(handle, ed);
                                                });
 
             // Prepare the engine configuration
@@ -114,7 +114,7 @@ TEST(GPU_EnginePluginTest, LoadPluginsAndExecuteOpGraph)
             const hipdnnPluginConstData_t engine_config = {.ptr = nullptr, .size = 0};
 
             // Create workspace for the operation
-            auto workspace_size = plugin->get_workspace_size(handle, &engine_config, &op_graph);
+            auto workspace_size = plugin->getWorkspaceSize(handle, &engine_config, &op_graph);
             void* workspace = nullptr;
             if(workspace_size > 0)
             {
@@ -124,9 +124,9 @@ TEST(GPU_EnginePluginTest, LoadPluginsAndExecuteOpGraph)
 
             // Create execution context for the operation
             auto execution_context
-                = plugin->create_execution_context(handle, &engine_config, &op_graph);
+                = plugin->createExecutionContext(handle, &engine_config, &op_graph);
             Scoped_resource execution_context_res(execution_context, [&plugin, handle](auto ec) {
-                plugin->destroy_execution_context(handle, ec);
+                plugin->destroyExecutionContext(handle, ec);
             });
 
             // Fill output device buffer with zeros
@@ -138,7 +138,7 @@ TEST(GPU_EnginePluginTest, LoadPluginsAndExecuteOpGraph)
                 = {{{.uid = 0, .ptr = in_dev_data}, {.uid = 1, .ptr = out_dev_data}}};
 
             // Execute the operation graph
-            plugin->execute_op_graph(
+            plugin->executeOpGraph(
                 handle, execution_context, workspace, device_buffers.data(), num_device_buffers);
 
             // Copy the results back to the host. This call blocks the host's execution until the copy is finished.

@@ -73,9 +73,9 @@ public:
 
     void set_handle()
     {
-        EXPECT_CALL(*_mock_engine_plugin_resource_manager, create_execution_context(_, _, _))
+        EXPECT_CALL(*_mock_engine_plugin_resource_manager, createExecutionContext(_, _, _))
             .WillOnce(Return(get_execution_context()));
-        EXPECT_CALL(*_mock_engine_plugin_resource_manager, destroy_execution_context(_, _));
+        EXPECT_CALL(*_mock_engine_plugin_resource_manager, destroyExecutionContext(_, _));
 
         EXPECT_CALL(*_mock_handle, get_plugin_resource_manager())
             .WillOnce(Return(_mock_engine_plugin_resource_manager));

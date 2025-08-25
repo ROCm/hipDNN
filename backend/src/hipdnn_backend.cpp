@@ -151,7 +151,7 @@ HIPDNN_BACKEND_EXPORT hipdnnStatus_t hipdnnBackendExecute(hipdnnHandle_t handle,
         throw_if_invalid_descriptor(execution_plan);
         throw_if_invalid_descriptor(variant_pack);
 
-        handle->get_plugin_resource_manager()->execute_op_graph(execution_plan, variant_pack);
+        handle->get_plugin_resource_manager()->executeOpGraph(execution_plan, variant_pack);
 
         LOG_API_SUCCESS(api_name, "");
     });
@@ -308,8 +308,8 @@ HIPDNN_BACKEND_EXPORT hipdnnStatus_t hipdnnSetEnginePluginPaths_ext(
             paths_vec.emplace_back(plugin_paths[i]);
         }
 
-        hipdnn_backend::plugin::Engine_plugin_resource_manager::set_plugin_paths(paths_vec,
-                                                                                 loading_mode);
+        hipdnn_backend::plugin::EnginePluginResourceManager::setPluginPaths(paths_vec,
+                                                                            loading_mode);
         // TODO: automatic formatting loading mode to string
         LOG_API_SUCCESS(api_name,
                         "set_plugin_paths={}",
@@ -335,7 +335,7 @@ HIPDNN_BACKEND_EXPORT hipdnnStatus_t hipdnnGetLoadedEnginePluginPaths_ext(hipdnn
         throw_if_null(num_plugin_paths);
         throw_if_null(max_string_len);
 
-        handle->get_plugin_resource_manager()->get_loaded_plugin_files(
+        handle->get_plugin_resource_manager()->getLoadedPluginFiles(
             num_plugin_paths, plugin_paths, max_string_len);
 
         LOG_API_SUCCESS(api_name,

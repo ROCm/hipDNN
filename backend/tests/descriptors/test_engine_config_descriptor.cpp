@@ -81,7 +81,7 @@ public:
             .WillOnce(Return(_mock_handle.get()));
         EXPECT_CALL(*_mock_handle, get_plugin_resource_manager())
             .WillOnce(Return(_mock_engine_plugin_resource_manager));
-        EXPECT_CALL(*_mock_engine_plugin_resource_manager, get_workspace_size(_, _, _))
+        EXPECT_CALL(*_mock_engine_plugin_resource_manager, getWorkspaceSize(_, _, _))
             .WillOnce(Return(1024));
 
         set_engine();
