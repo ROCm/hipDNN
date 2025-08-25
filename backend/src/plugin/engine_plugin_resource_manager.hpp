@@ -26,7 +26,7 @@ struct EngineDetails;
 namespace hipdnn_backend
 {
 
-class Graph_descriptor;
+class GraphDescriptor;
 
 namespace plugin
 {
@@ -65,11 +65,10 @@ public:
     // MT-unsafe instance methods
     // virtual for gMock testing
     virtual void set_stream(hipStream_t stream) const;
-    virtual std::vector<int64_t>
-        get_applicable_engine_ids(const Graph_descriptor* graph_desc) const;
+    virtual std::vector<int64_t> get_applicable_engine_ids(const GraphDescriptor* graph_desc) const;
     virtual size_t get_workspace_size(int64_t engine_id,
                                       const hipdnnPluginConstData_t* engine_config,
-                                      const Graph_descriptor* graph_desc) const;
+                                      const GraphDescriptor* graph_desc) const;
 
     virtual void execute_op_graph(hipdnnBackendDescriptor_t execution_plan,
                                   hipdnnBackendDescriptor_t variant_pack) const;
@@ -77,12 +76,12 @@ public:
     static std::shared_ptr<const Engine_details_wrapper>
         get_engine_details(const std::shared_ptr<Engine_plugin_resource_manager>& rm,
                            int64_t engine_id,
-                           const Graph_descriptor* graph_desc);
+                           const GraphDescriptor* graph_desc);
     static std::shared_ptr<const Engine_execution_context_wrapper>
         create_execution_context(const std::shared_ptr<Engine_plugin_resource_manager>& rm,
                                  int64_t engine_id,
                                  const hipdnnPluginConstData_t* engine_config,
-                                 const Graph_descriptor* graph_desc);
+                                 const GraphDescriptor* graph_desc);
 
     virtual void get_loaded_plugin_files(size_t* num_plugins,
                                          char** plugin_paths,
@@ -92,7 +91,7 @@ private:
     // MT-unsafe instance methods
     // virtual for gMock testing
     virtual void get_engine_details(int64_t engine_id,
-                                    const Graph_descriptor* graph_desc,
+                                    const GraphDescriptor* graph_desc,
                                     hipdnnPluginConstData_t* engine_details) const;
     virtual void destroy_engine_details(int64_t engine_id,
                                         hipdnnPluginConstData_t* engine_details) const;
@@ -100,7 +99,7 @@ private:
     [[nodiscard]] virtual hipdnnEnginePluginExecutionContext_t
         create_execution_context(int64_t engine_id,
                                  const hipdnnPluginConstData_t* engine_config,
-                                 const Graph_descriptor* graph_desc) const;
+                                 const GraphDescriptor* graph_desc) const;
     virtual void
         destroy_execution_context(int64_t engine_id,
                                   hipdnnEnginePluginExecutionContext_t execution_context) const;
@@ -125,7 +124,7 @@ class Engine_details_wrapper
 public:
     Engine_details_wrapper(const std::shared_ptr<Engine_plugin_resource_manager>& rm,
                            int64_t engine_id,
-                           const Graph_descriptor* graph_desc);
+                           const GraphDescriptor* graph_desc);
     ~Engine_details_wrapper();
 
     // Prevent copying
@@ -150,7 +149,7 @@ public:
     Engine_execution_context_wrapper(const std::shared_ptr<Engine_plugin_resource_manager>& rm,
                                      int64_t engine_id,
                                      const hipdnnPluginConstData_t* engine_config,
-                                     const Graph_descriptor* graph_desc);
+                                     const GraphDescriptor* graph_desc);
     ~Engine_execution_context_wrapper();
 
     // Prevent copying

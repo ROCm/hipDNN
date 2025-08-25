@@ -9,14 +9,14 @@ namespace test_descriptor_utils
 {
 
 template <typename T>
-hipdnnBackendDescriptor* create_descriptor_ptr()
+HipdnnBackendDescriptor* createDescriptorPtr()
 {
-    return hipdnnBackendDescriptor::pack_descriptor(std::make_shared<T>());
+    return HipdnnBackendDescriptor::packDescriptor(std::make_shared<T>());
 }
 
 template <typename T>
-std::unique_ptr<hipdnnBackendDescriptor> create_descriptor()
+std::unique_ptr<HipdnnBackendDescriptor> createDescriptor()
 {
-    return std::unique_ptr<hipdnnBackendDescriptor>(create_descriptor_ptr<T>());
+    return std::unique_ptr<HipdnnBackendDescriptor>(createDescriptorPtr<T>());
 }
 }

@@ -14,284 +14,276 @@
 namespace hipdnn_backend
 {
 
-void Engine_heuristic_descriptor::finalize()
+void EngineHeuristicDescriptor::finalize()
 {
-    THROW_IF_TRUE(is_finalized(),
+    THROW_IF_TRUE(isFinalized(),
                   HIPDNN_STATUS_BAD_PARAM,
-                  "Engine_heuristic_descriptor::finalize() failed: Already finalized.");
+                  "EngineHeuristicDescriptor::finalize() failed: Already finalized.");
 
     THROW_IF_NULL(_graph,
                   HIPDNN_STATUS_BAD_PARAM,
-                  "Engine_heuristic_descriptor::finalize() failed: Graph is not set.");
+                  "EngineHeuristicDescriptor::finalize() failed: Graph is not set.");
 
-    THROW_IF_FALSE(_heuristic_mode_set,
+    THROW_IF_FALSE(_heuristicModeSet,
                    HIPDNN_STATUS_BAD_PARAM,
-                   "Engine_heuristic_descriptor::finalize() failed: Heuristic mode is not set.");
+                   "EngineHeuristicDescriptor::finalize() failed: Heuristic mode is not set.");
 
-    auto handle = _graph->get_handle();
-    auto plugin_resource_manager = handle->get_plugin_resource_manager();
+    auto handle = _graph->getHandle();
+    auto pluginResourceManager = handle->get_plugin_resource_manager();
 
     // TODO - For now we are going to return the engine IDs we get from the plugin resource manager.
     // In the future, we will need to implement a plugin system for engine heuristics that allows plugins to determine sort order of the returned engines.
-    _engine_ids = plugin_resource_manager->get_applicable_engine_ids(_graph.get());
+    _engineIds = pluginResourceManager->get_applicable_engine_ids(_graph.get());
 
-    hipdnnBackendDescriptorImpl<Engine_heuristic_descriptor>::finalize();
+    HipdnnBackendDescriptorImpl<EngineHeuristicDescriptor>::finalize();
 }
 
-void Engine_heuristic_descriptor::get_attribute(hipdnnBackendAttributeName_t attribute_name,
-                                                hipdnnBackendAttributeType_t attribute_type,
-                                                int64_t requested_element_count,
-                                                int64_t* element_count,
-                                                void* array_of_elements) const
+void EngineHeuristicDescriptor::getAttribute(hipdnnBackendAttributeName_t attributeName,
+                                             hipdnnBackendAttributeType_t attributeType,
+                                             int64_t requestedElementCount,
+                                             int64_t* elementCount,
+                                             void* arrayOfElements) const
 {
-    THROW_IF_FALSE(is_finalized(),
+    THROW_IF_FALSE(isFinalized(),
                    HIPDNN_STATUS_BAD_PARAM_NOT_FINALIZED,
-                   "Engine_heuristic_descriptor::get_attribute() failed: Not finalized.");
+                   "EngineHeuristicDescriptor::getAttribute() failed: Not finalized.");
 
-    switch(attribute_name)
+    switch(attributeName)
     {
     case HIPDNN_ATTR_ENGINEHEUR_OPERATION_GRAPH:
-        get_graph(attribute_type, requested_element_count, element_count, array_of_elements);
+        getGraph(attributeType, requestedElementCount, elementCount, arrayOfElements);
         break;
     case HIPDNN_ATTR_ENGINEHEUR_MODE:
-        get_heuristic_mode(
-            attribute_type, requested_element_count, element_count, array_of_elements);
+        getHeuristicMode(attributeType, requestedElementCount, elementCount, arrayOfElements);
         break;
     case HIPDNN_ATTR_ENGINEHEUR_RESULTS:
-        get_engine_configs(
-            attribute_type, requested_element_count, element_count, array_of_elements);
+        getEngineConfigs(attributeType, requestedElementCount, elementCount, arrayOfElements);
         break;
     default:
         throw Hipdnn_exception(
             HIPDNN_STATUS_NOT_SUPPORTED,
-            std::string(
-                "Engine_heuristic_descriptor::get_attribute() is not supported for attribute ")
-                + hipdnn_backend::hipdnn_get_attribute_name_string(attribute_name) + ".");
+            std::string("EngineHeuristicDescriptor::getAttribute() is not supported for attribute ")
+                + hipdnn_backend::hipdnn_get_attribute_name_string(attributeName) + ".");
     }
 }
 
-void Engine_heuristic_descriptor::set_attribute(hipdnnBackendAttributeName_t attribute_name,
-                                                hipdnnBackendAttributeType_t attribute_type,
-                                                int64_t element_count,
-                                                const void* array_of_elements)
+void EngineHeuristicDescriptor::setAttribute(hipdnnBackendAttributeName_t attributeName,
+                                             hipdnnBackendAttributeType_t attributeType,
+                                             int64_t elementCount,
+                                             const void* arrayOfElements)
 {
-    THROW_IF_TRUE(is_finalized(),
+    THROW_IF_TRUE(isFinalized(),
                   HIPDNN_STATUS_NOT_INITIALIZED,
-                  "Engine_heuristic_descriptor::set_attribute() failed: Already finalized.");
+                  "EngineHeuristicDescriptor::setAttribute() failed: Already finalized.");
 
-    switch(attribute_name)
+    switch(attributeName)
     {
     case HIPDNN_ATTR_ENGINEHEUR_MODE:
-        set_heuristic_mode(attribute_type, element_count, array_of_elements);
+        setHeuristicMode(attributeType, elementCount, arrayOfElements);
         break;
     case HIPDNN_ATTR_ENGINEHEUR_OPERATION_GRAPH:
-        set_graph(attribute_type, element_count, array_of_elements);
+        setGraph(attributeType, elementCount, arrayOfElements);
         break;
     default:
         throw Hipdnn_exception(
             HIPDNN_STATUS_NOT_SUPPORTED,
-            std::string(
-                "Engine_heuristic_descriptor::set_attribute() is not supported for attribute ")
-                + hipdnn_backend::hipdnn_get_attribute_name_string(attribute_name) + ".");
+            std::string("EngineHeuristicDescriptor::setAttribute() is not supported for attribute ")
+                + hipdnn_backend::hipdnn_get_attribute_name_string(attributeName) + ".");
     }
 }
 
-void Engine_heuristic_descriptor::set_heuristic_mode(hipdnnBackendAttributeType_t attribute_type,
-                                                     int64_t element_count,
-                                                     const void* array_of_elements)
+void EngineHeuristicDescriptor::setHeuristicMode(hipdnnBackendAttributeType_t attributeType,
+                                                 int64_t elementCount,
+                                                 const void* arrayOfElements)
 {
-    THROW_IF_NE(
-        attribute_type,
-        HIPDNN_TYPE_HEUR_MODE,
-        HIPDNN_STATUS_BAD_PARAM,
-        "Engine_heuristic_descriptor failed to set heuristic mode: Invalid attribute type.");
+    THROW_IF_NE(attributeType,
+                HIPDNN_TYPE_HEUR_MODE,
+                HIPDNN_STATUS_BAD_PARAM,
+                "EngineHeuristicDescriptor failed to set heuristic mode: Invalid attribute type.");
 
-    THROW_IF_NE(element_count,
+    THROW_IF_NE(elementCount,
                 1,
                 HIPDNN_STATUS_BAD_PARAM,
-                "Engine_heuristic_descriptor failed to set heuristic mode: Invalid element count.");
+                "EngineHeuristicDescriptor failed to set heuristic mode: Invalid element count.");
 
-    THROW_IF_NULL(array_of_elements,
+    THROW_IF_NULL(arrayOfElements,
                   HIPDNN_STATUS_BAD_PARAM_NULL_POINTER,
-                  "Engine_heuristic_descriptor failed to set heuristic mode: Null pointer.");
+                  "EngineHeuristicDescriptor failed to set heuristic mode: Null pointer.");
 
-    auto heur_mode = static_cast<const hipdnnBackendHeurMode_t*>(array_of_elements);
+    auto heurMode = static_cast<const hipdnnBackendHeurMode_t*>(arrayOfElements);
     THROW_IF_NULL(
-        heur_mode,
+        heurMode,
         HIPDNN_STATUS_BAD_PARAM_NULL_POINTER,
-        "Engine_heuristic_descriptor failed to set heuristic mode: Heuristic mode is null.");
+        "EngineHeuristicDescriptor failed to set heuristic mode: Heuristic mode is null.");
 
-    auto heur_mode_value = *heur_mode;
-    if(heur_mode_value != HIPDNN_HEUR_MODE_FALLBACK)
+    auto heurModeValue = *heurMode;
+    if(heurModeValue != HIPDNN_HEUR_MODE_FALLBACK)
     {
         throw Hipdnn_exception(HIPDNN_STATUS_NOT_SUPPORTED,
-                               "Engine_heuristic_descriptor::set_heuristic_mode() is not "
+                               "EngineHeuristicDescriptor::setHeuristicMode() is not "
                                "supported for the given heuristic mode.");
     }
 
-    _heuristic_mode = heur_mode_value;
-    _heuristic_mode_set = true;
+    _heuristicMode = heurModeValue;
+    _heuristicModeSet = true;
 }
 
-void Engine_heuristic_descriptor::set_graph(hipdnnBackendAttributeType_t attribute_type,
-                                            int64_t element_count,
-                                            const void* array_of_elements)
+void EngineHeuristicDescriptor::setGraph(hipdnnBackendAttributeType_t attributeType,
+                                         int64_t elementCount,
+                                         const void* arrayOfElements)
 {
-    THROW_IF_NE(attribute_type,
+    THROW_IF_NE(attributeType,
                 HIPDNN_TYPE_BACKEND_DESCRIPTOR,
                 HIPDNN_STATUS_BAD_PARAM,
-                "Engine_heuristic_descriptor failed to set graph: Invalid attribute type.");
+                "EngineHeuristicDescriptor failed to set graph: Invalid attribute type.");
 
-    THROW_IF_NE(element_count,
+    THROW_IF_NE(elementCount,
                 1,
                 HIPDNN_STATUS_BAD_PARAM,
-                "Engine_heuristic_descriptor failed to set graph: Invalid element count.");
+                "EngineHeuristicDescriptor failed to set graph: Invalid element count.");
 
-    auto graph = hipdnnBackendDescriptor::unpack_descriptor<const Graph_descriptor>(
-        array_of_elements,
+    auto graph = HipdnnBackendDescriptor::unpackDescriptor<const GraphDescriptor>(
+        arrayOfElements,
         HIPDNN_STATUS_BAD_PARAM_NULL_POINTER,
-        "Engine_heuristic_descriptor failed to set graph: Null pointer.");
+        "EngineHeuristicDescriptor failed to set graph: Null pointer.");
 
-    THROW_IF_FALSE(graph->is_finalized(),
+    THROW_IF_FALSE(graph->isFinalized(),
                    HIPDNN_STATUS_BAD_PARAM_NOT_FINALIZED,
-                   "Engine_heuristic_descriptor failed to set graph: Graph is not finalized.");
+                   "EngineHeuristicDescriptor failed to set graph: Graph is not finalized.");
 
     _graph = graph;
 }
 
-void Engine_heuristic_descriptor::get_graph(hipdnnBackendAttributeType_t attribute_type,
-                                            int64_t requested_element_count,
-                                            int64_t* element_count,
-                                            void* array_of_elements) const
+void EngineHeuristicDescriptor::getGraph(hipdnnBackendAttributeType_t attributeType,
+                                         int64_t requestedElementCount,
+                                         int64_t* elementCount,
+                                         void* arrayOfElements) const
 {
-    THROW_IF_NE(attribute_type,
+    THROW_IF_NE(attributeType,
                 HIPDNN_TYPE_BACKEND_DESCRIPTOR,
                 HIPDNN_STATUS_BAD_PARAM,
-                "Engine_heuristic_descriptor failed to get graph: Invalid attribute type.");
+                "EngineHeuristicDescriptor failed to get graph: Invalid attribute type.");
 
-    THROW_IF_NE(requested_element_count,
+    THROW_IF_NE(requestedElementCount,
                 1,
                 HIPDNN_STATUS_BAD_PARAM,
-                "Engine_heuristic_descriptor failed to get graph: Invalid element count.");
+                "EngineHeuristicDescriptor failed to get graph: Invalid element count.");
 
-    THROW_IF_NULL(array_of_elements,
+    THROW_IF_NULL(arrayOfElements,
                   HIPDNN_STATUS_BAD_PARAM_NULL_POINTER,
-                  "Engine_heuristic_descriptor failed to get graph: Null pointer.");
+                  "EngineHeuristicDescriptor failed to get graph: Null pointer.");
 
-    if(element_count != nullptr)
+    if(elementCount != nullptr)
     {
-        *element_count = 1;
+        *elementCount = 1;
     }
 
-    hipdnnBackendDescriptor::pack_descriptor(_graph, array_of_elements);
+    HipdnnBackendDescriptor::packDescriptor(_graph, arrayOfElements);
 }
 
-void Engine_heuristic_descriptor::get_engine_configs(hipdnnBackendAttributeType_t attribute_type,
-                                                     int64_t requested_element_count,
-                                                     int64_t* element_count,
-                                                     void* array_of_elements) const
+void EngineHeuristicDescriptor::getEngineConfigs(hipdnnBackendAttributeType_t attributeType,
+                                                 int64_t requestedElementCount,
+                                                 int64_t* elementCount,
+                                                 void* arrayOfElements) const
 {
-    THROW_IF_NE(
-        attribute_type,
-        HIPDNN_TYPE_BACKEND_DESCRIPTOR,
-        HIPDNN_STATUS_BAD_PARAM,
-        "Engine_heuristic_descriptor failed to get engine configs: Invalid attribute type.");
+    THROW_IF_NE(attributeType,
+                HIPDNN_TYPE_BACKEND_DESCRIPTOR,
+                HIPDNN_STATUS_BAD_PARAM,
+                "EngineHeuristicDescriptor failed to get engine configs: Invalid attribute type.");
 
     // Return the number of engine configs if they aren't requesting any.
-    if(requested_element_count == 0)
+    if(requestedElementCount == 0)
     {
-        THROW_IF_NULL(element_count,
+        THROW_IF_NULL(elementCount,
                       HIPDNN_STATUS_BAD_PARAM_NULL_POINTER,
-                      "Engine_heuristic_descriptor failed to get engine config count: Null pointer "
+                      "EngineHeuristicDescriptor failed to get engine config count: Null pointer "
                       "for element count.");
-        *element_count = static_cast<int64_t>(_engine_ids.size());
+        *elementCount = static_cast<int64_t>(_engineIds.size());
     }
     else
     {
-        THROW_IF_NULL(array_of_elements,
+        THROW_IF_NULL(arrayOfElements,
                       HIPDNN_STATUS_BAD_PARAM_NULL_POINTER,
-                      "Engine_heuristic_descriptor failed to get engine configs: Null pointer.");
+                      "EngineHeuristicDescriptor failed to get engine configs: Null pointer.");
 
-        THROW_IF_NULL(element_count,
+        THROW_IF_NULL(elementCount,
                       HIPDNN_STATUS_BAD_PARAM_NULL_POINTER,
-                      "Engine_heuristic_descriptor failed to get engine config: Null pointer for "
+                      "EngineHeuristicDescriptor failed to get engine config: Null pointer for "
                       "element count.");
 
         // Create engine config descriptors for each engine ID
-        auto output_array = static_cast<hipdnnBackendDescriptor_t*>(array_of_elements);
+        auto outputArray = static_cast<hipdnnBackendDescriptor_t*>(arrayOfElements);
         for(size_t i = 0;
-            std::cmp_less(i, _engine_ids.size()) && std::cmp_less(i, requested_element_count);
+            std::cmp_less(i, _engineIds.size()) && std::cmp_less(i, requestedElementCount);
             ++i)
         {
-            auto config = hipdnnBackendDescriptor::unpack_descriptor<Engine_config_descriptor>(
-                output_array[i],
+            auto config = HipdnnBackendDescriptor::unpackDescriptor<EngineConfigDescriptor>(
+                outputArray[i],
                 HIPDNN_STATUS_BAD_PARAM_NULL_POINTER,
-                "Engine_heuristic_descriptor failed to get engine config: Config "
+                "EngineHeuristicDescriptor failed to get engine config: Config "
                 "descriptor is null.");
 
-            auto engine = std::make_shared<Engine_descriptor>();
+            auto engine = std::make_shared<EngineDescriptor>();
 
-            engine->set_attribute(
-                HIPDNN_ATTR_ENGINE_GLOBAL_INDEX, HIPDNN_TYPE_INT64, 1, &_engine_ids[i]);
+            engine->setAttribute(
+                HIPDNN_ATTR_ENGINE_GLOBAL_INDEX, HIPDNN_TYPE_INT64, 1, &_engineIds[i]);
 
-            Scoped_descriptor graph_desc(hipdnnBackendDescriptor::pack_descriptor(_graph));
-            engine->set_attribute(HIPDNN_ATTR_ENGINE_OPERATION_GRAPH,
-                                  HIPDNN_TYPE_BACKEND_DESCRIPTOR,
-                                  1,
-                                  graph_desc.get_ptr());
+            ScopedDescriptor graphDesc(HipdnnBackendDescriptor::packDescriptor(_graph));
+            engine->setAttribute(HIPDNN_ATTR_ENGINE_OPERATION_GRAPH,
+                                 HIPDNN_TYPE_BACKEND_DESCRIPTOR,
+                                 1,
+                                 graphDesc.getPtr());
             engine->finalize();
 
-            Scoped_descriptor engine_desc(hipdnnBackendDescriptor::pack_descriptor(engine));
-            config->set_attribute(HIPDNN_ATTR_ENGINECFG_ENGINE,
-                                  HIPDNN_TYPE_BACKEND_DESCRIPTOR,
-                                  1,
-                                  engine_desc.get_ptr());
+            ScopedDescriptor engineDesc(HipdnnBackendDescriptor::packDescriptor(engine));
+            config->setAttribute(HIPDNN_ATTR_ENGINECFG_ENGINE,
+                                 HIPDNN_TYPE_BACKEND_DESCRIPTOR,
+                                 1,
+                                 engineDesc.getPtr());
         }
 
-        *element_count
-            = std::min(requested_element_count, static_cast<int64_t>(_engine_ids.size()));
+        *elementCount = std::min(requestedElementCount, static_cast<int64_t>(_engineIds.size()));
     }
 }
 
-void Engine_heuristic_descriptor::get_heuristic_mode(hipdnnBackendAttributeType_t attribute_type,
-                                                     int64_t requested_element_count,
-                                                     int64_t* element_count,
-                                                     void* array_of_elements) const
+void EngineHeuristicDescriptor::getHeuristicMode(hipdnnBackendAttributeType_t attributeType,
+                                                 int64_t requestedElementCount,
+                                                 int64_t* elementCount,
+                                                 void* arrayOfElements) const
 {
-    THROW_IF_NE(
-        attribute_type,
-        HIPDNN_TYPE_HEUR_MODE,
-        HIPDNN_STATUS_BAD_PARAM,
-        "Engine_heuristic_descriptor failed to get heuristic mode: Invalid attribute type.");
+    THROW_IF_NE(attributeType,
+                HIPDNN_TYPE_HEUR_MODE,
+                HIPDNN_STATUS_BAD_PARAM,
+                "EngineHeuristicDescriptor failed to get heuristic mode: Invalid attribute type.");
 
-    THROW_IF_NE(requested_element_count,
+    THROW_IF_NE(requestedElementCount,
                 1,
                 HIPDNN_STATUS_BAD_PARAM,
-                "Engine_heuristic_descriptor failed to get heuristic mode: Invalid element count.");
+                "EngineHeuristicDescriptor failed to get heuristic mode: Invalid element count.");
 
-    THROW_IF_NULL(array_of_elements,
+    THROW_IF_NULL(arrayOfElements,
                   HIPDNN_STATUS_BAD_PARAM_NULL_POINTER,
-                  "Engine_heuristic_descriptor failed to get heuristic mode: Null pointer.");
+                  "EngineHeuristicDescriptor failed to get heuristic mode: Null pointer.");
 
-    if(element_count != nullptr)
+    if(elementCount != nullptr)
     {
-        *element_count = 1;
+        *elementCount = 1;
     }
 
-    auto heur_mode_out = static_cast<hipdnnBackendHeurMode_t*>(array_of_elements);
-    *heur_mode_out = _heuristic_mode;
+    auto heurModeOut = static_cast<hipdnnBackendHeurMode_t*>(arrayOfElements);
+    *heurModeOut = _heuristicMode;
 }
 
-std::shared_ptr<const Graph_descriptor> Engine_heuristic_descriptor::get_graph() const
+std::shared_ptr<const GraphDescriptor> EngineHeuristicDescriptor::getGraph() const
 {
-    THROW_IF_FALSE(is_finalized(),
+    THROW_IF_FALSE(isFinalized(),
                    HIPDNN_STATUS_INTERNAL_ERROR,
-                   "Engine_heuristic_descriptor::get_graph() failed: Not finalized.");
+                   "EngineHeuristicDescriptor::getGraph() failed: Not finalized.");
 
     return _graph;
 }
 
-hipdnnBackendDescriptorType_t Engine_heuristic_descriptor::get_static_type()
+hipdnnBackendDescriptorType_t EngineHeuristicDescriptor::getStaticType()
 {
     return HIPDNN_BACKEND_ENGINEHEUR_DESCRIPTOR;
 }

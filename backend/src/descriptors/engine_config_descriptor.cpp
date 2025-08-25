@@ -13,142 +13,139 @@
 namespace hipdnn_backend
 {
 
-Engine_config_descriptor::Engine_config_descriptor()
+EngineConfigDescriptor::EngineConfigDescriptor()
 {
-    _engine_config_data = std::make_unique<hipdnn_sdk::data_objects::EngineConfigT>();
+    _engineConfigData = std::make_unique<hipdnn_sdk::data_objects::EngineConfigT>();
 }
 
-void Engine_config_descriptor::finalize()
+void EngineConfigDescriptor::finalize()
 {
-    THROW_IF_TRUE(is_finalized(),
+    THROW_IF_TRUE(isFinalized(),
                   HIPDNN_STATUS_BAD_PARAM,
-                  "Engine_config_descriptor::finalize() failed: Already finalized.");
+                  "EngineConfigDescriptor::finalize() failed: Already finalized.");
 
     THROW_IF_NULL(_engine,
                   HIPDNN_STATUS_BAD_PARAM,
-                  "Engine_config_descriptor::finalize() failed: Engine is not set.");
+                  "EngineConfigDescriptor::finalize() failed: Engine is not set.");
 
-    auto graph = _engine->get_graph();
-    auto handle = graph->get_handle();
-    auto plugin_resource_manager = handle->get_plugin_resource_manager();
+    auto graph = _engine->getGraph();
+    auto handle = graph->getHandle();
+    auto pluginResourceManager = handle->get_plugin_resource_manager();
 
-    auto engine_id = _engine->get_engine_id();
+    auto engineId = _engine->getEngineId();
 
-    auto engine_config_plugin_data = get_serialized_engine_config();
-    auto workspace_size = static_cast<int64_t>(plugin_resource_manager->get_workspace_size(
-        engine_id, &engine_config_plugin_data, graph.get()));
+    auto engineConfigPluginData = getSerializedEngineConfig();
+    auto workspaceSize = static_cast<int64_t>(
+        pluginResourceManager->get_workspace_size(engineId, &engineConfigPluginData, graph.get()));
 
-    THROW_IF_LT(workspace_size,
+    THROW_IF_LT(workspaceSize,
                 0,
                 HIPDNN_STATUS_INTERNAL_ERROR,
-                "Engine_config_descriptor::set_max_workspace_size() failed: "
+                "EngineConfigDescriptor::setMaxWorkspaceSize() failed: "
                 "Max workspace size cannot be negative.");
 
-    _max_workspace_size = workspace_size;
-    hipdnnBackendDescriptorImpl<Engine_config_descriptor>::finalize();
+    _maxWorkspaceSize = workspaceSize;
+    HipdnnBackendDescriptorImpl<EngineConfigDescriptor>::finalize();
 }
 
-void Engine_config_descriptor::get_attribute(hipdnnBackendAttributeName_t attribute_name,
-                                             hipdnnBackendAttributeType_t attribute_type,
-                                             int64_t requested_element_count,
-                                             int64_t* element_count,
-                                             void* array_of_elements) const
+void EngineConfigDescriptor::getAttribute(hipdnnBackendAttributeName_t attributeName,
+                                          hipdnnBackendAttributeType_t attributeType,
+                                          int64_t requestedElementCount,
+                                          int64_t* elementCount,
+                                          void* arrayOfElements) const
 {
-    THROW_IF_FALSE(is_finalized(),
+    THROW_IF_FALSE(isFinalized(),
                    HIPDNN_STATUS_NOT_INITIALIZED,
-                   "Engine_config_descriptor::get_attribute() failed: Not finalized.");
+                   "EngineConfigDescriptor::getAttribute() failed: Not finalized.");
 
-    switch(attribute_name)
+    switch(attributeName)
     {
     case HIPDNN_ATTR_ENGINECFG_ENGINE:
-        get_engine(attribute_type, requested_element_count, element_count, array_of_elements);
+        getEngine(attributeType, requestedElementCount, elementCount, arrayOfElements);
         break;
     case HIPDNN_ATTR_ENGINECFG_WORKSPACE_SIZE:
-        get_max_workspace_size(
-            attribute_type, requested_element_count, element_count, array_of_elements);
+        getMaxWorkspaceSize(attributeType, requestedElementCount, elementCount, arrayOfElements);
         break;
     case HIPDNN_ATTR_ENGINECFG_INTERMEDIATE_INFO:
     case HIPDNN_ATTR_ENGINECFG_KNOB_CHOICES:
     default:
         throw Hipdnn_exception(
             HIPDNN_STATUS_NOT_SUPPORTED,
-            std::string("Engine_config_descriptor::get_attribute() is not supported for attribute ")
-                + hipdnn_backend::hipdnn_get_attribute_name_string(attribute_name) + ".");
+            std::string("EngineConfigDescriptor::getAttribute() is not supported for attribute ")
+                + hipdnn_backend::hipdnn_get_attribute_name_string(attributeName) + ".");
     }
 }
 
-void Engine_config_descriptor::get_engine(hipdnnBackendAttributeType_t attribute_type,
-                                          int64_t requested_element_count,
-                                          int64_t* element_count,
-                                          void* array_of_elements) const
+void EngineConfigDescriptor::getEngine(hipdnnBackendAttributeType_t attributeType,
+                                       int64_t requestedElementCount,
+                                       int64_t* elementCount,
+                                       void* arrayOfElements) const
 {
-    THROW_IF_NE(attribute_type,
+    THROW_IF_NE(attributeType,
                 HIPDNN_TYPE_BACKEND_DESCRIPTOR,
                 HIPDNN_STATUS_BAD_PARAM,
-                "Engine_config_descriptor failed to get engine: "
+                "EngineConfigDescriptor failed to get engine: "
                 "Invalid attribute type.");
 
-    THROW_IF_NE(requested_element_count,
+    THROW_IF_NE(requestedElementCount,
                 1,
                 HIPDNN_STATUS_BAD_PARAM,
-                "Engine_config_descriptor failed to get engine: "
+                "EngineConfigDescriptor failed to get engine: "
                 "Invalid element count.");
 
-    THROW_IF_NULL(array_of_elements,
+    THROW_IF_NULL(arrayOfElements,
                   HIPDNN_STATUS_BAD_PARAM_NULL_POINTER,
-                  "Engine_config_descriptor failed to get engine: "
+                  "EngineConfigDescriptor failed to get engine: "
                   "Null pointer.");
 
-    if(element_count != nullptr)
+    if(elementCount != nullptr)
     {
-        *element_count = 1;
+        *elementCount = 1;
     }
 
-    hipdnnBackendDescriptor::pack_descriptor(_engine, array_of_elements);
+    HipdnnBackendDescriptor::packDescriptor(_engine, arrayOfElements);
 }
 
-void Engine_config_descriptor::get_max_workspace_size(hipdnnBackendAttributeType_t attribute_type,
-                                                      int64_t requested_element_count,
-                                                      int64_t* element_count,
-                                                      void* array_of_elements) const
+void EngineConfigDescriptor::getMaxWorkspaceSize(hipdnnBackendAttributeType_t attributeType,
+                                                 int64_t requestedElementCount,
+                                                 int64_t* elementCount,
+                                                 void* arrayOfElements) const
 {
-    THROW_IF_NE(
-        attribute_type,
-        HIPDNN_TYPE_INT64,
-        HIPDNN_STATUS_BAD_PARAM,
-        "Engine_config_descriptor failed to get max workspace size: Invalid attribute type.");
+    THROW_IF_NE(attributeType,
+                HIPDNN_TYPE_INT64,
+                HIPDNN_STATUS_BAD_PARAM,
+                "EngineConfigDescriptor failed to get max workspace size: Invalid attribute type.");
 
-    THROW_IF_NE(
-        requested_element_count,
-        1,
-        HIPDNN_STATUS_BAD_PARAM,
-        "Engine_config_descriptor failed to get max workspace size: Invalid element count.");
+    THROW_IF_NE(requestedElementCount,
+                1,
+                HIPDNN_STATUS_BAD_PARAM,
+                "EngineConfigDescriptor failed to get max workspace size: Invalid element count.");
 
-    THROW_IF_NULL(array_of_elements,
+    THROW_IF_NULL(arrayOfElements,
                   HIPDNN_STATUS_BAD_PARAM_NULL_POINTER,
-                  "Engine_config_descriptor failed to get max workspace size: Null pointer.");
+                  "EngineConfigDescriptor failed to get max workspace size: Null pointer.");
 
-    if(element_count != nullptr)
+    if(elementCount != nullptr)
     {
-        *element_count = 1;
+        *elementCount = 1;
     }
 
-    *static_cast<int64_t*>(array_of_elements) = _max_workspace_size;
+    *static_cast<int64_t*>(arrayOfElements) = _maxWorkspaceSize;
 }
 
-void Engine_config_descriptor::set_attribute(hipdnnBackendAttributeName_t attribute_name,
-                                             hipdnnBackendAttributeType_t attribute_type,
-                                             int64_t element_count,
-                                             const void* array_of_elements)
+void EngineConfigDescriptor::setAttribute(hipdnnBackendAttributeName_t attributeName,
+                                          hipdnnBackendAttributeType_t attributeType,
+                                          int64_t elementCount,
+                                          const void* arrayOfElements)
 {
-    THROW_IF_TRUE(is_finalized(),
+    THROW_IF_TRUE(isFinalized(),
                   HIPDNN_STATUS_NOT_INITIALIZED,
-                  "Engine_config_descriptor::set_attribute() failed: Already finalized.");
+                  "EngineConfigDescriptor::setAttribute() failed: Already finalized.");
 
-    switch(attribute_name)
+    switch(attributeName)
     {
     case HIPDNN_ATTR_ENGINECFG_ENGINE:
-        set_engine(attribute_type, element_count, array_of_elements);
+        setEngine(attributeType, elementCount, arrayOfElements);
         break;
     case HIPDNN_ATTR_ENGINECFG_INTERMEDIATE_INFO:
     case HIPDNN_ATTR_ENGINECFG_KNOB_CHOICES:
@@ -156,73 +153,73 @@ void Engine_config_descriptor::set_attribute(hipdnnBackendAttributeName_t attrib
     default:
         throw Hipdnn_exception(
             HIPDNN_STATUS_NOT_SUPPORTED,
-            std::string("Engine_config_descriptor::set_attribute() is not supported for attribute ")
-                + hipdnn_backend::hipdnn_get_attribute_name_string(attribute_name) + ".");
+            std::string("EngineConfigDescriptor::setAttribute() is not supported for attribute ")
+                + hipdnn_backend::hipdnn_get_attribute_name_string(attributeName) + ".");
     }
 
     // reset the serialized buffer when an attribute is set to ensure it's not cached out of date.
-    _engine_config_serialized_buffer = flatbuffers::DetachedBuffer();
+    _engineConfigSerializedBuffer = flatbuffers::DetachedBuffer();
 }
 
-void Engine_config_descriptor::set_engine(hipdnnBackendAttributeType_t attribute_type,
-                                          int64_t element_count,
-                                          const void* array_of_elements)
+void EngineConfigDescriptor::setEngine(hipdnnBackendAttributeType_t attributeType,
+                                       int64_t elementCount,
+                                       const void* arrayOfElements)
 {
-    THROW_IF_NE(attribute_type,
+    THROW_IF_NE(attributeType,
                 HIPDNN_TYPE_BACKEND_DESCRIPTOR,
                 HIPDNN_STATUS_BAD_PARAM,
-                "Engine_config_descriptor failed to set engine: "
+                "EngineConfigDescriptor failed to set engine: "
                 "Invalid attribute type.");
 
-    THROW_IF_NE(element_count,
+    THROW_IF_NE(elementCount,
                 1,
                 HIPDNN_STATUS_BAD_PARAM,
-                "Engine_config_descriptor failed to set engine: "
+                "EngineConfigDescriptor failed to set engine: "
                 "Invalid element count.");
 
-    auto engine = hipdnnBackendDescriptor::unpack_descriptor<const Engine_descriptor>(
-        array_of_elements,
+    auto engine = HipdnnBackendDescriptor::unpackDescriptor<const EngineDescriptor>(
+        arrayOfElements,
         HIPDNN_STATUS_BAD_PARAM_NULL_POINTER,
-        "Engine_config_descriptor failed to set engine: Engine is null.");
+        "EngineConfigDescriptor failed to set engine: Engine is null.");
 
-    THROW_IF_FALSE(engine->is_finalized(),
+    THROW_IF_FALSE(engine->isFinalized(),
                    HIPDNN_STATUS_BAD_PARAM_NOT_FINALIZED,
-                   "Engine_config_descriptor failed to set engine: "
+                   "EngineConfigDescriptor failed to set engine: "
                    "Engine is not finalized.");
 
     _engine = engine;
-    _engine_config_data->engine_id = _engine->get_engine_id();
+    _engineConfigData->engine_id = _engine->getEngineId();
 }
 
-std::shared_ptr<const Engine_descriptor> Engine_config_descriptor::get_engine() const
+std::shared_ptr<const EngineDescriptor> EngineConfigDescriptor::getEngine() const
 {
-    THROW_IF_FALSE(is_finalized(),
+    THROW_IF_FALSE(isFinalized(),
                    HIPDNN_STATUS_INTERNAL_ERROR,
-                   "Engine_config_descriptor::get_engine() failed: Not finalized.");
+                   "EngineConfigDescriptor::getEngine() failed: Not finalized.");
     return _engine;
 }
 
-hipdnnBackendDescriptorType_t Engine_config_descriptor::get_static_type()
+hipdnnBackendDescriptorType_t EngineConfigDescriptor::getStaticType()
 {
     return HIPDNN_BACKEND_ENGINECFG_DESCRIPTOR;
 }
 
-hipdnnPluginConstData_t Engine_config_descriptor::get_serialized_engine_config() const
+hipdnnPluginConstData_t EngineConfigDescriptor::getSerializedEngineConfig() const
 {
-    if(_engine_config_serialized_buffer.size() == 0)
+    if(_engineConfigSerializedBuffer.size() == 0)
     {
         THROW_IF_NULL(_engine,
                       HIPDNN_STATUS_INTERNAL_ERROR,
-                      "Engine_config_descriptor::get_serialized_engine_config: engine is null");
+                      "EngineConfigDescriptor::getSerializedEngineConfig: engine is null");
 
         flatbuffers::FlatBufferBuilder builder;
         builder.Finish(
-            hipdnn_sdk::data_objects::EngineConfig::Pack(builder, _engine_config_data.get()));
-        _engine_config_serialized_buffer = builder.Release();
+            hipdnn_sdk::data_objects::EngineConfig::Pack(builder, _engineConfigData.get()));
+        _engineConfigSerializedBuffer = builder.Release();
     }
 
-    return {.ptr = _engine_config_serialized_buffer.data(),
-            .size = _engine_config_serialized_buffer.size()};
+    return {.ptr = _engineConfigSerializedBuffer.data(),
+            .size = _engineConfigSerializedBuffer.size()};
 }
 
 } // namespace hipdnn_backend

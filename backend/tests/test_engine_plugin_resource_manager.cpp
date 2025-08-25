@@ -206,7 +206,7 @@ TEST(Engine_plugin_resource_manager, self_move_assignment)
     std::shared_ptr<Mock_engine_plugin_manager> plugin_manager
         = std::make_shared<Mock_engine_plugin_manager>();
 
-    Mock_graph_descriptor mock_graph_desc;
+    MockGraphDescriptor mock_graph_desc;
     hipdnnPluginConstData_t fake_serialized_data
         = {reinterpret_cast<const void*>("fake_graph_data"), 15};
 
@@ -218,7 +218,7 @@ TEST(Engine_plugin_resource_manager, self_move_assignment)
 
     EXPECT_CALL(*mock_plugin, set_stream(hipdnnEnginePluginHandle_t(0xdeadbeef), nullptr)).Times(2);
 
-    EXPECT_CALL(mock_graph_desc, get_serialized_graph())
+    EXPECT_CALL(mock_graph_desc, getSerializedGraph())
         .WillOnce(::testing::Return(fake_serialized_data));
     EXPECT_CALL(*mock_plugin,
                 get_applicable_engine_ids(hipdnnEnginePluginHandle_t(0xdeadbeef), testing::_))
@@ -400,7 +400,7 @@ TEST(Engine_plugin_resource_manager, get_applicable_engine_ids_with_loaded_plugi
     std::shared_ptr<Mock_engine_plugin_manager> plugin_manager
         = std::make_shared<Mock_engine_plugin_manager>();
 
-    Mock_graph_descriptor mock_graph_desc;
+    MockGraphDescriptor mock_graph_desc;
     hipdnnPluginConstData_t fake_serialized_data = {
         reinterpret_cast<const void*>("fake_graph_data"),
         15 // length of "fake_graph_data"
@@ -412,7 +412,7 @@ TEST(Engine_plugin_resource_manager, get_applicable_engine_ids_with_loaded_plugi
     EXPECT_CALL(*mock_plugin, get_all_engine_ids())
         .WillOnce(::testing::Return(std::vector<int64_t>{100, 101, 102}));
 
-    EXPECT_CALL(mock_graph_desc, get_serialized_graph())
+    EXPECT_CALL(mock_graph_desc, getSerializedGraph())
         .WillOnce(::testing::Return(fake_serialized_data));
 
     EXPECT_CALL(
@@ -445,7 +445,7 @@ TEST(Engine_plugin_resource_manager, get_workspace_size)
     std::shared_ptr<Mock_engine_plugin_manager> plugin_manager
         = std::make_shared<Mock_engine_plugin_manager>();
 
-    Mock_graph_descriptor mock_graph_desc;
+    MockGraphDescriptor mock_graph_desc;
     hipdnnPluginConstData_t fake_engine_config = {
         reinterpret_cast<const void*>("fake_config"),
         11 // length of "fake_config"
@@ -461,7 +461,7 @@ TEST(Engine_plugin_resource_manager, get_workspace_size)
     EXPECT_CALL(*mock_plugin, get_all_engine_ids())
         .WillOnce(::testing::Return(std::vector<int64_t>{100, 101, 102}));
 
-    EXPECT_CALL(mock_graph_desc, get_serialized_graph())
+    EXPECT_CALL(mock_graph_desc, getSerializedGraph())
         .WillOnce(::testing::Return(fake_serialized_data));
 
     EXPECT_CALL(
@@ -495,7 +495,7 @@ TEST(Engine_plugin_resource_manager, get_engine_details)
     std::shared_ptr<Mock_engine_plugin_manager> plugin_manager
         = std::make_shared<Mock_engine_plugin_manager>();
 
-    Mock_graph_descriptor mock_graph_desc;
+    MockGraphDescriptor mock_graph_desc;
     hipdnnPluginConstData_t fake_serialized_data = {
         reinterpret_cast<const void*>("fake_graph_data"),
         15 // length of "fake_graph_data"
@@ -507,7 +507,7 @@ TEST(Engine_plugin_resource_manager, get_engine_details)
     EXPECT_CALL(*mock_plugin, get_all_engine_ids())
         .WillOnce(::testing::Return(std::vector<int64_t>{100, 101, 102}));
 
-    EXPECT_CALL(mock_graph_desc, get_serialized_graph())
+    EXPECT_CALL(mock_graph_desc, getSerializedGraph())
         .WillOnce(::testing::Return(fake_serialized_data));
 
     EXPECT_CALL(*mock_plugin,
@@ -525,7 +525,7 @@ TEST(Engine_plugin_resource_manager, get_engine_details)
                                      const hipdnnPluginConstData_t*,
                                      hipdnnPluginConstData_t* output) {
             // Create valid flatbuffer engine details
-            static auto builder = flatbuffer_test_utils::create_valid_engine_details(engine_id);
+            static auto builder = flatbuffer_test_utils::createValidEngineDetails(engine_id);
             output->ptr = builder.GetBufferPointer();
             output->size = builder.GetSize();
         }));
@@ -558,7 +558,7 @@ TEST(Engine_plugin_resource_manager, create_execution_context)
     std::shared_ptr<Mock_engine_plugin_manager> plugin_manager
         = std::make_shared<Mock_engine_plugin_manager>();
 
-    Mock_graph_descriptor mock_graph_desc;
+    MockGraphDescriptor mock_graph_desc;
     hipdnnPluginConstData_t fake_engine_config = {
         reinterpret_cast<const void*>("fake_config"),
         11 // length of "fake_config"
@@ -574,7 +574,7 @@ TEST(Engine_plugin_resource_manager, create_execution_context)
     EXPECT_CALL(*mock_plugin, get_all_engine_ids())
         .WillOnce(::testing::Return(std::vector<int64_t>{100, 101, 102}));
 
-    EXPECT_CALL(mock_graph_desc, get_serialized_graph())
+    EXPECT_CALL(mock_graph_desc, getSerializedGraph())
         .WillOnce(::testing::Return(fake_serialized_data));
 
     EXPECT_CALL(
@@ -616,7 +616,7 @@ TEST(Engine_plugin_resource_manager, create_execution_context_with_invalid_engin
     std::shared_ptr<Mock_engine_plugin_manager> plugin_manager
         = std::make_shared<Mock_engine_plugin_manager>();
 
-    Mock_graph_descriptor mock_graph_desc;
+    MockGraphDescriptor mock_graph_desc;
     hipdnnPluginConstData_t fake_engine_config = {
         reinterpret_cast<const void*>("fake_config"),
         11 // length of "fake_config"
@@ -674,14 +674,14 @@ TEST(Engine_plugin_resource_manager, execute_op_graph_fail_non_finalized_plan)
         = std::make_shared<Mock_engine_plugin_manager>();
 
     auto execution_plan_wrapper
-        = test_descriptor_utils::create_descriptor<Mock_execution_plan_descriptor>();
-    auto variant_wrapper = test_descriptor_utils::create_descriptor<Mock_variant_descriptor>();
+        = test_descriptor_utils::createDescriptor<MockExecutionPlanDescriptor>();
+    auto variant_wrapper = test_descriptor_utils::createDescriptor<MockVariantDescriptor>();
 
     auto mock_execution_plan
-        = Mock_descriptor_utility::as_descriptor_unsafe<Mock_execution_plan_descriptor>(
+        = MockDescriptorUtility::asDescriptorUnsafe<MockExecutionPlanDescriptor>(
             execution_plan_wrapper.get());
-    auto mock_variant_pack = Mock_descriptor_utility::as_descriptor_unsafe<Mock_variant_descriptor>(
-        variant_wrapper.get());
+    auto mock_variant_pack
+        = MockDescriptorUtility::asDescriptorUnsafe<MockVariantDescriptor>(variant_wrapper.get());
 
     std::vector<int64_t> tensor_ids = {1, 2, 3};
     std::vector<const void*> data_ptrs = {reinterpret_cast<void*>(0x1000),
@@ -695,7 +695,7 @@ TEST(Engine_plugin_resource_manager, execute_op_graph_fail_non_finalized_plan)
         .WillOnce(::testing::Return(std::vector<int64_t>{100, 101, 102}));
     EXPECT_CALL(*mock_plugin, destroy_handle(testing::Eq(hipdnnEnginePluginHandle_t(0xdeadbeef))));
 
-    EXPECT_CALL(*mock_execution_plan, is_finalized()).WillOnce(::testing::Return(false));
+    EXPECT_CALL(*mock_execution_plan, isFinalized()).WillOnce(::testing::Return(false));
 
     {
         Engine_plugin_resource_manager resource_manager(plugin_manager);
@@ -714,14 +714,14 @@ TEST(Engine_plugin_resource_manager, execute_op_graph_fail_non_finalized_variant
         = std::make_shared<Mock_engine_plugin_manager>();
 
     auto execution_plan_wrapper
-        = test_descriptor_utils::create_descriptor<Mock_execution_plan_descriptor>();
-    auto variant_wrapper = test_descriptor_utils::create_descriptor<Mock_variant_descriptor>();
+        = test_descriptor_utils::createDescriptor<MockExecutionPlanDescriptor>();
+    auto variant_wrapper = test_descriptor_utils::createDescriptor<MockVariantDescriptor>();
 
     auto mock_execution_plan
-        = Mock_descriptor_utility::as_descriptor_unsafe<Mock_execution_plan_descriptor>(
+        = MockDescriptorUtility::asDescriptorUnsafe<MockExecutionPlanDescriptor>(
             execution_plan_wrapper.get());
-    auto mock_variant_pack = Mock_descriptor_utility::as_descriptor_unsafe<Mock_variant_descriptor>(
-        variant_wrapper.get());
+    auto mock_variant_pack
+        = MockDescriptorUtility::asDescriptorUnsafe<MockVariantDescriptor>(variant_wrapper.get());
 
     std::vector<int64_t> tensor_ids = {1, 2, 3};
     std::vector<const void*> data_ptrs = {reinterpret_cast<void*>(0x1000),
@@ -735,8 +735,8 @@ TEST(Engine_plugin_resource_manager, execute_op_graph_fail_non_finalized_variant
         .WillOnce(::testing::Return(std::vector<int64_t>{100, 101, 102}));
     EXPECT_CALL(*mock_plugin, destroy_handle(testing::Eq(hipdnnEnginePluginHandle_t(0xdeadbeef))));
 
-    EXPECT_CALL(*mock_execution_plan, is_finalized()).WillOnce(::testing::Return(true));
-    EXPECT_CALL(*mock_variant_pack, is_finalized()).WillOnce(::testing::Return(false));
+    EXPECT_CALL(*mock_execution_plan, isFinalized()).WillOnce(::testing::Return(true));
+    EXPECT_CALL(*mock_variant_pack, isFinalized()).WillOnce(::testing::Return(false));
 
     {
         Engine_plugin_resource_manager resource_manager(plugin_manager);
@@ -755,22 +755,21 @@ TEST(Engine_plugin_resource_manager, execute_op_graph_fail_tensor_mismatch)
         = std::make_shared<Mock_engine_plugin_manager>();
 
     auto engine_config_wrapper
-        = test_descriptor_utils::create_descriptor<Mock_engine_config_descriptor>();
-    auto engine_wrapper = test_descriptor_utils::create_descriptor<Mock_engine_descriptor>();
+        = test_descriptor_utils::createDescriptor<MockEngineConfigDescriptor>();
+    auto engine_wrapper = test_descriptor_utils::createDescriptor<MockEngineDescriptor>();
     auto execution_plan_wrapper
-        = test_descriptor_utils::create_descriptor<Mock_execution_plan_descriptor>();
-    auto variant_wrapper = test_descriptor_utils::create_descriptor<Mock_variant_descriptor>();
+        = test_descriptor_utils::createDescriptor<MockExecutionPlanDescriptor>();
+    auto variant_wrapper = test_descriptor_utils::createDescriptor<MockVariantDescriptor>();
 
-    auto mock_engine_config
-        = Mock_descriptor_utility::as_descriptor_unsafe<Mock_engine_config_descriptor>(
-            engine_config_wrapper.get());
-    auto mock_engine = Mock_descriptor_utility::as_descriptor_unsafe<Mock_engine_descriptor>(
-        engine_wrapper.get());
+    auto mock_engine_config = MockDescriptorUtility::asDescriptorUnsafe<MockEngineConfigDescriptor>(
+        engine_config_wrapper.get());
+    auto mock_engine
+        = MockDescriptorUtility::asDescriptorUnsafe<MockEngineDescriptor>(engine_wrapper.get());
     auto mock_execution_plan
-        = Mock_descriptor_utility::as_descriptor_unsafe<Mock_execution_plan_descriptor>(
+        = MockDescriptorUtility::asDescriptorUnsafe<MockExecutionPlanDescriptor>(
             execution_plan_wrapper.get());
-    auto mock_variant_pack = Mock_descriptor_utility::as_descriptor_unsafe<Mock_variant_descriptor>(
-        variant_wrapper.get());
+    auto mock_variant_pack
+        = MockDescriptorUtility::asDescriptorUnsafe<MockVariantDescriptor>(variant_wrapper.get());
 
     // More data ptrs than tensor ids
     std::vector<int64_t> tensor_ids = {1};
@@ -785,17 +784,17 @@ TEST(Engine_plugin_resource_manager, execute_op_graph_fail_tensor_mismatch)
         .WillOnce(::testing::Return(std::vector<int64_t>{100, 101, 102}));
     EXPECT_CALL(*mock_plugin, destroy_handle(testing::Eq(hipdnnEnginePluginHandle_t(0xdeadbeef))));
 
-    EXPECT_CALL(*mock_execution_plan, is_finalized()).WillOnce(::testing::Return(true));
-    EXPECT_CALL(*mock_variant_pack, is_finalized()).WillOnce(::testing::Return(true));
+    EXPECT_CALL(*mock_execution_plan, isFinalized()).WillOnce(::testing::Return(true));
+    EXPECT_CALL(*mock_variant_pack, isFinalized()).WillOnce(::testing::Return(true));
 
-    EXPECT_CALL(*mock_execution_plan, get_engine_config())
+    EXPECT_CALL(*mock_execution_plan, getEngineConfig())
         .WillOnce(::testing::Return(mock_engine_config));
-    EXPECT_CALL(*mock_engine_config, get_engine()).WillOnce(::testing::Return(mock_engine));
-    EXPECT_CALL(*mock_engine, get_engine_id()).WillOnce(::testing::Return(int64_t(100)));
-    EXPECT_CALL(*mock_variant_pack, get_workspace())
+    EXPECT_CALL(*mock_engine_config, getEngine()).WillOnce(::testing::Return(mock_engine));
+    EXPECT_CALL(*mock_engine, getEngineId()).WillOnce(::testing::Return(int64_t(100)));
+    EXPECT_CALL(*mock_variant_pack, getWorkspace())
         .WillOnce(::testing::Return(reinterpret_cast<void*>(0x4000)));
-    EXPECT_CALL(*mock_variant_pack, get_tensor_ids()).WillOnce(::testing::ReturnRef(tensor_ids));
-    EXPECT_CALL(*mock_variant_pack, get_data_pointers()).WillOnce(::testing::ReturnRef(data_ptrs));
+    EXPECT_CALL(*mock_variant_pack, getTensorIds()).WillOnce(::testing::ReturnRef(tensor_ids));
+    EXPECT_CALL(*mock_variant_pack, getDataPointers()).WillOnce(::testing::ReturnRef(data_ptrs));
 
     {
         Engine_plugin_resource_manager resource_manager(plugin_manager);
@@ -820,22 +819,21 @@ TEST(Engine_plugin_resource_manager, execute_op_graph_success_with_valid_descrip
         = std::make_shared<Mock_engine_plugin_manager>();
 
     auto engine_config_wrapper
-        = test_descriptor_utils::create_descriptor<Mock_engine_config_descriptor>();
-    auto engine_wrapper = test_descriptor_utils::create_descriptor<Mock_engine_descriptor>();
+        = test_descriptor_utils::createDescriptor<MockEngineConfigDescriptor>();
+    auto engine_wrapper = test_descriptor_utils::createDescriptor<MockEngineDescriptor>();
     auto execution_plan_wrapper
-        = test_descriptor_utils::create_descriptor<Mock_execution_plan_descriptor>();
-    auto variant_wrapper = test_descriptor_utils::create_descriptor<Mock_variant_descriptor>();
+        = test_descriptor_utils::createDescriptor<MockExecutionPlanDescriptor>();
+    auto variant_wrapper = test_descriptor_utils::createDescriptor<MockVariantDescriptor>();
 
-    auto mock_engine_config
-        = Mock_descriptor_utility::as_descriptor_unsafe<Mock_engine_config_descriptor>(
-            engine_config_wrapper.get());
-    auto mock_engine = Mock_descriptor_utility::as_descriptor_unsafe<Mock_engine_descriptor>(
-        engine_wrapper.get());
+    auto mock_engine_config = MockDescriptorUtility::asDescriptorUnsafe<MockEngineConfigDescriptor>(
+        engine_config_wrapper.get());
+    auto mock_engine
+        = MockDescriptorUtility::asDescriptorUnsafe<MockEngineDescriptor>(engine_wrapper.get());
     auto mock_execution_plan
-        = Mock_descriptor_utility::as_descriptor_unsafe<Mock_execution_plan_descriptor>(
+        = MockDescriptorUtility::asDescriptorUnsafe<MockExecutionPlanDescriptor>(
             execution_plan_wrapper.get());
-    auto mock_variant_pack = Mock_descriptor_utility::as_descriptor_unsafe<Mock_variant_descriptor>(
-        variant_wrapper.get());
+    auto mock_variant_pack
+        = MockDescriptorUtility::asDescriptorUnsafe<MockVariantDescriptor>(variant_wrapper.get());
 
     std::vector<int64_t> tensor_ids = {1, 2, 3};
     std::vector<const void*> data_ptrs = {reinterpret_cast<void*>(0x1000),
@@ -849,18 +847,18 @@ TEST(Engine_plugin_resource_manager, execute_op_graph_success_with_valid_descrip
         .WillOnce(::testing::Return(std::vector<int64_t>{100, 101, 102}));
     EXPECT_CALL(*mock_plugin, destroy_handle(testing::Eq(hipdnnEnginePluginHandle_t(0xdeadbeef))));
 
-    EXPECT_CALL(*mock_execution_plan, is_finalized()).WillOnce(::testing::Return(true));
-    EXPECT_CALL(*mock_variant_pack, is_finalized()).WillOnce(::testing::Return(true));
+    EXPECT_CALL(*mock_execution_plan, isFinalized()).WillOnce(::testing::Return(true));
+    EXPECT_CALL(*mock_variant_pack, isFinalized()).WillOnce(::testing::Return(true));
 
-    EXPECT_CALL(*mock_execution_plan, get_engine_config())
+    EXPECT_CALL(*mock_execution_plan, getEngineConfig())
         .WillOnce(::testing::Return(mock_engine_config));
-    EXPECT_CALL(*mock_engine_config, get_engine()).WillOnce(::testing::Return(mock_engine));
-    EXPECT_CALL(*mock_engine, get_engine_id()).WillOnce(::testing::Return(int64_t(100)));
-    EXPECT_CALL(*mock_variant_pack, get_workspace())
+    EXPECT_CALL(*mock_engine_config, getEngine()).WillOnce(::testing::Return(mock_engine));
+    EXPECT_CALL(*mock_engine, getEngineId()).WillOnce(::testing::Return(int64_t(100)));
+    EXPECT_CALL(*mock_variant_pack, getWorkspace())
         .WillOnce(::testing::Return(reinterpret_cast<void*>(0x4000)));
-    EXPECT_CALL(*mock_variant_pack, get_tensor_ids()).WillOnce(::testing::ReturnRef(tensor_ids));
-    EXPECT_CALL(*mock_variant_pack, get_data_pointers()).WillOnce(::testing::ReturnRef(data_ptrs));
-    EXPECT_CALL(*mock_execution_plan, get_execution_context())
+    EXPECT_CALL(*mock_variant_pack, getTensorIds()).WillOnce(::testing::ReturnRef(tensor_ids));
+    EXPECT_CALL(*mock_variant_pack, getDataPointers()).WillOnce(::testing::ReturnRef(data_ptrs));
+    EXPECT_CALL(*mock_execution_plan, getExecutionContext())
         .WillOnce(::testing::Return(hipdnnEnginePluginExecutionContext_t(0xcafebabe)));
 
     std::vector<hipdnnPluginDeviceBuffer_t> expected_device_buffers;
@@ -947,7 +945,7 @@ TEST(Engine_plugin_resource_manager, get_workspace_size_null_engine_config)
     std::shared_ptr<Mock_engine_plugin_manager> plugin_manager
         = std::make_shared<Mock_engine_plugin_manager>();
 
-    Mock_graph_descriptor mock_graph_desc;
+    MockGraphDescriptor mock_graph_desc;
 
     EXPECT_CALL(*plugin_manager, get_plugins()).WillOnce(::testing::ReturnRef(plugins));
     EXPECT_CALL(*mock_plugin, create_handle())
@@ -972,7 +970,7 @@ TEST(Engine_plugin_resource_manager, get_workspace_size_invalid_engine_id)
     std::shared_ptr<Mock_engine_plugin_manager> plugin_manager
         = std::make_shared<Mock_engine_plugin_manager>();
 
-    Mock_graph_descriptor mock_graph_desc;
+    MockGraphDescriptor mock_graph_desc;
     hipdnnPluginConstData_t fake_engine_config = {
         reinterpret_cast<const void*>("fake_config"),
         11 // length of "fake_config"
@@ -1001,7 +999,7 @@ TEST(Engine_plugin_resource_manager, get_workspace_size_throws_exception_for_inv
     std::shared_ptr<Mock_engine_plugin_manager> plugin_manager
         = std::make_shared<Mock_engine_plugin_manager>();
 
-    Mock_graph_descriptor mock_graph_desc;
+    MockGraphDescriptor mock_graph_desc;
     hipdnnPluginConstData_t fake_engine_config = {
         reinterpret_cast<const void*>("fake_config"),
         11 // length of "fake_config"
