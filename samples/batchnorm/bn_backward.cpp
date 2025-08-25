@@ -131,14 +131,12 @@ void Sample_runner::operator()(const Tensor_layout& layout)
 
         auto epsilon = get_epsilon<InputType>();
 
-        // Use 1000 for absolute tolerance because bn backwards involves large summations,
-        // and still use minimal tolerance for relative error.
         auto dx_validator
             = hipdnn_sdk::reference_test_utilities::Cpu_fp_reference_validation<InputType>(
-                static_cast<InputType>(1000), static_cast<InputType>(epsilon));
+                static_cast<InputType>(epsilon), static_cast<InputType>(epsilon));
         auto dscale_dbias_validator
             = hipdnn_sdk::reference_test_utilities::Cpu_fp_reference_validation<IntermediateType>(
-                static_cast<IntermediateType>(1000), static_cast<IntermediateType>(epsilon));
+                static_cast<IntermediateType>(epsilon), static_cast<IntermediateType>(epsilon));
 
         bool dx_valid = dx_validator.all_close(dx_ref_tensor.memory(), dx_tensor.memory());
         bool dscale_valid = dscale_dbias_validator.all_close(dscale_ref_tensor.memory(),
