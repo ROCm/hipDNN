@@ -18,6 +18,14 @@ Engine_plugin::Engine_plugin(Shared_library&& lib)
     resolve_symbols();
 }
 
+Engine_plugin::Engine_plugin()
+{
+    // This constructor is used for mocking purposes in tests.
+#ifndef NDEBUG
+    _initialized = true;
+#endif
+}
+
 void Engine_plugin::resolve_symbols()
 {
     if(type() != HIPDNN_PLUGIN_TYPE_ENGINE)

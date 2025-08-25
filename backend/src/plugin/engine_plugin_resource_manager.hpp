@@ -31,10 +31,10 @@ class Graph_descriptor;
 namespace plugin
 {
 
-class Engine_plugin;
-class Engine_plugin_manager;
 class Engine_details_wrapper;
 class Engine_execution_context_wrapper;
+class Engine_plugin;
+class Engine_plugin_manager;
 
 class Engine_plugin_resource_manager
 {
@@ -51,7 +51,7 @@ public:
 
     static std::shared_ptr<Engine_plugin_resource_manager> create();
 
-    Engine_plugin_resource_manager(std::shared_ptr<Engine_plugin_manager>& pm);
+    Engine_plugin_resource_manager(std::shared_ptr<Engine_plugin_manager> pm);
     virtual ~Engine_plugin_resource_manager();
 
     // Prevent copying
@@ -84,9 +84,9 @@ public:
                                  const hipdnnPluginConstData_t* engine_config,
                                  const Graph_descriptor* graph_desc);
 
-    void get_loaded_plugin_files(size_t* num_plugins,
-                                 char** plugin_paths,
-                                 size_t* max_string_len) const;
+    virtual void get_loaded_plugin_files(size_t* num_plugins,
+                                         char** plugin_paths,
+                                         size_t* max_string_len) const;
 
 private:
     // MT-unsafe instance methods

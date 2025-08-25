@@ -12,7 +12,7 @@ TEST(TestTensor, BasicRowMajorUsage)
 {
     SKIP_IF_NO_DEVICES();
 
-    auto tensor = Tensor::make_tensor<float>({1, 2, 3, 4});
+    Tensor<float> tensor({1, 2, 3, 4});
 
     // NCHW (row-major) strides with dims {N=1, C=2, H=3, W=4}:
     // N stride = C*H*W = 2*3*4 = 24
@@ -30,10 +30,10 @@ TEST(TestTensor, FillWithValuesUsage)
 {
     SKIP_IF_NO_DEVICES();
 
-    auto tensor = Tensor::make_tensor<float>({1, 2, 3, 4});
+    Tensor<float> tensor({1, 2, 3, 4});
 
     tensor.fill_with_value(1.0f);
-    auto buffer = tensor.memory().host_data<float>();
+    auto buffer = tensor.memory().host_data();
 
     for(size_t i = 0; i < tensor.memory().count(); i++)
     {
@@ -45,10 +45,10 @@ TEST(TestTensor, FillWithRandomValuesUsage)
 {
     SKIP_IF_NO_DEVICES();
 
-    auto tensor = Tensor::make_tensor<float>({1, 2, 3, 4});
+    Tensor<float> tensor({1, 2, 3, 4});
 
     tensor.fill_with_random_values(1.0f, 3.0f);
-    auto buffer = tensor.memory().host_data<float>();
+    auto buffer = tensor.memory().host_data();
 
     for(size_t i = 0; i < tensor.memory().count(); i++)
     {
@@ -61,7 +61,7 @@ TEST(TestTensor, BasicNHWCUsage)
 {
     SKIP_IF_NO_DEVICES();
 
-    auto tensor = Tensor::make_tensor<float>({1, 2, 3, 4}, Tensor_layout::NHWC);
+    Tensor<float> tensor({1, 2, 3, 4}, Tensor_layout::NHWC);
 
     EXPECT_EQ(tensor.memory().count(), 24);
     // NHWC strides with dims {N=1, C=2, H=3, W=4}:
@@ -79,20 +79,20 @@ TEST(TestTensor, GetAndSetHostValueNCHW)
 {
     SKIP_IF_NO_DEVICES();
 
-    auto tensor = Tensor::make_tensor<float>({1, 2, 3, 4});
+    Tensor<float> tensor({1, 2, 3, 4});
     tensor.fill_with_value(0.0f);
-    tensor.set_host_value<float>(0, 1, 1, 2, 99.0f);
+    tensor.set_host_value(0, 1, 1, 2, 99.0f);
 
-    EXPECT_FLOAT_EQ(tensor.get_host_value<float>(0, 1, 1, 2), 99.0f);
+    EXPECT_FLOAT_EQ(tensor.get_host_value(0, 1, 1, 2), 99.0f);
 }
 
 TEST(TestTensor, GetAndSetHostValueNHWC)
 {
     SKIP_IF_NO_DEVICES();
 
-    auto tensor = Tensor::make_tensor<float>({1, 2, 3, 4}, Tensor_layout::NHWC);
+    Tensor<float> tensor({1, 2, 3, 4}, Tensor_layout::NHWC);
     tensor.fill_with_value(0.0f);
-    tensor.set_host_value<float>(0, 1, 1, 2, 99.0f);
+    tensor.set_host_value(0, 1, 1, 2, 99.0f);
 
-    EXPECT_FLOAT_EQ(tensor.get_host_value<float>(0, 1, 1, 2), 99.0f);
+    EXPECT_FLOAT_EQ(tensor.get_host_value(0, 1, 1, 2), 99.0f);
 }
