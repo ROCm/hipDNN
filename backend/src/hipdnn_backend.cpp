@@ -60,7 +60,7 @@ HIPDNN_BACKEND_EXPORT hipdnnStatus_t hipdnnCreate(hipdnnHandle_t* handle)
     return hipdnn_backend::try_catch([&, api_name = __func__]() {
         throw_if_null(handle);
 
-        hipdnn_backend::Handle_factory::create_handle(handle);
+        hipdnn_backend::HandleFactory::createHandle(handle);
 
         LOG_API_SUCCESS(api_name, "created_handle={:p}", static_cast<void*>(*handle));
     });
@@ -87,7 +87,7 @@ HIPDNN_BACKEND_EXPORT hipdnnStatus_t hipdnnSetStream(hipdnnHandle_t handle, hipS
     return hipdnn_backend::try_catch([&, api_name = __func__]() {
         throw_if_null(handle);
 
-        handle->set_stream(stream_id);
+        handle->setStream(stream_id);
 
         LOG_API_SUCCESS(api_name, "");
     });
@@ -103,7 +103,7 @@ HIPDNN_BACKEND_EXPORT hipdnnStatus_t hipdnnGetStream(hipdnnHandle_t handle, hipS
         throw_if_null(handle);
         throw_if_null(stream_id);
 
-        *stream_id = handle->get_stream();
+        *stream_id = handle->getStream();
 
         LOG_API_SUCCESS(api_name, "retrieved_stream={:p}", static_cast<void*>(*stream_id));
     });
@@ -151,7 +151,7 @@ HIPDNN_BACKEND_EXPORT hipdnnStatus_t hipdnnBackendExecute(hipdnnHandle_t handle,
         throw_if_invalid_descriptor(execution_plan);
         throw_if_invalid_descriptor(variant_pack);
 
-        handle->get_plugin_resource_manager()->execute_op_graph(execution_plan, variant_pack);
+        handle->getPluginResourceManager()->execute_op_graph(execution_plan, variant_pack);
 
         LOG_API_SUCCESS(api_name, "");
     });
@@ -335,7 +335,7 @@ HIPDNN_BACKEND_EXPORT hipdnnStatus_t hipdnnGetLoadedEnginePluginPaths_ext(hipdnn
         throw_if_null(num_plugin_paths);
         throw_if_null(max_string_len);
 
-        handle->get_plugin_resource_manager()->get_loaded_plugin_files(
+        handle->getPluginResourceManager()->get_loaded_plugin_files(
             num_plugin_paths, plugin_paths, max_string_len);
 
         LOG_API_SUCCESS(api_name,

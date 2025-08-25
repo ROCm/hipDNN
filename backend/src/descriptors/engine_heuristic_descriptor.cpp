@@ -29,7 +29,7 @@ void Engine_heuristic_descriptor::finalize()
                    "Engine_heuristic_descriptor::finalize() failed: Heuristic mode is not set.");
 
     auto handle = _graph->get_handle();
-    auto plugin_resource_manager = handle->get_plugin_resource_manager();
+    auto plugin_resource_manager = handle->getPluginResourceManager();
 
     // TODO - For now we are going to return the engine IDs we get from the plugin resource manager.
     // In the future, we will need to implement a plugin system for engine heuristics that allows plugins to determine sort order of the returned engines.

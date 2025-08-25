@@ -25,7 +25,7 @@ void Engine_descriptor::finalize()
                    "Engine_descriptor::finalize() failed: Engine id is not set.");
 
     auto handle = _graph->get_handle();
-    auto plugin_resource_manager = handle->get_plugin_resource_manager();
+    auto plugin_resource_manager = handle->getPluginResourceManager();
 
     auto engine_ids = plugin_resource_manager->get_applicable_engine_ids(_graph.get());
     if(std::ranges::find(engine_ids, _engine_id) == engine_ids.end())

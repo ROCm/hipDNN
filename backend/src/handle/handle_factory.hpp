@@ -9,11 +9,11 @@
 namespace hipdnn_backend
 {
 
-class Handle_factory
+class HandleFactory
 {
 public:
-    static void create_handle(hipdnnHandle_t* handle);
-    static void destroy_handle(hipdnnHandle_t handle);
+    static void createHandle(hipdnnHandle_t* handle);
+    static void destroyHandle(hipdnnHandle_t handle);
 };
 
 } // namespace hipdnn_backend

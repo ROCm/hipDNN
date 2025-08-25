@@ -77,7 +77,7 @@ public:
             .WillOnce(Return(get_execution_context()));
         EXPECT_CALL(*_mock_engine_plugin_resource_manager, destroy_execution_context(_, _));
 
-        EXPECT_CALL(*_mock_handle, get_plugin_resource_manager())
+        EXPECT_CALL(*_mock_handle, getPluginResourceManager())
             .WillOnce(Return(_mock_engine_plugin_resource_manager));
         get_execution_plan_descriptor()->set_attribute(
             HIPDNN_ATTR_EXECUTION_PLAN_HANDLE, HIPDNN_TYPE_HANDLE, 1, &_mock_handle);
