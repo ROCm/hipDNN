@@ -4,6 +4,7 @@
 #pragma once
 
 #include <flatbuffers/flatbuffers.h>
+#include <hipdnn_sdk/data_objects/engine_details_generated.h>
 #include <hipdnn_sdk/data_objects/graph_generated.h>
 #include <string>
 #include <vector>
@@ -11,7 +12,7 @@
 namespace flatbuffer_test_utils
 {
 
-static flatbuffers::FlatBufferBuilder create_valid_graph()
+inline flatbuffers::FlatBufferBuilder create_valid_graph()
 {
     std::vector<::flatbuffers::Offset<hipdnn_sdk::data_objects::TensorAttributes>>
         tensor_attributes;
@@ -26,6 +27,14 @@ static flatbuffers::FlatBufferBuilder create_valid_graph()
                                                       &tensor_attributes,
                                                       &nodes);
     builder.Finish(graph_offset);
+    return builder;
+}
+
+inline flatbuffers::FlatBufferBuilder create_valid_engine_details(int64_t engine_id)
+{
+    flatbuffers::FlatBufferBuilder builder;
+    auto engine_details_offset = hipdnn_sdk::data_objects::CreateEngineDetails(builder, engine_id);
+    builder.Finish(engine_details_offset);
     return builder;
 }
 
