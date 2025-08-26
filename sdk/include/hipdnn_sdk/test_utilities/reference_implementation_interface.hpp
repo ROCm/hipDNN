@@ -19,33 +19,33 @@ namespace reference_test_utilities
 using namespace hipdnn_sdk::data_objects;
 using namespace hipdnn_sdk::utilities;
 
-template <class Input_data_type,
-          class Scale_bias_data_type,
-          class Mean_variance_data_type = Scale_bias_data_type>
-class Reference_implementation_interface
+template <class InputDataType,
+          class ScaleBiasDataType,
+          class MeanVarianceDataType = ScaleBiasDataType>
+class IReferenceImplementation
 {
 public:
-    virtual ~Reference_implementation_interface() = default;
+    virtual ~IReferenceImplementation() = default;
 
     virtual void
-        batchnorm_fwd_inference(const ITensor<Input_data_type>& input,
-                                const ITensor<Scale_bias_data_type>& scale,
-                                const ITensor<Scale_bias_data_type>& bias,
-                                const ITensor<Mean_variance_data_type>& estimated_mean,
-                                const ITensor<Mean_variance_data_type>& estimated_variance,
-                                ITensor<Input_data_type>& output,
-                                double epsilon)
+        batchnormFwdInference(const ITensor<InputDataType>& input,
+                              const ITensor<ScaleBiasDataType>& scale,
+                              const ITensor<ScaleBiasDataType>& bias,
+                              const ITensor<MeanVarianceDataType>& estimatedMean,
+                              const ITensor<MeanVarianceDataType>& estimatedVariance,
+                              ITensor<InputDataType>& output,
+                              double epsilon)
         = 0;
 
     // Could call this bwd_training or bwd_propagation
-    virtual void batchnorm_bwd(const ITensor<Input_data_type>& dy,
-                               const ITensor<Input_data_type>& x,
-                               const ITensor<Mean_variance_data_type>& mean,
-                               const ITensor<Mean_variance_data_type>& inv_variance,
-                               const ITensor<Scale_bias_data_type>& scale,
-                               ITensor<Input_data_type>& dx,
-                               ITensor<Scale_bias_data_type>& dscale,
-                               ITensor<Scale_bias_data_type>& dbias)
+    virtual void batchnormBwd(const ITensor<InputDataType>& dy,
+                              const ITensor<InputDataType>& x,
+                              const ITensor<MeanVarianceDataType>& mean,
+                              const ITensor<MeanVarianceDataType>& invVariance,
+                              const ITensor<ScaleBiasDataType>& scale,
+                              ITensor<InputDataType>& dx,
+                              ITensor<ScaleBiasDataType>& dscale,
+                              ITensor<ScaleBiasDataType>& dbias)
         = 0;
 };
 

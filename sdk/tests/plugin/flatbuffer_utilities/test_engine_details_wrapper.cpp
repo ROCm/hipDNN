@@ -8,10 +8,10 @@
 
 using namespace hipdnn_plugin;
 
-flatbuffers::FlatBufferBuilder build_valid_engine_details_buffer(int64_t engine_id)
+flatbuffers::FlatBufferBuilder buildValidEngineDetailsBuffer(int64_t engineId)
 {
     flatbuffers::FlatBufferBuilder builder;
-    auto config = hipdnn_sdk::data_objects::CreateEngineDetails(builder, engine_id);
+    auto config = hipdnn_sdk::data_objects::CreateEngineDetails(builder, engineId);
     builder.Finish(config);
     return builder;
 }
@@ -26,11 +26,11 @@ TEST(EngineDetailsWrapperTest, InvalidBufferIsNotValid)
 
 TEST(EngineDetailsWrapperTest, ValidBufferIsValid)
 {
-    int64_t test_engine_id = 42;
-    auto builder = build_valid_engine_details_buffer(test_engine_id);
+    int64_t testEngineId = 42;
+    auto builder = buildValidEngineDetailsBuffer(testEngineId);
     EngineDetailsWrapper wrapper(builder.GetBufferPointer(), builder.GetSize());
     EXPECT_TRUE(wrapper.isValid());
-    EXPECT_EQ(wrapper.engineId(), test_engine_id);
+    EXPECT_EQ(wrapper.engineId(), testEngineId);
     EXPECT_NO_THROW(wrapper.getEngineDetails());
 }
 

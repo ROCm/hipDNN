@@ -250,15 +250,15 @@ protected:
     template <typename InputType, typename IntermediateType>
     void runCpuBatchnormBwd(Batchnorm2dTensorBundle<InputType, IntermediateType>& cpuTensorBundle)
     {
-        Cpu_fp_reference_implementation<InputType, IntermediateType, IntermediateType> cpuRefImpl;
-        cpuRefImpl.batchnorm_bwd(cpuTensorBundle.dyTensor,
-                                 cpuTensorBundle.xTensor,
-                                 cpuTensorBundle.meanTensor,
-                                 cpuTensorBundle.invVarianceTensor,
-                                 cpuTensorBundle.scaleTensor,
-                                 cpuTensorBundle.dxTensor,
-                                 cpuTensorBundle.dscaleTensor,
-                                 cpuTensorBundle.dbiasTensor);
+        CpuFpReferenceImplementation<InputType, IntermediateType, IntermediateType> cpuRefImpl;
+        cpuRefImpl.batchnormBwd(cpuTensorBundle.dyTensor,
+                                cpuTensorBundle.xTensor,
+                                cpuTensorBundle.meanTensor,
+                                cpuTensorBundle.invVarianceTensor,
+                                cpuTensorBundle.scaleTensor,
+                                cpuTensorBundle.dxTensor,
+                                cpuTensorBundle.dscaleTensor,
+                                cpuTensorBundle.dbiasTensor);
     }
 
     template <typename InputType, typename IntermediateType>
@@ -286,16 +286,16 @@ protected:
 
         runCpuBatchnormBwd<InputType, IntermediateType>(cpuTensorBundle);
 
-        Cpu_fp_reference_validation<InputType> cpuRefValidation(tolerance, tolerance);
-        EXPECT_TRUE(cpuRefValidation.all_close(cpuTensorBundle.dxTensor.memory(),
-                                               graphTensorBundle.dxTensor.memory()));
+        CpuFpReferenceValidation<InputType> cpuRefValidation(tolerance, tolerance);
+        EXPECT_TRUE(cpuRefValidation.allClose(cpuTensorBundle.dxTensor.memory(),
+                                              graphTensorBundle.dxTensor.memory()));
 
-        Cpu_fp_reference_validation<IntermediateType> cpuRefIntermediateValidation(tolerance,
-                                                                                   tolerance);
-        EXPECT_TRUE(cpuRefIntermediateValidation.all_close(
-            cpuTensorBundle.dscaleTensor.memory(), graphTensorBundle.dscaleTensor.memory()));
-        EXPECT_TRUE(cpuRefIntermediateValidation.all_close(cpuTensorBundle.dbiasTensor.memory(),
-                                                           graphTensorBundle.dbiasTensor.memory()));
+        CpuFpReferenceValidation<IntermediateType> cpuRefIntermediateValidation(tolerance,
+                                                                                tolerance);
+        EXPECT_TRUE(cpuRefIntermediateValidation.allClose(cpuTensorBundle.dscaleTensor.memory(),
+                                                          graphTensorBundle.dscaleTensor.memory()));
+        EXPECT_TRUE(cpuRefIntermediateValidation.allClose(cpuTensorBundle.dbiasTensor.memory(),
+                                                          graphTensorBundle.dbiasTensor.memory()));
     }
 
 private:
@@ -338,6 +338,10 @@ std::vector<Batchnorm2dTestCase> getBnBwdTestCases()
 
 } // namespace
 
+// Note:
+// Tolerance ranges are set to be 4e-3f due to batchnorm being numerical unstable for large tensor sizes.
+// MIOpen uses 4e-3f for it's batchnorm tests to verify, but it uses RMS calc instead of allClose type check.
+// You can swap the tests above to use cpu_fp_reference_miopen_rms_validation if you want to match MIOpen's tolerance checks exactly.
 TEST_P(BatchnormBackwardIntegrationTest, RunFloatBwdBatchnormGraphNCHW)
 {
     Batchnorm2dTestCase testCase = GetParam();

@@ -88,7 +88,7 @@ void create_heuristic_descriptor(hipdnnBackendDescriptor_t* heuristic_descriptor
 
 TEST_F(Plugin_loading_tests, EmptyPluginPath)
 {
-    Temp_directory plugin_dir("empty_plugins");
+    TempDirectory plugin_dir("empty_plugins");
     auto plugin_path = plugin_dir.path().string();
     const std::array<const char*, 1> paths = {plugin_path.c_str()};
     ASSERT_EQ(

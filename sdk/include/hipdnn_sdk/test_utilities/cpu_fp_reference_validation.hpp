@@ -20,55 +20,55 @@ namespace reference_test_utilities
 using namespace hipdnn_sdk::utilities;
 
 template <class T>
-class Cpu_fp_reference_validation : public Reference_validation_interface<T>
+class CpuFpReferenceValidation : public IReferenceValidation<T>
 {
 public:
-    Cpu_fp_reference_validation(T absolute_tolerance = std::numeric_limits<T>::epsilon(),
-                                T relative_tolerance = std::numeric_limits<T>::epsilon())
-        : _absolute_tolerance(absolute_tolerance)
-        , _relative_tolerance(relative_tolerance)
+    CpuFpReferenceValidation(T absoluteTolerance = std::numeric_limits<T>::epsilon(),
+                             T relativeTolerance = std::numeric_limits<T>::epsilon())
+        : _absoluteTolerance(absoluteTolerance)
+        , _relativeTolerance(relativeTolerance)
     {
-        if(absolute_tolerance < static_cast<T>(0.0f) || relative_tolerance < static_cast<T>(0.0f))
+        if(absoluteTolerance < static_cast<T>(0.0f) || relativeTolerance < static_cast<T>(0.0f))
         {
             throw std::invalid_argument("Tolerances must be non-negative");
         }
     }
 
-    ~Cpu_fp_reference_validation() override = default;
+    ~CpuFpReferenceValidation() override = default;
 
-    bool all_close(IMigratableMemory<T>& reference,
-                   IMigratableMemory<T>& implementation) override
+    bool allClose(IMigratableMemory<T>& reference,
+                  IMigratableMemory<T>& implementation) override
     {
         if(reference.count() != implementation.count())
         {
             return false;
         }
 
-        size_t element_count = reference.count();
+        size_t elementCount = reference.count();
 
-        const T* ref_data = reference.hostData();
-        const T* impl_data = implementation.hostData();
+        const T* refData = reference.hostData();
+        const T* implData = implementation.hostData();
 
-        for(size_t i = 0; i < element_count; ++i)
+        for(size_t i = 0; i < elementCount; ++i)
         {
-            T ref_value = ref_data[i];
-            T impl_value = impl_data[i];
+            T refValue = refData[i];
+            T implValue = implData[i];
 
-            T abs_diff = std::fabs(impl_value - ref_value);
-            T threshold = _absolute_tolerance + _relative_tolerance * std::fabs(ref_value);
+            T absDiff = std::fabs(implValue - refValue);
+            T threshold = _absoluteTolerance + _relativeTolerance * std::fabs(refValue);
 
-            if(abs_diff > threshold)
+            if(absDiff > threshold)
             {
                 HIPDNN_LOG_ERROR("Validation failed at index {}: reference value = {}, "
                                  "implementation value = {}, "
                                  "absolute difference = {}, threshold = {} (atol={}, rtol={})",
                                  i,
-                                 ref_value,
-                                 impl_value,
-                                 abs_diff,
+                                 refValue,
+                                 implValue,
+                                 absDiff,
                                  threshold,
-                                 _absolute_tolerance,
-                                 _relative_tolerance);
+                                 _absoluteTolerance,
+                                 _relativeTolerance);
                 return false;
             }
         }
@@ -78,8 +78,8 @@ public:
 
 private:
     // Tolerances for comparison
-    T _absolute_tolerance;
-    T _relative_tolerance;
+    T _absoluteTolerance;
+    T _relativeTolerance;
 };
 
 } // namespace reference_test_utilities

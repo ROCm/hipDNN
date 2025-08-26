@@ -132,7 +132,7 @@ void Sample_runner::operator()(const TensorLayout& layout)
         std::cout << "Running CPU reference validation...\n";
 
         auto ref_impl = hipdnn_sdk::reference_test_utilities::
-            Cpu_fp_reference_implementation<InputType, IntermediateType>();
+            CpuFpReferenceImplementation<InputType, IntermediateType>();
 
         Tensor<InputType> y_ref_tensor(y->get_dim(), layout);
         Tensor<IntermediateType> next_mean_ref_tensor(next_running_mean->get_dim());
@@ -157,16 +157,16 @@ void Sample_runner::operator()(const TensorLayout& layout)
         // auto epsilon = get_epsilon<InputType>();
         //
         // auto y_validator
-        //     = hipdnn_sdk::reference_test_utilities::Cpu_fp_reference_validation<InputType>(
+        //     = hipdnn_sdk::reference_test_utilities::CpuFpReferenceValidation<InputType>(
         //         static_cast<InputType>(epsilon), static_cast<InputType>(epsilon));
         //
         // auto stats_validator
-        //     = hipdnn_sdk::reference_test_utilities::Cpu_fp_reference_validation<IntermediateType>(
+        //     = hipdnn_sdk::reference_test_utilities::CpuFpReferenceValidation<IntermediateType>(
         //         static_cast<IntermediateType>(epsilon), static_cast<IntermediateType>(epsilon));
-        // bool y_valid = y_validator.all_close(y_ref_tensor.memory(), y_tensor.memory());
-        // bool next_mean_valid = stats_validator.all_close(next_mean_ref_tensor.memory(),
+        // bool y_valid = y_validator.allClose(y_ref_tensor.memory(), y_tensor.memory());
+        // bool next_mean_valid = stats_validator.allClose(next_mean_ref_tensor.memory(),
         //                                                        next_mean_tensor.memory());
-        // bool next_var_valid = stats_validator.all_close(next_var_ref_tensor.memory(),
+        // bool next_var_valid = stats_validator.allClose(next_var_ref_tensor.memory(),
         //                                                       next_var_tensor.memory());
         // TODO: consider adding validation for other output buffers, but they are verified indirectly by y
         // std::cout << "CPU reference validation:\n";
