@@ -18,7 +18,7 @@ TEST(HipdnnEnginePluginExecutionContextTest, SetAndGetPlan)
     auto* plan_ptr = mock_plan.get();
     ctx.set_plan(std::move(mock_plan));
 
-    miopen_legacy_plugin::Plan_interface& plan_ref = ctx.plan();
+    miopen_legacy_plugin::PlanInterface& plan_ref = ctx.plan();
 
     EXPECT_EQ(&plan_ref, plan_ptr);
 }

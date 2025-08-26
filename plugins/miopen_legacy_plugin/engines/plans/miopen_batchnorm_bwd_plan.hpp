@@ -15,13 +15,13 @@
 namespace miopen_legacy_plugin
 {
 
-class Batchnorm_bwd_params
+class BatchnormBwdParams
 {
 public:
-    Batchnorm_bwd_params(
+    BatchnormBwdParams(
         const hipdnn_sdk::data_objects::BatchnormBackwardAttributes& attributes,
         const std::unordered_map<int64_t, const hipdnn_sdk::data_objects::TensorAttributes*>&
-            tensor_map);
+            tensorMap);
 
     const Miopen_tensor& x() const;
     const Miopen_tensor& dy() const;
@@ -30,14 +30,14 @@ public:
     const Miopen_tensor& dscale() const;
     const Miopen_tensor& dbias() const;
 
-    const std::optional<std::unique_ptr<Miopen_tensor>>& opt_mean() const;
-    const std::optional<std::unique_ptr<Miopen_tensor>>& opt_inv_variance() const;
+    const std::optional<std::unique_ptr<Miopen_tensor>>& optMean() const;
+    const std::optional<std::unique_ptr<Miopen_tensor>>& optInvVariance() const;
 
 private:
-    void initialize_tensors(
+    void initializeTensors(
         const hipdnn_sdk::data_objects::BatchnormBackwardAttributes& attributes,
         const std::unordered_map<int64_t, const hipdnn_sdk::data_objects::TensorAttributes*>&
-            tensor_map);
+            tensorMap);
 
     std::unique_ptr<Miopen_tensor> _x;
     std::unique_ptr<Miopen_tensor> _dy;
@@ -46,22 +46,22 @@ private:
     std::unique_ptr<Miopen_tensor> _dscale;
     std::unique_ptr<Miopen_tensor> _dbias;
 
-    std::optional<std::unique_ptr<Miopen_tensor>> _opt_mean;
-    std::optional<std::unique_ptr<Miopen_tensor>> _opt_inv_variance;
+    std::optional<std::unique_ptr<Miopen_tensor>> _optMean;
+    std::optional<std::unique_ptr<Miopen_tensor>> _optInvVariance;
 };
 
-class Batchnorm_bwd_plan : public Plan_interface
+class BatchnormBwdPlan : public PlanInterface
 {
 public:
-    Batchnorm_bwd_plan(std::unique_ptr<Batchnorm_bwd_params> params);
+    BatchnormBwdPlan(std::unique_ptr<BatchnormBwdParams> params);
 
     void execute(const hipdnnEnginePluginHandle& handle,
-                 const hipdnnPluginDeviceBuffer_t* device_buffers,
-                 uint32_t num_device_buffers,
+                 const hipdnnPluginDeviceBuffer_t* deviceBuffers,
+                 uint32_t numDeviceBuffers,
                  void* workspace = nullptr) const override;
 
 private:
-    std::unique_ptr<Batchnorm_bwd_params> _params;
+    std::unique_ptr<BatchnormBwdParams> _params;
 };
 
 } // namespace miopen_legacy_plugin

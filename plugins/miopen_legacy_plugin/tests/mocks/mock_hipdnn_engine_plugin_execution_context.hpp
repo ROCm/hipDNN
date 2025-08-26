@@ -16,7 +16,7 @@ struct Mock_hipdnn_engine_plugin_execution_context : public hipdnnEnginePluginEx
     {
     }
 
-    miopen_legacy_plugin::Plan_interface& plan() const override
+    miopen_legacy_plugin::PlanInterface& plan() const override
     {
         return *_mock_plan;
     }

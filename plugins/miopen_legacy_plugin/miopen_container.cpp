@@ -18,9 +18,9 @@ Miopen_container::Miopen_container()
     HIPDNN_LOG_INFO("Creating Miopen_container");
 
     int64_t engine_id = 1;
-    auto miopen_engine = std::make_unique<Miopen_engine>(engine_id++);
+    auto miopen_engine = std::make_unique<MiopenEngine>(engine_id++);
 
-    auto batchnorm_plan_builder = std::make_unique<Miopen_batchnorm_plan_builder>();
+    auto batchnorm_plan_builder = std::make_unique<MiopenBatchnormPlanBuilder>();
     miopen_engine->add_plan_builder(std::move(batchnorm_plan_builder));
 
     _engine_manager = std::make_unique<Engine_manager>();
