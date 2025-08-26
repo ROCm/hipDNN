@@ -19,7 +19,7 @@ class EnginePlugin : public PluginBase
 {
 protected:
     // The constructor is protected to prevent direct instantiation of the class.
-    EnginePlugin(Shared_library&& lib);
+    EnginePlugin(SharedLibrary&& lib);
 
     // We need this to allow mocking this class
     EnginePlugin();

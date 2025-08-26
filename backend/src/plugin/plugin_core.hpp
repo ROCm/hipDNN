@@ -31,7 +31,7 @@ class PluginBase
 {
 protected:
     // The constructor is protected to prevent direct instantiation of the class.
-    PluginBase(Shared_library&& lib);
+    PluginBase(SharedLibrary&& lib);
 
     // This constructor is used for mocking purposes in tests.
     PluginBase();
@@ -72,7 +72,7 @@ protected:
         }
     }
 
-    Shared_library _lib;
+    SharedLibrary _lib;
 
 private:
     void resolveSymbols();
@@ -246,8 +246,8 @@ private:
 
         try
         {
-            Shared_library lib(filePath);
-            const auto libraryPath = lib.library_path();
+            SharedLibrary lib(filePath);
+            const auto libraryPath = lib.libraryPath();
 
             // Shared library ensures an injective, weakly canonical mapping to a path
             if(_loadedPluginFiles.contains(libraryPath))

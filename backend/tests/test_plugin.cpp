@@ -23,7 +23,7 @@ class Plugin : public plugin::PluginBase
 {
 public:
     // Forward constructor to base class
-    explicit Plugin(plugin::Shared_library&& lib)
+    explicit Plugin(plugin::SharedLibrary&& lib)
         : PluginBase(std::move(lib))
     {
     }
@@ -321,7 +321,7 @@ TEST(PluginTest, SetLoggingCallback)
 {
     g_callback_was_called = false;
 
-    plugin::Shared_library lib(PLUGIN_PATH1);
+    plugin::SharedLibrary lib(PLUGIN_PATH1);
 
     Plugin plugin(std::move(lib));
 
