@@ -98,7 +98,7 @@ protected:
 
         // Initialize HIP
         ASSERT_EQ(hipInit(0), hipSuccess);
-        ASSERT_EQ(hipGetDevice(&deviceId), hipSuccess);
+        ASSERT_EQ(hipGetDevice(&_deviceId), hipSuccess);
 
         //Note: The plugin paths has to be set before we create the hipdnn handle.
         const std::array<const char*, 1> paths = {PLUGIN_DIR};
@@ -107,7 +107,7 @@ protected:
                   HIPDNN_STATUS_SUCCESS);
 
         // Create handle
-        ASSERT_EQ(hipdnnCreate(&handle), HIPDNN_STATUS_SUCCESS);
+        ASSERT_EQ(hipdnnCreate(&_handle), HIPDNN_STATUS_SUCCESS);
 
         //todo: bring back stream support once MigratableMemory supports it
         //ASSERT_EQ(hipStreamCreate(&stream), hipSuccess);
@@ -116,13 +116,13 @@ protected:
 
     void TearDown() override
     {
-        if(handle != nullptr)
+        if(_handle != nullptr)
         {
-            ASSERT_EQ(hipdnnDestroy(handle), HIPDNN_STATUS_SUCCESS);
+            ASSERT_EQ(hipdnnDestroy(_handle), HIPDNN_STATUS_SUCCESS);
         }
-        if(stream != nullptr)
+        if(_stream != nullptr)
         {
-            ASSERT_EQ(hipStreamDestroy(stream), hipSuccess);
+            ASSERT_EQ(hipStreamDestroy(_stream), hipSuccess);
         }
     }
 
@@ -206,10 +206,10 @@ protected:
         auto result = graphObj->validate();
         ASSERT_EQ(result.code, error_code_t::OK) << result.err_msg;
 
-        result = graphObj->build_operation_graph(handle);
+        result = graphObj->build_operation_graph(_handle);
         ASSERT_EQ(result.code, error_code_t::OK) << result.err_msg;
 
-        result = graphObj->create_execution_plans(handle);
+        result = graphObj->create_execution_plans(_handle);
         ASSERT_EQ(result.code, error_code_t::OK) << result.err_msg;
 
         result = graphObj->check_support();
@@ -226,7 +226,7 @@ protected:
                                                                           *biasTensorAttr,
                                                                           graphTensorBundle);
 
-        result = graphObj->execute(handle, variantPack, nullptr);
+        result = graphObj->execute(_handle, variantPack, nullptr);
         ASSERT_EQ(result.code, error_code_t::OK) << result.err_msg;
     }
 
@@ -273,9 +273,9 @@ protected:
     }
 
 private:
-    hipdnnHandle_t handle = nullptr;
-    hipStream_t stream = nullptr;
-    int deviceId = 0;
+    hipdnnHandle_t _handle = nullptr;
+    hipStream_t _stream = nullptr;
+    int _deviceId = 0;
 };
 
 namespace
