@@ -10,7 +10,7 @@ namespace hipdnn_backend
 namespace plugin
 {
 
-PluginBase::PluginBase(Shared_library&& lib)
+PluginBase::PluginBase(SharedLibrary&& lib)
     : _lib(std::move(lib))
 {
     resolveSymbols();

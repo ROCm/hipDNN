@@ -12,7 +12,7 @@ namespace hipdnn_backend
 namespace plugin
 {
 
-EnginePlugin::EnginePlugin(Shared_library&& lib)
+EnginePlugin::EnginePlugin(SharedLibrary&& lib)
     : PluginBase(std::move(lib))
 {
     resolveSymbols();
@@ -148,12 +148,12 @@ std::vector<int64_t>
     uint32_t numEngines = 0;
 
     invokePluginFunction("get applicable engine IDs",
-                           _funcGetApplicableEngineIds,
-                           handle,
-                           opGraph,
-                           engineIds.data(),
-                           maxEngines,
-                           &numEngines);
+                         _funcGetApplicableEngineIds,
+                         handle,
+                         opGraph,
+                         engineIds.data(),
+                         maxEngines,
+                         &numEngines);
 
     if(numEngines == 0)
     {
@@ -223,11 +223,11 @@ hipdnnEnginePluginExecutionContext_t
     assert(_initialized);
     hipdnnEnginePluginExecutionContext_t exec_context;
     invokePluginFunction("create execution context",
-                           _funcCreateExecutionContext,
-                           handle,
-                           engineConfig,
-                           opGraph,
-                           &exec_context);
+                         _funcCreateExecutionContext,
+                         handle,
+                         engineConfig,
+                         opGraph,
+                         &exec_context);
     return exec_context;
 }
 
@@ -247,12 +247,12 @@ void EnginePlugin::executeOpGraph(hipdnnEnginePluginHandle_t handle,
 {
     assert(_initialized);
     invokePluginFunction("execute op graph",
-                           _funcExecuteOpGraph,
-                           handle,
-                           executionContext,
-                           workspace,
-                           deviceBuffers,
-                           numDeviceBuffers);
+                         _funcExecuteOpGraph,
+                         handle,
+                         executionContext,
+                         workspace,
+                         deviceBuffers,
+                         numDeviceBuffers);
 }
 
 } // namespace plugin
