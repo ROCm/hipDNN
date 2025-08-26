@@ -40,7 +40,7 @@ public:
 
     void initialize_execution_context(const hipdnnEnginePluginHandle& handle,
                                       const hipdnn_plugin::Graph_interface& op_graph,
-                                      const hipdnn_plugin::Engine_config_interface& engine_config,
+                                      const hipdnn_plugin::IEngineConfig& engineConfig,
                                       hipdnnEnginePluginExecutionContext& execution_context) const;
 
 private:

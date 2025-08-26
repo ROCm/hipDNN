@@ -54,10 +54,10 @@ size_t Engine_manager::get_workspace_size(const hipdnnEnginePluginHandle& handle
 void Engine_manager::initialize_execution_context(
     const hipdnnEnginePluginHandle& handle,
     const hipdnn_plugin::Graph_interface& op_graph,
-    const hipdnn_plugin::Engine_config_interface& engine_config,
+    const hipdnn_plugin::IEngineConfig& engineConfig,
     hipdnnEnginePluginExecutionContext& execution_context) const
 {
-    auto& engine = get_engine(engine_config.engine_id());
+    auto& engine = get_engine(engineConfig.engineId());
     engine.initialize_execution_context(handle, op_graph, execution_context);
 }
 

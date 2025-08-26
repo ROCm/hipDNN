@@ -331,10 +331,10 @@ hipdnnPluginStatus_t
 
         auto& engine_manager = handle->get_engine_manager();
 
-        Engine_config_wrapper engine_config_wrapper(engine_config->ptr, engine_config->size);
+        EngineConfigWrapper engineConfigWrapper(engine_config->ptr, engine_config->size);
         Graph_wrapper op_graph_wrapper(op_graph->ptr, op_graph->size);
         *workspace_size = engine_manager.get_workspace_size(
-            *handle, engine_config_wrapper.engine_id(), op_graph_wrapper);
+            *handle, engineConfigWrapper.engineId(), op_graph_wrapper);
 
         LOG_API_SUCCESS(api_name, "workspace_size={}", *workspace_size);
     });
@@ -359,7 +359,7 @@ hipdnnPluginStatus_t hipdnnEnginePluginCreateExecutionContext(
         throw_if_null(execution_context);
 
         Graph_wrapper op_graph_wrapper(op_graph->ptr, op_graph->size);
-        Engine_config_wrapper engine_config_wrapper(engine_config->ptr, engine_config->size);
+        EngineConfigWrapper engineConfigWrapper(engine_config->ptr, engine_config->size);
 
         auto& engine_manager = handle->get_engine_manager();
 
@@ -368,7 +368,7 @@ hipdnnPluginStatus_t hipdnnEnginePluginCreateExecutionContext(
         try
         {
             engine_manager.initialize_execution_context(
-                *handle, op_graph_wrapper, engine_config_wrapper, *context);
+                *handle, op_graph_wrapper, engineConfigWrapper, *context);
         }
         catch(...)
         {

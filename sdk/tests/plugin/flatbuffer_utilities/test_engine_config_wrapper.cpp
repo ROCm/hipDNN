@@ -8,36 +8,36 @@
 
 using namespace hipdnn_plugin;
 
-flatbuffers::FlatBufferBuilder build_valid_engine_config_buffer(int64_t engine_id)
+flatbuffers::FlatBufferBuilder buildValidEngineConfigBuffer(int64_t engineId)
 {
     flatbuffers::FlatBufferBuilder builder;
-    auto config = hipdnn_sdk::data_objects::CreateEngineConfig(builder, engine_id);
+    auto config = hipdnn_sdk::data_objects::CreateEngineConfig(builder, engineId);
     builder.Finish(config);
     return builder;
 }
 
 TEST(EngineConfigWrapperTest, InvalidBufferIsNotValid)
 {
-    Engine_config_wrapper wrapper(nullptr, 0);
-    EXPECT_FALSE(wrapper.is_valid());
-    EXPECT_THROW(wrapper.engine_id(), Hipdnn_plugin_exception);
-    EXPECT_THROW(wrapper.get_engine_config(), Hipdnn_plugin_exception);
+    EngineConfigWrapper wrapper(nullptr, 0);
+    EXPECT_FALSE(wrapper.isValid());
+    EXPECT_THROW(wrapper.engineId(), Hipdnn_plugin_exception);
+    EXPECT_THROW(wrapper.getEngineConfig(), Hipdnn_plugin_exception);
 }
 
 TEST(EngineConfigWrapperTest, ValidBufferIsValid)
 {
-    int64_t test_engine_id = 42;
-    auto builder = build_valid_engine_config_buffer(test_engine_id);
-    Engine_config_wrapper wrapper(builder.GetBufferPointer(), builder.GetSize());
-    EXPECT_TRUE(wrapper.is_valid());
-    EXPECT_EQ(wrapper.engine_id(), test_engine_id);
-    EXPECT_NO_THROW(wrapper.get_engine_config());
+    int64_t testEngineId = 42;
+    auto builder = buildValidEngineConfigBuffer(testEngineId);
+    EngineConfigWrapper wrapper(builder.GetBufferPointer(), builder.GetSize());
+    EXPECT_TRUE(wrapper.isValid());
+    EXPECT_EQ(wrapper.engineId(), testEngineId);
+    EXPECT_NO_THROW(wrapper.getEngineConfig());
 }
 
 TEST(EngineConfigWrapperTest, CorruptedBufferIsNotValid)
 {
     std::vector<uint8_t> buffer(16, 0xFF); // Not a valid flatbuffer
-    Engine_config_wrapper wrapper(buffer.data(), buffer.size());
-    EXPECT_FALSE(wrapper.is_valid());
-    EXPECT_THROW(wrapper.engine_id(), Hipdnn_plugin_exception);
+    EngineConfigWrapper wrapper(buffer.data(), buffer.size());
+    EXPECT_FALSE(wrapper.isValid());
+    EXPECT_THROW(wrapper.engineId(), Hipdnn_plugin_exception);
 }

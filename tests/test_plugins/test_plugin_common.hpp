@@ -359,8 +359,8 @@ public:
             }
 
             hipdnn_plugin::Graph_wrapper op_graph_wrapper(op_graph->ptr, op_graph->size);
-            hipdnn_plugin::Engine_config_wrapper engine_config_wrapper(engine_config->ptr,
-                                                                       engine_config->size);
+            hipdnn_plugin::EngineConfigWrapper engineConfigWrapper(engine_config->ptr,
+                                                                   engine_config->size);
 
             *execution_context = new hipdnnEnginePluginExecutionContext();
 
