@@ -31,9 +31,9 @@ private:
 public:
     std::string name;
 
-    DerivedT& set_name(const std::string& name_value)
+    DerivedT& set_name(const std::string& nameValue)
     {
-        name = name_value;
+        name = nameValue;
         return self();
     }
 
@@ -42,13 +42,14 @@ public:
         return name;
     }
 
-    error_t fill_from_graph_attributes(const Graph_attributes& graph_attributes)
+    // NOLINTNEXTLINE(readability-identifier-naming)
+    error_t fill_from_graph_attributes(const GraphAttributes& graphAttributes)
     {
         for(auto& [_, tensor] : self().inputs)
         {
             if(tensor)
             {
-                tensor->set_from_graph_attributes(graph_attributes);
+                tensor->set_from_graph_attributes(graphAttributes);
             }
         }
 
@@ -56,7 +57,7 @@ public:
         {
             if(tensor)
             {
-                tensor->set_from_graph_attributes(graph_attributes);
+                tensor->set_from_graph_attributes(graphAttributes);
             }
         }
 

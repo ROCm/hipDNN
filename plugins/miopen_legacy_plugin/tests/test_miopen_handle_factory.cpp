@@ -15,7 +15,7 @@ using namespace hipdnn_plugin;
 
 TEST(MiopenHandleFactoryTest, ThrowsOnNullHandle)
 {
-    EXPECT_THROW(Miopen_handle_factory::create_miopen_handle(nullptr), Hipdnn_plugin_exception);
+    EXPECT_THROW(MiopenHandleFactory::createMiopenHandle(nullptr), Hipdnn_plugin_exception);
 }
 
 TEST(MiopenHandleFactoryTest, CreatesAndDestroysHandle)
@@ -23,17 +23,17 @@ TEST(MiopenHandleFactoryTest, CreatesAndDestroysHandle)
     SKIP_IF_NO_DEVICES();
 
     hipdnnEnginePluginHandle_t handle = nullptr;
-    EXPECT_NO_THROW(Miopen_handle_factory::create_miopen_handle(&handle));
+    EXPECT_NO_THROW(MiopenHandleFactory::createMiopenHandle(&handle));
     ASSERT_NE(handle, nullptr);
-    ASSERT_NE(handle->miopen_handle, nullptr);
+    ASSERT_NE(handle->miopenHandle, nullptr);
 
     // Clean up
-    miopenDestroy(handle->miopen_handle);
+    miopenDestroy(handle->miopenHandle);
     delete handle;
 }
 
 TEST(MiopenHandleFactoryTest, ThrowsOnDestroyNullHandle)
 {
     hipdnnEnginePluginHandle_t handle = nullptr;
-    EXPECT_THROW(Miopen_handle_factory::destroy_miopen_handle(handle), Hipdnn_plugin_exception);
+    EXPECT_THROW(MiopenHandleFactory::destroyMiopenHandle(handle), Hipdnn_plugin_exception);
 }

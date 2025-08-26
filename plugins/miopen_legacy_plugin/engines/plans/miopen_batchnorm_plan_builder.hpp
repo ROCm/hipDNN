@@ -9,23 +9,23 @@
 namespace miopen_legacy_plugin
 {
 
-class Miopen_batchnorm_plan_builder : public Plan_builder_interface
+class MiopenBatchnormPlanBuilder : public PlanBuilderInterface
 {
 public:
-    Miopen_batchnorm_plan_builder() = default;
-    ~Miopen_batchnorm_plan_builder() override = default;
+    MiopenBatchnormPlanBuilder() = default;
+    ~MiopenBatchnormPlanBuilder() override = default;
 
     // Disallow copy and assignment
-    Miopen_batchnorm_plan_builder(const Miopen_batchnorm_plan_builder&) = delete;
-    Miopen_batchnorm_plan_builder& operator=(const Miopen_batchnorm_plan_builder&) = delete;
+    MiopenBatchnormPlanBuilder(const MiopenBatchnormPlanBuilder&) = delete;
+    MiopenBatchnormPlanBuilder& operator=(const MiopenBatchnormPlanBuilder&) = delete;
 
-    bool is_applicable(const hipdnn_plugin::Graph_interface& op_graph) const override;
-    size_t get_workspace_size(const hipdnnEnginePluginHandle& handle,
-                              const hipdnn_plugin::Graph_interface& op_graph) const override;
+    bool isApplicable(const hipdnn_plugin::Graph_interface& opGraph) const override;
+    size_t getWorkspaceSize(const HipdnnEnginePluginHandle& handle,
+                            const hipdnn_plugin::Graph_interface& opGraph) const override;
 
-    void build_plan(const hipdnnEnginePluginHandle& handle,
-                    const hipdnn_plugin::Graph_interface& op_graph,
-                    hipdnnEnginePluginExecutionContext& execution_context) const override;
+    void buildPlan(const HipdnnEnginePluginHandle& handle,
+                   const hipdnn_plugin::Graph_interface& opGraph,
+                   HipdnnEnginePluginExecutionContext& executionContext) const override;
 };
 
 }

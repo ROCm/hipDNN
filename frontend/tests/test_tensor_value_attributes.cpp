@@ -10,13 +10,13 @@
 #include <numbers>
 #include <vector>
 
-using namespace hipdnn_frontend::graph;
+// using namespace hipdnn_frontend::graph;
 using hipdnn_frontend::DataType_t;
 using namespace hipdnn_sdk::data_objects;
 
 TEST(TensorValueAttributesTests, SetGetClearFloat)
 {
-    Tensor_attributes tensor;
+    hipdnn_frontend::graph::TensorAttributes tensor;
     EXPECT_FALSE(tensor.has_value());
 
     constexpr float test_value = std::numbers::pi_v<float>;
@@ -34,7 +34,7 @@ TEST(TensorValueAttributesTests, SetGetClearFloat)
 
 TEST(TensorValueAttributesTests, PackUnpackFloat)
 {
-    Tensor_attributes tensor;
+    hipdnn_frontend::graph::TensorAttributes tensor;
     tensor.set_uid(7)
         .set_name("value_tensor")
         .set_data_type(DataType_t::FLOAT)
@@ -82,7 +82,7 @@ TEST(TensorValueAttributesTests, PackUnpackFloat)
 
 TEST(TensorValueAttributesTests, PackUnpackHalf)
 {
-    Tensor_attributes tensor;
+    hipdnn_frontend::graph::TensorAttributes tensor;
     tensor.set_uid(8)
         .set_name("half_tensor")
         .set_data_type(DataType_t::HALF)
@@ -112,7 +112,7 @@ TEST(TensorValueAttributesTests, PackUnpackHalf)
 
 TEST(TensorValueAttributesTests, PackUnpackDouble)
 {
-    Tensor_attributes tensor;
+    hipdnn_frontend::graph::TensorAttributes tensor;
     tensor.set_uid(9)
         .set_name("double_tensor")
         .set_data_type(DataType_t::DOUBLE)
@@ -142,7 +142,7 @@ TEST(TensorValueAttributesTests, PackUnpackDouble)
 
 TEST(TensorValueAttributesTests, PackUnpackEmptyValue)
 {
-    Tensor_attributes tensor;
+    hipdnn_frontend::graph::TensorAttributes tensor;
     tensor.set_uid(10)
         .set_name("empty_tensor")
         .set_data_type(DataType_t::FLOAT)
@@ -167,7 +167,7 @@ TEST(TensorValueAttributesTests, PackUnpackEmptyValue)
 
 TEST(TensorValueAttributesTests, TypeSafety)
 {
-    Tensor_attributes tensor;
+    hipdnn_frontend::graph::TensorAttributes tensor;
     tensor.set_value(42.0f);
 
     auto float_opt = tensor.get_value<float>();
@@ -190,7 +190,7 @@ TEST(TensorValueAttributesTests, TypeSafety)
 
 TEST(TensorValueAttributesTests, NumericLimits)
 {
-    Tensor_attributes tensor;
+    hipdnn_frontend::graph::TensorAttributes tensor;
 
     tensor.set_value(std::numeric_limits<float>::max());
     auto float_opt = tensor.get_value<float>();

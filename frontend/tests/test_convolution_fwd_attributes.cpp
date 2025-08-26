@@ -5,19 +5,19 @@
 
 TEST(ConvolutionFwdAttributesTests, CreateConvolutionFwdAttributes)
 {
-    hipdnn_frontend::graph::Conv_fprop_attributes conv_attributes;
+    hipdnn_frontend::graph::ConvFpropAttributes conv_attributes;
 
     // Set tensors
-    conv_attributes.set_x(std::make_shared<hipdnn_frontend::graph::Tensor_attributes>());
-    conv_attributes.set_w(std::make_shared<hipdnn_frontend::graph::Tensor_attributes>());
-    conv_attributes.set_y(std::make_shared<hipdnn_frontend::graph::Tensor_attributes>());
+    conv_attributes.set_x(std::make_shared<hipdnn_frontend::graph::TensorAttributes>());
+    conv_attributes.set_w(std::make_shared<hipdnn_frontend::graph::TensorAttributes>());
+    conv_attributes.set_y(std::make_shared<hipdnn_frontend::graph::TensorAttributes>());
 
     // Set convolution parameters
     conv_attributes.set_pre_padding({1, 1});
     conv_attributes.set_post_padding({1, 1});
     conv_attributes.set_stride({1, 1});
     conv_attributes.set_dilation({1, 1});
-    conv_attributes.set_conv_mode(hipdnn_frontend::ConvolutionMode_t::CROSS_CORRELATION);
+    conv_attributes.set_convolution_mode(hipdnn_frontend::ConvolutionMode_t::CROSS_CORRELATION);
 
     // Configure input tensor
     auto x_tensor = conv_attributes.get_x();
@@ -67,24 +67,24 @@ TEST(ConvolutionFwdAttributesTests, CreateConvolutionFwdAttributes)
     EXPECT_EQ(conv_attributes.get_post_padding(), (std::vector<int64_t>{1, 1}));
     EXPECT_EQ(conv_attributes.get_stride(), (std::vector<int64_t>{1, 1}));
     EXPECT_EQ(conv_attributes.get_dilation(), (std::vector<int64_t>{1, 1}));
-    EXPECT_EQ(conv_attributes.get_conv_mode(),
+    EXPECT_EQ(conv_attributes.get_convolution_mode(),
               hipdnn_frontend::ConvolutionMode_t::CROSS_CORRELATION);
 }
 
 TEST(ConvolutionFwdAttributesTests, PackAttributes)
 {
-    hipdnn_frontend::graph::Conv_fprop_attributes conv_attributes;
+    hipdnn_frontend::graph::ConvFpropAttributes conv_attributes;
 
     // Set tensors
-    auto x_tensor = std::make_shared<hipdnn_frontend::graph::Tensor_attributes>();
+    auto x_tensor = std::make_shared<hipdnn_frontend::graph::TensorAttributes>();
     x_tensor->set_uid(1);
     conv_attributes.set_x(x_tensor);
 
-    auto w_tensor = std::make_shared<hipdnn_frontend::graph::Tensor_attributes>();
+    auto w_tensor = std::make_shared<hipdnn_frontend::graph::TensorAttributes>();
     w_tensor->set_uid(2);
     conv_attributes.set_w(w_tensor);
 
-    auto y_tensor = std::make_shared<hipdnn_frontend::graph::Tensor_attributes>();
+    auto y_tensor = std::make_shared<hipdnn_frontend::graph::TensorAttributes>();
     y_tensor->set_uid(3);
     conv_attributes.set_y(y_tensor);
 
@@ -93,7 +93,7 @@ TEST(ConvolutionFwdAttributesTests, PackAttributes)
     conv_attributes.set_post_padding({2, 2});
     conv_attributes.set_stride({2, 2});
     conv_attributes.set_dilation({1, 1});
-    conv_attributes.set_conv_mode(hipdnn_frontend::ConvolutionMode_t::CROSS_CORRELATION);
+    conv_attributes.set_convolution_mode(hipdnn_frontend::ConvolutionMode_t::CROSS_CORRELATION);
 
     // Pack attributes
     flatbuffers::FlatBufferBuilder builder;
@@ -132,10 +132,10 @@ TEST(ConvolutionFwdAttributesTests, PackAttributes)
 
 TEST(ConvolutionFwdAttributesTests, DefaultValues)
 {
-    hipdnn_frontend::graph::Conv_fprop_attributes conv_attributes;
+    hipdnn_frontend::graph::ConvFpropAttributes conv_attributes;
 
     // Check default convolution mode
-    EXPECT_EQ(conv_attributes.get_conv_mode(),
+    EXPECT_EQ(conv_attributes.get_convolution_mode(),
               hipdnn_frontend::ConvolutionMode_t::CROSS_CORRELATION);
 
     // Check that parameters are empty by default
@@ -152,7 +152,7 @@ TEST(ConvolutionFwdAttributesTests, DefaultValues)
 
 TEST(ConvolutionFwdAttributesTests, SetPrePaddingWithMove)
 {
-    hipdnn_frontend::graph::Conv_fprop_attributes conv_attributes;
+    hipdnn_frontend::graph::ConvFpropAttributes conv_attributes;
 
     std::vector<int64_t> pre_padding_move = {3, 3};
     conv_attributes.set_pre_padding(std::move(pre_padding_move));
@@ -162,7 +162,7 @@ TEST(ConvolutionFwdAttributesTests, SetPrePaddingWithMove)
 
 TEST(ConvolutionFwdAttributesTests, SetPostPaddingWithMove)
 {
-    hipdnn_frontend::graph::Conv_fprop_attributes conv_attributes;
+    hipdnn_frontend::graph::ConvFpropAttributes conv_attributes;
 
     std::vector<int64_t> post_padding_move = {4, 4};
     conv_attributes.set_post_padding(std::move(post_padding_move));
@@ -172,7 +172,7 @@ TEST(ConvolutionFwdAttributesTests, SetPostPaddingWithMove)
 
 TEST(ConvolutionFwdAttributesTests, SetStrideWithMove)
 {
-    hipdnn_frontend::graph::Conv_fprop_attributes conv_attributes;
+    hipdnn_frontend::graph::ConvFpropAttributes conv_attributes;
 
     std::vector<int64_t> stride_move = {2, 2};
     conv_attributes.set_stride(std::move(stride_move));
@@ -182,7 +182,7 @@ TEST(ConvolutionFwdAttributesTests, SetStrideWithMove)
 
 TEST(ConvolutionFwdAttributesTests, SetDilationWithMove)
 {
-    hipdnn_frontend::graph::Conv_fprop_attributes conv_attributes;
+    hipdnn_frontend::graph::ConvFpropAttributes conv_attributes;
 
     std::vector<int64_t> dilation_move = {2, 2};
     conv_attributes.set_dilation(std::move(dilation_move));
@@ -192,7 +192,7 @@ TEST(ConvolutionFwdAttributesTests, SetDilationWithMove)
 
 TEST(ConvolutionFwdAttributesTests, SetPaddingBothPreAndPost)
 {
-    hipdnn_frontend::graph::Conv_fprop_attributes conv_attributes;
+    hipdnn_frontend::graph::ConvFpropAttributes conv_attributes;
 
     std::vector<int64_t> padding = {5, 5};
     conv_attributes.set_padding(padding);
@@ -204,9 +204,9 @@ TEST(ConvolutionFwdAttributesTests, SetPaddingBothPreAndPost)
 
 TEST(ConvolutionFwdAttributesTests, SetXMove)
 {
-    hipdnn_frontend::graph::Conv_fprop_attributes conv_attributes;
+    hipdnn_frontend::graph::ConvFpropAttributes conv_attributes;
 
-    auto x_tensor = std::make_shared<hipdnn_frontend::graph::Tensor_attributes>();
+    auto x_tensor = std::make_shared<hipdnn_frontend::graph::TensorAttributes>();
     x_tensor->set_uid(10)
         .set_name("MovedInputTensor")
         .set_data_type(hipdnn_frontend::DataType_t::FLOAT)
@@ -228,9 +228,9 @@ TEST(ConvolutionFwdAttributesTests, SetXMove)
 
 TEST(ConvolutionFwdAttributesTests, SetWMove)
 {
-    hipdnn_frontend::graph::Conv_fprop_attributes conv_attributes;
+    hipdnn_frontend::graph::ConvFpropAttributes conv_attributes;
 
-    auto w_tensor = std::make_shared<hipdnn_frontend::graph::Tensor_attributes>();
+    auto w_tensor = std::make_shared<hipdnn_frontend::graph::TensorAttributes>();
     w_tensor->set_uid(20)
         .set_name("MovedWeightTensor")
         .set_data_type(hipdnn_frontend::DataType_t::HALF)
@@ -252,9 +252,9 @@ TEST(ConvolutionFwdAttributesTests, SetWMove)
 
 TEST(ConvolutionFwdAttributesTests, SetYWithMove)
 {
-    hipdnn_frontend::graph::Conv_fprop_attributes conv_attributes;
+    hipdnn_frontend::graph::ConvFpropAttributes conv_attributes;
 
-    auto y_tensor = std::make_shared<hipdnn_frontend::graph::Tensor_attributes>();
+    auto y_tensor = std::make_shared<hipdnn_frontend::graph::TensorAttributes>();
     y_tensor->set_uid(30)
         .set_name("MovedOutputTensor")
         .set_data_type(hipdnn_frontend::DataType_t::BFLOAT16)
@@ -276,16 +276,16 @@ TEST(ConvolutionFwdAttributesTests, SetYWithMove)
 
 TEST(ConvolutionFwdAttributesTests, SetTensorsConstRef)
 {
-    hipdnn_frontend::graph::Conv_fprop_attributes conv_attributes;
+    hipdnn_frontend::graph::ConvFpropAttributes conv_attributes;
 
     // Create tensors
-    auto x_tensor = std::make_shared<hipdnn_frontend::graph::Tensor_attributes>();
+    auto x_tensor = std::make_shared<hipdnn_frontend::graph::TensorAttributes>();
     x_tensor->set_uid(40).set_name("InputConstRef");
 
-    auto w_tensor = std::make_shared<hipdnn_frontend::graph::Tensor_attributes>();
+    auto w_tensor = std::make_shared<hipdnn_frontend::graph::TensorAttributes>();
     w_tensor->set_uid(50).set_name("WeightConstRef");
 
-    auto y_tensor = std::make_shared<hipdnn_frontend::graph::Tensor_attributes>();
+    auto y_tensor = std::make_shared<hipdnn_frontend::graph::TensorAttributes>();
     y_tensor->set_uid(60).set_name("OutputConstRef");
 
     // Set using const reference (copy)

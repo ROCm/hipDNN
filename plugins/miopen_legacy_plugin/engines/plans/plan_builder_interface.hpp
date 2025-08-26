@@ -15,20 +15,20 @@
 namespace miopen_legacy_plugin
 {
 
-class Plan_builder_interface
+class PlanBuilderInterface
 {
 public:
-    virtual ~Plan_builder_interface() = default;
+    virtual ~PlanBuilderInterface() = default;
 
-    virtual bool is_applicable(const hipdnn_plugin::Graph_interface& op_graph) const = 0;
+    virtual bool isApplicable(const hipdnn_plugin::Graph_interface& opGraph) const = 0;
 
-    virtual size_t get_workspace_size(const hipdnnEnginePluginHandle& handle,
-                                      const hipdnn_plugin::Graph_interface& op_graph) const
+    virtual size_t getWorkspaceSize(const HipdnnEnginePluginHandle& handle,
+                                    const hipdnn_plugin::Graph_interface& opGraph) const
         = 0;
 
-    virtual void build_plan(const hipdnnEnginePluginHandle& handle,
-                            const hipdnn_plugin::Graph_interface& op_graph,
-                            hipdnnEnginePluginExecutionContext& execution_context) const
+    virtual void buildPlan(const HipdnnEnginePluginHandle& handle,
+                           const hipdnn_plugin::Graph_interface& opGraph,
+                           HipdnnEnginePluginExecutionContext& executionContext) const
         = 0;
 };
 }

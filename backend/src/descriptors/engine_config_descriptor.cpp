@@ -69,10 +69,10 @@ void EngineConfigDescriptor::getAttribute(hipdnnBackendAttributeName_t attribute
     case HIPDNN_ATTR_ENGINECFG_INTERMEDIATE_INFO:
     case HIPDNN_ATTR_ENGINECFG_KNOB_CHOICES:
     default:
-        throw Hipdnn_exception(
+        throw HipdnnException(
             HIPDNN_STATUS_NOT_SUPPORTED,
             std::string("EngineConfigDescriptor::getAttribute() is not supported for attribute ")
-                + hipdnn_backend::hipdnn_get_attribute_name_string(attributeName) + ".");
+                + hipdnn_backend::hipdnnGetAttributeNameString(attributeName) + ".");
     }
 }
 
@@ -151,10 +151,10 @@ void EngineConfigDescriptor::setAttribute(hipdnnBackendAttributeName_t attribute
     case HIPDNN_ATTR_ENGINECFG_KNOB_CHOICES:
     case HIPDNN_ATTR_ENGINECFG_WORKSPACE_SIZE:
     default:
-        throw Hipdnn_exception(
+        throw HipdnnException(
             HIPDNN_STATUS_NOT_SUPPORTED,
             std::string("EngineConfigDescriptor::setAttribute() is not supported for attribute ")
-                + hipdnn_backend::hipdnn_get_attribute_name_string(attributeName) + ".");
+                + hipdnn_backend::hipdnnGetAttributeNameString(attributeName) + ".");
     }
 
     // reset the serialized buffer when an attribute is set to ensure it's not cached out of date.

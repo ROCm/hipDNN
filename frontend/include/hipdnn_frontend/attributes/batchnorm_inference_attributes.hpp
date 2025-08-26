@@ -12,120 +12,119 @@ namespace hipdnn_frontend
 {
 namespace graph
 {
-class Batchnorm_inference_attributes : public AttributesCRTP<Batchnorm_inference_attributes>
+class BatchnormInferenceAttributes : public AttributesCRTP<BatchnormInferenceAttributes>
 {
 public:
     enum class input_names
     {
-        x = 0,
-        mean = 1,
-        inv_variance = 2,
-        scale = 3,
-        bias = 4
+        X = 0,
+        MEAN = 1,
+        INV_VARIANCE = 2,
+        SCALE = 3,
+        BIAS = 4
     };
 
     enum class output_names
     {
-        y = 0
+        Y = 0
     };
 
-    std::unordered_map<input_names, std::shared_ptr<Tensor_attributes>> inputs;
-    std::unordered_map<output_names, std::shared_ptr<Tensor_attributes>> outputs;
+    std::unordered_map<input_names, std::shared_ptr<TensorAttributes>> inputs;
+    std::unordered_map<output_names, std::shared_ptr<TensorAttributes>> outputs;
 
-    std::shared_ptr<Tensor_attributes> get_x() const
+    std::shared_ptr<TensorAttributes> get_x() const
     {
-        return get_input(input_names::x);
+        return getInput(input_names::X);
     }
-    std::shared_ptr<Tensor_attributes> get_mean() const
+    std::shared_ptr<TensorAttributes> get_mean() const
     {
-        return get_input(input_names::mean);
+        return getInput(input_names::MEAN);
     }
-    std::shared_ptr<Tensor_attributes> get_inv_variance() const
+    std::shared_ptr<TensorAttributes> get_inv_variance() const
     {
-        return get_input(input_names::inv_variance);
+        return getInput(input_names::INV_VARIANCE);
     }
-    std::shared_ptr<Tensor_attributes> get_scale() const
+    std::shared_ptr<TensorAttributes> get_scale() const
     {
-        return get_input(input_names::scale);
+        return getInput(input_names::SCALE);
     }
-    std::shared_ptr<Tensor_attributes> get_bias() const
+    std::shared_ptr<TensorAttributes> get_bias() const
     {
-        return get_input(input_names::bias);
+        return getInput(input_names::BIAS);
     }
-    std::shared_ptr<Tensor_attributes> get_y() const
+    std::shared_ptr<TensorAttributes> get_y() const
     {
-        return get_output(output_names::y);
+        return getOutput(output_names::Y);
     }
 
-    Batchnorm_inference_attributes& set_x(const std::shared_ptr<Tensor_attributes>& value)
+    BatchnormInferenceAttributes& set_x(const std::shared_ptr<TensorAttributes>& value)
     {
-        return set_input(input_names::x, value);
+        return setInput(input_names::X, value);
     }
-    Batchnorm_inference_attributes& set_x(std::shared_ptr<Tensor_attributes>&& value)
+    BatchnormInferenceAttributes& set_x(std::shared_ptr<TensorAttributes>&& value)
     {
-        return set_input(input_names::x, std::move(value));
+        return setInput(input_names::X, std::move(value));
     }
-    Batchnorm_inference_attributes& set_mean(const std::shared_ptr<Tensor_attributes>& value)
+    BatchnormInferenceAttributes& set_mean(const std::shared_ptr<TensorAttributes>& value)
     {
-        return set_input(input_names::mean, value);
+        return setInput(input_names::MEAN, value);
     }
-    Batchnorm_inference_attributes& set_mean(std::shared_ptr<Tensor_attributes>&& value)
+    BatchnormInferenceAttributes& set_mean(std::shared_ptr<TensorAttributes>&& value)
     {
-        return set_input(input_names::mean, std::move(value));
+        return setInput(input_names::MEAN, std::move(value));
     }
-    Batchnorm_inference_attributes&
-        set_inv_variance(const std::shared_ptr<Tensor_attributes>& value)
+    BatchnormInferenceAttributes& set_inv_variance(const std::shared_ptr<TensorAttributes>& value)
     {
-        return set_input(input_names::inv_variance, value);
+        return setInput(input_names::INV_VARIANCE, value);
     }
-    Batchnorm_inference_attributes& set_inv_variance(std::shared_ptr<Tensor_attributes>&& value)
+    BatchnormInferenceAttributes& set_inv_variance(std::shared_ptr<TensorAttributes>&& value)
     {
-        return set_input(input_names::inv_variance, std::move(value));
+        return setInput(input_names::INV_VARIANCE, std::move(value));
     }
-    Batchnorm_inference_attributes& set_scale(const std::shared_ptr<Tensor_attributes>& value)
+    BatchnormInferenceAttributes& set_scale(const std::shared_ptr<TensorAttributes>& value)
     {
-        return set_input(input_names::scale, value);
+        return setInput(input_names::SCALE, value);
     }
-    Batchnorm_inference_attributes& set_scale(std::shared_ptr<Tensor_attributes>&& value)
+    BatchnormInferenceAttributes& set_scale(std::shared_ptr<TensorAttributes>&& value)
     {
-        return set_input(input_names::scale, std::move(value));
+        return setInput(input_names::SCALE, std::move(value));
     }
-    Batchnorm_inference_attributes& set_bias(const std::shared_ptr<Tensor_attributes>& value)
+    BatchnormInferenceAttributes& set_bias(const std::shared_ptr<TensorAttributes>& value)
     {
-        return set_input(input_names::bias, value);
+        return setInput(input_names::BIAS, value);
     }
-    Batchnorm_inference_attributes& set_bias(std::shared_ptr<Tensor_attributes>&& value)
+    BatchnormInferenceAttributes& set_bias(std::shared_ptr<TensorAttributes>&& value)
     {
-        return set_input(input_names::bias, std::move(value));
+        return setInput(input_names::BIAS, std::move(value));
     }
-    Batchnorm_inference_attributes& set_y(const std::shared_ptr<Tensor_attributes>& value)
+    BatchnormInferenceAttributes& set_y(const std::shared_ptr<TensorAttributes>& value)
     {
-        return set_output(output_names::y, value);
+        return setOutput(output_names::Y, value);
     }
-    Batchnorm_inference_attributes& set_y(std::shared_ptr<Tensor_attributes>&& value)
+    BatchnormInferenceAttributes& set_y(std::shared_ptr<TensorAttributes>&& value)
     {
-        return set_output(output_names::y, std::move(value));
+        return setOutput(output_names::Y, std::move(value));
     }
 
     flatbuffers::Offset<hipdnn_sdk::data_objects::BatchnormInferenceAttributes>
         pack_attributes(flatbuffers::FlatBufferBuilder& builder) const
     {
         auto mean = get_mean();
-        auto inv_variance = get_inv_variance();
+        auto invVariance = get_inv_variance();
 
         return hipdnn_sdk::data_objects::CreateBatchnormInferenceAttributes(
             builder,
             get_x()->get_uid(),
             mean ? flatbuffers::Optional<int64_t>(mean->get_uid()) : flatbuffers::nullopt,
-            inv_variance ? flatbuffers::Optional<int64_t>(inv_variance->get_uid())
-                         : flatbuffers::nullopt,
+            invVariance ? flatbuffers::Optional<int64_t>(invVariance->get_uid())
+                        : flatbuffers::nullopt,
             get_scale()->get_uid(),
             get_bias()->get_uid(),
             get_y()->get_uid());
     }
 
 private:
-    std::shared_ptr<Tensor_attributes> get_input(input_names name) const
+    std::shared_ptr<TensorAttributes> getInput(input_names name) const
     {
         auto it = inputs.find(name);
         if(it != inputs.end())
@@ -135,7 +134,7 @@ private:
         return nullptr;
     }
 
-    std::shared_ptr<Tensor_attributes> get_output(output_names name) const
+    std::shared_ptr<TensorAttributes> getOutput(output_names name) const
     {
         auto it = outputs.find(name);
         if(it != outputs.end())
@@ -145,31 +144,32 @@ private:
         return nullptr;
     }
 
-    Batchnorm_inference_attributes& set_input(input_names name,
-                                              const std::shared_ptr<Tensor_attributes>& value)
+    BatchnormInferenceAttributes& setInput(input_names name,
+                                           const std::shared_ptr<TensorAttributes>& value)
     {
         inputs[name] = value;
         return *this;
     }
-    Batchnorm_inference_attributes& set_input(input_names name,
-                                              std::shared_ptr<Tensor_attributes>&& value)
+    BatchnormInferenceAttributes& setInput(input_names name,
+                                           std::shared_ptr<TensorAttributes>&& value)
     {
         inputs[name] = std::move(value);
         return *this;
     }
 
-    Batchnorm_inference_attributes& set_output(output_names name,
-                                               const std::shared_ptr<Tensor_attributes>& value)
+    BatchnormInferenceAttributes& setOutput(output_names name,
+                                            const std::shared_ptr<TensorAttributes>& value)
     {
         outputs[name] = value;
         return *this;
     }
-    Batchnorm_inference_attributes& set_output(output_names name,
-                                               std::shared_ptr<Tensor_attributes>&& value)
+    BatchnormInferenceAttributes& setOutput(output_names name,
+                                            std::shared_ptr<TensorAttributes>&& value)
     {
         outputs[name] = std::move(value);
         return *this;
     }
 };
+typedef BatchnormInferenceAttributes Batchnorm_inference_attributes;
 }
 }

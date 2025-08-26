@@ -18,7 +18,6 @@
 #include <hipdnn_sdk/utilities/tensor.hpp>
 
 using namespace hipdnn_frontend;
-using namespace hipdnn_frontend::graph;
 using namespace hipdnn_sdk::utilities;
 using namespace hipdnn_sdk::reference_test_utilities;
 
@@ -134,14 +133,14 @@ protected:
 
     template <typename Input_type, typename Intermediate_type>
     std::unordered_map<int64_t, void*> create_variant_pack(
-        const Tensor_attributes& x_tensor_attr,
-        const Tensor_attributes& dy_tensor_attr,
-        const Tensor_attributes& dx_tensor_attr,
-        const Tensor_attributes& scale_tensor_attr,
-        const Tensor_attributes& dscale_tensor_attr,
-        const Tensor_attributes& dbias_tensor_attr,
-        const Tensor_attributes& mean_tensor_attr,
-        const Tensor_attributes& inv_variance_tensor_attr,
+        const graph::TensorAttributes& x_tensor_attr,
+        const graph::TensorAttributes& dy_tensor_attr,
+        const graph::TensorAttributes& dx_tensor_attr,
+        const graph::TensorAttributes& scale_tensor_attr,
+        const graph::TensorAttributes& dscale_tensor_attr,
+        const graph::TensorAttributes& dbias_tensor_attr,
+        const graph::TensorAttributes& mean_tensor_attr,
+        const graph::TensorAttributes& inv_variance_tensor_attr,
         Batchnorm_2d_tensor_bundle<Input_type, Intermediate_type>& tensor_bundle)
     {
         std::unordered_map<int64_t, void*> variant_pack;
@@ -173,31 +172,33 @@ protected:
 
         int64_t uid = 1;
 
-        auto x_attr = make_tensor_attributes("x", input_data_type, graph_tensor_bundle.x_tensor);
+        auto x_attr
+            = graph::make_tensor_attributes("x", input_data_type, graph_tensor_bundle.x_tensor);
         x_attr.set_uid(uid++);
-        auto x_tensor_attr = std::make_shared<Tensor_attributes>(std::move(x_attr));
+        auto x_tensor_attr = std::make_shared<graph::TensorAttributes>(std::move(x_attr));
 
-        auto dy_attr = make_tensor_attributes("dy", input_data_type, graph_tensor_bundle.dy_tensor);
+        auto dy_attr
+            = graph::make_tensor_attributes("dy", input_data_type, graph_tensor_bundle.dy_tensor);
         dy_attr.set_uid(uid++);
-        auto dy_tensor_attr = std::make_shared<Tensor_attributes>(std::move(dy_attr));
+        auto dy_tensor_attr = std::make_shared<graph::TensorAttributes>(std::move(dy_attr));
 
-        auto scale_attr = make_tensor_attributes(
+        auto scale_attr = graph::make_tensor_attributes(
             "scale", intermediate_data_type, graph_tensor_bundle.scale_tensor);
         scale_attr.set_uid(uid++);
-        auto scale_tensor_attr = std::make_shared<Tensor_attributes>(std::move(scale_attr));
+        auto scale_tensor_attr = std::make_shared<graph::TensorAttributes>(std::move(scale_attr));
 
-        auto mean_attr = make_tensor_attributes(
+        auto mean_attr = graph::make_tensor_attributes(
             "mean", intermediate_data_type, graph_tensor_bundle.mean_tensor);
         mean_attr.set_uid(uid++);
-        auto mean_tensor_attr = std::make_shared<Tensor_attributes>(std::move(mean_attr));
+        auto mean_tensor_attr = std::make_shared<graph::TensorAttributes>(std::move(mean_attr));
 
-        auto inv_variance_attr = make_tensor_attributes(
+        auto inv_variance_attr = graph::make_tensor_attributes(
             "inv_variance", intermediate_data_type, graph_tensor_bundle.inv_variance_tensor);
         inv_variance_attr.set_uid(uid++);
         auto inv_variance_tensor_attr
-            = std::make_shared<Tensor_attributes>(std::move(inv_variance_attr));
+            = std::make_shared<graph::TensorAttributes>(std::move(inv_variance_attr));
 
-        Batchnorm_backward_attributes bn_attrs;
+        graph::BatchnormBackwardAttributes bn_attrs;
         bn_attrs.set_name("batchnorm_backward");
         bn_attrs.set_saved_mean_and_inv_variance(mean_tensor_attr, inv_variance_tensor_attr);
 

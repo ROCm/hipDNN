@@ -12,24 +12,24 @@
 namespace miopen_legacy_plugin
 {
 
-class Mock_plan_builder : public Plan_builder_interface
+class Mock_plan_builder : public PlanBuilderInterface
 {
 public:
     MOCK_METHOD(bool,
-                is_applicable,
-                (const hipdnn_plugin::Graph_interface& op_graph),
+                isApplicable,
+                (const hipdnn_plugin::Graph_interface& opGraph),
                 (const, override));
     MOCK_METHOD(size_t,
-                get_workspace_size,
-                (const hipdnnEnginePluginHandle& handle,
-                 const hipdnn_plugin::Graph_interface& op_graph),
+                getWorkspaceSize,
+                (const HipdnnEnginePluginHandle& handle,
+                 const hipdnn_plugin::Graph_interface& opGraph),
                 (const, override));
 
     MOCK_METHOD(void,
-                build_plan,
-                (const hipdnnEnginePluginHandle& handle,
-                 const hipdnn_plugin::Graph_interface& op_graph,
-                 hipdnnEnginePluginExecutionContext& execution_context),
+                buildPlan,
+                (const HipdnnEnginePluginHandle& handle,
+                 const hipdnn_plugin::Graph_interface& opGraph,
+                 HipdnnEnginePluginExecutionContext& executionContext),
                 (const, override));
 };
 

@@ -16,9 +16,9 @@ namespace hipdnn_frontend::graph
 class DBNNode : public NodeCRTP<DBNNode> //NOLINT
 {
 public:
-    Batchnorm_backward_attributes attributes;
+    BatchnormBackwardAttributes attributes;
 
-    DBNNode(Batchnorm_backward_attributes&& batchnorm_attrs, const Graph_attributes& graph_attrs)
+    DBNNode(BatchnormBackwardAttributes&& batchnorm_attrs, const GraphAttributes& graph_attrs)
         : NodeCRTP(graph_attrs)
         , attributes(std::move(batchnorm_attrs))
     {
@@ -100,7 +100,7 @@ public:
             dx->set_stride(x->get_stride());
         }
 
-        auto infer_c_tensor = [&](std::shared_ptr<Tensor_attributes>& tensor_to_infer) {
+        auto infer_c_tensor = [&](std::shared_ptr<TensorAttributes>& tensor_to_infer) {
             if(tensor_to_infer->get_dim().empty())
             {
                 std::vector<int64_t> tensor_dims(x->get_dim().size(), 1);
@@ -137,7 +137,7 @@ public:
     }
 
     error_t populate_hipdnn_tensor_ids(
-        std::unordered_map<int64_t, std::shared_ptr<Tensor_attributes>>& tensor_lookup,
+        std::unordered_map<int64_t, std::shared_ptr<TensorAttributes>>& tensor_lookup,
         int64_t& current_tensor_id,
         std::unordered_set<int64_t>& used_ids) const override
     {

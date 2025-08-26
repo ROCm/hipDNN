@@ -15,38 +15,38 @@
 namespace miopen_legacy_plugin
 {
 
-class Engine_manager
+class EngineManager
 {
 public:
-    Engine_manager() = default;
-    ~Engine_manager() = default;
+    EngineManager() = default;
+    ~EngineManager() = default;
 
     //disallow copy and assignment
-    Engine_manager(const Engine_manager&) = delete;
-    Engine_manager& operator=(const Engine_manager&) = delete;
+    EngineManager(const EngineManager&) = delete;
+    EngineManager& operator=(const EngineManager&) = delete;
 
-    void add_engine(std::unique_ptr<Engine_interface> engine);
+    void addEngine(std::unique_ptr<EngineInterface> engine);
 
-    std::vector<int64_t> get_applicable_engine_ids(const hipdnn_plugin::Graph_interface& op_graph);
+    std::vector<int64_t> getApplicableEngineIds(const hipdnn_plugin::Graph_interface& opGraph);
 
-    void get_engine_details(hipdnnEnginePluginHandle& handle,
-                            const hipdnn_plugin::Graph_interface& op_graph,
-                            int64_t engine_id,
-                            hipdnnPluginConstData_t& engine_details_out);
+    void getEngineDetails(HipdnnEnginePluginHandle& handle,
+                          const hipdnn_plugin::Graph_interface& opGraph,
+                          int64_t engineId,
+                          hipdnnPluginConstData_t& engineDetailsOut);
 
-    size_t get_workspace_size(const hipdnnEnginePluginHandle& handle,
-                              int64_t engine_id,
-                              const hipdnn_plugin::Graph_interface& op_graph) const;
+    size_t getWorkspaceSize(const HipdnnEnginePluginHandle& handle,
+                            int64_t engineId,
+                            const hipdnn_plugin::Graph_interface& opGraph) const;
 
-    void initialize_execution_context(const hipdnnEnginePluginHandle& handle,
-                                      const hipdnn_plugin::Graph_interface& op_graph,
-                                      const hipdnn_plugin::Engine_config_interface& engine_config,
-                                      hipdnnEnginePluginExecutionContext& execution_context) const;
+    void initializeExecutionContext(const HipdnnEnginePluginHandle& handle,
+                                    const hipdnn_plugin::Graph_interface& opGraph,
+                                    const hipdnn_plugin::Engine_config_interface& engineConfig,
+                                    HipdnnEnginePluginExecutionContext& executionContext) const;
 
 private:
-    Engine_interface& get_engine(int64_t engine_id) const;
+    EngineInterface& getEngine(int64_t engineId) const;
 
-    std::unordered_map<int64_t, std::unique_ptr<Engine_interface>> _engines;
+    std::unordered_map<int64_t, std::unique_ptr<EngineInterface>> _engines;
 };
 
 }

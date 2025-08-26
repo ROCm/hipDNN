@@ -9,7 +9,7 @@
 namespace miopen_legacy_plugin
 {
 
-class Engine_manager;
+class EngineManager;
 
 /*
  * Container class to manage the intantiation and ownership of all MIOpen plan builders and engines.
@@ -20,16 +20,16 @@ class Engine_manager;
  * If logic is needed, it should be placed in a separate function that can be called after the 
  * container has finished constructing all its components.
  */
-class Miopen_container
+class MiopenContainer
 {
 public:
-    Miopen_container();
-    ~Miopen_container();
+    MiopenContainer();
+    ~MiopenContainer();
 
-    Engine_manager& get_engine_manager();
+    EngineManager& getEngineManager();
 
 private:
-    std::unique_ptr<Engine_manager> _engine_manager;
+    std::unique_ptr<EngineManager> _engineManager;
 };
 
 }

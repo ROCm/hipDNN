@@ -52,7 +52,7 @@ TEST_F(Flatbuffer_utilities_test, WillCorrectlyUnpackValidGraphBuffer)
 
     auto serialized_graph = builder.Release();
     std::unique_ptr<hipdnn_sdk::data_objects::GraphT> graph;
-    ASSERT_NO_THROW(flatbuffer_utilities::convert_serialized_graph_to_graph(
+    ASSERT_NO_THROW(flatbuffer_utilities::convertSerializedGraphToGraph(
         serialized_graph.data(), serialized_graph.size(), graph));
 
     verify_graph(*graph);
@@ -65,7 +65,7 @@ TEST_F(Flatbuffer_utilities_test, WillStillHaveValidGraphAfterBuilderDestructs)
         auto builder = create_valid_graph();
 
         auto serialized_graph = builder.Release();
-        ASSERT_NO_THROW(flatbuffer_utilities::convert_serialized_graph_to_graph(
+        ASSERT_NO_THROW(flatbuffer_utilities::convertSerializedGraphToGraph(
             serialized_graph.data(), serialized_graph.size(), graph));
     }
 
@@ -78,7 +78,7 @@ TEST(Flatbuffer_invalid_tests, WillNotUnpackNullBuffer)
 
     std::unique_ptr<hipdnn_sdk::data_objects::GraphT> graph;
     ASSERT_THROW_HIPDNN_STATUS(
-        flatbuffer_utilities::convert_serialized_graph_to_graph(buffer, size, graph),
+        flatbuffer_utilities::convertSerializedGraphToGraph(buffer, size, graph),
         HIPDNN_STATUS_BAD_PARAM);
     ASSERT_EQ(graph, nullptr);
 }
@@ -90,7 +90,7 @@ TEST(Flatbuffer_invalid_tests, WillNotUnpackInvalidBuffer)
 
     std::unique_ptr<hipdnn_sdk::data_objects::GraphT> graph;
     ASSERT_THROW_HIPDNN_STATUS(
-        flatbuffer_utilities::convert_serialized_graph_to_graph(buffer, size, graph),
+        flatbuffer_utilities::convertSerializedGraphToGraph(buffer, size, graph),
         HIPDNN_STATUS_BAD_PARAM);
     ASSERT_EQ(graph, nullptr);
 }
@@ -103,7 +103,7 @@ TEST(Flatbuffer_invalid_tests, WillNotUnpackWrongSizeBuffer)
 
     std::unique_ptr<hipdnn_sdk::data_objects::GraphT> graph;
     ASSERT_THROW_HIPDNN_STATUS(
-        flatbuffer_utilities::convert_serialized_graph_to_graph(buffer, size, graph),
+        flatbuffer_utilities::convertSerializedGraphToGraph(buffer, size, graph),
         HIPDNN_STATUS_BAD_PARAM);
     ASSERT_EQ(graph, nullptr);
 }

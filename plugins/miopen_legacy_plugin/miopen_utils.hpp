@@ -33,12 +33,11 @@ namespace miopen_legacy_plugin
 namespace miopen_utils
 {
 
-hipdnnPluginDeviceBuffer_t find_device_buffer(int64_t uid,
-                                              const hipdnnPluginDeviceBuffer_t* device_buffers,
-                                              uint32_t num_device_buffers);
+hipdnnPluginDeviceBuffer_t findDeviceBuffer(int64_t uid,
+                                            const hipdnnPluginDeviceBuffer_t* deviceBuffers,
+                                            uint32_t numDeviceBuffers);
 
-miopenDataType_t
-    tensor_data_type_to_miopen_data_type(const hipdnn_sdk::data_objects::DataType& data_type);
+miopenDataType_t tensorDataTypeToMiopenDataType(const hipdnn_sdk::data_objects::DataType& dataType);
 
 }
 

@@ -60,10 +60,11 @@ void EngineHeuristicDescriptor::getAttribute(hipdnnBackendAttributeName_t attrib
         getEngineConfigs(attributeType, requestedElementCount, elementCount, arrayOfElements);
         break;
     default:
-        throw Hipdnn_exception(
+        throw HipdnnException(
             HIPDNN_STATUS_NOT_SUPPORTED,
-            std::string("EngineHeuristicDescriptor::getAttribute() is not supported for attribute ")
-                + hipdnn_backend::hipdnn_get_attribute_name_string(attributeName) + ".");
+            std::string(
+                "EngineHeuristicDescriptor::getAttribute() is not supported for attribute ")
+                + hipdnn_backend::hipdnnGetAttributeNameString(attributeName) + ".");
     }
 }
 
@@ -85,10 +86,11 @@ void EngineHeuristicDescriptor::setAttribute(hipdnnBackendAttributeName_t attrib
         setGraph(attributeType, elementCount, arrayOfElements);
         break;
     default:
-        throw Hipdnn_exception(
+        throw HipdnnException(
             HIPDNN_STATUS_NOT_SUPPORTED,
-            std::string("EngineHeuristicDescriptor::setAttribute() is not supported for attribute ")
-                + hipdnn_backend::hipdnn_get_attribute_name_string(attributeName) + ".");
+            std::string(
+                "EngineHeuristicDescriptor::setAttribute() is not supported for attribute ")
+                + hipdnn_backend::hipdnnGetAttributeNameString(attributeName) + ".");
     }
 }
 
@@ -119,9 +121,9 @@ void EngineHeuristicDescriptor::setHeuristicMode(hipdnnBackendAttributeType_t at
     auto heurModeValue = *heurMode;
     if(heurModeValue != HIPDNN_HEUR_MODE_FALLBACK)
     {
-        throw Hipdnn_exception(HIPDNN_STATUS_NOT_SUPPORTED,
-                               "EngineHeuristicDescriptor::setHeuristicMode() is not "
-                               "supported for the given heuristic mode.");
+        throw HipdnnException(HIPDNN_STATUS_NOT_SUPPORTED,
+                              "EngineHeuristicDescriptor::setHeuristicMode() is not "
+                              "supported for the given heuristic mode.");
     }
 
     _heuristicMode = heurModeValue;

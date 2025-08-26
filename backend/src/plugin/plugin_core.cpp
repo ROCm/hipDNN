@@ -45,7 +45,7 @@ void PluginBase::resolveSymbols()
         _funcSetLoggingCallback
             = _lib.get_symbol<decltype(_funcSetLoggingCallback)>(funcNameSetLoggingCallback);
     }
-    catch(const Hipdnn_exception&)
+    catch(const HipdnnException&)
     {
         _funcSetLoggingCallback = nullptr;
 
