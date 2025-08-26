@@ -8,6 +8,9 @@
 #include <iostream>
 #include <vector>
 
+namespace test_operations_common
+{
+
 using namespace hipdnn_sdk::reference_test_utilities;
 
 struct Bn_2d_test_case
@@ -67,3 +70,5 @@ inline std::vector<Bn_2d_test_case> get_bn_2d_test_cases()
         {.n = 64, .c = 3, .h = 14, .w = 14},
     };
 }
+
+} // namespace test_operation_common

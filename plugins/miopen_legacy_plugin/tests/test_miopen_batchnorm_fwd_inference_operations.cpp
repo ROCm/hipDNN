@@ -14,11 +14,12 @@
 #include <hipdnn_sdk/utilities/hip_bfloat16_utils.hpp>
 #include <hipdnn_sdk/utilities/tensor.hpp>
 
+#include "common/test_operations_common.hpp"
 #include "hipdnn_engine_plugin_execution_context.hpp"
 #include "hipdnn_engine_plugin_handle.hpp"
-#include "test_batchnorm_common.hpp"
 
 using namespace hipdnn_sdk::reference_test_utilities;
+using namespace test_operations_common;
 
 class Batchnorm_fwd_infer_execute_graph_test : public ::testing::TestWithParam<Bn_2d_test_case>
 {

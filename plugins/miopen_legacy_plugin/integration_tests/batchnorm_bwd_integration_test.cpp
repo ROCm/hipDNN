@@ -357,7 +357,7 @@ std::vector<Bn_2d_test_case> get_bn_bwd_test_cases()
 // Tolerance ranges are set to be 4e-3f due to batchnorm being numerical unstable for large tensor sizes.
 // MIOpen uses 4e-3f for it's batchnorm tests to verify, but it uses RMS calc instead of all_close type check.
 // You can swap the tests above to use cpu_fp_reference_miopen_rms_validation if you want to match MIOpen's tolerance checks exactly.
-TEST_P(Batchnorm_backward_integration_test, RunFloatBwdBatchnormGraph)
+TEST_P(Batchnorm_backward_integration_test, RunFloatBwdBatchnormGraphNCHW)
 {
     Bn_2d_test_case test_case = GetParam();
     run_batchnorm_test<float, float>(test_case, 4e-3f);
@@ -367,7 +367,7 @@ INSTANTIATE_TEST_SUITE_P(RunFloatBwdBatchnormGraph,
                          Batchnorm_backward_integration_test,
                          testing::ValuesIn(get_bn_bwd_test_cases()));
 
-TEST_P(Batchnorm_backward_integration_test_bfloat16, RunBfloat16BwdBatchnormGraph)
+TEST_P(Batchnorm_backward_integration_test_bfloat16, RunBfloat16BwdBatchnormGraphNCHW)
 {
     Bn_2d_test_case test_case = GetParam();
     run_batchnorm_test<hip_bfloat16, float>(test_case, 4e-3_bf);
@@ -377,7 +377,7 @@ INSTANTIATE_TEST_SUITE_P(RunBfloat16BwdBatchnormGraph,
                          Batchnorm_backward_integration_test_bfloat16,
                          testing::ValuesIn(get_bn_bwd_test_cases()));
 
-TEST_P(Batchnorm_backward_integration_test_half, RunHalfBwdBatchnormGraph)
+TEST_P(Batchnorm_backward_integration_test_half, RunHalfBwdBatchnormGraphNCWH)
 {
     Bn_2d_test_case test_case = GetParam();
     run_batchnorm_test<half, float>(test_case, 4e-3_h);

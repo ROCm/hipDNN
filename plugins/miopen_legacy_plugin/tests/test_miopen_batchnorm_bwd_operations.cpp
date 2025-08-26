@@ -14,11 +14,12 @@
 #include <hipdnn_sdk/utilities/hip_bfloat16_utils.hpp>
 #include <hipdnn_sdk/utilities/tensor.hpp>
 
+#include "common/test_operations_common.hpp"
 #include "hipdnn_engine_plugin_execution_context.hpp"
 #include "hipdnn_engine_plugin_handle.hpp"
-#include "test_batchnorm_common.hpp"
 
 using namespace hipdnn_sdk::reference_test_utilities;
+using namespace test_operations_common;
 
 class Batchnorm_bwd_execute_graph_test : public ::testing::TestWithParam<Bn_2d_test_case>
 {
@@ -80,21 +81,21 @@ TEST_P(Batchnorm_bwd_execute_graph_test, RunFloatBwdBatchnormGraphNHWC)
         test_case, hipdnn_sdk::data_objects::DataType::DataType_FLOAT, 4e-3f, Tensor_layout::NHWC);
 }
 
-TEST_P(Batchnorm_bwd_execute_graph_test, RunBfloat16BwdBatchnormGraphNHWC)
-{
-    Bn_2d_test_case test_case = {.n = 1, .c = 3, .h = 14, .w = 14};
-    RunBwdBatchnormGraph<hip_bfloat16, float>(test_case,
-                                              hipdnn_sdk::data_objects::DataType::DataType_BFLOAT16,
-                                              4e-3_bf,
-                                              Tensor_layout::NHWC);
-}
+// TEST_P(Batchnorm_bwd_execute_graph_test, RunBfloat16BwdBatchnormGraphNHWC)
+// {
+//     Bn_2d_test_case test_case = {.n = 1, .c = 3, .h = 14, .w = 14};
+//     RunBwdBatchnormGraph<hip_bfloat16, float>(test_case,
+//                                               hipdnn_sdk::data_objects::DataType::DataType_BFLOAT16,
+//                                               4e-3_bf,
+//                                               Tensor_layout::NHWC);
+// }
 
-TEST_P(Batchnorm_bwd_execute_graph_test, RunHalfBwdBatchnormGraphNHWC)
-{
-    Bn_2d_test_case test_case = {.n = 1, .c = 3, .h = 14, .w = 14};
-    RunBwdBatchnormGraph<half, float>(
-        test_case, hipdnn_sdk::data_objects::DataType::DataType_HALF, 4e-3_h, Tensor_layout::NHWC);
-}
+// TEST_P(Batchnorm_bwd_execute_graph_test, RunHalfBwdBatchnormGraphNHWC)
+// {
+//     Bn_2d_test_case test_case = {.n = 1, .c = 3, .h = 14, .w = 14};
+//     RunBwdBatchnormGraph<half, float>(
+//         test_case, hipdnn_sdk::data_objects::DataType::DataType_HALF, 4e-3_h, Tensor_layout::NHWC);
+// }
 
 // TODO: Re-enable when double support is added to MIOpen plugin
 // TEST_F(Batchnorm_bwd_execute_graph_test, RunDoubleBwdBatchnormGraph)

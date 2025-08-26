@@ -305,7 +305,7 @@ std::vector<Bn_2d_test_case> get_bn_fwd_inference_test_cases()
 
 } // namespace
 
-TEST_P(Batchnorm_forward_inference_integration_test, RunFloatFwdBatchnormGraph)
+TEST_P(Batchnorm_forward_inference_integration_test, RunFloatFwdBatchnormGraphNCHW)
 {
     Bn_2d_test_case test_case = GetParam();
     run_batchnorm_test<float, float>(test_case, 1e-6f);
@@ -320,7 +320,7 @@ class Batchnorm_forward_inference_integration_test_bfloat16
 {
 };
 
-TEST_P(Batchnorm_forward_inference_integration_test_bfloat16, RunBfloat16FwdBatchnormGraph)
+TEST_P(Batchnorm_forward_inference_integration_test_bfloat16, RunBfloat16FwdBatchnormGraphNCHW)
 {
     Bn_2d_test_case test_case = GetParam();
     run_batchnorm_test<hip_bfloat16, float>(test_case, 1e-2_bf);
@@ -334,7 +334,7 @@ class Batchnorm_forward_inference_integration_test_half
     : public Batchnorm_forward_inference_integration_test
 {
 };
-TEST_P(Batchnorm_forward_inference_integration_test_half, RunHalfFwdbatchnormGraph)
+TEST_P(Batchnorm_forward_inference_integration_test_half, RunHalfFwdbatchnormGraphNCHW)
 {
     Bn_2d_test_case test_case = GetParam();
     run_batchnorm_test<half, float>(test_case, 1e-2_h);
