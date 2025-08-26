@@ -264,7 +264,8 @@ protected:
     void run_cpu_batchnorm_bwd(
         Batchnorm_2d_tensor_bundle<Input_type, Intermediate_type>& cpu_tensor_bundle)
     {
-        CpuFpReferenceImplementation<Input_type, Intermediate_type, Intermediate_type> cpu_ref_impl;
+        Cpu_fp_reference_implementation<Input_type, Intermediate_type, Intermediate_type>
+            cpu_ref_impl;
         cpu_ref_impl.batchnorm_bwd(cpu_tensor_bundle.dy_tensor,
                                    cpu_tensor_bundle.x_tensor,
                                    cpu_tensor_bundle.mean_tensor,

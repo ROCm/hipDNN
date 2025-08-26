@@ -200,7 +200,7 @@ void Batchnorm_fwd_infer_execute_graph_test::RunFwdBatchnormGraph(
     variance_tensor_cpu.fill_with_random_values(
         static_cast<Intermediate_type>(0.1f), static_cast<Intermediate_type>(1.0f), seed);
 
-    CpuFpReferenceImplementation<Input_type, Intermediate_type, Intermediate_type> cpu_ref_impl;
+    Cpu_fp_reference_implementation<Input_type, Intermediate_type, Intermediate_type> cpu_ref_impl;
     cpu_ref_impl.batchnorm_fwd_inference(x_tensor_cpu,
                                          scale_tensor_cpu,
                                          bias_tensor_cpu,

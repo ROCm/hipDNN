@@ -13,7 +13,7 @@ using namespace hipdnn_sdk::reference_test_utilities;
 using namespace hipdnn_sdk::data_objects;
 using namespace hipdnn_sdk::utilities;
 
-TEST(CpuFpReferenceImplementation, BatchnormInferFloatUsage)
+TEST(Cpu_fp_reference_implementation, BatchnormInferFloatUsage)
 {
     Tensor<float> input_tensor({1, 3, 224, 224});
     Tensor<float> output_tensor({1, 3, 224, 224});
@@ -22,13 +22,13 @@ TEST(CpuFpReferenceImplementation, BatchnormInferFloatUsage)
     Tensor<float> mean_tensor({1, 3});
     Tensor<float> variance_tensor({1, 3});
 
-    CpuFpReferenceImplementation<float, float, float> ref_impl;
+    Cpu_fp_reference_implementation<float, float, float> ref_impl;
 
     ref_impl.batchnorm_fwd_inference(
         input_tensor, scale_tensor, bias_tensor, mean_tensor, variance_tensor, output_tensor, 1e-5);
 }
 
-TEST(CpuFpReferenceImplementation, BatchnormInferBFloat16Usage)
+TEST(Cpu_fp_reference_implementation, BatchnormInferBFloat16Usage)
 {
     Tensor<hip_bfloat16> input_tensor({1, 3, 224, 224});
     Tensor<hip_bfloat16> output_tensor({1, 3, 224, 224});
@@ -37,13 +37,13 @@ TEST(CpuFpReferenceImplementation, BatchnormInferBFloat16Usage)
     Tensor<float> mean_tensor({1, 3});
     Tensor<float> variance_tensor({1, 3});
 
-    CpuFpReferenceImplementation<hip_bfloat16, float, float> ref_impl;
+    Cpu_fp_reference_implementation<hip_bfloat16, float, float> ref_impl;
 
     ref_impl.batchnorm_fwd_inference(
         input_tensor, scale_tensor, bias_tensor, mean_tensor, variance_tensor, output_tensor, 1e-5);
 }
 
-TEST(CpuFpReferenceImplementation, BatchnormInferHalfUsage)
+TEST(Cpu_fp_reference_implementation, BatchnormInferHalfUsage)
 {
     Tensor<half> input_tensor({1, 3, 224, 224});
     Tensor<half> output_tensor({1, 3, 224, 224});
@@ -52,13 +52,13 @@ TEST(CpuFpReferenceImplementation, BatchnormInferHalfUsage)
     Tensor<float> mean_tensor({1, 3});
     Tensor<float> variance_tensor({1, 3});
 
-    CpuFpReferenceImplementation<half, float, float> ref_impl;
+    Cpu_fp_reference_implementation<half, float, float> ref_impl;
 
     ref_impl.batchnorm_fwd_inference(
         input_tensor, scale_tensor, bias_tensor, mean_tensor, variance_tensor, output_tensor, 1e-5);
 }
 
-TEST(CpuFpReferenceImplementation, BatchnormInferDoubleUsage)
+TEST(Cpu_fp_reference_implementation, BatchnormInferDoubleUsage)
 {
     Tensor<double> input_tensor({1, 3, 224, 224});
     Tensor<double> output_tensor({1, 3, 224, 224});
@@ -67,13 +67,13 @@ TEST(CpuFpReferenceImplementation, BatchnormInferDoubleUsage)
     Tensor<double> mean_tensor({1, 3});
     Tensor<double> variance_tensor({1, 3});
 
-    CpuFpReferenceImplementation<double, double, double> ref_impl;
+    Cpu_fp_reference_implementation<double, double, double> ref_impl;
 
     ref_impl.batchnorm_fwd_inference(
         input_tensor, scale_tensor, bias_tensor, mean_tensor, variance_tensor, output_tensor, 1e-5);
 }
 
-TEST(CpuFpReferenceImplementation, BatchnormInferFloatUsageNHWC)
+TEST(Cpu_fp_reference_implementation, BatchnormInferFloatUsageNHWC)
 {
     Tensor<float> input_tensor({6, 3, 32, 32}, Tensor_layout::NHWC);
     Tensor<float> output_tensor({6, 3, 32, 32}, Tensor_layout::NHWC);
@@ -82,13 +82,13 @@ TEST(CpuFpReferenceImplementation, BatchnormInferFloatUsageNHWC)
     Tensor<float> mean_tensor({1, 3, 1, 1});
     Tensor<float> variance_tensor({1, 3, 1, 1});
 
-    CpuFpReferenceImplementation<float, float, float> ref_impl;
+    Cpu_fp_reference_implementation<float, float, float> ref_impl;
 
     ref_impl.batchnorm_fwd_inference(
         input_tensor, scale_tensor, bias_tensor, mean_tensor, variance_tensor, output_tensor, 1e-5);
 }
 
-TEST(CpuFpReferenceImplementation, BatchnormInferSanityValidation)
+TEST(Cpu_fp_reference_implementation, BatchnormInferSanityValidation)
 {
     SKIP_IF_NO_DEVICES();
 
@@ -123,7 +123,7 @@ TEST(CpuFpReferenceImplementation, BatchnormInferSanityValidation)
     // where inv_variance (named by convention) = 1 / sqrt(1.25 + 1e-5) = 0.894423613312618
     const std::vector<double> expected_output = {-2.18327084, -0.39442361, 1.39442361, 3.18327084};
 
-    CpuFpReferenceImplementation<double, double, double> ref_impl;
+    Cpu_fp_reference_implementation<double, double, double> ref_impl;
     ref_impl.batchnorm_fwd_inference(
         input_tensor, scale_tensor, bias_tensor, mean_tensor, variance_tensor, output_tensor, 1e-5);
 
@@ -135,7 +135,7 @@ TEST(CpuFpReferenceImplementation, BatchnormInferSanityValidation)
     EXPECT_NEAR(output_tensor.get_host_value(0, 0, 1, 1), expected_output[3], tolerance);
 }
 
-TEST(CpuFpReferenceImplementation, BatchnormBwdFloatUsage)
+TEST(Cpu_fp_reference_implementation, BatchnormBwdFloatUsage)
 {
     Tensor<float> x_tensor({6, 3, 32, 32});
     Tensor<float> dy_tensor({6, 3, 32, 32});
@@ -146,7 +146,7 @@ TEST(CpuFpReferenceImplementation, BatchnormBwdFloatUsage)
     Tensor<float> dscale_tensor({1, 3});
     Tensor<float> dbias_tensor({1, 3});
 
-    CpuFpReferenceImplementation<float, float, float> ref_impl;
+    Cpu_fp_reference_implementation<float, float, float> ref_impl;
 
     ref_impl.batchnorm_bwd(dy_tensor,
                            x_tensor,
@@ -158,7 +158,7 @@ TEST(CpuFpReferenceImplementation, BatchnormBwdFloatUsage)
                            dbias_tensor);
 }
 
-TEST(CpuFpReferenceImplementation, BatchnormBwdBFloat16Usage)
+TEST(Cpu_fp_reference_implementation, BatchnormBwdBFloat16Usage)
 {
     Tensor<hip_bfloat16> x_tensor({6, 3, 32, 32});
     Tensor<hip_bfloat16> dy_tensor({6, 3, 32, 32});
@@ -169,7 +169,7 @@ TEST(CpuFpReferenceImplementation, BatchnormBwdBFloat16Usage)
     Tensor<float> dscale_tensor({1, 3});
     Tensor<float> dbias_tensor({1, 3});
 
-    CpuFpReferenceImplementation<hip_bfloat16, float, float> ref_impl;
+    Cpu_fp_reference_implementation<hip_bfloat16, float, float> ref_impl;
 
     ref_impl.batchnorm_bwd(dy_tensor,
                            x_tensor,
@@ -181,7 +181,7 @@ TEST(CpuFpReferenceImplementation, BatchnormBwdBFloat16Usage)
                            dbias_tensor);
 }
 
-TEST(CpuFpReferenceImplementation, BatchnormBwdHalfUsage)
+TEST(Cpu_fp_reference_implementation, BatchnormBwdHalfUsage)
 {
     Tensor<half> x_tensor({6, 3, 32, 32});
     Tensor<half> dy_tensor({6, 3, 32, 32});
@@ -192,7 +192,7 @@ TEST(CpuFpReferenceImplementation, BatchnormBwdHalfUsage)
     Tensor<float> dscale_tensor({1, 3});
     Tensor<float> dbias_tensor({1, 3});
 
-    CpuFpReferenceImplementation<half, float, float> ref_impl;
+    Cpu_fp_reference_implementation<half, float, float> ref_impl;
 
     ref_impl.batchnorm_bwd(dy_tensor,
                            x_tensor,
@@ -204,7 +204,7 @@ TEST(CpuFpReferenceImplementation, BatchnormBwdHalfUsage)
                            dbias_tensor);
 }
 
-TEST(CpuFpReferenceImplementation, BatchnormBwdDoubleUsage)
+TEST(Cpu_fp_reference_implementation, BatchnormBwdDoubleUsage)
 {
     Tensor<double> x_tensor({6, 3, 32, 32});
     Tensor<double> dy_tensor({6, 3, 32, 32});
@@ -215,7 +215,7 @@ TEST(CpuFpReferenceImplementation, BatchnormBwdDoubleUsage)
     Tensor<double> dscale_tensor({1, 3});
     Tensor<double> dbias_tensor({1, 3});
 
-    CpuFpReferenceImplementation<double, double, double> ref_impl;
+    Cpu_fp_reference_implementation<double, double, double> ref_impl;
 
     ref_impl.batchnorm_bwd(dy_tensor,
                            x_tensor,
@@ -227,7 +227,7 @@ TEST(CpuFpReferenceImplementation, BatchnormBwdDoubleUsage)
                            dbias_tensor);
 }
 
-TEST(CpuFpReferenceImplementation, BatchnormBwdFloatUsageNHWC)
+TEST(Cpu_fp_reference_implementation, BatchnormBwdFloatUsageNHWC)
 {
     Tensor<float> x_tensor({6, 3, 32, 32}, Tensor_layout::NHWC);
     Tensor<float> dy_tensor({6, 3, 32, 32}, Tensor_layout::NHWC);
@@ -238,7 +238,7 @@ TEST(CpuFpReferenceImplementation, BatchnormBwdFloatUsageNHWC)
     Tensor<float> dscale_tensor({1, 3});
     Tensor<float> dbias_tensor({1, 3});
 
-    CpuFpReferenceImplementation<float, float, float> ref_impl;
+    Cpu_fp_reference_implementation<float, float, float> ref_impl;
 
     ref_impl.batchnorm_bwd(dy_tensor,
                            x_tensor,
@@ -250,7 +250,7 @@ TEST(CpuFpReferenceImplementation, BatchnormBwdFloatUsageNHWC)
                            dbias_tensor);
 }
 
-TEST(CpuFpReferenceImplementation, BatchnormBwdSanityValidation)
+TEST(Cpu_fp_reference_implementation, BatchnormBwdSanityValidation)
 {
     const std::vector<int64_t> dims = {1, 1, 2, 2};
 
@@ -297,7 +297,7 @@ TEST(CpuFpReferenceImplementation, BatchnormBwdSanityValidation)
     std::vector<double> expected_dx
         = {-2.14659950e-06, -7.15533166e-07, 7.15533166e-07, 2.14659950e-06};
 
-    CpuFpReferenceImplementation<double, double, double> ref_impl;
+    Cpu_fp_reference_implementation<double, double, double> ref_impl;
     ref_impl.batchnorm_bwd(dy_tensor,
                            x_tensor,
                            mean_tensor,
