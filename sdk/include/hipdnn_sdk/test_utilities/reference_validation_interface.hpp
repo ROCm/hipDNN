@@ -16,13 +16,13 @@ namespace reference_test_utilities
 using namespace hipdnn_sdk::utilities;
 
 template <class T>
-class Reference_validation_interface
+class IReferenceValidation
 {
 public:
-    virtual ~Reference_validation_interface() = default;
+    virtual ~IReferenceValidation() = default;
 
-    virtual bool all_close(Migratable_memory_interface<T>& reference,
-                           Migratable_memory_interface<T>& implementation)
+    virtual bool allClose(Migratable_memory_interface<T>& reference,
+                          Migratable_memory_interface<T>& implementation)
         = 0;
 };
 

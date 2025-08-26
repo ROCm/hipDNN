@@ -152,14 +152,14 @@ void BatchnormFwdInferExecuteGraphTest::runFwdBatchnormGraph(
                                                        static_cast<IntermediateType>(1.0f),
                                                        seed));
 
-    auto batchnormBuilder = flatbuffer_test_utils::create_valid_batchnorm_graph(
+    auto batchnormBuilder = flatbuffer_test_utils::createValidBatchnormGraph(
         xTensor.strides(), xTensor.dims(), true, inputDataType);
 
     hipdnnPluginConstData_t opGraph;
     opGraph.ptr = batchnormBuilder.GetBufferPointer();
     opGraph.size = batchnormBuilder.GetSize();
 
-    auto engineConfigBuilder = flatbuffer_test_utils::create_valid_engine_config(1);
+    auto engineConfigBuilder = flatbuffer_test_utils::createValidEngineConfig(1);
     hipdnnPluginConstData_t engineConfig;
     engineConfig.ptr = engineConfigBuilder.GetBufferPointer();
     engineConfig.size = engineConfigBuilder.GetSize();
@@ -196,17 +196,17 @@ void BatchnormFwdInferExecuteGraphTest::runFwdBatchnormGraph(
     varianceTensorCpu.fill_with_random_values(
         static_cast<IntermediateType>(0.1f), static_cast<IntermediateType>(1.0f), seed);
 
-    Cpu_fp_reference_implementation<InputType, IntermediateType, IntermediateType> cpuRefImpl;
-    cpuRefImpl.batchnorm_fwd_inference(xTensorCpu,
-                                       scaleTensorCpu,
-                                       biasTensorCpu,
-                                       meanTensorCpu,
-                                       varianceTensorCpu,
-                                       yTensorCpu,
-                                       1e-3);
+    CpuFpReferenceImplementation<InputType, IntermediateType, IntermediateType> cpuRefImpl;
+    cpuRefImpl.batchnormFwdInference(xTensorCpu,
+                                     scaleTensorCpu,
+                                     biasTensorCpu,
+                                     meanTensorCpu,
+                                     varianceTensorCpu,
+                                     yTensorCpu,
+                                     1e-3);
 
-    Cpu_fp_reference_validation<InputType> cpuRefValidation(epsilon, epsilon);
-    EXPECT_TRUE(cpuRefValidation.all_close(yTensorCpu.memory(), yTensor.memory()));
+    CpuFpReferenceValidation<InputType> cpuRefValidation(epsilon, epsilon);
+    EXPECT_TRUE(cpuRefValidation.allClose(yTensorCpu.memory(), yTensor.memory()));
 }
 
 INSTANTIATE_TEST_SUITE_P(RunFwdBatchnormGraphWithParams,

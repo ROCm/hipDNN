@@ -19,33 +19,33 @@ namespace reference_test_utilities
 using namespace hipdnn_sdk::data_objects;
 using namespace hipdnn_sdk::utilities;
 
-template <class Input_data_type,
-          class Scale_bias_data_type,
-          class Mean_variance_data_type = Scale_bias_data_type>
-class Reference_implementation_interface
+template <class InputDataType,
+          class ScaleBiasDataType,
+          class MeanVarianceDataType = ScaleBiasDataType>
+class IReferenceImplementation
 {
 public:
-    virtual ~Reference_implementation_interface() = default;
+    virtual ~IReferenceImplementation() = default;
 
     virtual void
-        batchnorm_fwd_inference(const Tensor_interface<Input_data_type>& input,
-                                const Tensor_interface<Scale_bias_data_type>& scale,
-                                const Tensor_interface<Scale_bias_data_type>& bias,
-                                const Tensor_interface<Mean_variance_data_type>& estimated_mean,
-                                const Tensor_interface<Mean_variance_data_type>& estimated_variance,
-                                Tensor_interface<Input_data_type>& output,
-                                double epsilon)
+        batchnormFwdInference(const Tensor_interface<InputDataType>& input,
+                              const Tensor_interface<ScaleBiasDataType>& scale,
+                              const Tensor_interface<ScaleBiasDataType>& bias,
+                              const Tensor_interface<MeanVarianceDataType>& estimatedMean,
+                              const Tensor_interface<MeanVarianceDataType>& estimatedVariance,
+                              Tensor_interface<InputDataType>& output,
+                              double epsilon)
         = 0;
 
     // Could call this bwd_training or bwd_propagation
-    virtual void batchnorm_bwd(const Tensor_interface<Input_data_type>& dy,
-                               const Tensor_interface<Input_data_type>& x,
-                               const Tensor_interface<Mean_variance_data_type>& mean,
-                               const Tensor_interface<Mean_variance_data_type>& inv_variance,
-                               const Tensor_interface<Scale_bias_data_type>& scale,
-                               Tensor_interface<Input_data_type>& dx,
-                               Tensor_interface<Scale_bias_data_type>& dscale,
-                               Tensor_interface<Scale_bias_data_type>& dbias)
+    virtual void batchnormBwd(const Tensor_interface<InputDataType>& dy,
+                              const Tensor_interface<InputDataType>& x,
+                              const Tensor_interface<MeanVarianceDataType>& mean,
+                              const Tensor_interface<MeanVarianceDataType>& invVariance,
+                              const Tensor_interface<ScaleBiasDataType>& scale,
+                              Tensor_interface<InputDataType>& dx,
+                              Tensor_interface<ScaleBiasDataType>& dscale,
+                              Tensor_interface<ScaleBiasDataType>& dbias)
         = 0;
 };
 
