@@ -14,7 +14,7 @@ using namespace hipdnn_plugin;
 namespace miopen_legacy_plugin
 {
 
-void EngineManager::addEngine(std::unique_ptr<Engine_interface> engine)
+void EngineManager::addEngine(std::unique_ptr<EngineInterface> engine)
 {
     _engines.emplace(engine->id(), std::move(engine));
 }
@@ -25,7 +25,7 @@ std::vector<int64_t>
     std::vector<int64_t> applicable;
     for(const auto& engine : _engines)
     {
-        if(engine.second->is_applicable(opGraph))
+        if(engine.second->isApplicable(opGraph))
         {
             applicable.push_back(engine.second->id());
         }
@@ -40,7 +40,7 @@ void EngineManager::getEngineDetails(HipdnnEnginePluginHandle& handle,
 {
     (void)opGraph; // Unused parameter
     auto& engine = getEngine(engineId);
-    engine.get_details(handle, engineDetailsOut);
+    engine.getDetails(handle, engineDetailsOut);
 }
 
 size_t EngineManager::getWorkspaceSize(const HipdnnEnginePluginHandle& handle,
@@ -48,7 +48,7 @@ size_t EngineManager::getWorkspaceSize(const HipdnnEnginePluginHandle& handle,
                                        const hipdnn_plugin::Graph_interface& opGraph) const
 {
     auto& engine = getEngine(engineId);
-    return engine.get_workspace_size(handle, opGraph);
+    return engine.getWorkspaceSize(handle, opGraph);
 }
 
 void EngineManager::initializeExecutionContext(
@@ -58,10 +58,10 @@ void EngineManager::initializeExecutionContext(
     HipdnnEnginePluginExecutionContext& executionContext) const
 {
     auto& engine = getEngine(engineConfig.engine_id());
-    engine.initialize_execution_context(handle, opGraph, executionContext);
+    engine.initializeExecutionContext(handle, opGraph, executionContext);
 }
 
-Engine_interface& EngineManager::getEngine(int64_t engineId) const
+EngineInterface& EngineManager::getEngine(int64_t engineId) const
 {
     auto it = _engines.find(engineId);
     if(it == _engines.end())

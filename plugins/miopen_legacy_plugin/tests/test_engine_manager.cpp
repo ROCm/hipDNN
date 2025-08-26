@@ -22,15 +22,15 @@ using ::testing::Return;
 
 TEST(Engine_managerTest, ReturnsApplicableEngineIds)
 {
-    std::set<std::unique_ptr<Engine_interface>> engines;
+    std::set<std::unique_ptr<EngineInterface>> engines;
 
     auto mock_engine1 = std::make_unique<Mock_engine>();
     EXPECT_CALL(*mock_engine1, id()).WillRepeatedly(Return(1));
-    EXPECT_CALL(*mock_engine1, is_applicable(::testing::_)).WillRepeatedly(Return(true));
+    EXPECT_CALL(*mock_engine1, isApplicable(::testing::_)).WillRepeatedly(Return(true));
 
     auto mock_engine2 = std::make_unique<Mock_engine>();
     EXPECT_CALL(*mock_engine2, id()).WillRepeatedly(Return(2));
-    EXPECT_CALL(*mock_engine2, is_applicable(::testing::_)).WillRepeatedly(Return(false));
+    EXPECT_CALL(*mock_engine2, isApplicable(::testing::_)).WillRepeatedly(Return(false));
 
     EngineManager manager;
     manager.addEngine(std::move(mock_engine1));
@@ -45,16 +45,16 @@ TEST(Engine_managerTest, ReturnsApplicableEngineIds)
 
 TEST(Engine_managerTest, ReturnsMultipleApplicableEngineIds)
 {
-    std::set<std::unique_ptr<Engine_interface>> engines;
+    std::set<std::unique_ptr<EngineInterface>> engines;
 
     Mock_graph mock_graph;
     auto mock_engine1 = std::make_unique<Mock_engine>();
     EXPECT_CALL(*mock_engine1, id()).WillRepeatedly(Return(1));
-    EXPECT_CALL(*mock_engine1, is_applicable(::testing::_)).WillRepeatedly(Return(true));
+    EXPECT_CALL(*mock_engine1, isApplicable(::testing::_)).WillRepeatedly(Return(true));
 
     auto mock_engine2 = std::make_unique<Mock_engine>();
     EXPECT_CALL(*mock_engine2, id()).WillRepeatedly(Return(2));
-    EXPECT_CALL(*mock_engine2, is_applicable(::testing::_)).WillRepeatedly(Return(true));
+    EXPECT_CALL(*mock_engine2, isApplicable(::testing::_)).WillRepeatedly(Return(true));
 
     EngineManager manager;
     manager.addEngine(std::move(mock_engine1));
@@ -69,15 +69,15 @@ TEST(Engine_managerTest, ReturnsMultipleApplicableEngineIds)
 
 TEST(Engine_managerTest, ReturnsNoApplicableEngineIds)
 {
-    std::set<std::unique_ptr<Engine_interface>> engines;
+    std::set<std::unique_ptr<EngineInterface>> engines;
 
     auto mock_engine1 = std::make_unique<Mock_engine>();
     EXPECT_CALL(*mock_engine1, id()).WillRepeatedly(Return(1));
-    EXPECT_CALL(*mock_engine1, is_applicable(::testing::_)).WillRepeatedly(Return(false));
+    EXPECT_CALL(*mock_engine1, isApplicable(::testing::_)).WillRepeatedly(Return(false));
 
     auto mock_engine2 = std::make_unique<Mock_engine>();
     EXPECT_CALL(*mock_engine2, id()).WillRepeatedly(Return(2));
-    EXPECT_CALL(*mock_engine2, is_applicable(::testing::_)).WillRepeatedly(Return(false));
+    EXPECT_CALL(*mock_engine2, isApplicable(::testing::_)).WillRepeatedly(Return(false));
 
     EngineManager manager;
     manager.addEngine(std::move(mock_engine1));
@@ -98,7 +98,7 @@ TEST(Engine_managerTest, ReturnsEngineDetails)
     engine_details.size = 200;
     auto mock_engine = std::make_unique<Mock_engine>();
     EXPECT_CALL(*mock_engine, id()).WillRepeatedly(Return(1));
-    EXPECT_CALL(*mock_engine, get_details(::testing::_, ::testing::_))
+    EXPECT_CALL(*mock_engine, getDetails(::testing::_, ::testing::_))
         .WillOnce(
             [&engine_details](HipdnnEnginePluginHandle& handle, hipdnnPluginConstData_t& out) {
                 (void)handle;
@@ -137,8 +137,7 @@ TEST(Engine_managerTest, GetWorkspaceSizeReturnsCorrectValue)
     EXPECT_CALL(*mock_engine, id()).WillRepeatedly(Return(42));
     HipdnnEnginePluginHandle dummy_handle = {};
     Mock_graph mock_graph;
-    EXPECT_CALL(*mock_engine, get_workspace_size(::testing::_, ::testing::_))
-        .WillOnce(Return(4096));
+    EXPECT_CALL(*mock_engine, getWorkspaceSize(::testing::_, ::testing::_)).WillOnce(Return(4096));
 
     manager.addEngine(std::move(mock_engine));
 
@@ -160,8 +159,7 @@ TEST(Engine_managerTest, InitializeExecutionContextCallsEngine)
 {
     auto mock_engine = std::make_unique<Mock_engine>();
     EXPECT_CALL(*mock_engine, id()).WillRepeatedly(Return(7));
-    EXPECT_CALL(*mock_engine,
-                initialize_execution_context(::testing::_, ::testing::_, ::testing::_))
+    EXPECT_CALL(*mock_engine, initializeExecutionContext(::testing::_, ::testing::_, ::testing::_))
         .Times(1);
 
     EngineManager manager;

@@ -19,34 +19,34 @@ using namespace hipdnn_plugin;
 
 TEST(Miopen_engineTest, ConstructorAndId)
 {
-    Miopen_engine engine(42);
+    MiopenEngine engine(42);
     EXPECT_EQ(engine.id(), 42);
 }
 
 TEST(Miopen_engineTest, WorkspaceSizeReturnsZeroIfNoPlanBuilders)
 {
-    Miopen_engine engine(1);
+    MiopenEngine engine(1);
 
     Mock_graph mock_graph;
 
     HipdnnEnginePluginHandle dummy_handle;
-    EXPECT_EQ(engine.get_workspace_size(dummy_handle, mock_graph), 0u);
+    EXPECT_EQ(engine.getWorkspaceSize(dummy_handle, mock_graph), 0u);
 }
 
 TEST(Miopen_engineTest, WorkspaceSizeReturnsPlanBuilderWorkspace)
 {
     auto mock_plan_builder = std::make_unique<Mock_plan_builder>();
-    EXPECT_CALL(*mock_plan_builder, is_applicable(::testing::_)).WillOnce(::testing::Return(true));
-    EXPECT_CALL(*mock_plan_builder, get_workspace_size(::testing::_, ::testing::_))
+    EXPECT_CALL(*mock_plan_builder, isApplicable(::testing::_)).WillOnce(::testing::Return(true));
+    EXPECT_CALL(*mock_plan_builder, getWorkspaceSize(::testing::_, ::testing::_))
         .WillOnce(::testing::Return(1337u));
 
-    Miopen_engine engine(1);
+    MiopenEngine engine(1);
     engine.add_plan_builder(std::move(mock_plan_builder));
 
     Mock_graph mock_graph;
 
     HipdnnEnginePluginHandle dummy_handle;
-    EXPECT_EQ(engine.get_workspace_size(dummy_handle, mock_graph), 1337u);
+    EXPECT_EQ(engine.getWorkspaceSize(dummy_handle, mock_graph), 1337u);
 }
 
 TEST(Miopen_engineTest, WorkspaceSizeReturnsMaxPlanBuilderWorkspace)
@@ -54,48 +54,48 @@ TEST(Miopen_engineTest, WorkspaceSizeReturnsMaxPlanBuilderWorkspace)
     auto mock_plan_builder = std::make_unique<Mock_plan_builder>();
     auto mock_plan_builder2 = std::make_unique<Mock_plan_builder>();
 
-    EXPECT_CALL(*mock_plan_builder, is_applicable(::testing::_)).WillOnce(::testing::Return(true));
-    EXPECT_CALL(*mock_plan_builder, get_workspace_size(::testing::_, ::testing::_))
+    EXPECT_CALL(*mock_plan_builder, isApplicable(::testing::_)).WillOnce(::testing::Return(true));
+    EXPECT_CALL(*mock_plan_builder, getWorkspaceSize(::testing::_, ::testing::_))
         .WillOnce(::testing::Return(1337u));
-    EXPECT_CALL(*mock_plan_builder2, is_applicable(::testing::_)).WillOnce(::testing::Return(true));
-    EXPECT_CALL(*mock_plan_builder2, get_workspace_size(::testing::_, ::testing::_))
+    EXPECT_CALL(*mock_plan_builder2, isApplicable(::testing::_)).WillOnce(::testing::Return(true));
+    EXPECT_CALL(*mock_plan_builder2, getWorkspaceSize(::testing::_, ::testing::_))
         .WillOnce(::testing::Return(45000u));
 
-    Miopen_engine engine(1);
+    MiopenEngine engine(1);
     engine.add_plan_builder(std::move(mock_plan_builder));
     engine.add_plan_builder(std::move(mock_plan_builder2));
 
     Mock_graph mock_graph;
 
     HipdnnEnginePluginHandle dummy_handle;
-    EXPECT_EQ(engine.get_workspace_size(dummy_handle, mock_graph), 45000u);
+    EXPECT_EQ(engine.getWorkspaceSize(dummy_handle, mock_graph), 45000u);
 }
 
 TEST(Miopen_engineTest, WorkspaceSizeReturnsZeroIfNoPlanBuilderApplicable)
 {
     auto mock_plan_builder = std::make_unique<Mock_plan_builder>();
-    EXPECT_CALL(*mock_plan_builder, is_applicable(::testing::_)).WillOnce(::testing::Return(false));
+    EXPECT_CALL(*mock_plan_builder, isApplicable(::testing::_)).WillOnce(::testing::Return(false));
 
-    Miopen_engine engine(1);
+    MiopenEngine engine(1);
     engine.add_plan_builder(std::move(mock_plan_builder));
 
     Mock_graph mock_graph;
 
     HipdnnEnginePluginHandle dummy_handle;
-    EXPECT_EQ(engine.get_workspace_size(dummy_handle, mock_graph), 0u);
+    EXPECT_EQ(engine.getWorkspaceSize(dummy_handle, mock_graph), 0u);
 }
 
 TEST(Miopen_engineTest, IsApplicableReturnsTrueIfAnyPlanBuilderApplicable)
 {
     auto mock_plan_builder = std::make_unique<Mock_plan_builder>();
-    EXPECT_CALL(*mock_plan_builder, is_applicable(::testing::_)).WillOnce(::testing::Return(true));
+    EXPECT_CALL(*mock_plan_builder, isApplicable(::testing::_)).WillOnce(::testing::Return(true));
 
-    Miopen_engine engine(0);
+    MiopenEngine engine(0);
     engine.add_plan_builder(std::move(mock_plan_builder));
 
     Mock_graph mock_graph;
 
-    EXPECT_TRUE(engine.is_applicable(mock_graph));
+    EXPECT_TRUE(engine.isApplicable(mock_graph));
 }
 
 TEST(Miopen_engineTest, IsApplicableReturnsAfterTheFirstApplicablePlanBuilder)
@@ -103,47 +103,47 @@ TEST(Miopen_engineTest, IsApplicableReturnsAfterTheFirstApplicablePlanBuilder)
     auto mock_plan_builder1 = std::make_unique<Mock_plan_builder>();
     auto mock_plan_builder2 = std::make_unique<Mock_plan_builder>();
 
-    EXPECT_CALL(*mock_plan_builder1, is_applicable(::testing::_)).WillOnce(::testing::Return(true));
-    EXPECT_CALL(*mock_plan_builder2, is_applicable(::testing::_)).Times(0);
+    EXPECT_CALL(*mock_plan_builder1, isApplicable(::testing::_)).WillOnce(::testing::Return(true));
+    EXPECT_CALL(*mock_plan_builder2, isApplicable(::testing::_)).Times(0);
 
-    Miopen_engine engine(0);
+    MiopenEngine engine(0);
     engine.add_plan_builder(std::move(mock_plan_builder1));
     engine.add_plan_builder(std::move(mock_plan_builder2));
 
     Mock_graph mock_graph;
 
-    EXPECT_TRUE(engine.is_applicable(mock_graph));
+    EXPECT_TRUE(engine.isApplicable(mock_graph));
 }
 
 TEST(Miopen_engineTest, IsApplicableReturnsFalseIfNoPlanBuilders)
 {
-    Miopen_engine engine(0);
+    MiopenEngine engine(0);
 
     Mock_graph mock_graph;
 
-    EXPECT_FALSE(engine.is_applicable(mock_graph));
+    EXPECT_FALSE(engine.isApplicable(mock_graph));
 }
 
 TEST(Miopen_engineTest, IsApplicableReturnsFalseIfNoPlanBuilderApplicable)
 {
     auto mock_plan_builder = std::make_unique<Mock_plan_builder>();
-    EXPECT_CALL(*mock_plan_builder, is_applicable(::testing::_)).WillOnce(::testing::Return(false));
+    EXPECT_CALL(*mock_plan_builder, isApplicable(::testing::_)).WillOnce(::testing::Return(false));
 
-    Miopen_engine engine(0);
+    MiopenEngine engine(0);
     engine.add_plan_builder(std::move(mock_plan_builder));
 
     Mock_graph mock_graph;
 
-    EXPECT_FALSE(engine.is_applicable(mock_graph));
+    EXPECT_FALSE(engine.isApplicable(mock_graph));
 }
 
 TEST(Miopen_engineTest, GetDetailsReturnsSerializedEngineDetails)
 {
-    Miopen_engine engine(1);
+    MiopenEngine engine(1);
     HipdnnEnginePluginHandle dummy_handle;
 
     hipdnnPluginConstData_t result;
-    engine.get_details(dummy_handle, result);
+    engine.getDetails(dummy_handle, result);
 
     hipdnn_plugin::Engine_details_wrapper engine_details(result.ptr, result.size);
     EXPECT_EQ(engine_details.engine_id(), 1);
@@ -155,12 +155,12 @@ TEST(Miopen_engineTest, InitializeExecutionContextInvokesFirstApplicablePlanBuil
     auto mock_plan_builder2 = std::make_unique<Mock_plan_builder>();
 
     // Only the first plan builder is applicable
-    EXPECT_CALL(*mock_plan_builder1, is_applicable(::testing::_)).WillOnce(::testing::Return(true));
-    EXPECT_CALL(*mock_plan_builder1, build_plan(::testing::_, ::testing::_, ::testing::_)).Times(1);
-    EXPECT_CALL(*mock_plan_builder2, is_applicable(::testing::_)).Times(0);
-    EXPECT_CALL(*mock_plan_builder2, build_plan(::testing::_, ::testing::_, ::testing::_)).Times(0);
+    EXPECT_CALL(*mock_plan_builder1, isApplicable(::testing::_)).WillOnce(::testing::Return(true));
+    EXPECT_CALL(*mock_plan_builder1, buildPlan(::testing::_, ::testing::_, ::testing::_)).Times(1);
+    EXPECT_CALL(*mock_plan_builder2, isApplicable(::testing::_)).Times(0);
+    EXPECT_CALL(*mock_plan_builder2, buildPlan(::testing::_, ::testing::_, ::testing::_)).Times(0);
 
-    Miopen_engine engine(1);
+    MiopenEngine engine(1);
     engine.add_plan_builder(std::move(mock_plan_builder1));
     engine.add_plan_builder(std::move(mock_plan_builder2));
 
@@ -168,7 +168,7 @@ TEST(Miopen_engineTest, InitializeExecutionContextInvokesFirstApplicablePlanBuil
     HipdnnEnginePluginHandle dummy_handle;
     Mock_hipdnn_engine_plugin_execution_context ctx;
 
-    engine.initialize_execution_context(dummy_handle, mock_graph, ctx);
+    engine.initializeExecutionContext(dummy_handle, mock_graph, ctx);
 }
 
 TEST(Miopen_engineTest, InitializeExecutionContextSkipsNonApplicableBuilders)
@@ -177,13 +177,12 @@ TEST(Miopen_engineTest, InitializeExecutionContextSkipsNonApplicableBuilders)
     auto mock_plan_builder2 = std::make_unique<Mock_plan_builder>();
 
     // First plan builder not applicable, second is
-    EXPECT_CALL(*mock_plan_builder1, is_applicable(::testing::_))
-        .WillOnce(::testing::Return(false));
-    EXPECT_CALL(*mock_plan_builder1, build_plan(::testing::_, ::testing::_, ::testing::_)).Times(0);
-    EXPECT_CALL(*mock_plan_builder2, is_applicable(::testing::_)).WillOnce(::testing::Return(true));
-    EXPECT_CALL(*mock_plan_builder2, build_plan(::testing::_, ::testing::_, ::testing::_)).Times(1);
+    EXPECT_CALL(*mock_plan_builder1, isApplicable(::testing::_)).WillOnce(::testing::Return(false));
+    EXPECT_CALL(*mock_plan_builder1, buildPlan(::testing::_, ::testing::_, ::testing::_)).Times(0);
+    EXPECT_CALL(*mock_plan_builder2, isApplicable(::testing::_)).WillOnce(::testing::Return(true));
+    EXPECT_CALL(*mock_plan_builder2, buildPlan(::testing::_, ::testing::_, ::testing::_)).Times(1);
 
-    Miopen_engine engine(1);
+    MiopenEngine engine(1);
     engine.add_plan_builder(std::move(mock_plan_builder1));
     engine.add_plan_builder(std::move(mock_plan_builder2));
 
@@ -191,7 +190,7 @@ TEST(Miopen_engineTest, InitializeExecutionContextSkipsNonApplicableBuilders)
     HipdnnEnginePluginHandle dummy_handle;
     Mock_hipdnn_engine_plugin_execution_context ctx;
 
-    engine.initialize_execution_context(dummy_handle, mock_graph, ctx);
+    engine.initializeExecutionContext(dummy_handle, mock_graph, ctx);
 }
 
 TEST(Miopen_engineTest, InitializeExecutionContextDoesNotCallBuildPlanIfNoApplicableBuilders)
@@ -199,14 +198,12 @@ TEST(Miopen_engineTest, InitializeExecutionContextDoesNotCallBuildPlanIfNoApplic
     auto mock_plan_builder1 = std::make_unique<Mock_plan_builder>();
     auto mock_plan_builder2 = std::make_unique<Mock_plan_builder>();
 
-    EXPECT_CALL(*mock_plan_builder1, is_applicable(::testing::_))
-        .WillOnce(::testing::Return(false));
-    EXPECT_CALL(*mock_plan_builder1, build_plan(::testing::_, ::testing::_, ::testing::_)).Times(0);
-    EXPECT_CALL(*mock_plan_builder2, is_applicable(::testing::_))
-        .WillOnce(::testing::Return(false));
-    EXPECT_CALL(*mock_plan_builder2, build_plan(::testing::_, ::testing::_, ::testing::_)).Times(0);
+    EXPECT_CALL(*mock_plan_builder1, isApplicable(::testing::_)).WillOnce(::testing::Return(false));
+    EXPECT_CALL(*mock_plan_builder1, buildPlan(::testing::_, ::testing::_, ::testing::_)).Times(0);
+    EXPECT_CALL(*mock_plan_builder2, isApplicable(::testing::_)).WillOnce(::testing::Return(false));
+    EXPECT_CALL(*mock_plan_builder2, buildPlan(::testing::_, ::testing::_, ::testing::_)).Times(0);
 
-    Miopen_engine engine(1);
+    MiopenEngine engine(1);
     engine.add_plan_builder(std::move(mock_plan_builder1));
     engine.add_plan_builder(std::move(mock_plan_builder2));
 
@@ -214,5 +211,5 @@ TEST(Miopen_engineTest, InitializeExecutionContextDoesNotCallBuildPlanIfNoApplic
     HipdnnEnginePluginHandle dummy_handle;
     Mock_hipdnn_engine_plugin_execution_context ctx;
 
-    engine.initialize_execution_context(dummy_handle, mock_graph, ctx);
+    engine.initializeExecutionContext(dummy_handle, mock_graph, ctx);
 }

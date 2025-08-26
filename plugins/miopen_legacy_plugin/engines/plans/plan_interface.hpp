@@ -8,14 +8,14 @@
 namespace miopen_legacy_plugin
 {
 
-class Plan_interface
+class PlanInterface
 {
 public:
-    virtual ~Plan_interface() = default;
+    virtual ~PlanInterface() = default;
 
     virtual void execute(const HipdnnEnginePluginHandle& handle,
-                         const hipdnnPluginDeviceBuffer_t* device_buffers,
-                         uint32_t num_device_buffers,
+                         const hipdnnPluginDeviceBuffer_t* deviceBuffers,
+                         uint32_t numDeviceBuffers,
                          void* workspace = nullptr) const
         = 0;
 };
