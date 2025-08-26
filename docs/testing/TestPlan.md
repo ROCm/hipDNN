@@ -1,6 +1,6 @@
 # hipDNN Test Plan
 
-This document outlines the test plan for hipDNN, covering test execution procedures and expectations.
+This document outlines the test plan for hipDNN, covering test execution procedures and expectations. If needed, reference the [Quick Start Guide](../Building.md#quick-start-guide) to prepare a local environment.
 
 > [!IMPORTANT]
 > ⚠️ **All prerequisites and tests in this document must pass for a successful release.**
