@@ -27,7 +27,7 @@ void EngineDescriptor::finalize()
     auto handle = _graph->getHandle();
     auto pluginResourceManager = handle->get_plugin_resource_manager();
 
-    auto engineIds = pluginResourceManager->get_applicable_engine_ids(_graph.get());
+    auto engineIds = pluginResourceManager->getApplicableEngineIds(_graph.get());
     if(std::ranges::find(engineIds, _engineId) == engineIds.end())
     {
         throw Hipdnn_exception(HIPDNN_STATUS_BAD_PARAM,
@@ -35,7 +35,7 @@ void EngineDescriptor::finalize()
                                "range of engine IDs");
     }
 
-    _engineDetails = plugin::Engine_plugin_resource_manager::get_engine_details(
+    _engineDetails = plugin::EnginePluginResourceManager::getEngineDetails(
         pluginResourceManager, _engineId, _graph.get());
 
     HipdnnBackendDescriptorImpl<EngineDescriptor>::finalize();

@@ -13,7 +13,7 @@ class EngineConfigDescriptor;
 
 namespace plugin
 {
-class Engine_execution_context_wrapper;
+class EngineExecutionContextWrapper;
 }
 
 class ExecutionPlanDescriptor : public HipdnnBackendDescriptorImpl<ExecutionPlanDescriptor>
@@ -21,7 +21,7 @@ class ExecutionPlanDescriptor : public HipdnnBackendDescriptorImpl<ExecutionPlan
 private:
     hipdnnHandle_t _handle = nullptr;
     std::shared_ptr<const EngineConfigDescriptor> _engineConfig;
-    std::shared_ptr<const plugin::Engine_execution_context_wrapper> _executionContext;
+    std::shared_ptr<const plugin::EngineExecutionContextWrapper> _executionContext;
 
     void getWorkspaceSize(hipdnnBackendAttributeType_t attributeType,
                           int64_t requestedElementCount,

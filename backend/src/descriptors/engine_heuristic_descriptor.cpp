@@ -33,7 +33,7 @@ void EngineHeuristicDescriptor::finalize()
 
     // TODO - For now we are going to return the engine IDs we get from the plugin resource manager.
     // In the future, we will need to implement a plugin system for engine heuristics that allows plugins to determine sort order of the returned engines.
-    _engineIds = pluginResourceManager->get_applicable_engine_ids(_graph.get());
+    _engineIds = pluginResourceManager->getApplicableEngineIds(_graph.get());
 
     HipdnnBackendDescriptorImpl<EngineHeuristicDescriptor>::finalize();
 }

@@ -30,11 +30,11 @@ void ExecutionPlanDescriptor::finalize()
     auto engineConfigPluginData = _engineConfig->getSerializedEngineConfig();
     auto engine = _engineConfig->getEngine();
 
-    _executionContext = plugin::Engine_plugin_resource_manager::create_execution_context(
-        pluginResourceManager,
-        engine->getEngineId(),
-        &engineConfigPluginData,
-        engine->getGraph().get());
+    _executionContext
+        = plugin::EnginePluginResourceManager::createExecutionContext(pluginResourceManager,
+                                                                      engine->getEngineId(),
+                                                                      &engineConfigPluginData,
+                                                                      engine->getGraph().get());
 
     HipdnnBackendDescriptorImpl<ExecutionPlanDescriptor>::finalize();
 }

@@ -31,141 +31,140 @@ class GraphDescriptor;
 namespace plugin
 {
 
-class Engine_details_wrapper;
-class Engine_execution_context_wrapper;
-class Engine_plugin;
-class Engine_plugin_manager;
+class EngineDetailsWrapper;
+class EngineExecutionContextWrapper;
+class EnginePlugin;
+class EnginePluginManager;
 
-class Engine_plugin_resource_manager
+class EnginePluginResourceManager
 {
 protected:
     // Protected constructor for mock testing
-    Engine_plugin_resource_manager();
+    EnginePluginResourceManager();
 
 public:
     // MT-safe static functions
     // Load plugins from a specific path, for testing purposes
-    static void set_plugin_paths(const std::vector<std::filesystem::path>& plugin_paths,
-                                 hipdnnPluginLoadingMode_ext_t loading_mode);
-    static std::set<std::filesystem::path> get_plugin_paths();
+    static void setPluginPaths(const std::vector<std::filesystem::path>& pluginPaths,
+                               hipdnnPluginLoadingMode_ext_t loadingMode);
+    static std::set<std::filesystem::path> getPluginPaths();
 
-    static std::shared_ptr<Engine_plugin_resource_manager> create();
+    static std::shared_ptr<EnginePluginResourceManager> create();
 
-    Engine_plugin_resource_manager(std::shared_ptr<Engine_plugin_manager> pm);
-    virtual ~Engine_plugin_resource_manager();
+    EnginePluginResourceManager(std::shared_ptr<EnginePluginManager> pm);
+    virtual ~EnginePluginResourceManager();
 
     // Prevent copying
-    Engine_plugin_resource_manager(const Engine_plugin_resource_manager&) = delete;
-    Engine_plugin_resource_manager& operator=(const Engine_plugin_resource_manager&) = delete;
+    EnginePluginResourceManager(const EnginePluginResourceManager&) = delete;
+    EnginePluginResourceManager& operator=(const EnginePluginResourceManager&) = delete;
 
     // Allow moving
-    Engine_plugin_resource_manager(Engine_plugin_resource_manager&& other) noexcept;
-    Engine_plugin_resource_manager& operator=(Engine_plugin_resource_manager&& other) noexcept;
+    EnginePluginResourceManager(EnginePluginResourceManager&& other) noexcept;
+    EnginePluginResourceManager& operator=(EnginePluginResourceManager&& other) noexcept;
 
     // MT-unsafe instance methods
     // virtual for gMock testing
-    virtual void set_stream(hipStream_t stream) const;
-    virtual std::vector<int64_t> get_applicable_engine_ids(const GraphDescriptor* graph_desc) const;
-    virtual size_t get_workspace_size(int64_t engine_id,
-                                      const hipdnnPluginConstData_t* engine_config,
-                                      const GraphDescriptor* graph_desc) const;
+    virtual void setStream(hipStream_t stream) const;
+    virtual std::vector<int64_t> getApplicableEngineIds(const GraphDescriptor* graphDesc) const;
+    virtual size_t getWorkspaceSize(int64_t engineId,
+                                    const hipdnnPluginConstData_t* engineConfig,
+                                    const GraphDescriptor* graphDesc) const;
 
-    virtual void execute_op_graph(hipdnnBackendDescriptor_t execution_plan,
-                                  hipdnnBackendDescriptor_t variant_pack) const;
+    virtual void executeOpGraph(hipdnnBackendDescriptor_t executionPlan,
+                                hipdnnBackendDescriptor_t variantPack) const;
 
-    static std::shared_ptr<const Engine_details_wrapper>
-        get_engine_details(const std::shared_ptr<Engine_plugin_resource_manager>& rm,
-                           int64_t engine_id,
-                           const GraphDescriptor* graph_desc);
-    static std::shared_ptr<const Engine_execution_context_wrapper>
-        create_execution_context(const std::shared_ptr<Engine_plugin_resource_manager>& rm,
-                                 int64_t engine_id,
-                                 const hipdnnPluginConstData_t* engine_config,
-                                 const GraphDescriptor* graph_desc);
+    static std::shared_ptr<const EngineDetailsWrapper>
+        getEngineDetails(const std::shared_ptr<EnginePluginResourceManager>& rm,
+                         int64_t engineId,
+                         const GraphDescriptor* graphDesc);
+    static std::shared_ptr<const EngineExecutionContextWrapper>
+        createExecutionContext(const std::shared_ptr<EnginePluginResourceManager>& rm,
+                               int64_t engineId,
+                               const hipdnnPluginConstData_t* engineConfig,
+                               const GraphDescriptor* graphDesc);
 
-    virtual void get_loaded_plugin_files(size_t* num_plugins,
-                                         char** plugin_paths,
-                                         size_t* max_string_len) const;
+    virtual void
+        getLoadedPluginFiles(size_t* numPlugins, char** pluginPaths, size_t* maxStringLen) const;
 
 private:
     // MT-unsafe instance methods
     // virtual for gMock testing
-    virtual void get_engine_details(int64_t engine_id,
-                                    const GraphDescriptor* graph_desc,
-                                    hipdnnPluginConstData_t* engine_details) const;
-    virtual void destroy_engine_details(int64_t engine_id,
-                                        hipdnnPluginConstData_t* engine_details) const;
+    virtual void getEngineDetails(int64_t engineId,
+                                  const GraphDescriptor* graphDesc,
+                                  hipdnnPluginConstData_t* engineDetails) const;
+    virtual void destroyEngineDetails(int64_t engineId,
+                                      hipdnnPluginConstData_t* engineDetails) const;
 
     [[nodiscard]] virtual hipdnnEnginePluginExecutionContext_t
-        create_execution_context(int64_t engine_id,
-                                 const hipdnnPluginConstData_t* engine_config,
-                                 const GraphDescriptor* graph_desc) const;
+        createExecutionContext(int64_t engineId,
+                               const hipdnnPluginConstData_t* engineConfig,
+                               const GraphDescriptor* graphDesc) const;
     virtual void
-        destroy_execution_context(int64_t engine_id,
-                                  hipdnnEnginePluginExecutionContext_t execution_context) const;
+        destroyExecutionContext(int64_t engineId,
+                                hipdnnEnginePluginExecutionContext_t executionContext) const;
 
-    void execute_op_graph(int64_t engine_id,
-                          hipdnnEnginePluginExecutionContext_t execution_context,
-                          void* workspace,
-                          const hipdnnPluginDeviceBuffer_t* device_buffers,
-                          uint32_t num_device_buffers) const;
+    void executeOpGraph(int64_t engineId,
+                        hipdnnEnginePluginExecutionContext_t executionContext,
+                        void* workspace,
+                        const hipdnnPluginDeviceBuffer_t* deviceBuffers,
+                        uint32_t numDeviceBuffers) const;
 
-    std::shared_ptr<Engine_plugin_manager> _pm;
-    std::unordered_map<hipdnnEnginePluginHandle_t, const Engine_plugin*> _handle_to_plugin;
-    std::unordered_map<int64_t, hipdnnEnginePluginHandle_t> _engine_id_to_handle;
+    std::shared_ptr<EnginePluginManager> _pm;
+    std::unordered_map<hipdnnEnginePluginHandle_t, const EnginePlugin*> _handleToPlugin;
+    std::unordered_map<int64_t, hipdnnEnginePluginHandle_t> _engineIdToHandle;
 
-    friend class Engine_details_wrapper;
-    friend class Engine_execution_context_wrapper;
+    friend class EngineDetailsWrapper;
+    friend class EngineExecutionContextWrapper;
 };
 
 // A class to manage engine details lifecycle
-class Engine_details_wrapper
+class EngineDetailsWrapper
 {
 public:
-    Engine_details_wrapper(const std::shared_ptr<Engine_plugin_resource_manager>& rm,
-                           int64_t engine_id,
-                           const GraphDescriptor* graph_desc);
-    ~Engine_details_wrapper();
+    EngineDetailsWrapper(const std::shared_ptr<EnginePluginResourceManager>& rm,
+                         int64_t engineId,
+                         const GraphDescriptor* graphDesc);
+    ~EngineDetailsWrapper();
 
     // Prevent copying
-    Engine_details_wrapper(const Engine_details_wrapper&) = delete;
-    Engine_details_wrapper& operator=(const Engine_details_wrapper&) = delete;
+    EngineDetailsWrapper(const EngineDetailsWrapper&) = delete;
+    EngineDetailsWrapper& operator=(const EngineDetailsWrapper&) = delete;
 
     // Allow moving
-    Engine_details_wrapper(Engine_details_wrapper&& other) noexcept;
-    Engine_details_wrapper& operator=(Engine_details_wrapper&& other) noexcept;
+    EngineDetailsWrapper(EngineDetailsWrapper&& other) noexcept;
+    EngineDetailsWrapper& operator=(EngineDetailsWrapper&& other) noexcept;
 
     const hipdnn_sdk::data_objects::EngineDetails* get() const;
 
 private:
-    std::shared_ptr<Engine_plugin_resource_manager> _rm;
-    hipdnnPluginConstData_t _engine_details_data;
+    std::shared_ptr<EnginePluginResourceManager> _rm;
+    hipdnnPluginConstData_t _engineDetailsData;
 };
 
 // A class to manage engine execution context lifecycle
-class Engine_execution_context_wrapper
+class EngineExecutionContextWrapper
 {
 public:
-    Engine_execution_context_wrapper(const std::shared_ptr<Engine_plugin_resource_manager>& rm,
-                                     int64_t engine_id,
-                                     const hipdnnPluginConstData_t* engine_config,
-                                     const GraphDescriptor* graph_desc);
-    ~Engine_execution_context_wrapper();
+    EngineExecutionContextWrapper(const std::shared_ptr<EnginePluginResourceManager>& rm,
+                                  int64_t engineId,
+                                  const hipdnnPluginConstData_t* engineConfig,
+                                  const GraphDescriptor* graphDesc);
+    ~EngineExecutionContextWrapper();
 
     // Prevent copying
-    Engine_execution_context_wrapper(const Engine_execution_context_wrapper&) = delete;
-    Engine_execution_context_wrapper& operator=(const Engine_execution_context_wrapper&) = delete;
+    EngineExecutionContextWrapper(const EngineExecutionContextWrapper&) = delete;
+    EngineExecutionContextWrapper& operator=(const EngineExecutionContextWrapper&) = delete;
 
     // Allow moving
-    Engine_execution_context_wrapper(Engine_execution_context_wrapper&& other) noexcept;
-    Engine_execution_context_wrapper& operator=(Engine_execution_context_wrapper&& other) noexcept;
+    EngineExecutionContextWrapper(EngineExecutionContextWrapper&& other) noexcept;
+    EngineExecutionContextWrapper& operator=(EngineExecutionContextWrapper&& other) noexcept;
 
     hipdnnEnginePluginExecutionContext_t get() const;
 
 private:
-    std::shared_ptr<Engine_plugin_resource_manager> _rm;
-    int64_t _engine_id;
-    hipdnnEnginePluginExecutionContext_t _execution_context;
+    std::shared_ptr<EnginePluginResourceManager> _rm;
+    int64_t _engineId;
+    hipdnnEnginePluginExecutionContext_t _executionContext;
 };
 
 } // namespace plugin

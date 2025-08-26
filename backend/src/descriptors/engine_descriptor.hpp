@@ -12,7 +12,7 @@ class GraphDescriptor;
 
 namespace plugin
 {
-class Engine_details_wrapper;
+class EngineDetailsWrapper;
 }
 
 class EngineDescriptor : public HipdnnBackendDescriptorImpl<EngineDescriptor>
@@ -21,7 +21,7 @@ private:
     std::shared_ptr<const GraphDescriptor> _graph;
     int64_t _engineId;
     bool _engineIdSet = false;
-    std::shared_ptr<const plugin::Engine_details_wrapper> _engineDetails;
+    std::shared_ptr<const plugin::EngineDetailsWrapper> _engineDetails;
 
     void setGraph(hipdnnBackendAttributeType_t attributeType,
                   int64_t elementCount,

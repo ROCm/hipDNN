@@ -36,7 +36,7 @@ void EngineConfigDescriptor::finalize()
 
     auto engineConfigPluginData = getSerializedEngineConfig();
     auto workspaceSize = static_cast<int64_t>(
-        pluginResourceManager->get_workspace_size(engineId, &engineConfigPluginData, graph.get()));
+        pluginResourceManager->getWorkspaceSize(engineId, &engineConfigPluginData, graph.get()));
 
     THROW_IF_LT(workspaceSize,
                 0,

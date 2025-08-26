@@ -10,13 +10,13 @@ namespace hipdnn_backend
 namespace plugin
 {
 
-Plugin_base::Plugin_base(Shared_library&& lib)
+PluginBase::PluginBase(Shared_library&& lib)
     : _lib(std::move(lib))
 {
-    resolve_symbols();
+    resolveSymbols();
 }
 
-Plugin_base::Plugin_base()
+PluginBase::PluginBase()
 {
     // This constructor is used for mocking purposes in tests.
 #ifndef NDEBUG
@@ -24,31 +24,30 @@ Plugin_base::Plugin_base()
 #endif
 }
 
-void Plugin_base::resolve_symbols()
+void PluginBase::resolveSymbols()
 {
-    const auto func_name_get_name = "hipdnnPluginGetName";
-    _func_get_name = _lib.get_symbol<decltype(_func_get_name)>(func_name_get_name);
+    const auto funcNameGetName = "hipdnnPluginGetName";
+    _funcGetName = _lib.get_symbol<decltype(_funcGetName)>(funcNameGetName);
 
-    const auto func_name_get_version = "hipdnnPluginGetVersion";
-    _func_get_version = _lib.get_symbol<decltype(_func_get_version)>(func_name_get_version);
+    const auto funcNameGetVersion = "hipdnnPluginGetVersion";
+    _funcGetVersion = _lib.get_symbol<decltype(_funcGetVersion)>(funcNameGetVersion);
 
-    const auto func_name_get_type = "hipdnnPluginGetType";
-    _func_get_type = _lib.get_symbol<decltype(_func_get_type)>(func_name_get_type);
+    const auto funcNameGetType = "hipdnnPluginGetType";
+    _funcGetType = _lib.get_symbol<decltype(_funcGetType)>(funcNameGetType);
 
-    const auto func_name_get_last_error_str = "hipdnnPluginGetLastErrorString";
-    _func_get_last_error_str
-        = _lib.get_symbol<decltype(_func_get_last_error_str)>(func_name_get_last_error_str);
+    const auto funcNameGetLastErrorStr = "hipdnnPluginGetLastErrorString";
+    _funcGetLastErrorStr = _lib.get_symbol<decltype(_funcGetLastErrorStr)>(funcNameGetLastErrorStr);
 
     // Logging callback is optional
     try
     {
-        const auto func_name_set_logging_callback = "hipdnnPluginSetLoggingCallback";
-        _func_set_logging_callback
-            = _lib.get_symbol<decltype(_func_set_logging_callback)>(func_name_set_logging_callback);
+        const auto funcNameSetLoggingCallback = "hipdnnPluginSetLoggingCallback";
+        _funcSetLoggingCallback
+            = _lib.get_symbol<decltype(_funcSetLoggingCallback)>(funcNameSetLoggingCallback);
     }
     catch(const Hipdnn_exception&)
     {
-        _func_set_logging_callback = nullptr;
+        _funcSetLoggingCallback = nullptr;
 
         // Add name of plugin if ever possible
         HIPDNN_LOG_INFO("Plugin does not support logging callback");
@@ -59,48 +58,48 @@ void Plugin_base::resolve_symbols()
 #endif
 }
 
-std::string_view Plugin_base::name() const
+std::string_view PluginBase::name() const
 {
     assert(_initialized);
     const char* name;
-    invoke_plugin_function("get plugin name", _func_get_name, &name);
+    invokePluginFunction("get plugin name", _funcGetName, &name);
     return name;
 }
 
-std::string_view Plugin_base::version() const
+std::string_view PluginBase::version() const
 {
     assert(_initialized);
     const char* version;
-    invoke_plugin_function("get plugin version", _func_get_version, &version);
+    invokePluginFunction("get plugin version", _funcGetVersion, &version);
     return version;
 }
 
-hipdnnPluginType_t Plugin_base::type() const
+hipdnnPluginType_t PluginBase::type() const
 {
     assert(_initialized);
     hipdnnPluginType_t type;
-    invoke_plugin_function("get plugin type", _func_get_type, &type);
+    invokePluginFunction("get plugin type", _funcGetType, &type);
     return type;
 }
 
-std::string_view Plugin_base::get_last_error_string() const noexcept
+std::string_view PluginBase::getLastErrorString() const noexcept
 {
     assert(_initialized);
     const char* error_str = nullptr;
-    _func_get_last_error_str(&error_str);
+    _funcGetLastErrorStr(&error_str);
     return error_str;
 }
 
-hipdnnPluginStatus_t Plugin_base::set_logging_callback(hipdnnCallback_t callback) const
+hipdnnPluginStatus_t PluginBase::setLoggingCallback(hipdnnCallback_t callback) const
 {
     assert(_initialized);
-    if(_func_set_logging_callback == nullptr)
+    if(_funcSetLoggingCallback == nullptr)
     {
         // Plugin does not support logging callback, so we vacuously return success
         return HIPDNN_PLUGIN_STATUS_SUCCESS;
     }
 
-    return _func_set_logging_callback(callback);
+    return _funcSetLoggingCallback(callback);
 }
 
 } // namespace plugin

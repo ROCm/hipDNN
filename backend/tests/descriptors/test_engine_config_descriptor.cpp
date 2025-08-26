@@ -75,7 +75,7 @@ public:
         EXPECT_CALL(*getMockGraphDescriptor(), getHandle()).WillOnce(Return(_mockHandle.get()));
         EXPECT_CALL(*_mockHandle, get_plugin_resource_manager())
             .WillOnce(Return(_mockEnginePluginResourceManager));
-        EXPECT_CALL(*_mockEnginePluginResourceManager, get_workspace_size(_, _, _))
+        EXPECT_CALL(*_mockEnginePluginResourceManager, getWorkspaceSize(_, _, _))
             .WillOnce(Return(1024));
 
         setEngine();

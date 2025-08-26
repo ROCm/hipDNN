@@ -72,9 +72,9 @@ public:
 
     void setHandle()
     {
-        EXPECT_CALL(*_mockEnginePluginResourceManager, create_execution_context(_, _, _))
+        EXPECT_CALL(*_mockEnginePluginResourceManager, createExecutionContext(_, _, _))
             .WillOnce(Return(getExecutionContext()));
-        EXPECT_CALL(*_mockEnginePluginResourceManager, destroy_execution_context(_, _));
+        EXPECT_CALL(*_mockEnginePluginResourceManager, destroyExecutionContext(_, _));
 
         EXPECT_CALL(*_mockHandle, get_plugin_resource_manager())
             .WillOnce(Return(_mockEnginePluginResourceManager));
