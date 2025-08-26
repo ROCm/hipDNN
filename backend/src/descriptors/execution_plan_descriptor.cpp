@@ -26,7 +26,7 @@ void ExecutionPlanDescriptor::finalize()
                   HIPDNN_STATUS_BAD_PARAM,
                   "ExecutionPlanDescriptor::finalize() failed: Engine was not set.");
 
-    auto pluginResourceManager = _handle->get_plugin_resource_manager();
+    auto pluginResourceManager = _handle->getPluginResourceManager();
     auto engineConfigPluginData = _engineConfig->getSerializedEngineConfig();
     auto engine = _engineConfig->getEngine();
 

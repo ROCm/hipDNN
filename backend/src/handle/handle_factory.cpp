@@ -9,7 +9,7 @@
 namespace hipdnn_backend
 {
 
-void Handle_factory::create_handle(hipdnnHandle_t* handle)
+void HandleFactory::createHandle(hipdnnHandle_t* handle)
 {
     THROW_IF_NULL(handle, HIPDNN_STATUS_BAD_PARAM_NULL_POINTER, "handle is null.");
 
@@ -18,7 +18,7 @@ void Handle_factory::create_handle(hipdnnHandle_t* handle)
     HIPDNN_LOG_INFO("Created handle: {:p}", static_cast<void*>(*handle));
 }
 
-void Handle_factory::destroy_handle(hipdnnHandle_t handle)
+void HandleFactory::destroyHandle(hipdnnHandle_t handle)
 {
     THROW_IF_NULL(handle, HIPDNN_STATUS_BAD_PARAM_NULL_POINTER, "handle is null.");
 

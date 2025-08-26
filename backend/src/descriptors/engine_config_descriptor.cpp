@@ -30,7 +30,7 @@ void EngineConfigDescriptor::finalize()
 
     auto graph = _engine->getGraph();
     auto handle = graph->getHandle();
-    auto pluginResourceManager = handle->get_plugin_resource_manager();
+    auto pluginResourceManager = handle->getPluginResourceManager();
 
     auto engineId = _engine->getEngineId();
 

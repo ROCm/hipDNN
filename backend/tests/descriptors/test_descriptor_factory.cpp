@@ -134,16 +134,16 @@ TEST(DescriptorFactoryTest, TestHandleFactory)
 {
     hipdnnHandle_t handleT = nullptr;
 
-    ASSERT_NO_THROW(hipdnn_backend::Handle_factory::create_handle(&handleT));
+    ASSERT_NO_THROW(hipdnn_backend::HandleFactory::createHandle(&handleT));
     EXPECT_NE(handleT, nullptr);
 
-    hipdnn_backend::Handle_factory::destroy_handle(handleT);
+    hipdnn_backend::HandleFactory::destroyHandle(handleT);
     handleT = nullptr;
 
-    ASSERT_THROW_HIPDNN_STATUS(hipdnn_backend::Handle_factory::destroy_handle(nullptr),
+    ASSERT_THROW_HIPDNN_STATUS(hipdnn_backend::HandleFactory::destroyHandle(nullptr),
                                HIPDNN_STATUS_BAD_PARAM_NULL_POINTER);
 
-    ASSERT_THROW_HIPDNN_STATUS(hipdnn_backend::Handle_factory::create_handle(nullptr),
+    ASSERT_THROW_HIPDNN_STATUS(hipdnn_backend::HandleFactory::createHandle(nullptr),
                                HIPDNN_STATUS_BAD_PARAM_NULL_POINTER);
 }
 

@@ -13,12 +13,12 @@ struct hipdnnHandle // NOLINT
 public:
     hipdnnHandle();
     virtual ~hipdnnHandle() = default;
-    virtual void set_stream(hipStream_t stream);
-    virtual hipStream_t get_stream() const;
+    virtual void setStream(hipStream_t stream);
+    virtual hipStream_t getStream() const;
     virtual std::shared_ptr<hipdnn_backend::plugin::EnginePluginResourceManager>
-        get_plugin_resource_manager() const;
+        getPluginResourceManager() const;
 
 private:
     hipStream_t _stream = nullptr;
-    std::shared_ptr<hipdnn_backend::plugin::EnginePluginResourceManager> _plugin_resource_manager;
+    std::shared_ptr<hipdnn_backend::plugin::EnginePluginResourceManager> _pluginResourceManager;
 };

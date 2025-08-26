@@ -872,12 +872,12 @@ TEST(EnginePluginResourceManager, execute_op_graph_success_with_valid_descriptor
 
     EXPECT_CALL(*mock_plugin,
                 executeOpGraph(hipdnnEnginePluginHandle_t(0xdeadbeef),
-                                 hipdnnEnginePluginExecutionContext_t(0xcafebabe),
-                                 reinterpret_cast<void*>(0x4000),
-                                 MatchesMemory(expected_device_buffers.data(),
-                                               expected_device_buffers.size()
-                                                   * sizeof(hipdnnPluginDeviceBuffer_t)),
-                                 static_cast<uint32_t>(tensor_ids.size())));
+                               hipdnnEnginePluginExecutionContext_t(0xcafebabe),
+                               reinterpret_cast<void*>(0x4000),
+                               MatchesMemory(expected_device_buffers.data(),
+                                             expected_device_buffers.size()
+                                                 * sizeof(hipdnnPluginDeviceBuffer_t)),
+                               static_cast<uint32_t>(tensor_ids.size())));
 
     {
         EnginePluginResourceManager resource_manager(plugin_manager);

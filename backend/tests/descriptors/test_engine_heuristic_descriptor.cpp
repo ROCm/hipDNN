@@ -63,7 +63,7 @@ public:
     {
         EXPECT_CALL(*getMockGraph(), isFinalized()).WillRepeatedly(Return(true));
         EXPECT_CALL(*getMockGraph(), getHandle()).WillRepeatedly(Return(_mockHandle.get()));
-        EXPECT_CALL(*_mockHandle, get_plugin_resource_manager())
+        EXPECT_CALL(*_mockHandle, getPluginResourceManager())
             .WillRepeatedly(Return(_mockEnginePluginResourceManager));
         ASSERT_NO_THROW(
             getEngineHeuristicDescriptor()->setAttribute(HIPDNN_ATTR_ENGINEHEUR_OPERATION_GRAPH,

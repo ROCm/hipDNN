@@ -70,7 +70,7 @@ public:
         setGraph();
         setGlobalIndex(ENGINE_ID);
         EXPECT_CALL(*getMockGraph(), getHandle()).WillOnce(Return(_mockHandle.get()));
-        EXPECT_CALL(*_mockHandle, get_plugin_resource_manager())
+        EXPECT_CALL(*_mockHandle, getPluginResourceManager())
             .WillOnce(Return(_mockEnginePluginResourceManager));
         EXPECT_CALL(*_mockEnginePluginResourceManager, getApplicableEngineIds(_))
             .WillOnce(Return(std::vector<int64_t>{ENGINE_ID}));

@@ -76,7 +76,7 @@ public:
             .WillOnce(Return(getExecutionContext()));
         EXPECT_CALL(*_mockEnginePluginResourceManager, destroyExecutionContext(_, _));
 
-        EXPECT_CALL(*_mockHandle, get_plugin_resource_manager())
+        EXPECT_CALL(*_mockHandle, getPluginResourceManager())
             .WillOnce(Return(_mockEnginePluginResourceManager));
         getExecutionPlanDescriptor()->setAttribute(
             HIPDNN_ATTR_EXECUTION_PLAN_HANDLE, HIPDNN_TYPE_HANDLE, 1, &_mockHandle);
