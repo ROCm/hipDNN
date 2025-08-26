@@ -20,18 +20,18 @@ public:
     virtual int64_t id() const = 0;
 
     virtual bool is_applicable(const hipdnn_plugin::Graph_interface& op_graph) const = 0;
-    virtual void get_details(hipdnnEnginePluginHandle& handle,
+    virtual void get_details(HipdnnEnginePluginHandle& handle,
                              hipdnnPluginConstData_t& details_out) const
         = 0;
 
-    virtual size_t get_workspace_size(const hipdnnEnginePluginHandle& handle,
+    virtual size_t get_workspace_size(const HipdnnEnginePluginHandle& handle,
                                       const hipdnn_plugin::Graph_interface& op_graph) const
         = 0;
 
     virtual void
-        initialize_execution_context(const hipdnnEnginePluginHandle& handle,
+        initialize_execution_context(const HipdnnEnginePluginHandle& handle,
                                      const hipdnn_plugin::Graph_interface& op_graph,
-                                     hipdnnEnginePluginExecutionContext& execution_context) const
+                                     HipdnnEnginePluginExecutionContext& execution_context) const
         = 0;
 };
 

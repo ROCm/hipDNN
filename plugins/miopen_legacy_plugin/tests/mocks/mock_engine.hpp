@@ -24,19 +24,19 @@ public:
                 (const, override));
     MOCK_METHOD(void,
                 get_details,
-                (hipdnnEnginePluginHandle & handle, hipdnnPluginConstData_t& details_out),
+                (HipdnnEnginePluginHandle & handle, hipdnnPluginConstData_t& details_out),
                 (const, override));
     MOCK_METHOD(size_t,
                 get_workspace_size,
-                (const hipdnnEnginePluginHandle& handle,
+                (const HipdnnEnginePluginHandle& handle,
                  const hipdnn_plugin::Graph_interface& op_graph),
                 (const, override));
 
     MOCK_METHOD(void,
                 initialize_execution_context,
-                (const hipdnnEnginePluginHandle& handle,
+                (const HipdnnEnginePluginHandle& handle,
                  const hipdnn_plugin::Graph_interface& op_graph,
-                 hipdnnEnginePluginExecutionContext& execution_context),
+                 HipdnnEnginePluginExecutionContext& execution_context),
                 (const, override));
 };
 

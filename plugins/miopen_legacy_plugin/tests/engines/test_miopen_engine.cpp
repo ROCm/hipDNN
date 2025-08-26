@@ -29,7 +29,7 @@ TEST(Miopen_engineTest, WorkspaceSizeReturnsZeroIfNoPlanBuilders)
 
     Mock_graph mock_graph;
 
-    hipdnnEnginePluginHandle dummy_handle;
+    HipdnnEnginePluginHandle dummy_handle;
     EXPECT_EQ(engine.get_workspace_size(dummy_handle, mock_graph), 0u);
 }
 
@@ -45,7 +45,7 @@ TEST(Miopen_engineTest, WorkspaceSizeReturnsPlanBuilderWorkspace)
 
     Mock_graph mock_graph;
 
-    hipdnnEnginePluginHandle dummy_handle;
+    HipdnnEnginePluginHandle dummy_handle;
     EXPECT_EQ(engine.get_workspace_size(dummy_handle, mock_graph), 1337u);
 }
 
@@ -67,7 +67,7 @@ TEST(Miopen_engineTest, WorkspaceSizeReturnsMaxPlanBuilderWorkspace)
 
     Mock_graph mock_graph;
 
-    hipdnnEnginePluginHandle dummy_handle;
+    HipdnnEnginePluginHandle dummy_handle;
     EXPECT_EQ(engine.get_workspace_size(dummy_handle, mock_graph), 45000u);
 }
 
@@ -81,7 +81,7 @@ TEST(Miopen_engineTest, WorkspaceSizeReturnsZeroIfNoPlanBuilderApplicable)
 
     Mock_graph mock_graph;
 
-    hipdnnEnginePluginHandle dummy_handle;
+    HipdnnEnginePluginHandle dummy_handle;
     EXPECT_EQ(engine.get_workspace_size(dummy_handle, mock_graph), 0u);
 }
 
@@ -140,7 +140,7 @@ TEST(Miopen_engineTest, IsApplicableReturnsFalseIfNoPlanBuilderApplicable)
 TEST(Miopen_engineTest, GetDetailsReturnsSerializedEngineDetails)
 {
     Miopen_engine engine(1);
-    hipdnnEnginePluginHandle dummy_handle;
+    HipdnnEnginePluginHandle dummy_handle;
 
     hipdnnPluginConstData_t result;
     engine.get_details(dummy_handle, result);
@@ -165,7 +165,7 @@ TEST(Miopen_engineTest, InitializeExecutionContextInvokesFirstApplicablePlanBuil
     engine.add_plan_builder(std::move(mock_plan_builder2));
 
     Mock_graph mock_graph;
-    hipdnnEnginePluginHandle dummy_handle;
+    HipdnnEnginePluginHandle dummy_handle;
     Mock_hipdnn_engine_plugin_execution_context ctx;
 
     engine.initialize_execution_context(dummy_handle, mock_graph, ctx);
@@ -188,7 +188,7 @@ TEST(Miopen_engineTest, InitializeExecutionContextSkipsNonApplicableBuilders)
     engine.add_plan_builder(std::move(mock_plan_builder2));
 
     Mock_graph mock_graph;
-    hipdnnEnginePluginHandle dummy_handle;
+    HipdnnEnginePluginHandle dummy_handle;
     Mock_hipdnn_engine_plugin_execution_context ctx;
 
     engine.initialize_execution_context(dummy_handle, mock_graph, ctx);
@@ -211,7 +211,7 @@ TEST(Miopen_engineTest, InitializeExecutionContextDoesNotCallBuildPlanIfNoApplic
     engine.add_plan_builder(std::move(mock_plan_builder2));
 
     Mock_graph mock_graph;
-    hipdnnEnginePluginHandle dummy_handle;
+    HipdnnEnginePluginHandle dummy_handle;
     Mock_hipdnn_engine_plugin_execution_context ctx;
 
     engine.initialize_execution_context(dummy_handle, mock_graph, ctx);

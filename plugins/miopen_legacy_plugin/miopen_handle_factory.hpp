@@ -8,12 +8,12 @@
 namespace miopen_legacy_plugin
 {
 
-class Miopen_handle_factory
+class MiopenHandleFactory
 {
 public:
-    static void create_miopen_handle(hipdnnEnginePluginHandle_t* handle);
+    static void createMiopenHandle(hipdnnEnginePluginHandle_t* handle);
 
-    static void destroy_miopen_handle(hipdnnEnginePluginHandle_t handle);
+    static void destroyMiopenHandle(hipdnnEnginePluginHandle_t handle);
 };
 
 }

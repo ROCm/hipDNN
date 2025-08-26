@@ -38,7 +38,7 @@ bool Miopen_batchnorm_plan_builder::is_applicable(
 }
 
 size_t Miopen_batchnorm_plan_builder::get_workspace_size(
-    const hipdnnEnginePluginHandle& handle, const hipdnn_plugin::Graph_interface& op_graph) const
+    const HipdnnEnginePluginHandle& handle, const hipdnn_plugin::Graph_interface& op_graph) const
 {
     std::ignore = handle;
     std::ignore = op_graph;
@@ -54,10 +54,10 @@ std::string get_node_name(const hipdnn_sdk::data_objects::Node& node)
     return node.name() != nullptr ? node.name()->str() : "";
 }
 
-void build_plan_inference_single_node(const hipdnnEnginePluginHandle& handle,
+void build_plan_inference_single_node(const HipdnnEnginePluginHandle& handle,
                                       const hipdnn_plugin::Graph_interface& op_graph,
                                       const hipdnn_sdk::data_objects::Node& node,
-                                      hipdnnEnginePluginExecutionContext& execution_context)
+                                      HipdnnEnginePluginExecutionContext& execution_context)
 {
     std::ignore = handle;
 
@@ -73,13 +73,13 @@ void build_plan_inference_single_node(const hipdnnEnginePluginHandle& handle,
     auto params
         = std::make_unique<Batchnorm_fwd_inference_params>(*attr, op_graph.get_tensor_map());
     auto plan = std::make_unique<Batchnorm_fwd_inference_plan>(std::move(params));
-    execution_context.set_plan(std::move(plan));
+    execution_context.setPlan(std::move(plan));
 }
 
-void build_plan_bwd_single_node(const hipdnnEnginePluginHandle& handle,
+void build_plan_bwd_single_node(const HipdnnEnginePluginHandle& handle,
                                 const hipdnn_plugin::Graph_interface& op_graph,
                                 const hipdnn_sdk::data_objects::Node& node,
-                                hipdnnEnginePluginExecutionContext& execution_context)
+                                HipdnnEnginePluginExecutionContext& execution_context)
 {
     std::ignore = handle;
 
@@ -94,15 +94,15 @@ void build_plan_bwd_single_node(const hipdnnEnginePluginHandle& handle,
 
     auto params = std::make_unique<Batchnorm_bwd_params>(*attr, op_graph.get_tensor_map());
     auto plan = std::make_unique<Batchnorm_bwd_plan>(std::move(params));
-    execution_context.set_plan(std::move(plan));
+    execution_context.setPlan(std::move(plan));
 }
 
 } // namespace
 
 void Miopen_batchnorm_plan_builder::build_plan(
-    const hipdnnEnginePluginHandle& handle,
+    const HipdnnEnginePluginHandle& handle,
     const hipdnn_plugin::Graph_interface& op_graph,
-    hipdnnEnginePluginExecutionContext& execution_context) const
+    HipdnnEnginePluginExecutionContext& execution_context) const
 {
     const auto& node = op_graph.get_node(0);
 

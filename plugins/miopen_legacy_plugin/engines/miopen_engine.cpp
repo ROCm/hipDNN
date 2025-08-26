@@ -33,7 +33,7 @@ bool Miopen_engine::is_applicable(const hipdnn_plugin::Graph_interface& op_graph
     return false;
 }
 
-void Miopen_engine::get_details(hipdnnEnginePluginHandle& handle,
+void Miopen_engine::get_details(HipdnnEnginePluginHandle& handle,
                                 hipdnnPluginConstData_t& details_out) const
 {
     flatbuffers::FlatBufferBuilder builder;
@@ -43,10 +43,10 @@ void Miopen_engine::get_details(hipdnnEnginePluginHandle& handle,
     details_out.ptr = detached_buffer->data();
     details_out.size = detached_buffer->size();
 
-    handle.store_engine_details_detached_buffer(details_out.ptr, std::move(detached_buffer));
+    handle.storeEngineDetailsDetachedBuffer(details_out.ptr, std::move(detached_buffer));
 }
 
-size_t Miopen_engine::get_workspace_size(const hipdnnEnginePluginHandle& handle,
+size_t Miopen_engine::get_workspace_size(const HipdnnEnginePluginHandle& handle,
                                          const hipdnn_plugin::Graph_interface& op_graph) const
 {
     size_t workspace_size = 0;
@@ -62,9 +62,9 @@ size_t Miopen_engine::get_workspace_size(const hipdnnEnginePluginHandle& handle,
 }
 
 void Miopen_engine::initialize_execution_context(
-    const hipdnnEnginePluginHandle& handle,
+    const HipdnnEnginePluginHandle& handle,
     const hipdnn_plugin::Graph_interface& op_graph,
-    hipdnnEnginePluginExecutionContext& execution_context) const
+    HipdnnEnginePluginExecutionContext& execution_context) const
 {
     for(const auto& plan_builder : _plan_builders)
     {

@@ -22,13 +22,13 @@ public:
 
     virtual bool is_applicable(const hipdnn_plugin::Graph_interface& op_graph) const = 0;
 
-    virtual size_t get_workspace_size(const hipdnnEnginePluginHandle& handle,
+    virtual size_t get_workspace_size(const HipdnnEnginePluginHandle& handle,
                                       const hipdnn_plugin::Graph_interface& op_graph) const
         = 0;
 
-    virtual void build_plan(const hipdnnEnginePluginHandle& handle,
+    virtual void build_plan(const HipdnnEnginePluginHandle& handle,
                             const hipdnn_plugin::Graph_interface& op_graph,
-                            hipdnnEnginePluginExecutionContext& execution_context) const
+                            HipdnnEnginePluginExecutionContext& execution_context) const
         = 0;
 };
 }

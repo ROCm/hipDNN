@@ -19,42 +19,42 @@ Batchnorm_bwd_params::Batchnorm_bwd_params(
     initialize_tensors(attributes, tensor_map);
 }
 
-const Miopen_tensor& Batchnorm_bwd_params::x() const
+const MiopenTensor& Batchnorm_bwd_params::x() const
 {
     return *_x;
 }
 
-const Miopen_tensor& Batchnorm_bwd_params::dy() const
+const MiopenTensor& Batchnorm_bwd_params::dy() const
 {
     return *_dy;
 }
 
-const Miopen_tensor& Batchnorm_bwd_params::dx() const
+const MiopenTensor& Batchnorm_bwd_params::dx() const
 {
     return *_dx;
 }
 
-const Miopen_tensor& Batchnorm_bwd_params::scale() const
+const MiopenTensor& Batchnorm_bwd_params::scale() const
 {
     return *_scale;
 }
 
-const Miopen_tensor& Batchnorm_bwd_params::dscale() const
+const MiopenTensor& Batchnorm_bwd_params::dscale() const
 {
     return *_dscale;
 }
 
-const Miopen_tensor& Batchnorm_bwd_params::dbias() const
+const MiopenTensor& Batchnorm_bwd_params::dbias() const
 {
     return *_dbias;
 }
 
-const std::optional<std::unique_ptr<Miopen_tensor>>& Batchnorm_bwd_params::opt_mean() const
+const std::optional<std::unique_ptr<MiopenTensor>>& Batchnorm_bwd_params::opt_mean() const
 {
     return _opt_mean;
 }
 
-const std::optional<std::unique_ptr<Miopen_tensor>>& Batchnorm_bwd_params::opt_inv_variance() const
+const std::optional<std::unique_ptr<MiopenTensor>>& Batchnorm_bwd_params::opt_inv_variance() const
 {
     return _opt_inv_variance;
 }
@@ -62,14 +62,14 @@ const std::optional<std::unique_ptr<Miopen_tensor>>& Batchnorm_bwd_params::opt_i
 namespace
 {
 
-std::unique_ptr<Miopen_tensor> create_tensor(
+std::unique_ptr<MiopenTensor> create_tensor(
     const std::unordered_map<int64_t, const hipdnn_sdk::data_objects::TensorAttributes*>&
         tensor_map,
     int64_t uid)
 {
     if(auto tensor_attr = tensor_map.find(uid); tensor_attr != tensor_map.end())
     {
-        return std::make_unique<Miopen_tensor>(*tensor_attr->second);
+        return std::make_unique<MiopenTensor>(*tensor_attr->second);
     }
 
     throw hipdnn_plugin::Hipdnn_plugin_exception(HIPDNN_PLUGIN_STATUS_INTERNAL_ERROR,
@@ -107,7 +107,7 @@ Batchnorm_bwd_plan::Batchnorm_bwd_plan(std::unique_ptr<Batchnorm_bwd_params> par
 {
 }
 
-void Batchnorm_bwd_plan::execute(const hipdnnEnginePluginHandle& handle,
+void Batchnorm_bwd_plan::execute(const HipdnnEnginePluginHandle& handle,
                                  const hipdnnPluginDeviceBuffer_t* device_buffers,
                                  uint32_t num_device_buffers,
                                  void* workspace) const
@@ -121,51 +121,50 @@ void Batchnorm_bwd_plan::execute(const hipdnnEnginePluginHandle& handle,
     double epsilon = 1e-3;
 
     auto x_buffer
-        = miopen_utils::find_device_buffer(_params->x().uid(), device_buffers, num_device_buffers);
+        = miopen_utils::findDeviceBuffer(_params->x().uid(), device_buffers, num_device_buffers);
     auto dy_buffer
-        = miopen_utils::find_device_buffer(_params->dy().uid(), device_buffers, num_device_buffers);
+        = miopen_utils::findDeviceBuffer(_params->dy().uid(), device_buffers, num_device_buffers);
     auto dx_buffer
-        = miopen_utils::find_device_buffer(_params->dx().uid(), device_buffers, num_device_buffers);
-    auto scale_buffer = miopen_utils::find_device_buffer(
+        = miopen_utils::findDeviceBuffer(_params->dx().uid(), device_buffers, num_device_buffers);
+    auto scale_buffer = miopen_utils::findDeviceBuffer(
         _params->scale().uid(), device_buffers, num_device_buffers);
-    auto dscale_buffer = miopen_utils::find_device_buffer(
+    auto dscale_buffer = miopen_utils::findDeviceBuffer(
         _params->dscale().uid(), device_buffers, num_device_buffers);
-    auto dbias_buffer = miopen_utils::find_device_buffer(
+    auto dbias_buffer = miopen_utils::findDeviceBuffer(
         _params->dbias().uid(), device_buffers, num_device_buffers);
 
     hipdnnPluginDeviceBuffer_t mean_buffer = {0, nullptr};
     if(_params->opt_mean().has_value())
     {
-        mean_buffer = miopen_utils::find_device_buffer(
+        mean_buffer = miopen_utils::findDeviceBuffer(
             _params->opt_mean().value()->uid(), device_buffers, num_device_buffers);
     }
 
     hipdnnPluginDeviceBuffer_t inv_variance_buffer = {0, nullptr};
     if(_params->opt_inv_variance().has_value())
     {
-        inv_variance_buffer = miopen_utils::find_device_buffer(
+        inv_variance_buffer = miopen_utils::findDeviceBuffer(
             _params->opt_inv_variance().value()->uid(), device_buffers, num_device_buffers);
     }
 
     THROW_ON_MIOPEN_FAILURE(miopenBatchNormalizationBackward_V2(
-        handle.miopen_handle,
+        handle.miopenHandle,
         MIOPEN_BATCHNORM_MODE,
         &alpha_data_diff,
         &beta_data_diff,
         &alpha_param_diff,
         &beta_param_diff,
-        _params->x().tensor_descriptor(),
+        _params->x().tensorDescriptor(),
         x_buffer.ptr,
-        _params->dy().tensor_descriptor(),
+        _params->dy().tensorDescriptor(),
         dy_buffer.ptr,
-        _params->dx().tensor_descriptor(),
+        _params->dx().tensorDescriptor(),
         dx_buffer.ptr,
-        _params->scale().tensor_descriptor(),
-        _params->scale().tensor_descriptor(),
-        _params->opt_mean().has_value() ? _params->opt_mean().value()->tensor_descriptor()
-                                        : nullptr,
+        _params->scale().tensorDescriptor(),
+        _params->scale().tensorDescriptor(),
+        _params->opt_mean().has_value() ? _params->opt_mean().value()->tensorDescriptor() : nullptr,
         _params->opt_inv_variance().has_value()
-            ? _params->opt_inv_variance().value()->tensor_descriptor()
+            ? _params->opt_inv_variance().value()->tensorDescriptor()
             : nullptr,
         scale_buffer.ptr,
         dscale_buffer.ptr,

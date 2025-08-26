@@ -12,11 +12,11 @@ using namespace miopen_legacy_plugin;
 
 TEST(HipdnnEnginePluginExecutionContextTest, SetAndGetPlan)
 {
-    hipdnnEnginePluginExecutionContext ctx;
+    HipdnnEnginePluginExecutionContext ctx;
 
     auto mock_plan = std::make_unique<miopen_legacy_plugin::Mock_plan>();
     auto* plan_ptr = mock_plan.get();
-    ctx.set_plan(std::move(mock_plan));
+    ctx.setPlan(std::move(mock_plan));
 
     miopen_legacy_plugin::Plan_interface& plan_ref = ctx.plan();
 
@@ -25,19 +25,19 @@ TEST(HipdnnEnginePluginExecutionContextTest, SetAndGetPlan)
 
 TEST(HipdnnEnginePluginExecutionContextTest, HasValidPlan)
 {
-    hipdnnEnginePluginExecutionContext ctx;
+    HipdnnEnginePluginExecutionContext ctx;
 
-    EXPECT_FALSE(ctx.has_valid_plan());
+    EXPECT_FALSE(ctx.hasValidPlan());
 
     auto mock_plan = std::make_unique<miopen_legacy_plugin::Mock_plan>();
-    ctx.set_plan(std::move(mock_plan));
+    ctx.setPlan(std::move(mock_plan));
 
-    EXPECT_TRUE(ctx.has_valid_plan());
+    EXPECT_TRUE(ctx.hasValidPlan());
 }
 
 TEST(HipdnnEnginePluginExecutionContextTest, GetPlanThrowsIfNotSet)
 {
-    hipdnnEnginePluginExecutionContext ctx;
+    HipdnnEnginePluginExecutionContext ctx;
 
     EXPECT_THROW(ctx.plan(), hipdnn_plugin::Hipdnn_plugin_exception);
 }

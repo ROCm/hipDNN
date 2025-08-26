@@ -60,7 +60,7 @@ TEST(MiopenLegacyEnginePluginApiTest, EnginePluginCreateAlsoCreatesMIOpenHandleO
 
     EXPECT_EQ(status, HIPDNN_PLUGIN_STATUS_SUCCESS);
     ASSERT_NE(handle, nullptr);
-    ASSERT_NE(handle->miopen_handle, nullptr);
+    ASSERT_NE(handle->miopenHandle, nullptr);
 
     EXPECT_EQ(hipdnnEnginePluginDestroy(handle), HIPDNN_PLUGIN_STATUS_SUCCESS);
 }
@@ -77,7 +77,7 @@ TEST(MiopenLegacyEnginePluginApiTest, EnginePluginCreateTwiceGivesTheSameContain
     EXPECT_EQ(status1, HIPDNN_PLUGIN_STATUS_SUCCESS);
     EXPECT_EQ(status2, HIPDNN_PLUGIN_STATUS_SUCCESS);
 
-    EXPECT_EQ(handle1->miopen_container, handle2->miopen_container);
+    EXPECT_EQ(handle1->miopenContainer, handle2->miopenContainer);
 
     EXPECT_EQ(hipdnnEnginePluginDestroy(handle1), HIPDNN_PLUGIN_STATUS_SUCCESS);
     EXPECT_EQ(hipdnnEnginePluginDestroy(handle2), HIPDNN_PLUGIN_STATUS_SUCCESS);
@@ -124,7 +124,7 @@ TEST(MiopenLegacyEnginePluginApiTest, EnginePluginSetStreamValidStream)
     hipStream_t stream = nullptr;
     EXPECT_EQ(hipStreamCreate(&stream), hipSuccess);
     EXPECT_EQ(hipdnnEnginePluginSetStream(handle, stream), HIPDNN_PLUGIN_STATUS_SUCCESS);
-    EXPECT_EQ(handle->get_stream(), stream);
+    EXPECT_EQ(handle->getStream(), stream);
 
     EXPECT_EQ(hipdnnEnginePluginDestroy(handle), HIPDNN_PLUGIN_STATUS_SUCCESS);
     EXPECT_EQ(hipStreamDestroy(stream), hipSuccess);

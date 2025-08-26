@@ -14,24 +14,24 @@
 
 #include "engines/plans/plan_interface.hpp"
 
-struct hipdnnEnginePluginExecutionContext
+struct HipdnnEnginePluginExecutionContext
 {
 public:
-    virtual ~hipdnnEnginePluginExecutionContext() = default;
+    virtual ~HipdnnEnginePluginExecutionContext() = default;
 
-    bool has_valid_plan() const
+    bool hasValidPlan() const
     {
         return _plan != nullptr;
     }
 
-    void set_plan(std::unique_ptr<miopen_legacy_plugin::Plan_interface> plan)
+    void setPlan(std::unique_ptr<miopen_legacy_plugin::Plan_interface> plan)
     {
         _plan = std::move(plan);
     }
 
     virtual miopen_legacy_plugin::Plan_interface& plan() const
     {
-        if(!has_valid_plan())
+        if(!hasValidPlan())
         {
             throw hipdnn_plugin::Hipdnn_plugin_exception(
                 HIPDNN_PLUGIN_STATUS_INTERNAL_ERROR,
