@@ -481,7 +481,7 @@ public:
             attributes.name = "BatchnormInference_" + std::to_string(_sub_nodes.size());
         }
 
-        auto y = attributes.outputs[Batchnorm_inference_attributes::output_names::y]
+        auto y = attributes.outputs[BatchnormInferenceAttributes::output_names::y]
             = output_tensor(attributes.name + "::Y");
         attributes.inputs[BatchnormInferenceAttributes::input_names::x] = std::move(x);
         attributes.inputs[BatchnormInferenceAttributes::input_names::mean] = std::move(mean);

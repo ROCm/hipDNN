@@ -209,7 +209,7 @@ void Batchnorm_bwd_execute_graph_test::RunBwdBatchnormGraph(
     inv_variance_tensor_cpu.fill_with_random_values(
         static_cast<Intermediate_type>(1.9f), static_cast<Intermediate_type>(2.0f), seed);
 
-    Cpu_fp_reference_implementation<Input_type, Intermediate_type, Intermediate_type> cpu_ref_impl;
+    CpuFpReferenceImplementation<Input_type, Intermediate_type, Intermediate_type> cpu_ref_impl;
     cpu_ref_impl.batchnorm_bwd(dy_tensor_cpu,
                                x_tensor_cpu,
                                mean_tensor_cpu,

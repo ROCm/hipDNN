@@ -18,7 +18,6 @@
 #include <hipdnn_sdk/utilities/tensor.hpp>
 
 using namespace hipdnn_frontend;
-// using namespace hipdnn_frontend::graph;
 using namespace hipdnn_sdk::utilities;
 using namespace hipdnn_sdk::reference_test_utilities;
 
