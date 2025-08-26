@@ -87,8 +87,8 @@ void VariantDescriptor::getAttribute(hipdnnBackendAttributeName_t attributeName,
         break;
 
     default:
-        throw Hipdnn_exception(HIPDNN_STATUS_NOT_SUPPORTED,
-                               "VariantDescriptor::getAttribute: attributeName not supported");
+        throw HipdnnException(HIPDNN_STATUS_NOT_SUPPORTED,
+                              "VariantDescriptor::getAttribute: attributeName not supported");
     }
 }
 
@@ -137,8 +137,8 @@ void VariantDescriptor::setAttribute(hipdnnBackendAttributeName_t attributeName,
         break;
 
     default:
-        throw Hipdnn_exception(HIPDNN_STATUS_NOT_SUPPORTED,
-                               "VariantDescriptor::setAttribute: attributeName not supported");
+        throw HipdnnException(HIPDNN_STATUS_NOT_SUPPORTED,
+                              "VariantDescriptor::setAttribute: attributeName not supported");
     }
 }
 

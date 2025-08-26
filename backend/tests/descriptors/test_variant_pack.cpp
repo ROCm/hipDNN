@@ -122,13 +122,13 @@ TEST_F(InitializeVariantPackDescriptorTests, InvalidFinalizeCounts)
     descriptor.setAttribute(
         HIPDNN_ATTR_VARIANT_PACK_WORKSPACE, HIPDNN_TYPE_VOID_PTR, 1, &workspace);
 
-    ASSERT_THROW(descriptor.finalize(), Hipdnn_exception);
+    ASSERT_THROW(descriptor.finalize(), HipdnnException);
     EXPECT_FALSE(descriptor.isFinalized());
 }
 
 TEST_F(InitializeVariantPackDescriptorTests, InvalidFinalizeUnsetParams)
 {
-    ASSERT_THROW(descriptor.finalize(), Hipdnn_exception);
+    ASSERT_THROW(descriptor.finalize(), HipdnnException);
     EXPECT_FALSE(descriptor.isFinalized());
 }
 

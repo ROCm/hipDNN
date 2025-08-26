@@ -48,8 +48,8 @@ void GraphDescriptor::getAttribute([[maybe_unused]] hipdnnBackendAttributeName_t
                                    [[maybe_unused]] int64_t* elementCount,
                                    [[maybe_unused]] void* arrayOfElements) const
 {
-    throw Hipdnn_exception(HIPDNN_STATUS_NOT_SUPPORTED,
-                           "GraphDescriptor::getAttribute: not supported");
+    throw HipdnnException(HIPDNN_STATUS_NOT_SUPPORTED,
+                          "GraphDescriptor::getAttribute: not supported");
 }
 
 void GraphDescriptor::setAttribute(hipdnnBackendAttributeName_t attributeName,
@@ -67,10 +67,10 @@ void GraphDescriptor::setAttribute(hipdnnBackendAttributeName_t attributeName,
         setHandle(attributeType, elementCount, arrayOfElements);
         break;
     default:
-        throw Hipdnn_exception(
+        throw HipdnnException(
             HIPDNN_STATUS_NOT_SUPPORTED,
             std::string("GraphDescriptor::setAttribute() is not supported for attribute ")
-                + hipdnn_backend::hipdnn_get_attribute_name_string(attributeName) + ".");
+                + hipdnn_backend::hipdnnGetAttributeNameString(attributeName) + ".");
     }
 
     if(attributeName != HIPDNN_ATTR_OPERATIONGRAPH_HANDLE)
@@ -90,7 +90,7 @@ void GraphDescriptor::deserializeGraph(const uint8_t* serializedGraph, size_t gr
                   "GraphDescriptor::deserializeGraph: graphByteSize is 0");
 
     // TODO: Consider skipping validation entirely, or maybe add an API option to skip it for schema extension cases.
-    flatbuffer_utilities::convert_serialized_graph_to_graph(serializedGraph, graphByteSize, _graph);
+    flatbuffer_utilities::convertSerializedGraphToGraph(serializedGraph, graphByteSize, _graph);
 }
 
 hipdnnPluginConstData_t GraphDescriptor::getSerializedGraph() const

@@ -22,7 +22,7 @@ void DescriptorFactory::create(hipdnnBackendDescriptorType_t descriptorType,
         descriptor, HIPDNN_STATUS_BAD_PARAM_NULL_POINTER, "hipdnnBackendDescriptor_t* is null.");
 
     HIPDNN_LOG_INFO("Creating descriptor of type: {}",
-                    hipdnn_get_backend_descriptor_type_name(descriptorType));
+                    hipdnnGetBackendDescriptorTypeName(descriptorType));
 
     std::shared_ptr<IBackendDescriptor> privateDesc;
     switch(descriptorType)
@@ -46,10 +46,10 @@ void DescriptorFactory::create(hipdnnBackendDescriptorType_t descriptorType,
         privateDesc = std::make_shared<EngineHeuristicDescriptor>();
         break;
     default:
-        throw Hipdnn_exception(HIPDNN_STATUS_NOT_SUPPORTED,
-                               std::string("Descriptor type ")
-                                   + hipdnn_get_backend_descriptor_type_name(descriptorType)
-                                   + " is not supported.");
+        throw HipdnnException(HIPDNN_STATUS_NOT_SUPPORTED,
+                              std::string("Descriptor type ")
+                                  + hipdnnGetBackendDescriptorTypeName(descriptorType)
+                                  + " is not supported.");
     }
 
     *descriptor = HipdnnBackendDescriptor::packDescriptor(privateDesc);

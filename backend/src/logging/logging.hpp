@@ -8,14 +8,14 @@
 #include <spdlog/spdlog.h>
 
 #ifdef HIPDNN_BACKEND_COMPILATION
-#define _HIPDNN_BACKEND_LOG_ACTION(level, ...)                           \
-    do                                                                   \
-    {                                                                    \
-        hipdnn_backend::logging::initialize();                           \
-        if(auto _logger = hipdnn_backend::logging::get_backend_logger()) \
-        {                                                                \
-            _logger->level(__VA_ARGS__);                                 \
-        }                                                                \
+#define _HIPDNN_BACKEND_LOG_ACTION(level, ...)                         \
+    do                                                                 \
+    {                                                                  \
+        hipdnn_backend::logging::initialize();                         \
+        if(auto _logger = hipdnn_backend::logging::getBackendLogger()) \
+        {                                                              \
+            _logger->level(__VA_ARGS__);                               \
+        }                                                              \
     } while(0)
 
 #define HIPDNN_LOG_INFO(...) _HIPDNN_BACKEND_LOG_ACTION(info, __VA_ARGS__)
@@ -33,13 +33,13 @@ void initialize();
 
 void cleanup();
 
-void set_log_level(const std::string& level);
+void setLogLevel(const std::string& level);
 
-std::shared_ptr<spdlog::logger> get_backend_logger();
+std::shared_ptr<spdlog::logger> getBackendLogger();
 
-std::shared_ptr<spdlog::logger> get_callback_receiver_logger();
+std::shared_ptr<spdlog::logger> getCallbackReceiverLogger();
 
-void hipdnn_logging_callback(hipdnnSeverity_t severity, const char* msg);
+void hipdnnLoggingCallback(hipdnnSeverity_t severity, const char* msg);
 
 } // namespace logging
 } // namespace hipdnn_backend
