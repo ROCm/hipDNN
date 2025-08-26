@@ -206,7 +206,7 @@ void BatchnormBwdExecuteGraphTest::runBwdBatchnormGraph(
         static_cast<IntermediateType>(1.9f), static_cast<IntermediateType>(2.0f), seed);
 
     CpuFpReferenceImplementation<InputType, IntermediateType, IntermediateType> cpuRefImpl;
-    cpuRefImpl.batchnorm_bwd(dyTensorCpu,
+    cpuRefImpl.batchnormBwd(dyTensorCpu,
                              xTensorCpu,
                              meanTensorCpu,
                              invVarianceTensorCpu,
@@ -218,11 +218,11 @@ void BatchnormBwdExecuteGraphTest::runBwdBatchnormGraph(
     CpuFpReferenceValidation<InputType> cpuRefValidationInput(epsilon, epsilon);
     CpuFpReferenceValidation<IntermediateType> cpuRefValidationIntermediate(epsilon, epsilon);
 
-    EXPECT_TRUE(cpuRefValidationInput.all_close(dxTensorCpu.memory(), dxTensor.memory()));
+    EXPECT_TRUE(cpuRefValidationInput.allClose(dxTensorCpu.memory(), dxTensor.memory()));
     EXPECT_TRUE(
-        cpuRefValidationIntermediate.all_close(dscaleTensorCpu.memory(), dscaleTensor.memory()));
+        cpuRefValidationIntermediate.allClose(dscaleTensorCpu.memory(), dscaleTensor.memory()));
     EXPECT_TRUE(
-        cpuRefValidationIntermediate.all_close(dbiasTensorCpu.memory(), dbiasTensor.memory()));
+        cpuRefValidationIntermediate.allClose(dbiasTensorCpu.memory(), dbiasTensor.memory()));
 }
 
 INSTANTIATE_TEST_SUITE_P(RunBwdBatchnormGraphWithParams,

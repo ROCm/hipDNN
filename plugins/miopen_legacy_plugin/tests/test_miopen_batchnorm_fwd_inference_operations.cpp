@@ -197,7 +197,7 @@ void BatchnormFwdInferExecuteGraphTest::runFwdBatchnormGraph(
         static_cast<IntermediateType>(0.1f), static_cast<IntermediateType>(1.0f), seed);
 
     CpuFpReferenceImplementation<InputType, IntermediateType, IntermediateType> cpuRefImpl;
-    cpuRefImpl.batchnorm_fwd_inference(xTensorCpu,
+    cpuRefImpl.batchnormFwdInference(xTensorCpu,
                                        scaleTensorCpu,
                                        biasTensorCpu,
                                        meanTensorCpu,

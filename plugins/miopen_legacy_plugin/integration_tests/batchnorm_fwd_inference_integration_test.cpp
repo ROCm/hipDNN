@@ -234,7 +234,7 @@ protected:
     void runCpuBatchnormFwd(Batchnorm2dTensorBundle<InputType, IntermediateType>& cpuTensorBundle)
     {
         CpuFpReferenceImplementation<InputType, IntermediateType, IntermediateType> cpuRefImpl;
-        cpuRefImpl.batchnorm_fwd_inference(cpuTensorBundle.xTensor,
+        cpuRefImpl.batchnormFwdInference(cpuTensorBundle.xTensor,
                                            cpuTensorBundle.scaleTensor,
                                            cpuTensorBundle.biasTensor,
                                            cpuTensorBundle.meanTensor,
