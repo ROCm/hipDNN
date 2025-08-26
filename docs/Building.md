@@ -1,99 +1,284 @@
-# Building hipDNN 
-This guide assumes you are using the development dockerfile to build and run hipDNN.  If you are not, you will need
-to ensure your environment is setup correctly.
+# Building hipDNN
 
-## System Dependencies
-The development dockerfile is a good place to look to understand what system dependencies are required in order build
-hipDNN.  At the time of writing this readme, the following bare minimum system dependencies are required:
-- Package Repository: ROCm 6.4 or later
-    - rocm-llvm-devel (amd clang compiler is included with this.)
-    - hip-devel
-- Cmake 3.25.2 or later
-- Ninja 1.12.1 or later (Optional)
-    - Ninja is the preferred build system for hipDNN
-    - Cmake will default to using make unless you set CMAKE_GENERATOR to Ninja. This environment variable is already set in the development docker containers
+## Table of Contents
+- [Prerequisites](#prerequisites)
+  - [System Requirements](#system-requirements)
+  - [Dependencies](#dependencies)
+- [Quick Start Guide](#quick-start-guide)
+  - [Using Docker (Recommended)](#using-docker-recommended)
+  - [Native Build](#native-build)
+- [Build Configurations](#build-configurations)
+- [Build Targets](#build-targets)
+- [Platform-Specific Instructions](#platform-specific-instructions)
+  - [Linux](#linux)
+  - [Windows](#windows)
+- [Troubleshooting](#troubleshooting)
+- [Verifying Installation](#verifying-installation)
 
+## Prerequisites
 
-## 3rdParty Dependencies
-The current open source dependencies used in this repository are
-- flatbuffers
-- gtest
-- spdlog
+### System Requirements
+- **GPU**: AMD GPU with ROCm support
+- **Operating System**: 
+  - Linux: Matching support to [TheRock](https://github.com/ROCm/TheRock)
+  - Windows: Windows 11 (limited support, see [Windows section](#windows))
 
-These can be found in our [Dependencies.cmake file](../cmake/Dependencies.cmake).  By default, cmake will look
-for these dependencies installed on the system before it attempts to pull them from a remote source.
+### Dependencies
 
-## Quickstart Building and Installing HipDNN
-1. Build a version of our development [Dockerfiles](../dockerfiles). See [building docker](#build-the-development-docker-container)
-2. Run the docker image you built and mount the location of this repository.
-    - `docker run -it -v $HOME:/location/of/repository --privileged --rm --device=/dev/kfd --device /dev/dri:/dev/dri:rw --volume /dev/dri:/dev/dri:rw -v /var/lib/docker/:/var/lib/docker --group-add video --cap-add=SYS_PTRACE --security-opt seccomp=unconfined docker_image_name`
-3. Use Cmake to generate the make files 
+#### Required Dependencies
+| Dependency | Version | Description |
+|------------|---------|-------------|
+| ROCm | 6.4+ | AMD GPU compute stack |
+| CMake | 3.25.2+ | Build system generator |
+| C++ Compiler | C++20 compatible | AMD Clang (included with ROCm) |
+| HIP | Matching ROCm install | GPU programming interface |
+
+#### Optional Dependencies
+| Dependency | Version | Description |
+|------------|---------|-------------|
+| Ninja | 1.12.1+ | Faster build system (recommended) |
+| Docker | Latest | For containerized builds |
+
+#### Third-Party Libraries
+The following libraries are automatically managed by CMake (see [Dependencies.cmake](../cmake/Dependencies.cmake)):
+- [FlatBuffers](https://github.com/google/flatbuffers) - Serialization library
+- [Google Test](https://github.com/google/googletest) - Unit testing framework
+- [spdlog](https://github.com/gabime/spdlog) - Logging library
+
+## Quick Start Guide
+
+### Using Docker (Recommended)
+
+> [!TIP]
+> 💡 Docker provides a consistent development environment with all dependencies pre-installed. This is the recommended approach for most users. For more details about Docker images, see the [Docker README](../dockerfiles/README.md).
+
+1. **Clone hipDNN**
+   ```bash
+   git clone https://github.com/ROCm/hipDNN.git
+   ```
+
+2. **Build the Development Container**
+   ```bash
+   cd hipDNN/dockerfiles/
+   
+   # For Ubuntu 22.04 (recommended)
+   docker build -f ./Dockerfile.ubuntu22 -t hipdnn-dev:ubuntu22 .
+   
+   # For AlmaLinux
+   docker build -f ./Dockerfile.almalinux -t hipdnn-dev:almalinux .
+   ```
+
+3. **Run the Container**
+   ```bash
+   # Replace <path/to/hipDNN> with your hipDNN repository path
+   docker run -it \
+     -v <path/to/hipDNN>:/workspace/hipDNN \
+     --privileged \
+     --rm \
+     --device=/dev/kfd \
+     --device=/dev/dri:/dev/dri:rw \
+     --volume=/dev/dri:/dev/dri:rw \
+     -v /var/lib/docker:/var/lib/docker \
+     --group-add video \
+     --cap-add=SYS_PTRACE \
+     --security-opt seccomp=unconfined \
+     hipdnn-dev:ubuntu22
+   ```
+
+4. **Build and Test**
+   ```bash
+   cd /workspace/hipDNN
+   mkdir build && cd build
+   cmake -GNinja ..
+   ninja check
+   ```
+
+5. **Install**
+   ```bash
+   # Default installation to /opt/rocm
+   sudo ninja install
+   ```
+
+### Native Build
+
+1. **Install ROCm** (follow [official ROCm installation guide](https://rocm.docs.amd.com/))
+
+2. **Clone and Build**
+   ```bash
+   git clone https://github.com/ROCm/hipDNN.git
+   cd hipDNN
+   mkdir build && cd build
+   
+   # Configure with Ninja (recommended)
+   cmake -GNinja ..
+   
+   # Build and run tests
+   ninja check
+
+   # Install
+   sudo ninja install
+   ```
+
+## Build Configurations
+
+### Release Build (Default)
+```bash
+cmake -GNinja ..
 ```
-# default release build
-cd path/to/repository
-mkdir build
-cd build
-cmake ..
-```
-4. Build and install using Ninja:  `ninja -j10 install`
-    - By default the install location will be in the `/opt/rocm` folder.
 
-### Additional Build Configurations and Targets
-#### Cmake Configurations
-```
-# default release
-mkdir build
-cd build
-cmake ..
-
-# default debug
-mkdir build
-cd build
-cmake -DCMAKE_BUILD_TYPE=Debug ..
-
-# code coverage
-mkdir build
-cd build
-cmake -DCODE_COVERAGE=ON ..
-
-# address sanitizer
-mkdir build
-cd build
-cmake -DBUILD_ADDRESS_SANITIZER=ON ..
+### Debug Build
+```bash
+cmake -GNinja -DCMAKE_BUILD_TYPE=Debug ..
 ```
 
-#### Ninja Targets
-When building with ninja dont forget to add the -jnproc flag for using additional cores
-  - `ninja`: default build
-  - `ninja install`: installs the library to the default location (/opt/rocm)
-  - `ninja check`: Builds everything and automatically runs the unit tests and integration tests via the ctest runner.
-    - Can add `-DBUILD_ADDRESS_SANITIZER` to initial cmake command if you want memory violation checks to occur
-    - Due to an incompatibility between HIP and AddressSanitizer, some tests will be skipped in AddressSanitizer builds
-  - `ninja unit-check`: Minimal version of `ninja check` that only runs the unit tests.
-  - `ninja integration-check`: Version of `ninja check` that only runs the integration tests (this is the bulk of the testing time).
-  - `ninja check_format`: checks the format of all c/c++ files in the repository and issues a warning
-  - `ninja format`: formats any files in the repository which are not correctly formatted.
-  - `ninja code_coverage`: builds, runs tests, and generates code coverage reports
-    - Must add `-DCODE_COVERAGE=ON` to initial cmake command.
+### Code Coverage Build
+```bash
+cmake -GNinja -DCODE_COVERAGE=ON ..
+ninja code_coverage
+# Coverage reports will be generated in build/coverage/
+```
 
+### Address Sanitizer Build
+```bash
+cmake -GNinja -DBUILD_ADDRESS_SANITIZER=ON ..
+ninja check
+# Note: Some HIP-related tests may be skipped due to AddressSanitizer incompatibility
+```
 
-### Build the development docker container
-Our development dockerfiles are located in the `dockerfiles` directory.  See the [readme](../dockerfiles//README.md) for more information on building the docker containers.
+### Custom Installation Path
+```bash
+cmake -GNinja -DCMAKE_INSTALL_PREFIX=/custom/install/path ..
+```
 
-## Building Samples
-See the samples [readme](../samples/README.MD) for how to build and run the samples.
+### Building Specific Components
+```bash
+# Build without plugins
+cmake -GNinja -DHIP_DNN_BUILD_PLUGINS=OFF ..
 
-## Building on Windows
+# Build only the backend
+cmake -GNinja -DHIP_DNN_BUILD_FRONTEND=OFF ..
 
-*Note - HIP & GPU related tests are not currently working*
-1. Follow the instructions for preparing for and cloning TheRock
-2. Open up a "x64 Native Tools Command Prompt for VS 2022" command shell from the start menu
-3. From the native tools prompt, clone and build TheRock
-4. Set your HIP_PLATFORM: `set HIP_PLATFORM=amd`
-5. Set your TheRock dist location: `set PATH=C:\src\hipDNN\build\backend\src;C:\src\TheRock\build\dist\rocm\bin;%PATH%`
-    - If your locations differ, you may need to edit \<src\>/cmake/ClangToolChain.cmake
-    - This is done so that the executables / dlls can find their dependency dlls.
-6. From the native tools prompt, clone and build hipDNN
-    - `cmake -GNinja -DHIP_DNN_BUILD_PLUGINS=OFF ..`
-    - `ninja check`
+# Build without samples
+cmake -GNinja -DHIP_DNN_BUILD_SAMPLES=OFF ..
+```
 
+## Build Targets
+
+> [!NOTE]
+> 📝 Make is supported for all targets. Configure with `cmake -G "Unix Makefiles" ..` if it is not the default generator in your environment. For parallel builds, use `make -j$(nproc)` on Linux. Unlike `ninja`, `make` does not build in parallel by default.
+
+All targets support parallel builds with ninja:
+
+| Target | Description |
+|--------|-------------|
+| `ninja` | Build all components |
+| `ninja check` | Build and run all tests (see [Testing](./Testing.md)) |
+| `ninja unit-check` | Build and run exclusively the unit tests and API tests (minimal version of `ninja check`) |
+| `ninja integration-check` | Build and run exclusively the E2E integration tests (this is the bulk of the testing time) |
+| `ninja install` | Install libraries and headers |
+| `ninja format` | Auto-format all C++ source files |
+| `ninja check_format` | Check code formatting compliance |
+| `ninja code_coverage` | Generate test coverage reports (requires `-DCODE_COVERAGE=ON`) |
+| `ninja clean` | Clean build artifacts |
+
+## Platform-Specific Instructions
+
+### Linux
+The standard build instructions above work for all supported Linux distributions. Ensure ROCm is properly installed and configured for your distribution.
+
+### Windows
+
+> [!WARNING]
+> GPU functionality and HIP-related tests are not currently supported on Windows. Only CPU tests can be run.
+
+1. **Prerequisites**
+   - Visual Studio 2022 with C++ workload
+   - [TheRock](https://github.com/ROCm/TheRock) (ROCm Windows port)
+   - CMake 3.25.2+
+   - Ninja (recommended)
+
+2. **Setup Environment**
+   ```cmd
+   # Open "x64 Native Tools Command Prompt for VS 2022"
+   
+   # Set HIP platform
+   set HIP_PLATFORM=amd
+   
+   # Clone and build TheRock (see TheRock documentation)
+   ```
+
+3. **Build hipDNN**
+   ```cmd
+   cd <path\to\hipDNN>
+   mkdir build
+   cd build
+   
+   # Configure without plugins (not supported on Windows)
+   cmake -GNinja -DHIP_DNN_BUILD_PLUGINS=OFF ..
+   
+   # Build and test (CPU tests only)
+   ninja check
+   ```
+
+4. **Path Configuration**
+   Add the following to your PATH:
+   ```cmd
+   set PATH=<hipDNN_build_dir>\backend\src;<TheRock_dist>\rocm\bin;%PATH%
+   ```
+   
+   If using custom paths, you may need to modify [ClangToolChain.cmake](../cmake/ClangToolChain.cmake).
+
+## Troubleshooting
+
+### Common Build Issues
+
+1. **Out of memory during build**
+   ```bash
+   # Reduce parallel jobs
+   ninja -j4  # or even -j2 for systems with limited RAM
+   ```
+
+2. **Docker GPU access issues**
+   - Ensure ROCm is installed on the host system
+   - Verify GPU is visible: `rocm-smi` or `rocminfo`
+   - Check user is in `video` and `render` groups:
+     ```bash
+     sudo usermod -a -G video,render $USER
+     # Log out and back in for changes to take effect
+     ```
+
+## Verifying Installation
+
+After installation, verify hipDNN is correctly installed:
+
+1. **Check installed files**
+   ```bash
+   # Default installation
+   ls /opt/rocm/include/hipdnn*
+   ls /opt/rocm/lib/libhipdnn*
+   ```
+
+2. **Build and run samples**
+   ```bash
+   cd samples
+   # See [samples README](../samples/README.md) for detailed instructions
+   ```
+
+3. **Test with a simple program**
+   ```cpp
+   #include <hipdnn.h>
+   #include <iostream>
+   
+   int main() {
+       size_t version;
+       hipdnnGetVersion(&version);
+       std::cout << "hipDNN version: " << version << std::endl;
+       return 0;
+   }
+   ```
+   
+   Compile with:
+   ```bash
+   hipcc test_hipdnn.cpp -lhipdnn -o test_hipdnn
+   ./test_hipdnn
+   ```
