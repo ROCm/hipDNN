@@ -62,6 +62,7 @@ find_package(miopen CONFIG REQUIRED)
 add_library(miopen_legacy_plugin_private
     engines/miopen_engine.cpp
     engines/plans/miopen_batchnorm_plan_builder.cpp
+    engines/plans/miopen_batchnorm_bwd_plan.cpp
     engines/plans/miopen_batchnorm_fwd_inference_plan.cpp
     engine_manager.cpp
     miopen_handle_factory.cpp

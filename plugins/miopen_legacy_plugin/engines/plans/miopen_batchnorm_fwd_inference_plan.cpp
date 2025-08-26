@@ -50,6 +50,9 @@ const std::optional<std::unique_ptr<Miopen_tensor>>&
     return _est_variance_tensor_descriptor;
 }
 
+namespace
+{
+
 std::unique_ptr<Miopen_tensor> create_tensor(
     const std::unordered_map<int64_t, const hipdnn_sdk::data_objects::TensorAttributes*>&
         tensor_map,
@@ -64,6 +67,8 @@ std::unique_ptr<Miopen_tensor> create_tensor(
                                                  "Failed to find tensor with UID in tensor_map: "
                                                      + std::to_string(uid));
 }
+
+} // namespace
 
 void Batchnorm_fwd_inference_params::initialize_tensors(
     const hipdnn_sdk::data_objects::BatchnormInferenceAttributes& attributes,
