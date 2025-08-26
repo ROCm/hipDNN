@@ -34,7 +34,7 @@ void throw_if_invalid_descriptor(hipdnnBackendDescriptor_t descriptor)
                                                "hipdnnBackendDescriptor_t is nullptr");
     }
 
-    if(!descriptor->is_valid())
+    if(!descriptor->isValid())
     {
         throw hipdnn_backend::Hipdnn_exception(
             HIPDNN_STATUS_BAD_PARAM_NULL_POINTER,
@@ -117,7 +117,7 @@ HIPDNN_BACKEND_EXPORT hipdnnStatus_t hipdnnBackendCreateDescriptor(
                   static_cast<void*>(descriptor));
 
     return hipdnn_backend::try_catch([&, api_name = __func__]() {
-        hipdnn_backend::Descriptor_factory::create(descriptor_type, descriptor);
+        hipdnn_backend::DescriptorFactory::create(descriptor_type, descriptor);
 
         LOG_API_SUCCESS(api_name, "created_descriptor={:p}", static_cast<void*>(*descriptor));
     });
@@ -131,7 +131,7 @@ HIPDNN_BACKEND_EXPORT hipdnnStatus_t
     return hipdnn_backend::try_catch([&, api_name = __func__]() {
         throw_if_invalid_descriptor(descriptor);
 
-        hipdnn_backend::Descriptor_factory::destroy(descriptor);
+        hipdnn_backend::DescriptorFactory::destroy(descriptor);
 
         LOG_API_SUCCESS(api_name, "");
     });
@@ -151,7 +151,7 @@ HIPDNN_BACKEND_EXPORT hipdnnStatus_t hipdnnBackendExecute(hipdnnHandle_t handle,
         throw_if_invalid_descriptor(execution_plan);
         throw_if_invalid_descriptor(variant_pack);
 
-        handle->getPluginResourceManager()->execute_op_graph(execution_plan, variant_pack);
+        handle->getPluginResourceManager()->executeOpGraph(execution_plan, variant_pack);
 
         LOG_API_SUCCESS(api_name, "");
     });
@@ -190,11 +190,11 @@ HIPDNN_BACKEND_EXPORT hipdnnStatus_t
     return hipdnn_backend::try_catch([&, api_name = __func__]() {
         throw_if_invalid_descriptor(descriptor);
 
-        descriptor->get_attribute(attribute_name,
-                                  attribute_type,
-                                  requested_element_count,
-                                  element_count,
-                                  array_of_elements);
+        descriptor->getAttribute(attribute_name,
+                                 attribute_type,
+                                 requested_element_count,
+                                 element_count,
+                                 array_of_elements);
 
         if(element_count == nullptr)
         {
@@ -230,7 +230,7 @@ HIPDNN_BACKEND_EXPORT hipdnnStatus_t
     return hipdnn_backend::try_catch([&, api_name = __func__]() {
         throw_if_invalid_descriptor(descriptor);
 
-        descriptor->set_attribute(attribute_name, attribute_type, element_count, array_of_elements);
+        descriptor->setAttribute(attribute_name, attribute_type, element_count, array_of_elements);
 
         LOG_API_SUCCESS(
             api_name, "status={}", hipdnn_backend::hipdnn_get_status_string(HIPDNN_STATUS_SUCCESS));
@@ -246,7 +246,7 @@ HIPDNN_BACKEND_EXPORT hipdnnStatus_t hipdnnBackendCreateAndDeserializeGraph_ext(
                   graph_byte_size);
 
     return hipdnn_backend::try_catch([&, api_name = __func__]() {
-        hipdnn_backend::Descriptor_factory::create_graph_ext(
+        hipdnn_backend::DescriptorFactory::createGraphExt(
             descriptor, serialized_graph, graph_byte_size);
 
         LOG_API_SUCCESS(api_name, "created_descriptor={:p}", static_cast<void*>(*descriptor));
@@ -308,8 +308,8 @@ HIPDNN_BACKEND_EXPORT hipdnnStatus_t hipdnnSetEnginePluginPaths_ext(
             paths_vec.emplace_back(plugin_paths[i]);
         }
 
-        hipdnn_backend::plugin::Engine_plugin_resource_manager::set_plugin_paths(paths_vec,
-                                                                                 loading_mode);
+        hipdnn_backend::plugin::EnginePluginResourceManager::setPluginPaths(paths_vec,
+                                                                            loading_mode);
         // TODO: automatic formatting loading mode to string
         LOG_API_SUCCESS(api_name,
                         "set_plugin_paths={}",
@@ -335,7 +335,7 @@ HIPDNN_BACKEND_EXPORT hipdnnStatus_t hipdnnGetLoadedEnginePluginPaths_ext(hipdnn
         throw_if_null(num_plugin_paths);
         throw_if_null(max_string_len);
 
-        handle->getPluginResourceManager()->get_loaded_plugin_files(
+        handle->getPluginResourceManager()->getLoadedPluginFiles(
             num_plugin_paths, plugin_paths, max_string_len);
 
         LOG_API_SUCCESS(api_name,

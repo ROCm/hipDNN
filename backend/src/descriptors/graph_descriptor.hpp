@@ -13,36 +13,36 @@
 namespace hipdnn_backend
 {
 
-class Graph_descriptor : public hipdnnBackendDescriptorImpl<Graph_descriptor>
+class GraphDescriptor : public HipdnnBackendDescriptorImpl<GraphDescriptor>
 {
 private:
     std::unique_ptr<hipdnn_sdk::data_objects::GraphT> _graph;
     hipdnnHandle_t _handle = nullptr;
-    mutable flatbuffers::DetachedBuffer _graph_serialized_buffer;
+    mutable flatbuffers::DetachedBuffer _graphSerializedBuffer;
 
-    void set_handle(hipdnnBackendAttributeType_t attribute_type,
-                    int64_t element_count,
-                    const void* array_of_elements);
+    void setHandle(hipdnnBackendAttributeType_t attributeType,
+                   int64_t elementCount,
+                   const void* arrayOfElements);
 
 public:
     void finalize() override;
 
-    void get_attribute([[maybe_unused]] hipdnnBackendAttributeName_t attribute_name,
-                       [[maybe_unused]] hipdnnBackendAttributeType_t attribute_type,
-                       [[maybe_unused]] int64_t requested_element_count,
-                       [[maybe_unused]] int64_t* element_count,
-                       [[maybe_unused]] void* array_of_elements) const override;
+    void getAttribute([[maybe_unused]] hipdnnBackendAttributeName_t attributeName,
+                      [[maybe_unused]] hipdnnBackendAttributeType_t attributeType,
+                      [[maybe_unused]] int64_t requestedElementCount,
+                      [[maybe_unused]] int64_t* elementCount,
+                      [[maybe_unused]] void* arrayOfElements) const override;
 
-    void set_attribute([[maybe_unused]] hipdnnBackendAttributeName_t attribute_name,
-                       [[maybe_unused]] hipdnnBackendAttributeType_t attribute_type,
-                       [[maybe_unused]] int64_t element_count,
-                       [[maybe_unused]] const void* array_of_elements) override;
+    void setAttribute([[maybe_unused]] hipdnnBackendAttributeName_t attributeName,
+                      [[maybe_unused]] hipdnnBackendAttributeType_t attributeType,
+                      [[maybe_unused]] int64_t elementCount,
+                      [[maybe_unused]] const void* arrayOfElements) override;
 
-    void deserialize_graph(const uint8_t* serialized_graph, size_t graph_byte_size);
+    void deserializeGraph(const uint8_t* serializedGraph, size_t graphByteSize);
 
-    virtual hipdnnPluginConstData_t get_serialized_graph() const;
-    virtual hipdnnHandle_t get_handle() const;
+    virtual hipdnnPluginConstData_t getSerializedGraph() const;
+    virtual hipdnnHandle_t getHandle() const;
 
-    static hipdnnBackendDescriptorType_t get_static_type();
+    static hipdnnBackendDescriptorType_t getStaticType();
 };
 }

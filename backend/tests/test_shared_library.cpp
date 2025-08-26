@@ -29,52 +29,52 @@ const std::string FULL_LIBRARY_PATH
 
 TEST(SharedLibraryTest, LoadLibrary)
 {
-    plugin::Shared_library library;
+    plugin::SharedLibrary library;
     library.load(LIBRARY_PATH);
     library.unload();
 }
 
 TEST(SharedLibraryTest, LoadLibraryCtor)
 {
-    plugin::Shared_library library(LIBRARY_PATH);
+    plugin::SharedLibrary library(LIBRARY_PATH);
 }
 
 TEST(SharedLibraryTest, LoadLibraryWrongPath)
 {
-    plugin::Shared_library library;
+    plugin::SharedLibrary library;
     ASSERT_THROW_HIPDNN_STATUS(library.load(WRONG_LIBRARY_PATH), HIPDNN_STATUS_PLUGIN_ERROR);
     library.unload();
 }
 
 TEST(SharedLibraryTest, LoadLibraryCtorWrongPath)
 {
-    ASSERT_THROW_HIPDNN_STATUS(plugin::Shared_library(WRONG_LIBRARY_PATH),
+    ASSERT_THROW_HIPDNN_STATUS(plugin::SharedLibrary(WRONG_LIBRARY_PATH),
                                HIPDNN_STATUS_PLUGIN_ERROR);
 }
 
 TEST(SharedLibraryTest, GetSymbol)
 {
-    plugin::Shared_library library(LIBRARY_PATH);
+    plugin::SharedLibrary library(LIBRARY_PATH);
 
     ASSERT_NO_THROW(library.get_symbol(SYMBOL_NAME));
 }
 
 TEST(SharedLibraryTest, GetSymbolUninitialized)
 {
-    plugin::Shared_library library;
+    plugin::SharedLibrary library;
     ASSERT_THROW_HIPDNN_STATUS(library.get_symbol(SYMBOL_NAME), HIPDNN_STATUS_INTERNAL_ERROR);
 }
 
 TEST(SharedLibraryTest, GetSymbolWrongName)
 {
-    plugin::Shared_library library(LIBRARY_PATH);
+    plugin::SharedLibrary library(LIBRARY_PATH);
 
     ASSERT_THROW_HIPDNN_STATUS(library.get_symbol(WRONG_SYMBOL_NAME), HIPDNN_STATUS_PLUGIN_ERROR);
 }
 
 TEST(SharedLibraryTest, CallFunction)
 {
-    plugin::Shared_library library(LIBRARY_PATH);
+    plugin::SharedLibrary library(LIBRARY_PATH);
 
     // Get the function pointer
     using Func_type = hipdnnPluginStatus_t (*)(const char**);
@@ -109,7 +109,7 @@ class Shared_library_path_test : public ::testing::TestWithParam<std::string>
 TEST_P(Shared_library_path_test, LoadWithValidPathFormats)
 {
     const auto& path_param = GetParam();
-    plugin::Shared_library library;
+    plugin::SharedLibrary library;
     ASSERT_NO_THROW(library.load(path_param));
 }
 

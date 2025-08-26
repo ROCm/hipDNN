@@ -11,30 +11,30 @@ namespace hipdnn_backend
 namespace plugin
 {
 
-Shared_library::Shared_library()
-    : _library_handle(nullptr)
+SharedLibrary::SharedLibrary()
+    : _libraryHandle(nullptr)
 {
     // Default constructor does nothing
 }
 
-Shared_library::Shared_library(const std::filesystem::path& library_path)
-    : _library_handle(nullptr)
+SharedLibrary::SharedLibrary(const std::filesystem::path& libraryPath)
+    : _libraryHandle(nullptr)
 {
-    load(library_path);
+    load(libraryPath);
 }
 
-Shared_library::Shared_library(Shared_library&& other) noexcept
-    : _library_handle(other._library_handle)
+SharedLibrary::SharedLibrary(SharedLibrary&& other) noexcept
+    : _libraryHandle(other._libraryHandle)
 {
-    other._library_handle = nullptr;
+    other._libraryHandle = nullptr;
 }
 
-Shared_library::~Shared_library()
+SharedLibrary::~SharedLibrary()
 {
     unload();
 }
 
-Shared_library& Shared_library::operator=(Shared_library&& other) noexcept
+SharedLibrary& SharedLibrary::operator=(SharedLibrary&& other) noexcept
 {
     if(this != &other)
     {
@@ -42,8 +42,8 @@ Shared_library& Shared_library::operator=(Shared_library&& other) noexcept
         unload();
 
         // Transfer ownership
-        _library_handle = other._library_handle;
-        other._library_handle = nullptr;
+        _libraryHandle = other._libraryHandle;
+        other._libraryHandle = nullptr;
     }
     return *this;
 }
@@ -51,19 +51,19 @@ Shared_library& Shared_library::operator=(Shared_library&& other) noexcept
 // This function loads a shared library from the specified path.
 // On Windows, it adds a ".dll" extension if no extension exists.
 // On Linux, it adds a "lib" prefix to the filename and a ".so" extension if no extension exists.
-void Shared_library::load(const std::filesystem::path& library_path)
+void SharedLibrary::load(const std::filesystem::path& libraryPath)
 {
-    if(_library_handle != nullptr)
+    if(_libraryHandle != nullptr)
     {
         throw Hipdnn_exception(HIPDNN_STATUS_INTERNAL_ERROR, "Library is already loaded.");
     }
 
-    auto modified_library_path = library_path;
+    auto modifiedLibraryPath = libraryPath;
 
     // Check file extension and add prefix/suffix if needed
-    if(modified_library_path.has_extension())
+    if(modifiedLibraryPath.has_extension())
     {
-        if(modified_library_path.extension() != hipdnn_sdk::utilities::SHARED_LIB_EXT)
+        if(modifiedLibraryPath.extension() != hipdnn_sdk::utilities::SHARED_LIB_EXT)
         {
             throw Hipdnn_exception(HIPDNN_STATUS_BAD_PARAM,
                                    std::string("Invalid file extension. Expected ")
@@ -72,52 +72,51 @@ void Shared_library::load(const std::filesystem::path& library_path)
     }
     else
     {
-        auto library_name = hipdnn_sdk::utilities::get_library_name(
-            modified_library_path.filename().string().c_str());
-        modified_library_path = modified_library_path.parent_path() / library_name;
+        auto libraryName = hipdnn_sdk::utilities::get_library_name(
+            modifiedLibraryPath.filename().string().c_str());
+        modifiedLibraryPath = modifiedLibraryPath.parent_path() / libraryName;
     }
 
-    _library_path = std::filesystem::weakly_canonical(modified_library_path);
+    _libraryPath = std::filesystem::weakly_canonical(modifiedLibraryPath);
 
     // Needs to be a resolved, weakly canonical path at this point
-    if(!std::filesystem::exists(_library_path))
+    if(!std::filesystem::exists(_libraryPath))
     {
         throw Hipdnn_exception(HIPDNN_STATUS_PLUGIN_ERROR,
                                "Shared libary: plugin file does not exist: "
-                                   + _library_path.string());
+                                   + _libraryPath.string());
     }
 
-    HIPDNN_LOG_INFO(
-        "Shared_library: Attempting to load shared library from final absolute path: {}",
-        _library_path.string());
+    HIPDNN_LOG_INFO("SharedLibrary: Attempting to load shared library from final absolute path: {}",
+                    _libraryPath.string());
 
-    _library_handle = platform_utils::open_library(_library_path);
+    _libraryHandle = platform_utils::open_library(_libraryPath);
 }
 
-void Shared_library::unload() noexcept
+void SharedLibrary::unload() noexcept
 {
-    if(_library_handle != nullptr)
+    if(_libraryHandle != nullptr)
     {
-        platform_utils::close_library(_library_handle);
-        _library_handle = nullptr;
+        platform_utils::close_library(_libraryHandle);
+        _libraryHandle = nullptr;
     }
 }
 
-void* Shared_library::get_symbol(std::string_view symbol_name) const
+void* SharedLibrary::get_symbol(std::string_view symbol_name) const
 {
-    if(_library_handle == nullptr)
+    if(_libraryHandle == nullptr)
     {
         throw Hipdnn_exception(HIPDNN_STATUS_INTERNAL_ERROR,
                                "Library is not loaded. Cannot get symbol: "
                                    + std::string(symbol_name));
     }
 
-    return platform_utils::get_symbol(_library_handle, symbol_name.data());
+    return platform_utils::get_symbol(_libraryHandle, symbol_name.data());
 }
 
-const std::filesystem::path& Shared_library::library_path() const
+const std::filesystem::path& SharedLibrary::libraryPath() const
 {
-    return _library_path;
+    return _libraryPath;
 }
 
 } // namespace plugin
