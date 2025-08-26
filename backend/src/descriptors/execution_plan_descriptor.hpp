@@ -9,57 +9,57 @@
 namespace hipdnn_backend
 {
 
-class Engine_config_descriptor;
+class EngineConfigDescriptor;
 
 namespace plugin
 {
-class Engine_execution_context_wrapper;
+class EngineExecutionContextWrapper;
 }
 
-class Execution_plan_descriptor : public hipdnnBackendDescriptorImpl<Execution_plan_descriptor>
+class ExecutionPlanDescriptor : public HipdnnBackendDescriptorImpl<ExecutionPlanDescriptor>
 {
 private:
     hipdnnHandle_t _handle = nullptr;
-    std::shared_ptr<const Engine_config_descriptor> _engine_config;
-    std::shared_ptr<const plugin::Engine_execution_context_wrapper> _execution_context;
+    std::shared_ptr<const EngineConfigDescriptor> _engineConfig;
+    std::shared_ptr<const plugin::EngineExecutionContextWrapper> _executionContext;
 
-    void get_workspace_size(hipdnnBackendAttributeType_t attribute_type,
-                            int64_t requested_element_count,
-                            int64_t* element_count,
-                            void* array_of_elements) const;
+    void getWorkspaceSize(hipdnnBackendAttributeType_t attributeType,
+                          int64_t requestedElementCount,
+                          int64_t* elementCount,
+                          void* arrayOfElements) const;
 
-    void set_handle(hipdnnBackendAttributeType_t attribute_type,
-                    int64_t element_count,
-                    const void* array_of_elements);
+    void setHandle(hipdnnBackendAttributeType_t attributeType,
+                   int64_t elementCount,
+                   const void* arrayOfElements);
 
-    void set_engine_config(hipdnnBackendAttributeType_t attribute_type,
-                           int64_t element_count,
-                           const void* array_of_elements);
+    void setEngineConfig(hipdnnBackendAttributeType_t attributeType,
+                         int64_t elementCount,
+                         const void* arrayOfElements);
 
-    void get_engine_config(hipdnnBackendAttributeType_t attribute_type,
-                           int64_t requested_element_count,
-                           int64_t* element_count,
-                           void* array_of_elements) const;
+    void getEngineConfig(hipdnnBackendAttributeType_t attributeType,
+                         int64_t requestedElementCount,
+                         int64_t* elementCount,
+                         void* arrayOfElements) const;
 
 public:
     void finalize() override;
 
-    void get_attribute(hipdnnBackendAttributeName_t attribute_name,
-                       hipdnnBackendAttributeType_t attribute_type,
-                       int64_t requested_element_count,
-                       int64_t* element_count,
-                       void* array_of_elements) const override;
+    void getAttribute(hipdnnBackendAttributeName_t attributeName,
+                      hipdnnBackendAttributeType_t attributeType,
+                      int64_t requestedElementCount,
+                      int64_t* elementCount,
+                      void* arrayOfElements) const override;
 
-    void set_attribute(hipdnnBackendAttributeName_t attribute_name,
-                       hipdnnBackendAttributeType_t attribute_type,
-                       int64_t element_count,
-                       const void* array_of_elements) override;
+    void setAttribute(hipdnnBackendAttributeName_t attributeName,
+                      hipdnnBackendAttributeType_t attributeType,
+                      int64_t elementCount,
+                      const void* arrayOfElements) override;
 
     // Throws an exception if the descriptor is not finalized.
-    virtual std::shared_ptr<const Engine_config_descriptor> get_engine_config() const;
-    virtual hipdnnEnginePluginExecutionContext_t get_execution_context() const;
+    virtual std::shared_ptr<const EngineConfigDescriptor> getEngineConfig() const;
+    virtual hipdnnEnginePluginExecutionContext_t getExecutionContext() const;
 
-    static hipdnnBackendDescriptorType_t get_static_type();
+    static hipdnnBackendDescriptorType_t getStaticType();
 };
 
 } // namespace hipdnn_backend

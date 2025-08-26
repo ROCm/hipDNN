@@ -17,22 +17,22 @@ namespace hipdnn_backend
 namespace plugin
 {
 
-class Mock_engine_plugin_manager : public Engine_plugin_manager
+class Mock_engine_plugin_manager : public EnginePluginManager
 {
 public:
     MOCK_METHOD(void,
-                load_plugins,
+                loadPlugins,
                 (const std::set<std::filesystem::path>& custom_paths,
                  hipdnnPluginLoadingMode_ext_t mode),
                 (override));
 
-    MOCK_METHOD(const std::vector<std::shared_ptr<Engine_plugin>>&,
-                get_plugins,
+    MOCK_METHOD(const std::vector<std::shared_ptr<EnginePlugin>>&,
+                getPlugins,
                 (),
                 (const, override));
 
     MOCK_METHOD(const std::set<std::filesystem::path>&,
-                get_loaded_plugin_files,
+                getLoadedPluginFiles,
                 (),
                 (const, override));
 };

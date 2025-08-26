@@ -4,26 +4,26 @@
 
 namespace hipdnn_backend
 {
-struct Scoped_descriptor
+struct ScopedDescriptor
 {
     hipdnnBackendDescriptor_t descriptor = nullptr;
-    Scoped_descriptor() = default;
-    explicit Scoped_descriptor(hipdnnBackendDescriptor_t desc)
+    ScopedDescriptor() = default;
+    explicit ScopedDescriptor(hipdnnBackendDescriptor_t desc)
         : descriptor(desc)
     {
     }
-    ~Scoped_descriptor()
+    ~ScopedDescriptor()
     {
         delete descriptor;
     }
-    Scoped_descriptor(const Scoped_descriptor&) = delete;
-    Scoped_descriptor& operator=(const Scoped_descriptor&) = delete;
-    Scoped_descriptor(Scoped_descriptor&& other) noexcept
+    ScopedDescriptor(const ScopedDescriptor&) = delete;
+    ScopedDescriptor& operator=(const ScopedDescriptor&) = delete;
+    ScopedDescriptor(ScopedDescriptor&& other) noexcept
     {
         descriptor = other.descriptor;
         other.descriptor = nullptr;
     }
-    Scoped_descriptor& operator=(Scoped_descriptor&& other) noexcept
+    ScopedDescriptor& operator=(ScopedDescriptor&& other) noexcept
     {
         if(this != &other)
         {
@@ -37,7 +37,7 @@ struct Scoped_descriptor
     {
         return descriptor;
     }
-    hipdnnBackendDescriptor_t* get_ptr()
+    hipdnnBackendDescriptor_t* getPtr()
     {
         return &descriptor;
     }

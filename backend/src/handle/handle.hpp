@@ -15,11 +15,10 @@ public:
     virtual ~hipdnnHandle() = default;
     virtual void set_stream(hipStream_t stream);
     virtual hipStream_t get_stream() const;
-    virtual std::shared_ptr<hipdnn_backend::plugin::Engine_plugin_resource_manager>
+    virtual std::shared_ptr<hipdnn_backend::plugin::EnginePluginResourceManager>
         get_plugin_resource_manager() const;
 
 private:
     hipStream_t _stream = nullptr;
-    std::shared_ptr<hipdnn_backend::plugin::Engine_plugin_resource_manager>
-        _plugin_resource_manager;
+    std::shared_ptr<hipdnn_backend::plugin::EnginePluginResourceManager> _plugin_resource_manager;
 };

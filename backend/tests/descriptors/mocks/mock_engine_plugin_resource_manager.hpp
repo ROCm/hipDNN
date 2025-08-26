@@ -11,43 +11,43 @@ namespace hipdnn_backend
 namespace plugin
 {
 
-class Mock_engine_plugin_resource_manager : public Engine_plugin_resource_manager
+class Mock_engine_plugin_resource_manager : public EnginePluginResourceManager
 {
 public:
-    MOCK_METHOD(void, set_stream, (hipStream_t stream), (const, override));
+    MOCK_METHOD(void, setStream, (hipStream_t stream), (const, override));
     MOCK_METHOD(void,
-                execute_op_graph,
-                (hipdnnBackendDescriptor_t execution_plan, hipdnnBackendDescriptor_t variant_pack),
+                executeOpGraph,
+                (hipdnnBackendDescriptor_t executionPlan, hipdnnBackendDescriptor_t variantPack),
                 (const, override));
     MOCK_METHOD(std::vector<int64_t>,
-                get_applicable_engine_ids,
-                (const hipdnn_backend::Graph_descriptor* graph_desc),
+                getApplicableEngineIds,
+                (const hipdnn_backend::GraphDescriptor* graphDesc),
                 (const, override));
     MOCK_METHOD(void,
-                get_engine_details,
-                (int64_t engine_id,
-                 const hipdnn_backend::Graph_descriptor* graph_desc,
-                 hipdnnPluginConstData_t* engine_details),
+                getEngineDetails,
+                (int64_t engineId,
+                 const hipdnn_backend::GraphDescriptor* graphDesc,
+                 hipdnnPluginConstData_t* engineDetails),
                 (const, override));
     MOCK_METHOD(void,
-                destroy_engine_details,
-                (int64_t engine_id, hipdnnPluginConstData_t* engine_details),
+                destroyEngineDetails,
+                (int64_t engineId, hipdnnPluginConstData_t* engineDetails),
                 (const, override));
     MOCK_METHOD(size_t,
-                get_workspace_size,
-                (int64_t engine_id,
-                 const hipdnnPluginConstData_t* engine_config,
-                 const hipdnn_backend::Graph_descriptor* graph_desc),
+                getWorkspaceSize,
+                (int64_t engineId,
+                 const hipdnnPluginConstData_t* engineConfig,
+                 const hipdnn_backend::GraphDescriptor* graphDesc),
                 (const, override));
     MOCK_METHOD(hipdnnEnginePluginExecutionContext_t,
-                create_execution_context,
-                (int64_t engine_id,
-                 const hipdnnPluginConstData_t* engine_config,
-                 const hipdnn_backend::Graph_descriptor* graph_desc),
+                createExecutionContext,
+                (int64_t engineId,
+                 const hipdnnPluginConstData_t* engineConfig,
+                 const hipdnn_backend::GraphDescriptor* graphDesc),
                 (const, override));
     MOCK_METHOD(void,
-                destroy_execution_context,
-                (int64_t engine_id, hipdnnEnginePluginExecutionContext_t execution_context),
+                destroyExecutionContext,
+                (int64_t engineId, hipdnnEnginePluginExecutionContext_t executionContext),
                 (const, override));
 };
 

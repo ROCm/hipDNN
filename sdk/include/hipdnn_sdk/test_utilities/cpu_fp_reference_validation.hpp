@@ -36,8 +36,8 @@ public:
 
     ~Cpu_fp_reference_validation() override = default;
 
-    bool compare_buffers(Migratable_memory_interface<T>& reference,
-                         Migratable_memory_interface<T>& implementation) override
+    bool all_close(Migratable_memory_interface<T>& reference,
+                   Migratable_memory_interface<T>& implementation) override
     {
         if(reference.count() != implementation.count())
         {
@@ -51,25 +51,24 @@ public:
 
         for(size_t i = 0; i < element_count; ++i)
         {
-
             T ref_value = ref_data[i];
             T impl_value = impl_data[i];
 
-            T abs_diff = std::fabs(ref_value - impl_value);
+            T abs_diff = std::fabs(impl_value - ref_value);
+            T threshold = _absolute_tolerance + _relative_tolerance * std::fabs(ref_value);
 
-            if(abs_diff > _absolute_tolerance
-               && abs_diff
-                      > _relative_tolerance * std::max(std::fabs(ref_value), std::fabs(impl_value)))
+            if(abs_diff > threshold)
             {
                 HIPDNN_LOG_ERROR("Validation failed at index {}: reference value = {}, "
                                  "implementation value = {}, "
-                                 "absolute difference = {}, relative difference = {}",
+                                 "absolute difference = {}, threshold = {} (atol={}, rtol={})",
                                  i,
                                  ref_value,
                                  impl_value,
                                  abs_diff,
-                                 _relative_tolerance
-                                     * std::max(std::fabs(ref_value), std::fabs(impl_value)));
+                                 threshold,
+                                 _absolute_tolerance,
+                                 _relative_tolerance);
                 return false;
             }
         }

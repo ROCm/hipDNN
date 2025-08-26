@@ -16,6 +16,7 @@ endif()
 
 add_executable(miopen_plugin_integration_test
     main.cpp
+    batchnorm_bwd_integration_test.cpp
     batchnorm_fwd_inference_integration_test.cpp
 )
 

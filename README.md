@@ -1,34 +1,73 @@
 # hipDNN
 
-# EARLY ADOPTER WARNING
-**Hipdnn is in the early stages of development, there is currently very limited or no functionality available to solve problems**
+> [!CAUTION]
+> **hipDNN is in the early stages of development. There is currently limited functionality available to solve problems. See [Operation Support](./docs/OperationSupport.md) for reference.**
+
+## Overview
+
+hipDNN is a graph-based deep learning library for AMD GPUs that leverages a flexible plugin architecture to provide optimized implementations and utilities for various routines. 
+
+---
+
+## Table of Contents
+
+- [Getting Started](#getting-started)
+- [Documentation](#documentation)
+  - [User Guides](#user-guides)
+  - [Developer Guides](#developer-guides)
+  - [Testing](#testing)
+- [Project Structure](#project-structure)
+- [Contributing](#contributing)
+
+---
 
 ## Getting Started
-The fastest way to get started with hipdnn is to follow the [quick start steps in the build guide](./docs/Building.md#quickstart-building-and-installing-hipdnn)
 
-## Building
-The full build steps are documented in the [Building.md](./docs/Building.md) file.
+The fastest way to get started with hipDNN is to follow the [quick start steps in the build guide](./docs/Building.md#quick-start-guide).
 
-## Design
-The overall design of hipDNN is documented in the [Design.md](./docs/Design.md) file.  This document includes the overall
-architecture of the library.
+---
 
-## Plugin Development
-If you are interested in writing a plugin for hipDNN, please see the [Plugin Development](./docs/PluginDevelopment.md) document.
+## Documentation
 
-## Logging
-There are two environment variables that control the logging in hipDNN. 
+### User Guides
+- **[Building](./docs/Building.md)** - Prerequisites, build configurations, and platform-specific instructions
+- **[How-To](./docs/HowTo.md)** - Using hipDNN components and extending the framework
+- **[Environment Configuration](./docs/Environment.md)** - Runtime configuration and logging setup
+- **[Operation Support](./docs/OperationSupport.md)** - Currently supported operations and their status
+- **[Samples](./samples/README.md)** - Frontend usage examples
 
-`HIPDNN_LOG_LEVEL`: This controls the level of logging.  The supported levels are:
-- `off`: no logging
-- `info`: info level logging
-- `warn`: warning level logging
-- `error`: error level logging
-- `fatal`: fatal level logging
+### Developer Guides
+- **[Design Overview](./docs/Design.md)** - Architecture and design descriptions and diagrams
+- **[Extending hipDNN](./docs/HowTo.md#extending-hipdnn)** - How to extend hipDNN functionality
+- **[Plugin Development](./docs/PluginDevelopment.md)** - Creating and using custom plugins for hipDNN
+- **[Roadmap](./docs/Roadmap.md)** - Feature priorities and development plans
 
-If the log level is not set, then the default log level is `off`.
+### Testing
+- **[Testing](./docs/Testing.md)** - Synopsis of testing information
+- **[Testing Strategy](./docs/testing/TestingStrategy.md)** - Specific testing approach
+- **[Test Plan](./docs/testing/TestPlan.md)** - Detailed test planning
+- **[Test Run Template](./docs/testing/TestRunTemplate.md)** - Guidelines for test execution
 
-`HIPDNN_LOG_FILE`: this controls the path to the file where logs will be **appended**.  If this is not set, logs will go to `stderr`.
+---
 
-### Frontend and Plugin Logging.
-The frontend and plugins log to the same file as the backend but they will have to setup the logger themselves via the `initialize_callback_logging` function. The user should pass the backend API call `hipdnnLoggingCallback_ext` as the callback function to have the logs all output to the same destination.
+## Project Structure
+
+hipDNN is organized into several key components. For detailed architecture descriptions, see the [Design Overview](./docs/Design.md).
+
+| Component | Description |
+|-----------|-------------|
+| **[Backend](./backend/)** | Core shared library providing C API for operation graphs and managing plugins |
+| **[Frontend](./frontend/)** | Header-only C++ API wrapper around the backend |
+| **[SDK](./sdk/)** | Header-only library for plugin development and utilities |
+| **[Plugins](./plugins/)** | Plugin implementations, including [MIOpen Legacy Plugin](./plugins/miopen_legacy_plugin/) |
+| **[Samples](./samples/)** | Example implementations demonstrating hipDNN usage |
+| **[Tests](./tests/)** | Tests for the public API (incl. frontend integration tests) |
+
+### Docker Support
+See [Docker README](./dockerfiles/README.md) for containerized development environments.
+
+---
+
+## Contributing
+
+For information about contributing to the hipDNN project, please see the [Contributing Guide](./CONTRIBUTING.md).

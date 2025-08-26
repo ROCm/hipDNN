@@ -26,41 +26,41 @@ namespace hipdnn_backend
 namespace plugin
 {
 
-// The Plugin_base is the base class for all plugins.
-class Plugin_base
+// The PluginBase is the base class for all plugins.
+class PluginBase
 {
 protected:
     // The constructor is protected to prevent direct instantiation of the class.
-    Plugin_base(Shared_library&& lib);
+    PluginBase(SharedLibrary&& lib);
 
     // This constructor is used for mocking purposes in tests.
-    Plugin_base();
+    PluginBase();
 
 public:
     // Prevent copying
-    Plugin_base(const Plugin_base&) = delete;
-    Plugin_base& operator=(const Plugin_base&) = delete;
+    PluginBase(const PluginBase&) = delete;
+    PluginBase& operator=(const PluginBase&) = delete;
 
     // Allow moving
-    Plugin_base(Plugin_base&& other) = default;
-    Plugin_base& operator=(Plugin_base&& other) = default;
+    PluginBase(PluginBase&& other) = default;
+    PluginBase& operator=(PluginBase&& other) = default;
 
-    virtual ~Plugin_base() = default;
+    virtual ~PluginBase() = default;
 
     std::string_view name() const;
     std::string_view version() const;
     hipdnnPluginType_t type() const;
 
-    static hipdnnPluginType_t get_plugin_type();
+    static hipdnnPluginType_t getPluginType();
 
-    hipdnnPluginStatus_t set_logging_callback(hipdnnCallback_t callback) const;
+    hipdnnPluginStatus_t setLoggingCallback(hipdnnCallback_t callback) const;
 
 protected:
     // This function must not throw as it is used during error handling.
-    std::string_view get_last_error_string() const noexcept;
+    std::string_view getLastErrorString() const noexcept;
 
     template <typename Callable, typename... Args>
-    void invoke_plugin_function(const char* description, Callable&& func, Args&&... args) const
+    void invokePluginFunction(const char* description, Callable&& func, Args&&... args) const
     {
         auto status = func(std::forward<Args>(args)...);
         if(status != HIPDNN_PLUGIN_STATUS_SUCCESS)
@@ -68,45 +68,44 @@ protected:
             throw Hipdnn_exception(HIPDNN_STATUS_PLUGIN_ERROR,
                                    std::string("Failed to ") + description + ". Status: "
                                        + to_string(status) + "(" + std::to_string(status) + ")"
-                                       + ", Error: " + std::string(get_last_error_string()));
+                                       + ", Error: " + std::string(getLastErrorString()));
         }
     }
 
-    Shared_library _lib;
+    SharedLibrary _lib;
 
 private:
-    void resolve_symbols();
+    void resolveSymbols();
 
 #ifndef NDEBUG
     bool _initialized = false;
 #endif
-    hipdnnPluginStatus_t (*_func_get_name)(const char**);
-    hipdnnPluginStatus_t (*_func_get_version)(const char**);
-    hipdnnPluginStatus_t (*_func_get_type)(hipdnnPluginType_t*);
-    void (*_func_get_last_error_str)(const char**);
-    hipdnnPluginStatus_t (*_func_set_logging_callback)(hipdnnCallback_t);
+    hipdnnPluginStatus_t (*_funcGetName)(const char**);
+    hipdnnPluginStatus_t (*_funcGetVersion)(const char**);
+    hipdnnPluginStatus_t (*_funcGetType)(hipdnnPluginType_t*);
+    void (*_funcGetLastErrorStr)(const char**);
+    hipdnnPluginStatus_t (*_funcSetLoggingCallback)(hipdnnCallback_t);
 };
 
-// The Plugin_manager_base is responsible for loading and unloading plugins. This class is the base class for all plugin managers.
+// The PluginManagerBase is responsible for loading and unloading plugins. This class is the base class for all plugin managers.
 template <class Plugin>
-class Plugin_manager_base
+class PluginManagerBase
 {
-    static_assert(std::is_base_of_v<Plugin_base, Plugin>,
-                  "Plugin must be derived from Plugin_base");
+    static_assert(std::is_base_of_v<PluginBase, Plugin>, "Plugin must be derived from PluginBase");
 
 protected:
-    explicit Plugin_manager_base(std::set<std::filesystem::path> default_paths)
-        : _default_plugin_paths(std::move(default_paths))
+    explicit PluginManagerBase(std::set<std::filesystem::path> defaultPaths)
+        : _defaultPluginPaths(std::move(defaultPaths))
     {
     }
 
     // TODO: figure out how to ignore cognitive complexity warnings induced by logging macros
-    std::set<std::filesystem::path> resolve_default_paths() const
+    std::set<std::filesystem::path> resolveDefaultPaths() const
     {
-        std::filesystem::path base_dir;
+        std::filesystem::path baseDir;
         try
         {
-            base_dir = hipdnn_backend::platform_utils::get_current_module_directory();
+            baseDir = hipdnn_backend::platform_utils::get_current_module_directory();
         }
         catch(const Hipdnn_exception& e)
         {
@@ -114,68 +113,68 @@ protected:
                 "Failed to resolve module directory, will use unresolved default paths: {}",
                 e.get_message());
             // Fallback to using original, unresolved paths. TODO: possibly remove.
-            return _default_plugin_paths;
+            return _defaultPluginPaths;
         }
 
-        std::set<std::filesystem::path> resolved_paths;
+        std::set<std::filesystem::path> resolvedPaths;
 
-        for(const auto& path : _default_plugin_paths)
+        for(const auto& path : _defaultPluginPaths)
         {
-            resolved_paths.insert(path.is_relative() ? base_dir / path : path);
+            resolvedPaths.insert(path.is_relative() ? baseDir / path : path);
         }
 
-        return resolved_paths;
+        return resolvedPaths;
     }
 
     // This function is called before adding a plugin to the plugin list.
     // The function must throw Hipdnn_exception if the plugin is not valid.
-    virtual void validate_before_adding(const Plugin& plugin)
+    virtual void validateBeforeAdding(const Plugin& plugin)
     {
         std::ignore = plugin;
     }
 
     // This function is called after the plugin is added to the plugin list.
-    virtual void action_after_adding(const Plugin& plugin)
+    virtual void actionAfterAdding(const Plugin& plugin)
     {
         std::ignore = plugin;
     }
 
 public:
-    virtual ~Plugin_manager_base() = default;
+    virtual ~PluginManagerBase() = default;
 
-    virtual void load_plugins(const std::set<std::filesystem::path>& custom_paths,
-                              hipdnnPluginLoadingMode_ext_t mode)
+    virtual void loadPlugins(const std::set<std::filesystem::path>& customPaths,
+                             hipdnnPluginLoadingMode_ext_t mode)
     {
-        std::set<std::filesystem::path> paths_to_load;
+        std::set<std::filesystem::path> pathsToLoad;
 
         if(mode == HIPDNN_PLUGIN_LOADING_ADDITIVE)
         {
             // Default paths are resolved relative to the shared libary path, and are therefore handled separately.
-            auto default_paths = resolve_default_paths();
-            for(const auto& path : default_paths)
+            auto defaultPaths = resolveDefaultPaths();
+            for(const auto& path : defaultPaths)
             {
                 HIPDNN_LOG_INFO("Scanning default plugin path: {}", path.string());
 
                 if(std::filesystem::is_directory(path))
                 {
-                    scan_directory_for_plugins(path, paths_to_load);
+                    scan_directory_for_plugins(path, pathsToLoad);
                 }
             }
         }
 
-        for(const auto& path : custom_paths)
+        for(const auto& path : customPaths)
         {
             try
             {
-                auto resolved_path = std::filesystem::weakly_canonical(path);
-                if(std::filesystem::is_directory(resolved_path))
+                auto resolvedPath = std::filesystem::weakly_canonical(path);
+                if(std::filesystem::is_directory(resolvedPath))
                 {
-                    scan_directory_for_plugins(resolved_path, paths_to_load);
+                    scan_directory_for_plugins(resolvedPath, pathsToLoad);
                 }
                 // Cannot necessarily check that a custom file path exists, because it can be platform opaque
-                else if(!resolved_path.filename().empty())
+                else if(!resolvedPath.filename().empty())
                 {
-                    paths_to_load.insert(resolved_path);
+                    pathsToLoad.insert(resolvedPath);
                 }
                 else
                 {
@@ -193,65 +192,65 @@ public:
 
         if(mode == HIPDNN_PLUGIN_LOADING_ABSOLUTE)
         {
-            clear_plugins();
+            clearPlugins();
         }
 
-        for(const auto& path : paths_to_load)
+        for(const auto& path : pathsToLoad)
         {
             load_plugin_from_file(path);
         }
     }
 
-    virtual const std::vector<std::shared_ptr<Plugin>>& get_plugins() const
+    virtual const std::vector<std::shared_ptr<Plugin>>& getPlugins() const
     {
         return _plugins;
     }
 
-    virtual const std::set<std::filesystem::path>& get_loaded_plugin_files() const
+    virtual const std::set<std::filesystem::path>& getLoadedPluginFiles() const
     {
-        return _loaded_plugin_files;
+        return _loadedPluginFiles;
     }
 
 private:
-    void clear_plugins()
+    void clearPlugins()
     {
         _plugins.clear();
-        _loaded_plugin_files.clear();
+        _loadedPluginFiles.clear();
     }
 
-    void scan_directory_for_plugins(const std::filesystem::path& dir_path,
-                                    std::set<std::filesystem::path>& paths_to_load) const
+    void scan_directory_for_plugins(const std::filesystem::path& dirPath,
+                                    std::set<std::filesystem::path>& pathsToLoad) const
     {
         try
         {
-            for(const auto& entry : std::filesystem::directory_iterator(dir_path))
+            for(const auto& entry : std::filesystem::directory_iterator(dirPath))
             {
                 const auto& path = entry.path();
                 if(entry.is_regular_file()
                    && path.extension() == hipdnn_sdk::utilities::SHARED_LIB_EXT)
                 {
-                    paths_to_load.insert(std::filesystem::weakly_canonical(path));
+                    pathsToLoad.insert(std::filesystem::weakly_canonical(path));
                 }
             }
         }
         catch(const std::filesystem::filesystem_error& e)
         {
-            HIPDNN_LOG_WARN("Error scanning plugin directory {}: {}", dir_path.string(), e.what());
+            HIPDNN_LOG_WARN("Error scanning plugin directory {}: {}", dirPath.string(), e.what());
         }
     }
 
-    void load_plugin_from_file(const std::filesystem::path& file_path)
+    void load_plugin_from_file(const std::filesystem::path& filePath)
     {
 
-        HIPDNN_LOG_INFO("Attempting to load plugin from [{}]", file_path.string());
+        HIPDNN_LOG_INFO("Attempting to load plugin from [{}]", filePath.string());
 
         try
         {
-            Shared_library lib(file_path);
-            const auto library_path = lib.library_path();
+            SharedLibrary lib(filePath);
+            const auto libraryPath = lib.libraryPath();
 
             // Shared library ensures an injective, weakly canonical mapping to a path
-            if(_loaded_plugin_files.contains(library_path))
+            if(_loadedPluginFiles.contains(libraryPath))
             {
                 return;
             }
@@ -263,40 +262,40 @@ private:
             const auto type = plugin->type();
 
             // For now only use engine or unspecified plugin types
-            if(type != Plugin::get_plugin_type())
+            if(type != Plugin::getPluginType())
             {
                 throw Hipdnn_exception(HIPDNN_STATUS_PLUGIN_ERROR,
                                        std::string("Plugin type mismatch: expected ")
-                                           + to_string(Plugin::get_plugin_type()) + ", got "
+                                           + to_string(Plugin::getPluginType()) + ", got "
                                            + to_string(type));
             }
 
-            plugin->set_logging_callback(logging::hipdnn_logging_callback);
+            plugin->setLoggingCallback(logging::hipdnn_logging_callback);
 
-            validate_before_adding(*plugin);
+            validateBeforeAdding(*plugin);
 
             _plugins.emplace_back(std::move(plugin));
-            _loaded_plugin_files.insert(library_path);
+            _loadedPluginFiles.insert(libraryPath);
 
-            HIPDNN_LOG_INFO("Plugin loaded successfully: {}", file_path.string());
+            HIPDNN_LOG_INFO("Plugin loaded successfully: {}", filePath.string());
             HIPDNN_LOG_INFO("Plugin info: name={}, version={}, type={}({})",
                             name,
                             version,
                             type,
                             static_cast<int>(type));
 
-            action_after_adding(*_plugins.back());
+            actionAfterAdding(*_plugins.back());
         }
         catch(const Hipdnn_exception& e)
         {
             HIPDNN_LOG_WARN(
-                "Error loading plugin from [{}]: {}", file_path.string(), e.get_message());
+                "Error loading plugin from [{}]: {}", filePath.string(), e.get_message());
         }
     }
 
     std::vector<std::shared_ptr<Plugin>> _plugins;
-    std::set<std::filesystem::path> _loaded_plugin_files;
-    std::set<std::filesystem::path> _default_plugin_paths;
+    std::set<std::filesystem::path> _loadedPluginFiles;
+    std::set<std::filesystem::path> _defaultPluginPaths;
 };
 
 } // namespace plugin

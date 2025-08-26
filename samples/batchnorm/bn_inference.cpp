@@ -44,7 +44,7 @@ void Sample_runner::operator()(const Tensor_layout& layout)
     auto inv_variance = create_tensor({1, C, 1, 1}, intermediate_type);
 
     auto bn_attributes = graph::Batchnorm_inference_attributes();
-    bn_attributes.name = "bn_inference_node";
+    bn_attributes.set_name("bn_inference_node");
 
     auto y = graph->batchnorm_inference(x, mean, inv_variance, scale, bias, bn_attributes);
     y->set_output(true).set_data_type(input_type);
@@ -129,9 +129,8 @@ void Sample_runner::operator()(const Tensor_layout& layout)
                 static_cast<InputType>(epsilon), static_cast<InputType>(epsilon));
 
         std::cout << "CPU reference validation "
-                  << (validator.compare_buffers(y_ref_tensor.memory(), y_tensor.memory())
-                          ? "successful"
-                          : "failed")
+                  << (validator.all_close(y_ref_tensor.memory(), y_tensor.memory()) ? "successful"
+                                                                                    : "failed")
                   << ".\n";
     }
 

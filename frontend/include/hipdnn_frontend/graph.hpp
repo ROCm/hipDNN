@@ -402,6 +402,11 @@ public:
                   std::shared_ptr<TensorAttributes> bias,
                   BatchnormAttributes attributes)
     {
+        if(attributes.name.empty())
+        {
+            attributes.name = "Batchnorm_" + std::to_string(_sub_nodes.size());
+        }
+
         auto y = output_tensor(attributes.name + "::Y");
         auto mean_out = output_tensor(attributes.name + "::MEAN");
         auto inv_variance_out = output_tensor(attributes.name + "::INV_VARIANCE");
@@ -439,6 +444,11 @@ public:
                            std::shared_ptr<TensorAttributes> scale,
                            BatchnormBackwardAttributes attributes)
     {
+        if(attributes.name.empty())
+        {
+            attributes.name = "BatchnormBackward_" + std::to_string(_sub_nodes.size());
+        }
+
         auto dx = output_tensor(attributes.name + "::DX");
         attributes.set_dx(dx);
 
@@ -459,19 +469,24 @@ public:
     }
 
     std::shared_ptr<TensorAttributes>
-        batchnorm_inference(std::shared_ptr<TensorAttributes> x,
+        batchnorm_inference(std::shared_ptr<TensorAttributes> x, // NOLINT
                             std::shared_ptr<TensorAttributes> mean,
-                            std::shared_ptr<TensorAttributes> inv_variance,
+                            std::shared_ptr<TensorAttributes> invVariance,
                             std::shared_ptr<TensorAttributes> scale,
                             std::shared_ptr<TensorAttributes> bias,
                             BatchnormInferenceAttributes attributes)
     {
-        auto y = attributes.outputs[BatchnormInferenceAttributes::output_names::y]
+        if(attributes.name.empty())
+        {
+            attributes.name = "BatchnormInference_" + std::to_string(_sub_nodes.size());
+        }
+
+        auto y = attributes.outputs[Batchnorm_inference_attributes::output_names::y]
             = output_tensor(attributes.name + "::Y");
         attributes.inputs[BatchnormInferenceAttributes::input_names::x] = std::move(x);
         attributes.inputs[BatchnormInferenceAttributes::input_names::mean] = std::move(mean);
         attributes.inputs[BatchnormInferenceAttributes::input_names::inv_variance]
-            = std::move(inv_variance);
+            = std::move(invVariance);
         attributes.inputs[BatchnormInferenceAttributes::input_names::scale] = std::move(scale);
         attributes.inputs[BatchnormInferenceAttributes::input_names::bias] = std::move(bias);
 

@@ -12,29 +12,28 @@
 namespace flatbuffer_test_utils
 {
 
-inline flatbuffers::FlatBufferBuilder create_valid_graph()
+inline flatbuffers::FlatBufferBuilder createValidGraph()
 {
-    std::vector<::flatbuffers::Offset<hipdnn_sdk::data_objects::TensorAttributes>>
-        tensor_attributes;
+    std::vector<::flatbuffers::Offset<hipdnn_sdk::data_objects::TensorAttributes>> tensorAttributes;
     std::vector<::flatbuffers::Offset<hipdnn_sdk::data_objects::Node>> nodes;
     flatbuffers::FlatBufferBuilder builder;
-    auto graph_offset
+    auto graphOffset
         = hipdnn_sdk::data_objects::CreateGraphDirect(builder,
                                                       "test",
                                                       hipdnn_sdk::data_objects::DataType_FLOAT,
                                                       hipdnn_sdk::data_objects::DataType_HALF,
                                                       hipdnn_sdk::data_objects::DataType_BFLOAT16,
-                                                      &tensor_attributes,
+                                                      &tensorAttributes,
                                                       &nodes);
-    builder.Finish(graph_offset);
+    builder.Finish(graphOffset);
     return builder;
 }
 
-inline flatbuffers::FlatBufferBuilder create_valid_engine_details(int64_t engine_id)
+inline flatbuffers::FlatBufferBuilder createValidEngineDetails(int64_t engineId)
 {
     flatbuffers::FlatBufferBuilder builder;
-    auto engine_details_offset = hipdnn_sdk::data_objects::CreateEngineDetails(builder, engine_id);
-    builder.Finish(engine_details_offset);
+    auto engineDetailsOffset = hipdnn_sdk::data_objects::CreateEngineDetails(builder, engineId);
+    builder.Finish(engineDetailsOffset);
     return builder;
 }
 
