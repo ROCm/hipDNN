@@ -12,6 +12,7 @@
 #include "hipdnn_backend_attribute_type.h"
 #include "hipdnn_backend_descriptor_type.h"
 #include "hipdnn_backend_heuristic_type.h"
+#include "hipdnn_backend_limits.h"
 #include "hipdnn_backend_plugin_loading_mode.h"
 #include "hipdnn_status.h"
 #include <hipdnn_sdk/logging/callback_types.h>
@@ -241,7 +242,7 @@ HIPDNN_BACKEND_EXPORT const char* hipdnnGetErrorString(hipdnnStatus_t status);
  *
  * This function copies the last error message associated with the calling thread into the provided
  * message buffer, up to max_size bytes (including the null terminator).
- * Note the max size for an error message is 256 characters.
+ * Note the max size for an error message is HIPDNN_MAX_ERROR_STRING_SIZE characters.
  * 
  * @param[out] message   Pointer to a character buffer where the error message will be copied.
  * @param[in]  max_size  Maximum number of bytes to copy, including the null terminator.
