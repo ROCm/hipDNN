@@ -100,8 +100,7 @@ TEST(GraphWrapperTest, GetTensorMapReturnsCorrectTensors)
 
     std::vector<int64_t> strides = {1, 1, 1, 1};
     std::vector<int64_t> dims = {1, 1, 1, 1};
-    std::vector<::flatbuffers::Offset<hipdnn_sdk::data_objects::TensorAttributes>>
-        tensorAttributes;
+    std::vector<::flatbuffers::Offset<hipdnn_sdk::data_objects::TensorAttributes>> tensorAttributes;
     tensorAttributes.push_back(hipdnn_sdk::data_objects::CreateTensorAttributesDirect(
         builder, 1, "x", hipdnn_sdk::data_objects::DataType_FLOAT, &strides, &dims));
     tensorAttributes.push_back(hipdnn_sdk::data_objects::CreateTensorAttributesDirect(
