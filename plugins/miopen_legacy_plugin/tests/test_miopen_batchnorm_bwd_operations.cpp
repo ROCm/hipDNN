@@ -130,10 +130,10 @@ void BatchnormBwdExecuteGraphTest::runBwdBatchnormGraph(
 
     PinnedTensor<IntermediateType> scaleTensor(derivedDims);
     deviceBuffers.push_back(generateRandomDeviceBuffer(scaleTensor,
-                                                          4,
-                                                          static_cast<IntermediateType>(-0.1f),
-                                                          static_cast<IntermediateType>(0.1f),
-                                                          seed));
+                                                       4,
+                                                       static_cast<IntermediateType>(-0.1f),
+                                                       static_cast<IntermediateType>(0.1f),
+                                                       seed));
 
     PinnedTensor<IntermediateType> dscaleTensor(derivedDims);
     deviceBuffers.push_back(generateEmptyDeviceBuffer(dscaleTensor, 5));
@@ -143,17 +143,17 @@ void BatchnormBwdExecuteGraphTest::runBwdBatchnormGraph(
 
     PinnedTensor<IntermediateType> meanTensor(derivedDims);
     deviceBuffers.push_back(generateRandomDeviceBuffer(meanTensor,
-                                                          7,
-                                                          static_cast<IntermediateType>(-0.1f),
-                                                          static_cast<IntermediateType>(0.1f),
-                                                          seed));
+                                                       7,
+                                                       static_cast<IntermediateType>(-0.1f),
+                                                       static_cast<IntermediateType>(0.1f),
+                                                       seed));
 
     PinnedTensor<IntermediateType> invVarianceTensor(derivedDims);
     deviceBuffers.push_back(generateRandomDeviceBuffer(invVarianceTensor,
-                                                          8,
-                                                          static_cast<IntermediateType>(1.9f),
-                                                          static_cast<IntermediateType>(2.0f),
-                                                          seed));
+                                                       8,
+                                                       static_cast<IntermediateType>(1.9f),
+                                                       static_cast<IntermediateType>(2.0f),
+                                                       seed));
 
     auto batchnormBuilder = flatbuffer_test_utils::create_valid_batchnorm_bwd_graph(
         dyTensor.strides(), dyTensor.dims(), true, inputDataType);

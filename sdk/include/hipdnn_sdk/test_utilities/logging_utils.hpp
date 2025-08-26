@@ -61,7 +61,7 @@ inline void initialize_spdlog_default_logger(const std::string& component_name)
 #ifndef DISABLE_TEST_LOGGING
     spdlog::drop_all();
     auto logger = spdlog::stdout_color_mt(component_name);
-    logger->set_formatter(std::make_unique<hipdnn::logging::Component_formatter>());
+    logger->set_formatter(std::make_unique<hipdnn::logging::ComponentFormatter>());
     spdlog::set_default_logger(logger);
     spdlog::set_level(spdlog::level::info); // Set default log level
 #endif

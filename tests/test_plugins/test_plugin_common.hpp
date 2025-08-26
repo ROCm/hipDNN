@@ -122,8 +122,7 @@ public:
             hipdnn_plugin::throwIfNull(callback);
             hipdnn_plugin::throwIfNull(get_instance());
 
-            hipdnn::logging::initialize_callback_logging(get_instance()->get_plugin_name(),
-                                                         callback);
+            hipdnn::logging::initializeCallbackLogging(get_instance()->get_plugin_name(), callback);
             LOG_API_SUCCESS(api_name, "");
         });
     }
