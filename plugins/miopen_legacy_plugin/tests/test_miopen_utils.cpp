@@ -15,9 +15,9 @@ TEST(MiopenUtilsTest, FindDeviceBufferReturnsCorrectBuffer)
         = {{.uid = 42, .ptr = reinterpret_cast<void*>(0x1234)},
            {.uid = 99, .ptr = reinterpret_cast<void*>(0x5678)}};
 
-    auto Result = miopen_utils::findDeviceBuffer(99, buffers.data(), 2);
-    EXPECT_EQ(Result.uid, 99);
-    EXPECT_EQ(Result.ptr, reinterpret_cast<void*>(0x5678));
+    auto result = miopen_utils::findDeviceBuffer(99, buffers.data(), 2);
+    EXPECT_EQ(result.uid, 99);
+    EXPECT_EQ(result.ptr, reinterpret_cast<void*>(0x5678));
 }
 
 TEST(MiopenUtilsTest, FindDeviceBufferThrowsIfNotFound)
