@@ -36,8 +36,8 @@ public:
 
     ~Cpu_fp_reference_validation() override = default;
 
-    bool all_close(Migratable_memory_interface<T>& reference,
-                   Migratable_memory_interface<T>& implementation) override
+    bool all_close(IMigratableMemory<T>& reference,
+                   IMigratableMemory<T>& implementation) override
     {
         if(reference.count() != implementation.count())
         {
@@ -46,8 +46,8 @@ public:
 
         size_t element_count = reference.count();
 
-        const T* ref_data = reference.host_data();
-        const T* impl_data = implementation.host_data();
+        const T* ref_data = reference.hostData();
+        const T* impl_data = implementation.hostData();
 
         for(size_t i = 0; i < element_count; ++i)
         {

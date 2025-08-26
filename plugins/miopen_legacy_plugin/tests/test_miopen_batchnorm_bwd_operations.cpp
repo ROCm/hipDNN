@@ -46,7 +46,7 @@ protected:
     void RunBwdBatchnormGraph(Bn_2d_test_case test_case,
                               hipdnn_sdk::data_objects::DataType input_data_type,
                               Input_type epsilon,
-                              const Tensor_layout& layout);
+                              const TensorLayout& layout);
 
     hipdnnEnginePluginHandle_t _handle = nullptr;
 };
@@ -55,7 +55,7 @@ TEST_P(Batchnorm_bwd_execute_graph_test, RunFloatBwdBatchnormGraphNCHW)
 {
     Bn_2d_test_case test_case = GetParam();
     RunBwdBatchnormGraph<float, float>(
-        test_case, hipdnn_sdk::data_objects::DataType::DataType_FLOAT, 4e-3f, Tensor_layout::NCHW);
+        test_case, hipdnn_sdk::data_objects::DataType::DataType_FLOAT, 4e-3f, TensorLayout::NCHW);
 }
 
 TEST_P(Batchnorm_bwd_execute_graph_test, RunBfloat16BwdBatchnormGraphNCHW)
@@ -64,21 +64,21 @@ TEST_P(Batchnorm_bwd_execute_graph_test, RunBfloat16BwdBatchnormGraphNCHW)
     RunBwdBatchnormGraph<hip_bfloat16, float>(test_case,
                                               hipdnn_sdk::data_objects::DataType::DataType_BFLOAT16,
                                               4e-3_bf,
-                                              Tensor_layout::NCHW);
+                                              TensorLayout::NCHW);
 }
 
 TEST_P(Batchnorm_bwd_execute_graph_test, RunHalfBwdBatchnormGraphNCHW)
 {
     Bn_2d_test_case test_case = {.n = 1, .c = 3, .h = 14, .w = 14};
     RunBwdBatchnormGraph<half, float>(
-        test_case, hipdnn_sdk::data_objects::DataType::DataType_HALF, 4e-3_h, Tensor_layout::NCHW);
+        test_case, hipdnn_sdk::data_objects::DataType::DataType_HALF, 4e-3_h, TensorLayout::NCHW);
 }
 
 TEST_P(Batchnorm_bwd_execute_graph_test, RunFloatBwdBatchnormGraphNHWC)
 {
     Bn_2d_test_case test_case = GetParam();
     RunBwdBatchnormGraph<float, float>(
-        test_case, hipdnn_sdk::data_objects::DataType::DataType_FLOAT, 4e-3f, Tensor_layout::NHWC);
+        test_case, hipdnn_sdk::data_objects::DataType::DataType_FLOAT, 4e-3f, TensorLayout::NHWC);
 }
 
 // TEST_P(Batchnorm_bwd_execute_graph_test, RunBfloat16BwdBatchnormGraphNHWC)
@@ -87,14 +87,14 @@ TEST_P(Batchnorm_bwd_execute_graph_test, RunFloatBwdBatchnormGraphNHWC)
 //     RunBwdBatchnormGraph<hip_bfloat16, float>(test_case,
 //                                               hipdnn_sdk::data_objects::DataType::DataType_BFLOAT16,
 //                                               4e-3_bf,
-//                                               Tensor_layout::NHWC);
+//                                               TensorLayout::NHWC);
 // }
 
 // TEST_P(Batchnorm_bwd_execute_graph_test, RunHalfBwdBatchnormGraphNHWC)
 // {
 //     Bn_2d_test_case test_case = {.n = 1, .c = 3, .h = 14, .w = 14};
 //     RunBwdBatchnormGraph<half, float>(
-//         test_case, hipdnn_sdk::data_objects::DataType::DataType_HALF, 4e-3_h, Tensor_layout::NHWC);
+//         test_case, hipdnn_sdk::data_objects::DataType::DataType_HALF, 4e-3_h, TensorLayout::NHWC);
 // }
 
 // TODO: Re-enable when double support is added to MIOpen plugin
@@ -110,7 +110,7 @@ void Batchnorm_bwd_execute_graph_test::RunBwdBatchnormGraph(
     Bn_2d_test_case test_case,
     hipdnn_sdk::data_objects::DataType input_data_type,
     Input_type epsilon,
-    const Tensor_layout& layout)
+    const TensorLayout& layout)
 {
     unsigned int seed = std::random_device{}();
 
@@ -182,31 +182,31 @@ void Batchnorm_bwd_execute_graph_test::RunBwdBatchnormGraph(
                                            static_cast<uint32_t>(device_buffers.size()));
     EXPECT_EQ(status, HIPDNN_PLUGIN_STATUS_SUCCESS);
 
-    dx_tensor.memory().mark_device_modified();
-    dscale_tensor.memory().mark_device_modified();
-    dbias_tensor.memory().mark_device_modified();
+    dx_tensor.memory().markDeviceModified();
+    dscale_tensor.memory().markDeviceModified();
+    dbias_tensor.memory().markDeviceModified();
 
     hipdnnEnginePluginDestroyExecutionContext(_handle, execution_context);
 
     Tensor<Input_type> x_tensor_cpu(dims, layout);
-    x_tensor_cpu.fill_with_random_values(
+    x_tensor_cpu.fillWithRandomValues(
         static_cast<Input_type>(-1.0f), static_cast<Input_type>(1.0f), seed);
     Tensor<Input_type> dy_tensor_cpu(dims, layout);
-    dy_tensor_cpu.fill_with_random_values(
+    dy_tensor_cpu.fillWithRandomValues(
         static_cast<Input_type>(-0.1f), static_cast<Input_type>(0.1f), seed);
     Tensor<Input_type> dx_tensor_cpu(dims, layout);
 
     Tensor<Intermediate_type> scale_tensor_cpu(derived_dims);
-    scale_tensor_cpu.fill_with_random_values(
+    scale_tensor_cpu.fillWithRandomValues(
         static_cast<Intermediate_type>(-0.1f), static_cast<Intermediate_type>(0.1f), seed);
     Tensor<Intermediate_type> dscale_tensor_cpu(derived_dims);
     Tensor<Intermediate_type> dbias_tensor_cpu(derived_dims);
     Tensor<Intermediate_type> mean_tensor_cpu(derived_dims);
-    mean_tensor_cpu.fill_with_random_values(
+    mean_tensor_cpu.fillWithRandomValues(
         static_cast<Intermediate_type>(-0.1f), static_cast<Intermediate_type>(0.1f), seed);
 
     Tensor<Intermediate_type> inv_variance_tensor_cpu(derived_dims);
-    inv_variance_tensor_cpu.fill_with_random_values(
+    inv_variance_tensor_cpu.fillWithRandomValues(
         static_cast<Intermediate_type>(1.9f), static_cast<Intermediate_type>(2.0f), seed);
 
     Cpu_fp_reference_implementation<Input_type, Intermediate_type, Intermediate_type> cpu_ref_impl;

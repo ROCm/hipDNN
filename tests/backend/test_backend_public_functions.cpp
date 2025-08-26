@@ -252,7 +252,7 @@ TEST(HipDNNBackendTest, GetLoadedPluginPaths_LoadsDefault)
     auto loaded_plugins = test_util::get_loaded_plugins(handle);
 
     fs::path expected_plugin_path = fs::path("../../backend/src/hipdnn_plugins/engines")
-                                    / get_library_name("test_good_default_plugin");
+                                    / getLibraryName("test_good_default_plugin");
 
     EXPECT_TRUE(test_util::is_plugin_loaded(loaded_plugins, expected_plugin_path.string()));
     EXPECT_EQ(hipdnnDestroy(handle), HIPDNN_STATUS_SUCCESS);
@@ -275,8 +275,8 @@ TEST(HipDNNBackendTest, GetLoadedPluginPaths_AdditiveLoadsBothDefaultAndCustom)
     EXPECT_GE(loaded_plugins.size(), 2);
 
     auto default_plugin_path = fs::path("../../backend/src/hipdnn_plugins/engines")
-                               / get_library_name("test_good_default_plugin");
-    auto test_plugin_path = PLUGIN_DIR / get_library_name(test_good_plugin_name);
+                               / getLibraryName("test_good_default_plugin");
+    auto test_plugin_path = PLUGIN_DIR / getLibraryName(test_good_plugin_name);
 
     EXPECT_TRUE(test_util::is_plugin_loaded(loaded_plugins, default_plugin_path.string()));
     EXPECT_TRUE(test_util::is_plugin_loaded(loaded_plugins, test_plugin_path.string()));
@@ -301,7 +301,7 @@ TEST(HipDNNBackendTest, GetLoadedPluginPaths_AbsoluteLoadsOnlyCustom)
     EXPECT_EQ(loaded_plugins.size(), 1);
 
     auto default_plugin_path = fs::path("backend/src/hipdnn_plugins/engines")
-                               / get_library_name("test_good_default_plugin");
+                               / getLibraryName("test_good_default_plugin");
 
     EXPECT_FALSE(test_util::is_plugin_loaded(loaded_plugins, default_plugin_path.string()));
     EXPECT_TRUE(test_util::is_plugin_loaded(loaded_plugins, plugin_file_path));

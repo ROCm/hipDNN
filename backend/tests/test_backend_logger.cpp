@@ -27,16 +27,16 @@ public:
 
         testing::internal::CaptureStderr();
 
-        hipdnn_sdk::utilities::set_env("HIPDNN_LOG_LEVEL", "off");
-        hipdnn_sdk::utilities::unset_env("HIPDNN_LOG_FILE");
+        hipdnn_sdk::utilities::setEnv("HIPDNN_LOG_LEVEL", "off");
+        hipdnn_sdk::utilities::unsetEnv("HIPDNN_LOG_FILE");
     }
 
     void TearDown() override
     {
         hipdnn_backend::logging::cleanup();
 
-        hipdnn_sdk::utilities::unset_env("HIPDNN_LOG_LEVEL");
-        hipdnn_sdk::utilities::unset_env("HIPDNN_LOG_FILE");
+        hipdnn_sdk::utilities::unsetEnv("HIPDNN_LOG_LEVEL");
+        hipdnn_sdk::utilities::unsetEnv("HIPDNN_LOG_FILE");
 
         if(!_log_file.empty())
         {
@@ -83,7 +83,7 @@ TEST_F(Backend_logging_test, MacrosDontLogWhenOff)
 
 TEST_F(Backend_logging_test, MacrosRespectLogLevelInfo)
 {
-    hipdnn_sdk::utilities::set_env("HIPDNN_LOG_LEVEL", "info");
+    hipdnn_sdk::utilities::setEnv("HIPDNN_LOG_LEVEL", "info");
 
     HIPDNN_LOG_INFO("Info test message");
     HIPDNN_LOG_WARN("Warn test message");
@@ -97,7 +97,7 @@ TEST_F(Backend_logging_test, MacrosRespectLogLevelInfo)
 
 TEST_F(Backend_logging_test, MacrosRespectLogLevelWarn)
 {
-    hipdnn_sdk::utilities::set_env("HIPDNN_LOG_LEVEL", "warn");
+    hipdnn_sdk::utilities::setEnv("HIPDNN_LOG_LEVEL", "warn");
 
     HIPDNN_LOG_INFO("Info should not appear");
     HIPDNN_LOG_WARN("Warn should appear");
@@ -111,7 +111,7 @@ TEST_F(Backend_logging_test, MacrosRespectLogLevelWarn)
 
 TEST_F(Backend_logging_test, MacrosRespectLogLevelError)
 {
-    hipdnn_sdk::utilities::set_env("HIPDNN_LOG_LEVEL", "error");
+    hipdnn_sdk::utilities::setEnv("HIPDNN_LOG_LEVEL", "error");
 
     HIPDNN_LOG_INFO("Info should not appear");
     HIPDNN_LOG_WARN("Warn should not appear");
@@ -125,12 +125,12 @@ TEST_F(Backend_logging_test, MacrosRespectLogLevelError)
 
 TEST_F(Backend_logging_test, LoggingCanBeReinitialized)
 {
-    hipdnn_sdk::utilities::set_env("HIPDNN_LOG_LEVEL", "off");
+    hipdnn_sdk::utilities::setEnv("HIPDNN_LOG_LEVEL", "off");
     HIPDNN_LOG_INFO("This should not appear");
 
     hipdnn_backend::logging::cleanup();
 
-    hipdnn_sdk::utilities::set_env("HIPDNN_LOG_LEVEL", "info");
+    hipdnn_sdk::utilities::setEnv("HIPDNN_LOG_LEVEL", "info");
     HIPDNN_LOG_INFO("This should appear after reinitialization");
 
     verify_stderr_contains("This should appear after reinitialization");
@@ -138,7 +138,7 @@ TEST_F(Backend_logging_test, LoggingCanBeReinitialized)
 
 TEST_F(Backend_logging_test, LogPatternFormatIsCorrectOnStderr)
 {
-    hipdnn_sdk::utilities::set_env("HIPDNN_LOG_LEVEL", "info");
+    hipdnn_sdk::utilities::setEnv("HIPDNN_LOG_LEVEL", "info");
 
     HIPDNN_LOG_INFO("Pattern format test message");
 
@@ -154,7 +154,7 @@ TEST_F(Backend_logging_test, LogPatternFormatIsCorrectOnStderr)
 
 TEST_F(Backend_logging_test, MultipleMessagesAreLoggedToStderr)
 {
-    hipdnn_sdk::utilities::set_env("HIPDNN_LOG_LEVEL", "info");
+    hipdnn_sdk::utilities::setEnv("HIPDNN_LOG_LEVEL", "info");
 
     HIPDNN_LOG_INFO("First backend message");
     HIPDNN_LOG_INFO("Second backend message");
@@ -177,8 +177,8 @@ TEST_F(Backend_logging_test, MultipleMessagesAreLoggedToStderr)
 TEST_F(Backend_logging_test, LogFileCanBeSpecifiedByEnvVar)
 {
     _log_file = "custom_backend_test.log";
-    hipdnn_sdk::utilities::set_env("HIPDNN_LOG_FILE", _log_file.c_str());
-    hipdnn_sdk::utilities::set_env("HIPDNN_LOG_LEVEL", "info");
+    hipdnn_sdk::utilities::setEnv("HIPDNN_LOG_FILE", _log_file.c_str());
+    hipdnn_sdk::utilities::setEnv("HIPDNN_LOG_LEVEL", "info");
 
     HIPDNN_LOG_INFO("Logging to custom file");
 

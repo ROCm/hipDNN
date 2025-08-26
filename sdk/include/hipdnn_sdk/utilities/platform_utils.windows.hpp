@@ -16,9 +16,9 @@ constexpr const char* SHARED_LIB_EXT = ".dll";
 constexpr const char* LIB_PREFIX = "";
 constexpr const char* EXECUTABLE_EXT = ".exe";
 
-inline std::string get_env(const char* var, const char* default_value = nullptr)
+inline std::string getEnv(const char* var, const char* defaultValue = nullptr)
 {
-    std::string result = default_value != nullptr ? default_value : "";
+    std::string result = defaultValue != nullptr ? defaultValue : "";
 
     GetEnvironmentVariableA(var, nullptr, 0);
 
@@ -34,7 +34,7 @@ inline std::string get_env(const char* var, const char* default_value = nullptr)
     return result;
 }
 
-inline void set_env(const char* var, const char* value)
+inline void setEnv(const char* var, const char* value)
 {
     if(value != nullptr)
     {
@@ -42,7 +42,7 @@ inline void set_env(const char* var, const char* value)
     }
 }
 
-inline void unset_env(const char* var)
+inline void unsetEnv(const char* var)
 {
     SetEnvironmentVariableA(var, nullptr);
 }

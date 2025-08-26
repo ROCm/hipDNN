@@ -3,7 +3,7 @@
 
 #pragma once
 
-// Scoped_resource is a utility class that manages a resource with a custom destructor.
+// ScopedResource is a utility class that manages a resource with a custom destructor.
 
 #include <utility>
 
@@ -11,18 +11,18 @@ namespace hipdnn::sdk::utilities
 {
 
 template <typename T, typename Destructor>
-class Scoped_resource
+class ScopedResource
 {
 public:
-    Scoped_resource() = default;
-    Scoped_resource(T resource, Destructor destructor)
+    ScopedResource() = default;
+    ScopedResource(T resource, Destructor destructor)
         : _resource(resource)
         , _destructor(destructor)
         , _empty(false)
     {
     }
 
-    ~Scoped_resource()
+    ~ScopedResource()
     {
         if(!_empty)
         {
@@ -31,11 +31,11 @@ public:
     }
 
     // Prevent copying
-    Scoped_resource(const Scoped_resource&) = delete;
-    Scoped_resource& operator=(const Scoped_resource&) = delete;
+    ScopedResource(const ScopedResource&) = delete;
+    ScopedResource& operator=(const ScopedResource&) = delete;
 
     // Allow moving
-    Scoped_resource(Scoped_resource&& other) noexcept
+    ScopedResource(ScopedResource&& other) noexcept
     {
         if(other._empty)
         {
@@ -48,7 +48,7 @@ public:
         _empty = false;
     }
 
-    Scoped_resource& operator=(Scoped_resource&& other) noexcept
+    ScopedResource& operator=(ScopedResource&& other) noexcept
     {
         if(this != &other)
         {

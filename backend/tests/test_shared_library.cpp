@@ -22,7 +22,7 @@ const char* const SYMBOL_NAME = "hipdnnPluginGetName";
 const char* const WRONG_SYMBOL_NAME = "wrong_symbol_name";
 
 const std::string FULL_LIBRARY_PATH
-    = (std::filesystem::path(".") /= hipdnn_sdk::utilities::get_library_name("hipdnn_test_plugin1"))
+    = (std::filesystem::path(".") /= hipdnn_sdk::utilities::getLibraryName("hipdnn_test_plugin1"))
           .string();
 
 }
@@ -99,7 +99,7 @@ TEST(Shared_Library_Test, get_current_module_directory_from_executable)
 
     // Only tests that it works from a statically linked binary
     EXPECT_TRUE(std::filesystem::exists(
-        path / hipdnn_sdk::utilities::get_executable_name("hipdnn_backend_tests")));
+        path / hipdnn_sdk::utilities::getExecutableName("hipdnn_backend_tests")));
 }
 
 class Shared_library_path_test : public ::testing::TestWithParam<std::string>

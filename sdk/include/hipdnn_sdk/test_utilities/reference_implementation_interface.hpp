@@ -28,24 +28,24 @@ public:
     virtual ~Reference_implementation_interface() = default;
 
     virtual void
-        batchnorm_fwd_inference(const Tensor_interface<Input_data_type>& input,
-                                const Tensor_interface<Scale_bias_data_type>& scale,
-                                const Tensor_interface<Scale_bias_data_type>& bias,
-                                const Tensor_interface<Mean_variance_data_type>& estimated_mean,
-                                const Tensor_interface<Mean_variance_data_type>& estimated_variance,
-                                Tensor_interface<Input_data_type>& output,
+        batchnorm_fwd_inference(const ITensor<Input_data_type>& input,
+                                const ITensor<Scale_bias_data_type>& scale,
+                                const ITensor<Scale_bias_data_type>& bias,
+                                const ITensor<Mean_variance_data_type>& estimated_mean,
+                                const ITensor<Mean_variance_data_type>& estimated_variance,
+                                ITensor<Input_data_type>& output,
                                 double epsilon)
         = 0;
 
     // Could call this bwd_training or bwd_propagation
-    virtual void batchnorm_bwd(const Tensor_interface<Input_data_type>& dy,
-                               const Tensor_interface<Input_data_type>& x,
-                               const Tensor_interface<Mean_variance_data_type>& mean,
-                               const Tensor_interface<Mean_variance_data_type>& inv_variance,
-                               const Tensor_interface<Scale_bias_data_type>& scale,
-                               Tensor_interface<Input_data_type>& dx,
-                               Tensor_interface<Scale_bias_data_type>& dscale,
-                               Tensor_interface<Scale_bias_data_type>& dbias)
+    virtual void batchnorm_bwd(const ITensor<Input_data_type>& dy,
+                               const ITensor<Input_data_type>& x,
+                               const ITensor<Mean_variance_data_type>& mean,
+                               const ITensor<Mean_variance_data_type>& inv_variance,
+                               const ITensor<Scale_bias_data_type>& scale,
+                               ITensor<Input_data_type>& dx,
+                               ITensor<Scale_bias_data_type>& dscale,
+                               ITensor<Scale_bias_data_type>& dbias)
         = 0;
 };
 

@@ -36,7 +36,7 @@ public:
 
         HIPDNN_LOG_ERROR("Error occured in status:{} message:{}", status, message);
 
-        hipdnn::sdk::utilities::copy_max_size_with_null_terminator(
+        hipdnn::sdk::utilities::copyMaxSizeWithNullTerminator(
             last_error, message, sizeof(last_error));
 
         return status;

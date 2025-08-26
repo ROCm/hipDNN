@@ -47,7 +47,7 @@ struct Batchnorm_2d_tensor_bundle
 {
     Batchnorm_2d_tensor_bundle(const std::vector<int64_t>& dims,
                                unsigned int seed = 1,
-                               const Tensor_layout& layout = Tensor_layout::NCHW)
+                               const TensorLayout& layout = TensorLayout::NCHW)
         : derived_dims({1, dims[1], 1, 1})
         , x_tensor(dims, layout)
         , dy_tensor(dims, layout)
@@ -58,23 +58,23 @@ struct Batchnorm_2d_tensor_bundle
         , mean_tensor(derived_dims)
         , inv_variance_tensor(derived_dims)
     {
-        x_tensor.fill_with_random_values(
+        x_tensor.fillWithRandomValues(
             static_cast<Input_type>(-1.0f), static_cast<Input_type>(1.0f), seed);
 
         // Keep dy & scale as low values, since they become huge with large size tensors, and blow up precision.
-        dy_tensor.fill_with_random_values(
+        dy_tensor.fillWithRandomValues(
             static_cast<Input_type>(-0.1f), static_cast<Input_type>(0.1f), seed);
-        scale_tensor.fill_with_random_values(
+        scale_tensor.fillWithRandomValues(
             static_cast<Intermediate_type>(-0.1f), static_cast<Intermediate_type>(0.1f), seed);
 
         // Mean assuming a large # of samples will trend towards mid point of x range
         // Setting to 0.
-        mean_tensor.fill_with_random_values(
+        mean_tensor.fillWithRandomValues(
             static_cast<Intermediate_type>(-0.1f), static_cast<Intermediate_type>(0.1f), seed);
 
         // inv_variance is 1/sqrt(variance + epsilon) and needs to be positive in all cases
         // Based off X & mean calc, we are setting it close to 2.0f in this case
-        inv_variance_tensor.fill_with_random_values(
+        inv_variance_tensor.fillWithRandomValues(
             static_cast<Intermediate_type>(1.9f), static_cast<Intermediate_type>(2.0f), seed);
     }
 
@@ -144,18 +144,18 @@ protected:
         Batchnorm_2d_tensor_bundle<Input_type, Intermediate_type>& tensor_bundle)
     {
         std::unordered_map<int64_t, void*> variant_pack;
-        variant_pack[x_tensor_attr.get_uid()] = tensor_bundle.x_tensor.memory().device_data();
-        variant_pack[dy_tensor_attr.get_uid()] = tensor_bundle.dy_tensor.memory().device_data();
-        variant_pack[dx_tensor_attr.get_uid()] = tensor_bundle.dx_tensor.memory().device_data();
+        variant_pack[x_tensor_attr.get_uid()] = tensor_bundle.x_tensor.memory().deviceData();
+        variant_pack[dy_tensor_attr.get_uid()] = tensor_bundle.dy_tensor.memory().deviceData();
+        variant_pack[dx_tensor_attr.get_uid()] = tensor_bundle.dx_tensor.memory().deviceData();
         variant_pack[scale_tensor_attr.get_uid()]
-            = tensor_bundle.scale_tensor.memory().device_data();
+            = tensor_bundle.scale_tensor.memory().deviceData();
         variant_pack[dscale_tensor_attr.get_uid()]
-            = tensor_bundle.dscale_tensor.memory().device_data();
+            = tensor_bundle.dscale_tensor.memory().deviceData();
         variant_pack[dbias_tensor_attr.get_uid()]
-            = tensor_bundle.dbias_tensor.memory().device_data();
-        variant_pack[mean_tensor_attr.get_uid()] = tensor_bundle.mean_tensor.memory().device_data();
+            = tensor_bundle.dbias_tensor.memory().deviceData();
+        variant_pack[mean_tensor_attr.get_uid()] = tensor_bundle.mean_tensor.memory().deviceData();
         variant_pack[inv_variance_tensor_attr.get_uid()]
-            = tensor_bundle.inv_variance_tensor.memory().device_data();
+            = tensor_bundle.inv_variance_tensor.memory().deviceData();
 
         return variant_pack;
     }
@@ -279,7 +279,7 @@ protected:
     template <typename Input_type, typename Intermediate_type>
     void run_batchnorm_test(const Bn_2d_test_case& test_case,
                             Input_type tolerance = 1e4f,
-                            const Tensor_layout& layout = Tensor_layout::NCHW)
+                            const TensorLayout& layout = TensorLayout::NCHW)
     {
         auto input_data_type = get_data_type_enum_from_type<Input_type>();
         auto intermediate_data_type = get_data_type_enum_from_type<Intermediate_type>();
@@ -296,9 +296,9 @@ protected:
 
         run_miopen_batchnorm_bwd<Input_type, Intermediate_type>(
             graph_tensor_bundle, input_data_type, intermediate_data_type);
-        graph_tensor_bundle.dx_tensor.memory().mark_device_modified();
-        graph_tensor_bundle.dscale_tensor.memory().mark_device_modified();
-        graph_tensor_bundle.dbias_tensor.memory().mark_device_modified();
+        graph_tensor_bundle.dx_tensor.memory().markDeviceModified();
+        graph_tensor_bundle.dscale_tensor.memory().markDeviceModified();
+        graph_tensor_bundle.dbias_tensor.memory().markDeviceModified();
 
         run_cpu_batchnorm_bwd<Input_type, Intermediate_type>(cpu_tensor_bundle);
 
@@ -391,7 +391,7 @@ INSTANTIATE_TEST_SUITE_P(RunHalfBwdBatchnormGraph,
 TEST_P(Batchnorm_backward_integration_test_nhwc, RunFloatBwdBatchnormGraphNHWC)
 {
     Bn_2d_test_case test_case = GetParam();
-    run_batchnorm_test<float, float>(test_case, 4e-3f, Tensor_layout::NHWC);
+    run_batchnorm_test<float, float>(test_case, 4e-3f, TensorLayout::NHWC);
 }
 
 INSTANTIATE_TEST_SUITE_P(RunFloatBwdBatchnormGraphNHWC,

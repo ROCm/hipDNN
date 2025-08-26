@@ -40,7 +40,7 @@ inline hipdnnSeverity_t string_to_severity(const std::string& level_str)
 inline void test_logging_callback(hipdnnSeverity_t severity, const char* message)
 {
 #ifndef DISABLE_TEST_LOGGING
-    std::string log_level_str = hipdnn_sdk::utilities::get_env("HIPDNN_LOG_LEVEL", "off");
+    std::string log_level_str = hipdnn_sdk::utilities::getEnv("HIPDNN_LOG_LEVEL", "off");
 
     if(log_level_str == "off")
     {

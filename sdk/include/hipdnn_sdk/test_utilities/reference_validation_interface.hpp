@@ -21,8 +21,8 @@ class Reference_validation_interface
 public:
     virtual ~Reference_validation_interface() = default;
 
-    virtual bool all_close(Migratable_memory_interface<T>& reference,
-                           Migratable_memory_interface<T>& implementation)
+    virtual bool all_close(IMigratableMemory<T>& reference,
+                           IMigratableMemory<T>& implementation)
         = 0;
 };
 

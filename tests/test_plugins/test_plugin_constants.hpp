@@ -28,7 +28,7 @@ inline std::string get_plugin_path(const char* plugin_name)
 {
     namespace fs = std::filesystem;
 
-    fs::path plugin_file = PLUGIN_DIR / hipdnn_sdk::utilities::get_library_name(plugin_name);
+    fs::path plugin_file = PLUGIN_DIR / hipdnn_sdk::utilities::getLibraryName(plugin_name);
 
     // Check if the file exists
     if(!fs::exists(plugin_file))

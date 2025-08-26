@@ -33,32 +33,32 @@ struct Bn_2d_test_case
 
 template <typename T>
 hipdnnPluginDeviceBuffer_t generate_random_device_buffer(
-    Tensor_interface<T>& tensor, int uid, T min, T max, unsigned int seed = 0)
+    ITensor<T>& tensor, int uid, T min, T max, unsigned int seed = 0)
 {
-    tensor.fill_with_random_values(min, max, seed);
+    tensor.fillWithRandomValues(min, max, seed);
     hipdnnPluginDeviceBuffer_t buffer;
     buffer.uid = uid;
-    buffer.ptr = tensor.memory().device_data();
+    buffer.ptr = tensor.memory().deviceData();
     return buffer;
 }
 
 template <typename T>
 hipdnnPluginDeviceBuffer_t
-    generate_static_device_buffer(Tensor_interface<T>& tensor, int uid, T value)
+    generate_static_device_buffer(ITensor<T>& tensor, int uid, T value)
 {
-    tensor.fill_with_value(value);
+    tensor.fillWithValue(value);
     hipdnnPluginDeviceBuffer_t buffer;
     buffer.uid = uid;
-    buffer.ptr = tensor.memory().device_data();
+    buffer.ptr = tensor.memory().deviceData();
     return buffer;
 }
 
 template <typename T>
-hipdnnPluginDeviceBuffer_t generate_empty_device_buffer(Tensor_interface<T>& tensor, int uid)
+hipdnnPluginDeviceBuffer_t generate_empty_device_buffer(ITensor<T>& tensor, int uid)
 {
     hipdnnPluginDeviceBuffer_t buffer;
     buffer.uid = uid;
-    buffer.ptr = tensor.memory().device_data();
+    buffer.ptr = tensor.memory().deviceData();
     return buffer;
 }
 

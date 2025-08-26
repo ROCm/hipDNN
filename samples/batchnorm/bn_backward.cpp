@@ -20,7 +20,7 @@ using namespace hipdnn_sdk::utilities;
 
 // TODO: verify this sample when applicable engines are added
 template <typename InputType, typename IntermediateType>
-void Sample_runner::operator()(const Tensor_layout& layout)
+void Sample_runner::operator()(const TensorLayout& layout)
 {
     auto input_type = get_data_type_enum_from_type<InputType>();
     auto intermediate_type = get_data_type_enum_from_type<IntermediateType>();
@@ -79,35 +79,35 @@ void Sample_runner::operator()(const Tensor_layout& layout)
     Tensor<IntermediateType> dscale_tensor(dscale->get_dim());
     Tensor<IntermediateType> dbias_tensor(dbias->get_dim());
 
-    dy_tensor.fill_with_random_values(static_cast<InputType>(0.0f), static_cast<InputType>(1.0f));
-    x_tensor.fill_with_random_values(static_cast<InputType>(0.0f), static_cast<InputType>(1.0f));
-    scale_tensor.fill_with_random_values(static_cast<IntermediateType>(0.0f),
+    dy_tensor.fillWithRandomValues(static_cast<InputType>(0.0f), static_cast<InputType>(1.0f));
+    x_tensor.fillWithRandomValues(static_cast<InputType>(0.0f), static_cast<InputType>(1.0f));
+    scale_tensor.fillWithRandomValues(static_cast<IntermediateType>(0.0f),
                                          static_cast<IntermediateType>(1.0f));
-    saved_mean_tensor.fill_with_random_values(static_cast<IntermediateType>(0.0f),
+    saved_mean_tensor.fillWithRandomValues(static_cast<IntermediateType>(0.0f),
                                               static_cast<IntermediateType>(1.0f));
-    saved_inv_var_tensor.fill_with_random_values(static_cast<IntermediateType>(0.1f),
+    saved_inv_var_tensor.fillWithRandomValues(static_cast<IntermediateType>(0.1f),
                                                  static_cast<IntermediateType>(1.0f));
 
     std::unordered_map<int64_t, void*> variant_pack;
 
-    variant_pack[dy->get_uid()] = dy_tensor.memory().device_data();
-    variant_pack[x->get_uid()] = x_tensor.memory().device_data();
-    variant_pack[scale->get_uid()] = scale_tensor.memory().device_data();
-    variant_pack[saved_mean->get_uid()] = saved_mean_tensor.memory().device_data();
-    variant_pack[saved_inv_variance->get_uid()] = saved_inv_var_tensor.memory().device_data();
-    variant_pack[dx->get_uid()] = dx_tensor.memory().device_data();
-    variant_pack[dscale->get_uid()] = dscale_tensor.memory().device_data();
-    variant_pack[dbias->get_uid()] = dbias_tensor.memory().device_data();
+    variant_pack[dy->get_uid()] = dy_tensor.memory().deviceData();
+    variant_pack[x->get_uid()] = x_tensor.memory().deviceData();
+    variant_pack[scale->get_uid()] = scale_tensor.memory().deviceData();
+    variant_pack[saved_mean->get_uid()] = saved_mean_tensor.memory().deviceData();
+    variant_pack[saved_inv_variance->get_uid()] = saved_inv_var_tensor.memory().deviceData();
+    variant_pack[dx->get_uid()] = dx_tensor.memory().deviceData();
+    variant_pack[dscale->get_uid()] = dscale_tensor.memory().deviceData();
+    variant_pack[dbias->get_uid()] = dbias_tensor.memory().deviceData();
 
     HIPDNN_FE_CHECK(graph->execute(handle, variant_pack, nullptr));
 
-    dx_tensor.memory().mark_device_modified();
-    dscale_tensor.memory().mark_device_modified();
-    dbias_tensor.memory().mark_device_modified();
+    dx_tensor.memory().markDeviceModified();
+    dscale_tensor.memory().markDeviceModified();
+    dbias_tensor.memory().markDeviceModified();
 
-    auto dx_host_ptr = dx_tensor.memory().host_data();
-    auto dscale_host_ptr = dscale_tensor.memory().host_data();
-    auto dbias_host_ptr = dbias_tensor.memory().host_data();
+    auto dx_host_ptr = dx_tensor.memory().hostData();
+    auto dscale_host_ptr = dscale_tensor.memory().hostData();
+    auto dbias_host_ptr = dbias_tensor.memory().hostData();
 
     if(config.cpu_validation)
     {

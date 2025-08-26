@@ -75,8 +75,8 @@ TEST(CpuFpReferenceImplementation, BatchnormInferDoubleUsage)
 
 TEST(CpuFpReferenceImplementation, BatchnormInferFloatUsageNHWC)
 {
-    Tensor<float> input_tensor({6, 3, 32, 32}, Tensor_layout::NHWC);
-    Tensor<float> output_tensor({6, 3, 32, 32}, Tensor_layout::NHWC);
+    Tensor<float> input_tensor({6, 3, 32, 32}, TensorLayout::NHWC);
+    Tensor<float> output_tensor({6, 3, 32, 32}, TensorLayout::NHWC);
     Tensor<float> bias_tensor({1, 3, 1, 1});
     Tensor<float> scale_tensor({1, 3, 1, 1});
     Tensor<float> mean_tensor({1, 3, 1, 1});
@@ -102,21 +102,21 @@ TEST(CpuFpReferenceImplementation, BatchnormInferSanityValidation)
     Tensor<double> variance_tensor({1, 1, 1, 1});
 
     // x = [1, 2, 3, 4]
-    input_tensor.set_host_value(0, 0, 0, 0, 1.0);
-    input_tensor.set_host_value(0, 0, 0, 1, 2.0);
-    input_tensor.set_host_value(0, 0, 1, 0, 3.0);
-    input_tensor.set_host_value(0, 0, 1, 1, 4.0);
+    input_tensor.setHostValue(0, 0, 0, 0, 1.0);
+    input_tensor.setHostValue(0, 0, 0, 1, 2.0);
+    input_tensor.setHostValue(0, 0, 1, 0, 3.0);
+    input_tensor.setHostValue(0, 0, 1, 1, 4.0);
 
     // fixed scale and bias parameters (one channel)
-    scale_tensor.set_host_value(0, 0, 0, 0, 2.0);
-    bias_tensor.set_host_value(0, 0, 0, 0, 0.5);
+    scale_tensor.setHostValue(0, 0, 0, 0, 2.0);
+    bias_tensor.setHostValue(0, 0, 0, 0, 0.5);
 
     // inference uses population statistics per channel:
     // mean = (1+2+3+4)/4 = 2.5
     // variance = [(-1.5)^2 + (-0.5)^2 + (0.5)^2 + (1.5)^2] / 4 = 5.0 / 4 = 1.25
     // (in practice, computed during training)
-    mean_tensor.set_host_value(0, 0, 0, 0, 2.5);
-    variance_tensor.set_host_value(0, 0, 0, 0, 1.25);
+    mean_tensor.setHostValue(0, 0, 0, 0, 2.5);
+    variance_tensor.setHostValue(0, 0, 0, 0, 1.25);
 
     // output is calculated via a pointwise linear transform on x:
     // y = scale * (x - mean) * inv_variance + bias = 2 * (x - 2.5) * inv_variance + 0.5
@@ -129,10 +129,10 @@ TEST(CpuFpReferenceImplementation, BatchnormInferSanityValidation)
 
     auto tolerance = 1e-6;
 
-    EXPECT_NEAR(output_tensor.get_host_value(0, 0, 0, 0), expected_output[0], tolerance);
-    EXPECT_NEAR(output_tensor.get_host_value(0, 0, 0, 1), expected_output[1], tolerance);
-    EXPECT_NEAR(output_tensor.get_host_value(0, 0, 1, 0), expected_output[2], tolerance);
-    EXPECT_NEAR(output_tensor.get_host_value(0, 0, 1, 1), expected_output[3], tolerance);
+    EXPECT_NEAR(output_tensor.getHostValue(0, 0, 0, 0), expected_output[0], tolerance);
+    EXPECT_NEAR(output_tensor.getHostValue(0, 0, 0, 1), expected_output[1], tolerance);
+    EXPECT_NEAR(output_tensor.getHostValue(0, 0, 1, 0), expected_output[2], tolerance);
+    EXPECT_NEAR(output_tensor.getHostValue(0, 0, 1, 1), expected_output[3], tolerance);
 }
 
 TEST(CpuFpReferenceImplementation, BatchnormBwdFloatUsage)
@@ -229,8 +229,8 @@ TEST(CpuFpReferenceImplementation, BatchnormBwdDoubleUsage)
 
 TEST(CpuFpReferenceImplementation, BatchnormBwdFloatUsageNHWC)
 {
-    Tensor<float> x_tensor({6, 3, 32, 32}, Tensor_layout::NHWC);
-    Tensor<float> dy_tensor({6, 3, 32, 32}, Tensor_layout::NHWC);
+    Tensor<float> x_tensor({6, 3, 32, 32}, TensorLayout::NHWC);
+    Tensor<float> dy_tensor({6, 3, 32, 32}, TensorLayout::NHWC);
     Tensor<float> dx_tensor({6, 3, 32, 32});
     Tensor<float> scale_tensor({1, 3});
     Tensor<float> mean_tensor({1, 3});
@@ -264,26 +264,26 @@ TEST(CpuFpReferenceImplementation, BatchnormBwdSanityValidation)
     Tensor<double> dbias_tensor({1, 1, 1, 1});
 
     // x = [1, 2, 3, 4]
-    x_tensor.set_host_value(0, 0, 0, 0, 1.0);
-    x_tensor.set_host_value(0, 0, 0, 1, 2.0);
-    x_tensor.set_host_value(0, 0, 1, 0, 3.0);
-    x_tensor.set_host_value(0, 0, 1, 1, 4.0);
+    x_tensor.setHostValue(0, 0, 0, 0, 1.0);
+    x_tensor.setHostValue(0, 0, 0, 1, 2.0);
+    x_tensor.setHostValue(0, 0, 1, 0, 3.0);
+    x_tensor.setHostValue(0, 0, 1, 1, 4.0);
 
     // gradient dy = [0.1, 0.2, 0.3, 0.4]
-    dy_tensor.set_host_value(0, 0, 0, 0, 0.1);
-    dy_tensor.set_host_value(0, 0, 0, 1, 0.2);
-    dy_tensor.set_host_value(0, 0, 1, 0, 0.3);
-    dy_tensor.set_host_value(0, 0, 1, 1, 0.4);
+    dy_tensor.setHostValue(0, 0, 0, 0, 0.1);
+    dy_tensor.setHostValue(0, 0, 0, 1, 0.2);
+    dy_tensor.setHostValue(0, 0, 1, 0, 0.3);
+    dy_tensor.setHostValue(0, 0, 1, 1, 0.4);
 
     // scale (one channel) = 2.0
-    scale_tensor.set_host_value(0, 0, 0, 0, 2.0);
+    scale_tensor.setHostValue(0, 0, 0, 0, 2.0);
 
     // 1 batch, so compute mean and variance over all elements
     // mean = (1+2+3+4)/4 = 2.5
     // variance = [(-1.5)^2 + (-0.5)^2 + (0.5)^2 + (1.5)^2] / 4 = 5.0 / 4 = 1.25
     // inv_variance = 1 / sqrt(1.25 + 1e-5) = 0.894423613312618
-    mean_tensor.set_host_value(0, 0, 0, 0, 2.5);
-    inv_variance_tensor.set_host_value(0, 0, 0, 0, 0.894423613312618);
+    mean_tensor.setHostValue(0, 0, 0, 0, 2.5);
+    inv_variance_tensor.setHostValue(0, 0, 0, 0, 0.894423613312618);
 
     // dbias = sum(dy) = 0.1 + 0.2 + 0.3 + 0.4 = 1.0
     auto expected_dbias = 1.0;
@@ -309,10 +309,10 @@ TEST(CpuFpReferenceImplementation, BatchnormBwdSanityValidation)
 
     auto tolerance = 1e-6;
 
-    EXPECT_NEAR(dbias_tensor.get_host_value(0, 0, 0, 0), expected_dbias, tolerance);
-    EXPECT_NEAR(dscale_tensor.get_host_value(0, 0, 0, 0), expected_dscale, tolerance);
-    EXPECT_NEAR(dx_tensor.get_host_value(0, 0, 0, 0), expected_dx[0], tolerance);
-    EXPECT_NEAR(dx_tensor.get_host_value(0, 0, 0, 1), expected_dx[1], tolerance);
-    EXPECT_NEAR(dx_tensor.get_host_value(0, 0, 1, 0), expected_dx[2], tolerance);
-    EXPECT_NEAR(dx_tensor.get_host_value(0, 0, 1, 1), expected_dx[3], tolerance);
+    EXPECT_NEAR(dbias_tensor.getHostValue(0, 0, 0, 0), expected_dbias, tolerance);
+    EXPECT_NEAR(dscale_tensor.getHostValue(0, 0, 0, 0), expected_dscale, tolerance);
+    EXPECT_NEAR(dx_tensor.getHostValue(0, 0, 0, 0), expected_dx[0], tolerance);
+    EXPECT_NEAR(dx_tensor.getHostValue(0, 0, 0, 1), expected_dx[1], tolerance);
+    EXPECT_NEAR(dx_tensor.getHostValue(0, 0, 1, 0), expected_dx[2], tolerance);
+    EXPECT_NEAR(dx_tensor.getHostValue(0, 0, 1, 1), expected_dx[3], tolerance);
 }
