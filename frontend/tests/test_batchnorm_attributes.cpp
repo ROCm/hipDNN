@@ -5,27 +5,26 @@
 
 TEST(BatchnormAttributesTests, CreateBatchnormAttributes)
 {
-    hipdnn_frontend::graph::Batchnorm_attributes batchnorm_attributes;
+    hipdnn_frontend::graph::BatchnormAttributes batchnorm_attributes;
 
-    batchnorm_attributes.set_x(std::make_shared<hipdnn_frontend::graph::Tensor_attributes>());
-    batchnorm_attributes.set_y(std::make_shared<hipdnn_frontend::graph::Tensor_attributes>());
-    batchnorm_attributes.set_scale(std::make_shared<hipdnn_frontend::graph::Tensor_attributes>());
-    batchnorm_attributes.set_bias(std::make_shared<hipdnn_frontend::graph::Tensor_attributes>());
+    batchnorm_attributes.set_x(std::make_shared<hipdnn_frontend::graph::TensorAttributes>());
+    batchnorm_attributes.set_y(std::make_shared<hipdnn_frontend::graph::TensorAttributes>());
+    batchnorm_attributes.set_scale(std::make_shared<hipdnn_frontend::graph::TensorAttributes>());
+    batchnorm_attributes.set_bias(std::make_shared<hipdnn_frontend::graph::TensorAttributes>());
     batchnorm_attributes.set_prev_running_mean(
-        std::make_shared<hipdnn_frontend::graph::Tensor_attributes>());
+        std::make_shared<hipdnn_frontend::graph::TensorAttributes>());
     batchnorm_attributes.set_prev_running_variance(
-        std::make_shared<hipdnn_frontend::graph::Tensor_attributes>());
-    batchnorm_attributes.set_momentum(
-        std::make_shared<hipdnn_frontend::graph::Tensor_attributes>());
-    batchnorm_attributes.set_mean(std::make_shared<hipdnn_frontend::graph::Tensor_attributes>());
+        std::make_shared<hipdnn_frontend::graph::TensorAttributes>());
+    batchnorm_attributes.set_momentum(std::make_shared<hipdnn_frontend::graph::TensorAttributes>());
+    batchnorm_attributes.set_mean(std::make_shared<hipdnn_frontend::graph::TensorAttributes>());
     batchnorm_attributes.set_inv_variance(
-        std::make_shared<hipdnn_frontend::graph::Tensor_attributes>());
+        std::make_shared<hipdnn_frontend::graph::TensorAttributes>());
     batchnorm_attributes.set_next_running_mean(
-        std::make_shared<hipdnn_frontend::graph::Tensor_attributes>());
+        std::make_shared<hipdnn_frontend::graph::TensorAttributes>());
     batchnorm_attributes.set_next_running_variance(
-        std::make_shared<hipdnn_frontend::graph::Tensor_attributes>());
+        std::make_shared<hipdnn_frontend::graph::TensorAttributes>());
     batchnorm_attributes.set_epsilon(
-        std::make_shared<hipdnn_frontend::graph::Tensor_attributes>()); // Set epsilon
+        std::make_shared<hipdnn_frontend::graph::TensorAttributes>()); // Set epsilon
 
     auto x_tensor = batchnorm_attributes.get_x();
     x_tensor->set_uid(1)
@@ -111,14 +110,14 @@ TEST(BatchnormAttributesTests, CreateBatchnormAttributes)
         .set_dim({1})
         .set_stride({1});
 
-    auto peer_stat_1 = std::make_shared<hipdnn_frontend::graph::Tensor_attributes>();
+    auto peer_stat_1 = std::make_shared<hipdnn_frontend::graph::TensorAttributes>();
     peer_stat_1->set_uid(12)
         .set_name("PeerStat1")
         .set_data_type(hipdnn_frontend::DataType_t::FLOAT)
         .set_dim({1, 2})
         .set_stride({3, 4});
 
-    auto peer_stat_2 = std::make_shared<hipdnn_frontend::graph::Tensor_attributes>();
+    auto peer_stat_2 = std::make_shared<hipdnn_frontend::graph::TensorAttributes>();
     peer_stat_2->set_uid(13)
         .set_name("PeerStat2")
         .set_data_type(hipdnn_frontend::DataType_t::FLOAT)
@@ -217,60 +216,60 @@ TEST(BatchnormAttributesTests, CreateBatchnormAttributes)
 
 TEST(BatchnormAttributesTests, PackAttributes)
 {
-    hipdnn_frontend::graph::Batchnorm_attributes batchnorm_attributes;
+    hipdnn_frontend::graph::BatchnormAttributes batchnorm_attributes;
 
-    auto x_tensor = std::make_shared<hipdnn_frontend::graph::Tensor_attributes>();
+    auto x_tensor = std::make_shared<hipdnn_frontend::graph::TensorAttributes>();
     x_tensor->set_uid(1);
     batchnorm_attributes.set_x(x_tensor);
 
-    auto y_tensor = std::make_shared<hipdnn_frontend::graph::Tensor_attributes>();
+    auto y_tensor = std::make_shared<hipdnn_frontend::graph::TensorAttributes>();
     y_tensor->set_uid(2);
     batchnorm_attributes.set_y(y_tensor);
 
-    auto scale_tensor = std::make_shared<hipdnn_frontend::graph::Tensor_attributes>();
+    auto scale_tensor = std::make_shared<hipdnn_frontend::graph::TensorAttributes>();
     scale_tensor->set_uid(3);
     batchnorm_attributes.set_scale(scale_tensor);
 
-    auto bias_tensor = std::make_shared<hipdnn_frontend::graph::Tensor_attributes>();
+    auto bias_tensor = std::make_shared<hipdnn_frontend::graph::TensorAttributes>();
     bias_tensor->set_uid(4);
     batchnorm_attributes.set_bias(bias_tensor);
 
-    auto prev_mean_tensor = std::make_shared<hipdnn_frontend::graph::Tensor_attributes>();
+    auto prev_mean_tensor = std::make_shared<hipdnn_frontend::graph::TensorAttributes>();
     prev_mean_tensor->set_uid(5);
     batchnorm_attributes.set_prev_running_mean(prev_mean_tensor);
 
-    auto prev_variance_tensor = std::make_shared<hipdnn_frontend::graph::Tensor_attributes>();
+    auto prev_variance_tensor = std::make_shared<hipdnn_frontend::graph::TensorAttributes>();
     prev_variance_tensor->set_uid(6);
     batchnorm_attributes.set_prev_running_variance(prev_variance_tensor);
 
-    auto momentum_tensor = std::make_shared<hipdnn_frontend::graph::Tensor_attributes>();
+    auto momentum_tensor = std::make_shared<hipdnn_frontend::graph::TensorAttributes>();
     momentum_tensor->set_uid(7);
     batchnorm_attributes.set_momentum(momentum_tensor);
 
-    auto mean_tensor = std::make_shared<hipdnn_frontend::graph::Tensor_attributes>();
+    auto mean_tensor = std::make_shared<hipdnn_frontend::graph::TensorAttributes>();
     mean_tensor->set_uid(8);
     batchnorm_attributes.set_mean(mean_tensor);
 
-    auto inv_variance_tensor = std::make_shared<hipdnn_frontend::graph::Tensor_attributes>();
+    auto inv_variance_tensor = std::make_shared<hipdnn_frontend::graph::TensorAttributes>();
     inv_variance_tensor->set_uid(9);
     batchnorm_attributes.set_inv_variance(inv_variance_tensor);
 
-    auto next_mean_tensor = std::make_shared<hipdnn_frontend::graph::Tensor_attributes>();
+    auto next_mean_tensor = std::make_shared<hipdnn_frontend::graph::TensorAttributes>();
     next_mean_tensor->set_uid(10);
     batchnorm_attributes.set_next_running_mean(next_mean_tensor);
 
-    auto next_variance_tensor = std::make_shared<hipdnn_frontend::graph::Tensor_attributes>();
+    auto next_variance_tensor = std::make_shared<hipdnn_frontend::graph::TensorAttributes>();
     next_variance_tensor->set_uid(11);
     batchnorm_attributes.set_next_running_variance(next_variance_tensor);
 
-    auto epsilon_tensor = std::make_shared<hipdnn_frontend::graph::Tensor_attributes>();
+    auto epsilon_tensor = std::make_shared<hipdnn_frontend::graph::TensorAttributes>();
     epsilon_tensor->set_uid(14);
     batchnorm_attributes.set_epsilon(epsilon_tensor);
 
-    auto peer_stat_1 = std::make_shared<hipdnn_frontend::graph::Tensor_attributes>();
+    auto peer_stat_1 = std::make_shared<hipdnn_frontend::graph::TensorAttributes>();
     peer_stat_1->set_uid(12);
 
-    auto peer_stat_2 = std::make_shared<hipdnn_frontend::graph::Tensor_attributes>();
+    auto peer_stat_2 = std::make_shared<hipdnn_frontend::graph::TensorAttributes>();
     peer_stat_2->set_uid(13);
 
     batchnorm_attributes.set_peer_stats({peer_stat_1, peer_stat_2});
@@ -303,25 +302,25 @@ TEST(BatchnormAttributesTests, PackAttributes)
 
 TEST(BatchnormAttributesTests, PackAttributesWithoutOptionalValues)
 {
-    hipdnn_frontend::graph::Batchnorm_attributes batchnorm_attributes;
+    hipdnn_frontend::graph::BatchnormAttributes batchnorm_attributes;
 
-    auto x_tensor = std::make_shared<hipdnn_frontend::graph::Tensor_attributes>();
+    auto x_tensor = std::make_shared<hipdnn_frontend::graph::TensorAttributes>();
     x_tensor->set_uid(1);
     batchnorm_attributes.set_x(x_tensor);
 
-    auto y_tensor = std::make_shared<hipdnn_frontend::graph::Tensor_attributes>();
+    auto y_tensor = std::make_shared<hipdnn_frontend::graph::TensorAttributes>();
     y_tensor->set_uid(2);
     batchnorm_attributes.set_y(y_tensor);
 
-    auto scale_tensor = std::make_shared<hipdnn_frontend::graph::Tensor_attributes>();
+    auto scale_tensor = std::make_shared<hipdnn_frontend::graph::TensorAttributes>();
     scale_tensor->set_uid(3);
     batchnorm_attributes.set_scale(scale_tensor);
 
-    auto bias_tensor = std::make_shared<hipdnn_frontend::graph::Tensor_attributes>();
+    auto bias_tensor = std::make_shared<hipdnn_frontend::graph::TensorAttributes>();
     bias_tensor->set_uid(4);
     batchnorm_attributes.set_bias(bias_tensor);
 
-    auto epsilon_tensor = std::make_shared<hipdnn_frontend::graph::Tensor_attributes>();
+    auto epsilon_tensor = std::make_shared<hipdnn_frontend::graph::TensorAttributes>();
     epsilon_tensor->set_uid(5);
     batchnorm_attributes.set_epsilon(epsilon_tensor);
 
@@ -352,9 +351,9 @@ TEST(BatchnormAttributesTests, PackAttributesWithoutOptionalValues)
 
 TEST(BatchnormAttributesTests, SetXWithMove)
 {
-    hipdnn_frontend::graph::Batchnorm_attributes batchnorm_attributes;
+    hipdnn_frontend::graph::BatchnormAttributes batchnorm_attributes;
 
-    auto x_tensor = std::make_shared<hipdnn_frontend::graph::Tensor_attributes>();
+    auto x_tensor = std::make_shared<hipdnn_frontend::graph::TensorAttributes>();
     x_tensor->set_uid(1).set_name("XTensor");
 
     auto raw_ptr = x_tensor.get();
@@ -370,9 +369,9 @@ TEST(BatchnormAttributesTests, SetXWithMove)
 
 TEST(BatchnormAttributesTests, SetScaleWithMove)
 {
-    hipdnn_frontend::graph::Batchnorm_attributes batchnorm_attributes;
+    hipdnn_frontend::graph::BatchnormAttributes batchnorm_attributes;
 
-    auto scale_tensor = std::make_shared<hipdnn_frontend::graph::Tensor_attributes>();
+    auto scale_tensor = std::make_shared<hipdnn_frontend::graph::TensorAttributes>();
     scale_tensor->set_uid(2).set_name("ScaleTensor");
 
     auto raw_ptr = scale_tensor.get();
@@ -389,9 +388,9 @@ TEST(BatchnormAttributesTests, SetScaleWithMove)
 
 TEST(BatchnormAttributesTests, SetBiasWithMove)
 {
-    hipdnn_frontend::graph::Batchnorm_attributes batchnorm_attributes;
+    hipdnn_frontend::graph::BatchnormAttributes batchnorm_attributes;
 
-    auto bias_tensor = std::make_shared<hipdnn_frontend::graph::Tensor_attributes>();
+    auto bias_tensor = std::make_shared<hipdnn_frontend::graph::TensorAttributes>();
     bias_tensor->set_uid(3).set_name("BiasTensor");
 
     auto raw_ptr = bias_tensor.get();
@@ -408,18 +407,18 @@ TEST(BatchnormAttributesTests, SetBiasWithMove)
 
 TEST(BatchnormAttributesTests, SetPeerStatsWithMove)
 {
-    hipdnn_frontend::graph::Batchnorm_attributes batchnorm_attributes;
+    hipdnn_frontend::graph::BatchnormAttributes batchnorm_attributes;
 
-    auto peer_stat_1 = std::make_shared<hipdnn_frontend::graph::Tensor_attributes>();
+    auto peer_stat_1 = std::make_shared<hipdnn_frontend::graph::TensorAttributes>();
     peer_stat_1->set_uid(10).set_name("PeerStat1");
 
-    auto peer_stat_2 = std::make_shared<hipdnn_frontend::graph::Tensor_attributes>();
+    auto peer_stat_2 = std::make_shared<hipdnn_frontend::graph::TensorAttributes>();
     peer_stat_2->set_uid(11).set_name("PeerStat2");
 
     auto raw_ptr_1 = peer_stat_1.get();
     auto raw_ptr_2 = peer_stat_2.get();
 
-    std::vector<std::shared_ptr<hipdnn_frontend::graph::Tensor_attributes>> peer_stats_move
+    std::vector<std::shared_ptr<hipdnn_frontend::graph::TensorAttributes>> peer_stats_move
         = {peer_stat_1, peer_stat_2};
 
     batchnorm_attributes.set_peer_stats(std::move(peer_stats_move));
@@ -438,15 +437,15 @@ TEST(BatchnormAttributesTests, SetPeerStatsWithMove)
 
 TEST(BatchnormAttributesTests, SetPreviousRunningStatsWithMove)
 {
-    hipdnn_frontend::graph::Batchnorm_attributes batchnorm_attributes;
+    hipdnn_frontend::graph::BatchnormAttributes batchnorm_attributes;
 
-    auto mean_tensor = std::make_shared<hipdnn_frontend::graph::Tensor_attributes>();
+    auto mean_tensor = std::make_shared<hipdnn_frontend::graph::TensorAttributes>();
     mean_tensor->set_uid(20).set_name("MeanTensor");
 
-    auto variance_tensor = std::make_shared<hipdnn_frontend::graph::Tensor_attributes>();
+    auto variance_tensor = std::make_shared<hipdnn_frontend::graph::TensorAttributes>();
     variance_tensor->set_uid(21).set_name("VarianceTensor");
 
-    auto momentum_tensor = std::make_shared<hipdnn_frontend::graph::Tensor_attributes>();
+    auto momentum_tensor = std::make_shared<hipdnn_frontend::graph::TensorAttributes>();
     momentum_tensor->set_uid(22).set_name("MomentumTensor");
 
     auto raw_mean_ptr = mean_tensor.get();
@@ -483,9 +482,9 @@ TEST(BatchnormAttributesTests, SetPreviousRunningStatsWithMove)
 
 TEST(BatchnormAttributesTests, SimplifiedSetXWithMove)
 {
-    hipdnn_frontend::graph::Batchnorm_attributes batchnorm_attributes;
+    hipdnn_frontend::graph::BatchnormAttributes batchnorm_attributes;
 
-    auto x_tensor = std::make_shared<hipdnn_frontend::graph::Tensor_attributes>();
+    auto x_tensor = std::make_shared<hipdnn_frontend::graph::TensorAttributes>();
     batchnorm_attributes.set_x(std::move(x_tensor));
 
     // Just verify the tensor was set
@@ -494,11 +493,11 @@ TEST(BatchnormAttributesTests, SimplifiedSetXWithMove)
 
 TEST(BatchnormAttributesTests, SimplifiedSetPeerStatsWithMove)
 {
-    hipdnn_frontend::graph::Batchnorm_attributes batchnorm_attributes;
+    hipdnn_frontend::graph::BatchnormAttributes batchnorm_attributes;
 
-    std::vector<std::shared_ptr<hipdnn_frontend::graph::Tensor_attributes>> peer_stats_move;
-    peer_stats_move.push_back(std::make_shared<hipdnn_frontend::graph::Tensor_attributes>());
-    peer_stats_move.push_back(std::make_shared<hipdnn_frontend::graph::Tensor_attributes>());
+    std::vector<std::shared_ptr<hipdnn_frontend::graph::TensorAttributes>> peer_stats_move;
+    peer_stats_move.push_back(std::make_shared<hipdnn_frontend::graph::TensorAttributes>());
+    peer_stats_move.push_back(std::make_shared<hipdnn_frontend::graph::TensorAttributes>());
 
     size_t original_size = peer_stats_move.size();
     batchnorm_attributes.set_peer_stats(std::move(peer_stats_move));
@@ -510,11 +509,11 @@ TEST(BatchnormAttributesTests, SimplifiedSetPeerStatsWithMove)
 
 TEST(BatchnormAttributesTests, SimplifiedSetPreviousRunningStatsWithMove)
 {
-    hipdnn_frontend::graph::Batchnorm_attributes batchnorm_attributes;
+    hipdnn_frontend::graph::BatchnormAttributes batchnorm_attributes;
 
-    auto mean_tensor = std::make_shared<hipdnn_frontend::graph::Tensor_attributes>();
-    auto variance_tensor = std::make_shared<hipdnn_frontend::graph::Tensor_attributes>();
-    auto momentum_tensor = std::make_shared<hipdnn_frontend::graph::Tensor_attributes>();
+    auto mean_tensor = std::make_shared<hipdnn_frontend::graph::TensorAttributes>();
+    auto variance_tensor = std::make_shared<hipdnn_frontend::graph::TensorAttributes>();
+    auto momentum_tensor = std::make_shared<hipdnn_frontend::graph::TensorAttributes>();
 
     batchnorm_attributes.set_previous_running_stats(
         std::move(mean_tensor), std::move(variance_tensor), std::move(momentum_tensor));

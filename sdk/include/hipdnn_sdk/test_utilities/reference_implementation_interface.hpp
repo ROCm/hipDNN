@@ -22,10 +22,10 @@ using namespace hipdnn_sdk::utilities;
 template <class Input_data_type,
           class Scale_bias_data_type,
           class Mean_variance_data_type = Scale_bias_data_type>
-class Reference_implementation_interface
+class ReferenceImplementationInterface
 {
 public:
-    virtual ~Reference_implementation_interface() = default;
+    virtual ~ReferenceImplementationInterface() = default;
 
     virtual void
         batchnorm_fwd_inference(const Tensor_interface<Input_data_type>& input,

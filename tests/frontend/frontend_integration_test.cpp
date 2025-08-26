@@ -106,12 +106,12 @@ protected:
 
     struct Batchnorm_test_tensors
     {
-        std::shared_ptr<Tensor_attributes> x;
-        std::shared_ptr<Tensor_attributes> mean;
-        std::shared_ptr<Tensor_attributes> inv_variance;
-        std::shared_ptr<Tensor_attributes> scale;
-        std::shared_ptr<Tensor_attributes> bias;
-        std::shared_ptr<Tensor_attributes> y;
+        std::shared_ptr<TensorAttributes> x;
+        std::shared_ptr<TensorAttributes> mean;
+        std::shared_ptr<TensorAttributes> inv_variance;
+        std::shared_ptr<TensorAttributes> scale;
+        std::shared_ptr<TensorAttributes> bias;
+        std::shared_ptr<TensorAttributes> y;
     };
 
     void SetUp() override
@@ -163,7 +163,7 @@ protected:
         {
             x_attr.set_uid(uid++);
         }
-        tensors.x = std::make_shared<Tensor_attributes>(std::move(x_attr));
+        tensors.x = std::make_shared<TensorAttributes>(std::move(x_attr));
 
         auto mean_attr
             = make_tensor_attributes("mean", DataType_t::FLOAT, tensor_bundle.mean_tensor);
@@ -171,7 +171,7 @@ protected:
         {
             mean_attr.set_uid(uid++);
         }
-        tensors.mean = std::make_shared<Tensor_attributes>(std::move(mean_attr));
+        tensors.mean = std::make_shared<TensorAttributes>(std::move(mean_attr));
 
         auto inv_variance_attr = make_tensor_attributes(
             "inv_variance", DataType_t::FLOAT, tensor_bundle.variance_tensor);
@@ -179,7 +179,7 @@ protected:
         {
             inv_variance_attr.set_uid(uid++);
         }
-        tensors.inv_variance = std::make_shared<Tensor_attributes>(std::move(inv_variance_attr));
+        tensors.inv_variance = std::make_shared<TensorAttributes>(std::move(inv_variance_attr));
 
         auto scale_attr
             = make_tensor_attributes("scale", DataType_t::FLOAT, tensor_bundle.scale_tensor);
@@ -187,7 +187,7 @@ protected:
         {
             scale_attr.set_uid(uid++);
         }
-        tensors.scale = std::make_shared<Tensor_attributes>(std::move(scale_attr));
+        tensors.scale = std::make_shared<TensorAttributes>(std::move(scale_attr));
 
         auto bias_attr
             = make_tensor_attributes("bias", DataType_t::FLOAT, tensor_bundle.bias_tensor);
@@ -195,9 +195,9 @@ protected:
         {
             bias_attr.set_uid(uid++);
         }
-        tensors.bias = std::make_shared<Tensor_attributes>(std::move(bias_attr));
+        tensors.bias = std::make_shared<TensorAttributes>(std::move(bias_attr));
 
-        Batchnorm_inference_attributes bn_attrs;
+        BatchnormInferenceAttributes bn_attrs;
         bn_attrs.set_name("batchnorm_inference");
 
         tensors.y = graph->batchnorm_inference(

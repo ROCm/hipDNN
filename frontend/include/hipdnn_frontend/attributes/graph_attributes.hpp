@@ -11,7 +11,7 @@ namespace hipdnn_frontend
 {
 namespace graph
 {
-class Graph_attributes
+class GraphAttributes
 {
 public:
     const std::string& get_name() const
@@ -20,33 +20,33 @@ public:
     }
     DataType_t get_compute_data_type() const
     {
-        return _compute_type;
+        return _computeType;
     }
     DataType_t get_intermediate_data_type() const
     {
-        return _intermediate_type;
+        return _intermediateType;
     }
     DataType_t get_io_data_type() const
     {
-        return _io_type;
+        return _ioType;
     }
 
-    Graph_attributes& set_compute_data_type(DataType_t compute_type)
+    GraphAttributes& set_compute_data_type(DataType_t computeType)
     {
-        _compute_type = compute_type;
+        _computeType = computeType;
         return *this;
     }
-    Graph_attributes& set_intermediate_data_type(DataType_t intermediate_type)
+    GraphAttributes& set_intermediate_data_type(DataType_t intermediateType)
     {
-        _intermediate_type = intermediate_type;
+        _intermediateType = intermediateType;
         return *this;
     }
-    Graph_attributes& set_io_data_type(DataType_t io_type)
+    GraphAttributes& set_io_data_type(DataType_t ioType)
     {
-        _io_type = io_type;
+        _ioType = ioType;
         return *this;
     }
-    Graph_attributes& set_name(const std::string& name)
+    GraphAttributes& set_name(const std::string& name)
     {
         _name = name;
         return *this;
@@ -54,9 +54,10 @@ public:
 
 private:
     std::string _name;
-    DataType_t _compute_type = DataType_t::NOT_SET;
-    DataType_t _intermediate_type = DataType_t::NOT_SET;
-    DataType_t _io_type = DataType_t::NOT_SET;
+    DataType_t _computeType = DataType_t::NOT_SET;
+    DataType_t _intermediateType = DataType_t::NOT_SET;
+    DataType_t _ioType = DataType_t::NOT_SET;
 };
+typedef GraphAttributes Graph_attributes;
 }
 }

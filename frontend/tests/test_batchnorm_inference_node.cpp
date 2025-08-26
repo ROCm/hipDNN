@@ -8,13 +8,13 @@ using namespace hipdnn_frontend::graph;
 
 TEST(BatchnormInferenceNodeTests, BatchnormInferenceNodeProperties)
 {
-    Batchnorm_inference_attributes batchnorm_attributes;
-    batchnorm_attributes.set_x(std::make_shared<Tensor_attributes>());
-    batchnorm_attributes.set_y(std::make_shared<Tensor_attributes>());
-    batchnorm_attributes.set_mean(std::make_shared<Tensor_attributes>());
-    batchnorm_attributes.set_inv_variance(std::make_shared<Tensor_attributes>());
-    batchnorm_attributes.set_scale(std::make_shared<Tensor_attributes>());
-    batchnorm_attributes.set_bias(std::make_shared<Tensor_attributes>());
+    BatchnormInferenceAttributes batchnorm_attributes;
+    batchnorm_attributes.set_x(std::make_shared<TensorAttributes>());
+    batchnorm_attributes.set_y(std::make_shared<TensorAttributes>());
+    batchnorm_attributes.set_mean(std::make_shared<TensorAttributes>());
+    batchnorm_attributes.set_inv_variance(std::make_shared<TensorAttributes>());
+    batchnorm_attributes.set_scale(std::make_shared<TensorAttributes>());
+    batchnorm_attributes.set_bias(std::make_shared<TensorAttributes>());
 
     auto input_tensor = batchnorm_attributes.get_x();
     input_tensor->set_uid(1)
@@ -26,7 +26,7 @@ TEST(BatchnormInferenceNodeTests, BatchnormInferenceNodeProperties)
     auto output_tensor = batchnorm_attributes.get_y();
     output_tensor->set_uid(2).set_name("OutputTensor");
 
-    Graph_attributes graph_attributes;
+    GraphAttributes graph_attributes;
     BatchnormInferenceNode node(std::move(batchnorm_attributes), graph_attributes);
     auto error = node.infer_properties_node();
 
@@ -37,13 +37,13 @@ TEST(BatchnormInferenceNodeTests, BatchnormInferenceNodeProperties)
 
 TEST(BatchnormInferenceNodeTests, PreValidateNode)
 {
-    Batchnorm_inference_attributes batchnorm_attributes;
-    batchnorm_attributes.set_x(std::make_shared<Tensor_attributes>());
-    batchnorm_attributes.set_y(std::make_shared<Tensor_attributes>());
-    batchnorm_attributes.set_scale(std::make_shared<Tensor_attributes>());
-    batchnorm_attributes.set_bias(std::make_shared<Tensor_attributes>());
+    BatchnormInferenceAttributes batchnorm_attributes;
+    batchnorm_attributes.set_x(std::make_shared<TensorAttributes>());
+    batchnorm_attributes.set_y(std::make_shared<TensorAttributes>());
+    batchnorm_attributes.set_scale(std::make_shared<TensorAttributes>());
+    batchnorm_attributes.set_bias(std::make_shared<TensorAttributes>());
 
-    Graph_attributes graph_attributes;
+    GraphAttributes graph_attributes;
     BatchnormInferenceNode node(std::move(batchnorm_attributes), graph_attributes);
 
     auto error = node.pre_validate_node();
@@ -52,36 +52,36 @@ TEST(BatchnormInferenceNodeTests, PreValidateNode)
 
 TEST(BatchnormInferenceNodeTests, PreValidateNodeMissingValues)
 {
-    Batchnorm_inference_attributes batchnorm_attributes;
+    BatchnormInferenceAttributes batchnorm_attributes;
 
-    Graph_attributes graph_attributes;
+    GraphAttributes graph_attributes;
     BatchnormInferenceNode node(std::move(batchnorm_attributes), graph_attributes);
 
     auto error = node.pre_validate_node();
     EXPECT_EQ(error.code, error_code_t::ATTRIBUTE_NOT_SET);
 
-    batchnorm_attributes.set_x(std::make_shared<Tensor_attributes>());
+    batchnorm_attributes.set_x(std::make_shared<TensorAttributes>());
     auto batchnorm_attributes_copy = batchnorm_attributes;
     BatchnormInferenceNode node_with_x(std::move(batchnorm_attributes_copy), graph_attributes);
 
     error = node_with_x.pre_validate_node();
     EXPECT_EQ(error.code, error_code_t::ATTRIBUTE_NOT_SET);
 
-    batchnorm_attributes.set_y(std::make_shared<Tensor_attributes>());
+    batchnorm_attributes.set_y(std::make_shared<TensorAttributes>());
     batchnorm_attributes_copy = batchnorm_attributes;
     BatchnormInferenceNode node_with_y(std::move(batchnorm_attributes_copy), graph_attributes);
 
     error = node_with_y.pre_validate_node();
     EXPECT_EQ(error.code, error_code_t::ATTRIBUTE_NOT_SET);
 
-    batchnorm_attributes.set_scale(std::make_shared<Tensor_attributes>());
+    batchnorm_attributes.set_scale(std::make_shared<TensorAttributes>());
     batchnorm_attributes_copy = batchnorm_attributes;
     BatchnormInferenceNode node_with_scale(std::move(batchnorm_attributes_copy), graph_attributes);
 
     error = node_with_scale.pre_validate_node();
     EXPECT_EQ(error.code, error_code_t::ATTRIBUTE_NOT_SET);
 
-    batchnorm_attributes.set_bias(std::make_shared<Tensor_attributes>());
+    batchnorm_attributes.set_bias(std::make_shared<TensorAttributes>());
     batchnorm_attributes_copy = batchnorm_attributes;
     BatchnormInferenceNode node_with_all_values(std::move(batchnorm_attributes_copy),
                                                 graph_attributes);
@@ -92,13 +92,13 @@ TEST(BatchnormInferenceNodeTests, PreValidateNodeMissingValues)
 
 TEST(BatchnormInferenceNodeTests, InferPropertiesNode)
 {
-    Batchnorm_inference_attributes batchnorm_attributes;
-    batchnorm_attributes.set_x(std::make_shared<Tensor_attributes>());
-    batchnorm_attributes.set_y(std::make_shared<Tensor_attributes>());
-    batchnorm_attributes.set_mean(std::make_shared<Tensor_attributes>());
-    batchnorm_attributes.set_inv_variance(std::make_shared<Tensor_attributes>());
-    batchnorm_attributes.set_scale(std::make_shared<Tensor_attributes>());
-    batchnorm_attributes.set_bias(std::make_shared<Tensor_attributes>());
+    BatchnormInferenceAttributes batchnorm_attributes;
+    batchnorm_attributes.set_x(std::make_shared<TensorAttributes>());
+    batchnorm_attributes.set_y(std::make_shared<TensorAttributes>());
+    batchnorm_attributes.set_mean(std::make_shared<TensorAttributes>());
+    batchnorm_attributes.set_inv_variance(std::make_shared<TensorAttributes>());
+    batchnorm_attributes.set_scale(std::make_shared<TensorAttributes>());
+    batchnorm_attributes.set_bias(std::make_shared<TensorAttributes>());
 
     auto input_tensor = batchnorm_attributes.get_x();
     input_tensor->set_uid(1)
@@ -110,7 +110,7 @@ TEST(BatchnormInferenceNodeTests, InferPropertiesNode)
     auto output_tensor = batchnorm_attributes.get_y();
     output_tensor->set_uid(2).set_name("OutputTensor");
 
-    Graph_attributes graph_attributes;
+    GraphAttributes graph_attributes;
     BatchnormInferenceNode node(std::move(batchnorm_attributes), graph_attributes);
 
     auto error = node.infer_properties_node();
@@ -122,10 +122,10 @@ TEST(BatchnormInferenceNodeTests, InferPropertiesNode)
 
 TEST(BatchnormInferenceNodeTests, PackNode)
 {
-    Batchnorm_inference_attributes batchnorm_attributes;
+    BatchnormInferenceAttributes batchnorm_attributes;
     batchnorm_attributes.name = "BatchnormInference";
 
-    auto x_tensor = std::make_shared<Tensor_attributes>();
+    auto x_tensor = std::make_shared<TensorAttributes>();
     x_tensor->set_uid(1)
         .set_name("XTensor")
         .set_data_type(DataType_t::FLOAT)
@@ -133,7 +133,7 @@ TEST(BatchnormInferenceNodeTests, PackNode)
         .set_stride({4, 3, 2, 1});
     batchnorm_attributes.set_x(x_tensor);
 
-    auto y_tensor = std::make_shared<Tensor_attributes>();
+    auto y_tensor = std::make_shared<TensorAttributes>();
     y_tensor->set_uid(2)
         .set_name("YTensor")
         .set_data_type(DataType_t::FLOAT)
@@ -141,7 +141,7 @@ TEST(BatchnormInferenceNodeTests, PackNode)
         .set_stride({4, 3, 2, 1});
     batchnorm_attributes.set_y(y_tensor);
 
-    auto mean_tensor = std::make_shared<Tensor_attributes>();
+    auto mean_tensor = std::make_shared<TensorAttributes>();
     mean_tensor->set_uid(3)
         .set_name("MeanTensor")
         .set_data_type(DataType_t::FLOAT)
@@ -149,7 +149,7 @@ TEST(BatchnormInferenceNodeTests, PackNode)
         .set_stride({2, 1, 1, 1});
     batchnorm_attributes.set_mean(mean_tensor);
 
-    auto inv_variance_tensor = std::make_shared<Tensor_attributes>();
+    auto inv_variance_tensor = std::make_shared<TensorAttributes>();
     inv_variance_tensor->set_uid(4)
         .set_name("InvVarianceTensor")
         .set_data_type(DataType_t::FLOAT)
@@ -157,7 +157,7 @@ TEST(BatchnormInferenceNodeTests, PackNode)
         .set_stride({2, 1, 1, 1});
     batchnorm_attributes.set_inv_variance(inv_variance_tensor);
 
-    auto scale_tensor = std::make_shared<Tensor_attributes>();
+    auto scale_tensor = std::make_shared<TensorAttributes>();
     scale_tensor->set_uid(5)
         .set_name("ScaleTensor")
         .set_data_type(DataType_t::FLOAT)
@@ -165,7 +165,7 @@ TEST(BatchnormInferenceNodeTests, PackNode)
         .set_stride({2, 1, 1, 1});
     batchnorm_attributes.set_scale(scale_tensor);
 
-    auto bias_tensor = std::make_shared<Tensor_attributes>();
+    auto bias_tensor = std::make_shared<TensorAttributes>();
     bias_tensor->set_uid(6)
         .set_name("BiasTensor")
         .set_data_type(DataType_t::FLOAT)
@@ -173,7 +173,7 @@ TEST(BatchnormInferenceNodeTests, PackNode)
         .set_stride({2, 1, 1, 1});
     batchnorm_attributes.set_bias(bias_tensor);
 
-    Graph_attributes graph_attributes;
+    GraphAttributes graph_attributes;
     BatchnormInferenceNode node(std::move(batchnorm_attributes), graph_attributes);
 
     flatbuffers::FlatBufferBuilder builder;
@@ -201,10 +201,10 @@ TEST(BatchnormInferenceNodeTests, PackNode)
 
 TEST(BatchnormInferenceNodeTests, PackNodeWithoutMeanAndInvVariance)
 {
-    Batchnorm_inference_attributes batchnorm_attributes;
+    BatchnormInferenceAttributes batchnorm_attributes;
     batchnorm_attributes.name = "BatchnormInference";
 
-    auto x_tensor = std::make_shared<Tensor_attributes>();
+    auto x_tensor = std::make_shared<TensorAttributes>();
     x_tensor->set_uid(1)
         .set_name("XTensor")
         .set_data_type(DataType_t::FLOAT)
@@ -212,7 +212,7 @@ TEST(BatchnormInferenceNodeTests, PackNodeWithoutMeanAndInvVariance)
         .set_stride({4, 3, 2, 1});
     batchnorm_attributes.set_x(x_tensor);
 
-    auto y_tensor = std::make_shared<Tensor_attributes>();
+    auto y_tensor = std::make_shared<TensorAttributes>();
     y_tensor->set_uid(2)
         .set_name("YTensor")
         .set_data_type(DataType_t::FLOAT)
@@ -220,7 +220,7 @@ TEST(BatchnormInferenceNodeTests, PackNodeWithoutMeanAndInvVariance)
         .set_stride({4, 3, 2, 1});
     batchnorm_attributes.set_y(y_tensor);
 
-    auto scale_tensor = std::make_shared<Tensor_attributes>();
+    auto scale_tensor = std::make_shared<TensorAttributes>();
     scale_tensor->set_uid(3)
         .set_name("ScaleTensor")
         .set_data_type(DataType_t::FLOAT)
@@ -228,7 +228,7 @@ TEST(BatchnormInferenceNodeTests, PackNodeWithoutMeanAndInvVariance)
         .set_stride({2, 1, 1, 1});
     batchnorm_attributes.set_scale(scale_tensor);
 
-    auto bias_tensor = std::make_shared<Tensor_attributes>();
+    auto bias_tensor = std::make_shared<TensorAttributes>();
     bias_tensor->set_uid(4)
         .set_name("BiasTensor")
         .set_data_type(DataType_t::FLOAT)
@@ -238,7 +238,7 @@ TEST(BatchnormInferenceNodeTests, PackNodeWithoutMeanAndInvVariance)
 
     // Do not set mean and inv_variance
 
-    Graph_attributes graph_attributes;
+    GraphAttributes graph_attributes;
     BatchnormInferenceNode node(std::move(batchnorm_attributes), graph_attributes);
 
     flatbuffers::FlatBufferBuilder builder;

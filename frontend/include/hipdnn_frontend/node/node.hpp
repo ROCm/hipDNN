@@ -18,8 +18,8 @@ namespace graph
 class INode // NOLINT
 {
 public:
-    Graph_attributes graph_attributes;
-    INode(Graph_attributes attributes)
+    GraphAttributes graph_attributes;
+    INode(GraphAttributes attributes)
         : graph_attributes(std::move(attributes))
     {
     }
@@ -38,7 +38,7 @@ public:
         return {};
     }
     virtual error_t populate_hipdnn_tensor_ids(
-        [[maybe_unused]] std::unordered_map<int64_t, std::shared_ptr<Tensor_attributes>>&
+        [[maybe_unused]] std::unordered_map<int64_t, std::shared_ptr<TensorAttributes>>&
             tensor_lookup,
         [[maybe_unused]] int64_t& current_tensor_id,
         [[maybe_unused]] std::unordered_set<int64_t>& used_ids) const
@@ -79,7 +79,7 @@ protected:
     }
 
     error_t populate_hipdnn_tensor_ids_subtree(
-        std::unordered_map<int64_t, std::shared_ptr<Tensor_attributes>>& tensor_lookup,
+        std::unordered_map<int64_t, std::shared_ptr<TensorAttributes>>& tensor_lookup,
         int64_t& current_tensor_id,
         std::unordered_set<int64_t>& used_ids)
     {
@@ -141,7 +141,7 @@ public:
     }
 
     error_t populate_hipdnn_tensor_ids(
-        std::unordered_map<int64_t, std::shared_ptr<Tensor_attributes>>& tensor_lookup,
+        std::unordered_map<int64_t, std::shared_ptr<TensorAttributes>>& tensor_lookup,
         int64_t& current_tensor_id,
         std::unordered_set<int64_t>& used_ids) const override
     {

@@ -23,14 +23,14 @@ using namespace hipdnn_sdk::utilities;
 template <class Input_data_type,
           class Scale_bias_data_type,
           class Mean_variance_data_type = Scale_bias_data_type>
-class Cpu_fp_reference_implementation
-    : public Reference_implementation_interface<Input_data_type,
-                                                Scale_bias_data_type,
-                                                Mean_variance_data_type>
+class CpuFpReferenceImplementation
+    : public ReferenceImplementationInterface<Input_data_type,
+                                              Scale_bias_data_type,
+                                              Mean_variance_data_type>
 {
 public:
-    Cpu_fp_reference_implementation() = default;
-    ~Cpu_fp_reference_implementation() override = default;
+    CpuFpReferenceImplementation() = default;
+    ~CpuFpReferenceImplementation() override = default;
 
     void
         batchnorm_fwd_inference(const Tensor_interface<Input_data_type>& input,

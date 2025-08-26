@@ -18,7 +18,7 @@
 #include <hipdnn_sdk/utilities/tensor.hpp>
 
 using namespace hipdnn_frontend;
-using namespace hipdnn_frontend::graph;
+// using namespace hipdnn_frontend::graph;
 using namespace hipdnn_sdk::utilities;
 using namespace hipdnn_sdk::reference_test_utilities;
 
@@ -123,12 +123,12 @@ protected:
 
     template <typename Input_type, typename Intermediate_type>
     std::unordered_map<int64_t, void*> create_variant_pack(
-        const Tensor_attributes& x_tensor_attr,
-        const Tensor_attributes& y_tensor_attr,
-        const Tensor_attributes& mean_tensor_attr,
-        const Tensor_attributes& inv_variance_tensor_attr,
-        const Tensor_attributes& scale_tensor_attr,
-        const Tensor_attributes& bias_tensor_attr,
+        const graph::TensorAttributes& x_tensor_attr,
+        const graph::TensorAttributes& y_tensor_attr,
+        const graph::TensorAttributes& mean_tensor_attr,
+        const graph::TensorAttributes& inv_variance_tensor_attr,
+        const graph::TensorAttributes& scale_tensor_attr,
+        const graph::TensorAttributes& bias_tensor_attr,
         Batchnorm_2d_tensor_bundle<Input_type, Intermediate_type>& tensor_bundle)
     {
         std::unordered_map<int64_t, void*> variant_pack;
@@ -155,32 +155,33 @@ protected:
         graph->set_name("BatchnormInferenceTest");
 
         int64_t uid = 1;
-        auto x_attr = make_tensor_attributes("X", input_data_type, graph_tensor_bundle.x_tensor);
+        auto x_attr
+            = graph::make_tensor_attributes("X", input_data_type, graph_tensor_bundle.x_tensor);
         x_attr.set_uid(uid++);
-        auto x_tensor_attr = std::make_shared<Tensor_attributes>(std::move(x_attr));
+        auto x_tensor_attr = std::make_shared<graph::TensorAttributes>(std::move(x_attr));
 
-        auto mean_attr = make_tensor_attributes(
+        auto mean_attr = graph::make_tensor_attributes(
             "mean", intermediate_data_type, graph_tensor_bundle.mean_tensor);
         mean_attr.set_uid(uid++);
-        auto mean_tensor_attr = std::make_shared<Tensor_attributes>(std::move(mean_attr));
+        auto mean_tensor_attr = std::make_shared<graph::TensorAttributes>(std::move(mean_attr));
 
-        auto inv_variance_attr = make_tensor_attributes(
+        auto inv_variance_attr = graph::make_tensor_attributes(
             "inv_variance", intermediate_data_type, graph_tensor_bundle.variance_tensor);
         inv_variance_attr.set_uid(uid++);
         auto inv_variance_tensor_attr
-            = std::make_shared<Tensor_attributes>(std::move(inv_variance_attr));
+            = std::make_shared<graph::TensorAttributes>(std::move(inv_variance_attr));
 
-        auto scale_attr = make_tensor_attributes(
+        auto scale_attr = graph::make_tensor_attributes(
             "scale", intermediate_data_type, graph_tensor_bundle.scale_tensor);
         scale_attr.set_uid(uid++);
-        auto scale_tensor_attr = std::make_shared<Tensor_attributes>(std::move(scale_attr));
+        auto scale_tensor_attr = std::make_shared<graph::TensorAttributes>(std::move(scale_attr));
 
-        auto bias_attr = make_tensor_attributes(
+        auto bias_attr = graph::make_tensor_attributes(
             "bias", intermediate_data_type, graph_tensor_bundle.bias_tensor);
         bias_attr.set_uid(uid++);
-        auto bias_tensor_attr = std::make_shared<Tensor_attributes>(std::move(bias_attr));
+        auto bias_tensor_attr = std::make_shared<graph::TensorAttributes>(std::move(bias_attr));
 
-        Batchnorm_inference_attributes bn_attrs;
+        graph::BatchnormInferenceAttributes bn_attrs;
         bn_attrs.set_name("batchnorm_inference");
 
         auto y_tensor_attr = graph->batchnorm_inference(x_tensor_attr,
@@ -231,8 +232,7 @@ protected:
     void run_cpu_batchnorm_fwd(
         Batchnorm_2d_tensor_bundle<Input_type, Intermediate_type>& cpu_tensor_bundle)
     {
-        Cpu_fp_reference_implementation<Input_type, Intermediate_type, Intermediate_type>
-            cpu_ref_impl;
+        CpuFpReferenceImplementation<Input_type, Intermediate_type, Intermediate_type> cpu_ref_impl;
         cpu_ref_impl.batchnorm_fwd_inference(cpu_tensor_bundle.x_tensor,
                                              cpu_tensor_bundle.scale_tensor,
                                              cpu_tensor_bundle.bias_tensor,
