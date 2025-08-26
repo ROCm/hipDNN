@@ -154,9 +154,9 @@ protected:
         DataType_t inputDataType,
         DataType_t intermediateDataType)
     {
-        auto graphObj = std::make_shared<hipdnn_frontend::graph::Graph>();
+        auto graph = std::make_shared<hipdnn_frontend::graph::Graph>();
 
-        graphObj->set_name("BatchnormInferenceTest");
+        graph->set_name("BatchnormInferenceTest");
 
         int64_t uid = 1;
         auto xAttr = graph::make_tensor_attributes("X", inputDataType, graphTensorBundle.xTensor);
@@ -187,12 +187,12 @@ protected:
         graph::BatchnormInferenceAttributes bnAttrs;
         bnAttrs.set_name("batchnorm_inference");
 
-        auto yTensorAttr = graphObj->batchnorm_inference(xTensorAttr,
-                                                         meanTensorAttr,
-                                                         invVarianceTensorAttr,
-                                                         scaleTensorAttr,
-                                                         biasTensorAttr,
-                                                         bnAttrs);
+        auto yTensorAttr = graph->batchnorm_inference(xTensorAttr,
+                                                      meanTensorAttr,
+                                                      invVarianceTensorAttr,
+                                                      scaleTensorAttr,
+                                                      biasTensorAttr,
+                                                      bnAttrs);
 
         if(!yTensorAttr->has_uid())
         {
@@ -203,19 +203,19 @@ protected:
         yTensorAttr->set_data_type(inputDataType);
 
         // Validate and build graph
-        auto result = graphObj->validate();
+        auto result = graph->validate();
         ASSERT_EQ(result.code, error_code_t::OK) << result.err_msg;
 
-        result = graphObj->build_operation_graph(_handle);
+        result = graph->build_operation_graph(_handle);
         ASSERT_EQ(result.code, error_code_t::OK) << result.err_msg;
 
-        result = graphObj->create_execution_plans(_handle);
+        result = graph->create_execution_plans(_handle);
         ASSERT_EQ(result.code, error_code_t::OK) << result.err_msg;
 
-        result = graphObj->check_support();
+        result = graph->check_support();
         ASSERT_EQ(result.code, error_code_t::OK) << result.err_msg;
 
-        result = graphObj->build_plans();
+        result = graph->build_plans();
         ASSERT_EQ(result.code, error_code_t::OK) << result.err_msg;
 
         auto variantPack = createVariantPack<InputType, IntermediateType>(*xTensorAttr,
@@ -226,7 +226,7 @@ protected:
                                                                           *biasTensorAttr,
                                                                           graphTensorBundle);
 
-        result = graphObj->execute(_handle, variantPack, nullptr);
+        result = graph->execute(_handle, variantPack, nullptr);
         ASSERT_EQ(result.code, error_code_t::OK) << result.err_msg;
     }
 
