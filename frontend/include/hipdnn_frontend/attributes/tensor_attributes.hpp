@@ -17,10 +17,44 @@ namespace hipdnn_frontend
 {
 namespace graph
 {
+
 class TensorAttributes
 {
 public:
     using ValueVariant = std::variant<std::monostate, double, float, uint16_t, uint8_t, int32_t>;
+
+    TensorAttributes() = default;
+
+    TensorAttributes(double const& scalar)
+    {
+        _value = scalar;
+        _dim = _stride = {1};
+        _dataType = DataType_t::DOUBLE;
+    }
+    TensorAttributes(float const& scalar)
+    {
+        _value = scalar;
+        _dim = _stride = {1};
+        _dataType = DataType_t::FLOAT;
+    }
+    TensorAttributes(uint16_t const& scalar)
+    {
+        _value = scalar;
+        _dim = _stride = {1};
+        _dataType = DataType_t::HALF;
+    }
+    TensorAttributes(uint8_t const& scalar)
+    {
+        _value = scalar;
+        _dim = _stride = {1};
+        _dataType = DataType_t::UINT8;
+    }
+    TensorAttributes(int32_t const& scalar)
+    {
+        _value = scalar;
+        _dim = _stride = {1};
+        _dataType = DataType_t::INT32;
+    }
 
     bool has_value() const
     {

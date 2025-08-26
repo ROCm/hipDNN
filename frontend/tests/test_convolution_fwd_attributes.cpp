@@ -17,7 +17,7 @@ TEST(ConvolutionFwdAttributesTests, CreateConvolutionFwdAttributes)
     conv_attributes.set_post_padding({1, 1});
     conv_attributes.set_stride({1, 1});
     conv_attributes.set_dilation({1, 1});
-    conv_attributes.set_conv_mode(hipdnn_frontend::ConvolutionMode_t::CROSS_CORRELATION);
+    conv_attributes.set_convolution_mode(hipdnn_frontend::ConvolutionMode_t::CROSS_CORRELATION);
 
     // Configure input tensor
     auto x_tensor = conv_attributes.get_x();
@@ -67,7 +67,7 @@ TEST(ConvolutionFwdAttributesTests, CreateConvolutionFwdAttributes)
     EXPECT_EQ(conv_attributes.get_post_padding(), (std::vector<int64_t>{1, 1}));
     EXPECT_EQ(conv_attributes.get_stride(), (std::vector<int64_t>{1, 1}));
     EXPECT_EQ(conv_attributes.get_dilation(), (std::vector<int64_t>{1, 1}));
-    EXPECT_EQ(conv_attributes.get_conv_mode(),
+    EXPECT_EQ(conv_attributes.get_convolution_mode(),
               hipdnn_frontend::ConvolutionMode_t::CROSS_CORRELATION);
 }
 
@@ -93,7 +93,7 @@ TEST(ConvolutionFwdAttributesTests, PackAttributes)
     conv_attributes.set_post_padding({2, 2});
     conv_attributes.set_stride({2, 2});
     conv_attributes.set_dilation({1, 1});
-    conv_attributes.set_conv_mode(hipdnn_frontend::ConvolutionMode_t::CROSS_CORRELATION);
+    conv_attributes.set_convolution_mode(hipdnn_frontend::ConvolutionMode_t::CROSS_CORRELATION);
 
     // Pack attributes
     flatbuffers::FlatBufferBuilder builder;
@@ -135,7 +135,7 @@ TEST(ConvolutionFwdAttributesTests, DefaultValues)
     hipdnn_frontend::graph::ConvFpropAttributes conv_attributes;
 
     // Check default convolution mode
-    EXPECT_EQ(conv_attributes.get_conv_mode(),
+    EXPECT_EQ(conv_attributes.get_convolution_mode(),
               hipdnn_frontend::ConvolutionMode_t::CROSS_CORRELATION);
 
     // Check that parameters are empty by default

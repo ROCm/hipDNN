@@ -676,7 +676,7 @@ TEST(ConvolutionFwdNodeTests, PackNode)
     conv_attributes.set_post_padding({1, 1});
     conv_attributes.set_stride({1, 1});
     conv_attributes.set_dilation({1, 1});
-    conv_attributes.set_conv_mode(hipdnn_frontend::ConvolutionMode_t::CROSS_CORRELATION);
+    conv_attributes.set_convolution_mode(hipdnn_frontend::ConvolutionMode_t::CROSS_CORRELATION);
 
     GraphAttributes graph_attributes;
     ConvolutionNode node(std::move(conv_attributes), graph_attributes);

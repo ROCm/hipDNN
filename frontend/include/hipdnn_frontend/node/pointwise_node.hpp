@@ -59,7 +59,7 @@ public:
 
         HIPDNN_CHECK_ERROR(attributes.fill_from_graph_attributes(graph_attributes));
 
-        auto out = attributes.outputs[PointwiseAttributes::output_names::out_0];
+        auto out = attributes.outputs[PointwiseAttributes::output_names::OUT_0];
 
         if(out->get_dim().empty())
         {

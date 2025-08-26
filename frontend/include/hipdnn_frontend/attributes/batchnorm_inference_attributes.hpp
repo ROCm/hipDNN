@@ -17,16 +17,16 @@ class BatchnormInferenceAttributes : public AttributesCRTP<BatchnormInferenceAtt
 public:
     enum class input_names
     {
-        x = 0,
-        mean = 1,
-        inv_variance = 2,
-        scale = 3,
-        bias = 4
+        X = 0,
+        MEAN = 1,
+        INV_VARIANCE = 2,
+        SCALE = 3,
+        BIAS = 4
     };
 
     enum class output_names
     {
-        y = 0
+        Y = 0
     };
 
     std::unordered_map<input_names, std::shared_ptr<TensorAttributes>> inputs;
@@ -34,76 +34,76 @@ public:
 
     std::shared_ptr<TensorAttributes> get_x() const
     {
-        return getInput(input_names::x);
+        return getInput(input_names::X);
     }
     std::shared_ptr<TensorAttributes> get_mean() const
     {
-        return getInput(input_names::mean);
+        return getInput(input_names::MEAN);
     }
     std::shared_ptr<TensorAttributes> get_inv_variance() const
     {
-        return getInput(input_names::inv_variance);
+        return getInput(input_names::INV_VARIANCE);
     }
     std::shared_ptr<TensorAttributes> get_scale() const
     {
-        return getInput(input_names::scale);
+        return getInput(input_names::SCALE);
     }
     std::shared_ptr<TensorAttributes> get_bias() const
     {
-        return getInput(input_names::bias);
+        return getInput(input_names::BIAS);
     }
     std::shared_ptr<TensorAttributes> get_y() const
     {
-        return getOutput(output_names::y);
+        return getOutput(output_names::Y);
     }
 
     BatchnormInferenceAttributes& set_x(const std::shared_ptr<TensorAttributes>& value)
     {
-        return setInput(input_names::x, value);
+        return setInput(input_names::X, value);
     }
     BatchnormInferenceAttributes& set_x(std::shared_ptr<TensorAttributes>&& value)
     {
-        return setInput(input_names::x, std::move(value));
+        return setInput(input_names::X, std::move(value));
     }
     BatchnormInferenceAttributes& set_mean(const std::shared_ptr<TensorAttributes>& value)
     {
-        return setInput(input_names::mean, value);
+        return setInput(input_names::MEAN, value);
     }
     BatchnormInferenceAttributes& set_mean(std::shared_ptr<TensorAttributes>&& value)
     {
-        return setInput(input_names::mean, std::move(value));
+        return setInput(input_names::MEAN, std::move(value));
     }
     BatchnormInferenceAttributes& set_inv_variance(const std::shared_ptr<TensorAttributes>& value)
     {
-        return setInput(input_names::inv_variance, value);
+        return setInput(input_names::INV_VARIANCE, value);
     }
     BatchnormInferenceAttributes& set_inv_variance(std::shared_ptr<TensorAttributes>&& value)
     {
-        return setInput(input_names::inv_variance, std::move(value));
+        return setInput(input_names::INV_VARIANCE, std::move(value));
     }
     BatchnormInferenceAttributes& set_scale(const std::shared_ptr<TensorAttributes>& value)
     {
-        return setInput(input_names::scale, value);
+        return setInput(input_names::SCALE, value);
     }
     BatchnormInferenceAttributes& set_scale(std::shared_ptr<TensorAttributes>&& value)
     {
-        return setInput(input_names::scale, std::move(value));
+        return setInput(input_names::SCALE, std::move(value));
     }
     BatchnormInferenceAttributes& set_bias(const std::shared_ptr<TensorAttributes>& value)
     {
-        return setInput(input_names::bias, value);
+        return setInput(input_names::BIAS, value);
     }
     BatchnormInferenceAttributes& set_bias(std::shared_ptr<TensorAttributes>&& value)
     {
-        return setInput(input_names::bias, std::move(value));
+        return setInput(input_names::BIAS, std::move(value));
     }
     BatchnormInferenceAttributes& set_y(const std::shared_ptr<TensorAttributes>& value)
     {
-        return setOutput(output_names::y, value);
+        return setOutput(output_names::Y, value);
     }
     BatchnormInferenceAttributes& set_y(std::shared_ptr<TensorAttributes>&& value)
     {
-        return setOutput(output_names::y, std::move(value));
+        return setOutput(output_names::Y, std::move(value));
     }
 
     flatbuffers::Offset<hipdnn_sdk::data_objects::BatchnormInferenceAttributes>

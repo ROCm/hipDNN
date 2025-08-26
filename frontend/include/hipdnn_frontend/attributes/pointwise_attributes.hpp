@@ -39,19 +39,19 @@ public:
     }
     std::shared_ptr<TensorAttributes> get_input_0() const
     {
-        return getInput(input_names::in_0);
+        return getInput(input_names::IN_0);
     }
     std::shared_ptr<TensorAttributes> get_input_1() const
     {
-        return getInput(input_names::in_1);
+        return getInput(input_names::IN_1);
     }
     std::shared_ptr<TensorAttributes> get_input_2() const
     {
-        return getInput(input_names::in_2);
+        return getInput(input_names::IN_2);
     }
     std::shared_ptr<TensorAttributes> get_output_0() const
     {
-        return getOutput(output_names::out_0);
+        return getOutput(output_names::OUT_0);
     }
 
     PointwiseAttributes& set_mode(PointwiseMode_t mode)
@@ -59,17 +59,17 @@ public:
         _mode = mode;
         return *this;
     }
-    PointwiseAttributes& set_relu_lower_clip(std::optional<float> reluLowerClip)
+    PointwiseAttributes& set_relu_lower_clip(float reluLowerClip)
     {
         _reluLowerClip = reluLowerClip;
         return *this;
     }
-    PointwiseAttributes& set_relu_upper_clip(std::optional<float> reluUpperClip)
+    PointwiseAttributes& set_relu_upper_clip(float reluUpperClip)
     {
         _reluUpperClip = reluUpperClip;
         return *this;
     }
-    PointwiseAttributes& set_relu_lower_clip_slope(std::optional<float> reluLowerSlope)
+    PointwiseAttributes& set_relu_lower_clip_slope(float reluLowerSlope)
     {
         _reluLowerSlope = reluLowerSlope;
         return *this;
@@ -81,54 +81,54 @@ public:
     }
     PointwiseAttributes& set_input_0(const std::shared_ptr<TensorAttributes>& input0)
     {
-        inputs[input_names::in_0] = input0;
+        inputs[input_names::IN_0] = input0;
         return *this;
     }
     PointwiseAttributes& set_input_0(std::shared_ptr<TensorAttributes>&& input0)
     {
-        inputs[input_names::in_0] = std::move(input0);
+        inputs[input_names::IN_0] = std::move(input0);
         return *this;
     }
     PointwiseAttributes& set_input_1(const std::shared_ptr<TensorAttributes>& input1)
     {
-        inputs[input_names::in_1] = input1;
+        inputs[input_names::IN_1] = input1;
         return *this;
     }
     PointwiseAttributes& set_input_1(std::shared_ptr<TensorAttributes>&& input1)
     {
-        inputs[input_names::in_1] = std::move(input1);
+        inputs[input_names::IN_1] = std::move(input1);
         return *this;
     }
     PointwiseAttributes& set_input_2(const std::shared_ptr<TensorAttributes>& input2)
     {
-        inputs[input_names::in_2] = input2;
+        inputs[input_names::IN_2] = input2;
         return *this;
     }
     PointwiseAttributes& set_input_2(std::shared_ptr<TensorAttributes>&& input2)
     {
-        inputs[input_names::in_2] = std::move(input2);
+        inputs[input_names::IN_2] = std::move(input2);
         return *this;
     }
     PointwiseAttributes& set_output_0(const std::shared_ptr<TensorAttributes>& output0)
     {
-        outputs[output_names::out_0] = output0;
+        outputs[output_names::OUT_0] = output0;
         return *this;
     }
     PointwiseAttributes& set_output_0(std::shared_ptr<TensorAttributes>&& output0)
     {
-        outputs[output_names::out_0] = std::move(output0);
+        outputs[output_names::OUT_0] = std::move(output0);
         return *this;
     }
 
     enum class input_names
     {
-        in_0 = 0,
-        in_1 = 1,
-        in_2 = 2,
+        IN_0 = 0,
+        IN_1 = 1,
+        IN_2 = 2,
     };
     enum class output_names
     {
-        out_0 = 0,
+        OUT_0 = 0,
     };
     std::unordered_map<input_names, std::shared_ptr<TensorAttributes>> inputs;
     std::unordered_map<output_names, std::shared_ptr<TensorAttributes>> outputs;

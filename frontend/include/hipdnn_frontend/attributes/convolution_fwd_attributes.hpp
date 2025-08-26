@@ -140,7 +140,7 @@ public:
         return *this;
     }
 
-    ConvFpropAttributes& set_conv_mode(ConvolutionMode_t mode)
+    ConvFpropAttributes& set_convolution_mode(ConvolutionMode_t mode)
     {
         conv_mode = mode;
         return *this;
@@ -163,7 +163,7 @@ public:
     {
         return dilation;
     }
-    ConvolutionMode_t get_conv_mode() const
+    ConvolutionMode_t get_convolution_mode() const
     {
         return conv_mode;
     }

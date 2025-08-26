@@ -58,6 +58,6 @@ private:
     DataType_t _intermediateType = DataType_t::NOT_SET;
     DataType_t _ioType = DataType_t::NOT_SET;
 };
-typedef GraphAttributes Graph_attributes;
+typedef GraphAttributes Context;
 }
 }

@@ -481,14 +481,14 @@ public:
             attributes.name = "BatchnormInference_" + std::to_string(_sub_nodes.size());
         }
 
-        auto y = attributes.outputs[BatchnormInferenceAttributes::output_names::y]
+        auto y = attributes.outputs[BatchnormInferenceAttributes::output_names::Y]
             = output_tensor(attributes.name + "::Y");
-        attributes.inputs[BatchnormInferenceAttributes::input_names::x] = std::move(x);
-        attributes.inputs[BatchnormInferenceAttributes::input_names::mean] = std::move(mean);
-        attributes.inputs[BatchnormInferenceAttributes::input_names::inv_variance]
+        attributes.inputs[BatchnormInferenceAttributes::input_names::X] = std::move(x);
+        attributes.inputs[BatchnormInferenceAttributes::input_names::MEAN] = std::move(mean);
+        attributes.inputs[BatchnormInferenceAttributes::input_names::INV_VARIANCE]
             = std::move(invVariance);
-        attributes.inputs[BatchnormInferenceAttributes::input_names::scale] = std::move(scale);
-        attributes.inputs[BatchnormInferenceAttributes::input_names::bias] = std::move(bias);
+        attributes.inputs[BatchnormInferenceAttributes::input_names::SCALE] = std::move(scale);
+        attributes.inputs[BatchnormInferenceAttributes::input_names::BIAS] = std::move(bias);
 
         _sub_nodes.emplace_back(
             std::make_shared<BatchnormInferenceNode>(std::move(attributes), graph_attributes));
@@ -508,9 +508,9 @@ public:
         {
             in_0->set_name(attributes.name + "::IN_0");
         }
-        auto out_0 = attributes.outputs[PointwiseAttributes::output_names::out_0]
+        auto out_0 = attributes.outputs[PointwiseAttributes::output_names::OUT_0]
             = output_tensor(attributes.name + "::OUT_0");
-        attributes.inputs[PointwiseAttributes::input_names::in_0] = std::move(in_0);
+        attributes.inputs[PointwiseAttributes::input_names::IN_0] = std::move(in_0);
 
         _sub_nodes.emplace_back(
             std::make_shared<PointwiseNode>(std::move(attributes), graph_attributes));
@@ -535,10 +535,10 @@ public:
         {
             in_1->set_name(attributes.name + "::IN_1");
         }
-        auto out_0 = attributes.outputs[PointwiseAttributes::output_names::out_0]
+        auto out_0 = attributes.outputs[PointwiseAttributes::output_names::OUT_0]
             = output_tensor(attributes.name + "::OUT_0");
-        attributes.inputs[PointwiseAttributes::input_names::in_0] = std::move(in_0);
-        attributes.inputs[PointwiseAttributes::input_names::in_1] = std::move(in_1);
+        attributes.inputs[PointwiseAttributes::input_names::IN_0] = std::move(in_0);
+        attributes.inputs[PointwiseAttributes::input_names::IN_1] = std::move(in_1);
 
         _sub_nodes.emplace_back(
             std::make_shared<PointwiseNode>(std::move(attributes), graph_attributes));
@@ -568,11 +568,11 @@ public:
         {
             in_2->set_name(attributes.name + "::IN_2");
         }
-        auto out_0 = attributes.outputs[PointwiseAttributes::output_names::out_0]
+        auto out_0 = attributes.outputs[PointwiseAttributes::output_names::OUT_0]
             = output_tensor(attributes.name + "::OUT_0");
-        attributes.inputs[PointwiseAttributes::input_names::in_0] = std::move(in_0);
-        attributes.inputs[PointwiseAttributes::input_names::in_1] = std::move(in_1);
-        attributes.inputs[PointwiseAttributes::input_names::in_2] = std::move(in_2);
+        attributes.inputs[PointwiseAttributes::input_names::IN_0] = std::move(in_0);
+        attributes.inputs[PointwiseAttributes::input_names::IN_1] = std::move(in_1);
+        attributes.inputs[PointwiseAttributes::input_names::IN_2] = std::move(in_2);
 
         _sub_nodes.emplace_back(
             std::make_shared<PointwiseNode>(std::move(attributes), graph_attributes));
