@@ -38,13 +38,14 @@ void Sample_runner::operator()(const Tensor_layout& layout)
         .set_intermediate_data_type(intermediate_type)
         .set_compute_data_type(intermediate_type);
 
-    auto dy = create_tensor({N, C, H, W}, input_type);
-    auto x = create_tensor({N, C, H, W}, input_type);
+    auto dy = create_tensor({N, C, H, W}, input_type, layout);
+    auto x = create_tensor({N, C, H, W}, input_type, layout);
     auto scale = create_tensor({1, C, 1, 1}, intermediate_type);
     auto saved_mean = create_tensor({1, C, 1, 1}, intermediate_type);
     auto saved_inv_variance = create_tensor({1, C, 1, 1}, intermediate_type);
 
     auto bn_bwd_attributes = graph::Batchnorm_backward_attributes();
+    bn_bwd_attributes.set_name("bn_backward_node");
     bn_bwd_attributes.set_saved_mean_and_inv_variance(saved_mean, saved_inv_variance);
 
     auto [dx, dscale, dbias] = graph->batchnorm_backward(dy, x, scale, bn_bwd_attributes);
@@ -137,11 +138,11 @@ void Sample_runner::operator()(const Tensor_layout& layout)
             = hipdnn_sdk::reference_test_utilities::Cpu_fp_reference_validation<IntermediateType>(
                 static_cast<IntermediateType>(epsilon), static_cast<IntermediateType>(epsilon));
 
-        bool dx_valid = dx_validator.compare_buffers(dx_ref_tensor.memory(), dx_tensor.memory());
-        bool dscale_valid = dscale_dbias_validator.compare_buffers(dscale_ref_tensor.memory(),
-                                                                   dscale_tensor.memory());
-        bool dbias_valid = dscale_dbias_validator.compare_buffers(dbias_ref_tensor.memory(),
-                                                                  dbias_tensor.memory());
+        bool dx_valid = dx_validator.all_close(dx_ref_tensor.memory(), dx_tensor.memory());
+        bool dscale_valid
+            = dscale_dbias_validator.all_close(dscale_ref_tensor.memory(), dscale_tensor.memory());
+        bool dbias_valid
+            = dscale_dbias_validator.all_close(dbias_ref_tensor.memory(), dbias_tensor.memory());
 
         std::cout << "CPU reference validation:\n";
         std::cout << "  dx: " << (dx_valid ? "successful" : "failed") << "\n";
