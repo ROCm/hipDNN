@@ -185,7 +185,7 @@ TEST(Engine_managerTest, InitializeExecutionContextThrowsOnInvalidEngineId)
     MockEngineConfig mockEngineConfig;
 
     EXPECT_CALL(mockEngineConfig, engineId()).Times(testing::AnyNumber()); // Uninteresting call
-    EXPECT_THROW(manager.initialize_execution_context(
-                     dummy_handle, mock_graph, mockEngineConfig, exec_ctx),
-                 hipdnn_plugin::HipdnnPluginException);
+    EXPECT_THROW(
+        manager.initialize_execution_context(dummy_handle, mock_graph, mockEngineConfig, exec_ctx),
+        hipdnn_plugin::HipdnnPluginException);
 }

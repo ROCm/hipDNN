@@ -113,7 +113,7 @@ private:
         if(!isValid())
         {
             throw hipdnn_plugin::HipdnnPluginException(HIPDNN_PLUGIN_STATUS_INTERNAL_ERROR,
-                                                         "Graph is not valid");
+                                                       "Graph is not valid");
         }
     }
 

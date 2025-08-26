@@ -120,7 +120,7 @@ hipdnnPluginStatus_t hipdnnEnginePluginGetAllEngineIds(int64_t* engine_ids,
         if(all_engine_ids.size() > std::numeric_limits<uint32_t>::max())
         {
             throw HipdnnPluginException(HIPDNN_PLUGIN_STATUS_INTERNAL_ERROR,
-                                          "Number of engines exceeds maximum uint32_t value.");
+                                        "Number of engines exceeds maximum uint32_t value.");
         }
 
         if(max_engines == 0)

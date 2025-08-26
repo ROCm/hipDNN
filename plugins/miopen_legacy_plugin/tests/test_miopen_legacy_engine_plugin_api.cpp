@@ -223,7 +223,7 @@ TEST(MiopenLegacyEnginePluginApiTest, EnginePluginGetEngineDetailsValid)
     auto status = hipdnnEnginePluginGetEngineDetails(handle, 1, &op_graph, &engine_details_out);
 
     hipdnn_plugin::EngineDetailsWrapper engine_details(engine_details_out.ptr,
-                                                         engine_details_out.size);
+                                                       engine_details_out.size);
 
     EXPECT_EQ(status, HIPDNN_PLUGIN_STATUS_SUCCESS);
     EXPECT_EQ(engine_details.engineId(), 1);

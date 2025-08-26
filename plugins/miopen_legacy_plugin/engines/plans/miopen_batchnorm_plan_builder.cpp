@@ -14,8 +14,7 @@
 namespace miopen_legacy_plugin
 {
 
-bool Miopen_batchnorm_plan_builder::is_applicable(
-    const hipdnn_plugin::IGraph& op_graph) const
+bool Miopen_batchnorm_plan_builder::is_applicable(const hipdnn_plugin::IGraph& op_graph) const
 {
 
     if(op_graph.nodeCount() != 1)
@@ -37,8 +36,9 @@ bool Miopen_batchnorm_plan_builder::is_applicable(
     return true;
 }
 
-size_t Miopen_batchnorm_plan_builder::get_workspace_size(
-    const hipdnnEnginePluginHandle& handle, const hipdnn_plugin::IGraph& op_graph) const
+size_t
+    Miopen_batchnorm_plan_builder::get_workspace_size(const hipdnnEnginePluginHandle& handle,
+                                                      const hipdnn_plugin::IGraph& op_graph) const
 {
     std::ignore = handle;
     std::ignore = op_graph;
@@ -70,8 +70,7 @@ void build_plan_inference_single_node(const hipdnnEnginePluginHandle& handle,
                 + get_node_name(node));
     }
 
-    auto params
-        = std::make_unique<Batchnorm_fwd_inference_params>(*attr, op_graph.getTensorMap());
+    auto params = std::make_unique<Batchnorm_fwd_inference_params>(*attr, op_graph.getTensorMap());
     auto plan = std::make_unique<Batchnorm_fwd_inference_plan>(std::move(params));
     execution_context.set_plan(std::move(plan));
 }

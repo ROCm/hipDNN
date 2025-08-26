@@ -289,7 +289,7 @@ public:
             if(!get_instance()->supports_engine_operations())
             {
                 throw hipdnn_plugin::HipdnnPluginException(HIPDNN_PLUGIN_STATUS_INTERNAL_ERROR,
-                                                             "No engine details to destroy");
+                                                           "No engine details to destroy");
             }
 
             hipdnn_plugin::throwIfNull(engine_details->ptr);
@@ -384,7 +384,7 @@ public:
             if(!get_instance()->supports_engine_operations())
             {
                 throw hipdnn_plugin::HipdnnPluginException(HIPDNN_PLUGIN_STATUS_INTERNAL_ERROR,
-                                                             "No execution context to destroy");
+                                                           "No execution context to destroy");
             }
 
             delete execution_context;

@@ -64,8 +64,8 @@ std::unique_ptr<Miopen_tensor> create_tensor(
     }
 
     throw hipdnn_plugin::HipdnnPluginException(HIPDNN_PLUGIN_STATUS_INTERNAL_ERROR,
-                                                 "Failed to find tensor with UID in tensor_map: "
-                                                     + std::to_string(uid));
+                                               "Failed to find tensor with UID in tensor_map: "
+                                                   + std::to_string(uid));
 }
 
 } // namespace

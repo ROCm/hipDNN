@@ -63,7 +63,7 @@ private:
         if(!isValid())
         {
             throw hipdnn_plugin::HipdnnPluginException(HIPDNN_PLUGIN_STATUS_INTERNAL_ERROR,
-                                                         "Engine config is not valid");
+                                                       "Engine config is not valid");
         }
     }
 

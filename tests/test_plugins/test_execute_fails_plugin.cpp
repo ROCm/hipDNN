@@ -36,7 +36,7 @@ public:
     void execute_graph() const override
     {
         throw hipdnn_plugin::HipdnnPluginException(HIPDNN_PLUGIN_STATUS_INTERNAL_ERROR,
-                                                     "Simulated execution failure for testing");
+                                                   "Simulated execution failure for testing");
     }
 };
 

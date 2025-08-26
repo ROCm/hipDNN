@@ -56,8 +56,8 @@ void run_engine(const uint32_t* input, uint32_t* output, uint32_t size)
     if(error != hipSuccess)
     {
         throw HipdnnPluginException(HIPDNN_PLUGIN_STATUS_INTERNAL_ERROR,
-                                      "kernel launch failed, error: "
-                                          + std::string(hipGetErrorString(error)));
+                                    "kernel launch failed, error: "
+                                        + std::string(hipGetErrorString(error)));
     }
 }
 
@@ -174,8 +174,8 @@ void execute_op_graph(hipdnnEnginePluginHandle_t handle,
     if(num_device_buffers != 2)
     {
         throw HipdnnPluginException(HIPDNN_PLUGIN_STATUS_INVALID_VALUE,
-                                      "expected 2 device buffers, got "
-                                          + std::to_string(num_device_buffers));
+                                    "expected 2 device buffers, got "
+                                        + std::to_string(num_device_buffers));
     }
 
     run_engine(static_cast<const uint32_t*>(device_buffers[0].ptr),

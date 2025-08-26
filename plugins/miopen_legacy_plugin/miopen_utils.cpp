@@ -21,10 +21,9 @@ hipdnnPluginDeviceBuffer_t find_device_buffer(int64_t uid,
         }
     }
 
-    throw hipdnn_plugin::HipdnnPluginException(
-        HIPDNN_PLUGIN_STATUS_INVALID_VALUE,
-        "Device buffer with the uid: " + std::to_string(uid)
-            + " not found in the provided device buffers.");
+    throw hipdnn_plugin::HipdnnPluginException(HIPDNN_PLUGIN_STATUS_INVALID_VALUE,
+                                               "Device buffer with the uid: " + std::to_string(uid)
+                                                   + " not found in the provided device buffers.");
 }
 
 miopenDataType_t

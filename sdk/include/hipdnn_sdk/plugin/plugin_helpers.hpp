@@ -24,7 +24,7 @@ void throwIfNull(T* value)
     if(value == nullptr)
     {
         throw HipdnnPluginException(HIPDNN_PLUGIN_STATUS_BAD_PARAM,
-                                      std::string(typeid(T).name()) + " is nullptr");
+                                    std::string(typeid(T).name()) + " is nullptr");
     }
 }
 
@@ -41,13 +41,12 @@ hipdnnPluginStatus_t tryCatch(F f)
     }
     catch(const std::exception& ex)
     {
-        return PluginLastErrorManager::setLastError(HIPDNN_PLUGIN_STATUS_INTERNAL_ERROR,
-                                                         ex.what());
+        return PluginLastErrorManager::setLastError(HIPDNN_PLUGIN_STATUS_INTERNAL_ERROR, ex.what());
     }
     catch(...)
     {
         return PluginLastErrorManager::setLastError(HIPDNN_PLUGIN_STATUS_INTERNAL_ERROR,
-                                                         "Unknown exception occured");
+                                                    "Unknown exception occured");
     }
     return HIPDNN_PLUGIN_STATUS_SUCCESS;
 }

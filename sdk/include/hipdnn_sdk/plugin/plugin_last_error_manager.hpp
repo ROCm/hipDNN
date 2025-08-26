@@ -43,7 +43,7 @@ public:
     }
 
     static hipdnnPluginStatus_t setLastError(hipdnnPluginStatus_t status,
-                                               const std::string& message)
+                                             const std::string& message)
     {
         return setLastError(status, message.c_str());
     }

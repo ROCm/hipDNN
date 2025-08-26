@@ -53,7 +53,7 @@ extern "C" hipdnnPluginStatus_t hipdnnPluginSetLoggingCallback(hipdnnCallback_t 
     if(callback == nullptr)
     {
         return PluginLastErrorManager::setLastError(HIPDNN_PLUGIN_STATUS_BAD_PARAM,
-                                                         "hipdnnPluginGetType: type is null");
+                                                    "hipdnnPluginGetType: type is null");
     }
     logging_callback = callback;
     logging_callback(HIPDNN_SEV_INFO, "Logging callback successfully set for test plugin.");
