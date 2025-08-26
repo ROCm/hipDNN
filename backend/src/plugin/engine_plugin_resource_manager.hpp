@@ -68,7 +68,7 @@ public:
     virtual std::vector<int64_t> getApplicableEngineIds(const GraphDescriptor* graphDesc) const;
     virtual size_t getWorkspaceSize(int64_t engineId,
                                     const hipdnnPluginConstData_t* engineConfig,
-                                    const Graph_descriptor* graphDesc) const;
+                                    const GraphDescriptor* graphDesc) const;
 
     virtual void executeOpGraph(hipdnnBackendDescriptor_t executionPlan,
                                 hipdnnBackendDescriptor_t variantPack) const;
