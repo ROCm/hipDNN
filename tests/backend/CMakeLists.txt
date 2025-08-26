@@ -6,6 +6,7 @@ find_package(hip REQUIRED)
 find_package(Threads REQUIRED)
 
 add_executable(public_hipdnn_backend_tests 
+    test_plugin_loading.cpp
     test_backend_public_functions.cpp
     test_backend_execute_api.cpp
     test_engine_config_api.cpp
@@ -39,6 +40,9 @@ target_compile_definitions(public_hipdnn_backend_tests
     TEST_GOOD_PLUGIN_NAME="${TEST_GOOD_PLUGIN_NAME}"
     TEST_EXECUTE_FAILS_PLUGIN_NAME="${TEST_EXECUTE_FAILS_PLUGIN_NAME}"
     TEST_NO_APPLICABLE_ENGINES_PLUGIN_NAME="${TEST_NO_APPLICABLE_ENGINES_PLUGIN_NAME}"
+    TEST_DUPLICATE_ID_A_PLUGIN_NAME="${TEST_DUPLICATE_ID_A_PLUGIN_NAME}"
+    TEST_DUPLICATE_ID_B_PLUGIN_NAME="${TEST_DUPLICATE_ID_B_PLUGIN_NAME}"
+    TEST_INCOMPLETE_API_PLUGIN_NAME="${TEST_INCOMPLETE_API_PLUGIN_NAME}"
 )
 
 # Ensure test plugins are built before tests

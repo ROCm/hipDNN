@@ -40,7 +40,7 @@ public:
 
     void deserialize_graph(const uint8_t* serialized_graph, size_t graph_byte_size);
 
-    hipdnnPluginConstData_t get_serialized_graph() const;
+    virtual hipdnnPluginConstData_t get_serialized_graph() const;
     virtual hipdnnHandle_t get_handle() const;
 
     static hipdnnBackendDescriptorType_t get_static_type();

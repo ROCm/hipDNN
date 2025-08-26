@@ -56,8 +56,8 @@ public:
                        const void* array_of_elements) override;
 
     // Throws an exception if the descriptor is not finalized.
-    std::shared_ptr<const Engine_config_descriptor> get_engine_config() const;
-    hipdnnEnginePluginExecutionContext_t get_execution_context() const;
+    virtual std::shared_ptr<const Engine_config_descriptor> get_engine_config() const;
+    virtual hipdnnEnginePluginExecutionContext_t get_execution_context() const;
 
     static hipdnnBackendDescriptorType_t get_static_type();
 };

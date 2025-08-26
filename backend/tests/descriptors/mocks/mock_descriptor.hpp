@@ -6,7 +6,9 @@
 #include "descriptors/backend_descriptor.hpp"
 #include "descriptors/engine_config_descriptor.hpp"
 #include "descriptors/engine_descriptor.hpp"
+#include "descriptors/execution_plan_descriptor.hpp"
 #include "descriptors/graph_descriptor.hpp"
+#include "descriptors/variant_descriptor.hpp"
 
 #include <gmock/gmock.h>
 
@@ -139,10 +141,75 @@ public:
                 (const, override));
 
     MOCK_METHOD(hipdnnHandle_t, get_handle, (), (const, override));
+    MOCK_METHOD(hipdnnPluginConstData_t, get_serialized_graph, (), (const, override));
 
     static hipdnnBackendDescriptorType_t get_static_type()
     {
         return HIPDNN_BACKEND_OPERATIONGRAPH_DESCRIPTOR;
+    }
+};
+
+class Mock_execution_plan_descriptor : public Execution_plan_descriptor
+{
+public:
+    MOCK_METHOD(void, finalize, (), (override));
+    MOCK_METHOD(bool, is_finalized, (), (const, override));
+    MOCK_METHOD(void,
+                set_attribute,
+                (hipdnnBackendAttributeName_t attribute_name,
+                 hipdnnBackendAttributeType_t attribute_type,
+                 int64_t element_count,
+                 const void* array_of_element),
+                (override));
+    MOCK_METHOD(void,
+                get_attribute,
+                (hipdnnBackendAttributeName_t attribute_name,
+                 hipdnnBackendAttributeType_t attribute_type,
+                 int64_t requested_element_count,
+                 int64_t* element_count,
+                 void* array_of_elements),
+                (const, override));
+
+    MOCK_METHOD(std::shared_ptr<const Engine_config_descriptor>,
+                get_engine_config,
+                (),
+                (const, override));
+    MOCK_METHOD(hipdnnEnginePluginExecutionContext_t, get_execution_context, (), (const, override));
+
+    static hipdnnBackendDescriptorType_t get_static_type()
+    {
+        return HIPDNN_BACKEND_EXECUTION_PLAN_DESCRIPTOR;
+    }
+};
+
+class Mock_variant_descriptor : public Variant_descriptor
+{
+public:
+    MOCK_METHOD(void, finalize, (), (override));
+    MOCK_METHOD(bool, is_finalized, (), (const, override));
+    MOCK_METHOD(void,
+                set_attribute,
+                (hipdnnBackendAttributeName_t attribute_name,
+                 hipdnnBackendAttributeType_t attribute_type,
+                 int64_t element_count,
+                 const void* array_of_element),
+                (override));
+    MOCK_METHOD(void,
+                get_attribute,
+                (hipdnnBackendAttributeName_t attribute_name,
+                 hipdnnBackendAttributeType_t attribute_type,
+                 int64_t requested_element_count,
+                 int64_t* element_count,
+                 void* array_of_elements),
+                (const, override));
+
+    MOCK_METHOD(void*, get_workspace, (), (const, override));
+    MOCK_METHOD(const std::vector<const void*>&, get_data_pointers, (), (const, override));
+    MOCK_METHOD(const std::vector<int64_t>&, get_tensor_ids, (), (const, override));
+
+    static hipdnnBackendDescriptorType_t get_static_type()
+    {
+        return HIPDNN_BACKEND_VARIANT_PACK_DESCRIPTOR;
     }
 };
 

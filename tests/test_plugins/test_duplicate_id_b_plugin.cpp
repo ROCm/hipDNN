@@ -8,12 +8,12 @@ thread_local char
     hipdnn_plugin::Plugin_last_error_manager::last_error[HIPDNN_PLUGIN_ERROR_STRING_MAX_LENGTH]
     = "";
 
-class No_applicable_engines_plugin : public Test_plugin_base
+class Duplicate_id_b_plugin : public Test_plugin_base
 {
 public:
     const char* get_plugin_name() const override
     {
-        return "test_no_applicable_engines_plugin";
+        return "test_duplicate_id_b_plugin";
     }
     const char* get_plugin_version() const override
     {
@@ -21,25 +21,22 @@ public:
     }
     int64_t get_engine_id() const override
     {
-        return hipdnn_tests::plugin_constants::engine_id<No_applicable_engines_plugin>();
+        return hipdnn_tests::plugin_constants::engine_id<Duplicate_id_b_plugin>();
     }
     uint32_t get_num_engines() const override
     {
-        return 0;
+        return 1;
     }
     uint32_t get_num_applicable_engines() const override
     {
-        return 0;
+        return 1;
     }
-
-    // Since no engines are applicable, supports_engine_operations returns false
-    // This will cause all engine operations to throw appropriate errors
 };
 
 // Initialize plugin instance on load
 __attribute__((constructor)) static void initialize_plugin()
 {
-    Test_plugin_base::set_instance(std::make_unique<No_applicable_engines_plugin>());
+    Test_plugin_base::set_instance(std::make_unique<Duplicate_id_b_plugin>());
 }
 
 // Register all API functions

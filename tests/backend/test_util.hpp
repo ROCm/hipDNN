@@ -9,8 +9,6 @@
 namespace test_util
 {
 
-#define HIPDNN_TEST_PLUGIN_ID -1
-
 void create_test_handle(hipdnnHandle_t* handle);
 
 void create_test_graph(hipdnnBackendDescriptor_t* descriptor, hipdnnHandle_t handle);
@@ -24,7 +22,8 @@ void populate_test_engine(hipdnnBackendDescriptor_t engine,
 void create_test_engine(hipdnnBackendDescriptor_t* engine,
                         hipdnnBackendDescriptor_t* graph,
                         hipdnnHandle_t handle,
-                        int64_t gidx);
+                        int64_t gidx,
+                        bool finalize = false);
 
 void populate_test_engine_config(hipdnnBackendDescriptor_t* engine_config,
                                  hipdnnBackendDescriptor_t* engine,

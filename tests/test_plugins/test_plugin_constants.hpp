@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include "test_plugin_engine_id_map.hpp"
 #include <filesystem>
 #include <hipdnn_sdk/utilities/platform_utils.hpp>
 #include <stdexcept>
@@ -18,6 +19,9 @@ const std::filesystem::path PLUGIN_DIR = "../test_plugins";
 inline const char* test_good_plugin_name = TEST_GOOD_PLUGIN_NAME;
 inline const char* test_execute_fails_plugin_name = TEST_EXECUTE_FAILS_PLUGIN_NAME;
 inline const char* test_no_applicable_engines_plugin_name = TEST_NO_APPLICABLE_ENGINES_PLUGIN_NAME;
+inline const char* test_duplicate_id_a_plugin_name = TEST_DUPLICATE_ID_A_PLUGIN_NAME;
+inline const char* test_duplicate_id_b_plugin_name = TEST_DUPLICATE_ID_B_PLUGIN_NAME;
+inline const char* test_incomplete_api_plugin_name = TEST_INCOMPLETE_API_PLUGIN_NAME;
 
 // Compose full plugin path with existence checking
 inline std::string get_plugin_path(const char* plugin_name)
@@ -53,6 +57,27 @@ inline const std::string& test_no_applicable_engines_plugin_path()
     static const std::string test_no_applicable_engines_plugin_path
         = get_plugin_path(test_no_applicable_engines_plugin_name);
     return test_no_applicable_engines_plugin_path;
+}
+
+inline const std::string& test_duplicate_id_a_plugin_path()
+{
+    static const std::string test_duplicate_id_a_plugin_path
+        = get_plugin_path(test_duplicate_id_a_plugin_name);
+    return test_duplicate_id_a_plugin_path;
+}
+
+inline const std::string& test_duplicate_id_b_plugin_path()
+{
+    static const std::string test_duplicate_id_b_plugin_path
+        = get_plugin_path(test_duplicate_id_b_plugin_name);
+    return test_duplicate_id_b_plugin_path;
+}
+
+inline const std::string& test_incomplete_api_plugin_path()
+{
+    static const std::string test_incomplete_api_plugin_path
+        = get_plugin_path(test_incomplete_api_plugin_name);
+    return test_incomplete_api_plugin_path;
 }
 
 } // namespace plugin_constants
