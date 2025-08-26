@@ -29,9 +29,9 @@ protected:
 
 TEST_F(MiopenLegacyPluginApiTest, GetNameSuccess)
 {
-    const char* namePtr = nullptr;
-    EXPECT_EQ(hipdnnPluginGetName(&namePtr), HIPDNN_PLUGIN_STATUS_SUCCESS);
-    EXPECT_STREQ(namePtr, "miopen_legacy_plugin");
+    const char* name = nullptr;
+    EXPECT_EQ(hipdnnPluginGetName(&name), HIPDNN_PLUGIN_STATUS_SUCCESS);
+    EXPECT_STREQ(name, "miopen_legacy_plugin");
 }
 
 TEST_F(MiopenLegacyPluginApiTest, GetNameNullptr)
@@ -41,9 +41,9 @@ TEST_F(MiopenLegacyPluginApiTest, GetNameNullptr)
 
 TEST_F(MiopenLegacyPluginApiTest, GetVersionSuccess)
 {
-    const char* versionPtr = nullptr;
-    EXPECT_EQ(hipdnnPluginGetVersion(&versionPtr), HIPDNN_PLUGIN_STATUS_SUCCESS);
-    EXPECT_STREQ(versionPtr, "1.0.0");
+    const char* version = nullptr;
+    EXPECT_EQ(hipdnnPluginGetVersion(&version), HIPDNN_PLUGIN_STATUS_SUCCESS);
+    EXPECT_STREQ(version, "1.0.0");
 }
 
 TEST_F(MiopenLegacyPluginApiTest, GetVersionNullptr)
@@ -53,9 +53,9 @@ TEST_F(MiopenLegacyPluginApiTest, GetVersionNullptr)
 
 TEST_F(MiopenLegacyPluginApiTest, GetTypeSuccess)
 {
-    hipdnnPluginType_t typeVar;
-    EXPECT_EQ(hipdnnPluginGetType(&typeVar), HIPDNN_PLUGIN_STATUS_SUCCESS);
-    EXPECT_EQ(typeVar, HIPDNN_PLUGIN_TYPE_ENGINE);
+    hipdnnPluginType_t type;
+    EXPECT_EQ(hipdnnPluginGetType(&type), HIPDNN_PLUGIN_STATUS_SUCCESS);
+    EXPECT_EQ(type, HIPDNN_PLUGIN_TYPE_ENGINE);
 }
 
 TEST_F(MiopenLegacyPluginApiTest, GetTypeNullptr)

@@ -27,15 +27,15 @@ protected:
     void SetUp() override
     {
         SKIP_IF_NO_DEVICES();
-        hipdnnPluginStatus_t status = hipdnnEnginePluginCreate(&handle);
+        hipdnnPluginStatus_t status = hipdnnEnginePluginCreate(&_handle);
         ASSERT_EQ(status, HIPDNN_PLUGIN_STATUS_SUCCESS);
     }
 
     void TearDown() override
     {
-        if(handle != nullptr)
+        if(_handle != nullptr)
         {
-            hipdnnEnginePluginDestroy(handle);
+            hipdnnEnginePluginDestroy(_handle);
         }
     }
 
@@ -45,7 +45,7 @@ protected:
                               InputType epsilon,
                               const Tensor_layout& layout);
 
-    hipdnnEnginePluginHandle_t handle = nullptr;
+    hipdnnEnginePluginHandle_t _handle = nullptr;
 };
 
 TEST_P(BatchnormFwdInferExecuteGraphTest, RunFloatFwdBatchnormGraphNCHW)
@@ -165,10 +165,10 @@ void BatchnormFwdInferExecuteGraphTest::runFwdBatchnormGraph(
     engineConfig.size = engineConfigBuilder.GetSize();
 
     hipdnnEnginePluginExecutionContext_t executionContext;
-    hipdnnEnginePluginCreateExecutionContext(handle, &engineConfig, &opGraph, &executionContext);
+    hipdnnEnginePluginCreateExecutionContext(_handle, &engineConfig, &opGraph, &executionContext);
 
     hipdnnPluginStatus_t status
-        = hipdnnEnginePluginExecuteOpGraph(handle,
+        = hipdnnEnginePluginExecuteOpGraph(_handle,
                                            executionContext,
                                            nullptr,
                                            deviceBuffers.data(),
@@ -177,7 +177,7 @@ void BatchnormFwdInferExecuteGraphTest::runFwdBatchnormGraph(
 
     yTensor.memory().mark_device_modified();
 
-    hipdnnEnginePluginDestroyExecutionContext(handle, executionContext);
+    hipdnnEnginePluginDestroyExecutionContext(_handle, executionContext);
 
     Tensor<InputType> xTensorCpu(dims, layout);
     xTensorCpu.fill_with_random_values(

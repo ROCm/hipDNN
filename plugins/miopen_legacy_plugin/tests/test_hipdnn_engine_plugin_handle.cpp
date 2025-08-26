@@ -12,17 +12,17 @@ class HipdnnEnginePluginHandleTest : public ::testing::Test
 protected:
     void SetUp() override
     {
-        handle = std::make_unique<HipdnnEnginePluginHandle>();
+        _handle = std::make_unique<HipdnnEnginePluginHandle>();
     }
 
-    std::unique_ptr<HipdnnEnginePluginHandle> handle;
+    std::unique_ptr<HipdnnEnginePluginHandle> _handle;
 };
 
 TEST_F(HipdnnEnginePluginHandleTest, DefaultConstruction)
 {
-    EXPECT_EQ(handle->miopenHandle, nullptr);
-    EXPECT_EQ(handle->miopenContainer, nullptr);
-    EXPECT_EQ(handle->getStream(), nullptr);
+    EXPECT_EQ(_handle->miopenHandle, nullptr);
+    EXPECT_EQ(_handle->miopenContainer, nullptr);
+    EXPECT_EQ(_handle->getStream(), nullptr);
 }
 
 TEST_F(HipdnnEnginePluginHandleTest, StoreDetachedBuffer)
@@ -33,10 +33,10 @@ TEST_F(HipdnnEnginePluginHandleTest, StoreDetachedBuffer)
     auto buffer = std::make_unique<flatbuffers::DetachedBuffer>(builder.Release());
     const void* ptr = reinterpret_cast<const void*>(0x12354);
 
-    handle->storeEngineDetailsDetachedBuffer(ptr, std::move(buffer));
+    _handle->storeEngineDetailsDetachedBuffer(ptr, std::move(buffer));
 
     // Buffer should be stored, verify by trying to remove it
-    handle->removeEngineDetailsDetachedBuffer(ptr);
+    _handle->removeEngineDetailsDetachedBuffer(ptr);
 }
 
 TEST_F(HipdnnEnginePluginHandleTest, RemoveDetachedBuffer)
@@ -47,11 +47,11 @@ TEST_F(HipdnnEnginePluginHandleTest, RemoveDetachedBuffer)
     auto buffer = std::make_unique<flatbuffers::DetachedBuffer>(builder.Release());
     const void* ptr = reinterpret_cast<const void*>(0x12354);
 
-    handle->storeEngineDetailsDetachedBuffer(ptr, std::move(buffer));
-    handle->removeEngineDetailsDetachedBuffer(ptr);
+    _handle->storeEngineDetailsDetachedBuffer(ptr, std::move(buffer));
+    _handle->removeEngineDetailsDetachedBuffer(ptr);
 
     // Should not crash when removing non-existent buffer
-    handle->removeEngineDetailsDetachedBuffer(ptr);
+    _handle->removeEngineDetailsDetachedBuffer(ptr);
 }
 
 TEST_F(HipdnnEnginePluginHandleTest, RemoveNonExistentBuffer)
@@ -59,7 +59,7 @@ TEST_F(HipdnnEnginePluginHandleTest, RemoveNonExistentBuffer)
     const void* fakePtr = reinterpret_cast<const void*>(0x12345678);
 
     // Should not crash when removing non-existent buffer
-    EXPECT_NO_THROW(handle->removeEngineDetailsDetachedBuffer(fakePtr));
+    EXPECT_NO_THROW(_handle->removeEngineDetailsDetachedBuffer(fakePtr));
 }
 
 TEST_F(HipdnnEnginePluginHandleTest, MultipleBuffers)
@@ -76,14 +76,14 @@ TEST_F(HipdnnEnginePluginHandleTest, MultipleBuffers)
     auto buffer2 = std::make_unique<flatbuffers::DetachedBuffer>(builder2.Release());
     const void* ptr2 = reinterpret_cast<const void*>(0x54311);
 
-    handle->storeEngineDetailsDetachedBuffer(ptr1, std::move(buffer1));
-    handle->storeEngineDetailsDetachedBuffer(ptr2, std::move(buffer2));
+    _handle->storeEngineDetailsDetachedBuffer(ptr1, std::move(buffer1));
+    _handle->storeEngineDetailsDetachedBuffer(ptr2, std::move(buffer2));
 
-    handle->removeEngineDetailsDetachedBuffer(ptr1);
-    handle->removeEngineDetailsDetachedBuffer(ptr2);
+    _handle->removeEngineDetailsDetachedBuffer(ptr1);
+    _handle->removeEngineDetailsDetachedBuffer(ptr2);
 }
 
 TEST_F(HipdnnEnginePluginHandleTest, ThrowsWithNoMiopenHandle)
 {
-    EXPECT_THROW(handle->setStream(nullptr), hipdnn_plugin::Hipdnn_plugin_exception);
+    EXPECT_THROW(_handle->setStream(nullptr), hipdnn_plugin::Hipdnn_plugin_exception);
 }
