@@ -12,48 +12,48 @@
 namespace miopen_legacy_plugin
 {
 
-class Batchnorm_fwd_inference_params
+class BatchnormFwdInferenceParams
 {
 public:
-    Batchnorm_fwd_inference_params(
+    BatchnormFwdInferenceParams(
         const hipdnn_sdk::data_objects::BatchnormInferenceAttributes& attributes,
         const std::unordered_map<int64_t, const hipdnn_sdk::data_objects::TensorAttributes*>&
-            tensor_map);
+            tensorMap);
 
     const Miopen_tensor& x() const;
     const Miopen_tensor& y() const;
     const Miopen_tensor& scale() const;
     const Miopen_tensor& bias() const;
-    const std::optional<std::unique_ptr<Miopen_tensor>>& est_mean() const;
-    const std::optional<std::unique_ptr<Miopen_tensor>>& est_variance() const;
+    const std::optional<std::unique_ptr<Miopen_tensor>>& estMean() const;
+    const std::optional<std::unique_ptr<Miopen_tensor>>& estVariance() const;
 
 private:
-    void initialize_tensors(
+    void initializeTensors(
         const hipdnn_sdk::data_objects::BatchnormInferenceAttributes& attributes,
         const std::unordered_map<int64_t, const hipdnn_sdk::data_objects::TensorAttributes*>&
-            tensor_map);
+            tensorMap);
 
-    std::unique_ptr<Miopen_tensor> _x_pair;
-    std::unique_ptr<Miopen_tensor> _y_pair;
-    std::unique_ptr<Miopen_tensor> _scale_pair;
-    std::unique_ptr<Miopen_tensor> _bias_pair;
+    std::unique_ptr<Miopen_tensor> _xPair;
+    std::unique_ptr<Miopen_tensor> _yPair;
+    std::unique_ptr<Miopen_tensor> _scalePair;
+    std::unique_ptr<Miopen_tensor> _biasPair;
 
-    std::optional<std::unique_ptr<Miopen_tensor>> _est_mean_tensor_descriptor;
-    std::optional<std::unique_ptr<Miopen_tensor>> _est_variance_tensor_descriptor;
+    std::optional<std::unique_ptr<Miopen_tensor>> _estMeanTensorDescriptor;
+    std::optional<std::unique_ptr<Miopen_tensor>> _estVarianceTensorDescriptor;
 };
 
-class Batchnorm_fwd_inference_plan : public Plan_interface
+class BatchnormFwdInferencePlan : public PlanInterface
 {
 public:
-    Batchnorm_fwd_inference_plan(std::unique_ptr<Batchnorm_fwd_inference_params> inference_params);
+    BatchnormFwdInferencePlan(std::unique_ptr<BatchnormFwdInferenceParams> inferenceParams);
 
     void execute(const hipdnnEnginePluginHandle& handle,
-                 const hipdnnPluginDeviceBuffer_t* device_buffers,
-                 uint32_t num_device_buffers,
+                 const hipdnnPluginDeviceBuffer_t* deviceBuffers,
+                 uint32_t numDeviceBuffers,
                  void* workspace = nullptr) const override;
 
 private:
-    std::unique_ptr<Batchnorm_fwd_inference_params> _inference_params;
+    std::unique_ptr<BatchnormFwdInferenceParams> _inferenceParams;
 };
 
 }
