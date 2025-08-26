@@ -49,33 +49,33 @@ protected:
             });
     }
 
-    static std::shared_ptr<Tensor_attributes> create_basic_batchnorm_graph(Graph& graph)
+    static std::shared_ptr<TensorAttributes> create_basic_batchnorm_graph(Graph& graph)
     {
         graph.set_name("SerializedGraphTest")
             .set_compute_data_type(DataType_t::FLOAT)
             .set_intermediate_data_type(DataType_t::HALF)
             .set_io_data_type(DataType_t::FLOAT);
 
-        auto x = std::make_shared<Tensor_attributes>();
+        auto x = std::make_shared<TensorAttributes>();
         x->set_uid(1)
             .set_name("X")
             .set_dim({1, 2, 3, 4})
             .set_stride({5, 6, 7, 8})
             .set_data_type(DataType_t::FLOAT);
 
-        auto mean = std::make_shared<Tensor_attributes>();
+        auto mean = std::make_shared<TensorAttributes>();
         mean->set_uid(2).set_name("Mean").set_data_type(DataType_t::FLOAT);
 
-        auto inv_variance = std::make_shared<Tensor_attributes>();
+        auto inv_variance = std::make_shared<TensorAttributes>();
         inv_variance->set_uid(3).set_name("InvVariance").set_data_type(DataType_t::FLOAT);
 
-        auto scale = std::make_shared<Tensor_attributes>();
+        auto scale = std::make_shared<TensorAttributes>();
         scale->set_uid(4).set_name("Scale").set_data_type(DataType_t::FLOAT);
 
-        auto bias = std::make_shared<Tensor_attributes>();
+        auto bias = std::make_shared<TensorAttributes>();
         bias->set_uid(5).set_name("Bias").set_data_type(DataType_t::FLOAT);
 
-        Batchnorm_inference_attributes batchnorm_attributes;
+        BatchnormInferenceAttributes batchnorm_attributes;
         batchnorm_attributes.name = "BatchnormNode";
 
         return graph.batchnorm_inference(x, mean, inv_variance, scale, bias, batchnorm_attributes);
@@ -104,15 +104,15 @@ TEST_F(Graph_test_fixture, BatchnormNodeCreation)
 {
     Graph graph;
 
-    auto x = std::make_shared<Tensor_attributes>();
+    auto x = std::make_shared<TensorAttributes>();
     x->set_dim({1, 2, 3, 4}).set_stride({5, 6, 7, 8}).set_data_type(DataType_t::FLOAT);
 
-    auto scale = std::make_shared<Tensor_attributes>();
-    auto bias = std::make_shared<Tensor_attributes>();
+    auto scale = std::make_shared<TensorAttributes>();
+    auto bias = std::make_shared<TensorAttributes>();
 
-    Batchnorm_attributes attributes;
+    BatchnormAttributes attributes;
     attributes.name = "BatchnormNode";
-    attributes.set_epsilon(std::make_shared<Tensor_attributes>());
+    attributes.set_epsilon(std::make_shared<TensorAttributes>());
 
     auto [y, mean, inv_variance, next_running_mean, next_running_variance]
         = graph.batchnorm(x, scale, bias, attributes);
@@ -137,14 +137,14 @@ TEST_F(Graph_test_fixture, BatchnormBackwardNodeCreation)
 {
     Graph graph;
 
-    auto dy = std::make_shared<Tensor_attributes>();
-    auto x = std::make_shared<Tensor_attributes>();
-    auto scale = std::make_shared<Tensor_attributes>();
+    auto dy = std::make_shared<TensorAttributes>();
+    auto x = std::make_shared<TensorAttributes>();
+    auto scale = std::make_shared<TensorAttributes>();
 
     dy->set_dim({1, 2, 3, 4}).set_stride({5, 6, 7, 8}).set_data_type(DataType_t::FLOAT);
     x->set_dim({1, 2, 3, 4}).set_stride({5, 6, 7, 8}).set_data_type(DataType_t::FLOAT);
 
-    Batchnorm_backward_attributes attributes;
+    BatchnormBackwardAttributes attributes;
     attributes.name = "BatchnormBackwardNode";
 
     auto [dx, dscale, dbias] = graph.batchnorm_backward(dy, x, scale, attributes);
@@ -166,15 +166,15 @@ TEST_F(Graph_test_fixture, BatchnormInferenceNodeCreation)
 {
     Graph graph;
 
-    auto x = std::make_shared<Tensor_attributes>();
+    auto x = std::make_shared<TensorAttributes>();
     x->set_dim({1, 2, 3, 4}).set_stride({5, 6, 7, 8}).set_data_type(DataType_t::FLOAT);
 
-    auto mean = std::make_shared<Tensor_attributes>();
-    auto inv_variance = std::make_shared<Tensor_attributes>();
-    auto scale = std::make_shared<Tensor_attributes>();
-    auto bias = std::make_shared<Tensor_attributes>();
+    auto mean = std::make_shared<TensorAttributes>();
+    auto inv_variance = std::make_shared<TensorAttributes>();
+    auto scale = std::make_shared<TensorAttributes>();
+    auto bias = std::make_shared<TensorAttributes>();
 
-    Batchnorm_inference_attributes attributes;
+    BatchnormInferenceAttributes attributes;
     attributes.name = "BatchnormNode";
 
     auto y = graph.batchnorm_inference(x, mean, inv_variance, scale, bias, attributes);
@@ -190,10 +190,10 @@ TEST_F(Graph_test_fixture, PointwiseNodeCreationSingleInput)
 {
     Graph graph;
 
-    auto in_0 = std::make_shared<Tensor_attributes>();
+    auto in_0 = std::make_shared<TensorAttributes>();
     in_0->set_dim({1, 2, 3, 4}).set_stride({5, 6, 7, 8}).set_data_type(DataType_t::FLOAT);
 
-    Pointwise_attributes attributes;
+    PointwiseAttributes attributes;
     attributes.name = "PointwiseNode";
     attributes.set_mode(PointwiseMode_t::RELU_FWD);
 
@@ -210,13 +210,13 @@ TEST_F(Graph_test_fixture, PointwiseNodeCreationTwoInputs)
 {
     Graph graph;
 
-    auto in_0 = std::make_shared<Tensor_attributes>();
-    auto in_1 = std::make_shared<Tensor_attributes>();
+    auto in_0 = std::make_shared<TensorAttributes>();
+    auto in_1 = std::make_shared<TensorAttributes>();
 
     in_0->set_dim({1, 2, 3, 4}).set_stride({5, 6, 7, 8}).set_data_type(DataType_t::FLOAT);
     in_1->set_dim({1, 2, 3, 4}).set_stride({5, 6, 7, 8}).set_data_type(DataType_t::FLOAT);
 
-    Pointwise_attributes attributes;
+    PointwiseAttributes attributes;
     attributes.name = "PointwiseNode";
     attributes.set_mode(PointwiseMode_t::RELU_FWD);
 
@@ -233,15 +233,15 @@ TEST_F(Graph_test_fixture, PointwiseNodeCreationThreeInputs)
 {
     Graph graph;
 
-    auto in_0 = std::make_shared<Tensor_attributes>();
-    auto in_1 = std::make_shared<Tensor_attributes>();
-    auto in_2 = std::make_shared<Tensor_attributes>();
+    auto in_0 = std::make_shared<TensorAttributes>();
+    auto in_1 = std::make_shared<TensorAttributes>();
+    auto in_2 = std::make_shared<TensorAttributes>();
 
     in_0->set_dim({1, 2, 3, 4}).set_stride({5, 6, 7, 8}).set_data_type(DataType_t::FLOAT);
     in_1->set_dim({1, 2, 3, 4}).set_stride({5, 6, 7, 8}).set_data_type(DataType_t::FLOAT);
     in_2->set_dim({1, 2, 3, 4}).set_stride({5, 6, 7, 8}).set_data_type(DataType_t::FLOAT);
 
-    Pointwise_attributes attributes;
+    PointwiseAttributes attributes;
     attributes.name = "PointwiseNode";
     attributes.set_mode(PointwiseMode_t::RELU_FWD);
 
@@ -258,13 +258,13 @@ TEST_F(Graph_test_fixture, ConvolutionFwdNodeCreation)
 {
     Graph graph;
 
-    auto x = std::make_shared<Tensor_attributes>();
+    auto x = std::make_shared<TensorAttributes>();
     x->set_dim({1, 3, 32, 32}).set_stride({3072, 1024, 32, 1}).set_data_type(DataType_t::FLOAT);
 
-    auto w = std::make_shared<Tensor_attributes>();
+    auto w = std::make_shared<TensorAttributes>();
     w->set_dim({64, 3, 3, 3}).set_stride({27, 9, 3, 1}).set_data_type(DataType_t::FLOAT);
 
-    Conv_fprop_attributes attributes;
+    ConvFpropAttributes attributes;
     attributes.name = "ConvolutionNode";
     attributes.set_pre_padding({1, 1});
     attributes.set_post_padding({1, 1});
@@ -280,7 +280,7 @@ TEST_F(Graph_test_fixture, ConvolutionFwdNodeCreation)
     EXPECT_TRUE(validation_result.is_good()) << validation_result.get_message();
 }
 
-static void validate_tensor(const Tensor_attributes& tensor,
+static void validate_tensor(const TensorAttributes& tensor,
                             const hipdnn_sdk::data_objects::TensorAttributesT& serialized_tensor)
 {
     EXPECT_EQ(tensor.get_name(), serialized_tensor.name);
@@ -301,26 +301,26 @@ TEST_F(Graph_test_fixture, BuildAndSerializeBatchnormInferenceGraph)
         .set_intermediate_data_type(DataType_t::HALF)
         .set_io_data_type(DataType_t::FLOAT);
 
-    auto x = std::make_shared<Tensor_attributes>();
+    auto x = std::make_shared<TensorAttributes>();
     x->set_uid(1)
         .set_name("X")
         .set_dim({1, 2, 3, 4})
         .set_stride({5, 6, 7, 8})
         .set_data_type(DataType_t::FLOAT);
 
-    auto mean = std::make_shared<Tensor_attributes>();
+    auto mean = std::make_shared<TensorAttributes>();
     mean->set_uid(2).set_name("Mean").set_data_type(DataType_t::FLOAT);
 
-    auto inv_variance = std::make_shared<Tensor_attributes>();
+    auto inv_variance = std::make_shared<TensorAttributes>();
     inv_variance->set_uid(3).set_name("InvVariance").set_data_type(DataType_t::FLOAT);
 
-    auto scale = std::make_shared<Tensor_attributes>();
+    auto scale = std::make_shared<TensorAttributes>();
     scale->set_uid(4).set_name("Scale").set_data_type(DataType_t::FLOAT);
 
-    auto bias = std::make_shared<Tensor_attributes>();
+    auto bias = std::make_shared<TensorAttributes>();
     bias->set_uid(5).set_name("Bias").set_data_type(DataType_t::FLOAT);
 
-    Batchnorm_inference_attributes batchnorm_attributes;
+    BatchnormInferenceAttributes batchnorm_attributes;
     batchnorm_attributes.name = "BatchnormNode";
 
     auto y = graph.batchnorm_inference(x, mean, inv_variance, scale, bias, batchnorm_attributes);
@@ -378,34 +378,34 @@ TEST_F(Graph_test_fixture, BuildAndSerializeBatchnormGraph)
         .set_intermediate_data_type(DataType_t::HALF)
         .set_io_data_type(DataType_t::FLOAT);
 
-    auto x = std::make_shared<Tensor_attributes>();
+    auto x = std::make_shared<TensorAttributes>();
     x->set_uid(1)
         .set_name("X")
         .set_dim({1, 2, 3, 4})
         .set_stride({5, 6, 7, 8})
         .set_data_type(DataType_t::FLOAT);
 
-    auto scale = std::make_shared<Tensor_attributes>();
+    auto scale = std::make_shared<TensorAttributes>();
     scale->set_uid(2).set_name("Scale").set_data_type(DataType_t::FLOAT);
 
-    auto bias = std::make_shared<Tensor_attributes>();
+    auto bias = std::make_shared<TensorAttributes>();
     bias->set_uid(3).set_name("Bias").set_data_type(DataType_t::FLOAT);
 
-    auto prev_running_mean = std::make_shared<Tensor_attributes>();
+    auto prev_running_mean = std::make_shared<TensorAttributes>();
     prev_running_mean->set_uid(4).set_name("PrevRunningMean").set_data_type(DataType_t::FLOAT);
 
-    auto prev_running_variance = std::make_shared<Tensor_attributes>();
+    auto prev_running_variance = std::make_shared<TensorAttributes>();
     prev_running_variance->set_uid(5)
         .set_name("PrevRunningVariance")
         .set_data_type(DataType_t::FLOAT);
 
-    auto momentum = std::make_shared<Tensor_attributes>();
+    auto momentum = std::make_shared<TensorAttributes>();
     momentum->set_uid(6).set_name("Momentum").set_data_type(DataType_t::FLOAT);
 
-    auto epsilon = std::make_shared<Tensor_attributes>();
+    auto epsilon = std::make_shared<TensorAttributes>();
     epsilon->set_uid(7).set_name("Epsilon").set_data_type(DataType_t::FLOAT);
 
-    Batchnorm_attributes batchnorm_attributes;
+    BatchnormAttributes batchnorm_attributes;
     batchnorm_attributes.name = "BatchnormNode";
     batchnorm_attributes.set_previous_running_stats(
         prev_running_mean, prev_running_variance, momentum);
@@ -482,34 +482,34 @@ TEST_F(Graph_test_fixture, BuildAndSerializeBatchnormAndPointwiseGraph)
         .set_intermediate_data_type(DataType_t::HALF)
         .set_io_data_type(DataType_t::FLOAT);
 
-    auto x = std::make_shared<Tensor_attributes>();
+    auto x = std::make_shared<TensorAttributes>();
     x->set_uid(1)
         .set_name("X")
         .set_dim({1, 2, 3, 4})
         .set_stride({5, 6, 7, 8})
         .set_data_type(DataType_t::FLOAT);
 
-    auto scale = std::make_shared<Tensor_attributes>();
+    auto scale = std::make_shared<TensorAttributes>();
     scale->set_uid(2).set_name("Scale").set_data_type(DataType_t::FLOAT);
 
-    auto bias = std::make_shared<Tensor_attributes>();
+    auto bias = std::make_shared<TensorAttributes>();
     bias->set_uid(3).set_name("Bias").set_data_type(DataType_t::FLOAT);
 
-    auto prev_running_mean = std::make_shared<Tensor_attributes>();
+    auto prev_running_mean = std::make_shared<TensorAttributes>();
     prev_running_mean->set_uid(4).set_name("PrevRunningMean").set_data_type(DataType_t::FLOAT);
 
-    auto prev_running_variance = std::make_shared<Tensor_attributes>();
+    auto prev_running_variance = std::make_shared<TensorAttributes>();
     prev_running_variance->set_uid(5)
         .set_name("PrevRunningVariance")
         .set_data_type(DataType_t::FLOAT);
 
-    auto momentum = std::make_shared<Tensor_attributes>();
+    auto momentum = std::make_shared<TensorAttributes>();
     momentum->set_uid(6).set_name("Momentum").set_data_type(DataType_t::FLOAT);
 
-    auto epsilon = std::make_shared<Tensor_attributes>();
+    auto epsilon = std::make_shared<TensorAttributes>();
     epsilon->set_uid(7).set_name("Epsilon").set_data_type(DataType_t::FLOAT);
 
-    Batchnorm_attributes batchnorm_attributes;
+    BatchnormAttributes batchnorm_attributes;
     batchnorm_attributes.name = "BatchnormNode";
     batchnorm_attributes.set_previous_running_stats(
         prev_running_mean, prev_running_variance, momentum);
@@ -518,7 +518,7 @@ TEST_F(Graph_test_fixture, BuildAndSerializeBatchnormAndPointwiseGraph)
     auto [y, mean, inv_variance, next_running_mean, next_running_variance]
         = graph.batchnorm(x, scale, bias, batchnorm_attributes);
 
-    Pointwise_attributes pointwise_attributes;
+    PointwiseAttributes pointwise_attributes;
     pointwise_attributes.name = "PointwiseNode";
     pointwise_attributes.set_mode(PointwiseMode_t::RELU_FWD);
 
@@ -603,14 +603,14 @@ TEST_F(Graph_test_fixture, BuildAndSerializePointwiseGraph)
         .set_intermediate_data_type(DataType_t::HALF)
         .set_io_data_type(DataType_t::FLOAT);
 
-    auto in_0 = std::make_shared<Tensor_attributes>();
+    auto in_0 = std::make_shared<TensorAttributes>();
     in_0->set_uid(1)
         .set_name("Input0")
         .set_dim({1, 2, 3, 4})
         .set_stride({5, 6, 7, 8})
         .set_data_type(DataType_t::FLOAT);
 
-    Pointwise_attributes pointwise_attributes;
+    PointwiseAttributes pointwise_attributes;
     pointwise_attributes.name = "PointwiseNode";
     pointwise_attributes.set_mode(PointwiseMode_t::RELU_FWD);
 
@@ -662,31 +662,31 @@ TEST_F(Graph_test_fixture, BuildAndSerializePointwiseAndBatchnormInferenceGraph)
         .set_intermediate_data_type(DataType_t::HALF)
         .set_io_data_type(DataType_t::FLOAT);
 
-    auto x = std::make_shared<Tensor_attributes>();
+    auto x = std::make_shared<TensorAttributes>();
     x->set_uid(1)
         .set_name("X")
         .set_dim({1, 2, 3, 4})
         .set_stride({5, 6, 7, 8})
         .set_data_type(DataType_t::FLOAT);
 
-    auto mean = std::make_shared<Tensor_attributes>();
+    auto mean = std::make_shared<TensorAttributes>();
     mean->set_uid(2).set_name("Mean").set_data_type(DataType_t::FLOAT);
 
-    auto inv_variance = std::make_shared<Tensor_attributes>();
+    auto inv_variance = std::make_shared<TensorAttributes>();
     inv_variance->set_uid(3).set_name("InvVariance").set_data_type(DataType_t::FLOAT);
 
-    auto scale = std::make_shared<Tensor_attributes>();
+    auto scale = std::make_shared<TensorAttributes>();
     scale->set_uid(4).set_name("Scale").set_data_type(DataType_t::FLOAT);
 
-    auto bias = std::make_shared<Tensor_attributes>();
+    auto bias = std::make_shared<TensorAttributes>();
     bias->set_uid(5).set_name("Bias").set_data_type(DataType_t::FLOAT);
 
-    Batchnorm_inference_attributes batchnorm_attributes;
+    BatchnormInferenceAttributes batchnorm_attributes;
     batchnorm_attributes.name = "BatchnormNode";
 
     auto y = graph.batchnorm_inference(x, mean, inv_variance, scale, bias, batchnorm_attributes);
 
-    Pointwise_attributes pointwise_attributes;
+    PointwiseAttributes pointwise_attributes;
     pointwise_attributes.name = "PointwiseNode";
     pointwise_attributes.set_mode(PointwiseMode_t::RELU_FWD);
 
@@ -756,30 +756,30 @@ TEST_F(Graph_test_fixture, BuildAndSerializeBatchnormBackwardGraph)
         .set_intermediate_data_type(DataType_t::HALF)
         .set_io_data_type(DataType_t::FLOAT);
 
-    auto dy = std::make_shared<Tensor_attributes>();
+    auto dy = std::make_shared<TensorAttributes>();
     dy->set_uid(1)
         .set_name("Dy")
         .set_dim({1, 2, 3, 4})
         .set_stride({5, 6, 7, 8})
         .set_data_type(DataType_t::FLOAT);
 
-    auto x = std::make_shared<Tensor_attributes>();
+    auto x = std::make_shared<TensorAttributes>();
     x->set_uid(2)
         .set_name("X")
         .set_dim({1, 2, 3, 4})
         .set_stride({5, 6, 7, 8})
         .set_data_type(DataType_t::FLOAT);
 
-    auto scale = std::make_shared<Tensor_attributes>();
+    auto scale = std::make_shared<TensorAttributes>();
     scale->set_uid(3).set_name("Scale").set_data_type(DataType_t::FLOAT);
 
-    auto mean = std::make_shared<Tensor_attributes>();
+    auto mean = std::make_shared<TensorAttributes>();
     mean->set_uid(4).set_name("Mean").set_data_type(DataType_t::FLOAT);
 
-    auto inv_variance = std::make_shared<Tensor_attributes>();
+    auto inv_variance = std::make_shared<TensorAttributes>();
     inv_variance->set_uid(5).set_name("InvVariance").set_data_type(DataType_t::FLOAT);
 
-    Batchnorm_backward_attributes batchnorm_attributes;
+    BatchnormBackwardAttributes batchnorm_attributes;
     batchnorm_attributes.name = "BatchnormBackwardNode";
     batchnorm_attributes.set_saved_mean_and_inv_variance(mean, inv_variance);
 
@@ -840,21 +840,21 @@ TEST_F(Graph_test_fixture, BuildAndSerializeConvolutionFwdGraph)
         .set_intermediate_data_type(DataType_t::HALF)
         .set_io_data_type(DataType_t::FLOAT);
 
-    auto x = std::make_shared<Tensor_attributes>();
+    auto x = std::make_shared<TensorAttributes>();
     x->set_uid(1)
         .set_name("X")
         .set_dim({1, 3, 32, 32})
         .set_stride({3072, 1024, 32, 1})
         .set_data_type(DataType_t::FLOAT);
 
-    auto w = std::make_shared<Tensor_attributes>();
+    auto w = std::make_shared<TensorAttributes>();
     w->set_uid(2)
         .set_name("W")
         .set_dim({64, 3, 3, 3})
         .set_stride({27, 9, 3, 1})
         .set_data_type(DataType_t::FLOAT);
 
-    Conv_fprop_attributes convolution_attributes;
+    ConvFpropAttributes convolution_attributes;
     convolution_attributes.name = "ConvolutionNode";
     convolution_attributes.set_pre_padding({1, 1});
     convolution_attributes.set_post_padding({1, 1});
@@ -913,36 +913,36 @@ TEST_F(Graph_test_fixture, BuildAndSerializePointwiseAndBatchnormBackwardGraph)
         .set_intermediate_data_type(DataType_t::HALF)
         .set_io_data_type(DataType_t::FLOAT);
 
-    auto x_pointwise = std::make_shared<Tensor_attributes>();
+    auto x_pointwise = std::make_shared<TensorAttributes>();
     x_pointwise->set_uid(6)
         .set_name("X_Pointwise")
         .set_dim({1, 2, 3, 4})
         .set_stride({5, 6, 7, 8})
         .set_data_type(DataType_t::FLOAT);
 
-    Pointwise_attributes pointwise_attributes;
+    PointwiseAttributes pointwise_attributes;
     pointwise_attributes.name = "PointwiseNode";
     pointwise_attributes.set_mode(PointwiseMode_t::RELU_FWD);
 
     auto dy = graph.pointwise(x_pointwise, pointwise_attributes);
 
-    auto x = std::make_shared<Tensor_attributes>();
+    auto x = std::make_shared<TensorAttributes>();
     x->set_uid(1)
         .set_name("X")
         .set_dim({1, 2, 3, 4})
         .set_stride({5, 6, 7, 8})
         .set_data_type(DataType_t::FLOAT);
 
-    auto scale = std::make_shared<Tensor_attributes>();
+    auto scale = std::make_shared<TensorAttributes>();
     scale->set_uid(2).set_name("Scale").set_data_type(DataType_t::FLOAT);
 
-    auto mean = std::make_shared<Tensor_attributes>();
+    auto mean = std::make_shared<TensorAttributes>();
     mean->set_uid(3).set_name("Mean").set_data_type(DataType_t::FLOAT);
 
-    auto inv_variance = std::make_shared<Tensor_attributes>();
+    auto inv_variance = std::make_shared<TensorAttributes>();
     inv_variance->set_uid(4).set_name("InvVariance").set_data_type(DataType_t::FLOAT);
 
-    Batchnorm_backward_attributes batchnorm_attributes;
+    BatchnormBackwardAttributes batchnorm_attributes;
     batchnorm_attributes.name = "BatchnormBackwardNode";
     batchnorm_attributes.set_saved_mean_and_inv_variance(mean, inv_variance);
 
@@ -1008,7 +1008,7 @@ TEST_F(Graph_test_fixture, BuildAndSerializePointwiseAndBatchnormBackwardGraph)
 // Test graph.tensor()
 TEST_F(Graph_test_fixture, TensorGraphAttributes)
 {
-    auto tensor = Graph::tensor(Tensor_attributes()
+    auto tensor = Graph::tensor(TensorAttributes()
                                     .set_name("TestTensor")
                                     .set_uid(100)
                                     .set_stride({5, 6, 7, 8})
@@ -1027,7 +1027,7 @@ TEST_F(Graph_test_fixture, TensorGraphAttributes)
 // Test graph.tensor_like()
 TEST_F(Graph_test_fixture, TensorLikeGraphAttributes)
 {
-    auto tensor = Graph::tensor(Tensor_attributes()
+    auto tensor = Graph::tensor(TensorAttributes()
                                     .set_name("TestTensor")
                                     .set_uid(100)
                                     .set_dim({1, 2, 3, 4})
@@ -1425,14 +1425,14 @@ TEST_F(Graph_test_fixture, ExecutePacksVariantPackAndPassesTheCorrectArguments)
     using ::testing::Return;
 
     Graph graph;
-    auto tensor = std::make_shared<Tensor_attributes>();
+    auto tensor = std::make_shared<TensorAttributes>();
     tensor->set_uid(42)
         .set_name("InputTensor")
         .set_dim({1, 2, 3, 4})
         .set_stride({5, 6, 7, 8})
         .set_data_type(DataType_t::FLOAT);
 
-    Pointwise_attributes pointwise_attributes;
+    PointwiseAttributes pointwise_attributes;
     pointwise_attributes.name = "PointwiseNode";
     pointwise_attributes.set_mode(PointwiseMode_t::RELU_FWD);
     auto out_tensor = graph.pointwise(tensor, pointwise_attributes);

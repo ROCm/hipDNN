@@ -14,7 +14,7 @@ namespace hipdnn_frontend
 {
 namespace graph
 {
-class Pointwise_attributes : public AttributesCRTP<Pointwise_attributes>
+class PointwiseAttributes : public AttributesCRTP<PointwiseAttributes>
 {
 public:
     PointwiseMode_t get_mode() const
@@ -23,139 +23,139 @@ public:
     }
     std::optional<float> get_relu_lower_clip() const
     {
-        return _relu_lower_clip;
+        return _reluLowerClip;
     }
     std::optional<float> get_relu_upper_clip() const
     {
-        return _relu_upper_clip;
+        return _reluUpperClip;
     }
     std::optional<float> get_relu_lower_slope() const
     {
-        return _relu_lower_slope;
+        return _reluLowerSlope;
     }
     std::optional<int64_t> get_axis() const
     {
         return _axis;
     }
-    std::shared_ptr<Tensor_attributes> get_input_0() const
+    std::shared_ptr<TensorAttributes> get_input_0() const
     {
-        return get_input(input_names::in_0);
+        return getInput(input_names::IN_0);
     }
-    std::shared_ptr<Tensor_attributes> get_input_1() const
+    std::shared_ptr<TensorAttributes> get_input_1() const
     {
-        return get_input(input_names::in_1);
+        return getInput(input_names::IN_1);
     }
-    std::shared_ptr<Tensor_attributes> get_input_2() const
+    std::shared_ptr<TensorAttributes> get_input_2() const
     {
-        return get_input(input_names::in_2);
+        return getInput(input_names::IN_2);
     }
-    std::shared_ptr<Tensor_attributes> get_output_0() const
+    std::shared_ptr<TensorAttributes> get_output_0() const
     {
-        return get_output(output_names::out_0);
+        return getOutput(output_names::OUT_0);
     }
 
-    Pointwise_attributes& set_mode(PointwiseMode_t mode)
+    PointwiseAttributes& set_mode(PointwiseMode_t mode)
     {
         _mode = mode;
         return *this;
     }
-    Pointwise_attributes& set_relu_lower_clip(std::optional<float> relu_lower_clip)
+    PointwiseAttributes& set_relu_lower_clip(float reluLowerClip)
     {
-        _relu_lower_clip = relu_lower_clip;
+        _reluLowerClip = reluLowerClip;
         return *this;
     }
-    Pointwise_attributes& set_relu_upper_clip(std::optional<float> relu_upper_clip)
+    PointwiseAttributes& set_relu_upper_clip(float reluUpperClip)
     {
-        _relu_upper_clip = relu_upper_clip;
+        _reluUpperClip = reluUpperClip;
         return *this;
     }
-    Pointwise_attributes& set_relu_lower_clip_slope(std::optional<float> relu_lower_slope)
+    PointwiseAttributes& set_relu_lower_clip_slope(float reluLowerSlope)
     {
-        _relu_lower_slope = relu_lower_slope;
+        _reluLowerSlope = reluLowerSlope;
         return *this;
     }
-    Pointwise_attributes& set_axis(std::optional<int64_t> axis)
+    PointwiseAttributes& set_axis(std::optional<int64_t> axis)
     {
         _axis = axis;
         return *this;
     }
-    Pointwise_attributes& set_input_0(const std::shared_ptr<Tensor_attributes>& input_0)
+    PointwiseAttributes& set_input_0(const std::shared_ptr<TensorAttributes>& input0)
     {
-        inputs[input_names::in_0] = input_0;
+        inputs[input_names::IN_0] = input0;
         return *this;
     }
-    Pointwise_attributes& set_input_0(std::shared_ptr<Tensor_attributes>&& input_0)
+    PointwiseAttributes& set_input_0(std::shared_ptr<TensorAttributes>&& input0)
     {
-        inputs[input_names::in_0] = std::move(input_0);
+        inputs[input_names::IN_0] = std::move(input0);
         return *this;
     }
-    Pointwise_attributes& set_input_1(const std::shared_ptr<Tensor_attributes>& input_1)
+    PointwiseAttributes& set_input_1(const std::shared_ptr<TensorAttributes>& input1)
     {
-        inputs[input_names::in_1] = input_1;
+        inputs[input_names::IN_1] = input1;
         return *this;
     }
-    Pointwise_attributes& set_input_1(std::shared_ptr<Tensor_attributes>&& input_1)
+    PointwiseAttributes& set_input_1(std::shared_ptr<TensorAttributes>&& input1)
     {
-        inputs[input_names::in_1] = std::move(input_1);
+        inputs[input_names::IN_1] = std::move(input1);
         return *this;
     }
-    Pointwise_attributes& set_input_2(const std::shared_ptr<Tensor_attributes>& input_2)
+    PointwiseAttributes& set_input_2(const std::shared_ptr<TensorAttributes>& input2)
     {
-        inputs[input_names::in_2] = input_2;
+        inputs[input_names::IN_2] = input2;
         return *this;
     }
-    Pointwise_attributes& set_input_2(std::shared_ptr<Tensor_attributes>&& input_2)
+    PointwiseAttributes& set_input_2(std::shared_ptr<TensorAttributes>&& input2)
     {
-        inputs[input_names::in_2] = std::move(input_2);
+        inputs[input_names::IN_2] = std::move(input2);
         return *this;
     }
-    Pointwise_attributes& set_output_0(const std::shared_ptr<Tensor_attributes>& output_0)
+    PointwiseAttributes& set_output_0(const std::shared_ptr<TensorAttributes>& output0)
     {
-        outputs[output_names::out_0] = output_0;
+        outputs[output_names::OUT_0] = output0;
         return *this;
     }
-    Pointwise_attributes& set_output_0(std::shared_ptr<Tensor_attributes>&& output_0)
+    PointwiseAttributes& set_output_0(std::shared_ptr<TensorAttributes>&& output0)
     {
-        outputs[output_names::out_0] = std::move(output_0);
+        outputs[output_names::OUT_0] = std::move(output0);
         return *this;
     }
 
     enum class input_names
     {
-        in_0 = 0,
-        in_1 = 1,
-        in_2 = 2,
+        IN_0 = 0,
+        IN_1 = 1,
+        IN_2 = 2,
     };
     enum class output_names
     {
-        out_0 = 0,
+        OUT_0 = 0,
     };
-    std::unordered_map<input_names, std::shared_ptr<Tensor_attributes>> inputs;
-    std::unordered_map<output_names, std::shared_ptr<Tensor_attributes>> outputs;
+    std::unordered_map<input_names, std::shared_ptr<TensorAttributes>> inputs;
+    std::unordered_map<output_names, std::shared_ptr<TensorAttributes>> outputs;
 
     flatbuffers::Offset<hipdnn_sdk::data_objects::PointwiseAttributes>
-        pack_attributes(flatbuffers::FlatBufferBuilder& builder) const
+        pack_attributes(flatbuffers::FlatBufferBuilder& builder) const // NOLINT
     {
-        auto in_0 = get_input_0();
-        auto in_1 = get_input_1();
-        auto in_2 = get_input_2();
-        auto out_0 = get_output_0();
+        auto in0 = get_input_0();
+        auto in1 = get_input_1();
+        auto in2 = get_input_2();
+        auto ot0 = get_output_0();
 
         return hipdnn_sdk::data_objects::CreatePointwiseAttributes(
             builder,
             to_sdk_type(_mode),
-            _relu_lower_clip,
-            _relu_upper_clip,
-            _relu_lower_slope,
+            _reluLowerClip,
+            _reluUpperClip,
+            _reluLowerSlope,
             _axis,
-            in_0->get_uid(),
-            in_1 ? flatbuffers::Optional<int64_t>(in_1->get_uid()) : flatbuffers::nullopt,
-            in_2 ? flatbuffers::Optional<int64_t>(in_2->get_uid()) : flatbuffers::nullopt,
-            out_0->get_uid());
+            in0->get_uid(),
+            in1 ? flatbuffers::Optional<int64_t>(in1->get_uid()) : flatbuffers::nullopt,
+            in2 ? flatbuffers::Optional<int64_t>(in2->get_uid()) : flatbuffers::nullopt,
+            ot0->get_uid());
     }
 
 private:
-    std::shared_ptr<Tensor_attributes> get_input(input_names name) const
+    std::shared_ptr<TensorAttributes> getInput(input_names name) const
     {
         auto it = inputs.find(name);
         if(it != inputs.end())
@@ -164,7 +164,7 @@ private:
         }
         return nullptr;
     }
-    std::shared_ptr<Tensor_attributes> get_output(output_names name) const
+    std::shared_ptr<TensorAttributes> getOutput(output_names name) const
     {
         auto it = outputs.find(name);
         if(it != outputs.end())
@@ -174,10 +174,11 @@ private:
         return nullptr;
     }
     PointwiseMode_t _mode = PointwiseMode_t::NOT_SET;
-    std::optional<float> _relu_lower_clip = std::nullopt;
-    std::optional<float> _relu_upper_clip = std::nullopt;
-    std::optional<float> _relu_lower_slope = std::nullopt;
+    std::optional<float> _reluLowerClip = std::nullopt;
+    std::optional<float> _reluUpperClip = std::nullopt;
+    std::optional<float> _reluLowerSlope = std::nullopt;
     std::optional<int64_t> _axis = std::nullopt;
 };
+typedef PointwiseAttributes Pointwise_attributes;
 }
 }

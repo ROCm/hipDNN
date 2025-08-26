@@ -17,10 +17,44 @@ namespace hipdnn_frontend
 {
 namespace graph
 {
-class Tensor_attributes
+
+class TensorAttributes
 {
 public:
     using ValueVariant = std::variant<std::monostate, double, float, uint16_t, uint8_t, int32_t>;
+
+    TensorAttributes() = default;
+
+    TensorAttributes(double const& scalar)
+    {
+        _value = scalar;
+        _dim = _stride = {1};
+        _dataType = DataType_t::DOUBLE;
+    }
+    TensorAttributes(float const& scalar)
+    {
+        _value = scalar;
+        _dim = _stride = {1};
+        _dataType = DataType_t::FLOAT;
+    }
+    TensorAttributes(uint16_t const& scalar)
+    {
+        _value = scalar;
+        _dim = _stride = {1};
+        _dataType = DataType_t::HALF;
+    }
+    TensorAttributes(uint8_t const& scalar)
+    {
+        _value = scalar;
+        _dim = _stride = {1};
+        _dataType = DataType_t::UINT8;
+    }
+    TensorAttributes(int32_t const& scalar)
+    {
+        _value = scalar;
+        _dim = _stride = {1};
+        _dataType = DataType_t::INT32;
+    }
 
     bool has_value() const
     {
@@ -38,7 +72,7 @@ public:
     }
 
     template <typename T>
-    Tensor_attributes& set_value(T v)
+    TensorAttributes& set_value(T v)
     {
         static_assert(std::disjunction_v<std::is_same<T, float>,
                                          std::is_same<T, double>,
@@ -50,7 +84,7 @@ public:
         return *this;
     }
 
-    Tensor_attributes& clear_value()
+    TensorAttributes& clear_value()
     {
         _value = {};
         return *this;
@@ -68,7 +102,7 @@ public:
 
     DataType_t get_data_type() const
     {
-        return _data_type;
+        return _dataType;
     }
 
     const std::vector<int64_t>& get_stride() const
@@ -93,95 +127,95 @@ public:
 
     bool get_is_virtual() const
     {
-        return _is_virtual;
+        return _isVirtual;
     }
 
     bool has_uid() const
     {
-        return _uid_set;
+        return _uidSet;
     }
 
-    Tensor_attributes& set_uid(int64_t uid)
+    TensorAttributes& set_uid(int64_t uid)
     {
         _uid = uid;
-        _uid_set = true;
+        _uidSet = true;
         return *this;
     }
 
-    Tensor_attributes& set_name(const std::string& name)
+    TensorAttributes& set_name(const std::string& name)
     {
         _name = name;
         return *this;
     }
 
-    Tensor_attributes& set_data_type(DataType_t data_type)
+    TensorAttributes& set_data_type(DataType_t dataType)
     {
-        _data_type = data_type;
+        _dataType = dataType;
         return *this;
     }
 
-    Tensor_attributes& set_stride(const std::vector<int64_t>& stride)
+    TensorAttributes& set_stride(const std::vector<int64_t>& stride)
     {
         _stride = stride;
         return *this;
     }
 
-    Tensor_attributes& set_dim(const std::vector<int64_t>& dim)
+    TensorAttributes& set_dim(const std::vector<int64_t>& dim)
     {
         _dim = dim;
         return *this;
     }
 
-    Tensor_attributes& set_is_virtual(bool is_virtual)
+    TensorAttributes& set_is_virtual(bool isVirtual)
     {
-        _is_virtual = is_virtual;
+        _isVirtual = isVirtual;
         return *this;
     }
 
-    Tensor_attributes& set_output(bool output)
+    TensorAttributes& set_output(bool output)
     {
         return set_is_virtual(!output);
     }
 
-    Tensor_attributes& clear_uid()
+    TensorAttributes& clear_uid() // NOLINT(readability-identifier-naming)
     {
         _uid = 0;
-        _uid_set = false;
+        _uidSet = false;
         return *this;
     }
 
-    Tensor_attributes& set_from_graph_attributes(const Graph_attributes& graph_attributes)
+    TensorAttributes& set_from_graph_attributes(const GraphAttributes& graphAttributes)
     {
-        if(_data_type == DataType_t::NOT_SET)
+        if(_dataType == DataType_t::NOT_SET)
         {
-            if(_is_virtual)
+            if(_isVirtual)
             {
-                _data_type = graph_attributes.get_intermediate_data_type();
+                _dataType = graphAttributes.get_intermediate_data_type();
             }
             else
             {
-                _data_type = graph_attributes.get_io_data_type();
+                _dataType = graphAttributes.get_io_data_type();
             }
         }
 
         return *this;
     }
 
-    bool validate_dims_set_and_positive() const
+    bool validate_dims_set_and_positive() const // NOLINT(readability-identifier-naming
     {
-        constexpr auto is_positive = [](int64_t value) { return value > 0; };
-        return !_dim.empty() && std::ranges::all_of(_dim.begin(), _dim.end(), is_positive);
+        constexpr auto isPositive = [](int64_t value) { return value > 0; };
+        return !_dim.empty() && std::ranges::all_of(_dim.begin(), _dim.end(), isPositive);
     }
 
-    bool validate_dims_and_strides_set_and_positive() const
+    bool validate_dims_and_strides_set_and_positive() const // NOLINT(readability-identifier-naming
     {
-        constexpr auto is_positive = [](int64_t value) { return value > 0; };
+        constexpr auto isPositive = [](int64_t value) { return value > 0; };
         return validate_dims_set_and_positive() && _stride.size() == _dim.size()
-               && std::ranges::all_of(_stride.begin(), _stride.end(), is_positive);
+               && std::ranges::all_of(_stride.begin(), _stride.end(), isPositive);
     }
 
     flatbuffers::Offset<hipdnn_sdk::data_objects::TensorAttributes>
-        pack_attributes(flatbuffers::FlatBufferBuilder& builder) const
+        pack_attributes(flatbuffers::FlatBufferBuilder& builder) const // NOLINT
     {
         auto result = std::visit(
             [&](auto&& arg)
@@ -189,33 +223,33 @@ public:
                 using T = std::decay_t<decltype(arg)>;
                 if constexpr(std::is_same_v<T, float>)
                 {
-                    hipdnn_sdk::data_objects::Float32Value float_val(arg);
+                    hipdnn_sdk::data_objects::Float32Value floatVal(arg);
                     return {hipdnn_sdk::data_objects::TensorValue_Float32Value,
-                            builder.CreateStruct(float_val).Union()};
+                            builder.CreateStruct(floatVal).Union()};
                 }
                 else if constexpr(std::is_same_v<T, double>)
                 {
-                    hipdnn_sdk::data_objects::Float64Value double_val(arg);
+                    hipdnn_sdk::data_objects::Float64Value doubleVal(arg);
                     return {hipdnn_sdk::data_objects::TensorValue_Float64Value,
-                            builder.CreateStruct(double_val).Union()};
+                            builder.CreateStruct(doubleVal).Union()};
                 }
                 else if constexpr(std::is_same_v<T, uint16_t>)
                 {
-                    hipdnn_sdk::data_objects::Float16Value half_val(arg);
+                    hipdnn_sdk::data_objects::Float16Value halfVal(arg);
                     return {hipdnn_sdk::data_objects::TensorValue_Float16Value,
-                            builder.CreateStruct(half_val).Union()};
+                            builder.CreateStruct(halfVal).Union()};
                 }
                 else if constexpr(std::is_same_v<T, uint8_t>)
                 {
-                    hipdnn_sdk::data_objects::Float8Value uint8_val(arg);
+                    hipdnn_sdk::data_objects::Float8Value uint8Val(arg);
                     return {hipdnn_sdk::data_objects::TensorValue_Float8Value,
-                            builder.CreateStruct(uint8_val).Union()};
+                            builder.CreateStruct(uint8Val).Union()};
                 }
                 else if constexpr(std::is_same_v<T, int32_t>)
                 {
-                    hipdnn_sdk::data_objects::Int32Value int32_val(arg);
+                    hipdnn_sdk::data_objects::Int32Value int32Val(arg);
                     return {hipdnn_sdk::data_objects::TensorValue_Int32Value,
-                            builder.CreateStruct(int32_val).Union()};
+                            builder.CreateStruct(int32Val).Union()};
                 }
                 else
                 {
@@ -228,24 +262,24 @@ public:
         return hipdnn_sdk::data_objects::CreateTensorAttributesDirect(builder,
                                                                       _uid,
                                                                       _name.c_str(),
-                                                                      to_sdk_type(_data_type),
+                                                                      to_sdk_type(_dataType),
                                                                       &_stride,
                                                                       &_dim,
-                                                                      _is_virtual,
+                                                                      _isVirtual,
                                                                       result.first,
                                                                       result.second);
     }
 
 private:
     int64_t _uid = 0;
-    bool _uid_set = false;
+    bool _uidSet = false;
     std::string _name;
-    DataType_t _data_type = DataType_t::NOT_SET;
+    DataType_t _dataType = DataType_t::NOT_SET;
     std::vector<int64_t> _stride;
     std::vector<int64_t> _dim;
-    bool _is_virtual = false;
+    bool _isVirtual = false;
     ValueVariant _value;
 };
-
+typedef TensorAttributes Tensor_attributes;
 }
 }

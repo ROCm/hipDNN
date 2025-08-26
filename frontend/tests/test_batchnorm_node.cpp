@@ -10,14 +10,14 @@ using namespace hipdnn_frontend::graph;
 
 TEST(BatchnormNodeTests, PreValidateNode)
 {
-    Batchnorm_attributes batchnorm_attributes;
-    batchnorm_attributes.set_x(std::make_shared<Tensor_attributes>());
-    batchnorm_attributes.set_y(std::make_shared<Tensor_attributes>());
-    batchnorm_attributes.set_scale(std::make_shared<Tensor_attributes>());
-    batchnorm_attributes.set_bias(std::make_shared<Tensor_attributes>());
-    batchnorm_attributes.set_epsilon(std::make_shared<Tensor_attributes>());
+    BatchnormAttributes batchnorm_attributes;
+    batchnorm_attributes.set_x(std::make_shared<TensorAttributes>());
+    batchnorm_attributes.set_y(std::make_shared<TensorAttributes>());
+    batchnorm_attributes.set_scale(std::make_shared<TensorAttributes>());
+    batchnorm_attributes.set_bias(std::make_shared<TensorAttributes>());
+    batchnorm_attributes.set_epsilon(std::make_shared<TensorAttributes>());
 
-    Graph_attributes graph_attributes;
+    GraphAttributes graph_attributes;
     BatchnormNode node(std::move(batchnorm_attributes), graph_attributes);
 
     auto error = node.pre_validate_node();
@@ -26,43 +26,43 @@ TEST(BatchnormNodeTests, PreValidateNode)
 
 TEST(BatchnormNodeTests, PreValidateNodeMissingValues)
 {
-    Batchnorm_attributes batchnorm_attributes;
+    BatchnormAttributes batchnorm_attributes;
 
-    Graph_attributes graph_attributes;
+    GraphAttributes graph_attributes;
     BatchnormNode node(std::move(batchnorm_attributes), graph_attributes);
 
     auto error = node.pre_validate_node();
     EXPECT_EQ(error.code, error_code_t::ATTRIBUTE_NOT_SET);
 
-    batchnorm_attributes.set_x(std::make_shared<Tensor_attributes>());
+    batchnorm_attributes.set_x(std::make_shared<TensorAttributes>());
     auto batchnorm_attributes_copy = batchnorm_attributes;
     BatchnormNode node_with_x(std::move(batchnorm_attributes_copy), graph_attributes);
 
     error = node_with_x.pre_validate_node();
     EXPECT_EQ(error.code, error_code_t::ATTRIBUTE_NOT_SET);
 
-    batchnorm_attributes.set_y(std::make_shared<Tensor_attributes>());
+    batchnorm_attributes.set_y(std::make_shared<TensorAttributes>());
     batchnorm_attributes_copy = batchnorm_attributes;
     BatchnormNode node_with_y(std::move(batchnorm_attributes_copy), graph_attributes);
 
     error = node_with_y.pre_validate_node();
     EXPECT_EQ(error.code, error_code_t::ATTRIBUTE_NOT_SET);
 
-    batchnorm_attributes.set_scale(std::make_shared<Tensor_attributes>());
+    batchnorm_attributes.set_scale(std::make_shared<TensorAttributes>());
     batchnorm_attributes_copy = batchnorm_attributes;
     BatchnormNode node_with_scale(std::move(batchnorm_attributes_copy), graph_attributes);
 
     error = node_with_scale.pre_validate_node();
     EXPECT_EQ(error.code, error_code_t::ATTRIBUTE_NOT_SET);
 
-    batchnorm_attributes.set_bias(std::make_shared<Tensor_attributes>());
+    batchnorm_attributes.set_bias(std::make_shared<TensorAttributes>());
     batchnorm_attributes_copy = batchnorm_attributes;
     BatchnormNode node_with_bias(std::move(batchnorm_attributes_copy), graph_attributes);
 
     error = node_with_bias.pre_validate_node();
     EXPECT_EQ(error.code, error_code_t::ATTRIBUTE_NOT_SET);
 
-    batchnorm_attributes.set_epsilon(std::make_shared<Tensor_attributes>());
+    batchnorm_attributes.set_epsilon(std::make_shared<TensorAttributes>());
     batchnorm_attributes_copy = batchnorm_attributes;
     BatchnormNode node_with_all_values(std::move(batchnorm_attributes_copy), graph_attributes);
 
@@ -72,12 +72,12 @@ TEST(BatchnormNodeTests, PreValidateNodeMissingValues)
 
 TEST(BatchnormNodeTests, InferPropertiesNode)
 {
-    Batchnorm_attributes batchnorm_attributes;
-    batchnorm_attributes.set_x(std::make_shared<Tensor_attributes>());
-    batchnorm_attributes.set_y(std::make_shared<Tensor_attributes>());
-    batchnorm_attributes.set_scale(std::make_shared<Tensor_attributes>());
-    batchnorm_attributes.set_bias(std::make_shared<Tensor_attributes>());
-    batchnorm_attributes.set_epsilon(std::make_shared<Tensor_attributes>());
+    BatchnormAttributes batchnorm_attributes;
+    batchnorm_attributes.set_x(std::make_shared<TensorAttributes>());
+    batchnorm_attributes.set_y(std::make_shared<TensorAttributes>());
+    batchnorm_attributes.set_scale(std::make_shared<TensorAttributes>());
+    batchnorm_attributes.set_bias(std::make_shared<TensorAttributes>());
+    batchnorm_attributes.set_epsilon(std::make_shared<TensorAttributes>());
 
     auto input_tensor = batchnorm_attributes.get_x();
     input_tensor->set_uid(1)
@@ -89,7 +89,7 @@ TEST(BatchnormNodeTests, InferPropertiesNode)
     auto output_tensor = batchnorm_attributes.get_y();
     output_tensor->set_uid(2).set_name("OutputTensor");
 
-    Graph_attributes graph_attributes;
+    GraphAttributes graph_attributes;
     BatchnormNode node(std::move(batchnorm_attributes), graph_attributes);
 
     auto error = node.infer_properties_node();
@@ -101,18 +101,18 @@ TEST(BatchnormNodeTests, InferPropertiesNode)
 
 TEST(BatchnormNodeTests, InferPropertiesNodeWithStats)
 {
-    Batchnorm_attributes batchnorm_attributes;
-    batchnorm_attributes.set_x(std::make_shared<Tensor_attributes>());
-    batchnorm_attributes.set_y(std::make_shared<Tensor_attributes>());
-    batchnorm_attributes.set_scale(std::make_shared<Tensor_attributes>());
-    batchnorm_attributes.set_bias(std::make_shared<Tensor_attributes>());
-    batchnorm_attributes.set_epsilon(std::make_shared<Tensor_attributes>());
-    batchnorm_attributes.set_mean(std::make_shared<Tensor_attributes>());
-    batchnorm_attributes.set_inv_variance(std::make_shared<Tensor_attributes>());
-    batchnorm_attributes.set_prev_running_mean(std::make_shared<Tensor_attributes>());
-    batchnorm_attributes.set_prev_running_variance(std::make_shared<Tensor_attributes>());
-    batchnorm_attributes.set_next_running_mean(std::make_shared<Tensor_attributes>());
-    batchnorm_attributes.set_next_running_variance(std::make_shared<Tensor_attributes>());
+    BatchnormAttributes batchnorm_attributes;
+    batchnorm_attributes.set_x(std::make_shared<TensorAttributes>());
+    batchnorm_attributes.set_y(std::make_shared<TensorAttributes>());
+    batchnorm_attributes.set_scale(std::make_shared<TensorAttributes>());
+    batchnorm_attributes.set_bias(std::make_shared<TensorAttributes>());
+    batchnorm_attributes.set_epsilon(std::make_shared<TensorAttributes>());
+    batchnorm_attributes.set_mean(std::make_shared<TensorAttributes>());
+    batchnorm_attributes.set_inv_variance(std::make_shared<TensorAttributes>());
+    batchnorm_attributes.set_prev_running_mean(std::make_shared<TensorAttributes>());
+    batchnorm_attributes.set_prev_running_variance(std::make_shared<TensorAttributes>());
+    batchnorm_attributes.set_next_running_mean(std::make_shared<TensorAttributes>());
+    batchnorm_attributes.set_next_running_variance(std::make_shared<TensorAttributes>());
 
     auto input_tensor = batchnorm_attributes.get_x();
     input_tensor->set_uid(1)
@@ -136,7 +136,7 @@ TEST(BatchnormNodeTests, InferPropertiesNodeWithStats)
     auto next_running_variance_tensor = batchnorm_attributes.get_next_running_variance();
     next_running_variance_tensor->set_uid(6).set_name("NextRunningVarianceTensor");
 
-    Graph_attributes graph_attributes;
+    GraphAttributes graph_attributes;
     BatchnormNode node(std::move(batchnorm_attributes), graph_attributes);
 
     auto error = node.infer_properties_node();
@@ -153,10 +153,10 @@ TEST(BatchnormNodeTests, InferPropertiesNodeWithStats)
 
 TEST(BatchnormNodeTests, PackNode)
 {
-    Batchnorm_attributes batchnorm_attributes;
+    BatchnormAttributes batchnorm_attributes;
     batchnorm_attributes.name = "Batchnorm";
 
-    auto x_tensor = std::make_shared<Tensor_attributes>();
+    auto x_tensor = std::make_shared<TensorAttributes>();
     x_tensor->set_uid(1)
         .set_name("XTensor")
         .set_data_type(DataType_t::FLOAT)
@@ -164,7 +164,7 @@ TEST(BatchnormNodeTests, PackNode)
         .set_stride({4, 3, 2, 1});
     batchnorm_attributes.set_x(x_tensor);
 
-    auto y_tensor = std::make_shared<Tensor_attributes>();
+    auto y_tensor = std::make_shared<TensorAttributes>();
     y_tensor->set_uid(2)
         .set_name("YTensor")
         .set_data_type(DataType_t::FLOAT)
@@ -172,7 +172,7 @@ TEST(BatchnormNodeTests, PackNode)
         .set_stride({4, 3, 2, 1});
     batchnorm_attributes.set_y(y_tensor);
 
-    auto scale_tensor = std::make_shared<Tensor_attributes>();
+    auto scale_tensor = std::make_shared<TensorAttributes>();
     scale_tensor->set_uid(3)
         .set_name("ScaleTensor")
         .set_data_type(DataType_t::FLOAT)
@@ -180,7 +180,7 @@ TEST(BatchnormNodeTests, PackNode)
         .set_stride({2, 1, 1, 1});
     batchnorm_attributes.set_scale(scale_tensor);
 
-    auto bias_tensor = std::make_shared<Tensor_attributes>();
+    auto bias_tensor = std::make_shared<TensorAttributes>();
     bias_tensor->set_uid(4)
         .set_name("BiasTensor")
         .set_data_type(DataType_t::FLOAT)
@@ -188,7 +188,7 @@ TEST(BatchnormNodeTests, PackNode)
         .set_stride({2, 1, 1, 1});
     batchnorm_attributes.set_bias(bias_tensor);
 
-    auto epsilon_tensor = std::make_shared<Tensor_attributes>();
+    auto epsilon_tensor = std::make_shared<TensorAttributes>();
     epsilon_tensor->set_uid(5)
         .set_name("EpsilonTensor")
         .set_data_type(DataType_t::FLOAT)
@@ -196,7 +196,7 @@ TEST(BatchnormNodeTests, PackNode)
         .set_stride({1});
     batchnorm_attributes.set_epsilon(epsilon_tensor);
 
-    Graph_attributes graph_attributes;
+    GraphAttributes graph_attributes;
     BatchnormNode node(std::move(batchnorm_attributes), graph_attributes);
 
     flatbuffers::FlatBufferBuilder builder;
@@ -223,36 +223,36 @@ TEST(BatchnormNodeTests, PackNode)
 
 TEST(BatchnormNodeTests, GatherhipdnnTensorIds)
 {
-    Batchnorm_attributes batchnorm_attributes;
-    auto x_tensor = std::make_shared<Tensor_attributes>();
+    BatchnormAttributes batchnorm_attributes;
+    auto x_tensor = std::make_shared<TensorAttributes>();
     x_tensor->set_uid(1).set_name("XTensor");
     batchnorm_attributes.set_x(x_tensor);
 
-    auto y_tensor = std::make_shared<Tensor_attributes>();
+    auto y_tensor = std::make_shared<TensorAttributes>();
     y_tensor->set_uid(2).set_name("YTensor");
     batchnorm_attributes.set_y(y_tensor);
 
-    auto scale_tensor = std::make_shared<Tensor_attributes>();
+    auto scale_tensor = std::make_shared<TensorAttributes>();
     scale_tensor->set_uid(3).set_name("ScaleTensor");
     batchnorm_attributes.set_scale(scale_tensor);
 
-    auto bias_tensor = std::make_shared<Tensor_attributes>();
+    auto bias_tensor = std::make_shared<TensorAttributes>();
     bias_tensor->set_uid(4).set_name("BiasTensor");
     batchnorm_attributes.set_bias(bias_tensor);
 
-    auto epsilon_tensor = std::make_shared<Tensor_attributes>();
+    auto epsilon_tensor = std::make_shared<TensorAttributes>();
     epsilon_tensor->set_uid(5).set_name("EpsilonTensor");
     batchnorm_attributes.set_epsilon(epsilon_tensor);
 
-    auto peer_stat_1 = std::make_shared<Tensor_attributes>();
+    auto peer_stat_1 = std::make_shared<TensorAttributes>();
     peer_stat_1->set_uid(9).set_name("PeerStat1");
 
-    auto peer_stat_2 = std::make_shared<Tensor_attributes>();
+    auto peer_stat_2 = std::make_shared<TensorAttributes>();
     peer_stat_2->set_uid(10).set_name("PeerStat2");
 
     batchnorm_attributes.set_peer_stats({peer_stat_1, peer_stat_2});
 
-    Graph_attributes graph_attributes;
+    GraphAttributes graph_attributes;
     BatchnormNode node(std::move(batchnorm_attributes), graph_attributes);
 
     std::unordered_set<int64_t> used_ids;
@@ -269,29 +269,29 @@ TEST(BatchnormNodeTests, GatherhipdnnTensorIds)
 
 TEST(BatchnormNodeTests, PopulatehipdnnTensorIds)
 {
-    Batchnorm_attributes batchnorm_attributes;
-    batchnorm_attributes.set_x(std::make_shared<Tensor_attributes>());
-    batchnorm_attributes.set_y(std::make_shared<Tensor_attributes>());
-    batchnorm_attributes.set_scale(std::make_shared<Tensor_attributes>());
-    batchnorm_attributes.set_bias(std::make_shared<Tensor_attributes>());
-    batchnorm_attributes.set_epsilon(std::make_shared<Tensor_attributes>());
+    BatchnormAttributes batchnorm_attributes;
+    batchnorm_attributes.set_x(std::make_shared<TensorAttributes>());
+    batchnorm_attributes.set_y(std::make_shared<TensorAttributes>());
+    batchnorm_attributes.set_scale(std::make_shared<TensorAttributes>());
+    batchnorm_attributes.set_bias(std::make_shared<TensorAttributes>());
+    batchnorm_attributes.set_epsilon(std::make_shared<TensorAttributes>());
 
-    auto peer_stat_1 = std::make_shared<Tensor_attributes>();
-    auto peer_stat_2 = std::make_shared<Tensor_attributes>();
+    auto peer_stat_1 = std::make_shared<TensorAttributes>();
+    auto peer_stat_2 = std::make_shared<TensorAttributes>();
 
     batchnorm_attributes.set_peer_stats({peer_stat_1, peer_stat_2});
 
-    Graph_attributes graph_attributes;
+    GraphAttributes graph_attributes;
     BatchnormNode node(std::move(batchnorm_attributes), graph_attributes);
 
-    std::unordered_map<int64_t, std::shared_ptr<Tensor_attributes>> tensor_lookup;
+    std::unordered_map<int64_t, std::shared_ptr<TensorAttributes>> tensor_lookup;
     std::unordered_set<int64_t> used_ids;
     int64_t current_tensor_id = 1;
 
     auto error = node.populate_hipdnn_tensor_ids(tensor_lookup, current_tensor_id, used_ids);
     EXPECT_EQ(error.code, error_code_t::OK);
 
-    std::vector<std::shared_ptr<Tensor_attributes>> tensors;
+    std::vector<std::shared_ptr<TensorAttributes>> tensors;
     tensors.reserve(node.attributes.inputs.size() + node.attributes.outputs.size()
                     + node.attributes.peer_stats.size());
 
