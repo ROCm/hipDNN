@@ -26,8 +26,8 @@ protected:
 
 TEST_F(TestMiopenBatchnormPlanBuilder, IsApplicableReturnsFalseForMultiNodeGraph)
 {
-    Mock_graph mockGraph;
-    EXPECT_CALL(mockGraph, node_count()).WillRepeatedly(::testing::Return(2));
+    MockGraph mockGraph;
+    EXPECT_CALL(mockGraph, nodeCount()).WillRepeatedly(::testing::Return(2));
 
     bool applicable = planBuilder.isApplicable(mockGraph);
 
@@ -36,9 +36,9 @@ TEST_F(TestMiopenBatchnormPlanBuilder, IsApplicableReturnsFalseForMultiNodeGraph
 
 TEST_F(TestMiopenBatchnormPlanBuilder, IsApplicableReturnsFalseForUnsupportedAttributes)
 {
-    Mock_graph mockGraph;
-    EXPECT_CALL(mockGraph, node_count()).WillOnce(::testing::Return(1));
-    EXPECT_CALL(mockGraph, has_only_supported_attributes(::testing::_))
+    MockGraph mockGraph;
+    EXPECT_CALL(mockGraph, nodeCount()).WillOnce(::testing::Return(1));
+    EXPECT_CALL(mockGraph, hasOnlySupportedAttributes(::testing::_))
         .WillOnce(::testing::Return(false));
 
     bool applicable = planBuilder.isApplicable(mockGraph);
@@ -48,9 +48,9 @@ TEST_F(TestMiopenBatchnormPlanBuilder, IsApplicableReturnsFalseForUnsupportedAtt
 
 TEST_F(TestMiopenBatchnormPlanBuilder, IsApplicableReturnsTrueForSupportedSingleNodeGraph)
 {
-    Mock_graph mockGraph;
-    EXPECT_CALL(mockGraph, node_count()).WillOnce(::testing::Return(1));
-    EXPECT_CALL(mockGraph, has_only_supported_attributes(::testing::_))
+    MockGraph mockGraph;
+    EXPECT_CALL(mockGraph, nodeCount()).WillOnce(::testing::Return(1));
+    EXPECT_CALL(mockGraph, hasOnlySupportedAttributes(::testing::_))
         .WillOnce(::testing::Return(true));
 
     bool applicable = planBuilder.isApplicable(mockGraph);
@@ -60,7 +60,7 @@ TEST_F(TestMiopenBatchnormPlanBuilder, IsApplicableReturnsTrueForSupportedSingle
 
 TEST_F(TestMiopenBatchnormPlanBuilder, GetWorkspaceSizeReturnsExpectedValue)
 {
-    Mock_graph mockGraph;
+    MockGraph mockGraph;
 
     size_t workspaceSize = planBuilder.getWorkspaceSize(dummyHandle, mockGraph);
 
@@ -71,7 +71,7 @@ TEST_F(TestMiopenBatchnormPlanBuilder, BuildPlanSetsPlanForSupportedNode)
 {
     // Use a real flatbuffer graph with a valid batchnorm node
     auto builder = flatbuffer_test_utils::create_valid_batchnorm_graph();
-    hipdnn_plugin::Graph_wrapper graph(builder.GetBufferPointer(), builder.GetSize());
+    hipdnn_plugin::GraphWrapper graph(builder.GetBufferPointer(), builder.GetSize());
     HipdnnEnginePluginExecutionContext ctx;
 
     // Should not throw
@@ -101,11 +101,11 @@ TEST_F(TestMiopenBatchnormPlanBuilder, BuildPlanThrowsForUnsupportedNodeType)
                                                       &nodes);
     builder.Finish(graphOffset);
 
-    hipdnn_plugin::Graph_wrapper graph(builder.GetBufferPointer(), builder.GetSize());
+    hipdnn_plugin::GraphWrapper graph(builder.GetBufferPointer(), builder.GetSize());
 
     HipdnnEnginePluginExecutionContext ctx;
 
     EXPECT_THROW(planBuilder.buildPlan(dummyHandle, graph, ctx),
-                 hipdnn_plugin::Hipdnn_plugin_exception);
+                 hipdnn_plugin::HipdnnPluginException);
     EXPECT_FALSE(ctx.hasValidPlan());
 }

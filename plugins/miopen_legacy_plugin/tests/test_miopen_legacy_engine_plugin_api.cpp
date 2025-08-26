@@ -222,11 +222,10 @@ TEST(MiopenLegacyEnginePluginApiTest, EnginePluginGetEngineDetailsValid)
 
     auto status = hipdnnEnginePluginGetEngineDetails(handle, 1, &opGraph, &engineDetailsOut);
 
-    hipdnn_plugin::Engine_details_wrapper engineDetails(engineDetailsOut.ptr,
-                                                        engineDetailsOut.size);
+    hipdnn_plugin::EngineDetailsWrapper engineDetails(engineDetailsOut.ptr, engineDetailsOut.size);
 
     EXPECT_EQ(status, HIPDNN_PLUGIN_STATUS_SUCCESS);
-    EXPECT_EQ(engineDetails.engine_id(), 1);
+    EXPECT_EQ(engineDetails.engineId(), 1);
 
     // Clean up
     EXPECT_EQ(hipdnnEnginePluginDestroyEngineDetails(handle, &engineDetailsOut),

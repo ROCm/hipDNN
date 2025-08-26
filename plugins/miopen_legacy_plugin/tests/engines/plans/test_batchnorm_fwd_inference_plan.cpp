@@ -12,15 +12,15 @@ TEST(BatchnormFwdInferenceParamsTest, InitializesAllTensorsFromValidGraph)
 {
     // Create a valid batchnorm graph
     auto builder = flatbuffer_test_utils::create_valid_batchnorm_graph();
-    hipdnn_plugin::Graph_wrapper graph(builder.GetBufferPointer(), builder.GetSize());
+    hipdnn_plugin::GraphWrapper graph(builder.GetBufferPointer(), builder.GetSize());
 
     // Get the batchnorm node and attributes
-    const auto& node = graph.get_node(0);
+    const auto& node = graph.getNode(0);
     auto* attrs = node.attributes_as_BatchnormInferenceAttributes();
     ASSERT_NE(attrs, nullptr);
 
     // Construct params
-    BatchnormFwdInferenceParams params(*attrs, graph.get_tensor_map());
+    BatchnormFwdInferenceParams params(*attrs, graph.getTensorMap());
 
     // All required tensors should be initialized
     EXPECT_NO_THROW(params.x());
@@ -43,14 +43,14 @@ TEST(BatchnormFwdInferenceParamsTest, HandlesMissingOptionalTensors)
     auto builder = flatbuffer_test_utils::create_valid_batchnorm_graph(
         {1, 1, 1, 1}, {1, 1, 1, 1}, false // Set has_optional_attributes to false
     );
-    hipdnn_plugin::Graph_wrapper graph(builder.GetBufferPointer(), builder.GetSize());
+    hipdnn_plugin::GraphWrapper graph(builder.GetBufferPointer(), builder.GetSize());
 
     // Get the batchnorm node and attributes
-    const auto& node = graph.get_node(0);
+    const auto& node = graph.getNode(0);
     auto* attrs = node.attributes_as_BatchnormInferenceAttributes();
     ASSERT_NE(attrs, nullptr);
 
-    const auto& tensorMap = graph.get_tensor_map();
+    const auto& tensorMap = graph.getTensorMap();
     BatchnormFwdInferenceParams params(*attrs, tensorMap);
 
     // Optional tensors should not be present

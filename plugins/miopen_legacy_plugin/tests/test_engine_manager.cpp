@@ -36,7 +36,7 @@ TEST(EngineManagerTest, ReturnsApplicableEngineIds)
     manager.addEngine(std::move(mockEngine1));
     manager.addEngine(std::move(mockEngine2));
 
-    Mock_graph mockGraph;
+    MockGraph mockGraph;
     auto applicable = manager.getApplicableEngineIds(mockGraph);
 
     EXPECT_EQ(applicable.size(), 1);
@@ -47,7 +47,7 @@ TEST(EngineManagerTest, ReturnsMultipleApplicableEngineIds)
 {
     std::set<std::unique_ptr<EngineInterface>> engines;
 
-    Mock_graph mockGraph;
+    MockGraph mockGraph;
     auto mockEngine1 = std::make_unique<MockEngine>();
     EXPECT_CALL(*mockEngine1, id()).WillRepeatedly(Return(1));
     EXPECT_CALL(*mockEngine1, isApplicable(::testing::_)).WillRepeatedly(Return(true));
@@ -83,7 +83,7 @@ TEST(EngineManagerTest, ReturnsNoApplicableEngineIds)
     manager.addEngine(std::move(mockEngine1));
     manager.addEngine(std::move(mockEngine2));
 
-    Mock_graph mockGraph;
+    MockGraph mockGraph;
     auto applicable = manager.getApplicableEngineIds(mockGraph);
 
     EXPECT_TRUE(applicable.empty());
@@ -107,7 +107,7 @@ TEST(EngineManagerTest, ReturnsEngineDetails)
 
     manager.addEngine(std::move(mockEngine));
 
-    Mock_graph mockGraph;
+    MockGraph mockGraph;
     HipdnnEnginePluginHandle dummyHandle = {};
     hipdnnPluginConstData_t details;
     manager.getEngineDetails(dummyHandle, mockGraph, 1, details);
@@ -120,12 +120,12 @@ TEST(EngineManagerTest, ThrowsOnInvalidEngineId)
 {
     EngineManager manager;
 
-    Mock_graph mockGraph;
+    MockGraph mockGraph;
     hipdnnPluginConstData_t engineDetails;
 
     HipdnnEnginePluginHandle dummyHandle = {};
     EXPECT_THROW(manager.getEngineDetails(dummyHandle, mockGraph, 999, engineDetails),
-                 hipdnn_plugin::Hipdnn_plugin_exception);
+                 hipdnn_plugin::HipdnnPluginException);
 }
 
 TEST(EngineManagerTest, GetWorkspaceSizeReturnsCorrectValue)
@@ -135,7 +135,7 @@ TEST(EngineManagerTest, GetWorkspaceSizeReturnsCorrectValue)
     auto mockEngine = std::make_unique<MockEngine>();
     EXPECT_CALL(*mockEngine, id()).WillRepeatedly(Return(42));
     HipdnnEnginePluginHandle dummyHandle = {};
-    Mock_graph mockGraph;
+    MockGraph mockGraph;
     EXPECT_CALL(*mockEngine, getWorkspaceSize(::testing::_, ::testing::_)).WillOnce(Return(4096));
 
     manager.addEngine(std::move(mockEngine));
@@ -148,10 +148,10 @@ TEST(EngineManagerTest, GetWorkspaceSizeThrowsOnInvalidEngineId)
 {
     EngineManager manager;
     HipdnnEnginePluginHandle dummyHandle = {};
-    Mock_graph mockGraph;
+    MockGraph mockGraph;
 
     EXPECT_THROW(manager.getWorkspaceSize(dummyHandle, 999, mockGraph),
-                 hipdnn_plugin::Hipdnn_plugin_exception);
+                 hipdnn_plugin::HipdnnPluginException);
 }
 
 TEST(EngineManagerTest, InitializeExecutionContextCallsEngine)
@@ -164,10 +164,10 @@ TEST(EngineManagerTest, InitializeExecutionContextCallsEngine)
     EngineManager manager;
     manager.addEngine(std::move(mockEngine));
     HipdnnEnginePluginHandle dummyHandle = {};
-    Mock_graph mockGraph;
-    Mock_engine_config mockEngineConfig;
-    ON_CALL(mockEngineConfig, engine_id()).WillByDefault(Return(7));
-    EXPECT_CALL(mockEngineConfig, engine_id()).Times(testing::AnyNumber()); // Uninteresting call
+    MockGraph mockGraph;
+    MockEngineConfig mockEngineConfig;
+    ON_CALL(mockEngineConfig, engineId()).WillByDefault(Return(7));
+    EXPECT_CALL(mockEngineConfig, engineId()).Times(testing::AnyNumber()); // Uninteresting call
     MockHipdnnEnginePluginExecutionContext execCtx;
 
     manager.initializeExecutionContext(dummyHandle, mockGraph, mockEngineConfig, execCtx);
@@ -178,11 +178,11 @@ TEST(EngineManagerTest, InitializeExecutionContextThrowsOnInvalidEngineId)
     MockHipdnnEnginePluginExecutionContext execCtx;
     EngineManager manager;
     HipdnnEnginePluginHandle dummyHandle = {};
-    Mock_graph mockGraph;
-    Mock_engine_config mockEngineConfig;
+    MockGraph mockGraph;
+    MockEngineConfig mockEngineConfig;
 
-    EXPECT_CALL(mockEngineConfig, engine_id()).Times(testing::AnyNumber()); // Uninteresting call
+    EXPECT_CALL(mockEngineConfig, engineId()).Times(testing::AnyNumber()); // Uninteresting call
     EXPECT_THROW(
         manager.initializeExecutionContext(dummyHandle, mockGraph, mockEngineConfig, execCtx),
-        hipdnn_plugin::Hipdnn_plugin_exception);
+        hipdnn_plugin::HipdnnPluginException);
 }

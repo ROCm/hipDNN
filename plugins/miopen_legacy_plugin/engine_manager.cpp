@@ -19,8 +19,7 @@ void EngineManager::addEngine(std::unique_ptr<EngineInterface> engine)
     _engines.emplace(engine->id(), std::move(engine));
 }
 
-std::vector<int64_t>
-    EngineManager::getApplicableEngineIds(const hipdnn_plugin::Graph_interface& opGraph)
+std::vector<int64_t> EngineManager::getApplicableEngineIds(const hipdnn_plugin::IGraph& opGraph)
 {
     std::vector<int64_t> applicable;
     for(const auto& engine : _engines)
@@ -34,7 +33,7 @@ std::vector<int64_t>
 }
 
 void EngineManager::getEngineDetails(HipdnnEnginePluginHandle& handle,
-                                     const hipdnn_plugin::Graph_interface& opGraph,
+                                     const hipdnn_plugin::IGraph& opGraph,
                                      int64_t engineId,
                                      hipdnnPluginConstData_t& engineDetailsOut)
 {
@@ -45,7 +44,7 @@ void EngineManager::getEngineDetails(HipdnnEnginePluginHandle& handle,
 
 size_t EngineManager::getWorkspaceSize(const HipdnnEnginePluginHandle& handle,
                                        int64_t engineId,
-                                       const hipdnn_plugin::Graph_interface& opGraph) const
+                                       const hipdnn_plugin::IGraph& opGraph) const
 {
     auto& engine = getEngine(engineId);
     return engine.getWorkspaceSize(handle, opGraph);
@@ -53,11 +52,11 @@ size_t EngineManager::getWorkspaceSize(const HipdnnEnginePluginHandle& handle,
 
 void EngineManager::initializeExecutionContext(
     const HipdnnEnginePluginHandle& handle,
-    const hipdnn_plugin::Graph_interface& opGraph,
-    const hipdnn_plugin::Engine_config_interface& engineConfig,
+    const hipdnn_plugin::IGraph& opGraph,
+    const hipdnn_plugin::IEngineConfig& engineConfig,
     HipdnnEnginePluginExecutionContext& executionContext) const
 {
-    auto& engine = getEngine(engineConfig.engine_id());
+    auto& engine = getEngine(engineConfig.engineId());
     engine.initializeExecutionContext(handle, opGraph, executionContext);
 }
 
@@ -66,8 +65,8 @@ EngineInterface& EngineManager::getEngine(int64_t engineId) const
     auto it = _engines.find(engineId);
     if(it == _engines.end())
     {
-        throw Hipdnn_plugin_exception(HIPDNN_PLUGIN_STATUS_INVALID_VALUE,
-                                      "Engine with ID " + std::to_string(engineId) + " not found.");
+        throw HipdnnPluginException(HIPDNN_PLUGIN_STATUS_INVALID_VALUE,
+                                    "Engine with ID " + std::to_string(engineId) + " not found.");
     }
     return *it->second;
 }

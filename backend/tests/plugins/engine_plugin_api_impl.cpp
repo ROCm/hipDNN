@@ -41,7 +41,7 @@ extern "C" hipdnnPluginStatus_t hipdnnEnginePluginGetAllEngineIds(int64_t* engin
                                                                   uint32_t max_engines,
                                                                   uint32_t* num_engines)
 {
-    return hipdnn_plugin::try_catch([&]() {
+    return hipdnn_plugin::tryCatch([&]() {
         if(max_engines != 0)
         {
             THROW_IF_NULL(engine_ids);
@@ -54,7 +54,7 @@ extern "C" hipdnnPluginStatus_t hipdnnEnginePluginGetAllEngineIds(int64_t* engin
 
 extern "C" hipdnnPluginStatus_t hipdnnEnginePluginCreate(hipdnnEnginePluginHandle_t* handle)
 {
-    return hipdnn_plugin::try_catch([&]() {
+    return hipdnn_plugin::tryCatch([&]() {
         THROW_IF_NULL(handle);
         *handle = new HipdnnEnginePluginHandle(nullptr);
     });
@@ -62,7 +62,7 @@ extern "C" hipdnnPluginStatus_t hipdnnEnginePluginCreate(hipdnnEnginePluginHandl
 
 extern "C" hipdnnPluginStatus_t hipdnnEnginePluginDestroy(hipdnnEnginePluginHandle_t handle)
 {
-    return hipdnn_plugin::try_catch([&]() {
+    return hipdnn_plugin::tryCatch([&]() {
         check_handle_validity(handle);
         delete handle;
     });
@@ -71,7 +71,7 @@ extern "C" hipdnnPluginStatus_t hipdnnEnginePluginDestroy(hipdnnEnginePluginHand
 extern "C" hipdnnPluginStatus_t hipdnnEnginePluginSetStream(hipdnnEnginePluginHandle_t handle,
                                                             hipStream_t stream)
 {
-    return hipdnn_plugin::try_catch([&]() {
+    return hipdnn_plugin::tryCatch([&]() {
         check_handle_validity(handle);
         handle->stream = stream;
     });
@@ -84,7 +84,7 @@ extern "C" hipdnnPluginStatus_t
                                              uint32_t max_engines,
                                              uint32_t* num_engines)
 {
-    return hipdnn_plugin::try_catch([&]() {
+    return hipdnn_plugin::tryCatch([&]() {
         check_handle_validity(handle);
         THROW_IF_NULL(op_graph);
         if(max_engines != 0)
@@ -103,7 +103,7 @@ extern "C" hipdnnPluginStatus_t
                                        const hipdnnPluginConstData_t* op_graph,
                                        hipdnnPluginConstData_t* engine_details)
 {
-    return hipdnn_plugin::try_catch([&]() {
+    return hipdnn_plugin::tryCatch([&]() {
         check_handle_validity(handle);
         check_engine_id_validity(engine_id);
         THROW_IF_NULL(op_graph);
@@ -117,7 +117,7 @@ extern "C" hipdnnPluginStatus_t
     hipdnnEnginePluginDestroyEngineDetails(hipdnnEnginePluginHandle_t handle,
                                            hipdnnPluginConstData_t* engine_details)
 {
-    return hipdnn_plugin::try_catch([&]() {
+    return hipdnn_plugin::tryCatch([&]() {
         check_handle_validity(handle);
         THROW_IF_NULL(engine_details);
 
@@ -131,7 +131,7 @@ extern "C" hipdnnPluginStatus_t
                                        const hipdnnPluginConstData_t* op_graph,
                                        size_t* workspace_size)
 {
-    return hipdnn_plugin::try_catch([&]() {
+    return hipdnn_plugin::tryCatch([&]() {
         check_handle_validity(handle);
         THROW_IF_NULL(engine_config);
         THROW_IF_NULL(op_graph);
@@ -147,7 +147,7 @@ extern "C" hipdnnPluginStatus_t hipdnnEnginePluginCreateExecutionContext(
     const hipdnnPluginConstData_t* op_graph,
     hipdnnEnginePluginExecutionContext_t* execution_context)
 {
-    return hipdnn_plugin::try_catch([&]() {
+    return hipdnn_plugin::tryCatch([&]() {
         check_handle_validity(handle);
         THROW_IF_NULL(engine_config);
         THROW_IF_NULL(op_graph);
@@ -160,7 +160,7 @@ extern "C" hipdnnPluginStatus_t hipdnnEnginePluginCreateExecutionContext(
 extern "C" hipdnnPluginStatus_t hipdnnEnginePluginDestroyExecutionContext(
     hipdnnEnginePluginHandle_t handle, hipdnnEnginePluginExecutionContext_t execution_context)
 {
-    return hipdnn_plugin::try_catch([&]() {
+    return hipdnn_plugin::tryCatch([&]() {
         check_handle_validity(handle);
         THROW_IF_NULL(execution_context);
 
@@ -175,7 +175,7 @@ extern "C" hipdnnPluginStatus_t
                                      const hipdnnPluginDeviceBuffer_t* device_buffers,
                                      uint32_t num_device_buffers)
 {
-    return hipdnn_plugin::try_catch([&]() {
+    return hipdnn_plugin::tryCatch([&]() {
         check_handle_validity(handle);
         THROW_IF_NULL(execution_context);
         // Workspace can be null if the workspace size is zero.

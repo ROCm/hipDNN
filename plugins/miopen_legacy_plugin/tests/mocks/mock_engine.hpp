@@ -18,24 +18,20 @@ class MockEngine : public EngineInterface
 {
 public:
     MOCK_METHOD(int64_t, id, (), (const, override));
-    MOCK_METHOD(bool,
-                isApplicable,
-                (const hipdnn_plugin::Graph_interface& opGraph),
-                (const, override));
+    MOCK_METHOD(bool, isApplicable, (const hipdnn_plugin::IGraph& opGraph), (const, override));
     MOCK_METHOD(void,
                 getDetails,
                 (HipdnnEnginePluginHandle & handle, hipdnnPluginConstData_t& detailsOut),
                 (const, override));
     MOCK_METHOD(size_t,
                 getWorkspaceSize,
-                (const HipdnnEnginePluginHandle& handle,
-                 const hipdnn_plugin::Graph_interface& opGraph),
+                (const HipdnnEnginePluginHandle& handle, const hipdnn_plugin::IGraph& opGraph),
                 (const, override));
 
     MOCK_METHOD(void,
                 initializeExecutionContext,
                 (const HipdnnEnginePluginHandle& handle,
-                 const hipdnn_plugin::Graph_interface& opGraph,
+                 const hipdnn_plugin::IGraph& opGraph,
                  HipdnnEnginePluginExecutionContext& executionContext),
                 (const, override));
 };

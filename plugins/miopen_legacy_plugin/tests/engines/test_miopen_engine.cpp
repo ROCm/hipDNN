@@ -27,7 +27,7 @@ TEST(MiopenEngineTest, WorkspaceSizeReturnsZeroIfNoPlanBuilders)
 {
     MiopenEngine engine(1);
 
-    Mock_graph mockGraph;
+    MockGraph mockGraph;
 
     HipdnnEnginePluginHandle dummyHandle;
     EXPECT_EQ(engine.getWorkspaceSize(dummyHandle, mockGraph), 0u);
@@ -43,7 +43,7 @@ TEST(MiopenEngineTest, WorkspaceSizeReturnsPlanBuilderWorkspace)
     MiopenEngine engine(1);
     engine.addPlanBuilder(std::move(mockPlanBuilder));
 
-    Mock_graph mockGraph;
+    MockGraph mockGraph;
 
     HipdnnEnginePluginHandle dummyHandle;
     EXPECT_EQ(engine.getWorkspaceSize(dummyHandle, mockGraph), 1337u);
@@ -65,7 +65,7 @@ TEST(MiopenEngineTest, WorkspaceSizeReturnsMaxPlanBuilderWorkspace)
     engine.addPlanBuilder(std::move(mockPlanBuilder));
     engine.addPlanBuilder(std::move(mockPlanBuilder2));
 
-    Mock_graph mockGraph;
+    MockGraph mockGraph;
 
     HipdnnEnginePluginHandle dummyHandle;
     EXPECT_EQ(engine.getWorkspaceSize(dummyHandle, mockGraph), 45000u);
@@ -79,7 +79,7 @@ TEST(MiopenEngineTest, WorkspaceSizeReturnsZeroIfNoPlanBuilderApplicable)
     MiopenEngine engine(1);
     engine.addPlanBuilder(std::move(mockPlanBuilder));
 
-    Mock_graph mockGraph;
+    MockGraph mockGraph;
 
     HipdnnEnginePluginHandle dummyHandle;
     EXPECT_EQ(engine.getWorkspaceSize(dummyHandle, mockGraph), 0u);
@@ -93,7 +93,7 @@ TEST(MiopenEngineTest, IsApplicableReturnsTrueIfAnyPlanBuilderApplicable)
     MiopenEngine engine(0);
     engine.addPlanBuilder(std::move(mockPlanBuilder));
 
-    Mock_graph mockGraph;
+    MockGraph mockGraph;
 
     EXPECT_TRUE(engine.isApplicable(mockGraph));
 }
@@ -110,7 +110,7 @@ TEST(MiopenEngineTest, IsApplicableReturnsAfterTheFirstApplicablePlanBuilder)
     engine.addPlanBuilder(std::move(mockPlanBuilder1));
     engine.addPlanBuilder(std::move(mockPlanBuilder2));
 
-    Mock_graph mockGraph;
+    MockGraph mockGraph;
 
     EXPECT_TRUE(engine.isApplicable(mockGraph));
 }
@@ -119,7 +119,7 @@ TEST(MiopenEngineTest, IsApplicableReturnsFalseIfNoPlanBuilders)
 {
     MiopenEngine engine(0);
 
-    Mock_graph mockGraph;
+    MockGraph mockGraph;
 
     EXPECT_FALSE(engine.isApplicable(mockGraph));
 }
@@ -132,7 +132,7 @@ TEST(MiopenEngineTest, IsApplicableReturnsFalseIfNoPlanBuilderApplicable)
     MiopenEngine engine(0);
     engine.addPlanBuilder(std::move(mockPlanBuilder));
 
-    Mock_graph mockGraph;
+    MockGraph mockGraph;
 
     EXPECT_FALSE(engine.isApplicable(mockGraph));
 }
@@ -145,8 +145,8 @@ TEST(MiopenEngineTest, GetDetailsReturnsSerializedEngineDetails)
     hipdnnPluginConstData_t result;
     engine.getDetails(dummyHandle, result);
 
-    hipdnn_plugin::Engine_details_wrapper engineDetails(result.ptr, result.size);
-    EXPECT_EQ(engineDetails.engine_id(), 1);
+    hipdnn_plugin::EngineDetailsWrapper engineDetails(result.ptr, result.size);
+    EXPECT_EQ(engineDetails.engineId(), 1);
 }
 
 TEST(MiopenEngineTest, InitializeExecutionContextInvokesFirstApplicablePlanBuilder)
@@ -164,7 +164,7 @@ TEST(MiopenEngineTest, InitializeExecutionContextInvokesFirstApplicablePlanBuild
     engine.addPlanBuilder(std::move(mockPlanBuilder1));
     engine.addPlanBuilder(std::move(mockPlanBuilder2));
 
-    Mock_graph mockGraph;
+    MockGraph mockGraph;
     HipdnnEnginePluginHandle dummyHandle;
     MockHipdnnEnginePluginExecutionContext ctx;
 
@@ -186,7 +186,7 @@ TEST(MiopenEngineTest, InitializeExecutionContextSkipsNonApplicableBuilders)
     engine.addPlanBuilder(std::move(mockPlanBuilder1));
     engine.addPlanBuilder(std::move(mockPlanBuilder2));
 
-    Mock_graph mockGraph;
+    MockGraph mockGraph;
     HipdnnEnginePluginHandle dummyHandle;
     MockHipdnnEnginePluginExecutionContext ctx;
 
@@ -207,7 +207,7 @@ TEST(MiopenEngineTest, InitializeExecutionContextDoesNotCallBuildPlanIfNoApplica
     engine.addPlanBuilder(std::move(mockPlanBuilder1));
     engine.addPlanBuilder(std::move(mockPlanBuilder2));
 
-    Mock_graph mockGraph;
+    MockGraph mockGraph;
     HipdnnEnginePluginHandle dummyHandle;
     MockHipdnnEnginePluginExecutionContext ctx;
 

@@ -14,32 +14,32 @@ using namespace hipdnn_plugin;
 TEST(PluginHelpersTest, TryCatchReturnsSuccessOnNoException)
 {
     auto lambda = []() {};
-    auto status = try_catch(lambda);
+    auto status = tryCatch(lambda);
     EXPECT_EQ(status, HIPDNN_PLUGIN_STATUS_SUCCESS);
 }
 
 TEST(PluginHelpersTest, TryCatchHandlesHipdnnException)
 {
     auto lambda = []() {
-        throw Hipdnn_plugin_exception(HIPDNN_PLUGIN_STATUS_INTERNAL_ERROR, "internal error");
+        throw HipdnnPluginException(HIPDNN_PLUGIN_STATUS_INTERNAL_ERROR, "internal error");
     };
-    auto status = try_catch(lambda);
+    auto status = tryCatch(lambda);
     EXPECT_EQ(status, HIPDNN_PLUGIN_STATUS_INTERNAL_ERROR);
-    EXPECT_STREQ(Plugin_last_error_manager::get_last_error(), "internal error");
+    EXPECT_STREQ(PluginLastErrorManager::getLastError(), "internal error");
 }
 
 TEST(PluginHelpersTest, TryCatchHandlesStdException)
 {
     auto lambda = []() { throw std::runtime_error("std exception"); };
-    auto status = try_catch(lambda);
+    auto status = tryCatch(lambda);
     EXPECT_EQ(status, HIPDNN_PLUGIN_STATUS_INTERNAL_ERROR);
-    EXPECT_STREQ(Plugin_last_error_manager::get_last_error(), "std exception");
+    EXPECT_STREQ(PluginLastErrorManager::getLastError(), "std exception");
 }
 
 TEST(PluginHelpersTest, TryCatchHandlesUnknownException)
 {
     auto lambda = []() { throw 42; };
-    auto status = try_catch(lambda);
+    auto status = tryCatch(lambda);
     EXPECT_EQ(status, HIPDNN_PLUGIN_STATUS_INTERNAL_ERROR);
-    EXPECT_STREQ(Plugin_last_error_manager::get_last_error(), "Unknown exception occured");
+    EXPECT_STREQ(PluginLastErrorManager::getLastError(), "Unknown exception occured");
 }
