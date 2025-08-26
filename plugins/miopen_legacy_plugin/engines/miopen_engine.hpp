@@ -31,7 +31,7 @@ public:
         const hipdnn_plugin::Graph_interface& opGraph,
         HipdnnEnginePluginExecutionContext& executionContext) const override;
 
-    void add_plan_builder(std::unique_ptr<PlanBuilderInterface> planBuilder);
+    void addPlanBuilder(std::unique_ptr<PlanBuilderInterface> planBuilder);
 
 private:
     int64_t _id;

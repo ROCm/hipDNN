@@ -17,14 +17,14 @@ MiopenContainer::MiopenContainer()
 {
     HIPDNN_LOG_INFO("Creating MiopenContainer");
 
-    int64_t engine_id = 1;
-    auto miopen_engine = std::make_unique<MiopenEngine>(engine_id++);
+    int64_t engineId = 1;
+    auto miopenEngine = std::make_unique<MiopenEngine>(engineId++);
 
-    auto batchnorm_plan_builder = std::make_unique<MiopenBatchnormPlanBuilder>();
-    miopen_engine->add_plan_builder(std::move(batchnorm_plan_builder));
+    auto batchnormPlanBuilder = std::make_unique<MiopenBatchnormPlanBuilder>();
+    miopenEngine->addPlanBuilder(std::move(batchnormPlanBuilder));
 
     _engineManager = std::make_unique<EngineManager>();
-    _engineManager->addEngine(std::move(miopen_engine));
+    _engineManager->addEngine(std::move(miopenEngine));
 }
 
 MiopenContainer::~MiopenContainer()

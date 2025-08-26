@@ -75,7 +75,7 @@ void MiopenEngine::initializeExecutionContext(
     }
 }
 
-void MiopenEngine::add_plan_builder(std::unique_ptr<PlanBuilderInterface> planBuilder)
+void MiopenEngine::addPlanBuilder(std::unique_ptr<PlanBuilderInterface> planBuilder)
 {
     _planBuilders.insert(std::move(planBuilder));
 }
