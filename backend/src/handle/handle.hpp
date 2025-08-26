@@ -8,7 +8,7 @@
 #include <hip/hip_runtime.h>
 #include <memory>
 
-struct hipdnnHandle
+struct hipdnnHandle // NOLINT
 {
 public:
     hipdnnHandle();

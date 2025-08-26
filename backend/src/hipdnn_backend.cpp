@@ -62,7 +62,7 @@ HIPDNN_BACKEND_EXPORT hipdnnStatus_t hipdnnCreate(hipdnnHandle_t* handle)
 
         hipdnn_backend::HandleFactory::createHandle(handle);
 
-        LOG_API_SUCCESS(api_name, "created_handle={:p}", static_cast<void*>(*handle));
+        LOG_API_SUCCESS(api_name, "createHandle={:p}", static_cast<void*>(*handle));
     });
 }
 
