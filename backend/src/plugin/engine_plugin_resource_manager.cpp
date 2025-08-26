@@ -422,7 +422,7 @@ EngineDetailsWrapper::EngineDetailsWrapper(const std::shared_ptr<EnginePluginRes
     if(!verifier.VerifyBuffer<hipdnn_sdk::data_objects::EngineDetails>())
     {
         throw Hipdnn_exception(HIPDNN_STATUS_BAD_PARAM,
-                               "Engine_details_wrapper: unable to verify the flatbuffer schema.");
+                               "EngineDetailsWrapper: unable to verify the flatbuffer schema.");
     }
 }
 
@@ -535,7 +535,7 @@ hipdnnEnginePluginExecutionContext_t EngineExecutionContextWrapper::get() const
     if(_executionContext == nullptr)
     {
         throw Hipdnn_exception(HIPDNN_STATUS_INTERNAL_ERROR,
-                               "Engine_execution_context_wrapper: wrong usage: "
+                               "EngineExecutionContextWrapper: wrong usage: "
                                "get() called on an empty object");
     }
 
