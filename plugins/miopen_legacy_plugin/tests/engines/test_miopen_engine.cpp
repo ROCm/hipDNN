@@ -27,7 +27,7 @@ TEST(Miopen_engineTest, WorkspaceSizeReturnsZeroIfNoPlanBuilders)
 {
     MiopenEngine engine(1);
 
-    Mock_graph mock_graph;
+    MockGraph mock_graph;
 
     HipdnnEnginePluginHandle dummy_handle;
     EXPECT_EQ(engine.getWorkspaceSize(dummy_handle, mock_graph), 0u);
@@ -43,7 +43,7 @@ TEST(Miopen_engineTest, WorkspaceSizeReturnsPlanBuilderWorkspace)
     MiopenEngine engine(1);
     engine.addPlanBuilder(std::move(mock_plan_builder));
 
-    Mock_graph mock_graph;
+    MockGraph mock_graph;
 
     HipdnnEnginePluginHandle dummy_handle;
     EXPECT_EQ(engine.getWorkspaceSize(dummy_handle, mock_graph), 1337u);
@@ -65,7 +65,7 @@ TEST(Miopen_engineTest, WorkspaceSizeReturnsMaxPlanBuilderWorkspace)
     engine.addPlanBuilder(std::move(mock_plan_builder));
     engine.addPlanBuilder(std::move(mock_plan_builder2));
 
-    Mock_graph mock_graph;
+    MockGraph mock_graph;
 
     HipdnnEnginePluginHandle dummy_handle;
     EXPECT_EQ(engine.getWorkspaceSize(dummy_handle, mock_graph), 45000u);
@@ -79,7 +79,7 @@ TEST(Miopen_engineTest, WorkspaceSizeReturnsZeroIfNoPlanBuilderApplicable)
     MiopenEngine engine(1);
     engine.addPlanBuilder(std::move(mock_plan_builder));
 
-    Mock_graph mock_graph;
+    MockGraph mock_graph;
 
     HipdnnEnginePluginHandle dummy_handle;
     EXPECT_EQ(engine.getWorkspaceSize(dummy_handle, mock_graph), 0u);
@@ -93,7 +93,7 @@ TEST(Miopen_engineTest, IsApplicableReturnsTrueIfAnyPlanBuilderApplicable)
     MiopenEngine engine(0);
     engine.addPlanBuilder(std::move(mock_plan_builder));
 
-    Mock_graph mock_graph;
+    MockGraph mock_graph;
 
     EXPECT_TRUE(engine.isApplicable(mock_graph));
 }
@@ -110,7 +110,7 @@ TEST(Miopen_engineTest, IsApplicableReturnsAfterTheFirstApplicablePlanBuilder)
     engine.addPlanBuilder(std::move(mock_plan_builder1));
     engine.addPlanBuilder(std::move(mock_plan_builder2));
 
-    Mock_graph mock_graph;
+    MockGraph mock_graph;
 
     EXPECT_TRUE(engine.isApplicable(mock_graph));
 }
@@ -119,7 +119,7 @@ TEST(Miopen_engineTest, IsApplicableReturnsFalseIfNoPlanBuilders)
 {
     MiopenEngine engine(0);
 
-    Mock_graph mock_graph;
+    MockGraph mock_graph;
 
     EXPECT_FALSE(engine.isApplicable(mock_graph));
 }
@@ -132,7 +132,7 @@ TEST(Miopen_engineTest, IsApplicableReturnsFalseIfNoPlanBuilderApplicable)
     MiopenEngine engine(0);
     engine.addPlanBuilder(std::move(mock_plan_builder));
 
-    Mock_graph mock_graph;
+    MockGraph mock_graph;
 
     EXPECT_FALSE(engine.isApplicable(mock_graph));
 }
@@ -145,8 +145,8 @@ TEST(Miopen_engineTest, GetDetailsReturnsSerializedEngineDetails)
     hipdnnPluginConstData_t result;
     engine.getDetails(dummy_handle, result);
 
-    hipdnn_plugin::Engine_details_wrapper engine_details(result.ptr, result.size);
-    EXPECT_EQ(engine_details.engine_id(), 1);
+    hipdnn_plugin::EngineDetailsWrapper engine_details(result.ptr, result.size);
+    EXPECT_EQ(engine_details.engineId(), 1);
 }
 
 TEST(Miopen_engineTest, InitializeExecutionContextInvokesFirstApplicablePlanBuilder)
@@ -164,7 +164,7 @@ TEST(Miopen_engineTest, InitializeExecutionContextInvokesFirstApplicablePlanBuil
     engine.addPlanBuilder(std::move(mock_plan_builder1));
     engine.addPlanBuilder(std::move(mock_plan_builder2));
 
-    Mock_graph mock_graph;
+    MockGraph mock_graph;
     HipdnnEnginePluginHandle dummy_handle;
     Mock_hipdnn_engine_plugin_execution_context ctx;
 
@@ -186,7 +186,7 @@ TEST(Miopen_engineTest, InitializeExecutionContextSkipsNonApplicableBuilders)
     engine.addPlanBuilder(std::move(mock_plan_builder1));
     engine.addPlanBuilder(std::move(mock_plan_builder2));
 
-    Mock_graph mock_graph;
+    MockGraph mock_graph;
     HipdnnEnginePluginHandle dummy_handle;
     Mock_hipdnn_engine_plugin_execution_context ctx;
 
@@ -207,7 +207,7 @@ TEST(Miopen_engineTest, InitializeExecutionContextDoesNotCallBuildPlanIfNoApplic
     engine.addPlanBuilder(std::move(mock_plan_builder1));
     engine.addPlanBuilder(std::move(mock_plan_builder2));
 
-    Mock_graph mock_graph;
+    MockGraph mock_graph;
     HipdnnEnginePluginHandle dummy_handle;
     Mock_hipdnn_engine_plugin_execution_context ctx;
 

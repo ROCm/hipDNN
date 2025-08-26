@@ -66,8 +66,7 @@ void ExecutionPlanDescriptor::getAttribute(hipdnnBackendAttributeName_t attribut
     default:
         throw HipdnnException(
             HIPDNN_STATUS_NOT_SUPPORTED,
-            std::string(
-                "ExecutionPlanDescriptor::getAttribute() is not supported for attribute ")
+            std::string("ExecutionPlanDescriptor::getAttribute() is not supported for attribute ")
                 + hipdnn_backend::hipdnnGetAttributeNameString(attributeName) + ".");
     }
 }
@@ -115,8 +114,7 @@ void ExecutionPlanDescriptor::setAttribute(hipdnnBackendAttributeName_t attribut
     default:
         throw HipdnnException(
             HIPDNN_STATUS_NOT_SUPPORTED,
-            std::string(
-                "ExecutionPlanDescriptor::setAttribute() is not supported for attribute ")
+            std::string("ExecutionPlanDescriptor::setAttribute() is not supported for attribute ")
                 + hipdnn_backend::hipdnnGetAttributeNameString(attributeName) + ".");
     }
 }

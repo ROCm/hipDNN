@@ -19,35 +19,34 @@ namespace hipdnn_plugin
 {
 
 template <typename T>
-void throw_if_null(T* value)
+void throwIfNull(T* value)
 {
     if(value == nullptr)
     {
-        throw Hipdnn_plugin_exception(HIPDNN_PLUGIN_STATUS_BAD_PARAM,
-                                      std::string(typeid(T).name()) + " is nullptr");
+        throw HipdnnPluginException(HIPDNN_PLUGIN_STATUS_BAD_PARAM,
+                                    std::string(typeid(T).name()) + " is nullptr");
     }
 }
 
 template <class F>
-hipdnnPluginStatus_t try_catch(F f)
+hipdnnPluginStatus_t tryCatch(F f)
 {
     try
     {
         f();
     }
-    catch(const Hipdnn_plugin_exception& ex)
+    catch(const HipdnnPluginException& ex)
     {
-        return Plugin_last_error_manager::set_last_error(ex.get_status(), ex.what());
+        return PluginLastErrorManager::setLastError(ex.getStatus(), ex.what());
     }
     catch(const std::exception& ex)
     {
-        return Plugin_last_error_manager::set_last_error(HIPDNN_PLUGIN_STATUS_INTERNAL_ERROR,
-                                                         ex.what());
+        return PluginLastErrorManager::setLastError(HIPDNN_PLUGIN_STATUS_INTERNAL_ERROR, ex.what());
     }
     catch(...)
     {
-        return Plugin_last_error_manager::set_last_error(HIPDNN_PLUGIN_STATUS_INTERNAL_ERROR,
-                                                         "Unknown exception occured");
+        return PluginLastErrorManager::setLastError(HIPDNN_PLUGIN_STATUS_INTERNAL_ERROR,
+                                                    "Unknown exception occured");
     }
     return HIPDNN_PLUGIN_STATUS_SUCCESS;
 }

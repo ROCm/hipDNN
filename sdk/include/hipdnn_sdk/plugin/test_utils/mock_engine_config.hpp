@@ -10,15 +10,15 @@
 namespace hipdnn_plugin
 {
 
-class Mock_engine_config : public Engine_config_interface
+class MockEngineConfig : public IEngineConfig
 {
 public:
     MOCK_METHOD(const hipdnn_sdk::data_objects::EngineConfig&,
-                get_engine_config,
+                getEngineConfig,
                 (),
                 (const, override));
-    MOCK_METHOD(bool, is_valid, (), (const, override));
-    MOCK_METHOD(int64_t, engine_id, (), (const, override));
+    MOCK_METHOD(bool, isValid, (), (const, override));
+    MOCK_METHOD(int64_t, engineId, (), (const, override));
 };
 
 }
