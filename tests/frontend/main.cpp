@@ -14,7 +14,7 @@ int main(int argc, char** argv)
 {
     ::testing::InitGoogleTest(&argc, argv);
 
-    logging_test_utils::initialize_spdlog_default_logger(MIOPEN_FRONTEND_INTEGRATION_TESTS);
+    logging_test_utils::initializeSpdlogDefaultLogger(MIOPEN_FRONTEND_INTEGRATION_TESTS);
 
     return RUN_ALL_TESTS();
 }

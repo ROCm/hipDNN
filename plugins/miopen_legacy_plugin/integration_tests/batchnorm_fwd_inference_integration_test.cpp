@@ -233,14 +233,14 @@ protected:
     template <typename InputType, typename IntermediateType>
     void runCpuBatchnormFwd(Batchnorm2dTensorBundle<InputType, IntermediateType>& cpuTensorBundle)
     {
-        Cpu_fp_reference_implementation<InputType, IntermediateType, IntermediateType> cpuRefImpl;
-        cpuRefImpl.batchnorm_fwd_inference(cpuTensorBundle.xTensor,
-                                           cpuTensorBundle.scaleTensor,
-                                           cpuTensorBundle.biasTensor,
-                                           cpuTensorBundle.meanTensor,
-                                           cpuTensorBundle.varianceTensor,
-                                           cpuTensorBundle.yTensor,
-                                           1e-3);
+        CpuFpReferenceImplementation<InputType, IntermediateType, IntermediateType> cpuRefImpl;
+        cpuRefImpl.batchnormFwdInference(cpuTensorBundle.xTensor,
+                                         cpuTensorBundle.scaleTensor,
+                                         cpuTensorBundle.biasTensor,
+                                         cpuTensorBundle.meanTensor,
+                                         cpuTensorBundle.varianceTensor,
+                                         cpuTensorBundle.yTensor,
+                                         1e-3);
     }
 
     template <typename InputType, typename IntermediateType>
@@ -267,9 +267,9 @@ protected:
 
         runCpuBatchnormFwd<InputType, IntermediateType>(cpuTensorBundle);
 
-        Cpu_fp_reference_validation<InputType> cpuRefValidation(tolerance, tolerance);
-        EXPECT_TRUE(cpuRefValidation.all_close(cpuTensorBundle.yTensor.memory(),
-                                               graphTensorBundle.yTensor.memory()));
+        CpuFpReferenceValidation<InputType> cpuRefValidation(tolerance, tolerance);
+        EXPECT_TRUE(cpuRefValidation.allClose(cpuTensorBundle.yTensor.memory(),
+                                              graphTensorBundle.yTensor.memory()));
     }
 
 private:

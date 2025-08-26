@@ -162,10 +162,10 @@ TEST(MiopenLegacyEnginePluginApiTest, EnginePluginGetApplicableEngineIdsValid)
     hipdnnEnginePluginHandle_t handle = nullptr;
     ASSERT_EQ(hipdnnEnginePluginCreate(&handle), HIPDNN_PLUGIN_STATUS_SUCCESS);
 
-    auto builder = flatbuffer_test_utils::create_valid_batchnorm_graph();
+    auto builder = flatbuffer_test_utils::createValidBatchnormGraph();
     auto serializedGraph = builder.Release();
     hipdnnPluginConstData_t opGraph
-        = flatbuffer_test_utils::create_valid_const_data_graph(serializedGraph);
+        = flatbuffer_test_utils::createValidConstDataGraph(serializedGraph);
     std::array<int64_t, 1> engineIds = {0};
     uint32_t numEngines = 0;
 
@@ -214,10 +214,10 @@ TEST(MiopenLegacyEnginePluginApiTest, EnginePluginGetEngineDetailsValid)
     hipdnnEnginePluginHandle_t handle = nullptr;
     ASSERT_EQ(hipdnnEnginePluginCreate(&handle), HIPDNN_PLUGIN_STATUS_SUCCESS);
 
-    auto builder = flatbuffer_test_utils::create_valid_batchnorm_graph();
+    auto builder = flatbuffer_test_utils::createValidBatchnormGraph();
     auto serializedGraph = builder.Release();
     hipdnnPluginConstData_t opGraph
-        = flatbuffer_test_utils::create_valid_const_data_graph(serializedGraph);
+        = flatbuffer_test_utils::createValidConstDataGraph(serializedGraph);
     hipdnnPluginConstData_t engineDetailsOut;
 
     auto status = hipdnnEnginePluginGetEngineDetails(handle, 1, &opGraph, &engineDetailsOut);
@@ -280,15 +280,15 @@ TEST(MiopenLegacyEnginePluginApiTest, EnginePluginGetWorkspaceSizeValid)
     ASSERT_EQ(hipdnnEnginePluginCreate(&handle), HIPDNN_PLUGIN_STATUS_SUCCESS);
 
     // Create a valid flatbuffer graph and engine config
-    auto builder = flatbuffer_test_utils::create_valid_batchnorm_graph();
+    auto builder = flatbuffer_test_utils::createValidBatchnormGraph();
     auto serializedGraph = builder.Release();
     hipdnnPluginConstData_t opGraph
-        = flatbuffer_test_utils::create_valid_const_data_graph(serializedGraph);
+        = flatbuffer_test_utils::createValidConstDataGraph(serializedGraph);
 
-    auto engineConfigBuilder = flatbuffer_test_utils::create_valid_engine_config(1);
+    auto engineConfigBuilder = flatbuffer_test_utils::createValidEngineConfig(1);
     auto serializedEngineConfig = engineConfigBuilder.Release();
     hipdnnPluginConstData_t engineConfig
-        = flatbuffer_test_utils::create_valid_const_data_engine_config(serializedEngineConfig);
+        = flatbuffer_test_utils::createValidConstDataEngineConfig(serializedEngineConfig);
 
     size_t workspaceSize = 0;
     auto status
@@ -332,15 +332,15 @@ TEST(MiopenLegacyEnginePluginApiTest, EnginePluginCreateExecutionContextValid)
     hipdnnEnginePluginHandle_t handle = nullptr;
     ASSERT_EQ(hipdnnEnginePluginCreate(&handle), HIPDNN_PLUGIN_STATUS_SUCCESS);
 
-    auto builder = flatbuffer_test_utils::create_valid_batchnorm_graph();
+    auto builder = flatbuffer_test_utils::createValidBatchnormGraph();
     auto serializedGraph = builder.Release();
     hipdnnPluginConstData_t opGraph
-        = flatbuffer_test_utils::create_valid_const_data_graph(serializedGraph);
+        = flatbuffer_test_utils::createValidConstDataGraph(serializedGraph);
 
-    auto engineConfigBuilder = flatbuffer_test_utils::create_valid_engine_config(1);
+    auto engineConfigBuilder = flatbuffer_test_utils::createValidEngineConfig(1);
     auto serializedEngineConfig = engineConfigBuilder.Release();
     hipdnnPluginConstData_t engineConfig
-        = flatbuffer_test_utils::create_valid_const_data_engine_config(serializedEngineConfig);
+        = flatbuffer_test_utils::createValidConstDataEngineConfig(serializedEngineConfig);
 
     hipdnnEnginePluginExecutionContext_t executionContext = nullptr;
     auto status = hipdnnEnginePluginCreateExecutionContext(

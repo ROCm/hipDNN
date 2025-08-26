@@ -114,35 +114,35 @@ void Sample_runner::operator()(const Tensor_layout& layout)
         std::cout << "Running CPU reference validation...\n";
 
         auto ref_impl = hipdnn_sdk::reference_test_utilities::
-            Cpu_fp_reference_implementation<InputType, IntermediateType>();
+            CpuFpReferenceImplementation<InputType, IntermediateType>();
 
         Tensor<InputType> dx_ref_tensor(dx->get_dim(), layout);
         Tensor<IntermediateType> dscale_ref_tensor(dscale->get_dim());
         Tensor<IntermediateType> dbias_ref_tensor(dbias->get_dim());
 
-        ref_impl.batchnorm_bwd(dy_tensor,
-                               x_tensor,
-                               saved_mean_tensor,
-                               saved_inv_var_tensor,
-                               scale_tensor,
-                               dx_ref_tensor,
-                               dscale_ref_tensor,
-                               dbias_ref_tensor);
+        ref_impl.batchnormBwd(dy_tensor,
+                              x_tensor,
+                              saved_mean_tensor,
+                              saved_inv_var_tensor,
+                              scale_tensor,
+                              dx_ref_tensor,
+                              dscale_ref_tensor,
+                              dbias_ref_tensor);
 
         auto epsilon = get_epsilon<InputType>();
 
         auto dx_validator
-            = hipdnn_sdk::reference_test_utilities::Cpu_fp_reference_validation<InputType>(
+            = hipdnn_sdk::reference_test_utilities::CpuFpReferenceValidation<InputType>(
                 static_cast<InputType>(epsilon), static_cast<InputType>(epsilon));
         auto dscale_dbias_validator
-            = hipdnn_sdk::reference_test_utilities::Cpu_fp_reference_validation<IntermediateType>(
+            = hipdnn_sdk::reference_test_utilities::CpuFpReferenceValidation<IntermediateType>(
                 static_cast<IntermediateType>(epsilon), static_cast<IntermediateType>(epsilon));
 
-        bool dx_valid = dx_validator.all_close(dx_ref_tensor.memory(), dx_tensor.memory());
+        bool dx_valid = dx_validator.allClose(dx_ref_tensor.memory(), dx_tensor.memory());
         bool dscale_valid
-            = dscale_dbias_validator.all_close(dscale_ref_tensor.memory(), dscale_tensor.memory());
+            = dscale_dbias_validator.allClose(dscale_ref_tensor.memory(), dscale_tensor.memory());
         bool dbias_valid
-            = dscale_dbias_validator.all_close(dbias_ref_tensor.memory(), dbias_tensor.memory());
+            = dscale_dbias_validator.allClose(dbias_ref_tensor.memory(), dbias_tensor.memory());
 
         std::cout << "CPU reference validation:\n";
         std::cout << "  dx: " << (dx_valid ? "successful" : "failed") << "\n";

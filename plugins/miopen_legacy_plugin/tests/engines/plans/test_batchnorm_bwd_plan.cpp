@@ -11,7 +11,7 @@ using namespace miopen_legacy_plugin;
 TEST(BatchnormBwdParamsTest, InitializesAllTensorsFromValidGraph)
 {
     // Create a valid batchnorm graph
-    auto builder = flatbuffer_test_utils::create_valid_batchnorm_bwd_graph();
+    auto builder = flatbuffer_test_utils::createValidBatchnormBwdGraph();
     hipdnn_plugin::GraphWrapper graph(builder.GetBufferPointer(), builder.GetSize());
 
     // Get the batchnorm node and attributes
@@ -42,7 +42,7 @@ TEST(BatchnormBwdParamsTest, InitializesAllTensorsFromValidGraph)
 TEST(BatchnormBwdParamsTest, HandlesMissingOptionalTensors)
 {
     // Create a valid batchnorm graph and remove mean/variance from tensor map
-    auto builder = flatbuffer_test_utils::create_valid_batchnorm_bwd_graph(
+    auto builder = flatbuffer_test_utils::createValidBatchnormBwdGraph(
         {1, 1, 1, 1}, {1, 1, 1, 1}, false // Set has_optional_attributes to false
     );
     hipdnn_plugin::GraphWrapper graph(builder.GetBufferPointer(), builder.GetSize());

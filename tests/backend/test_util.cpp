@@ -255,7 +255,7 @@ void create_and_initialize_backend_descriptor(hipdnnBackendDescriptor_t* backend
 
 flatbuffers::FlatBufferBuilder create_and_populate_batchnorm_node()
 {
-    return flatbuffer_test_utils::create_valid_batchnorm_graph();
+    return flatbuffer_test_utils::createValidBatchnormGraph();
 }
 
 void extract_tensor_info_from_graph(
