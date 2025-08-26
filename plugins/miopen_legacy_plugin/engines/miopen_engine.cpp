@@ -9,23 +9,23 @@
 namespace miopen_legacy_plugin
 {
 
-Miopen_engine::Miopen_engine(int64_t id)
+MiopenEngine::MiopenEngine(int64_t id)
     : _id(id)
 {
 }
 
-int64_t Miopen_engine::id() const
+int64_t MiopenEngine::id() const
 {
     return _id;
 }
 
-bool Miopen_engine::is_applicable(const hipdnn_plugin::IGraph& op_graph) const
+bool MiopenEngine::isApplicable(const hipdnn_plugin::IGraph& opGraph) const
 {
     // This is wrong if we ever have more than 1 plan builder thats applicable.
     // If this is the case, we should split plan builders accross multiple engines.
-    for(const auto& plan_builder : _plan_builders)
+    for(const auto& planBuilder : _planBuilders)
     {
-        if(plan_builder->is_applicable(op_graph))
+        if(planBuilder->isApplicable(opGraph))
         {
             return true;
         }
@@ -33,52 +33,51 @@ bool Miopen_engine::is_applicable(const hipdnn_plugin::IGraph& op_graph) const
     return false;
 }
 
-void Miopen_engine::get_details(hipdnnEnginePluginHandle& handle,
-                                hipdnnPluginConstData_t& details_out) const
+void MiopenEngine::getDetails(HipdnnEnginePluginHandle& handle,
+                              hipdnnPluginConstData_t& detailsOut) const
 {
     flatbuffers::FlatBufferBuilder builder;
-    auto engine_details = hipdnn_sdk::data_objects::CreateEngineDetails(builder, _id);
-    builder.Finish(engine_details);
-    auto detached_buffer = std::make_unique<flatbuffers::DetachedBuffer>(builder.Release());
-    details_out.ptr = detached_buffer->data();
-    details_out.size = detached_buffer->size();
+    auto engineDetails = hipdnn_sdk::data_objects::CreateEngineDetails(builder, _id);
+    builder.Finish(engineDetails);
+    auto detachedBuffer = std::make_unique<flatbuffers::DetachedBuffer>(builder.Release());
+    detailsOut.ptr = detachedBuffer->data();
+    detailsOut.size = detachedBuffer->size();
 
-    handle.store_engine_details_detached_buffer(details_out.ptr, std::move(detached_buffer));
+    handle.storeEngineDetailsDetachedBuffer(detailsOut.ptr, std::move(detachedBuffer));
 }
 
-size_t Miopen_engine::get_workspace_size(const hipdnnEnginePluginHandle& handle,
-                                         const hipdnn_plugin::IGraph& op_graph) const
+size_t MiopenEngine::getWorkspaceSize(const HipdnnEnginePluginHandle& handle,
+                                      const hipdnn_plugin::IGraph& opGraph) const
 {
-    size_t workspace_size = 0;
-    for(const auto& plan_builder : _plan_builders)
+    size_t workspaceSize = 0;
+    for(const auto& planBuilder : _planBuilders)
     {
-        if(plan_builder->is_applicable(op_graph))
+        if(planBuilder->isApplicable(opGraph))
         {
-            workspace_size
-                = std::max(workspace_size, plan_builder->get_workspace_size(handle, op_graph));
+            workspaceSize = std::max(workspaceSize, planBuilder->getWorkspaceSize(handle, opGraph));
         }
     }
-    return workspace_size;
+    return workspaceSize;
 }
 
-void Miopen_engine::initialize_execution_context(
-    const hipdnnEnginePluginHandle& handle,
-    const hipdnn_plugin::IGraph& op_graph,
-    hipdnnEnginePluginExecutionContext& execution_context) const
+void MiopenEngine::initializeExecutionContext(
+    const HipdnnEnginePluginHandle& handle,
+    const hipdnn_plugin::IGraph& opGraph,
+    HipdnnEnginePluginExecutionContext& executionContext) const
 {
-    for(const auto& plan_builder : _plan_builders)
+    for(const auto& planBuilder : _planBuilders)
     {
-        if(plan_builder->is_applicable(op_graph))
+        if(planBuilder->isApplicable(opGraph))
         {
-            plan_builder->build_plan(handle, op_graph, execution_context);
+            planBuilder->buildPlan(handle, opGraph, executionContext);
             break;
         }
     }
 }
 
-void Miopen_engine::add_plan_builder(std::unique_ptr<Plan_builder_interface> plan_builder)
+void MiopenEngine::addPlanBuilder(std::unique_ptr<PlanBuilderInterface> planBuilder)
 {
-    _plan_builders.insert(std::move(plan_builder));
+    _planBuilders.insert(std::move(planBuilder));
 }
 
 }

@@ -9,14 +9,14 @@
 
 #include "hipdnn_engine_plugin_execution_context.hpp"
 
-struct Mock_hipdnn_engine_plugin_execution_context : public hipdnnEnginePluginExecutionContext
+struct Mock_hipdnn_engine_plugin_execution_context : public HipdnnEnginePluginExecutionContext
 {
     Mock_hipdnn_engine_plugin_execution_context()
         : _mock_plan(std::make_unique<miopen_legacy_plugin::Mock_plan>())
     {
     }
 
-    miopen_legacy_plugin::Plan_interface& plan() const override
+    miopen_legacy_plugin::PlanInterface& plan() const override
     {
         return *_mock_plan;
     }

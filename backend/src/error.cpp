@@ -6,10 +6,10 @@
 #include <hipdnn_sdk/utilities/string_util.hpp>
 
 // NOLINTNEXTLINE(modernize-avoid-c-arrays)
-thread_local char hipdnn_backend::Last_error_manager::last_error[HIPDNN_MAX_ERROR_STRING_SIZE] = "";
+thread_local char hipdnn_backend::LastErrorManager::lastError[HIPDNN_MAX_ERROR_STRING_SIZE] = "";
 
-hipdnnStatus_t hipdnn_backend::Last_error_manager::set_last_error(hipdnnStatus_t status,
-                                                                  const char* message)
+hipdnnStatus_t hipdnn_backend::LastErrorManager::setLastError(hipdnnStatus_t status,
+                                                              const char* message)
 {
     if(status == HIPDNN_STATUS_SUCCESS)
     {
@@ -17,21 +17,21 @@ hipdnnStatus_t hipdnn_backend::Last_error_manager::set_last_error(hipdnnStatus_t
     }
 
     HIPDNN_LOG_ERROR(
-        "Error occured in status:{} message:{}", hipdnn_get_status_string(status), message);
+        "Error occured in status:{} message:{}", hipdnnGetStatusString(status), message);
 
     hipdnn::sdk::utilities::copy_max_size_with_null_terminator(
-        last_error, message, HIPDNN_MAX_ERROR_STRING_SIZE);
+        lastError, message, HIPDNN_MAX_ERROR_STRING_SIZE);
 
     return status;
 }
 
-hipdnnStatus_t hipdnn_backend::Last_error_manager::set_last_error(hipdnnStatus_t status,
-                                                                  const std::string& message)
+hipdnnStatus_t hipdnn_backend::LastErrorManager::setLastError(hipdnnStatus_t status,
+                                                              const std::string& message)
 {
-    return set_last_error(status, message.c_str());
+    return setLastError(status, message.c_str());
 }
 
-const char* hipdnn_backend::Last_error_manager::get_last_error()
+const char* hipdnn_backend::LastErrorManager::getLastError()
 {
-    return last_error;
+    return lastError;
 }

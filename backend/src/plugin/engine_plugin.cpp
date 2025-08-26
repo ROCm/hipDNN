@@ -30,7 +30,7 @@ void EnginePlugin::resolveSymbols()
 {
     if(type() != HIPDNN_PLUGIN_TYPE_ENGINE)
     {
-        throw Hipdnn_exception(HIPDNN_STATUS_PLUGIN_ERROR, "Wrong plugin type");
+        throw HipdnnException(HIPDNN_STATUS_PLUGIN_ERROR, "Wrong plugin type");
     }
 
     const auto funcNameGetAllEngineIds = "hipdnnEnginePluginGetAllEngineIds";
@@ -105,7 +105,7 @@ std::vector<int64_t> EnginePlugin::getAllEngineIds() const
     std::ranges::sort(engineIds);
     if(std::ranges::adjacent_find(engineIds) != engineIds.end())
     {
-        throw Hipdnn_exception(HIPDNN_STATUS_PLUGIN_ERROR, "Duplicate engine IDs found");
+        throw HipdnnException(HIPDNN_STATUS_PLUGIN_ERROR, "Duplicate engine IDs found");
     }
     _allEngineIds = engineIds;
 
@@ -170,15 +170,15 @@ std::vector<int64_t>
     std::ranges::sort(engineIds);
     if(std::ranges::adjacent_find(engineIds) != engineIds.end())
     {
-        throw Hipdnn_exception(HIPDNN_STATUS_PLUGIN_ERROR, "Duplicate engine IDs found");
+        throw HipdnnException(HIPDNN_STATUS_PLUGIN_ERROR, "Duplicate engine IDs found");
     }
 
     for(const auto engineId : engineIds)
     {
         if(std::ranges::find(_allEngineIds, engineId) == _allEngineIds.end())
         {
-            throw Hipdnn_exception(HIPDNN_STATUS_PLUGIN_ERROR,
-                                   "Engine ID not found in the plugin's known IDs");
+            throw HipdnnException(HIPDNN_STATUS_PLUGIN_ERROR,
+                                  "Engine ID not found in the plugin's known IDs");
         }
     }
 

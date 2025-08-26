@@ -30,9 +30,9 @@ void EngineDescriptor::finalize()
     auto engineIds = pluginResourceManager->getApplicableEngineIds(_graph.get());
     if(std::ranges::find(engineIds, _engineId) == engineIds.end())
     {
-        throw Hipdnn_exception(HIPDNN_STATUS_BAD_PARAM,
-                               "EngineDescriptor::finalize() failed: Engine id is not in a valid "
-                               "range of engine IDs");
+        throw HipdnnException(HIPDNN_STATUS_BAD_PARAM,
+                              "EngineDescriptor::finalize() failed: Engine id is not in a valid "
+                              "range of engine IDs");
     }
 
     _engineDetails = plugin::EnginePluginResourceManager::getEngineDetails(
@@ -66,10 +66,10 @@ void EngineDescriptor::getAttribute(hipdnnBackendAttributeName_t attributeName,
     case HIPDNN_ATTR_ENGINE_SM_COUNT_TARGET:
     case HIPDNN_ATTR_ENGINE_DEVICEPROP:
     default:
-        throw Hipdnn_exception(
+        throw HipdnnException(
             HIPDNN_STATUS_NOT_SUPPORTED,
             std::string("EngineDescriptor::getAttribute() is not supported for attribute ")
-                + hipdnn_backend::hipdnn_get_attribute_name_string(attributeName) + ".");
+                + hipdnn_backend::hipdnnGetAttributeNameString(attributeName) + ".");
     }
 }
 
@@ -152,10 +152,10 @@ void EngineDescriptor::setAttribute(hipdnnBackendAttributeName_t attributeName,
     case HIPDNN_ATTR_ENGINE_SM_COUNT_TARGET:
     case HIPDNN_ATTR_ENGINE_DEVICEPROP:
     default:
-        throw Hipdnn_exception(
+        throw HipdnnException(
             HIPDNN_STATUS_NOT_SUPPORTED,
             std::string("EngineDescriptor::setAttribute() is not supported for attribute ")
-                + hipdnn_backend::hipdnn_get_attribute_name_string(attributeName) + ".");
+                + hipdnn_backend::hipdnnGetAttributeNameString(attributeName) + ".");
     }
 }
 

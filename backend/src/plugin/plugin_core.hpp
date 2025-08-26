@@ -65,10 +65,10 @@ protected:
         auto status = func(std::forward<Args>(args)...);
         if(status != HIPDNN_PLUGIN_STATUS_SUCCESS)
         {
-            throw Hipdnn_exception(HIPDNN_STATUS_PLUGIN_ERROR,
-                                   std::string("Failed to ") + description + ". Status: "
-                                       + toString(status) + "(" + std::to_string(status) + ")"
-                                       + ", Error: " + std::string(getLastErrorString()));
+            throw HipdnnException(HIPDNN_STATUS_PLUGIN_ERROR,
+                                  std::string("Failed to ") + description + ". Status: "
+                                      + toString(status) + "(" + std::to_string(status) + ")"
+                                      + ", Error: " + std::string(getLastErrorString()));
         }
     }
 
@@ -105,13 +105,13 @@ protected:
         std::filesystem::path baseDir;
         try
         {
-            baseDir = hipdnn_backend::platform_utils::get_current_module_directory();
+            baseDir = hipdnn_backend::platform_utils::getCurrentModuleDirectory();
         }
-        catch(const Hipdnn_exception& e)
+        catch(const HipdnnException& e)
         {
             HIPDNN_LOG_WARN(
                 "Failed to resolve module directory, will use unresolved default paths: {}",
-                e.get_message());
+                e.getMessage());
             // Fallback to using original, unresolved paths. TODO: possibly remove.
             return _defaultPluginPaths;
         }
@@ -264,13 +264,13 @@ private:
             // For now only use engine or unspecified plugin types
             if(type != Plugin::getPluginType())
             {
-                throw Hipdnn_exception(HIPDNN_STATUS_PLUGIN_ERROR,
-                                       std::string("Plugin type mismatch: expected ")
-                                           + toString(Plugin::getPluginType()) + ", got "
-                                           + toString(type));
+                throw HipdnnException(HIPDNN_STATUS_PLUGIN_ERROR,
+                                      std::string("Plugin type mismatch: expected ")
+                                          + toString(Plugin::getPluginType()) + ", got "
+                                          + toString(type));
             }
 
-            plugin->setLoggingCallback(logging::hipdnn_logging_callback);
+            plugin->setLoggingCallback(logging::hipdnnLoggingCallback);
 
             validateBeforeAdding(*plugin);
 
@@ -286,10 +286,10 @@ private:
 
             actionAfterAdding(*_plugins.back());
         }
-        catch(const Hipdnn_exception& e)
+        catch(const HipdnnException& e)
         {
             HIPDNN_LOG_WARN(
-                "Error loading plugin from [{}]: {}", filePath.string(), e.get_message());
+                "Error loading plugin from [{}]: {}", filePath.string(), e.getMessage());
         }
     }
 

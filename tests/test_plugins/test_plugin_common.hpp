@@ -17,13 +17,13 @@
 #include <hipdnn_sdk/plugin/plugin_helpers.hpp>
 #include <hipdnn_sdk/plugin/plugin_last_error_manager.hpp>
 
-struct hipdnnEnginePluginHandle
+struct HipdnnEnginePluginHandle
 {
 public:
-    virtual ~hipdnnEnginePluginHandle() = default;
+    virtual ~HipdnnEnginePluginHandle() = default;
 };
 
-struct hipdnnEnginePluginExecutionContext
+struct HipdnnEnginePluginExecutionContext
 {
 };
 
@@ -164,7 +164,7 @@ public:
         return hipdnn_plugin::tryCatch([&, api_name = __func__]() {
             hipdnn_plugin::throwIfNull(handle);
 
-            *handle = new hipdnnEnginePluginHandle();
+            *handle = new HipdnnEnginePluginHandle();
 
             LOG_API_SUCCESS(api_name, "created_handle={:p}", static_cast<void*>(*handle));
         });
@@ -362,7 +362,7 @@ public:
             hipdnn_plugin::EngineConfigWrapper engineConfigWrapper(engine_config->ptr,
                                                                    engine_config->size);
 
-            *execution_context = new hipdnnEnginePluginExecutionContext();
+            *execution_context = new HipdnnEnginePluginExecutionContext();
 
             LOG_API_SUCCESS(
                 api_name, "created_execution_context={:p}", static_cast<void*>(*execution_context));

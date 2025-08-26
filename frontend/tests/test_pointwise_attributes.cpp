@@ -9,10 +9,10 @@ using namespace hipdnn_frontend::graph;
 
 TEST(PointwiseAttributesTests, CreatePointwiseAttributes)
 {
-    Pointwise_attributes pointwise_attributes;
+    PointwiseAttributes pointwise_attributes;
 
-    pointwise_attributes.set_input_0(std::make_shared<Tensor_attributes>());
-    pointwise_attributes.set_output_0(std::make_shared<Tensor_attributes>());
+    pointwise_attributes.set_input_0(std::make_shared<TensorAttributes>());
+    pointwise_attributes.set_output_0(std::make_shared<TensorAttributes>());
     pointwise_attributes.set_mode(PointwiseMode_t::RELU_FWD)
         .set_relu_lower_clip(0.1f)
         .set_relu_upper_clip(6.0f)
@@ -58,11 +58,11 @@ TEST(PointwiseAttributesTests, CreatePointwiseAttributes)
 
 TEST(PointwiseAttributesTests, CreatePointwiseAttributesWithTwoInputs)
 {
-    Pointwise_attributes pointwise_attributes;
+    PointwiseAttributes pointwise_attributes;
 
-    pointwise_attributes.set_input_0(std::make_shared<Tensor_attributes>());
-    pointwise_attributes.set_input_1(std::make_shared<Tensor_attributes>());
-    pointwise_attributes.set_output_0(std::make_shared<Tensor_attributes>());
+    pointwise_attributes.set_input_0(std::make_shared<TensorAttributes>());
+    pointwise_attributes.set_input_1(std::make_shared<TensorAttributes>());
+    pointwise_attributes.set_output_0(std::make_shared<TensorAttributes>());
     pointwise_attributes.set_mode(PointwiseMode_t::RELU_FWD);
 
     auto input_tensor_0 = pointwise_attributes.get_input_0();
@@ -93,9 +93,9 @@ TEST(PointwiseAttributesTests, CreatePointwiseAttributesWithTwoInputs)
 
 TEST(PointwiseAttributesTests, SetInput0WithMove)
 {
-    Pointwise_attributes pointwise_attributes;
+    PointwiseAttributes pointwise_attributes;
 
-    auto input_tensor = std::make_shared<Tensor_attributes>();
+    auto input_tensor = std::make_shared<TensorAttributes>();
     input_tensor->set_uid(1).set_name("InputTensor0");
 
     auto raw_ptr = input_tensor.get();
@@ -112,9 +112,9 @@ TEST(PointwiseAttributesTests, SetInput0WithMove)
 
 TEST(PointwiseAttributesTests, SetInput1WithMove)
 {
-    Pointwise_attributes pointwise_attributes;
+    PointwiseAttributes pointwise_attributes;
 
-    auto input_tensor = std::make_shared<Tensor_attributes>();
+    auto input_tensor = std::make_shared<TensorAttributes>();
     input_tensor->set_uid(2).set_name("InputTensor1");
 
     auto raw_ptr = input_tensor.get();
@@ -131,9 +131,9 @@ TEST(PointwiseAttributesTests, SetInput1WithMove)
 
 TEST(PointwiseAttributesTests, SetInput2WithMove)
 {
-    Pointwise_attributes pointwise_attributes;
+    PointwiseAttributes pointwise_attributes;
 
-    auto input_tensor = std::make_shared<Tensor_attributes>();
+    auto input_tensor = std::make_shared<TensorAttributes>();
     input_tensor->set_uid(3).set_name("InputTensor2");
 
     auto raw_ptr = input_tensor.get();
@@ -150,9 +150,9 @@ TEST(PointwiseAttributesTests, SetInput2WithMove)
 
 TEST(PointwiseAttributesTests, SetOutput0WithMove)
 {
-    Pointwise_attributes pointwise_attributes;
+    PointwiseAttributes pointwise_attributes;
 
-    auto output_tensor = std::make_shared<Tensor_attributes>();
+    auto output_tensor = std::make_shared<TensorAttributes>();
     output_tensor->set_uid(4).set_name("OutputTensor");
 
     auto raw_ptr = output_tensor.get();
@@ -171,9 +171,9 @@ TEST(PointwiseAttributesTests, SetOutput0WithMove)
 
 TEST(PointwiseAttributesTests, SimplifiedSetInput0WithMove)
 {
-    Pointwise_attributes pointwise_attributes;
+    PointwiseAttributes pointwise_attributes;
 
-    auto input_tensor = std::make_shared<Tensor_attributes>();
+    auto input_tensor = std::make_shared<TensorAttributes>();
     pointwise_attributes.set_input_0(std::move(input_tensor));
 
     // Just verify the tensor was set
@@ -182,9 +182,9 @@ TEST(PointwiseAttributesTests, SimplifiedSetInput0WithMove)
 
 TEST(PointwiseAttributesTests, SimplifiedSetInput1WithMove)
 {
-    Pointwise_attributes pointwise_attributes;
+    PointwiseAttributes pointwise_attributes;
 
-    auto input_tensor = std::make_shared<Tensor_attributes>();
+    auto input_tensor = std::make_shared<TensorAttributes>();
     pointwise_attributes.set_input_1(std::move(input_tensor));
 
     // Just verify the tensor was set
@@ -193,9 +193,9 @@ TEST(PointwiseAttributesTests, SimplifiedSetInput1WithMove)
 
 TEST(PointwiseAttributesTests, SimplifiedSetInput2WithMove)
 {
-    Pointwise_attributes pointwise_attributes;
+    PointwiseAttributes pointwise_attributes;
 
-    auto input_tensor = std::make_shared<Tensor_attributes>();
+    auto input_tensor = std::make_shared<TensorAttributes>();
     pointwise_attributes.set_input_2(std::move(input_tensor));
 
     // Just verify the tensor was set
@@ -204,9 +204,9 @@ TEST(PointwiseAttributesTests, SimplifiedSetInput2WithMove)
 
 TEST(PointwiseAttributesTests, SimplifiedSetOutput0WithMove)
 {
-    Pointwise_attributes pointwise_attributes;
+    PointwiseAttributes pointwise_attributes;
 
-    auto output_tensor = std::make_shared<Tensor_attributes>();
+    auto output_tensor = std::make_shared<TensorAttributes>();
     pointwise_attributes.set_output_0(std::move(output_tensor));
 
     // Just verify the tensor was set
@@ -215,12 +215,12 @@ TEST(PointwiseAttributesTests, SimplifiedSetOutput0WithMove)
 
 TEST(PointwiseAttributesTests, CreatePointwiseAttributesWithThreeInputs)
 {
-    Pointwise_attributes pointwise_attributes;
+    PointwiseAttributes pointwise_attributes;
 
-    pointwise_attributes.set_input_0(std::make_shared<Tensor_attributes>());
-    pointwise_attributes.set_input_1(std::make_shared<Tensor_attributes>());
-    pointwise_attributes.set_input_2(std::make_shared<Tensor_attributes>());
-    pointwise_attributes.set_output_0(std::make_shared<Tensor_attributes>());
+    pointwise_attributes.set_input_0(std::make_shared<TensorAttributes>());
+    pointwise_attributes.set_input_1(std::make_shared<TensorAttributes>());
+    pointwise_attributes.set_input_2(std::make_shared<TensorAttributes>());
+    pointwise_attributes.set_output_0(std::make_shared<TensorAttributes>());
     pointwise_attributes.set_mode(PointwiseMode_t::RELU_FWD);
 
     auto input_tensor_0 = pointwise_attributes.get_input_0();

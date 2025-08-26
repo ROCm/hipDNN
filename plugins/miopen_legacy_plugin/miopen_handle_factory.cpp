@@ -12,16 +12,16 @@ using namespace hipdnn_plugin;
 namespace miopen_legacy_plugin
 {
 
-void Miopen_handle_factory::create_miopen_handle(hipdnnEnginePluginHandle_t* handle)
+void MiopenHandleFactory::createMiopenHandle(hipdnnEnginePluginHandle_t* handle)
 {
     if(handle == nullptr)
     {
         throw HipdnnPluginException(HIPDNN_PLUGIN_STATUS_BAD_PARAM, "handle is null");
     }
 
-    *handle = new hipdnnEnginePluginHandle();
+    *handle = new HipdnnEnginePluginHandle();
 
-    miopenStatus_t status = miopenCreate(&(*handle)->miopen_handle);
+    miopenStatus_t status = miopenCreate(&(*handle)->miopenHandle);
 
     if(status != miopenStatusSuccess)
     {
@@ -32,14 +32,14 @@ void Miopen_handle_factory::create_miopen_handle(hipdnnEnginePluginHandle_t* han
     }
 }
 
-void Miopen_handle_factory::destroy_miopen_handle(hipdnnEnginePluginHandle_t handle)
+void MiopenHandleFactory::destroyMiopenHandle(hipdnnEnginePluginHandle_t handle)
 {
     if(handle == nullptr)
     {
         throw HipdnnPluginException(HIPDNN_PLUGIN_STATUS_BAD_PARAM, "handle is null");
     }
 
-    miopenStatus_t status = miopenDestroy(handle->miopen_handle);
+    miopenStatus_t status = miopenDestroy(handle->miopenHandle);
 
     if(status != miopenStatusSuccess)
     {

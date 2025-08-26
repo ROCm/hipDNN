@@ -5,15 +5,15 @@
 
 TEST(BatchnormInferenceAttributesTests, CreateBatchnormInferenceAttributes)
 {
-    hipdnn_frontend::graph::Batchnorm_inference_attributes batchnorm_attributes;
+    hipdnn_frontend::graph::BatchnormInferenceAttributes batchnorm_attributes;
 
-    batchnorm_attributes.set_x(std::make_shared<hipdnn_frontend::graph::Tensor_attributes>());
-    batchnorm_attributes.set_y(std::make_shared<hipdnn_frontend::graph::Tensor_attributes>());
-    batchnorm_attributes.set_mean(std::make_shared<hipdnn_frontend::graph::Tensor_attributes>());
+    batchnorm_attributes.set_x(std::make_shared<hipdnn_frontend::graph::TensorAttributes>());
+    batchnorm_attributes.set_y(std::make_shared<hipdnn_frontend::graph::TensorAttributes>());
+    batchnorm_attributes.set_mean(std::make_shared<hipdnn_frontend::graph::TensorAttributes>());
     batchnorm_attributes.set_inv_variance(
-        std::make_shared<hipdnn_frontend::graph::Tensor_attributes>());
-    batchnorm_attributes.set_scale(std::make_shared<hipdnn_frontend::graph::Tensor_attributes>());
-    batchnorm_attributes.set_bias(std::make_shared<hipdnn_frontend::graph::Tensor_attributes>());
+        std::make_shared<hipdnn_frontend::graph::TensorAttributes>());
+    batchnorm_attributes.set_scale(std::make_shared<hipdnn_frontend::graph::TensorAttributes>());
+    batchnorm_attributes.set_bias(std::make_shared<hipdnn_frontend::graph::TensorAttributes>());
 
     auto input_tensor = batchnorm_attributes.get_x();
     input_tensor->set_uid(1)
@@ -96,9 +96,9 @@ TEST(BatchnormInferenceAttributesTests, CreateBatchnormInferenceAttributes)
 
 TEST(BatchnormInferenceAttributesTests, SetXWithMove)
 {
-    hipdnn_frontend::graph::Batchnorm_inference_attributes batchnorm_attributes;
+    hipdnn_frontend::graph::BatchnormInferenceAttributes batchnorm_attributes;
 
-    auto x_tensor = std::make_shared<hipdnn_frontend::graph::Tensor_attributes>();
+    auto x_tensor = std::make_shared<hipdnn_frontend::graph::TensorAttributes>();
     x_tensor->set_uid(1).set_name("XTensor");
 
     auto raw_ptr = x_tensor.get();
@@ -115,9 +115,9 @@ TEST(BatchnormInferenceAttributesTests, SetXWithMove)
 
 TEST(BatchnormInferenceAttributesTests, SetMeanWithMove)
 {
-    hipdnn_frontend::graph::Batchnorm_inference_attributes batchnorm_attributes;
+    hipdnn_frontend::graph::BatchnormInferenceAttributes batchnorm_attributes;
 
-    auto mean_tensor = std::make_shared<hipdnn_frontend::graph::Tensor_attributes>();
+    auto mean_tensor = std::make_shared<hipdnn_frontend::graph::TensorAttributes>();
     mean_tensor->set_uid(2).set_name("MeanTensor");
 
     auto raw_ptr = mean_tensor.get();
@@ -134,9 +134,9 @@ TEST(BatchnormInferenceAttributesTests, SetMeanWithMove)
 
 TEST(BatchnormInferenceAttributesTests, SetInvVarianceWithMove)
 {
-    hipdnn_frontend::graph::Batchnorm_inference_attributes batchnorm_attributes;
+    hipdnn_frontend::graph::BatchnormInferenceAttributes batchnorm_attributes;
 
-    auto inv_variance_tensor = std::make_shared<hipdnn_frontend::graph::Tensor_attributes>();
+    auto inv_variance_tensor = std::make_shared<hipdnn_frontend::graph::TensorAttributes>();
     inv_variance_tensor->set_uid(3).set_name("InvVarianceTensor");
 
     auto raw_ptr = inv_variance_tensor.get();
@@ -153,9 +153,9 @@ TEST(BatchnormInferenceAttributesTests, SetInvVarianceWithMove)
 
 TEST(BatchnormInferenceAttributesTests, SetScaleWithMove)
 {
-    hipdnn_frontend::graph::Batchnorm_inference_attributes batchnorm_attributes;
+    hipdnn_frontend::graph::BatchnormInferenceAttributes batchnorm_attributes;
 
-    auto scale_tensor = std::make_shared<hipdnn_frontend::graph::Tensor_attributes>();
+    auto scale_tensor = std::make_shared<hipdnn_frontend::graph::TensorAttributes>();
     scale_tensor->set_uid(4).set_name("ScaleTensor");
 
     auto raw_ptr = scale_tensor.get();
@@ -172,9 +172,9 @@ TEST(BatchnormInferenceAttributesTests, SetScaleWithMove)
 
 TEST(BatchnormInferenceAttributesTests, SetBiasWithMove)
 {
-    hipdnn_frontend::graph::Batchnorm_inference_attributes batchnorm_attributes;
+    hipdnn_frontend::graph::BatchnormInferenceAttributes batchnorm_attributes;
 
-    auto bias_tensor = std::make_shared<hipdnn_frontend::graph::Tensor_attributes>();
+    auto bias_tensor = std::make_shared<hipdnn_frontend::graph::TensorAttributes>();
     bias_tensor->set_uid(5).set_name("BiasTensor");
 
     auto raw_ptr = bias_tensor.get();
@@ -191,9 +191,9 @@ TEST(BatchnormInferenceAttributesTests, SetBiasWithMove)
 
 TEST(BatchnormInferenceAttributesTests, SetYWithMove)
 {
-    hipdnn_frontend::graph::Batchnorm_inference_attributes batchnorm_attributes;
+    hipdnn_frontend::graph::BatchnormInferenceAttributes batchnorm_attributes;
 
-    auto y_tensor = std::make_shared<hipdnn_frontend::graph::Tensor_attributes>();
+    auto y_tensor = std::make_shared<hipdnn_frontend::graph::TensorAttributes>();
     y_tensor->set_uid(6).set_name("YTensor");
 
     auto raw_ptr = y_tensor.get();
@@ -212,9 +212,9 @@ TEST(BatchnormInferenceAttributesTests, SetYWithMove)
 
 TEST(BatchnormInferenceAttributesTests, SimplifiedSetXWithMove)
 {
-    hipdnn_frontend::graph::Batchnorm_inference_attributes batchnorm_attributes;
+    hipdnn_frontend::graph::BatchnormInferenceAttributes batchnorm_attributes;
 
-    auto x_tensor = std::make_shared<hipdnn_frontend::graph::Tensor_attributes>();
+    auto x_tensor = std::make_shared<hipdnn_frontend::graph::TensorAttributes>();
     batchnorm_attributes.set_x(std::move(x_tensor));
 
     // Just verify the tensor was set
@@ -223,9 +223,9 @@ TEST(BatchnormInferenceAttributesTests, SimplifiedSetXWithMove)
 
 TEST(BatchnormInferenceAttributesTests, SimplifiedSetMeanWithMove)
 {
-    hipdnn_frontend::graph::Batchnorm_inference_attributes batchnorm_attributes;
+    hipdnn_frontend::graph::BatchnormInferenceAttributes batchnorm_attributes;
 
-    auto mean_tensor = std::make_shared<hipdnn_frontend::graph::Tensor_attributes>();
+    auto mean_tensor = std::make_shared<hipdnn_frontend::graph::TensorAttributes>();
     batchnorm_attributes.set_mean(std::move(mean_tensor));
 
     // Just verify the tensor was set
@@ -234,9 +234,9 @@ TEST(BatchnormInferenceAttributesTests, SimplifiedSetMeanWithMove)
 
 TEST(BatchnormInferenceAttributesTests, SimplifiedSetInvVarianceWithMove)
 {
-    hipdnn_frontend::graph::Batchnorm_inference_attributes batchnorm_attributes;
+    hipdnn_frontend::graph::BatchnormInferenceAttributes batchnorm_attributes;
 
-    auto inv_variance_tensor = std::make_shared<hipdnn_frontend::graph::Tensor_attributes>();
+    auto inv_variance_tensor = std::make_shared<hipdnn_frontend::graph::TensorAttributes>();
     batchnorm_attributes.set_inv_variance(std::move(inv_variance_tensor));
 
     // Just verify the tensor was set
@@ -245,9 +245,9 @@ TEST(BatchnormInferenceAttributesTests, SimplifiedSetInvVarianceWithMove)
 
 TEST(BatchnormInferenceAttributesTests, SimplifiedSetScaleWithMove)
 {
-    hipdnn_frontend::graph::Batchnorm_inference_attributes batchnorm_attributes;
+    hipdnn_frontend::graph::BatchnormInferenceAttributes batchnorm_attributes;
 
-    auto scale_tensor = std::make_shared<hipdnn_frontend::graph::Tensor_attributes>();
+    auto scale_tensor = std::make_shared<hipdnn_frontend::graph::TensorAttributes>();
     batchnorm_attributes.set_scale(std::move(scale_tensor));
 
     // Just verify the tensor was set
@@ -256,9 +256,9 @@ TEST(BatchnormInferenceAttributesTests, SimplifiedSetScaleWithMove)
 
 TEST(BatchnormInferenceAttributesTests, SimplifiedSetBiasWithMove)
 {
-    hipdnn_frontend::graph::Batchnorm_inference_attributes batchnorm_attributes;
+    hipdnn_frontend::graph::BatchnormInferenceAttributes batchnorm_attributes;
 
-    auto bias_tensor = std::make_shared<hipdnn_frontend::graph::Tensor_attributes>();
+    auto bias_tensor = std::make_shared<hipdnn_frontend::graph::TensorAttributes>();
     batchnorm_attributes.set_bias(std::move(bias_tensor));
 
     // Just verify the tensor was set
@@ -267,9 +267,9 @@ TEST(BatchnormInferenceAttributesTests, SimplifiedSetBiasWithMove)
 
 TEST(BatchnormInferenceAttributesTests, SimplifiedSetYWithMove)
 {
-    hipdnn_frontend::graph::Batchnorm_inference_attributes batchnorm_attributes;
+    hipdnn_frontend::graph::BatchnormInferenceAttributes batchnorm_attributes;
 
-    auto y_tensor = std::make_shared<hipdnn_frontend::graph::Tensor_attributes>();
+    auto y_tensor = std::make_shared<hipdnn_frontend::graph::TensorAttributes>();
     batchnorm_attributes.set_y(std::move(y_tensor));
 
     // Just verify the tensor was set

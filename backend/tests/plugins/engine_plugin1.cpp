@@ -18,7 +18,7 @@ const char* const PLUGIN_NAME = "EnginePlugin1";
 const char* const PLUGIN_VERSION = "1.0";
 const hipdnnPluginType_t PLUGIN_TYPE = HIPDNN_PLUGIN_TYPE_ENGINE;
 
-struct hipdnnEnginePluginExecutionContext
+struct HipdnnEnginePluginExecutionContext
 {
     uint64_t dummy; // Placeholder
 };
@@ -148,7 +148,7 @@ hipdnnEnginePluginExecutionContext_t
     std::ignore = engine_config;
     std::ignore = op_graph;
 
-    auto execution_context = new hipdnnEnginePluginExecutionContext(0);
+    auto execution_context = new HipdnnEnginePluginExecutionContext(0);
     return execution_context;
 }
 

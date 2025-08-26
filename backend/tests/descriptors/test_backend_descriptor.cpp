@@ -65,7 +65,7 @@ TEST(BackendDescriptorTest, UnpackDescriptorThrowsOnNullDescriptor)
                 HIPDNN_STATUS_INTERNAL_ERROR,
                 "fail");
         },
-        Hipdnn_exception);
+        HipdnnException);
 }
 
 TEST(BackendDescriptorTest, UnpackDescriptorThrowsOnNullPrivateDescriptor)
@@ -77,7 +77,7 @@ TEST(BackendDescriptorTest, UnpackDescriptorThrowsOnNullPrivateDescriptor)
             HipdnnBackendDescriptor::unpackDescriptor<MockDescriptor<EngineDescriptor>>(
                 packed.get(), HIPDNN_STATUS_INTERNAL_ERROR, "fail");
         },
-        Hipdnn_exception);
+        HipdnnException);
 }
 
 TEST(BackendDescriptorTest, UnpackDescriptorFromArrayThrowsOnNullArray)
@@ -87,5 +87,5 @@ TEST(BackendDescriptorTest, UnpackDescriptorFromArrayThrowsOnNullArray)
             HipdnnBackendDescriptor::unpackDescriptor<MockDescriptor<EngineDescriptor>>(
                 static_cast<void*>(nullptr), HIPDNN_STATUS_INTERNAL_ERROR, "fail");
         },
-        Hipdnn_exception);
+        HipdnnException);
 }

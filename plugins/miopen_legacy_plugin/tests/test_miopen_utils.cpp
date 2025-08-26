@@ -15,7 +15,7 @@ TEST(MiopenUtilsTest, FindDeviceBufferReturnsCorrectBuffer)
         = {{.uid = 42, .ptr = reinterpret_cast<void*>(0x1234)},
            {.uid = 99, .ptr = reinterpret_cast<void*>(0x5678)}};
 
-    auto result = miopen_utils::find_device_buffer(99, buffers.data(), 2);
+    auto result = miopen_utils::findDeviceBuffer(99, buffers.data(), 2);
     EXPECT_EQ(result.uid, 99);
     EXPECT_EQ(result.ptr, reinterpret_cast<void*>(0x5678));
 }
@@ -26,7 +26,7 @@ TEST(MiopenUtilsTest, FindDeviceBufferThrowsIfNotFound)
         = {{.uid = 1, .ptr = reinterpret_cast<void*>(0x1111)}};
 
     EXPECT_THROW(
-        miopen_utils::find_device_buffer(2, buffers.data(), static_cast<uint32_t>(buffers.size())),
+        miopen_utils::findDeviceBuffer(2, buffers.data(), static_cast<uint32_t>(buffers.size())),
         hipdnn_plugin::HipdnnPluginException);
 }
 
@@ -36,16 +36,15 @@ TEST(MiopenUtilsTest, TensorDataTypeToMiopenDataType)
     using hipdnn_sdk::data_objects::DataType_FLOAT;
     using hipdnn_sdk::data_objects::DataType_HALF;
 
-    EXPECT_EQ(miopen_utils::tensor_data_type_to_miopen_data_type(DataType_FLOAT), miopenFloat);
-    EXPECT_EQ(miopen_utils::tensor_data_type_to_miopen_data_type(DataType_HALF), miopenHalf);
-    EXPECT_EQ(miopen_utils::tensor_data_type_to_miopen_data_type(DataType_BFLOAT16),
-              miopenBFloat16);
+    EXPECT_EQ(miopen_utils::tensorDataTypeToMiopenDataType(DataType_FLOAT), miopenFloat);
+    EXPECT_EQ(miopen_utils::tensorDataTypeToMiopenDataType(DataType_HALF), miopenHalf);
+    EXPECT_EQ(miopen_utils::tensorDataTypeToMiopenDataType(DataType_BFLOAT16), miopenBFloat16);
 }
 
 TEST(MiopenUtilsTest, TensorDataTypeToMiopenDataTypeThrowsOnUnsupported)
 {
     // Use a value not in the enum
-    EXPECT_THROW(miopen_utils::tensor_data_type_to_miopen_data_type(
+    EXPECT_THROW(miopen_utils::tensorDataTypeToMiopenDataType(
                      static_cast<hipdnn_sdk::data_objects::DataType>(-1)),
                  hipdnn_plugin::HipdnnPluginException);
 }

@@ -20,7 +20,7 @@ TEST(BatchnormFwdInferenceParamsTest, InitializesAllTensorsFromValidGraph)
     ASSERT_NE(attrs, nullptr);
 
     // Construct params
-    Batchnorm_fwd_inference_params params(*attrs, graph.getTensorMap());
+    BatchnormFwdInferenceParams params(*attrs, graph.getTensorMap());
 
     // All required tensors should be initialized
     EXPECT_NO_THROW(params.x());
@@ -29,8 +29,8 @@ TEST(BatchnormFwdInferenceParamsTest, InitializesAllTensorsFromValidGraph)
     EXPECT_NO_THROW(params.bias());
 
     // Optional tensors should be present
-    auto& mean_opt = params.est_mean();
-    auto& var_opt = params.est_variance();
+    auto& mean_opt = params.estMean();
+    auto& var_opt = params.estVariance();
     EXPECT_TRUE(mean_opt.has_value());
     EXPECT_TRUE(var_opt.has_value());
     EXPECT_NE(mean_opt.value(), nullptr);
@@ -51,9 +51,9 @@ TEST(BatchnormFwdInferenceParamsTest, HandlesMissingOptionalTensors)
     ASSERT_NE(attrs, nullptr);
 
     const auto& tensor_map = graph.getTensorMap();
-    Batchnorm_fwd_inference_params params(*attrs, tensor_map);
+    BatchnormFwdInferenceParams params(*attrs, tensor_map);
 
     // Optional tensors should not be present
-    EXPECT_FALSE(params.est_mean().has_value());
-    EXPECT_FALSE(params.est_variance().has_value());
+    EXPECT_FALSE(params.estMean().has_value());
+    EXPECT_FALSE(params.estVariance().has_value());
 }

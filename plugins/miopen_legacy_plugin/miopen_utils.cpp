@@ -9,15 +9,15 @@ namespace miopen_legacy_plugin
 namespace miopen_utils
 {
 
-hipdnnPluginDeviceBuffer_t find_device_buffer(int64_t uid,
-                                              const hipdnnPluginDeviceBuffer_t* device_buffers,
-                                              uint32_t num_device_buffers)
+hipdnnPluginDeviceBuffer_t findDeviceBuffer(int64_t uid,
+                                            const hipdnnPluginDeviceBuffer_t* deviceBuffers,
+                                            uint32_t numDeviceBuffers)
 {
-    for(uint32_t i = 0; i < num_device_buffers; i++)
+    for(uint32_t i = 0; i < numDeviceBuffers; i++)
     {
-        if(uid == device_buffers[i].uid)
+        if(uid == deviceBuffers[i].uid)
         {
-            return device_buffers[i];
+            return deviceBuffers[i];
         }
     }
 
@@ -26,10 +26,9 @@ hipdnnPluginDeviceBuffer_t find_device_buffer(int64_t uid,
                                                    + " not found in the provided device buffers.");
 }
 
-miopenDataType_t
-    tensor_data_type_to_miopen_data_type(const hipdnn_sdk::data_objects::DataType& data_type)
+miopenDataType_t tensorDataTypeToMiopenDataType(const hipdnn_sdk::data_objects::DataType& dataType)
 {
-    switch(data_type)
+    switch(dataType)
     {
     case hipdnn_sdk::data_objects::DataType_FLOAT:
         return miopenFloat;
@@ -41,7 +40,7 @@ miopenDataType_t
         throw hipdnn_plugin::HipdnnPluginException(
             HIPDNN_PLUGIN_STATUS_BAD_PARAM,
             "Unsupported data type for MIOpen: "
-                + std::string(hipdnn_sdk::data_objects::toString(data_type)));
+                + std::string(hipdnn_sdk::data_objects::toString(dataType)));
     }
 }
 

@@ -14,9 +14,9 @@
             (x);                                                   \
             FAIL() << "Expected exception not thrown";             \
         }                                                          \
-        catch(const hipdnn_backend::Hipdnn_exception& e)           \
+        catch(const hipdnn_backend::HipdnnException& e)            \
         {                                                          \
-            ASSERT_EQ(e.get_status(), status);                     \
+            ASSERT_EQ(e.getStatus(), status);                      \
         }                                                          \
         catch(...)                                                 \
         {                                                          \

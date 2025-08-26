@@ -13,29 +13,29 @@
 namespace miopen_legacy_plugin
 {
 
-class Miopen_engine : public Engine_interface
+class MiopenEngine : public EngineInterface
 {
 public:
-    Miopen_engine(int64_t id);
+    MiopenEngine(int64_t id);
 
     int64_t id() const override;
 
-    bool is_applicable(const hipdnn_plugin::IGraph& op_graph) const override;
-    void get_details(hipdnnEnginePluginHandle& handle,
-                     hipdnnPluginConstData_t& details_out) const override;
-    size_t get_workspace_size(const hipdnnEnginePluginHandle& handle,
-                              const hipdnn_plugin::IGraph& op_graph) const override;
+    bool isApplicable(const hipdnn_plugin::IGraph& opGraph) const override;
+    void getDetails(HipdnnEnginePluginHandle& handle,
+                    hipdnnPluginConstData_t& detailsOut) const override;
+    size_t getWorkspaceSize(const HipdnnEnginePluginHandle& handle,
+                            const hipdnn_plugin::IGraph& opGraph) const override;
 
-    void initialize_execution_context(
-        const hipdnnEnginePluginHandle& handle,
-        const hipdnn_plugin::IGraph& op_graph,
-        hipdnnEnginePluginExecutionContext& execution_context) const override;
+    void initializeExecutionContext(
+        const HipdnnEnginePluginHandle& handle,
+        const hipdnn_plugin::IGraph& opGraph,
+        HipdnnEnginePluginExecutionContext& executionContext) const override;
 
-    void add_plan_builder(std::unique_ptr<Plan_builder_interface> plan_builder);
+    void addPlanBuilder(std::unique_ptr<PlanBuilderInterface> planBuilder);
 
 private:
     int64_t _id;
-    std::set<std::unique_ptr<Plan_builder_interface>> _plan_builders;
+    std::set<std::unique_ptr<PlanBuilderInterface>> _planBuilders;
 };
 
 }

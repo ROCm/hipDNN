@@ -20,7 +20,7 @@ TEST(BatchnormBwdParamsTest, InitializesAllTensorsFromValidGraph)
     ASSERT_NE(attrs, nullptr);
 
     // Construct params
-    Batchnorm_bwd_params params(*attrs, graph.getTensorMap());
+    BatchnormBwdParams params(*attrs, graph.getTensorMap());
 
     // All required tensors should be initialized
     EXPECT_NO_THROW(params.x());
@@ -31,8 +31,8 @@ TEST(BatchnormBwdParamsTest, InitializesAllTensorsFromValidGraph)
     EXPECT_NO_THROW(params.dbias());
 
     // Optional tensors should be present
-    auto& mean_opt = params.opt_mean();
-    auto& var_opt = params.opt_inv_variance();
+    auto& mean_opt = params.optMean();
+    auto& var_opt = params.optInvVariance();
     EXPECT_TRUE(mean_opt.has_value());
     EXPECT_TRUE(var_opt.has_value());
     EXPECT_NE(mean_opt.value(), nullptr);
@@ -53,9 +53,9 @@ TEST(BatchnormBwdParamsTest, HandlesMissingOptionalTensors)
     ASSERT_NE(attrs, nullptr);
 
     const auto& tensor_map = graph.getTensorMap();
-    Batchnorm_bwd_params params(*attrs, tensor_map);
+    BatchnormBwdParams params(*attrs, tensor_map);
 
     // Optional tensors should not be present
-    EXPECT_FALSE(params.opt_mean().has_value());
-    EXPECT_FALSE(params.opt_inv_variance().has_value());
+    EXPECT_FALSE(params.optMean().has_value());
+    EXPECT_FALSE(params.optInvVariance().has_value());
 }

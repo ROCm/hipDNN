@@ -13,28 +13,28 @@
 namespace miopen_legacy_plugin
 {
 
-Miopen_container::Miopen_container()
+MiopenContainer::MiopenContainer()
 {
-    HIPDNN_LOG_INFO("Creating Miopen_container");
+    HIPDNN_LOG_INFO("Creating MiopenContainer");
 
-    int64_t engine_id = 1;
-    auto miopen_engine = std::make_unique<Miopen_engine>(engine_id++);
+    int64_t engineId = 1;
+    auto miopenEngine = std::make_unique<MiopenEngine>(engineId++);
 
-    auto batchnorm_plan_builder = std::make_unique<Miopen_batchnorm_plan_builder>();
-    miopen_engine->add_plan_builder(std::move(batchnorm_plan_builder));
+    auto batchnormPlanBuilder = std::make_unique<MiopenBatchnormPlanBuilder>();
+    miopenEngine->addPlanBuilder(std::move(batchnormPlanBuilder));
 
-    _engine_manager = std::make_unique<Engine_manager>();
-    _engine_manager->add_engine(std::move(miopen_engine));
+    _engineManager = std::make_unique<EngineManager>();
+    _engineManager->addEngine(std::move(miopenEngine));
 }
 
-Miopen_container::~Miopen_container()
+MiopenContainer::~MiopenContainer()
 {
-    HIPDNN_LOG_INFO("Destroying Miopen_container");
+    HIPDNN_LOG_INFO("Destroying MiopenContainer");
 }
 
-Engine_manager& Miopen_container::get_engine_manager()
+EngineManager& MiopenContainer::getEngineManager()
 {
-    return *_engine_manager;
+    return *_engineManager;
 }
 
 } // namespace miopen_legacy_plugin

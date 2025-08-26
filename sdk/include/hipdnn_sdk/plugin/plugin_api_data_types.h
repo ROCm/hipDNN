@@ -78,14 +78,14 @@ typedef struct
  *
  * This handle is used to represent an engine plugin.
  */
-typedef struct hipdnnEnginePluginHandle* hipdnnEnginePluginHandle_t;
+typedef struct HipdnnEnginePluginHandle* hipdnnEnginePluginHandle_t;
 
 /**
  * @brief Opaque handle for an engine execution context.
  *
  * This handle is used to represent the execution context of an engine.
  */
-typedef struct hipdnnEnginePluginExecutionContext* hipdnnEnginePluginExecutionContext_t;
+typedef struct HipdnnEnginePluginExecutionContext* hipdnnEnginePluginExecutionContext_t;
 
 /** @} */ // End of PluginDataTypes group
 
