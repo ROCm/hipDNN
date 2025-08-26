@@ -20,12 +20,12 @@ public:
     MiopenBatchnormPlanBuilder& operator=(const MiopenBatchnormPlanBuilder&) = delete;
 
     bool isApplicable(const hipdnn_plugin::Graph_interface& opGraph) const override;
-    size_t getWorkspaceSize(const hipdnnEnginePluginHandle& handle,
+    size_t getWorkspaceSize(const HipdnnEnginePluginHandle& handle,
                             const hipdnn_plugin::Graph_interface& opGraph) const override;
 
-    void buildPlan(const hipdnnEnginePluginHandle& handle,
+    void buildPlan(const HipdnnEnginePluginHandle& handle,
                    const hipdnn_plugin::Graph_interface& opGraph,
-                   hipdnnEnginePluginExecutionContext& executionContext) const override;
+                   HipdnnEnginePluginExecutionContext& executionContext) const override;
 };
 
 }

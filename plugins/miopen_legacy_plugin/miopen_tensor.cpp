@@ -7,22 +7,22 @@
 namespace miopen_legacy_plugin
 {
 
-Miopen_tensor::Miopen_tensor(const hipdnn_sdk::data_objects::TensorAttributes& tensor)
+MiopenTensor::MiopenTensor(const hipdnn_sdk::data_objects::TensorAttributes& tensor)
     : _uid(tensor.uid())
 {
     THROW_ON_MIOPEN_FAILURE(miopenCreateTensorDescriptor(&_descriptor));
 
     std::vector<int> dims(tensor.dims()->begin(), tensor.dims()->end());
     std::vector<int> strides(tensor.strides()->begin(), tensor.strides()->end());
-    THROW_ON_MIOPEN_FAILURE(miopenSetTensorDescriptor(
-        _descriptor,
-        miopen_utils::tensor_data_type_to_miopen_data_type(tensor.data_type()),
-        static_cast<int>(dims.size()),
-        reinterpret_cast<int*>(dims.data()),
-        reinterpret_cast<int*>(strides.data())));
+    THROW_ON_MIOPEN_FAILURE(
+        miopenSetTensorDescriptor(_descriptor,
+                                  miopen_utils::tensorDataTypeToMiopenDataType(tensor.data_type()),
+                                  static_cast<int>(dims.size()),
+                                  reinterpret_cast<int*>(dims.data()),
+                                  reinterpret_cast<int*>(strides.data())));
 }
 
-Miopen_tensor::~Miopen_tensor()
+MiopenTensor::~MiopenTensor()
 {
     if(_descriptor != nullptr)
     {
@@ -30,12 +30,12 @@ Miopen_tensor::~Miopen_tensor()
     }
 }
 
-int64_t Miopen_tensor::uid() const
+int64_t MiopenTensor::uid() const
 {
     return _uid;
 }
 
-miopenTensorDescriptor_t Miopen_tensor::tensor_descriptor() const
+miopenTensorDescriptor_t MiopenTensor::tensorDescriptor() const
 {
     return _descriptor;
 }

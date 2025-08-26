@@ -13,7 +13,7 @@ class PlanInterface
 public:
     virtual ~PlanInterface() = default;
 
-    virtual void execute(const hipdnnEnginePluginHandle& handle,
+    virtual void execute(const HipdnnEnginePluginHandle& handle,
                          const hipdnnPluginDeviceBuffer_t* deviceBuffers,
                          uint32_t numDeviceBuffers,
                          void* workspace = nullptr) const

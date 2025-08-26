@@ -9,16 +9,16 @@
 namespace miopen_legacy_plugin
 {
 
-class Miopen_tensor
+class MiopenTensor
 {
 public:
-    Miopen_tensor(const hipdnn_sdk::data_objects::TensorAttributes& tensor);
+    MiopenTensor(const hipdnn_sdk::data_objects::TensorAttributes& tensor);
 
-    ~Miopen_tensor();
+    ~MiopenTensor();
 
     int64_t uid() const;
 
-    miopenTensorDescriptor_t tensor_descriptor() const;
+    miopenTensorDescriptor_t tensorDescriptor() const;
 
 private:
     int64_t _uid;

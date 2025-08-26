@@ -15,44 +15,44 @@
 #include "miopen_utils.hpp"
 
 // NOLINTBEGIN
-struct hipdnnEnginePluginHandle
+struct HipdnnEnginePluginHandle
 {
 public:
-    virtual ~hipdnnEnginePluginHandle() = default;
+    virtual ~HipdnnEnginePluginHandle() = default;
 
-    miopenHandle_t miopen_handle = nullptr;
+    miopenHandle_t miopenHandle = nullptr;
 
-    void set_stream(hipStream_t stream)
+    void setStream(hipStream_t stream)
     {
-        THROW_ON_MIOPEN_FAILURE(miopenSetStream(miopen_handle, stream));
+        THROW_ON_MIOPEN_FAILURE(miopenSetStream(miopenHandle, stream));
         _stream = stream;
     }
 
-    hipStream_t get_stream() const
+    hipStream_t getStream() const
     {
         return _stream;
     }
 
-    std::shared_ptr<miopen_legacy_plugin::Miopen_container> miopen_container;
-    miopen_legacy_plugin::Engine_manager& get_engine_manager()
+    std::shared_ptr<miopen_legacy_plugin::MiopenContainer> miopenContainer;
+    miopen_legacy_plugin::EngineManager& getEngineManager()
     {
-        return miopen_container->get_engine_manager();
+        return miopenContainer->getEngineManager();
     }
 
-    void store_engine_details_detached_buffer(const void* ptr,
-                                              std::unique_ptr<flatbuffers::DetachedBuffer> buffer)
+    void storeEngineDetailsDetachedBuffer(const void* ptr,
+                                          std::unique_ptr<flatbuffers::DetachedBuffer> buffer)
     {
         HIPDNN_LOG_INFO("Storing detached buffer at address: {:p}", ptr);
-        _engine_details_buffers[ptr] = std::move(buffer);
+        _engineDetailsBuffers[ptr] = std::move(buffer);
     }
 
-    void remove_engine_details_detached_buffer(const void* ptr)
+    void removeEngineDetailsDetachedBuffer(const void* ptr)
     {
         HIPDNN_LOG_INFO("Removing detached buffer at address: {:p}", ptr);
 
-        if(_engine_details_buffers.contains(ptr))
+        if(_engineDetailsBuffers.contains(ptr))
         {
-            _engine_details_buffers.erase(ptr);
+            _engineDetailsBuffers.erase(ptr);
         }
         else
         {
@@ -66,7 +66,7 @@ public:
 private:
     hipStream_t _stream = nullptr;
     std::unordered_map<const void*, std::unique_ptr<flatbuffers::DetachedBuffer>>
-        _engine_details_buffers;
+        _engineDetailsBuffers;
 };
 
 // NOLINTEND

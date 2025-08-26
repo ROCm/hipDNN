@@ -20,12 +20,12 @@ public:
         const std::unordered_map<int64_t, const hipdnn_sdk::data_objects::TensorAttributes*>&
             tensorMap);
 
-    const Miopen_tensor& x() const;
-    const Miopen_tensor& y() const;
-    const Miopen_tensor& scale() const;
-    const Miopen_tensor& bias() const;
-    const std::optional<std::unique_ptr<Miopen_tensor>>& estMean() const;
-    const std::optional<std::unique_ptr<Miopen_tensor>>& estVariance() const;
+    const MiopenTensor& x() const;
+    const MiopenTensor& y() const;
+    const MiopenTensor& scale() const;
+    const MiopenTensor& bias() const;
+    const std::optional<std::unique_ptr<MiopenTensor>>& estMean() const;
+    const std::optional<std::unique_ptr<MiopenTensor>>& estVariance() const;
 
 private:
     void initializeTensors(
@@ -33,13 +33,13 @@ private:
         const std::unordered_map<int64_t, const hipdnn_sdk::data_objects::TensorAttributes*>&
             tensorMap);
 
-    std::unique_ptr<Miopen_tensor> _xPair;
-    std::unique_ptr<Miopen_tensor> _yPair;
-    std::unique_ptr<Miopen_tensor> _scalePair;
-    std::unique_ptr<Miopen_tensor> _biasPair;
+    std::unique_ptr<MiopenTensor> _xPair;
+    std::unique_ptr<MiopenTensor> _yPair;
+    std::unique_ptr<MiopenTensor> _scalePair;
+    std::unique_ptr<MiopenTensor> _biasPair;
 
-    std::optional<std::unique_ptr<Miopen_tensor>> _estMeanTensorDescriptor;
-    std::optional<std::unique_ptr<Miopen_tensor>> _estVarianceTensorDescriptor;
+    std::optional<std::unique_ptr<MiopenTensor>> _estMeanTensorDescriptor;
+    std::optional<std::unique_ptr<MiopenTensor>> _estVarianceTensorDescriptor;
 };
 
 class BatchnormFwdInferencePlan : public PlanInterface
@@ -47,7 +47,7 @@ class BatchnormFwdInferencePlan : public PlanInterface
 public:
     BatchnormFwdInferencePlan(std::unique_ptr<BatchnormFwdInferenceParams> inferenceParams);
 
-    void execute(const hipdnnEnginePluginHandle& handle,
+    void execute(const HipdnnEnginePluginHandle& handle,
                  const hipdnnPluginDeviceBuffer_t* deviceBuffers,
                  uint32_t numDeviceBuffers,
                  void* workspace = nullptr) const override;

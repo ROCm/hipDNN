@@ -33,7 +33,7 @@ bool MiopenEngine::isApplicable(const hipdnn_plugin::Graph_interface& opGraph) c
     return false;
 }
 
-void MiopenEngine::getDetails(hipdnnEnginePluginHandle& handle,
+void MiopenEngine::getDetails(HipdnnEnginePluginHandle& handle,
                               hipdnnPluginConstData_t& detailsOut) const
 {
     flatbuffers::FlatBufferBuilder builder;
@@ -43,10 +43,10 @@ void MiopenEngine::getDetails(hipdnnEnginePluginHandle& handle,
     detailsOut.ptr = detachedBuffer->data();
     detailsOut.size = detachedBuffer->size();
 
-    handle.store_engine_details_detached_buffer(detailsOut.ptr, std::move(detachedBuffer));
+    handle.storeEngineDetailsDetachedBuffer(detailsOut.ptr, std::move(detachedBuffer));
 }
 
-size_t MiopenEngine::getWorkspaceSize(const hipdnnEnginePluginHandle& handle,
+size_t MiopenEngine::getWorkspaceSize(const HipdnnEnginePluginHandle& handle,
                                       const hipdnn_plugin::Graph_interface& opGraph) const
 {
     size_t workspaceSize = 0;
@@ -54,17 +54,16 @@ size_t MiopenEngine::getWorkspaceSize(const hipdnnEnginePluginHandle& handle,
     {
         if(planBuilder->isApplicable(opGraph))
         {
-            workspaceSize
-                = std::max(workspaceSize, planBuilder->getWorkspaceSize(handle, opGraph));
+            workspaceSize = std::max(workspaceSize, planBuilder->getWorkspaceSize(handle, opGraph));
         }
     }
     return workspaceSize;
 }
 
 void MiopenEngine::initializeExecutionContext(
-    const hipdnnEnginePluginHandle& handle,
+    const HipdnnEnginePluginHandle& handle,
     const hipdnn_plugin::Graph_interface& opGraph,
-    hipdnnEnginePluginExecutionContext& executionContext) const
+    HipdnnEnginePluginExecutionContext& executionContext) const
 {
     for(const auto& planBuilder : _planBuilders)
     {
@@ -76,7 +75,7 @@ void MiopenEngine::initializeExecutionContext(
     }
 }
 
-void MiopenEngine::add_plan_builder(std::unique_ptr<PlanBuilderInterface> planBuilder)
+void MiopenEngine::addPlanBuilder(std::unique_ptr<PlanBuilderInterface> planBuilder)
 {
     _planBuilders.insert(std::move(planBuilder));
 }

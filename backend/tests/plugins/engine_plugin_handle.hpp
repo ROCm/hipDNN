@@ -7,7 +7,7 @@
 
 #include <hip/hip_runtime.h>
 
-struct hipdnnEnginePluginHandle
+struct HipdnnEnginePluginHandle
 {
     hipStream_t stream;
 };

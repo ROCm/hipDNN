@@ -23,15 +23,15 @@ public:
         const std::unordered_map<int64_t, const hipdnn_sdk::data_objects::TensorAttributes*>&
             tensorMap);
 
-    const Miopen_tensor& x() const;
-    const Miopen_tensor& dy() const;
-    const Miopen_tensor& dx() const;
-    const Miopen_tensor& scale() const;
-    const Miopen_tensor& dscale() const;
-    const Miopen_tensor& dbias() const;
+    const MiopenTensor& x() const;
+    const MiopenTensor& dy() const;
+    const MiopenTensor& dx() const;
+    const MiopenTensor& scale() const;
+    const MiopenTensor& dscale() const;
+    const MiopenTensor& dbias() const;
 
-    const std::optional<std::unique_ptr<Miopen_tensor>>& optMean() const;
-    const std::optional<std::unique_ptr<Miopen_tensor>>& optInvVariance() const;
+    const std::optional<std::unique_ptr<MiopenTensor>>& optMean() const;
+    const std::optional<std::unique_ptr<MiopenTensor>>& optInvVariance() const;
 
 private:
     void initializeTensors(
@@ -39,15 +39,15 @@ private:
         const std::unordered_map<int64_t, const hipdnn_sdk::data_objects::TensorAttributes*>&
             tensorMap);
 
-    std::unique_ptr<Miopen_tensor> _x;
-    std::unique_ptr<Miopen_tensor> _dy;
-    std::unique_ptr<Miopen_tensor> _dx;
-    std::unique_ptr<Miopen_tensor> _scale;
-    std::unique_ptr<Miopen_tensor> _dscale;
-    std::unique_ptr<Miopen_tensor> _dbias;
+    std::unique_ptr<MiopenTensor> _x;
+    std::unique_ptr<MiopenTensor> _dy;
+    std::unique_ptr<MiopenTensor> _dx;
+    std::unique_ptr<MiopenTensor> _scale;
+    std::unique_ptr<MiopenTensor> _dscale;
+    std::unique_ptr<MiopenTensor> _dbias;
 
-    std::optional<std::unique_ptr<Miopen_tensor>> _optMean;
-    std::optional<std::unique_ptr<Miopen_tensor>> _optInvVariance;
+    std::optional<std::unique_ptr<MiopenTensor>> _optMean;
+    std::optional<std::unique_ptr<MiopenTensor>> _optInvVariance;
 };
 
 class BatchnormBwdPlan : public PlanInterface
@@ -55,7 +55,7 @@ class BatchnormBwdPlan : public PlanInterface
 public:
     BatchnormBwdPlan(std::unique_ptr<BatchnormBwdParams> params);
 
-    void execute(const hipdnnEnginePluginHandle& handle,
+    void execute(const HipdnnEnginePluginHandle& handle,
                  const hipdnnPluginDeviceBuffer_t* deviceBuffers,
                  uint32_t numDeviceBuffers,
                  void* workspace = nullptr) const override;

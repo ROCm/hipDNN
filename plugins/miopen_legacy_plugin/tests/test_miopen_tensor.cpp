@@ -20,11 +20,11 @@ TEST(MiopenTensorTest, CanCreateAndDestroyTensor)
     const auto* tensor_attr = tensor_map.begin()->second;
     ASSERT_NE(tensor_attr, nullptr);
 
-    // Construct and destroy Miopen_tensor
+    // Construct and destroy MiopenTensor
     EXPECT_NO_THROW({
-        Miopen_tensor tensor(*tensor_attr);
+        MiopenTensor tensor(*tensor_attr);
         EXPECT_EQ(tensor.uid(), tensor_attr->uid());
-        EXPECT_NE(tensor.tensor_descriptor(), nullptr);
+        EXPECT_NE(tensor.tensorDescriptor(), nullptr);
     });
 }
 
@@ -36,8 +36,8 @@ TEST(MiopenTensorTest, TensorDescriptorIsValid)
     const auto& tensor_map = graph.get_tensor_map();
     ASSERT_FALSE(tensor_map.empty());
     const auto* tensor_attr = tensor_map.begin()->second;
-    Miopen_tensor tensor(*tensor_attr);
+    MiopenTensor tensor(*tensor_attr);
 
     // The descriptor should be non-null and can be used in MIOpen API calls
-    EXPECT_NE(tensor.tensor_descriptor(), nullptr);
+    EXPECT_NE(tensor.tensorDescriptor(), nullptr);
 }

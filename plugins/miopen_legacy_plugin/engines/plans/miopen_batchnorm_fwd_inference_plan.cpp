@@ -17,33 +17,32 @@ BatchnormFwdInferenceParams::BatchnormFwdInferenceParams(
     initializeTensors(attributes, tensorMap);
 }
 
-const Miopen_tensor& BatchnormFwdInferenceParams::x() const
+const MiopenTensor& BatchnormFwdInferenceParams::x() const
 {
     return *_xPair;
 }
 
-const Miopen_tensor& BatchnormFwdInferenceParams::y() const
+const MiopenTensor& BatchnormFwdInferenceParams::y() const
 {
     return *_yPair;
 }
 
-const Miopen_tensor& BatchnormFwdInferenceParams::scale() const
+const MiopenTensor& BatchnormFwdInferenceParams::scale() const
 {
     return *_scalePair;
 }
 
-const Miopen_tensor& BatchnormFwdInferenceParams::bias() const
+const MiopenTensor& BatchnormFwdInferenceParams::bias() const
 {
     return *_biasPair;
 }
 
-const std::optional<std::unique_ptr<Miopen_tensor>>& BatchnormFwdInferenceParams::estMean() const
+const std::optional<std::unique_ptr<MiopenTensor>>& BatchnormFwdInferenceParams::estMean() const
 {
     return _estMeanTensorDescriptor;
 }
 
-const std::optional<std::unique_ptr<Miopen_tensor>>&
-    BatchnormFwdInferenceParams::estVariance() const
+const std::optional<std::unique_ptr<MiopenTensor>>& BatchnormFwdInferenceParams::estVariance() const
 {
     return _estVarianceTensorDescriptor;
 }
@@ -51,13 +50,13 @@ const std::optional<std::unique_ptr<Miopen_tensor>>&
 namespace
 {
 
-std::unique_ptr<Miopen_tensor> createTensor(
+std::unique_ptr<MiopenTensor> createTensor(
     const std::unordered_map<int64_t, const hipdnn_sdk::data_objects::TensorAttributes*>& tensorMap,
     int64_t uid)
 {
     if(auto tensorAttr = tensorMap.find(uid); tensorAttr != tensorMap.end())
     {
-        return std::make_unique<Miopen_tensor>(*tensorAttr->second);
+        return std::make_unique<MiopenTensor>(*tensorAttr->second);
     }
 
     throw hipdnn_plugin::Hipdnn_plugin_exception(HIPDNN_PLUGIN_STATUS_INTERNAL_ERROR,
@@ -93,7 +92,7 @@ BatchnormFwdInferencePlan::BatchnormFwdInferencePlan(
 {
 }
 
-void BatchnormFwdInferencePlan::execute(const hipdnnEnginePluginHandle& handle,
+void BatchnormFwdInferencePlan::execute(const HipdnnEnginePluginHandle& handle,
                                         const hipdnnPluginDeviceBuffer_t* deviceBuffers,
                                         uint32_t numDeviceBuffers,
                                         void* workspace) const
@@ -105,45 +104,45 @@ void BatchnormFwdInferencePlan::execute(const hipdnnEnginePluginHandle& handle,
     auto beta = static_cast<float>(0);
     double epsilon = 1e-3;
 
-    auto xBuffer = miopen_utils::find_device_buffer(
+    auto xBuffer = miopen_utils::findDeviceBuffer(
         _inferenceParams->x().uid(), deviceBuffers, numDeviceBuffers);
-    auto yBuffer = miopen_utils::find_device_buffer(
+    auto yBuffer = miopen_utils::findDeviceBuffer(
         _inferenceParams->y().uid(), deviceBuffers, numDeviceBuffers);
-    auto scaleBuffer = miopen_utils::find_device_buffer(
+    auto scaleBuffer = miopen_utils::findDeviceBuffer(
         _inferenceParams->scale().uid(), deviceBuffers, numDeviceBuffers);
-    auto biasBuffer = miopen_utils::find_device_buffer(
+    auto biasBuffer = miopen_utils::findDeviceBuffer(
         _inferenceParams->bias().uid(), deviceBuffers, numDeviceBuffers);
 
     hipdnnPluginDeviceBuffer_t estMeanBuffer = {0, nullptr};
     if(_inferenceParams->estMean().has_value())
     {
-        estMeanBuffer = miopen_utils::find_device_buffer(
+        estMeanBuffer = miopen_utils::findDeviceBuffer(
             _inferenceParams->estMean().value()->uid(), deviceBuffers, numDeviceBuffers);
     }
 
     hipdnnPluginDeviceBuffer_t estVarianceBuffer = {0, nullptr};
     if(_inferenceParams->estVariance().has_value())
     {
-        estVarianceBuffer = miopen_utils::find_device_buffer(
+        estVarianceBuffer = miopen_utils::findDeviceBuffer(
             _inferenceParams->estVariance().value()->uid(), deviceBuffers, numDeviceBuffers);
     }
 
     THROW_ON_MIOPEN_FAILURE(miopenBatchNormalizationForwardInference_V2(
-        handle.miopen_handle,
+        handle.miopenHandle,
         MIOPEN_BATCHNORM_MODE,
         &alpha,
         &beta,
-        _inferenceParams->x().tensor_descriptor(),
+        _inferenceParams->x().tensorDescriptor(),
         xBuffer.ptr,
-        _inferenceParams->y().tensor_descriptor(),
+        _inferenceParams->y().tensorDescriptor(),
         yBuffer.ptr,
-        _inferenceParams->scale().tensor_descriptor(),
-        _inferenceParams->bias().tensor_descriptor(),
+        _inferenceParams->scale().tensorDescriptor(),
+        _inferenceParams->bias().tensorDescriptor(),
         _inferenceParams->estMean().has_value()
-            ? _inferenceParams->estMean().value()->tensor_descriptor()
+            ? _inferenceParams->estMean().value()->tensorDescriptor()
             : nullptr,
         _inferenceParams->estVariance().has_value()
-            ? _inferenceParams->estVariance().value()->tensor_descriptor()
+            ? _inferenceParams->estVariance().value()->tensorDescriptor()
             : nullptr,
         scaleBuffer.ptr,
         biasBuffer.ptr,
