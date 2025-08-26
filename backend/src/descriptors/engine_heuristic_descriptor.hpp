@@ -10,57 +10,57 @@
 namespace hipdnn_backend
 {
 
-class Graph_descriptor;
+class GraphDescriptor;
 
-class Engine_heuristic_descriptor : public hipdnnBackendDescriptorImpl<Engine_heuristic_descriptor>
+class EngineHeuristicDescriptor : public HipdnnBackendDescriptorImpl<EngineHeuristicDescriptor>
 {
 private:
-    std::shared_ptr<const Graph_descriptor> _graph;
-    std::vector<int64_t> _engine_ids;
-    hipdnnBackendHeurMode_t _heuristic_mode = HIPDNN_HEUR_MODE_FALLBACK;
-    bool _heuristic_mode_set = false;
+    std::shared_ptr<const GraphDescriptor> _graph;
+    std::vector<int64_t> _engineIds;
+    hipdnnBackendHeurMode_t _heuristicMode = HIPDNN_HEUR_MODE_FALLBACK;
+    bool _heuristicModeSet = false;
 
-    void set_graph(hipdnnBackendAttributeType_t attribute_type,
-                   int64_t element_count,
-                   const void* array_of_elements);
+    void setGraph(hipdnnBackendAttributeType_t attributeType,
+                  int64_t elementCount,
+                  const void* arrayOfElements);
 
-    void set_heuristic_mode(hipdnnBackendAttributeType_t attribute_type,
-                            int64_t element_count,
-                            const void* array_of_elements);
+    void setHeuristicMode(hipdnnBackendAttributeType_t attributeType,
+                          int64_t elementCount,
+                          const void* arrayOfElements);
 
-    void get_graph(hipdnnBackendAttributeType_t attribute_type,
-                   int64_t requested_element_count,
-                   int64_t* element_count,
-                   void* array_of_elements) const;
+    void getGraph(hipdnnBackendAttributeType_t attributeType,
+                  int64_t requestedElementCount,
+                  int64_t* elementCount,
+                  void* arrayOfElements) const;
 
-    void get_engine_configs(hipdnnBackendAttributeType_t attribute_type,
-                            int64_t requested_element_count,
-                            int64_t* element_count,
-                            void* array_of_elements) const;
+    void getEngineConfigs(hipdnnBackendAttributeType_t attributeType,
+                          int64_t requestedElementCount,
+                          int64_t* elementCount,
+                          void* arrayOfElements) const;
 
-    void get_heuristic_mode(hipdnnBackendAttributeType_t attribute_type,
-                            int64_t requested_element_count,
-                            int64_t* element_count,
-                            void* array_of_elements) const;
+    void getHeuristicMode(hipdnnBackendAttributeType_t attributeType,
+                          int64_t requestedElementCount,
+                          int64_t* elementCount,
+                          void* arrayOfElements) const;
 
 public:
     void finalize() override;
 
-    void get_attribute(hipdnnBackendAttributeName_t attribute_name,
-                       hipdnnBackendAttributeType_t attribute_type,
-                       int64_t requested_element_count,
-                       int64_t* element_count,
-                       void* array_of_elements) const override;
+    void getAttribute(hipdnnBackendAttributeName_t attributeName,
+                      hipdnnBackendAttributeType_t attributeType,
+                      int64_t requestedElementCount,
+                      int64_t* elementCount,
+                      void* arrayOfElements) const override;
 
-    void set_attribute(hipdnnBackendAttributeName_t attribute_name,
-                       hipdnnBackendAttributeType_t attribute_type,
-                       int64_t element_count,
-                       const void* array_of_elements) override;
+    void setAttribute(hipdnnBackendAttributeName_t attributeName,
+                      hipdnnBackendAttributeType_t attributeType,
+                      int64_t elementCount,
+                      const void* arrayOfElements) override;
 
     // Throws an exception if the descriptor is not finalized.
-    std::shared_ptr<const Graph_descriptor> get_graph() const;
+    std::shared_ptr<const GraphDescriptor> getGraph() const;
 
-    static hipdnnBackendDescriptorType_t get_static_type();
+    static hipdnnBackendDescriptorType_t getStaticType();
 };
 
 } // namespace hipdnn_backend

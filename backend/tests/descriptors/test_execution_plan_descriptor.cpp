@@ -24,100 +24,99 @@ using namespace ::testing;
 
 using ::testing::Return;
 
-class Execution_plan_descriptor_test : public ::testing::Test
+class ExecutionPlanDescriptorTest : public ::testing::Test
 {
 public:
-    std::unique_ptr<hipdnnBackendDescriptor> _plan_wrapper = nullptr;
-    std::unique_ptr<hipdnnBackendDescriptor> _mock_graph_wrapper = nullptr;
-    std::unique_ptr<hipdnnBackendDescriptor> _mock_engine_wrapper = nullptr;
-    std::unique_ptr<hipdnnBackendDescriptor> _mock_engine_config_wrapper = nullptr;
-    std::unique_ptr<hipdnnBackendDescriptor> _mock_engine_config_bad_type_wrapper = nullptr;
-    std::unique_ptr<hipdnnBackendDescriptor> _mock_wrong_type_wrapper = nullptr;
-    std::unique_ptr<Mock_handle> _mock_handle = nullptr;
-    std::shared_ptr<Mock_engine_plugin_resource_manager> _mock_engine_plugin_resource_manager
-        = nullptr;
+    std::unique_ptr<HipdnnBackendDescriptor> _planWrapper = nullptr;
+    std::unique_ptr<HipdnnBackendDescriptor> _mockGraphWrapper = nullptr;
+    std::unique_ptr<HipdnnBackendDescriptor> _mockEngineWrapper = nullptr;
+    std::unique_ptr<HipdnnBackendDescriptor> _mockEngineConfigWrapper = nullptr;
+    std::unique_ptr<HipdnnBackendDescriptor> _mockEngineConfigBadTypeWrapper = nullptr;
+    std::unique_ptr<HipdnnBackendDescriptor> _mockWrongTypeWrapper = nullptr;
+    std::unique_ptr<Mock_handle> _mockHandle = nullptr;
+    std::shared_ptr<Mock_engine_plugin_resource_manager> _mockEnginePluginResourceManager = nullptr;
 
-    std::shared_ptr<Execution_plan_descriptor> get_execution_plan_descriptor() const
+    std::shared_ptr<ExecutionPlanDescriptor> getExecutionPlanDescriptor() const
     {
-        return _plan_wrapper->as_descriptor<Execution_plan_descriptor>();
+        return _planWrapper->asDescriptor<ExecutionPlanDescriptor>();
     }
 
-    std::shared_ptr<Mock_graph_descriptor> get_mock_graph() const
+    std::shared_ptr<MockGraphDescriptor> getMockGraph() const
     {
-        return Mock_descriptor_utility::as_descriptor_unsafe<Mock_graph_descriptor>(
-            _mock_graph_wrapper.get());
+        return MockDescriptorUtility::asDescriptorUnsafe<MockGraphDescriptor>(
+            _mockGraphWrapper.get());
     }
 
-    std::shared_ptr<Mock_engine_descriptor> get_mock_engine() const
+    std::shared_ptr<MockEngineDescriptor> getMockEngine() const
     {
-        return Mock_descriptor_utility::as_descriptor_unsafe<Mock_engine_descriptor>(
-            _mock_engine_wrapper.get());
+        return MockDescriptorUtility::asDescriptorUnsafe<MockEngineDescriptor>(
+            _mockEngineWrapper.get());
     }
 
-    std::shared_ptr<Mock_engine_config_descriptor> get_mock_engine_config() const
+    std::shared_ptr<MockEngineConfigDescriptor> getMockEngineConfig() const
     {
-        return Mock_descriptor_utility::as_descriptor_unsafe<Mock_engine_config_descriptor>(
-            _mock_engine_config_wrapper.get());
+        return MockDescriptorUtility::asDescriptorUnsafe<MockEngineConfigDescriptor>(
+            _mockEngineConfigWrapper.get());
     }
 
-    std::shared_ptr<Mock_engine_config_descriptor> get_mock_engine_config_bad_type() const
+    std::shared_ptr<MockEngineConfigDescriptor> getMockEngineConfigBadType() const
     {
-        return Mock_descriptor_utility::as_descriptor_unsafe<Mock_engine_config_descriptor>(
-            _mock_engine_config_bad_type_wrapper.get());
+        return MockDescriptorUtility::asDescriptorUnsafe<MockEngineConfigDescriptor>(
+            _mockEngineConfigBadTypeWrapper.get());
     }
 
-    static hipdnnEnginePluginExecutionContext_t get_execution_context()
+    static hipdnnEnginePluginExecutionContext_t getExecutionContext()
     {
         return reinterpret_cast<hipdnnEnginePluginExecutionContext_t>(0xFFFFFFFF);
     }
 
-    void set_handle()
+    void setHandle()
     {
-        EXPECT_CALL(*_mock_engine_plugin_resource_manager, createExecutionContext(_, _, _))
-            .WillOnce(Return(get_execution_context()));
-        EXPECT_CALL(*_mock_engine_plugin_resource_manager, destroyExecutionContext(_, _));
+        EXPECT_CALL(*_mockEnginePluginResourceManager, createExecutionContext(_, _, _))
+            .WillOnce(Return(getExecutionContext()));
+        EXPECT_CALL(*_mockEnginePluginResourceManager, destroyExecutionContext(_, _));
 
-        EXPECT_CALL(*_mock_handle, get_plugin_resource_manager())
-            .WillOnce(Return(_mock_engine_plugin_resource_manager));
-        get_execution_plan_descriptor()->set_attribute(
-            HIPDNN_ATTR_EXECUTION_PLAN_HANDLE, HIPDNN_TYPE_HANDLE, 1, &_mock_handle);
+        EXPECT_CALL(*_mockHandle, get_plugin_resource_manager())
+            .WillOnce(Return(_mockEnginePluginResourceManager));
+        getExecutionPlanDescriptor()->setAttribute(
+            HIPDNN_ATTR_EXECUTION_PLAN_HANDLE, HIPDNN_TYPE_HANDLE, 1, &_mockHandle);
     }
 
-    void set_engine_config()
+    void setEngineConfig()
     {
-        EXPECT_CALL(*get_mock_engine(), get_engine_id()).WillOnce(Return(ENGINE_ID));
-        EXPECT_CALL(*get_mock_engine(), get_graph()).WillOnce(Return(get_mock_graph()));
+        EXPECT_CALL(*getMockEngine(), getEngineId()).WillOnce(Return(ENGINE_ID));
+        EXPECT_CALL(*getMockEngine(), getGraph()).WillOnce(Return(getMockGraph()));
 
-        EXPECT_CALL(*get_mock_engine_config(), is_finalized()).WillOnce(Return(true));
-        EXPECT_CALL(*get_mock_engine_config(), get_engine()).WillOnce(Return(get_mock_engine()));
-        EXPECT_CALL(*get_mock_engine_config(), get_serialized_engine_config())
-            .WillOnce(Invoke([]() { return hipdnnPluginConstData_t{nullptr, 0}; }));
+        EXPECT_CALL(*getMockEngineConfig(), isFinalized()).WillOnce(Return(true));
+        EXPECT_CALL(*getMockEngineConfig(), getEngine()).WillOnce(Return(getMockEngine()));
+        EXPECT_CALL(*getMockEngineConfig(), getSerializedEngineConfig()).WillOnce(Invoke([]() {
+            return hipdnnPluginConstData_t{nullptr, 0};
+        }));
 
-        get_execution_plan_descriptor()->set_attribute(HIPDNN_ATTR_EXECUTION_PLAN_ENGINE_CONFIG,
-                                                       HIPDNN_TYPE_BACKEND_DESCRIPTOR,
-                                                       1,
-                                                       &_mock_engine_config_wrapper);
+        getExecutionPlanDescriptor()->setAttribute(HIPDNN_ATTR_EXECUTION_PLAN_ENGINE_CONFIG,
+                                                   HIPDNN_TYPE_BACKEND_DESCRIPTOR,
+                                                   1,
+                                                   &_mockEngineConfigWrapper);
     }
 
-    void make_execution_plan_finalized()
+    void makeExecutionPlanFinalized()
     {
-        set_handle();
-        set_engine_config();
-        ASSERT_NO_THROW(get_execution_plan_descriptor()->finalize());
+        setHandle();
+        setEngineConfig();
+        ASSERT_NO_THROW(getExecutionPlanDescriptor()->finalize());
     }
 
 protected:
     void SetUp() override
     {
-        _plan_wrapper = create_descriptor<Execution_plan_descriptor>();
-        _mock_graph_wrapper = test_descriptor_utils::create_descriptor<Mock_graph_descriptor>();
-        _mock_engine_wrapper = create_descriptor<Mock_engine_descriptor>();
-        _mock_engine_config_wrapper = create_descriptor<Mock_engine_config_descriptor>();
-        _mock_engine_config_bad_type_wrapper = create_descriptor<Mock_engine_config_descriptor>();
-        _mock_wrong_type_wrapper = create_descriptor<Mock_engine_descriptor>();
-        _mock_handle = std::make_unique<Mock_handle>();
-        _mock_engine_plugin_resource_manager
-            = std::make_shared<Mock_engine_plugin_resource_manager>();
+        _planWrapper = createDescriptor<ExecutionPlanDescriptor>();
+        _mockGraphWrapper = test_descriptor_utils::createDescriptor<MockGraphDescriptor>();
+        _mockEngineWrapper = createDescriptor<MockEngineDescriptor>();
+        _mockEngineConfigWrapper = createDescriptor<MockEngineConfigDescriptor>();
+        _mockEngineConfigBadTypeWrapper = createDescriptor<MockEngineConfigDescriptor>();
+        _mockWrongTypeWrapper = createDescriptor<MockEngineDescriptor>();
+        _mockHandle = std::make_unique<Mock_handle>();
+        _mockEnginePluginResourceManager = std::make_shared<Mock_engine_plugin_resource_manager>();
     }
 
     void TearDown() override {}
@@ -126,241 +125,241 @@ private:
     static constexpr int64_t ENGINE_ID = 0;
 };
 
-TEST_F(Execution_plan_descriptor_test, CreateExecutionPlanDescriptor)
+TEST_F(ExecutionPlanDescriptorTest, CreateExecutionPlanDescriptor)
 {
-    auto plan = get_execution_plan_descriptor();
+    auto plan = getExecutionPlanDescriptor();
     ASSERT_NE(plan, nullptr);
-    ASSERT_FALSE(plan->is_finalized());
-    ASSERT_EQ(plan->get_type(), HIPDNN_BACKEND_EXECUTION_PLAN_DESCRIPTOR);
+    ASSERT_FALSE(plan->isFinalized());
+    ASSERT_EQ(plan->getType(), HIPDNN_BACKEND_EXECUTION_PLAN_DESCRIPTOR);
 }
 
-TEST_F(Execution_plan_descriptor_test, SetAttrOnUnfinalizedExecutionPlanDescriptor)
+TEST_F(ExecutionPlanDescriptorTest, SetAttrOnUnfinalizedExecutionPlanDescriptor)
 {
-    auto plan = get_execution_plan_descriptor();
-    uint64_t dummy_workspace_size;
+    auto plan = getExecutionPlanDescriptor();
+    uint64_t dummyWorkspaceSize;
 
     ASSERT_THROW_HIPDNN_STATUS(
-        plan->set_attribute(
-            HIPDNN_ATTR_EXECUTION_PLAN_WORKSPACE_SIZE, HIPDNN_TYPE_INT64, 1, &dummy_workspace_size),
+        plan->setAttribute(
+            HIPDNN_ATTR_EXECUTION_PLAN_WORKSPACE_SIZE, HIPDNN_TYPE_INT64, 1, &dummyWorkspaceSize),
         HIPDNN_STATUS_NOT_SUPPORTED);
 
-    make_execution_plan_finalized();
+    makeExecutionPlanFinalized();
 
     ASSERT_THROW_HIPDNN_STATUS(
-        plan->set_attribute(
-            HIPDNN_ATTR_EXECUTION_PLAN_WORKSPACE_SIZE, HIPDNN_TYPE_INT64, 1, &dummy_workspace_size),
+        plan->setAttribute(
+            HIPDNN_ATTR_EXECUTION_PLAN_WORKSPACE_SIZE, HIPDNN_TYPE_INT64, 1, &dummyWorkspaceSize),
         HIPDNN_STATUS_NOT_INITIALIZED);
 }
 
-TEST_F(Execution_plan_descriptor_test, SetExecutionPlanDescriptorHandle)
+TEST_F(ExecutionPlanDescriptorTest, SetExecutionPlanDescriptorHandle)
 {
-    auto plan = get_execution_plan_descriptor();
+    auto plan = getExecutionPlanDescriptor();
     hipdnnHandle_t handle = nullptr;
 
     ASSERT_THROW_HIPDNN_STATUS(
-        plan->set_attribute(HIPDNN_ATTR_EXECUTION_PLAN_HANDLE, HIPDNN_TYPE_INT64, 1, &handle),
+        plan->setAttribute(HIPDNN_ATTR_EXECUTION_PLAN_HANDLE, HIPDNN_TYPE_INT64, 1, &handle),
         HIPDNN_STATUS_BAD_PARAM);
 
     ASSERT_THROW_HIPDNN_STATUS(
-        plan->set_attribute(HIPDNN_ATTR_EXECUTION_PLAN_HANDLE, HIPDNN_TYPE_HANDLE, 2, &handle),
+        plan->setAttribute(HIPDNN_ATTR_EXECUTION_PLAN_HANDLE, HIPDNN_TYPE_HANDLE, 2, &handle),
         HIPDNN_STATUS_BAD_PARAM);
 
     ASSERT_THROW_HIPDNN_STATUS(
-        plan->set_attribute(HIPDNN_ATTR_EXECUTION_PLAN_HANDLE, HIPDNN_TYPE_HANDLE, 1, nullptr),
+        plan->setAttribute(HIPDNN_ATTR_EXECUTION_PLAN_HANDLE, HIPDNN_TYPE_HANDLE, 1, nullptr),
         HIPDNN_STATUS_BAD_PARAM_NULL_POINTER);
 
     ASSERT_THROW_HIPDNN_STATUS(
-        plan->set_attribute(HIPDNN_ATTR_EXECUTION_PLAN_HANDLE, HIPDNN_TYPE_HANDLE, 1, &handle),
+        plan->setAttribute(HIPDNN_ATTR_EXECUTION_PLAN_HANDLE, HIPDNN_TYPE_HANDLE, 1, &handle),
         HIPDNN_STATUS_BAD_PARAM_NULL_POINTER);
 
     handle = reinterpret_cast<hipdnnHandle_t>(0x12345678);
-    plan->set_attribute(HIPDNN_ATTR_EXECUTION_PLAN_HANDLE, HIPDNN_TYPE_HANDLE, 1, &handle);
+    plan->setAttribute(HIPDNN_ATTR_EXECUTION_PLAN_HANDLE, HIPDNN_TYPE_HANDLE, 1, &handle);
 }
 
-TEST_F(Execution_plan_descriptor_test, SetExecutionPlanDescriptorEngineConfig)
+TEST_F(ExecutionPlanDescriptorTest, SetExecutionPlanDescriptorEngineConfig)
 {
-    auto plan = get_execution_plan_descriptor();
-    auto mock_engine_config = get_mock_engine_config();
+    auto plan = getExecutionPlanDescriptor();
+    auto mockEngineConfig = getMockEngineConfig();
 
-    EXPECT_CALL(*get_mock_engine_config_bad_type(), is_finalized()).Times(1);
-    EXPECT_CALL(*mock_engine_config, is_finalized()).WillOnce(Return(false)).WillOnce(Return(true));
+    EXPECT_CALL(*getMockEngineConfigBadType(), isFinalized()).Times(1);
+    EXPECT_CALL(*mockEngineConfig, isFinalized()).WillOnce(Return(false)).WillOnce(Return(true));
 
-    // is_finalized()->false
-    ASSERT_THROW_HIPDNN_STATUS(plan->set_attribute(HIPDNN_ATTR_EXECUTION_PLAN_ENGINE_CONFIG,
-                                                   HIPDNN_TYPE_BACKEND_DESCRIPTOR,
-                                                   1,
-                                                   &_mock_engine_config_wrapper),
+    // isFinalized()->false
+    ASSERT_THROW_HIPDNN_STATUS(plan->setAttribute(HIPDNN_ATTR_EXECUTION_PLAN_ENGINE_CONFIG,
+                                                  HIPDNN_TYPE_BACKEND_DESCRIPTOR,
+                                                  1,
+                                                  &_mockEngineConfigWrapper),
                                HIPDNN_STATUS_BAD_PARAM_NOT_FINALIZED);
 
-    // is_finalized()->true
-    plan->set_attribute(HIPDNN_ATTR_EXECUTION_PLAN_ENGINE_CONFIG,
-                        HIPDNN_TYPE_BACKEND_DESCRIPTOR,
-                        1,
-                        &_mock_engine_config_wrapper);
+    // isFinalized()->true
+    plan->setAttribute(HIPDNN_ATTR_EXECUTION_PLAN_ENGINE_CONFIG,
+                       HIPDNN_TYPE_BACKEND_DESCRIPTOR,
+                       1,
+                       &_mockEngineConfigWrapper);
 
-    ASSERT_THROW_HIPDNN_STATUS(plan->set_attribute(HIPDNN_ATTR_EXECUTION_PLAN_ENGINE_CONFIG,
-                                                   HIPDNN_TYPE_HANDLE,
-                                                   1,
-                                                   &_mock_engine_config_wrapper),
+    ASSERT_THROW_HIPDNN_STATUS(plan->setAttribute(HIPDNN_ATTR_EXECUTION_PLAN_ENGINE_CONFIG,
+                                                  HIPDNN_TYPE_HANDLE,
+                                                  1,
+                                                  &_mockEngineConfigWrapper),
                                HIPDNN_STATUS_BAD_PARAM);
 
-    ASSERT_THROW_HIPDNN_STATUS(plan->set_attribute(HIPDNN_ATTR_EXECUTION_PLAN_ENGINE_CONFIG,
-                                                   HIPDNN_TYPE_BACKEND_DESCRIPTOR,
-                                                   2,
-                                                   &_mock_engine_config_wrapper),
+    ASSERT_THROW_HIPDNN_STATUS(plan->setAttribute(HIPDNN_ATTR_EXECUTION_PLAN_ENGINE_CONFIG,
+                                                  HIPDNN_TYPE_BACKEND_DESCRIPTOR,
+                                                  2,
+                                                  &_mockEngineConfigWrapper),
                                HIPDNN_STATUS_BAD_PARAM);
 
     ASSERT_THROW_HIPDNN_STATUS(
-        plan->set_attribute(
+        plan->setAttribute(
             HIPDNN_ATTR_EXECUTION_PLAN_ENGINE_CONFIG, HIPDNN_TYPE_BACKEND_DESCRIPTOR, 1, nullptr),
         HIPDNN_STATUS_BAD_PARAM_NULL_POINTER);
 
-    hipdnnBackendDescriptor_t engine_config = nullptr;
-    ASSERT_THROW_HIPDNN_STATUS(plan->set_attribute(HIPDNN_ATTR_EXECUTION_PLAN_ENGINE_CONFIG,
-                                                   HIPDNN_TYPE_BACKEND_DESCRIPTOR,
-                                                   1,
-                                                   &engine_config),
+    hipdnnBackendDescriptor_t engineConfig = nullptr;
+    ASSERT_THROW_HIPDNN_STATUS(plan->setAttribute(HIPDNN_ATTR_EXECUTION_PLAN_ENGINE_CONFIG,
+                                                  HIPDNN_TYPE_BACKEND_DESCRIPTOR,
+                                                  1,
+                                                  &engineConfig),
                                HIPDNN_STATUS_BAD_PARAM_NULL_POINTER);
 
-    ASSERT_THROW_HIPDNN_STATUS(plan->set_attribute(HIPDNN_ATTR_EXECUTION_PLAN_ENGINE_CONFIG,
-                                                   HIPDNN_TYPE_BACKEND_DESCRIPTOR,
-                                                   1,
-                                                   &_mock_engine_config_bad_type_wrapper),
+    ASSERT_THROW_HIPDNN_STATUS(plan->setAttribute(HIPDNN_ATTR_EXECUTION_PLAN_ENGINE_CONFIG,
+                                                  HIPDNN_TYPE_BACKEND_DESCRIPTOR,
+                                                  1,
+                                                  &_mockEngineConfigBadTypeWrapper),
                                HIPDNN_STATUS_BAD_PARAM_NOT_FINALIZED);
 
-    ASSERT_THROW_HIPDNN_STATUS(plan->set_attribute(HIPDNN_ATTR_EXECUTION_PLAN_ENGINE_CONFIG,
-                                                   HIPDNN_TYPE_BACKEND_DESCRIPTOR,
-                                                   1,
-                                                   &_mock_wrong_type_wrapper),
+    ASSERT_THROW_HIPDNN_STATUS(plan->setAttribute(HIPDNN_ATTR_EXECUTION_PLAN_ENGINE_CONFIG,
+                                                  HIPDNN_TYPE_BACKEND_DESCRIPTOR,
+                                                  1,
+                                                  &_mockWrongTypeWrapper),
                                HIPDNN_STATUS_BAD_PARAM);
 }
 
-TEST_F(Execution_plan_descriptor_test, FinalizeExecutionPlanDescriptor)
+TEST_F(ExecutionPlanDescriptorTest, FinalizeExecutionPlanDescriptor)
 {
-    auto plan = get_execution_plan_descriptor();
+    auto plan = getExecutionPlanDescriptor();
     ASSERT_THROW_HIPDNN_STATUS(plan->finalize(), HIPDNN_STATUS_BAD_PARAM);
 
-    set_handle();
-    set_engine_config();
+    setHandle();
+    setEngineConfig();
 
     ASSERT_NO_THROW(plan->finalize());
 
     ASSERT_THROW(plan->finalize(), hipdnn_backend::Hipdnn_exception);
 }
 
-TEST_F(Execution_plan_descriptor_test, GetAttrOnUnfinalizedExecutionPlanDescriptor)
+TEST_F(ExecutionPlanDescriptorTest, GetAttrOnUnfinalizedExecutionPlanDescriptor)
 {
-    auto plan = get_execution_plan_descriptor();
-    uint64_t dummy_workspace_size;
+    auto plan = getExecutionPlanDescriptor();
+    uint64_t dummyWorkspaceSize;
 
-    ASSERT_THROW_HIPDNN_STATUS(plan->get_attribute(HIPDNN_ATTR_EXECUTION_PLAN_WORKSPACE_SIZE,
-                                                   HIPDNN_TYPE_INT64,
-                                                   1,
-                                                   nullptr,
-                                                   &dummy_workspace_size),
+    ASSERT_THROW_HIPDNN_STATUS(plan->getAttribute(HIPDNN_ATTR_EXECUTION_PLAN_WORKSPACE_SIZE,
+                                                  HIPDNN_TYPE_INT64,
+                                                  1,
+                                                  nullptr,
+                                                  &dummyWorkspaceSize),
                                HIPDNN_STATUS_NOT_INITIALIZED);
 }
 
-TEST_F(Execution_plan_descriptor_test, GetExecutionPlanDescriptorWorkspaceSize)
+TEST_F(ExecutionPlanDescriptorTest, GetExecutionPlanDescriptorWorkspaceSize)
 {
-    auto plan = get_execution_plan_descriptor();
-    auto mock_engine_config = get_mock_engine_config();
-    int64_t workspace_size = 0;
+    auto plan = getExecutionPlanDescriptor();
+    auto mockEngineConfig = getMockEngineConfig();
+    int64_t workspaceSize = 0;
 
-    make_execution_plan_finalized();
-    EXPECT_CALL(*mock_engine_config, get_attribute(_, _, _, _, _)).WillOnce(SetArg4ToInt64(1024));
-    plan->get_attribute(
-        HIPDNN_ATTR_EXECUTION_PLAN_WORKSPACE_SIZE, HIPDNN_TYPE_INT64, 1, nullptr, &workspace_size);
-    ASSERT_EQ(workspace_size, 1024);
+    makeExecutionPlanFinalized();
+    EXPECT_CALL(*mockEngineConfig, getAttribute(_, _, _, _, _)).WillOnce(SetArg4ToInt64(1024));
+    plan->getAttribute(
+        HIPDNN_ATTR_EXECUTION_PLAN_WORKSPACE_SIZE, HIPDNN_TYPE_INT64, 1, nullptr, &workspaceSize);
+    ASSERT_EQ(workspaceSize, 1024);
 }
 
-TEST_F(Execution_plan_descriptor_test, GetExecutionPlanDescriptorEngineConfig)
+TEST_F(ExecutionPlanDescriptorTest, GetExecutionPlanDescriptorEngineConfig)
 {
-    auto plan = get_execution_plan_descriptor();
+    auto plan = getExecutionPlanDescriptor();
 
-    Scoped_descriptor returned_engine_config;
-    Scoped_descriptor null_count_engine_config;
+    ScopedDescriptor returnedEngineConfig;
+    ScopedDescriptor nullCountEngineConfig;
     int64_t count = 0;
 
-    make_execution_plan_finalized();
+    makeExecutionPlanFinalized();
 
-    ASSERT_NO_THROW(plan->get_attribute(HIPDNN_ATTR_EXECUTION_PLAN_ENGINE_CONFIG,
-                                        HIPDNN_TYPE_BACKEND_DESCRIPTOR,
-                                        1,
-                                        &count,
-                                        returned_engine_config.get_ptr()));
+    ASSERT_NO_THROW(plan->getAttribute(HIPDNN_ATTR_EXECUTION_PLAN_ENGINE_CONFIG,
+                                       HIPDNN_TYPE_BACKEND_DESCRIPTOR,
+                                       1,
+                                       &count,
+                                       returnedEngineConfig.getPtr()));
 
     ASSERT_EQ(count, 1);
-    ASSERT_EQ(*returned_engine_config.get(), *(_mock_engine_config_wrapper.get()));
+    ASSERT_EQ(*returnedEngineConfig.get(), *(_mockEngineConfigWrapper.get()));
 
-    ASSERT_NO_THROW(plan->get_attribute(HIPDNN_ATTR_EXECUTION_PLAN_ENGINE_CONFIG,
-                                        HIPDNN_TYPE_BACKEND_DESCRIPTOR,
-                                        1,
-                                        nullptr,
-                                        null_count_engine_config.get_ptr()));
+    ASSERT_NO_THROW(plan->getAttribute(HIPDNN_ATTR_EXECUTION_PLAN_ENGINE_CONFIG,
+                                       HIPDNN_TYPE_BACKEND_DESCRIPTOR,
+                                       1,
+                                       nullptr,
+                                       nullCountEngineConfig.getPtr()));
 
-    ASSERT_EQ(*null_count_engine_config.get(), *(_mock_engine_config_wrapper.get()));
+    ASSERT_EQ(*nullCountEngineConfig.get(), *(_mockEngineConfigWrapper.get()));
 }
 
-TEST_F(Execution_plan_descriptor_test, GetExecutionPlanDescriptorEngineConfigErrors)
+TEST_F(ExecutionPlanDescriptorTest, GetExecutionPlanDescriptorEngineConfigErrors)
 {
-    auto plan = get_execution_plan_descriptor();
-    hipdnnBackendDescriptor_t returned_engine_config = nullptr;
+    auto plan = getExecutionPlanDescriptor();
+    hipdnnBackendDescriptor_t returnedEngineConfig = nullptr;
     int64_t count = 0;
-    void* dummy = &returned_engine_config;
+    void* dummy = &returnedEngineConfig;
 
-    make_execution_plan_finalized();
+    makeExecutionPlanFinalized();
 
     ASSERT_THROW_HIPDNN_STATUS(
-        plan->get_attribute(
+        plan->getAttribute(
             HIPDNN_ATTR_EXECUTION_PLAN_ENGINE_CONFIG, HIPDNN_TYPE_INT64, 1, &count, &dummy),
         HIPDNN_STATUS_BAD_PARAM);
 
-    ASSERT_THROW_HIPDNN_STATUS(plan->get_attribute(HIPDNN_ATTR_EXECUTION_PLAN_ENGINE_CONFIG,
-                                                   HIPDNN_TYPE_BACKEND_DESCRIPTOR,
-                                                   0, // Too small (needs to be at least 1)
-                                                   &count,
-                                                   &dummy),
+    ASSERT_THROW_HIPDNN_STATUS(plan->getAttribute(HIPDNN_ATTR_EXECUTION_PLAN_ENGINE_CONFIG,
+                                                  HIPDNN_TYPE_BACKEND_DESCRIPTOR,
+                                                  0, // Too small (needs to be at least 1)
+                                                  &count,
+                                                  &dummy),
                                HIPDNN_STATUS_BAD_PARAM);
 }
 
-TEST_F(Execution_plan_descriptor_test, GetExecutionPlanDescriptorUnsupportedAttr)
+TEST_F(ExecutionPlanDescriptorTest, GetExecutionPlanDescriptorUnsupportedAttr)
 {
-    auto plan = get_execution_plan_descriptor();
+    auto plan = getExecutionPlanDescriptor();
     int64_t count = 0;
-    std::array<char, 256> dummy_buffer{};
+    std::array<char, 256> dummyBuffer{};
 
-    make_execution_plan_finalized();
+    makeExecutionPlanFinalized();
 
-    ASSERT_THROW_HIPDNN_STATUS(plan->get_attribute(HIPDNN_ATTR_EXECUTION_PLAN_KERNEL_CACHE,
-                                                   HIPDNN_TYPE_INT64,
-                                                   1,
-                                                   &count,
-                                                   dummy_buffer.data()),
+    ASSERT_THROW_HIPDNN_STATUS(plan->getAttribute(HIPDNN_ATTR_EXECUTION_PLAN_KERNEL_CACHE,
+                                                  HIPDNN_TYPE_INT64,
+                                                  1,
+                                                  &count,
+                                                  dummyBuffer.data()),
                                HIPDNN_STATUS_NOT_SUPPORTED);
 }
 
-TEST_F(Execution_plan_descriptor_test, GetEngineConfigThrowsIfNotFinalized)
+TEST_F(ExecutionPlanDescriptorTest, GetEngineConfigThrowsIfNotFinalized)
 {
-    auto plan = get_execution_plan_descriptor();
-    ASSERT_THROW_HIPDNN_STATUS(plan->get_engine_config(), HIPDNN_STATUS_INTERNAL_ERROR);
+    auto plan = getExecutionPlanDescriptor();
+    ASSERT_THROW_HIPDNN_STATUS(plan->getEngineConfig(), HIPDNN_STATUS_INTERNAL_ERROR);
 }
 
-TEST_F(Execution_plan_descriptor_test, GetEngineConfigReturnsPointerIfFinalized)
+TEST_F(ExecutionPlanDescriptorTest, GetEngineConfigReturnsPointerIfFinalized)
 {
-    auto plan = get_execution_plan_descriptor();
-    make_execution_plan_finalized();
-    auto engine_config_ptr = plan->get_engine_config();
-    ASSERT_NE(engine_config_ptr, nullptr);
-    ASSERT_EQ(static_cast<const Backend_descriptor_interface*>(engine_config_ptr.get()),
-              static_cast<const Backend_descriptor_interface*>(get_mock_engine_config().get()));
+    auto plan = getExecutionPlanDescriptor();
+    makeExecutionPlanFinalized();
+    auto engineConfigPtr = plan->getEngineConfig();
+    ASSERT_NE(engineConfigPtr, nullptr);
+    ASSERT_EQ(static_cast<const IBackendDescriptor*>(engineConfigPtr.get()),
+              static_cast<const IBackendDescriptor*>(getMockEngineConfig().get()));
 }
 
-TEST_F(Execution_plan_descriptor_test, ExecutionPlanDescriptorGetExecutionContext)
+TEST_F(ExecutionPlanDescriptorTest, ExecutionPlanDescriptorGetExecutionContext)
 {
-    auto plan = get_execution_plan_descriptor();
-    make_execution_plan_finalized();
-    auto context = plan->get_execution_context();
+    auto plan = getExecutionPlanDescriptor();
+    makeExecutionPlanFinalized();
+    auto context = plan->getExecutionContext();
     ASSERT_NE(context, nullptr);
-    ASSERT_EQ(context, get_execution_context());
+    ASSERT_EQ(context, getExecutionContext());
 }

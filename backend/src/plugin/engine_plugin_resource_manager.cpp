@@ -206,11 +206,11 @@ void EnginePluginResourceManager::setStream(hipStream_t stream) const
 }
 
 std::vector<int64_t>
-    EnginePluginResourceManager::getApplicableEngineIds(const Graph_descriptor* graphDesc) const
+    EnginePluginResourceManager::getApplicableEngineIds(const GraphDescriptor* graphDesc) const
 {
     THROW_IF_NULL(graphDesc, HIPDNN_STATUS_INTERNAL_ERROR, "Graph descriptor cannot be null");
 
-    auto serializedGraphData = graphDesc->get_serialized_graph();
+    auto serializedGraphData = graphDesc->getSerializedGraph();
 
     std::vector<int64_t> engineIds;
 
@@ -240,7 +240,7 @@ std::vector<int64_t>
 }
 
 void EnginePluginResourceManager::getEngineDetails(int64_t engineId,
-                                                   const Graph_descriptor* graphDesc,
+                                                   const GraphDescriptor* graphDesc,
                                                    hipdnnPluginConstData_t* engineDetails) const
 {
     THROW_IF_NULL(graphDesc, HIPDNN_STATUS_INTERNAL_ERROR, "Graph descriptor cannot be null");
@@ -253,7 +253,7 @@ void EnginePluginResourceManager::getEngineDetails(int64_t engineId,
                                "Invalid engine ID: " + std::to_string(engineId));
     }
 
-    auto serializedGraphData = graphDesc->get_serialized_graph();
+    auto serializedGraphData = graphDesc->getSerializedGraph();
 
     auto handle = it->second;
     auto plugin = _handleToPlugin.at(handle);
@@ -280,14 +280,14 @@ void EnginePluginResourceManager::destroyEngineDetails(int64_t engineId,
 std::shared_ptr<const EngineDetailsWrapper> EnginePluginResourceManager::getEngineDetails(
     const std::shared_ptr<EnginePluginResourceManager>& rm,
     int64_t engineId,
-    const Graph_descriptor* graphDesc)
+    const GraphDescriptor* graphDesc)
 {
     return std::make_shared<EngineDetailsWrapper>(rm, engineId, graphDesc);
 }
 
 size_t EnginePluginResourceManager::getWorkspaceSize(int64_t engineId,
                                                      const hipdnnPluginConstData_t* engineConfig,
-                                                     const Graph_descriptor* graphDesc) const
+                                                     const GraphDescriptor* graphDesc) const
 {
     THROW_IF_NULL(engineConfig, HIPDNN_STATUS_INTERNAL_ERROR, "Engine config cannot be null");
     THROW_IF_NULL(graphDesc, HIPDNN_STATUS_INTERNAL_ERROR, "Graph descriptor cannot be null");
@@ -299,7 +299,7 @@ size_t EnginePluginResourceManager::getWorkspaceSize(int64_t engineId,
                                "Invalid engine ID: " + std::to_string(engineId));
     }
 
-    auto serializedGraphData = graphDesc->get_serialized_graph();
+    auto serializedGraphData = graphDesc->getSerializedGraph();
 
     auto handle = it->second;
     auto plugin = _handleToPlugin.at(handle);
@@ -312,7 +312,7 @@ size_t EnginePluginResourceManager::getWorkspaceSize(int64_t engineId,
 hipdnnEnginePluginExecutionContext_t
     EnginePluginResourceManager::createExecutionContext(int64_t engineId,
                                                         const hipdnnPluginConstData_t* engineConfig,
-                                                        const Graph_descriptor* graphDesc) const
+                                                        const GraphDescriptor* graphDesc) const
 {
     THROW_IF_NULL(engineConfig, HIPDNN_STATUS_BAD_PARAM, "Engine config cannot be null");
     THROW_IF_NULL(graphDesc, HIPDNN_STATUS_BAD_PARAM, "Graph descriptor cannot be null");
@@ -324,7 +324,7 @@ hipdnnEnginePluginExecutionContext_t
                                "Invalid engine ID: " + std::to_string(engineId));
     }
 
-    auto serializedGraphData = graphDesc->get_serialized_graph();
+    auto serializedGraphData = graphDesc->getSerializedGraph();
 
     auto handle = it->second;
     auto plugin = _handleToPlugin.at(handle);
@@ -346,7 +346,7 @@ std::shared_ptr<const EngineExecutionContextWrapper>
         const std::shared_ptr<EnginePluginResourceManager>& rm,
         int64_t engineId,
         const hipdnnPluginConstData_t* engineConfig,
-        const Graph_descriptor* graphDesc)
+        const GraphDescriptor* graphDesc)
 {
     return std::make_shared<EngineExecutionContextWrapper>(rm, engineId, engineConfig, graphDesc);
 }
@@ -367,26 +367,26 @@ void EnginePluginResourceManager::executeOpGraph(
 void EnginePluginResourceManager::executeOpGraph(hipdnnBackendDescriptor_t executionPlan,
                                                  hipdnnBackendDescriptor_t variantPack) const
 {
-    auto executionPlanDesc = executionPlan->as_descriptor<Execution_plan_descriptor>();
-    auto variantPackDesc = variantPack->as_descriptor<Variant_descriptor>();
+    auto executionPlanDesc = executionPlan->asDescriptor<ExecutionPlanDescriptor>();
+    auto variantPackDesc = variantPack->asDescriptor<VariantDescriptor>();
 
-    THROW_IF_FALSE(executionPlanDesc->is_finalized(),
+    THROW_IF_FALSE(executionPlanDesc->isFinalized(),
                    HIPDNN_STATUS_BAD_PARAM,
                    "Engine_plugin_resource_manager::execute_op_graph failed: executionPlanDesc "
                    "is not finalized");
 
-    THROW_IF_FALSE(variantPackDesc->is_finalized(),
+    THROW_IF_FALSE(variantPackDesc->isFinalized(),
                    HIPDNN_STATUS_BAD_PARAM,
                    "Engine_plugin_resource_manager::execute_op_graph failed: variantPackDesc is "
                    "not finalized");
 
-    auto config = executionPlanDesc->get_engine_config();
-    auto engine = config->get_engine();
-    auto engineId = engine->get_engine_id();
-    void* workspace = variantPackDesc->get_workspace();
+    auto config = executionPlanDesc->getEngineConfig();
+    auto engine = config->getEngine();
+    auto engineId = engine->getEngineId();
+    void* workspace = variantPackDesc->getWorkspace();
 
-    auto& tensorIds = variantPackDesc->get_tensor_ids();
-    auto& tensorPointers = variantPackDesc->get_data_pointers();
+    auto& tensorIds = variantPackDesc->getTensorIds();
+    auto& tensorPointers = variantPackDesc->getDataPointers();
 
     THROW_IF_NE(tensorIds.size(),
                 tensorPointers.size(),
@@ -405,7 +405,7 @@ void EnginePluginResourceManager::executeOpGraph(hipdnnBackendDescriptor_t execu
     }
 
     executeOpGraph(engineId,
-                   executionPlanDesc->get_execution_context(),
+                   executionPlanDesc->getExecutionContext(),
                    workspace,
                    deviceBuffers.data(),
                    static_cast<uint32_t>(tensorIds.size()));
@@ -413,7 +413,7 @@ void EnginePluginResourceManager::executeOpGraph(hipdnnBackendDescriptor_t execu
 
 EngineDetailsWrapper::EngineDetailsWrapper(const std::shared_ptr<EnginePluginResourceManager>& rm,
                                            int64_t engineId,
-                                           const Graph_descriptor* graphDesc)
+                                           const GraphDescriptor* graphDesc)
     : _rm(rm)
 {
     _rm->getEngineDetails(engineId, graphDesc, &_engineDetailsData);
@@ -481,7 +481,7 @@ EngineExecutionContextWrapper::EngineExecutionContextWrapper(
     const std::shared_ptr<EnginePluginResourceManager>& rm,
     int64_t engineId,
     const hipdnnPluginConstData_t* engineConfig,
-    const Graph_descriptor* graphDesc)
+    const GraphDescriptor* graphDesc)
     : _rm(rm)
     , _engineId(engineId)
 {

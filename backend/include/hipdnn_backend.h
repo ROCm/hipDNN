@@ -29,7 +29,7 @@ typedef struct hipdnnHandle* hipdnnHandle_t;
 /*!
 * @brief Creates the hipdnnBackendDescriptor_t type
 */
-typedef struct hipdnnBackendDescriptor* hipdnnBackendDescriptor_t;
+typedef struct HipdnnBackendDescriptor* hipdnnBackendDescriptor_t;
 
 /*! @brief Creates a hipdnnHandle_t
  *

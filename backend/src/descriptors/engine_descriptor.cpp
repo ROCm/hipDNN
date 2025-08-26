@@ -11,53 +11,53 @@
 namespace hipdnn_backend
 {
 
-void Engine_descriptor::finalize()
+void EngineDescriptor::finalize()
 {
-    THROW_IF_TRUE(is_finalized(),
+    THROW_IF_TRUE(isFinalized(),
                   HIPDNN_STATUS_BAD_PARAM,
-                  "Engine_descriptor::finalize() failed: Already finalized.");
+                  "EngineDescriptor::finalize() failed: Already finalized.");
 
     THROW_IF_NULL(
-        _graph, HIPDNN_STATUS_BAD_PARAM, "Engine_descriptor::finalize() failed: Graph is not set.");
+        _graph, HIPDNN_STATUS_BAD_PARAM, "EngineDescriptor::finalize() failed: Graph is not set.");
 
-    THROW_IF_FALSE(_engine_id_set,
+    THROW_IF_FALSE(_engineIdSet,
                    HIPDNN_STATUS_BAD_PARAM,
-                   "Engine_descriptor::finalize() failed: Engine id is not set.");
+                   "EngineDescriptor::finalize() failed: Engine id is not set.");
 
-    auto handle = _graph->get_handle();
-    auto plugin_resource_manager = handle->get_plugin_resource_manager();
+    auto handle = _graph->getHandle();
+    auto pluginResourceManager = handle->get_plugin_resource_manager();
 
-    auto engine_ids = plugin_resource_manager->getApplicableEngineIds(_graph.get());
-    if(std::ranges::find(engine_ids, _engine_id) == engine_ids.end())
+    auto engineIds = pluginResourceManager->getApplicableEngineIds(_graph.get());
+    if(std::ranges::find(engineIds, _engineId) == engineIds.end())
     {
         throw Hipdnn_exception(HIPDNN_STATUS_BAD_PARAM,
-                               "Engine_descriptor::finalize() failed: Engine id is not in a valid "
+                               "EngineDescriptor::finalize() failed: Engine id is not in a valid "
                                "range of engine IDs");
     }
 
-    _engine_details = plugin::EnginePluginResourceManager::getEngineDetails(
-        plugin_resource_manager, _engine_id, _graph.get());
+    _engineDetails = plugin::EnginePluginResourceManager::getEngineDetails(
+        pluginResourceManager, _engineId, _graph.get());
 
-    hipdnnBackendDescriptorImpl<Engine_descriptor>::finalize();
+    HipdnnBackendDescriptorImpl<EngineDescriptor>::finalize();
 }
 
-void Engine_descriptor::get_attribute(hipdnnBackendAttributeName_t attribute_name,
-                                      [[maybe_unused]] hipdnnBackendAttributeType_t attribute_type,
-                                      [[maybe_unused]] int64_t requested_element_count,
-                                      [[maybe_unused]] int64_t* element_count,
-                                      [[maybe_unused]] void* array_of_elements) const
+void EngineDescriptor::getAttribute(hipdnnBackendAttributeName_t attributeName,
+                                    [[maybe_unused]] hipdnnBackendAttributeType_t attributeType,
+                                    [[maybe_unused]] int64_t requestedElementCount,
+                                    [[maybe_unused]] int64_t* elementCount,
+                                    [[maybe_unused]] void* arrayOfElements) const
 {
-    THROW_IF_FALSE(is_finalized(),
+    THROW_IF_FALSE(isFinalized(),
                    HIPDNN_STATUS_NOT_INITIALIZED,
-                   "Engine_descriptor::get_attribute() failed: Not finalized.");
+                   "EngineDescriptor::getAttribute() failed: Not finalized.");
 
-    switch(attribute_name)
+    switch(attributeName)
     {
     case HIPDNN_ATTR_ENGINE_OPERATION_GRAPH:
-        get_graph(attribute_type, requested_element_count, element_count, array_of_elements);
+        getGraph(attributeType, requestedElementCount, elementCount, arrayOfElements);
         break;
     case HIPDNN_ATTR_ENGINE_GLOBAL_INDEX:
-        get_global_id(attribute_type, requested_element_count, element_count, array_of_elements);
+        getGlobalId(attributeType, requestedElementCount, elementCount, arrayOfElements);
         break;
     case HIPDNN_ATTR_ENGINE_KNOB_INFO:
     case HIPDNN_ATTR_ENGINE_NUMERICAL_NOTE:
@@ -68,82 +68,82 @@ void Engine_descriptor::get_attribute(hipdnnBackendAttributeName_t attribute_nam
     default:
         throw Hipdnn_exception(
             HIPDNN_STATUS_NOT_SUPPORTED,
-            std::string("Engine_descriptor::get_attribute() is not supported for attribute ")
-                + hipdnn_backend::hipdnn_get_attribute_name_string(attribute_name) + ".");
+            std::string("EngineDescriptor::getAttribute() is not supported for attribute ")
+                + hipdnn_backend::hipdnn_get_attribute_name_string(attributeName) + ".");
     }
 }
 
-void Engine_descriptor::get_graph(hipdnnBackendAttributeType_t attribute_type,
-                                  int64_t requested_element_count,
-                                  int64_t* element_count,
-                                  void* array_of_elements) const
+void EngineDescriptor::getGraph(hipdnnBackendAttributeType_t attributeType,
+                                int64_t requestedElementCount,
+                                int64_t* elementCount,
+                                void* arrayOfElements) const
 {
 
-    THROW_IF_NE(attribute_type,
+    THROW_IF_NE(attributeType,
                 HIPDNN_TYPE_BACKEND_DESCRIPTOR,
                 HIPDNN_STATUS_BAD_PARAM,
-                "Engine_descriptor failed to get graph: Invalid attribute type.");
+                "EngineDescriptor failed to get graph: Invalid attribute type.");
 
-    THROW_IF_NE(requested_element_count,
+    THROW_IF_NE(requestedElementCount,
                 1,
                 HIPDNN_STATUS_BAD_PARAM,
-                "Engine_descriptor failed to get graph: Invalid element count.");
+                "EngineDescriptor failed to get graph: Invalid element count.");
 
-    THROW_IF_NULL(array_of_elements,
+    THROW_IF_NULL(arrayOfElements,
                   HIPDNN_STATUS_BAD_PARAM_NULL_POINTER,
-                  "Engine_descriptor failed to get graph: Null pointer.");
+                  "EngineDescriptor failed to get graph: Null pointer.");
 
-    if(element_count != nullptr)
+    if(elementCount != nullptr)
     {
-        *element_count = 1;
+        *elementCount = 1;
     }
 
-    hipdnnBackendDescriptor::pack_descriptor(_graph, array_of_elements);
+    HipdnnBackendDescriptor::packDescriptor(_graph, arrayOfElements);
 }
 
-void Engine_descriptor::get_global_id(hipdnnBackendAttributeType_t attribute_type,
-                                      int64_t requested_element_count,
-                                      int64_t* element_count,
-                                      void* array_of_elements) const
+void EngineDescriptor::getGlobalId(hipdnnBackendAttributeType_t attributeType,
+                                   int64_t requestedElementCount,
+                                   int64_t* elementCount,
+                                   void* arrayOfElements) const
 {
-    THROW_IF_NE(attribute_type,
+    THROW_IF_NE(attributeType,
                 HIPDNN_TYPE_INT64,
                 HIPDNN_STATUS_BAD_PARAM,
-                "Engine_descriptor failed to get global engine ID: Invalid attribute type.");
+                "EngineDescriptor failed to get global engine ID: Invalid attribute type.");
 
-    THROW_IF_NE(requested_element_count,
+    THROW_IF_NE(requestedElementCount,
                 1,
                 HIPDNN_STATUS_BAD_PARAM,
-                "Engine_descriptor failed to get global engine ID: Invalid element count.");
+                "EngineDescriptor failed to get global engine ID: Invalid element count.");
 
-    THROW_IF_NULL(array_of_elements,
+    THROW_IF_NULL(arrayOfElements,
                   HIPDNN_STATUS_BAD_PARAM_NULL_POINTER,
-                  "Engine_descriptor failed to get global engine ID: Null pointer.");
+                  "EngineDescriptor failed to get global engine ID: Null pointer.");
 
-    if(element_count != nullptr)
+    if(elementCount != nullptr)
     {
-        *element_count = 1;
+        *elementCount = 1;
     }
 
-    *static_cast<int64_t*>(array_of_elements) = _engine_id;
+    *static_cast<int64_t*>(arrayOfElements) = _engineId;
 }
 
-void Engine_descriptor::set_attribute(hipdnnBackendAttributeName_t attribute_name,
-                                      hipdnnBackendAttributeType_t attribute_type,
-                                      int64_t element_count,
-                                      const void* array_of_elements)
+void EngineDescriptor::setAttribute(hipdnnBackendAttributeName_t attributeName,
+                                    hipdnnBackendAttributeType_t attributeType,
+                                    int64_t elementCount,
+                                    const void* arrayOfElements)
 {
-    THROW_IF_TRUE(is_finalized(),
+    THROW_IF_TRUE(isFinalized(),
                   HIPDNN_STATUS_NOT_INITIALIZED,
-                  "Engine_descriptor::set_attribute() failed: Already finalized.");
+                  "EngineDescriptor::setAttribute() failed: Already finalized.");
 
-    switch(attribute_name)
+    switch(attributeName)
     {
     case HIPDNN_ATTR_ENGINE_OPERATION_GRAPH:
-        set_graph(attribute_type, element_count, array_of_elements);
+        setGraph(attributeType, elementCount, arrayOfElements);
         break;
     case HIPDNN_ATTR_ENGINE_GLOBAL_INDEX:
-        set_global_id(attribute_type, element_count, array_of_elements);
+        setGlobalId(attributeType, elementCount, arrayOfElements);
         break;
     case HIPDNN_ATTR_ENGINE_KNOB_INFO:
     case HIPDNN_ATTR_ENGINE_NUMERICAL_NOTE:
@@ -154,78 +154,78 @@ void Engine_descriptor::set_attribute(hipdnnBackendAttributeName_t attribute_nam
     default:
         throw Hipdnn_exception(
             HIPDNN_STATUS_NOT_SUPPORTED,
-            std::string("Engine_descriptor::set_attribute() is not supported for attribute ")
-                + hipdnn_backend::hipdnn_get_attribute_name_string(attribute_name) + ".");
+            std::string("EngineDescriptor::setAttribute() is not supported for attribute ")
+                + hipdnn_backend::hipdnn_get_attribute_name_string(attributeName) + ".");
     }
 }
 
-void Engine_descriptor::set_graph(hipdnnBackendAttributeType_t attribute_type,
-                                  int64_t element_count,
-                                  const void* array_of_elements)
+void EngineDescriptor::setGraph(hipdnnBackendAttributeType_t attributeType,
+                                int64_t elementCount,
+                                const void* arrayOfElements)
 {
-    THROW_IF_NE(attribute_type,
+    THROW_IF_NE(attributeType,
                 HIPDNN_TYPE_BACKEND_DESCRIPTOR,
                 HIPDNN_STATUS_BAD_PARAM,
-                "Engine_descriptor failed to set graph: Invalid attribute type.");
+                "EngineDescriptor failed to set graph: Invalid attribute type.");
 
-    THROW_IF_NE(element_count,
+    THROW_IF_NE(elementCount,
                 1,
                 HIPDNN_STATUS_BAD_PARAM,
-                "Engine_descriptor failed to set graph: Invalid element count.");
+                "EngineDescriptor failed to set graph: Invalid element count.");
 
-    auto graph = hipdnnBackendDescriptor::unpack_descriptor<const Graph_descriptor>(
-        array_of_elements,
+    auto graph = HipdnnBackendDescriptor::unpackDescriptor<const GraphDescriptor>(
+        arrayOfElements,
         HIPDNN_STATUS_BAD_PARAM_NULL_POINTER,
-        "Engine_descriptor failed to set graph: Graph is null.");
+        "EngineDescriptor failed to set graph: Graph is null.");
 
-    THROW_IF_FALSE(graph->is_finalized(),
+    THROW_IF_FALSE(graph->isFinalized(),
                    HIPDNN_STATUS_BAD_PARAM_NOT_FINALIZED,
-                   "Engine_descriptor failed to set graph: Graph is not finalized.");
+                   "EngineDescriptor failed to set graph: Graph is not finalized.");
 
     _graph = graph;
 }
 
-void Engine_descriptor::set_global_id(hipdnnBackendAttributeType_t attribute_type,
-                                      int64_t element_count,
-                                      const void* array_of_elements)
+void EngineDescriptor::setGlobalId(hipdnnBackendAttributeType_t attributeType,
+                                   int64_t elementCount,
+                                   const void* arrayOfElements)
 {
-    THROW_IF_NE(attribute_type,
+    THROW_IF_NE(attributeType,
                 HIPDNN_TYPE_INT64,
                 HIPDNN_STATUS_BAD_PARAM,
                 "Engine failed to set engine id: Invalid attribute type.");
 
-    THROW_IF_NE(element_count,
+    THROW_IF_NE(elementCount,
                 1,
                 HIPDNN_STATUS_BAD_PARAM,
                 "Engine failed to set engine id: Invalid element count.");
 
-    THROW_IF_NULL(array_of_elements,
+    THROW_IF_NULL(arrayOfElements,
                   HIPDNN_STATUS_BAD_PARAM_NULL_POINTER,
                   "Engine failed to set engine id: Null pointer.");
 
-    _engine_id = *static_cast<const int64_t*>(array_of_elements);
-    _engine_id_set = true;
+    _engineId = *static_cast<const int64_t*>(arrayOfElements);
+    _engineIdSet = true;
 }
 
-std::shared_ptr<const Graph_descriptor> Engine_descriptor::get_graph() const
+std::shared_ptr<const GraphDescriptor> EngineDescriptor::getGraph() const
 {
-    THROW_IF_FALSE(is_finalized(),
+    THROW_IF_FALSE(isFinalized(),
                    HIPDNN_STATUS_INTERNAL_ERROR,
-                   "Engine_descriptor::get_graph() failed: Not finalized.");
+                   "EngineDescriptor::getGraph() failed: Not finalized.");
 
     return _graph;
 }
 
-int64_t Engine_descriptor::get_engine_id() const
+int64_t EngineDescriptor::getEngineId() const
 {
-    THROW_IF_FALSE(is_finalized(),
+    THROW_IF_FALSE(isFinalized(),
                    HIPDNN_STATUS_INTERNAL_ERROR,
-                   "Engine_descriptor::get_engine_id() failed: Not finalized.");
+                   "EngineDescriptor::getEngineId() failed: Not finalized.");
 
-    return _engine_id;
+    return _engineId;
 }
 
-hipdnnBackendDescriptorType_t Engine_descriptor::get_static_type()
+hipdnnBackendDescriptorType_t EngineDescriptor::getStaticType()
 {
     return HIPDNN_BACKEND_ENGINE_DESCRIPTOR;
 }

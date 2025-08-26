@@ -14,15 +14,15 @@
 
 using namespace hipdnn_backend;
 
-class Graph_descriptor_test : public ::testing::Test
+class GraphDescriptorTest : public ::testing::Test
 {
 public:
-    static flatbuffers::FlatBufferBuilder create_valid_graph()
+    static flatbuffers::FlatBufferBuilder createValidGraph()
     {
-        return flatbuffer_test_utils::create_valid_graph();
+        return flatbuffer_test_utils::createValidGraph();
     }
 
-    static void verify_graph(const hipdnn_sdk::data_objects::GraphT& graph)
+    static void verifyGraph(const hipdnn_sdk::data_objects::GraphT& graph)
     {
         EXPECT_EQ(graph.name, "test");
         EXPECT_EQ(graph.compute_type, hipdnn_sdk::data_objects::DataType_FLOAT);
@@ -33,78 +33,78 @@ public:
     }
 };
 
-TEST_F(Graph_descriptor_test, SerializeDeserializeGraph)
+TEST_F(GraphDescriptorTest, SerializeDeserializeGraph)
 {
-    auto builder = create_valid_graph();
-    auto serialized_graph = builder.Release();
+    auto builder = createValidGraph();
+    auto serializedGraph = builder.Release();
 
-    Graph_descriptor descriptor;
-    descriptor.deserialize_graph(serialized_graph.data(), serialized_graph.size());
+    GraphDescriptor descriptor;
+    descriptor.deserializeGraph(serializedGraph.data(), serializedGraph.size());
 
-    auto output = descriptor.get_serialized_graph();
+    auto output = descriptor.getSerializedGraph();
     flatbuffers::Verifier verifier(static_cast<const uint8_t*>(output.ptr), output.size);
     ASSERT_TRUE(verifier.VerifyBuffer<hipdnn_sdk::data_objects::Graph>());
 }
 
-TEST_F(Graph_descriptor_test, WillCorrectlySetGraph)
+TEST_F(GraphDescriptorTest, WillCorrectlySetGraph)
 {
-    auto builder = create_valid_graph();
-    auto serialized_graph = builder.Release();
+    auto builder = createValidGraph();
+    auto serializedGraph = builder.Release();
 
-    Graph_descriptor descriptor;
-    ASSERT_NO_THROW(descriptor.deserialize_graph(serialized_graph.data(), serialized_graph.size()));
+    GraphDescriptor descriptor;
+    ASSERT_NO_THROW(descriptor.deserializeGraph(serializedGraph.data(), serializedGraph.size()));
 
     ASSERT_THROW_HIPDNN_STATUS(descriptor.finalize(), HIPDNN_STATUS_BAD_PARAM);
 
     auto handle = reinterpret_cast<hipdnnHandle_t>(0x12345678);
-    ASSERT_NO_THROW(descriptor.set_attribute(
-        HIPDNN_ATTR_OPERATIONGRAPH_HANDLE, HIPDNN_TYPE_HANDLE, 1, &handle));
+    ASSERT_NO_THROW(
+        descriptor.setAttribute(HIPDNN_ATTR_OPERATIONGRAPH_HANDLE, HIPDNN_TYPE_HANDLE, 1, &handle));
     ASSERT_NO_THROW(descriptor.finalize());
 }
 
-TEST_F(Graph_descriptor_test, WillCorrectlySetGraphReverseOrder)
+TEST_F(GraphDescriptorTest, WillCorrectlySetGraphReverseOrder)
 {
-    auto builder = create_valid_graph();
-    auto serialized_graph = builder.Release();
+    auto builder = createValidGraph();
+    auto serializedGraph = builder.Release();
 
-    Graph_descriptor descriptor;
+    GraphDescriptor descriptor;
     auto handle = reinterpret_cast<hipdnnHandle_t>(0x12345678);
-    ASSERT_NO_THROW(descriptor.set_attribute(
-        HIPDNN_ATTR_OPERATIONGRAPH_HANDLE, HIPDNN_TYPE_HANDLE, 1, &handle));
+    ASSERT_NO_THROW(
+        descriptor.setAttribute(HIPDNN_ATTR_OPERATIONGRAPH_HANDLE, HIPDNN_TYPE_HANDLE, 1, &handle));
 
     ASSERT_THROW_HIPDNN_STATUS(descriptor.finalize(), HIPDNN_STATUS_BAD_PARAM);
 
-    ASSERT_NO_THROW(descriptor.deserialize_graph(serialized_graph.data(), serialized_graph.size()));
+    ASSERT_NO_THROW(descriptor.deserializeGraph(serializedGraph.data(), serializedGraph.size()));
     ASSERT_NO_THROW(descriptor.finalize());
 }
 
-TEST_F(Graph_descriptor_test, WillFailToSetInvalidGraph)
+TEST_F(GraphDescriptorTest, WillFailToSetInvalidGraph)
 {
-    Graph_descriptor descriptor;
-    ASSERT_THROW_HIPDNN_STATUS(descriptor.deserialize_graph(nullptr, 0),
+    GraphDescriptor descriptor;
+    ASSERT_THROW_HIPDNN_STATUS(descriptor.deserializeGraph(nullptr, 0),
                                HIPDNN_STATUS_BAD_PARAM_NULL_POINTER);
 }
 
-TEST_F(Graph_descriptor_test, FinalizeFailInvalidGraph)
+TEST_F(GraphDescriptorTest, FinalizeFailInvalidGraph)
 {
-    Graph_descriptor descriptor;
+    GraphDescriptor descriptor;
     ASSERT_THROW_HIPDNN_STATUS(descriptor.finalize(), HIPDNN_STATUS_BAD_PARAM);
 }
 
-TEST_F(Graph_descriptor_test, GetAttributeReturnsNotSupported)
+TEST_F(GraphDescriptorTest, GetAttributeReturnsNotSupported)
 {
-    Graph_descriptor descriptor;
-    int64_t element_count = 0;
+    GraphDescriptor descriptor;
+    int64_t elementCount = 0;
     ASSERT_THROW_HIPDNN_STATUS(
-        descriptor.get_attribute(
-            HIPDNN_ATTR_ENGINEHEUR_MODE, HIPDNN_TYPE_DATA_TYPE, 0, &element_count, nullptr),
+        descriptor.getAttribute(
+            HIPDNN_ATTR_ENGINEHEUR_MODE, HIPDNN_TYPE_DATA_TYPE, 0, &elementCount, nullptr),
         HIPDNN_STATUS_NOT_SUPPORTED);
 }
 
-TEST_F(Graph_descriptor_test, SetAttributeReturnsNotSupported)
+TEST_F(GraphDescriptorTest, SetAttributeReturnsNotSupported)
 {
-    Graph_descriptor descriptor;
+    GraphDescriptor descriptor;
     ASSERT_THROW_HIPDNN_STATUS(
-        descriptor.set_attribute(HIPDNN_ATTR_ENGINEHEUR_MODE, HIPDNN_TYPE_DATA_TYPE, 0, nullptr),
+        descriptor.setAttribute(HIPDNN_ATTR_ENGINEHEUR_MODE, HIPDNN_TYPE_DATA_TYPE, 0, nullptr),
         HIPDNN_STATUS_NOT_SUPPORTED);
 }

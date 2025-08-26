@@ -10,163 +10,163 @@
 namespace hipdnn_backend
 {
 
-void Variant_descriptor::finalize()
+void VariantDescriptor::finalize()
 {
-    THROW_IF_NE(_data_pointers.size(),
-                _unique_ids.size(),
+    THROW_IF_NE(_dataPointers.size(),
+                _uniqueIds.size(),
                 HIPDNN_STATUS_BAD_PARAM,
                 "Data pointers and unique ids don't match");
     THROW_IF_TRUE(
-        _data_pointers.empty(), HIPDNN_STATUS_BAD_PARAM, "Data pointers and unique ids are empty");
+        _dataPointers.empty(), HIPDNN_STATUS_BAD_PARAM, "Data pointers and unique ids are empty");
 
-    hipdnnBackendDescriptorImpl<Variant_descriptor>::finalize();
+    HipdnnBackendDescriptorImpl<VariantDescriptor>::finalize();
 }
 
-void Variant_descriptor::get_attribute(hipdnnBackendAttributeName_t attribute_name,
-                                       hipdnnBackendAttributeType_t attribute_type,
-                                       int64_t requested_element_count,
-                                       int64_t* element_count,
-                                       void* array_of_elements) const
+void VariantDescriptor::getAttribute(hipdnnBackendAttributeName_t attributeName,
+                                     hipdnnBackendAttributeType_t attributeType,
+                                     int64_t requestedElementCount,
+                                     int64_t* elementCount,
+                                     void* arrayOfElements) const
 {
-    THROW_IF_FALSE(is_finalized(),
+    THROW_IF_FALSE(isFinalized(),
                    HIPDNN_STATUS_NOT_INITIALIZED,
-                   "Variant_descriptor::get_attribute() failed: Not finalized.");
-    THROW_IF_NULL(array_of_elements,
+                   "VariantDescriptor::getAttribute() failed: Not finalized.");
+    THROW_IF_NULL(arrayOfElements,
                   HIPDNN_STATUS_BAD_PARAM_NULL_POINTER,
-                  "Variant_descriptor::get_attribute(): array_of_elements is null");
+                  "VariantDescriptor::getAttribute(): arrayOfElements is null");
 
-    switch(attribute_name)
+    switch(attributeName)
     {
     case HIPDNN_ATTR_VARIANT_PACK_DATA_POINTERS:
-        THROW_IF_FALSE(attribute_type == HIPDNN_TYPE_VOID_PTR,
+        THROW_IF_FALSE(attributeType == HIPDNN_TYPE_VOID_PTR,
                        HIPDNN_STATUS_BAD_PARAM,
-                       "Variant_descriptor::get_attribute(): attribute_type is not "
+                       "VariantDescriptor::getAttribute(): attributeType is not "
                        "HIPDNN_TYPE_VOID_PTR for DATA_POINTERS");
-        THROW_IF_NULL(element_count,
+        THROW_IF_NULL(elementCount,
                       HIPDNN_STATUS_BAD_PARAM_NULL_POINTER,
-                      "Variant_descriptor::get_attribute(): element_count is null");
-        *element_count = std::min<int64_t>(requested_element_count,
-                                           static_cast<int64_t>(_data_pointers.size()));
-        for(size_t i = 0; std::cmp_less(i, *element_count); ++i)
+                      "VariantDescriptor::getAttribute(): elementCount is null");
+        *elementCount
+            = std::min<int64_t>(requestedElementCount, static_cast<int64_t>(_dataPointers.size()));
+        for(size_t i = 0; std::cmp_less(i, *elementCount); ++i)
         {
-            static_cast<void**>(array_of_elements)[i] = const_cast<void*>(_data_pointers[i]);
+            static_cast<void**>(arrayOfElements)[i] = const_cast<void*>(_dataPointers[i]);
         }
         break;
 
     case HIPDNN_ATTR_VARIANT_PACK_UNIQUE_IDS:
-        THROW_IF_FALSE(attribute_type == HIPDNN_TYPE_INT64,
+        THROW_IF_FALSE(attributeType == HIPDNN_TYPE_INT64,
                        HIPDNN_STATUS_BAD_PARAM,
-                       "Variant_descriptor::get_attribute(): attribute_type is not "
+                       "VariantDescriptor::getAttribute(): attributeType is not "
                        "HIPDNN_TYPE_INT64 for UNIQUE_IDS");
-        THROW_IF_NULL(element_count,
+        THROW_IF_NULL(elementCount,
                       HIPDNN_STATUS_BAD_PARAM_NULL_POINTER,
-                      "Variant_descriptor::get_attribute(): element_count is null");
-        *element_count
-            = std::min<int64_t>(requested_element_count, static_cast<int64_t>(_unique_ids.size()));
-        for(size_t i = 0; std::cmp_less(i, *element_count); ++i)
+                      "VariantDescriptor::getAttribute(): elementCount is null");
+        *elementCount
+            = std::min<int64_t>(requestedElementCount, static_cast<int64_t>(_uniqueIds.size()));
+        for(size_t i = 0; std::cmp_less(i, *elementCount); ++i)
         {
-            static_cast<int64_t*>(array_of_elements)[i] = _unique_ids[i];
+            static_cast<int64_t*>(arrayOfElements)[i] = _uniqueIds[i];
         }
         break;
 
     case HIPDNN_ATTR_VARIANT_PACK_WORKSPACE:
-        THROW_IF_FALSE(attribute_type == HIPDNN_TYPE_VOID_PTR,
+        THROW_IF_FALSE(attributeType == HIPDNN_TYPE_VOID_PTR,
                        HIPDNN_STATUS_BAD_PARAM,
-                       "Variant_descriptor::get_attribute(): attribute_type is not "
+                       "VariantDescriptor::getAttribute(): attributeType is not "
                        "HIPDNN_TYPE_VOID_PTR for WORKSPACE");
-        THROW_IF_FALSE(requested_element_count == 1,
+        THROW_IF_FALSE(requestedElementCount == 1,
                        HIPDNN_STATUS_BAD_PARAM,
-                       "Variant_descriptor::get_attribute(): requested_element_count "
+                       "VariantDescriptor::getAttribute(): requestedElementCount "
                        "is not 1 for WORKSPACE");
-        if(element_count != nullptr)
+        if(elementCount != nullptr)
         {
-            *element_count = 1;
+            *elementCount = 1;
         }
 
-        *static_cast<void**>(array_of_elements) = _workspace;
+        *static_cast<void**>(arrayOfElements) = _workspace;
         break;
 
     default:
         throw Hipdnn_exception(HIPDNN_STATUS_NOT_SUPPORTED,
-                               "Variant_descriptor::get_attribute: attribute_name not supported");
+                               "VariantDescriptor::getAttribute: attributeName not supported");
     }
 }
 
-void Variant_descriptor::set_attribute(hipdnnBackendAttributeName_t attribute_name,
-                                       hipdnnBackendAttributeType_t attribute_type,
-                                       int64_t element_count,
-                                       const void* array_of_elements)
+void VariantDescriptor::setAttribute(hipdnnBackendAttributeName_t attributeName,
+                                     hipdnnBackendAttributeType_t attributeType,
+                                     int64_t elementCount,
+                                     const void* arrayOfElements)
 {
-    THROW_IF_TRUE(is_finalized(),
+    THROW_IF_TRUE(isFinalized(),
                   HIPDNN_STATUS_NOT_INITIALIZED,
-                  "Variant_descriptor::set_attribute() failed: Already finalized.");
-    THROW_IF_NULL(array_of_elements,
+                  "VariantDescriptor::setAttribute() failed: Already finalized.");
+    THROW_IF_NULL(arrayOfElements,
                   HIPDNN_STATUS_BAD_PARAM_NULL_POINTER,
-                  "Variant_descriptor::set_attribute(): array_of_elements is null");
+                  "VariantDescriptor::setAttribute(): arrayOfElements is null");
 
-    switch(attribute_name)
+    switch(attributeName)
     {
     case HIPDNN_ATTR_VARIANT_PACK_DATA_POINTERS:
-        THROW_IF_FALSE(attribute_type == HIPDNN_TYPE_VOID_PTR,
+        THROW_IF_FALSE(attributeType == HIPDNN_TYPE_VOID_PTR,
                        HIPDNN_STATUS_BAD_PARAM,
-                       "Variant_descriptor::set_attribute(): attribute_type is not "
+                       "VariantDescriptor::setAttribute(): attributeType is not "
                        "HIPDNN_TYPE_VOID_PTR for DATA_POINTERS");
-        _data_pointers.assign(static_cast<const void* const*>(array_of_elements),
-                              static_cast<const void* const*>(array_of_elements) + element_count);
+        _dataPointers.assign(static_cast<const void* const*>(arrayOfElements),
+                             static_cast<const void* const*>(arrayOfElements) + elementCount);
         break;
 
     case HIPDNN_ATTR_VARIANT_PACK_UNIQUE_IDS:
-        THROW_IF_FALSE(attribute_type == HIPDNN_TYPE_INT64,
+        THROW_IF_FALSE(attributeType == HIPDNN_TYPE_INT64,
                        HIPDNN_STATUS_BAD_PARAM,
-                       "Variant_descriptor::set_attribute(): attribute_type is not "
+                       "VariantDescriptor::setAttribute(): attributeType is not "
                        "HIPDNN_TYPE_INT64 for UNIQUE_IDS");
-        _unique_ids.assign(static_cast<const int64_t*>(array_of_elements),
-                           static_cast<const int64_t*>(array_of_elements) + element_count);
+        _uniqueIds.assign(static_cast<const int64_t*>(arrayOfElements),
+                          static_cast<const int64_t*>(arrayOfElements) + elementCount);
         break;
 
     case HIPDNN_ATTR_VARIANT_PACK_WORKSPACE:
-        THROW_IF_FALSE(attribute_type == HIPDNN_TYPE_VOID_PTR,
+        THROW_IF_FALSE(attributeType == HIPDNN_TYPE_VOID_PTR,
                        HIPDNN_STATUS_BAD_PARAM,
-                       "Variant_descriptor::set_attribute(): attribute_type is not "
+                       "VariantDescriptor::setAttribute(): attributeType is not "
                        "HIPDNN_TYPE_VOID_PTR for WORKSPACE");
-        THROW_IF_FALSE(element_count == 1,
+        THROW_IF_FALSE(elementCount == 1,
                        HIPDNN_STATUS_BAD_PARAM,
-                       "Variant_descriptor::set_attribute(): element_count is not 1 for WORKSPACE");
+                       "VariantDescriptor::setAttribute(): elementCount is not 1 for WORKSPACE");
 
-        _workspace = *static_cast<void* const*>(array_of_elements);
+        _workspace = *static_cast<void* const*>(arrayOfElements);
         break;
 
     default:
         throw Hipdnn_exception(HIPDNN_STATUS_NOT_SUPPORTED,
-                               "Variant_descriptor::set_attribute: attribute_name not supported");
+                               "VariantDescriptor::setAttribute: attributeName not supported");
     }
 }
 
-void* Variant_descriptor::get_workspace() const
+void* VariantDescriptor::getWorkspace() const
 {
-    THROW_IF_FALSE(is_finalized(),
+    THROW_IF_FALSE(isFinalized(),
                    HIPDNN_STATUS_INTERNAL_ERROR,
-                   "Variant_descriptor::get_workspace() failed: Not finalized.");
+                   "VariantDescriptor::getWorkspace() failed: Not finalized.");
     return _workspace;
 }
 
-const std::vector<const void*>& Variant_descriptor::get_data_pointers() const
+const std::vector<const void*>& VariantDescriptor::getDataPointers() const
 {
-    THROW_IF_FALSE(is_finalized(),
+    THROW_IF_FALSE(isFinalized(),
                    HIPDNN_STATUS_INTERNAL_ERROR,
-                   "Variant_descriptor::get_data_pointers() failed: Not finalized.");
-    return _data_pointers;
+                   "VariantDescriptor::getDataPointers() failed: Not finalized.");
+    return _dataPointers;
 }
 
-const std::vector<int64_t>& Variant_descriptor::get_tensor_ids() const
+const std::vector<int64_t>& VariantDescriptor::getTensorIds() const
 {
-    THROW_IF_FALSE(is_finalized(),
+    THROW_IF_FALSE(isFinalized(),
                    HIPDNN_STATUS_INTERNAL_ERROR,
-                   "Variant_descriptor::get_unique_ids() failed: Not finalized.");
-    return _unique_ids;
+                   "VariantDescriptor::getTensorIds() failed: Not finalized.");
+    return _uniqueIds;
 }
 
-hipdnnBackendDescriptorType_t Variant_descriptor::get_static_type()
+hipdnnBackendDescriptorType_t VariantDescriptor::getStaticType()
 {
     return HIPDNN_BACKEND_VARIANT_PACK_DESCRIPTOR;
 }

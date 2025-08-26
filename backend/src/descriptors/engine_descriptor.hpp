@@ -8,58 +8,58 @@
 namespace hipdnn_backend
 {
 
-class Graph_descriptor;
+class GraphDescriptor;
 
 namespace plugin
 {
 class EngineDetailsWrapper;
 }
 
-class Engine_descriptor : public hipdnnBackendDescriptorImpl<Engine_descriptor>
+class EngineDescriptor : public HipdnnBackendDescriptorImpl<EngineDescriptor>
 {
 private:
-    std::shared_ptr<const Graph_descriptor> _graph;
-    int64_t _engine_id;
-    bool _engine_id_set = false;
-    std::shared_ptr<const plugin::EngineDetailsWrapper> _engine_details;
+    std::shared_ptr<const GraphDescriptor> _graph;
+    int64_t _engineId;
+    bool _engineIdSet = false;
+    std::shared_ptr<const plugin::EngineDetailsWrapper> _engineDetails;
 
-    void set_graph(hipdnnBackendAttributeType_t attribute_type,
-                   int64_t element_count,
-                   const void* array_of_elements);
+    void setGraph(hipdnnBackendAttributeType_t attributeType,
+                  int64_t elementCount,
+                  const void* arrayOfElements);
 
-    void get_graph(hipdnnBackendAttributeType_t attribute_type,
-                   int64_t requested_element_count,
-                   int64_t* element_count,
-                   void* array_of_elements) const;
+    void getGraph(hipdnnBackendAttributeType_t attributeType,
+                  int64_t requestedElementCount,
+                  int64_t* elementCount,
+                  void* arrayOfElements) const;
 
-    void set_global_id(hipdnnBackendAttributeType_t attribute_type,
-                       int64_t element_count,
-                       const void* array_of_elements);
+    void setGlobalId(hipdnnBackendAttributeType_t attributeType,
+                     int64_t elementCount,
+                     const void* arrayOfElements);
 
-    void get_global_id(hipdnnBackendAttributeType_t attribute_type,
-                       int64_t requested_element_count,
-                       int64_t* element_count,
-                       void* array_of_elements) const;
+    void getGlobalId(hipdnnBackendAttributeType_t attributeType,
+                     int64_t requestedElementCount,
+                     int64_t* elementCount,
+                     void* arrayOfElements) const;
 
 public:
     void finalize() override;
 
-    void get_attribute(hipdnnBackendAttributeName_t attribute_name,
-                       hipdnnBackendAttributeType_t attribute_type,
-                       int64_t requested_element_count,
-                       int64_t* element_count,
-                       void* array_of_elements) const override;
+    void getAttribute(hipdnnBackendAttributeName_t attributeName,
+                      hipdnnBackendAttributeType_t attributeType,
+                      int64_t requestedElementCount,
+                      int64_t* elementCount,
+                      void* arrayOfElements) const override;
 
-    void set_attribute(hipdnnBackendAttributeName_t attribute_name,
-                       hipdnnBackendAttributeType_t attribute_type,
-                       int64_t element_count,
-                       const void* array_of_elements) override;
+    void setAttribute(hipdnnBackendAttributeName_t attributeName,
+                      hipdnnBackendAttributeType_t attributeType,
+                      int64_t elementCount,
+                      const void* arrayOfElements) override;
 
     // These getters throw an exception if the descriptor is not finalized.
-    virtual std::shared_ptr<const Graph_descriptor> get_graph() const;
-    virtual int64_t get_engine_id() const;
+    virtual std::shared_ptr<const GraphDescriptor> getGraph() const;
+    virtual int64_t getEngineId() const;
 
-    static hipdnnBackendDescriptorType_t get_static_type();
+    static hipdnnBackendDescriptorType_t getStaticType();
 };
 
 } // namespace hipdnn_backend

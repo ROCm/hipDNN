@@ -173,7 +173,7 @@ TEST_F(Plugin_loading_tests, IncorrectEngineID)
 
     ASSERT_EQ(
         std::string{buffer.data()},
-        "Engine_descriptor::finalize() failed: Engine id is not in a valid range of engine IDs");
+        "EngineDescriptor::finalize() failed: Engine id is not in a valid range of engine IDs");
 }
 
 TEST_F(Plugin_loading_tests, DuplicateEngineIds)
