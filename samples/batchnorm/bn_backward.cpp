@@ -38,8 +38,8 @@ void Sample_runner::operator()(const Tensor_layout& layout)
         .set_intermediate_data_type(intermediate_type)
         .set_compute_data_type(intermediate_type);
 
-    auto dy = create_tensor({N, C, H, W}, input_type);
-    auto x = create_tensor({N, C, H, W}, input_type);
+    auto dy = create_tensor({N, C, H, W}, input_type, layout);
+    auto x = create_tensor({N, C, H, W}, input_type, layout);
     auto scale = create_tensor({1, C, 1, 1}, intermediate_type);
     auto saved_mean = create_tensor({1, C, 1, 1}, intermediate_type);
     auto saved_inv_variance = create_tensor({1, C, 1, 1}, intermediate_type);

@@ -123,15 +123,14 @@ void run(F&& f)
 }
 
 inline std::shared_ptr<hipdnn_frontend::graph::Tensor_attributes>
-    create_tensor(const std::vector<int64_t>& dims, hipdnn_frontend::DataType_t data_type)
+    create_tensor(const std::vector<int64_t>& dims,
+                  hipdnn_frontend::DataType_t data_type,
+                  const Tensor_layout& layout = Tensor_layout::NCHW)
 {
     auto tensor = std::make_shared<hipdnn_frontend::graph::Tensor_attributes>();
     tensor->set_dim(dims).set_data_type(data_type);
+    tensor->set_stride(hipdnn_sdk::utilities::generate_strides(dims, layout.stride_order));
 
-    std::vector<int64_t> stride_order(dims.size());
-    std::iota(stride_order.rbegin(), stride_order.rend(), 0);
-
-    tensor->set_stride(hipdnn_sdk::utilities::generate_strides(dims, stride_order));
     return tensor;
 }
 
