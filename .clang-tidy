@@ -43,3 +43,4 @@ CheckOptions:
 #  - { key: readability-identifier-naming.EnumCase,                value: Leading_upper_snake_case  }
 #  - { key: readability-identifier-naming.EnumConstantCase,        value: UPPER_CASE }
   - { key: readability-identifier-naming.GlobalConstantCase,      value: UPPER_CASE }
+  - { key: readability-identifier-naming.StaticVariablePrefix,      value: s_ }
