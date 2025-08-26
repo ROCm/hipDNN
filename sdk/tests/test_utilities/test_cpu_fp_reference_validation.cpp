@@ -33,7 +33,7 @@ TEST(CpuFpReferenceValidation, BasicBFloat16Usage)
     auto buffer1 = create_buffer<hip_bfloat16>(100, 1.0_bf);
     auto buffer2 = create_buffer<hip_bfloat16>(100, 1.0_bf);
 
-    EXPECT_TRUE(ref_validation.compare_buffers(buffer1, buffer2));
+    EXPECT_TRUE(ref_validation.all_close(buffer1, buffer2));
 }
 
 TEST(CpuFpReferenceValidation, BasicHalfUsage)
@@ -43,7 +43,7 @@ TEST(CpuFpReferenceValidation, BasicHalfUsage)
     auto buffer1 = create_buffer<half>(100, 1.0_h);
     auto buffer2 = create_buffer<half>(100, 1.0_h);
 
-    EXPECT_TRUE(ref_validation.compare_buffers(buffer1, buffer2));
+    EXPECT_TRUE(ref_validation.all_close(buffer1, buffer2));
 }
 
 TEST(CpuFpReferenceValidation, BasicFloatUsage)
@@ -53,7 +53,7 @@ TEST(CpuFpReferenceValidation, BasicFloatUsage)
     auto buffer1 = create_buffer<float>(100, 1.0f);
     auto buffer2 = create_buffer<float>(100, 1.0f);
 
-    EXPECT_TRUE(ref_validation.compare_buffers(buffer1, buffer2));
+    EXPECT_TRUE(ref_validation.all_close(buffer1, buffer2));
 }
 
 TEST(CpuFpReferenceValidation, BasicDoubleUsage)
@@ -63,7 +63,7 @@ TEST(CpuFpReferenceValidation, BasicDoubleUsage)
     auto buffer1 = create_buffer<double>(100, 1.0);
     auto buffer2 = create_buffer<double>(100, 1.0);
 
-    EXPECT_TRUE(ref_validation.compare_buffers(buffer1, buffer2));
+    EXPECT_TRUE(ref_validation.all_close(buffer1, buffer2));
 }
 
 TEST(CpuFpReferenceValidation, BFloat16NotComparable)
@@ -73,7 +73,7 @@ TEST(CpuFpReferenceValidation, BFloat16NotComparable)
     auto buffer1 = create_buffer<hip_bfloat16>(100, 1.0_bf);
     auto buffer2 = create_buffer<hip_bfloat16>(100, 2.0_bf);
 
-    EXPECT_FALSE(ref_validation.compare_buffers(buffer1, buffer2));
+    EXPECT_FALSE(ref_validation.all_close(buffer1, buffer2));
 }
 
 TEST(CpuFpReferenceValidation, HalfNotComparable)
@@ -83,7 +83,7 @@ TEST(CpuFpReferenceValidation, HalfNotComparable)
     auto buffer1 = create_buffer<half>(100, 1.0_h);
     auto buffer2 = create_buffer<half>(100, 2.0_h);
 
-    EXPECT_FALSE(ref_validation.compare_buffers(buffer1, buffer2));
+    EXPECT_FALSE(ref_validation.all_close(buffer1, buffer2));
 }
 
 TEST(CpuFpReferenceValidation, FloatNotComparable)
@@ -93,7 +93,7 @@ TEST(CpuFpReferenceValidation, FloatNotComparable)
     auto buffer1 = create_buffer<float>(100, 1.0f);
     auto buffer2 = create_buffer<float>(100, 2.0f);
 
-    EXPECT_FALSE(ref_validation.compare_buffers(buffer1, buffer2));
+    EXPECT_FALSE(ref_validation.all_close(buffer1, buffer2));
 }
 
 TEST(CpuFpReferenceValidation, DoubleNotComparable)
@@ -103,7 +103,7 @@ TEST(CpuFpReferenceValidation, DoubleNotComparable)
     auto buffer1 = create_buffer<double>(100, 1.0);
     auto buffer2 = create_buffer<double>(100, 2.0);
 
-    EXPECT_FALSE(ref_validation.compare_buffers(buffer1, buffer2));
+    EXPECT_FALSE(ref_validation.all_close(buffer1, buffer2));
 }
 
 TEST(CpuFpReferenceValidation, ToleranceComparison)
@@ -115,8 +115,8 @@ TEST(CpuFpReferenceValidation, ToleranceComparison)
     auto buffer2 = create_buffer<double>(100, 1.000001);
 
     // Set a very small tolerance
-    EXPECT_TRUE(ref_validation_high_tolerance.compare_buffers(buffer1, buffer2));
+    EXPECT_TRUE(ref_validation_high_tolerance.all_close(buffer1, buffer2));
 
     // Change the tolerance to a larger value
-    EXPECT_FALSE(ref_validation_low_tolerance.compare_buffers(buffer1, buffer2));
+    EXPECT_FALSE(ref_validation_low_tolerance.all_close(buffer1, buffer2));
 }

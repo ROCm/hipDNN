@@ -14,30 +14,14 @@
 #include <hipdnn_sdk/utilities/hip_bfloat16_utils.hpp>
 #include <hipdnn_sdk/utilities/tensor.hpp>
 
+#include "common/test_operations_common.hpp"
 #include "hipdnn_engine_plugin_execution_context.hpp"
 #include "hipdnn_engine_plugin_handle.hpp"
 
 using namespace hipdnn_sdk::reference_test_utilities;
+using namespace test_operations_common;
 
-struct Bn_2d_test_case
-{
-    int64_t n;
-    int64_t c;
-    int64_t h;
-    int64_t w;
-
-    friend std::ostream& operator<<(std::ostream& ss, const Bn_2d_test_case& tc)
-    {
-        return ss << "(n:" << tc.n << " c:" << tc.c << " h:" << tc.h << " w:" << tc.w << ")";
-    }
-
-    std::vector<int64_t> get_dims() const
-    {
-        return {n, c, h, w};
-    }
-};
-
-class Batchnorm_execute_graph_test : public ::testing::TestWithParam<Bn_2d_test_case>
+class Batchnorm_fwd_infer_execute_graph_test : public ::testing::TestWithParam<Bn_2d_test_case>
 {
 protected:
     // NOLINTNEXTLINE(readability-identifier-naming)
@@ -59,7 +43,7 @@ protected:
 
     template <typename Input_type, typename Intermediate_type>
     // NOLINTNEXTLINE(readability-identifier-naming)
-    void RunFwdbatchnormGraph(Bn_2d_test_case test_case,
+    void RunFwdBatchnormGraph(Bn_2d_test_case test_case,
                               hipdnn_sdk::data_objects::DataType input_data_type,
                               Input_type epsilon,
                               const Tensor_layout& layout);
@@ -67,102 +51,62 @@ protected:
     hipdnnEnginePluginHandle_t _handle = nullptr;
 };
 
-std::vector<Bn_2d_test_case> get_bn_fwd_inference_test_cases()
-{
-    return {
-        {.n = 1, .c = 3, .h = 14, .w = 14},
-        {.n = 2, .c = 3, .h = 14, .w = 14},
-        {.n = 64, .c = 3, .h = 14, .w = 14},
-        // TODO: Move to integration tests for MIOpen plugin
-        // {.n = 64, .c = 256, .h = 14, .w = 14},
-        // {.n = 64, .c = 256, .h = 28, .w = 28},
-        // {.n = 64, .c = 256, .h = 56, .w = 56},
-        // {.n = 64, .c = 512, .h = 14, .w = 14},
-        // {.n = 64, .c = 512, .h = 28, .w = 28},
-        // {.n = 64, .c = 512, .h = 7, .w = 7},
-        // {.n = 64, .c = 64, .h = 112, .w = 112},
-        // {.n = 64, .c = 64, .h = 56, .w = 56},
-    };
-}
-
-template <typename T>
-hipdnnPluginDeviceBuffer_t generate_random_device_buffer(
-    Tensor_interface<T>& tensor, int uid, T min, T max, unsigned int seed = 0)
-{
-    tensor.fill_with_random_values(min, max, seed);
-    hipdnnPluginDeviceBuffer_t buffer;
-    buffer.uid = uid;
-    buffer.ptr = tensor.memory().device_data();
-    return buffer;
-}
-
-template <typename T>
-hipdnnPluginDeviceBuffer_t
-    generate_static_device_buffer(Tensor_interface<T>& tensor, int uid, T value)
-{
-    tensor.fill_with_value(value);
-    hipdnnPluginDeviceBuffer_t buffer;
-    buffer.uid = uid;
-    buffer.ptr = tensor.memory().device_data();
-    return buffer;
-}
-
-TEST_P(Batchnorm_execute_graph_test, RunFloatFwdbatchnormGraphNCHW)
+TEST_P(Batchnorm_fwd_infer_execute_graph_test, RunFloatFwdBatchnormGraphNCHW)
 {
     Bn_2d_test_case test_case = GetParam();
-    RunFwdbatchnormGraph<float, float>(
+    RunFwdBatchnormGraph<float, float>(
         test_case, hipdnn_sdk::data_objects::DataType::DataType_FLOAT, 1e-6f, Tensor_layout::NCHW);
 }
 
-TEST_F(Batchnorm_execute_graph_test, RunBfloat16FwdbatchnormGraphNCHW)
+TEST_F(Batchnorm_fwd_infer_execute_graph_test, RunBfloat16FwdBatchnormGraphNCHW)
 {
     Bn_2d_test_case test_case = {.n = 1, .c = 3, .h = 14, .w = 14};
-    RunFwdbatchnormGraph<hip_bfloat16, float>(test_case,
+    RunFwdBatchnormGraph<hip_bfloat16, float>(test_case,
                                               hipdnn_sdk::data_objects::DataType::DataType_BFLOAT16,
                                               1e-2_bf,
                                               Tensor_layout::NCHW);
 }
 
-TEST_F(Batchnorm_execute_graph_test, RunHalfFwdbatchnormGraphNCHW)
+TEST_F(Batchnorm_fwd_infer_execute_graph_test, RunHalfFwdBatchnormGraphNCHW)
 {
     Bn_2d_test_case test_case = {.n = 1, .c = 3, .h = 14, .w = 14};
-    RunFwdbatchnormGraph<half, float>(
+    RunFwdBatchnormGraph<half, float>(
         test_case, hipdnn_sdk::data_objects::DataType::DataType_HALF, 1e-2_h, Tensor_layout::NCHW);
 }
 
-TEST_P(Batchnorm_execute_graph_test, RunFloatFwdbatchnormGraphNHWC)
+TEST_P(Batchnorm_fwd_infer_execute_graph_test, RunFloatFwdBatchnormGraphNHWC)
 {
     Bn_2d_test_case test_case = GetParam();
-    RunFwdbatchnormGraph<float, float>(
+    RunFwdBatchnormGraph<float, float>(
         test_case, hipdnn_sdk::data_objects::DataType::DataType_FLOAT, 1e-6f, Tensor_layout::NHWC);
 }
 
-TEST_F(Batchnorm_execute_graph_test, RunBfloat16FwdbatchnormGraphNHWC)
+TEST_F(Batchnorm_fwd_infer_execute_graph_test, RunBfloat16FwdBatchnormGraphNHWC)
 {
     Bn_2d_test_case test_case = {.n = 1, .c = 3, .h = 14, .w = 14};
-    RunFwdbatchnormGraph<hip_bfloat16, float>(test_case,
+    RunFwdBatchnormGraph<hip_bfloat16, float>(test_case,
                                               hipdnn_sdk::data_objects::DataType::DataType_BFLOAT16,
                                               1e-2_bf,
                                               Tensor_layout::NHWC);
 }
 
-TEST_F(Batchnorm_execute_graph_test, RunHalfFwdbatchnormGraphNHWC)
+TEST_F(Batchnorm_fwd_infer_execute_graph_test, RunHalfFwdBatchnormGraphNHWC)
 {
     Bn_2d_test_case test_case = {.n = 1, .c = 3, .h = 14, .w = 14};
-    RunFwdbatchnormGraph<half, float>(
+    RunFwdBatchnormGraph<half, float>(
         test_case, hipdnn_sdk::data_objects::DataType::DataType_HALF, 1e-2_h, Tensor_layout::NHWC);
 }
 
 // TODO: Re-enable when double support is added to MIOpen plugin
-// TEST_F(Batchnorm_execute_graph_test, RunDoubleFwdbatchnormGraph)
+// TEST_F(Batchnorm_fwd_infer_execute_graph_test, RunDoubleFwdBatchnormGraph)
 // {
 //     Bn_2d_test_case test_case = {.n = 1, .c = 3, .h = 14, .w = 14};
-//     RunFwdbatchnormGraph<double, double>(
+//     RunFwdBatchnormGraph<double, double>(
 //         test_case, hipdnn_sdk::data_objects::DataType::DataType_DOUBLE, 1e-6);
 // }
 
 template <typename Input_type, typename Intermediate_type>
-void Batchnorm_execute_graph_test::RunFwdbatchnormGraph(
+void Batchnorm_fwd_infer_execute_graph_test::RunFwdBatchnormGraph(
     Bn_2d_test_case test_case,
     hipdnn_sdk::data_objects::DataType input_data_type,
     Input_type epsilon,
@@ -172,8 +116,6 @@ void Batchnorm_execute_graph_test::RunFwdbatchnormGraph(
 
     std::vector<int64_t> dims = {test_case.n, test_case.c, test_case.h, test_case.w};
 
-    // Based on miopen::DeriveBNTensorDescriptor(), the strides for the derived tensors are
-    // {1, C, 1, 1} for mean, variance, scale, and bias tensors.
     std::vector<int64_t> derived_dims = {1, dims[1], 1, 1};
 
     std::vector<hipdnnPluginDeviceBuffer_t> device_buffers;
@@ -183,8 +125,7 @@ void Batchnorm_execute_graph_test::RunFwdbatchnormGraph(
         x_tensor, 1, static_cast<Input_type>(0.0f), static_cast<Input_type>(1.0f), seed));
 
     PinnedTensor<Input_type> y_tensor(dims, layout);
-    device_buffers.push_back(generate_random_device_buffer(
-        y_tensor, 2, static_cast<Input_type>(-100.0f), static_cast<Input_type>(100.0f), seed));
+    device_buffers.push_back(generate_empty_device_buffer(y_tensor, 2));
 
     PinnedTensor<Intermediate_type> scale_tensor(derived_dims);
     device_buffers.push_back(generate_random_device_buffer(scale_tensor,
@@ -246,8 +187,6 @@ void Batchnorm_execute_graph_test::RunFwdbatchnormGraph(
     x_tensor_cpu.fill_with_random_values(
         static_cast<Input_type>(0.0f), static_cast<Input_type>(1.0f), seed);
     Tensor<Input_type> y_tensor_cpu(dims, layout);
-    y_tensor_cpu.fill_with_random_values(
-        static_cast<Input_type>(-100.0f), static_cast<Input_type>(100.0f), seed);
     Tensor<Intermediate_type> scale_tensor_cpu(derived_dims);
     scale_tensor_cpu.fill_with_random_values(
         static_cast<Intermediate_type>(0.0f), static_cast<Intermediate_type>(1.0f), seed);
@@ -271,9 +210,9 @@ void Batchnorm_execute_graph_test::RunFwdbatchnormGraph(
                                          1e-3);
 
     Cpu_fp_reference_validation<Input_type> cpu_ref_validation(epsilon, epsilon);
-    EXPECT_TRUE(cpu_ref_validation.compare_buffers(y_tensor_cpu.memory(), y_tensor.memory()));
+    EXPECT_TRUE(cpu_ref_validation.all_close(y_tensor_cpu.memory(), y_tensor.memory()));
 }
 
-INSTANTIATE_TEST_SUITE_P(RunFwdbatchnormGraphWithParams,
-                         Batchnorm_execute_graph_test,
-                         testing::ValuesIn(get_bn_fwd_inference_test_cases()));
+INSTANTIATE_TEST_SUITE_P(RunFwdBatchnormGraphWithParams,
+                         Batchnorm_fwd_infer_execute_graph_test,
+                         testing::ValuesIn(get_bn_2d_test_cases()));
