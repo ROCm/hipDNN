@@ -31,12 +31,12 @@ TEST(BatchnormBwdParamsTest, InitializesAllTensorsFromValidGraph)
     EXPECT_NO_THROW(params.dbias());
 
     // Optional tensors should be present
-    auto& mean_opt = params.optMean();
-    auto& var_opt = params.optInvVariance();
-    EXPECT_TRUE(mean_opt.has_value());
-    EXPECT_TRUE(var_opt.has_value());
-    EXPECT_NE(mean_opt.value(), nullptr);
-    EXPECT_NE(var_opt.value(), nullptr);
+    auto& meanOpt = params.optMean();
+    auto& varOpt = params.optInvVariance();
+    EXPECT_TRUE(meanOpt.has_value());
+    EXPECT_TRUE(varOpt.has_value());
+    EXPECT_NE(meanOpt.value(), nullptr);
+    EXPECT_NE(varOpt.value(), nullptr);
 }
 
 TEST(BatchnormBwdParamsTest, HandlesMissingOptionalTensors)
@@ -52,8 +52,8 @@ TEST(BatchnormBwdParamsTest, HandlesMissingOptionalTensors)
     auto* attrs = node.attributes_as_BatchnormBackwardAttributes();
     ASSERT_NE(attrs, nullptr);
 
-    const auto& tensor_map = graph.getTensorMap();
-    BatchnormBwdParams params(*attrs, tensor_map);
+    const auto& tensorMap = graph.getTensorMap();
+    BatchnormBwdParams params(*attrs, tensorMap);
 
     // Optional tensors should not be present
     EXPECT_FALSE(params.optMean().has_value());

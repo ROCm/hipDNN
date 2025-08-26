@@ -14,14 +14,14 @@
 namespace miopen_legacy_plugin
 {
 
-class Mock_engine : public EngineInterface
+class MockEngine : public EngineInterface
 {
 public:
     MOCK_METHOD(int64_t, id, (), (const, override));
-    MOCK_METHOD(bool, isApplicable, (const hipdnn_plugin::IGraph& op_graph), (const, override));
+    MOCK_METHOD(bool, isApplicable, (const hipdnn_plugin::IGraph& opGraph), (const, override));
     MOCK_METHOD(void,
                 getDetails,
-                (HipdnnEnginePluginHandle & handle, hipdnnPluginConstData_t& details_out),
+                (HipdnnEnginePluginHandle & handle, hipdnnPluginConstData_t& detailsOut),
                 (const, override));
     MOCK_METHOD(size_t,
                 getWorkspaceSize,
@@ -32,7 +32,7 @@ public:
                 initializeExecutionContext,
                 (const HipdnnEnginePluginHandle& handle,
                  const hipdnn_plugin::IGraph& opGraph,
-                 HipdnnEnginePluginExecutionContext& execution_context),
+                 HipdnnEnginePluginExecutionContext& executionContext),
                 (const, override));
 };
 

@@ -8,7 +8,7 @@
 
 namespace
 {
-void test_logging_callback(hipdnnSeverity_t severity, const char* msg)
+void testLoggingCallback(hipdnnSeverity_t severity, const char* msg)
 {
     (void)severity;
     // std::cout << msg << "\n"; // uncomment to see formatted log messages during tests.
@@ -16,62 +16,62 @@ void test_logging_callback(hipdnnSeverity_t severity, const char* msg)
     (void)msg;
 }
 
-class Miopen_legacy_plugin_api_test : public ::testing::Test
+class MiopenLegacyPluginApiTest : public ::testing::Test
 {
 protected:
     void SetUp() override
     {
-        ASSERT_EQ(hipdnnPluginSetLoggingCallback(test_logging_callback),
+        ASSERT_EQ(hipdnnPluginSetLoggingCallback(testLoggingCallback),
                   HIPDNN_PLUGIN_STATUS_SUCCESS);
     }
 };
 } // namespace
 
-TEST_F(Miopen_legacy_plugin_api_test, GetNameSuccess)
+TEST_F(MiopenLegacyPluginApiTest, GetNameSuccess)
 {
     const char* name = nullptr;
     EXPECT_EQ(hipdnnPluginGetName(&name), HIPDNN_PLUGIN_STATUS_SUCCESS);
     EXPECT_STREQ(name, "miopen_legacy_plugin");
 }
 
-TEST_F(Miopen_legacy_plugin_api_test, GetNameNullptr)
+TEST_F(MiopenLegacyPluginApiTest, GetNameNullptr)
 {
     EXPECT_EQ(hipdnnPluginGetName(nullptr), HIPDNN_PLUGIN_STATUS_BAD_PARAM);
 }
 
-TEST_F(Miopen_legacy_plugin_api_test, GetVersionSuccess)
+TEST_F(MiopenLegacyPluginApiTest, GetVersionSuccess)
 {
     const char* version = nullptr;
     EXPECT_EQ(hipdnnPluginGetVersion(&version), HIPDNN_PLUGIN_STATUS_SUCCESS);
     EXPECT_STREQ(version, "1.0.0");
 }
 
-TEST_F(Miopen_legacy_plugin_api_test, GetVersionNullptr)
+TEST_F(MiopenLegacyPluginApiTest, GetVersionNullptr)
 {
     EXPECT_EQ(hipdnnPluginGetVersion(nullptr), HIPDNN_PLUGIN_STATUS_BAD_PARAM);
 }
 
-TEST_F(Miopen_legacy_plugin_api_test, GetTypeSuccess)
+TEST_F(MiopenLegacyPluginApiTest, GetTypeSuccess)
 {
     hipdnnPluginType_t type;
     EXPECT_EQ(hipdnnPluginGetType(&type), HIPDNN_PLUGIN_STATUS_SUCCESS);
     EXPECT_EQ(type, HIPDNN_PLUGIN_TYPE_ENGINE);
 }
 
-TEST_F(Miopen_legacy_plugin_api_test, GetTypeNullptr)
+TEST_F(MiopenLegacyPluginApiTest, GetTypeNullptr)
 {
     EXPECT_EQ(hipdnnPluginGetType(nullptr), HIPDNN_PLUGIN_STATUS_BAD_PARAM);
 }
 
-TEST_F(Miopen_legacy_plugin_api_test, GetLastErrorStringSuccess)
+TEST_F(MiopenLegacyPluginApiTest, GetLastErrorStringSuccess)
 {
-    const char* error_str = nullptr;
-    hipdnnPluginGetLastErrorString(&error_str);
-    ASSERT_NE(error_str, nullptr);
-    EXPECT_GE(strlen(error_str), 0u);
+    const char* errorStr = nullptr;
+    hipdnnPluginGetLastErrorString(&errorStr);
+    ASSERT_NE(errorStr, nullptr);
+    EXPECT_GE(strlen(errorStr), 0u);
 }
 
-TEST_F(Miopen_legacy_plugin_api_test, GetLastErrorStringNullptr)
+TEST_F(MiopenLegacyPluginApiTest, GetLastErrorStringNullptr)
 {
     EXPECT_NO_THROW(hipdnnPluginGetLastErrorString(nullptr));
 }
