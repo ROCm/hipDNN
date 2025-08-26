@@ -6,6 +6,7 @@
 #include "hipdnn_backend_attribute_name.h"
 #include "hipdnn_backend_attribute_type.h"
 #include "hipdnn_backend_descriptor_type.h"
+#include "hipdnn_backend_limits.h"
 #include "hipdnn_backend_plugin_loading_mode.h"
 #include "hipdnn_status.h"
 #include <sstream>
@@ -13,9 +14,6 @@
 
 namespace hipdnn_backend
 {
-
-// TODO replace with using the define from a common SDK header.
-static const size_t HIPDNN_MAX_ERROR_STRING_SIZE = 256;
 
 inline const char* hipdnn_get_status_string(hipdnnStatus_t status)
 {
