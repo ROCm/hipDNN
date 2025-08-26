@@ -16,7 +16,7 @@ void MiopenHandleFactory::createMiopenHandle(hipdnnEnginePluginHandle_t* handle)
 {
     if(handle == nullptr)
     {
-        throw Hipdnn_plugin_exception(HIPDNN_PLUGIN_STATUS_BAD_PARAM, "handle is null");
+        throw HipdnnPluginException(HIPDNN_PLUGIN_STATUS_BAD_PARAM, "handle is null");
     }
 
     *handle = new HipdnnEnginePluginHandle();
@@ -27,8 +27,8 @@ void MiopenHandleFactory::createMiopenHandle(hipdnnEnginePluginHandle_t* handle)
     {
         delete *handle;
         *handle = nullptr;
-        throw Hipdnn_plugin_exception(HIPDNN_PLUGIN_STATUS_INTERNAL_ERROR,
-                                      "Failed to create MIOpen handle");
+        throw HipdnnPluginException(HIPDNN_PLUGIN_STATUS_INTERNAL_ERROR,
+                                    "Failed to create MIOpen handle");
     }
 }
 
@@ -36,15 +36,15 @@ void MiopenHandleFactory::destroyMiopenHandle(hipdnnEnginePluginHandle_t handle)
 {
     if(handle == nullptr)
     {
-        throw Hipdnn_plugin_exception(HIPDNN_PLUGIN_STATUS_BAD_PARAM, "handle is null");
+        throw HipdnnPluginException(HIPDNN_PLUGIN_STATUS_BAD_PARAM, "handle is null");
     }
 
     miopenStatus_t status = miopenDestroy(handle->miopenHandle);
 
     if(status != miopenStatusSuccess)
     {
-        throw Hipdnn_plugin_exception(HIPDNN_PLUGIN_STATUS_INTERNAL_ERROR,
-                                      "Failed to destroy MIOpen handle");
+        throw HipdnnPluginException(HIPDNN_PLUGIN_STATUS_INTERNAL_ERROR,
+                                    "Failed to destroy MIOpen handle");
     }
 }
 

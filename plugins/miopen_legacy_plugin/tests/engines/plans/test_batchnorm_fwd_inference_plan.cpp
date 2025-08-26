@@ -12,15 +12,15 @@ TEST(BatchnormFwdInferenceParamsTest, InitializesAllTensorsFromValidGraph)
 {
     // Create a valid batchnorm graph
     auto builder = flatbuffer_test_utils::create_valid_batchnorm_graph();
-    hipdnn_plugin::Graph_wrapper graph(builder.GetBufferPointer(), builder.GetSize());
+    hipdnn_plugin::GraphWrapper graph(builder.GetBufferPointer(), builder.GetSize());
 
     // Get the batchnorm node and attributes
-    const auto& node = graph.get_node(0);
+    const auto& node = graph.getNode(0);
     auto* attrs = node.attributes_as_BatchnormInferenceAttributes();
     ASSERT_NE(attrs, nullptr);
 
     // Construct params
-    BatchnormFwdInferenceParams params(*attrs, graph.get_tensor_map());
+    BatchnormFwdInferenceParams params(*attrs, graph.getTensorMap());
 
     // All required tensors should be initialized
     EXPECT_NO_THROW(params.x());
@@ -29,12 +29,12 @@ TEST(BatchnormFwdInferenceParamsTest, InitializesAllTensorsFromValidGraph)
     EXPECT_NO_THROW(params.bias());
 
     // Optional tensors should be present
-    auto& mean_opt = params.estMean();
-    auto& var_opt = params.estVariance();
-    EXPECT_TRUE(mean_opt.has_value());
-    EXPECT_TRUE(var_opt.has_value());
-    EXPECT_NE(mean_opt.value(), nullptr);
-    EXPECT_NE(var_opt.value(), nullptr);
+    auto& meanOpt = params.estMean();
+    auto& varOpt = params.estVariance();
+    EXPECT_TRUE(meanOpt.has_value());
+    EXPECT_TRUE(varOpt.has_value());
+    EXPECT_NE(meanOpt.value(), nullptr);
+    EXPECT_NE(varOpt.value(), nullptr);
 }
 
 TEST(BatchnormFwdInferenceParamsTest, HandlesMissingOptionalTensors)
@@ -43,15 +43,15 @@ TEST(BatchnormFwdInferenceParamsTest, HandlesMissingOptionalTensors)
     auto builder = flatbuffer_test_utils::create_valid_batchnorm_graph(
         {1, 1, 1, 1}, {1, 1, 1, 1}, false // Set has_optional_attributes to false
     );
-    hipdnn_plugin::Graph_wrapper graph(builder.GetBufferPointer(), builder.GetSize());
+    hipdnn_plugin::GraphWrapper graph(builder.GetBufferPointer(), builder.GetSize());
 
     // Get the batchnorm node and attributes
-    const auto& node = graph.get_node(0);
+    const auto& node = graph.getNode(0);
     auto* attrs = node.attributes_as_BatchnormInferenceAttributes();
     ASSERT_NE(attrs, nullptr);
 
-    const auto& tensor_map = graph.get_tensor_map();
-    BatchnormFwdInferenceParams params(*attrs, tensor_map);
+    const auto& tensorMap = graph.getTensorMap();
+    BatchnormFwdInferenceParams params(*attrs, tensorMap);
 
     // Optional tensors should not be present
     EXPECT_FALSE(params.estMean().has_value());

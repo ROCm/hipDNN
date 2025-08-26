@@ -189,11 +189,8 @@ HIPDNN_BACKEND_EXPORT hipdnnStatus_t
     return hipdnn_backend::tryCatch([&, apiName = __func__]() {
         throwIfInvalidDescriptor(descriptor);
 
-        descriptor->getAttribute(attributeName,
-                                 attributeType,
-                                 requestedElementCount,
-                                 elementCount,
-                                 arrayOfElements);
+        descriptor->getAttribute(
+            attributeName, attributeType, requestedElementCount, elementCount, arrayOfElements);
 
         if(elementCount == nullptr)
         {
@@ -307,8 +304,7 @@ HIPDNN_BACKEND_EXPORT hipdnnStatus_t hipdnnSetEnginePluginPaths_ext(
             pathsVec.emplace_back(pluginPaths[i]);
         }
 
-        hipdnn_backend::plugin::EnginePluginResourceManager::setPluginPaths(pathsVec,
-                                                                            loadingMode);
+        hipdnn_backend::plugin::EnginePluginResourceManager::setPluginPaths(pathsVec, loadingMode);
         // TODO: automatic formatting loading mode to string
         LOG_API_SUCCESS(apiName,
                         "set_plugin_paths={}",

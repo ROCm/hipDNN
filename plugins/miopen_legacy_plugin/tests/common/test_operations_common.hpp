@@ -13,26 +13,26 @@ namespace test_operations_common
 
 using namespace hipdnn_sdk::reference_test_utilities;
 
-struct Bn_2d_test_case
+struct Batchnorm2dTestCase
 {
     int64_t n;
     int64_t c;
     int64_t h;
     int64_t w;
 
-    friend std::ostream& operator<<(std::ostream& ss, const Bn_2d_test_case& tc)
+    friend std::ostream& operator<<(std::ostream& ss, const Batchnorm2dTestCase& tc)
     {
         return ss << "(n:" << tc.n << " c:" << tc.c << " h:" << tc.h << " w:" << tc.w << ")";
     }
 
-    std::vector<int64_t> get_dims() const
+    std::vector<int64_t> getDims() const
     {
         return {n, c, h, w};
     }
 };
 
 template <typename T>
-hipdnnPluginDeviceBuffer_t generate_random_device_buffer(
+hipdnnPluginDeviceBuffer_t generateRandomDeviceBuffer(
     ITensor<T>& tensor, int uid, T min, T max, unsigned int seed = 0)
 {
     tensor.fillWithRandomValues(min, max, seed);
@@ -43,8 +43,7 @@ hipdnnPluginDeviceBuffer_t generate_random_device_buffer(
 }
 
 template <typename T>
-hipdnnPluginDeviceBuffer_t
-    generate_static_device_buffer(ITensor<T>& tensor, int uid, T value)
+hipdnnPluginDeviceBuffer_t generateStaticDeviceBuffer(ITensor<T>& tensor, int uid, T value)
 {
     tensor.fillWithValue(value);
     hipdnnPluginDeviceBuffer_t buffer;
@@ -54,7 +53,7 @@ hipdnnPluginDeviceBuffer_t
 }
 
 template <typename T>
-hipdnnPluginDeviceBuffer_t generate_empty_device_buffer(ITensor<T>& tensor, int uid)
+hipdnnPluginDeviceBuffer_t generateEmptyDeviceBuffer(ITensor<T>& tensor, int uid)
 {
     hipdnnPluginDeviceBuffer_t buffer;
     buffer.uid = uid;
@@ -62,7 +61,7 @@ hipdnnPluginDeviceBuffer_t generate_empty_device_buffer(ITensor<T>& tensor, int 
     return buffer;
 }
 
-inline std::vector<Bn_2d_test_case> get_bn_2d_test_cases()
+inline std::vector<Batchnorm2dTestCase> getBatchnorm2dTestCases()
 {
     return {
         {.n = 1, .c = 3, .h = 14, .w = 14},

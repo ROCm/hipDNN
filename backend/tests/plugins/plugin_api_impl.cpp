@@ -13,7 +13,7 @@
 using namespace hipdnn_plugin;
 
 // NOLINTNEXTLINE(modernize-avoid-c-arrays)
-thread_local char Plugin_last_error_manager::last_error[HIPDNN_PLUGIN_ERROR_STRING_MAX_LENGTH] = "";
+thread_local char PluginLastErrorManager::_lastError[HIPDNN_PLUGIN_ERROR_STRING_MAX_LENGTH] = "";
 static hipdnnCallback_t logging_callback = nullptr;
 
 #ifdef THROW_IF_NULL
@@ -26,7 +26,7 @@ static hipdnnCallback_t logging_callback = nullptr;
 
 extern "C" hipdnnPluginStatus_t hipdnnPluginGetName(const char** name)
 {
-    return hipdnn_plugin::try_catch([&]() {
+    return hipdnn_plugin::tryCatch([&]() {
         THROW_IF_NULL(name);
         *name = PLUGIN_NAME;
     });
@@ -34,7 +34,7 @@ extern "C" hipdnnPluginStatus_t hipdnnPluginGetName(const char** name)
 
 extern "C" hipdnnPluginStatus_t hipdnnPluginGetVersion(const char** version)
 {
-    return hipdnn_plugin::try_catch([&]() {
+    return hipdnn_plugin::tryCatch([&]() {
         THROW_IF_NULL(version);
         *version = PLUGIN_VERSION;
     });
@@ -42,7 +42,7 @@ extern "C" hipdnnPluginStatus_t hipdnnPluginGetVersion(const char** version)
 
 extern "C" hipdnnPluginStatus_t hipdnnPluginGetType(hipdnnPluginType_t* type)
 {
-    return hipdnn_plugin::try_catch([&]() {
+    return hipdnn_plugin::tryCatch([&]() {
         THROW_IF_NULL(type);
         *type = PLUGIN_TYPE;
     });
@@ -52,8 +52,8 @@ extern "C" hipdnnPluginStatus_t hipdnnPluginSetLoggingCallback(hipdnnCallback_t 
 {
     if(callback == nullptr)
     {
-        return Plugin_last_error_manager::set_last_error(HIPDNN_PLUGIN_STATUS_BAD_PARAM,
-                                                         "hipdnnPluginGetType: type is null");
+        return PluginLastErrorManager::setLastError(HIPDNN_PLUGIN_STATUS_BAD_PARAM,
+                                                    "hipdnnPluginGetType: type is null");
     }
     logging_callback = callback;
     logging_callback(HIPDNN_SEV_INFO, "Logging callback successfully set for test plugin.");
@@ -66,5 +66,5 @@ extern "C" void hipdnnPluginGetLastErrorString(const char** error_str)
     {
         return;
     }
-    *error_str = Plugin_last_error_manager::get_last_error();
+    *error_str = PluginLastErrorManager::getLastError();
 }
