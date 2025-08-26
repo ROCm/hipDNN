@@ -5,7 +5,7 @@
 #include "test_plugin_engine_id_map.hpp"
 // NOLINTNEXTLINE(modernize-avoid-c-arrays)
 thread_local char
-    hipdnn_plugin::PluginLastErrorManager::_last_error[HIPDNN_PLUGIN_ERROR_STRING_MAX_LENGTH]
+    hipdnn_plugin::PluginLastErrorManager::_lastError[HIPDNN_PLUGIN_ERROR_STRING_MAX_LENGTH]
     = "";
 
 class Execute_fails_plugin : public Test_plugin_base
