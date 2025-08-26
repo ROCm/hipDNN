@@ -28,7 +28,8 @@ add_executable(miopen_legacy_plugin_tests
     test_engine_manager.cpp
     test_hipdnn_engine_plugin_handle.cpp
     test_hipdnn_plugin_execution_context.cpp
-    test_miopen_batchnorm_operations.cpp
+    test_miopen_batchnorm_fwd_inference_operations.cpp
+    test_miopen_batchnorm_bwd_operations.cpp
     test_miopen_handle_factory.cpp
     test_miopen_legacy_engine_plugin_api.cpp
     test_miopen_legacy_plugin_api.cpp
