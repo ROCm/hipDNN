@@ -10,14 +10,14 @@
 namespace miopen_legacy_plugin
 {
 
-class Mock_plan : public PlanInterface
+class MockPlan : public PlanInterface
 {
 public:
     MOCK_METHOD(void,
                 execute,
                 (const HipdnnEnginePluginHandle& handle,
-                 const hipdnnPluginDeviceBuffer_t* device_buffers,
-                 uint32_t num_device_buffers,
+                 const hipdnnPluginDeviceBuffer_t* deviceBuffers,
+                 uint32_t numDeviceBuffers,
                  void* workspace),
                 (const, override));
 };

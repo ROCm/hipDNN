@@ -26,7 +26,7 @@ using namespace hipdnn_plugin;
 using namespace miopen_legacy_plugin;
 
 // NOLINTNEXTLINE(modernize-avoid-c-arrays)
-thread_local char Plugin_last_error_manager::last_error[HIPDNN_PLUGIN_ERROR_STRING_MAX_LENGTH] = "";
+thread_local char PluginLastErrorManager::_lastError[HIPDNN_PLUGIN_ERROR_STRING_MAX_LENGTH] = "";
 
 // Keep a weak pointer to the MiopenContainer thats made when we create a plugin handle.
 // The original shared_ptr is then stored on the handle so that it can be used for the lifecycle
@@ -41,8 +41,8 @@ hipdnnPluginStatus_t hipdnnPluginGetName(const char** name)
 {
     LOG_API_ENTRY("name_ptr={:p}", static_cast<void*>(name));
 
-    return hipdnn_plugin::try_catch([&, apiName = __func__]() {
-        throw_if_null(name);
+    return hipdnn_plugin::tryCatch([&, apiName = __func__]() {
+        throwIfNull(name);
 
         *name = pluginName;
 
@@ -54,8 +54,8 @@ hipdnnPluginStatus_t hipdnnPluginGetVersion(const char** version)
 {
     LOG_API_ENTRY("versionPtr={:p}", static_cast<void*>(version));
 
-    return hipdnn_plugin::try_catch([&, apiName = __func__]() {
-        throw_if_null(version);
+    return hipdnn_plugin::tryCatch([&, apiName = __func__]() {
+        throwIfNull(version);
 
         *version = pluginVersion;
 
@@ -67,8 +67,8 @@ hipdnnPluginStatus_t hipdnnPluginGetType(hipdnnPluginType_t* type)
 {
     LOG_API_ENTRY("typePtr={:p}", static_cast<void*>(type));
 
-    return hipdnn_plugin::try_catch([&, apiName = __func__]() {
-        throw_if_null(type);
+    return hipdnn_plugin::tryCatch([&, apiName = __func__]() {
+        throwIfNull(type);
 
         *type = HIPDNN_PLUGIN_TYPE_ENGINE;
 
@@ -80,10 +80,10 @@ void hipdnnPluginGetLastErrorString(const char** errorStr)
 {
     LOG_API_ENTRY("errorStrPtr={:p}", static_cast<void*>(errorStr));
 
-    hipdnn_plugin::try_catch([&, apiName = __func__]() {
-        throw_if_null(errorStr);
+    hipdnn_plugin::tryCatch([&, apiName = __func__]() {
+        throwIfNull(errorStr);
 
-        *errorStr = Plugin_last_error_manager::get_last_error();
+        *errorStr = PluginLastErrorManager::getLastError();
 
         LOG_API_SUCCESS(apiName, "errorStr={:p}", static_cast<void*>(errorStr));
     });
@@ -92,8 +92,8 @@ void hipdnnPluginGetLastErrorString(const char** errorStr)
 // Once plugins are loaded via plugin manager then logging will work for them
 hipdnnPluginStatus_t hipdnnPluginSetLoggingCallback(hipdnnCallback_t callback)
 {
-    return hipdnn_plugin::try_catch([&, apiName = __func__]() {
-        throw_if_null(callback);
+    return hipdnn_plugin::tryCatch([&, apiName = __func__]() {
+        throwIfNull(callback);
         hipdnn::logging::initialize_callback_logging(pluginName, callback);
         LOG_API_SUCCESS(apiName, "");
     });
@@ -107,19 +107,19 @@ hipdnnPluginStatus_t
                   maxEngines,
                   static_cast<void*>(numEngines));
 
-    return hipdnn_plugin::try_catch([&, apiName = __func__]() {
+    return hipdnn_plugin::tryCatch([&, apiName = __func__]() {
         if(maxEngines != 0)
         {
-            throw_if_null(engineIds);
+            throwIfNull(engineIds);
         }
-        throw_if_null(numEngines);
+        throwIfNull(numEngines);
 
         // For now, we will just return a single engine ID.
         auto allEngineIds = std::vector<int64_t>({1});
         if(allEngineIds.size() > std::numeric_limits<uint32_t>::max())
         {
-            throw Hipdnn_plugin_exception(HIPDNN_PLUGIN_STATUS_INTERNAL_ERROR,
-                                          "Number of engines exceeds maximum uint32_t value.");
+            throw HipdnnPluginException(HIPDNN_PLUGIN_STATUS_INTERNAL_ERROR,
+                                        "Number of engines exceeds maximum uint32_t value.");
         }
 
         if(maxEngines == 0)
@@ -154,8 +154,8 @@ hipdnnPluginStatus_t hipdnnEnginePluginCreate(hipdnnEnginePluginHandle_t* handle
 {
     LOG_API_ENTRY("handle_ptr={:p}", static_cast<void*>(handle));
 
-    return hipdnn_plugin::try_catch([&, apiName = __func__]() {
-        throw_if_null(handle);
+    return hipdnn_plugin::tryCatch([&, apiName = __func__]() {
+        throwIfNull(handle);
 
         miopen_legacy_plugin::MiopenHandleFactory::createMiopenHandle(handle);
 
@@ -192,8 +192,8 @@ hipdnnPluginStatus_t hipdnnEnginePluginDestroy(hipdnnEnginePluginHandle_t handle
 {
     LOG_API_ENTRY("handle={:p}", static_cast<void*>(handle));
 
-    return hipdnn_plugin::try_catch([&, apiName = __func__]() {
-        throw_if_null(handle);
+    return hipdnn_plugin::tryCatch([&, apiName = __func__]() {
+        throwIfNull(handle);
 
         miopen_legacy_plugin::MiopenHandleFactory::destroyMiopenHandle(handle);
         delete handle;
@@ -209,8 +209,8 @@ hipdnnPluginStatus_t hipdnnEnginePluginSetStream(hipdnnEnginePluginHandle_t hand
     LOG_API_ENTRY(
         "handle={:p}, stream_id={:p}", static_cast<void*>(handle), static_cast<void*>(stream));
 
-    return hipdnn_plugin::try_catch([&, apiName = __func__]() {
-        throw_if_null(handle);
+    return hipdnn_plugin::tryCatch([&, apiName = __func__]() {
+        throwIfNull(handle);
 
         handle->setStream(stream);
 
@@ -232,17 +232,17 @@ hipdnnPluginStatus_t
                   maxEngines,
                   static_cast<void*>(numEngines));
 
-    return hipdnn_plugin::try_catch([&, apiName = __func__]() {
-        throw_if_null(handle);
-        throw_if_null(opGraph);
+    return hipdnn_plugin::tryCatch([&, apiName = __func__]() {
+        throwIfNull(handle);
+        throwIfNull(opGraph);
         if(maxEngines != 0)
         {
-            throw_if_null(engineIds);
+            throwIfNull(engineIds);
         }
-        throw_if_null(numEngines);
+        throwIfNull(numEngines);
 
         auto& engineManager = handle->getEngineManager();
-        Graph_wrapper opGraphWrapper(opGraph->ptr, opGraph->size);
+        GraphWrapper opGraphWrapper(opGraph->ptr, opGraph->size);
 
         auto applicableEngines = engineManager.getApplicableEngineIds(opGraphWrapper);
 
@@ -278,13 +278,13 @@ hipdnnPluginStatus_t hipdnnEnginePluginGetEngineDetails(hipdnnEnginePluginHandle
                   static_cast<const void*>(opGraph),
                   static_cast<void*>(engineDetails));
 
-    return hipdnn_plugin::try_catch([&, apiName = __func__]() {
-        throw_if_null(handle);
-        throw_if_null(opGraph);
-        throw_if_null(engineDetails);
+    return hipdnn_plugin::tryCatch([&, apiName = __func__]() {
+        throwIfNull(handle);
+        throwIfNull(opGraph);
+        throwIfNull(engineDetails);
 
         auto& engineManager = handle->getEngineManager();
-        Graph_wrapper opGraphWrapper(opGraph->ptr, opGraph->size);
+        GraphWrapper opGraphWrapper(opGraph->ptr, opGraph->size);
 
         engineManager.getEngineDetails(*handle, opGraphWrapper, engineId, *engineDetails);
 
@@ -299,10 +299,10 @@ hipdnnPluginStatus_t hipdnnEnginePluginDestroyEngineDetails(hipdnnEnginePluginHa
                   static_cast<void*>(handle),
                   static_cast<void*>(engineDetails));
 
-    return hipdnn_plugin::try_catch([&, apiName = __func__]() {
-        throw_if_null(handle);
-        throw_if_null(engineDetails);
-        throw_if_null(engineDetails->ptr);
+    return hipdnn_plugin::tryCatch([&, apiName = __func__]() {
+        throwIfNull(handle);
+        throwIfNull(engineDetails);
+        throwIfNull(engineDetails->ptr);
 
         handle->removeEngineDetailsDetachedBuffer(engineDetails->ptr);
 
@@ -321,18 +321,18 @@ hipdnnPluginStatus_t hipdnnEnginePluginGetWorkspaceSize(hipdnnEnginePluginHandle
                   static_cast<const void*>(opGraph),
                   static_cast<void*>(workspaceSize));
 
-    return hipdnn_plugin::try_catch([&, apiName = __func__]() {
-        throw_if_null(handle);
-        throw_if_null(engineConfig);
-        throw_if_null(opGraph);
-        throw_if_null(workspaceSize);
+    return hipdnn_plugin::tryCatch([&, apiName = __func__]() {
+        throwIfNull(handle);
+        throwIfNull(engineConfig);
+        throwIfNull(opGraph);
+        throwIfNull(workspaceSize);
 
         auto& engineManager = handle->getEngineManager();
 
-        Engine_config_wrapper engineConfigWrapper(engineConfig->ptr, engineConfig->size);
-        Graph_wrapper opGraphWrapper(opGraph->ptr, opGraph->size);
+        EngineConfigWrapper engineConfigWrapper(engineConfig->ptr, engineConfig->size);
+        GraphWrapper opGraphWrapper(opGraph->ptr, opGraph->size);
         *workspaceSize = engineManager.getWorkspaceSize(
-            *handle, engineConfigWrapper.engine_id(), opGraphWrapper);
+            *handle, engineConfigWrapper.engineId(), opGraphWrapper);
 
         LOG_API_SUCCESS(apiName, "workspaceSize={}", *workspaceSize);
     });
@@ -350,14 +350,14 @@ hipdnnPluginStatus_t
                   static_cast<const void*>(opGraph),
                   static_cast<void*>(executionContext));
 
-    return hipdnn_plugin::try_catch([&, apiName = __func__]() {
-        throw_if_null(handle);
-        throw_if_null(engineConfig);
-        throw_if_null(opGraph);
-        throw_if_null(executionContext);
+    return hipdnn_plugin::tryCatch([&, apiName = __func__]() {
+        throwIfNull(handle);
+        throwIfNull(engineConfig);
+        throwIfNull(opGraph);
+        throwIfNull(executionContext);
 
-        Graph_wrapper opGraphWrapper(opGraph->ptr, opGraph->size);
-        Engine_config_wrapper engineConfigWrapper(engineConfig->ptr, engineConfig->size);
+        GraphWrapper opGraphWrapper(opGraph->ptr, opGraph->size);
+        EngineConfigWrapper engineConfigWrapper(engineConfig->ptr, engineConfig->size);
 
         auto& engineManager = handle->getEngineManager();
 
@@ -389,9 +389,9 @@ hipdnnPluginStatus_t
                   static_cast<void*>(handle),
                   static_cast<void*>(executionContext));
 
-    return hipdnn_plugin::try_catch([&, apiName = __func__]() {
-        throw_if_null(handle);
-        throw_if_null(executionContext);
+    return hipdnn_plugin::tryCatch([&, apiName = __func__]() {
+        throwIfNull(handle);
+        throwIfNull(executionContext);
 
         delete executionContext;
 
@@ -414,10 +414,10 @@ hipdnnPluginStatus_t
                   static_cast<const void*>(deviceBuffers),
                   numDeviceBuffers);
 
-    return hipdnn_plugin::try_catch([&, apiName = __func__]() {
-        throw_if_null(handle);
-        throw_if_null(executionContext);
-        throw_if_null(deviceBuffers);
+    return hipdnn_plugin::tryCatch([&, apiName = __func__]() {
+        throwIfNull(handle);
+        throwIfNull(executionContext);
+        throwIfNull(deviceBuffers);
 
         executionContext->plan().execute(*handle, deviceBuffers, numDeviceBuffers, workspace);
 

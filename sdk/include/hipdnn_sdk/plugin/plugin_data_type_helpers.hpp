@@ -8,7 +8,7 @@
 #include <hipdnn_sdk/logging/logger.hpp>
 #include <hipdnn_sdk/plugin/plugin_api_data_types.h>
 
-inline const char* to_string(hipdnnPluginStatus_t status)
+inline const char* toString(hipdnnPluginStatus_t status)
 {
     switch(status)
     {
@@ -29,7 +29,7 @@ inline const char* to_string(hipdnnPluginStatus_t status)
 
 inline std::ostream& operator<<(std::ostream& os, hipdnnPluginStatus_t status)
 {
-    return os << to_string(status);
+    return os << toString(status);
 }
 
 template <>
@@ -38,11 +38,11 @@ struct fmt::formatter<hipdnnPluginStatus_t> : fmt::formatter<const char*>
     template <typename FormatContext>
     auto format(hipdnnPluginStatus_t status, FormatContext& ctx) const
     {
-        return fmt::formatter<const char*>::format(to_string(status), ctx);
+        return fmt::formatter<const char*>::format(toString(status), ctx);
     }
 };
 
-inline const char* to_string(hipdnnPluginType_t type)
+inline const char* toString(hipdnnPluginType_t type)
 {
     switch(type)
     {
@@ -57,7 +57,7 @@ inline const char* to_string(hipdnnPluginType_t type)
 
 inline std::ostream& operator<<(std::ostream& os, hipdnnPluginType_t type)
 {
-    return os << to_string(type);
+    return os << toString(type);
 }
 
 template <>
@@ -66,6 +66,6 @@ struct fmt::formatter<hipdnnPluginType_t> : fmt::formatter<const char*>
     template <typename FormatContext>
     auto format(hipdnnPluginType_t type, FormatContext& ctx) const
     {
-        return fmt::formatter<const char*>::format(to_string(type), ctx);
+        return fmt::formatter<const char*>::format(toString(type), ctx);
     }
 };

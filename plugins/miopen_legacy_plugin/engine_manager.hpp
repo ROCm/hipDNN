@@ -27,20 +27,20 @@ public:
 
     void addEngine(std::unique_ptr<EngineInterface> engine);
 
-    std::vector<int64_t> getApplicableEngineIds(const hipdnn_plugin::Graph_interface& opGraph);
+    std::vector<int64_t> getApplicableEngineIds(const hipdnn_plugin::IGraph& opGraph);
 
     void getEngineDetails(HipdnnEnginePluginHandle& handle,
-                          const hipdnn_plugin::Graph_interface& opGraph,
+                          const hipdnn_plugin::IGraph& opGraph,
                           int64_t engineId,
                           hipdnnPluginConstData_t& engineDetailsOut);
 
     size_t getWorkspaceSize(const HipdnnEnginePluginHandle& handle,
                             int64_t engineId,
-                            const hipdnn_plugin::Graph_interface& opGraph) const;
+                            const hipdnn_plugin::IGraph& opGraph) const;
 
     void initializeExecutionContext(const HipdnnEnginePluginHandle& handle,
-                                    const hipdnn_plugin::Graph_interface& opGraph,
-                                    const hipdnn_plugin::Engine_config_interface& engineConfig,
+                                    const hipdnn_plugin::IGraph& opGraph,
+                                    const hipdnn_plugin::IEngineConfig& engineConfig,
                                     HipdnnEnginePluginExecutionContext& executionContext) const;
 
 private:

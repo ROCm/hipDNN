@@ -17,74 +17,73 @@
 using namespace miopen_legacy_plugin;
 using namespace hipdnn_plugin;
 
-class Test_miopen_batchnorm_plan_builder : public ::testing::Test
+class TestMiopenBatchnormPlanBuilder : public ::testing::Test
 {
 protected:
-    MiopenBatchnormPlanBuilder plan_builder;
-    HipdnnEnginePluginHandle dummy_handle;
+    MiopenBatchnormPlanBuilder planBuilder;
+    HipdnnEnginePluginHandle dummyHandle;
 };
 
-TEST_F(Test_miopen_batchnorm_plan_builder, IsApplicableReturnsFalseForMultiNodeGraph)
+TEST_F(TestMiopenBatchnormPlanBuilder, IsApplicableReturnsFalseForMultiNodeGraph)
 {
-    Mock_graph mock_graph;
-    EXPECT_CALL(mock_graph, node_count()).WillRepeatedly(::testing::Return(2));
+    MockGraph mockGraph;
+    EXPECT_CALL(mockGraph, nodeCount()).WillRepeatedly(::testing::Return(2));
 
-    bool applicable = plan_builder.isApplicable(mock_graph);
+    bool applicable = planBuilder.isApplicable(mockGraph);
 
     EXPECT_FALSE(applicable);
 }
 
-TEST_F(Test_miopen_batchnorm_plan_builder, IsApplicableReturnsFalseForUnsupportedAttributes)
+TEST_F(TestMiopenBatchnormPlanBuilder, IsApplicableReturnsFalseForUnsupportedAttributes)
 {
-    Mock_graph mock_graph;
-    EXPECT_CALL(mock_graph, node_count()).WillOnce(::testing::Return(1));
-    EXPECT_CALL(mock_graph, has_only_supported_attributes(::testing::_))
+    MockGraph mockGraph;
+    EXPECT_CALL(mockGraph, nodeCount()).WillOnce(::testing::Return(1));
+    EXPECT_CALL(mockGraph, hasOnlySupportedAttributes(::testing::_))
         .WillOnce(::testing::Return(false));
 
-    bool applicable = plan_builder.isApplicable(mock_graph);
+    bool applicable = planBuilder.isApplicable(mockGraph);
 
     EXPECT_FALSE(applicable);
 }
 
-TEST_F(Test_miopen_batchnorm_plan_builder, IsApplicableReturnsTrueForSupportedSingleNodeGraph)
+TEST_F(TestMiopenBatchnormPlanBuilder, IsApplicableReturnsTrueForSupportedSingleNodeGraph)
 {
-    Mock_graph mock_graph;
-    EXPECT_CALL(mock_graph, node_count()).WillOnce(::testing::Return(1));
-    EXPECT_CALL(mock_graph, has_only_supported_attributes(::testing::_))
+    MockGraph mockGraph;
+    EXPECT_CALL(mockGraph, nodeCount()).WillOnce(::testing::Return(1));
+    EXPECT_CALL(mockGraph, hasOnlySupportedAttributes(::testing::_))
         .WillOnce(::testing::Return(true));
 
-    bool applicable = plan_builder.isApplicable(mock_graph);
+    bool applicable = planBuilder.isApplicable(mockGraph);
 
     EXPECT_TRUE(applicable);
 }
 
-TEST_F(Test_miopen_batchnorm_plan_builder, GetWorkspaceSizeReturnsExpectedValue)
+TEST_F(TestMiopenBatchnormPlanBuilder, GetWorkspaceSizeReturnsExpectedValue)
 {
-    Mock_graph mock_graph;
+    MockGraph mockGraph;
 
-    size_t workspace_size = plan_builder.getWorkspaceSize(dummy_handle, mock_graph);
+    size_t workspaceSize = planBuilder.getWorkspaceSize(dummyHandle, mockGraph);
 
-    EXPECT_EQ(workspace_size, 0u);
+    EXPECT_EQ(workspaceSize, 0u);
 }
 
-TEST_F(Test_miopen_batchnorm_plan_builder, BuildPlanSetsPlanForSupportedNode)
+TEST_F(TestMiopenBatchnormPlanBuilder, BuildPlanSetsPlanForSupportedNode)
 {
     // Use a real flatbuffer graph with a valid batchnorm node
     auto builder = flatbuffer_test_utils::createValidBatchnormGraph();
-    hipdnn_plugin::Graph_wrapper graph(builder.GetBufferPointer(), builder.GetSize());
+    hipdnn_plugin::GraphWrapper graph(builder.GetBufferPointer(), builder.GetSize());
     HipdnnEnginePluginExecutionContext ctx;
 
     // Should not throw
-    EXPECT_NO_THROW(plan_builder.buildPlan(dummy_handle, graph, ctx));
+    EXPECT_NO_THROW(planBuilder.buildPlan(dummyHandle, graph, ctx));
     EXPECT_TRUE(ctx.hasValidPlan());
 }
 
-TEST_F(Test_miopen_batchnorm_plan_builder, BuildPlanThrowsForUnsupportedNodeType)
+TEST_F(TestMiopenBatchnormPlanBuilder, BuildPlanThrowsForUnsupportedNodeType)
 {
     // Create a graph with a node of unsupported type
     flatbuffers::FlatBufferBuilder builder;
-    std::vector<::flatbuffers::Offset<hipdnn_sdk::data_objects::TensorAttributes>>
-        tensor_attributes;
+    std::vector<::flatbuffers::Offset<hipdnn_sdk::data_objects::TensorAttributes>> tensorAttributes;
     std::vector<::flatbuffers::Offset<hipdnn_sdk::data_objects::Node>> nodes;
 
     // Node with NONE attributes type
@@ -92,21 +91,21 @@ TEST_F(Test_miopen_batchnorm_plan_builder, BuildPlanThrowsForUnsupportedNodeType
         builder, "unsupported", hipdnn_sdk::data_objects::NodeAttributes_NONE, 0);
     nodes.push_back(node);
 
-    auto graph_offset
+    auto graphOffset
         = hipdnn_sdk::data_objects::CreateGraphDirect(builder,
                                                       "test",
                                                       hipdnn_sdk::data_objects::DataType_FLOAT,
                                                       hipdnn_sdk::data_objects::DataType_HALF,
                                                       hipdnn_sdk::data_objects::DataType_BFLOAT16,
-                                                      &tensor_attributes,
+                                                      &tensorAttributes,
                                                       &nodes);
-    builder.Finish(graph_offset);
+    builder.Finish(graphOffset);
 
-    hipdnn_plugin::Graph_wrapper graph(builder.GetBufferPointer(), builder.GetSize());
+    hipdnn_plugin::GraphWrapper graph(builder.GetBufferPointer(), builder.GetSize());
 
     HipdnnEnginePluginExecutionContext ctx;
 
-    EXPECT_THROW(plan_builder.buildPlan(dummy_handle, graph, ctx),
-                 hipdnn_plugin::Hipdnn_plugin_exception);
+    EXPECT_THROW(planBuilder.buildPlan(dummyHandle, graph, ctx),
+                 hipdnn_plugin::HipdnnPluginException);
     EXPECT_FALSE(ctx.hasValidPlan());
 }
