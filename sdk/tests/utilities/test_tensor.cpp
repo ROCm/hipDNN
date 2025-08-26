@@ -75,7 +75,7 @@ TEST(TestTensor, BasicNHWCUsage)
     EXPECT_EQ(tensor.strides()[3], 2);
 }
 
-TEST(TestTensor, GetAndSetHostValueNCHW)
+TEST(TestTensor, GetAndset_host_valueNCHW)
 {
     SKIP_IF_NO_DEVICES();
 
@@ -86,7 +86,7 @@ TEST(TestTensor, GetAndSetHostValueNCHW)
     EXPECT_FLOAT_EQ(tensor.get_host_value(0, 1, 1, 2), 99.0f);
 }
 
-TEST(TestTensor, GetAndSetHostValueNHWC)
+TEST(TestTensor, GetAndset_host_valueNHWC)
 {
     SKIP_IF_NO_DEVICES();
 

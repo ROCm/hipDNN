@@ -263,9 +263,8 @@ protected:
     void run_cpu_batchnorm_bwd(
         Batchnorm_2d_tensor_bundle<Input_type, Intermediate_type>& cpu_tensor_bundle)
     {
-        Cpu_fp_reference_implementation<Input_type, Intermediate_type, Intermediate_type>
-            cpu_ref_impl;
-        cpu_ref_impl.batchnorm_bwd(cpu_tensor_bundle.dy_tensor,
+        CpuFpReferenceImplementation<Input_type, Intermediate_type, Intermediate_type> cpu_ref_impl;
+        cpu_ref_impl.batchnormBwd(cpu_tensor_bundle.dy_tensor,
                                    cpu_tensor_bundle.x_tensor,
                                    cpu_tensor_bundle.mean_tensor,
                                    cpu_tensor_bundle.inv_variance_tensor,
@@ -301,15 +300,15 @@ protected:
 
         run_cpu_batchnorm_bwd<Input_type, Intermediate_type>(cpu_tensor_bundle);
 
-        Cpu_fp_reference_validation<Input_type> cpu_ref_validation(tolerance, tolerance);
-        EXPECT_TRUE(cpu_ref_validation.all_close(cpu_tensor_bundle.dx_tensor.memory(),
+        CpuFpReferenceValidation<Input_type> cpu_ref_validation(tolerance, tolerance);
+        EXPECT_TRUE(cpu_ref_validation.allClose(cpu_tensor_bundle.dx_tensor.memory(),
                                                  graph_tensor_bundle.dx_tensor.memory()));
 
-        Cpu_fp_reference_validation<Intermediate_type> cpu_ref_intermediate_validation(tolerance,
+        CpuFpReferenceValidation<Intermediate_type> cpu_ref_intermediate_validation(tolerance,
                                                                                        tolerance);
-        EXPECT_TRUE(cpu_ref_intermediate_validation.all_close(
+        EXPECT_TRUE(cpu_ref_intermediate_validation.allClose(
             cpu_tensor_bundle.dscale_tensor.memory(), graph_tensor_bundle.dscale_tensor.memory()));
-        EXPECT_TRUE(cpu_ref_intermediate_validation.all_close(
+        EXPECT_TRUE(cpu_ref_intermediate_validation.allClose(
             cpu_tensor_bundle.dbias_tensor.memory(), graph_tensor_bundle.dbias_tensor.memory()));
     }
 
@@ -355,7 +354,7 @@ std::vector<Bn_2d_test_case> get_bn_bwd_test_cases()
 
 // Note:
 // Tolerance ranges are set to be 4e-3f due to batchnorm being numerical unstable for large tensor sizes.
-// MIOpen uses 4e-3f for it's batchnorm tests to verify, but it uses RMS calc instead of all_close type check.
+// MIOpen uses 4e-3f for it's batchnorm tests to verify, but it uses RMS calc instead of allClose type check.
 // You can swap the tests above to use cpu_fp_reference_miopen_rms_validation if you want to match MIOpen's tolerance checks exactly.
 TEST_P(Batchnorm_backward_integration_test, RunFloatBwdBatchnormGraphNCHW)
 {

@@ -158,14 +158,14 @@ void Batchnorm_bwd_execute_graph_test::RunBwdBatchnormGraph(
                                                            static_cast<Intermediate_type>(2.0f),
                                                            seed));
 
-    auto batchnorm_builder = flatbuffer_test_utils::create_valid_batchnorm_bwd_graph(
+    auto batchnorm_builder = flatbuffer_test_utils::createValidBatchnormBwdGraph(
         dy_tensor.strides(), dy_tensor.dims(), true, input_data_type);
 
     hipdnnPluginConstData_t op_graph;
     op_graph.ptr = batchnorm_builder.GetBufferPointer();
     op_graph.size = batchnorm_builder.GetSize();
 
-    auto engine_config_builder = flatbuffer_test_utils::create_valid_engine_config(1);
+    auto engine_config_builder = flatbuffer_test_utils::createValidEngineConfig(1);
     hipdnnPluginConstData_t engine_config;
     engine_config.ptr = engine_config_builder.GetBufferPointer();
     engine_config.size = engine_config_builder.GetSize();
@@ -209,25 +209,24 @@ void Batchnorm_bwd_execute_graph_test::RunBwdBatchnormGraph(
     inv_variance_tensor_cpu.fill_with_random_values(
         static_cast<Intermediate_type>(1.9f), static_cast<Intermediate_type>(2.0f), seed);
 
-    Cpu_fp_reference_implementation<Input_type, Intermediate_type, Intermediate_type> cpu_ref_impl;
-    cpu_ref_impl.batchnorm_bwd(dy_tensor_cpu,
-                               x_tensor_cpu,
-                               mean_tensor_cpu,
-                               inv_variance_tensor_cpu,
-                               scale_tensor_cpu,
-                               dx_tensor_cpu,
-                               dscale_tensor_cpu,
-                               dbias_tensor_cpu);
+    CpuFpReferenceImplementation<Input_type, Intermediate_type, Intermediate_type> cpu_ref_impl;
+    cpu_ref_impl.batchnormBwd(dy_tensor_cpu,
+                              x_tensor_cpu,
+                              mean_tensor_cpu,
+                              inv_variance_tensor_cpu,
+                              scale_tensor_cpu,
+                              dx_tensor_cpu,
+                              dscale_tensor_cpu,
+                              dbias_tensor_cpu);
 
-    Cpu_fp_reference_validation<Input_type> cpu_ref_validation_input(epsilon, epsilon);
-    Cpu_fp_reference_validation<Intermediate_type> cpu_ref_validation_intermediate(epsilon,
-                                                                                   epsilon);
+    CpuFpReferenceValidation<Input_type> cpu_ref_validation_input(epsilon, epsilon);
+    CpuFpReferenceValidation<Intermediate_type> cpu_ref_validation_intermediate(epsilon, epsilon);
 
-    EXPECT_TRUE(cpu_ref_validation_input.all_close(dx_tensor_cpu.memory(), dx_tensor.memory()));
-    EXPECT_TRUE(cpu_ref_validation_intermediate.all_close(dscale_tensor_cpu.memory(),
-                                                          dscale_tensor.memory()));
-    EXPECT_TRUE(cpu_ref_validation_intermediate.all_close(dbias_tensor_cpu.memory(),
-                                                          dbias_tensor.memory()));
+    EXPECT_TRUE(cpu_ref_validation_input.allClose(dx_tensor_cpu.memory(), dx_tensor.memory()));
+    EXPECT_TRUE(cpu_ref_validation_intermediate.allClose(dscale_tensor_cpu.memory(),
+                                                         dscale_tensor.memory()));
+    EXPECT_TRUE(
+        cpu_ref_validation_intermediate.allClose(dbias_tensor_cpu.memory(), dbias_tensor.memory()));
 }
 
 INSTANTIATE_TEST_SUITE_P(RunBwdBatchnormGraphWithParams,

@@ -21,7 +21,7 @@ TEST(Graph_wrapperTest, NullBufferIsInvalid)
 
 TEST(Graph_wrapperTest, NonGraphBufferIsInvalid)
 {
-    auto builder = flatbuffer_test_utils::create_valid_engine_details(123);
+    auto builder = flatbuffer_test_utils::createValidEngineDetails(123);
     auto serialized_graph = builder.Release();
 
     Graph_wrapper wrapper(serialized_graph.data(), serialized_graph.size());
@@ -31,7 +31,7 @@ TEST(Graph_wrapperTest, NonGraphBufferIsInvalid)
 
 TEST(Graph_wrapperTest, ValidGraphReturnsCorrectNodeCountForEmptyGraph)
 {
-    flatbuffers::FlatBufferBuilder builder = flatbuffer_test_utils::create_empty_valid_graph();
+    flatbuffers::FlatBufferBuilder builder = flatbuffer_test_utils::createEmptyValidGraph();
     auto serialized_graph = builder.Release();
 
     Graph_wrapper wrapper(serialized_graph.data(), serialized_graph.size());
@@ -42,7 +42,7 @@ TEST(Graph_wrapperTest, ValidGraphReturnsCorrectNodeCountForEmptyGraph)
 
 TEST(Graph_wrapperTest, ValidGraphReturnsCorrectNodeCount)
 {
-    flatbuffers::FlatBufferBuilder builder = flatbuffer_test_utils::create_valid_batchnorm_graph();
+    flatbuffers::FlatBufferBuilder builder = flatbuffer_test_utils::createValidBatchnormGraph();
     auto serialized_graph = builder.Release();
 
     Graph_wrapper wrapper(serialized_graph.data(), serialized_graph.size());
@@ -53,7 +53,7 @@ TEST(Graph_wrapperTest, ValidGraphReturnsCorrectNodeCount)
 
 TEST(Graph_wrapperTest, HasSupportedTypesReturnsTrueIfAllSupported)
 {
-    flatbuffers::FlatBufferBuilder builder = flatbuffer_test_utils::create_valid_batchnorm_graph();
+    flatbuffers::FlatBufferBuilder builder = flatbuffer_test_utils::createValidBatchnormGraph();
     auto serialized_graph = builder.Release();
 
     Graph_wrapper wrapper(serialized_graph.data(), serialized_graph.size());
@@ -68,7 +68,7 @@ TEST(Graph_wrapperTest, HasSupportedTypesReturnsTrueIfAllSupported)
 
 TEST(Graph_wrapperTest, HasSupportedTypesReturnsFalseIfAnyUnsupported)
 {
-    flatbuffers::FlatBufferBuilder builder = flatbuffer_test_utils::create_valid_batchnorm_graph();
+    flatbuffers::FlatBufferBuilder builder = flatbuffer_test_utils::createValidBatchnormGraph();
     auto serialized_graph = builder.Release();
 
     Graph_wrapper wrapper(serialized_graph.data(), serialized_graph.size());
@@ -83,7 +83,7 @@ TEST(Graph_wrapperTest, HasSupportedTypesReturnsFalseIfAnyUnsupported)
 
 TEST(Graph_wrapperTest, GetTensorMapEmptyGraph)
 {
-    flatbuffers::FlatBufferBuilder builder = flatbuffer_test_utils::create_empty_valid_graph();
+    flatbuffers::FlatBufferBuilder builder = flatbuffer_test_utils::createEmptyValidGraph();
     auto serialized_graph = builder.Release();
 
     Graph_wrapper wrapper(serialized_graph.data(), serialized_graph.size());

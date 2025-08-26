@@ -70,7 +70,7 @@ TEST_F(Test_miopen_batchnorm_plan_builder, GetWorkspaceSizeReturnsExpectedValue)
 TEST_F(Test_miopen_batchnorm_plan_builder, BuildPlanSetsPlanForSupportedNode)
 {
     // Use a real flatbuffer graph with a valid batchnorm node
-    auto builder = flatbuffer_test_utils::create_valid_batchnorm_graph();
+    auto builder = flatbuffer_test_utils::createValidBatchnormGraph();
     hipdnn_plugin::Graph_wrapper graph(builder.GetBufferPointer(), builder.GetSize());
     hipdnnEnginePluginExecutionContext ctx;
 

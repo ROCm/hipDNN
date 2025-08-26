@@ -14,7 +14,7 @@ int main(int argc, char** argv)
     ::testing::InitGoogleTest(&argc, argv);
 
     hipdnn::logging::initialize_callback_logging(HIPDNN_SDK_TESTS,
-                                                 logging_test_utils::test_logging_callback);
+                                                 logging_test_utils::testLoggingCallback);
 
     return RUN_ALL_TESTS();
 }
