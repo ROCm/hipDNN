@@ -168,12 +168,12 @@ TEST(Engine_managerTest, InitializeExecutionContextCallsEngine)
     manager.add_engine(std::move(mock_engine));
     hipdnnEnginePluginHandle dummy_handle = {};
     Mock_graph mock_graph;
-    Mock_engine_config mock_engine_config;
-    ON_CALL(mock_engine_config, engine_id()).WillByDefault(Return(7));
-    EXPECT_CALL(mock_engine_config, engine_id()).Times(testing::AnyNumber()); // Uninteresting call
+    MockEngineConfig mockEngineConfig;
+    ON_CALL(mockEngineConfig, engineId()).WillByDefault(Return(7));
+    EXPECT_CALL(mockEngineConfig, engineId()).Times(testing::AnyNumber()); // Uninteresting call
     Mock_hipdnn_engine_plugin_execution_context exec_ctx;
 
-    manager.initialize_execution_context(dummy_handle, mock_graph, mock_engine_config, exec_ctx);
+    manager.initialize_execution_context(dummy_handle, mock_graph, mockEngineConfig, exec_ctx);
 }
 
 TEST(Engine_managerTest, InitializeExecutionContextThrowsOnInvalidEngineId)
@@ -182,10 +182,10 @@ TEST(Engine_managerTest, InitializeExecutionContextThrowsOnInvalidEngineId)
     Engine_manager manager;
     hipdnnEnginePluginHandle dummy_handle = {};
     Mock_graph mock_graph;
-    Mock_engine_config mock_engine_config;
+    MockEngineConfig mockEngineConfig;
 
-    EXPECT_CALL(mock_engine_config, engine_id()).Times(testing::AnyNumber()); // Uninteresting call
+    EXPECT_CALL(mockEngineConfig, engineId()).Times(testing::AnyNumber()); // Uninteresting call
     EXPECT_THROW(manager.initialize_execution_context(
-                     dummy_handle, mock_graph, mock_engine_config, exec_ctx),
+                     dummy_handle, mock_graph, mockEngineConfig, exec_ctx),
                  hipdnn_plugin::Hipdnn_plugin_exception);
 }
