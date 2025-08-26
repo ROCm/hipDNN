@@ -252,13 +252,13 @@ protected:
     {
         CpuFpReferenceImplementation<InputType, IntermediateType, IntermediateType> cpuRefImpl;
         cpuRefImpl.batchnormBwd(cpuTensorBundle.dyTensor,
-                                 cpuTensorBundle.xTensor,
-                                 cpuTensorBundle.meanTensor,
-                                 cpuTensorBundle.invVarianceTensor,
-                                 cpuTensorBundle.scaleTensor,
-                                 cpuTensorBundle.dxTensor,
-                                 cpuTensorBundle.dscaleTensor,
-                                 cpuTensorBundle.dbiasTensor);
+                                cpuTensorBundle.xTensor,
+                                cpuTensorBundle.meanTensor,
+                                cpuTensorBundle.invVarianceTensor,
+                                cpuTensorBundle.scaleTensor,
+                                cpuTensorBundle.dxTensor,
+                                cpuTensorBundle.dscaleTensor,
+                                cpuTensorBundle.dbiasTensor);
     }
 
     template <typename InputType, typename IntermediateType>
@@ -288,14 +288,14 @@ protected:
 
         CpuFpReferenceValidation<InputType> cpuRefValidation(tolerance, tolerance);
         EXPECT_TRUE(cpuRefValidation.allClose(cpuTensorBundle.dxTensor.memory(),
-                                               graphTensorBundle.dxTensor.memory()));
+                                              graphTensorBundle.dxTensor.memory()));
 
         CpuFpReferenceValidation<IntermediateType> cpuRefIntermediateValidation(tolerance,
-                                                                                   tolerance);
-        EXPECT_TRUE(cpuRefIntermediateValidation.allClose(
-            cpuTensorBundle.dscaleTensor.memory(), graphTensorBundle.dscaleTensor.memory()));
+                                                                                tolerance);
+        EXPECT_TRUE(cpuRefIntermediateValidation.allClose(cpuTensorBundle.dscaleTensor.memory(),
+                                                          graphTensorBundle.dscaleTensor.memory()));
         EXPECT_TRUE(cpuRefIntermediateValidation.allClose(cpuTensorBundle.dbiasTensor.memory(),
-                                                           graphTensorBundle.dbiasTensor.memory()));
+                                                          graphTensorBundle.dbiasTensor.memory()));
     }
 
 private:

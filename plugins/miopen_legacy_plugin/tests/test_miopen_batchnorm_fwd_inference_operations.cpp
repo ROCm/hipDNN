@@ -198,12 +198,12 @@ void BatchnormFwdInferExecuteGraphTest::runFwdBatchnormGraph(
 
     CpuFpReferenceImplementation<InputType, IntermediateType, IntermediateType> cpuRefImpl;
     cpuRefImpl.batchnormFwdInference(xTensorCpu,
-                                       scaleTensorCpu,
-                                       biasTensorCpu,
-                                       meanTensorCpu,
-                                       varianceTensorCpu,
-                                       yTensorCpu,
-                                       1e-3);
+                                     scaleTensorCpu,
+                                     biasTensorCpu,
+                                     meanTensorCpu,
+                                     varianceTensorCpu,
+                                     yTensorCpu,
+                                     1e-3);
 
     CpuFpReferenceValidation<InputType> cpuRefValidation(epsilon, epsilon);
     EXPECT_TRUE(cpuRefValidation.allClose(yTensorCpu.memory(), yTensor.memory()));

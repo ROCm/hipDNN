@@ -235,12 +235,12 @@ protected:
     {
         CpuFpReferenceImplementation<InputType, IntermediateType, IntermediateType> cpuRefImpl;
         cpuRefImpl.batchnormFwdInference(cpuTensorBundle.xTensor,
-                                           cpuTensorBundle.scaleTensor,
-                                           cpuTensorBundle.biasTensor,
-                                           cpuTensorBundle.meanTensor,
-                                           cpuTensorBundle.varianceTensor,
-                                           cpuTensorBundle.yTensor,
-                                           1e-3);
+                                         cpuTensorBundle.scaleTensor,
+                                         cpuTensorBundle.biasTensor,
+                                         cpuTensorBundle.meanTensor,
+                                         cpuTensorBundle.varianceTensor,
+                                         cpuTensorBundle.yTensor,
+                                         1e-3);
     }
 
     template <typename InputType, typename IntermediateType>
@@ -269,7 +269,7 @@ protected:
 
         CpuFpReferenceValidation<InputType> cpuRefValidation(tolerance, tolerance);
         EXPECT_TRUE(cpuRefValidation.allClose(cpuTensorBundle.yTensor.memory(),
-                                               graphTensorBundle.yTensor.memory()));
+                                              graphTensorBundle.yTensor.memory()));
     }
 
 private:
