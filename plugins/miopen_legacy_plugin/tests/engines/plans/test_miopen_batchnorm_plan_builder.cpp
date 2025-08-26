@@ -107,6 +107,6 @@ TEST_F(Test_miopen_batchnorm_plan_builder, BuildPlanThrowsForUnsupportedNodeType
     hipdnnEnginePluginExecutionContext ctx;
 
     EXPECT_THROW(plan_builder.build_plan(dummy_handle, graph, ctx),
-                 hipdnn_plugin::Hipdnn_plugin_exception);
+                 hipdnn_plugin::HipdnnPluginException);
     EXPECT_FALSE(ctx.has_valid_plan());
 }

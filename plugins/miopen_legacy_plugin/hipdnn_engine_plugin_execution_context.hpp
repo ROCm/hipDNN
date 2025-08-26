@@ -33,7 +33,7 @@ public:
     {
         if(!has_valid_plan())
         {
-            throw hipdnn_plugin::Hipdnn_plugin_exception(
+            throw hipdnn_plugin::HipdnnPluginException(
                 HIPDNN_PLUGIN_STATUS_INTERNAL_ERROR,
                 "Cannot get plan in execution context, its not set");
         }

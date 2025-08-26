@@ -126,7 +126,7 @@ TEST(Engine_managerTest, ThrowsOnInvalidEngineId)
 
     hipdnnEnginePluginHandle dummy_handle = {};
     EXPECT_THROW(manager.get_engine_details(dummy_handle, mock_graph, 999, engine_details),
-                 hipdnn_plugin::Hipdnn_plugin_exception);
+                 hipdnn_plugin::HipdnnPluginException);
 }
 
 TEST(Engine_managerTest, GetWorkspaceSizeReturnsCorrectValue)
@@ -153,7 +153,7 @@ TEST(Engine_managerTest, GetWorkspaceSizeThrowsOnInvalidEngineId)
     MockGraph mock_graph;
 
     EXPECT_THROW(manager.get_workspace_size(dummy_handle, 999, mock_graph),
-                 hipdnn_plugin::Hipdnn_plugin_exception);
+                 hipdnn_plugin::HipdnnPluginException);
 }
 
 TEST(Engine_managerTest, InitializeExecutionContextCallsEngine)
@@ -187,5 +187,5 @@ TEST(Engine_managerTest, InitializeExecutionContextThrowsOnInvalidEngineId)
     EXPECT_CALL(mockEngineConfig, engineId()).Times(testing::AnyNumber()); // Uninteresting call
     EXPECT_THROW(manager.initialize_execution_context(
                      dummy_handle, mock_graph, mockEngineConfig, exec_ctx),
-                 hipdnn_plugin::Hipdnn_plugin_exception);
+                 hipdnn_plugin::HipdnnPluginException);
 }

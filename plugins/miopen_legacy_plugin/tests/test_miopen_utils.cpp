@@ -27,7 +27,7 @@ TEST(MiopenUtilsTest, FindDeviceBufferThrowsIfNotFound)
 
     EXPECT_THROW(
         miopen_utils::find_device_buffer(2, buffers.data(), static_cast<uint32_t>(buffers.size())),
-        hipdnn_plugin::Hipdnn_plugin_exception);
+        hipdnn_plugin::HipdnnPluginException);
 }
 
 TEST(MiopenUtilsTest, TensorDataTypeToMiopenDataType)
@@ -47,5 +47,5 @@ TEST(MiopenUtilsTest, TensorDataTypeToMiopenDataTypeThrowsOnUnsupported)
     // Use a value not in the enum
     EXPECT_THROW(miopen_utils::tensor_data_type_to_miopen_data_type(
                      static_cast<hipdnn_sdk::data_objects::DataType>(-1)),
-                 hipdnn_plugin::Hipdnn_plugin_exception);
+                 hipdnn_plugin::HipdnnPluginException);
 }

@@ -66,7 +66,7 @@ Engine_interface& Engine_manager::get_engine(int64_t engine_id) const
     auto it = _engines.find(engine_id);
     if(it == _engines.end())
     {
-        throw Hipdnn_plugin_exception(HIPDNN_PLUGIN_STATUS_INVALID_VALUE,
+        throw HipdnnPluginException(HIPDNN_PLUGIN_STATUS_INVALID_VALUE,
                                       "Engine with ID " + std::to_string(engine_id)
                                           + " not found.");
     }

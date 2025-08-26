@@ -67,7 +67,7 @@ protected:
         {
             throw Hipdnn_exception(HIPDNN_STATUS_PLUGIN_ERROR,
                                    std::string("Failed to ") + description + ". Status: "
-                                       + to_string(status) + "(" + std::to_string(status) + ")"
+                                       + toString(status) + "(" + std::to_string(status) + ")"
                                        + ", Error: " + std::string(getLastErrorString()));
         }
     }
@@ -266,8 +266,8 @@ private:
             {
                 throw Hipdnn_exception(HIPDNN_STATUS_PLUGIN_ERROR,
                                        std::string("Plugin type mismatch: expected ")
-                                           + to_string(Plugin::getPluginType()) + ", got "
-                                           + to_string(type));
+                                           + toString(Plugin::getPluginType()) + ", got "
+                                           + toString(type));
             }
 
             plugin->setLoggingCallback(logging::hipdnn_logging_callback);

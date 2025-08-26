@@ -39,5 +39,5 @@ TEST(HipdnnEnginePluginExecutionContextTest, GetPlanThrowsIfNotSet)
 {
     hipdnnEnginePluginExecutionContext ctx;
 
-    EXPECT_THROW(ctx.plan(), hipdnn_plugin::Hipdnn_plugin_exception);
+    EXPECT_THROW(ctx.plan(), hipdnn_plugin::HipdnnPluginException);
 }

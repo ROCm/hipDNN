@@ -13,21 +13,21 @@
 // NOTE: The last_error variable must be defined in one of the plugin source files:
 //
 // NOLINTNEXTLINE(modernize-avoid-c-arrays)
-// thread_local char Plugin_last_error_manager::last_error[HIPDNN_PLUGIN_ERROR_STRING_MAX_LENGTH] = "";
+// thread_local char PluginLastErrorManager::_last_error[HIPDNN_PLUGIN_ERROR_STRING_MAX_LENGTH] = "";
 
 namespace hipdnn_plugin
 {
 
-class Plugin_last_error_manager
+class PluginLastErrorManager
 {
 private:
     // We cannot use std::string in thread-local storage here because it requires a thread-local storage destructor.
     // This prevents the shared object (plugin) from being unloaded until the program terminates.
     // NOLINTNEXTLINE(modernize-avoid-c-arrays)
-    thread_local static char last_error[HIPDNN_PLUGIN_ERROR_STRING_MAX_LENGTH];
+    thread_local static char _last_error[HIPDNN_PLUGIN_ERROR_STRING_MAX_LENGTH];
 
 public:
-    static hipdnnPluginStatus_t set_last_error(hipdnnPluginStatus_t status, const char* message)
+    static hipdnnPluginStatus_t setLastError(hipdnnPluginStatus_t status, const char* message)
     {
         if(status == HIPDNN_PLUGIN_STATUS_SUCCESS)
         {
@@ -37,20 +37,20 @@ public:
         HIPDNN_LOG_ERROR("Error occured in status:{} message:{}", status, message);
 
         hipdnn::sdk::utilities::copy_max_size_with_null_terminator(
-            last_error, message, sizeof(last_error));
+            _last_error, message, sizeof(_last_error));
 
         return status;
     }
 
-    static hipdnnPluginStatus_t set_last_error(hipdnnPluginStatus_t status,
+    static hipdnnPluginStatus_t setLastError(hipdnnPluginStatus_t status,
                                                const std::string& message)
     {
-        return set_last_error(status, message.c_str());
+        return setLastError(status, message.c_str());
     }
 
-    static const char* get_last_error()
+    static const char* getLastError()
     {
-        return last_error;
+        return _last_error;
     }
 };
 

@@ -16,7 +16,7 @@ TEST(Graph_wrapperTest, NullBufferIsInvalid)
 {
     GraphWrapper wrapper(nullptr, 0);
     EXPECT_FALSE(wrapper.isValid());
-    EXPECT_THROW(wrapper.getGraph(), Hipdnn_plugin_exception);
+    EXPECT_THROW(wrapper.getGraph(), HipdnnPluginException);
 }
 
 TEST(Graph_wrapperTest, NonGraphBufferIsInvalid)

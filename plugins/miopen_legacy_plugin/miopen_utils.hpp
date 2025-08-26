@@ -21,7 +21,7 @@
     {                                                                                   \
         if(status != miopenStatusSuccess)                                               \
         {                                                                               \
-            throw hipdnn_plugin::Hipdnn_plugin_exception(                               \
+            throw hipdnn_plugin::HipdnnPluginException(                               \
                 HIPDNN_PLUGIN_STATUS_INTERNAL_ERROR,                                    \
                 "MIOpen error occurred: " + std::string(miopenGetErrorString(status))); \
         }                                                                               \

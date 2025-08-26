@@ -72,7 +72,7 @@ std::unique_ptr<Miopen_tensor> create_tensor(
         return std::make_unique<Miopen_tensor>(*tensor_attr->second);
     }
 
-    throw hipdnn_plugin::Hipdnn_plugin_exception(HIPDNN_PLUGIN_STATUS_INTERNAL_ERROR,
+    throw hipdnn_plugin::HipdnnPluginException(HIPDNN_PLUGIN_STATUS_INTERNAL_ERROR,
                                                  "Failed to find tensor with UID in tensor_map: "
                                                      + std::to_string(uid));
 }

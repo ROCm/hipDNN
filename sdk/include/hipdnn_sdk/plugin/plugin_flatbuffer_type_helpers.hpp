@@ -10,12 +10,12 @@
 
 namespace hipdnn_sdk::data_objects
 {
-inline const char* to_string(hipdnn_sdk::data_objects::NodeAttributes attributes)
+inline const char* toString(hipdnn_sdk::data_objects::NodeAttributes attributes)
 {
     return hipdnn_sdk::data_objects::EnumNameNodeAttributes(attributes);
 }
 
-inline const char* to_string(hipdnn_sdk::data_objects::DataType data_type)
+inline const char* toString(hipdnn_sdk::data_objects::DataType data_type)
 {
     return hipdnn_sdk::data_objects::EnumNameDataType(data_type);
 }

@@ -61,7 +61,7 @@ private:
     {
         if(!isValid())
         {
-            throw hipdnn_plugin::Hipdnn_plugin_exception(HIPDNN_PLUGIN_STATUS_INTERNAL_ERROR,
+            throw hipdnn_plugin::HipdnnPluginException(HIPDNN_PLUGIN_STATUS_INTERNAL_ERROR,
                                                          "Engine details is not valid");
         }
     }

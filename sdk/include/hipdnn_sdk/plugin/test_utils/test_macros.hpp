@@ -14,13 +14,13 @@
             (x);                                                         \
             FAIL() << "Expected exception not thrown";                   \
         }                                                                \
-        catch(const hipdnn_plugin::Hipdnn_plugin_exception& e)           \
+        catch(const hipdnn_plugin::HipdnnPluginException& e)             \
         {                                                                \
             ASSERT_EQ(e.get_status(), status);                           \
         }                                                                \
         catch(...)                                                       \
         {                                                                \
-            FAIL() << "Expected hipdnn_plugin::Hipdnn_plugin_exception"; \
+            FAIL() << "Expected hipdnn_plugin::HipdnnPluginException";   \
         }                                                                \
     } while(0)
 // NOLINTEND

@@ -20,8 +20,8 @@ TEST(EngineDetailsWrapperTest, InvalidBufferIsNotValid)
 {
     EngineDetailsWrapper wrapper(nullptr, 0);
     EXPECT_FALSE(wrapper.isValid());
-    EXPECT_THROW(wrapper.engineId(), Hipdnn_plugin_exception);
-    EXPECT_THROW(wrapper.getEngineDetails(), Hipdnn_plugin_exception);
+    EXPECT_THROW(wrapper.engineId(), HipdnnPluginException);
+    EXPECT_THROW(wrapper.getEngineDetails(), HipdnnPluginException);
 }
 
 TEST(EngineDetailsWrapperTest, ValidBufferIsValid)
@@ -39,5 +39,5 @@ TEST(EngineDetailsWrapperTest, CorruptedBufferIsNotValid)
     std::vector<uint8_t> buffer(16, 0xFF); // Not a valid flatbuffer
     EngineDetailsWrapper wrapper(buffer.data(), buffer.size());
     EXPECT_FALSE(wrapper.isValid());
-    EXPECT_THROW(wrapper.engineId(), Hipdnn_plugin_exception);
+    EXPECT_THROW(wrapper.engineId(), HipdnnPluginException);
 }

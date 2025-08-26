@@ -21,7 +21,7 @@ hipdnnPluginDeviceBuffer_t find_device_buffer(int64_t uid,
         }
     }
 
-    throw hipdnn_plugin::Hipdnn_plugin_exception(
+    throw hipdnn_plugin::HipdnnPluginException(
         HIPDNN_PLUGIN_STATUS_INVALID_VALUE,
         "Device buffer with the uid: " + std::to_string(uid)
             + " not found in the provided device buffers.");
@@ -39,10 +39,10 @@ miopenDataType_t
     case hipdnn_sdk::data_objects::DataType_BFLOAT16:
         return miopenBFloat16;
     default:
-        throw hipdnn_plugin::Hipdnn_plugin_exception(
+        throw hipdnn_plugin::HipdnnPluginException(
             HIPDNN_PLUGIN_STATUS_BAD_PARAM,
             "Unsupported data type for MIOpen: "
-                + std::string(hipdnn_sdk::data_objects::to_string(data_type)));
+                + std::string(hipdnn_sdk::data_objects::toString(data_type)));
     }
 }
 

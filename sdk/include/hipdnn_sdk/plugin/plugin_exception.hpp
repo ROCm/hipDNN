@@ -11,10 +11,10 @@
 namespace hipdnn_plugin
 {
 
-class Hipdnn_plugin_exception : public std::exception
+class HipdnnPluginException : public std::exception
 {
 public:
-    explicit Hipdnn_plugin_exception(hipdnnPluginStatus_t status, std::string message)
+    explicit HipdnnPluginException(hipdnnPluginStatus_t status, std::string message)
         : _status(status)
         , _message(std::move(message))
     {
@@ -25,12 +25,12 @@ public:
         return _message.c_str();
     }
 
-    std::string get_message() const noexcept
+    std::string getMessage() const noexcept
     {
         return _message;
     }
 
-    hipdnnPluginStatus_t get_status() const noexcept
+    hipdnnPluginStatus_t getStatus() const noexcept
     {
         return _status;
     }
@@ -40,40 +40,40 @@ private:
     std::string _message;
 };
 
-#define PLUGIN_THROW_IF_NE(x, y, failure_status, message)       \
+#define PLUGIN_THROW_IF_NE(x, y, failureStatus, message)       \
     if(x != y)                                                  \
     {                                                           \
-        throw Hipdnn_plugin_exception(failure_status, message); \
+        throw HipdnnPluginException(failureStatus, message); \
     }
 
-#define PLUGIN_THROW_IF_EQ(x, y, failure_status, message)       \
+#define PLUGIN_THROW_IF_EQ(x, y, failureStatus, message)       \
     if(x == y)                                                  \
     {                                                           \
-        throw Hipdnn_plugin_exception(failure_status, message); \
+        throw HipdnnPluginException(failureStatus, message); \
     }
 
-#define PLUGIN_THROW_IF_TRUE(x, failure_status, message)        \
+#define PLUGIN_THROW_IF_TRUE(x, failureStatus, message)        \
     if(x)                                                       \
     {                                                           \
-        throw Hipdnn_plugin_exception(failure_status, message); \
+        throw HipdnnPluginException(failureStatus, message); \
     }
 
-#define PLUGIN_THROW_IF_FALSE(x, failure_status, message)       \
+#define PLUGIN_THROW_IF_FALSE(x, failureStatus, message)       \
     if(!(x))                                                    \
     {                                                           \
-        throw Hipdnn_plugin_exception(failure_status, message); \
+        throw HipdnnPluginException(failureStatus, message); \
     }
 
-#define PLUGIN_THROW_IF_NULL(x, failure_status, message)        \
+#define PLUGIN_THROW_IF_NULL(x, failureStatus, message)        \
     if(x == nullptr)                                            \
     {                                                           \
-        throw Hipdnn_plugin_exception(failure_status, message); \
+        throw HipdnnPluginException(failureStatus, message); \
     }
 
-#define PLUGIN_THROW_IF_LT(x, y, failure_status, message)       \
+#define PLUGIN_THROW_IF_LT(x, y, failureStatus, message)       \
     if(x < y)                                                   \
     {                                                           \
-        throw Hipdnn_plugin_exception(failure_status, message); \
+        throw HipdnnPluginException(failureStatus, message); \
     }
 
 }
