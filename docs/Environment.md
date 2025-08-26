@@ -46,7 +46,7 @@ export HIPDNN_LOG_FILE=/path/to/hipdnn.log
 
 The frontend and plugins can be configured to use the same logging destination as the backend, which is lazy-initialized automatically:
 
-1. Initialize logging using the `initialize_callback_logging` function
+1. Initialize logging using the `initializeCallbackLogging` function
 2. Pass `hipdnnLoggingCallback_ext` as the callback function (accessible via plugin API or backend header)
 3. This ensures all components log to the same destination
 

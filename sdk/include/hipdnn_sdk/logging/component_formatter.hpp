@@ -12,11 +12,11 @@
 namespace hipdnn::logging
 {
 
-class Component_formatter final : public spdlog::formatter
+class ComponentFormatter final : public spdlog::formatter
 {
 public:
-    Component_formatter()
-        : _pass_through_formatter{std::make_unique<spdlog::pattern_formatter>("%v")}
+    ComponentFormatter()
+        : _passThroughFormatter{std::make_unique<spdlog::pattern_formatter>("%v")}
     {
     }
 
@@ -25,24 +25,23 @@ public:
         // The logger "hipdnn_callback_receiver" receives pre-formatted strings from a callback sink
         if(msg.logger_name == "hipdnn_callback_receiver")
         {
-            _pass_through_formatter->format(msg, dest);
+            _passThroughFormatter->format(msg, dest);
         }
         else
         {
-            auto standard_formatter
-                = std::make_unique<spdlog::pattern_formatter>(generate_pattern_string(
-                    std::string(msg.logger_name.data(), msg.logger_name.size())));
-            standard_formatter->format(msg, dest);
+            auto standardFormatter = std::make_unique<spdlog::pattern_formatter>(
+                generatePatternString(std::string(msg.logger_name.data(), msg.logger_name.size())));
+            standardFormatter->format(msg, dest);
         }
     }
 
     std::unique_ptr<spdlog::formatter> clone() const override
     {
-        return std::make_unique<Component_formatter>();
+        return std::make_unique<ComponentFormatter>();
     }
 
 private:
-    std::unique_ptr<spdlog::pattern_formatter> _pass_through_formatter;
+    std::unique_ptr<spdlog::pattern_formatter> _passThroughFormatter;
 };
 
 } // namespace hipdnn::logging

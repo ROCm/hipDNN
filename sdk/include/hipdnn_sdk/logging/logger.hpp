@@ -38,15 +38,15 @@
 
 namespace hipdnn::logging
 {
-inline void initialize_callback_logging(const std::string& component_name,
-                                        hipdnnCallback_t callback_function)
+inline void initializeCallbackLogging(const std::string& componentName,
+                                      hipdnnCallback_t callbackFunction)
 {
     try
     {
-        static std::mutex callback_init_mutex;
-        std::lock_guard<std::mutex> lock(callback_init_mutex);
+        static std::mutex callbackInitMutex;
+        std::lock_guard<std::mutex> lock(callbackInitMutex);
 
-        if(spdlog::get(component_name))
+        if(spdlog::get(componentName))
         {
             return;
         }
@@ -56,14 +56,14 @@ inline void initialize_callback_logging(const std::string& component_name,
             spdlog::init_thread_pool(8192, 1);
         }
 
-        auto callback_logger
-            = hipdnn::logging::create_async_callback_logger_mt(callback_function, component_name);
-        spdlog::register_logger(callback_logger);
+        auto callbackLogger
+            = hipdnn::logging::createAsyncCallbackLoggerMt(callbackFunction, componentName);
+        spdlog::register_logger(callbackLogger);
     }
     catch(const spdlog::spdlog_ex& ex)
     {
         std::cerr << "hipDNN SDK: Failed to initialize callback logger for component '"
-                  << component_name << "'. Error: " << ex.what() << "\n";
+                  << componentName << "'. Error: " << ex.what() << "\n";
     }
 }
 
