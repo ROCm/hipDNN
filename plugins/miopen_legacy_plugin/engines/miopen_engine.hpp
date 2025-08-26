@@ -20,15 +20,15 @@ public:
 
     int64_t id() const override;
 
-    bool is_applicable(const hipdnn_plugin::Graph_interface& op_graph) const override;
+    bool is_applicable(const hipdnn_plugin::IGraph& op_graph) const override;
     void get_details(hipdnnEnginePluginHandle& handle,
                      hipdnnPluginConstData_t& details_out) const override;
     size_t get_workspace_size(const hipdnnEnginePluginHandle& handle,
-                              const hipdnn_plugin::Graph_interface& op_graph) const override;
+                              const hipdnn_plugin::IGraph& op_graph) const override;
 
     void initialize_execution_context(
         const hipdnnEnginePluginHandle& handle,
-        const hipdnn_plugin::Graph_interface& op_graph,
+        const hipdnn_plugin::IGraph& op_graph,
         hipdnnEnginePluginExecutionContext& execution_context) const override;
 
     void add_plan_builder(std::unique_ptr<Plan_builder_interface> plan_builder);

@@ -358,7 +358,7 @@ public:
                     "No engines available - cannot create execution context");
             }
 
-            hipdnn_plugin::Graph_wrapper op_graph_wrapper(op_graph->ptr, op_graph->size);
+            hipdnn_plugin::GraphWrapper op_graph_wrapper(op_graph->ptr, op_graph->size);
             hipdnn_plugin::EngineConfigWrapper engineConfigWrapper(engine_config->ptr,
                                                                    engine_config->size);
 

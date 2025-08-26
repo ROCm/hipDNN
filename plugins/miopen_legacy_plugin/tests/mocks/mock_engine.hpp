@@ -20,7 +20,7 @@ public:
     MOCK_METHOD(int64_t, id, (), (const, override));
     MOCK_METHOD(bool,
                 is_applicable,
-                (const hipdnn_plugin::Graph_interface& op_graph),
+                (const hipdnn_plugin::IGraph& op_graph),
                 (const, override));
     MOCK_METHOD(void,
                 get_details,
@@ -29,13 +29,13 @@ public:
     MOCK_METHOD(size_t,
                 get_workspace_size,
                 (const hipdnnEnginePluginHandle& handle,
-                 const hipdnn_plugin::Graph_interface& op_graph),
+                 const hipdnn_plugin::IGraph& opGraph),
                 (const, override));
 
     MOCK_METHOD(void,
                 initialize_execution_context,
                 (const hipdnnEnginePluginHandle& handle,
-                 const hipdnn_plugin::Graph_interface& op_graph,
+                 const hipdnn_plugin::IGraph& opGraph,
                  hipdnnEnginePluginExecutionContext& execution_context),
                 (const, override));
 };

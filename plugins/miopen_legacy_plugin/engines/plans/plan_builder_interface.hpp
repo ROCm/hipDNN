@@ -20,14 +20,14 @@ class Plan_builder_interface
 public:
     virtual ~Plan_builder_interface() = default;
 
-    virtual bool is_applicable(const hipdnn_plugin::Graph_interface& op_graph) const = 0;
+    virtual bool is_applicable(const hipdnn_plugin::IGraph& op_graph) const = 0;
 
     virtual size_t get_workspace_size(const hipdnnEnginePluginHandle& handle,
-                                      const hipdnn_plugin::Graph_interface& op_graph) const
+                                      const hipdnn_plugin::IGraph& op_graph) const
         = 0;
 
     virtual void build_plan(const hipdnnEnginePluginHandle& handle,
-                            const hipdnn_plugin::Graph_interface& op_graph,
+                            const hipdnn_plugin::IGraph& op_graph,
                             hipdnnEnginePluginExecutionContext& execution_context) const
         = 0;
 };

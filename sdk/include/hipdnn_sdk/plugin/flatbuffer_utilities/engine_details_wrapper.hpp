@@ -12,54 +12,54 @@
 namespace hipdnn_plugin
 {
 
-class Engine_details_interface
+class IEngineDetails
 {
 public:
-    virtual ~Engine_details_interface() = default;
+    virtual ~IEngineDetails() = default;
 
-    virtual const hipdnn_sdk::data_objects::EngineDetails& get_engine_details() const = 0;
-    virtual bool is_valid() const = 0;
-    virtual int64_t engine_id() const = 0;
+    virtual const hipdnn_sdk::data_objects::EngineDetails& getEngineDetails() const = 0;
+    virtual bool isValid() const = 0;
+    virtual int64_t engineId() const = 0;
 };
 
-class Engine_details_wrapper : public Engine_details_interface
+class EngineDetailsWrapper : public IEngineDetails
 {
 public:
-    explicit Engine_details_wrapper(const void* buffer, size_t size)
+    explicit EngineDetailsWrapper(const void* buffer, size_t size)
     {
         if(buffer != nullptr)
         {
             flatbuffers::Verifier verifier(static_cast<const uint8_t*>(buffer), size);
             if(verifier.VerifyBuffer<hipdnn_sdk::data_objects::EngineDetails>())
             {
-                _shallow_engine_details
+                _shallowEngineDetails
                     = flatbuffers::GetRoot<hipdnn_sdk::data_objects::EngineDetails>(buffer);
             }
         }
     }
 
-    const hipdnn_sdk::data_objects::EngineDetails& get_engine_details() const override
+    const hipdnn_sdk::data_objects::EngineDetails& getEngineDetails() const override
     {
-        throw_if_not_valid();
-        return *_shallow_engine_details;
+        throwIfNotValid();
+        return *_shallowEngineDetails;
     }
 
-    bool is_valid() const override
+    bool isValid() const override
     {
-        return _shallow_engine_details != nullptr;
+        return _shallowEngineDetails != nullptr;
     }
 
-    int64_t engine_id() const override
+    int64_t engineId() const override
     {
-        throw_if_not_valid();
+        throwIfNotValid();
 
-        return _shallow_engine_details->engine_id();
+        return _shallowEngineDetails->engine_id();
     }
 
 private:
-    void throw_if_not_valid() const
+    void throwIfNotValid() const
     {
-        if(!is_valid())
+        if(!isValid())
         {
             throw hipdnn_plugin::Hipdnn_plugin_exception(HIPDNN_PLUGIN_STATUS_INTERNAL_ERROR,
                                                          "Engine details is not valid");
@@ -68,7 +68,7 @@ private:
 
     // Pointer to the flatbuffer representation of the engine details. We do not own this memory
     // as were just reading from the buffer passed during construction.
-    const hipdnn_sdk::data_objects::EngineDetails* _shallow_engine_details = nullptr;
+    const hipdnn_sdk::data_objects::EngineDetails* _shallowEngineDetails = nullptr;
 };
 
 }

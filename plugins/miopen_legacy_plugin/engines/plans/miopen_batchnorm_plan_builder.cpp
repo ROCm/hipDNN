@@ -15,18 +15,18 @@ namespace miopen_legacy_plugin
 {
 
 bool Miopen_batchnorm_plan_builder::is_applicable(
-    const hipdnn_plugin::Graph_interface& op_graph) const
+    const hipdnn_plugin::IGraph& op_graph) const
 {
 
-    if(op_graph.node_count() != 1)
+    if(op_graph.nodeCount() != 1)
     {
         HIPDNN_LOG_INFO(
             "Batchnorm plan builder is applicable only for single node graphs. Graph has {} nodes",
-            op_graph.node_count());
+            op_graph.nodeCount());
         return false;
     }
 
-    if(!op_graph.has_only_supported_attributes(std::set<hipdnn_sdk::data_objects::NodeAttributes>{
+    if(!op_graph.hasOnlySupportedAttributes(std::set<hipdnn_sdk::data_objects::NodeAttributes>{
            hipdnn_sdk::data_objects::NodeAttributes_BatchnormInferenceAttributes,
            hipdnn_sdk::data_objects::NodeAttributes_BatchnormBackwardAttributes}))
     {
@@ -38,7 +38,7 @@ bool Miopen_batchnorm_plan_builder::is_applicable(
 }
 
 size_t Miopen_batchnorm_plan_builder::get_workspace_size(
-    const hipdnnEnginePluginHandle& handle, const hipdnn_plugin::Graph_interface& op_graph) const
+    const hipdnnEnginePluginHandle& handle, const hipdnn_plugin::IGraph& op_graph) const
 {
     std::ignore = handle;
     std::ignore = op_graph;
@@ -55,7 +55,7 @@ std::string get_node_name(const hipdnn_sdk::data_objects::Node& node)
 }
 
 void build_plan_inference_single_node(const hipdnnEnginePluginHandle& handle,
-                                      const hipdnn_plugin::Graph_interface& op_graph,
+                                      const hipdnn_plugin::IGraph& op_graph,
                                       const hipdnn_sdk::data_objects::Node& node,
                                       hipdnnEnginePluginExecutionContext& execution_context)
 {
@@ -71,13 +71,13 @@ void build_plan_inference_single_node(const hipdnnEnginePluginHandle& handle,
     }
 
     auto params
-        = std::make_unique<Batchnorm_fwd_inference_params>(*attr, op_graph.get_tensor_map());
+        = std::make_unique<Batchnorm_fwd_inference_params>(*attr, op_graph.getTensorMap());
     auto plan = std::make_unique<Batchnorm_fwd_inference_plan>(std::move(params));
     execution_context.set_plan(std::move(plan));
 }
 
 void build_plan_bwd_single_node(const hipdnnEnginePluginHandle& handle,
-                                const hipdnn_plugin::Graph_interface& op_graph,
+                                const hipdnn_plugin::IGraph& op_graph,
                                 const hipdnn_sdk::data_objects::Node& node,
                                 hipdnnEnginePluginExecutionContext& execution_context)
 {
@@ -92,7 +92,7 @@ void build_plan_bwd_single_node(const hipdnnEnginePluginHandle& handle,
                 + get_node_name(node));
     }
 
-    auto params = std::make_unique<Batchnorm_bwd_params>(*attr, op_graph.get_tensor_map());
+    auto params = std::make_unique<Batchnorm_bwd_params>(*attr, op_graph.getTensorMap());
     auto plan = std::make_unique<Batchnorm_bwd_plan>(std::move(params));
     execution_context.set_plan(std::move(plan));
 }
@@ -101,10 +101,10 @@ void build_plan_bwd_single_node(const hipdnnEnginePluginHandle& handle,
 
 void Miopen_batchnorm_plan_builder::build_plan(
     const hipdnnEnginePluginHandle& handle,
-    const hipdnn_plugin::Graph_interface& op_graph,
+    const hipdnn_plugin::IGraph& op_graph,
     hipdnnEnginePluginExecutionContext& execution_context) const
 {
-    const auto& node = op_graph.get_node(0);
+    const auto& node = op_graph.getNode(0);
 
     std::string node_name = get_node_name(node);
     switch(node.attributes_type())

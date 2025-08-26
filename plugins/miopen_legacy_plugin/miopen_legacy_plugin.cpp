@@ -243,7 +243,7 @@ hipdnnPluginStatus_t
         throw_if_null(num_engines);
 
         auto& engine_manager = handle->get_engine_manager();
-        Graph_wrapper op_graph_wrapper(op_graph->ptr, op_graph->size);
+        GraphWrapper op_graph_wrapper(op_graph->ptr, op_graph->size);
 
         auto applicable_engines = engine_manager.get_applicable_engine_ids(op_graph_wrapper);
 
@@ -285,7 +285,7 @@ hipdnnPluginStatus_t hipdnnEnginePluginGetEngineDetails(hipdnnEnginePluginHandle
         throw_if_null(engine_details);
 
         auto& engine_manager = handle->get_engine_manager();
-        Graph_wrapper op_graph_wrapper(op_graph->ptr, op_graph->size);
+        GraphWrapper op_graph_wrapper(op_graph->ptr, op_graph->size);
 
         engine_manager.get_engine_details(*handle, op_graph_wrapper, engine_id, *engine_details);
 
@@ -332,7 +332,7 @@ hipdnnPluginStatus_t
         auto& engine_manager = handle->get_engine_manager();
 
         EngineConfigWrapper engineConfigWrapper(engine_config->ptr, engine_config->size);
-        Graph_wrapper op_graph_wrapper(op_graph->ptr, op_graph->size);
+        GraphWrapper op_graph_wrapper(op_graph->ptr, op_graph->size);
         *workspace_size = engine_manager.get_workspace_size(
             *handle, engineConfigWrapper.engineId(), op_graph_wrapper);
 
@@ -358,7 +358,7 @@ hipdnnPluginStatus_t hipdnnEnginePluginCreateExecutionContext(
         throw_if_null(op_graph);
         throw_if_null(execution_context);
 
-        Graph_wrapper op_graph_wrapper(op_graph->ptr, op_graph->size);
+        GraphWrapper op_graph_wrapper(op_graph->ptr, op_graph->size);
         EngineConfigWrapper engineConfigWrapper(engine_config->ptr, engine_config->size);
 
         auto& engine_manager = handle->get_engine_manager();

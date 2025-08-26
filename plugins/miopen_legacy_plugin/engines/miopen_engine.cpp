@@ -19,7 +19,7 @@ int64_t Miopen_engine::id() const
     return _id;
 }
 
-bool Miopen_engine::is_applicable(const hipdnn_plugin::Graph_interface& op_graph) const
+bool Miopen_engine::is_applicable(const hipdnn_plugin::IGraph& op_graph) const
 {
     // This is wrong if we ever have more than 1 plan builder thats applicable.
     // If this is the case, we should split plan builders accross multiple engines.
@@ -47,7 +47,7 @@ void Miopen_engine::get_details(hipdnnEnginePluginHandle& handle,
 }
 
 size_t Miopen_engine::get_workspace_size(const hipdnnEnginePluginHandle& handle,
-                                         const hipdnn_plugin::Graph_interface& op_graph) const
+                                         const hipdnn_plugin::IGraph& op_graph) const
 {
     size_t workspace_size = 0;
     for(const auto& plan_builder : _plan_builders)
@@ -63,7 +63,7 @@ size_t Miopen_engine::get_workspace_size(const hipdnnEnginePluginHandle& handle,
 
 void Miopen_engine::initialize_execution_context(
     const hipdnnEnginePluginHandle& handle,
-    const hipdnn_plugin::Graph_interface& op_graph,
+    const hipdnn_plugin::IGraph& op_graph,
     hipdnnEnginePluginExecutionContext& execution_context) const
 {
     for(const auto& plan_builder : _plan_builders)

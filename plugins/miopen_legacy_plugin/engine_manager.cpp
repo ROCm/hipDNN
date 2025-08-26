@@ -20,7 +20,7 @@ void Engine_manager::add_engine(std::unique_ptr<Engine_interface> engine)
 }
 
 std::vector<int64_t>
-    Engine_manager::get_applicable_engine_ids(const hipdnn_plugin::Graph_interface& op_graph)
+    Engine_manager::get_applicable_engine_ids(const hipdnn_plugin::IGraph& op_graph)
 {
     std::vector<int64_t> applicable;
     for(const auto& engine : _engines)
@@ -34,7 +34,7 @@ std::vector<int64_t>
 }
 
 void Engine_manager::get_engine_details(hipdnnEnginePluginHandle& handle,
-                                        const hipdnn_plugin::Graph_interface& op_graph,
+                                        const hipdnn_plugin::IGraph& op_graph,
                                         int64_t engine_id,
                                         hipdnnPluginConstData_t& engine_details_out)
 {
@@ -45,7 +45,7 @@ void Engine_manager::get_engine_details(hipdnnEnginePluginHandle& handle,
 
 size_t Engine_manager::get_workspace_size(const hipdnnEnginePluginHandle& handle,
                                           int64_t engine_id,
-                                          const hipdnn_plugin::Graph_interface& op_graph) const
+                                          const hipdnn_plugin::IGraph& op_graph) const
 {
     auto& engine = get_engine(engine_id);
     return engine.get_workspace_size(handle, op_graph);
@@ -53,7 +53,7 @@ size_t Engine_manager::get_workspace_size(const hipdnnEnginePluginHandle& handle
 
 void Engine_manager::initialize_execution_context(
     const hipdnnEnginePluginHandle& handle,
-    const hipdnn_plugin::Graph_interface& op_graph,
+    const hipdnn_plugin::IGraph& op_graph,
     const hipdnn_plugin::IEngineConfig& engineConfig,
     hipdnnEnginePluginExecutionContext& execution_context) const
 {

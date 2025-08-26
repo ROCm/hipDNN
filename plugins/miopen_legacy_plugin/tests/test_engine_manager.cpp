@@ -36,7 +36,7 @@ TEST(Engine_managerTest, ReturnsApplicableEngineIds)
     manager.add_engine(std::move(mock_engine1));
     manager.add_engine(std::move(mock_engine2));
 
-    Mock_graph mock_graph;
+    MockGraph mock_graph;
     auto applicable = manager.get_applicable_engine_ids(mock_graph);
 
     EXPECT_EQ(applicable.size(), 1);
@@ -47,7 +47,7 @@ TEST(Engine_managerTest, ReturnsMultipleApplicableEngineIds)
 {
     std::set<std::unique_ptr<Engine_interface>> engines;
 
-    Mock_graph mock_graph;
+    MockGraph mock_graph;
     auto mock_engine1 = std::make_unique<Mock_engine>();
     EXPECT_CALL(*mock_engine1, id()).WillRepeatedly(Return(1));
     EXPECT_CALL(*mock_engine1, is_applicable(::testing::_)).WillRepeatedly(Return(true));
@@ -83,7 +83,7 @@ TEST(Engine_managerTest, ReturnsNoApplicableEngineIds)
     manager.add_engine(std::move(mock_engine1));
     manager.add_engine(std::move(mock_engine2));
 
-    Mock_graph mock_graph;
+    MockGraph mock_graph;
     auto applicable = manager.get_applicable_engine_ids(mock_graph);
 
     EXPECT_TRUE(applicable.empty());
@@ -108,7 +108,7 @@ TEST(Engine_managerTest, ReturnsEngineDetails)
 
     manager.add_engine(std::move(mock_engine));
 
-    Mock_graph mock_graph;
+    MockGraph mock_graph;
     hipdnnEnginePluginHandle dummy_handle = {};
     hipdnnPluginConstData_t details;
     manager.get_engine_details(dummy_handle, mock_graph, 1, details);
@@ -121,7 +121,7 @@ TEST(Engine_managerTest, ThrowsOnInvalidEngineId)
 {
     Engine_manager manager;
 
-    Mock_graph mock_graph;
+    MockGraph mock_graph;
     hipdnnPluginConstData_t engine_details;
 
     hipdnnEnginePluginHandle dummy_handle = {};
@@ -136,7 +136,7 @@ TEST(Engine_managerTest, GetWorkspaceSizeReturnsCorrectValue)
     auto mock_engine = std::make_unique<Mock_engine>();
     EXPECT_CALL(*mock_engine, id()).WillRepeatedly(Return(42));
     hipdnnEnginePluginHandle dummy_handle = {};
-    Mock_graph mock_graph;
+    MockGraph mock_graph;
     EXPECT_CALL(*mock_engine, get_workspace_size(::testing::_, ::testing::_))
         .WillOnce(Return(4096));
 
@@ -150,7 +150,7 @@ TEST(Engine_managerTest, GetWorkspaceSizeThrowsOnInvalidEngineId)
 {
     Engine_manager manager;
     hipdnnEnginePluginHandle dummy_handle = {};
-    Mock_graph mock_graph;
+    MockGraph mock_graph;
 
     EXPECT_THROW(manager.get_workspace_size(dummy_handle, 999, mock_graph),
                  hipdnn_plugin::Hipdnn_plugin_exception);
@@ -167,7 +167,7 @@ TEST(Engine_managerTest, InitializeExecutionContextCallsEngine)
     Engine_manager manager;
     manager.add_engine(std::move(mock_engine));
     hipdnnEnginePluginHandle dummy_handle = {};
-    Mock_graph mock_graph;
+    MockGraph mock_graph;
     MockEngineConfig mockEngineConfig;
     ON_CALL(mockEngineConfig, engineId()).WillByDefault(Return(7));
     EXPECT_CALL(mockEngineConfig, engineId()).Times(testing::AnyNumber()); // Uninteresting call
@@ -181,7 +181,7 @@ TEST(Engine_managerTest, InitializeExecutionContextThrowsOnInvalidEngineId)
     Mock_hipdnn_engine_plugin_execution_context exec_ctx;
     Engine_manager manager;
     hipdnnEnginePluginHandle dummy_handle = {};
-    Mock_graph mock_graph;
+    MockGraph mock_graph;
     MockEngineConfig mockEngineConfig;
 
     EXPECT_CALL(mockEngineConfig, engineId()).Times(testing::AnyNumber()); // Uninteresting call
