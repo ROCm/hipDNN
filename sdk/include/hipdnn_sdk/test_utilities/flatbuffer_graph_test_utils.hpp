@@ -116,6 +116,106 @@ inline flatbuffers::FlatBufferBuilder
     return builder;
 }
 
+inline flatbuffers::FlatBufferBuilder
+    create_valid_batchnorm_bwd_graph(std::vector<int64_t> strides = {1, 3, 224, 224},
+                                     std::vector<int64_t> dims = {1, 3, 224, 224},
+                                     bool has_optional_attributes = true,
+                                     hipdnn_sdk::data_objects::DataType input_data_type
+                                     = DataType_FLOAT)
+{
+    flatbuffers::FlatBufferBuilder builder;
+    std::vector<::flatbuffers::Offset<hipdnn_sdk::data_objects::TensorAttributes>>
+        tensor_attributes;
+
+    std::vector<int64_t> derived_strides = {1, strides[1], 1, 1};
+    std::vector<int64_t> derived_dims = {1, dims[1], 1, 1};
+
+    tensor_attributes.push_back(hipdnn_sdk::data_objects::CreateTensorAttributesDirect(
+        builder, 1, "x", input_data_type, &strides, &dims));
+
+    tensor_attributes.push_back(hipdnn_sdk::data_objects::CreateTensorAttributesDirect(
+        builder, 2, "dy", input_data_type, &strides, &dims));
+
+    tensor_attributes.push_back(hipdnn_sdk::data_objects::CreateTensorAttributesDirect(
+        builder, 3, "dx", input_data_type, &strides, &dims));
+
+    tensor_attributes.push_back(hipdnn_sdk::data_objects::CreateTensorAttributesDirect(
+        builder,
+        4,
+        "scale",
+        hipdnn_sdk::data_objects::DataType_FLOAT,
+        &derived_strides,
+        &derived_dims));
+
+    tensor_attributes.push_back(hipdnn_sdk::data_objects::CreateTensorAttributesDirect(
+        builder,
+        5,
+        "dscale",
+        hipdnn_sdk::data_objects::DataType_FLOAT,
+        &derived_strides,
+        &derived_dims));
+
+    tensor_attributes.push_back(hipdnn_sdk::data_objects::CreateTensorAttributesDirect(
+        builder,
+        6,
+        "dbias",
+        hipdnn_sdk::data_objects::DataType_FLOAT,
+        &derived_strides,
+        &derived_dims));
+
+    if(has_optional_attributes)
+    {
+        tensor_attributes.push_back(hipdnn_sdk::data_objects::CreateTensorAttributesDirect(
+            builder,
+            7,
+            "mean",
+            hipdnn_sdk::data_objects::DataType_FLOAT,
+            &derived_strides,
+            &derived_dims));
+
+        tensor_attributes.push_back(hipdnn_sdk::data_objects::CreateTensorAttributesDirect(
+            builder,
+            8,
+            "inv_variance",
+            hipdnn_sdk::data_objects::DataType_FLOAT,
+            &derived_strides,
+            &derived_dims));
+    }
+
+    auto bnorm_attributes = hipdnn_sdk::data_objects::CreateBatchnormBackwardAttributes(
+        builder,
+        2, // dy_tensor_uid
+        1, // x_tensor_uid
+        has_optional_attributes ? flatbuffers::Optional<int64_t>(7)
+                                : flatbuffers::nullopt, // mean_tensor_uid
+        has_optional_attributes ? flatbuffers::Optional<int64_t>(8)
+                                : flatbuffers::nullopt, // inv_variance_tensor_uid
+        4, // scale_tensor_uid
+        flatbuffers::Offset<flatbuffers::Vector<int64_t>>(), // peer_stats_tensor_uid
+        3, // dx_tensor_uid
+        5, // dscale_tensor_uid
+        6 // dbias_tensor_uid
+    );
+
+    std::vector<::flatbuffers::Offset<hipdnn_sdk::data_objects::Node>> nodes;
+    auto node = hipdnn_sdk::data_objects::CreateNodeDirect(
+        builder,
+        "batchnorm_bwd",
+        hipdnn_sdk::data_objects::NodeAttributes_BatchnormBackwardAttributes,
+        bnorm_attributes.Union());
+    nodes.push_back(node);
+
+    auto graph_offset = hipdnn_sdk::data_objects::CreateGraphDirect(builder,
+                                                                    "test",
+                                                                    DataType_FLOAT,
+                                                                    DataType_HALF,
+                                                                    DataType_BFLOAT16,
+                                                                    &tensor_attributes,
+                                                                    &nodes);
+    builder.Finish(graph_offset);
+    return builder;
+}
+
 inline hipdnnPluginConstData_t
     create_valid_const_data_graph(flatbuffers::DetachedBuffer& serialized_graph)
 {

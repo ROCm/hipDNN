@@ -4,50 +4,50 @@
 #include "backend_descriptor.hpp"
 #include "error.hpp"
 
-void hipdnnBackendDescriptor::finalize()
+void HipdnnBackendDescriptor::finalize()
 {
     THROW_IF_TRUE(!_impl, HIPDNN_STATUS_INTERNAL_ERROR, "Null _impl in finalize.");
     _impl->finalize();
 }
 
-bool hipdnnBackendDescriptor::is_finalized() const
+bool HipdnnBackendDescriptor::isFinalized() const
 {
-    THROW_IF_TRUE(!_impl, HIPDNN_STATUS_INTERNAL_ERROR, "Null _impl in is_finalized.");
-    return _impl->is_finalized();
+    THROW_IF_TRUE(!_impl, HIPDNN_STATUS_INTERNAL_ERROR, "Null _impl in isFinalized.");
+    return _impl->isFinalized();
 }
 
-void hipdnnBackendDescriptor::get_attribute(hipdnnBackendAttributeName_t attribute_name,
-                                            hipdnnBackendAttributeType_t attribute_type,
-                                            int64_t requested_element_count,
-                                            int64_t* element_count,
-                                            void* array_of_elements) const
+void HipdnnBackendDescriptor::getAttribute(hipdnnBackendAttributeName_t attributeName,
+                                           hipdnnBackendAttributeType_t attributeType,
+                                           int64_t requestedElementCount,
+                                           int64_t* elementCount,
+                                           void* arrayOfElements) const
 {
-    THROW_IF_TRUE(!_impl, HIPDNN_STATUS_INTERNAL_ERROR, "Null _impl in get_attribute.");
-    _impl->get_attribute(
-        attribute_name, attribute_type, requested_element_count, element_count, array_of_elements);
+    THROW_IF_TRUE(!_impl, HIPDNN_STATUS_INTERNAL_ERROR, "Null _impl in getAttribute.");
+    _impl->getAttribute(
+        attributeName, attributeType, requestedElementCount, elementCount, arrayOfElements);
 }
 
-void hipdnnBackendDescriptor::set_attribute(hipdnnBackendAttributeName_t attribute_name,
-                                            hipdnnBackendAttributeType_t attribute_type,
-                                            int64_t element_count,
-                                            const void* array_of_elements)
+void HipdnnBackendDescriptor::setAttribute(hipdnnBackendAttributeName_t attributeName,
+                                           hipdnnBackendAttributeType_t attributeType,
+                                           int64_t elementCount,
+                                           const void* arrayOfElements)
 {
-    THROW_IF_TRUE(!_impl, HIPDNN_STATUS_INTERNAL_ERROR, "Null _impl in set_attribute.");
-    _impl->set_attribute(attribute_name, attribute_type, element_count, array_of_elements);
+    THROW_IF_TRUE(!_impl, HIPDNN_STATUS_INTERNAL_ERROR, "Null _impl in setAttribute.");
+    _impl->setAttribute(attributeName, attributeType, elementCount, arrayOfElements);
 }
 
-hipdnnBackendDescriptorType_t hipdnnBackendDescriptor::get_type() const
+hipdnnBackendDescriptorType_t HipdnnBackendDescriptor::getType() const
 {
-    THROW_IF_TRUE(!_impl, HIPDNN_STATUS_INTERNAL_ERROR, "Null _impl in get_type.");
-    return _impl->get_type();
+    THROW_IF_TRUE(!_impl, HIPDNN_STATUS_INTERNAL_ERROR, "Null _impl in getType.");
+    return _impl->getType();
 }
 
-bool hipdnnBackendDescriptor::is_valid()
+bool HipdnnBackendDescriptor::isValid()
 {
-    return _impl && get_type() != hipdnnBackendDescriptorType_t::HIPDNN_INVALID_TYPE;
+    return _impl && getType() != hipdnnBackendDescriptorType_t::HIPDNN_INVALID_TYPE;
 }
 
-bool hipdnnBackendDescriptor::operator==(const hipdnnBackendDescriptor& other) const
+bool HipdnnBackendDescriptor::operator==(const HipdnnBackendDescriptor& other) const
 {
     return _impl == other._impl;
 }

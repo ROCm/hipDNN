@@ -22,6 +22,9 @@ using namespace hipdnn_frontend::graph;
 using namespace hipdnn_sdk::utilities;
 using namespace hipdnn_sdk::reference_test_utilities;
 
+namespace
+{
+
 struct Bn_2d_test_case
 {
     int64_t n;
@@ -80,6 +83,9 @@ struct Batchnorm_2d_tensor_bundle
     PinnedTensor<Intermediate_type> mean_tensor;
     PinnedTensor<Intermediate_type> variance_tensor;
 };
+
+} // namespace
+
 class Batchnorm_forward_inference_integration_test
     : public ::testing::TestWithParam<Bn_2d_test_case>
 {
@@ -267,8 +273,8 @@ protected:
         run_cpu_batchnorm_fwd<Input_type, Intermediate_type>(cpu_tensor_bundle);
 
         Cpu_fp_reference_validation<Input_type> cpu_ref_validation(tolerance, tolerance);
-        EXPECT_TRUE(cpu_ref_validation.compare_buffers(cpu_tensor_bundle.y_tensor.memory(),
-                                                       graph_tensor_bundle.y_tensor.memory()));
+        EXPECT_TRUE(cpu_ref_validation.all_close(cpu_tensor_bundle.y_tensor.memory(),
+                                                 graph_tensor_bundle.y_tensor.memory()));
     }
 
 private:
@@ -276,6 +282,9 @@ private:
     hipStream_t _stream = nullptr;
     int _device_id = 0;
 };
+
+namespace
+{
 
 std::vector<Bn_2d_test_case> get_bn_fwd_inference_test_cases()
 {
@@ -294,7 +303,9 @@ std::vector<Bn_2d_test_case> get_bn_fwd_inference_test_cases()
     };
 }
 
-TEST_P(Batchnorm_forward_inference_integration_test, RunFloatFwdBatchnormGraph)
+} // namespace
+
+TEST_P(Batchnorm_forward_inference_integration_test, RunFloatFwdBatchnormGraphNCHW)
 {
     Bn_2d_test_case test_case = GetParam();
     run_batchnorm_test<float, float>(test_case, 1e-6f);
@@ -309,7 +320,7 @@ class Batchnorm_forward_inference_integration_test_bfloat16
 {
 };
 
-TEST_P(Batchnorm_forward_inference_integration_test_bfloat16, RunBfloat16FwdBatchnormGraph)
+TEST_P(Batchnorm_forward_inference_integration_test_bfloat16, RunBfloat16FwdBatchnormGraphNCHW)
 {
     Bn_2d_test_case test_case = GetParam();
     run_batchnorm_test<hip_bfloat16, float>(test_case, 1e-2_bf);
@@ -323,7 +334,7 @@ class Batchnorm_forward_inference_integration_test_half
     : public Batchnorm_forward_inference_integration_test
 {
 };
-TEST_P(Batchnorm_forward_inference_integration_test_half, RunHalfFwdbatchnormGraph)
+TEST_P(Batchnorm_forward_inference_integration_test_half, RunHalfFwdbatchnormGraphNCHW)
 {
     Bn_2d_test_case test_case = GetParam();
     run_batchnorm_test<half, float>(test_case, 1e-2_h);

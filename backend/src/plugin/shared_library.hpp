@@ -12,42 +12,42 @@ namespace hipdnn_backend
 namespace plugin
 {
 
-class Shared_library
+class SharedLibrary
 {
 public:
-    Shared_library();
-    explicit Shared_library(const std::filesystem::path& library_path);
-    Shared_library(Shared_library&& other) noexcept;
-    Shared_library(const Shared_library&) = delete;
+    SharedLibrary();
+    explicit SharedLibrary(const std::filesystem::path& libraryPath);
+    SharedLibrary(SharedLibrary&& other) noexcept;
+    SharedLibrary(const SharedLibrary&) = delete;
 
-    ~Shared_library();
+    ~SharedLibrary();
 
-    Shared_library& operator=(Shared_library&& other) noexcept;
-    Shared_library& operator=(const Shared_library&) = delete;
+    SharedLibrary& operator=(SharedLibrary&& other) noexcept;
+    SharedLibrary& operator=(const SharedLibrary&) = delete;
 
     // This function loads a shared library from the specified path.
     // On Windows, it adds a ".dll" extension if no extension exists.
     // On Linux, it adds a "lib" prefix to the filename and a ".so" extension if no extension exists.
-    void load(const std::filesystem::path& library_path);
+    void load(const std::filesystem::path& libraryPath);
 
     // This function unloads the shared library.
     void unload() noexcept;
 
-    void* get_symbol(std::string_view symbol_name) const;
+    void* get_symbol(std::string_view symbolName) const;
 
     template <class T>
-    T get_symbol(std::string_view symbol_name) const
+    T get_symbol(std::string_view symbolName) const
     {
-        void* symbol = get_symbol(symbol_name);
+        void* symbol = get_symbol(symbolName);
         return reinterpret_cast<T>(symbol);
     }
 
-    const std::filesystem::path& library_path() const;
+    const std::filesystem::path& libraryPath() const;
 
 private:
-    std::filesystem::path _library_path;
+    std::filesystem::path _libraryPath;
 
-    hipdnn_backend::platform_utils::PluginLibHandle _library_handle;
+    hipdnn_backend::platform_utils::PluginLibHandle _libraryHandle;
 };
 
 } // namespace plugin

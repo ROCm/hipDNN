@@ -5,7 +5,9 @@
 #include <hipdnn_sdk/plugin/plugin_exception.hpp>
 #include <hipdnn_sdk/plugin/plugin_flatbuffer_type_helpers.hpp>
 #include <miopen/miopen.h>
+#include <string>
 
+#include "engines/plans/miopen_batchnorm_bwd_plan.hpp"
 #include "engines/plans/miopen_batchnorm_fwd_inference_plan.hpp"
 #include "miopen_batchnorm_plan_builder.hpp"
 
@@ -25,7 +27,8 @@ bool Miopen_batchnorm_plan_builder::is_applicable(
     }
 
     if(!op_graph.has_only_supported_attributes(std::set<hipdnn_sdk::data_objects::NodeAttributes>{
-           hipdnn_sdk::data_objects::NodeAttributes_BatchnormInferenceAttributes}))
+           hipdnn_sdk::data_objects::NodeAttributes_BatchnormInferenceAttributes,
+           hipdnn_sdk::data_objects::NodeAttributes_BatchnormBackwardAttributes}))
     {
         HIPDNN_LOG_INFO("Batchnorm plan builder is not applicable for this graph");
         return false;
@@ -43,43 +46,83 @@ size_t Miopen_batchnorm_plan_builder::get_workspace_size(
     return 0u;
 }
 
+namespace
+{
+
+std::string get_node_name(const hipdnn_sdk::data_objects::Node& node)
+{
+    return node.name() != nullptr ? node.name()->str() : "";
+}
+
+void build_plan_inference_single_node(const hipdnnEnginePluginHandle& handle,
+                                      const hipdnn_plugin::Graph_interface& op_graph,
+                                      const hipdnn_sdk::data_objects::Node& node,
+                                      hipdnnEnginePluginExecutionContext& execution_context)
+{
+    std::ignore = handle;
+
+    const auto* attr = node.attributes_as_BatchnormInferenceAttributes();
+    if(attr == nullptr)
+    {
+        throw hipdnn_plugin::Hipdnn_plugin_exception(
+            HIPDNN_PLUGIN_STATUS_BAD_PARAM,
+            "Failed to convert node attributes to BatchnormInferenceAttributes for node: "
+                + get_node_name(node));
+    }
+
+    auto params
+        = std::make_unique<Batchnorm_fwd_inference_params>(*attr, op_graph.get_tensor_map());
+    auto plan = std::make_unique<Batchnorm_fwd_inference_plan>(std::move(params));
+    execution_context.set_plan(std::move(plan));
+}
+
+void build_plan_bwd_single_node(const hipdnnEnginePluginHandle& handle,
+                                const hipdnn_plugin::Graph_interface& op_graph,
+                                const hipdnn_sdk::data_objects::Node& node,
+                                hipdnnEnginePluginExecutionContext& execution_context)
+{
+    std::ignore = handle;
+
+    const auto* attr = node.attributes_as_BatchnormBackwardAttributes();
+    if(attr == nullptr)
+    {
+        throw hipdnn_plugin::Hipdnn_plugin_exception(
+            HIPDNN_PLUGIN_STATUS_BAD_PARAM,
+            "Failed to convert node attributes to BatchnormBackwardAttributes for node: "
+                + get_node_name(node));
+    }
+
+    auto params = std::make_unique<Batchnorm_bwd_params>(*attr, op_graph.get_tensor_map());
+    auto plan = std::make_unique<Batchnorm_bwd_plan>(std::move(params));
+    execution_context.set_plan(std::move(plan));
+}
+
+} // namespace
+
 void Miopen_batchnorm_plan_builder::build_plan(
     const hipdnnEnginePluginHandle& handle,
     const hipdnn_plugin::Graph_interface& op_graph,
     hipdnnEnginePluginExecutionContext& execution_context) const
 {
-    std::ignore = handle;
-
     const auto& node = op_graph.get_node(0);
 
-    if(node.attributes_type()
-       == hipdnn_sdk::data_objects::NodeAttributes_BatchnormInferenceAttributes)
+    std::string node_name = get_node_name(node);
+    switch(node.attributes_type())
     {
-        HIPDNN_LOG_INFO("Building batchnorm fwd inference plan for node: {}", node.name()->str());
-        if(const auto* batchnorm_inference_attr = node.attributes_as_BatchnormInferenceAttributes();
-           batchnorm_inference_attr != nullptr)
-        {
-            auto fwd_inference_params = std::make_unique<Batchnorm_fwd_inference_params>(
-                *batchnorm_inference_attr, op_graph.get_tensor_map());
-
-            auto batchnorm_fwd_plan
-                = std::make_unique<Batchnorm_fwd_inference_plan>(std::move(fwd_inference_params));
-            execution_context.set_plan(std::move(batchnorm_fwd_plan));
-        }
-        else
-        {
-            throw hipdnn_plugin::Hipdnn_plugin_exception(
-                HIPDNN_PLUGIN_STATUS_BAD_PARAM,
-                "Failed to convert node attributes to BatchnormInferenceAttributes for node: "
-                    + node.name()->str());
-        }
-    }
-    else
-    {
+    case hipdnn_sdk::data_objects::NodeAttributes_BatchnormInferenceAttributes:
+        HIPDNN_LOG_INFO("Building batchnorm fwd inference plan for node: {}", node_name);
+        build_plan_inference_single_node(handle, op_graph, node, execution_context);
+        break;
+    case hipdnn_sdk::data_objects::NodeAttributes_BatchnormBackwardAttributes:
+        HIPDNN_LOG_INFO("Building batchnorm backward plan for node: {}", node_name);
+        build_plan_bwd_single_node(handle, op_graph, node, execution_context);
+        break;
+    default:
         throw hipdnn_plugin::Hipdnn_plugin_exception(
             HIPDNN_PLUGIN_STATUS_BAD_PARAM,
             "Unsupported node type for batchnorm plan builder: "
                 + std::string(hipdnn_sdk::data_objects::to_string(node.attributes_type())));
     }
 }
-}
+
+} // namespace miopen_legacy_plugin

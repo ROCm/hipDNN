@@ -16,60 +16,60 @@ namespace hipdnn_backend
 namespace plugin
 {
 
-class Mock_engine_plugin : public Engine_plugin
+class Mock_engine_plugin : public EnginePlugin
 {
 public:
-    // Mock all public methods from Engine_plugin
-    MOCK_METHOD(hipdnnEnginePluginHandle_t, create_handle, (), (const));
-    MOCK_METHOD(std::vector<int64_t>, get_all_engine_ids, (), (const));
-    MOCK_METHOD(void, destroy_handle, (hipdnnEnginePluginHandle_t handle), (const));
-    MOCK_METHOD(void, set_stream, (hipdnnEnginePluginHandle_t handle, hipStream_t stream), (const));
+    // Mock all public methods from EnginePlugin
+    MOCK_METHOD(hipdnnEnginePluginHandle_t, createHandle, (), (const));
+    MOCK_METHOD(std::vector<int64_t>, getAllEngineIds, (), (const));
+    MOCK_METHOD(void, destroyHandle, (hipdnnEnginePluginHandle_t handle), (const));
+    MOCK_METHOD(void, setStream, (hipdnnEnginePluginHandle_t handle, hipStream_t stream), (const));
     MOCK_METHOD(std::vector<int64_t>,
-                get_applicable_engine_ids,
-                (hipdnnEnginePluginHandle_t handle, const hipdnnPluginConstData_t* op_graph),
+                getApplicableEngineIds,
+                (hipdnnEnginePluginHandle_t handle, const hipdnnPluginConstData_t* opGraph),
                 (const));
     MOCK_METHOD(void,
-                get_engine_details,
+                getEngineDetails,
                 (hipdnnEnginePluginHandle_t handle,
-                 int64_t engine_id,
-                 const hipdnnPluginConstData_t* op_graph,
-                 hipdnnPluginConstData_t* engine_details),
+                 int64_t engineId,
+                 const hipdnnPluginConstData_t* opGraph,
+                 hipdnnPluginConstData_t* engineDetails),
                 (const));
     MOCK_METHOD(void,
-                destroy_engine_details,
-                (hipdnnEnginePluginHandle_t handle, hipdnnPluginConstData_t* engine_details),
+                destroyEngineDetails,
+                (hipdnnEnginePluginHandle_t handle, hipdnnPluginConstData_t* engineDetails),
                 (const));
     MOCK_METHOD(size_t,
-                get_workspace_size,
+                getWorkspaceSize,
                 (hipdnnEnginePluginHandle_t handle,
-                 const hipdnnPluginConstData_t* engine_config,
-                 const hipdnnPluginConstData_t* op_graph),
+                 const hipdnnPluginConstData_t* engineConfig,
+                 const hipdnnPluginConstData_t* opGraph),
                 (const));
     MOCK_METHOD(hipdnnEnginePluginExecutionContext_t,
-                create_execution_context,
+                createExecutionContext,
                 (hipdnnEnginePluginHandle_t handle,
-                 const hipdnnPluginConstData_t* engine_config,
-                 const hipdnnPluginConstData_t* op_graph),
+                 const hipdnnPluginConstData_t* engineConfig,
+                 const hipdnnPluginConstData_t* opGraph),
                 (const));
     MOCK_METHOD(void,
-                destroy_execution_context,
+                destroyExecutionContext,
                 (hipdnnEnginePluginHandle_t handle,
-                 hipdnnEnginePluginExecutionContext_t execution_context),
+                 hipdnnEnginePluginExecutionContext_t executionContext),
                 (const));
     MOCK_METHOD(void,
-                execute_op_graph,
+                executeOpGraph,
                 (hipdnnEnginePluginHandle_t handle,
-                 hipdnnEnginePluginExecutionContext_t execution_context,
+                 hipdnnEnginePluginExecutionContext_t executionContext,
                  void* workspace,
-                 const hipdnnPluginDeviceBuffer_t* device_buffers,
-                 uint32_t num_device_buffers),
+                 const hipdnnPluginDeviceBuffer_t* deviceBuffers,
+                 uint32_t numDeviceBuffers),
                 (const));
 
-    // Mock inherited methods from Plugin_base
+    // Mock inherited methods from PluginBase
     MOCK_METHOD(std::string_view, name, (), (const));
     MOCK_METHOD(std::string_view, version, (), (const));
     MOCK_METHOD(hipdnnPluginType_t, type, (), (const));
-    MOCK_METHOD(hipdnnPluginStatus_t, set_logging_callback, (hipdnnCallback_t callback), (const));
+    MOCK_METHOD(hipdnnPluginStatus_t, setLoggingCallback, (hipdnnCallback_t callback), (const));
 };
 
 } // namespace plugin

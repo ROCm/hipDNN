@@ -15,66 +15,66 @@
 namespace hipdnn_backend
 {
 
-void Descriptor_factory::create(hipdnnBackendDescriptorType_t descriptor_type,
-                                hipdnnBackendDescriptor_t* descriptor)
+void DescriptorFactory::create(hipdnnBackendDescriptorType_t descriptorType,
+                               hipdnnBackendDescriptor_t* descriptor)
 {
     THROW_IF_NULL(
         descriptor, HIPDNN_STATUS_BAD_PARAM_NULL_POINTER, "hipdnnBackendDescriptor_t* is null.");
 
     HIPDNN_LOG_INFO("Creating descriptor of type: {}",
-                    hipdnnGetBackendDescriptorTypeName(descriptor_type));
+                    hipdnnGetBackendDescriptorTypeName(descriptorType));
 
-    std::shared_ptr<Backend_descriptor_interface> private_desc;
-    switch(descriptor_type)
+    std::shared_ptr<IBackendDescriptor> privateDesc;
+    switch(descriptorType)
     {
     case HIPDNN_BACKEND_ENGINECFG_DESCRIPTOR:
-        private_desc = std::make_shared<Engine_config_descriptor>();
+        privateDesc = std::make_shared<EngineConfigDescriptor>();
         break;
     case HIPDNN_BACKEND_ENGINE_DESCRIPTOR:
-        private_desc = std::make_shared<Engine_descriptor>();
+        privateDesc = std::make_shared<EngineDescriptor>();
         break;
     case HIPDNN_BACKEND_EXECUTION_PLAN_DESCRIPTOR:
-        private_desc = std::make_shared<Execution_plan_descriptor>();
+        privateDesc = std::make_shared<ExecutionPlanDescriptor>();
         break;
     case HIPDNN_BACKEND_OPERATIONGRAPH_DESCRIPTOR:
-        private_desc = std::make_shared<Graph_descriptor>();
+        privateDesc = std::make_shared<GraphDescriptor>();
         break;
     case HIPDNN_BACKEND_VARIANT_PACK_DESCRIPTOR:
-        private_desc = std::make_shared<Variant_descriptor>();
+        privateDesc = std::make_shared<VariantDescriptor>();
         break;
     case HIPDNN_BACKEND_ENGINEHEUR_DESCRIPTOR:
-        private_desc = std::make_shared<Engine_heuristic_descriptor>();
+        privateDesc = std::make_shared<EngineHeuristicDescriptor>();
         break;
     default:
         throw HipdnnException(HIPDNN_STATUS_NOT_SUPPORTED,
                               std::string("Descriptor type ")
-                                  + hipdnnGetBackendDescriptorTypeName(descriptor_type)
+                                  + hipdnnGetBackendDescriptorTypeName(descriptorType)
                                   + " is not supported.");
     }
 
-    *descriptor = hipdnnBackendDescriptor::pack_descriptor(private_desc);
+    *descriptor = HipdnnBackendDescriptor::packDescriptor(privateDesc);
 
     HIPDNN_LOG_INFO("Created descriptor: {:p}", static_cast<void*>(*descriptor));
 }
 
-void Descriptor_factory::create_graph_ext(hipdnnBackendDescriptor_t* descriptor,
-                                          const uint8_t* serialized_graph,
-                                          size_t graph_byte_size)
+void DescriptorFactory::createGraphExt(hipdnnBackendDescriptor_t* descriptor,
+                                       const uint8_t* serializedGraph,
+                                       size_t graphByteSize)
 {
     THROW_IF_NULL(
         descriptor, HIPDNN_STATUS_BAD_PARAM_NULL_POINTER, "hipdnnBackendDescriptor_t* is null.");
     THROW_IF_NULL(
-        serialized_graph, HIPDNN_STATUS_BAD_PARAM_NULL_POINTER, "serialized_graph is null.");
-    THROW_IF_TRUE(graph_byte_size == 0, HIPDNN_STATUS_BAD_PARAM, "graph_byte_size is 0.");
+        serializedGraph, HIPDNN_STATUS_BAD_PARAM_NULL_POINTER, "serializedGraph is null.");
+    THROW_IF_TRUE(graphByteSize == 0, HIPDNN_STATUS_BAD_PARAM, "graphByteSize is 0.");
 
-    auto graph_descriptor = std::make_shared<Graph_descriptor>();
-    graph_descriptor->deserialize_graph(serialized_graph, graph_byte_size);
-    *descriptor = hipdnnBackendDescriptor::pack_descriptor(graph_descriptor);
+    auto graphDescriptor = std::make_shared<GraphDescriptor>();
+    graphDescriptor->deserializeGraph(serializedGraph, graphByteSize);
+    *descriptor = HipdnnBackendDescriptor::packDescriptor(graphDescriptor);
 
     HIPDNN_LOG_INFO("Created graph descriptor: {:p}", static_cast<void*>(*descriptor));
 }
 
-void Descriptor_factory::destroy(hipdnnBackendDescriptor_t descriptor)
+void DescriptorFactory::destroy(hipdnnBackendDescriptor_t descriptor)
 {
     THROW_IF_NULL(
         descriptor, HIPDNN_STATUS_BAD_PARAM_NULL_POINTER, "hipdnnBackendDescriptor_t is null.");

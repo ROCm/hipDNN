@@ -8,10 +8,10 @@
 
 struct Mock_handle : hipdnnHandle
 {
-    MOCK_METHOD(void, set_stream, (hipStream_t stream), (override));
-    MOCK_METHOD(hipStream_t, get_stream, (), (const, override));
-    MOCK_METHOD(std::shared_ptr<hipdnn_backend::plugin::Engine_plugin_resource_manager>,
-                get_plugin_resource_manager,
+    MOCK_METHOD(void, setStream, (hipStream_t stream), (override));
+    MOCK_METHOD(hipStream_t, getStream, (), (const, override));
+    MOCK_METHOD(std::shared_ptr<hipdnn_backend::plugin::EnginePluginResourceManager>,
+                getPluginResourceManager,
                 (),
                 (const, override));
 };

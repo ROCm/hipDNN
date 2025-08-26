@@ -6,23 +6,22 @@
 using namespace hipdnn_backend::plugin;
 
 hipdnnHandle::hipdnnHandle()
-    : _plugin_resource_manager(Engine_plugin_resource_manager::create())
+    : _pluginResourceManager(EnginePluginResourceManager::create())
 {
 }
 
-void hipdnnHandle::set_stream(hipStream_t stream)
+void hipdnnHandle::setStream(hipStream_t stream)
 {
     _stream = stream;
-    _plugin_resource_manager->set_stream(stream);
+    _pluginResourceManager->setStream(stream);
 }
 
-hipStream_t hipdnnHandle::get_stream() const
+hipStream_t hipdnnHandle::getStream() const
 {
     return _stream;
 }
 
-std::shared_ptr<hipdnn_backend::plugin::Engine_plugin_resource_manager>
-    hipdnnHandle::get_plugin_resource_manager() const
+std::shared_ptr<EnginePluginResourceManager> hipdnnHandle::getPluginResourceManager() const
 {
-    return _plugin_resource_manager;
+    return _pluginResourceManager;
 }

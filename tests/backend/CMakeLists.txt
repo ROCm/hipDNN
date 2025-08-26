@@ -46,7 +46,15 @@ target_compile_definitions(public_hipdnn_backend_tests
 )
 
 # Ensure test plugins are built before tests
-add_dependencies(public_hipdnn_backend_tests test_good_plugin test_execute_fails_plugin test_no_applicable_engines_plugin test_good_default_plugin)
+add_dependencies(public_hipdnn_backend_tests 
+    test_good_plugin 
+    test_execute_fails_plugin 
+    test_no_applicable_engines_plugin 
+    test_good_default_plugin
+    test_duplicate_id_a_plugin
+    test_duplicate_id_b_plugin
+    test_incomplete_api_plugin
+)
 
 clang_tidy_check(public_hipdnn_backend_tests)
 add_unit_test_target(public_hipdnn_backend_tests ${CMAKE_CURRENT_BINARY_DIR})

@@ -25,151 +25,150 @@ namespace plugin
 namespace
 {
 
-struct Plugin_loading_config
+struct PluginLoadingConfig
 {
     std::set<std::filesystem::path> paths;
     hipdnnPluginLoadingMode_ext_t mode = HIPDNN_DEFAULT_PLUGIN_LOADING_MODE;
 };
 
-std::mutex plugin_mutex;
-Plugin_loading_config plugin_config;
-std::weak_ptr<Engine_plugin_manager> pm_ptr;
+std::mutex pluginMutex;
+PluginLoadingConfig pluginConfig;
+std::weak_ptr<EnginePluginManager> pmPtr;
 
 } // namespace
 
-void Engine_plugin_resource_manager::set_plugin_paths(
-    const std::vector<std::filesystem::path>& plugin_paths,
-    hipdnnPluginLoadingMode_ext_t loading_mode)
+void EnginePluginResourceManager::setPluginPaths(
+    const std::vector<std::filesystem::path>& pluginPaths,
+    hipdnnPluginLoadingMode_ext_t loadingMode)
 {
-    std::lock_guard<std::mutex> lock(plugin_mutex);
+    std::lock_guard<std::mutex> lock(pluginMutex);
 
-    THROW_IF_FALSE(pm_ptr.expired(),
+    THROW_IF_FALSE(pmPtr.expired(),
                    HIPDNN_STATUS_NOT_SUPPORTED,
                    "hipdnnSetEnginePluginPaths_ext cannot be called with an active handle.");
 
-    plugin_config.mode = loading_mode;
+    pluginConfig.mode = loadingMode;
 
-    if(loading_mode == HIPDNN_PLUGIN_LOADING_ABSOLUTE)
+    if(loadingMode == HIPDNN_PLUGIN_LOADING_ABSOLUTE)
     {
-        plugin_config.paths = {plugin_paths.begin(), plugin_paths.end()};
+        pluginConfig.paths = {pluginPaths.begin(), pluginPaths.end()};
     }
     else
     {
-        plugin_config.paths.insert(plugin_paths.begin(), plugin_paths.end());
+        pluginConfig.paths.insert(pluginPaths.begin(), pluginPaths.end());
     }
 }
 
-std::set<std::filesystem::path> Engine_plugin_resource_manager::get_plugin_paths()
+std::set<std::filesystem::path> EnginePluginResourceManager::getPluginPaths()
 {
-    std::lock_guard<std::mutex> lock(plugin_mutex);
-    return plugin_config.paths;
+    std::lock_guard<std::mutex> lock(pluginMutex);
+    return pluginConfig.paths;
 }
 
-void Engine_plugin_resource_manager::get_loaded_plugin_files(size_t* num_plugins,
-                                                             char** plugin_paths,
-                                                             size_t* max_string_len) const
+void EnginePluginResourceManager::getLoadedPluginFiles(size_t* numPlugins,
+                                                       char** pluginPaths,
+                                                       size_t* maxStringLen) const
 {
     if(!_pm)
     {
-        *num_plugins = 0;
-        *max_string_len = 0;
+        *numPlugins = 0;
+        *maxStringLen = 0;
         return;
     }
 
-    const auto& path_set = _pm->get_loaded_plugin_files();
+    const auto& pathSet = _pm->getLoadedPluginFiles();
 
-    size_t required_len = 0;
-    for(const auto& path : path_set)
+    size_t requiredLen = 0;
+    for(const auto& path : pathSet)
     {
-        required_len = std::max(required_len, path.string().length() + 1);
+        requiredLen = std::max(requiredLen, path.string().length() + 1);
     }
 
-    if(plugin_paths == nullptr)
+    if(pluginPaths == nullptr)
     {
-        *num_plugins = path_set.size();
-        *max_string_len = required_len;
+        *numPlugins = pathSet.size();
+        *maxStringLen = requiredLen;
         return;
     }
 
-    if(*num_plugins < path_set.size() || *max_string_len < required_len)
+    if(*numPlugins < pathSet.size() || *maxStringLen < requiredLen)
     {
         throw HipdnnException(HIPDNN_STATUS_BAD_PARAM, "Insufficient buffer space provided.");
     }
 
-    std::vector<std::string> paths_vec;
-    paths_vec.reserve(path_set.size());
-    paths_vec.assign(path_set.begin(), path_set.end());
+    std::vector<std::string> pathsVec;
+    pathsVec.reserve(pathSet.size());
+    pathsVec.assign(pathSet.begin(), pathSet.end());
 
-    for(size_t i = 0; i < paths_vec.size(); ++i)
+    for(size_t i = 0; i < pathsVec.size(); ++i)
     {
-        if(plugin_paths[i] == nullptr)
+        if(pluginPaths[i] == nullptr)
         {
             throw HipdnnException(HIPDNN_STATUS_BAD_PARAM, "A plugin path string buffer is null.");
         }
         hipdnn::sdk::utilities::copy_max_size_with_null_terminator(
-            plugin_paths[i], paths_vec[i].c_str(), *max_string_len);
+            pluginPaths[i], pathsVec[i].c_str(), *maxStringLen);
     }
 }
 
-std::shared_ptr<Engine_plugin_resource_manager> Engine_plugin_resource_manager::create()
+std::shared_ptr<EnginePluginResourceManager> EnginePluginResourceManager::create()
 {
-    auto pm = pm_ptr.lock();
+    auto pm = pmPtr.lock();
 
     if(!pm)
     {
-        std::lock_guard<std::mutex> lock(plugin_mutex);
+        std::lock_guard<std::mutex> lock(pluginMutex);
 
-        pm = pm_ptr.lock();
+        pm = pmPtr.lock();
 
         if(!pm)
         {
-            pm = std::make_shared<Engine_plugin_manager>();
-            pm->load_plugins(plugin_config.paths, plugin_config.mode);
-            pm_ptr = pm;
+            pm = std::make_shared<EnginePluginManager>();
+            pm->loadPlugins(pluginConfig.paths, pluginConfig.mode);
+            pmPtr = pm;
         }
     }
 
-    return std::make_shared<Engine_plugin_resource_manager>(pm);
+    return std::make_shared<EnginePluginResourceManager>(pm);
 }
 
-Engine_plugin_resource_manager::Engine_plugin_resource_manager()
-    : _pm(std::make_shared<Engine_plugin_manager>())
+EnginePluginResourceManager::EnginePluginResourceManager()
+    : _pm(std::make_shared<EnginePluginManager>())
 {
 }
 
-Engine_plugin_resource_manager::Engine_plugin_resource_manager(
-    std::shared_ptr<Engine_plugin_manager> pm)
+EnginePluginResourceManager::EnginePluginResourceManager(std::shared_ptr<EnginePluginManager> pm)
     : _pm(std::move(pm))
 {
     // Create plugin handles
-    const auto& plugins = _pm->get_plugins();
+    const auto& plugins = _pm->getPlugins();
     for(const auto& plugin : plugins)
     {
-        auto handle = plugin->create_handle();
+        auto handle = plugin->createHandle();
 
-        if(_handle_to_plugin.contains(handle))
+        if(_handleToPlugin.contains(handle))
         {
             throw HipdnnException(HIPDNN_STATUS_PLUGIN_ERROR, "Plugin handle already exists");
         }
 
-        _handle_to_plugin[handle] = plugin.get();
+        _handleToPlugin[handle] = plugin.get();
 
-        auto engine_ids = plugin->get_all_engine_ids();
-        for(const auto id : engine_ids)
+        auto engineIds = plugin->getAllEngineIds();
+        for(const auto id : engineIds)
         {
-            _engine_id_to_handle[id] = handle;
+            _engineIdToHandle[id] = handle;
         }
     }
 }
 
-Engine_plugin_resource_manager::~Engine_plugin_resource_manager()
+EnginePluginResourceManager::~EnginePluginResourceManager()
 {
     // Destroy plugin handles
-    for(const auto& [handle, plugin] : _handle_to_plugin)
+    for(const auto& [handle, plugin] : _handleToPlugin)
     {
         try
         {
-            plugin->destroy_handle(handle);
+            plugin->destroyHandle(handle);
         }
         catch(const HipdnnException& e)
         {
@@ -178,57 +177,57 @@ Engine_plugin_resource_manager::~Engine_plugin_resource_manager()
     }
 }
 
-Engine_plugin_resource_manager::Engine_plugin_resource_manager(
-    Engine_plugin_resource_manager&& other) noexcept
+EnginePluginResourceManager::EnginePluginResourceManager(
+    EnginePluginResourceManager&& other) noexcept
     : _pm(std::move(other._pm))
-    , _handle_to_plugin(std::move(other._handle_to_plugin))
-    , _engine_id_to_handle(std::move(other._engine_id_to_handle))
+    , _handleToPlugin(std::move(other._handleToPlugin))
+    , _engineIdToHandle(std::move(other._engineIdToHandle))
 {
 }
 
-Engine_plugin_resource_manager&
-    Engine_plugin_resource_manager::operator=(Engine_plugin_resource_manager&& other) noexcept
+EnginePluginResourceManager&
+    EnginePluginResourceManager::operator=(EnginePluginResourceManager&& other) noexcept
 {
     if(this != &other)
     {
         _pm = std::move(other._pm);
-        _handle_to_plugin = std::move(other._handle_to_plugin);
-        _engine_id_to_handle = std::move(other._engine_id_to_handle);
+        _handleToPlugin = std::move(other._handleToPlugin);
+        _engineIdToHandle = std::move(other._engineIdToHandle);
     }
     return *this;
 }
 
-void Engine_plugin_resource_manager::set_stream(hipStream_t stream) const
+void EnginePluginResourceManager::setStream(hipStream_t stream) const
 {
-    for(const auto& [handle, plugin] : _handle_to_plugin)
+    for(const auto& [handle, plugin] : _handleToPlugin)
     {
-        plugin->set_stream(handle, stream);
+        plugin->setStream(handle, stream);
     }
 }
 
-std::vector<int64_t> Engine_plugin_resource_manager::get_applicable_engine_ids(
-    const Graph_descriptor* graph_desc) const
+std::vector<int64_t>
+    EnginePluginResourceManager::getApplicableEngineIds(const GraphDescriptor* graphDesc) const
 {
-    THROW_IF_NULL(graph_desc, HIPDNN_STATUS_INTERNAL_ERROR, "Graph descriptor cannot be null");
+    THROW_IF_NULL(graphDesc, HIPDNN_STATUS_INTERNAL_ERROR, "Graph descriptor cannot be null");
 
-    auto serialized_graph_data = graph_desc->get_serialized_graph();
+    auto serializedGraphData = graphDesc->getSerializedGraph();
 
-    std::vector<int64_t> engine_ids;
+    std::vector<int64_t> engineIds;
 
-    for(const auto& [handle, plugin] : _handle_to_plugin)
+    for(const auto& [handle, plugin] : _handleToPlugin)
     {
-        auto ids = plugin->get_applicable_engine_ids(handle, &serialized_graph_data);
-        engine_ids.insert(engine_ids.end(), ids.begin(), ids.end());
+        auto ids = plugin->getApplicableEngineIds(handle, &serializedGraphData);
+        engineIds.insert(engineIds.end(), ids.begin(), ids.end());
 
         for(const auto& id : ids)
         {
-            if(!_engine_id_to_handle.contains(id))
+            if(!_engineIdToHandle.contains(id))
             {
                 throw HipdnnException(HIPDNN_STATUS_PLUGIN_ERROR, "Unknown engine ID");
             }
 
-            auto existing_handle = _engine_id_to_handle.at(id);
-            if(existing_handle != handle)
+            auto existingHandle = _engineIdToHandle.at(id);
+            if(existingHandle != handle)
             {
                 throw HipdnnException(HIPDNN_STATUS_PLUGIN_ERROR,
                                       "Engine ID " + std::to_string(id)
@@ -237,211 +236,206 @@ std::vector<int64_t> Engine_plugin_resource_manager::get_applicable_engine_ids(
         }
     }
 
-    return engine_ids;
+    return engineIds;
 }
 
-void Engine_plugin_resource_manager::get_engine_details(
-    int64_t engine_id,
-    const Graph_descriptor* graph_desc,
-    hipdnnPluginConstData_t* engine_details) const
+void EnginePluginResourceManager::getEngineDetails(int64_t engineId,
+                                                   const GraphDescriptor* graphDesc,
+                                                   hipdnnPluginConstData_t* engineDetails) const
 {
-    THROW_IF_NULL(graph_desc, HIPDNN_STATUS_INTERNAL_ERROR, "Graph descriptor cannot be null");
-    THROW_IF_NULL(engine_details, HIPDNN_STATUS_INTERNAL_ERROR, "Engine details cannot be null");
+    THROW_IF_NULL(graphDesc, HIPDNN_STATUS_INTERNAL_ERROR, "Graph descriptor cannot be null");
+    THROW_IF_NULL(engineDetails, HIPDNN_STATUS_INTERNAL_ERROR, "Engine details cannot be null");
 
-    auto it = _engine_id_to_handle.find(engine_id);
-    if(it == _engine_id_to_handle.end())
+    auto it = _engineIdToHandle.find(engineId);
+    if(it == _engineIdToHandle.end())
     {
         throw HipdnnException(HIPDNN_STATUS_INTERNAL_ERROR,
-                              "Invalid engine ID: " + std::to_string(engine_id));
+                              "Invalid engine ID: " + std::to_string(engineId));
     }
 
-    auto serialized_graph_data = graph_desc->get_serialized_graph();
+    auto serializedGraphData = graphDesc->getSerializedGraph();
 
     auto handle = it->second;
-    auto plugin = _handle_to_plugin.at(handle);
+    auto plugin = _handleToPlugin.at(handle);
 
-    plugin->get_engine_details(handle, engine_id, &serialized_graph_data, engine_details);
+    plugin->getEngineDetails(handle, engineId, &serializedGraphData, engineDetails);
 
-    if(engine_details->ptr == nullptr || engine_details->size == 0)
+    if(engineDetails->ptr == nullptr || engineDetails->size == 0)
     {
         throw HipdnnException(HIPDNN_STATUS_PLUGIN_ERROR,
-                              "Engine details for engine ID " + std::to_string(engine_id)
+                              "Engine details for engine ID " + std::to_string(engineId)
                                   + " are empty or null");
     }
 }
 
-void Engine_plugin_resource_manager::destroy_engine_details(
-    int64_t engine_id, hipdnnPluginConstData_t* engine_details) const
+void EnginePluginResourceManager::destroyEngineDetails(int64_t engineId,
+                                                       hipdnnPluginConstData_t* engineDetails) const
 {
-    auto handle = _engine_id_to_handle.at(engine_id);
-    auto plugin = _handle_to_plugin.at(handle);
+    auto handle = _engineIdToHandle.at(engineId);
+    auto plugin = _handleToPlugin.at(handle);
 
-    plugin->destroy_engine_details(handle, engine_details);
+    plugin->destroyEngineDetails(handle, engineDetails);
 }
 
-std::shared_ptr<const Engine_details_wrapper> Engine_plugin_resource_manager::get_engine_details(
-    const std::shared_ptr<Engine_plugin_resource_manager>& rm,
-    int64_t engine_id,
-    const Graph_descriptor* graph_desc)
+std::shared_ptr<const EngineDetailsWrapper> EnginePluginResourceManager::getEngineDetails(
+    const std::shared_ptr<EnginePluginResourceManager>& rm,
+    int64_t engineId,
+    const GraphDescriptor* graphDesc)
 {
-    return std::make_shared<Engine_details_wrapper>(rm, engine_id, graph_desc);
+    return std::make_shared<EngineDetailsWrapper>(rm, engineId, graphDesc);
 }
 
-size_t
-    Engine_plugin_resource_manager::get_workspace_size(int64_t engine_id,
-                                                       const hipdnnPluginConstData_t* engine_config,
-                                                       const Graph_descriptor* graph_desc) const
+size_t EnginePluginResourceManager::getWorkspaceSize(int64_t engineId,
+                                                     const hipdnnPluginConstData_t* engineConfig,
+                                                     const GraphDescriptor* graphDesc) const
 {
-    THROW_IF_NULL(engine_config, HIPDNN_STATUS_INTERNAL_ERROR, "Engine config cannot be null");
-    THROW_IF_NULL(graph_desc, HIPDNN_STATUS_INTERNAL_ERROR, "Graph descriptor cannot be null");
+    THROW_IF_NULL(engineConfig, HIPDNN_STATUS_INTERNAL_ERROR, "Engine config cannot be null");
+    THROW_IF_NULL(graphDesc, HIPDNN_STATUS_INTERNAL_ERROR, "Graph descriptor cannot be null");
 
-    auto it = _engine_id_to_handle.find(engine_id);
-    if(it == _engine_id_to_handle.end())
+    auto it = _engineIdToHandle.find(engineId);
+    if(it == _engineIdToHandle.end())
     {
         throw HipdnnException(HIPDNN_STATUS_INTERNAL_ERROR,
-                              "Invalid engine ID: " + std::to_string(engine_id));
+                              "Invalid engine ID: " + std::to_string(engineId));
     }
 
-    auto serialized_graph_data = graph_desc->get_serialized_graph();
+    auto serializedGraphData = graphDesc->getSerializedGraph();
 
     auto handle = it->second;
-    auto plugin = _handle_to_plugin.at(handle);
+    auto plugin = _handleToPlugin.at(handle);
 
-    return plugin->get_workspace_size(handle, engine_config, &serialized_graph_data);
+    return plugin->getWorkspaceSize(handle, engineConfig, &serializedGraphData);
 }
 
-// TODO: Pack engine_config
-// TODO: Get engine_id from engine_config
-hipdnnEnginePluginExecutionContext_t Engine_plugin_resource_manager::create_execution_context(
-    int64_t engine_id,
-    const hipdnnPluginConstData_t* engine_config,
-    const Graph_descriptor* graph_desc) const
+// TODO: Pack engineConfig
+// TODO: Get engineId from engineConfig
+hipdnnEnginePluginExecutionContext_t
+    EnginePluginResourceManager::createExecutionContext(int64_t engineId,
+                                                        const hipdnnPluginConstData_t* engineConfig,
+                                                        const GraphDescriptor* graphDesc) const
 {
-    THROW_IF_NULL(engine_config, HIPDNN_STATUS_BAD_PARAM, "Engine config cannot be null");
-    THROW_IF_NULL(graph_desc, HIPDNN_STATUS_BAD_PARAM, "Graph descriptor cannot be null");
+    THROW_IF_NULL(engineConfig, HIPDNN_STATUS_BAD_PARAM, "Engine config cannot be null");
+    THROW_IF_NULL(graphDesc, HIPDNN_STATUS_BAD_PARAM, "Graph descriptor cannot be null");
 
-    auto it = _engine_id_to_handle.find(engine_id);
-    if(it == _engine_id_to_handle.end())
+    auto it = _engineIdToHandle.find(engineId);
+    if(it == _engineIdToHandle.end())
     {
         throw HipdnnException(HIPDNN_STATUS_INTERNAL_ERROR,
-                              "Invalid engine ID: " + std::to_string(engine_id));
+                              "Invalid engine ID: " + std::to_string(engineId));
     }
 
-    auto serialized_graph_data = graph_desc->get_serialized_graph();
+    auto serializedGraphData = graphDesc->getSerializedGraph();
 
     auto handle = it->second;
-    auto plugin = _handle_to_plugin.at(handle);
+    auto plugin = _handleToPlugin.at(handle);
 
-    return plugin->create_execution_context(handle, engine_config, &serialized_graph_data);
+    return plugin->createExecutionContext(handle, engineConfig, &serializedGraphData);
 }
 
-void Engine_plugin_resource_manager::destroy_execution_context(
-    int64_t engine_id, hipdnnEnginePluginExecutionContext_t execution_context) const
+void EnginePluginResourceManager::destroyExecutionContext(
+    int64_t engineId, hipdnnEnginePluginExecutionContext_t executionContext) const
 {
-    auto handle = _engine_id_to_handle.at(engine_id);
-    auto plugin = _handle_to_plugin.at(handle);
+    auto handle = _engineIdToHandle.at(engineId);
+    auto plugin = _handleToPlugin.at(handle);
 
-    plugin->destroy_execution_context(handle, execution_context);
+    plugin->destroyExecutionContext(handle, executionContext);
 }
 
-std::shared_ptr<const Engine_execution_context_wrapper>
-    Engine_plugin_resource_manager::create_execution_context(
-        const std::shared_ptr<Engine_plugin_resource_manager>& rm,
-        int64_t engine_id,
-        const hipdnnPluginConstData_t* engine_config,
-        const Graph_descriptor* graph_desc)
+std::shared_ptr<const EngineExecutionContextWrapper>
+    EnginePluginResourceManager::createExecutionContext(
+        const std::shared_ptr<EnginePluginResourceManager>& rm,
+        int64_t engineId,
+        const hipdnnPluginConstData_t* engineConfig,
+        const GraphDescriptor* graphDesc)
 {
-    return std::make_shared<Engine_execution_context_wrapper>(
-        rm, engine_id, engine_config, graph_desc);
+    return std::make_shared<EngineExecutionContextWrapper>(rm, engineId, engineConfig, graphDesc);
 }
 
-void Engine_plugin_resource_manager::execute_op_graph(
-    int64_t engine_id,
-    hipdnnEnginePluginExecutionContext_t execution_context,
+void EnginePluginResourceManager::executeOpGraph(
+    int64_t engineId,
+    hipdnnEnginePluginExecutionContext_t executionContext,
     void* workspace,
-    const hipdnnPluginDeviceBuffer_t* device_buffers,
-    uint32_t num_device_buffers) const
+    const hipdnnPluginDeviceBuffer_t* deviceBuffers,
+    uint32_t numDeviceBuffers) const
 {
-    auto handle = _engine_id_to_handle.at(engine_id);
-    auto plugin = _handle_to_plugin.at(handle);
+    auto handle = _engineIdToHandle.at(engineId);
+    auto plugin = _handleToPlugin.at(handle);
 
-    plugin->execute_op_graph(
-        handle, execution_context, workspace, device_buffers, num_device_buffers);
+    plugin->executeOpGraph(handle, executionContext, workspace, deviceBuffers, numDeviceBuffers);
 }
 
-void Engine_plugin_resource_manager::execute_op_graph(hipdnnBackendDescriptor_t execution_plan,
-                                                      hipdnnBackendDescriptor_t variant_pack) const
+void EnginePluginResourceManager::executeOpGraph(hipdnnBackendDescriptor_t executionPlan,
+                                                 hipdnnBackendDescriptor_t variantPack) const
 {
-    auto execution_plan_desc = execution_plan->as_descriptor<Execution_plan_descriptor>();
-    auto variant_pack_desc = variant_pack->as_descriptor<Variant_descriptor>();
+    auto executionPlanDesc = executionPlan->asDescriptor<ExecutionPlanDescriptor>();
+    auto variantPackDesc = variantPack->asDescriptor<VariantDescriptor>();
 
-    THROW_IF_FALSE(execution_plan_desc->is_finalized(),
+    THROW_IF_FALSE(executionPlanDesc->isFinalized(),
                    HIPDNN_STATUS_BAD_PARAM,
-                   "Engine_plugin_resource_manager::execute_op_graph failed: execution_plan_desc "
+                   "Engine_plugin_resource_manager::execute_op_graph failed: executionPlanDesc "
                    "is not finalized");
 
-    THROW_IF_FALSE(variant_pack_desc->is_finalized(),
+    THROW_IF_FALSE(variantPackDesc->isFinalized(),
                    HIPDNN_STATUS_BAD_PARAM,
-                   "Engine_plugin_resource_manager::execute_op_graph failed: variant_pack_desc is "
+                   "Engine_plugin_resource_manager::execute_op_graph failed: variantPackDesc is "
                    "not finalized");
 
-    auto config = execution_plan_desc->get_engine_config();
-    auto engine = config->get_engine();
-    auto engine_id = engine->get_engine_id();
-    void* workspace = variant_pack_desc->get_workspace();
+    auto config = executionPlanDesc->getEngineConfig();
+    auto engine = config->getEngine();
+    auto engineId = engine->getEngineId();
+    void* workspace = variantPackDesc->getWorkspace();
 
-    auto& tensor_ids = variant_pack_desc->get_tensor_ids();
-    auto& tensor_pointers = variant_pack_desc->get_data_pointers();
+    auto& tensorIds = variantPackDesc->getTensorIds();
+    auto& tensorPointers = variantPackDesc->getDataPointers();
 
-    THROW_IF_NE(tensor_ids.size(),
-                tensor_pointers.size(),
+    THROW_IF_NE(tensorIds.size(),
+                tensorPointers.size(),
                 HIPDNN_STATUS_BAD_PARAM,
                 "Engine_plugin_resource_manager::execute_op_graph failed: "
-                "tensor_ids and tensor_pointers must have the same size");
+                "tensorIds and tensorPointers must have the same size");
 
-    std::vector<hipdnnPluginDeviceBuffer_t> device_buffers;
-    device_buffers.reserve(tensor_ids.size());
-    for(size_t i = 0; i < tensor_ids.size(); ++i)
+    std::vector<hipdnnPluginDeviceBuffer_t> deviceBuffers;
+    deviceBuffers.reserve(tensorIds.size());
+    for(size_t i = 0; i < tensorIds.size(); ++i)
     {
         hipdnnPluginDeviceBuffer_t buffer;
-        buffer.uid = tensor_ids[i];
-        buffer.ptr = const_cast<void*>(tensor_pointers[i]);
-        device_buffers.push_back(buffer);
+        buffer.uid = tensorIds[i];
+        buffer.ptr = const_cast<void*>(tensorPointers[i]);
+        deviceBuffers.push_back(buffer);
     }
 
-    execute_op_graph(engine_id,
-                     execution_plan_desc->get_execution_context(),
-                     workspace,
-                     device_buffers.data(),
-                     static_cast<uint32_t>(tensor_ids.size()));
+    executeOpGraph(engineId,
+                   executionPlanDesc->getExecutionContext(),
+                   workspace,
+                   deviceBuffers.data(),
+                   static_cast<uint32_t>(tensorIds.size()));
 }
 
-Engine_details_wrapper::Engine_details_wrapper(
-    const std::shared_ptr<Engine_plugin_resource_manager>& rm,
-    int64_t engine_id,
-    const Graph_descriptor* graph_desc)
+EngineDetailsWrapper::EngineDetailsWrapper(const std::shared_ptr<EnginePluginResourceManager>& rm,
+                                           int64_t engineId,
+                                           const GraphDescriptor* graphDesc)
     : _rm(rm)
 {
-    _rm->get_engine_details(engine_id, graph_desc, &_engine_details_data);
-    flatbuffers::Verifier verifier(static_cast<const uint8_t*>(_engine_details_data.ptr),
-                                   _engine_details_data.size);
+    _rm->getEngineDetails(engineId, graphDesc, &_engineDetailsData);
+    flatbuffers::Verifier verifier(static_cast<const uint8_t*>(_engineDetailsData.ptr),
+                                   _engineDetailsData.size);
     if(!verifier.VerifyBuffer<hipdnn_sdk::data_objects::EngineDetails>())
     {
         throw HipdnnException(HIPDNN_STATUS_BAD_PARAM,
-                              "Engine_details_wrapper: unable to verify the flatbuffer schema.");
+                              "EngineDetailsWrapper: unable to verify the flatbuffer schema.");
     }
 }
 
-Engine_details_wrapper::~Engine_details_wrapper()
+EngineDetailsWrapper::~EngineDetailsWrapper()
 {
-    if(_engine_details_data.ptr == nullptr)
+    if(_engineDetailsData.ptr == nullptr)
     {
         return;
     }
 
     try
     {
-        _rm->destroy_engine_details(get()->engine_id(), &_engine_details_data);
+        _rm->destroyEngineDetails(get()->engine_id(), &_engineDetailsData);
     }
     catch(const HipdnnException& e)
     {
@@ -449,61 +443,61 @@ Engine_details_wrapper::~Engine_details_wrapper()
     }
 }
 
-Engine_details_wrapper::Engine_details_wrapper(Engine_details_wrapper&& other) noexcept
+EngineDetailsWrapper::EngineDetailsWrapper(EngineDetailsWrapper&& other) noexcept
     : _rm(std::move(other._rm))
-    , _engine_details_data(other._engine_details_data)
+    , _engineDetailsData(other._engineDetailsData)
 {
     other._rm = nullptr;
-    other._engine_details_data.ptr = nullptr;
+    other._engineDetailsData.ptr = nullptr;
 }
 
-Engine_details_wrapper& Engine_details_wrapper::operator=(Engine_details_wrapper&& other) noexcept
+EngineDetailsWrapper& EngineDetailsWrapper::operator=(EngineDetailsWrapper&& other) noexcept
 {
     if(this != &other)
     {
         _rm = std::move(other._rm);
-        _engine_details_data = other._engine_details_data;
+        _engineDetailsData = other._engineDetailsData;
 
         other._rm = nullptr;
-        other._engine_details_data.ptr = nullptr;
+        other._engineDetailsData.ptr = nullptr;
     }
     return *this;
 }
 
-const hipdnn_sdk::data_objects::EngineDetails* Engine_details_wrapper::get() const
+const hipdnn_sdk::data_objects::EngineDetails* EngineDetailsWrapper::get() const
 {
-    if(_engine_details_data.ptr == nullptr)
+    if(_engineDetailsData.ptr == nullptr)
     {
         throw HipdnnException(HIPDNN_STATUS_INTERNAL_ERROR,
-                              "Engine_details_wrapper: wrong usage: "
+                              "EngineDetailsWrapper: wrong usage: "
                               "get() called on an empty object");
     }
 
-    return hipdnn_sdk::data_objects::GetEngineDetails(_engine_details_data.ptr);
+    return hipdnn_sdk::data_objects::GetEngineDetails(_engineDetailsData.ptr);
 }
 
-// TODO: Use engine_id from engine_config
-Engine_execution_context_wrapper::Engine_execution_context_wrapper(
-    const std::shared_ptr<Engine_plugin_resource_manager>& rm,
-    int64_t engine_id,
-    const hipdnnPluginConstData_t* engine_config,
-    const Graph_descriptor* graph_desc)
+// TODO: Use engineId from engineConfig
+EngineExecutionContextWrapper::EngineExecutionContextWrapper(
+    const std::shared_ptr<EnginePluginResourceManager>& rm,
+    int64_t engineId,
+    const hipdnnPluginConstData_t* engineConfig,
+    const GraphDescriptor* graphDesc)
     : _rm(rm)
-    , _engine_id(engine_id)
+    , _engineId(engineId)
 {
-    _execution_context = _rm->create_execution_context(engine_id, engine_config, graph_desc);
+    _executionContext = _rm->createExecutionContext(engineId, engineConfig, graphDesc);
 }
 
-Engine_execution_context_wrapper::~Engine_execution_context_wrapper()
+EngineExecutionContextWrapper::~EngineExecutionContextWrapper()
 {
-    if(_execution_context == nullptr)
+    if(_executionContext == nullptr)
     {
         return;
     }
 
     try
     {
-        _rm->destroy_execution_context(_engine_id, _execution_context);
+        _rm->destroyExecutionContext(_engineId, _executionContext);
     }
     catch(const HipdnnException& e)
     {
@@ -511,41 +505,41 @@ Engine_execution_context_wrapper::~Engine_execution_context_wrapper()
     }
 }
 
-Engine_execution_context_wrapper::Engine_execution_context_wrapper(
-    Engine_execution_context_wrapper&& other) noexcept
+EngineExecutionContextWrapper::EngineExecutionContextWrapper(
+    EngineExecutionContextWrapper&& other) noexcept
     : _rm(std::move(other._rm))
-    , _engine_id(other._engine_id)
-    , _execution_context(other._execution_context)
+    , _engineId(other._engineId)
+    , _executionContext(other._executionContext)
 {
     other._rm = nullptr;
-    other._execution_context = nullptr;
+    other._executionContext = nullptr;
 }
 
-Engine_execution_context_wrapper&
-    Engine_execution_context_wrapper::operator=(Engine_execution_context_wrapper&& other) noexcept
+EngineExecutionContextWrapper&
+    EngineExecutionContextWrapper::operator=(EngineExecutionContextWrapper&& other) noexcept
 {
     if(this != &other)
     {
         _rm = std::move(other._rm);
-        _engine_id = other._engine_id;
-        _execution_context = other._execution_context;
+        _engineId = other._engineId;
+        _executionContext = other._executionContext;
 
         other._rm = nullptr;
-        other._execution_context = nullptr;
+        other._executionContext = nullptr;
     }
     return *this;
 }
 
-hipdnnEnginePluginExecutionContext_t Engine_execution_context_wrapper::get() const
+hipdnnEnginePluginExecutionContext_t EngineExecutionContextWrapper::get() const
 {
-    if(_execution_context == nullptr)
+    if(_executionContext == nullptr)
     {
         throw HipdnnException(HIPDNN_STATUS_INTERNAL_ERROR,
-                              "Engine_execution_context_wrapper: wrong usage: "
+                              "EngineExecutionContextWrapper: wrong usage: "
                               "get() called on an empty object");
     }
 
-    return _execution_context;
+    return _executionContext;
 }
 
 } // namespace plugin

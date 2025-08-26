@@ -12,52 +12,50 @@
 namespace hipdnn_backend
 {
 
-void Execution_plan_descriptor::finalize()
+void ExecutionPlanDescriptor::finalize()
 {
-    THROW_IF_TRUE(is_finalized(),
+    THROW_IF_TRUE(isFinalized(),
                   HIPDNN_STATUS_BAD_PARAM,
-                  "Execution_plan_descriptor::finalize() failed: Already finalized.");
+                  "ExecutionPlanDescriptor::finalize() failed: Already finalized.");
 
     THROW_IF_NULL(_handle,
                   HIPDNN_STATUS_BAD_PARAM,
-                  "Execution_plan_descriptor::finalize() failed: Handle was not set.");
+                  "ExecutionPlanDescriptor::finalize() failed: Handle was not set.");
 
-    THROW_IF_NULL(_engine_config,
+    THROW_IF_NULL(_engineConfig,
                   HIPDNN_STATUS_BAD_PARAM,
-                  "Execution_plan_descriptor::finalize() failed: Engine was not set.");
+                  "ExecutionPlanDescriptor::finalize() failed: Engine was not set.");
 
-    auto plugin_resource_manager = _handle->get_plugin_resource_manager();
-    auto engine_config_plugin_data = _engine_config->get_serialized_engine_config();
-    auto engine = _engine_config->get_engine();
+    auto pluginResourceManager = _handle->getPluginResourceManager();
+    auto engineConfigPluginData = _engineConfig->getSerializedEngineConfig();
+    auto engine = _engineConfig->getEngine();
 
-    _execution_context = plugin::Engine_plugin_resource_manager::create_execution_context(
-        plugin_resource_manager,
-        engine->get_engine_id(),
-        &engine_config_plugin_data,
-        engine->get_graph().get());
+    _executionContext
+        = plugin::EnginePluginResourceManager::createExecutionContext(pluginResourceManager,
+                                                                      engine->getEngineId(),
+                                                                      &engineConfigPluginData,
+                                                                      engine->getGraph().get());
 
-    hipdnnBackendDescriptorImpl<Execution_plan_descriptor>::finalize();
+    HipdnnBackendDescriptorImpl<ExecutionPlanDescriptor>::finalize();
 }
 
-void Execution_plan_descriptor::get_attribute(hipdnnBackendAttributeName_t attribute_name,
-                                              hipdnnBackendAttributeType_t attribute_type,
-                                              int64_t requested_element_count,
-                                              int64_t* element_count,
-                                              void* array_of_elements) const
+void ExecutionPlanDescriptor::getAttribute(hipdnnBackendAttributeName_t attributeName,
+                                           hipdnnBackendAttributeType_t attributeType,
+                                           int64_t requestedElementCount,
+                                           int64_t* elementCount,
+                                           void* arrayOfElements) const
 {
-    THROW_IF_FALSE(is_finalized(),
+    THROW_IF_FALSE(isFinalized(),
                    HIPDNN_STATUS_NOT_INITIALIZED,
-                   "Execution_plan_descriptor::get_attribute() failed: Not finalized.");
+                   "ExecutionPlanDescriptor::getAttribute() failed: Not finalized.");
 
-    switch(attribute_name)
+    switch(attributeName)
     {
     case HIPDNN_ATTR_EXECUTION_PLAN_WORKSPACE_SIZE:
-        get_workspace_size(
-            attribute_type, requested_element_count, element_count, array_of_elements);
+        getWorkspaceSize(attributeType, requestedElementCount, elementCount, arrayOfElements);
         break;
     case HIPDNN_ATTR_EXECUTION_PLAN_ENGINE_CONFIG:
-        get_engine_config(
-            attribute_type, requested_element_count, element_count, array_of_elements);
+        getEngineConfig(attributeType, requestedElementCount, elementCount, arrayOfElements);
         break;
     case HIPDNN_ATTR_EXECUTION_PLAN_HANDLE:
     case HIPDNN_ATTR_EXECUTION_PLAN_COMPUTED_INTERMEDIATE_UIDS:
@@ -69,44 +67,44 @@ void Execution_plan_descriptor::get_attribute(hipdnnBackendAttributeName_t attri
         throw HipdnnException(
             HIPDNN_STATUS_NOT_SUPPORTED,
             std::string(
-                "Execution_plan_descriptor::get_attribute() is not supported for attribute ")
-                + hipdnn_backend::hipdnnGetAttributeNameString(attribute_name) + ".");
+                "ExecutionPlanDescriptor::getAttribute() is not supported for attribute ")
+                + hipdnn_backend::hipdnnGetAttributeNameString(attributeName) + ".");
     }
 }
 
-void Execution_plan_descriptor::get_workspace_size(hipdnnBackendAttributeType_t attribute_type,
-                                                   int64_t requested_element_count,
-                                                   int64_t* element_count,
-                                                   void* array_of_elements) const
+void ExecutionPlanDescriptor::getWorkspaceSize(hipdnnBackendAttributeType_t attributeType,
+                                               int64_t requestedElementCount,
+                                               int64_t* elementCount,
+                                               void* arrayOfElements) const
 {
-    THROW_IF_NULL(_engine_config,
+    THROW_IF_NULL(_engineConfig,
                   HIPDNN_STATUS_INTERNAL_ERROR,
-                  "Execution_plan_descriptor failed to get workspace size: Engine was not set "
+                  "ExecutionPlanDescriptor failed to get workspace size: Engine was not set "
                   "(internal error).");
 
-    _engine_config->get_attribute(HIPDNN_ATTR_ENGINECFG_WORKSPACE_SIZE,
-                                  attribute_type,
-                                  requested_element_count,
-                                  element_count,
-                                  array_of_elements);
+    _engineConfig->getAttribute(HIPDNN_ATTR_ENGINECFG_WORKSPACE_SIZE,
+                                attributeType,
+                                requestedElementCount,
+                                elementCount,
+                                arrayOfElements);
 }
 
-void Execution_plan_descriptor::set_attribute(hipdnnBackendAttributeName_t attribute_name,
-                                              hipdnnBackendAttributeType_t attribute_type,
-                                              int64_t element_count,
-                                              const void* array_of_elements)
+void ExecutionPlanDescriptor::setAttribute(hipdnnBackendAttributeName_t attributeName,
+                                           hipdnnBackendAttributeType_t attributeType,
+                                           int64_t elementCount,
+                                           const void* arrayOfElements)
 {
-    THROW_IF_TRUE(is_finalized(),
+    THROW_IF_TRUE(isFinalized(),
                   HIPDNN_STATUS_NOT_INITIALIZED,
-                  "Execution_plan_descriptor::set_attribute() failed: Already finalized.");
+                  "ExecutionPlanDescriptor::setAttribute() failed: Already finalized.");
 
-    switch(attribute_name)
+    switch(attributeName)
     {
     case HIPDNN_ATTR_EXECUTION_PLAN_HANDLE:
-        set_handle(attribute_type, element_count, array_of_elements);
+        setHandle(attributeType, elementCount, arrayOfElements);
         break;
     case HIPDNN_ATTR_EXECUTION_PLAN_ENGINE_CONFIG:
-        set_engine_config(attribute_type, element_count, array_of_elements);
+        setEngineConfig(attributeType, elementCount, arrayOfElements);
         break;
     case HIPDNN_ATTR_EXECUTION_PLAN_WORKSPACE_SIZE:
     case HIPDNN_ATTR_EXECUTION_PLAN_COMPUTED_INTERMEDIATE_UIDS:
@@ -118,116 +116,116 @@ void Execution_plan_descriptor::set_attribute(hipdnnBackendAttributeName_t attri
         throw HipdnnException(
             HIPDNN_STATUS_NOT_SUPPORTED,
             std::string(
-                "Execution_plan_descriptor::set_attribute() is not supported for attribute ")
-                + hipdnn_backend::hipdnnGetAttributeNameString(attribute_name) + ".");
+                "ExecutionPlanDescriptor::setAttribute() is not supported for attribute ")
+                + hipdnn_backend::hipdnnGetAttributeNameString(attributeName) + ".");
     }
 }
 
-void Execution_plan_descriptor::set_handle(hipdnnBackendAttributeType_t attribute_type,
-                                           int64_t element_count,
-                                           const void* array_of_elements)
+void ExecutionPlanDescriptor::setHandle(hipdnnBackendAttributeType_t attributeType,
+                                        int64_t elementCount,
+                                        const void* arrayOfElements)
 {
-    THROW_IF_NE(attribute_type,
+    THROW_IF_NE(attributeType,
                 HIPDNN_TYPE_HANDLE,
                 HIPDNN_STATUS_BAD_PARAM,
-                "Execution_plan_descriptor failed to set handle: Invalid attribute type.");
-    THROW_IF_NE(element_count,
+                "ExecutionPlanDescriptor failed to set handle: Invalid attribute type.");
+    THROW_IF_NE(elementCount,
                 1,
                 HIPDNN_STATUS_BAD_PARAM,
-                "Execution_plan_descriptor failed to set handle: Invalid element count.");
-    THROW_IF_NULL(array_of_elements,
+                "ExecutionPlanDescriptor failed to set handle: Invalid element count.");
+    THROW_IF_NULL(arrayOfElements,
                   HIPDNN_STATUS_BAD_PARAM_NULL_POINTER,
-                  "Execution_plan_descriptor failed to set handle: Null pointer.");
+                  "ExecutionPlanDescriptor failed to set handle: Null pointer.");
 
-    hipdnnHandle_t handle = *static_cast<const hipdnnHandle_t*>(array_of_elements);
+    hipdnnHandle_t handle = *static_cast<const hipdnnHandle_t*>(arrayOfElements);
 
     THROW_IF_NULL(handle,
                   HIPDNN_STATUS_BAD_PARAM_NULL_POINTER,
-                  "Execution_plan_descriptor failed to set handle: Handle is null.");
+                  "ExecutionPlanDescriptor failed to set handle: Handle is null.");
 
     _handle = handle;
 }
 
-void Execution_plan_descriptor::set_engine_config(hipdnnBackendAttributeType_t attribute_type,
-                                                  int64_t element_count,
-                                                  const void* array_of_elements)
+void ExecutionPlanDescriptor::setEngineConfig(hipdnnBackendAttributeType_t attributeType,
+                                              int64_t elementCount,
+                                              const void* arrayOfElements)
 {
-    THROW_IF_NE(attribute_type,
+    THROW_IF_NE(attributeType,
                 HIPDNN_TYPE_BACKEND_DESCRIPTOR,
                 HIPDNN_STATUS_BAD_PARAM,
-                "Execution_plan_descriptor failed to set engine config: Invalid attribute type.");
+                "ExecutionPlanDescriptor failed to set engine config: Invalid attribute type.");
 
-    THROW_IF_NE(element_count,
+    THROW_IF_NE(elementCount,
                 1,
                 HIPDNN_STATUS_BAD_PARAM,
-                "Execution_plan_descriptor failed to set engine config: Invalid element count.");
+                "ExecutionPlanDescriptor failed to set engine config: Invalid element count.");
 
-    auto engine_config = hipdnnBackendDescriptor::unpack_descriptor<const Engine_config_descriptor>(
-        array_of_elements,
+    auto engineConfig = HipdnnBackendDescriptor::unpackDescriptor<const EngineConfigDescriptor>(
+        arrayOfElements,
         HIPDNN_STATUS_BAD_PARAM_NULL_POINTER,
-        "Execution_plan_descriptor failed to set engine config: Null pointer.");
+        "ExecutionPlanDescriptor failed to set engine config: Null pointer.");
 
-    THROW_IF_FALSE(engine_config->is_finalized(),
+    THROW_IF_FALSE(engineConfig->isFinalized(),
                    HIPDNN_STATUS_BAD_PARAM_NOT_FINALIZED,
-                   "Execution_plan_descriptor failed to set engine config: Engine config "
+                   "ExecutionPlanDescriptor failed to set engine config: Engine config "
                    "descriptor is not finalized.");
 
-    _engine_config = engine_config;
+    _engineConfig = engineConfig;
 }
 
-void Execution_plan_descriptor::get_engine_config(hipdnnBackendAttributeType_t attribute_type,
-                                                  int64_t requested_element_count,
-                                                  int64_t* element_count,
-                                                  void* array_of_elements) const
+void ExecutionPlanDescriptor::getEngineConfig(hipdnnBackendAttributeType_t attributeType,
+                                              int64_t requestedElementCount,
+                                              int64_t* elementCount,
+                                              void* arrayOfElements) const
 {
-    THROW_IF_NE(attribute_type,
+    THROW_IF_NE(attributeType,
                 HIPDNN_TYPE_BACKEND_DESCRIPTOR,
                 HIPDNN_STATUS_BAD_PARAM,
-                "Execution_plan_descriptor failed to get engine config: Invalid attribute type.");
+                "ExecutionPlanDescriptor failed to get engine config: Invalid attribute type.");
 
-    THROW_IF_NE(requested_element_count,
+    THROW_IF_NE(requestedElementCount,
                 1,
                 HIPDNN_STATUS_BAD_PARAM,
-                "Execution_plan_descriptor failed to get engine config: "
+                "ExecutionPlanDescriptor failed to get engine config: "
                 "Invalid element count.");
 
-    THROW_IF_NULL(array_of_elements,
+    THROW_IF_NULL(arrayOfElements,
                   HIPDNN_STATUS_BAD_PARAM_NULL_POINTER,
-                  "Execution_plan_descriptor failed to get engine config: Null pointer for "
-                  "array_of_elements.");
+                  "ExecutionPlanDescriptor failed to get engine config: Null pointer for "
+                  "arrayOfElements.");
 
-    if(element_count != nullptr)
+    if(elementCount != nullptr)
     {
-        *element_count = 1;
+        *elementCount = 1;
     }
 
-    THROW_IF_NULL(_engine_config,
+    THROW_IF_NULL(_engineConfig,
                   HIPDNN_STATUS_BAD_PARAM_NULL_POINTER,
-                  "Execution_plan_descriptor failed to get engine config: Engine config is null. "
+                  "ExecutionPlanDescriptor failed to get engine config: Engine config is null. "
                   "Engine config was not set.");
 
-    hipdnnBackendDescriptor::pack_descriptor(_engine_config, array_of_elements);
+    HipdnnBackendDescriptor::packDescriptor(_engineConfig, arrayOfElements);
 }
 
-std::shared_ptr<const Engine_config_descriptor> Execution_plan_descriptor::get_engine_config() const
+std::shared_ptr<const EngineConfigDescriptor> ExecutionPlanDescriptor::getEngineConfig() const
 {
-    THROW_IF_FALSE(is_finalized(),
+    THROW_IF_FALSE(isFinalized(),
                    HIPDNN_STATUS_INTERNAL_ERROR,
-                   "Execution_plan_descriptor::get_engine_config() failed: Not finalized.");
+                   "ExecutionPlanDescriptor::getEngineConfig() failed: Not finalized.");
 
-    return _engine_config;
+    return _engineConfig;
 }
 
-hipdnnEnginePluginExecutionContext_t Execution_plan_descriptor::get_execution_context() const
+hipdnnEnginePluginExecutionContext_t ExecutionPlanDescriptor::getExecutionContext() const
 {
-    THROW_IF_FALSE(is_finalized(),
+    THROW_IF_FALSE(isFinalized(),
                    HIPDNN_STATUS_INTERNAL_ERROR,
-                   "Execution_plan_descriptor::get_execution_context() failed: Not finalized.");
+                   "ExecutionPlanDescriptor::getExecutionContext() failed: Not finalized.");
 
-    return _execution_context->get();
+    return _executionContext->get();
 }
 
-hipdnnBackendDescriptorType_t Execution_plan_descriptor::get_static_type()
+hipdnnBackendDescriptorType_t ExecutionPlanDescriptor::getStaticType()
 {
     return HIPDNN_BACKEND_EXECUTION_PLAN_DESCRIPTOR;
 }

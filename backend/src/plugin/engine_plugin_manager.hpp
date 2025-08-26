@@ -15,21 +15,21 @@ namespace hipdnn_backend
 namespace plugin
 {
 
-class Engine_plugin_manager : public Plugin_manager_base<Engine_plugin>
+class EnginePluginManager : public PluginManagerBase<EnginePlugin>
 {
 public:
-    Engine_plugin_manager()
-        : Plugin_manager_base<Engine_plugin>({"hipdnn_plugins/engines/"})
+    EnginePluginManager()
+        : PluginManagerBase<EnginePlugin>({"hipdnn_plugins/engines/"})
     {
     }
 
 private:
-    void validate_before_adding(const Engine_plugin& plugin) override
+    void validateBeforeAdding(const EnginePlugin& plugin) override
     {
-        auto engine_ids = plugin.get_all_engine_ids();
-        for(const auto id : engine_ids)
+        auto engineIds = plugin.getAllEngineIds();
+        for(const auto id : engineIds)
         {
-            if(_engine_ids.contains(id))
+            if(_engineIds.contains(id))
             {
                 throw HipdnnException(HIPDNN_STATUS_PLUGIN_ERROR,
                                       "Engine ID " + std::to_string(id)
@@ -38,13 +38,13 @@ private:
         }
     }
 
-    void action_after_adding(const Engine_plugin& plugin) override
+    void actionAfterAdding(const EnginePlugin& plugin) override
     {
-        auto engine_ids = plugin.get_all_engine_ids();
-        _engine_ids.insert(engine_ids.begin(), engine_ids.end());
+        auto engineIds = plugin.getAllEngineIds();
+        _engineIds.insert(engineIds.begin(), engineIds.end());
     }
 
-    std::set<int64_t> _engine_ids;
+    std::set<int64_t> _engineIds;
 };
 
 } // namespace plugin
