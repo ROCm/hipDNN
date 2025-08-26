@@ -29,8 +29,8 @@ TEST(PluginLastErrorManagerTest, SetLastErrorWithStdString)
 
 TEST(PluginLastErrorManagerTest, SetLastErrorSuccessDoesNotChangeError)
 {
-    const char* prev_msg = "previous error";
-    PluginLastErrorManager::setLastError(HIPDNN_PLUGIN_STATUS_INTERNAL_ERROR, prev_msg);
+    const char* prevMsg = "previous error";
+    PluginLastErrorManager::setLastError(HIPDNN_PLUGIN_STATUS_INTERNAL_ERROR, prevMsg);
     PluginLastErrorManager::setLastError(HIPDNN_PLUGIN_STATUS_SUCCESS, "should not overwrite");
-    EXPECT_STREQ(PluginLastErrorManager::getLastError(), prev_msg);
+    EXPECT_STREQ(PluginLastErrorManager::getLastError(), prevMsg);
 }
