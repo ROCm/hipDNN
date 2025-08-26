@@ -246,6 +246,6 @@ private:
     bool _isVirtual = false;
     ValueVariant _value;
 };
-
+typedef TensorAttributes Tensor_attributes;
 }
 }
