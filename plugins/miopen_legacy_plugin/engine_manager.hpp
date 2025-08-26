@@ -39,9 +39,9 @@ public:
                             const hipdnn_plugin::IGraph& opGraph) const;
 
     void initializeExecutionContext(const HipdnnEnginePluginHandle& handle,
-                                      const hipdnn_plugin::IGraph& opGraph,
-                                      const hipdnn_plugin::IEngineConfig& engineConfig,
-                                      HipdnnEnginePluginExecutionContext& executionContext) const;
+                                    const hipdnn_plugin::IGraph& opGraph,
+                                    const hipdnn_plugin::IEngineConfig& engineConfig,
+                                    HipdnnEnginePluginExecutionContext& executionContext) const;
 
 private:
     EngineInterface& getEngine(int64_t engineId) const;

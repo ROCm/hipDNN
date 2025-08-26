@@ -36,9 +36,8 @@ bool MiopenBatchnormPlanBuilder::isApplicable(const hipdnn_plugin::IGraph& opGra
     return true;
 }
 
-size_t
-    MiopenBatchnormPlanBuilder::getWorkspaceSize(const HipdnnEnginePluginHandle& handle,
-                                                      const hipdnn_plugin::IGraph& opGraph) const
+size_t MiopenBatchnormPlanBuilder::getWorkspaceSize(const HipdnnEnginePluginHandle& handle,
+                                                    const hipdnn_plugin::IGraph& opGraph) const
 {
     std::ignore = handle;
     std::ignore = opGraph;
