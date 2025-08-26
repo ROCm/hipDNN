@@ -81,7 +81,7 @@ inline int32_t initialize_frontend_logging(hipdnnCallback_t fn)
     }
 
 #ifdef COMPONENT_NAME
-    hipdnn::logging::initialize_callback_logging(COMPONENT_NAME, fn);
+    hipdnn::logging::initializeCallbackLogging(COMPONENT_NAME, fn);
 #else
     return -1;
 #endif

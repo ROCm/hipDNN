@@ -37,7 +37,7 @@ protected:
 
         spdlog::drop_all();
 
-        hipdnn::logging::initialize_callback_logging(_test_logger_name, test_logging_callback);
+        hipdnn::logging::initializeCallbackLogging(_test_logger_name, test_logging_callback);
 
         auto test_logger = spdlog::get(_test_logger_name);
         ASSERT_NE(test_logger, nullptr);
