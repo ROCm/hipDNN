@@ -9,71 +9,68 @@
 namespace test_util
 {
 
-void create_test_handle(hipdnnHandle_t* handle);
+void createTestHandle(hipdnnHandle_t* handle);
 
-void create_test_graph(hipdnnBackendDescriptor_t* descriptor, hipdnnHandle_t handle);
+void createTestGraph(hipdnnBackendDescriptor_t* descriptor, hipdnnHandle_t handle);
 
-void populate_test_engine(hipdnnBackendDescriptor_t engine,
-                          hipdnnBackendDescriptor_t* graph,
-                          hipdnnHandle_t handle,
-                          int64_t gidx,
-                          bool finalize = false);
-
-void create_test_engine(hipdnnBackendDescriptor_t* engine,
+void populateTestEngine(hipdnnBackendDescriptor_t engine,
                         hipdnnBackendDescriptor_t* graph,
                         hipdnnHandle_t handle,
                         int64_t gidx,
                         bool finalize = false);
 
-void populate_test_engine_config(hipdnnBackendDescriptor_t* engine_config,
-                                 hipdnnBackendDescriptor_t* engine,
-                                 hipdnnBackendDescriptor_t* graph,
-                                 hipdnnHandle_t handle,
-                                 int64_t gidx,
-                                 bool finalize = false);
+void createTestEngine(hipdnnBackendDescriptor_t* engine,
+                      hipdnnBackendDescriptor_t* graph,
+                      hipdnnHandle_t handle,
+                      int64_t gidx,
+                      bool finalize = false);
 
-void create_test_engine_config(hipdnnBackendDescriptor_t* engine_config,
+void populateTestEngineConfig(hipdnnBackendDescriptor_t* engineConfig,
+                              hipdnnBackendDescriptor_t* engine,
+                              hipdnnBackendDescriptor_t* graph,
+                              hipdnnHandle_t handle,
+                              int64_t gidx,
+                              bool finalize = false);
+
+void createTestEngineConfig(hipdnnBackendDescriptor_t* engineConfig,
+                            hipdnnBackendDescriptor_t* engine,
+                            hipdnnBackendDescriptor_t* graph,
+                            hipdnnHandle_t handle,
+                            int64_t gidx,
+                            bool finalize = false);
+
+void populateTestExecutionPlan(hipdnnBackendDescriptor_t* executionPlan,
+                               hipdnnBackendDescriptor_t* engineConfig,
                                hipdnnBackendDescriptor_t* engine,
                                hipdnnBackendDescriptor_t* graph,
                                hipdnnHandle_t handle,
                                int64_t gidx,
                                bool finalize = false);
 
-void populate_test_execution_plan(hipdnnBackendDescriptor_t* execution_plan,
-                                  hipdnnBackendDescriptor_t* engine_config,
-                                  hipdnnBackendDescriptor_t* engine,
-                                  hipdnnBackendDescriptor_t* graph,
-                                  hipdnnHandle_t handle,
-                                  int64_t gidx,
-                                  bool finalize = false);
+flatbuffers::FlatBufferBuilder createAndPopulateBatchnormNode();
 
-flatbuffers::FlatBufferBuilder create_and_populate_batchnorm_node();
+void* allocateTensorMemory([[maybe_unused]] const int64_t* dims,
+                           [[maybe_unused]] size_t dimsCount,
+                           [[maybe_unused]] hipdnnBackendAttributeType_t dataType,
+                           [[maybe_unused]] bool initialize);
 
-void* allocate_tensor_memory([[maybe_unused]] const int64_t* dims,
-                             [[maybe_unused]] size_t dims_count,
-                             [[maybe_unused]] hipdnnBackendAttributeType_t data_type,
-                             [[maybe_unused]] bool initialize);
+void freeTensorMemory(void* dataPtr);
 
-void free_tensor_memory(void* data_ptr);
+void populateVariantPackWithMappings(hipdnnBackendDescriptor_t variantPack,
+                                     const std::unordered_map<int64_t, void*>& dataPtrMappings,
+                                     void* workspace = nullptr);
 
-void populate_variant_pack_with_mappings(
-    hipdnnBackendDescriptor_t variant_pack,
-    const std::unordered_map<int64_t, void*>& data_ptr_mappings,
-    void* workspace = nullptr);
+void createAndInitializeBackendDescriptor(hipdnnBackendDescriptor_t* backendDescriptor,
+                                          const flatbuffers::DetachedBuffer& serializedGraph,
+                                          hipdnnHandle_t handle);
 
-void create_and_initialize_backend_descriptor(hipdnnBackendDescriptor_t* backend_descriptor,
-                                              const flatbuffers::DetachedBuffer& serialized_graph,
-                                              hipdnnHandle_t handle);
+void extractTensorInfoFromGraph(const flatbuffers::DetachedBuffer& serializedGraph,
+                                std::unordered_map<int64_t, std::string>& uidToNameMap,
+                                std::unordered_map<std::string, int64_t>& nameToUidMap,
+                                std::unordered_map<int64_t, std::vector<int64_t>>& uidToDimsMap);
 
-void extract_tensor_info_from_graph(
-    const flatbuffers::DetachedBuffer& serialized_graph,
-    std::unordered_map<int64_t, std::string>& uid_to_name_map,
-    std::unordered_map<std::string, int64_t>& name_to_uid_map,
-    std::unordered_map<int64_t, std::vector<int64_t>>& uid_to_dims_map);
+std::vector<std::string> getLoadedPlugins(hipdnnHandle_t handle);
 
-std::vector<std::string> get_loaded_plugins(hipdnnHandle_t handle);
-
-bool is_plugin_loaded(const std::vector<std::string>& loaded_plugins,
-                      const std::string& plugin_name);
+bool isPluginLoaded(const std::vector<std::string>& loadedPlugins, const std::string& pluginName);
 
 } // namespace test_util

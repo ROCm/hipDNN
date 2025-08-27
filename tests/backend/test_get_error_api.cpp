@@ -13,7 +13,7 @@
 // NOLINTBEGIN(modernize-avoid-c-arrays)
 TEST(GetErrorStringTest, AllStatusCodes)
 {
-    std::vector<std::tuple<hipdnnStatus_t, std::string>> status_pairs
+    std::vector<std::tuple<hipdnnStatus_t, std::string>> statusPairs
         = {{HIPDNN_STATUS_SUCCESS, "HIPDNN_STATUS_SUCCESS"},
            {HIPDNN_STATUS_NOT_INITIALIZED, "HIPDNN_STATUS_NOT_INITIALIZED"},
            {HIPDNN_STATUS_BAD_PARAM, "HIPDNN_STATUS_BAD_PARAM"},
@@ -32,7 +32,7 @@ TEST(GetErrorStringTest, AllStatusCodes)
            {HIPDNN_STATUS_EXECUTION_FAILED, "HIPDNN_STATUS_EXECUTION_FAILED"},
            {static_cast<hipdnnStatus_t>(-999), "HIPDNN_STATUS_UNKNOWN"}};
 
-    for(const auto& [status, text] : status_pairs)
+    for(const auto& [status, text] : statusPairs)
     {
         const char* str = hipdnnGetErrorString(status);
         ASSERT_STREQ(str, text.c_str());
@@ -67,40 +67,40 @@ TEST(GetLastErrorStringTest, BufferTruncationAndNullTermination)
 
     ASSERT_EQ(buffer[sizeof(buffer) - 1], '\0');
     ASSERT_LT(strlen(buffer), sizeof(buffer));
-    std::string buffer_str(buffer);
-    ASSERT_NE(buffer_str, "");
+    std::string bufferStr(buffer);
+    ASSERT_NE(bufferStr, "");
 }
 
 TEST(GetLastErrorStringTest, PerThreadErrorIsolation)
 {
     // Set error in main thread
     hipdnnDestroy(nullptr);
-    char main_buf[HIPDNN_MAX_ERROR_STRING_SIZE];
-    hipdnnGetLastErrorString(main_buf, sizeof(main_buf));
+    char mainBuf[HIPDNN_MAX_ERROR_STRING_SIZE];
+    hipdnnGetLastErrorString(mainBuf, sizeof(mainBuf));
 
-    std::string thread_error;
-    std::thread t([&thread_error]() {
+    std::string threadError;
+    std::thread t([&threadError]() {
         char buf[HIPDNN_MAX_ERROR_STRING_SIZE];
         hipdnnGetLastErrorString(buf, sizeof(buf));
-        thread_error = buf;
+        threadError = buf;
     });
     t.join();
 
     // Main thread error should be unchanged
-    char main_buf2[HIPDNN_MAX_ERROR_STRING_SIZE];
-    hipdnnGetLastErrorString(main_buf2, sizeof(main_buf2));
-    ASSERT_STREQ(main_buf, main_buf2);
-    ASSERT_TRUE(thread_error.empty());
+    char mainBuf2[HIPDNN_MAX_ERROR_STRING_SIZE];
+    hipdnnGetLastErrorString(mainBuf2, sizeof(mainBuf2));
+    ASSERT_STREQ(mainBuf, mainBuf2);
+    ASSERT_TRUE(threadError.empty());
 }
 
 TEST(GetLastErrorStringTest, BufferLargerThanMax)
 {
     hipdnnDestroy(nullptr);
-    char main_buf[1028];
-    hipdnnGetLastErrorString(main_buf, sizeof(main_buf));
+    char mainBuf[1028];
+    hipdnnGetLastErrorString(mainBuf, sizeof(mainBuf));
 
-    char main_buf2[HIPDNN_MAX_ERROR_STRING_SIZE];
-    hipdnnGetLastErrorString(main_buf2, sizeof(main_buf2));
-    ASSERT_STREQ(main_buf, main_buf2);
+    char mainBuf2[HIPDNN_MAX_ERROR_STRING_SIZE];
+    hipdnnGetLastErrorString(mainBuf2, sizeof(mainBuf2));
+    ASSERT_STREQ(mainBuf, mainBuf2);
 }
 // NOLINTEND(modernize-avoid-c-arrays)

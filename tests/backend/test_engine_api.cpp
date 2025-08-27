@@ -8,7 +8,7 @@
 
 #include <gtest/gtest.h>
 
-class Engine_api_tests : public ::testing::Test
+class EngineApiTests : public ::testing::Test
 {
 protected:
     hipdnnBackendDescriptor_t _engine;
@@ -44,7 +44,7 @@ protected:
     }
 };
 
-TEST_F(Engine_api_tests, SetEngineGraph)
+TEST_F(EngineApiTests, SetEngineGraph)
 {
     EXPECT_EQ(hipdnnBackendSetAttribute(_engine,
                                         HIPDNN_ATTR_ENGINE_OPERATION_GRAPH,
@@ -53,7 +53,7 @@ TEST_F(Engine_api_tests, SetEngineGraph)
                                         &_graph),
               HIPDNN_STATUS_BAD_PARAM_NULL_POINTER);
 
-    test_util::create_test_graph(&_graph, _handle);
+    test_util::createTestGraph(&_graph, _handle);
     ASSERT_EQ(hipdnnBackendFinalize(_graph), HIPDNN_STATUS_SUCCESS);
     EXPECT_EQ(hipdnnBackendSetAttribute(_engine,
                                         HIPDNN_ATTR_ENGINE_OPERATION_GRAPH,
@@ -63,7 +63,7 @@ TEST_F(Engine_api_tests, SetEngineGraph)
               HIPDNN_STATUS_SUCCESS);
 }
 
-TEST_F(Engine_api_tests, SetEngineGlobalIndex)
+TEST_F(EngineApiTests, SetEngineGlobalIndex)
 {
     int64_t gidx = hipdnn_tests::plugin_constants::engine_id<Good_plugin>();
 
@@ -76,38 +76,38 @@ TEST_F(Engine_api_tests, SetEngineGlobalIndex)
               HIPDNN_STATUS_SUCCESS);
 }
 
-TEST_F(Engine_api_tests, SetEngineAttrNotSupported)
+TEST_F(EngineApiTests, SetEngineAttrNotSupported)
 {
     EXPECT_EQ(hipdnnBackendSetAttribute(
                   _engine, HIPDNN_ATTR_EXECUTION_PLAN_HANDLE, HIPDNN_TYPE_HANDLE, 1, nullptr),
               HIPDNN_STATUS_NOT_SUPPORTED);
 }
 
-TEST_F(Engine_api_tests, SetEngineAttrAlreadyFinalized)
+TEST_F(EngineApiTests, SetEngineAttrAlreadyFinalized)
 {
     int64_t gidx = hipdnn_tests::plugin_constants::engine_id<Good_plugin>();
 
-    test_util::populate_test_engine(_engine, &_graph, _handle, gidx, true);
+    test_util::populateTestEngine(_engine, &_graph, _handle, gidx, true);
     EXPECT_EQ(hipdnnBackendSetAttribute(
                   _engine, HIPDNN_ATTR_ENGINE_GLOBAL_INDEX, HIPDNN_TYPE_INT64, 1, &gidx),
               HIPDNN_STATUS_NOT_INITIALIZED);
 }
 
-TEST_F(Engine_api_tests, FinalizeEngine)
+TEST_F(EngineApiTests, FinalizeEngine)
 {
     int64_t gidx = hipdnn_tests::plugin_constants::engine_id<Good_plugin>();
 
     EXPECT_EQ(hipdnnBackendFinalize(_engine), HIPDNN_STATUS_BAD_PARAM);
-    test_util::populate_test_engine(_engine, &_graph, _handle, gidx);
+    test_util::populateTestEngine(_engine, &_graph, _handle, gidx);
     EXPECT_EQ(hipdnnBackendFinalize(_engine), HIPDNN_STATUS_SUCCESS);
 }
 
-TEST_F(Engine_api_tests, GetEngineGraph)
+TEST_F(EngineApiTests, GetEngineGraph)
 {
     hipdnnBackendDescriptor_t graph = nullptr;
     int64_t gidx = hipdnn_tests::plugin_constants::engine_id<Good_plugin>();
 
-    test_util::populate_test_engine(_engine, &_graph, _handle, gidx, true);
+    test_util::populateTestEngine(_engine, &_graph, _handle, gidx, true);
     EXPECT_EQ(hipdnnBackendGetAttribute(_engine,
                                         HIPDNN_ATTR_ENGINE_OPERATION_GRAPH,
                                         HIPDNN_TYPE_BACKEND_DESCRIPTOR,
@@ -120,15 +120,15 @@ TEST_F(Engine_api_tests, GetEngineGraph)
     hipdnnBackendDestroyDescriptor(graph);
 }
 
-TEST_F(Engine_api_tests, GetEngineGlobalIndex)
+TEST_F(EngineApiTests, GetEngineGlobalIndex)
 {
     int64_t gidx = hipdnn_tests::plugin_constants::engine_id<Good_plugin>();
-    int64_t gidx_out;
+    int64_t gidxOut;
 
-    test_util::populate_test_engine(_engine, &_graph, _handle, gidx, true);
+    test_util::populateTestEngine(_engine, &_graph, _handle, gidx, true);
     EXPECT_EQ(
         hipdnnBackendGetAttribute(
-            _engine, HIPDNN_ATTR_ENGINE_GLOBAL_INDEX, HIPDNN_TYPE_INT64, 1, nullptr, &gidx_out),
+            _engine, HIPDNN_ATTR_ENGINE_GLOBAL_INDEX, HIPDNN_TYPE_INT64, 1, nullptr, &gidxOut),
         HIPDNN_STATUS_SUCCESS);
-    EXPECT_EQ(gidx_out, gidx);
+    EXPECT_EQ(gidxOut, gidx);
 }

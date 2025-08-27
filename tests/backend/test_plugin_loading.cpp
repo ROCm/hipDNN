@@ -15,23 +15,23 @@
 
 #include <gtest/gtest.h>
 
-class Plugin_loading_tests : public ::testing::Test
+class PluginLoadingTests : public ::testing::Test
 {
 protected:
-    hipdnnBackendDescriptor_t _engine_config = nullptr;
+    hipdnnBackendDescriptor_t _engineConfig = nullptr;
     hipdnnBackendDescriptor_t _engine = nullptr;
     hipdnnBackendDescriptor_t _graph = nullptr;
-    hipdnnBackendDescriptor_t _heuristic_descriptor = nullptr;
+    hipdnnBackendDescriptor_t _heuristicDescriptor = nullptr;
     hipdnnHandle_t _handle = nullptr;
 
     void SetUp() override {}
 
     void TearDown() override
     {
-        if(_engine_config != nullptr)
+        if(_engineConfig != nullptr)
         {
-            EXPECT_EQ(hipdnnBackendDestroyDescriptor(_engine_config), HIPDNN_STATUS_SUCCESS);
-            _engine_config = nullptr;
+            EXPECT_EQ(hipdnnBackendDestroyDescriptor(_engineConfig), HIPDNN_STATUS_SUCCESS);
+            _engineConfig = nullptr;
         }
         if(_engine != nullptr)
         {
@@ -43,10 +43,10 @@ protected:
             EXPECT_EQ(hipdnnBackendDestroyDescriptor(_graph), HIPDNN_STATUS_SUCCESS);
             _graph = nullptr;
         }
-        if(_heuristic_descriptor != nullptr)
+        if(_heuristicDescriptor != nullptr)
         {
-            EXPECT_EQ(hipdnnBackendDestroyDescriptor(_heuristic_descriptor), HIPDNN_STATUS_SUCCESS);
-            _heuristic_descriptor = nullptr;
+            EXPECT_EQ(hipdnnBackendDestroyDescriptor(_heuristicDescriptor), HIPDNN_STATUS_SUCCESS);
+            _heuristicDescriptor = nullptr;
         }
         if(_handle != nullptr)
         {
@@ -56,68 +56,68 @@ protected:
     }
 };
 
-void create_heuristic_descriptor(hipdnnBackendDescriptor_t* heuristic_descriptor,
-                                 hipdnnBackendDescriptor_t* graph,
-                                 bool finalize = false)
+void createHeuristicDescriptor(hipdnnBackendDescriptor_t* heuristicDescriptor,
+                               hipdnnBackendDescriptor_t* graph,
+                               bool finalize = false)
 {
     EXPECT_EQ(
-        hipdnnBackendCreateDescriptor(HIPDNN_BACKEND_ENGINEHEUR_DESCRIPTOR, heuristic_descriptor),
+        hipdnnBackendCreateDescriptor(HIPDNN_BACKEND_ENGINEHEUR_DESCRIPTOR, heuristicDescriptor),
         HIPDNN_STATUS_SUCCESS);
 
-    EXPECT_EQ(hipdnnBackendSetAttribute(*heuristic_descriptor,
+    EXPECT_EQ(hipdnnBackendSetAttribute(*heuristicDescriptor,
                                         HIPDNN_ATTR_ENGINEHEUR_OPERATION_GRAPH,
                                         HIPDNN_TYPE_BACKEND_DESCRIPTOR,
                                         1,
                                         graph),
               HIPDNN_STATUS_SUCCESS);
 
-    hipdnnBackendHeurMode_t backend_modes = HIPDNN_HEUR_MODE_FALLBACK;
+    auto backendModes = HIPDNN_HEUR_MODE_FALLBACK;
 
-    EXPECT_EQ(hipdnnBackendSetAttribute(*heuristic_descriptor,
+    EXPECT_EQ(hipdnnBackendSetAttribute(*heuristicDescriptor,
                                         HIPDNN_ATTR_ENGINEHEUR_MODE,
                                         HIPDNN_TYPE_HEUR_MODE,
                                         1,
-                                        &backend_modes),
+                                        &backendModes),
               HIPDNN_STATUS_SUCCESS);
 
     if(finalize)
     {
-        EXPECT_EQ(hipdnnBackendFinalize(*heuristic_descriptor), HIPDNN_STATUS_SUCCESS);
+        EXPECT_EQ(hipdnnBackendFinalize(*heuristicDescriptor), HIPDNN_STATUS_SUCCESS);
     }
 }
 
-TEST_F(Plugin_loading_tests, EmptyPluginPath)
+TEST_F(PluginLoadingTests, EmptyPluginPath)
 {
-    TempDirectory plugin_dir("empty_plugins");
-    auto plugin_path = plugin_dir.path().string();
-    const std::array<const char*, 1> paths = {plugin_path.c_str()};
+    TempDirectory pluginDir("empty_plugins");
+    auto pluginPath = pluginDir.path().string();
+    const std::array<const char*, 1> paths = {pluginPath.c_str()};
     ASSERT_EQ(
         hipdnnSetEnginePluginPaths_ext(paths.size(), paths.data(), HIPDNN_PLUGIN_LOADING_ABSOLUTE),
         HIPDNN_STATUS_SUCCESS);
 
     ASSERT_EQ(hipdnnCreate(&_handle), HIPDNN_STATUS_SUCCESS);
-    EXPECT_EQ(hipdnnBackendCreateDescriptor(HIPDNN_BACKEND_ENGINECFG_DESCRIPTOR, &_engine_config),
+    EXPECT_EQ(hipdnnBackendCreateDescriptor(HIPDNN_BACKEND_ENGINECFG_DESCRIPTOR, &_engineConfig),
               HIPDNN_STATUS_SUCCESS);
-    ASSERT_NE(_engine_config, nullptr);
+    ASSERT_NE(_engineConfig, nullptr);
 
-    test_util::create_test_graph(&_graph, _handle);
+    test_util::createTestGraph(&_graph, _handle);
     hipdnnBackendFinalize(_graph);
 
-    create_heuristic_descriptor(&_heuristic_descriptor, &_graph, true);
+    createHeuristicDescriptor(&_heuristicDescriptor, &_graph, true);
 
-    int64_t available_engine_count = -1;
-    EXPECT_EQ(hipdnnBackendGetAttribute(_heuristic_descriptor,
+    auto availableEngineCount = int64_t{-1};
+    EXPECT_EQ(hipdnnBackendGetAttribute(_heuristicDescriptor,
                                         HIPDNN_ATTR_ENGINEHEUR_RESULTS,
                                         HIPDNN_TYPE_BACKEND_DESCRIPTOR,
                                         0,
-                                        &available_engine_count,
+                                        &availableEngineCount,
                                         nullptr),
               HIPDNN_STATUS_SUCCESS);
 
-    EXPECT_EQ(available_engine_count, 0);
+    EXPECT_EQ(availableEngineCount, 0);
 }
 
-TEST_F(Plugin_loading_tests, NoPluginsSupportGraph)
+TEST_F(PluginLoadingTests, NoPluginsSupportGraph)
 {
     const std::array<const char*, 1> paths
         = {hipdnn_tests::plugin_constants::test_no_applicable_engines_plugin_path().c_str()};
@@ -126,28 +126,28 @@ TEST_F(Plugin_loading_tests, NoPluginsSupportGraph)
         HIPDNN_STATUS_SUCCESS);
 
     ASSERT_EQ(hipdnnCreate(&_handle), HIPDNN_STATUS_SUCCESS);
-    EXPECT_EQ(hipdnnBackendCreateDescriptor(HIPDNN_BACKEND_ENGINECFG_DESCRIPTOR, &_engine_config),
+    EXPECT_EQ(hipdnnBackendCreateDescriptor(HIPDNN_BACKEND_ENGINECFG_DESCRIPTOR, &_engineConfig),
               HIPDNN_STATUS_SUCCESS);
-    ASSERT_NE(_engine_config, nullptr);
+    ASSERT_NE(_engineConfig, nullptr);
 
-    test_util::create_test_graph(&_graph, _handle);
+    test_util::createTestGraph(&_graph, _handle);
     hipdnnBackendFinalize(_graph);
 
-    create_heuristic_descriptor(&_heuristic_descriptor, &_graph, true);
+    createHeuristicDescriptor(&_heuristicDescriptor, &_graph, true);
 
-    int64_t available_engine_count = -1;
-    EXPECT_EQ(hipdnnBackendGetAttribute(_heuristic_descriptor,
+    auto availableEngineCount = int64_t{-1};
+    EXPECT_EQ(hipdnnBackendGetAttribute(_heuristicDescriptor,
                                         HIPDNN_ATTR_ENGINEHEUR_RESULTS,
                                         HIPDNN_TYPE_BACKEND_DESCRIPTOR,
                                         0,
-                                        &available_engine_count,
+                                        &availableEngineCount,
                                         nullptr),
               HIPDNN_STATUS_SUCCESS);
 
-    EXPECT_EQ(available_engine_count, 0);
+    EXPECT_EQ(availableEngineCount, 0);
 }
 
-TEST_F(Plugin_loading_tests, IncorrectEngineID)
+TEST_F(PluginLoadingTests, IncorrectEngineID)
 {
     const std::array<const char*, 1> paths
         = {hipdnn_tests::plugin_constants::test_no_applicable_engines_plugin_path().c_str()};
@@ -156,27 +156,27 @@ TEST_F(Plugin_loading_tests, IncorrectEngineID)
         HIPDNN_STATUS_SUCCESS);
 
     ASSERT_EQ(hipdnnCreate(&_handle), HIPDNN_STATUS_SUCCESS);
-    EXPECT_EQ(hipdnnBackendCreateDescriptor(HIPDNN_BACKEND_ENGINECFG_DESCRIPTOR, &_engine_config),
+    EXPECT_EQ(hipdnnBackendCreateDescriptor(HIPDNN_BACKEND_ENGINECFG_DESCRIPTOR, &_engineConfig),
               HIPDNN_STATUS_SUCCESS);
-    ASSERT_NE(_engine_config, nullptr);
+    ASSERT_NE(_engineConfig, nullptr);
 
-    test_util::create_test_graph(&_graph, _handle);
+    test_util::createTestGraph(&_graph, _handle);
     hipdnnBackendFinalize(_graph);
 
-    test_util::create_test_engine(&_engine, &_graph, _handle, -193489);
+    test_util::createTestEngine(&_engine, &_graph, _handle, -193489);
 
     ASSERT_EQ(hipdnnBackendFinalize(_engine), HIPDNN_STATUS_BAD_PARAM);
 
-    constexpr size_t buffer_size = 512;
-    std::array<char, buffer_size> buffer;
-    hipdnnGetLastErrorString(buffer.data(), buffer_size);
+    constexpr size_t BUFFER_SIZE = 512;
+    std::array<char, BUFFER_SIZE> buffer;
+    hipdnnGetLastErrorString(buffer.data(), BUFFER_SIZE);
 
     ASSERT_EQ(
         std::string{buffer.data()},
         "EngineDescriptor::finalize() failed: Engine id is not in a valid range of engine IDs");
 }
 
-TEST_F(Plugin_loading_tests, DuplicateEngineIds)
+TEST_F(PluginLoadingTests, DuplicateEngineIds)
 {
     const std::array<const char*, 2> paths
         = {hipdnn_tests::plugin_constants::test_duplicate_id_a_plugin_path().c_str(),
@@ -189,10 +189,10 @@ TEST_F(Plugin_loading_tests, DuplicateEngineIds)
 
     // TODO: Warning is logged, but we don't have means of querying the last warning
 
-    EXPECT_EQ(test_util::get_loaded_plugins(_handle).size(), 1);
+    EXPECT_EQ(test_util::getLoadedPlugins(_handle).size(), 1);
 }
 
-TEST_F(Plugin_loading_tests, IncompleteAPI)
+TEST_F(PluginLoadingTests, IncompleteAPI)
 {
     using namespace hipdnn_sdk::utilities;
     using namespace hipdnn_tests::plugin_constants;
@@ -206,10 +206,10 @@ TEST_F(Plugin_loading_tests, IncompleteAPI)
 
     // TODO: Warning is logged, but we don't have means of querying the last warning
 
-    EXPECT_EQ(test_util::get_loaded_plugins(_handle).size(), 0);
+    EXPECT_EQ(test_util::getLoadedPlugins(_handle).size(), 0);
 }
 
-TEST_F(Plugin_loading_tests, MultiplePluginsOneApplicableEngine)
+TEST_F(PluginLoadingTests, MultiplePluginsOneApplicableEngine)
 {
     const std::array<const char*, 1> paths
         = {hipdnn_tests::plugin_constants::test_no_applicable_engines_plugin_path().c_str()};
@@ -218,28 +218,28 @@ TEST_F(Plugin_loading_tests, MultiplePluginsOneApplicableEngine)
         HIPDNN_STATUS_SUCCESS);
 
     ASSERT_EQ(hipdnnCreate(&_handle), HIPDNN_STATUS_SUCCESS);
-    EXPECT_EQ(hipdnnBackendCreateDescriptor(HIPDNN_BACKEND_ENGINECFG_DESCRIPTOR, &_engine_config),
+    EXPECT_EQ(hipdnnBackendCreateDescriptor(HIPDNN_BACKEND_ENGINECFG_DESCRIPTOR, &_engineConfig),
               HIPDNN_STATUS_SUCCESS);
-    ASSERT_NE(_engine_config, nullptr);
+    ASSERT_NE(_engineConfig, nullptr);
 
-    test_util::create_test_graph(&_graph, _handle);
+    test_util::createTestGraph(&_graph, _handle);
     hipdnnBackendFinalize(_graph);
 
-    create_heuristic_descriptor(&_heuristic_descriptor, &_graph, true);
+    createHeuristicDescriptor(&_heuristicDescriptor, &_graph, true);
 
-    int64_t available_engine_count = -1;
-    EXPECT_EQ(hipdnnBackendGetAttribute(_heuristic_descriptor,
+    auto availableEngineCount = int64_t{-1};
+    EXPECT_EQ(hipdnnBackendGetAttribute(_heuristicDescriptor,
                                         HIPDNN_ATTR_ENGINEHEUR_RESULTS,
                                         HIPDNN_TYPE_BACKEND_DESCRIPTOR,
                                         0,
-                                        &available_engine_count,
+                                        &availableEngineCount,
                                         nullptr),
               HIPDNN_STATUS_SUCCESS);
 
-    EXPECT_EQ(available_engine_count, 1);
+    EXPECT_EQ(availableEngineCount, 1);
 }
 
-TEST_F(Plugin_loading_tests, MultiplePluginsMultipleApplicableEngines)
+TEST_F(PluginLoadingTests, MultiplePluginsMultipleApplicableEngines)
 {
     const std::array<const char*, 1> paths
         = {hipdnn_tests::plugin_constants::test_good_plugin_path().c_str()};
@@ -248,23 +248,23 @@ TEST_F(Plugin_loading_tests, MultiplePluginsMultipleApplicableEngines)
         HIPDNN_STATUS_SUCCESS);
 
     ASSERT_EQ(hipdnnCreate(&_handle), HIPDNN_STATUS_SUCCESS);
-    EXPECT_EQ(hipdnnBackendCreateDescriptor(HIPDNN_BACKEND_ENGINECFG_DESCRIPTOR, &_engine_config),
+    EXPECT_EQ(hipdnnBackendCreateDescriptor(HIPDNN_BACKEND_ENGINECFG_DESCRIPTOR, &_engineConfig),
               HIPDNN_STATUS_SUCCESS);
-    ASSERT_NE(_engine_config, nullptr);
+    ASSERT_NE(_engineConfig, nullptr);
 
-    test_util::create_test_graph(&_graph, _handle);
+    test_util::createTestGraph(&_graph, _handle);
     hipdnnBackendFinalize(_graph);
 
-    create_heuristic_descriptor(&_heuristic_descriptor, &_graph, true);
+    createHeuristicDescriptor(&_heuristicDescriptor, &_graph, true);
 
-    int64_t available_engine_count = -1;
-    EXPECT_EQ(hipdnnBackendGetAttribute(_heuristic_descriptor,
+    auto availableEngineCount = int64_t{-1};
+    EXPECT_EQ(hipdnnBackendGetAttribute(_heuristicDescriptor,
                                         HIPDNN_ATTR_ENGINEHEUR_RESULTS,
                                         HIPDNN_TYPE_BACKEND_DESCRIPTOR,
                                         0,
-                                        &available_engine_count,
+                                        &availableEngineCount,
                                         nullptr),
               HIPDNN_STATUS_SUCCESS);
 
-    EXPECT_EQ(available_engine_count, 2);
+    EXPECT_EQ(availableEngineCount, 2);
 }
