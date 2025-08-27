@@ -15,17 +15,17 @@ namespace utilities
 // Sets a default stride ordering based off the provided stride order.
 // Ex. dim = {1,2,3,4} stride_order = {3, 0, 2, 1} for NHWC
 // returns {24, 1, 8, 2}
-inline std::vector<int64_t> generate_strides(const std::vector<int64_t>& dim,
-                                             const std::vector<int64_t>& stride_order)
+inline std::vector<int64_t> generateStrides(const std::vector<int64_t>& dim,
+                                            const std::vector<int64_t>& strideOrder)
 {
-    size_t num_dims = dim.size();
-    std::vector<int64_t> stride(num_dims, 1);
+    size_t numDims = dim.size();
+    std::vector<int64_t> stride(numDims, 1);
 
     // Create a mapping of stride order to dimension index
-    std::vector<size_t> indices(num_dims);
+    std::vector<size_t> indices(numDims);
     std::iota(indices.begin(), indices.end(), 0);
-    std::ranges::sort(indices.begin(), indices.end(), [&stride_order](size_t a, size_t b) {
-        return stride_order[a] < stride_order[b];
+    std::ranges::sort(indices.begin(), indices.end(), [&strideOrder](size_t a, size_t b) {
+        return strideOrder[a] < strideOrder[b];
     });
 
     int64_t accumulator = 1;
@@ -40,24 +40,24 @@ inline std::vector<int64_t> generate_strides(const std::vector<int64_t>& dim,
 
 // Sets stride order as NHWC for the provided dims.
 // Ex. 4 will return {3, 0, 2, 1} for NHWC
-inline std::vector<int64_t> stride_order_nhwc(size_t num_dims)
+inline std::vector<int64_t> strideOrderNhwc(size_t numDims)
 {
     // Default all to 0, and set everything up until NC
-    std::vector<int64_t> stride_order(num_dims, 0);
+    std::vector<int64_t> strideOrder(numDims, 0);
 
-    if(num_dims < 2)
+    if(numDims < 2)
     {
-        return stride_order;
+        return strideOrder;
     }
 
     int64_t order = 1;
-    for(size_t i = num_dims - 1; i > 1; --i)
+    for(size_t i = numDims - 1; i > 1; --i)
     {
-        stride_order[i] = order++;
+        strideOrder[i] = order++;
     }
-    stride_order[0] = order;
+    strideOrder[0] = order;
 
-    return stride_order;
+    return strideOrder;
 }
 
 }

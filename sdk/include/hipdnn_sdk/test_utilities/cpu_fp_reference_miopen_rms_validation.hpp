@@ -25,71 +25,70 @@ using namespace hipdnn_sdk::utilities;
 // RMS check is only relative tolerance based. We recommend using cpu_fp_reference_validation
 // instead, but this class can be used to compare with MIOpen tolerance checks.
 template <class T>
-class Cpu_fp_reference_miopen_rms_validation : public Reference_validation_interface<T>
+class CpuFpReferenceMiopenRmsValidation : public IReferenceValidation<T>
 {
 public:
-    Cpu_fp_reference_miopen_rms_validation(T relative_tolerance = std::numeric_limits<T>::epsilon())
-        : _relative_tolerance(static_cast<double>(relative_tolerance))
+    CpuFpReferenceMiopenRmsValidation(T relativeTolerance = std::numeric_limits<T>::epsilon())
+        : _relativeTolerance(static_cast<double>(relativeTolerance))
     {
-        if(relative_tolerance < T{0})
+        if(relativeTolerance < T{0})
         {
             throw std::invalid_argument("Tolerances must be non-negative");
         }
     }
 
-    ~Cpu_fp_reference_miopen_rms_validation() override = default;
+    ~CpuFpReferenceMiopenRmsValidation() override = default;
 
-    bool all_close(Migratable_memory_interface<T>& reference,
-                   Migratable_memory_interface<T>& implementation) override
+    bool allClose(Migratable_memory_interface<T>& reference,
+                  Migratable_memory_interface<T>& implementation) override
     {
         if(reference.count() != implementation.count())
         {
             return false;
         }
 
-        size_t element_count = reference.count();
+        size_t elementCount = reference.count();
 
-        if(element_count == 0)
+        if(elementCount == 0)
         {
             return true;
         }
 
-        const T* ref_data = reference.host_data();
-        const T* impl_data = implementation.host_data();
+        const T* refData = reference.host_data();
+        const T* implData = implementation.host_data();
 
-        double square_difference = 0.0;
-        double max_ref_magnitude = 0.0;
-        double max_impl_magnitude = 0.0;
+        double squareDifference = 0.0;
+        double maxRefMagnitude = 0.0;
+        double maxImplMagnitude = 0.0;
 
         // Iterate through all elements to calculate square differences and find max magnitudes
-        for(size_t i = 0; i < element_count; ++i)
+        for(size_t i = 0; i < elementCount; ++i)
         {
-            auto ref_value = static_cast<double>(ref_data[i]);
-            auto impl_value = static_cast<double>(impl_data[i]);
+            auto refValue = static_cast<double>(refData[i]);
+            auto implValue = static_cast<double>(implData[i]);
 
             // Accumulate square differences
-            auto diff = ref_value - impl_value;
-            square_difference += diff * diff;
+            auto diff = refValue - implValue;
+            squareDifference += diff * diff;
 
             // Track maximum magnitudes
-            max_ref_magnitude = std::max(max_ref_magnitude, std::fabs(ref_value));
-            max_impl_magnitude = std::max(max_impl_magnitude, std::fabs(impl_value));
+            maxRefMagnitude = std::max(maxRefMagnitude, std::fabs(refValue));
+            maxImplMagnitude = std::max(maxImplMagnitude, std::fabs(implValue));
         }
 
         // Find the maximum magnitude between reference and implementation
-        double max_magnitude
-            = std::max({max_ref_magnitude, max_impl_magnitude, std::numeric_limits<double>::min()});
+        double maxMagnitude
+            = std::max({maxRefMagnitude, maxImplMagnitude, std::numeric_limits<double>::min()});
 
-        double relative_rms_error
-            = std::sqrt(square_difference)
-              / (std::sqrt(static_cast<double>(element_count)) * max_magnitude);
+        double relativeRmsError = std::sqrt(squareDifference)
+                                  / (std::sqrt(static_cast<double>(elementCount)) * maxMagnitude);
 
-        return relative_rms_error <= _relative_tolerance;
+        return relativeRmsError <= _relativeTolerance;
     }
 
 private:
     // Tolerance for comparison
-    double _relative_tolerance;
+    double _relativeTolerance;
 };
 
 } // namespace reference_test_utilities

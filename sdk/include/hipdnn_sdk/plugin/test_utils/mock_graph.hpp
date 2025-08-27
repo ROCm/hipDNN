@@ -10,20 +10,20 @@
 namespace hipdnn_plugin
 {
 
-class Mock_graph : public Graph_interface
+class MockGraph : public IGraph
 {
 public:
-    MOCK_METHOD(const hipdnn_sdk::data_objects::Graph&, get_graph, (), (const, override));
-    MOCK_METHOD(bool, is_valid, (), (const, override));
-    MOCK_METHOD(uint, node_count, (), (const, override));
+    MOCK_METHOD(const hipdnn_sdk::data_objects::Graph&, getGraph, (), (const, override));
+    MOCK_METHOD(bool, isValid, (), (const, override));
+    MOCK_METHOD(uint, nodeCount, (), (const, override));
     MOCK_METHOD(bool,
-                has_only_supported_attributes,
-                (std::set<hipdnn_sdk::data_objects::NodeAttributes> supported_attributes),
+                hasOnlySupportedAttributes,
+                (std::set<hipdnn_sdk::data_objects::NodeAttributes> supportedAttributes),
                 (const, override));
-    MOCK_METHOD(const hipdnn_sdk::data_objects::Node&, get_node, (uint index), (const, override));
+    MOCK_METHOD(const hipdnn_sdk::data_objects::Node&, getNode, (uint index), (const, override));
     MOCK_METHOD(
         (const std::unordered_map<int64_t, const hipdnn_sdk::data_objects::TensorAttributes*>&),
-        get_tensor_map,
+        getTensorMap,
         (),
         (const, override));
 };

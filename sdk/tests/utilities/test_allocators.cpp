@@ -13,7 +13,7 @@ using namespace hipdnn_sdk::utilities;
 // Test that allocators work with STL containers
 TEST(Allocators, HostAllocatorWithVector)
 {
-    std::vector<int, Host_allocator<int>> vec;
+    std::vector<int, HostAllocator<int>> vec;
     vec.push_back(1);
     vec.push_back(2);
     vec.push_back(3);
@@ -26,7 +26,7 @@ TEST(Allocators, HostAllocatorWithVector)
 
 TEST(Allocators, HostAllocatorWithList)
 {
-    std::list<double, Host_allocator<double>> lst;
+    std::list<double, HostAllocator<double>> lst;
     lst.push_back(1.5);
     lst.push_back(2.5);
     lst.push_back(3.5);
@@ -39,7 +39,7 @@ TEST(Allocators, HostAllocatorWithList)
 
 TEST(Allocators, HostAllocatorBasicOperations)
 {
-    Host_allocator<int> alloc;
+    HostAllocator<int> alloc;
 
     // Allocate memory for 10 integers
     auto ptr = alloc.allocate(10);
@@ -69,24 +69,24 @@ TEST(Allocators, HostAllocatorBasicOperations)
 
 TEST(Allocators, HostAllocatorRebind)
 {
-    Host_allocator<int> int_alloc;
-    typename Host_allocator<int>::template rebind<double>::other double_alloc;
+    HostAllocator<int> intAlloc;
+    typename HostAllocator<int>::template rebind<double>::other doubleAlloc;
 
-    auto int_ptr = int_alloc.allocate(5);
-    auto double_ptr = double_alloc.allocate(5);
+    auto intPtr = intAlloc.allocate(5);
+    auto doublePtr = doubleAlloc.allocate(5);
 
-    ASSERT_NE(int_ptr, nullptr);
-    ASSERT_NE(double_ptr, nullptr);
+    ASSERT_NE(intPtr, nullptr);
+    ASSERT_NE(doublePtr, nullptr);
 
-    int_alloc.deallocate(int_ptr, 5);
-    double_alloc.deallocate(double_ptr, 5);
+    intAlloc.deallocate(intPtr, 5);
+    doubleAlloc.deallocate(doublePtr, 5);
 }
 
 TEST(Allocators, HostAllocatorComparison)
 {
-    Host_allocator<int> alloc1;
-    Host_allocator<int> alloc2;
-    Host_allocator<double> alloc3;
+    HostAllocator<int> alloc1;
+    HostAllocator<int> alloc2;
+    HostAllocator<double> alloc3;
 
     EXPECT_TRUE(alloc1 == alloc2);
     EXPECT_FALSE(alloc1 != alloc2);
@@ -97,7 +97,7 @@ TEST(Allocators, PinnedHostAllocatorWithVector)
 {
     SKIP_IF_NO_DEVICES();
 
-    std::vector<float, Pinned_host_allocator<float>> vec;
+    std::vector<float, PinnedHostAllocator<float>> vec;
     vec.resize(100);
 
     for(size_t i = 0; i < vec.size(); ++i)
@@ -115,7 +115,7 @@ TEST(Allocators, PinnedHostAllocatorBasicOperations)
 {
     SKIP_IF_NO_DEVICES();
 
-    Pinned_host_allocator<int> alloc;
+    PinnedHostAllocator<int> alloc;
 
     // Allocate pinned memory for 10 integers
     auto ptr = alloc.allocate(10);
@@ -147,37 +147,37 @@ TEST(Allocators, PinnedHostAllocatorRebind)
 {
     SKIP_IF_NO_DEVICES();
 
-    Pinned_host_allocator<int> int_alloc;
-    typename Pinned_host_allocator<int>::template rebind<double>::other double_alloc;
+    PinnedHostAllocator<int> intAlloc;
+    typename PinnedHostAllocator<int>::template rebind<double>::other doubleAlloc;
 
-    auto int_ptr = int_alloc.allocate(5);
-    auto double_ptr = double_alloc.allocate(5);
+    auto intPtr = intAlloc.allocate(5);
+    auto doublePtr = doubleAlloc.allocate(5);
 
-    ASSERT_NE(int_ptr, nullptr);
-    ASSERT_NE(double_ptr, nullptr);
+    ASSERT_NE(intPtr, nullptr);
+    ASSERT_NE(doublePtr, nullptr);
 
-    int_alloc.deallocate(int_ptr, 5);
-    double_alloc.deallocate(double_ptr, 5);
+    intAlloc.deallocate(intPtr, 5);
+    doubleAlloc.deallocate(doublePtr, 5);
 }
 
 TEST(Allocators, DeviceAllocatorBasicOperations)
 {
     SKIP_IF_NO_DEVICES();
 
-    Device_allocator<float> alloc;
+    DeviceAllocator<float> alloc;
 
     // Allocate device memory for 100 floats
     auto ptr = alloc.allocate(100);
     ASSERT_NE(ptr, nullptr);
 
     // Verify we can use the pointer with HIP operations
-    std::vector<float> host_data(100);
-    for(size_t i = 0; i < host_data.size(); ++i)
+    std::vector<float> hostData(100);
+    for(size_t i = 0; i < hostData.size(); ++i)
     {
-        host_data[i] = static_cast<float>(i);
+        hostData[i] = static_cast<float>(i);
     }
 
-    hipError_t err = hipMemcpy(ptr, host_data.data(), 100 * sizeof(float), hipMemcpyHostToDevice);
+    hipError_t err = hipMemcpy(ptr, hostData.data(), 100 * sizeof(float), hipMemcpyHostToDevice);
     EXPECT_EQ(err, hipSuccess);
 
     std::vector<float> result(100);
@@ -197,26 +197,26 @@ TEST(Allocators, DeviceAllocatorRebind)
 {
     SKIP_IF_NO_DEVICES();
 
-    Device_allocator<int> int_alloc;
-    typename Device_allocator<int>::template rebind<double>::other double_alloc;
+    DeviceAllocator<int> intAlloc;
+    typename DeviceAllocator<int>::template rebind<double>::other doubleAlloc;
 
-    auto int_ptr = int_alloc.allocate(5);
-    auto double_ptr = double_alloc.allocate(5);
+    auto intPtr = intAlloc.allocate(5);
+    auto doublePtr = doubleAlloc.allocate(5);
 
-    ASSERT_NE(int_ptr, nullptr);
-    ASSERT_NE(double_ptr, nullptr);
+    ASSERT_NE(intPtr, nullptr);
+    ASSERT_NE(doublePtr, nullptr);
 
-    int_alloc.deallocate(int_ptr, 5);
-    double_alloc.deallocate(double_ptr, 5);
+    intAlloc.deallocate(intPtr, 5);
+    doubleAlloc.deallocate(doublePtr, 5);
 }
 
 TEST(Allocators, DeviceAllocatorComparison)
 {
     SKIP_IF_NO_DEVICES();
 
-    Device_allocator<int> alloc1;
-    Device_allocator<int> alloc2;
-    Device_allocator<double> alloc3;
+    DeviceAllocator<int> alloc1;
+    DeviceAllocator<int> alloc2;
+    DeviceAllocator<double> alloc3;
 
     EXPECT_TRUE(alloc1 == alloc2);
     EXPECT_FALSE(alloc1 != alloc2);
@@ -226,9 +226,9 @@ TEST(Allocators, DeviceAllocatorComparison)
 // Test allocator traits compatibility
 TEST(Allocators, AllocatorTraitsCompatibility)
 {
-    using HostTraits = std::allocator_traits<Host_allocator<int>>;
-    using PinnedTraits = std::allocator_traits<Pinned_host_allocator<int>>;
-    using DeviceTraits = std::allocator_traits<Device_allocator<int>>;
+    using HostTraits = std::allocator_traits<HostAllocator<int>>;
+    using PinnedTraits = std::allocator_traits<PinnedHostAllocator<int>>;
+    using DeviceTraits = std::allocator_traits<DeviceAllocator<int>>;
 
     // Check that all required types are defined
     static_assert(std::is_same_v<HostTraits::value_type, int>);
@@ -253,7 +253,7 @@ TEST(Allocators, AllocatorTraitsCompatibility)
 // Test exception handling
 TEST(Allocators, AllocationFailure)
 {
-    Host_allocator<int> alloc;
+    HostAllocator<int> alloc;
 
     // Try to allocate an impossibly large amount of memory
     EXPECT_THROW(std::ignore = alloc.allocate(std::numeric_limits<std::size_t>::max()),
@@ -264,7 +264,7 @@ TEST(Allocators, PinnedAllocationFailure)
 {
     SKIP_IF_NO_DEVICES();
 
-    Pinned_host_allocator<int> alloc;
+    PinnedHostAllocator<int> alloc;
 
     // Try to allocate an impossibly large amount of memory
     EXPECT_THROW(std::ignore = alloc.allocate(std::numeric_limits<std::size_t>::max()),
@@ -275,7 +275,7 @@ TEST(Allocators, DeviceAllocationFailure)
 {
     SKIP_IF_NO_DEVICES();
 
-    Device_allocator<int> alloc;
+    DeviceAllocator<int> alloc;
 
     // Try to allocate an impossibly large amount of memory
     EXPECT_THROW(std::ignore = alloc.allocate(std::numeric_limits<std::size_t>::max()),

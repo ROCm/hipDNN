@@ -68,9 +68,9 @@ const std::filesystem::path PLUGIN_PATH1 = std::filesystem::path(".") /= PLUGIN_
 const std::filesystem::path PLUGIN_PATH2 = std::filesystem::path(".") /= PLUGIN_NAME2;
 
 const std::filesystem::path FULL_PLUGIN_PATH1 = std::filesystem::path(".")
-    /= hipdnn_sdk::utilities::get_library_name(PLUGIN_NAME1.c_str());
+    /= hipdnn_sdk::utilities::getLibraryName(PLUGIN_NAME1.c_str());
 const std::filesystem::path FULL_PLUGIN_PATH2 = std::filesystem::path(".")
-    /= hipdnn_sdk::utilities::get_library_name(PLUGIN_NAME2.c_str());
+    /= hipdnn_sdk::utilities::getLibraryName(PLUGIN_NAME2.c_str());
 
 } // namespace
 
@@ -103,7 +103,7 @@ TEST(PluginManagerTest, LoadPlugins)
 
 TEST(PluginManagerTest, LoadPluginsFromDirectory)
 {
-    Temp_directory temp_dir("temp_plugin_dir");
+    TempDirectory temp_dir("temp_plugin_dir");
 
     std::filesystem::copy_file(
         FULL_PLUGIN_PATH1, temp_dir.path() / std::filesystem::path(FULL_PLUGIN_PATH1).filename());
@@ -181,7 +181,7 @@ TEST(PluginManagerTest, LoadPlugins_AbsoluteReplaces)
 
 TEST(PluginManagerTest, LoadPluginsAdditiveWithDefault)
 {
-    Temp_directory default_dir("test_plugins_dir");
+    TempDirectory default_dir("test_plugins_dir");
 
     // Place a plugin in the default directory
     std::filesystem::copy_file(FULL_PLUGIN_PATH1,
@@ -206,7 +206,7 @@ TEST(PluginManagerTest, LoadPluginsAdditiveWithDefault)
 
 TEST(PluginManagerTest, LoadPluginsCombinedFileAndDirectory)
 {
-    Temp_directory temp_dir("temp_plugin_dir_combined");
+    TempDirectory temp_dir("temp_plugin_dir_combined");
 
     std::filesystem::copy_file(
         FULL_PLUGIN_PATH1, temp_dir.path() / std::filesystem::path(FULL_PLUGIN_PATH1).filename());

@@ -16,7 +16,7 @@
 using namespace hipdnn_backend;
 
 template <typename T, typename Destructor>
-using Scoped_resource = hipdnn::sdk::utilities::Scoped_resource<T, Destructor>;
+using ScopedResource = hipdnn::sdk::utilities::ScopedResource<T, Destructor>;
 class Test_engine_plugin_manager : public plugin::PluginManagerBase<plugin::EnginePlugin>
 {
 public:
@@ -54,7 +54,7 @@ TEST(GPU_EnginePluginTest, LoadPluginsAndExecuteOpGraph)
 
     hipStream_t stream;
     ASSERT_EQ(hipStreamCreate(&stream), hipSuccess);
-    Scoped_resource stream_res(stream, [](hipStream_t s) { std::ignore = hipStreamDestroy(s); });
+    ScopedResource stream_res(stream, [](hipStream_t s) { std::ignore = hipStreamDestroy(s); });
 
     // TODO set a real op graph
     const std::array<uint8_t, 8> op_graph_data = {0x07, 0x06, 0x05, 0x04, 0x03, 0x02, 0x01, 0x00};
@@ -77,13 +77,13 @@ TEST(GPU_EnginePluginTest, LoadPluginsAndExecuteOpGraph)
     // Allocate input device buffer.
     uint32_t* in_dev_data{};
     ASSERT_EQ(hipMalloc(&in_dev_data, size_bytes), hipSuccess);
-    Scoped_resource in_dev_data_res(in_dev_data, [](uint32_t* ptr) { std::ignore = hipFree(ptr); });
+    ScopedResource in_dev_data_res(in_dev_data, [](uint32_t* ptr) { std::ignore = hipFree(ptr); });
 
     // Allocate output device buffer.
     uint32_t* out_dev_data{};
     ASSERT_EQ(hipMalloc(&out_dev_data, size_bytes), hipSuccess);
-    Scoped_resource out_dev_data_res(out_dev_data,
-                                     [](uint32_t* ptr) { std::ignore = hipFree(ptr); });
+    ScopedResource out_dev_data_res(out_dev_data,
+                                    [](uint32_t* ptr) { std::ignore = hipFree(ptr); });
 
     // Copy the input data from the host to the device.
     ASSERT_EQ(hipMemcpy(in_dev_data, in_host_data.data(), size_bytes, hipMemcpyHostToDevice),
@@ -92,7 +92,7 @@ TEST(GPU_EnginePluginTest, LoadPluginsAndExecuteOpGraph)
     for(const auto& plugin : plugins)
     {
         auto handle = plugin->createHandle();
-        Scoped_resource handle_res(handle, [&plugin](auto h) { plugin->destroyHandle(h); });
+        ScopedResource handle_res(handle, [&plugin](auto h) { plugin->destroyHandle(h); });
 
         plugin->setStream(handle, stream);
 
@@ -104,10 +104,10 @@ TEST(GPU_EnginePluginTest, LoadPluginsAndExecuteOpGraph)
             // Get engine details
             hipdnnPluginConstData_t engine_details;
             plugin->getEngineDetails(handle, engine_id, &op_graph, &engine_details);
-            Scoped_resource engine_details_res(&engine_details,
-                                               [handle, &plugin](hipdnnPluginConstData_t* ed) {
-                                                   plugin->destroyEngineDetails(handle, ed);
-                                               });
+            ScopedResource engine_details_res(&engine_details,
+                                              [handle, &plugin](hipdnnPluginConstData_t* ed) {
+                                                  plugin->destroyEngineDetails(handle, ed);
+                                              });
 
             // Prepare the engine configuration
             // TODO set a real engine config based on the engine details
@@ -120,12 +120,12 @@ TEST(GPU_EnginePluginTest, LoadPluginsAndExecuteOpGraph)
             {
                 ASSERT_EQ(hipMalloc(&workspace, workspace_size), hipSuccess);
             }
-            Scoped_resource workspace_res(workspace, [](void* ptr) { std::ignore = hipFree(ptr); });
+            ScopedResource workspace_res(workspace, [](void* ptr) { std::ignore = hipFree(ptr); });
 
             // Create execution context for the operation
             auto execution_context
                 = plugin->createExecutionContext(handle, &engine_config, &op_graph);
-            Scoped_resource execution_context_res(execution_context, [&plugin, handle](auto ec) {
+            ScopedResource execution_context_res(execution_context, [&plugin, handle](auto ec) {
                 plugin->destroyExecutionContext(handle, ec);
             });
 

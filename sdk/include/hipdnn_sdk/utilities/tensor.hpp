@@ -15,20 +15,19 @@ namespace hipdnn_sdk
 namespace utilities
 {
 
-struct Tensor_layout
+struct TensorLayout
 {
     std::string name;
-    std::vector<int64_t> stride_order;
+    std::vector<int64_t> strideOrder;
 
-    static const Tensor_layout NCHW;
-    static const Tensor_layout NHWC;
+    static const TensorLayout NCHW;
+    static const TensorLayout NHWC;
 };
 
-inline const Tensor_layout Tensor_layout::NCHW{.name = "NCHW", .stride_order = {3, 2, 1, 0}};
-inline const Tensor_layout Tensor_layout::NHWC{.name = "NHWC",
-                                               .stride_order = stride_order_nhwc(4)};
+inline const TensorLayout TensorLayout::NCHW{.name = "NCHW", .strideOrder = {3, 2, 1, 0}};
+inline const TensorLayout TensorLayout::NHWC{.name = "NHWC", .strideOrder = strideOrderNhwc(4)};
 
-inline std::ostream& operator<<(std::ostream& os, const Tensor_layout& layout)
+inline std::ostream& operator<<(std::ostream& os, const TensorLayout& layout)
 {
     return os << layout.name;
 }
@@ -36,45 +35,43 @@ inline std::ostream& operator<<(std::ostream& os, const Tensor_layout& layout)
 // NOLINTBEGIN(portability-template-virtual-member-function)
 
 template <typename T>
-class Tensor_interface
+class ITensor
 {
 public:
-    virtual ~Tensor_interface() = default;
+    virtual ~ITensor() = default;
 
     virtual const std::vector<int64_t>& dims() const = 0;
     virtual const std::vector<int64_t>& strides() const = 0;
 
-    virtual Migratable_memory_interface<T>& memory() = 0;
-    virtual const Migratable_memory_interface<T>& memory() const = 0;
+    virtual IMigratableMemory<T>& memory() = 0;
+    virtual const IMigratableMemory<T>& memory() const = 0;
 
-    virtual T get_host_value(int64_t nidx, int64_t cidx, int64_t hidx, int64_t widx) const = 0;
-    virtual void set_host_value(int64_t nidx, int64_t cidx, int64_t hidx, int64_t widx, T value)
-        = 0;
-    virtual int64_t get_index(int64_t nidx, int64_t cidx, int64_t hidx, int64_t widx) const = 0;
-    virtual void fill_with_value(T value) = 0;
-    virtual void fill_with_random_values(T min, T max, unsigned int seed = std::random_device{}())
-        = 0;
+    virtual T getHostValue(int64_t nidx, int64_t cidx, int64_t hidx, int64_t widx) const = 0;
+    virtual void setHostValue(int64_t nidx, int64_t cidx, int64_t hidx, int64_t widx, T value) = 0;
+    virtual int64_t getIndex(int64_t nidx, int64_t cidx, int64_t hidx, int64_t widx) const = 0;
+    virtual void fillWithValue(T value) = 0;
+    virtual void fillWithRandomValues(T min, T max, unsigned int seed = std::random_device{}()) = 0;
 };
 
 // NOLINTEND(portability-template-virtual-member-function)
 
-template <class T, class HostAlloc = Host_allocator<T>, class DeviceAlloc = Device_allocator<T>>
-class Tensor : public Tensor_interface<T>
+template <class T, class HostAlloc = HostAllocator<T>, class DeviceAlloc = DeviceAllocator<T>>
+class Tensor : public ITensor<T>
 {
 public:
     Tensor(const std::vector<int64_t>& dims, const std::vector<int64_t>& strides)
-        : _memory(calculate_item_count(dims))
+        : _memory(calculateItemCount(dims))
         , _dims(dims)
         , _strides(strides)
     {
-        if(!is_packed(dims, strides))
+        if(!isPacked(dims, strides))
         {
             throw std::invalid_argument("Tensor must be packed");
         }
     }
 
-    Tensor(const std::vector<int64_t>& dims, const Tensor_layout& layout = Tensor_layout::NCHW)
-        : Tensor(dims, generate_strides(dims, layout.stride_order))
+    Tensor(const std::vector<int64_t>& dims, const TensorLayout& layout = TensorLayout::NCHW)
+        : Tensor(dims, generateStrides(dims, layout.strideOrder))
     {
     }
 
@@ -94,49 +91,49 @@ public:
         return _strides;
     }
 
-    const Migratable_memory_interface<T>& memory() const override
+    const IMigratableMemory<T>& memory() const override
     {
         return _memory;
     }
 
-    Migratable_memory_interface<T>& memory() override
+    IMigratableMemory<T>& memory() override
     {
         return _memory;
     }
 
-    T get_host_value(int64_t nidx, int64_t cidx, int64_t hidx, int64_t widx) const override
+    T getHostValue(int64_t nidx, int64_t cidx, int64_t hidx, int64_t widx) const override
     {
-        int64_t index = get_index(nidx, cidx, hidx, widx);
-        const auto* data = _memory.host_data();
+        int64_t index = getIndex(nidx, cidx, hidx, widx);
+        const auto* data = _memory.hostData();
         return data[index];
     }
 
-    void set_host_value(int64_t nidx, int64_t cidx, int64_t hidx, int64_t widx, T value) override
+    void setHostValue(int64_t nidx, int64_t cidx, int64_t hidx, int64_t widx, T value) override
     {
-        int64_t index = get_index(nidx, cidx, hidx, widx);
-        auto* data = _memory.host_data();
+        int64_t index = getIndex(nidx, cidx, hidx, widx);
+        auto* data = _memory.hostData();
         data[index] = value;
     }
 
-    int64_t get_index(int64_t nidx, int64_t cidx, int64_t hidx, int64_t widx) const override
+    int64_t getIndex(int64_t nidx, int64_t cidx, int64_t hidx, int64_t widx) const override
     {
         return (nidx * _strides[0]) + (cidx * _strides[1]) + (hidx * _strides[2])
                + (widx * _strides[3]);
     }
 
-    void fill_with_value(T value) override
+    void fillWithValue(T value) override
     {
-        T* data = _memory.host_data();
+        T* data = _memory.hostData();
         std::fill(data, data + _memory.count(), value);
     }
 
-    void fill_with_random_values(T min, T max, unsigned int seed = std::random_device{}()) override
+    void fillWithRandomValues(T min, T max, unsigned int seed = std::random_device{}()) override
     {
         std::mt19937 generator(seed);
         std::uniform_real_distribution<float> distribution(static_cast<float>(min),
                                                            static_cast<float>(max));
 
-        auto* data = _memory.host_data();
+        auto* data = _memory.hostData();
         for(size_t i = 0; i < _memory.count(); ++i)
         {
             data[i] = static_cast<T>(distribution(generator));
@@ -144,14 +141,14 @@ public:
     }
 
 private:
-    bool is_packed(const std::vector<int64_t>& dims, const std::vector<int64_t>& strides) const
+    bool isPacked(const std::vector<int64_t>& dims, const std::vector<int64_t>& strides) const
     {
         // Item count = largest stride * item count in that dimension
-        return (calculate_item_count(dims) == calculate_element_space(dims, strides));
+        return (calculateItemCount(dims) == calculateElementSpace(dims, strides));
     }
 
-    static size_t calculate_element_space(const std::vector<int64_t>& dims,
-                                          const std::vector<int64_t>& strides)
+    static size_t calculateElementSpace(const std::vector<int64_t>& dims,
+                                        const std::vector<int64_t>& strides)
     {
         return static_cast<size_t>(
             std::inner_product(dims.begin(),
@@ -162,7 +159,7 @@ private:
                                [](size_t len, size_t stride) { return (len - 1) * stride; }));
     }
 
-    static size_t calculate_item_count(const std::vector<int64_t>& dims)
+    static size_t calculateItemCount(const std::vector<int64_t>& dims)
     {
         if(dims.empty())
         {
@@ -173,13 +170,13 @@ private:
             std::accumulate(dims.begin(), dims.end(), 1, std::multiplies<>()));
     }
 
-    Migratable_memory<T, HostAlloc, DeviceAlloc> _memory;
+    MigratableMemory<T, HostAlloc, DeviceAlloc> _memory;
     std::vector<int64_t> _dims;
     std::vector<int64_t> _strides;
 };
 
 template <typename T>
-using PinnedTensor = Tensor<T, Pinned_host_allocator<T>>;
+using PinnedTensor = Tensor<T, PinnedHostAllocator<T>>;
 
 } // namespace utilities
 } // namespace hipdnn_sdk

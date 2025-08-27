@@ -12,99 +12,98 @@
 using namespace hipdnn_plugin;
 using namespace hipdnn_sdk::data_objects;
 
-TEST(Graph_wrapperTest, NullBufferIsInvalid)
+TEST(GraphWrapperTest, NullBufferIsInvalid)
 {
-    Graph_wrapper wrapper(nullptr, 0);
-    EXPECT_FALSE(wrapper.is_valid());
-    EXPECT_THROW(wrapper.get_graph(), Hipdnn_plugin_exception);
+    GraphWrapper wrapper(nullptr, 0);
+    EXPECT_FALSE(wrapper.isValid());
+    EXPECT_THROW(wrapper.getGraph(), HipdnnPluginException);
 }
 
-TEST(Graph_wrapperTest, NonGraphBufferIsInvalid)
+TEST(GraphWrapperTest, NonGraphBufferIsInvalid)
 {
-    auto builder = flatbuffer_test_utils::create_valid_engine_details(123);
-    auto serialized_graph = builder.Release();
+    auto builder = flatbuffer_test_utils::createValidEngineDetails(123);
+    auto serializedGraph = builder.Release();
 
-    Graph_wrapper wrapper(serialized_graph.data(), serialized_graph.size());
+    GraphWrapper wrapper(serializedGraph.data(), serializedGraph.size());
 
-    EXPECT_FALSE(wrapper.is_valid());
+    EXPECT_FALSE(wrapper.isValid());
 }
 
-TEST(Graph_wrapperTest, ValidGraphReturnsCorrectNodeCountForEmptyGraph)
+TEST(GraphWrapperTest, ValidGraphReturnsCorrectNodeCountForEmptyGraph)
 {
-    flatbuffers::FlatBufferBuilder builder = flatbuffer_test_utils::create_empty_valid_graph();
-    auto serialized_graph = builder.Release();
+    flatbuffers::FlatBufferBuilder builder = flatbuffer_test_utils::createEmptyValidGraph();
+    auto serializedGraph = builder.Release();
 
-    Graph_wrapper wrapper(serialized_graph.data(), serialized_graph.size());
+    GraphWrapper wrapper(serializedGraph.data(), serializedGraph.size());
 
-    EXPECT_TRUE(wrapper.is_valid());
-    EXPECT_EQ(wrapper.node_count(), 0);
+    EXPECT_TRUE(wrapper.isValid());
+    EXPECT_EQ(wrapper.nodeCount(), 0);
 }
 
-TEST(Graph_wrapperTest, ValidGraphReturnsCorrectNodeCount)
+TEST(GraphWrapperTest, ValidGraphReturnsCorrectNodeCount)
 {
-    flatbuffers::FlatBufferBuilder builder = flatbuffer_test_utils::create_valid_batchnorm_graph();
-    auto serialized_graph = builder.Release();
+    flatbuffers::FlatBufferBuilder builder = flatbuffer_test_utils::createValidBatchnormGraph();
+    auto serializedGraph = builder.Release();
 
-    Graph_wrapper wrapper(serialized_graph.data(), serialized_graph.size());
+    GraphWrapper wrapper(serializedGraph.data(), serializedGraph.size());
 
-    EXPECT_TRUE(wrapper.is_valid());
-    EXPECT_EQ(wrapper.node_count(), 1);
+    EXPECT_TRUE(wrapper.isValid());
+    EXPECT_EQ(wrapper.nodeCount(), 1);
 }
 
-TEST(Graph_wrapperTest, HasSupportedTypesReturnsTrueIfAllSupported)
+TEST(GraphWrapperTest, HasSupportedTypesReturnsTrueIfAllSupported)
 {
-    flatbuffers::FlatBufferBuilder builder = flatbuffer_test_utils::create_valid_batchnorm_graph();
-    auto serialized_graph = builder.Release();
+    flatbuffers::FlatBufferBuilder builder = flatbuffer_test_utils::createValidBatchnormGraph();
+    auto serializedGraph = builder.Release();
 
-    Graph_wrapper wrapper(serialized_graph.data(), serialized_graph.size());
+    GraphWrapper wrapper(serializedGraph.data(), serializedGraph.size());
 
     std::set<hipdnn_sdk::data_objects::NodeAttributes> supported
         = {hipdnn_sdk::data_objects::NodeAttributes_BatchnormInferenceAttributes};
-    EXPECT_TRUE(wrapper.has_only_supported_attributes(supported));
+    EXPECT_TRUE(wrapper.hasOnlySupportedAttributes(supported));
 
     supported.insert(hipdnn_sdk::data_objects::NodeAttributes_PointwiseAttributes);
-    EXPECT_TRUE(wrapper.has_only_supported_attributes(supported));
+    EXPECT_TRUE(wrapper.hasOnlySupportedAttributes(supported));
 }
 
-TEST(Graph_wrapperTest, HasSupportedTypesReturnsFalseIfAnyUnsupported)
+TEST(GraphWrapperTest, HasSupportedTypesReturnsFalseIfAnyUnsupported)
 {
-    flatbuffers::FlatBufferBuilder builder = flatbuffer_test_utils::create_valid_batchnorm_graph();
-    auto serialized_graph = builder.Release();
+    flatbuffers::FlatBufferBuilder builder = flatbuffer_test_utils::createValidBatchnormGraph();
+    auto serializedGraph = builder.Release();
 
-    Graph_wrapper wrapper(serialized_graph.data(), serialized_graph.size());
+    GraphWrapper wrapper(serializedGraph.data(), serializedGraph.size());
 
     std::set<hipdnn_sdk::data_objects::NodeAttributes> supported
         = {hipdnn_sdk::data_objects::NodeAttributes_PointwiseAttributes};
-    EXPECT_FALSE(wrapper.has_only_supported_attributes(supported));
+    EXPECT_FALSE(wrapper.hasOnlySupportedAttributes(supported));
 
     supported.insert(hipdnn_sdk::data_objects::NodeAttributes_BatchnormAttributes);
-    EXPECT_FALSE(wrapper.has_only_supported_attributes(supported));
+    EXPECT_FALSE(wrapper.hasOnlySupportedAttributes(supported));
 }
 
-TEST(Graph_wrapperTest, GetTensorMapEmptyGraph)
+TEST(GraphWrapperTest, GetTensorMapEmptyGraph)
 {
-    flatbuffers::FlatBufferBuilder builder = flatbuffer_test_utils::create_empty_valid_graph();
-    auto serialized_graph = builder.Release();
+    flatbuffers::FlatBufferBuilder builder = flatbuffer_test_utils::createEmptyValidGraph();
+    auto serializedGraph = builder.Release();
 
-    Graph_wrapper wrapper(serialized_graph.data(), serialized_graph.size());
-    ASSERT_TRUE(wrapper.is_valid());
+    GraphWrapper wrapper(serializedGraph.data(), serializedGraph.size());
+    ASSERT_TRUE(wrapper.isValid());
 
-    const auto& tensor_map = wrapper.get_tensor_map();
-    EXPECT_TRUE(tensor_map.empty());
+    const auto& tensorMap = wrapper.getTensorMap();
+    EXPECT_TRUE(tensorMap.empty());
 }
 
-TEST(Graph_wrapperTest, GetTensorMapReturnsCorrectTensors)
+TEST(GraphWrapperTest, GetTensorMapReturnsCorrectTensors)
 {
     flatbuffers::FlatBufferBuilder builder;
     std::vector<::flatbuffers::Offset<hipdnn_sdk::data_objects::Node>> nodes;
 
     std::vector<int64_t> strides = {1, 1, 1, 1};
     std::vector<int64_t> dims = {1, 1, 1, 1};
-    std::vector<::flatbuffers::Offset<hipdnn_sdk::data_objects::TensorAttributes>>
-        tensor_attributes;
-    tensor_attributes.push_back(hipdnn_sdk::data_objects::CreateTensorAttributesDirect(
+    std::vector<::flatbuffers::Offset<hipdnn_sdk::data_objects::TensorAttributes>> tensorAttributes;
+    tensorAttributes.push_back(hipdnn_sdk::data_objects::CreateTensorAttributesDirect(
         builder, 1, "x", hipdnn_sdk::data_objects::DataType_FLOAT, &strides, &dims));
-    tensor_attributes.push_back(hipdnn_sdk::data_objects::CreateTensorAttributesDirect(
+    tensorAttributes.push_back(hipdnn_sdk::data_objects::CreateTensorAttributesDirect(
         builder, 2, "y", hipdnn_sdk::data_objects::DataType_FLOAT, &strides, &dims));
 
     auto graph = hipdnn_sdk::data_objects::CreateGraphDirect(builder,
@@ -112,18 +111,18 @@ TEST(Graph_wrapperTest, GetTensorMapReturnsCorrectTensors)
                                                              DataType_FLOAT,
                                                              DataType_HALF,
                                                              DataType_BFLOAT16,
-                                                             &tensor_attributes,
+                                                             &tensorAttributes,
                                                              &nodes);
     builder.Finish(graph);
 
-    auto serialized_graph = builder.Release();
-    Graph_wrapper wrapper(serialized_graph.data(), serialized_graph.size());
-    ASSERT_TRUE(wrapper.is_valid());
+    auto serializedGraph = builder.Release();
+    GraphWrapper wrapper(serializedGraph.data(), serializedGraph.size());
+    ASSERT_TRUE(wrapper.isValid());
 
-    const auto& tensor_map = wrapper.get_tensor_map();
-    EXPECT_EQ(tensor_map.size(), 2);
-    EXPECT_NE(tensor_map.find(1), tensor_map.end());
-    EXPECT_NE(tensor_map.find(2), tensor_map.end());
-    EXPECT_EQ(tensor_map.at(1)->uid(), 1);
-    EXPECT_EQ(tensor_map.at(2)->uid(), 2);
+    const auto& tensorMap = wrapper.getTensorMap();
+    EXPECT_EQ(tensorMap.size(), 2);
+    EXPECT_NE(tensorMap.find(1), tensorMap.end());
+    EXPECT_NE(tensorMap.find(2), tensorMap.end());
+    EXPECT_EQ(tensorMap.at(1)->uid(), 1);
+    EXPECT_EQ(tensorMap.at(2)->uid(), 2);
 }

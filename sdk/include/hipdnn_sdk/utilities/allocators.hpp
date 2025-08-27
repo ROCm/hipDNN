@@ -19,7 +19,7 @@ namespace utilities
 
 /// @brief Interface for host memory allocators
 template <typename T>
-class Host_allocator_interface
+class IHostAllocator
 {
 public:
     using value_type = T;
@@ -33,10 +33,10 @@ public:
     template <typename U>
     struct rebind // NOLINT(readability-identifier-naming)
     {
-        using other = Host_allocator_interface<U>;
+        using other = IHostAllocator<U>;
     };
 
-    virtual ~Host_allocator_interface() = default;
+    virtual ~IHostAllocator() = default;
 
     /// @brief Allocate memory
     /// @param n Number of elements to allocate
@@ -64,7 +64,7 @@ public:
 
 /// @brief Interface for device memory allocators
 template <typename T>
-class Device_allocator_interface
+class IDeviceAllocator
 {
 public:
     using value_type = T;
@@ -78,10 +78,10 @@ public:
     template <typename U>
     struct rebind // NOLINT(readability-identifier-naming)
     {
-        using other = Device_allocator_interface<U>;
+        using other = IDeviceAllocator<U>;
     };
 
-    virtual ~Device_allocator_interface() = default;
+    virtual ~IDeviceAllocator() = default;
 
     /// @brief Allocate device memory
     /// @param n Number of elements to allocate
@@ -99,7 +99,7 @@ public:
 
 /// @brief Standard host allocator using malloc/free
 template <typename T>
-class Host_allocator : public Host_allocator_interface<T>
+class HostAllocator : public IHostAllocator<T>
 {
 public:
     using value_type = T;
@@ -113,19 +113,19 @@ public:
     template <typename U>
     struct rebind // NOLINT(readability-identifier-naming)
     {
-        using other = Host_allocator<U>;
+        using other = HostAllocator<U>;
     };
 
-    Host_allocator() noexcept = default;
-    Host_allocator(const Host_allocator&) noexcept = default;
+    HostAllocator() noexcept = default;
+    HostAllocator(const HostAllocator&) noexcept = default;
 
     template <typename U>
-    Host_allocator(const Host_allocator<U>& other) noexcept
+    HostAllocator(const HostAllocator<U>& other) noexcept
     {
         std::ignore = other;
     }
 
-    ~Host_allocator() override = default;
+    ~HostAllocator() override = default;
 
     [[nodiscard]] T* allocate(std::size_t n) override
     {
@@ -150,7 +150,7 @@ public:
 };
 
 template <typename T, typename U>
-bool operator==(const Host_allocator<T>& lhs, const Host_allocator<U>& rhs) noexcept
+bool operator==(const HostAllocator<T>& lhs, const HostAllocator<U>& rhs) noexcept
 {
     std::ignore = lhs;
     std::ignore = rhs;
@@ -158,7 +158,7 @@ bool operator==(const Host_allocator<T>& lhs, const Host_allocator<U>& rhs) noex
 }
 
 template <typename T, typename U>
-bool operator!=(const Host_allocator<T>& lhs, const Host_allocator<U>& rhs) noexcept
+bool operator!=(const HostAllocator<T>& lhs, const HostAllocator<U>& rhs) noexcept
 {
     std::ignore = lhs;
     std::ignore = rhs;
@@ -167,7 +167,7 @@ bool operator!=(const Host_allocator<T>& lhs, const Host_allocator<U>& rhs) noex
 
 /// @brief Pinned host allocator using hipHostMalloc/hipHostFree
 template <typename T>
-class Pinned_host_allocator : public Host_allocator_interface<T>
+class PinnedHostAllocator : public IHostAllocator<T>
 {
 public:
     using value_type = T;
@@ -181,19 +181,19 @@ public:
     template <typename U>
     struct rebind // NOLINT(readability-identifier-naming)
     {
-        using other = Pinned_host_allocator<U>;
+        using other = PinnedHostAllocator<U>;
     };
 
-    Pinned_host_allocator() noexcept = default;
-    Pinned_host_allocator(const Pinned_host_allocator&) noexcept = default;
+    PinnedHostAllocator() noexcept = default;
+    PinnedHostAllocator(const PinnedHostAllocator&) noexcept = default;
 
     template <typename U>
-    Pinned_host_allocator(const Pinned_host_allocator<U>& other) noexcept
+    PinnedHostAllocator(const PinnedHostAllocator<U>& other) noexcept
     {
         std::ignore = other;
     }
 
-    ~Pinned_host_allocator() override = default;
+    ~PinnedHostAllocator() override = default;
 
     [[nodiscard]] T* allocate(std::size_t n) override
     {
@@ -219,7 +219,7 @@ public:
 };
 
 template <typename T, typename U>
-bool operator==(const Pinned_host_allocator<T>& lhs, const Pinned_host_allocator<U>& rhs) noexcept
+bool operator==(const PinnedHostAllocator<T>& lhs, const PinnedHostAllocator<U>& rhs) noexcept
 {
     std::ignore = lhs;
     std::ignore = rhs;
@@ -227,7 +227,7 @@ bool operator==(const Pinned_host_allocator<T>& lhs, const Pinned_host_allocator
 }
 
 template <typename T, typename U>
-bool operator!=(const Pinned_host_allocator<T>& lhs, const Pinned_host_allocator<U>& rhs) noexcept
+bool operator!=(const PinnedHostAllocator<T>& lhs, const PinnedHostAllocator<U>& rhs) noexcept
 {
     std::ignore = lhs;
     std::ignore = rhs;
@@ -236,7 +236,7 @@ bool operator!=(const Pinned_host_allocator<T>& lhs, const Pinned_host_allocator
 
 /// @brief Device allocator using hipMalloc/hipFree
 template <typename T>
-class Device_allocator : public Device_allocator_interface<T>
+class DeviceAllocator : public IDeviceAllocator<T>
 {
 public:
     using value_type = T;
@@ -250,19 +250,19 @@ public:
     template <typename U>
     struct rebind // NOLINT(readability-identifier-naming)
     {
-        using other = Device_allocator<U>;
+        using other = DeviceAllocator<U>;
     };
 
-    Device_allocator() noexcept = default;
-    Device_allocator(const Device_allocator&) noexcept = default;
+    DeviceAllocator() noexcept = default;
+    DeviceAllocator(const DeviceAllocator&) noexcept = default;
 
     template <typename U>
-    Device_allocator(const Device_allocator<U>& other) noexcept
+    DeviceAllocator(const DeviceAllocator<U>& other) noexcept
     {
         std::ignore = other;
     }
 
-    ~Device_allocator() override = default;
+    ~DeviceAllocator() override = default;
 
     [[nodiscard]] T* allocate(std::size_t n) override
     {
@@ -292,7 +292,7 @@ public:
 };
 
 template <typename T, typename U>
-bool operator==(const Device_allocator<T>& lhs, const Device_allocator<U>& rhs) noexcept
+bool operator==(const DeviceAllocator<T>& lhs, const DeviceAllocator<U>& rhs) noexcept
 {
     std::ignore = lhs;
     std::ignore = rhs;
@@ -300,7 +300,7 @@ bool operator==(const Device_allocator<T>& lhs, const Device_allocator<U>& rhs) 
 }
 
 template <typename T, typename U>
-bool operator!=(const Device_allocator<T>& lhs, const Device_allocator<U>& rhs) noexcept
+bool operator!=(const DeviceAllocator<T>& lhs, const DeviceAllocator<U>& rhs) noexcept
 {
     std::ignore = lhs;
     std::ignore = rhs;

@@ -11,16 +11,16 @@ using namespace miopen_legacy_plugin;
 TEST(BatchnormBwdParamsTest, InitializesAllTensorsFromValidGraph)
 {
     // Create a valid batchnorm graph
-    auto builder = flatbuffer_test_utils::create_valid_batchnorm_bwd_graph();
-    hipdnn_plugin::Graph_wrapper graph(builder.GetBufferPointer(), builder.GetSize());
+    auto builder = flatbuffer_test_utils::createValidBatchnormBwdGraph();
+    hipdnn_plugin::GraphWrapper graph(builder.GetBufferPointer(), builder.GetSize());
 
     // Get the batchnorm node and attributes
-    const auto& node = graph.get_node(0);
+    const auto& node = graph.getNode(0);
     auto* attrs = node.attributes_as_BatchnormBackwardAttributes();
     ASSERT_NE(attrs, nullptr);
 
     // Construct params
-    BatchnormBwdParams params(*attrs, graph.get_tensor_map());
+    BatchnormBwdParams params(*attrs, graph.getTensorMap());
 
     // All required tensors should be initialized
     EXPECT_NO_THROW(params.x());
@@ -31,29 +31,29 @@ TEST(BatchnormBwdParamsTest, InitializesAllTensorsFromValidGraph)
     EXPECT_NO_THROW(params.dbias());
 
     // Optional tensors should be present
-    auto& mean_opt = params.optMean();
-    auto& var_opt = params.optInvVariance();
-    EXPECT_TRUE(mean_opt.has_value());
-    EXPECT_TRUE(var_opt.has_value());
-    EXPECT_NE(mean_opt.value(), nullptr);
-    EXPECT_NE(var_opt.value(), nullptr);
+    auto& meanOpt = params.optMean();
+    auto& varOpt = params.optInvVariance();
+    EXPECT_TRUE(meanOpt.has_value());
+    EXPECT_TRUE(varOpt.has_value());
+    EXPECT_NE(meanOpt.value(), nullptr);
+    EXPECT_NE(varOpt.value(), nullptr);
 }
 
 TEST(BatchnormBwdParamsTest, HandlesMissingOptionalTensors)
 {
     // Create a valid batchnorm graph and remove mean/variance from tensor map
-    auto builder = flatbuffer_test_utils::create_valid_batchnorm_bwd_graph(
+    auto builder = flatbuffer_test_utils::createValidBatchnormBwdGraph(
         {1, 1, 1, 1}, {1, 1, 1, 1}, false // Set has_optional_attributes to false
     );
-    hipdnn_plugin::Graph_wrapper graph(builder.GetBufferPointer(), builder.GetSize());
+    hipdnn_plugin::GraphWrapper graph(builder.GetBufferPointer(), builder.GetSize());
 
     // Get the batchnorm node and attributes
-    const auto& node = graph.get_node(0);
+    const auto& node = graph.getNode(0);
     auto* attrs = node.attributes_as_BatchnormBackwardAttributes();
     ASSERT_NE(attrs, nullptr);
 
-    const auto& tensor_map = graph.get_tensor_map();
-    BatchnormBwdParams params(*attrs, tensor_map);
+    const auto& tensorMap = graph.getTensorMap();
+    BatchnormBwdParams params(*attrs, tensorMap);
 
     // Optional tensors should not be present
     EXPECT_FALSE(params.optMean().has_value());

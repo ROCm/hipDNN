@@ -19,7 +19,7 @@ using namespace hipdnn_frontend;
 using namespace hipdnn_sdk::utilities;
 
 template <typename InputType, typename IntermediateType>
-void Sample_runner::operator()(const Tensor_layout& layout)
+void Sample_runner::operator()(const TensorLayout& layout)
 {
     auto input_type = getDataTypeEnumFromType<InputType>();
     auto intermediate_type = getDataTypeEnumFromType<IntermediateType>();
@@ -71,42 +71,42 @@ void Sample_runner::operator()(const Tensor_layout& layout)
     Tensor<IntermediateType> inv_variance_tensor(inv_variance->get_dim());
     Tensor<InputType> y_tensor(y->get_dim(), layout);
 
-    x_tensor.fill_with_random_values(static_cast<InputType>(0.0f), static_cast<InputType>(1.0f));
+    x_tensor.fillWithRandomValues(static_cast<InputType>(0.0f), static_cast<InputType>(1.0f));
 
-    scale_tensor.fill_with_value(static_cast<IntermediateType>(1.0f));
+    scale_tensor.fillWithValue(static_cast<IntermediateType>(1.0f));
 
-    bias_tensor.fill_with_value(static_cast<IntermediateType>(0.0f));
+    bias_tensor.fillWithValue(static_cast<IntermediateType>(0.0f));
 
-    mean_tensor.fill_with_value(static_cast<IntermediateType>(0.5f));
+    mean_tensor.fillWithValue(static_cast<IntermediateType>(0.5f));
 
-    inv_variance_tensor.fill_with_value(static_cast<IntermediateType>(1.0f));
+    inv_variance_tensor.fillWithValue(static_cast<IntermediateType>(1.0f));
 
     std::unordered_map<int64_t, void*> variant_pack;
 
-    variant_pack[x->get_uid()] = x_tensor.memory().device_data();
-    variant_pack[scale->get_uid()] = scale_tensor.memory().device_data();
-    variant_pack[bias->get_uid()] = bias_tensor.memory().device_data();
-    variant_pack[mean->get_uid()] = mean_tensor.memory().device_data();
-    variant_pack[inv_variance->get_uid()] = inv_variance_tensor.memory().device_data();
-    variant_pack[y->get_uid()] = y_tensor.memory().device_data();
+    variant_pack[x->get_uid()] = x_tensor.memory().deviceData();
+    variant_pack[scale->get_uid()] = scale_tensor.memory().deviceData();
+    variant_pack[bias->get_uid()] = bias_tensor.memory().deviceData();
+    variant_pack[mean->get_uid()] = mean_tensor.memory().deviceData();
+    variant_pack[inv_variance->get_uid()] = inv_variance_tensor.memory().deviceData();
+    variant_pack[y->get_uid()] = y_tensor.memory().deviceData();
 
     HIPDNN_FE_CHECK(graph->execute(handle, variant_pack, nullptr));
 
-    y_tensor.memory().mark_device_modified();
-    auto y_host_ptr = y_tensor.memory().host_data();
+    y_tensor.memory().markDeviceModified();
+    auto y_host_ptr = y_tensor.memory().hostData();
 
     if(config.cpu_validation)
     {
         std::cout << "Running CPU reference validation...\n";
 
         auto ref_impl = hipdnn_sdk::reference_test_utilities::
-            Cpu_fp_reference_implementation<InputType, IntermediateType>();
+            CpuFpReferenceImplementation<InputType, IntermediateType>();
         Tensor<InputType> y_ref_tensor(y->get_dim(), layout);
 
         // Convert inverse variance to variance for CPU reference
         Tensor<IntermediateType> variance_tensor(inv_variance->get_dim());
-        auto inv_variance_host_ptr = inv_variance_tensor.memory().host_data();
-        auto variance_host_ptr = variance_tensor.memory().host_data();
+        auto inv_variance_host_ptr = inv_variance_tensor.memory().hostData();
+        auto variance_host_ptr = variance_tensor.memory().hostData();
 
         for(size_t i = 0; i < inv_variance_tensor.memory().count(); ++i)
         {
@@ -116,21 +116,20 @@ void Sample_runner::operator()(const Tensor_layout& layout)
 
         auto epsilon = get_epsilon<InputType>();
 
-        ref_impl.batchnorm_fwd_inference(x_tensor,
-                                         scale_tensor,
-                                         bias_tensor,
-                                         mean_tensor,
-                                         variance_tensor,
-                                         y_ref_tensor,
-                                         epsilon);
+        ref_impl.batchnormFwdInference(x_tensor,
+                                       scale_tensor,
+                                       bias_tensor,
+                                       mean_tensor,
+                                       variance_tensor,
+                                       y_ref_tensor,
+                                       epsilon);
 
-        auto validator
-            = hipdnn_sdk::reference_test_utilities::Cpu_fp_reference_validation<InputType>(
-                static_cast<InputType>(epsilon), static_cast<InputType>(epsilon));
+        auto validator = hipdnn_sdk::reference_test_utilities::CpuFpReferenceValidation<InputType>(
+            static_cast<InputType>(epsilon), static_cast<InputType>(epsilon));
 
         std::cout << "CPU reference validation "
-                  << (validator.all_close(y_ref_tensor.memory(), y_tensor.memory()) ? "successful"
-                                                                                    : "failed")
+                  << (validator.allClose(y_ref_tensor.memory(), y_tensor.memory()) ? "successful"
+                                                                                   : "failed")
                   << ".\n";
     }
 

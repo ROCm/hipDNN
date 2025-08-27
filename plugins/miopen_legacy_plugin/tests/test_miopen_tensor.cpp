@@ -11,32 +11,32 @@ using namespace miopen_legacy_plugin;
 TEST(MiopenTensorTest, CanCreateAndDestroyTensor)
 {
     // Use a real tensor attributes from a valid batchnorm graph
-    auto builder = flatbuffer_test_utils::create_valid_batchnorm_graph();
-    hipdnn_plugin::Graph_wrapper graph(builder.GetBufferPointer(), builder.GetSize());
+    auto builder = flatbuffer_test_utils::createValidBatchnormGraph();
+    hipdnn_plugin::GraphWrapper graph(builder.GetBufferPointer(), builder.GetSize());
 
     // Get the first tensor attributes from the tensor map
-    const auto& tensor_map = graph.get_tensor_map();
-    ASSERT_FALSE(tensor_map.empty());
-    const auto* tensor_attr = tensor_map.begin()->second;
-    ASSERT_NE(tensor_attr, nullptr);
+    const auto& tensorMap = graph.getTensorMap();
+    ASSERT_FALSE(tensorMap.empty());
+    const auto* tensorAttr = tensorMap.begin()->second;
+    ASSERT_NE(tensorAttr, nullptr);
 
     // Construct and destroy MiopenTensor
     EXPECT_NO_THROW({
-        MiopenTensor tensor(*tensor_attr);
-        EXPECT_EQ(tensor.uid(), tensor_attr->uid());
+        MiopenTensor tensor(*tensorAttr);
+        EXPECT_EQ(tensor.uid(), tensorAttr->uid());
         EXPECT_NE(tensor.tensorDescriptor(), nullptr);
     });
 }
 
 TEST(MiopenTensorTest, TensorDescriptorIsValid)
 {
-    auto builder = flatbuffer_test_utils::create_valid_batchnorm_graph();
-    hipdnn_plugin::Graph_wrapper graph(builder.GetBufferPointer(), builder.GetSize());
+    auto builder = flatbuffer_test_utils::createValidBatchnormGraph();
+    hipdnn_plugin::GraphWrapper graph(builder.GetBufferPointer(), builder.GetSize());
 
-    const auto& tensor_map = graph.get_tensor_map();
-    ASSERT_FALSE(tensor_map.empty());
-    const auto* tensor_attr = tensor_map.begin()->second;
-    MiopenTensor tensor(*tensor_attr);
+    const auto& tensorMap = graph.getTensorMap();
+    ASSERT_FALSE(tensorMap.empty());
+    const auto* tensorAttr = tensorMap.begin()->second;
+    MiopenTensor tensor(*tensorAttr);
 
     // The descriptor should be non-null and can be used in MIOpen API calls
     EXPECT_NE(tensor.tensorDescriptor(), nullptr);

@@ -12,11 +12,11 @@ using namespace hipdnn_sdk::reference_test_utilities;
 using namespace hipdnn_sdk::utilities;
 
 template <typename T>
-Migratable_memory<T> create_buffer(size_t size, T mult)
+MigratableMemory<T> create_buffer(size_t size, T mult)
 {
-    Migratable_memory<T> buffer(size);
+    MigratableMemory<T> buffer(size);
 
-    T* data = buffer.host_data();
+    T* data = buffer.hostData();
 
     for(size_t i = 0; i < size; ++i)
     {
@@ -28,95 +28,95 @@ Migratable_memory<T> create_buffer(size_t size, T mult)
 
 TEST(CpuFpReferenceValidation, BasicBFloat16Usage)
 {
-    Cpu_fp_reference_validation<hip_bfloat16> ref_validation;
+    CpuFpReferenceValidation<hip_bfloat16> refValidation;
 
     auto buffer1 = create_buffer<hip_bfloat16>(100, 1.0_bf);
     auto buffer2 = create_buffer<hip_bfloat16>(100, 1.0_bf);
 
-    EXPECT_TRUE(ref_validation.all_close(buffer1, buffer2));
+    EXPECT_TRUE(refValidation.allClose(buffer1, buffer2));
 }
 
 TEST(CpuFpReferenceValidation, BasicHalfUsage)
 {
-    Cpu_fp_reference_validation<half> ref_validation;
+    CpuFpReferenceValidation<half> refValidation;
 
     auto buffer1 = create_buffer<half>(100, 1.0_h);
     auto buffer2 = create_buffer<half>(100, 1.0_h);
 
-    EXPECT_TRUE(ref_validation.all_close(buffer1, buffer2));
+    EXPECT_TRUE(refValidation.allClose(buffer1, buffer2));
 }
 
 TEST(CpuFpReferenceValidation, BasicFloatUsage)
 {
-    Cpu_fp_reference_validation<float> ref_validation;
+    CpuFpReferenceValidation<float> refValidation;
 
     auto buffer1 = create_buffer<float>(100, 1.0f);
     auto buffer2 = create_buffer<float>(100, 1.0f);
 
-    EXPECT_TRUE(ref_validation.all_close(buffer1, buffer2));
+    EXPECT_TRUE(refValidation.allClose(buffer1, buffer2));
 }
 
 TEST(CpuFpReferenceValidation, BasicDoubleUsage)
 {
-    Cpu_fp_reference_validation<double> ref_validation;
+    CpuFpReferenceValidation<double> refValidation;
 
     auto buffer1 = create_buffer<double>(100, 1.0);
     auto buffer2 = create_buffer<double>(100, 1.0);
 
-    EXPECT_TRUE(ref_validation.all_close(buffer1, buffer2));
+    EXPECT_TRUE(refValidation.allClose(buffer1, buffer2));
 }
 
 TEST(CpuFpReferenceValidation, BFloat16NotComparable)
 {
-    Cpu_fp_reference_validation<hip_bfloat16> ref_validation;
+    CpuFpReferenceValidation<hip_bfloat16> refValidation;
 
     auto buffer1 = create_buffer<hip_bfloat16>(100, 1.0_bf);
     auto buffer2 = create_buffer<hip_bfloat16>(100, 2.0_bf);
 
-    EXPECT_FALSE(ref_validation.all_close(buffer1, buffer2));
+    EXPECT_FALSE(refValidation.allClose(buffer1, buffer2));
 }
 
 TEST(CpuFpReferenceValidation, HalfNotComparable)
 {
-    Cpu_fp_reference_validation<half> ref_validation;
+    CpuFpReferenceValidation<half> refValidation;
 
     auto buffer1 = create_buffer<half>(100, 1.0_h);
     auto buffer2 = create_buffer<half>(100, 2.0_h);
 
-    EXPECT_FALSE(ref_validation.all_close(buffer1, buffer2));
+    EXPECT_FALSE(refValidation.allClose(buffer1, buffer2));
 }
 
 TEST(CpuFpReferenceValidation, FloatNotComparable)
 {
-    Cpu_fp_reference_validation<float> ref_validation;
+    CpuFpReferenceValidation<float> refValidation;
 
     auto buffer1 = create_buffer<float>(100, 1.0f);
     auto buffer2 = create_buffer<float>(100, 2.0f);
 
-    EXPECT_FALSE(ref_validation.all_close(buffer1, buffer2));
+    EXPECT_FALSE(refValidation.allClose(buffer1, buffer2));
 }
 
 TEST(CpuFpReferenceValidation, DoubleNotComparable)
 {
-    Cpu_fp_reference_validation<double> ref_validation;
+    CpuFpReferenceValidation<double> refValidation;
 
     auto buffer1 = create_buffer<double>(100, 1.0);
     auto buffer2 = create_buffer<double>(100, 2.0);
 
-    EXPECT_FALSE(ref_validation.all_close(buffer1, buffer2));
+    EXPECT_FALSE(refValidation.allClose(buffer1, buffer2));
 }
 
 TEST(CpuFpReferenceValidation, ToleranceComparison)
 {
-    Cpu_fp_reference_validation<double> ref_validation_low_tolerance(1e-7, 1e-7);
-    Cpu_fp_reference_validation<double> ref_validation_high_tolerance(1e-5, 1e-5);
+    CpuFpReferenceValidation<double> refValidationLowTolerance(1e-7, 1e-7);
+    CpuFpReferenceValidation<double> refValidationHighTolerance(1e-5, 1e-5);
 
     auto buffer1 = create_buffer<double>(100, 1.0);
     auto buffer2 = create_buffer<double>(100, 1.000001);
 
     // Set a very small tolerance
-    EXPECT_TRUE(ref_validation_high_tolerance.all_close(buffer1, buffer2));
+    EXPECT_TRUE(refValidationHighTolerance.allClose(buffer1, buffer2));
 
     // Change the tolerance to a larger value
-    EXPECT_FALSE(ref_validation_low_tolerance.all_close(buffer1, buffer2));
+    EXPECT_FALSE(refValidationLowTolerance.allClose(buffer1, buffer2));
 }

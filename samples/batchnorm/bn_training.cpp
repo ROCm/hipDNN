@@ -20,7 +20,7 @@ using namespace hipdnn_sdk::utilities;
 
 // TODO: verify this sample when applicable engines are added
 template <typename InputType, typename IntermediateType>
-void Sample_runner::operator()(const Tensor_layout& layout)
+void Sample_runner::operator()(const TensorLayout& layout)
 {
     auto input_type = getDataTypeEnumFromType<InputType>();
     auto intermediate_type = getDataTypeEnumFromType<IntermediateType>();
@@ -89,50 +89,50 @@ void Sample_runner::operator()(const Tensor_layout& layout)
     Tensor<IntermediateType> saved_mean_tensor(saved_mean->get_dim());
     Tensor<IntermediateType> saved_inv_var_tensor(saved_inv_variance->get_dim());
 
-    x_tensor.fill_with_random_values(static_cast<InputType>(0.0f), static_cast<InputType>(1.0f));
-    scale_tensor.fill_with_random_values(static_cast<IntermediateType>(0.0f),
+    x_tensor.fillWithRandomValues(static_cast<InputType>(0.0f), static_cast<InputType>(1.0f));
+    scale_tensor.fillWithRandomValues(static_cast<IntermediateType>(0.0f),
+                                      static_cast<IntermediateType>(1.0f));
+    bias_tensor.fillWithRandomValues(static_cast<IntermediateType>(0.0f),
+                                     static_cast<IntermediateType>(1.0f));
+    prev_mean_tensor.fillWithRandomValues(static_cast<IntermediateType>(0.0f),
+                                          static_cast<IntermediateType>(1.0f));
+    prev_var_tensor.fillWithRandomValues(static_cast<IntermediateType>(0.1f),
                                          static_cast<IntermediateType>(1.0f));
-    bias_tensor.fill_with_random_values(static_cast<IntermediateType>(0.0f),
-                                        static_cast<IntermediateType>(1.0f));
-    prev_mean_tensor.fill_with_random_values(static_cast<IntermediateType>(0.0f),
-                                             static_cast<IntermediateType>(1.0f));
-    prev_var_tensor.fill_with_random_values(static_cast<IntermediateType>(0.1f),
-                                            static_cast<IntermediateType>(1.0f));
 
-    momentum_tensor.memory().host_data()[0] = 0.1f;
-    epsilon_tensor.memory().host_data()[0] = 1e-5f;
+    momentum_tensor.memory().hostData()[0] = 0.1f;
+    epsilon_tensor.memory().hostData()[0] = 1e-5f;
 
     std::unordered_map<int64_t, void*> variant_pack;
 
-    variant_pack[x->get_uid()] = x_tensor.memory().device_data();
-    variant_pack[scale->get_uid()] = scale_tensor.memory().device_data();
-    variant_pack[bias->get_uid()] = bias_tensor.memory().device_data();
-    variant_pack[prev_running_mean->get_uid()] = prev_mean_tensor.memory().device_data();
-    variant_pack[prev_running_var->get_uid()] = prev_var_tensor.memory().device_data();
-    variant_pack[momentum->get_uid()] = momentum_tensor.memory().device_data();
-    variant_pack[epsilon->get_uid()] = epsilon_tensor.memory().device_data();
-    variant_pack[y->get_uid()] = y_tensor.memory().device_data();
-    variant_pack[next_running_mean->get_uid()] = next_mean_tensor.memory().device_data();
-    variant_pack[next_running_var->get_uid()] = next_var_tensor.memory().device_data();
-    variant_pack[saved_mean->get_uid()] = saved_mean_tensor.memory().device_data();
-    variant_pack[saved_inv_variance->get_uid()] = saved_inv_var_tensor.memory().device_data();
+    variant_pack[x->get_uid()] = x_tensor.memory().deviceData();
+    variant_pack[scale->get_uid()] = scale_tensor.memory().deviceData();
+    variant_pack[bias->get_uid()] = bias_tensor.memory().deviceData();
+    variant_pack[prev_running_mean->get_uid()] = prev_mean_tensor.memory().deviceData();
+    variant_pack[prev_running_var->get_uid()] = prev_var_tensor.memory().deviceData();
+    variant_pack[momentum->get_uid()] = momentum_tensor.memory().deviceData();
+    variant_pack[epsilon->get_uid()] = epsilon_tensor.memory().deviceData();
+    variant_pack[y->get_uid()] = y_tensor.memory().deviceData();
+    variant_pack[next_running_mean->get_uid()] = next_mean_tensor.memory().deviceData();
+    variant_pack[next_running_var->get_uid()] = next_var_tensor.memory().deviceData();
+    variant_pack[saved_mean->get_uid()] = saved_mean_tensor.memory().deviceData();
+    variant_pack[saved_inv_variance->get_uid()] = saved_inv_var_tensor.memory().deviceData();
 
     HIPDNN_FE_CHECK(graph->execute(handle, variant_pack, nullptr));
 
-    y_tensor.memory().mark_device_modified();
-    next_mean_tensor.memory().mark_device_modified();
-    next_var_tensor.memory().mark_device_modified();
-    saved_mean_tensor.memory().mark_device_modified();
-    saved_inv_var_tensor.memory().mark_device_modified();
+    y_tensor.memory().markDeviceModified();
+    next_mean_tensor.memory().markDeviceModified();
+    next_var_tensor.memory().markDeviceModified();
+    saved_mean_tensor.memory().markDeviceModified();
+    saved_inv_var_tensor.memory().markDeviceModified();
 
-    auto y_host_ptr = y_tensor.memory().host_data();
+    auto y_host_ptr = y_tensor.memory().hostData();
 
     if(config.cpu_validation)
     {
         std::cout << "Running CPU reference validation...\n";
 
         auto ref_impl = hipdnn_sdk::reference_test_utilities::
-            Cpu_fp_reference_implementation<InputType, IntermediateType>();
+            CpuFpReferenceImplementation<InputType, IntermediateType>();
 
         Tensor<InputType> y_ref_tensor(y->get_dim(), layout);
         Tensor<IntermediateType> next_mean_ref_tensor(next_running_mean->get_dim());
@@ -157,16 +157,16 @@ void Sample_runner::operator()(const Tensor_layout& layout)
         // auto epsilon = get_epsilon<InputType>();
         //
         // auto y_validator
-        //     = hipdnn_sdk::reference_test_utilities::Cpu_fp_reference_validation<InputType>(
+        //     = hipdnn_sdk::reference_test_utilities::CpuFpReferenceValidation<InputType>(
         //         static_cast<InputType>(epsilon), static_cast<InputType>(epsilon));
         //
         // auto stats_validator
-        //     = hipdnn_sdk::reference_test_utilities::Cpu_fp_reference_validation<IntermediateType>(
+        //     = hipdnn_sdk::reference_test_utilities::CpuFpReferenceValidation<IntermediateType>(
         //         static_cast<IntermediateType>(epsilon), static_cast<IntermediateType>(epsilon));
-        // bool y_valid = y_validator.all_close(y_ref_tensor.memory(), y_tensor.memory());
-        // bool next_mean_valid = stats_validator.all_close(next_mean_ref_tensor.memory(),
+        // bool y_valid = y_validator.allClose(y_ref_tensor.memory(), y_tensor.memory());
+        // bool next_mean_valid = stats_validator.allClose(next_mean_ref_tensor.memory(),
         //                                                        next_mean_tensor.memory());
-        // bool next_var_valid = stats_validator.all_close(next_var_ref_tensor.memory(),
+        // bool next_var_valid = stats_validator.allClose(next_var_ref_tensor.memory(),
         //                                                       next_var_tensor.memory());
         // TODO: consider adding validation for other output buffers, but they are verified indirectly by y
         // std::cout << "CPU reference validation:\n";

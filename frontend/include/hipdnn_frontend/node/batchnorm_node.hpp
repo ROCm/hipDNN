@@ -92,9 +92,9 @@ public:
             if(tensorToInfer->get_stride().empty())
             {
                 auto strideOrder
-                    = hipdnn_sdk::utilities::stride_order_nhwc(tensorToInfer->get_dim().size());
+                    = hipdnn_sdk::utilities::strideOrderNhwc(tensorToInfer->get_dim().size());
                 tensorToInfer->set_stride(
-                    hipdnn_sdk::utilities::generate_strides(tensorToInfer->get_dim(), strideOrder));
+                    hipdnn_sdk::utilities::generateStrides(tensorToInfer->get_dim(), strideOrder));
             }
         };
 

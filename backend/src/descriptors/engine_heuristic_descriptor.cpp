@@ -62,8 +62,7 @@ void EngineHeuristicDescriptor::getAttribute(hipdnnBackendAttributeName_t attrib
     default:
         throw HipdnnException(
             HIPDNN_STATUS_NOT_SUPPORTED,
-            std::string(
-                "EngineHeuristicDescriptor::getAttribute() is not supported for attribute ")
+            std::string("EngineHeuristicDescriptor::getAttribute() is not supported for attribute ")
                 + hipdnn_backend::hipdnnGetAttributeNameString(attributeName) + ".");
     }
 }
@@ -88,8 +87,7 @@ void EngineHeuristicDescriptor::setAttribute(hipdnnBackendAttributeName_t attrib
     default:
         throw HipdnnException(
             HIPDNN_STATUS_NOT_SUPPORTED,
-            std::string(
-                "EngineHeuristicDescriptor::setAttribute() is not supported for attribute ")
+            std::string("EngineHeuristicDescriptor::setAttribute() is not supported for attribute ")
                 + hipdnn_backend::hipdnnGetAttributeNameString(attributeName) + ".");
     }
 }

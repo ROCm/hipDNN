@@ -59,9 +59,9 @@ std::unique_ptr<MiopenTensor> createTensor(
         return std::make_unique<MiopenTensor>(*tensorAttr->second);
     }
 
-    throw hipdnn_plugin::Hipdnn_plugin_exception(HIPDNN_PLUGIN_STATUS_INTERNAL_ERROR,
-                                                 "Failed to find tensor with UID in tensorMap: "
-                                                     + std::to_string(uid));
+    throw hipdnn_plugin::HipdnnPluginException(HIPDNN_PLUGIN_STATUS_INTERNAL_ERROR,
+                                               "Failed to find tensor with UID in tensorMap: "
+                                                   + std::to_string(uid));
 }
 
 } // namespace

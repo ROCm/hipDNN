@@ -87,12 +87,12 @@ protected:
             , variance_tensor(Tensor<Intermediate_type>(derived_dims))
         {
             // Initialize with simple constant values
-            x_tensor.fill_with_value(static_cast<Input_type>(1.0f));
-            y_tensor.fill_with_value(static_cast<Input_type>(0.0f));
-            scale_tensor.fill_with_value(static_cast<Intermediate_type>(1.0f));
-            bias_tensor.fill_with_value(static_cast<Intermediate_type>(0.0f));
-            mean_tensor.fill_with_value(static_cast<Intermediate_type>(0.0f));
-            variance_tensor.fill_with_value(static_cast<Intermediate_type>(1.0f));
+            x_tensor.fillWithValue(static_cast<Input_type>(1.0f));
+            y_tensor.fillWithValue(static_cast<Input_type>(0.0f));
+            scale_tensor.fillWithValue(static_cast<Intermediate_type>(1.0f));
+            bias_tensor.fillWithValue(static_cast<Intermediate_type>(0.0f));
+            mean_tensor.fillWithValue(static_cast<Intermediate_type>(0.0f));
+            variance_tensor.fillWithValue(static_cast<Intermediate_type>(1.0f));
         }
 
         std::vector<int64_t> derived_dims;
@@ -215,13 +215,13 @@ protected:
                             Simple_batchnorm_2d_tensor_bundle<float, float>& tensor_bundle)
     {
         std::unordered_map<int64_t, void*> variant_pack;
-        variant_pack[tensors.x->get_uid()] = tensor_bundle.x_tensor.memory().device_data();
-        variant_pack[tensors.mean->get_uid()] = tensor_bundle.mean_tensor.memory().device_data();
+        variant_pack[tensors.x->get_uid()] = tensor_bundle.x_tensor.memory().deviceData();
+        variant_pack[tensors.mean->get_uid()] = tensor_bundle.mean_tensor.memory().deviceData();
         variant_pack[tensors.inv_variance->get_uid()]
-            = tensor_bundle.variance_tensor.memory().device_data();
-        variant_pack[tensors.scale->get_uid()] = tensor_bundle.scale_tensor.memory().device_data();
-        variant_pack[tensors.bias->get_uid()] = tensor_bundle.bias_tensor.memory().device_data();
-        variant_pack[tensors.y->get_uid()] = tensor_bundle.y_tensor.memory().device_data();
+            = tensor_bundle.variance_tensor.memory().deviceData();
+        variant_pack[tensors.scale->get_uid()] = tensor_bundle.scale_tensor.memory().deviceData();
+        variant_pack[tensors.bias->get_uid()] = tensor_bundle.bias_tensor.memory().deviceData();
+        variant_pack[tensors.y->get_uid()] = tensor_bundle.y_tensor.memory().deviceData();
 
         return variant_pack;
     }

@@ -16,7 +16,7 @@
 namespace hipdnn::logging
 {
 
-inline hipdnnSeverity_t spdlog_to_hipdnn_severity(spdlog::level::level_enum level)
+inline hipdnnSeverity_t spdlogToHipdnnSeverity(spdlog::level::level_enum level)
 {
     switch(level)
     {
@@ -37,64 +37,63 @@ inline hipdnnSeverity_t spdlog_to_hipdnn_severity(spdlog::level::level_enum leve
 // Moreover, MSVC is likely the incompatible compiler here.
 // NOLINTBEGIN(portability-template-virtual-member-function)
 template <typename Mutex>
-class Callback_sink final : public spdlog::sinks::base_sink<Mutex>
+class CallbackSink final : public spdlog::sinks::base_sink<Mutex>
 {
 public:
-    explicit Callback_sink(hipdnnCallback_t callback)
-        : _callback_fn{callback}
+    explicit CallbackSink(hipdnnCallback_t callback)
+        : _callbackFn{callback}
     {
     }
-    ~Callback_sink() override = default;
+    ~CallbackSink() override = default;
 
 protected:
     void sink_it_(const spdlog::details::log_msg& msg) override
     {
-        if(_callback_fn == nullptr)
+        if(_callbackFn == nullptr)
         {
             return;
         }
 
         spdlog::memory_buf_t formatted;
         spdlog::sinks::base_sink<Mutex>::formatter_->format(msg, formatted);
-        std::string formatted_str(formatted.data(), formatted.size());
+        std::string formattedStr(formatted.data(), formatted.size());
 
-        while(!formatted_str.empty()
-              && (formatted_str.back() == '\n' || formatted_str.back() == '\r'))
+        while(!formattedStr.empty() && (formattedStr.back() == '\n' || formattedStr.back() == '\r'))
         {
-            formatted_str.pop_back();
+            formattedStr.pop_back();
         }
 
-        hipdnnSeverity_t severity = spdlog_to_hipdnn_severity(msg.level);
+        hipdnnSeverity_t severity = spdlogToHipdnnSeverity(msg.level);
 
-        _callback_fn(severity, formatted_str.c_str());
+        _callbackFn(severity, formattedStr.c_str());
     }
 
     void flush_() override {}
 
 private:
-    hipdnnCallback_t _callback_fn;
+    hipdnnCallback_t _callbackFn;
 };
 // NOLINTEND(portability-template-virtual-member-function)
 
-using callback_sink_mt = Callback_sink<std::mutex>;
+using CallbackSinkMt = CallbackSink<std::mutex>;
 
-inline std::shared_ptr<spdlog::logger> create_async_callback_logger_mt(hipdnnCallback_t callback,
-                                                                       const std::string& source)
+inline std::shared_ptr<spdlog::logger> createAsyncCallbackLoggerMt(hipdnnCallback_t callback,
+                                                                   const std::string& source)
 {
-    auto sink = std::make_shared<hipdnn::logging::callback_sink_mt>(callback);
+    auto sink = std::make_shared<hipdnn::logging::CallbackSinkMt>(callback);
     auto logger = std::make_shared<spdlog::async_logger>(
         source, sink, spdlog::thread_pool(), spdlog::async_overflow_policy::block);
-    logger->set_pattern(generate_pattern_string(source));
+    logger->set_pattern(generatePatternString(source));
     logger->flush_on(spdlog::level::info);
     return logger;
 }
 
 template <typename Factory = spdlog::synchronous_factory>
-inline std::shared_ptr<spdlog::logger> create_callback_logger_mt(hipdnnCallback_t callback,
-                                                                 const std::string& source)
+inline std::shared_ptr<spdlog::logger> createCallbackLoggerMt(hipdnnCallback_t callback,
+                                                              const std::string& source)
 {
-    auto logger = Factory::template create<hipdnn::logging::callback_sink_mt>(source, callback);
-    logger->set_pattern(generate_pattern_string(source));
+    auto logger = Factory::template create<hipdnn::logging::CallbackSinkMt>(source, callback);
+    logger->set_pattern(generatePatternString(source));
     return logger;
 }
 

@@ -346,7 +346,7 @@ public:
             }
 
             // Generate Y strides using the extracted stride order and Y dimensions
-            auto yStrides = hipdnn_sdk::utilities::generate_strides(yDimsFinal, strideOrder);
+            auto yStrides = hipdnn_sdk::utilities::generateStrides(yDimsFinal, strideOrder);
 
             y->set_stride(yStrides);
         }

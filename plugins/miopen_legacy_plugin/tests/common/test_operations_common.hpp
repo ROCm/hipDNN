@@ -13,56 +13,55 @@ namespace test_operations_common
 
 using namespace hipdnn_sdk::reference_test_utilities;
 
-struct Bn_2d_test_case
+struct Batchnorm2dTestCase
 {
     int64_t n;
     int64_t c;
     int64_t h;
     int64_t w;
 
-    friend std::ostream& operator<<(std::ostream& ss, const Bn_2d_test_case& tc)
+    friend std::ostream& operator<<(std::ostream& ss, const Batchnorm2dTestCase& tc)
     {
         return ss << "(n:" << tc.n << " c:" << tc.c << " h:" << tc.h << " w:" << tc.w << ")";
     }
 
-    std::vector<int64_t> get_dims() const
+    std::vector<int64_t> getDims() const
     {
         return {n, c, h, w};
     }
 };
 
 template <typename T>
-hipdnnPluginDeviceBuffer_t generate_random_device_buffer(
-    Tensor_interface<T>& tensor, int uid, T min, T max, unsigned int seed = 0)
-{
-    tensor.fill_with_random_values(min, max, seed);
-    hipdnnPluginDeviceBuffer_t buffer;
-    buffer.uid = uid;
-    buffer.ptr = tensor.memory().device_data();
-    return buffer;
-}
-
-template <typename T>
 hipdnnPluginDeviceBuffer_t
-    generate_static_device_buffer(Tensor_interface<T>& tensor, int uid, T value)
+    generateRandomDeviceBuffer(ITensor<T>& tensor, int uid, T min, T max, unsigned int seed = 0)
 {
-    tensor.fill_with_value(value);
+    tensor.fillWithRandomValues(min, max, seed);
     hipdnnPluginDeviceBuffer_t buffer;
     buffer.uid = uid;
-    buffer.ptr = tensor.memory().device_data();
+    buffer.ptr = tensor.memory().deviceData();
     return buffer;
 }
 
 template <typename T>
-hipdnnPluginDeviceBuffer_t generate_empty_device_buffer(Tensor_interface<T>& tensor, int uid)
+hipdnnPluginDeviceBuffer_t generateStaticDeviceBuffer(ITensor<T>& tensor, int uid, T value)
 {
+    tensor.fillWithValue(value);
     hipdnnPluginDeviceBuffer_t buffer;
     buffer.uid = uid;
-    buffer.ptr = tensor.memory().device_data();
+    buffer.ptr = tensor.memory().deviceData();
     return buffer;
 }
 
-inline std::vector<Bn_2d_test_case> get_bn_2d_test_cases()
+template <typename T>
+hipdnnPluginDeviceBuffer_t generateEmptyDeviceBuffer(ITensor<T>& tensor, int uid)
+{
+    hipdnnPluginDeviceBuffer_t buffer;
+    buffer.uid = uid;
+    buffer.ptr = tensor.memory().deviceData();
+    return buffer;
+}
+
+inline std::vector<Batchnorm2dTestCase> getBatchnorm2dTestCases()
 {
     return {
         {.n = 1, .c = 3, .h = 14, .w = 14},
