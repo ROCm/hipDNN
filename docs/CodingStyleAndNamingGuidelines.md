@@ -26,7 +26,9 @@ This document defines the canonical project-wide coding and test naming conventi
   - [Test (gtest)](#test-gtest)
 - [12. Decision Checklist](#12-decision-checklist)
 - [13. Deviation Process](#13-deviation-process)
-- [14. Future Improvements](#14-future-improvements)
+- [14. Automated Tooling](#14-automated-tooling)
+  - [14.1 Clang-Tidy Rules](#141-clang-tidy-rules)
+  - [14.2 Test Naming Enforcement Tool](#142-test-naming-enforcement-tool)
 
 ## 1. Naming Summary
 
@@ -88,7 +90,6 @@ If later you add invariants or non-trivial behavior, consider converting to a cl
 
 - Naming: `IInterfaceName`.
 - Keep pure abstract; avoid data members.
-- Prefer minimal surface area; segregate roles into multiple interfaces if needed.
 
 ## 8. Enums
 
@@ -228,11 +229,27 @@ When adding new code, verify:
 
 If an external API or standard library interop forces divergence (e.g., fixed enum value names), document the exception with a brief comment near the declaration.
 
-## 14. Future Improvements
+## 14. Automated Tooling
 
-- Automated lint / CI rule for test suite naming.
-- Scripted audit to migrate legacy underscore-heavy identifiers progressively.
+The repository includes automated tooling to enforce coding standards and maintain consistency across the codebase.
+
+### 14.1 Clang-Tidy Rules
+
+The project uses clang-tidy to automatically enforce many of the coding style guidelines defined in this document. The configuration can be found in `.clang-tidy` at the repository root.
+
+The CI pipeline automatically runs clang-tidy on all pull requests to ensure compliance before merging.
+
+### 14.2 Test Naming Enforcement Tool
+
+*[Placeholder: A dedicated test naming enforcement tool is planned to automatically validate that all test names follow the conventions outlined in Section 10]*
+
+This tool will:
+- Parse all test files and extract TEST/TEST_F suite names
+- Validate ordering of keywords (Integration, Gpu, Feature, Layout, Datatype)
+- Check for prohibited underscores in test suite names
+- Generate reports on non-compliant test names
+- Integrate with CI to block merges with invalid test names
 
 ---
 
-Adhering to these rules maintains readability, consistency, and tooling friendliness across the codebase.
+Adhering to these rules and utilizing the automated tooling maintains readability, consistency, and tooling friendliness across the codebase.
