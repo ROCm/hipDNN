@@ -8,7 +8,7 @@
 #include <hipdnn_sdk/logging/logger.hpp>
 #include <hipdnn_status.h>
 
-inline const char* to_string(hipdnnStatus_t status)
+inline const char* toString(hipdnnStatus_t status)
 {
     switch(status)
     {
@@ -49,7 +49,7 @@ inline const char* to_string(hipdnnStatus_t status)
 
 inline std::ostream& operator<<(std::ostream& os, hipdnnStatus_t status)
 {
-    return os << to_string(status);
+    return os << toString(status);
 }
 
 template <>
@@ -58,6 +58,6 @@ struct fmt::formatter<hipdnnStatus_t> : fmt::formatter<const char*>
     template <typename FormatContext>
     auto format(hipdnnStatus_t status, FormatContext& ctx) const
     {
-        return fmt::formatter<const char*>::format(to_string(status), ctx);
+        return fmt::formatter<const char*>::format(toString(status), ctx);
     }
 };

@@ -12,7 +12,7 @@
 namespace hipdnn_frontend
 {
 
-class Scoped_hipdnn_backend_descriptor
+class ScopedHipdnnBackendDescriptor
 {
 private:
     hipdnnBackendDescriptor_t _descriptor;
@@ -20,74 +20,74 @@ private:
 
     // For some reason clang isnt picking up the usage of the two variables correctly.
     // Ive marked them as [[maybe_unused]] to avoid warnings.
-    static void log_backend_error([[maybe_unused]] const std::string& error_string,
+    static void logBackendError([[maybe_unused]] const std::string& errorString,
                                   [[maybe_unused]] const hipdnnStatus_t status)
     {
-        std::array<char, HIPDNN_MAX_ERROR_STRING_SIZE> backend_err_msg;
-        hipdnn_frontend::hipdnn_backend()->get_last_error_string(backend_err_msg.data(),
-                                                                 backend_err_msg.size());
+        std::array<char, HIPDNN_MAX_ERROR_STRING_SIZE> backendErrMsg;
+        hipdnn_frontend::hipdnnBackend()->getLastErrorString(backendErrMsg.data(),
+                                                                 backendErrMsg.size());
         HIPDNN_LOG_ERROR(
-            "{}: {}. Backend error string: {}", error_string, status, backend_err_msg.data());
+            "{}: {}. Backend error string: {}", errorString, status, backendErrMsg.data());
     }
 
 public:
-    Scoped_hipdnn_backend_descriptor()
+    ScopedHipdnnBackendDescriptor()
         : _descriptor(nullptr)
         , _valid(false)
     {
     }
 
-    Scoped_hipdnn_backend_descriptor(hipdnnBackendDescriptor_t descriptor)
+    ScopedHipdnnBackendDescriptor(hipdnnBackendDescriptor_t descriptor)
         : _descriptor(descriptor)
         , _valid(true)
     {
     }
 
-    explicit Scoped_hipdnn_backend_descriptor(hipdnnBackendDescriptorType_t descriptor_type)
+    explicit ScopedHipdnnBackendDescriptor(hipdnnBackendDescriptorType_t descriptorType)
     {
-        auto status = hipdnn_backend()->backend_create_descriptor(descriptor_type, &_descriptor);
+        auto status = hipdnnBackend()->backendCreateDescriptor(descriptorType, &_descriptor);
 
         _valid = (status == HIPDNN_STATUS_SUCCESS);
 
         if(!_valid)
         {
             _descriptor = nullptr;
-            log_backend_error("Failed to create backend descriptor", status);
+            logBackendError("Failed to create backend descriptor", status);
         }
     }
 
-    explicit Scoped_hipdnn_backend_descriptor(const uint8_t* serialized_graph,
-                                              size_t graph_byte_size)
+    explicit ScopedHipdnnBackendDescriptor(const uint8_t* serializedGraph,
+                                              size_t graphByteSize)
     {
-        auto status = hipdnn_backend()->backend_create_and_deserialize_graph_ext(
-            &_descriptor, serialized_graph, graph_byte_size);
+        auto status = hipdnnBackend()->backendCreateAndDeserializeGraphExt(
+            &_descriptor, serializedGraph, graphByteSize);
 
         _valid = (status == HIPDNN_STATUS_SUCCESS);
 
         if(!_valid)
         {
             _descriptor = nullptr;
-            log_backend_error("Failed to create and deserialize graph", status);
+            logBackendError("Failed to create and deserialize graph", status);
         }
     }
 
-    ~Scoped_hipdnn_backend_descriptor()
+    ~ScopedHipdnnBackendDescriptor()
     {
         if(_valid && _descriptor != nullptr)
         {
-            auto status = hipdnn_backend()->backend_destroy_descriptor(_descriptor);
+            auto status = hipdnnBackend()->backendDestroyDescriptor(_descriptor);
 
             if(status != HIPDNN_STATUS_SUCCESS)
             {
-                log_backend_error("Failed to destroy backend descriptor", status);
+                logBackendError("Failed to destroy backend descriptor", status);
             }
         }
     }
 
-    Scoped_hipdnn_backend_descriptor(const Scoped_hipdnn_backend_descriptor&) = delete;
-    Scoped_hipdnn_backend_descriptor& operator=(const Scoped_hipdnn_backend_descriptor&) = delete;
+    ScopedHipdnnBackendDescriptor(const ScopedHipdnnBackendDescriptor&) = delete;
+    ScopedHipdnnBackendDescriptor& operator=(const ScopedHipdnnBackendDescriptor&) = delete;
 
-    Scoped_hipdnn_backend_descriptor(Scoped_hipdnn_backend_descriptor&& other) noexcept
+    ScopedHipdnnBackendDescriptor(ScopedHipdnnBackendDescriptor&& other) noexcept
         : _descriptor(other._descriptor)
         , _valid(other._valid)
     {
@@ -95,16 +95,16 @@ public:
         other._valid = false;
     }
 
-    Scoped_hipdnn_backend_descriptor& operator=(Scoped_hipdnn_backend_descriptor&& other) noexcept
+    ScopedHipdnnBackendDescriptor& operator=(ScopedHipdnnBackendDescriptor&& other) noexcept
     {
         if(this != &other)
         {
             if(_valid && _descriptor != nullptr)
             {
-                auto status = hipdnn_backend()->backend_destroy_descriptor(_descriptor);
+                auto status = hipdnnBackend()->backendDestroyDescriptor(_descriptor);
                 if(status != HIPDNN_STATUS_SUCCESS)
                 {
-                    log_backend_error("Failed to destroy backend descriptor during move assignment",
+                    logBackendError("Failed to destroy backend descriptor during move assignment",
                                       status);
                 }
             }

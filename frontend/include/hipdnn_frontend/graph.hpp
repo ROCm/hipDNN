@@ -25,7 +25,7 @@ namespace graph
     if((backend_status) != HIPDNN_STATUS_SUCCESS)                                         \
     {                                                                                     \
         std::array<char, 256> backend_err_msg{};                                          \
-        hipdnn_frontend::hipdnn_backend()->get_last_error_string(backend_err_msg.data(),  \
+        hipdnn_frontend::hipdnnBackend()->getLastErrorString(backend_err_msg.data(),  \
                                                                  backend_err_msg.size()); \
         std::string full_error_msg                                                        \
             = std::string(error_message) + " Backend error: " + backend_err_msg.data();   \
@@ -35,10 +35,10 @@ namespace graph
 class Graph : public INode
 {
 private:
-    std::unique_ptr<Scoped_hipdnn_backend_descriptor> _graph_desc;
-    std::unique_ptr<Scoped_hipdnn_backend_descriptor> _engine_heuristic_desc;
-    std::unique_ptr<Scoped_hipdnn_backend_descriptor> _engine_config_desc;
-    std::unique_ptr<Scoped_hipdnn_backend_descriptor> _execution_plan_desc;
+    std::unique_ptr<ScopedHipdnnBackendDescriptor> _graph_desc;
+    std::unique_ptr<ScopedHipdnnBackendDescriptor> _engine_heuristic_desc;
+    std::unique_ptr<ScopedHipdnnBackendDescriptor> _engine_config_desc;
+    std::unique_ptr<ScopedHipdnnBackendDescriptor> _execution_plan_desc;
 
     static std::shared_ptr<TensorAttributes> output_tensor(const std::string& name)
     {
@@ -49,11 +49,11 @@ private:
 
     error_t initialize_heuristic_descriptor(std::vector<HeurMode_t> const& modes)
     {
-        _engine_heuristic_desc = std::make_unique<Scoped_hipdnn_backend_descriptor>(
+        _engine_heuristic_desc = std::make_unique<ScopedHipdnnBackendDescriptor>(
             HIPDNN_BACKEND_ENGINEHEUR_DESCRIPTOR);
 
         RETURN_ON_BACKEND_FAILURE(
-            hipdnn_backend()->backend_set_attribute(_engine_heuristic_desc->get(),
+            hipdnnBackend()->backendSetAttribute(_engine_heuristic_desc->get(),
                                                     HIPDNN_ATTR_ENGINEHEUR_OPERATION_GRAPH,
                                                     HIPDNN_TYPE_BACKEND_DESCRIPTOR,
                                                     1,
@@ -72,14 +72,14 @@ private:
         }
 
         RETURN_ON_BACKEND_FAILURE(
-            hipdnn_backend()->backend_set_attribute(_engine_heuristic_desc->get(),
+            hipdnnBackend()->backendSetAttribute(_engine_heuristic_desc->get(),
                                                     HIPDNN_ATTR_ENGINEHEUR_MODE,
                                                     HIPDNN_TYPE_HEUR_MODE,
                                                     1,
                                                     backend_modes.data()),
             "Failed to set mode on the engine heuristic descriptor.");
 
-        RETURN_ON_BACKEND_FAILURE(hipdnn_backend()->backend_finalize(_engine_heuristic_desc->get()),
+        RETURN_ON_BACKEND_FAILURE(hipdnnBackend()->backendFinalize(_engine_heuristic_desc->get()),
                                   "Failed to finalize engine heuristic descriptor");
 
         return {error_code_t::OK, ""};
@@ -89,7 +89,7 @@ private:
     {
         int64_t available_engine_count = 0;
         RETURN_ON_BACKEND_FAILURE(
-            hipdnn_backend()->backend_get_attribute(_engine_heuristic_desc->get(),
+            hipdnnBackend()->backendGetAttribute(_engine_heuristic_desc->get(),
                                                     HIPDNN_ATTR_ENGINEHEUR_RESULTS,
                                                     HIPDNN_TYPE_BACKEND_DESCRIPTOR,
                                                     0,
@@ -104,11 +104,11 @@ private:
         }
 
         int required_count = 1;
-        std::vector<std::unique_ptr<Scoped_hipdnn_backend_descriptor>> engine_configs;
+        std::vector<std::unique_ptr<ScopedHipdnnBackendDescriptor>> engine_configs;
         std::vector<hipdnnBackendDescriptor_t> engine_configs_shallow;
         for(size_t i = 0; std::cmp_less(i, required_count); ++i)
         {
-            auto engine_cfg_desc = std::make_unique<Scoped_hipdnn_backend_descriptor>(
+            auto engine_cfg_desc = std::make_unique<ScopedHipdnnBackendDescriptor>(
                 HIPDNN_BACKEND_ENGINECFG_DESCRIPTOR);
 
             if(engine_cfg_desc == nullptr || !engine_cfg_desc->valid())
@@ -122,7 +122,7 @@ private:
 
         int64_t count = 0;
         RETURN_ON_BACKEND_FAILURE(
-            hipdnn_backend()->backend_get_attribute(
+            hipdnnBackend()->backendGetAttribute(
                 _engine_heuristic_desc->get(),
                 HIPDNN_ATTR_ENGINEHEUR_RESULTS,
                 HIPDNN_TYPE_BACKEND_DESCRIPTOR,
@@ -196,7 +196,7 @@ public:
 
         builder.Finish(graph);
         auto serialized_graph = builder.Release();
-        _graph_desc = std::make_unique<Scoped_hipdnn_backend_descriptor>(serialized_graph.data(),
+        _graph_desc = std::make_unique<ScopedHipdnnBackendDescriptor>(serialized_graph.data(),
                                                                          serialized_graph.size());
 
         if(!_graph_desc->valid())
@@ -206,14 +206,14 @@ public:
         }
 
         RETURN_ON_BACKEND_FAILURE(
-            hipdnn_backend()->backend_set_attribute(_graph_desc->get(),
+            hipdnnBackend()->backendSetAttribute(_graph_desc->get(),
                                                     HIPDNN_ATTR_OPERATIONGRAPH_HANDLE,
                                                     HIPDNN_TYPE_HANDLE,
                                                     1,
                                                     &handle),
             "Failed to set handle on the graph.");
 
-        RETURN_ON_BACKEND_FAILURE(hipdnn_backend()->backend_finalize(_graph_desc->get()),
+        RETURN_ON_BACKEND_FAILURE(hipdnnBackend()->backendFinalize(_graph_desc->get()),
                                   "Failed to finalize backend descriptor for the graph");
 
         return {error_code_t::OK, ""};
@@ -235,7 +235,7 @@ public:
         status = initialize_engine_config();
         HIPDNN_CHECK_ERROR(status);
 
-        _execution_plan_desc = std::make_unique<Scoped_hipdnn_backend_descriptor>(
+        _execution_plan_desc = std::make_unique<ScopedHipdnnBackendDescriptor>(
             HIPDNN_BACKEND_EXECUTION_PLAN_DESCRIPTOR);
 
         if(!_execution_plan_desc->valid())
@@ -245,7 +245,7 @@ public:
         }
 
         RETURN_ON_BACKEND_FAILURE(
-            hipdnn_backend()->backend_set_attribute(_execution_plan_desc->get(),
+            hipdnnBackend()->backendSetAttribute(_execution_plan_desc->get(),
                                                     HIPDNN_ATTR_EXECUTION_PLAN_HANDLE,
                                                     HIPDNN_TYPE_HANDLE,
                                                     1,
@@ -268,18 +268,18 @@ public:
 
     error_t build_plans()
     {
-        RETURN_ON_BACKEND_FAILURE(hipdnn_backend()->backend_finalize(_engine_config_desc->get()),
+        RETURN_ON_BACKEND_FAILURE(hipdnnBackend()->backendFinalize(_engine_config_desc->get()),
                                   "Failed to finalize engine config descriptor");
 
         RETURN_ON_BACKEND_FAILURE(
-            hipdnn_backend()->backend_set_attribute(_execution_plan_desc->get(),
+            hipdnnBackend()->backendSetAttribute(_execution_plan_desc->get(),
                                                     HIPDNN_ATTR_EXECUTION_PLAN_ENGINE_CONFIG,
                                                     HIPDNN_TYPE_BACKEND_DESCRIPTOR,
                                                     1,
                                                     &_engine_config_desc->get()),
             "Failed to set the engine config on execution plan.");
 
-        RETURN_ON_BACKEND_FAILURE(hipdnn_backend()->backend_finalize(_execution_plan_desc->get()),
+        RETURN_ON_BACKEND_FAILURE(hipdnnBackend()->backendFinalize(_execution_plan_desc->get()),
                                   "Failed to finalize execution plan descriptor");
 
         return {error_code_t::OK, ""};
@@ -288,7 +288,7 @@ public:
     error_t get_workspace_size(int64_t& workspace_size) const
     {
         RETURN_ON_BACKEND_FAILURE(
-            hipdnn_backend()->backend_get_attribute(_execution_plan_desc->get(),
+            hipdnnBackend()->backendGetAttribute(_execution_plan_desc->get(),
                                                     HIPDNN_ATTR_EXECUTION_PLAN_WORKSPACE_SIZE,
                                                     HIPDNN_TYPE_INT64,
                                                     1,
@@ -303,7 +303,7 @@ public:
                     std::unordered_map<int64_t, void*>& variant_pack,
                     void* workspace) const
     {
-        auto variant_pack_desc = std::make_unique<Scoped_hipdnn_backend_descriptor>(
+        auto variant_pack_desc = std::make_unique<ScopedHipdnnBackendDescriptor>(
             HIPDNN_BACKEND_VARIANT_PACK_DESCRIPTOR);
         if(!variant_pack_desc || !variant_pack_desc->valid())
         {
@@ -322,7 +322,7 @@ public:
             variant_pack_values.push_back(value);
         }
 
-        RETURN_ON_BACKEND_FAILURE(hipdnn_backend()->backend_set_attribute(
+        RETURN_ON_BACKEND_FAILURE(hipdnnBackend()->backendSetAttribute(
                                       variant_pack_desc->get(),
                                       HIPDNN_ATTR_VARIANT_PACK_DATA_POINTERS,
                                       HIPDNN_TYPE_VOID_PTR,
@@ -331,7 +331,7 @@ public:
                                   "failed to set the variant pack data pointers.");
 
         RETURN_ON_BACKEND_FAILURE(
-            hipdnn_backend()->backend_set_attribute(variant_pack_desc->get(),
+            hipdnnBackend()->backendSetAttribute(variant_pack_desc->get(),
                                                     HIPDNN_ATTR_VARIANT_PACK_UNIQUE_IDS,
                                                     HIPDNN_TYPE_INT64,
                                                     static_cast<int64_t>(variant_pack_keys.size()),
@@ -339,17 +339,17 @@ public:
             "failed to set the variant pack unique ids.");
 
         RETURN_ON_BACKEND_FAILURE(
-            hipdnn_backend()->backend_set_attribute(variant_pack_desc->get(),
+            hipdnnBackend()->backendSetAttribute(variant_pack_desc->get(),
                                                     HIPDNN_ATTR_VARIANT_PACK_WORKSPACE,
                                                     HIPDNN_TYPE_VOID_PTR,
                                                     1,
                                                     &workspace),
             "failed to set the variant pack unique ids.");
 
-        RETURN_ON_BACKEND_FAILURE(hipdnn_backend()->backend_finalize(variant_pack_desc->get()),
+        RETURN_ON_BACKEND_FAILURE(hipdnnBackend()->backendFinalize(variant_pack_desc->get()),
                                   "Failed to finalize variant pack descriptor");
 
-        RETURN_ON_BACKEND_FAILURE(hipdnn_backend()->backend_execute(handle,
+        RETURN_ON_BACKEND_FAILURE(hipdnnBackend()->backendExecute(handle,
                                                                     _execution_plan_desc->get(),
                                                                     variant_pack_desc->get()),
                                   "Execute failed.");
