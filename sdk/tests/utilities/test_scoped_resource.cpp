@@ -22,7 +22,7 @@ TEST(ScopedResourceTest, BasicUsage)
 
     {
         utilities::ScopedResource sr(&r, [](auto r) { r->released = true; });
-        ASSERT_TRUE(!sr.is_empty());
+        ASSERT_TRUE(!sr.isEmpty());
         ASSERT_EQ(sr.get()->released, r.released);
     }
 
@@ -37,8 +37,8 @@ TEST(ScopedResourceTest, CheckMove)
         utilities::ScopedResource sr1(&r, [](auto r) { r->released = true; });
 
         utilities::ScopedResource sr2(std::move(sr1));
-        ASSERT_TRUE(sr1.is_empty());
-        ASSERT_FALSE(sr2.is_empty());
+        ASSERT_TRUE(sr1.isEmpty());
+        ASSERT_FALSE(sr2.isEmpty());
         ASSERT_FALSE(r.released);
     }
 
@@ -59,8 +59,8 @@ TEST(ScopedResourceTest, CheckMoveAssign)
         ASSERT_FALSE(r1.released);
         ASSERT_TRUE(r2.released);
 
-        ASSERT_TRUE(sr1.is_empty());
-        ASSERT_FALSE(sr2.is_empty());
+        ASSERT_TRUE(sr1.isEmpty());
+        ASSERT_FALSE(sr2.isEmpty());
     }
 
     ASSERT_TRUE(r1.released);
