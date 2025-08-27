@@ -3,10 +3,10 @@
 #pragma once
 
 #include "Node.hpp"
-#include <hipdnn_frontend/attributes/BatchnormAttributes.hpp>
-#include <hipdnn_frontend/attributes/GraphAttributes.hpp>
 #include <hipdnn_frontend/Error.hpp>
 #include <hipdnn_frontend/Utilities.hpp>
+#include <hipdnn_frontend/attributes/BatchnormAttributes.hpp>
+#include <hipdnn_frontend/attributes/GraphAttributes.hpp>
 #include <hipdnn_sdk/data_objects/graph_generated.h>
 #include <hipdnn_sdk/utilities/ShapeUtils.hpp>
 

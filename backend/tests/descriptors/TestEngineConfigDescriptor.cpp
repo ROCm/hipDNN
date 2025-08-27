@@ -1,6 +1,8 @@
 // Copyright © Advanced Micro Devices, Inc., or its affiliates.
 // SPDX-License-Identifier: MIT
 
+#include "TestDescriptorUtils.hpp"
+#include "TestMacros.hpp"
 #include "descriptors/EngineConfigDescriptor.hpp"
 #include "descriptors/EngineDescriptor.hpp"
 #include "descriptors/GraphDescriptor.hpp"
@@ -9,8 +11,6 @@
 #include "mocks/MockDescriptor.hpp"
 #include "mocks/MockEnginePluginResourceManager.hpp"
 #include "mocks/MockHandle.hpp"
-#include "TestDescriptorUtils.hpp"
-#include "TestMacros.hpp"
 
 #include <gtest/gtest.h>
 

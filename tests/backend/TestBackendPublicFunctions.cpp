@@ -2,8 +2,8 @@
 // SPDX-License-Identifier:  MIT
 
 #include "../test_plugins/TestPluginConstants.hpp"
-#include "hipdnn_backend.h"
 #include "TestUtil.hpp"
+#include "hipdnn_backend.h"
 #include <array>
 #include <gtest/gtest.h>
 #include <hipdnn_sdk/data_objects/graph_generated.h>

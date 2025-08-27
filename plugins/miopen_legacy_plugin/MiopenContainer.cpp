@@ -6,9 +6,9 @@
 #include <hipdnn_sdk/logging/Logger.hpp>
 
 #include "EngineManager.hpp"
+#include "MiopenContainer.hpp"
 #include "engines/MiopenEngine.hpp"
 #include "engines/plans/MiopenBatchnormPlanBuilder.hpp"
-#include "MiopenContainer.hpp"
 
 namespace miopen_legacy_plugin
 {

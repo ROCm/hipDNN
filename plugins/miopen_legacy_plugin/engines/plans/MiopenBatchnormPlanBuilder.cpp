@@ -7,9 +7,9 @@
 #include <miopen/miopen.h>
 #include <string>
 
+#include "MiopenBatchnormPlanBuilder.hpp"
 #include "engines/plans/MiopenBatchnormBwdPlan.hpp"
 #include "engines/plans/MiopenBatchnormFwdInferencePlan.hpp"
-#include "MiopenBatchnormPlanBuilder.hpp"
 
 namespace miopen_legacy_plugin
 {
@@ -75,9 +75,9 @@ void buildPlanInferenceSingleNode(const HipdnnEnginePluginHandle& handle,
 }
 
 void buildPlanBwdSingleNode(const HipdnnEnginePluginHandle& handle,
-                                const hipdnn_plugin::IGraph& opGraph,
-                                const hipdnn_sdk::data_objects::Node& node,
-                                HipdnnEnginePluginExecutionContext& executionContext)
+                            const hipdnn_plugin::IGraph& opGraph,
+                            const hipdnn_sdk::data_objects::Node& node,
+                            HipdnnEnginePluginExecutionContext& executionContext)
 {
     std::ignore = handle;
 

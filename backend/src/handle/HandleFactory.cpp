@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: MIT
 
 #include "handle/HandleFactory.hpp"
-#include "handle/Handle.hpp"
 #include "HipdnnException.hpp"
+#include "handle/Handle.hpp"
 #include "logging/Logging.hpp"
 
 namespace hipdnn_backend

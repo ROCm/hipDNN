@@ -5,8 +5,8 @@
 
 #include <hipdnn_backend.h>
 #include <hipdnn_frontend.hpp>
-#include <hipdnn_frontend/attributes/BatchnormBackwardAttributes.hpp>
 #include <hipdnn_frontend/Graph.hpp>
+#include <hipdnn_frontend/attributes/BatchnormBackwardAttributes.hpp>
 #include <hipdnn_sdk/test_utilities/CpuFpReferenceImplementation.hpp>
 #include <hipdnn_sdk/test_utilities/CpuFpReferenceValidation.hpp>
 #include <hipdnn_sdk/utilities/Tensor.hpp>

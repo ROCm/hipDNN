@@ -14,9 +14,9 @@
 #include <hipdnn_sdk/utilities/HipBfloat16Utils.hpp>
 #include <hipdnn_sdk/utilities/Tensor.hpp>
 
-#include "common/TestOperationsCommon.hpp"
 #include "HipdnnEnginePluginExecutionContext.hpp"
 #include "HipdnnEnginePluginHandle.hpp"
+#include "common/TestOperationsCommon.hpp"
 
 using namespace hipdnn_sdk::reference_test_utilities;
 using namespace test_operations_common;

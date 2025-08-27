@@ -2,9 +2,9 @@
 // SPDX-License-Identifier:  MIT
 #pragma once
 
+#include <hipdnn_frontend/Error.hpp>
 #include <hipdnn_frontend/attributes/GraphAttributes.hpp>
 #include <hipdnn_frontend/attributes/TensorAttributes.hpp>
-#include <hipdnn_frontend/Error.hpp>
 #include <hipdnn_sdk/data_objects/graph_generated.h>
 #include <memory>
 #include <unordered_map>

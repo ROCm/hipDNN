@@ -6,9 +6,9 @@
 #include <hipdnn_sdk/plugin/PluginApiDataTypes.h>
 #include <hipdnn_sdk/utilities/PlatformUtils.hpp>
 
-#include "descriptors/TestMacros.hpp"
 #include "HipdnnException.hpp"
 #include "PlatformUtils.hpp"
+#include "descriptors/TestMacros.hpp"
 #include "plugin/SharedLibrary.hpp"
 
 using namespace hipdnn_backend;

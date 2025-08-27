@@ -1,18 +1,18 @@
 // Copyright © Advanced Micro Devices, Inc., or its affiliates.
 // SPDX-License-Identifier: MIT
 
+#include "HipdnnException.hpp"
+#include "TestDescriptorUtils.hpp"
+#include "TestMacros.hpp"
 #include "descriptors/EngineConfigDescriptor.hpp"
 #include "descriptors/EngineDescriptor.hpp"
 #include "descriptors/EngineHeuristicDescriptor.hpp"
 #include "descriptors/GraphDescriptor.hpp"
 #include "descriptors/ScopedDescriptor.hpp"
 #include "hipdnn_backend.h"
-#include "HipdnnException.hpp"
 #include "mocks/MockDescriptor.hpp"
 #include "mocks/MockEnginePluginResourceManager.hpp"
 #include "mocks/MockHandle.hpp"
-#include "TestDescriptorUtils.hpp"
-#include "TestMacros.hpp"
 
 #include <gtest/gtest.h>
 #include <hipdnn_sdk/data_objects/engine_details_generated.h>

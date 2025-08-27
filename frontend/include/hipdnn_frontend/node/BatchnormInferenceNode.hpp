@@ -3,9 +3,9 @@
 #pragma once
 
 #include "Node.hpp"
+#include <hipdnn_frontend/Error.hpp>
 #include <hipdnn_frontend/attributes/BatchnormInferenceAttributes.hpp>
 #include <hipdnn_frontend/attributes/GraphAttributes.hpp>
-#include <hipdnn_frontend/Error.hpp>
 #include <hipdnn_sdk/data_objects/graph_generated.h>
 
 namespace hipdnn_frontend::graph

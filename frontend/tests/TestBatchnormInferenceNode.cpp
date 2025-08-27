@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
-#include <hipdnn_frontend/attributes/BatchnormInferenceAttributes.hpp>
 #include <hipdnn_frontend/Error.hpp>
+#include <hipdnn_frontend/attributes/BatchnormInferenceAttributes.hpp>
 #include <hipdnn_frontend/node/BatchnormInferenceNode.hpp>
 
 using namespace hipdnn_frontend;

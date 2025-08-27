@@ -2,10 +2,10 @@
 // SPDX-License-Identifier:  MIT
 
 #include <gtest/gtest.h>
+#include <hipdnn_frontend/Error.hpp>
 #include <hipdnn_frontend/attributes/GraphAttributes.hpp>
 #include <hipdnn_frontend/attributes/PointwiseAttributes.hpp>
 #include <hipdnn_frontend/attributes/TensorAttributes.hpp>
-#include <hipdnn_frontend/Error.hpp>
 #include <hipdnn_frontend/node/PointwiseNode.hpp>
 
 using namespace hipdnn_frontend;

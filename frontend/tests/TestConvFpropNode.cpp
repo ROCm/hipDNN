@@ -1,8 +1,8 @@
 // Copyright © Advanced Micro Devices, Inc., or its affiliates.
 // SPDX-License-Identifier:  MIT
 #include <gtest/gtest.h>
-#include <hipdnn_frontend/attributes/ConvolutionFwdAttributes.hpp>
 #include <hipdnn_frontend/Error.hpp>
+#include <hipdnn_frontend/attributes/ConvolutionFwdAttributes.hpp>
 #include <hipdnn_frontend/node/ConvolutionFpropNode.hpp>
 
 using namespace hipdnn_frontend;

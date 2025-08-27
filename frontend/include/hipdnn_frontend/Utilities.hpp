@@ -2,8 +2,8 @@
 // SPDX-License-Identifier:  MIT
 #pragma once
 
-#include "attributes/TensorAttributes.hpp"
 #include "Error.hpp"
+#include "attributes/TensorAttributes.hpp"
 #include <algorithm>
 #include <hipdnn_sdk/logging/CallbackTypes.h>
 #include <hipdnn_sdk/logging/Logger.hpp>

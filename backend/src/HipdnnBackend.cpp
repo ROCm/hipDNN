@@ -1,15 +1,15 @@
 // Copyright © Advanced Micro Devices, Inc., or its affiliates.
 // SPDX-License-Identifier:  MIT
 
-#include "hipdnn_backend.h"
+#include "Error.hpp"
+#include "Helpers.hpp"
+#include "HipdnnException.hpp"
 #include "descriptors/BackendDescriptor.hpp"
 #include "descriptors/DescriptorFactory.hpp"
 #include "descriptors/VariantDescriptor.hpp"
-#include "Error.hpp"
 #include "handle/Handle.hpp"
 #include "handle/HandleFactory.hpp"
-#include "Helpers.hpp"
-#include "HipdnnException.hpp"
+#include "hipdnn_backend.h"
 #include "logging/Logging.hpp"
 #include "plugin/EnginePluginResourceManager.hpp"
 #include <hipdnn_sdk/logging/CallbackTypes.h>

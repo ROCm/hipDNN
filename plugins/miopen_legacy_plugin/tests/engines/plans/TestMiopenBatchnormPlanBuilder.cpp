@@ -9,8 +9,8 @@
 #include <hipdnn_sdk/plugin/test_utils/MockGraph.hpp>
 #include <hipdnn_sdk/test_utilities/FlatbufferGraphTestUtils.hpp>
 
-#include "engines/plans/MiopenBatchnormPlanBuilder.hpp"
 #include "HipdnnEnginePluginHandle.hpp"
+#include "engines/plans/MiopenBatchnormPlanBuilder.hpp"
 
 #include "mocks/MockHipdnnEnginePluginExecutionContext.hpp"
 
