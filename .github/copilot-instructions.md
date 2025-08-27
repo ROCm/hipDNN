@@ -1,13 +1,93 @@
-When generating code, use Leading_upper_snake_case for class and struct names, use lower_case for functions, variables, and private members.  Prefix private members with _.
+# Copilot Rules for hipDNN Project
 
-Always add copywrite lines "Copyright © Advanced Micro Devices, Inc., or its affiliates." and "SPDX-License-Identifier:  MIT" to the top of all source files.  Ensure you add those whenever you generate a file.
+## C++ Code Style
 
-When generating header files, add #pragma once at the top after the copywrite
+### Naming Conventions
+- Use CamelCase for class and struct names (e.g., `BatchNormTestCase`, `SimpleTensorBundle`)
+- Use camelBack for functions, variables, and private members (e.g., `setupEnvironment()`, `tensorData`)
+- Prefix private members with underscore (e.g., `_handle`, `_testData`)
 
-We use CMake for managing our c/c++ dependencies.  When talking about dependencies, always use cmake.
+### File Headers
+- Always add copyright header to all source files:
+  ```cpp
+  // Copyright © Advanced Micro Devices, Inc., or its affiliates.
+  // SPDX-License-Identifier:  MIT
+  ```
+- For header files (.h, .hpp), add `#pragma once` immediately after copyright
 
-We use Flatbuffers for serialization, if possible, please respond with flatbuffer relevent responses.
+### Code Practices
+- Use `auto` when initializing with a cast to avoid duplicating the type name
+  ```cpp
+  // Good
+  auto tensor = static_cast<float*>(data);
+  // Avoid
+  float* tensor = static_cast<float*>(data);
+  ```
+- Use auto when initializing variables, unless the type is not obvious.
 
-Use gtest when creating C/C++ tests. Dont generate a main function.
+### Build System
+- Always use CMake for managing C/C++ dependencies
+- When discussing dependencies or build configuration, provide CMake-based solutions
 
-Use auto when initializing with a cast to avoid duplicating the type name.
+### Serialization
+- Use Flatbuffers for serialization needs
+- Provide Flatbuffer schema definitions when creating serializable data structures
+
+### Testing
+- Use Google Test (gtest) framework for all C/C++ tests
+- Never generate a main() function in test files - gtest provides its own
+- Use TEST(), TEST_F(), or TEST_P() macros as appropriate
+
+## Example Code Structure
+
+```cpp
+// Copyright © Advanced Micro Devices, Inc., or its affiliates.
+// SPDX-License-Identifier:  MIT
+
+#pragma once  // For header files only
+
+#include <memory>
+#include <vector>
+
+// Class names in PascalCase
+class MyTestClass
+{
+public:
+    // Public methods in camelCase
+    void setupTest();
+    int getValue() const;
+
+private:
+    // Private members prefixed with _
+    int _testValue;
+    std::vector<float> _data;
+};
+
+// Functions in camelCase
+void processData(const MyTestClass& obj);
+```
+
+## Test File Example
+
+```cpp
+// Copyright © Advanced Micro Devices, Inc., or its affiliates.
+// SPDX-License-Identifier:  MIT
+
+#include <gtest/gtest.h>
+
+class MyTestFixture : public ::testing::Test
+{
+protected:
+    void SetUp() override
+    {
+        // Setup code
+    }
+
+private:
+    int _testData;
+};
+
+TEST_F(MyTestFixture, testSomething)
+{
+    // Test implementation
+}
