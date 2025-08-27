@@ -46,6 +46,9 @@ function(add_test_plugin target_name)
         PRIVATE 
             ${HIPDNN_WARNING_COMPILE_OPTIONS}
     )
+
+    clang_tidy_check(${target_name})
+
 endfunction()
 
 #NOTE: If you add a new test plugin, then ensure it is listed in the frontend and backend
