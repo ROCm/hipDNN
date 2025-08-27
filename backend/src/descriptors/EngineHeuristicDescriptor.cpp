@@ -6,10 +6,10 @@
 #include "EngineDescriptor.hpp"
 #include "Error.hpp"
 #include "GraphDescriptor.hpp"
-#include "handle/Handle.hpp"
 #include "HipdnnBackendDescriptorType.h"
 #include "HipdnnException.hpp"
 #include "ScopedDescriptor.hpp"
+#include "handle/Handle.hpp"
 
 namespace hipdnn_backend
 {

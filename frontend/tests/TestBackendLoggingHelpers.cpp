@@ -5,8 +5,8 @@
 #include <spdlog/spdlog.h>
 #include <sstream>
 
-#include <hipdnn_frontend/backend/BackendLoggingHelpers.hpp>
 #include <HipdnnStatus.h>
+#include <hipdnn_frontend/backend/BackendLoggingHelpers.hpp>
 
 TEST(BackendLoggingHelpersTest, ToString_AllStatusValues)
 {

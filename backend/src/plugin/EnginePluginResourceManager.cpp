@@ -6,14 +6,14 @@
 #include <mutex>
 #include <vector>
 
+#include "EnginePluginManager.hpp"
+#include "EnginePluginResourceManager.hpp"
+#include "HipdnnException.hpp"
 #include "descriptors/EngineConfigDescriptor.hpp"
 #include "descriptors/EngineDescriptor.hpp"
 #include "descriptors/ExecutionPlanDescriptor.hpp"
 #include "descriptors/GraphDescriptor.hpp"
 #include "descriptors/VariantDescriptor.hpp"
-#include "EnginePluginManager.hpp"
-#include "EnginePluginResourceManager.hpp"
-#include "HipdnnException.hpp"
 #include "logging/Logging.hpp"
 #include <hipdnn_sdk/utilities/StringUtil.hpp>
 

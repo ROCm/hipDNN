@@ -3,8 +3,8 @@
 
 #pragma once
 
-#include "hipdnn_backend.h"
 #include "HipdnnException.hpp"
+#include "hipdnn_backend.h"
 #include <memory>
 
 struct IBackendDescriptor

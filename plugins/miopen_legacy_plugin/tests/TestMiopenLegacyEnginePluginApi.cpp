@@ -4,8 +4,8 @@
 #include <gtest/gtest.h>
 
 #include <hipdnn_sdk/plugin/EnginePluginApi.h>
-#include <hipdnn_sdk/plugin/flatbuffer_utilities/EngineDetailsWrapper.hpp>
 #include <hipdnn_sdk/plugin/PluginApiDataTypes.h>
+#include <hipdnn_sdk/plugin/flatbuffer_utilities/EngineDetailsWrapper.hpp>
 #include <hipdnn_sdk/test_utilities/FlatbufferGraphTestUtils.hpp>
 #include <hipdnn_sdk/test_utilities/TestUtilities.hpp>
 

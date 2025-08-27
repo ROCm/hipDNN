@@ -1,9 +1,9 @@
 // Copyright © Advanced Micro Devices, Inc., or its affiliates.
 // SPDX-License-Identifier:  MIT
 
-#include "descriptors/VariantDescriptor.hpp"
 #include "HipdnnException.hpp"
 #include "TestMacros.hpp"
+#include "descriptors/VariantDescriptor.hpp"
 #include <gtest/gtest.h>
 
 namespace hipdnn_backend

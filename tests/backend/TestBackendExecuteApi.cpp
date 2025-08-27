@@ -1,10 +1,10 @@
 // Copyright © Advanced Micro Devices, Inc., or its affiliates.
 // SPDX-License-Identifier:  MIT
 
-#include "hipdnn_backend.h"
 #include "HipdnnStatus.h"
 #include "TestMacros.hpp"
 #include "TestUtil.hpp"
+#include "hipdnn_backend.h"
 #include <test_plugins/TestPluginConstants.hpp>
 
 #include <hipdnn_sdk/test_utilities/FlatbufferGraphTestUtils.hpp>

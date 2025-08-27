@@ -1,16 +1,16 @@
 // Copyright © Advanced Micro Devices, Inc., or its affiliates.
 // SPDX-License-Identifier: MIT
 
+#include "FlatbufferTestUtils.hpp"
+#include "HipdnnException.hpp"
+#include "TestMacros.hpp"
 #include "descriptors/DescriptorFactory.hpp"
 #include "descriptors/EngineConfigDescriptor.hpp"
 #include "descriptors/EngineDescriptor.hpp"
 #include "descriptors/ExecutionPlanDescriptor.hpp"
 #include "descriptors/GraphDescriptor.hpp"
 #include "descriptors/VariantDescriptor.hpp"
-#include "FlatbufferTestUtils.hpp"
 #include "handle/HandleFactory.hpp"
-#include "HipdnnException.hpp"
-#include "TestMacros.hpp"
 
 #include "gtest/gtest.h"
 

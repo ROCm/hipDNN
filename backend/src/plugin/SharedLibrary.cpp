@@ -3,8 +3,8 @@
 
 #include "SharedLibrary.hpp"
 #include "HipdnnException.hpp"
-#include "logging/Logging.hpp"
 #include "PlatformUtils.hpp"
+#include "logging/Logging.hpp"
 
 namespace hipdnn_backend
 {

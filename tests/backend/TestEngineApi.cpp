@@ -1,9 +1,9 @@
 // Copyright © Advanced Micro Devices, Inc., or its affiliates.
 // SPDX-License-Identifier:  MIT
 
+#include "TestUtil.hpp"
 #include "hipdnn_backend.h"
 #include "test_plugins/TestPluginEngineIdMap.hpp"
-#include "TestUtil.hpp"
 #include <test_plugins/TestPluginConstants.hpp>
 
 #include <gtest/gtest.h>

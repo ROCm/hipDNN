@@ -1,12 +1,12 @@
 // Copyright © Advanced Micro Devices, Inc., or its affiliates.
 // SPDX-License-Identifier:  MIT
 
+#include "TestUtil.hpp"
 #include "descriptors/BackendDescriptor.hpp"
 #include "hipdnn_backend.h"
 #include "hipdnn_sdk/plugin/EnginePluginApi.h"
 #include "hipdnn_sdk/plugin/PluginApi.h"
 #include "hipdnn_sdk/utilities/PlatformUtils.hpp"
-#include "TestUtil.hpp"
 #include <HipdnnBackendAttributeName.h>
 #include <HipdnnBackendAttributeType.h>
 #include <HipdnnBackendHeuristicType.h>

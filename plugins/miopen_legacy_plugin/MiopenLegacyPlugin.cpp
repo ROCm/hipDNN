@@ -6,12 +6,12 @@
 
 #include <hipdnn_sdk/logging/Logger.hpp>
 #include <hipdnn_sdk/plugin/EnginePluginApi.h>
-#include <hipdnn_sdk/plugin/flatbuffer_utilities/EngineConfigWrapper.hpp>
-#include <hipdnn_sdk/plugin/flatbuffer_utilities/GraphWrapper.hpp>
 #include <hipdnn_sdk/plugin/PluginApi.h>
 #include <hipdnn_sdk/plugin/PluginDataTypeHelpers.hpp>
 #include <hipdnn_sdk/plugin/PluginHelpers.hpp>
 #include <hipdnn_sdk/plugin/PluginLastErrorManager.hpp>
+#include <hipdnn_sdk/plugin/flatbuffer_utilities/EngineConfigWrapper.hpp>
+#include <hipdnn_sdk/plugin/flatbuffer_utilities/GraphWrapper.hpp>
 
 #include "EngineManager.hpp"
 #include "HipdnnEnginePluginExecutionContext.hpp"

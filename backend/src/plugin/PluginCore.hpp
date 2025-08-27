@@ -13,8 +13,8 @@
 #include <vector>
 
 #include "HipdnnBackendPluginLoadingMode.h"
-#include "logging/Logging.hpp"
 #include "PlatformUtils.hpp"
+#include "logging/Logging.hpp"
 #include <hipdnn_sdk/plugin/PluginApiDataTypes.h>
 #include <hipdnn_sdk/plugin/PluginDataTypeHelpers.hpp>
 
