@@ -3,9 +3,9 @@
 
 #include "test_plugin_common.hpp"
 #include "test_plugin_engine_id_map.hpp"
-// NOLINTNEXTLINE(modernize-avoid-c-arrays)
+// NOLINTNEXTLINE
 thread_local char
-    hipdnn_plugin::PluginLastErrorManager::_lastError[HIPDNN_PLUGIN_ERROR_STRING_MAX_LENGTH]
+    hipdnn_plugin::PluginLastErrorManager::s_lastError[HIPDNN_PLUGIN_ERROR_STRING_MAX_LENGTH]
     = "";
 
 class GoodPlugin : public TestPluginBase

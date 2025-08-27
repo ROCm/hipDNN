@@ -25,8 +25,8 @@ static const char* pluginVersion = "1.0.0";
 using namespace hipdnn_plugin;
 using namespace miopen_legacy_plugin;
 
-// NOLINTNEXTLINE(modernize-avoid-c-arrays)
-thread_local char PluginLastErrorManager::_lastError[HIPDNN_PLUGIN_ERROR_STRING_MAX_LENGTH] = "";
+// NOLINTNEXTLINE
+thread_local char PluginLastErrorManager::s_lastError[HIPDNN_PLUGIN_ERROR_STRING_MAX_LENGTH] = "";
 
 // Keep a weak pointer to the MiopenContainer thats made when we create a plugin handle.
 // The original shared_ptr is then stored on the handle so that it can be used for the lifecycle
@@ -166,8 +166,8 @@ hipdnnPluginStatus_t hipdnnEnginePluginCreate(hipdnnEnginePluginHandle_t* handle
         }
         else
         {
-            static std::mutex miopenContainerMutex;
-            std::lock_guard<std::mutex> lock(miopenContainerMutex);
+            static std::mutex s_miopenContainerMutex;
+            std::lock_guard<std::mutex> lock(s_miopenContainerMutex);
 
             // if we do have a race condition that results in threads getting locked, we want to
             // ensure that we only create one instance.  Therefore, the second thread to get

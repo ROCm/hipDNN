@@ -12,8 +12,8 @@
 #include <hipdnn_sdk/logging/callback_types.h>
 #include <hipdnn_sdk/logging/logger.hpp>
 
-static std::vector<std::string> s_capturedLogs;
-static std::mutex s_logMutex;
+static std::vector<std::string> s_capturedLogs; //NOLINT
+static std::mutex s_logMutex; //NOLINT
 
 // Custom callback for testing. It doesn't fully simulate the real logging behavior,
 // but the backend tests use the true callback function. The test could use the backend callback, but then it has to link against the backend.
