@@ -8,27 +8,26 @@ using namespace hipdnn_backend;
 
 TEST(HelpersTests, TryCatchSuccess)
 {
-    auto success_function = []() -> hipdnnStatus_t { return HIPDNN_STATUS_SUCCESS; };
+    auto successFunction = []() -> hipdnnStatus_t { return HIPDNN_STATUS_SUCCESS; };
 
-    hipdnnStatus_t status = tryCatch(success_function);
+    hipdnnStatus_t status = tryCatch(successFunction);
     EXPECT_EQ(status, HIPDNN_STATUS_SUCCESS);
 }
 
 TEST(HelpersTests, TryCatchException)
 {
-    auto exception_function
-        = []() -> hipdnnStatus_t { throw std::runtime_error("Test exception"); };
+    auto exceptionFunction = []() -> hipdnnStatus_t { throw std::runtime_error("Test exception"); };
 
-    hipdnnStatus_t status = tryCatch(exception_function);
+    hipdnnStatus_t status = tryCatch(exceptionFunction);
     EXPECT_EQ(status, HIPDNN_STATUS_INTERNAL_ERROR);
 }
 
 TEST(HelpersTests, TryCatchUnknownException)
 {
-    auto unknown_exception_function = []() -> hipdnnStatus_t {
+    auto unknownExceptionFunction = []() -> hipdnnStatus_t {
         throw 42; // Throwing an unknown exception
     };
 
-    hipdnnStatus_t status = tryCatch(unknown_exception_function);
+    hipdnnStatus_t status = tryCatch(unknownExceptionFunction);
     EXPECT_EQ(status, HIPDNN_STATUS_INTERNAL_ERROR);
 }

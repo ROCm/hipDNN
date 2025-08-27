@@ -30,8 +30,8 @@ public:
     std::unique_ptr<HipdnnBackendDescriptor> _mockGraphWrapper = nullptr;
     std::unique_ptr<HipdnnBackendDescriptor> _mockGraphBadTypeWrapper = nullptr;
     std::unique_ptr<HipdnnBackendDescriptor> _mockWrongTypeWrapper = nullptr;
-    std::unique_ptr<Mock_handle> _mockHandle = nullptr;
-    std::shared_ptr<Mock_engine_plugin_resource_manager> _mockEnginePluginResourceManager = nullptr;
+    std::unique_ptr<MockHandle> _mockHandle = nullptr;
+    std::shared_ptr<MockEnginePluginResourceManager> _mockEnginePluginResourceManager = nullptr;
 
     std::shared_ptr<EngineDescriptor> getEngineDescriptor() const
     {
@@ -89,8 +89,8 @@ protected:
         _mockGraphWrapper = test_descriptor_utils::createDescriptor<MockGraphDescriptor>();
         _mockGraphBadTypeWrapper = test_descriptor_utils::createDescriptor<MockGraphDescriptor>();
         _mockWrongTypeWrapper = test_descriptor_utils::createDescriptor<MockEngineDescriptor>();
-        _mockHandle = std::make_unique<Mock_handle>();
-        _mockEnginePluginResourceManager = std::make_shared<Mock_engine_plugin_resource_manager>();
+        _mockHandle = std::make_unique<MockHandle>();
+        _mockEnginePluginResourceManager = std::make_shared<MockEnginePluginResourceManager>();
 
         serializeEngineDetails(ENGINE_ID);
     }

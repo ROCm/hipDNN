@@ -275,7 +275,7 @@ TEST(HipDNNBackendTest, GetLoadedPluginPathsAdditiveLoadsBothDefaultAndCustom)
 
     auto defaultPluginPath = fs::path("../../backend/src/hipdnn_plugins/engines")
                              / getLibraryName("test_good_default_plugin");
-    auto testPluginPath = PLUGIN_DIR / getLibraryName(test_good_plugin_name);
+    auto testPluginPath = PLUGIN_DIR / getLibraryName(TEST_GOOD_PLUGIN_NAME);
 
     EXPECT_TRUE(test_util::isPluginLoaded(loadedPlugins, defaultPluginPath.string()));
     EXPECT_TRUE(test_util::isPluginLoaded(loadedPlugins, testPluginPath.string()));
@@ -285,7 +285,7 @@ TEST(HipDNNBackendTest, GetLoadedPluginPathsAdditiveLoadsBothDefaultAndCustom)
 
 TEST(HipDNNBackendTest, GetLoadedPluginPathsAbsoluteLoadsOnlyCustom)
 {
-    auto& pluginFilePath = test_good_plugin_path();
+    auto& pluginFilePath = testGoodPluginPath();
     const std::array<const char*, 1> paths = {pluginFilePath.c_str()};
     hipdnnStatus_t status = hipdnnSetEnginePluginPaths_ext(
         paths.size(), paths.data(), HIPDNN_PLUGIN_LOADING_ABSOLUTE);

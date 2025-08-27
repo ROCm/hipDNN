@@ -6,7 +6,7 @@
 #include "handle/handle.hpp"
 #include <gmock/gmock.h>
 
-struct Mock_handle : hipdnnHandle
+struct MockHandle : hipdnnHandle
 {
     MOCK_METHOD(void, setStream, (hipStream_t stream), (override));
     MOCK_METHOD(hipStream_t, getStream, (), (const, override));
