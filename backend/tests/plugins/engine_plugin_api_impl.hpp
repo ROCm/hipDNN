@@ -7,30 +7,30 @@
 
 #include <hipdnn_sdk/plugin/plugin_api_data_types.h>
 
-void get_all_engine_ids(int64_t* engine_ids, uint32_t max_engines, uint32_t* num_engines);
-void get_applicable_engine_ids(hipdnnEnginePluginHandle_t handle,
-                               const hipdnnPluginConstData_t* op_graph,
-                               int64_t* engine_ids,
-                               uint32_t max_engines,
-                               uint32_t* num_engines);
-void check_engine_id_validity(int64_t engine_id); // throw if invalid
-void get_engine_details(hipdnnEnginePluginHandle_t handle,
-                        int64_t engine_id,
-                        const hipdnnPluginConstData_t* op_graph,
-                        hipdnnPluginConstData_t* engine_details);
-void destroy_engine_details(hipdnnEnginePluginHandle_t handle,
-                            hipdnnPluginConstData_t* engine_details);
-size_t get_workspace_size(hipdnnEnginePluginHandle_t handle,
-                          const hipdnnPluginConstData_t* engine_config,
-                          const hipdnnPluginConstData_t* op_graph);
+void getAllEngineIds(int64_t* engineIds, uint32_t maxEngines, uint32_t* numEngines);
+void getApplicableEngineIds(hipdnnEnginePluginHandle_t handle,
+                            const hipdnnPluginConstData_t* opGraph,
+                            int64_t* engineIds,
+                            uint32_t maxEngines,
+                            uint32_t* numEngines);
+void checkEngineIdValidity(int64_t engineId); // throw if invalid
+void getEngineDetails(hipdnnEnginePluginHandle_t handle,
+                      int64_t engineId,
+                      const hipdnnPluginConstData_t* opGraph,
+                      hipdnnPluginConstData_t* engineDetails);
+void destroyEngineDetails(hipdnnEnginePluginHandle_t handle,
+                          hipdnnPluginConstData_t* engineDetails);
+size_t getWorkspaceSize(hipdnnEnginePluginHandle_t handle,
+                        const hipdnnPluginConstData_t* engineConfig,
+                        const hipdnnPluginConstData_t* opGraph);
 hipdnnEnginePluginExecutionContext_t
-    create_execution_context(hipdnnEnginePluginHandle_t handle,
-                             const hipdnnPluginConstData_t* engine_config,
-                             const hipdnnPluginConstData_t* op_graph);
-void destroy_execution_context(hipdnnEnginePluginHandle_t handle,
-                               hipdnnEnginePluginExecutionContext_t execution_context);
-void execute_op_graph(hipdnnEnginePluginHandle_t handle,
-                      hipdnnEnginePluginExecutionContext_t execution_context,
-                      void* workspace,
-                      const hipdnnPluginDeviceBuffer_t* device_buffers,
-                      uint32_t num_device_buffers);
+    createExecutionContext(hipdnnEnginePluginHandle_t handle,
+                           const hipdnnPluginConstData_t* engineConfig,
+                           const hipdnnPluginConstData_t* opGraph);
+void destroyExecutionContext(hipdnnEnginePluginHandle_t handle,
+                             hipdnnEnginePluginExecutionContext_t executionContext);
+void executeOpGraph(hipdnnEnginePluginHandle_t handle,
+                    hipdnnEnginePluginExecutionContext_t executionContext,
+                    void* workspace,
+                    const hipdnnPluginDeviceBuffer_t* deviceBuffers,
+                    uint32_t numDeviceBuffers);

@@ -33,7 +33,7 @@ const int64_t PLUGIN_FIRST_ENGINE_ID = 100;
 const unsigned GPU_DATA_SIZE = 512;
 
 // TODO Use HIP RTC to compile the kernel at runtime
-__global__ void engine_kernel(const uint32_t* input, uint32_t* output, uint32_t size)
+__global__ void engineKernel(const uint32_t* input, uint32_t* output, uint32_t size)
 {
     const auto tid = blockIdx.x * blockDim.x + threadIdx.x;
     if(tid < size)
@@ -43,13 +43,13 @@ __global__ void engine_kernel(const uint32_t* input, uint32_t* output, uint32_t 
 }
 
 // Run the kernel
-void run_engine(const uint32_t* input, uint32_t* output, uint32_t size)
+void runEngine(const uint32_t* input, uint32_t* output, uint32_t size)
 {
-    const auto block_size = 256U;
-    const auto grid_size = (size + block_size - 1) / block_size;
+    const auto blockSize = 256U;
+    const auto gridSize = (size + blockSize - 1) / blockSize;
 
     // Launch the kernel on the default stream.
-    engine_kernel<<<dim3(grid_size), dim3(block_size), 0, hipStreamDefault>>>(input, output, size);
+    engineKernel<<<dim3(gridSize), dim3(blockSize), 0, hipStreamDefault>>>(input, output, size);
 
     // Check if the kernel launch was successful.
     hipError_t error = hipGetLastError();
@@ -63,76 +63,74 @@ void run_engine(const uint32_t* input, uint32_t* output, uint32_t size)
 
 } // namespace
 
-void get_all_engine_ids(int64_t* engine_ids, uint32_t max_engines, uint32_t* num_engines)
+void getAllEngineIds(int64_t* engineIds, uint32_t maxEngines, uint32_t* numEngines)
 {
-    for(uint32_t i = 0; i < max_engines && i < PLUGIN_NUM_ENGINES; ++i)
+    for(uint32_t i = 0; i < maxEngines && i < PLUGIN_NUM_ENGINES; ++i)
     {
-        engine_ids[i] = PLUGIN_FIRST_ENGINE_ID + i;
+        engineIds[i] = PLUGIN_FIRST_ENGINE_ID + i;
     }
-    *num_engines = PLUGIN_NUM_ENGINES;
+    *numEngines = PLUGIN_NUM_ENGINES;
 }
 
-void get_applicable_engine_ids(hipdnnEnginePluginHandle_t handle,
-                               const hipdnnPluginConstData_t* op_graph,
-                               int64_t* engine_ids,
-                               uint32_t max_engines,
-                               uint32_t* num_engines)
+void getApplicableEngineIds(hipdnnEnginePluginHandle_t handle,
+                            const hipdnnPluginConstData_t* opGraph,
+                            int64_t* engineIds,
+                            uint32_t maxEngines,
+                            uint32_t* numEngines)
 {
     std::ignore = handle;
-    std::ignore = op_graph;
+    std::ignore = opGraph;
 
     // TODO Implement actual logic to determine applicable engine IDs.
     // Now we just return a fixed set of engine IDs.
-    for(uint32_t i = 0; i < max_engines && i < PLUGIN_NUM_ENGINES; ++i)
+    for(uint32_t i = 0; i < maxEngines && i < PLUGIN_NUM_ENGINES; ++i)
     {
-        engine_ids[i] = PLUGIN_FIRST_ENGINE_ID + i;
+        engineIds[i] = PLUGIN_FIRST_ENGINE_ID + i;
     }
-    *num_engines = PLUGIN_NUM_ENGINES;
+    *numEngines = PLUGIN_NUM_ENGINES;
 }
 
-void check_engine_id_validity(int64_t engine_id)
+void checkEngineIdValidity(int64_t engineId)
 {
-    // Check if the engine_id is within the valid range.
-    if(engine_id < PLUGIN_FIRST_ENGINE_ID
-       || engine_id >= PLUGIN_FIRST_ENGINE_ID + PLUGIN_NUM_ENGINES)
+    // Check if the engineId is within the valid range.
+    if(engineId < PLUGIN_FIRST_ENGINE_ID || engineId >= PLUGIN_FIRST_ENGINE_ID + PLUGIN_NUM_ENGINES)
     {
         throw HipdnnPluginException(HIPDNN_PLUGIN_STATUS_INVALID_VALUE, "invalid engine_id");
     }
 }
 
-void get_engine_details(hipdnnEnginePluginHandle_t handle,
-                        int64_t engine_id,
-                        const hipdnnPluginConstData_t* op_graph,
-                        hipdnnPluginConstData_t* engine_details)
+void getEngineDetails(hipdnnEnginePluginHandle_t handle,
+                      int64_t engineId,
+                      const hipdnnPluginConstData_t* opGraph,
+                      hipdnnPluginConstData_t* engineDetails)
 {
     std::ignore = handle;
-    std::ignore = engine_id;
-    std::ignore = op_graph;
+    std::ignore = engineId;
+    std::ignore = opGraph;
 
     // TODO Implement actual logic
     // For now, we just allocate some memory for engine details.
     size_t size = 1024;
-    engine_details->ptr = new uint8_t[size];
-    engine_details->size = size;
+    engineDetails->ptr = new uint8_t[size];
+    engineDetails->size = size;
 }
 
-void destroy_engine_details(hipdnnEnginePluginHandle_t handle,
-                            hipdnnPluginConstData_t* engine_details)
+void destroyEngineDetails(hipdnnEnginePluginHandle_t handle, hipdnnPluginConstData_t* engineDetails)
 {
     std::ignore = handle;
 
-    delete[] static_cast<const uint8_t*>(engine_details->ptr);
-    engine_details->ptr = nullptr;
-    engine_details->size = 0;
+    delete[] static_cast<const uint8_t*>(engineDetails->ptr);
+    engineDetails->ptr = nullptr;
+    engineDetails->size = 0;
 }
 
-size_t get_workspace_size(hipdnnEnginePluginHandle_t handle,
-                          const hipdnnPluginConstData_t* engine_config,
-                          const hipdnnPluginConstData_t* op_graph)
+size_t getWorkspaceSize(hipdnnEnginePluginHandle_t handle,
+                        const hipdnnPluginConstData_t* engineConfig,
+                        const hipdnnPluginConstData_t* opGraph)
 {
     std::ignore = handle;
-    std::ignore = engine_config;
-    std::ignore = op_graph;
+    std::ignore = engineConfig;
+    std::ignore = opGraph;
 
     // TODO Implement actual logic
     // For now, we just return a fixed workspace size.
@@ -140,45 +138,45 @@ size_t get_workspace_size(hipdnnEnginePluginHandle_t handle,
 }
 
 hipdnnEnginePluginExecutionContext_t
-    create_execution_context(hipdnnEnginePluginHandle_t handle,
-                             const hipdnnPluginConstData_t* engine_config,
-                             const hipdnnPluginConstData_t* op_graph)
+    createExecutionContext(hipdnnEnginePluginHandle_t handle,
+                           const hipdnnPluginConstData_t* engineConfig,
+                           const hipdnnPluginConstData_t* opGraph)
 {
     std::ignore = handle;
-    std::ignore = engine_config;
-    std::ignore = op_graph;
+    std::ignore = engineConfig;
+    std::ignore = opGraph;
 
-    auto execution_context = new HipdnnEnginePluginExecutionContext(0);
-    return execution_context;
+    auto executionContext = new HipdnnEnginePluginExecutionContext(0);
+    return executionContext;
 }
 
-void destroy_execution_context(hipdnnEnginePluginHandle_t handle,
-                               hipdnnEnginePluginExecutionContext_t execution_context)
+void destroyExecutionContext(hipdnnEnginePluginHandle_t handle,
+                             hipdnnEnginePluginExecutionContext_t executionContext)
 {
     std::ignore = handle;
 
     // Free the memory allocated for the execution context.
-    delete execution_context;
+    delete executionContext;
 }
 
-void execute_op_graph(hipdnnEnginePluginHandle_t handle,
-                      hipdnnEnginePluginExecutionContext_t execution_context,
-                      void* workspace,
-                      const hipdnnPluginDeviceBuffer_t* device_buffers,
-                      uint32_t num_device_buffers)
+void executeOpGraph(hipdnnEnginePluginHandle_t handle,
+                    hipdnnEnginePluginExecutionContext_t executionContext,
+                    void* workspace,
+                    const hipdnnPluginDeviceBuffer_t* deviceBuffers,
+                    uint32_t numDeviceBuffers)
 {
     std::ignore = handle;
-    std::ignore = execution_context;
+    std::ignore = executionContext;
     std::ignore = workspace;
 
-    if(num_device_buffers != 2)
+    if(numDeviceBuffers != 2)
     {
         throw HipdnnPluginException(HIPDNN_PLUGIN_STATUS_INVALID_VALUE,
                                     "expected 2 device buffers, got "
-                                        + std::to_string(num_device_buffers));
+                                        + std::to_string(numDeviceBuffers));
     }
 
-    run_engine(static_cast<const uint32_t*>(device_buffers[0].ptr),
-               static_cast<uint32_t*>(device_buffers[1].ptr),
-               GPU_DATA_SIZE);
+    runEngine(static_cast<const uint32_t*>(deviceBuffers[0].ptr),
+              static_cast<uint32_t*>(deviceBuffers[1].ptr),
+              GPU_DATA_SIZE);
 }

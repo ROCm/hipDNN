@@ -33,8 +33,8 @@ public:
     std::unique_ptr<HipdnnBackendDescriptor> _mockEngineConfigWrapper = nullptr;
     std::unique_ptr<HipdnnBackendDescriptor> _mockEngineConfigBadTypeWrapper = nullptr;
     std::unique_ptr<HipdnnBackendDescriptor> _mockWrongTypeWrapper = nullptr;
-    std::unique_ptr<Mock_handle> _mockHandle = nullptr;
-    std::shared_ptr<Mock_engine_plugin_resource_manager> _mockEnginePluginResourceManager = nullptr;
+    std::unique_ptr<MockHandle> _mockHandle = nullptr;
+    std::shared_ptr<MockEnginePluginResourceManager> _mockEnginePluginResourceManager = nullptr;
 
     std::shared_ptr<ExecutionPlanDescriptor> getExecutionPlanDescriptor() const
     {
@@ -115,8 +115,8 @@ protected:
         _mockEngineConfigWrapper = createDescriptor<MockEngineConfigDescriptor>();
         _mockEngineConfigBadTypeWrapper = createDescriptor<MockEngineConfigDescriptor>();
         _mockWrongTypeWrapper = createDescriptor<MockEngineDescriptor>();
-        _mockHandle = std::make_unique<Mock_handle>();
-        _mockEnginePluginResourceManager = std::make_shared<Mock_engine_plugin_resource_manager>();
+        _mockHandle = std::make_unique<MockHandle>();
+        _mockEnginePluginResourceManager = std::make_shared<MockEnginePluginResourceManager>();
     }
 
     void TearDown() override {}

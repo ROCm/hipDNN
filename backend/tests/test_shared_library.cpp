@@ -77,18 +77,18 @@ TEST(SharedLibraryTest, CallFunction)
     plugin::SharedLibrary library(LIBRARY_PATH);
 
     // Get the function pointer
-    using Func_type = hipdnnPluginStatus_t (*)(const char**);
-    auto func_get_name = library.get_symbol<Func_type>(SYMBOL_NAME);
+    using FuncType = hipdnnPluginStatus_t (*)(const char**);
+    auto funcGetName = library.get_symbol<FuncType>(SYMBOL_NAME);
 
     // Call the function to get the plugin name
     const char* name = nullptr;
-    auto status = func_get_name(&name);
+    auto status = funcGetName(&name);
     ASSERT_EQ(status, HIPDNN_PLUGIN_STATUS_SUCCESS);
     ASSERT_NE(name, nullptr);
     ASSERT_STREQ(name, "Plugin1");
 }
 
-TEST(Shared_Library_Test, get_current_module_directory_from_executable)
+TEST(SharedLibraryTest, GetCurrentModuleDirectoryFromExecutable)
 {
     std::filesystem::path path;
     ASSERT_NO_THROW(path = platform_utils::getCurrentModuleDirectory());
@@ -102,19 +102,19 @@ TEST(Shared_Library_Test, get_current_module_directory_from_executable)
         path / hipdnn_sdk::utilities::getExecutableName("hipdnn_backend_tests")));
 }
 
-class Shared_library_path_test : public ::testing::TestWithParam<std::string>
+class SharedLibraryPathTest : public ::testing::TestWithParam<std::string>
 {
 };
 
-TEST_P(Shared_library_path_test, LoadWithValidPathFormats)
+TEST_P(SharedLibraryPathTest, LoadWithValidPathFormats)
 {
-    const auto& path_param = GetParam();
+    const auto& pathParam = GetParam();
     plugin::SharedLibrary library;
-    ASSERT_NO_THROW(library.load(path_param));
+    ASSERT_NO_THROW(library.load(pathParam));
 }
 
 INSTANTIATE_TEST_SUITE_P(PathVariations,
-                         Shared_library_path_test,
+                         SharedLibraryPathTest,
                          ::testing::Values(
                              // Path without extension
                              std::string(LIBRARY_PATH),
