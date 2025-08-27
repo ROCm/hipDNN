@@ -12,36 +12,36 @@
 #include <hipdnn_sdk/logging/callback_types.h>
 #include <hipdnn_sdk/logging/logger.hpp>
 
-static std::vector<std::string> g_captured_logs;
-static std::mutex g_log_mutex;
+static std::vector<std::string> g_CapturedLogs;
+static std::mutex g_LogMutex;
 
 // Custom callback for testing. It doesn't fully simulate the real logging behavior,
 // but the backend tests use the true callback function. The test could use the backend callback, but then it has to link against the backend.
-void test_logging_callback(hipdnnSeverity_t severity [[maybe_unused]], const char* msg)
+void testLoggingCallback(hipdnnSeverity_t severity [[maybe_unused]], const char* msg)
 {
-    std::lock_guard<std::mutex> lock(g_log_mutex);
+    std::lock_guard<std::mutex> lock(g_LogMutex);
     if(msg != nullptr)
     {
-        g_captured_logs.emplace_back(msg);
+        g_CapturedLogs.emplace_back(msg);
     }
 }
 
-class Callback_logger_test : public ::testing::Test
+class CallbackLoggerTest : public ::testing::Test
 {
 protected:
-    const std::string _test_logger_name = COMPONENT_NAME;
+    const std::string _testLoggerName = COMPONENT_NAME;
 
     void SetUp() override
     {
-        g_captured_logs.clear();
+        g_CapturedLogs.clear();
 
         spdlog::drop_all();
 
-        hipdnn::logging::initializeCallbackLogging(_test_logger_name, test_logging_callback);
+        hipdnn::logging::initializeCallbackLogging(_testLoggerName, testLoggingCallback);
 
-        auto test_logger = spdlog::get(_test_logger_name);
-        ASSERT_NE(test_logger, nullptr);
-        test_logger->set_level(spdlog::level::trace);
+        auto testLogger = spdlog::get(_testLoggerName);
+        ASSERT_NE(testLogger, nullptr);
+        testLogger->set_level(spdlog::level::trace);
     }
 
     void TearDown() override
@@ -49,94 +49,94 @@ protected:
         spdlog::shutdown();
     }
 
-    static std::vector<std::string> get_captured_logs()
+    static std::vector<std::string> getCapturedLogs()
     {
         spdlog::shutdown(); // block until async queue is fully processed
-        return g_captured_logs;
+        return g_CapturedLogs;
     }
 };
 
-TEST_F(Callback_logger_test, InfoMessageIsCorrectlyPassedToCallback)
+TEST_F(CallbackLoggerTest, InfoMessageIsCorrectlyPassedToCallback)
 {
-    std::string test_message = "Test info message";
-    HIPDNN_LOG_INFO(test_message);
+    std::string testMessage = "Test info message";
+    HIPDNN_LOG_INFO(testMessage);
 
-    auto logs = get_captured_logs();
+    auto logs = getCapturedLogs();
     ASSERT_EQ(logs.size(), 1);
-    EXPECT_NE(logs[0].find(test_message), std::string::npos);
+    EXPECT_NE(logs[0].find(testMessage), std::string::npos);
 }
 
-TEST_F(Callback_logger_test, WarnMessageIsCorrectlyPassedToCallback)
+TEST_F(CallbackLoggerTest, WarnMessageIsCorrectlyPassedToCallback)
 {
-    std::string test_message = "Test warning message";
-    HIPDNN_LOG_WARN(test_message);
+    std::string testMessage = "Test warning message";
+    HIPDNN_LOG_WARN(testMessage);
 
-    auto logs = get_captured_logs();
+    auto logs = getCapturedLogs();
     ASSERT_EQ(logs.size(), 1);
-    EXPECT_NE(logs[0].find(test_message), std::string::npos);
+    EXPECT_NE(logs[0].find(testMessage), std::string::npos);
 }
 
-TEST_F(Callback_logger_test, ErrorMessageIsCorrectlyPassedToCallback)
+TEST_F(CallbackLoggerTest, ErrorMessageIsCorrectlyPassedToCallback)
 {
-    std::string test_message = "Test error message";
-    HIPDNN_LOG_ERROR(test_message);
+    std::string testMessage = "Test error message";
+    HIPDNN_LOG_ERROR(testMessage);
 
-    auto logs = get_captured_logs();
+    auto logs = getCapturedLogs();
     ASSERT_EQ(logs.size(), 1);
-    EXPECT_NE(logs[0].find(test_message), std::string::npos);
+    EXPECT_NE(logs[0].find(testMessage), std::string::npos);
 }
 
-TEST_F(Callback_logger_test, FormattedMessagesAreCorrectlyPassed)
+TEST_F(CallbackLoggerTest, FormattedMessagesAreCorrectlyPassed)
 {
     int value = 42;
     std::string text = "formatted";
     HIPDNN_LOG_INFO("Test {} message with value {}", text, value);
 
-    auto logs = get_captured_logs();
+    auto logs = getCapturedLogs();
     ASSERT_EQ(logs.size(), 1);
     EXPECT_NE(logs[0].find("Test formatted message with value 42"), std::string::npos);
 }
 
-TEST_F(Callback_logger_test, LogLevelsAreRespected)
+TEST_F(CallbackLoggerTest, LogLevelsAreRespected)
 {
-    auto test_logger = spdlog::get(_test_logger_name);
-    ASSERT_NE(test_logger, nullptr);
+    auto testLogger = spdlog::get(_testLoggerName);
+    ASSERT_NE(testLogger, nullptr);
 
     // Set level to error so info and warn should be ignored
-    test_logger->set_level(spdlog::level::err);
+    testLogger->set_level(spdlog::level::err);
 
     HIPDNN_LOG_INFO("This info should not appear");
     HIPDNN_LOG_WARN("This warning should not appear");
     HIPDNN_LOG_ERROR("This error should appear");
 
-    auto logs = get_captured_logs();
+    auto logs = getCapturedLogs();
     ASSERT_EQ(logs.size(), 1);
     EXPECT_NE(logs[0].find("This error should appear"), std::string::npos);
 }
 
-TEST_F(Callback_logger_test, MultipleMessagesAreLogged)
+TEST_F(CallbackLoggerTest, MultipleMessagesAreLogged)
 {
     HIPDNN_LOG_INFO("First message");
     HIPDNN_LOG_WARN("Second message");
     HIPDNN_LOG_ERROR("Third message");
 
-    auto logs = get_captured_logs();
+    auto logs = getCapturedLogs();
     ASSERT_EQ(logs.size(), 3);
     EXPECT_NE(logs[0].find("First message"), std::string::npos);
     EXPECT_NE(logs[1].find("Second message"), std::string::npos);
     EXPECT_NE(logs[2].find("Third message"), std::string::npos);
 }
 
-TEST_F(Callback_logger_test, CallbackReceivesFormattedPattern)
+TEST_F(CallbackLoggerTest, CallbackReceivesFormattedPattern)
 {
-    std::string test_message = "Pattern check";
-    HIPDNN_LOG_INFO(test_message);
+    std::string testMessage = "Pattern check";
+    HIPDNN_LOG_INFO(testMessage);
 
-    auto logs = get_captured_logs();
+    auto logs = getCapturedLogs();
     ASSERT_EQ(logs.size(), 1);
 
     std::regex pattern(R"(\[\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{3}\] \[tid \d+\] \[info\] \[)"
-                       + _test_logger_name + R"(\] )" + test_message);
+                       + _testLoggerName + R"(\] )" + testMessage);
 
     EXPECT_TRUE(std::regex_search(logs[0], pattern))
         << "Log message did not match expected pattern.\n"
