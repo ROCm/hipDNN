@@ -28,24 +28,24 @@ public:
     virtual ~IReferenceImplementation() = default;
 
     virtual void
-        batchnormFwdInference(const Tensor_interface<InputDataType>& input,
-                              const Tensor_interface<ScaleBiasDataType>& scale,
-                              const Tensor_interface<ScaleBiasDataType>& bias,
-                              const Tensor_interface<MeanVarianceDataType>& estimatedMean,
-                              const Tensor_interface<MeanVarianceDataType>& estimatedVariance,
-                              Tensor_interface<InputDataType>& output,
+        batchnormFwdInference(const ITensor<InputDataType>& input,
+                              const ITensor<ScaleBiasDataType>& scale,
+                              const ITensor<ScaleBiasDataType>& bias,
+                              const ITensor<MeanVarianceDataType>& estimatedMean,
+                              const ITensor<MeanVarianceDataType>& estimatedVariance,
+                              ITensor<InputDataType>& output,
                               double epsilon)
         = 0;
 
     // Could call this bwd_training or bwd_propagation
-    virtual void batchnormBwd(const Tensor_interface<InputDataType>& dy,
-                              const Tensor_interface<InputDataType>& x,
-                              const Tensor_interface<MeanVarianceDataType>& mean,
-                              const Tensor_interface<MeanVarianceDataType>& invVariance,
-                              const Tensor_interface<ScaleBiasDataType>& scale,
-                              Tensor_interface<InputDataType>& dx,
-                              Tensor_interface<ScaleBiasDataType>& dscale,
-                              Tensor_interface<ScaleBiasDataType>& dbias)
+    virtual void batchnormBwd(const ITensor<InputDataType>& dy,
+                              const ITensor<InputDataType>& x,
+                              const ITensor<MeanVarianceDataType>& mean,
+                              const ITensor<MeanVarianceDataType>& invVariance,
+                              const ITensor<ScaleBiasDataType>& scale,
+                              ITensor<InputDataType>& dx,
+                              ITensor<ScaleBiasDataType>& dscale,
+                              ITensor<ScaleBiasDataType>& dbias)
         = 0;
 };
 

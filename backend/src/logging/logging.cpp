@@ -42,8 +42,8 @@ void initialize()
             return;
         }
 
-        std::string logLevel = hipdnn_sdk::utilities::get_env("HIPDNN_LOG_LEVEL", "off");
-        std::string logFilePath = hipdnn_sdk::utilities::get_env("HIPDNN_LOG_FILE");
+        std::string logLevel = hipdnn_sdk::utilities::getEnv("HIPDNN_LOG_LEVEL", "off");
+        std::string logFilePath = hipdnn_sdk::utilities::getEnv("HIPDNN_LOG_FILE");
 
         // It doesn't need to return if logLevel == off, but it avoids unnecessary initialization
         if(logLevel == "off")

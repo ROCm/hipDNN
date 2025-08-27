@@ -47,7 +47,7 @@ struct Batchnorm2dTensorBundle
 {
     Batchnorm2dTensorBundle(const std::vector<int64_t>& dims,
                             unsigned int seed = 1,
-                            const Tensor_layout& layout = Tensor_layout::NCHW)
+                            const TensorLayout& layout = TensorLayout::NCHW)
         : derivedDims({1, dims[1], 1, 1})
         , xTensor(dims, layout)
         , dyTensor(dims, layout)
@@ -58,18 +58,18 @@ struct Batchnorm2dTensorBundle
         , meanTensor(derivedDims)
         , invVarianceTensor(derivedDims)
     {
-        xTensor.fill_with_random_values(
+        xTensor.fillWithRandomValues(
             static_cast<InputType>(-1.0f), static_cast<InputType>(1.0f), seed);
 
-        dyTensor.fill_with_random_values(
+        dyTensor.fillWithRandomValues(
             static_cast<InputType>(-0.1f), static_cast<InputType>(0.1f), seed);
-        scaleTensor.fill_with_random_values(
+        scaleTensor.fillWithRandomValues(
             static_cast<IntermediateType>(-0.1f), static_cast<IntermediateType>(0.1f), seed);
 
-        meanTensor.fill_with_random_values(
+        meanTensor.fillWithRandomValues(
             static_cast<IntermediateType>(-0.1f), static_cast<IntermediateType>(0.1f), seed);
 
-        invVarianceTensor.fill_with_random_values(
+        invVarianceTensor.fillWithRandomValues(
             static_cast<IntermediateType>(1.9f), static_cast<IntermediateType>(2.0f), seed);
     }
 
@@ -137,15 +137,15 @@ protected:
                           Batchnorm2dTensorBundle<InputType, IntermediateType>& tensorBundle)
     {
         std::unordered_map<int64_t, void*> variantPack;
-        variantPack[xTensorAttr.get_uid()] = tensorBundle.xTensor.memory().device_data();
-        variantPack[dyTensorAttr.get_uid()] = tensorBundle.dyTensor.memory().device_data();
-        variantPack[dxTensorAttr.get_uid()] = tensorBundle.dxTensor.memory().device_data();
-        variantPack[scaleTensorAttr.get_uid()] = tensorBundle.scaleTensor.memory().device_data();
-        variantPack[dscaleTensorAttr.get_uid()] = tensorBundle.dscaleTensor.memory().device_data();
-        variantPack[dbiasTensorAttr.get_uid()] = tensorBundle.dbiasTensor.memory().device_data();
-        variantPack[meanTensorAttr.get_uid()] = tensorBundle.meanTensor.memory().device_data();
+        variantPack[xTensorAttr.get_uid()] = tensorBundle.xTensor.memory().deviceData();
+        variantPack[dyTensorAttr.get_uid()] = tensorBundle.dyTensor.memory().deviceData();
+        variantPack[dxTensorAttr.get_uid()] = tensorBundle.dxTensor.memory().deviceData();
+        variantPack[scaleTensorAttr.get_uid()] = tensorBundle.scaleTensor.memory().deviceData();
+        variantPack[dscaleTensorAttr.get_uid()] = tensorBundle.dscaleTensor.memory().deviceData();
+        variantPack[dbiasTensorAttr.get_uid()] = tensorBundle.dbiasTensor.memory().deviceData();
+        variantPack[meanTensorAttr.get_uid()] = tensorBundle.meanTensor.memory().deviceData();
         variantPack[invVarianceTensorAttr.get_uid()]
-            = tensorBundle.invVarianceTensor.memory().device_data();
+            = tensorBundle.invVarianceTensor.memory().deviceData();
 
         return variantPack;
     }
@@ -264,7 +264,7 @@ protected:
     template <typename InputType, typename IntermediateType>
     void runBatchnormTest(const Batchnorm2dTestCase& testCase,
                           InputType tolerance = 1e4f,
-                          const Tensor_layout& layout = Tensor_layout::NCHW)
+                          const TensorLayout& layout = TensorLayout::NCHW)
     {
         auto inputDataType = get_data_type_enum_from_type<InputType>();
         auto intermediateDataType = get_data_type_enum_from_type<IntermediateType>();
@@ -280,9 +280,9 @@ protected:
 
         runMiopenBatchnormBwd<InputType, IntermediateType>(
             graphTensorBundle, inputDataType, intermediateDataType);
-        graphTensorBundle.dxTensor.memory().mark_device_modified();
-        graphTensorBundle.dscaleTensor.memory().mark_device_modified();
-        graphTensorBundle.dbiasTensor.memory().mark_device_modified();
+        graphTensorBundle.dxTensor.memory().markDeviceModified();
+        graphTensorBundle.dscaleTensor.memory().markDeviceModified();
+        graphTensorBundle.dbiasTensor.memory().markDeviceModified();
 
         runCpuBatchnormBwd<InputType, IntermediateType>(cpuTensorBundle);
 
@@ -375,7 +375,7 @@ INSTANTIATE_TEST_SUITE_P(RunHalfBwdBatchnormGraph,
 TEST_P(BatchnormBackwardIntegrationTestNHWC, RunFloatBwdBatchnormGraphNHWC)
 {
     Batchnorm2dTestCase testCase = GetParam();
-    runBatchnormTest<float, float>(testCase, 4e-3f, Tensor_layout::NHWC);
+    runBatchnormTest<float, float>(testCase, 4e-3f, TensorLayout::NHWC);
 }
 
 INSTANTIATE_TEST_SUITE_P(RunFloatBwdBatchnormGraphNHWC,

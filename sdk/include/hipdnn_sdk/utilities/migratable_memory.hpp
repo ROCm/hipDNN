@@ -14,7 +14,7 @@ namespace hipdnn_sdk
 namespace utilities
 {
 
-enum class Memory_location
+enum class MemoryLocation
 {
     HOST,
     DEVICE,
@@ -25,180 +25,180 @@ enum class Memory_location
 // NOLINTBEGIN(portability-template-virtual-member-function)
 
 template <typename T>
-class Migratable_memory_interface
+class IMigratableMemory
 {
 public:
-    virtual ~Migratable_memory_interface() = default;
+    virtual ~IMigratableMemory() = default;
 
-    virtual T* host_data() = 0;
-    virtual T* host_data_async() = 0;
-    virtual const T* host_data() const = 0;
-    virtual const T* host_data_async() const = 0;
-    virtual void* device_data() = 0;
-    virtual void* device_data_async() = 0;
+    virtual T* hostData() = 0;
+    virtual T* hostDataAsync() = 0;
+    virtual const T* hostData() const = 0;
+    virtual const T* hostDataAsync() const = 0;
+    virtual void* deviceData() = 0;
+    virtual void* deviceDataAsync() = 0;
 
-    virtual void mark_host_modified() = 0;
-    virtual void mark_device_modified() = 0;
+    virtual void markHostModified() = 0;
+    virtual void markDeviceModified() = 0;
 
     virtual size_t count() const = 0;
     virtual bool empty() const = 0;
-    virtual Memory_location location() const = 0;
+    virtual MemoryLocation location() const = 0;
 
-    virtual void resize(size_t new_count) = 0;
+    virtual void resize(size_t newCount) = 0;
     virtual void clear() = 0;
 };
 
 // NOLINTEND(portability-template-virtual-member-function)
 
-template <class T, class HostAlloc = Host_allocator<T>, class DeviceAlloc = Device_allocator<T>>
-class Migratable_memory : public Migratable_memory_interface<T>
+template <class T, class HostAlloc = HostAllocator<T>, class DeviceAlloc = DeviceAllocator<T>>
+class MigratableMemory : public IMigratableMemory<T>
 {
-    static_assert(std::is_base_of_v<Host_allocator_interface<T>, HostAlloc>,
-                  "HostAlloc must derive from Host_allocator_interface<T>");
-    static_assert(std::is_base_of_v<Device_allocator_interface<T>, DeviceAlloc>,
-                  "DeviceAlloc must derive from Device_allocator_interface<T>");
+    static_assert(std::is_base_of_v<IHostAllocator<T>, HostAlloc>,
+                  "HostAlloc must derive from IHostAllocator<T>");
+    static_assert(std::is_base_of_v<IDeviceAllocator<T>, DeviceAlloc>,
+                  "DeviceAlloc must derive from IDeviceAllocator<T>");
 
 public:
-    explicit Migratable_memory(size_t count = 0, hipStream_t stream = nullptr)
+    explicit MigratableMemory(size_t count = 0, hipStream_t stream = nullptr)
         : _count(count)
-        , _item_size(sizeof(T))
-        , _total_size(count * _item_size)
+        , _itemSize(sizeof(T))
+        , _totalSize(count * _itemSize)
         , _stream(stream)
     {
         if(count > 0)
         {
-            allocate_host();
+            allocateHost();
         }
     }
 
-    ~Migratable_memory() override
+    ~MigratableMemory() override
     {
         cleanup();
     }
 
-    Migratable_memory(Migratable_memory&& other) noexcept
-        : _host_ptr(other._host_ptr)
-        , _device_ptr(other._device_ptr)
+    MigratableMemory(MigratableMemory&& other) noexcept
+        : _hostPtr(other._hostPtr)
+        , _devicePtr(other._devicePtr)
         , _count(other._count)
-        , _item_size(other._item_size)
-        , _total_size(other._total_size)
-        , _current_location(other._current_location)
-        , _host_valid(other._host_valid)
-        , _device_valid(other._device_valid)
+        , _itemSize(other._itemSize)
+        , _totalSize(other._totalSize)
+        , _currentLocation(other._currentLocation)
+        , _hostValid(other._hostValid)
+        , _deviceValid(other._deviceValid)
         , _stream(other._stream)
-        , _host_allocator(std::move(other._host_allocator))
-        , _device_allocator(std::move(other._device_allocator))
+        , _hostAllocator(std::move(other._hostAllocator))
+        , _deviceAllocator(std::move(other._deviceAllocator))
     {
-        other._host_ptr = nullptr;
-        other._device_ptr = nullptr;
+        other._hostPtr = nullptr;
+        other._devicePtr = nullptr;
         other._count = 0;
-        other._item_size = 0;
-        other._total_size = 0;
-        other._current_location = Memory_location::NONE;
+        other._itemSize = 0;
+        other._totalSize = 0;
+        other._currentLocation = MemoryLocation::NONE;
         other._stream = nullptr;
-        other._host_valid = false;
-        other._device_valid = false;
+        other._hostValid = false;
+        other._deviceValid = false;
     }
 
-    Migratable_memory& operator=(Migratable_memory&& other) noexcept
+    MigratableMemory& operator=(MigratableMemory&& other) noexcept
     {
         if(this != &other)
         {
             cleanup();
-            _host_ptr = other._host_ptr;
-            _device_ptr = other._device_ptr;
+            _hostPtr = other._hostPtr;
+            _devicePtr = other._devicePtr;
             _count = other._count;
-            _item_size = other._item_size;
-            _total_size = other._total_size;
-            _current_location = other._current_location;
-            _host_valid = other._host_valid;
-            _device_valid = other._device_valid;
+            _itemSize = other._itemSize;
+            _totalSize = other._totalSize;
+            _currentLocation = other._currentLocation;
+            _hostValid = other._hostValid;
+            _deviceValid = other._deviceValid;
             _stream = other._stream;
-            _device_allocator = std::move(other._device_allocator);
-            _host_allocator = std::move(other._host_allocator);
+            _deviceAllocator = std::move(other._deviceAllocator);
+            _hostAllocator = std::move(other._hostAllocator);
 
-            other._host_ptr = nullptr;
-            other._device_ptr = nullptr;
+            other._hostPtr = nullptr;
+            other._devicePtr = nullptr;
             other._count = 0;
-            other._item_size = 0;
-            other._total_size = 0;
-            other._current_location = Memory_location::NONE;
+            other._itemSize = 0;
+            other._totalSize = 0;
+            other._currentLocation = MemoryLocation::NONE;
             other._stream = nullptr;
-            other._host_valid = false;
-            other._device_valid = false;
+            other._hostValid = false;
+            other._deviceValid = false;
         }
         return *this;
     }
 
-    Migratable_memory(const Migratable_memory&) = delete;
-    Migratable_memory& operator=(const Migratable_memory&) = delete;
+    MigratableMemory(const MigratableMemory&) = delete;
+    MigratableMemory& operator=(const MigratableMemory&) = delete;
 
-    void resize(size_t new_count) override
+    void resize(size_t newCount) override
     {
         cleanup();
-        _count = new_count;
-        _total_size = new_count * _item_size;
-        _current_location = Memory_location::NONE;
-        _host_valid = false;
-        _device_valid = false;
-        if(new_count > 0)
+        _count = newCount;
+        _totalSize = newCount * _itemSize;
+        _currentLocation = MemoryLocation::NONE;
+        _hostValid = false;
+        _deviceValid = false;
+        if(newCount > 0)
         {
-            allocate_host();
+            allocateHost();
         }
     }
 
     // Get host pointer (migrates if needed)
-    T* host_data() override
+    T* hostData() override
     {
-        ensure_host_valid();
-        return static_cast<T*>(_host_ptr);
+        ensureHostValid();
+        return static_cast<T*>(_hostPtr);
     }
 
-    T* host_data_async() override
+    T* hostDataAsync() override
     {
-        ensure_host_valid(true);
-        return static_cast<T*>(_host_ptr);
+        ensureHostValid(true);
+        return static_cast<T*>(_hostPtr);
     }
 
     // Get host pointer (migrates if needed)
-    const T* host_data() const override
+    const T* hostData() const override
     {
-        ensure_const_host_valid();
-        return static_cast<T*>(_host_ptr);
+        ensureConstHostValid();
+        return static_cast<T*>(_hostPtr);
     }
 
-    const T* host_data_async() const override
+    const T* hostDataAsync() const override
     {
-        ensure_const_host_valid();
-        return static_cast<T*>(_host_ptr);
+        ensureConstHostValid();
+        return static_cast<T*>(_hostPtr);
     }
 
-    void* device_data() override
+    void* deviceData() override
     {
-        ensure_device_valid();
-        return static_cast<T*>(_device_ptr);
+        ensureDeviceValid();
+        return static_cast<T*>(_devicePtr);
     }
 
-    void* device_data_async() override
+    void* deviceDataAsync() override
     {
-        ensure_device_valid(true);
-        return static_cast<T*>(_device_ptr);
+        ensureDeviceValid(true);
+        return static_cast<T*>(_devicePtr);
     }
 
     // Mark memory as modified on host
-    void mark_host_modified() override
+    void markHostModified() override
     {
-        _host_valid = true;
-        _device_valid = false;
-        _current_location = Memory_location::HOST;
+        _hostValid = true;
+        _deviceValid = false;
+        _currentLocation = MemoryLocation::HOST;
     }
 
     // Mark memory as modified on device
-    void mark_device_modified() override
+    void markDeviceModified() override
     {
-        _device_valid = true;
-        _host_valid = false;
-        _current_location = Memory_location::DEVICE;
+        _deviceValid = true;
+        _hostValid = false;
+        _currentLocation = MemoryLocation::DEVICE;
     }
 
     size_t count() const override
@@ -211,24 +211,24 @@ public:
         return _count == 0;
     }
 
-    Memory_location location() const override
+    MemoryLocation location() const override
     {
-        return _current_location;
+        return _currentLocation;
     }
 
     void clear() override
     {
         cleanup();
         _count = 0;
-        _item_size = 0;
-        _total_size = 0;
-        _current_location = Memory_location::NONE;
-        _host_valid = false;
-        _device_valid = false;
+        _itemSize = 0;
+        _totalSize = 0;
+        _currentLocation = MemoryLocation::NONE;
+        _hostValid = false;
+        _deviceValid = false;
     }
 
 private:
-    static void throw_on_error(hipError_t err, const char* msg)
+    static void throwOnError(hipError_t err, const char* msg)
     {
         if(err != hipSuccess)
         {
@@ -236,7 +236,7 @@ private:
         }
     }
 
-    static void log_on_error(hipError_t err, const char* msg)
+    static void logOnError(hipError_t err, const char* msg)
     {
         std::ignore = msg;
 
@@ -246,126 +246,126 @@ private:
         }
     }
 
-    void allocate_host()
+    void allocateHost()
     {
-        if((_host_ptr == nullptr) && _count > 0)
+        if((_hostPtr == nullptr) && _count > 0)
         {
-            _host_ptr = _host_allocator.allocate(_count);
-            _host_valid = true;
-            _current_location = Memory_location::HOST;
+            _hostPtr = _hostAllocator.allocate(_count);
+            _hostValid = true;
+            _currentLocation = MemoryLocation::HOST;
         }
     }
 
-    void allocate_device()
+    void allocateDevice()
     {
-        if((_device_ptr == nullptr) && _count > 0)
+        if((_devicePtr == nullptr) && _count > 0)
         {
-            _device_ptr = _device_allocator.allocate(_count);
+            _devicePtr = _deviceAllocator.allocate(_count);
         }
     }
 
-    void ensure_const_host_valid() const
+    void ensureConstHostValid() const
     {
-        if((_host_ptr == nullptr) && _count > 0)
+        if((_hostPtr == nullptr) && _count > 0)
         {
             throw std::runtime_error("Host memory not allocated.");
         }
 
-        if(!_host_valid && _device_valid && (_device_ptr != nullptr))
+        if(!_hostValid && _deviceValid && (_devicePtr != nullptr))
         {
             throw std::runtime_error(
                 "Host memory is out of date and requires non-const access to update.");
         }
     }
 
-    void ensure_host_valid(bool async = false)
+    void ensureHostValid(bool async = false)
     {
         if(_count == 0)
         {
             return;
         }
 
-        allocate_host();
+        allocateHost();
 
-        if(!_host_valid && _device_valid && (_device_ptr != nullptr))
+        if(!_hostValid && _deviceValid && (_devicePtr != nullptr))
         {
             if(async)
             {
-                throw_on_error(
+                throwOnError(
                     hipMemcpyAsync(
-                        _host_ptr, _device_ptr, _total_size, hipMemcpyDeviceToHost, _stream),
+                        _hostPtr, _devicePtr, _totalSize, hipMemcpyDeviceToHost, _stream),
                     "Failed to copy from device to host");
             }
             else
             {
-                throw_on_error(
+                throwOnError(
                     hipMemcpyWithStream(
-                        _host_ptr, _device_ptr, _total_size, hipMemcpyDeviceToHost, _stream),
+                        _hostPtr, _devicePtr, _totalSize, hipMemcpyDeviceToHost, _stream),
                     "Failed to copy from device to host");
             }
-            _host_valid = true;
-            _current_location = Memory_location::BOTH;
+            _hostValid = true;
+            _currentLocation = MemoryLocation::BOTH;
         }
     }
 
-    void ensure_device_valid(bool async = false)
+    void ensureDeviceValid(bool async = false)
     {
         if(_count == 0)
         {
             return;
         }
 
-        allocate_device();
+        allocateDevice();
 
-        if(!_device_valid && _host_valid && (_host_ptr != nullptr))
+        if(!_deviceValid && _hostValid && (_hostPtr != nullptr))
         {
             if(async)
             {
-                throw_on_error(
+                throwOnError(
                     hipMemcpyAsync(
-                        _device_ptr, _host_ptr, _total_size, hipMemcpyHostToDevice, _stream),
+                        _devicePtr, _hostPtr, _totalSize, hipMemcpyHostToDevice, _stream),
                     "Failed to copy from host to device");
             }
             else
             {
-                throw_on_error(
+                throwOnError(
                     hipMemcpyWithStream(
-                        _device_ptr, _host_ptr, _total_size, hipMemcpyHostToDevice, _stream),
+                        _devicePtr, _hostPtr, _totalSize, hipMemcpyHostToDevice, _stream),
                     "Failed to copy from host to device");
             }
-            _device_valid = true;
-            _current_location = Memory_location::BOTH;
+            _deviceValid = true;
+            _currentLocation = MemoryLocation::BOTH;
         }
     }
 
     void cleanup()
     {
-        if(_host_ptr != nullptr)
+        if(_hostPtr != nullptr)
         {
-            _host_allocator.deallocate(static_cast<T*>(_host_ptr), _count);
-            _host_ptr = nullptr;
+            _hostAllocator.deallocate(static_cast<T*>(_hostPtr), _count);
+            _hostPtr = nullptr;
         }
-        if(_device_ptr != nullptr)
+        if(_devicePtr != nullptr)
         {
-            _device_allocator.deallocate(static_cast<T*>(_device_ptr), _count);
-            _device_ptr = nullptr;
+            _deviceAllocator.deallocate(static_cast<T*>(_devicePtr), _count);
+            _devicePtr = nullptr;
         }
-        _host_valid = false;
-        _device_valid = false;
-        _current_location = Memory_location::NONE;
+        _hostValid = false;
+        _deviceValid = false;
+        _currentLocation = MemoryLocation::NONE;
     }
 
-    void* _host_ptr{nullptr};
-    void* _device_ptr{nullptr};
+    void* _hostPtr{nullptr};
+    void* _devicePtr{nullptr};
     size_t _count;
-    size_t _item_size;
-    size_t _total_size;
-    Memory_location _current_location{Memory_location::NONE};
-    bool _host_valid{false};
-    bool _device_valid{false};
+    size_t _itemSize;
+    size_t _totalSize;
+    MemoryLocation _currentLocation{MemoryLocation::NONE};
+    bool _hostValid{false};
+    bool _deviceValid{false};
     hipStream_t _stream{nullptr};
-    HostAlloc _host_allocator;
-    DeviceAlloc _device_allocator;
+    HostAlloc _hostAllocator;
+    DeviceAlloc _deviceAllocator;
 };
 
 } // namespace utilities

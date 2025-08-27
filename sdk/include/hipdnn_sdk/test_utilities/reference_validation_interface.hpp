@@ -21,8 +21,8 @@ class IReferenceValidation
 public:
     virtual ~IReferenceValidation() = default;
 
-    virtual bool allClose(Migratable_memory_interface<T>& reference,
-                          Migratable_memory_interface<T>& implementation)
+    virtual bool allClose(IMigratableMemory<T>& reference,
+                          IMigratableMemory<T>& implementation)
         = 0;
 };
 

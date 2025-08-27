@@ -24,7 +24,7 @@ protected:
         ON_CALL(*_mock_backend, get_last_error_string(_, _))
             .WillByDefault([](char* error_string, size_t size) {
                 std::string fake_error = "Fake backend error";
-                hipdnn::sdk::utilities::copy_max_size_with_null_terminator(
+                hipdnn::sdk::utilities::copyMaxSizeWithNullTerminator(
                     error_string, fake_error.c_str(), size - 1);
             });
     }

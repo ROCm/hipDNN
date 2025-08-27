@@ -57,8 +57,8 @@ inline error_t find_common_shape(const std::vector<std::vector<int64_t>>& input_
 
 // Utility function to create Tensor_attributes from a Tensor
 template <class T,
-          class HostAlloc = hipdnn_sdk::utilities::Host_allocator<T>,
-          class DeviceAlloc = hipdnn_sdk::utilities::Device_allocator<T>>
+          class HostAlloc = hipdnn_sdk::utilities::HostAllocator<T>,
+          class DeviceAlloc = hipdnn_sdk::utilities::DeviceAllocator<T>>
 inline TensorAttributes
     make_tensor_attributes(const std::string& name,
                            DataType_t data_type,

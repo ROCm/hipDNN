@@ -30,12 +30,12 @@ public:
     CpuFpReferenceImplementation() = default;
     ~CpuFpReferenceImplementation() override = default;
 
-    void batchnormFwdInference(const Tensor_interface<InputDataType>& input,
-                               const Tensor_interface<ScaleBiasDataType>& scale,
-                               const Tensor_interface<ScaleBiasDataType>& bias,
-                               const Tensor_interface<MeanVarianceDataType>& estimatedMean,
-                               const Tensor_interface<MeanVarianceDataType>& estimatedVariance,
-                               Tensor_interface<InputDataType>& output,
+    void batchnormFwdInference(const ITensor<InputDataType>& input,
+                               const ITensor<ScaleBiasDataType>& scale,
+                               const ITensor<ScaleBiasDataType>& bias,
+                               const ITensor<MeanVarianceDataType>& estimatedMean,
+                               const ITensor<MeanVarianceDataType>& estimatedVariance,
+                               ITensor<InputDataType>& output,
                                double epsilon) override
     {
         if(input.dims().size() != 4)
@@ -50,8 +50,8 @@ public:
         int64_t width = input.dims().at(3);
 
         std::for_each(channels.begin(), channels.end(), [&](int64_t cidx) {
-            auto mean = estimatedMean.get_host_value(0, cidx, 0, 0);
-            auto variance = estimatedVariance.get_host_value(0, cidx, 0, 0);
+            auto mean = estimatedMean.getHostValue(0, cidx, 0, 0);
+            auto variance = estimatedVariance.getHostValue(0, cidx, 0, 0);
             MeanVarianceDataType invVariance
                 = static_cast<MeanVarianceDataType>(1.0f)
                   / sqrtInternal(variance + static_cast<MeanVarianceDataType>(epsilon));
@@ -64,33 +64,33 @@ public:
                     for(int column = 0; column < width; column++)
                     {
                         auto in = static_cast<MeanVarianceDataType>(
-                            input.get_host_value(bidx, cidx, row, column));
+                            input.getHostValue(bidx, cidx, row, column));
                         MeanVarianceDataType elemStd = in - mean;
                         MeanVarianceDataType inhat = elemStd * invVariance;
-                        output.set_host_value(
+                        output.setHostValue(
                             bidx,
                             cidx,
                             row,
                             column,
-                            static_cast<InputDataType>((scale.get_host_value(0, cidx, 0, 0)
+                            static_cast<InputDataType>((scale.getHostValue(0, cidx, 0, 0)
                                                         * static_cast<ScaleBiasDataType>(inhat))
-                                                       + bias.get_host_value(0, cidx, 0, 0)));
+                                                       + bias.getHostValue(0, cidx, 0, 0)));
                     }
                 }
             }
         });
 
-        output.memory().mark_host_modified(); // Mark output memory as modified on host
+        output.memory().markHostModified(); // Mark output memory as modified on host
     }
 
-    void batchnormBwd(const Tensor_interface<InputDataType>& dy,
-                      const Tensor_interface<InputDataType>& x,
-                      const Tensor_interface<MeanVarianceDataType>& mean,
-                      const Tensor_interface<MeanVarianceDataType>& invVariance,
-                      const Tensor_interface<ScaleBiasDataType>& scale,
-                      Tensor_interface<InputDataType>& dx,
-                      Tensor_interface<ScaleBiasDataType>& dscale,
-                      Tensor_interface<ScaleBiasDataType>& dbias) override
+    void batchnormBwd(const ITensor<InputDataType>& dy,
+                      const ITensor<InputDataType>& x,
+                      const ITensor<MeanVarianceDataType>& mean,
+                      const ITensor<MeanVarianceDataType>& invVariance,
+                      const ITensor<ScaleBiasDataType>& scale,
+                      ITensor<InputDataType>& dx,
+                      ITensor<ScaleBiasDataType>& dscale,
+                      ITensor<ScaleBiasDataType>& dbias) override
     {
         if(x.dims().size() != 4)
         {
@@ -108,10 +108,10 @@ public:
         std::iota(channels.begin(), channels.end(), 0);
 
         std::for_each(channels.begin(), channels.end(), [&](int64_t cidx) {
-            auto channelMean = mean.get_host_value(0, cidx, 0, 0);
+            auto channelMean = mean.getHostValue(0, cidx, 0, 0);
             auto channelInvVariance
-                = invVariance.get_host_value(0, cidx, 0, 0); // 1 / sqrt(var + eps)
-            auto channelScale = scale.get_host_value(0, cidx, 0, 0);
+                = invVariance.getHostValue(0, cidx, 0, 0); // 1 / sqrt(var + eps)
+            auto channelScale = scale.getHostValue(0, cidx, 0, 0);
 
             // Calculate dot product for (x - mean) * channelInvVariance * dy and ∑ dy for this channel
             MeanVarianceDataType dotProduct = 0;
@@ -124,9 +124,9 @@ public:
                     for(int column = 0; column < width; column++)
                     {
                         auto xVal = static_cast<MeanVarianceDataType>(
-                            x.get_host_value(bidx, cidx, row, column));
+                            x.getHostValue(bidx, cidx, row, column));
                         auto dyVal = static_cast<MeanVarianceDataType>(
-                            dy.get_host_value(bidx, cidx, row, column));
+                            dy.getHostValue(bidx, cidx, row, column));
 
                         MeanVarianceDataType xHat = (xVal - channelMean) * channelInvVariance;
                         dotProduct += xHat * dyVal;
@@ -140,9 +140,9 @@ public:
             // - dbias = ∑ dy
             // - dx = scale * invVariance * (dy - mean(dy) - xHat * mean(dy * xHat))
 
-            dscale.set_host_value(0, cidx, 0, 0, static_cast<ScaleBiasDataType>(dotProduct));
+            dscale.setHostValue(0, cidx, 0, 0, static_cast<ScaleBiasDataType>(dotProduct));
 
-            dbias.set_host_value(0, cidx, 0, 0, static_cast<ScaleBiasDataType>(sumDy));
+            dbias.setHostValue(0, cidx, 0, 0, static_cast<ScaleBiasDataType>(sumDy));
 
             MeanVarianceDataType meanDy = sumDy / nhwF;
             MeanVarianceDataType meanDyXhat = dotProduct / nhwF;
@@ -156,24 +156,24 @@ public:
                     for(int column = 0; column < width; column++)
                     {
                         auto xVal = static_cast<MeanVarianceDataType>(
-                            x.get_host_value(bidx, cidx, row, column));
+                            x.getHostValue(bidx, cidx, row, column));
                         auto dyVal = static_cast<MeanVarianceDataType>(
-                            dy.get_host_value(bidx, cidx, row, column));
+                            dy.getHostValue(bidx, cidx, row, column));
 
                         MeanVarianceDataType xHat = (xVal - channelMean) * channelInvVariance;
                         MeanVarianceDataType dxVal
                             = (dyVal - meanDy - xHat * meanDyXhat) * scalarCoef;
 
-                        dx.set_host_value(
+                        dx.setHostValue(
                             bidx, cidx, row, column, static_cast<InputDataType>(dxVal));
                     }
                 }
             }
         });
 
-        dx.memory().mark_host_modified();
-        dscale.memory().mark_host_modified();
-        dbias.memory().mark_host_modified();
+        dx.memory().markHostModified();
+        dscale.memory().markHostModified();
+        dbias.memory().markHostModified();
     }
 
 private:

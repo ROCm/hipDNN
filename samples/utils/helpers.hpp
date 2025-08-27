@@ -15,7 +15,7 @@
 #include <random>
 #include <vector>
 
-using hipdnn_sdk::utilities::Tensor_layout;
+using hipdnn_sdk::utilities::TensorLayout;
 
 #define HIP_CHECK(status)                                                                      \
     do                                                                                         \
@@ -114,22 +114,22 @@ constexpr float get_epsilon<hip_bfloat16>()
 template <typename F>
 void run(F&& f)
 {
-    f.template operator()<float, float>(Tensor_layout::NCHW);
-    f.template operator()<half, float>(Tensor_layout::NCHW);
-    f.template operator()<hip_bfloat16, float>(Tensor_layout::NCHW);
-    f.template operator()<float, float>(Tensor_layout::NHWC);
-    f.template operator()<half, float>(Tensor_layout::NHWC);
-    f.template operator()<hip_bfloat16, float>(Tensor_layout::NHWC);
+    f.template operator()<float, float>(TensorLayout::NCHW);
+    f.template operator()<half, float>(TensorLayout::NCHW);
+    f.template operator()<hip_bfloat16, float>(TensorLayout::NCHW);
+    f.template operator()<float, float>(TensorLayout::NHWC);
+    f.template operator()<half, float>(TensorLayout::NHWC);
+    f.template operator()<hip_bfloat16, float>(TensorLayout::NHWC);
 }
 
 inline std::shared_ptr<hipdnn_frontend::graph::Tensor_attributes>
     create_tensor(const std::vector<int64_t>& dims,
                   hipdnn_frontend::DataType_t data_type,
-                  const Tensor_layout& layout = Tensor_layout::NCHW)
+                  const TensorLayout& layout = TensorLayout::NCHW)
 {
     auto tensor = std::make_shared<hipdnn_frontend::graph::Tensor_attributes>();
     tensor->set_dim(dims).set_data_type(data_type);
-    tensor->set_stride(hipdnn_sdk::utilities::generate_strides(dims, layout.stride_order));
+    tensor->set_stride(hipdnn_sdk::utilities::generateStrides(dims, layout.strideOrder));
 
     return tensor;
 }
@@ -151,5 +151,5 @@ struct Sample_runner
     Config config;
 
     template <typename InputType, typename IntermediateType>
-    void operator()(const Tensor_layout& layout);
+    void operator()(const TensorLayout& layout);
 };

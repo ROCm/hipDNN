@@ -111,8 +111,8 @@ public:
             if(tensor_to_infer->get_stride().empty())
             {
                 auto stride_order
-                    = hipdnn_sdk::utilities::stride_order_nhwc(tensor_to_infer->get_dim().size());
-                tensor_to_infer->set_stride(hipdnn_sdk::utilities::generate_strides(
+                    = hipdnn_sdk::utilities::strideOrderNhwc(tensor_to_infer->get_dim().size());
+                tensor_to_infer->set_stride(hipdnn_sdk::utilities::generateStrides(
                     tensor_to_infer->get_dim(), stride_order));
             }
         };
