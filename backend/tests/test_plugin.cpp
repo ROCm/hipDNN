@@ -53,13 +53,25 @@ public:
     }
 };
 
-bool g_CALLBACK_CALLED = false;
-void dummyCallback(hipdnnSeverity_t sev, const char* msg)
+class PluginCallbackTest : public ::testing::Test
 {
-    (void)sev;
-    (void)msg;
-    g_CALLBACK_CALLED = true;
-}
+protected:
+    void SetUp() override
+    {
+        s_callbackCalled = false;
+    }
+
+    static void dummyCallback(hipdnnSeverity_t sev, const char* msg)
+    {
+        (void)sev;
+        (void)msg;
+        s_callbackCalled = true;
+    }
+
+    static bool s_callbackCalled;
+};
+
+bool PluginCallbackTest::s_callbackCalled = false;
 
 const std::string PLUGIN_NAME1 = "hipdnn_test_plugin1";
 const std::string PLUGIN_NAME2 = "hipdnn_test_plugin2";
@@ -316,15 +328,14 @@ TEST(PluginManagerTest, LastErrorOnSecondLoad)
     }
 }
 
-TEST(PluginTest, SetLoggingCallback)
+TEST_F(PluginCallbackTest, SetLoggingCallback)
 {
-    g_CALLBACK_CALLED = false;
 
     plugin::SharedLibrary lib(PLUGIN_PATH1);
 
     Plugin plugin(std::move(lib));
 
     EXPECT_EQ(plugin.setLoggingCallback(dummyCallback), HIPDNN_PLUGIN_STATUS_SUCCESS);
-    EXPECT_TRUE(g_CALLBACK_CALLED);
+    EXPECT_TRUE(s_callbackCalled);
     EXPECT_EQ(plugin.setLoggingCallback(nullptr), HIPDNN_PLUGIN_STATUS_BAD_PARAM);
 }
