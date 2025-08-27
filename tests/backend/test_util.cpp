@@ -13,16 +13,16 @@
 namespace test_util
 {
 
-void create_test_handle(hipdnnHandle_t* handle)
+void createTestHandle(hipdnnHandle_t* handle)
 {
     ASSERT_EQ(hipdnnCreate(handle), HIPDNN_STATUS_SUCCESS);
 }
 
-void create_test_graph(hipdnnBackendDescriptor_t* descriptor, hipdnnHandle_t handle)
+void createTestGraph(hipdnnBackendDescriptor_t* descriptor, hipdnnHandle_t handle)
 {
     flatbuffers::FlatBufferBuilder builder;
     std::vector<::flatbuffers::Offset<hipdnn_sdk::data_objects::TensorAttributes>>
-        tensor_attributes;
+        tensorAttributes;
     std::vector<::flatbuffers::Offset<hipdnn_sdk::data_objects::Node>> nodes;
     auto graph
         = hipdnn_sdk::data_objects::CreateGraphDirect(builder,
@@ -30,13 +30,13 @@ void create_test_graph(hipdnnBackendDescriptor_t* descriptor, hipdnnHandle_t han
                                                       hipdnn_sdk::data_objects::DataType_FLOAT,
                                                       hipdnn_sdk::data_objects::DataType_FLOAT,
                                                       hipdnn_sdk::data_objects::DataType_FLOAT,
-                                                      &tensor_attributes,
+                                                      &tensorAttributes,
                                                       &nodes);
     builder.Finish(graph);
-    flatbuffers::DetachedBuffer serialized_graph = builder.Release();
+    flatbuffers::DetachedBuffer serializedGraph = builder.Release();
 
     ASSERT_EQ(hipdnnBackendCreateAndDeserializeGraph_ext(
-                  descriptor, serialized_graph.data(), serialized_graph.size()),
+                  descriptor, serializedGraph.data(), serializedGraph.size()),
               HIPDNN_STATUS_SUCCESS);
 
     ASSERT_EQ(hipdnnBackendSetAttribute(
@@ -44,15 +44,15 @@ void create_test_graph(hipdnnBackendDescriptor_t* descriptor, hipdnnHandle_t han
               HIPDNN_STATUS_SUCCESS);
 }
 
-void populate_test_engine(hipdnnBackendDescriptor_t engine,
-                          hipdnnBackendDescriptor_t* graph,
-                          hipdnnHandle_t handle,
-                          int64_t gidx,
-                          bool finalize)
+void populateTestEngine(hipdnnBackendDescriptor_t engine,
+                        hipdnnBackendDescriptor_t* graph,
+                        hipdnnHandle_t handle,
+                        int64_t gidx,
+                        bool finalize)
 {
     if(*graph == nullptr)
     {
-        create_test_graph(graph, handle);
+        createTestGraph(graph, handle);
     }
 
     ASSERT_EQ(hipdnnBackendFinalize(*graph), HIPDNN_STATUS_SUCCESS);
@@ -70,30 +70,30 @@ void populate_test_engine(hipdnnBackendDescriptor_t engine,
     }
 }
 
-void create_test_engine(hipdnnBackendDescriptor_t* engine,
-                        hipdnnBackendDescriptor_t* graph,
-                        hipdnnHandle_t handle,
-                        int64_t gidx,
-                        bool finalize)
+void createTestEngine(hipdnnBackendDescriptor_t* engine,
+                      hipdnnBackendDescriptor_t* graph,
+                      hipdnnHandle_t handle,
+                      int64_t gidx,
+                      bool finalize)
 {
     ASSERT_EQ(hipdnnBackendCreateDescriptor(HIPDNN_BACKEND_ENGINE_DESCRIPTOR, engine),
               HIPDNN_STATUS_SUCCESS);
-    populate_test_engine(*engine, graph, handle, gidx, finalize);
+    populateTestEngine(*engine, graph, handle, gidx, finalize);
 }
 
-void populate_test_engine_config(hipdnnBackendDescriptor_t* engine_config,
-                                 hipdnnBackendDescriptor_t* engine,
-                                 hipdnnBackendDescriptor_t* graph,
-                                 hipdnnHandle_t handle,
-                                 int64_t gidx,
-                                 bool finalize)
+void populateTestEngineConfig(hipdnnBackendDescriptor_t* engineConfig,
+                              hipdnnBackendDescriptor_t* engine,
+                              hipdnnBackendDescriptor_t* graph,
+                              hipdnnHandle_t handle,
+                              int64_t gidx,
+                              bool finalize)
 {
     if(*engine == nullptr)
     {
-        create_test_engine(engine, graph, handle, gidx, true);
+        createTestEngine(engine, graph, handle, gidx, true);
     }
 
-    ASSERT_EQ(hipdnnBackendSetAttribute(*engine_config,
+    ASSERT_EQ(hipdnnBackendSetAttribute(*engineConfig,
                                         HIPDNN_ATTR_ENGINECFG_ENGINE,
                                         HIPDNN_TYPE_BACKEND_DESCRIPTOR,
                                         1,
@@ -102,57 +102,57 @@ void populate_test_engine_config(hipdnnBackendDescriptor_t* engine_config,
 
     if(finalize)
     {
-        ASSERT_EQ(hipdnnBackendFinalize(*engine_config), HIPDNN_STATUS_SUCCESS);
+        ASSERT_EQ(hipdnnBackendFinalize(*engineConfig), HIPDNN_STATUS_SUCCESS);
     }
 }
 
-void create_test_engine_config(hipdnnBackendDescriptor_t* engine_config,
+void createTestEngineConfig(hipdnnBackendDescriptor_t* engineConfig,
+                            hipdnnBackendDescriptor_t* engine,
+                            hipdnnBackendDescriptor_t* graph,
+                            hipdnnHandle_t handle,
+                            int64_t gidx,
+                            bool finalize)
+{
+    ASSERT_EQ(hipdnnBackendCreateDescriptor(HIPDNN_BACKEND_ENGINECFG_DESCRIPTOR, engineConfig),
+              HIPDNN_STATUS_SUCCESS);
+    populateTestEngineConfig(engineConfig, engine, graph, handle, gidx, finalize);
+}
+
+void populateTestExecutionPlan(hipdnnBackendDescriptor_t* executionPlan,
+                               hipdnnBackendDescriptor_t* engineConfig,
                                hipdnnBackendDescriptor_t* engine,
                                hipdnnBackendDescriptor_t* graph,
                                hipdnnHandle_t handle,
                                int64_t gidx,
                                bool finalize)
 {
-    ASSERT_EQ(hipdnnBackendCreateDescriptor(HIPDNN_BACKEND_ENGINECFG_DESCRIPTOR, engine_config),
-              HIPDNN_STATUS_SUCCESS);
-    populate_test_engine_config(engine_config, engine, graph, handle, gidx, finalize);
-}
-
-void populate_test_execution_plan(hipdnnBackendDescriptor_t* execution_plan,
-                                  hipdnnBackendDescriptor_t* engine_config,
-                                  hipdnnBackendDescriptor_t* engine,
-                                  hipdnnBackendDescriptor_t* graph,
-                                  hipdnnHandle_t handle,
-                                  int64_t gidx,
-                                  bool finalize)
-{
     ASSERT_EQ(
         hipdnnBackendSetAttribute(
-            *execution_plan, HIPDNN_ATTR_EXECUTION_PLAN_HANDLE, HIPDNN_TYPE_HANDLE, 1, &handle),
+            *executionPlan, HIPDNN_ATTR_EXECUTION_PLAN_HANDLE, HIPDNN_TYPE_HANDLE, 1, &handle),
         HIPDNN_STATUS_SUCCESS);
 
-    if(*engine_config == nullptr)
+    if(*engineConfig == nullptr)
     {
-        create_test_engine_config(engine_config, engine, graph, handle, gidx, true);
+        createTestEngineConfig(engineConfig, engine, graph, handle, gidx, true);
     }
 
-    ASSERT_EQ(hipdnnBackendSetAttribute(*execution_plan,
+    ASSERT_EQ(hipdnnBackendSetAttribute(*executionPlan,
                                         HIPDNN_ATTR_EXECUTION_PLAN_ENGINE_CONFIG,
                                         HIPDNN_TYPE_BACKEND_DESCRIPTOR,
                                         1,
-                                        engine_config),
+                                        engineConfig),
               HIPDNN_STATUS_SUCCESS);
 
     if(finalize)
     {
-        ASSERT_EQ(hipdnnBackendFinalize(*execution_plan), HIPDNN_STATUS_SUCCESS);
+        ASSERT_EQ(hipdnnBackendFinalize(*executionPlan), HIPDNN_STATUS_SUCCESS);
     }
 }
 
-void* allocate_tensor_memory([[maybe_unused]] const int64_t* dims,
-                             [[maybe_unused]] size_t dims_count,
-                             [[maybe_unused]] hipdnnBackendAttributeType_t data_type,
-                             [[maybe_unused]] bool initialize)
+void* allocateTensorMemory([[maybe_unused]] const int64_t* dims,
+                           [[maybe_unused]] size_t dimsCount,
+                           [[maybe_unused]] hipdnnBackendAttributeType_t dataType,
+                           [[maybe_unused]] bool initialize)
 {
     // TODO: Implement memory allocation logic based on the data type and dimensions
     // For now, just return a dummy pointer
@@ -160,38 +160,38 @@ void* allocate_tensor_memory([[maybe_unused]] const int64_t* dims,
     return memory;
 }
 
-void free_tensor_memory(void* data_ptr)
+void freeTensorMemory(void* dataPtr)
 {
-    if(data_ptr != nullptr)
+    if(dataPtr != nullptr)
     {
-        free(data_ptr);
+        free(dataPtr);
     }
 }
 
-void set_tensor_mappings_in_variant_pack(hipdnnBackendDescriptor_t variant_pack,
-                                         const std::vector<int64_t>& tensor_ids,
-                                         const std::vector<void*>& data_ptrs)
+void setTensorMappingsInVariantPack(hipdnnBackendDescriptor_t variantPack,
+                                    const std::vector<int64_t>& tensorIds,
+                                    const std::vector<void*>& dataPtrs)
 {
-    ASSERT_EQ(hipdnnBackendSetAttribute(variant_pack,
+    ASSERT_EQ(hipdnnBackendSetAttribute(variantPack,
                                         HIPDNN_ATTR_VARIANT_PACK_UNIQUE_IDS,
                                         HIPDNN_TYPE_INT64,
-                                        static_cast<int64_t>(tensor_ids.size()),
-                                        tensor_ids.data()),
+                                        static_cast<int64_t>(tensorIds.size()),
+                                        tensorIds.data()),
               HIPDNN_STATUS_SUCCESS);
 
-    ASSERT_EQ(hipdnnBackendSetAttribute(variant_pack,
+    ASSERT_EQ(hipdnnBackendSetAttribute(variantPack,
                                         HIPDNN_ATTR_VARIANT_PACK_DATA_POINTERS,
                                         HIPDNN_TYPE_VOID_PTR,
-                                        static_cast<int64_t>(data_ptrs.size()),
-                                        data_ptrs.data()),
+                                        static_cast<int64_t>(dataPtrs.size()),
+                                        dataPtrs.data()),
               HIPDNN_STATUS_SUCCESS);
 }
 
-void set_workspace_in_variant_pack(hipdnnBackendDescriptor_t variant_pack, void* workspace)
+void setWorkspaceInVariantPack(hipdnnBackendDescriptor_t variantPack, void* workspace)
 {
     if(workspace != nullptr)
     {
-        ASSERT_EQ(hipdnnBackendSetAttribute(variant_pack,
+        ASSERT_EQ(hipdnnBackendSetAttribute(variantPack,
                                             HIPDNN_ATTR_VARIANT_PACK_WORKSPACE,
                                             HIPDNN_TYPE_VOID_PTR,
                                             1,
@@ -200,144 +200,144 @@ void set_workspace_in_variant_pack(hipdnnBackendDescriptor_t variant_pack, void*
     }
 }
 
-void finalize_variant_pack(hipdnnBackendDescriptor_t variant_pack)
+void finalizeVariantPack(hipdnnBackendDescriptor_t variantPack)
 {
-    ASSERT_EQ(hipdnnBackendFinalize(variant_pack), HIPDNN_STATUS_SUCCESS);
+    ASSERT_EQ(hipdnnBackendFinalize(variantPack), HIPDNN_STATUS_SUCCESS);
 }
 
-void extract_tensor_mappings(const std::unordered_map<int64_t, void*>& data_ptr_mappings,
-                             std::vector<int64_t>& tensor_ids,
-                             std::vector<void*>& data_ptrs)
+void extractTensorMappings(const std::unordered_map<int64_t, void*>& dataPtrMappings,
+                           std::vector<int64_t>& tensorIds,
+                           std::vector<void*>& dataPtrs)
 {
-    for(const auto& [id, data_ptr] : data_ptr_mappings)
+    for(const auto& [id, dataPtr] : dataPtrMappings)
     {
-        ASSERT_NE(data_ptr, nullptr);
-        tensor_ids.push_back(id);
-        data_ptrs.push_back(data_ptr);
+        ASSERT_NE(dataPtr, nullptr);
+        tensorIds.push_back(id);
+        dataPtrs.push_back(dataPtr);
     }
-    ASSERT_EQ(tensor_ids.size(), data_ptrs.size());
-    ASSERT_FALSE(tensor_ids.empty());
-    ASSERT_FALSE(data_ptrs.empty());
+    ASSERT_EQ(tensorIds.size(), dataPtrs.size());
+    ASSERT_FALSE(tensorIds.empty());
+    ASSERT_FALSE(dataPtrs.empty());
 }
 
-void populate_variant_pack_with_mappings(
-    hipdnnBackendDescriptor_t variant_pack,
-    const std::unordered_map<int64_t, void*>& data_ptr_mappings,
+void populateVariantPackWithMappings(
+    hipdnnBackendDescriptor_t variantPack,
+    const std::unordered_map<int64_t, void*>& dataPtrMappings,
     void* workspace)
 {
-    std::vector<int64_t> tensor_ids;
-    std::vector<void*> data_ptrs;
+    std::vector<int64_t> tensorIds;
+    std::vector<void*> dataPtrs;
 
-    extract_tensor_mappings(data_ptr_mappings, tensor_ids, data_ptrs);
-    set_tensor_mappings_in_variant_pack(variant_pack, tensor_ids, data_ptrs);
-    set_workspace_in_variant_pack(variant_pack, workspace);
-    finalize_variant_pack(variant_pack);
+    extractTensorMappings(dataPtrMappings, tensorIds, dataPtrs);
+    setTensorMappingsInVariantPack(variantPack, tensorIds, dataPtrs);
+    setWorkspaceInVariantPack(variantPack, workspace);
+    finalizeVariantPack(variantPack);
 }
 
-void create_and_initialize_backend_descriptor(hipdnnBackendDescriptor_t* backend_descriptor,
-                                              const flatbuffers::DetachedBuffer& serialized_graph,
-                                              hipdnnHandle_t handle)
+void createAndInitializeBackendDescriptor(hipdnnBackendDescriptor_t* backendDescriptor,
+                                          const flatbuffers::DetachedBuffer& serializedGraph,
+                                          hipdnnHandle_t handle)
 {
-    ASSERT_EQ(*backend_descriptor, nullptr);
+    ASSERT_EQ(*backendDescriptor, nullptr);
 
     auto status = hipdnnBackendCreateAndDeserializeGraph_ext(
-        backend_descriptor, serialized_graph.data(), serialized_graph.size());
+        backendDescriptor, serializedGraph.data(), serializedGraph.size());
     ASSERT_EQ(status, HIPDNN_STATUS_SUCCESS);
 
     ASSERT_EQ(
         hipdnnBackendSetAttribute(
-            *backend_descriptor, HIPDNN_ATTR_OPERATIONGRAPH_HANDLE, HIPDNN_TYPE_HANDLE, 1, &handle),
+            *backendDescriptor, HIPDNN_ATTR_OPERATIONGRAPH_HANDLE, HIPDNN_TYPE_HANDLE, 1, &handle),
         HIPDNN_STATUS_SUCCESS);
 
-    status = hipdnnBackendFinalize(*backend_descriptor);
+    status = hipdnnBackendFinalize(*backendDescriptor);
     ASSERT_EQ(status, HIPDNN_STATUS_SUCCESS);
 }
 
-flatbuffers::FlatBufferBuilder create_and_populate_batchnorm_node()
+flatbuffers::FlatBufferBuilder createAndPopulateBatchnormNode()
 {
     return flatbuffer_test_utils::createValidBatchnormGraph();
 }
 
-void extract_tensor_info_from_graph(
-    const flatbuffers::DetachedBuffer& serialized_graph,
-    std::unordered_map<int64_t, std::string>& uid_to_name_map,
-    std::unordered_map<std::string, int64_t>& name_to_uid_map,
-    std::unordered_map<int64_t, std::vector<int64_t>>& uid_to_dims_map)
+void extractTensorInfoFromGraph(
+    const flatbuffers::DetachedBuffer& serializedGraph,
+    std::unordered_map<int64_t, std::string>& uidToNameMap,
+    std::unordered_map<std::string, int64_t>& nameToUidMap,
+    std::unordered_map<int64_t, std::vector<int64_t>>& uidToDimsMap)
 {
-    uid_to_name_map.clear();
-    name_to_uid_map.clear();
-    uid_to_dims_map.clear();
+    uidToNameMap.clear();
+    nameToUidMap.clear();
+    uidToDimsMap.clear();
 
-    auto deserialized_graph = hipdnn_sdk::data_objects::UnPackGraph(serialized_graph.data());
-    ASSERT_NE(deserialized_graph, nullptr);
+    auto deserializedGraph = hipdnn_sdk::data_objects::UnPackGraph(serializedGraph.data());
+    ASSERT_NE(deserializedGraph, nullptr);
 
     // Extract all tensor information from the deserialized graph
-    for(const auto& tensor : deserialized_graph->tensors)
+    for(const auto& tensor : deserializedGraph->tensors)
     {
         int64_t uid = tensor->uid;
         std::string name = tensor->name;
 
-        uid_to_name_map[uid] = name;
-        name_to_uid_map[name] = uid;
+        uidToNameMap[uid] = name;
+        nameToUidMap[name] = uid;
 
         if(!tensor->dims.empty())
         {
-            uid_to_dims_map[uid] = tensor->dims;
+            uidToDimsMap[uid] = tensor->dims;
         }
     }
 
-    ASSERT_FALSE(uid_to_name_map.empty());
+    ASSERT_FALSE(uidToNameMap.empty());
 }
 
-std::vector<std::string> get_loaded_plugins(hipdnnHandle_t handle)
+std::vector<std::string> getLoadedPlugins(hipdnnHandle_t handle)
 {
-    size_t num_plugins = 0;
-    size_t max_path_length = 0;
+    size_t numPlugins = 0;
+    size_t maxPathLength = 0;
     auto status
-        = hipdnnGetLoadedEnginePluginPaths_ext(handle, &num_plugins, nullptr, &max_path_length);
+        = hipdnnGetLoadedEnginePluginPaths_ext(handle, &numPlugins, nullptr, &maxPathLength);
 
     if(status != HIPDNN_STATUS_SUCCESS)
     {
         throw std::runtime_error("Failed to get loaded plugin paths");
     }
 
-    if(num_plugins == 0)
+    if(numPlugins == 0)
     {
         return {};
     }
 
-    std::vector<std::vector<char>> path_buffers(num_plugins, std::vector<char>(max_path_length));
-    std::vector<char*> plugin_paths_c(num_plugins);
-    for(size_t i = 0; i < num_plugins; ++i)
+    std::vector<std::vector<char>> pathBuffers(numPlugins, std::vector<char>(maxPathLength));
+    std::vector<char*> pluginPathsC(numPlugins);
+    for(size_t i = 0; i < numPlugins; ++i)
     {
-        plugin_paths_c[i] = path_buffers[i].data();
+        pluginPathsC[i] = pathBuffers[i].data();
     }
 
     status = hipdnnGetLoadedEnginePluginPaths_ext(
-        handle, &num_plugins, plugin_paths_c.data(), &max_path_length);
+        handle, &numPlugins, pluginPathsC.data(), &maxPathLength);
     if(status != HIPDNN_STATUS_SUCCESS)
     {
         throw std::runtime_error("Failed to get loaded plugin paths");
     }
 
-    std::vector<std::string> plugin_paths;
-    plugin_paths.reserve(num_plugins);
-    for(size_t i = 0; i < num_plugins; ++i)
+    std::vector<std::string> pluginPaths;
+    pluginPaths.reserve(numPlugins);
+    for(size_t i = 0; i < numPlugins; ++i)
     {
-        plugin_paths.emplace_back(plugin_paths_c[i]);
+        pluginPaths.emplace_back(pluginPathsC[i]);
     }
-    return plugin_paths;
+    return pluginPaths;
 }
 
-bool is_plugin_loaded(const std::vector<std::string>& loaded_plugins,
-                      const std::string& plugin_name)
+bool isPluginLoaded(const std::vector<std::string>& loadedPlugins,
+                    const std::string& pluginName)
 {
     namespace fs = std::filesystem;
 
-    return std::ranges::any_of(loaded_plugins, [&](const std::string& loaded_path_str) {
+    return std::ranges::any_of(loadedPlugins, [&](const std::string& loadedPathStr) {
         try
         {
-            return fs::canonical(loaded_path_str) == fs::canonical(plugin_name);
+            return fs::canonical(loadedPathStr) == fs::canonical(pluginName);
         }
         catch(const fs::filesystem_error&)
         {

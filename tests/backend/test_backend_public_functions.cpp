@@ -62,10 +62,10 @@ TEST(HipDNNBackendTest, CreateHandleFailsIfHandlePtrIsNull)
 TEST(HipDNNBackendTest, Execute)
 {
     hipdnnHandle_t handle = nullptr;
-    hipdnnBackendDescriptor_t execution_plan = nullptr;
-    hipdnnBackendDescriptor_t variant_pack = nullptr;
+    hipdnnBackendDescriptor_t executionPlan = nullptr;
+    hipdnnBackendDescriptor_t variantPack = nullptr;
 
-    hipdnnStatus_t status = hipdnnBackendExecute(handle, execution_plan, variant_pack);
+    hipdnnStatus_t status = hipdnnBackendExecute(handle, executionPlan, variantPack);
 
     EXPECT_EQ(status, HIPDNN_STATUS_BAD_PARAM_NULL_POINTER);
 }
@@ -82,18 +82,18 @@ TEST(HipDNNBackendTest, Finalize)
 TEST(HipDNNBackendTest, GetAttribute)
 {
     hipdnnBackendDescriptor_t descriptor = nullptr;
-    hipdnnBackendAttributeName_t attribute_name = HIPDNN_ATTR_ENGINEHEUR_OPERATION_GRAPH;
-    hipdnnBackendAttributeType_t attribute_type = HIPDNN_TYPE_NUMERICAL_NOTE;
-    int64_t requested_element_count = 0;
-    int64_t element_count = 0;
-    void* array_of_elements = nullptr;
+    hipdnnBackendAttributeName_t attributeName = HIPDNN_ATTR_ENGINEHEUR_OPERATION_GRAPH;
+    hipdnnBackendAttributeType_t attributeType = HIPDNN_TYPE_NUMERICAL_NOTE;
+    int64_t requestedElementCount = 0;
+    int64_t elementCount = 0;
+    void* arrayOfElements = nullptr;
 
     hipdnnStatus_t status = hipdnnBackendGetAttribute(descriptor,
-                                                      attribute_name,
-                                                      attribute_type,
-                                                      requested_element_count,
-                                                      &element_count,
-                                                      array_of_elements);
+                                                      attributeName,
+                                                      attributeType,
+                                                      requestedElementCount,
+                                                      &elementCount,
+                                                      arrayOfElements);
 
     EXPECT_EQ(status, HIPDNN_STATUS_BAD_PARAM_NULL_POINTER);
 }
@@ -101,13 +101,13 @@ TEST(HipDNNBackendTest, GetAttribute)
 TEST(HipDNNBackendTest, SetAttribute)
 {
     hipdnnBackendDescriptor_t descriptor = nullptr;
-    hipdnnBackendAttributeName_t attribute_name = HIPDNN_ATTR_ENGINEHEUR_OPERATION_GRAPH;
-    hipdnnBackendAttributeType_t attribute_type = HIPDNN_TYPE_NUMERICAL_NOTE;
-    int64_t element_count = 0;
-    void* array_of_elements = nullptr;
+    hipdnnBackendAttributeName_t attributeName = HIPDNN_ATTR_ENGINEHEUR_OPERATION_GRAPH;
+    hipdnnBackendAttributeType_t attributeType = HIPDNN_TYPE_NUMERICAL_NOTE;
+    int64_t elementCount = 0;
+    void* arrayOfElements = nullptr;
 
     hipdnnStatus_t status = hipdnnBackendSetAttribute(
-        descriptor, attribute_name, attribute_type, element_count, array_of_elements);
+        descriptor, attributeName, attributeType, elementCount, arrayOfElements);
 
     EXPECT_EQ(status, HIPDNN_STATUS_BAD_PARAM_NULL_POINTER);
 }
@@ -116,7 +116,7 @@ TEST(HipDNNBackendTest, WillSetBackendGraphCorrectly)
 {
     flatbuffers::FlatBufferBuilder builder;
     std::vector<::flatbuffers::Offset<hipdnn_sdk::data_objects::TensorAttributes>>
-        tensor_attributes;
+        tensorAttributes;
     std::vector<::flatbuffers::Offset<hipdnn_sdk::data_objects::Node>> nodes;
     auto graph
         = hipdnn_sdk::data_objects::CreateGraphDirect(builder,
@@ -124,15 +124,15 @@ TEST(HipDNNBackendTest, WillSetBackendGraphCorrectly)
                                                       hipdnn_sdk::data_objects::DataType_FLOAT,
                                                       hipdnn_sdk::data_objects::DataType_FLOAT,
                                                       hipdnn_sdk::data_objects::DataType_FLOAT,
-                                                      &tensor_attributes,
+                                                      &tensorAttributes,
                                                       &nodes);
     builder.Finish(graph);
-    flatbuffers::DetachedBuffer serialized_graph = builder.Release();
+    flatbuffers::DetachedBuffer serializedGraph = builder.Release();
 
     hipdnnBackendDescriptor_t descriptor = nullptr;
 
     auto status = hipdnnBackendCreateAndDeserializeGraph_ext(
-        &descriptor, serialized_graph.data(), serialized_graph.size());
+        &descriptor, serializedGraph.data(), serializedGraph.size());
 
     EXPECT_EQ(status, HIPDNN_STATUS_SUCCESS);
 
@@ -175,11 +175,11 @@ TEST(HipDNNBackendTest, WillFailToCreateGraphIfGraphIsNull)
     EXPECT_EQ(descriptor, nullptr);
 }
 
-TEST(HipDNNBackendTest, SetPluginPathsExt_Success)
+TEST(HipDNNBackendTest, SetPluginPathsExtSuccess)
 {
     using namespace hipdnn_tests::plugin_constants;
-    std::string plugin_dir_str = PLUGIN_DIR.string();
-    std::array<const char*, 3> paths = {plugin_dir_str.c_str(), "./", "../directory/"};
+    std::string pluginDirStr = PLUGIN_DIR.string();
+    std::array<const char*, 3> paths = {pluginDirStr.c_str(), "./", "../directory/"};
 
     hipdnnStatus_t status = hipdnnSetEnginePluginPaths_ext(
         paths.size(), paths.data(), HIPDNN_PLUGIN_LOADING_ABSOLUTE);
@@ -187,7 +187,7 @@ TEST(HipDNNBackendTest, SetPluginPathsExt_Success)
     EXPECT_EQ(status, HIPDNN_STATUS_SUCCESS);
 }
 
-TEST(HipDNNBackendTest, SetPluginPathsExt_InvalidAndValidNullPointerCorrectness)
+TEST(HipDNNBackendTest, SetPluginPathsExtInvalidAndValidNullPointerCorrectness)
 {
     hipdnnStatus_t status
         = hipdnnSetEnginePluginPaths_ext(1, nullptr, HIPDNN_PLUGIN_LOADING_ABSOLUTE);
@@ -201,13 +201,13 @@ TEST(HipDNNBackendTest, SetPluginPathsExt_InvalidAndValidNullPointerCorrectness)
     ASSERT_EQ(status, HIPDNN_STATUS_SUCCESS);
     ASSERT_NE(handle, nullptr);
 
-    auto loaded_plugins = test_util::get_loaded_plugins(handle);
-    EXPECT_EQ(loaded_plugins.size(), 0);
+    auto loadedPlugins = test_util::getLoadedPlugins(handle);
+    EXPECT_EQ(loadedPlugins.size(), 0);
 
     EXPECT_EQ(hipdnnDestroy(handle), HIPDNN_STATUS_SUCCESS);
 }
 
-TEST(HipDNNBackendTest, SetPluginPathsExt_FailsOnNullStringInList)
+TEST(HipDNNBackendTest, SetPluginPathsExtFailsOnNullStringInList)
 {
     std::array<const char*, 2> paths = {"./valid/path.so", nullptr};
 
@@ -217,7 +217,7 @@ TEST(HipDNNBackendTest, SetPluginPathsExt_FailsOnNullStringInList)
     EXPECT_EQ(status, HIPDNN_STATUS_BAD_PARAM_NULL_POINTER);
 }
 
-TEST(HipDNNBackendTest, PluginPathsExt_FailsWithIneligibleHandle)
+TEST(HipDNNBackendTest, PluginPathsExtFailsWithIneligibleHandle)
 {
     hipdnnHandle_t handle = nullptr;
     hipdnnStatus_t status = hipdnnCreate(&handle);
@@ -232,13 +232,13 @@ TEST(HipDNNBackendTest, PluginPathsExt_FailsWithIneligibleHandle)
 
     EXPECT_EQ(hipdnnDestroy(handle), HIPDNN_STATUS_SUCCESS);
 
-    size_t num_plugins = 0;
-    size_t max_path_length = 0;
-    status = hipdnnGetLoadedEnginePluginPaths_ext(nullptr, &num_plugins, nullptr, &max_path_length);
+    size_t numPlugins = 0;
+    size_t maxPathLength = 0;
+    status = hipdnnGetLoadedEnginePluginPaths_ext(nullptr, &numPlugins, nullptr, &maxPathLength);
     EXPECT_EQ(status, HIPDNN_STATUS_BAD_PARAM_NULL_POINTER);
 }
 
-TEST(HipDNNBackendTest, GetLoadedPluginPaths_LoadsDefault)
+TEST(HipDNNBackendTest, GetLoadedPluginPathsLoadsDefault)
 {
     hipdnnStatus_t status
         = hipdnnSetEnginePluginPaths_ext(0, nullptr, HIPDNN_PLUGIN_LOADING_ADDITIVE);
@@ -249,19 +249,19 @@ TEST(HipDNNBackendTest, GetLoadedPluginPaths_LoadsDefault)
     ASSERT_EQ(status, HIPDNN_STATUS_SUCCESS);
     ASSERT_NE(handle, nullptr);
 
-    auto loaded_plugins = test_util::get_loaded_plugins(handle);
+    auto loadedPlugins = test_util::getLoadedPlugins(handle);
 
-    fs::path expected_plugin_path = fs::path("../../backend/src/hipdnn_plugins/engines")
-                                    / getLibraryName("test_good_default_plugin");
+    fs::path expectedPluginPath = fs::path("../../backend/src/hipdnn_plugins/engines")
+                                  / getLibraryName("test_good_default_plugin");
 
-    EXPECT_TRUE(test_util::is_plugin_loaded(loaded_plugins, expected_plugin_path.string()));
+    EXPECT_TRUE(test_util::isPluginLoaded(loadedPlugins, expectedPluginPath.string()));
     EXPECT_EQ(hipdnnDestroy(handle), HIPDNN_STATUS_SUCCESS);
 }
 
-TEST(HipDNNBackendTest, GetLoadedPluginPaths_AdditiveLoadsBothDefaultAndCustom)
+TEST(HipDNNBackendTest, GetLoadedPluginPathsAdditiveLoadsBothDefaultAndCustom)
 {
-    std::string plugin_dir_str = PLUGIN_DIR.string();
-    const std::array<const char*, 1> paths = {plugin_dir_str.c_str()};
+    std::string pluginDirStr = PLUGIN_DIR.string();
+    const std::array<const char*, 1> paths = {pluginDirStr.c_str()};
     hipdnnStatus_t status = hipdnnSetEnginePluginPaths_ext(
         paths.size(), paths.data(), HIPDNN_PLUGIN_LOADING_ADDITIVE);
     EXPECT_EQ(status, HIPDNN_STATUS_SUCCESS);
@@ -271,23 +271,23 @@ TEST(HipDNNBackendTest, GetLoadedPluginPaths_AdditiveLoadsBothDefaultAndCustom)
     ASSERT_EQ(status, HIPDNN_STATUS_SUCCESS);
     ASSERT_NE(handle, nullptr);
 
-    auto loaded_plugins = test_util::get_loaded_plugins(handle);
-    EXPECT_GE(loaded_plugins.size(), 2);
+    auto loadedPlugins = test_util::getLoadedPlugins(handle);
+    EXPECT_GE(loadedPlugins.size(), 2);
 
-    auto default_plugin_path = fs::path("../../backend/src/hipdnn_plugins/engines")
-                               / getLibraryName("test_good_default_plugin");
-    auto test_plugin_path = PLUGIN_DIR / getLibraryName(test_good_plugin_name);
+    auto defaultPluginPath = fs::path("../../backend/src/hipdnn_plugins/engines")
+                             / getLibraryName("test_good_default_plugin");
+    auto testPluginPath = PLUGIN_DIR / getLibraryName(test_good_plugin_name);
 
-    EXPECT_TRUE(test_util::is_plugin_loaded(loaded_plugins, default_plugin_path.string()));
-    EXPECT_TRUE(test_util::is_plugin_loaded(loaded_plugins, test_plugin_path.string()));
+    EXPECT_TRUE(test_util::isPluginLoaded(loadedPlugins, defaultPluginPath.string()));
+    EXPECT_TRUE(test_util::isPluginLoaded(loadedPlugins, testPluginPath.string()));
 
     EXPECT_EQ(hipdnnDestroy(handle), HIPDNN_STATUS_SUCCESS);
 }
 
-TEST(HipDNNBackendTest, GetLoadedPluginPaths_AbsoluteLoadsOnlyCustom)
+TEST(HipDNNBackendTest, GetLoadedPluginPathsAbsoluteLoadsOnlyCustom)
 {
-    auto& plugin_file_path = test_good_plugin_path();
-    const std::array<const char*, 1> paths = {plugin_file_path.c_str()};
+    auto& pluginFilePath = test_good_plugin_path();
+    const std::array<const char*, 1> paths = {pluginFilePath.c_str()};
     hipdnnStatus_t status = hipdnnSetEnginePluginPaths_ext(
         paths.size(), paths.data(), HIPDNN_PLUGIN_LOADING_ABSOLUTE);
     EXPECT_EQ(status, HIPDNN_STATUS_SUCCESS);
@@ -297,14 +297,14 @@ TEST(HipDNNBackendTest, GetLoadedPluginPaths_AbsoluteLoadsOnlyCustom)
     ASSERT_EQ(status, HIPDNN_STATUS_SUCCESS);
     ASSERT_NE(handle, nullptr);
 
-    auto loaded_plugins = test_util::get_loaded_plugins(handle);
-    EXPECT_EQ(loaded_plugins.size(), 1);
+    auto loadedPlugins = test_util::getLoadedPlugins(handle);
+    EXPECT_EQ(loadedPlugins.size(), 1);
 
-    auto default_plugin_path = fs::path("backend/src/hipdnn_plugins/engines")
-                               / getLibraryName("test_good_default_plugin");
+    auto defaultPluginPath = fs::path("backend/src/hipdnn_plugins/engines")
+                             / getLibraryName("test_good_default_plugin");
 
-    EXPECT_FALSE(test_util::is_plugin_loaded(loaded_plugins, default_plugin_path.string()));
-    EXPECT_TRUE(test_util::is_plugin_loaded(loaded_plugins, plugin_file_path));
+    EXPECT_FALSE(test_util::isPluginLoaded(loadedPlugins, defaultPluginPath.string()));
+    EXPECT_TRUE(test_util::isPluginLoaded(loadedPlugins, pluginFilePath));
 
     EXPECT_EQ(hipdnnDestroy(handle), HIPDNN_STATUS_SUCCESS);
 }

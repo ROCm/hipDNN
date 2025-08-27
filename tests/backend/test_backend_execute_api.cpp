@@ -11,17 +11,17 @@
 
 #include <gtest/gtest.h>
 
-class Execution_backend_end_api_tests : public ::testing::Test
+class ExecutionBackendEndApiTests : public ::testing::Test
 {
 protected:
     static constexpr int64_t GIDX = hipdnn_tests::plugin_constants::engine_id<Good_plugin>();
     hipdnnBackendDescriptor_t _plan = nullptr;
     hipdnnHandle_t _handle = nullptr;
-    hipdnnBackendDescriptor_t _engine_config = nullptr;
+    hipdnnBackendDescriptor_t _engineConfig = nullptr;
     hipdnnBackendDescriptor_t _engine = nullptr;
-    hipdnnBackendDescriptor_t _graph_descriptor = nullptr;
+    hipdnnBackendDescriptor_t _graphDescriptor = nullptr;
 
-    hipdnnBackendDescriptor_t _variant_pack = nullptr;
+    hipdnnBackendDescriptor_t _variantPack = nullptr;
 
     void SetUp() override
     {
@@ -36,15 +36,15 @@ protected:
 
     void TearDown() override
     {
-        destroy_test_handle();
-        destroy_test_descriptor(_plan);
-        destroy_test_descriptor(_engine_config);
-        destroy_test_descriptor(_engine);
-        destroy_test_descriptor(_graph_descriptor);
-        destroy_test_descriptor(_variant_pack);
+        destroyTestHandle();
+        destroyTestDescriptor(_plan);
+        destroyTestDescriptor(_engineConfig);
+        destroyTestDescriptor(_engine);
+        destroyTestDescriptor(_graphDescriptor);
+        destroyTestDescriptor(_variantPack);
     }
 
-    static void destroy_test_descriptor(hipdnnBackendDescriptor_t descriptor)
+    static void destroyTestDescriptor(hipdnnBackendDescriptor_t descriptor)
     {
         if(descriptor != nullptr)
         {
@@ -54,7 +54,7 @@ protected:
     }
 
 private:
-    void destroy_test_handle()
+    void destroyTestHandle()
     {
         if(_handle != nullptr)
         {
@@ -64,140 +64,140 @@ private:
     }
 };
 
-TEST_F(Execution_backend_end_api_tests, TestBackendExecuteWithNullHandle)
+TEST_F(ExecutionBackendEndApiTests, TestBackendExecuteWithNullHandle)
 {
-    auto batchnorm_builder = test_util::create_and_populate_batchnorm_node();
-    auto serialized_graph = batchnorm_builder.Release();
+    auto batchnormBuilder = test_util::createAndPopulateBatchnormNode();
+    auto serializedGraph = batchnormBuilder.Release();
 
-    test_util::create_and_initialize_backend_descriptor(
-        &_graph_descriptor, serialized_graph, _handle);
-    test_util::create_test_engine(&_engine, &_graph_descriptor, _handle, GIDX, true);
-    test_util::create_test_engine_config(
-        &_engine_config, &_engine, &_graph_descriptor, _handle, GIDX, true);
+    test_util::createAndInitializeBackendDescriptor(
+        &_graphDescriptor, serializedGraph, _handle);
+    test_util::createTestEngine(&_engine, &_graphDescriptor, _handle, GIDX, true);
+    test_util::createTestEngineConfig(
+        &_engineConfig, &_engine, &_graphDescriptor, _handle, GIDX, true);
 
     EXPECT_EQ(hipdnnBackendCreateDescriptor(HIPDNN_BACKEND_EXECUTION_PLAN_DESCRIPTOR, &_plan),
               HIPDNN_STATUS_SUCCESS);
 
-    test_util::populate_test_execution_plan(
-        &_plan, &_engine_config, &_engine, &_graph_descriptor, _handle, GIDX, true);
+    test_util::populateTestExecutionPlan(
+        &_plan, &_engineConfig, &_engine, &_graphDescriptor, _handle, GIDX, true);
 
-    ASSERT_EQ(hipdnnBackendExecute(nullptr, _plan, _variant_pack),
+    ASSERT_EQ(hipdnnBackendExecute(nullptr, _plan, _variantPack),
               HIPDNN_STATUS_BAD_PARAM_NULL_POINTER);
 }
 
-TEST_F(Execution_backend_end_api_tests, TestBackendExecuteWithNullDescriptors)
+TEST_F(ExecutionBackendEndApiTests, TestBackendExecuteWithNullDescriptors)
 {
-    auto batchnorm_builder = test_util::create_and_populate_batchnorm_node();
-    auto serialized_graph = batchnorm_builder.Release();
+    auto batchnormBuilder = test_util::createAndPopulateBatchnormNode();
+    auto serializedGraph = batchnormBuilder.Release();
 
-    test_util::create_and_initialize_backend_descriptor(
-        &_graph_descriptor, serialized_graph, _handle);
-    test_util::create_test_engine(&_engine, &_graph_descriptor, _handle, GIDX, true);
-    test_util::create_test_engine_config(
-        &_engine_config, &_engine, &_graph_descriptor, _handle, GIDX, true);
+    test_util::createAndInitializeBackendDescriptor(
+        &_graphDescriptor, serializedGraph, _handle);
+    test_util::createTestEngine(&_engine, &_graphDescriptor, _handle, GIDX, true);
+    test_util::createTestEngineConfig(
+        &_engineConfig, &_engine, &_graphDescriptor, _handle, GIDX, true);
 
     EXPECT_EQ(hipdnnBackendCreateDescriptor(HIPDNN_BACKEND_EXECUTION_PLAN_DESCRIPTOR, &_plan),
               HIPDNN_STATUS_SUCCESS);
 
-    test_util::populate_test_execution_plan(
-        &_plan, &_engine_config, &_engine, &_graph_descriptor, _handle, GIDX, true);
+    test_util::populateTestExecutionPlan(
+        &_plan, &_engineConfig, &_engine, &_graphDescriptor, _handle, GIDX, true);
 
-    ASSERT_EQ(hipdnnBackendExecute(_handle, nullptr, _variant_pack),
+    ASSERT_EQ(hipdnnBackendExecute(_handle, nullptr, _variantPack),
               HIPDNN_STATUS_BAD_PARAM_NULL_POINTER);
 
     ASSERT_EQ(hipdnnBackendExecute(_handle, _plan, nullptr), HIPDNN_STATUS_BAD_PARAM_NULL_POINTER);
 }
 
-TEST_F(Execution_backend_end_api_tests, TestBackendExecuteWithUnfinalizedPlan)
+TEST_F(ExecutionBackendEndApiTests, TestBackendExecuteWithUnfinalizedPlan)
 {
-    hipdnnBackendDescriptor_t unfinalized_plan = nullptr;
+    hipdnnBackendDescriptor_t unfinalizedPlan = nullptr;
     ASSERT_EQ(
-        hipdnnBackendCreateDescriptor(HIPDNN_BACKEND_EXECUTION_PLAN_DESCRIPTOR, &unfinalized_plan),
+        hipdnnBackendCreateDescriptor(HIPDNN_BACKEND_EXECUTION_PLAN_DESCRIPTOR, &unfinalizedPlan),
         HIPDNN_STATUS_SUCCESS);
 
-    auto batchnorm_builder = test_util::create_and_populate_batchnorm_node();
-    auto serialized_graph = batchnorm_builder.Release();
+    auto batchnormBuilder = test_util::createAndPopulateBatchnormNode();
+    auto serializedGraph = batchnormBuilder.Release();
 
-    test_util::create_and_initialize_backend_descriptor(
-        &_graph_descriptor, serialized_graph, _handle);
+    test_util::createAndInitializeBackendDescriptor(
+        &_graphDescriptor, serializedGraph, _handle);
 
-    ASSERT_EQ(hipdnnBackendCreateDescriptor(HIPDNN_BACKEND_VARIANT_PACK_DESCRIPTOR, &_variant_pack),
+    ASSERT_EQ(hipdnnBackendCreateDescriptor(HIPDNN_BACKEND_VARIANT_PACK_DESCRIPTOR, &_variantPack),
               HIPDNN_STATUS_SUCCESS);
 
-    ASSERT_EQ(hipdnnBackendExecute(_handle, unfinalized_plan, _variant_pack),
+    ASSERT_EQ(hipdnnBackendExecute(_handle, unfinalizedPlan, _variantPack),
               HIPDNN_STATUS_BAD_PARAM);
 
-    destroy_test_descriptor(unfinalized_plan);
+    destroyTestDescriptor(unfinalizedPlan);
 }
 
-TEST_F(Execution_backend_end_api_tests, TestBackendExecuteWithWrongDescriptorTypes)
+TEST_F(ExecutionBackendEndApiTests, TestBackendExecuteWithWrongDescriptorTypes)
 {
-    auto batchnorm_builder = test_util::create_and_populate_batchnorm_node();
-    auto serialized_graph = batchnorm_builder.Release();
+    auto batchnormBuilder = test_util::createAndPopulateBatchnormNode();
+    auto serializedGraph = batchnormBuilder.Release();
 
-    test_util::create_and_initialize_backend_descriptor(
-        &_graph_descriptor, serialized_graph, _handle);
-    test_util::create_test_engine(&_engine, &_graph_descriptor, _handle, GIDX, true);
+    test_util::createAndInitializeBackendDescriptor(
+        &_graphDescriptor, serializedGraph, _handle);
+    test_util::createTestEngine(&_engine, &_graphDescriptor, _handle, GIDX, true);
 
-    ASSERT_EQ(hipdnnBackendCreateDescriptor(HIPDNN_BACKEND_VARIANT_PACK_DESCRIPTOR, &_variant_pack),
+    ASSERT_EQ(hipdnnBackendCreateDescriptor(HIPDNN_BACKEND_VARIANT_PACK_DESCRIPTOR, &_variantPack),
               HIPDNN_STATUS_SUCCESS);
 
-    ASSERT_EQ(hipdnnBackendExecute(_handle, _engine, _variant_pack), HIPDNN_STATUS_BAD_PARAM);
+    ASSERT_EQ(hipdnnBackendExecute(_handle, _engine, _variantPack), HIPDNN_STATUS_BAD_PARAM);
 
     EXPECT_EQ(hipdnnBackendCreateDescriptor(HIPDNN_BACKEND_EXECUTION_PLAN_DESCRIPTOR, &_plan),
               HIPDNN_STATUS_SUCCESS);
 
-    test_util::populate_test_execution_plan(
-        &_plan, &_engine_config, &_engine, &_graph_descriptor, _handle, GIDX, true);
-    ASSERT_EQ(hipdnnBackendExecute(_handle, _plan, _graph_descriptor), HIPDNN_STATUS_BAD_PARAM);
+    test_util::populateTestExecutionPlan(
+        &_plan, &_engineConfig, &_engine, &_graphDescriptor, _handle, GIDX, true);
+    ASSERT_EQ(hipdnnBackendExecute(_handle, _plan, _graphDescriptor), HIPDNN_STATUS_BAD_PARAM);
 }
 
-TEST_F(Execution_backend_end_api_tests, TestBackendExecute)
+TEST_F(ExecutionBackendEndApiTests, TestBackendExecute)
 {
-    auto batchnorm_builder = test_util::create_and_populate_batchnorm_node();
-    auto serialized_graph = batchnorm_builder.Release();
+    auto batchnormBuilder = test_util::createAndPopulateBatchnormNode();
+    auto serializedGraph = batchnormBuilder.Release();
 
-    std::unordered_map<int64_t, std::string> uid_to_name_map;
-    std::unordered_map<std::string, int64_t> name_to_uid_map;
-    std::unordered_map<int64_t, std::vector<int64_t>> uid_to_dims_map;
+    std::unordered_map<int64_t, std::string> uidToNameMap;
+    std::unordered_map<std::string, int64_t> nameToUidMap;
+    std::unordered_map<int64_t, std::vector<int64_t>> uidToDimsMap;
 
-    test_util::extract_tensor_info_from_graph(
-        serialized_graph, uid_to_name_map, name_to_uid_map, uid_to_dims_map);
+    test_util::extractTensorInfoFromGraph(
+        serializedGraph, uidToNameMap, nameToUidMap, uidToDimsMap);
 
-    test_util::create_and_initialize_backend_descriptor(
-        &_graph_descriptor, serialized_graph, _handle);
-    test_util::create_test_engine(&_engine, &_graph_descriptor, _handle, GIDX, true);
-    test_util::create_test_engine_config(
-        &_engine_config, &_engine, &_graph_descriptor, _handle, GIDX, true);
+    test_util::createAndInitializeBackendDescriptor(
+        &_graphDescriptor, serializedGraph, _handle);
+    test_util::createTestEngine(&_engine, &_graphDescriptor, _handle, GIDX, true);
+    test_util::createTestEngineConfig(
+        &_engineConfig, &_engine, &_graphDescriptor, _handle, GIDX, true);
 
     EXPECT_EQ(hipdnnBackendCreateDescriptor(HIPDNN_BACKEND_EXECUTION_PLAN_DESCRIPTOR, &_plan),
               HIPDNN_STATUS_SUCCESS);
 
-    test_util::populate_test_execution_plan(
-        &_plan, &_engine_config, &_engine, &_graph_descriptor, _handle, GIDX, true);
+    test_util::populateTestExecutionPlan(
+        &_plan, &_engineConfig, &_engine, &_graphDescriptor, _handle, GIDX, true);
 
-    std::unordered_map<int64_t, void*> data_ptr_mappings;
+    std::unordered_map<int64_t, void*> dataPtrMappings;
 
-    for(const auto& [uid, dims] : uid_to_dims_map)
+    for(const auto& [uid, dims] : uidToDimsMap)
     {
-        void* tensor_data
-            = test_util::allocate_tensor_memory(dims.data(), dims.size(), HIPDNN_TYPE_FLOAT, true);
+        void* tensorData
+            = test_util::allocateTensorMemory(dims.data(), dims.size(), HIPDNN_TYPE_FLOAT, true);
 
-        ASSERT_NE(tensor_data, nullptr)
-            << "Failed to allocate memory for tensor " << uid_to_name_map[uid];
+        ASSERT_NE(tensorData, nullptr)
+            << "Failed to allocate memory for tensor " << uidToNameMap[uid];
 
-        data_ptr_mappings[uid] = tensor_data;
+        dataPtrMappings[uid] = tensorData;
     }
 
-    ASSERT_EQ(hipdnnBackendCreateDescriptor(HIPDNN_BACKEND_VARIANT_PACK_DESCRIPTOR, &_variant_pack),
+    ASSERT_EQ(hipdnnBackendCreateDescriptor(HIPDNN_BACKEND_VARIANT_PACK_DESCRIPTOR, &_variantPack),
               HIPDNN_STATUS_SUCCESS);
 
-    test_util::populate_variant_pack_with_mappings(_variant_pack, data_ptr_mappings, nullptr);
+    test_util::populateVariantPackWithMappings(_variantPack, dataPtrMappings, nullptr);
 
-    ASSERT_EQ(hipdnnBackendExecute(_handle, _plan, _variant_pack), HIPDNN_STATUS_SUCCESS);
+    ASSERT_EQ(hipdnnBackendExecute(_handle, _plan, _variantPack), HIPDNN_STATUS_SUCCESS);
 
-    for(const auto& [uid, data_ptr] : data_ptr_mappings)
+    for(const auto& [uid, dataPtr] : dataPtrMappings)
     {
-        test_util::free_tensor_memory(data_ptr);
+        test_util::freeTensorMemory(dataPtr);
     }
 }
