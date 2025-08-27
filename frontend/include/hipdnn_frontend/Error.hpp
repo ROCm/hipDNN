@@ -18,7 +18,7 @@
 
 namespace hipdnn_frontend
 {
-enum class error_code_t
+enum class error_code_t // NOLINT(readability-identifier-naming)
 {
     OK,
     INVALID_VALUE,

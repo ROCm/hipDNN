@@ -142,13 +142,13 @@ public:
         return *this;
     }
 
-    enum class input_names
+    enum class input_names // NOLINT(readability-identifier-naming)
     {
         IN_0 = 0,
         IN_1 = 1,
         IN_2 = 2,
     };
-    enum class output_names
+    enum class output_names // NOLINT(readability-identifier-naming)
     {
         OUT_0 = 0,
     };

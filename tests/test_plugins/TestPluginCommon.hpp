@@ -53,12 +53,12 @@ public:
     // Static instance management
     static void setInstance(std::unique_ptr<TestPluginBase> instance)
     {
-        _instance = std::move(instance);
+        s_instance = std::move(instance);
     }
 
     static TestPluginBase* getInstance()
     {
-        return _instance.get();
+        return s_instance.get();
     }
 
     // Common API implementations
@@ -425,7 +425,7 @@ public:
     }
 
 private:
-    inline static std::unique_ptr<TestPluginBase> _instance;
+    inline static std::unique_ptr<TestPluginBase> s_instance; //NOLINT
 };
 
 // Macro to register plugin API functions

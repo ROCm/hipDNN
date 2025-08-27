@@ -16,7 +16,7 @@ namespace graph
 class BatchnormAttributes : public AttributesCRTP<BatchnormAttributes>
 {
 public:
-    enum class input_names
+    enum class input_names // NOLINT(readability-identifier-naming)
     {
         X = 0,
         SCALE = 1,
@@ -27,7 +27,7 @@ public:
         EPSILON = 6
     };
 
-    enum class output_names
+    enum class output_names // NOLINT(readability-identifier-naming)
     {
         Y = 0,
         MEAN = 1,

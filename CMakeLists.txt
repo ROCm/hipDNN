@@ -34,7 +34,7 @@ option(HIP_DNN_SKIP_TESTS "Skips building all tests" OFF)
 option(HIP_DNN_BUILD_PLUGINS "Builds the plugins as part of the main cmake" ON)
 
 option(CODE_COVERAGE "Build with code coverage flags" OFF)
-option(ENABLE_CLANG_TIDY "Enable Clang-Tidy checks" OFF)
+option(ENABLE_CLANG_TIDY "Enable Clang-Tidy checks" ON)
 option(BUILD_ADDRESS_SANITIZER "Build with Address Sanitizer enabled" OFF)
 
 list(
