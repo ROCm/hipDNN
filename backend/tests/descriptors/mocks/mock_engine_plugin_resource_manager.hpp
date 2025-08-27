@@ -11,7 +11,7 @@ namespace hipdnn_backend
 namespace plugin
 {
 
-class Mock_engine_plugin_resource_manager : public EnginePluginResourceManager
+class MockEnginePluginResourceManager : public EnginePluginResourceManager
 {
 public:
     MOCK_METHOD(void, setStream, (hipStream_t stream), (const, override));

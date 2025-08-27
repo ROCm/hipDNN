@@ -15,27 +15,27 @@ namespace testing
 
 using namespace hipdnn_sdk::data_objects;
 
-class Flatbuffer_utilities_test : public ::testing::Test
+class FlatbufferUtilitiesTest : public ::testing::Test
 {
 public:
-    static flatbuffers::FlatBufferBuilder create_valid_graph()
+    static flatbuffers::FlatBufferBuilder createValidGraph()
     {
         std::vector<::flatbuffers::Offset<hipdnn_sdk::data_objects::TensorAttributes>>
-            tensor_attributes;
+            tensorAttributes;
         std::vector<::flatbuffers::Offset<hipdnn_sdk::data_objects::Node>> nodes;
         flatbuffers::FlatBufferBuilder builder;
-        auto graph_offset = hipdnn_sdk::data_objects::CreateGraphDirect(builder,
-                                                                        "test",
-                                                                        DataType_FLOAT,
-                                                                        DataType_HALF,
-                                                                        DataType_BFLOAT16,
-                                                                        &tensor_attributes,
-                                                                        &nodes);
-        builder.Finish(graph_offset);
+        auto graphOffset = hipdnn_sdk::data_objects::CreateGraphDirect(builder,
+                                                                       "test",
+                                                                       DataType_FLOAT,
+                                                                       DataType_HALF,
+                                                                       DataType_BFLOAT16,
+                                                                       &tensorAttributes,
+                                                                       &nodes);
+        builder.Finish(graphOffset);
         return builder;
     }
 
-    static void verify_graph(const hipdnn_sdk::data_objects::GraphT& graph)
+    static void verifyGraph(const hipdnn_sdk::data_objects::GraphT& graph)
     {
         EXPECT_EQ(graph.name, "test");
         EXPECT_EQ(graph.compute_type, DataType_FLOAT);
@@ -46,33 +46,33 @@ public:
     }
 };
 
-TEST_F(Flatbuffer_utilities_test, WillCorrectlyUnpackValidGraphBuffer)
+TEST_F(FlatbufferUtilitiesTest, WillCorrectlyUnpackValidGraphBuffer)
 {
-    auto builder = create_valid_graph();
+    auto builder = createValidGraph();
 
-    auto serialized_graph = builder.Release();
+    auto serializedGraph = builder.Release();
     std::unique_ptr<hipdnn_sdk::data_objects::GraphT> graph;
     ASSERT_NO_THROW(flatbuffer_utilities::convertSerializedGraphToGraph(
-        serialized_graph.data(), serialized_graph.size(), graph));
+        serializedGraph.data(), serializedGraph.size(), graph));
 
-    verify_graph(*graph);
+    verifyGraph(*graph);
 }
 
-TEST_F(Flatbuffer_utilities_test, WillStillHaveValidGraphAfterBuilderDestructs)
+TEST_F(FlatbufferUtilitiesTest, WillStillHaveValidGraphAfterBuilderDestructs)
 {
     std::unique_ptr<hipdnn_sdk::data_objects::GraphT> graph;
     {
-        auto builder = create_valid_graph();
+        auto builder = createValidGraph();
 
-        auto serialized_graph = builder.Release();
+        auto serializedGraph = builder.Release();
         ASSERT_NO_THROW(flatbuffer_utilities::convertSerializedGraphToGraph(
-            serialized_graph.data(), serialized_graph.size(), graph));
+            serializedGraph.data(), serializedGraph.size(), graph));
     }
 
-    verify_graph(*graph);
+    verifyGraph(*graph);
 }
 
-TEST(Flatbuffer_invalid_tests, WillNotUnpackNullBuffer)
+TEST(FlatbufferInvalidTests, WillNotUnpackNullBuffer)
 {
     auto [buffer, size] = std::make_pair(static_cast<const uint8_t*>(nullptr), size_t(10));
 
@@ -83,7 +83,7 @@ TEST(Flatbuffer_invalid_tests, WillNotUnpackNullBuffer)
     ASSERT_EQ(graph, nullptr);
 }
 
-TEST(Flatbuffer_invalid_tests, WillNotUnpackInvalidBuffer)
+TEST(FlatbufferInvalidTests, WillNotUnpackInvalidBuffer)
 {
     auto arr = std::array<uint8_t, 10>{0};
     auto [buffer, size] = std::make_pair(arr.data(), size_t(10));
@@ -95,11 +95,11 @@ TEST(Flatbuffer_invalid_tests, WillNotUnpackInvalidBuffer)
     ASSERT_EQ(graph, nullptr);
 }
 
-TEST(Flatbuffer_invalid_tests, WillNotUnpackWrongSizeBuffer)
+TEST(FlatbufferInvalidTests, WillNotUnpackWrongSizeBuffer)
 {
-    auto builder = Flatbuffer_utilities_test::create_valid_graph();
-    auto serialized_graph = builder.Release();
-    auto [buffer, size] = std::make_pair(serialized_graph.data(), serialized_graph.size() - 20);
+    auto builder = FlatbufferUtilitiesTest::createValidGraph();
+    auto serializedGraph = builder.Release();
+    auto [buffer, size] = std::make_pair(serializedGraph.data(), serializedGraph.size() - 20);
 
     std::unique_ptr<hipdnn_sdk::data_objects::GraphT> graph;
     ASSERT_THROW_HIPDNN_STATUS(

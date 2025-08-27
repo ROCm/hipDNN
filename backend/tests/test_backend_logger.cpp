@@ -14,12 +14,12 @@
 #include <hipdnn_sdk/utilities/platform_utils.hpp>
 #include <logging/logging.hpp>
 
-class Backend_logging_test : public ::testing::Test
+class BackendLoggingTest : public ::testing::Test
 {
 public:
-    std::string _log_file;
-    std::array<int, 2> _stderr_pipe;
-    int _old_stderr;
+    std::string _logFile;
+    std::array<int, 2> _stderrPipe;
+    int _oldStderr;
 
     void SetUp() override
     {
@@ -38,50 +38,50 @@ public:
         hipdnn_sdk::utilities::unsetEnv("HIPDNN_LOG_LEVEL");
         hipdnn_sdk::utilities::unsetEnv("HIPDNN_LOG_FILE");
 
-        if(!_log_file.empty())
+        if(!_logFile.empty())
         {
-            std::remove(_log_file.c_str());
+            std::remove(_logFile.c_str());
         }
     }
 
-    static std::string get_stderr_content()
+    static std::string getStderrContent()
     {
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
         return testing::internal::GetCapturedStderr();
     }
 
-    static void verify_stderr_contains(const std::string& expected_content)
+    static void verifyStderrContains(const std::string& expectedContent)
     {
-        std::string log_content = get_stderr_content();
-        EXPECT_NE(log_content.find(expected_content), std::string::npos)
-            << std::string("Expected to find: \"") << expected_content << "\" in stderr."
+        std::string logContent = getStderrContent();
+        EXPECT_NE(logContent.find(expectedContent), std::string::npos)
+            << std::string("Expected to find: \"") << expectedContent << "\" in stderr."
             << "\nActual stderr content:\n"
-            << log_content;
+            << logContent;
     }
 
-    static void verify_stderr_not_contains(const std::string& unexpected_content)
+    static void verifyStderrNotContains(const std::string& unexpectedContent)
     {
-        std::string log_content = get_stderr_content();
-        EXPECT_EQ(log_content.find(unexpected_content), std::string::npos)
-            << std::string("Expected NOT to find: \"") << unexpected_content << "\" in stderr."
+        std::string logContent = getStderrContent();
+        EXPECT_EQ(logContent.find(unexpectedContent), std::string::npos)
+            << std::string("Expected NOT to find: \"") << unexpectedContent << "\" in stderr."
             << "\nActual stderr content:\n"
-            << log_content;
+            << logContent;
     }
 };
 
-TEST_F(Backend_logging_test, MacrosDontLogWhenOff)
+TEST_F(BackendLoggingTest, MacrosDontLogWhenOff)
 {
     HIPDNN_LOG_INFO("Initializing with info message");
     HIPDNN_LOG_WARN("Initializing with warn message");
     HIPDNN_LOG_ERROR("Initializing with error message");
 
-    std::string log_content = get_stderr_content();
-    EXPECT_TRUE(log_content.empty())
-        << std::string("Expected stderr to be empty, but it contained:\n") << log_content;
+    std::string logContent = getStderrContent();
+    EXPECT_TRUE(logContent.empty())
+        << std::string("Expected stderr to be empty, but it contained:\n") << logContent;
 }
 
-TEST_F(Backend_logging_test, MacrosRespectLogLevelInfo)
+TEST_F(BackendLoggingTest, MacrosRespectLogLevelInfo)
 {
     hipdnn_sdk::utilities::setEnv("HIPDNN_LOG_LEVEL", "info");
 
@@ -89,13 +89,13 @@ TEST_F(Backend_logging_test, MacrosRespectLogLevelInfo)
     HIPDNN_LOG_WARN("Warn test message");
     HIPDNN_LOG_ERROR("Error test message");
 
-    std::string log_content = get_stderr_content();
-    EXPECT_NE(log_content.find("Info test message"), std::string::npos);
-    EXPECT_NE(log_content.find("Warn test message"), std::string::npos);
-    EXPECT_NE(log_content.find("Error test message"), std::string::npos);
+    std::string logContent = getStderrContent();
+    EXPECT_NE(logContent.find("Info test message"), std::string::npos);
+    EXPECT_NE(logContent.find("Warn test message"), std::string::npos);
+    EXPECT_NE(logContent.find("Error test message"), std::string::npos);
 }
 
-TEST_F(Backend_logging_test, MacrosRespectLogLevelWarn)
+TEST_F(BackendLoggingTest, MacrosRespectLogLevelWarn)
 {
     hipdnn_sdk::utilities::setEnv("HIPDNN_LOG_LEVEL", "warn");
 
@@ -103,13 +103,13 @@ TEST_F(Backend_logging_test, MacrosRespectLogLevelWarn)
     HIPDNN_LOG_WARN("Warn should appear");
     HIPDNN_LOG_ERROR("Error should appear");
 
-    std::string log_content = get_stderr_content();
-    EXPECT_EQ(log_content.find("Info should not appear"), std::string::npos);
-    EXPECT_NE(log_content.find("Warn should appear"), std::string::npos);
-    EXPECT_NE(log_content.find("Error should appear"), std::string::npos);
+    std::string logContent = getStderrContent();
+    EXPECT_EQ(logContent.find("Info should not appear"), std::string::npos);
+    EXPECT_NE(logContent.find("Warn should appear"), std::string::npos);
+    EXPECT_NE(logContent.find("Error should appear"), std::string::npos);
 }
 
-TEST_F(Backend_logging_test, MacrosRespectLogLevelError)
+TEST_F(BackendLoggingTest, MacrosRespectLogLevelError)
 {
     hipdnn_sdk::utilities::setEnv("HIPDNN_LOG_LEVEL", "error");
 
@@ -117,13 +117,13 @@ TEST_F(Backend_logging_test, MacrosRespectLogLevelError)
     HIPDNN_LOG_WARN("Warn should not appear");
     HIPDNN_LOG_ERROR("Error should appear");
 
-    std::string log_content = get_stderr_content();
-    EXPECT_EQ(log_content.find("Info should not appear"), std::string::npos);
-    EXPECT_EQ(log_content.find("Warn should not appear"), std::string::npos);
-    EXPECT_NE(log_content.find("Error should appear"), std::string::npos);
+    std::string logContent = getStderrContent();
+    EXPECT_EQ(logContent.find("Info should not appear"), std::string::npos);
+    EXPECT_EQ(logContent.find("Warn should not appear"), std::string::npos);
+    EXPECT_NE(logContent.find("Error should appear"), std::string::npos);
 }
 
-TEST_F(Backend_logging_test, LoggingCanBeReinitialized)
+TEST_F(BackendLoggingTest, LoggingCanBeReinitialized)
 {
     hipdnn_sdk::utilities::setEnv("HIPDNN_LOG_LEVEL", "off");
     HIPDNN_LOG_INFO("This should not appear");
@@ -133,26 +133,26 @@ TEST_F(Backend_logging_test, LoggingCanBeReinitialized)
     hipdnn_sdk::utilities::setEnv("HIPDNN_LOG_LEVEL", "info");
     HIPDNN_LOG_INFO("This should appear after reinitialization");
 
-    verify_stderr_contains("This should appear after reinitialization");
+    verifyStderrContains("This should appear after reinitialization");
 }
 
-TEST_F(Backend_logging_test, LogPatternFormatIsCorrectOnStderr)
+TEST_F(BackendLoggingTest, LogPatternFormatIsCorrectOnStderr)
 {
     hipdnn_sdk::utilities::setEnv("HIPDNN_LOG_LEVEL", "info");
 
     HIPDNN_LOG_INFO("Pattern format test message");
 
-    std::string log_content = get_stderr_content();
+    std::string logContent = getStderrContent();
 
     // [timestamp format] [thread id] [log level] [hipdnn_backend] message
-    std::regex pattern_regex(
+    std::regex patternRegex(
         R"(\[\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{3}\] \[tid \d+\] \[info\] \[hipdnn_backend\] Pattern format test message)");
 
-    EXPECT_TRUE(std::regex_search(log_content, pattern_regex))
-        << std::string("Expected log format pattern not found. Stderr content:\n") << log_content;
+    EXPECT_TRUE(std::regex_search(logContent, patternRegex))
+        << std::string("Expected log format pattern not found. Stderr content:\n") << logContent;
 }
 
-TEST_F(Backend_logging_test, MultipleMessagesAreLoggedToStderr)
+TEST_F(BackendLoggingTest, MultipleMessagesAreLoggedToStderr)
 {
     hipdnn_sdk::utilities::setEnv("HIPDNN_LOG_LEVEL", "info");
 
@@ -160,24 +160,24 @@ TEST_F(Backend_logging_test, MultipleMessagesAreLoggedToStderr)
     HIPDNN_LOG_INFO("Second backend message");
     HIPDNN_LOG_INFO("Third backend message");
 
-    std::string log_content = get_stderr_content();
-    EXPECT_NE(log_content.find("First backend message"), std::string::npos);
-    EXPECT_NE(log_content.find("Second backend message"), std::string::npos);
-    EXPECT_NE(log_content.find("Third backend message"), std::string::npos);
+    std::string logContent = getStderrContent();
+    EXPECT_NE(logContent.find("First backend message"), std::string::npos);
+    EXPECT_NE(logContent.find("Second backend message"), std::string::npos);
+    EXPECT_NE(logContent.find("Third backend message"), std::string::npos);
 
     // Verify expected order
-    size_t pos1 = log_content.find("First backend message");
-    size_t pos2 = log_content.find("Second backend message");
-    size_t pos3 = log_content.find("Third backend message");
+    size_t pos1 = logContent.find("First backend message");
+    size_t pos2 = logContent.find("Second backend message");
+    size_t pos3 = logContent.find("Third backend message");
 
     EXPECT_TRUE(pos1 < pos2 && pos2 < pos3)
         << std::string("Messages not logged in expected order to stderr");
 }
 
-TEST_F(Backend_logging_test, LogFileCanBeSpecifiedByEnvVar)
+TEST_F(BackendLoggingTest, LogFileCanBeSpecifiedByEnvVar)
 {
-    _log_file = "custom_backend_test.log";
-    hipdnn_sdk::utilities::setEnv("HIPDNN_LOG_FILE", _log_file.c_str());
+    _logFile = "custom_backend_test.log";
+    hipdnn_sdk::utilities::setEnv("HIPDNN_LOG_FILE", _logFile.c_str());
     hipdnn_sdk::utilities::setEnv("HIPDNN_LOG_LEVEL", "info");
 
     HIPDNN_LOG_INFO("Logging to custom file");
@@ -185,19 +185,18 @@ TEST_F(Backend_logging_test, LogFileCanBeSpecifiedByEnvVar)
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
     hipdnn_backend::logging::cleanup();
 
-    std::string log_content;
-    std::ifstream log_file_stream(_log_file);
-    ASSERT_TRUE(log_file_stream.is_open())
-        << std::string("Log file was not created: ") << _log_file;
+    std::string logContent;
+    std::ifstream logFileStream(_logFile);
+    ASSERT_TRUE(logFileStream.is_open()) << std::string("Log file was not created: ") << _logFile;
 
-    log_content.assign((std::istreambuf_iterator<char>(log_file_stream)),
-                       std::istreambuf_iterator<char>());
-    log_file_stream.close();
+    logContent.assign((std::istreambuf_iterator<char>(logFileStream)),
+                      std::istreambuf_iterator<char>());
+    logFileStream.close();
 
-    EXPECT_NE(log_content.find("Logging to custom file"), std::string::npos)
-        << std::string("Expected to find message in log file ") << _log_file
+    EXPECT_NE(logContent.find("Logging to custom file"), std::string::npos)
+        << std::string("Expected to find message in log file ") << _logFile
         << "\nActual log content:\n"
-        << log_content;
+        << logContent;
 
-    verify_stderr_not_contains("Logging to custom file");
+    verifyStderrNotContains("Logging to custom file");
 }
