@@ -166,8 +166,8 @@ hipdnnPluginStatus_t hipdnnEnginePluginCreate(hipdnnEnginePluginHandle_t* handle
         }
         else
         {
-            static std::mutex miopenContainerMutex;
-            std::lock_guard<std::mutex> lock(miopenContainerMutex);
+            static std::mutex s_miopenContainerMutex;
+            std::lock_guard<std::mutex> lock(s_miopenContainerMutex);
 
             // if we do have a race condition that results in threads getting locked, we want to
             // ensure that we only create one instance.  Therefore, the second thread to get

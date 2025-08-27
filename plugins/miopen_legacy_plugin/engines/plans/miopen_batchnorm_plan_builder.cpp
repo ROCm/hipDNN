@@ -74,7 +74,7 @@ void buildPlanInferenceSingleNode(const HipdnnEnginePluginHandle& handle,
     executionContext.setPlan(std::move(plan));
 }
 
-void build_plan_bwd_single_node(const HipdnnEnginePluginHandle& handle,
+void buildPlanBwdSingleNode(const HipdnnEnginePluginHandle& handle,
                                 const hipdnn_plugin::IGraph& opGraph,
                                 const hipdnn_sdk::data_objects::Node& node,
                                 HipdnnEnginePluginExecutionContext& executionContext)
@@ -113,7 +113,7 @@ void MiopenBatchnormPlanBuilder::buildPlan(
         break;
     case hipdnn_sdk::data_objects::NodeAttributes_BatchnormBackwardAttributes:
         HIPDNN_LOG_INFO("Building batchnorm backward plan for node: {}", nodeName);
-        build_plan_bwd_single_node(handle, opGraph, node, executionContext);
+        buildPlanBwdSingleNode(handle, opGraph, node, executionContext);
         break;
     default:
         throw hipdnn_plugin::HipdnnPluginException(

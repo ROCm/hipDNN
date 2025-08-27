@@ -68,7 +68,7 @@ protected:
         s_callbackCalled = true;
     }
 
-    static bool s_callbackCalled;
+    static bool s_callbackCalled; //NOLINT
 };
 
 bool PluginCallbackTest::s_callbackCalled = false;
@@ -248,7 +248,7 @@ TEST(PluginManagerTest, LastError)
     ASSERT_EQ(plugins.size(), 1);
 
     using FuncType = hipdnnPluginStatus_t (*)(const char**);
-    auto funcGetName = plugins[0]->_lib.get_symbol<FuncType>("hipdnnPluginGetName");
+    auto funcGetName = plugins[0]->_lib.getSymbol<FuncType>("hipdnnPluginGetName");
 
     ASSERT_TRUE(plugins[0]->getLastErrorString().empty());
 
@@ -267,7 +267,7 @@ TEST(PluginManagerTest, LastErrorMultithreaded)
     ASSERT_EQ(plugins.size(), 1);
 
     using FuncType = hipdnnPluginStatus_t (*)(const char**);
-    auto funcGetName = plugins[0]->_lib.get_symbol<FuncType>("hipdnnPluginGetName");
+    auto funcGetName = plugins[0]->_lib.getSymbol<FuncType>("hipdnnPluginGetName");
 
     auto checkGetName = [&]() {
         if(!plugins[0]->getLastErrorString().empty())
@@ -309,7 +309,7 @@ TEST(PluginManagerTest, LastErrorOnSecondLoad)
         const auto& plugins = pluginManager.getPlugins();
         ASSERT_EQ(plugins.size(), 1);
 
-        auto funcGetName = plugins[0]->_lib.get_symbol<FuncType>(funcName);
+        auto funcGetName = plugins[0]->_lib.getSymbol<FuncType>(funcName);
         funcGetName(nullptr);
     }
 
@@ -320,7 +320,7 @@ TEST(PluginManagerTest, LastErrorOnSecondLoad)
         const auto& plugins = pluginManager.getPlugins();
         ASSERT_EQ(plugins.size(), 1);
 
-        auto funcGetName = plugins[0]->_lib.get_symbol<FuncType>(funcName);
+        auto funcGetName = plugins[0]->_lib.getSymbol<FuncType>(funcName);
 
         ASSERT_TRUE(plugins[0]->getLastErrorString().empty());
         ASSERT_NE(funcGetName(nullptr), HIPDNN_PLUGIN_STATUS_SUCCESS);
