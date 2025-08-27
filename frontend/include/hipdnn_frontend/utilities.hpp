@@ -21,34 +21,34 @@ namespace graph
 // For example:
 // input_shapes = {{1, 2}, {1, 2}, {1, 2, 5}} -> common_shape = {1, 2, 5}
 // input_shapes = {{1, 2, 3}, {1, 2, 4}, {1, 2}} -> error
-inline error_t find_common_shape(const std::vector<std::vector<int64_t>>& input_shapes,
-                                 std::vector<int64_t>& common_shape)
+inline error_t findCommonShape(const std::vector<std::vector<int64_t>>& inputShapes,
+                               std::vector<int64_t>& commonShape)
 {
-    if(input_shapes.empty())
+    if(inputShapes.empty())
     {
         return {error_code_t::INVALID_VALUE, "Input shapes cannot be empty"};
     }
 
     size_t dims = std::ranges::max_element(
-                      input_shapes.begin(),
-                      input_shapes.end(),
+                      inputShapes.begin(),
+                      inputShapes.end(),
                       [](const std::vector<int64_t>& a, const std::vector<int64_t>& b) {
                           return a.size() < b.size();
                       })
                       ->size();
 
-    common_shape.resize(dims, 1);
+    commonShape.resize(dims, 1);
 
-    for(auto& current : input_shapes)
+    for(auto& current : inputShapes)
     {
         for(size_t j = current.size(); j-- > 0;)
         {
-            if(common_shape[j] != current[j] && common_shape[j] != 1 && current[j] != 1)
+            if(commonShape[j] != current[j] && commonShape[j] != 1 && current[j] != 1)
             {
                 return {error_code_t::INVALID_VALUE, "Incompatible shapes"};
             }
 
-            common_shape[j] = std::max(common_shape[j], current[j]);
+            commonShape[j] = std::max(commonShape[j], current[j]);
         }
     }
 
@@ -60,20 +60,20 @@ template <class T,
           class HostAlloc = hipdnn_sdk::utilities::HostAllocator<T>,
           class DeviceAlloc = hipdnn_sdk::utilities::DeviceAllocator<T>>
 inline TensorAttributes
-    make_tensor_attributes(const std::string& name,
-                           DataType_t data_type,
-                           const hipdnn_sdk::utilities::Tensor<T, HostAlloc, DeviceAlloc>& tensor)
+    makeTensorAttributes(const std::string& name,
+                         DataType_t dataType,
+                         const hipdnn_sdk::utilities::Tensor<T, HostAlloc, DeviceAlloc>& tensor)
 {
     return TensorAttributes()
         .set_name(name)
-        .set_data_type(data_type)
+        .set_data_type(dataType)
         .set_dim(tensor.dims())
         .set_stride(tensor.strides());
 }
 
 }
 
-inline int32_t initialize_frontend_logging(hipdnnCallback_t fn)
+inline int32_t initializeFrontendLogging(hipdnnCallback_t fn)
 {
     if(fn == nullptr)
     {

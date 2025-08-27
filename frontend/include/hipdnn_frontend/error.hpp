@@ -26,7 +26,7 @@ enum class error_code_t
     ATTRIBUTE_NOT_SET
 };
 
-typedef struct error_object // NOLINT
+typedef struct error_object // NOLINT(readability-identifier-naming)
 {
     error_code_t code;
     std::string err_msg;
@@ -35,9 +35,10 @@ typedef struct error_object // NOLINT
         : code(error_code_t::OK)
     {
     }
-    error_object(error_code_t error_code, const std::string& message) // NOLINT
+    // NOLINTNEXTLINE(readability-identifier-naming)
+    error_object(error_code_t error_code, std::string message)
         : code(error_code)
-        , err_msg(message)
+        , err_msg(std::move(message))
     {
     }
 

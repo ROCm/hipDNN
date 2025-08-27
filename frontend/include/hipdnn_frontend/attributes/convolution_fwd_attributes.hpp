@@ -171,16 +171,15 @@ public:
     flatbuffers::Offset<hipdnn_sdk::data_objects::ConvolutionFwdAttributes>
         pack_attributes(flatbuffers::FlatBufferBuilder& builder) const // NOLINT
     {
-        return hipdnn_sdk::data_objects::CreateConvolutionFwdAttributesDirect(
-            builder,
-            get_x()->get_uid(),
-            get_w()->get_uid(),
-            get_y()->get_uid(),
-            &pre_padding,
-            &post_padding,
-            &stride,
-            &dilation,
-            to_sdk_type(conv_mode));
+        return hipdnn_sdk::data_objects::CreateConvolutionFwdAttributesDirect(builder,
+                                                                              get_x()->get_uid(),
+                                                                              get_w()->get_uid(),
+                                                                              get_y()->get_uid(),
+                                                                              &pre_padding,
+                                                                              &post_padding,
+                                                                              &stride,
+                                                                              &dilation,
+                                                                              toSdkType(conv_mode));
     }
 
 private:

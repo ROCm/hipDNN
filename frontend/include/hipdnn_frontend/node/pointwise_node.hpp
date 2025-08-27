@@ -16,9 +16,9 @@ class PointwiseNode : public NodeCRTP<PointwiseNode> // NOLINT
 public:
     PointwiseAttributes attributes;
 
-    PointwiseNode(PointwiseAttributes&& batchnorm_attrs, const GraphAttributes& graph_attrs)
-        : NodeCRTP(graph_attrs)
-        , attributes(std::move(batchnorm_attrs))
+    PointwiseNode(PointwiseAttributes&& batchnormAttrs, const GraphAttributes& graphAttrs)
+        : NodeCRTP(graphAttrs)
+        , attributes(std::move(batchnormAttrs))
     {
     }
 
@@ -63,18 +63,18 @@ public:
 
         if(out->get_dim().empty())
         {
-            std::vector<std::vector<int64_t>> input_shapes;
+            std::vector<std::vector<int64_t>> inputShapes;
             for(auto& [_, tensor] : attributes.inputs)
             {
                 if(tensor)
                 {
-                    input_shapes.push_back(tensor->get_dim());
+                    inputShapes.push_back(tensor->get_dim());
                 }
             }
 
-            auto output_dims = out->get_dim();
-            HIPDNN_CHECK_ERROR(find_common_shape(input_shapes, output_dims));
-            out->set_dim(output_dims);
+            auto outputDims = out->get_dim();
+            HIPDNN_CHECK_ERROR(findCommonShape(inputShapes, outputDims));
+            out->set_dim(outputDims);
         }
 
         // Note: Strides will only be set if there is an input tensor with the same dims currently.
