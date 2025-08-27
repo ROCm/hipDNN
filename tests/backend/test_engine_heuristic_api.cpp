@@ -15,10 +15,10 @@ namespace
 constexpr hipdnnBackendHeurMode_t FALLBACK_MODE = HIPDNN_HEUR_MODE_FALLBACK;
 }
 
-class Engine_heuristic_api_tests : public ::testing::Test
+class EngineHeuristicApiTests : public ::testing::Test
 {
 protected:
-    hipdnnBackendDescriptor_t _engine_heuristic = nullptr;
+    hipdnnBackendDescriptor_t _engineHeuristic = nullptr;
     hipdnnBackendDescriptor_t _graph = nullptr;
     hipdnnHandle_t _handle = nullptr;
 
@@ -32,16 +32,16 @@ protected:
 
         ASSERT_EQ(hipdnnCreate(&_handle), HIPDNN_STATUS_SUCCESS);
         EXPECT_EQ(
-            hipdnnBackendCreateDescriptor(HIPDNN_BACKEND_ENGINEHEUR_DESCRIPTOR, &_engine_heuristic),
+            hipdnnBackendCreateDescriptor(HIPDNN_BACKEND_ENGINEHEUR_DESCRIPTOR, &_engineHeuristic),
             HIPDNN_STATUS_SUCCESS);
-        ASSERT_NE(_engine_heuristic, nullptr);
+        ASSERT_NE(_engineHeuristic, nullptr);
     }
 
     void TearDown() override
     {
-        if(_engine_heuristic != nullptr)
+        if(_engineHeuristic != nullptr)
         {
-            EXPECT_EQ(hipdnnBackendDestroyDescriptor(_engine_heuristic), HIPDNN_STATUS_SUCCESS);
+            EXPECT_EQ(hipdnnBackendDestroyDescriptor(_engineHeuristic), HIPDNN_STATUS_SUCCESS);
         }
         if(_graph != nullptr)
         {
@@ -54,9 +54,9 @@ protected:
         }
     }
 
-    void set_heuristic_mode()
+    void setHeuristicMode()
     {
-        ASSERT_EQ(hipdnnBackendSetAttribute(_engine_heuristic,
+        ASSERT_EQ(hipdnnBackendSetAttribute(_engineHeuristic,
                                             HIPDNN_ATTR_ENGINEHEUR_MODE,
                                             HIPDNN_TYPE_HEUR_MODE,
                                             1,
@@ -64,11 +64,11 @@ protected:
                   HIPDNN_STATUS_SUCCESS);
     }
 
-    void set_operation_graph()
+    void setOperationGraph()
     {
-        test_util::create_test_graph(&_graph, _handle);
+        test_util::createTestGraph(&_graph, _handle);
         ASSERT_EQ(hipdnnBackendFinalize(_graph), HIPDNN_STATUS_SUCCESS);
-        ASSERT_EQ(hipdnnBackendSetAttribute(_engine_heuristic,
+        ASSERT_EQ(hipdnnBackendSetAttribute(_engineHeuristic,
                                             HIPDNN_ATTR_ENGINEHEUR_OPERATION_GRAPH,
                                             HIPDNN_TYPE_BACKEND_DESCRIPTOR,
                                             1,
@@ -76,31 +76,31 @@ protected:
                   HIPDNN_STATUS_SUCCESS);
     }
 
-    void populate_engine_heuristic(bool finalize = true)
+    void populateEngineHeuristic(bool finalize = true)
     {
-        set_operation_graph();
-        set_heuristic_mode();
+        setOperationGraph();
+        setHeuristicMode();
 
         if(finalize)
         {
-            ASSERT_EQ(hipdnnBackendFinalize(_engine_heuristic), HIPDNN_STATUS_SUCCESS);
+            ASSERT_EQ(hipdnnBackendFinalize(_engineHeuristic), HIPDNN_STATUS_SUCCESS);
         }
     }
 };
 
-TEST_F(Engine_heuristic_api_tests, SetEngineHeuristicOperationGraph)
+TEST_F(EngineHeuristicApiTests, SetEngineHeuristicOperationGraph)
 {
-    hipdnnBackendDescriptor_t null_graph = nullptr;
-    EXPECT_EQ(hipdnnBackendSetAttribute(_engine_heuristic,
+    hipdnnBackendDescriptor_t nullGraph = nullptr;
+    EXPECT_EQ(hipdnnBackendSetAttribute(_engineHeuristic,
                                         HIPDNN_ATTR_ENGINEHEUR_OPERATION_GRAPH,
                                         HIPDNN_TYPE_BACKEND_DESCRIPTOR,
                                         1,
-                                        &null_graph),
+                                        &nullGraph),
               HIPDNN_STATUS_BAD_PARAM_NULL_POINTER);
 
-    test_util::create_test_graph(&_graph, _handle);
+    test_util::createTestGraph(&_graph, _handle);
     ASSERT_EQ(hipdnnBackendFinalize(_graph), HIPDNN_STATUS_SUCCESS);
-    EXPECT_EQ(hipdnnBackendSetAttribute(_engine_heuristic,
+    EXPECT_EQ(hipdnnBackendSetAttribute(_engineHeuristic,
                                         HIPDNN_ATTR_ENGINEHEUR_OPERATION_GRAPH,
                                         HIPDNN_TYPE_BACKEND_DESCRIPTOR,
                                         1,
@@ -108,36 +108,35 @@ TEST_F(Engine_heuristic_api_tests, SetEngineHeuristicOperationGraph)
               HIPDNN_STATUS_SUCCESS);
 }
 
-TEST_F(Engine_heuristic_api_tests, SetEngineHeuristicMode)
+TEST_F(EngineHeuristicApiTests, SetEngineHeuristicMode)
 {
-    EXPECT_EQ(
-        hipdnnBackendSetAttribute(
-            _engine_heuristic, HIPDNN_ATTR_ENGINEHEUR_MODE, HIPDNN_TYPE_HEUR_MODE, 1, nullptr),
-        HIPDNN_STATUS_BAD_PARAM_NULL_POINTER);
+    EXPECT_EQ(hipdnnBackendSetAttribute(
+                  _engineHeuristic, HIPDNN_ATTR_ENGINEHEUR_MODE, HIPDNN_TYPE_HEUR_MODE, 1, nullptr),
+              HIPDNN_STATUS_BAD_PARAM_NULL_POINTER);
 
-    EXPECT_EQ(hipdnnBackendSetAttribute(_engine_heuristic,
+    EXPECT_EQ(hipdnnBackendSetAttribute(_engineHeuristic,
                                         HIPDNN_ATTR_ENGINEHEUR_MODE,
                                         HIPDNN_TYPE_HEUR_MODE,
                                         2,
                                         &FALLBACK_MODE),
               HIPDNN_STATUS_BAD_PARAM);
 
-    EXPECT_EQ(hipdnnBackendSetAttribute(_engine_heuristic,
+    EXPECT_EQ(hipdnnBackendSetAttribute(_engineHeuristic,
                                         HIPDNN_ATTR_ENGINEHEUR_MODE,
                                         HIPDNN_TYPE_BACKEND_DESCRIPTOR,
                                         1,
                                         &FALLBACK_MODE),
               HIPDNN_STATUS_BAD_PARAM);
 
-    auto unsupported_mode = static_cast<hipdnnBackendHeurMode_t>(999);
-    EXPECT_EQ(hipdnnBackendSetAttribute(_engine_heuristic,
+    auto unsupportedMode = static_cast<hipdnnBackendHeurMode_t>(999);
+    EXPECT_EQ(hipdnnBackendSetAttribute(_engineHeuristic,
                                         HIPDNN_ATTR_ENGINEHEUR_MODE,
                                         HIPDNN_TYPE_HEUR_MODE,
                                         1,
-                                        &unsupported_mode),
+                                        &unsupportedMode),
               HIPDNN_STATUS_NOT_SUPPORTED);
 
-    EXPECT_EQ(hipdnnBackendSetAttribute(_engine_heuristic,
+    EXPECT_EQ(hipdnnBackendSetAttribute(_engineHeuristic,
                                         HIPDNN_ATTR_ENGINEHEUR_MODE,
                                         HIPDNN_TYPE_HEUR_MODE,
                                         1,
@@ -145,32 +144,32 @@ TEST_F(Engine_heuristic_api_tests, SetEngineHeuristicMode)
               HIPDNN_STATUS_SUCCESS);
 }
 
-TEST_F(Engine_heuristic_api_tests, SetUnsupportedAttribute)
+TEST_F(EngineHeuristicApiTests, SetUnsupportedAttribute)
 {
     int32_t dummy = 0;
     EXPECT_EQ(hipdnnBackendSetAttribute(
-                  _engine_heuristic, HIPDNN_ATTR_ENGINEHEUR_RESULTS, HIPDNN_TYPE_INT32, 1, &dummy),
+                  _engineHeuristic, HIPDNN_ATTR_ENGINEHEUR_RESULTS, HIPDNN_TYPE_INT32, 1, &dummy),
               HIPDNN_STATUS_NOT_SUPPORTED);
 }
 
-TEST_F(Engine_heuristic_api_tests, FinalizeEngineHeuristic)
+TEST_F(EngineHeuristicApiTests, FinalizeEngineHeuristic)
 {
-    EXPECT_EQ(hipdnnBackendFinalize(_engine_heuristic), HIPDNN_STATUS_BAD_PARAM);
+    EXPECT_EQ(hipdnnBackendFinalize(_engineHeuristic), HIPDNN_STATUS_BAD_PARAM);
 
-    set_operation_graph();
-    EXPECT_EQ(hipdnnBackendFinalize(_engine_heuristic), HIPDNN_STATUS_BAD_PARAM);
+    setOperationGraph();
+    EXPECT_EQ(hipdnnBackendFinalize(_engineHeuristic), HIPDNN_STATUS_BAD_PARAM);
 
-    set_heuristic_mode();
-    EXPECT_EQ(hipdnnBackendFinalize(_engine_heuristic), HIPDNN_STATUS_SUCCESS);
+    setHeuristicMode();
+    EXPECT_EQ(hipdnnBackendFinalize(_engineHeuristic), HIPDNN_STATUS_SUCCESS);
 
-    EXPECT_EQ(hipdnnBackendFinalize(_engine_heuristic), HIPDNN_STATUS_BAD_PARAM);
+    EXPECT_EQ(hipdnnBackendFinalize(_engineHeuristic), HIPDNN_STATUS_BAD_PARAM);
 }
 
-TEST_F(Engine_heuristic_api_tests, SetAttributeOnFinalizedDescriptor)
+TEST_F(EngineHeuristicApiTests, SetAttributeOnFinalizedDescriptor)
 {
-    populate_engine_heuristic(true);
+    populateEngineHeuristic(true);
 
-    EXPECT_EQ(hipdnnBackendSetAttribute(_engine_heuristic,
+    EXPECT_EQ(hipdnnBackendSetAttribute(_engineHeuristic,
                                         HIPDNN_ATTR_ENGINEHEUR_MODE,
                                         HIPDNN_TYPE_HEUR_MODE,
                                         1,
@@ -178,43 +177,43 @@ TEST_F(Engine_heuristic_api_tests, SetAttributeOnFinalizedDescriptor)
               HIPDNN_STATUS_NOT_INITIALIZED);
 }
 
-TEST_F(Engine_heuristic_api_tests, GetAttributeOnUnfinalizedDescriptor)
+TEST_F(EngineHeuristicApiTests, GetAttributeOnUnfinalizedDescriptor)
 {
-    hipdnnBackendDescriptor_t dummy_graph = nullptr;
+    hipdnnBackendDescriptor_t dummyGraph = nullptr;
 
-    EXPECT_EQ(hipdnnBackendGetAttribute(_engine_heuristic,
+    EXPECT_EQ(hipdnnBackendGetAttribute(_engineHeuristic,
                                         HIPDNN_ATTR_ENGINEHEUR_OPERATION_GRAPH,
                                         HIPDNN_TYPE_BACKEND_DESCRIPTOR,
                                         1,
                                         nullptr,
-                                        &dummy_graph),
+                                        &dummyGraph),
               HIPDNN_STATUS_BAD_PARAM_NOT_FINALIZED);
 }
 
-TEST_F(Engine_heuristic_api_tests, GetOperationGraph)
+TEST_F(EngineHeuristicApiTests, GetOperationGraph)
 {
-    populate_engine_heuristic(true);
+    populateEngineHeuristic(true);
 
-    hipdnnBackendDescriptor_t retrieved_graph = nullptr;
-    hipdnnBackendDescriptor_t retrieved_graph2 = nullptr;
+    hipdnnBackendDescriptor_t retrievedGraph = nullptr;
+    hipdnnBackendDescriptor_t retrievedGraph2 = nullptr;
 
-    EXPECT_EQ(hipdnnBackendGetAttribute(_engine_heuristic,
+    EXPECT_EQ(hipdnnBackendGetAttribute(_engineHeuristic,
                                         HIPDNN_ATTR_ENGINEHEUR_OPERATION_GRAPH,
                                         HIPDNN_TYPE_INT64,
                                         1,
                                         nullptr,
-                                        &retrieved_graph),
+                                        &retrievedGraph),
               HIPDNN_STATUS_BAD_PARAM);
 
-    EXPECT_EQ(hipdnnBackendGetAttribute(_engine_heuristic,
+    EXPECT_EQ(hipdnnBackendGetAttribute(_engineHeuristic,
                                         HIPDNN_ATTR_ENGINEHEUR_OPERATION_GRAPH,
                                         HIPDNN_TYPE_BACKEND_DESCRIPTOR,
                                         2,
                                         nullptr,
-                                        &retrieved_graph),
+                                        &retrievedGraph),
               HIPDNN_STATUS_BAD_PARAM);
 
-    EXPECT_EQ(hipdnnBackendGetAttribute(_engine_heuristic,
+    EXPECT_EQ(hipdnnBackendGetAttribute(_engineHeuristic,
                                         HIPDNN_ATTR_ENGINEHEUR_OPERATION_GRAPH,
                                         HIPDNN_TYPE_BACKEND_DESCRIPTOR,
                                         1,
@@ -222,39 +221,39 @@ TEST_F(Engine_heuristic_api_tests, GetOperationGraph)
                                         nullptr),
               HIPDNN_STATUS_BAD_PARAM_NULL_POINTER);
 
-    EXPECT_EQ(hipdnnBackendGetAttribute(_engine_heuristic,
+    EXPECT_EQ(hipdnnBackendGetAttribute(_engineHeuristic,
                                         HIPDNN_ATTR_ENGINEHEUR_OPERATION_GRAPH,
                                         HIPDNN_TYPE_BACKEND_DESCRIPTOR,
                                         1,
                                         nullptr,
-                                        &retrieved_graph),
+                                        &retrievedGraph),
               HIPDNN_STATUS_SUCCESS);
-    EXPECT_NE(retrieved_graph, nullptr);
+    EXPECT_NE(retrievedGraph, nullptr);
 
-    hipdnnBackendDestroyDescriptor(retrieved_graph);
-    retrieved_graph = nullptr;
+    hipdnnBackendDestroyDescriptor(retrievedGraph);
+    retrievedGraph = nullptr;
 
     int64_t count = 0;
-    EXPECT_EQ(hipdnnBackendGetAttribute(_engine_heuristic,
+    EXPECT_EQ(hipdnnBackendGetAttribute(_engineHeuristic,
                                         HIPDNN_ATTR_ENGINEHEUR_OPERATION_GRAPH,
                                         HIPDNN_TYPE_BACKEND_DESCRIPTOR,
                                         1,
                                         &count,
-                                        &retrieved_graph2),
+                                        &retrievedGraph2),
               HIPDNN_STATUS_SUCCESS);
     EXPECT_EQ(count, 1);
 
-    hipdnnBackendDestroyDescriptor(retrieved_graph2);
-    retrieved_graph2 = nullptr;
+    hipdnnBackendDestroyDescriptor(retrievedGraph2);
+    retrievedGraph2 = nullptr;
 }
 
-TEST_F(Engine_heuristic_api_tests, GetHeuristicMode)
+TEST_F(EngineHeuristicApiTests, GetHeuristicMode)
 {
-    populate_engine_heuristic(true);
+    populateEngineHeuristic(true);
 
     hipdnnBackendHeurMode_t mode = HIPDNN_HEUR_MODE_FALLBACK;
 
-    EXPECT_EQ(hipdnnBackendGetAttribute(_engine_heuristic,
+    EXPECT_EQ(hipdnnBackendGetAttribute(_engineHeuristic,
                                         HIPDNN_ATTR_ENGINEHEUR_MODE,
                                         HIPDNN_TYPE_BACKEND_DESCRIPTOR,
                                         1,
@@ -262,7 +261,7 @@ TEST_F(Engine_heuristic_api_tests, GetHeuristicMode)
                                         &mode),
               HIPDNN_STATUS_BAD_PARAM);
 
-    EXPECT_EQ(hipdnnBackendGetAttribute(_engine_heuristic,
+    EXPECT_EQ(hipdnnBackendGetAttribute(_engineHeuristic,
                                         HIPDNN_ATTR_ENGINEHEUR_MODE,
                                         HIPDNN_TYPE_HEUR_MODE,
                                         2,
@@ -270,7 +269,7 @@ TEST_F(Engine_heuristic_api_tests, GetHeuristicMode)
                                         &mode),
               HIPDNN_STATUS_BAD_PARAM);
 
-    EXPECT_EQ(hipdnnBackendGetAttribute(_engine_heuristic,
+    EXPECT_EQ(hipdnnBackendGetAttribute(_engineHeuristic,
                                         HIPDNN_ATTR_ENGINEHEUR_MODE,
                                         HIPDNN_TYPE_HEUR_MODE,
                                         1,
@@ -278,7 +277,7 @@ TEST_F(Engine_heuristic_api_tests, GetHeuristicMode)
                                         nullptr),
               HIPDNN_STATUS_BAD_PARAM_NULL_POINTER);
 
-    EXPECT_EQ(hipdnnBackendGetAttribute(_engine_heuristic,
+    EXPECT_EQ(hipdnnBackendGetAttribute(_engineHeuristic,
                                         HIPDNN_ATTR_ENGINEHEUR_MODE,
                                         HIPDNN_TYPE_HEUR_MODE,
                                         1,
@@ -288,23 +287,20 @@ TEST_F(Engine_heuristic_api_tests, GetHeuristicMode)
     EXPECT_EQ(mode, HIPDNN_HEUR_MODE_FALLBACK);
 
     int64_t count = 0;
-    EXPECT_EQ(hipdnnBackendGetAttribute(_engine_heuristic,
-                                        HIPDNN_ATTR_ENGINEHEUR_MODE,
-                                        HIPDNN_TYPE_HEUR_MODE,
-                                        1,
-                                        &count,
-                                        &mode),
-              HIPDNN_STATUS_SUCCESS);
+    EXPECT_EQ(
+        hipdnnBackendGetAttribute(
+            _engineHeuristic, HIPDNN_ATTR_ENGINEHEUR_MODE, HIPDNN_TYPE_HEUR_MODE, 1, &count, &mode),
+        HIPDNN_STATUS_SUCCESS);
     EXPECT_EQ(count, 1);
     EXPECT_EQ(mode, HIPDNN_HEUR_MODE_FALLBACK);
 }
 
-TEST_F(Engine_heuristic_api_tests, GetUnsupportedAttribute)
+TEST_F(EngineHeuristicApiTests, GetUnsupportedAttribute)
 {
-    populate_engine_heuristic(true);
+    populateEngineHeuristic(true);
 
     hipdnnBackendHeurMode_t dummy;
-    EXPECT_EQ(hipdnnBackendGetAttribute(_engine_heuristic,
+    EXPECT_EQ(hipdnnBackendGetAttribute(_engineHeuristic,
                                         HIPDNN_ATTR_ENGINE_KNOB_INFO,
                                         HIPDNN_TYPE_HEUR_MODE,
                                         1,
@@ -313,12 +309,12 @@ TEST_F(Engine_heuristic_api_tests, GetUnsupportedAttribute)
               HIPDNN_STATUS_NOT_SUPPORTED);
 }
 
-TEST_F(Engine_heuristic_api_tests, GetEngineConfigsCountOnly)
+TEST_F(EngineHeuristicApiTests, GetEngineConfigsCountOnly)
 {
-    populate_engine_heuristic(true);
+    populateEngineHeuristic(true);
 
     int64_t count = 0;
-    EXPECT_EQ(hipdnnBackendGetAttribute(_engine_heuristic,
+    EXPECT_EQ(hipdnnBackendGetAttribute(_engineHeuristic,
                                         HIPDNN_ATTR_ENGINEHEUR_RESULTS,
                                         HIPDNN_TYPE_INT64,
                                         0,
@@ -326,7 +322,7 @@ TEST_F(Engine_heuristic_api_tests, GetEngineConfigsCountOnly)
                                         nullptr),
               HIPDNN_STATUS_BAD_PARAM);
 
-    EXPECT_EQ(hipdnnBackendGetAttribute(_engine_heuristic,
+    EXPECT_EQ(hipdnnBackendGetAttribute(_engineHeuristic,
                                         HIPDNN_ATTR_ENGINEHEUR_RESULTS,
                                         HIPDNN_TYPE_BACKEND_DESCRIPTOR,
                                         0,
@@ -336,12 +332,12 @@ TEST_F(Engine_heuristic_api_tests, GetEngineConfigsCountOnly)
     EXPECT_EQ(count, 1);
 }
 
-TEST_F(Engine_heuristic_api_tests, GetEngineConfigs)
+TEST_F(EngineHeuristicApiTests, GetEngineConfigs)
 {
-    populate_engine_heuristic(true);
+    populateEngineHeuristic(true);
 
     std::vector<hipdnnBackendDescriptor_t> configs(3);
-    EXPECT_EQ(hipdnnBackendGetAttribute(_engine_heuristic,
+    EXPECT_EQ(hipdnnBackendGetAttribute(_engineHeuristic,
                                         HIPDNN_ATTR_ENGINEHEUR_RESULTS,
                                         HIPDNN_TYPE_BACKEND_DESCRIPTOR,
                                         3,
@@ -350,7 +346,7 @@ TEST_F(Engine_heuristic_api_tests, GetEngineConfigs)
               HIPDNN_STATUS_BAD_PARAM_NULL_POINTER);
 
     int64_t count = 0;
-    EXPECT_EQ(hipdnnBackendGetAttribute(_engine_heuristic,
+    EXPECT_EQ(hipdnnBackendGetAttribute(_engineHeuristic,
                                         HIPDNN_ATTR_ENGINEHEUR_RESULTS,
                                         HIPDNN_TYPE_BACKEND_DESCRIPTOR,
                                         1,
@@ -358,7 +354,7 @@ TEST_F(Engine_heuristic_api_tests, GetEngineConfigs)
                                         nullptr),
               HIPDNN_STATUS_BAD_PARAM_NULL_POINTER);
 
-    EXPECT_EQ(hipdnnBackendGetAttribute(_engine_heuristic,
+    EXPECT_EQ(hipdnnBackendGetAttribute(_engineHeuristic,
                                         HIPDNN_ATTR_ENGINEHEUR_RESULTS,
                                         HIPDNN_TYPE_BACKEND_DESCRIPTOR,
                                         0,
@@ -374,7 +370,7 @@ TEST_F(Engine_heuristic_api_tests, GetEngineConfigs)
     }
 
     count = 0;
-    EXPECT_EQ(hipdnnBackendGetAttribute(_engine_heuristic,
+    EXPECT_EQ(hipdnnBackendGetAttribute(_engineHeuristic,
                                         HIPDNN_ATTR_ENGINEHEUR_RESULTS,
                                         HIPDNN_TYPE_BACKEND_DESCRIPTOR,
                                         3, // Ask for 3, but only one engine avaliable.
@@ -395,12 +391,12 @@ TEST_F(Engine_heuristic_api_tests, GetEngineConfigs)
               HIPDNN_STATUS_SUCCESS);
     ASSERT_NE(engine, nullptr);
 
-    int64_t engine_id = 0;
+    int64_t engineId = 0;
     EXPECT_EQ(
         hipdnnBackendGetAttribute(
-            engine, HIPDNN_ATTR_ENGINE_GLOBAL_INDEX, HIPDNN_TYPE_INT64, 1, nullptr, &engine_id),
+            engine, HIPDNN_ATTR_ENGINE_GLOBAL_INDEX, HIPDNN_TYPE_INT64, 1, nullptr, &engineId),
         HIPDNN_STATUS_SUCCESS);
-    EXPECT_EQ(engine_id, hipdnn_tests::plugin_constants::engine_id<Good_plugin>());
+    EXPECT_EQ(engineId, hipdnn_tests::plugin_constants::engine_id<Good_plugin>());
 
     // Expecting to only need to clean-up 1 engine config, since we only created & requested 1.
     for(auto config : configs)
@@ -414,9 +410,9 @@ TEST_F(Engine_heuristic_api_tests, GetEngineConfigs)
     EXPECT_EQ(hipdnnBackendDestroyDescriptor(engine), HIPDNN_STATUS_SUCCESS);
 }
 
-TEST_F(Engine_heuristic_api_tests, GetEngineConfigsRequestMoreThanAvailable)
+TEST_F(EngineHeuristicApiTests, GetEngineConfigsRequestMoreThanAvailable)
 {
-    populate_engine_heuristic(true);
+    populateEngineHeuristic(true);
 
     std::vector<hipdnnBackendDescriptor_t> configs(5);
     for(size_t i = 0; i < 5; ++i)
@@ -426,7 +422,7 @@ TEST_F(Engine_heuristic_api_tests, GetEngineConfigsRequestMoreThanAvailable)
     }
 
     int64_t count = 0;
-    EXPECT_EQ(hipdnnBackendGetAttribute(_engine_heuristic,
+    EXPECT_EQ(hipdnnBackendGetAttribute(_engineHeuristic,
                                         HIPDNN_ATTR_ENGINEHEUR_RESULTS,
                                         HIPDNN_TYPE_BACKEND_DESCRIPTOR,
                                         5,
