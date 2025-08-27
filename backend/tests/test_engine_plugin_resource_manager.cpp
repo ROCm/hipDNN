@@ -520,9 +520,9 @@ TEST(EnginePluginResourceManager, GetEngineDetails)
                                      const hipdnnPluginConstData_t*,
                                      hipdnnPluginConstData_t* output) {
             // Create valid flatbuffer engine details
-            static auto builder = flatbuffer_test_utils::createValidEngineDetails(engineId);
-            output->ptr = builder.GetBufferPointer();
-            output->size = builder.GetSize();
+            static auto s_builder = flatbuffer_test_utils::createValidEngineDetails(engineId);
+            output->ptr = s_builder.GetBufferPointer();
+            output->size = s_builder.GetSize();
         }));
 
     EXPECT_CALL(*mockPlugin,
