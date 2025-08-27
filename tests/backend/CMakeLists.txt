@@ -6,17 +6,17 @@ find_package(hip REQUIRED)
 find_package(Threads REQUIRED)
 
 add_executable(public_hipdnn_backend_tests 
-    test_plugin_loading.cpp
-    test_backend_public_functions.cpp
-    test_backend_execute_api.cpp
-    test_engine_config_api.cpp
-    test_engine_heuristic_api.cpp
-    test_engine_api.cpp
-    test_execution_plan_api.cpp
-    test_get_error_api.cpp
-    test_variant_pack_api.cpp
-    test_handle_api.cpp
-    test_util.cpp
+    TestPluginLoading.cpp
+    TestBackendPublicFunctions.cpp
+    TestBackendExecuteApi.cpp
+    TestEngineConfigApi.cpp
+    TestEngineHeuristicApi.cpp
+    TestEngineApi.cpp
+    TestExecutionPlanApi.cpp
+    TestGetErrorApi.cpp
+    TestVariantPackApi.cpp
+    TestHandleApi.cpp
+    TestUtil.cpp
 )
 
 target_compile_options(public_hipdnn_backend_tests PRIVATE ${HIPDNN_WARNING_COMPILE_OPTIONS})
