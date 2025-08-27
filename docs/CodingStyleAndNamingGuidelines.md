@@ -2,6 +2,32 @@
 
 This document defines the canonical project-wide coding and test naming conventions.
 
+## Table of Contents
+
+- [1. Naming Summary](#1-naming-summary)
+- [2. File & Class Naming](#2-file--class-naming)
+- [3. Functions](#3-functions)
+- [4. Variables](#4-variables)
+- [5. Members](#5-members)
+- [6. Globals](#6-globals)
+- [7. Interfaces](#7-interfaces)
+- [8. Enums](#8-enums)
+- [9. Constants](#9-constants)
+- [10. Test Naming Guidelines](#10-test-naming-guidelines)
+  - [10.1 Keywords (reserved positions)](#101-keywords-reserved-positions)
+  - [10.2 Valid Examples](#102-valid-examples)
+  - [10.3 Invalid Examples (and why)](#103-invalid-examples-and-why)
+  - [10.4 Test Case (second parameter)](#104-test-case-second-parameter)
+  - [10.5 Rationale](#105-rationale)
+- [11. Examples](#11-examples)
+  - [Class & File](#class--file)
+  - [Interface](#interface)
+  - [Constant & Enum](#constant--enum)
+  - [Test (gtest)](#test-gtest)
+- [12. Decision Checklist](#12-decision-checklist)
+- [13. Deviation Process](#13-deviation-process)
+- [14. Future Improvements](#14-future-improvements)
+
 ## 1. Naming Summary
 
 | Kind | Format | Example |
@@ -45,7 +71,7 @@ This document defines the canonical project-wide coding and test naming conventi
 
 Example:
 
-```
+```cpp
 struct TensorExtent {
     int n;
     int c;
@@ -69,8 +95,8 @@ If later you add invariants or non-trivial behavior, consider converting to a cl
 
 ## 8. Enums
 
-- Enum type name: PascalCase (e.g. EngineMode, ConvolutionMode).
-- Enumerator names: UPPER_SNAKE (ENGINE_MODE_DEFAULT, ENGINE_MODE_DETERMINISTIC).
+- Enum type name: PascalCase (e.g. `EngineMode`, `ConvolutionMode`).
+- Enumerator names: UPPER_SNAKE (`ENGINE_MODE_DEFAULT`, `ENGINE_MODE_DETERMINISTIC`).
 - Keep tokens concise; avoid redundant suffixes unless needed for disambiguation.
 - When mirroring external APIs, keep exact enumerator spellings.
 - Do not mix styles (no camelCase or PascalCase enumerators).
@@ -86,7 +112,7 @@ GoogleTest reserves underscores in test suite and test names for future expansio
 
 Rules below apply ONLY to the TestSuite name (first parameter of `TEST` / `TEST_F`). The TestCase (second parameter) can be descriptive but should still avoid the reserved keywords where noted.
 
-Ordering & Composition (left → right):
+**Ordering & Composition (left → right):**
 
 1. Optional `Integration` prefix for integration tests.
 2. Optional `Gpu` (immediately after `Integration` if both apply) for GPU-required tests.
@@ -98,14 +124,14 @@ Omit any category that does not apply.
 
 ### 10.1 Keywords (reserved positions)
 
-- Integration (only for integration tests, always first if present).
-- Gpu (always first unless preceded by Integration).
-- Datatypes: Bfp16, Fp16, Float.
-- Layout / Shape (examples): Nchw, Nhwc (optional).
+- **Integration** (only for integration tests, always first if present).
+- **Gpu** (always first unless preceded by Integration).
+- **Datatypes**: Bfp16, Fp16, Float.
+- **Layout / Shape** (examples): Nchw, Nhwc (optional).
 
 ### 10.2 Valid Examples
 
-```
+```cpp
 IntegrationGpuConvolutionPlannerNchwFloat
 GpuActivationKernelNchwFloat
 GpuExecutionPlanBuilderFloat
@@ -141,7 +167,7 @@ May be richly descriptive: `HandlesLargeStride`, `RejectsMismatchedLayouts`. Avo
 ### Class & File
 
 File: `ExecutionPlan.hpp`
-```
+```cpp
 class ExecutionPlan {
 public:
     static constexpr int MAX_STEPS = 8;
@@ -158,7 +184,7 @@ private:
 
 ### Interface
 
-```
+```cpp
 class IAllocator {
 public:
     virtual ~IAllocator() = default;
@@ -169,7 +195,7 @@ public:
 
 ### Constant & Enum
 
-```
+```cpp
 enum EngineMode {
     ENGINE_MODE_DEFAULT = 0,
     ENGINE_MODE_DETERMINISTIC = 1
@@ -180,7 +206,7 @@ constexpr size_t MAX_WORKSPACE_BYTES = 1ull << 32;
 
 ### Test (gtest)
 
-```
+```cpp
 TEST(GpuConvolutionPlannerNchwFloat, HandlesLargeKernels) {
     // ...
 }
