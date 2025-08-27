@@ -43,8 +43,8 @@ inline void initializeCallbackLogging(const std::string& componentName,
 {
     try
     {
-        static std::mutex callbackInitMutex;
-        std::lock_guard<std::mutex> lock(callbackInitMutex);
+        static std::mutex s_callbackInitMutex;
+        std::lock_guard<std::mutex> lock(s_callbackInitMutex);
 
         if(spdlog::get(componentName))
         {

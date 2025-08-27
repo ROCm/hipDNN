@@ -85,9 +85,9 @@ hipdnnPluginType_t PluginBase::type() const
 std::string_view PluginBase::getLastErrorString() const noexcept
 {
     assert(_initialized);
-    const char* error_str = nullptr;
-    _funcGetLastErrorStr(&error_str);
-    return error_str;
+    const char* errorStr = nullptr;
+    _funcGetLastErrorStr(&errorStr);
+    return errorStr;
 }
 
 hipdnnPluginStatus_t PluginBase::setLoggingCallback(hipdnnCallback_t callback) const
