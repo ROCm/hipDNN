@@ -15,7 +15,7 @@ namespace graph
 class BatchnormInferenceAttributes : public AttributesCRTP<BatchnormInferenceAttributes>
 {
 public:
-    enum class input_names
+    enum class input_names // NOLINT(readability-identifier-naming)
     {
         X = 0,
         MEAN = 1,
@@ -24,7 +24,7 @@ public:
         BIAS = 4
     };
 
-    enum class output_names
+    enum class output_names // NOLINT(readability-identifier-naming)
     {
         Y = 0
     };

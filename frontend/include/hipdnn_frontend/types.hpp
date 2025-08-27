@@ -12,20 +12,20 @@
 namespace hipdnn_frontend
 {
 
-enum class ConvolutionMode_t
+enum class ConvolutionMode_t // NOLINT(readability-identifier-naming)
 {
     NOT_SET = 0,
     CROSS_CORRELATION = 1,
     CONVOLUTION = 2
 };
 
-enum class PointwiseMode_t
+enum class PointwiseMode_t // NOLINT(readability-identifier-naming)
 {
     NOT_SET = 0,
     RELU_FWD = 1,
 };
 
-enum class DataType_t
+enum class DataType_t // NOLINT(readability-identifier-naming)
 {
     NOT_SET = 0,
     FLOAT = 1,
@@ -36,7 +36,7 @@ enum class DataType_t
     INT32 = 6,
 };
 
-enum class HeurMode_t
+enum class HeurMode_t // NOLINT(readability-identifier-naming)
 {
     FALLBACK,
 };

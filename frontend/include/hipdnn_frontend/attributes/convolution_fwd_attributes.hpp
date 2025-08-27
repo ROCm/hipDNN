@@ -17,13 +17,13 @@ namespace graph
 class ConvFpropAttributes : public AttributesCRTP<ConvFpropAttributes>
 {
 public:
-    enum class input_names
+    enum class input_names // NOLINT(readability-identifier-naming)
     {
         X = 0, // Input tensor
         W = 1 // Weights/filter tensor
     };
 
-    enum class output_names
+    enum class output_names // NOLINT(readability-identifier-naming)
     {
         Y = 0 // Output tensor
     };

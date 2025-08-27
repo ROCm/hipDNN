@@ -15,7 +15,7 @@ namespace graph
 class BatchnormBackwardAttributes : public AttributesCRTP<BatchnormBackwardAttributes>
 {
 public:
-    enum class input_names
+    enum class input_names // NOLINT(readability-identifier-naming)
     {
         DY = 0,
         X = 1,
@@ -24,7 +24,7 @@ public:
         INV_VARIANCE = 4
     };
 
-    enum class output_names
+    enum class output_names // NOLINT(readability-identifier-naming)
     {
         DX = 0,
         DSCALE = 1,
