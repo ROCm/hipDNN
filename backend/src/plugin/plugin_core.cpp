@@ -27,23 +27,23 @@ PluginBase::PluginBase()
 void PluginBase::resolveSymbols()
 {
     const auto funcNameGetName = "hipdnnPluginGetName";
-    _funcGetName = _lib.get_symbol<decltype(_funcGetName)>(funcNameGetName);
+    _funcGetName = _lib.getSymbol<decltype(_funcGetName)>(funcNameGetName);
 
     const auto funcNameGetVersion = "hipdnnPluginGetVersion";
-    _funcGetVersion = _lib.get_symbol<decltype(_funcGetVersion)>(funcNameGetVersion);
+    _funcGetVersion = _lib.getSymbol<decltype(_funcGetVersion)>(funcNameGetVersion);
 
     const auto funcNameGetType = "hipdnnPluginGetType";
-    _funcGetType = _lib.get_symbol<decltype(_funcGetType)>(funcNameGetType);
+    _funcGetType = _lib.getSymbol<decltype(_funcGetType)>(funcNameGetType);
 
     const auto funcNameGetLastErrorStr = "hipdnnPluginGetLastErrorString";
-    _funcGetLastErrorStr = _lib.get_symbol<decltype(_funcGetLastErrorStr)>(funcNameGetLastErrorStr);
+    _funcGetLastErrorStr = _lib.getSymbol<decltype(_funcGetLastErrorStr)>(funcNameGetLastErrorStr);
 
     // Logging callback is optional
     try
     {
         const auto funcNameSetLoggingCallback = "hipdnnPluginSetLoggingCallback";
         _funcSetLoggingCallback
-            = _lib.get_symbol<decltype(_funcSetLoggingCallback)>(funcNameSetLoggingCallback);
+            = _lib.getSymbol<decltype(_funcSetLoggingCallback)>(funcNameSetLoggingCallback);
     }
     catch(const HipdnnException&)
     {

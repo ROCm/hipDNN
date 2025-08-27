@@ -56,20 +56,20 @@ TEST(SharedLibraryTest, GetSymbol)
 {
     plugin::SharedLibrary library(LIBRARY_PATH);
 
-    ASSERT_NO_THROW(library.get_symbol(SYMBOL_NAME));
+    ASSERT_NO_THROW(library.getSymbol(SYMBOL_NAME));
 }
 
 TEST(SharedLibraryTest, GetSymbolUninitialized)
 {
     plugin::SharedLibrary library;
-    ASSERT_THROW_HIPDNN_STATUS(library.get_symbol(SYMBOL_NAME), HIPDNN_STATUS_INTERNAL_ERROR);
+    ASSERT_THROW_HIPDNN_STATUS(library.getSymbol(SYMBOL_NAME), HIPDNN_STATUS_INTERNAL_ERROR);
 }
 
 TEST(SharedLibraryTest, GetSymbolWrongName)
 {
     plugin::SharedLibrary library(LIBRARY_PATH);
 
-    ASSERT_THROW_HIPDNN_STATUS(library.get_symbol(WRONG_SYMBOL_NAME), HIPDNN_STATUS_PLUGIN_ERROR);
+    ASSERT_THROW_HIPDNN_STATUS(library.getSymbol(WRONG_SYMBOL_NAME), HIPDNN_STATUS_PLUGIN_ERROR);
 }
 
 TEST(SharedLibraryTest, CallFunction)
@@ -78,7 +78,7 @@ TEST(SharedLibraryTest, CallFunction)
 
     // Get the function pointer
     using FuncType = hipdnnPluginStatus_t (*)(const char**);
-    auto funcGetName = library.get_symbol<FuncType>(SYMBOL_NAME);
+    auto funcGetName = library.getSymbol<FuncType>(SYMBOL_NAME);
 
     // Call the function to get the plugin name
     const char* name = nullptr;

@@ -102,7 +102,7 @@ void SharedLibrary::unload() noexcept
     }
 }
 
-void* SharedLibrary::get_symbol(std::string_view symbolName) const
+void* SharedLibrary::getSymbol(std::string_view symbolName) const
 {
     if(_libraryHandle == nullptr)
     {

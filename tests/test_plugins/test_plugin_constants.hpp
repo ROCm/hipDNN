@@ -17,60 +17,60 @@ namespace plugin_constants
 const std::filesystem::path PLUGIN_DIR = "../test_plugins";
 
 // Compose full plugin path with existence checking
-inline std::string get_plugin_path(const char* plugin_name)
+inline std::string getPluginPath(const char* pluginName)
 {
     namespace fs = std::filesystem;
 
-    fs::path plugin_file = PLUGIN_DIR / hipdnn_sdk::utilities::getLibraryName(plugin_name);
+    fs::path pluginFile = PLUGIN_DIR / hipdnn_sdk::utilities::getLibraryName(pluginName);
 
     // Check if the file exists
-    if(!fs::exists(plugin_file))
+    if(!fs::exists(pluginFile))
     {
-        throw std::runtime_error("Plugin file not found: " + plugin_file.string());
+        throw std::runtime_error("Plugin file not found: " + pluginFile.string());
     }
 
-    return plugin_file.string();
+    return pluginFile.string();
 }
 
 inline const std::string& testGoodPluginPath()
 {
-    static const std::string testGoodPluginPath = get_plugin_path(TEST_GOOD_PLUGIN_NAME);
-    return testGoodPluginPath;
+    static const std::string s_testGoodPluginPath = getPluginPath(TEST_GOOD_PLUGIN_NAME);
+    return s_testGoodPluginPath;
 }
 
 inline const std::string& testExecuteFailsPluginPath()
 {
-    static const std::string testExecuteFailsPluginPath
-        = get_plugin_path(TEST_EXECUTE_FAILS_PLUGIN_NAME);
-    return testExecuteFailsPluginPath;
+    static const std::string s_testExecuteFailsPluginPath
+        = getPluginPath(TEST_EXECUTE_FAILS_PLUGIN_NAME);
+    return s_testExecuteFailsPluginPath;
 }
 
 inline const std::string& testNoApplicableEnginesPluginPath()
 {
-    static const std::string testNoApplicableEnginesPluginPath
-        = get_plugin_path(TEST_NO_APPLICABLE_ENGINES_PLUGIN_NAME);
-    return testNoApplicableEnginesPluginPath;
+    static const std::string s_testNoApplicableEnginesPluginPath
+        = getPluginPath(TEST_NO_APPLICABLE_ENGINES_PLUGIN_NAME);
+    return s_testNoApplicableEnginesPluginPath;
 }
 
 inline const std::string& testDuplicateIdAPluginPath()
 {
-    static const std::string testDuplicateIdAPluginPath
-        = get_plugin_path(TEST_DUPLICATE_ID_A_PLUGIN_NAME);
-    return testDuplicateIdAPluginPath;
+    static const std::string s_testDuplicateIdAPluginPath
+        = getPluginPath(TEST_DUPLICATE_ID_A_PLUGIN_NAME);
+    return s_testDuplicateIdAPluginPath;
 }
 
 inline const std::string& testDuplicateIdBPluginPath()
 {
-    static const std::string testDuplicateIdBPluginPath
-        = get_plugin_path(TEST_DUPLICATE_ID_B_PLUGIN_NAME);
-    return testDuplicateIdBPluginPath;
+    static const std::string s_testDuplicateIdBPluginPath
+        = getPluginPath(TEST_DUPLICATE_ID_B_PLUGIN_NAME);
+    return s_testDuplicateIdBPluginPath;
 }
 
 inline const std::string& testIncompleteApiPluginPath()
 {
-    static const std::string testIncompleteApiPluginPath
-        = get_plugin_path(TEST_INCOMPLETE_API_PLUGIN_NAME);
-    return testIncompleteApiPluginPath;
+    static const std::string s_testIncompleteApiPluginPath
+        = getPluginPath(TEST_INCOMPLETE_API_PLUGIN_NAME);
+    return s_testIncompleteApiPluginPath;
 }
 
 } // namespace plugin_constants

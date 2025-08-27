@@ -25,8 +25,8 @@ namespace
 
 // Could refactor this to a class with a single static instance.
 // The benefit would be a destructor to cleanup logging.
-std::mutex s_loggingInitMutex;
-bool s_loggingInitialized = false;
+std::mutex s_loggingInitMutex; // NOLINT(readability-identifier-naming)
+bool s_loggingInitialized = false; // NOLINT(readability-identifier-naming)
 const std::string S_BACKEND_LOGGER_NAME = "hipdnn_backend";
 const std::string S_CALLBACK_RECEIVER_LOGGER_NAME = "hipdnn_callback_receiver";
 
