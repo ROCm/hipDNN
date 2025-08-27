@@ -5,8 +5,8 @@
 #include "logging/logging.hpp"
 #include <hipdnn_sdk/utilities/string_util.hpp>
 
-// NOLINTNEXTLINE(modernize-avoid-c-arrays)
-thread_local char hipdnn_backend::LastErrorManager::lastError[HIPDNN_MAX_ERROR_STRING_SIZE] = "";
+// NOLINTNEXTLINE
+thread_local char hipdnn_backend::LastErrorManager::s_lastError[HIPDNN_MAX_ERROR_STRING_SIZE] = "";
 
 hipdnnStatus_t hipdnn_backend::LastErrorManager::setLastError(hipdnnStatus_t status,
                                                               const char* message)
@@ -20,7 +20,7 @@ hipdnnStatus_t hipdnn_backend::LastErrorManager::setLastError(hipdnnStatus_t sta
         "Error occured in status:{} message:{}", hipdnnGetStatusString(status), message);
 
     hipdnn::sdk::utilities::copyMaxSizeWithNullTerminator(
-        lastError, message, HIPDNN_MAX_ERROR_STRING_SIZE);
+        s_lastError, message, HIPDNN_MAX_ERROR_STRING_SIZE);
 
     return status;
 }
@@ -33,5 +33,5 @@ hipdnnStatus_t hipdnn_backend::LastErrorManager::setLastError(hipdnnStatus_t sta
 
 const char* hipdnn_backend::LastErrorManager::getLastError()
 {
-    return lastError;
+    return s_lastError;
 }

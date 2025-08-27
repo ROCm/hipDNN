@@ -280,8 +280,9 @@ class LastErrorManager
 private:
     // We cannot use std::string in thread-local storage here because it requires a thread-local storage destructor.
     // This prevents the shared object (plugin) from being unloaded until the program terminates.
-    // NOLINTNEXTLINE(modernize-avoid-c-arrays)
-    thread_local static char lastError[HIPDNN_MAX_ERROR_STRING_SIZE];
+    // Note: We need to nolint this to avoid issues since thread_local static confused clang-tidy.
+    // NOLINTNEXTLINE
+    thread_local static char s_lastError[HIPDNN_MAX_ERROR_STRING_SIZE];
 
 public:
     static hipdnnStatus_t setLastError(hipdnnStatus_t status, const char* message);
