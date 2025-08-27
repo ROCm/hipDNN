@@ -39,10 +39,10 @@ using hipdnn_sdk::utilities::TensorLayout;
         }                                                                                \
     } while(0)
 
-#define HIPDNN_FE_CHECK(status_obj)                                                       \
+#define HIPDNN_FE_CHECK(statusObj)                                                        \
     do                                                                                    \
     {                                                                                     \
-        auto const& status = status_obj;                                                  \
+        auto const& status = statusObj;                                                   \
         if(!status.is_good())                                                             \
         {                                                                                 \
             std::cerr << "hipDNN Frontend Error: " << status.get_message() << " in file " \
@@ -124,11 +124,11 @@ void run(F&& f)
 
 inline std::shared_ptr<hipdnn_frontend::graph::Tensor_attributes>
     createTensor(const std::vector<int64_t>& dims,
-                 hipdnn_frontend::DataType_t data_type,
+                 hipdnn_frontend::DataType_t dataType,
                  const TensorLayout& layout = TensorLayout::NCHW)
 {
     auto tensor = std::make_shared<hipdnn_frontend::graph::Tensor_attributes>();
-    tensor->set_dim(dims).set_data_type(data_type);
+    tensor->set_dim(dims).set_data_type(dataType);
     tensor->set_stride(hipdnn_sdk::utilities::generateStrides(dims, layout.strideOrder));
 
     return tensor;

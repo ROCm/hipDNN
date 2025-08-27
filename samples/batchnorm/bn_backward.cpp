@@ -134,15 +134,15 @@ void SampleRunner::operator()(const TensorLayout& layout)
         auto dxValidator
             = hipdnn_sdk::reference_test_utilities::CpuFpReferenceValidation<InputType>(
                 static_cast<InputType>(epsilon), static_cast<InputType>(epsilon));
-        auto dscaleDbiaValidator
+        auto dscaleDbiasValidator
             = hipdnn_sdk::reference_test_utilities::CpuFpReferenceValidation<IntermediateType>(
                 static_cast<IntermediateType>(epsilon), static_cast<IntermediateType>(epsilon));
 
         bool dxValid = dxValidator.allClose(dxRefTensor.memory(), dxTensor.memory());
         bool dscaleValid
-            = dscaleDbiaValidator.allClose(dscaleRefTensor.memory(), dscaleTensor.memory());
+            = dscaleDbiasValidator.allClose(dscaleRefTensor.memory(), dscaleTensor.memory());
         bool dbiasValid
-            = dscaleDbiaValidator.allClose(dbiasRefTensor.memory(), dbiasTensor.memory());
+            = dscaleDbiasValidator.allClose(dbiasRefTensor.memory(), dbiasTensor.memory());
 
         std::cout << "CPU reference validation:\n";
         std::cout << "  dx: " << (dxValid ? "successful" : "failed") << "\n";
