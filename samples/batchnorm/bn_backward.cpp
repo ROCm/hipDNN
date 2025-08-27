@@ -20,35 +20,35 @@ using namespace hipdnn_sdk::utilities;
 
 // TODO: verify this sample when applicable engines are added
 template <typename InputType, typename IntermediateType>
-void Sample_runner::operator()(const TensorLayout& layout)
+void SampleRunner::operator()(const TensorLayout& layout)
 {
-    auto input_type = get_data_type_enum_from_type<InputType>();
-    auto intermediate_type = get_data_type_enum_from_type<IntermediateType>();
+    auto inputType = getDataTypeEnumFromType<InputType>();
+    auto intermediateType = getDataTypeEnumFromType<IntermediateType>();
 
-    std::cout << "Running batch normalization backwards graph " << input_type << " [" << layout
-              << "]" << (config.cpu_validation ? " (with CPU validation)" : "") << "...\n";
+    std::cout << "Running batch normalization backwards graph " << inputType << " [" << layout
+              << "]" << (config.cpuValidation ? " (with CPU validation)" : "") << "...\n";
 
-    int64_t N = 16; // BATCH SIZE
-    int64_t C = 16; // CHANNELS (FEATURES)
-    int64_t H = 16; // HEIGHT (SPATIAL DIMENSION)
-    int64_t W = 16; // WIDTH (SPATIAL DIMENSION)
+    int64_t n = 16; // BATCH SIZE
+    int64_t c = 16; // CHANNELS (FEATURES)
+    int64_t h = 16; // HEIGHT (SPATIAL DIMENSION)
+    int64_t w = 16; // WIDTH (SPATIAL DIMENSION)
 
     auto graph = std::make_shared<graph::Graph>();
-    graph->set_io_data_type(input_type)
-        .set_intermediate_data_type(intermediate_type)
-        .set_compute_data_type(intermediate_type);
+    graph->set_io_data_type(inputType)
+        .set_intermediate_data_type(intermediateType)
+        .set_compute_data_type(intermediateType);
 
-    auto dy = create_tensor({N, C, H, W}, input_type, layout);
-    auto x = create_tensor({N, C, H, W}, input_type, layout);
-    auto scale = create_tensor({1, C, 1, 1}, intermediate_type);
-    auto saved_mean = create_tensor({1, C, 1, 1}, intermediate_type);
-    auto saved_inv_variance = create_tensor({1, C, 1, 1}, intermediate_type);
+    auto dy = createTensor({n, c, h, w}, inputType, layout);
+    auto x = createTensor({n, c, h, w}, inputType, layout);
+    auto scale = createTensor({1, c, 1, 1}, intermediateType);
+    auto savedMean = createTensor({1, c, 1, 1}, intermediateType);
+    auto savedInvVariance = createTensor({1, c, 1, 1}, intermediateType);
 
-    auto bn_bwd_attributes = graph::Batchnorm_backward_attributes();
-    bn_bwd_attributes.set_name("bn_backward_node");
-    bn_bwd_attributes.set_saved_mean_and_inv_variance(saved_mean, saved_inv_variance);
+    auto bnBwdAttributes = graph::BatchnormBackwardAttributes();
+    bnBwdAttributes.set_name("bn_backward_node");
+    bnBwdAttributes.set_saved_mean_and_inv_variance(savedMean, savedInvVariance);
 
-    auto [dx, dscale, dbias] = graph->batchnorm_backward(dy, x, scale, bn_bwd_attributes);
+    auto [dx, dscale, dbias] = graph->batchnorm_backward(dy, x, scale, bnBwdAttributes);
 
     dx->set_output(true);
     dscale->set_output(true);
@@ -69,117 +69,117 @@ void Sample_runner::operator()(const TensorLayout& layout)
     HIPDNN_FE_CHECK(graph->build_plans());
     std::cout << "Plans build successful.\n";
 
-    Tensor<InputType> dy_tensor(dy->get_dim(), layout);
-    Tensor<InputType> x_tensor(x->get_dim(), layout);
-    Tensor<IntermediateType> scale_tensor(scale->get_dim());
-    Tensor<IntermediateType> saved_mean_tensor(saved_mean->get_dim());
-    Tensor<IntermediateType> saved_inv_var_tensor(saved_inv_variance->get_dim());
+    Tensor<InputType> dyTensor(dy->get_dim(), layout);
+    Tensor<InputType> xTensor(x->get_dim(), layout);
+    Tensor<IntermediateType> scaleTensor(scale->get_dim());
+    Tensor<IntermediateType> savedMeanTensor(savedMean->get_dim());
+    Tensor<IntermediateType> savedInvVarTensor(savedInvVariance->get_dim());
 
-    Tensor<InputType> dx_tensor(dx->get_dim(), layout);
-    Tensor<IntermediateType> dscale_tensor(dscale->get_dim());
-    Tensor<IntermediateType> dbias_tensor(dbias->get_dim());
+    Tensor<InputType> dxTensor(dx->get_dim(), layout);
+    Tensor<IntermediateType> dscaleTensor(dscale->get_dim());
+    Tensor<IntermediateType> dbiasTensor(dbias->get_dim());
 
-    dy_tensor.fillWithRandomValues(static_cast<InputType>(0.0f), static_cast<InputType>(1.0f));
-    x_tensor.fillWithRandomValues(static_cast<InputType>(0.0f), static_cast<InputType>(1.0f));
-    scale_tensor.fillWithRandomValues(static_cast<IntermediateType>(0.0f),
+    dyTensor.fillWithRandomValues(static_cast<InputType>(0.0f), static_cast<InputType>(1.0f));
+    xTensor.fillWithRandomValues(static_cast<InputType>(0.0f), static_cast<InputType>(1.0f));
+    scaleTensor.fillWithRandomValues(static_cast<IntermediateType>(0.0f),
                                       static_cast<IntermediateType>(1.0f));
-    saved_mean_tensor.fillWithRandomValues(static_cast<IntermediateType>(0.0f),
+    savedMeanTensor.fillWithRandomValues(static_cast<IntermediateType>(0.0f),
                                            static_cast<IntermediateType>(1.0f));
-    saved_inv_var_tensor.fillWithRandomValues(static_cast<IntermediateType>(0.1f),
+    savedInvVarTensor.fillWithRandomValues(static_cast<IntermediateType>(0.1f),
                                               static_cast<IntermediateType>(1.0f));
 
-    std::unordered_map<int64_t, void*> variant_pack;
+    std::unordered_map<int64_t, void*> variantPack;
 
-    variant_pack[dy->get_uid()] = dy_tensor.memory().deviceData();
-    variant_pack[x->get_uid()] = x_tensor.memory().deviceData();
-    variant_pack[scale->get_uid()] = scale_tensor.memory().deviceData();
-    variant_pack[saved_mean->get_uid()] = saved_mean_tensor.memory().deviceData();
-    variant_pack[saved_inv_variance->get_uid()] = saved_inv_var_tensor.memory().deviceData();
-    variant_pack[dx->get_uid()] = dx_tensor.memory().deviceData();
-    variant_pack[dscale->get_uid()] = dscale_tensor.memory().deviceData();
-    variant_pack[dbias->get_uid()] = dbias_tensor.memory().deviceData();
+    variantPack[dy->get_uid()] = dyTensor.memory().deviceData();
+    variantPack[x->get_uid()] = xTensor.memory().deviceData();
+    variantPack[scale->get_uid()] = scaleTensor.memory().deviceData();
+    variantPack[savedMean->get_uid()] = savedMeanTensor.memory().deviceData();
+    variantPack[savedInvVariance->get_uid()] = savedInvVarTensor.memory().deviceData();
+    variantPack[dx->get_uid()] = dxTensor.memory().deviceData();
+    variantPack[dscale->get_uid()] = dscaleTensor.memory().deviceData();
+    variantPack[dbias->get_uid()] = dbiasTensor.memory().deviceData();
 
-    HIPDNN_FE_CHECK(graph->execute(handle, variant_pack, nullptr));
+    HIPDNN_FE_CHECK(graph->execute(handle, variantPack, nullptr));
 
-    dx_tensor.memory().markDeviceModified();
-    dscale_tensor.memory().markDeviceModified();
-    dbias_tensor.memory().markDeviceModified();
+    dxTensor.memory().markDeviceModified();
+    dscaleTensor.memory().markDeviceModified();
+    dbiasTensor.memory().markDeviceModified();
 
-    auto dx_host_ptr = dx_tensor.memory().hostData();
-    auto dscale_host_ptr = dscale_tensor.memory().hostData();
-    auto dbias_host_ptr = dbias_tensor.memory().hostData();
+    auto dxHostPtr = dxTensor.memory().hostData();
+    auto dscaleHostPtr = dscaleTensor.memory().hostData();
+    auto dbiasHostPtr = dbiasTensor.memory().hostData();
 
-    if(config.cpu_validation)
+    if(config.cpuValidation)
     {
         std::cout << "Running CPU reference validation...\n";
 
-        auto ref_impl = hipdnn_sdk::reference_test_utilities::
+        auto refImpl = hipdnn_sdk::reference_test_utilities::
             CpuFpReferenceImplementation<InputType, IntermediateType>();
 
-        Tensor<InputType> dx_ref_tensor(dx->get_dim(), layout);
-        Tensor<IntermediateType> dscale_ref_tensor(dscale->get_dim());
-        Tensor<IntermediateType> dbias_ref_tensor(dbias->get_dim());
+        Tensor<InputType> dxRefTensor(dx->get_dim(), layout);
+        Tensor<IntermediateType> dscaleRefTensor(dscale->get_dim());
+        Tensor<IntermediateType> dbiasRefTensor(dbias->get_dim());
 
-        ref_impl.batchnormBwd(dy_tensor,
-                              x_tensor,
-                              saved_mean_tensor,
-                              saved_inv_var_tensor,
-                              scale_tensor,
-                              dx_ref_tensor,
-                              dscale_ref_tensor,
-                              dbias_ref_tensor);
+        refImpl.batchnormBwd(dyTensor,
+                              xTensor,
+                              savedMeanTensor,
+                              savedInvVarTensor,
+                              scaleTensor,
+                              dxRefTensor,
+                              dscaleRefTensor,
+                              dbiasRefTensor);
 
-        auto epsilon = get_epsilon<InputType>();
+        auto epsilon = getEpsilon<InputType>();
 
-        auto dx_validator
+        auto dxValidator
             = hipdnn_sdk::reference_test_utilities::CpuFpReferenceValidation<InputType>(
                 static_cast<InputType>(epsilon), static_cast<InputType>(epsilon));
-        auto dscale_dbias_validator
+        auto dscaleDbiaValidator
             = hipdnn_sdk::reference_test_utilities::CpuFpReferenceValidation<IntermediateType>(
                 static_cast<IntermediateType>(epsilon), static_cast<IntermediateType>(epsilon));
 
-        bool dx_valid = dx_validator.allClose(dx_ref_tensor.memory(), dx_tensor.memory());
-        bool dscale_valid
-            = dscale_dbias_validator.allClose(dscale_ref_tensor.memory(), dscale_tensor.memory());
-        bool dbias_valid
-            = dscale_dbias_validator.allClose(dbias_ref_tensor.memory(), dbias_tensor.memory());
+        bool dxValid = dxValidator.allClose(dxRefTensor.memory(), dxTensor.memory());
+        bool dscaleValid
+            = dscaleDbiaValidator.allClose(dscaleRefTensor.memory(), dscaleTensor.memory());
+        bool dbiasValid
+            = dscaleDbiaValidator.allClose(dbiasRefTensor.memory(), dbiasTensor.memory());
 
         std::cout << "CPU reference validation:\n";
-        std::cout << "  dx: " << (dx_valid ? "successful" : "failed") << "\n";
-        std::cout << "  dscale: " << (dscale_valid ? "successful" : "failed") << "\n";
-        std::cout << "  dbias: " << (dbias_valid ? "successful" : "failed") << "\n";
+        std::cout << "  dx: " << (dxValid ? "successful" : "failed") << "\n";
+        std::cout << "  dscale: " << (dscaleValid ? "successful" : "failed") << "\n";
+        std::cout << "  dbias: " << (dbiasValid ? "successful" : "failed") << "\n";
     }
 
     std::cout << "First 10 dx values: ";
     for(int i = 0; i < 10; ++i)
     {
-        std::cout << static_cast<float>(dx_host_ptr[i]) << " ";
+        std::cout << static_cast<float>(dxHostPtr[i]) << " ";
     }
     std::cout << "\nFirst 10 dscale values: ";
     for(int i = 0; i < 10; ++i)
     {
-        std::cout << static_cast<float>(dscale_host_ptr[i]) << " ";
+        std::cout << static_cast<float>(dscaleHostPtr[i]) << " ";
     }
     std::cout << "\nFirst 10 dbias values: ";
     for(int i = 0; i < 10; ++i)
     {
-        std::cout << static_cast<float>(dbias_host_ptr[i]) << " ";
+        std::cout << static_cast<float>(dbiasHostPtr[i]) << " ";
     }
 
-    std::cout << "\nBatch normalization backward graph execution complete for " << input_type
+    std::cout << "\nBatch normalization backward graph execution complete for " << inputType
               << ".\n\n";
 }
 
 int main(int argc, char* argv[])
 {
-    auto config = parse_command_line_args(argc, argv);
+    auto config = parseCommandLineArgs(argc, argv);
 
     initialize_frontend_logging(hipdnnLoggingCallback_ext);
 
     hipdnnHandle_t handle;
     HIPDNN_CHECK(hipdnnCreate(&handle));
 
-    run(Sample_runner{handle, config});
+    run(SampleRunner{handle, config});
 
     HIPDNN_CHECK(hipdnnDestroy(handle));
     std::cout << "All batch normalization backwards runs completed successfully.\n";

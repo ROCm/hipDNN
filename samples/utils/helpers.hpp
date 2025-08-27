@@ -51,9 +51,9 @@ using hipdnn_sdk::utilities::TensorLayout;
         }                                                                                 \
     } while(0)
 
-inline void print_sample_help(const std::string& sample_name)
+inline void printSampleHelp(const std::string& sampleName)
 {
-    std::cout << "Usage: " << sample_name << " [OPTIONS]\n"
+    std::cout << "Usage: " << sampleName << " [OPTIONS]\n"
               << "Options:\n"
               << "  --verify-cpu, -vc    Enable CPU reference validation\n"
               << "  --help, -h      Show this help message\n"
@@ -62,10 +62,10 @@ inline void print_sample_help(const std::string& sample_name)
 
 struct Config
 {
-    bool cpu_validation = false;
+    bool cpuValidation = false;
 };
 
-inline Config parse_command_line_args(int argc, char* argv[])
+inline Config parseCommandLineArgs(int argc, char* argv[])
 {
     auto config = Config{};
 
@@ -75,17 +75,17 @@ inline Config parse_command_line_args(int argc, char* argv[])
 
         if(arg == "--verify-cpu" || arg == "-vc")
         {
-            config.cpu_validation = true;
+            config.cpuValidation = true;
         }
         else if(arg == "--help" || arg == "-h")
         {
-            print_sample_help(argv[0]);
+            printSampleHelp(argv[0]);
             exit(EXIT_SUCCESS);
         }
         else
         {
             std::cerr << "Unknown argument: " << arg << std::endl;
-            print_sample_help(argv[0]);
+            printSampleHelp(argv[0]);
             exit(EXIT_FAILURE);
         }
     }
@@ -94,19 +94,19 @@ inline Config parse_command_line_args(int argc, char* argv[])
 }
 
 template <typename T>
-constexpr float get_epsilon()
+constexpr float getEpsilon()
 {
     return 1e-5f;
 }
 
 template <>
-constexpr float get_epsilon<half>()
+constexpr float getEpsilon<half>()
 {
     return 1e-3f;
 }
 
 template <>
-constexpr float get_epsilon<hip_bfloat16>()
+constexpr float getEpsilon<hip_bfloat16>()
 {
     return 1e-2f;
 }
@@ -123,7 +123,7 @@ void run(F&& f)
 }
 
 inline std::shared_ptr<hipdnn_frontend::graph::Tensor_attributes>
-    create_tensor(const std::vector<int64_t>& dims,
+    createTensor(const std::vector<int64_t>& dims,
                   hipdnn_frontend::DataType_t data_type,
                   const TensorLayout& layout = TensorLayout::NCHW)
 {
@@ -134,7 +134,7 @@ inline std::shared_ptr<hipdnn_frontend::graph::Tensor_attributes>
     return tensor;
 }
 
-inline int64_t get_tensor_element_count(
+inline int64_t getTensorElementCount(
     const std::shared_ptr<hipdnn_frontend::graph::Tensor_attributes>& tensor)
 {
     int64_t count = 1;
@@ -145,7 +145,7 @@ inline int64_t get_tensor_element_count(
     return count;
 }
 
-struct Sample_runner
+struct SampleRunner
 {
     hipdnnHandle_t handle;
     Config config;

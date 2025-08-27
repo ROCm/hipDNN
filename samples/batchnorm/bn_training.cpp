@@ -20,45 +20,45 @@ using namespace hipdnn_sdk::utilities;
 
 // TODO: verify this sample when applicable engines are added
 template <typename InputType, typename IntermediateType>
-void Sample_runner::operator()(const TensorLayout& layout)
+void SampleRunner::operator()(const TensorLayout& layout)
 {
-    auto input_type = get_data_type_enum_from_type<InputType>();
-    auto intermediate_type = get_data_type_enum_from_type<IntermediateType>();
+    auto inputType = getDataTypeEnumFromType<InputType>();
+    auto intermediateType = getDataTypeEnumFromType<IntermediateType>();
 
-    std::cout << "Running batch normalization training graph " << input_type << " [" << layout
-              << "]" << (config.cpu_validation ? " (with CPU validation)" : "") << "...\n";
+    std::cout << "Running batch normalization training graph " << inputType << " [" << layout
+              << "]" << (config.cpuValidation ? " (with CPU validation)" : "") << "...\n";
 
-    int64_t N = 16; // BATCH SIZE
-    int64_t C = 16; // CHANNELS (FEATURES)
-    int64_t H = 16; // HEIGHT (SPATIAL DIMENSION)
-    int64_t W = 16; // WIDTH (SPATIAL DIMENSION)
+    int64_t n = 16; // BATCH SIZE
+    int64_t c = 16; // CHANNELS (FEATURES)
+    int64_t h = 16; // HEIGHT (SPATIAL DIMENSION)
+    int64_t w = 16; // WIDTH (SPATIAL DIMENSION)
 
     auto graph = std::make_shared<graph::Graph>();
-    graph->set_io_data_type(input_type)
-        .set_intermediate_data_type(intermediate_type)
-        .set_compute_data_type(intermediate_type);
+    graph->set_io_data_type(inputType)
+        .set_intermediate_data_type(intermediateType)
+        .set_compute_data_type(intermediateType);
 
-    auto x = create_tensor({N, C, H, W}, input_type);
-    auto scale = create_tensor({1, C, 1, 1}, intermediate_type);
-    auto bias = create_tensor({1, C, 1, 1}, intermediate_type);
-    auto prev_running_mean = create_tensor({1, C, 1, 1}, intermediate_type);
-    auto prev_running_var = create_tensor({1, C, 1, 1}, intermediate_type);
-    auto momentum = create_tensor({1, 1, 1, 1}, intermediate_type);
-    auto epsilon = create_tensor({1, 1, 1, 1}, intermediate_type);
+    auto x = createTensor({n, c, h, w}, inputType);
+    auto scale = createTensor({1, c, 1, 1}, intermediateType);
+    auto bias = createTensor({1, c, 1, 1}, intermediateType);
+    auto prevRunningMean = createTensor({1, c, 1, 1}, intermediateType);
+    auto prevRunningVar = createTensor({1, c, 1, 1}, intermediateType);
+    auto momentum = createTensor({1, 1, 1, 1}, intermediateType);
+    auto epsilon = createTensor({1, 1, 1, 1}, intermediateType);
 
-    auto bn_attributes = graph::Batchnorm_attributes();
-    bn_attributes.set_name("bn_training_node");
-    bn_attributes.set_previous_running_stats(prev_running_mean, prev_running_var, momentum)
-        .set_epsilon(epsilon);
+    auto bnAttributes = graph::BatchnormAttributes();
+    bnAttributes.setName("bn_training_node");
+    bnAttributes.setPreviousRunningStats(prevRunningMean, prevRunningVar, momentum)
+        .setEpsilon(epsilon);
 
-    auto [y, next_running_mean, next_running_var, saved_mean, saved_inv_variance]
-        = graph->batchnorm(x, scale, bias, bn_attributes);
+    auto [y, nextRunningMean, nextRunningVar, savedMean, savedInvVariance]
+        = graph->batchnorm(x, scale, bias, bnAttributes);
 
     y->set_output(true);
-    next_running_mean->set_output(true);
-    next_running_var->set_output(true);
-    saved_mean->set_output(true);
-    saved_inv_variance->set_output(true);
+    nextRunningMean->set_output(true);
+    nextRunningVar->set_output(true);
+    savedMean->set_output(true);
+    savedInvVariance->set_output(true);
 
     HIPDNN_FE_CHECK(graph->validate());
     std::cout << "Graph validation successful.\n";
@@ -75,70 +75,70 @@ void Sample_runner::operator()(const TensorLayout& layout)
     HIPDNN_FE_CHECK(graph->build_plans());
     std::cout << "Plans build successful.\n";
 
-    Tensor<InputType> x_tensor(x->get_dim(), layout);
-    Tensor<IntermediateType> scale_tensor(scale->get_dim());
-    Tensor<IntermediateType> bias_tensor(bias->get_dim());
-    Tensor<IntermediateType> prev_mean_tensor(prev_running_mean->get_dim());
-    Tensor<IntermediateType> prev_var_tensor(prev_running_var->get_dim());
-    Tensor<IntermediateType> momentum_tensor(momentum->get_dim());
-    Tensor<IntermediateType> epsilon_tensor(epsilon->get_dim());
+    Tensor<InputType> xTensor(x->get_dim(), layout);
+    Tensor<IntermediateType> scaleTensor(scale->get_dim());
+    Tensor<IntermediateType> biasTensor(bias->get_dim());
+    Tensor<IntermediateType> prevMeanTensor(prevRunningMean->get_dim());
+    Tensor<IntermediateType> prevVarTensor(prevRunningVar->get_dim());
+    Tensor<IntermediateType> momentumTensor(momentum->get_dim());
+    Tensor<IntermediateType> epsilonTensor(epsilon->get_dim());
 
-    Tensor<InputType> y_tensor(y->get_dim(), layout);
-    Tensor<IntermediateType> next_mean_tensor(next_running_mean->get_dim());
-    Tensor<IntermediateType> next_var_tensor(next_running_var->get_dim());
-    Tensor<IntermediateType> saved_mean_tensor(saved_mean->get_dim());
-    Tensor<IntermediateType> saved_inv_var_tensor(saved_inv_variance->get_dim());
+    Tensor<InputType> yTensor(y->get_dim(), layout);
+    Tensor<IntermediateType> nextMeanTensor(nextRunningMean->get_dim());
+    Tensor<IntermediateType> nextVarTensor(nextRunningVar->get_dim());
+    Tensor<IntermediateType> savedMeanTensor(savedMean->get_dim());
+    Tensor<IntermediateType> savedInvVarTensor(savedInvVariance->get_dim());
 
-    x_tensor.fillWithRandomValues(static_cast<InputType>(0.0f), static_cast<InputType>(1.0f));
-    scale_tensor.fillWithRandomValues(static_cast<IntermediateType>(0.0f),
+    xTensor.fillWithRandomValues(static_cast<InputType>(0.0f), static_cast<InputType>(1.0f));
+    scaleTensor.fillWithRandomValues(static_cast<IntermediateType>(0.0f),
                                       static_cast<IntermediateType>(1.0f));
-    bias_tensor.fillWithRandomValues(static_cast<IntermediateType>(0.0f),
+    biasTensor.fillWithRandomValues(static_cast<IntermediateType>(0.0f),
                                      static_cast<IntermediateType>(1.0f));
-    prev_mean_tensor.fillWithRandomValues(static_cast<IntermediateType>(0.0f),
+    prevMeanTensor.fillWithRandomValues(static_cast<IntermediateType>(0.0f),
                                           static_cast<IntermediateType>(1.0f));
-    prev_var_tensor.fillWithRandomValues(static_cast<IntermediateType>(0.1f),
+    prevVarTensor.fillWithRandomValues(static_cast<IntermediateType>(0.1f),
                                          static_cast<IntermediateType>(1.0f));
 
-    momentum_tensor.memory().hostData()[0] = 0.1f;
-    epsilon_tensor.memory().hostData()[0] = 1e-5f;
+    momentumTensor.memory().hostData()[0] = 0.1f;
+    epsilonTensor.memory().hostData()[0] = 1e-5f;
 
-    std::unordered_map<int64_t, void*> variant_pack;
+    std::unordered_map<int64_t, void*> variantPack;
 
-    variant_pack[x->get_uid()] = x_tensor.memory().deviceData();
-    variant_pack[scale->get_uid()] = scale_tensor.memory().deviceData();
-    variant_pack[bias->get_uid()] = bias_tensor.memory().deviceData();
-    variant_pack[prev_running_mean->get_uid()] = prev_mean_tensor.memory().deviceData();
-    variant_pack[prev_running_var->get_uid()] = prev_var_tensor.memory().deviceData();
-    variant_pack[momentum->get_uid()] = momentum_tensor.memory().deviceData();
-    variant_pack[epsilon->get_uid()] = epsilon_tensor.memory().deviceData();
-    variant_pack[y->get_uid()] = y_tensor.memory().deviceData();
-    variant_pack[next_running_mean->get_uid()] = next_mean_tensor.memory().deviceData();
-    variant_pack[next_running_var->get_uid()] = next_var_tensor.memory().deviceData();
-    variant_pack[saved_mean->get_uid()] = saved_mean_tensor.memory().deviceData();
-    variant_pack[saved_inv_variance->get_uid()] = saved_inv_var_tensor.memory().deviceData();
+    variantPack[x->get_uid()] = xTensor.memory().deviceData();
+    variantPack[scale->get_uid()] = scaleTensor.memory().deviceData();
+    variantPack[bias->get_uid()] = biasTensor.memory().deviceData();
+    variantPack[prevRunningMean->get_uid()] = prevMeanTensor.memory().deviceData();
+    variantPack[prevRunningVar->get_uid()] = prevVarTensor.memory().deviceData();
+    variantPack[momentum->get_uid()] = momentumTensor.memory().deviceData();
+    variantPack[epsilon->get_uid()] = epsilonTensor.memory().deviceData();
+    variantPack[y->get_uid()] = yTensor.memory().deviceData();
+    variantPack[nextRunningMean->get_uid()] = nextMeanTensor.memory().deviceData();
+    variantPack[nextRunningVar->get_uid()] = nextVarTensor.memory().deviceData();
+    variantPack[savedMean->get_uid()] = savedMeanTensor.memory().deviceData();
+    variantPack[savedInvVariance->get_uid()] = savedInvVarTensor.memory().deviceData();
 
-    HIPDNN_FE_CHECK(graph->execute(handle, variant_pack, nullptr));
+    HIPDNN_FE_CHECK(graph->execute(handle, variantPack, nullptr));
 
-    y_tensor.memory().markDeviceModified();
-    next_mean_tensor.memory().markDeviceModified();
-    next_var_tensor.memory().markDeviceModified();
-    saved_mean_tensor.memory().markDeviceModified();
-    saved_inv_var_tensor.memory().markDeviceModified();
+    yTensor.memory().markDeviceModified();
+    nextMeanTensor.memory().markDeviceModified();
+    nextVarTensor.memory().markDeviceModified();
+    savedMeanTensor.memory().markDeviceModified();
+    savedInvVarTensor.memory().markDeviceModified();
 
-    auto y_host_ptr = y_tensor.memory().hostData();
+    auto yHostPtr = yTensor.memory().hostData();
 
-    if(config.cpu_validation)
+    if(config.cpuValidation)
     {
         std::cout << "Running CPU reference validation...\n";
 
-        auto ref_impl = hipdnn_sdk::reference_test_utilities::
+        auto refImpl = hipdnn_sdk::reference_test_utilities::
             CpuFpReferenceImplementation<InputType, IntermediateType>();
 
-        Tensor<InputType> y_ref_tensor(y->get_dim(), layout);
-        Tensor<IntermediateType> next_mean_ref_tensor(next_running_mean->get_dim());
-        Tensor<IntermediateType> next_var_ref_tensor(next_running_var->get_dim());
-        Tensor<IntermediateType> saved_mean_ref_tensor(saved_mean->get_dim());
-        Tensor<IntermediateType> saved_inv_var_ref_tensor(saved_inv_variance->get_dim());
+        Tensor<InputType> yRefTensor(y->get_dim(), layout);
+        Tensor<IntermediateType> nextMeanRefTensor(nextRunningMean->get_dim());
+        Tensor<IntermediateType> nextVarRefTensor(nextRunningVar->get_dim());
+        Tensor<IntermediateType> savedMeanRefTensor(savedMean->get_dim());
+        Tensor<IntermediateType> savedInvVarRefTensor(savedInvVariance->get_dim());
 
         // TODO: Uncomment when CPU reference implemented
         // ref_impl.batchnorm_fwd_training(x_tensor,
@@ -181,23 +181,23 @@ void Sample_runner::operator()(const TensorLayout& layout)
     std::cout << "First 10 y values: ";
     for(int i = 0; i < 10; ++i)
     {
-        std::cout << static_cast<float>(y_host_ptr[i]) << " ";
+        std::cout << static_cast<float>(yHostPtr[i]) << " ";
     }
 
-    std::cout << "\nBatch normalization training graph execution complete for " << input_type
+    std::cout << "\nBatch normalization training graph execution complete for " << inputType
               << ".\n\n";
 }
 
 int main(int argc, char* argv[])
 {
-    auto config = parse_command_line_args(argc, argv);
+    auto config = parseCommandLineArgs(argc, argv);
 
     initialize_frontend_logging(hipdnnLoggingCallback_ext);
 
     hipdnnHandle_t handle;
     HIPDNN_CHECK(hipdnnCreate(&handle));
 
-    run(Sample_runner{handle, config});
+    run(SampleRunner{handle, config});
 
     HIPDNN_CHECK(hipdnnDestroy(handle));
     std::cout << "All batch normalization training runs completed successfully.\n";
