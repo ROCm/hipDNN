@@ -18,7 +18,7 @@ protected:
     void SetUp() override
     {
         const std::array<const char*, 1> paths
-            = {hipdnn_tests::plugin_constants::test_good_plugin_path().c_str()};
+            = {hipdnn_tests::plugin_constants::testGoodPluginPath().c_str()};
         ASSERT_EQ(hipdnnSetEnginePluginPaths_ext(
                       paths.size(), paths.data(), HIPDNN_PLUGIN_LOADING_ABSOLUTE),
                   HIPDNN_STATUS_SUCCESS);
@@ -65,7 +65,7 @@ TEST_F(EngineApiTests, SetEngineGraph)
 
 TEST_F(EngineApiTests, SetEngineGlobalIndex)
 {
-    int64_t gidx = hipdnn_tests::plugin_constants::engine_id<Good_plugin>();
+    int64_t gidx = hipdnn_tests::plugin_constants::engineId<GoodPlugin>();
 
     EXPECT_EQ(hipdnnBackendSetAttribute(
                   _engine, HIPDNN_ATTR_ENGINE_GLOBAL_INDEX, HIPDNN_TYPE_INT64, 1, nullptr),
@@ -85,7 +85,7 @@ TEST_F(EngineApiTests, SetEngineAttrNotSupported)
 
 TEST_F(EngineApiTests, SetEngineAttrAlreadyFinalized)
 {
-    int64_t gidx = hipdnn_tests::plugin_constants::engine_id<Good_plugin>();
+    int64_t gidx = hipdnn_tests::plugin_constants::engineId<GoodPlugin>();
 
     test_util::populateTestEngine(_engine, &_graph, _handle, gidx, true);
     EXPECT_EQ(hipdnnBackendSetAttribute(
@@ -95,7 +95,7 @@ TEST_F(EngineApiTests, SetEngineAttrAlreadyFinalized)
 
 TEST_F(EngineApiTests, FinalizeEngine)
 {
-    int64_t gidx = hipdnn_tests::plugin_constants::engine_id<Good_plugin>();
+    int64_t gidx = hipdnn_tests::plugin_constants::engineId<GoodPlugin>();
 
     EXPECT_EQ(hipdnnBackendFinalize(_engine), HIPDNN_STATUS_BAD_PARAM);
     test_util::populateTestEngine(_engine, &_graph, _handle, gidx);
@@ -105,7 +105,7 @@ TEST_F(EngineApiTests, FinalizeEngine)
 TEST_F(EngineApiTests, GetEngineGraph)
 {
     hipdnnBackendDescriptor_t graph = nullptr;
-    int64_t gidx = hipdnn_tests::plugin_constants::engine_id<Good_plugin>();
+    int64_t gidx = hipdnn_tests::plugin_constants::engineId<GoodPlugin>();
 
     test_util::populateTestEngine(_engine, &_graph, _handle, gidx, true);
     EXPECT_EQ(hipdnnBackendGetAttribute(_engine,
@@ -122,7 +122,7 @@ TEST_F(EngineApiTests, GetEngineGraph)
 
 TEST_F(EngineApiTests, GetEngineGlobalIndex)
 {
-    int64_t gidx = hipdnn_tests::plugin_constants::engine_id<Good_plugin>();
+    int64_t gidx = hipdnn_tests::plugin_constants::engineId<GoodPlugin>();
     int64_t gidxOut;
 
     test_util::populateTestEngine(_engine, &_graph, _handle, gidx, true);

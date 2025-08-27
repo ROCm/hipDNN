@@ -5,23 +5,23 @@
 namespace hipdnn_tests::plugin_constants
 {
 template <class T>
-constexpr int64_t engine_id() = delete;
+constexpr int64_t engineId() = delete;
 } // namespace hipdnn_tests::plugin_constants
 
-#define HIPDNN_MAP_TO_ID(Class_name, id)      \
-    class Class_name;                         \
+#define HIPDNN_MAP_TO_ID(ClassName, id)       \
+    class ClassName;                          \
     namespace hipdnn_tests::plugin_constants  \
     {                                         \
     template <>                               \
-    constexpr int64_t engine_id<Class_name>() \
+    constexpr int64_t engineId<ClassName>()   \
     {                                         \
         return id;                            \
     };                                        \
     }
 
-HIPDNN_MAP_TO_ID(Good_plugin, -2);
-HIPDNN_MAP_TO_ID(Good_default_plugin, -3);
-HIPDNN_MAP_TO_ID(No_applicable_engines_plugin, -4);
-HIPDNN_MAP_TO_ID(Execute_fails_plugin, -5);
-HIPDNN_MAP_TO_ID(Duplicate_id_a_plugin, -6);
-HIPDNN_MAP_TO_ID(Duplicate_id_b_plugin, -6);
+HIPDNN_MAP_TO_ID(GoodPlugin, -2);
+HIPDNN_MAP_TO_ID(GoodDefaultPlugin, -3);
+HIPDNN_MAP_TO_ID(NoApplicableEnginesPlugin, -4);
+HIPDNN_MAP_TO_ID(ExecuteFailsPlugin, -5);
+HIPDNN_MAP_TO_ID(DuplicateIdAPlugin, -6);
+HIPDNN_MAP_TO_ID(DuplicateIdBPlugin, -6);

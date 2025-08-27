@@ -14,7 +14,7 @@
 class ExecutionBackendEndApiTests : public ::testing::Test
 {
 protected:
-    static constexpr int64_t GIDX = hipdnn_tests::plugin_constants::engine_id<Good_plugin>();
+    static constexpr int64_t GIDX = hipdnn_tests::plugin_constants::engineId<GoodPlugin>();
     hipdnnBackendDescriptor_t _plan = nullptr;
     hipdnnHandle_t _handle = nullptr;
     hipdnnBackendDescriptor_t _engineConfig = nullptr;
@@ -26,7 +26,7 @@ protected:
     void SetUp() override
     {
         const std::array<const char*, 1> paths
-            = {hipdnn_tests::plugin_constants::test_good_plugin_path().c_str()};
+            = {hipdnn_tests::plugin_constants::testGoodPluginPath().c_str()};
         ASSERT_EQ(hipdnnSetEnginePluginPaths_ext(
                       paths.size(), paths.data(), HIPDNN_PLUGIN_LOADING_ABSOLUTE),
                   HIPDNN_STATUS_SUCCESS);

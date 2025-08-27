@@ -28,229 +28,229 @@ struct HipdnnEnginePluginExecutionContext
 };
 
 // Base class for test plugins
-class Test_plugin_base
+class TestPluginBase
 {
 public:
-    virtual ~Test_plugin_base() = default;
+    virtual ~TestPluginBase() = default;
 
     // Virtual methods to be overridden by derived classes
-    virtual const char* get_plugin_name() const = 0;
-    virtual const char* get_plugin_version() const = 0;
-    virtual int64_t get_engine_id() const = 0;
-    virtual uint32_t get_num_engines() const = 0;
-    virtual uint32_t get_num_applicable_engines() const = 0;
-    virtual bool supports_engine_operations() const
+    virtual const char* getPluginName() const = 0;
+    virtual const char* getPluginVersion() const = 0;
+    virtual int64_t getEngineId() const = 0;
+    virtual uint32_t getNumEngines() const = 0;
+    virtual uint32_t getNumApplicableEngines() const = 0;
+    virtual bool supportsEngineOperations() const
     {
-        return get_num_applicable_engines() > 0;
+        return getNumApplicableEngines() > 0;
     }
 
     // Execute graph - derived classes override this for custom behavior
-    virtual void execute_graph() const
+    virtual void executeGraph() const
     {
-        HIPDNN_LOG_INFO("execute_graph called");
+        HIPDNN_LOG_INFO("executeGraph called");
     }
 
     // Static instance management
-    static void set_instance(std::unique_ptr<Test_plugin_base> instance)
+    static void setInstance(std::unique_ptr<TestPluginBase> instance)
     {
         _instance = std::move(instance);
     }
 
-    static Test_plugin_base* get_instance()
+    static TestPluginBase* getInstance()
     {
         return _instance.get();
     }
 
     // Common API implementations
-    static hipdnnPluginStatus_t plugin_get_name(const char** name)
+    static hipdnnPluginStatus_t pluginGetName(const char** name)
     {
-        LOG_API_ENTRY("name_ptr={:p}", static_cast<void*>(name));
+        LOG_API_ENTRY("namePtr={:p}", static_cast<void*>(name));
 
-        return hipdnn_plugin::tryCatch([&, api_name = __func__]() {
+        return hipdnn_plugin::tryCatch([&, apiName = __func__]() {
             hipdnn_plugin::throwIfNull(name);
-            hipdnn_plugin::throwIfNull(get_instance());
+            hipdnn_plugin::throwIfNull(getInstance());
 
-            *name = get_instance()->get_plugin_name();
+            *name = getInstance()->getPluginName();
 
-            LOG_API_SUCCESS(api_name, "plugin_name={:p}", static_cast<void*>(name));
+            LOG_API_SUCCESS(apiName, "pluginName={:p}", static_cast<void*>(name));
         });
     }
 
-    static hipdnnPluginStatus_t plugin_get_version(const char** version)
+    static hipdnnPluginStatus_t pluginGetVersion(const char** version)
     {
-        LOG_API_ENTRY("version_ptr={:p}", static_cast<void*>(version));
+        LOG_API_ENTRY("versionPtr={:p}", static_cast<void*>(version));
 
-        return hipdnn_plugin::tryCatch([&, api_name = __func__]() {
+        return hipdnn_plugin::tryCatch([&, apiName = __func__]() {
             hipdnn_plugin::throwIfNull(version);
-            hipdnn_plugin::throwIfNull(get_instance());
+            hipdnn_plugin::throwIfNull(getInstance());
 
-            *version = get_instance()->get_plugin_version();
+            *version = getInstance()->getPluginVersion();
 
-            LOG_API_SUCCESS(api_name, "version={:p}", static_cast<void*>(version));
+            LOG_API_SUCCESS(apiName, "version={:p}", static_cast<void*>(version));
         });
     }
 
-    static hipdnnPluginStatus_t plugin_get_type(hipdnnPluginType_t* type)
+    static hipdnnPluginStatus_t pluginGetType(hipdnnPluginType_t* type)
     {
-        LOG_API_ENTRY("type_ptr={:p}", static_cast<void*>(type));
+        LOG_API_ENTRY("typePtr={:p}", static_cast<void*>(type));
 
-        return hipdnn_plugin::tryCatch([&, api_name = __func__]() {
+        return hipdnn_plugin::tryCatch([&, apiName = __func__]() {
             hipdnn_plugin::throwIfNull(type);
 
             *type = HIPDNN_PLUGIN_TYPE_ENGINE;
 
-            LOG_API_SUCCESS(api_name, "type={}", *type);
+            LOG_API_SUCCESS(apiName, "type={}", *type);
         });
     }
 
-    static void plugin_get_last_error_string(const char** error_str)
+    static void pluginGetLastErrorString(const char** errorStr)
     {
-        LOG_API_ENTRY("error_str_ptr={:p}", static_cast<void*>(error_str));
+        LOG_API_ENTRY("errorStrPtr={:p}", static_cast<void*>(errorStr));
 
-        hipdnn_plugin::tryCatch([&, api_name = __func__]() {
-            hipdnn_plugin::throwIfNull(error_str);
+        hipdnn_plugin::tryCatch([&, apiName = __func__]() {
+            hipdnn_plugin::throwIfNull(errorStr);
 
-            *error_str = hipdnn_plugin::PluginLastErrorManager::getLastError();
+            *errorStr = hipdnn_plugin::PluginLastErrorManager::getLastError();
 
-            LOG_API_SUCCESS(api_name, "error_str={:p}", static_cast<void*>(error_str));
+            LOG_API_SUCCESS(apiName, "errorStr={:p}", static_cast<void*>(errorStr));
         });
     }
 
-    static hipdnnPluginStatus_t plugin_set_logging_callback(hipdnnCallback_t callback)
+    static hipdnnPluginStatus_t pluginSetLoggingCallback(hipdnnCallback_t callback)
     {
-        return hipdnn_plugin::tryCatch([&, api_name = __func__]() {
+        return hipdnn_plugin::tryCatch([&, apiName = __func__]() {
             hipdnn_plugin::throwIfNull(callback);
-            hipdnn_plugin::throwIfNull(get_instance());
+            hipdnn_plugin::throwIfNull(getInstance());
 
-            hipdnn::logging::initializeCallbackLogging(get_instance()->get_plugin_name(), callback);
-            LOG_API_SUCCESS(api_name, "");
+            hipdnn::logging::initializeCallbackLogging(getInstance()->getPluginName(), callback);
+            LOG_API_SUCCESS(apiName, "");
         });
     }
 
-    static hipdnnPluginStatus_t engine_plugin_get_all_engine_ids(int64_t* engine_ids,
-                                                                 uint32_t max_engines,
-                                                                 uint32_t* num_engines)
+    static hipdnnPluginStatus_t enginePluginGetAllEngineIds(int64_t* engineIds,
+                                                             uint32_t maxEngines,
+                                                             uint32_t* numEngines)
     {
-        LOG_API_ENTRY("engine_ids={:p}, max_engines={}, num_engines={:p}",
-                      static_cast<void*>(engine_ids),
-                      max_engines,
-                      static_cast<void*>(num_engines));
+        LOG_API_ENTRY("engineIds={:p}, maxEngines={}, numEngines={:p}",
+                      static_cast<void*>(engineIds),
+                      maxEngines,
+                      static_cast<void*>(numEngines));
 
-        return hipdnn_plugin::tryCatch([&, api_name = __func__]() {
-            if(max_engines != 0)
+        return hipdnn_plugin::tryCatch([&, apiName = __func__]() {
+            if(maxEngines != 0)
             {
-                hipdnn_plugin::throwIfNull(engine_ids);
+                hipdnn_plugin::throwIfNull(engineIds);
             }
-            hipdnn_plugin::throwIfNull(num_engines);
-            hipdnn_plugin::throwIfNull(get_instance());
+            hipdnn_plugin::throwIfNull(numEngines);
+            hipdnn_plugin::throwIfNull(getInstance());
 
-            *num_engines = get_instance()->get_num_engines();
+            *numEngines = getInstance()->getNumEngines();
 
-            if(max_engines >= 1 && *num_engines > 0)
+            if(maxEngines >= 1 && *numEngines > 0)
             {
-                assert(*num_engines == 1);
-                engine_ids[0] = get_instance()->get_engine_id();
+                assert(*numEngines == 1);
+                engineIds[0] = getInstance()->getEngineId();
             }
 
-            LOG_API_SUCCESS(api_name, "num_engines={}", *num_engines);
+            LOG_API_SUCCESS(apiName, "numEngines={}", *numEngines);
         });
     }
 
-    static hipdnnPluginStatus_t engine_plugin_create(hipdnnEnginePluginHandle_t* handle)
+    static hipdnnPluginStatus_t enginePluginCreate(hipdnnEnginePluginHandle_t* handle)
     {
-        LOG_API_ENTRY("handle_ptr={:p}", static_cast<void*>(handle));
+        LOG_API_ENTRY("handlePtr={:p}", static_cast<void*>(handle));
 
-        return hipdnn_plugin::tryCatch([&, api_name = __func__]() {
+        return hipdnn_plugin::tryCatch([&, apiName = __func__]() {
             hipdnn_plugin::throwIfNull(handle);
 
             *handle = new HipdnnEnginePluginHandle();
 
-            LOG_API_SUCCESS(api_name, "created_handle={:p}", static_cast<void*>(*handle));
+            LOG_API_SUCCESS(apiName, "createdHandle={:p}", static_cast<void*>(*handle));
         });
     }
 
-    static hipdnnPluginStatus_t engine_plugin_destroy(hipdnnEnginePluginHandle_t handle)
+    static hipdnnPluginStatus_t enginePluginDestroy(hipdnnEnginePluginHandle_t handle)
     {
         LOG_API_ENTRY("handle={:p}", static_cast<void*>(handle));
 
-        return hipdnn_plugin::tryCatch([&, api_name = __func__]() {
+        return hipdnn_plugin::tryCatch([&, apiName = __func__]() {
             hipdnn_plugin::throwIfNull(handle);
 
             delete handle;
             handle = nullptr;
 
-            LOG_API_SUCCESS(api_name, "");
+            LOG_API_SUCCESS(apiName, "");
         });
     }
 
-    static hipdnnPluginStatus_t engine_plugin_set_stream(hipdnnEnginePluginHandle_t handle,
-                                                         hipStream_t stream)
+    static hipdnnPluginStatus_t enginePluginSetStream(hipdnnEnginePluginHandle_t handle,
+                                                       hipStream_t stream)
     {
         LOG_API_ENTRY(
-            "handle={:p}, stream_id={:p}", static_cast<void*>(handle), static_cast<void*>(stream));
+            "handle={:p}, streamId={:p}", static_cast<void*>(handle), static_cast<void*>(stream));
 
-        return hipdnn_plugin::tryCatch([&, api_name = __func__]() {
+        return hipdnn_plugin::tryCatch([&, apiName = __func__]() {
             hipdnn_plugin::throwIfNull(handle);
 
-            LOG_API_SUCCESS(api_name, "");
+            LOG_API_SUCCESS(apiName, "");
         });
     }
 
     static hipdnnPluginStatus_t
-        engine_plugin_get_applicable_engine_ids(hipdnnEnginePluginHandle_t handle,
-                                                const hipdnnPluginConstData_t* op_graph,
-                                                int64_t* engine_ids,
-                                                uint32_t max_engines,
-                                                uint32_t* num_engines)
+        enginePluginGetApplicableEngineIds(hipdnnEnginePluginHandle_t handle,
+                                            const hipdnnPluginConstData_t* opGraph,
+                                            int64_t* engineIds,
+                                            uint32_t maxEngines,
+                                            uint32_t* numEngines)
     {
         LOG_API_ENTRY(
-            "handle={:p}, op_graph={:p}, engine_ids={:p}, max_engines={}, num_engines={:p}",
+            "handle={:p}, opGraph={:p}, engineIds={:p}, maxEngines={}, numEngines={:p}",
             static_cast<void*>(handle),
-            static_cast<const void*>(op_graph),
-            static_cast<void*>(engine_ids),
-            max_engines,
-            static_cast<void*>(num_engines));
+            static_cast<const void*>(opGraph),
+            static_cast<void*>(engineIds),
+            maxEngines,
+            static_cast<void*>(numEngines));
 
-        return hipdnn_plugin::tryCatch([&, api_name = __func__]() {
+        return hipdnn_plugin::tryCatch([&, apiName = __func__]() {
             hipdnn_plugin::throwIfNull(handle);
-            hipdnn_plugin::throwIfNull(op_graph);
-            if(max_engines != 0)
+            hipdnn_plugin::throwIfNull(opGraph);
+            if(maxEngines != 0)
             {
-                hipdnn_plugin::throwIfNull(engine_ids);
+                hipdnn_plugin::throwIfNull(engineIds);
             }
-            hipdnn_plugin::throwIfNull(num_engines);
-            hipdnn_plugin::throwIfNull(get_instance());
+            hipdnn_plugin::throwIfNull(numEngines);
+            hipdnn_plugin::throwIfNull(getInstance());
 
-            *num_engines = get_instance()->get_num_applicable_engines();
+            *numEngines = getInstance()->getNumApplicableEngines();
 
-            if(max_engines >= 1 && *num_engines > 0)
+            if(maxEngines >= 1 && *numEngines > 0)
             {
-                engine_ids[0] = get_instance()->get_engine_id();
+                engineIds[0] = getInstance()->getEngineId();
             }
 
-            LOG_API_SUCCESS(api_name, "num_engines={}", *num_engines);
+            LOG_API_SUCCESS(apiName, "numEngines={}", *numEngines);
         });
     }
 
     static hipdnnPluginStatus_t
-        engine_plugin_get_engine_details(hipdnnEnginePluginHandle_t handle,
-                                         int64_t engine_id,
-                                         const hipdnnPluginConstData_t* op_graph,
-                                         hipdnnPluginConstData_t* engine_details)
+        enginePluginGetEngineDetails(hipdnnEnginePluginHandle_t handle,
+                                      int64_t engineId,
+                                      const hipdnnPluginConstData_t* opGraph,
+                                      hipdnnPluginConstData_t* engineDetails)
     {
-        LOG_API_ENTRY("handle={:p}, engine_id={}, op_graph={:p}, engine_details={:p}",
+        LOG_API_ENTRY("handle={:p}, engineId={}, opGraph={:p}, engineDetails={:p}",
                       static_cast<void*>(handle),
-                      engine_id,
-                      static_cast<const void*>(op_graph),
-                      static_cast<void*>(engine_details));
+                      engineId,
+                      static_cast<const void*>(opGraph),
+                      static_cast<void*>(engineDetails));
 
-        return hipdnn_plugin::tryCatch([&, api_name = __func__]() {
+        return hipdnn_plugin::tryCatch([&, apiName = __func__]() {
             hipdnn_plugin::throwIfNull(handle);
-            hipdnn_plugin::throwIfNull(op_graph);
-            hipdnn_plugin::throwIfNull(engine_details);
-            hipdnn_plugin::throwIfNull(get_instance());
+            hipdnn_plugin::throwIfNull(opGraph);
+            hipdnn_plugin::throwIfNull(engineDetails);
+            hipdnn_plugin::throwIfNull(getInstance());
 
-            if(!get_instance()->supports_engine_operations())
+            if(!getInstance()->supportsEngineOperations())
             {
                 throw hipdnn_plugin::HipdnnPluginException(
                     HIPDNN_PLUGIN_STATUS_INTERNAL_ERROR,
@@ -258,176 +258,176 @@ public:
             }
 
             flatbuffers::FlatBufferBuilder builder;
-            auto new_engine_details = hipdnn_sdk::data_objects::CreateEngineDetails(
-                builder, get_instance()->get_engine_id());
-            builder.Finish(new_engine_details);
-            auto serialized_details = builder.Release();
+            auto newEngineDetails = hipdnn_sdk::data_objects::CreateEngineDetails(
+                builder, getInstance()->getEngineId());
+            builder.Finish(newEngineDetails);
+            auto serializedDetails = builder.Release();
 
-            auto* temp_buffer = new uint8_t[serialized_details.size()];
-            std::memcpy(temp_buffer, serialized_details.data(), serialized_details.size());
+            auto* tempBuffer = new uint8_t[serializedDetails.size()];
+            std::memcpy(tempBuffer, serializedDetails.data(), serializedDetails.size());
 
-            engine_details->ptr = temp_buffer;
-            engine_details->size = serialized_details.size();
+            engineDetails->ptr = tempBuffer;
+            engineDetails->size = serializedDetails.size();
 
-            LOG_API_SUCCESS(api_name, "engine_details->ptr={:p}", engine_details->ptr);
+            LOG_API_SUCCESS(apiName, "engineDetails->ptr={:p}", engineDetails->ptr);
         });
     }
 
     static hipdnnPluginStatus_t
-        engine_plugin_destroy_engine_details(hipdnnEnginePluginHandle_t handle,
-                                             hipdnnPluginConstData_t* engine_details)
+        enginePluginDestroyEngineDetails(hipdnnEnginePluginHandle_t handle,
+                                          hipdnnPluginConstData_t* engineDetails)
     {
-        LOG_API_ENTRY("handle={:p}, engine_details={}",
+        LOG_API_ENTRY("handle={:p}, engineDetails={}",
                       static_cast<void*>(handle),
-                      static_cast<void*>(engine_details));
+                      static_cast<void*>(engineDetails));
 
-        return hipdnn_plugin::tryCatch([&, api_name = __func__]() {
+        return hipdnn_plugin::tryCatch([&, apiName = __func__]() {
             hipdnn_plugin::throwIfNull(handle);
-            hipdnn_plugin::throwIfNull(engine_details);
+            hipdnn_plugin::throwIfNull(engineDetails);
 
-            if(!get_instance()->supports_engine_operations())
+            if(!getInstance()->supportsEngineOperations())
             {
                 throw hipdnn_plugin::HipdnnPluginException(HIPDNN_PLUGIN_STATUS_INTERNAL_ERROR,
                                                            "No engine details to destroy");
             }
 
-            hipdnn_plugin::throwIfNull(engine_details->ptr);
+            hipdnn_plugin::throwIfNull(engineDetails->ptr);
 
-            delete[] static_cast<const uint8_t*>(engine_details->ptr);
+            delete[] static_cast<const uint8_t*>(engineDetails->ptr);
 
-            LOG_API_SUCCESS(api_name, "engine_details->ptr={:p}", engine_details->ptr);
+            LOG_API_SUCCESS(apiName, "engineDetails->ptr={:p}", engineDetails->ptr);
         });
     }
 
     static hipdnnPluginStatus_t
-        engine_plugin_get_workspace_size(hipdnnEnginePluginHandle_t handle,
-                                         const hipdnnPluginConstData_t* engine_config,
-                                         const hipdnnPluginConstData_t* op_graph,
-                                         size_t* workspace_size)
+        enginePluginGetWorkspaceSize(hipdnnEnginePluginHandle_t handle,
+                                      const hipdnnPluginConstData_t* engineConfig,
+                                      const hipdnnPluginConstData_t* opGraph,
+                                      size_t* workspaceSize)
     {
-        LOG_API_ENTRY("handle={:p}, engine_config={:p}, op_graph={:p}, workspace_size={:p}",
+        LOG_API_ENTRY("handle={:p}, engineConfig={:p}, opGraph={:p}, workspaceSize={:p}",
                       static_cast<void*>(handle),
-                      static_cast<const void*>(engine_config),
-                      static_cast<const void*>(op_graph),
-                      static_cast<void*>(workspace_size));
+                      static_cast<const void*>(engineConfig),
+                      static_cast<const void*>(opGraph),
+                      static_cast<void*>(workspaceSize));
 
-        return hipdnn_plugin::tryCatch([&, api_name = __func__]() {
+        return hipdnn_plugin::tryCatch([&, apiName = __func__]() {
             hipdnn_plugin::throwIfNull(handle);
-            hipdnn_plugin::throwIfNull(engine_config);
-            hipdnn_plugin::throwIfNull(op_graph);
-            hipdnn_plugin::throwIfNull(workspace_size);
-            hipdnn_plugin::throwIfNull(get_instance());
+            hipdnn_plugin::throwIfNull(engineConfig);
+            hipdnn_plugin::throwIfNull(opGraph);
+            hipdnn_plugin::throwIfNull(workspaceSize);
+            hipdnn_plugin::throwIfNull(getInstance());
 
-            if(!get_instance()->supports_engine_operations())
+            if(!getInstance()->supportsEngineOperations())
             {
                 throw hipdnn_plugin::HipdnnPluginException(
                     HIPDNN_PLUGIN_STATUS_INTERNAL_ERROR,
                     "No engines available - cannot get workspace size");
             }
 
-            *workspace_size = 1024;
+            *workspaceSize = 1024;
 
-            LOG_API_SUCCESS(api_name, "workspace_size={}", *workspace_size);
+            LOG_API_SUCCESS(apiName, "workspaceSize={}", *workspaceSize);
         });
     }
 
-    static hipdnnPluginStatus_t engine_plugin_create_execution_context(
+    static hipdnnPluginStatus_t enginePluginCreateExecutionContext(
         hipdnnEnginePluginHandle_t handle,
-        const hipdnnPluginConstData_t* engine_config,
-        const hipdnnPluginConstData_t* op_graph,
-        hipdnnEnginePluginExecutionContext_t* execution_context)
+        const hipdnnPluginConstData_t* engineConfig,
+        const hipdnnPluginConstData_t* opGraph,
+        hipdnnEnginePluginExecutionContext_t* executionContext)
     {
-        LOG_API_ENTRY("handle={:p}, engine_config={:p}, op_graph={:p}, execution_context={:p}",
+        LOG_API_ENTRY("handle={:p}, engineConfig={:p}, opGraph={:p}, executionContext={:p}",
                       static_cast<void*>(handle),
-                      static_cast<const void*>(engine_config),
-                      static_cast<const void*>(op_graph),
-                      static_cast<void*>(execution_context));
+                      static_cast<const void*>(engineConfig),
+                      static_cast<const void*>(opGraph),
+                      static_cast<void*>(executionContext));
 
-        return hipdnn_plugin::tryCatch([&, api_name = __func__]() {
+        return hipdnn_plugin::tryCatch([&, apiName = __func__]() {
             hipdnn_plugin::throwIfNull(handle);
-            hipdnn_plugin::throwIfNull(engine_config);
-            hipdnn_plugin::throwIfNull(op_graph);
-            hipdnn_plugin::throwIfNull(execution_context);
-            hipdnn_plugin::throwIfNull(get_instance());
+            hipdnn_plugin::throwIfNull(engineConfig);
+            hipdnn_plugin::throwIfNull(opGraph);
+            hipdnn_plugin::throwIfNull(executionContext);
+            hipdnn_plugin::throwIfNull(getInstance());
 
-            if(!get_instance()->supports_engine_operations())
+            if(!getInstance()->supportsEngineOperations())
             {
                 throw hipdnn_plugin::HipdnnPluginException(
                     HIPDNN_PLUGIN_STATUS_INTERNAL_ERROR,
                     "No engines available - cannot create execution context");
             }
 
-            hipdnn_plugin::GraphWrapper op_graph_wrapper(op_graph->ptr, op_graph->size);
-            hipdnn_plugin::EngineConfigWrapper engineConfigWrapper(engine_config->ptr,
-                                                                   engine_config->size);
+            hipdnn_plugin::GraphWrapper opGraphWrapper(opGraph->ptr, opGraph->size);
+            hipdnn_plugin::EngineConfigWrapper engineConfigWrapper(engineConfig->ptr,
+                                                                   engineConfig->size);
 
-            *execution_context = new HipdnnEnginePluginExecutionContext();
+            *executionContext = new HipdnnEnginePluginExecutionContext();
 
             LOG_API_SUCCESS(
-                api_name, "created_execution_context={:p}", static_cast<void*>(*execution_context));
+                apiName, "createdExecutionContext={:p}", static_cast<void*>(*executionContext));
         });
     }
 
-    static hipdnnPluginStatus_t engine_plugin_destroy_execution_context(
-        hipdnnEnginePluginHandle_t handle, hipdnnEnginePluginExecutionContext_t execution_context)
+    static hipdnnPluginStatus_t enginePluginDestroyExecutionContext(
+        hipdnnEnginePluginHandle_t handle, hipdnnEnginePluginExecutionContext_t executionContext)
     {
-        LOG_API_ENTRY("handle={:p}, execution_context={:p}",
+        LOG_API_ENTRY("handle={:p}, executionContext={:p}",
                       static_cast<void*>(handle),
-                      static_cast<void*>(execution_context));
+                      static_cast<void*>(executionContext));
 
-        return hipdnn_plugin::tryCatch([&, api_name = __func__]() {
+        return hipdnn_plugin::tryCatch([&, apiName = __func__]() {
             hipdnn_plugin::throwIfNull(handle);
-            hipdnn_plugin::throwIfNull(execution_context);
-            hipdnn_plugin::throwIfNull(get_instance());
+            hipdnn_plugin::throwIfNull(executionContext);
+            hipdnn_plugin::throwIfNull(getInstance());
 
-            if(!get_instance()->supports_engine_operations())
+            if(!getInstance()->supportsEngineOperations())
             {
                 throw hipdnn_plugin::HipdnnPluginException(HIPDNN_PLUGIN_STATUS_INTERNAL_ERROR,
                                                            "No execution context to destroy");
             }
 
-            delete execution_context;
+            delete executionContext;
 
-            LOG_API_SUCCESS(api_name, "destroyed execution_context");
+            LOG_API_SUCCESS(apiName, "destroyed executionContext");
         });
     }
 
     static hipdnnPluginStatus_t
-        engine_plugin_execute_op_graph(hipdnnEnginePluginHandle_t handle,
-                                       hipdnnEnginePluginExecutionContext_t execution_context,
-                                       void* workspace,
-                                       const hipdnnPluginDeviceBuffer_t* device_buffers,
-                                       uint32_t num_device_buffers)
+        enginePluginExecuteOpGraph(hipdnnEnginePluginHandle_t handle,
+                                    hipdnnEnginePluginExecutionContext_t executionContext,
+                                    void* workspace,
+                                    const hipdnnPluginDeviceBuffer_t* deviceBuffers,
+                                    uint32_t numDeviceBuffers)
     {
-        LOG_API_ENTRY("handle={:p}, execution_context={:p}, workspace={:p}, device_buffers={:p}, "
-                      "num_device_buffers={}",
+        LOG_API_ENTRY("handle={:p}, executionContext={:p}, workspace={:p}, deviceBuffers={:p}, "
+                      "numDeviceBuffers={}",
                       static_cast<void*>(handle),
-                      static_cast<void*>(execution_context),
+                      static_cast<void*>(executionContext),
                       workspace,
-                      static_cast<const void*>(device_buffers),
-                      num_device_buffers);
+                      static_cast<const void*>(deviceBuffers),
+                      numDeviceBuffers);
 
-        return hipdnn_plugin::tryCatch([&, api_name = __func__]() {
+        return hipdnn_plugin::tryCatch([&, apiName = __func__]() {
             hipdnn_plugin::throwIfNull(handle);
-            hipdnn_plugin::throwIfNull(execution_context);
-            hipdnn_plugin::throwIfNull(device_buffers);
-            hipdnn_plugin::throwIfNull(get_instance());
+            hipdnn_plugin::throwIfNull(executionContext);
+            hipdnn_plugin::throwIfNull(deviceBuffers);
+            hipdnn_plugin::throwIfNull(getInstance());
 
-            if(!get_instance()->supports_engine_operations())
+            if(!getInstance()->supportsEngineOperations())
             {
                 throw hipdnn_plugin::HipdnnPluginException(
                     HIPDNN_PLUGIN_STATUS_INTERNAL_ERROR,
                     "No engines available - cannot execute graph");
             }
 
-            get_instance()->execute_graph();
+            getInstance()->executeGraph();
 
-            LOG_API_SUCCESS(api_name, "executed graph");
+            LOG_API_SUCCESS(apiName, "executed graph");
         });
     }
 
 private:
-    inline static std::unique_ptr<Test_plugin_base> _instance;
+    inline static std::unique_ptr<TestPluginBase> _instance;
 };
 
 // Macro to register plugin API functions
@@ -435,116 +435,116 @@ private:
     extern "C" {                                                                                   \
     hipdnnPluginStatus_t hipdnnPluginGetName(const char** name)                                    \
     {                                                                                              \
-        return Test_plugin_base::plugin_get_name(name);                                            \
+        return TestPluginBase::pluginGetName(name);                                                \
     }                                                                                              \
                                                                                                    \
     hipdnnPluginStatus_t hipdnnPluginGetVersion(const char** version)                              \
     {                                                                                              \
-        return Test_plugin_base::plugin_get_version(version);                                      \
+        return TestPluginBase::pluginGetVersion(version);                                          \
     }                                                                                              \
                                                                                                    \
     hipdnnPluginStatus_t hipdnnPluginGetType(hipdnnPluginType_t* type)                             \
     {                                                                                              \
-        return Test_plugin_base::plugin_get_type(type);                                            \
+        return TestPluginBase::pluginGetType(type);                                                \
     }                                                                                              \
                                                                                                    \
-    void hipdnnPluginGetLastErrorString(const char** error_str)                                    \
+    void hipdnnPluginGetLastErrorString(const char** errorStr)                                     \
     {                                                                                              \
-        Test_plugin_base::plugin_get_last_error_string(error_str);                                 \
+        TestPluginBase::pluginGetLastErrorString(errorStr);                                        \
     }                                                                                              \
                                                                                                    \
     hipdnnPluginStatus_t hipdnnPluginSetLoggingCallback(hipdnnCallback_t callback)                 \
     {                                                                                              \
-        return Test_plugin_base::plugin_set_logging_callback(callback);                            \
+        return TestPluginBase::pluginSetLoggingCallback(callback);                                 \
     }                                                                                              \
                                                                                                    \
-    hipdnnPluginStatus_t hipdnnEnginePluginGetAllEngineIds(int64_t* engine_ids,                    \
-                                                           uint32_t max_engines,                   \
-                                                           uint32_t* num_engines)                  \
+    hipdnnPluginStatus_t hipdnnEnginePluginGetAllEngineIds(int64_t* engineIds,                     \
+                                                           uint32_t maxEngines,                    \
+                                                           uint32_t* numEngines)                   \
     {                                                                                              \
-        return Test_plugin_base::engine_plugin_get_all_engine_ids(                                 \
-            engine_ids, max_engines, num_engines);                                                 \
+        return TestPluginBase::enginePluginGetAllEngineIds(                                        \
+            engineIds, maxEngines, numEngines);                                                    \
     }                                                                                              \
                                                                                                    \
     hipdnnPluginStatus_t hipdnnEnginePluginCreate(hipdnnEnginePluginHandle_t* handle)              \
     {                                                                                              \
-        return Test_plugin_base::engine_plugin_create(handle);                                     \
+        return TestPluginBase::enginePluginCreate(handle);                                         \
     }                                                                                              \
                                                                                                    \
     hipdnnPluginStatus_t hipdnnEnginePluginDestroy(hipdnnEnginePluginHandle_t handle)              \
     {                                                                                              \
-        return Test_plugin_base::engine_plugin_destroy(handle);                                    \
+        return TestPluginBase::enginePluginDestroy(handle);                                        \
     }                                                                                              \
                                                                                                    \
     hipdnnPluginStatus_t hipdnnEnginePluginSetStream(hipdnnEnginePluginHandle_t handle,            \
                                                      hipStream_t stream)                           \
     {                                                                                              \
-        return Test_plugin_base::engine_plugin_set_stream(handle, stream);                         \
+        return TestPluginBase::enginePluginSetStream(handle, stream);                              \
     }                                                                                              \
                                                                                                    \
     hipdnnPluginStatus_t                                                                           \
         hipdnnEnginePluginGetApplicableEngineIds(hipdnnEnginePluginHandle_t handle,                \
-                                                 const hipdnnPluginConstData_t* op_graph,          \
-                                                 int64_t* engine_ids,                              \
-                                                 uint32_t max_engines,                             \
-                                                 uint32_t* num_engines)                            \
+                                                 const hipdnnPluginConstData_t* opGraph,           \
+                                                 int64_t* engineIds,                               \
+                                                 uint32_t maxEngines,                              \
+                                                 uint32_t* numEngines)                             \
     {                                                                                              \
-        return Test_plugin_base::engine_plugin_get_applicable_engine_ids(                          \
-            handle, op_graph, engine_ids, max_engines, num_engines);                               \
+        return TestPluginBase::enginePluginGetApplicableEngineIds(                                 \
+            handle, opGraph, engineIds, maxEngines, numEngines);                                   \
     }                                                                                              \
                                                                                                    \
     hipdnnPluginStatus_t                                                                           \
         hipdnnEnginePluginGetEngineDetails(hipdnnEnginePluginHandle_t handle,                      \
-                                           int64_t engine_id,                                      \
-                                           const hipdnnPluginConstData_t* op_graph,                \
-                                           hipdnnPluginConstData_t* engine_details)                \
+                                           int64_t engineId,                                       \
+                                           const hipdnnPluginConstData_t* opGraph,                 \
+                                           hipdnnPluginConstData_t* engineDetails)                 \
     {                                                                                              \
-        return Test_plugin_base::engine_plugin_get_engine_details(                                 \
-            handle, engine_id, op_graph, engine_details);                                          \
+        return TestPluginBase::enginePluginGetEngineDetails(                                       \
+            handle, engineId, opGraph, engineDetails);                                             \
     }                                                                                              \
                                                                                                    \
     hipdnnPluginStatus_t                                                                           \
         hipdnnEnginePluginDestroyEngineDetails(hipdnnEnginePluginHandle_t handle,                  \
-                                               hipdnnPluginConstData_t* engine_details)            \
+                                               hipdnnPluginConstData_t* engineDetails)             \
     {                                                                                              \
-        return Test_plugin_base::engine_plugin_destroy_engine_details(handle, engine_details);     \
+        return TestPluginBase::enginePluginDestroyEngineDetails(handle, engineDetails);            \
     }                                                                                              \
                                                                                                    \
     hipdnnPluginStatus_t                                                                           \
         hipdnnEnginePluginGetWorkspaceSize(hipdnnEnginePluginHandle_t handle,                      \
-                                           const hipdnnPluginConstData_t* engine_config,           \
-                                           const hipdnnPluginConstData_t* op_graph,                \
-                                           size_t* workspace_size)                                 \
+                                           const hipdnnPluginConstData_t* engineConfig,            \
+                                           const hipdnnPluginConstData_t* opGraph,                 \
+                                           size_t* workspaceSize)                                  \
     {                                                                                              \
-        return Test_plugin_base::engine_plugin_get_workspace_size(                                 \
-            handle, engine_config, op_graph, workspace_size);                                      \
+        return TestPluginBase::enginePluginGetWorkspaceSize(                                       \
+            handle, engineConfig, opGraph, workspaceSize);                                         \
     }                                                                                              \
                                                                                                    \
     hipdnnPluginStatus_t hipdnnEnginePluginCreateExecutionContext(                                 \
         hipdnnEnginePluginHandle_t handle,                                                         \
-        const hipdnnPluginConstData_t* engine_config,                                              \
-        const hipdnnPluginConstData_t* op_graph,                                                   \
-        hipdnnEnginePluginExecutionContext_t* execution_context)                                   \
+        const hipdnnPluginConstData_t* engineConfig,                                               \
+        const hipdnnPluginConstData_t* opGraph,                                                    \
+        hipdnnEnginePluginExecutionContext_t* executionContext)                                    \
     {                                                                                              \
-        return Test_plugin_base::engine_plugin_create_execution_context(                           \
-            handle, engine_config, op_graph, execution_context);                                   \
+        return TestPluginBase::enginePluginCreateExecutionContext(                                 \
+            handle, engineConfig, opGraph, executionContext);                                      \
     }                                                                                              \
                                                                                                    \
     hipdnnPluginStatus_t hipdnnEnginePluginDestroyExecutionContext(                                \
-        hipdnnEnginePluginHandle_t handle, hipdnnEnginePluginExecutionContext_t execution_context) \
+        hipdnnEnginePluginHandle_t handle, hipdnnEnginePluginExecutionContext_t executionContext)  \
     {                                                                                              \
-        return Test_plugin_base::engine_plugin_destroy_execution_context(handle,                   \
-                                                                         execution_context);       \
+        return TestPluginBase::enginePluginDestroyExecutionContext(handle,                         \
+                                                                         executionContext);        \
     }                                                                                              \
                                                                                                    \
     hipdnnPluginStatus_t                                                                           \
         hipdnnEnginePluginExecuteOpGraph(hipdnnEnginePluginHandle_t handle,                        \
-                                         hipdnnEnginePluginExecutionContext_t execution_context,   \
+                                         hipdnnEnginePluginExecutionContext_t executionContext,    \
                                          void* workspace,                                          \
-                                         const hipdnnPluginDeviceBuffer_t* device_buffers,         \
-                                         uint32_t num_device_buffers)                              \
+                                         const hipdnnPluginDeviceBuffer_t* deviceBuffers,          \
+                                         uint32_t numDeviceBuffers)                                \
     {                                                                                              \
-        return Test_plugin_base::engine_plugin_execute_op_graph(                                   \
-            handle, execution_context, workspace, device_buffers, num_device_buffers);             \
+        return TestPluginBase::enginePluginExecuteOpGraph(                                         \
+            handle, executionContext, workspace, deviceBuffers, numDeviceBuffers);                 \
     }                                                                                              \
     } // extern "C"
