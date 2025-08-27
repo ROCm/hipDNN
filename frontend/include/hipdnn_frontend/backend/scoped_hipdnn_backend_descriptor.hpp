@@ -21,11 +21,11 @@ private:
     // For some reason clang isnt picking up the usage of the two variables correctly.
     // Ive marked them as [[maybe_unused]] to avoid warnings.
     static void logBackendError([[maybe_unused]] const std::string& errorString,
-                                  [[maybe_unused]] const hipdnnStatus_t status)
+                                [[maybe_unused]] const hipdnnStatus_t status)
     {
         std::array<char, HIPDNN_MAX_ERROR_STRING_SIZE> backendErrMsg;
         hipdnn_frontend::hipdnnBackend()->getLastErrorString(backendErrMsg.data(),
-                                                                 backendErrMsg.size());
+                                                             backendErrMsg.size());
         HIPDNN_LOG_ERROR(
             "{}: {}. Backend error string: {}", errorString, status, backendErrMsg.data());
     }
@@ -56,8 +56,7 @@ public:
         }
     }
 
-    explicit ScopedHipdnnBackendDescriptor(const uint8_t* serializedGraph,
-                                              size_t graphByteSize)
+    explicit ScopedHipdnnBackendDescriptor(const uint8_t* serializedGraph, size_t graphByteSize)
     {
         auto status = hipdnnBackend()->backendCreateAndDeserializeGraphExt(
             &_descriptor, serializedGraph, graphByteSize);
@@ -105,7 +104,7 @@ public:
                 if(status != HIPDNN_STATUS_SUCCESS)
                 {
                     logBackendError("Failed to destroy backend descriptor during move assignment",
-                                      status);
+                                    status);
                 }
             }
             _descriptor = other._descriptor;

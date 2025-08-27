@@ -32,7 +32,7 @@ public:
     }
 
     hipdnnStatus_t backendCreateDescriptor(hipdnnBackendDescriptorType_t descriptorType,
-                                             hipdnnBackendDescriptor_t* descriptor) override
+                                           hipdnnBackendDescriptor_t* descriptor) override
     {
         return hipdnnBackendCreateDescriptor(descriptorType, descriptor);
     }
@@ -43,8 +43,8 @@ public:
     }
 
     hipdnnStatus_t backendExecute(hipdnnHandle_t handle,
-                                   hipdnnBackendDescriptor_t executionPlan,
-                                   hipdnnBackendDescriptor_t variantPack) override
+                                  hipdnnBackendDescriptor_t executionPlan,
+                                  hipdnnBackendDescriptor_t variantPack) override
     {
         return hipdnnBackendExecute(handle, executionPlan, variantPack);
     }
@@ -55,11 +55,11 @@ public:
     }
 
     hipdnnStatus_t backendGetAttribute(hipdnnBackendDescriptor_t descriptor,
-                                         hipdnnBackendAttributeName_t attributeName,
-                                         hipdnnBackendAttributeType_t attributeType,
-                                         int64_t requestedElementCount,
-                                         int64_t* elementCount,
-                                         void* arrayOfElements) override
+                                       hipdnnBackendAttributeName_t attributeName,
+                                       hipdnnBackendAttributeType_t attributeType,
+                                       int64_t requestedElementCount,
+                                       int64_t* elementCount,
+                                       void* arrayOfElements) override
     {
         return hipdnnBackendGetAttribute(descriptor,
                                          attributeName,
@@ -70,10 +70,10 @@ public:
     }
 
     hipdnnStatus_t backendSetAttribute(hipdnnBackendDescriptor_t descriptor,
-                                         hipdnnBackendAttributeName_t attributeName,
-                                         hipdnnBackendAttributeType_t attributeType,
-                                         int64_t elementCount,
-                                         const void* arrayOfElements) override
+                                       hipdnnBackendAttributeName_t attributeName,
+                                       hipdnnBackendAttributeType_t attributeType,
+                                       int64_t elementCount,
+                                       const void* arrayOfElements) override
     {
         return hipdnnBackendSetAttribute(
             descriptor, attributeName, attributeType, elementCount, arrayOfElements);
@@ -90,8 +90,8 @@ public:
     }
 
     hipdnnStatus_t backendCreateAndDeserializeGraphExt(hipdnnBackendDescriptor_t* descriptor,
-                                                            const uint8_t* serializedGraph,
-                                                            size_t graphByteSize) override
+                                                       const uint8_t* serializedGraph,
+                                                       size_t graphByteSize) override
     {
         return hipdnnBackendCreateAndDeserializeGraph_ext(
             descriptor, serializedGraph, graphByteSize);
@@ -103,8 +103,8 @@ public:
     }
 
     hipdnnStatus_t setEnginePluginPathsExt(size_t numPaths,
-                                               const char* const* pluginPaths,
-                                               hipdnnPluginLoadingMode_ext_t mode) override
+                                           const char* const* pluginPaths,
+                                           hipdnnPluginLoadingMode_ext_t mode) override
     {
         return hipdnnSetEnginePluginPaths_ext(numPaths, pluginPaths, mode);
     }
