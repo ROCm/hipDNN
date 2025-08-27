@@ -336,13 +336,13 @@ TEST_F(EngineDescriptorTest, GetGraphReturnsPointerIfFinalized)
               static_cast<const IBackendDescriptor*>(getMockGraph().get()));
 }
 
-TEST_F(EngineDescriptorTest, getEngineIdThrowsIfNotFinalized)
+TEST_F(EngineDescriptorTest, GetEngineIdThrowsIfNotFinalized)
 {
     auto engine = getEngineDescriptor();
     ASSERT_THROW_HIPDNN_STATUS(engine->getEngineId(), HIPDNN_STATUS_INTERNAL_ERROR);
 }
 
-TEST_F(EngineDescriptorTest, getEngineIdReturnsValueIfFinalized)
+TEST_F(EngineDescriptorTest, GetEngineIdReturnsValueIfFinalized)
 {
     auto engine = getEngineDescriptor();
     makeEngineFinalized();
