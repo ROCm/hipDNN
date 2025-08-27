@@ -62,7 +62,7 @@ public:
     }
 
     template <typename T>
-    std::optional<T> get_value() const
+    std::optional<T> get_value() const // NOLINT(readability-identifier-naming)
     {
         if(auto p = std::get_if<T>(&_value))
         {
@@ -72,7 +72,7 @@ public:
     }
 
     template <typename T>
-    TensorAttributes& set_value(T v)
+    TensorAttributes& set_value(T v) // NOLINT(readability-identifier-naming)
     {
         static_assert(std::disjunction_v<std::is_same<T, float>,
                                          std::is_same<T, double>,
@@ -90,32 +90,32 @@ public:
         return *this;
     }
 
-    int64_t get_uid() const
+    int64_t get_uid() const // NOLINT(readability-identifier-naming)
     {
         return _uid;
     }
 
-    const std::string& get_name() const
+    const std::string& get_name() const // NOLINT(readability-identifier-naming)
     {
         return _name;
     }
 
-    DataType_t get_data_type() const
+    DataType_t get_data_type() const // NOLINT(readability-identifier-naming)
     {
         return _dataType;
     }
 
-    const std::vector<int64_t>& get_stride() const
+    const std::vector<int64_t>& get_stride() const // NOLINT(readability-identifier-naming)
     {
         return _stride;
     }
 
-    const std::vector<int64_t>& get_dim() const
+    const std::vector<int64_t>& get_dim() const // NOLINT(readability-identifier-naming)
     {
         return _dim;
     }
 
-    int64_t get_volume() const
+    int64_t get_volume() const // NOLINT(readability-identifier-naming)
     {
         int64_t volume = 1;
         for(const auto& d : _dim)
@@ -125,7 +125,7 @@ public:
         return volume;
     }
 
-    bool get_is_virtual() const
+    bool get_is_virtual() const // NOLINT(readability-identifier-naming)
     {
         return _isVirtual;
     }
@@ -135,44 +135,46 @@ public:
         return _uidSet;
     }
 
-    TensorAttributes& set_uid(int64_t uid)
+    TensorAttributes& set_uid(int64_t uid) // NOLINT(readability-identifier-naming)
     {
         _uid = uid;
         _uidSet = true;
         return *this;
     }
 
-    TensorAttributes& set_name(const std::string& name)
+    TensorAttributes& set_name(const std::string& name) // NOLINT(readability-identifier-naming)
     {
         _name = name;
         return *this;
     }
 
-    TensorAttributes& set_data_type(DataType_t dataType)
+    TensorAttributes& set_data_type(DataType_t dataType) // NOLINT(readability-identifier-naming)
     {
         _dataType = dataType;
         return *this;
     }
 
-    TensorAttributes& set_stride(const std::vector<int64_t>& stride)
+    TensorAttributes&
+        set_stride(const std::vector<int64_t>& stride) // NOLINT(readability-identifier-naming)
     {
         _stride = stride;
         return *this;
     }
 
-    TensorAttributes& set_dim(const std::vector<int64_t>& dim)
+    TensorAttributes&
+        set_dim(const std::vector<int64_t>& dim) // NOLINT(readability-identifier-naming)
     {
         _dim = dim;
         return *this;
     }
 
-    TensorAttributes& set_is_virtual(bool isVirtual)
+    TensorAttributes& set_is_virtual(bool isVirtual) // NOLINT(readability-identifier-naming)
     {
         _isVirtual = isVirtual;
         return *this;
     }
 
-    TensorAttributes& set_output(bool output)
+    TensorAttributes& set_output(bool output) // NOLINT(readability-identifier-naming)
     {
         return set_is_virtual(!output);
     }
@@ -184,6 +186,7 @@ public:
         return *this;
     }
 
+    // NOLINTNEXTLINE(readability-identifier-naming)
     TensorAttributes& set_from_graph_attributes(const GraphAttributes& graphAttributes)
     {
         if(_dataType == DataType_t::NOT_SET)
