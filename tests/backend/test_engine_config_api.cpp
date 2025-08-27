@@ -18,7 +18,7 @@ protected:
     void SetUp() override
     {
         const std::array<const char*, 1> paths
-            = {hipdnn_tests::plugin_constants::test_good_plugin_path().c_str()};
+            = {hipdnn_tests::plugin_constants::testGoodPluginPath().c_str()};
         ASSERT_EQ(hipdnnSetEnginePluginPaths_ext(
                       paths.size(), paths.data(), HIPDNN_PLUGIN_LOADING_ABSOLUTE),
                   HIPDNN_STATUS_SUCCESS);
@@ -51,7 +51,7 @@ protected:
 
 TEST_F(Engine_config_api_tests, SetEngineConfigEngine)
 {
-    int64_t gidx = hipdnn_tests::plugin_constants::engine_id<Good_plugin>();
+    int64_t gidx = hipdnn_tests::plugin_constants::engineId<GoodPlugin>();
 
     EXPECT_EQ(hipdnnBackendSetAttribute(_engineConfig,
                                         HIPDNN_ATTR_ENGINECFG_ENGINE,
@@ -71,7 +71,7 @@ TEST_F(Engine_config_api_tests, SetEngineConfigEngine)
 
 TEST_F(Engine_config_api_tests, FinalizeEngineConfig)
 {
-    int64_t gidx = hipdnn_tests::plugin_constants::engine_id<Good_plugin>();
+    int64_t gidx = hipdnn_tests::plugin_constants::engineId<GoodPlugin>();
 
     EXPECT_EQ(hipdnnBackendFinalize(_engineConfig), HIPDNN_STATUS_BAD_PARAM);
     test_util::populateTestEngineConfig(&_engineConfig, &_engine, &_graph, _handle, gidx);
@@ -80,7 +80,7 @@ TEST_F(Engine_config_api_tests, FinalizeEngineConfig)
 
 TEST_F(Engine_config_api_tests, GetMaxWorkspaceSizeFromEngineConfig)
 {
-    int64_t gidx = hipdnn_tests::plugin_constants::engine_id<Good_plugin>();
+    int64_t gidx = hipdnn_tests::plugin_constants::engineId<GoodPlugin>();
     int64_t max_workspace_size = 0;
 
     test_util::populateTestEngineConfig(&_engineConfig, &_engine, &_graph, _handle, gidx, true);

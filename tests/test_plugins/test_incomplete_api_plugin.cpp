@@ -4,7 +4,7 @@
 extern "C" {
 hipdnnPluginStatus_t hipdnnPluginGetName(const char** name)
 {
-    *name = "test_incomplete_api_plugin";
+    *name = "test_IncompleteApiPlugin";
     return HIPDNN_PLUGIN_STATUS_SUCCESS;
 }
 

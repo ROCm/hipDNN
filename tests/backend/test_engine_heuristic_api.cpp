@@ -25,7 +25,7 @@ protected:
     void SetUp() override
     {
         const std::array<const char*, 1> paths
-            = {hipdnn_tests::plugin_constants::test_good_plugin_path().c_str()};
+            = {hipdnn_tests::plugin_constants::testGoodPluginPath().c_str()};
         ASSERT_EQ(hipdnnSetEnginePluginPaths_ext(
                       paths.size(), paths.data(), HIPDNN_PLUGIN_LOADING_ABSOLUTE),
                   HIPDNN_STATUS_SUCCESS);
@@ -396,7 +396,7 @@ TEST_F(EngineHeuristicApiTests, GetEngineConfigs)
         hipdnnBackendGetAttribute(
             engine, HIPDNN_ATTR_ENGINE_GLOBAL_INDEX, HIPDNN_TYPE_INT64, 1, nullptr, &engineId),
         HIPDNN_STATUS_SUCCESS);
-    EXPECT_EQ(engineId, hipdnn_tests::plugin_constants::engine_id<Good_plugin>());
+    EXPECT_EQ(engineId, hipdnn_tests::plugin_constants::engineId<GoodPlugin>());
 
     // Expecting to only need to clean-up 1 engine config, since we only created & requested 1.
     for(auto config : configs)

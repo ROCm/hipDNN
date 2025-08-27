@@ -8,35 +8,35 @@ thread_local char
     hipdnn_plugin::PluginLastErrorManager::_lastError[HIPDNN_PLUGIN_ERROR_STRING_MAX_LENGTH]
     = "";
 
-class Duplicate_id_a_plugin : public Test_plugin_base
+class DuplicateIdAPlugin : public TestPluginBase
 {
 public:
-    const char* get_plugin_name() const override
+    const char* getPluginName() const override
     {
-        return "test_duplicate_id_a_plugin";
+        return "test_DuplicateIdAPlugin";
     }
-    const char* get_plugin_version() const override
+    const char* getPluginVersion() const override
     {
         return "1.0.0";
     }
-    int64_t get_engine_id() const override
+    int64_t getEngineId() const override
     {
-        return hipdnn_tests::plugin_constants::engine_id<Duplicate_id_a_plugin>();
+        return hipdnn_tests::plugin_constants::engineId<DuplicateIdAPlugin>();
     }
-    uint32_t get_num_engines() const override
+    uint32_t getNumEngines() const override
     {
         return 1;
     }
-    uint32_t get_num_applicable_engines() const override
+    uint32_t getNumApplicableEngines() const override
     {
         return 1;
     }
 };
 
 // Initialize plugin instance on load
-__attribute__((constructor)) static void initialize_plugin()
+__attribute__((constructor)) static void initializePlugin()
 {
-    Test_plugin_base::set_instance(std::make_unique<Duplicate_id_a_plugin>());
+    TestPluginBase::setInstance(std::make_unique<DuplicateIdAPlugin>());
 }
 
 // Register all API functions
