@@ -34,7 +34,7 @@ public:
 };
 
 // Initialize plugin instance on load
-__attribute__((constructor)) static void InitializePlugin()
+__attribute__((constructor)) static void initializePlugin()
 {
     TestPluginBase::setInstance(std::make_unique<GoodPlugin>());
 }
