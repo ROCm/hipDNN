@@ -24,12 +24,12 @@ public:
         return _plan != nullptr;
     }
 
-    void setPlan(std::unique_ptr<miopen_legacy_plugin::PlanInterface> plan)
+    void setPlan(std::unique_ptr<miopen_legacy_plugin::IPlan> plan)
     {
         _plan = std::move(plan);
     }
 
-    virtual miopen_legacy_plugin::PlanInterface& plan() const
+    virtual miopen_legacy_plugin::IPlan& plan() const
     {
         if(!hasValidPlan())
         {
@@ -41,5 +41,5 @@ public:
     }
 
 private:
-    std::unique_ptr<miopen_legacy_plugin::PlanInterface> _plan;
+    std::unique_ptr<miopen_legacy_plugin::IPlan> _plan;
 };

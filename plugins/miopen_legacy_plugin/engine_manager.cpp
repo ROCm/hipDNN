@@ -14,7 +14,7 @@ using namespace hipdnn_plugin;
 namespace miopen_legacy_plugin
 {
 
-void EngineManager::addEngine(std::unique_ptr<EngineInterface> engine)
+void EngineManager::addEngine(std::unique_ptr<IEngine> engine)
 {
     _engines.emplace(engine->id(), std::move(engine));
 }
@@ -60,7 +60,7 @@ void EngineManager::initializeExecutionContext(
     engine.initializeExecutionContext(handle, opGraph, executionContext);
 }
 
-EngineInterface& EngineManager::getEngine(int64_t engineId) const
+IEngine& EngineManager::getEngine(int64_t engineId) const
 {
     auto it = _engines.find(engineId);
     if(it == _engines.end())

@@ -25,7 +25,7 @@ public:
     EngineManager(const EngineManager&) = delete;
     EngineManager& operator=(const EngineManager&) = delete;
 
-    void addEngine(std::unique_ptr<EngineInterface> engine);
+    void addEngine(std::unique_ptr<IEngine> engine);
 
     std::vector<int64_t> getApplicableEngineIds(const hipdnn_plugin::IGraph& opGraph);
 
@@ -44,9 +44,9 @@ public:
                                     HipdnnEnginePluginExecutionContext& executionContext) const;
 
 private:
-    EngineInterface& getEngine(int64_t engineId) const;
+    IEngine& getEngine(int64_t engineId) const;
 
-    std::unordered_map<int64_t, std::unique_ptr<EngineInterface>> _engines;
+    std::unordered_map<int64_t, std::unique_ptr<IEngine>> _engines;
 };
 
 }

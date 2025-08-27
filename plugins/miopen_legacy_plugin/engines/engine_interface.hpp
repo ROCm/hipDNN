@@ -12,10 +12,10 @@
 namespace miopen_legacy_plugin
 {
 
-class EngineInterface
+class IEngine
 {
 public:
-    virtual ~EngineInterface() = default;
+    virtual ~IEngine() = default;
 
     virtual int64_t id() const = 0;
 

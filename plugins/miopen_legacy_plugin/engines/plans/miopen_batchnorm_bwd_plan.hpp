@@ -50,7 +50,7 @@ private:
     std::optional<std::unique_ptr<MiopenTensor>> _optInvVariance;
 };
 
-class BatchnormBwdPlan : public PlanInterface
+class BatchnormBwdPlan : public IPlan
 {
 public:
     BatchnormBwdPlan(std::unique_ptr<BatchnormBwdParams> params);

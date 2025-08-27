@@ -10,7 +10,7 @@
 namespace miopen_legacy_plugin
 {
 
-class MockPlan : public PlanInterface
+class MockPlan : public IPlan
 {
 public:
     MOCK_METHOD(void,
