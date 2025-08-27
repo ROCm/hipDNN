@@ -164,8 +164,7 @@ public:
                         MeanVarianceDataType dxVal
                             = (dyVal - meanDy - xHat * meanDyXhat) * scalarCoef;
 
-                        dx.setHostValue(
-                            bidx, cidx, row, column, static_cast<InputDataType>(dxVal));
+                        dx.setHostValue(bidx, cidx, row, column, static_cast<InputDataType>(dxVal));
                     }
                 }
             }

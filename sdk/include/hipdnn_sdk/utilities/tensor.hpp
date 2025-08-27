@@ -25,8 +25,7 @@ struct TensorLayout
 };
 
 inline const TensorLayout TensorLayout::NCHW{.name = "NCHW", .strideOrder = {3, 2, 1, 0}};
-inline const TensorLayout TensorLayout::NHWC{.name = "NHWC",
-                                               .strideOrder = strideOrderNhwc(4)};
+inline const TensorLayout TensorLayout::NHWC{.name = "NHWC", .strideOrder = strideOrderNhwc(4)};
 
 inline std::ostream& operator<<(std::ostream& os, const TensorLayout& layout)
 {
@@ -48,12 +47,10 @@ public:
     virtual const IMigratableMemory<T>& memory() const = 0;
 
     virtual T getHostValue(int64_t nidx, int64_t cidx, int64_t hidx, int64_t widx) const = 0;
-    virtual void setHostValue(int64_t nidx, int64_t cidx, int64_t hidx, int64_t widx, T value)
-        = 0;
+    virtual void setHostValue(int64_t nidx, int64_t cidx, int64_t hidx, int64_t widx, T value) = 0;
     virtual int64_t getIndex(int64_t nidx, int64_t cidx, int64_t hidx, int64_t widx) const = 0;
     virtual void fillWithValue(T value) = 0;
-    virtual void fillWithRandomValues(T min, T max, unsigned int seed = std::random_device{}())
-        = 0;
+    virtual void fillWithRandomValues(T min, T max, unsigned int seed = std::random_device{}()) = 0;
 };
 
 // NOLINTEND(portability-template-virtual-member-function)
@@ -151,7 +148,7 @@ private:
     }
 
     static size_t calculateElementSpace(const std::vector<int64_t>& dims,
-                                          const std::vector<int64_t>& strides)
+                                        const std::vector<int64_t>& strides)
     {
         return static_cast<size_t>(
             std::inner_product(dims.begin(),

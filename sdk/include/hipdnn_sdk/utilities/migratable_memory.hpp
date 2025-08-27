@@ -291,17 +291,15 @@ private:
         {
             if(async)
             {
-                throwOnError(
-                    hipMemcpyAsync(
-                        _hostPtr, _devicePtr, _totalSize, hipMemcpyDeviceToHost, _stream),
-                    "Failed to copy from device to host");
+                throwOnError(hipMemcpyAsync(
+                                 _hostPtr, _devicePtr, _totalSize, hipMemcpyDeviceToHost, _stream),
+                             "Failed to copy from device to host");
             }
             else
             {
-                throwOnError(
-                    hipMemcpyWithStream(
-                        _hostPtr, _devicePtr, _totalSize, hipMemcpyDeviceToHost, _stream),
-                    "Failed to copy from device to host");
+                throwOnError(hipMemcpyWithStream(
+                                 _hostPtr, _devicePtr, _totalSize, hipMemcpyDeviceToHost, _stream),
+                             "Failed to copy from device to host");
             }
             _hostValid = true;
             _currentLocation = MemoryLocation::BOTH;
@@ -321,17 +319,15 @@ private:
         {
             if(async)
             {
-                throwOnError(
-                    hipMemcpyAsync(
-                        _devicePtr, _hostPtr, _totalSize, hipMemcpyHostToDevice, _stream),
-                    "Failed to copy from host to device");
+                throwOnError(hipMemcpyAsync(
+                                 _devicePtr, _hostPtr, _totalSize, hipMemcpyHostToDevice, _stream),
+                             "Failed to copy from host to device");
             }
             else
             {
-                throwOnError(
-                    hipMemcpyWithStream(
-                        _devicePtr, _hostPtr, _totalSize, hipMemcpyHostToDevice, _stream),
-                    "Failed to copy from host to device");
+                throwOnError(hipMemcpyWithStream(
+                                 _devicePtr, _hostPtr, _totalSize, hipMemcpyHostToDevice, _stream),
+                             "Failed to copy from host to device");
             }
             _deviceValid = true;
             _currentLocation = MemoryLocation::BOTH;

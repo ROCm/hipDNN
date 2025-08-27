@@ -83,7 +83,7 @@ TEST(GPU_EnginePluginTest, LoadPluginsAndExecuteOpGraph)
     uint32_t* out_dev_data{};
     ASSERT_EQ(hipMalloc(&out_dev_data, size_bytes), hipSuccess);
     ScopedResource out_dev_data_res(out_dev_data,
-                                     [](uint32_t* ptr) { std::ignore = hipFree(ptr); });
+                                    [](uint32_t* ptr) { std::ignore = hipFree(ptr); });
 
     // Copy the input data from the host to the device.
     ASSERT_EQ(hipMemcpy(in_dev_data, in_host_data.data(), size_bytes, hipMemcpyHostToDevice),
@@ -105,9 +105,9 @@ TEST(GPU_EnginePluginTest, LoadPluginsAndExecuteOpGraph)
             hipdnnPluginConstData_t engine_details;
             plugin->getEngineDetails(handle, engine_id, &op_graph, &engine_details);
             ScopedResource engine_details_res(&engine_details,
-                                               [handle, &plugin](hipdnnPluginConstData_t* ed) {
-                                                   plugin->destroyEngineDetails(handle, ed);
-                                               });
+                                              [handle, &plugin](hipdnnPluginConstData_t* ed) {
+                                                  plugin->destroyEngineDetails(handle, ed);
+                                              });
 
             // Prepare the engine configuration
             // TODO set a real engine config based on the engine details

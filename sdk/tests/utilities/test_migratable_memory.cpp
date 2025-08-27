@@ -26,10 +26,7 @@ void checkBuffer(const T* buffer, size_t size, T mult = 1)
 }
 
 template <typename T>
-void checkBufferSynchronized(const T* buffer,
-                               size_t size,
-                               hipStream_t stream = nullptr,
-                               T mult = 1)
+void checkBufferSynchronized(const T* buffer, size_t size, hipStream_t stream = nullptr, T mult = 1)
 {
     hipError_t error = hipStreamSynchronize(stream);
     EXPECT_EQ(error, hipSuccess) << "Error synchronizing stream";
@@ -174,8 +171,7 @@ TEST(MigratableMemory, MigrateToDeviceAsyncNonDefaultStream)
     EXPECT_NE(memory.deviceDataAsync(), nullptr);
     EXPECT_EQ(memory.location(), MemoryLocation::BOTH);
 
-    checkBufferSynchronized(
-        static_cast<float*>(memory.deviceDataAsync()), memory.count(), stream);
+    checkBufferSynchronized(static_cast<float*>(memory.deviceDataAsync()), memory.count(), stream);
 
     error = hipStreamDestroy(stream);
     EXPECT_EQ(error, hipSuccess) << "Failed to destroy HIP stream";
@@ -263,8 +259,7 @@ TEST(MigratableMemory, MigrateToHostAsyncNonDefaultStream)
 
     initBuffer(memory.hostData(), memory.count());
 
-    checkBufferSynchronized(
-        static_cast<float*>(memory.deviceDataAsync()), memory.count(), stream);
+    checkBufferSynchronized(static_cast<float*>(memory.deviceDataAsync()), memory.count(), stream);
     EXPECT_EQ(memory.location(), MemoryLocation::BOTH);
 
     std::array<float, 10> array;

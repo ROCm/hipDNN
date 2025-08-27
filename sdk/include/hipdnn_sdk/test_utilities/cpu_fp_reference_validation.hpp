@@ -36,8 +36,7 @@ public:
 
     ~CpuFpReferenceValidation() override = default;
 
-    bool allClose(IMigratableMemory<T>& reference,
-                  IMigratableMemory<T>& implementation) override
+    bool allClose(IMigratableMemory<T>& reference, IMigratableMemory<T>& implementation) override
     {
         if(reference.count() != implementation.count())
         {

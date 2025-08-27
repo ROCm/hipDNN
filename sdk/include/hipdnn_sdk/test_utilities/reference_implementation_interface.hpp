@@ -27,14 +27,13 @@ class IReferenceImplementation
 public:
     virtual ~IReferenceImplementation() = default;
 
-    virtual void
-        batchnormFwdInference(const ITensor<InputDataType>& input,
-                              const ITensor<ScaleBiasDataType>& scale,
-                              const ITensor<ScaleBiasDataType>& bias,
-                              const ITensor<MeanVarianceDataType>& estimatedMean,
-                              const ITensor<MeanVarianceDataType>& estimatedVariance,
-                              ITensor<InputDataType>& output,
-                              double epsilon)
+    virtual void batchnormFwdInference(const ITensor<InputDataType>& input,
+                                       const ITensor<ScaleBiasDataType>& scale,
+                                       const ITensor<ScaleBiasDataType>& bias,
+                                       const ITensor<MeanVarianceDataType>& estimatedMean,
+                                       const ITensor<MeanVarianceDataType>& estimatedVariance,
+                                       ITensor<InputDataType>& output,
+                                       double epsilon)
         = 0;
 
     // Could call this bwd_training or bwd_propagation

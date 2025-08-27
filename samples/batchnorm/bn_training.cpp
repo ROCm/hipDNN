@@ -91,13 +91,13 @@ void Sample_runner::operator()(const TensorLayout& layout)
 
     x_tensor.fillWithRandomValues(static_cast<InputType>(0.0f), static_cast<InputType>(1.0f));
     scale_tensor.fillWithRandomValues(static_cast<IntermediateType>(0.0f),
-                                         static_cast<IntermediateType>(1.0f));
+                                      static_cast<IntermediateType>(1.0f));
     bias_tensor.fillWithRandomValues(static_cast<IntermediateType>(0.0f),
-                                        static_cast<IntermediateType>(1.0f));
+                                     static_cast<IntermediateType>(1.0f));
     prev_mean_tensor.fillWithRandomValues(static_cast<IntermediateType>(0.0f),
-                                             static_cast<IntermediateType>(1.0f));
+                                          static_cast<IntermediateType>(1.0f));
     prev_var_tensor.fillWithRandomValues(static_cast<IntermediateType>(0.1f),
-                                            static_cast<IntermediateType>(1.0f));
+                                         static_cast<IntermediateType>(1.0f));
 
     momentum_tensor.memory().hostData()[0] = 0.1f;
     epsilon_tensor.memory().hostData()[0] = 1e-5f;

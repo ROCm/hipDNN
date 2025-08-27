@@ -32,8 +32,8 @@ struct Batchnorm2dTestCase
 };
 
 template <typename T>
-hipdnnPluginDeviceBuffer_t generateRandomDeviceBuffer(
-    ITensor<T>& tensor, int uid, T min, T max, unsigned int seed = 0)
+hipdnnPluginDeviceBuffer_t
+    generateRandomDeviceBuffer(ITensor<T>& tensor, int uid, T min, T max, unsigned int seed = 0)
 {
     tensor.fillWithRandomValues(min, max, seed);
     hipdnnPluginDeviceBuffer_t buffer;

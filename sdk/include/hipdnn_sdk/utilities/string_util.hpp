@@ -8,8 +8,7 @@
 namespace hipdnn::sdk::utilities
 {
 
-static void
-    copyMaxSizeWithNullTerminator(char* destination, const char* source, size_t maxSize)
+static void copyMaxSizeWithNullTerminator(char* destination, const char* source, size_t maxSize)
 {
     if(source == nullptr || destination == nullptr || maxSize == 0)
     {

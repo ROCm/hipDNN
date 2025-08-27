@@ -82,11 +82,11 @@ void Sample_runner::operator()(const TensorLayout& layout)
     dy_tensor.fillWithRandomValues(static_cast<InputType>(0.0f), static_cast<InputType>(1.0f));
     x_tensor.fillWithRandomValues(static_cast<InputType>(0.0f), static_cast<InputType>(1.0f));
     scale_tensor.fillWithRandomValues(static_cast<IntermediateType>(0.0f),
-                                         static_cast<IntermediateType>(1.0f));
+                                      static_cast<IntermediateType>(1.0f));
     saved_mean_tensor.fillWithRandomValues(static_cast<IntermediateType>(0.0f),
-                                              static_cast<IntermediateType>(1.0f));
+                                           static_cast<IntermediateType>(1.0f));
     saved_inv_var_tensor.fillWithRandomValues(static_cast<IntermediateType>(0.1f),
-                                                 static_cast<IntermediateType>(1.0f));
+                                              static_cast<IntermediateType>(1.0f));
 
     std::unordered_map<int64_t, void*> variant_pack;
 
