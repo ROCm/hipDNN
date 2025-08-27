@@ -157,7 +157,7 @@ public:
 
                 if(std::filesystem::is_directory(path))
                 {
-                    scan_directory_for_plugins(path, pathsToLoad);
+                    scanDirectoryForPlugins(path, pathsToLoad);
                 }
             }
         }
@@ -169,7 +169,7 @@ public:
                 auto resolvedPath = std::filesystem::weakly_canonical(path);
                 if(std::filesystem::is_directory(resolvedPath))
                 {
-                    scan_directory_for_plugins(resolvedPath, pathsToLoad);
+                    scanDirectoryForPlugins(resolvedPath, pathsToLoad);
                 }
                 // Cannot necessarily check that a custom file path exists, because it can be platform opaque
                 else if(!resolvedPath.filename().empty())
@@ -197,7 +197,7 @@ public:
 
         for(const auto& path : pathsToLoad)
         {
-            load_plugin_from_file(path);
+            loadPluginFromFile(path);
         }
     }
 
@@ -218,8 +218,8 @@ private:
         _loadedPluginFiles.clear();
     }
 
-    void scan_directory_for_plugins(const std::filesystem::path& dirPath,
-                                    std::set<std::filesystem::path>& pathsToLoad) const
+    void scanDirectoryForPlugins(const std::filesystem::path& dirPath,
+                                 std::set<std::filesystem::path>& pathsToLoad) const
     {
         try
         {
@@ -239,7 +239,7 @@ private:
         }
     }
 
-    void load_plugin_from_file(const std::filesystem::path& filePath)
+    void loadPluginFromFile(const std::filesystem::path& filePath)
     {
 
         HIPDNN_LOG_INFO("Attempting to load plugin from [{}]", filePath.string());
