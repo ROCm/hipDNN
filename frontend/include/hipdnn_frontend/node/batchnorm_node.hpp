@@ -17,9 +17,9 @@ class BatchNormNode : public NodeCRTP<BatchNormNode> //NOLINT
 public:
     BatchnormAttributes attributes;
 
-    BatchNormNode(BatchnormAttributes&& batchnorm_attrs, const GraphAttributes& graph_attrs)
-        : NodeCRTP(graph_attrs)
-        , attributes(std::move(batchnorm_attrs))
+    BatchNormNode(BatchnormAttributes&& batchnormAttrs, const GraphAttributes& graphAttrs)
+        : NodeCRTP(graphAttrs)
+        , attributes(std::move(batchnormAttrs))
     {
     }
 
@@ -81,80 +81,79 @@ public:
             y->set_stride(x->get_stride());
         }
 
-        auto infer_c_tensor = [&](std::shared_ptr<TensorAttributes>& tensor_to_infer) {
-            if(tensor_to_infer->get_dim().empty())
+        auto inferCTensor = [&](std::shared_ptr<TensorAttributes>& tensorToInfer) {
+            if(tensorToInfer->get_dim().empty())
             {
-                std::vector<int64_t> tensor_dims(x->get_dim().size(), 1);
-                tensor_dims[1] = x->get_dim()[1];
-                tensor_to_infer->set_dim(tensor_dims);
+                std::vector<int64_t> tensorDims(x->get_dim().size(), 1);
+                tensorDims[1] = x->get_dim()[1];
+                tensorToInfer->set_dim(tensorDims);
             }
 
-            if(tensor_to_infer->get_stride().empty())
+            if(tensorToInfer->get_stride().empty())
             {
-                auto stride_order
-                    = hipdnn_sdk::utilities::stride_order_nhwc(tensor_to_infer->get_dim().size());
-                tensor_to_infer->set_stride(hipdnn_sdk::utilities::generate_strides(
-                    tensor_to_infer->get_dim(), stride_order));
+                auto strideOrder
+                    = hipdnn_sdk::utilities::stride_order_nhwc(tensorToInfer->get_dim().size());
+                tensorToInfer->set_stride(
+                    hipdnn_sdk::utilities::generate_strides(tensorToInfer->get_dim(), strideOrder));
             }
         };
 
         auto mean = attributes.get_mean();
-        auto inv_var = attributes.get_inv_variance();
+        auto invVar = attributes.get_inv_variance();
 
         if(mean)
         {
-            infer_c_tensor(mean);
+            inferCTensor(mean);
         }
 
-        if(inv_var)
+        if(invVar)
         {
-            infer_c_tensor(inv_var);
+            inferCTensor(invVar);
         }
 
-        auto prev_running_mean = attributes.get_prev_running_mean();
-        auto prev_running_var = attributes.get_prev_running_variance();
+        auto prevRunningMean = attributes.get_prev_running_mean();
+        auto prevRunningVar = attributes.get_prev_running_variance();
 
-        auto next_running_mean = attributes.get_next_running_mean();
-        auto next_running_var = attributes.get_next_running_variance();
+        auto nextRunningMean = attributes.get_next_running_mean();
+        auto nextRunningVar = attributes.get_next_running_variance();
 
-        if(prev_running_mean && prev_running_var && next_running_mean && next_running_var)
+        if(prevRunningMean && prevRunningVar && nextRunningMean && nextRunningVar)
         {
-            infer_c_tensor(next_running_mean);
-            infer_c_tensor(next_running_var);
+            inferCTensor(nextRunningMean);
+            inferCTensor(nextRunningVar);
         }
 
         return {};
     }
 
-    void gather_hipdnn_tensor_ids(std::unordered_set<int64_t>& used_ids) const override
+    void gather_hipdnn_tensor_ids(std::unordered_set<int64_t>& usedIds) const override
     {
-        NodeCRTP<BatchNormNode>::gather_hipdnn_tensor_ids(used_ids);
+        NodeCRTP<BatchNormNode>::gather_hipdnn_tensor_ids(usedIds);
 
         for(auto& tensor : attributes.peer_stats)
         {
             if(tensor && tensor->has_uid())
             {
-                used_ids.insert(tensor->get_uid());
+                usedIds.insert(tensor->get_uid());
             }
         }
     }
 
     error_t populate_hipdnn_tensor_ids(
-        std::unordered_map<int64_t, std::shared_ptr<TensorAttributes>>& tensor_lookup,
-        int64_t& current_tensor_id,
-        std::unordered_set<int64_t>& used_ids) const override
+        std::unordered_map<int64_t, std::shared_ptr<TensorAttributes>>& tensorLookup,
+        int64_t& currentTensorId,
+        std::unordered_set<int64_t>& usedIds) const override
     {
-        NodeCRTP<BatchNormNode>::populate_hipdnn_tensor_ids(
-            tensor_lookup, current_tensor_id, used_ids);
+        NodeCRTP<BatchNormNode>::populate_hipdnn_tensor_ids(tensorLookup, currentTensorId, usedIds);
 
         for(auto& tensor : attributes.peer_stats)
         {
             if(tensor && !tensor->has_uid())
             {
-                tensor->set_uid(get_unused_tensor_uid(current_tensor_id, used_ids));
+                tensor->set_uid(get_unused_tensor_uid(currentTensorId, usedIds));
             }
 
-            tensor_lookup[tensor->get_uid()] = tensor;
+            tensorLookup[tensor->get_uid()] = tensor;
         }
 
         return {};

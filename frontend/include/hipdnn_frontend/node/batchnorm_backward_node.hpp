@@ -18,9 +18,9 @@ class DBNNode : public NodeCRTP<DBNNode> //NOLINT
 public:
     BatchnormBackwardAttributes attributes;
 
-    DBNNode(BatchnormBackwardAttributes&& batchnorm_attrs, const GraphAttributes& graph_attrs)
-        : NodeCRTP(graph_attrs)
-        , attributes(std::move(batchnorm_attrs))
+    DBNNode(BatchnormBackwardAttributes&& batchnormAttrs, const GraphAttributes& graphAttrs)
+        : NodeCRTP(graphAttrs)
+        , attributes(std::move(batchnormAttrs))
     {
     }
 
@@ -100,57 +100,57 @@ public:
             dx->set_stride(x->get_stride());
         }
 
-        auto infer_c_tensor = [&](std::shared_ptr<TensorAttributes>& tensor_to_infer) {
-            if(tensor_to_infer->get_dim().empty())
+        auto inferCTensor = [&](std::shared_ptr<TensorAttributes>& tensorToInfer) {
+            if(tensorToInfer->get_dim().empty())
             {
-                std::vector<int64_t> tensor_dims(x->get_dim().size(), 1);
-                tensor_dims[1] = x->get_dim()[1];
-                tensor_to_infer->set_dim(tensor_dims);
+                std::vector<int64_t> tensorDims(x->get_dim().size(), 1);
+                tensorDims[1] = x->get_dim()[1];
+                tensorToInfer->set_dim(tensorDims);
             }
 
-            if(tensor_to_infer->get_stride().empty())
+            if(tensorToInfer->get_stride().empty())
             {
-                auto stride_order
-                    = hipdnn_sdk::utilities::stride_order_nhwc(tensor_to_infer->get_dim().size());
-                tensor_to_infer->set_stride(hipdnn_sdk::utilities::generate_strides(
-                    tensor_to_infer->get_dim(), stride_order));
+                auto strideOrder
+                    = hipdnn_sdk::utilities::stride_order_nhwc(tensorToInfer->get_dim().size());
+                tensorToInfer->set_stride(
+                    hipdnn_sdk::utilities::generate_strides(tensorToInfer->get_dim(), strideOrder));
             }
         };
 
-        infer_c_tensor(dscale);
-        infer_c_tensor(dbias);
+        inferCTensor(dscale);
+        inferCTensor(dbias);
 
         return {};
     }
 
-    void gather_hipdnn_tensor_ids(std::unordered_set<int64_t>& used_ids) const override
+    void gather_hipdnn_tensor_ids(std::unordered_set<int64_t>& usedIds) const override
     {
-        NodeCRTP<DBNNode>::gather_hipdnn_tensor_ids(used_ids);
+        NodeCRTP<DBNNode>::gather_hipdnn_tensor_ids(usedIds);
 
         for(auto& tensor : attributes.peer_stats)
         {
             if(tensor && tensor->has_uid())
             {
-                used_ids.insert(tensor->get_uid());
+                usedIds.insert(tensor->get_uid());
             }
         }
     }
 
     error_t populate_hipdnn_tensor_ids(
-        std::unordered_map<int64_t, std::shared_ptr<TensorAttributes>>& tensor_lookup,
-        int64_t& current_tensor_id,
-        std::unordered_set<int64_t>& used_ids) const override
+        std::unordered_map<int64_t, std::shared_ptr<TensorAttributes>>& tensorLookup,
+        int64_t& currentTensorId,
+        std::unordered_set<int64_t>& usedIds) const override
     {
-        NodeCRTP<DBNNode>::populate_hipdnn_tensor_ids(tensor_lookup, current_tensor_id, used_ids);
+        NodeCRTP<DBNNode>::populate_hipdnn_tensor_ids(tensorLookup, currentTensorId, usedIds);
 
         for(auto& tensor : attributes.peer_stats)
         {
             if(tensor && !tensor->has_uid())
             {
-                tensor->set_uid(get_unused_tensor_uid(current_tensor_id, used_ids));
+                tensor->set_uid(get_unused_tensor_uid(currentTensorId, usedIds));
             }
 
-            tensor_lookup[tensor->get_uid()] = tensor;
+            tensorLookup[tensor->get_uid()] = tensor;
         }
 
         return {};

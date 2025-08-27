@@ -42,7 +42,7 @@ enum class HeurMode_t
 };
 
 template <typename T>
-DataType_t get_data_type_enum_from_type()
+DataType_t getDataTypeEnumFromType()
 {
     if constexpr(std::is_same_v<T, float>)
     {
@@ -74,8 +74,7 @@ DataType_t get_data_type_enum_from_type()
     }
 }
 
-[[maybe_unused]] static hipdnn_sdk::data_objects::ConvMode
-    to_sdk_type(const ConvolutionMode_t& type)
+[[maybe_unused]] static hipdnn_sdk::data_objects::ConvMode toSdkType(const ConvolutionMode_t& type)
 {
     switch(type)
     {
@@ -88,7 +87,7 @@ DataType_t get_data_type_enum_from_type()
     }
 }
 
-[[maybe_unused]] static hipdnn_sdk::data_objects::DataType to_sdk_type(const DataType_t& type)
+[[maybe_unused]] static hipdnn_sdk::data_objects::DataType toSdkType(const DataType_t& type)
 {
     switch(type)
     {
@@ -110,7 +109,7 @@ DataType_t get_data_type_enum_from_type()
 }
 
 [[maybe_unused]] static hipdnn_sdk::data_objects::PointwiseMode
-    to_sdk_type(const PointwiseMode_t& type)
+    toSdkType(const PointwiseMode_t& type)
 {
     switch(type)
     {
@@ -121,7 +120,7 @@ DataType_t get_data_type_enum_from_type()
     }
 }
 
-[[maybe_unused]] static hipdnnBackendHeurMode_t to_backend_type(const HeurMode_t& type)
+[[maybe_unused]] static hipdnnBackendHeurMode_t toBackendType(const HeurMode_t& type)
 {
     switch(type)
     {
@@ -132,6 +131,7 @@ DataType_t get_data_type_enum_from_type()
     }
 }
 
+// NOLINTNEXTLINE(readability-identifier-naming)
 [[maybe_unused]] static const char* to_string(const DataType_t& type)
 {
     switch(type)

@@ -15,10 +15,10 @@ class BatchnormInferenceNode : public NodeCRTP<BatchnormInferenceNode> //NOLINT
 public:
     BatchnormInferenceAttributes attributes;
 
-    BatchnormInferenceNode(BatchnormInferenceAttributes&& batchnorm_attrs,
-                           const GraphAttributes& graph_attrs)
-        : NodeCRTP(graph_attrs)
-        , attributes(std::move(batchnorm_attrs))
+    BatchnormInferenceNode(BatchnormInferenceAttributes&& batchnormAttrs,
+                           const GraphAttributes& graphAttrs)
+        : NodeCRTP(graphAttrs)
+        , attributes(std::move(batchnormAttrs))
     {
     }
 

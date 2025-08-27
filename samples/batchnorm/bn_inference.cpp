@@ -21,8 +21,8 @@ using namespace hipdnn_sdk::utilities;
 template <typename InputType, typename IntermediateType>
 void Sample_runner::operator()(const Tensor_layout& layout)
 {
-    auto input_type = get_data_type_enum_from_type<InputType>();
-    auto intermediate_type = get_data_type_enum_from_type<IntermediateType>();
+    auto input_type = getDataTypeEnumFromType<InputType>();
+    auto intermediate_type = getDataTypeEnumFromType<IntermediateType>();
 
     std::cout << "Running batch normalization inference graph " << input_type << " [" << layout
               << "]" << (config.cpu_validation ? " (with CPU validation)" : "") << "...\n";

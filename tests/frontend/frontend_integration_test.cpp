@@ -158,22 +158,21 @@ protected:
         int64_t uid = 1;
         Batchnorm_test_tensors tensors;
 
-        auto x_attr = make_tensor_attributes("X", DataType_t::FLOAT, tensor_bundle.x_tensor);
+        auto x_attr = makeTensorAttributes("X", DataType_t::FLOAT, tensor_bundle.x_tensor);
         if(use_manual_uids)
         {
             x_attr.set_uid(uid++);
         }
         tensors.x = std::make_shared<TensorAttributes>(std::move(x_attr));
 
-        auto mean_attr
-            = make_tensor_attributes("mean", DataType_t::FLOAT, tensor_bundle.mean_tensor);
+        auto mean_attr = makeTensorAttributes("mean", DataType_t::FLOAT, tensor_bundle.mean_tensor);
         if(use_manual_uids)
         {
             mean_attr.set_uid(uid++);
         }
         tensors.mean = std::make_shared<TensorAttributes>(std::move(mean_attr));
 
-        auto inv_variance_attr = make_tensor_attributes(
+        auto inv_variance_attr = makeTensorAttributes(
             "inv_variance", DataType_t::FLOAT, tensor_bundle.variance_tensor);
         if(use_manual_uids)
         {
@@ -182,15 +181,14 @@ protected:
         tensors.inv_variance = std::make_shared<TensorAttributes>(std::move(inv_variance_attr));
 
         auto scale_attr
-            = make_tensor_attributes("scale", DataType_t::FLOAT, tensor_bundle.scale_tensor);
+            = makeTensorAttributes("scale", DataType_t::FLOAT, tensor_bundle.scale_tensor);
         if(use_manual_uids)
         {
             scale_attr.set_uid(uid++);
         }
         tensors.scale = std::make_shared<TensorAttributes>(std::move(scale_attr));
 
-        auto bias_attr
-            = make_tensor_attributes("bias", DataType_t::FLOAT, tensor_bundle.bias_tensor);
+        auto bias_attr = makeTensorAttributes("bias", DataType_t::FLOAT, tensor_bundle.bias_tensor);
         if(use_manual_uids)
         {
             bias_attr.set_uid(uid++);

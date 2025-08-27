@@ -173,26 +173,26 @@ protected:
         int64_t uid = 1;
 
         auto x_attr
-            = graph::make_tensor_attributes("x", input_data_type, graph_tensor_bundle.x_tensor);
+            = graph::makeTensorAttributes("x", input_data_type, graph_tensor_bundle.x_tensor);
         x_attr.set_uid(uid++);
         auto x_tensor_attr = std::make_shared<graph::TensorAttributes>(std::move(x_attr));
 
         auto dy_attr
-            = graph::make_tensor_attributes("dy", input_data_type, graph_tensor_bundle.dy_tensor);
+            = graph::makeTensorAttributes("dy", input_data_type, graph_tensor_bundle.dy_tensor);
         dy_attr.set_uid(uid++);
         auto dy_tensor_attr = std::make_shared<graph::TensorAttributes>(std::move(dy_attr));
 
-        auto scale_attr = graph::make_tensor_attributes(
+        auto scale_attr = graph::makeTensorAttributes(
             "scale", intermediate_data_type, graph_tensor_bundle.scale_tensor);
         scale_attr.set_uid(uid++);
         auto scale_tensor_attr = std::make_shared<graph::TensorAttributes>(std::move(scale_attr));
 
-        auto mean_attr = graph::make_tensor_attributes(
+        auto mean_attr = graph::makeTensorAttributes(
             "mean", intermediate_data_type, graph_tensor_bundle.mean_tensor);
         mean_attr.set_uid(uid++);
         auto mean_tensor_attr = std::make_shared<graph::TensorAttributes>(std::move(mean_attr));
 
-        auto inv_variance_attr = graph::make_tensor_attributes(
+        auto inv_variance_attr = graph::makeTensorAttributes(
             "inv_variance", intermediate_data_type, graph_tensor_bundle.inv_variance_tensor);
         inv_variance_attr.set_uid(uid++);
         auto inv_variance_tensor_attr
@@ -281,8 +281,8 @@ protected:
                             Input_type tolerance = 1e4f,
                             const Tensor_layout& layout = Tensor_layout::NCHW)
     {
-        auto input_data_type = get_data_type_enum_from_type<Input_type>();
-        auto intermediate_data_type = get_data_type_enum_from_type<Intermediate_type>();
+        auto input_data_type = getDataTypeEnumFromType<Input_type>();
+        auto intermediate_data_type = getDataTypeEnumFromType<Intermediate_type>();
 
         unsigned int seed = std::random_device{}();
         //log the random seed in case we need to reproduce the test

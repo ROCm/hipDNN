@@ -285,7 +285,7 @@ static void validate_tensor(const TensorAttributes& tensor,
 {
     EXPECT_EQ(tensor.get_name(), serialized_tensor.name);
     EXPECT_EQ(tensor.get_uid(), serialized_tensor.uid);
-    EXPECT_EQ(to_sdk_type(tensor.get_data_type()), serialized_tensor.data_type);
+    EXPECT_EQ(toSdkType(tensor.get_data_type()), serialized_tensor.data_type);
     EXPECT_EQ(tensor.get_dim(), serialized_tensor.dims);
     EXPECT_EQ(tensor.get_stride(), serialized_tensor.strides);
 }
@@ -1102,7 +1102,7 @@ TEST_F(Graph_test_fixture, CanSuccessfullyCreateExecutionPlans)
     std::vector<hipdnnBackendHeurMode_t> backend_modes;
     for(const auto& mode : heurModes)
     {
-        backend_modes.push_back(to_backend_type(mode));
+        backend_modes.push_back(toBackendType(mode));
     }
     auto tensor_attributes = create_basic_batchnorm_graph(graph);
 

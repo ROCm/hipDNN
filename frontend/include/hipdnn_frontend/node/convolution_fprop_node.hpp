@@ -17,9 +17,9 @@ class ConvolutionNode : public NodeCRTP<ConvolutionNode> //NOLINT
 public:
     ConvFpropAttributes attributes;
 
-    ConvolutionNode(ConvFpropAttributes&& conv_attrs, const GraphAttributes& graph_attrs)
-        : NodeCRTP(graph_attrs)
-        , attributes(std::move(conv_attrs))
+    ConvolutionNode(ConvFpropAttributes&& convAttrs, const GraphAttributes& graphAttrs)
+        : NodeCRTP(graphAttrs)
+        , attributes(std::move(convAttrs))
     {
     }
 
@@ -61,7 +61,7 @@ public:
         auto y = attributes.get_y();
 
         // Validate input tensor dimensions and strides
-        auto& x_dims = x->get_dim();
+        auto& xDims = x->get_dim();
 
         HIPDNN_RETURN_IF_FALSE(
             x->validate_dims_and_strides_set_and_positive(),
@@ -69,13 +69,13 @@ public:
             "ConvolutionNode: Input tensor dimensions and strides must be set and positive");
 
         HIPDNN_RETURN_IF_LT(
-            x_dims.size(),
+            xDims.size(),
             3,
             error_code_t::INVALID_VALUE,
             "ConvolutionNode: Input tensor must have at least 3 dimensions (N, C, spatial)");
 
         // Validate weight tensor dimensions and strides
-        auto& w_dims = w->get_dim();
+        auto& wDims = w->get_dim();
 
         HIPDNN_RETURN_IF_FALSE(
             w->validate_dims_and_strides_set_and_positive(),
@@ -83,8 +83,8 @@ public:
             "ConvolutionNode: Weight tensor dimensions and strides must be set and positive");
 
         HIPDNN_RETURN_IF_NE(
-            w_dims.size(),
-            x_dims.size(),
+            wDims.size(),
+            xDims.size(),
             error_code_t::INVALID_VALUE,
             "ConvolutionNode: Weight tensor dimension count must match input tensor "
             "dimension count");
@@ -92,7 +92,7 @@ public:
         // Validate input channels match between input and weight tensors
         // For regular convolution: x_dims[1] == w_dims[1]
         // For grouped convolution: x_dims[1] % w_dims[1] == 0
-        HIPDNN_RETURN_IF_NE(x_dims[1] % w_dims[1],
+        HIPDNN_RETURN_IF_NE(xDims[1] % wDims[1],
                             0,
                             error_code_t::INVALID_VALUE,
                             "ConvolutionNode: Input tensor channels must match weight tensor input "
@@ -100,37 +100,37 @@ public:
 
         // For grouped convolution: x_dims[1] / w_dims[1] is group count.
         // Output channels must be divisible by group count.
-        auto group_count = x_dims[1] / w_dims[1];
-        HIPDNN_RETURN_IF_NE(w_dims[0] % group_count,
+        auto groupCount = xDims[1] / wDims[1];
+        HIPDNN_RETURN_IF_NE(wDims[0] % groupCount,
                             0,
                             error_code_t::INVALID_VALUE,
                             "ConvolutionNode: Weight tensor output channels must be divisible by "
                             "the number of groups");
 
         // Validate output tensor dimensions and strides if they are set
-        auto& y_dims = y->get_dim();
-        auto& y_strides = y->get_stride();
+        auto& yDims = y->get_dim();
+        auto& yStrides = y->get_stride();
 
-        if(!y_dims.empty())
+        if(!yDims.empty())
         {
             HIPDNN_RETURN_IF_NE(
-                y_dims.size(),
-                x_dims.size(),
+                yDims.size(),
+                xDims.size(),
                 error_code_t::INVALID_VALUE,
                 "ConvolutionNode: Output tensor dimension count must match input tensor "
                 "dimension count");
 
             // Validate batch size matches
             HIPDNN_RETURN_IF_NE(
-                y_dims[0],
-                x_dims[0],
+                yDims[0],
+                xDims[0],
                 error_code_t::INVALID_VALUE,
                 "ConvolutionNode: Output tensor batch size must match input tensor batch size");
 
             // Validate output channels match weight output channels
             HIPDNN_RETURN_IF_NE(
-                y_dims[1],
-                w_dims[0],
+                yDims[1],
+                wDims[0],
                 error_code_t::INVALID_VALUE,
                 "ConvolutionNode: Output tensor channels must match weight tensor output channels");
 
@@ -140,7 +140,7 @@ public:
                 "ConvolutionNode: Output tensor dimensions must be set and positive");
         }
 
-        if(!y_strides.empty())
+        if(!yStrides.empty())
         {
             HIPDNN_RETURN_IF_FALSE(
                 y->validate_dims_and_strides_set_and_positive(),
@@ -149,57 +149,57 @@ public:
         }
 
         // Validate spatial parameter counts match spatial dimensions
-        auto spatial_dims = x_dims.size() - 2; // Skip N and C dimensions
-        auto& pre_padding = attributes.get_pre_padding();
-        auto& post_padding = attributes.get_post_padding();
+        auto spatialDims = xDims.size() - 2; // Skip N and C dimensions
+        auto& prePadding = attributes.get_pre_padding();
+        auto& postPadding = attributes.get_post_padding();
         auto& stride = attributes.get_stride();
         auto& dilation = attributes.get_dilation();
 
         HIPDNN_RETURN_IF_NE(
-            pre_padding.size(),
-            spatial_dims,
+            prePadding.size(),
+            spatialDims,
             error_code_t::INVALID_VALUE,
             "ConvolutionNode: pre_padding parameter count must match spatial dimension count");
 
         HIPDNN_RETURN_IF_NE(
-            post_padding.size(),
-            spatial_dims,
+            postPadding.size(),
+            spatialDims,
             error_code_t::INVALID_VALUE,
             "ConvolutionNode: post_padding parameter count must match spatial dimension count");
 
         HIPDNN_RETURN_IF_NE(
             stride.size(),
-            spatial_dims,
+            spatialDims,
             error_code_t::INVALID_VALUE,
             "ConvolutionNode: stride parameter count must match spatial dimension count");
 
         HIPDNN_RETURN_IF_NE(
             dilation.size(),
-            spatial_dims,
+            spatialDims,
             error_code_t::INVALID_VALUE,
             "ConvolutionNode: dilation parameter count must match spatial dimension count");
 
         // Check spatial parameters for each dimension
-        for(size_t i = 0; i < spatial_dims; ++i)
+        for(size_t i = 0; i < spatialDims; ++i)
         {
-            auto pre_pad = pre_padding[i];
-            auto post_pad = post_padding[i];
-            auto stride_val = stride[i];
-            auto dilation_val = dilation[i];
+            auto prePad = prePadding[i];
+            auto postPad = postPadding[i];
+            auto strideVal = stride[i];
+            auto dilationVal = dilation[i];
 
             // Validate parameters
             HIPDNN_RETURN_IF_LT(
-                stride_val, 1, error_code_t::INVALID_VALUE, "ConvolutionNode: Stride must be > 0");
+                strideVal, 1, error_code_t::INVALID_VALUE, "ConvolutionNode: Stride must be > 0");
 
             HIPDNN_RETURN_IF_LT(
-                dilation_val, 1, error_code_t::INVALID_VALUE, "ConvolutionNode: Dilation must > 0");
+                dilationVal, 1, error_code_t::INVALID_VALUE, "ConvolutionNode: Dilation must > 0");
 
-            HIPDNN_RETURN_IF_LT(pre_pad,
+            HIPDNN_RETURN_IF_LT(prePad,
                                 0,
                                 error_code_t::INVALID_VALUE,
                                 "ConvolutionNode: Pre-padding must be non-negative");
 
-            HIPDNN_RETURN_IF_LT(post_pad,
+            HIPDNN_RETURN_IF_LT(postPad,
                                 0,
                                 error_code_t::INVALID_VALUE,
                                 "ConvolutionNode: Post-padding must be non-negative");
@@ -225,33 +225,33 @@ public:
 
         HIPDNN_CHECK_ERROR(attributes.fill_from_graph_attributes(graph_attributes));
 
-        auto y_dims = y->get_dim();
+        auto yDims = y->get_dim();
 
         // Infer output dimensions if not set
-        if(y_dims.empty())
+        if(yDims.empty())
         {
-            auto& x_dims = x->get_dim();
-            auto& w_dims = w->get_dim();
+            auto& xDims = x->get_dim();
+            auto& wDims = w->get_dim();
 
-            y_dims.resize(x_dims.size());
+            yDims.resize(xDims.size());
 
-            auto& pre_padding = attributes.get_pre_padding();
-            auto& post_padding = attributes.get_post_padding();
+            auto& prePadding = attributes.get_pre_padding();
+            auto& postPadding = attributes.get_post_padding();
             auto& stride = attributes.get_stride();
             auto& dilation = attributes.get_dilation();
 
-            y_dims[0] = x_dims[0]; // N (batch) matches input
-            y_dims[1] = w_dims[0]; // C (output channels)
+            yDims[0] = xDims[0]; // N (batch) matches input
+            yDims[1] = wDims[0]; // C (output channels)
 
             // Calculate spatial dimensions (Optional D, H, W)
             // Starting from dim 2 (skip N and C)
-            for(size_t i = 2; i < x_dims.size(); ++i)
+            for(size_t i = 2; i < xDims.size(); ++i)
             {
-                auto spatial_idx = i - 2; // Index into spatial dimension arrays
+                auto spatialIdx = i - 2; // Index into spatial dimension arrays
 
                 HIPDNN_RETURN_IF_TRUE(
-                    spatial_idx >= pre_padding.size() || spatial_idx >= post_padding.size()
-                        || spatial_idx >= stride.size() || spatial_idx >= dilation.size(),
+                    spatialIdx >= prePadding.size() || spatialIdx >= postPadding.size()
+                        || spatialIdx >= stride.size() || spatialIdx >= dilation.size(),
                     error_code_t::INVALID_VALUE,
                     "ConvolutionNode: Insufficient padding/stride/dilation parameters for spatial "
                     "dimensions");
@@ -260,39 +260,39 @@ public:
                 // output_size = floor((input_size + pre_padding + post_padding - dilated_kernel_size) / stride) + 1
                 // where dilated_kernel_size = dilation * (kernel_size - 1) + 1
 
-                auto input_size = x_dims[i];
-                auto kernel_size = w_dims[i];
-                auto pre_pad = pre_padding[spatial_idx];
-                auto post_pad = post_padding[spatial_idx];
-                auto stride_val = stride[spatial_idx];
-                auto dilation_val = dilation[spatial_idx];
+                auto inputSize = xDims[i];
+                auto kernelSize = wDims[i];
+                auto prePad = prePadding[spatialIdx];
+                auto postPad = postPadding[spatialIdx];
+                auto strideVal = stride[spatialIdx];
+                auto dilationVal = dilation[spatialIdx];
 
                 // Validate parameters
-                HIPDNN_RETURN_IF_LT(stride_val,
+                HIPDNN_RETURN_IF_LT(strideVal,
                                     1,
                                     error_code_t::INVALID_VALUE,
                                     "ConvolutionNode: Stride must be positive");
 
-                HIPDNN_RETURN_IF_LT(dilation_val,
+                HIPDNN_RETURN_IF_LT(dilationVal,
                                     1,
                                     error_code_t::INVALID_VALUE,
                                     "ConvolutionNode: Dilation must be positive");
 
-                HIPDNN_RETURN_IF_LT(pre_pad,
+                HIPDNN_RETURN_IF_LT(prePad,
                                     0,
                                     error_code_t::INVALID_VALUE,
                                     "ConvolutionNode: Pre-padding must be non-negative");
 
-                HIPDNN_RETURN_IF_LT(post_pad,
+                HIPDNN_RETURN_IF_LT(postPad,
                                     0,
                                     error_code_t::INVALID_VALUE,
                                     "ConvolutionNode: Post-padding must be non-negative");
 
                 // Calculate dilated kernel size
-                auto dilated_kernel_size = (dilation_val * (kernel_size - 1)) + 1;
+                auto dilatedKernelSize = (dilationVal * (kernelSize - 1)) + 1;
 
                 // Calculate output dimension
-                auto numerator = input_size + pre_pad + post_pad - dilated_kernel_size;
+                auto numerator = inputSize + prePad + postPad - dilatedKernelSize;
                 HIPDNN_RETURN_IF_LT(
                     numerator,
                     0,
@@ -300,55 +300,55 @@ public:
                     "ConvolutionNode: Invalid convolution parameters result in negative "
                     "output size");
 
-                y_dims[i] = (numerator / stride_val) + 1;
+                yDims[i] = (numerator / strideVal) + 1;
             }
 
             // Set the inferred dimensions
-            y->set_dim(y_dims);
+            y->set_dim(yDims);
         }
 
         // Infer output strides if not set
         if(y->get_stride().empty())
         {
-            auto& x_strides = x->get_stride();
-            auto& y_dims_final = y->get_dim();
+            auto& xStrides = x->get_stride();
+            auto& yDimsFinal = y->get_dim();
 
             HIPDNN_RETURN_IF_TRUE(
-                x_strides.empty(),
+                xStrides.empty(),
                 error_code_t::ATTRIBUTE_NOT_SET,
                 "ConvolutionNode: Cannot infer output strides - missing input strides");
 
             HIPDNN_RETURN_IF_TRUE(
-                y_dims_final.empty(),
+                yDimsFinal.empty(),
                 error_code_t::ATTRIBUTE_NOT_SET,
                 "ConvolutionNode: Cannot infer output strides - missing output dimensions");
 
             HIPDNN_RETURN_IF_NE(
-                x_strides.size(),
-                y_dims_final.size(),
+                xStrides.size(),
+                yDimsFinal.size(),
                 error_code_t::ATTRIBUTE_NOT_SET,
                 "ConvolutionNode: Stride dimension mismatch between input and output tensors");
 
             // All validations passed - perform stride generation
-            std::vector<int64_t> stride_order(x_strides.size());
-            std::vector<size_t> indices(x_strides.size());
+            std::vector<int64_t> strideOrder(xStrides.size());
+            std::vector<size_t> indices(xStrides.size());
             std::iota(indices.begin(), indices.end(), 0);
 
             // Sort indices by their corresponding stride values (ascending)
-            std::ranges::sort(indices.begin(), indices.end(), [&x_strides](size_t a, size_t b) {
-                return x_strides[a] < x_strides[b];
+            std::ranges::sort(indices.begin(), indices.end(), [&xStrides](size_t a, size_t b) {
+                return xStrides[a] < xStrides[b];
             });
 
             // Assign order based on sorted indices
             for(size_t i = 0; i < indices.size(); ++i)
             {
-                stride_order[indices[i]] = static_cast<int64_t>(i);
+                strideOrder[indices[i]] = static_cast<int64_t>(i);
             }
 
             // Generate Y strides using the extracted stride order and Y dimensions
-            auto y_strides = hipdnn_sdk::utilities::generate_strides(y_dims_final, stride_order);
+            auto yStrides = hipdnn_sdk::utilities::generate_strides(yDimsFinal, strideOrder);
 
-            y->set_stride(y_strides);
+            y->set_stride(yStrides);
         }
 
         return {};
