@@ -19,35 +19,35 @@ using namespace hipdnn_frontend;
 using namespace hipdnn_sdk::utilities;
 
 template <typename InputType, typename IntermediateType>
-void Sample_runner::operator()(const TensorLayout& layout)
+void SampleRunner::operator()(const TensorLayout& layout)
 {
-    auto input_type = getDataTypeEnumFromType<InputType>();
-    auto intermediate_type = getDataTypeEnumFromType<IntermediateType>();
+    auto inputType = getDataTypeEnumFromType<InputType>();
+    auto intermediateType = getDataTypeEnumFromType<IntermediateType>();
 
-    std::cout << "Running batch normalization inference graph " << input_type << " [" << layout
-              << "]" << (config.cpu_validation ? " (with CPU validation)" : "") << "...\n";
+    std::cout << "Running batch normalization inference graph " << inputType << " [" << layout
+              << "]" << (config.cpuValidation ? " (with CPU validation)" : "") << "...\n";
 
-    int64_t N = 16; // BATCH SIZE
-    int64_t C = 16; // CHANNELS (FEATURES)
-    int64_t H = 16; // HEIGHT (SPATIAL DIMENSION)
-    int64_t W = 16; // WIDTH (SPATIAL DIMENSION)
+    int64_t n = 16; // BATCH SIZE
+    int64_t c = 16; // CHANNELS (FEATURES)
+    int64_t h = 16; // HEIGHT (SPATIAL DIMENSION)
+    int64_t w = 16; // WIDTH (SPATIAL DIMENSION)
 
     auto graph = std::make_shared<graph::Graph>();
-    graph->set_io_data_type(input_type)
-        .set_intermediate_data_type(intermediate_type)
-        .set_compute_data_type(intermediate_type);
+    graph->set_io_data_type(inputType)
+        .set_intermediate_data_type(intermediateType)
+        .set_compute_data_type(intermediateType);
 
-    auto x = create_tensor({N, C, H, W}, input_type);
-    auto scale = create_tensor({1, C, 1, 1}, intermediate_type);
-    auto bias = create_tensor({1, C, 1, 1}, intermediate_type);
-    auto mean = create_tensor({1, C, 1, 1}, intermediate_type);
-    auto inv_variance = create_tensor({1, C, 1, 1}, intermediate_type);
+    auto x = createTensor({n, c, h, w}, inputType);
+    auto scale = createTensor({1, c, 1, 1}, intermediateType);
+    auto bias = createTensor({1, c, 1, 1}, intermediateType);
+    auto mean = createTensor({1, c, 1, 1}, intermediateType);
+    auto invVariance = createTensor({1, c, 1, 1}, intermediateType);
 
-    auto bn_attributes = graph::Batchnorm_inference_attributes();
-    bn_attributes.set_name("bn_inference_node");
+    auto bnAttributes = graph::BatchnormInferenceAttributes();
+    bnAttributes.set_name("bn_inference_node");
 
-    auto y = graph->batchnorm_inference(x, mean, inv_variance, scale, bias, bn_attributes);
-    y->set_output(true).set_data_type(input_type);
+    auto y = graph->batchnorm_inference(x, mean, invVariance, scale, bias, bnAttributes);
+    y->set_output(true).set_data_type(inputType);
 
     HIPDNN_FE_CHECK(graph->validate());
     std::cout << "Graph validation successful.\n";
@@ -64,95 +64,90 @@ void Sample_runner::operator()(const TensorLayout& layout)
     HIPDNN_FE_CHECK(graph->build_plans());
     std::cout << "Plans build successful.\n";
 
-    Tensor<InputType> x_tensor(x->get_dim(), layout);
-    Tensor<IntermediateType> scale_tensor(scale->get_dim());
-    Tensor<IntermediateType> bias_tensor(bias->get_dim());
-    Tensor<IntermediateType> mean_tensor(mean->get_dim());
-    Tensor<IntermediateType> inv_variance_tensor(inv_variance->get_dim());
-    Tensor<InputType> y_tensor(y->get_dim(), layout);
+    Tensor<InputType> xTensor(x->get_dim(), layout);
+    Tensor<IntermediateType> scaleTensor(scale->get_dim());
+    Tensor<IntermediateType> biasTensor(bias->get_dim());
+    Tensor<IntermediateType> meanTensor(mean->get_dim());
+    Tensor<IntermediateType> invVarianceTensor(invVariance->get_dim());
+    Tensor<InputType> yTensor(y->get_dim(), layout);
 
-    x_tensor.fillWithRandomValues(static_cast<InputType>(0.0f), static_cast<InputType>(1.0f));
+    xTensor.fillWithRandomValues(static_cast<InputType>(0.0f), static_cast<InputType>(1.0f));
 
-    scale_tensor.fillWithValue(static_cast<IntermediateType>(1.0f));
+    scaleTensor.fillWithValue(static_cast<IntermediateType>(1.0f));
 
-    bias_tensor.fillWithValue(static_cast<IntermediateType>(0.0f));
+    biasTensor.fillWithValue(static_cast<IntermediateType>(0.0f));
 
-    mean_tensor.fillWithValue(static_cast<IntermediateType>(0.5f));
+    meanTensor.fillWithValue(static_cast<IntermediateType>(0.5f));
 
-    inv_variance_tensor.fillWithValue(static_cast<IntermediateType>(1.0f));
+    invVarianceTensor.fillWithValue(static_cast<IntermediateType>(1.0f));
 
-    std::unordered_map<int64_t, void*> variant_pack;
+    std::unordered_map<int64_t, void*> variantPack;
 
-    variant_pack[x->get_uid()] = x_tensor.memory().deviceData();
-    variant_pack[scale->get_uid()] = scale_tensor.memory().deviceData();
-    variant_pack[bias->get_uid()] = bias_tensor.memory().deviceData();
-    variant_pack[mean->get_uid()] = mean_tensor.memory().deviceData();
-    variant_pack[inv_variance->get_uid()] = inv_variance_tensor.memory().deviceData();
-    variant_pack[y->get_uid()] = y_tensor.memory().deviceData();
+    variantPack[x->get_uid()] = xTensor.memory().deviceData();
+    variantPack[scale->get_uid()] = scaleTensor.memory().deviceData();
+    variantPack[bias->get_uid()] = biasTensor.memory().deviceData();
+    variantPack[mean->get_uid()] = meanTensor.memory().deviceData();
+    variantPack[invVariance->get_uid()] = invVarianceTensor.memory().deviceData();
+    variantPack[y->get_uid()] = yTensor.memory().deviceData();
 
-    HIPDNN_FE_CHECK(graph->execute(handle, variant_pack, nullptr));
+    HIPDNN_FE_CHECK(graph->execute(handle, variantPack, nullptr));
 
-    y_tensor.memory().markDeviceModified();
-    auto y_host_ptr = y_tensor.memory().hostData();
+    yTensor.memory().markDeviceModified();
+    auto yHostPtr = yTensor.memory().hostData();
 
-    if(config.cpu_validation)
+    if(config.cpuValidation)
     {
         std::cout << "Running CPU reference validation...\n";
 
-        auto ref_impl = hipdnn_sdk::reference_test_utilities::
+        auto refImpl = hipdnn_sdk::reference_test_utilities::
             CpuFpReferenceImplementation<InputType, IntermediateType>();
-        Tensor<InputType> y_ref_tensor(y->get_dim(), layout);
+        Tensor<InputType> yRefTensor(y->get_dim(), layout);
 
         // Convert inverse variance to variance for CPU reference
-        Tensor<IntermediateType> variance_tensor(inv_variance->get_dim());
-        auto inv_variance_host_ptr = inv_variance_tensor.memory().hostData();
-        auto variance_host_ptr = variance_tensor.memory().hostData();
+        Tensor<IntermediateType> varianceTensor(invVariance->get_dim());
+        auto invVarianceHostPtr = invVarianceTensor.memory().hostData();
+        auto varianceHostPtr = varianceTensor.memory().hostData();
 
-        for(size_t i = 0; i < inv_variance_tensor.memory().count(); ++i)
+        for(size_t i = 0; i < invVarianceTensor.memory().count(); ++i)
         {
-            variance_host_ptr[i] = static_cast<IntermediateType>(1.0f)
-                                   / (inv_variance_host_ptr[i] * inv_variance_host_ptr[i]);
+            varianceHostPtr[i] = static_cast<IntermediateType>(1.0f)
+                                 / (invVarianceHostPtr[i] * invVarianceHostPtr[i]);
         }
 
-        auto epsilon = get_epsilon<InputType>();
+        auto epsilon = getEpsilon<InputType>();
 
-        ref_impl.batchnormFwdInference(x_tensor,
-                                       scale_tensor,
-                                       bias_tensor,
-                                       mean_tensor,
-                                       variance_tensor,
-                                       y_ref_tensor,
-                                       epsilon);
+        refImpl.batchnormFwdInference(
+            xTensor, scaleTensor, biasTensor, meanTensor, varianceTensor, yRefTensor, epsilon);
 
         auto validator = hipdnn_sdk::reference_test_utilities::CpuFpReferenceValidation<InputType>(
             static_cast<InputType>(epsilon), static_cast<InputType>(epsilon));
 
         std::cout << "CPU reference validation "
-                  << (validator.allClose(y_ref_tensor.memory(), y_tensor.memory()) ? "successful"
-                                                                                   : "failed")
+                  << (validator.allClose(yRefTensor.memory(), yTensor.memory()) ? "successful"
+                                                                                : "failed")
                   << ".\n";
     }
 
     std::cout << "First 10 y values: ";
     for(int i = 0; i < 10; ++i)
     {
-        std::cout << static_cast<float>(y_host_ptr[i]) << " ";
+        std::cout << static_cast<float>(yHostPtr[i]) << " ";
     }
 
-    std::cout << "\nBatch normalization inference graph execution complete for " << input_type
+    std::cout << "\nBatch normalization inference graph execution complete for " << inputType
               << ".\n\n";
 }
 
 int main(int argc, char* argv[])
 {
-    auto config = parse_command_line_args(argc, argv);
+    auto config = parseCommandLineArgs(argc, argv);
 
-    initialize_frontend_logging(hipdnnLoggingCallback_ext);
+    initializeFrontendLogging(hipdnnLoggingCallback_ext);
 
     hipdnnHandle_t handle;
     HIPDNN_CHECK(hipdnnCreate(&handle));
 
-    run(Sample_runner{handle, config});
+    run(SampleRunner{handle, config});
 
     HIPDNN_CHECK(hipdnnDestroy(handle));
     std::cout << "All batch normalization inference runs completed successfully.\n";

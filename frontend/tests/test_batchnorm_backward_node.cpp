@@ -10,16 +10,16 @@ using namespace hipdnn_frontend::graph;
 
 TEST(DBNNodeTests, PreValidateNode)
 {
-    BatchnormBackwardAttributes batchnorm_attributes;
-    batchnorm_attributes.set_dy(std::make_shared<TensorAttributes>());
-    batchnorm_attributes.set_x(std::make_shared<TensorAttributes>());
-    batchnorm_attributes.set_scale(std::make_shared<TensorAttributes>());
-    batchnorm_attributes.set_dx(std::make_shared<TensorAttributes>());
-    batchnorm_attributes.set_dscale(std::make_shared<TensorAttributes>());
-    batchnorm_attributes.set_dbias(std::make_shared<TensorAttributes>());
+    BatchnormBackwardAttributes batchnormAttributes;
+    batchnormAttributes.set_dy(std::make_shared<TensorAttributes>());
+    batchnormAttributes.set_x(std::make_shared<TensorAttributes>());
+    batchnormAttributes.set_scale(std::make_shared<TensorAttributes>());
+    batchnormAttributes.set_dx(std::make_shared<TensorAttributes>());
+    batchnormAttributes.set_dscale(std::make_shared<TensorAttributes>());
+    batchnormAttributes.set_dbias(std::make_shared<TensorAttributes>());
 
-    GraphAttributes graph_attributes;
-    DBNNode node(std::move(batchnorm_attributes), graph_attributes);
+    GraphAttributes graphAttributes;
+    DBNNode node(std::move(batchnormAttributes), graphAttributes);
 
     auto error = node.pre_validate_node();
     EXPECT_EQ(error.code, error_code_t::OK);
@@ -27,156 +27,156 @@ TEST(DBNNodeTests, PreValidateNode)
 
 TEST(DBNNodeTests, PreValidateNodeMissingValues)
 {
-    BatchnormBackwardAttributes batchnorm_attributes;
+    BatchnormBackwardAttributes batchnormAttributes;
 
-    GraphAttributes graph_attributes;
-    DBNNode node(std::move(batchnorm_attributes), graph_attributes);
+    GraphAttributes graphAttributes;
+    DBNNode node(std::move(batchnormAttributes), graphAttributes);
 
     auto error = node.pre_validate_node();
     EXPECT_EQ(error.code, error_code_t::ATTRIBUTE_NOT_SET);
 
-    batchnorm_attributes.set_dy(std::make_shared<TensorAttributes>());
-    auto batchnorm_attributes_copy = batchnorm_attributes;
-    DBNNode node_with_dy(std::move(batchnorm_attributes_copy), graph_attributes);
+    batchnormAttributes.set_dy(std::make_shared<TensorAttributes>());
+    auto batchnormAttributesCopy = batchnormAttributes;
+    DBNNode nodeWithDy(std::move(batchnormAttributesCopy), graphAttributes);
 
-    error = node_with_dy.pre_validate_node();
+    error = nodeWithDy.pre_validate_node();
     EXPECT_EQ(error.code, error_code_t::ATTRIBUTE_NOT_SET);
 
-    batchnorm_attributes.set_x(std::make_shared<TensorAttributes>());
-    batchnorm_attributes_copy = batchnorm_attributes;
-    DBNNode node_with_x(std::move(batchnorm_attributes_copy), graph_attributes);
+    batchnormAttributes.set_x(std::make_shared<TensorAttributes>());
+    batchnormAttributesCopy = batchnormAttributes;
+    DBNNode nodeWithX(std::move(batchnormAttributesCopy), graphAttributes);
 
-    error = node_with_x.pre_validate_node();
+    error = nodeWithX.pre_validate_node();
     EXPECT_EQ(error.code, error_code_t::ATTRIBUTE_NOT_SET);
 
-    batchnorm_attributes.set_scale(std::make_shared<TensorAttributes>());
-    batchnorm_attributes_copy = batchnorm_attributes;
-    DBNNode node_with_scale(std::move(batchnorm_attributes_copy), graph_attributes);
+    batchnormAttributes.set_scale(std::make_shared<TensorAttributes>());
+    batchnormAttributesCopy = batchnormAttributes;
+    DBNNode nodeWithScale(std::move(batchnormAttributesCopy), graphAttributes);
 
-    error = node_with_scale.pre_validate_node();
+    error = nodeWithScale.pre_validate_node();
     EXPECT_EQ(error.code, error_code_t::ATTRIBUTE_NOT_SET);
 
-    batchnorm_attributes.set_dx(std::make_shared<TensorAttributes>());
-    batchnorm_attributes_copy = batchnorm_attributes;
-    DBNNode node_with_dx(std::move(batchnorm_attributes_copy), graph_attributes);
+    batchnormAttributes.set_dx(std::make_shared<TensorAttributes>());
+    batchnormAttributesCopy = batchnormAttributes;
+    DBNNode nodeWithDx(std::move(batchnormAttributesCopy), graphAttributes);
 
-    error = node_with_dx.pre_validate_node();
+    error = nodeWithDx.pre_validate_node();
     EXPECT_EQ(error.code, error_code_t::ATTRIBUTE_NOT_SET);
 
-    batchnorm_attributes.set_dscale(std::make_shared<TensorAttributes>());
-    batchnorm_attributes_copy = batchnorm_attributes;
-    DBNNode node_with_dscale(std::move(batchnorm_attributes_copy), graph_attributes);
+    batchnormAttributes.set_dscale(std::make_shared<TensorAttributes>());
+    batchnormAttributesCopy = batchnormAttributes;
+    DBNNode nodeWithDscale(std::move(batchnormAttributesCopy), graphAttributes);
 
-    error = node_with_dscale.pre_validate_node();
+    error = nodeWithDscale.pre_validate_node();
     EXPECT_EQ(error.code, error_code_t::ATTRIBUTE_NOT_SET);
 
-    batchnorm_attributes.set_dbias(std::make_shared<TensorAttributes>());
-    batchnorm_attributes_copy = batchnorm_attributes;
-    DBNNode node_with_all_values(std::move(batchnorm_attributes_copy), graph_attributes);
+    batchnormAttributes.set_dbias(std::make_shared<TensorAttributes>());
+    batchnormAttributesCopy = batchnormAttributes;
+    DBNNode nodeWithAllValues(std::move(batchnormAttributesCopy), graphAttributes);
 
-    error = node_with_all_values.pre_validate_node();
+    error = nodeWithAllValues.pre_validate_node();
     EXPECT_EQ(error.code, error_code_t::OK);
 }
 
 TEST(DBNNodeTests, InferPropertiesNode)
 {
-    BatchnormBackwardAttributes batchnorm_attributes;
-    batchnorm_attributes.set_dy(std::make_shared<TensorAttributes>());
-    batchnorm_attributes.set_x(std::make_shared<TensorAttributes>());
-    batchnorm_attributes.set_scale(std::make_shared<TensorAttributes>());
-    batchnorm_attributes.set_mean(std::make_shared<TensorAttributes>());
-    batchnorm_attributes.set_inv_variance(std::make_shared<TensorAttributes>());
-    batchnorm_attributes.set_dx(std::make_shared<TensorAttributes>());
-    batchnorm_attributes.set_dscale(std::make_shared<TensorAttributes>());
-    batchnorm_attributes.set_dbias(std::make_shared<TensorAttributes>());
+    BatchnormBackwardAttributes batchnormAttributes;
+    batchnormAttributes.set_dy(std::make_shared<TensorAttributes>());
+    batchnormAttributes.set_x(std::make_shared<TensorAttributes>());
+    batchnormAttributes.set_scale(std::make_shared<TensorAttributes>());
+    batchnormAttributes.set_mean(std::make_shared<TensorAttributes>());
+    batchnormAttributes.set_inv_variance(std::make_shared<TensorAttributes>());
+    batchnormAttributes.set_dx(std::make_shared<TensorAttributes>());
+    batchnormAttributes.set_dscale(std::make_shared<TensorAttributes>());
+    batchnormAttributes.set_dbias(std::make_shared<TensorAttributes>());
 
-    auto x_tensor = batchnorm_attributes.get_x();
-    x_tensor->set_uid(1)
+    auto xTensor = batchnormAttributes.get_x();
+    xTensor->set_uid(1)
         .set_name("InputTensor")
         .set_data_type(DataType_t::FLOAT)
         .set_dim({1, 2, 3, 4})
         .set_stride({5, 6, 7, 8});
 
-    auto dx_tensor = batchnorm_attributes.get_dx();
-    dx_tensor->set_uid(2).set_name("DxTensor");
+    auto dxTensor = batchnormAttributes.get_dx();
+    dxTensor->set_uid(2).set_name("DxTensor");
 
-    auto dscale_tensor = batchnorm_attributes.get_dscale();
-    dscale_tensor->set_uid(3).set_name("DscaleTensor");
+    auto dscaleTensor = batchnormAttributes.get_dscale();
+    dscaleTensor->set_uid(3).set_name("DscaleTensor");
 
-    auto dbias_tensor = batchnorm_attributes.get_dbias();
-    dbias_tensor->set_uid(4).set_name("DbiasTensor");
+    auto dbiasTensor = batchnormAttributes.get_dbias();
+    dbiasTensor->set_uid(4).set_name("DbiasTensor");
 
-    GraphAttributes graph_attributes;
-    DBNNode node(std::move(batchnorm_attributes), graph_attributes);
+    GraphAttributes graphAttributes;
+    DBNNode node(std::move(batchnormAttributes), graphAttributes);
 
     auto error = node.infer_properties_node();
     EXPECT_EQ(error.code, error_code_t::OK);
 
-    EXPECT_EQ(dx_tensor->get_dim(), (std::vector<int64_t>{1, 2, 3, 4}));
-    EXPECT_EQ(dx_tensor->get_stride(), (std::vector<int64_t>{5, 6, 7, 8}));
+    EXPECT_EQ(dxTensor->get_dim(), (std::vector<int64_t>{1, 2, 3, 4}));
+    EXPECT_EQ(dxTensor->get_stride(), (std::vector<int64_t>{5, 6, 7, 8}));
 
-    EXPECT_EQ(dscale_tensor->get_dim(), (std::vector<int64_t>{1, 2, 1, 1}));
-    EXPECT_EQ(dscale_tensor->get_stride(), (std::vector<int64_t>{2, 1, 2, 2}));
+    EXPECT_EQ(dscaleTensor->get_dim(), (std::vector<int64_t>{1, 2, 1, 1}));
+    EXPECT_EQ(dscaleTensor->get_stride(), (std::vector<int64_t>{2, 1, 2, 2}));
 
-    EXPECT_EQ(dbias_tensor->get_dim(), (std::vector<int64_t>{1, 2, 1, 1}));
-    EXPECT_EQ(dbias_tensor->get_stride(), (std::vector<int64_t>{2, 1, 2, 2}));
+    EXPECT_EQ(dbiasTensor->get_dim(), (std::vector<int64_t>{1, 2, 1, 1}));
+    EXPECT_EQ(dbiasTensor->get_stride(), (std::vector<int64_t>{2, 1, 2, 2}));
 }
 
 TEST(DBNNodeTests, GatherhipdnnTensorIds)
 {
-    BatchnormBackwardAttributes batchnorm_attributes;
-    batchnorm_attributes.set_dy(std::make_shared<TensorAttributes>());
-    batchnorm_attributes.set_x(std::make_shared<TensorAttributes>());
-    batchnorm_attributes.set_scale(std::make_shared<TensorAttributes>());
-    batchnorm_attributes.set_mean(std::make_shared<TensorAttributes>());
-    batchnorm_attributes.set_inv_variance(std::make_shared<TensorAttributes>());
-    batchnorm_attributes.set_dx(std::make_shared<TensorAttributes>());
-    batchnorm_attributes.set_dscale(std::make_shared<TensorAttributes>());
-    batchnorm_attributes.set_dbias(std::make_shared<TensorAttributes>());
+    BatchnormBackwardAttributes batchnormAttributes;
+    batchnormAttributes.set_dy(std::make_shared<TensorAttributes>());
+    batchnormAttributes.set_x(std::make_shared<TensorAttributes>());
+    batchnormAttributes.set_scale(std::make_shared<TensorAttributes>());
+    batchnormAttributes.set_mean(std::make_shared<TensorAttributes>());
+    batchnormAttributes.set_inv_variance(std::make_shared<TensorAttributes>());
+    batchnormAttributes.set_dx(std::make_shared<TensorAttributes>());
+    batchnormAttributes.set_dscale(std::make_shared<TensorAttributes>());
+    batchnormAttributes.set_dbias(std::make_shared<TensorAttributes>());
 
-    auto peer_stat_1 = std::make_shared<TensorAttributes>();
-    peer_stat_1->set_uid(9).set_name("PeerStat1");
+    auto peerStat1 = std::make_shared<TensorAttributes>();
+    peerStat1->set_uid(9).set_name("PeerStat1");
 
-    auto peer_stat_2 = std::make_shared<TensorAttributes>();
-    peer_stat_2->set_uid(10).set_name("PeerStat2");
+    auto peerStat2 = std::make_shared<TensorAttributes>();
+    peerStat2->set_uid(10).set_name("PeerStat2");
 
-    batchnorm_attributes.set_peer_stats({peer_stat_1, peer_stat_2});
+    batchnormAttributes.set_peer_stats({peerStat1, peerStat2});
 
-    GraphAttributes graph_attributes;
-    DBNNode node(std::move(batchnorm_attributes), graph_attributes);
+    GraphAttributes graphAttributes;
+    DBNNode node(std::move(batchnormAttributes), graphAttributes);
 
-    std::unordered_set<int64_t> used_ids;
-    node.gather_hipdnn_tensor_ids(used_ids);
+    std::unordered_set<int64_t> usedIds;
+    node.gather_hipdnn_tensor_ids(usedIds);
 
-    EXPECT_TRUE(used_ids.contains(9));
-    EXPECT_TRUE(used_ids.contains(10));
+    EXPECT_TRUE(usedIds.contains(9));
+    EXPECT_TRUE(usedIds.contains(10));
 }
 
 TEST(DBNNodeTests, PopulatehipdnnTensorIds)
 {
-    BatchnormBackwardAttributes batchnorm_attributes;
-    batchnorm_attributes.set_dy(std::make_shared<TensorAttributes>());
-    batchnorm_attributes.set_x(std::make_shared<TensorAttributes>());
-    batchnorm_attributes.set_scale(std::make_shared<TensorAttributes>());
-    batchnorm_attributes.set_mean(std::make_shared<TensorAttributes>());
-    batchnorm_attributes.set_inv_variance(std::make_shared<TensorAttributes>());
-    batchnorm_attributes.set_dx(std::make_shared<TensorAttributes>());
-    batchnorm_attributes.set_dscale(std::make_shared<TensorAttributes>());
-    batchnorm_attributes.set_dbias(std::make_shared<TensorAttributes>());
+    BatchnormBackwardAttributes batchnormAttributes;
+    batchnormAttributes.set_dy(std::make_shared<TensorAttributes>());
+    batchnormAttributes.set_x(std::make_shared<TensorAttributes>());
+    batchnormAttributes.set_scale(std::make_shared<TensorAttributes>());
+    batchnormAttributes.set_mean(std::make_shared<TensorAttributes>());
+    batchnormAttributes.set_inv_variance(std::make_shared<TensorAttributes>());
+    batchnormAttributes.set_dx(std::make_shared<TensorAttributes>());
+    batchnormAttributes.set_dscale(std::make_shared<TensorAttributes>());
+    batchnormAttributes.set_dbias(std::make_shared<TensorAttributes>());
 
-    auto peer_stat_1 = std::make_shared<TensorAttributes>();
-    auto peer_stat_2 = std::make_shared<TensorAttributes>();
+    auto peerStat1 = std::make_shared<TensorAttributes>();
+    auto peerStat2 = std::make_shared<TensorAttributes>();
 
-    batchnorm_attributes.set_peer_stats({peer_stat_1, peer_stat_2});
+    batchnormAttributes.set_peer_stats({peerStat1, peerStat2});
 
-    GraphAttributes graph_attributes;
-    DBNNode node(std::move(batchnorm_attributes), graph_attributes);
+    GraphAttributes graphAttributes;
+    DBNNode node(std::move(batchnormAttributes), graphAttributes);
 
-    std::unordered_map<int64_t, std::shared_ptr<TensorAttributes>> tensor_lookup;
-    std::unordered_set<int64_t> used_ids;
-    int64_t current_tensor_id = 1;
+    std::unordered_map<int64_t, std::shared_ptr<TensorAttributes>> tensorLookup;
+    std::unordered_set<int64_t> usedIds;
+    int64_t currentTensorId = 1;
 
-    auto error = node.populate_hipdnn_tensor_ids(tensor_lookup, current_tensor_id, used_ids);
+    auto error = node.populate_hipdnn_tensor_ids(tensorLookup, currentTensorId, usedIds);
     EXPECT_EQ(error.code, error_code_t::OK);
 
     // Collect all tensor attributes from input map, output map, and peer_stats vector
@@ -185,105 +185,105 @@ TEST(DBNNodeTests, PopulatehipdnnTensorIds)
                     + node.attributes.peer_stats.size());
 
     // Add tensors from input map
-    for(const auto& input_pair : node.attributes.inputs)
+    for(const auto& inputPair : node.attributes.inputs)
     {
-        tensors.emplace_back(input_pair.second);
+        tensors.emplace_back(inputPair.second);
     }
 
     // Add tensors from output map
-    for(const auto& output_pair : node.attributes.outputs)
+    for(const auto& outputPair : node.attributes.outputs)
     {
-        tensors.emplace_back(output_pair.second);
+        tensors.emplace_back(outputPair.second);
     }
 
     // Add tensors from peer_stats vector
-    for(const auto& peer_stat : node.attributes.peer_stats)
+    for(const auto& peerStat : node.attributes.peer_stats)
     {
-        tensors.emplace_back(peer_stat);
+        tensors.emplace_back(peerStat);
     }
 
     // Check that all tensors have unique IDs
-    std::unordered_set<int64_t> tensor_ids;
+    std::unordered_set<int64_t> tensorIds;
     for(const auto& tensor : tensors)
     {
         ASSERT_TRUE(tensor->has_uid());
-        EXPECT_TRUE(tensor_ids.insert(tensor->get_uid()).second)
+        EXPECT_TRUE(tensorIds.insert(tensor->get_uid()).second)
             << "Duplicate tensor ID found: " << tensor->get_uid();
     }
 }
 
 TEST(DBNNodeTests, PackNode)
 {
-    BatchnormBackwardAttributes batchnorm_attributes;
-    batchnorm_attributes.name = "BatchnormBackward";
+    BatchnormBackwardAttributes batchnormAttributes;
+    batchnormAttributes.name = "BatchnormBackward";
 
     // Set up tensor attributes
-    auto dy_tensor = std::make_shared<TensorAttributes>();
-    dy_tensor->set_uid(1)
+    auto dyTensor = std::make_shared<TensorAttributes>();
+    dyTensor->set_uid(1)
         .set_name("DyTensor")
         .set_data_type(DataType_t::FLOAT)
         .set_dim({1, 2, 3, 4})
         .set_stride({4, 3, 2, 1});
-    batchnorm_attributes.set_dy(dy_tensor);
+    batchnormAttributes.set_dy(dyTensor);
 
-    auto x_tensor = std::make_shared<TensorAttributes>();
-    x_tensor->set_uid(2)
+    auto xTensor = std::make_shared<TensorAttributes>();
+    xTensor->set_uid(2)
         .set_name("XTensor")
         .set_data_type(DataType_t::FLOAT)
         .set_dim({1, 2, 3, 4})
         .set_stride({4, 3, 2, 1});
-    batchnorm_attributes.set_x(x_tensor);
+    batchnormAttributes.set_x(xTensor);
 
-    auto scale_tensor = std::make_shared<TensorAttributes>();
-    scale_tensor->set_uid(3)
+    auto scaleTensor = std::make_shared<TensorAttributes>();
+    scaleTensor->set_uid(3)
         .set_name("ScaleTensor")
         .set_data_type(DataType_t::FLOAT)
         .set_dim({1, 2, 1, 1})
         .set_stride({2, 1, 1, 1});
-    batchnorm_attributes.set_scale(scale_tensor);
+    batchnormAttributes.set_scale(scaleTensor);
 
-    auto mean_tensor = std::make_shared<TensorAttributes>();
-    mean_tensor->set_uid(4)
+    auto meanTensor = std::make_shared<TensorAttributes>();
+    meanTensor->set_uid(4)
         .set_name("MeanTensor")
         .set_data_type(DataType_t::FLOAT)
         .set_dim({1, 2, 1, 1})
         .set_stride({2, 1, 1, 1});
-    batchnorm_attributes.set_mean(mean_tensor);
+    batchnormAttributes.set_mean(meanTensor);
 
-    auto inv_variance_tensor = std::make_shared<TensorAttributes>();
-    inv_variance_tensor->set_uid(5)
+    auto invVarianceTensor = std::make_shared<TensorAttributes>();
+    invVarianceTensor->set_uid(5)
         .set_name("InvVarianceTensor")
         .set_data_type(DataType_t::FLOAT)
         .set_dim({1, 2, 1, 1})
         .set_stride({2, 1, 1, 1});
-    batchnorm_attributes.set_inv_variance(inv_variance_tensor);
+    batchnormAttributes.set_inv_variance(invVarianceTensor);
 
-    auto dx_tensor = std::make_shared<TensorAttributes>();
-    dx_tensor->set_uid(6)
+    auto dxTensor = std::make_shared<TensorAttributes>();
+    dxTensor->set_uid(6)
         .set_name("DxTensor")
         .set_data_type(DataType_t::FLOAT)
         .set_dim({1, 2, 3, 4})
         .set_stride({4, 3, 2, 1});
-    batchnorm_attributes.set_dx(dx_tensor);
+    batchnormAttributes.set_dx(dxTensor);
 
-    auto dscale_tensor = std::make_shared<TensorAttributes>();
-    dscale_tensor->set_uid(7)
+    auto dscaleTensor = std::make_shared<TensorAttributes>();
+    dscaleTensor->set_uid(7)
         .set_name("DscaleTensor")
         .set_data_type(DataType_t::FLOAT)
         .set_dim({1, 2, 1, 1})
         .set_stride({2, 1, 1, 1});
-    batchnorm_attributes.set_dscale(dscale_tensor);
+    batchnormAttributes.set_dscale(dscaleTensor);
 
-    auto dbias_tensor = std::make_shared<TensorAttributes>();
-    dbias_tensor->set_uid(8)
+    auto dbiasTensor = std::make_shared<TensorAttributes>();
+    dbiasTensor->set_uid(8)
         .set_name("DbiasTensor")
         .set_data_type(DataType_t::FLOAT)
         .set_dim({1, 2, 1, 1})
         .set_stride({2, 1, 1, 1});
-    batchnorm_attributes.set_dbias(dbias_tensor);
+    batchnormAttributes.set_dbias(dbiasTensor);
 
-    GraphAttributes graph_attributes;
-    DBNNode node(std::move(batchnorm_attributes), graph_attributes);
+    GraphAttributes graphAttributes;
+    DBNNode node(std::move(batchnormAttributes), graphAttributes);
 
     // Pack the node
     flatbuffers::FlatBufferBuilder builder;
@@ -291,104 +291,104 @@ TEST(DBNNodeTests, PackNode)
     EXPECT_NE(offset.o, 0);
 
     builder.Finish(offset);
-    auto buffer_pointer = builder.GetBufferPointer();
-    auto node_flatbuffer = flatbuffers::GetRoot<hipdnn_sdk::data_objects::Node>(buffer_pointer);
+    auto bufferPointer = builder.GetBufferPointer();
+    auto nodeFlatbuffer = flatbuffers::GetRoot<hipdnn_sdk::data_objects::Node>(bufferPointer);
 
-    EXPECT_STREQ(node_flatbuffer->name()->c_str(), "BatchnormBackward");
-    EXPECT_EQ(node_flatbuffer->attributes_type(),
+    EXPECT_STREQ(nodeFlatbuffer->name()->c_str(), "BatchnormBackward");
+    EXPECT_EQ(nodeFlatbuffer->attributes_type(),
               hipdnn_sdk::data_objects::NodeAttributes_BatchnormBackwardAttributes);
 
-    auto packed_attributes = node_flatbuffer->attributes_as_BatchnormBackwardAttributes();
-    ASSERT_NE(packed_attributes, nullptr);
+    auto packedAttributes = nodeFlatbuffer->attributes_as_BatchnormBackwardAttributes();
+    ASSERT_NE(packedAttributes, nullptr);
 
-    EXPECT_EQ(packed_attributes->dy_tensor_uid(), dy_tensor->get_uid());
-    EXPECT_EQ(packed_attributes->x_tensor_uid(), x_tensor->get_uid());
-    EXPECT_EQ(packed_attributes->scale_tensor_uid(), scale_tensor->get_uid());
-    EXPECT_EQ(packed_attributes->mean_tensor_uid(), mean_tensor->get_uid());
-    EXPECT_EQ(packed_attributes->inv_variance_tensor_uid(), inv_variance_tensor->get_uid());
-    EXPECT_EQ(packed_attributes->dx_tensor_uid(), dx_tensor->get_uid());
-    EXPECT_EQ(packed_attributes->dscale_tensor_uid(), dscale_tensor->get_uid());
-    EXPECT_EQ(packed_attributes->dbias_tensor_uid(), dbias_tensor->get_uid());
+    EXPECT_EQ(packedAttributes->dy_tensor_uid(), dyTensor->get_uid());
+    EXPECT_EQ(packedAttributes->x_tensor_uid(), xTensor->get_uid());
+    EXPECT_EQ(packedAttributes->scale_tensor_uid(), scaleTensor->get_uid());
+    EXPECT_EQ(packedAttributes->mean_tensor_uid(), meanTensor->get_uid());
+    EXPECT_EQ(packedAttributes->inv_variance_tensor_uid(), invVarianceTensor->get_uid());
+    EXPECT_EQ(packedAttributes->dx_tensor_uid(), dxTensor->get_uid());
+    EXPECT_EQ(packedAttributes->dscale_tensor_uid(), dscaleTensor->get_uid());
+    EXPECT_EQ(packedAttributes->dbias_tensor_uid(), dbiasTensor->get_uid());
 }
 
 TEST(DBNNodeTests, PackNodeWithoutMeanAndInvVariance)
 {
-    BatchnormBackwardAttributes batchnorm_attributes;
-    batchnorm_attributes.name = "BatchnormBackward";
+    BatchnormBackwardAttributes batchnormAttributes;
+    batchnormAttributes.name = "BatchnormBackward";
 
     // Set up tensor attributes
-    auto dy_tensor = std::make_shared<TensorAttributes>();
-    dy_tensor->set_uid(1)
+    auto dyTensor = std::make_shared<TensorAttributes>();
+    dyTensor->set_uid(1)
         .set_name("DyTensor")
         .set_data_type(DataType_t::FLOAT)
         .set_dim({1, 2, 3, 4})
         .set_stride({4, 3, 2, 1});
-    batchnorm_attributes.set_dy(dy_tensor);
+    batchnormAttributes.set_dy(dyTensor);
 
-    auto x_tensor = std::make_shared<TensorAttributes>();
-    x_tensor->set_uid(2)
+    auto xTensor = std::make_shared<TensorAttributes>();
+    xTensor->set_uid(2)
         .set_name("XTensor")
         .set_data_type(DataType_t::FLOAT)
         .set_dim({1, 2, 3, 4})
         .set_stride({4, 3, 2, 1});
-    batchnorm_attributes.set_x(x_tensor);
+    batchnormAttributes.set_x(xTensor);
 
-    auto scale_tensor = std::make_shared<TensorAttributes>();
-    scale_tensor->set_uid(3)
+    auto scaleTensor = std::make_shared<TensorAttributes>();
+    scaleTensor->set_uid(3)
         .set_name("ScaleTensor")
         .set_data_type(DataType_t::FLOAT)
         .set_dim({1, 2, 1, 1})
         .set_stride({2, 1, 1, 1});
-    batchnorm_attributes.set_scale(scale_tensor);
+    batchnormAttributes.set_scale(scaleTensor);
 
-    auto dx_tensor = std::make_shared<TensorAttributes>();
-    dx_tensor->set_uid(4)
+    auto dxTensor = std::make_shared<TensorAttributes>();
+    dxTensor->set_uid(4)
         .set_name("DxTensor")
         .set_data_type(DataType_t::FLOAT)
         .set_dim({1, 2, 3, 4})
         .set_stride({4, 3, 2, 1});
-    batchnorm_attributes.set_dx(dx_tensor);
+    batchnormAttributes.set_dx(dxTensor);
 
-    auto dscale_tensor = std::make_shared<TensorAttributes>();
-    dscale_tensor->set_uid(5)
+    auto dscaleTensor = std::make_shared<TensorAttributes>();
+    dscaleTensor->set_uid(5)
         .set_name("DscaleTensor")
         .set_data_type(DataType_t::FLOAT)
         .set_dim({1, 2, 1, 1})
         .set_stride({2, 1, 1, 1});
-    batchnorm_attributes.set_dscale(dscale_tensor);
+    batchnormAttributes.set_dscale(dscaleTensor);
 
-    auto dbias_tensor = std::make_shared<TensorAttributes>();
-    dbias_tensor->set_uid(6)
+    auto dbiasTensor = std::make_shared<TensorAttributes>();
+    dbiasTensor->set_uid(6)
         .set_name("DbiasTensor")
         .set_data_type(DataType_t::FLOAT)
         .set_dim({1, 2, 1, 1})
         .set_stride({2, 1, 1, 1});
-    batchnorm_attributes.set_dbias(dbias_tensor);
+    batchnormAttributes.set_dbias(dbiasTensor);
 
-    GraphAttributes graph_attributes;
-    DBNNode node(std::move(batchnorm_attributes), graph_attributes);
+    GraphAttributes graphAttributes;
+    DBNNode node(std::move(batchnormAttributes), graphAttributes);
 
     flatbuffers::FlatBufferBuilder builder;
     auto offset = node.pack_node(builder);
     EXPECT_NE(offset.o, 0);
 
     builder.Finish(offset);
-    auto buffer_pointer = builder.GetBufferPointer();
-    auto node_flatbuffer = flatbuffers::GetRoot<hipdnn_sdk::data_objects::Node>(buffer_pointer);
+    auto bufferPointer = builder.GetBufferPointer();
+    auto nodeFlatbuffer = flatbuffers::GetRoot<hipdnn_sdk::data_objects::Node>(bufferPointer);
 
-    EXPECT_STREQ(node_flatbuffer->name()->c_str(), "BatchnormBackward");
-    EXPECT_EQ(node_flatbuffer->attributes_type(),
+    EXPECT_STREQ(nodeFlatbuffer->name()->c_str(), "BatchnormBackward");
+    EXPECT_EQ(nodeFlatbuffer->attributes_type(),
               hipdnn_sdk::data_objects::NodeAttributes_BatchnormBackwardAttributes);
 
-    auto packed_attributes = node_flatbuffer->attributes_as_BatchnormBackwardAttributes();
-    ASSERT_NE(packed_attributes, nullptr);
+    auto packedAttributes = nodeFlatbuffer->attributes_as_BatchnormBackwardAttributes();
+    ASSERT_NE(packedAttributes, nullptr);
 
-    EXPECT_EQ(packed_attributes->dy_tensor_uid(), dy_tensor->get_uid());
-    EXPECT_EQ(packed_attributes->x_tensor_uid(), x_tensor->get_uid());
-    EXPECT_EQ(packed_attributes->scale_tensor_uid(), scale_tensor->get_uid());
-    EXPECT_EQ(packed_attributes->mean_tensor_uid(), flatbuffers::nullopt);
-    EXPECT_EQ(packed_attributes->inv_variance_tensor_uid(), flatbuffers::nullopt);
-    EXPECT_EQ(packed_attributes->dx_tensor_uid(), dx_tensor->get_uid());
-    EXPECT_EQ(packed_attributes->dscale_tensor_uid(), dscale_tensor->get_uid());
-    EXPECT_EQ(packed_attributes->dbias_tensor_uid(), dbias_tensor->get_uid());
+    EXPECT_EQ(packedAttributes->dy_tensor_uid(), dyTensor->get_uid());
+    EXPECT_EQ(packedAttributes->x_tensor_uid(), xTensor->get_uid());
+    EXPECT_EQ(packedAttributes->scale_tensor_uid(), scaleTensor->get_uid());
+    EXPECT_EQ(packedAttributes->mean_tensor_uid(), flatbuffers::nullopt);
+    EXPECT_EQ(packedAttributes->inv_variance_tensor_uid(), flatbuffers::nullopt);
+    EXPECT_EQ(packedAttributes->dx_tensor_uid(), dxTensor->get_uid());
+    EXPECT_EQ(packedAttributes->dscale_tensor_uid(), dscaleTensor->get_uid());
+    EXPECT_EQ(packedAttributes->dbias_tensor_uid(), dbiasTensor->get_uid());
 }

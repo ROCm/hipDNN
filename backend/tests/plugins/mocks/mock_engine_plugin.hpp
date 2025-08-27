@@ -16,7 +16,7 @@ namespace hipdnn_backend
 namespace plugin
 {
 
-class Mock_engine_plugin : public EnginePlugin
+class MockEnginePlugin : public EnginePlugin
 {
 public:
     // Mock all public methods from EnginePlugin

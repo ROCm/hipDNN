@@ -33,12 +33,12 @@ public:
     // This function unloads the shared library.
     void unload() noexcept;
 
-    void* get_symbol(std::string_view symbolName) const;
+    void* getSymbol(std::string_view symbolName) const;
 
     template <class T>
-    T get_symbol(std::string_view symbolName) const
+    T getSymbol(std::string_view symbolName) const
     {
-        void* symbol = get_symbol(symbolName);
+        void* symbol = getSymbol(symbolName);
         return reinterpret_cast<T>(symbol);
     }
 

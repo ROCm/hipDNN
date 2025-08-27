@@ -68,7 +68,7 @@ public:
         return *this;
     }
 
-    bool is_empty() const
+    bool isEmpty() const
     {
         return _empty;
     }

@@ -34,43 +34,43 @@ void EnginePlugin::resolveSymbols()
     }
 
     const auto funcNameGetAllEngineIds = "hipdnnEnginePluginGetAllEngineIds";
-    _funcGetAllEngineIds = _lib.get_symbol<decltype(_funcGetAllEngineIds)>(funcNameGetAllEngineIds);
+    _funcGetAllEngineIds = _lib.getSymbol<decltype(_funcGetAllEngineIds)>(funcNameGetAllEngineIds);
 
     const auto funcNameCreateHandle = "hipdnnEnginePluginCreate";
-    _funcCreateHandle = _lib.get_symbol<decltype(_funcCreateHandle)>(funcNameCreateHandle);
+    _funcCreateHandle = _lib.getSymbol<decltype(_funcCreateHandle)>(funcNameCreateHandle);
 
     const auto funcNameDestroyHandle = "hipdnnEnginePluginDestroy";
-    _funcDestroyHandle = _lib.get_symbol<decltype(_funcDestroyHandle)>(funcNameDestroyHandle);
+    _funcDestroyHandle = _lib.getSymbol<decltype(_funcDestroyHandle)>(funcNameDestroyHandle);
 
     const auto funcNameSetStream = "hipdnnEnginePluginSetStream";
-    _funcSetStream = _lib.get_symbol<decltype(_funcSetStream)>(funcNameSetStream);
+    _funcSetStream = _lib.getSymbol<decltype(_funcSetStream)>(funcNameSetStream);
 
     const auto funcNameGetApplicableEngineIds = "hipdnnEnginePluginGetApplicableEngineIds";
     _funcGetApplicableEngineIds
-        = _lib.get_symbol<decltype(_funcGetApplicableEngineIds)>(funcNameGetApplicableEngineIds);
+        = _lib.getSymbol<decltype(_funcGetApplicableEngineIds)>(funcNameGetApplicableEngineIds);
 
     const auto funcNameGetEngineDetails = "hipdnnEnginePluginGetEngineDetails";
     _funcGetEngineDetails
-        = _lib.get_symbol<decltype(_funcGetEngineDetails)>(funcNameGetEngineDetails);
+        = _lib.getSymbol<decltype(_funcGetEngineDetails)>(funcNameGetEngineDetails);
 
     const auto funcNameDestroyEngineDetails = "hipdnnEnginePluginDestroyEngineDetails";
     _funcDestroyEngineDetails
-        = _lib.get_symbol<decltype(_funcDestroyEngineDetails)>(funcNameDestroyEngineDetails);
+        = _lib.getSymbol<decltype(_funcDestroyEngineDetails)>(funcNameDestroyEngineDetails);
 
     const auto funcNameGetWorkspaceSize = "hipdnnEnginePluginGetWorkspaceSize";
     _funcGetWorkspaceSize
-        = _lib.get_symbol<decltype(_funcGetWorkspaceSize)>(funcNameGetWorkspaceSize);
+        = _lib.getSymbol<decltype(_funcGetWorkspaceSize)>(funcNameGetWorkspaceSize);
 
     const auto funcNameCreateExecutionContext = "hipdnnEnginePluginCreateExecutionContext";
     _funcCreateExecutionContext
-        = _lib.get_symbol<decltype(_funcCreateExecutionContext)>(funcNameCreateExecutionContext);
+        = _lib.getSymbol<decltype(_funcCreateExecutionContext)>(funcNameCreateExecutionContext);
 
     const auto funcNameDestroyExecutionContext = "hipdnnEnginePluginDestroyExecutionContext";
     _funcDestroyExecutionContext
-        = _lib.get_symbol<decltype(_funcDestroyExecutionContext)>(funcNameDestroyExecutionContext);
+        = _lib.getSymbol<decltype(_funcDestroyExecutionContext)>(funcNameDestroyExecutionContext);
 
     const auto funcNameExecuteOpGraph = "hipdnnEnginePluginExecuteOpGraph";
-    _funcExecuteOpGraph = _lib.get_symbol<decltype(_funcExecuteOpGraph)>(funcNameExecuteOpGraph);
+    _funcExecuteOpGraph = _lib.getSymbol<decltype(_funcExecuteOpGraph)>(funcNameExecuteOpGraph);
 
 #ifndef NDEBUG
     _initialized = true;
@@ -221,14 +221,14 @@ hipdnnEnginePluginExecutionContext_t
                                          const hipdnnPluginConstData_t* opGraph) const
 {
     assert(_initialized);
-    hipdnnEnginePluginExecutionContext_t exec_context;
+    hipdnnEnginePluginExecutionContext_t execContext;
     invokePluginFunction("create execution context",
                          _funcCreateExecutionContext,
                          handle,
                          engineConfig,
                          opGraph,
-                         &exec_context);
-    return exec_context;
+                         &execContext);
+    return execContext;
 }
 
 void EnginePlugin::destroyExecutionContext(

@@ -120,7 +120,7 @@ TEST_F(PluginLoadingTests, EmptyPluginPath)
 TEST_F(PluginLoadingTests, NoPluginsSupportGraph)
 {
     const std::array<const char*, 1> paths
-        = {hipdnn_tests::plugin_constants::test_no_applicable_engines_plugin_path().c_str()};
+        = {hipdnn_tests::plugin_constants::testNoApplicableEnginesPluginPath().c_str()};
     ASSERT_EQ(
         hipdnnSetEnginePluginPaths_ext(paths.size(), paths.data(), HIPDNN_PLUGIN_LOADING_ABSOLUTE),
         HIPDNN_STATUS_SUCCESS);
@@ -150,7 +150,7 @@ TEST_F(PluginLoadingTests, NoPluginsSupportGraph)
 TEST_F(PluginLoadingTests, IncorrectEngineID)
 {
     const std::array<const char*, 1> paths
-        = {hipdnn_tests::plugin_constants::test_no_applicable_engines_plugin_path().c_str()};
+        = {hipdnn_tests::plugin_constants::testNoApplicableEnginesPluginPath().c_str()};
     ASSERT_EQ(
         hipdnnSetEnginePluginPaths_ext(paths.size(), paths.data(), HIPDNN_PLUGIN_LOADING_ABSOLUTE),
         HIPDNN_STATUS_SUCCESS);
@@ -179,8 +179,8 @@ TEST_F(PluginLoadingTests, IncorrectEngineID)
 TEST_F(PluginLoadingTests, DuplicateEngineIds)
 {
     const std::array<const char*, 2> paths
-        = {hipdnn_tests::plugin_constants::test_duplicate_id_a_plugin_path().c_str(),
-           hipdnn_tests::plugin_constants::test_duplicate_id_b_plugin_path().c_str()};
+        = {hipdnn_tests::plugin_constants::testDuplicateIdAPluginPath().c_str(),
+           hipdnn_tests::plugin_constants::testDuplicateIdBPluginPath().c_str()};
     ASSERT_EQ(
         hipdnnSetEnginePluginPaths_ext(paths.size(), paths.data(), HIPDNN_PLUGIN_LOADING_ABSOLUTE),
         HIPDNN_STATUS_SUCCESS);
@@ -197,7 +197,7 @@ TEST_F(PluginLoadingTests, IncompleteAPI)
     using namespace hipdnn_sdk::utilities;
     using namespace hipdnn_tests::plugin_constants;
 
-    const std::array<const char*, 1> paths = {test_incomplete_api_plugin_path().c_str()};
+    const std::array<const char*, 1> paths = {testIncompleteApiPluginPath().c_str()};
     ASSERT_EQ(
         hipdnnSetEnginePluginPaths_ext(paths.size(), paths.data(), HIPDNN_PLUGIN_LOADING_ABSOLUTE),
         HIPDNN_STATUS_SUCCESS);
@@ -212,7 +212,7 @@ TEST_F(PluginLoadingTests, IncompleteAPI)
 TEST_F(PluginLoadingTests, MultiplePluginsOneApplicableEngine)
 {
     const std::array<const char*, 1> paths
-        = {hipdnn_tests::plugin_constants::test_no_applicable_engines_plugin_path().c_str()};
+        = {hipdnn_tests::plugin_constants::testNoApplicableEnginesPluginPath().c_str()};
     ASSERT_EQ(
         hipdnnSetEnginePluginPaths_ext(paths.size(), paths.data(), HIPDNN_PLUGIN_LOADING_ADDITIVE),
         HIPDNN_STATUS_SUCCESS);
@@ -242,7 +242,7 @@ TEST_F(PluginLoadingTests, MultiplePluginsOneApplicableEngine)
 TEST_F(PluginLoadingTests, MultiplePluginsMultipleApplicableEngines)
 {
     const std::array<const char*, 1> paths
-        = {hipdnn_tests::plugin_constants::test_good_plugin_path().c_str()};
+        = {hipdnn_tests::plugin_constants::testGoodPluginPath().c_str()};
     ASSERT_EQ(
         hipdnnSetEnginePluginPaths_ext(paths.size(), paths.data(), HIPDNN_PLUGIN_LOADING_ADDITIVE),
         HIPDNN_STATUS_SUCCESS);

@@ -5,296 +5,295 @@
 
 TEST(ConvolutionFwdAttributesTests, CreateConvolutionFwdAttributes)
 {
-    hipdnn_frontend::graph::ConvFpropAttributes conv_attributes;
+    hipdnn_frontend::graph::ConvFpropAttributes convAttributes;
 
     // Set tensors
-    conv_attributes.set_x(std::make_shared<hipdnn_frontend::graph::TensorAttributes>());
-    conv_attributes.set_w(std::make_shared<hipdnn_frontend::graph::TensorAttributes>());
-    conv_attributes.set_y(std::make_shared<hipdnn_frontend::graph::TensorAttributes>());
+    convAttributes.set_x(std::make_shared<hipdnn_frontend::graph::TensorAttributes>());
+    convAttributes.set_w(std::make_shared<hipdnn_frontend::graph::TensorAttributes>());
+    convAttributes.set_y(std::make_shared<hipdnn_frontend::graph::TensorAttributes>());
 
     // Set convolution parameters
-    conv_attributes.set_pre_padding({1, 1});
-    conv_attributes.set_post_padding({1, 1});
-    conv_attributes.set_stride({1, 1});
-    conv_attributes.set_dilation({1, 1});
-    conv_attributes.set_convolution_mode(hipdnn_frontend::ConvolutionMode_t::CROSS_CORRELATION);
+    convAttributes.set_pre_padding({1, 1});
+    convAttributes.set_post_padding({1, 1});
+    convAttributes.set_stride({1, 1});
+    convAttributes.set_dilation({1, 1});
+    convAttributes.set_convolution_mode(hipdnn_frontend::ConvolutionMode_t::CROSS_CORRELATION);
 
     // Configure input tensor
-    auto x_tensor = conv_attributes.get_x();
-    x_tensor->set_uid(1)
+    auto xTensor = convAttributes.get_x();
+    xTensor->set_uid(1)
         .set_name("InputTensor")
         .set_data_type(hipdnn_frontend::DataType_t::FLOAT)
         .set_dim({1, 3, 32, 32}) // NCHW format
         .set_stride({3072, 1024, 32, 1});
 
     // Configure weights tensor
-    auto w_tensor = conv_attributes.get_w();
-    w_tensor->set_uid(2)
+    auto wTensor = convAttributes.get_w();
+    wTensor->set_uid(2)
         .set_name("WeightsTensor")
         .set_data_type(hipdnn_frontend::DataType_t::FLOAT)
         .set_dim({64, 3, 3, 3}) // KCHW format
         .set_stride({27, 9, 3, 1});
 
     // Configure output tensor
-    auto y_tensor = conv_attributes.get_y();
-    y_tensor->set_uid(3)
+    auto yTensor = convAttributes.get_y();
+    yTensor->set_uid(3)
         .set_name("OutputTensor")
         .set_data_type(hipdnn_frontend::DataType_t::FLOAT)
         .set_dim({1, 64, 32, 32}) // NCHW format
         .set_stride({65536, 1024, 32, 1});
 
     // Verify tensor attributes
-    EXPECT_EQ(x_tensor->get_uid(), 1);
-    EXPECT_EQ(x_tensor->get_name(), "InputTensor");
-    EXPECT_EQ(x_tensor->get_data_type(), hipdnn_frontend::DataType_t::FLOAT);
-    EXPECT_EQ(x_tensor->get_dim(), (std::vector<int64_t>{1, 3, 32, 32}));
-    EXPECT_EQ(x_tensor->get_stride(), (std::vector<int64_t>{3072, 1024, 32, 1}));
+    EXPECT_EQ(xTensor->get_uid(), 1);
+    EXPECT_EQ(xTensor->get_name(), "InputTensor");
+    EXPECT_EQ(xTensor->get_data_type(), hipdnn_frontend::DataType_t::FLOAT);
+    EXPECT_EQ(xTensor->get_dim(), (std::vector<int64_t>{1, 3, 32, 32}));
+    EXPECT_EQ(xTensor->get_stride(), (std::vector<int64_t>{3072, 1024, 32, 1}));
 
-    EXPECT_EQ(w_tensor->get_uid(), 2);
-    EXPECT_EQ(w_tensor->get_name(), "WeightsTensor");
-    EXPECT_EQ(w_tensor->get_data_type(), hipdnn_frontend::DataType_t::FLOAT);
-    EXPECT_EQ(w_tensor->get_dim(), (std::vector<int64_t>{64, 3, 3, 3}));
-    EXPECT_EQ(w_tensor->get_stride(), (std::vector<int64_t>{27, 9, 3, 1}));
+    EXPECT_EQ(wTensor->get_uid(), 2);
+    EXPECT_EQ(wTensor->get_name(), "WeightsTensor");
+    EXPECT_EQ(wTensor->get_data_type(), hipdnn_frontend::DataType_t::FLOAT);
+    EXPECT_EQ(wTensor->get_dim(), (std::vector<int64_t>{64, 3, 3, 3}));
+    EXPECT_EQ(wTensor->get_stride(), (std::vector<int64_t>{27, 9, 3, 1}));
 
-    EXPECT_EQ(y_tensor->get_uid(), 3);
-    EXPECT_EQ(y_tensor->get_name(), "OutputTensor");
-    EXPECT_EQ(y_tensor->get_data_type(), hipdnn_frontend::DataType_t::FLOAT);
-    EXPECT_EQ(y_tensor->get_dim(), (std::vector<int64_t>{1, 64, 32, 32}));
-    EXPECT_EQ(y_tensor->get_stride(), (std::vector<int64_t>{65536, 1024, 32, 1}));
+    EXPECT_EQ(yTensor->get_uid(), 3);
+    EXPECT_EQ(yTensor->get_name(), "OutputTensor");
+    EXPECT_EQ(yTensor->get_data_type(), hipdnn_frontend::DataType_t::FLOAT);
+    EXPECT_EQ(yTensor->get_dim(), (std::vector<int64_t>{1, 64, 32, 32}));
+    EXPECT_EQ(yTensor->get_stride(), (std::vector<int64_t>{65536, 1024, 32, 1}));
 
     // Verify convolution parameters
-    EXPECT_EQ(conv_attributes.get_pre_padding(), (std::vector<int64_t>{1, 1}));
-    EXPECT_EQ(conv_attributes.get_post_padding(), (std::vector<int64_t>{1, 1}));
-    EXPECT_EQ(conv_attributes.get_stride(), (std::vector<int64_t>{1, 1}));
-    EXPECT_EQ(conv_attributes.get_dilation(), (std::vector<int64_t>{1, 1}));
-    EXPECT_EQ(conv_attributes.get_convolution_mode(),
+    EXPECT_EQ(convAttributes.get_pre_padding(), (std::vector<int64_t>{1, 1}));
+    EXPECT_EQ(convAttributes.get_post_padding(), (std::vector<int64_t>{1, 1}));
+    EXPECT_EQ(convAttributes.get_stride(), (std::vector<int64_t>{1, 1}));
+    EXPECT_EQ(convAttributes.get_dilation(), (std::vector<int64_t>{1, 1}));
+    EXPECT_EQ(convAttributes.get_convolution_mode(),
               hipdnn_frontend::ConvolutionMode_t::CROSS_CORRELATION);
 }
 
 TEST(ConvolutionFwdAttributesTests, PackAttributes)
 {
-    hipdnn_frontend::graph::ConvFpropAttributes conv_attributes;
+    hipdnn_frontend::graph::ConvFpropAttributes convAttributes;
 
     // Set tensors
-    auto x_tensor = std::make_shared<hipdnn_frontend::graph::TensorAttributes>();
-    x_tensor->set_uid(1);
-    conv_attributes.set_x(x_tensor);
+    auto xTensor = std::make_shared<hipdnn_frontend::graph::TensorAttributes>();
+    xTensor->set_uid(1);
+    convAttributes.set_x(xTensor);
 
-    auto w_tensor = std::make_shared<hipdnn_frontend::graph::TensorAttributes>();
-    w_tensor->set_uid(2);
-    conv_attributes.set_w(w_tensor);
+    auto wTensor = std::make_shared<hipdnn_frontend::graph::TensorAttributes>();
+    wTensor->set_uid(2);
+    convAttributes.set_w(wTensor);
 
-    auto y_tensor = std::make_shared<hipdnn_frontend::graph::TensorAttributes>();
-    y_tensor->set_uid(3);
-    conv_attributes.set_y(y_tensor);
+    auto yTensor = std::make_shared<hipdnn_frontend::graph::TensorAttributes>();
+    yTensor->set_uid(3);
+    convAttributes.set_y(yTensor);
 
     // Set convolution parameters
-    conv_attributes.set_pre_padding({2, 2});
-    conv_attributes.set_post_padding({2, 2});
-    conv_attributes.set_stride({2, 2});
-    conv_attributes.set_dilation({1, 1});
-    conv_attributes.set_convolution_mode(hipdnn_frontend::ConvolutionMode_t::CROSS_CORRELATION);
+    convAttributes.set_pre_padding({2, 2});
+    convAttributes.set_post_padding({2, 2});
+    convAttributes.set_stride({2, 2});
+    convAttributes.set_dilation({1, 1});
+    convAttributes.set_convolution_mode(hipdnn_frontend::ConvolutionMode_t::CROSS_CORRELATION);
 
     // Pack attributes
     flatbuffers::FlatBufferBuilder builder;
-    auto packed_attributes = conv_attributes.pack_attributes(builder);
-    builder.Finish(packed_attributes);
+    auto packedAttributes = convAttributes.pack_attributes(builder);
+    builder.Finish(packedAttributes);
 
     auto buffer = builder.GetBufferPointer();
-    auto conv_attributes_fb
+    auto convAttributesFb
         = flatbuffers::GetRoot<hipdnn_sdk::data_objects::ConvolutionFwdAttributes>(buffer);
 
     // Verify packed tensor UIDs
-    EXPECT_EQ(conv_attributes_fb->x_tensor_uid(), 1);
-    EXPECT_EQ(conv_attributes_fb->w_tensor_uid(), 2);
-    EXPECT_EQ(conv_attributes_fb->y_tensor_uid(), 3);
+    EXPECT_EQ(convAttributesFb->x_tensor_uid(), 1);
+    EXPECT_EQ(convAttributesFb->w_tensor_uid(), 2);
+    EXPECT_EQ(convAttributesFb->y_tensor_uid(), 3);
 
     // Verify packed convolution parameters
-    ASSERT_EQ(conv_attributes_fb->pre_padding()->size(), 2);
-    EXPECT_EQ(conv_attributes_fb->pre_padding()->Get(0), 2);
-    EXPECT_EQ(conv_attributes_fb->pre_padding()->Get(1), 2);
+    ASSERT_EQ(convAttributesFb->pre_padding()->size(), 2);
+    EXPECT_EQ(convAttributesFb->pre_padding()->Get(0), 2);
+    EXPECT_EQ(convAttributesFb->pre_padding()->Get(1), 2);
 
-    ASSERT_EQ(conv_attributes_fb->post_padding()->size(), 2);
-    EXPECT_EQ(conv_attributes_fb->post_padding()->Get(0), 2);
-    EXPECT_EQ(conv_attributes_fb->post_padding()->Get(1), 2);
+    ASSERT_EQ(convAttributesFb->post_padding()->size(), 2);
+    EXPECT_EQ(convAttributesFb->post_padding()->Get(0), 2);
+    EXPECT_EQ(convAttributesFb->post_padding()->Get(1), 2);
 
-    ASSERT_EQ(conv_attributes_fb->stride()->size(), 2);
-    EXPECT_EQ(conv_attributes_fb->stride()->Get(0), 2);
-    EXPECT_EQ(conv_attributes_fb->stride()->Get(1), 2);
+    ASSERT_EQ(convAttributesFb->stride()->size(), 2);
+    EXPECT_EQ(convAttributesFb->stride()->Get(0), 2);
+    EXPECT_EQ(convAttributesFb->stride()->Get(1), 2);
 
-    ASSERT_EQ(conv_attributes_fb->dilation()->size(), 2);
-    EXPECT_EQ(conv_attributes_fb->dilation()->Get(0), 1);
-    EXPECT_EQ(conv_attributes_fb->dilation()->Get(1), 1);
+    ASSERT_EQ(convAttributesFb->dilation()->size(), 2);
+    EXPECT_EQ(convAttributesFb->dilation()->Get(0), 1);
+    EXPECT_EQ(convAttributesFb->dilation()->Get(1), 1);
 
-    EXPECT_EQ(conv_attributes_fb->conv_mode(),
-              hipdnn_sdk::data_objects::ConvMode_CROSS_CORRELATION);
+    EXPECT_EQ(convAttributesFb->conv_mode(), hipdnn_sdk::data_objects::ConvMode_CROSS_CORRELATION);
 }
 
 TEST(ConvolutionFwdAttributesTests, DefaultValues)
 {
-    hipdnn_frontend::graph::ConvFpropAttributes conv_attributes;
+    hipdnn_frontend::graph::ConvFpropAttributes convAttributes;
 
     // Check default convolution mode
-    EXPECT_EQ(conv_attributes.get_convolution_mode(),
+    EXPECT_EQ(convAttributes.get_convolution_mode(),
               hipdnn_frontend::ConvolutionMode_t::CROSS_CORRELATION);
 
     // Check that parameters are empty by default
-    EXPECT_TRUE(conv_attributes.get_pre_padding().empty());
-    EXPECT_TRUE(conv_attributes.get_post_padding().empty());
-    EXPECT_TRUE(conv_attributes.get_stride().empty());
-    EXPECT_TRUE(conv_attributes.get_dilation().empty());
+    EXPECT_TRUE(convAttributes.get_pre_padding().empty());
+    EXPECT_TRUE(convAttributes.get_post_padding().empty());
+    EXPECT_TRUE(convAttributes.get_stride().empty());
+    EXPECT_TRUE(convAttributes.get_dilation().empty());
 
     // Check that tensors are null by default
-    EXPECT_EQ(conv_attributes.get_x(), nullptr);
-    EXPECT_EQ(conv_attributes.get_w(), nullptr);
-    EXPECT_EQ(conv_attributes.get_y(), nullptr);
+    EXPECT_EQ(convAttributes.get_x(), nullptr);
+    EXPECT_EQ(convAttributes.get_w(), nullptr);
+    EXPECT_EQ(convAttributes.get_y(), nullptr);
 }
 
 TEST(ConvolutionFwdAttributesTests, SetPrePaddingWithMove)
 {
-    hipdnn_frontend::graph::ConvFpropAttributes conv_attributes;
+    hipdnn_frontend::graph::ConvFpropAttributes convAttributes;
 
-    std::vector<int64_t> pre_padding_move = {3, 3};
-    conv_attributes.set_pre_padding(std::move(pre_padding_move));
+    std::vector<int64_t> prePaddingMove = {3, 3};
+    convAttributes.set_pre_padding(std::move(prePaddingMove));
 
-    EXPECT_EQ(conv_attributes.get_pre_padding(), (std::vector<int64_t>{3, 3}));
+    EXPECT_EQ(convAttributes.get_pre_padding(), (std::vector<int64_t>{3, 3}));
 }
 
 TEST(ConvolutionFwdAttributesTests, SetPostPaddingWithMove)
 {
-    hipdnn_frontend::graph::ConvFpropAttributes conv_attributes;
+    hipdnn_frontend::graph::ConvFpropAttributes convAttributes;
 
-    std::vector<int64_t> post_padding_move = {4, 4};
-    conv_attributes.set_post_padding(std::move(post_padding_move));
+    std::vector<int64_t> postPaddingMove = {4, 4};
+    convAttributes.set_post_padding(std::move(postPaddingMove));
 
-    EXPECT_EQ(conv_attributes.get_post_padding(), (std::vector<int64_t>{4, 4}));
+    EXPECT_EQ(convAttributes.get_post_padding(), (std::vector<int64_t>{4, 4}));
 }
 
 TEST(ConvolutionFwdAttributesTests, SetStrideWithMove)
 {
-    hipdnn_frontend::graph::ConvFpropAttributes conv_attributes;
+    hipdnn_frontend::graph::ConvFpropAttributes convAttributes;
 
-    std::vector<int64_t> stride_move = {2, 2};
-    conv_attributes.set_stride(std::move(stride_move));
+    std::vector<int64_t> strideMove = {2, 2};
+    convAttributes.set_stride(std::move(strideMove));
 
-    EXPECT_EQ(conv_attributes.get_stride(), (std::vector<int64_t>{2, 2}));
+    EXPECT_EQ(convAttributes.get_stride(), (std::vector<int64_t>{2, 2}));
 }
 
 TEST(ConvolutionFwdAttributesTests, SetDilationWithMove)
 {
-    hipdnn_frontend::graph::ConvFpropAttributes conv_attributes;
+    hipdnn_frontend::graph::ConvFpropAttributes convAttributes;
 
-    std::vector<int64_t> dilation_move = {2, 2};
-    conv_attributes.set_dilation(std::move(dilation_move));
+    std::vector<int64_t> dilationMove = {2, 2};
+    convAttributes.set_dilation(std::move(dilationMove));
 
-    EXPECT_EQ(conv_attributes.get_dilation(), (std::vector<int64_t>{2, 2}));
+    EXPECT_EQ(convAttributes.get_dilation(), (std::vector<int64_t>{2, 2}));
 }
 
 TEST(ConvolutionFwdAttributesTests, SetPaddingBothPreAndPost)
 {
-    hipdnn_frontend::graph::ConvFpropAttributes conv_attributes;
+    hipdnn_frontend::graph::ConvFpropAttributes convAttributes;
 
     std::vector<int64_t> padding = {5, 5};
-    conv_attributes.set_padding(padding);
+    convAttributes.set_padding(padding);
 
     // set_padding should set both pre and post padding to the same value
-    EXPECT_EQ(conv_attributes.get_pre_padding(), (std::vector<int64_t>{5, 5}));
-    EXPECT_EQ(conv_attributes.get_post_padding(), (std::vector<int64_t>{5, 5}));
+    EXPECT_EQ(convAttributes.get_pre_padding(), (std::vector<int64_t>{5, 5}));
+    EXPECT_EQ(convAttributes.get_post_padding(), (std::vector<int64_t>{5, 5}));
 }
 
 TEST(ConvolutionFwdAttributesTests, SetXMove)
 {
-    hipdnn_frontend::graph::ConvFpropAttributes conv_attributes;
+    hipdnn_frontend::graph::ConvFpropAttributes convAttributes;
 
-    auto x_tensor = std::make_shared<hipdnn_frontend::graph::TensorAttributes>();
-    x_tensor->set_uid(10)
+    auto xTensor = std::make_shared<hipdnn_frontend::graph::TensorAttributes>();
+    xTensor->set_uid(10)
         .set_name("MovedInputTensor")
         .set_data_type(hipdnn_frontend::DataType_t::FLOAT)
         .set_dim({1, 3, 224, 224})
         .set_stride({150528, 50176, 224, 1});
 
     // Store the raw pointer before moving
-    auto raw_ptr = x_tensor.get();
+    auto rawPtr = xTensor.get();
 
-    conv_attributes.set_x(std::move(x_tensor));
+    convAttributes.set_x(std::move(xTensor));
 
-    // After move, x_tensor should be nullptr
-    EXPECT_EQ(x_tensor, nullptr);
+    // After move, xTensor should be nullptr
+    EXPECT_EQ(xTensor, nullptr);
 
     // The moved tensor should be accessible through get_x()
-    auto retrieved_tensor = conv_attributes.get_x();
-    EXPECT_EQ(retrieved_tensor.get(), raw_ptr);
+    auto retrievedTensor = convAttributes.get_x();
+    EXPECT_EQ(retrievedTensor.get(), rawPtr);
 }
 
 TEST(ConvolutionFwdAttributesTests, SetWMove)
 {
-    hipdnn_frontend::graph::ConvFpropAttributes conv_attributes;
+    hipdnn_frontend::graph::ConvFpropAttributes convAttributes;
 
-    auto w_tensor = std::make_shared<hipdnn_frontend::graph::TensorAttributes>();
-    w_tensor->set_uid(20)
+    auto wTensor = std::make_shared<hipdnn_frontend::graph::TensorAttributes>();
+    wTensor->set_uid(20)
         .set_name("MovedWeightTensor")
         .set_data_type(hipdnn_frontend::DataType_t::HALF)
         .set_dim({128, 64, 5, 5})
         .set_stride({1600, 25, 5, 1});
 
     // Store the raw pointer before moving
-    auto raw_ptr = w_tensor.get();
+    auto rawPtr = wTensor.get();
 
-    conv_attributes.set_w(std::move(w_tensor));
+    convAttributes.set_w(std::move(wTensor));
 
-    // After move, w_tensor should be nullptr
-    EXPECT_EQ(w_tensor, nullptr);
+    // After move, wTensor should be nullptr
+    EXPECT_EQ(wTensor, nullptr);
 
     // The moved tensor should be accessible through get_w()
-    auto retrieved_tensor = conv_attributes.get_w();
-    EXPECT_EQ(retrieved_tensor.get(), raw_ptr);
+    auto retrievedTensor = convAttributes.get_w();
+    EXPECT_EQ(retrievedTensor.get(), rawPtr);
 }
 
 TEST(ConvolutionFwdAttributesTests, SetYWithMove)
 {
-    hipdnn_frontend::graph::ConvFpropAttributes conv_attributes;
+    hipdnn_frontend::graph::ConvFpropAttributes convAttributes;
 
-    auto y_tensor = std::make_shared<hipdnn_frontend::graph::TensorAttributes>();
-    y_tensor->set_uid(30)
+    auto yTensor = std::make_shared<hipdnn_frontend::graph::TensorAttributes>();
+    yTensor->set_uid(30)
         .set_name("MovedOutputTensor")
         .set_data_type(hipdnn_frontend::DataType_t::BFLOAT16)
         .set_dim({1, 128, 112, 112})
         .set_stride({1605632, 12544, 112, 1});
 
     // Store the raw pointer before moving
-    auto raw_ptr = y_tensor.get();
+    auto rawPtr = yTensor.get();
 
-    conv_attributes.set_y(std::move(y_tensor));
+    convAttributes.set_y(std::move(yTensor));
 
-    // After move, y_tensor should be nullptr
-    EXPECT_EQ(y_tensor, nullptr);
+    // After move, yTensor should be nullptr
+    EXPECT_EQ(yTensor, nullptr);
 
     // The moved tensor should be accessible through get_y()
-    auto retrieved_tensor = conv_attributes.get_y();
-    EXPECT_EQ(retrieved_tensor.get(), raw_ptr);
+    auto retrievedTensor = convAttributes.get_y();
+    EXPECT_EQ(retrievedTensor.get(), rawPtr);
 }
 
 TEST(ConvolutionFwdAttributesTests, SetTensorsConstRef)
 {
-    hipdnn_frontend::graph::ConvFpropAttributes conv_attributes;
+    hipdnn_frontend::graph::ConvFpropAttributes convAttributes;
 
     // Create tensors
-    auto x_tensor = std::make_shared<hipdnn_frontend::graph::TensorAttributes>();
-    x_tensor->set_uid(40).set_name("InputConstRef");
+    auto xTensor = std::make_shared<hipdnn_frontend::graph::TensorAttributes>();
+    xTensor->set_uid(40).set_name("InputConstRef");
 
-    auto w_tensor = std::make_shared<hipdnn_frontend::graph::TensorAttributes>();
-    w_tensor->set_uid(50).set_name("WeightConstRef");
+    auto wTensor = std::make_shared<hipdnn_frontend::graph::TensorAttributes>();
+    wTensor->set_uid(50).set_name("WeightConstRef");
 
-    auto y_tensor = std::make_shared<hipdnn_frontend::graph::TensorAttributes>();
-    y_tensor->set_uid(60).set_name("OutputConstRef");
+    auto yTensor = std::make_shared<hipdnn_frontend::graph::TensorAttributes>();
+    yTensor->set_uid(60).set_name("OutputConstRef");
 
     // Set using const reference (copy)
-    conv_attributes.set_x(x_tensor);
-    conv_attributes.set_w(w_tensor);
-    conv_attributes.set_y(y_tensor);
+    convAttributes.set_x(xTensor);
+    convAttributes.set_w(wTensor);
+    convAttributes.set_y(yTensor);
 
     // Original tensors should still be valid
-    EXPECT_NE(x_tensor, nullptr);
-    EXPECT_NE(w_tensor, nullptr);
-    EXPECT_NE(y_tensor, nullptr);
+    EXPECT_NE(xTensor, nullptr);
+    EXPECT_NE(wTensor, nullptr);
+    EXPECT_NE(yTensor, nullptr);
 }

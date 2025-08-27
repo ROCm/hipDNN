@@ -14,63 +14,63 @@ TEST(ErrorTests, StaticSetLastError)
     EXPECT_EQ(status, HIPDNN_STATUS_SUCCESS);
 
     // Test setting a valid error
-    std::string error_message = "An error occurred";
-    status = LastErrorManager::setLastError(HIPDNN_STATUS_NOT_SUPPORTED, error_message.c_str());
+    std::string errorMessage = "An error occurred";
+    status = LastErrorManager::setLastError(HIPDNN_STATUS_NOT_SUPPORTED, errorMessage.c_str());
     EXPECT_EQ(status, HIPDNN_STATUS_NOT_SUPPORTED);
-    EXPECT_STREQ(LastErrorManager::getLastError(), error_message.c_str());
+    EXPECT_STREQ(LastErrorManager::getLastError(), errorMessage.c_str());
 }
 
 TEST(ErrorTests, ErrorCStringMessagePerThread)
 {
-    std::string main_error = "Main thread error";
-    std::string worker_error = "Worker thread error";
-    LastErrorManager::setLastError(HIPDNN_STATUS_BAD_PARAM, main_error.c_str());
+    std::string mainError = "Main thread error";
+    std::string workerError = "Worker thread error";
+    LastErrorManager::setLastError(HIPDNN_STATUS_BAD_PARAM, mainError.c_str());
 
-    std::string thread_error;
-    std::thread t([&thread_error, worker_error]() {
-        LastErrorManager::setLastError(HIPDNN_STATUS_NOT_SUPPORTED, worker_error.c_str());
-        thread_error = LastErrorManager::getLastError();
+    std::string threadError;
+    std::thread t([&threadError, workerError]() {
+        LastErrorManager::setLastError(HIPDNN_STATUS_NOT_SUPPORTED, workerError.c_str());
+        threadError = LastErrorManager::getLastError();
     });
     t.join();
 
-    EXPECT_EQ(LastErrorManager::getLastError(), main_error);
-    EXPECT_EQ(thread_error, worker_error);
+    EXPECT_EQ(LastErrorManager::getLastError(), mainError);
+    EXPECT_EQ(threadError, workerError);
 }
 
 TEST(ErrorTests, ErrorSTDStringMessagePerThread)
 {
-    std::string main_error = "Main thread error";
-    std::string worker_error = "Worker thread error";
-    LastErrorManager::setLastError(HIPDNN_STATUS_BAD_PARAM, main_error);
+    std::string mainError = "Main thread error";
+    std::string workerError = "Worker thread error";
+    LastErrorManager::setLastError(HIPDNN_STATUS_BAD_PARAM, mainError);
 
-    std::string thread_error;
-    std::thread t([&thread_error, worker_error]() {
-        LastErrorManager::setLastError(HIPDNN_STATUS_NOT_SUPPORTED, worker_error);
-        thread_error = LastErrorManager::getLastError();
+    std::string threadError;
+    std::thread t([&threadError, workerError]() {
+        LastErrorManager::setLastError(HIPDNN_STATUS_NOT_SUPPORTED, workerError);
+        threadError = LastErrorManager::getLastError();
     });
     t.join();
 
-    EXPECT_EQ(LastErrorManager::getLastError(), main_error);
-    EXPECT_EQ(thread_error, worker_error);
+    EXPECT_EQ(LastErrorManager::getLastError(), mainError);
+    EXPECT_EQ(threadError, workerError);
 }
 
 TEST(ErrorTests, SetSuccessSTDStringDoesNotSetErrorMessage)
 {
-    std::string error_message = "This message should not be set";
-    hipdnnStatus_t status = LastErrorManager::setLastError(HIPDNN_STATUS_SUCCESS, error_message);
+    std::string errorMessage = "This message should not be set";
+    hipdnnStatus_t status = LastErrorManager::setLastError(HIPDNN_STATUS_SUCCESS, errorMessage);
     EXPECT_EQ(status, HIPDNN_STATUS_SUCCESS);
 
-    EXPECT_NE(LastErrorManager::getLastError(), error_message);
+    EXPECT_NE(LastErrorManager::getLastError(), errorMessage);
 }
 
 TEST(ErrorTests, SetSuccessCStringDoesNotSetErrorMessage)
 {
-    std::string error_message = "This message should not be set";
+    std::string errorMessage = "This message should not be set";
     hipdnnStatus_t status
-        = LastErrorManager::setLastError(HIPDNN_STATUS_SUCCESS, error_message.c_str());
+        = LastErrorManager::setLastError(HIPDNN_STATUS_SUCCESS, errorMessage.c_str());
     EXPECT_EQ(status, HIPDNN_STATUS_SUCCESS);
 
-    EXPECT_NE(LastErrorManager::getLastError(), error_message);
+    EXPECT_NE(LastErrorManager::getLastError(), errorMessage);
 }
 
 TEST(ErrorTests, GetBackendDescriptorTypeName)

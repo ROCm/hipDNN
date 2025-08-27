@@ -3,43 +3,43 @@
 
 #include "test_plugin_common.hpp"
 #include "test_plugin_engine_id_map.hpp"
-// NOLINTNEXTLINE(modernize-avoid-c-arrays)
+// NOLINTNEXTLINE
 thread_local char
-    hipdnn_plugin::PluginLastErrorManager::_lastError[HIPDNN_PLUGIN_ERROR_STRING_MAX_LENGTH]
+    hipdnn_plugin::PluginLastErrorManager::s_lastError[HIPDNN_PLUGIN_ERROR_STRING_MAX_LENGTH]
     = "";
 
-class No_applicable_engines_plugin : public Test_plugin_base
+class NoApplicableEnginesPlugin : public TestPluginBase
 {
 public:
-    const char* get_plugin_name() const override
+    const char* getPluginName() const override
     {
-        return "test_no_applicable_engines_plugin";
+        return "test_NoApplicableEnginesPlugin";
     }
-    const char* get_plugin_version() const override
+    const char* getPluginVersion() const override
     {
         return "1.0.0";
     }
-    int64_t get_engine_id() const override
+    int64_t getEngineId() const override
     {
-        return hipdnn_tests::plugin_constants::engine_id<No_applicable_engines_plugin>();
+        return hipdnn_tests::plugin_constants::engineId<NoApplicableEnginesPlugin>();
     }
-    uint32_t get_num_engines() const override
+    uint32_t getNumEngines() const override
     {
         return 0;
     }
-    uint32_t get_num_applicable_engines() const override
+    uint32_t getNumApplicableEngines() const override
     {
         return 0;
     }
 
-    // Since no engines are applicable, supports_engine_operations returns false
+    // Since no engines are applicable, SupportsEngineOperations returns false
     // This will cause all engine operations to throw appropriate errors
 };
 
 // Initialize plugin instance on load
-__attribute__((constructor)) static void initialize_plugin()
+__attribute__((constructor)) static void initializePlugin()
 {
-    Test_plugin_base::set_instance(std::make_unique<No_applicable_engines_plugin>());
+    TestPluginBase::setInstance(std::make_unique<NoApplicableEnginesPlugin>());
 }
 
 // Register all API functions
