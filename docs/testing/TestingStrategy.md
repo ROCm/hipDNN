@@ -2,6 +2,8 @@
 
 This document outlines the comprehensive testing strategy for hipDNN, covering white box testing (unit tests), black box testing (API tests), integration testing, and performance/benchmarking.
 
+Please refer to the coding standards in [Coding Style and Naming Guidelines](../CodingStyleAndNamingGuidelines.md) to see test naming conventions we follow.
+
 ---
 
 ## 1. White Box Testing (Unit Tests) ⬜
