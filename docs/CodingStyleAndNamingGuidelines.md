@@ -36,8 +36,8 @@ This document defines the canonical project-wide coding and test naming conventi
 | Interface | I + PascalCase | ITensorView |
 | Function | camelCase | buildGraph() |
 | Variable (local / parameter) | camelCase | workspaceSize |
-| Member variable | _camelCase | _cachedPlan |
-| Static class variable | s_camelCase | s_engineCount |
+| Private Member variable | _camelCase | _cachedPlan |
+| Static variable | s_camelCase | s_engineCount |
 | Global variable | g_camel_case | g_global_state |
 | Constant / Macro | UPPER_CASE | MAX_WORKSPACE_BYTES |
 | Enum Type | PascalCase | EngineMode |
@@ -54,11 +54,9 @@ This document defines the canonical project-wide coding and test naming conventi
 ## 3. Functions
 
 - Use descriptive action-oriented verbs: `createPlan`, `finalizeConfig`, `launchKernels`.
-- Overloads should remain behaviorally symmetrical; prefer explicit helper names instead of ambiguous overload sets when argument meaning changes.
 
 ## 4. Variables
 
-- Minimize scope; declare as near first use.
 - Favor clarity over abbreviation: prefer `intermediateSize` to `intSz`.
 
 ## 5. Members
@@ -85,7 +83,6 @@ If later you add invariants or non-trivial behavior, consider converting to a cl
 ## 6. Globals
 
 - Avoid unless absolutely required; prefix `g_` to make visibility explicit.
-- Provide a clear initialization and teardown story if non-trivial.
 
 ## 7. Interfaces
 
@@ -97,9 +94,7 @@ If later you add invariants or non-trivial behavior, consider converting to a cl
 
 - Enum type name: PascalCase (e.g. `EngineMode`, `ConvolutionMode`).
 - Enumerator names: UPPER_SNAKE (`ENGINE_MODE_DEFAULT`, `ENGINE_MODE_DETERMINISTIC`).
-- Keep tokens concise; avoid redundant suffixes unless needed for disambiguation.
 - When mirroring external APIs, keep exact enumerator spellings.
-- Do not mix styles (no camelCase or PascalCase enumerators).
 
 ## 9. Constants
 
