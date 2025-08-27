@@ -110,10 +110,9 @@ TEST_F(EngineHeuristicApiTests, SetEngineHeuristicOperationGraph)
 
 TEST_F(EngineHeuristicApiTests, SetEngineHeuristicMode)
 {
-    EXPECT_EQ(
-        hipdnnBackendSetAttribute(
-            _engineHeuristic, HIPDNN_ATTR_ENGINEHEUR_MODE, HIPDNN_TYPE_HEUR_MODE, 1, nullptr),
-        HIPDNN_STATUS_BAD_PARAM_NULL_POINTER);
+    EXPECT_EQ(hipdnnBackendSetAttribute(
+                  _engineHeuristic, HIPDNN_ATTR_ENGINEHEUR_MODE, HIPDNN_TYPE_HEUR_MODE, 1, nullptr),
+              HIPDNN_STATUS_BAD_PARAM_NULL_POINTER);
 
     EXPECT_EQ(hipdnnBackendSetAttribute(_engineHeuristic,
                                         HIPDNN_ATTR_ENGINEHEUR_MODE,
@@ -288,13 +287,10 @@ TEST_F(EngineHeuristicApiTests, GetHeuristicMode)
     EXPECT_EQ(mode, HIPDNN_HEUR_MODE_FALLBACK);
 
     int64_t count = 0;
-    EXPECT_EQ(hipdnnBackendGetAttribute(_engineHeuristic,
-                                        HIPDNN_ATTR_ENGINEHEUR_MODE,
-                                        HIPDNN_TYPE_HEUR_MODE,
-                                        1,
-                                        &count,
-                                        &mode),
-              HIPDNN_STATUS_SUCCESS);
+    EXPECT_EQ(
+        hipdnnBackendGetAttribute(
+            _engineHeuristic, HIPDNN_ATTR_ENGINEHEUR_MODE, HIPDNN_TYPE_HEUR_MODE, 1, &count, &mode),
+        HIPDNN_STATUS_SUCCESS);
     EXPECT_EQ(count, 1);
     EXPECT_EQ(mode, HIPDNN_HEUR_MODE_FALLBACK);
 }

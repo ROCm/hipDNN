@@ -69,8 +69,7 @@ TEST_F(ExecutionBackendEndApiTests, TestBackendExecuteWithNullHandle)
     auto batchnormBuilder = test_util::createAndPopulateBatchnormNode();
     auto serializedGraph = batchnormBuilder.Release();
 
-    test_util::createAndInitializeBackendDescriptor(
-        &_graphDescriptor, serializedGraph, _handle);
+    test_util::createAndInitializeBackendDescriptor(&_graphDescriptor, serializedGraph, _handle);
     test_util::createTestEngine(&_engine, &_graphDescriptor, _handle, GIDX, true);
     test_util::createTestEngineConfig(
         &_engineConfig, &_engine, &_graphDescriptor, _handle, GIDX, true);
@@ -90,8 +89,7 @@ TEST_F(ExecutionBackendEndApiTests, TestBackendExecuteWithNullDescriptors)
     auto batchnormBuilder = test_util::createAndPopulateBatchnormNode();
     auto serializedGraph = batchnormBuilder.Release();
 
-    test_util::createAndInitializeBackendDescriptor(
-        &_graphDescriptor, serializedGraph, _handle);
+    test_util::createAndInitializeBackendDescriptor(&_graphDescriptor, serializedGraph, _handle);
     test_util::createTestEngine(&_engine, &_graphDescriptor, _handle, GIDX, true);
     test_util::createTestEngineConfig(
         &_engineConfig, &_engine, &_graphDescriptor, _handle, GIDX, true);
@@ -118,8 +116,7 @@ TEST_F(ExecutionBackendEndApiTests, TestBackendExecuteWithUnfinalizedPlan)
     auto batchnormBuilder = test_util::createAndPopulateBatchnormNode();
     auto serializedGraph = batchnormBuilder.Release();
 
-    test_util::createAndInitializeBackendDescriptor(
-        &_graphDescriptor, serializedGraph, _handle);
+    test_util::createAndInitializeBackendDescriptor(&_graphDescriptor, serializedGraph, _handle);
 
     ASSERT_EQ(hipdnnBackendCreateDescriptor(HIPDNN_BACKEND_VARIANT_PACK_DESCRIPTOR, &_variantPack),
               HIPDNN_STATUS_SUCCESS);
@@ -135,8 +132,7 @@ TEST_F(ExecutionBackendEndApiTests, TestBackendExecuteWithWrongDescriptorTypes)
     auto batchnormBuilder = test_util::createAndPopulateBatchnormNode();
     auto serializedGraph = batchnormBuilder.Release();
 
-    test_util::createAndInitializeBackendDescriptor(
-        &_graphDescriptor, serializedGraph, _handle);
+    test_util::createAndInitializeBackendDescriptor(&_graphDescriptor, serializedGraph, _handle);
     test_util::createTestEngine(&_engine, &_graphDescriptor, _handle, GIDX, true);
 
     ASSERT_EQ(hipdnnBackendCreateDescriptor(HIPDNN_BACKEND_VARIANT_PACK_DESCRIPTOR, &_variantPack),
@@ -164,8 +160,7 @@ TEST_F(ExecutionBackendEndApiTests, TestBackendExecute)
     test_util::extractTensorInfoFromGraph(
         serializedGraph, uidToNameMap, nameToUidMap, uidToDimsMap);
 
-    test_util::createAndInitializeBackendDescriptor(
-        &_graphDescriptor, serializedGraph, _handle);
+    test_util::createAndInitializeBackendDescriptor(&_graphDescriptor, serializedGraph, _handle);
     test_util::createTestEngine(&_engine, &_graphDescriptor, _handle, GIDX, true);
     test_util::createTestEngineConfig(
         &_engineConfig, &_engine, &_graphDescriptor, _handle, GIDX, true);

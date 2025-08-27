@@ -56,24 +56,21 @@ void* allocateTensorMemory([[maybe_unused]] const int64_t* dims,
 
 void freeTensorMemory(void* dataPtr);
 
-void populateVariantPackWithMappings(
-    hipdnnBackendDescriptor_t variantPack,
-    const std::unordered_map<int64_t, void*>& dataPtrMappings,
-    void* workspace = nullptr);
+void populateVariantPackWithMappings(hipdnnBackendDescriptor_t variantPack,
+                                     const std::unordered_map<int64_t, void*>& dataPtrMappings,
+                                     void* workspace = nullptr);
 
 void createAndInitializeBackendDescriptor(hipdnnBackendDescriptor_t* backendDescriptor,
                                           const flatbuffers::DetachedBuffer& serializedGraph,
                                           hipdnnHandle_t handle);
 
-void extractTensorInfoFromGraph(
-    const flatbuffers::DetachedBuffer& serializedGraph,
-    std::unordered_map<int64_t, std::string>& uidToNameMap,
-    std::unordered_map<std::string, int64_t>& nameToUidMap,
-    std::unordered_map<int64_t, std::vector<int64_t>>& uidToDimsMap);
+void extractTensorInfoFromGraph(const flatbuffers::DetachedBuffer& serializedGraph,
+                                std::unordered_map<int64_t, std::string>& uidToNameMap,
+                                std::unordered_map<std::string, int64_t>& nameToUidMap,
+                                std::unordered_map<int64_t, std::vector<int64_t>>& uidToDimsMap);
 
 std::vector<std::string> getLoadedPlugins(hipdnnHandle_t handle);
 
-bool isPluginLoaded(const std::vector<std::string>& loadedPlugins,
-                    const std::string& pluginName);
+bool isPluginLoaded(const std::vector<std::string>& loadedPlugins, const std::string& pluginName);
 
 } // namespace test_util

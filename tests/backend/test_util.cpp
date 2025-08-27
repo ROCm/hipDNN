@@ -21,8 +21,7 @@ void createTestHandle(hipdnnHandle_t* handle)
 void createTestGraph(hipdnnBackendDescriptor_t* descriptor, hipdnnHandle_t handle)
 {
     flatbuffers::FlatBufferBuilder builder;
-    std::vector<::flatbuffers::Offset<hipdnn_sdk::data_objects::TensorAttributes>>
-        tensorAttributes;
+    std::vector<::flatbuffers::Offset<hipdnn_sdk::data_objects::TensorAttributes>> tensorAttributes;
     std::vector<::flatbuffers::Offset<hipdnn_sdk::data_objects::Node>> nodes;
     auto graph
         = hipdnn_sdk::data_objects::CreateGraphDirect(builder,
@@ -93,12 +92,10 @@ void populateTestEngineConfig(hipdnnBackendDescriptor_t* engineConfig,
         createTestEngine(engine, graph, handle, gidx, true);
     }
 
-    ASSERT_EQ(hipdnnBackendSetAttribute(*engineConfig,
-                                        HIPDNN_ATTR_ENGINECFG_ENGINE,
-                                        HIPDNN_TYPE_BACKEND_DESCRIPTOR,
-                                        1,
-                                        engine),
-              HIPDNN_STATUS_SUCCESS);
+    ASSERT_EQ(
+        hipdnnBackendSetAttribute(
+            *engineConfig, HIPDNN_ATTR_ENGINECFG_ENGINE, HIPDNN_TYPE_BACKEND_DESCRIPTOR, 1, engine),
+        HIPDNN_STATUS_SUCCESS);
 
     if(finalize)
     {
@@ -220,10 +217,9 @@ void extractTensorMappings(const std::unordered_map<int64_t, void*>& dataPtrMapp
     ASSERT_FALSE(dataPtrs.empty());
 }
 
-void populateVariantPackWithMappings(
-    hipdnnBackendDescriptor_t variantPack,
-    const std::unordered_map<int64_t, void*>& dataPtrMappings,
-    void* workspace)
+void populateVariantPackWithMappings(hipdnnBackendDescriptor_t variantPack,
+                                     const std::unordered_map<int64_t, void*>& dataPtrMappings,
+                                     void* workspace)
 {
     std::vector<int64_t> tensorIds;
     std::vector<void*> dataPtrs;
@@ -258,11 +254,10 @@ flatbuffers::FlatBufferBuilder createAndPopulateBatchnormNode()
     return flatbuffer_test_utils::createValidBatchnormGraph();
 }
 
-void extractTensorInfoFromGraph(
-    const flatbuffers::DetachedBuffer& serializedGraph,
-    std::unordered_map<int64_t, std::string>& uidToNameMap,
-    std::unordered_map<std::string, int64_t>& nameToUidMap,
-    std::unordered_map<int64_t, std::vector<int64_t>>& uidToDimsMap)
+void extractTensorInfoFromGraph(const flatbuffers::DetachedBuffer& serializedGraph,
+                                std::unordered_map<int64_t, std::string>& uidToNameMap,
+                                std::unordered_map<std::string, int64_t>& nameToUidMap,
+                                std::unordered_map<int64_t, std::vector<int64_t>>& uidToDimsMap)
 {
     uidToNameMap.clear();
     nameToUidMap.clear();
@@ -329,8 +324,7 @@ std::vector<std::string> getLoadedPlugins(hipdnnHandle_t handle)
     return pluginPaths;
 }
 
-bool isPluginLoaded(const std::vector<std::string>& loadedPlugins,
-                    const std::string& pluginName)
+bool isPluginLoaded(const std::vector<std::string>& loadedPlugins, const std::string& pluginName)
 {
     namespace fs = std::filesystem;
 

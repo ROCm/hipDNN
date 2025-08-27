@@ -115,8 +115,7 @@ TEST(HipDNNBackendTest, SetAttribute)
 TEST(HipDNNBackendTest, WillSetBackendGraphCorrectly)
 {
     flatbuffers::FlatBufferBuilder builder;
-    std::vector<::flatbuffers::Offset<hipdnn_sdk::data_objects::TensorAttributes>>
-        tensorAttributes;
+    std::vector<::flatbuffers::Offset<hipdnn_sdk::data_objects::TensorAttributes>> tensorAttributes;
     std::vector<::flatbuffers::Offset<hipdnn_sdk::data_objects::Node>> nodes;
     auto graph
         = hipdnn_sdk::data_objects::CreateGraphDirect(builder,

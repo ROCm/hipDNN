@@ -123,7 +123,6 @@ TEST_F(ExecutionPlanApiTests, FinalizeExecutionPlan)
               HIPDNN_STATUS_SUCCESS);
     EXPECT_EQ(hipdnnBackendFinalize(_plan), HIPDNN_STATUS_BAD_PARAM);
 
-    test_util::populateTestExecutionPlan(
-        &_plan, &_engineConfig, &_engine, &_graph, _handle, GIDX);
+    test_util::populateTestExecutionPlan(&_plan, &_engineConfig, &_engine, &_graph, _handle, GIDX);
     EXPECT_EQ(hipdnnBackendFinalize(_plan), HIPDNN_STATUS_SUCCESS);
 }
