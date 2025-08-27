@@ -12,7 +12,7 @@
 namespace miopen_legacy_plugin
 {
 
-class MockPlanBuilder : public PlanBuilderInterface
+class MockPlanBuilder : public IPlanBuilder
 {
 public:
     MOCK_METHOD(bool, isApplicable, (const hipdnn_plugin::IGraph& opGraph), (const, override));

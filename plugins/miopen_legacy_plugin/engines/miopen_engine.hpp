@@ -13,7 +13,7 @@
 namespace miopen_legacy_plugin
 {
 
-class MiopenEngine : public EngineInterface
+class MiopenEngine : public IEngine
 {
 public:
     MiopenEngine(int64_t id);
@@ -31,11 +31,11 @@ public:
         const hipdnn_plugin::IGraph& opGraph,
         HipdnnEnginePluginExecutionContext& executionContext) const override;
 
-    void addPlanBuilder(std::unique_ptr<PlanBuilderInterface> planBuilder);
+    void addPlanBuilder(std::unique_ptr<IPlanBuilder> planBuilder);
 
 private:
     int64_t _id;
-    std::set<std::unique_ptr<PlanBuilderInterface>> _planBuilders;
+    std::set<std::unique_ptr<IPlanBuilder>> _planBuilders;
 };
 
 }

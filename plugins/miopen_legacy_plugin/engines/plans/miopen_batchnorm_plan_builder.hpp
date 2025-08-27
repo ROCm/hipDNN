@@ -9,7 +9,7 @@
 namespace miopen_legacy_plugin
 {
 
-class MiopenBatchnormPlanBuilder : public PlanBuilderInterface
+class MiopenBatchnormPlanBuilder : public IPlanBuilder
 {
 public:
     MiopenBatchnormPlanBuilder() = default;
