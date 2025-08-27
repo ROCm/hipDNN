@@ -25,8 +25,8 @@ void SampleRunner::operator()(const TensorLayout& layout)
     auto inputType = getDataTypeEnumFromType<InputType>();
     auto intermediateType = getDataTypeEnumFromType<IntermediateType>();
 
-    std::cout << "Running batch normalization training graph " << inputType << " [" << layout
-              << "]" << (config.cpuValidation ? " (with CPU validation)" : "") << "...\n";
+    std::cout << "Running batch normalization training graph " << inputType << " [" << layout << "]"
+              << (config.cpuValidation ? " (with CPU validation)" : "") << "...\n";
 
     int64_t n = 16; // BATCH SIZE
     int64_t c = 16; // CHANNELS (FEATURES)
@@ -91,13 +91,13 @@ void SampleRunner::operator()(const TensorLayout& layout)
 
     xTensor.fillWithRandomValues(static_cast<InputType>(0.0f), static_cast<InputType>(1.0f));
     scaleTensor.fillWithRandomValues(static_cast<IntermediateType>(0.0f),
-                                      static_cast<IntermediateType>(1.0f));
-    biasTensor.fillWithRandomValues(static_cast<IntermediateType>(0.0f),
                                      static_cast<IntermediateType>(1.0f));
+    biasTensor.fillWithRandomValues(static_cast<IntermediateType>(0.0f),
+                                    static_cast<IntermediateType>(1.0f));
     prevMeanTensor.fillWithRandomValues(static_cast<IntermediateType>(0.0f),
-                                          static_cast<IntermediateType>(1.0f));
+                                        static_cast<IntermediateType>(1.0f));
     prevVarTensor.fillWithRandomValues(static_cast<IntermediateType>(0.1f),
-                                         static_cast<IntermediateType>(1.0f));
+                                       static_cast<IntermediateType>(1.0f));
 
     momentumTensor.memory().hostData()[0] = 0.1f;
     epsilonTensor.memory().hostData()[0] = 1e-5f;

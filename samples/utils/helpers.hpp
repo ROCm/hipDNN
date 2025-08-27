@@ -124,8 +124,8 @@ void run(F&& f)
 
 inline std::shared_ptr<hipdnn_frontend::graph::Tensor_attributes>
     createTensor(const std::vector<int64_t>& dims,
-                  hipdnn_frontend::DataType_t data_type,
-                  const TensorLayout& layout = TensorLayout::NCHW)
+                 hipdnn_frontend::DataType_t data_type,
+                 const TensorLayout& layout = TensorLayout::NCHW)
 {
     auto tensor = std::make_shared<hipdnn_frontend::graph::Tensor_attributes>();
     tensor->set_dim(dims).set_data_type(data_type);
@@ -134,8 +134,8 @@ inline std::shared_ptr<hipdnn_frontend::graph::Tensor_attributes>
     return tensor;
 }
 
-inline int64_t getTensorElementCount(
-    const std::shared_ptr<hipdnn_frontend::graph::Tensor_attributes>& tensor)
+inline int64_t
+    getTensorElementCount(const std::shared_ptr<hipdnn_frontend::graph::Tensor_attributes>& tensor)
 {
     int64_t count = 1;
     for(auto dim : tensor->get_dim())

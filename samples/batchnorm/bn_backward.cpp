@@ -82,11 +82,11 @@ void SampleRunner::operator()(const TensorLayout& layout)
     dyTensor.fillWithRandomValues(static_cast<InputType>(0.0f), static_cast<InputType>(1.0f));
     xTensor.fillWithRandomValues(static_cast<InputType>(0.0f), static_cast<InputType>(1.0f));
     scaleTensor.fillWithRandomValues(static_cast<IntermediateType>(0.0f),
-                                      static_cast<IntermediateType>(1.0f));
+                                     static_cast<IntermediateType>(1.0f));
     savedMeanTensor.fillWithRandomValues(static_cast<IntermediateType>(0.0f),
-                                           static_cast<IntermediateType>(1.0f));
+                                         static_cast<IntermediateType>(1.0f));
     savedInvVarTensor.fillWithRandomValues(static_cast<IntermediateType>(0.1f),
-                                              static_cast<IntermediateType>(1.0f));
+                                           static_cast<IntermediateType>(1.0f));
 
     std::unordered_map<int64_t, void*> variantPack;
 
@@ -121,13 +121,13 @@ void SampleRunner::operator()(const TensorLayout& layout)
         Tensor<IntermediateType> dbiasRefTensor(dbias->get_dim());
 
         refImpl.batchnormBwd(dyTensor,
-                              xTensor,
-                              savedMeanTensor,
-                              savedInvVarTensor,
-                              scaleTensor,
-                              dxRefTensor,
-                              dscaleRefTensor,
-                              dbiasRefTensor);
+                             xTensor,
+                             savedMeanTensor,
+                             savedInvVarTensor,
+                             scaleTensor,
+                             dxRefTensor,
+                             dscaleRefTensor,
+                             dbiasRefTensor);
 
         auto epsilon = getEpsilon<InputType>();
 

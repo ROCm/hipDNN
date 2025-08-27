@@ -111,25 +111,20 @@ void SampleRunner::operator()(const TensorLayout& layout)
         for(size_t i = 0; i < invVarianceTensor.memory().count(); ++i)
         {
             varianceHostPtr[i] = static_cast<IntermediateType>(1.0f)
-                                   / (invVarianceHostPtr[i] * invVarianceHostPtr[i]);
+                                 / (invVarianceHostPtr[i] * invVarianceHostPtr[i]);
         }
 
         auto epsilon = getEpsilon<InputType>();
 
-        refImpl.batchnormFwdInference(xTensor,
-                                       scaleTensor,
-                                       biasTensor,
-                                       meanTensor,
-                                       varianceTensor,
-                                       yRefTensor,
-                                       epsilon);
+        refImpl.batchnormFwdInference(
+            xTensor, scaleTensor, biasTensor, meanTensor, varianceTensor, yRefTensor, epsilon);
 
         auto validator = hipdnn_sdk::reference_test_utilities::CpuFpReferenceValidation<InputType>(
             static_cast<InputType>(epsilon), static_cast<InputType>(epsilon));
 
         std::cout << "CPU reference validation "
                   << (validator.allClose(yRefTensor.memory(), yTensor.memory()) ? "successful"
-                                                                                   : "failed")
+                                                                                : "failed")
                   << ".\n";
     }
 
