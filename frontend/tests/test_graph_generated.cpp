@@ -10,7 +10,7 @@ TEST(FlatBuffers, SerializeAndDeserialize)
     auto graph = hipdnn_sdk::data_objects::CreateGraphDirect(builder, "Graph");
     builder.Finish(graph);
 
-    auto deserialized_graph
+    auto deserializedGraph
         = flatbuffers::GetRoot<hipdnn_sdk::data_objects::Graph>(builder.GetBufferPointer());
-    EXPECT_EQ(deserialized_graph->name()->str(), "Graph");
+    EXPECT_EQ(deserializedGraph->name()->str(), "Graph");
 }

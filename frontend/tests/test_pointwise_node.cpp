@@ -18,24 +18,24 @@ TEST(PointwiseNodeTests, SingleInput)
     attributes.set_output_0(std::make_shared<TensorAttributes>());
     attributes.set_mode(PointwiseMode_t::RELU_FWD);
 
-    auto input_tensor = attributes.get_input_0();
-    input_tensor->set_uid(1)
+    auto inputTensor = attributes.get_input_0();
+    inputTensor->set_uid(1)
         .set_name("InputTensor")
         .set_data_type(DataType_t::FLOAT)
         .set_dim({1, 2, 3, 4})
         .set_stride({5, 6, 7, 8});
 
-    auto output_tensor = attributes.get_output_0();
-    output_tensor->set_uid(2).set_name("OutputTensor");
+    auto outputTensor = attributes.get_output_0();
+    outputTensor->set_uid(2).set_name("OutputTensor");
 
-    GraphAttributes graph_attributes;
-    PointwiseNode node(std::move(attributes), graph_attributes);
+    GraphAttributes graphAttributes;
+    PointwiseNode node(std::move(attributes), graphAttributes);
 
     auto error = node.infer_properties_node();
     EXPECT_EQ(error.code, error_code_t::OK);
 
-    EXPECT_EQ(output_tensor->get_dim(), (std::vector<int64_t>{1, 2, 3, 4}));
-    EXPECT_EQ(output_tensor->get_stride(), (std::vector<int64_t>{5, 6, 7, 8}));
+    EXPECT_EQ(outputTensor->get_dim(), (std::vector<int64_t>{1, 2, 3, 4}));
+    EXPECT_EQ(outputTensor->get_stride(), (std::vector<int64_t>{5, 6, 7, 8}));
 }
 
 TEST(PointwiseNodeTests, TwoInputs)
@@ -46,31 +46,31 @@ TEST(PointwiseNodeTests, TwoInputs)
     attributes.set_output_0(std::make_shared<TensorAttributes>());
     attributes.set_mode(PointwiseMode_t::RELU_FWD);
 
-    auto input_tensor0 = attributes.get_input_0();
-    input_tensor0->set_uid(1)
+    auto inputTensor0 = attributes.get_input_0();
+    inputTensor0->set_uid(1)
         .set_name("InputTensor0")
         .set_data_type(DataType_t::FLOAT)
         .set_dim({1, 2, 3, 4})
         .set_stride({5, 6, 7, 8});
 
-    auto input_tensor1 = attributes.get_input_1();
-    input_tensor1->set_uid(2)
+    auto inputTensor1 = attributes.get_input_1();
+    inputTensor1->set_uid(2)
         .set_name("InputTensor1")
         .set_data_type(DataType_t::FLOAT)
         .set_dim({1, 2, 3, 4})
         .set_stride({5, 6, 7, 8});
 
-    auto output_tensor = attributes.get_output_0();
-    output_tensor->set_uid(3).set_name("OutputTensor");
+    auto outputTensor = attributes.get_output_0();
+    outputTensor->set_uid(3).set_name("OutputTensor");
 
-    GraphAttributes graph_attributes;
-    PointwiseNode node(std::move(attributes), graph_attributes);
+    GraphAttributes graphAttributes;
+    PointwiseNode node(std::move(attributes), graphAttributes);
 
     auto error = node.infer_properties_node();
     EXPECT_EQ(error.code, error_code_t::OK);
 
-    EXPECT_EQ(output_tensor->get_dim(), (std::vector<int64_t>{1, 2, 3, 4}));
-    EXPECT_EQ(output_tensor->get_stride(), (std::vector<int64_t>{5, 6, 7, 8}));
+    EXPECT_EQ(outputTensor->get_dim(), (std::vector<int64_t>{1, 2, 3, 4}));
+    EXPECT_EQ(outputTensor->get_stride(), (std::vector<int64_t>{5, 6, 7, 8}));
 }
 
 TEST(PointwiseNodeTests, ThreeInputs)
@@ -82,38 +82,38 @@ TEST(PointwiseNodeTests, ThreeInputs)
     attributes.set_output_0(std::make_shared<TensorAttributes>());
     attributes.set_mode(PointwiseMode_t::RELU_FWD);
 
-    auto input_tensor0 = attributes.get_input_0();
-    input_tensor0->set_uid(1)
+    auto inputTensor0 = attributes.get_input_0();
+    inputTensor0->set_uid(1)
         .set_name("InputTensor0")
         .set_data_type(DataType_t::FLOAT)
         .set_dim({1, 2, 3, 4})
         .set_stride({5, 6, 7, 8});
 
-    auto input_tensor1 = attributes.get_input_1();
-    input_tensor1->set_uid(2)
+    auto inputTensor1 = attributes.get_input_1();
+    inputTensor1->set_uid(2)
         .set_name("InputTensor1")
         .set_data_type(DataType_t::FLOAT)
         .set_dim({1, 2, 3, 4})
         .set_stride({5, 6, 7, 8});
 
-    auto input_tensor2 = attributes.get_input_2();
-    input_tensor2->set_uid(3)
+    auto inputTensor2 = attributes.get_input_2();
+    inputTensor2->set_uid(3)
         .set_name("InputTensor2")
         .set_data_type(DataType_t::FLOAT)
         .set_dim({1, 2, 3, 4})
         .set_stride({5, 6, 7, 8});
 
-    auto output_tensor = attributes.get_output_0();
-    output_tensor->set_uid(4).set_name("OutputTensor");
+    auto outputTensor = attributes.get_output_0();
+    outputTensor->set_uid(4).set_name("OutputTensor");
 
-    GraphAttributes graph_attributes;
-    PointwiseNode node(std::move(attributes), graph_attributes);
+    GraphAttributes graphAttributes;
+    PointwiseNode node(std::move(attributes), graphAttributes);
 
     auto error = node.infer_properties_node();
     EXPECT_EQ(error.code, error_code_t::OK);
 
-    EXPECT_EQ(output_tensor->get_dim(), (std::vector<int64_t>{1, 2, 3, 4}));
-    EXPECT_EQ(output_tensor->get_stride(), (std::vector<int64_t>{5, 6, 7, 8}));
+    EXPECT_EQ(outputTensor->get_dim(), (std::vector<int64_t>{1, 2, 3, 4}));
+    EXPECT_EQ(outputTensor->get_stride(), (std::vector<int64_t>{5, 6, 7, 8}));
 }
 
 TEST(PointwiseNodeTests, PreValidateNode)
@@ -123,8 +123,8 @@ TEST(PointwiseNodeTests, PreValidateNode)
     attributes.set_output_0(std::make_shared<TensorAttributes>());
     attributes.set_mode(PointwiseMode_t::RELU_FWD);
 
-    GraphAttributes graph_attributes;
-    PointwiseNode node(std::move(attributes), graph_attributes);
+    GraphAttributes graphAttributes;
+    PointwiseNode node(std::move(attributes), graphAttributes);
 
     auto error = node.pre_validate_node();
     EXPECT_EQ(error.code, error_code_t::OK);
@@ -134,31 +134,31 @@ TEST(PointwiseNodeTests, PreValidateNodeMissingValues)
 {
     PointwiseAttributes attributes;
 
-    GraphAttributes graph_attributes;
-    PointwiseNode node(std::move(attributes), graph_attributes);
+    GraphAttributes graphAttributes;
+    PointwiseNode node(std::move(attributes), graphAttributes);
 
     auto error = node.pre_validate_node();
     EXPECT_EQ(error.code, error_code_t::ATTRIBUTE_NOT_SET);
 
     attributes.set_input_0(std::make_shared<TensorAttributes>());
-    auto attributes_copy = attributes;
-    PointwiseNode node_with_input(std::move(attributes_copy), graph_attributes);
+    auto attributesCopy = attributes;
+    PointwiseNode nodeWithInput(std::move(attributesCopy), graphAttributes);
 
-    error = node_with_input.pre_validate_node();
+    error = nodeWithInput.pre_validate_node();
     EXPECT_EQ(error.code, error_code_t::ATTRIBUTE_NOT_SET);
 
     attributes.set_output_0(std::make_shared<TensorAttributes>());
-    attributes_copy = attributes;
-    PointwiseNode node_with_output(std::move(attributes_copy), graph_attributes);
+    attributesCopy = attributes;
+    PointwiseNode nodeWithOutput(std::move(attributesCopy), graphAttributes);
 
-    error = node_with_output.pre_validate_node();
+    error = nodeWithOutput.pre_validate_node();
     EXPECT_EQ(error.code, error_code_t::ATTRIBUTE_NOT_SET);
 
     attributes.set_mode(PointwiseMode_t::RELU_FWD);
-    attributes_copy = attributes;
-    PointwiseNode node_with_all_values(std::move(attributes_copy), graph_attributes);
+    attributesCopy = attributes;
+    PointwiseNode nodeWithAllValues(std::move(attributesCopy), graphAttributes);
 
-    error = node_with_all_values.pre_validate_node();
+    error = nodeWithAllValues.pre_validate_node();
     EXPECT_EQ(error.code, error_code_t::OK);
 }
 
@@ -169,24 +169,24 @@ TEST(PointwiseNodeTests, InferPropertiesNode)
     attributes.set_output_0(std::make_shared<TensorAttributes>());
     attributes.set_mode(PointwiseMode_t::RELU_FWD);
 
-    auto input_tensor = attributes.get_input_0();
-    input_tensor->set_uid(1)
+    auto inputTensor = attributes.get_input_0();
+    inputTensor->set_uid(1)
         .set_name("InputTensor")
         .set_data_type(DataType_t::FLOAT)
         .set_dim({1, 2, 3, 4})
         .set_stride({5, 6, 7, 8});
 
-    auto output_tensor = attributes.get_output_0();
-    output_tensor->set_uid(2).set_name("OutputTensor");
+    auto outputTensor = attributes.get_output_0();
+    outputTensor->set_uid(2).set_name("OutputTensor");
 
-    GraphAttributes graph_attributes;
-    PointwiseNode node(std::move(attributes), graph_attributes);
+    GraphAttributes graphAttributes;
+    PointwiseNode node(std::move(attributes), graphAttributes);
 
     auto error = node.infer_properties_node();
     EXPECT_EQ(error.code, error_code_t::OK);
 
-    EXPECT_EQ(output_tensor->get_dim(), (std::vector<int64_t>{1, 2, 3, 4}));
-    EXPECT_EQ(output_tensor->get_stride(), (std::vector<int64_t>{5, 6, 7, 8}));
+    EXPECT_EQ(outputTensor->get_dim(), (std::vector<int64_t>{1, 2, 3, 4}));
+    EXPECT_EQ(outputTensor->get_stride(), (std::vector<int64_t>{5, 6, 7, 8}));
 }
 
 TEST(PointwiseNodeTests, PackNode)
@@ -194,43 +194,43 @@ TEST(PointwiseNodeTests, PackNode)
     PointwiseAttributes attributes;
     attributes.name = "PointwiseNode";
 
-    auto input_tensor = std::make_shared<TensorAttributes>();
-    input_tensor->set_uid(1)
+    auto inputTensor = std::make_shared<TensorAttributes>();
+    inputTensor->set_uid(1)
         .set_name("InputTensor")
         .set_data_type(DataType_t::FLOAT)
         .set_dim({1, 2, 3, 4})
         .set_stride({4, 3, 2, 1});
-    attributes.set_input_0(input_tensor);
+    attributes.set_input_0(inputTensor);
 
-    auto output_tensor = std::make_shared<TensorAttributes>();
-    output_tensor->set_uid(2)
+    auto outputTensor = std::make_shared<TensorAttributes>();
+    outputTensor->set_uid(2)
         .set_name("OutputTensor")
         .set_data_type(DataType_t::FLOAT)
         .set_dim({1, 2, 3, 4})
         .set_stride({4, 3, 2, 1});
-    attributes.set_output_0(output_tensor);
+    attributes.set_output_0(outputTensor);
 
     attributes.set_mode(PointwiseMode_t::RELU_FWD);
 
-    GraphAttributes graph_attributes;
-    PointwiseNode node(std::move(attributes), graph_attributes);
+    GraphAttributes graphAttributes;
+    PointwiseNode node(std::move(attributes), graphAttributes);
 
     flatbuffers::FlatBufferBuilder builder;
     auto offset = node.pack_node(builder);
     EXPECT_NE(offset.o, 0);
 
     builder.Finish(offset);
-    auto buffer_pointer = builder.GetBufferPointer();
-    auto node_flatbuffer = flatbuffers::GetRoot<hipdnn_sdk::data_objects::Node>(buffer_pointer);
+    auto bufferPointer = builder.GetBufferPointer();
+    auto nodeFlatbuffer = flatbuffers::GetRoot<hipdnn_sdk::data_objects::Node>(bufferPointer);
 
-    EXPECT_STREQ(node_flatbuffer->name()->c_str(), "PointwiseNode");
-    EXPECT_EQ(node_flatbuffer->attributes_type(),
+    EXPECT_STREQ(nodeFlatbuffer->name()->c_str(), "PointwiseNode");
+    EXPECT_EQ(nodeFlatbuffer->attributes_type(),
               hipdnn_sdk::data_objects::NodeAttributes_PointwiseAttributes);
 
-    auto packed_attributes = node_flatbuffer->attributes_as_PointwiseAttributes();
-    ASSERT_NE(packed_attributes, nullptr);
+    auto packedAttributes = nodeFlatbuffer->attributes_as_PointwiseAttributes();
+    ASSERT_NE(packedAttributes, nullptr);
 
-    EXPECT_EQ(packed_attributes->in_0_tensor_uid(), input_tensor->get_uid());
-    EXPECT_EQ(packed_attributes->out_0_tensor_uid(), output_tensor->get_uid());
-    EXPECT_EQ(packed_attributes->operation(), static_cast<int>(PointwiseMode_t::RELU_FWD));
+    EXPECT_EQ(packedAttributes->in_0_tensor_uid(), inputTensor->get_uid());
+    EXPECT_EQ(packedAttributes->out_0_tensor_uid(), outputTensor->get_uid());
+    EXPECT_EQ(packedAttributes->operation(), static_cast<int>(PointwiseMode_t::RELU_FWD));
 }

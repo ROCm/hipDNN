@@ -9,251 +9,251 @@ using namespace hipdnn_frontend::graph;
 
 TEST(PointwiseAttributesTests, CreatePointwiseAttributes)
 {
-    PointwiseAttributes pointwise_attributes;
+    PointwiseAttributes pointwiseAttributes;
 
-    pointwise_attributes.set_input_0(std::make_shared<TensorAttributes>());
-    pointwise_attributes.set_output_0(std::make_shared<TensorAttributes>());
-    pointwise_attributes.set_mode(PointwiseMode_t::RELU_FWD)
+    pointwiseAttributes.set_input_0(std::make_shared<TensorAttributes>());
+    pointwiseAttributes.set_output_0(std::make_shared<TensorAttributes>());
+    pointwiseAttributes.set_mode(PointwiseMode_t::RELU_FWD)
         .set_relu_lower_clip(0.1f)
         .set_relu_upper_clip(6.0f)
         .set_relu_lower_clip_slope(0.01f)
         .set_axis(1);
 
-    auto input_tensor = pointwise_attributes.get_input_0();
-    EXPECT_FALSE(input_tensor->has_uid());
+    auto inputTensor = pointwiseAttributes.get_input_0();
+    EXPECT_FALSE(inputTensor->has_uid());
 
-    input_tensor->set_uid(1)
+    inputTensor->set_uid(1)
         .set_name("InputTensor")
         .set_data_type(DataType_t::FLOAT)
         .set_dim({1, 2, 3, 4})
         .set_stride({5, 6, 7, 8});
 
-    auto output_tensor = pointwise_attributes.get_output_0();
-    EXPECT_FALSE(output_tensor->has_uid());
+    auto outputTensor = pointwiseAttributes.get_output_0();
+    EXPECT_FALSE(outputTensor->has_uid());
 
-    output_tensor->set_uid(2)
+    outputTensor->set_uid(2)
         .set_name("OutputTensor")
         .set_data_type(DataType_t::HALF)
         .set_dim({5, 6, 7, 8})
         .set_stride({1, 2, 3, 4});
 
-    EXPECT_EQ(input_tensor->get_uid(), 1);
-    EXPECT_EQ(input_tensor->get_name(), "InputTensor");
-    EXPECT_EQ(input_tensor->get_data_type(), DataType_t::FLOAT);
-    EXPECT_EQ(input_tensor->get_dim(), (std::vector<int64_t>{1, 2, 3, 4}));
-    EXPECT_EQ(input_tensor->get_stride(), (std::vector<int64_t>{5, 6, 7, 8}));
+    EXPECT_EQ(inputTensor->get_uid(), 1);
+    EXPECT_EQ(inputTensor->get_name(), "InputTensor");
+    EXPECT_EQ(inputTensor->get_data_type(), DataType_t::FLOAT);
+    EXPECT_EQ(inputTensor->get_dim(), (std::vector<int64_t>{1, 2, 3, 4}));
+    EXPECT_EQ(inputTensor->get_stride(), (std::vector<int64_t>{5, 6, 7, 8}));
 
-    EXPECT_EQ(output_tensor->get_uid(), 2);
-    EXPECT_EQ(output_tensor->get_name(), "OutputTensor");
-    EXPECT_EQ(output_tensor->get_data_type(), DataType_t::HALF);
-    EXPECT_EQ(output_tensor->get_dim(), (std::vector<int64_t>{5, 6, 7, 8}));
-    EXPECT_EQ(output_tensor->get_stride(), (std::vector<int64_t>{1, 2, 3, 4}));
+    EXPECT_EQ(outputTensor->get_uid(), 2);
+    EXPECT_EQ(outputTensor->get_name(), "OutputTensor");
+    EXPECT_EQ(outputTensor->get_data_type(), DataType_t::HALF);
+    EXPECT_EQ(outputTensor->get_dim(), (std::vector<int64_t>{5, 6, 7, 8}));
+    EXPECT_EQ(outputTensor->get_stride(), (std::vector<int64_t>{1, 2, 3, 4}));
 
-    EXPECT_EQ(pointwise_attributes.get_mode(), PointwiseMode_t::RELU_FWD);
-    EXPECT_EQ(pointwise_attributes.get_relu_lower_clip(), 0.1f);
-    EXPECT_EQ(pointwise_attributes.get_relu_upper_clip(), 6.0f);
-    EXPECT_EQ(pointwise_attributes.get_relu_lower_slope(), 0.01f);
-    EXPECT_EQ(pointwise_attributes.get_axis(), 1);
+    EXPECT_EQ(pointwiseAttributes.get_mode(), PointwiseMode_t::RELU_FWD);
+    EXPECT_EQ(pointwiseAttributes.get_relu_lower_clip(), 0.1f);
+    EXPECT_EQ(pointwiseAttributes.get_relu_upper_clip(), 6.0f);
+    EXPECT_EQ(pointwiseAttributes.get_relu_lower_slope(), 0.01f);
+    EXPECT_EQ(pointwiseAttributes.get_axis(), 1);
 }
 
 TEST(PointwiseAttributesTests, CreatePointwiseAttributesWithTwoInputs)
 {
-    PointwiseAttributes pointwise_attributes;
+    PointwiseAttributes pointwiseAttributes;
 
-    pointwise_attributes.set_input_0(std::make_shared<TensorAttributes>());
-    pointwise_attributes.set_input_1(std::make_shared<TensorAttributes>());
-    pointwise_attributes.set_output_0(std::make_shared<TensorAttributes>());
-    pointwise_attributes.set_mode(PointwiseMode_t::RELU_FWD);
+    pointwiseAttributes.set_input_0(std::make_shared<TensorAttributes>());
+    pointwiseAttributes.set_input_1(std::make_shared<TensorAttributes>());
+    pointwiseAttributes.set_output_0(std::make_shared<TensorAttributes>());
+    pointwiseAttributes.set_mode(PointwiseMode_t::RELU_FWD);
 
-    auto input_tensor_0 = pointwise_attributes.get_input_0();
-    input_tensor_0->set_uid(1)
+    auto inputTensor0 = pointwiseAttributes.get_input_0();
+    inputTensor0->set_uid(1)
         .set_name("InputTensor0")
         .set_data_type(DataType_t::FLOAT)
         .set_dim({1, 2, 3, 4})
         .set_stride({5, 6, 7, 8});
 
-    auto input_tensor_1 = pointwise_attributes.get_input_1();
-    input_tensor_1->set_uid(2)
+    auto inputTensor1 = pointwiseAttributes.get_input_1();
+    inputTensor1->set_uid(2)
         .set_name("InputTensor1")
         .set_data_type(DataType_t::FLOAT)
         .set_dim({1, 2, 3, 4})
         .set_stride({5, 6, 7, 8});
 
-    auto output_tensor = pointwise_attributes.get_output_0();
-    output_tensor->set_uid(3).set_name("OutputTensor");
+    auto outputTensor = pointwiseAttributes.get_output_0();
+    outputTensor->set_uid(3).set_name("OutputTensor");
 
-    EXPECT_EQ(input_tensor_0->get_uid(), 1);
-    EXPECT_EQ(input_tensor_0->get_name(), "InputTensor0");
-    EXPECT_EQ(input_tensor_1->get_uid(), 2);
-    EXPECT_EQ(input_tensor_1->get_name(), "InputTensor1");
-    EXPECT_EQ(output_tensor->get_uid(), 3);
-    EXPECT_EQ(output_tensor->get_name(), "OutputTensor");
-    EXPECT_EQ(pointwise_attributes.get_mode(), PointwiseMode_t::RELU_FWD);
+    EXPECT_EQ(inputTensor0->get_uid(), 1);
+    EXPECT_EQ(inputTensor0->get_name(), "InputTensor0");
+    EXPECT_EQ(inputTensor1->get_uid(), 2);
+    EXPECT_EQ(inputTensor1->get_name(), "InputTensor1");
+    EXPECT_EQ(outputTensor->get_uid(), 3);
+    EXPECT_EQ(outputTensor->get_name(), "OutputTensor");
+    EXPECT_EQ(pointwiseAttributes.get_mode(), PointwiseMode_t::RELU_FWD);
 }
 
 TEST(PointwiseAttributesTests, SetInput0WithMove)
 {
-    PointwiseAttributes pointwise_attributes;
+    PointwiseAttributes pointwiseAttributes;
 
-    auto input_tensor = std::make_shared<TensorAttributes>();
-    input_tensor->set_uid(1).set_name("InputTensor0");
+    auto inputTensor = std::make_shared<TensorAttributes>();
+    inputTensor->set_uid(1).set_name("InputTensor0");
 
-    auto raw_ptr = input_tensor.get();
+    auto rawPtr = inputTensor.get();
 
-    pointwise_attributes.set_input_0(std::move(input_tensor));
+    pointwiseAttributes.set_input_0(std::move(inputTensor));
 
-    auto retrieved = pointwise_attributes.get_input_0();
+    auto retrieved = pointwiseAttributes.get_input_0();
     EXPECT_EQ(retrieved->get_uid(), 1);
     EXPECT_EQ(retrieved->get_name(), "InputTensor0");
 
-    EXPECT_EQ(input_tensor, nullptr);
-    EXPECT_EQ(retrieved.get(), raw_ptr);
+    EXPECT_EQ(inputTensor, nullptr);
+    EXPECT_EQ(retrieved.get(), rawPtr);
 }
 
 TEST(PointwiseAttributesTests, SetInput1WithMove)
 {
-    PointwiseAttributes pointwise_attributes;
+    PointwiseAttributes pointwiseAttributes;
 
-    auto input_tensor = std::make_shared<TensorAttributes>();
-    input_tensor->set_uid(2).set_name("InputTensor1");
+    auto inputTensor = std::make_shared<TensorAttributes>();
+    inputTensor->set_uid(2).set_name("InputTensor1");
 
-    auto raw_ptr = input_tensor.get();
+    auto rawPtr = inputTensor.get();
 
-    pointwise_attributes.set_input_1(std::move(input_tensor));
+    pointwiseAttributes.set_input_1(std::move(inputTensor));
 
-    auto retrieved = pointwise_attributes.get_input_1();
+    auto retrieved = pointwiseAttributes.get_input_1();
     EXPECT_EQ(retrieved->get_uid(), 2);
     EXPECT_EQ(retrieved->get_name(), "InputTensor1");
 
-    EXPECT_EQ(input_tensor, nullptr);
-    EXPECT_EQ(retrieved.get(), raw_ptr);
+    EXPECT_EQ(inputTensor, nullptr);
+    EXPECT_EQ(retrieved.get(), rawPtr);
 }
 
 TEST(PointwiseAttributesTests, SetInput2WithMove)
 {
-    PointwiseAttributes pointwise_attributes;
+    PointwiseAttributes pointwiseAttributes;
 
-    auto input_tensor = std::make_shared<TensorAttributes>();
-    input_tensor->set_uid(3).set_name("InputTensor2");
+    auto inputTensor = std::make_shared<TensorAttributes>();
+    inputTensor->set_uid(3).set_name("InputTensor2");
 
-    auto raw_ptr = input_tensor.get();
+    auto rawPtr = inputTensor.get();
 
-    pointwise_attributes.set_input_2(std::move(input_tensor));
+    pointwiseAttributes.set_input_2(std::move(inputTensor));
 
-    auto retrieved = pointwise_attributes.get_input_2();
+    auto retrieved = pointwiseAttributes.get_input_2();
     EXPECT_EQ(retrieved->get_uid(), 3);
     EXPECT_EQ(retrieved->get_name(), "InputTensor2");
 
-    EXPECT_EQ(input_tensor, nullptr);
-    EXPECT_EQ(retrieved.get(), raw_ptr);
+    EXPECT_EQ(inputTensor, nullptr);
+    EXPECT_EQ(retrieved.get(), rawPtr);
 }
 
 TEST(PointwiseAttributesTests, SetOutput0WithMove)
 {
-    PointwiseAttributes pointwise_attributes;
+    PointwiseAttributes pointwiseAttributes;
 
-    auto output_tensor = std::make_shared<TensorAttributes>();
-    output_tensor->set_uid(4).set_name("OutputTensor");
+    auto outputTensor = std::make_shared<TensorAttributes>();
+    outputTensor->set_uid(4).set_name("OutputTensor");
 
-    auto raw_ptr = output_tensor.get();
+    auto rawPtr = outputTensor.get();
 
-    pointwise_attributes.set_output_0(std::move(output_tensor));
+    pointwiseAttributes.set_output_0(std::move(outputTensor));
 
-    auto retrieved = pointwise_attributes.get_output_0();
+    auto retrieved = pointwiseAttributes.get_output_0();
     EXPECT_EQ(retrieved->get_uid(), 4);
     EXPECT_EQ(retrieved->get_name(), "OutputTensor");
 
-    EXPECT_EQ(output_tensor, nullptr);
-    EXPECT_EQ(retrieved.get(), raw_ptr);
+    EXPECT_EQ(outputTensor, nullptr);
+    EXPECT_EQ(retrieved.get(), rawPtr);
 }
 
 // Simplified move tests - testing move semantics without setting uid/name
 
 TEST(PointwiseAttributesTests, SimplifiedSetInput0WithMove)
 {
-    PointwiseAttributes pointwise_attributes;
+    PointwiseAttributes pointwiseAttributes;
 
-    auto input_tensor = std::make_shared<TensorAttributes>();
-    pointwise_attributes.set_input_0(std::move(input_tensor));
+    auto inputTensor = std::make_shared<TensorAttributes>();
+    pointwiseAttributes.set_input_0(std::move(inputTensor));
 
     // Just verify the tensor was set
-    EXPECT_NE(pointwise_attributes.get_input_0(), nullptr);
+    EXPECT_NE(pointwiseAttributes.get_input_0(), nullptr);
 }
 
 TEST(PointwiseAttributesTests, SimplifiedSetInput1WithMove)
 {
-    PointwiseAttributes pointwise_attributes;
+    PointwiseAttributes pointwiseAttributes;
 
-    auto input_tensor = std::make_shared<TensorAttributes>();
-    pointwise_attributes.set_input_1(std::move(input_tensor));
+    auto inputTensor = std::make_shared<TensorAttributes>();
+    pointwiseAttributes.set_input_1(std::move(inputTensor));
 
     // Just verify the tensor was set
-    EXPECT_NE(pointwise_attributes.get_input_1(), nullptr);
+    EXPECT_NE(pointwiseAttributes.get_input_1(), nullptr);
 }
 
 TEST(PointwiseAttributesTests, SimplifiedSetInput2WithMove)
 {
-    PointwiseAttributes pointwise_attributes;
+    PointwiseAttributes pointwiseAttributes;
 
-    auto input_tensor = std::make_shared<TensorAttributes>();
-    pointwise_attributes.set_input_2(std::move(input_tensor));
+    auto inputTensor = std::make_shared<TensorAttributes>();
+    pointwiseAttributes.set_input_2(std::move(inputTensor));
 
     // Just verify the tensor was set
-    EXPECT_NE(pointwise_attributes.get_input_2(), nullptr);
+    EXPECT_NE(pointwiseAttributes.get_input_2(), nullptr);
 }
 
 TEST(PointwiseAttributesTests, SimplifiedSetOutput0WithMove)
 {
-    PointwiseAttributes pointwise_attributes;
+    PointwiseAttributes pointwiseAttributes;
 
-    auto output_tensor = std::make_shared<TensorAttributes>();
-    pointwise_attributes.set_output_0(std::move(output_tensor));
+    auto outputTensor = std::make_shared<TensorAttributes>();
+    pointwiseAttributes.set_output_0(std::move(outputTensor));
 
     // Just verify the tensor was set
-    EXPECT_NE(pointwise_attributes.get_output_0(), nullptr);
+    EXPECT_NE(pointwiseAttributes.get_output_0(), nullptr);
 }
 
 TEST(PointwiseAttributesTests, CreatePointwiseAttributesWithThreeInputs)
 {
-    PointwiseAttributes pointwise_attributes;
+    PointwiseAttributes pointwiseAttributes;
 
-    pointwise_attributes.set_input_0(std::make_shared<TensorAttributes>());
-    pointwise_attributes.set_input_1(std::make_shared<TensorAttributes>());
-    pointwise_attributes.set_input_2(std::make_shared<TensorAttributes>());
-    pointwise_attributes.set_output_0(std::make_shared<TensorAttributes>());
-    pointwise_attributes.set_mode(PointwiseMode_t::RELU_FWD);
+    pointwiseAttributes.set_input_0(std::make_shared<TensorAttributes>());
+    pointwiseAttributes.set_input_1(std::make_shared<TensorAttributes>());
+    pointwiseAttributes.set_input_2(std::make_shared<TensorAttributes>());
+    pointwiseAttributes.set_output_0(std::make_shared<TensorAttributes>());
+    pointwiseAttributes.set_mode(PointwiseMode_t::RELU_FWD);
 
-    auto input_tensor_0 = pointwise_attributes.get_input_0();
-    input_tensor_0->set_uid(1)
+    auto inputTensor0 = pointwiseAttributes.get_input_0();
+    inputTensor0->set_uid(1)
         .set_name("InputTensor0")
         .set_data_type(DataType_t::FLOAT)
         .set_dim({1, 2, 3, 4})
         .set_stride({5, 6, 7, 8});
 
-    auto input_tensor_1 = pointwise_attributes.get_input_1();
-    input_tensor_1->set_uid(2)
+    auto inputTensor1 = pointwiseAttributes.get_input_1();
+    inputTensor1->set_uid(2)
         .set_name("InputTensor1")
         .set_data_type(DataType_t::FLOAT)
         .set_dim({1, 2, 3, 4})
         .set_stride({5, 6, 7, 8});
 
-    auto input_tensor_2 = pointwise_attributes.get_input_2();
-    input_tensor_2->set_uid(3)
+    auto inputTensor2 = pointwiseAttributes.get_input_2();
+    inputTensor2->set_uid(3)
         .set_name("InputTensor2")
         .set_data_type(DataType_t::FLOAT)
         .set_dim({1, 2, 3, 4})
         .set_stride({5, 6, 7, 8});
 
-    auto output_tensor = pointwise_attributes.get_output_0();
-    output_tensor->set_uid(4).set_name("OutputTensor");
+    auto outputTensor = pointwiseAttributes.get_output_0();
+    outputTensor->set_uid(4).set_name("OutputTensor");
 
-    EXPECT_EQ(input_tensor_0->get_uid(), 1);
-    EXPECT_EQ(input_tensor_0->get_name(), "InputTensor0");
-    EXPECT_EQ(input_tensor_1->get_uid(), 2);
-    EXPECT_EQ(input_tensor_1->get_name(), "InputTensor1");
-    EXPECT_EQ(input_tensor_2->get_uid(), 3);
-    EXPECT_EQ(input_tensor_2->get_name(), "InputTensor2");
-    EXPECT_EQ(output_tensor->get_uid(), 4);
-    EXPECT_EQ(output_tensor->get_name(), "OutputTensor");
-    EXPECT_EQ(pointwise_attributes.get_mode(), PointwiseMode_t::RELU_FWD);
+    EXPECT_EQ(inputTensor0->get_uid(), 1);
+    EXPECT_EQ(inputTensor0->get_name(), "InputTensor0");
+    EXPECT_EQ(inputTensor1->get_uid(), 2);
+    EXPECT_EQ(inputTensor1->get_name(), "InputTensor1");
+    EXPECT_EQ(inputTensor2->get_uid(), 3);
+    EXPECT_EQ(inputTensor2->get_name(), "InputTensor2");
+    EXPECT_EQ(outputTensor->get_uid(), 4);
+    EXPECT_EQ(outputTensor->get_name(), "OutputTensor");
+    EXPECT_EQ(pointwiseAttributes.get_mode(), PointwiseMode_t::RELU_FWD);
 }
