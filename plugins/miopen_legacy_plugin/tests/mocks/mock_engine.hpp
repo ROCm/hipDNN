@@ -14,7 +14,7 @@
 namespace miopen_legacy_plugin
 {
 
-class MockEngine : public EngineInterface
+class MockEngine : public IEngine
 {
 public:
     MOCK_METHOD(int64_t, id, (), (const, override));

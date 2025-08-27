@@ -174,7 +174,7 @@ int main(int argc, char* argv[])
 {
     auto config = parseCommandLineArgs(argc, argv);
 
-    initialize_frontend_logging(hipdnnLoggingCallback_ext);
+    initializeFrontendLogging(hipdnnLoggingCallback_ext);
 
     hipdnnHandle_t handle;
     HIPDNN_CHECK(hipdnnCreate(&handle));

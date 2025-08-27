@@ -143,7 +143,7 @@ public:
 
         return hipdnn_sdk::data_objects::CreatePointwiseAttributes(
             builder,
-            to_sdk_type(_mode),
+            toSdkType(_mode),
             _reluLowerClip,
             _reluUpperClip,
             _reluLowerSlope,

@@ -42,7 +42,7 @@ private:
     std::optional<std::unique_ptr<MiopenTensor>> _estVarianceTensorDescriptor;
 };
 
-class BatchnormFwdInferencePlan : public PlanInterface
+class BatchnormFwdInferencePlan : public IPlan
 {
 public:
     BatchnormFwdInferencePlan(std::unique_ptr<BatchnormFwdInferenceParams> inferenceParams);

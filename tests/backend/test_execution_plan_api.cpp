@@ -7,13 +7,13 @@
 
 #include <gtest/gtest.h>
 
-class Execution_plan_api_tests : public ::testing::Test
+class ExecutionPlanApiTests : public ::testing::Test
 {
 protected:
     static constexpr int64_t GIDX = hipdnn_tests::plugin_constants::engine_id<Good_plugin>();
     hipdnnBackendDescriptor_t _plan;
     hipdnnHandle_t _handle = nullptr;
-    hipdnnBackendDescriptor_t _engine_config = nullptr;
+    hipdnnBackendDescriptor_t _engineConfig = nullptr;
     hipdnnBackendDescriptor_t _engine = nullptr;
     hipdnnBackendDescriptor_t _graph = nullptr;
 
@@ -33,15 +33,15 @@ protected:
 
     void TearDown() override
     {
-        destroy_test_descriptor(_plan);
-        destroy_test_handle();
-        destroy_test_descriptor(_engine_config);
-        destroy_test_descriptor(_engine);
-        destroy_test_descriptor(_graph);
+        destroyTestDescriptor(_plan);
+        destroyTestHandle();
+        destroyTestDescriptor(_engineConfig);
+        destroyTestDescriptor(_engine);
+        destroyTestDescriptor(_graph);
     }
 
 private:
-    void destroy_test_handle()
+    void destroyTestHandle()
     {
         if(_handle != nullptr)
         {
@@ -50,7 +50,7 @@ private:
         }
     }
 
-    static void destroy_test_descriptor(hipdnnBackendDescriptor_t descriptor)
+    static void destroyTestDescriptor(hipdnnBackendDescriptor_t descriptor)
     {
         if(descriptor != nullptr)
         {
@@ -60,7 +60,7 @@ private:
     }
 };
 
-TEST_F(Execution_plan_api_tests, SetExecutionPlanHandle)
+TEST_F(ExecutionPlanApiTests, SetExecutionPlanHandle)
 {
     EXPECT_EQ(hipdnnBackendSetAttribute(
                   _plan, HIPDNN_ATTR_EXECUTION_PLAN_HANDLE, HIPDNN_TYPE_HANDLE, 1, nullptr),
@@ -71,7 +71,7 @@ TEST_F(Execution_plan_api_tests, SetExecutionPlanHandle)
               HIPDNN_STATUS_SUCCESS);
 }
 
-TEST_F(Execution_plan_api_tests, SetExecutionPlanEngineConfig)
+TEST_F(ExecutionPlanApiTests, SetExecutionPlanEngineConfig)
 {
     EXPECT_EQ(hipdnnBackendSetAttribute(_plan,
                                         HIPDNN_ATTR_EXECUTION_PLAN_ENGINE_CONFIG,
@@ -80,24 +80,24 @@ TEST_F(Execution_plan_api_tests, SetExecutionPlanEngineConfig)
                                         nullptr),
               HIPDNN_STATUS_BAD_PARAM_NULL_POINTER);
 
-    test_util::create_test_engine_config(&_engine_config, &_engine, &_graph, _handle, GIDX, true);
+    test_util::createTestEngineConfig(&_engineConfig, &_engine, &_graph, _handle, GIDX, true);
 
     EXPECT_EQ(hipdnnBackendSetAttribute(_plan,
                                         HIPDNN_ATTR_EXECUTION_PLAN_ENGINE_CONFIG,
                                         HIPDNN_TYPE_BACKEND_DESCRIPTOR,
                                         1,
-                                        &_engine_config),
+                                        &_engineConfig),
               HIPDNN_STATUS_SUCCESS);
 }
 
-TEST_F(Execution_plan_api_tests, SetExecutionPlanAttrNotSupported)
+TEST_F(ExecutionPlanApiTests, SetExecutionPlanAttrNotSupported)
 {
     EXPECT_EQ(hipdnnBackendSetAttribute(
                   _plan, HIPDNN_ATTR_EXECUTION_PLAN_WORKSPACE_SIZE, HIPDNN_TYPE_INT64, 1, nullptr),
               HIPDNN_STATUS_NOT_SUPPORTED);
 }
 
-TEST_F(Execution_plan_api_tests, GetExecutionPlanWorkSpaceSize)
+TEST_F(ExecutionPlanApiTests, GetExecutionPlanWorkSpaceSize)
 {
     size_t size = 0;
     EXPECT_EQ(
@@ -105,8 +105,8 @@ TEST_F(Execution_plan_api_tests, GetExecutionPlanWorkSpaceSize)
             _plan, HIPDNN_ATTR_EXECUTION_PLAN_WORKSPACE_SIZE, HIPDNN_TYPE_INT64, 1, nullptr, &size),
         HIPDNN_STATUS_NOT_INITIALIZED);
 
-    test_util::populate_test_execution_plan(
-        &_plan, &_engine_config, &_engine, &_graph, _handle, GIDX, true);
+    test_util::populateTestExecutionPlan(
+        &_plan, &_engineConfig, &_engine, &_graph, _handle, GIDX, true);
     EXPECT_EQ(
         hipdnnBackendGetAttribute(
             _plan, HIPDNN_ATTR_EXECUTION_PLAN_WORKSPACE_SIZE, HIPDNN_TYPE_INT64, 1, nullptr, &size),
@@ -114,7 +114,7 @@ TEST_F(Execution_plan_api_tests, GetExecutionPlanWorkSpaceSize)
     EXPECT_EQ(size, 1024);
 }
 
-TEST_F(Execution_plan_api_tests, FinalizeExecutionPlan)
+TEST_F(ExecutionPlanApiTests, FinalizeExecutionPlan)
 {
     EXPECT_EQ(hipdnnBackendFinalize(_plan), HIPDNN_STATUS_BAD_PARAM);
 
@@ -123,7 +123,6 @@ TEST_F(Execution_plan_api_tests, FinalizeExecutionPlan)
               HIPDNN_STATUS_SUCCESS);
     EXPECT_EQ(hipdnnBackendFinalize(_plan), HIPDNN_STATUS_BAD_PARAM);
 
-    test_util::populate_test_execution_plan(
-        &_plan, &_engine_config, &_engine, &_graph, _handle, GIDX);
+    test_util::populateTestExecutionPlan(&_plan, &_engineConfig, &_engine, &_graph, _handle, GIDX);
     EXPECT_EQ(hipdnnBackendFinalize(_plan), HIPDNN_STATUS_SUCCESS);
 }

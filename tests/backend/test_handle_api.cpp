@@ -5,72 +5,72 @@
 #include <gtest/gtest.h>
 #include <hipdnn_sdk/test_utilities/test_utilities.hpp>
 
-TEST(hipDNNHandleAPITests, CreateAndDestroy)
+TEST(HipDNNHandleAPITests, CreateAndDestroy)
 {
     hipdnnHandle_t handle = nullptr;
 
-    hipdnnStatus_t create_status = hipdnnCreate(&handle);
-    ASSERT_EQ(create_status, HIPDNN_STATUS_SUCCESS);
+    auto createStatus = hipdnnCreate(&handle);
+    ASSERT_EQ(createStatus, HIPDNN_STATUS_SUCCESS);
     ASSERT_NE(handle, nullptr);
 
-    auto destroy_status = hipdnnDestroy(handle);
-    ASSERT_EQ(destroy_status, HIPDNN_STATUS_SUCCESS);
+    auto destroyStatus = hipdnnDestroy(handle);
+    ASSERT_EQ(destroyStatus, HIPDNN_STATUS_SUCCESS);
 }
 
-TEST(hipDNNHandleAPITests, SetStreamNullptrHandle)
+TEST(HipDNNHandleAPITests, SetStreamNullptrHandle)
 {
-    hipStream_t test_stream = nullptr;
-    hipdnnStatus_t set_stream_status = hipdnnSetStream(nullptr, test_stream);
-    ASSERT_EQ(set_stream_status, HIPDNN_STATUS_BAD_PARAM_NULL_POINTER);
+    hipStream_t testStream = nullptr;
+    auto setStreamStatus = hipdnnSetStream(nullptr, testStream);
+    ASSERT_EQ(setStreamStatus, HIPDNN_STATUS_BAD_PARAM_NULL_POINTER);
 }
 
-TEST(hipDNNHandleAPITests, GetStreamNullptrHandle)
+TEST(HipDNNHandleAPITests, GetStreamNullptrHandle)
 {
-    hipStream_t retrieved_stream = nullptr;
-    hipdnnStatus_t get_stream_status = hipdnnGetStream(nullptr, &retrieved_stream);
-    ASSERT_EQ(get_stream_status, HIPDNN_STATUS_BAD_PARAM_NULL_POINTER);
+    hipStream_t retrievedStream = nullptr;
+    auto getStreamStatus = hipdnnGetStream(nullptr, &retrievedStream);
+    ASSERT_EQ(getStreamStatus, HIPDNN_STATUS_BAD_PARAM_NULL_POINTER);
 }
 
-TEST(hipDNNHandleAPITests, GetStreamNullptrStreamPointer)
+TEST(HipDNNHandleAPITests, GetStreamNullptrStreamPointer)
 {
     hipdnnHandle_t handle = nullptr;
 
-    hipdnnStatus_t create_status = hipdnnCreate(&handle);
-    ASSERT_EQ(create_status, HIPDNN_STATUS_SUCCESS);
+    auto createStatus = hipdnnCreate(&handle);
+    ASSERT_EQ(createStatus, HIPDNN_STATUS_SUCCESS);
     ASSERT_NE(handle, nullptr);
 
-    hipStream_t test_stream = nullptr;
-    hipdnnStatus_t get_stream_status = hipdnnGetStream(handle, &test_stream);
-    ASSERT_EQ(get_stream_status, HIPDNN_STATUS_SUCCESS);
-    ASSERT_EQ(test_stream, nullptr);
+    hipStream_t testStream = nullptr;
+    auto getStreamStatus = hipdnnGetStream(handle, &testStream);
+    ASSERT_EQ(getStreamStatus, HIPDNN_STATUS_SUCCESS);
+    ASSERT_EQ(testStream, nullptr);
 
-    hipdnnStatus_t destroy_status = hipdnnDestroy(handle);
-    ASSERT_EQ(destroy_status, HIPDNN_STATUS_SUCCESS);
+    auto destroyStatus = hipdnnDestroy(handle);
+    ASSERT_EQ(destroyStatus, HIPDNN_STATUS_SUCCESS);
 }
 
-TEST(GPU_hipDNNHandleAPITests, GetStreamPointer)
+TEST(GPUHipDNNHandleAPITests, GetStreamPointer)
 {
     SKIP_IF_NO_DEVICES();
 
     hipdnnHandle_t handle = nullptr;
 
-    hipdnnStatus_t create_status = hipdnnCreate(&handle);
-    ASSERT_EQ(create_status, HIPDNN_STATUS_SUCCESS);
+    auto createStatus = hipdnnCreate(&handle);
+    ASSERT_EQ(createStatus, HIPDNN_STATUS_SUCCESS);
     ASSERT_NE(handle, nullptr);
 
     hipStream_t stream;
     ASSERT_EQ(hipStreamCreate(&stream), hipSuccess) << "Failed to create HIP stream.";
 
-    hipdnnStatus_t set_stream_status = hipdnnSetStream(handle, stream);
-    ASSERT_EQ(set_stream_status, HIPDNN_STATUS_SUCCESS);
+    auto setStreamStatus = hipdnnSetStream(handle, stream);
+    ASSERT_EQ(setStreamStatus, HIPDNN_STATUS_SUCCESS);
 
-    hipStream_t retrieved_stream = nullptr;
-    hipdnnStatus_t get_stream_status = hipdnnGetStream(handle, &retrieved_stream);
-    ASSERT_EQ(get_stream_status, HIPDNN_STATUS_SUCCESS);
-    ASSERT_EQ(retrieved_stream, stream);
+    hipStream_t retrievedStream = nullptr;
+    auto getStreamStatus = hipdnnGetStream(handle, &retrievedStream);
+    ASSERT_EQ(getStreamStatus, HIPDNN_STATUS_SUCCESS);
+    ASSERT_EQ(retrievedStream, stream);
 
-    hipdnnStatus_t destroy_status = hipdnnDestroy(handle);
-    ASSERT_EQ(destroy_status, HIPDNN_STATUS_SUCCESS);
+    auto destroyStatus = hipdnnDestroy(handle);
+    ASSERT_EQ(destroyStatus, HIPDNN_STATUS_SUCCESS);
 
     ASSERT_EQ(hipStreamDestroy(stream), hipSuccess) << "Failed to destroy HIP stream.";
 }

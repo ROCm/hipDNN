@@ -162,26 +162,25 @@ protected:
 
         int64_t uid = 1;
 
-        auto xAttr = graph::make_tensor_attributes("x", inputDataType, graphTensorBundle.xTensor);
+        auto xAttr = graph::makeTensorAttributes("x", inputDataType, graphTensorBundle.xTensor);
         xAttr.set_uid(uid++);
         auto xTensorAttr = std::make_shared<graph::TensorAttributes>(std::move(xAttr));
 
-        auto dyAttr
-            = graph::make_tensor_attributes("dy", inputDataType, graphTensorBundle.dyTensor);
+        auto dyAttr = graph::makeTensorAttributes("dy", inputDataType, graphTensorBundle.dyTensor);
         dyAttr.set_uid(uid++);
         auto dyTensorAttr = std::make_shared<graph::TensorAttributes>(std::move(dyAttr));
 
-        auto scaleAttr = graph::make_tensor_attributes(
+        auto scaleAttr = graph::makeTensorAttributes(
             "scale", intermediateDataType, graphTensorBundle.scaleTensor);
         scaleAttr.set_uid(uid++);
         auto scaleTensorAttr = std::make_shared<graph::TensorAttributes>(std::move(scaleAttr));
 
-        auto meanAttr = graph::make_tensor_attributes(
+        auto meanAttr = graph::makeTensorAttributes(
             "mean", intermediateDataType, graphTensorBundle.meanTensor);
         meanAttr.set_uid(uid++);
         auto meanTensorAttr = std::make_shared<graph::TensorAttributes>(std::move(meanAttr));
 
-        auto invVarianceAttr = graph::make_tensor_attributes(
+        auto invVarianceAttr = graph::makeTensorAttributes(
             "inv_variance", intermediateDataType, graphTensorBundle.invVarianceTensor);
         invVarianceAttr.set_uid(uid++);
         auto invVarianceTensorAttr
@@ -266,8 +265,8 @@ protected:
                           InputType tolerance = 1e4f,
                           const TensorLayout& layout = TensorLayout::NCHW)
     {
-        auto inputDataType = get_data_type_enum_from_type<InputType>();
-        auto intermediateDataType = get_data_type_enum_from_type<IntermediateType>();
+        auto inputDataType = getDataTypeEnumFromType<InputType>();
+        auto intermediateDataType = getDataTypeEnumFromType<IntermediateType>();
 
         unsigned int seed = std::random_device{}();
         HIPDNN_LOG_INFO("Test is using {} for its random seed", seed);

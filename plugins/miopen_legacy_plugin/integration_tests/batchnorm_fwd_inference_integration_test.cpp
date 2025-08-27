@@ -159,27 +159,27 @@ protected:
         graph->set_name("BatchnormInferenceTest");
 
         int64_t uid = 1;
-        auto xAttr = graph::make_tensor_attributes("X", inputDataType, graphTensorBundle.xTensor);
+        auto xAttr = graph::makeTensorAttributes("X", inputDataType, graphTensorBundle.xTensor);
         xAttr.set_uid(uid++);
         auto xTensorAttr = std::make_shared<graph::TensorAttributes>(std::move(xAttr));
 
-        auto meanAttr = graph::make_tensor_attributes(
+        auto meanAttr = graph::makeTensorAttributes(
             "mean", intermediateDataType, graphTensorBundle.meanTensor);
         meanAttr.set_uid(uid++);
         auto meanTensorAttr = std::make_shared<graph::TensorAttributes>(std::move(meanAttr));
 
-        auto invVarianceAttr = graph::make_tensor_attributes(
+        auto invVarianceAttr = graph::makeTensorAttributes(
             "inv_variance", intermediateDataType, graphTensorBundle.varianceTensor);
         invVarianceAttr.set_uid(uid++);
         auto invVarianceTensorAttr
             = std::make_shared<graph::TensorAttributes>(std::move(invVarianceAttr));
 
-        auto scaleAttr = graph::make_tensor_attributes(
+        auto scaleAttr = graph::makeTensorAttributes(
             "scale", intermediateDataType, graphTensorBundle.scaleTensor);
         scaleAttr.set_uid(uid++);
         auto scaleTensorAttr = std::make_shared<graph::TensorAttributes>(std::move(scaleAttr));
 
-        auto biasAttr = graph::make_tensor_attributes(
+        auto biasAttr = graph::makeTensorAttributes(
             "bias", intermediateDataType, graphTensorBundle.biasTensor);
         biasAttr.set_uid(uid++);
         auto biasTensorAttr = std::make_shared<graph::TensorAttributes>(std::move(biasAttr));
@@ -248,8 +248,8 @@ protected:
                           InputType tolerance = 1e-4f,
                           const TensorLayout& layout = TensorLayout::NCHW)
     {
-        auto inputDataType = get_data_type_enum_from_type<InputType>();
-        auto intermediateDataType = get_data_type_enum_from_type<IntermediateType>();
+        auto inputDataType = getDataTypeEnumFromType<InputType>();
+        auto intermediateDataType = getDataTypeEnumFromType<IntermediateType>();
 
         unsigned int seed = std::random_device{}();
         //log the random seed in case we need to reproduce the test

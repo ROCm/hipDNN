@@ -262,7 +262,7 @@ public:
         return hipdnn_sdk::data_objects::CreateTensorAttributesDirect(builder,
                                                                       _uid,
                                                                       _name.c_str(),
-                                                                      to_sdk_type(_dataType),
+                                                                      toSdkType(_dataType),
                                                                       &_stride,
                                                                       &_dim,
                                                                       _isVirtual,

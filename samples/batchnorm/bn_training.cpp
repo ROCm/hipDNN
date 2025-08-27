@@ -47,9 +47,9 @@ void SampleRunner::operator()(const TensorLayout& layout)
     auto epsilon = createTensor({1, 1, 1, 1}, intermediateType);
 
     auto bnAttributes = graph::BatchnormAttributes();
-    bnAttributes.setName("bn_training_node");
-    bnAttributes.setPreviousRunningStats(prevRunningMean, prevRunningVar, momentum)
-        .setEpsilon(epsilon);
+    bnAttributes.set_name("bn_training_node");
+    bnAttributes.set_previous_running_stats(prevRunningMean, prevRunningVar, momentum)
+        .set_epsilon(epsilon);
 
     auto [y, nextRunningMean, nextRunningVar, savedMean, savedInvVariance]
         = graph->batchnorm(x, scale, bias, bnAttributes);
@@ -192,7 +192,7 @@ int main(int argc, char* argv[])
 {
     auto config = parseCommandLineArgs(argc, argv);
 
-    initialize_frontend_logging(hipdnnLoggingCallback_ext);
+    initializeFrontendLogging(hipdnnLoggingCallback_ext);
 
     hipdnnHandle_t handle;
     HIPDNN_CHECK(hipdnnCreate(&handle));

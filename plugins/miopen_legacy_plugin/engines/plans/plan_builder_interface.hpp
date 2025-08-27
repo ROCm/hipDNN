@@ -15,10 +15,10 @@
 namespace miopen_legacy_plugin
 {
 
-class PlanBuilderInterface
+class IPlanBuilder
 {
 public:
-    virtual ~PlanBuilderInterface() = default;
+    virtual ~IPlanBuilder() = default;
 
     virtual bool isApplicable(const hipdnn_plugin::IGraph& opGraph) const = 0;
 
