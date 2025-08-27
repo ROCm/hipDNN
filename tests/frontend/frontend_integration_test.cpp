@@ -28,21 +28,21 @@ enum class FailurePoint
     EXECUTE // Expect failure at execute
 };
 
-struct Integration_test_case
+struct IntegrationTestCase
 {
-    std::string plugin_path;
+    std::string pluginPath;
     std::string description;
-    std::string graph_name;
-    FailurePoint expected_failure;
-    bool use_manual_uids;
+    std::string graphName;
+    FailurePoint expectedFailure;
+    bool useManualUids;
 
-    friend std::ostream& operator<<(std::ostream& os, const Integration_test_case& tc)
+    friend std::ostream& operator<<(std::ostream& os, const IntegrationTestCase& tc)
     {
         os << "BatchnormTestCase{"
-           << "plugin_path: " << tc.plugin_path << ", description: " << tc.description
-           << ", graph_name: " << tc.graph_name << ", expected_failure: ";
+           << "plugin_path: " << tc.pluginPath << ", description: " << tc.description
+           << ", graph_name: " << tc.graphName << ", expected_failure: ";
 
-        switch(tc.expected_failure)
+        switch(tc.expectedFailure)
         {
         case FailurePoint::NONE:
             os << "NONE";
@@ -58,7 +58,7 @@ struct Integration_test_case
             break;
         }
 
-        os << ", use_manual_uids: " << (tc.use_manual_uids ? "true" : "false") << "}";
+        os << ", use_manual_uids: " << (tc.useManualUids ? "true" : "false") << "}";
 
         return os;
     }
@@ -70,45 +70,45 @@ struct Integration_test_case
 //        - We are using fake test plugins to simulate different scenarios.
 //        - The tests will validate the graph creation, execution plan building, and execution through the full flow.
 //        - We are using a batchnorm graph since the graph doesn't really matter due to fake plugins.
-class Frontend_e2e_integration_test : public ::testing::TestWithParam<Integration_test_case>
+class FrontendEndToEndIntegrationTest : public ::testing::TestWithParam<IntegrationTestCase>
 {
 protected:
     // Simplified tensor bundle for frontend integration tests
     template <typename Input_type, typename Intermediate_type>
-    struct Simple_batchnorm_2d_tensor_bundle
+    struct SimpleBatchnorm2DTensorBundle
     {
-        Simple_batchnorm_2d_tensor_bundle(const std::vector<int64_t>& dims)
-            : derived_dims({1, dims[1], 1, 1})
-            , x_tensor(Tensor<Input_type>(dims))
-            , y_tensor(Tensor<Input_type>(dims))
-            , scale_tensor(Tensor<Intermediate_type>(derived_dims))
-            , bias_tensor(Tensor<Intermediate_type>(derived_dims))
-            , mean_tensor(Tensor<Intermediate_type>(derived_dims))
-            , variance_tensor(Tensor<Intermediate_type>(derived_dims))
+        SimpleBatchnorm2DTensorBundle(const std::vector<int64_t>& dims)
+            : derivedDims({1, dims[1], 1, 1})
+            , xTensor(Tensor<Input_type>(dims))
+            , yTensor(Tensor<Input_type>(dims))
+            , scaleTensor(Tensor<Intermediate_type>(derivedDims))
+            , biasTensor(Tensor<Intermediate_type>(derivedDims))
+            , meanTensor(Tensor<Intermediate_type>(derivedDims))
+            , varianceTensor(Tensor<Intermediate_type>(derivedDims))
         {
             // Initialize with simple constant values
-            x_tensor.fillWithValue(static_cast<Input_type>(1.0f));
-            y_tensor.fillWithValue(static_cast<Input_type>(0.0f));
-            scale_tensor.fillWithValue(static_cast<Intermediate_type>(1.0f));
-            bias_tensor.fillWithValue(static_cast<Intermediate_type>(0.0f));
-            mean_tensor.fillWithValue(static_cast<Intermediate_type>(0.0f));
-            variance_tensor.fillWithValue(static_cast<Intermediate_type>(1.0f));
+            xTensor.fillWithValue(static_cast<Input_type>(1.0f));
+            yTensor.fillWithValue(static_cast<Input_type>(0.0f));
+            scaleTensor.fillWithValue(static_cast<Intermediate_type>(1.0f));
+            biasTensor.fillWithValue(static_cast<Intermediate_type>(0.0f));
+            meanTensor.fillWithValue(static_cast<Intermediate_type>(0.0f));
+            varianceTensor.fillWithValue(static_cast<Intermediate_type>(1.0f));
         }
 
-        std::vector<int64_t> derived_dims;
-        Tensor<Input_type> x_tensor;
-        Tensor<Input_type> y_tensor;
-        Tensor<Intermediate_type> scale_tensor;
-        Tensor<Intermediate_type> bias_tensor;
-        Tensor<Intermediate_type> mean_tensor;
-        Tensor<Intermediate_type> variance_tensor;
+        std::vector<int64_t> derivedDims;
+        Tensor<Input_type> xTensor;
+        Tensor<Input_type> yTensor;
+        Tensor<Intermediate_type> scaleTensor;
+        Tensor<Intermediate_type> biasTensor;
+        Tensor<Intermediate_type> meanTensor;
+        Tensor<Intermediate_type> varianceTensor;
     };
 
-    struct Batchnorm_test_tensors
+    struct BatchnormTestTensors
     {
         std::shared_ptr<TensorAttributes> x;
         std::shared_ptr<TensorAttributes> mean;
-        std::shared_ptr<TensorAttributes> inv_variance;
+        std::shared_ptr<TensorAttributes> invVariance;
         std::shared_ptr<TensorAttributes> scale;
         std::shared_ptr<TensorAttributes> bias;
         std::shared_ptr<TensorAttributes> y;
@@ -127,14 +127,14 @@ protected:
         }
     }
 
-    static hipdnnHandle_t setup_test_environment_with_plugin(const std::string& plugin_path)
+    static hipdnnHandle_t setupEnvironmentWithPlugin(const std::string& pluginPath)
     {
         EXPECT_EQ(hipInit(0), hipSuccess);
-        int device_id = 0;
-        EXPECT_EQ(hipGetDevice(&device_id), hipSuccess);
+        int deviceId = 0;
+        EXPECT_EQ(hipGetDevice(&deviceId), hipSuccess);
 
         // Set up plugin path - load specific plugin by absolute path
-        const std::array<const char*, 1> paths = {plugin_path.c_str()};
+        const std::array<const char*, 1> paths = {pluginPath.c_str()};
         EXPECT_EQ(hipdnnSetEnginePluginPaths_ext(
                       paths.size(), paths.data(), HIPDNN_PLUGIN_LOADING_ABSOLUTE),
                   HIPDNN_STATUS_SUCCESS);
@@ -146,62 +146,60 @@ protected:
         return handle;
     }
 
-    static std::pair<std::shared_ptr<Graph>, Batchnorm_test_tensors>
-        create_batchnorm_test_graph_with_uids(
-            const std::string& graph_name,
-            const Simple_batchnorm_2d_tensor_bundle<float, float>& tensor_bundle,
-            bool use_manual_uids)
+    static std::pair<std::shared_ptr<Graph>, BatchnormTestTensors> createBatchnormTestGraphWithUids(
+        const std::string& graphName,
+        const SimpleBatchnorm2DTensorBundle<float, float>& tensorBundle,
+        bool useManualUids)
     {
         auto graph = std::make_shared<hipdnn_frontend::graph::Graph>();
-        graph->set_name(graph_name);
+        graph->set_name(graphName);
 
         int64_t uid = 1;
-        Batchnorm_test_tensors tensors;
+        BatchnormTestTensors tensors;
 
-        auto x_attr = makeTensorAttributes("X", DataType_t::FLOAT, tensor_bundle.x_tensor);
-        if(use_manual_uids)
+        auto xAttr = makeTensorAttributes("X", DataType_t::FLOAT, tensorBundle.xTensor);
+        if(useManualUids)
         {
-            x_attr.set_uid(uid++);
+            xAttr.set_uid(uid++);
         }
-        tensors.x = std::make_shared<TensorAttributes>(std::move(x_attr));
+        tensors.x = std::make_shared<TensorAttributes>(std::move(xAttr));
 
-        auto mean_attr = makeTensorAttributes("mean", DataType_t::FLOAT, tensor_bundle.mean_tensor);
-        if(use_manual_uids)
+        auto meanAttr = makeTensorAttributes("mean", DataType_t::FLOAT, tensorBundle.meanTensor);
+        if(useManualUids)
         {
-            mean_attr.set_uid(uid++);
+            meanAttr.set_uid(uid++);
         }
-        tensors.mean = std::make_shared<TensorAttributes>(std::move(mean_attr));
+        tensors.mean = std::make_shared<TensorAttributes>(std::move(meanAttr));
 
-        auto inv_variance_attr = makeTensorAttributes(
-            "inv_variance", DataType_t::FLOAT, tensor_bundle.variance_tensor);
-        if(use_manual_uids)
+        auto invVarianceAttr
+            = makeTensorAttributes("inv_variance", DataType_t::FLOAT, tensorBundle.varianceTensor);
+        if(useManualUids)
         {
-            inv_variance_attr.set_uid(uid++);
+            invVarianceAttr.set_uid(uid++);
         }
-        tensors.inv_variance = std::make_shared<TensorAttributes>(std::move(inv_variance_attr));
+        tensors.invVariance = std::make_shared<TensorAttributes>(std::move(invVarianceAttr));
 
-        auto scale_attr
-            = makeTensorAttributes("scale", DataType_t::FLOAT, tensor_bundle.scale_tensor);
-        if(use_manual_uids)
+        auto scaleAttr = makeTensorAttributes("scale", DataType_t::FLOAT, tensorBundle.scaleTensor);
+        if(useManualUids)
         {
-            scale_attr.set_uid(uid++);
+            scaleAttr.set_uid(uid++);
         }
-        tensors.scale = std::make_shared<TensorAttributes>(std::move(scale_attr));
+        tensors.scale = std::make_shared<TensorAttributes>(std::move(scaleAttr));
 
-        auto bias_attr = makeTensorAttributes("bias", DataType_t::FLOAT, tensor_bundle.bias_tensor);
-        if(use_manual_uids)
+        auto biasAttr = makeTensorAttributes("bias", DataType_t::FLOAT, tensorBundle.biasTensor);
+        if(useManualUids)
         {
-            bias_attr.set_uid(uid++);
+            biasAttr.set_uid(uid++);
         }
-        tensors.bias = std::make_shared<TensorAttributes>(std::move(bias_attr));
+        tensors.bias = std::make_shared<TensorAttributes>(std::move(biasAttr));
 
-        BatchnormInferenceAttributes bn_attrs;
-        bn_attrs.set_name("batchnorm_inference");
+        BatchnormInferenceAttributes bnAttrs;
+        bnAttrs.set_name("batchnorm_inference");
 
         tensors.y = graph->batchnorm_inference(
-            tensors.x, tensors.mean, tensors.inv_variance, tensors.scale, tensors.bias, bn_attrs);
+            tensors.x, tensors.mean, tensors.invVariance, tensors.scale, tensors.bias, bnAttrs);
 
-        if(use_manual_uids)
+        if(useManualUids)
         {
             tensors.y->set_uid(uid++);
         }
@@ -211,26 +209,26 @@ protected:
     }
 
     static std::unordered_map<int64_t, void*>
-        create_variant_pack(const Batchnorm_test_tensors& tensors,
-                            Simple_batchnorm_2d_tensor_bundle<float, float>& tensor_bundle)
+        createVariantPack(const BatchnormTestTensors& tensors,
+                          SimpleBatchnorm2DTensorBundle<float, float>& tensorBundle)
     {
-        std::unordered_map<int64_t, void*> variant_pack;
-        variant_pack[tensors.x->get_uid()] = tensor_bundle.x_tensor.memory().deviceData();
-        variant_pack[tensors.mean->get_uid()] = tensor_bundle.mean_tensor.memory().deviceData();
-        variant_pack[tensors.inv_variance->get_uid()]
-            = tensor_bundle.variance_tensor.memory().deviceData();
-        variant_pack[tensors.scale->get_uid()] = tensor_bundle.scale_tensor.memory().deviceData();
-        variant_pack[tensors.bias->get_uid()] = tensor_bundle.bias_tensor.memory().deviceData();
-        variant_pack[tensors.y->get_uid()] = tensor_bundle.y_tensor.memory().deviceData();
+        std::unordered_map<int64_t, void*> variantPack;
+        variantPack[tensors.x->get_uid()] = tensorBundle.xTensor.memory().deviceData();
+        variantPack[tensors.mean->get_uid()] = tensorBundle.meanTensor.memory().deviceData();
+        variantPack[tensors.invVariance->get_uid()]
+            = tensorBundle.varianceTensor.memory().deviceData();
+        variantPack[tensors.scale->get_uid()] = tensorBundle.scaleTensor.memory().deviceData();
+        variantPack[tensors.bias->get_uid()] = tensorBundle.biasTensor.memory().deviceData();
+        variantPack[tensors.y->get_uid()] = tensorBundle.yTensor.memory().deviceData();
 
-        return variant_pack;
+        return variantPack;
     }
 
-    static void run_graph_pipeline(const std::shared_ptr<Graph>& graph,
-                                   hipdnnHandle_t handle,
-                                   const Batchnorm_test_tensors& tensors,
-                                   Simple_batchnorm_2d_tensor_bundle<float, float>& tensor_bundle,
-                                   FailurePoint expected_failure = FailurePoint::NONE)
+    static void runGraphPipeline(const std::shared_ptr<Graph>& graph,
+                                 hipdnnHandle_t handle,
+                                 const BatchnormTestTensors& tensors,
+                                 SimpleBatchnorm2DTensorBundle<float, float>& tensorBundle,
+                                 FailurePoint expectedFailure = FailurePoint::NONE)
     {
         auto result = graph->validate();
         ASSERT_EQ(result.code, error_code_t::OK) << result.err_msg;
@@ -239,7 +237,7 @@ protected:
         ASSERT_EQ(result.code, error_code_t::OK) << result.err_msg;
 
         result = graph->create_execution_plans(handle);
-        if(expected_failure == FailurePoint::CREATE_EXECUTION_PLAN)
+        if(expectedFailure == FailurePoint::CREATE_EXECUTION_PLAN)
         {
             ASSERT_NE(result.code, error_code_t::OK) << "create_execution_plans should fail";
             return;
@@ -254,15 +252,15 @@ protected:
 
         ASSERT_TRUE(tensors.x->has_uid());
         ASSERT_TRUE(tensors.mean->has_uid());
-        ASSERT_TRUE(tensors.inv_variance->has_uid());
+        ASSERT_TRUE(tensors.invVariance->has_uid());
         ASSERT_TRUE(tensors.scale->has_uid());
         ASSERT_TRUE(tensors.bias->has_uid());
         ASSERT_TRUE(tensors.y->has_uid());
 
-        auto variant_pack = create_variant_pack(tensors, tensor_bundle);
+        auto variantPack = createVariantPack(tensors, tensorBundle);
 
-        result = graph->execute(handle, variant_pack, nullptr);
-        if(expected_failure == FailurePoint::EXECUTE)
+        result = graph->execute(handle, variantPack, nullptr);
+        if(expectedFailure == FailurePoint::EXECUTE)
         {
             ASSERT_NE(result.code, error_code_t::OK) << "Execute should fail";
         }
@@ -272,22 +270,22 @@ protected:
         }
     }
 
-    void run_test()
+    void runTest()
     {
-        const auto& test_case = GetParam();
+        const auto& testCase = GetParam();
 
         // Setup environment with specified plugin
-        _handle = setup_test_environment_with_plugin(test_case.plugin_path);
+        _handle = setupEnvironmentWithPlugin(testCase.pluginPath);
 
         // Create tensor bundle
         std::vector<int64_t> dims = {2, 3, 14, 14}; // n=2, c=3, h=14, w=14
-        Simple_batchnorm_2d_tensor_bundle<float, float> tensor_bundle(dims);
+        SimpleBatchnorm2DTensorBundle<float, float> tensorBundle(dims);
 
         // Create graph and tensors using the unified function
-        auto [graph, tensors] = create_batchnorm_test_graph_with_uids(
-            test_case.graph_name, tensor_bundle, test_case.use_manual_uids);
+        auto [graph, tensors] = createBatchnormTestGraphWithUids(
+            testCase.graphName, tensorBundle, testCase.useManualUids);
 
-        run_graph_pipeline(graph, _handle, tensors, tensor_bundle, test_case.expected_failure);
+        runGraphPipeline(graph, _handle, tensors, tensorBundle, testCase.expectedFailure);
     }
 
 private:
@@ -296,37 +294,37 @@ private:
 
 INSTANTIATE_TEST_SUITE_P(
     IntegrationTests,
-    Frontend_e2e_integration_test,
-    ::testing::Values(Integration_test_case{hipdnn_tests::plugin_constants::test_good_plugin_path(),
-                                            "Default plugin with manual UIDs",
-                                            "DefaultPluginBatchnormTest",
-                                            FailurePoint::NONE,
-                                            true},
-                      Integration_test_case{hipdnn_tests::plugin_constants::test_good_plugin_path(),
-                                            "Default plugin with auto UIDs",
-                                            "DefaultPluginBatchnormTestAutoUID",
-                                            FailurePoint::NONE,
-                                            false},
-                      Integration_test_case{
+    FrontendEndToEndIntegrationTest,
+    ::testing::Values(IntegrationTestCase{hipdnn_tests::plugin_constants::test_good_plugin_path(),
+                                          "Default plugin with manual UIDs",
+                                          "DefaultPluginBatchnormTest",
+                                          FailurePoint::NONE,
+                                          true},
+                      IntegrationTestCase{hipdnn_tests::plugin_constants::test_good_plugin_path(),
+                                          "Default plugin with auto UIDs",
+                                          "DefaultPluginBatchnormTestAutoUID",
+                                          FailurePoint::NONE,
+                                          false},
+                      IntegrationTestCase{
                           hipdnn_tests::plugin_constants::test_execute_fails_plugin_path(),
                           "Execute fails plugin",
                           "ExecuteFailsPluginBatchnormTest",
                           FailurePoint::EXECUTE,
                           true},
-                      Integration_test_case{
+                      IntegrationTestCase{
                           hipdnn_tests::plugin_constants::test_no_applicable_engines_plugin_path(),
                           "No applicable engines plugin",
                           "NoEnginesPluginBatchnormTest",
                           FailurePoint::CREATE_EXECUTION_PLAN,
                           true}),
     // Provide a custom name for each test instance
-    [](const ::testing::TestParamInfo<Integration_test_case>& info) {
+    [](const ::testing::TestParamInfo<IntegrationTestCase>& info) {
         std::string name = info.param.description;
         std::ranges::replace_if(name, [](char c) { return !std::isalnum(c); }, '_');
         return name;
     });
 
-TEST_P(Frontend_e2e_integration_test, IntegrationTest)
+TEST_P(FrontendEndToEndIntegrationTest, IntegrationTest)
 {
-    run_test();
+    runTest();
 }
