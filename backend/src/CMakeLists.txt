@@ -8,25 +8,25 @@ set(HIP_DNN_BACKEND_INSTALL_INCLUDE_DIR "${CMAKE_INSTALL_INCLUDEDIR}/hipdnn/back
 set(HIP_DNN_BACKEND_SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 
 add_library(hipdnn_backend_private
-    descriptors/backend_descriptor.cpp
-    descriptors/engine_config_descriptor.cpp
-    descriptors/engine_descriptor.cpp
-    descriptors/engine_heuristic_descriptor.cpp
-    descriptors/execution_plan_descriptor.cpp
-    descriptors/graph_descriptor.cpp
-    descriptors/variant_descriptor.cpp
-    descriptors/descriptor_factory.cpp
-    handle/handle_factory.cpp
-    handle/handle.cpp
-    logging/logging.cpp
-    flatbuffer_utilities.cpp
-    plugin/engine_plugin.cpp
-    plugin/engine_plugin_resource_manager.cpp
-    plugin/plugin_core.cpp
-    plugin/shared_library.cpp
-    error.cpp
-    $<$<BOOL:WIN32>:platform_utils.windows.cpp>
-    $<$<BOOL:LINUX>:platform_utils.linux.cpp>
+    descriptors/BackendDescriptor.cpp
+    descriptors/EngineConfigDescriptor.cpp
+    descriptors/EngineDescriptor.cpp
+    descriptors/EngineHeuristicDescriptor.cpp
+    descriptors/ExecutionPlanDescriptor.cpp
+    descriptors/GraphDescriptor.cpp
+    descriptors/VariantDescriptor.cpp
+    descriptors/DescriptorFactory.cpp
+    handle/HandleFactory.cpp
+    handle/Handle.cpp
+    logging/Logging.cpp
+    FlatbufferUtilities.cpp
+    plugin/EnginePlugin.cpp
+    plugin/EnginePluginResourceManager.cpp
+    plugin/PluginCore.cpp
+    plugin/SharedLibrary.cpp
+    Error.cpp
+    $<$<BOOL:WIN32>:PlatformUtils.windows.cpp>
+    $<$<BOOL:LINUX>:PlatformUtils.linux.cpp>
 )
 
 target_include_directories(hipdnn_backend_private 
@@ -46,7 +46,7 @@ target_compile_definitions(hipdnn_backend_private PRIVATE HIPDNN_BACKEND_COMPILA
 clang_tidy_check(hipdnn_backend_private)
 
 add_library(hipdnn_backend SHARED 
-    hipdnn_backend.cpp
+    HipdnnBackend.cpp
 )
 
 target_include_directories(hipdnn_backend 

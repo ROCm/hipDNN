@@ -8,14 +8,14 @@
 // Cmake Generated export header.
 #include "hipdnn_backend_export.h"
 
-#include "hipdnn_backend_attribute_name.h"
-#include "hipdnn_backend_attribute_type.h"
-#include "hipdnn_backend_descriptor_type.h"
-#include "hipdnn_backend_heuristic_type.h"
-#include "hipdnn_backend_limits.h"
-#include "hipdnn_backend_plugin_loading_mode.h"
-#include "hipdnn_status.h"
-#include <hipdnn_sdk/logging/callback_types.h>
+#include "HipdnnBackendAttributeName.h"
+#include "HipdnnBackendAttributeType.h"
+#include "HipdnnBackendDescriptorType.h"
+#include "HipdnnBackendHeuristicType.h"
+#include "HipdnnBackendLimits.h"
+#include "HipdnnBackendPluginLoadingMode.h"
+#include "HipdnnStatus.h"
+#include <hipdnn_sdk/logging/CallbackTypes.h>
 
 // NOLINTBEGIN
 #ifdef __cplusplus

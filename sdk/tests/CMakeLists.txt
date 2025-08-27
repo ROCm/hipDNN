@@ -16,22 +16,22 @@ enable_language(HIP)
 
 add_executable(hipdnn_sdk_tests
     main.cpp
-    plugin/test_plugin_exception.cpp
-    plugin/test_plugin_helpers.cpp
-    plugin/test_plugin_last_error_manager.cpp
-    plugin/test_plugin_data_type_helpers.cpp
-    plugin/flatbuffer_utilities/test_graph_wrapper.cpp
-    plugin/flatbuffer_utilities/test_engine_config_wrapper.cpp
-    plugin/flatbuffer_utilities/test_engine_details_wrapper.cpp
-    utilities/test_scoped_resource.cpp
-    utilities/test_callback_logger.cpp
-    utilities/test_migratable_memory.cpp
-    utilities/test_allocators.cpp
-    utilities/test_floats.cpp
-    utilities/test_shape_utilities.cpp
-    utilities/test_tensor.cpp
-    test_utilities/test_cpu_fp_reference_implementation.cpp
-    test_utilities/test_cpu_fp_reference_validation.cpp
+    plugin/TestPluginException.cpp
+    plugin/TestPluginHelpers.cpp
+    plugin/TestPluginLastErrorManager.cpp
+    plugin/TestPluginDataTypeHelpers.cpp
+    plugin/flatbuffer_utilities/TestGraphWrapper.cpp
+    plugin/flatbuffer_utilities/TestEngineConfigWrapper.cpp
+    plugin/flatbuffer_utilities/TestEngineDetailsWrapper.cpp
+    utilities/TestScopedResource.cpp
+    utilities/TestCallbackLogger.cpp
+    utilities/TestMigratableMemory.cpp
+    utilities/TestAllocators.cpp
+    utilities/TestFloats.cpp
+    utilities/TestShapeUtilities.cpp
+    utilities/TestTensor.cpp
+    test_utilities/TestCpuFpReferenceImplementation.cpp
+    test_utilities/TestCpuFpReferenceValidation.cpp
 )
 
 target_compile_definitions(hipdnn_sdk_tests PRIVATE

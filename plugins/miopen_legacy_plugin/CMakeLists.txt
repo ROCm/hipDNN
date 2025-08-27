@@ -60,15 +60,15 @@ endif()
 find_package(miopen CONFIG REQUIRED)
 
 add_library(miopen_legacy_plugin_private
-    engines/miopen_engine.cpp
-    engines/plans/miopen_batchnorm_plan_builder.cpp
-    engines/plans/miopen_batchnorm_bwd_plan.cpp
-    engines/plans/miopen_batchnorm_fwd_inference_plan.cpp
-    engine_manager.cpp
-    miopen_handle_factory.cpp
-    miopen_container.cpp
-    miopen_utils.cpp
-    miopen_tensor.cpp
+    engines/MiopenEngine.cpp
+    engines/plans/MiopenBatchnormPlanBuilder.cpp
+    engines/plans/MiopenBatchnormBwdPlan.cpp
+    engines/plans/MiopenBatchnormFwdInferencePlan.cpp
+    EngineManager.cpp
+    MiopenHandleFactory.cpp
+    MiopenContainer.cpp
+    MiopenUtils.cpp
+    MiopenTensor.cpp
 )
 target_compile_definitions(miopen_legacy_plugin_private PRIVATE 
     COMPONENT_NAME="miopen_legacy_plugin"
@@ -84,7 +84,7 @@ clang_tidy_check(miopen_legacy_plugin_private)
 
 
 add_library(miopen_legacy_plugin SHARED
-    miopen_legacy_plugin.cpp
+    MiopenLegacyPlugin.cpp
 )
 target_compile_definitions(miopen_legacy_plugin PRIVATE 
     COMPONENT_NAME="miopen_legacy_plugin"

@@ -13,25 +13,25 @@ find_package(Threads REQUIRED)
 
 add_executable(hipdnn_frontend_tests 
     main.cpp
-    test_backend_logging_helpers.cpp
-    test_batchnorm_attributes.cpp
-    test_batchnorm_backward_attributes.cpp
-    test_batchnorm_backward_node.cpp
-    test_batchnorm_inference_attributes.cpp
-    test_batchnorm_inference_node.cpp
-    test_batchnorm_node.cpp
-    test_convolution_fwd_attributes.cpp
-    test_conv_fprop_node.cpp
-    test_error.cpp
-    test_graph.cpp
-    test_graph_generated.cpp
-    test_pointwise_attributes.cpp
-    test_pointwise_node.cpp
-    test_scoped_hipdnn_backend_descriptor.cpp
-    test_tensor_attributes.cpp
-    test_tensor_value_attributes.cpp
-    test_types.cpp
-    test_utilities.cpp
+    TestBackendLoggingHelpers.cpp
+    TestBatchnormAttributes.cpp
+    TestBatchnormBackwardAttributes.cpp
+    TestBatchnormBackwardNode.cpp
+    TestBatchnormInferenceAttributes.cpp
+    TestBatchnormInferenceNode.cpp
+    TestBatchnormNode.cpp
+    TestConvolutionFwdAttributes.cpp
+    TestConvFpropNode.cpp
+    TestError.cpp
+    TestGraph.cpp
+    TestGraphGenerated.cpp
+    TestPointwiseAttributes.cpp
+    TestPointwiseNode.cpp
+    TestScopedHipdnnBackendDescriptor.cpp
+    TestTensorAttributes.cpp
+    TestTensorValueAttributes.cpp
+    TestTypes.cpp
+    TestUtilities.cpp
 )
 
 target_compile_options(hipdnn_frontend_tests PRIVATE ${HIPDNN_WARNING_COMPILE_OPTIONS})

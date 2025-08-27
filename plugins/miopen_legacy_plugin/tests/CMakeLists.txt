@@ -20,21 +20,21 @@ find_package(Threads REQUIRED)
 enable_language(HIP)
 
 add_executable(miopen_legacy_plugin_tests
-    engines/test_miopen_engine.cpp
-    engines/plans/test_batchnorm_bwd_plan.cpp
-    engines/plans/test_batchnorm_fwd_inference_plan.cpp
-    engines/plans/test_miopen_batchnorm_plan_builder.cpp
+    engines/TestMiopenEngine.cpp
+    engines/plans/TestBatchnormBwdPlan.cpp
+    engines/plans/TestBatchnormFwdInferencePlan.cpp
+    engines/plans/TestMiopenBatchnormPlanBuilder.cpp
     main.cpp
-    test_engine_manager.cpp
-    test_hipdnn_engine_plugin_handle.cpp
-    test_hipdnn_plugin_execution_context.cpp
-    test_miopen_batchnorm_fwd_inference_operations.cpp
-    test_miopen_batchnorm_bwd_operations.cpp
-    test_miopen_handle_factory.cpp
-    test_miopen_legacy_engine_plugin_api.cpp
-    test_miopen_legacy_plugin_api.cpp
-    test_miopen_tensor.cpp
-    test_miopen_utils.cpp
+    TestEngineManager.cpp
+    TestHipdnnEnginePluginHandle.cpp
+    TestHipdnnPluginExecutionContext.cpp
+    TestMiopenBatchnormFwdInferenceOperations.cpp
+    TestMiopenBatchnormBwdOperations.cpp
+    TestMiopenHandleFactory.cpp
+    TestMiopenLegacyEnginePluginApi.cpp
+    TestMiopenLegacyPluginApi.cpp
+    TestMiopenTensor.cpp
+    TestMiopenUtils.cpp
 )
 
 target_compile_options(miopen_legacy_plugin_tests PRIVATE ${HIPDNN_WARNING_COMPILE_OPTIONS})
