@@ -53,12 +53,12 @@ public:
     }
 };
 
-bool gCallbackWasCalled = false;
+bool g_CALLBACK_CALLED = false;
 void dummyCallback(hipdnnSeverity_t sev, const char* msg)
 {
     (void)sev;
     (void)msg;
-    gCallbackWasCalled = true;
+    g_CALLBACK_CALLED = true;
 }
 
 const std::string PLUGIN_NAME1 = "hipdnn_test_plugin1";
@@ -318,13 +318,13 @@ TEST(PluginManagerTest, LastErrorOnSecondLoad)
 
 TEST(PluginTest, SetLoggingCallback)
 {
-    gCallbackWasCalled = false;
+    g_CALLBACK_CALLED = false;
 
     plugin::SharedLibrary lib(PLUGIN_PATH1);
 
     Plugin plugin(std::move(lib));
 
     EXPECT_EQ(plugin.setLoggingCallback(dummyCallback), HIPDNN_PLUGIN_STATUS_SUCCESS);
-    EXPECT_TRUE(gCallbackWasCalled);
+    EXPECT_TRUE(g_CALLBACK_CALLED);
     EXPECT_EQ(plugin.setLoggingCallback(nullptr), HIPDNN_PLUGIN_STATUS_BAD_PARAM);
 }
