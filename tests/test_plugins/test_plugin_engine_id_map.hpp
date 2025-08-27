@@ -8,15 +8,15 @@ template <class T>
 constexpr int64_t engineId() = delete;
 } // namespace hipdnn_tests::plugin_constants
 
-#define HIPDNN_MAP_TO_ID(ClassName, id)       \
-    class ClassName;                          \
-    namespace hipdnn_tests::plugin_constants  \
-    {                                         \
-    template <>                               \
-    constexpr int64_t engineId<ClassName>()   \
-    {                                         \
-        return id;                            \
-    };                                        \
+#define HIPDNN_MAP_TO_ID(ClassName, id)      \
+    class ClassName;                         \
+    namespace hipdnn_tests::plugin_constants \
+    {                                        \
+    template <>                              \
+    constexpr int64_t engineId<ClassName>()  \
+    {                                        \
+        return id;                           \
+    };                                       \
     }
 
 HIPDNN_MAP_TO_ID(GoodPlugin, -2);

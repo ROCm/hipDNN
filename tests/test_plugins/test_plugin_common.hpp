@@ -127,9 +127,8 @@ public:
         });
     }
 
-    static hipdnnPluginStatus_t enginePluginGetAllEngineIds(int64_t* engineIds,
-                                                             uint32_t maxEngines,
-                                                             uint32_t* numEngines)
+    static hipdnnPluginStatus_t
+        enginePluginGetAllEngineIds(int64_t* engineIds, uint32_t maxEngines, uint32_t* numEngines)
     {
         LOG_API_ENTRY("engineIds={:p}, maxEngines={}, numEngines={:p}",
                       static_cast<void*>(engineIds),
@@ -184,7 +183,7 @@ public:
     }
 
     static hipdnnPluginStatus_t enginePluginSetStream(hipdnnEnginePluginHandle_t handle,
-                                                       hipStream_t stream)
+                                                      hipStream_t stream)
     {
         LOG_API_ENTRY(
             "handle={:p}, streamId={:p}", static_cast<void*>(handle), static_cast<void*>(stream));
@@ -198,18 +197,17 @@ public:
 
     static hipdnnPluginStatus_t
         enginePluginGetApplicableEngineIds(hipdnnEnginePluginHandle_t handle,
-                                            const hipdnnPluginConstData_t* opGraph,
-                                            int64_t* engineIds,
-                                            uint32_t maxEngines,
-                                            uint32_t* numEngines)
+                                           const hipdnnPluginConstData_t* opGraph,
+                                           int64_t* engineIds,
+                                           uint32_t maxEngines,
+                                           uint32_t* numEngines)
     {
-        LOG_API_ENTRY(
-            "handle={:p}, opGraph={:p}, engineIds={:p}, maxEngines={}, numEngines={:p}",
-            static_cast<void*>(handle),
-            static_cast<const void*>(opGraph),
-            static_cast<void*>(engineIds),
-            maxEngines,
-            static_cast<void*>(numEngines));
+        LOG_API_ENTRY("handle={:p}, opGraph={:p}, engineIds={:p}, maxEngines={}, numEngines={:p}",
+                      static_cast<void*>(handle),
+                      static_cast<const void*>(opGraph),
+                      static_cast<void*>(engineIds),
+                      maxEngines,
+                      static_cast<void*>(numEngines));
 
         return hipdnn_plugin::tryCatch([&, apiName = __func__]() {
             hipdnn_plugin::throwIfNull(handle);
@@ -232,11 +230,10 @@ public:
         });
     }
 
-    static hipdnnPluginStatus_t
-        enginePluginGetEngineDetails(hipdnnEnginePluginHandle_t handle,
-                                      int64_t engineId,
-                                      const hipdnnPluginConstData_t* opGraph,
-                                      hipdnnPluginConstData_t* engineDetails)
+    static hipdnnPluginStatus_t enginePluginGetEngineDetails(hipdnnEnginePluginHandle_t handle,
+                                                             int64_t engineId,
+                                                             const hipdnnPluginConstData_t* opGraph,
+                                                             hipdnnPluginConstData_t* engineDetails)
     {
         LOG_API_ENTRY("handle={:p}, engineId={}, opGraph={:p}, engineDetails={:p}",
                       static_cast<void*>(handle),
@@ -275,7 +272,7 @@ public:
 
     static hipdnnPluginStatus_t
         enginePluginDestroyEngineDetails(hipdnnEnginePluginHandle_t handle,
-                                          hipdnnPluginConstData_t* engineDetails)
+                                         hipdnnPluginConstData_t* engineDetails)
     {
         LOG_API_ENTRY("handle={:p}, engineDetails={}",
                       static_cast<void*>(handle),
@@ -301,9 +298,9 @@ public:
 
     static hipdnnPluginStatus_t
         enginePluginGetWorkspaceSize(hipdnnEnginePluginHandle_t handle,
-                                      const hipdnnPluginConstData_t* engineConfig,
-                                      const hipdnnPluginConstData_t* opGraph,
-                                      size_t* workspaceSize)
+                                     const hipdnnPluginConstData_t* engineConfig,
+                                     const hipdnnPluginConstData_t* opGraph,
+                                     size_t* workspaceSize)
     {
         LOG_API_ENTRY("handle={:p}, engineConfig={:p}, opGraph={:p}, workspaceSize={:p}",
                       static_cast<void*>(handle),
@@ -331,11 +328,11 @@ public:
         });
     }
 
-    static hipdnnPluginStatus_t enginePluginCreateExecutionContext(
-        hipdnnEnginePluginHandle_t handle,
-        const hipdnnPluginConstData_t* engineConfig,
-        const hipdnnPluginConstData_t* opGraph,
-        hipdnnEnginePluginExecutionContext_t* executionContext)
+    static hipdnnPluginStatus_t
+        enginePluginCreateExecutionContext(hipdnnEnginePluginHandle_t handle,
+                                           const hipdnnPluginConstData_t* engineConfig,
+                                           const hipdnnPluginConstData_t* opGraph,
+                                           hipdnnEnginePluginExecutionContext_t* executionContext)
     {
         LOG_API_ENTRY("handle={:p}, engineConfig={:p}, opGraph={:p}, executionContext={:p}",
                       static_cast<void*>(handle),
@@ -368,8 +365,9 @@ public:
         });
     }
 
-    static hipdnnPluginStatus_t enginePluginDestroyExecutionContext(
-        hipdnnEnginePluginHandle_t handle, hipdnnEnginePluginExecutionContext_t executionContext)
+    static hipdnnPluginStatus_t
+        enginePluginDestroyExecutionContext(hipdnnEnginePluginHandle_t handle,
+                                            hipdnnEnginePluginExecutionContext_t executionContext)
     {
         LOG_API_ENTRY("handle={:p}, executionContext={:p}",
                       static_cast<void*>(handle),
@@ -394,10 +392,10 @@ public:
 
     static hipdnnPluginStatus_t
         enginePluginExecuteOpGraph(hipdnnEnginePluginHandle_t handle,
-                                    hipdnnEnginePluginExecutionContext_t executionContext,
-                                    void* workspace,
-                                    const hipdnnPluginDeviceBuffer_t* deviceBuffers,
-                                    uint32_t numDeviceBuffers)
+                                   hipdnnEnginePluginExecutionContext_t executionContext,
+                                   void* workspace,
+                                   const hipdnnPluginDeviceBuffer_t* deviceBuffers,
+                                   uint32_t numDeviceBuffers)
     {
         LOG_API_ENTRY("handle={:p}, executionContext={:p}, workspace={:p}, deviceBuffers={:p}, "
                       "numDeviceBuffers={}",
@@ -431,120 +429,118 @@ private:
 };
 
 // Macro to register plugin API functions
-#define REGISTER_TEST_PLUGIN_API()                                                                 \
-    extern "C" {                                                                                   \
-    hipdnnPluginStatus_t hipdnnPluginGetName(const char** name)                                    \
-    {                                                                                              \
-        return TestPluginBase::pluginGetName(name);                                                \
-    }                                                                                              \
-                                                                                                   \
-    hipdnnPluginStatus_t hipdnnPluginGetVersion(const char** version)                              \
-    {                                                                                              \
-        return TestPluginBase::pluginGetVersion(version);                                          \
-    }                                                                                              \
-                                                                                                   \
-    hipdnnPluginStatus_t hipdnnPluginGetType(hipdnnPluginType_t* type)                             \
-    {                                                                                              \
-        return TestPluginBase::pluginGetType(type);                                                \
-    }                                                                                              \
-                                                                                                   \
-    void hipdnnPluginGetLastErrorString(const char** errorStr)                                     \
-    {                                                                                              \
-        TestPluginBase::pluginGetLastErrorString(errorStr);                                        \
-    }                                                                                              \
-                                                                                                   \
-    hipdnnPluginStatus_t hipdnnPluginSetLoggingCallback(hipdnnCallback_t callback)                 \
-    {                                                                                              \
-        return TestPluginBase::pluginSetLoggingCallback(callback);                                 \
-    }                                                                                              \
-                                                                                                   \
-    hipdnnPluginStatus_t hipdnnEnginePluginGetAllEngineIds(int64_t* engineIds,                     \
-                                                           uint32_t maxEngines,                    \
-                                                           uint32_t* numEngines)                   \
-    {                                                                                              \
-        return TestPluginBase::enginePluginGetAllEngineIds(                                        \
-            engineIds, maxEngines, numEngines);                                                    \
-    }                                                                                              \
-                                                                                                   \
-    hipdnnPluginStatus_t hipdnnEnginePluginCreate(hipdnnEnginePluginHandle_t* handle)              \
-    {                                                                                              \
-        return TestPluginBase::enginePluginCreate(handle);                                         \
-    }                                                                                              \
-                                                                                                   \
-    hipdnnPluginStatus_t hipdnnEnginePluginDestroy(hipdnnEnginePluginHandle_t handle)              \
-    {                                                                                              \
-        return TestPluginBase::enginePluginDestroy(handle);                                        \
-    }                                                                                              \
-                                                                                                   \
-    hipdnnPluginStatus_t hipdnnEnginePluginSetStream(hipdnnEnginePluginHandle_t handle,            \
-                                                     hipStream_t stream)                           \
-    {                                                                                              \
-        return TestPluginBase::enginePluginSetStream(handle, stream);                              \
-    }                                                                                              \
-                                                                                                   \
-    hipdnnPluginStatus_t                                                                           \
-        hipdnnEnginePluginGetApplicableEngineIds(hipdnnEnginePluginHandle_t handle,                \
-                                                 const hipdnnPluginConstData_t* opGraph,           \
-                                                 int64_t* engineIds,                               \
-                                                 uint32_t maxEngines,                              \
-                                                 uint32_t* numEngines)                             \
-    {                                                                                              \
-        return TestPluginBase::enginePluginGetApplicableEngineIds(                                 \
-            handle, opGraph, engineIds, maxEngines, numEngines);                                   \
-    }                                                                                              \
-                                                                                                   \
-    hipdnnPluginStatus_t                                                                           \
-        hipdnnEnginePluginGetEngineDetails(hipdnnEnginePluginHandle_t handle,                      \
-                                           int64_t engineId,                                       \
-                                           const hipdnnPluginConstData_t* opGraph,                 \
-                                           hipdnnPluginConstData_t* engineDetails)                 \
-    {                                                                                              \
-        return TestPluginBase::enginePluginGetEngineDetails(                                       \
-            handle, engineId, opGraph, engineDetails);                                             \
-    }                                                                                              \
-                                                                                                   \
-    hipdnnPluginStatus_t                                                                           \
-        hipdnnEnginePluginDestroyEngineDetails(hipdnnEnginePluginHandle_t handle,                  \
-                                               hipdnnPluginConstData_t* engineDetails)             \
-    {                                                                                              \
-        return TestPluginBase::enginePluginDestroyEngineDetails(handle, engineDetails);            \
-    }                                                                                              \
-                                                                                                   \
-    hipdnnPluginStatus_t                                                                           \
-        hipdnnEnginePluginGetWorkspaceSize(hipdnnEnginePluginHandle_t handle,                      \
-                                           const hipdnnPluginConstData_t* engineConfig,            \
-                                           const hipdnnPluginConstData_t* opGraph,                 \
-                                           size_t* workspaceSize)                                  \
-    {                                                                                              \
-        return TestPluginBase::enginePluginGetWorkspaceSize(                                       \
-            handle, engineConfig, opGraph, workspaceSize);                                         \
-    }                                                                                              \
-                                                                                                   \
-    hipdnnPluginStatus_t hipdnnEnginePluginCreateExecutionContext(                                 \
-        hipdnnEnginePluginHandle_t handle,                                                         \
-        const hipdnnPluginConstData_t* engineConfig,                                               \
-        const hipdnnPluginConstData_t* opGraph,                                                    \
-        hipdnnEnginePluginExecutionContext_t* executionContext)                                    \
-    {                                                                                              \
-        return TestPluginBase::enginePluginCreateExecutionContext(                                 \
-            handle, engineConfig, opGraph, executionContext);                                      \
-    }                                                                                              \
-                                                                                                   \
-    hipdnnPluginStatus_t hipdnnEnginePluginDestroyExecutionContext(                                \
-        hipdnnEnginePluginHandle_t handle, hipdnnEnginePluginExecutionContext_t executionContext)  \
-    {                                                                                              \
-        return TestPluginBase::enginePluginDestroyExecutionContext(handle,                         \
-                                                                         executionContext);        \
-    }                                                                                              \
-                                                                                                   \
-    hipdnnPluginStatus_t                                                                           \
-        hipdnnEnginePluginExecuteOpGraph(hipdnnEnginePluginHandle_t handle,                        \
-                                         hipdnnEnginePluginExecutionContext_t executionContext,    \
-                                         void* workspace,                                          \
-                                         const hipdnnPluginDeviceBuffer_t* deviceBuffers,          \
-                                         uint32_t numDeviceBuffers)                                \
-    {                                                                                              \
-        return TestPluginBase::enginePluginExecuteOpGraph(                                         \
-            handle, executionContext, workspace, deviceBuffers, numDeviceBuffers);                 \
-    }                                                                                              \
+#define REGISTER_TEST_PLUGIN_API()                                                                \
+    extern "C" {                                                                                  \
+    hipdnnPluginStatus_t hipdnnPluginGetName(const char** name)                                   \
+    {                                                                                             \
+        return TestPluginBase::pluginGetName(name);                                               \
+    }                                                                                             \
+                                                                                                  \
+    hipdnnPluginStatus_t hipdnnPluginGetVersion(const char** version)                             \
+    {                                                                                             \
+        return TestPluginBase::pluginGetVersion(version);                                         \
+    }                                                                                             \
+                                                                                                  \
+    hipdnnPluginStatus_t hipdnnPluginGetType(hipdnnPluginType_t* type)                            \
+    {                                                                                             \
+        return TestPluginBase::pluginGetType(type);                                               \
+    }                                                                                             \
+                                                                                                  \
+    void hipdnnPluginGetLastErrorString(const char** errorStr)                                    \
+    {                                                                                             \
+        TestPluginBase::pluginGetLastErrorString(errorStr);                                       \
+    }                                                                                             \
+                                                                                                  \
+    hipdnnPluginStatus_t hipdnnPluginSetLoggingCallback(hipdnnCallback_t callback)                \
+    {                                                                                             \
+        return TestPluginBase::pluginSetLoggingCallback(callback);                                \
+    }                                                                                             \
+                                                                                                  \
+    hipdnnPluginStatus_t hipdnnEnginePluginGetAllEngineIds(int64_t* engineIds,                    \
+                                                           uint32_t maxEngines,                   \
+                                                           uint32_t* numEngines)                  \
+    {                                                                                             \
+        return TestPluginBase::enginePluginGetAllEngineIds(engineIds, maxEngines, numEngines);    \
+    }                                                                                             \
+                                                                                                  \
+    hipdnnPluginStatus_t hipdnnEnginePluginCreate(hipdnnEnginePluginHandle_t* handle)             \
+    {                                                                                             \
+        return TestPluginBase::enginePluginCreate(handle);                                        \
+    }                                                                                             \
+                                                                                                  \
+    hipdnnPluginStatus_t hipdnnEnginePluginDestroy(hipdnnEnginePluginHandle_t handle)             \
+    {                                                                                             \
+        return TestPluginBase::enginePluginDestroy(handle);                                       \
+    }                                                                                             \
+                                                                                                  \
+    hipdnnPluginStatus_t hipdnnEnginePluginSetStream(hipdnnEnginePluginHandle_t handle,           \
+                                                     hipStream_t stream)                          \
+    {                                                                                             \
+        return TestPluginBase::enginePluginSetStream(handle, stream);                             \
+    }                                                                                             \
+                                                                                                  \
+    hipdnnPluginStatus_t                                                                          \
+        hipdnnEnginePluginGetApplicableEngineIds(hipdnnEnginePluginHandle_t handle,               \
+                                                 const hipdnnPluginConstData_t* opGraph,          \
+                                                 int64_t* engineIds,                              \
+                                                 uint32_t maxEngines,                             \
+                                                 uint32_t* numEngines)                            \
+    {                                                                                             \
+        return TestPluginBase::enginePluginGetApplicableEngineIds(                                \
+            handle, opGraph, engineIds, maxEngines, numEngines);                                  \
+    }                                                                                             \
+                                                                                                  \
+    hipdnnPluginStatus_t                                                                          \
+        hipdnnEnginePluginGetEngineDetails(hipdnnEnginePluginHandle_t handle,                     \
+                                           int64_t engineId,                                      \
+                                           const hipdnnPluginConstData_t* opGraph,                \
+                                           hipdnnPluginConstData_t* engineDetails)                \
+    {                                                                                             \
+        return TestPluginBase::enginePluginGetEngineDetails(                                      \
+            handle, engineId, opGraph, engineDetails);                                            \
+    }                                                                                             \
+                                                                                                  \
+    hipdnnPluginStatus_t                                                                          \
+        hipdnnEnginePluginDestroyEngineDetails(hipdnnEnginePluginHandle_t handle,                 \
+                                               hipdnnPluginConstData_t* engineDetails)            \
+    {                                                                                             \
+        return TestPluginBase::enginePluginDestroyEngineDetails(handle, engineDetails);           \
+    }                                                                                             \
+                                                                                                  \
+    hipdnnPluginStatus_t                                                                          \
+        hipdnnEnginePluginGetWorkspaceSize(hipdnnEnginePluginHandle_t handle,                     \
+                                           const hipdnnPluginConstData_t* engineConfig,           \
+                                           const hipdnnPluginConstData_t* opGraph,                \
+                                           size_t* workspaceSize)                                 \
+    {                                                                                             \
+        return TestPluginBase::enginePluginGetWorkspaceSize(                                      \
+            handle, engineConfig, opGraph, workspaceSize);                                        \
+    }                                                                                             \
+                                                                                                  \
+    hipdnnPluginStatus_t hipdnnEnginePluginCreateExecutionContext(                                \
+        hipdnnEnginePluginHandle_t handle,                                                        \
+        const hipdnnPluginConstData_t* engineConfig,                                              \
+        const hipdnnPluginConstData_t* opGraph,                                                   \
+        hipdnnEnginePluginExecutionContext_t* executionContext)                                   \
+    {                                                                                             \
+        return TestPluginBase::enginePluginCreateExecutionContext(                                \
+            handle, engineConfig, opGraph, executionContext);                                     \
+    }                                                                                             \
+                                                                                                  \
+    hipdnnPluginStatus_t hipdnnEnginePluginDestroyExecutionContext(                               \
+        hipdnnEnginePluginHandle_t handle, hipdnnEnginePluginExecutionContext_t executionContext) \
+    {                                                                                             \
+        return TestPluginBase::enginePluginDestroyExecutionContext(handle, executionContext);     \
+    }                                                                                             \
+                                                                                                  \
+    hipdnnPluginStatus_t                                                                          \
+        hipdnnEnginePluginExecuteOpGraph(hipdnnEnginePluginHandle_t handle,                       \
+                                         hipdnnEnginePluginExecutionContext_t executionContext,   \
+                                         void* workspace,                                         \
+                                         const hipdnnPluginDeviceBuffer_t* deviceBuffers,         \
+                                         uint32_t numDeviceBuffers)                               \
+    {                                                                                             \
+        return TestPluginBase::enginePluginExecuteOpGraph(                                        \
+            handle, executionContext, workspace, deviceBuffers, numDeviceBuffers);                \
+    }                                                                                             \
     } // extern "C"
