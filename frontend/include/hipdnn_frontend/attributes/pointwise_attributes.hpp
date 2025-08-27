@@ -17,103 +17,125 @@ namespace graph
 class PointwiseAttributes : public AttributesCRTP<PointwiseAttributes>
 {
 public:
+    // NOLINTNEXTLINE(readability-identifier-naming)
     PointwiseMode_t get_mode() const
     {
         return _mode;
     }
+    // NOLINTNEXTLINE(readability-identifier-naming)
     std::optional<float> get_relu_lower_clip() const
     {
         return _reluLowerClip;
     }
+    // NOLINTNEXTLINE(readability-identifier-naming)
     std::optional<float> get_relu_upper_clip() const
     {
         return _reluUpperClip;
     }
+    // NOLINTNEXTLINE(readability-identifier-naming)
     std::optional<float> get_relu_lower_slope() const
     {
         return _reluLowerSlope;
     }
+    // NOLINTNEXTLINE(readability-identifier-naming)
     std::optional<int64_t> get_axis() const
     {
         return _axis;
     }
+    // NOLINTNEXTLINE(readability-identifier-naming)
     std::shared_ptr<TensorAttributes> get_input_0() const
     {
         return getInput(input_names::IN_0);
     }
+    // NOLINTNEXTLINE(readability-identifier-naming)
     std::shared_ptr<TensorAttributes> get_input_1() const
     {
         return getInput(input_names::IN_1);
     }
+    // NOLINTNEXTLINE(readability-identifier-naming)
     std::shared_ptr<TensorAttributes> get_input_2() const
     {
         return getInput(input_names::IN_2);
     }
+    // NOLINTNEXTLINE(readability-identifier-naming)
     std::shared_ptr<TensorAttributes> get_output_0() const
     {
         return getOutput(output_names::OUT_0);
     }
 
+    // NOLINTNEXTLINE(readability-identifier-naming)
     PointwiseAttributes& set_mode(PointwiseMode_t mode)
     {
         _mode = mode;
         return *this;
     }
+    // NOLINTNEXTLINE(readability-identifier-naming)
     PointwiseAttributes& set_relu_lower_clip(float reluLowerClip)
     {
         _reluLowerClip = reluLowerClip;
         return *this;
     }
+    // NOLINTNEXTLINE(readability-identifier-naming)
     PointwiseAttributes& set_relu_upper_clip(float reluUpperClip)
     {
         _reluUpperClip = reluUpperClip;
         return *this;
     }
+    // NOLINTNEXTLINE(readability-identifier-naming)
     PointwiseAttributes& set_relu_lower_clip_slope(float reluLowerSlope)
     {
         _reluLowerSlope = reluLowerSlope;
         return *this;
     }
+    // NOLINTNEXTLINE(readability-identifier-naming)
     PointwiseAttributes& set_axis(std::optional<int64_t> axis)
     {
         _axis = axis;
         return *this;
     }
+    // NOLINTNEXTLINE(readability-identifier-naming)
     PointwiseAttributes& set_input_0(const std::shared_ptr<TensorAttributes>& input0)
     {
         inputs[input_names::IN_0] = input0;
         return *this;
     }
+    // NOLINTNEXTLINE(readability-identifier-naming)
     PointwiseAttributes& set_input_0(std::shared_ptr<TensorAttributes>&& input0)
     {
         inputs[input_names::IN_0] = std::move(input0);
         return *this;
     }
+    // NOLINTNEXTLINE(readability-identifier-naming)
     PointwiseAttributes& set_input_1(const std::shared_ptr<TensorAttributes>& input1)
     {
         inputs[input_names::IN_1] = input1;
         return *this;
     }
+    // NOLINTNEXTLINE(readability-identifier-naming)
     PointwiseAttributes& set_input_1(std::shared_ptr<TensorAttributes>&& input1)
     {
         inputs[input_names::IN_1] = std::move(input1);
         return *this;
     }
+    // NOLINTNEXTLINE(readability-identifier-naming)
     PointwiseAttributes& set_input_2(const std::shared_ptr<TensorAttributes>& input2)
     {
         inputs[input_names::IN_2] = input2;
         return *this;
     }
+    // NOLINTNEXTLINE(readability-identifier-naming)
     PointwiseAttributes& set_input_2(std::shared_ptr<TensorAttributes>&& input2)
     {
         inputs[input_names::IN_2] = std::move(input2);
         return *this;
     }
+    // NOLINTNEXTLINE(readability-identifier-naming)
     PointwiseAttributes& set_output_0(const std::shared_ptr<TensorAttributes>& output0)
     {
         outputs[output_names::OUT_0] = output0;
         return *this;
     }
+    // NOLINTNEXTLINE(readability-identifier-naming)
     PointwiseAttributes& set_output_0(std::shared_ptr<TensorAttributes>&& output0)
     {
         outputs[output_names::OUT_0] = std::move(output0);

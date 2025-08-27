@@ -39,52 +39,54 @@ public:
     ConvolutionMode_t conv_mode = ConvolutionMode_t::CROSS_CORRELATION;
 
     // Getters for tensors
+    // NOLINTNEXTLINE(readability-identifier-naming)
     std::shared_ptr<TensorAttributes> get_x() const
     {
         return getInput(input_names::X);
     }
-
+    // NOLINTNEXTLINE(readability-identifier-naming)
     std::shared_ptr<TensorAttributes> get_w() const
     {
         return getInput(input_names::W);
     }
-
+    // NOLINTNEXTLINE(readability-identifier-naming)
     std::shared_ptr<TensorAttributes> get_y() const
     {
         return getOutput(output_names::Y);
     }
 
-    // Setters for tensors
+    // Setters for tensor
+    // NOLINTNEXTLINE(readability-identifier-naming)
     ConvFpropAttributes& set_x(std::shared_ptr<TensorAttributes>&& value)
     {
         return setInput(input_names::X, std::move(value));
     }
-
+    // NOLINTNEXTLINE(readability-identifier-naming)
     ConvFpropAttributes& set_x(const std::shared_ptr<TensorAttributes>& value)
     {
         return setInput(input_names::X, value);
     }
-
+    // NOLINTNEXTLINE(readability-identifier-naming)
     ConvFpropAttributes& set_w(std::shared_ptr<TensorAttributes>&& value)
     {
         return setInput(input_names::W, std::move(value));
     }
-
+    // NOLINTNEXTLINE(readability-identifier-naming)
     ConvFpropAttributes& set_w(const std::shared_ptr<TensorAttributes>& value)
     {
         return setInput(input_names::W, value);
     }
-
+    // NOLINTNEXTLINE(readability-identifier-naming)
     ConvFpropAttributes& set_y(std::shared_ptr<TensorAttributes>&& value)
     {
         return setOutput(output_names::Y, std::move(value));
     }
-
+    // NOLINTNEXTLINE(readability-identifier-naming)
     ConvFpropAttributes& set_y(const std::shared_ptr<TensorAttributes>& value)
     {
         return setOutput(output_names::Y, value);
     }
-
+    // NOLINTNEXTLINE(readability-identifier-naming)
     ConvFpropAttributes& set_padding(std::vector<int64_t> padding)
     {
         pre_padding = padding;
@@ -92,54 +94,63 @@ public:
         return *this;
     }
 
+    // NOLINTNEXTLINE(readability-identifier-naming)
     ConvFpropAttributes& set_pre_padding(const std::vector<int64_t>& padding)
     {
         pre_padding = padding;
         return *this;
     }
 
+    // NOLINTNEXTLINE(readability-identifier-naming)
     ConvFpropAttributes& set_pre_padding(std::vector<int64_t>&& padding)
     {
         pre_padding = std::move(padding);
         return *this;
     }
 
+    // NOLINTNEXTLINE(readability-identifier-naming)
     ConvFpropAttributes& set_post_padding(const std::vector<int64_t>& padding)
     {
         post_padding = padding;
         return *this;
     }
 
+    // NOLINTNEXTLINE(readability-identifier-naming)
     ConvFpropAttributes& set_post_padding(std::vector<int64_t>&& padding)
     {
         post_padding = std::move(padding);
         return *this;
     }
 
+    // NOLINTNEXTLINE(readability-identifier-naming)
     ConvFpropAttributes& set_stride(const std::vector<int64_t>& strideVals)
     {
         stride = strideVals;
         return *this;
     }
 
+    // NOLINTNEXTLINE(readability-identifier-naming)
     ConvFpropAttributes& set_stride(std::vector<int64_t>&& strideVals)
     {
         stride = std::move(strideVals);
         return *this;
     }
 
+    // NOLINTNEXTLINE(readability-identifier-naming)
     ConvFpropAttributes& set_dilation(const std::vector<int64_t>& dilationVals)
     {
         dilation = dilationVals;
         return *this;
     }
 
+    // NOLINTNEXTLINE(readability-identifier-naming)
     ConvFpropAttributes& set_dilation(std::vector<int64_t>&& dilationVals)
     {
         dilation = std::move(dilationVals);
         return *this;
     }
 
+    // NOLINTNEXTLINE(readability-identifier-naming)
     ConvFpropAttributes& set_convolution_mode(ConvolutionMode_t mode)
     {
         conv_mode = mode;
@@ -147,22 +158,27 @@ public:
     }
 
     // Getters for convolution parameters
+    // NOLINTNEXTLINE(readability-identifier-naming)
     const std::vector<int64_t>& get_pre_padding() const
     {
         return pre_padding;
     }
+    // NOLINTNEXTLINE(readability-identifier-naming)
     const std::vector<int64_t>& get_post_padding() const
     {
         return post_padding;
     }
+    // NOLINTNEXTLINE(readability-identifier-naming)
     const std::vector<int64_t>& get_stride() const
     {
         return stride;
     }
+    // NOLINTNEXTLINE(readability-identifier-naming)
     const std::vector<int64_t>& get_dilation() const
     {
         return dilation;
     }
+    // NOLINTNEXTLINE(readability-identifier-naming)
     ConvolutionMode_t get_convolution_mode() const
     {
         return conv_mode;

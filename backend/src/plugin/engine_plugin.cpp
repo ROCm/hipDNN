@@ -221,14 +221,14 @@ hipdnnEnginePluginExecutionContext_t
                                          const hipdnnPluginConstData_t* opGraph) const
 {
     assert(_initialized);
-    hipdnnEnginePluginExecutionContext_t exec_context;
+    hipdnnEnginePluginExecutionContext_t execContext;
     invokePluginFunction("create execution context",
                          _funcCreateExecutionContext,
                          handle,
                          engineConfig,
                          opGraph,
-                         &exec_context);
-    return exec_context;
+                         &execContext);
+    return execContext;
 }
 
 void EnginePlugin::destroyExecutionContext(

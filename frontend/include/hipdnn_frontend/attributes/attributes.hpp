@@ -31,13 +31,13 @@ private:
 public:
     std::string name;
 
-    DerivedT& set_name(const std::string& nameValue)
+    DerivedT& set_name(const std::string& nameValue) // NOLINT(readability-identifier-naming)
     {
         name = nameValue;
         return self();
     }
 
-    const std::string& get_name() const
+    const std::string& get_name() const // NOLINT(readability-identifier-naming)
     {
         return name;
     }

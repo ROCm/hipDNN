@@ -42,32 +42,32 @@ typedef struct error_object // NOLINT(readability-identifier-naming)
     {
     }
 
-    std::string get_message() const
+    std::string get_message() const // NOLINT(readability-identifier-naming)
     {
         return err_msg;
     }
 
-    error_code_t get_code() const
+    error_code_t get_code() const // NOLINT(readability-identifier-naming)
     {
         return code;
     }
 
-    bool is_good() const
+    bool is_good() const // NOLINT(readability-identifier-naming)
     {
         return code == error_code_t::OK;
     }
-    bool is_bad() const
+    bool is_bad() const // NOLINT(readability-identifier-naming)
     {
         return code != error_code_t::OK;
     }
 
-    bool operator==(error_code_t other_code) const
+    bool operator==(error_code_t otherCode) const
     {
-        return code == other_code;
+        return code == otherCode;
     }
-    bool operator!=(error_code_t other_code) const
+    bool operator!=(error_code_t otherCode) const
     {
-        return code != other_code;
+        return code != otherCode;
     }
     bool operator==(const error_object& other) const
     {

@@ -56,7 +56,7 @@ public:
         _dataType = DataType_t::INT32;
     }
 
-    bool has_value() const
+    bool has_value() const // NOLINT(readability-identifier-naming)
     {
         return !std::holds_alternative<std::monostate>(_value);
     }
@@ -84,7 +84,7 @@ public:
         return *this;
     }
 
-    TensorAttributes& clear_value()
+    TensorAttributes& clear_value() // NOLINT(readability-identifier-naming)
     {
         _value = {};
         return *this;
@@ -130,7 +130,7 @@ public:
         return _isVirtual;
     }
 
-    bool has_uid() const
+    bool has_uid() const // NOLINT(readability-identifier-naming)
     {
         return _uidSet;
     }
@@ -203,13 +203,13 @@ public:
 
     bool validate_dims_set_and_positive() const // NOLINT(readability-identifier-naming
     {
-        constexpr auto isPositive = [](int64_t value) { return value > 0; };
+        auto isPositive = [](int64_t value) constexpr { return value > 0; };
         return !_dim.empty() && std::ranges::all_of(_dim.begin(), _dim.end(), isPositive);
     }
 
     bool validate_dims_and_strides_set_and_positive() const // NOLINT(readability-identifier-naming
     {
-        constexpr auto isPositive = [](int64_t value) { return value > 0; };
+        auto isPositive = [](int64_t value) constexpr { return value > 0; };
         return validate_dims_set_and_positive() && _stride.size() == _dim.size()
                && std::ranges::all_of(_stride.begin(), _stride.end(), isPositive);
     }

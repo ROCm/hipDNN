@@ -151,18 +151,18 @@ public:
 
     error_t validate()
     {
-        return validate_subtree();
+        return validateSubtree();
     }
 
     error_t build_operation_graph(hipdnnHandle_t handle)
     {
         std::unordered_set<int64_t> usedTensorUids;
-        gather_hipdnn_tensor_ids_subtree(usedTensorUids);
+        gatherHipdnnTensorIdsSubtree(usedTensorUids);
 
         std::unordered_map<int64_t, std::shared_ptr<TensorAttributes>> tensorLookup;
         int64_t currentTensorId = 0;
 
-        populate_hipdnn_tensor_ids_subtree(tensorLookup, currentTensorId, usedTensorUids);
+        populateHipdnnTensorIdsSubtree(tensorLookup, currentTensorId, usedTensorUids);
         flatbuffers::FlatBufferBuilder builder;
 
         std::vector<::flatbuffers::Offset<hipdnn_sdk::data_objects::TensorAttributes>>

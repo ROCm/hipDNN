@@ -15,7 +15,7 @@ namespace hipdnn_frontend
 {
 namespace graph
 {
-class INode // NOLINT
+class INode
 {
 public:
     GraphAttributes graph_attributes;
@@ -58,28 +58,28 @@ public:
 protected:
     std::vector<std::shared_ptr<INode>> _sub_nodes;
 
-    error_t validate_subtree()
+    error_t validateSubtree()
     {
         HIPDNN_CHECK_ERROR(pre_validate_node());
         HIPDNN_CHECK_ERROR(infer_properties_node());
         for(const auto& node : _sub_nodes)
         {
-            HIPDNN_CHECK_ERROR(node->validate_subtree());
+            HIPDNN_CHECK_ERROR(node->validateSubtree());
         }
         HIPDNN_CHECK_ERROR(post_validate_node());
         return {};
     }
 
-    void gather_hipdnn_tensor_ids_subtree(std::unordered_set<int64_t>& usedIds) const
+    void gatherHipdnnTensorIdsSubtree(std::unordered_set<int64_t>& usedIds) const
     {
         gather_hipdnn_tensor_ids(usedIds);
         for(const auto& node : _sub_nodes)
         {
-            node->gather_hipdnn_tensor_ids_subtree(usedIds);
+            node->gatherHipdnnTensorIdsSubtree(usedIds);
         }
     }
 
-    error_t populate_hipdnn_tensor_ids_subtree(
+    error_t populateHipdnnTensorIdsSubtree(
         std::unordered_map<int64_t, std::shared_ptr<TensorAttributes>>& tensorLookup,
         int64_t& currentTensorId,
         std::unordered_set<int64_t>& usedIds)

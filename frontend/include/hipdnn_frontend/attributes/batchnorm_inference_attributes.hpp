@@ -32,82 +32,100 @@ public:
     std::unordered_map<input_names, std::shared_ptr<TensorAttributes>> inputs;
     std::unordered_map<output_names, std::shared_ptr<TensorAttributes>> outputs;
 
+    // NOLINTNEXTLINE(readability-identifier-naming)
     std::shared_ptr<TensorAttributes> get_x() const
     {
         return getInput(input_names::X);
     }
+    // NOLINTNEXTLINE(readability-identifier-naming)
     std::shared_ptr<TensorAttributes> get_mean() const
     {
         return getInput(input_names::MEAN);
     }
+    // NOLINTNEXTLINE(readability-identifier-naming)
     std::shared_ptr<TensorAttributes> get_inv_variance() const
     {
         return getInput(input_names::INV_VARIANCE);
     }
+    // NOLINTNEXTLINE(readability-identifier-naming)
     std::shared_ptr<TensorAttributes> get_scale() const
     {
         return getInput(input_names::SCALE);
     }
+    // NOLINTNEXTLINE(readability-identifier-naming)
     std::shared_ptr<TensorAttributes> get_bias() const
     {
         return getInput(input_names::BIAS);
     }
+    // NOLINTNEXTLINE(readability-identifier-naming)
     std::shared_ptr<TensorAttributes> get_y() const
     {
         return getOutput(output_names::Y);
     }
 
+    // NOLINTNEXTLINE(readability-identifier-naming)
     BatchnormInferenceAttributes& set_x(const std::shared_ptr<TensorAttributes>& value)
     {
         return setInput(input_names::X, value);
     }
+    // NOLINTNEXTLINE(readability-identifier-naming)
     BatchnormInferenceAttributes& set_x(std::shared_ptr<TensorAttributes>&& value)
     {
         return setInput(input_names::X, std::move(value));
     }
+    // NOLINTNEXTLINE(readability-identifier-naming)
     BatchnormInferenceAttributes& set_mean(const std::shared_ptr<TensorAttributes>& value)
     {
         return setInput(input_names::MEAN, value);
     }
+    // NOLINTNEXTLINE(readability-identifier-naming)
     BatchnormInferenceAttributes& set_mean(std::shared_ptr<TensorAttributes>&& value)
     {
         return setInput(input_names::MEAN, std::move(value));
     }
+    // NOLINTNEXTLINE(readability-identifier-naming)
     BatchnormInferenceAttributes& set_inv_variance(const std::shared_ptr<TensorAttributes>& value)
     {
         return setInput(input_names::INV_VARIANCE, value);
     }
+    // NOLINTNEXTLINE(readability-identifier-naming)
     BatchnormInferenceAttributes& set_inv_variance(std::shared_ptr<TensorAttributes>&& value)
     {
         return setInput(input_names::INV_VARIANCE, std::move(value));
     }
+    // NOLINTNEXTLINE(readability-identifier-naming)
     BatchnormInferenceAttributes& set_scale(const std::shared_ptr<TensorAttributes>& value)
     {
         return setInput(input_names::SCALE, value);
     }
+    // NOLINTNEXTLINE(readability-identifier-naming)
     BatchnormInferenceAttributes& set_scale(std::shared_ptr<TensorAttributes>&& value)
     {
         return setInput(input_names::SCALE, std::move(value));
     }
+    // NOLINTNEXTLINE(readability-identifier-naming)
     BatchnormInferenceAttributes& set_bias(const std::shared_ptr<TensorAttributes>& value)
     {
         return setInput(input_names::BIAS, value);
     }
+    // NOLINTNEXTLINE(readability-identifier-naming)
     BatchnormInferenceAttributes& set_bias(std::shared_ptr<TensorAttributes>&& value)
     {
         return setInput(input_names::BIAS, std::move(value));
     }
+    // NOLINTNEXTLINE(readability-identifier-naming)
     BatchnormInferenceAttributes& set_y(const std::shared_ptr<TensorAttributes>& value)
     {
         return setOutput(output_names::Y, value);
     }
+    // NOLINTNEXTLINE(readability-identifier-naming)
     BatchnormInferenceAttributes& set_y(std::shared_ptr<TensorAttributes>&& value)
     {
         return setOutput(output_names::Y, std::move(value));
     }
 
     flatbuffers::Offset<hipdnn_sdk::data_objects::BatchnormInferenceAttributes>
-        pack_attributes(flatbuffers::FlatBufferBuilder& builder) const
+        pack_attributes(flatbuffers::FlatBufferBuilder& builder) const // NOLINT
     {
         auto mean = get_mean();
         auto invVariance = get_inv_variance();
