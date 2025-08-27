@@ -48,21 +48,21 @@ TEST(ErrorTests, CodeEqualityOperators)
 
 TEST(ErrorTests, CheckHipdnnErrorMacro)
 {
-    auto success_function = []() -> hipdnn_frontend::error_t {
+    auto successFunction = []() -> hipdnn_frontend::error_t {
         return {hipdnn_frontend::error_code_t::OK, "Success"};
     };
 
-    auto failure_function = []() -> hipdnn_frontend::error_t {
+    auto failureFunction = []() -> hipdnn_frontend::error_t {
         return {hipdnn_frontend::error_code_t::INVALID_VALUE, "Failure"};
     };
 
-    auto test_function = [&]() -> hipdnn_frontend::error_t {
-        HIPDNN_CHECK_ERROR(success_function());
-        HIPDNN_CHECK_ERROR(failure_function());
+    auto testFunction = [&]() -> hipdnn_frontend::error_t {
+        HIPDNN_CHECK_ERROR(successFunction());
+        HIPDNN_CHECK_ERROR(failureFunction());
         return {hipdnn_frontend::error_code_t::OK, "Should not reach here"};
     };
 
-    hipdnn_frontend::error_t result = test_function();
+    hipdnn_frontend::error_t result = testFunction();
     EXPECT_EQ(result.get_code(), hipdnn_frontend::error_code_t::INVALID_VALUE);
     EXPECT_EQ(result.get_message(), "Failure");
 }

@@ -11,118 +11,118 @@
 using namespace hipdnn_frontend;
 using namespace ::testing;
 
-class Hipdnn_backend_descriptor_test_fixture : public ::testing::Test
+class HipdnnBackendDescriptorTestFixture : public ::testing::Test
 {
 protected:
-    std::shared_ptr<Mock_hipdnn_backend> _mock_backend;
+    std::shared_ptr<Mock_hipdnn_backend> _mockBackend;
 
     void SetUp() override
     {
-        _mock_backend = std::make_shared<Mock_hipdnn_backend>();
-        IHipdnnBackend::setInstance(_mock_backend);
+        _mockBackend = std::make_shared<Mock_hipdnn_backend>();
+        IHipdnnBackend::setInstance(_mockBackend);
 
-        ON_CALL(*_mock_backend, getLastErrorString(_, _))
-            .WillByDefault([](char* error_string, size_t size) {
-                std::string fake_error = "Fake backend error";
+        ON_CALL(*_mockBackend, getLastErrorString(_, _))
+            .WillByDefault([](char* errorString, size_t size) {
+                std::string fakeError = "Fake backend error";
                 hipdnn::sdk::utilities::copyMaxSizeWithNullTerminator(
-                    error_string, fake_error.c_str(), size - 1);
+                    errorString, fakeError.c_str(), size - 1);
             });
     }
     void TearDown() override
     {
         IHipdnnBackend::resetInstance();
-        _mock_backend.reset();
+        _mockBackend.reset();
     }
 };
 
-TEST_F(Hipdnn_backend_descriptor_test_fixture, DefaultConstructorIsInvalid)
+TEST_F(HipdnnBackendDescriptorTestFixture, DefaultConstructorIsInvalid)
 {
     auto desc = ScopedHipdnnBackendDescriptor();
     EXPECT_FALSE(desc.valid());
     EXPECT_EQ(desc.get(), nullptr);
 }
 
-TEST_F(Hipdnn_backend_descriptor_test_fixture, ConstructWithRawDescriptorIsValid)
+TEST_F(HipdnnBackendDescriptorTestFixture, ConstructWithRawDescriptorIsValid)
 {
-    auto fake_desc = reinterpret_cast<hipdnnBackendDescriptor_t>(0x1234);
-    auto desc = ScopedHipdnnBackendDescriptor(fake_desc);
+    auto fakeDesc = reinterpret_cast<hipdnnBackendDescriptor_t>(0x1234);
+    auto desc = ScopedHipdnnBackendDescriptor(fakeDesc);
 
-    EXPECT_CALL(*_mock_backend, backendDestroyDescriptor(fake_desc))
+    EXPECT_CALL(*_mockBackend, backendDestroyDescriptor(fakeDesc))
         .WillOnce(Return(HIPDNN_STATUS_SUCCESS));
 
     EXPECT_TRUE(desc.valid());
-    EXPECT_EQ(desc.get(), fake_desc);
+    EXPECT_EQ(desc.get(), fakeDesc);
 }
 
-TEST_F(Hipdnn_backend_descriptor_test_fixture, ConstructWithTypeSuccess)
+TEST_F(HipdnnBackendDescriptorTestFixture, ConstructWithTypeSuccess)
 {
-    auto fake_desc = reinterpret_cast<hipdnnBackendDescriptor_t>(0x5678);
-    EXPECT_CALL(*_mock_backend, backendCreateDescriptor(HIPDNN_BACKEND_ENGINECFG_DESCRIPTOR, _))
-        .WillOnce([&fake_desc](hipdnnBackendDescriptorType_t, hipdnnBackendDescriptor_t* out) {
-            *out = fake_desc;
+    auto fakeDesc = reinterpret_cast<hipdnnBackendDescriptor_t>(0x5678);
+    EXPECT_CALL(*_mockBackend, backendCreateDescriptor(HIPDNN_BACKEND_ENGINECFG_DESCRIPTOR, _))
+        .WillOnce([&fakeDesc](hipdnnBackendDescriptorType_t, hipdnnBackendDescriptor_t* out) {
+            *out = fakeDesc;
             return HIPDNN_STATUS_SUCCESS;
         });
-    EXPECT_CALL(*_mock_backend, backendDestroyDescriptor(fake_desc))
+    EXPECT_CALL(*_mockBackend, backendDestroyDescriptor(fakeDesc))
         .WillOnce(Return(HIPDNN_STATUS_SUCCESS));
 
     auto desc = ScopedHipdnnBackendDescriptor(HIPDNN_BACKEND_ENGINECFG_DESCRIPTOR);
     EXPECT_TRUE(desc.valid());
-    EXPECT_EQ(desc.get(), fake_desc);
+    EXPECT_EQ(desc.get(), fakeDesc);
 }
 
-TEST_F(Hipdnn_backend_descriptor_test_fixture, ConstructWithTypeFailure)
+TEST_F(HipdnnBackendDescriptorTestFixture, ConstructWithTypeFailure)
 {
-    EXPECT_CALL(*_mock_backend, backendCreateDescriptor(HIPDNN_BACKEND_ENGINEHEUR_DESCRIPTOR, _))
+    EXPECT_CALL(*_mockBackend, backendCreateDescriptor(HIPDNN_BACKEND_ENGINEHEUR_DESCRIPTOR, _))
         .WillOnce([](hipdnnBackendDescriptorType_t, hipdnnBackendDescriptor_t*) {
             return HIPDNN_STATUS_BAD_PARAM;
         });
-    EXPECT_CALL(*_mock_backend, getLastErrorString).Times(AnyNumber()); // Uninteresting call
+    EXPECT_CALL(*_mockBackend, getLastErrorString).Times(AnyNumber()); // Uninteresting call
 
     auto desc = ScopedHipdnnBackendDescriptor(HIPDNN_BACKEND_ENGINEHEUR_DESCRIPTOR);
     EXPECT_FALSE(desc.valid());
     EXPECT_EQ(desc.get(), nullptr);
 }
 
-TEST_F(Hipdnn_backend_descriptor_test_fixture, ConstructWithSerializedGraphSuccess)
+TEST_F(HipdnnBackendDescriptorTestFixture, ConstructWithSerializedGraphSuccess)
 {
-    auto fake_desc = reinterpret_cast<hipdnnBackendDescriptor_t>(0x4321);
-    std::vector<uint8_t> fake_graph{1, 2, 3, 4};
-    EXPECT_CALL(*_mock_backend, backendCreateAndDeserializeGraphExt(_, _, _))
-        .WillOnce([&fake_desc](hipdnnBackendDescriptor_t* out, const uint8_t*, size_t) {
-            *out = fake_desc;
+    auto fakeDesc = reinterpret_cast<hipdnnBackendDescriptor_t>(0x4321);
+    std::vector<uint8_t> fakeGraph{1, 2, 3, 4};
+    EXPECT_CALL(*_mockBackend, backendCreateAndDeserializeGraphExt(_, _, _))
+        .WillOnce([&fakeDesc](hipdnnBackendDescriptor_t* out, const uint8_t*, size_t) {
+            *out = fakeDesc;
             return HIPDNN_STATUS_SUCCESS;
         });
-    EXPECT_CALL(*_mock_backend, backendDestroyDescriptor(fake_desc))
+    EXPECT_CALL(*_mockBackend, backendDestroyDescriptor(fakeDesc))
         .WillOnce(Return(HIPDNN_STATUS_SUCCESS));
 
-    auto desc = ScopedHipdnnBackendDescriptor(fake_graph.data(), fake_graph.size());
+    auto desc = ScopedHipdnnBackendDescriptor(fakeGraph.data(), fakeGraph.size());
     EXPECT_TRUE(desc.valid());
-    EXPECT_EQ(desc.get(), fake_desc);
+    EXPECT_EQ(desc.get(), fakeDesc);
 }
 
-TEST_F(Hipdnn_backend_descriptor_test_fixture, ConstructWithSerializedGraphFailure)
+TEST_F(HipdnnBackendDescriptorTestFixture, ConstructWithSerializedGraphFailure)
 {
-    std::vector<uint8_t> fake_graph{1, 2, 3, 4};
-    EXPECT_CALL(*_mock_backend, backendCreateAndDeserializeGraphExt(_, _, _))
+    std::vector<uint8_t> fakeGraph{1, 2, 3, 4};
+    EXPECT_CALL(*_mockBackend, backendCreateAndDeserializeGraphExt(_, _, _))
         .WillOnce([](hipdnnBackendDescriptor_t*, const uint8_t*, size_t) {
             return HIPDNN_STATUS_BAD_PARAM;
         });
-    EXPECT_CALL(*_mock_backend, getLastErrorString).Times(AnyNumber()); // Uninteresting call
+    EXPECT_CALL(*_mockBackend, getLastErrorString).Times(AnyNumber()); // Uninteresting call
 
-    auto desc = ScopedHipdnnBackendDescriptor(fake_graph.data(), fake_graph.size());
+    auto desc = ScopedHipdnnBackendDescriptor(fakeGraph.data(), fakeGraph.size());
     EXPECT_FALSE(desc.valid());
     EXPECT_EQ(desc.get(), nullptr);
 }
 
-TEST_F(Hipdnn_backend_descriptor_test_fixture, DestructorDestroysDescriptorIfValid)
+TEST_F(HipdnnBackendDescriptorTestFixture, DestructorDestroysDescriptorIfValid)
 {
-    auto fake_desc = reinterpret_cast<hipdnnBackendDescriptor_t>(0x9999);
-    EXPECT_CALL(*_mock_backend, backendCreateDescriptor(HIPDNN_BACKEND_ENGINECFG_DESCRIPTOR, _))
-        .WillOnce([&fake_desc](hipdnnBackendDescriptorType_t, hipdnnBackendDescriptor_t* out) {
-            *out = fake_desc;
+    auto fakeDesc = reinterpret_cast<hipdnnBackendDescriptor_t>(0x9999);
+    EXPECT_CALL(*_mockBackend, backendCreateDescriptor(HIPDNN_BACKEND_ENGINECFG_DESCRIPTOR, _))
+        .WillOnce([&fakeDesc](hipdnnBackendDescriptorType_t, hipdnnBackendDescriptor_t* out) {
+            *out = fakeDesc;
             return HIPDNN_STATUS_SUCCESS;
         });
-    EXPECT_CALL(*_mock_backend, backendDestroyDescriptor(fake_desc))
+    EXPECT_CALL(*_mockBackend, backendDestroyDescriptor(fakeDesc))
         .WillOnce(Return(HIPDNN_STATUS_SUCCESS));
 
     {
@@ -131,17 +131,17 @@ TEST_F(Hipdnn_backend_descriptor_test_fixture, DestructorDestroysDescriptorIfVal
     }
 }
 
-TEST_F(Hipdnn_backend_descriptor_test_fixture, DestructorHandlesDestroyFailure)
+TEST_F(HipdnnBackendDescriptorTestFixture, DestructorHandlesDestroyFailure)
 {
-    auto fake_desc = reinterpret_cast<hipdnnBackendDescriptor_t>(0x8888);
-    EXPECT_CALL(*_mock_backend, backendCreateDescriptor(HIPDNN_BACKEND_ENGINECFG_DESCRIPTOR, _))
-        .WillOnce([&fake_desc](hipdnnBackendDescriptorType_t, hipdnnBackendDescriptor_t* out) {
-            *out = fake_desc;
+    auto fakeDesc = reinterpret_cast<hipdnnBackendDescriptor_t>(0x8888);
+    EXPECT_CALL(*_mockBackend, backendCreateDescriptor(HIPDNN_BACKEND_ENGINECFG_DESCRIPTOR, _))
+        .WillOnce([&fakeDesc](hipdnnBackendDescriptorType_t, hipdnnBackendDescriptor_t* out) {
+            *out = fakeDesc;
             return HIPDNN_STATUS_SUCCESS;
         });
-    EXPECT_CALL(*_mock_backend, backendDestroyDescriptor(fake_desc))
+    EXPECT_CALL(*_mockBackend, backendDestroyDescriptor(fakeDesc))
         .WillOnce(Return(HIPDNN_STATUS_BAD_PARAM));
-    EXPECT_CALL(*_mock_backend, getLastErrorString).Times(AnyNumber()); // Uninteresting call
+    EXPECT_CALL(*_mockBackend, getLastErrorString).Times(AnyNumber()); // Uninteresting call
 
     {
         auto desc = ScopedHipdnnBackendDescriptor(HIPDNN_BACKEND_ENGINECFG_DESCRIPTOR);
@@ -149,15 +149,15 @@ TEST_F(Hipdnn_backend_descriptor_test_fixture, DestructorHandlesDestroyFailure)
     }
 }
 
-TEST_F(Hipdnn_backend_descriptor_test_fixture, MoveConstructorTransfersOwnership)
+TEST_F(HipdnnBackendDescriptorTestFixture, MoveConstructorTransfersOwnership)
 {
-    auto fake_desc = reinterpret_cast<hipdnnBackendDescriptor_t>(0x1111);
-    EXPECT_CALL(*_mock_backend, backendCreateDescriptor(HIPDNN_BACKEND_ENGINECFG_DESCRIPTOR, _))
-        .WillOnce([&fake_desc](hipdnnBackendDescriptorType_t, hipdnnBackendDescriptor_t* out) {
-            *out = fake_desc;
+    auto fakeDesc = reinterpret_cast<hipdnnBackendDescriptor_t>(0x1111);
+    EXPECT_CALL(*_mockBackend, backendCreateDescriptor(HIPDNN_BACKEND_ENGINECFG_DESCRIPTOR, _))
+        .WillOnce([&fakeDesc](hipdnnBackendDescriptorType_t, hipdnnBackendDescriptor_t* out) {
+            *out = fakeDesc;
             return HIPDNN_STATUS_SUCCESS;
         });
-    EXPECT_CALL(*_mock_backend, backendDestroyDescriptor(fake_desc))
+    EXPECT_CALL(*_mockBackend, backendDestroyDescriptor(fakeDesc))
         .WillOnce(Return(HIPDNN_STATUS_SUCCESS));
 
     auto desc1 = ScopedHipdnnBackendDescriptor(HIPDNN_BACKEND_ENGINECFG_DESCRIPTOR);
@@ -171,24 +171,24 @@ TEST_F(Hipdnn_backend_descriptor_test_fixture, MoveConstructorTransfersOwnership
     EXPECT_EQ(desc1.get(), nullptr);
 }
 
-TEST_F(Hipdnn_backend_descriptor_test_fixture, MoveAssignmentTransfersOwnership)
+TEST_F(HipdnnBackendDescriptorTestFixture, MoveAssignmentTransfersOwnership)
 {
-    auto fake_desc1 = reinterpret_cast<hipdnnBackendDescriptor_t>(0x2222);
-    auto fake_desc2 = reinterpret_cast<hipdnnBackendDescriptor_t>(0x3333);
+    auto fakeDesc1 = reinterpret_cast<hipdnnBackendDescriptor_t>(0x2222);
+    auto fakeDesc2 = reinterpret_cast<hipdnnBackendDescriptor_t>(0x3333);
 
-    EXPECT_CALL(*_mock_backend, backendCreateDescriptor(HIPDNN_BACKEND_ENGINECFG_DESCRIPTOR, _))
-        .WillOnce([&fake_desc1](hipdnnBackendDescriptorType_t, hipdnnBackendDescriptor_t* out) {
-            *out = fake_desc1;
+    EXPECT_CALL(*_mockBackend, backendCreateDescriptor(HIPDNN_BACKEND_ENGINECFG_DESCRIPTOR, _))
+        .WillOnce([&fakeDesc1](hipdnnBackendDescriptorType_t, hipdnnBackendDescriptor_t* out) {
+            *out = fakeDesc1;
             return HIPDNN_STATUS_SUCCESS;
         })
-        .WillOnce([&fake_desc2](hipdnnBackendDescriptorType_t, hipdnnBackendDescriptor_t* out) {
-            *out = fake_desc2;
+        .WillOnce([&fakeDesc2](hipdnnBackendDescriptorType_t, hipdnnBackendDescriptor_t* out) {
+            *out = fakeDesc2;
             return HIPDNN_STATUS_SUCCESS;
         });
 
-    EXPECT_CALL(*_mock_backend, backendDestroyDescriptor(fake_desc1))
+    EXPECT_CALL(*_mockBackend, backendDestroyDescriptor(fakeDesc1))
         .WillOnce(Return(HIPDNN_STATUS_SUCCESS));
-    EXPECT_CALL(*_mock_backend, backendDestroyDescriptor(fake_desc2))
+    EXPECT_CALL(*_mockBackend, backendDestroyDescriptor(fakeDesc2))
         .WillOnce(Return(HIPDNN_STATUS_SUCCESS));
 
     auto desc1 = ScopedHipdnnBackendDescriptor(HIPDNN_BACKEND_ENGINECFG_DESCRIPTOR);
@@ -197,12 +197,12 @@ TEST_F(Hipdnn_backend_descriptor_test_fixture, MoveAssignmentTransfersOwnership)
     desc2 = std::move(desc1);
 
     EXPECT_TRUE(desc2.valid());
-    EXPECT_EQ(desc2.get(), fake_desc1);
+    EXPECT_EQ(desc2.get(), fakeDesc1);
     EXPECT_FALSE(desc1.valid());
     EXPECT_EQ(desc1.get(), nullptr);
 }
 
-TEST_F(Hipdnn_backend_descriptor_test_fixture, MoveFromInvalidDescriptor)
+TEST_F(HipdnnBackendDescriptorTestFixture, MoveFromInvalidDescriptor)
 {
     auto desc1 = ScopedHipdnnBackendDescriptor();
     auto desc2 = ScopedHipdnnBackendDescriptor(std::move(desc1));
@@ -210,17 +210,17 @@ TEST_F(Hipdnn_backend_descriptor_test_fixture, MoveFromInvalidDescriptor)
     EXPECT_EQ(desc2.get(), nullptr);
 }
 
-TEST_F(Hipdnn_backend_descriptor_test_fixture, MoveAssignFromInvalidDescriptor)
+TEST_F(HipdnnBackendDescriptorTestFixture, MoveAssignFromInvalidDescriptor)
 {
-    auto fake_desc = reinterpret_cast<hipdnnBackendDescriptor_t>(0x5555);
+    auto fakeDesc = reinterpret_cast<hipdnnBackendDescriptor_t>(0x5555);
 
-    EXPECT_CALL(*_mock_backend, backendCreateDescriptor(HIPDNN_BACKEND_ENGINECFG_DESCRIPTOR, _))
-        .WillOnce([&fake_desc](hipdnnBackendDescriptorType_t, hipdnnBackendDescriptor_t* out) {
-            *out = fake_desc;
+    EXPECT_CALL(*_mockBackend, backendCreateDescriptor(HIPDNN_BACKEND_ENGINECFG_DESCRIPTOR, _))
+        .WillOnce([&fakeDesc](hipdnnBackendDescriptorType_t, hipdnnBackendDescriptor_t* out) {
+            *out = fakeDesc;
             return HIPDNN_STATUS_SUCCESS;
         });
 
-    EXPECT_CALL(*_mock_backend, backendDestroyDescriptor(fake_desc))
+    EXPECT_CALL(*_mockBackend, backendDestroyDescriptor(fakeDesc))
         .WillOnce(Return(HIPDNN_STATUS_SUCCESS));
 
     auto desc1 = ScopedHipdnnBackendDescriptor(HIPDNN_BACKEND_ENGINECFG_DESCRIPTOR);

@@ -85,16 +85,16 @@ TEST(TensorAttributesTests, SetOutput)
 
 TEST(TensorAttributesTests, SetFromGraphAttributes)
 {
-    GraphAttributes graph_attributes;
-    graph_attributes.set_io_data_type(DataType_t::FLOAT);
-    graph_attributes.set_intermediate_data_type(DataType_t::HALF);
+    GraphAttributes graphAttributes;
+    graphAttributes.set_io_data_type(DataType_t::FLOAT);
+    graphAttributes.set_intermediate_data_type(DataType_t::HALF);
 
     TensorAttributes tensor;
-    tensor.set_is_virtual(false).set_from_graph_attributes(graph_attributes);
+    tensor.set_is_virtual(false).set_from_graph_attributes(graphAttributes);
     EXPECT_EQ(tensor.get_data_type(), DataType_t::FLOAT);
 
     tensor.set_data_type(DataType_t::NOT_SET);
-    tensor.set_is_virtual(true).set_from_graph_attributes(graph_attributes);
+    tensor.set_is_virtual(true).set_from_graph_attributes(graphAttributes);
     EXPECT_EQ(tensor.get_data_type(), DataType_t::HALF);
 }
 
@@ -112,11 +112,11 @@ TEST(TensorAttributesTests, PackAttributes)
     auto packed = tensor.pack_attributes(builder);
     builder.Finish(packed);
 
-    auto buffer_pointer = builder.GetBufferPointer();
-    auto tensor_attributes_flatbuffer
-        = flatbuffers::GetRoot<hipdnn_sdk::data_objects::TensorAttributes>(buffer_pointer);
+    auto bufferPointer = builder.GetBufferPointer();
+    auto tensorAttributesFlatbuffer
+        = flatbuffers::GetRoot<hipdnn_sdk::data_objects::TensorAttributes>(bufferPointer);
     auto unpacked = std::unique_ptr<hipdnn_sdk::data_objects::TensorAttributesT>(
-        tensor_attributes_flatbuffer->UnPack());
+        tensorAttributesFlatbuffer->UnPack());
 
     EXPECT_EQ(unpacked->uid, 1);
     EXPECT_EQ(unpacked->name, "PackedTensor");

@@ -19,13 +19,13 @@ TEST(TensorValueAttributesTests, SetGetClearFloat)
     hipdnn_frontend::graph::TensorAttributes tensor;
     EXPECT_FALSE(tensor.has_value());
 
-    constexpr float test_value = std::numbers::pi_v<float>;
-    tensor.set_value(test_value);
+    constexpr float testValue = std::numbers::pi_v<float>;
+    tensor.set_value(testValue);
     EXPECT_TRUE(tensor.has_value());
 
     auto opt = tensor.get_value<float>();
     ASSERT_TRUE(opt.has_value());
-    EXPECT_FLOAT_EQ(opt.value(), test_value);
+    EXPECT_FLOAT_EQ(opt.value(), testValue);
 
     tensor.clear_value();
     EXPECT_FALSE(tensor.has_value());
@@ -44,40 +44,40 @@ TEST(TensorValueAttributesTests, PackUnpackFloat)
         .set_value(std::numbers::e_v<float>);
 
     flatbuffers::FlatBufferBuilder builder;
-    auto fb_offset = tensor.pack_attributes(builder);
-    builder.Finish(fb_offset);
+    auto fbOffset = tensor.pack_attributes(builder);
+    builder.Finish(fbOffset);
 
-    auto buffer_pointer = builder.GetBufferPointer();
-    auto fb_tensor = flatbuffers::GetRoot<TensorAttributes>(buffer_pointer);
+    auto bufferPointer = builder.GetBufferPointer();
+    auto fbTensor = flatbuffers::GetRoot<TensorAttributes>(bufferPointer);
 
-    EXPECT_EQ(fb_tensor->uid(), 7);
-    EXPECT_STREQ(fb_tensor->name()->c_str(), "value_tensor");
-    EXPECT_EQ(fb_tensor->data_type(), DataType_FLOAT);
-    EXPECT_EQ(fb_tensor->strides()->size(), 2u);
-    EXPECT_EQ(fb_tensor->dims()->size(), 2u);
-    EXPECT_FALSE(fb_tensor->virtual_());
+    EXPECT_EQ(fbTensor->uid(), 7);
+    EXPECT_STREQ(fbTensor->name()->c_str(), "value_tensor");
+    EXPECT_EQ(fbTensor->data_type(), DataType_FLOAT);
+    EXPECT_EQ(fbTensor->strides()->size(), 2u);
+    EXPECT_EQ(fbTensor->dims()->size(), 2u);
+    EXPECT_FALSE(fbTensor->virtual_());
 
-    EXPECT_EQ(fb_tensor->value_type(), TensorValue_Float32Value);
-    auto fval = fb_tensor->value_as_Float32Value();
+    EXPECT_EQ(fbTensor->value_type(), TensorValue_Float32Value);
+    auto fval = fbTensor->value_as_Float32Value();
     ASSERT_NE(fval, nullptr);
     EXPECT_FLOAT_EQ(fval->value(), std::numbers::e_v<float>);
 
-    auto unpacked = std::unique_ptr<TensorAttributesT>(fb_tensor->UnPack());
+    auto unpacked = std::unique_ptr<TensorAttributesT>(fbTensor->UnPack());
     EXPECT_EQ(unpacked->uid, 7);
     EXPECT_EQ(unpacked->name, "value_tensor");
     EXPECT_EQ(unpacked->data_type, DataType_FLOAT);
 
-    std::vector<int64_t> expected_strides = {1, 2};
-    std::vector<int64_t> expected_dims = {3, 4};
-    EXPECT_EQ(unpacked->strides, expected_strides);
-    EXPECT_EQ(unpacked->dims, expected_dims);
+    std::vector<int64_t> expectedStrides = {1, 2};
+    std::vector<int64_t> expectedDims = {3, 4};
+    EXPECT_EQ(unpacked->strides, expectedStrides);
+    EXPECT_EQ(unpacked->dims, expectedDims);
 
     EXPECT_FALSE(unpacked->virtual_);
 
     ASSERT_EQ(unpacked->value.type, TensorValue_Float32Value);
-    auto* float_val = unpacked->value.AsFloat32Value();
-    ASSERT_NE(float_val, nullptr);
-    EXPECT_FLOAT_EQ(float_val->value(), std::numbers::e_v<float>);
+    auto* floatVal = unpacked->value.AsFloat32Value();
+    ASSERT_NE(floatVal, nullptr);
+    EXPECT_FLOAT_EQ(floatVal->value(), std::numbers::e_v<float>);
 }
 
 TEST(TensorValueAttributesTests, PackUnpackHalf)
@@ -92,22 +92,22 @@ TEST(TensorValueAttributesTests, PackUnpackHalf)
         .set_value(uint16_t{16384});
 
     flatbuffers::FlatBufferBuilder builder;
-    auto fb_offset = tensor.pack_attributes(builder);
-    builder.Finish(fb_offset);
+    auto fbOffset = tensor.pack_attributes(builder);
+    builder.Finish(fbOffset);
 
-    auto buffer_pointer = builder.GetBufferPointer();
-    auto fb_tensor = flatbuffers::GetRoot<TensorAttributes>(buffer_pointer);
+    auto bufferPointer = builder.GetBufferPointer();
+    auto fbTensor = flatbuffers::GetRoot<TensorAttributes>(bufferPointer);
 
-    EXPECT_EQ(fb_tensor->value_type(), TensorValue_Float16Value);
-    auto hval = fb_tensor->value_as_Float16Value();
+    EXPECT_EQ(fbTensor->value_type(), TensorValue_Float16Value);
+    auto hval = fbTensor->value_as_Float16Value();
     ASSERT_NE(hval, nullptr);
     EXPECT_EQ(hval->value(), uint16_t{16384});
 
-    auto unpacked = std::unique_ptr<TensorAttributesT>(fb_tensor->UnPack());
+    auto unpacked = std::unique_ptr<TensorAttributesT>(fbTensor->UnPack());
     ASSERT_EQ(unpacked->value.type, TensorValue_Float16Value);
-    auto* half_val = unpacked->value.AsFloat16Value();
-    ASSERT_NE(half_val, nullptr);
-    EXPECT_EQ(half_val->value(), uint16_t{16384});
+    auto* halfVal = unpacked->value.AsFloat16Value();
+    ASSERT_NE(halfVal, nullptr);
+    EXPECT_EQ(halfVal->value(), uint16_t{16384});
 }
 
 TEST(TensorValueAttributesTests, PackUnpackDouble)
@@ -122,22 +122,22 @@ TEST(TensorValueAttributesTests, PackUnpackDouble)
         .set_value(std::numbers::pi_v<double>);
 
     flatbuffers::FlatBufferBuilder builder;
-    auto fb_offset = tensor.pack_attributes(builder);
-    builder.Finish(fb_offset);
+    auto fbOffset = tensor.pack_attributes(builder);
+    builder.Finish(fbOffset);
 
-    auto buffer_pointer = builder.GetBufferPointer();
-    auto fb_tensor = flatbuffers::GetRoot<TensorAttributes>(buffer_pointer);
+    auto bufferPointer = builder.GetBufferPointer();
+    auto fbTensor = flatbuffers::GetRoot<TensorAttributes>(bufferPointer);
 
-    EXPECT_EQ(fb_tensor->value_type(), TensorValue_Float64Value);
-    auto dval = fb_tensor->value_as_Float64Value();
+    EXPECT_EQ(fbTensor->value_type(), TensorValue_Float64Value);
+    auto dval = fbTensor->value_as_Float64Value();
     ASSERT_NE(dval, nullptr);
     EXPECT_DOUBLE_EQ(dval->value(), std::numbers::pi_v<double>);
 
-    auto unpacked = std::unique_ptr<TensorAttributesT>(fb_tensor->UnPack());
+    auto unpacked = std::unique_ptr<TensorAttributesT>(fbTensor->UnPack());
     ASSERT_EQ(unpacked->value.type, TensorValue_Float64Value);
-    auto* double_val = unpacked->value.AsFloat64Value();
-    ASSERT_NE(double_val, nullptr);
-    EXPECT_DOUBLE_EQ(double_val->value(), std::numbers::pi_v<double>);
+    auto* doubleVal = unpacked->value.AsFloat64Value();
+    ASSERT_NE(doubleVal, nullptr);
+    EXPECT_DOUBLE_EQ(doubleVal->value(), std::numbers::pi_v<double>);
 }
 
 TEST(TensorValueAttributesTests, PackUnpackEmptyValue)
@@ -153,15 +153,15 @@ TEST(TensorValueAttributesTests, PackUnpackEmptyValue)
     EXPECT_FALSE(tensor.has_value());
 
     flatbuffers::FlatBufferBuilder builder;
-    auto fb_offset = tensor.pack_attributes(builder);
-    builder.Finish(fb_offset);
+    auto fbOffset = tensor.pack_attributes(builder);
+    builder.Finish(fbOffset);
 
-    auto buffer_pointer = builder.GetBufferPointer();
-    auto fb_tensor = flatbuffers::GetRoot<TensorAttributes>(buffer_pointer);
+    auto bufferPointer = builder.GetBufferPointer();
+    auto fbTensor = flatbuffers::GetRoot<TensorAttributes>(bufferPointer);
 
-    EXPECT_EQ(fb_tensor->value_type(), TensorValue_NONE);
+    EXPECT_EQ(fbTensor->value_type(), TensorValue_NONE);
 
-    auto unpacked = std::unique_ptr<TensorAttributesT>(fb_tensor->UnPack());
+    auto unpacked = std::unique_ptr<TensorAttributesT>(fbTensor->UnPack());
     EXPECT_EQ(unpacked->value.type, TensorValue_NONE);
 }
 
@@ -170,9 +170,9 @@ TEST(TensorValueAttributesTests, TypeSafety)
     hipdnn_frontend::graph::TensorAttributes tensor;
     tensor.set_value(42.0f);
 
-    auto float_opt = tensor.get_value<float>();
-    ASSERT_TRUE(float_opt.has_value());
-    EXPECT_FLOAT_EQ(float_opt.value(), 42.0f);
+    auto floatOpt = tensor.get_value<float>();
+    ASSERT_TRUE(floatOpt.has_value());
+    EXPECT_FLOAT_EQ(floatOpt.value(), 42.0f);
 
     EXPECT_FALSE(tensor.get_value<uint16_t>().has_value());
     EXPECT_FALSE(tensor.get_value<uint8_t>().has_value());
@@ -183,9 +183,9 @@ TEST(TensorValueAttributesTests, TypeSafety)
 
     EXPECT_FALSE(tensor.get_value<float>().has_value());
 
-    auto int_opt = tensor.get_value<int32_t>();
-    ASSERT_TRUE(int_opt.has_value());
-    EXPECT_EQ(int_opt.value(), 123);
+    auto intOpt = tensor.get_value<int32_t>();
+    ASSERT_TRUE(intOpt.has_value());
+    EXPECT_EQ(intOpt.value(), 123);
 }
 
 TEST(TensorValueAttributesTests, NumericLimits)
@@ -193,30 +193,30 @@ TEST(TensorValueAttributesTests, NumericLimits)
     hipdnn_frontend::graph::TensorAttributes tensor;
 
     tensor.set_value(std::numeric_limits<float>::max());
-    auto float_opt = tensor.get_value<float>();
-    ASSERT_TRUE(float_opt.has_value());
-    EXPECT_FLOAT_EQ(float_opt.value(), std::numeric_limits<float>::max());
+    auto floatOpt = tensor.get_value<float>();
+    ASSERT_TRUE(floatOpt.has_value());
+    EXPECT_FLOAT_EQ(floatOpt.value(), std::numeric_limits<float>::max());
 
     tensor.set_value(std::numeric_limits<int32_t>::min());
-    auto int_opt = tensor.get_value<int32_t>();
-    ASSERT_TRUE(int_opt.has_value());
-    EXPECT_EQ(int_opt.value(), std::numeric_limits<int32_t>::min());
+    auto intOpt = tensor.get_value<int32_t>();
+    ASSERT_TRUE(intOpt.has_value());
+    EXPECT_EQ(intOpt.value(), std::numeric_limits<int32_t>::min());
 
     tensor.set_value(std::numeric_limits<uint8_t>::max());
-    auto uint8_opt = tensor.get_value<uint8_t>();
-    ASSERT_TRUE(uint8_opt.has_value());
-    EXPECT_EQ(uint8_opt.value(), std::numeric_limits<uint8_t>::max());
+    auto uint8Opt = tensor.get_value<uint8_t>();
+    ASSERT_TRUE(uint8Opt.has_value());
+    EXPECT_EQ(uint8Opt.value(), std::numeric_limits<uint8_t>::max());
 
     tensor.set_value(std::numeric_limits<double>::infinity());
 
     flatbuffers::FlatBufferBuilder builder;
-    auto fb_offset = tensor.pack_attributes(builder);
-    builder.Finish(fb_offset);
+    auto fbOffset = tensor.pack_attributes(builder);
+    builder.Finish(fbOffset);
 
-    auto buffer_pointer = builder.GetBufferPointer();
-    auto fb_tensor = flatbuffers::GetRoot<TensorAttributes>(buffer_pointer);
+    auto bufferPointer = builder.GetBufferPointer();
+    auto fbTensor = flatbuffers::GetRoot<TensorAttributes>(bufferPointer);
 
-    auto dval = fb_tensor->value_as_Float64Value();
+    auto dval = fbTensor->value_as_Float64Value();
     ASSERT_NE(dval, nullptr);
     EXPECT_TRUE(std::isinf(dval->value()));
 }
