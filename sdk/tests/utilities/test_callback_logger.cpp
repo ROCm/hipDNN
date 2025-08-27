@@ -12,17 +12,17 @@
 #include <hipdnn_sdk/logging/callback_types.h>
 #include <hipdnn_sdk/logging/logger.hpp>
 
-static std::vector<std::string> s_CapturedLogs;
-static std::mutex s_LogMutex;
+static std::vector<std::string> s_capturedLogs;
+static std::mutex s_logMutex;
 
 // Custom callback for testing. It doesn't fully simulate the real logging behavior,
 // but the backend tests use the true callback function. The test could use the backend callback, but then it has to link against the backend.
 void testLoggingCallback(hipdnnSeverity_t severity [[maybe_unused]], const char* msg)
 {
-    std::lock_guard<std::mutex> lock(s_LogMutex);
+    std::lock_guard<std::mutex> lock(s_logMutex);
     if(msg != nullptr)
     {
-        s_CapturedLogs.emplace_back(msg);
+        s_capturedLogs.emplace_back(msg);
     }
 }
 
@@ -33,7 +33,7 @@ protected:
 
     void SetUp() override
     {
-        s_CapturedLogs.clear();
+        s_capturedLogs.clear();
 
         spdlog::drop_all();
 
@@ -52,7 +52,7 @@ protected:
     static std::vector<std::string> getCapturedLogs()
     {
         spdlog::shutdown(); // block until async queue is fully processed
-        return s_CapturedLogs;
+        return s_capturedLogs;
     }
 };
 
