@@ -61,7 +61,7 @@ protected:
         s_callbackCalled = false;
     }
 
-    static void callback(hipdnnSeverity_t sev, const char* msg)
+    static void dummyCallback(hipdnnSeverity_t sev, const char* msg)
     {
         (void)sev;
         (void)msg;
@@ -335,7 +335,7 @@ TEST_F(PluginCallbackTest, SetLoggingCallback)
 
     Plugin plugin(std::move(lib));
 
-    EXPECT_EQ(plugin.setLoggingCallback(callback), HIPDNN_PLUGIN_STATUS_SUCCESS);
+    EXPECT_EQ(plugin.setLoggingCallback(dummyCallback), HIPDNN_PLUGIN_STATUS_SUCCESS);
     EXPECT_TRUE(s_callbackCalled);
     EXPECT_EQ(plugin.setLoggingCallback(nullptr), HIPDNN_PLUGIN_STATUS_BAD_PARAM);
 }
