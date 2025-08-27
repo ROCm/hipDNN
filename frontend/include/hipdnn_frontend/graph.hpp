@@ -154,7 +154,7 @@ public:
         return validateSubtree();
     }
 
-    error_t build_operation_graph(hipdnnHandle_t handle)
+    error_t build_operation_graph(hipdnnHandle_t handle) // NOLINT(readability-identifier-naming)
     {
         std::unordered_set<int64_t> usedTensorUids;
         gatherHipdnnTensorIdsSubtree(usedTensorUids);
@@ -217,6 +217,7 @@ public:
         return {error_code_t::OK, ""};
     }
 
+    // NOLINTNEXTLINE(readability-identifier-naming)
     error_t create_execution_plans(hipdnnHandle_t handle,
                                    std::vector<HeurMode_t> const& modes = {HeurMode_t::FALLBACK})
     {
@@ -253,7 +254,7 @@ public:
         return {error_code_t::OK, ""};
     }
 
-    error_t check_support()
+    error_t check_support() // NOLINT(readability-identifier-naming)
     {
         if(!_executionPlanDesc || !_executionPlanDesc->valid())
         {
@@ -264,7 +265,7 @@ public:
         return {error_code_t::OK, ""};
     }
 
-    error_t build_plans()
+    error_t build_plans() // NOLINT(readability-identifier-naming)
     {
         RETURN_ON_BACKEND_FAILURE(hipdnnBackend()->backendFinalize(_engineConfigDesc->get()),
                                   "Failed to finalize engine config descriptor");
@@ -283,6 +284,7 @@ public:
         return {error_code_t::OK, ""};
     }
 
+    // NOLINTNEXTLINE(readability-identifier-naming)
     error_t get_workspace_size(int64_t& workspaceSize) const
     {
         RETURN_ON_BACKEND_FAILURE(

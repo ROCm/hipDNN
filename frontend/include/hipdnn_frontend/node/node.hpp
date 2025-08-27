@@ -111,6 +111,7 @@ private:
     }
 
 public:
+    // NOLINTNEXTLINE(readability-identifier-naming)
     void gather_hipdnn_tensor_ids(std::unordered_set<int64_t>& usedIds) const override
     {
         for(auto& [_, tensor] : self().attributes.inputs)
@@ -129,7 +130,7 @@ public:
             }
         }
     }
-
+    // NOLINTNEXTLINE(readability-identifier-naming)
     static int64_t get_unused_tensor_uid(int64_t& currentTensorId,
                                          std::unordered_set<int64_t>& usedIds)
     {
@@ -141,6 +142,7 @@ public:
         return currentTensorId++;
     }
 
+    // NOLINT(readability-identifier-naming)
     error_t populate_hipdnn_tensor_ids(
         std::unordered_map<int64_t, std::shared_ptr<TensorAttributes>>& tensorLookup,
         int64_t& currentTensorId,

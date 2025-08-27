@@ -19,13 +19,13 @@ TEST(TensorValueAttributesTests, SetGetClearFloat)
     hipdnn_frontend::graph::TensorAttributes tensor;
     EXPECT_FALSE(tensor.has_value());
 
-    constexpr float testValue = std::numbers::pi_v<float>;
-    tensor.set_value(testValue);
+    constexpr float TEST_VALUE = std::numbers::pi_v<float>;
+    tensor.set_value(TEST_VALUE);
     EXPECT_TRUE(tensor.has_value());
 
     auto opt = tensor.get_value<float>();
     ASSERT_TRUE(opt.has_value());
-    EXPECT_FLOAT_EQ(opt.value(), testValue);
+    EXPECT_FLOAT_EQ(opt.value(), TEST_VALUE);
 
     tensor.clear_value();
     EXPECT_FALSE(tensor.has_value());
