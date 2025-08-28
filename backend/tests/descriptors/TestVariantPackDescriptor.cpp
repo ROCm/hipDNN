@@ -9,7 +9,7 @@
 namespace hipdnn_backend
 {
 
-class InitializeVariantPackDescriptorTests : public ::testing::Test
+class TestVariantPackDescriptorWhenInitialized : public ::testing::Test
 {
 protected:
     VariantDescriptor descriptor;
@@ -20,7 +20,7 @@ protected:
     }
 };
 
-TEST_F(InitializeVariantPackDescriptorTests, ValidSetAttributes)
+TEST_F(TestVariantPackDescriptorWhenInitialized, ValidSetAttributes)
 {
     std::array<void*, 3> devPtrs = {reinterpret_cast<void*>(0x1234),
                                     reinterpret_cast<void*>(0x5678),
@@ -43,7 +43,7 @@ TEST_F(InitializeVariantPackDescriptorTests, ValidSetAttributes)
     EXPECT_TRUE(descriptor.isFinalized());
 }
 
-TEST_F(InitializeVariantPackDescriptorTests, ValidSetAndGetBeforeFinalAttributes)
+TEST_F(TestVariantPackDescriptorWhenInitialized, ValidSetAndGetBeforeFinalAttributes)
 {
     std::array<void*, 3> devPtrs = {reinterpret_cast<void*>(0x1234),
                                     reinterpret_cast<void*>(0x5678),
@@ -73,7 +73,7 @@ TEST_F(InitializeVariantPackDescriptorTests, ValidSetAndGetBeforeFinalAttributes
                                HIPDNN_STATUS_NOT_INITIALIZED);
 }
 
-TEST_F(InitializeVariantPackDescriptorTests, InvalidSetAttributes)
+TEST_F(TestVariantPackDescriptorWhenInitialized, InvalidSetAttributes)
 {
     std::array<void*, 3> devPtrs = {reinterpret_cast<void*>(0x1234),
                                     reinterpret_cast<void*>(0x5678),
@@ -103,7 +103,7 @@ TEST_F(InitializeVariantPackDescriptorTests, InvalidSetAttributes)
         HIPDNN_STATUS_BAD_PARAM_NULL_POINTER);
 }
 
-TEST_F(InitializeVariantPackDescriptorTests, InvalidFinalizeCounts)
+TEST_F(TestVariantPackDescriptorWhenInitialized, InvalidFinalizeCounts)
 {
     std::array<void*, 3> devPtrs = {reinterpret_cast<void*>(0x1234),
                                     reinterpret_cast<void*>(0x5678),
@@ -126,13 +126,13 @@ TEST_F(InitializeVariantPackDescriptorTests, InvalidFinalizeCounts)
     EXPECT_FALSE(descriptor.isFinalized());
 }
 
-TEST_F(InitializeVariantPackDescriptorTests, InvalidFinalizeUnsetParams)
+TEST_F(TestVariantPackDescriptorWhenInitialized, InvalidFinalizeUnsetParams)
 {
     ASSERT_THROW(descriptor.finalize(), HipdnnException);
     EXPECT_FALSE(descriptor.isFinalized());
 }
 
-TEST_F(InitializeVariantPackDescriptorTests, InvalidGetAttributeNotFinalized)
+TEST_F(TestVariantPackDescriptorWhenInitialized, InvalidGetAttributeNotFinalized)
 {
     std::array<void*, 3> retrievedDevPtrs;
     int64_t elementCount = 0;
@@ -145,7 +145,7 @@ TEST_F(InitializeVariantPackDescriptorTests, InvalidGetAttributeNotFinalized)
                                HIPDNN_STATUS_NOT_INITIALIZED);
 }
 
-class FinalizedVariantPackDescriptorTests : public ::testing::Test
+class TestVariantPackDescriptorWhenFinalized : public ::testing::Test
 {
 protected:
     VariantDescriptor descriptor;
@@ -175,7 +175,7 @@ protected:
     }
 };
 
-TEST_F(FinalizedVariantPackDescriptorTests, InvalidSetAttribute)
+TEST_F(TestVariantPackDescriptorWhenFinalized, InvalidSetAttribute)
 {
     ASSERT_THROW_HIPDNN_STATUS(descriptor.setAttribute(HIPDNN_ATTR_VARIANT_PACK_DATA_POINTERS,
                                                        HIPDNN_TYPE_VOID_PTR,
@@ -184,7 +184,7 @@ TEST_F(FinalizedVariantPackDescriptorTests, InvalidSetAttribute)
                                HIPDNN_STATUS_NOT_INITIALIZED);
 }
 
-TEST_F(FinalizedVariantPackDescriptorTests, ValidGetAttributes)
+TEST_F(TestVariantPackDescriptorWhenFinalized, ValidGetAttributes)
 {
     std::array<void*, 3> retrievedDevPtrs;
     std::array<int64_t, 3> retrievedUids;
@@ -217,7 +217,7 @@ TEST_F(FinalizedVariantPackDescriptorTests, ValidGetAttributes)
     EXPECT_EQ(retrievedWorkspace, _workspace);
 }
 
-TEST_F(FinalizedVariantPackDescriptorTests, InvalidGetAttributes)
+TEST_F(TestVariantPackDescriptorWhenFinalized, InvalidGetAttributes)
 {
     std::array<void*, 3> retrievedDevPtrs;
     std::array<int64_t, 3> retrievedUids;
