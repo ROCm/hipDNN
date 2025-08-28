@@ -3,6 +3,7 @@
 
 #include "TestUtil.hpp"
 #include "descriptors/BackendDescriptor.hpp"
+#define HIPDNN_BACKEND_STATIC_DEFINE
 #include "hipdnn_backend.h"
 #include "hipdnn_sdk/plugin/EnginePluginApi.h"
 #include "hipdnn_sdk/plugin/PluginApi.h"
