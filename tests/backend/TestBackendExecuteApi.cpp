@@ -11,7 +11,7 @@
 
 #include <gtest/gtest.h>
 
-class ExecutionBackendEndApiTests : public ::testing::Test
+class IntegrationBackendExecuteApi : public ::testing::Test
 {
 protected:
     static constexpr int64_t GIDX = hipdnn_tests::plugin_constants::engineId<GoodPlugin>();
@@ -64,7 +64,7 @@ private:
     }
 };
 
-TEST_F(ExecutionBackendEndApiTests, TestBackendExecuteWithNullHandle)
+TEST_F(IntegrationBackendExecuteApi, NullHandle)
 {
     auto batchnormBuilder = test_util::createAndPopulateBatchnormNode();
     auto serializedGraph = batchnormBuilder.Release();
@@ -84,7 +84,7 @@ TEST_F(ExecutionBackendEndApiTests, TestBackendExecuteWithNullHandle)
               HIPDNN_STATUS_BAD_PARAM_NULL_POINTER);
 }
 
-TEST_F(ExecutionBackendEndApiTests, TestBackendExecuteWithNullDescriptors)
+TEST_F(IntegrationBackendExecuteApi, NullDescriptors)
 {
     auto batchnormBuilder = test_util::createAndPopulateBatchnormNode();
     auto serializedGraph = batchnormBuilder.Release();
@@ -106,7 +106,28 @@ TEST_F(ExecutionBackendEndApiTests, TestBackendExecuteWithNullDescriptors)
     ASSERT_EQ(hipdnnBackendExecute(_handle, _plan, nullptr), HIPDNN_STATUS_BAD_PARAM_NULL_POINTER);
 }
 
-TEST_F(ExecutionBackendEndApiTests, TestBackendExecuteWithUnfinalizedPlan)
+TEST_F(IntegrationBackendExecuteApi, NullPlan)
+{
+
+    auto batchnormBuilder = test_util::createAndPopulateBatchnormNode();
+    auto serializedGraph = batchnormBuilder.Release();
+
+    test_util::createAndInitializeBackendDescriptor(&_graphDescriptor, serializedGraph, _handle);
+    test_util::createTestEngine(&_engine, &_graphDescriptor, _handle, GIDX, true);
+    test_util::createTestEngineConfig(
+        &_engineConfig, &_engine, &_graphDescriptor, _handle, GIDX, true);
+
+    EXPECT_EQ(hipdnnBackendCreateDescriptor(HIPDNN_BACKEND_EXECUTION_PLAN_DESCRIPTOR, &_plan),
+              HIPDNN_STATUS_SUCCESS);
+
+    test_util::populateTestExecutionPlan(
+        &_plan, &_engineConfig, &_engine, &_graphDescriptor, _handle, GIDX, true);
+
+    ASSERT_EQ(hipdnnBackendExecute(_handle, nullptr, _variantPack),
+              HIPDNN_STATUS_BAD_PARAM_NULL_POINTER);
+}
+
+TEST_F(IntegrationBackendExecuteApi, UnfinalizedPlan)
 {
     hipdnnBackendDescriptor_t unfinalizedPlan = nullptr;
     ASSERT_EQ(
@@ -127,7 +148,7 @@ TEST_F(ExecutionBackendEndApiTests, TestBackendExecuteWithUnfinalizedPlan)
     destroyTestDescriptor(unfinalizedPlan);
 }
 
-TEST_F(ExecutionBackendEndApiTests, TestBackendExecuteWithWrongDescriptorTypes)
+TEST_F(IntegrationBackendExecuteApi, WrongDescriptorTypes)
 {
     auto batchnormBuilder = test_util::createAndPopulateBatchnormNode();
     auto serializedGraph = batchnormBuilder.Release();
@@ -148,7 +169,7 @@ TEST_F(ExecutionBackendEndApiTests, TestBackendExecuteWithWrongDescriptorTypes)
     ASSERT_EQ(hipdnnBackendExecute(_handle, _plan, _graphDescriptor), HIPDNN_STATUS_BAD_PARAM);
 }
 
-TEST_F(ExecutionBackendEndApiTests, TestBackendExecute)
+TEST_F(IntegrationBackendExecuteApi, ValidExecute)
 {
     auto batchnormBuilder = test_util::createAndPopulateBatchnormNode();
     auto serializedGraph = batchnormBuilder.Release();
