@@ -56,7 +56,7 @@ TEST(IntegrationBackendDescriptor, Finalize)
     EXPECT_EQ(status, HIPDNN_STATUS_BAD_PARAM_NULL_POINTER);
 }
 
-TEST(IntegrationBackendDescriptor, GetAttribute)
+TEST(IntegrationBackendDescriptor, GetAttributeWithNullDescriptor)
 {
     hipdnnBackendDescriptor_t descriptor = nullptr;
     hipdnnBackendAttributeName_t attributeName = HIPDNN_ATTR_ENGINEHEUR_OPERATION_GRAPH;
@@ -75,7 +75,7 @@ TEST(IntegrationBackendDescriptor, GetAttribute)
     EXPECT_EQ(status, HIPDNN_STATUS_BAD_PARAM_NULL_POINTER);
 }
 
-TEST(IntegrationBackendDescriptor, SetAttribute)
+TEST(IntegrationBackendDescriptor, SetAttributeWithNullDescriptor)
 {
     hipdnnBackendDescriptor_t descriptor = nullptr;
     hipdnnBackendAttributeName_t attributeName = HIPDNN_ATTR_ENGINEHEUR_OPERATION_GRAPH;
@@ -87,6 +87,16 @@ TEST(IntegrationBackendDescriptor, SetAttribute)
         descriptor, attributeName, attributeType, elementCount, arrayOfElements);
 
     EXPECT_EQ(status, HIPDNN_STATUS_BAD_PARAM_NULL_POINTER);
+}
+
+TEST(IntegrationBackendDescriptor, CreateAndDeserializeGraphExtWithNullGraph)
+{
+    hipdnnBackendDescriptor_t descriptor = nullptr;
+
+    auto status = hipdnnBackendCreateAndDeserializeGraph_ext(&descriptor, nullptr, 0);
+
+    EXPECT_EQ(status, HIPDNN_STATUS_BAD_PARAM_NULL_POINTER);
+    EXPECT_EQ(descriptor, nullptr);
 }
 
 TEST(IntegrationBackendDescriptor, SetOperationGraph)

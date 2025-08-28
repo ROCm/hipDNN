@@ -17,7 +17,6 @@ add_executable(public_hipdnn_backend_tests
     IntegrationPluginLoading.cpp
     IntegrationSetPluginPathsExt.cpp
     IntegrationVariantPackApi.cpp
-    TestCreateAndDeserializeGraphExt.cpp
     TestUtil.cpp
 )
 
