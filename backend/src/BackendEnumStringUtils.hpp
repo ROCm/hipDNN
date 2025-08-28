@@ -8,8 +8,6 @@
 #include "HipdnnBackendDescriptorType.h"
 #include "HipdnnBackendPluginLoadingMode.h"
 #include "HipdnnStatus.h"
-#include <sstream>
-#include <thread>
 
 namespace hipdnn_backend
 {

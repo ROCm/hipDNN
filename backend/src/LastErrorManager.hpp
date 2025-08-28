@@ -3,13 +3,8 @@
 
 #pragma once
 
-#include "HipdnnBackendAttributeName.h"
-#include "HipdnnBackendAttributeType.h"
-#include "HipdnnBackendDescriptorType.h"
 #include "HipdnnBackendLimits.h"
-#include "HipdnnBackendPluginLoadingMode.h"
 #include "HipdnnStatus.h"
-#include <sstream>
 #include <thread>
 
 namespace hipdnn_backend
