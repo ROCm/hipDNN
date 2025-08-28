@@ -17,7 +17,7 @@ TEST(IntegrationHandleApi, CreateAndDestroy)
     ASSERT_EQ(destroyStatus, HIPDNN_STATUS_SUCCESS);
 }
 
-TEST(IntegrationBackendDescriptor, CreateWithNullptr)
+TEST(IntegrationHandleApi, CreateWithNullptr)
 {
     hipdnnStatus_t status = hipdnnCreate(nullptr);
 
@@ -55,7 +55,7 @@ TEST(IntegrationHandleApi, GetStreamNullptrStreamPointer)
     ASSERT_EQ(destroyStatus, HIPDNN_STATUS_SUCCESS);
 }
 
-TEST(IntegrationGPUHandleApi, GetStreamPointer)
+TEST(IntegrationGpuHandleApi, GetStreamPointer)
 {
     SKIP_IF_NO_DEVICES();
 

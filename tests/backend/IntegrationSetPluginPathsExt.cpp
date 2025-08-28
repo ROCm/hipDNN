@@ -4,10 +4,15 @@
 #include "TestUtil.hpp"
 #include "hipdnn_backend.h"
 #include <array>
+#include <filesystem>
 #include <gtest/gtest.h>
 #include <hipdnn_sdk/data_objects/graph_generated.h>
 #include <hipdnn_sdk/utilities/PlatformUtils.hpp>
 #include <vector>
+
+using namespace hipdnn_sdk::utilities;
+using namespace hipdnn_tests::plugin_constants;
+namespace fs = std::filesystem;
 
 TEST(IntegrationSetPluginPathsExt, ValidInputs)
 {

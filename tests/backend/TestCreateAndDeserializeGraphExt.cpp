@@ -3,7 +3,8 @@
 #include <hipdnn_sdk/data_objects/graph_generated.h>
 #include <hipdnn_sdk/utilities/PlatformUtils.hpp>
 
-TEST(CreateAndDeserializeGraphExt, NullptrGraph)
+// TODO: Move this into backend/tests
+TEST(TestCreateAndDeserializeGraphExt, NullptrGraph)
 {
     hipdnnBackendDescriptor_t descriptor = nullptr;
 

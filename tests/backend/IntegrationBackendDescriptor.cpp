@@ -1,17 +1,12 @@
 // Copyright © Advanced Micro Devices, Inc., or its affiliates.
 // SPDX-License-Identifier:  MIT
 
-#include "../test_plugins/TestPluginConstants.hpp"
-#include "TestUtil.hpp"
 #include "hipdnn_backend.h"
-#include <array>
 #include <gtest/gtest.h>
 #include <hipdnn_sdk/data_objects/graph_generated.h>
 #include <hipdnn_sdk/utilities/PlatformUtils.hpp>
 #include <vector>
 
-using namespace hipdnn_tests::plugin_constants;
-using namespace hipdnn_sdk::utilities;
 namespace fs = std::filesystem;
 
 TEST(IntegrationBackendDescriptor, CreateAndDestroy)
@@ -145,5 +140,3 @@ TEST(IntegrationBackendDescriptor, FinalizeInvalidOperationGraph)
     status = hipdnnBackendDestroyDescriptor(descriptor);
     EXPECT_EQ(status, HIPDNN_STATUS_SUCCESS);
 }
-
-/// ANOTHER FILE vvv
