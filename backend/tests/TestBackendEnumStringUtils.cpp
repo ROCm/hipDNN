@@ -1,79 +1,13 @@
 // Copyright © Advanced Micro Devices, Inc., or its affiliates.
 // SPDX-License-Identifier: MIT
 
-#include "Error.hpp"
+#include "BackendEnumStringUtils.hpp"
+
 #include <gtest/gtest.h>
 
 using namespace hipdnn_backend;
 
-TEST(ErrorTests, StaticSetLastError)
-{
-    // Test setting a success status
-    hipdnnStatus_t status
-        = LastErrorManager::setLastError(HIPDNN_STATUS_SUCCESS, "Operation successful");
-    EXPECT_EQ(status, HIPDNN_STATUS_SUCCESS);
-
-    // Test setting a valid error
-    std::string errorMessage = "An error occurred";
-    status = LastErrorManager::setLastError(HIPDNN_STATUS_NOT_SUPPORTED, errorMessage.c_str());
-    EXPECT_EQ(status, HIPDNN_STATUS_NOT_SUPPORTED);
-    EXPECT_STREQ(LastErrorManager::getLastError(), errorMessage.c_str());
-}
-
-TEST(ErrorTests, ErrorCStringMessagePerThread)
-{
-    std::string mainError = "Main thread error";
-    std::string workerError = "Worker thread error";
-    LastErrorManager::setLastError(HIPDNN_STATUS_BAD_PARAM, mainError.c_str());
-
-    std::string threadError;
-    std::thread t([&threadError, workerError]() {
-        LastErrorManager::setLastError(HIPDNN_STATUS_NOT_SUPPORTED, workerError.c_str());
-        threadError = LastErrorManager::getLastError();
-    });
-    t.join();
-
-    EXPECT_EQ(LastErrorManager::getLastError(), mainError);
-    EXPECT_EQ(threadError, workerError);
-}
-
-TEST(ErrorTests, ErrorSTDStringMessagePerThread)
-{
-    std::string mainError = "Main thread error";
-    std::string workerError = "Worker thread error";
-    LastErrorManager::setLastError(HIPDNN_STATUS_BAD_PARAM, mainError);
-
-    std::string threadError;
-    std::thread t([&threadError, workerError]() {
-        LastErrorManager::setLastError(HIPDNN_STATUS_NOT_SUPPORTED, workerError);
-        threadError = LastErrorManager::getLastError();
-    });
-    t.join();
-
-    EXPECT_EQ(LastErrorManager::getLastError(), mainError);
-    EXPECT_EQ(threadError, workerError);
-}
-
-TEST(ErrorTests, SetSuccessSTDStringDoesNotSetErrorMessage)
-{
-    std::string errorMessage = "This message should not be set";
-    hipdnnStatus_t status = LastErrorManager::setLastError(HIPDNN_STATUS_SUCCESS, errorMessage);
-    EXPECT_EQ(status, HIPDNN_STATUS_SUCCESS);
-
-    EXPECT_NE(LastErrorManager::getLastError(), errorMessage);
-}
-
-TEST(ErrorTests, SetSuccessCStringDoesNotSetErrorMessage)
-{
-    std::string errorMessage = "This message should not be set";
-    hipdnnStatus_t status
-        = LastErrorManager::setLastError(HIPDNN_STATUS_SUCCESS, errorMessage.c_str());
-    EXPECT_EQ(status, HIPDNN_STATUS_SUCCESS);
-
-    EXPECT_NE(LastErrorManager::getLastError(), errorMessage);
-}
-
-TEST(ErrorTests, GetBackendDescriptorTypeName)
+TEST(TestBackendEnumStringUtils, GetBackendDescriptorTypeName)
 {
     EXPECT_STREQ(hipdnnGetBackendDescriptorTypeName(HIPDNN_BACKEND_ENGINE_DESCRIPTOR),
                  "HIPDNN_BACKEND_ENGINE_DESCRIPTOR");
@@ -108,7 +42,7 @@ TEST(ErrorTests, GetBackendDescriptorTypeName)
                  "UNKNOWN_TYPE");
 }
 
-TEST(ErrorTests, GetBackendAttributeName)
+TEST(TestBackendEnumStringUtils, GetBackendAttributeName)
 {
     EXPECT_STREQ(hipdnnGetAttributeNameString(HIPDNN_ATTR_ENGINEHEUR_MODE),
                  "HIPDNN_ATTR_ENGINEHEUR_MODE");
@@ -223,7 +157,7 @@ TEST(ErrorTests, GetBackendAttributeName)
                  "HIPDNN_ATTR_DEVICEPROP_JSON_REPRESENTATION");
 }
 
-TEST(ErrorTests, Get_Status_String)
+TEST(TestBackendEnumStringUtils, GetStatusString)
 {
     EXPECT_STREQ(hipdnnGetStatusString(HIPDNN_STATUS_SUCCESS), "HIPDNN_STATUS_SUCCESS");
     EXPECT_STREQ(hipdnnGetStatusString(HIPDNN_STATUS_NOT_INITIALIZED),
@@ -253,7 +187,7 @@ TEST(ErrorTests, Get_Status_String)
     EXPECT_STREQ(hipdnnGetStatusString(static_cast<hipdnnStatus_t>(-1)), "HIPDNN_STATUS_UNKNOWN");
 }
 
-TEST(ErrorTests, Get_Attribute_Type_String)
+TEST(TestBackendEnumStringUtils, GetAttributeTypeString)
 {
     EXPECT_STREQ(hipdnnGetAttributeTypeString(HIPDNN_TYPE_HANDLE), "HIPDNN_TYPE_HANDLE");
     EXPECT_STREQ(hipdnnGetAttributeTypeString(HIPDNN_TYPE_DATA_TYPE), "HIPDNN_TYPE_DATA_TYPE");
@@ -291,4 +225,15 @@ TEST(ErrorTests, Get_Attribute_Type_String)
 
     EXPECT_STREQ(hipdnnGetAttributeTypeString(static_cast<hipdnnBackendAttributeType_t>(-1)),
                  "HIPDNN_ATTRIBUTE_UNKNOWN");
+}
+
+TEST(TestBackendEnumStringUtils, GetPluginLoadingModeString)
+{
+    EXPECT_STREQ(hipdnnGetPluginLoadingModeString(HIPDNN_PLUGIN_LOADING_ADDITIVE),
+                 "HIPDNN_PLUGIN_LOADING_ADDITIVE");
+    EXPECT_STREQ(hipdnnGetPluginLoadingModeString(HIPDNN_PLUGIN_LOADING_ABSOLUTE),
+                 "HIPDNN_PLUGIN_LOADING_ABSOLUTE");
+
+    EXPECT_STREQ(hipdnnGetPluginLoadingModeString(static_cast<hipdnnPluginLoadingMode_ext_t>(-1)),
+                 "HIPDNN_PLUGIN_LOADING_UNKNOWN");
 }
