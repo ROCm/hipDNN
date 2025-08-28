@@ -1,0 +1,117 @@
+// Copyright © Advanced Micro Devices, Inc., or its affiliates.
+// SPDX-License-Identifier:  MIT
+
+#pragma once
+
+#include "Types.hpp"
+#include <string>
+
+#define HIPDNN_CHECK_ERROR(x) \
+    do                        \
+    {                         \
+        auto err = x;         \
+        if(err.is_bad())      \
+        {                     \
+            return err;       \
+        }                     \
+    } while(0)
+
+namespace hipdnn_frontend
+{
+enum class error_code_t // NOLINT(readability-identifier-naming)
+{
+    OK,
+    INVALID_VALUE,
+    HIPDNN_BACKEND_ERROR,
+    ATTRIBUTE_NOT_SET
+};
+
+typedef struct error_object // NOLINT(readability-identifier-naming)
+{
+    error_code_t code;
+    std::string err_msg;
+
+    error_object()
+        : code(error_code_t::OK)
+    {
+    }
+    // NOLINTNEXTLINE(readability-identifier-naming)
+    error_object(error_code_t error_code, std::string message)
+        : code(error_code)
+        , err_msg(std::move(message))
+    {
+    }
+
+    std::string get_message() const // NOLINT(readability-identifier-naming)
+    {
+        return err_msg;
+    }
+
+    error_code_t get_code() const // NOLINT(readability-identifier-naming)
+    {
+        return code;
+    }
+
+    bool is_good() const // NOLINT(readability-identifier-naming)
+    {
+        return code == error_code_t::OK;
+    }
+    bool is_bad() const // NOLINT(readability-identifier-naming)
+    {
+        return code != error_code_t::OK;
+    }
+
+    bool operator==(error_code_t otherCode) const
+    {
+        return code == otherCode;
+    }
+    bool operator!=(error_code_t otherCode) const
+    {
+        return code != otherCode;
+    }
+    bool operator==(const error_object& other) const
+    {
+        return code == other.code;
+    }
+    bool operator!=(const error_object& other) const
+    {
+        return code != other.code;
+    }
+} error_t;
+
+#define HIPDNN_RETURN_IF_NE(x, y, error_status, message) \
+    if(x != y)                                           \
+    {                                                    \
+        return {error_status, message};                  \
+    }
+
+#define HIPDNN_RETURN_IF_EQ(x, y, error_status, message) \
+    if(x == y)                                           \
+    {                                                    \
+        return {error_status, message};                  \
+    }
+
+#define HIPDNN_RETURN_IF_TRUE(x, error_status, message) \
+    if(x)                                               \
+    {                                                   \
+        return {error_status, message};                 \
+    }
+
+#define HIPDNN_RETURN_IF_FALSE(x, error_status, message) \
+    if(!(x))                                             \
+    {                                                    \
+        return {error_status, message};                  \
+    }
+
+#define HIPDNN_RETURN_IF_NULL(x, error_status, message) \
+    if(x == nullptr)                                    \
+    {                                                   \
+        return {error_status, message};                 \
+    }
+
+#define HIPDNN_RETURN_IF_LT(x, y, error_status, message) \
+    if(x < y)                                            \
+    {                                                    \
+        return {error_status, message};                  \
+    }
+}

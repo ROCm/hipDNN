@@ -28,18 +28,24 @@ HeaderFileExtensions: ['h','hpp']
 
 # This regex is a inclusion filter for the files to be checked. Its a Posix regex and
 # does not seem to support negative lookahead.  
-HeaderFilterRegex: '^(.*backend.*|.*frontend.*|.*sdk.*|.*plugins[\\/].*)$'
+HeaderFilterRegex: '*'
 ExcludeHeaderFilterRegex: '^(.*data_objects.*)$'
 
 CheckOptions:
   - { key: readability-identifier-naming.NamespaceCase,           value: lower_case }
-  - { key: readability-identifier-naming.ClassCase,               value: Leading_upper_snake_case }
-  - { key: readability-identifier-naming.StructCase,              value: Leading_upper_snake_case }
-  - { key: readability-identifier-naming.FunctionCase,            value: lower_case }
-  - { key: readability-identifier-naming.VariableCase,            value: lower_case }
-  - { key: readability-identifier-naming.ParameterCase,           value: lower_case }
-  - { key: readability-identifier-naming.PrivateMemberCase,       value: lower_case }
+  - { key: readability-identifier-naming.ClassCase,               value: CamelCase }
+  - { key: readability-identifier-naming.StructCase,              value: CamelCase }
+  - { key: readability-identifier-naming.FunctionCase,            value: camelBack }
+  - { key: readability-identifier-naming.VariableCase,            value: camelBack }
+  - { key: readability-identifier-naming.ParameterCase,           value: camelBack }
+  - { key: readability-identifier-naming.PrivateMemberCase,       value: camelBack }
   - { key: readability-identifier-naming.PrivateMemberPrefix,     value: _ }
-#  - { key: readability-identifier-naming.EnumCase,                value: Leading_upper_snake_case  }
-#  - { key: readability-identifier-naming.EnumConstantCase,        value: UPPER_CASE }
+  - { key: readability-identifier-naming.EnumCase,                value: CamelCase  }
+  - { key: readability-identifier-naming.EnumConstantCase,        value: UPPER_CASE }
   - { key: readability-identifier-naming.GlobalConstantCase,      value: UPPER_CASE }
+  - { key: readability-identifier-naming.ConstexprVariableCase,   value: UPPER_CASE }
+  - { key: readability-identifier-naming.StaticVariablePrefix,    value: s_ }
+  # Ignore hipdnnHandle name everywhere (required for public API compatibility)
+  - { key: readability-identifier-naming.StructIgnoredRegexp,     value: "hipdnnHandle" }
+  - { key: readability-identifier-naming.ClassIgnoredRegexp,      value: "hipdnnHandle" }
+  - { key: readability-identifier-naming.TypedefIgnoredRegexp,    value: "hipdnnHandle" }

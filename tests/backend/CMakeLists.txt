@@ -6,17 +6,17 @@ find_package(hip REQUIRED)
 find_package(Threads REQUIRED)
 
 add_executable(public_hipdnn_backend_tests 
-    test_plugin_loading.cpp
-    test_backend_public_functions.cpp
-    test_backend_execute_api.cpp
-    test_engine_config_api.cpp
-    test_engine_heuristic_api.cpp
-    test_engine_api.cpp
-    test_execution_plan_api.cpp
-    test_get_error_api.cpp
-    test_variant_pack_api.cpp
-    test_handle_api.cpp
-    test_util.cpp
+    TestPluginLoading.cpp
+    TestBackendPublicFunctions.cpp
+    TestBackendExecuteApi.cpp
+    TestEngineConfigApi.cpp
+    TestEngineHeuristicApi.cpp
+    TestEngineApi.cpp
+    TestExecutionPlanApi.cpp
+    TestGetErrorApi.cpp
+    TestVariantPackApi.cpp
+    TestHandleApi.cpp
+    TestUtil.cpp
 )
 
 target_compile_options(public_hipdnn_backend_tests PRIVATE ${HIPDNN_WARNING_COMPILE_OPTIONS})
@@ -46,7 +46,15 @@ target_compile_definitions(public_hipdnn_backend_tests
 )
 
 # Ensure test plugins are built before tests
-add_dependencies(public_hipdnn_backend_tests test_good_plugin test_execute_fails_plugin test_no_applicable_engines_plugin test_good_default_plugin)
+add_dependencies(public_hipdnn_backend_tests 
+    test_good_plugin 
+    test_execute_fails_plugin 
+    test_no_applicable_engines_plugin 
+    test_good_default_plugin
+    test_duplicate_id_a_plugin
+    test_duplicate_id_b_plugin
+    test_incomplete_api_plugin
+)
 
 clang_tidy_check(public_hipdnn_backend_tests)
 add_unit_test_target(public_hipdnn_backend_tests ${CMAKE_CURRENT_BINARY_DIR})

@@ -5,11 +5,11 @@
 
 #define COMPONENT_NAME "hipdnn_frontend"
 
-#include <hipdnn_frontend/attributes/batchnorm_inference_attributes.hpp>
-#include <hipdnn_frontend/attributes/pointwise_attributes.hpp>
-#include <hipdnn_frontend/attributes/tensor_attributes.hpp>
-#include <hipdnn_frontend/error.hpp>
-#include <hipdnn_frontend/node/batchnorm_inference_node.hpp>
-#include <hipdnn_frontend/node/node.hpp>
-#include <hipdnn_frontend/node/pointwise_node.hpp>
-#include <hipdnn_frontend/types.hpp>
+#include <hipdnn_frontend/Error.hpp>
+#include <hipdnn_frontend/Types.hpp>
+#include <hipdnn_frontend/attributes/BatchnormInferenceAttributes.hpp>
+#include <hipdnn_frontend/attributes/PointwiseAttributes.hpp>
+#include <hipdnn_frontend/attributes/TensorAttributes.hpp>
+#include <hipdnn_frontend/node/BatchnormInferenceNode.hpp>
+#include <hipdnn_frontend/node/Node.hpp>
+#include <hipdnn_frontend/node/PointwiseNode.hpp>

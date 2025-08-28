@@ -7,7 +7,7 @@ find_package(Threads REQUIRED)
 
 add_executable(public_hipdnn_frontend_tests 
     main.cpp
-    frontend_integration_test.cpp
+    FrontendIntegrationTest.cpp
 )
 
 target_compile_options(public_hipdnn_frontend_tests PRIVATE ${HIPDNN_WARNING_COMPILE_OPTIONS})

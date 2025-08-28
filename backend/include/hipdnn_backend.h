@@ -8,14 +8,14 @@
 // Cmake Generated export header.
 #include "hipdnn_backend_export.h"
 
-#include "hipdnn_backend_attribute_name.h"
-#include "hipdnn_backend_attribute_type.h"
-#include "hipdnn_backend_descriptor_type.h"
-#include "hipdnn_backend_heuristic_type.h"
-#include "hipdnn_backend_limits.h"
-#include "hipdnn_backend_plugin_loading_mode.h"
-#include "hipdnn_status.h"
-#include <hipdnn_sdk/logging/callback_types.h>
+#include "HipdnnBackendAttributeName.h"
+#include "HipdnnBackendAttributeType.h"
+#include "HipdnnBackendDescriptorType.h"
+#include "HipdnnBackendHeuristicType.h"
+#include "HipdnnBackendLimits.h"
+#include "HipdnnBackendPluginLoadingMode.h"
+#include "HipdnnStatus.h"
+#include <hipdnn_sdk/logging/CallbackTypes.h>
 
 // NOLINTBEGIN
 #ifdef __cplusplus
@@ -30,7 +30,7 @@ typedef struct hipdnnHandle* hipdnnHandle_t;
 /*!
 * @brief Creates the hipdnnBackendDescriptor_t type
 */
-typedef struct hipdnnBackendDescriptor* hipdnnBackendDescriptor_t;
+typedef struct HipdnnBackendDescriptor* hipdnnBackendDescriptor_t;
 
 /*! @brief Creates a hipdnnHandle_t
  *
@@ -83,10 +83,10 @@ HIPDNN_BACKEND_EXPORT hipdnnStatus_t hipdnnGetStream(hipdnnHandle_t handle, hipS
 
 /*! @brief Creates a backend descriptor
  *
- * Allocates memory for a given descriptor_type at the location pointed
+ * Allocates memory for a given descriptorType at the location pointed
  * by the descriptor
  *
- * @param [in]   descriptor_type  One among the enumerated hipdnnBackendDescriptor_t
+ * @param [in]   descriptorType   One among the enumerated hipdnnBackendDescriptor_t
  * @param [out]  descriptor       Pointer to a descriptor
  *
  * @retval  HIPDNN_STATUS_SUCCESS            The creation was successful
@@ -95,7 +95,7 @@ HIPDNN_BACKEND_EXPORT hipdnnStatus_t hipdnnGetStream(hipdnnHandle_t handle, hipS
  * 
  */
 HIPDNN_BACKEND_EXPORT hipdnnStatus_t hipdnnBackendCreateDescriptor(
-    hipdnnBackendDescriptorType_t descriptor_type, hipdnnBackendDescriptor_t* descriptor);
+    hipdnnBackendDescriptorType_t descriptorType, hipdnnBackendDescriptor_t* descriptor);
 
 /*! @brief Destroys an instance of hipdnnBackendDescriptor_t
  *
@@ -118,26 +118,26 @@ HIPDNN_BACKEND_EXPORT hipdnnStatus_t
 
 /*! @brief Executes a graph
  *
- * Executes the given engine_configuration_plan on the variant_pack and the finalized execution_plan
- * on the data. The data and the working space are encapsulated in the variant_pack.
+ * Executes the given engine_configuration_plan on the variantPack and the finalized executionPlan
+ * on the data. The data and the working space are encapsulated in the variantPack.
  *
  * @param  [in]  handle              An instance of hipdnnHandle_t
- * @param  [in]  execution_plan      Descriptor of the finalized execution_plan
- * @param  [in]  variant_pack        Descriptor of the finalized variant_pack consisting of:
+ * @param  [in]  executionPlan       Descriptor of the finalized executionPlan
+ * @param  [in]  variantPack         Descriptor of the finalized variantPack consisting of:
  *                                   * Data pointer for each non-virtual pointer of the operation set in
  *                                     the execution plan.
  *                                   * Pointer to user-allocated workspace in global memory at least as
  *                                     large as the size queried
  *
- * @retval  HIPDNN_STATUS_SUCCESS               The execution_plan was executed successfully
+ * @retval  HIPDNN_STATUS_SUCCESS               The executionPlan was executed successfully
  * @retval  HIPDNN_STATUS_BAD_PARAM             An incorrect or inconsistent value is encountered. For example, a required data pointer is invalid.
  * @retval  HIPDNN_STATUS_INTERNAL_ERROR        Some internal errors were encountered.
- * @retval  HIPDNN_STATUS_EXECUTION_FAILED      An error was encountered executing the plan with the variant_pack.
+ * @retval  HIPDNN_STATUS_EXECUTION_FAILED      An error was encountered executing the plan with the variantPack.
  * 
  */
 HIPDNN_BACKEND_EXPORT hipdnnStatus_t hipdnnBackendExecute(hipdnnHandle_t handle,
-                                                          hipdnnBackendDescriptor_t execution_plan,
-                                                          hipdnnBackendDescriptor_t variant_pack);
+                                                          hipdnnBackendDescriptor_t executionPlan,
+                                                          hipdnnBackendDescriptor_t variantPack);
 
 /*! @brief Finalizes a backend descriptor
 *
@@ -157,74 +157,74 @@ HIPDNN_BACKEND_EXPORT hipdnnStatus_t hipdnnBackendFinalize(hipdnnBackendDescript
 
 /*! @brief Retrieves backend descriptor's attribute
  *
- * This function retrieves the values of an attribute of a descriptor. attribute_name is the name of
- * the attribute whose value is requested. attribute_type is the type of attribute.
- * requested_element_count is the number of elements to be potentially retrieved. The number of
- * elements for the requested attribute is stored in element_count. The retrieved values are stored
- * in array_of_elements. When the attribute is expected to have a single value, array_of_elements can be
+ * This function retrieves the values of an attribute of a descriptor. attributeName is the name of
+ * the attribute whose value is requested. attributeType is the type of attribute.
+ * requestedElementCount is the number of elements to be potentially retrieved. The number of
+ * elements for the requested attribute is stored in elementCount. The retrieved values are stored
+ * in arrayOfElements. When the attribute is expected to have a single value, arrayOfElements can be
  * pointer to the output value. This function will return HIPDNN_STATUS_NOT_INTIALIZED if the
  * descriptor has not been successfully finalized using hipdnnBackendFinalize()
  *
  * @param  [in]   descriptor               Instance of hipdnnBackendDescriptor_t whose attribute to
  *                                         retrieve
- * @param  [in]   attribute_name           The name of the attribute being get from the descriptor
- * @param  [in]   attribute_type           The type of attribute
- * @param  [in]   requested_element_count  Number of elements to output to array_of_elements
- * @param  [out]  element_count            Output pointer for the number of elements the descriptor
+ * @param  [in]   attributeName            The name of the attribute being get from the descriptor
+ * @param  [in]   attributeType            The type of attribute
+ * @param  [in]   requestedElementCount    Number of elements to output to arrayOfElements
+ * @param  [out]  elementCount             Output pointer for the number of elements the descriptor
  *                                         attribute has. Note that hipdnnBackendGetAttribute() will
- *                                         only write the least of this and requested_element_count
- *                                         elements to array_of_elements
- * @param  [out]  array_of_elements        Array of elements of the datatype of the attribute_type. The
- *                                         data type of the attribute_type is listed in the mapping
+ *                                         only write the least of this and requestedElementCount
+ *                                         elements to arrayOfElements
+ * @param  [out]  arrayOfElements          Array of elements of the datatype of the attributeType. The
+ *                                         data type of the attributeType is listed in the mapping
  *                                         table of hipdnnBackendAttributeType_t
  *
- * @retval  HIPDNN_STATUS_SUCCESS           The attribute_name was retrieved from the descriptor successfully
+ * @retval  HIPDNN_STATUS_SUCCESS           The attributeName was retrieved from the descriptor successfully
  * @retval  HIPDNN_STATUS_BAD_PARAM         One or more invalid or inconsistent argument values were encountered. Some examples include: 
- *                                              attribute_name is not a valid attribute for the descriptor. 
- *                                              attribute_type is not one of the valid types for the attribute.
+ *                                              attributeName is not a valid attribute for the descriptor. 
+ *                                              attributeType is not one of the valid types for the attribute.
  * @retval  HIPDNN_STATUS_NOT_INITIALIZED   The descriptor has not been successfully finalized using hipdnnBackendFinalize().
  * 
  */
 HIPDNN_BACKEND_EXPORT hipdnnStatus_t
     hipdnnBackendGetAttribute(hipdnnBackendDescriptor_t descriptor,
-                              hipdnnBackendAttributeName_t attribute_name,
-                              hipdnnBackendAttributeType_t attribute_type,
-                              int64_t requested_element_count,
-                              int64_t* element_count,
-                              void* array_of_elements);
+                              hipdnnBackendAttributeName_t attributeName,
+                              hipdnnBackendAttributeType_t attributeType,
+                              int64_t requestedElementCount,
+                              int64_t* elementCount,
+                              void* arrayOfElements);
 
 /*! @brief Sets an attribute of a descriptor
  *
  * This function sets an attribute of a descriptor to values provided as a pointer. descriptor is the descriptor to be set. 
- * attribute_name is the name of the attribute to be set. attribute_type is the type of attribute. 
- * The value to which the attribute is set, is pointed by the array_of_elements. The number of elements is given by element_count. 
+ * attributeName is the name of the attribute to be set. attributeType is the type of attribute. 
+ * The value to which the attribute is set, is pointed by the arrayOfElements. The number of elements is given by elementCount. 
  * This function will return HIPDNN_STATUS_NOT_INITIALIZED if the descriptor is already successfully finalized using hipdnnBackendFinalize().
  *
  * @param  [in]  descriptor         Instance of hipdnnBackendDescriptor_t whose attribute is being set
- * @param  [in]  attribute_name     The name of the attribute being set on the descriptor
- * @param  [in]  attribute_type     The type of attribute
- * @param  [in]  element_count      Number of elements being set
- * @param  [in]  array_of_elements  The starting location for an array from where to read the values
+ * @param  [in]  attributeName      The name of the attribute being set on the descriptor
+ * @param  [in]  attributeType      The type of attribute
+ * @param  [in]  elementCount       Number of elements being set
+ * @param  [in]  arrayOfElements    The starting location for an array from where to read the values
  *                                  from. The elements of the array are expected to be of the datatype
- *                                  of the attribute_type. The datatype of the attribute_type is listed
+ *                                  of the attributeType. The datatype of the attributeType is listed
  *                                  in the mapping table of hipdnnBackendAttributeType_t.
  *
- * @retval  HIPDNN_STATUS_SUCCESS           The attribute_name was set to the descriptor
+ * @retval  HIPDNN_STATUS_SUCCESS           The attributeName was set to the descriptor
  * @retval  HIPDNN_STATUS_NOT_INITIALIZED   The backend descriptor pointed to by the descriptor is already in the finalized state.
  * @retval  HIPDNN_STATUS_BAD_PARAM         The function is called with arguments that correspond to invalid values. Some examples include:
- *                                              attribute_name is not a settable attribute of descriptor.
- *                                              attribute_type is incorrect for this attribute_name.
- *                                              element_count value is unexpected.
- *                                              array_of_elements contains values invalid for the attribute_type.
+ *                                              attributeName is not a settable attribute of descriptor.
+ *                                              attributeType is incorrect for this attributeName.
+ *                                              elementCount value is unexpected.
+ *                                              arrayOfElements contains values invalid for the attributeType.
  * @retval  HIPDNN_STATUS_NOT_SUPPORTED     The values to which the attributes are being set are not supported by the current version of hipDNN.
  * 
  */
 HIPDNN_BACKEND_EXPORT hipdnnStatus_t
     hipdnnBackendSetAttribute(hipdnnBackendDescriptor_t descriptor,
-                              hipdnnBackendAttributeName_t attribute_name,
-                              hipdnnBackendAttributeType_t attribute_type,
-                              int64_t element_count,
-                              const void* array_of_elements);
+                              hipdnnBackendAttributeName_t attributeName,
+                              hipdnnBackendAttributeType_t attributeType,
+                              int64_t elementCount,
+                              const void* arrayOfElements);
 
 /**
  * @brief Converts the hipDNN status code to a NULL terminated static string.
@@ -245,9 +245,9 @@ HIPDNN_BACKEND_EXPORT const char* hipdnnGetErrorString(hipdnnStatus_t status);
  * Note the max size for an error message is HIPDNN_MAX_ERROR_STRING_SIZE characters.
  * 
  * @param[out] message   Pointer to a character buffer where the error message will be copied.
- * @param[in]  max_size  Maximum number of bytes to copy, including the null terminator.
+ * @param[in]  maxSize   Maximum number of bytes to copy, including the null terminator.
  */
-HIPDNN_BACKEND_EXPORT void hipdnnGetLastErrorString(char* message, size_t max_size);
+HIPDNN_BACKEND_EXPORT void hipdnnGetLastErrorString(char* message, size_t maxSize);
 
 /*
  **************************************************************************************************
@@ -266,19 +266,19 @@ HIPDNN_BACKEND_EXPORT void hipdnnGetLastErrorString(char* message, size_t max_si
  *
  * @param [out] descriptor        Pointer to a backend descriptor where the deserialized graph will 
  *                                be stored.
- * @param [in]  serialized_graph  Pointer to the serialized graph data in a byte array.
- * @param [in]  graph_byte_size   Size of the serialized graph in bytes.
+ * @param [in]  serializedGraph   Pointer to the serialized graph data in a byte array.
+ * @param [in]  graphByteSize     Size of the serialized graph in bytes.
  *
  * @retval HIPDNN_STATUS_SUCCESS           The graph was successfully deserialized and stored in the descriptor.
  * @retval HIPDNN_STATUS_BAD_PARAM         Invalid or inconsistent parameter values were encountered, such as:
  *                                         - descriptor is null.
- *                                         - serialized_graph is null.
- *                                         - graph_byte_size is zero.
+ *                                         - serializedGraph is null.
+ *                                         - graphByteSize is zero.
  * @retval HIPDNN_STATUS_ALLOC_FAILED      Memory allocation for the descriptor or graph failed.
  * @retval HIPDNN_STATUS_INTERNAL_ERROR    An internal error occurred during deserialization.
  */
 HIPDNN_BACKEND_EXPORT hipdnnStatus_t hipdnnBackendCreateAndDeserializeGraph_ext(
-    hipdnnBackendDescriptor_t* descriptor, const uint8_t* serialized_graph, size_t graph_byte_size);
+    hipdnnBackendDescriptor_t* descriptor, const uint8_t* serializedGraph, size_t graphByteSize);
 
 /*!
  * @brief Callback function for logging messages.
@@ -301,44 +301,44 @@ HIPDNN_BACKEND_EXPORT void hipdnnLoggingCallback_ext(hipdnnSeverity_t severity, 
  * platform-agnostic names, allowing users to omit prefixes like `lib` and extensions 
  * like `.so` or `.dll`.
  *
- * @param[in] num_paths      The number of paths in the `plugin_paths` array.
- * @param[in] plugin_paths   An array of relative or absolute path strings.
- * @param[in] loading_mode   Specifies whether to add paths to or replace the default search paths.
+ * @param[in] numPaths       The number of paths in the `pluginPaths` array.
+ * @param[in] pluginPaths    An array of relative or absolute path strings.
+ * @param[in] loadingMode    Specifies whether to add paths to or replace the default search paths.
  *
  * @retval HIPDNN_STATUS_SUCCESS           The operation was successful.
- * @retval HIPDNN_STATUS_BAD_PARAM_NULL_POINTER         `plugin_paths` is nullptr when `num_paths` is greater than 0.
+ * @retval HIPDNN_STATUS_BAD_PARAM_NULL_POINTER         `pluginPaths` is nullptr when `numPaths` is greater than 0.
  * @retval HIPDNN_STATUS_NOT_SUPPORTED         Called with active handle.
  * @retval HIPDNN_STATUS_INTERNAL_ERROR    An internal error occurred.
  */
 HIPDNN_BACKEND_EXPORT hipdnnStatus_t hipdnnSetEnginePluginPaths_ext(
-    size_t num_paths, const char* const* plugin_paths, hipdnnPluginLoadingMode_ext_t loading_mode);
+    size_t numPaths, const char* const* pluginPaths, hipdnnPluginLoadingMode_ext_t loadingMode);
 
 /**
  * @brief Gets file paths of loaded engine plugins for a given handle.
  *
  * This function must be called twice:
- * 1. First call: Pass `plugin_paths` as `nullptr` to query the number of plugins and required buffer size.
- *    - Sets `num_plugin_paths` to the total number of loaded plugins
- *    - Sets `max_string_len` to the maximum string length needed (including null terminator)
+ * 1. First call: Pass `pluginPaths` as `nullptr` to query the number of plugins and required buffer size.
+ *    - Sets `numPluginPaths` to the total number of loaded plugins
+ *    - Sets `maxStringLen` to the maximum string length needed (including null terminator)
  * 
  * 2. Second call: Pass allocated buffers to retrieve the actual plugin paths.
- *    - Allocate an array of `num_plugin_paths` char pointers
- *    - Each char pointer should point to a buffer of at least `max_string_len` characters
+ *    - Allocate an array of `numPluginPaths` char pointers
+ *    - Each char pointer should point to a buffer of at least `maxStringLen` characters
  *    - The function will populate these buffers with the plugin paths
  *
  * @param[in]     handle           A valid hipDNN handle
- * @param[in,out] num_plugin_paths Pointer to number of plugins; updated with actual count.
- * @param[out]    plugin_paths     Array of character pointers for plugin paths, or `nullptr` to query sizes.
- * @param[in,out] max_string_len   Pointer to max string length; updated with required length.
+ * @param[in,out] numPluginPaths   Pointer to number of plugins; updated with actual count.
+ * @param[out]    pluginPaths      Array of character pointers for plugin paths, or `nullptr` to query sizes.
+ * @param[in,out] maxStringLen     Pointer to max string length; updated with required length.
  *
  * @retval HIPDNN_STATUS_SUCCESS           Success.
  * @retval HIPDNN_STATUS_BAD_PARAM         Invalid handle, null pointers, or insufficient buffer sizes.
  * @retval HIPDNN_STATUS_INTERNAL_ERROR    Internal error.
  */
 HIPDNN_BACKEND_EXPORT hipdnnStatus_t hipdnnGetLoadedEnginePluginPaths_ext(hipdnnHandle_t handle,
-                                                                          size_t* num_plugin_paths,
-                                                                          char** plugin_paths,
-                                                                          size_t* max_string_len);
+                                                                          size_t* numPluginPaths,
+                                                                          char** pluginPaths,
+                                                                          size_t* maxStringLen);
 
 #ifdef __cplusplus
 }

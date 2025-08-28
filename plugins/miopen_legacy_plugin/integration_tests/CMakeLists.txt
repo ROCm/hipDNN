@@ -16,8 +16,8 @@ endif()
 
 add_executable(miopen_plugin_integration_test
     main.cpp
-    batchnorm_bwd_integration_test.cpp
-    batchnorm_fwd_inference_integration_test.cpp
+    BatchnormBwdIntegrationTest.cpp
+    BatchnormFwdInferenceIntegrationTest.cpp
 )
 
 target_compile_options(miopen_plugin_integration_test PRIVATE ${HIPDNN_WARNING_COMPILE_OPTIONS})

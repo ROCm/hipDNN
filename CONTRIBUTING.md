@@ -17,6 +17,7 @@ Before contributing, please review these essential documents to understand the p
 - **[How-To](./docs/HowTo.md)** - Using hipDNN components and common approaches for extending functionality
 - **[TestingStrategy](./docs/testing/TestingStrategy.md)** - Understand our testing approach and requirements
 - **[Roadmap](./docs/Roadmap.md)** - Check planned features and find contribution opportunities
+- **[Coding Style and Naming Guidelines](./docs/CodingStyleAndNamingGuidelines.md)** - Follow our coding conventions for consistency
 
 We encourage you to open a GitHub issue to discuss your planned contribution before starting work. This helps ensure your efforts align with project goals and prevents duplicate work.
 
