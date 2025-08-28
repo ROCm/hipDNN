@@ -80,11 +80,14 @@ TEST_F(IntegrationBackendExecuteApi, NullHandle)
     test_util::populateTestExecutionPlan(
         &_plan, &_engineConfig, &_engine, &_graphDescriptor, _handle, GIDX, true);
 
+    ASSERT_EQ(hipdnnBackendCreateDescriptor(HIPDNN_BACKEND_VARIANT_PACK_DESCRIPTOR, &_variantPack),
+              HIPDNN_STATUS_SUCCESS);
+
     ASSERT_EQ(hipdnnBackendExecute(nullptr, _plan, _variantPack),
               HIPDNN_STATUS_BAD_PARAM_NULL_POINTER);
 }
 
-TEST_F(IntegrationBackendExecuteApi, NullDescriptors)
+TEST_F(IntegrationBackendExecuteApi, NullVariantPack)
 {
     auto batchnormBuilder = test_util::createAndPopulateBatchnormNode();
     auto serializedGraph = batchnormBuilder.Release();
@@ -99,29 +102,14 @@ TEST_F(IntegrationBackendExecuteApi, NullDescriptors)
 
     test_util::populateTestExecutionPlan(
         &_plan, &_engineConfig, &_engine, &_graphDescriptor, _handle, GIDX, true);
-
-    ASSERT_EQ(hipdnnBackendExecute(_handle, nullptr, _variantPack),
-              HIPDNN_STATUS_BAD_PARAM_NULL_POINTER);
 
     ASSERT_EQ(hipdnnBackendExecute(_handle, _plan, nullptr), HIPDNN_STATUS_BAD_PARAM_NULL_POINTER);
 }
 
 TEST_F(IntegrationBackendExecuteApi, NullPlan)
 {
-
-    auto batchnormBuilder = test_util::createAndPopulateBatchnormNode();
-    auto serializedGraph = batchnormBuilder.Release();
-
-    test_util::createAndInitializeBackendDescriptor(&_graphDescriptor, serializedGraph, _handle);
-    test_util::createTestEngine(&_engine, &_graphDescriptor, _handle, GIDX, true);
-    test_util::createTestEngineConfig(
-        &_engineConfig, &_engine, &_graphDescriptor, _handle, GIDX, true);
-
-    EXPECT_EQ(hipdnnBackendCreateDescriptor(HIPDNN_BACKEND_EXECUTION_PLAN_DESCRIPTOR, &_plan),
+    ASSERT_EQ(hipdnnBackendCreateDescriptor(HIPDNN_BACKEND_VARIANT_PACK_DESCRIPTOR, &_variantPack),
               HIPDNN_STATUS_SUCCESS);
-
-    test_util::populateTestExecutionPlan(
-        &_plan, &_engineConfig, &_engine, &_graphDescriptor, _handle, GIDX, true);
 
     ASSERT_EQ(hipdnnBackendExecute(_handle, nullptr, _variantPack),
               HIPDNN_STATUS_BAD_PARAM_NULL_POINTER);
