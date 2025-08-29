@@ -59,7 +59,7 @@ public:
 
         HIPDNN_CHECK_ERROR(attributes.fill_from_graph_attributes(graph_attributes));
 
-        auto out = attributes.outputs[PointwiseAttributes::output_names::OUT_0];
+        auto out = attributes.get_output_0();
 
         if(out->get_dim().empty())
         {
@@ -104,7 +104,7 @@ public:
     {
         return hipdnn_sdk::data_objects::CreateNodeDirect(
             builder,
-            attributes.name.c_str(),
+            attributes.get_name().c_str(),
             hipdnn_sdk::data_objects::NodeAttributes::NodeAttributes_PointwiseAttributes,
             attributes.pack_attributes(builder).Union());
     }

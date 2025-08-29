@@ -215,7 +215,7 @@ TEST(DBNNodeTests, PopulatehipdnnTensorIds)
 TEST(DBNNodeTests, PackNode)
 {
     BatchnormBackwardAttributes batchnormAttributes;
-    batchnormAttributes.name = "BatchnormBackward";
+    batchnormAttributes.set_name("BatchnormBackward");
 
     // Set up tensor attributes
     auto dyTensor = std::make_shared<TensorAttributes>();
@@ -314,7 +314,7 @@ TEST(DBNNodeTests, PackNode)
 TEST(DBNNodeTests, PackNodeWithoutMeanAndInvVariance)
 {
     BatchnormBackwardAttributes batchnormAttributes;
-    batchnormAttributes.name = "BatchnormBackward";
+    batchnormAttributes.set_name("BatchnormBackward");
 
     // Set up tensor attributes
     auto dyTensor = std::make_shared<TensorAttributes>();

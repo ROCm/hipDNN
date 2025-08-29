@@ -646,7 +646,7 @@ TEST(ConvolutionFwdNodeTests, StrideInferenceWithStride2x2)
 TEST(ConvolutionFwdNodeTests, PackNode)
 {
     ConvFpropAttributes convAttributes;
-    convAttributes.name = "Convolution";
+    convAttributes.set_name("Convolution");
 
     auto xTensor = std::make_shared<TensorAttributes>();
     xTensor->set_uid(1)
