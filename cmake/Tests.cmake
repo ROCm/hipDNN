@@ -22,6 +22,24 @@ set(UNIT_CHECK_DEPENDS_GLOBAL "" CACHE INTERNAL "Accumulated unit check depends"
 set(INTEGRATION_CHECK_COMMAND_GLOBAL "" CACHE INTERNAL "Accumulated integration check commands" FORCE)
 set(INTEGRATION_CHECK_DEPENDS_GLOBAL "" CACHE INTERNAL "Accumulated integration check depends" FORCE)
 
+function(create_test_name_validation_target)
+    # Uses ctest --show-only=json-v1 to get the list of tests
+    add_custom_command(
+        OUTPUT ${CMAKE_BINARY_DIR}/test_names_validated
+        COMMAND ${CMAKE_CTEST_COMMAND} --show-only=json-v1 > ${CMAKE_BINARY_DIR}/ctest_tests.json
+        COMMAND ${CMAKE_SOURCE_DIR}/cmake/scripts/check_test_names.py 
+                --ctest-json ${CMAKE_BINARY_DIR}/ctest_tests.json
+        COMMAND ${CMAKE_COMMAND} -E touch ${CMAKE_BINARY_DIR}/test_names_validated
+        DEPENDS ${CMAKE_SOURCE_DIR}/cmake/scripts/check_test_names.py
+        COMMENT "Validating test names using CTest"
+        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+        VERBATIM
+    )
+    
+    add_custom_target(validate_test_names 
+        DEPENDS ${CMAKE_BINARY_DIR}/test_names_validated)
+endfunction()
+
 # Generic internal function to append tests to check targets
 function(_append_test_to_check_target_internal TARGET WORKING_DIR TEST_TYPE STATUS_MESSAGE)
     if(STATUS_MESSAGE)
@@ -82,6 +100,9 @@ enable_testing() # Cmake wont discover or run tests without this line
 add_custom_target(check_ctest COMMAND ${TEST_ENVIRONMENT} ${CMAKE_CTEST_COMMAND} --output-on-failure -C ${CMAKE_CFG_INTDIR})
 
 function(_add_gtest_target_internal APPEND_FUNCTION_SUFFIX TARGET WORKING_DIR)
+
+    # could grab names from each binary here
+    
     if("${APPEND_FUNCTION_SUFFIX}" STREQUAL "test")
         _append_test_to_check_target_internal(${TARGET} ${WORKING_DIR} "" "Appending check target")
     elseif("${APPEND_FUNCTION_SUFFIX}" STREQUAL "unit_test")
