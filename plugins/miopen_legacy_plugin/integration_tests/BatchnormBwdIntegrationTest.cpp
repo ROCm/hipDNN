@@ -322,16 +322,11 @@ std::vector<Batchnorm2dTestCase> getBnBwdTestCases()
 {
     return {
         {.n = 1, .c = 3, .h = 14, .w = 14},
-        {.n = 2, .c = 3, .h = 14, .w = 14},
-        {.n = 64, .c = 3, .h = 14, .w = 14},
-        {.n = 64, .c = 256, .h = 14, .w = 14},
+        {.n = 2, .c = 3, .h = 1, .w = 14},
+        {.n = 64, .c = 3, .h = 14, .w = 1},
         {.n = 64, .c = 256, .h = 28, .w = 28},
-        {.n = 64, .c = 256, .h = 56, .w = 56},
         {.n = 64, .c = 512, .h = 14, .w = 14},
-        {.n = 64, .c = 512, .h = 28, .w = 28},
-        {.n = 64, .c = 512, .h = 7, .w = 7},
         {.n = 64, .c = 64, .h = 112, .w = 112},
-        {.n = 64, .c = 64, .h = 56, .w = 56},
     };
 }
 
@@ -375,6 +370,22 @@ TEST_P(BatchnormBackwardIntegrationTestNHWC, RunFloatBwdBatchnormGraphNHWC)
 {
     Batchnorm2dTestCase testCase = GetParam();
     runBatchnormTest<float, float>(testCase, 4e-3f, TensorLayout::NHWC);
+}
+
+// MIOpen segfaults for this case, re-enable when fix is released.
+// https://github.com/ROCm/rocm-libraries/pull/1197
+TEST_P(BatchnormBackwardIntegrationTestNHWC, DISABLED_RunBfloat16BwdBatchnormGraphNHWC)
+{
+    Batchnorm2dTestCase testCase = GetParam();
+    runBatchnormTest<hip_bfloat16, float>(testCase, 4e-3_bf, TensorLayout::NHWC);
+}
+
+// MIOpen segfaults for this case, re-enable when fix is released.
+// https://github.com/ROCm/rocm-libraries/pull/1197
+TEST_P(BatchnormBackwardIntegrationTestNHWC, DISABLED_RunHalfBwdBatchnormGraphNHWC)
+{
+    Batchnorm2dTestCase testCase = GetParam();
+    runBatchnormTest<half, float>(testCase, 4e-3_h, TensorLayout::NHWC);
 }
 
 INSTANTIATE_TEST_SUITE_P(RunFloatBwdBatchnormGraphNHWC,

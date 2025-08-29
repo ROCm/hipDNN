@@ -30,24 +30,19 @@ public:
     const MiopenTensor& dscale() const;
     const MiopenTensor& dbias() const;
 
-    const std::optional<std::unique_ptr<MiopenTensor>>& optMean() const;
-    const std::optional<std::unique_ptr<MiopenTensor>>& optInvVariance() const;
+    const std::optional<MiopenTensor>& optMean() const;
+    const std::optional<MiopenTensor>& optInvVariance() const;
 
 private:
-    void initializeTensors(
-        const hipdnn_sdk::data_objects::BatchnormBackwardAttributes& attributes,
-        const std::unordered_map<int64_t, const hipdnn_sdk::data_objects::TensorAttributes*>&
-            tensorMap);
+    MiopenTensor _x;
+    MiopenTensor _dy;
+    MiopenTensor _dx;
+    MiopenTensor _scale;
+    MiopenTensor _dscale;
+    MiopenTensor _dbias;
 
-    std::unique_ptr<MiopenTensor> _x;
-    std::unique_ptr<MiopenTensor> _dy;
-    std::unique_ptr<MiopenTensor> _dx;
-    std::unique_ptr<MiopenTensor> _scale;
-    std::unique_ptr<MiopenTensor> _dscale;
-    std::unique_ptr<MiopenTensor> _dbias;
-
-    std::optional<std::unique_ptr<MiopenTensor>> _optMean;
-    std::optional<std::unique_ptr<MiopenTensor>> _optInvVariance;
+    std::optional<MiopenTensor> _optMean;
+    std::optional<MiopenTensor> _optInvVariance;
 };
 
 class BatchnormBwdPlan : public IPlan

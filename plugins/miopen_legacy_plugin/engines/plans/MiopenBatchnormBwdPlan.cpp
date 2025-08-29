@@ -11,63 +11,16 @@ namespace miopen_legacy_plugin
 // rather than making it configurable and adding extra complexity.
 const miopenBatchNormMode_t MIOPEN_BATCHNORM_MODE = miopenBNSpatial;
 
-BatchnormBwdParams::BatchnormBwdParams(
-    const hipdnn_sdk::data_objects::BatchnormBackwardAttributes& attributes,
-    const std::unordered_map<int64_t, const hipdnn_sdk::data_objects::TensorAttributes*>& tensorMap)
-{
-    initializeTensors(attributes, tensorMap);
-}
-
-const MiopenTensor& BatchnormBwdParams::x() const
-{
-    return *_x;
-}
-
-const MiopenTensor& BatchnormBwdParams::dy() const
-{
-    return *_dy;
-}
-
-const MiopenTensor& BatchnormBwdParams::dx() const
-{
-    return *_dx;
-}
-
-const MiopenTensor& BatchnormBwdParams::scale() const
-{
-    return *_scale;
-}
-
-const MiopenTensor& BatchnormBwdParams::dscale() const
-{
-    return *_dscale;
-}
-
-const MiopenTensor& BatchnormBwdParams::dbias() const
-{
-    return *_dbias;
-}
-
-const std::optional<std::unique_ptr<MiopenTensor>>& BatchnormBwdParams::optMean() const
-{
-    return _optMean;
-}
-
-const std::optional<std::unique_ptr<MiopenTensor>>& BatchnormBwdParams::optInvVariance() const
-{
-    return _optInvVariance;
-}
-
 namespace
 {
 
-std::unique_ptr<MiopenTensor> createTensor(
+MiopenTensor createTensor(
     const std::unordered_map<int64_t, const hipdnn_sdk::data_objects::TensorAttributes*>& tensorMap,
     int64_t uid)
 {
     if(auto tensorAttr = tensorMap.find(uid); tensorAttr != tensorMap.end())
     {
-        return std::make_unique<MiopenTensor>(*tensorAttr->second);
+        return {*tensorAttr->second};
     }
 
     throw hipdnn_plugin::HipdnnPluginException(HIPDNN_PLUGIN_STATUS_INTERNAL_ERROR,
@@ -77,17 +30,16 @@ std::unique_ptr<MiopenTensor> createTensor(
 
 } // namespace
 
-void BatchnormBwdParams::initializeTensors(
+BatchnormBwdParams::BatchnormBwdParams(
     const hipdnn_sdk::data_objects::BatchnormBackwardAttributes& attributes,
     const std::unordered_map<int64_t, const hipdnn_sdk::data_objects::TensorAttributes*>& tensorMap)
+    : _x(createTensor(tensorMap, attributes.x_tensor_uid()))
+    , _dy(createTensor(tensorMap, attributes.dy_tensor_uid()))
+    , _dx(createTensor(tensorMap, attributes.dx_tensor_uid()))
+    , _scale(createTensor(tensorMap, attributes.scale_tensor_uid()))
+    , _dscale(createTensor(tensorMap, attributes.dscale_tensor_uid()))
+    , _dbias(createTensor(tensorMap, attributes.dbias_tensor_uid()))
 {
-    _x = createTensor(tensorMap, attributes.x_tensor_uid());
-    _dy = createTensor(tensorMap, attributes.dy_tensor_uid());
-    _dx = createTensor(tensorMap, attributes.dx_tensor_uid());
-    _scale = createTensor(tensorMap, attributes.scale_tensor_uid());
-    _dscale = createTensor(tensorMap, attributes.dscale_tensor_uid());
-    _dbias = createTensor(tensorMap, attributes.dbias_tensor_uid());
-
     if(attributes.mean_tensor_uid().has_value())
     {
         _optMean = createTensor(tensorMap, attributes.mean_tensor_uid().value());
@@ -97,6 +49,46 @@ void BatchnormBwdParams::initializeTensors(
     {
         _optInvVariance = createTensor(tensorMap, attributes.inv_variance_tensor_uid().value());
     }
+}
+
+const MiopenTensor& BatchnormBwdParams::x() const
+{
+    return _x;
+}
+
+const MiopenTensor& BatchnormBwdParams::dy() const
+{
+    return _dy;
+}
+
+const MiopenTensor& BatchnormBwdParams::dx() const
+{
+    return _dx;
+}
+
+const MiopenTensor& BatchnormBwdParams::scale() const
+{
+    return _scale;
+}
+
+const MiopenTensor& BatchnormBwdParams::dscale() const
+{
+    return _dscale;
+}
+
+const MiopenTensor& BatchnormBwdParams::dbias() const
+{
+    return _dbias;
+}
+
+const std::optional<MiopenTensor>& BatchnormBwdParams::optMean() const
+{
+    return _optMean;
+}
+
+const std::optional<MiopenTensor>& BatchnormBwdParams::optInvVariance() const
+{
+    return _optInvVariance;
 }
 
 BatchnormBwdPlan::BatchnormBwdPlan(std::unique_ptr<BatchnormBwdParams> params)
@@ -134,14 +126,14 @@ void BatchnormBwdPlan::execute(const HipdnnEnginePluginHandle& handle,
     if(_params->optMean().has_value())
     {
         meanBuffer = miopen_utils::findDeviceBuffer(
-            _params->optMean().value()->uid(), deviceBuffers, numDeviceBuffers);
+            _params->optMean().value().uid(), deviceBuffers, numDeviceBuffers);
     }
 
     hipdnnPluginDeviceBuffer_t invVarianceBuffer = {0, nullptr};
     if(_params->optInvVariance().has_value())
     {
         invVarianceBuffer = miopen_utils::findDeviceBuffer(
-            _params->optInvVariance().value()->uid(), deviceBuffers, numDeviceBuffers);
+            _params->optInvVariance().value().uid(), deviceBuffers, numDeviceBuffers);
     }
 
     THROW_ON_MIOPEN_FAILURE(miopenBatchNormalizationBackward_V2(
@@ -159,10 +151,9 @@ void BatchnormBwdPlan::execute(const HipdnnEnginePluginHandle& handle,
         dxBuffer.ptr,
         _params->scale().tensorDescriptor(),
         _params->scale().tensorDescriptor(),
-        _params->optMean().has_value() ? _params->optMean().value()->tensorDescriptor() : nullptr,
-        _params->optInvVariance().has_value()
-            ? _params->optInvVariance().value()->tensorDescriptor()
-            : nullptr,
+        _params->optMean().has_value() ? _params->optMean().value().tensorDescriptor() : nullptr,
+        _params->optInvVariance().has_value() ? _params->optInvVariance().value().tensorDescriptor()
+                                              : nullptr,
         scaleBuffer.ptr,
         dscaleBuffer.ptr,
         dbiasBuffer.ptr,

@@ -283,16 +283,11 @@ std::vector<Batchnorm2dTestCase> getBnFwdInferenceTestCases()
 {
     return {
         {.n = 1, .c = 3, .h = 14, .w = 14},
-        {.n = 2, .c = 3, .h = 14, .w = 14},
-        {.n = 64, .c = 3, .h = 14, .w = 14},
-        {.n = 64, .c = 256, .h = 14, .w = 14},
+        {.n = 2, .c = 3, .h = 1, .w = 14},
+        {.n = 64, .c = 3, .h = 14, .w = 1},
         {.n = 64, .c = 256, .h = 28, .w = 28},
-        {.n = 64, .c = 256, .h = 56, .w = 56},
         {.n = 64, .c = 512, .h = 14, .w = 14},
-        {.n = 64, .c = 512, .h = 28, .w = 28},
-        {.n = 64, .c = 512, .h = 7, .w = 7},
         {.n = 64, .c = 64, .h = 112, .w = 112},
-        {.n = 64, .c = 64, .h = 56, .w = 56},
     };
 }
 
@@ -350,4 +345,34 @@ TEST_P(BatchnormForwardInferenceIntegrationTestNhwc, RunFloatFwdBatchnormGraphNH
 // Consider using fewer/smaller test cases to reduce test time
 INSTANTIATE_TEST_SUITE_P(RunFloatFwdBatchnormGraphNHWC,
                          BatchnormForwardInferenceIntegrationTestNhwc,
+                         testing::ValuesIn(getBnFwdInferenceTestCases()));
+
+class BatchnormForwardInferenceIntegrationTestBfloat16Nhwc
+    : public BatchnormForwardInferenceIntegrationTest
+{
+};
+
+TEST_P(BatchnormForwardInferenceIntegrationTestBfloat16Nhwc, RunBfloat16FwdBatchnormGraphNHWC)
+{
+    Batchnorm2dTestCase testCase = GetParam();
+    runBatchnormTest<hip_bfloat16, float>(testCase, 1e-2_bf, TensorLayout::NHWC);
+}
+
+INSTANTIATE_TEST_SUITE_P(RunBfloat16FwdBatchnormGraphNHWC,
+                         BatchnormForwardInferenceIntegrationTestBfloat16Nhwc,
+                         testing::ValuesIn(getBnFwdInferenceTestCases()));
+
+class BatchnormForwardInferenceIntegrationTestHalfNhwc
+    : public BatchnormForwardInferenceIntegrationTest
+{
+};
+
+TEST_P(BatchnormForwardInferenceIntegrationTestHalfNhwc, RunHalfFwdBatchnormGraphNHWC)
+{
+    Batchnorm2dTestCase testCase = GetParam();
+    runBatchnormTest<half, float>(testCase, 1e-2_h, TensorLayout::NHWC);
+}
+
+INSTANTIATE_TEST_SUITE_P(RunHalfFwdBatchnormGraphNHWC,
+                         BatchnormForwardInferenceIntegrationTestHalfNhwc,
                          testing::ValuesIn(getBnFwdInferenceTestCases()));
