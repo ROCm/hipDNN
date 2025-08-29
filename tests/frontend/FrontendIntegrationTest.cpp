@@ -70,7 +70,7 @@ struct IntegrationTestCase
 //        - We are using fake test plugins to simulate different scenarios.
 //        - The tests will validate the graph creation, execution plan building, and execution through the full flow.
 //        - We are using a batchnorm graph since the graph doesn't really matter due to fake plugins.
-class FrontendEndToEndIntegrationTest : public ::testing::TestWithParam<IntegrationTestCase>
+class IntegrationFrontendBatchnormFp32 : public ::testing::TestWithParam<IntegrationTestCase>
 {
 protected:
     // Simplified tensor bundle for frontend integration tests
@@ -293,26 +293,26 @@ private:
 };
 
 INSTANTIATE_TEST_SUITE_P(
-    IntegrationTests,
-    FrontendEndToEndIntegrationTest,
+    IntegrationFrontendTests,
+    IntegrationFrontendBatchnormFp32,
     ::testing::Values(
         IntegrationTestCase{hipdnn_tests::plugin_constants::testGoodPluginPath(),
-                            "Default plugin with manual UIDs",
+                            "DefaultPluginWithManualUids",
                             "DefaultPluginBatchnormTest",
                             FailurePoint::NONE,
                             true},
         IntegrationTestCase{hipdnn_tests::plugin_constants::testGoodPluginPath(),
-                            "Default plugin with auto UIDs",
+                            "DefaultPluginWithAutoUids",
                             "DefaultPluginBatchnormTestAutoUID",
                             FailurePoint::NONE,
                             false},
         IntegrationTestCase{hipdnn_tests::plugin_constants::testExecuteFailsPluginPath(),
-                            "Execute fails plugin",
+                            "ExecuteFailsPlugin",
                             "ExecuteFailsPluginBatchnormTest",
                             FailurePoint::EXECUTE,
                             true},
         IntegrationTestCase{hipdnn_tests::plugin_constants::testNoApplicableEnginesPluginPath(),
-                            "No applicable engines plugin",
+                            "NoApplicableEnginesPlugin",
                             "NoEnginesPluginBatchnormTest",
                             FailurePoint::CREATE_EXECUTION_PLAN,
                             true}),
@@ -323,7 +323,7 @@ INSTANTIATE_TEST_SUITE_P(
         return name;
     });
 
-TEST_P(FrontendEndToEndIntegrationTest, IntegrationTest)
+TEST_P(IntegrationFrontendBatchnormFp32, ExecutePluginPipeline)
 {
     runTest();
 }
