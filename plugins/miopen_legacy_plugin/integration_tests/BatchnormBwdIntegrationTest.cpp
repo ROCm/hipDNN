@@ -100,16 +100,16 @@ protected:
         ASSERT_EQ(hipInit(0), hipSuccess);
         ASSERT_EQ(hipGetDevice(&_deviceId), hipSuccess);
 
+        // Note: The plugin paths has to be set before we create the hipdnn handle.
         const std::array<const char*, 1> paths = {PLUGIN_DIR};
         ASSERT_EQ(hipdnnSetEnginePluginPaths_ext(
                       paths.size(), paths.data(), HIPDNN_PLUGIN_LOADING_ABSOLUTE),
                   HIPDNN_STATUS_SUCCESS);
 
+        // Create handle and stream
         ASSERT_EQ(hipdnnCreate(&_handle), HIPDNN_STATUS_SUCCESS);
-
-        //todo: bring back stream support once MigratableMemory supports it
-        //ASSERT_EQ(hipStreamCreate(&stream), hipSuccess);
-        //ASSERT_EQ(hipdnnSetStream(handle, stream), HIPDNN_STATUS_SUCCESS);
+        ASSERT_EQ(hipStreamCreate(&_stream), hipSuccess);
+        ASSERT_EQ(hipdnnSetStream(_handle, _stream), HIPDNN_STATUS_SUCCESS);
     }
 
     void TearDown() override
@@ -242,7 +242,7 @@ protected:
                                                                           *invVarianceTensorAttr,
                                                                           graphTensorBundle);
 
-        result = graphObj->execute(_handle, variantPack, nullptr);
+        result = graphObj->execute(_handle, variantPack, _stream);
         ASSERT_EQ(result.code, error_code_t::OK) << result.err_msg;
     }
 
