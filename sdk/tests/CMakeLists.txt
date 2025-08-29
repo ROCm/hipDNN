@@ -32,6 +32,7 @@ add_executable(hipdnn_sdk_tests
     utilities/TestTensor.cpp
     test_utilities/TestCpuFpReferenceImplementation.cpp
     test_utilities/TestCpuFpReferenceValidation.cpp
+    test_utilities/TestCpuFpReferenceMiopenRmsValidation.cpp
 )
 
 target_compile_definitions(hipdnn_sdk_tests PRIVATE
