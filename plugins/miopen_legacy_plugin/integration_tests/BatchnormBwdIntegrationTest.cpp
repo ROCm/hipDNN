@@ -322,7 +322,7 @@ std::vector<Batchnorm2dTestCase> getBnBwdTestCases()
 {
     return {
         {.n = 1, .c = 3, .h = 14, .w = 14},
-        // MIOpen segfaults for this case, re-enable when fix is released.
+        // MIOpen segfaults for this case, re-enable when fix is released:
         // https://github.com/ROCm/rocm-libraries/pull/1197
         // {.n = 1, .c = 256, .h = 1, .w = 1}, // Would produce near-zero variance in theory
         {.n = 2, .c = 3, .h = 1, .w = 1},
@@ -376,7 +376,7 @@ TEST_P(BatchnormBackwardIntegrationTestNHWC, RunFloatBwdBatchnormGraphNHWC)
     runBatchnormTest<float, float>(testCase, 4e-3f, TensorLayout::NHWC);
 }
 
-// MIOpen segfaults for this case, re-enable when fix is released.
+// MIOpen segfaults for this case, re-enable when fix is released:
 // https://github.com/ROCm/rocm-libraries/pull/1197
 TEST_P(BatchnormBackwardIntegrationTestNHWC, DISABLED_RunBfloat16BwdBatchnormGraphNHWC)
 {
@@ -384,7 +384,7 @@ TEST_P(BatchnormBackwardIntegrationTestNHWC, DISABLED_RunBfloat16BwdBatchnormGra
     runBatchnormTest<hip_bfloat16, float>(testCase, 4e-3_bf, TensorLayout::NHWC);
 }
 
-// MIOpen segfaults for this case, re-enable when fix is released.
+// MIOpen segfaults for this case, re-enable when fix is released:
 // https://github.com/ROCm/rocm-libraries/pull/1197
 TEST_P(BatchnormBackwardIntegrationTestNHWC, DISABLED_RunHalfBwdBatchnormGraphNHWC)
 {

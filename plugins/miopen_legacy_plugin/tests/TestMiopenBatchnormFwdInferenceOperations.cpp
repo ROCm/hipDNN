@@ -71,6 +71,14 @@ TEST_P(BatchnormFwdInferExecuteGraphTest, RunHalfFwdBatchnormGraphNCHW)
         testCase, hipdnn_sdk::data_objects::DataType::DataType_HALF, 1e-2_h, TensorLayout::NCHW);
 }
 
+// TODO: Re-enable when double support is added to MIOpen plugin
+TEST_P(BatchnormFwdInferExecuteGraphTest, DISABLED_RunDoubleFwdBatchnormGraphNCHW)
+{
+    auto testCase = Batchnorm2dTestCase{.n = 1, .c = 3, .h = 14, .w = 14};
+    runFwdBatchnormGraph<double, double>(
+        testCase, hipdnn_sdk::data_objects::DataType::DataType_DOUBLE, 1e-6, TensorLayout::NCHW);
+}
+
 TEST_P(BatchnormFwdInferExecuteGraphTest, RunFloatFwdBatchnormGraphNHWC)
 {
     auto testCase = GetParam();
@@ -95,12 +103,12 @@ TEST_P(BatchnormFwdInferExecuteGraphTest, RunHalfFwdBatchnormGraphNHWC)
 }
 
 // TODO: Re-enable when double support is added to MIOpen plugin
-// TEST_F(BatchnormFwdInferExecuteGraphTest, RunDoubleFwdBatchnormGraph)
-// {
-//     auto testCase = Batchnorm2dTestCase{.n = 1, .c = 3, .h = 14, .w = 14};
-//     runFwdBatchnormGraph<double, double>(
-//         testCase, hipdnn_sdk::data_objects::DataType::DataType_DOUBLE, 1e-6);
-// }
+TEST_P(BatchnormFwdInferExecuteGraphTest, DISABLED_RunDoubleFwdBatchnormGraphNHWC)
+{
+    auto testCase = Batchnorm2dTestCase{.n = 1, .c = 3, .h = 14, .w = 14};
+    runFwdBatchnormGraph<double, double>(
+        testCase, hipdnn_sdk::data_objects::DataType::DataType_DOUBLE, 1e-6, TensorLayout::NHWC);
+}
 
 template <typename InputType, typename IntermediateType>
 void BatchnormFwdInferExecuteGraphTest::runFwdBatchnormGraph(
