@@ -4,7 +4,7 @@
 #include <gtest/gtest.h>
 #include <hipdnn_sdk/utilities/ScopedResource.hpp>
 
-using namespace hipdnn::sdk;
+using namespace hipdnn_sdk;
 
 namespace
 {

@@ -155,14 +155,14 @@ void BatchnormBwdExecuteGraphTest::runBwdBatchnormGraph(
                                                        static_cast<IntermediateType>(2.0f),
                                                        seed));
 
-    auto batchnormBuilder = flatbuffer_test_utils::createValidBatchnormBwdGraph(
+    auto batchnormBuilder = hipdnn_backend::flatbuffer_utilities::createValidBatchnormBwdGraph(
         dyTensor.strides(), dyTensor.dims(), true, inputDataType);
 
     hipdnnPluginConstData_t opGraph;
     opGraph.ptr = batchnormBuilder.GetBufferPointer();
     opGraph.size = batchnormBuilder.GetSize();
 
-    auto engineConfigBuilder = flatbuffer_test_utils::createValidEngineConfig(1);
+    auto engineConfigBuilder = hipdnn_backend::flatbuffer_utilities::createValidEngineConfig(1);
     hipdnnPluginConstData_t engineConfig;
     engineConfig.ptr = engineConfigBuilder.GetBufferPointer();
     engineConfig.size = engineConfigBuilder.GetSize();
