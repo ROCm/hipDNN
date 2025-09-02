@@ -21,7 +21,7 @@
 using namespace hipdnn_sdk::reference_test_utilities;
 using namespace test_operations_common;
 
-class BatchnormFwdInferExecuteGraphTestBase : public ::testing::Test
+class BatchnormFwdInferExecuteGraphTest : public ::testing::TestWithParam<Batchnorm2dTestCase>
 {
 protected:
     void SetUp() override
@@ -48,80 +48,70 @@ protected:
     hipdnnEnginePluginHandle_t _handle = nullptr;
 };
 
-class BatchnormFwdInferExecuteGraphTest : public BatchnormFwdInferExecuteGraphTestBase
-{
-};
-
-class BatchnormFwdInferExecuteGraphTestWithParams
-    : public BatchnormFwdInferExecuteGraphTestBase,
-      public ::testing::WithParamInterface<Batchnorm2dTestCase>
-{
-};
-
-TEST_P(BatchnormFwdInferExecuteGraphTestWithParams, RunFloatFwdBatchnormGraphNCHW)
+TEST_P(BatchnormFwdInferExecuteGraphTest, RunFloatFwdBatchnormGraphNCHW)
 {
     auto testCase = GetParam();
     runFwdBatchnormGraph<float, float>(
         testCase, hipdnn_sdk::data_objects::DataType::DataType_FLOAT, 1e-6f, TensorLayout::NCHW);
 }
 
-TEST_F(BatchnormFwdInferExecuteGraphTest, RunBfloat16FwdBatchnormGraphNCHW)
+TEST_P(BatchnormFwdInferExecuteGraphTest, RunBfloat16FwdBatchnormGraphNCHW)
 {
-    auto testCase = Batchnorm2dTestCase{.n = 1, .c = 3, .h = 14, .w = 14};
+    auto testCase = GetParam();
     runFwdBatchnormGraph<hip_bfloat16, float>(testCase,
                                               hipdnn_sdk::data_objects::DataType::DataType_BFLOAT16,
                                               1e-2_bf,
                                               TensorLayout::NCHW);
 }
 
-TEST_F(BatchnormFwdInferExecuteGraphTest, RunHalfFwdBatchnormGraphNCHW)
+TEST_P(BatchnormFwdInferExecuteGraphTest, RunHalfFwdBatchnormGraphNCHW)
 {
-    auto testCase = Batchnorm2dTestCase{.n = 1, .c = 3, .h = 14, .w = 14};
+    auto testCase = GetParam();
     runFwdBatchnormGraph<half, float>(
         testCase, hipdnn_sdk::data_objects::DataType::DataType_HALF, 1e-2_h, TensorLayout::NCHW);
 }
 
 // TODO: Re-enable when double support is added to MIOpen plugin
-TEST_F(BatchnormFwdInferExecuteGraphTest, DISABLED_RunDoubleFwdBatchnormGraphNCHW)
+TEST_P(BatchnormFwdInferExecuteGraphTest, DISABLED_RunDoubleFwdBatchnormGraphNCHW)
 {
-    auto testCase = Batchnorm2dTestCase{.n = 1, .c = 3, .h = 14, .w = 14};
+    auto testCase = GetParam();
     runFwdBatchnormGraph<double, double>(
         testCase, hipdnn_sdk::data_objects::DataType::DataType_DOUBLE, 1e-6, TensorLayout::NCHW);
 }
 
-TEST_P(BatchnormFwdInferExecuteGraphTestWithParams, RunFloatFwdBatchnormGraphNHWC)
+TEST_P(BatchnormFwdInferExecuteGraphTest, RunFloatFwdBatchnormGraphNHWC)
 {
     auto testCase = GetParam();
     runFwdBatchnormGraph<float, float>(
         testCase, hipdnn_sdk::data_objects::DataType::DataType_FLOAT, 1e-6f, TensorLayout::NHWC);
 }
 
-TEST_F(BatchnormFwdInferExecuteGraphTest, RunBfloat16FwdBatchnormGraphNHWC)
+TEST_P(BatchnormFwdInferExecuteGraphTest, RunBfloat16FwdBatchnormGraphNHWC)
 {
-    auto testCase = Batchnorm2dTestCase{.n = 1, .c = 3, .h = 14, .w = 14};
+    auto testCase = GetParam();
     runFwdBatchnormGraph<hip_bfloat16, float>(testCase,
                                               hipdnn_sdk::data_objects::DataType::DataType_BFLOAT16,
                                               1e-2_bf,
                                               TensorLayout::NHWC);
 }
 
-TEST_F(BatchnormFwdInferExecuteGraphTest, RunHalfFwdBatchnormGraphNHWC)
+TEST_P(BatchnormFwdInferExecuteGraphTest, RunHalfFwdBatchnormGraphNHWC)
 {
-    auto testCase = Batchnorm2dTestCase{.n = 1, .c = 3, .h = 14, .w = 14};
+    auto testCase = GetParam();
     runFwdBatchnormGraph<half, float>(
         testCase, hipdnn_sdk::data_objects::DataType::DataType_HALF, 1e-2_h, TensorLayout::NHWC);
 }
 
 // TODO: Re-enable when double support is added to MIOpen plugin
-TEST_F(BatchnormFwdInferExecuteGraphTest, DISABLED_RunDoubleFwdBatchnormGraphNHWC)
+TEST_P(BatchnormFwdInferExecuteGraphTest, DISABLED_RunDoubleFwdBatchnormGraphNHWC)
 {
-    auto testCase = Batchnorm2dTestCase{.n = 1, .c = 3, .h = 14, .w = 14};
+    auto testCase = GetParam();
     runFwdBatchnormGraph<double, double>(
         testCase, hipdnn_sdk::data_objects::DataType::DataType_DOUBLE, 1e-6, TensorLayout::NHWC);
 }
 
 template <typename InputType, typename IntermediateType>
-void BatchnormFwdInferExecuteGraphTestBase::runFwdBatchnormGraph(
+void BatchnormFwdInferExecuteGraphTest::runFwdBatchnormGraph(
     Batchnorm2dTestCase testCase,
     hipdnn_sdk::data_objects::DataType inputDataType,
     InputType epsilon,
@@ -228,5 +218,5 @@ void BatchnormFwdInferExecuteGraphTestBase::runFwdBatchnormGraph(
 }
 
 INSTANTIATE_TEST_SUITE_P(RunFwdBatchnormGraphWithParams,
-                         BatchnormFwdInferExecuteGraphTestWithParams,
+                         BatchnormFwdInferExecuteGraphTest,
                          testing::ValuesIn(getBatchnorm2dTestCases()));
