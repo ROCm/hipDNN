@@ -28,7 +28,8 @@ add_executable(hipdnn_backend_tests
     main.cpp
     TestEnginePlugin.cpp
     TestEnginePluginResourceManager.cpp
-    TestError.cpp
+    TestLastErrorManager.cpp
+    TestBackendEnumStringUtils.cpp
     TestFlatbufferUtilities.cpp
     TestHandle.cpp
     TestHelpers.cpp

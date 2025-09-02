@@ -17,20 +17,19 @@ using namespace hipdnn_backend;
 
 template <typename T, typename Destructor>
 using ScopedResource = hipdnn::sdk::utilities::ScopedResource<T, Destructor>;
-class TestEnginePluginManager : public plugin::PluginManagerBase<plugin::EnginePlugin>
+class SimpleEnginePluginManager : public plugin::PluginManagerBase<plugin::EnginePlugin>
 {
 public:
-    TestEnginePluginManager()
+    SimpleEnginePluginManager()
         : plugin::PluginManagerBase<plugin::EnginePlugin>({"./"})
     {
     }
 };
-TEST(GpuEnginePluginTest, LoadPluginsAndExecuteOpGraph)
-{
-    SKIP_IF_NO_DEVICES();
 
-    // Create an EngienPluginManager instance
-    TestEnginePluginManager pluginManager;
+TEST(TestEnginePluginManager, LoadPluginsAndExecuteOpGraph)
+{
+    // Create an SimpleEnginePluginManager instance
+    SimpleEnginePluginManager pluginManager;
 
     // Create a list of paths to plugins
     std::set<std::filesystem::path> pluginPaths = {"./hipdnn_test_engine_plugin1"};
@@ -52,9 +51,7 @@ TEST(GpuEnginePluginTest, LoadPluginsAndExecuteOpGraph)
     const auto& engineIds0 = plugins[0]->getAllEngineIds();
     ASSERT_EQ(engineIds0, expectedEngineIds0);
 
-    hipStream_t stream;
-    ASSERT_EQ(hipStreamCreate(&stream), hipSuccess);
-    ScopedResource streamRes(stream, [](hipStream_t s) { std::ignore = hipStreamDestroy(s); });
+    auto stream = reinterpret_cast<hipStream_t>(0x1234);
 
     // TODO set a real op graph
     const std::array<uint8_t, 8> opGraphData = {0x07, 0x06, 0x05, 0x04, 0x03, 0x02, 0x01, 0x00};

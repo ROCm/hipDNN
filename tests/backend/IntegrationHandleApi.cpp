@@ -5,7 +5,7 @@
 #include <gtest/gtest.h>
 #include <hipdnn_sdk/test_utilities/TestUtilities.hpp>
 
-TEST(IntegrationHandleApi, CreateAndDestroy)
+TEST(IntegrationHipdnnHandleApi, CreateAndDestroy)
 {
     hipdnnHandle_t handle = nullptr;
 
@@ -17,28 +17,28 @@ TEST(IntegrationHandleApi, CreateAndDestroy)
     ASSERT_EQ(destroyStatus, HIPDNN_STATUS_SUCCESS);
 }
 
-TEST(IntegrationHandleApi, CreateWithNullptr)
+TEST(IntegrationHipdnnHandleApi, CreateWithNullptr)
 {
     hipdnnStatus_t status = hipdnnCreate(nullptr);
 
     EXPECT_EQ(status, HIPDNN_STATUS_BAD_PARAM_NULL_POINTER);
 }
 
-TEST(IntegrationHandleApi, SetStreamNullptrHandle)
+TEST(IntegrationHipdnnHandleApi, SetStreamNullptrHandle)
 {
     hipStream_t testStream = nullptr;
     auto setStreamStatus = hipdnnSetStream(nullptr, testStream);
     ASSERT_EQ(setStreamStatus, HIPDNN_STATUS_BAD_PARAM_NULL_POINTER);
 }
 
-TEST(IntegrationHandleApi, GetStreamNullptrHandle)
+TEST(IntegrationHipdnnHandleApi, GetStreamNullptrHandle)
 {
     hipStream_t retrievedStream = nullptr;
     auto getStreamStatus = hipdnnGetStream(nullptr, &retrievedStream);
     ASSERT_EQ(getStreamStatus, HIPDNN_STATUS_BAD_PARAM_NULL_POINTER);
 }
 
-TEST(IntegrationHandleApi, GetStreamNullptrStreamPointer)
+TEST(IntegrationHipdnnHandleApi, GetStreamNullptrStreamPointer)
 {
     hipdnnHandle_t handle = nullptr;
 
@@ -55,7 +55,7 @@ TEST(IntegrationHandleApi, GetStreamNullptrStreamPointer)
     ASSERT_EQ(destroyStatus, HIPDNN_STATUS_SUCCESS);
 }
 
-TEST(IntegrationGpuHandleApi, GetStreamPointer)
+TEST(IntegrationGpuHipdnnHandleApi, GetStreamPointer)
 {
     SKIP_IF_NO_DEVICES();
 

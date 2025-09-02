@@ -1,7 +1,7 @@
 // Copyright © Advanced Micro Devices, Inc., or its affiliates.
 // SPDX-License-Identifier:  MIT
 
-#include "Error.hpp"
+#include "BackendEnumStringUtils.hpp"
 #include "Helpers.hpp"
 #include "HipdnnException.hpp"
 #include "descriptors/BackendDescriptor.hpp"
@@ -12,8 +12,8 @@
 #include "hipdnn_backend.h"
 #include "logging/Logging.hpp"
 #include "plugin/EnginePluginResourceManager.hpp"
-#include <hipdnn_sdk/logging/CallbackTypes.h>
 
+#include <hipdnn_sdk/logging/CallbackTypes.h>
 #include <hipdnn_sdk/utilities/StringUtil.hpp>
 
 using namespace hipdnn_backend;
