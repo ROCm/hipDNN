@@ -96,7 +96,7 @@ void EnginePluginResourceManager::getLoadedPluginFiles(size_t* numPlugins,
         throw HipdnnException(HIPDNN_STATUS_BAD_PARAM, "Insufficient buffer space provided.");
     }
 
-    std::vector<std::string> pathsVec;
+    std::vector<std::filesystem::path> pathsVec;
     pathsVec.reserve(pathSet.size());
     pathsVec.assign(pathSet.begin(), pathSet.end());
 
@@ -107,7 +107,7 @@ void EnginePluginResourceManager::getLoadedPluginFiles(size_t* numPlugins,
             throw HipdnnException(HIPDNN_STATUS_BAD_PARAM, "A plugin path string buffer is null.");
         }
         hipdnn::sdk::utilities::copyMaxSizeWithNullTerminator(
-            pluginPaths[i], pathsVec[i].c_str(), *maxStringLen);
+            pluginPaths[i], pathsVec[i].string().c_str(), *maxStringLen);
     }
 }
 
