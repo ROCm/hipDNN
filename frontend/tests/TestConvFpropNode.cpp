@@ -482,7 +482,7 @@ TEST(ConvolutionFwdNodeTests, StrideInferenceDimensionMismatch)
     EXPECT_EQ(error.code, error_code_t::ATTRIBUTE_NOT_SET);
 }
 
-TEST(ConvolutionFwdNodeTests, StrideInferenceNCHWLayoutSuccess)
+TEST(ConvolutionFwdNodeTests, StrideInferenceNchwLayoutSuccess)
 {
     ConvFpropAttributes convAttributes;
 
@@ -520,7 +520,7 @@ TEST(ConvolutionFwdNodeTests, StrideInferenceNCHWLayoutSuccess)
     EXPECT_EQ(inferredStrides[3], 1); // W stride should be 1 (contiguous)
 }
 
-TEST(ConvolutionFwdNodeTests, StrideInferenceNHWCLayoutSuccess)
+TEST(ConvolutionFwdNodeTests, StrideInferenceNhwcLayoutSuccess)
 {
     ConvFpropAttributes convAttributes;
 
@@ -1061,7 +1061,7 @@ TEST(ConvolutionFwdNodeTests, StrideInference3DConvolutionWithDilation)
     EXPECT_EQ(inferredStrides[4], 1); // W stride: 1
 }
 
-TEST(ConvolutionFwdNodeTests, StrideInferenceWithNHWCLayoutAndComplexParams)
+TEST(ConvolutionFwdNodeTests, StrideInferenceWithNhwcLayoutAndComplexParams)
 {
     ConvFpropAttributes convAttributes;
 
@@ -1523,7 +1523,7 @@ TEST(ConvolutionFwdNodeTests, InferPropertiesGroupedConvWithStride)
     EXPECT_EQ(inferredStrides[3], 1); // W stride
 }
 
-TEST(ConvolutionFwdNodeTests, InferPropertiesGroupedConvNHWCLayout)
+TEST(ConvolutionFwdNodeTests, InferPropertiesGroupedConvNhwcLayout)
 {
     ConvFpropAttributes convAttributes;
 
@@ -1614,7 +1614,7 @@ TEST(ConvolutionFwdNodeTests, InferPropertiesGroupedConv3D)
     EXPECT_EQ(inferredStrides[4], 1); // W stride: 1
 }
 
-TEST(ConvolutionFwdNodeTests, InferPropertiesGroupedConv3DNHWCLayout)
+TEST(ConvolutionFwdNodeTests, InferPropertiesGroupedConv3DNhwcLayout)
 {
     ConvFpropAttributes convAttributes;
 
