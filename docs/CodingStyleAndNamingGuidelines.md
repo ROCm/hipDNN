@@ -13,22 +13,23 @@ This document defines the canonical project-wide coding and test naming conventi
 - [7. Interfaces](#7-interfaces)
 - [8. Enums](#8-enums)
 - [9. Constants](#9-constants)
-- [10. Test Naming Guidelines](#10-test-naming-guidelines)
-  - [10.1 Keywords (reserved positions)](#101-keywords-reserved-positions)
-  - [10.2 Valid Examples](#102-valid-examples)
-  - [10.3 Invalid Examples (and why)](#103-invalid-examples-and-why)
-  - [10.4 Test Case (second parameter)](#104-test-case-second-parameter)
-  - [10.5 Rationale](#105-rationale)
-- [11. Examples](#11-examples)
+- [10. Namespaces](#10-namespaces)
+- [11. Test Naming Guidelines](#11-test-naming-guidelines)
+  - [11.1 Keywords (reserved positions)](#111-keywords-reserved-positions)
+  - [11.2 Valid Examples](#112-valid-examples)
+  - [11.3 Invalid Examples (and why)](#113-invalid-examples-and-why)
+  - [11.4 Test Case (second parameter)](#114-test-case-second-parameter)
+  - [11.5 Rationale](#115-rationale)
+- [12. Examples](#12-examples)
   - [Class & File](#class--file)
   - [Interface](#interface)
   - [Constant & Enum](#constant--enum)
   - [Test (gtest)](#test-gtest)
-- [12. Decision Checklist](#12-decision-checklist)
-- [13. Deviation Process](#13-deviation-process)
-- [14. Automated Tooling](#14-automated-tooling)
-  - [14.1 Clang-Tidy Rules](#141-clang-tidy-rules)
-  - [14.2 Test Naming Enforcement Tool](#142-test-naming-enforcement-tool)
+- [13. Decision Checklist](#13-decision-checklist)
+- [14. Deviation Process](#14-deviation-process)
+- [15. Automated Tooling](#15-automated-tooling)
+  - [15.1 Clang-Tidy Rules](#151-clang-tidy-rules)
+  - [15.2 Test Naming Enforcement Tool](#152-test-naming-enforcement-tool)
 
 ## 1. Naming Summary
 
@@ -102,7 +103,15 @@ If later you add invariants or non-trivial behavior, consider converting to a cl
 - UPPER_CASE with optional single underscores: `DEFAULT_ALIGNMENT`, `MAX_TENSOR_RANK`.
 - Prefer `constexpr` over macros when possible.
 
-## 10. Test Naming Guidelines
+## 10. Namespaces
+
+- lower_snake_case with single underscores
+- Most code should fit generally within a few namespaces
+  - `hipdnn_\<component\>`: (eg. hipdnn_frontend) Contains all basic code required for the component
+    - `utilities`: Contains code that can aid and assist in using component code
+    - `test_utilities`: Contains code that can aid and assist in testing component code
+
+## 11. Test Naming Guidelines
 
 GoogleTest reserves underscores in test suite and test names for future expansion. Current repository names with underscores risk future incompatibility; we proactively constrain test suite naming.
 
@@ -118,14 +127,14 @@ Rules below apply ONLY to the TestSuite name (first parameter of `TEST` / `TEST_
 
 Omit any category that does not apply.
 
-### 10.1 Keywords (reserved positions)
+### 11.1 Keywords (reserved positions)
 
 - **Integration** (only for integration tests, always first if present).
 - **Gpu** (always first unless preceded by Integration).
 - **Datatypes**: Bfp16, Fp16, Float.
 - **Layout / Shape** (examples): Nchw, Nhwc (optional).
 
-### 10.2 Valid Examples
+### 11.2 Valid Examples
 
 ```cpp
 IntegrationGpuConvolutionPlannerNchwFloat
@@ -137,7 +146,7 @@ ConvolutionHeuristicsFloat
 ConvolutionHeuristics
 ```
 
-### 10.3 Invalid Examples (and why)
+### 11.3 Invalid Examples (and why)
 
 | Name | Issue |
 |------|-------|
@@ -147,18 +156,18 @@ ConvolutionHeuristics
 | Gpu_Convolution | Underscore not allowed |
 | GpuConvolutionFP16 | Datatype token must match exact casing `Fp16` |
 
-### 10.4 Test Case (second parameter)
+### 11.4 Test Case (second parameter)
 
 May be richly descriptive: `HandlesLargeStride`, `RejectsMismatchedLayouts`. Avoid duplicating suite-level keywords (`Integration`, `Gpu`, datatype tokens) redundantly inside the test case name unless clarity requires.
 
-### 10.5 Rationale
+### 11.5 Rationale
 
 - Ordering enforces quick visual parsing (environment → scope → subject → specialization).
 - Avoid underscores to remain future-proof with gtest evolution.
 - Suffix datatype to emphasize functional context before precision variant.
 - Consistent pattern simplifies filtering (e.g. `--gtest_filter=Gpu*Float`).
 
-## 11. Examples
+## 12. Examples
 
 ### Class & File
 
@@ -216,7 +225,7 @@ TEST(ConvolutionHeuristics, ChoosesDeterministicPath) {
 }
 ```
 
-## 12. Decision Checklist
+## 13. Decision Checklist
 
 When adding new code, verify:
 - Names follow the table in Section 1.
@@ -225,21 +234,21 @@ When adding new code, verify:
 - Layout tokens appear before datatype tokens when both used.
 - No stray underscores in test suite names.
 
-## 13. Deviation Process
+## 14. Deviation Process
 
 If an external API or standard library interop forces divergence (e.g., fixed enum value names), document the exception with a brief comment near the declaration.
 
-## 14. Automated Tooling
+## 15. Automated Tooling
 
 The repository includes automated tooling to enforce coding standards and maintain consistency across the codebase.
 
-### 14.1 Clang-Tidy Rules
+### 15.1 Clang-Tidy Rules
 
 The project uses clang-tidy to automatically enforce many of the coding style guidelines defined in this document. The configuration can be found in `.clang-tidy` at the repository root.
 
 The CI pipeline automatically runs clang-tidy on all pull requests to ensure compliance before merging.
 
-### 14.2 Test Naming Enforcement Tool
+### 15.2 Test Naming Enforcement Tool
 
 *[Placeholder: A dedicated test naming enforcement tool is planned to automatically validate that all test names follow the conventions outlined in Section 10]*
 
