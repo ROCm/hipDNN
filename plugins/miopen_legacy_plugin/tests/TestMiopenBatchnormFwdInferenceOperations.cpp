@@ -21,7 +21,7 @@
 using namespace hipdnn_sdk::reference_test_utilities;
 using namespace test_operations_common;
 
-class BatchnormFwdInferExecuteGraphTest : public ::testing::TestWithParam<Batchnorm2dTestCase>
+class TestGpuBatchnormFwdInferExecuteGraph : public ::testing::TestWithParam<Batchnorm2dTestCase>
 {
 protected:
     void SetUp() override
@@ -48,14 +48,14 @@ protected:
     hipdnnEnginePluginHandle_t _handle = nullptr;
 };
 
-TEST_P(BatchnormFwdInferExecuteGraphTest, RunFloatFwdBatchnormGraphNCHW)
+TEST_P(TestGpuBatchnormFwdInferExecuteGraph, Fp32Nchw)
 {
     auto testCase = GetParam();
     runFwdBatchnormGraph<float, float>(
         testCase, hipdnn_sdk::data_objects::DataType::DataType_FLOAT, 1e-6f, TensorLayout::NCHW);
 }
 
-TEST_F(BatchnormFwdInferExecuteGraphTest, RunBfloat16FwdBatchnormGraphNCHW)
+TEST_F(TestGpuBatchnormFwdInferExecuteGraph, Bfp16Nchw)
 {
     auto testCase = Batchnorm2dTestCase{.n = 1, .c = 3, .h = 14, .w = 14};
     runFwdBatchnormGraph<hip_bfloat16, float>(testCase,
@@ -64,21 +64,21 @@ TEST_F(BatchnormFwdInferExecuteGraphTest, RunBfloat16FwdBatchnormGraphNCHW)
                                               TensorLayout::NCHW);
 }
 
-TEST_F(BatchnormFwdInferExecuteGraphTest, RunHalfFwdBatchnormGraphNCHW)
+TEST_F(TestGpuBatchnormFwdInferExecuteGraph, Fp16Nchw)
 {
     auto testCase = Batchnorm2dTestCase{.n = 1, .c = 3, .h = 14, .w = 14};
     runFwdBatchnormGraph<half, float>(
         testCase, hipdnn_sdk::data_objects::DataType::DataType_HALF, 1e-2_h, TensorLayout::NCHW);
 }
 
-TEST_P(BatchnormFwdInferExecuteGraphTest, RunFloatFwdBatchnormGraphNHWC)
+TEST_P(TestGpuBatchnormFwdInferExecuteGraph, Fp32Nhwc)
 {
     auto testCase = GetParam();
     runFwdBatchnormGraph<float, float>(
         testCase, hipdnn_sdk::data_objects::DataType::DataType_FLOAT, 1e-6f, TensorLayout::NHWC);
 }
 
-TEST_F(BatchnormFwdInferExecuteGraphTest, RunBfloat16FwdBatchnormGraphNHWC)
+TEST_F(TestGpuBatchnormFwdInferExecuteGraph, Bfp16Nhwc)
 {
     auto testCase = Batchnorm2dTestCase{.n = 1, .c = 3, .h = 14, .w = 14};
     runFwdBatchnormGraph<hip_bfloat16, float>(testCase,
@@ -87,7 +87,7 @@ TEST_F(BatchnormFwdInferExecuteGraphTest, RunBfloat16FwdBatchnormGraphNHWC)
                                               TensorLayout::NHWC);
 }
 
-TEST_F(BatchnormFwdInferExecuteGraphTest, RunHalfFwdBatchnormGraphNHWC)
+TEST_F(TestGpuBatchnormFwdInferExecuteGraph, Fp16Nhwc)
 {
     auto testCase = Batchnorm2dTestCase{.n = 1, .c = 3, .h = 14, .w = 14};
     runFwdBatchnormGraph<half, float>(
@@ -103,7 +103,7 @@ TEST_F(BatchnormFwdInferExecuteGraphTest, RunHalfFwdBatchnormGraphNHWC)
 // }
 
 template <typename InputType, typename IntermediateType>
-void BatchnormFwdInferExecuteGraphTest::runFwdBatchnormGraph(
+void TestGpuBatchnormFwdInferExecuteGraph::runFwdBatchnormGraph(
     Batchnorm2dTestCase testCase,
     hipdnn_sdk::data_objects::DataType inputDataType,
     InputType epsilon,
@@ -209,6 +209,6 @@ void BatchnormFwdInferExecuteGraphTest::runFwdBatchnormGraph(
     EXPECT_TRUE(cpuRefValidation.allClose(yTensorCpu.memory(), yTensor.memory()));
 }
 
-INSTANTIATE_TEST_SUITE_P(RunFwdBatchnormGraphWithParams,
-                         BatchnormFwdInferExecuteGraphTest,
+INSTANTIATE_TEST_SUITE_P(,
+                         TestGpuBatchnormFwdInferExecuteGraph,
                          testing::ValuesIn(getBatchnorm2dTestCases()));

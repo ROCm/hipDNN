@@ -21,7 +21,7 @@
 using namespace hipdnn_sdk::reference_test_utilities;
 using namespace test_operations_common;
 
-class TestMiopenBatchnormBwdExecuteGraph : public ::testing::TestWithParam<Batchnorm2dTestCase>
+class TestGpuMiopenBatchnormBwdExecuteGraph : public ::testing::TestWithParam<Batchnorm2dTestCase>
 {
 protected:
     void SetUp() override
@@ -48,14 +48,14 @@ protected:
     hipdnnEnginePluginHandle_t _handle = nullptr;
 };
 
-TEST_P(TestMiopenBatchnormBwdExecuteGraph, F16Nchw)
+TEST_P(TestGpuMiopenBatchnormBwdExecuteGraph, Fp32Nchw)
 {
     Batchnorm2dTestCase testCase = GetParam();
     runBwdBatchnormGraph<float, float>(
         testCase, hipdnn_sdk::data_objects::DataType::DataType_FLOAT, 4e-3f, TensorLayout::NCHW);
 }
 
-TEST_P(TestMiopenBatchnormBwdExecuteGraph, RunBfloat16BwdBatchnormGraphNCHW)
+TEST_P(TestGpuMiopenBatchnormBwdExecuteGraph, Bfp16Nchw)
 {
     Batchnorm2dTestCase testCase = {.n = 1, .c = 3, .h = 14, .w = 14};
     runBwdBatchnormGraph<hip_bfloat16, float>(testCase,
@@ -64,21 +64,21 @@ TEST_P(TestMiopenBatchnormBwdExecuteGraph, RunBfloat16BwdBatchnormGraphNCHW)
                                               TensorLayout::NCHW);
 }
 
-TEST_P(TestMiopenBatchnormBwdExecuteGraph, RunHalfBwdBatchnormGraphNCHW)
+TEST_P(TestGpuMiopenBatchnormBwdExecuteGraph, Fp16Nchw)
 {
     Batchnorm2dTestCase testCase = {.n = 1, .c = 3, .h = 14, .w = 14};
     runBwdBatchnormGraph<half, float>(
         testCase, hipdnn_sdk::data_objects::DataType::DataType_HALF, 4e-3_h, TensorLayout::NCHW);
 }
 
-TEST_P(TestMiopenBatchnormBwdExecuteGraph, RunFloatBwdBatchnormGraphNHWC)
+TEST_P(TestGpuMiopenBatchnormBwdExecuteGraph, Fp32Nhwc)
 {
     Batchnorm2dTestCase testCase = GetParam();
     runBwdBatchnormGraph<float, float>(
         testCase, hipdnn_sdk::data_objects::DataType::DataType_FLOAT, 4e-3f, TensorLayout::NHWC);
 }
 
-// TEST_P(BatchnormBwdExecuteGraphTest, RunBfloat16BwdBatchnormGraphNHWC)
+// TEST_P(TestGpuMiopenBatchnormBwdExecuteGraph, RunBfloat16BwdBatchnormGraphNHWC)
 // {
 //     Batchnorm2dTestCase testCase = {.n = 1, .c = 3, .h = 14, .w = 14};
 //     runBwdBatchnormGraph<hip_bfloat16, float>(testCase,
@@ -87,7 +87,7 @@ TEST_P(TestMiopenBatchnormBwdExecuteGraph, RunFloatBwdBatchnormGraphNHWC)
 //                                               TensorLayout::NHWC);
 // }
 
-// TEST_P(BatchnormBwdExecuteGraphTest, RunHalfBwdBatchnormGraphNHWC)
+// TEST_P(TestGpuMiopenBatchnormBwdExecuteGraph, RunHalfBwdBatchnormGraphNHWC)
 // {
 //     Batchnorm2dTestCase testCase = {.n = 1, .c = 3, .h = 14, .w = 14};
 //     runBwdBatchnormGraph<half, float>(
@@ -95,7 +95,7 @@ TEST_P(TestMiopenBatchnormBwdExecuteGraph, RunFloatBwdBatchnormGraphNHWC)
 // }
 
 // TODO: Re-enable when double support is added to MIOpen plugin
-// TEST_F(BatchnormBwdExecuteGraphTest, RunDoubleBwdBatchnormGraph)
+// TEST_F(TestGpuMiopenBatchnormBwdExecuteGraph, RunDoubleBwdBatchnormGraph)
 // {
 //     Batchnorm2dTestCase testCase = {.n = 1, .c = 3, .h = 14, .w = 14};
 //     runBwdBatchnormGraph<double, double>(
@@ -103,7 +103,7 @@ TEST_P(TestMiopenBatchnormBwdExecuteGraph, RunFloatBwdBatchnormGraphNHWC)
 // }
 
 template <typename InputType, typename IntermediateType>
-void TestMiopenBatchnormBwdExecuteGraph::runBwdBatchnormGraph(
+void TestGpuMiopenBatchnormBwdExecuteGraph::runBwdBatchnormGraph(
     Batchnorm2dTestCase testCase,
     hipdnn_sdk::data_objects::DataType inputDataType,
     InputType epsilon,
@@ -225,6 +225,6 @@ void TestMiopenBatchnormBwdExecuteGraph::runBwdBatchnormGraph(
         cpuRefValidationIntermediate.allClose(dbiasTensorCpu.memory(), dbiasTensor.memory()));
 }
 
-INSTANTIATE_TEST_SUITE_P(RunBwdBatchnormGraphWithParams,
-                         TestMiopenBatchnormBwdExecuteGraph,
+INSTANTIATE_TEST_SUITE_P(,
+                         TestGpuMiopenBatchnormBwdExecuteGraph,
                          testing::ValuesIn(getBatchnorm2dTestCases()));

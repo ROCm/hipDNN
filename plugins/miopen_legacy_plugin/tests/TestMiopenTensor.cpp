@@ -8,7 +8,7 @@
 
 using namespace miopen_legacy_plugin;
 
-TEST(MiopenTensorTest, CanCreateAndDestroyTensor)
+TEST(TestMiopenTensor, CanCreateAndDestroy)
 {
     // Use a real tensor attributes from a valid batchnorm graph
     auto builder = flatbuffer_test_utils::createValidBatchnormGraph();
@@ -28,7 +28,7 @@ TEST(MiopenTensorTest, CanCreateAndDestroyTensor)
     });
 }
 
-TEST(MiopenTensorTest, TensorDescriptorIsValid)
+TEST(TestMiopenTensor, TensorDescriptorIsValid)
 {
     auto builder = flatbuffer_test_utils::createValidBatchnormGraph();
     hipdnn_plugin::GraphWrapper graph(builder.GetBufferPointer(), builder.GetSize());
