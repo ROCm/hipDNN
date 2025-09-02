@@ -8,7 +8,7 @@
 #include <hipdnn_sdk/data_objects/graph_generated.h>
 #include <hipdnn_sdk/plugin/PluginApiDataTypes.h>
 
-namespace hipdnn_backend::flatbuffer_utilities
+namespace hipdnn_backend::test_utilities
 {
 
 using namespace hipdnn_sdk::data_objects;

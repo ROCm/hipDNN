@@ -13,7 +13,7 @@
 #include <spdlog/spdlog.h>
 #include <string>
 
-namespace logging_test_utils
+namespace hipdnn_sdk::test_utilities
 {
 
 inline hipdnnSeverity_t stringToSeverity(const std::string& levelStr)
@@ -67,4 +67,4 @@ inline void initializeSpdlogDefaultLogger(const std::string& componentName)
 #endif
 }
 
-} // namespace logging_test_utils
+} // namespace hipdnn_sdk::test_utilities
