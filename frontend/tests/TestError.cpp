@@ -4,7 +4,7 @@
 #include <gtest/gtest.h>
 #include <hipdnn_frontend/Error.hpp>
 
-TEST(ErrorTests, DefaultConstructor)
+TEST(TestError, DefaultConstructor)
 {
     hipdnn_frontend::error_t error;
     EXPECT_EQ(error.get_code(), hipdnn_frontend::error_code_t::OK);
@@ -13,7 +13,7 @@ TEST(ErrorTests, DefaultConstructor)
     EXPECT_EQ(error.get_message(), "");
 }
 
-TEST(ErrorTests, ParameterizedConstructor)
+TEST(TestError, ParameterizedConstructor)
 {
     hipdnn_frontend::error_t error(hipdnn_frontend::error_code_t::INVALID_VALUE,
                                    "Invalid value provided");
@@ -23,7 +23,7 @@ TEST(ErrorTests, ParameterizedConstructor)
     EXPECT_EQ(error.get_message(), "Invalid value provided");
 }
 
-TEST(ErrorTests, EqualityOperators)
+TEST(TestError, EqualityOperators)
 {
     hipdnn_frontend::error_t error1(hipdnn_frontend::error_code_t::INVALID_VALUE, "Error 1");
     hipdnn_frontend::error_t error2(hipdnn_frontend::error_code_t::INVALID_VALUE, "Error 2");
@@ -35,7 +35,7 @@ TEST(ErrorTests, EqualityOperators)
     EXPECT_FALSE(error1 != error2);
 }
 
-TEST(ErrorTests, CodeEqualityOperators)
+TEST(TestError, CodeEqualityOperators)
 {
     hipdnn_frontend::error_t error(hipdnn_frontend::error_code_t::INVALID_VALUE,
                                    "Invalid value provided");
@@ -46,7 +46,7 @@ TEST(ErrorTests, CodeEqualityOperators)
     EXPECT_FALSE(error != hipdnn_frontend::error_code_t::INVALID_VALUE);
 }
 
-TEST(ErrorTests, CheckHipdnnErrorMacro)
+TEST(TestError, CheckHipdnnErrorMacro)
 {
     auto successFunction = []() -> hipdnn_frontend::error_t {
         return {hipdnn_frontend::error_code_t::OK, "Success"};

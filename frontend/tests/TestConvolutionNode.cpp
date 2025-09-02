@@ -3,12 +3,12 @@
 #include <gtest/gtest.h>
 #include <hipdnn_frontend/Error.hpp>
 #include <hipdnn_frontend/attributes/ConvolutionFwdAttributes.hpp>
-#include <hipdnn_frontend/node/ConvolutionFpropNode.hpp>
+#include <hipdnn_frontend/node/ConvolutionNode.hpp>
 
 using namespace hipdnn_frontend;
 using namespace hipdnn_frontend::graph;
 
-TEST(ConvolutionFwdNodeTests, PreValidateNode)
+TEST(TestConvolutionNode, PreValidateNode)
 {
     ConvFpropAttributes convAttributes;
 
@@ -37,7 +37,7 @@ TEST(ConvolutionFwdNodeTests, PreValidateNode)
     EXPECT_EQ(error.code, error_code_t::OK) << error.err_msg;
 }
 
-TEST(ConvolutionFwdNodeTests, PreValidateNodeMissingXTensor)
+TEST(TestConvolutionNode, PreValidateNodeMissingXTensor)
 {
     ConvFpropAttributes convAttributes;
 
@@ -66,7 +66,7 @@ TEST(ConvolutionFwdNodeTests, PreValidateNodeMissingXTensor)
     EXPECT_EQ(error.code, error_code_t::ATTRIBUTE_NOT_SET);
 }
 
-TEST(ConvolutionFwdNodeTests, PreValidateNodeMissingWTensor)
+TEST(TestConvolutionNode, PreValidateNodeMissingWTensor)
 {
     ConvFpropAttributes convAttributes;
 
@@ -95,7 +95,7 @@ TEST(ConvolutionFwdNodeTests, PreValidateNodeMissingWTensor)
     EXPECT_EQ(error.code, error_code_t::ATTRIBUTE_NOT_SET);
 }
 
-TEST(ConvolutionFwdNodeTests, PreValidateNodeMissingYTensor)
+TEST(TestConvolutionNode, PreValidateNodeMissingYTensor)
 {
     ConvFpropAttributes convAttributes;
 
@@ -124,7 +124,7 @@ TEST(ConvolutionFwdNodeTests, PreValidateNodeMissingYTensor)
     EXPECT_EQ(error.code, error_code_t::ATTRIBUTE_NOT_SET);
 }
 
-TEST(ConvolutionFwdNodeTests, PreValidateNodeMissingConvolutionParameters)
+TEST(TestConvolutionNode, PreValidateNodeMissingConvolutionParameters)
 {
     ConvFpropAttributes convAttributes;
 
@@ -152,7 +152,7 @@ TEST(ConvolutionFwdNodeTests, PreValidateNodeMissingConvolutionParameters)
     EXPECT_EQ(error.code, error_code_t::ATTRIBUTE_NOT_SET);
 }
 
-TEST(ConvolutionFwdNodeTests, PreValidateNodeAllValuesSet)
+TEST(TestConvolutionNode, PreValidateNodeAllValuesSet)
 {
     ConvFpropAttributes convAttributes;
 
@@ -184,7 +184,7 @@ TEST(ConvolutionFwdNodeTests, PreValidateNodeAllValuesSet)
     EXPECT_EQ(error.code, error_code_t::OK) << error.err_msg;
 }
 
-TEST(ConvolutionFwdNodeTests, InferPropertiesNodeMissingXTensor)
+TEST(TestConvolutionNode, InferPropertiesNodeMissingXTensor)
 {
     ConvFpropAttributes convAttributes;
     GraphAttributes graphAttributes;
@@ -194,7 +194,7 @@ TEST(ConvolutionFwdNodeTests, InferPropertiesNodeMissingXTensor)
     EXPECT_EQ(error.code, error_code_t::ATTRIBUTE_NOT_SET);
 }
 
-TEST(ConvolutionFwdNodeTests, InferPropertiesNodeMissingWTensor)
+TEST(TestConvolutionNode, InferPropertiesNodeMissingWTensor)
 {
     ConvFpropAttributes convAttributes;
     convAttributes.set_x(std::make_shared<TensorAttributes>());
@@ -205,7 +205,7 @@ TEST(ConvolutionFwdNodeTests, InferPropertiesNodeMissingWTensor)
     EXPECT_EQ(error.code, error_code_t::ATTRIBUTE_NOT_SET);
 }
 
-TEST(ConvolutionFwdNodeTests, InferPropertiesNodeMissingYTensor)
+TEST(TestConvolutionNode, InferPropertiesNodeMissingYTensor)
 {
     ConvFpropAttributes convAttributes;
     convAttributes.set_x(std::make_shared<TensorAttributes>());
@@ -217,7 +217,7 @@ TEST(ConvolutionFwdNodeTests, InferPropertiesNodeMissingYTensor)
     EXPECT_EQ(error.code, error_code_t::ATTRIBUTE_NOT_SET);
 }
 
-TEST(ConvolutionFwdNodeTests, InferPropertiesNode2DConvolutionSuccess)
+TEST(TestConvolutionNode, InferPropertiesNode2DConvolutionSuccess)
 {
     ConvFpropAttributes convAttributes;
 
@@ -252,7 +252,7 @@ TEST(ConvolutionFwdNodeTests, InferPropertiesNode2DConvolutionSuccess)
     EXPECT_EQ(inferredDims[3], 32); // Width: (32 + 1 + 1 - 3) / 1 + 1 = 32
 }
 
-TEST(ConvolutionFwdNodeTests, InferPropertiesNode3DConvolutionSuccess)
+TEST(TestConvolutionNode, InferPropertiesNode3DConvolutionSuccess)
 {
     ConvFpropAttributes convAttributes;
 
@@ -288,7 +288,7 @@ TEST(ConvolutionFwdNodeTests, InferPropertiesNode3DConvolutionSuccess)
     EXPECT_EQ(inferredDims[4], 16); // Width: (16 + 1 + 1 - 3) / 1 + 1 = 16
 }
 
-TEST(ConvolutionFwdNodeTests, InferPropertiesNodeInsufficientSpatialParameters)
+TEST(TestConvolutionNode, InferPropertiesNodeInsufficientSpatialParameters)
 {
     ConvFpropAttributes convAttributes;
 
@@ -315,7 +315,7 @@ TEST(ConvolutionFwdNodeTests, InferPropertiesNodeInsufficientSpatialParameters)
     EXPECT_EQ(error.code, error_code_t::INVALID_VALUE);
 }
 
-TEST(ConvolutionFwdNodeTests, InferPropertiesNodeInvalidStrideValues)
+TEST(TestConvolutionNode, InferPropertiesNodeInvalidStrideValues)
 {
     ConvFpropAttributes convAttributes;
 
@@ -342,7 +342,7 @@ TEST(ConvolutionFwdNodeTests, InferPropertiesNodeInvalidStrideValues)
     EXPECT_EQ(error.code, error_code_t::INVALID_VALUE);
 }
 
-TEST(ConvolutionFwdNodeTests, InferPropertiesNodeInvalidDilationValues)
+TEST(TestConvolutionNode, InferPropertiesNodeInvalidDilationValues)
 {
     ConvFpropAttributes convAttributes;
 
@@ -369,7 +369,7 @@ TEST(ConvolutionFwdNodeTests, InferPropertiesNodeInvalidDilationValues)
     EXPECT_EQ(error.code, error_code_t::INVALID_VALUE);
 }
 
-TEST(ConvolutionFwdNodeTests, InferPropertiesNodeNegativeOutputSize)
+TEST(TestConvolutionNode, InferPropertiesNodeNegativeOutputSize)
 {
     ConvFpropAttributes convAttributes;
 
@@ -396,7 +396,7 @@ TEST(ConvolutionFwdNodeTests, InferPropertiesNodeNegativeOutputSize)
     EXPECT_EQ(error.code, error_code_t::INVALID_VALUE);
 }
 
-TEST(ConvolutionFwdNodeTests, StrideInferenceMissingInputStrides)
+TEST(TestConvolutionNode, StrideInferenceMissingInputStrides)
 {
     ConvFpropAttributes convAttributes;
 
@@ -425,7 +425,7 @@ TEST(ConvolutionFwdNodeTests, StrideInferenceMissingInputStrides)
     EXPECT_EQ(error.code, error_code_t::ATTRIBUTE_NOT_SET);
 }
 
-TEST(ConvolutionFwdNodeTests, StrideInferenceMissingOutputDimensions)
+TEST(TestConvolutionNode, StrideInferenceMissingOutputDimensions)
 {
     ConvFpropAttributes convAttributes;
 
@@ -453,7 +453,7 @@ TEST(ConvolutionFwdNodeTests, StrideInferenceMissingOutputDimensions)
     EXPECT_EQ(node.infer_properties_node(), error_code_t::ATTRIBUTE_NOT_SET);
 }
 
-TEST(ConvolutionFwdNodeTests, StrideInferenceDimensionMismatch)
+TEST(TestConvolutionNode, StrideInferenceDimensionMismatch)
 {
     ConvFpropAttributes convAttributes;
 
@@ -482,7 +482,7 @@ TEST(ConvolutionFwdNodeTests, StrideInferenceDimensionMismatch)
     EXPECT_EQ(error.code, error_code_t::ATTRIBUTE_NOT_SET);
 }
 
-TEST(ConvolutionFwdNodeTests, StrideInferenceNCHWLayoutSuccess)
+TEST(TestConvolutionNode, StrideInferenceNchwLayoutSuccess)
 {
     ConvFpropAttributes convAttributes;
 
@@ -520,7 +520,7 @@ TEST(ConvolutionFwdNodeTests, StrideInferenceNCHWLayoutSuccess)
     EXPECT_EQ(inferredStrides[3], 1); // W stride should be 1 (contiguous)
 }
 
-TEST(ConvolutionFwdNodeTests, StrideInferenceNHWCLayoutSuccess)
+TEST(TestConvolutionNode, StrideInferenceNhwcLayoutSuccess)
 {
     ConvFpropAttributes convAttributes;
 
@@ -558,7 +558,7 @@ TEST(ConvolutionFwdNodeTests, StrideInferenceNHWCLayoutSuccess)
     EXPECT_EQ(inferredStrides[3], 1); // C stride should be 1 (contiguous)
 }
 
-TEST(ConvolutionFwdNodeTests, StrideInferencePreExistingStridesNotOverwritten)
+TEST(TestConvolutionNode, StrideInferencePreExistingStridesNotOverwritten)
 {
     ConvFpropAttributes convAttributes;
 
@@ -596,7 +596,7 @@ TEST(ConvolutionFwdNodeTests, StrideInferencePreExistingStridesNotOverwritten)
     EXPECT_EQ(finalStrides[3], 1);
 }
 
-TEST(ConvolutionFwdNodeTests, StrideInferenceWithStride2x2)
+TEST(TestConvolutionNode, StrideInferenceWithStride2x2)
 {
     ConvFpropAttributes convAttributes;
 
@@ -643,7 +643,7 @@ TEST(ConvolutionFwdNodeTests, StrideInferenceWithStride2x2)
     EXPECT_EQ(inferredStrides[3], 1); // W stride: 1
 }
 
-TEST(ConvolutionFwdNodeTests, PackNode)
+TEST(TestConvolutionNode, PackNode)
 {
     ConvFpropAttributes convAttributes;
     convAttributes.name = "Convolution";
@@ -719,7 +719,7 @@ TEST(ConvolutionFwdNodeTests, PackNode)
     EXPECT_EQ(packedAttributes->conv_mode(), hipdnn_sdk::data_objects::ConvMode_CROSS_CORRELATION);
 }
 
-TEST(ConvolutionFwdNodeTests, GatherHipdnnTensorIds)
+TEST(TestConvolutionNode, GatherHipdnnTensorIds)
 {
     ConvFpropAttributes convAttributes;
     auto xTensor = std::make_shared<TensorAttributes>();
@@ -750,7 +750,7 @@ TEST(ConvolutionFwdNodeTests, GatherHipdnnTensorIds)
     EXPECT_TRUE(usedIds.contains(3));
 }
 
-TEST(ConvolutionFwdNodeTests, PopulateHipdnnTensorIds)
+TEST(TestConvolutionNode, PopulateHipdnnTensorIds)
 {
     ConvFpropAttributes convAttributes;
     convAttributes.set_x(std::make_shared<TensorAttributes>());
@@ -794,7 +794,7 @@ TEST(ConvolutionFwdNodeTests, PopulateHipdnnTensorIds)
     }
 }
 
-TEST(ConvolutionFwdNodeTests, StrideInferenceWithLargeKernel5x5)
+TEST(TestConvolutionNode, StrideInferenceWithLargeKernel5x5)
 {
     ConvFpropAttributes convAttributes;
 
@@ -838,7 +838,7 @@ TEST(ConvolutionFwdNodeTests, StrideInferenceWithLargeKernel5x5)
     EXPECT_EQ(inferredStrides[3], 1); // W stride: 1
 }
 
-TEST(ConvolutionFwdNodeTests, StrideInferenceWithAsymmetricPadding)
+TEST(TestConvolutionNode, StrideInferenceWithAsymmetricPadding)
 {
     ConvFpropAttributes convAttributes;
 
@@ -882,7 +882,7 @@ TEST(ConvolutionFwdNodeTests, StrideInferenceWithAsymmetricPadding)
     EXPECT_EQ(inferredStrides[3], 1); // W stride: 1
 }
 
-TEST(ConvolutionFwdNodeTests, StrideInferenceWithDilation2x2)
+TEST(TestConvolutionNode, StrideInferenceWithDilation2x2)
 {
     ConvFpropAttributes convAttributes;
 
@@ -927,7 +927,7 @@ TEST(ConvolutionFwdNodeTests, StrideInferenceWithDilation2x2)
     EXPECT_EQ(inferredStrides[3], 1); // W stride: 1
 }
 
-TEST(ConvolutionFwdNodeTests, StrideInferenceWithStride3x3AndLargeKernel)
+TEST(TestConvolutionNode, StrideInferenceWithStride3x3AndLargeKernel)
 {
     ConvFpropAttributes convAttributes;
 
@@ -971,7 +971,7 @@ TEST(ConvolutionFwdNodeTests, StrideInferenceWithStride3x3AndLargeKernel)
     EXPECT_EQ(inferredStrides[3], 1); // W stride: 1
 }
 
-TEST(ConvolutionFwdNodeTests, StrideInferenceWith1x1ConvolutionNoPadding)
+TEST(TestConvolutionNode, StrideInferenceWith1x1ConvolutionNoPadding)
 {
     ConvFpropAttributes convAttributes;
 
@@ -1015,7 +1015,7 @@ TEST(ConvolutionFwdNodeTests, StrideInferenceWith1x1ConvolutionNoPadding)
     EXPECT_EQ(inferredStrides[3], 1); // W stride: 1
 }
 
-TEST(ConvolutionFwdNodeTests, StrideInference3DConvolutionWithDilation)
+TEST(TestConvolutionNode, StrideInference3DConvolutionWithDilation)
 {
     ConvFpropAttributes convAttributes;
 
@@ -1061,7 +1061,7 @@ TEST(ConvolutionFwdNodeTests, StrideInference3DConvolutionWithDilation)
     EXPECT_EQ(inferredStrides[4], 1); // W stride: 1
 }
 
-TEST(ConvolutionFwdNodeTests, StrideInferenceWithNHWCLayoutAndComplexParams)
+TEST(TestConvolutionNode, StrideInferenceWithNhwcLayoutAndComplexParams)
 {
     ConvFpropAttributes convAttributes;
 
@@ -1110,7 +1110,7 @@ TEST(ConvolutionFwdNodeTests, StrideInferenceWithNHWCLayoutAndComplexParams)
     EXPECT_EQ(inferredStrides[3], 56); // W stride: 56
 }
 
-TEST(ConvolutionFwdNodeTests, StrideInferenceDepthwiseConvolution)
+TEST(TestConvolutionNode, StrideInferenceDepthwiseConvolution)
 {
     ConvFpropAttributes convAttributes;
 
@@ -1154,7 +1154,7 @@ TEST(ConvolutionFwdNodeTests, StrideInferenceDepthwiseConvolution)
     EXPECT_EQ(inferredStrides[3], 1); // W stride: 1
 }
 
-TEST(ConvolutionFwdNodeTests, PreValidateTensorDimsEmpty)
+TEST(TestConvolutionNode, PreValidateTensorDimsEmpty)
 {
     ConvFpropAttributes convAttributes;
 
@@ -1182,7 +1182,7 @@ TEST(ConvolutionFwdNodeTests, PreValidateTensorDimsEmpty)
     EXPECT_EQ(error.code, error_code_t::INVALID_VALUE);
 }
 
-TEST(ConvolutionFwdNodeTests, PreValidateTensorDimsTooFew)
+TEST(TestConvolutionNode, PreValidateTensorDimsTooFew)
 {
     ConvFpropAttributes convAttributes;
 
@@ -1211,7 +1211,7 @@ TEST(ConvolutionFwdNodeTests, PreValidateTensorDimsTooFew)
     EXPECT_EQ(error.code, error_code_t::INVALID_VALUE);
 }
 
-TEST(ConvolutionFwdNodeTests, PreValidateStrideMismatchInput)
+TEST(TestConvolutionNode, PreValidateStrideMismatchInput)
 {
     ConvFpropAttributes convAttributes;
 
@@ -1241,7 +1241,7 @@ TEST(ConvolutionFwdNodeTests, PreValidateStrideMismatchInput)
     EXPECT_EQ(error.code, error_code_t::INVALID_VALUE);
 }
 
-TEST(ConvolutionFwdNodeTests, PreValidateWeightDimsMismatch)
+TEST(TestConvolutionNode, PreValidateWeightDimsMismatch)
 {
     ConvFpropAttributes convAttributes;
 
@@ -1271,7 +1271,7 @@ TEST(ConvolutionFwdNodeTests, PreValidateWeightDimsMismatch)
     EXPECT_EQ(error.code, error_code_t::INVALID_VALUE);
 }
 
-TEST(ConvolutionFwdNodeTests, PreValidateOutputStridesWithoutDims)
+TEST(TestConvolutionNode, PreValidateOutputStridesWithoutDims)
 {
     ConvFpropAttributes convAttributes;
 
@@ -1302,7 +1302,7 @@ TEST(ConvolutionFwdNodeTests, PreValidateOutputStridesWithoutDims)
     EXPECT_EQ(error.code, error_code_t::INVALID_VALUE);
 }
 
-TEST(ConvolutionFwdNodeTests, PreValidateSpatialParamMismatch)
+TEST(TestConvolutionNode, PreValidateSpatialParamMismatch)
 {
     ConvFpropAttributes convAttributes;
 
@@ -1332,7 +1332,7 @@ TEST(ConvolutionFwdNodeTests, PreValidateSpatialParamMismatch)
     EXPECT_EQ(error.code, error_code_t::INVALID_VALUE);
 }
 
-TEST(ConvolutionFwdNodeTests, PreValidateGroupedConvInputChannelNotDivisible)
+TEST(TestConvolutionNode, PreValidateGroupedConvInputChannelNotDivisible)
 {
     ConvFpropAttributes convAttributes;
 
@@ -1361,7 +1361,7 @@ TEST(ConvolutionFwdNodeTests, PreValidateGroupedConvInputChannelNotDivisible)
     EXPECT_EQ(error.code, error_code_t::INVALID_VALUE);
 }
 
-TEST(ConvolutionFwdNodeTests, PreValidateGroupedConvOutputChannelNotDivisible)
+TEST(TestConvolutionNode, PreValidateGroupedConvOutputChannelNotDivisible)
 {
     ConvFpropAttributes convAttributes;
 
@@ -1391,7 +1391,7 @@ TEST(ConvolutionFwdNodeTests, PreValidateGroupedConvOutputChannelNotDivisible)
     EXPECT_EQ(error.code, error_code_t::INVALID_VALUE);
 }
 
-TEST(ConvolutionFwdNodeTests, InferPropertiesGroupedConv2Groups)
+TEST(TestConvolutionNode, InferPropertiesGroupedConv2Groups)
 {
     ConvFpropAttributes convAttributes;
 
@@ -1435,7 +1435,7 @@ TEST(ConvolutionFwdNodeTests, InferPropertiesGroupedConv2Groups)
     EXPECT_EQ(inferredStrides[3], 1); // W stride 1
 }
 
-TEST(ConvolutionFwdNodeTests, InferPropertiesGroupedConv4Groups)
+TEST(TestConvolutionNode, InferPropertiesGroupedConv4Groups)
 {
     ConvFpropAttributes convAttributes;
 
@@ -1479,7 +1479,7 @@ TEST(ConvolutionFwdNodeTests, InferPropertiesGroupedConv4Groups)
     EXPECT_EQ(inferredStrides[3], 1); // W stride
 }
 
-TEST(ConvolutionFwdNodeTests, InferPropertiesGroupedConvWithStride)
+TEST(TestConvolutionNode, InferPropertiesGroupedConvWithStride)
 {
     ConvFpropAttributes convAttributes;
 
@@ -1523,7 +1523,7 @@ TEST(ConvolutionFwdNodeTests, InferPropertiesGroupedConvWithStride)
     EXPECT_EQ(inferredStrides[3], 1); // W stride
 }
 
-TEST(ConvolutionFwdNodeTests, InferPropertiesGroupedConvNHWCLayout)
+TEST(TestConvolutionNode, InferPropertiesGroupedConvNhwcLayout)
 {
     ConvFpropAttributes convAttributes;
 
@@ -1568,7 +1568,7 @@ TEST(ConvolutionFwdNodeTests, InferPropertiesGroupedConvNHWCLayout)
     EXPECT_GT(inferredStrides[3], inferredStrides[1]); // W > C
 }
 
-TEST(ConvolutionFwdNodeTests, InferPropertiesGroupedConv3D)
+TEST(TestConvolutionNode, InferPropertiesGroupedConv3D)
 {
     ConvFpropAttributes convAttributes;
 
@@ -1614,7 +1614,7 @@ TEST(ConvolutionFwdNodeTests, InferPropertiesGroupedConv3D)
     EXPECT_EQ(inferredStrides[4], 1); // W stride: 1
 }
 
-TEST(ConvolutionFwdNodeTests, InferPropertiesGroupedConv3DNHWCLayout)
+TEST(TestConvolutionNode, InferPropertiesGroupedConv3DNhwcLayout)
 {
     ConvFpropAttributes convAttributes;
 
@@ -1661,7 +1661,7 @@ TEST(ConvolutionFwdNodeTests, InferPropertiesGroupedConv3DNHWCLayout)
     EXPECT_GT(inferredStrides[4], inferredStrides[1]); // W > C
 }
 
-TEST(ConvolutionFwdNodeTests, PreValidateOutputDimsMismatchBatch)
+TEST(TestConvolutionNode, PreValidateOutputDimsMismatchBatch)
 {
     ConvFpropAttributes convAttributes;
 
@@ -1691,7 +1691,7 @@ TEST(ConvolutionFwdNodeTests, PreValidateOutputDimsMismatchBatch)
     EXPECT_EQ(error.code, error_code_t::INVALID_VALUE);
 }
 
-TEST(ConvolutionFwdNodeTests, PreValidateOutputDimsWrongCount)
+TEST(TestConvolutionNode, PreValidateOutputDimsWrongCount)
 {
     ConvFpropAttributes convAttributes;
 
@@ -1721,7 +1721,7 @@ TEST(ConvolutionFwdNodeTests, PreValidateOutputDimsWrongCount)
     EXPECT_EQ(error.code, error_code_t::INVALID_VALUE);
 }
 
-TEST(ConvolutionFwdNodeTests, InferPropertiesNodeNegativeStrideValues)
+TEST(TestConvolutionNode, InferPropertiesNodeNegativeStrideValues)
 {
     ConvFpropAttributes convAttributes;
 
@@ -1749,7 +1749,7 @@ TEST(ConvolutionFwdNodeTests, InferPropertiesNodeNegativeStrideValues)
     EXPECT_EQ(error.code, error_code_t::INVALID_VALUE);
 }
 
-TEST(ConvolutionFwdNodeTests, InferPropertiesNodeNegativeDilationValues)
+TEST(TestConvolutionNode, InferPropertiesNodeNegativeDilationValues)
 {
     ConvFpropAttributes convAttributes;
 
@@ -1777,7 +1777,7 @@ TEST(ConvolutionFwdNodeTests, InferPropertiesNodeNegativeDilationValues)
     EXPECT_EQ(error.code, error_code_t::INVALID_VALUE);
 }
 
-TEST(ConvolutionFwdNodeTests, InferPropertiesNodeNegativePrePaddingValues)
+TEST(TestConvolutionNode, InferPropertiesNodeNegativePrePaddingValues)
 {
     ConvFpropAttributes convAttributes;
 
@@ -1805,7 +1805,7 @@ TEST(ConvolutionFwdNodeTests, InferPropertiesNodeNegativePrePaddingValues)
     EXPECT_EQ(error.code, error_code_t::INVALID_VALUE);
 }
 
-TEST(ConvolutionFwdNodeTests, InferPropertiesNodeNegativePostPaddingValues)
+TEST(TestConvolutionNode, InferPropertiesNodeNegativePostPaddingValues)
 {
     ConvFpropAttributes convAttributes;
 
@@ -1833,7 +1833,7 @@ TEST(ConvolutionFwdNodeTests, InferPropertiesNodeNegativePostPaddingValues)
     EXPECT_EQ(error.code, error_code_t::INVALID_VALUE);
 }
 
-TEST(ConvolutionFwdNodeTests, PreValidateNodeNegativePrePadding)
+TEST(TestConvolutionNode, PreValidateNodeNegativePrePadding)
 {
     ConvFpropAttributes convAttributes;
 
@@ -1862,7 +1862,7 @@ TEST(ConvolutionFwdNodeTests, PreValidateNodeNegativePrePadding)
     EXPECT_EQ(error.code, error_code_t::INVALID_VALUE);
 }
 
-TEST(ConvolutionFwdNodeTests, PreValidateNodeNegativePostPadding)
+TEST(TestConvolutionNode, PreValidateNodeNegativePostPadding)
 {
     ConvFpropAttributes convAttributes;
 
@@ -1891,7 +1891,7 @@ TEST(ConvolutionFwdNodeTests, PreValidateNodeNegativePostPadding)
     EXPECT_EQ(error.code, error_code_t::INVALID_VALUE);
 }
 
-TEST(ConvolutionFwdNodeTests, PreValidateNodeZeroStride)
+TEST(TestConvolutionNode, PreValidateNodeZeroStride)
 {
     ConvFpropAttributes convAttributes;
 
@@ -1920,7 +1920,7 @@ TEST(ConvolutionFwdNodeTests, PreValidateNodeZeroStride)
     EXPECT_EQ(error.code, error_code_t::INVALID_VALUE);
 }
 
-TEST(ConvolutionFwdNodeTests, PreValidateNodeNegativeStride)
+TEST(TestConvolutionNode, PreValidateNodeNegativeStride)
 {
     ConvFpropAttributes convAttributes;
 
@@ -1949,7 +1949,7 @@ TEST(ConvolutionFwdNodeTests, PreValidateNodeNegativeStride)
     EXPECT_EQ(error.code, error_code_t::INVALID_VALUE);
 }
 
-TEST(ConvolutionFwdNodeTests, PreValidateNodeZeroDilation)
+TEST(TestConvolutionNode, PreValidateNodeZeroDilation)
 {
     ConvFpropAttributes convAttributes;
 
@@ -1978,7 +1978,7 @@ TEST(ConvolutionFwdNodeTests, PreValidateNodeZeroDilation)
     EXPECT_EQ(error.code, error_code_t::INVALID_VALUE);
 }
 
-TEST(ConvolutionFwdNodeTests, PreValidateNodeNegativeDilation)
+TEST(TestConvolutionNode, PreValidateNodeNegativeDilation)
 {
     ConvFpropAttributes convAttributes;
 
@@ -2007,7 +2007,7 @@ TEST(ConvolutionFwdNodeTests, PreValidateNodeNegativeDilation)
     EXPECT_EQ(error.code, error_code_t::INVALID_VALUE);
 }
 
-TEST(ConvolutionFwdNodeTests, PreValidateNodeBoundaryValueZeroPadding)
+TEST(TestConvolutionNode, PreValidateNodeBoundaryValueZeroPadding)
 {
     ConvFpropAttributes convAttributes;
 
@@ -2037,7 +2037,7 @@ TEST(ConvolutionFwdNodeTests, PreValidateNodeBoundaryValueZeroPadding)
     EXPECT_EQ(error.code, error_code_t::OK) << error.err_msg;
 }
 
-TEST(ConvolutionFwdNodeTests, PreValidateNodeZeroInputDimension)
+TEST(TestConvolutionNode, PreValidateNodeZeroInputDimension)
 {
     ConvFpropAttributes convAttributes;
 
@@ -2066,7 +2066,7 @@ TEST(ConvolutionFwdNodeTests, PreValidateNodeZeroInputDimension)
     EXPECT_EQ(error.code, error_code_t::INVALID_VALUE);
 }
 
-TEST(ConvolutionFwdNodeTests, PreValidateNodeNegativeInputDimension)
+TEST(TestConvolutionNode, PreValidateNodeNegativeInputDimension)
 {
     ConvFpropAttributes convAttributes;
 
@@ -2095,7 +2095,7 @@ TEST(ConvolutionFwdNodeTests, PreValidateNodeNegativeInputDimension)
     EXPECT_EQ(error.code, error_code_t::INVALID_VALUE);
 }
 
-TEST(ConvolutionFwdNodeTests, PreValidateNodeZeroInputStride)
+TEST(TestConvolutionNode, PreValidateNodeZeroInputStride)
 {
     ConvFpropAttributes convAttributes;
 
@@ -2124,7 +2124,7 @@ TEST(ConvolutionFwdNodeTests, PreValidateNodeZeroInputStride)
     EXPECT_EQ(error.code, error_code_t::INVALID_VALUE);
 }
 
-TEST(ConvolutionFwdNodeTests, PreValidateNodeNegativeInputStride)
+TEST(TestConvolutionNode, PreValidateNodeNegativeInputStride)
 {
     ConvFpropAttributes convAttributes;
 
@@ -2153,7 +2153,7 @@ TEST(ConvolutionFwdNodeTests, PreValidateNodeNegativeInputStride)
     EXPECT_EQ(error.code, error_code_t::INVALID_VALUE);
 }
 
-TEST(ConvolutionFwdNodeTests, PreValidateNodeZeroWeightDimension)
+TEST(TestConvolutionNode, PreValidateNodeZeroWeightDimension)
 {
     ConvFpropAttributes convAttributes;
 
@@ -2182,7 +2182,7 @@ TEST(ConvolutionFwdNodeTests, PreValidateNodeZeroWeightDimension)
     EXPECT_EQ(error.code, error_code_t::INVALID_VALUE);
 }
 
-TEST(ConvolutionFwdNodeTests, PreValidateNodeZeroWeightInputChannels)
+TEST(TestConvolutionNode, PreValidateNodeZeroWeightInputChannels)
 {
     ConvFpropAttributes convAttributes;
 
@@ -2211,7 +2211,7 @@ TEST(ConvolutionFwdNodeTests, PreValidateNodeZeroWeightInputChannels)
     EXPECT_EQ(error.code, error_code_t::INVALID_VALUE);
 }
 
-TEST(ConvolutionFwdNodeTests, PreValidateNodeNegativeWeightDimension)
+TEST(TestConvolutionNode, PreValidateNodeNegativeWeightDimension)
 {
     ConvFpropAttributes convAttributes;
 
@@ -2240,7 +2240,7 @@ TEST(ConvolutionFwdNodeTests, PreValidateNodeNegativeWeightDimension)
     EXPECT_EQ(error.code, error_code_t::INVALID_VALUE);
 }
 
-TEST(ConvolutionFwdNodeTests, PreValidateNodeZeroWeightStride)
+TEST(TestConvolutionNode, PreValidateNodeZeroWeightStride)
 {
     ConvFpropAttributes convAttributes;
 
@@ -2269,7 +2269,7 @@ TEST(ConvolutionFwdNodeTests, PreValidateNodeZeroWeightStride)
     EXPECT_EQ(error.code, error_code_t::INVALID_VALUE);
 }
 
-TEST(ConvolutionFwdNodeTests, PreValidateNodeNegativeWeightStride)
+TEST(TestConvolutionNode, PreValidateNodeNegativeWeightStride)
 {
     ConvFpropAttributes convAttributes;
 
@@ -2298,7 +2298,7 @@ TEST(ConvolutionFwdNodeTests, PreValidateNodeNegativeWeightStride)
     EXPECT_EQ(error.code, error_code_t::INVALID_VALUE);
 }
 
-TEST(ConvolutionFwdNodeTests, PreValidateNodeZeroOutputDimension)
+TEST(TestConvolutionNode, PreValidateNodeZeroOutputDimension)
 {
     ConvFpropAttributes convAttributes;
 
@@ -2328,7 +2328,7 @@ TEST(ConvolutionFwdNodeTests, PreValidateNodeZeroOutputDimension)
     EXPECT_EQ(error.code, error_code_t::INVALID_VALUE);
 }
 
-TEST(ConvolutionFwdNodeTests, PreValidateNodeNegativeOutputDimension)
+TEST(TestConvolutionNode, PreValidateNodeNegativeOutputDimension)
 {
     ConvFpropAttributes convAttributes;
 
@@ -2358,7 +2358,7 @@ TEST(ConvolutionFwdNodeTests, PreValidateNodeNegativeOutputDimension)
     EXPECT_EQ(error.code, error_code_t::INVALID_VALUE);
 }
 
-TEST(ConvolutionFwdNodeTests, PreValidateNodeZeroOutputStride)
+TEST(TestConvolutionNode, PreValidateNodeZeroOutputStride)
 {
     ConvFpropAttributes convAttributes;
 
@@ -2389,7 +2389,7 @@ TEST(ConvolutionFwdNodeTests, PreValidateNodeZeroOutputStride)
     EXPECT_EQ(error.code, error_code_t::INVALID_VALUE);
 }
 
-TEST(ConvolutionFwdNodeTests, PreValidateNodeNegativeOutputStride)
+TEST(TestConvolutionNode, PreValidateNodeNegativeOutputStride)
 {
     ConvFpropAttributes convAttributes;
 
@@ -2420,7 +2420,7 @@ TEST(ConvolutionFwdNodeTests, PreValidateNodeNegativeOutputStride)
     EXPECT_EQ(error.code, error_code_t::INVALID_VALUE);
 }
 
-TEST(ConvolutionFwdNodeTests, PreValidateGroupedConvInvalidOutputChannels)
+TEST(TestConvolutionNode, PreValidateGroupedConvInvalidOutputChannels)
 {
     ConvFpropAttributes convAttributes;
 

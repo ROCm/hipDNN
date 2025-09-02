@@ -8,7 +8,7 @@
 #include <HipdnnStatus.h>
 #include <hipdnn_frontend/backend/BackendLoggingHelpers.hpp>
 
-TEST(BackendLoggingHelpersTest, ToString_AllStatusValues)
+TEST(TestBackendLoggingHelpers, ToStringAllStatusValues)
 {
     EXPECT_STREQ(toString(HIPDNN_STATUS_SUCCESS), "HIPDNN_STATUS_SUCCESS");
     EXPECT_STREQ(toString(HIPDNN_STATUS_NOT_INITIALIZED), "HIPDNN_STATUS_NOT_INITIALIZED");
@@ -35,7 +35,7 @@ TEST(BackendLoggingHelpersTest, ToString_AllStatusValues)
     EXPECT_STREQ(toString(static_cast<hipdnnStatus_t>(-1)), "HIPDNN_STATUS_UNKNOWN");
 }
 
-TEST(BackendLoggingHelpersTest, OstreamOperator)
+TEST(TestBackendLoggingHelpers, OstreamOperator)
 {
     std::ostringstream oss;
     oss << HIPDNN_STATUS_SUCCESS;
@@ -50,7 +50,7 @@ TEST(BackendLoggingHelpersTest, OstreamOperator)
     EXPECT_EQ(oss.str(), "HIPDNN_STATUS_UNKNOWN");
 }
 
-TEST(BackendLoggingHelpersTest, FmtFormatter)
+TEST(TestBackendLoggingHelpers, FmtFormatter)
 {
     EXPECT_EQ(fmt::format("{}", HIPDNN_STATUS_SUCCESS), "HIPDNN_STATUS_SUCCESS");
     EXPECT_EQ(fmt::format("{}", HIPDNN_STATUS_BAD_PARAM), "HIPDNN_STATUS_BAD_PARAM");
