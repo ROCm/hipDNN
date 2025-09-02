@@ -12,7 +12,7 @@
 using namespace ::testing;
 using namespace hipdnn_backend;
 
-TEST(BackendDescriptorTest, PackAndUnpackDescriptorWorks)
+TEST(TestBackendDescriptor, PackAndUnpackDescriptorWorks)
 {
     auto mockPtr = std::make_shared<MockDescriptor<EngineDescriptor>>();
 
@@ -25,7 +25,7 @@ TEST(BackendDescriptorTest, PackAndUnpackDescriptorWorks)
     ASSERT_EQ(unpacked->getType(), HIPDNN_BACKEND_ENGINE_DESCRIPTOR);
 }
 
-TEST(BackendDescriptorTest, AsDescriptorCastsCorrectly)
+TEST(TestBackendDescriptor, AsDescriptorCastsCorrectly)
 {
     auto mockPtr = std::make_shared<MockDescriptor<EngineDescriptor>>();
     ScopedDescriptor packed(HipdnnBackendDescriptor::packDescriptor(mockPtr));
@@ -34,7 +34,7 @@ TEST(BackendDescriptorTest, AsDescriptorCastsCorrectly)
     ASSERT_EQ(result.get(), mockPtr.get());
 }
 
-TEST(BackendDescriptorTest, UnpackDescriptorFromArrayWorks)
+TEST(TestBackendDescriptor, UnpackDescriptorFromArrayWorks)
 {
     auto mockPtr = std::make_shared<MockDescriptor<EngineDescriptor>>();
     ScopedDescriptor packed(HipdnnBackendDescriptor::packDescriptor(mockPtr));
@@ -45,7 +45,7 @@ TEST(BackendDescriptorTest, UnpackDescriptorFromArrayWorks)
     ASSERT_EQ(unpacked.get(), mockPtr.get());
 }
 
-TEST(BackendDescriptorTest, PackDescriptorToArrayWorks)
+TEST(TestBackendDescriptor, PackDescriptorToArrayWorks)
 {
     auto mockPtr = std::make_shared<MockDescriptor<EngineDescriptor>>();
     hipdnnBackendDescriptor_t desc = nullptr;
@@ -56,7 +56,7 @@ TEST(BackendDescriptorTest, PackDescriptorToArrayWorks)
     ASSERT_NE(desc, nullptr);
 }
 
-TEST(BackendDescriptorTest, UnpackDescriptorThrowsOnNullDescriptor)
+TEST(TestBackendDescriptor, UnpackDescriptorThrowsOnNullDescriptor)
 {
     EXPECT_THROW(
         {
@@ -68,7 +68,7 @@ TEST(BackendDescriptorTest, UnpackDescriptorThrowsOnNullDescriptor)
         HipdnnException);
 }
 
-TEST(BackendDescriptorTest, UnpackDescriptorThrowsOnNullPrivateDescriptor)
+TEST(TestBackendDescriptor, UnpackDescriptorThrowsOnNullPrivateDescriptor)
 {
     ScopedDescriptor packed(new HipdnnBackendDescriptor());
 
@@ -80,7 +80,7 @@ TEST(BackendDescriptorTest, UnpackDescriptorThrowsOnNullPrivateDescriptor)
         HipdnnException);
 }
 
-TEST(BackendDescriptorTest, UnpackDescriptorFromArrayThrowsOnNullArray)
+TEST(TestBackendDescriptor, UnpackDescriptorFromArrayThrowsOnNullArray)
 {
     EXPECT_THROW(
         {
