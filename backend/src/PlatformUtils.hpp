@@ -9,6 +9,7 @@
 
 #ifdef _WIN32
 
+#define NOMINMAX
 #include <windows.h>
 
 namespace hipdnn_backend::platform_utils

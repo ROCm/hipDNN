@@ -1,6 +1,8 @@
 // Copyright © Advanced Micro Devices, Inc., or its affiliates.
 // SPDX-License-Identifier:  MIT
 
+#define HIPDNN_PLUGIN_STATIC_DEFINE
+
 #include "TestUtil.hpp"
 #include "descriptors/BackendDescriptor.hpp"
 #include "hipdnn_backend.h"
