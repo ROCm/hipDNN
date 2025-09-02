@@ -10,8 +10,6 @@ from pathlib import Path
 from typing import List, Tuple, Dict, Any, Optional
 
 class TestNameValidator:
-    """Validates test names against hipDNN naming conventions."""
-    
     def __init__(self):
         self.valid_patterns = [
             # Standard: TestSuiteName.TestCaseName
@@ -22,15 +20,11 @@ class TestNameValidator:
         
         # Controlled keywords
         self.keywords = {
-            'test_types': ['Integration'], # Add more based on our needs
+            'test_types': ['Test', 'Integration'],
             'gpu': ['Gpu'],
-            # Made all datatypes use their abbreviations for consistency, but this many not align with the actual names.
-            # I think this is a promising option, but can change if it's not desirable.
             'datatypes': ['Bfp16', 'Fp16', 'Fp32', 'Fp64'],
             'shapes': ['Nhwc', 'Nchw', 'Ndhwc', 'Ncdhw']
         }
-
-        # Could store their intended location too
         
         self.valid_keywords = [kw for sublist in self.keywords.values() for kw in sublist]
 
@@ -42,14 +36,15 @@ class TestNameValidator:
             {'regex': re.compile(r'^[^.]+$'), 'message': "Test name missing separator '.' between suite and test case"}
         ]
 
-        # Rules specific to the test case part
+        # Rules specific to the test case
         self.case_rules = [
             {'regex': re.compile(r'^[a-z]'), 'message': "Test case name should start with an uppercase letter (PascalCase)"},
             {'validator': self._check_case_for_keywords, 'message': "Test case name should not contain keywords that belong in the suite name"}
         ]
 
-        # Additional rules for test suite structure
+        # Rules specific to the test suite
         self.suite_rules = [
+            {'regex': re.compile(r'^[^A-Z]'), 'message': "Test suite name should start with an uppercase letter (PascalCase)"},
             {
                 'validator': self._validate_suite_structure,
                 'message': "Test suite name structure validation"
@@ -73,26 +68,28 @@ class TestNameValidator:
         """
         issues = []
         
-        # Build regex parts from keywords
-        integration_part = f"({'|'.join(self.keywords['test_types'])})?"
+        prefix_part = f"({'|'.join(self.keywords['test_types'])})?"
         gpu_part = f"({self.keywords['gpu'][0]})?"
-        # Feature part is anything between the prefix and suffix and not a keyword we are looking for
         feature_part = r"[A-Z][a-zA-Z0-9]*"
         shapes_part = f"({'|'.join(self.keywords['shapes'])})?"
         datatypes_part = f"({'|'.join(self.keywords['datatypes'])})?"
 
-        # ^(Integration|...)?(Gpu)?[A-Z][a-zA-Z0-9]*?(Nhwc|...)?(Bfp16|...)?$
         structure_regex = re.compile(
-            f"^{integration_part}{gpu_part}{feature_part}{shapes_part}{datatypes_part}$"
+            f"^{prefix_part}{gpu_part}{feature_part}{shapes_part}{datatypes_part}$"
         )
-
-        match = structure_regex.match(suite_name)
 
         if not structure_regex.match(suite_name):
             issues.append("Suite name does not follow the structure: [Integration][Gpu]FeatureName[Shape][Datatype]")
         
-        if self.keywords['gpu'][0] in suite_name and not suite_name.startswith(self.keywords['gpu'][0]) and not suite_name.startswith(self.keywords['test_types'][0] + self.keywords['gpu'][0]):
-             issues.append("'Gpu' must be at the start of the suite name or after 'Integration'")
+        if 'Gpu' in suite_name:
+            valid_position = suite_name.startswith('Gpu')
+            for test_type in self.keywords['test_types']:
+                if suite_name.startswith(test_type + 'Gpu'):
+                    valid_position = True
+                    break
+            
+            if not valid_position:
+                issues.append("'Gpu' must be at the start of the suite name or immediately after a test type keyword")
 
         return issues
 
@@ -116,20 +113,18 @@ class TestNameValidator:
         """
         issues = []
         
-        # Apply general issue rules
         for rule in self.general_rules:
             if rule['regex'].search(test_name) and ('validator' not in rule or rule['validator'](test_name)):
                 issues.append(rule['message'])
 
         for keyword in self.valid_keywords:
-            # Check capitalization
             matches = re.findall(re.escape(keyword), test_name, re.IGNORECASE)
+            
+            # Check capitalization
             for match in matches:
                 if match != keyword:
                     issues.append(f"Keyword '{match}' should be capitalized as '{keyword}'")
-
-            # pattern = re.compile(re.escape(keyword), re.IGNORECASE)
-            # matches = pattern.findall(test_name)
+            
             # Check duplicates
             if len(matches) > 1:
                 issues.append(f"Keyword '{keyword}' appears more than once.")
@@ -138,10 +133,12 @@ class TestNameValidator:
         if parsed_name:
             suite_name, case_name = parsed_name
 
-            # Validate suite
-            if not re.match(r'^[A-Z]', suite_name):
-                issues.append("Test suite name should start with an uppercase letter (PascalCase)")
-            issues.extend(self._validate_suite_structure(suite_name))
+            # Validate suite using suite_rules
+            for rule in self.suite_rules:
+                if 'regex' in rule and rule['regex'].search(suite_name):
+                    issues.append(rule['message'])
+                if 'validator' in rule:
+                    issues.extend(rule['validator'](suite_name))
 
             # Validate case
             for rule in self.case_rules:
@@ -157,10 +154,6 @@ class TestNameValidator:
         
         return (is_valid and len(issues) == 0, issues)
 
-        # matches_pattern = any(pattern.match(test_name) for pattern in self.valid_patterns)
-        # is_valid = matches_pattern and len(issues) == 0
-        # return (is_valid, issues)
-    
     def extract_test_names_from_ctest_json(self, json_path: Path) -> List[str]:
         """Extract test names from CTest JSON output."""
         try:
@@ -186,8 +179,6 @@ class TestNameValidator:
 
 
 def parse_args() -> argparse.Namespace:
-    """Parse command line arguments."""
-
     parser = argparse.ArgumentParser(
         description='Validate test names against hipDNN rules'
     )
@@ -224,7 +215,6 @@ def parse_args() -> argparse.Namespace:
 
 
 def main() -> int:
-
     args = parse_args()
 
     validator = TestNameValidator()
@@ -275,17 +265,17 @@ def main() -> int:
         print("  - No underscores anywhere (gtest reserves _ for future use)")
         print("  - No spaces, special characters, or leading numbers")
         print("\nKeyword Capitalization:")
-        print("  - Integration, Gpu, Bfp16, Fp16, Float, Nhwc, Nchw")
+        print("  - Integration, Gpu, Bfp16, Fp16, Fp32, Fp64, Nhwc, Nchw, Ndhwc, Ncdhw")
         print("  - All variants must use exact capitalization shown above")
         print("\nTest Suite Naming Structure:")
         print("  - Order: [Integration][Gpu]FeatureName[Shape][Datatype]")
         print("  - Integration tests: must start with 'Integration'")
         print("  - GPU tests: must include 'Gpu' (first, or after Integration)")
-        print("  - Datatypes: Bfp16, Fp16, Fp32 (at the end)")
-        print("  - Shapes: Nhwc, Nchw (optional, only appear once in entire name)")
+        print("  - Datatypes: Bfp16, Fp16, Fp32, Fp64 (at the end)")
+        print("  - Shapes: Nhwc, Nchw, Ndhwc, Ncdhw (optional, only appear once in entire name)")
         print("\nExamples:")
         print("  - GpuBatchNorm.Forward")
-        print("  - IntegrationGpuConvolutionNchwFloat.BackpropData")
+        print("  - IntegrationGpuConvolutionNchwFp32.BackpropData")
         print("  - MemoryPool.Allocate")
         
     return 1 if args.strict else 0
