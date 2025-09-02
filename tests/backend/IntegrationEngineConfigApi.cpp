@@ -7,7 +7,7 @@
 
 #include <gtest/gtest.h>
 
-class EngineConfigApiTests : public ::testing::Test
+class IntegrationEngineConfigApi : public ::testing::Test
 {
 protected:
     hipdnnBackendDescriptor_t _engineConfig;
@@ -49,7 +49,7 @@ protected:
     }
 };
 
-TEST_F(EngineConfigApiTests, SetEngineConfigEngine)
+TEST_F(IntegrationEngineConfigApi, SetEngineConfigEngine)
 {
     int64_t gidx = hipdnn_tests::plugin_constants::engineId<GoodPlugin>();
 
@@ -69,7 +69,7 @@ TEST_F(EngineConfigApiTests, SetEngineConfigEngine)
               HIPDNN_STATUS_SUCCESS);
 }
 
-TEST_F(EngineConfigApiTests, FinalizeEngineConfig)
+TEST_F(IntegrationEngineConfigApi, Finalize)
 {
     int64_t gidx = hipdnn_tests::plugin_constants::engineId<GoodPlugin>();
 
@@ -78,7 +78,7 @@ TEST_F(EngineConfigApiTests, FinalizeEngineConfig)
     EXPECT_EQ(hipdnnBackendFinalize(_engineConfig), HIPDNN_STATUS_SUCCESS);
 }
 
-TEST_F(EngineConfigApiTests, GetMaxWorkspaceSizeFromEngineConfig)
+TEST_F(IntegrationEngineConfigApi, GetMaxWorkspaceSize)
 {
     int64_t gidx = hipdnn_tests::plugin_constants::engineId<GoodPlugin>();
     int64_t maxWorkspaceSize = 0;

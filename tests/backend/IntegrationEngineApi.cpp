@@ -8,7 +8,7 @@
 
 #include <gtest/gtest.h>
 
-class EngineApiTests : public ::testing::Test
+class IntegrationEngineApi : public ::testing::Test
 {
 protected:
     hipdnnBackendDescriptor_t _engine;
@@ -44,7 +44,7 @@ protected:
     }
 };
 
-TEST_F(EngineApiTests, SetEngineGraph)
+TEST_F(IntegrationEngineApi, SetEngineOperationGraph)
 {
     EXPECT_EQ(hipdnnBackendSetAttribute(_engine,
                                         HIPDNN_ATTR_ENGINE_OPERATION_GRAPH,
@@ -63,7 +63,7 @@ TEST_F(EngineApiTests, SetEngineGraph)
               HIPDNN_STATUS_SUCCESS);
 }
 
-TEST_F(EngineApiTests, SetEngineGlobalIndex)
+TEST_F(IntegrationEngineApi, SetEngineGlobalIndex)
 {
     int64_t gidx = hipdnn_tests::plugin_constants::engineId<GoodPlugin>();
 
@@ -76,14 +76,14 @@ TEST_F(EngineApiTests, SetEngineGlobalIndex)
               HIPDNN_STATUS_SUCCESS);
 }
 
-TEST_F(EngineApiTests, SetEngineAttrNotSupported)
+TEST_F(IntegrationEngineApi, SetAttrNotSupported)
 {
     EXPECT_EQ(hipdnnBackendSetAttribute(
                   _engine, HIPDNN_ATTR_EXECUTION_PLAN_HANDLE, HIPDNN_TYPE_HANDLE, 1, nullptr),
               HIPDNN_STATUS_NOT_SUPPORTED);
 }
 
-TEST_F(EngineApiTests, SetEngineAttrAlreadyFinalized)
+TEST_F(IntegrationEngineApi, SetAttrEngineAlreadyFinalized)
 {
     int64_t gidx = hipdnn_tests::plugin_constants::engineId<GoodPlugin>();
 
@@ -93,7 +93,7 @@ TEST_F(EngineApiTests, SetEngineAttrAlreadyFinalized)
               HIPDNN_STATUS_NOT_INITIALIZED);
 }
 
-TEST_F(EngineApiTests, FinalizeEngine)
+TEST_F(IntegrationEngineApi, Finalize)
 {
     int64_t gidx = hipdnn_tests::plugin_constants::engineId<GoodPlugin>();
 
@@ -102,7 +102,7 @@ TEST_F(EngineApiTests, FinalizeEngine)
     EXPECT_EQ(hipdnnBackendFinalize(_engine), HIPDNN_STATUS_SUCCESS);
 }
 
-TEST_F(EngineApiTests, GetEngineGraph)
+TEST_F(IntegrationEngineApi, GetEngineOperationGraph)
 {
     hipdnnBackendDescriptor_t graph = nullptr;
     int64_t gidx = hipdnn_tests::plugin_constants::engineId<GoodPlugin>();
@@ -120,7 +120,7 @@ TEST_F(EngineApiTests, GetEngineGraph)
     hipdnnBackendDestroyDescriptor(graph);
 }
 
-TEST_F(EngineApiTests, GetEngineGlobalIndex)
+TEST_F(IntegrationEngineApi, GetEngineGlobalIndex)
 {
     int64_t gidx = hipdnn_tests::plugin_constants::engineId<GoodPlugin>();
     int64_t gidxOut;
