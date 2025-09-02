@@ -3,9 +3,13 @@
 
 #pragma once
 
+#include <hipdnn_sdk/data_objects/tensor_attributes_generated.h>
 #include <hipdnn_sdk/plugin/PluginException.hpp>
 #include <hipdnn_sdk/plugin/PluginFlatbufferTypeHelpers.hpp>
 #include <miopen/miopen.h>
+#include <unordered_map>
+
+#include "MiopenTensor.hpp"
 
 #define LOG_ON_MIOPEN_FAILURE(status)                                                    \
     do                                                                                   \
@@ -38,6 +42,10 @@ hipdnnPluginDeviceBuffer_t findDeviceBuffer(int64_t uid,
                                             uint32_t numDeviceBuffers);
 
 miopenDataType_t tensorDataTypeToMiopenDataType(const hipdnn_sdk::data_objects::DataType& dataType);
+
+MiopenTensor createTensor(
+    const std::unordered_map<int64_t, const hipdnn_sdk::data_objects::TensorAttributes*>& tensorMap,
+    int64_t uid);
 
 }
 

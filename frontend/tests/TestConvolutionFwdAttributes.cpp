@@ -3,7 +3,7 @@
 #include <gtest/gtest.h>
 #include <hipdnn_frontend/attributes/ConvolutionFwdAttributes.hpp>
 
-TEST(ConvolutionFwdAttributesTests, CreateConvolutionFwdAttributes)
+TEST(TestConvolutionFwdAttributes, CreateConvolutionFwdAttributes)
 {
     hipdnn_frontend::graph::ConvFpropAttributes convAttributes;
 
@@ -71,7 +71,7 @@ TEST(ConvolutionFwdAttributesTests, CreateConvolutionFwdAttributes)
               hipdnn_frontend::ConvolutionMode_t::CROSS_CORRELATION);
 }
 
-TEST(ConvolutionFwdAttributesTests, PackAttributes)
+TEST(TestConvolutionFwdAttributes, PackAttributes)
 {
     hipdnn_frontend::graph::ConvFpropAttributes convAttributes;
 
@@ -129,7 +129,7 @@ TEST(ConvolutionFwdAttributesTests, PackAttributes)
     EXPECT_EQ(convAttributesFb->conv_mode(), hipdnn_sdk::data_objects::ConvMode_CROSS_CORRELATION);
 }
 
-TEST(ConvolutionFwdAttributesTests, DefaultValues)
+TEST(TestConvolutionFwdAttributes, DefaultValues)
 {
     hipdnn_frontend::graph::ConvFpropAttributes convAttributes;
 
@@ -149,7 +149,7 @@ TEST(ConvolutionFwdAttributesTests, DefaultValues)
     EXPECT_EQ(convAttributes.get_y(), nullptr);
 }
 
-TEST(ConvolutionFwdAttributesTests, SetPrePaddingWithMove)
+TEST(TestConvolutionFwdAttributes, SetPrePaddingWithMove)
 {
     hipdnn_frontend::graph::ConvFpropAttributes convAttributes;
 
@@ -159,7 +159,7 @@ TEST(ConvolutionFwdAttributesTests, SetPrePaddingWithMove)
     EXPECT_EQ(convAttributes.get_pre_padding(), (std::vector<int64_t>{3, 3}));
 }
 
-TEST(ConvolutionFwdAttributesTests, SetPostPaddingWithMove)
+TEST(TestConvolutionFwdAttributes, SetPostPaddingWithMove)
 {
     hipdnn_frontend::graph::ConvFpropAttributes convAttributes;
 
@@ -169,7 +169,7 @@ TEST(ConvolutionFwdAttributesTests, SetPostPaddingWithMove)
     EXPECT_EQ(convAttributes.get_post_padding(), (std::vector<int64_t>{4, 4}));
 }
 
-TEST(ConvolutionFwdAttributesTests, SetStrideWithMove)
+TEST(TestConvolutionFwdAttributes, SetStrideWithMove)
 {
     hipdnn_frontend::graph::ConvFpropAttributes convAttributes;
 
@@ -179,7 +179,7 @@ TEST(ConvolutionFwdAttributesTests, SetStrideWithMove)
     EXPECT_EQ(convAttributes.get_stride(), (std::vector<int64_t>{2, 2}));
 }
 
-TEST(ConvolutionFwdAttributesTests, SetDilationWithMove)
+TEST(TestConvolutionFwdAttributes, SetDilationWithMove)
 {
     hipdnn_frontend::graph::ConvFpropAttributes convAttributes;
 
@@ -189,7 +189,7 @@ TEST(ConvolutionFwdAttributesTests, SetDilationWithMove)
     EXPECT_EQ(convAttributes.get_dilation(), (std::vector<int64_t>{2, 2}));
 }
 
-TEST(ConvolutionFwdAttributesTests, SetPaddingBothPreAndPost)
+TEST(TestConvolutionFwdAttributes, SetPaddingBothPreAndPost)
 {
     hipdnn_frontend::graph::ConvFpropAttributes convAttributes;
 
@@ -201,7 +201,7 @@ TEST(ConvolutionFwdAttributesTests, SetPaddingBothPreAndPost)
     EXPECT_EQ(convAttributes.get_post_padding(), (std::vector<int64_t>{5, 5}));
 }
 
-TEST(ConvolutionFwdAttributesTests, SetXMove)
+TEST(TestConvolutionFwdAttributes, SetXMove)
 {
     hipdnn_frontend::graph::ConvFpropAttributes convAttributes;
 
@@ -225,7 +225,7 @@ TEST(ConvolutionFwdAttributesTests, SetXMove)
     EXPECT_EQ(retrievedTensor.get(), rawPtr);
 }
 
-TEST(ConvolutionFwdAttributesTests, SetWMove)
+TEST(TestConvolutionFwdAttributes, SetWMove)
 {
     hipdnn_frontend::graph::ConvFpropAttributes convAttributes;
 
@@ -249,7 +249,7 @@ TEST(ConvolutionFwdAttributesTests, SetWMove)
     EXPECT_EQ(retrievedTensor.get(), rawPtr);
 }
 
-TEST(ConvolutionFwdAttributesTests, SetYWithMove)
+TEST(TestConvolutionFwdAttributes, SetYWithMove)
 {
     hipdnn_frontend::graph::ConvFpropAttributes convAttributes;
 
@@ -273,7 +273,7 @@ TEST(ConvolutionFwdAttributesTests, SetYWithMove)
     EXPECT_EQ(retrievedTensor.get(), rawPtr);
 }
 
-TEST(ConvolutionFwdAttributesTests, SetTensorsConstRef)
+TEST(TestConvolutionFwdAttributes, SetTensorsConstRef)
 {
     hipdnn_frontend::graph::ConvFpropAttributes convAttributes;
 
