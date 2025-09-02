@@ -11,7 +11,7 @@
 namespace test_operations_common
 {
 
-using namespace hipdnn_sdk::reference_test_utilities;
+using namespace hipdnn_sdk::test_utilities;
 
 struct Batchnorm2dTestCase
 {

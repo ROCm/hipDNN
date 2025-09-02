@@ -18,7 +18,7 @@
 #include "HipdnnEnginePluginHandle.hpp"
 #include "common/TestOperationsCommon.hpp"
 
-using namespace hipdnn_sdk::reference_test_utilities;
+using namespace hipdnn_sdk::test_utilities;
 using namespace test_operations_common;
 
 class BatchnormBwdExecuteGraphTest : public ::testing::TestWithParam<Batchnorm2dTestCase>
