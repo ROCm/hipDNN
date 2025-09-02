@@ -10,10 +10,10 @@
 
 #include "descriptors/BackendDescriptor.hpp"
 #include "descriptors/DescriptorFactory.hpp"
+#include "descriptors/DescriptorTestUtils.hpp"
 #include "descriptors/ExecutionPlanDescriptor.hpp"
 #include "descriptors/FlatbufferTestUtils.hpp"
 #include "descriptors/GraphDescriptor.hpp"
-#include "descriptors/TestDescriptorUtils.hpp"
 #include "descriptors/TestMacros.hpp"
 #include "descriptors/VariantDescriptor.hpp"
 #include "descriptors/mocks/MockDescriptor.hpp"
