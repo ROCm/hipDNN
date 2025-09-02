@@ -9,7 +9,7 @@
 using namespace hipdnn_frontend;
 using namespace hipdnn_frontend::graph;
 
-TEST(TensorAttributesTests, DefaultConstructor)
+TEST(TestTensorAttributes, DefaultConstructor)
 {
     TensorAttributes tensor;
     EXPECT_EQ(tensor.get_uid(), 0);
@@ -22,7 +22,7 @@ TEST(TensorAttributesTests, DefaultConstructor)
     EXPECT_FALSE(tensor.has_uid());
 }
 
-TEST(TensorAttributesTests, SetAndGetUid)
+TEST(TestTensorAttributes, SetAndGetUid)
 {
     TensorAttributes tensor;
     tensor.set_uid(42);
@@ -34,28 +34,28 @@ TEST(TensorAttributesTests, SetAndGetUid)
     EXPECT_FALSE(tensor.has_uid());
 }
 
-TEST(TensorAttributesTests, SetAndGetName)
+TEST(TestTensorAttributes, SetAndGetName)
 {
     TensorAttributes tensor;
     tensor.set_name("TestTensor");
     EXPECT_EQ(tensor.get_name(), "TestTensor");
 }
 
-TEST(TensorAttributesTests, SetAndGetDataType)
+TEST(TestTensorAttributes, SetAndGetDataType)
 {
     TensorAttributes tensor;
     tensor.set_data_type(DataType_t::FLOAT);
     EXPECT_EQ(tensor.get_data_type(), DataType_t::FLOAT);
 }
 
-TEST(TensorAttributesTests, SetAndGetStride)
+TEST(TestTensorAttributes, SetAndGetStride)
 {
     TensorAttributes tensor;
     tensor.set_stride({1, 2, 3});
     EXPECT_EQ(tensor.get_stride(), std::vector<int64_t>({1, 2, 3}));
 }
 
-TEST(TensorAttributesTests, SetAndGetDim)
+TEST(TestTensorAttributes, SetAndGetDim)
 {
     TensorAttributes tensor;
     tensor.set_dim({4, 5, 6});
@@ -63,7 +63,7 @@ TEST(TensorAttributesTests, SetAndGetDim)
     EXPECT_EQ(tensor.get_volume(), 4 * 5 * 6);
 }
 
-TEST(TensorAttributesTests, SetAndGetIsVirtual)
+TEST(TestTensorAttributes, SetAndGetIsVirtual)
 {
     TensorAttributes tensor;
     tensor.set_is_virtual(true);
@@ -73,7 +73,7 @@ TEST(TensorAttributesTests, SetAndGetIsVirtual)
     EXPECT_FALSE(tensor.get_is_virtual());
 }
 
-TEST(TensorAttributesTests, SetOutput)
+TEST(TestTensorAttributes, SetOutput)
 {
     TensorAttributes tensor;
     tensor.set_output(true);
@@ -83,7 +83,7 @@ TEST(TensorAttributesTests, SetOutput)
     EXPECT_TRUE(tensor.get_is_virtual());
 }
 
-TEST(TensorAttributesTests, SetFromGraphAttributes)
+TEST(TestTensorAttributes, SetFromGraphAttributes)
 {
     GraphAttributes graphAttributes;
     graphAttributes.set_io_data_type(DataType_t::FLOAT);
@@ -98,7 +98,7 @@ TEST(TensorAttributesTests, SetFromGraphAttributes)
     EXPECT_EQ(tensor.get_data_type(), DataType_t::HALF);
 }
 
-TEST(TensorAttributesTests, PackAttributes)
+TEST(TestTensorAttributes, PackAttributes)
 {
     TensorAttributes tensor;
     tensor.set_uid(1)
@@ -126,7 +126,7 @@ TEST(TensorAttributesTests, PackAttributes)
     EXPECT_TRUE(unpacked->virtual_);
 }
 
-TEST(TensorAttributesTests, ValidateDimsAndStridesSetAndPositiveValidCase)
+TEST(TestTensorAttributes, ValidateDimsAndStridesSetAndPositiveValidCase)
 {
     TensorAttributes tensor;
     tensor.set_dim({4, 5, 6});
@@ -134,14 +134,14 @@ TEST(TensorAttributesTests, ValidateDimsAndStridesSetAndPositiveValidCase)
     EXPECT_TRUE(tensor.validate_dims_and_strides_set_and_positive());
 }
 
-TEST(TensorAttributesTests, ValidateDimsAndStridesSetAndPositiveEmptyDims)
+TEST(TestTensorAttributes, ValidateDimsAndStridesSetAndPositiveEmptyDims)
 {
     TensorAttributes tensor;
     // No dimensions set
     EXPECT_FALSE(tensor.validate_dims_and_strides_set_and_positive());
 }
 
-TEST(TensorAttributesTests, ValidateDimsAndStridesSetAndPositiveZeroDimension)
+TEST(TestTensorAttributes, ValidateDimsAndStridesSetAndPositiveZeroDimension)
 {
     TensorAttributes tensor;
     tensor.set_dim({4, 0, 6}); // Zero in middle dimension
@@ -149,7 +149,7 @@ TEST(TensorAttributesTests, ValidateDimsAndStridesSetAndPositiveZeroDimension)
     EXPECT_FALSE(tensor.validate_dims_and_strides_set_and_positive());
 }
 
-TEST(TensorAttributesTests, ValidateDimsAndStridesSetAndPositiveNegativeDimension)
+TEST(TestTensorAttributes, ValidateDimsAndStridesSetAndPositiveNegativeDimension)
 {
     TensorAttributes tensor;
     tensor.set_dim({4, -5, 6}); // Negative dimension
@@ -157,7 +157,7 @@ TEST(TensorAttributesTests, ValidateDimsAndStridesSetAndPositiveNegativeDimensio
     EXPECT_FALSE(tensor.validate_dims_and_strides_set_and_positive());
 }
 
-TEST(TensorAttributesTests, ValidateDimsAndStridesSetAndPositiveZeroStride)
+TEST(TestTensorAttributes, ValidateDimsAndStridesSetAndPositiveZeroStride)
 {
     TensorAttributes tensor;
     tensor.set_dim({4, 5, 6});
@@ -165,7 +165,7 @@ TEST(TensorAttributesTests, ValidateDimsAndStridesSetAndPositiveZeroStride)
     EXPECT_FALSE(tensor.validate_dims_and_strides_set_and_positive());
 }
 
-TEST(TensorAttributesTests, ValidateDimsAndStridesSetAndPositiveNegativeStride)
+TEST(TestTensorAttributes, ValidateDimsAndStridesSetAndPositiveNegativeStride)
 {
     TensorAttributes tensor;
     tensor.set_dim({4, 5, 6});
@@ -173,7 +173,7 @@ TEST(TensorAttributesTests, ValidateDimsAndStridesSetAndPositiveNegativeStride)
     EXPECT_FALSE(tensor.validate_dims_and_strides_set_and_positive());
 }
 
-TEST(TensorAttributesTests, ValidateDimsAndStridesSetAndPositiveStrideSizeMismatch)
+TEST(TestTensorAttributes, ValidateDimsAndStridesSetAndPositiveStrideSizeMismatch)
 {
     TensorAttributes tensor;
     tensor.set_dim({4, 5, 6});
@@ -181,7 +181,7 @@ TEST(TensorAttributesTests, ValidateDimsAndStridesSetAndPositiveStrideSizeMismat
     EXPECT_FALSE(tensor.validate_dims_and_strides_set_and_positive());
 }
 
-TEST(TensorAttributesTests, ValidateDimsAndStridesSetAndPositiveMoreStridesThanDims)
+TEST(TestTensorAttributes, ValidateDimsAndStridesSetAndPositiveMoreStridesThanDims)
 {
     TensorAttributes tensor;
     tensor.set_dim({4, 5});
@@ -189,7 +189,7 @@ TEST(TensorAttributesTests, ValidateDimsAndStridesSetAndPositiveMoreStridesThanD
     EXPECT_FALSE(tensor.validate_dims_and_strides_set_and_positive());
 }
 
-TEST(TensorAttributesTests, ValidateDimsAndStridesSetAndPositiveAllZeroDims)
+TEST(TestTensorAttributes, ValidateDimsAndStridesSetAndPositiveAllZeroDims)
 {
     TensorAttributes tensor;
     tensor.set_dim({0, 0, 0});
@@ -197,7 +197,7 @@ TEST(TensorAttributesTests, ValidateDimsAndStridesSetAndPositiveAllZeroDims)
     EXPECT_FALSE(tensor.validate_dims_and_strides_set_and_positive());
 }
 
-TEST(TensorAttributesTests, ValidateDimsAndStridesSetAndPositiveAllNegativeDims)
+TEST(TestTensorAttributes, ValidateDimsAndStridesSetAndPositiveAllNegativeDims)
 {
     TensorAttributes tensor;
     tensor.set_dim({-1, -2, -3});
@@ -205,7 +205,7 @@ TEST(TensorAttributesTests, ValidateDimsAndStridesSetAndPositiveAllNegativeDims)
     EXPECT_FALSE(tensor.validate_dims_and_strides_set_and_positive());
 }
 
-TEST(TensorAttributesTests, ValidateDimsAndStridesSetAndPositiveMixedInvalidValues)
+TEST(TestTensorAttributes, ValidateDimsAndStridesSetAndPositiveMixedInvalidValues)
 {
     TensorAttributes tensor;
     tensor.set_dim({4, 0, -6}); // Mix of valid, zero, and negative
@@ -213,7 +213,7 @@ TEST(TensorAttributesTests, ValidateDimsAndStridesSetAndPositiveMixedInvalidValu
     EXPECT_FALSE(tensor.validate_dims_and_strides_set_and_positive());
 }
 
-TEST(TensorAttributesTests, ValidateDimsAndStridesSetAndPositiveSingleDimension)
+TEST(TestTensorAttributes, ValidateDimsAndStridesSetAndPositiveSingleDimension)
 {
     TensorAttributes tensor;
     tensor.set_dim({10});
@@ -221,7 +221,7 @@ TEST(TensorAttributesTests, ValidateDimsAndStridesSetAndPositiveSingleDimension)
     EXPECT_TRUE(tensor.validate_dims_and_strides_set_and_positive());
 }
 
-TEST(TensorAttributesTests, ValidateDimsAndStridesSetAndPositiveSingleZeroDimension)
+TEST(TestTensorAttributes, ValidateDimsAndStridesSetAndPositiveSingleZeroDimension)
 {
     TensorAttributes tensor;
     tensor.set_dim({0});
@@ -229,7 +229,7 @@ TEST(TensorAttributesTests, ValidateDimsAndStridesSetAndPositiveSingleZeroDimens
     EXPECT_FALSE(tensor.validate_dims_and_strides_set_and_positive());
 }
 
-TEST(TensorAttributesTests, ValidateDimsAndStridesSetAndPositiveLargeDimensions)
+TEST(TestTensorAttributes, ValidateDimsAndStridesSetAndPositiveLargeDimensions)
 {
     TensorAttributes tensor;
     tensor.set_dim({1024, 2048, 4096});
@@ -237,7 +237,7 @@ TEST(TensorAttributesTests, ValidateDimsAndStridesSetAndPositiveLargeDimensions)
     EXPECT_TRUE(tensor.validate_dims_and_strides_set_and_positive());
 }
 
-TEST(TensorAttributesTests, ValidateDimsAndStridesSetAndPositive5DValidCase)
+TEST(TestTensorAttributes, ValidateDimsAndStridesSetAndPositive5DValidCase)
 {
     TensorAttributes tensor;
     tensor.set_dim({2, 3, 4, 5, 6});
@@ -245,84 +245,84 @@ TEST(TensorAttributesTests, ValidateDimsAndStridesSetAndPositive5DValidCase)
     EXPECT_TRUE(tensor.validate_dims_and_strides_set_and_positive());
 }
 
-TEST(TensorAttributesTests, ValidateDimsSetAndPositiveValidCase)
+TEST(TestTensorAttributes, ValidateDimsSetAndPositiveValidCase)
 {
     TensorAttributes tensor;
     tensor.set_dim({4, 5, 6});
     EXPECT_TRUE(tensor.validate_dims_set_and_positive());
 }
 
-TEST(TensorAttributesTests, ValidateDimsSetAndPositiveEmptyDims)
+TEST(TestTensorAttributes, ValidateDimsSetAndPositiveEmptyDims)
 {
     TensorAttributes tensor;
     // No dimensions set
     EXPECT_FALSE(tensor.validate_dims_set_and_positive());
 }
 
-TEST(TensorAttributesTests, ValidateDimsSetAndPositiveZeroDimension)
+TEST(TestTensorAttributes, ValidateDimsSetAndPositiveZeroDimension)
 {
     TensorAttributes tensor;
     tensor.set_dim({4, 0, 6}); // Zero in middle dimension
     EXPECT_FALSE(tensor.validate_dims_set_and_positive());
 }
 
-TEST(TensorAttributesTests, ValidateDimsSetAndPositiveNegativeDimension)
+TEST(TestTensorAttributes, ValidateDimsSetAndPositiveNegativeDimension)
 {
     TensorAttributes tensor;
     tensor.set_dim({4, -5, 6}); // Negative dimension
     EXPECT_FALSE(tensor.validate_dims_set_and_positive());
 }
 
-TEST(TensorAttributesTests, ValidateDimsSetAndPositiveAllZeroDims)
+TEST(TestTensorAttributes, ValidateDimsSetAndPositiveAllZeroDims)
 {
     TensorAttributes tensor;
     tensor.set_dim({0, 0, 0});
     EXPECT_FALSE(tensor.validate_dims_set_and_positive());
 }
 
-TEST(TensorAttributesTests, ValidateDimsSetAndPositiveAllNegativeDims)
+TEST(TestTensorAttributes, ValidateDimsSetAndPositiveAllNegativeDims)
 {
     TensorAttributes tensor;
     tensor.set_dim({-1, -2, -3});
     EXPECT_FALSE(tensor.validate_dims_set_and_positive());
 }
 
-TEST(TensorAttributesTests, ValidateDimsSetAndPositiveMixedInvalidValues)
+TEST(TestTensorAttributes, ValidateDimsSetAndPositiveMixedInvalidValues)
 {
     TensorAttributes tensor;
     tensor.set_dim({4, 0, -6}); // Mix of valid, zero, and negative
     EXPECT_FALSE(tensor.validate_dims_set_and_positive());
 }
 
-TEST(TensorAttributesTests, ValidateDimsSetAndPositiveSingleDimension)
+TEST(TestTensorAttributes, ValidateDimsSetAndPositiveSingleDimension)
 {
     TensorAttributes tensor;
     tensor.set_dim({10});
     EXPECT_TRUE(tensor.validate_dims_set_and_positive());
 }
 
-TEST(TensorAttributesTests, ValidateDimsSetAndPositiveSingleZeroDimension)
+TEST(TestTensorAttributes, ValidateDimsSetAndPositiveSingleZeroDimension)
 {
     TensorAttributes tensor;
     tensor.set_dim({0});
     EXPECT_FALSE(tensor.validate_dims_set_and_positive());
 }
 
-TEST(TensorAttributesTests, ValidateDimsSetAndPositiveLargeDimensions)
+TEST(TestTensorAttributes, ValidateDimsSetAndPositiveLargeDimensions)
 {
     TensorAttributes tensor;
     tensor.set_dim({1024, 2048, 4096});
     EXPECT_TRUE(tensor.validate_dims_set_and_positive());
 }
 
-TEST(TensorAttributesTests, ValidateDimsSetAndPositive5DValidCase)
+TEST(TestTensorAttributes, ValidateDimsSetAndPositive5DValidCase)
 {
     TensorAttributes tensor;
     tensor.set_dim({2, 3, 4, 5, 6});
     EXPECT_TRUE(tensor.validate_dims_set_and_positive());
 }
 
-TEST(TensorAttributesTests, ValidateDimsSetAndPositiveWithStridesIgnored)
+TEST(TestTensorAttributes, ValidateDimsSetAndPositiveWithStridesIgnored)
 {
     TensorAttributes tensor;
     tensor.set_dim({4, 5, 6});

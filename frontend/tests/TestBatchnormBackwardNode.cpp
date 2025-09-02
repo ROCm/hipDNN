@@ -8,7 +8,7 @@
 using namespace hipdnn_frontend;
 using namespace hipdnn_frontend::graph;
 
-TEST(DBNNodeTests, PreValidateNode)
+TEST(TestBatchnormBackwardNode, PreValidateNode)
 {
     BatchnormBackwardAttributes batchnormAttributes;
     batchnormAttributes.set_dy(std::make_shared<TensorAttributes>());
@@ -25,7 +25,7 @@ TEST(DBNNodeTests, PreValidateNode)
     EXPECT_EQ(error.code, error_code_t::OK);
 }
 
-TEST(DBNNodeTests, PreValidateNodeMissingValues)
+TEST(TestBatchnormBackwardNode, PreValidateNodeMissingValues)
 {
     BatchnormBackwardAttributes batchnormAttributes;
 
@@ -78,7 +78,7 @@ TEST(DBNNodeTests, PreValidateNodeMissingValues)
     EXPECT_EQ(error.code, error_code_t::OK);
 }
 
-TEST(DBNNodeTests, InferPropertiesNode)
+TEST(TestBatchnormBackwardNode, InferPropertiesNode)
 {
     BatchnormBackwardAttributes batchnormAttributes;
     batchnormAttributes.set_dy(std::make_shared<TensorAttributes>());
@@ -122,7 +122,7 @@ TEST(DBNNodeTests, InferPropertiesNode)
     EXPECT_EQ(dbiasTensor->get_stride(), (std::vector<int64_t>{2, 1, 2, 2}));
 }
 
-TEST(DBNNodeTests, GatherhipdnnTensorIds)
+TEST(TestBatchnormBackwardNode, GatherHipdnnTensorIds)
 {
     BatchnormBackwardAttributes batchnormAttributes;
     batchnormAttributes.set_dy(std::make_shared<TensorAttributes>());
@@ -152,7 +152,7 @@ TEST(DBNNodeTests, GatherhipdnnTensorIds)
     EXPECT_TRUE(usedIds.contains(10));
 }
 
-TEST(DBNNodeTests, PopulatehipdnnTensorIds)
+TEST(TestBatchnormBackwardNode, PopulateHipdnnTensorIds)
 {
     BatchnormBackwardAttributes batchnormAttributes;
     batchnormAttributes.set_dy(std::make_shared<TensorAttributes>());
@@ -212,7 +212,7 @@ TEST(DBNNodeTests, PopulatehipdnnTensorIds)
     }
 }
 
-TEST(DBNNodeTests, PackNode)
+TEST(TestBatchnormBackwardNode, PackNode)
 {
     BatchnormBackwardAttributes batchnormAttributes;
     batchnormAttributes.name = "BatchnormBackward";
@@ -311,7 +311,7 @@ TEST(DBNNodeTests, PackNode)
     EXPECT_EQ(packedAttributes->dbias_tensor_uid(), dbiasTensor->get_uid());
 }
 
-TEST(DBNNodeTests, PackNodeWithoutMeanAndInvVariance)
+TEST(TestBatchnormBackwardNode, PackNodeWithoutMeanAndInvVariance)
 {
     BatchnormBackwardAttributes batchnormAttributes;
     batchnormAttributes.name = "BatchnormBackward";

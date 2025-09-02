@@ -22,6 +22,30 @@ MiopenTensor::MiopenTensor(const hipdnn_sdk::data_objects::TensorAttributes& ten
                                   reinterpret_cast<int*>(strides.data())));
 }
 
+MiopenTensor::MiopenTensor(MiopenTensor&& other) noexcept
+    : _uid(other._uid)
+    , _descriptor(other._descriptor)
+{
+    other._descriptor = nullptr;
+}
+
+MiopenTensor& MiopenTensor::operator=(MiopenTensor&& other) noexcept
+{
+    if(this != &other)
+    {
+        if(_descriptor != nullptr)
+        {
+            LOG_ON_MIOPEN_FAILURE(miopenDestroyTensorDescriptor(_descriptor));
+        }
+
+        _uid = other._uid;
+        _descriptor = other._descriptor;
+
+        other._descriptor = nullptr;
+    }
+    return *this;
+}
+
 MiopenTensor::~MiopenTensor()
 {
     if(_descriptor != nullptr)

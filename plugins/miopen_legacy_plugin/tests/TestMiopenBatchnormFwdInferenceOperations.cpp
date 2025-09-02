@@ -55,20 +55,28 @@ TEST_P(TestGpuBatchnormFwdInferExecuteGraph, Fp32Nchw)
         testCase, hipdnn_sdk::data_objects::DataType::DataType_FLOAT, 1e-6f, TensorLayout::NCHW);
 }
 
-TEST_F(TestGpuBatchnormFwdInferExecuteGraph, Bfp16Nchw)
+TEST_P(TestGpuBatchnormFwdInferExecuteGraph, Bfp16Nchw)
 {
-    auto testCase = Batchnorm2dTestCase{.n = 1, .c = 3, .h = 14, .w = 14};
+    auto testCase = GetParam();
     runFwdBatchnormGraph<hip_bfloat16, float>(testCase,
                                               hipdnn_sdk::data_objects::DataType::DataType_BFLOAT16,
                                               1e-2_bf,
                                               TensorLayout::NCHW);
 }
 
-TEST_F(TestGpuBatchnormFwdInferExecuteGraph, Fp16Nchw)
+TEST_P(TestGpuBatchnormFwdInferExecuteGraph, Fp16Nchw)
 {
-    auto testCase = Batchnorm2dTestCase{.n = 1, .c = 3, .h = 14, .w = 14};
+    auto testCase = GetParam();
     runFwdBatchnormGraph<half, float>(
         testCase, hipdnn_sdk::data_objects::DataType::DataType_HALF, 1e-2_h, TensorLayout::NCHW);
+}
+
+// TODO: Re-enable when double support is added to MIOpen plugin
+TEST_P(TestGpuBatchnormFwdInferExecuteGraph, DISABLED_Fp64Nchw)
+{
+    auto testCase = GetParam();
+    runFwdBatchnormGraph<double, double>(
+        testCase, hipdnn_sdk::data_objects::DataType::DataType_DOUBLE, 1e-6, TensorLayout::NCHW);
 }
 
 TEST_P(TestGpuBatchnormFwdInferExecuteGraph, Fp32Nhwc)
@@ -78,29 +86,29 @@ TEST_P(TestGpuBatchnormFwdInferExecuteGraph, Fp32Nhwc)
         testCase, hipdnn_sdk::data_objects::DataType::DataType_FLOAT, 1e-6f, TensorLayout::NHWC);
 }
 
-TEST_F(TestGpuBatchnormFwdInferExecuteGraph, Bfp16Nhwc)
+TEST_P(TestGpuBatchnormFwdInferExecuteGraph, Bfp16Nhwc)
 {
-    auto testCase = Batchnorm2dTestCase{.n = 1, .c = 3, .h = 14, .w = 14};
+    auto testCase = GetParam();
     runFwdBatchnormGraph<hip_bfloat16, float>(testCase,
                                               hipdnn_sdk::data_objects::DataType::DataType_BFLOAT16,
                                               1e-2_bf,
                                               TensorLayout::NHWC);
 }
 
-TEST_F(TestGpuBatchnormFwdInferExecuteGraph, Fp16Nhwc)
+TEST_P(TestGpuBatchnormFwdInferExecuteGraph, Fp16Nhwc)
 {
-    auto testCase = Batchnorm2dTestCase{.n = 1, .c = 3, .h = 14, .w = 14};
+    auto testCase = GetParam();
     runFwdBatchnormGraph<half, float>(
         testCase, hipdnn_sdk::data_objects::DataType::DataType_HALF, 1e-2_h, TensorLayout::NHWC);
 }
 
 // TODO: Re-enable when double support is added to MIOpen plugin
-// TEST_F(BatchnormFwdInferExecuteGraphTest, RunDoubleFwdBatchnormGraph)
-// {
-//     auto testCase = Batchnorm2dTestCase{.n = 1, .c = 3, .h = 14, .w = 14};
-//     runFwdBatchnormGraph<double, double>(
-//         testCase, hipdnn_sdk::data_objects::DataType::DataType_DOUBLE, 1e-6);
-// }
+TEST_P(TestGpuBatchnormFwdInferExecuteGraph, DISABLED_Fp64Nhwc)
+{
+    auto testCase = GetParam();
+    runFwdBatchnormGraph<double, double>(
+        testCase, hipdnn_sdk::data_objects::DataType::DataType_DOUBLE, 1e-6, TensorLayout::NHWC);
+}
 
 template <typename InputType, typename IntermediateType>
 void TestGpuBatchnormFwdInferExecuteGraph::runFwdBatchnormGraph(
