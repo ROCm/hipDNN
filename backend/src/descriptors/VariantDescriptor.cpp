@@ -2,7 +2,6 @@
 // SPDX-License-Identifier:  MIT
 
 #include "VariantDescriptor.hpp"
-#include "Error.hpp"
 #include "FlatbufferUtilities.hpp"
 #include "HipdnnBackendDescriptorType.h"
 #include "HipdnnException.hpp"

@@ -100,18 +100,16 @@ protected:
         ASSERT_EQ(hipInit(0), hipSuccess);
         ASSERT_EQ(hipGetDevice(&_deviceId), hipSuccess);
 
-        //Note: The plugin paths has to be set before we create the hipdnn handle.
+        // Note: The plugin paths has to be set before we create the hipdnn handle.
         const std::array<const char*, 1> paths = {PLUGIN_DIR};
         ASSERT_EQ(hipdnnSetEnginePluginPaths_ext(
                       paths.size(), paths.data(), HIPDNN_PLUGIN_LOADING_ABSOLUTE),
                   HIPDNN_STATUS_SUCCESS);
 
-        // Create handle
+        // Create handle and stream
         ASSERT_EQ(hipdnnCreate(&_handle), HIPDNN_STATUS_SUCCESS);
-
-        //todo: bring back stream support once MigratableMemory supports it
-        //ASSERT_EQ(hipStreamCreate(&stream), hipSuccess);
-        //ASSERT_EQ(hipdnnSetStream(handle, stream), HIPDNN_STATUS_SUCCESS);
+        ASSERT_EQ(hipStreamCreate(&_stream), hipSuccess);
+        ASSERT_EQ(hipdnnSetStream(_handle, _stream), HIPDNN_STATUS_SUCCESS);
     }
 
     void TearDown() override
@@ -226,7 +224,7 @@ protected:
                                                                           *biasTensorAttr,
                                                                           graphTensorBundle);
 
-        result = graph->execute(_handle, variantPack, nullptr);
+        result = graph->execute(_handle, variantPack, _stream);
         ASSERT_EQ(result.code, error_code_t::OK) << result.err_msg;
     }
 
@@ -285,16 +283,13 @@ std::vector<Batchnorm2dTestCase> getBnFwdInferenceTestCases()
 {
     return {
         {.n = 1, .c = 3, .h = 14, .w = 14},
-        {.n = 2, .c = 3, .h = 14, .w = 14},
-        {.n = 64, .c = 3, .h = 14, .w = 14},
-        {.n = 64, .c = 256, .h = 14, .w = 14},
-        {.n = 64, .c = 256, .h = 28, .w = 28},
-        {.n = 64, .c = 256, .h = 56, .w = 56},
-        {.n = 64, .c = 512, .h = 14, .w = 14},
-        {.n = 64, .c = 512, .h = 28, .w = 28},
-        {.n = 64, .c = 512, .h = 7, .w = 7},
+        {.n = 1, .c = 256, .h = 1, .w = 1},
+        {.n = 2, .c = 3, .h = 1, .w = 1},
+        {.n = 32, .c = 1, .h = 14, .w = 14},
+        {.n = 32, .c = 3, .h = 1, .w = 14},
+        {.n = 32, .c = 3, .h = 14, .w = 1},
         {.n = 64, .c = 64, .h = 112, .w = 112},
-        {.n = 64, .c = 64, .h = 56, .w = 56},
+        {.n = 64, .c = 512, .h = 14, .w = 14},
     };
 }
 
@@ -352,4 +347,34 @@ TEST_P(BatchnormForwardInferenceIntegrationTestNhwc, RunFloatFwdBatchnormGraphNH
 // Consider using fewer/smaller test cases to reduce test time
 INSTANTIATE_TEST_SUITE_P(RunFloatFwdBatchnormGraphNHWC,
                          BatchnormForwardInferenceIntegrationTestNhwc,
+                         testing::ValuesIn(getBnFwdInferenceTestCases()));
+
+class BatchnormForwardInferenceIntegrationTestBfloat16Nhwc
+    : public BatchnormForwardInferenceIntegrationTest
+{
+};
+
+TEST_P(BatchnormForwardInferenceIntegrationTestBfloat16Nhwc, RunBfloat16FwdBatchnormGraphNHWC)
+{
+    Batchnorm2dTestCase testCase = GetParam();
+    runBatchnormTest<hip_bfloat16, float>(testCase, 1e-2_bf, TensorLayout::NHWC);
+}
+
+INSTANTIATE_TEST_SUITE_P(RunBfloat16FwdBatchnormGraphNHWC,
+                         BatchnormForwardInferenceIntegrationTestBfloat16Nhwc,
+                         testing::ValuesIn(getBnFwdInferenceTestCases()));
+
+class BatchnormForwardInferenceIntegrationTestHalfNhwc
+    : public BatchnormForwardInferenceIntegrationTest
+{
+};
+
+TEST_P(BatchnormForwardInferenceIntegrationTestHalfNhwc, RunHalfFwdBatchnormGraphNHWC)
+{
+    Batchnorm2dTestCase testCase = GetParam();
+    runBatchnormTest<half, float>(testCase, 1e-2_h, TensorLayout::NHWC);
+}
+
+INSTANTIATE_TEST_SUITE_P(RunHalfFwdBatchnormGraphNHWC,
+                         BatchnormForwardInferenceIntegrationTestHalfNhwc,
                          testing::ValuesIn(getBnFwdInferenceTestCases()));

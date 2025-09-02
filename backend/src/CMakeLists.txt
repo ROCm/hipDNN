@@ -24,7 +24,7 @@ add_library(hipdnn_backend_private
     plugin/EnginePluginResourceManager.cpp
     plugin/PluginCore.cpp
     plugin/SharedLibrary.cpp
-    Error.cpp
+    LastErrorManager.cpp
     $<$<BOOL:WIN32>:PlatformUtils.windows.cpp>
     $<$<BOOL:LINUX>:PlatformUtils.linux.cpp>
 )
