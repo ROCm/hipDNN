@@ -6,7 +6,7 @@
 using namespace hipdnn_frontend;
 using namespace hipdnn_frontend::graph;
 
-TEST(BatchnormInferenceNodeTests, BatchnormInferenceNodeProperties)
+TEST(TestBatchnormInferenceNode, BatchnormInferenceNodeProperties)
 {
     BatchnormInferenceAttributes batchnormAttributes;
     batchnormAttributes.set_x(std::make_shared<TensorAttributes>());
@@ -35,7 +35,7 @@ TEST(BatchnormInferenceNodeTests, BatchnormInferenceNodeProperties)
     EXPECT_EQ(outputTensor->get_stride(), (std::vector<int64_t>{5, 6, 7, 8}));
 }
 
-TEST(BatchnormInferenceNodeTests, PreValidateNode)
+TEST(TestBatchnormInferenceNode, PreValidateNode)
 {
     BatchnormInferenceAttributes batchnormAttributes;
     batchnormAttributes.set_x(std::make_shared<TensorAttributes>());
@@ -50,7 +50,7 @@ TEST(BatchnormInferenceNodeTests, PreValidateNode)
     EXPECT_EQ(error.code, error_code_t::OK);
 }
 
-TEST(BatchnormInferenceNodeTests, PreValidateNodeMissingValues)
+TEST(TestBatchnormInferenceNode, PreValidateNodeMissingValues)
 {
     BatchnormInferenceAttributes batchnormAttributes;
 
@@ -89,7 +89,7 @@ TEST(BatchnormInferenceNodeTests, PreValidateNodeMissingValues)
     EXPECT_EQ(error.code, error_code_t::OK);
 }
 
-TEST(BatchnormInferenceNodeTests, InferPropertiesNode)
+TEST(TestBatchnormInferenceNode, InferPropertiesNode)
 {
     BatchnormInferenceAttributes batchnormAttributes;
     batchnormAttributes.set_x(std::make_shared<TensorAttributes>());
@@ -119,7 +119,7 @@ TEST(BatchnormInferenceNodeTests, InferPropertiesNode)
     EXPECT_EQ(outputTensor->get_stride(), (std::vector<int64_t>{5, 6, 7, 8}));
 }
 
-TEST(BatchnormInferenceNodeTests, PackNode)
+TEST(TestBatchnormInferenceNode, PackNode)
 {
     BatchnormInferenceAttributes batchnormAttributes;
     batchnormAttributes.name = "BatchnormInference";
@@ -198,7 +198,7 @@ TEST(BatchnormInferenceNodeTests, PackNode)
     EXPECT_EQ(packedAttributes->bias_tensor_uid(), biasTensor->get_uid());
 }
 
-TEST(BatchnormInferenceNodeTests, PackNodeWithoutMeanAndInvVariance)
+TEST(TestBatchnormInferenceNode, PackNodeWithoutMeanAndInvVariance)
 {
     BatchnormInferenceAttributes batchnormAttributes;
     batchnormAttributes.name = "BatchnormInference";
