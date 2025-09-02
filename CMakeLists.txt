@@ -129,8 +129,6 @@ finalize_integration_check_target()
 
 add_dependencies(check validate_test_names)
 add_dependencies(check_ctest validate_test_names)
-add_dependencies(unit-check validate_test_names)
-add_dependencies(integration-check validate_test_names)
 
 if(CODE_COVERAGE)
     if(HIP_DNN_BUILD_PLUGINS)
