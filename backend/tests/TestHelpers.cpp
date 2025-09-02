@@ -6,7 +6,7 @@
 
 using namespace hipdnn_backend;
 
-TEST(HelpersTests, TryCatchSuccess)
+TEST(TestHelpers, TryCatchSuccess)
 {
     auto successFunction = []() -> hipdnnStatus_t { return HIPDNN_STATUS_SUCCESS; };
 
@@ -14,7 +14,7 @@ TEST(HelpersTests, TryCatchSuccess)
     EXPECT_EQ(status, HIPDNN_STATUS_SUCCESS);
 }
 
-TEST(HelpersTests, TryCatchException)
+TEST(TestHelpers, TryCatchException)
 {
     auto exceptionFunction = []() -> hipdnnStatus_t { throw std::runtime_error("Test exception"); };
 
@@ -22,7 +22,7 @@ TEST(HelpersTests, TryCatchException)
     EXPECT_EQ(status, HIPDNN_STATUS_INTERNAL_ERROR);
 }
 
-TEST(HelpersTests, TryCatchUnknownException)
+TEST(TestHelpers, TryCatchUnknownException)
 {
     auto unknownExceptionFunction = []() -> hipdnnStatus_t {
         throw 42; // Throwing an unknown exception
