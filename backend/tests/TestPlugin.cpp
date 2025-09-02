@@ -53,7 +53,7 @@ public:
     }
 };
 
-class PluginCallbackTest : public ::testing::Test
+class TestPluginCallback : public ::testing::Test
 {
 protected:
     void SetUp() override
@@ -71,7 +71,7 @@ protected:
     static bool s_callbackCalled; //NOLINT
 };
 
-bool PluginCallbackTest::s_callbackCalled = false;
+bool TestPluginCallback::s_callbackCalled = false;
 
 const std::string PLUGIN_NAME1 = "hipdnn_test_plugin1";
 const std::string PLUGIN_NAME2 = "hipdnn_test_plugin2";
@@ -86,7 +86,7 @@ const std::filesystem::path FULL_PLUGIN_PATH2 = std::filesystem::path(".")
 
 } // namespace
 
-TEST(PluginManagerTest, LoadPlugins)
+TEST(TestPluginManager, LoadPlugins)
 {
     // Create a PluginManager instance
     TestPluginManager pluginManager;
@@ -113,7 +113,7 @@ TEST(PluginManagerTest, LoadPlugins)
     ASSERT_EQ(plugins[1]->type(), HIPDNN_PLUGIN_TYPE_UNSPECIFIED);
 }
 
-TEST(PluginManagerTest, LoadPluginsFromDirectory)
+TEST(TestPluginManager, LoadPluginsFromDirectory)
 {
     TempDirectory tempDir("temp_plugin_dir");
 
@@ -137,7 +137,7 @@ TEST(PluginManagerTest, LoadPluginsFromDirectory)
     EXPECT_TRUE(pluginNames.contains("Plugin2"));
 }
 
-TEST(PluginManagerTest, LoadPluginsAbsolute)
+TEST(TestPluginManager, LoadPluginsAbsolute)
 {
     TestPluginManager pluginManager;
     pluginManager.loadPlugins({PLUGIN_PATH1}, HIPDNN_PLUGIN_LOADING_ABSOLUTE);
@@ -149,7 +149,7 @@ TEST(PluginManagerTest, LoadPluginsAbsolute)
     EXPECT_EQ(plugins[0]->name(), "Plugin2");
 }
 
-TEST(PluginManagerTest, LoadPluginsAdditive)
+TEST(TestPluginManager, LoadPluginsAdditive)
 {
     TestPluginManager pluginManager;
     pluginManager.loadPlugins({PLUGIN_PATH1}, HIPDNN_PLUGIN_LOADING_ABSOLUTE);
@@ -160,7 +160,7 @@ TEST(PluginManagerTest, LoadPluginsAdditive)
     EXPECT_EQ(plugins.size(), 2);
 }
 
-TEST(PluginManagerTest, LoadPluginsAdditiveAccumulates)
+TEST(TestPluginManager, LoadPluginsAdditiveAccumulates)
 {
     TestPluginManager pluginManager;
     pluginManager.loadPlugins({PLUGIN_PATH1}, HIPDNN_PLUGIN_LOADING_ADDITIVE);
@@ -179,7 +179,7 @@ TEST(PluginManagerTest, LoadPluginsAdditiveAccumulates)
     EXPECT_TRUE(pluginNames.contains("Plugin2"));
 }
 
-TEST(PluginManagerTest, LoadPluginsAbsoluteReplaces)
+TEST(TestPluginManager, LoadPluginsAbsoluteReplaces)
 {
     TestPluginManager pluginManager;
     pluginManager.loadPlugins({PLUGIN_PATH1}, HIPDNN_PLUGIN_LOADING_ADDITIVE);
@@ -191,7 +191,7 @@ TEST(PluginManagerTest, LoadPluginsAbsoluteReplaces)
     EXPECT_EQ(plugins[0]->name(), "Plugin2");
 }
 
-TEST(PluginManagerTest, LoadPluginsAdditiveWithDefault)
+TEST(TestPluginManager, LoadPluginsAdditiveWithDefault)
 {
     TempDirectory defaultDir("test_plugins_dir");
 
@@ -215,7 +215,7 @@ TEST(PluginManagerTest, LoadPluginsAdditiveWithDefault)
     EXPECT_TRUE(pluginNames.contains("Plugin2"));
 }
 
-TEST(PluginManagerTest, LoadPluginsCombinedFileAndDirectory)
+TEST(TestPluginManager, LoadPluginsCombinedFileAndDirectory)
 {
     TempDirectory tempDir("temp_plugin_dir_combined");
 
@@ -237,7 +237,7 @@ TEST(PluginManagerTest, LoadPluginsCombinedFileAndDirectory)
     EXPECT_TRUE(pluginNames.contains("Plugin2"));
 }
 
-TEST(PluginManagerTest, LastError)
+TEST(TestPluginManager, LastError)
 {
     TestPluginManager pluginManager;
 
@@ -256,7 +256,7 @@ TEST(PluginManagerTest, LastError)
     ASSERT_EQ(plugins[0]->getLastErrorString(), "name is null");
 }
 
-TEST(PluginManagerTest, LastErrorMultithreaded)
+TEST(TestPluginManager, LastErrorMultithreaded)
 {
     TestPluginManager pluginManager;
 
@@ -295,7 +295,7 @@ TEST(PluginManagerTest, LastErrorMultithreaded)
     ASSERT_EQ(result2, true);
 }
 
-TEST(PluginManagerTest, LastErrorOnSecondLoad)
+TEST(TestPluginManager, LastErrorOnSecondLoad)
 {
     using FuncType = hipdnnPluginStatus_t (*)(const char**);
     const auto funcName = "hipdnnPluginGetName";
@@ -328,7 +328,7 @@ TEST(PluginManagerTest, LastErrorOnSecondLoad)
     }
 }
 
-TEST_F(PluginCallbackTest, SetLoggingCallback)
+TEST_F(TestPluginCallback, SetLoggingCallback)
 {
 
     plugin::SharedLibrary lib(PLUGIN_PATH1);

@@ -2,12 +2,13 @@
 // SPDX-License-Identifier:  MIT
 
 #include "EngineConfigDescriptor.hpp"
+#include "BackendEnumStringUtils.hpp"
 #include "EngineDescriptor.hpp"
-#include "Error.hpp"
 #include "GraphDescriptor.hpp"
 #include "HipdnnBackendDescriptorType.h"
 #include "HipdnnException.hpp"
 #include "handle/Handle.hpp"
+
 #include <hipdnn_sdk/data_objects/engine_config_generated.h>
 
 namespace hipdnn_backend

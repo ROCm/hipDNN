@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: MIT
 
 #include "BackendDescriptor.hpp"
-#include "Error.hpp"
 
 void HipdnnBackendDescriptor::finalize()
 {

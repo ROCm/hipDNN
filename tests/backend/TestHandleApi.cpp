@@ -48,7 +48,7 @@ TEST(HipDNNHandleAPITests, GetStreamNullptrStreamPointer)
     ASSERT_EQ(destroyStatus, HIPDNN_STATUS_SUCCESS);
 }
 
-TEST(GPUHipDNNHandleAPITests, GetStreamPointer)
+TEST(GpuHipDNNHandleAPITests, GetStreamPointer)
 {
     SKIP_IF_NO_DEVICES();
 
