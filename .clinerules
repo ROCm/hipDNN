@@ -47,7 +47,7 @@ Rules below apply ONLY to the TestSuite name (first parameter of `TEST` / `TEST_
 1. Optional `Integration` prefix for integration tests.
 2. Optional `Gpu` (immediately after `Integration` if both apply) for GPU-required tests.
 3. Core Feature / Subject under test (PascalCase, no underscores).
-4. Optional Datatype token (`Bfp16`, `Fp16`, `Float`) at the end.
+4. Optional Datatype token (`Bfp16`, `Fp16`, `Fp32`) at the end.
 
 Omit any category that does not apply.
 
@@ -55,7 +55,7 @@ Omit any category that does not apply.
 
 - **Integration** (only for integration tests, always first if present).
 - **Gpu** (always first unless preceded by Integration).
-- **Datatypes**: Bfp16, Fp16, Float.
+- **Datatypes**: Bfp16, Fp16, Fp32.
 
 ### 10.2 Unit Tests
 
@@ -64,12 +64,12 @@ In most cases unit style tests should be named so the directly mirror the class 
 ### 10.3 Valid Examples
 
 ```cpp
-IntegrationGpuConvolutionPlannerNchwFloat
-GpuTestActivationKernelNchwFloat
-GpuTestExecutionPlanBuilderFloat
+IntegrationGpuConvolutionPlannerNchwFp32
+GpuTestActivationKernelNchwFp32
+GpuTestExecutionPlanBuilderFp32
 GpuTestExecutionPlanBuilderNchw
 IntegrationGraphFusion
-TestConvolutionHeuristicsFloat
+TestConvolutionHeuristicsFp32
 TestConvolutionHeuristics
 ```
 

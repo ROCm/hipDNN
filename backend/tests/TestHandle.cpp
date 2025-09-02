@@ -14,7 +14,7 @@ TEST(TestHandle, DefaultStreamIsNull)
     EXPECT_EQ(handle.getStream(), nullptr) << "Default stream should be nullptr.";
 }
 
-TEST(GPUTestHandle, SetAndGetStream)
+TEST(GpuTestHandle, SetAndGetStream)
 {
     SKIP_IF_NO_DEVICES();
 
@@ -30,7 +30,7 @@ TEST(GPUTestHandle, SetAndGetStream)
     ASSERT_EQ(hipStreamDestroy(stream), hipSuccess) << "Failed to destroy HIP stream.";
 }
 
-TEST(GPUTestHandle, SetStreamToNull)
+TEST(GpuTestHandle, SetStreamToNull)
 {
     SKIP_IF_NO_DEVICES();
 

@@ -113,7 +113,7 @@ Rules below apply ONLY to the TestSuite name (first parameter of `TEST` / `TEST_
 1. Optional `Integration` prefix for integration tests.
 2. Optional `Gpu` (immediately after `Integration` if both apply) for GPU-required tests.
 3. Core Feature / Subject under test (PascalCase, no underscores).
-4. Optional Datatype token (`Bfp16`, `Fp16`, `Float`) at the end.
+4. Optional Datatype token (`Bfp16`, `Fp16`, `Fp32`) at the end.
 
 Omit any category that does not apply.
 
@@ -121,7 +121,7 @@ Omit any category that does not apply.
 
 - **Integration** (only for integration tests, always first if present).
 - **Gpu** (always first unless preceded by Integration).
-- **Datatypes**: Bfp16, Fp16, Float.
+- **Datatypes**: Bfp16, Fp16, Fp32.
 
 ### 10.2 Unit Tests
 
@@ -130,12 +130,12 @@ In most cases unit style tests should be named so the directly mirror the class 
 ### 10.3 Valid Examples
 
 ```cpp
-IntegrationGpuConvolutionPlannerNchwFloat
-GpuTestActivationKernelNchwFloat
-GpuTestExecutionPlanBuilderFloat
+IntegrationGpuConvolutionPlannerNchwFp32
+GpuTestActivationKernelNchwFp32
+GpuTestExecutionPlanBuilderFp32
 GpuTestExecutionPlanBuilderNchw
 IntegrationGraphFusion
-TestConvolutionHeuristicsFloat
+TestConvolutionHeuristicsFp32
 TestConvolutionHeuristics
 ```
 
@@ -144,8 +144,8 @@ TestConvolutionHeuristics
 | Name | Issue |
 |------|-------|
 | GpuIntegrationConvolution | Wrong order; Integration must precede Gpu |
-| ConvolutionFloatNchw | Layout must precede datatype |
-| IntegrationConvolutionGpuFloat | Gpu must directly follow Integration |
+| ConvolutionFp32Nchw | Layout must precede datatype |
+| IntegrationConvolutionGpuFp32 | Gpu must directly follow Integration |
 | Gpu_Convolution | Underscore not allowed |
 | GpuConvolutionFP16 | Datatype token must match exact casing `Fp16` |
 
@@ -155,14 +155,14 @@ May be richly descriptive: `HandlesLargeStride`, `RejectsMismatchedLayouts`. Avo
 
 ### 10.6 Test File Naming
 
-The test file name should mirror the primary test suite it contains.  For example, if the main test in a suite is `TestMyClass`, the file should be named `TestMyClass.cpp`.  That same file may also contain `GpuTestMyClass` but it is not the primary test suite so the file name does not need to reflect it.  For integration tests, the main test suite might be named `IntegrationGpuFeatureX` but have several child suites like `IntegrationGpuFeatureXFloat` and `IntegrationGpuFeatureXBfp16`. The parent suite name is the primary suite, so the file name should be `IntegrationGpuFeatureX.cpp`. 
+The test file name should mirror the primary test suite it contains.  For example, if the main test in a suite is `TestMyClass`, the file should be named `TestMyClass.cpp`.  That same file may also contain `GpuTestMyClass` but it is not the primary test suite so the file name does not need to reflect it.  For integration tests, the main test suite might be named `IntegrationGpuFeatureX` but have several child suites like `IntegrationGpuFeatureXFp32` and `IntegrationGpuFeatureXBfp16`. The parent suite name is the primary suite, so the file name should be `IntegrationGpuFeatureX.cpp`. 
 
 ### 10.7 Rationale
 
 - Ordering enforces quick visual parsing (environment → scope → subject → specialization).
 - Avoid underscores to remain future-proof with gtest evolution.
 - Suffix datatype to emphasize functional context before precision variant.
-- Consistent pattern simplifies filtering (e.g. `--gtest_filter=Gpu*Float`).
+- Consistent pattern simplifies filtering (e.g. `--gtest_filter=Gpu*Fp32`).
 
 ## 11. Examples
 
@@ -209,7 +209,7 @@ constexpr size_t MAX_WORKSPACE_BYTES = 1ull << 32;
 ### Test (gtest)
 
 ```cpp
-TEST(IntegrationGpuGraphFusionFloat, FusesThreeSequentialOps) {
+TEST(IntegrationGpuGraphFusionFp32, FusesThreeSequentialOps) {
     // ...
 }
 TEST(IntegrationGpuGraphFusionBfp16, FusesThreeSequentialOps) {
