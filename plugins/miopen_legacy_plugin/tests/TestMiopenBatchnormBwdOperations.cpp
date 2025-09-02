@@ -78,7 +78,7 @@ TEST_P(TestGpuMiopenBatchnormBwdExecuteGraph, Fp32Nhwc)
         testCase, hipdnn_sdk::data_objects::DataType::DataType_FLOAT, 4e-3f, TensorLayout::NHWC);
 }
 
-// TEST_P(TestGpuMiopenBatchnormBwdExecuteGraph, RunBfloat16BwdBatchnormGraphNHWC)
+// TEST_P(TestGpuMiopenBatchnormBwdExecuteGraph, Bfp16Nhwc)
 // {
 //     Batchnorm2dTestCase testCase = {.n = 1, .c = 3, .h = 14, .w = 14};
 //     runBwdBatchnormGraph<hip_bfloat16, float>(testCase,
@@ -87,7 +87,7 @@ TEST_P(TestGpuMiopenBatchnormBwdExecuteGraph, Fp32Nhwc)
 //                                               TensorLayout::NHWC);
 // }
 
-// TEST_P(TestGpuMiopenBatchnormBwdExecuteGraph, RunHalfBwdBatchnormGraphNHWC)
+// TEST_P(TestGpuMiopenBatchnormBwdExecuteGraph, Fp16Nhwc)
 // {
 //     Batchnorm2dTestCase testCase = {.n = 1, .c = 3, .h = 14, .w = 14};
 //     runBwdBatchnormGraph<half, float>(
