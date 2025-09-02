@@ -14,7 +14,7 @@
 
 using namespace hipdnn_backend;
 
-class GraphDescriptorTest : public ::testing::Test
+class TestGraphDescriptor : public ::testing::Test
 {
 public:
     static flatbuffers::FlatBufferBuilder createValidGraph()
@@ -33,7 +33,7 @@ public:
     }
 };
 
-TEST_F(GraphDescriptorTest, SerializeDeserializeGraph)
+TEST_F(TestGraphDescriptor, SerializeDeserializeGraph)
 {
     auto builder = createValidGraph();
     auto serializedGraph = builder.Release();
@@ -46,7 +46,7 @@ TEST_F(GraphDescriptorTest, SerializeDeserializeGraph)
     ASSERT_TRUE(verifier.VerifyBuffer<hipdnn_sdk::data_objects::Graph>());
 }
 
-TEST_F(GraphDescriptorTest, WillCorrectlySetGraph)
+TEST_F(TestGraphDescriptor, WillCorrectlySetGraph)
 {
     auto builder = createValidGraph();
     auto serializedGraph = builder.Release();
@@ -62,7 +62,7 @@ TEST_F(GraphDescriptorTest, WillCorrectlySetGraph)
     ASSERT_NO_THROW(descriptor.finalize());
 }
 
-TEST_F(GraphDescriptorTest, WillCorrectlySetGraphReverseOrder)
+TEST_F(TestGraphDescriptor, WillCorrectlySetGraphReverseOrder)
 {
     auto builder = createValidGraph();
     auto serializedGraph = builder.Release();
@@ -78,20 +78,20 @@ TEST_F(GraphDescriptorTest, WillCorrectlySetGraphReverseOrder)
     ASSERT_NO_THROW(descriptor.finalize());
 }
 
-TEST_F(GraphDescriptorTest, WillFailToSetInvalidGraph)
+TEST_F(TestGraphDescriptor, WillFailToSetInvalidGraph)
 {
     GraphDescriptor descriptor;
     ASSERT_THROW_HIPDNN_STATUS(descriptor.deserializeGraph(nullptr, 0),
                                HIPDNN_STATUS_BAD_PARAM_NULL_POINTER);
 }
 
-TEST_F(GraphDescriptorTest, FinalizeFailInvalidGraph)
+TEST_F(TestGraphDescriptor, FinalizeFailInvalidGraph)
 {
     GraphDescriptor descriptor;
     ASSERT_THROW_HIPDNN_STATUS(descriptor.finalize(), HIPDNN_STATUS_BAD_PARAM);
 }
 
-TEST_F(GraphDescriptorTest, GetAttributeReturnsNotSupported)
+TEST_F(TestGraphDescriptor, GetAttributeReturnsNotSupported)
 {
     GraphDescriptor descriptor;
     int64_t elementCount = 0;
@@ -101,7 +101,7 @@ TEST_F(GraphDescriptorTest, GetAttributeReturnsNotSupported)
         HIPDNN_STATUS_NOT_SUPPORTED);
 }
 
-TEST_F(GraphDescriptorTest, SetAttributeReturnsNotSupported)
+TEST_F(TestGraphDescriptor, SetAttributeReturnsNotSupported)
 {
     GraphDescriptor descriptor;
     ASSERT_THROW_HIPDNN_STATUS(

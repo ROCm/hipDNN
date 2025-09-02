@@ -10,10 +10,10 @@
 
 #include "descriptors/BackendDescriptor.hpp"
 #include "descriptors/DescriptorFactory.hpp"
+#include "descriptors/DescriptorTestUtils.hpp"
 #include "descriptors/ExecutionPlanDescriptor.hpp"
 #include "descriptors/FlatbufferTestUtils.hpp"
 #include "descriptors/GraphDescriptor.hpp"
-#include "descriptors/TestDescriptorUtils.hpp"
 #include "descriptors/TestMacros.hpp"
 #include "descriptors/VariantDescriptor.hpp"
 #include "descriptors/mocks/MockDescriptor.hpp"
@@ -26,7 +26,7 @@ using namespace hipdnn_backend;
 using namespace hipdnn_backend::plugin;
 using namespace ::testing;
 
-TEST(EnginePluginResourceManager, PluginLoading)
+TEST(TestEnginePluginResourceManager, PluginLoading)
 {
     std::shared_ptr<MockEnginePlugin> mockPlugin = std::make_shared<MockEnginePlugin>();
     std::vector<std::shared_ptr<EnginePlugin>> plugins{mockPlugin};
@@ -49,7 +49,7 @@ TEST(EnginePluginResourceManager, PluginLoading)
     }
 }
 
-TEST(EnginePluginResourceManager, SetStream)
+TEST(TestEnginePluginResourceManager, SetStream)
 {
     std::shared_ptr<MockEnginePlugin> mockPlugin = std::make_shared<MockEnginePlugin>();
     std::vector<std::shared_ptr<EnginePlugin>> plugins{mockPlugin};
@@ -77,7 +77,7 @@ TEST(EnginePluginResourceManager, SetStream)
     }
 }
 
-TEST(EnginePluginResourceManager, StaticPluginPathManagementSetAndGetSinglePath)
+TEST(TestEnginePluginResourceManager, StaticPluginPathManagementSetAndGetSinglePath)
 {
     std::vector<std::filesystem::path> pluginPaths = {"/test/plugin/path"};
 
@@ -88,7 +88,7 @@ TEST(EnginePluginResourceManager, StaticPluginPathManagementSetAndGetSinglePath)
     EXPECT_EQ(retrievedPaths, expectedPaths);
 }
 
-TEST(EnginePluginResourceManager, StaticPluginPathManagementSetAndGetMultiplePaths)
+TEST(TestEnginePluginResourceManager, StaticPluginPathManagementSetAndGetMultiplePaths)
 {
     std::vector<std::filesystem::path> pluginPaths
         = {"/test/plugin/path1", "/test/plugin/path2", "/test/plugin/path3"};
@@ -100,7 +100,7 @@ TEST(EnginePluginResourceManager, StaticPluginPathManagementSetAndGetMultiplePat
     EXPECT_EQ(retrievedPaths, expectedPaths);
 }
 
-TEST(EnginePluginResourceManager, StaticPluginPathManagementAdditiveLoadingMode)
+TEST(TestEnginePluginResourceManager, StaticPluginPathManagementAdditiveLoadingMode)
 {
     std::vector<std::filesystem::path> initialPaths = {"/test/path1"};
     EnginePluginResourceManager::setPluginPaths(initialPaths, HIPDNN_PLUGIN_LOADING_ABSOLUTE);
@@ -114,7 +114,7 @@ TEST(EnginePluginResourceManager, StaticPluginPathManagementAdditiveLoadingMode)
     EXPECT_EQ(retrievedPaths, expectedPaths);
 }
 
-TEST(EnginePluginResourceManager, StaticPluginPathManagementAbsoluteLoadingModeReplacesExisting)
+TEST(TestEnginePluginResourceManager, StaticPluginPathManagementAbsoluteLoadingModeReplacesExisting)
 {
     std::vector<std::filesystem::path> initialPaths = {"/test/path1", "/test/path2"};
     EnginePluginResourceManager::setPluginPaths(initialPaths, HIPDNN_PLUGIN_LOADING_ABSOLUTE);
@@ -128,7 +128,7 @@ TEST(EnginePluginResourceManager, StaticPluginPathManagementAbsoluteLoadingModeR
     EXPECT_EQ(retrievedPaths, expectedPaths);
 }
 
-TEST(EnginePluginResourceManager, StaticPluginPathManagementEmptyPathsClearing)
+TEST(TestEnginePluginResourceManager, StaticPluginPathManagementEmptyPathsClearing)
 {
     std::vector<std::filesystem::path> pluginPaths = {"/test/path1", "/test/path2"};
     EnginePluginResourceManager::setPluginPaths(pluginPaths, HIPDNN_PLUGIN_LOADING_ABSOLUTE);
@@ -140,7 +140,7 @@ TEST(EnginePluginResourceManager, StaticPluginPathManagementEmptyPathsClearing)
     EXPECT_TRUE(retrievedPaths.empty());
 }
 
-TEST(EnginePluginResourceManager, MoveConstructor)
+TEST(TestEnginePluginResourceManager, MoveConstructor)
 {
     std::shared_ptr<MockEnginePlugin> mockPlugin = std::make_shared<MockEnginePlugin>();
     std::vector<std::shared_ptr<EnginePlugin>> plugins{mockPlugin};
@@ -162,7 +162,7 @@ TEST(EnginePluginResourceManager, MoveConstructor)
     EXPECT_NO_THROW(rm2.setStream(nullptr));
 }
 
-TEST(EnginePluginResourceManager, MoveAssignment)
+TEST(TestEnginePluginResourceManager, MoveAssignment)
 {
     std::shared_ptr<MockEnginePlugin> mockPlugin1 = std::make_shared<MockEnginePlugin>();
     std::shared_ptr<MockEnginePlugin> mockPlugin2 = std::make_shared<MockEnginePlugin>();
@@ -197,7 +197,7 @@ TEST(EnginePluginResourceManager, MoveAssignment)
     EXPECT_NO_THROW(rm2.setStream(nullptr));
 }
 
-TEST(EnginePluginResourceManager, SelfMoveAssignment)
+TEST(TestEnginePluginResourceManager, SelfMoveAssignment)
 {
     std::shared_ptr<MockEnginePlugin> mockPlugin = std::make_shared<MockEnginePlugin>();
     std::vector<std::shared_ptr<EnginePlugin>> plugins{mockPlugin};
@@ -251,7 +251,7 @@ TEST(EnginePluginResourceManager, SelfMoveAssignment)
     EXPECT_GT(maxStringLen, 0);
 }
 
-TEST(EnginePluginResourceManager, RapidCreationDestruction)
+TEST(TestEnginePluginResourceManager, RapidCreationDestruction)
 {
     const int numIterations = 100;
 
@@ -275,7 +275,7 @@ TEST(EnginePluginResourceManager, RapidCreationDestruction)
     }
 }
 
-TEST(EnginePluginResourceManager, ConcurrentCreationAndPublicMethods)
+TEST(TestEnginePluginResourceManager, ConcurrentCreationAndPublicMethods)
 {
     const size_t numThreads = 4;
     const size_t managersPerThread = 10;
@@ -346,7 +346,7 @@ TEST(EnginePluginResourceManager, ConcurrentCreationAndPublicMethods)
     allManagers.clear();
 }
 
-TEST(EnginePluginResourceManager, GetApplicableEngineIdsNullGraphDescriptor)
+TEST(TestEnginePluginResourceManager, GetApplicableEngineIdsNullGraphDescriptor)
 {
     std::shared_ptr<MockEnginePlugin> mockPlugin = std::make_shared<MockEnginePlugin>();
     std::vector<std::shared_ptr<EnginePlugin>> plugins{mockPlugin};
@@ -368,7 +368,7 @@ TEST(EnginePluginResourceManager, GetApplicableEngineIdsNullGraphDescriptor)
     }
 }
 
-TEST(EnginePluginResourceManager, SetNullStream)
+TEST(TestEnginePluginResourceManager, SetNullStream)
 {
     std::shared_ptr<MockEnginePlugin> mockPlugin = std::make_shared<MockEnginePlugin>();
     std::vector<std::shared_ptr<EnginePlugin>> plugins{mockPlugin};
@@ -390,7 +390,7 @@ TEST(EnginePluginResourceManager, SetNullStream)
     }
 }
 
-TEST(EnginePluginResourceManager, GetApplicableEngineIdsWithLoadedPlugin)
+TEST(TestEnginePluginResourceManager, GetApplicableEngineIdsWithLoadedPlugin)
 {
     std::shared_ptr<MockEnginePlugin> mockPlugin = std::make_shared<MockEnginePlugin>();
     std::vector<std::shared_ptr<EnginePlugin>> plugins{mockPlugin};
@@ -434,7 +434,7 @@ TEST(EnginePluginResourceManager, GetApplicableEngineIdsWithLoadedPlugin)
     }
 }
 
-TEST(EnginePluginResourceManager, GetWorkspaceSize)
+TEST(TestEnginePluginResourceManager, GetWorkspaceSize)
 {
     std::shared_ptr<MockEnginePlugin> mockPlugin = std::make_shared<MockEnginePlugin>();
     std::vector<std::shared_ptr<EnginePlugin>> plugins{mockPlugin};
@@ -483,7 +483,7 @@ TEST(EnginePluginResourceManager, GetWorkspaceSize)
     }
 }
 
-TEST(EnginePluginResourceManager, GetEngineDetails)
+TEST(TestEnginePluginResourceManager, GetEngineDetails)
 {
     std::shared_ptr<MockEnginePlugin> mockPlugin = std::make_shared<MockEnginePlugin>();
     std::vector<std::shared_ptr<EnginePlugin>> plugins{mockPlugin};
@@ -547,7 +547,7 @@ TEST(EnginePluginResourceManager, GetEngineDetails)
     }
 }
 
-TEST(EnginePluginResourceManager, CreateExecutionContext)
+TEST(TestEnginePluginResourceManager, CreateExecutionContext)
 {
     std::shared_ptr<MockEnginePlugin> mockPlugin = std::make_shared<MockEnginePlugin>();
     std::vector<std::shared_ptr<EnginePlugin>> plugins{mockPlugin};
@@ -604,7 +604,7 @@ TEST(EnginePluginResourceManager, CreateExecutionContext)
     }
 }
 
-TEST(EnginePluginResourceManager, CreateExecutionContextWithInvalidEngineId)
+TEST(TestEnginePluginResourceManager, CreateExecutionContextWithInvalidEngineId)
 {
     std::shared_ptr<MockEnginePlugin> mockPlugin = std::make_shared<MockEnginePlugin>();
     std::vector<std::shared_ptr<EnginePlugin>> plugins{mockPlugin};
@@ -639,7 +639,7 @@ TEST(EnginePluginResourceManager, CreateExecutionContextWithInvalidEngineId)
     }
 }
 
-TEST(EnginePluginResourceManager, ExecuteOpGraphWithNullParameters)
+TEST(TestEnginePluginResourceManager, ExecuteOpGraphWithNullParameters)
 {
     std::shared_ptr<MockEnginePlugin> mockPlugin = std::make_shared<MockEnginePlugin>();
     std::vector<std::shared_ptr<EnginePlugin>> plugins{mockPlugin};
@@ -661,7 +661,7 @@ TEST(EnginePluginResourceManager, ExecuteOpGraphWithNullParameters)
     }
 }
 
-TEST(EnginePluginResourceManager, ExecuteOpGraphFailNonFinalizedPlan)
+TEST(TestEnginePluginResourceManager, ExecuteOpGraphFailNonFinalizedPlan)
 {
     std::shared_ptr<MockEnginePlugin> mockPlugin = std::make_shared<MockEnginePlugin>();
     std::vector<std::shared_ptr<EnginePlugin>> plugins{mockPlugin};
@@ -700,7 +700,7 @@ TEST(EnginePluginResourceManager, ExecuteOpGraphFailNonFinalizedPlan)
     }
 }
 
-TEST(EnginePluginResourceManager, ExecuteOpGraphFailNonFinalizedVariant)
+TEST(TestEnginePluginResourceManager, ExecuteOpGraphFailNonFinalizedVariant)
 {
     std::shared_ptr<MockEnginePlugin> mockPlugin = std::make_shared<MockEnginePlugin>();
     std::vector<std::shared_ptr<EnginePlugin>> plugins{mockPlugin};
@@ -740,7 +740,7 @@ TEST(EnginePluginResourceManager, ExecuteOpGraphFailNonFinalizedVariant)
     }
 }
 
-TEST(EnginePluginResourceManager, ExecuteOpGraphFailTensorMismatch)
+TEST(TestEnginePluginResourceManager, ExecuteOpGraphFailTensorMismatch)
 {
     std::shared_ptr<MockEnginePlugin> mockPlugin = std::make_shared<MockEnginePlugin>();
     std::vector<std::shared_ptr<EnginePlugin>> plugins{mockPlugin};
@@ -803,7 +803,7 @@ MATCHER_P2(MatchesMemory, data, size, "")
     return memcmp(arg, data, size) == 0;
 }
 
-TEST(EnginePluginResourceManager, ExecuteOpGraphSuccessWithValidDescriptors)
+TEST(TestEnginePluginResourceManager, ExecuteOpGraphSuccessWithValidDescriptors)
 {
     std::shared_ptr<MockEnginePlugin> mockPlugin = std::make_shared<MockEnginePlugin>();
     std::vector<std::shared_ptr<EnginePlugin>> plugins{mockPlugin};
@@ -878,7 +878,7 @@ TEST(EnginePluginResourceManager, ExecuteOpGraphSuccessWithValidDescriptors)
     }
 }
 
-TEST(EnginePluginResourceManager, GetLoadedPluginFiles)
+TEST(TestEnginePluginResourceManager, GetLoadedPluginFiles)
 {
     std::shared_ptr<MockEnginePlugin> mockPlugin = std::make_shared<MockEnginePlugin>();
     std::vector<std::shared_ptr<EnginePlugin>> plugins{mockPlugin};
@@ -928,7 +928,7 @@ TEST(EnginePluginResourceManager, GetLoadedPluginFiles)
     }
 }
 
-TEST(EnginePluginResourceManager, GetWorkspaceSizeNullEngineConfig)
+TEST(TestEnginePluginResourceManager, GetWorkspaceSizeNullEngineConfig)
 {
     std::shared_ptr<MockEnginePlugin> mockPlugin = std::make_shared<MockEnginePlugin>();
     std::vector<std::shared_ptr<EnginePlugin>> plugins{mockPlugin};
@@ -952,7 +952,7 @@ TEST(EnginePluginResourceManager, GetWorkspaceSizeNullEngineConfig)
     }
 }
 
-TEST(EnginePluginResourceManager, GetWorkspaceSizeInvalidEngineId)
+TEST(TestEnginePluginResourceManager, GetWorkspaceSizeInvalidEngineId)
 {
     std::shared_ptr<MockEnginePlugin> mockPlugin = std::make_shared<MockEnginePlugin>();
     std::vector<std::shared_ptr<EnginePlugin>> plugins{mockPlugin};
@@ -981,7 +981,7 @@ TEST(EnginePluginResourceManager, GetWorkspaceSizeInvalidEngineId)
     }
 }
 
-TEST(EnginePluginResourceManager, GetWorkspaceSizeThrowsExceptionForInvalidEngineId)
+TEST(TestEnginePluginResourceManager, GetWorkspaceSizeThrowsExceptionForInvalidEngineId)
 {
     std::shared_ptr<MockEnginePlugin> mockPlugin = std::make_shared<MockEnginePlugin>();
     std::vector<std::shared_ptr<EnginePlugin>> plugins{mockPlugin};
@@ -1012,7 +1012,7 @@ TEST(EnginePluginResourceManager, GetWorkspaceSizeThrowsExceptionForInvalidEngin
     }
 }
 
-TEST(EnginePluginResourceManager, SetPluginPathsWithActiveResourceManager)
+TEST(TestEnginePluginResourceManager, SetPluginPathsWithActiveResourceManager)
 {
     std::shared_ptr<MockEnginePlugin> mockPlugin = std::make_shared<MockEnginePlugin>();
     std::vector<std::shared_ptr<EnginePlugin>> plugins{mockPlugin};

@@ -1,7 +1,8 @@
 // Copyright © Advanced Micro Devices, Inc., or its affiliates.
 // SPDX-License-Identifier: MIT
 
-#include "Error.hpp"
+#include "LastErrorManager.hpp"
+#include "BackendEnumStringUtils.hpp"
 #include "logging/Logging.hpp"
 #include <hipdnn_sdk/utilities/StringUtil.hpp>
 
