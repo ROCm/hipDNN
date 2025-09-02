@@ -2,6 +2,7 @@
 // SPDX-License-Identifier:  MIT
 
 #include "MiopenBatchnormFwdInferencePlan.hpp"
+#include "MiopenUtils.hpp"
 
 namespace miopen_legacy_plugin
 {
@@ -10,40 +11,22 @@ namespace miopen_legacy_plugin
 // rather than making it configurable and adding extra complexity.
 const miopenBatchNormMode_t MIOPEN_BATCHNORM_MODE = miopenBNSpatial;
 
-namespace
-{
-
-MiopenTensor createTensor(
-    const std::unordered_map<int64_t, const hipdnn_sdk::data_objects::TensorAttributes*>& tensorMap,
-    int64_t uid)
-{
-    if(auto tensorAttr = tensorMap.find(uid); tensorAttr != tensorMap.end())
-    {
-        return {*tensorAttr->second};
-    }
-
-    throw hipdnn_plugin::HipdnnPluginException(HIPDNN_PLUGIN_STATUS_INTERNAL_ERROR,
-                                               "Failed to find tensor with UID in tensorMap: "
-                                                   + std::to_string(uid));
-}
-
-} // namespace
-
 BatchnormFwdInferenceParams::BatchnormFwdInferenceParams(
     const hipdnn_sdk::data_objects::BatchnormInferenceAttributes& attributes,
     const std::unordered_map<int64_t, const hipdnn_sdk::data_objects::TensorAttributes*>& tensorMap)
-    : _x(createTensor(tensorMap, attributes.x_tensor_uid()))
-    , _y(createTensor(tensorMap, attributes.y_tensor_uid()))
-    , _scale(createTensor(tensorMap, attributes.scale_tensor_uid()))
-    , _bias(createTensor(tensorMap, attributes.bias_tensor_uid()))
+    : _x(miopen_utils::createTensor(tensorMap, attributes.x_tensor_uid()))
+    , _y(miopen_utils::createTensor(tensorMap, attributes.y_tensor_uid()))
+    , _scale(miopen_utils::createTensor(tensorMap, attributes.scale_tensor_uid()))
+    , _bias(miopen_utils::createTensor(tensorMap, attributes.bias_tensor_uid()))
 {
     if(attributes.mean_tensor_uid().has_value())
     {
-        _estMean = createTensor(tensorMap, attributes.mean_tensor_uid().value());
+        _estMean = miopen_utils::createTensor(tensorMap, attributes.mean_tensor_uid().value());
     }
     if(attributes.inv_variance_tensor_uid().has_value())
     {
-        _estVariance = createTensor(tensorMap, attributes.inv_variance_tensor_uid().value());
+        _estVariance
+            = miopen_utils::createTensor(tensorMap, attributes.inv_variance_tensor_uid().value());
     }
 }
 

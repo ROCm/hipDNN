@@ -21,7 +21,7 @@
 using namespace hipdnn_sdk::reference_test_utilities;
 using namespace test_operations_common;
 
-class BatchnormBwdExecuteGraphTest : public ::testing::TestWithParam<Batchnorm2dTestCase>
+class BatchnormBwdExecuteGraphTestBase : public ::testing::Test
 {
 protected:
     void SetUp() override
@@ -48,14 +48,24 @@ protected:
     hipdnnEnginePluginHandle_t _handle = nullptr;
 };
 
-TEST_P(BatchnormBwdExecuteGraphTest, RunFloatBwdBatchnormGraphNCHW)
+class BatchnormBwdExecuteGraphTest : public BatchnormBwdExecuteGraphTestBase
+{
+};
+
+class BatchnormBwdExecuteGraphTestWithParams
+    : public BatchnormBwdExecuteGraphTestBase,
+      public ::testing::WithParamInterface<Batchnorm2dTestCase>
+{
+};
+
+TEST_P(BatchnormBwdExecuteGraphTestWithParams, RunFloatBwdBatchnormGraphNCHW)
 {
     Batchnorm2dTestCase testCase = GetParam();
     runBwdBatchnormGraph<float, float>(
         testCase, hipdnn_sdk::data_objects::DataType::DataType_FLOAT, 4e-3f, TensorLayout::NCHW);
 }
 
-TEST_P(BatchnormBwdExecuteGraphTest, RunBfloat16BwdBatchnormGraphNCHW)
+TEST_F(BatchnormBwdExecuteGraphTest, RunBfloat16BwdBatchnormGraphNCHW)
 {
     Batchnorm2dTestCase testCase = {.n = 1, .c = 3, .h = 14, .w = 14};
     runBwdBatchnormGraph<hip_bfloat16, float>(testCase,
@@ -64,7 +74,7 @@ TEST_P(BatchnormBwdExecuteGraphTest, RunBfloat16BwdBatchnormGraphNCHW)
                                               TensorLayout::NCHW);
 }
 
-TEST_P(BatchnormBwdExecuteGraphTest, RunHalfBwdBatchnormGraphNCHW)
+TEST_F(BatchnormBwdExecuteGraphTest, RunHalfBwdBatchnormGraphNCHW)
 {
     Batchnorm2dTestCase testCase = {.n = 1, .c = 3, .h = 14, .w = 14};
     runBwdBatchnormGraph<half, float>(
@@ -72,14 +82,14 @@ TEST_P(BatchnormBwdExecuteGraphTest, RunHalfBwdBatchnormGraphNCHW)
 }
 
 // TODO: Re-enable when double support is added to MIOpen plugin
-TEST_P(BatchnormBwdExecuteGraphTest, DISABLED_RunDoubleBwdBatchnormGraphNCHW)
+TEST_F(BatchnormBwdExecuteGraphTest, DISABLED_RunDoubleBwdBatchnormGraphNCHW)
 {
     Batchnorm2dTestCase testCase = {.n = 1, .c = 3, .h = 14, .w = 14};
     runBwdBatchnormGraph<double, double>(
         testCase, hipdnn_sdk::data_objects::DataType::DataType_DOUBLE, 4e-3, TensorLayout::NCHW);
 }
 
-TEST_P(BatchnormBwdExecuteGraphTest, RunFloatBwdBatchnormGraphNHWC)
+TEST_P(BatchnormBwdExecuteGraphTestWithParams, RunFloatBwdBatchnormGraphNHWC)
 {
     Batchnorm2dTestCase testCase = GetParam();
     runBwdBatchnormGraph<float, float>(
@@ -90,7 +100,7 @@ TEST_P(BatchnormBwdExecuteGraphTest, RunFloatBwdBatchnormGraphNHWC)
 
 // MIOpen segfaults for this case, re-enable when fix is released:
 // https://github.com/ROCm/rocm-libraries/pull/1197
-TEST_P(BatchnormBwdExecuteGraphTest, DISABLED_RunBfloat16BwdBatchnormGraphNHWC)
+TEST_F(BatchnormBwdExecuteGraphTest, DISABLED_RunBfloat16BwdBatchnormGraphNHWC)
 {
     Batchnorm2dTestCase testCase = {.n = 1, .c = 3, .h = 14, .w = 14};
     runBwdBatchnormGraph<hip_bfloat16, float>(testCase,
@@ -101,7 +111,7 @@ TEST_P(BatchnormBwdExecuteGraphTest, DISABLED_RunBfloat16BwdBatchnormGraphNHWC)
 
 // MIOpen segfaults for this case, re-enable when fix is released:
 // https://github.com/ROCm/rocm-libraries/pull/1197
-TEST_P(BatchnormBwdExecuteGraphTest, DISABLED_RunHalfBwdBatchnormGraphNHWC)
+TEST_F(BatchnormBwdExecuteGraphTest, DISABLED_RunHalfBwdBatchnormGraphNHWC)
 {
     Batchnorm2dTestCase testCase = {.n = 1, .c = 3, .h = 14, .w = 14};
     runBwdBatchnormGraph<half, float>(
@@ -109,7 +119,7 @@ TEST_P(BatchnormBwdExecuteGraphTest, DISABLED_RunHalfBwdBatchnormGraphNHWC)
 }
 
 // TODO: Re-enable when double support is added to MIOpen plugin
-TEST_P(BatchnormBwdExecuteGraphTest, DISABLED_RunDoubleBwdBatchnormGraphNHWC)
+TEST_F(BatchnormBwdExecuteGraphTest, DISABLED_RunDoubleBwdBatchnormGraphNHWC)
 {
     Batchnorm2dTestCase testCase = {.n = 1, .c = 3, .h = 14, .w = 14};
     runBwdBatchnormGraph<double, double>(
@@ -117,7 +127,7 @@ TEST_P(BatchnormBwdExecuteGraphTest, DISABLED_RunDoubleBwdBatchnormGraphNHWC)
 }
 
 template <typename InputType, typename IntermediateType>
-void BatchnormBwdExecuteGraphTest::runBwdBatchnormGraph(
+void BatchnormBwdExecuteGraphTestBase::runBwdBatchnormGraph(
     Batchnorm2dTestCase testCase,
     hipdnn_sdk::data_objects::DataType inputDataType,
     InputType epsilon,
@@ -240,5 +250,5 @@ void BatchnormBwdExecuteGraphTest::runBwdBatchnormGraph(
 }
 
 INSTANTIATE_TEST_SUITE_P(RunBwdBatchnormGraphWithParams,
-                         BatchnormBwdExecuteGraphTest,
+                         BatchnormBwdExecuteGraphTestWithParams,
                          testing::ValuesIn(getBatchnorm2dTestCases()));
