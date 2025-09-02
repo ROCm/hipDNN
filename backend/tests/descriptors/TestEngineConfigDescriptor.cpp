@@ -1,7 +1,7 @@
 // Copyright © Advanced Micro Devices, Inc., or its affiliates.
 // SPDX-License-Identifier: MIT
 
-#include "TestDescriptorUtils.hpp"
+#include "DescriptorTestUtils.hpp"
 #include "TestMacros.hpp"
 #include "descriptors/EngineConfigDescriptor.hpp"
 #include "descriptors/EngineDescriptor.hpp"
@@ -22,7 +22,7 @@ using namespace ::testing;
 
 using ::testing::Return;
 
-class EngineConfigDescriptorTest : public ::testing::Test
+class TestEngineConfigDescriptor : public ::testing::Test
 {
 public:
     std::unique_ptr<HipdnnBackendDescriptor> _engineConfigWrapper = nullptr;
@@ -96,7 +96,7 @@ protected:
     }
 };
 
-TEST_F(EngineConfigDescriptorTest, CreateEngineConfigDescriptor)
+TEST_F(TestEngineConfigDescriptor, CreateEngineConfigDescriptor)
 {
     auto engineConfig = getEngineConfigDescriptor();
     ASSERT_NE(engineConfig, nullptr);
@@ -104,7 +104,7 @@ TEST_F(EngineConfigDescriptorTest, CreateEngineConfigDescriptor)
     ASSERT_EQ(engineConfig->getType(), HIPDNN_BACKEND_ENGINECFG_DESCRIPTOR);
 }
 
-TEST_F(EngineConfigDescriptorTest, SetEngineConfigDescriptorEngine)
+TEST_F(TestEngineConfigDescriptor, SetEngineConfigDescriptorEngine)
 {
     auto engineConfig = getEngineConfigDescriptor();
 
@@ -154,7 +154,7 @@ TEST_F(EngineConfigDescriptorTest, SetEngineConfigDescriptorEngine)
                                HIPDNN_STATUS_BAD_PARAM);
 }
 
-TEST_F(EngineConfigDescriptorTest, SetAttrOnFinalizedEngineConfigDescriptor)
+TEST_F(TestEngineConfigDescriptor, SetAttrOnFinalizedEngineConfigDescriptor)
 {
     auto engineConfig = getEngineConfigDescriptor();
     makeEngineConfigFinalized();
@@ -165,7 +165,7 @@ TEST_F(EngineConfigDescriptorTest, SetAttrOnFinalizedEngineConfigDescriptor)
         HIPDNN_STATUS_NOT_INITIALIZED);
 }
 
-TEST_F(EngineConfigDescriptorTest, FinalizeEngineConfigDescriptor)
+TEST_F(TestEngineConfigDescriptor, FinalizeEngineConfigDescriptor)
 {
     auto engineConfig = getEngineConfigDescriptor();
     ASSERT_THROW_HIPDNN_STATUS(engineConfig->finalize(), HIPDNN_STATUS_BAD_PARAM);
@@ -173,7 +173,7 @@ TEST_F(EngineConfigDescriptorTest, FinalizeEngineConfigDescriptor)
     makeEngineConfigFinalized();
 }
 
-TEST_F(EngineConfigDescriptorTest, GetAttrOnUnfinalizedEngineConfigDescriptor)
+TEST_F(TestEngineConfigDescriptor, GetAttrOnUnfinalizedEngineConfigDescriptor)
 {
     auto engineConfig = getEngineConfigDescriptor();
     hipdnnBackendDescriptor_t dummyEngine = nullptr;
@@ -184,7 +184,7 @@ TEST_F(EngineConfigDescriptorTest, GetAttrOnUnfinalizedEngineConfigDescriptor)
         HIPDNN_STATUS_NOT_INITIALIZED);
 }
 
-TEST_F(EngineConfigDescriptorTest, GetEngineConfigDescriptorUnsupportedAttr)
+TEST_F(TestEngineConfigDescriptor, GetEngineConfigDescriptorUnsupportedAttr)
 {
     auto engineConfig = getEngineConfigDescriptor();
     hipdnnBackendDescriptor_t dummy = nullptr;
@@ -199,7 +199,7 @@ TEST_F(EngineConfigDescriptorTest, GetEngineConfigDescriptorUnsupportedAttr)
                                HIPDNN_STATUS_NOT_SUPPORTED);
 }
 
-TEST_F(EngineConfigDescriptorTest, GetEngineConfigDescriptorEngine)
+TEST_F(TestEngineConfigDescriptor, GetEngineConfigDescriptorEngine)
 {
     auto engineConfig = getEngineConfigDescriptor();
     ScopedDescriptor engine;
@@ -233,13 +233,13 @@ TEST_F(EngineConfigDescriptorTest, GetEngineConfigDescriptorEngine)
     ASSERT_EQ(count, 1);
 }
 
-TEST_F(EngineConfigDescriptorTest, GetEngineThrowsIfNotFinalized)
+TEST_F(TestEngineConfigDescriptor, GetEngineThrowsIfNotFinalized)
 {
     auto engineConfig = getEngineConfigDescriptor();
     ASSERT_THROW_HIPDNN_STATUS(engineConfig->getEngine(), HIPDNN_STATUS_INTERNAL_ERROR);
 }
 
-TEST_F(EngineConfigDescriptorTest, GetEngineReturnsPointerIfFinalized)
+TEST_F(TestEngineConfigDescriptor, GetEngineReturnsPointerIfFinalized)
 {
     auto engineConfig = getEngineConfigDescriptor();
     makeEngineConfigFinalized();
@@ -249,7 +249,7 @@ TEST_F(EngineConfigDescriptorTest, GetEngineReturnsPointerIfFinalized)
               static_cast<const IBackendDescriptor*>(getMockEngine().get()));
 }
 
-TEST_F(EngineConfigDescriptorTest, GetEngineDescriptorMaxWorkspaceSize)
+TEST_F(TestEngineConfigDescriptor, GetEngineDescriptorMaxWorkspaceSize)
 {
     auto engineConfig = getEngineConfigDescriptor();
     int64_t workspaceSize = 0;

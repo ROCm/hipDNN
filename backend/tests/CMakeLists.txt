@@ -24,7 +24,7 @@ add_executable(hipdnn_backend_tests
     descriptors/TestEngineHeuristicDescriptor.cpp
     descriptors/TestExecutionPlanDescriptor.cpp
     descriptors/TestGraphDescriptor.cpp
-    descriptors/TestVariantPack.cpp
+    descriptors/TestVariantPackDescriptor.cpp
     main.cpp
     TestEnginePlugin.cpp
     TestEnginePluginResourceManager.cpp

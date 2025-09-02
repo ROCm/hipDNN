@@ -1,8 +1,8 @@
 // Copyright © Advanced Micro Devices, Inc., or its affiliates.
 // SPDX-License-Identifier: MIT
 
+#include "DescriptorTestUtils.hpp"
 #include "HipdnnException.hpp"
-#include "TestDescriptorUtils.hpp"
 #include "TestMacros.hpp"
 #include "descriptors/EngineConfigDescriptor.hpp"
 #include "descriptors/EngineDescriptor.hpp"
@@ -27,7 +27,7 @@ using namespace ::testing;
 
 using ::testing::Return;
 
-class EngineHeuristicDescriptorTest : public ::testing::Test
+class TestEngineHeuristicDescriptor : public ::testing::Test
 {
 public:
     std::unique_ptr<HipdnnBackendDescriptor> _engineHeuristicWrapper = nullptr;
@@ -120,7 +120,7 @@ protected:
     std::vector<flatbuffers::DetachedBuffer> _engineDetailBuffers;
 };
 
-TEST_F(EngineHeuristicDescriptorTest, CreateEngineHeuristicDescriptor)
+TEST_F(TestEngineHeuristicDescriptor, CreateEngineHeuristicDescriptor)
 {
     auto heur = getEngineHeuristicDescriptor();
     ASSERT_NE(heur, nullptr);
@@ -128,7 +128,7 @@ TEST_F(EngineHeuristicDescriptorTest, CreateEngineHeuristicDescriptor)
     ASSERT_EQ(heur->getType(), HIPDNN_BACKEND_ENGINEHEUR_DESCRIPTOR);
 }
 
-TEST_F(EngineHeuristicDescriptorTest, SetEngineHeuristicDescriptorGraph)
+TEST_F(TestEngineHeuristicDescriptor, SetEngineHeuristicDescriptorGraph)
 {
     auto heur = getEngineHeuristicDescriptor();
 
@@ -183,7 +183,7 @@ TEST_F(EngineHeuristicDescriptorTest, SetEngineHeuristicDescriptorGraph)
                                HIPDNN_STATUS_BAD_PARAM);
 }
 
-TEST_F(EngineHeuristicDescriptorTest, SetEngineHeuristicDescriptorHeurMode)
+TEST_F(TestEngineHeuristicDescriptor, SetEngineHeuristicDescriptorHeurMode)
 {
     auto heur = getEngineHeuristicDescriptor();
     hipdnnBackendHeurMode_t mode = HIPDNN_HEUR_MODE_FALLBACK;
@@ -209,7 +209,7 @@ TEST_F(EngineHeuristicDescriptorTest, SetEngineHeuristicDescriptorHeurMode)
         heur->setAttribute(HIPDNN_ATTR_ENGINEHEUR_MODE, HIPDNN_TYPE_HEUR_MODE, 1, &mode));
 }
 
-TEST_F(EngineHeuristicDescriptorTest, SetEngineHeuristicDescriptorUnsupportedAttr)
+TEST_F(TestEngineHeuristicDescriptor, SetEngineHeuristicDescriptorUnsupportedAttr)
 {
     auto heur = getEngineHeuristicDescriptor();
     int32_t dummy = 0;
@@ -219,7 +219,7 @@ TEST_F(EngineHeuristicDescriptorTest, SetEngineHeuristicDescriptorUnsupportedAtt
         HIPDNN_STATUS_NOT_SUPPORTED);
 }
 
-TEST_F(EngineHeuristicDescriptorTest, SetAttrOnFinalizedEngineHeuristicDescriptor)
+TEST_F(TestEngineHeuristicDescriptor, SetAttrOnFinalizedEngineHeuristicDescriptor)
 {
     auto heur = getEngineHeuristicDescriptor();
     makeEngineHeuristicFinalized();
@@ -231,7 +231,7 @@ TEST_F(EngineHeuristicDescriptorTest, SetAttrOnFinalizedEngineHeuristicDescripto
                                HIPDNN_STATUS_NOT_INITIALIZED);
 }
 
-TEST_F(EngineHeuristicDescriptorTest, FinalizeEngineHeuristicDescriptor)
+TEST_F(TestEngineHeuristicDescriptor, FinalizeEngineHeuristicDescriptor)
 {
     auto heur = getEngineHeuristicDescriptor();
     EXPECT_CALL(*_mockEnginePluginResourceManager, getApplicableEngineIds)
@@ -248,7 +248,7 @@ TEST_F(EngineHeuristicDescriptorTest, FinalizeEngineHeuristicDescriptor)
     ASSERT_THROW_HIPDNN_STATUS(heur->finalize(), HIPDNN_STATUS_BAD_PARAM);
 }
 
-TEST_F(EngineHeuristicDescriptorTest, FinalizeEngineHeuristicDescriptorReverseOrder)
+TEST_F(TestEngineHeuristicDescriptor, FinalizeEngineHeuristicDescriptorReverseOrder)
 {
     auto heur = getEngineHeuristicDescriptor();
     EXPECT_CALL(*_mockEnginePluginResourceManager, getApplicableEngineIds)
@@ -265,7 +265,7 @@ TEST_F(EngineHeuristicDescriptorTest, FinalizeEngineHeuristicDescriptorReverseOr
     ASSERT_THROW_HIPDNN_STATUS(heur->finalize(), HIPDNN_STATUS_BAD_PARAM);
 }
 
-TEST_F(EngineHeuristicDescriptorTest, GetAttrOnUnfinalizedEngineHeuristicDescriptor)
+TEST_F(TestEngineHeuristicDescriptor, GetAttrOnUnfinalizedEngineHeuristicDescriptor)
 {
     auto heur = getEngineHeuristicDescriptor();
     hipdnnBackendDescriptor_t dummyGraph = nullptr;
@@ -278,7 +278,7 @@ TEST_F(EngineHeuristicDescriptorTest, GetAttrOnUnfinalizedEngineHeuristicDescrip
                                HIPDNN_STATUS_BAD_PARAM_NOT_FINALIZED);
 }
 
-TEST_F(EngineHeuristicDescriptorTest, GetEngineHeuristicDescriptorUnsupportedAttr)
+TEST_F(TestEngineHeuristicDescriptor, GetEngineHeuristicDescriptorUnsupportedAttr)
 {
     auto heur = getEngineHeuristicDescriptor();
     hipdnnBackendHeurMode_t dummy;
@@ -290,7 +290,7 @@ TEST_F(EngineHeuristicDescriptorTest, GetEngineHeuristicDescriptorUnsupportedAtt
         HIPDNN_STATUS_NOT_SUPPORTED);
 }
 
-TEST_F(EngineHeuristicDescriptorTest, GetEngineHeuristicDescriptorGraph)
+TEST_F(TestEngineHeuristicDescriptor, GetEngineHeuristicDescriptorGraph)
 {
     auto heur = getEngineHeuristicDescriptor();
     ScopedDescriptor graph;
@@ -333,7 +333,7 @@ TEST_F(EngineHeuristicDescriptorTest, GetEngineHeuristicDescriptorGraph)
     ASSERT_EQ(count, 1);
 }
 
-TEST_F(EngineHeuristicDescriptorTest, GetEngineHeuristicDescriptorEngineConfigs)
+TEST_F(TestEngineHeuristicDescriptor, GetEngineHeuristicDescriptorEngineConfigs)
 {
     auto heur = getEngineHeuristicDescriptor();
     makeEngineHeuristicFinalized();
@@ -394,7 +394,7 @@ TEST_F(EngineHeuristicDescriptorTest, GetEngineHeuristicDescriptorEngineConfigs)
     ASSERT_EQ(count, 1);
 }
 
-TEST_F(EngineHeuristicDescriptorTest, GetEngineConfigsWithNullConfig)
+TEST_F(TestEngineHeuristicDescriptor, GetEngineConfigsWithNullConfig)
 {
     auto heur = getEngineHeuristicDescriptor();
     makeEngineHeuristicFinalized();
@@ -428,7 +428,7 @@ TEST_F(EngineHeuristicDescriptorTest, GetEngineConfigsWithNullConfig)
     }
 }
 
-TEST_F(EngineHeuristicDescriptorTest, GetEngineConfigsWithNoEngineIds)
+TEST_F(TestEngineHeuristicDescriptor, GetEngineConfigsWithNoEngineIds)
 {
     auto heur = getEngineHeuristicDescriptor();
     setGraph();
@@ -456,7 +456,7 @@ TEST_F(EngineHeuristicDescriptorTest, GetEngineConfigsWithNoEngineIds)
     }
 }
 
-TEST_F(EngineHeuristicDescriptorTest, GetEngineConfigsRequestMoreThanAvailable)
+TEST_F(TestEngineHeuristicDescriptor, GetEngineConfigsRequestMoreThanAvailable)
 {
     auto heur = getEngineHeuristicDescriptor();
     makeEngineHeuristicFinalized();
@@ -487,7 +487,7 @@ TEST_F(EngineHeuristicDescriptorTest, GetEngineConfigsRequestMoreThanAvailable)
     }
 }
 
-TEST_F(EngineHeuristicDescriptorTest, GetEngineConfigsCountOnly)
+TEST_F(TestEngineHeuristicDescriptor, GetEngineConfigsCountOnly)
 {
     auto heur = getEngineHeuristicDescriptor();
     makeEngineHeuristicFinalized();
@@ -500,7 +500,7 @@ TEST_F(EngineHeuristicDescriptorTest, GetEngineConfigsCountOnly)
     ASSERT_EQ(count, 3);
 }
 
-TEST_F(EngineHeuristicDescriptorTest, GetEngineHeuristicDescriptorHeurMode)
+TEST_F(TestEngineHeuristicDescriptor, GetEngineHeuristicDescriptorHeurMode)
 {
     auto heur = getEngineHeuristicDescriptor();
     hipdnnBackendHeurMode_t mode = HIPDNN_HEUR_MODE_FALLBACK;
@@ -531,13 +531,13 @@ TEST_F(EngineHeuristicDescriptorTest, GetEngineHeuristicDescriptorHeurMode)
     ASSERT_EQ(mode, HIPDNN_HEUR_MODE_FALLBACK);
 }
 
-TEST_F(EngineHeuristicDescriptorTest, GetGraphThrowsIfNotFinalized)
+TEST_F(TestEngineHeuristicDescriptor, GetGraphThrowsIfNotFinalized)
 {
     auto heur = getEngineHeuristicDescriptor();
     ASSERT_THROW_HIPDNN_STATUS(heur->getGraph(), HIPDNN_STATUS_INTERNAL_ERROR);
 }
 
-TEST_F(EngineHeuristicDescriptorTest, GetGraphReturnsPointerIfFinalized)
+TEST_F(TestEngineHeuristicDescriptor, GetGraphReturnsPointerIfFinalized)
 {
     auto heur = getEngineHeuristicDescriptor();
     makeEngineHeuristicFinalized();
