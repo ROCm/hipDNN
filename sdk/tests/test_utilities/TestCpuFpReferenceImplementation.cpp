@@ -78,10 +78,10 @@ TEST(CpuFpReferenceImplementation, BatchnormInferFloatUsageNHWC)
 {
     Tensor<float> inputTensor({6, 3, 32, 32}, TensorLayout::NHWC);
     Tensor<float> outputTensor({6, 3, 32, 32}, TensorLayout::NHWC);
-    Tensor<float> biasTensor({1, 3, 1, 1});
-    Tensor<float> scaleTensor({1, 3, 1, 1});
-    Tensor<float> meanTensor({1, 3, 1, 1});
-    Tensor<float> varianceTensor({1, 3, 1, 1});
+    Tensor<float> biasTensor({1, 3});
+    Tensor<float> scaleTensor({1, 3});
+    Tensor<float> meanTensor({1, 3});
+    Tensor<float> varianceTensor({1, 3});
 
     CpuFpReferenceImplementation<float, float, float> refImpl;
 
@@ -91,33 +91,31 @@ TEST(CpuFpReferenceImplementation, BatchnormInferFloatUsageNHWC)
 
 TEST(CpuFpReferenceImplementation, BatchnormInferSanityValidation)
 {
-    SKIP_IF_NO_DEVICES();
-
     const std::vector<int64_t> dims = {1, 1, 2, 2};
 
     Tensor<double> inputTensor(dims);
     Tensor<double> outputTensor(dims);
-    Tensor<double> scaleTensor({1, 1, 1, 1});
-    Tensor<double> biasTensor({1, 1, 1, 1});
-    Tensor<double> meanTensor({1, 1, 1, 1});
-    Tensor<double> varianceTensor({1, 1, 1, 1});
+    Tensor<double> scaleTensor({1, 1});
+    Tensor<double> biasTensor({1, 1});
+    Tensor<double> meanTensor({1, 1});
+    Tensor<double> varianceTensor({1, 1});
 
     // x = [1, 2, 3, 4]
-    inputTensor.setHostValue(0, 0, 0, 0, 1.0);
-    inputTensor.setHostValue(0, 0, 0, 1, 2.0);
-    inputTensor.setHostValue(0, 0, 1, 0, 3.0);
-    inputTensor.setHostValue(0, 0, 1, 1, 4.0);
+    inputTensor.setHostValue(1.0, 0, 0, 0, 0);
+    inputTensor.setHostValue(2.0, 0, 0, 0, 1);
+    inputTensor.setHostValue(3.0, 0, 0, 1, 0);
+    inputTensor.setHostValue(4.0, 0, 0, 1, 1);
 
     // fixed scale and bias parameters (one channel)
-    scaleTensor.setHostValue(0, 0, 0, 0, 2.0);
-    biasTensor.setHostValue(0, 0, 0, 0, 0.5);
+    scaleTensor.setHostValue(2.0, 0, 0);
+    biasTensor.setHostValue(0.5, 0, 0);
 
     // inference uses population statistics per channel:
     // mean = (1+2+3+4)/4 = 2.5
     // variance = [(-1.5)^2 + (-0.5)^2 + (0.5)^2 + (1.5)^2] / 4 = 5.0 / 4 = 1.25
     // (in practice, computed during training)
-    meanTensor.setHostValue(0, 0, 0, 0, 2.5);
-    varianceTensor.setHostValue(0, 0, 0, 0, 1.25);
+    meanTensor.setHostValue(2.5, 0, 0);
+    varianceTensor.setHostValue(1.25, 0, 0);
 
     // output is calculated via a pointwise linear transform on x:
     // y = scale * (x - mean) * inv_variance + bias = 2 * (x - 2.5) * inv_variance + 0.5
@@ -258,33 +256,33 @@ TEST(CpuFpReferenceImplementation, BatchnormBwdSanityValidation)
     Tensor<double> xTensor(dims);
     Tensor<double> dyTensor(dims);
     Tensor<double> dxTensor(dims);
-    Tensor<double> scaleTensor({1, 1, 1, 1});
-    Tensor<double> meanTensor({1, 1, 1, 1});
-    Tensor<double> invVarianceTensor({1, 1, 1, 1});
-    Tensor<double> dscaleTensor({1, 1, 1, 1});
-    Tensor<double> dbiasTensor({1, 1, 1, 1});
+    Tensor<double> scaleTensor({1, 1});
+    Tensor<double> meanTensor({1, 1});
+    Tensor<double> invVarianceTensor({1, 1});
+    Tensor<double> dscaleTensor({1, 1});
+    Tensor<double> dbiasTensor({1, 1});
 
     // x = [1, 2, 3, 4]
-    xTensor.setHostValue(0, 0, 0, 0, 1.0);
-    xTensor.setHostValue(0, 0, 0, 1, 2.0);
-    xTensor.setHostValue(0, 0, 1, 0, 3.0);
-    xTensor.setHostValue(0, 0, 1, 1, 4.0);
+    xTensor.setHostValue(1.0, 0, 0, 0, 0);
+    xTensor.setHostValue(2.0, 0, 0, 0, 1);
+    xTensor.setHostValue(3.0, 0, 0, 1, 0);
+    xTensor.setHostValue(4.0, 0, 0, 1, 1);
 
     // gradient dy = [0.1, 0.2, 0.3, 0.4]
-    dyTensor.setHostValue(0, 0, 0, 0, 0.1);
-    dyTensor.setHostValue(0, 0, 0, 1, 0.2);
-    dyTensor.setHostValue(0, 0, 1, 0, 0.3);
-    dyTensor.setHostValue(0, 0, 1, 1, 0.4);
+    dyTensor.setHostValue(0.1, 0, 0, 0, 0);
+    dyTensor.setHostValue(0.2, 0, 0, 0, 1);
+    dyTensor.setHostValue(0.3, 0, 0, 1, 0);
+    dyTensor.setHostValue(0.4, 0, 0, 1, 1);
 
     // scale (one channel) = 2.0
-    scaleTensor.setHostValue(0, 0, 0, 0, 2.0);
+    scaleTensor.setHostValue(2.0, 0, 0);
 
     // 1 batch, so compute mean and variance over all elements
     // mean = (1+2+3+4)/4 = 2.5
     // variance = [(-1.5)^2 + (-0.5)^2 + (0.5)^2 + (1.5)^2] / 4 = 5.0 / 4 = 1.25
     // inv_variance = 1 / sqrt(1.25 + 1e-5) = 0.894423613312618
-    meanTensor.setHostValue(0, 0, 0, 0, 2.5);
-    invVarianceTensor.setHostValue(0, 0, 0, 0, 0.894423613312618);
+    meanTensor.setHostValue(2.5, 0, 0);
+    invVarianceTensor.setHostValue(0.894423613312618, 0, 0);
 
     // dbias = sum(dy) = 0.1 + 0.2 + 0.3 + 0.4 = 1.0
     auto expectedDbias = 1.0;
@@ -310,8 +308,8 @@ TEST(CpuFpReferenceImplementation, BatchnormBwdSanityValidation)
 
     auto tolerance = 1e-6;
 
-    EXPECT_NEAR(dbiasTensor.getHostValue(0, 0, 0, 0), expectedDbias, tolerance);
-    EXPECT_NEAR(dscaleTensor.getHostValue(0, 0, 0, 0), expectedDscale, tolerance);
+    EXPECT_NEAR(dbiasTensor.getHostValue(0, 0), expectedDbias, tolerance);
+    EXPECT_NEAR(dscaleTensor.getHostValue(0, 0), expectedDscale, tolerance);
     EXPECT_NEAR(dxTensor.getHostValue(0, 0, 0, 0), expectedDx[0], tolerance);
     EXPECT_NEAR(dxTensor.getHostValue(0, 0, 0, 1), expectedDx[1], tolerance);
     EXPECT_NEAR(dxTensor.getHostValue(0, 0, 1, 0), expectedDx[2], tolerance);

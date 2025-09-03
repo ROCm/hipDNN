@@ -33,7 +33,7 @@ struct Batchnorm2dTestCase
 
 template <typename T>
 hipdnnPluginDeviceBuffer_t
-    generateRandomDeviceBuffer(ITensor<T>& tensor, int uid, T min, T max, unsigned int seed = 0)
+    generateRandomDeviceBuffer(TensorBase<T>& tensor, int uid, T min, T max, unsigned int seed = 0)
 {
     tensor.fillWithRandomValues(min, max, seed);
     hipdnnPluginDeviceBuffer_t buffer;
@@ -43,7 +43,7 @@ hipdnnPluginDeviceBuffer_t
 }
 
 template <typename T>
-hipdnnPluginDeviceBuffer_t generateStaticDeviceBuffer(ITensor<T>& tensor, int uid, T value)
+hipdnnPluginDeviceBuffer_t generateStaticDeviceBuffer(TensorBase<T>& tensor, int uid, T value)
 {
     tensor.fillWithValue(value);
     hipdnnPluginDeviceBuffer_t buffer;
@@ -53,7 +53,7 @@ hipdnnPluginDeviceBuffer_t generateStaticDeviceBuffer(ITensor<T>& tensor, int ui
 }
 
 template <typename T>
-hipdnnPluginDeviceBuffer_t generateEmptyDeviceBuffer(ITensor<T>& tensor, int uid)
+hipdnnPluginDeviceBuffer_t generateEmptyDeviceBuffer(TensorBase<T>& tensor, int uid)
 {
     hipdnnPluginDeviceBuffer_t buffer;
     buffer.uid = uid;
