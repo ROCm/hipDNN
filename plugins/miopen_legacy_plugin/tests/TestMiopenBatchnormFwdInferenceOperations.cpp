@@ -155,164 +155,164 @@ protected:
     hipdnnEnginePluginHandle_t _handle = nullptr;
 };
 
-class TestGpuMiopenBatchnormFwdInferenceExecuteGraphFp32Nchw
+class TestGpuMiopenBatchnormFwdInferenceExecuteGraphNchwFp32
     : public BatchnormFwdInferenceExecuteGraphBase<float, float>
 {
 public:
-    TestGpuMiopenBatchnormFwdInferenceExecuteGraphFp32Nchw()
+    TestGpuMiopenBatchnormFwdInferenceExecuteGraphNchwFp32()
         : BatchnormFwdInferenceExecuteGraphBase(TensorLayout::NCHW)
     {
     }
 };
 
-class TestGpuMiopenBatchnormFwdInferenceExecuteGraphFp16Nchw
+class TestGpuMiopenBatchnormFwdInferenceExecuteGraphNchwFp16
     : public BatchnormFwdInferenceExecuteGraphBase<half, float>
 {
 public:
-    TestGpuMiopenBatchnormFwdInferenceExecuteGraphFp16Nchw()
+    TestGpuMiopenBatchnormFwdInferenceExecuteGraphNchwFp16()
         : BatchnormFwdInferenceExecuteGraphBase(TensorLayout::NCHW)
     {
     }
 };
 
-class TestGpuMiopenBatchnormFwdInferenceExecuteGraphBfp16Nchw
+class TestGpuMiopenBatchnormFwdInferenceExecuteGraphNchwBfp16
     : public BatchnormFwdInferenceExecuteGraphBase<hip_bfloat16, float>
 {
 public:
-    TestGpuMiopenBatchnormFwdInferenceExecuteGraphBfp16Nchw()
+    TestGpuMiopenBatchnormFwdInferenceExecuteGraphNchwBfp16()
         : BatchnormFwdInferenceExecuteGraphBase(TensorLayout::NCHW)
     {
     }
 };
 
-class TestGpuMiopenBatchnormFwdInferenceExecuteGraphFp64Nchw
+class TestGpuMiopenBatchnormFwdInferenceExecuteGraphNchwFp64
     : public BatchnormFwdInferenceExecuteGraphBase<double, double>
 {
 public:
-    TestGpuMiopenBatchnormFwdInferenceExecuteGraphFp64Nchw()
+    TestGpuMiopenBatchnormFwdInferenceExecuteGraphNchwFp64()
         : BatchnormFwdInferenceExecuteGraphBase(TensorLayout::NCHW)
     {
     }
 };
 
-class TestGpuMiopenBatchnormFwdInferenceExecuteGraphFp32Nhwc
+class TestGpuMiopenBatchnormFwdInferenceExecuteGraphNhwcFp32
     : public BatchnormFwdInferenceExecuteGraphBase<float, float>
 {
 public:
-    TestGpuMiopenBatchnormFwdInferenceExecuteGraphFp32Nhwc()
+    TestGpuMiopenBatchnormFwdInferenceExecuteGraphNhwcFp32()
         : BatchnormFwdInferenceExecuteGraphBase(TensorLayout::NHWC)
     {
     }
 };
 
-class TestGpuMiopenBatchnormFwdInferenceExecuteGraphFp16Nhwc
+class TestGpuMiopenBatchnormFwdInferenceExecuteGraphNhwcFp16
     : public BatchnormFwdInferenceExecuteGraphBase<half, float>
 {
 public:
-    TestGpuMiopenBatchnormFwdInferenceExecuteGraphFp16Nhwc()
+    TestGpuMiopenBatchnormFwdInferenceExecuteGraphNhwcFp16()
         : BatchnormFwdInferenceExecuteGraphBase(TensorLayout::NHWC)
     {
     }
 };
 
-class TestGpuMiopenBatchnormFwdInferenceExecuteGraphBfp16Nhwc
+class TestGpuMiopenBatchnormFwdInferenceExecuteGraphNhwcBfp16
     : public BatchnormFwdInferenceExecuteGraphBase<hip_bfloat16, float>
 {
 public:
-    TestGpuMiopenBatchnormFwdInferenceExecuteGraphBfp16Nhwc()
+    TestGpuMiopenBatchnormFwdInferenceExecuteGraphNhwcBfp16()
         : BatchnormFwdInferenceExecuteGraphBase(TensorLayout::NHWC)
     {
     }
 };
 
-class TestGpuMiopenBatchnormFwdInferenceExecuteGraphFp64Nhwc
+class TestGpuMiopenBatchnormFwdInferenceExecuteGraphNhwcFp64
     : public BatchnormFwdInferenceExecuteGraphBase<double, double>
 {
 public:
-    TestGpuMiopenBatchnormFwdInferenceExecuteGraphFp64Nhwc()
+    TestGpuMiopenBatchnormFwdInferenceExecuteGraphNhwcFp64()
         : BatchnormFwdInferenceExecuteGraphBase(TensorLayout::NHWC)
     {
     }
 };
 
-TEST_P(TestGpuMiopenBatchnormFwdInferenceExecuteGraphFp32Nchw, Correctness)
+TEST_P(TestGpuMiopenBatchnormFwdInferenceExecuteGraphNchwFp32, Correctness)
 {
     auto testCase = GetParam();
     runFwdBatchnormGraph(testCase, hipdnn_sdk::data_objects::DataType::DataType_FLOAT, 1e-6f);
 }
 
-TEST_P(TestGpuMiopenBatchnormFwdInferenceExecuteGraphBfp16Nchw, Correctness)
+TEST_P(TestGpuMiopenBatchnormFwdInferenceExecuteGraphNchwBfp16, Correctness)
 {
     auto testCase = GetParam();
     runFwdBatchnormGraph(testCase, hipdnn_sdk::data_objects::DataType::DataType_BFLOAT16, 1e-2_bf);
 }
 
-TEST_P(TestGpuMiopenBatchnormFwdInferenceExecuteGraphFp16Nchw, Correctness)
+TEST_P(TestGpuMiopenBatchnormFwdInferenceExecuteGraphNchwFp16, Correctness)
 {
     auto testCase = GetParam();
     runFwdBatchnormGraph(testCase, hipdnn_sdk::data_objects::DataType::DataType_HALF, 1e-2_h);
 }
 
 // TODO: Re-enable when double support is added to MIOpen plugin
-TEST_P(TestGpuMiopenBatchnormFwdInferenceExecuteGraphFp64Nchw, DISABLED_Correctness)
+TEST_P(TestGpuMiopenBatchnormFwdInferenceExecuteGraphNchwFp64, DISABLED_Correctness)
 {
     auto testCase = GetParam();
     runFwdBatchnormGraph(testCase, hipdnn_sdk::data_objects::DataType::DataType_DOUBLE, 1e-6);
 }
 
-TEST_P(TestGpuMiopenBatchnormFwdInferenceExecuteGraphFp32Nhwc, Correctness)
+TEST_P(TestGpuMiopenBatchnormFwdInferenceExecuteGraphNhwcFp32, Correctness)
 {
     auto testCase = GetParam();
     runFwdBatchnormGraph(testCase, hipdnn_sdk::data_objects::DataType::DataType_FLOAT, 1e-6f);
 }
 
-TEST_P(TestGpuMiopenBatchnormFwdInferenceExecuteGraphBfp16Nhwc, Correctness)
+TEST_P(TestGpuMiopenBatchnormFwdInferenceExecuteGraphNhwcBfp16, Correctness)
 {
     auto testCase = GetParam();
     runFwdBatchnormGraph(testCase, hipdnn_sdk::data_objects::DataType::DataType_BFLOAT16, 1e-2_bf);
 }
 
-TEST_P(TestGpuMiopenBatchnormFwdInferenceExecuteGraphFp16Nhwc, Correctness)
+TEST_P(TestGpuMiopenBatchnormFwdInferenceExecuteGraphNhwcFp16, Correctness)
 {
     auto testCase = GetParam();
     runFwdBatchnormGraph(testCase, hipdnn_sdk::data_objects::DataType::DataType_HALF, 1e-2_h);
 }
 
 // TODO: Re-enable when double support is added to MIOpen plugin
-TEST_P(TestGpuMiopenBatchnormFwdInferenceExecuteGraphFp64Nhwc, DISABLED_Correctness)
+TEST_P(TestGpuMiopenBatchnormFwdInferenceExecuteGraphNhwcFp64, DISABLED_Correctness)
 {
     auto testCase = GetParam();
     runFwdBatchnormGraph(testCase, hipdnn_sdk::data_objects::DataType::DataType_DOUBLE, 1e-6);
 }
 
 INSTANTIATE_TEST_SUITE_P(,
-                         TestGpuMiopenBatchnormFwdInferenceExecuteGraphFp32Nchw,
+                         TestGpuMiopenBatchnormFwdInferenceExecuteGraphNchwFp32,
                          testing::ValuesIn(getBatchnorm2dTestCases()));
 
 INSTANTIATE_TEST_SUITE_P(,
-                         TestGpuMiopenBatchnormFwdInferenceExecuteGraphFp16Nchw,
+                         TestGpuMiopenBatchnormFwdInferenceExecuteGraphNchwFp16,
                          testing::ValuesIn(getBatchnorm2dTestCases()));
 
 INSTANTIATE_TEST_SUITE_P(,
-                         TestGpuMiopenBatchnormFwdInferenceExecuteGraphBfp16Nchw,
+                         TestGpuMiopenBatchnormFwdInferenceExecuteGraphNchwBfp16,
                          testing::ValuesIn(getBatchnorm2dTestCases()));
 
 INSTANTIATE_TEST_SUITE_P(,
-                         TestGpuMiopenBatchnormFwdInferenceExecuteGraphFp64Nchw,
+                         TestGpuMiopenBatchnormFwdInferenceExecuteGraphNchwFp64,
                          testing::ValuesIn(getBatchnorm2dTestCases()));
 
 INSTANTIATE_TEST_SUITE_P(,
-                         TestGpuMiopenBatchnormFwdInferenceExecuteGraphFp32Nhwc,
+                         TestGpuMiopenBatchnormFwdInferenceExecuteGraphNhwcFp32,
                          testing::ValuesIn(getBatchnorm2dTestCases()));
 
 INSTANTIATE_TEST_SUITE_P(,
-                         TestGpuMiopenBatchnormFwdInferenceExecuteGraphFp16Nhwc,
+                         TestGpuMiopenBatchnormFwdInferenceExecuteGraphNhwcFp16,
                          testing::ValuesIn(getBatchnorm2dTestCases()));
 
 INSTANTIATE_TEST_SUITE_P(,
-                         TestGpuMiopenBatchnormFwdInferenceExecuteGraphBfp16Nhwc,
+                         TestGpuMiopenBatchnormFwdInferenceExecuteGraphNhwcBfp16,
                          testing::ValuesIn(getBatchnorm2dTestCases()));
 
 INSTANTIATE_TEST_SUITE_P(,
-                         TestGpuMiopenBatchnormFwdInferenceExecuteGraphFp64Nhwc,
+                         TestGpuMiopenBatchnormFwdInferenceExecuteGraphNhwcFp64,
                          testing::ValuesIn(getBatchnorm2dTestCases()));

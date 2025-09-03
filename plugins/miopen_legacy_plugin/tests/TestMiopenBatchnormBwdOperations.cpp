@@ -171,112 +171,112 @@ protected:
     hipdnnEnginePluginHandle_t _handle = nullptr;
 };
 
-class TestGpuMiopenBatchnormBwdExecuteGraphFp32Nchw
+class TestGpuMiopenBatchnormBwdExecuteGraphNchwFp32
     : public BatchnormBwdExecuteGraphBase<float, float>
 {
 public:
-    TestGpuMiopenBatchnormBwdExecuteGraphFp32Nchw()
+    TestGpuMiopenBatchnormBwdExecuteGraphNchwFp32()
         : BatchnormBwdExecuteGraphBase(TensorLayout::NCHW)
     {
     }
 };
 
-class TestGpuMiopenBatchnormBwdExecuteGraphFp16Nchw
+class TestGpuMiopenBatchnormBwdExecuteGraphNchwFp16
     : public BatchnormBwdExecuteGraphBase<half, float>
 {
 public:
-    TestGpuMiopenBatchnormBwdExecuteGraphFp16Nchw()
+    TestGpuMiopenBatchnormBwdExecuteGraphNchwFp16()
         : BatchnormBwdExecuteGraphBase(TensorLayout::NCHW)
     {
     }
 };
 
-class TestGpuMiopenBatchnormBwdExecuteGraphBfp16Nchw
+class TestGpuMiopenBatchnormBwdExecuteGraphNchwBfp16
     : public BatchnormBwdExecuteGraphBase<hip_bfloat16, float>
 {
 public:
-    TestGpuMiopenBatchnormBwdExecuteGraphBfp16Nchw()
+    TestGpuMiopenBatchnormBwdExecuteGraphNchwBfp16()
         : BatchnormBwdExecuteGraphBase(TensorLayout::NCHW)
     {
     }
 };
 
-class TestGpuMiopenBatchnormBwdExecuteGraphFp64Nchw
+class TestGpuMiopenBatchnormBwdExecuteGraphNchwFp64
     : public BatchnormBwdExecuteGraphBase<double, double>
 {
 public:
-    TestGpuMiopenBatchnormBwdExecuteGraphFp64Nchw()
+    TestGpuMiopenBatchnormBwdExecuteGraphNchwFp64()
         : BatchnormBwdExecuteGraphBase(TensorLayout::NCHW)
     {
     }
 };
 
-class TestGpuMiopenBatchnormBwdExecuteGraphFp32Nhwc
+class TestGpuMiopenBatchnormBwdExecuteGraphNhwcFp32
     : public BatchnormBwdExecuteGraphBase<float, float>
 {
 public:
-    TestGpuMiopenBatchnormBwdExecuteGraphFp32Nhwc()
+    TestGpuMiopenBatchnormBwdExecuteGraphNhwcFp32()
         : BatchnormBwdExecuteGraphBase(TensorLayout::NHWC)
     {
     }
 };
 
-class TestGpuMiopenBatchnormBwdExecuteGraphFp16Nhwc
+class TestGpuMiopenBatchnormBwdExecuteGraphNhwcFp16
     : public BatchnormBwdExecuteGraphBase<half, float>
 {
 public:
-    TestGpuMiopenBatchnormBwdExecuteGraphFp16Nhwc()
+    TestGpuMiopenBatchnormBwdExecuteGraphNhwcFp16()
         : BatchnormBwdExecuteGraphBase(TensorLayout::NHWC)
     {
     }
 };
 
-class TestGpuMiopenBatchnormBwdExecuteGraphBfp16Nhwc
+class TestGpuMiopenBatchnormBwdExecuteGraphNhwcBfp16
     : public BatchnormBwdExecuteGraphBase<hip_bfloat16, float>
 {
 public:
-    TestGpuMiopenBatchnormBwdExecuteGraphBfp16Nhwc()
+    TestGpuMiopenBatchnormBwdExecuteGraphNhwcBfp16()
         : BatchnormBwdExecuteGraphBase(TensorLayout::NHWC)
     {
     }
 };
 
-class TestGpuMiopenBatchnormBwdExecuteGraphFp64Nhwc
+class TestGpuMiopenBatchnormBwdExecuteGraphNhwcFp64
     : public BatchnormBwdExecuteGraphBase<double, double>
 {
 public:
-    TestGpuMiopenBatchnormBwdExecuteGraphFp64Nhwc()
+    TestGpuMiopenBatchnormBwdExecuteGraphNhwcFp64()
         : BatchnormBwdExecuteGraphBase(TensorLayout::NHWC)
     {
     }
 };
 
-TEST_P(TestGpuMiopenBatchnormBwdExecuteGraphFp32Nchw, Correctness)
+TEST_P(TestGpuMiopenBatchnormBwdExecuteGraphNchwFp32, Correctness)
 {
     Batchnorm2dTestCase testCase = GetParam();
     runBwdBatchnormGraph(testCase, hipdnn_sdk::data_objects::DataType::DataType_FLOAT, 4e-3f);
 }
 
-TEST_P(TestGpuMiopenBatchnormBwdExecuteGraphBfp16Nchw, Correctness)
+TEST_P(TestGpuMiopenBatchnormBwdExecuteGraphNchwBfp16, Correctness)
 {
     Batchnorm2dTestCase testCase = GetParam();
     runBwdBatchnormGraph(testCase, hipdnn_sdk::data_objects::DataType::DataType_BFLOAT16, 4e-3_bf);
 }
 
-TEST_P(TestGpuMiopenBatchnormBwdExecuteGraphFp16Nchw, Correctness)
+TEST_P(TestGpuMiopenBatchnormBwdExecuteGraphNchwFp16, Correctness)
 {
     Batchnorm2dTestCase testCase = GetParam();
     runBwdBatchnormGraph(testCase, hipdnn_sdk::data_objects::DataType::DataType_HALF, 4e-3_h);
 }
 
 // TODO: Re-enable when double support is added to MIOpen plugin
-TEST_P(TestGpuMiopenBatchnormBwdExecuteGraphFp64Nchw, DISABLED_Correctness)
+TEST_P(TestGpuMiopenBatchnormBwdExecuteGraphNchwFp64, DISABLED_Correctness)
 {
     Batchnorm2dTestCase testCase = GetParam();
     runBwdBatchnormGraph(testCase, hipdnn_sdk::data_objects::DataType::DataType_DOUBLE, 4e-3);
 }
 
-TEST_P(TestGpuMiopenBatchnormBwdExecuteGraphFp32Nhwc, Correctness)
+TEST_P(TestGpuMiopenBatchnormBwdExecuteGraphNhwcFp32, Correctness)
 {
     Batchnorm2dTestCase testCase = GetParam();
     runBwdBatchnormGraph(testCase, hipdnn_sdk::data_objects::DataType::DataType_FLOAT, 4e-3f);
@@ -286,7 +286,7 @@ TEST_P(TestGpuMiopenBatchnormBwdExecuteGraphFp32Nhwc, Correctness)
 
 // MIOpen segfaults for this case, re-enable when fix is released:
 // https://github.com/ROCm/rocm-libraries/pull/1197
-TEST_P(TestGpuMiopenBatchnormBwdExecuteGraphBfp16Nhwc, DISABLED_Correctness)
+TEST_P(TestGpuMiopenBatchnormBwdExecuteGraphNhwcBfp16, DISABLED_Correctness)
 {
     Batchnorm2dTestCase testCase = GetParam();
     runBwdBatchnormGraph(testCase, hipdnn_sdk::data_objects::DataType::DataType_BFLOAT16, 4e-3_bf);
@@ -294,42 +294,42 @@ TEST_P(TestGpuMiopenBatchnormBwdExecuteGraphBfp16Nhwc, DISABLED_Correctness)
 
 // MIOpen segfaults for this case, re-enable when fix is released:
 // https://github.com/ROCm/rocm-libraries/pull/1197
-TEST_P(TestGpuMiopenBatchnormBwdExecuteGraphFp16Nhwc, DISABLED_Correctness)
+TEST_P(TestGpuMiopenBatchnormBwdExecuteGraphNhwcFp16, DISABLED_Correctness)
 {
     Batchnorm2dTestCase testCase = GetParam();
     runBwdBatchnormGraph(testCase, hipdnn_sdk::data_objects::DataType::DataType_HALF, 4e-3_h);
 }
 
 // TODO: Re-enable when double support is added to MIOpen plugin
-TEST_P(TestGpuMiopenBatchnormBwdExecuteGraphFp64Nhwc, DISABLED_Correctness)
+TEST_P(TestGpuMiopenBatchnormBwdExecuteGraphNhwcFp64, DISABLED_Correctness)
 {
     Batchnorm2dTestCase testCase = GetParam();
     runBwdBatchnormGraph(testCase, hipdnn_sdk::data_objects::DataType::DataType_DOUBLE, 4e-3);
 }
 
 INSTANTIATE_TEST_SUITE_P(,
-                         TestGpuMiopenBatchnormBwdExecuteGraphFp32Nchw,
+                         TestGpuMiopenBatchnormBwdExecuteGraphNchwFp32,
                          testing::ValuesIn(getBatchnorm2dTestCases()));
 
 INSTANTIATE_TEST_SUITE_P(,
-                         TestGpuMiopenBatchnormBwdExecuteGraphFp16Nchw,
+                         TestGpuMiopenBatchnormBwdExecuteGraphNchwFp16,
                          testing::ValuesIn(getBatchnorm2dTestCases()));
 
 INSTANTIATE_TEST_SUITE_P(,
-                         TestGpuMiopenBatchnormBwdExecuteGraphBfp16Nchw,
+                         TestGpuMiopenBatchnormBwdExecuteGraphNchwBfp16,
                          testing::ValuesIn(getBatchnorm2dTestCases()));
 INSTANTIATE_TEST_SUITE_P(,
-                         TestGpuMiopenBatchnormBwdExecuteGraphFp64Nchw,
+                         TestGpuMiopenBatchnormBwdExecuteGraphNchwFp64,
                          testing::ValuesIn(getBatchnorm2dTestCases()));
 INSTANTIATE_TEST_SUITE_P(,
-                         TestGpuMiopenBatchnormBwdExecuteGraphFp32Nhwc,
+                         TestGpuMiopenBatchnormBwdExecuteGraphNhwcFp32,
                          testing::ValuesIn(getBatchnorm2dTestCases()));
 INSTANTIATE_TEST_SUITE_P(,
-                         TestGpuMiopenBatchnormBwdExecuteGraphFp16Nhwc,
+                         TestGpuMiopenBatchnormBwdExecuteGraphNhwcFp16,
                          testing::ValuesIn(getBatchnorm2dTestCases()));
 INSTANTIATE_TEST_SUITE_P(,
-                         TestGpuMiopenBatchnormBwdExecuteGraphBfp16Nhwc,
+                         TestGpuMiopenBatchnormBwdExecuteGraphNhwcBfp16,
                          testing::ValuesIn(getBatchnorm2dTestCases()));
 INSTANTIATE_TEST_SUITE_P(,
-                         TestGpuMiopenBatchnormBwdExecuteGraphFp64Nhwc,
+                         TestGpuMiopenBatchnormBwdExecuteGraphNhwcFp64,
                          testing::ValuesIn(getBatchnorm2dTestCases()));
