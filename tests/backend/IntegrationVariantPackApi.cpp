@@ -5,7 +5,7 @@
 #include <cstring>
 #include <gtest/gtest.h>
 
-class VariantPackDescriptorApiTests : public ::testing::Test
+class IntegrationVariantPackDescriptorApi : public ::testing::Test
 {
 protected:
     hipdnnBackendDescriptor_t _varpack;
@@ -23,7 +23,7 @@ protected:
     }
 };
 
-TEST_F(VariantPackDescriptorApiTests, ValidSetAttributesAndFinalize)
+TEST_F(IntegrationVariantPackDescriptorApi, ValidSetAttributesAndFinalize)
 {
     std::array<void*, 3> devPtrs = {reinterpret_cast<void*>(0x1234),
                                     reinterpret_cast<void*>(0x5678),
@@ -47,7 +47,7 @@ TEST_F(VariantPackDescriptorApiTests, ValidSetAttributesAndFinalize)
     EXPECT_EQ(hipdnnBackendFinalize(_varpack), HIPDNN_STATUS_SUCCESS);
 }
 
-TEST_F(VariantPackDescriptorApiTests, ValidSetAttributesAndGetAttributesBeforeFinalize)
+TEST_F(IntegrationVariantPackDescriptorApi, ValidSetAttributesAndGetAttributesBeforeFinalize)
 {
     std::array<void*, 3> devPtrs = {reinterpret_cast<void*>(0x1234),
                                     reinterpret_cast<void*>(0x5678),
@@ -81,7 +81,7 @@ TEST_F(VariantPackDescriptorApiTests, ValidSetAttributesAndGetAttributesBeforeFi
               HIPDNN_STATUS_NOT_INITIALIZED);
 }
 
-TEST_F(VariantPackDescriptorApiTests, InvalidSetAttributes)
+TEST_F(IntegrationVariantPackDescriptorApi, InvalidSetAttributes)
 {
     std::array<void*, 3> devPtrs = {reinterpret_cast<void*>(0x1234),
                                     reinterpret_cast<void*>(0x5678),
@@ -114,7 +114,7 @@ TEST_F(VariantPackDescriptorApiTests, InvalidSetAttributes)
         HIPDNN_STATUS_BAD_PARAM_NULL_POINTER);
 }
 
-TEST_F(VariantPackDescriptorApiTests, InvalidGetAttributes)
+TEST_F(IntegrationVariantPackDescriptorApi, InvalidGetAttributes)
 {
     std::array<void*, 3> retrievedDevPtrs;
     int64_t elementCount = 0;
@@ -129,13 +129,13 @@ TEST_F(VariantPackDescriptorApiTests, InvalidGetAttributes)
 }
 
 // Invalid finalize since no devPtrs, or ids were set
-TEST_F(VariantPackDescriptorApiTests, InvalidFinalizeEmpty)
+TEST_F(IntegrationVariantPackDescriptorApi, InvalidFinalizeEmpty)
 {
     EXPECT_EQ(hipdnnBackendFinalize(_varpack), HIPDNN_STATUS_BAD_PARAM);
 }
 
 // Invalid finalize since devPtrs, and ids do not have the same size.
-TEST_F(VariantPackDescriptorApiTests, InvalidFinalizeParams)
+TEST_F(IntegrationVariantPackDescriptorApi, InvalidFinalizeParams)
 {
     std::array<void*, 3> devPtrs = {reinterpret_cast<void*>(0x1234),
                                     reinterpret_cast<void*>(0x5678),
@@ -159,7 +159,7 @@ TEST_F(VariantPackDescriptorApiTests, InvalidFinalizeParams)
     EXPECT_EQ(hipdnnBackendFinalize(_varpack), HIPDNN_STATUS_BAD_PARAM);
 }
 
-TEST_F(VariantPackDescriptorApiTests, InvalidNullDescriptor)
+TEST_F(IntegrationVariantPackDescriptorApi, InvalidNullDescriptor)
 {
     hipdnnBackendDescriptor_t nullDescriptor = nullptr;
     int64_t dummyData = 42;
@@ -178,7 +178,7 @@ TEST_F(VariantPackDescriptorApiTests, InvalidNullDescriptor)
     EXPECT_EQ(status, HIPDNN_STATUS_BAD_PARAM_NULL_POINTER);
 }
 
-class FinalizedVariantPackDescriptorApiTests : public ::testing::Test
+class IntegrationVariantPackDescriptorApiFinalized : public ::testing::Test
 {
 protected:
     hipdnnBackendDescriptor_t _varpack;
@@ -219,7 +219,7 @@ protected:
     }
 };
 
-TEST_F(FinalizedVariantPackDescriptorApiTests, ValidGetAttributes)
+TEST_F(IntegrationVariantPackDescriptorApiFinalized, ValidGetAttributes)
 {
     std::array<void*, 3> retrievedDevPtrs;
     std::array<int64_t, 3> retrievedUids;
@@ -258,7 +258,7 @@ TEST_F(FinalizedVariantPackDescriptorApiTests, ValidGetAttributes)
     EXPECT_EQ(retrievedWorkspace, _workspace);
 }
 
-TEST_F(FinalizedVariantPackDescriptorApiTests, InvalidGetAttributes)
+TEST_F(IntegrationVariantPackDescriptorApiFinalized, InvalidGetAttributes)
 {
     std::array<void*, 3> retrievedDevPtrs;
     std::array<int64_t, 3> retrievedUids;
@@ -312,7 +312,7 @@ TEST_F(FinalizedVariantPackDescriptorApiTests, InvalidGetAttributes)
               HIPDNN_STATUS_BAD_PARAM_NULL_POINTER);
 }
 
-TEST_F(FinalizedVariantPackDescriptorApiTests, InvalidSetAttributes)
+TEST_F(IntegrationVariantPackDescriptorApiFinalized, InvalidSetAttributes)
 {
     EXPECT_EQ(hipdnnBackendSetAttribute(_varpack,
                                         HIPDNN_ATTR_VARIANT_PACK_DATA_POINTERS,

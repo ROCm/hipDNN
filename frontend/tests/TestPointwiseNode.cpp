@@ -11,7 +11,7 @@
 using namespace hipdnn_frontend;
 using namespace hipdnn_frontend::graph;
 
-TEST(PointwiseNodeTests, SingleInput)
+TEST(TestPointwiseNode, SingleInput)
 {
     PointwiseAttributes attributes;
     attributes.set_input_0(std::make_shared<TensorAttributes>());
@@ -38,7 +38,7 @@ TEST(PointwiseNodeTests, SingleInput)
     EXPECT_EQ(outputTensor->get_stride(), (std::vector<int64_t>{5, 6, 7, 8}));
 }
 
-TEST(PointwiseNodeTests, TwoInputs)
+TEST(TestPointwiseNode, TwoInputs)
 {
     PointwiseAttributes attributes;
     attributes.set_input_0(std::make_shared<TensorAttributes>());
@@ -73,7 +73,7 @@ TEST(PointwiseNodeTests, TwoInputs)
     EXPECT_EQ(outputTensor->get_stride(), (std::vector<int64_t>{5, 6, 7, 8}));
 }
 
-TEST(PointwiseNodeTests, ThreeInputs)
+TEST(TestPointwiseNode, ThreeInputs)
 {
     PointwiseAttributes attributes;
     attributes.set_input_0(std::make_shared<TensorAttributes>());
@@ -116,7 +116,7 @@ TEST(PointwiseNodeTests, ThreeInputs)
     EXPECT_EQ(outputTensor->get_stride(), (std::vector<int64_t>{5, 6, 7, 8}));
 }
 
-TEST(PointwiseNodeTests, PreValidateNode)
+TEST(TestPointwiseNode, PreValidateNode)
 {
     PointwiseAttributes attributes;
     attributes.set_input_0(std::make_shared<TensorAttributes>());
@@ -130,7 +130,7 @@ TEST(PointwiseNodeTests, PreValidateNode)
     EXPECT_EQ(error.code, error_code_t::OK);
 }
 
-TEST(PointwiseNodeTests, PreValidateNodeMissingValues)
+TEST(TestPointwiseNode, PreValidateNodeMissingValues)
 {
     PointwiseAttributes attributes;
 
@@ -162,7 +162,7 @@ TEST(PointwiseNodeTests, PreValidateNodeMissingValues)
     EXPECT_EQ(error.code, error_code_t::OK);
 }
 
-TEST(PointwiseNodeTests, InferPropertiesNode)
+TEST(TestPointwiseNode, InferPropertiesNode)
 {
     PointwiseAttributes attributes;
     attributes.set_input_0(std::make_shared<TensorAttributes>());
@@ -189,7 +189,7 @@ TEST(PointwiseNodeTests, InferPropertiesNode)
     EXPECT_EQ(outputTensor->get_stride(), (std::vector<int64_t>{5, 6, 7, 8}));
 }
 
-TEST(PointwiseNodeTests, PackNode)
+TEST(TestPointwiseNode, PackNode)
 {
     PointwiseAttributes attributes;
     attributes.name = "PointwiseNode";

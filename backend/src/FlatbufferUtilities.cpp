@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: MIT
 
 #include "FlatbufferUtilities.hpp"
-#include "Error.hpp"
 #include "HipdnnException.hpp"
 #include <flatbuffers/flatbuffers.h>
 #include <flatbuffers/verifier.h>

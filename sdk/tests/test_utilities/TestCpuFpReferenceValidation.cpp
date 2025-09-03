@@ -1,6 +1,8 @@
 // Copyright © Advanced Micro Devices, Inc., or its affiliates.
 // SPDX-License-Identifier:  MIT
 
+#include "Helpers.hpp"
+
 #include <gtest/gtest.h>
 
 #include <hipdnn_sdk/test_utilities/CpuFpReferenceValidation.hpp>
@@ -10,21 +12,7 @@
 
 using namespace hipdnn_sdk::reference_test_utilities;
 using namespace hipdnn_sdk::utilities;
-
-template <typename T>
-MigratableMemory<T> createBuffer(size_t size, T mult)
-{
-    MigratableMemory<T> buffer(size);
-
-    T* data = buffer.hostData();
-
-    for(size_t i = 0; i < size; ++i)
-    {
-        data[i] = static_cast<T>(static_cast<float>(i)) * mult;
-    }
-
-    return buffer;
-}
+using namespace helpers;
 
 TEST(CpuFpReferenceValidation, BasicBFloat16Usage)
 {
@@ -119,4 +107,22 @@ TEST(CpuFpReferenceValidation, ToleranceComparison)
 
     // Change the tolerance to a larger value
     EXPECT_FALSE(refValidationLowTolerance.allClose(buffer1, buffer2));
+}
+
+TEST(CpuFpReferenceValidation, DefaultTolerance)
+{
+    CpuFpReferenceValidation<float> refValidation;
+
+    MigratableMemory<float> buffer1(1);
+    MigratableMemory<float> buffer2(1);
+
+    buffer1.hostData()[0] = 1.0f;
+    buffer2.hostData()[0] = 1.0f + std::numeric_limits<float>::epsilon();
+
+    EXPECT_TRUE(refValidation.allClose(buffer1, buffer2));
+}
+
+TEST(CpuFpReferenceValidation, NegativeToleranceThrows)
+{
+    EXPECT_THROW(CpuFpReferenceValidation<float> refValidation(-1e-5f), std::invalid_argument);
 }

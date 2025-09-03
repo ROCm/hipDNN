@@ -5,17 +5,18 @@ include(GoogleTest)
 find_package(hip REQUIRED)
 find_package(Threads REQUIRED)
 
-add_executable(public_hipdnn_backend_tests 
-    TestPluginLoading.cpp
-    TestBackendPublicFunctions.cpp
-    TestBackendExecuteApi.cpp
-    TestEngineConfigApi.cpp
-    TestEngineHeuristicApi.cpp
-    TestEngineApi.cpp
-    TestExecutionPlanApi.cpp
-    TestGetErrorApi.cpp
-    TestVariantPackApi.cpp
-    TestHandleApi.cpp
+add_executable(public_hipdnn_backend_tests
+    IntegrationBackendDescriptor.cpp
+    IntegrationBackendExecuteApi.cpp
+    IntegrationEngineApi.cpp
+    IntegrationEngineConfigApi.cpp
+    IntegrationEngineHeuristicApi.cpp
+    IntegrationExecutionPlanApi.cpp
+    IntegrationGetLastErrorString.cpp
+    IntegrationHandleApi.cpp
+    IntegrationPluginLoading.cpp
+    IntegrationSetPluginPathsExt.cpp
+    IntegrationVariantPackApi.cpp
     TestUtil.cpp
 )
 

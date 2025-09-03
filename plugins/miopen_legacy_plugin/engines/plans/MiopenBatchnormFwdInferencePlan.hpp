@@ -24,22 +24,18 @@ public:
     const MiopenTensor& y() const;
     const MiopenTensor& scale() const;
     const MiopenTensor& bias() const;
-    const std::optional<std::unique_ptr<MiopenTensor>>& estMean() const;
-    const std::optional<std::unique_ptr<MiopenTensor>>& estVariance() const;
+
+    const std::optional<MiopenTensor>& estMean() const;
+    const std::optional<MiopenTensor>& estVariance() const;
 
 private:
-    void initializeTensors(
-        const hipdnn_sdk::data_objects::BatchnormInferenceAttributes& attributes,
-        const std::unordered_map<int64_t, const hipdnn_sdk::data_objects::TensorAttributes*>&
-            tensorMap);
+    MiopenTensor _x;
+    MiopenTensor _y;
+    MiopenTensor _scale;
+    MiopenTensor _bias;
 
-    std::unique_ptr<MiopenTensor> _xPair;
-    std::unique_ptr<MiopenTensor> _yPair;
-    std::unique_ptr<MiopenTensor> _scalePair;
-    std::unique_ptr<MiopenTensor> _biasPair;
-
-    std::optional<std::unique_ptr<MiopenTensor>> _estMeanTensorDescriptor;
-    std::optional<std::unique_ptr<MiopenTensor>> _estVarianceTensorDescriptor;
+    std::optional<MiopenTensor> _estMean;
+    std::optional<MiopenTensor> _estVariance;
 };
 
 class BatchnormFwdInferencePlan : public IPlan
