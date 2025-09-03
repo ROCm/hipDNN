@@ -4,6 +4,8 @@
 hipdnn_add_dependency(GTest v1.16.0)
 include(GoogleTest)
 
+find_package(Python3 COMPONENTS Interpreter)
+
 # Set executable prefix based on platform
 if(WIN32)
     set(EXEC_PREFIX "")
@@ -23,22 +25,38 @@ set(INTEGRATION_CHECK_COMMAND_GLOBAL "" CACHE INTERNAL "Accumulated integration 
 set(INTEGRATION_CHECK_DEPENDS_GLOBAL "" CACHE INTERNAL "Accumulated integration check depends" FORCE)
 
 function(create_test_name_validation_target)
-    add_custom_command(
-        OUTPUT ${CMAKE_BINARY_DIR}/test_names_validated
-        COMMAND ${CMAKE_CTEST_COMMAND} --show-only=json-v1 > ${CMAKE_BINARY_DIR}/ctest_tests.json
-        COMMAND ${CMAKE_SOURCE_DIR}/cmake/scripts/test_name_validator.py 
-                --ctest-json ${CMAKE_BINARY_DIR}/ctest_tests.json
-        COMMAND ${CMAKE_COMMAND} -E touch ${CMAKE_BINARY_DIR}/test_names_validated
-        DEPENDS 
-            ${CMAKE_SOURCE_DIR}/cmake/scripts/test_name_validator.py
-            ${CHECK_DEPENDS_GLOBAL}
-        COMMENT "Validating test names using CTest"
-        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-        VERBATIM
-    )
-    
-    add_custom_target(validate_test_names 
-        DEPENDS ${CMAKE_BINARY_DIR}/test_names_validated)
+    if(Python3_FOUND)
+        # For platform compatibility
+        file(WRITE ${CMAKE_BINARY_DIR}/generate_ctest_json.cmake
+            "execute_process(
+                COMMAND ${CMAKE_CTEST_COMMAND} --show-only=json-v1
+                OUTPUT_FILE ${CMAKE_BINARY_DIR}/ctest_tests.json
+                WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+            )"
+        )
+        
+        add_custom_command(
+            OUTPUT ${CMAKE_BINARY_DIR}/test_names_validated
+            COMMAND ${CMAKE_COMMAND} -P ${CMAKE_BINARY_DIR}/generate_ctest_json.cmake
+            COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/cmake/scripts/test_name_validator.py 
+                    --ctest-json ${CMAKE_BINARY_DIR}/ctest_tests.json
+            COMMAND ${CMAKE_COMMAND} -E touch ${CMAKE_BINARY_DIR}/test_names_validated
+            DEPENDS 
+                ${CMAKE_SOURCE_DIR}/cmake/scripts/test_name_validator.py
+                ${CHECK_DEPENDS_GLOBAL}
+            COMMENT "Validating test names using CTest"
+            WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+            VERBATIM
+        )
+        
+        add_custom_target(validate_test_names 
+            DEPENDS ${CMAKE_BINARY_DIR}/test_names_validated)
+    else()
+        message(WARNING "Python3 not found. Test name validation will be skipped.")
+        add_custom_target(validate_test_names
+            COMMAND ${CMAKE_COMMAND} -E echo "Test name validation skipped - Python3 not found"
+        )
+    endif()
 endfunction()
 
 # Generic internal function to append tests to check targets

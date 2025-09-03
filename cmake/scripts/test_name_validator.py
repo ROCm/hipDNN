@@ -376,7 +376,6 @@ class TestTestNameValidator(unittest.TestCase):
         for name in invalid_names:
             with self.subTest(name=name):
                 issues = self.validator.validate_test_name(name)
-                print(issues)
                 self.assertTrue(len(issues) > 0, f"Expected structure error for {name}")
 
     def test_keyword_misplacement(self) -> None:
