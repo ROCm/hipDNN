@@ -20,7 +20,7 @@ using namespace miopen_legacy_plugin;
 using namespace hipdnn_plugin;
 using ::testing::Return;
 
-TEST(EngineManagerTest, ReturnsApplicableEngineIds)
+TEST(TestMiopenEngineManager, ReturnsApplicableEngineIds)
 {
     std::set<std::unique_ptr<IEngine>> engines;
 
@@ -43,7 +43,7 @@ TEST(EngineManagerTest, ReturnsApplicableEngineIds)
     EXPECT_EQ(applicable[0], 1);
 }
 
-TEST(EngineManagerTest, ReturnsMultipleApplicableEngineIds)
+TEST(TestMiopenEngineManager, ReturnsMultipleApplicableEngineIds)
 {
     std::set<std::unique_ptr<IEngine>> engines;
 
@@ -67,7 +67,7 @@ TEST(EngineManagerTest, ReturnsMultipleApplicableEngineIds)
     EXPECT_TRUE(std::ranges::find(applicable, 2) != applicable.end());
 }
 
-TEST(EngineManagerTest, ReturnsNoApplicableEngineIds)
+TEST(TestMiopenEngineManager, ReturnsNoApplicableEngineIds)
 {
     std::set<std::unique_ptr<IEngine>> engines;
 
@@ -89,7 +89,7 @@ TEST(EngineManagerTest, ReturnsNoApplicableEngineIds)
     EXPECT_TRUE(applicable.empty());
 }
 
-TEST(EngineManagerTest, ReturnsEngineDetails)
+TEST(TestMiopenEngineManager, ReturnsEngineDetails)
 {
     EngineManager manager;
 
@@ -116,7 +116,7 @@ TEST(EngineManagerTest, ReturnsEngineDetails)
     EXPECT_EQ(details.size, engineDetails.size);
 }
 
-TEST(EngineManagerTest, ThrowsOnInvalidEngineId)
+TEST(TestMiopenEngineManager, ThrowsOnInvalidEngineId)
 {
     EngineManager manager;
 
@@ -128,7 +128,7 @@ TEST(EngineManagerTest, ThrowsOnInvalidEngineId)
                  hipdnn_plugin::HipdnnPluginException);
 }
 
-TEST(EngineManagerTest, GetWorkspaceSizeReturnsCorrectValue)
+TEST(TestMiopenEngineManager, GetWorkspaceSizeReturnsCorrectValue)
 {
     EngineManager manager;
 
@@ -144,7 +144,7 @@ TEST(EngineManagerTest, GetWorkspaceSizeReturnsCorrectValue)
     EXPECT_EQ(workspaceSize, 4096);
 }
 
-TEST(EngineManagerTest, GetWorkspaceSizeThrowsOnInvalidEngineId)
+TEST(TestMiopenEngineManager, GetWorkspaceSizeThrowsOnInvalidEngineId)
 {
     EngineManager manager;
     HipdnnEnginePluginHandle dummyHandle = {};
@@ -154,7 +154,7 @@ TEST(EngineManagerTest, GetWorkspaceSizeThrowsOnInvalidEngineId)
                  hipdnn_plugin::HipdnnPluginException);
 }
 
-TEST(EngineManagerTest, InitializeExecutionContextCallsEngine)
+TEST(TestMiopenEngineManager, InitializeExecutionContextCallsEngine)
 {
     auto mockEngine = std::make_unique<MockEngine>();
     EXPECT_CALL(*mockEngine, id()).WillRepeatedly(Return(7));
@@ -173,7 +173,7 @@ TEST(EngineManagerTest, InitializeExecutionContextCallsEngine)
     manager.initializeExecutionContext(dummyHandle, mockGraph, mockEngineConfig, execCtx);
 }
 
-TEST(EngineManagerTest, InitializeExecutionContextThrowsOnInvalidEngineId)
+TEST(TestMiopenEngineManager, InitializeExecutionContextThrowsOnInvalidEngineId)
 {
     MockHipdnnEnginePluginExecutionContext execCtx;
     EngineManager manager;

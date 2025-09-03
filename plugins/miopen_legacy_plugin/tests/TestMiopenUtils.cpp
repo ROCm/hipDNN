@@ -9,7 +9,7 @@
 
 using namespace miopen_legacy_plugin;
 
-TEST(MiopenUtilsTest, FindDeviceBufferReturnsCorrectBuffer)
+TEST(TestMiopenUtils, FindDeviceBufferReturnsCorrectBuffer)
 {
     std::vector<hipdnnPluginDeviceBuffer_t> buffers
         = {{.uid = 42, .ptr = reinterpret_cast<void*>(0x1234)},
@@ -20,7 +20,7 @@ TEST(MiopenUtilsTest, FindDeviceBufferReturnsCorrectBuffer)
     EXPECT_EQ(result.ptr, reinterpret_cast<void*>(0x5678));
 }
 
-TEST(MiopenUtilsTest, FindDeviceBufferThrowsIfNotFound)
+TEST(TestMiopenUtils, FindDeviceBufferThrowsIfNotFound)
 {
     std::vector<hipdnnPluginDeviceBuffer_t> buffers
         = {{.uid = 1, .ptr = reinterpret_cast<void*>(0x1111)}};
@@ -30,7 +30,7 @@ TEST(MiopenUtilsTest, FindDeviceBufferThrowsIfNotFound)
         hipdnn_plugin::HipdnnPluginException);
 }
 
-TEST(MiopenUtilsTest, TensorDataTypeToMiopenDataType)
+TEST(TestMiopenUtils, TensorDataTypeToMiopenDataType)
 {
     using hipdnn_sdk::data_objects::DataType_BFLOAT16;
     using hipdnn_sdk::data_objects::DataType_FLOAT;
@@ -41,7 +41,7 @@ TEST(MiopenUtilsTest, TensorDataTypeToMiopenDataType)
     EXPECT_EQ(miopen_utils::tensorDataTypeToMiopenDataType(DataType_BFLOAT16), miopenBFloat16);
 }
 
-TEST(MiopenUtilsTest, TensorDataTypeToMiopenDataTypeThrowsOnUnsupported)
+TEST(TestMiopenUtils, TensorDataTypeToMiopenDataTypeThrowsOnUnsupported)
 {
     // Use a value not in the enum
     EXPECT_THROW(miopen_utils::tensorDataTypeToMiopenDataType(
