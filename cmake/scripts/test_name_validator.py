@@ -6,6 +6,7 @@ import argparse
 import json
 import re
 import sys
+import unittest
 from pathlib import Path
 from typing import List, Dict
 
@@ -28,7 +29,7 @@ class TestNameValidator:
     FULL_NAME_RE = re.compile(
         r"^(?:(?P<prefix>[A-Z][A-Za-z0-9]*)/)?"
         r"(?P<suite>[A-Z][A-Za-z0-9]*)"
-        r"\.(?P<case>(?:DISABLED_[A-Za-z0-9_]+|[A-Z][A-Za-z0-9]*))"
+        r"\.(?P<case>(?:DISABLED_[A-Z][A-Za-z0-9]+|[A-Z][A-Za-z0-9]*))"
         r"(?:/.*)?$"
     )
 
@@ -38,6 +39,9 @@ class TestNameValidator:
         Returns a list of issues found, or empty list if valid.
         """
         issues = []
+
+        if case_name.startswith("DISABLED_"):
+            case_name = case_name[9:]
 
         # Check for disallowed positional keywords
         found_keywords = [kw for kw in self.POSITIONAL_KEYWORDS if kw in case_name]
@@ -160,7 +164,6 @@ def parse_args() -> argparse.Namespace:
         "--ctest-json",
         type=Path,
         help="Path to CTest JSON output (from ctest --show-only=json-v1)",
-        required=True,
     )
 
     parser.add_argument(
@@ -177,11 +180,25 @@ def parse_args() -> argparse.Namespace:
         default=False,
     )
 
+    parser.add_argument(
+        "--run-tests",
+        action="store_true",
+        help="Run unit tests for this validator",
+        default=False,
+    )
+
     return parser.parse_args()
 
 
 def main() -> int:
     args = parse_args()
+
+    if args.run_tests:
+        unittest.main(argv=[sys.argv[0]], exit=True)
+
+    if not args.ctest_json:
+        print("Error: --ctest-json is required when not running tests", file=sys.stderr)
+        return 1
 
     validator = TestNameValidator()
 
@@ -227,6 +244,201 @@ def main() -> int:
     )
 
     return 1 if args.strict else 0
+
+
+class TestTestNameValidator(unittest.TestCase):
+    def setUp(self):
+        self.validator = TestNameValidator()
+
+    def test_valid_test_names_basic(self):
+        """Test basic valid test names in PascalCase"""
+        valid_names = [
+            "TestMyClass.Something",
+            "IntegrationConvolution.Forward",
+            "TestBatchNorm.Backward",
+            "TestExecutionPlanBuilder.Build",
+        ]
+
+        for name in valid_names:
+            with self.subTest(name=name):
+                issues = self.validator.validate_test_name(name)
+                self.assertEqual(
+                    issues, [], f"Expected {name} to be valid, but got issues: {issues}"
+                )
+
+    def test_valid_test_names_with_gpu(self):
+        """Test valid test names with Gpu keyword"""
+        valid_names = [
+            "TestGpuConvolution.Forward",
+            "IntegrationGpuBatchNorm.Backward",
+            "TestGpuExecutionPlanBuilder.Build",
+        ]
+
+        for name in valid_names:
+            with self.subTest(name=name):
+                issues = self.validator.validate_test_name(name)
+                self.assertEqual(
+                    issues, [], f"Expected {name} to be valid, but got issues: {issues}"
+                )
+
+    def test_valid_test_names_with_datatypes(self):
+        """Test valid test names with datatype suffixes"""
+        valid_names = [
+            "TestConvolutionFp32.Forward",
+            "TestBatchNormFp16.Backward",
+            "IntegrationConvolutionBfp16.Wrw",
+            "TestGpuConvolutionFp64.Performance",
+            "IntegrationGpuBatchNormFp32.Convergence",
+        ]
+
+        for name in valid_names:
+            with self.subTest(name=name):
+                issues = self.validator.validate_test_name(name)
+                self.assertEqual(
+                    issues, [], f"Expected {name} to be valid, but got issues: {issues}"
+                )
+
+    def test_valid_test_names_with_instance(self):
+        """Test valid parameterized test names with instance"""
+        valid_names = [
+            "Temp/TestConvolution.Forward",
+            "Group/IntegrationGpuBatchNormFp32.Accuracy",
+            "Config/TestMyClass.Method",
+        ]
+
+        for name in valid_names:
+            with self.subTest(name=name):
+                issues = self.validator.validate_test_name(name)
+                self.assertEqual(
+                    issues, [], f"Expected {name} to be valid, but got issues: {issues}"
+                )
+
+    def test_valid_disabled_test_names(self):
+        """Test valid disabled test names"""
+        valid_names = [
+            "TestMyClass.DISABLED_Something",
+            "IntegrationGpuConvolutionFp32.DISABLED_Forward",
+        ]
+
+        for name in valid_names:
+            with self.subTest(name=name):
+                issues = self.validator.validate_test_name(name)
+                self.assertEqual(
+                    issues, [], f"Expected {name} to be valid, but got issues: {issues}"
+                )
+
+    def test_invalid_format(self):
+        """Test names with invalid format"""
+        invalid_names = [
+            "test_my_class.test_something",  # lowercase
+            "TestMyClass_Something",  # underscore instead of dot
+            "TestMyClass.test_something",  # lowercase test case
+            "testMyClass.Something",  # lowercase suite
+            "Test-MyClass.Something",  # hyphens
+            "Test My Class.Something",  # spaces
+        ]
+
+        for name in invalid_names:
+            with self.subTest(name=name):
+                issues = self.validator.validate_test_name(name)
+                self.assertTrue(len(issues) > 0, f"Expected format error for {name}")
+
+    def test_keywords_in_test_case(self):
+        """Test that positional keywords are not allowed in test case names"""
+        invalid_names = [
+            "TestMyClass.TestGpuFunction",  # Gpu in test case
+            "TestMyClass.TestFp32Precision",  # Fp32 in test case
+            "TestMyClass.IntegrationTest",  # Integration in test case
+            "TestMyClass.TestBfp16Type",  # Bfp16 in test case
+        ]
+
+        for name in invalid_names:
+            with self.subTest(name=name):
+                issues = self.validator.validate_test_name(name)
+                self.assertTrue(
+                    any("should not contain keywords" in issue for issue in issues),
+                    f"Expected keyword error in test case for {name}",
+                )
+
+    def test_invalid_suite_structure(self):
+        """Test suite names that don't follow the required structure"""
+        invalid_names = [
+            "MyClass.Something",  # Missing Test/Integration prefix
+            "GpuTestConvolution.Forward",  # Gpu must come after Test/Integration
+            "TestConvolutionGpu.Forward",  # Gpu must come before feature name
+            "ConvolutionTest.Forward",  # Test must be at the beginning
+            "TestFp32Convolution.Forward",  # Datatype must be at the end
+        ]
+
+        for name in invalid_names:
+            with self.subTest(name=name):
+                issues = self.validator.validate_test_name(name)
+                print(issues)
+                self.assertTrue(len(issues) > 0, f"Expected structure error for {name}")
+
+    def test_keyword_misplacement(self):
+        """Test keywords misplaced in the feature name"""
+        invalid_names = [
+            "TestConvolutionGpuPlannerFp32.Forward",  # Gpu in middle
+            "TestConvolutionTestPlannerFp32.Forward",  # Test in middle
+            "IntegrationConvolutionFp32Planner.Forward",  # Fp32 in middle
+        ]
+
+        for name in invalid_names:
+            with self.subTest(name=name):
+                issues = self.validator.validate_test_name(name)
+                self.assertTrue(
+                    any("misplaced" in issue for issue in issues),
+                    f"Expected misplacement error for {name}",
+                )
+
+    def test_keyword_capitalization(self):
+        """Test incorrect keyword capitalization"""
+        invalid_names = [
+            "TestGPUConvolution.Forward",  # GPU instead of Gpu
+            "TestConvolutionFP32.Forward",  # FP32 instead of Fp32
+            "testConvolution.Forward",  # test instead of Test
+            "INTEGRATIONConvolution.Forward",  # INTEGRATION instead of Integration
+        ]
+
+        for name in invalid_names:
+            with self.subTest(name=name):
+                issues = self.validator.validate_test_name(name)
+                self.assertTrue(
+                    len(issues) > 0, f"Expected capitalization issues for {name}"
+                )
+
+    def test_keyword_duplicates(self):
+        """Test duplicate keywords"""
+        invalid_names = [
+            "TestTestConvolution.Forward",  # Duplicate Test
+            "TestGpuConvolutionGpu.Forward",  # Duplicate Gpu
+        ]
+
+        for name in invalid_names:
+            with self.subTest(name=name):
+                issues = self.validator.validate_test_name(name)
+                self.assertTrue(
+                    len(issues) > 0, f"Expected issues for duplicate keywords in {name}"
+                )
+
+    def test_complex_valid_names(self):
+        """Test more complex but valid test names"""
+        valid_names = [
+            "IntegrationGpuConvolutionPlannerNchwFp32.Forward",
+            "TestActivationKernelNchwFp32.Relu",
+            "TestExecutionPlanBuilderFp32.Optimization",
+            "IntegrationGraphFusion.MultipleOps",
+            "TestConvolutionHeuristicsFp32.Performance",
+            "TestConvolutionHeuristics.Accuracy",
+        ]
+
+        for name in valid_names:
+            with self.subTest(name=name):
+                issues = self.validator.validate_test_name(name)
+                self.assertEqual(
+                    issues, [], f"Expected {name} to be valid, but got issues: {issues}"
+                )
 
 
 if __name__ == "__main__":
