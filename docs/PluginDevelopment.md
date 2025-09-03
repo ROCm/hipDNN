@@ -117,9 +117,9 @@ In general, the **best practices** consist of:
 
 ### Key Files Reference
 
-- **Plugin API Interface**: [`plugins/miopen_legacy_plugin/engines/MiopenEngine.cpp`](../sdk/include/hipdnn_sdk/plugin/EnginePluginApi.h)
-- **Example Plugin Implementation**: [`plugins/miopen_legacy_plugin/engines/MiopenEngine.cpp`](../plugins/miopen_legacy_plugin/MiopenLegacyPlugin.cpp)
-- **Example Engine Manager**: [`plugins/miopen_legacy_plugin/engines/MiopenEngine.cpp`](../plugins/miopen_legacy_plugin/EngineManager.hpp)
+- **Plugin API Interface**: [`sdk/include/hipdnn_sdk/plugin/EnginePluginApi.h`](../sdk/include/hipdnn_sdk/plugin/EnginePluginApi.h)
+- **Example Plugin Implementation**: [`plugins/miopen_legacy_plugin/MiopenLegacyPlugin.cpp`](../plugins/miopen_legacy_plugin/MiopenLegacyPlugin.cpp)
+- **Example Engine Manager**: [`plugins/miopen_legacy_plugin/EngineManager.hpp`](../plugins/miopen_legacy_plugin/EngineManager.hpp)
 - **Example Engine Implementation**: [`plugins/miopen_legacy_plugin/engines/MiopenEngine.cpp`](../plugins/miopen_legacy_plugin/engines/MiopenEngine.cpp)
 
 ## Plugin Architecture
