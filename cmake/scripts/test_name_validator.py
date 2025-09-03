@@ -7,7 +7,7 @@ import json
 import re
 import sys
 from pathlib import Path
-from typing import List, Dict, Any, Optional
+from typing import List, Dict
 
 
 class TestNameValidator:
@@ -18,7 +18,12 @@ class TestNameValidator:
         "datatypes": ["Bfp16", "Fp16", "Fp32", "Fp64"],
         "shapes": ["Nhwc", "Nchw", "Ndhwc", "Ncdhw"],
     }
-    VALID_KEYWORDS = [kw for sublist in KEYWORDS.values() for kw in sublist]
+
+    FLATTENED_KEYWORDS = [kw for sublist in KEYWORDS.values() for kw in sublist]
+
+    POSITIONAL_KEYWORDS = (
+        KEYWORDS["test_types"] + KEYWORDS["datatypes"] + KEYWORDS["gpu"]
+    )
 
     FULL_NAME_RE = re.compile(
         r"^(?:(?P<prefix>[A-Z][A-Za-z0-9]*)/)?"
@@ -34,13 +39,8 @@ class TestNameValidator:
         """
         issues = []
 
-        dissallowed = (
-            self.KEYWORDS["test_types"]
-            + self.KEYWORDS["datatypes"]
-            + self.KEYWORDS["gpu"]
-        )
-        # Check for disallowed keywords
-        found_keywords = [kw for kw in dissallowed if kw in case_name]
+        # Check for disallowed positional keywords
+        found_keywords = [kw for kw in self.POSITIONAL_KEYWORDS if kw in case_name]
         if found_keywords:
             issues.append(
                 f"Test case name should not contain keywords: {', '.join(found_keywords)}. These belong in the test suite name."
@@ -74,14 +74,7 @@ class TestNameValidator:
 
         feature_name = match.group("feature")
 
-        # Can move to class level
-        disallowed_in_feature = (
-            self.KEYWORDS["test_types"]
-            + self.KEYWORDS["gpu"]
-            + self.KEYWORDS["datatypes"]
-        )
-
-        for keyword in disallowed_in_feature:
+        for keyword in self.POSITIONAL_KEYWORDS:
             if keyword in feature_name:
                 issues.append(
                     f"Keyword '{keyword}' is misplaced and should not be in the middle of the suite name."
@@ -107,7 +100,7 @@ class TestNameValidator:
         suite_name = parsed_match.group("suite")
         case_name = parsed_match.group("case")
 
-        for keyword in self.VALID_KEYWORDS:
+        for keyword in self.FLATTENED_KEYWORDS:
             matches = re.findall(
                 re.escape(keyword), f"{prefix}/{suite_name}.{case_name}", re.IGNORECASE
             )

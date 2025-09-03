@@ -26,11 +26,11 @@ function(create_test_name_validation_target)
     add_custom_command(
         OUTPUT ${CMAKE_BINARY_DIR}/test_names_validated
         COMMAND ${CMAKE_CTEST_COMMAND} --show-only=json-v1 > ${CMAKE_BINARY_DIR}/ctest_tests.json
-        COMMAND ${CMAKE_SOURCE_DIR}/cmake/scripts/check_test_names.py 
+        COMMAND ${CMAKE_SOURCE_DIR}/cmake/scripts/test_name_validator.py 
                 --ctest-json ${CMAKE_BINARY_DIR}/ctest_tests.json
         COMMAND ${CMAKE_COMMAND} -E touch ${CMAKE_BINARY_DIR}/test_names_validated
         DEPENDS 
-            ${CMAKE_SOURCE_DIR}/cmake/scripts/check_test_names.py
+            ${CMAKE_SOURCE_DIR}/cmake/scripts/test_name_validator.py
             ${CHECK_DEPENDS_GLOBAL}
         COMMENT "Validating test names using CTest"
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
