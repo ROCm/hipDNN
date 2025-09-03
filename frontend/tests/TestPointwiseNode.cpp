@@ -192,7 +192,7 @@ TEST(TestPointwiseNode, InferPropertiesNode)
 TEST(TestPointwiseNode, PackNode)
 {
     PointwiseAttributes attributes;
-    attributes.name = "PointwiseNode";
+    attributes.set_name("PointwiseNode");
 
     auto inputTensor = std::make_shared<TensorAttributes>();
     inputTensor->set_uid(1)

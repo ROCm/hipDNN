@@ -75,7 +75,7 @@ protected:
         bias->set_uid(5).set_name("Bias").set_data_type(DataType_t::FLOAT);
 
         BatchnormInferenceAttributes batchnormAttributes;
-        batchnormAttributes.name = "BatchnormNode";
+        batchnormAttributes.set_name("BatchnormNode");
 
         return graph.batchnorm_inference(x, mean, invVariance, scale, bias, batchnormAttributes);
     }
@@ -110,7 +110,7 @@ TEST_F(TestGraph, BatchnormNodeCreation)
     auto bias = std::make_shared<TensorAttributes>();
 
     BatchnormAttributes attributes;
-    attributes.name = "BatchnormNode";
+    attributes.set_name("BatchnormNode");
     attributes.set_epsilon(std::make_shared<TensorAttributes>());
 
     auto [y, mean, invVariance, nextRunningMean, nextRunningVariance]
@@ -144,7 +144,7 @@ TEST_F(TestGraph, BatchnormBackwardNodeCreation)
     x->set_dim({1, 2, 3, 4}).set_stride({5, 6, 7, 8}).set_data_type(DataType_t::FLOAT);
 
     BatchnormBackwardAttributes attributes;
-    attributes.name = "BatchnormBackwardNode";
+    attributes.set_name("BatchnormBackwardNode");
 
     auto [dx, dscale, dbias] = graph.batchnorm_backward(dy, x, scale, attributes);
 
@@ -174,7 +174,7 @@ TEST_F(TestGraph, BatchnormInferenceNodeCreation)
     auto bias = std::make_shared<TensorAttributes>();
 
     BatchnormInferenceAttributes attributes;
-    attributes.name = "BatchnormNode";
+    attributes.set_name("BatchnormNode");
 
     auto y = graph.batchnorm_inference(x, mean, invVariance, scale, bias, attributes);
 
@@ -193,7 +193,7 @@ TEST_F(TestGraph, PointwiseNodeCreationSingleInput)
     in0->set_dim({1, 2, 3, 4}).set_stride({5, 6, 7, 8}).set_data_type(DataType_t::FLOAT);
 
     PointwiseAttributes attributes;
-    attributes.name = "PointwiseNode";
+    attributes.set_name("PointwiseNode");
     attributes.set_mode(PointwiseMode_t::RELU_FWD);
 
     auto out0 = graph.pointwise(in0, attributes);
@@ -216,7 +216,7 @@ TEST_F(TestGraph, PointwiseNodeCreationTwoInputs)
     in1->set_dim({1, 2, 3, 4}).set_stride({5, 6, 7, 8}).set_data_type(DataType_t::FLOAT);
 
     PointwiseAttributes attributes;
-    attributes.name = "PointwiseNode";
+    attributes.set_name("PointwiseNode");
     attributes.set_mode(PointwiseMode_t::RELU_FWD);
 
     auto out0 = graph.pointwise(in0, in1, attributes);
@@ -241,7 +241,7 @@ TEST_F(TestGraph, PointwiseNodeCreationThreeInputs)
     in2->set_dim({1, 2, 3, 4}).set_stride({5, 6, 7, 8}).set_data_type(DataType_t::FLOAT);
 
     PointwiseAttributes attributes;
-    attributes.name = "PointwiseNode";
+    attributes.set_name("PointwiseNode");
     attributes.set_mode(PointwiseMode_t::RELU_FWD);
 
     auto out0 = graph.pointwise(in0, in1, in2, attributes);
@@ -264,7 +264,7 @@ TEST_F(TestGraph, ConvolutionFwdNodeCreation)
     w->set_dim({64, 3, 3, 3}).set_stride({27, 9, 3, 1}).set_data_type(DataType_t::FLOAT);
 
     ConvFpropAttributes attributes;
-    attributes.name = "ConvolutionNode";
+    attributes.set_name("ConvolutionNode");
     attributes.set_pre_padding({1, 1});
     attributes.set_post_padding({1, 1});
     attributes.set_stride({1, 1});
@@ -320,7 +320,7 @@ TEST_F(TestGraph, BuildAndSerializeBatchnormInferenceGraph)
     bias->set_uid(5).set_name("Bias").set_data_type(DataType_t::FLOAT);
 
     BatchnormInferenceAttributes batchnormAttributes;
-    batchnormAttributes.name = "BatchnormNode";
+    batchnormAttributes.set_name("BatchnormNode");
 
     auto y = graph.batchnorm_inference(x, mean, invVariance, scale, bias, batchnormAttributes);
 
@@ -405,7 +405,7 @@ TEST_F(TestGraph, BuildAndSerializeBatchnormGraph)
     epsilon->set_uid(7).set_name("Epsilon").set_data_type(DataType_t::FLOAT);
 
     BatchnormAttributes batchnormAttributes;
-    batchnormAttributes.name = "BatchnormNode";
+    batchnormAttributes.set_name("BatchnormNode");
     batchnormAttributes.set_previous_running_stats(prevRunningMean, prevRunningVariance, momentum);
     batchnormAttributes.set_epsilon(epsilon);
 
@@ -508,7 +508,7 @@ TEST_F(TestGraph, BuildAndSerializeBatchnormAndPointwiseGraph)
     epsilon->set_uid(7).set_name("Epsilon").set_data_type(DataType_t::FLOAT);
 
     BatchnormAttributes batchnormAttributes;
-    batchnormAttributes.name = "BatchnormNode";
+    batchnormAttributes.set_name("BatchnormNode");
     batchnormAttributes.set_previous_running_stats(prevRunningMean, prevRunningVariance, momentum);
     batchnormAttributes.set_epsilon(epsilon);
 
@@ -516,7 +516,7 @@ TEST_F(TestGraph, BuildAndSerializeBatchnormAndPointwiseGraph)
         = graph.batchnorm(x, scale, bias, batchnormAttributes);
 
     PointwiseAttributes pointwiseAttributes;
-    pointwiseAttributes.name = "PointwiseNode";
+    pointwiseAttributes.set_name("PointwiseNode");
     pointwiseAttributes.set_mode(PointwiseMode_t::RELU_FWD);
 
     auto out0 = graph.pointwise(y, pointwiseAttributes);
@@ -608,7 +608,7 @@ TEST_F(TestGraph, BuildAndSerializePointwiseGraph)
         .set_data_type(DataType_t::FLOAT);
 
     PointwiseAttributes pointwiseAttributes;
-    pointwiseAttributes.name = "PointwiseNode";
+    pointwiseAttributes.set_name("PointwiseNode");
     pointwiseAttributes.set_mode(PointwiseMode_t::RELU_FWD);
 
     auto out0 = graph.pointwise(in0, pointwiseAttributes);
@@ -679,12 +679,12 @@ TEST_F(TestGraph, BuildAndSerializePointwiseAndBatchnormInferenceGraph)
     bias->set_uid(5).set_name("Bias").set_data_type(DataType_t::FLOAT);
 
     BatchnormInferenceAttributes batchnormAttributes;
-    batchnormAttributes.name = "BatchnormNode";
+    batchnormAttributes.set_name("BatchnormNode");
 
     auto y = graph.batchnorm_inference(x, mean, invVariance, scale, bias, batchnormAttributes);
 
     PointwiseAttributes pointwiseAttributes;
-    pointwiseAttributes.name = "PointwiseNode";
+    pointwiseAttributes.set_name("PointwiseNode");
     pointwiseAttributes.set_mode(PointwiseMode_t::RELU_FWD);
 
     auto out0 = graph.pointwise(y, pointwiseAttributes);
@@ -777,7 +777,7 @@ TEST_F(TestGraph, BuildAndSerializeBatchnormBackwardGraph)
     invVariance->set_uid(5).set_name("InvVariance").set_data_type(DataType_t::FLOAT);
 
     BatchnormBackwardAttributes batchnormAttributes;
-    batchnormAttributes.name = "BatchnormBackwardNode";
+    batchnormAttributes.set_name("BatchnormBackwardNode");
     batchnormAttributes.set_saved_mean_and_inv_variance(mean, invVariance);
 
     auto [dx, dscale, dbias] = graph.batchnorm_backward(dy, x, scale, batchnormAttributes);
@@ -852,7 +852,7 @@ TEST_F(TestGraph, BuildAndSerializeConvolutionFwdGraph)
         .set_data_type(DataType_t::FLOAT);
 
     ConvFpropAttributes convolutionAttributes;
-    convolutionAttributes.name = "ConvolutionNode";
+    convolutionAttributes.set_name("ConvolutionNode");
     convolutionAttributes.set_pre_padding({1, 1});
     convolutionAttributes.set_post_padding({1, 1});
     convolutionAttributes.set_stride({1, 1});
@@ -918,7 +918,7 @@ TEST_F(TestGraph, BuildAndSerializePointwiseAndBatchnormBackwardGraph)
         .set_data_type(DataType_t::FLOAT);
 
     PointwiseAttributes pointwiseAttributes;
-    pointwiseAttributes.name = "PointwiseNode";
+    pointwiseAttributes.set_name("PointwiseNode");
     pointwiseAttributes.set_mode(PointwiseMode_t::RELU_FWD);
 
     auto dy = graph.pointwise(xPointwise, pointwiseAttributes);
@@ -940,7 +940,7 @@ TEST_F(TestGraph, BuildAndSerializePointwiseAndBatchnormBackwardGraph)
     invVariance->set_uid(4).set_name("InvVariance").set_data_type(DataType_t::FLOAT);
 
     BatchnormBackwardAttributes batchnormAttributes;
-    batchnormAttributes.name = "BatchnormBackwardNode";
+    batchnormAttributes.set_name("BatchnormBackwardNode");
     batchnormAttributes.set_saved_mean_and_inv_variance(mean, invVariance);
 
     auto [dx, dscale, dbias] = graph.batchnorm_backward(dy, x, scale, batchnormAttributes);
@@ -1423,7 +1423,7 @@ TEST_F(TestGraph, ExecutePacksVariantPackAndPassesTheCorrectArguments)
         .set_data_type(DataType_t::FLOAT);
 
     PointwiseAttributes pointwiseAttributes;
-    pointwiseAttributes.name = "PointwiseNode";
+    pointwiseAttributes.set_name("PointwiseNode");
     pointwiseAttributes.set_mode(PointwiseMode_t::RELU_FWD);
     auto out_tensor = graph.pointwise(tensor, pointwiseAttributes);
 
