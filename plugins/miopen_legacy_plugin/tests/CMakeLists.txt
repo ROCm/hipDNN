@@ -20,17 +20,17 @@ find_package(Threads REQUIRED)
 enable_language(HIP)
 
 add_executable(miopen_legacy_plugin_tests
-    engines/TestMiopenEngine.cpp
-    engines/plans/TestBatchnormBwdPlan.cpp
-    engines/plans/TestBatchnormFwdInferencePlan.cpp
+    engines/plans/TestMiopenBatchnormBwdPlan.cpp
+    engines/plans/TestMiopenBatchnormFwdInferencePlan.cpp
     engines/plans/TestMiopenBatchnormPlanBuilder.cpp
+    engines/TestMiopenEngine.cpp
     main.cpp
-    TestEngineManager.cpp
-    TestHipdnnEnginePluginHandle.cpp
-    TestHipdnnPluginExecutionContext.cpp
     TestMiopenBatchnormFwdInferenceOperations.cpp
     TestMiopenBatchnormBwdOperations.cpp
+    TestMiopenEngineManager.cpp
     TestMiopenHandleFactory.cpp
+    TestMiopenHipdnnEnginePluginHandle.cpp
+    TestMiopenHipdnnPluginExecutionContext.cpp
     TestMiopenLegacyEnginePluginApi.cpp
     TestMiopenLegacyPluginApi.cpp
     TestMiopenTensor.cpp

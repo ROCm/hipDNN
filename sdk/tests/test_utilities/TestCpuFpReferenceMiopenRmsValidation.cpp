@@ -12,7 +12,7 @@
 #include <hipdnn_sdk/utilities/HipBfloat16Utils.hpp>
 #include <limits>
 
-using namespace hipdnn_sdk::reference_test_utilities;
+using namespace hipdnn_sdk::test_utilities;
 using namespace hipdnn_sdk::utilities;
 using namespace helpers;
 

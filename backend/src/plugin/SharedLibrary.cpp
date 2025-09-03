@@ -90,14 +90,14 @@ void SharedLibrary::load(const std::filesystem::path& libraryPath)
     HIPDNN_LOG_INFO("SharedLibrary: Attempting to load shared library from final absolute path: {}",
                     _libraryPath.string());
 
-    _libraryHandle = platform_utils::openLibrary(_libraryPath);
+    _libraryHandle = platform_utilities::openLibrary(_libraryPath);
 }
 
 void SharedLibrary::unload() noexcept
 {
     if(_libraryHandle != nullptr)
     {
-        platform_utils::closeLibrary(_libraryHandle);
+        platform_utilities::closeLibrary(_libraryHandle);
         _libraryHandle = nullptr;
     }
 }
@@ -111,7 +111,7 @@ void* SharedLibrary::getSymbol(std::string_view symbolName) const
                                   + std::string(symbolName));
     }
 
-    return platform_utils::getSymbol(_libraryHandle, symbolName.data());
+    return platform_utilities::getSymbol(_libraryHandle, symbolName.data());
 }
 
 const std::filesystem::path& SharedLibrary::libraryPath() const

@@ -8,10 +8,10 @@
 
 using namespace miopen_legacy_plugin;
 
-TEST(BatchnormBwdParamsTest, InitializesAllTensorsFromValidGraph)
+TEST(TestBatchnormBwdParams, InitializesAllTensorsFromValidGraph)
 {
     // Create a valid batchnorm graph
-    auto builder = flatbuffer_test_utils::createValidBatchnormBwdGraph();
+    auto builder = hipdnn_backend::test_utilities::createValidBatchnormBwdGraph();
     hipdnn_plugin::GraphWrapper graph(builder.GetBufferPointer(), builder.GetSize());
 
     // Get the batchnorm node and attributes
@@ -37,10 +37,10 @@ TEST(BatchnormBwdParamsTest, InitializesAllTensorsFromValidGraph)
     EXPECT_TRUE(varOpt.has_value());
 }
 
-TEST(BatchnormBwdParamsTest, HandlesMissingOptionalTensors)
+TEST(TestBatchnormBwdParams, HandlesMissingOptionalTensors)
 {
     // Create a valid batchnorm graph and remove mean/variance from tensor map
-    auto builder = flatbuffer_test_utils::createValidBatchnormBwdGraph(
+    auto builder = hipdnn_backend::test_utilities::createValidBatchnormBwdGraph(
         {1, 1, 1, 1}, {1, 1, 1, 1}, false // Set has_optional_attributes to false
     );
     hipdnn_plugin::GraphWrapper graph(builder.GetBufferPointer(), builder.GetSize());

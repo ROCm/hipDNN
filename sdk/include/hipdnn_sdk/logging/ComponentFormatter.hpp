@@ -9,7 +9,7 @@
 #include <string>
 #include <vector>
 
-namespace hipdnn::logging
+namespace hipdnn_sdk::logging
 {
 
 class ComponentFormatter final : public spdlog::formatter
@@ -44,4 +44,4 @@ private:
     std::unique_ptr<spdlog::pattern_formatter> _passThroughFormatter;
 };
 
-} // namespace hipdnn::logging
+} // namespace hipdnn_sdk::logging
