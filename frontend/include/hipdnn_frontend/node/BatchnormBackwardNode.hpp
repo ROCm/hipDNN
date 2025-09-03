@@ -161,7 +161,7 @@ public:
     {
         return hipdnn_sdk::data_objects::CreateNodeDirect(
             builder,
-            attributes.name.c_str(),
+            attributes.get_name().c_str(),
             hipdnn_sdk::data_objects::NodeAttributes::NodeAttributes_BatchnormBackwardAttributes,
             attributes.pack_attributes(builder).Union());
     }
