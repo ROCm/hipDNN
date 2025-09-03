@@ -57,11 +57,13 @@ White box tests focus on internal implementation details of hipDNN components.
 
 ---
 
-## 2. Black Box Testing (API Tests) ⬛
+## 2. Integration Tests
 
-Black box tests validate the public API without knowledge of internal implementation.
+### Black Box Testing (API Tests) ⬛
 
-### Backend API Tests
+Black box tests validate the public API without knowledge of internal implementation.  These are a type of integration test.
+
+#### Backend API Tests
 
 | Attribute | Details |
 |-----------|---------|
@@ -71,7 +73,7 @@ Black box tests validate the public API without knowledge of internal implementa
 | **Environments** | Windows & supported Linux distros |
 | **Frequency** | Run on each PR |
 
-#### Test Categories
+##### Test Categories
 - Descriptor APIs (create, get/set properties, destroy)
   - Engine API
   - Engine config API
@@ -87,7 +89,7 @@ Black box tests validate the public API without knowledge of internal implementa
 
 ---
 
-## 3. Integration Testing 🧩
+## End to End Integration Tests 🧩
 
 Integration tests validate end-to-end functionality across components.
 
@@ -98,16 +100,16 @@ Integration tests validate end-to-end functionality across components.
 | **Frontend-Backend** | `tests/frontend/` | Validate end-to-end hipDNN functionality | No - mark GPU ops with `SKIP_IF_NO_DEVICE()` | Fast | Windows & Linux |
 | **Plugin Integration** | `plugins/<name>/integration_tests/` | Validate end-to-end graph support for plugin | Yes - required for validation | Can be slower | Windows & Linux |
 
-### Test Requirements by Type
+#### Test Requirements by Type
 
-#### Frontend-Backend
+##### Frontend-Backend
 - Use fake plugins for controlled behavior
 - No accuracy/solution validation (stubbed)
 - Test graph creation and execution API
 - Test backend descriptor creation from frontend
 - Test execution flow validation
 
-#### Plugin Integration
+##### Plugin Integration
 - Validate correctness and graph support
 - Each plugin maintains its own test suite
 - Test on all ASICs supported by the plugin
@@ -145,6 +147,6 @@ Tests must work in the following environments:
 
 For each PR, the latest commit must pass every CI pipeline listed in the [Test Plan](./TestPlan.md#prerequisites).
 
-## 4. Performance Testing
+## 3. Performance Testing
 
 See the [Roadmap](../Roadmap.md#testing-and-performance) for status of the upcoming performance benchmarking project, which will track performance of hipDNN and installed plugins across a broad set of graphs.
