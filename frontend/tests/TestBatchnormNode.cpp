@@ -154,7 +154,7 @@ TEST(TestBatchnormNode, InferPropertiesNodeWithStats)
 TEST(TestBatchnormNode, PackNode)
 {
     BatchnormAttributes batchnormAttributes;
-    batchnormAttributes.name = "Batchnorm";
+    batchnormAttributes.set_name("Batchnorm");
 
     auto xTensor = std::make_shared<TensorAttributes>();
     xTensor->set_uid(1)
