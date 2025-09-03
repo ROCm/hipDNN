@@ -596,15 +596,15 @@ TEST(CpuFpReferenceImplementation, ConvFwdNHWCLayoutValidation)
 {
     // Test that NCHW and NHWC produce equivalent results
     // Simple 1x1 input, 1x1 kernel for easy validation
-    
+
     // NCHW tensors
     Tensor<double> inputTensorNCHW({1, 1, 1, 1}, TensorLayout::NCHW);
     Tensor<double> outputTensorNCHW({1, 1, 1, 1}, TensorLayout::NCHW);
-    
+
     // NHWC tensors
     Tensor<double> inputTensorNHWC({1, 1, 1, 1}, TensorLayout::NHWC);
     Tensor<double> outputTensorNHWC({1, 1, 1, 1}, TensorLayout::NHWC);
-    
+
     // Shared weight tensor (layout doesn't change)
     Tensor<double> weightTensor({1, 1, 1, 1}); // [G*K][C][Y][X] = [1][1][1][1]
 
@@ -622,15 +622,18 @@ TEST(CpuFpReferenceImplementation, ConvFwdNHWCLayoutValidation)
     CpuFpReferenceImplementation<double, double, double> refImpl;
 
     // Run convolution on both layouts
-    refImpl.convFwdInference(inputTensorNCHW, weightTensor, outputTensorNCHW, strides, dilations, padding);
-    refImpl.convFwdInference(inputTensorNHWC, weightTensor, outputTensorNHWC, strides, dilations, padding);
+    refImpl.convFwdInference(
+        inputTensorNCHW, weightTensor, outputTensorNCHW, strides, dilations, padding);
+    refImpl.convFwdInference(
+        inputTensorNHWC, weightTensor, outputTensorNHWC, strides, dilations, padding);
 
     // Results should be identical
     double expectedResult = 2.5 * 3.5; // 8.75
     EXPECT_NEAR(outputTensorNCHW.getHostValue(0, 0, 0, 0), expectedResult, 1e-10);
     EXPECT_NEAR(outputTensorNHWC.getHostValue(0, 0, 0, 0), expectedResult, 1e-10);
-    
+
     // Verify both layouts produce the same result
-    EXPECT_NEAR(outputTensorNCHW.getHostValue(0, 0, 0, 0), 
-                outputTensorNHWC.getHostValue(0, 0, 0, 0), 1e-10);
+    EXPECT_NEAR(outputTensorNCHW.getHostValue(0, 0, 0, 0),
+                outputTensorNHWC.getHostValue(0, 0, 0, 0),
+                1e-10);
 }
