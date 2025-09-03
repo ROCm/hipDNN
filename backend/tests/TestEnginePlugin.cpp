@@ -26,8 +26,10 @@ public:
     }
 };
 
-TEST(TestEnginePluginManager, LoadPluginsAndExecuteOpGraph)
+TEST(TestGpuEnginePluginManager, LoadPluginsAndExecuteOpGraph)
 {
+    SKIP_IF_NO_DEVICES();
+
     // Create an SimpleEnginePluginManager instance
     SimpleEnginePluginManager pluginManager;
 

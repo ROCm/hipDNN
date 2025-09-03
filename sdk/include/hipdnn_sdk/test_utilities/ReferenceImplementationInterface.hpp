@@ -27,24 +27,24 @@ class IReferenceImplementation
 public:
     virtual ~IReferenceImplementation() = default;
 
-    virtual void batchnormFwdInference(const ITensor<InputDataType>& input,
-                                       const ITensor<ScaleBiasDataType>& scale,
-                                       const ITensor<ScaleBiasDataType>& bias,
-                                       const ITensor<MeanVarianceDataType>& estimatedMean,
-                                       const ITensor<MeanVarianceDataType>& estimatedVariance,
-                                       ITensor<InputDataType>& output,
+    virtual void batchnormFwdInference(const TensorBase<InputDataType>& input,
+                                       const TensorBase<ScaleBiasDataType>& scale,
+                                       const TensorBase<ScaleBiasDataType>& bias,
+                                       const TensorBase<MeanVarianceDataType>& estimatedMean,
+                                       const TensorBase<MeanVarianceDataType>& estimatedVariance,
+                                       TensorBase<InputDataType>& output,
                                        double epsilon)
         = 0;
 
     // Could call this bwd_training or bwd_propagation
-    virtual void batchnormBwd(const ITensor<InputDataType>& dy,
-                              const ITensor<InputDataType>& x,
-                              const ITensor<MeanVarianceDataType>& mean,
-                              const ITensor<MeanVarianceDataType>& invVariance,
-                              const ITensor<ScaleBiasDataType>& scale,
-                              ITensor<InputDataType>& dx,
-                              ITensor<ScaleBiasDataType>& dscale,
-                              ITensor<ScaleBiasDataType>& dbias)
+    virtual void batchnormBwd(const TensorBase<InputDataType>& dy,
+                              const TensorBase<InputDataType>& x,
+                              const TensorBase<MeanVarianceDataType>& mean,
+                              const TensorBase<MeanVarianceDataType>& invVariance,
+                              const TensorBase<ScaleBiasDataType>& scale,
+                              TensorBase<InputDataType>& dx,
+                              TensorBase<ScaleBiasDataType>& dscale,
+                              TensorBase<ScaleBiasDataType>& dbias)
         = 0;
 };
 
