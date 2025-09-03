@@ -3,7 +3,7 @@
 
 #include <gtest/gtest.h>
 
-#define HIPDNN_BACKEND_STATIC_DEFINE
+#define HIPDNN_PLUGIN_STATIC_DEFINE
 
 #include <hipdnn_sdk/plugin/PluginDataTypeHelpers.hpp>
 #include <hipdnn_sdk/plugin/PluginLastErrorManager.hpp>

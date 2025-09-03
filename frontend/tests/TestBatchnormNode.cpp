@@ -8,7 +8,7 @@
 using namespace hipdnn_frontend;
 using namespace hipdnn_frontend::graph;
 
-TEST(BatchnormNodeTests, PreValidateNode)
+TEST(TestBatchnormNode, PreValidateNode)
 {
     BatchnormAttributes batchnormAttributes;
     batchnormAttributes.set_x(std::make_shared<TensorAttributes>());
@@ -24,7 +24,7 @@ TEST(BatchnormNodeTests, PreValidateNode)
     EXPECT_EQ(error.code, error_code_t::OK);
 }
 
-TEST(BatchnormNodeTests, PreValidateNodeMissingValues)
+TEST(TestBatchnormNode, PreValidateNodeMissingValues)
 {
     BatchnormAttributes batchnormAttributes;
 
@@ -70,7 +70,7 @@ TEST(BatchnormNodeTests, PreValidateNodeMissingValues)
     EXPECT_EQ(error.code, error_code_t::OK);
 }
 
-TEST(BatchnormNodeTests, InferPropertiesNode)
+TEST(TestBatchnormNode, InferPropertiesNode)
 {
     BatchnormAttributes batchnormAttributes;
     batchnormAttributes.set_x(std::make_shared<TensorAttributes>());
@@ -99,7 +99,7 @@ TEST(BatchnormNodeTests, InferPropertiesNode)
     EXPECT_EQ(outputTensor->get_stride(), (std::vector<int64_t>{5, 6, 7, 8}));
 }
 
-TEST(BatchnormNodeTests, InferPropertiesNodeWithStats)
+TEST(TestBatchnormNode, InferPropertiesNodeWithStats)
 {
     BatchnormAttributes batchnormAttributes;
     batchnormAttributes.set_x(std::make_shared<TensorAttributes>());
@@ -151,7 +151,7 @@ TEST(BatchnormNodeTests, InferPropertiesNodeWithStats)
     EXPECT_EQ(nextRunningVarianceTensor->get_dim(), (std::vector<int64_t>{1, 2, 1, 1}));
 }
 
-TEST(BatchnormNodeTests, PackNode)
+TEST(TestBatchnormNode, PackNode)
 {
     BatchnormAttributes batchnormAttributes;
     batchnormAttributes.name = "Batchnorm";
@@ -221,7 +221,7 @@ TEST(BatchnormNodeTests, PackNode)
     EXPECT_EQ(packedAttributes->epsilon_tensor_uid(), epsilonTensor->get_uid());
 }
 
-TEST(BatchnormNodeTests, GatherhipdnnTensorIds)
+TEST(TestBatchnormNode, GatherHipdnnTensorIds)
 {
     BatchnormAttributes batchnormAttributes;
     auto xTensor = std::make_shared<TensorAttributes>();
@@ -267,7 +267,7 @@ TEST(BatchnormNodeTests, GatherhipdnnTensorIds)
     EXPECT_TRUE(usedIds.contains(10));
 }
 
-TEST(BatchnormNodeTests, PopulatehipdnnTensorIds)
+TEST(TestBatchnormNode, PopulateHipdnnTensorIds)
 {
     BatchnormAttributes batchnormAttributes;
     batchnormAttributes.set_x(std::make_shared<TensorAttributes>());

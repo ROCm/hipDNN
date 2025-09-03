@@ -39,8 +39,7 @@ public:
 
     ~CpuFpReferenceMiopenRmsValidation() override = default;
 
-    bool allClose(Migratable_memory_interface<T>& reference,
-                  Migratable_memory_interface<T>& implementation) override
+    bool allClose(IMigratableMemory<T>& reference, IMigratableMemory<T>& implementation) override
     {
         if(reference.count() != implementation.count())
         {
@@ -54,8 +53,8 @@ public:
             return true;
         }
 
-        const T* refData = reference.host_data();
-        const T* implData = implementation.host_data();
+        const T* refData = reference.hostData();
+        const T* implData = implementation.hostData();
 
         double squareDifference = 0.0;
         double maxRefMagnitude = 0.0;

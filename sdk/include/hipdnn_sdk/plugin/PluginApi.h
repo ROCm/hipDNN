@@ -7,7 +7,7 @@
 #include <hipdnn_sdk/plugin/PluginApiDataTypes.h>
 
 #ifdef _WIN32
-#ifdef HIPDNN_BACKEND_STATIC_DEFINE
+#ifdef HIPDNN_PLUGIN_STATIC_DEFINE
 #define HIPDNN_PLUGIN_EXPORT
 #else
 #define HIPDNN_PLUGIN_EXPORT __declspec(dllexport)

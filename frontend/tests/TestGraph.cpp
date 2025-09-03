@@ -14,7 +14,7 @@ using namespace hipdnn_frontend;
 using namespace hipdnn_frontend::graph;
 using namespace ::testing;
 
-class GraphTestFixture : public ::testing::Test
+class TestGraph : public ::testing::Test
 {
 protected:
     std::shared_ptr<Mock_hipdnn_backend> _mockBackend;
@@ -81,7 +81,7 @@ protected:
     }
 };
 
-TEST_F(GraphTestFixture, SetAndGetAttributes)
+TEST_F(TestGraph, SetAndGetAttributes)
 {
     Graph graph;
 
@@ -99,7 +99,7 @@ TEST_F(GraphTestFixture, SetAndGetAttributes)
     EXPECT_TRUE(validationResult.is_good()) << validationResult.get_message();
 }
 
-TEST_F(GraphTestFixture, BatchnormNodeCreation)
+TEST_F(TestGraph, BatchnormNodeCreation)
 {
     Graph graph;
 
@@ -132,7 +132,7 @@ TEST_F(GraphTestFixture, BatchnormNodeCreation)
     EXPECT_TRUE(validationResult.is_good()) << validationResult.get_message();
 }
 
-TEST_F(GraphTestFixture, BatchnormBackwardNodeCreation)
+TEST_F(TestGraph, BatchnormBackwardNodeCreation)
 {
     Graph graph;
 
@@ -161,7 +161,7 @@ TEST_F(GraphTestFixture, BatchnormBackwardNodeCreation)
     EXPECT_TRUE(validationResult.is_good()) << validationResult.get_message();
 }
 
-TEST_F(GraphTestFixture, BatchnormInferenceNodeCreation)
+TEST_F(TestGraph, BatchnormInferenceNodeCreation)
 {
     Graph graph;
 
@@ -185,7 +185,7 @@ TEST_F(GraphTestFixture, BatchnormInferenceNodeCreation)
     EXPECT_TRUE(validationResult.is_good()) << validationResult.get_message();
 }
 
-TEST_F(GraphTestFixture, PointwiseNodeCreationSingleInput)
+TEST_F(TestGraph, PointwiseNodeCreationSingleInput)
 {
     Graph graph;
 
@@ -205,7 +205,7 @@ TEST_F(GraphTestFixture, PointwiseNodeCreationSingleInput)
     EXPECT_TRUE(validationResult.is_good()) << validationResult.get_message();
 }
 
-TEST_F(GraphTestFixture, PointwiseNodeCreationTwoInputs)
+TEST_F(TestGraph, PointwiseNodeCreationTwoInputs)
 {
     Graph graph;
 
@@ -228,7 +228,7 @@ TEST_F(GraphTestFixture, PointwiseNodeCreationTwoInputs)
     EXPECT_TRUE(validationResult.is_good()) << validationResult.get_message();
 }
 
-TEST_F(GraphTestFixture, PointwiseNodeCreationThreeInputs)
+TEST_F(TestGraph, PointwiseNodeCreationThreeInputs)
 {
     Graph graph;
 
@@ -253,7 +253,7 @@ TEST_F(GraphTestFixture, PointwiseNodeCreationThreeInputs)
     EXPECT_TRUE(validationResult.is_good()) << validationResult.get_message();
 }
 
-TEST_F(GraphTestFixture, ConvolutionFwdNodeCreation)
+TEST_F(TestGraph, ConvolutionFwdNodeCreation)
 {
     Graph graph;
 
@@ -290,7 +290,7 @@ static void validateTensor(const TensorAttributes& tensor,
 }
 
 // NOLINTBEGIN
-TEST_F(GraphTestFixture, BuildAndSerializeBatchnormInferenceGraph)
+TEST_F(TestGraph, BuildAndSerializeBatchnormInferenceGraph)
 {
     ::testing::FLAGS_gmock_verbose = "error";
     Graph graph;
@@ -367,7 +367,7 @@ TEST_F(GraphTestFixture, BuildAndSerializeBatchnormInferenceGraph)
     EXPECT_EQ(deserializedBatchnormAttributes->y_tensor_uid, y->get_uid());
 }
 
-TEST_F(GraphTestFixture, BuildAndSerializeBatchnormGraph)
+TEST_F(TestGraph, BuildAndSerializeBatchnormGraph)
 {
     ::testing::FLAGS_gmock_verbose = "error";
     Graph graph;
@@ -470,7 +470,7 @@ TEST_F(GraphTestFixture, BuildAndSerializeBatchnormGraph)
               nextRunningVariance->get_uid());
 }
 
-TEST_F(GraphTestFixture, BuildAndSerializeBatchnormAndPointwiseGraph)
+TEST_F(TestGraph, BuildAndSerializeBatchnormAndPointwiseGraph)
 {
     ::testing::FLAGS_gmock_verbose = "error";
     Graph graph;
@@ -590,7 +590,7 @@ TEST_F(GraphTestFixture, BuildAndSerializeBatchnormAndPointwiseGraph)
               hipdnn_sdk::data_objects::PointwiseMode_RELU_FWD);
 }
 
-TEST_F(GraphTestFixture, BuildAndSerializePointwiseGraph)
+TEST_F(TestGraph, BuildAndSerializePointwiseGraph)
 {
     ::testing::FLAGS_gmock_verbose = "error";
     Graph graph;
@@ -649,7 +649,7 @@ TEST_F(GraphTestFixture, BuildAndSerializePointwiseGraph)
               hipdnn_sdk::data_objects::PointwiseMode_RELU_FWD);
 }
 
-TEST_F(GraphTestFixture, BuildAndSerializePointwiseAndBatchnormInferenceGraph)
+TEST_F(TestGraph, BuildAndSerializePointwiseAndBatchnormInferenceGraph)
 {
     ::testing::FLAGS_gmock_verbose = "error";
     Graph graph;
@@ -743,7 +743,7 @@ TEST_F(GraphTestFixture, BuildAndSerializePointwiseAndBatchnormInferenceGraph)
               hipdnn_sdk::data_objects::PointwiseMode_RELU_FWD);
 }
 
-TEST_F(GraphTestFixture, BuildAndSerializeBatchnormBackwardGraph)
+TEST_F(TestGraph, BuildAndSerializeBatchnormBackwardGraph)
 {
     ::testing::FLAGS_gmock_verbose = "error";
     Graph graph;
@@ -828,7 +828,7 @@ TEST_F(GraphTestFixture, BuildAndSerializeBatchnormBackwardGraph)
     EXPECT_EQ(deserializedBatchnormAttributes->dbias_tensor_uid, dbias->get_uid());
 }
 
-TEST_F(GraphTestFixture, BuildAndSerializeConvolutionFwdGraph)
+TEST_F(TestGraph, BuildAndSerializeConvolutionFwdGraph)
 {
     Graph graph;
 
@@ -900,7 +900,7 @@ TEST_F(GraphTestFixture, BuildAndSerializeConvolutionFwdGraph)
     EXPECT_EQ(deserializedConvolutionAttributes->dilation, std::vector<int64_t>({1, 1}));
 }
 
-TEST_F(GraphTestFixture, BuildAndSerializePointwiseAndBatchnormBackwardGraph)
+TEST_F(TestGraph, BuildAndSerializePointwiseAndBatchnormBackwardGraph)
 {
     ::testing::FLAGS_gmock_verbose = "error";
     Graph graph;
@@ -1003,7 +1003,7 @@ TEST_F(GraphTestFixture, BuildAndSerializePointwiseAndBatchnormBackwardGraph)
 }
 
 // Test graph.tensor()
-TEST_F(GraphTestFixture, TensorGraphAttributes)
+TEST_F(TestGraph, TensorGraphAttributes)
 {
     auto tensor = Graph::tensor(TensorAttributes()
                                     .set_name("TestTensor")
@@ -1022,7 +1022,7 @@ TEST_F(GraphTestFixture, TensorGraphAttributes)
 }
 
 // Test graph.tensorLike()
-TEST_F(GraphTestFixture, TensorLikeGraphAttributes)
+TEST_F(TestGraph, TensorLikeGraphAttributes)
 {
     auto tensor = Graph::tensor(TensorAttributes()
                                     .set_name("TestTensor")
@@ -1051,7 +1051,7 @@ TEST_F(GraphTestFixture, TensorLikeGraphAttributes)
     EXPECT_NE(tensor->get_uid(), tensorLikeNoName->get_uid());
 }
 
-TEST_F(GraphTestFixture, WillCorrectlyBuildOperationGraphDescriptor)
+TEST_F(TestGraph, WillCorrectlyBuildOperationGraphDescriptor)
 {
     ::testing::FLAGS_gmock_verbose = "error";
     Graph graph;
@@ -1080,7 +1080,7 @@ TEST_F(GraphTestFixture, WillCorrectlyBuildOperationGraphDescriptor)
     EXPECT_TRUE(result.is_good());
 }
 
-TEST_F(GraphTestFixture, CreatingExecutionPlansFailsWithNoGraph)
+TEST_F(TestGraph, CreatingExecutionPlansFailsWithNoGraph)
 {
     Graph graph;
 
@@ -1091,7 +1091,7 @@ TEST_F(GraphTestFixture, CreatingExecutionPlansFailsWithNoGraph)
               "execution plan.");
 }
 
-TEST_F(GraphTestFixture, CanSuccessfullyCreateExecutionPlans)
+TEST_F(TestGraph, CanSuccessfullyCreateExecutionPlans)
 {
     ::testing::FLAGS_gmock_verbose = "error";
     Graph graph;
@@ -1223,7 +1223,7 @@ TEST_F(GraphTestFixture, CanSuccessfullyCreateExecutionPlans)
     EXPECT_TRUE(exec_plan_result.is_good());
 }
 
-TEST_F(GraphTestFixture, CheckSupportFailsIfNoExecutionPlanCreated)
+TEST_F(TestGraph, CheckSupportFailsIfNoExecutionPlanCreated)
 {
     ::testing::FLAGS_gmock_verbose = "error";
     Graph graph;
@@ -1236,7 +1236,7 @@ TEST_F(GraphTestFixture, CheckSupportFailsIfNoExecutionPlanCreated)
     EXPECT_EQ(result.get_message(), "Execution plan descriptor is not created or invalid.");
 }
 
-TEST_F(GraphTestFixture, CheckSupportSucceedsWhenExecutionPlanCreated)
+TEST_F(TestGraph, CheckSupportSucceedsWhenExecutionPlanCreated)
 {
     ::testing::FLAGS_gmock_verbose = "error";
     Graph graph;
@@ -1268,7 +1268,7 @@ TEST_F(GraphTestFixture, CheckSupportSucceedsWhenExecutionPlanCreated)
     EXPECT_EQ(result.get_message(), "");
 }
 
-TEST_F(GraphTestFixture, EngineConfigAndExecutionPlanAreFinalizedAfterBuildPlans)
+TEST_F(TestGraph, EngineConfigAndExecutionPlanAreFinalizedAfterBuildPlans)
 {
     ::testing::FLAGS_gmock_verbose = "error";
     Graph graph;
@@ -1346,7 +1346,7 @@ TEST_F(GraphTestFixture, EngineConfigAndExecutionPlanAreFinalizedAfterBuildPlans
     EXPECT_EQ(result.get_message(), "");
 }
 
-TEST_F(GraphTestFixture, WorkspaceSizeIsRetrievedFromExecutionPlan)
+TEST_F(TestGraph, WorkspaceSizeIsRetrievedFromExecutionPlan)
 {
     ::testing::FLAGS_gmock_verbose = "error";
     Graph graph;
@@ -1406,7 +1406,7 @@ TEST_F(GraphTestFixture, WorkspaceSizeIsRetrievedFromExecutionPlan)
     EXPECT_EQ(workspaceSizeResult, workspace_size);
 }
 
-TEST_F(GraphTestFixture, ExecutePacksVariantPackAndPassesTheCorrectArguments)
+TEST_F(TestGraph, ExecutePacksVariantPackAndPassesTheCorrectArguments)
 {
     ::testing::FLAGS_gmock_verbose = "error";
     using ::testing::_;

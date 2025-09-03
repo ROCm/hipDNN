@@ -15,7 +15,7 @@ namespace
 constexpr hipdnnBackendHeurMode_t FALLBACK_MODE = HIPDNN_HEUR_MODE_FALLBACK;
 }
 
-class EngineHeuristicApiTests : public ::testing::Test
+class IntegrationEngineHeuristicApi : public ::testing::Test
 {
 protected:
     hipdnnBackendDescriptor_t _engineHeuristic = nullptr;
@@ -88,7 +88,7 @@ protected:
     }
 };
 
-TEST_F(EngineHeuristicApiTests, SetEngineHeuristicOperationGraph)
+TEST_F(IntegrationEngineHeuristicApi, SetEngineHeuristicOperationGraph)
 {
     hipdnnBackendDescriptor_t nullGraph = nullptr;
     EXPECT_EQ(hipdnnBackendSetAttribute(_engineHeuristic,
@@ -108,7 +108,7 @@ TEST_F(EngineHeuristicApiTests, SetEngineHeuristicOperationGraph)
               HIPDNN_STATUS_SUCCESS);
 }
 
-TEST_F(EngineHeuristicApiTests, SetEngineHeuristicMode)
+TEST_F(IntegrationEngineHeuristicApi, SetEngineHeuristicMode)
 {
     EXPECT_EQ(hipdnnBackendSetAttribute(
                   _engineHeuristic, HIPDNN_ATTR_ENGINEHEUR_MODE, HIPDNN_TYPE_HEUR_MODE, 1, nullptr),
@@ -144,7 +144,7 @@ TEST_F(EngineHeuristicApiTests, SetEngineHeuristicMode)
               HIPDNN_STATUS_SUCCESS);
 }
 
-TEST_F(EngineHeuristicApiTests, SetUnsupportedAttribute)
+TEST_F(IntegrationEngineHeuristicApi, SetUnsupportedAttribute)
 {
     int32_t dummy = 0;
     EXPECT_EQ(hipdnnBackendSetAttribute(
@@ -152,7 +152,7 @@ TEST_F(EngineHeuristicApiTests, SetUnsupportedAttribute)
               HIPDNN_STATUS_NOT_SUPPORTED);
 }
 
-TEST_F(EngineHeuristicApiTests, FinalizeEngineHeuristic)
+TEST_F(IntegrationEngineHeuristicApi, Finalize)
 {
     EXPECT_EQ(hipdnnBackendFinalize(_engineHeuristic), HIPDNN_STATUS_BAD_PARAM);
 
@@ -165,7 +165,7 @@ TEST_F(EngineHeuristicApiTests, FinalizeEngineHeuristic)
     EXPECT_EQ(hipdnnBackendFinalize(_engineHeuristic), HIPDNN_STATUS_BAD_PARAM);
 }
 
-TEST_F(EngineHeuristicApiTests, SetAttributeOnFinalizedDescriptor)
+TEST_F(IntegrationEngineHeuristicApi, SetAttributeOnFinalizedDescriptor)
 {
     populateEngineHeuristic(true);
 
@@ -177,7 +177,7 @@ TEST_F(EngineHeuristicApiTests, SetAttributeOnFinalizedDescriptor)
               HIPDNN_STATUS_NOT_INITIALIZED);
 }
 
-TEST_F(EngineHeuristicApiTests, GetAttributeOnUnfinalizedDescriptor)
+TEST_F(IntegrationEngineHeuristicApi, GetAttributeOnUnfinalizedDescriptor)
 {
     hipdnnBackendDescriptor_t dummyGraph = nullptr;
 
@@ -190,7 +190,7 @@ TEST_F(EngineHeuristicApiTests, GetAttributeOnUnfinalizedDescriptor)
               HIPDNN_STATUS_BAD_PARAM_NOT_FINALIZED);
 }
 
-TEST_F(EngineHeuristicApiTests, GetOperationGraph)
+TEST_F(IntegrationEngineHeuristicApi, GetEngineHeuristicOperationGraph)
 {
     populateEngineHeuristic(true);
 
@@ -247,7 +247,7 @@ TEST_F(EngineHeuristicApiTests, GetOperationGraph)
     retrievedGraph2 = nullptr;
 }
 
-TEST_F(EngineHeuristicApiTests, GetHeuristicMode)
+TEST_F(IntegrationEngineHeuristicApi, GetEngineHeuristicMode)
 {
     populateEngineHeuristic(true);
 
@@ -295,7 +295,7 @@ TEST_F(EngineHeuristicApiTests, GetHeuristicMode)
     EXPECT_EQ(mode, HIPDNN_HEUR_MODE_FALLBACK);
 }
 
-TEST_F(EngineHeuristicApiTests, GetUnsupportedAttribute)
+TEST_F(IntegrationEngineHeuristicApi, GetUnsupportedAttribute)
 {
     populateEngineHeuristic(true);
 
@@ -309,7 +309,7 @@ TEST_F(EngineHeuristicApiTests, GetUnsupportedAttribute)
               HIPDNN_STATUS_NOT_SUPPORTED);
 }
 
-TEST_F(EngineHeuristicApiTests, GetEngineConfigsCountOnly)
+TEST_F(IntegrationEngineHeuristicApi, GetEngineConfigsCountOnly)
 {
     populateEngineHeuristic(true);
 
@@ -332,7 +332,7 @@ TEST_F(EngineHeuristicApiTests, GetEngineConfigsCountOnly)
     EXPECT_EQ(count, 1);
 }
 
-TEST_F(EngineHeuristicApiTests, GetEngineConfigs)
+TEST_F(IntegrationEngineHeuristicApi, GetEngineConfigs)
 {
     populateEngineHeuristic(true);
 
@@ -410,7 +410,7 @@ TEST_F(EngineHeuristicApiTests, GetEngineConfigs)
     EXPECT_EQ(hipdnnBackendDestroyDescriptor(engine), HIPDNN_STATUS_SUCCESS);
 }
 
-TEST_F(EngineHeuristicApiTests, GetEngineConfigsRequestMoreThanAvailable)
+TEST_F(IntegrationEngineHeuristicApi, GetEngineConfigsRequestMoreThanAvailable)
 {
     populateEngineHeuristic(true);
 
