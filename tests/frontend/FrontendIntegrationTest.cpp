@@ -21,6 +21,8 @@ using namespace hipdnn_frontend;
 using namespace hipdnn_frontend::graph;
 using namespace hipdnn_sdk::utilities;
 
+namespace {
+
 enum class FailurePoint
 {
     NONE, // No failure expected
@@ -70,7 +72,7 @@ struct IntegrationTestCase
 //        - We are using fake test plugins to simulate different scenarios.
 //        - The tests will validate the graph creation, execution plan building, and execution through the full flow.
 //        - We are using a batchnorm graph since the graph doesn't really matter due to fake plugins.
-class IntegrationFrontendBatchnormFp32 : public ::testing::TestWithParam<IntegrationTestCase>
+class IntegrationBatchnormForwardInferenceFp32 : public ::testing::TestWithParam<IntegrationTestCase>
 {
 protected:
     // Simplified tensor bundle for frontend integration tests
@@ -292,9 +294,10 @@ private:
     hipdnnHandle_t _handle = nullptr;
 };
 
-INSTANTIATE_TEST_SUITE_P(
-    IntegrationFrontendTests,
-    IntegrationFrontendBatchnormFp32,
+} // namespace
+
+INSTANTIATE_TEST_SUITE_P(,
+    IntegrationBatchnormForwardInferenceFp32,
     ::testing::Values(
         IntegrationTestCase{hipdnn_tests::plugin_constants::testGoodPluginPath(),
                             "DefaultPluginWithManualUids",
@@ -323,7 +326,7 @@ INSTANTIATE_TEST_SUITE_P(
         return name;
     });
 
-TEST_P(IntegrationFrontendBatchnormFp32, ExecutePluginPipeline)
+TEST_P(IntegrationBatchnormForwardInferenceFp32, ExecutePluginPipeline)
 {
     runTest();
 }
