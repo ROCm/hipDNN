@@ -46,6 +46,13 @@ public:
                               ITensor<ScaleBiasDataType>& dscale,
                               ITensor<ScaleBiasDataType>& dbias)
         = 0;
+
+    virtual void convFwdInference(const ITensor<InputDataType>& input,
+                                  const ITensor<InputDataType>& weight,
+                                  ITensor<InputDataType>& output,
+                                  const std::vector<int64_t>& strides,
+                                  const std::vector<int64_t>& dilations,
+                                  const std::vector<int64_t>& padding) = 0;
 };
 
 } // namespace reference_test_utilities
