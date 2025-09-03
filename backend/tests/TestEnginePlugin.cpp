@@ -28,6 +28,8 @@ public:
 
 TEST(TestEnginePluginManager, LoadPluginsAndExecuteOpGraph)
 {
+    SKIP_IF_NO_DEVICES();
+
     // Create an SimpleEnginePluginManager instance
     SimpleEnginePluginManager pluginManager;
 
