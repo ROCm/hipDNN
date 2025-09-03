@@ -55,7 +55,7 @@ protected:
 
         std::vector<int64_t> dims = {testCase.n, testCase.c, testCase.h, testCase.w};
 
-        std::vector<int64_t> derivedDims = {1, dims[1], 1, 1};
+        std::vector<int64_t> derivedDims = {1, dims[1]};
 
         std::vector<hipdnnPluginDeviceBuffer_t> deviceBuffers;
 
