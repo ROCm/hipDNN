@@ -573,3 +573,64 @@ TEST(CpuFpReferenceImplementation, ConvFwdInvalidPaddingValue)
                      inputTensor, weightTensor, outputTensor, strides, dilations, padding),
                  std::invalid_argument);
 }
+
+// NHWC Layout Tests
+
+TEST(CpuFpReferenceImplementation, ConvFwdFloatUsageNHWC)
+{
+    // Basic 2D convolution with NHWC layout
+    Tensor<float> inputTensor({1, 2, 4, 4}, TensorLayout::NHWC);
+    Tensor<float> weightTensor({3, 2, 3, 3}); // Weight layout remains [G*K][C][Y][X]
+    Tensor<float> outputTensor({1, 3, 2, 2}, TensorLayout::NHWC);
+
+    std::vector<int64_t> strides = {1, 1};
+    std::vector<int64_t> dilations = {1, 1};
+    std::vector<int64_t> padding = {0, 0};
+
+    CpuFpReferenceImplementation<float, float, float> refImpl;
+
+    refImpl.convFwdInference(inputTensor, weightTensor, outputTensor, strides, dilations, padding);
+}
+
+TEST(CpuFpReferenceImplementation, ConvFwdNHWCLayoutValidation)
+{
+    // Test that NCHW and NHWC produce equivalent results
+    // Simple 1x1 input, 1x1 kernel for easy validation
+    
+    // NCHW tensors
+    Tensor<double> inputTensorNCHW({1, 1, 1, 1}, TensorLayout::NCHW);
+    Tensor<double> outputTensorNCHW({1, 1, 1, 1}, TensorLayout::NCHW);
+    
+    // NHWC tensors
+    Tensor<double> inputTensorNHWC({1, 1, 1, 1}, TensorLayout::NHWC);
+    Tensor<double> outputTensorNHWC({1, 1, 1, 1}, TensorLayout::NHWC);
+    
+    // Shared weight tensor (layout doesn't change)
+    Tensor<double> weightTensor({1, 1, 1, 1}); // [G*K][C][Y][X] = [1][1][1][1]
+
+    // Set identical input values
+    inputTensorNCHW.setHostValue(0, 0, 0, 0, 2.5);
+    inputTensorNHWC.setHostValue(0, 0, 0, 0, 2.5);
+
+    // Set weight value
+    weightTensor.setHostValue(0, 0, 0, 0, 3.5);
+
+    std::vector<int64_t> strides = {1, 1};
+    std::vector<int64_t> dilations = {1, 1};
+    std::vector<int64_t> padding = {0, 0};
+
+    CpuFpReferenceImplementation<double, double, double> refImpl;
+
+    // Run convolution on both layouts
+    refImpl.convFwdInference(inputTensorNCHW, weightTensor, outputTensorNCHW, strides, dilations, padding);
+    refImpl.convFwdInference(inputTensorNHWC, weightTensor, outputTensorNHWC, strides, dilations, padding);
+
+    // Results should be identical
+    double expectedResult = 2.5 * 3.5; // 8.75
+    EXPECT_NEAR(outputTensorNCHW.getHostValue(0, 0, 0, 0), expectedResult, 1e-10);
+    EXPECT_NEAR(outputTensorNHWC.getHostValue(0, 0, 0, 0), expectedResult, 1e-10);
+    
+    // Verify both layouts produce the same result
+    EXPECT_NEAR(outputTensorNCHW.getHostValue(0, 0, 0, 0), 
+                outputTensorNHWC.getHostValue(0, 0, 0, 0), 1e-10);
+}
