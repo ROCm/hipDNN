@@ -14,6 +14,12 @@ class MiopenTensor
 public:
     MiopenTensor(const hipdnn_sdk::data_objects::TensorAttributes& tensor);
 
+    MiopenTensor(const MiopenTensor&) = delete;
+    MiopenTensor& operator=(const MiopenTensor&) = delete;
+
+    MiopenTensor(MiopenTensor&& other) noexcept;
+    MiopenTensor& operator=(MiopenTensor&& other) noexcept;
+
     ~MiopenTensor();
 
     int64_t uid() const;

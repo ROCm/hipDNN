@@ -2,9 +2,9 @@
 // SPDX-License-Identifier:  MIT
 
 #include "EngineHeuristicDescriptor.hpp"
+#include "BackendEnumStringUtils.hpp"
 #include "EngineConfigDescriptor.hpp"
 #include "EngineDescriptor.hpp"
-#include "Error.hpp"
 #include "GraphDescriptor.hpp"
 #include "HipdnnBackendDescriptorType.h"
 #include "HipdnnException.hpp"

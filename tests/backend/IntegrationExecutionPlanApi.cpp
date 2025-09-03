@@ -7,7 +7,7 @@
 
 #include <gtest/gtest.h>
 
-class ExecutionPlanApiTests : public ::testing::Test
+class IntegrationExecutionPlanApi : public ::testing::Test
 {
 protected:
     static constexpr int64_t GIDX = hipdnn_tests::plugin_constants::engineId<GoodPlugin>();
@@ -60,7 +60,7 @@ private:
     }
 };
 
-TEST_F(ExecutionPlanApiTests, SetExecutionPlanHandle)
+TEST_F(IntegrationExecutionPlanApi, SetExecutionPlanHandle)
 {
     EXPECT_EQ(hipdnnBackendSetAttribute(
                   _plan, HIPDNN_ATTR_EXECUTION_PLAN_HANDLE, HIPDNN_TYPE_HANDLE, 1, nullptr),
@@ -71,7 +71,7 @@ TEST_F(ExecutionPlanApiTests, SetExecutionPlanHandle)
               HIPDNN_STATUS_SUCCESS);
 }
 
-TEST_F(ExecutionPlanApiTests, SetExecutionPlanEngineConfig)
+TEST_F(IntegrationExecutionPlanApi, SetExecutionPlanEngineConfig)
 {
     EXPECT_EQ(hipdnnBackendSetAttribute(_plan,
                                         HIPDNN_ATTR_EXECUTION_PLAN_ENGINE_CONFIG,
@@ -90,14 +90,14 @@ TEST_F(ExecutionPlanApiTests, SetExecutionPlanEngineConfig)
               HIPDNN_STATUS_SUCCESS);
 }
 
-TEST_F(ExecutionPlanApiTests, SetExecutionPlanAttrNotSupported)
+TEST_F(IntegrationExecutionPlanApi, SetExecutionPlanAttrNotSupported)
 {
     EXPECT_EQ(hipdnnBackendSetAttribute(
                   _plan, HIPDNN_ATTR_EXECUTION_PLAN_WORKSPACE_SIZE, HIPDNN_TYPE_INT64, 1, nullptr),
               HIPDNN_STATUS_NOT_SUPPORTED);
 }
 
-TEST_F(ExecutionPlanApiTests, GetExecutionPlanWorkSpaceSize)
+TEST_F(IntegrationExecutionPlanApi, GetExecutionPlanWorkSpaceSize)
 {
     size_t size = 0;
     EXPECT_EQ(
@@ -114,7 +114,7 @@ TEST_F(ExecutionPlanApiTests, GetExecutionPlanWorkSpaceSize)
     EXPECT_EQ(size, 1024);
 }
 
-TEST_F(ExecutionPlanApiTests, FinalizeExecutionPlan)
+TEST_F(IntegrationExecutionPlanApi, Finalize)
 {
     EXPECT_EQ(hipdnnBackendFinalize(_plan), HIPDNN_STATUS_BAD_PARAM);
 

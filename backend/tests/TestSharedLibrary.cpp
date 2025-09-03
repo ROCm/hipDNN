@@ -27,52 +27,52 @@ const std::string FULL_LIBRARY_PATH
 
 }
 
-TEST(SharedLibraryTest, LoadLibrary)
+TEST(TestSharedLibrary, LoadLibrary)
 {
     plugin::SharedLibrary library;
     library.load(LIBRARY_PATH);
     library.unload();
 }
 
-TEST(SharedLibraryTest, LoadLibraryCtor)
+TEST(TestSharedLibrary, LoadLibraryCtor)
 {
     plugin::SharedLibrary library(LIBRARY_PATH);
 }
 
-TEST(SharedLibraryTest, LoadLibraryWrongPath)
+TEST(TestSharedLibrary, LoadLibraryWrongPath)
 {
     plugin::SharedLibrary library;
     ASSERT_THROW_HIPDNN_STATUS(library.load(WRONG_LIBRARY_PATH), HIPDNN_STATUS_PLUGIN_ERROR);
     library.unload();
 }
 
-TEST(SharedLibraryTest, LoadLibraryCtorWrongPath)
+TEST(TestSharedLibrary, LoadLibraryCtorWrongPath)
 {
     ASSERT_THROW_HIPDNN_STATUS(plugin::SharedLibrary(WRONG_LIBRARY_PATH),
                                HIPDNN_STATUS_PLUGIN_ERROR);
 }
 
-TEST(SharedLibraryTest, GetSymbol)
+TEST(TestSharedLibrary, GetSymbol)
 {
     plugin::SharedLibrary library(LIBRARY_PATH);
 
     ASSERT_NO_THROW(library.getSymbol(SYMBOL_NAME));
 }
 
-TEST(SharedLibraryTest, GetSymbolUninitialized)
+TEST(TestSharedLibrary, GetSymbolUninitialized)
 {
     plugin::SharedLibrary library;
     ASSERT_THROW_HIPDNN_STATUS(library.getSymbol(SYMBOL_NAME), HIPDNN_STATUS_INTERNAL_ERROR);
 }
 
-TEST(SharedLibraryTest, GetSymbolWrongName)
+TEST(TestSharedLibrary, GetSymbolWrongName)
 {
     plugin::SharedLibrary library(LIBRARY_PATH);
 
     ASSERT_THROW_HIPDNN_STATUS(library.getSymbol(WRONG_SYMBOL_NAME), HIPDNN_STATUS_PLUGIN_ERROR);
 }
 
-TEST(SharedLibraryTest, CallFunction)
+TEST(TestSharedLibrary, CallFunction)
 {
     plugin::SharedLibrary library(LIBRARY_PATH);
 
@@ -88,7 +88,7 @@ TEST(SharedLibraryTest, CallFunction)
     ASSERT_STREQ(name, "Plugin1");
 }
 
-TEST(SharedLibraryTest, GetCurrentModuleDirectoryFromExecutable)
+TEST(TestSharedLibrary, GetCurrentModuleDirectoryFromExecutable)
 {
     std::filesystem::path path;
     ASSERT_NO_THROW(path = platform_utils::getCurrentModuleDirectory());
@@ -102,11 +102,11 @@ TEST(SharedLibraryTest, GetCurrentModuleDirectoryFromExecutable)
         path / hipdnn_sdk::utilities::getExecutableName("hipdnn_backend_tests")));
 }
 
-class SharedLibraryPathTest : public ::testing::TestWithParam<std::string>
+class TestSharedLibraryPaths : public ::testing::TestWithParam<std::string>
 {
 };
 
-TEST_P(SharedLibraryPathTest, LoadWithValidPathFormats)
+TEST_P(TestSharedLibraryPaths, LoadWithValidPathFormats)
 {
     const auto& pathParam = GetParam();
     plugin::SharedLibrary library;
@@ -114,7 +114,7 @@ TEST_P(SharedLibraryPathTest, LoadWithValidPathFormats)
 }
 
 INSTANTIATE_TEST_SUITE_P(PathVariations,
-                         SharedLibraryPathTest,
+                         TestSharedLibraryPaths,
                          ::testing::Values(
                              // Path without extension
                              std::string(LIBRARY_PATH),

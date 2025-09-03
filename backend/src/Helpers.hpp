@@ -2,9 +2,9 @@
 // SPDX-License-Identifier:  MIT
 #pragma once
 
-#include "Error.hpp"
 #include "HipdnnException.hpp"
 #include "HipdnnStatus.h"
+#include "LastErrorManager.hpp"
 
 #include <iostream>
 

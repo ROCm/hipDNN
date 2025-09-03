@@ -2,6 +2,7 @@
 // SPDX-License-Identifier:  MIT
 
 #include "MiopenBatchnormFwdInferencePlan.hpp"
+#include "MiopenUtils.hpp"
 
 namespace miopen_legacy_plugin
 {
@@ -13,77 +14,50 @@ const miopenBatchNormMode_t MIOPEN_BATCHNORM_MODE = miopenBNSpatial;
 BatchnormFwdInferenceParams::BatchnormFwdInferenceParams(
     const hipdnn_sdk::data_objects::BatchnormInferenceAttributes& attributes,
     const std::unordered_map<int64_t, const hipdnn_sdk::data_objects::TensorAttributes*>& tensorMap)
+    : _x(miopen_utils::createTensor(tensorMap, attributes.x_tensor_uid()))
+    , _y(miopen_utils::createTensor(tensorMap, attributes.y_tensor_uid()))
+    , _scale(miopen_utils::createTensor(tensorMap, attributes.scale_tensor_uid()))
+    , _bias(miopen_utils::createTensor(tensorMap, attributes.bias_tensor_uid()))
 {
-    initializeTensors(attributes, tensorMap);
+    if(attributes.mean_tensor_uid().has_value())
+    {
+        _estMean = miopen_utils::createTensor(tensorMap, attributes.mean_tensor_uid().value());
+    }
+    if(attributes.inv_variance_tensor_uid().has_value())
+    {
+        _estVariance
+            = miopen_utils::createTensor(tensorMap, attributes.inv_variance_tensor_uid().value());
+    }
 }
 
 const MiopenTensor& BatchnormFwdInferenceParams::x() const
 {
-    return *_xPair;
+    return _x;
 }
 
 const MiopenTensor& BatchnormFwdInferenceParams::y() const
 {
-    return *_yPair;
+    return _y;
 }
 
 const MiopenTensor& BatchnormFwdInferenceParams::scale() const
 {
-    return *_scalePair;
+    return _scale;
 }
 
 const MiopenTensor& BatchnormFwdInferenceParams::bias() const
 {
-    return *_biasPair;
+    return _bias;
 }
 
-const std::optional<std::unique_ptr<MiopenTensor>>& BatchnormFwdInferenceParams::estMean() const
+const std::optional<MiopenTensor>& BatchnormFwdInferenceParams::estMean() const
 {
-    return _estMeanTensorDescriptor;
+    return _estMean;
 }
 
-const std::optional<std::unique_ptr<MiopenTensor>>& BatchnormFwdInferenceParams::estVariance() const
+const std::optional<MiopenTensor>& BatchnormFwdInferenceParams::estVariance() const
 {
-    return _estVarianceTensorDescriptor;
-}
-
-namespace
-{
-
-std::unique_ptr<MiopenTensor> createTensor(
-    const std::unordered_map<int64_t, const hipdnn_sdk::data_objects::TensorAttributes*>& tensorMap,
-    int64_t uid)
-{
-    if(auto tensorAttr = tensorMap.find(uid); tensorAttr != tensorMap.end())
-    {
-        return std::make_unique<MiopenTensor>(*tensorAttr->second);
-    }
-
-    throw hipdnn_plugin::HipdnnPluginException(HIPDNN_PLUGIN_STATUS_INTERNAL_ERROR,
-                                               "Failed to find tensor with UID in tensorMap: "
-                                                   + std::to_string(uid));
-}
-
-} // namespace
-
-void BatchnormFwdInferenceParams::initializeTensors(
-    const hipdnn_sdk::data_objects::BatchnormInferenceAttributes& attributes,
-    const std::unordered_map<int64_t, const hipdnn_sdk::data_objects::TensorAttributes*>& tensorMap)
-{
-    _xPair = createTensor(tensorMap, attributes.x_tensor_uid());
-    _yPair = createTensor(tensorMap, attributes.y_tensor_uid());
-    _scalePair = createTensor(tensorMap, attributes.scale_tensor_uid());
-    _biasPair = createTensor(tensorMap, attributes.bias_tensor_uid());
-
-    if(attributes.mean_tensor_uid().has_value())
-    {
-        _estMeanTensorDescriptor = createTensor(tensorMap, attributes.mean_tensor_uid().value());
-    }
-    if(attributes.inv_variance_tensor_uid().has_value())
-    {
-        _estVarianceTensorDescriptor
-            = createTensor(tensorMap, attributes.inv_variance_tensor_uid().value());
-    }
+    return _estVariance;
 }
 
 BatchnormFwdInferencePlan::BatchnormFwdInferencePlan(
@@ -117,14 +91,14 @@ void BatchnormFwdInferencePlan::execute(const HipdnnEnginePluginHandle& handle,
     if(_inferenceParams->estMean().has_value())
     {
         estMeanBuffer = miopen_utils::findDeviceBuffer(
-            _inferenceParams->estMean().value()->uid(), deviceBuffers, numDeviceBuffers);
+            _inferenceParams->estMean().value().uid(), deviceBuffers, numDeviceBuffers);
     }
 
     hipdnnPluginDeviceBuffer_t estVarianceBuffer = {0, nullptr};
     if(_inferenceParams->estVariance().has_value())
     {
         estVarianceBuffer = miopen_utils::findDeviceBuffer(
-            _inferenceParams->estVariance().value()->uid(), deviceBuffers, numDeviceBuffers);
+            _inferenceParams->estVariance().value().uid(), deviceBuffers, numDeviceBuffers);
     }
 
     THROW_ON_MIOPEN_FAILURE(miopenBatchNormalizationForwardInference_V2(
@@ -139,10 +113,10 @@ void BatchnormFwdInferencePlan::execute(const HipdnnEnginePluginHandle& handle,
         _inferenceParams->scale().tensorDescriptor(),
         _inferenceParams->bias().tensorDescriptor(),
         _inferenceParams->estMean().has_value()
-            ? _inferenceParams->estMean().value()->tensorDescriptor()
+            ? _inferenceParams->estMean().value().tensorDescriptor()
             : nullptr,
         _inferenceParams->estVariance().has_value()
-            ? _inferenceParams->estVariance().value()->tensorDescriptor()
+            ? _inferenceParams->estVariance().value().tensorDescriptor()
             : nullptr,
         scaleBuffer.ptr,
         biasBuffer.ptr,

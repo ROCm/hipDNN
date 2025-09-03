@@ -3,7 +3,7 @@
 #include <gtest/gtest.h>
 #include <hipdnn_frontend/attributes/BatchnormAttributes.hpp>
 
-TEST(BatchnormAttributesTests, CreateBatchnormAttributes)
+TEST(TestBatchnormAttributes, CreateBatchnormAttributes)
 {
     hipdnn_frontend::graph::BatchnormAttributes batchnormAttributes;
 
@@ -214,7 +214,7 @@ TEST(BatchnormAttributesTests, CreateBatchnormAttributes)
     EXPECT_EQ(epsilonTensor->get_stride(), (std::vector<int64_t>{1}));
 }
 
-TEST(BatchnormAttributesTests, PackAttributes)
+TEST(TestBatchnormAttributes, PackAttributes)
 {
     hipdnn_frontend::graph::BatchnormAttributes batchnormAttributes;
 
@@ -300,7 +300,7 @@ TEST(BatchnormAttributesTests, PackAttributes)
     EXPECT_EQ(batchnormAttributesFb->peer_stats_tensor_uid()->Get(1), 13);
 }
 
-TEST(BatchnormAttributesTests, PackAttributesWithoutOptionalValues)
+TEST(TestBatchnormAttributes, PackAttributesWithoutOptionalValues)
 {
     hipdnn_frontend::graph::BatchnormAttributes batchnormAttributes;
 
@@ -349,7 +349,7 @@ TEST(BatchnormAttributesTests, PackAttributesWithoutOptionalValues)
     ASSERT_EQ(batchnormAttributesFb->peer_stats_tensor_uid()->size(), 0);
 }
 
-TEST(BatchnormAttributesTests, SetXWithMove)
+TEST(TestBatchnormAttributes, SetXWithMove)
 {
     hipdnn_frontend::graph::BatchnormAttributes batchnormAttributes;
 
@@ -367,7 +367,7 @@ TEST(BatchnormAttributesTests, SetXWithMove)
     EXPECT_EQ(retrieved.get(), rawPtr);
 }
 
-TEST(BatchnormAttributesTests, SetScaleWithMove)
+TEST(TestBatchnormAttributes, SetScaleWithMove)
 {
     hipdnn_frontend::graph::BatchnormAttributes batchnormAttributes;
 
@@ -386,7 +386,7 @@ TEST(BatchnormAttributesTests, SetScaleWithMove)
     EXPECT_EQ(retrieved.get(), rawPtr);
 }
 
-TEST(BatchnormAttributesTests, SetBiasWithMove)
+TEST(TestBatchnormAttributes, SetBiasWithMove)
 {
     hipdnn_frontend::graph::BatchnormAttributes batchnormAttributes;
 
@@ -405,7 +405,7 @@ TEST(BatchnormAttributesTests, SetBiasWithMove)
     EXPECT_EQ(retrieved.get(), rawPtr);
 }
 
-TEST(BatchnormAttributesTests, SetPeerStatsWithMove)
+TEST(TestBatchnormAttributes, SetPeerStatsWithMove)
 {
     hipdnn_frontend::graph::BatchnormAttributes batchnormAttributes;
 
@@ -435,7 +435,7 @@ TEST(BatchnormAttributesTests, SetPeerStatsWithMove)
     EXPECT_EQ(peerStats[1].get(), rawPtr2);
 }
 
-TEST(BatchnormAttributesTests, SetPreviousRunningStatsWithMove)
+TEST(TestBatchnormAttributes, SetPreviousRunningStatsWithMove)
 {
     hipdnn_frontend::graph::BatchnormAttributes batchnormAttributes;
 
@@ -480,7 +480,7 @@ TEST(BatchnormAttributesTests, SetPreviousRunningStatsWithMove)
 
 // Simplified move tests - testing move semantics without setting uid/name
 
-TEST(BatchnormAttributesTests, SimplifiedSetXWithMove)
+TEST(TestBatchnormAttributes, SimplifiedSetXWithMove)
 {
     hipdnn_frontend::graph::BatchnormAttributes batchnormAttributes;
 
@@ -491,7 +491,7 @@ TEST(BatchnormAttributesTests, SimplifiedSetXWithMove)
     EXPECT_NE(batchnormAttributes.get_x(), nullptr);
 }
 
-TEST(BatchnormAttributesTests, SimplifiedSetPeerStatsWithMove)
+TEST(TestBatchnormAttributes, SimplifiedSetPeerStatsWithMove)
 {
     hipdnn_frontend::graph::BatchnormAttributes batchnormAttributes;
 
@@ -507,7 +507,7 @@ TEST(BatchnormAttributesTests, SimplifiedSetPeerStatsWithMove)
     EXPECT_EQ(peerStats.size(), originalSize);
 }
 
-TEST(BatchnormAttributesTests, SimplifiedSetPreviousRunningStatsWithMove)
+TEST(TestBatchnormAttributes, SimplifiedSetPreviousRunningStatsWithMove)
 {
     hipdnn_frontend::graph::BatchnormAttributes batchnormAttributes;
 

@@ -1,8 +1,8 @@
 // Copyright © Advanced Micro Devices, Inc., or its affiliates.
 // SPDX-License-Identifier: MIT
 
+#include "DescriptorTestUtils.hpp"
 #include "HipdnnException.hpp"
-#include "TestDescriptorUtils.hpp"
 #include "TestMacros.hpp"
 #include "descriptors/EngineDescriptor.hpp"
 #include "descriptors/GraphDescriptor.hpp"
@@ -23,7 +23,7 @@ using namespace ::testing;
 
 using ::testing::Return;
 
-class EngineDescriptorTest : public ::testing::Test
+class TestEngineDescriptor : public ::testing::Test
 {
 public:
     std::unique_ptr<HipdnnBackendDescriptor> _engineWrapper = nullptr;
@@ -117,7 +117,7 @@ private:
     hipdnnPluginConstData_t _serializedEngineDetails;
 };
 
-TEST_F(EngineDescriptorTest, CreateEngineDescriptor)
+TEST_F(TestEngineDescriptor, CreateEngineDescriptor)
 {
     auto engine = getEngineDescriptor();
     ASSERT_NE(engine, nullptr);
@@ -125,7 +125,7 @@ TEST_F(EngineDescriptorTest, CreateEngineDescriptor)
     ASSERT_EQ(engine->getType(), HIPDNN_BACKEND_ENGINE_DESCRIPTOR);
 }
 
-TEST_F(EngineDescriptorTest, SetEngineDescriptorGraph)
+TEST_F(TestEngineDescriptor, SetEngineDescriptorGraph)
 {
     auto engine = getEngineDescriptor();
     EXPECT_CALL(*getMockGraphBadType(), isFinalized()).Times(1);
@@ -176,7 +176,7 @@ TEST_F(EngineDescriptorTest, SetEngineDescriptorGraph)
         HIPDNN_ATTR_ENGINE_OPERATION_GRAPH, HIPDNN_TYPE_BACKEND_DESCRIPTOR, 1, &_mockGraphWrapper));
 }
 
-TEST_F(EngineDescriptorTest, SetEngineDescriptorGlobalId)
+TEST_F(TestEngineDescriptor, SetEngineDescriptorGlobalId)
 {
     auto engine = getEngineDescriptor();
     int64_t gidx = 0;
@@ -198,7 +198,7 @@ TEST_F(EngineDescriptorTest, SetEngineDescriptorGlobalId)
         engine->setAttribute(HIPDNN_ATTR_ENGINE_GLOBAL_INDEX, HIPDNN_TYPE_INT64, 1, &gidx));
 }
 
-TEST_F(EngineDescriptorTest, SetAttrOnFinalizedEngineDescriptor)
+TEST_F(TestEngineDescriptor, SetAttrOnFinalizedEngineDescriptor)
 {
     auto engine = getEngineDescriptor();
     makeEngineFinalized();
@@ -210,7 +210,7 @@ TEST_F(EngineDescriptorTest, SetAttrOnFinalizedEngineDescriptor)
                                HIPDNN_STATUS_NOT_INITIALIZED);
 }
 
-TEST_F(EngineDescriptorTest, FinalizeEngineDescriptor)
+TEST_F(TestEngineDescriptor, FinalizeEngineDescriptor)
 {
     auto engine = getEngineDescriptor();
     ASSERT_THROW_HIPDNN_STATUS(engine->finalize(), HIPDNN_STATUS_BAD_PARAM);
@@ -220,7 +220,7 @@ TEST_F(EngineDescriptorTest, FinalizeEngineDescriptor)
     ASSERT_THROW_HIPDNN_STATUS(engine->finalize(), HIPDNN_STATUS_BAD_PARAM);
 }
 
-TEST_F(EngineDescriptorTest, GetAttrOnUnfinalizedEngineDescriptor)
+TEST_F(TestEngineDescriptor, GetAttrOnUnfinalizedEngineDescriptor)
 {
     auto engine = getEngineDescriptor();
     hipdnnBackendDescriptor_t dummyGraph = nullptr;
@@ -233,7 +233,7 @@ TEST_F(EngineDescriptorTest, GetAttrOnUnfinalizedEngineDescriptor)
                                HIPDNN_STATUS_NOT_INITIALIZED);
 }
 
-TEST_F(EngineDescriptorTest, GetEngineDescriptorUnsupportedAttr)
+TEST_F(TestEngineDescriptor, GetEngineDescriptorUnsupportedAttr)
 {
     auto engine = getEngineDescriptor();
     int32_t dummy;
@@ -246,7 +246,7 @@ TEST_F(EngineDescriptorTest, GetEngineDescriptorUnsupportedAttr)
         HIPDNN_STATUS_NOT_SUPPORTED);
 }
 
-TEST_F(EngineDescriptorTest, GetEngineDescriptorGraph)
+TEST_F(TestEngineDescriptor, GetEngineDescriptorGraph)
 {
     auto engine = getEngineDescriptor();
     ScopedDescriptor graph;
@@ -289,7 +289,7 @@ TEST_F(EngineDescriptorTest, GetEngineDescriptorGraph)
     ASSERT_EQ(count, 1);
 }
 
-TEST_F(EngineDescriptorTest, GetEngineDescriptorGlobalId)
+TEST_F(TestEngineDescriptor, GetEngineDescriptorGlobalId)
 {
     auto engine = getEngineDescriptor();
     int64_t gidx = -1;
@@ -320,13 +320,13 @@ TEST_F(EngineDescriptorTest, GetEngineDescriptorGlobalId)
     ASSERT_EQ(count, 1);
 }
 
-TEST_F(EngineDescriptorTest, GetGraphThrowsIfNotFinalized)
+TEST_F(TestEngineDescriptor, GetGraphThrowsIfNotFinalized)
 {
     auto engine = getEngineDescriptor();
     ASSERT_THROW_HIPDNN_STATUS(engine->getGraph(), HIPDNN_STATUS_INTERNAL_ERROR);
 }
 
-TEST_F(EngineDescriptorTest, GetGraphReturnsPointerIfFinalized)
+TEST_F(TestEngineDescriptor, GetGraphReturnsPointerIfFinalized)
 {
     auto engine = getEngineDescriptor();
     makeEngineFinalized();
@@ -336,13 +336,13 @@ TEST_F(EngineDescriptorTest, GetGraphReturnsPointerIfFinalized)
               static_cast<const IBackendDescriptor*>(getMockGraph().get()));
 }
 
-TEST_F(EngineDescriptorTest, GetEngineIdThrowsIfNotFinalized)
+TEST_F(TestEngineDescriptor, GetEngineIdThrowsIfNotFinalized)
 {
     auto engine = getEngineDescriptor();
     ASSERT_THROW_HIPDNN_STATUS(engine->getEngineId(), HIPDNN_STATUS_INTERNAL_ERROR);
 }
 
-TEST_F(EngineDescriptorTest, GetEngineIdReturnsValueIfFinalized)
+TEST_F(TestEngineDescriptor, GetEngineIdReturnsValueIfFinalized)
 {
     auto engine = getEngineDescriptor();
     makeEngineFinalized();

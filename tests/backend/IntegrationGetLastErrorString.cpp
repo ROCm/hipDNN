@@ -11,7 +11,7 @@
 #include "hipdnn_backend.h"
 
 // NOLINTBEGIN(modernize-avoid-c-arrays)
-TEST(GetErrorStringTest, AllStatusCodes)
+TEST(IntegrationGetErrorString, AllStatusCodes)
 {
     std::vector<std::tuple<hipdnnStatus_t, std::string>> statusPairs
         = {{HIPDNN_STATUS_SUCCESS, "HIPDNN_STATUS_SUCCESS"},
@@ -39,7 +39,7 @@ TEST(GetErrorStringTest, AllStatusCodes)
     }
 }
 
-TEST(GetLastErrorStringTest, GetLastError)
+TEST(IntegrationGetLastErrorString, ReturnLastError)
 {
     char buffer[HIPDNN_MAX_ERROR_STRING_SIZE];
     hipdnnStatus_t status = hipdnnDestroy(nullptr);
@@ -49,7 +49,7 @@ TEST(GetLastErrorStringTest, GetLastError)
     ASSERT_NE(std::string(buffer), "");
 }
 
-TEST(GetLastErrorStringTest, NullBufferOrZeroSize)
+TEST(IntegrationGetLastErrorString, NullBufferOrZeroSize)
 {
     // Should not crash or throw
     hipdnnGetLastErrorString(nullptr, 10);
@@ -57,7 +57,7 @@ TEST(GetLastErrorStringTest, NullBufferOrZeroSize)
     hipdnnGetLastErrorString(buf, 0);
 }
 
-TEST(GetLastErrorStringTest, BufferTruncationAndNullTermination)
+TEST(IntegrationGetLastErrorString, BufferTruncationAndNullTermination)
 {
     hipdnnStatus_t status = hipdnnDestroy(nullptr);
     ASSERT_EQ(status, HIPDNN_STATUS_BAD_PARAM_NULL_POINTER);
@@ -71,7 +71,7 @@ TEST(GetLastErrorStringTest, BufferTruncationAndNullTermination)
     ASSERT_NE(bufferStr, "");
 }
 
-TEST(GetLastErrorStringTest, PerThreadErrorIsolation)
+TEST(IntegrationGetLastErrorString, PerThreadErrorIsolation)
 {
     // Set error in main thread
     hipdnnDestroy(nullptr);
@@ -93,7 +93,7 @@ TEST(GetLastErrorStringTest, PerThreadErrorIsolation)
     ASSERT_TRUE(threadError.empty());
 }
 
-TEST(GetLastErrorStringTest, BufferLargerThanMax)
+TEST(IntegrationGetLastErrorString, BufferLargerThanMax)
 {
     hipdnnDestroy(nullptr);
     char mainBuf[1028];
