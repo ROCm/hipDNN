@@ -84,9 +84,7 @@ struct Batchnorm2dTensorBundle
     PinnedTensor<IntermediateType> invVarianceTensor;
 };
 
-} // namespace
-
-class BatchnormBackwardIntegrationTest : public ::testing::TestWithParam<Batchnorm2dTestCase>
+class BatchnormBackward : public ::testing::TestWithParam<Batchnorm2dTestCase>
 {
 protected:
     void SetUp() override
@@ -100,16 +98,16 @@ protected:
         ASSERT_EQ(hipInit(0), hipSuccess);
         ASSERT_EQ(hipGetDevice(&_deviceId), hipSuccess);
 
+        // Note: The plugin paths has to be set before we create the hipdnn handle.
         const std::array<const char*, 1> paths = {PLUGIN_DIR};
         ASSERT_EQ(hipdnnSetEnginePluginPaths_ext(
                       paths.size(), paths.data(), HIPDNN_PLUGIN_LOADING_ABSOLUTE),
                   HIPDNN_STATUS_SUCCESS);
 
+        // Create handle and stream
         ASSERT_EQ(hipdnnCreate(&_handle), HIPDNN_STATUS_SUCCESS);
-
-        //todo: bring back stream support once MigratableMemory supports it
-        //ASSERT_EQ(hipStreamCreate(&stream), hipSuccess);
-        //ASSERT_EQ(hipdnnSetStream(handle, stream), HIPDNN_STATUS_SUCCESS);
+        ASSERT_EQ(hipStreamCreate(&_stream), hipSuccess);
+        ASSERT_EQ(hipdnnSetStream(_handle, _stream), HIPDNN_STATUS_SUCCESS);
     }
 
     void TearDown() override
@@ -242,7 +240,7 @@ protected:
                                                                           *invVarianceTensorAttr,
                                                                           graphTensorBundle);
 
-        result = graphObj->execute(_handle, variantPack, nullptr);
+        result = graphObj->execute(_handle, variantPack, _stream);
         ASSERT_EQ(result.code, error_code_t::OK) << result.err_msg;
     }
 
@@ -303,35 +301,43 @@ private:
     int _deviceId = 0;
 };
 
-class BatchnormBackwardIntegrationTestBfloat16 : public BatchnormBackwardIntegrationTest
+class IntegrationGpuBatchnormBackwardNchwFp32 : public BatchnormBackward
 {
 };
 
-class BatchnormBackwardIntegrationTestHalf : public BatchnormBackwardIntegrationTest
+class IntegrationGpuBatchnormBackwardNchwBfp16 : public BatchnormBackward
 {
 };
 
-class BatchnormBackwardIntegrationTestNHWC : public BatchnormBackwardIntegrationTest
+class IntegrationGpuBatchnormBackwardNchwFp16 : public BatchnormBackward
 {
 };
 
-namespace
+class IntegrationGpuBatchnormBackwardNhwcFp32 : public BatchnormBackward
 {
+};
+
+class IntegrationGpuBatchnormBackwardNhwcBfp16 : public BatchnormBackward
+{
+};
+
+class IntegrationGpuBatchnormBackwardNhwcFp16 : public BatchnormBackward
+{
+};
 
 std::vector<Batchnorm2dTestCase> getBnBwdTestCases()
 {
     return {
         {.n = 1, .c = 3, .h = 14, .w = 14},
-        {.n = 2, .c = 3, .h = 14, .w = 14},
-        {.n = 64, .c = 3, .h = 14, .w = 14},
-        {.n = 64, .c = 256, .h = 14, .w = 14},
-        {.n = 64, .c = 256, .h = 28, .w = 28},
-        {.n = 64, .c = 256, .h = 56, .w = 56},
-        {.n = 64, .c = 512, .h = 14, .w = 14},
-        {.n = 64, .c = 512, .h = 28, .w = 28},
-        {.n = 64, .c = 512, .h = 7, .w = 7},
+        // MIOpen segfaults for this case, re-enable when fix is released:
+        // https://github.com/ROCm/rocm-libraries/pull/1197
+        // {.n = 1, .c = 256, .h = 1, .w = 1}, // Would produce near-zero variance in theory
+        {.n = 2, .c = 3, .h = 1, .w = 1},
+        {.n = 32, .c = 1, .h = 14, .w = 14},
+        {.n = 32, .c = 3, .h = 1, .w = 14},
+        {.n = 32, .c = 3, .h = 14, .w = 1},
         {.n = 64, .c = 64, .h = 112, .w = 112},
-        {.n = 64, .c = 64, .h = 56, .w = 56},
+        {.n = 64, .c = 512, .h = 14, .w = 14},
     };
 }
 
@@ -341,42 +347,66 @@ std::vector<Batchnorm2dTestCase> getBnBwdTestCases()
 // Tolerance ranges are set to be 4e-3f due to batchnorm being numerical unstable for large tensor sizes.
 // MIOpen uses 4e-3f for it's batchnorm tests to verify, but it uses RMS calc instead of allClose type check.
 // You can swap the tests above to use cpu_fp_reference_miopen_rms_validation if you want to match MIOpen's tolerance checks exactly.
-TEST_P(BatchnormBackwardIntegrationTest, RunFloatBwdBatchnormGraphNCHW)
+TEST_P(IntegrationGpuBatchnormBackwardNchwFp32, Correctness)
 {
     Batchnorm2dTestCase testCase = GetParam();
     runBatchnormTest<float, float>(testCase, 4e-3f);
 }
 
-INSTANTIATE_TEST_SUITE_P(RunFloatBwdBatchnormGraph,
-                         BatchnormBackwardIntegrationTest,
+INSTANTIATE_TEST_SUITE_P(,
+                         IntegrationGpuBatchnormBackwardNchwFp32,
                          testing::ValuesIn(getBnBwdTestCases()));
 
-TEST_P(BatchnormBackwardIntegrationTestBfloat16, RunBfloat16BwdBatchnormGraphNCHW)
+TEST_P(IntegrationGpuBatchnormBackwardNchwBfp16, Correctness)
 {
     Batchnorm2dTestCase testCase = GetParam();
     runBatchnormTest<hip_bfloat16, float>(testCase, 4e-3_bf);
 }
 
-INSTANTIATE_TEST_SUITE_P(RunBfloat16BwdBatchnormGraph,
-                         BatchnormBackwardIntegrationTestBfloat16,
+INSTANTIATE_TEST_SUITE_P(,
+                         IntegrationGpuBatchnormBackwardNchwBfp16,
                          testing::ValuesIn(getBnBwdTestCases()));
 
-TEST_P(BatchnormBackwardIntegrationTestHalf, RunHalfBwdBatchnormGraphNCWH)
+TEST_P(IntegrationGpuBatchnormBackwardNchwFp16, Correctness)
 {
     Batchnorm2dTestCase testCase = GetParam();
     runBatchnormTest<half, float>(testCase, 4e-3_h);
 }
 
-INSTANTIATE_TEST_SUITE_P(RunHalfBwdBatchnormGraph,
-                         BatchnormBackwardIntegrationTestHalf,
+INSTANTIATE_TEST_SUITE_P(,
+                         IntegrationGpuBatchnormBackwardNchwFp16,
                          testing::ValuesIn(getBnBwdTestCases()));
 
-TEST_P(BatchnormBackwardIntegrationTestNHWC, RunFloatBwdBatchnormGraphNHWC)
+TEST_P(IntegrationGpuBatchnormBackwardNhwcFp32, Correctness)
 {
     Batchnorm2dTestCase testCase = GetParam();
     runBatchnormTest<float, float>(testCase, 4e-3f, TensorLayout::NHWC);
 }
 
-INSTANTIATE_TEST_SUITE_P(RunFloatBwdBatchnormGraphNHWC,
-                         BatchnormBackwardIntegrationTestNHWC,
+INSTANTIATE_TEST_SUITE_P(,
+                         IntegrationGpuBatchnormBackwardNhwcFp32,
+                         testing::ValuesIn(getBnBwdTestCases()));
+
+// MIOpen segfaults for this case, re-enable when fix is released:
+// https://github.com/ROCm/rocm-libraries/pull/1197}
+TEST_P(IntegrationGpuBatchnormBackwardNhwcBfp16, DISABLED_Correctness)
+{
+    Batchnorm2dTestCase testCase = GetParam();
+    runBatchnormTest<hip_bfloat16, float>(testCase, 4e-3_bf, TensorLayout::NHWC);
+}
+
+INSTANTIATE_TEST_SUITE_P(,
+                         IntegrationGpuBatchnormBackwardNhwcBfp16,
+                         testing::ValuesIn(getBnBwdTestCases()));
+
+// MIOpen segfaults for this case, re-enable when fix is released:
+// https://github.com/ROCm/rocm-libraries/pull/1197
+TEST_P(IntegrationGpuBatchnormBackwardNhwcFp16, DISABLED_Correctness)
+{
+    Batchnorm2dTestCase testCase = GetParam();
+    runBatchnormTest<half, float>(testCase, 4e-3_h, TensorLayout::NHWC);
+}
+
+INSTANTIATE_TEST_SUITE_P(,
+                         IntegrationGpuBatchnormBackwardNhwcFp16,
                          testing::ValuesIn(getBnBwdTestCases()));

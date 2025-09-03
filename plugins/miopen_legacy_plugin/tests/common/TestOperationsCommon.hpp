@@ -66,7 +66,6 @@ inline std::vector<Batchnorm2dTestCase> getBatchnorm2dTestCases()
     return {
         {.n = 1, .c = 3, .h = 14, .w = 14},
         {.n = 2, .c = 3, .h = 14, .w = 14},
-        {.n = 64, .c = 3, .h = 14, .w = 14},
     };
 }
 

@@ -44,6 +44,20 @@ miopenDataType_t tensorDataTypeToMiopenDataType(const hipdnn_sdk::data_objects::
     }
 }
 
+MiopenTensor createTensor(
+    const std::unordered_map<int64_t, const hipdnn_sdk::data_objects::TensorAttributes*>& tensorMap,
+    int64_t uid)
+{
+    if(auto tensorAttr = tensorMap.find(uid); tensorAttr != tensorMap.end())
+    {
+        return {*tensorAttr->second};
+    }
+
+    throw hipdnn_plugin::HipdnnPluginException(HIPDNN_PLUGIN_STATUS_INTERNAL_ERROR,
+                                               "Failed to find tensor with UID in tensorMap: "
+                                                   + std::to_string(uid));
+}
+
 }
 
 }

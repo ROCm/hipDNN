@@ -17,7 +17,7 @@
 
 #include <gtest/gtest.h>
 
-class PluginLoadingTests : public ::testing::Test
+class IntegrationPluginLoading : public ::testing::Test
 {
 protected:
     hipdnnBackendDescriptor_t _engineConfig = nullptr;
@@ -88,7 +88,7 @@ void createHeuristicDescriptor(hipdnnBackendDescriptor_t* heuristicDescriptor,
     }
 }
 
-TEST_F(PluginLoadingTests, EmptyPluginPath)
+TEST_F(IntegrationPluginLoading, EmptyPluginPath)
 {
     TempDirectory pluginDir("empty_plugins");
     auto pluginPath = pluginDir.path().string();
@@ -119,7 +119,7 @@ TEST_F(PluginLoadingTests, EmptyPluginPath)
     EXPECT_EQ(availableEngineCount, 0);
 }
 
-TEST_F(PluginLoadingTests, NoPluginsSupportGraph)
+TEST_F(IntegrationPluginLoading, NoPluginsSupportGraph)
 {
     const std::array<const char*, 1> paths
         = {hipdnn_tests::plugin_constants::testNoApplicableEnginesPluginPath().c_str()};
@@ -149,7 +149,7 @@ TEST_F(PluginLoadingTests, NoPluginsSupportGraph)
     EXPECT_EQ(availableEngineCount, 0);
 }
 
-TEST_F(PluginLoadingTests, IncorrectEngineID)
+TEST_F(IntegrationPluginLoading, IncorrectEngineID)
 {
     const std::array<const char*, 1> paths
         = {hipdnn_tests::plugin_constants::testNoApplicableEnginesPluginPath().c_str()};
@@ -178,7 +178,7 @@ TEST_F(PluginLoadingTests, IncorrectEngineID)
         "EngineDescriptor::finalize() failed: Engine id is not in a valid range of engine IDs");
 }
 
-TEST_F(PluginLoadingTests, DuplicateEngineIds)
+TEST_F(IntegrationPluginLoading, DuplicateEngineIds)
 {
     const std::array<const char*, 2> paths
         = {hipdnn_tests::plugin_constants::testDuplicateIdAPluginPath().c_str(),
@@ -194,7 +194,7 @@ TEST_F(PluginLoadingTests, DuplicateEngineIds)
     EXPECT_EQ(test_util::getLoadedPlugins(_handle).size(), 1);
 }
 
-TEST_F(PluginLoadingTests, IncompleteAPI)
+TEST_F(IntegrationPluginLoading, IncompleteAPI)
 {
     using namespace hipdnn_sdk::utilities;
     using namespace hipdnn_tests::plugin_constants;
@@ -211,7 +211,7 @@ TEST_F(PluginLoadingTests, IncompleteAPI)
     EXPECT_EQ(test_util::getLoadedPlugins(_handle).size(), 0);
 }
 
-TEST_F(PluginLoadingTests, MultiplePluginsOneApplicableEngine)
+TEST_F(IntegrationPluginLoading, MultiplePluginsOneApplicableEngine)
 {
     const std::array<const char*, 1> paths
         = {hipdnn_tests::plugin_constants::testNoApplicableEnginesPluginPath().c_str()};
@@ -241,7 +241,7 @@ TEST_F(PluginLoadingTests, MultiplePluginsOneApplicableEngine)
     EXPECT_EQ(availableEngineCount, 1);
 }
 
-TEST_F(PluginLoadingTests, MultiplePluginsMultipleApplicableEngines)
+TEST_F(IntegrationPluginLoading, MultiplePluginsMultipleApplicableEngines)
 {
     const std::array<const char*, 1> paths
         = {hipdnn_tests::plugin_constants::testGoodPluginPath().c_str()};

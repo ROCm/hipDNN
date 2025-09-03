@@ -14,7 +14,7 @@
 using hipdnn_frontend::DataType_t;
 using namespace hipdnn_sdk::data_objects;
 
-TEST(TensorValueAttributesTests, SetGetClearFloat)
+TEST(TestTensorValueAttributes, SetGetClearFloat)
 {
     hipdnn_frontend::graph::TensorAttributes tensor;
     EXPECT_FALSE(tensor.has_value());
@@ -32,7 +32,7 @@ TEST(TensorValueAttributesTests, SetGetClearFloat)
     EXPECT_FALSE(tensor.get_value<float>().has_value());
 }
 
-TEST(TensorValueAttributesTests, PackUnpackFloat)
+TEST(TestTensorValueAttributes, PackUnpackFloat)
 {
     hipdnn_frontend::graph::TensorAttributes tensor;
     tensor.set_uid(7)
@@ -80,7 +80,7 @@ TEST(TensorValueAttributesTests, PackUnpackFloat)
     EXPECT_FLOAT_EQ(floatVal->value(), std::numbers::e_v<float>);
 }
 
-TEST(TensorValueAttributesTests, PackUnpackHalf)
+TEST(TestTensorValueAttributes, PackUnpackHalf)
 {
     hipdnn_frontend::graph::TensorAttributes tensor;
     tensor.set_uid(8)
@@ -110,7 +110,7 @@ TEST(TensorValueAttributesTests, PackUnpackHalf)
     EXPECT_EQ(halfVal->value(), uint16_t{16384});
 }
 
-TEST(TensorValueAttributesTests, PackUnpackDouble)
+TEST(TestTensorValueAttributes, PackUnpackDouble)
 {
     hipdnn_frontend::graph::TensorAttributes tensor;
     tensor.set_uid(9)
@@ -140,7 +140,7 @@ TEST(TensorValueAttributesTests, PackUnpackDouble)
     EXPECT_DOUBLE_EQ(doubleVal->value(), std::numbers::pi_v<double>);
 }
 
-TEST(TensorValueAttributesTests, PackUnpackEmptyValue)
+TEST(TestTensorValueAttributes, PackUnpackEmptyValue)
 {
     hipdnn_frontend::graph::TensorAttributes tensor;
     tensor.set_uid(10)
@@ -165,7 +165,7 @@ TEST(TensorValueAttributesTests, PackUnpackEmptyValue)
     EXPECT_EQ(unpacked->value.type, TensorValue_NONE);
 }
 
-TEST(TensorValueAttributesTests, TypeSafety)
+TEST(TestTensorValueAttributes, TypeSafety)
 {
     hipdnn_frontend::graph::TensorAttributes tensor;
     tensor.set_value(42.0f);
@@ -188,7 +188,7 @@ TEST(TensorValueAttributesTests, TypeSafety)
     EXPECT_EQ(intOpt.value(), 123);
 }
 
-TEST(TensorValueAttributesTests, NumericLimits)
+TEST(TestTensorValueAttributes, NumericLimits)
 {
     hipdnn_frontend::graph::TensorAttributes tensor;
 

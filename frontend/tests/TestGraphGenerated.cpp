@@ -3,7 +3,7 @@
 #include <gtest/gtest.h>
 #include <hipdnn_sdk/data_objects/graph_generated.h>
 
-TEST(FlatBuffers, SerializeAndDeserialize)
+TEST(TestGraphGenerated, SerializeAndDeserialize)
 {
     flatbuffers::FlatBufferBuilder builder;
 

@@ -7,7 +7,7 @@
 using namespace hipdnn_frontend;
 using namespace hipdnn_frontend::graph;
 
-TEST(PointwiseAttributesTests, CreatePointwiseAttributes)
+TEST(TestPointwiseAttributes, CreatePointwiseAttributes)
 {
     PointwiseAttributes pointwiseAttributes;
 
@@ -56,7 +56,7 @@ TEST(PointwiseAttributesTests, CreatePointwiseAttributes)
     EXPECT_EQ(pointwiseAttributes.get_axis(), 1);
 }
 
-TEST(PointwiseAttributesTests, CreatePointwiseAttributesWithTwoInputs)
+TEST(TestPointwiseAttributes, CreatePointwiseAttributesWithTwoInputs)
 {
     PointwiseAttributes pointwiseAttributes;
 
@@ -91,7 +91,7 @@ TEST(PointwiseAttributesTests, CreatePointwiseAttributesWithTwoInputs)
     EXPECT_EQ(pointwiseAttributes.get_mode(), PointwiseMode_t::RELU_FWD);
 }
 
-TEST(PointwiseAttributesTests, SetInput0WithMove)
+TEST(TestPointwiseAttributes, SetInput0WithMove)
 {
     PointwiseAttributes pointwiseAttributes;
 
@@ -110,7 +110,7 @@ TEST(PointwiseAttributesTests, SetInput0WithMove)
     EXPECT_EQ(retrieved.get(), rawPtr);
 }
 
-TEST(PointwiseAttributesTests, SetInput1WithMove)
+TEST(TestPointwiseAttributes, SetInput1WithMove)
 {
     PointwiseAttributes pointwiseAttributes;
 
@@ -129,7 +129,7 @@ TEST(PointwiseAttributesTests, SetInput1WithMove)
     EXPECT_EQ(retrieved.get(), rawPtr);
 }
 
-TEST(PointwiseAttributesTests, SetInput2WithMove)
+TEST(TestPointwiseAttributes, SetInput2WithMove)
 {
     PointwiseAttributes pointwiseAttributes;
 
@@ -148,7 +148,7 @@ TEST(PointwiseAttributesTests, SetInput2WithMove)
     EXPECT_EQ(retrieved.get(), rawPtr);
 }
 
-TEST(PointwiseAttributesTests, SetOutput0WithMove)
+TEST(TestPointwiseAttributes, SetOutput0WithMove)
 {
     PointwiseAttributes pointwiseAttributes;
 
@@ -169,7 +169,7 @@ TEST(PointwiseAttributesTests, SetOutput0WithMove)
 
 // Simplified move tests - testing move semantics without setting uid/name
 
-TEST(PointwiseAttributesTests, SimplifiedSetInput0WithMove)
+TEST(TestPointwiseAttributes, SimplifiedSetInput0WithMove)
 {
     PointwiseAttributes pointwiseAttributes;
 
@@ -180,7 +180,7 @@ TEST(PointwiseAttributesTests, SimplifiedSetInput0WithMove)
     EXPECT_NE(pointwiseAttributes.get_input_0(), nullptr);
 }
 
-TEST(PointwiseAttributesTests, SimplifiedSetInput1WithMove)
+TEST(TestPointwiseAttributes, SimplifiedSetInput1WithMove)
 {
     PointwiseAttributes pointwiseAttributes;
 
@@ -191,7 +191,7 @@ TEST(PointwiseAttributesTests, SimplifiedSetInput1WithMove)
     EXPECT_NE(pointwiseAttributes.get_input_1(), nullptr);
 }
 
-TEST(PointwiseAttributesTests, SimplifiedSetInput2WithMove)
+TEST(TestPointwiseAttributes, SimplifiedSetInput2WithMove)
 {
     PointwiseAttributes pointwiseAttributes;
 
@@ -202,7 +202,7 @@ TEST(PointwiseAttributesTests, SimplifiedSetInput2WithMove)
     EXPECT_NE(pointwiseAttributes.get_input_2(), nullptr);
 }
 
-TEST(PointwiseAttributesTests, SimplifiedSetOutput0WithMove)
+TEST(TestPointwiseAttributes, SimplifiedSetOutput0WithMove)
 {
     PointwiseAttributes pointwiseAttributes;
 
@@ -213,7 +213,7 @@ TEST(PointwiseAttributesTests, SimplifiedSetOutput0WithMove)
     EXPECT_NE(pointwiseAttributes.get_output_0(), nullptr);
 }
 
-TEST(PointwiseAttributesTests, CreatePointwiseAttributesWithThreeInputs)
+TEST(TestPointwiseAttributes, CreatePointwiseAttributesWithThreeInputs)
 {
     PointwiseAttributes pointwiseAttributes;
 
