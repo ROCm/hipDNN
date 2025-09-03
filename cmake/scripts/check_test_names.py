@@ -11,7 +11,7 @@ from typing import List, Dict, Any, Optional
 
 
 class TestNameValidator:
-    def __init__(self):
+    def __init__(self) -> None:
         # Controlled keywords
         self.keywords = {
             "test_types": ["Test", "Integration"],
@@ -29,7 +29,8 @@ class TestNameValidator:
         self.full_name_re = re.compile(
             r"^(?:(?P<prefix>[A-Z][A-Za-z0-9]*)/)?"
             r"(?P<suite>[A-Z][A-Za-z0-9]*)"
-            r"\.(?P<case>(?:DISABLED_[A-Za-z0-9_]+|[A-Z][A-Za-z0-9]*))$"
+            r"\.(?P<case>(?:DISABLED_[A-Za-z0-9_]+|[A-Z][A-Za-z0-9]*))"
+            r"(?:/.*)?$" # Not used for any validation
         )
 
     def _validate_test_case(self, case_name: str) -> List[str]:
@@ -42,7 +43,7 @@ class TestNameValidator:
             + self.keywords["gpu"]
         )
         # Check for disallowed keywords
-        found_keywords = [kw for kw in dissallowed if kw.lower() in case_name.lower()]
+        found_keywords = [kw for kw in dissallowed if kw in case_name]
         if found_keywords:
             issues.append(
                 f"Test case name should not contain keywords: {', '.join(found_keywords)}. These belong in the test suite name."
@@ -59,25 +60,30 @@ class TestNameValidator:
 
         prefix_part = f"({'|'.join(self.keywords['test_types'])})"
         gpu_part = f"({self.keywords['gpu'][0]})?"
-
-        # feature_part = r"[A-Z][a-zA-Z0-9]*"
-
-        disallowed_in_middle = (
-            self.keywords["test_types"]
-            + self.keywords["gpu"]
-            + self.keywords["datatypes"]
-        )
-        feature_part = f"(?!.*({'|'.join(disallowed_in_middle)}))[A-Z][a-zA-Z0-9]*"
+        feature_part = r"(?P<feature>[A-Z][a-zA-Z0-9]*?)"
         datatypes_part = f"({'|'.join(self.keywords['datatypes'])})?"
 
         structure_regex = re.compile(
             f"^{prefix_part}{gpu_part}{feature_part}{datatypes_part}$"
         )
 
-        if not structure_regex.match(suite_name):
+        match = structure_regex.match(suite_name)
+
+        if not match:
             issues.append(
                 "Suite name does not follow the structure: (Test|Integration)[Gpu?]FeatureName[Datatype?]"
             )
+            return issues
+
+        feature_name = match.group("feature")
+
+        disallowed_in_feature = self.keywords["test_types"] + self.keywords["gpu"] + self.keywords["datatypes"]
+
+        for keyword in disallowed_in_feature:
+            if keyword in feature_name:
+                issues.append(
+                    f"Keyword '{keyword}' is misplaced and should not be in the middle of the suite name."
+                )
 
         return issues
 
@@ -86,25 +92,7 @@ class TestNameValidator:
         Validate a single test name.
         Returns a list of issues found, or empty list if valid
         """
-        issues: List[str] = []
-
-        for keyword in self.valid_keywords:
-            matches = re.findall(re.escape(keyword), test_name, re.IGNORECASE)
-
-            # Check capitalization
-            issues.extend(
-                [
-                    f"Keyword '{match}' should be capitalized as '{keyword}'"
-                    for match in matches
-                    if match != keyword
-                ]
-            )
-
-            # Check duplicates
-            if len(matches) > 1:
-                issues.append(
-                    f"Keyword '{keyword}' appears more than once."
-                )  # Potentially useful to make test names more concise
+        issues = []
 
         parsed_match = self.full_name_re.match(test_name)
         if not parsed_match:
@@ -113,9 +101,28 @@ class TestNameValidator:
             )
             return issues
 
-        
+        prefix = parsed_match.group("prefix") or ""
         suite_name = parsed_match.group("suite")
         case_name = parsed_match.group("case")
+
+        for keyword in self.valid_keywords:
+            matches = re.findall(re.escape(keyword), f"{prefix}/{suite_name}.{case_name}", re.IGNORECASE)
+
+            valid_matches = [m for m in matches if m == keyword or m == keyword.upper()]
+            # Check capitalization
+            issues.extend(
+                [
+                    f"Keyword '{match}' should be capitalized as '{keyword}'"
+                    for match in valid_matches
+                    if match != keyword
+                ]
+            )
+
+            # Check duplicates
+            if len(valid_matches) > 1:
+                issues.append(
+                    f"Keyword '{keyword}' appears more than once."
+                )  # Potentially useful to make test names more concise
 
         issues.extend(self._validate_suite_structure(suite_name))
         issues.extend(self._validate_test_case(case_name))
@@ -132,7 +139,7 @@ class TestNameValidator:
             if "tests" in data:
                 for test in data["tests"]:
                     if "name" in test:
-                        test_names.append(test["name"])
+                        test_names.append(test["name"].split('#')[0].strip())
 
             return test_names
         except FileNotFoundError:
@@ -169,13 +176,6 @@ def parse_args() -> argparse.Namespace:
         "--verbose",
         action="store_true",
         help="Show all test names, not just invalid ones",
-        default=False,
-    )
-
-    parser.add_argument(
-        "--guidelines",
-        action="store_true",
-        help="Show naming guidelines at end of output",
         default=False,
     )
 
@@ -224,29 +224,7 @@ def main() -> int:
                     print(f"  → {issue}")
 
     print(f"\nWarning: {invalid_count} test(s) have non-conforming names")
-
-    if args.guidelines:
-        print("\nPlease update test names to follow hipDNN's naming conventions:")
-        print("\nGeneral Rules:")
-        print("  - Test suites: PascalCase (no underscores)")
-        print("  - Test cases: PascalCase (no underscores)")
-        print("  - Full format: TestSuite.TestCase")
-        print(
-            "  - No underscores in test case names (except when starting with 'DISABLED_')"
-        )
-        print("  - No underscores in test suite names")
-        print("  - No spaces, special characters, or leading numbers")
-        print("\nKeyword Capitalization:")
-        print("  - Integration, Gpu, Bfp16, Fp16, Fp32, Fp64, Nhwc, Nchw, Ndhwc, Ncdhw")
-        print("  - All variants must use exact capitalization shown above")
-        print("\nTest Suite Naming Structure:")
-        print("  - Order: (Test|Integration)[Gpu?]FeatureName[Datatype?]")
-        print(
-            "  - TestType: REQUIRED - must be 'Test' or 'Integration' at the beginning"
-        )
-        print("  - GPU tests: 'Gpu' must come immediately after the TestType")
-        print("  - Datatypes: Bfp16, Fp16, Fp32, Fp64 (only at the end)")
-        print("  - Shapes: Nhwc, Nchw, Ndhwc, Ncdhw (can appear anywhere in the name)")
+    print(" - For detailed hipDNN test naming rules, see: docs/CodingStyleAndNamingGuidelines.md\n")
 
     return 1 if args.strict else 0
 
