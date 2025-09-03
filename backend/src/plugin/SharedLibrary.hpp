@@ -47,7 +47,7 @@ public:
 private:
     std::filesystem::path _libraryPath;
 
-    hipdnn_backend::platform_utils::PluginLibHandle _libraryHandle;
+    hipdnn_backend::platform_utilities::PluginLibHandle _libraryHandle;
 };
 
 } // namespace plugin

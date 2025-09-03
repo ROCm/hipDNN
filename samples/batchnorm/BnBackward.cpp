@@ -113,8 +113,8 @@ void SampleRunner::operator()(const TensorLayout& layout)
     {
         std::cout << "Running CPU reference validation...\n";
 
-        auto refImpl = hipdnn_sdk::reference_test_utilities::
-            CpuFpReferenceImplementation<InputType, IntermediateType>();
+        auto refImpl = hipdnn_sdk::test_utilities::CpuFpReferenceImplementation<InputType,
+                                                                                IntermediateType>();
 
         Tensor<InputType> dxRefTensor(dx->get_dim(), layout);
         Tensor<IntermediateType> dscaleRefTensor(dscale->get_dim());
@@ -131,11 +131,10 @@ void SampleRunner::operator()(const TensorLayout& layout)
 
         auto epsilon = getEpsilon<InputType>();
 
-        auto dxValidator
-            = hipdnn_sdk::reference_test_utilities::CpuFpReferenceValidation<InputType>(
-                static_cast<InputType>(epsilon), static_cast<InputType>(epsilon));
+        auto dxValidator = hipdnn_sdk::test_utilities::CpuFpReferenceValidation<InputType>(
+            static_cast<InputType>(epsilon), static_cast<InputType>(epsilon));
         auto dscaleDbiasValidator
-            = hipdnn_sdk::reference_test_utilities::CpuFpReferenceValidation<IntermediateType>(
+            = hipdnn_sdk::test_utilities::CpuFpReferenceValidation<IntermediateType>(
                 static_cast<IntermediateType>(epsilon), static_cast<IntermediateType>(epsilon));
 
         bool dxValid = dxValidator.allClose(dxRefTensor.memory(), dxTensor.memory());

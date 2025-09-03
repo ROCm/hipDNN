@@ -22,7 +22,7 @@
 
 using namespace hipdnn_backend;
 using namespace plugin;
-using namespace test_descriptor_utils;
+using namespace hipdnn_backend::test_utilities;
 using namespace ::testing;
 
 using ::testing::Return;

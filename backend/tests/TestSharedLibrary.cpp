@@ -91,7 +91,7 @@ TEST(TestSharedLibrary, CallFunction)
 TEST(TestSharedLibrary, GetCurrentModuleDirectoryFromExecutable)
 {
     std::filesystem::path path;
-    ASSERT_NO_THROW(path = platform_utils::getCurrentModuleDirectory());
+    ASSERT_NO_THROW(path = platform_utilities::getCurrentModuleDirectory());
 
     EXPECT_FALSE(path.empty());
     EXPECT_TRUE(path.is_absolute());

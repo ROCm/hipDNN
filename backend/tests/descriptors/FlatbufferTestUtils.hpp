@@ -9,7 +9,7 @@
 #include <string>
 #include <vector>
 
-namespace flatbuffer_test_utils
+namespace hipdnn_backend::test_utilities
 {
 
 inline flatbuffers::FlatBufferBuilder createValidGraph()
