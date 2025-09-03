@@ -11,36 +11,33 @@ from typing import List, Dict, Any, Optional
 
 
 class TestNameValidator:
-    def __init__(self) -> None:
-        # Controlled keywords
-        self.keywords = {
-            "test_types": ["Test", "Integration"],
-            "gpu": ["Gpu"],
-            "datatypes": ["Bfp16", "Fp16", "Fp32", "Fp64"],
-            "shapes": ["Nhwc", "Nchw", "Ndhwc", "Ncdhw"],
-        }
 
-        # Flattened list of all valid keywords for easy checks
-        self.valid_keywords = [
-            kw for sublist in self.keywords.values() for kw in sublist
-        ]
+    KEYWORDS = {
+        "test_types": ["Test", "Integration"],
+        "gpu": ["Gpu"],
+        "datatypes": ["Bfp16", "Fp16", "Fp32", "Fp64"],
+        "shapes": ["Nhwc", "Nchw", "Ndhwc", "Ncdhw"],
+    }
+    VALID_KEYWORDS = [kw for sublist in KEYWORDS.values() for kw in sublist]
 
-        # Regex to parse full test name into components
-        self.full_name_re = re.compile(
-            r"^(?:(?P<prefix>[A-Z][A-Za-z0-9]*)/)?"
-            r"(?P<suite>[A-Z][A-Za-z0-9]*)"
-            r"\.(?P<case>(?:DISABLED_[A-Za-z0-9_]+|[A-Z][A-Za-z0-9]*))"
-            r"(?:/.*)?$" # Not used for any validation
-        )
+    FULL_NAME_RE = re.compile(
+        r"^(?:(?P<prefix>[A-Z][A-Za-z0-9]*)/)?"
+        r"(?P<suite>[A-Z][A-Za-z0-9]*)"
+        r"\.(?P<case>(?:DISABLED_[A-Za-z0-9_]+|[A-Z][A-Za-z0-9]*))"
+        r"(?:/.*)?$"
+    )
 
     def _validate_test_case(self, case_name: str) -> List[str]:
-        """Fully validate a test case name according to hipDNN conventions."""
+        """
+        Validate a test case name.
+        Returns a list of issues found, or empty list if valid.
+        """
         issues = []
 
         dissallowed = (
-            self.keywords["test_types"]
-            + self.keywords["datatypes"]
-            + self.keywords["gpu"]
+            self.KEYWORDS["test_types"]
+            + self.KEYWORDS["datatypes"]
+            + self.KEYWORDS["gpu"]
         )
         # Check for disallowed keywords
         found_keywords = [kw for kw in dissallowed if kw in case_name]
@@ -53,15 +50,15 @@ class TestNameValidator:
 
     def _validate_suite_structure(self, suite_name: str) -> List[str]:
         """
-        Validate the structure of a test suite name according to hipDNN test naming conventions.
+        Validate the structure of a test suite name.
         Returns a list of issues found, or empty list if valid.
         """
         issues = []
 
-        prefix_part = f"({'|'.join(self.keywords['test_types'])})"
-        gpu_part = f"({self.keywords['gpu'][0]})?"
+        prefix_part = f"({'|'.join(self.KEYWORDS['test_types'])})"
+        gpu_part = f"({self.KEYWORDS['gpu'][0]})?"
         feature_part = r"(?P<feature>[A-Z][a-zA-Z0-9]*?)"
-        datatypes_part = f"({'|'.join(self.keywords['datatypes'])})?"
+        datatypes_part = f"({'|'.join(self.KEYWORDS['datatypes'])})?"
 
         structure_regex = re.compile(
             f"^{prefix_part}{gpu_part}{feature_part}{datatypes_part}$"
@@ -77,7 +74,12 @@ class TestNameValidator:
 
         feature_name = match.group("feature")
 
-        disallowed_in_feature = self.keywords["test_types"] + self.keywords["gpu"] + self.keywords["datatypes"]
+        # Can move to class level
+        disallowed_in_feature = (
+            self.KEYWORDS["test_types"]
+            + self.KEYWORDS["gpu"]
+            + self.KEYWORDS["datatypes"]
+        )
 
         for keyword in disallowed_in_feature:
             if keyword in feature_name:
@@ -89,12 +91,12 @@ class TestNameValidator:
 
     def validate_test_name(self, test_name: str) -> List[str]:
         """
-        Validate a single test name.
+        Validate a single full test name.
         Returns a list of issues found, or empty list if valid
         """
         issues = []
 
-        parsed_match = self.full_name_re.match(test_name)
+        parsed_match = self.FULL_NAME_RE.match(test_name)
         if not parsed_match:
             issues.append(
                 "Test name does not match expected PascalCase format 'TestSuite.TestCase' or 'TestSuite/Instance.TestCase' without special characters."
@@ -105,8 +107,10 @@ class TestNameValidator:
         suite_name = parsed_match.group("suite")
         case_name = parsed_match.group("case")
 
-        for keyword in self.valid_keywords:
-            matches = re.findall(re.escape(keyword), f"{prefix}/{suite_name}.{case_name}", re.IGNORECASE)
+        for keyword in self.VALID_KEYWORDS:
+            matches = re.findall(
+                re.escape(keyword), f"{prefix}/{suite_name}.{case_name}", re.IGNORECASE
+            )
 
             valid_matches = [m for m in matches if m == keyword or m == keyword.upper()]
             # Check capitalization
@@ -129,7 +133,8 @@ class TestNameValidator:
 
         return issues
 
-    def extract_test_names_from_ctest_json(self, json_path: Path) -> List[str]:
+    @staticmethod
+    def extract_test_names_from_ctest_json(json_path: Path) -> List[str]:
         """Extract test names from CTest JSON output."""
         try:
             with open(json_path, "r") as f:
@@ -139,7 +144,7 @@ class TestNameValidator:
             if "tests" in data:
                 for test in data["tests"]:
                     if "name" in test:
-                        test_names.append(test["name"].split('#')[0].strip())
+                        test_names.append(test["name"].split("#")[0].strip())
 
             return test_names
         except FileNotFoundError:
@@ -224,7 +229,9 @@ def main() -> int:
                     print(f"  → {issue}")
 
     print(f"\nWarning: {invalid_count} test(s) have non-conforming names")
-    print(" - For detailed hipDNN test naming rules, see: docs/CodingStyleAndNamingGuidelines.md\n")
+    print(
+        " - For detailed hipDNN test naming rules, see: docs/CodingStyleAndNamingGuidelines.md\n"
+    )
 
     return 1 if args.strict else 0
 
