@@ -83,10 +83,7 @@ struct Batchnorm2dTensorBundle
     PinnedTensor<IntermediateType> varianceTensor;
 };
 
-} // namespace
-
-class BatchnormForwardInferenceIntegrationTest
-    : public ::testing::TestWithParam<Batchnorm2dTestCase>
+class BatchnormForwardInference : public ::testing::TestWithParam<Batchnorm2dTestCase>
 {
 protected:
     void SetUp() override
@@ -276,8 +273,29 @@ private:
     int _deviceId = 0;
 };
 
-namespace
+class IntegrationGpuBatchnormForwardInferenceNchwFp32 : public BatchnormForwardInference
 {
+};
+
+class IntegrationGpuBatchnormForwardInferenceNchwBfp16 : public BatchnormForwardInference
+{
+};
+
+class IntegrationGpuBatchnormForwardInferenceNchwFp16 : public BatchnormForwardInference
+{
+};
+
+class IntegrationGpuBatchnormForwardInferenceNhwcFp32 : public BatchnormForwardInference
+{
+};
+
+class IntegrationGpuBatchnormForwardInferenceNhwcBfp16 : public BatchnormForwardInference
+{
+};
+
+class IntegrationGpuBatchnormForwardInferenceNhwcFp16 : public BatchnormForwardInference
+{
+};
 
 std::vector<Batchnorm2dTestCase> getBnFwdInferenceTestCases()
 {
@@ -295,86 +313,62 @@ std::vector<Batchnorm2dTestCase> getBnFwdInferenceTestCases()
 
 } // namespace
 
-TEST_P(BatchnormForwardInferenceIntegrationTest, RunFloatFwdBatchnormGraphNCHW)
+TEST_P(IntegrationGpuBatchnormForwardInferenceNchwFp32, Correctness)
 {
     Batchnorm2dTestCase testCase = GetParam();
     runBatchnormTest<float, float>(testCase, 1e-6f);
 }
 
-INSTANTIATE_TEST_SUITE_P(RunFloatFwdBatchnormGraph,
-                         BatchnormForwardInferenceIntegrationTest,
+INSTANTIATE_TEST_SUITE_P(,
+                         IntegrationGpuBatchnormForwardInferenceNchwFp32,
                          testing::ValuesIn(getBnFwdInferenceTestCases()));
 
-class BatchnormForwardInferenceIntegrationTestBfloat16
-    : public BatchnormForwardInferenceIntegrationTest
-{
-};
-
-TEST_P(BatchnormForwardInferenceIntegrationTestBfloat16, RunBfloat16FwdBatchnormGraphNCHW)
+TEST_P(IntegrationGpuBatchnormForwardInferenceNchwBfp16, Correctness)
 {
     Batchnorm2dTestCase testCase = GetParam();
     runBatchnormTest<hip_bfloat16, float>(testCase, 1e-2_bf);
 }
 
-INSTANTIATE_TEST_SUITE_P(RunBfloat16FwdBatchnormGraph,
-                         BatchnormForwardInferenceIntegrationTestBfloat16,
+INSTANTIATE_TEST_SUITE_P(,
+                         IntegrationGpuBatchnormForwardInferenceNchwBfp16,
                          testing::ValuesIn(getBnFwdInferenceTestCases()));
 
-class BatchnormForwardInferenceIntegrationTestHalf : public BatchnormForwardInferenceIntegrationTest
-{
-};
-TEST_P(BatchnormForwardInferenceIntegrationTestHalf, RunHalfFwdbatchnormGraphNCHW)
+TEST_P(IntegrationGpuBatchnormForwardInferenceNchwFp16, Correctness)
 {
     Batchnorm2dTestCase testCase = GetParam();
     runBatchnormTest<half, float>(testCase, 1e-2_h);
 }
 
-INSTANTIATE_TEST_SUITE_P(RunHalfFwdbatchnormGraph,
-                         BatchnormForwardInferenceIntegrationTestHalf,
+INSTANTIATE_TEST_SUITE_P(,
+                         IntegrationGpuBatchnormForwardInferenceNchwFp16,
                          testing::ValuesIn(getBnFwdInferenceTestCases()));
 
-// Basic NHWC float test case
-class BatchnormForwardInferenceIntegrationTestNhwc : public BatchnormForwardInferenceIntegrationTest
-{
-};
-
-TEST_P(BatchnormForwardInferenceIntegrationTestNhwc, RunFloatFwdBatchnormGraphNHWC)
+TEST_P(IntegrationGpuBatchnormForwardInferenceNhwcFp32, Correctness)
 {
     Batchnorm2dTestCase testCase = GetParam();
     runBatchnormTest<float, float>(testCase, 1e-6f, TensorLayout::NHWC);
 }
 
-// Consider using fewer/smaller test cases to reduce test time
-INSTANTIATE_TEST_SUITE_P(RunFloatFwdBatchnormGraphNHWC,
-                         BatchnormForwardInferenceIntegrationTestNhwc,
+INSTANTIATE_TEST_SUITE_P(,
+                         IntegrationGpuBatchnormForwardInferenceNhwcFp32,
                          testing::ValuesIn(getBnFwdInferenceTestCases()));
 
-class BatchnormForwardInferenceIntegrationTestBfloat16Nhwc
-    : public BatchnormForwardInferenceIntegrationTest
-{
-};
-
-TEST_P(BatchnormForwardInferenceIntegrationTestBfloat16Nhwc, RunBfloat16FwdBatchnormGraphNHWC)
+TEST_P(IntegrationGpuBatchnormForwardInferenceNhwcBfp16, Correctness)
 {
     Batchnorm2dTestCase testCase = GetParam();
     runBatchnormTest<hip_bfloat16, float>(testCase, 1e-2_bf, TensorLayout::NHWC);
 }
 
-INSTANTIATE_TEST_SUITE_P(RunBfloat16FwdBatchnormGraphNHWC,
-                         BatchnormForwardInferenceIntegrationTestBfloat16Nhwc,
+INSTANTIATE_TEST_SUITE_P(,
+                         IntegrationGpuBatchnormForwardInferenceNhwcBfp16,
                          testing::ValuesIn(getBnFwdInferenceTestCases()));
 
-class BatchnormForwardInferenceIntegrationTestHalfNhwc
-    : public BatchnormForwardInferenceIntegrationTest
-{
-};
-
-TEST_P(BatchnormForwardInferenceIntegrationTestHalfNhwc, RunHalfFwdBatchnormGraphNHWC)
+TEST_P(IntegrationGpuBatchnormForwardInferenceNhwcFp16, Correctness)
 {
     Batchnorm2dTestCase testCase = GetParam();
     runBatchnormTest<half, float>(testCase, 1e-2_h, TensorLayout::NHWC);
 }
 
-INSTANTIATE_TEST_SUITE_P(RunHalfFwdBatchnormGraphNHWC,
-                         BatchnormForwardInferenceIntegrationTestHalfNhwc,
+INSTANTIATE_TEST_SUITE_P(,
+                         IntegrationGpuBatchnormForwardInferenceNhwcFp16,
                          testing::ValuesIn(getBnFwdInferenceTestCases()));
