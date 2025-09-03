@@ -36,7 +36,7 @@ inline std::ostream& operator<<(std::ostream& os, const TensorLayout& layout)
 
 // Helper to check if all types in a parameter pack satisfy a predicate
 template <template <typename> class Predicate, typename... Ts>
-struct all_of_types : std::conjunction<Predicate<Ts>...>
+struct AllOfTypes : std::conjunction<Predicate<Ts>...>
 {
 };
 
@@ -55,7 +55,7 @@ public:
     template <typename... Args>
     int64_t getIndex(Args... indices) const
     {
-        static_assert(all_of_types<std::is_integral, Args...>::value,
+        static_assert(AllOfTypes<std::is_integral, Args...>::value,
                       "Indices must be an integral type!");
 
         std::vector<int64_t> indexVector = {static_cast<int64_t>(indices)...};
@@ -74,9 +74,6 @@ public:
     template <typename... Args>
     T getHostValue(Args... indices) const
     {
-        static_assert(all_of_types<std::is_integral, Args...>::value,
-                      "Indices must be an integral type!");
-
         int64_t index = getIndex(indices...);
         const auto* data = memory().hostData();
         return data[index];
@@ -85,9 +82,6 @@ public:
     template <typename... Args>
     void setHostValue(T value, Args... indices)
     {
-        static_assert(all_of_types<std::is_integral, Args...>::value,
-                      "Indices must be an integral type!");
-
         int64_t index = getIndex(indices...);
         auto* data = memory().hostData();
         data[index] = value;
