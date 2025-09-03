@@ -9,24 +9,27 @@ import sys
 import unittest
 from pathlib import Path
 from typing import List, Dict
+from re import Pattern
 
 
 class TestNameValidator:
 
-    KEYWORDS = {
+    KEYWORDS: Dict[str, List[str]] = {
         "test_types": ["Test", "Integration"],
         "gpu": ["Gpu"],
         "datatypes": ["Bfp16", "Fp16", "Fp32", "Fp64"],
         "shapes": ["Nhwc", "Nchw", "Ndhwc", "Ncdhw"],
     }
 
-    FLATTENED_KEYWORDS = [kw for sublist in KEYWORDS.values() for kw in sublist]
+    FLATTENED_KEYWORDS: List[str] = [
+        kw for sublist in KEYWORDS.values() for kw in sublist
+    ]
 
-    POSITIONAL_KEYWORDS = (
+    POSITIONAL_KEYWORDS: List[str] = (
         KEYWORDS["test_types"] + KEYWORDS["datatypes"] + KEYWORDS["gpu"]
     )
 
-    FULL_NAME_RE = re.compile(
+    FULL_NAME_RE: Pattern[str] = re.compile(
         r"^(?:(?P<prefix>[A-Z][A-Za-z0-9]*)/)?"
         r"(?P<suite>[A-Z][A-Za-z0-9]*)"
         r"\.(?P<case>(?:DISABLED_[A-Z][A-Za-z0-9]+|[A-Z][A-Za-z0-9]*))"
@@ -247,10 +250,10 @@ def main() -> int:
 
 
 class TestTestNameValidator(unittest.TestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         self.validator = TestNameValidator()
 
-    def test_valid_test_names_basic(self):
+    def test_valid_test_names_basic(self) -> None:
         """Test basic valid test names in PascalCase"""
         valid_names = [
             "TestMyClass.Something",
@@ -266,7 +269,7 @@ class TestTestNameValidator(unittest.TestCase):
                     issues, [], f"Expected {name} to be valid, but got issues: {issues}"
                 )
 
-    def test_valid_test_names_with_gpu(self):
+    def test_valid_test_names_with_gpu(self) -> None:
         """Test valid test names with Gpu keyword"""
         valid_names = [
             "TestGpuConvolution.Forward",
@@ -281,7 +284,7 @@ class TestTestNameValidator(unittest.TestCase):
                     issues, [], f"Expected {name} to be valid, but got issues: {issues}"
                 )
 
-    def test_valid_test_names_with_datatypes(self):
+    def test_valid_test_names_with_datatypes(self) -> None:
         """Test valid test names with datatype suffixes"""
         valid_names = [
             "TestConvolutionFp32.Forward",
@@ -298,7 +301,7 @@ class TestTestNameValidator(unittest.TestCase):
                     issues, [], f"Expected {name} to be valid, but got issues: {issues}"
                 )
 
-    def test_valid_test_names_with_instance(self):
+    def test_valid_test_names_with_instance(self) -> None:
         """Test valid parameterized test names with instance"""
         valid_names = [
             "Temp/TestConvolution.Forward",
@@ -313,7 +316,7 @@ class TestTestNameValidator(unittest.TestCase):
                     issues, [], f"Expected {name} to be valid, but got issues: {issues}"
                 )
 
-    def test_valid_disabled_test_names(self):
+    def test_valid_disabled_test_names(self) -> None:
         """Test valid disabled test names"""
         valid_names = [
             "TestMyClass.DISABLED_Something",
@@ -327,7 +330,7 @@ class TestTestNameValidator(unittest.TestCase):
                     issues, [], f"Expected {name} to be valid, but got issues: {issues}"
                 )
 
-    def test_invalid_format(self):
+    def test_invalid_format(self) -> None:
         """Test names with invalid format"""
         invalid_names = [
             "test_my_class.test_something",  # lowercase
@@ -343,7 +346,7 @@ class TestTestNameValidator(unittest.TestCase):
                 issues = self.validator.validate_test_name(name)
                 self.assertTrue(len(issues) > 0, f"Expected format error for {name}")
 
-    def test_keywords_in_test_case(self):
+    def test_keywords_in_test_case(self) -> None:
         """Test that positional keywords are not allowed in test case names"""
         invalid_names = [
             "TestMyClass.TestGpuFunction",  # Gpu in test case
@@ -360,7 +363,7 @@ class TestTestNameValidator(unittest.TestCase):
                     f"Expected keyword error in test case for {name}",
                 )
 
-    def test_invalid_suite_structure(self):
+    def test_invalid_suite_structure(self) -> None:
         """Test suite names that don't follow the required structure"""
         invalid_names = [
             "MyClass.Something",  # Missing Test/Integration prefix
@@ -376,7 +379,7 @@ class TestTestNameValidator(unittest.TestCase):
                 print(issues)
                 self.assertTrue(len(issues) > 0, f"Expected structure error for {name}")
 
-    def test_keyword_misplacement(self):
+    def test_keyword_misplacement(self) -> None:
         """Test keywords misplaced in the feature name"""
         invalid_names = [
             "TestConvolutionGpuPlannerFp32.Forward",  # Gpu in middle
@@ -392,7 +395,7 @@ class TestTestNameValidator(unittest.TestCase):
                     f"Expected misplacement error for {name}",
                 )
 
-    def test_keyword_capitalization(self):
+    def test_keyword_capitalization(self) -> None:
         """Test incorrect keyword capitalization"""
         invalid_names = [
             "TestGPUConvolution.Forward",  # GPU instead of Gpu
@@ -408,7 +411,7 @@ class TestTestNameValidator(unittest.TestCase):
                     len(issues) > 0, f"Expected capitalization issues for {name}"
                 )
 
-    def test_keyword_duplicates(self):
+    def test_keyword_duplicates(self) -> None:
         """Test duplicate keywords"""
         invalid_names = [
             "TestTestConvolution.Forward",  # Duplicate Test
@@ -422,7 +425,7 @@ class TestTestNameValidator(unittest.TestCase):
                     len(issues) > 0, f"Expected issues for duplicate keywords in {name}"
                 )
 
-    def test_complex_valid_names(self):
+    def test_complex_valid_names(self) -> None:
         """Test more complex but valid test names"""
         valid_names = [
             "IntegrationGpuConvolutionPlannerNchwFp32.Forward",
