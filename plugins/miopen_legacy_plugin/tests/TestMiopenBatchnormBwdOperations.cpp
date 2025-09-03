@@ -72,7 +72,7 @@ TEST_P(TestGpuMiopenBatchnormBwdExecuteGraph, Fp16Nchw)
 }
 
 // TODO: Re-enable when double support is added to MIOpen plugin
-TEST_P(BatchnormBwdExecuteGraphTest, DISABLED_RunDoubleBwdBatchnormGraphNCHW)
+TEST_P(TestGpuMiopenBatchnormBwdExecuteGraph, DISABLED_Fp64Nchw)
 {
     Batchnorm2dTestCase testCase = GetParam();
     runBwdBatchnormGraph<double, double>(
