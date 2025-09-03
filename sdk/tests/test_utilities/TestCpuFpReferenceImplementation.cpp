@@ -324,13 +324,13 @@ TEST(CpuFpReferenceImplementation, ConvFwdFloatUsage)
 {
     // Basic 2D convolution: 1 batch, 2 input channels, 3 output channels, 1 group
     // Input: 1x2x4x4, Weight: 3x2x3x3, Output: 1x3x2x2
-    Tensor<float> inputTensor({1, 2, 4, 4});      // NCHW
-    Tensor<float> weightTensor({3, 2, 3, 3});     // [G*K][C][Y][X] - 4D flattened
-    Tensor<float> outputTensor({1, 3, 2, 2});     // NCHW
+    Tensor<float> inputTensor({1, 2, 4, 4}); // NCHW
+    Tensor<float> weightTensor({3, 2, 3, 3}); // [G*K][C][Y][X] - 4D flattened
+    Tensor<float> outputTensor({1, 3, 2, 2}); // NCHW
 
-    std::vector<int64_t> strides = {1, 1};    // [H, W]
-    std::vector<int64_t> dilations = {1, 1};  // [H, W]
-    std::vector<int64_t> padding = {0, 0};    // [H, W]
+    std::vector<int64_t> strides = {1, 1}; // [H, W]
+    std::vector<int64_t> dilations = {1, 1}; // [H, W]
+    std::vector<int64_t> padding = {0, 0}; // [H, W]
 
     CpuFpReferenceImplementation<float, float, float> refImpl;
 
@@ -423,7 +423,7 @@ TEST(CpuFpReferenceImplementation, ConvFwdSanityValidation)
 
     // Set input value to 2.0
     inputTensor.setHostValue(0, 0, 0, 0, 2.0);
-    
+
     // Set weight value to 3.0 (linearized indexing: G*K=0, C=0, Y=0, X=0)
     weightTensor.setHostValue(0, 0, 0, 0, 3.0);
 
@@ -484,7 +484,8 @@ TEST(CpuFpReferenceImplementation, ConvFwdInvalidInputDimensions)
 
     CpuFpReferenceImplementation<float, float, float> refImpl;
 
-    EXPECT_THROW(refImpl.convFwdInference(inputTensor, weightTensor, outputTensor, strides, dilations, padding), 
+    EXPECT_THROW(refImpl.convFwdInference(
+                     inputTensor, weightTensor, outputTensor, strides, dilations, padding),
                  std::invalid_argument);
 }
 
@@ -500,7 +501,8 @@ TEST(CpuFpReferenceImplementation, ConvFwdInvalidWeightDimensions)
 
     CpuFpReferenceImplementation<float, float, float> refImpl;
 
-    EXPECT_THROW(refImpl.convFwdInference(inputTensor, weightTensor, outputTensor, strides, dilations, padding), 
+    EXPECT_THROW(refImpl.convFwdInference(
+                     inputTensor, weightTensor, outputTensor, strides, dilations, padding),
                  std::invalid_argument);
 }
 
@@ -516,7 +518,8 @@ TEST(CpuFpReferenceImplementation, ConvFwdInvalidStrideSize)
 
     CpuFpReferenceImplementation<float, float, float> refImpl;
 
-    EXPECT_THROW(refImpl.convFwdInference(inputTensor, weightTensor, outputTensor, strides, dilations, padding), 
+    EXPECT_THROW(refImpl.convFwdInference(
+                     inputTensor, weightTensor, outputTensor, strides, dilations, padding),
                  std::invalid_argument);
 }
 
@@ -532,7 +535,8 @@ TEST(CpuFpReferenceImplementation, ConvFwdInvalidStrideValue)
 
     CpuFpReferenceImplementation<float, float, float> refImpl;
 
-    EXPECT_THROW(refImpl.convFwdInference(inputTensor, weightTensor, outputTensor, strides, dilations, padding), 
+    EXPECT_THROW(refImpl.convFwdInference(
+                     inputTensor, weightTensor, outputTensor, strides, dilations, padding),
                  std::invalid_argument);
 }
 
@@ -548,7 +552,8 @@ TEST(CpuFpReferenceImplementation, ConvFwdInvalidDilationValue)
 
     CpuFpReferenceImplementation<float, float, float> refImpl;
 
-    EXPECT_THROW(refImpl.convFwdInference(inputTensor, weightTensor, outputTensor, strides, dilations, padding), 
+    EXPECT_THROW(refImpl.convFwdInference(
+                     inputTensor, weightTensor, outputTensor, strides, dilations, padding),
                  std::invalid_argument);
 }
 
@@ -564,6 +569,7 @@ TEST(CpuFpReferenceImplementation, ConvFwdInvalidPaddingValue)
 
     CpuFpReferenceImplementation<float, float, float> refImpl;
 
-    EXPECT_THROW(refImpl.convFwdInference(inputTensor, weightTensor, outputTensor, strides, dilations, padding), 
+    EXPECT_THROW(refImpl.convFwdInference(
+                     inputTensor, weightTensor, outputTensor, strides, dilations, padding),
                  std::invalid_argument);
 }

@@ -42,13 +42,13 @@ public:
         int64_t inputWidth = inputDims[3];
 
         int64_t totalOutputChannels = weightDims[0]; // G * K (flattened)
-        int64_t channelsPerGroup = weightDims[1];    // C
-        int64_t kernelHeight = weightDims[2];        // Y
-        int64_t kernelWidth = weightDims[3];         // X
+        int64_t channelsPerGroup = weightDims[1]; // C
+        int64_t kernelHeight = weightDims[2]; // Y
+        int64_t kernelWidth = weightDims[3]; // X
 
         int64_t outputHeight = outputDims[2];
         int64_t outputWidth = outputDims[3];
-        
+
         // Calculate groups from input/weight channel relationship
         int64_t nGroups = nInputChannels / channelsPerGroup;
         int64_t outputChannelsPerGroup = totalOutputChannels / nGroups;
@@ -67,7 +67,7 @@ public:
 
             // Convert template parameters to int64_t to avoid sign conversion warnings
             int64_t gIdx = static_cast<int64_t>(g);
-            int64_t nIdx = static_cast<int64_t>(n); 
+            int64_t nIdx = static_cast<int64_t>(n);
             int64_t kIdx = static_cast<int64_t>(k);
             int64_t hoIdx = static_cast<int64_t>(ho);
             int64_t woIdx = static_cast<int64_t>(wo);
@@ -95,14 +95,15 @@ public:
                         {
                             // Get input value
                             InputDataType inputVal = input.getHostValue(nIdx, inputChannel, hi, wi);
-                            
+
                             // Calculate weight index for 4D access: [G*K][C][Y][X] format
                             // Weight tensor first dimension is flattened: group*outputChannelsPerGroup + kernelIdx
                             int64_t weightIdx = gIdx * outputChannelsPerGroup + kIdx;
                             InputDataType weightVal = weight.getHostValue(weightIdx, c, y, x);
 
                             // Perform multiply-accumulate operation
-                            accumulator += static_cast<float>(inputVal) * static_cast<float>(weightVal);
+                            accumulator
+                                += static_cast<float>(inputVal) * static_cast<float>(weightVal);
                         }
                     }
                 }
@@ -110,16 +111,14 @@ public:
 
             // Store result in output tensor (NCHW format: batch, channel, height, width)
             int64_t outputChannel = gIdx * outputChannelsPerGroup + kIdx;
-            output.setHostValue(nIdx, outputChannel, hoIdx, woIdx, static_cast<InputDataType>(accumulator));
+            output.setHostValue(
+                nIdx, outputChannel, hoIdx, woIdx, static_cast<InputDataType>(accumulator));
         };
 
         // Execute convolution in parallel across batch, groups, output channels, and spatial dimensions
-        makeParallelTensorFunctor(convolutionFunc,
-                                 nGroups,
-                                 nBatch,
-                                 outputChannelsPerGroup,
-                                 outputHeight,
-                                 outputWidth)(std::thread::hardware_concurrency());
+        makeParallelTensorFunctor(
+            convolutionFunc, nGroups, nBatch, outputChannelsPerGroup, outputHeight, outputWidth)(
+            std::thread::hardware_concurrency());
 
         // Mark output as modified on host
         output.memory().markHostModified();
@@ -197,19 +196,20 @@ private:
 
         int64_t inputChannels = inputDims[1];
         int64_t totalOutputChannels = weightDims[0]; // G * K
-        int64_t channelsPerGroup = weightDims[1];    // C
+        int64_t channelsPerGroup = weightDims[1]; // C
 
         // Calculate number of groups
         if(inputChannels % channelsPerGroup != 0)
         {
             throw std::invalid_argument("Input channels must be divisible by channels per group");
         }
-        
+
         int64_t nGroups = inputChannels / channelsPerGroup;
-        
+
         if(totalOutputChannels % nGroups != 0)
         {
-            throw std::invalid_argument("Total output channels must be divisible by number of groups");
+            throw std::invalid_argument(
+                "Total output channels must be divisible by number of groups");
         }
 
         // Validate output dimensions

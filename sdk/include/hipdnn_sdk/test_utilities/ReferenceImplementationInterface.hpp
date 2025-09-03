@@ -52,7 +52,8 @@ public:
                                   ITensor<InputDataType>& output,
                                   const std::vector<int64_t>& strides,
                                   const std::vector<int64_t>& dilations,
-                                  const std::vector<int64_t>& padding) = 0;
+                                  const std::vector<int64_t>& padding)
+        = 0;
 };
 
 } // namespace reference_test_utilities

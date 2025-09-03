@@ -3,9 +3,9 @@
 
 #pragma once
 
-#include <hipdnn_sdk/test_utilities/ReferenceImplementationInterface.hpp>
-#include <hipdnn_sdk/test_utilities/CpuFpReferenceConvolution.hpp>
 #include <hipdnn_sdk/test_utilities/CpuFpReferenceBatchnorm.hpp>
+#include <hipdnn_sdk/test_utilities/CpuFpReferenceConvolution.hpp>
+#include <hipdnn_sdk/test_utilities/ReferenceImplementationInterface.hpp>
 
 #if defined(__HIP_PLATFORM_AMD__)
 // Need these for the half and bfloat16 types
@@ -39,7 +39,8 @@ public:
                                double epsilon) override
     {
         CpuFpReferenceBatchnormImpl<InputDataType, ScaleBiasDataType, MeanVarianceDataType>::
-            batchnormFwdInference(input, scale, bias, estimatedMean, estimatedVariance, output, epsilon);
+            batchnormFwdInference(
+                input, scale, bias, estimatedMean, estimatedVariance, output, epsilon);
     }
 
     void batchnormBwd(const ITensor<InputDataType>& dy,

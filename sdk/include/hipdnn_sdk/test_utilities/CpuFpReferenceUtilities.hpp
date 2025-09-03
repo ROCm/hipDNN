@@ -20,7 +20,8 @@ namespace reference_test_utilities
 struct JoinableThread : std::thread
 {
     template <typename... Xs>
-    JoinableThread(Xs&&... xs) : std::thread(std::forward<Xs>(xs)...)
+    JoinableThread(Xs&&... xs)
+        : std::thread(std::forward<Xs>(xs)...)
     {
     }
 
@@ -56,13 +57,15 @@ struct ParallelTensorFunctor
     std::array<std::size_t, NDIM> _strides;
     std::size_t _totalElements;
 
-    ParallelTensorFunctor(F f, Xs... xs) : _func(f), _lengths({static_cast<std::size_t>(xs)...})
+    ParallelTensorFunctor(F f, Xs... xs)
+        : _func(f)
+        , _lengths({static_cast<std::size_t>(xs)...})
     {
         _strides.back() = 1;
         std::partial_sum(_lengths.rbegin(),
-                       _lengths.rend() - 1,
-                       _strides.rbegin() + 1,
-                       std::multiplies<std::size_t>());
+                         _lengths.rend() - 1,
+                         _strides.rbegin() + 1,
+                         std::multiplies<std::size_t>());
         _totalElements = _strides[0] * _lengths[0];
     }
 

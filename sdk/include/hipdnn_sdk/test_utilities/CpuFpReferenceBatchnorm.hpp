@@ -3,8 +3,8 @@
 
 #pragma once
 
-#include <hipdnn_sdk/utilities/Tensor.hpp>
 #include <algorithm>
+#include <hipdnn_sdk/utilities/Tensor.hpp>
 #include <numeric>
 #include <vector>
 
