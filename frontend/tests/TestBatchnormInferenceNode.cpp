@@ -122,7 +122,7 @@ TEST(TestBatchnormInferenceNode, InferPropertiesNode)
 TEST(TestBatchnormInferenceNode, PackNode)
 {
     BatchnormInferenceAttributes batchnormAttributes;
-    batchnormAttributes.name = "BatchnormInference";
+    batchnormAttributes.set_name("BatchnormInference");
 
     auto xTensor = std::make_shared<TensorAttributes>();
     xTensor->set_uid(1)
@@ -201,7 +201,7 @@ TEST(TestBatchnormInferenceNode, PackNode)
 TEST(TestBatchnormInferenceNode, PackNodeWithoutMeanAndInvVariance)
 {
     BatchnormInferenceAttributes batchnormAttributes;
-    batchnormAttributes.name = "BatchnormInference";
+    batchnormAttributes.set_name("BatchnormInference");
 
     auto xTensor = std::make_shared<TensorAttributes>();
     xTensor->set_uid(1)
