@@ -3,6 +3,7 @@
 
 #include "FlatbufferUtilities.hpp"
 #include "HipdnnException.hpp"
+#include "descriptors/FlatbufferTestUtils.hpp"
 #include "descriptors/TestMacros.hpp"
 #include <flatbuffers/flatbuffers.h>
 #include <gtest/gtest.h>
@@ -14,27 +15,11 @@ namespace testing
 {
 
 using namespace hipdnn_sdk::data_objects;
+using namespace hipdnn_backend::test_utilities;
 
 class TestFlatbufferUtilities : public ::testing::Test
 {
 public:
-    static flatbuffers::FlatBufferBuilder createValidGraph()
-    {
-        std::vector<::flatbuffers::Offset<hipdnn_sdk::data_objects::TensorAttributes>>
-            tensorAttributes;
-        std::vector<::flatbuffers::Offset<hipdnn_sdk::data_objects::Node>> nodes;
-        flatbuffers::FlatBufferBuilder builder;
-        auto graphOffset = hipdnn_sdk::data_objects::CreateGraphDirect(builder,
-                                                                       "test",
-                                                                       DataType_FLOAT,
-                                                                       DataType_HALF,
-                                                                       DataType_BFLOAT16,
-                                                                       &tensorAttributes,
-                                                                       &nodes);
-        builder.Finish(graphOffset);
-        return builder;
-    }
-
     static void verifyGraph(const hipdnn_sdk::data_objects::GraphT& graph)
     {
         EXPECT_EQ(graph.name, "test");
@@ -97,7 +82,7 @@ TEST_F(TestFlatbufferUtilities, WillNotUnpackInvalidBuffer)
 
 TEST_F(TestFlatbufferUtilities, WillNotUnpackWrongSizeBuffer)
 {
-    auto builder = TestFlatbufferUtilities::createValidGraph();
+    auto builder = createValidGraph();
     auto serializedGraph = builder.Release();
     auto [buffer, size] = std::make_pair(serializedGraph.data(), serializedGraph.size() - 20);
 

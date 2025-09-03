@@ -105,7 +105,7 @@ protected:
         std::filesystem::path baseDir;
         try
         {
-            baseDir = hipdnn_backend::platform_utils::getCurrentModuleDirectory();
+            baseDir = hipdnn_backend::platform_utilities::getCurrentModuleDirectory();
         }
         catch(const HipdnnException& e)
         {

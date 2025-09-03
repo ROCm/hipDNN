@@ -18,7 +18,7 @@
 #include "HipdnnEnginePluginHandle.hpp"
 #include "common/TestOperationsCommon.hpp"
 
-using namespace hipdnn_sdk::reference_test_utilities;
+using namespace hipdnn_sdk::test_utilities;
 using namespace test_operations_common;
 
 class BatchnormFwdInferExecuteGraphTest : public ::testing::TestWithParam<Batchnorm2dTestCase>
@@ -160,14 +160,14 @@ void BatchnormFwdInferExecuteGraphTest::runFwdBatchnormGraph(
                                                        static_cast<IntermediateType>(1.0f),
                                                        seed));
 
-    auto batchnormBuilder = flatbuffer_test_utils::createValidBatchnormGraph(
+    auto batchnormBuilder = hipdnn_backend::test_utilities::createValidBatchnormGraph(
         xTensor.strides(), xTensor.dims(), true, inputDataType);
 
     hipdnnPluginConstData_t opGraph;
     opGraph.ptr = batchnormBuilder.GetBufferPointer();
     opGraph.size = batchnormBuilder.GetSize();
 
-    auto engineConfigBuilder = flatbuffer_test_utils::createValidEngineConfig(1);
+    auto engineConfigBuilder = hipdnn_backend::test_utilities::createValidEngineConfig(1);
     hipdnnPluginConstData_t engineConfig;
     engineConfig.ptr = engineConfigBuilder.GetBufferPointer();
     engineConfig.size = engineConfigBuilder.GetSize();

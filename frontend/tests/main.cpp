@@ -12,7 +12,7 @@ int main(int argc, char** argv)
 {
     ::testing::InitGoogleTest(&argc, argv);
 
-    logging_test_utils::initializeSpdlogDefaultLogger(HIPDNN_FRONTEND_TESTS);
+    hipdnn_sdk::test_utilities::initializeSpdlogDefaultLogger(HIPDNN_FRONTEND_TESTS);
 
     return RUN_ALL_TESTS();
 }

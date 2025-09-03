@@ -16,7 +16,7 @@
 using namespace hipdnn_backend;
 
 template <typename T, typename Destructor>
-using ScopedResource = hipdnn::sdk::utilities::ScopedResource<T, Destructor>;
+using ScopedResource = hipdnn_sdk::utilities::ScopedResource<T, Destructor>;
 class SimpleEnginePluginManager : public plugin::PluginManagerBase<plugin::EnginePlugin>
 {
 public:

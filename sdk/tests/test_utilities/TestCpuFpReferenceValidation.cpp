@@ -10,7 +10,7 @@
 #include <hipdnn_sdk/utilities/HalfUtils.hpp>
 #include <hipdnn_sdk/utilities/HipBfloat16Utils.hpp>
 
-using namespace hipdnn_sdk::reference_test_utilities;
+using namespace hipdnn_sdk::test_utilities;
 using namespace hipdnn_sdk::utilities;
 using namespace helpers;
 

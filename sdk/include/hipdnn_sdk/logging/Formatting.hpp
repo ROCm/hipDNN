@@ -5,7 +5,7 @@
 
 #include <string>
 
-namespace hipdnn::logging
+namespace hipdnn_sdk::logging
 {
 
 /**
@@ -18,4 +18,4 @@ inline std::string generatePatternString(const std::string& componentName)
     return "[%Y-%m-%d %H:%M:%S.%e] [tid %t] [%l] [" + componentName + "] %v";
 }
 
-} // namespace hipdnn::logging
+} // namespace hipdnn_sdk::logging

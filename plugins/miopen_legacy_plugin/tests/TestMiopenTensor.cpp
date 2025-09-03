@@ -11,7 +11,7 @@ using namespace miopen_legacy_plugin;
 TEST(MiopenTensorTest, CanCreateAndDestroyTensor)
 {
     // Use a real tensor attributes from a valid batchnorm graph
-    auto builder = flatbuffer_test_utils::createValidBatchnormGraph();
+    auto builder = hipdnn_backend::test_utilities::createValidBatchnormGraph();
     hipdnn_plugin::GraphWrapper graph(builder.GetBufferPointer(), builder.GetSize());
 
     // Get the first tensor attributes from the tensor map
@@ -30,7 +30,7 @@ TEST(MiopenTensorTest, CanCreateAndDestroyTensor)
 
 TEST(MiopenTensorTest, TensorDescriptorIsValid)
 {
-    auto builder = flatbuffer_test_utils::createValidBatchnormGraph();
+    auto builder = hipdnn_backend::test_utilities::createValidBatchnormGraph();
     hipdnn_plugin::GraphWrapper graph(builder.GetBufferPointer(), builder.GetSize());
 
     const auto& tensorMap = graph.getTensorMap();
