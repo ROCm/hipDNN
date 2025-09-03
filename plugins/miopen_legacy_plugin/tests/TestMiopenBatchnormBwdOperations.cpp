@@ -57,7 +57,7 @@ TEST_P(BatchnormBwdExecuteGraphTest, RunFloatBwdBatchnormGraphNCHW)
 
 TEST_P(BatchnormBwdExecuteGraphTest, RunBfloat16BwdBatchnormGraphNCHW)
 {
-    Batchnorm2dTestCase testCase = {.n = 1, .c = 3, .h = 14, .w = 14};
+    Batchnorm2dTestCase testCase = GetParam();
     runBwdBatchnormGraph<hip_bfloat16, float>(testCase,
                                               hipdnn_sdk::data_objects::DataType::DataType_BFLOAT16,
                                               4e-3_bf,
@@ -66,9 +66,17 @@ TEST_P(BatchnormBwdExecuteGraphTest, RunBfloat16BwdBatchnormGraphNCHW)
 
 TEST_P(BatchnormBwdExecuteGraphTest, RunHalfBwdBatchnormGraphNCHW)
 {
-    Batchnorm2dTestCase testCase = {.n = 1, .c = 3, .h = 14, .w = 14};
+    Batchnorm2dTestCase testCase = GetParam();
     runBwdBatchnormGraph<half, float>(
         testCase, hipdnn_sdk::data_objects::DataType::DataType_HALF, 4e-3_h, TensorLayout::NCHW);
+}
+
+// TODO: Re-enable when double support is added to MIOpen plugin
+TEST_P(BatchnormBwdExecuteGraphTest, DISABLED_RunDoubleBwdBatchnormGraphNCHW)
+{
+    Batchnorm2dTestCase testCase = GetParam();
+    runBwdBatchnormGraph<double, double>(
+        testCase, hipdnn_sdk::data_objects::DataType::DataType_DOUBLE, 4e-3, TensorLayout::NCHW);
 }
 
 TEST_P(BatchnormBwdExecuteGraphTest, RunFloatBwdBatchnormGraphNHWC)
@@ -78,29 +86,35 @@ TEST_P(BatchnormBwdExecuteGraphTest, RunFloatBwdBatchnormGraphNHWC)
         testCase, hipdnn_sdk::data_objects::DataType::DataType_FLOAT, 4e-3f, TensorLayout::NHWC);
 }
 
-// TEST_P(BatchnormBwdExecuteGraphTest, RunBfloat16BwdBatchnormGraphNHWC)
-// {
-//     Batchnorm2dTestCase testCase = {.n = 1, .c = 3, .h = 14, .w = 14};
-//     runBwdBatchnormGraph<hip_bfloat16, float>(testCase,
-//                                               hipdnn_sdk::data_objects::DataType::DataType_BFLOAT16,
-//                                               4e-3_bf,
-//                                               TensorLayout::NHWC);
-// }
+// TODO: add unique test suite and conform to naming rules
 
-// TEST_P(BatchnormBwdExecuteGraphTest, RunHalfBwdBatchnormGraphNHWC)
-// {
-//     Batchnorm2dTestCase testCase = {.n = 1, .c = 3, .h = 14, .w = 14};
-//     runBwdBatchnormGraph<half, float>(
-//         testCase, hipdnn_sdk::data_objects::DataType::DataType_HALF, 4e-3_h, TensorLayout::NHWC);
-// }
+// MIOpen segfaults for this case, re-enable when fix is released:
+// https://github.com/ROCm/rocm-libraries/pull/1197
+TEST_P(BatchnormBwdExecuteGraphTest, DISABLED_RunBfloat16BwdBatchnormGraphNHWC)
+{
+    Batchnorm2dTestCase testCase = GetParam();
+    runBwdBatchnormGraph<hip_bfloat16, float>(testCase,
+                                              hipdnn_sdk::data_objects::DataType::DataType_BFLOAT16,
+                                              4e-3_bf,
+                                              TensorLayout::NHWC);
+}
+
+// MIOpen segfaults for this case, re-enable when fix is released:
+// https://github.com/ROCm/rocm-libraries/pull/1197
+TEST_P(BatchnormBwdExecuteGraphTest, DISABLED_RunHalfBwdBatchnormGraphNHWC)
+{
+    Batchnorm2dTestCase testCase = GetParam();
+    runBwdBatchnormGraph<half, float>(
+        testCase, hipdnn_sdk::data_objects::DataType::DataType_HALF, 4e-3_h, TensorLayout::NHWC);
+}
 
 // TODO: Re-enable when double support is added to MIOpen plugin
-// TEST_F(BatchnormBwdExecuteGraphTest, RunDoubleBwdBatchnormGraph)
-// {
-//     Batchnorm2dTestCase testCase = {.n = 1, .c = 3, .h = 14, .w = 14};
-//     runBwdBatchnormGraph<double, double>(
-//         testCase, hipdnn_sdk::data_objects::DataType::DataType_DOUBLE, 1e-6);
-// }
+TEST_P(BatchnormBwdExecuteGraphTest, DISABLED_RunDoubleBwdBatchnormGraphNHWC)
+{
+    Batchnorm2dTestCase testCase = GetParam();
+    runBwdBatchnormGraph<double, double>(
+        testCase, hipdnn_sdk::data_objects::DataType::DataType_DOUBLE, 4e-3, TensorLayout::NHWC);
+}
 
 template <typename InputType, typename IntermediateType>
 void BatchnormBwdExecuteGraphTest::runBwdBatchnormGraph(

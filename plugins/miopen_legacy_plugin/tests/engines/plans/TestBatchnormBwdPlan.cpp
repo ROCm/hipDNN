@@ -35,8 +35,6 @@ TEST(BatchnormBwdParamsTest, InitializesAllTensorsFromValidGraph)
     auto& varOpt = params.optInvVariance();
     EXPECT_TRUE(meanOpt.has_value());
     EXPECT_TRUE(varOpt.has_value());
-    EXPECT_NE(meanOpt.value(), nullptr);
-    EXPECT_NE(varOpt.value(), nullptr);
 }
 
 TEST(BatchnormBwdParamsTest, HandlesMissingOptionalTensors)

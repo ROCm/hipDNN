@@ -11,7 +11,7 @@
 using namespace hipdnn_frontend;
 using namespace ::testing;
 
-class HipdnnBackendDescriptorTestFixture : public ::testing::Test
+class TestScopedHipdnnBackendDescriptor : public ::testing::Test
 {
 protected:
     std::shared_ptr<Mock_hipdnn_backend> _mockBackend;
@@ -35,14 +35,14 @@ protected:
     }
 };
 
-TEST_F(HipdnnBackendDescriptorTestFixture, DefaultConstructorIsInvalid)
+TEST_F(TestScopedHipdnnBackendDescriptor, DefaultConstructorIsInvalid)
 {
     auto desc = ScopedHipdnnBackendDescriptor();
     EXPECT_FALSE(desc.valid());
     EXPECT_EQ(desc.get(), nullptr);
 }
 
-TEST_F(HipdnnBackendDescriptorTestFixture, ConstructWithRawDescriptorIsValid)
+TEST_F(TestScopedHipdnnBackendDescriptor, ConstructWithRawDescriptorIsValid)
 {
     auto fakeDesc = reinterpret_cast<hipdnnBackendDescriptor_t>(0x1234);
     auto desc = ScopedHipdnnBackendDescriptor(fakeDesc);
@@ -54,7 +54,7 @@ TEST_F(HipdnnBackendDescriptorTestFixture, ConstructWithRawDescriptorIsValid)
     EXPECT_EQ(desc.get(), fakeDesc);
 }
 
-TEST_F(HipdnnBackendDescriptorTestFixture, ConstructWithTypeSuccess)
+TEST_F(TestScopedHipdnnBackendDescriptor, ConstructWithTypeSuccess)
 {
     auto fakeDesc = reinterpret_cast<hipdnnBackendDescriptor_t>(0x5678);
     EXPECT_CALL(*_mockBackend, backendCreateDescriptor(HIPDNN_BACKEND_ENGINECFG_DESCRIPTOR, _))
@@ -70,7 +70,7 @@ TEST_F(HipdnnBackendDescriptorTestFixture, ConstructWithTypeSuccess)
     EXPECT_EQ(desc.get(), fakeDesc);
 }
 
-TEST_F(HipdnnBackendDescriptorTestFixture, ConstructWithTypeFailure)
+TEST_F(TestScopedHipdnnBackendDescriptor, ConstructWithTypeFailure)
 {
     EXPECT_CALL(*_mockBackend, backendCreateDescriptor(HIPDNN_BACKEND_ENGINEHEUR_DESCRIPTOR, _))
         .WillOnce([](hipdnnBackendDescriptorType_t, hipdnnBackendDescriptor_t*) {
@@ -83,7 +83,7 @@ TEST_F(HipdnnBackendDescriptorTestFixture, ConstructWithTypeFailure)
     EXPECT_EQ(desc.get(), nullptr);
 }
 
-TEST_F(HipdnnBackendDescriptorTestFixture, ConstructWithSerializedGraphSuccess)
+TEST_F(TestScopedHipdnnBackendDescriptor, ConstructWithSerializedGraphSuccess)
 {
     auto fakeDesc = reinterpret_cast<hipdnnBackendDescriptor_t>(0x4321);
     std::vector<uint8_t> fakeGraph{1, 2, 3, 4};
@@ -100,7 +100,7 @@ TEST_F(HipdnnBackendDescriptorTestFixture, ConstructWithSerializedGraphSuccess)
     EXPECT_EQ(desc.get(), fakeDesc);
 }
 
-TEST_F(HipdnnBackendDescriptorTestFixture, ConstructWithSerializedGraphFailure)
+TEST_F(TestScopedHipdnnBackendDescriptor, ConstructWithSerializedGraphFailure)
 {
     std::vector<uint8_t> fakeGraph{1, 2, 3, 4};
     EXPECT_CALL(*_mockBackend, backendCreateAndDeserializeGraphExt(_, _, _))
@@ -114,7 +114,7 @@ TEST_F(HipdnnBackendDescriptorTestFixture, ConstructWithSerializedGraphFailure)
     EXPECT_EQ(desc.get(), nullptr);
 }
 
-TEST_F(HipdnnBackendDescriptorTestFixture, DestructorDestroysDescriptorIfValid)
+TEST_F(TestScopedHipdnnBackendDescriptor, DestructorDestroysDescriptorIfValid)
 {
     auto fakeDesc = reinterpret_cast<hipdnnBackendDescriptor_t>(0x9999);
     EXPECT_CALL(*_mockBackend, backendCreateDescriptor(HIPDNN_BACKEND_ENGINECFG_DESCRIPTOR, _))
@@ -131,7 +131,7 @@ TEST_F(HipdnnBackendDescriptorTestFixture, DestructorDestroysDescriptorIfValid)
     }
 }
 
-TEST_F(HipdnnBackendDescriptorTestFixture, DestructorHandlesDestroyFailure)
+TEST_F(TestScopedHipdnnBackendDescriptor, DestructorHandlesDestroyFailure)
 {
     auto fakeDesc = reinterpret_cast<hipdnnBackendDescriptor_t>(0x8888);
     EXPECT_CALL(*_mockBackend, backendCreateDescriptor(HIPDNN_BACKEND_ENGINECFG_DESCRIPTOR, _))
@@ -149,7 +149,7 @@ TEST_F(HipdnnBackendDescriptorTestFixture, DestructorHandlesDestroyFailure)
     }
 }
 
-TEST_F(HipdnnBackendDescriptorTestFixture, MoveConstructorTransfersOwnership)
+TEST_F(TestScopedHipdnnBackendDescriptor, MoveConstructorTransfersOwnership)
 {
     auto fakeDesc = reinterpret_cast<hipdnnBackendDescriptor_t>(0x1111);
     EXPECT_CALL(*_mockBackend, backendCreateDescriptor(HIPDNN_BACKEND_ENGINECFG_DESCRIPTOR, _))
@@ -171,7 +171,7 @@ TEST_F(HipdnnBackendDescriptorTestFixture, MoveConstructorTransfersOwnership)
     EXPECT_EQ(desc1.get(), nullptr);
 }
 
-TEST_F(HipdnnBackendDescriptorTestFixture, MoveAssignmentTransfersOwnership)
+TEST_F(TestScopedHipdnnBackendDescriptor, MoveAssignmentTransfersOwnership)
 {
     auto fakeDesc1 = reinterpret_cast<hipdnnBackendDescriptor_t>(0x2222);
     auto fakeDesc2 = reinterpret_cast<hipdnnBackendDescriptor_t>(0x3333);
@@ -202,7 +202,7 @@ TEST_F(HipdnnBackendDescriptorTestFixture, MoveAssignmentTransfersOwnership)
     EXPECT_EQ(desc1.get(), nullptr);
 }
 
-TEST_F(HipdnnBackendDescriptorTestFixture, MoveFromInvalidDescriptor)
+TEST_F(TestScopedHipdnnBackendDescriptor, MoveFromInvalidDescriptor)
 {
     auto desc1 = ScopedHipdnnBackendDescriptor();
     auto desc2 = ScopedHipdnnBackendDescriptor(std::move(desc1));
@@ -210,7 +210,7 @@ TEST_F(HipdnnBackendDescriptorTestFixture, MoveFromInvalidDescriptor)
     EXPECT_EQ(desc2.get(), nullptr);
 }
 
-TEST_F(HipdnnBackendDescriptorTestFixture, MoveAssignFromInvalidDescriptor)
+TEST_F(TestScopedHipdnnBackendDescriptor, MoveAssignFromInvalidDescriptor)
 {
     auto fakeDesc = reinterpret_cast<hipdnnBackendDescriptor_t>(0x5555);
 
