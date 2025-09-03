@@ -8,15 +8,15 @@
 #include <cmath>
 #include <hipdnn_sdk/test_utilities/CpuFpReferenceMiopenRmsValidation.hpp>
 #include <hipdnn_sdk/test_utilities/TestUtilities.hpp>
-#include <hipdnn_sdk/utilities/HalfUtils.hpp>
-#include <hipdnn_sdk/utilities/HipBfloat16Utils.hpp>
+#include <hipdnn_sdk/utilities/UtilsBfp16.hpp>
+#include <hipdnn_sdk/utilities/UtilsFp16.hpp>
 #include <limits>
 
 using namespace hipdnn_sdk::test_utilities;
 using namespace hipdnn_sdk::utilities;
 using namespace helpers;
 
-TEST(CpuFpReferenceMiopenRmsValidation, BasicBFloat16Usage)
+TEST(TestCpuFpReferenceMiopenRmsValidationBfp16, BasicUsage)
 {
     CpuFpReferenceMiopenRmsValidation<hip_bfloat16> refValidation;
 
@@ -26,7 +26,7 @@ TEST(CpuFpReferenceMiopenRmsValidation, BasicBFloat16Usage)
     EXPECT_TRUE(refValidation.allClose(buffer1, buffer2));
 }
 
-TEST(CpuFpReferenceMiopenRmsValidation, BasicHalfUsage)
+TEST(TestCpuFpReferenceMiopenRmsValidationFp16, BasicUsage)
 {
     CpuFpReferenceMiopenRmsValidation<half> refValidation;
 
@@ -36,7 +36,7 @@ TEST(CpuFpReferenceMiopenRmsValidation, BasicHalfUsage)
     EXPECT_TRUE(refValidation.allClose(buffer1, buffer2));
 }
 
-TEST(CpuFpReferenceMiopenRmsValidation, BasicFloatUsage)
+TEST(TestCpuFpReferenceMiopenRmsValidationFp32, BasicUsage)
 {
     CpuFpReferenceMiopenRmsValidation<float> refValidation;
 
@@ -46,7 +46,7 @@ TEST(CpuFpReferenceMiopenRmsValidation, BasicFloatUsage)
     EXPECT_TRUE(refValidation.allClose(buffer1, buffer2));
 }
 
-TEST(CpuFpReferenceMiopenRmsValidation, BasicDoubleUsage)
+TEST(TestCpuFpReferenceMiopenRmsValidationFp64, BasicUsage)
 {
     CpuFpReferenceMiopenRmsValidation<double> refValidation;
 
@@ -56,7 +56,7 @@ TEST(CpuFpReferenceMiopenRmsValidation, BasicDoubleUsage)
     EXPECT_TRUE(refValidation.allClose(buffer1, buffer2));
 }
 
-TEST(CpuFpReferenceMiopenRmsValidation, BFloat16NotComparable)
+TEST(TestCpuFpReferenceMiopenRmsValidationBfp16, NotComparable)
 {
     CpuFpReferenceMiopenRmsValidation<hip_bfloat16> refValidation;
 
@@ -66,7 +66,7 @@ TEST(CpuFpReferenceMiopenRmsValidation, BFloat16NotComparable)
     EXPECT_FALSE(refValidation.allClose(buffer1, buffer2));
 }
 
-TEST(CpuFpReferenceMiopenRmsValidation, HalfNotComparable)
+TEST(TestCpuFpReferenceMiopenRmsValidationFp16, NotComparable)
 {
     CpuFpReferenceMiopenRmsValidation<half> refValidation;
 
@@ -76,7 +76,7 @@ TEST(CpuFpReferenceMiopenRmsValidation, HalfNotComparable)
     EXPECT_FALSE(refValidation.allClose(buffer1, buffer2));
 }
 
-TEST(CpuFpReferenceMiopenRmsValidation, FloatNotComparable)
+TEST(TestCpuFpReferenceMiopenRmsValidationFp32, NotComparable)
 {
     CpuFpReferenceMiopenRmsValidation<float> refValidation;
 
@@ -86,7 +86,7 @@ TEST(CpuFpReferenceMiopenRmsValidation, FloatNotComparable)
     EXPECT_FALSE(refValidation.allClose(buffer1, buffer2));
 }
 
-TEST(CpuFpReferenceMiopenRmsValidation, DoubleNotComparable)
+TEST(TestCpuFpReferenceMiopenRmsValidationFp64, NotComparable)
 {
     CpuFpReferenceMiopenRmsValidation<double> refValidation;
 
@@ -96,7 +96,7 @@ TEST(CpuFpReferenceMiopenRmsValidation, DoubleNotComparable)
     EXPECT_FALSE(refValidation.allClose(buffer1, buffer2));
 }
 
-TEST(CpuFpReferenceMiopenRmsValidation, ToleranceComparison)
+TEST(TestCpuFpReferenceMiopenRmsValidation, ToleranceComparison)
 {
     CpuFpReferenceMiopenRmsValidation<double> refValidationLowTolerance(1e-7);
     CpuFpReferenceMiopenRmsValidation<double> refValidationHighTolerance(1e-3);
@@ -112,7 +112,7 @@ TEST(CpuFpReferenceMiopenRmsValidation, ToleranceComparison)
     EXPECT_FALSE(refValidationLowTolerance.allClose(buffer1, buffer2));
 }
 
-TEST(CpuFpReferenceMiopenRmsValidation, EmptyBuffers)
+TEST(TestCpuFpReferenceMiopenRmsValidation, EmptyBuffers)
 {
     CpuFpReferenceMiopenRmsValidation<float> refValidation;
 
@@ -122,7 +122,7 @@ TEST(CpuFpReferenceMiopenRmsValidation, EmptyBuffers)
     EXPECT_TRUE(refValidation.allClose(buffer1, buffer2));
 }
 
-TEST(CpuFpReferenceMiopenRmsValidation, DifferentSizeBuffers)
+TEST(TestCpuFpReferenceMiopenRmsValidation, DifferentSizeBuffers)
 {
     CpuFpReferenceMiopenRmsValidation<float> refValidation;
 
@@ -133,7 +133,7 @@ TEST(CpuFpReferenceMiopenRmsValidation, DifferentSizeBuffers)
 }
 
 // Test MIOpen-specific RMS calculation behavior
-TEST(CpuFpReferenceMiopenRmsValidation, MiopenRmsCalculation)
+TEST(TestCpuFpReferenceMiopenRmsValidation, MiopenRmsCalculation)
 {
     // Test that RMS error is calculated correctly
     CpuFpReferenceMiopenRmsValidation<double> refValidation(0.1);
@@ -170,7 +170,7 @@ TEST(CpuFpReferenceMiopenRmsValidation, MiopenRmsCalculation)
     EXPECT_FALSE(refValidationTight.allClose(buffer1, buffer2)); // 0.0244 > 0.02
 }
 
-TEST(CpuFpReferenceMiopenRmsValidation, DefaultTolerance)
+TEST(TestCpuFpReferenceMiopenRmsValidation, DefaultTolerance)
 {
     CpuFpReferenceMiopenRmsValidation<float> refValidation;
 
@@ -183,7 +183,7 @@ TEST(CpuFpReferenceMiopenRmsValidation, DefaultTolerance)
     EXPECT_TRUE(refValidation.allClose(buffer1, buffer2));
 }
 
-TEST(CpuFpReferenceMiopenRmsValidation, NegativeToleranceThrows)
+TEST(TestCpuFpReferenceMiopenRmsValidation, NegativeToleranceThrows)
 {
     EXPECT_THROW(CpuFpReferenceMiopenRmsValidation<float> refValidation(-1e-5f),
                  std::invalid_argument);

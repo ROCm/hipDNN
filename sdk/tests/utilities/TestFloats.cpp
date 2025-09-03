@@ -3,22 +3,22 @@
 
 #include <gtest/gtest.h>
 
-#include <hipdnn_sdk/utilities/HalfUtils.hpp>
-#include <hipdnn_sdk/utilities/HipBfloat16Utils.hpp>
+#include <hipdnn_sdk/utilities/UtilsBfp16.hpp>
+#include <hipdnn_sdk/utilities/UtilsFp16.hpp>
 
-TEST(TestHalf, BasicUsage)
+TEST(TestUtilsFp16, BasicUsage)
 {
     half h = 1.0_h;
     EXPECT_EQ(h, 1.0_h);
 }
 
-TEST(TestHalf, Fabs)
+TEST(TestUtilsFp16, Fabs)
 {
     EXPECT_EQ(std::fabs(-1.0_h), 1.0_h);
     EXPECT_EQ(std::fabs(1.0_h), 1.0_h);
 }
 
-TEST(TestHalf, Max)
+TEST(TestUtilsFp16, Max)
 {
     half a = 1.0_h;
     half b = 2.0_h;
@@ -26,19 +26,19 @@ TEST(TestHalf, Max)
     EXPECT_EQ(std::max(b, a), 2.0_h);
 }
 
-TEST(TestBFloat16, BasicUsage)
+TEST(TestUtilsBfp16, BasicUsage)
 {
     hip_bfloat16 bf = 1.0_bf;
     EXPECT_EQ(bf, 1.0_bf);
 }
 
-TEST(TestBFloat16, Fabs)
+TEST(TestUtilsBfp16, Fabs)
 {
     EXPECT_EQ(std::fabs(-1.0_bf), 1.0_bf);
     EXPECT_EQ(std::fabs(1.0_bf), 1.0_bf);
 }
 
-TEST(TestBFloat16, Max)
+TEST(TestUtilsBfp16, Max)
 {
     hip_bfloat16 a = 1.0_bf;
     hip_bfloat16 b = 2.0_bf;

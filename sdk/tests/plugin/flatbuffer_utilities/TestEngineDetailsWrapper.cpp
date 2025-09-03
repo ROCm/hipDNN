@@ -16,7 +16,7 @@ flatbuffers::FlatBufferBuilder buildValidEngineDetailsBuffer(int64_t engineId)
     return builder;
 }
 
-TEST(EngineDetailsWrapperTest, InvalidBufferIsNotValid)
+TEST(TestEngineDetailsWrapper, InvalidBufferIsNotValid)
 {
     EngineDetailsWrapper wrapper(nullptr, 0);
     EXPECT_FALSE(wrapper.isValid());
@@ -24,7 +24,7 @@ TEST(EngineDetailsWrapperTest, InvalidBufferIsNotValid)
     EXPECT_THROW(wrapper.getEngineDetails(), HipdnnPluginException);
 }
 
-TEST(EngineDetailsWrapperTest, ValidBufferIsValid)
+TEST(TestEngineDetailsWrapper, ValidBufferIsValid)
 {
     int64_t testEngineId = 42;
     auto builder = buildValidEngineDetailsBuffer(testEngineId);
@@ -34,7 +34,7 @@ TEST(EngineDetailsWrapperTest, ValidBufferIsValid)
     EXPECT_NO_THROW(wrapper.getEngineDetails());
 }
 
-TEST(EngineDetailsWrapperTest, CorruptedBufferIsNotValid)
+TEST(TestEngineDetailsWrapper, CorruptedBufferIsNotValid)
 {
     std::vector<uint8_t> buffer(16, 0xFF); // Not a valid flatbuffer
     EngineDetailsWrapper wrapper(buffer.data(), buffer.size());

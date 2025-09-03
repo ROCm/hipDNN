@@ -7,7 +7,7 @@
 
 using namespace hipdnn_plugin;
 
-TEST(HipdnnPluginExceptionTest, WhatReturnsMessage)
+TEST(TestPluginException, WhatReturnsMessage)
 {
     HipdnnPluginException ex(HIPDNN_PLUGIN_STATUS_BAD_PARAM, "bad param");
     EXPECT_STREQ(ex.what(), "bad param");
@@ -15,38 +15,38 @@ TEST(HipdnnPluginExceptionTest, WhatReturnsMessage)
     EXPECT_EQ(ex.getStatus(), HIPDNN_PLUGIN_STATUS_BAD_PARAM);
 }
 
-TEST(HipdnnPluginExceptionTest, ThrowIfNeMacroThrows)
+TEST(TestPluginException, ThrowIfNeMacroThrows)
 {
     EXPECT_THROW(PLUGIN_THROW_IF_NE(1, 2, HIPDNN_PLUGIN_STATUS_INTERNAL_ERROR, "not equal"),
                  HipdnnPluginException);
 }
 
-TEST(HipdnnPluginExceptionTest, ThrowIfEqMacroThrows)
+TEST(TestPluginException, ThrowIfEqMacroThrows)
 {
     EXPECT_THROW(PLUGIN_THROW_IF_EQ(1, 1, HIPDNN_PLUGIN_STATUS_INTERNAL_ERROR, "equal"),
                  HipdnnPluginException);
 }
 
-TEST(HipdnnPluginExceptionTest, ThrowIfTrueMacroThrows)
+TEST(TestPluginException, ThrowIfTrueMacroThrows)
 {
     EXPECT_THROW(PLUGIN_THROW_IF_TRUE(true, HIPDNN_PLUGIN_STATUS_INTERNAL_ERROR, "true"),
                  HipdnnPluginException);
 }
 
-TEST(HipdnnPluginExceptionTest, ThrowIfFalseMacroThrows)
+TEST(TestPluginException, ThrowIfFalseMacroThrows)
 {
     EXPECT_THROW(PLUGIN_THROW_IF_FALSE(false, HIPDNN_PLUGIN_STATUS_INTERNAL_ERROR, "false"),
                  HipdnnPluginException);
 }
 
-TEST(HipdnnPluginExceptionTest, ThrowIfNullMacroThrows)
+TEST(TestPluginException, ThrowIfNullMacroThrows)
 {
     void* ptr = nullptr;
     EXPECT_THROW(PLUGIN_THROW_IF_NULL(ptr, HIPDNN_PLUGIN_STATUS_INTERNAL_ERROR, "null"),
                  HipdnnPluginException);
 }
 
-TEST(HipdnnPluginExceptionTest, ThrowIfLtMacroThrows)
+TEST(TestPluginException, ThrowIfLtMacroThrows)
 {
     EXPECT_THROW(PLUGIN_THROW_IF_LT(1, 2, HIPDNN_PLUGIN_STATUS_INTERNAL_ERROR, "less than"),
                  HipdnnPluginException);
