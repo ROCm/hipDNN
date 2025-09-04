@@ -9,7 +9,6 @@ if(HIP_DNN_SKIP_TESTS)
 endif()
 
 add_compile_definitions(__HIP_PLATFORM_AMD__)
-#add_compile_definitions(__HIPCC__)
 find_package(hip REQUIRED)
 find_package(Threads REQUIRED)
 enable_language(HIP)
