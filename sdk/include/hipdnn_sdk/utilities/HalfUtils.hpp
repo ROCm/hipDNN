@@ -16,8 +16,7 @@ namespace std
 {
 inline __HOST_DEVICE__ half fabs(half num)
 {
-    auto f = static_cast<float>(num);
-    return f > 0.0f ? num : half{-f};
+    return num > 0.0_h ? num : static_cast<half>(num * -1.0_h);
 }
 
 inline __HOST_DEVICE__ half max(half a, half b)
