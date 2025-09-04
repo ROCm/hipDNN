@@ -11,7 +11,7 @@
 
 namespace hipdnn_frontend::graph
 {
-class PointwiseNode : public BaseNode<PointwiseNode> // NOLINT
+class PointwiseNode : public BaseNode<PointwiseNode>
 {
 public:
     PointwiseAttributes attributes;
