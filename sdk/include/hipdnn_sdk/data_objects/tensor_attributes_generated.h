@@ -22,6 +22,8 @@ struct Float32Value;
 
 struct Float16Value;
 
+struct BFloat16Value;
+
 struct Float8Value;
 
 struct Int32Value;
@@ -36,6 +38,8 @@ bool operator==(const Float32Value &lhs, const Float32Value &rhs);
 bool operator!=(const Float32Value &lhs, const Float32Value &rhs);
 bool operator==(const Float16Value &lhs, const Float16Value &rhs);
 bool operator!=(const Float16Value &lhs, const Float16Value &rhs);
+bool operator==(const BFloat16Value &lhs, const BFloat16Value &rhs);
+bool operator!=(const BFloat16Value &lhs, const BFloat16Value &rhs);
 bool operator==(const Float8Value &lhs, const Float8Value &rhs);
 bool operator!=(const Float8Value &lhs, const Float8Value &rhs);
 bool operator==(const Int32Value &lhs, const Int32Value &rhs);
@@ -49,18 +53,20 @@ enum TensorValue : uint8_t {
   TensorValue_NONE = 0,
   TensorValue_Float32Value = 1,
   TensorValue_Float16Value = 2,
-  TensorValue_Float8Value = 3,
-  TensorValue_Int32Value = 4,
-  TensorValue_Float64Value = 5,
+  TensorValue_BFloat16Value = 3,
+  TensorValue_Float8Value = 4,
+  TensorValue_Int32Value = 5,
+  TensorValue_Float64Value = 6,
   TensorValue_MIN = TensorValue_NONE,
   TensorValue_MAX = TensorValue_Float64Value
 };
 
-inline const TensorValue (&EnumValuesTensorValue())[6] {
+inline const TensorValue (&EnumValuesTensorValue())[7] {
   static const TensorValue values[] = {
     TensorValue_NONE,
     TensorValue_Float32Value,
     TensorValue_Float16Value,
+    TensorValue_BFloat16Value,
     TensorValue_Float8Value,
     TensorValue_Int32Value,
     TensorValue_Float64Value
@@ -69,10 +75,11 @@ inline const TensorValue (&EnumValuesTensorValue())[6] {
 }
 
 inline const char * const *EnumNamesTensorValue() {
-  static const char * const names[7] = {
+  static const char * const names[8] = {
     "NONE",
     "Float32Value",
     "Float16Value",
+    "BFloat16Value",
     "Float8Value",
     "Int32Value",
     "Float64Value",
@@ -99,6 +106,10 @@ template<> struct TensorValueTraits<hipdnn_sdk::data_objects::Float16Value> {
   static const TensorValue enum_value = TensorValue_Float16Value;
 };
 
+template<> struct TensorValueTraits<hipdnn_sdk::data_objects::BFloat16Value> {
+  static const TensorValue enum_value = TensorValue_BFloat16Value;
+};
+
 template<> struct TensorValueTraits<hipdnn_sdk::data_objects::Float8Value> {
   static const TensorValue enum_value = TensorValue_Float8Value;
 };
@@ -121,6 +132,10 @@ template<> struct TensorValueUnionTraits<hipdnn_sdk::data_objects::Float32Value>
 
 template<> struct TensorValueUnionTraits<hipdnn_sdk::data_objects::Float16Value> {
   static const TensorValue enum_value = TensorValue_Float16Value;
+};
+
+template<> struct TensorValueUnionTraits<hipdnn_sdk::data_objects::BFloat16Value> {
+  static const TensorValue enum_value = TensorValue_BFloat16Value;
 };
 
 template<> struct TensorValueUnionTraits<hipdnn_sdk::data_objects::Float8Value> {
@@ -181,6 +196,14 @@ struct TensorValueUnion {
     return type == TensorValue_Float16Value ?
       reinterpret_cast<const hipdnn_sdk::data_objects::Float16Value *>(value) : nullptr;
   }
+  hipdnn_sdk::data_objects::BFloat16Value *AsBFloat16Value() {
+    return type == TensorValue_BFloat16Value ?
+      reinterpret_cast<hipdnn_sdk::data_objects::BFloat16Value *>(value) : nullptr;
+  }
+  const hipdnn_sdk::data_objects::BFloat16Value *AsBFloat16Value() const {
+    return type == TensorValue_BFloat16Value ?
+      reinterpret_cast<const hipdnn_sdk::data_objects::BFloat16Value *>(value) : nullptr;
+  }
   hipdnn_sdk::data_objects::Float8Value *AsFloat8Value() {
     return type == TensorValue_Float8Value ?
       reinterpret_cast<hipdnn_sdk::data_objects::Float8Value *>(value) : nullptr;
@@ -221,6 +244,10 @@ inline bool operator==(const TensorValueUnion &lhs, const TensorValueUnion &rhs)
     case TensorValue_Float16Value: {
       return *(reinterpret_cast<const hipdnn_sdk::data_objects::Float16Value *>(lhs.value)) ==
              *(reinterpret_cast<const hipdnn_sdk::data_objects::Float16Value *>(rhs.value));
+    }
+    case TensorValue_BFloat16Value: {
+      return *(reinterpret_cast<const hipdnn_sdk::data_objects::BFloat16Value *>(lhs.value)) ==
+             *(reinterpret_cast<const hipdnn_sdk::data_objects::BFloat16Value *>(rhs.value));
     }
     case TensorValue_Float8Value: {
       return *(reinterpret_cast<const hipdnn_sdk::data_objects::Float8Value *>(lhs.value)) ==
@@ -277,25 +304,25 @@ inline bool operator!=(const Float32Value &lhs, const Float32Value &rhs) {
 }
 
 
-FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(2) Float16Value FLATBUFFERS_FINAL_CLASS {
+FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(4) Float16Value FLATBUFFERS_FINAL_CLASS {
  private:
-  uint16_t value_;
+  float value_;
 
  public:
   Float16Value()
       : value_(0) {
   }
-  Float16Value(uint16_t _value)
+  Float16Value(float _value)
       : value_(::flatbuffers::EndianScalar(_value)) {
   }
-  uint16_t value() const {
+  float value() const {
     return ::flatbuffers::EndianScalar(value_);
   }
-  void mutate_value(uint16_t _value) {
+  void mutate_value(float _value) {
     ::flatbuffers::WriteScalar(&value_, _value);
   }
 };
-FLATBUFFERS_STRUCT_END(Float16Value, 2);
+FLATBUFFERS_STRUCT_END(Float16Value, 4);
 
 inline bool operator==(const Float16Value &lhs, const Float16Value &rhs) {
   return
@@ -303,6 +330,36 @@ inline bool operator==(const Float16Value &lhs, const Float16Value &rhs) {
 }
 
 inline bool operator!=(const Float16Value &lhs, const Float16Value &rhs) {
+    return !(lhs == rhs);
+}
+
+
+FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(4) BFloat16Value FLATBUFFERS_FINAL_CLASS {
+ private:
+  float value_;
+
+ public:
+  BFloat16Value()
+      : value_(0) {
+  }
+  BFloat16Value(float _value)
+      : value_(::flatbuffers::EndianScalar(_value)) {
+  }
+  float value() const {
+    return ::flatbuffers::EndianScalar(value_);
+  }
+  void mutate_value(float _value) {
+    ::flatbuffers::WriteScalar(&value_, _value);
+  }
+};
+FLATBUFFERS_STRUCT_END(BFloat16Value, 4);
+
+inline bool operator==(const BFloat16Value &lhs, const BFloat16Value &rhs) {
+  return
+      (lhs.value() == rhs.value());
+}
+
+inline bool operator!=(const BFloat16Value &lhs, const BFloat16Value &rhs) {
     return !(lhs == rhs);
 }
 
@@ -470,6 +527,9 @@ struct TensorAttributes FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   const hipdnn_sdk::data_objects::Float16Value *value_as_Float16Value() const {
     return value_type() == hipdnn_sdk::data_objects::TensorValue_Float16Value ? static_cast<const hipdnn_sdk::data_objects::Float16Value *>(value()) : nullptr;
   }
+  const hipdnn_sdk::data_objects::BFloat16Value *value_as_BFloat16Value() const {
+    return value_type() == hipdnn_sdk::data_objects::TensorValue_BFloat16Value ? static_cast<const hipdnn_sdk::data_objects::BFloat16Value *>(value()) : nullptr;
+  }
   const hipdnn_sdk::data_objects::Float8Value *value_as_Float8Value() const {
     return value_type() == hipdnn_sdk::data_objects::TensorValue_Float8Value ? static_cast<const hipdnn_sdk::data_objects::Float8Value *>(value()) : nullptr;
   }
@@ -509,6 +569,10 @@ template<> inline const hipdnn_sdk::data_objects::Float32Value *TensorAttributes
 
 template<> inline const hipdnn_sdk::data_objects::Float16Value *TensorAttributes::value_as<hipdnn_sdk::data_objects::Float16Value>() const {
   return value_as_Float16Value();
+}
+
+template<> inline const hipdnn_sdk::data_objects::BFloat16Value *TensorAttributes::value_as<hipdnn_sdk::data_objects::BFloat16Value>() const {
+  return value_as_BFloat16Value();
 }
 
 template<> inline const hipdnn_sdk::data_objects::Float8Value *TensorAttributes::value_as<hipdnn_sdk::data_objects::Float8Value>() const {
@@ -684,7 +748,10 @@ inline bool VerifyTensorValue(::flatbuffers::Verifier &verifier, const void *obj
       return verifier.VerifyField<hipdnn_sdk::data_objects::Float32Value>(static_cast<const uint8_t *>(obj), 0, 4);
     }
     case TensorValue_Float16Value: {
-      return verifier.VerifyField<hipdnn_sdk::data_objects::Float16Value>(static_cast<const uint8_t *>(obj), 0, 2);
+      return verifier.VerifyField<hipdnn_sdk::data_objects::Float16Value>(static_cast<const uint8_t *>(obj), 0, 4);
+    }
+    case TensorValue_BFloat16Value: {
+      return verifier.VerifyField<hipdnn_sdk::data_objects::BFloat16Value>(static_cast<const uint8_t *>(obj), 0, 4);
     }
     case TensorValue_Float8Value: {
       return verifier.VerifyField<hipdnn_sdk::data_objects::Float8Value>(static_cast<const uint8_t *>(obj), 0, 1);
@@ -722,6 +789,10 @@ inline void *TensorValueUnion::UnPack(const void *obj, TensorValue type, const :
       auto ptr = reinterpret_cast<const hipdnn_sdk::data_objects::Float16Value *>(obj);
       return new hipdnn_sdk::data_objects::Float16Value(*ptr);
     }
+    case TensorValue_BFloat16Value: {
+      auto ptr = reinterpret_cast<const hipdnn_sdk::data_objects::BFloat16Value *>(obj);
+      return new hipdnn_sdk::data_objects::BFloat16Value(*ptr);
+    }
     case TensorValue_Float8Value: {
       auto ptr = reinterpret_cast<const hipdnn_sdk::data_objects::Float8Value *>(obj);
       return new hipdnn_sdk::data_objects::Float8Value(*ptr);
@@ -747,6 +818,10 @@ inline ::flatbuffers::Offset<void> TensorValueUnion::Pack(::flatbuffers::FlatBuf
     }
     case TensorValue_Float16Value: {
       auto ptr = reinterpret_cast<const hipdnn_sdk::data_objects::Float16Value *>(value);
+      return _fbb.CreateStruct(*ptr).Union();
+    }
+    case TensorValue_BFloat16Value: {
+      auto ptr = reinterpret_cast<const hipdnn_sdk::data_objects::BFloat16Value *>(value);
       return _fbb.CreateStruct(*ptr).Union();
     }
     case TensorValue_Float8Value: {
@@ -775,6 +850,10 @@ inline TensorValueUnion::TensorValueUnion(const TensorValueUnion &u) : type(u.ty
       value = new hipdnn_sdk::data_objects::Float16Value(*reinterpret_cast<hipdnn_sdk::data_objects::Float16Value *>(u.value));
       break;
     }
+    case TensorValue_BFloat16Value: {
+      value = new hipdnn_sdk::data_objects::BFloat16Value(*reinterpret_cast<hipdnn_sdk::data_objects::BFloat16Value *>(u.value));
+      break;
+    }
     case TensorValue_Float8Value: {
       value = new hipdnn_sdk::data_objects::Float8Value(*reinterpret_cast<hipdnn_sdk::data_objects::Float8Value *>(u.value));
       break;
@@ -801,6 +880,11 @@ inline void TensorValueUnion::Reset() {
     }
     case TensorValue_Float16Value: {
       auto ptr = reinterpret_cast<hipdnn_sdk::data_objects::Float16Value *>(value);
+      delete ptr;
+      break;
+    }
+    case TensorValue_BFloat16Value: {
+      auto ptr = reinterpret_cast<hipdnn_sdk::data_objects::BFloat16Value *>(value);
       delete ptr;
       break;
     }

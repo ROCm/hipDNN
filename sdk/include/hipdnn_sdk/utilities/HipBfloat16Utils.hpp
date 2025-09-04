@@ -34,8 +34,6 @@ inline __HOST_DEVICE__ bool __hisnan(const hip_bfloat16 a)
     return !(~hr.data & 0x7f80) && +(hr.data & 0x7f);
 }
 
-//#define HIPRT_NAN_BF16 __ushort_as_bfloat16((unsigned short)0x7FFFU)
-
 inline __HOST_DEVICE__ hip_bfloat16 __hmax(const hip_bfloat16 a, const hip_bfloat16 b)
 {
     auto a_nan = __hisnan(a), b_nan = __hisnan(b);
