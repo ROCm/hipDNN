@@ -7,57 +7,65 @@
 #include <hipdnn_sdk/logging/Logger.hpp>
 #include <string>
 
-inline __HOST_DEVICE__ half __ushort_as_half(unsigned short x)
-{
-    __half_raw r;
-    r.x = x;
-    return r;
-}
+#define HIPDNN_NAN_FP16 ushort_as_half(static_cast<unsigned short>(0x7FFFU))
 
 inline __HOST_DEVICE__ half operator""_h(long double value)
 {
     return {static_cast<float>(value)};
 }
 
-inline __HOST_DEVICE__ half __habs(__half num)
+namespace hipdnn_sdk::utilities::fp16
+{
+
+inline __HOST_DEVICE__ half ushort_as_half(unsigned short x)
+{
+    __half_raw r;
+    r.x = x;
+    return r;
+}
+
+inline __HOST_DEVICE__ half habs(half num)
 {
     auto raw = static_cast<__half_raw>(num);
     raw.x &= 0x7FFFu;
     return raw;
 }
 
-inline __HOST_DEVICE__ bool __hisnan(__half x)
+inline __HOST_DEVICE__ bool hisnan(__half x)
 {
     __half_raw hr = x;
     return (hr.x & 0x7FFFU) > 0x7C00u;
 }
 
-inline __HOST_DEVICE__ __half __hmax(const __half a, const __half b)
+inline __HOST_DEVICE__ half hmax(const half a, const half b)
 {
-    if(__hisnan(a) && !__hisnan(b))
+    if(hisnan(a) && !hisnan(b))
         return b;
-    if(!__hisnan(a) && __hisnan(b))
+    if(!hisnan(a) && hisnan(b))
         return a;
-    if(__hisnan(a) && __hisnan(b))
-        return HIPRT_NAN_FP16;
+    if(hisnan(a) && hisnan(b))
+        return HIPDNN_NAN_FP16;
     if(static_cast<__half_raw>(a).x > static_cast<__half_raw>(b).x)
         return __half_raw{static_cast<__half_raw>(a).x};
     return __half_raw{static_cast<__half_raw>(b).x};
 }
 
+} // namespace hipdnn_sdk::utilities::fp16
+
 namespace std
 {
+
 inline __HOST_DEVICE__ half fabs(half num)
 {
-    return __habs(num);
+    return hipdnn_sdk::utilities::fp16::habs(num);
 }
 
 inline __HOST_DEVICE__ half max(half a, half b)
 {
-    return __hmax(a, b);
+    return hipdnn_sdk::utilities::fp16::hmax(a, b);
 }
 
-}
+} // namespace std
 
 template <>
 struct fmt::formatter<half> : fmt::formatter<float>
