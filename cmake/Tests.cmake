@@ -29,6 +29,7 @@ function(create_test_name_validation_target)
     if(Python3_FOUND)
         # Write list of test executables with their paths to a file
         set(TEST_EXECUTABLES_FILE ${CMAKE_BINARY_DIR}/test_executables.txt)
+        list(REMOVE_DUPLICATES CHECK_EXECUTABLE_PATHS_GLOBAL)
         file(WRITE ${TEST_EXECUTABLES_FILE} "")
         foreach(test_executable ${CHECK_EXECUTABLE_PATHS_GLOBAL})
             file(APPEND ${TEST_EXECUTABLES_FILE} "${test_executable}\n")
@@ -88,18 +89,14 @@ function(_append_test_to_check_target_internal TARGET WORKING_DIR TEST_TYPE STAT
     set(${COMMAND_VAR} ${${COMMAND_VAR}} ${NEW_COMMAND} CACHE INTERNAL "${CACHE_DESC}" FORCE)
     set(${DEPENDS_VAR} ${${DEPENDS_VAR}} ${TARGET} CACHE INTERNAL "Accumulated ${TEST_TYPE} check depends" FORCE)
     
-    # Also track the executable path for test name validation
-    # Only add to main CHECK_EXECUTABLE_PATHS_GLOBAL list, not type-specific ones
-    if("${TEST_TYPE}" STREQUAL "" OR "${TEST_TYPE}" STREQUAL "UNIT" OR "${TEST_TYPE}" STREQUAL "INTEGRATION")
-        # Make the path relative to CMAKE_BINARY_DIR
-        file(RELATIVE_PATH REL_WORKING_DIR ${CMAKE_BINARY_DIR} ${WORKING_DIR})
-        if(REL_WORKING_DIR)
-            set(EXECUTABLE_PATH "${REL_WORKING_DIR}/${TARGET}")
-        else()
-            set(EXECUTABLE_PATH "${TARGET}")
-        endif()
-        set(CHECK_EXECUTABLE_PATHS_GLOBAL ${CHECK_EXECUTABLE_PATHS_GLOBAL} ${EXECUTABLE_PATH} CACHE INTERNAL "Accumulated check executable paths" FORCE)
+    # Track the binary paths for test name validation
+    file(RELATIVE_PATH REL_WORKING_DIR ${CMAKE_BINARY_DIR} ${WORKING_DIR})
+    if(REL_WORKING_DIR)
+        set(EXECUTABLE_PATH "${REL_WORKING_DIR}/${TARGET}")
+    else()
+        set(EXECUTABLE_PATH "${TARGET}")
     endif()
+    set(CHECK_EXECUTABLE_PATHS_GLOBAL ${CHECK_EXECUTABLE_PATHS_GLOBAL} ${EXECUTABLE_PATH} CACHE INTERNAL "Accumulated check executable paths" FORCE)
 endfunction()
 
 # Generic internal function to finalize check targets

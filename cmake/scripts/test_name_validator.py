@@ -160,100 +160,127 @@ class TestNameValidator:
             return []
 
     @staticmethod
-    def extract_test_names_from_executables(executables_file: Path, build_dir: Path) -> List[str]:
+    def extract_test_names_from_executables(
+        executables_file: Path, build_dir: Path, verbose: bool = False
+    ) -> List[str]:
         """Extract test names by running executables with --gtest_list_tests."""
         test_names = []
-        
+
         try:
             with open(executables_file, "r") as f:
                 executables = [line.strip() for line in f if line.strip()]
+                if verbose:
+                    print(f"Found {len(executables)} test executables to process.")
+                    print(f"Executables: {executables}")
         except FileNotFoundError:
-            print(f"Error: Executables file not found: {executables_file}", file=sys.stderr)
+            print(
+                f"Error: Executables file not found: {executables_file}",
+                file=sys.stderr,
+            )
             return []
-        
+
         for executable in executables:
             exe_path = build_dir / executable
             if not exe_path.exists():
                 print(f"Warning: Executable not found: {exe_path}", file=sys.stderr)
                 continue
-            
+
             try:
                 result = subprocess.run(
                     [str(exe_path), "--gtest_list_tests"],
                     capture_output=True,
                     text=True,
-                    timeout=10
+                    timeout=5,
                 )
-                
+
                 if result.returncode != 0:
-                    print(f"Warning: Failed to list tests from {executable}: {result.stderr}", file=sys.stderr)
+                    print(
+                        f"Warning: Failed to list tests from {executable}: {result.stderr}",
+                        file=sys.stderr,
+                    )
                     continue
-                
+
                 current_suite = None
                 for line in result.stdout.splitlines():
                     line = line.strip()
                     if not line:
                         continue
-                    
-                    if line.endswith('.'):
+
+                    if line.endswith("."):
                         current_suite = line[:-1]
                     elif line and current_suite:
                         test_case = line.strip()
                         test_names.append(f"{current_suite}.{test_case}")
-                        
+
             except subprocess.TimeoutExpired:
                 print(f"Warning: Timeout running {executable}", file=sys.stderr)
             except Exception as e:
                 print(f"Warning: Error running {executable}: {e}", file=sys.stderr)
-        
+
         return test_names
 
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Validate test names against hipDNN rules"
+        description="Validate test names against hipDNN rules",
+        epilog="At least one of --ctest-json or --test-executables must be provided.",
     )
 
-    parser.add_argument(
+    input_group = parser.add_argument_group(
+        "input methods", "Specify one or both methods to gather test names"
+    )
+
+    input_group.add_argument(
         "--ctest-json",
         type=Path,
-        help="Path to CTest JSON output (from ctest --show-only=json-v1) [DEPRECATED]",
+        help="Path to CTest JSON output (from ctest --show-only=json-v1)",
     )
 
-    parser.add_argument(
+    input_group.add_argument(
         "--test-executables",
         type=Path,
         help="Path to file containing list of test executables",
     )
 
-    parser.add_argument(
+    input_group.add_argument(
         "--build-dir",
         type=Path,
-        help="Build directory where test executables are located",
+        help="Build directory where test executables are located. Required if --test-executables is provided.",
     )
 
-    parser.add_argument(
+    options_group = parser.add_argument_group("options")
+
+    options_group.add_argument(
         "--strict",
         action="store_true",
         help="Exit with non-zero status if any test names are invalid",
         default=False,
     )
 
-    parser.add_argument(
+    options_group.add_argument(
         "--verbose",
         action="store_true",
         help="Show all test names, not just invalid ones",
         default=False,
     )
 
-    parser.add_argument(
+    options_group.add_argument(
         "--run-tests",
         action="store_true",
         help="Run unit tests for this validator",
         default=False,
     )
 
-    return parser.parse_args()
+    args = parser.parse_args()
+
+    if not args.run_tests:
+        if args.test_executables and not args.build_dir:
+            parser.error("--build-dir is required when using --test-executables")
+        
+        if not args.ctest_json and not args.test_executables:
+            parser.error("At least one of --ctest-json or --test-executables must be provided")
+    
+    return args
 
 
 def main() -> int:
@@ -266,12 +293,14 @@ def main() -> int:
     test_names = []
 
     if args.test_executables and args.build_dir:
-        test_names = validator.extract_test_names_from_executables(args.test_executables, args.build_dir)
-    elif args.ctest_json:
-        test_names = validator.extract_test_names_from_ctest_json(args.ctest_json)
-    else:
-        print("Error: Either --test-executables with --build-dir, or --ctest-json is required", file=sys.stderr)
-        return 1
+        test_names.extend(
+            validator.extract_test_names_from_executables(
+                args.test_executables, args.build_dir, args.verbose
+            )
+        )
+
+    if args.ctest_json:
+        test_names.extend(validator.extract_test_names_from_ctest_json(args.ctest_json))
 
     if not test_names:
         print("Warning: No test names found to validate", file=sys.stderr)
@@ -290,12 +319,13 @@ def main() -> int:
     print(f"{'=' * 60}")
     print(f"Total tests found: {len(test_names)}")
     print(f"Valid test names: {len(test_names) - invalid_count}")
-    print(f"Invalid test names: {invalid_count}")
+    print(f"Invalid test names: {invalid_count}\n")
 
     if invalid_count == 0:
         return 0
+    
 
-    print(f"\n{'Test Name':<50} {'Status':<10}")
+    print(f"{'Test Name':<50} {'Status':<10}")
     print(f"{'-' * 60}")
 
     for test_name, issues in sorted(results.items()):
