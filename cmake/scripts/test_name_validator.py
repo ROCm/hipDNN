@@ -4,11 +4,13 @@
 
 import argparse
 import json
+import os
 import re
+import subprocess
 import sys
 import unittest
 from pathlib import Path
-from typing import List, Dict
+from typing import List, Dict, Tuple
 from re import Pattern
 
 
@@ -157,6 +159,55 @@ class TestNameValidator:
             print(f"Unexpected error reading CTest JSON file: {e}", file=sys.stderr)
             return []
 
+    @staticmethod
+    def extract_test_names_from_executables(executables_file: Path, build_dir: Path) -> List[str]:
+        """Extract test names by running executables with --gtest_list_tests."""
+        test_names = []
+        
+        try:
+            with open(executables_file, "r") as f:
+                executables = [line.strip() for line in f if line.strip()]
+        except FileNotFoundError:
+            print(f"Error: Executables file not found: {executables_file}", file=sys.stderr)
+            return []
+        
+        for executable in executables:
+            exe_path = build_dir / executable
+            if not exe_path.exists():
+                print(f"Warning: Executable not found: {exe_path}", file=sys.stderr)
+                continue
+            
+            try:
+                result = subprocess.run(
+                    [str(exe_path), "--gtest_list_tests"],
+                    capture_output=True,
+                    text=True,
+                    timeout=10
+                )
+                
+                if result.returncode != 0:
+                    print(f"Warning: Failed to list tests from {executable}: {result.stderr}", file=sys.stderr)
+                    continue
+                
+                current_suite = None
+                for line in result.stdout.splitlines():
+                    line = line.strip()
+                    if not line:
+                        continue
+                    
+                    if line.endswith('.'):
+                        current_suite = line[:-1]
+                    elif line and current_suite:
+                        test_case = line.strip()
+                        test_names.append(f"{current_suite}.{test_case}")
+                        
+            except subprocess.TimeoutExpired:
+                print(f"Warning: Timeout running {executable}", file=sys.stderr)
+            except Exception as e:
+                print(f"Warning: Error running {executable}: {e}", file=sys.stderr)
+        
+        return test_names
+
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
@@ -166,7 +217,19 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--ctest-json",
         type=Path,
-        help="Path to CTest JSON output (from ctest --show-only=json-v1)",
+        help="Path to CTest JSON output (from ctest --show-only=json-v1) [DEPRECATED]",
+    )
+
+    parser.add_argument(
+        "--test-executables",
+        type=Path,
+        help="Path to file containing list of test executables",
+    )
+
+    parser.add_argument(
+        "--build-dir",
+        type=Path,
+        help="Build directory where test executables are located",
     )
 
     parser.add_argument(
@@ -199,13 +262,16 @@ def main() -> int:
     if args.run_tests:
         unittest.main(argv=[sys.argv[0]], exit=True)
 
-    if not args.ctest_json:
-        print("Error: --ctest-json is required when not running tests", file=sys.stderr)
-        return 1
-
     validator = TestNameValidator()
+    test_names = []
 
-    test_names = validator.extract_test_names_from_ctest_json(args.ctest_json)
+    if args.test_executables and args.build_dir:
+        test_names = validator.extract_test_names_from_executables(args.test_executables, args.build_dir)
+    elif args.ctest_json:
+        test_names = validator.extract_test_names_from_ctest_json(args.ctest_json)
+    else:
+        print("Error: Either --test-executables with --build-dir, or --ctest-json is required", file=sys.stderr)
+        return 1
 
     if not test_names:
         print("Warning: No test names found to validate", file=sys.stderr)
