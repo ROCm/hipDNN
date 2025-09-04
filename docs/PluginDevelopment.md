@@ -67,11 +67,11 @@ Before creating a plugin, ensure you have **built and installed hipDNN**. Plugin
 
 1. **Create Plugin Structure**
    - Create a new project/repository for your plugin
-   - Implement the plugin interface defined in [`sdk/include/hipdnn_sdk/plugin/engine_plugin_api.h`](../sdk/include/hipdnn_sdk/plugin/engine_plugin_api.h)
+   - Implement the plugin interface defined in [`sdk/include/hipdnn_sdk/plugin/EnginePluginApi.h`](../sdk/include/hipdnn_sdk/plugin/EnginePluginApi.h)
    - See [MIOpen Legacy Plugin](../plugins/miopen_legacy_plugin/) as a reference implementation (currently included but will become a separate project)
 
 2. **Implement Plugin API Functions**
-   
+
    The underlying implementation below the plugin API level is entirely at the developer's discretion. While the following architectural components are recommended for code organization and maintainability; the only true requirement is to implement the exported API functions defined in `engine_plugin_api.h`. However, the common architectural pattern consists of:
    - **Engine Manager**: Manages available engines and their capabilities
    - **Engine**: Implements graph execution for specific operations (each engine must have a globally unique `int64_t` ID)
@@ -117,10 +117,10 @@ In general, the **best practices** consist of:
 
 ### Key Files Reference
 
-- **Plugin API Interface**: [`sdk/include/hipdnn_sdk/plugin/engine_plugin_api.h`](../sdk/include/hipdnn_sdk/plugin/engine_plugin_api.h)
-- **Example Plugin Implementation**: [`plugins/miopen_legacy_plugin/miopen_legacy_plugin.cpp`](../plugins/miopen_legacy_plugin/miopen_legacy_plugin.cpp)
-- **Example Engine Manager**: [`plugins/miopen_legacy_plugin/engine_manager.cpp`](../plugins/miopen_legacy_plugin/engine_manager.cpp)
-- **Example Engine Implementation**: [`plugins/miopen_legacy_plugin/engines/miopen_engine.cpp`](../plugins/miopen_legacy_plugin/engines/miopen_engine.cpp)
+- **Plugin API Interface**: [`sdk/include/hipdnn_sdk/plugin/EnginePluginApi.h`](../sdk/include/hipdnn_sdk/plugin/EnginePluginApi.h)
+- **Example Plugin Implementation**: [`plugins/miopen_legacy_plugin/MiopenLegacyPlugin.cpp`](../plugins/miopen_legacy_plugin/MiopenLegacyPlugin.cpp)
+- **Example Engine Manager**: [`plugins/miopen_legacy_plugin/EngineManager.hpp`](../plugins/miopen_legacy_plugin/EngineManager.hpp)
+- **Example Engine Implementation**: [`plugins/miopen_legacy_plugin/engines/MiopenEngine.cpp`](../plugins/miopen_legacy_plugin/engines/MiopenEngine.cpp)
 
 ## Plugin Architecture
 
@@ -303,7 +303,7 @@ Integration tests validate end-to-end functionality of your plugin:
   - Enable tests for all supported ASICs
   - GPU typically required for meaningful validation
 
-For a comprehensive example of an integration test, see: [`plugins/miopen_legacy_plugin/integration_tests/batchnorm_fwd_inference_integration_test.cpp`](../plugins/miopen_legacy_plugin/integration_tests/batchnorm_fwd_inference_integration_test.cpp)
+For a comprehensive example of an integration test, see: [`plugins/miopen_legacy_plugin/integration_tests/BatchnormFwdInferenceIntegrationTest.cpp`](../plugins/miopen_legacy_plugin/integration_tests/BatchnormFwdInferenceIntegrationTest.cpp)
 
 Moreover, see our [general testing requirements](./testing/TestingStrategy.md#general-testing-requirements).
 
@@ -318,6 +318,6 @@ At a high level, it:
 - Coordinates streams and handles synchronization
 
 ### Structure
-- **Main Plugin**: [`miopen_legacy_plugin.cpp`](../plugins/miopen_legacy_plugin/miopen_legacy_plugin.cpp) - Entry point and plugin registration
-- **Engine Manager**: [`engine_manager.cpp`](../plugins/miopen_legacy_plugin/engine_manager.cpp) - Manages MIOpen engines
-- **MIOpen Engine**: [`engines/miopen_engine.cpp`](../plugins/miopen_legacy_plugin/engines/miopen_engine.cpp) - Implements graph execution using MIOpen kernels
+- **Main Plugin**: [`MiopenLegacyPlugin.cpp`](../plugins/miopen_legacy_plugin/MiopenLegacyPlugin.cpp) - Entry point and plugin registration
+- **Engine Manager**: [`EngineManager.hpp`](../plugins/miopen_legacy_plugin/EngineManager.hpp) - Manages MIOpen engines
+- **MIOpen Engine**: [`MiopenEngine.cpp`](../plugins/miopen_legacy_plugin/engines/MiopenEngine.cpp) - Implements graph execution using MIOpen kernels
