@@ -14,7 +14,6 @@ function(add_hipdnn_sample NAME SOURCE)
     add_executable(${NAME} ${SOURCE})
     target_link_libraries(${NAME} PRIVATE 
         hip::host
-        hip::device
         hipdnn_frontend
         hipdnn_backend
         hipdnn_sdk
