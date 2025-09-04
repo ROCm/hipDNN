@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include <hip/amd_detail/amd_hip_fp16.h>
+#include <hip/hip_fp16.h>
 #include <hipdnn_sdk/logging/Logger.hpp>
 #include <string>
 
@@ -16,7 +16,8 @@ namespace std
 {
 inline __HOST_DEVICE__ half fabs(half num)
 {
-    return num > 0.0_h ? num : num * -1.0_h;
+    auto f = static_cast<float>(num);
+    return f > 0.0f ? num : half{-f};
 }
 
 inline __HOST_DEVICE__ half max(half a, half b)

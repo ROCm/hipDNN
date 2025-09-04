@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include <hip/amd_detail/amd_hip_bfloat16.h>
+#include <hip/hip_bfloat16.h>
 #include <hipdnn_sdk/logging/Logger.hpp>
 #include <string>
 

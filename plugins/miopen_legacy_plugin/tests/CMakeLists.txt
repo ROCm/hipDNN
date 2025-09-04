@@ -14,7 +14,6 @@ if(HIP_DNN_SKIP_TESTS)
 endif()
 
 add_compile_definitions(__HIP_PLATFORM_AMD__)
-add_compile_definitions(__HIPCC__)
 find_package(hip REQUIRED)
 find_package(Threads REQUIRED)
 enable_language(HIP)
@@ -46,7 +45,6 @@ target_link_libraries(miopen_legacy_plugin_tests PUBLIC
     GTest::gtest
     GTest::gmock
     hip::host
-    hip::device
     miopen_legacy_plugin
     miopen_legacy_plugin_private
     Threads::Threads

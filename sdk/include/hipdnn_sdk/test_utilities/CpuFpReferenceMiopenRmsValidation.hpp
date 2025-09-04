@@ -31,7 +31,7 @@ public:
     CpuFpReferenceMiopenRmsValidation(T relativeTolerance = std::numeric_limits<T>::epsilon())
         : _relativeTolerance(static_cast<double>(relativeTolerance))
     {
-        if(relativeTolerance < T{0})
+        if(relativeTolerance < T{0.0})
         {
             throw std::invalid_argument("Tolerances must be non-negative");
         }
