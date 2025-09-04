@@ -6,9 +6,9 @@
 
 #include <hipdnn_sdk/plugin/EnginePluginApi.h>
 #include <hipdnn_sdk/plugin/PluginApiDataTypes.h>
-#include <hipdnn_sdk/test_utilities/CpuFpReferenceImplementation.hpp>
 #include <hipdnn_sdk/test_utilities/CpuFpReferenceValidation.hpp>
 #include <hipdnn_sdk/test_utilities/FlatbufferGraphTestUtils.hpp>
+#include <hipdnn_sdk/test_utilities/ReferenceImplementationInterface.hpp>
 #include <hipdnn_sdk/test_utilities/TestUtilities.hpp>
 #include <hipdnn_sdk/utilities/HalfUtils.hpp>
 #include <hipdnn_sdk/utilities/HipBfloat16Utils.hpp>
@@ -196,14 +196,15 @@ void BatchnormFwdInferExecuteGraphTest::runFwdBatchnormGraph(
     varianceTensorCpu.fillWithRandomValues(
         static_cast<IntermediateType>(0.1f), static_cast<IntermediateType>(1.0f), seed);
 
-    CpuFpReferenceImplementation<InputType, IntermediateType, IntermediateType> cpuRefImpl;
-    cpuRefImpl.batchnormFwdInference(xTensorCpu,
-                                     scaleTensorCpu,
-                                     biasTensorCpu,
-                                     meanTensorCpu,
-                                     varianceTensorCpu,
-                                     yTensorCpu,
-                                     1e-3);
+    CpuReferenceContainer cpuRefImpl;
+    cpuRefImpl.batchnormFwdInference<InputType, IntermediateType, IntermediateType>(
+        xTensorCpu,
+        scaleTensorCpu,
+        biasTensorCpu,
+        meanTensorCpu,
+        varianceTensorCpu,
+        yTensorCpu,
+        1e-3);
 
     CpuFpReferenceValidation<InputType> cpuRefValidation(epsilon, epsilon);
     EXPECT_TRUE(cpuRefValidation.allClose(yTensorCpu.memory(), yTensor.memory()));

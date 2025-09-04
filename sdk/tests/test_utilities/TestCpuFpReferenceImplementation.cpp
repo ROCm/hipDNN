@@ -2,7 +2,7 @@
 // SPDX-License-Identifier:  MIT
 
 #include <gtest/gtest.h>
-#include <hipdnn_sdk/test_utilities/CpuFpReferenceImplementation.hpp>
+#include <hipdnn_sdk/test_utilities/ReferenceImplementationInterface.hpp>
 
 #include <hipdnn_sdk/test_utilities/FlatbufferGraphTestUtils.hpp>
 #include <hipdnn_sdk/test_utilities/TestUtilities.hpp>
@@ -14,7 +14,7 @@ using namespace hipdnn_sdk::reference_test_utilities;
 using namespace hipdnn_sdk::data_objects;
 using namespace hipdnn_sdk::utilities;
 
-TEST(CpuFpReferenceImplementation, BatchnormInferFloatUsage)
+TEST(CpuReferenceContainer, BatchnormInferFloatUsage)
 {
     Tensor<float> inputTensor({1, 3, 224, 224});
     Tensor<float> outputTensor({1, 3, 224, 224});
@@ -23,13 +23,14 @@ TEST(CpuFpReferenceImplementation, BatchnormInferFloatUsage)
     Tensor<float> meanTensor({1, 3});
     Tensor<float> varianceTensor({1, 3});
 
-    CpuFpReferenceImplementation<float, float, float> refImpl;
+    // NEW ARCHITECTURE: One container, templates on methods!
+    CpuReferenceContainer refImpl;
 
-    refImpl.batchnormFwdInference(
+    refImpl.batchnormFwdInference<float, float, float>(
         inputTensor, scaleTensor, biasTensor, meanTensor, varianceTensor, outputTensor, 1e-5);
 }
 
-TEST(CpuFpReferenceImplementation, BatchnormInferBFloat16Usage)
+TEST(CpuReferenceContainer, BatchnormInferBFloat16Usage)
 {
     Tensor<hip_bfloat16> inputTensor({1, 3, 224, 224});
     Tensor<hip_bfloat16> outputTensor({1, 3, 224, 224});
@@ -38,13 +39,14 @@ TEST(CpuFpReferenceImplementation, BatchnormInferBFloat16Usage)
     Tensor<float> meanTensor({1, 3});
     Tensor<float> varianceTensor({1, 3});
 
-    CpuFpReferenceImplementation<hip_bfloat16, float, float> refImpl;
+    // NEW ARCHITECTURE: Mixed precision made easy!
+    CpuReferenceContainer refImpl;
 
-    refImpl.batchnormFwdInference(
+    refImpl.batchnormFwdInference<hip_bfloat16, float, float>(
         inputTensor, scaleTensor, biasTensor, meanTensor, varianceTensor, outputTensor, 1e-5);
 }
 
-TEST(CpuFpReferenceImplementation, BatchnormInferHalfUsage)
+TEST(CpuReferenceContainer, BatchnormInferHalfUsage)
 {
     Tensor<half> inputTensor({1, 3, 224, 224});
     Tensor<half> outputTensor({1, 3, 224, 224});
@@ -53,13 +55,14 @@ TEST(CpuFpReferenceImplementation, BatchnormInferHalfUsage)
     Tensor<float> meanTensor({1, 3});
     Tensor<float> varianceTensor({1, 3});
 
-    CpuFpReferenceImplementation<half, float, float> refImpl;
+    // NEW ARCHITECTURE: Half precision with float scale/bias!
+    CpuReferenceContainer refImpl;
 
-    refImpl.batchnormFwdInference(
+    refImpl.batchnormFwdInference<half, float, float>(
         inputTensor, scaleTensor, biasTensor, meanTensor, varianceTensor, outputTensor, 1e-5);
 }
 
-TEST(CpuFpReferenceImplementation, BatchnormInferDoubleUsage)
+TEST(CpuReferenceContainer, BatchnormInferDoubleUsage)
 {
     Tensor<double> inputTensor({1, 3, 224, 224});
     Tensor<double> outputTensor({1, 3, 224, 224});
@@ -68,13 +71,14 @@ TEST(CpuFpReferenceImplementation, BatchnormInferDoubleUsage)
     Tensor<double> meanTensor({1, 3});
     Tensor<double> varianceTensor({1, 3});
 
-    CpuFpReferenceImplementation<double, double, double> refImpl;
+    // NEW ARCHITECTURE: Double precision across all types!
+    CpuReferenceContainer refImpl;
 
-    refImpl.batchnormFwdInference(
+    refImpl.batchnormFwdInference<double, double, double>(
         inputTensor, scaleTensor, biasTensor, meanTensor, varianceTensor, outputTensor, 1e-5);
 }
 
-TEST(CpuFpReferenceImplementation, BatchnormInferFloatUsageNHWC)
+TEST(CpuReferenceContainer, BatchnormInferFloatUsageNHWC)
 {
     Tensor<float> inputTensor({6, 3, 32, 32}, TensorLayout::NHWC);
     Tensor<float> outputTensor({6, 3, 32, 32}, TensorLayout::NHWC);
@@ -83,13 +87,14 @@ TEST(CpuFpReferenceImplementation, BatchnormInferFloatUsageNHWC)
     Tensor<float> meanTensor({1, 3, 1, 1});
     Tensor<float> varianceTensor({1, 3, 1, 1});
 
-    CpuFpReferenceImplementation<float, float, float> refImpl;
+    // NEW ARCHITECTURE: Layout flexibility maintained!
+    CpuReferenceContainer refImpl;
 
-    refImpl.batchnormFwdInference(
+    refImpl.batchnormFwdInference<float, float, float>(
         inputTensor, scaleTensor, biasTensor, meanTensor, varianceTensor, outputTensor, 1e-5);
 }
 
-TEST(CpuFpReferenceImplementation, BatchnormInferSanityValidation)
+TEST(CpuReferenceContainer, BatchnormInferSanityValidation)
 {
     SKIP_IF_NO_DEVICES();
 
@@ -124,8 +129,9 @@ TEST(CpuFpReferenceImplementation, BatchnormInferSanityValidation)
     // where inv_variance (named by convention) = 1 / sqrt(1.25 + 1e-5) = 0.894423613312618
     const std::vector<double> expectedOutput = {-2.18327084, -0.39442361, 1.39442361, 3.18327084};
 
-    CpuFpReferenceImplementation<double, double, double> refImpl;
-    refImpl.batchnormFwdInference(
+    // NEW ARCHITECTURE: Precise validation with double precision!
+    CpuReferenceContainer refImpl;
+    refImpl.batchnormFwdInference<double, double, double>(
         inputTensor, scaleTensor, biasTensor, meanTensor, varianceTensor, outputTensor, 1e-5);
 
     auto tolerance = 1e-6;
@@ -136,7 +142,7 @@ TEST(CpuFpReferenceImplementation, BatchnormInferSanityValidation)
     EXPECT_NEAR(outputTensor.getHostValue(0, 0, 1, 1), expectedOutput[3], tolerance);
 }
 
-TEST(CpuFpReferenceImplementation, BatchnormBwdFloatUsage)
+TEST(CpuReferenceContainer, BatchnormBwdFloatUsage)
 {
     Tensor<float> xTensor({6, 3, 32, 32});
     Tensor<float> dyTensor({6, 3, 32, 32});
@@ -147,19 +153,20 @@ TEST(CpuFpReferenceImplementation, BatchnormBwdFloatUsage)
     Tensor<float> dscaleTensor({1, 3});
     Tensor<float> dbiasTensor({1, 3});
 
-    CpuFpReferenceImplementation<float, float, float> refImpl;
+    // NEW ARCHITECTURE: Backward pass with full float precision!
+    CpuReferenceContainer refImpl;
 
-    refImpl.batchnormBwd(dyTensor,
-                         xTensor,
-                         meanTensor,
-                         invVarianceTensor,
-                         scaleTensor,
-                         dxTensor,
-                         dscaleTensor,
-                         dbiasTensor);
+    refImpl.batchnormBwd<float, float, float>(dyTensor,
+                                              xTensor,
+                                              meanTensor,
+                                              invVarianceTensor,
+                                              scaleTensor,
+                                              dxTensor,
+                                              dscaleTensor,
+                                              dbiasTensor);
 }
 
-TEST(CpuFpReferenceImplementation, BatchnormBwdBFloat16Usage)
+TEST(CpuReferenceContainer, BatchnormBwdBFloat16Usage)
 {
     Tensor<hip_bfloat16> xTensor({6, 3, 32, 32});
     Tensor<hip_bfloat16> dyTensor({6, 3, 32, 32});
@@ -170,19 +177,20 @@ TEST(CpuFpReferenceImplementation, BatchnormBwdBFloat16Usage)
     Tensor<float> dscaleTensor({1, 3});
     Tensor<float> dbiasTensor({1, 3});
 
-    CpuFpReferenceImplementation<hip_bfloat16, float, float> refImpl;
+    // NEW ARCHITECTURE: Mixed precision backward pass!
+    CpuReferenceContainer refImpl;
 
-    refImpl.batchnormBwd(dyTensor,
-                         xTensor,
-                         meanTensor,
-                         invVarianceTensor,
-                         scaleTensor,
-                         dxTensor,
-                         dscaleTensor,
-                         dbiasTensor);
+    refImpl.batchnormBwd<hip_bfloat16, float, float>(dyTensor,
+                                                     xTensor,
+                                                     meanTensor,
+                                                     invVarianceTensor,
+                                                     scaleTensor,
+                                                     dxTensor,
+                                                     dscaleTensor,
+                                                     dbiasTensor);
 }
 
-TEST(CpuFpReferenceImplementation, BatchnormBwdHalfUsage)
+TEST(CpuReferenceContainer, BatchnormBwdHalfUsage)
 {
     Tensor<half> xTensor({6, 3, 32, 32});
     Tensor<half> dyTensor({6, 3, 32, 32});
@@ -193,19 +201,20 @@ TEST(CpuFpReferenceImplementation, BatchnormBwdHalfUsage)
     Tensor<float> dscaleTensor({1, 3});
     Tensor<float> dbiasTensor({1, 3});
 
-    CpuFpReferenceImplementation<half, float, float> refImpl;
+    // NEW ARCHITECTURE: Half precision input, float statistics!
+    CpuReferenceContainer refImpl;
 
-    refImpl.batchnormBwd(dyTensor,
-                         xTensor,
-                         meanTensor,
-                         invVarianceTensor,
-                         scaleTensor,
-                         dxTensor,
-                         dscaleTensor,
-                         dbiasTensor);
+    refImpl.batchnormBwd<half, float, float>(dyTensor,
+                                             xTensor,
+                                             meanTensor,
+                                             invVarianceTensor,
+                                             scaleTensor,
+                                             dxTensor,
+                                             dscaleTensor,
+                                             dbiasTensor);
 }
 
-TEST(CpuFpReferenceImplementation, BatchnormBwdDoubleUsage)
+TEST(CpuReferenceContainer, BatchnormBwdDoubleUsage)
 {
     Tensor<double> xTensor({6, 3, 32, 32});
     Tensor<double> dyTensor({6, 3, 32, 32});
@@ -216,19 +225,20 @@ TEST(CpuFpReferenceImplementation, BatchnormBwdDoubleUsage)
     Tensor<double> dscaleTensor({1, 3});
     Tensor<double> dbiasTensor({1, 3});
 
-    CpuFpReferenceImplementation<double, double, double> refImpl;
+    // NEW ARCHITECTURE: Maximum precision throughout!
+    CpuReferenceContainer refImpl;
 
-    refImpl.batchnormBwd(dyTensor,
-                         xTensor,
-                         meanTensor,
-                         invVarianceTensor,
-                         scaleTensor,
-                         dxTensor,
-                         dscaleTensor,
-                         dbiasTensor);
+    refImpl.batchnormBwd<double, double, double>(dyTensor,
+                                                 xTensor,
+                                                 meanTensor,
+                                                 invVarianceTensor,
+                                                 scaleTensor,
+                                                 dxTensor,
+                                                 dscaleTensor,
+                                                 dbiasTensor);
 }
 
-TEST(CpuFpReferenceImplementation, BatchnormBwdFloatUsageNHWC)
+TEST(CpuReferenceContainer, BatchnormBwdFloatUsageNHWC)
 {
     Tensor<float> xTensor({6, 3, 32, 32}, TensorLayout::NHWC);
     Tensor<float> dyTensor({6, 3, 32, 32}, TensorLayout::NHWC);
@@ -239,19 +249,20 @@ TEST(CpuFpReferenceImplementation, BatchnormBwdFloatUsageNHWC)
     Tensor<float> dscaleTensor({1, 3});
     Tensor<float> dbiasTensor({1, 3});
 
-    CpuFpReferenceImplementation<float, float, float> refImpl;
+    // NEW ARCHITECTURE: NHWC layout in backward pass!
+    CpuReferenceContainer refImpl;
 
-    refImpl.batchnormBwd(dyTensor,
-                         xTensor,
-                         meanTensor,
-                         invVarianceTensor,
-                         scaleTensor,
-                         dxTensor,
-                         dscaleTensor,
-                         dbiasTensor);
+    refImpl.batchnormBwd<float, float, float>(dyTensor,
+                                              xTensor,
+                                              meanTensor,
+                                              invVarianceTensor,
+                                              scaleTensor,
+                                              dxTensor,
+                                              dscaleTensor,
+                                              dbiasTensor);
 }
 
-TEST(CpuFpReferenceImplementation, BatchnormBwdSanityValidation)
+TEST(CpuReferenceContainer, BatchnormBwdSanityValidation)
 {
     const std::vector<int64_t> dims = {1, 1, 2, 2};
 
@@ -298,15 +309,16 @@ TEST(CpuFpReferenceImplementation, BatchnormBwdSanityValidation)
     std::vector<double> expectedDx
         = {-2.14659950e-06, -7.15533166e-07, 7.15533166e-07, 2.14659950e-06};
 
-    CpuFpReferenceImplementation<double, double, double> refImpl;
-    refImpl.batchnormBwd(dyTensor,
-                         xTensor,
-                         meanTensor,
-                         invVarianceTensor,
-                         scaleTensor,
-                         dxTensor,
-                         dscaleTensor,
-                         dbiasTensor);
+    // NEW ARCHITECTURE: Sanity validation with precise numerics!
+    CpuReferenceContainer refImpl;
+    refImpl.batchnormBwd<double, double, double>(dyTensor,
+                                                 xTensor,
+                                                 meanTensor,
+                                                 invVarianceTensor,
+                                                 scaleTensor,
+                                                 dxTensor,
+                                                 dscaleTensor,
+                                                 dbiasTensor);
 
     auto tolerance = 1e-6;
 
@@ -320,7 +332,7 @@ TEST(CpuFpReferenceImplementation, BatchnormBwdSanityValidation)
 
 // Convolution Forward Inference Tests
 
-TEST(CpuFpReferenceImplementation, ConvFwdFloatUsage)
+TEST(CpuReferenceContainer, ConvFwdFloatUsage)
 {
     // Basic 2D convolution: 1 batch, 2 input channels, 3 output channels, 1 group
     // Input: 1x2x4x4, Weight: 3x2x3x3, Output: 1x3x2x2
@@ -332,12 +344,14 @@ TEST(CpuFpReferenceImplementation, ConvFwdFloatUsage)
     std::vector<int64_t> dilations = {1, 1}; // [H, W]
     std::vector<int64_t> padding = {0, 0}; // [H, W]
 
-    CpuFpReferenceImplementation<float, float, float> refImpl;
+    // NEW ARCHITECTURE: Convolution with float precision!
+    CpuReferenceContainer refImpl;
 
-    refImpl.convFwdInference(inputTensor, weightTensor, outputTensor, strides, dilations, padding);
+    refImpl.convFwdInference<float>(
+        inputTensor, weightTensor, outputTensor, strides, dilations, padding);
 }
 
-TEST(CpuFpReferenceImplementation, ConvFwdDoubleUsage)
+TEST(CpuReferenceContainer, ConvFwdDoubleUsage)
 {
     Tensor<double> inputTensor({2, 4, 8, 8});
     Tensor<double> weightTensor({8, 4, 3, 3}); // 4D: [G*K][C][Y][X] = [8][4][3][3]
@@ -347,12 +361,14 @@ TEST(CpuFpReferenceImplementation, ConvFwdDoubleUsage)
     std::vector<int64_t> dilations = {1, 1};
     std::vector<int64_t> padding = {0, 0};
 
-    CpuFpReferenceImplementation<double, double, double> refImpl;
+    // NEW ARCHITECTURE: Double precision convolution!
+    CpuReferenceContainer refImpl;
 
-    refImpl.convFwdInference(inputTensor, weightTensor, outputTensor, strides, dilations, padding);
+    refImpl.convFwdInference<double>(
+        inputTensor, weightTensor, outputTensor, strides, dilations, padding);
 }
 
-TEST(CpuFpReferenceImplementation, ConvFwdHalfUsage)
+TEST(CpuReferenceContainer, ConvFwdHalfUsage)
 {
     Tensor<half> inputTensor({1, 1, 5, 5});
     Tensor<half> weightTensor({1, 1, 3, 3}); // 4D: [G*K][C][Y][X] = [1][1][3][3]
@@ -362,12 +378,14 @@ TEST(CpuFpReferenceImplementation, ConvFwdHalfUsage)
     std::vector<int64_t> dilations = {1, 1};
     std::vector<int64_t> padding = {0, 0};
 
-    CpuFpReferenceImplementation<half, float, float> refImpl;
+    // NEW ARCHITECTURE: Half precision convolution!
+    CpuReferenceContainer refImpl;
 
-    refImpl.convFwdInference(inputTensor, weightTensor, outputTensor, strides, dilations, padding);
+    refImpl.convFwdInference<half>(
+        inputTensor, weightTensor, outputTensor, strides, dilations, padding);
 }
 
-TEST(CpuFpReferenceImplementation, ConvFwdBFloat16Usage)
+TEST(CpuReferenceContainer, ConvFwdBFloat16Usage)
 {
     Tensor<hip_bfloat16> inputTensor({1, 3, 32, 32});
     Tensor<hip_bfloat16> weightTensor({16, 3, 5, 5}); // 4D: [G*K][C][Y][X] = [16][3][5][5]
@@ -377,12 +395,14 @@ TEST(CpuFpReferenceImplementation, ConvFwdBFloat16Usage)
     std::vector<int64_t> dilations = {1, 1};
     std::vector<int64_t> padding = {0, 0};
 
-    CpuFpReferenceImplementation<hip_bfloat16, float, float> refImpl;
+    // NEW ARCHITECTURE: BFloat16 precision convolution!
+    CpuReferenceContainer refImpl;
 
-    refImpl.convFwdInference(inputTensor, weightTensor, outputTensor, strides, dilations, padding);
+    refImpl.convFwdInference<hip_bfloat16>(
+        inputTensor, weightTensor, outputTensor, strides, dilations, padding);
 }
 
-TEST(CpuFpReferenceImplementation, ConvFwdWithStridesAndPadding)
+TEST(CpuReferenceContainer, ConvFwdWithStridesAndPadding)
 {
     // Test with strides=2, padding=1
     Tensor<float> inputTensor({1, 1, 4, 4});
@@ -393,12 +413,14 @@ TEST(CpuFpReferenceImplementation, ConvFwdWithStridesAndPadding)
     std::vector<int64_t> dilations = {1, 1};
     std::vector<int64_t> padding = {1, 1};
 
-    CpuFpReferenceImplementation<float, float, float> refImpl;
+    // NEW ARCHITECTURE: Advanced convolution with strides and padding!
+    CpuReferenceContainer refImpl;
 
-    refImpl.convFwdInference(inputTensor, weightTensor, outputTensor, strides, dilations, padding);
+    refImpl.convFwdInference<float>(
+        inputTensor, weightTensor, outputTensor, strides, dilations, padding);
 }
 
-TEST(CpuFpReferenceImplementation, ConvFwdWithDilations)
+TEST(CpuReferenceContainer, ConvFwdWithDilations)
 {
     // Test with dilations=2
     Tensor<float> inputTensor({1, 1, 5, 5});
@@ -409,12 +431,14 @@ TEST(CpuFpReferenceImplementation, ConvFwdWithDilations)
     std::vector<int64_t> dilations = {2, 2};
     std::vector<int64_t> padding = {0, 0};
 
-    CpuFpReferenceImplementation<float, float, float> refImpl;
+    // NEW ARCHITECTURE: Dilated convolution support!
+    CpuReferenceContainer refImpl;
 
-    refImpl.convFwdInference(inputTensor, weightTensor, outputTensor, strides, dilations, padding);
+    refImpl.convFwdInference<float>(
+        inputTensor, weightTensor, outputTensor, strides, dilations, padding);
 }
 
-TEST(CpuFpReferenceImplementation, ConvFwdSanityValidation)
+TEST(CpuReferenceContainer, ConvFwdSanityValidation)
 {
     // Simple 1x1 input, 1x1 kernel test for verification
     Tensor<double> inputTensor({1, 1, 1, 1});
@@ -431,15 +455,17 @@ TEST(CpuFpReferenceImplementation, ConvFwdSanityValidation)
     std::vector<int64_t> dilations = {1, 1};
     std::vector<int64_t> padding = {0, 0};
 
-    CpuFpReferenceImplementation<double, double, double> refImpl;
+    // NEW ARCHITECTURE: Sanity validation with precise results!
+    CpuReferenceContainer refImpl;
 
-    refImpl.convFwdInference(inputTensor, weightTensor, outputTensor, strides, dilations, padding);
+    refImpl.convFwdInference<double>(
+        inputTensor, weightTensor, outputTensor, strides, dilations, padding);
 
     // Expected output: 2.0 * 3.0 = 6.0
     EXPECT_NEAR(outputTensor.getHostValue(0, 0, 0, 0), 6.0, 1e-10);
 }
 
-TEST(CpuFpReferenceImplementation, ConvFwdDetailedValidation)
+TEST(CpuReferenceContainer, ConvFwdDetailedValidation)
 {
     // 2x2 input with 2x2 kernel
     Tensor<double> inputTensor({1, 1, 2, 2});
@@ -463,16 +489,18 @@ TEST(CpuFpReferenceImplementation, ConvFwdDetailedValidation)
     std::vector<int64_t> dilations = {1, 1};
     std::vector<int64_t> padding = {0, 0};
 
-    CpuFpReferenceImplementation<double, double, double> refImpl;
+    // NEW ARCHITECTURE: Detailed numerical validation!
+    CpuReferenceContainer refImpl;
 
-    refImpl.convFwdInference(inputTensor, weightTensor, outputTensor, strides, dilations, padding);
+    refImpl.convFwdInference<double>(
+        inputTensor, weightTensor, outputTensor, strides, dilations, padding);
 
     // Expected: 1*1 + 2*0 + 3*0 + 4*1 = 5.0
     EXPECT_NEAR(outputTensor.getHostValue(0, 0, 0, 0), 5.0, 1e-10);
 }
 
 // Parameter validation tests
-TEST(CpuFpReferenceImplementation, ConvFwdInvalidInputDimensions)
+TEST(CpuReferenceContainer, ConvFwdInvalidInputDimensions)
 {
     Tensor<float> inputTensor({1, 2, 4}); // 3D instead of 4D
     Tensor<float> weightTensor({1, 1, 2, 3, 3});
@@ -482,14 +510,15 @@ TEST(CpuFpReferenceImplementation, ConvFwdInvalidInputDimensions)
     std::vector<int64_t> dilations = {1, 1};
     std::vector<int64_t> padding = {0, 0};
 
-    CpuFpReferenceImplementation<float, float, float> refImpl;
+    // NEW ARCHITECTURE: Parameter validation with clear error messages!
+    CpuReferenceContainer refImpl;
 
-    EXPECT_THROW(refImpl.convFwdInference(
+    EXPECT_THROW(refImpl.convFwdInference<float>(
                      inputTensor, weightTensor, outputTensor, strides, dilations, padding),
                  std::invalid_argument);
 }
 
-TEST(CpuFpReferenceImplementation, ConvFwdInvalidWeightDimensions)
+TEST(CpuReferenceContainer, ConvFwdInvalidWeightDimensions)
 {
     Tensor<float> inputTensor({1, 2, 4, 4});
     Tensor<float> weightTensor({1, 1, 2}); // 3D instead of 4D
@@ -499,14 +528,15 @@ TEST(CpuFpReferenceImplementation, ConvFwdInvalidWeightDimensions)
     std::vector<int64_t> dilations = {1, 1};
     std::vector<int64_t> padding = {0, 0};
 
-    CpuFpReferenceImplementation<float, float, float> refImpl;
+    // NEW ARCHITECTURE: Weight dimension validation!
+    CpuReferenceContainer refImpl;
 
-    EXPECT_THROW(refImpl.convFwdInference(
+    EXPECT_THROW(refImpl.convFwdInference<float>(
                      inputTensor, weightTensor, outputTensor, strides, dilations, padding),
                  std::invalid_argument);
 }
 
-TEST(CpuFpReferenceImplementation, ConvFwdInvalidStrideSize)
+TEST(CpuReferenceContainer, ConvFwdInvalidStrideSize)
 {
     Tensor<float> inputTensor({1, 2, 4, 4});
     Tensor<float> weightTensor({1, 2, 3, 3}); // 4D: [G*K][C][Y][X] = [1][2][3][3]
@@ -516,14 +546,15 @@ TEST(CpuFpReferenceImplementation, ConvFwdInvalidStrideSize)
     std::vector<int64_t> dilations = {1, 1};
     std::vector<int64_t> padding = {0, 0};
 
-    CpuFpReferenceImplementation<float, float, float> refImpl;
+    // NEW ARCHITECTURE: Stride size validation!
+    CpuReferenceContainer refImpl;
 
-    EXPECT_THROW(refImpl.convFwdInference(
+    EXPECT_THROW(refImpl.convFwdInference<float>(
                      inputTensor, weightTensor, outputTensor, strides, dilations, padding),
                  std::invalid_argument);
 }
 
-TEST(CpuFpReferenceImplementation, ConvFwdInvalidStrideValue)
+TEST(CpuReferenceContainer, ConvFwdInvalidStrideValue)
 {
     Tensor<float> inputTensor({1, 2, 4, 4});
     Tensor<float> weightTensor({1, 2, 3, 3}); // 4D: [G*K][C][Y][X] = [1][2][3][3]
@@ -533,14 +564,15 @@ TEST(CpuFpReferenceImplementation, ConvFwdInvalidStrideValue)
     std::vector<int64_t> dilations = {1, 1};
     std::vector<int64_t> padding = {0, 0};
 
-    CpuFpReferenceImplementation<float, float, float> refImpl;
+    // NEW ARCHITECTURE: Stride value validation!
+    CpuReferenceContainer refImpl;
 
-    EXPECT_THROW(refImpl.convFwdInference(
+    EXPECT_THROW(refImpl.convFwdInference<float>(
                      inputTensor, weightTensor, outputTensor, strides, dilations, padding),
                  std::invalid_argument);
 }
 
-TEST(CpuFpReferenceImplementation, ConvFwdInvalidDilationValue)
+TEST(CpuReferenceContainer, ConvFwdInvalidDilationValue)
 {
     Tensor<float> inputTensor({1, 2, 4, 4});
     Tensor<float> weightTensor({1, 2, 3, 3}); // 4D: [G*K][C][Y][X] = [1][2][3][3]
@@ -550,14 +582,15 @@ TEST(CpuFpReferenceImplementation, ConvFwdInvalidDilationValue)
     std::vector<int64_t> dilations = {-1, 1}; // Negative dilation is invalid
     std::vector<int64_t> padding = {0, 0};
 
-    CpuFpReferenceImplementation<float, float, float> refImpl;
+    // NEW ARCHITECTURE: Dilation value validation!
+    CpuReferenceContainer refImpl;
 
-    EXPECT_THROW(refImpl.convFwdInference(
+    EXPECT_THROW(refImpl.convFwdInference<float>(
                      inputTensor, weightTensor, outputTensor, strides, dilations, padding),
                  std::invalid_argument);
 }
 
-TEST(CpuFpReferenceImplementation, ConvFwdInvalidPaddingValue)
+TEST(CpuReferenceContainer, ConvFwdInvalidPaddingValue)
 {
     Tensor<float> inputTensor({1, 2, 4, 4});
     Tensor<float> weightTensor({1, 2, 3, 3}); // 4D: [G*K][C][Y][X] = [1][2][3][3]
@@ -567,16 +600,17 @@ TEST(CpuFpReferenceImplementation, ConvFwdInvalidPaddingValue)
     std::vector<int64_t> dilations = {1, 1};
     std::vector<int64_t> padding = {-1, 0}; // Negative padding is invalid
 
-    CpuFpReferenceImplementation<float, float, float> refImpl;
+    // NEW ARCHITECTURE: Padding value validation!
+    CpuReferenceContainer refImpl;
 
-    EXPECT_THROW(refImpl.convFwdInference(
+    EXPECT_THROW(refImpl.convFwdInference<float>(
                      inputTensor, weightTensor, outputTensor, strides, dilations, padding),
                  std::invalid_argument);
 }
 
 // NHWC Layout Tests
 
-TEST(CpuFpReferenceImplementation, ConvFwdFloatUsageNHWC)
+TEST(CpuReferenceContainer, ConvFwdFloatUsageNHWC)
 {
     // Basic 2D convolution with NHWC layout
     Tensor<float> inputTensor({1, 2, 4, 4}, TensorLayout::NHWC);
@@ -587,12 +621,14 @@ TEST(CpuFpReferenceImplementation, ConvFwdFloatUsageNHWC)
     std::vector<int64_t> dilations = {1, 1};
     std::vector<int64_t> padding = {0, 0};
 
-    CpuFpReferenceImplementation<float, float, float> refImpl;
+    // NEW ARCHITECTURE: NHWC layout support!
+    CpuReferenceContainer refImpl;
 
-    refImpl.convFwdInference(inputTensor, weightTensor, outputTensor, strides, dilations, padding);
+    refImpl.convFwdInference<float>(
+        inputTensor, weightTensor, outputTensor, strides, dilations, padding);
 }
 
-TEST(CpuFpReferenceImplementation, ConvFwdNHWCLayoutValidation)
+TEST(CpuReferenceContainer, ConvFwdNHWCLayoutValidation)
 {
     // Test that NCHW and NHWC produce equivalent results
     // Simple 1x1 input, 1x1 kernel for easy validation
@@ -619,12 +655,13 @@ TEST(CpuFpReferenceImplementation, ConvFwdNHWCLayoutValidation)
     std::vector<int64_t> dilations = {1, 1};
     std::vector<int64_t> padding = {0, 0};
 
-    CpuFpReferenceImplementation<double, double, double> refImpl;
+    // NEW ARCHITECTURE: Layout equivalence validation!
+    CpuReferenceContainer refImpl;
 
     // Run convolution on both layouts
-    refImpl.convFwdInference(
+    refImpl.convFwdInference<double>(
         inputTensorNCHW, weightTensor, outputTensorNCHW, strides, dilations, padding);
-    refImpl.convFwdInference(
+    refImpl.convFwdInference<double>(
         inputTensorNHWC, weightTensor, outputTensorNHWC, strides, dilations, padding);
 
     // Results should be identical

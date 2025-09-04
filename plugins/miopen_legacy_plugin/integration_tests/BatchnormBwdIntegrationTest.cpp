@@ -11,8 +11,8 @@
 #include <hipdnn_frontend/Graph.hpp>
 #include <hipdnn_frontend/Utilities.hpp>
 #include <hipdnn_frontend/attributes/TensorAttributes.hpp>
-#include <hipdnn_sdk/test_utilities/CpuFpReferenceImplementation.hpp>
 #include <hipdnn_sdk/test_utilities/CpuFpReferenceValidation.hpp>
+#include <hipdnn_sdk/test_utilities/ReferenceImplementationInterface.hpp>
 #include <hipdnn_sdk/test_utilities/TestUtilities.hpp>
 #include <hipdnn_sdk/utilities/MigratableMemory.hpp>
 #include <hipdnn_sdk/utilities/Tensor.hpp>
@@ -249,15 +249,16 @@ protected:
     template <typename InputType, typename IntermediateType>
     void runCpuBatchnormBwd(Batchnorm2dTensorBundle<InputType, IntermediateType>& cpuTensorBundle)
     {
-        CpuFpReferenceImplementation<InputType, IntermediateType, IntermediateType> cpuRefImpl;
-        cpuRefImpl.batchnormBwd(cpuTensorBundle.dyTensor,
-                                cpuTensorBundle.xTensor,
-                                cpuTensorBundle.meanTensor,
-                                cpuTensorBundle.invVarianceTensor,
-                                cpuTensorBundle.scaleTensor,
-                                cpuTensorBundle.dxTensor,
-                                cpuTensorBundle.dscaleTensor,
-                                cpuTensorBundle.dbiasTensor);
+        CpuReferenceContainer cpuRefImpl;
+        cpuRefImpl.batchnormBwd<InputType, IntermediateType, IntermediateType>(
+            cpuTensorBundle.dyTensor,
+            cpuTensorBundle.xTensor,
+            cpuTensorBundle.meanTensor,
+            cpuTensorBundle.invVarianceTensor,
+            cpuTensorBundle.scaleTensor,
+            cpuTensorBundle.dxTensor,
+            cpuTensorBundle.dscaleTensor,
+            cpuTensorBundle.dbiasTensor);
     }
 
     template <typename InputType, typename IntermediateType>

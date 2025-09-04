@@ -4,6 +4,7 @@
 #pragma once
 
 #include <algorithm>
+#include <hipdnn_sdk/test_utilities/ReferenceImplementationInterface.hpp>
 #include <hipdnn_sdk/utilities/Tensor.hpp>
 #include <numeric>
 #include <vector>

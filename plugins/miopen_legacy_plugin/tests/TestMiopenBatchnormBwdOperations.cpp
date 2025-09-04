@@ -6,9 +6,9 @@
 
 #include <hipdnn_sdk/plugin/EnginePluginApi.h>
 #include <hipdnn_sdk/plugin/PluginApiDataTypes.h>
-#include <hipdnn_sdk/test_utilities/CpuFpReferenceImplementation.hpp>
 #include <hipdnn_sdk/test_utilities/CpuFpReferenceValidation.hpp>
 #include <hipdnn_sdk/test_utilities/FlatbufferGraphTestUtils.hpp>
+#include <hipdnn_sdk/test_utilities/ReferenceImplementationInterface.hpp>
 #include <hipdnn_sdk/test_utilities/TestUtilities.hpp>
 #include <hipdnn_sdk/utilities/HalfUtils.hpp>
 #include <hipdnn_sdk/utilities/HipBfloat16Utils.hpp>
@@ -205,15 +205,15 @@ void BatchnormBwdExecuteGraphTest::runBwdBatchnormGraph(
     invVarianceTensorCpu.fillWithRandomValues(
         static_cast<IntermediateType>(1.9f), static_cast<IntermediateType>(2.0f), seed);
 
-    CpuFpReferenceImplementation<InputType, IntermediateType, IntermediateType> cpuRefImpl;
-    cpuRefImpl.batchnormBwd(dyTensorCpu,
-                            xTensorCpu,
-                            meanTensorCpu,
-                            invVarianceTensorCpu,
-                            scaleTensorCpu,
-                            dxTensorCpu,
-                            dscaleTensorCpu,
-                            dbiasTensorCpu);
+    CpuReferenceContainer cpuRefImpl;
+    cpuRefImpl.batchnormBwd<InputType, IntermediateType, IntermediateType>(dyTensorCpu,
+                                                                           xTensorCpu,
+                                                                           meanTensorCpu,
+                                                                           invVarianceTensorCpu,
+                                                                           scaleTensorCpu,
+                                                                           dxTensorCpu,
+                                                                           dscaleTensorCpu,
+                                                                           dbiasTensorCpu);
 
     CpuFpReferenceValidation<InputType> cpuRefValidationInput(epsilon, epsilon);
     CpuFpReferenceValidation<IntermediateType> cpuRefValidationIntermediate(epsilon, epsilon);

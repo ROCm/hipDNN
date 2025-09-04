@@ -7,8 +7,8 @@
 #include <hipdnn_frontend.hpp>
 #include <hipdnn_frontend/Graph.hpp>
 #include <hipdnn_frontend/attributes/BatchnormInferenceAttributes.hpp>
-#include <hipdnn_sdk/test_utilities/CpuFpReferenceImplementation.hpp>
 #include <hipdnn_sdk/test_utilities/CpuFpReferenceValidation.hpp>
+#include <hipdnn_sdk/test_utilities/ReferenceImplementationInterface.hpp>
 #include <hipdnn_sdk/utilities/Tensor.hpp>
 
 #include <iostream>
@@ -99,8 +99,7 @@ void SampleRunner::operator()(const TensorLayout& layout)
     {
         std::cout << "Running CPU reference validation...\n";
 
-        auto refImpl = hipdnn_sdk::reference_test_utilities::
-            CpuFpReferenceImplementation<InputType, IntermediateType>();
+        auto refImpl = hipdnn_sdk::reference_test_utilities::CpuReferenceContainer();
         Tensor<InputType> yRefTensor(y->get_dim(), layout);
 
         // Convert inverse variance to variance for CPU reference
@@ -116,7 +115,7 @@ void SampleRunner::operator()(const TensorLayout& layout)
 
         auto epsilon = getEpsilon<InputType>();
 
-        refImpl.batchnormFwdInference(
+        refImpl.batchnormFwdInference<InputType, IntermediateType, IntermediateType>(
             xTensor, scaleTensor, biasTensor, meanTensor, varianceTensor, yRefTensor, epsilon);
 
         auto validator = hipdnn_sdk::reference_test_utilities::CpuFpReferenceValidation<InputType>(

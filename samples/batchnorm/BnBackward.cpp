@@ -7,8 +7,8 @@
 #include <hipdnn_frontend.hpp>
 #include <hipdnn_frontend/Graph.hpp>
 #include <hipdnn_frontend/attributes/BatchnormBackwardAttributes.hpp>
-#include <hipdnn_sdk/test_utilities/CpuFpReferenceImplementation.hpp>
 #include <hipdnn_sdk/test_utilities/CpuFpReferenceValidation.hpp>
+#include <hipdnn_sdk/test_utilities/ReferenceImplementationInterface.hpp>
 #include <hipdnn_sdk/utilities/Tensor.hpp>
 
 #include <iostream>
@@ -113,21 +113,20 @@ void SampleRunner::operator()(const TensorLayout& layout)
     {
         std::cout << "Running CPU reference validation...\n";
 
-        auto refImpl = hipdnn_sdk::reference_test_utilities::
-            CpuFpReferenceImplementation<InputType, IntermediateType>();
+        auto refImpl = hipdnn_sdk::reference_test_utilities::CpuReferenceContainer();
 
         Tensor<InputType> dxRefTensor(dx->get_dim(), layout);
         Tensor<IntermediateType> dscaleRefTensor(dscale->get_dim());
         Tensor<IntermediateType> dbiasRefTensor(dbias->get_dim());
 
-        refImpl.batchnormBwd(dyTensor,
-                             xTensor,
-                             savedMeanTensor,
-                             savedInvVarTensor,
-                             scaleTensor,
-                             dxRefTensor,
-                             dscaleRefTensor,
-                             dbiasRefTensor);
+        refImpl.batchnormBwd<InputType, IntermediateType, IntermediateType>(dyTensor,
+                                                                            xTensor,
+                                                                            savedMeanTensor,
+                                                                            savedInvVarTensor,
+                                                                            scaleTensor,
+                                                                            dxRefTensor,
+                                                                            dscaleRefTensor,
+                                                                            dbiasRefTensor);
 
         auto epsilon = getEpsilon<InputType>();
 
