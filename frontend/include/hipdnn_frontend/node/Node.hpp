@@ -94,11 +94,11 @@ protected:
     }
 };
 
-// Any class extending NodeCRTP must have an attributes member with an inputs & outputs map.
+// Any class extending BaseNode must have an attributes member with an inputs & outputs map.
 // The map needs to have TensorAttributes as the value.
-// NodeCRTP uses this to gather tensor uids, and populate unset ones.
+// BaseNode uses this to gather tensor uids, and populate unset ones.
 template <typename DerivedT>
-class NodeCRTP : public INode // NOLINT
+class BaseNode : public INode
 {
 private:
     DerivedT& self()
@@ -173,5 +173,8 @@ public:
 protected:
     using INode::INode;
 };
+
+template <typename DerivedT>
+using NodeCRTP = BaseNode<DerivedT>; // NOLINT
 }
 }

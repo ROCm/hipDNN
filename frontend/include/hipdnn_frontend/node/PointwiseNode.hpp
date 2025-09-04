@@ -11,13 +11,13 @@
 
 namespace hipdnn_frontend::graph
 {
-class PointwiseNode : public NodeCRTP<PointwiseNode> // NOLINT
+class PointwiseNode : public BaseNode<PointwiseNode> // NOLINT
 {
 public:
     PointwiseAttributes attributes;
 
     PointwiseNode(PointwiseAttributes&& batchnormAttrs, const GraphAttributes& graphAttrs)
-        : NodeCRTP(graphAttrs)
+        : BaseNode(graphAttrs)
         , attributes(std::move(batchnormAttrs))
     {
     }
@@ -57,9 +57,9 @@ public:
                     "PointwiseNode missing output for setting properties"};
         }
 
-        HIPDNN_CHECK_ERROR(attributes.fill_from_graph_attributes(graph_attributes));
+        HIPDNN_CHECK_ERROR(attributes.fill_from_context(graph_attributes));
 
-        auto out = attributes.outputs[PointwiseAttributes::output_names::OUT_0];
+        auto out = attributes.get_output_0();
 
         if(out->get_dim().empty())
         {

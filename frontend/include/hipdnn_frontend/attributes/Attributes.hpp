@@ -12,11 +12,11 @@ namespace hipdnn_frontend
 {
 namespace graph
 {
-// Any class extending AttributesCRTP must have an inputs & outputs map.
+// Any class extending Attributes must have an inputs & outputs map.
 // The map needs to have TensorAttributes as the value.
-// AttributesCRTP uses these maps to set the tensor data types.
+// Attributes uses these maps to set the tensor data types.
 template <typename DerivedT>
-class AttributesCRTP // NOLINT
+class Attributes
 {
 private:
     DerivedT& self()
@@ -43,13 +43,13 @@ public:
     }
 
     // NOLINTNEXTLINE(readability-identifier-naming)
-    error_t fill_from_graph_attributes(const GraphAttributes& graphAttributes)
+    error_t fill_from_context(const GraphAttributes& graphAttributes)
     {
         for(auto& [_, tensor] : self().inputs)
         {
             if(tensor)
             {
-                tensor->set_from_graph_attributes(graphAttributes);
+                tensor->fill_from_context(graphAttributes);
             }
         }
 
@@ -57,7 +57,7 @@ public:
         {
             if(tensor)
             {
-                tensor->set_from_graph_attributes(graphAttributes);
+                tensor->fill_from_context(graphAttributes);
             }
         }
 

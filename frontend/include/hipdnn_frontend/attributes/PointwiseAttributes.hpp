@@ -14,7 +14,7 @@ namespace hipdnn_frontend
 {
 namespace graph
 {
-class PointwiseAttributes : public AttributesCRTP<PointwiseAttributes>
+class PointwiseAttributes : public Attributes<PointwiseAttributes>
 {
 public:
     // NOLINTNEXTLINE(readability-identifier-naming)

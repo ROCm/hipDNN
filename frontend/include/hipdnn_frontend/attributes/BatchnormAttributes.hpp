@@ -13,7 +13,7 @@ namespace hipdnn_frontend
 {
 namespace graph
 {
-class BatchnormAttributes : public AttributesCRTP<BatchnormAttributes>
+class BatchnormAttributes : public Attributes<BatchnormAttributes>
 {
 public:
     enum class input_names // NOLINT(readability-identifier-naming)
@@ -257,6 +257,7 @@ public:
             .set_prev_running_variance(std::move(variance))
             .set_momentum(std::move(momentum));
     }
+
     flatbuffers::Offset<hipdnn_sdk::data_objects::BatchnormAttributes>
         pack_attributes(flatbuffers::FlatBufferBuilder& builder) const // NOLINT
     {

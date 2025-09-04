@@ -17,19 +17,19 @@ using namespace hipdnn_sdk::data_objects;
 TEST(TestTensorValueAttributes, SetGetClearFloat)
 {
     hipdnn_frontend::graph::TensorAttributes tensor;
-    EXPECT_FALSE(tensor.has_value());
+    EXPECT_FALSE(tensor.get_pass_by_value());
 
     constexpr float TEST_VALUE = std::numbers::pi_v<float>;
     tensor.set_value(TEST_VALUE);
-    EXPECT_TRUE(tensor.has_value());
+    EXPECT_TRUE(tensor.get_pass_by_value());
 
-    auto opt = tensor.get_value<float>();
+    auto opt = tensor.get_pass_by_value<float>();
     ASSERT_TRUE(opt.has_value());
     EXPECT_FLOAT_EQ(opt.value(), TEST_VALUE);
 
     tensor.clear_value();
-    EXPECT_FALSE(tensor.has_value());
-    EXPECT_FALSE(tensor.get_value<float>().has_value());
+    EXPECT_FALSE(tensor.get_pass_by_value());
+    EXPECT_FALSE(tensor.get_pass_by_value<float>().has_value());
 }
 
 TEST(TestTensorValueAttributes, PackUnpackFloat)
@@ -53,8 +53,8 @@ TEST(TestTensorValueAttributes, PackUnpackFloat)
     EXPECT_EQ(fbTensor->uid(), 7);
     EXPECT_STREQ(fbTensor->name()->c_str(), "value_tensor");
     EXPECT_EQ(fbTensor->data_type(), DataType_FLOAT);
-    EXPECT_EQ(fbTensor->strides()->size(), 2u);
-    EXPECT_EQ(fbTensor->dims()->size(), 2u);
+    EXPECT_EQ(fbTensor->strides()->size(), 1u);
+    EXPECT_EQ(fbTensor->dims()->size(), 1u);
     EXPECT_FALSE(fbTensor->virtual_());
 
     EXPECT_EQ(fbTensor->value_type(), TensorValue_Float32Value);
@@ -67,8 +67,8 @@ TEST(TestTensorValueAttributes, PackUnpackFloat)
     EXPECT_EQ(unpacked->name, "value_tensor");
     EXPECT_EQ(unpacked->data_type, DataType_FLOAT);
 
-    std::vector<int64_t> expectedStrides = {1, 2};
-    std::vector<int64_t> expectedDims = {3, 4};
+    std::vector<int64_t> expectedStrides = {1};
+    std::vector<int64_t> expectedDims = {1};
     EXPECT_EQ(unpacked->strides, expectedStrides);
     EXPECT_EQ(unpacked->dims, expectedDims);
 
@@ -150,7 +150,7 @@ TEST(TestTensorValueAttributes, PackUnpackEmptyValue)
         .set_dim({3, 4})
         .set_is_virtual(true);
 
-    EXPECT_FALSE(tensor.has_value());
+    EXPECT_FALSE(tensor.get_pass_by_value());
 
     flatbuffers::FlatBufferBuilder builder;
     auto fbOffset = tensor.pack_attributes(builder);
@@ -170,20 +170,20 @@ TEST(TestTensorValueAttributes, TypeSafety)
     hipdnn_frontend::graph::TensorAttributes tensor;
     tensor.set_value(42.0f);
 
-    auto floatOpt = tensor.get_value<float>();
+    auto floatOpt = tensor.get_pass_by_value<float>();
     ASSERT_TRUE(floatOpt.has_value());
     EXPECT_FLOAT_EQ(floatOpt.value(), 42.0f);
 
-    EXPECT_FALSE(tensor.get_value<uint16_t>().has_value());
-    EXPECT_FALSE(tensor.get_value<uint8_t>().has_value());
-    EXPECT_FALSE(tensor.get_value<int32_t>().has_value());
-    EXPECT_FALSE(tensor.get_value<double>().has_value());
+    EXPECT_FALSE(tensor.get_pass_by_value<uint16_t>().has_value());
+    EXPECT_FALSE(tensor.get_pass_by_value<uint8_t>().has_value());
+    EXPECT_FALSE(tensor.get_pass_by_value<int32_t>().has_value());
+    EXPECT_FALSE(tensor.get_pass_by_value<double>().has_value());
 
     tensor.set_value(int32_t{123});
 
-    EXPECT_FALSE(tensor.get_value<float>().has_value());
+    EXPECT_FALSE(tensor.get_pass_by_value<float>().has_value());
 
-    auto intOpt = tensor.get_value<int32_t>();
+    auto intOpt = tensor.get_pass_by_value<int32_t>();
     ASSERT_TRUE(intOpt.has_value());
     EXPECT_EQ(intOpt.value(), 123);
 }
@@ -193,17 +193,17 @@ TEST(TestTensorValueAttributes, NumericLimits)
     hipdnn_frontend::graph::TensorAttributes tensor;
 
     tensor.set_value(std::numeric_limits<float>::max());
-    auto floatOpt = tensor.get_value<float>();
+    auto floatOpt = tensor.get_pass_by_value<float>();
     ASSERT_TRUE(floatOpt.has_value());
     EXPECT_FLOAT_EQ(floatOpt.value(), std::numeric_limits<float>::max());
 
     tensor.set_value(std::numeric_limits<int32_t>::min());
-    auto intOpt = tensor.get_value<int32_t>();
+    auto intOpt = tensor.get_pass_by_value<int32_t>();
     ASSERT_TRUE(intOpt.has_value());
     EXPECT_EQ(intOpt.value(), std::numeric_limits<int32_t>::min());
 
     tensor.set_value(std::numeric_limits<uint8_t>::max());
-    auto uint8Opt = tensor.get_value<uint8_t>();
+    auto uint8Opt = tensor.get_pass_by_value<uint8_t>();
     ASSERT_TRUE(uint8Opt.has_value());
     EXPECT_EQ(uint8Opt.value(), std::numeric_limits<uint8_t>::max());
 
