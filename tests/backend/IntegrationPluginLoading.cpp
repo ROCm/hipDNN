@@ -14,8 +14,10 @@
 #include <HipdnnBackendHeuristicType.h>
 #include <hipdnn_sdk/test_utilities/TempDirectory.hpp>
 #include <test_plugins/TestPluginConstants.hpp>
+#include <test_plugins/TestPluginEngineIdMap.hpp>
 
 #include <gtest/gtest.h>
+#include <spdlog/spdlog.h>
 
 class IntegrationPluginLoading : public ::testing::Test
 {
@@ -189,7 +191,15 @@ TEST_F(IntegrationPluginLoading, DuplicateEngineIds)
 
     ASSERT_EQ(hipdnnCreate(&_handle), HIPDNN_STATUS_SUCCESS);
 
-    // TODO: Warning is logged, but we don't have means of querying the last warning
+    constexpr size_t BUFFER_SIZE = 2048;
+    std::array<char, BUFFER_SIZE> buffer;
+    hipdnnGetLastErrorString(buffer.data(), BUFFER_SIZE);
+
+    std::string expectedError
+        = fmt::format("Engine ID {} already exists",
+                      hipdnn_tests::plugin_constants::engineId<DuplicateIdBPlugin>());
+    ;
+    EXPECT_NE(std::string{buffer.data()}.find(expectedError), std::string::npos);
 
     EXPECT_EQ(test_util::getLoadedPlugins(_handle).size(), 1);
 }
@@ -206,8 +216,11 @@ TEST_F(IntegrationPluginLoading, IncompleteAPI)
 
     ASSERT_EQ(hipdnnCreate(&_handle), HIPDNN_STATUS_SUCCESS);
 
-    // TODO: Warning is logged, but we don't have means of querying the last warning
+    constexpr size_t BUFFER_SIZE = 2048;
+    std::array<char, BUFFER_SIZE> buffer;
+    hipdnnGetLastErrorString(buffer.data(), BUFFER_SIZE);
 
+    EXPECT_NE(std::string{buffer.data()}.find("Failed to get symbol"), std::string::npos);
     EXPECT_EQ(test_util::getLoadedPlugins(_handle).size(), 0);
 }
 
