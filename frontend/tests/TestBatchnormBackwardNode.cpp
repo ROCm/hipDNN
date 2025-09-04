@@ -19,7 +19,7 @@ TEST(TestBatchnormBackwardNode, PreValidateNode)
     batchnormAttributes.set_dbias(std::make_shared<TensorAttributes>());
 
     GraphAttributes graphAttributes;
-    DBNNode node(std::move(batchnormAttributes), graphAttributes);
+    BatchnormBackwardNode node(std::move(batchnormAttributes), graphAttributes);
 
     auto error = node.pre_validate_node();
     EXPECT_EQ(error.code, error_code_t::OK);
@@ -30,49 +30,49 @@ TEST(TestBatchnormBackwardNode, PreValidateNodeMissingValues)
     BatchnormBackwardAttributes batchnormAttributes;
 
     GraphAttributes graphAttributes;
-    DBNNode node(std::move(batchnormAttributes), graphAttributes);
+    BatchnormBackwardNode node(std::move(batchnormAttributes), graphAttributes);
 
     auto error = node.pre_validate_node();
     EXPECT_EQ(error.code, error_code_t::ATTRIBUTE_NOT_SET);
 
     batchnormAttributes.set_dy(std::make_shared<TensorAttributes>());
     auto batchnormAttributesCopy = batchnormAttributes;
-    DBNNode nodeWithDy(std::move(batchnormAttributesCopy), graphAttributes);
+    BatchnormBackwardNode nodeWithDy(std::move(batchnormAttributesCopy), graphAttributes);
 
     error = nodeWithDy.pre_validate_node();
     EXPECT_EQ(error.code, error_code_t::ATTRIBUTE_NOT_SET);
 
     batchnormAttributes.set_x(std::make_shared<TensorAttributes>());
     batchnormAttributesCopy = batchnormAttributes;
-    DBNNode nodeWithX(std::move(batchnormAttributesCopy), graphAttributes);
+    BatchnormBackwardNode nodeWithX(std::move(batchnormAttributesCopy), graphAttributes);
 
     error = nodeWithX.pre_validate_node();
     EXPECT_EQ(error.code, error_code_t::ATTRIBUTE_NOT_SET);
 
     batchnormAttributes.set_scale(std::make_shared<TensorAttributes>());
     batchnormAttributesCopy = batchnormAttributes;
-    DBNNode nodeWithScale(std::move(batchnormAttributesCopy), graphAttributes);
+    BatchnormBackwardNode nodeWithScale(std::move(batchnormAttributesCopy), graphAttributes);
 
     error = nodeWithScale.pre_validate_node();
     EXPECT_EQ(error.code, error_code_t::ATTRIBUTE_NOT_SET);
 
     batchnormAttributes.set_dx(std::make_shared<TensorAttributes>());
     batchnormAttributesCopy = batchnormAttributes;
-    DBNNode nodeWithDx(std::move(batchnormAttributesCopy), graphAttributes);
+    BatchnormBackwardNode nodeWithDx(std::move(batchnormAttributesCopy), graphAttributes);
 
     error = nodeWithDx.pre_validate_node();
     EXPECT_EQ(error.code, error_code_t::ATTRIBUTE_NOT_SET);
 
     batchnormAttributes.set_dscale(std::make_shared<TensorAttributes>());
     batchnormAttributesCopy = batchnormAttributes;
-    DBNNode nodeWithDscale(std::move(batchnormAttributesCopy), graphAttributes);
+    BatchnormBackwardNode nodeWithDscale(std::move(batchnormAttributesCopy), graphAttributes);
 
     error = nodeWithDscale.pre_validate_node();
     EXPECT_EQ(error.code, error_code_t::ATTRIBUTE_NOT_SET);
 
     batchnormAttributes.set_dbias(std::make_shared<TensorAttributes>());
     batchnormAttributesCopy = batchnormAttributes;
-    DBNNode nodeWithAllValues(std::move(batchnormAttributesCopy), graphAttributes);
+    BatchnormBackwardNode nodeWithAllValues(std::move(batchnormAttributesCopy), graphAttributes);
 
     error = nodeWithAllValues.pre_validate_node();
     EXPECT_EQ(error.code, error_code_t::OK);
@@ -107,7 +107,7 @@ TEST(TestBatchnormBackwardNode, InferPropertiesNode)
     dbiasTensor->set_uid(4).set_name("DbiasTensor");
 
     GraphAttributes graphAttributes;
-    DBNNode node(std::move(batchnormAttributes), graphAttributes);
+    BatchnormBackwardNode node(std::move(batchnormAttributes), graphAttributes);
 
     auto error = node.infer_properties_node();
     EXPECT_EQ(error.code, error_code_t::OK);
@@ -143,7 +143,7 @@ TEST(TestBatchnormBackwardNode, GatherHipdnnTensorIds)
     batchnormAttributes.set_peer_stats({peerStat1, peerStat2});
 
     GraphAttributes graphAttributes;
-    DBNNode node(std::move(batchnormAttributes), graphAttributes);
+    BatchnormBackwardNode node(std::move(batchnormAttributes), graphAttributes);
 
     std::unordered_set<int64_t> usedIds;
     node.gather_hipdnn_tensor_ids(usedIds);
@@ -170,7 +170,7 @@ TEST(TestBatchnormBackwardNode, PopulateHipdnnTensorIds)
     batchnormAttributes.set_peer_stats({peerStat1, peerStat2});
 
     GraphAttributes graphAttributes;
-    DBNNode node(std::move(batchnormAttributes), graphAttributes);
+    BatchnormBackwardNode node(std::move(batchnormAttributes), graphAttributes);
 
     std::unordered_map<int64_t, std::shared_ptr<TensorAttributes>> tensorLookup;
     std::unordered_set<int64_t> usedIds;
@@ -283,7 +283,7 @@ TEST(TestBatchnormBackwardNode, PackNode)
     batchnormAttributes.set_dbias(dbiasTensor);
 
     GraphAttributes graphAttributes;
-    DBNNode node(std::move(batchnormAttributes), graphAttributes);
+    BatchnormBackwardNode node(std::move(batchnormAttributes), graphAttributes);
 
     // Pack the node
     flatbuffers::FlatBufferBuilder builder;
@@ -366,7 +366,7 @@ TEST(TestBatchnormBackwardNode, PackNodeWithoutMeanAndInvVariance)
     batchnormAttributes.set_dbias(dbiasTensor);
 
     GraphAttributes graphAttributes;
-    DBNNode node(std::move(batchnormAttributes), graphAttributes);
+    BatchnormBackwardNode node(std::move(batchnormAttributes), graphAttributes);
 
     flatbuffers::FlatBufferBuilder builder;
     auto offset = node.pack_node(builder);
