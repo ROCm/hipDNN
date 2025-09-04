@@ -1084,7 +1084,7 @@ TEST_F(TestGraph, CreatingExecutionPlansFailsWithNoGraph)
 {
     Graph graph;
 
-    auto result = graph.create_execution_plans(_handle, {HeurMode_t::FALLBACK});
+    auto result = graph.create_execution_plans({HeurMode_t::FALLBACK});
     EXPECT_FALSE(result.is_good());
     EXPECT_EQ(result.get_message(),
               "Graph has not been built, build the operation graph first. Cannot create "
@@ -1206,20 +1206,7 @@ TEST_F(TestGraph, CanSuccessfullyCreateExecutionPlans)
             return HIPDNN_STATUS_SUCCESS;
         });
 
-    EXPECT_CALL(*_mockBackend,
-                backendSetAttribute(
-                    executionPlanDesc, HIPDNN_ATTR_EXECUTION_PLAN_HANDLE, HIPDNN_TYPE_HANDLE, 1, _))
-        .WillOnce([this](hipdnnBackendDescriptor_t,
-                         hipdnnBackendAttributeName_t,
-                         hipdnnBackendAttributeType_t,
-                         int64_t,
-                         const void* arrayOfElements) {
-            hipdnnHandle_t handle = *static_cast<const hipdnnHandle_t*>(arrayOfElements);
-            EXPECT_EQ(handle, this->_handle);
-            return HIPDNN_STATUS_SUCCESS;
-        });
-
-    auto exec_plan_result = graph.create_execution_plans(_handle, heurModes);
+    auto exec_plan_result = graph.create_execution_plans(heurModes);
     EXPECT_TRUE(exec_plan_result.is_good());
 }
 
@@ -1261,7 +1248,7 @@ TEST_F(TestGraph, CheckSupportSucceedsWhenExecutionPlanCreated)
             return HIPDNN_STATUS_SUCCESS;
         });
 
-    graph.create_execution_plans(_handle, heurModes);
+    graph.create_execution_plans(heurModes);
 
     auto result = graph.check_support();
     EXPECT_TRUE(result.is_good());
@@ -1316,7 +1303,7 @@ TEST_F(TestGraph, EngineConfigAndExecutionPlanAreFinalizedAfterBuildPlans)
             return HIPDNN_STATUS_SUCCESS;
         });
 
-    result = graph.create_execution_plans(_handle, heurModes);
+    result = graph.create_execution_plans(heurModes);
     EXPECT_TRUE(result.is_good());
 
     EXPECT_CALL(*_mockBackend, backendFinalize(engineConfigDesc))
@@ -1379,7 +1366,7 @@ TEST_F(TestGraph, WorkspaceSizeIsRetrievedFromExecutionPlan)
             return HIPDNN_STATUS_SUCCESS;
         });
 
-    graph.create_execution_plans(_handle, heurModes);
+    graph.create_execution_plans(heurModes);
 
     int64_t workspace_size = 123454;
     EXPECT_CALL(*_mockBackend,
@@ -1502,10 +1489,6 @@ TEST_F(TestGraph, ExecutePacksVariantPackAndPassesTheCorrectArguments)
             *desc = execPlanDesc;
             return HIPDNN_STATUS_SUCCESS;
         });
-    EXPECT_CALL(*_mockBackend,
-                backendSetAttribute(
-                    execPlanDesc, HIPDNN_ATTR_EXECUTION_PLAN_HANDLE, HIPDNN_TYPE_HANDLE, 1, _))
-        .WillOnce(Return(HIPDNN_STATUS_SUCCESS));
 
     // build_plans mocks
     EXPECT_CALL(*_mockBackend, backendFinalize(engineCfgDesc))
@@ -1644,7 +1627,7 @@ TEST_F(TestGraph, ExecutePacksVariantPackAndPassesTheCorrectArguments)
     EXPECT_TRUE(buildResult.is_good());
 
     std::vector<HeurMode_t> heurModes = {HeurMode_t::FALLBACK};
-    auto planResult = graph.create_execution_plans(_handle, heurModes);
+    auto planResult = graph.create_execution_plans(heurModes);
     EXPECT_TRUE(planResult.is_good());
 
     auto supportResult = graph.check_support();
