@@ -13,7 +13,7 @@
 namespace hipdnn_frontend::graph
 {
 
-class BatchnormBackwardNode : public BaseNode<BatchnormBackwardNode> //NOLINT
+class BatchnormBackwardNode : public BaseNode<BatchnormBackwardNode>
 {
 public:
     BatchnormBackwardAttributes attributes;

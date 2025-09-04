@@ -12,7 +12,7 @@
 
 namespace hipdnn_frontend::graph
 {
-class BatchnormNode : public BaseNode<BatchnormNode> //NOLINT
+class BatchnormNode : public BaseNode<BatchnormNode>
 {
 public:
     BatchnormAttributes attributes;
