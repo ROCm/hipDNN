@@ -72,7 +72,7 @@ target_link_libraries(your_plugin PRIVATE hipdnn::sdk)
 ```
 
 #### Using AMD Half or BFloat16 Types
-If you use AMD half or bfloat16 types (via the SDK's `half_utils.hpp` or `bfloat16_utils.hpp`), you need:
+If you use AMD half or bfloat16 types (via the SDK's `UtilsFp16.hpp` or `UtilsBfp16.hpp`), you need:
 ```cmake
 find_package(hip REQUIRED)
 enable_language(HIP)

@@ -20,6 +20,7 @@ All samples are templated for mixed-precision execution with Fp32, Fp16, and Bfp
 > [!TIP]
 > 💡 Set `HIPDNN_LOG_LEVEL=info` to observe detailed logs from the samples.
 
+The current samples include:
 
 ### [**`BnInference`**](./batchnorm/BnInference.cpp)
 
@@ -54,4 +55,4 @@ Executes the backward pass of a batch normalization graph to compute gradients o
     ```
     where `nhw = N * H * W`.
     
-    For training, `d_x` would subsequently be passed to the preceding layer, and `d_scale` and `d_bias` can be used by an optimizer to update the learnable parameters `scale` and `bias`.
+- For training, `d_x` would subsequently be passed to the preceding layer, and `d_scale` and `d_bias` can be used by an optimizer to update the learnable parameters `scale` and `bias`.
