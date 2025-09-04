@@ -180,17 +180,18 @@ class TestNameValidator:
             return []
 
         for executable in executables:
-            exe_path = build_dir / executable
-            if not exe_path.exists():
-                print(f"Warning: Executable not found: {exe_path}", file=sys.stderr)
+            exec_path = (build_dir / executable).resolve()
+            if not exec_path.exists() or not exec_path.is_file():
+                print(f"Warning: Executable not found: {exec_path}", file=sys.stderr)
                 continue
 
             try:
                 result = subprocess.run(
-                    [str(exe_path), "--gtest_list_tests"],
+                    [str(exec_path), "--gtest_list_tests"],
                     capture_output=True,
                     text=True,
                     timeout=5,
+                    cwd=str(exec_path.parent),
                 )
 
                 if result.returncode != 0:
@@ -276,10 +277,12 @@ def parse_args() -> argparse.Namespace:
     if not args.run_tests:
         if args.test_executables and not args.build_dir:
             parser.error("--build-dir is required when using --test-executables")
-        
+
         if not args.ctest_json and not args.test_executables:
-            parser.error("At least one of --ctest-json or --test-executables must be provided")
-    
+            parser.error(
+                "At least one of --ctest-json or --test-executables must be provided"
+            )
+
     return args
 
 
@@ -323,7 +326,6 @@ def main() -> int:
 
     if invalid_count == 0:
         return 0
-    
 
     print(f"{'Test Name':<50} {'Status':<10}")
     print(f"{'-' * 60}")

@@ -44,7 +44,7 @@ function(create_test_name_validation_target)
             DEPENDS 
                 ${CMAKE_SOURCE_DIR}/cmake/scripts/test_name_validator.py
                 ${CHECK_DEPENDS_GLOBAL}
-            COMMENT "Validating test names by running executables with --gtest_list_tests"
+            COMMENT "Validating test names with --gtest_list_tests test collection"
             WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
             VERBATIM
         )
