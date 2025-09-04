@@ -106,7 +106,7 @@ void EnginePluginResourceManager::getLoadedPluginFiles(size_t* numPlugins,
         {
             throw HipdnnException(HIPDNN_STATUS_BAD_PARAM, "A plugin path string buffer is null.");
         }
-        hipdnn::sdk::utilities::copyMaxSizeWithNullTerminator(
+        hipdnn_sdk::utilities::copyMaxSizeWithNullTerminator(
             pluginPaths[i], pathsVec[i].string().c_str(), *maxStringLen);
     }
 }

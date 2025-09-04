@@ -13,12 +13,18 @@
 using namespace miopen_legacy_plugin;
 using namespace hipdnn_plugin;
 
-TEST(MiopenHandleFactoryTest, ThrowsOnNullHandle)
+TEST(TestMiopenHandleFactory, ThrowsOnNullHandle)
 {
     EXPECT_THROW(MiopenHandleFactory::createMiopenHandle(nullptr), HipdnnPluginException);
 }
 
-TEST(MiopenHandleFactoryTest, CreatesAndDestroysHandle)
+TEST(TestMiopenHandleFactory, ThrowsOnDestroyNullHandle)
+{
+    hipdnnEnginePluginHandle_t handle = nullptr;
+    EXPECT_THROW(MiopenHandleFactory::destroyMiopenHandle(handle), HipdnnPluginException);
+}
+
+TEST(TestGpuMiopenHandleFactory, CreatesAndDestroysHandle)
 {
     SKIP_IF_NO_DEVICES();
 
@@ -30,10 +36,4 @@ TEST(MiopenHandleFactoryTest, CreatesAndDestroysHandle)
     // Clean up
     miopenDestroy(handle->miopenHandle);
     delete handle;
-}
-
-TEST(MiopenHandleFactoryTest, ThrowsOnDestroyNullHandle)
-{
-    hipdnnEnginePluginHandle_t handle = nullptr;
-    EXPECT_THROW(MiopenHandleFactory::destroyMiopenHandle(handle), HipdnnPluginException);
 }

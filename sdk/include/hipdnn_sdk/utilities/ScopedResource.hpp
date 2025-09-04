@@ -7,7 +7,7 @@
 
 #include <utility>
 
-namespace hipdnn::sdk::utilities
+namespace hipdnn_sdk::utilities
 {
 
 template <typename T, typename Destructor>
@@ -84,4 +84,4 @@ private:
     bool _empty = true;
 };
 
-} // namespace hipdnn::sdk::utilities
+} // namespace hipdnn_sdk::utilities

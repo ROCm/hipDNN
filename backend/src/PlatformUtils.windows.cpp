@@ -7,7 +7,7 @@
 
 #include "HipdnnException.hpp"
 
-namespace hipdnn_backend::platform_utils
+namespace hipdnn_backend::platform_utilities
 {
 
 std::filesystem::path getCurrentModuleDirectory()

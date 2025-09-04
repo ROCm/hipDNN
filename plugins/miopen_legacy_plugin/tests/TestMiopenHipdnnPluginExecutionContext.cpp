@@ -10,7 +10,7 @@
 
 using namespace miopen_legacy_plugin;
 
-TEST(HipdnnEnginePluginExecutionContextTest, SetAndGetPlan)
+TEST(TestMiopenHipdnnEnginePluginExecutionContext, SetAndGetPlan)
 {
     HipdnnEnginePluginExecutionContext ctx;
 
@@ -23,7 +23,7 @@ TEST(HipdnnEnginePluginExecutionContextTest, SetAndGetPlan)
     EXPECT_EQ(&planRef, planPtr);
 }
 
-TEST(HipdnnEnginePluginExecutionContextTest, HasValidPlan)
+TEST(TestMiopenHipdnnEnginePluginExecutionContext, HasValidPlan)
 {
     HipdnnEnginePluginExecutionContext ctx;
 
@@ -35,7 +35,7 @@ TEST(HipdnnEnginePluginExecutionContextTest, HasValidPlan)
     EXPECT_TRUE(ctx.hasValidPlan());
 }
 
-TEST(HipdnnEnginePluginExecutionContextTest, GetPlanThrowsIfNotSet)
+TEST(TestMiopenHipdnnEnginePluginExecutionContext, GetPlanThrowsIfNotSet)
 {
     HipdnnEnginePluginExecutionContext ctx;
 

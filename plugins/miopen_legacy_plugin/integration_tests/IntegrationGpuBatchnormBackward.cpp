@@ -19,7 +19,7 @@
 
 using namespace hipdnn_frontend;
 using namespace hipdnn_sdk::utilities;
-using namespace hipdnn_sdk::reference_test_utilities;
+using namespace hipdnn_sdk::test_utilities;
 
 namespace
 {

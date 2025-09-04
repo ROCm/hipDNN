@@ -425,14 +425,14 @@ public:
                   std::shared_ptr<TensorAttributes> bias,
                   BatchnormAttributes attributes)
     {
-        if(attributes.name.empty())
+        if(attributes.get_name().empty())
         {
-            attributes.name = "Batchnorm_" + std::to_string(_sub_nodes.size());
+            attributes.set_name("Batchnorm_" + std::to_string(_sub_nodes.size()));
         }
 
-        auto y = outputTensor(attributes.name + "::Y");
-        auto meanOut = outputTensor(attributes.name + "::MEAN");
-        auto invVarianceOut = outputTensor(attributes.name + "::INV_VARIANCE");
+        auto y = outputTensor(attributes.get_name() + "::Y");
+        auto meanOut = outputTensor(attributes.get_name() + "::MEAN");
+        auto invVarianceOut = outputTensor(attributes.get_name() + "::INV_VARIANCE");
 
         auto prevRunningMean = attributes.get_prev_running_mean();
         auto prevRunningVariance = attributes.get_prev_running_variance();
@@ -442,8 +442,8 @@ public:
         std::shared_ptr<TensorAttributes> nextRunningVariance;
         if(prevRunningMean && prevRunningVariance && momentum)
         {
-            nextRunningMean = outputTensor(attributes.name + "::NEXT_RUNNING_MEAN");
-            nextRunningVariance = outputTensor(attributes.name + "::NEXT_RUNNING_VARIANCE");
+            nextRunningMean = outputTensor(attributes.get_name() + "::NEXT_RUNNING_MEAN");
+            nextRunningVariance = outputTensor(attributes.get_name() + "::NEXT_RUNNING_VARIANCE");
         }
 
         attributes.set_x(std::move(x));
@@ -467,14 +467,14 @@ public:
                            std::shared_ptr<TensorAttributes> scale,
                            BatchnormBackwardAttributes attributes)
     {
-        if(attributes.name.empty())
+        if(attributes.get_name().empty())
         {
-            attributes.name = "BatchnormBackward_" + std::to_string(_sub_nodes.size());
+            attributes.set_name("BatchnormBackward_" + std::to_string(_sub_nodes.size()));
         }
 
-        auto dx = outputTensor(attributes.name + "::DX");
-        auto dscale = outputTensor(attributes.name + "::DSCALE");
-        auto dbias = outputTensor(attributes.name + "::DBIAS");
+        auto dx = outputTensor(attributes.get_name() + "::DX");
+        auto dscale = outputTensor(attributes.get_name() + "::DSCALE");
+        auto dbias = outputTensor(attributes.get_name() + "::DBIAS");
 
         attributes.set_x(std::move(x));
         attributes.set_dy(std::move(dy));
@@ -497,12 +497,12 @@ public:
                             std::shared_ptr<TensorAttributes> bias,
                             BatchnormInferenceAttributes attributes)
     {
-        if(attributes.name.empty())
+        if(attributes.get_name().empty())
         {
-            attributes.name = "BatchnormInference_" + std::to_string(_sub_nodes.size());
+            attributes.set_name("BatchnormInference_" + std::to_string(_sub_nodes.size()));
         }
 
-        auto y = outputTensor(attributes.name + "::Y");
+        auto y = outputTensor(attributes.get_name() + "::Y");
 
         attributes.set_x(std::move(x));
         attributes.set_mean(std::move(mean));
@@ -521,15 +521,15 @@ public:
                                                 PointwiseAttributes attributes)
 
     {
-        if(attributes.name.empty())
+        if(attributes.get_name().empty())
         {
-            attributes.name = "Pointwise_" + std::to_string(_sub_nodes.size());
+            attributes.set_name("Pointwise_" + std::to_string(_sub_nodes.size()));
         }
         if(in0->get_name().empty())
         {
-            in0->set_name(attributes.name + "::IN_0");
+            in0->set_name(attributes.get_name() + "::IN_0");
         }
-        auto out0 = outputTensor(attributes.name + "::OUT_0");
+        auto out0 = outputTensor(attributes.get_name() + "::OUT_0");
 
         attributes.set_input_0(std::move(in0));
         attributes.set_output_0(out0);
@@ -545,19 +545,19 @@ public:
                                                 PointwiseAttributes attributes)
 
     {
-        if(attributes.name.empty())
+        if(attributes.get_name().empty())
         {
-            attributes.name = "Pointwise_" + std::to_string(_sub_nodes.size());
+            attributes.set_name("Pointwise_" + std::to_string(_sub_nodes.size()));
         }
         if(in0->get_name().empty())
         {
-            in0->set_name(attributes.name + "::IN_0");
+            in0->set_name(attributes.get_name() + "::IN_0");
         }
         if(in1->get_name().empty())
         {
-            in1->set_name(attributes.name + "::IN_1");
+            in1->set_name(attributes.get_name() + "::IN_1");
         }
-        auto out0 = outputTensor(attributes.name + "::OUT_0");
+        auto out0 = outputTensor(attributes.get_name() + "::OUT_0");
 
         attributes.set_input_0(std::move(in0));
         attributes.set_input_1(std::move(in1));
@@ -575,23 +575,23 @@ public:
                                                 PointwiseAttributes attributes)
 
     {
-        if(attributes.name.empty())
+        if(attributes.get_name().empty())
         {
-            attributes.name = "Pointwise_" + std::to_string(_sub_nodes.size());
+            attributes.set_name("Pointwise_" + std::to_string(_sub_nodes.size()));
         }
         if(in0->get_name().empty())
         {
-            in0->set_name(attributes.name + "::IN_0");
+            in0->set_name(attributes.get_name() + "::IN_0");
         }
         if(in1->get_name().empty())
         {
-            in1->set_name(attributes.name + "::IN_1");
+            in1->set_name(attributes.get_name() + "::IN_1");
         }
         if(in2->get_name().empty())
         {
-            in2->set_name(attributes.name + "::IN_2");
+            in2->set_name(attributes.get_name() + "::IN_2");
         }
-        auto out0 = outputTensor(attributes.name + "::OUT_0");
+        auto out0 = outputTensor(attributes.get_name() + "::OUT_0");
 
         attributes.set_input_0(std::move(in0));
         attributes.set_input_1(std::move(in1));
@@ -609,20 +609,20 @@ public:
                                                  std::shared_ptr<TensorAttributes> w,
                                                  ConvFpropAttributes attributes)
     {
-        if(attributes.name.empty())
+        if(attributes.get_name().empty())
         {
-            attributes.name = "ConvolutionFprop_" + std::to_string(_sub_nodes.size());
+            attributes.set_name("ConvolutionFprop_" + std::to_string(_sub_nodes.size()));
         }
         if(x->get_name().empty())
         {
-            x->set_name(attributes.name + "::X");
+            x->set_name(attributes.get_name() + "::X");
         }
         if(w->get_name().empty())
         {
-            w->set_name(attributes.name + "::W");
+            w->set_name(attributes.get_name() + "::W");
         }
 
-        auto y = outputTensor(attributes.name + "::Y");
+        auto y = outputTensor(attributes.get_name() + "::Y");
 
         attributes.set_x(std::move(x));
         attributes.set_w(std::move(w));
