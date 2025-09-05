@@ -166,7 +166,16 @@ public:
         {
             try
             {
-                auto resolvedPath = std::filesystem::weakly_canonical(path);
+                auto resolvedPath = path;
+                if(path.is_relative())
+                {
+                    // If the path is relative, resolve it to our current module directory instead of allowing
+                    // std::filesystem to resolve it relative to the current working directory.
+                    resolvedPath = hipdnn_backend::platform_utilities::getCurrentModuleDirectory()
+                                   / resolvedPath;
+                }
+
+                resolvedPath = std::filesystem::weakly_canonical(resolvedPath);
                 if(std::filesystem::is_directory(resolvedPath))
                 {
                     scanDirectoryForPlugins(resolvedPath, pathsToLoad);

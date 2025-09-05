@@ -21,7 +21,7 @@ class SimpleEnginePluginManager : public plugin::PluginManagerBase<plugin::Engin
 {
 public:
     SimpleEnginePluginManager()
-        : plugin::PluginManagerBase<plugin::EnginePlugin>({"./"})
+        : plugin::PluginManagerBase<plugin::EnginePlugin>({})
     {
     }
 };

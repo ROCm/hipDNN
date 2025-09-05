@@ -17,6 +17,8 @@ namespace
 {
 
 const char* const LIBRARY_PATH = "./hipdnn_test_plugin1";
+const char* const LIBRARY_PATH_LIB_NAME_ONLY = "libhipdnn_test_plugin1.so";
+
 const char* const WRONG_LIBRARY_PATH = "./wrong_path";
 const char* const SYMBOL_NAME = "hipdnnPluginGetName";
 const char* const WRONG_SYMBOL_NAME = "wrong_symbol_name";
@@ -31,6 +33,13 @@ TEST(TestSharedLibrary, LoadLibrary)
 {
     plugin::SharedLibrary library;
     library.load(LIBRARY_PATH);
+    library.unload();
+}
+
+TEST(TestSharedLibrary, LoadLibraryWithLibNameOnly)
+{
+    plugin::SharedLibrary library;
+    library.load(LIBRARY_PATH_LIB_NAME_ONLY);
     library.unload();
 }
 

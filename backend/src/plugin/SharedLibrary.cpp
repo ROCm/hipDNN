@@ -77,6 +77,14 @@ void SharedLibrary::load(const std::filesystem::path& libraryPath)
         modifiedLibraryPath = modifiedLibraryPath.parent_path() / libraryName;
     }
 
+    if(modifiedLibraryPath.is_relative())
+    {
+        // If the path is relative, resolve it to our current module directory instead of allowing
+        // std::filesystem to resolve it relative to the current working directory.
+        modifiedLibraryPath
+            = hipdnn_backend::platform_utilities::getCurrentModuleDirectory() / modifiedLibraryPath;
+    }
+
     _libraryPath = std::filesystem::weakly_canonical(modifiedLibraryPath);
 
     // Needs to be a resolved, weakly canonical path at this point
