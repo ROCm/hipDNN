@@ -53,7 +53,7 @@ ConvFwdPlan::ConvFwdPlan(const HipdnnEnginePluginHandle& handle,
     miopenProblem_t problem;
     THROW_ON_MIOPEN_FAILURE(miopenCreateConvProblem(
         &problem, _params->conv().convDescriptor(), miopenProblemDirectionForward));
-    hipdnn::sdk::utilities::ScopedResource problemRes(
+    hipdnn_sdk::utilities::ScopedResource problemRes(
         problem, [](miopenProblem_t p) { std::ignore = miopenDestroyProblem(p); });
 
     THROW_ON_MIOPEN_FAILURE(miopenSetProblemTensorDescriptor(
