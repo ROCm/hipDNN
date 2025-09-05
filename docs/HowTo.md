@@ -44,10 +44,10 @@ The hipDNN backend is a shared library that provides the core C API for graph ex
 The hipDNN SDK is a header-only C++ library that provides utilities and interfaces for plugin development. For complete SDK functionality and future roadmap, see the [SDK section in the Design Guide](./Design.md#sdk).
 
 #### Key Components
-- Plugin interface definitions: [`sdk/include/hipdnn_sdk/plugin/engine_plugin_api.h`](../sdk/include/hipdnn_sdk/plugin/engine_plugin_api.h)
+- Plugin interface definitions: [`sdk/include/hipdnn_sdk/plugin/EnginePluginApi.h`](../sdk/include/hipdnn_sdk/plugin/EnginePluginApi.h)
 - Schema files: [`sdk/schemas/`](../sdk/schemas/)
 - Test utilities (incl. reference implementations): [`sdk/tests/test_utilities/`](../sdk/tests/test_utilities/)
-- Logging [`sdk/include/hipdnn_sdk/logging/logger.hpp`](../sdk/include/hipdnn_sdk/logging/logger.hpp)
+- Logging [`sdk/include/hipdnn_sdk/logging/Logger.hpp`](../sdk/include/hipdnn_sdk/logging/Logger.hpp)
 
 ### CMake Integration
 
@@ -72,7 +72,7 @@ target_link_libraries(your_plugin PRIVATE hipdnn::sdk)
 ```
 
 #### Using AMD Half or BFloat16 Types
-If you use AMD half or bfloat16 types (via the SDK's `half_utils.hpp` or `bfloat16_utils.hpp`), you need:
+If you use AMD half or bfloat16 types (via the SDK's `UtilsFp16.hpp` or `UtilsBfp16.hpp`), you need:
 ```cmake
 find_package(hip REQUIRED)
 enable_language(HIP)
@@ -155,7 +155,7 @@ Create C++ classes to expose the operation to users:
 1. **Create Node Class**
    - Add header file in [`frontend/include/hipdnn_frontend/node/`](../frontend/include/hipdnn_frontend/node/)
    - Inherit from the base `Node` class
-   - Example: [`frontend/include/hipdnn_frontend/node/batchnorm_node.hpp`](../frontend/include/hipdnn_frontend/node/batchnorm_node.hpp)
+   - Example: [`frontend/include/hipdnn_frontend/node/BatchnormNode.hpp`](../frontend/include/hipdnn_frontend/node/BatchnormNode.hpp)
 
 2. **Create Attribute Classes**
    - Add corresponding attribute classes in [`frontend/include/hipdnn_frontend/attributes/`](../frontend/include/hipdnn_frontend/attributes/)
