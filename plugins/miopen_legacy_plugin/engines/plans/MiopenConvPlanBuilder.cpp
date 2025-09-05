@@ -9,10 +9,10 @@
 #include <hipdnn_sdk/plugin/PluginException.hpp>
 #include <miopen/miopen.h>
 
-#include "engines/plans/MiopenConvFwdPlan.hpp"
 #include "MiopenConvDescriptor.hpp"
 #include "MiopenConvPlanBuilder.hpp"
 #include "MiopenUtils.hpp"
+#include "engines/plans/MiopenConvFwdPlan.hpp"
 
 namespace miopen_legacy_plugin
 {
@@ -57,18 +57,20 @@ bool isApplicableFwd(const HipdnnEnginePluginHandle& handle, const hipdnn_plugin
     const auto& tensorAttrW = miopen_utils::findTensorAttributes(tensorMap, attr->w_tensor_uid());
     const auto& tensorAttrY = miopen_utils::findTensorAttributes(tensorMap, attr->y_tensor_uid());
 
-    if(tensorAttrX.dims()->size() < MIN_SUPPORTED_TENSOR_DIMS || tensorAttrX.dims()->size() > MAX_SUPPORTED_TENSOR_DIMS)
+    if(tensorAttrX.dims()->size() < MIN_SUPPORTED_TENSOR_DIMS
+       || tensorAttrX.dims()->size() > MAX_SUPPORTED_TENSOR_DIMS)
     {
-        HIPDNN_LOG_INFO("Convolution plan builder supports only tensors with " + 
-                        std::to_string(MIN_SUPPORTED_TENSOR_DIMS) + " to " +
-                        std::to_string(MAX_SUPPORTED_TENSOR_DIMS) + " dimensions");
+        HIPDNN_LOG_INFO("Convolution plan builder supports only tensors with "
+                        + std::to_string(MIN_SUPPORTED_TENSOR_DIMS) + " to "
+                        + std::to_string(MAX_SUPPORTED_TENSOR_DIMS) + " dimensions");
         return false;
     }
 
-    if(tensorAttrY.dims()->size() != tensorAttrX.dims()->size() ||
-       tensorAttrW.dims()->size() != tensorAttrX.dims()->size())
+    if(tensorAttrY.dims()->size() != tensorAttrX.dims()->size()
+       || tensorAttrW.dims()->size() != tensorAttrX.dims()->size())
     {
-        HIPDNN_LOG_WARN("Convolution plan builder requires all tensors to have the same number of dimensions");
+        HIPDNN_LOG_WARN(
+            "Convolution plan builder requires all tensors to have the same number of dimensions");
         return false;
     }
 
@@ -82,17 +84,18 @@ bool isApplicableFwd(const HipdnnEnginePluginHandle& handle, const hipdnn_plugin
     const auto spatialDimCount = miopen_utils::getSpatialDimCount(tensorAttrX);
 
     auto checkVectorSize = [&](const auto* vec, const char* name) {
-        if (vec != nullptr && vec->size() != spatialDimCount) {
-            HIPDNN_LOG_WARN("Convolution plan builder: " + std::string(name) + " size does not match spatial dimension count");
+        if(vec != nullptr && vec->size() != spatialDimCount)
+        {
+            HIPDNN_LOG_WARN("Convolution plan builder: " + std::string(name)
+                            + " size does not match spatial dimension count");
             return false;
         }
         return true;
     };
 
-    if (!checkVectorSize(prePadding, "prePadding") ||
-        !checkVectorSize(postPadding, "postPadding") ||
-        !checkVectorSize(stride, "stride") ||
-        !checkVectorSize(dilation, "dilation")) {
+    if(!checkVectorSize(prePadding, "prePadding") || !checkVectorSize(postPadding, "postPadding")
+       || !checkVectorSize(stride, "stride") || !checkVectorSize(dilation, "dilation"))
+    {
         return false;
     }
 
@@ -100,14 +103,15 @@ bool isApplicableFwd(const HipdnnEnginePluginHandle& handle, const hipdnn_plugin
 
     if((prePadding == nullptr) != (postPadding == nullptr))
     {
-        HIPDNN_LOG_INFO("Convolution plan builder requires both prePadding and postPadding to be set or both to be null");
+        HIPDNN_LOG_INFO("Convolution plan builder requires both prePadding and postPadding to be "
+                        "set or both to be null");
         return false;
     }
 
     if(prePadding != nullptr && postPadding != nullptr)
     {
         // flatbuffers::Vector does not have comparison operators
-        if (!std::equal(prePadding->cbegin(), prePadding->cend(), postPadding->cbegin())) 
+        if(!std::equal(prePadding->cbegin(), prePadding->cend(), postPadding->cbegin()))
         {
             HIPDNN_LOG_INFO("Convolution plan builder supports only symmetric padding");
             return false;
@@ -117,35 +121,43 @@ bool isApplicableFwd(const HipdnnEnginePluginHandle& handle, const hipdnn_plugin
     // integer overflow + correctness checks
 
     auto checkVectorMinValue = [](const auto* vec, const char* name, int64_t minValue) {
-        if (vec != nullptr) {
-            if (std::any_of(vec->cbegin(), vec->cend(), [&](auto v) { return v < minValue; })) {
-                HIPDNN_LOG_WARN("Convolution plan builder: " + std::string(name) + " has value less than " + std::to_string(minValue));
+        if(vec != nullptr)
+        {
+            if(std::any_of(vec->cbegin(), vec->cend(), [&](auto v) { return v < minValue; }))
+            {
+                HIPDNN_LOG_WARN("Convolution plan builder: " + std::string(name)
+                                + " has value less than " + std::to_string(minValue));
                 return false;
             }
         }
         return true;
     };
 
-    if(!checkVectorMinValue(prePadding, "prePadding", 0) ||
-       !checkVectorMinValue(stride, "stride", 1) ||
-       !checkVectorMinValue(dilation, "dilation", 1))
+    if(!checkVectorMinValue(prePadding, "prePadding", 0)
+       || !checkVectorMinValue(stride, "stride", 1)
+       || !checkVectorMinValue(dilation, "dilation", 1))
     {
         return false;
     }
 
     auto checkVectorIntegerOverflow = [](const auto* vec, const char* name) {
-        if (vec != nullptr) {
-            if (std::any_of(vec->cbegin(), vec->cend(), [](auto v) { return v > static_cast<int64_t>(std::numeric_limits<int>::max()); })) {
-                HIPDNN_LOG_INFO("Convolution plan builder: " + std::string(name) + " has value greater than INT_MAX");
+        if(vec != nullptr)
+        {
+            if(std::any_of(vec->cbegin(), vec->cend(), [](auto v) {
+                   return v > static_cast<int64_t>(std::numeric_limits<int>::max());
+               }))
+            {
+                HIPDNN_LOG_INFO("Convolution plan builder: " + std::string(name)
+                                + " has value greater than INT_MAX");
                 return false;
             }
         }
         return true;
     };
 
-    if(!checkVectorIntegerOverflow(prePadding, "prePadding") ||
-       !checkVectorIntegerOverflow(stride, "stride") ||
-       !checkVectorIntegerOverflow(dilation, "dilation"))
+    if(!checkVectorIntegerOverflow(prePadding, "prePadding")
+       || !checkVectorIntegerOverflow(stride, "stride")
+       || !checkVectorIntegerOverflow(dilation, "dilation"))
     {
         return false;
     }
@@ -169,7 +181,8 @@ bool isApplicableFwd(const HipdnnEnginePluginHandle& handle, const hipdnn_plugin
     return solutionCount != 0;
 }
 
-size_t getWorkspaceSizeFwd(const HipdnnEnginePluginHandle& handle, const hipdnn_plugin::IGraph& opGraph)
+size_t getWorkspaceSizeFwd(const HipdnnEnginePluginHandle& handle,
+                           const hipdnn_plugin::IGraph& opGraph)
 {
     const auto& node = opGraph.getNode(0);
 
@@ -191,13 +204,12 @@ size_t getWorkspaceSizeFwd(const HipdnnEnginePluginHandle& handle, const hipdnn_
                                                                      params.y().tensorDescriptor(),
                                                                      &workSpaceSize));
 
-    return workSpaceSize; 
+    return workSpaceSize;
 }
 
-void buildPlanFwd(
-    const HipdnnEnginePluginHandle& handle,
-    const hipdnn_plugin::IGraph& opGraph,
-    HipdnnEnginePluginExecutionContext& executionContext)
+void buildPlanFwd(const HipdnnEnginePluginHandle& handle,
+                  const hipdnn_plugin::IGraph& opGraph,
+                  HipdnnEnginePluginExecutionContext& executionContext)
 {
     const auto& node = opGraph.getNode(0);
 
@@ -217,13 +229,14 @@ void buildPlanFwd(
 
 } // namespace
 
-bool MiopenConvPlanBuilder::isApplicable(const HipdnnEnginePluginHandle& handle, const hipdnn_plugin::IGraph& opGraph) const
+bool MiopenConvPlanBuilder::isApplicable(const HipdnnEnginePluginHandle& handle,
+                                         const hipdnn_plugin::IGraph& opGraph) const
 {
     if(opGraph.nodeCount() != 1)
     {
-        HIPDNN_LOG_INFO(
-            "Convolution plan builder is applicable only for single node graphs. Graph has {} nodes",
-            opGraph.nodeCount());
+        HIPDNN_LOG_INFO("Convolution plan builder is applicable only for single node graphs. Graph "
+                        "has {} nodes",
+                        opGraph.nodeCount());
         return false;
     }
 
@@ -247,7 +260,7 @@ bool MiopenConvPlanBuilder::isApplicable(const HipdnnEnginePluginHandle& handle,
 }
 
 size_t MiopenConvPlanBuilder::getWorkspaceSize(const HipdnnEnginePluginHandle& handle,
-                                                    const hipdnn_plugin::IGraph& opGraph) const
+                                               const hipdnn_plugin::IGraph& opGraph) const
 {
     const auto& node = opGraph.getNode(0);
 
@@ -263,10 +276,9 @@ size_t MiopenConvPlanBuilder::getWorkspaceSize(const HipdnnEnginePluginHandle& h
     }
 }
 
-void MiopenConvPlanBuilder::buildPlan(
-    const HipdnnEnginePluginHandle& handle,
-    const hipdnn_plugin::IGraph& opGraph,
-    HipdnnEnginePluginExecutionContext& executionContext) const
+void MiopenConvPlanBuilder::buildPlan(const HipdnnEnginePluginHandle& handle,
+                                      const hipdnn_plugin::IGraph& opGraph,
+                                      HipdnnEnginePluginExecutionContext& executionContext) const
 {
     const auto& node = opGraph.getNode(0);
 

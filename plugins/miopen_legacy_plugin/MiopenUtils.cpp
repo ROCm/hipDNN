@@ -44,7 +44,9 @@ miopenDataType_t tensorDataTypeToMiopenDataType(const hipdnn_sdk::data_objects::
     }
 }
 
-const hipdnn_sdk::data_objects::TensorAttributes& findTensorAttributes(const std::unordered_map<int64_t, const hipdnn_sdk::data_objects::TensorAttributes*>& tensorMap, int64_t uid)
+const hipdnn_sdk::data_objects::TensorAttributes& findTensorAttributes(
+    const std::unordered_map<int64_t, const hipdnn_sdk::data_objects::TensorAttributes*>& tensorMap,
+    int64_t uid)
 {
     if(auto tensorAttr = tensorMap.find(uid); tensorAttr != tensorMap.end())
     {

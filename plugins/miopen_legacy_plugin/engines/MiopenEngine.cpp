@@ -19,7 +19,8 @@ int64_t MiopenEngine::id() const
     return _id;
 }
 
-bool MiopenEngine::isApplicable(HipdnnEnginePluginHandle& handle, const hipdnn_plugin::IGraph& opGraph) const
+bool MiopenEngine::isApplicable(HipdnnEnginePluginHandle& handle,
+                                const hipdnn_plugin::IGraph& opGraph) const
 {
     // This is wrong if we ever have more than 1 plan builder thats applicable.
     // If this is the case, we should split plan builders accross multiple engines.

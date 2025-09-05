@@ -19,7 +19,8 @@ void EngineManager::addEngine(std::unique_ptr<IEngine> engine)
     _engines.emplace(engine->id(), std::move(engine));
 }
 
-std::vector<int64_t> EngineManager::getApplicableEngineIds(HipdnnEnginePluginHandle& handle, const hipdnn_plugin::IGraph& opGraph)
+std::vector<int64_t> EngineManager::getApplicableEngineIds(HipdnnEnginePluginHandle& handle,
+                                                           const hipdnn_plugin::IGraph& opGraph)
 {
     std::vector<int64_t> applicable;
     for(const auto& engine : _engines)

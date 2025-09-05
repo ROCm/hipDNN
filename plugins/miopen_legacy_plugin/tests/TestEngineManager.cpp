@@ -26,11 +26,13 @@ TEST(EngineManagerTest, ReturnsApplicableEngineIds)
 
     auto mockEngine1 = std::make_unique<MockEngine>();
     EXPECT_CALL(*mockEngine1, id()).WillRepeatedly(Return(1));
-    EXPECT_CALL(*mockEngine1, isApplicable(::testing::_, ::testing::_)).WillRepeatedly(Return(true));
+    EXPECT_CALL(*mockEngine1, isApplicable(::testing::_, ::testing::_))
+        .WillRepeatedly(Return(true));
 
     auto mockEngine2 = std::make_unique<MockEngine>();
     EXPECT_CALL(*mockEngine2, id()).WillRepeatedly(Return(2));
-    EXPECT_CALL(*mockEngine2, isApplicable(::testing::_, ::testing::_)).WillRepeatedly(Return(false));
+    EXPECT_CALL(*mockEngine2, isApplicable(::testing::_, ::testing::_))
+        .WillRepeatedly(Return(false));
 
     EngineManager manager;
     manager.addEngine(std::move(mockEngine1));
@@ -50,11 +52,13 @@ TEST(EngineManagerTest, ReturnsMultipleApplicableEngineIds)
 
     auto mockEngine1 = std::make_unique<MockEngine>();
     EXPECT_CALL(*mockEngine1, id()).WillRepeatedly(Return(1));
-    EXPECT_CALL(*mockEngine1, isApplicable(::testing::_, ::testing::_)).WillRepeatedly(Return(true));
+    EXPECT_CALL(*mockEngine1, isApplicable(::testing::_, ::testing::_))
+        .WillRepeatedly(Return(true));
 
     auto mockEngine2 = std::make_unique<MockEngine>();
     EXPECT_CALL(*mockEngine2, id()).WillRepeatedly(Return(2));
-    EXPECT_CALL(*mockEngine2, isApplicable(::testing::_, ::testing::_)).WillRepeatedly(Return(true));
+    EXPECT_CALL(*mockEngine2, isApplicable(::testing::_, ::testing::_))
+        .WillRepeatedly(Return(true));
 
     EngineManager manager;
     manager.addEngine(std::move(mockEngine1));
@@ -75,11 +79,13 @@ TEST(EngineManagerTest, ReturnsNoApplicableEngineIds)
 
     auto mockEngine1 = std::make_unique<MockEngine>();
     EXPECT_CALL(*mockEngine1, id()).WillRepeatedly(Return(1));
-    EXPECT_CALL(*mockEngine1, isApplicable(::testing::_, ::testing::_)).WillRepeatedly(Return(false));
+    EXPECT_CALL(*mockEngine1, isApplicable(::testing::_, ::testing::_))
+        .WillRepeatedly(Return(false));
 
     auto mockEngine2 = std::make_unique<MockEngine>();
     EXPECT_CALL(*mockEngine2, id()).WillRepeatedly(Return(2));
-    EXPECT_CALL(*mockEngine2, isApplicable(::testing::_, ::testing::_)).WillRepeatedly(Return(false));
+    EXPECT_CALL(*mockEngine2, isApplicable(::testing::_, ::testing::_))
+        .WillRepeatedly(Return(false));
 
     EngineManager manager;
     manager.addEngine(std::move(mockEngine1));

@@ -19,7 +19,8 @@ public:
     MiopenConvPlanBuilder(const MiopenConvPlanBuilder&) = delete;
     MiopenConvPlanBuilder& operator=(const MiopenConvPlanBuilder&) = delete;
 
-    bool isApplicable(const HipdnnEnginePluginHandle& handle, const hipdnn_plugin::IGraph& opGraph) const override;
+    bool isApplicable(const HipdnnEnginePluginHandle& handle,
+                      const hipdnn_plugin::IGraph& opGraph) const override;
     size_t getWorkspaceSize(const HipdnnEnginePluginHandle& handle,
                             const hipdnn_plugin::IGraph& opGraph) const override;
 
