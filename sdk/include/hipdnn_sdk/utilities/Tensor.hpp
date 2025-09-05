@@ -34,11 +34,17 @@ inline std::ostream& operator<<(std::ostream& os, const TensorLayout& layout)
 
 // NOLINTBEGIN(portability-template-virtual-member-function)
 
+// Helper to check if all types in a parameter pack satisfy a predicate
+template <template <typename> class Predicate, typename... Ts>
+struct AllOfTypes : std::conjunction<Predicate<Ts>...>
+{
+};
+
 template <typename T>
-class ITensor
+class TensorBase
 {
 public:
-    virtual ~ITensor() = default;
+    virtual ~TensorBase() = default;
 
     virtual const std::vector<int64_t>& dims() const = 0;
     virtual const std::vector<int64_t>& strides() const = 0;
@@ -46,9 +52,41 @@ public:
     virtual IMigratableMemory<T>& memory() = 0;
     virtual const IMigratableMemory<T>& memory() const = 0;
 
-    virtual T getHostValue(int64_t nidx, int64_t cidx, int64_t hidx, int64_t widx) const = 0;
-    virtual void setHostValue(int64_t nidx, int64_t cidx, int64_t hidx, int64_t widx, T value) = 0;
-    virtual int64_t getIndex(int64_t nidx, int64_t cidx, int64_t hidx, int64_t widx) const = 0;
+    template <typename... Args>
+    int64_t getIndex(Args... indices) const
+    {
+        static_assert(AllOfTypes<std::is_integral, Args...>::value,
+                      "Indices must be an integral type!");
+
+        std::vector<int64_t> indexVector = {static_cast<int64_t>(indices)...};
+
+        if(indexVector.size() > strides().size())
+        {
+            throw std::invalid_argument("Number of indices (" + std::to_string(indexVector.size())
+                                        + ") must not be greater than the number of dimensions ("
+                                        + std::to_string(strides().size()) + ")");
+        }
+
+        return std::inner_product(
+            indexVector.begin(), indexVector.end(), strides().begin(), int64_t{0});
+    }
+
+    template <typename... Args>
+    T getHostValue(Args... indices) const
+    {
+        int64_t index = getIndex(indices...);
+        const auto* data = memory().hostData();
+        return data[index];
+    }
+
+    template <typename... Args>
+    void setHostValue(T value, Args... indices)
+    {
+        int64_t index = getIndex(indices...);
+        auto* data = memory().hostData();
+        data[index] = value;
+    }
+
     virtual void fillWithValue(T value) = 0;
     virtual void fillWithRandomValues(T min, T max, unsigned int seed = std::random_device{}()) = 0;
 };
@@ -56,7 +94,7 @@ public:
 // NOLINTEND(portability-template-virtual-member-function)
 
 template <class T, class HostAlloc = HostAllocator<T>, class DeviceAlloc = DeviceAllocator<T>>
-class Tensor : public ITensor<T>
+class Tensor : public TensorBase<T>
 {
 public:
     Tensor(const std::vector<int64_t>& dims, const std::vector<int64_t>& strides)
@@ -99,26 +137,6 @@ public:
     IMigratableMemory<T>& memory() override
     {
         return _memory;
-    }
-
-    T getHostValue(int64_t nidx, int64_t cidx, int64_t hidx, int64_t widx) const override
-    {
-        int64_t index = getIndex(nidx, cidx, hidx, widx);
-        const auto* data = _memory.hostData();
-        return data[index];
-    }
-
-    void setHostValue(int64_t nidx, int64_t cidx, int64_t hidx, int64_t widx, T value) override
-    {
-        int64_t index = getIndex(nidx, cidx, hidx, widx);
-        auto* data = _memory.hostData();
-        data[index] = value;
-    }
-
-    int64_t getIndex(int64_t nidx, int64_t cidx, int64_t hidx, int64_t widx) const override
-    {
-        return (nidx * _strides[0]) + (cidx * _strides[1]) + (hidx * _strides[2])
-               + (widx * _strides[3]);
     }
 
     void fillWithValue(T value) override

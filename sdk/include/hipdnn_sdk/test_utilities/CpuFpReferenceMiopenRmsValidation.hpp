@@ -3,18 +3,14 @@
 
 #pragma once
 
-#if defined(__HIP_PLATFORM_AMD__)
-// Need these for the half and bfloat16 types
-#include <hipdnn_sdk/utilities/HalfUtils.hpp>
-#include <hipdnn_sdk/utilities/HipBfloat16Utils.hpp>
-#endif
-
 #include <hipdnn_sdk/logging/Logger.hpp>
 #include <hipdnn_sdk/test_utilities/ReferenceValidationInterface.hpp>
+#include <hipdnn_sdk/utilities/HalfUtils.hpp>
+#include <hipdnn_sdk/utilities/HipBfloat16Utils.hpp>
 
 namespace hipdnn_sdk
 {
-namespace reference_test_utilities
+namespace test_utilities
 {
 
 using namespace hipdnn_sdk::utilities;
@@ -31,7 +27,7 @@ public:
     CpuFpReferenceMiopenRmsValidation(T relativeTolerance = std::numeric_limits<T>::epsilon())
         : _relativeTolerance(static_cast<double>(relativeTolerance))
     {
-        if(relativeTolerance < T{0})
+        if(relativeTolerance < T{0.0})
         {
             throw std::invalid_argument("Tolerances must be non-negative");
         }
@@ -90,5 +86,5 @@ private:
     double _relativeTolerance;
 };
 
-} // namespace reference_test_utilities
+} // namespace test_utilities
 } // namespace hipdnn_sdk

@@ -97,7 +97,7 @@ auto [y, mean, inv_var, _, _] = graph.batchnorm(x, scale, bias, bn_attributes);
 
 // Build and execute
 graph.build_operation_graph(handle);
-graph.create_execution_plans(handle);
+graph.create_execution_plans();
 graph.build_plans();
 graph.execute(handle, variant_pack, workspace);
 ```

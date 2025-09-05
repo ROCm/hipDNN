@@ -28,7 +28,6 @@ target_link_libraries(public_hipdnn_backend_tests
     hipdnn_sdk
     hipdnn_backend
     hip::host
-    hip::device
 )
 
 target_include_directories(public_hipdnn_backend_tests

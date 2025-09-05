@@ -10,14 +10,14 @@
 
 namespace hipdnn_frontend::graph
 {
-class BatchnormInferenceNode : public NodeCRTP<BatchnormInferenceNode> //NOLINT
+class BatchnormInferenceNode : public BaseNode<BatchnormInferenceNode>
 {
 public:
     BatchnormInferenceAttributes attributes;
 
     BatchnormInferenceNode(BatchnormInferenceAttributes&& batchnormAttrs,
                            const GraphAttributes& graphAttrs)
-        : NodeCRTP(graphAttrs)
+        : BaseNode(graphAttrs)
         , attributes(std::move(batchnormAttrs))
     {
     }
@@ -65,7 +65,7 @@ public:
                     "BatchnormInferenceNode missing y for setting properties"};
         }
 
-        HIPDNN_CHECK_ERROR(attributes.fill_from_graph_attributes(graph_attributes));
+        HIPDNN_CHECK_ERROR(attributes.fill_from_context(graph_attributes));
 
         if(y->get_dim().empty())
         {
@@ -85,7 +85,7 @@ public:
     {
         return hipdnn_sdk::data_objects::CreateNodeDirect(
             builder,
-            attributes.name.c_str(),
+            attributes.get_name().c_str(),
             hipdnn_sdk::data_objects::NodeAttributes::NodeAttributes_BatchnormInferenceAttributes,
             attributes.pack_attributes(builder).Union());
     }

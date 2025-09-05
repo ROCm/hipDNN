@@ -12,7 +12,7 @@
 #define NOMINMAX
 #include <windows.h>
 
-namespace hipdnn_backend::platform_utils
+namespace hipdnn_backend::platform_utilities
 {
 
 typedef HMODULE PluginLibHandle;
@@ -21,7 +21,7 @@ typedef HMODULE PluginLibHandle;
 
 #elif defined(__linux__)
 
-namespace hipdnn_backend::platform_utils
+namespace hipdnn_backend::platform_utilities
 {
 
 typedef void* PluginLibHandle;
@@ -34,7 +34,7 @@ typedef void* PluginLibHandle;
 
 #endif
 
-namespace hipdnn_backend::platform_utils
+namespace hipdnn_backend::platform_utilities
 {
 
 std::filesystem::path getCurrentModuleDirectory();

@@ -24,6 +24,7 @@ add_executable(hipdnn_frontend_tests
     TestConvolutionNode.cpp
     TestError.cpp
     TestGraph.cpp
+    TestGraphAttributes.cpp
     TestGraphGenerated.cpp
     TestPointwiseAttributes.cpp
     TestPointwiseNode.cpp
@@ -43,13 +44,10 @@ target_link_libraries(hipdnn_frontend_tests
     GTest::gtest 
     GTest::gmock
     hip::host
-    hip::device
     Threads::Threads 
     hipdnn_sdk 
     hipdnn_frontend
 )
 clang_tidy_check(hipdnn_frontend_tests)
-
-add_dependencies(hipdnn_frontend_tests generate_hipdnn_sdk_headers)
 
 add_unit_test_target(hipdnn_frontend_tests ${CMAKE_CURRENT_BINARY_DIR})

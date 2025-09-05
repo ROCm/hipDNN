@@ -14,7 +14,7 @@ namespace hipdnn_frontend
 {
 namespace graph
 {
-class ConvFpropAttributes : public AttributesCRTP<ConvFpropAttributes>
+class ConvFpropAttributes : public Attributes<ConvFpropAttributes>
 {
 public:
     enum class input_names // NOLINT(readability-identifier-naming)
@@ -36,7 +36,7 @@ public:
     std::vector<int64_t> post_padding;
     std::vector<int64_t> stride;
     std::vector<int64_t> dilation;
-    ConvolutionMode_t conv_mode = ConvolutionMode_t::CROSS_CORRELATION;
+    ConvolutionMode_t math_mode = ConvolutionMode_t::CROSS_CORRELATION;
 
     // Getters for tensors
     // NOLINTNEXTLINE(readability-identifier-naming)
@@ -153,7 +153,7 @@ public:
     // NOLINTNEXTLINE(readability-identifier-naming)
     ConvFpropAttributes& set_convolution_mode(ConvolutionMode_t mode)
     {
-        conv_mode = mode;
+        math_mode = mode;
         return *this;
     }
 
@@ -181,7 +181,7 @@ public:
     // NOLINTNEXTLINE(readability-identifier-naming)
     ConvolutionMode_t get_convolution_mode() const
     {
-        return conv_mode;
+        return math_mode;
     }
 
     flatbuffers::Offset<hipdnn_sdk::data_objects::ConvolutionFwdAttributes>
@@ -195,7 +195,7 @@ public:
                                                                               &post_padding,
                                                                               &stride,
                                                                               &dilation,
-                                                                              toSdkType(conv_mode));
+                                                                              toSdkType(math_mode));
     }
 
 private:

@@ -10,7 +10,7 @@
 
 namespace hipdnn_sdk
 {
-namespace reference_test_utilities
+namespace test_utilities
 {
 
 using namespace hipdnn_sdk::utilities;
@@ -25,7 +25,7 @@ public:
         = 0;
 };
 
-} // namespace reference_test_utilities
+} // namespace test_utilities
 } // namespace hipdnn_sdk
 
 // NOLINTEND(portability-template-virtual-member-function)

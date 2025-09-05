@@ -251,7 +251,7 @@ void createAndInitializeBackendDescriptor(hipdnnBackendDescriptor_t* backendDesc
 
 flatbuffers::FlatBufferBuilder createAndPopulateBatchnormNode()
 {
-    return flatbuffer_test_utils::createValidBatchnormGraph();
+    return hipdnn_backend::test_utilities::createValidBatchnormGraph();
 }
 
 void extractTensorInfoFromGraph(const flatbuffers::DetachedBuffer& serializedGraph,

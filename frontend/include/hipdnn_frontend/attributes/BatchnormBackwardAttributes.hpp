@@ -12,7 +12,7 @@ namespace hipdnn_frontend
 {
 namespace graph
 {
-class BatchnormBackwardAttributes : public AttributesCRTP<BatchnormBackwardAttributes>
+class BatchnormBackwardAttributes : public Attributes<BatchnormBackwardAttributes>
 {
 public:
     enum class input_names // NOLINT(readability-identifier-naming)

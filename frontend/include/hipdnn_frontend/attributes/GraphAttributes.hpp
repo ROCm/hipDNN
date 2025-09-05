@@ -59,6 +59,20 @@ public:
         return *this;
     }
 
+    // NOLINTNEXTLINE(readability-identifier-naming)
+    GraphAttributes& fill_missing_properties(const GraphAttributes& other)
+    {
+        if(_computeType == DataType_t::NOT_SET)
+            _computeType = other._computeType;
+        if(_intermediateType == DataType_t::NOT_SET)
+            _intermediateType = other._intermediateType;
+        if(_ioType == DataType_t::NOT_SET)
+            _ioType = other._ioType;
+        if(_name.empty())
+            _name = other._name;
+        return *this;
+    }
+
 private:
     std::string _name;
     DataType_t _computeType = DataType_t::NOT_SET;

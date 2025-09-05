@@ -279,6 +279,6 @@ After installation, verify hipDNN is correctly installed:
    
    Compile with:
    ```bash
-   hipcc test_hipdnn.cpp -lhipdnn -o test_hipdnn
-   ./test_hipdnn
+   hipcc TestHipdnn.cpp -lhipdnn -o TestHipdnn
+   ./TestHipdnn
    ```

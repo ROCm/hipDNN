@@ -4,7 +4,7 @@
 #include <gtest/gtest.h>
 #include <hipdnn_frontend/Graph.hpp>
 #include <hipdnn_frontend/attributes/BatchnormInferenceAttributes.hpp>
-#include <hipdnn_frontend/attributes/ConvolutionFwdAttributes.hpp>
+#include <hipdnn_frontend/attributes/ConvolutionFpropAttributes.hpp>
 #include <hipdnn_frontend/attributes/PointwiseAttributes.hpp>
 #include <hipdnn_sdk/data_objects/graph_generated.h>
 
@@ -75,7 +75,7 @@ protected:
         bias->set_uid(5).set_name("Bias").set_data_type(DataType_t::FLOAT);
 
         BatchnormInferenceAttributes batchnormAttributes;
-        batchnormAttributes.name = "BatchnormNode";
+        batchnormAttributes.set_name("BatchnormNode");
 
         return graph.batchnorm_inference(x, mean, invVariance, scale, bias, batchnormAttributes);
     }
@@ -110,7 +110,7 @@ TEST_F(TestGraph, BatchnormNodeCreation)
     auto bias = std::make_shared<TensorAttributes>();
 
     BatchnormAttributes attributes;
-    attributes.name = "BatchnormNode";
+    attributes.set_name("BatchnormNode");
     attributes.set_epsilon(std::make_shared<TensorAttributes>());
 
     auto [y, mean, invVariance, nextRunningMean, nextRunningVariance]
@@ -144,7 +144,7 @@ TEST_F(TestGraph, BatchnormBackwardNodeCreation)
     x->set_dim({1, 2, 3, 4}).set_stride({5, 6, 7, 8}).set_data_type(DataType_t::FLOAT);
 
     BatchnormBackwardAttributes attributes;
-    attributes.name = "BatchnormBackwardNode";
+    attributes.set_name("BatchnormBackwardNode");
 
     auto [dx, dscale, dbias] = graph.batchnorm_backward(dy, x, scale, attributes);
 
@@ -174,7 +174,7 @@ TEST_F(TestGraph, BatchnormInferenceNodeCreation)
     auto bias = std::make_shared<TensorAttributes>();
 
     BatchnormInferenceAttributes attributes;
-    attributes.name = "BatchnormNode";
+    attributes.set_name("BatchnormNode");
 
     auto y = graph.batchnorm_inference(x, mean, invVariance, scale, bias, attributes);
 
@@ -193,7 +193,7 @@ TEST_F(TestGraph, PointwiseNodeCreationSingleInput)
     in0->set_dim({1, 2, 3, 4}).set_stride({5, 6, 7, 8}).set_data_type(DataType_t::FLOAT);
 
     PointwiseAttributes attributes;
-    attributes.name = "PointwiseNode";
+    attributes.set_name("PointwiseNode");
     attributes.set_mode(PointwiseMode_t::RELU_FWD);
 
     auto out0 = graph.pointwise(in0, attributes);
@@ -216,7 +216,7 @@ TEST_F(TestGraph, PointwiseNodeCreationTwoInputs)
     in1->set_dim({1, 2, 3, 4}).set_stride({5, 6, 7, 8}).set_data_type(DataType_t::FLOAT);
 
     PointwiseAttributes attributes;
-    attributes.name = "PointwiseNode";
+    attributes.set_name("PointwiseNode");
     attributes.set_mode(PointwiseMode_t::RELU_FWD);
 
     auto out0 = graph.pointwise(in0, in1, attributes);
@@ -241,7 +241,7 @@ TEST_F(TestGraph, PointwiseNodeCreationThreeInputs)
     in2->set_dim({1, 2, 3, 4}).set_stride({5, 6, 7, 8}).set_data_type(DataType_t::FLOAT);
 
     PointwiseAttributes attributes;
-    attributes.name = "PointwiseNode";
+    attributes.set_name("PointwiseNode");
     attributes.set_mode(PointwiseMode_t::RELU_FWD);
 
     auto out0 = graph.pointwise(in0, in1, in2, attributes);
@@ -264,7 +264,7 @@ TEST_F(TestGraph, ConvolutionFwdNodeCreation)
     w->set_dim({64, 3, 3, 3}).set_stride({27, 9, 3, 1}).set_data_type(DataType_t::FLOAT);
 
     ConvFpropAttributes attributes;
-    attributes.name = "ConvolutionNode";
+    attributes.set_name("ConvolutionFpropNode");
     attributes.set_pre_padding({1, 1});
     attributes.set_post_padding({1, 1});
     attributes.set_stride({1, 1});
@@ -272,7 +272,7 @@ TEST_F(TestGraph, ConvolutionFwdNodeCreation)
 
     auto y = graph.conv_fprop(x, w, attributes);
 
-    EXPECT_EQ(y->get_name(), "ConvolutionNode::Y");
+    EXPECT_EQ(y->get_name(), "ConvolutionFpropNode::Y");
     EXPECT_TRUE(y->get_is_virtual());
 
     auto validationResult = graph.validate();
@@ -320,7 +320,7 @@ TEST_F(TestGraph, BuildAndSerializeBatchnormInferenceGraph)
     bias->set_uid(5).set_name("Bias").set_data_type(DataType_t::FLOAT);
 
     BatchnormInferenceAttributes batchnormAttributes;
-    batchnormAttributes.name = "BatchnormNode";
+    batchnormAttributes.set_name("BatchnormNode");
 
     auto y = graph.batchnorm_inference(x, mean, invVariance, scale, bias, batchnormAttributes);
 
@@ -405,7 +405,7 @@ TEST_F(TestGraph, BuildAndSerializeBatchnormGraph)
     epsilon->set_uid(7).set_name("Epsilon").set_data_type(DataType_t::FLOAT);
 
     BatchnormAttributes batchnormAttributes;
-    batchnormAttributes.name = "BatchnormNode";
+    batchnormAttributes.set_name("BatchnormNode");
     batchnormAttributes.set_previous_running_stats(prevRunningMean, prevRunningVariance, momentum);
     batchnormAttributes.set_epsilon(epsilon);
 
@@ -508,7 +508,7 @@ TEST_F(TestGraph, BuildAndSerializeBatchnormAndPointwiseGraph)
     epsilon->set_uid(7).set_name("Epsilon").set_data_type(DataType_t::FLOAT);
 
     BatchnormAttributes batchnormAttributes;
-    batchnormAttributes.name = "BatchnormNode";
+    batchnormAttributes.set_name("BatchnormNode");
     batchnormAttributes.set_previous_running_stats(prevRunningMean, prevRunningVariance, momentum);
     batchnormAttributes.set_epsilon(epsilon);
 
@@ -516,7 +516,7 @@ TEST_F(TestGraph, BuildAndSerializeBatchnormAndPointwiseGraph)
         = graph.batchnorm(x, scale, bias, batchnormAttributes);
 
     PointwiseAttributes pointwiseAttributes;
-    pointwiseAttributes.name = "PointwiseNode";
+    pointwiseAttributes.set_name("PointwiseNode");
     pointwiseAttributes.set_mode(PointwiseMode_t::RELU_FWD);
 
     auto out0 = graph.pointwise(y, pointwiseAttributes);
@@ -608,7 +608,7 @@ TEST_F(TestGraph, BuildAndSerializePointwiseGraph)
         .set_data_type(DataType_t::FLOAT);
 
     PointwiseAttributes pointwiseAttributes;
-    pointwiseAttributes.name = "PointwiseNode";
+    pointwiseAttributes.set_name("PointwiseNode");
     pointwiseAttributes.set_mode(PointwiseMode_t::RELU_FWD);
 
     auto out0 = graph.pointwise(in0, pointwiseAttributes);
@@ -679,12 +679,12 @@ TEST_F(TestGraph, BuildAndSerializePointwiseAndBatchnormInferenceGraph)
     bias->set_uid(5).set_name("Bias").set_data_type(DataType_t::FLOAT);
 
     BatchnormInferenceAttributes batchnormAttributes;
-    batchnormAttributes.name = "BatchnormNode";
+    batchnormAttributes.set_name("BatchnormNode");
 
     auto y = graph.batchnorm_inference(x, mean, invVariance, scale, bias, batchnormAttributes);
 
     PointwiseAttributes pointwiseAttributes;
-    pointwiseAttributes.name = "PointwiseNode";
+    pointwiseAttributes.set_name("PointwiseNode");
     pointwiseAttributes.set_mode(PointwiseMode_t::RELU_FWD);
 
     auto out0 = graph.pointwise(y, pointwiseAttributes);
@@ -777,7 +777,7 @@ TEST_F(TestGraph, BuildAndSerializeBatchnormBackwardGraph)
     invVariance->set_uid(5).set_name("InvVariance").set_data_type(DataType_t::FLOAT);
 
     BatchnormBackwardAttributes batchnormAttributes;
-    batchnormAttributes.name = "BatchnormBackwardNode";
+    batchnormAttributes.set_name("BatchnormBackwardNode");
     batchnormAttributes.set_saved_mean_and_inv_variance(mean, invVariance);
 
     auto [dx, dscale, dbias] = graph.batchnorm_backward(dy, x, scale, batchnormAttributes);
@@ -852,7 +852,7 @@ TEST_F(TestGraph, BuildAndSerializeConvolutionFwdGraph)
         .set_data_type(DataType_t::FLOAT);
 
     ConvFpropAttributes convolutionAttributes;
-    convolutionAttributes.name = "ConvolutionNode";
+    convolutionAttributes.set_name("ConvolutionFpropNode");
     convolutionAttributes.set_pre_padding({1, 1});
     convolutionAttributes.set_post_padding({1, 1});
     convolutionAttributes.set_stride({1, 1});
@@ -886,7 +886,7 @@ TEST_F(TestGraph, BuildAndSerializeConvolutionFwdGraph)
     validateTensor(*w, tensorLookup[w->get_uid()]);
     validateTensor(*y, tensorLookup[y->get_uid()]);
 
-    EXPECT_EQ(deserializedGraph->nodes[0]->name, "ConvolutionNode");
+    EXPECT_EQ(deserializedGraph->nodes[0]->name, "ConvolutionFpropNode");
     EXPECT_EQ(deserializedGraph->nodes[0]->attributes.type,
               hipdnn_sdk::data_objects::NodeAttributes::NodeAttributes_ConvolutionFwdAttributes);
     auto deserializedConvolutionAttributes
@@ -918,7 +918,7 @@ TEST_F(TestGraph, BuildAndSerializePointwiseAndBatchnormBackwardGraph)
         .set_data_type(DataType_t::FLOAT);
 
     PointwiseAttributes pointwiseAttributes;
-    pointwiseAttributes.name = "PointwiseNode";
+    pointwiseAttributes.set_name("PointwiseNode");
     pointwiseAttributes.set_mode(PointwiseMode_t::RELU_FWD);
 
     auto dy = graph.pointwise(xPointwise, pointwiseAttributes);
@@ -940,7 +940,7 @@ TEST_F(TestGraph, BuildAndSerializePointwiseAndBatchnormBackwardGraph)
     invVariance->set_uid(4).set_name("InvVariance").set_data_type(DataType_t::FLOAT);
 
     BatchnormBackwardAttributes batchnormAttributes;
-    batchnormAttributes.name = "BatchnormBackwardNode";
+    batchnormAttributes.set_name("BatchnormBackwardNode");
     batchnormAttributes.set_saved_mean_and_inv_variance(mean, invVariance);
 
     auto [dx, dscale, dbias] = graph.batchnorm_backward(dy, x, scale, batchnormAttributes);
@@ -1084,7 +1084,7 @@ TEST_F(TestGraph, CreatingExecutionPlansFailsWithNoGraph)
 {
     Graph graph;
 
-    auto result = graph.create_execution_plans(_handle, {HeurMode_t::FALLBACK});
+    auto result = graph.create_execution_plans({HeurMode_t::FALLBACK});
     EXPECT_FALSE(result.is_good());
     EXPECT_EQ(result.get_message(),
               "Graph has not been built, build the operation graph first. Cannot create "
@@ -1206,20 +1206,7 @@ TEST_F(TestGraph, CanSuccessfullyCreateExecutionPlans)
             return HIPDNN_STATUS_SUCCESS;
         });
 
-    EXPECT_CALL(*_mockBackend,
-                backendSetAttribute(
-                    executionPlanDesc, HIPDNN_ATTR_EXECUTION_PLAN_HANDLE, HIPDNN_TYPE_HANDLE, 1, _))
-        .WillOnce([this](hipdnnBackendDescriptor_t,
-                         hipdnnBackendAttributeName_t,
-                         hipdnnBackendAttributeType_t,
-                         int64_t,
-                         const void* arrayOfElements) {
-            hipdnnHandle_t handle = *static_cast<const hipdnnHandle_t*>(arrayOfElements);
-            EXPECT_EQ(handle, this->_handle);
-            return HIPDNN_STATUS_SUCCESS;
-        });
-
-    auto exec_plan_result = graph.create_execution_plans(_handle, heurModes);
+    auto exec_plan_result = graph.create_execution_plans(heurModes);
     EXPECT_TRUE(exec_plan_result.is_good());
 }
 
@@ -1261,7 +1248,7 @@ TEST_F(TestGraph, CheckSupportSucceedsWhenExecutionPlanCreated)
             return HIPDNN_STATUS_SUCCESS;
         });
 
-    graph.create_execution_plans(_handle, heurModes);
+    graph.create_execution_plans(heurModes);
 
     auto result = graph.check_support();
     EXPECT_TRUE(result.is_good());
@@ -1316,7 +1303,7 @@ TEST_F(TestGraph, EngineConfigAndExecutionPlanAreFinalizedAfterBuildPlans)
             return HIPDNN_STATUS_SUCCESS;
         });
 
-    result = graph.create_execution_plans(_handle, heurModes);
+    result = graph.create_execution_plans(heurModes);
     EXPECT_TRUE(result.is_good());
 
     EXPECT_CALL(*_mockBackend, backendFinalize(engineConfigDesc))
@@ -1379,7 +1366,7 @@ TEST_F(TestGraph, WorkspaceSizeIsRetrievedFromExecutionPlan)
             return HIPDNN_STATUS_SUCCESS;
         });
 
-    graph.create_execution_plans(_handle, heurModes);
+    graph.create_execution_plans(heurModes);
 
     int64_t workspace_size = 123454;
     EXPECT_CALL(*_mockBackend,
@@ -1423,7 +1410,7 @@ TEST_F(TestGraph, ExecutePacksVariantPackAndPassesTheCorrectArguments)
         .set_data_type(DataType_t::FLOAT);
 
     PointwiseAttributes pointwiseAttributes;
-    pointwiseAttributes.name = "PointwiseNode";
+    pointwiseAttributes.set_name("PointwiseNode");
     pointwiseAttributes.set_mode(PointwiseMode_t::RELU_FWD);
     auto out_tensor = graph.pointwise(tensor, pointwiseAttributes);
 
@@ -1502,10 +1489,6 @@ TEST_F(TestGraph, ExecutePacksVariantPackAndPassesTheCorrectArguments)
             *desc = execPlanDesc;
             return HIPDNN_STATUS_SUCCESS;
         });
-    EXPECT_CALL(*_mockBackend,
-                backendSetAttribute(
-                    execPlanDesc, HIPDNN_ATTR_EXECUTION_PLAN_HANDLE, HIPDNN_TYPE_HANDLE, 1, _))
-        .WillOnce(Return(HIPDNN_STATUS_SUCCESS));
 
     // build_plans mocks
     EXPECT_CALL(*_mockBackend, backendFinalize(engineCfgDesc))
@@ -1539,12 +1522,30 @@ TEST_F(TestGraph, ExecutePacksVariantPackAndPassesTheCorrectArguments)
             return HIPDNN_STATUS_SUCCESS;
         });
 
-    // Prepare variant pack and workspace
+    // Prepare variant pack and workspace for execute
+    auto tensor1 = std::make_shared<TensorAttributes>();
+    tensor1->set_uid(42);
+
+    auto tensor2 = std::make_shared<TensorAttributes>();
+    tensor2->set_uid(22);
+
+    auto tensor3 = std::make_shared<TensorAttributes>();
+    tensor3->set_uid(33);
+
+    auto tensor4 = std::make_shared<TensorAttributes>();
+    tensor4->set_uid(1);
+
     std::unordered_map<int64_t, void*> variantPack;
-    variantPack[42] = reinterpret_cast<void*>(0xDEADBEEF);
-    variantPack[22] = reinterpret_cast<void*>(0xBEEFBEEF);
-    variantPack[33] = reinterpret_cast<void*>(0xBEEFDEAD);
-    variantPack[1] = reinterpret_cast<void*>(0xDEADBEE);
+    variantPack[tensor1->get_uid()] = reinterpret_cast<void*>(0xDEADBEEF);
+    variantPack[tensor2->get_uid()] = reinterpret_cast<void*>(0xBEEFBEEF);
+    variantPack[tensor3->get_uid()] = reinterpret_cast<void*>(0xBEEFDEAD);
+    variantPack[tensor4->get_uid()] = reinterpret_cast<void*>(0xDEADBEE);
+
+    std::unordered_map<std::shared_ptr<TensorAttributes>, void*> variantPackForExec;
+    variantPackForExec[tensor1] = reinterpret_cast<void*>(0xDEADBEEF);
+    variantPackForExec[tensor2] = reinterpret_cast<void*>(0xBEEFBEEF);
+    variantPackForExec[tensor3] = reinterpret_cast<void*>(0xBEEFDEAD);
+    variantPackForExec[tensor4] = reinterpret_cast<void*>(0xDEADBEE);
 
     void* workspace = reinterpret_cast<void*>(0xCAFEBABE);
 
@@ -1626,7 +1627,7 @@ TEST_F(TestGraph, ExecutePacksVariantPackAndPassesTheCorrectArguments)
     EXPECT_TRUE(buildResult.is_good());
 
     std::vector<HeurMode_t> heurModes = {HeurMode_t::FALLBACK};
-    auto planResult = graph.create_execution_plans(_handle, heurModes);
+    auto planResult = graph.create_execution_plans(heurModes);
     EXPECT_TRUE(planResult.is_good());
 
     auto supportResult = graph.check_support();
@@ -1640,7 +1641,7 @@ TEST_F(TestGraph, ExecutePacksVariantPackAndPassesTheCorrectArguments)
     EXPECT_TRUE(wsResult.is_good());
     EXPECT_EQ(workspaceSize, expectedWorkspaceSize);
 
-    auto execResult = graph.execute(_handle, variantPack, workspace);
+    auto execResult = graph.execute(_handle, variantPackForExec, workspace);
     EXPECT_TRUE(execResult.is_good());
 }
 

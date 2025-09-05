@@ -13,7 +13,7 @@
 #include <spdlog/spdlog.h>
 #include <string>
 
-namespace logging_test_utils
+namespace hipdnn_sdk::test_utilities
 {
 
 inline hipdnnSeverity_t stringToSeverity(const std::string& levelStr)
@@ -61,10 +61,10 @@ inline void initializeSpdlogDefaultLogger(const std::string& componentName)
 #ifndef DISABLE_TEST_LOGGING
     spdlog::drop_all();
     auto logger = spdlog::stdout_color_mt(componentName);
-    logger->set_formatter(std::make_unique<hipdnn::logging::ComponentFormatter>());
+    logger->set_formatter(std::make_unique<hipdnn_sdk::logging::ComponentFormatter>());
     spdlog::set_default_logger(logger);
     spdlog::set_level(spdlog::level::info); // Set default log level
 #endif
 }
 
-} // namespace logging_test_utils
+} // namespace hipdnn_sdk::test_utilities

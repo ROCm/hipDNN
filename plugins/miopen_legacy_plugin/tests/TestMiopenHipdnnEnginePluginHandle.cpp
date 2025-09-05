@@ -7,7 +7,7 @@
 
 #include "HipdnnEnginePluginHandle.hpp"
 
-class HipdnnEnginePluginHandleTest : public ::testing::Test
+class TestMiopenHipdnnEnginePluginHandle : public ::testing::Test
 {
 protected:
     void SetUp() override
@@ -18,14 +18,14 @@ protected:
     std::unique_ptr<HipdnnEnginePluginHandle> _handle;
 };
 
-TEST_F(HipdnnEnginePluginHandleTest, DefaultConstruction)
+TEST_F(TestMiopenHipdnnEnginePluginHandle, DefaultConstruction)
 {
     EXPECT_EQ(_handle->miopenHandle, nullptr);
     EXPECT_EQ(_handle->miopenContainer, nullptr);
     EXPECT_EQ(_handle->getStream(), nullptr);
 }
 
-TEST_F(HipdnnEnginePluginHandleTest, StoreDetachedBuffer)
+TEST_F(TestMiopenHipdnnEnginePluginHandle, StoreDetachedBuffer)
 {
     flatbuffers::FlatBufferBuilder builder;
     auto createdString = builder.CreateString("test");
@@ -39,7 +39,7 @@ TEST_F(HipdnnEnginePluginHandleTest, StoreDetachedBuffer)
     _handle->removeEngineDetailsDetachedBuffer(ptr);
 }
 
-TEST_F(HipdnnEnginePluginHandleTest, RemoveDetachedBuffer)
+TEST_F(TestMiopenHipdnnEnginePluginHandle, RemoveDetachedBuffer)
 {
     flatbuffers::FlatBufferBuilder builder;
     auto createdString = builder.CreateString("test");
@@ -54,7 +54,7 @@ TEST_F(HipdnnEnginePluginHandleTest, RemoveDetachedBuffer)
     _handle->removeEngineDetailsDetachedBuffer(ptr);
 }
 
-TEST_F(HipdnnEnginePluginHandleTest, RemoveNonExistentBuffer)
+TEST_F(TestMiopenHipdnnEnginePluginHandle, RemoveNonExistentBuffer)
 {
     const void* fakePtr = reinterpret_cast<const void*>(0x12345678);
 
@@ -62,7 +62,7 @@ TEST_F(HipdnnEnginePluginHandleTest, RemoveNonExistentBuffer)
     EXPECT_NO_THROW(_handle->removeEngineDetailsDetachedBuffer(fakePtr));
 }
 
-TEST_F(HipdnnEnginePluginHandleTest, MultipleBuffers)
+TEST_F(TestMiopenHipdnnEnginePluginHandle, MultipleBuffers)
 {
     flatbuffers::FlatBufferBuilder builder1;
     auto createdString1 = builder1.CreateString("test");
@@ -83,7 +83,7 @@ TEST_F(HipdnnEnginePluginHandleTest, MultipleBuffers)
     _handle->removeEngineDetailsDetachedBuffer(ptr2);
 }
 
-TEST_F(HipdnnEnginePluginHandleTest, ThrowsWithNoMiopenHandle)
+TEST_F(TestMiopenHipdnnEnginePluginHandle, ThrowsWithNoMiopenHandle)
 {
     EXPECT_THROW(_handle->setStream(nullptr), hipdnn_plugin::HipdnnPluginException);
 }

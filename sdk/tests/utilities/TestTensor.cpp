@@ -10,8 +10,6 @@ using namespace hipdnn_sdk::utilities;
 
 TEST(TestTensor, BasicRowMajorUsage)
 {
-    SKIP_IF_NO_DEVICES();
-
     Tensor<float> tensor({1, 2, 3, 4});
 
     // NCHW (row-major) strides with dims {N=1, C=2, H=3, W=4}:
@@ -28,8 +26,6 @@ TEST(TestTensor, BasicRowMajorUsage)
 
 TEST(TestTensor, FillWithValuesUsage)
 {
-    SKIP_IF_NO_DEVICES();
-
     Tensor<float> tensor({1, 2, 3, 4});
 
     tensor.fillWithValue(1.0f);
@@ -43,8 +39,6 @@ TEST(TestTensor, FillWithValuesUsage)
 
 TEST(TestTensor, FillWithRandomValuesUsage)
 {
-    SKIP_IF_NO_DEVICES();
-
     Tensor<float> tensor({1, 2, 3, 4});
 
     tensor.fillWithRandomValues(1.0f, 3.0f);
@@ -59,8 +53,6 @@ TEST(TestTensor, FillWithRandomValuesUsage)
 
 TEST(TestTensor, BasicNHWCUsage)
 {
-    SKIP_IF_NO_DEVICES();
-
     Tensor<float> tensor({1, 2, 3, 4}, TensorLayout::NHWC);
 
     EXPECT_EQ(tensor.memory().count(), 24);
@@ -77,22 +69,26 @@ TEST(TestTensor, BasicNHWCUsage)
 
 TEST(TestTensor, GetAndSetHostValueNCHW)
 {
-    SKIP_IF_NO_DEVICES();
-
     Tensor<float> tensor({1, 2, 3, 4});
     tensor.fillWithValue(0.0f);
-    tensor.setHostValue(0, 1, 1, 2, 99.0f);
+    tensor.setHostValue(99.0f, 0, 1, 1, 2);
 
     EXPECT_FLOAT_EQ(tensor.getHostValue(0, 1, 1, 2), 99.0f);
 }
 
 TEST(TestTensor, GetAndSetHostValueNHWC)
 {
-    SKIP_IF_NO_DEVICES();
-
     Tensor<float> tensor({1, 2, 3, 4}, TensorLayout::NHWC);
     tensor.fillWithValue(0.0f);
-    tensor.setHostValue(0, 1, 1, 2, 99.0f);
+    tensor.setHostValue(99.0f, 0, 1, 1, 2);
 
     EXPECT_FLOAT_EQ(tensor.getHostValue(0, 1, 1, 2), 99.0f);
+}
+
+TEST(TestTensor, ExceedDimensions)
+{
+    Tensor<float> tensor({1, 2, 3, 4});
+    tensor.fillWithValue(0.0f);
+
+    EXPECT_THROW(tensor.setHostValue(99.0f, 0, 1, 1, 2, 3), std::invalid_argument);
 }

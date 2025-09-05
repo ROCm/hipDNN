@@ -19,7 +19,7 @@
 
 using namespace hipdnn_backend;
 using namespace plugin;
-using namespace test_descriptor_utils;
+using namespace hipdnn_backend::test_utilities;
 using namespace ::testing;
 
 using ::testing::Return;
@@ -84,6 +84,7 @@ public:
 
     void setEngineConfig()
     {
+        EXPECT_CALL(*getMockGraph(), getHandle()).WillRepeatedly(Return(_mockHandle.get()));
         EXPECT_CALL(*getMockEngine(), getEngineId()).WillOnce(Return(ENGINE_ID));
         EXPECT_CALL(*getMockEngine(), getGraph()).WillOnce(Return(getMockGraph()));
 
@@ -110,7 +111,7 @@ protected:
     void SetUp() override
     {
         _planWrapper = createDescriptor<ExecutionPlanDescriptor>();
-        _mockGraphWrapper = test_descriptor_utils::createDescriptor<MockGraphDescriptor>();
+        _mockGraphWrapper = hipdnn_backend::test_utilities::createDescriptor<MockGraphDescriptor>();
         _mockEngineWrapper = createDescriptor<MockEngineDescriptor>();
         _mockEngineConfigWrapper = createDescriptor<MockEngineConfigDescriptor>();
         _mockEngineConfigBadTypeWrapper = createDescriptor<MockEngineConfigDescriptor>();

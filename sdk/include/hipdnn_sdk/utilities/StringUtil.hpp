@@ -5,7 +5,7 @@
 
 #include <cstring>
 
-namespace hipdnn::sdk::utilities
+namespace hipdnn_sdk::utilities
 {
 
 static void copyMaxSizeWithNullTerminator(char* destination, const char* source, size_t maxSize)

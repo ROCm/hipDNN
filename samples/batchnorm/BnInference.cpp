@@ -99,8 +99,8 @@ void SampleRunner::operator()(const TensorLayout& layout)
     {
         std::cout << "Running CPU reference validation...\n";
 
-        auto refImpl = hipdnn_sdk::reference_test_utilities::
-            CpuFpReferenceImplementation<InputType, IntermediateType>();
+        auto refImpl = hipdnn_sdk::test_utilities::CpuFpReferenceImplementation<InputType,
+                                                                                IntermediateType>();
         Tensor<InputType> yRefTensor(y->get_dim(), layout);
 
         // Convert inverse variance to variance for CPU reference
@@ -119,7 +119,7 @@ void SampleRunner::operator()(const TensorLayout& layout)
         refImpl.batchnormFwdInference(
             xTensor, scaleTensor, biasTensor, meanTensor, varianceTensor, yRefTensor, epsilon);
 
-        auto validator = hipdnn_sdk::reference_test_utilities::CpuFpReferenceValidation<InputType>(
+        auto validator = hipdnn_sdk::test_utilities::CpuFpReferenceValidation<InputType>(
             static_cast<InputType>(epsilon), static_cast<InputType>(epsilon));
 
         std::cout << "CPU reference validation "
