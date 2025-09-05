@@ -141,9 +141,8 @@ TEST_F(IntegrationPluginLoading, IncorrectEngineID)
 
     ASSERT_EQ(hipdnnBackendFinalize(_engine), HIPDNN_STATUS_BAD_PARAM);
 
-    constexpr size_t BUFFER_SIZE = 512;
-    std::array<char, BUFFER_SIZE> buffer;
-    hipdnnGetLastErrorString(buffer.data(), BUFFER_SIZE);
+    std::array<char, HIPDNN_ERROR_STRING_MAX_LENGTH> buffer;
+    hipdnnGetLastErrorString(buffer.data(), buffer.size());
 
     ASSERT_EQ(
         std::string{buffer.data()},
@@ -161,14 +160,13 @@ TEST_F(IntegrationPluginLoading, DuplicateEngineIds)
 
     ASSERT_EQ(hipdnnCreate(&_handle), HIPDNN_STATUS_SUCCESS);
 
-    constexpr size_t BUFFER_SIZE = 2048;
-    std::array<char, BUFFER_SIZE> buffer;
-    hipdnnGetLastErrorString(buffer.data(), BUFFER_SIZE);
+    std::array<char, HIPDNN_ERROR_STRING_MAX_LENGTH> buffer;
+    hipdnnGetLastErrorString(buffer.data(), buffer.size());
 
     std::string expectedError
         = fmt::format("Engine ID {} already exists",
                       hipdnn_tests::plugin_constants::engineId<DuplicateIdBPlugin>());
-    ;
+
     EXPECT_NE(std::string{buffer.data()}.find(expectedError), std::string::npos);
 
     EXPECT_EQ(test_util::getLoadedPlugins(_handle).size(), 1);
@@ -186,9 +184,8 @@ TEST_F(IntegrationPluginLoading, IncompleteAPI)
 
     ASSERT_EQ(hipdnnCreate(&_handle), HIPDNN_STATUS_SUCCESS);
 
-    constexpr size_t BUFFER_SIZE = 2048;
-    std::array<char, BUFFER_SIZE> buffer;
-    hipdnnGetLastErrorString(buffer.data(), BUFFER_SIZE);
+    std::array<char, HIPDNN_ERROR_STRING_MAX_LENGTH> buffer;
+    hipdnnGetLastErrorString(buffer.data(), buffer.size());
 
     EXPECT_NE(std::string{buffer.data()}.find("Failed to get symbol"), std::string::npos);
     EXPECT_EQ(test_util::getLoadedPlugins(_handle).size(), 0);

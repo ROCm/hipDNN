@@ -9,5 +9,5 @@
  *
  * This value is used across the API and backend to size buffers for error strings.
  */
-#define HIPDNN_MAX_ERROR_STRING_SIZE 256
+#define HIPDNN_ERROR_STRING_MAX_LENGTH 2048
 // NOLINTEND

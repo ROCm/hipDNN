@@ -13,7 +13,7 @@ class NoApplicableEnginesBPlugin : public TestPluginBase
 public:
     const char* getPluginName() const override
     {
-        return "test_NoApplicableEnginesPlugin";
+        return "test_NoApplicableEnginesBPlugin";
     }
     const char* getPluginVersion() const override
     {
