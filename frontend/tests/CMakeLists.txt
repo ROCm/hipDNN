@@ -44,7 +44,6 @@ target_link_libraries(hipdnn_frontend_tests
     GTest::gtest 
     GTest::gmock
     hip::host
-    hip::device
     Threads::Threads 
     hipdnn_sdk 
     hipdnn_frontend

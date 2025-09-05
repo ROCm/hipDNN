@@ -9,7 +9,6 @@ if(HIP_DNN_SKIP_TESTS)
 endif()
 
 add_compile_definitions(__HIP_PLATFORM_AMD__)
-add_compile_definitions(__HIPCC__)
 find_package(hip REQUIRED)
 find_package(Threads REQUIRED)
 enable_language(HIP)
@@ -45,7 +44,6 @@ target_link_libraries(hipdnn_sdk_tests
     Threads::Threads
     hipdnn_sdk
     hip::host
-    hip::device
     spdlog_header_only
     ${CMAKE_DL_LIBS}
 )

@@ -29,7 +29,6 @@ target_compile_definitions(miopen_plugin_integration_test PRIVATE
 target_link_libraries(miopen_plugin_integration_test PUBLIC 
     GTest::gtest
     hip::host
-    hip::device
     miopen_legacy_plugin
     hipdnn_frontend
     hipdnn_sdk

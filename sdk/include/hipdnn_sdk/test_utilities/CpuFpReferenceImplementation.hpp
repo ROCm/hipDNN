@@ -4,14 +4,10 @@
 #pragma once
 
 #include <hipdnn_sdk/test_utilities/ReferenceImplementationInterface.hpp>
-#include <numeric>
-#include <vector>
-
-#if defined(__HIP_PLATFORM_AMD__)
-// Need these for the half and bfloat16 types
 #include <hipdnn_sdk/utilities/HalfUtils.hpp>
 #include <hipdnn_sdk/utilities/HipBfloat16Utils.hpp>
-#endif
+#include <numeric>
+#include <vector>
 
 namespace hipdnn_sdk
 {
@@ -182,7 +178,7 @@ private:
 
     float sqrtInternal(float value) const
     {
-        return std::sqrtf(value);
+        return sqrtf(value);
     }
 };
 
