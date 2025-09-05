@@ -26,7 +26,7 @@ void testLoggingCallback(hipdnnSeverity_t severity [[maybe_unused]], const char*
     }
 }
 
-class CallbackLoggerTest : public ::testing::Test
+class TestCallbackLogger : public ::testing::Test
 {
 protected:
     const std::string _testLoggerName = COMPONENT_NAME;
@@ -56,7 +56,7 @@ protected:
     }
 };
 
-TEST_F(CallbackLoggerTest, InfoMessageIsCorrectlyPassedToCallback)
+TEST_F(TestCallbackLogger, InfoMessageIsCorrectlyPassedToCallback)
 {
     std::string testMessage = "Test info message";
     HIPDNN_LOG_INFO(testMessage);
@@ -66,7 +66,7 @@ TEST_F(CallbackLoggerTest, InfoMessageIsCorrectlyPassedToCallback)
     EXPECT_NE(logs[0].find(testMessage), std::string::npos);
 }
 
-TEST_F(CallbackLoggerTest, WarnMessageIsCorrectlyPassedToCallback)
+TEST_F(TestCallbackLogger, WarnMessageIsCorrectlyPassedToCallback)
 {
     std::string testMessage = "Test warning message";
     HIPDNN_LOG_WARN(testMessage);
@@ -76,7 +76,7 @@ TEST_F(CallbackLoggerTest, WarnMessageIsCorrectlyPassedToCallback)
     EXPECT_NE(logs[0].find(testMessage), std::string::npos);
 }
 
-TEST_F(CallbackLoggerTest, ErrorMessageIsCorrectlyPassedToCallback)
+TEST_F(TestCallbackLogger, ErrorMessageIsCorrectlyPassedToCallback)
 {
     std::string testMessage = "Test error message";
     HIPDNN_LOG_ERROR(testMessage);
@@ -86,7 +86,7 @@ TEST_F(CallbackLoggerTest, ErrorMessageIsCorrectlyPassedToCallback)
     EXPECT_NE(logs[0].find(testMessage), std::string::npos);
 }
 
-TEST_F(CallbackLoggerTest, FormattedMessagesAreCorrectlyPassed)
+TEST_F(TestCallbackLogger, FormattedMessagesAreCorrectlyPassed)
 {
     int value = 42;
     std::string text = "formatted";
@@ -97,7 +97,7 @@ TEST_F(CallbackLoggerTest, FormattedMessagesAreCorrectlyPassed)
     EXPECT_NE(logs[0].find("Test formatted message with value 42"), std::string::npos);
 }
 
-TEST_F(CallbackLoggerTest, LogLevelsAreRespected)
+TEST_F(TestCallbackLogger, LogLevelsAreRespected)
 {
     auto testLogger = spdlog::get(_testLoggerName);
     ASSERT_NE(testLogger, nullptr);
@@ -114,7 +114,7 @@ TEST_F(CallbackLoggerTest, LogLevelsAreRespected)
     EXPECT_NE(logs[0].find("This error should appear"), std::string::npos);
 }
 
-TEST_F(CallbackLoggerTest, MultipleMessagesAreLogged)
+TEST_F(TestCallbackLogger, MultipleMessagesAreLogged)
 {
     HIPDNN_LOG_INFO("First message");
     HIPDNN_LOG_WARN("Second message");
@@ -127,7 +127,7 @@ TEST_F(CallbackLoggerTest, MultipleMessagesAreLogged)
     EXPECT_NE(logs[2].find("Third message"), std::string::npos);
 }
 
-TEST_F(CallbackLoggerTest, CallbackReceivesFormattedPattern)
+TEST_F(TestCallbackLogger, CallbackReceivesFormattedPattern)
 {
     std::string testMessage = "Pattern check";
     HIPDNN_LOG_INFO(testMessage);

@@ -24,7 +24,7 @@ TEST(TestTensor, BasicRowMajorUsage)
     EXPECT_EQ(tensor.strides()[3], 1);
 }
 
-TEST(TestTensor, FillWithValuesUsage)
+TEST(TestTensor, FillWithValues)
 {
     Tensor<float> tensor({1, 2, 3, 4});
 
@@ -37,7 +37,7 @@ TEST(TestTensor, FillWithValuesUsage)
     }
 }
 
-TEST(TestTensor, FillWithRandomValuesUsage)
+TEST(TestTensor, FillWithRandomValues)
 {
     Tensor<float> tensor({1, 2, 3, 4});
 
@@ -51,7 +51,7 @@ TEST(TestTensor, FillWithRandomValuesUsage)
     }
 }
 
-TEST(TestTensor, BasicNHWCUsage)
+TEST(TestTensor, BasicNhwcUsage)
 {
     Tensor<float> tensor({1, 2, 3, 4}, TensorLayout::NHWC);
 
@@ -67,7 +67,7 @@ TEST(TestTensor, BasicNHWCUsage)
     EXPECT_EQ(tensor.strides()[3], 2);
 }
 
-TEST(TestTensor, GetAndSetHostValueNCHW)
+TEST(TestTensor, GetAndSetHostValueNchw)
 {
     Tensor<float> tensor({1, 2, 3, 4});
     tensor.fillWithValue(0.0f);
@@ -76,7 +76,7 @@ TEST(TestTensor, GetAndSetHostValueNCHW)
     EXPECT_FLOAT_EQ(tensor.getHostValue(0, 1, 1, 2), 99.0f);
 }
 
-TEST(TestTensor, GetAndSetHostValueNHWC)
+TEST(TestTensor, GetAndSetHostValueNhwc)
 {
     Tensor<float> tensor({1, 2, 3, 4}, TensorLayout::NHWC);
     tensor.fillWithValue(0.0f);
