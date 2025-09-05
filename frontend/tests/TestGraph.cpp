@@ -4,7 +4,7 @@
 #include <gtest/gtest.h>
 #include <hipdnn_frontend/Graph.hpp>
 #include <hipdnn_frontend/attributes/BatchnormInferenceAttributes.hpp>
-#include <hipdnn_frontend/attributes/ConvolutionFwdAttributes.hpp>
+#include <hipdnn_frontend/attributes/ConvolutionFpropAttributes.hpp>
 #include <hipdnn_frontend/attributes/PointwiseAttributes.hpp>
 #include <hipdnn_sdk/data_objects/graph_generated.h>
 
@@ -264,7 +264,7 @@ TEST_F(TestGraph, ConvolutionFwdNodeCreation)
     w->set_dim({64, 3, 3, 3}).set_stride({27, 9, 3, 1}).set_data_type(DataType_t::FLOAT);
 
     ConvFpropAttributes attributes;
-    attributes.set_name("ConvolutionNode");
+    attributes.set_name("ConvolutionFpropNode");
     attributes.set_pre_padding({1, 1});
     attributes.set_post_padding({1, 1});
     attributes.set_stride({1, 1});
@@ -272,7 +272,7 @@ TEST_F(TestGraph, ConvolutionFwdNodeCreation)
 
     auto y = graph.conv_fprop(x, w, attributes);
 
-    EXPECT_EQ(y->get_name(), "ConvolutionNode::Y");
+    EXPECT_EQ(y->get_name(), "ConvolutionFpropNode::Y");
     EXPECT_TRUE(y->get_is_virtual());
 
     auto validationResult = graph.validate();
@@ -852,7 +852,7 @@ TEST_F(TestGraph, BuildAndSerializeConvolutionFwdGraph)
         .set_data_type(DataType_t::FLOAT);
 
     ConvFpropAttributes convolutionAttributes;
-    convolutionAttributes.set_name("ConvolutionNode");
+    convolutionAttributes.set_name("ConvolutionFpropNode");
     convolutionAttributes.set_pre_padding({1, 1});
     convolutionAttributes.set_post_padding({1, 1});
     convolutionAttributes.set_stride({1, 1});
@@ -886,7 +886,7 @@ TEST_F(TestGraph, BuildAndSerializeConvolutionFwdGraph)
     validateTensor(*w, tensorLookup[w->get_uid()]);
     validateTensor(*y, tensorLookup[y->get_uid()]);
 
-    EXPECT_EQ(deserializedGraph->nodes[0]->name, "ConvolutionNode");
+    EXPECT_EQ(deserializedGraph->nodes[0]->name, "ConvolutionFpropNode");
     EXPECT_EQ(deserializedGraph->nodes[0]->attributes.type,
               hipdnn_sdk::data_objects::NodeAttributes::NodeAttributes_ConvolutionFwdAttributes);
     auto deserializedConvolutionAttributes
@@ -1539,12 +1539,30 @@ TEST_F(TestGraph, ExecutePacksVariantPackAndPassesTheCorrectArguments)
             return HIPDNN_STATUS_SUCCESS;
         });
 
-    // Prepare variant pack and workspace
+    // Prepare variant pack and workspace for execute
+    auto tensor1 = std::make_shared<TensorAttributes>();
+    tensor1->set_uid(42);
+
+    auto tensor2 = std::make_shared<TensorAttributes>();
+    tensor2->set_uid(22);
+
+    auto tensor3 = std::make_shared<TensorAttributes>();
+    tensor3->set_uid(33);
+
+    auto tensor4 = std::make_shared<TensorAttributes>();
+    tensor4->set_uid(1);
+
     std::unordered_map<int64_t, void*> variantPack;
-    variantPack[42] = reinterpret_cast<void*>(0xDEADBEEF);
-    variantPack[22] = reinterpret_cast<void*>(0xBEEFBEEF);
-    variantPack[33] = reinterpret_cast<void*>(0xBEEFDEAD);
-    variantPack[1] = reinterpret_cast<void*>(0xDEADBEE);
+    variantPack[tensor1->get_uid()] = reinterpret_cast<void*>(0xDEADBEEF);
+    variantPack[tensor2->get_uid()] = reinterpret_cast<void*>(0xBEEFBEEF);
+    variantPack[tensor3->get_uid()] = reinterpret_cast<void*>(0xBEEFDEAD);
+    variantPack[tensor4->get_uid()] = reinterpret_cast<void*>(0xDEADBEE);
+
+    std::unordered_map<std::shared_ptr<TensorAttributes>, void*> variantPackForExec;
+    variantPackForExec[tensor1] = reinterpret_cast<void*>(0xDEADBEEF);
+    variantPackForExec[tensor2] = reinterpret_cast<void*>(0xBEEFBEEF);
+    variantPackForExec[tensor3] = reinterpret_cast<void*>(0xBEEFDEAD);
+    variantPackForExec[tensor4] = reinterpret_cast<void*>(0xDEADBEE);
 
     void* workspace = reinterpret_cast<void*>(0xCAFEBABE);
 
@@ -1640,7 +1658,7 @@ TEST_F(TestGraph, ExecutePacksVariantPackAndPassesTheCorrectArguments)
     EXPECT_TRUE(wsResult.is_good());
     EXPECT_EQ(workspaceSize, expectedWorkspaceSize);
 
-    auto execResult = graph.execute(_handle, variantPack, workspace);
+    auto execResult = graph.execute(_handle, variantPackForExec, workspace);
     EXPECT_TRUE(execResult.is_good());
 }
 

@@ -34,13 +34,13 @@ public:
         set_value(scalar);
     }
 
-    bool has_value() const // NOLINT(readability-identifier-naming)
+    bool get_pass_by_value() const // NOLINT(readability-identifier-naming)
     {
         return !std::holds_alternative<std::monostate>(_value);
     }
 
     template <typename T>
-    std::optional<T> get_value() const // NOLINT(readability-identifier-naming)
+    std::optional<T> get_pass_by_value() const // NOLINT(readability-identifier-naming)
     {
         if(auto p = std::get_if<T>(&_value))
         {
@@ -169,7 +169,7 @@ public:
     }
 
     // NOLINTNEXTLINE(readability-identifier-naming)
-    TensorAttributes& set_from_graph_attributes(const GraphAttributes& graphAttributes)
+    TensorAttributes& fill_from_context(const GraphAttributes& graphAttributes)
     {
         if(_dataType == DataType_t::NOT_SET)
         {

@@ -24,6 +24,7 @@ add_executable(hipdnn_frontend_tests
     TestConvolutionNode.cpp
     TestError.cpp
     TestGraph.cpp
+    TestGraphAttributes.cpp
     TestGraphGenerated.cpp
     TestPointwiseAttributes.cpp
     TestPointwiseNode.cpp

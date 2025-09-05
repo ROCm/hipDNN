@@ -12,13 +12,13 @@
 
 namespace hipdnn_frontend::graph
 {
-class BatchNormNode : public NodeCRTP<BatchNormNode> //NOLINT
+class BatchnormNode : public BaseNode<BatchnormNode>
 {
 public:
     BatchnormAttributes attributes;
 
-    BatchNormNode(BatchnormAttributes&& batchnormAttrs, const GraphAttributes& graphAttrs)
-        : NodeCRTP(graphAttrs)
+    BatchnormNode(BatchnormAttributes&& batchnormAttrs, const GraphAttributes& graphAttrs)
+        : BaseNode(graphAttrs)
         , attributes(std::move(batchnormAttrs))
     {
     }
@@ -69,7 +69,7 @@ public:
                     "BatchnormNode missing y for setting properties"};
         }
 
-        HIPDNN_CHECK_ERROR(attributes.fill_from_graph_attributes(graph_attributes));
+        HIPDNN_CHECK_ERROR(attributes.fill_from_context(graph_attributes));
 
         if(y->get_dim().empty())
         {
@@ -128,7 +128,7 @@ public:
 
     void gather_hipdnn_tensor_ids(std::unordered_set<int64_t>& usedIds) const override
     {
-        NodeCRTP<BatchNormNode>::gather_hipdnn_tensor_ids(usedIds);
+        BaseNode<BatchnormNode>::gather_hipdnn_tensor_ids(usedIds);
 
         for(auto& tensor : attributes.peer_stats)
         {
@@ -144,7 +144,7 @@ public:
         int64_t& currentTensorId,
         std::unordered_set<int64_t>& usedIds) const override
     {
-        NodeCRTP<BatchNormNode>::populate_hipdnn_tensor_ids(tensorLookup, currentTensorId, usedIds);
+        BaseNode<BatchnormNode>::populate_hipdnn_tensor_ids(tensorLookup, currentTensorId, usedIds);
 
         for(auto& tensor : attributes.peer_stats)
         {
@@ -170,5 +170,5 @@ public:
     }
 };
 
-typedef BatchNormNode BatchnormNode;
+typedef BatchnormNode BatchNormNode;
 }
