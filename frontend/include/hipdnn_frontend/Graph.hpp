@@ -218,8 +218,15 @@ public:
     }
 
     // NOLINTNEXTLINE(readability-identifier-naming)
-    error_t create_execution_plans(hipdnnHandle_t handle,
+    error_t create_execution_plans(hipdnnHandle_t,
                                    std::vector<HeurMode_t> const& modes = {HeurMode_t::FALLBACK})
+    {
+        // Handle no longer needed.
+        return create_execution_plans(modes);
+    }
+
+    // NOLINTNEXTLINE(readability-identifier-naming)
+    error_t create_execution_plans(std::vector<HeurMode_t> const& modes = {HeurMode_t::FALLBACK})
     {
         if(!_graphDesc || !_graphDesc->valid())
         {
@@ -242,14 +249,6 @@ public:
             return {error_code_t::HIPDNN_BACKEND_ERROR,
                     "Failed to create backend execution descriptor."};
         }
-
-        RETURN_ON_BACKEND_FAILURE(
-            hipdnnBackend()->backendSetAttribute(_executionPlanDesc->get(),
-                                                 HIPDNN_ATTR_EXECUTION_PLAN_HANDLE,
-                                                 HIPDNN_TYPE_HANDLE,
-                                                 1,
-                                                 &handle),
-            "Failed to set the handle on execution plan.");
 
         return {error_code_t::OK, ""};
     }
