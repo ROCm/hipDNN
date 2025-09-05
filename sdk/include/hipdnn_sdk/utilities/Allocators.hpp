@@ -120,9 +120,8 @@ public:
     HostAllocator(const HostAllocator&) noexcept = default;
 
     template <typename U>
-    HostAllocator(const HostAllocator<U>& other) noexcept
+    HostAllocator([[maybe_unused]] const HostAllocator<U>& other) noexcept
     {
-        std::ignore = other;
     }
 
     ~HostAllocator() override = default;
@@ -142,26 +141,23 @@ public:
         return ptr;
     }
 
-    void deallocate(T* p, std::size_t n) noexcept override
+    void deallocate(T* p, [[maybe_unused]] std::size_t n) noexcept override
     {
-        std::ignore = n;
         std::free(p);
     }
 };
 
 template <typename T, typename U>
-bool operator==(const HostAllocator<T>& lhs, const HostAllocator<U>& rhs) noexcept
+bool operator==([[maybe_unused]] const HostAllocator<T>& lhs,
+                [[maybe_unused]] const HostAllocator<U>& rhs) noexcept
 {
-    std::ignore = lhs;
-    std::ignore = rhs;
     return true;
 }
 
 template <typename T, typename U>
-bool operator!=(const HostAllocator<T>& lhs, const HostAllocator<U>& rhs) noexcept
+bool operator!=([[maybe_unused]] const HostAllocator<T>& lhs,
+                [[maybe_unused]] const HostAllocator<U>& rhs) noexcept
 {
-    std::ignore = lhs;
-    std::ignore = rhs;
     return false;
 }
 
@@ -188,9 +184,8 @@ public:
     PinnedHostAllocator(const PinnedHostAllocator&) noexcept = default;
 
     template <typename U>
-    PinnedHostAllocator(const PinnedHostAllocator<U>& other) noexcept
+    PinnedHostAllocator([[maybe_unused]] const PinnedHostAllocator<U>& other) noexcept
     {
-        std::ignore = other;
     }
 
     ~PinnedHostAllocator() override = default;
@@ -211,26 +206,23 @@ public:
         return static_cast<T*>(ptr);
     }
 
-    void deallocate(T* p, std::size_t n) noexcept override
+    void deallocate(T* p, [[maybe_unused]] std::size_t n) noexcept override
     {
-        std::ignore = n;
         std::ignore = hipHostFree(p);
     }
 };
 
 template <typename T, typename U>
-bool operator==(const PinnedHostAllocator<T>& lhs, const PinnedHostAllocator<U>& rhs) noexcept
+bool operator==([[maybe_unused]] const PinnedHostAllocator<T>& lhs,
+                [[maybe_unused]] const PinnedHostAllocator<U>& rhs) noexcept
 {
-    std::ignore = lhs;
-    std::ignore = rhs;
     return true;
 }
 
 template <typename T, typename U>
-bool operator!=(const PinnedHostAllocator<T>& lhs, const PinnedHostAllocator<U>& rhs) noexcept
+bool operator!=([[maybe_unused]] const PinnedHostAllocator<T>& lhs,
+                [[maybe_unused]] const PinnedHostAllocator<U>& rhs) noexcept
 {
-    std::ignore = lhs;
-    std::ignore = rhs;
     return false;
 }
 
@@ -257,9 +249,8 @@ public:
     DeviceAllocator(const DeviceAllocator&) noexcept = default;
 
     template <typename U>
-    DeviceAllocator(const DeviceAllocator<U>& other) noexcept
+    DeviceAllocator([[maybe_unused]] const DeviceAllocator<U>& other) noexcept
     {
-        std::ignore = other;
     }
 
     ~DeviceAllocator() override = default;
@@ -280,9 +271,8 @@ public:
         return static_cast<T*>(ptr);
     }
 
-    void deallocate(T* p, std::size_t n) noexcept override
+    void deallocate(T* p, [[maybe_unused]] std::size_t n) noexcept override
     {
-        std::ignore = n;
         std::ignore = hipFree(p);
     }
 
@@ -292,18 +282,16 @@ public:
 };
 
 template <typename T, typename U>
-bool operator==(const DeviceAllocator<T>& lhs, const DeviceAllocator<U>& rhs) noexcept
+bool operator==([[maybe_unused]] const DeviceAllocator<T>& lhs,
+                [[maybe_unused]] const DeviceAllocator<U>& rhs) noexcept
 {
-    std::ignore = lhs;
-    std::ignore = rhs;
     return true;
 }
 
 template <typename T, typename U>
-bool operator!=(const DeviceAllocator<T>& lhs, const DeviceAllocator<U>& rhs) noexcept
+bool operator!=([[maybe_unused]] const DeviceAllocator<T>& lhs,
+                [[maybe_unused]] const DeviceAllocator<U>& rhs) noexcept
 {
-    std::ignore = lhs;
-    std::ignore = rhs;
     return false;
 }
 
