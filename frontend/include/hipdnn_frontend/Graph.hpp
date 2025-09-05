@@ -2,10 +2,10 @@
 // SPDX-License-Identifier:  MIT
 #pragma once
 
-#include "flatbuffers/detached_buffer.h"
 #include <hipdnn_frontend/attributes/BatchnormAttributes.hpp>
 #include <hipdnn_frontend/attributes/BatchnormInferenceAttributes.hpp>
 #include <hipdnn_frontend/attributes/ConvolutionFpropAttributes.hpp>
+#include <hipdnn_frontend/attributes/GraphAttributes.hpp>
 #include <hipdnn_frontend/attributes/PointwiseAttributes.hpp>
 #include <hipdnn_frontend/backend/BackendWrapper.hpp>
 #include <hipdnn_frontend/backend/ScopedHipdnnBackendDescriptor.hpp>
