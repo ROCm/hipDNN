@@ -14,7 +14,7 @@ TEST(TestTensorAttributes, DefaultConstructor)
     TensorAttributes tensor;
     EXPECT_EQ(tensor.get_uid(), 0);
     EXPECT_EQ(tensor.get_name(), "");
-    EXPECT_EQ(tensor.get_data_type(), DataType_t::NOT_SET);
+    EXPECT_EQ(tensor.get_data_type(), DataType::NOT_SET);
     EXPECT_TRUE(tensor.get_stride().empty());
     EXPECT_TRUE(tensor.get_dim().empty());
     EXPECT_EQ(tensor.get_volume(), 1);
@@ -44,8 +44,8 @@ TEST(TestTensorAttributes, SetAndGetName)
 TEST(TestTensorAttributes, SetAndGetDataType)
 {
     TensorAttributes tensor;
-    tensor.set_data_type(DataType_t::FLOAT);
-    EXPECT_EQ(tensor.get_data_type(), DataType_t::FLOAT);
+    tensor.set_data_type(DataType::FLOAT);
+    EXPECT_EQ(tensor.get_data_type(), DataType::FLOAT);
 }
 
 TEST(TestTensorAttributes, SetAndGetStride)
@@ -86,16 +86,16 @@ TEST(TestTensorAttributes, SetOutput)
 TEST(TestTensorAttributes, SetFromGraphAttributes)
 {
     GraphAttributes graphAttributes;
-    graphAttributes.set_io_data_type(DataType_t::FLOAT);
-    graphAttributes.set_intermediate_data_type(DataType_t::HALF);
+    graphAttributes.set_io_data_type(DataType::FLOAT);
+    graphAttributes.set_intermediate_data_type(DataType::HALF);
 
     TensorAttributes tensor;
     tensor.set_is_virtual(false).fill_from_context(graphAttributes);
-    EXPECT_EQ(tensor.get_data_type(), DataType_t::FLOAT);
+    EXPECT_EQ(tensor.get_data_type(), DataType::FLOAT);
 
-    tensor.set_data_type(DataType_t::NOT_SET);
+    tensor.set_data_type(DataType::NOT_SET);
     tensor.set_is_virtual(true).fill_from_context(graphAttributes);
-    EXPECT_EQ(tensor.get_data_type(), DataType_t::HALF);
+    EXPECT_EQ(tensor.get_data_type(), DataType::HALF);
 }
 
 TEST(TestTensorAttributes, PackAttributes)
@@ -103,7 +103,7 @@ TEST(TestTensorAttributes, PackAttributes)
     TensorAttributes tensor;
     tensor.set_uid(1)
         .set_name("PackedTensor")
-        .set_data_type(DataType_t::FLOAT)
+        .set_data_type(DataType::FLOAT)
         .set_stride({1, 2, 3})
         .set_dim({4, 5, 6})
         .set_is_virtual(true);

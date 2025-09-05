@@ -12,20 +12,22 @@
 namespace hipdnn_frontend
 {
 
-enum class ConvolutionMode_t // NOLINT(readability-identifier-naming)
+enum class ConvolutionMode
 {
     NOT_SET = 0,
     CROSS_CORRELATION = 1,
     CONVOLUTION = 2
 };
+typedef ConvolutionMode ConvolutionMode_t; // NOLINT(readability-identifier-naming)
 
-enum class PointwiseMode_t // NOLINT(readability-identifier-naming)
+enum class PointwiseMode
 {
     NOT_SET = 0,
     RELU_FWD = 1,
 };
+typedef PointwiseMode PointwiseMode_t; // NOLINT(readability-identifier-naming)
 
-enum class DataType_t // NOLINT(readability-identifier-naming)
+enum class DataType
 {
     NOT_SET = 0,
     FLOAT = 1,
@@ -35,96 +37,97 @@ enum class DataType_t // NOLINT(readability-identifier-naming)
     UINT8 = 5,
     INT32 = 6,
 };
+typedef DataType DataType_t; // NOLINT(readability-identifier-naming)
 
-enum class HeurMode_t // NOLINT(readability-identifier-naming)
+enum class HeuristicMode
 {
     FALLBACK,
 };
+typedef HeuristicMode HeurMode_t; // NOLINT(readability-identifier-naming)
 
 template <typename T>
-DataType_t getDataTypeEnumFromType()
+DataType getDataTypeEnumFromType()
 {
     if constexpr(std::is_same_v<T, float>)
     {
-        return DataType_t::FLOAT;
+        return DataType::FLOAT;
     }
     else if constexpr(std::is_same_v<T, half>)
     {
-        return DataType_t::HALF;
+        return DataType::HALF;
     }
     else if constexpr(std::is_same_v<T, hip_bfloat16>)
     {
-        return DataType_t::BFLOAT16;
+        return DataType::BFLOAT16;
     }
     else if constexpr(std::is_same_v<T, double>)
     {
-        return DataType_t::DOUBLE;
+        return DataType::DOUBLE;
     }
     else if constexpr(std::is_same_v<T, uint8_t>)
     {
-        return DataType_t::UINT8;
+        return DataType::UINT8;
     }
     else if constexpr(std::is_same_v<T, int32_t>)
     {
-        return DataType_t::INT32;
+        return DataType::INT32;
     }
     else
     {
-        return DataType_t::NOT_SET;
+        return DataType::NOT_SET;
     }
 }
 
-[[maybe_unused]] static hipdnn_sdk::data_objects::ConvMode toSdkType(const ConvolutionMode_t& type)
+[[maybe_unused]] static hipdnn_sdk::data_objects::ConvMode toSdkType(const ConvolutionMode& type)
 {
     switch(type)
     {
-    case ConvolutionMode_t::CROSS_CORRELATION:
+    case ConvolutionMode::CROSS_CORRELATION:
         return hipdnn_sdk::data_objects::ConvMode::ConvMode_CROSS_CORRELATION;
-    case ConvolutionMode_t::CONVOLUTION:
+    case ConvolutionMode::CONVOLUTION:
         return hipdnn_sdk::data_objects::ConvMode::ConvMode_CONVOLUTION;
     default:
         return hipdnn_sdk::data_objects::ConvMode::ConvMode_UNSET;
     }
 }
 
-[[maybe_unused]] static hipdnn_sdk::data_objects::DataType toSdkType(const DataType_t& type)
+[[maybe_unused]] static hipdnn_sdk::data_objects::DataType toSdkType(const DataType& type)
 {
     switch(type)
     {
-    case DataType_t::FLOAT:
+    case DataType::FLOAT:
         return hipdnn_sdk::data_objects::DataType::DataType_FLOAT;
-    case DataType_t::HALF:
+    case DataType::HALF:
         return hipdnn_sdk::data_objects::DataType::DataType_HALF;
-    case DataType_t::BFLOAT16:
+    case DataType::BFLOAT16:
         return hipdnn_sdk::data_objects::DataType::DataType_BFLOAT16;
-    case DataType_t::DOUBLE:
+    case DataType::DOUBLE:
         return hipdnn_sdk::data_objects::DataType::DataType_DOUBLE;
-    case DataType_t::UINT8:
+    case DataType::UINT8:
         return hipdnn_sdk::data_objects::DataType::DataType_UINT8;
-    case DataType_t::INT32:
+    case DataType::INT32:
         return hipdnn_sdk::data_objects::DataType::DataType_INT32;
     default:
         return hipdnn_sdk::data_objects::DataType::DataType_UNSET;
     }
 }
 
-[[maybe_unused]] static hipdnn_sdk::data_objects::PointwiseMode
-    toSdkType(const PointwiseMode_t& type)
+[[maybe_unused]] static hipdnn_sdk::data_objects::PointwiseMode toSdkType(const PointwiseMode& type)
 {
     switch(type)
     {
-    case PointwiseMode_t::RELU_FWD:
+    case PointwiseMode::RELU_FWD:
         return hipdnn_sdk::data_objects::PointwiseMode::PointwiseMode_RELU_FWD;
     default:
         return hipdnn_sdk::data_objects::PointwiseMode::PointwiseMode_UNSET;
     }
 }
 
-[[maybe_unused]] static hipdnnBackendHeurMode_t toBackendType(const HeurMode_t& type)
+[[maybe_unused]] static hipdnnBackendHeurMode_t toBackendType(const HeuristicMode& type)
 {
     switch(type)
     {
-    case HeurMode_t::FALLBACK:
+    case HeuristicMode::FALLBACK:
         return hipdnnBackendHeurMode_t::HIPDNN_HEUR_MODE_FALLBACK;
     default:
         return hipdnnBackendHeurMode_t::HIPDNN_HEUR_MODE_FALLBACK;
@@ -132,28 +135,28 @@ DataType_t getDataTypeEnumFromType()
 }
 
 // NOLINTNEXTLINE(readability-identifier-naming)
-[[maybe_unused]] static const char* to_string(const DataType_t& type)
+[[maybe_unused]] static const char* to_string(const DataType& type)
 {
     switch(type)
     {
-    case DataType_t::FLOAT:
+    case DataType::FLOAT:
         return "fp32";
-    case DataType_t::HALF:
+    case DataType::HALF:
         return "fp16";
-    case DataType_t::BFLOAT16:
+    case DataType::BFLOAT16:
         return "bf16";
-    case DataType_t::DOUBLE:
+    case DataType::DOUBLE:
         return "fp64";
-    case DataType_t::UINT8:
+    case DataType::UINT8:
         return "uint8";
-    case DataType_t::INT32:
+    case DataType::INT32:
         return "int32";
     default:
         return "unknown";
     }
 }
 
-[[maybe_unused]] static std::ostream& operator<<(std::ostream& os, const DataType_t& type)
+[[maybe_unused]] static std::ostream& operator<<(std::ostream& os, const DataType& type)
 {
     return os << to_string(type);
 }

@@ -18,7 +18,7 @@ class PointwiseAttributes : public Attributes<PointwiseAttributes>
 {
 public:
     // NOLINTNEXTLINE(readability-identifier-naming)
-    PointwiseMode_t get_mode() const
+    PointwiseMode get_mode() const
     {
         return _mode;
     }
@@ -45,26 +45,26 @@ public:
     // NOLINTNEXTLINE(readability-identifier-naming)
     std::shared_ptr<TensorAttributes> get_input_0() const
     {
-        return getInput(input_names::IN_0);
+        return getInput(InputNames::IN_0);
     }
     // NOLINTNEXTLINE(readability-identifier-naming)
     std::shared_ptr<TensorAttributes> get_input_1() const
     {
-        return getInput(input_names::IN_1);
+        return getInput(InputNames::IN_1);
     }
     // NOLINTNEXTLINE(readability-identifier-naming)
     std::shared_ptr<TensorAttributes> get_input_2() const
     {
-        return getInput(input_names::IN_2);
+        return getInput(InputNames::IN_2);
     }
     // NOLINTNEXTLINE(readability-identifier-naming)
     std::shared_ptr<TensorAttributes> get_output_0() const
     {
-        return getOutput(output_names::OUT_0);
+        return getOutput(OutputNames::OUT_0);
     }
 
     // NOLINTNEXTLINE(readability-identifier-naming)
-    PointwiseAttributes& set_mode(PointwiseMode_t mode)
+    PointwiseAttributes& set_mode(PointwiseMode mode)
     {
         _mode = mode;
         return *this;
@@ -96,64 +96,68 @@ public:
     // NOLINTNEXTLINE(readability-identifier-naming)
     PointwiseAttributes& set_input_0(const std::shared_ptr<TensorAttributes>& input0)
     {
-        inputs[input_names::IN_0] = input0;
+        inputs[InputNames::IN_0] = input0;
         return *this;
     }
     // NOLINTNEXTLINE(readability-identifier-naming)
     PointwiseAttributes& set_input_0(std::shared_ptr<TensorAttributes>&& input0)
     {
-        inputs[input_names::IN_0] = std::move(input0);
+        inputs[InputNames::IN_0] = std::move(input0);
         return *this;
     }
     // NOLINTNEXTLINE(readability-identifier-naming)
     PointwiseAttributes& set_input_1(const std::shared_ptr<TensorAttributes>& input1)
     {
-        inputs[input_names::IN_1] = input1;
+        inputs[InputNames::IN_1] = input1;
         return *this;
     }
     // NOLINTNEXTLINE(readability-identifier-naming)
     PointwiseAttributes& set_input_1(std::shared_ptr<TensorAttributes>&& input1)
     {
-        inputs[input_names::IN_1] = std::move(input1);
+        inputs[InputNames::IN_1] = std::move(input1);
         return *this;
     }
     // NOLINTNEXTLINE(readability-identifier-naming)
     PointwiseAttributes& set_input_2(const std::shared_ptr<TensorAttributes>& input2)
     {
-        inputs[input_names::IN_2] = input2;
+        inputs[InputNames::IN_2] = input2;
         return *this;
     }
     // NOLINTNEXTLINE(readability-identifier-naming)
     PointwiseAttributes& set_input_2(std::shared_ptr<TensorAttributes>&& input2)
     {
-        inputs[input_names::IN_2] = std::move(input2);
+        inputs[InputNames::IN_2] = std::move(input2);
         return *this;
     }
     // NOLINTNEXTLINE(readability-identifier-naming)
     PointwiseAttributes& set_output_0(const std::shared_ptr<TensorAttributes>& output0)
     {
-        outputs[output_names::OUT_0] = output0;
+        outputs[OutputNames::OUT_0] = output0;
         return *this;
     }
     // NOLINTNEXTLINE(readability-identifier-naming)
     PointwiseAttributes& set_output_0(std::shared_ptr<TensorAttributes>&& output0)
     {
-        outputs[output_names::OUT_0] = std::move(output0);
+        outputs[OutputNames::OUT_0] = std::move(output0);
         return *this;
     }
 
-    enum class input_names // NOLINT(readability-identifier-naming)
+    enum class InputNames
     {
         IN_0 = 0,
         IN_1 = 1,
         IN_2 = 2,
     };
-    enum class output_names // NOLINT(readability-identifier-naming)
+    typedef InputNames input_names; // NOLINT(readability-identifier-naming)
+
+    enum class OutputNames
     {
         OUT_0 = 0,
     };
-    std::unordered_map<input_names, std::shared_ptr<TensorAttributes>> inputs;
-    std::unordered_map<output_names, std::shared_ptr<TensorAttributes>> outputs;
+    typedef OutputNames output_names; // NOLINT(readability-identifier-naming)
+
+    std::unordered_map<InputNames, std::shared_ptr<TensorAttributes>> inputs;
+    std::unordered_map<OutputNames, std::shared_ptr<TensorAttributes>> outputs;
 
     flatbuffers::Offset<hipdnn_sdk::data_objects::PointwiseAttributes>
         pack_attributes(flatbuffers::FlatBufferBuilder& builder) const // NOLINT
@@ -177,7 +181,7 @@ public:
     }
 
 private:
-    std::shared_ptr<TensorAttributes> getInput(input_names name) const
+    std::shared_ptr<TensorAttributes> getInput(InputNames name) const
     {
         auto it = inputs.find(name);
         if(it != inputs.end())
@@ -186,7 +190,7 @@ private:
         }
         return nullptr;
     }
-    std::shared_ptr<TensorAttributes> getOutput(output_names name) const
+    std::shared_ptr<TensorAttributes> getOutput(OutputNames name) const
     {
         auto it = outputs.find(name);
         if(it != outputs.end())
@@ -195,7 +199,7 @@ private:
         }
         return nullptr;
     }
-    PointwiseMode_t _mode = PointwiseMode_t::NOT_SET;
+    PointwiseMode _mode = PointwiseMode::NOT_SET;
     std::optional<float> _reluLowerClip = std::nullopt;
     std::optional<float> _reluUpperClip = std::nullopt;
     std::optional<float> _reluLowerSlope = std::nullopt;
