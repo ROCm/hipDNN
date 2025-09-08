@@ -7,8 +7,8 @@
 #include <hipdnn_frontend/Types.hpp>
 #include <hipdnn_sdk/data_objects/graph_generated.h>
 #include <hipdnn_sdk/data_objects/tensor_attributes_generated.h>
-#include <hipdnn_sdk/utilities/HalfUtils.hpp>
-#include <hipdnn_sdk/utilities/HipBfloat16Utils.hpp>
+#include <hipdnn_sdk/utilities/UtilsBfp16.hpp>
+#include <hipdnn_sdk/utilities/UtilsFp16.hpp>
 #include <optional>
 #include <string>
 #include <type_traits>
