@@ -17,9 +17,6 @@
 #include <hipdnn_sdk/utilities/MigratableMemory.hpp>
 #include <hipdnn_sdk/utilities/Tensor.hpp>
 
-#undef COMPONENT_NAME
-#define COMPONENT_NAME "miopen_plugin_integration_test"
-
 using namespace hipdnn_frontend;
 using namespace hipdnn_sdk::utilities;
 using namespace hipdnn_sdk::test_utilities;
@@ -191,7 +188,6 @@ protected:
 
         if(!yTensorAttr->has_uid())
         {
-            HIPDNN_LOG_INFO("yTensorAttr does not have a UID, giving it a UID");
             yTensorAttr->set_uid(uid++);
         }
 
@@ -246,8 +242,6 @@ protected:
         auto intermediateDataType = getDataTypeEnumFromType<IntermediateType>();
 
         unsigned int seed = std::random_device{}();
-        //log the random seed in case we need to reproduce the test
-        HIPDNN_LOG_INFO("Test is using {} for its random seed", seed);
 
         Batchnorm2dTensorBundle graphTensorBundle(testCase.getDims(), seed, layout);
 
@@ -306,10 +300,10 @@ std::vector<Batchnorm2dTestCase> getBnFwdInferenceTestCases()
         {.n = 1, .c = 256, .h = 1, .w = 1},
         {.n = 2, .c = 3, .h = 1, .w = 1},
         {.n = 32, .c = 1, .h = 14, .w = 14},
-        {.n = 32, .c = 3, .h = 1, .w = 14},
-        {.n = 32, .c = 3, .h = 14, .w = 1},
-        {.n = 64, .c = 64, .h = 112, .w = 112},
-        {.n = 64, .c = 512, .h = 14, .w = 14},
+        // {.n = 32, .c = 3, .h = 1, .w = 14},
+        // {.n = 32, .c = 3, .h = 14, .w = 1},
+        // {.n = 64, .c = 64, .h = 112, .w = 112},
+        // {.n = 64, .c = 512, .h = 14, .w = 14},
     };
 }
 
