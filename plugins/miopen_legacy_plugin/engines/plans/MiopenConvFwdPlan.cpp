@@ -46,29 +46,29 @@ const MiopenConvDescriptor& ConvFwdParams::conv() const
 }
 
 ConvFwdPlan::ConvFwdPlan(const HipdnnEnginePluginHandle& handle,
-                         std::unique_ptr<ConvFwdParams> params)
+                         ConvFwdParams&& params)
     : _params(std::move(params))
 {
     // MIOpen Find 2.0 API
     miopenProblem_t problem;
     THROW_ON_MIOPEN_FAILURE(miopenCreateConvProblem(
-        &problem, _params->conv().convDescriptor(), miopenProblemDirectionForward));
+        &problem, _params.conv().convDescriptor(), miopenProblemDirectionForward));
     hipdnn_sdk::utilities::ScopedResource problemRes(
         problem, [](miopenProblem_t p) { std::ignore = miopenDestroyProblem(p); });
 
     THROW_ON_MIOPEN_FAILURE(miopenSetProblemTensorDescriptor(
-        problem, miopenTensorConvolutionX, _params->x().tensorDescriptor()));
+        problem, miopenTensorConvolutionX, _params.x().tensorDescriptor()));
     THROW_ON_MIOPEN_FAILURE(miopenSetProblemTensorDescriptor(
-        problem, miopenTensorConvolutionW, _params->w().tensorDescriptor()));
+        problem, miopenTensorConvolutionW, _params.w().tensorDescriptor()));
     THROW_ON_MIOPEN_FAILURE(miopenSetProblemTensorDescriptor(
-        problem, miopenTensorConvolutionY, _params->y().tensorDescriptor()));
+        problem, miopenTensorConvolutionY, _params.y().tensorDescriptor()));
 
     size_t numSolutions;
     // Requesting only the best solution
     THROW_ON_MIOPEN_FAILURE(
         miopenFindSolutions(handle.miopenHandle, problem, nullptr, &_solution, &numSolutions, 1));
 
-    if(numSolutions == 0)
+    if(numSolutions != 1)
     {
         throw hipdnn_plugin::HipdnnPluginException(HIPDNN_PLUGIN_STATUS_INTERNAL_ERROR,
                                                    "miopenFindSolutions returned no solutions");
@@ -83,21 +83,42 @@ ConvFwdPlan::~ConvFwdPlan()
     }
 }
 
+ConvFwdPlan::ConvFwdPlan(ConvFwdPlan&& other) noexcept
+    : _params(std::move(other._params)), _solution(other._solution)
+{
+    other._solution = nullptr;
+}
+
+ConvFwdPlan& ConvFwdPlan::operator=(ConvFwdPlan&& other) noexcept
+{
+    if(this != &other)
+    {
+        if(_solution != nullptr)
+        {
+            std::ignore = miopenDestroySolution(_solution);
+        }
+        _params = std::move(other._params);
+        _solution = other._solution;
+        other._solution = nullptr;
+    }
+    return *this;
+}
+
 void ConvFwdPlan::execute(const HipdnnEnginePluginHandle& handle,
                           const hipdnnPluginDeviceBuffer_t* deviceBuffers,
                           uint32_t numDeviceBuffers,
                           void* workspace) const
 {
-    auto xDesc = _params->x().tensorDescriptor();
-    auto wDesc = _params->w().tensorDescriptor();
-    auto yDesc = _params->y().tensorDescriptor();
+    auto xDesc = _params.x().tensorDescriptor();
+    auto wDesc = _params.w().tensorDescriptor();
+    auto yDesc = _params.y().tensorDescriptor();
 
     auto xBuffer
-        = miopen_utils::findDeviceBuffer(_params->x().uid(), deviceBuffers, numDeviceBuffers);
+        = miopen_utils::findDeviceBuffer(_params.x().uid(), deviceBuffers, numDeviceBuffers);
     auto wBuffer
-        = miopen_utils::findDeviceBuffer(_params->w().uid(), deviceBuffers, numDeviceBuffers);
+        = miopen_utils::findDeviceBuffer(_params.w().uid(), deviceBuffers, numDeviceBuffers);
     auto yBuffer
-        = miopen_utils::findDeviceBuffer(_params->y().uid(), deviceBuffers, numDeviceBuffers);
+        = miopen_utils::findDeviceBuffer(_params.y().uid(), deviceBuffers, numDeviceBuffers);
 
     std::array<miopenTensorArgument_t, 3> tensors
         = {miopenTensorArgument_t{

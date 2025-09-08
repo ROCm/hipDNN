@@ -71,7 +71,7 @@ void buildPlanInferenceSingleNode(const HipdnnEnginePluginHandle& handle,
                 + getNodeName(node));
     }
 
-    auto params = std::make_unique<BatchnormFwdInferenceParams>(*attr, opGraph.getTensorMap());
+    BatchnormFwdInferenceParams params(*attr, opGraph.getTensorMap());
     auto plan = std::make_unique<BatchnormFwdInferencePlan>(std::move(params));
     executionContext.setPlan(std::move(plan));
 }
@@ -92,7 +92,7 @@ void buildPlanBwdSingleNode(const HipdnnEnginePluginHandle& handle,
                 + getNodeName(node));
     }
 
-    auto params = std::make_unique<BatchnormBwdParams>(*attr, opGraph.getTensorMap());
+    BatchnormBwdParams params(*attr, opGraph.getTensorMap());
     auto plan = std::make_unique<BatchnormBwdPlan>(std::move(params));
     executionContext.setPlan(std::move(plan));
 }

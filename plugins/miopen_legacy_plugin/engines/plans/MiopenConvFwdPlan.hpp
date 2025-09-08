@@ -24,6 +24,12 @@ public:
         const std::unordered_map<int64_t, const hipdnn_sdk::data_objects::TensorAttributes*>&
             tensorMap);
 
+    ConvFwdParams(const ConvFwdParams&) = delete;
+    ConvFwdParams& operator=(const ConvFwdParams&) = delete;
+
+    ConvFwdParams(ConvFwdParams&&) = default;
+    ConvFwdParams& operator=(ConvFwdParams&&) = default;
+
     const MiopenTensor& x() const;
     const MiopenTensor& w() const;
     const MiopenTensor& y() const;
@@ -40,8 +46,14 @@ private:
 class ConvFwdPlan : public IPlan
 {
 public:
-    ConvFwdPlan(const HipdnnEnginePluginHandle& handle, std::unique_ptr<ConvFwdParams> params);
+    ConvFwdPlan(const HipdnnEnginePluginHandle& handle, ConvFwdParams&& params);
     ~ConvFwdPlan() override;
+
+    ConvFwdPlan(const ConvFwdPlan&) = delete;
+    ConvFwdPlan& operator=(const ConvFwdPlan&) = delete;
+
+    ConvFwdPlan(ConvFwdPlan&& other) noexcept;
+    ConvFwdPlan& operator=(ConvFwdPlan&& other) noexcept;
 
     void execute(const HipdnnEnginePluginHandle& handle,
                  const hipdnnPluginDeviceBuffer_t* deviceBuffers,
@@ -49,7 +61,7 @@ public:
                  void* workspace = nullptr) const override;
 
 private:
-    std::unique_ptr<ConvFwdParams> _params;
+    ConvFwdParams _params;
     miopenSolution_t _solution = nullptr;
 };
 

@@ -222,7 +222,7 @@ void buildPlanFwd(const HipdnnEnginePluginHandle& handle,
                 + getNodeName(node));
     }
 
-    auto params = std::make_unique<ConvFwdParams>(*attr, opGraph.getTensorMap());
+    ConvFwdParams params(*attr, opGraph.getTensorMap());
     auto plan = std::make_unique<ConvFwdPlan>(handle, std::move(params));
     executionContext.setPlan(std::move(plan));
 }
