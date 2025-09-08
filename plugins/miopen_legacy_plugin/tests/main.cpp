@@ -13,7 +13,7 @@ int main(int argc, char** argv)
 {
     ::testing::InitGoogleTest(&argc, argv);
 
-    hipdnn::logging::initializeCallbackLogging(COMPONENT_NAME,
-                                               hipdnn_sdk::test_utilities::testLoggingCallback);
+    hipdnn::logging::initializeCallbackLogging(COMPONENT_NAME, hipdnnLoggingCallback_ext);
+
     return RUN_ALL_TESTS();
 }

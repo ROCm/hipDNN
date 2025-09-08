@@ -14,5 +14,10 @@ int main(int argc, char** argv)
 
     hipdnn_frontend::initializeFrontendLogging();
 
+#undef COMPONENT_NAME
+#define COMPONENT_NAME "public_hipdnn_frontend_tests"
+
+    hipdnn::logging::initializeCallbackLogging(COMPONENT_NAME, hipdnnLoggingCallback_ext);
+
     return RUN_ALL_TESTS();
 }

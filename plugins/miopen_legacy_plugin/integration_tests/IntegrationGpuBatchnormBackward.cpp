@@ -17,6 +17,9 @@
 #include <hipdnn_sdk/utilities/MigratableMemory.hpp>
 #include <hipdnn_sdk/utilities/Tensor.hpp>
 
+#undef COMPONENT_NAME
+#define COMPONENT_NAME "miopen_plugin_integration_test"
+
 using namespace hipdnn_frontend;
 using namespace hipdnn_sdk::utilities;
 using namespace hipdnn_sdk::test_utilities;
