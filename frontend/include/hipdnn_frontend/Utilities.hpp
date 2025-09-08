@@ -5,6 +5,7 @@
 #include "Error.hpp"
 #include "attributes/TensorAttributes.hpp"
 #include <algorithm>
+#include <hipdnn_backend.h>
 #include <hipdnn_sdk/logging/CallbackTypes.h>
 #include <hipdnn_sdk/logging/Logger.hpp>
 #include <hipdnn_sdk/utilities/Tensor.hpp>
@@ -73,7 +74,7 @@ inline TensorAttributes
 
 }
 
-inline int32_t initializeFrontendLogging(hipdnnCallback_t fn)
+inline int32_t initializeFrontendLogging(hipdnnCallback_t fn = hipdnnLoggingCallback_ext)
 {
     if(fn == nullptr)
     {
