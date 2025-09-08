@@ -5,14 +5,14 @@
 #include "flatbuffers/detached_buffer.h"
 #include <hipdnn_frontend/attributes/BatchnormAttributes.hpp>
 #include <hipdnn_frontend/attributes/BatchnormInferenceAttributes.hpp>
-#include <hipdnn_frontend/attributes/ConvolutionFwdAttributes.hpp>
+#include <hipdnn_frontend/attributes/ConvolutionFpropAttributes.hpp>
 #include <hipdnn_frontend/attributes/PointwiseAttributes.hpp>
 #include <hipdnn_frontend/backend/BackendWrapper.hpp>
 #include <hipdnn_frontend/backend/ScopedHipdnnBackendDescriptor.hpp>
 #include <hipdnn_frontend/node/BatchnormBackwardNode.hpp>
 #include <hipdnn_frontend/node/BatchnormInferenceNode.hpp>
 #include <hipdnn_frontend/node/BatchnormNode.hpp>
-#include <hipdnn_frontend/node/ConvolutionNode.hpp>
+#include <hipdnn_frontend/node/ConvolutionFpropNode.hpp>
 #include <hipdnn_frontend/node/Node.hpp>
 #include <hipdnn_frontend/node/PointwiseNode.hpp>
 
@@ -218,8 +218,15 @@ public:
     }
 
     // NOLINTNEXTLINE(readability-identifier-naming)
-    error_t create_execution_plans(hipdnnHandle_t handle,
+    error_t create_execution_plans(hipdnnHandle_t,
                                    std::vector<HeurMode_t> const& modes = {HeurMode_t::FALLBACK})
+    {
+        // Handle no longer needed.
+        return create_execution_plans(modes);
+    }
+
+    // NOLINTNEXTLINE(readability-identifier-naming)
+    error_t create_execution_plans(std::vector<HeurMode_t> const& modes = {HeurMode_t::FALLBACK})
     {
         if(!_graphDesc || !_graphDesc->valid())
         {
@@ -242,14 +249,6 @@ public:
             return {error_code_t::HIPDNN_BACKEND_ERROR,
                     "Failed to create backend execution descriptor."};
         }
-
-        RETURN_ON_BACKEND_FAILURE(
-            hipdnnBackend()->backendSetAttribute(_executionPlanDesc->get(),
-                                                 HIPDNN_ATTR_EXECUTION_PLAN_HANDLE,
-                                                 HIPDNN_TYPE_HANDLE,
-                                                 1,
-                                                 &handle),
-            "Failed to set the handle on execution plan.");
 
         return {error_code_t::OK, ""};
     }
@@ -297,6 +296,28 @@ public:
             "Failed to get engine configurations from the execution plan descriptor.");
 
         return {error_code_t::OK, ""};
+    }
+
+    error_t execute(hipdnnHandle_t handle,
+                    std::unordered_map<std::shared_ptr<TensorAttributes>, void*>& tensorLookup,
+                    void* workspace) const
+    {
+
+        std::unordered_map<int64_t, void*> variantPack;
+        for(const auto& [tensor, ptr] : tensorLookup)
+        {
+            if(tensor && tensor->has_uid())
+            {
+                variantPack[tensor->get_uid()] = ptr;
+            }
+            else
+            {
+                return {error_code_t::INVALID_VALUE,
+                        "Tensor in tensor lookup is null or does not have a valid uid."};
+            }
+        }
+
+        return execute(handle, variantPack, workspace);
     }
 
     error_t execute(hipdnnHandle_t handle,
@@ -451,17 +472,15 @@ public:
         }
 
         auto dx = outputTensor(attributes.get_name() + "::DX");
-        attributes.set_dx(dx);
-
         auto dscale = outputTensor(attributes.get_name() + "::DSCALE");
-        attributes.set_dscale(dscale);
-
         auto dbias = outputTensor(attributes.get_name() + "::DBIAS");
-        attributes.set_dbias(dbias);
 
         attributes.set_x(std::move(x));
         attributes.set_dy(std::move(dy));
         attributes.set_scale(std::move(scale));
+        attributes.set_dx(dx);
+        attributes.set_dscale(dscale);
+        attributes.set_dbias(dbias);
 
         _sub_nodes.emplace_back(
             std::make_shared<BatchnormBackwardNode>(std::move(attributes), graph_attributes));
@@ -483,12 +502,13 @@ public:
         }
 
         auto y = outputTensor(attributes.get_name() + "::Y");
-        attributes.set_y(y);
+
         attributes.set_x(std::move(x));
         attributes.set_mean(std::move(mean));
         attributes.set_inv_variance(std::move(invVariance));
         attributes.set_scale(std::move(scale));
         attributes.set_bias(std::move(bias));
+        attributes.set_y(y);
 
         _sub_nodes.emplace_back(
             std::make_shared<BatchnormInferenceNode>(std::move(attributes), graph_attributes));
@@ -509,8 +529,9 @@ public:
             in0->set_name(attributes.get_name() + "::IN_0");
         }
         auto out0 = outputTensor(attributes.get_name() + "::OUT_0");
-        attributes.set_output_0(out0);
+
         attributes.set_input_0(std::move(in0));
+        attributes.set_output_0(out0);
 
         _sub_nodes.emplace_back(
             std::make_shared<PointwiseNode>(std::move(attributes), graph_attributes));
@@ -536,9 +557,10 @@ public:
             in1->set_name(attributes.get_name() + "::IN_1");
         }
         auto out0 = outputTensor(attributes.get_name() + "::OUT_0");
-        attributes.set_output_0(out0);
+
         attributes.set_input_0(std::move(in0));
         attributes.set_input_1(std::move(in1));
+        attributes.set_output_0(out0);
 
         _sub_nodes.emplace_back(
             std::make_shared<PointwiseNode>(std::move(attributes), graph_attributes));
@@ -569,10 +591,11 @@ public:
             in2->set_name(attributes.get_name() + "::IN_2");
         }
         auto out0 = outputTensor(attributes.get_name() + "::OUT_0");
-        attributes.set_output_0(out0);
+
         attributes.set_input_0(std::move(in0));
         attributes.set_input_1(std::move(in1));
         attributes.set_input_2(std::move(in2));
+        attributes.set_output_0(out0);
 
         _sub_nodes.emplace_back(
             std::make_shared<PointwiseNode>(std::move(attributes), graph_attributes));
@@ -587,7 +610,7 @@ public:
     {
         if(attributes.get_name().empty())
         {
-            attributes.set_name("Convolution_" + std::to_string(_sub_nodes.size()));
+            attributes.set_name("ConvolutionFprop_" + std::to_string(_sub_nodes.size()));
         }
         if(x->get_name().empty())
         {
@@ -605,7 +628,7 @@ public:
         attributes.set_y(y);
 
         _sub_nodes.emplace_back(
-            std::make_shared<ConvolutionNode>(std::move(attributes), graph_attributes));
+            std::make_shared<ConvolutionFpropNode>(std::move(attributes), graph_attributes));
 
         return y;
     }

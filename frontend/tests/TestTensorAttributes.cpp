@@ -90,11 +90,11 @@ TEST(TestTensorAttributes, SetFromGraphAttributes)
     graphAttributes.set_intermediate_data_type(DataType_t::HALF);
 
     TensorAttributes tensor;
-    tensor.set_is_virtual(false).set_from_graph_attributes(graphAttributes);
+    tensor.set_is_virtual(false).fill_from_context(graphAttributes);
     EXPECT_EQ(tensor.get_data_type(), DataType_t::FLOAT);
 
     tensor.set_data_type(DataType_t::NOT_SET);
-    tensor.set_is_virtual(true).set_from_graph_attributes(graphAttributes);
+    tensor.set_is_virtual(true).fill_from_context(graphAttributes);
     EXPECT_EQ(tensor.get_data_type(), DataType_t::HALF);
 }
 

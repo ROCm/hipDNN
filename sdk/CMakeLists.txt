@@ -64,6 +64,10 @@ target_include_directories(hipdnn_sdk INTERFACE
     $<INSTALL_INTERFACE:${HIP_DNN_SDK_INSTALL_INCLUDE_DIR}>
 )
 
+# This is required to use hip/hip_fp16.h and hip/hip_bfloat16.h in any code that includes the sdk
+# By doing this, we don't need to link to hip::device
+target_compile_definitions(hipdnn_sdk INTERFACE __HIPCC__)
+
 install( 
     TARGETS hipdnn_sdk FlatBuffers spdlog_header_only
     EXPORT hipdnn_sdk_targets

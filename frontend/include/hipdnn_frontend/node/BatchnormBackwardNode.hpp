@@ -13,13 +13,14 @@
 namespace hipdnn_frontend::graph
 {
 
-class DBNNode : public NodeCRTP<DBNNode> //NOLINT
+class BatchnormBackwardNode : public BaseNode<BatchnormBackwardNode>
 {
 public:
     BatchnormBackwardAttributes attributes;
 
-    DBNNode(BatchnormBackwardAttributes&& batchnormAttrs, const GraphAttributes& graphAttrs)
-        : NodeCRTP(graphAttrs)
+    BatchnormBackwardNode(BatchnormBackwardAttributes&& batchnormAttrs,
+                          const GraphAttributes& graphAttrs)
+        : BaseNode(graphAttrs)
         , attributes(std::move(batchnormAttrs))
     {
     }
@@ -88,7 +89,7 @@ public:
                     "BatchnormBackwardNode missing dbias for setting properties"};
         }
 
-        HIPDNN_CHECK_ERROR(attributes.fill_from_graph_attributes(graph_attributes));
+        HIPDNN_CHECK_ERROR(attributes.fill_from_context(graph_attributes));
 
         if(dx->get_dim().empty())
         {
@@ -125,7 +126,7 @@ public:
 
     void gather_hipdnn_tensor_ids(std::unordered_set<int64_t>& usedIds) const override
     {
-        NodeCRTP<DBNNode>::gather_hipdnn_tensor_ids(usedIds);
+        BaseNode<BatchnormBackwardNode>::gather_hipdnn_tensor_ids(usedIds);
 
         for(auto& tensor : attributes.peer_stats)
         {
@@ -141,7 +142,8 @@ public:
         int64_t& currentTensorId,
         std::unordered_set<int64_t>& usedIds) const override
     {
-        NodeCRTP<DBNNode>::populate_hipdnn_tensor_ids(tensorLookup, currentTensorId, usedIds);
+        BaseNode<BatchnormBackwardNode>::populate_hipdnn_tensor_ids(
+            tensorLookup, currentTensorId, usedIds);
 
         for(auto& tensor : attributes.peer_stats)
         {
@@ -167,5 +169,5 @@ public:
     }
 };
 
-typedef DBNNode BatchnormBackwardNode;
+typedef BatchnormBackwardNode DBNNode;
 }

@@ -19,7 +19,6 @@ class EngineExecutionContextWrapper;
 class ExecutionPlanDescriptor : public HipdnnBackendDescriptorImpl<ExecutionPlanDescriptor>
 {
 private:
-    hipdnnHandle_t _handle = nullptr;
     std::shared_ptr<const EngineConfigDescriptor> _engineConfig;
     std::shared_ptr<const plugin::EngineExecutionContextWrapper> _executionContext;
 
@@ -28,9 +27,11 @@ private:
                           int64_t* elementCount,
                           void* arrayOfElements) const;
 
-    void setHandle(hipdnnBackendAttributeType_t attributeType,
-                   int64_t elementCount,
-                   const void* arrayOfElements);
+    // Deprecated: No longer needed since we can get the handle from the engine config.
+    // Kept for backward compatibility.
+    static void setHandle(hipdnnBackendAttributeType_t attributeType,
+                          int64_t elementCount,
+                          const void* arrayOfElements);
 
     void setEngineConfig(hipdnnBackendAttributeType_t attributeType,
                          int64_t elementCount,

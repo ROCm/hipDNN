@@ -24,6 +24,7 @@ add_executable(hipdnn_frontend_tests
     TestConvolutionNode.cpp
     TestError.cpp
     TestGraph.cpp
+    TestGraphAttributes.cpp
     TestGraphGenerated.cpp
     TestPointwiseAttributes.cpp
     TestPointwiseNode.cpp
@@ -43,7 +44,6 @@ target_link_libraries(hipdnn_frontend_tests
     GTest::gtest 
     GTest::gmock
     hip::host
-    hip::device
     Threads::Threads 
     hipdnn_sdk 
     hipdnn_frontend

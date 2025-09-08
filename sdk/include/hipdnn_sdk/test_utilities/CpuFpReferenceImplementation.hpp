@@ -182,7 +182,7 @@ private:
 
     float sqrtInternal(float value) const
     {
-        return std::sqrtf(value);
+        return sqrtf(value);
     }
 };
 

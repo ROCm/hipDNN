@@ -5,6 +5,7 @@
 #include "BackendEnumStringUtils.hpp"
 #include "EngineConfigDescriptor.hpp"
 #include "EngineDescriptor.hpp"
+#include "GraphDescriptor.hpp"
 #include "HipdnnBackendDescriptorType.h"
 #include "HipdnnException.hpp"
 #include "handle/Handle.hpp"
@@ -18,23 +19,18 @@ void ExecutionPlanDescriptor::finalize()
                   HIPDNN_STATUS_BAD_PARAM,
                   "ExecutionPlanDescriptor::finalize() failed: Already finalized.");
 
-    THROW_IF_NULL(_handle,
-                  HIPDNN_STATUS_BAD_PARAM,
-                  "ExecutionPlanDescriptor::finalize() failed: Handle was not set.");
-
     THROW_IF_NULL(_engineConfig,
                   HIPDNN_STATUS_BAD_PARAM,
                   "ExecutionPlanDescriptor::finalize() failed: Engine was not set.");
 
-    auto pluginResourceManager = _handle->getPluginResourceManager();
-    auto engineConfigPluginData = _engineConfig->getSerializedEngineConfig();
     auto engine = _engineConfig->getEngine();
+    auto graph = engine->getGraph();
+    auto handle = graph->getHandle();
+    auto pluginResourceManager = handle->getPluginResourceManager();
+    auto engineConfigPluginData = _engineConfig->getSerializedEngineConfig();
 
-    _executionContext
-        = plugin::EnginePluginResourceManager::createExecutionContext(pluginResourceManager,
-                                                                      engine->getEngineId(),
-                                                                      &engineConfigPluginData,
-                                                                      engine->getGraph().get());
+    _executionContext = plugin::EnginePluginResourceManager::createExecutionContext(
+        pluginResourceManager, engine->getEngineId(), &engineConfigPluginData, graph.get());
 
     HipdnnBackendDescriptorImpl<ExecutionPlanDescriptor>::finalize();
 }
@@ -141,7 +137,7 @@ void ExecutionPlanDescriptor::setHandle(hipdnnBackendAttributeType_t attributeTy
                   HIPDNN_STATUS_BAD_PARAM_NULL_POINTER,
                   "ExecutionPlanDescriptor failed to set handle: Handle is null.");
 
-    _handle = handle;
+    // Just ignore handle since it's deprecated for execution plan, but still do the checks and keep the API.
 }
 
 void ExecutionPlanDescriptor::setEngineConfig(hipdnnBackendAttributeType_t attributeType,
