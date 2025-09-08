@@ -21,8 +21,8 @@ namespace graph
 // For example:
 // input_shapes = {{1, 2}, {1, 2}, {1, 2, 5}} -> common_shape = {1, 2, 5}
 // input_shapes = {{1, 2, 3}, {1, 2, 4}, {1, 2}} -> error
-inline ErrorObject findCommonShape(const std::vector<std::vector<int64_t>>& inputShapes,
-                                   std::vector<int64_t>& commonShape)
+inline Error findCommonShape(const std::vector<std::vector<int64_t>>& inputShapes,
+                             std::vector<int64_t>& commonShape)
 {
     if(inputShapes.empty())
     {

@@ -43,7 +43,7 @@ public:
     }
 
     // NOLINTNEXTLINE(readability-identifier-naming)
-    ErrorObject fill_from_context(const GraphAttributes& graphAttributes)
+    Error fill_from_context(const GraphAttributes& graphAttributes)
     {
         for(auto& [_, tensor] : self().inputs)
         {

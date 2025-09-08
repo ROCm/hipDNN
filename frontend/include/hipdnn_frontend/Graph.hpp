@@ -29,7 +29,7 @@ namespace graph
                                                              backend_err_msg.size());   \
         std::string full_error_msg                                                      \
             = std::string(error_message) + " Backend error: " + backend_err_msg.data(); \
-        return ErrorObject(ErrorCode::HIPDNN_BACKEND_ERROR, full_error_msg);            \
+        return Error(ErrorCode::HIPDNN_BACKEND_ERROR, full_error_msg);                  \
     }
 
 class Graph : public INode
@@ -47,7 +47,7 @@ private:
         return tensor;
     }
 
-    ErrorObject initializeHeuristicDescriptor(std::vector<HeuristicMode> const& modes)
+    Error initializeHeuristicDescriptor(std::vector<HeuristicMode> const& modes)
     {
         _engineHeuristicDesc
             = std::make_unique<ScopedHipdnnBackendDescriptor>(HIPDNN_BACKEND_ENGINEHEUR_DESCRIPTOR);
@@ -84,7 +84,7 @@ private:
         return {ErrorCode::OK, ""};
     }
 
-    ErrorObject initializeEngineConfig()
+    Error initializeEngineConfig()
     {
         int64_t availableEngineCount = 0;
         RETURN_ON_BACKEND_FAILURE(
@@ -149,13 +149,12 @@ public:
     {
     }
 
-    ErrorObject validate()
+    Error validate()
     {
         return validateSubtree();
     }
 
-    ErrorObject
-        build_operation_graph(hipdnnHandle_t handle) // NOLINT(readability-identifier-naming)
+    Error build_operation_graph(hipdnnHandle_t handle) // NOLINT(readability-identifier-naming)
     {
         std::unordered_set<int64_t> usedTensorUids;
         gatherHipdnnTensorIdsSubtree(usedTensorUids);
@@ -219,8 +218,8 @@ public:
     }
 
     // NOLINTNEXTLINE(readability-identifier-naming)
-    ErrorObject create_execution_plans(std::vector<HeuristicMode> const& modes
-                                       = {HeuristicMode::FALLBACK})
+    Error create_execution_plans(std::vector<HeuristicMode> const& modes
+                                 = {HeuristicMode::FALLBACK})
     {
         if(!_graphDesc || !_graphDesc->valid())
         {
@@ -229,7 +228,7 @@ public:
                     "execution plan."};
         }
 
-        ErrorObject status = initializeHeuristicDescriptor(modes);
+        Error status = initializeHeuristicDescriptor(modes);
         HIPDNN_CHECK_ERROR(status);
 
         status = initializeEngineConfig();
@@ -247,7 +246,7 @@ public:
         return {ErrorCode::OK, ""};
     }
 
-    ErrorObject check_support() // NOLINT(readability-identifier-naming)
+    Error check_support() // NOLINT(readability-identifier-naming)
     {
         if(!_executionPlanDesc || !_executionPlanDesc->valid())
         {
@@ -258,7 +257,7 @@ public:
         return {ErrorCode::OK, ""};
     }
 
-    ErrorObject build_plans() // NOLINT(readability-identifier-naming)
+    Error build_plans() // NOLINT(readability-identifier-naming)
     {
         RETURN_ON_BACKEND_FAILURE(hipdnnBackend()->backendFinalize(_engineConfigDesc->get()),
                                   "Failed to finalize engine config descriptor");
@@ -278,7 +277,7 @@ public:
     }
 
     // NOLINTNEXTLINE(readability-identifier-naming)
-    ErrorObject get_workspace_size(int64_t& workspaceSize) const
+    Error get_workspace_size(int64_t& workspaceSize) const
     {
         RETURN_ON_BACKEND_FAILURE(
             hipdnnBackend()->backendGetAttribute(_executionPlanDesc->get(),
@@ -292,9 +291,9 @@ public:
         return {ErrorCode::OK, ""};
     }
 
-    ErrorObject execute(hipdnnHandle_t handle,
-                        std::unordered_map<std::shared_ptr<TensorAttributes>, void*>& tensorLookup,
-                        void* workspace) const
+    Error execute(hipdnnHandle_t handle,
+                  std::unordered_map<std::shared_ptr<TensorAttributes>, void*>& tensorLookup,
+                  void* workspace) const
     {
 
         std::unordered_map<int64_t, void*> variantPack;
@@ -314,9 +313,9 @@ public:
         return execute(handle, variantPack, workspace);
     }
 
-    ErrorObject execute(hipdnnHandle_t handle,
-                        std::unordered_map<int64_t, void*>& variantPack,
-                        void* workspace) const
+    Error execute(hipdnnHandle_t handle,
+                  std::unordered_map<int64_t, void*>& variantPack,
+                  void* workspace) const
     {
         auto variantPackDesc = std::make_unique<ScopedHipdnnBackendDescriptor>(
             HIPDNN_BACKEND_VARIANT_PACK_DESCRIPTOR);

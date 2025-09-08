@@ -22,7 +22,7 @@ public:
     {
     }
 
-    ErrorObject pre_validate_node() const override
+    Error pre_validate_node() const override
     {
         if(!attributes.get_x())
         {
@@ -48,7 +48,7 @@ public:
         return {};
     }
 
-    ErrorObject infer_properties_node() override
+    Error infer_properties_node() override
     {
         auto x = attributes.get_x();
         auto y = attributes.get_y();

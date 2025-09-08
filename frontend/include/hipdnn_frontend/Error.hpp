@@ -28,17 +28,17 @@ enum class ErrorCode
 
 typedef ErrorCode error_code_t; // NOLINT(readability-identifier-naming)
 
-struct ErrorObject
+struct Error
 {
     ErrorCode code;
     std::string err_msg; // NOLINT(readability-identifier-naming)
 
-    ErrorObject()
+    Error()
         : code(ErrorCode::OK)
     {
     }
 
-    ErrorObject(ErrorCode errorCode, std::string message)
+    Error(ErrorCode errorCode, std::string message)
         : code(errorCode)
         , err_msg(std::move(message))
     {
@@ -71,18 +71,18 @@ struct ErrorObject
     {
         return code != otherCode;
     }
-    bool operator==(const ErrorObject& other) const
+    bool operator==(const Error& other) const
     {
         return code == other.code;
     }
-    bool operator!=(const ErrorObject& other) const
+    bool operator!=(const Error& other) const
     {
         return code != other.code;
     }
 };
 
-typedef ErrorObject error_object; // NOLINT(readability-identifier-naming)
-typedef ErrorObject error_t; // NOLINT(readability-identifier-naming)
+typedef Error error_object; // NOLINT(readability-identifier-naming)
+typedef Error error_t; // NOLINT(readability-identifier-naming)
 
 #define HIPDNN_RETURN_IF_NE(x, y, error_status, message) \
     if(x != y)                                           \

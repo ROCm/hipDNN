@@ -25,7 +25,7 @@ public:
     {
     }
 
-    ErrorObject pre_validate_node() const override
+    Error pre_validate_node() const override
     {
         if(!attributes.get_dy())
         {
@@ -61,7 +61,7 @@ public:
         return {};
     }
 
-    ErrorObject infer_properties_node() override
+    Error infer_properties_node() override
     {
         auto x = attributes.get_x();
         auto dx = attributes.get_dx();
@@ -137,7 +137,7 @@ public:
         }
     }
 
-    ErrorObject populate_hipdnn_tensor_ids(
+    Error populate_hipdnn_tensor_ids(
         std::unordered_map<int64_t, std::shared_ptr<TensorAttributes>>& tensorLookup,
         int64_t& currentTensorId,
         std::unordered_set<int64_t>& usedIds) const override

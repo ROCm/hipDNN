@@ -23,7 +23,7 @@ public:
     {
     }
 
-    ErrorObject pre_validate_node() const override
+    Error pre_validate_node() const override
     {
         // Validate tensor pointers
         HIPDNN_RETURN_IF_FALSE(attributes.get_x(),
@@ -212,7 +212,7 @@ public:
         return {};
     }
 
-    ErrorObject infer_properties_node() override
+    Error infer_properties_node() override
     {
         auto x = attributes.get_x();
         auto w = attributes.get_w();
