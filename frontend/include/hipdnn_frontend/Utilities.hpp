@@ -88,17 +88,17 @@ inline bool isLoggingEnabled()
 inline int32_t initializeFrontendLogging(hipdnnCallback_t fn = hipdnnLoggingCallback_ext)
 {
     static bool loggingInitialized = false;
-    if (loggingInitialized)
+    if(loggingInitialized)
     {
         return 0;
     }
 
-    if (!isLoggingEnabled())
+    if(!isLoggingEnabled())
     {
         return 0;
     }
 
-    if (fn == nullptr)
+    if(fn == nullptr)
     {
         return -1;
     }
@@ -115,28 +115,32 @@ inline int32_t initializeFrontendLogging(hipdnnCallback_t fn = hipdnnLoggingCall
     return 0;
 }
 
-#define HIPDNN_FE_LOG_INFO(...) \
-    do { \
+#define HIPDNN_FE_LOG_INFO(...)                       \
+    do                                                \
+    {                                                 \
         hipdnn_frontend::initializeFrontendLogging(); \
-        HIPDNN_LOG_INFO(__VA_ARGS__); \
+        HIPDNN_LOG_INFO(__VA_ARGS__);                 \
     } while(0)
 
-#define HIPDNN_FE_LOG_WARN(...) \
-    do { \
+#define HIPDNN_FE_LOG_WARN(...)                       \
+    do                                                \
+    {                                                 \
         hipdnn_frontend::initializeFrontendLogging(); \
-        HIPDNN_LOG_WARN(__VA_ARGS__); \
+        HIPDNN_LOG_WARN(__VA_ARGS__);                 \
     } while(0)
 
-#define HIPDNN_FE_LOG_ERROR(...) \
-    do { \
+#define HIPDNN_FE_LOG_ERROR(...)                      \
+    do                                                \
+    {                                                 \
         hipdnn_frontend::initializeFrontendLogging(); \
-        HIPDNN_LOG_ERROR(__VA_ARGS__); \
+        HIPDNN_LOG_ERROR(__VA_ARGS__);                \
     } while(0)
 
-#define HIPDNN_FE_LOG_CRITICAL(...) \
-    do { \
+#define HIPDNN_FE_LOG_CRITICAL(...)                   \
+    do                                                \
+    {                                                 \
         hipdnn_frontend::initializeFrontendLogging(); \
-        HIPDNN_LOG_CRITICAL(__VA_ARGS__); \
+        HIPDNN_LOG_CRITICAL(__VA_ARGS__);             \
     } while(0)
 
 }

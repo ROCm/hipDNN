@@ -37,6 +37,9 @@ add_executable(miopen_legacy_plugin_tests
 )
 
 target_compile_options(miopen_legacy_plugin_tests PRIVATE ${HIPDNN_WARNING_COMPILE_OPTIONS})
+target_compile_definitions(miopen_legacy_plugin_tests PRIVATE
+    COMPONENT_NAME="miopen_legacy_plugin_tests"
+)
 
 target_link_libraries(miopen_legacy_plugin_tests PUBLIC 
     GTest::gtest
@@ -45,7 +48,6 @@ target_link_libraries(miopen_legacy_plugin_tests PUBLIC
     miopen_legacy_plugin
     miopen_legacy_plugin_private
     hipdnn_sdk
-    hipdnn_backend
     Threads::Threads
 )
 
