@@ -40,6 +40,7 @@ function(create_test_name_validation_target)
             COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/cmake/scripts/test_name_validator.py 
                     --test-executables ${TEST_EXECUTABLES_FILE}
                     --build-dir ${CMAKE_BINARY_DIR}
+                    --strict
             COMMAND ${CMAKE_COMMAND} -E touch ${CMAKE_BINARY_DIR}/test_names_validated
             DEPENDS 
                 ${CMAKE_SOURCE_DIR}/cmake/scripts/test_name_validator.py
