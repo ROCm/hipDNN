@@ -23,36 +23,36 @@ public:
     {
     }
 
-    error_t pre_validate_node() const override
+    Error pre_validate_node() const override
     {
         // Validate tensor pointers
         HIPDNN_RETURN_IF_FALSE(attributes.get_x(),
-                               error_code_t::ATTRIBUTE_NOT_SET,
+                               ErrorCode::ATTRIBUTE_NOT_SET,
                                "ConvolutionFpropNode missing x (input) for pre-validation");
 
         HIPDNN_RETURN_IF_FALSE(attributes.get_w(),
-                               error_code_t::ATTRIBUTE_NOT_SET,
+                               ErrorCode::ATTRIBUTE_NOT_SET,
                                "ConvolutionFpropNode missing w (weights) for pre-validation");
 
         HIPDNN_RETURN_IF_FALSE(attributes.get_y(),
-                               error_code_t::ATTRIBUTE_NOT_SET,
+                               ErrorCode::ATTRIBUTE_NOT_SET,
                                "ConvolutionFpropNode missing y (output) for pre-validation");
 
         // Validate convolution parameters
         HIPDNN_RETURN_IF_TRUE(attributes.get_pre_padding().empty(),
-                              error_code_t::ATTRIBUTE_NOT_SET,
+                              ErrorCode::ATTRIBUTE_NOT_SET,
                               "ConvolutionFpropNode missing pre_padding for pre-validation");
 
         HIPDNN_RETURN_IF_TRUE(attributes.get_post_padding().empty(),
-                              error_code_t::ATTRIBUTE_NOT_SET,
+                              ErrorCode::ATTRIBUTE_NOT_SET,
                               "ConvolutionFpropNode missing post_padding for pre-validation");
 
         HIPDNN_RETURN_IF_TRUE(attributes.get_stride().empty(),
-                              error_code_t::ATTRIBUTE_NOT_SET,
+                              ErrorCode::ATTRIBUTE_NOT_SET,
                               "ConvolutionFpropNode missing stride for pre-validation");
 
         HIPDNN_RETURN_IF_TRUE(attributes.get_dilation().empty(),
-                              error_code_t::ATTRIBUTE_NOT_SET,
+                              ErrorCode::ATTRIBUTE_NOT_SET,
                               "ConvolutionFpropNode missing dilation for pre-validation");
 
         // Get tensor references
@@ -65,13 +65,13 @@ public:
 
         HIPDNN_RETURN_IF_FALSE(
             x->validate_dims_and_strides_set_and_positive(),
-            error_code_t::INVALID_VALUE,
+            ErrorCode::INVALID_VALUE,
             "ConvolutionFpropNode: Input tensor dimensions and strides must be set and positive");
 
         HIPDNN_RETURN_IF_LT(
             xDims.size(),
             3,
-            error_code_t::INVALID_VALUE,
+            ErrorCode::INVALID_VALUE,
             "ConvolutionFpropNode: Input tensor must have at least 3 dimensions (N, C, spatial)");
 
         // Validate weight tensor dimensions and strides
@@ -79,13 +79,13 @@ public:
 
         HIPDNN_RETURN_IF_FALSE(
             w->validate_dims_and_strides_set_and_positive(),
-            error_code_t::INVALID_VALUE,
+            ErrorCode::INVALID_VALUE,
             "ConvolutionFpropNode: Weight tensor dimensions and strides must be set and positive");
 
         HIPDNN_RETURN_IF_NE(
             wDims.size(),
             xDims.size(),
-            error_code_t::INVALID_VALUE,
+            ErrorCode::INVALID_VALUE,
             "ConvolutionFpropNode: Weight tensor dimension count must match input tensor "
             "dimension count");
 
@@ -95,7 +95,7 @@ public:
         HIPDNN_RETURN_IF_NE(
             xDims[1] % wDims[1],
             0,
-            error_code_t::INVALID_VALUE,
+            ErrorCode::INVALID_VALUE,
             "ConvolutionFpropNode: Input tensor channels must match weight tensor input "
             "channels or be divisible by them for grouped convolution");
 
@@ -105,7 +105,7 @@ public:
         HIPDNN_RETURN_IF_NE(
             wDims[0] % groupCount,
             0,
-            error_code_t::INVALID_VALUE,
+            ErrorCode::INVALID_VALUE,
             "ConvolutionFpropNode: Weight tensor output channels must be divisible by "
             "the number of groups");
 
@@ -118,34 +118,34 @@ public:
             HIPDNN_RETURN_IF_NE(
                 yDims.size(),
                 xDims.size(),
-                error_code_t::INVALID_VALUE,
+                ErrorCode::INVALID_VALUE,
                 "ConvolutionFpropNode: Output tensor dimension count must match input tensor "
                 "dimension count");
 
             // Validate batch size matches
             HIPDNN_RETURN_IF_NE(yDims[0],
                                 xDims[0],
-                                error_code_t::INVALID_VALUE,
+                                ErrorCode::INVALID_VALUE,
                                 "ConvolutionFpropNode: Output tensor batch size must match input "
                                 "tensor batch size");
 
             // Validate output channels match weight output channels
             HIPDNN_RETURN_IF_NE(yDims[1],
                                 wDims[0],
-                                error_code_t::INVALID_VALUE,
+                                ErrorCode::INVALID_VALUE,
                                 "ConvolutionFpropNode: Output tensor channels must match weight "
                                 "tensor output channels");
 
             HIPDNN_RETURN_IF_FALSE(
                 y->validate_dims_set_and_positive(),
-                error_code_t::INVALID_VALUE,
+                ErrorCode::INVALID_VALUE,
                 "ConvolutionFpropNode: Output tensor dimensions must be set and positive");
         }
 
         if(!yStrides.empty())
         {
             HIPDNN_RETURN_IF_FALSE(y->validate_dims_and_strides_set_and_positive(),
-                                   error_code_t::INVALID_VALUE,
+                                   ErrorCode::INVALID_VALUE,
                                    "ConvolutionFpropNode: Output tensor dimensions and strides "
                                    "must be set and positive");
         }
@@ -160,25 +160,25 @@ public:
         HIPDNN_RETURN_IF_NE(
             prePadding.size(),
             spatialDims,
-            error_code_t::INVALID_VALUE,
+            ErrorCode::INVALID_VALUE,
             "ConvolutionFpropNode: pre_padding parameter count must match spatial dimension count");
 
         HIPDNN_RETURN_IF_NE(postPadding.size(),
                             spatialDims,
-                            error_code_t::INVALID_VALUE,
+                            ErrorCode::INVALID_VALUE,
                             "ConvolutionFpropNode: post_padding parameter count must match spatial "
                             "dimension count");
 
         HIPDNN_RETURN_IF_NE(
             stride.size(),
             spatialDims,
-            error_code_t::INVALID_VALUE,
+            ErrorCode::INVALID_VALUE,
             "ConvolutionFpropNode: stride parameter count must match spatial dimension count");
 
         HIPDNN_RETURN_IF_NE(
             dilation.size(),
             spatialDims,
-            error_code_t::INVALID_VALUE,
+            ErrorCode::INVALID_VALUE,
             "ConvolutionFpropNode: dilation parameter count must match spatial dimension count");
 
         // Check spatial parameters for each dimension
@@ -190,46 +190,44 @@ public:
             auto dilationVal = dilation[i];
 
             // Validate parameters
-            HIPDNN_RETURN_IF_LT(strideVal,
-                                1,
-                                error_code_t::INVALID_VALUE,
-                                "ConvolutionFpropNode: Stride must be > 0");
+            HIPDNN_RETURN_IF_LT(
+                strideVal, 1, ErrorCode::INVALID_VALUE, "ConvolutionFpropNode: Stride must be > 0");
 
             HIPDNN_RETURN_IF_LT(dilationVal,
                                 1,
-                                error_code_t::INVALID_VALUE,
+                                ErrorCode::INVALID_VALUE,
                                 "ConvolutionFpropNode: Dilation must > 0");
 
             HIPDNN_RETURN_IF_LT(prePad,
                                 0,
-                                error_code_t::INVALID_VALUE,
+                                ErrorCode::INVALID_VALUE,
                                 "ConvolutionFpropNode: Pre-padding must be non-negative");
 
             HIPDNN_RETURN_IF_LT(postPad,
                                 0,
-                                error_code_t::INVALID_VALUE,
+                                ErrorCode::INVALID_VALUE,
                                 "ConvolutionFpropNode: Post-padding must be non-negative");
         }
 
         return {};
     }
 
-    error_t infer_properties_node() override
+    Error infer_properties_node() override
     {
         auto x = attributes.get_x();
         auto w = attributes.get_w();
         auto y = attributes.get_y();
 
         HIPDNN_RETURN_IF_FALSE(x,
-                               error_code_t::ATTRIBUTE_NOT_SET,
+                               ErrorCode::ATTRIBUTE_NOT_SET,
                                "ConvolutionFpropNode missing x for setting properties");
 
         HIPDNN_RETURN_IF_FALSE(w,
-                               error_code_t::ATTRIBUTE_NOT_SET,
+                               ErrorCode::ATTRIBUTE_NOT_SET,
                                "ConvolutionFpropNode missing w for setting properties");
 
         HIPDNN_RETURN_IF_FALSE(y,
-                               error_code_t::ATTRIBUTE_NOT_SET,
+                               ErrorCode::ATTRIBUTE_NOT_SET,
                                "ConvolutionFpropNode missing y for setting properties");
 
         HIPDNN_CHECK_ERROR(attributes.fill_from_context(graph_attributes));
@@ -261,7 +259,7 @@ public:
                 HIPDNN_RETURN_IF_TRUE(
                     spatialIdx >= prePadding.size() || spatialIdx >= postPadding.size()
                         || spatialIdx >= stride.size() || spatialIdx >= dilation.size(),
-                    error_code_t::INVALID_VALUE,
+                    ErrorCode::INVALID_VALUE,
                     "ConvolutionFpropNode: Insufficient padding/stride/dilation parameters for "
                     "spatial "
                     "dimensions");
@@ -280,22 +278,22 @@ public:
                 // Validate parameters
                 HIPDNN_RETURN_IF_LT(strideVal,
                                     1,
-                                    error_code_t::INVALID_VALUE,
+                                    ErrorCode::INVALID_VALUE,
                                     "ConvolutionFpropNode: Stride must be positive");
 
                 HIPDNN_RETURN_IF_LT(dilationVal,
                                     1,
-                                    error_code_t::INVALID_VALUE,
+                                    ErrorCode::INVALID_VALUE,
                                     "ConvolutionFpropNode: Dilation must be positive");
 
                 HIPDNN_RETURN_IF_LT(prePad,
                                     0,
-                                    error_code_t::INVALID_VALUE,
+                                    ErrorCode::INVALID_VALUE,
                                     "ConvolutionFpropNode: Pre-padding must be non-negative");
 
                 HIPDNN_RETURN_IF_LT(postPad,
                                     0,
-                                    error_code_t::INVALID_VALUE,
+                                    ErrorCode::INVALID_VALUE,
                                     "ConvolutionFpropNode: Post-padding must be non-negative");
 
                 // Calculate dilated kernel size
@@ -306,7 +304,7 @@ public:
                 HIPDNN_RETURN_IF_LT(
                     numerator,
                     0,
-                    error_code_t::INVALID_VALUE,
+                    ErrorCode::INVALID_VALUE,
                     "ConvolutionFpropNode: Invalid convolution parameters result in negative "
                     "output size");
 
@@ -325,18 +323,18 @@ public:
 
             HIPDNN_RETURN_IF_TRUE(
                 xStrides.empty(),
-                error_code_t::ATTRIBUTE_NOT_SET,
+                ErrorCode::ATTRIBUTE_NOT_SET,
                 "ConvolutionFpropNode: Cannot infer output strides - missing input strides");
 
             HIPDNN_RETURN_IF_TRUE(
                 yDimsFinal.empty(),
-                error_code_t::ATTRIBUTE_NOT_SET,
+                ErrorCode::ATTRIBUTE_NOT_SET,
                 "ConvolutionFpropNode: Cannot infer output strides - missing output dimensions");
 
             HIPDNN_RETURN_IF_NE(
                 xStrides.size(),
                 yDimsFinal.size(),
-                error_code_t::ATTRIBUTE_NOT_SET,
+                ErrorCode::ATTRIBUTE_NOT_SET,
                 "ConvolutionFpropNode: Stride dimension mismatch between input and output tensors");
 
             // All validations passed - perform stride generation

@@ -3,10 +3,7 @@
 
 #include "../utils/Helpers.hpp"
 
-#include <hipdnn_backend.h>
 #include <hipdnn_frontend.hpp>
-#include <hipdnn_frontend/Graph.hpp>
-#include <hipdnn_frontend/attributes/BatchnormInferenceAttributes.hpp>
 #include <hipdnn_sdk/test_utilities/CpuFpReferenceImplementation.hpp>
 #include <hipdnn_sdk/test_utilities/CpuFpReferenceValidation.hpp>
 #include <hipdnn_sdk/utilities/Tensor.hpp>
@@ -55,7 +52,7 @@ void SampleRunner::operator()(const TensorLayout& layout)
     HIPDNN_FE_CHECK(graph->build_operation_graph(handle));
     std::cout << "Operation graph build successful.\n";
 
-    HIPDNN_FE_CHECK(graph->create_execution_plans(handle));
+    HIPDNN_FE_CHECK(graph->create_execution_plans());
     std::cout << "Execution plans created successfully.\n";
 
     HIPDNN_FE_CHECK(graph->check_support());

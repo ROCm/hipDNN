@@ -17,13 +17,13 @@ TEST(TestConvolutionFwdAttributes, CreateConvolutionFwdAttributes)
     convAttributes.set_post_padding({1, 1});
     convAttributes.set_stride({1, 1});
     convAttributes.set_dilation({1, 1});
-    convAttributes.set_convolution_mode(hipdnn_frontend::ConvolutionMode_t::CROSS_CORRELATION);
+    convAttributes.set_convolution_mode(hipdnn_frontend::ConvolutionMode::CROSS_CORRELATION);
 
     // Configure input tensor
     auto xTensor = convAttributes.get_x();
     xTensor->set_uid(1)
         .set_name("InputTensor")
-        .set_data_type(hipdnn_frontend::DataType_t::FLOAT)
+        .set_data_type(hipdnn_frontend::DataType::FLOAT)
         .set_dim({1, 3, 32, 32}) // NCHW format
         .set_stride({3072, 1024, 32, 1});
 
@@ -31,7 +31,7 @@ TEST(TestConvolutionFwdAttributes, CreateConvolutionFwdAttributes)
     auto wTensor = convAttributes.get_w();
     wTensor->set_uid(2)
         .set_name("WeightsTensor")
-        .set_data_type(hipdnn_frontend::DataType_t::FLOAT)
+        .set_data_type(hipdnn_frontend::DataType::FLOAT)
         .set_dim({64, 3, 3, 3}) // KCHW format
         .set_stride({27, 9, 3, 1});
 
@@ -39,26 +39,26 @@ TEST(TestConvolutionFwdAttributes, CreateConvolutionFwdAttributes)
     auto yTensor = convAttributes.get_y();
     yTensor->set_uid(3)
         .set_name("OutputTensor")
-        .set_data_type(hipdnn_frontend::DataType_t::FLOAT)
+        .set_data_type(hipdnn_frontend::DataType::FLOAT)
         .set_dim({1, 64, 32, 32}) // NCHW format
         .set_stride({65536, 1024, 32, 1});
 
     // Verify tensor attributes
     EXPECT_EQ(xTensor->get_uid(), 1);
     EXPECT_EQ(xTensor->get_name(), "InputTensor");
-    EXPECT_EQ(xTensor->get_data_type(), hipdnn_frontend::DataType_t::FLOAT);
+    EXPECT_EQ(xTensor->get_data_type(), hipdnn_frontend::DataType::FLOAT);
     EXPECT_EQ(xTensor->get_dim(), (std::vector<int64_t>{1, 3, 32, 32}));
     EXPECT_EQ(xTensor->get_stride(), (std::vector<int64_t>{3072, 1024, 32, 1}));
 
     EXPECT_EQ(wTensor->get_uid(), 2);
     EXPECT_EQ(wTensor->get_name(), "WeightsTensor");
-    EXPECT_EQ(wTensor->get_data_type(), hipdnn_frontend::DataType_t::FLOAT);
+    EXPECT_EQ(wTensor->get_data_type(), hipdnn_frontend::DataType::FLOAT);
     EXPECT_EQ(wTensor->get_dim(), (std::vector<int64_t>{64, 3, 3, 3}));
     EXPECT_EQ(wTensor->get_stride(), (std::vector<int64_t>{27, 9, 3, 1}));
 
     EXPECT_EQ(yTensor->get_uid(), 3);
     EXPECT_EQ(yTensor->get_name(), "OutputTensor");
-    EXPECT_EQ(yTensor->get_data_type(), hipdnn_frontend::DataType_t::FLOAT);
+    EXPECT_EQ(yTensor->get_data_type(), hipdnn_frontend::DataType::FLOAT);
     EXPECT_EQ(yTensor->get_dim(), (std::vector<int64_t>{1, 64, 32, 32}));
     EXPECT_EQ(yTensor->get_stride(), (std::vector<int64_t>{65536, 1024, 32, 1}));
 
@@ -68,7 +68,7 @@ TEST(TestConvolutionFwdAttributes, CreateConvolutionFwdAttributes)
     EXPECT_EQ(convAttributes.get_stride(), (std::vector<int64_t>{1, 1}));
     EXPECT_EQ(convAttributes.get_dilation(), (std::vector<int64_t>{1, 1}));
     EXPECT_EQ(convAttributes.get_convolution_mode(),
-              hipdnn_frontend::ConvolutionMode_t::CROSS_CORRELATION);
+              hipdnn_frontend::ConvolutionMode::CROSS_CORRELATION);
 }
 
 TEST(TestConvolutionFwdAttributes, PackAttributes)
@@ -93,7 +93,7 @@ TEST(TestConvolutionFwdAttributes, PackAttributes)
     convAttributes.set_post_padding({2, 2});
     convAttributes.set_stride({2, 2});
     convAttributes.set_dilation({1, 1});
-    convAttributes.set_convolution_mode(hipdnn_frontend::ConvolutionMode_t::CROSS_CORRELATION);
+    convAttributes.set_convolution_mode(hipdnn_frontend::ConvolutionMode::CROSS_CORRELATION);
 
     // Pack attributes
     flatbuffers::FlatBufferBuilder builder;
@@ -135,7 +135,7 @@ TEST(TestConvolutionFwdAttributes, DefaultValues)
 
     // Check default convolution mode
     EXPECT_EQ(convAttributes.get_convolution_mode(),
-              hipdnn_frontend::ConvolutionMode_t::CROSS_CORRELATION);
+              hipdnn_frontend::ConvolutionMode::CROSS_CORRELATION);
 
     // Check that parameters are empty by default
     EXPECT_TRUE(convAttributes.get_pre_padding().empty());
@@ -208,7 +208,7 @@ TEST(TestConvolutionFwdAttributes, SetXMove)
     auto xTensor = std::make_shared<hipdnn_frontend::graph::TensorAttributes>();
     xTensor->set_uid(10)
         .set_name("MovedInputTensor")
-        .set_data_type(hipdnn_frontend::DataType_t::FLOAT)
+        .set_data_type(hipdnn_frontend::DataType::FLOAT)
         .set_dim({1, 3, 224, 224})
         .set_stride({150528, 50176, 224, 1});
 
@@ -232,7 +232,7 @@ TEST(TestConvolutionFwdAttributes, SetWMove)
     auto wTensor = std::make_shared<hipdnn_frontend::graph::TensorAttributes>();
     wTensor->set_uid(20)
         .set_name("MovedWeightTensor")
-        .set_data_type(hipdnn_frontend::DataType_t::HALF)
+        .set_data_type(hipdnn_frontend::DataType::HALF)
         .set_dim({128, 64, 5, 5})
         .set_stride({1600, 25, 5, 1});
 
@@ -256,7 +256,7 @@ TEST(TestConvolutionFwdAttributes, SetYWithMove)
     auto yTensor = std::make_shared<hipdnn_frontend::graph::TensorAttributes>();
     yTensor->set_uid(30)
         .set_name("MovedOutputTensor")
-        .set_data_type(hipdnn_frontend::DataType_t::BFLOAT16)
+        .set_data_type(hipdnn_frontend::DataType::BFLOAT16)
         .set_dim({1, 128, 112, 112})
         .set_stride({1605632, 12544, 112, 1});
 

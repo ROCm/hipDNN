@@ -7,8 +7,8 @@
 #include <hipdnn_frontend/Types.hpp>
 #include <hipdnn_sdk/data_objects/graph_generated.h>
 #include <hipdnn_sdk/data_objects/tensor_attributes_generated.h>
-#include <hipdnn_sdk/utilities/HalfUtils.hpp>
-#include <hipdnn_sdk/utilities/HipBfloat16Utils.hpp>
+#include <hipdnn_sdk/utilities/UtilsBfp16.hpp>
+#include <hipdnn_sdk/utilities/UtilsFp16.hpp>
 #include <optional>
 #include <string>
 #include <type_traits>
@@ -82,7 +82,7 @@ public:
         return _name;
     }
 
-    DataType_t get_data_type() const // NOLINT(readability-identifier-naming)
+    DataType get_data_type() const // NOLINT(readability-identifier-naming)
     {
         return _dataType;
     }
@@ -130,7 +130,7 @@ public:
         return *this;
     }
 
-    TensorAttributes& set_data_type(DataType_t dataType) // NOLINT(readability-identifier-naming)
+    TensorAttributes& set_data_type(DataType dataType) // NOLINT(readability-identifier-naming)
     {
         _dataType = dataType;
         return *this;
@@ -171,7 +171,7 @@ public:
     // NOLINTNEXTLINE(readability-identifier-naming)
     TensorAttributes& fill_from_context(const GraphAttributes& graphAttributes)
     {
-        if(_dataType == DataType_t::NOT_SET)
+        if(_dataType == DataType::NOT_SET)
         {
             if(_isVirtual)
             {
@@ -265,7 +265,7 @@ private:
     int64_t _uid = 0;
     bool _uidSet = false;
     std::string _name;
-    DataType_t _dataType = DataType_t::NOT_SET;
+    DataType _dataType = DataType::NOT_SET;
     std::vector<int64_t> _stride;
     std::vector<int64_t> _dim;
     bool _isVirtual = false;

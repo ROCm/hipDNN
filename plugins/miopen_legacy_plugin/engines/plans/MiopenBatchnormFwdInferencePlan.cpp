@@ -69,10 +69,8 @@ BatchnormFwdInferencePlan::BatchnormFwdInferencePlan(
 void BatchnormFwdInferencePlan::execute(const HipdnnEnginePluginHandle& handle,
                                         const hipdnnPluginDeviceBuffer_t* deviceBuffers,
                                         uint32_t numDeviceBuffers,
-                                        void* workspace) const
+                                        [[maybe_unused]] void* workspace) const
 {
-    std::ignore = workspace;
-
     // Hardcoded values from bn_driver in miopen
     auto alpha = static_cast<float>(1);
     auto beta = static_cast<float>(0);

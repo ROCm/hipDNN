@@ -7,6 +7,9 @@
 
 using namespace hipdnn_sdk::utilities;
 
+namespace
+{
+
 template <typename T>
 void initBuffer(T* buffer, size_t size, T mult = 1)
 {
@@ -37,7 +40,9 @@ void checkBufferSynchronized(const T* buffer, size_t size, hipStream_t stream = 
     }
 }
 
-TEST(MigratableMemory, NotInitialized)
+} // namespace
+
+TEST(TestMigratableMemory, NotInitialized)
 {
     MigratableMemory<float> memory;
 
@@ -47,7 +52,7 @@ TEST(MigratableMemory, NotInitialized)
     EXPECT_EQ(memory.hostData(), nullptr);
 }
 
-TEST(MigratableMemory, InitializeWithSize)
+TEST(TestMigratableMemory, InitializeWithSize)
 {
     MigratableMemory<float> memory(10);
 
@@ -57,7 +62,7 @@ TEST(MigratableMemory, InitializeWithSize)
     EXPECT_NE(memory.hostData(), nullptr);
 }
 
-TEST(MigratableMemory, MoveConstructor)
+TEST(TestMigratableMemory, MoveConstructor)
 {
     MigratableMemory<float> memory1(10);
     auto* oldHostData = memory1.hostData();
@@ -76,7 +81,7 @@ TEST(MigratableMemory, MoveConstructor)
     EXPECT_EQ(memory2.hostData(), oldHostData);
 }
 
-TEST(MigratableMemory, MoveAssignment)
+TEST(TestMigratableMemory, MoveAssignment)
 {
     MigratableMemory<float> memory1(10);
     auto* oldHostData = memory1.hostData();
@@ -96,7 +101,7 @@ TEST(MigratableMemory, MoveAssignment)
     EXPECT_EQ(memory2.hostData(), oldHostData);
 }
 
-TEST(MigratableMemory, Resize)
+TEST(TestMigratableMemory, Resize)
 {
     MigratableMemory<float> memory(10);
     memory.resize(20);
@@ -107,7 +112,7 @@ TEST(MigratableMemory, Resize)
     EXPECT_NE(memory.hostData(), nullptr);
 }
 
-TEST(MigratableMemory, MigrateToDevice)
+TEST(TestMigratableMemory, MigrateToDevice)
 {
     SKIP_IF_NO_DEVICES();
 
@@ -125,7 +130,7 @@ TEST(MigratableMemory, MigrateToDevice)
     checkBuffer(static_cast<float*>(memory.deviceData()), memory.count());
 }
 
-TEST(MigratableMemory, MigrateToDeviceNonDefaultStream)
+TEST(TestMigratableMemory, MigrateToDeviceNonDefaultStream)
 {
     SKIP_IF_NO_DEVICES();
 
@@ -151,7 +156,7 @@ TEST(MigratableMemory, MigrateToDeviceNonDefaultStream)
     EXPECT_EQ(error, hipSuccess) << "Failed to destroy HIP stream";
 }
 
-TEST(MigratableMemory, MigrateToDeviceAsyncNonDefaultStream)
+TEST(TestMigratableMemory, MigrateToDeviceAsyncNonDefaultStream)
 {
     SKIP_IF_NO_DEVICES();
 
@@ -177,7 +182,7 @@ TEST(MigratableMemory, MigrateToDeviceAsyncNonDefaultStream)
     EXPECT_EQ(error, hipSuccess) << "Failed to destroy HIP stream";
 }
 
-TEST(MigratableMemory, MigrateToHost)
+TEST(TestMigratableMemory, MigrateToHost)
 {
     SKIP_IF_NO_DEVICES();
 
@@ -204,7 +209,7 @@ TEST(MigratableMemory, MigrateToHost)
     EXPECT_EQ(memory.location(), MemoryLocation::BOTH);
 }
 
-TEST(MigratableMemory, MigrateToHostNonDefaultStream)
+TEST(TestMigratableMemory, MigrateToHostNonDefaultStream)
 {
     SKIP_IF_NO_DEVICES();
 
@@ -242,7 +247,7 @@ TEST(MigratableMemory, MigrateToHostNonDefaultStream)
     EXPECT_EQ(error, hipSuccess) << "Failed to destroy HIP stream";
 }
 
-TEST(MigratableMemory, MigrateToHostAsyncNonDefaultStream)
+TEST(TestMigratableMemory, MigrateToHostAsyncNonDefaultStream)
 {
     SKIP_IF_NO_DEVICES();
 
@@ -280,7 +285,7 @@ TEST(MigratableMemory, MigrateToHostAsyncNonDefaultStream)
     EXPECT_EQ(error, hipSuccess) << "Failed to destroy HIP stream";
 }
 
-TEST(MigratableMemory, Clear)
+TEST(TestMigratableMemory, Clear)
 {
     SKIP_IF_NO_DEVICES();
 

@@ -15,6 +15,7 @@
 #include <hipdnn_sdk/test_utilities/TempDirectory.hpp>
 
 using namespace hipdnn_backend;
+using namespace hipdnn_sdk::test_utilities;
 
 namespace
 {

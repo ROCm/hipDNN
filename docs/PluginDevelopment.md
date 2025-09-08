@@ -131,11 +131,11 @@ Your plugin should be structured as an independent project:
 ```
 your_kernel_plugin_project/
 ├── CMakeLists.txt
-├── your_plugin.cpp           # Main plugin entry point
-├── engine_manager.cpp        # Engine management
+├── YourPlugin.cpp           # Main plugin entry point
+├── EngineManager.cpp        # Engine management
 ├── engines/
-│   ├── engine_interface.hpp  # Engine interface
-│   ├── your_engine.cpp       # Engine implementation
+│   ├── EngineInterface.hpp  # Engine interface
+│   ├── YourEngine.cpp       # Engine implementation
 │   └── plans/                # Internal plans
 ├── tests/                    # Plugin-specific tests
 └── integration_tests/        # End-to-end integration tests
@@ -270,12 +270,12 @@ Following the [Testing Strategy](./testing/TestingStrategy.md), plugins should o
 ```
 your_kernel_plugin_project/
 ├── tests/                    # Unit tests
-│   ├── test_engine.cpp
-│   ├── test_kernels.cpp
-│   └── test_utilities.cpp
+│   ├── TestEngine.cpp
+│   ├── TestKernels.cpp
+│   └── TestUtilties.cpp
 └── integration_tests/        # End-to-end integration tests
-    ├── operation1_test.cpp
-    └── operation2_test.cpp
+    ├── Operation1Test.cpp
+    └── Operation2Test.cpp
 ```
 
 ### Unit Tests

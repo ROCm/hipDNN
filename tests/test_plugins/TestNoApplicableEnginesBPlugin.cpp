@@ -8,12 +8,12 @@ thread_local char
     hipdnn_plugin::PluginLastErrorManager::s_lastError[HIPDNN_PLUGIN_ERROR_STRING_MAX_LENGTH]
     = "";
 
-class GoodDefaultPlugin : public TestPluginBase
+class NoApplicableEnginesBPlugin : public TestPluginBase
 {
 public:
     const char* getPluginName() const override
     {
-        return COMPONENT_NAME;
+        return "test_NoApplicableEnginesBPlugin";
     }
     const char* getPluginVersion() const override
     {
@@ -21,22 +21,25 @@ public:
     }
     int64_t getEngineId() const override
     {
-        return hipdnn_tests::plugin_constants::engineId<GoodDefaultPlugin>();
+        return hipdnn_tests::plugin_constants::engineId<NoApplicableEnginesBPlugin>();
     }
     uint32_t getNumEngines() const override
     {
-        return 1;
+        return 0;
     }
     uint32_t getNumApplicableEngines() const override
     {
-        return 1;
+        return 0;
     }
+
+    // Since no engines are applicable, SupportsEngineOperations returns false
+    // This will cause all engine operations to throw appropriate errors
 };
 
 // Initialize plugin instance on load
 __attribute__((constructor)) static void initializePlugin()
 {
-    TestPluginBase::setInstance(std::make_unique<GoodDefaultPlugin>());
+    TestPluginBase::setInstance(std::make_unique<NoApplicableEnginesBPlugin>());
 }
 
 // Register all API functions

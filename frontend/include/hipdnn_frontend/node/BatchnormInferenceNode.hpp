@@ -22,46 +22,46 @@ public:
     {
     }
 
-    error_t pre_validate_node() const override
+    Error pre_validate_node() const override
     {
         if(!attributes.get_x())
         {
-            return {error_code_t::ATTRIBUTE_NOT_SET,
+            return {ErrorCode::ATTRIBUTE_NOT_SET,
                     "BatchnormInferenceNode missing x for pre-validation"};
         }
         if(!attributes.get_scale())
         {
-            return {error_code_t::ATTRIBUTE_NOT_SET,
+            return {ErrorCode::ATTRIBUTE_NOT_SET,
                     "BatchnormInferenceNode missing scale for pre-validation"};
         }
         if(!attributes.get_bias())
         {
-            return {error_code_t::ATTRIBUTE_NOT_SET,
+            return {ErrorCode::ATTRIBUTE_NOT_SET,
                     "BatchnormInferenceNode missing bias for pre-validation"};
         }
         if(!attributes.get_y())
         {
-            return {error_code_t::ATTRIBUTE_NOT_SET,
+            return {ErrorCode::ATTRIBUTE_NOT_SET,
                     "BatchnormInferenceNode missing y for pre-validation"};
         }
 
         return {};
     }
 
-    error_t infer_properties_node() override
+    Error infer_properties_node() override
     {
         auto x = attributes.get_x();
         auto y = attributes.get_y();
 
         if(!x)
         {
-            return {error_code_t::ATTRIBUTE_NOT_SET,
+            return {ErrorCode::ATTRIBUTE_NOT_SET,
                     "BatchnormInferenceNode missing x for setting properties"};
         }
 
         if(!y)
         {
-            return {error_code_t::ATTRIBUTE_NOT_SET,
+            return {ErrorCode::ATTRIBUTE_NOT_SET,
                     "BatchnormInferenceNode missing y for setting properties"};
         }
 

@@ -17,74 +17,76 @@ namespace graph
 class ConvFpropAttributes : public Attributes<ConvFpropAttributes>
 {
 public:
-    enum class input_names // NOLINT(readability-identifier-naming)
+    enum class InputNames
     {
         X = 0, // Input tensor
         W = 1 // Weights/filter tensor
     };
+    typedef InputNames input_names; // NOLINT(readability-identifier-naming)
 
-    enum class output_names // NOLINT(readability-identifier-naming)
+    enum class OutputNames
     {
         Y = 0 // Output tensor
     };
+    typedef OutputNames output_names; // NOLINT(readability-identifier-naming)
 
-    std::unordered_map<input_names, std::shared_ptr<TensorAttributes>> inputs;
-    std::unordered_map<output_names, std::shared_ptr<TensorAttributes>> outputs;
+    std::unordered_map<InputNames, std::shared_ptr<TensorAttributes>> inputs;
+    std::unordered_map<OutputNames, std::shared_ptr<TensorAttributes>> outputs;
 
     // Convolution parameters
     std::vector<int64_t> pre_padding;
     std::vector<int64_t> post_padding;
     std::vector<int64_t> stride;
     std::vector<int64_t> dilation;
-    ConvolutionMode_t math_mode = ConvolutionMode_t::CROSS_CORRELATION;
+    ConvolutionMode math_mode = ConvolutionMode::CROSS_CORRELATION;
 
     // Getters for tensors
     // NOLINTNEXTLINE(readability-identifier-naming)
     std::shared_ptr<TensorAttributes> get_x() const
     {
-        return getInput(input_names::X);
+        return getInput(InputNames::X);
     }
     // NOLINTNEXTLINE(readability-identifier-naming)
     std::shared_ptr<TensorAttributes> get_w() const
     {
-        return getInput(input_names::W);
+        return getInput(InputNames::W);
     }
     // NOLINTNEXTLINE(readability-identifier-naming)
     std::shared_ptr<TensorAttributes> get_y() const
     {
-        return getOutput(output_names::Y);
+        return getOutput(OutputNames::Y);
     }
 
     // Setters for tensor
     // NOLINTNEXTLINE(readability-identifier-naming)
     ConvFpropAttributes& set_x(std::shared_ptr<TensorAttributes>&& value)
     {
-        return setInput(input_names::X, std::move(value));
+        return setInput(InputNames::X, std::move(value));
     }
     // NOLINTNEXTLINE(readability-identifier-naming)
     ConvFpropAttributes& set_x(const std::shared_ptr<TensorAttributes>& value)
     {
-        return setInput(input_names::X, value);
+        return setInput(InputNames::X, value);
     }
     // NOLINTNEXTLINE(readability-identifier-naming)
     ConvFpropAttributes& set_w(std::shared_ptr<TensorAttributes>&& value)
     {
-        return setInput(input_names::W, std::move(value));
+        return setInput(InputNames::W, std::move(value));
     }
     // NOLINTNEXTLINE(readability-identifier-naming)
     ConvFpropAttributes& set_w(const std::shared_ptr<TensorAttributes>& value)
     {
-        return setInput(input_names::W, value);
+        return setInput(InputNames::W, value);
     }
     // NOLINTNEXTLINE(readability-identifier-naming)
     ConvFpropAttributes& set_y(std::shared_ptr<TensorAttributes>&& value)
     {
-        return setOutput(output_names::Y, std::move(value));
+        return setOutput(OutputNames::Y, std::move(value));
     }
     // NOLINTNEXTLINE(readability-identifier-naming)
     ConvFpropAttributes& set_y(const std::shared_ptr<TensorAttributes>& value)
     {
-        return setOutput(output_names::Y, value);
+        return setOutput(OutputNames::Y, value);
     }
     // NOLINTNEXTLINE(readability-identifier-naming)
     ConvFpropAttributes& set_padding(std::vector<int64_t> padding)
@@ -151,7 +153,7 @@ public:
     }
 
     // NOLINTNEXTLINE(readability-identifier-naming)
-    ConvFpropAttributes& set_convolution_mode(ConvolutionMode_t mode)
+    ConvFpropAttributes& set_convolution_mode(ConvolutionMode mode)
     {
         math_mode = mode;
         return *this;
@@ -179,7 +181,7 @@ public:
         return dilation;
     }
     // NOLINTNEXTLINE(readability-identifier-naming)
-    ConvolutionMode_t get_convolution_mode() const
+    ConvolutionMode get_convolution_mode() const
     {
         return math_mode;
     }
@@ -199,7 +201,7 @@ public:
     }
 
 private:
-    std::shared_ptr<TensorAttributes> getInput(input_names name) const
+    std::shared_ptr<TensorAttributes> getInput(InputNames name) const
     {
         auto it = inputs.find(name);
         if(it != inputs.end())
@@ -209,7 +211,7 @@ private:
         return nullptr;
     }
 
-    std::shared_ptr<TensorAttributes> getOutput(output_names name) const
+    std::shared_ptr<TensorAttributes> getOutput(OutputNames name) const
     {
         auto it = outputs.find(name);
         if(it != outputs.end())
@@ -219,26 +221,25 @@ private:
         return nullptr;
     }
 
-    ConvFpropAttributes& setInput(input_names name, const std::shared_ptr<TensorAttributes>& value)
+    ConvFpropAttributes& setInput(InputNames name, const std::shared_ptr<TensorAttributes>& value)
     {
         inputs[name] = value;
         return *this;
     }
 
-    ConvFpropAttributes& setInput(input_names name, std::shared_ptr<TensorAttributes>&& value)
+    ConvFpropAttributes& setInput(InputNames name, std::shared_ptr<TensorAttributes>&& value)
     {
         inputs[name] = std::move(value);
         return *this;
     }
 
-    ConvFpropAttributes& setOutput(output_names name,
-                                   const std::shared_ptr<TensorAttributes>& value)
+    ConvFpropAttributes& setOutput(OutputNames name, const std::shared_ptr<TensorAttributes>& value)
     {
         outputs[name] = value;
         return *this;
     }
 
-    ConvFpropAttributes& setOutput(output_names name, std::shared_ptr<TensorAttributes>&& value)
+    ConvFpropAttributes& setOutput(OutputNames name, std::shared_ptr<TensorAttributes>&& value)
     {
         outputs[name] = std::move(value);
         return *this;

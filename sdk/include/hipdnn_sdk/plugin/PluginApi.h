@@ -85,7 +85,7 @@ HIPDNN_PLUGIN_EXPORT void hipdnnPluginGetLastErrorString(const char** error_str)
  * The length includes the null-terminating character.
  * This is the recommended size for the internal per-thread buffer.
  */
-#define HIPDNN_PLUGIN_ERROR_STRING_MAX_LENGTH 256
+#define HIPDNN_PLUGIN_ERROR_STRING_MAX_LENGTH 2048
 
 /**
  * @brief Sets the logging callback function for the plugin.

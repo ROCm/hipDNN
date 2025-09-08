@@ -14,7 +14,7 @@ TEST(TestUtilities, FindCommonShapeValid)
     std::vector<int64_t> commonShape;
 
     auto error = findCommonShape(inputShapes, commonShape);
-    EXPECT_EQ(error.code, error_code_t::OK);
+    EXPECT_EQ(error.code, ErrorCode::OK);
     EXPECT_EQ(commonShape, (std::vector<int64_t>{1, 2, 3}));
 }
 
@@ -24,7 +24,7 @@ TEST(TestUtilities, FindCommonShapeEmptyInput)
     std::vector<int64_t> commonShape;
 
     auto error = findCommonShape(inputShapes, commonShape);
-    EXPECT_EQ(error.code, error_code_t::INVALID_VALUE);
+    EXPECT_EQ(error.code, ErrorCode::INVALID_VALUE);
 }
 
 TEST(TestUtilities, FindCommonShapeIncompatibleShapes)
@@ -33,7 +33,7 @@ TEST(TestUtilities, FindCommonShapeIncompatibleShapes)
     std::vector<int64_t> commonShape;
 
     auto error = findCommonShape(inputShapes, commonShape);
-    EXPECT_EQ(error.code, error_code_t::INVALID_VALUE);
+    EXPECT_EQ(error.code, ErrorCode::INVALID_VALUE);
 }
 
 TEST(TestUtilities, FindCommonShapeSingleInput)
@@ -42,6 +42,6 @@ TEST(TestUtilities, FindCommonShapeSingleInput)
     std::vector<int64_t> commonShape;
 
     auto error = findCommonShape(inputShapes, commonShape);
-    EXPECT_EQ(error.code, error_code_t::OK);
+    EXPECT_EQ(error.code, ErrorCode::OK);
     EXPECT_EQ(commonShape, (std::vector<int64_t>{1, 2, 3}));
 }
