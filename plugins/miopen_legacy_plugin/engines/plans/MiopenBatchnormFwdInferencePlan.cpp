@@ -60,8 +60,7 @@ const std::optional<MiopenTensor>& BatchnormFwdInferenceParams::estVariance() co
     return _estVariance;
 }
 
-BatchnormFwdInferencePlan::BatchnormFwdInferencePlan(
-    BatchnormFwdInferenceParams&& inferenceParams)
+BatchnormFwdInferencePlan::BatchnormFwdInferencePlan(BatchnormFwdInferenceParams&& inferenceParams)
     : _inferenceParams(std::move(inferenceParams))
 {
 }

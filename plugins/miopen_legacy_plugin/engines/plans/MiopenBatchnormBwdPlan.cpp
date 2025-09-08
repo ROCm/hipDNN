@@ -136,7 +136,7 @@ void BatchnormBwdPlan::execute(const HipdnnEnginePluginHandle& handle,
         _params.scale().tensorDescriptor(),
         _params.optMean().has_value() ? _params.optMean().value().tensorDescriptor() : nullptr,
         _params.optInvVariance().has_value() ? _params.optInvVariance().value().tensorDescriptor()
-                                              : nullptr,
+                                             : nullptr,
         scaleBuffer.ptr,
         dscaleBuffer.ptr,
         dbiasBuffer.ptr,

@@ -45,8 +45,7 @@ const MiopenConvDescriptor& ConvFwdParams::conv() const
     return _conv;
 }
 
-ConvFwdPlan::ConvFwdPlan(const HipdnnEnginePluginHandle& handle,
-                         ConvFwdParams&& params)
+ConvFwdPlan::ConvFwdPlan(const HipdnnEnginePluginHandle& handle, ConvFwdParams&& params)
     : _params(std::move(params))
 {
     // MIOpen Find 2.0 API
@@ -84,7 +83,8 @@ ConvFwdPlan::~ConvFwdPlan()
 }
 
 ConvFwdPlan::ConvFwdPlan(ConvFwdPlan&& other) noexcept
-    : _params(std::move(other._params)), _solution(other._solution)
+    : _params(std::move(other._params))
+    , _solution(other._solution)
 {
     other._solution = nullptr;
 }
