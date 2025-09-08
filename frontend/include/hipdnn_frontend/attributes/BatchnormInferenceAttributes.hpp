@@ -15,7 +15,7 @@ namespace graph
 class BatchnormInferenceAttributes : public Attributes<BatchnormInferenceAttributes>
 {
 public:
-    enum class input_names // NOLINT(readability-identifier-naming)
+    enum class InputNames
     {
         X = 0,
         MEAN = 1,
@@ -23,105 +23,107 @@ public:
         SCALE = 3,
         BIAS = 4
     };
+    typedef InputNames input_names; // NOLINT(readability-identifier-naming)
 
-    enum class output_names // NOLINT(readability-identifier-naming)
+    enum class OutputNames
     {
         Y = 0
     };
+    typedef OutputNames output_names; // NOLINT(readability-identifier-naming)
 
-    std::unordered_map<input_names, std::shared_ptr<TensorAttributes>> inputs;
-    std::unordered_map<output_names, std::shared_ptr<TensorAttributes>> outputs;
+    std::unordered_map<InputNames, std::shared_ptr<TensorAttributes>> inputs;
+    std::unordered_map<OutputNames, std::shared_ptr<TensorAttributes>> outputs;
 
     // NOLINTNEXTLINE(readability-identifier-naming)
     std::shared_ptr<TensorAttributes> get_x() const
     {
-        return getInput(input_names::X);
+        return getInput(InputNames::X);
     }
     // NOLINTNEXTLINE(readability-identifier-naming)
     std::shared_ptr<TensorAttributes> get_mean() const
     {
-        return getInput(input_names::MEAN);
+        return getInput(InputNames::MEAN);
     }
     // NOLINTNEXTLINE(readability-identifier-naming)
     std::shared_ptr<TensorAttributes> get_inv_variance() const
     {
-        return getInput(input_names::INV_VARIANCE);
+        return getInput(InputNames::INV_VARIANCE);
     }
     // NOLINTNEXTLINE(readability-identifier-naming)
     std::shared_ptr<TensorAttributes> get_scale() const
     {
-        return getInput(input_names::SCALE);
+        return getInput(InputNames::SCALE);
     }
     // NOLINTNEXTLINE(readability-identifier-naming)
     std::shared_ptr<TensorAttributes> get_bias() const
     {
-        return getInput(input_names::BIAS);
+        return getInput(InputNames::BIAS);
     }
     // NOLINTNEXTLINE(readability-identifier-naming)
     std::shared_ptr<TensorAttributes> get_y() const
     {
-        return getOutput(output_names::Y);
+        return getOutput(OutputNames::Y);
     }
 
     // NOLINTNEXTLINE(readability-identifier-naming)
     BatchnormInferenceAttributes& set_x(const std::shared_ptr<TensorAttributes>& value)
     {
-        return setInput(input_names::X, value);
+        return setInput(InputNames::X, value);
     }
     // NOLINTNEXTLINE(readability-identifier-naming)
     BatchnormInferenceAttributes& set_x(std::shared_ptr<TensorAttributes>&& value)
     {
-        return setInput(input_names::X, std::move(value));
+        return setInput(InputNames::X, std::move(value));
     }
     // NOLINTNEXTLINE(readability-identifier-naming)
     BatchnormInferenceAttributes& set_mean(const std::shared_ptr<TensorAttributes>& value)
     {
-        return setInput(input_names::MEAN, value);
+        return setInput(InputNames::MEAN, value);
     }
     // NOLINTNEXTLINE(readability-identifier-naming)
     BatchnormInferenceAttributes& set_mean(std::shared_ptr<TensorAttributes>&& value)
     {
-        return setInput(input_names::MEAN, std::move(value));
+        return setInput(InputNames::MEAN, std::move(value));
     }
     // NOLINTNEXTLINE(readability-identifier-naming)
     BatchnormInferenceAttributes& set_inv_variance(const std::shared_ptr<TensorAttributes>& value)
     {
-        return setInput(input_names::INV_VARIANCE, value);
+        return setInput(InputNames::INV_VARIANCE, value);
     }
     // NOLINTNEXTLINE(readability-identifier-naming)
     BatchnormInferenceAttributes& set_inv_variance(std::shared_ptr<TensorAttributes>&& value)
     {
-        return setInput(input_names::INV_VARIANCE, std::move(value));
+        return setInput(InputNames::INV_VARIANCE, std::move(value));
     }
     // NOLINTNEXTLINE(readability-identifier-naming)
     BatchnormInferenceAttributes& set_scale(const std::shared_ptr<TensorAttributes>& value)
     {
-        return setInput(input_names::SCALE, value);
+        return setInput(InputNames::SCALE, value);
     }
     // NOLINTNEXTLINE(readability-identifier-naming)
     BatchnormInferenceAttributes& set_scale(std::shared_ptr<TensorAttributes>&& value)
     {
-        return setInput(input_names::SCALE, std::move(value));
+        return setInput(InputNames::SCALE, std::move(value));
     }
     // NOLINTNEXTLINE(readability-identifier-naming)
     BatchnormInferenceAttributes& set_bias(const std::shared_ptr<TensorAttributes>& value)
     {
-        return setInput(input_names::BIAS, value);
+        return setInput(InputNames::BIAS, value);
     }
     // NOLINTNEXTLINE(readability-identifier-naming)
     BatchnormInferenceAttributes& set_bias(std::shared_ptr<TensorAttributes>&& value)
     {
-        return setInput(input_names::BIAS, std::move(value));
+        return setInput(InputNames::BIAS, std::move(value));
     }
     // NOLINTNEXTLINE(readability-identifier-naming)
     BatchnormInferenceAttributes& set_y(const std::shared_ptr<TensorAttributes>& value)
     {
-        return setOutput(output_names::Y, value);
+        return setOutput(OutputNames::Y, value);
     }
     // NOLINTNEXTLINE(readability-identifier-naming)
     BatchnormInferenceAttributes& set_y(std::shared_ptr<TensorAttributes>&& value)
     {
-        return setOutput(output_names::Y, std::move(value));
+        return setOutput(OutputNames::Y, std::move(value));
     }
 
     flatbuffers::Offset<hipdnn_sdk::data_objects::BatchnormInferenceAttributes>
@@ -142,7 +144,7 @@ public:
     }
 
 private:
-    std::shared_ptr<TensorAttributes> getInput(input_names name) const
+    std::shared_ptr<TensorAttributes> getInput(InputNames name) const
     {
         auto it = inputs.find(name);
         if(it != inputs.end())
@@ -152,7 +154,7 @@ private:
         return nullptr;
     }
 
-    std::shared_ptr<TensorAttributes> getOutput(output_names name) const
+    std::shared_ptr<TensorAttributes> getOutput(OutputNames name) const
     {
         auto it = outputs.find(name);
         if(it != outputs.end())
@@ -162,26 +164,26 @@ private:
         return nullptr;
     }
 
-    BatchnormInferenceAttributes& setInput(input_names name,
+    BatchnormInferenceAttributes& setInput(InputNames name,
                                            const std::shared_ptr<TensorAttributes>& value)
     {
         inputs[name] = value;
         return *this;
     }
-    BatchnormInferenceAttributes& setInput(input_names name,
+    BatchnormInferenceAttributes& setInput(InputNames name,
                                            std::shared_ptr<TensorAttributes>&& value)
     {
         inputs[name] = std::move(value);
         return *this;
     }
 
-    BatchnormInferenceAttributes& setOutput(output_names name,
+    BatchnormInferenceAttributes& setOutput(OutputNames name,
                                             const std::shared_ptr<TensorAttributes>& value)
     {
         outputs[name] = value;
         return *this;
     }
-    BatchnormInferenceAttributes& setOutput(output_names name,
+    BatchnormInferenceAttributes& setOutput(OutputNames name,
                                             std::shared_ptr<TensorAttributes>&& value)
     {
         outputs[name] = std::move(value);

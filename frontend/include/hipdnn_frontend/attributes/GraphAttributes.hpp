@@ -20,34 +20,34 @@ public:
         return _name;
     }
     // NOLINTNEXTLINE(readability-identifier-naming)
-    DataType_t get_compute_data_type() const
+    DataType get_compute_data_type() const
     {
         return _computeType;
     }
     // NOLINTNEXTLINE(readability-identifier-naming)
-    DataType_t get_intermediate_data_type() const
+    DataType get_intermediate_data_type() const
     {
         return _intermediateType;
     }
     // NOLINTNEXTLINE(readability-identifier-naming)
-    DataType_t get_io_data_type() const
+    DataType get_io_data_type() const
     {
         return _ioType;
     }
     // NOLINTNEXTLINE(readability-identifier-naming)
-    GraphAttributes& set_compute_data_type(DataType_t computeType)
+    GraphAttributes& set_compute_data_type(DataType computeType)
     {
         _computeType = computeType;
         return *this;
     }
     // NOLINTNEXTLINE(readability-identifier-naming)
-    GraphAttributes& set_intermediate_data_type(DataType_t intermediateType)
+    GraphAttributes& set_intermediate_data_type(DataType intermediateType)
     {
         _intermediateType = intermediateType;
         return *this;
     }
     // NOLINTNEXTLINE(readability-identifier-naming)
-    GraphAttributes& set_io_data_type(DataType_t ioType)
+    GraphAttributes& set_io_data_type(DataType ioType)
     {
         _ioType = ioType;
         return *this;
@@ -62,11 +62,11 @@ public:
     // NOLINTNEXTLINE(readability-identifier-naming)
     GraphAttributes& fill_missing_properties(const GraphAttributes& other)
     {
-        if(_computeType == DataType_t::NOT_SET)
+        if(_computeType == DataType::NOT_SET)
             _computeType = other._computeType;
-        if(_intermediateType == DataType_t::NOT_SET)
+        if(_intermediateType == DataType::NOT_SET)
             _intermediateType = other._intermediateType;
-        if(_ioType == DataType_t::NOT_SET)
+        if(_ioType == DataType::NOT_SET)
             _ioType = other._ioType;
         if(_name.empty())
             _name = other._name;
@@ -75,9 +75,9 @@ public:
 
 private:
     std::string _name;
-    DataType_t _computeType = DataType_t::NOT_SET;
-    DataType_t _intermediateType = DataType_t::NOT_SET;
-    DataType_t _ioType = DataType_t::NOT_SET;
+    DataType _computeType = DataType::NOT_SET;
+    DataType _intermediateType = DataType::NOT_SET;
+    DataType _ioType = DataType::NOT_SET;
 };
 typedef GraphAttributes Context;
 }
