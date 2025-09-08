@@ -49,10 +49,10 @@ void populateTestExecutionPlan(hipdnnBackendDescriptor_t* executionPlan,
 
 flatbuffers::FlatBufferBuilder createAndPopulateBatchnormNode();
 
-void* allocateTensorMemory([[maybe_unused]] const int64_t* dims,
-                           [[maybe_unused]] size_t dimsCount,
-                           [[maybe_unused]] hipdnnBackendAttributeType_t dataType,
-                           [[maybe_unused]] bool initialize);
+void* allocateTensorMemory(const int64_t* dims,
+                           size_t dimsCount,
+                           hipdnnBackendAttributeType_t dataType,
+                           bool initialize);
 
 void freeTensorMemory(void* dataPtr);
 
