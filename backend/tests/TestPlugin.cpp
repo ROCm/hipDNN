@@ -76,12 +76,14 @@ bool TestPluginCallback::s_callbackCalled = false;
 const std::string PLUGIN_NAME1 = "hipdnn_test_plugin1";
 const std::string PLUGIN_NAME2 = "hipdnn_test_plugin2";
 
-const std::filesystem::path PLUGIN_PATH1 = std::filesystem::path(".") /= PLUGIN_NAME1;
-const std::filesystem::path PLUGIN_PATH2 = std::filesystem::path(".") /= PLUGIN_NAME2;
+const std::filesystem::path PLUGIN_PATH1 = PLUGIN_NAME1;
+const std::filesystem::path PLUGIN_PATH2 = PLUGIN_NAME2;
 
-const std::filesystem::path FULL_PLUGIN_PATH1 = std::filesystem::path(".")
+const std::filesystem::path FULL_PLUGIN_PATH1
+    = hipdnn_backend::platform_utilities::getCurrentModuleDirectory()
     /= hipdnn_sdk::utilities::getLibraryName(PLUGIN_NAME1.c_str());
-const std::filesystem::path FULL_PLUGIN_PATH2 = std::filesystem::path(".")
+const std::filesystem::path FULL_PLUGIN_PATH2
+    = hipdnn_backend::platform_utilities::getCurrentModuleDirectory()
     /= hipdnn_sdk::utilities::getLibraryName(PLUGIN_NAME2.c_str());
 
 } // namespace
@@ -115,7 +117,9 @@ TEST(TestPluginManager, LoadPlugins)
 
 TEST(TestPluginManager, LoadPluginsFromDirectory)
 {
-    TempDirectory tempDir("temp_plugin_dir");
+    std::filesystem::path tempPluginDir
+        = hipdnn_backend::platform_utilities::getCurrentModuleDirectory() /= "temp_plugin_dir";
+    TempDirectory tempDir(tempPluginDir);
 
     std::filesystem::copy_file(
         FULL_PLUGIN_PATH1, tempDir.path() / std::filesystem::path(FULL_PLUGIN_PATH1).filename());
@@ -193,7 +197,9 @@ TEST(TestPluginManager, LoadPluginsAbsoluteReplaces)
 
 TEST(TestPluginManager, LoadPluginsAdditiveWithDefault)
 {
-    TempDirectory defaultDir("test_plugins_dir");
+    std::filesystem::path tempPluginDir
+        = hipdnn_backend::platform_utilities::getCurrentModuleDirectory() /= "test_plugins_dir";
+    TempDirectory defaultDir(tempPluginDir);
 
     // Place a plugin in the default directory
     std::filesystem::copy_file(
@@ -217,7 +223,11 @@ TEST(TestPluginManager, LoadPluginsAdditiveWithDefault)
 
 TEST(TestPluginManager, LoadPluginsCombinedFileAndDirectory)
 {
-    TempDirectory tempDir("temp_plugin_dir_combined");
+    std::filesystem::path tempPluginDir
+        = hipdnn_backend::platform_utilities::getCurrentModuleDirectory()
+        /= "temp_plugin_dir_combined";
+
+    TempDirectory tempDir(tempPluginDir);
 
     std::filesystem::copy_file(
         FULL_PLUGIN_PATH1, tempDir.path() / std::filesystem::path(FULL_PLUGIN_PATH1).filename());
