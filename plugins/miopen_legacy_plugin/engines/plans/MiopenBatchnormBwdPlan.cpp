@@ -82,10 +82,8 @@ BatchnormBwdPlan::BatchnormBwdPlan(std::unique_ptr<BatchnormBwdParams> params)
 void BatchnormBwdPlan::execute(const HipdnnEnginePluginHandle& handle,
                                const hipdnnPluginDeviceBuffer_t* deviceBuffers,
                                uint32_t numDeviceBuffers,
-                               void* workspace) const
+                               [[maybe_unused]] void* workspace) const
 {
-    std::ignore = workspace;
-
     float alphaDataDiff = 1.0f;
     float betaDataDiff = 0.0f;
     float alphaParamDiff = 1.0f;

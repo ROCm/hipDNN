@@ -37,10 +37,9 @@ protected:
     {
         EXPECT_CALL(*_mockBackend,
                     backendCreateAndDeserializeGraphExt(::testing::_, ::testing::_, ::testing::_))
-            .WillOnce([&deserializedGraph](hipdnnBackendDescriptor_t* descriptor,
+            .WillOnce([&deserializedGraph]([[maybe_unused]] hipdnnBackendDescriptor_t* descriptor,
                                            const uint8_t* serializedGraph,
                                            size_t graphByteSize) {
-                std::ignore = descriptor;
                 deserializedGraph = hipdnn_sdk::data_objects::UnPackGraph(serializedGraph);
                 EXPECT_NE(deserializedGraph, nullptr);
                 EXPECT_GE(graphByteSize, 0);
