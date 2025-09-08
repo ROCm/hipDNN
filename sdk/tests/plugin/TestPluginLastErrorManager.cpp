@@ -13,21 +13,21 @@ using namespace hipdnn_plugin;
 // NOLINTNEXTLINE
 thread_local char PluginLastErrorManager::s_lastError[HIPDNN_PLUGIN_ERROR_STRING_MAX_LENGTH] = "";
 
-TEST(PluginLastErrorManagerTest, SetAndGetLastErrorString)
+TEST(TestPluginLastErrorManager, SetAndGetLastErrorString)
 {
     const char* msg = "test error message";
     PluginLastErrorManager::setLastError(HIPDNN_PLUGIN_STATUS_INTERNAL_ERROR, msg);
     EXPECT_STREQ(PluginLastErrorManager::getLastError(), msg);
 }
 
-TEST(PluginLastErrorManagerTest, SetLastErrorWithStdString)
+TEST(TestPluginLastErrorManager, SetLastErrorWithStdString)
 {
     std::string msg = "std::string error";
     PluginLastErrorManager::setLastError(HIPDNN_PLUGIN_STATUS_BAD_PARAM, msg);
     EXPECT_STREQ(PluginLastErrorManager::getLastError(), msg.c_str());
 }
 
-TEST(PluginLastErrorManagerTest, SetLastErrorSuccessDoesNotChangeError)
+TEST(TestPluginLastErrorManager, SetLastErrorSuccessDoesNotChangeError)
 {
     const char* prevMsg = "previous error";
     PluginLastErrorManager::setLastError(HIPDNN_PLUGIN_STATUS_INTERNAL_ERROR, prevMsg);

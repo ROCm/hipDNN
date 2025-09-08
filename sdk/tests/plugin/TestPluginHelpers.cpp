@@ -11,14 +11,14 @@
 
 using namespace hipdnn_plugin;
 
-TEST(PluginHelpersTest, TryCatchReturnsSuccessOnNoException)
+TEST(TestPluginHelpers, TryCatchReturnsSuccessOnNoException)
 {
     auto lambda = []() {};
     auto status = tryCatch(lambda);
     EXPECT_EQ(status, HIPDNN_PLUGIN_STATUS_SUCCESS);
 }
 
-TEST(PluginHelpersTest, TryCatchHandlesHipdnnException)
+TEST(TestPluginHelpers, TryCatchHandlesHipdnnException)
 {
     auto lambda = []() {
         throw HipdnnPluginException(HIPDNN_PLUGIN_STATUS_INTERNAL_ERROR, "internal error");
@@ -28,7 +28,7 @@ TEST(PluginHelpersTest, TryCatchHandlesHipdnnException)
     EXPECT_STREQ(PluginLastErrorManager::getLastError(), "internal error");
 }
 
-TEST(PluginHelpersTest, TryCatchHandlesStdException)
+TEST(TestPluginHelpers, TryCatchHandlesStdException)
 {
     auto lambda = []() { throw std::runtime_error("std exception"); };
     auto status = tryCatch(lambda);
@@ -36,7 +36,7 @@ TEST(PluginHelpersTest, TryCatchHandlesStdException)
     EXPECT_STREQ(PluginLastErrorManager::getLastError(), "std exception");
 }
 
-TEST(PluginHelpersTest, TryCatchHandlesUnknownException)
+TEST(TestPluginHelpers, TryCatchHandlesUnknownException)
 {
     auto lambda = []() { throw 42; };
     auto status = tryCatch(lambda);

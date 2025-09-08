@@ -6,8 +6,8 @@
 #include <hipdnn_sdk/data_objects/convolution_fwd_attributes_generated.h>
 #include <hipdnn_sdk/data_objects/data_types_generated.h>
 #include <hipdnn_sdk/data_objects/pointwise_attributes_generated.h>
-#include <hipdnn_sdk/utilities/HalfUtils.hpp>
-#include <hipdnn_sdk/utilities/HipBfloat16Utils.hpp>
+#include <hipdnn_sdk/utilities/UtilsBfp16.hpp>
+#include <hipdnn_sdk/utilities/UtilsFp16.hpp>
 
 namespace hipdnn_frontend
 {
