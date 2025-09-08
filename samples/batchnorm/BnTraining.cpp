@@ -189,7 +189,7 @@ int main(int argc, char* argv[])
 {
     auto config = parseCommandLineArgs(argc, argv);
 
-    initializeFrontendLogging(hipdnnLoggingCallback_ext);
+    initializeFrontendLogging();
 
     hipdnnHandle_t handle;
     HIPDNN_CHECK(hipdnnCreate(&handle));
