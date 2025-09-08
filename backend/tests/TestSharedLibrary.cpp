@@ -24,7 +24,8 @@ const char* const SYMBOL_NAME = "hipdnnPluginGetName";
 const char* const WRONG_SYMBOL_NAME = "wrong_symbol_name";
 
 const std::string FULL_LIBRARY_PATH
-    = (std::filesystem::path(".") /= hipdnn_sdk::utilities::getLibraryName("hipdnn_test_plugin1"))
+    = (hipdnn_backend::platform_utilities::getCurrentModuleDirectory()
+       /= hipdnn_sdk::utilities::getLibraryName("hipdnn_test_plugin1"))
           .string();
 
 }
