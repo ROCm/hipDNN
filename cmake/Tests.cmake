@@ -13,6 +13,22 @@ else()
     set(EXEC_PREFIX "./")
 endif()
 
+set(INSTALL_TEST_PROJECT "${CMAKE_CURRENT_BINARY_DIR}/test_project/CMakeLists.txt")
+file(WRITE "${INSTALL_TEST_PROJECT}"
+[=[
+# CMake test project to aid with running the tests easilly via ctest
+
+cmake_minimum_required(VERSION 3.25.2)
+
+project(
+    hipDNN_tests
+    LANGUAGES CXX)
+
+enable_testing()
+
+]=]
+)
+
 set(CHECK_COMMAND_GLOBAL "" CACHE INTERNAL "Accumulated check commands" FORCE)
 set(CHECK_DEPENDS_GLOBAL "" CACHE INTERNAL "Accumulated check depends" FORCE)
 set(CHECK_EXECUTABLE_PATHS_GLOBAL "" CACHE INTERNAL "Accumulated check executable paths" FORCE)
@@ -24,6 +40,25 @@ set(UNIT_CHECK_DEPENDS_GLOBAL "" CACHE INTERNAL "Accumulated unit check depends"
 # Global collections for integration tests
 set(INTEGRATION_CHECK_COMMAND_GLOBAL "" CACHE INTERNAL "Accumulated integration check commands" FORCE)
 set(INTEGRATION_CHECK_DEPENDS_GLOBAL "" CACHE INTERNAL "Accumulated integration check depends" FORCE)
+
+function(add_test_to_test_project test_target)
+    get_target_property(EXE_PATH ${test_target} RUNTIME_OUTPUT_DIRECTORY)
+    if(EXE_PATH STREQUAL "EXE_PATH-NOTFOUND")
+        set(EXE_PATH ".")
+    endif()
+    get_filename_component(EXE_PATH "${EXE_PATH}" ABSOLUTE BASE_DIR "${CMAKE_CURRENT_BINARY_DIR}")
+    get_target_property(EXE_NAME ${test_target} RUNTIME_OUTPUT_NAME)
+    if(EXE_NAME STREQUAL "EXE_NAME-NOTFOUND")
+        get_target_property(EXE_NAME ${test_target} OUTPUT_NAME)
+        if(EXE_NAME STREQUAL "EXE_NAME-NOTFOUND")
+            set(EXE_NAME "${test_target}")
+        endif()
+    endif()
+    file(RELATIVE_PATH rel_path "${CMAKE_CURRENT_BINARY_DIR}" "${EXE_PATH}/${EXE_NAME}")
+
+
+    file(APPEND "${INSTALL_TEST_PROJECT}" "add_test(${test_target} \"../bin/${EXE_NAME}\")\n")
+endfunction()
 
 function(create_test_name_validation_target)
     if(Python3_FOUND)
@@ -151,6 +186,8 @@ function(_add_gtest_target_internal APPEND_FUNCTION_SUFFIX TARGET WORKING_DIR)
         COMMAND ${TARGET} 
         WORKING_DIRECTORY ${WORKING_DIR}
     )
+
+    add_test_to_test_project(${TARGET})
 endfunction()
 
 # Adds a generic test target
