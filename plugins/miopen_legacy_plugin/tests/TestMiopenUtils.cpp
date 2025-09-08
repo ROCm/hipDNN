@@ -59,10 +59,13 @@ TEST(TestMiopenUtils, FindTensorAttributesReturnsCorrectValue)
     auto attrOffset2 = hipdnn_sdk::data_objects::CreateTensorAttributesDirect(builder2, 2);
     builder2.Finish(attrOffset2);
 
-    auto attrPtr1 = flatbuffers::GetRoot<hipdnn_sdk::data_objects::TensorAttributes>(builder1.GetBufferPointer());
-    auto attrPtr2 = flatbuffers::GetRoot<hipdnn_sdk::data_objects::TensorAttributes>(builder2.GetBufferPointer());
+    auto attrPtr1 = flatbuffers::GetRoot<hipdnn_sdk::data_objects::TensorAttributes>(
+        builder1.GetBufferPointer());
+    auto attrPtr2 = flatbuffers::GetRoot<hipdnn_sdk::data_objects::TensorAttributes>(
+        builder2.GetBufferPointer());
 
-    auto attrMap = std::unordered_map<int64_t, const hipdnn_sdk::data_objects::TensorAttributes*>{{1, attrPtr1}, {2, attrPtr2}};
+    auto attrMap = std::unordered_map<int64_t, const hipdnn_sdk::data_objects::TensorAttributes*>{
+        {1, attrPtr1}, {2, attrPtr2}};
 
     EXPECT_EQ(miopen_utils::findTensorAttributes(attrMap, 1).uid(), 1);
     EXPECT_EQ(miopen_utils::findTensorAttributes(attrMap, 2).uid(), 2);
@@ -72,7 +75,8 @@ TEST(TestMiopenUtils, FindTensorAttributesThrowsIfNotFound)
 {
     auto attrMap = std::unordered_map<int64_t, const hipdnn_sdk::data_objects::TensorAttributes*>{};
 
-    EXPECT_THROW(miopen_utils::findTensorAttributes(attrMap, 1), hipdnn_plugin::HipdnnPluginException);
+    EXPECT_THROW(miopen_utils::findTensorAttributes(attrMap, 1),
+                 hipdnn_plugin::HipdnnPluginException);
 }
 
 TEST(TestMiopenUtils, GetSpatialDimCountReturnsCorrectValue)
@@ -80,10 +84,12 @@ TEST(TestMiopenUtils, GetSpatialDimCountReturnsCorrectValue)
     std::vector<int64_t> dims = {1, 1, 1, 1, 1};
 
     flatbuffers::FlatBufferBuilder builder;
-    auto attrOffset = hipdnn_sdk::data_objects::CreateTensorAttributesDirect(builder, 1, "", hipdnn_sdk::data_objects::DataType_UNSET, nullptr, &dims);
+    auto attrOffset = hipdnn_sdk::data_objects::CreateTensorAttributesDirect(
+        builder, 1, "", hipdnn_sdk::data_objects::DataType_UNSET, nullptr, &dims);
     builder.Finish(attrOffset);
 
-    auto attrPtr1 = flatbuffers::GetRoot<hipdnn_sdk::data_objects::TensorAttributes>(builder.GetBufferPointer());
+    auto attrPtr1 = flatbuffers::GetRoot<hipdnn_sdk::data_objects::TensorAttributes>(
+        builder.GetBufferPointer());
 
     EXPECT_EQ(miopen_utils::getSpatialDimCount(*attrPtr1), 3);
 }
@@ -93,10 +99,12 @@ TEST(TestMiopenUtils, GetSpatialDimCountThrowsOnInvalidDims)
     std::vector<int64_t> dims = {1, 1};
 
     flatbuffers::FlatBufferBuilder builder;
-    auto attrOffset = hipdnn_sdk::data_objects::CreateTensorAttributesDirect(builder, 1, "", hipdnn_sdk::data_objects::DataType_UNSET, nullptr, &dims);
+    auto attrOffset = hipdnn_sdk::data_objects::CreateTensorAttributesDirect(
+        builder, 1, "", hipdnn_sdk::data_objects::DataType_UNSET, nullptr, &dims);
     builder.Finish(attrOffset);
 
-    auto attrPtr1 = flatbuffers::GetRoot<hipdnn_sdk::data_objects::TensorAttributes>(builder.GetBufferPointer());
+    auto attrPtr1 = flatbuffers::GetRoot<hipdnn_sdk::data_objects::TensorAttributes>(
+        builder.GetBufferPointer());
 
     EXPECT_THROW(miopen_utils::getSpatialDimCount(*attrPtr1), hipdnn_plugin::HipdnnPluginException);
 }
