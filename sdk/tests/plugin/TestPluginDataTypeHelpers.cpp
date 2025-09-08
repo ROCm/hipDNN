@@ -7,7 +7,7 @@
 #include <hipdnn_sdk/plugin/PluginApiDataTypes.h>
 #include <hipdnn_sdk/plugin/PluginDataTypeHelpers.hpp>
 
-TEST(PluginDataTypeHelpersTest, ToStringPluginStatus)
+TEST(TestPluginDataTypeHelpers, ToStringPluginStatus)
 {
     EXPECT_STREQ(toString(HIPDNN_PLUGIN_STATUS_SUCCESS), "HIPDNN_PLUGIN_STATUS_SUCCESS");
     EXPECT_STREQ(toString(HIPDNN_PLUGIN_STATUS_BAD_PARAM), "HIPDNN_PLUGIN_STATUS_BAD_PARAM");
@@ -20,21 +20,21 @@ TEST(PluginDataTypeHelpersTest, ToStringPluginStatus)
     EXPECT_STREQ(toString(static_cast<hipdnnPluginStatus_t>(999)), "HIPDNN_PLUGIN_STATUS_UNKNOWN");
 }
 
-TEST(PluginDataTypeHelpersTest, ToStringPluginType)
+TEST(TestPluginDataTypeHelpers, ToStringPluginType)
 {
     EXPECT_STREQ(toString(HIPDNN_PLUGIN_TYPE_UNSPECIFIED), "HIPDNN_PLUGIN_TYPE_UNSPECIFIED");
     EXPECT_STREQ(toString(HIPDNN_PLUGIN_TYPE_ENGINE), "HIPDNN_PLUGIN_TYPE_ENGINE");
     EXPECT_STREQ(toString(static_cast<hipdnnPluginType_t>(999)), "HIPDNN_PLUGIN_TYPE_UNKNOWN");
 }
 
-TEST(PluginDataTypeHelpersTest, OstreamOperatorPluginStatus)
+TEST(TestPluginDataTypeHelpers, OstreamOperatorPluginStatus)
 {
     std::ostringstream oss;
     oss << HIPDNN_PLUGIN_STATUS_BAD_PARAM;
     EXPECT_EQ(oss.str(), "HIPDNN_PLUGIN_STATUS_BAD_PARAM");
 }
 
-TEST(PluginDataTypeHelpersTest, OstreamOperatorPluginType)
+TEST(TestPluginDataTypeHelpers, OstreamOperatorPluginType)
 {
     std::ostringstream oss;
     oss << HIPDNN_PLUGIN_TYPE_ENGINE;

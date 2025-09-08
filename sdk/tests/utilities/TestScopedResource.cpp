@@ -16,7 +16,7 @@ struct Resource
 
 } // namespace
 
-TEST(ScopedResourceTest, BasicUsage)
+TEST(TestScopedResource, BasicUsage)
 {
     Resource r;
 
@@ -29,7 +29,7 @@ TEST(ScopedResourceTest, BasicUsage)
     ASSERT_TRUE(r.released);
 }
 
-TEST(ScopedResourceTest, CheckMove)
+TEST(TestScopedResource, CheckMove)
 {
     Resource r;
 
@@ -45,7 +45,7 @@ TEST(ScopedResourceTest, CheckMove)
     ASSERT_TRUE(r.released);
 }
 
-TEST(ScopedResourceTest, CheckMoveAssign)
+TEST(TestScopedResource, CheckMoveAssign)
 {
     Resource r1;
     Resource r2;

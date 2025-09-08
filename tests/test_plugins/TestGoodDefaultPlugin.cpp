@@ -13,7 +13,7 @@ class GoodDefaultPlugin : public TestPluginBase
 public:
     const char* getPluginName() const override
     {
-        return "test_GoodDefaultPlugin";
+        return COMPONENT_NAME;
     }
     const char* getPluginVersion() const override
     {

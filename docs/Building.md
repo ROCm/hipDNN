@@ -38,6 +38,7 @@
 |------------|---------|-------------|
 | Ninja | 1.12.1+ | Faster build system (recommended) |
 | Docker | Latest | For containerized builds |
+| Python3 | Latest | For test name validation | 
 
 #### Third-Party Libraries
 The following libraries are automatically managed by CMake (see [Dependencies.cmake](../cmake/Dependencies.cmake)):
@@ -173,6 +174,7 @@ All targets support parallel builds with ninja:
 |--------|-------------|
 | `ninja` | Build all components |
 | `ninja check` | Build and run all tests (see [Testing](./Testing.md)) |
+| `ninja check-ctest` | Build and run all tests with CTest |
 | `ninja unit-check` | Build and run exclusively the unit tests and API tests (minimal version of `ninja check`) |
 | `ninja integration-check` | Build and run exclusively the E2E integration tests (this is the bulk of the testing time) |
 | `ninja install` | Install libraries and headers |
@@ -180,6 +182,8 @@ All targets support parallel builds with ninja:
 | `ninja check_format` | Check code formatting compliance |
 | `ninja code_coverage` | Generate test coverage reports (requires `-DCODE_COVERAGE=ON`) |
 | `ninja clean` | Clean build artifacts |
+| `ninja validate_test_names` | Validates test names conform to naming rules |
+| `ninja generate_hipdnn_sdk_headers` | Generate C++ headers from schema (`.fbs`) files |
 
 ## Platform-Specific Instructions
 
