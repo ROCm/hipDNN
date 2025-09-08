@@ -41,7 +41,7 @@ TEST(IntegrationGetErrorString, AllStatusCodes)
 
 TEST(IntegrationGetLastErrorString, ReturnLastError)
 {
-    char buffer[HIPDNN_MAX_ERROR_STRING_SIZE];
+    char buffer[HIPDNN_ERROR_STRING_MAX_LENGTH];
     hipdnnStatus_t status = hipdnnDestroy(nullptr);
     ASSERT_EQ(status, HIPDNN_STATUS_BAD_PARAM_NULL_POINTER);
 
@@ -75,19 +75,19 @@ TEST(IntegrationGetLastErrorString, PerThreadErrorIsolation)
 {
     // Set error in main thread
     hipdnnDestroy(nullptr);
-    char mainBuf[HIPDNN_MAX_ERROR_STRING_SIZE];
+    char mainBuf[HIPDNN_ERROR_STRING_MAX_LENGTH];
     hipdnnGetLastErrorString(mainBuf, sizeof(mainBuf));
 
     std::string threadError;
     std::thread t([&threadError]() {
-        char buf[HIPDNN_MAX_ERROR_STRING_SIZE];
+        char buf[HIPDNN_ERROR_STRING_MAX_LENGTH];
         hipdnnGetLastErrorString(buf, sizeof(buf));
         threadError = buf;
     });
     t.join();
 
     // Main thread error should be unchanged
-    char mainBuf2[HIPDNN_MAX_ERROR_STRING_SIZE];
+    char mainBuf2[HIPDNN_ERROR_STRING_MAX_LENGTH];
     hipdnnGetLastErrorString(mainBuf2, sizeof(mainBuf2));
     ASSERT_STREQ(mainBuf, mainBuf2);
     ASSERT_TRUE(threadError.empty());
@@ -99,7 +99,7 @@ TEST(IntegrationGetLastErrorString, BufferLargerThanMax)
     char mainBuf[1028];
     hipdnnGetLastErrorString(mainBuf, sizeof(mainBuf));
 
-    char mainBuf2[HIPDNN_MAX_ERROR_STRING_SIZE];
+    char mainBuf2[HIPDNN_ERROR_STRING_MAX_LENGTH];
     hipdnnGetLastErrorString(mainBuf2, sizeof(mainBuf2));
     ASSERT_STREQ(mainBuf, mainBuf2);
 }

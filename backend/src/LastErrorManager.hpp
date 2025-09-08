@@ -17,7 +17,7 @@ private:
     // This prevents the shared object (plugin) from being unloaded until the program terminates.
     // Note: We need to nolint this to avoid issues since static confused clang-tidy.
     // NOLINTNEXTLINE
-    thread_local static char s_lastError[HIPDNN_MAX_ERROR_STRING_SIZE];
+    thread_local static char s_lastError[HIPDNN_ERROR_STRING_MAX_LENGTH];
 
 public:
     static hipdnnStatus_t setLastError(hipdnnStatus_t status, const char* message);

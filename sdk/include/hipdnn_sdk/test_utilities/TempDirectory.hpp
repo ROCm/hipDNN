@@ -2,6 +2,9 @@
 
 #include <filesystem>
 
+namespace hipdnn_sdk::test_utilities
+{
+
 class TempDirectory
 {
     std::filesystem::path _path;
@@ -35,3 +38,5 @@ public:
         }
     }
 };
+
+}

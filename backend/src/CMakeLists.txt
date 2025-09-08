@@ -79,6 +79,11 @@ install(
     EXPORT hipdnn_backend_targets
 )
 
+export(
+    TARGETS hipdnn_backend
+    FILE  ${CMAKE_BINARY_DIR}/lib/cmake/hipdnn_backend/hipdnn_backendConfig.cmake
+)
+
 install(
     DIRECTORY ${HIP_DNN_BACKEND_INCLUDE_DIR}/
     DESTINATION ${HIP_DNN_BACKEND_INSTALL_INCLUDE_DIR}
@@ -91,6 +96,6 @@ install(
 
 install(
     EXPORT hipdnn_backend_targets
-    DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/cmake/hipdnn_backend
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/hipdnn_backend
     FILE hipdnn_backendConfig.cmake
 )

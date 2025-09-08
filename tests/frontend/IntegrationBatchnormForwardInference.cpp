@@ -317,7 +317,7 @@ INSTANTIATE_TEST_SUITE_P(
                             "ExecuteFailsPluginBatchnormTest",
                             FailurePoint::EXECUTE,
                             true},
-        IntegrationTestCase{hipdnn_tests::plugin_constants::testNoApplicableEnginesPluginPath(),
+        IntegrationTestCase{hipdnn_tests::plugin_constants::testNoApplicableEnginesAPluginPath(),
                             "NoApplicableEnginesPlugin",
                             "NoEnginesPluginBatchnormTest",
                             FailurePoint::CREATE_EXECUTION_PLAN,
