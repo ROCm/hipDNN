@@ -45,10 +45,17 @@ inline const std::string& testExecuteFailsPluginPath()
     return s_testExecuteFailsPluginPath;
 }
 
-inline const std::string& testNoApplicableEnginesPluginPath()
+inline const std::string& testNoApplicableEnginesAPluginPath()
 {
     static const std::string s_testNoApplicableEnginesPluginPath
-        = getPluginPath(TEST_NO_APPLICABLE_ENGINES_PLUGIN_NAME);
+        = getPluginPath(TEST_NO_APPLICABLE_ENGINES_A_PLUGIN_NAME);
+    return s_testNoApplicableEnginesPluginPath;
+}
+
+inline const std::string& testNoApplicableEnginesBPluginPath()
+{
+    static const std::string s_testNoApplicableEnginesPluginPath
+        = getPluginPath(TEST_NO_APPLICABLE_ENGINES_B_PLUGIN_NAME);
     return s_testNoApplicableEnginesPluginPath;
 }
 

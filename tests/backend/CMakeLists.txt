@@ -39,7 +39,8 @@ target_compile_definitions(public_hipdnn_backend_tests
     PRIVATE
     TEST_GOOD_PLUGIN_NAME="${TEST_GOOD_PLUGIN_NAME}"
     TEST_EXECUTE_FAILS_PLUGIN_NAME="${TEST_EXECUTE_FAILS_PLUGIN_NAME}"
-    TEST_NO_APPLICABLE_ENGINES_PLUGIN_NAME="${TEST_NO_APPLICABLE_ENGINES_PLUGIN_NAME}"
+    TEST_NO_APPLICABLE_ENGINES_A_PLUGIN_NAME="${TEST_NO_APPLICABLE_ENGINES_A_PLUGIN_NAME}"
+    TEST_NO_APPLICABLE_ENGINES_B_PLUGIN_NAME="${TEST_NO_APPLICABLE_ENGINES_B_PLUGIN_NAME}"
     TEST_DUPLICATE_ID_A_PLUGIN_NAME="${TEST_DUPLICATE_ID_A_PLUGIN_NAME}"
     TEST_DUPLICATE_ID_B_PLUGIN_NAME="${TEST_DUPLICATE_ID_B_PLUGIN_NAME}"
     TEST_INCOMPLETE_API_PLUGIN_NAME="${TEST_INCOMPLETE_API_PLUGIN_NAME}"
@@ -49,7 +50,8 @@ target_compile_definitions(public_hipdnn_backend_tests
 add_dependencies(public_hipdnn_backend_tests 
     test_good_plugin 
     test_execute_fails_plugin 
-    test_no_applicable_engines_plugin 
+    test_no_applicable_engines_a_plugin
+    test_no_applicable_engines_b_plugin
     test_good_default_plugin
     test_duplicate_id_a_plugin
     test_duplicate_id_b_plugin
