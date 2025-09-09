@@ -8,6 +8,7 @@
 #include <hipdnn_backend.h>
 #include <hipdnn_sdk/logging/CallbackTypes.h>
 #include <hipdnn_sdk/logging/Logger.hpp>
+#include <hipdnn_sdk/logging/LoggingUtils.hpp>
 #include <hipdnn_sdk/test_utilities/LoggingUtils.hpp>
 #include <hipdnn_sdk/utilities/PlatformUtils.hpp>
 #include <hipdnn_sdk/utilities/Tensor.hpp>
@@ -76,31 +77,19 @@ inline TensorAttributes
 
 }
 
-inline bool isLoggingEnabled()
-{
-    static bool loggingEnabled = []() {
-        auto logLevel = hipdnn_sdk::utilities::getEnv("HIPDNN_LOG_LEVEL", "off");
-        return !logLevel.empty() && logLevel != "off";
-    }();
-    return loggingEnabled;
-}
-
 inline int32_t initializeFrontendLogging(hipdnnCallback_t fn = hipdnnLoggingCallback_ext)
 {
-    static bool loggingInitialized = false;
-    if(loggingInitialized)
-    {
-        return 0;
-    }
-
-    if(!isLoggingEnabled())
-    {
-        return 0;
-    }
-
     if(fn == nullptr)
     {
         return -1;
+    }
+
+    static bool loggingInitialized = false;
+    static bool loggingEnabled = hipdnn_sdk::logging::isLoggingEnabled();
+
+    if(loggingInitialized || !loggingEnabled)
+    {
+        return 0;
     }
 
 #ifdef COMPONENT_NAME
@@ -136,11 +125,11 @@ inline int32_t initializeFrontendLogging(hipdnnCallback_t fn = hipdnnLoggingCall
         HIPDNN_LOG_ERROR(__VA_ARGS__);                \
     } while(0)
 
-#define HIPDNN_FE_LOG_CRITICAL(...)                   \
+#define HIPDNN_FE_LOG_FATAL(...)                      \
     do                                                \
     {                                                 \
         hipdnn_frontend::initializeFrontendLogging(); \
-        HIPDNN_LOG_CRITICAL(__VA_ARGS__);             \
+        HIPDNN_LOG_FATAL(__VA_ARGS__);                \
     } while(0)
 
 }
