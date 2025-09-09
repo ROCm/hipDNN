@@ -18,10 +18,7 @@ private:
     hipdnnBackendDescriptor_t _descriptor;
     bool _valid;
 
-    // For some reason clang isnt picking up the usage of the two variables correctly.
-    // Ive marked them as [[maybe_unused]] to avoid warnings.
-    static void logBackendError([[maybe_unused]] const std::string& errorString,
-                                [[maybe_unused]] const hipdnnStatus_t status)
+    static void logBackendError(const std::string& errorString, const hipdnnStatus_t status)
     {
         std::array<char, HIPDNN_ERROR_STRING_MAX_LENGTH> backendErrMsg;
         hipdnn_frontend::hipdnnBackend()->getLastErrorString(backendErrMsg.data(),
