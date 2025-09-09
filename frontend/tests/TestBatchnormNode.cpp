@@ -21,7 +21,7 @@ TEST(TestBatchnormNode, PreValidateNode)
     BatchnormNode node(std::move(batchnormAttributes), graphAttributes);
 
     auto error = node.pre_validate_node();
-    EXPECT_EQ(error.code, error_code_t::OK);
+    EXPECT_EQ(error.code, ErrorCode::OK);
 }
 
 TEST(TestBatchnormNode, PreValidateNodeMissingValues)
@@ -32,42 +32,42 @@ TEST(TestBatchnormNode, PreValidateNodeMissingValues)
     BatchnormNode node(std::move(batchnormAttributes), graphAttributes);
 
     auto error = node.pre_validate_node();
-    EXPECT_EQ(error.code, error_code_t::ATTRIBUTE_NOT_SET);
+    EXPECT_EQ(error.code, ErrorCode::ATTRIBUTE_NOT_SET);
 
     batchnormAttributes.set_x(std::make_shared<TensorAttributes>());
     auto batchnormAttributesCopy = batchnormAttributes;
     BatchnormNode nodeWithX(std::move(batchnormAttributesCopy), graphAttributes);
 
     error = nodeWithX.pre_validate_node();
-    EXPECT_EQ(error.code, error_code_t::ATTRIBUTE_NOT_SET);
+    EXPECT_EQ(error.code, ErrorCode::ATTRIBUTE_NOT_SET);
 
     batchnormAttributes.set_y(std::make_shared<TensorAttributes>());
     batchnormAttributesCopy = batchnormAttributes;
     BatchnormNode nodeWithY(std::move(batchnormAttributesCopy), graphAttributes);
 
     error = nodeWithY.pre_validate_node();
-    EXPECT_EQ(error.code, error_code_t::ATTRIBUTE_NOT_SET);
+    EXPECT_EQ(error.code, ErrorCode::ATTRIBUTE_NOT_SET);
 
     batchnormAttributes.set_scale(std::make_shared<TensorAttributes>());
     batchnormAttributesCopy = batchnormAttributes;
     BatchnormNode nodeWithScale(std::move(batchnormAttributesCopy), graphAttributes);
 
     error = nodeWithScale.pre_validate_node();
-    EXPECT_EQ(error.code, error_code_t::ATTRIBUTE_NOT_SET);
+    EXPECT_EQ(error.code, ErrorCode::ATTRIBUTE_NOT_SET);
 
     batchnormAttributes.set_bias(std::make_shared<TensorAttributes>());
     batchnormAttributesCopy = batchnormAttributes;
     BatchnormNode nodeWithBias(std::move(batchnormAttributesCopy), graphAttributes);
 
     error = nodeWithBias.pre_validate_node();
-    EXPECT_EQ(error.code, error_code_t::ATTRIBUTE_NOT_SET);
+    EXPECT_EQ(error.code, ErrorCode::ATTRIBUTE_NOT_SET);
 
     batchnormAttributes.set_epsilon(std::make_shared<TensorAttributes>());
     batchnormAttributesCopy = batchnormAttributes;
     BatchnormNode nodeWithAllValues(std::move(batchnormAttributesCopy), graphAttributes);
 
     error = nodeWithAllValues.pre_validate_node();
-    EXPECT_EQ(error.code, error_code_t::OK);
+    EXPECT_EQ(error.code, ErrorCode::OK);
 }
 
 TEST(TestBatchnormNode, InferPropertiesNode)
@@ -82,7 +82,7 @@ TEST(TestBatchnormNode, InferPropertiesNode)
     auto inputTensor = batchnormAttributes.get_x();
     inputTensor->set_uid(1)
         .set_name("InputTensor")
-        .set_data_type(DataType_t::FLOAT)
+        .set_data_type(DataType::FLOAT)
         .set_dim({1, 2, 3, 4})
         .set_stride({5, 6, 7, 8});
 
@@ -93,7 +93,7 @@ TEST(TestBatchnormNode, InferPropertiesNode)
     BatchnormNode node(std::move(batchnormAttributes), graphAttributes);
 
     auto error = node.infer_properties_node();
-    EXPECT_EQ(error.code, error_code_t::OK);
+    EXPECT_EQ(error.code, ErrorCode::OK);
 
     EXPECT_EQ(outputTensor->get_dim(), (std::vector<int64_t>{1, 2, 3, 4}));
     EXPECT_EQ(outputTensor->get_stride(), (std::vector<int64_t>{5, 6, 7, 8}));
@@ -117,7 +117,7 @@ TEST(TestBatchnormNode, InferPropertiesNodeWithStats)
     auto inputTensor = batchnormAttributes.get_x();
     inputTensor->set_uid(1)
         .set_name("InputTensor")
-        .set_data_type(DataType_t::FLOAT)
+        .set_data_type(DataType::FLOAT)
         .set_dim({1, 2, 3, 4})
         .set_stride({5, 6, 7, 8});
 
@@ -140,7 +140,7 @@ TEST(TestBatchnormNode, InferPropertiesNodeWithStats)
     BatchnormNode node(std::move(batchnormAttributes), graphAttributes);
 
     auto error = node.infer_properties_node();
-    EXPECT_EQ(error.code, error_code_t::OK);
+    EXPECT_EQ(error.code, ErrorCode::OK);
 
     EXPECT_EQ(outputTensor->get_dim(), (std::vector<int64_t>{1, 2, 3, 4}));
     EXPECT_EQ(outputTensor->get_stride(), (std::vector<int64_t>{5, 6, 7, 8}));
@@ -159,7 +159,7 @@ TEST(TestBatchnormNode, PackNode)
     auto xTensor = std::make_shared<TensorAttributes>();
     xTensor->set_uid(1)
         .set_name("XTensor")
-        .set_data_type(DataType_t::FLOAT)
+        .set_data_type(DataType::FLOAT)
         .set_dim({1, 2, 3, 4})
         .set_stride({4, 3, 2, 1});
     batchnormAttributes.set_x(xTensor);
@@ -167,7 +167,7 @@ TEST(TestBatchnormNode, PackNode)
     auto yTensor = std::make_shared<TensorAttributes>();
     yTensor->set_uid(2)
         .set_name("YTensor")
-        .set_data_type(DataType_t::FLOAT)
+        .set_data_type(DataType::FLOAT)
         .set_dim({1, 2, 3, 4})
         .set_stride({4, 3, 2, 1});
     batchnormAttributes.set_y(yTensor);
@@ -175,7 +175,7 @@ TEST(TestBatchnormNode, PackNode)
     auto scaleTensor = std::make_shared<TensorAttributes>();
     scaleTensor->set_uid(3)
         .set_name("ScaleTensor")
-        .set_data_type(DataType_t::FLOAT)
+        .set_data_type(DataType::FLOAT)
         .set_dim({1, 2, 1, 1})
         .set_stride({2, 1, 1, 1});
     batchnormAttributes.set_scale(scaleTensor);
@@ -183,7 +183,7 @@ TEST(TestBatchnormNode, PackNode)
     auto biasTensor = std::make_shared<TensorAttributes>();
     biasTensor->set_uid(4)
         .set_name("BiasTensor")
-        .set_data_type(DataType_t::FLOAT)
+        .set_data_type(DataType::FLOAT)
         .set_dim({1, 2, 1, 1})
         .set_stride({2, 1, 1, 1});
     batchnormAttributes.set_bias(biasTensor);
@@ -191,7 +191,7 @@ TEST(TestBatchnormNode, PackNode)
     auto epsilonTensor = std::make_shared<TensorAttributes>();
     epsilonTensor->set_uid(5)
         .set_name("EpsilonTensor")
-        .set_data_type(DataType_t::FLOAT)
+        .set_data_type(DataType::FLOAT)
         .set_dim({1})
         .set_stride({1});
     batchnormAttributes.set_epsilon(epsilonTensor);
@@ -289,7 +289,7 @@ TEST(TestBatchnormNode, PopulateHipdnnTensorIds)
     int64_t currentTensorId = 1;
 
     auto error = node.populate_hipdnn_tensor_ids(tensorLookup, currentTensorId, usedIds);
-    EXPECT_EQ(error.code, error_code_t::OK);
+    EXPECT_EQ(error.code, ErrorCode::OK);
 
     std::vector<std::shared_ptr<TensorAttributes>> tensors;
     tensors.reserve(node.attributes.inputs.size() + node.attributes.outputs.size()

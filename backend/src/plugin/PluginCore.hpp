@@ -129,16 +129,10 @@ protected:
 
     // This function is called before adding a plugin to the plugin list.
     // The function must throw Hipdnn_exception if the plugin is not valid.
-    virtual void validateBeforeAdding(const Plugin& plugin)
-    {
-        std::ignore = plugin;
-    }
+    virtual void validateBeforeAdding([[maybe_unused]] const Plugin& plugin) {}
 
     // This function is called after the plugin is added to the plugin list.
-    virtual void actionAfterAdding(const Plugin& plugin)
-    {
-        std::ignore = plugin;
-    }
+    virtual void actionAfterAdding([[maybe_unused]] const Plugin& plugin) {}
 
 public:
     virtual ~PluginManagerBase() = default;

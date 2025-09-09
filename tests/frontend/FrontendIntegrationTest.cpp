@@ -159,14 +159,14 @@ protected:
         int64_t uid = 1;
         BatchnormTestTensors tensors;
 
-        auto xAttr = makeTensorAttributes("X", DataType_t::FLOAT, tensorBundle.xTensor);
+        auto xAttr = makeTensorAttributes("X", DataType::FLOAT, tensorBundle.xTensor);
         if(useManualUids)
         {
             xAttr.set_uid(uid++);
         }
         tensors.x = std::make_shared<TensorAttributes>(std::move(xAttr));
 
-        auto meanAttr = makeTensorAttributes("mean", DataType_t::FLOAT, tensorBundle.meanTensor);
+        auto meanAttr = makeTensorAttributes("mean", DataType::FLOAT, tensorBundle.meanTensor);
         if(useManualUids)
         {
             meanAttr.set_uid(uid++);
@@ -174,21 +174,21 @@ protected:
         tensors.mean = std::make_shared<TensorAttributes>(std::move(meanAttr));
 
         auto invVarianceAttr
-            = makeTensorAttributes("inv_variance", DataType_t::FLOAT, tensorBundle.varianceTensor);
+            = makeTensorAttributes("inv_variance", DataType::FLOAT, tensorBundle.varianceTensor);
         if(useManualUids)
         {
             invVarianceAttr.set_uid(uid++);
         }
         tensors.invVariance = std::make_shared<TensorAttributes>(std::move(invVarianceAttr));
 
-        auto scaleAttr = makeTensorAttributes("scale", DataType_t::FLOAT, tensorBundle.scaleTensor);
+        auto scaleAttr = makeTensorAttributes("scale", DataType::FLOAT, tensorBundle.scaleTensor);
         if(useManualUids)
         {
             scaleAttr.set_uid(uid++);
         }
         tensors.scale = std::make_shared<TensorAttributes>(std::move(scaleAttr));
 
-        auto biasAttr = makeTensorAttributes("bias", DataType_t::FLOAT, tensorBundle.biasTensor);
+        auto biasAttr = makeTensorAttributes("bias", DataType::FLOAT, tensorBundle.biasTensor);
         if(useManualUids)
         {
             biasAttr.set_uid(uid++);
@@ -205,7 +205,7 @@ protected:
         {
             tensors.y->set_uid(uid++);
         }
-        tensors.y->set_data_type(DataType_t::FLOAT);
+        tensors.y->set_data_type(DataType::FLOAT);
 
         return {graph, tensors};
     }
@@ -233,24 +233,24 @@ protected:
                                  FailurePoint expectedFailure = FailurePoint::NONE)
     {
         auto result = graph->validate();
-        ASSERT_EQ(result.code, error_code_t::OK) << result.err_msg;
+        ASSERT_EQ(result.code, ErrorCode::OK) << result.err_msg;
 
         result = graph->build_operation_graph(handle);
-        ASSERT_EQ(result.code, error_code_t::OK) << result.err_msg;
+        ASSERT_EQ(result.code, ErrorCode::OK) << result.err_msg;
 
-        result = graph->create_execution_plans(handle);
+        result = graph->create_execution_plans();
         if(expectedFailure == FailurePoint::CREATE_EXECUTION_PLAN)
         {
-            ASSERT_NE(result.code, error_code_t::OK) << "create_execution_plans should fail";
+            ASSERT_NE(result.code, ErrorCode::OK) << "create_execution_plans should fail";
             return;
         }
-        ASSERT_EQ(result.code, error_code_t::OK) << result.err_msg;
+        ASSERT_EQ(result.code, ErrorCode::OK) << result.err_msg;
 
         result = graph->check_support();
-        ASSERT_EQ(result.code, error_code_t::OK) << result.err_msg;
+        ASSERT_EQ(result.code, ErrorCode::OK) << result.err_msg;
 
         result = graph->build_plans();
-        ASSERT_EQ(result.code, error_code_t::OK) << result.err_msg;
+        ASSERT_EQ(result.code, ErrorCode::OK) << result.err_msg;
 
         ASSERT_TRUE(tensors.x->has_uid());
         ASSERT_TRUE(tensors.mean->has_uid());
@@ -264,11 +264,11 @@ protected:
         result = graph->execute(handle, variantPack, nullptr);
         if(expectedFailure == FailurePoint::EXECUTE)
         {
-            ASSERT_NE(result.code, error_code_t::OK) << "Execute should fail";
+            ASSERT_NE(result.code, ErrorCode::OK) << "Execute should fail";
         }
         else
         {
-            ASSERT_EQ(result.code, error_code_t::OK) << result.err_msg;
+            ASSERT_EQ(result.code, ErrorCode::OK) << result.err_msg;
         }
     }
 

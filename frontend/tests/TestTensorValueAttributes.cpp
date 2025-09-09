@@ -11,7 +11,6 @@
 #include <vector>
 
 // using namespace hipdnn_frontend::graph;
-using hipdnn_frontend::DataType_t;
 using namespace hipdnn_sdk::data_objects;
 
 TEST(TestTensorValueAttributes, SetGetClearFloat)
@@ -47,7 +46,7 @@ TEST(TestTensorValueAttributes, PackUnpackFloatValue)
     hipdnn_frontend::graph::TensorAttributes tensor;
     tensor.set_uid(7)
         .set_name("value_tensor")
-        .set_data_type(DataType_t::FLOAT)
+        .set_data_type(hipdnn_frontend::DataType::FLOAT)
         .set_stride({1, 2})
         .set_dim({3, 4})
         .set_is_virtual(false)
@@ -95,7 +94,7 @@ TEST(TestTensorValueAttributes, PackUnpackHalfValue)
     hipdnn_frontend::graph::TensorAttributes tensor;
     tensor.set_uid(8)
         .set_name("half_tensor")
-        .set_data_type(DataType_t::HALF)
+        .set_data_type(hipdnn_frontend::DataType::HALF)
         .set_is_virtual(false)
         .set_value(1.0_h);
 
@@ -123,7 +122,7 @@ TEST(TestTensorValueAttributes, PackUnpackBFloat1Value)
     hipdnn_frontend::graph::TensorAttributes tensor;
     tensor.set_uid(8)
         .set_name("half_tensor")
-        .set_data_type(DataType_t::BFLOAT16)
+        .set_data_type(hipdnn_frontend::DataType::BFLOAT16)
         .set_is_virtual(false)
         .set_value(1.0_bf);
 
@@ -151,7 +150,7 @@ TEST(TestTensorValueAttributes, PackUnpackDoubleValue)
     hipdnn_frontend::graph::TensorAttributes tensor;
     tensor.set_uid(9)
         .set_name("double_tensor")
-        .set_data_type(DataType_t::DOUBLE)
+        .set_data_type(hipdnn_frontend::DataType::DOUBLE)
         .set_is_virtual(false)
         .set_value(std::numbers::pi_v<double>);
 
@@ -179,7 +178,7 @@ TEST(TestTensorValueAttributes, PackUnpackEmptyValue)
     hipdnn_frontend::graph::TensorAttributes tensor;
     tensor.set_uid(10)
         .set_name("empty_tensor")
-        .set_data_type(DataType_t::FLOAT)
+        .set_data_type(hipdnn_frontend::DataType::FLOAT)
         .set_stride({1, 2})
         .set_dim({3, 4})
         .set_is_virtual(true);

@@ -25,19 +25,19 @@ public:
     }
     virtual ~INode() = default;
 
-    virtual error_t pre_validate_node() const // NOLINT(readability-identifier-naming)
+    virtual Error pre_validate_node() const // NOLINT(readability-identifier-naming)
     {
         return {};
     }
-    virtual error_t infer_properties_node() // NOLINT(readability-identifier-naming)
+    virtual Error infer_properties_node() // NOLINT(readability-identifier-naming)
     {
         return {};
     }
-    virtual error_t post_validate_node() const // NOLINT(readability-identifier-naming)
+    virtual Error post_validate_node() const // NOLINT(readability-identifier-naming)
     {
         return {};
     }
-    virtual error_t populate_hipdnn_tensor_ids( // NOLINT(readability-identifier-naming)
+    virtual Error populate_hipdnn_tensor_ids( // NOLINT(readability-identifier-naming)
         [[maybe_unused]] std::unordered_map<int64_t, std::shared_ptr<TensorAttributes>>&
             tensorLookup,
         [[maybe_unused]] int64_t& currentTensorId,
@@ -58,7 +58,7 @@ public:
 protected:
     std::vector<std::shared_ptr<INode>> _sub_nodes;
 
-    error_t validateSubtree()
+    Error validateSubtree()
     {
         HIPDNN_CHECK_ERROR(pre_validate_node());
         HIPDNN_CHECK_ERROR(infer_properties_node());
@@ -79,7 +79,7 @@ protected:
         }
     }
 
-    error_t populateHipdnnTensorIdsSubtree(
+    Error populateHipdnnTensorIdsSubtree(
         std::unordered_map<int64_t, std::shared_ptr<TensorAttributes>>& tensorLookup,
         int64_t& currentTensorId,
         std::unordered_set<int64_t>& usedIds)
@@ -143,7 +143,7 @@ public:
     }
 
     // NOLINT(readability-identifier-naming)
-    error_t populate_hipdnn_tensor_ids(
+    Error populate_hipdnn_tensor_ids(
         std::unordered_map<int64_t, std::shared_ptr<TensorAttributes>>& tensorLookup,
         int64_t& currentTensorId,
         std::unordered_set<int64_t>& usedIds) const override

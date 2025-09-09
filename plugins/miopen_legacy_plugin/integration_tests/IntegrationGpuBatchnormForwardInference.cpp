@@ -143,8 +143,8 @@ protected:
     }
 
     void runMiopenBatchnormFwd(Batchnorm2dTensorBundle& graphTensorBundle,
-                               DataType_t inputDataType,
-                               DataType_t intermediateDataType)
+                               hipdnn_frontend::DataType inputDataType,
+                               hipdnn_frontend::DataType intermediateDataType)
     {
         auto graph = std::make_shared<hipdnn_frontend::graph::Graph>();
 
@@ -196,19 +196,19 @@ protected:
 
         // Validate and build graph
         auto result = graph->validate();
-        ASSERT_EQ(result.code, error_code_t::OK) << result.err_msg;
+        ASSERT_EQ(result.code, ErrorCode::OK) << result.err_msg;
 
         result = graph->build_operation_graph(_handle);
-        ASSERT_EQ(result.code, error_code_t::OK) << result.err_msg;
+        ASSERT_EQ(result.code, ErrorCode::OK) << result.err_msg;
 
-        result = graph->create_execution_plans(_handle);
-        ASSERT_EQ(result.code, error_code_t::OK) << result.err_msg;
+        result = graph->create_execution_plans();
+        ASSERT_EQ(result.code, ErrorCode::OK) << result.err_msg;
 
         result = graph->check_support();
-        ASSERT_EQ(result.code, error_code_t::OK) << result.err_msg;
+        ASSERT_EQ(result.code, ErrorCode::OK) << result.err_msg;
 
         result = graph->build_plans();
-        ASSERT_EQ(result.code, error_code_t::OK) << result.err_msg;
+        ASSERT_EQ(result.code, ErrorCode::OK) << result.err_msg;
 
         auto variantPack = createVariantPack(*xTensorAttr,
                                              *yTensorAttr,
@@ -219,7 +219,7 @@ protected:
                                              graphTensorBundle);
 
         result = graph->execute(_handle, variantPack, _stream);
-        ASSERT_EQ(result.code, error_code_t::OK) << result.err_msg;
+        ASSERT_EQ(result.code, ErrorCode::OK) << result.err_msg;
     }
 
     void runCpuBatchnormFwd(Batchnorm2dTensorBundle& cpuTensorBundle)

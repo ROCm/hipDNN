@@ -21,12 +21,12 @@ namespace graph
 // For example:
 // input_shapes = {{1, 2}, {1, 2}, {1, 2, 5}} -> common_shape = {1, 2, 5}
 // input_shapes = {{1, 2, 3}, {1, 2, 4}, {1, 2}} -> error
-inline error_t findCommonShape(const std::vector<std::vector<int64_t>>& inputShapes,
-                               std::vector<int64_t>& commonShape)
+inline Error findCommonShape(const std::vector<std::vector<int64_t>>& inputShapes,
+                             std::vector<int64_t>& commonShape)
 {
     if(inputShapes.empty())
     {
-        return {error_code_t::INVALID_VALUE, "Input shapes cannot be empty"};
+        return {ErrorCode::INVALID_VALUE, "Input shapes cannot be empty"};
     }
 
     size_t dims = std::ranges::max_element(
@@ -45,7 +45,7 @@ inline error_t findCommonShape(const std::vector<std::vector<int64_t>>& inputSha
         {
             if(commonShape[j] != current[j] && commonShape[j] != 1 && current[j] != 1)
             {
-                return {error_code_t::INVALID_VALUE, "Incompatible shapes"};
+                return {ErrorCode::INVALID_VALUE, "Incompatible shapes"};
             }
 
             commonShape[j] = std::max(commonShape[j], current[j]);
@@ -61,7 +61,7 @@ template <class T,
           class DeviceAlloc = hipdnn_sdk::utilities::DeviceAllocator<T>>
 inline TensorAttributes
     makeTensorAttributes(const std::string& name,
-                         DataType_t dataType,
+                         DataType dataType,
                          const hipdnn_sdk::utilities::Tensor<T, HostAlloc, DeviceAlloc>& tensor)
 {
     return TensorAttributes()

@@ -22,40 +22,38 @@ public:
     {
     }
 
-    error_t pre_validate_node() const override
+    Error pre_validate_node() const override
     {
         if(!attributes.get_input_0())
         {
-            return {error_code_t::ATTRIBUTE_NOT_SET,
-                    "PointwiseNode missing IN_0 for pre-validation"};
+            return {ErrorCode::ATTRIBUTE_NOT_SET, "PointwiseNode missing IN_0 for pre-validation"};
         }
         if(!attributes.get_output_0())
         {
-            return {error_code_t::ATTRIBUTE_NOT_SET,
-                    "PointwiseNode missing OUT_0 for pre-validation"};
+            return {ErrorCode::ATTRIBUTE_NOT_SET, "PointwiseNode missing OUT_0 for pre-validation"};
         }
-        if(attributes.get_mode() == PointwiseMode_t::NOT_SET)
+        if(attributes.get_mode() == PointwiseMode::NOT_SET)
         {
-            return {error_code_t::ATTRIBUTE_NOT_SET,
+            return {ErrorCode::ATTRIBUTE_NOT_SET,
                     "PointwiseNode missing operation for pre-validation"};
         }
 
         return {};
     }
 
-    error_t infer_properties_node() override
+    Error infer_properties_node() override
     {
         auto in0 = attributes.get_input_0();
         if(!in0)
         {
-            return {error_code_t::ATTRIBUTE_NOT_SET,
+            return {ErrorCode::ATTRIBUTE_NOT_SET,
                     "PointwiseNode missing input for setting properties"};
         }
 
         auto out = attributes.get_output_0();
         if(!out)
         {
-            return {error_code_t::ATTRIBUTE_NOT_SET,
+            return {ErrorCode::ATTRIBUTE_NOT_SET,
                     "PointwiseNode missing output for setting properties"};
         }
 
@@ -98,7 +96,7 @@ public:
 
             if(out->get_stride().empty())
             {
-                return {error_code_t::ATTRIBUTE_NOT_SET, "PointwiseNode output missing stride"};
+                return {ErrorCode::ATTRIBUTE_NOT_SET, "PointwiseNode output missing stride"};
             }
         }
 

@@ -20,70 +20,70 @@ TEST(TestBatchnormBackwardAttributes, CreateBatchnormBackwardAttributes)
     auto dyTensor = batchnormAttributes.get_dy();
     dyTensor->set_uid(1)
         .set_name("DyTensor")
-        .set_data_type(hipdnn_frontend::DataType_t::FLOAT)
+        .set_data_type(hipdnn_frontend::DataType::FLOAT)
         .set_dim({1, 2, 3, 4})
         .set_stride({5, 6, 7, 8});
 
     auto xTensor = batchnormAttributes.get_x();
     xTensor->set_uid(2)
         .set_name("XTensor")
-        .set_data_type(hipdnn_frontend::DataType_t::FLOAT)
+        .set_data_type(hipdnn_frontend::DataType::FLOAT)
         .set_dim({1, 2, 3, 4})
         .set_stride({5, 6, 7, 8});
 
     auto scaleTensor = batchnormAttributes.get_scale();
     scaleTensor->set_uid(3)
         .set_name("ScaleTensor")
-        .set_data_type(hipdnn_frontend::DataType_t::FLOAT)
+        .set_data_type(hipdnn_frontend::DataType::FLOAT)
         .set_dim({1, 2, 3, 4})
         .set_stride({5, 6, 7, 8});
 
     auto meanTensor = batchnormAttributes.get_mean();
     meanTensor->set_uid(4)
         .set_name("MeanTensor")
-        .set_data_type(hipdnn_frontend::DataType_t::FLOAT)
+        .set_data_type(hipdnn_frontend::DataType::FLOAT)
         .set_dim({1, 2, 3, 4})
         .set_stride({5, 6, 7, 8});
 
     auto invVarianceTensor = batchnormAttributes.get_inv_variance();
     invVarianceTensor->set_uid(5)
         .set_name("InvVarianceTensor")
-        .set_data_type(hipdnn_frontend::DataType_t::FLOAT)
+        .set_data_type(hipdnn_frontend::DataType::FLOAT)
         .set_dim({1, 2, 3, 4})
         .set_stride({5, 6, 7, 8});
 
     auto dxTensor = batchnormAttributes.get_dx();
     dxTensor->set_uid(6)
         .set_name("DxTensor")
-        .set_data_type(hipdnn_frontend::DataType_t::FLOAT)
+        .set_data_type(hipdnn_frontend::DataType::FLOAT)
         .set_dim({1, 2, 3, 4})
         .set_stride({5, 6, 7, 8});
 
     auto dscaleTensor = batchnormAttributes.get_dscale();
     dscaleTensor->set_uid(7)
         .set_name("DscaleTensor")
-        .set_data_type(hipdnn_frontend::DataType_t::FLOAT)
+        .set_data_type(hipdnn_frontend::DataType::FLOAT)
         .set_dim({1, 2, 3, 4})
         .set_stride({5, 6, 7, 8});
 
     auto dbiasTensor = batchnormAttributes.get_dbias();
     dbiasTensor->set_uid(8)
         .set_name("DbiasTensor")
-        .set_data_type(hipdnn_frontend::DataType_t::FLOAT)
+        .set_data_type(hipdnn_frontend::DataType::FLOAT)
         .set_dim({1, 2, 3, 4})
         .set_stride({5, 6, 7, 8});
 
     auto peerStat1 = std::make_shared<hipdnn_frontend::graph::TensorAttributes>();
     peerStat1->set_uid(9)
         .set_name("PeerStat1")
-        .set_data_type(hipdnn_frontend::DataType_t::FLOAT)
+        .set_data_type(hipdnn_frontend::DataType::FLOAT)
         .set_dim({1, 2})
         .set_stride({3, 4});
 
     auto peerStat2 = std::make_shared<hipdnn_frontend::graph::TensorAttributes>();
     peerStat2->set_uid(10)
         .set_name("PeerStat2")
-        .set_data_type(hipdnn_frontend::DataType_t::FLOAT)
+        .set_data_type(hipdnn_frontend::DataType::FLOAT)
         .set_dim({5, 6})
         .set_stride({7, 8});
 
@@ -91,49 +91,49 @@ TEST(TestBatchnormBackwardAttributes, CreateBatchnormBackwardAttributes)
 
     EXPECT_EQ(dyTensor->get_uid(), 1);
     EXPECT_EQ(dyTensor->get_name(), "DyTensor");
-    EXPECT_EQ(dyTensor->get_data_type(), hipdnn_frontend::DataType_t::FLOAT);
+    EXPECT_EQ(dyTensor->get_data_type(), hipdnn_frontend::DataType::FLOAT);
     EXPECT_EQ(dyTensor->get_dim(), (std::vector<int64_t>{1, 2, 3, 4}));
     EXPECT_EQ(dyTensor->get_stride(), (std::vector<int64_t>{5, 6, 7, 8}));
 
     EXPECT_EQ(xTensor->get_uid(), 2);
     EXPECT_EQ(xTensor->get_name(), "XTensor");
-    EXPECT_EQ(xTensor->get_data_type(), hipdnn_frontend::DataType_t::FLOAT);
+    EXPECT_EQ(xTensor->get_data_type(), hipdnn_frontend::DataType::FLOAT);
     EXPECT_EQ(xTensor->get_dim(), (std::vector<int64_t>{1, 2, 3, 4}));
     EXPECT_EQ(xTensor->get_stride(), (std::vector<int64_t>{5, 6, 7, 8}));
 
     EXPECT_EQ(scaleTensor->get_uid(), 3);
     EXPECT_EQ(scaleTensor->get_name(), "ScaleTensor");
-    EXPECT_EQ(scaleTensor->get_data_type(), hipdnn_frontend::DataType_t::FLOAT);
+    EXPECT_EQ(scaleTensor->get_data_type(), hipdnn_frontend::DataType::FLOAT);
     EXPECT_EQ(scaleTensor->get_dim(), (std::vector<int64_t>{1, 2, 3, 4}));
     EXPECT_EQ(scaleTensor->get_stride(), (std::vector<int64_t>{5, 6, 7, 8}));
 
     EXPECT_EQ(meanTensor->get_uid(), 4);
     EXPECT_EQ(meanTensor->get_name(), "MeanTensor");
-    EXPECT_EQ(meanTensor->get_data_type(), hipdnn_frontend::DataType_t::FLOAT);
+    EXPECT_EQ(meanTensor->get_data_type(), hipdnn_frontend::DataType::FLOAT);
     EXPECT_EQ(meanTensor->get_dim(), (std::vector<int64_t>{1, 2, 3, 4}));
     EXPECT_EQ(meanTensor->get_stride(), (std::vector<int64_t>{5, 6, 7, 8}));
 
     EXPECT_EQ(invVarianceTensor->get_uid(), 5);
     EXPECT_EQ(invVarianceTensor->get_name(), "InvVarianceTensor");
-    EXPECT_EQ(invVarianceTensor->get_data_type(), hipdnn_frontend::DataType_t::FLOAT);
+    EXPECT_EQ(invVarianceTensor->get_data_type(), hipdnn_frontend::DataType::FLOAT);
     EXPECT_EQ(invVarianceTensor->get_dim(), (std::vector<int64_t>{1, 2, 3, 4}));
     EXPECT_EQ(invVarianceTensor->get_stride(), (std::vector<int64_t>{5, 6, 7, 8}));
 
     EXPECT_EQ(dxTensor->get_uid(), 6);
     EXPECT_EQ(dxTensor->get_name(), "DxTensor");
-    EXPECT_EQ(dxTensor->get_data_type(), hipdnn_frontend::DataType_t::FLOAT);
+    EXPECT_EQ(dxTensor->get_data_type(), hipdnn_frontend::DataType::FLOAT);
     EXPECT_EQ(dxTensor->get_dim(), (std::vector<int64_t>{1, 2, 3, 4}));
     EXPECT_EQ(dxTensor->get_stride(), (std::vector<int64_t>{5, 6, 7, 8}));
 
     EXPECT_EQ(dscaleTensor->get_uid(), 7);
     EXPECT_EQ(dscaleTensor->get_name(), "DscaleTensor");
-    EXPECT_EQ(dscaleTensor->get_data_type(), hipdnn_frontend::DataType_t::FLOAT);
+    EXPECT_EQ(dscaleTensor->get_data_type(), hipdnn_frontend::DataType::FLOAT);
     EXPECT_EQ(dscaleTensor->get_dim(), (std::vector<int64_t>{1, 2, 3, 4}));
     EXPECT_EQ(dscaleTensor->get_stride(), (std::vector<int64_t>{5, 6, 7, 8}));
 
     EXPECT_EQ(dbiasTensor->get_uid(), 8);
     EXPECT_EQ(dbiasTensor->get_name(), "DbiasTensor");
-    EXPECT_EQ(dbiasTensor->get_data_type(), hipdnn_frontend::DataType_t::FLOAT);
+    EXPECT_EQ(dbiasTensor->get_data_type(), hipdnn_frontend::DataType::FLOAT);
     EXPECT_EQ(dbiasTensor->get_dim(), (std::vector<int64_t>{1, 2, 3, 4}));
     EXPECT_EQ(dbiasTensor->get_stride(), (std::vector<int64_t>{5, 6, 7, 8}));
 
@@ -142,13 +142,13 @@ TEST(TestBatchnormBackwardAttributes, CreateBatchnormBackwardAttributes)
 
     EXPECT_EQ(peerStats[0]->get_uid(), 9);
     EXPECT_EQ(peerStats[0]->get_name(), "PeerStat1");
-    EXPECT_EQ(peerStats[0]->get_data_type(), hipdnn_frontend::DataType_t::FLOAT);
+    EXPECT_EQ(peerStats[0]->get_data_type(), hipdnn_frontend::DataType::FLOAT);
     EXPECT_EQ(peerStats[0]->get_dim(), (std::vector<int64_t>{1, 2}));
     EXPECT_EQ(peerStats[0]->get_stride(), (std::vector<int64_t>{3, 4}));
 
     EXPECT_EQ(peerStats[1]->get_uid(), 10);
     EXPECT_EQ(peerStats[1]->get_name(), "PeerStat2");
-    EXPECT_EQ(peerStats[1]->get_data_type(), hipdnn_frontend::DataType_t::FLOAT);
+    EXPECT_EQ(peerStats[1]->get_data_type(), hipdnn_frontend::DataType::FLOAT);
     EXPECT_EQ(peerStats[1]->get_dim(), (std::vector<int64_t>{5, 6}));
     EXPECT_EQ(peerStats[1]->get_stride(), (std::vector<int64_t>{7, 8}));
 }

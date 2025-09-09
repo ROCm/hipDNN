@@ -63,7 +63,7 @@ void SampleRunner::operator()(const TensorLayout& layout)
     HIPDNN_FE_CHECK(graph->build_operation_graph(handle));
     std::cout << "Operation graph build successful.\n";
 
-    HIPDNN_FE_CHECK(graph->create_execution_plans(handle));
+    HIPDNN_FE_CHECK(graph->create_execution_plans());
     std::cout << "Execution plans created successfully.\n";
 
     HIPDNN_FE_CHECK(graph->check_support());

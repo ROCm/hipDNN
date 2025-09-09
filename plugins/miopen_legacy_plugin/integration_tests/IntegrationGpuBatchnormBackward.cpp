@@ -149,8 +149,8 @@ protected:
     }
 
     void runMiopenBatchnormBwd(Batchnorm2dTensorBundle& graphTensorBundle,
-                               DataType_t inputDataType,
-                               DataType_t intermediateDataType)
+                               hipdnn_frontend::DataType inputDataType,
+                               hipdnn_frontend::DataType intermediateDataType)
     {
         auto graphObj = std::make_shared<hipdnn_frontend::graph::Graph>();
 
@@ -214,19 +214,19 @@ protected:
         dbiasTensorAttr->set_data_type(intermediateDataType);
 
         auto result = graphObj->validate();
-        ASSERT_EQ(result.code, error_code_t::OK) << result.err_msg;
+        ASSERT_EQ(result.code, ErrorCode::OK) << result.err_msg;
 
         result = graphObj->build_operation_graph(_handle);
-        ASSERT_EQ(result.code, error_code_t::OK) << result.err_msg;
+        ASSERT_EQ(result.code, ErrorCode::OK) << result.err_msg;
 
-        result = graphObj->create_execution_plans(_handle);
-        ASSERT_EQ(result.code, error_code_t::OK) << result.err_msg;
+        result = graphObj->create_execution_plans();
+        ASSERT_EQ(result.code, ErrorCode::OK) << result.err_msg;
 
         result = graphObj->check_support();
-        ASSERT_EQ(result.code, error_code_t::OK) << result.err_msg;
+        ASSERT_EQ(result.code, ErrorCode::OK) << result.err_msg;
 
         result = graphObj->build_plans();
-        ASSERT_EQ(result.code, error_code_t::OK) << result.err_msg;
+        ASSERT_EQ(result.code, ErrorCode::OK) << result.err_msg;
 
         auto variantPack = createVariantPack(*xTensorAttr,
                                              *dyTensorAttr,
@@ -239,7 +239,7 @@ protected:
                                              graphTensorBundle);
 
         result = graphObj->execute(_handle, variantPack, _stream);
-        ASSERT_EQ(result.code, error_code_t::OK) << result.err_msg;
+        ASSERT_EQ(result.code, ErrorCode::OK) << result.err_msg;
     }
 
     void runCpuBatchnormBwd(Batchnorm2dTensorBundle& cpuTensorBundle)

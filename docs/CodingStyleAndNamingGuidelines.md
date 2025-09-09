@@ -7,6 +7,7 @@ This document defines the canonical project-wide coding and test naming conventi
 - [1. Naming Summary](#1-naming-summary)
 - [2. File & Class Naming](#2-file--class-naming)
 - [3. Functions](#3-functions)
+  - [3.1 Unused Function Arguments](#31-unused-function-arguments)
 - [4. Variables](#4-variables)
 - [5. Members](#5-members)
 - [6. Globals](#6-globals)
@@ -59,6 +60,11 @@ This document defines the canonical project-wide coding and test naming conventi
 ## 3. Functions
 
 - Use descriptive action-oriented verbs: `createPlan`, `finalizeConfig`, `launchKernels`.
+
+### 3.1 Unused Function Arguments
+
+- Prefer use of `[[maybe_unused]]` rather than commenting-out argument names or using std::ignore
+  - Exception is for arguments that *shall not* be used, such as the case in a legacy version of a method that has an argument that is no longer relevant and shouldn't be used.  In this case, comment-out the argument name and leave a comment indicating the reason.
 
 ## 4. Variables
 

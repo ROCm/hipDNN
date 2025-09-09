@@ -233,24 +233,24 @@ protected:
                                  FailurePoint expectedFailure = FailurePoint::NONE)
     {
         auto result = graph->validate();
-        ASSERT_EQ(result.code, error_code_t::OK) << result.err_msg;
+        ASSERT_EQ(result.code, ErrorCode::OK) << result.err_msg;
 
         result = graph->build_operation_graph(handle);
-        ASSERT_EQ(result.code, error_code_t::OK) << result.err_msg;
+        ASSERT_EQ(result.code, ErrorCode::OK) << result.err_msg;
 
-        result = graph->create_execution_plans(handle);
+        result = graph->create_execution_plans();
         if(expectedFailure == FailurePoint::CREATE_EXECUTION_PLAN)
         {
-            ASSERT_NE(result.code, error_code_t::OK) << "create_execution_plans should fail";
+            ASSERT_NE(result.code, ErrorCode::OK) << "create_execution_plans should fail";
             return;
         }
-        ASSERT_EQ(result.code, error_code_t::OK) << result.err_msg;
+        ASSERT_EQ(result.code, ErrorCode::OK) << result.err_msg;
 
         result = graph->check_support();
-        ASSERT_EQ(result.code, error_code_t::OK) << result.err_msg;
+        ASSERT_EQ(result.code, ErrorCode::OK) << result.err_msg;
 
         result = graph->build_plans();
-        ASSERT_EQ(result.code, error_code_t::OK) << result.err_msg;
+        ASSERT_EQ(result.code, ErrorCode::OK) << result.err_msg;
 
         ASSERT_TRUE(tensors.x->has_uid());
         ASSERT_TRUE(tensors.mean->has_uid());
@@ -264,11 +264,11 @@ protected:
         result = graph->execute(handle, variantPack, nullptr);
         if(expectedFailure == FailurePoint::EXECUTE)
         {
-            ASSERT_NE(result.code, error_code_t::OK) << "Execute should fail";
+            ASSERT_NE(result.code, ErrorCode::OK) << "Execute should fail";
         }
         else
         {
-            ASSERT_EQ(result.code, error_code_t::OK) << result.err_msg;
+            ASSERT_EQ(result.code, ErrorCode::OK) << result.err_msg;
         }
     }
 
