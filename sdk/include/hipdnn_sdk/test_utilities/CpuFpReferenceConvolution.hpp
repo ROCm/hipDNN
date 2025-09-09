@@ -23,6 +23,19 @@ template <class InputDataType,
 class CpuFpReferenceConvolutionImpl
 {
 public:
+    // Check if this CPU implementation supports the given node configuration
+    static bool isApplicable(const hipdnn_sdk::data_objects::Node& node)
+    {
+        using namespace hipdnn_sdk::data_objects;
+
+        if(node.attributes_type() != NodeAttributes_ConvolutionFwdAttributes)
+        {
+            return false;
+        }
+
+        return true;
+    }
+
     static void convFwdInference(const ITensor<InputDataType>& input,
                                  const ITensor<InputDataType>& weight,
                                  ITensor<InputDataType>& output,

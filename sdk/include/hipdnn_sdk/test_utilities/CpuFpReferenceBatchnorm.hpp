@@ -22,6 +22,22 @@ template <class InputDataType,
 class CpuFpReferenceBatchnormImpl
 {
 public:
+    // Check if this CPU implementation supports the given node configuration
+    static bool isApplicable(const hipdnn_sdk::data_objects::Node& node)
+    {
+        using namespace hipdnn_sdk::data_objects;
+
+        // Support both BatchNorm inference and backward
+        if(node.attributes_type() != NodeAttributes_BatchnormInferenceAttributes
+           && node.attributes_type() != NodeAttributes_BatchnormBackwardAttributes)
+        {
+            return false;
+        }
+
+        // Default to supporting the node
+        return true;
+    }
+
     static void batchnormFwdInference(const ITensor<InputDataType>& input,
                                       const ITensor<ScaleBiasDataType>& scale,
                                       const ITensor<ScaleBiasDataType>& bias,
