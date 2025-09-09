@@ -1,6 +1,6 @@
 # hipDNN Testing Strategy
 
-This document outlines the comprehensive testing strategy for hipDNN, covering white box testing (unit tests), black box testing (API tests), integration testing, and performance/benchmarking.
+This document outlines the comprehensive testing strategy for hipDNN, covering unit tests(white box testing), integration tests (black box testing, api tests, and end to end tests), and performance/benchmarking.
 
 Please refer to the coding standards in [Coding Style and Naming Guidelines](../CodingStyleAndNamingGuidelines.md) to see test naming conventions we follow.
 
@@ -14,11 +14,12 @@ White box tests focus on internal implementation details of hipDNN components.
 
 | Component | Location | Purpose | GPU Testing | Environments |
 |-----------|----------|---------|-------------|--------------|
-| **Backend** | `backend/tests/` | Test internal implementation of hipDNN backend | Minimal/None - mark with `SKIP_IF_NO_DEVICE()` | Windows & Linux |
-| **Frontend** | `frontend/tests/` | Test internal implementation of hipDNN frontend | Minimal/None - mark with `SKIP_IF_NO_DEVICE()` | Windows & Linux |
+| **Backend** | `backend/tests/` | Test internal implementation of hipDNN backend | Minimal/None | Windows & Linux |
+| **Frontend** | `frontend/tests/` | Test internal implementation of hipDNN frontend | Minimal/None | Windows & Linux |
 | **SDK** | `sdk/tests/` | Test internal implementation of hipDNN SDK | Minimal/None expected | Windows & Linux |
-| **Plugin** | `plugins/<name>/tests/` | Test internal implementation of specific plugin | Minimal & fast - mark with `SKIP_IF_NO_DEVICE()` | Windows & Linux |
+| **Plugin** | `plugins/<name>/tests/` | Test internal implementation of specific plugin | Minimal & fast | Windows & Linux |
 
+Note: If a test depends on the GPU then it needs to be marked with `SKIP_IF_NO_DEVICE()` so tests run and pass correctly on CPU only machines.
 ---
 
 ### Test Categories by Component
@@ -59,7 +60,7 @@ White box tests focus on internal implementation details of hipDNN components.
 
 ## 2. Integration Tests
 
-### Black Box Testing (API Tests) ⬛
+### Black Box Integration Tests ⬛
 
 Black box tests validate the public API without knowledge of internal implementation.  These are a type of integration test.
 
@@ -89,11 +90,11 @@ Black box tests validate the public API without knowledge of internal implementa
 
 ---
 
-## End to End Integration Tests 🧩
+### End to End Integration Tests 🧩
 
 Integration tests validate end-to-end functionality across components.
 
-### Integration Test Comparison
+#### End to End Integration Test Comparison
 
 | Test Type | Location | Purpose | GPU Required | Test Speed | Environments |
 |-----------|----------|---------|--------------|------------|--------------|
@@ -116,7 +117,7 @@ Integration tests validate end-to-end functionality across components.
 
 ---
 
-## General Testing Requirements
+## 3. General Testing Requirements
 
 ### Code Coverage 
 - **Target**: 80% overall coverage

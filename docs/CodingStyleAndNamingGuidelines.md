@@ -125,7 +125,7 @@ If later you add invariants or non-trivial behavior, consider converting to a cl
 
 GoogleTest reserves underscores in test suite and test names for future expansion. Current repository names with underscores risk future incompatibility; we proactively constrain test suite naming.
 
-Rules below apply ONLY to the TestSuite name (first parameter of `TEST` / `TEST_F` / `TEST_P`). The TestCase (second parameter) can be descriptive but should still avoid the reserved keywords where noted.  Additionally for `TEST_P` there is a prefix which you can leave blank or use for another purpose that makes sense.
+Rules below apply ONLY to the TestSuite name (first parameter of `TEST` / `TEST_F` / `TEST_P`). The TestCase (second parameter) can be descriptive but should still avoid the reserved keywords where noted.  When writing parameterized tests the prefix(parameter name is `InstantiationName`) in the `INSTANTIATE_TEST_SUITE_P` macro can be left blank or used for another purpose that make sense for that test.
 
 ### 11.1 Keywords
 
@@ -154,7 +154,7 @@ The test file name should mirror the primary test suite it contains.  For exampl
 
 ### 11.3 Integration Tests
 
-See TestingStrategy.md[testing/TestingStrategy.md] for more information on integration tests. Integration tests should be named to reflect the feature or component under test.
+See [TestingStrategy.md](testing/TestingStrategy.md) for more information on integration tests. Integration tests should be named to reflect the feature or component under test.
 
 #### Naming Examples
 
@@ -170,7 +170,7 @@ For integration tests, the main test suite might be named `IntegrationGpuFeature
 
 ### 11.4 Test Case Naming
 
-May be richly descriptive: `HandlesLargeStride`, `RejectsMismatchedLayouts`. Avoid duplicating suite-level keywords (`Integration`, `Gpu`, datatype tokens) redundantly inside the test case name.  The test case name is the preferred place to list the shape/layout variant being tested (e.g. `Nchw`, `Nhwc`).  In general the naming of the test case is entirely up to the developer.
+May be richly descriptive `HandlesLargeStride`, `RejectsMismatchedLayouts` or very simple `Correctness`, `Accuracy`. Avoid duplicating suite-level keywords (`Integration`, `Gpu`, datatype tokens) redundantly inside the test case name.  The test case name is the preferred place to list the shape/layout variant being tested (e.g. `Nchw`, `Nhwc`).  In general there should not be duplication across the suite name and test case name.  Otherwise the naming of the test case is entirely up to the developer.
 
 ### 11.5 Rationale
 
