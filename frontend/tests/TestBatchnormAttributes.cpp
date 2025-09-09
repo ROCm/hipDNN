@@ -29,98 +29,98 @@ TEST(TestBatchnormAttributes, CreateBatchnormAttributes)
     auto xTensor = batchnormAttributes.get_x();
     xTensor->set_uid(1)
         .set_name("XTensor")
-        .set_data_type(hipdnn_frontend::DataType_t::FLOAT)
+        .set_data_type(hipdnn_frontend::DataType::FLOAT)
         .set_dim({1, 2, 3, 4})
         .set_stride({5, 6, 7, 8});
 
     auto yTensor = batchnormAttributes.get_y();
     yTensor->set_uid(2)
         .set_name("YTensor")
-        .set_data_type(hipdnn_frontend::DataType_t::FLOAT)
+        .set_data_type(hipdnn_frontend::DataType::FLOAT)
         .set_dim({1, 2, 3, 4})
         .set_stride({5, 6, 7, 8});
 
     auto scaleTensor = batchnormAttributes.get_scale();
     scaleTensor->set_uid(3)
         .set_name("ScaleTensor")
-        .set_data_type(hipdnn_frontend::DataType_t::FLOAT)
+        .set_data_type(hipdnn_frontend::DataType::FLOAT)
         .set_dim({1, 2, 3, 4})
         .set_stride({5, 6, 7, 8});
 
     auto biasTensor = batchnormAttributes.get_bias();
     biasTensor->set_uid(4)
         .set_name("BiasTensor")
-        .set_data_type(hipdnn_frontend::DataType_t::FLOAT)
+        .set_data_type(hipdnn_frontend::DataType::FLOAT)
         .set_dim({1, 2, 3, 4})
         .set_stride({5, 6, 7, 8});
 
     auto prevMeanTensor = batchnormAttributes.get_prev_running_mean();
     prevMeanTensor->set_uid(5)
         .set_name("PrevMeanTensor")
-        .set_data_type(hipdnn_frontend::DataType_t::FLOAT)
+        .set_data_type(hipdnn_frontend::DataType::FLOAT)
         .set_dim({1, 2, 3, 4})
         .set_stride({5, 6, 7, 8});
 
     auto prevVarianceTensor = batchnormAttributes.get_prev_running_variance();
     prevVarianceTensor->set_uid(6)
         .set_name("PrevVarianceTensor")
-        .set_data_type(hipdnn_frontend::DataType_t::FLOAT)
+        .set_data_type(hipdnn_frontend::DataType::FLOAT)
         .set_dim({1, 2, 3, 4})
         .set_stride({5, 6, 7, 8});
 
     auto momentumTensor = batchnormAttributes.get_momentum();
     momentumTensor->set_uid(7)
         .set_name("MomentumTensor")
-        .set_data_type(hipdnn_frontend::DataType_t::FLOAT)
+        .set_data_type(hipdnn_frontend::DataType::FLOAT)
         .set_dim({1, 2, 3, 4})
         .set_stride({5, 6, 7, 8});
 
     auto meanTensor = batchnormAttributes.get_mean();
     meanTensor->set_uid(8)
         .set_name("MeanTensor")
-        .set_data_type(hipdnn_frontend::DataType_t::FLOAT)
+        .set_data_type(hipdnn_frontend::DataType::FLOAT)
         .set_dim({1, 2, 3, 4})
         .set_stride({5, 6, 7, 8});
 
     auto invVarianceTensor = batchnormAttributes.get_inv_variance();
     invVarianceTensor->set_uid(9)
         .set_name("InvVarianceTensor")
-        .set_data_type(hipdnn_frontend::DataType_t::FLOAT)
+        .set_data_type(hipdnn_frontend::DataType::FLOAT)
         .set_dim({1, 2, 3, 4})
         .set_stride({5, 6, 7, 8});
 
     auto nextMeanTensor = batchnormAttributes.get_next_running_mean();
     nextMeanTensor->set_uid(10)
         .set_name("NextMeanTensor")
-        .set_data_type(hipdnn_frontend::DataType_t::FLOAT)
+        .set_data_type(hipdnn_frontend::DataType::FLOAT)
         .set_dim({1, 2, 3, 4})
         .set_stride({5, 6, 7, 8});
 
     auto nextVarianceTensor = batchnormAttributes.get_next_running_variance();
     nextVarianceTensor->set_uid(11)
         .set_name("NextVarianceTensor")
-        .set_data_type(hipdnn_frontend::DataType_t::FLOAT)
+        .set_data_type(hipdnn_frontend::DataType::FLOAT)
         .set_dim({1, 2, 3, 4})
         .set_stride({5, 6, 7, 8});
 
     auto epsilonTensor = batchnormAttributes.get_epsilon();
     epsilonTensor->set_uid(14)
         .set_name("EpsilonTensor")
-        .set_data_type(hipdnn_frontend::DataType_t::FLOAT)
+        .set_data_type(hipdnn_frontend::DataType::FLOAT)
         .set_dim({1})
         .set_stride({1});
 
     auto peerStat1 = std::make_shared<hipdnn_frontend::graph::TensorAttributes>();
     peerStat1->set_uid(12)
         .set_name("PeerStat1")
-        .set_data_type(hipdnn_frontend::DataType_t::FLOAT)
+        .set_data_type(hipdnn_frontend::DataType::FLOAT)
         .set_dim({1, 2})
         .set_stride({3, 4});
 
     auto peerStat2 = std::make_shared<hipdnn_frontend::graph::TensorAttributes>();
     peerStat2->set_uid(13)
         .set_name("PeerStat2")
-        .set_data_type(hipdnn_frontend::DataType_t::FLOAT)
+        .set_data_type(hipdnn_frontend::DataType::FLOAT)
         .set_dim({5, 6})
         .set_stride({7, 8});
 
@@ -131,85 +131,85 @@ TEST(TestBatchnormAttributes, CreateBatchnormAttributes)
 
     EXPECT_EQ(peerStats[0]->get_uid(), 12);
     EXPECT_EQ(peerStats[0]->get_name(), "PeerStat1");
-    EXPECT_EQ(peerStats[0]->get_data_type(), hipdnn_frontend::DataType_t::FLOAT);
+    EXPECT_EQ(peerStats[0]->get_data_type(), hipdnn_frontend::DataType::FLOAT);
     EXPECT_EQ(peerStats[0]->get_dim(), (std::vector<int64_t>{1, 2}));
     EXPECT_EQ(peerStats[0]->get_stride(), (std::vector<int64_t>{3, 4}));
 
     EXPECT_EQ(peerStats[1]->get_uid(), 13);
     EXPECT_EQ(peerStats[1]->get_name(), "PeerStat2");
-    EXPECT_EQ(peerStats[1]->get_data_type(), hipdnn_frontend::DataType_t::FLOAT);
+    EXPECT_EQ(peerStats[1]->get_data_type(), hipdnn_frontend::DataType::FLOAT);
     EXPECT_EQ(peerStats[1]->get_dim(), (std::vector<int64_t>{5, 6}));
     EXPECT_EQ(peerStats[1]->get_stride(), (std::vector<int64_t>{7, 8}));
 
     EXPECT_EQ(xTensor->get_uid(), 1);
     EXPECT_EQ(xTensor->get_name(), "XTensor");
-    EXPECT_EQ(xTensor->get_data_type(), hipdnn_frontend::DataType_t::FLOAT);
+    EXPECT_EQ(xTensor->get_data_type(), hipdnn_frontend::DataType::FLOAT);
     EXPECT_EQ(xTensor->get_dim(), (std::vector<int64_t>{1, 2, 3, 4}));
     EXPECT_EQ(xTensor->get_stride(), (std::vector<int64_t>{5, 6, 7, 8}));
 
     EXPECT_EQ(yTensor->get_uid(), 2);
     EXPECT_EQ(yTensor->get_name(), "YTensor");
-    EXPECT_EQ(yTensor->get_data_type(), hipdnn_frontend::DataType_t::FLOAT);
+    EXPECT_EQ(yTensor->get_data_type(), hipdnn_frontend::DataType::FLOAT);
     EXPECT_EQ(yTensor->get_dim(), (std::vector<int64_t>{1, 2, 3, 4}));
     EXPECT_EQ(yTensor->get_stride(), (std::vector<int64_t>{5, 6, 7, 8}));
 
     EXPECT_EQ(scaleTensor->get_uid(), 3);
     EXPECT_EQ(scaleTensor->get_name(), "ScaleTensor");
-    EXPECT_EQ(scaleTensor->get_data_type(), hipdnn_frontend::DataType_t::FLOAT);
+    EXPECT_EQ(scaleTensor->get_data_type(), hipdnn_frontend::DataType::FLOAT);
     EXPECT_EQ(scaleTensor->get_dim(), (std::vector<int64_t>{1, 2, 3, 4}));
     EXPECT_EQ(scaleTensor->get_stride(), (std::vector<int64_t>{5, 6, 7, 8}));
 
     EXPECT_EQ(biasTensor->get_uid(), 4);
     EXPECT_EQ(biasTensor->get_name(), "BiasTensor");
-    EXPECT_EQ(biasTensor->get_data_type(), hipdnn_frontend::DataType_t::FLOAT);
+    EXPECT_EQ(biasTensor->get_data_type(), hipdnn_frontend::DataType::FLOAT);
     EXPECT_EQ(biasTensor->get_dim(), (std::vector<int64_t>{1, 2, 3, 4}));
     EXPECT_EQ(biasTensor->get_stride(), (std::vector<int64_t>{5, 6, 7, 8}));
 
     EXPECT_EQ(prevMeanTensor->get_uid(), 5);
     EXPECT_EQ(prevMeanTensor->get_name(), "PrevMeanTensor");
-    EXPECT_EQ(prevMeanTensor->get_data_type(), hipdnn_frontend::DataType_t::FLOAT);
+    EXPECT_EQ(prevMeanTensor->get_data_type(), hipdnn_frontend::DataType::FLOAT);
     EXPECT_EQ(prevMeanTensor->get_dim(), (std::vector<int64_t>{1, 2, 3, 4}));
     EXPECT_EQ(prevMeanTensor->get_stride(), (std::vector<int64_t>{5, 6, 7, 8}));
 
     EXPECT_EQ(prevVarianceTensor->get_uid(), 6);
     EXPECT_EQ(prevVarianceTensor->get_name(), "PrevVarianceTensor");
-    EXPECT_EQ(prevVarianceTensor->get_data_type(), hipdnn_frontend::DataType_t::FLOAT);
+    EXPECT_EQ(prevVarianceTensor->get_data_type(), hipdnn_frontend::DataType::FLOAT);
     EXPECT_EQ(prevVarianceTensor->get_dim(), (std::vector<int64_t>{1, 2, 3, 4}));
     EXPECT_EQ(prevVarianceTensor->get_stride(), (std::vector<int64_t>{5, 6, 7, 8}));
 
     EXPECT_EQ(momentumTensor->get_uid(), 7);
     EXPECT_EQ(momentumTensor->get_name(), "MomentumTensor");
-    EXPECT_EQ(momentumTensor->get_data_type(), hipdnn_frontend::DataType_t::FLOAT);
+    EXPECT_EQ(momentumTensor->get_data_type(), hipdnn_frontend::DataType::FLOAT);
     EXPECT_EQ(momentumTensor->get_dim(), (std::vector<int64_t>{1, 2, 3, 4}));
     EXPECT_EQ(momentumTensor->get_stride(), (std::vector<int64_t>{5, 6, 7, 8}));
 
     EXPECT_EQ(meanTensor->get_uid(), 8);
     EXPECT_EQ(meanTensor->get_name(), "MeanTensor");
-    EXPECT_EQ(meanTensor->get_data_type(), hipdnn_frontend::DataType_t::FLOAT);
+    EXPECT_EQ(meanTensor->get_data_type(), hipdnn_frontend::DataType::FLOAT);
     EXPECT_EQ(meanTensor->get_dim(), (std::vector<int64_t>{1, 2, 3, 4}));
     EXPECT_EQ(meanTensor->get_stride(), (std::vector<int64_t>{5, 6, 7, 8}));
 
     EXPECT_EQ(invVarianceTensor->get_uid(), 9);
     EXPECT_EQ(invVarianceTensor->get_name(), "InvVarianceTensor");
-    EXPECT_EQ(invVarianceTensor->get_data_type(), hipdnn_frontend::DataType_t::FLOAT);
+    EXPECT_EQ(invVarianceTensor->get_data_type(), hipdnn_frontend::DataType::FLOAT);
     EXPECT_EQ(invVarianceTensor->get_dim(), (std::vector<int64_t>{1, 2, 3, 4}));
     EXPECT_EQ(invVarianceTensor->get_stride(), (std::vector<int64_t>{5, 6, 7, 8}));
 
     EXPECT_EQ(nextMeanTensor->get_uid(), 10);
     EXPECT_EQ(nextMeanTensor->get_name(), "NextMeanTensor");
-    EXPECT_EQ(nextMeanTensor->get_data_type(), hipdnn_frontend::DataType_t::FLOAT);
+    EXPECT_EQ(nextMeanTensor->get_data_type(), hipdnn_frontend::DataType::FLOAT);
     EXPECT_EQ(nextMeanTensor->get_dim(), (std::vector<int64_t>{1, 2, 3, 4}));
     EXPECT_EQ(nextMeanTensor->get_stride(), (std::vector<int64_t>{5, 6, 7, 8}));
 
     EXPECT_EQ(nextVarianceTensor->get_uid(), 11);
     EXPECT_EQ(nextVarianceTensor->get_name(), "NextVarianceTensor");
-    EXPECT_EQ(nextVarianceTensor->get_data_type(), hipdnn_frontend::DataType_t::FLOAT);
+    EXPECT_EQ(nextVarianceTensor->get_data_type(), hipdnn_frontend::DataType::FLOAT);
     EXPECT_EQ(nextVarianceTensor->get_dim(), (std::vector<int64_t>{1, 2, 3, 4}));
     EXPECT_EQ(nextVarianceTensor->get_stride(), (std::vector<int64_t>{5, 6, 7, 8}));
 
     EXPECT_EQ(epsilonTensor->get_uid(), 14);
     EXPECT_EQ(epsilonTensor->get_name(), "EpsilonTensor");
-    EXPECT_EQ(epsilonTensor->get_data_type(), hipdnn_frontend::DataType_t::FLOAT);
+    EXPECT_EQ(epsilonTensor->get_data_type(), hipdnn_frontend::DataType::FLOAT);
     EXPECT_EQ(epsilonTensor->get_dim(), (std::vector<int64_t>{1}));
     EXPECT_EQ(epsilonTensor->get_stride(), (std::vector<int64_t>{1}));
 }

@@ -12,6 +12,7 @@
 #include <utility>
 #include <vector>
 
+#include "Helpers.hpp"
 #include "HipdnnBackendPluginLoadingMode.h"
 #include "PlatformUtils.hpp"
 #include "logging/Logging.hpp"
@@ -128,16 +129,10 @@ protected:
 
     // This function is called before adding a plugin to the plugin list.
     // The function must throw Hipdnn_exception if the plugin is not valid.
-    virtual void validateBeforeAdding(const Plugin& plugin)
-    {
-        std::ignore = plugin;
-    }
+    virtual void validateBeforeAdding([[maybe_unused]] const Plugin& plugin) {}
 
     // This function is called after the plugin is added to the plugin list.
-    virtual void actionAfterAdding(const Plugin& plugin)
-    {
-        std::ignore = plugin;
-    }
+    virtual void actionAfterAdding([[maybe_unused]] const Plugin& plugin) {}
 
 public:
     virtual ~PluginManagerBase() = default;
@@ -244,53 +239,50 @@ private:
 
         HIPDNN_LOG_INFO("Attempting to load plugin from [{}]", filePath.string());
 
-        try
-        {
-            SharedLibrary lib(filePath);
-            const auto libraryPath = lib.libraryPath();
+        hipdnn_backend::tryCatch(
+            [&]() {
+                SharedLibrary lib(filePath);
+                const auto libraryPath = lib.libraryPath();
 
-            // Shared library ensures an injective, weakly canonical mapping to a path
-            if(_loadedPluginFiles.contains(libraryPath))
-            {
-                return;
-            }
+                // Shared library ensures an injective, weakly canonical mapping to a path
+                if(_loadedPluginFiles.contains(libraryPath))
+                {
+                    return;
+                }
 
-            std::shared_ptr<Plugin> plugin = std::shared_ptr<Plugin>(new Plugin(std::move(lib)));
+                std::shared_ptr<Plugin> plugin
+                    = std::shared_ptr<Plugin>(new Plugin(std::move(lib)));
 
-            const auto name = plugin->name();
-            const auto version = plugin->version();
-            const auto type = plugin->type();
+                const auto name = plugin->name();
+                const auto version = plugin->version();
+                const auto type = plugin->type();
 
-            // For now only use engine or unspecified plugin types
-            if(type != Plugin::getPluginType())
-            {
-                throw HipdnnException(HIPDNN_STATUS_PLUGIN_ERROR,
-                                      std::string("Plugin type mismatch: expected ")
-                                          + toString(Plugin::getPluginType()) + ", got "
-                                          + toString(type));
-            }
+                // For now only use engine or unspecified plugin types
+                if(type != Plugin::getPluginType())
+                {
+                    throw HipdnnException(HIPDNN_STATUS_PLUGIN_ERROR,
+                                          std::string("Plugin type mismatch: expected ")
+                                              + toString(Plugin::getPluginType()) + ", got "
+                                              + toString(type));
+                }
 
-            plugin->setLoggingCallback(logging::hipdnnLoggingCallback);
+                plugin->setLoggingCallback(logging::hipdnnLoggingCallback);
 
-            validateBeforeAdding(*plugin);
+                validateBeforeAdding(*plugin);
 
-            _plugins.emplace_back(std::move(plugin));
-            _loadedPluginFiles.insert(libraryPath);
+                _plugins.emplace_back(std::move(plugin));
+                _loadedPluginFiles.insert(libraryPath);
 
-            HIPDNN_LOG_INFO("Plugin loaded successfully: {}", filePath.string());
-            HIPDNN_LOG_INFO("Plugin info: name={}, version={}, type={}({})",
-                            name,
-                            version,
-                            type,
-                            static_cast<int>(type));
+                HIPDNN_LOG_INFO("Plugin loaded successfully: {}", filePath.string());
+                HIPDNN_LOG_INFO("Plugin info: name={}, version={}, type={}({})",
+                                name,
+                                version,
+                                type,
+                                static_cast<int>(type));
 
-            actionAfterAdding(*_plugins.back());
-        }
-        catch(const HipdnnException& e)
-        {
-            HIPDNN_LOG_WARN(
-                "Error loading plugin from [{}]: {}", filePath.string(), e.getMessage());
-        }
+                actionAfterAdding(*_plugins.back());
+            },
+            fmt::format("Error loading plugin from [{}]: ", filePath.string()).c_str());
     }
 
     std::vector<std::shared_ptr<Plugin>> _plugins;

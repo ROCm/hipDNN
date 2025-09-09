@@ -84,6 +84,7 @@ public:
 
     void setEngineConfig()
     {
+        EXPECT_CALL(*getMockGraph(), getHandle()).WillRepeatedly(Return(_mockHandle.get()));
         EXPECT_CALL(*getMockEngine(), getEngineId()).WillOnce(Return(ENGINE_ID));
         EXPECT_CALL(*getMockEngine(), getGraph()).WillOnce(Return(getMockGraph()));
 

@@ -21,12 +21,17 @@ install(
     EXPORT hipdnn-frontend
 )
 
+export(
+    TARGETS hipdnn_frontend hipdnn_sdk hipdnn_backend FlatBuffers spdlog_header_only
+    FILE  ${CMAKE_BINARY_DIR}/lib/cmake/hipdnn_frontend/hipdnn_frontendConfig.cmake
+)
+
 install(
     DIRECTORY ${HIP_DNN_FRONTEND_INCLUDE_DIR}/
     DESTINATION ${HIP_DNN_FRONTEND_INSTALL_INCLUDE_DIR}
 )
 
 install(EXPORT hipdnn-frontend
-    DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/cmake/hipdnn_frontend
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/hipdnn_frontend
     FILE hipdnn_frontendConfig.cmake
 )

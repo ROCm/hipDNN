@@ -242,7 +242,7 @@ HIPDNN_BACKEND_EXPORT const char* hipdnnGetErrorString(hipdnnStatus_t status);
  *
  * This function copies the last error message associated with the calling thread into the provided
  * message buffer, up to max_size bytes (including the null terminator).
- * Note the max size for an error message is HIPDNN_MAX_ERROR_STRING_SIZE characters.
+ * Note the max size for an error message is HIPDNN_ERROR_STRING_MAX_LENGTH characters.
  * 
  * @param[out] message   Pointer to a character buffer where the error message will be copied.
  * @param[in]  maxSize   Maximum number of bytes to copy, including the null terminator.

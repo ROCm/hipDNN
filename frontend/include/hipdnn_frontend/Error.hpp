@@ -18,7 +18,7 @@
 
 namespace hipdnn_frontend
 {
-enum class error_code_t // NOLINT(readability-identifier-naming)
+enum class ErrorCode
 {
     OK,
     INVALID_VALUE,
@@ -26,18 +26,20 @@ enum class error_code_t // NOLINT(readability-identifier-naming)
     ATTRIBUTE_NOT_SET
 };
 
-typedef struct error_object // NOLINT(readability-identifier-naming)
-{
-    error_code_t code;
-    std::string err_msg;
+typedef ErrorCode error_code_t; // NOLINT(readability-identifier-naming)
 
-    error_object()
-        : code(error_code_t::OK)
+struct Error
+{
+    ErrorCode code;
+    std::string err_msg; // NOLINT(readability-identifier-naming)
+
+    Error()
+        : code(ErrorCode::OK)
     {
     }
-    // NOLINTNEXTLINE(readability-identifier-naming)
-    error_object(error_code_t error_code, std::string message)
-        : code(error_code)
+
+    Error(ErrorCode errorCode, std::string message)
+        : code(errorCode)
         , err_msg(std::move(message))
     {
     }
@@ -47,37 +49,40 @@ typedef struct error_object // NOLINT(readability-identifier-naming)
         return err_msg;
     }
 
-    error_code_t get_code() const // NOLINT(readability-identifier-naming)
+    ErrorCode get_code() const // NOLINT(readability-identifier-naming)
     {
         return code;
     }
 
     bool is_good() const // NOLINT(readability-identifier-naming)
     {
-        return code == error_code_t::OK;
+        return code == ErrorCode::OK;
     }
     bool is_bad() const // NOLINT(readability-identifier-naming)
     {
-        return code != error_code_t::OK;
+        return code != ErrorCode::OK;
     }
 
-    bool operator==(error_code_t otherCode) const
+    bool operator==(ErrorCode otherCode) const
     {
         return code == otherCode;
     }
-    bool operator!=(error_code_t otherCode) const
+    bool operator!=(ErrorCode otherCode) const
     {
         return code != otherCode;
     }
-    bool operator==(const error_object& other) const
+    bool operator==(const Error& other) const
     {
         return code == other.code;
     }
-    bool operator!=(const error_object& other) const
+    bool operator!=(const Error& other) const
     {
         return code != other.code;
     }
-} error_t;
+};
+
+typedef Error error_object; // NOLINT(readability-identifier-naming)
+typedef Error error_t; // NOLINT(readability-identifier-naming)
 
 #define HIPDNN_RETURN_IF_NE(x, y, error_status, message) \
     if(x != y)                                           \

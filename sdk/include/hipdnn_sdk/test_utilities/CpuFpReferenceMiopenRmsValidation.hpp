@@ -5,8 +5,8 @@
 
 #if defined(__HIP_PLATFORM_AMD__)
 // Need these for the half and bfloat16 types
-#include <hipdnn_sdk/utilities/HalfUtils.hpp>
-#include <hipdnn_sdk/utilities/HipBfloat16Utils.hpp>
+#include <hipdnn_sdk/utilities/UtilsBfp16.hpp>
+#include <hipdnn_sdk/utilities/UtilsFp16.hpp>
 #endif
 
 #include <hipdnn_sdk/logging/Logger.hpp>
@@ -31,7 +31,7 @@ public:
     CpuFpReferenceMiopenRmsValidation(T relativeTolerance = std::numeric_limits<T>::epsilon())
         : _relativeTolerance(static_cast<double>(relativeTolerance))
     {
-        if(relativeTolerance < T{0})
+        if(relativeTolerance < T{0.0})
         {
             throw std::invalid_argument("Tolerances must be non-negative");
         }

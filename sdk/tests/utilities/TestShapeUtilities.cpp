@@ -6,7 +6,7 @@
 
 using namespace hipdnn_sdk::utilities;
 
-TEST(ShapeUtilitiesTests, GenerateStridesNHWCValid)
+TEST(TestShapeUtils, GenerateStridesNhwcValid)
 {
     std::vector<int64_t> dim = {1, 2, 3, 4};
     std::vector<int64_t> strideOrder = {3, 0, 2, 1}; // NHWC
@@ -15,7 +15,7 @@ TEST(ShapeUtilitiesTests, GenerateStridesNHWCValid)
     EXPECT_EQ(strides, (std::vector<int64_t>{24, 1, 8, 2}));
 }
 
-TEST(ShapeUtilitiesTests, GenerateStridesNDHWCValid)
+TEST(TestShapeUtils, GenerateStridesNdhwcValid)
 {
     std::vector<int64_t> dim = {1, 2, 3, 4, 5};
     std::vector<int64_t> strideOrder = {4, 0, 3, 2, 1}; // NDHWC
@@ -24,7 +24,7 @@ TEST(ShapeUtilitiesTests, GenerateStridesNDHWCValid)
     EXPECT_EQ(strides, (std::vector<int64_t>{120, 1, 40, 10, 2}));
 }
 
-TEST(ShapeUtilitiesTests, GenerateStridesNCHWValid)
+TEST(TestShapeUtils, GenerateStridesNchwValid)
 {
     std::vector<int64_t> dim = {1, 2, 3, 4};
     std::vector<int64_t> strideOrder = {3, 2, 1, 0}; // NCHW
@@ -33,7 +33,7 @@ TEST(ShapeUtilitiesTests, GenerateStridesNCHWValid)
     EXPECT_EQ(strides, (std::vector<int64_t>{24, 12, 4, 1}));
 }
 
-TEST(ShapeUtilitiesTests, GenerateStridesNCDHWValid)
+TEST(TestShapeUtils, GenerateStridesNcdhwValid)
 {
     std::vector<int64_t> dim = {1, 2, 3, 4, 5};
     std::vector<int64_t> strideOrder = {4, 3, 2, 1, 0}; // NCDHW
@@ -42,7 +42,7 @@ TEST(ShapeUtilitiesTests, GenerateStridesNCDHWValid)
     EXPECT_EQ(strides, (std::vector<int64_t>{120, 60, 20, 5, 1}));
 }
 
-TEST(ShapeUtilitiesTests, GenerateStridesSingleDimension)
+TEST(TestShapeUtils, GenerateStridesSingleDimension)
 {
     std::vector<int64_t> dim = {5};
     std::vector<int64_t> strideOrder = {0};
@@ -51,7 +51,7 @@ TEST(ShapeUtilitiesTests, GenerateStridesSingleDimension)
     EXPECT_EQ(strides, (std::vector<int64_t>{1}));
 }
 
-TEST(ShapeUtilitiesTests, StrideOrderNHWCFiveDimensions)
+TEST(TestShapeUtils, StrideOrderNhwcFiveDimensions)
 {
     size_t numDims = 5;
     auto strideOrder = strideOrderNhwc(numDims);
@@ -59,7 +59,7 @@ TEST(ShapeUtilitiesTests, StrideOrderNHWCFiveDimensions)
     EXPECT_EQ(strideOrder, (std::vector<int64_t>{4, 0, 3, 2, 1}));
 }
 
-TEST(ShapeUtilitiesTests, StrideOrderNHWCFourDimensions)
+TEST(TestShapeUtils, StrideOrderNhwcFourDimensions)
 {
     size_t numDims = 4;
     auto strideOrder = strideOrderNhwc(numDims);
@@ -67,7 +67,7 @@ TEST(ShapeUtilitiesTests, StrideOrderNHWCFourDimensions)
     EXPECT_EQ(strideOrder, (std::vector<int64_t>{3, 0, 2, 1}));
 }
 
-TEST(ShapeUtilitiesTests, StrideOrderNHWCThreeDimensions)
+TEST(TestShapeUtils, StrideOrderNhwcThreeDimensions)
 {
     size_t numDims = 3;
     auto strideOrder = strideOrderNhwc(numDims);
@@ -75,7 +75,7 @@ TEST(ShapeUtilitiesTests, StrideOrderNHWCThreeDimensions)
     EXPECT_EQ(strideOrder, (std::vector<int64_t>{2, 0, 1}));
 }
 
-TEST(ShapeUtilitiesTests, StrideOrderNHWCWithTwoDimensions)
+TEST(TestShapeUtils, StrideOrderNhwcWithTwoDimensions)
 {
     size_t numDims = 2;
     auto strideOrder = strideOrderNhwc(numDims);
@@ -83,7 +83,7 @@ TEST(ShapeUtilitiesTests, StrideOrderNHWCWithTwoDimensions)
     EXPECT_EQ(strideOrder, (std::vector<int64_t>{1, 0}));
 }
 
-TEST(ShapeUtilitiesTests, StrideOrderNHWCWithSingleDimension)
+TEST(TestShapeUtils, StrideOrderNhwcWithSingleDimension)
 {
     size_t numDims = 1;
     auto strideOrder = strideOrderNhwc(numDims);
@@ -91,7 +91,7 @@ TEST(ShapeUtilitiesTests, StrideOrderNHWCWithSingleDimension)
     EXPECT_EQ(strideOrder, (std::vector<int64_t>{0}));
 }
 
-TEST(ShapeUtilitiesTests, GenerateStridesEmptyDimensions)
+TEST(TestShapeUtils, GenerateStridesEmptyDimensions)
 {
     std::vector<int64_t> dim = {};
     std::vector<int64_t> strideOrder = {};

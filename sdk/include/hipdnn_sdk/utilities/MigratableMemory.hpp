@@ -236,10 +236,8 @@ private:
         }
     }
 
-    static void logOnError(hipError_t err, const char* msg)
+    static void logOnError(hipError_t err, [[maybe_unused]] const char* msg)
     {
-        std::ignore = msg;
-
         if(err != hipSuccess)
         {
             HIPDNN_LOG_ERROR("{}: HIP error: {}", msg, hipGetErrorString(err));

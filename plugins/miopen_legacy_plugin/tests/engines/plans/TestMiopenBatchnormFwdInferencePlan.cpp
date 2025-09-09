@@ -8,7 +8,7 @@
 
 using namespace miopen_legacy_plugin;
 
-TEST(BatchnormFwdInferenceParamsTest, InitializesAllTensorsFromValidGraph)
+TEST(TestMiopenBatchnormFwdInferenceParams, InitializesAllTensorsFromValidGraph)
 {
     // Create a valid batchnorm graph
     auto builder = hipdnn_backend::test_utilities::createValidBatchnormGraph();
@@ -35,7 +35,7 @@ TEST(BatchnormFwdInferenceParamsTest, InitializesAllTensorsFromValidGraph)
     EXPECT_TRUE(varOpt.has_value());
 }
 
-TEST(BatchnormFwdInferenceParamsTest, HandlesMissingOptionalTensors)
+TEST(TestMiopenBatchnormFwdInferenceParams, HandlesMissingOptionalTensors)
 {
     // Create a valid batchnorm graph and remove mean/variance from tensor map
     auto builder = hipdnn_backend::test_utilities::createValidBatchnormGraph(
