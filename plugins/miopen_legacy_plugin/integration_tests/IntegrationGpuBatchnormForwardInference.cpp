@@ -242,6 +242,7 @@ protected:
         auto intermediateDataType = getDataTypeEnumFromType<IntermediateType>();
 
         unsigned int seed = std::random_device{}();
+        HIPDNN_FE_LOG_INFO("Test is using {} for its random seed", seed);
 
         Batchnorm2dTensorBundle graphTensorBundle(testCase.getDims(), seed, layout);
 
