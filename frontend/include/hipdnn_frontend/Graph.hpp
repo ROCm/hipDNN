@@ -15,6 +15,7 @@
 #include <hipdnn_frontend/node/ConvolutionFpropNode.hpp>
 #include <hipdnn_frontend/node/Node.hpp>
 #include <hipdnn_frontend/node/PointwiseNode.hpp>
+#include <hipdnn_frontend/Utilities.hpp>
 
 namespace hipdnn_frontend
 {
@@ -147,15 +148,20 @@ public:
     Graph()
         : INode(GraphAttributes{})
     {
+        HIPDNN_FE_LOG_INFO("Creating new Graph instance");
     }
 
     error_t validate()
     {
+        HIPDNN_FE_LOG_INFO("Validating graph: {}", graph_attributes.get_name());
+
         return validateSubtree();
     }
 
     error_t build_operation_graph(hipdnnHandle_t handle) // NOLINT(readability-identifier-naming)
     {
+        HIPDNN_FE_LOG_INFO("Building operation graph: {}", graph_attributes.get_name());
+        
         std::unordered_set<int64_t> usedTensorUids;
         gatherHipdnnTensorIdsSubtree(usedTensorUids);
 
@@ -228,6 +234,8 @@ public:
     // NOLINTNEXTLINE(readability-identifier-naming)
     error_t create_execution_plans(std::vector<HeurMode_t> const& modes = {HeurMode_t::FALLBACK})
     {
+        HIPDNN_FE_LOG_INFO("Creating execution plans for Graph: {}", graph_attributes.get_name());
+        
         if(!_graphDesc || !_graphDesc->valid())
         {
             return {error_code_t::HIPDNN_BACKEND_ERROR,
@@ -255,6 +263,8 @@ public:
 
     error_t check_support() // NOLINT(readability-identifier-naming)
     {
+        HIPDNN_FE_LOG_INFO("Checking execution plan support for graph: {}", graph_attributes.get_name());
+        
         if(!_executionPlanDesc || !_executionPlanDesc->valid())
         {
             return {error_code_t::HIPDNN_BACKEND_ERROR,
@@ -266,6 +276,8 @@ public:
 
     error_t build_plans() // NOLINT(readability-identifier-naming)
     {
+        HIPDNN_FE_LOG_INFO("Building plans for graph: {}", graph_attributes.get_name());
+
         RETURN_ON_BACKEND_FAILURE(hipdnnBackend()->backendFinalize(_engineConfigDesc->get()),
                                   "Failed to finalize engine config descriptor");
 
@@ -324,6 +336,8 @@ public:
                     std::unordered_map<int64_t, void*>& variantPack,
                     void* workspace) const
     {
+        HIPDNN_FE_LOG_INFO("Executing Graph: {}", graph_attributes.get_name());
+
         auto variantPackDesc = std::make_unique<ScopedHipdnnBackendDescriptor>(
             HIPDNN_BACKEND_VARIANT_PACK_DESCRIPTOR);
         if(!variantPackDesc || !variantPackDesc->valid())
