@@ -4,7 +4,6 @@
 #include "Logging.hpp"
 
 #include <hipdnn_sdk/logging/ComponentFormatter.hpp>
-#include <hipdnn_sdk/logging/Formatting.hpp>
 #include <hipdnn_sdk/logging/LoggingUtils.hpp>
 #include <hipdnn_sdk/utilities/PlatformUtils.hpp>
 #include <iostream>

@@ -26,4 +26,9 @@ inline bool isLoggingEnabled()
     return isValidLogLevel(logLevel) && logLevel != "off";
 }
 
+inline std::string generatePatternString(const std::string& componentName)
+{
+    return "[%Y-%m-%d %H:%M:%S.%e] [tid %t] [%l] [" + componentName + "] %v";
+}
+
 } // namespace hipdnn_sdk::logging
