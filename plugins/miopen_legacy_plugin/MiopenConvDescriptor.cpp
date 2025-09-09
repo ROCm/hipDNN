@@ -47,11 +47,11 @@ void copyWithCheck(const flatbuffers::Vector<int64_t>* src,
 MiopenConvDescriptor::MiopenConvDescriptor(
     size_t spatialDimCount, const hipdnn_sdk::data_objects::ConvolutionFwdAttributes& attributes)
 {
-    if(spatialDimCount >= std::numeric_limits<int>::max())
+    if(spatialDimCount > std::numeric_limits<int>::max())
     {
         throw hipdnn_plugin::HipdnnPluginException(
             HIPDNN_PLUGIN_STATUS_BAD_PARAM,
-            "MiopenConvDescriptor: spatialDimCount must be less than INT_MAX");
+            "MiopenConvDescriptor: spatialDimCount must be not greater than INT_MAX");
     }
 
     const auto convMode = attributes.conv_mode();
@@ -60,6 +60,31 @@ MiopenConvDescriptor::MiopenConvDescriptor(
         throw hipdnn_plugin::HipdnnPluginException(
             HIPDNN_PLUGIN_STATUS_BAD_PARAM,
             "MiopenConvDescriptor: only ConvMode_CROSS_CORRELATION is supported");
+    }
+
+    if((attributes.pre_padding() == nullptr) != (attributes.post_padding() == nullptr))
+    {
+        throw hipdnn_plugin::HipdnnPluginException(
+            HIPDNN_PLUGIN_STATUS_BAD_PARAM,
+            "MiopenConvDescriptor: both pre_padding and post_padding should be set or both "
+            "should be null");
+    }
+
+    if(attributes.pre_padding() != nullptr && attributes.post_padding() != nullptr)
+    {
+        if(attributes.pre_padding()->size() != attributes.post_padding()->size())
+        {
+            throw hipdnn_plugin::HipdnnPluginException(
+                HIPDNN_PLUGIN_STATUS_BAD_PARAM,
+                "MiopenConvDescriptor: pre_padding and post_padding sizes must be equal");
+        }
+
+        if(!std::ranges::equal(*attributes.pre_padding(), *attributes.post_padding()))
+        {
+            throw hipdnn_plugin::HipdnnPluginException(
+                HIPDNN_PLUGIN_STATUS_BAD_PARAM,
+                "MiopenConvDescriptor: asymmetric padding is not supported");
+        }
     }
 
     const auto attrPadding = attributes.pre_padding();

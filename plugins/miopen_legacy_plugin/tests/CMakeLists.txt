@@ -26,6 +26,7 @@ add_executable(miopen_legacy_plugin_tests
     main.cpp
     TestMiopenBatchnormFwdInferenceOperations.cpp
     TestMiopenBatchnormBwdOperations.cpp
+    TestMiopenConvDescriptor.cpp
     TestMiopenEngineManager.cpp
     TestMiopenHandleFactory.cpp
     TestMiopenHipdnnEnginePluginHandle.cpp
