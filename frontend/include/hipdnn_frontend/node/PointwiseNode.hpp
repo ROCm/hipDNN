@@ -11,60 +11,61 @@
 
 namespace hipdnn_frontend::graph
 {
-class PointwiseNode : public NodeCRTP<PointwiseNode> // NOLINT
+class PointwiseNode : public BaseNode<PointwiseNode>
 {
 public:
     PointwiseAttributes attributes;
 
     PointwiseNode(PointwiseAttributes&& batchnormAttrs, const GraphAttributes& graphAttrs)
-        : NodeCRTP(graphAttrs)
+        : BaseNode(graphAttrs)
         , attributes(std::move(batchnormAttrs))
     {
     }
 
-    error_t pre_validate_node() const override
+    Error pre_validate_node() const override
     {
         if(!attributes.get_input_0())
         {
-            return {error_code_t::ATTRIBUTE_NOT_SET,
-                    "PointwiseNode missing IN_0 for pre-validation"};
+            return {ErrorCode::ATTRIBUTE_NOT_SET, "PointwiseNode missing IN_0 for pre-validation"};
         }
         if(!attributes.get_output_0())
         {
-            return {error_code_t::ATTRIBUTE_NOT_SET,
-                    "PointwiseNode missing OUT_0 for pre-validation"};
+            return {ErrorCode::ATTRIBUTE_NOT_SET, "PointwiseNode missing OUT_0 for pre-validation"};
         }
-        if(attributes.get_mode() == PointwiseMode_t::NOT_SET)
+        if(attributes.get_mode() == PointwiseMode::NOT_SET)
         {
-            return {error_code_t::ATTRIBUTE_NOT_SET,
+            return {ErrorCode::ATTRIBUTE_NOT_SET,
                     "PointwiseNode missing operation for pre-validation"};
         }
 
         return {};
     }
 
-    error_t infer_properties_node() override
+    Error infer_properties_node() override
     {
-        if(attributes.inputs.empty())
+        auto in0 = attributes.get_input_0();
+        if(!in0)
         {
-            return {error_code_t::ATTRIBUTE_NOT_SET,
+            return {ErrorCode::ATTRIBUTE_NOT_SET,
                     "PointwiseNode missing input for setting properties"};
         }
 
-        if(attributes.outputs.empty())
+        auto out = attributes.get_output_0();
+        if(!out)
         {
-            return {error_code_t::ATTRIBUTE_NOT_SET,
+            return {ErrorCode::ATTRIBUTE_NOT_SET,
                     "PointwiseNode missing output for setting properties"};
         }
 
-        HIPDNN_CHECK_ERROR(attributes.fill_from_graph_attributes(graph_attributes));
-
-        auto out = attributes.outputs[PointwiseAttributes::output_names::OUT_0];
+        HIPDNN_CHECK_ERROR(attributes.fill_from_context(graph_attributes));
 
         if(out->get_dim().empty())
         {
             std::vector<std::vector<int64_t>> inputShapes;
-            for(auto& [_, tensor] : attributes.inputs)
+            std::vector<std::shared_ptr<TensorAttributes>> allInputs
+                = {in0, attributes.get_input_1(), attributes.get_input_2()};
+
+            for(const auto& tensor : allInputs)
             {
                 if(tensor)
                 {
@@ -81,7 +82,10 @@ public:
         //       This could fail if the input tensors were something like (1, 1, 2) and (2, 1, 1).
         if(out->get_stride().empty())
         {
-            for(auto& [_, tensor] : attributes.inputs)
+            std::vector<std::shared_ptr<TensorAttributes>> allInputs
+                = {in0, attributes.get_input_1(), attributes.get_input_2()};
+
+            for(const auto& tensor : allInputs)
             {
                 if(tensor && tensor->get_dim() == out->get_dim())
                 {
@@ -92,7 +96,7 @@ public:
 
             if(out->get_stride().empty())
             {
-                return {error_code_t::ATTRIBUTE_NOT_SET, "PointwiseNode output missing stride"};
+                return {ErrorCode::ATTRIBUTE_NOT_SET, "PointwiseNode output missing stride"};
             }
         }
 
@@ -104,7 +108,7 @@ public:
     {
         return hipdnn_sdk::data_objects::CreateNodeDirect(
             builder,
-            attributes.name.c_str(),
+            attributes.get_name().c_str(),
             hipdnn_sdk::data_objects::NodeAttributes::NodeAttributes_PointwiseAttributes,
             attributes.pack_attributes(builder).Union());
     }

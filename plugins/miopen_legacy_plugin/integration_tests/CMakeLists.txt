@@ -16,8 +16,8 @@ endif()
 
 add_executable(miopen_plugin_integration_test
     main.cpp
-    BatchnormBwdIntegrationTest.cpp
-    BatchnormFwdInferenceIntegrationTest.cpp
+    IntegrationGpuBatchnormBackward.cpp
+    IntegrationGpuBatchnormForwardInference.cpp
 )
 
 target_compile_options(miopen_plugin_integration_test PRIVATE ${HIPDNN_WARNING_COMPILE_OPTIONS})
@@ -29,7 +29,6 @@ target_compile_definitions(miopen_plugin_integration_test PRIVATE
 target_link_libraries(miopen_plugin_integration_test PUBLIC 
     GTest::gtest
     hip::host
-    hip::device
     miopen_legacy_plugin
     hipdnn_frontend
     hipdnn_sdk

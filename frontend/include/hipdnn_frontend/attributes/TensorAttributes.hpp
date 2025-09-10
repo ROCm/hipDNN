@@ -7,6 +7,8 @@
 #include <hipdnn_frontend/Types.hpp>
 #include <hipdnn_sdk/data_objects/graph_generated.h>
 #include <hipdnn_sdk/data_objects/tensor_attributes_generated.h>
+#include <hipdnn_sdk/utilities/UtilsBfp16.hpp>
+#include <hipdnn_sdk/utilities/UtilsFp16.hpp>
 #include <optional>
 #include <string>
 #include <type_traits>
@@ -21,48 +23,24 @@ namespace graph
 class TensorAttributes
 {
 public:
-    using ValueVariant = std::variant<std::monostate, double, float, uint16_t, uint8_t, int32_t>;
+    using ValueVariant
+        = std::variant<std::monostate, double, float, half, hip_bfloat16, uint8_t, int32_t>;
 
     TensorAttributes() = default;
 
-    TensorAttributes(double const& scalar)
+    template <typename T>
+    TensorAttributes(T const& scalar)
     {
-        _value = scalar;
-        _dim = _stride = {1};
-        _dataType = DataType_t::DOUBLE;
-    }
-    TensorAttributes(float const& scalar)
-    {
-        _value = scalar;
-        _dim = _stride = {1};
-        _dataType = DataType_t::FLOAT;
-    }
-    TensorAttributes(uint16_t const& scalar)
-    {
-        _value = scalar;
-        _dim = _stride = {1};
-        _dataType = DataType_t::HALF;
-    }
-    TensorAttributes(uint8_t const& scalar)
-    {
-        _value = scalar;
-        _dim = _stride = {1};
-        _dataType = DataType_t::UINT8;
-    }
-    TensorAttributes(int32_t const& scalar)
-    {
-        _value = scalar;
-        _dim = _stride = {1};
-        _dataType = DataType_t::INT32;
+        set_value(scalar);
     }
 
-    bool has_value() const // NOLINT(readability-identifier-naming)
+    bool get_pass_by_value() const // NOLINT(readability-identifier-naming)
     {
         return !std::holds_alternative<std::monostate>(_value);
     }
 
     template <typename T>
-    std::optional<T> get_value() const // NOLINT(readability-identifier-naming)
+    std::optional<T> get_pass_by_value() const // NOLINT(readability-identifier-naming)
     {
         if(auto p = std::get_if<T>(&_value))
         {
@@ -74,13 +52,17 @@ public:
     template <typename T>
     TensorAttributes& set_value(T v) // NOLINT(readability-identifier-naming)
     {
+
         static_assert(std::disjunction_v<std::is_same<T, float>,
                                          std::is_same<T, double>,
-                                         std::is_same<T, uint16_t>,
+                                         std::is_same<T, half>,
+                                         std::is_same<T, hip_bfloat16>,
                                          std::is_same<T, uint8_t>,
                                          std::is_same<T, int32_t>>,
                       "Unsupported type for Tensor_attributes::set_value");
         _value = v;
+        _dataType = getDataTypeEnumFromType<T>();
+        _dim = _stride = {1};
         return *this;
     }
 
@@ -100,7 +82,7 @@ public:
         return _name;
     }
 
-    DataType_t get_data_type() const // NOLINT(readability-identifier-naming)
+    DataType get_data_type() const // NOLINT(readability-identifier-naming)
     {
         return _dataType;
     }
@@ -148,7 +130,7 @@ public:
         return *this;
     }
 
-    TensorAttributes& set_data_type(DataType_t dataType) // NOLINT(readability-identifier-naming)
+    TensorAttributes& set_data_type(DataType dataType) // NOLINT(readability-identifier-naming)
     {
         _dataType = dataType;
         return *this;
@@ -187,9 +169,9 @@ public:
     }
 
     // NOLINTNEXTLINE(readability-identifier-naming)
-    TensorAttributes& set_from_graph_attributes(const GraphAttributes& graphAttributes)
+    TensorAttributes& fill_from_context(const GraphAttributes& graphAttributes)
     {
-        if(_dataType == DataType_t::NOT_SET)
+        if(_dataType == DataType::NOT_SET)
         {
             if(_isVirtual)
             {
@@ -236,11 +218,17 @@ public:
                     return {hipdnn_sdk::data_objects::TensorValue_Float64Value,
                             builder.CreateStruct(doubleVal).Union()};
                 }
-                else if constexpr(std::is_same_v<T, uint16_t>)
+                else if constexpr(std::is_same_v<T, half>)
                 {
                     hipdnn_sdk::data_objects::Float16Value halfVal(arg);
                     return {hipdnn_sdk::data_objects::TensorValue_Float16Value,
                             builder.CreateStruct(halfVal).Union()};
+                }
+                else if constexpr(std::is_same_v<T, hip_bfloat16>)
+                {
+                    hipdnn_sdk::data_objects::BFloat16Value bfVal(arg);
+                    return {hipdnn_sdk::data_objects::TensorValue_BFloat16Value,
+                            builder.CreateStruct(bfVal).Union()};
                 }
                 else if constexpr(std::is_same_v<T, uint8_t>)
                 {
@@ -277,7 +265,7 @@ private:
     int64_t _uid = 0;
     bool _uidSet = false;
     std::string _name;
-    DataType_t _dataType = DataType_t::NOT_SET;
+    DataType _dataType = DataType::NOT_SET;
     std::vector<int64_t> _stride;
     std::vector<int64_t> _dim;
     bool _isVirtual = false;

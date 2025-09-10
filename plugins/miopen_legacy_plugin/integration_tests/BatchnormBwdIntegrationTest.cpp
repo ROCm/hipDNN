@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 // Copyright © Advanced Micro Devices, Inc., or its affiliates.
 // SPDX-License-Identifier:  MIT
 
@@ -381,3 +382,5 @@ TEST_P(BatchnormBackwardIntegrationTestNHWC, RunFloatBwdBatchnormGraphNHWC)
 INSTANTIATE_TEST_SUITE_P(RunFloatBwdBatchnormGraphNHWC,
                          BatchnormBackwardIntegrationTestNHWC,
                          testing::ValuesIn(getBnBwdTestCases()));
+=======
+>>>>>>> e14c60382601a58475f97467ac1e964b2c5054dd

@@ -11,7 +11,7 @@
 using namespace hipdnn_sdk::utilities;
 
 // Test that allocators work with STL containers
-TEST(Allocators, HostAllocatorWithVector)
+TEST(TestAllocators, HostAllocatorWithVector)
 {
     std::vector<int, HostAllocator<int>> vec;
     vec.push_back(1);
@@ -24,7 +24,7 @@ TEST(Allocators, HostAllocatorWithVector)
     EXPECT_EQ(vec[2], 3);
 }
 
-TEST(Allocators, HostAllocatorWithList)
+TEST(TestAllocators, HostAllocatorWithList)
 {
     std::list<double, HostAllocator<double>> lst;
     lst.push_back(1.5);
@@ -37,7 +37,7 @@ TEST(Allocators, HostAllocatorWithList)
     EXPECT_EQ(*it++, 3.5);
 }
 
-TEST(Allocators, HostAllocatorBasicOperations)
+TEST(TestAllocators, HostAllocatorBasicOperations)
 {
     HostAllocator<int> alloc;
 
@@ -67,7 +67,7 @@ TEST(Allocators, HostAllocatorBasicOperations)
     alloc.deallocate(ptr, 10);
 }
 
-TEST(Allocators, HostAllocatorRebind)
+TEST(TestAllocators, HostAllocatorRebind)
 {
     HostAllocator<int> intAlloc;
     typename HostAllocator<int>::template rebind<double>::other doubleAlloc;
@@ -82,7 +82,7 @@ TEST(Allocators, HostAllocatorRebind)
     doubleAlloc.deallocate(doublePtr, 5);
 }
 
-TEST(Allocators, HostAllocatorComparison)
+TEST(TestAllocators, HostAllocatorComparison)
 {
     HostAllocator<int> alloc1;
     HostAllocator<int> alloc2;
@@ -93,7 +93,7 @@ TEST(Allocators, HostAllocatorComparison)
     EXPECT_TRUE(alloc1 == alloc3);
 }
 
-TEST(Allocators, PinnedHostAllocatorWithVector)
+TEST(TestGpuAllocators, PinnedHostAllocatorWithVector)
 {
     SKIP_IF_NO_DEVICES();
 
@@ -111,7 +111,7 @@ TEST(Allocators, PinnedHostAllocatorWithVector)
     }
 }
 
-TEST(Allocators, PinnedHostAllocatorBasicOperations)
+TEST(TestGpuAllocators, PinnedHostAllocatorBasicOperations)
 {
     SKIP_IF_NO_DEVICES();
 
@@ -143,7 +143,7 @@ TEST(Allocators, PinnedHostAllocatorBasicOperations)
     alloc.deallocate(ptr, 10);
 }
 
-TEST(Allocators, PinnedHostAllocatorRebind)
+TEST(TestGpuAllocators, PinnedHostAllocatorRebind)
 {
     SKIP_IF_NO_DEVICES();
 
@@ -160,7 +160,7 @@ TEST(Allocators, PinnedHostAllocatorRebind)
     doubleAlloc.deallocate(doublePtr, 5);
 }
 
-TEST(Allocators, DeviceAllocatorBasicOperations)
+TEST(TestGpuAllocators, DeviceAllocatorBasicOperations)
 {
     SKIP_IF_NO_DEVICES();
 
@@ -193,7 +193,7 @@ TEST(Allocators, DeviceAllocatorBasicOperations)
     alloc.deallocate(ptr, 100);
 }
 
-TEST(Allocators, DeviceAllocatorRebind)
+TEST(TestGpuAllocators, DeviceAllocatorRebind)
 {
     SKIP_IF_NO_DEVICES();
 
@@ -210,7 +210,7 @@ TEST(Allocators, DeviceAllocatorRebind)
     doubleAlloc.deallocate(doublePtr, 5);
 }
 
-TEST(Allocators, DeviceAllocatorComparison)
+TEST(TestGpuAllocators, DeviceAllocatorComparison)
 {
     SKIP_IF_NO_DEVICES();
 
@@ -224,7 +224,7 @@ TEST(Allocators, DeviceAllocatorComparison)
 }
 
 // Test allocator traits compatibility
-TEST(Allocators, AllocatorTraitsCompatibility)
+TEST(TestAllocators, AllocatorTraitsCompatibility)
 {
     using HostTraits = std::allocator_traits<HostAllocator<int>>;
     using PinnedTraits = std::allocator_traits<PinnedHostAllocator<int>>;
@@ -251,7 +251,7 @@ TEST(Allocators, AllocatorTraitsCompatibility)
 }
 
 // Test exception handling
-TEST(Allocators, AllocationFailure)
+TEST(TestAllocators, AllocationFailure)
 {
     HostAllocator<int> alloc;
 
@@ -260,7 +260,7 @@ TEST(Allocators, AllocationFailure)
                  std::bad_alloc);
 }
 
-TEST(Allocators, PinnedAllocationFailure)
+TEST(TestGpuAllocators, PinnedAllocationFailure)
 {
     SKIP_IF_NO_DEVICES();
 
@@ -271,7 +271,7 @@ TEST(Allocators, PinnedAllocationFailure)
                  std::bad_alloc);
 }
 
-TEST(Allocators, DeviceAllocationFailure)
+TEST(TestGpuAllocators, DeviceAllocationFailure)
 {
     SKIP_IF_NO_DEVICES();
 

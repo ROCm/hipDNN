@@ -9,8 +9,8 @@
 #include <hipdnn_sdk/data_objects/tensor_attributes_generated.h>
 #include <hipdnn_sdk/test_utilities/CpuFpReferenceBatchnorm.hpp>
 #include <hipdnn_sdk/test_utilities/CpuFpReferenceConvolution.hpp>
-#include <hipdnn_sdk/utilities/HalfUtils.hpp>
-#include <hipdnn_sdk/utilities/HipBfloat16Utils.hpp>
+#include <hipdnn_sdk/utilities/UtilsFp16.hpp>
+#include <hipdnn_sdk/utilities/UtilsBfp16.hpp>
 #include <hipdnn_sdk/utilities/Tensor.hpp>
 #include <iostream>
 #include <memory>
@@ -21,7 +21,7 @@
 #include <vector>
 namespace hipdnn_sdk
 {
-namespace reference_test_utilities
+namespace test_utilities
 {
 
 using namespace hipdnn_sdk::data_objects;
@@ -97,9 +97,9 @@ struct CpuImplTraits;
         using type = ImplClass<ComputeT, IntermediateT, IoT>;          \
     };
 
-DEFINE_CPU_IMPL_TRAITS(NodeAttributes_ConvolutionFwdAttributes, CpuFpReferenceConvolutionImpl)
-DEFINE_CPU_IMPL_TRAITS(NodeAttributes_BatchnormInferenceAttributes, CpuFpReferenceBatchnormImpl)
-DEFINE_CPU_IMPL_TRAITS(NodeAttributes_BatchnormBackwardAttributes, CpuFpReferenceBatchnormImpl)
+DEFINE_CPU_IMPL_TRAITS(NodeAttributes_ConvolutionFwdAttributes, hipdnn_sdk::reference_test_utilities::CpuFpReferenceConvolutionImpl)
+DEFINE_CPU_IMPL_TRAITS(NodeAttributes_BatchnormInferenceAttributes, hipdnn_sdk::test_utilities::CpuFpReferenceBatchnormImpl)
+DEFINE_CPU_IMPL_TRAITS(NodeAttributes_BatchnormBackwardAttributes, hipdnn_sdk::test_utilities::CpuFpReferenceBatchnormImpl)
 
 #undef DEFINE_CPU_IMPL_TRAITS
 
@@ -143,9 +143,9 @@ public:
             int64_t w_uid = conv_attrs->w_tensor_uid();
             int64_t y_uid = conv_attrs->y_tensor_uid();
 
-            auto& input = *static_cast<ITensor<IoT>*>(variantPack.at(x_uid));
-            auto& weight = *static_cast<ITensor<IoT>*>(variantPack.at(w_uid));
-            auto& output = *static_cast<ITensor<IoT>*>(variantPack.at(y_uid));
+            auto& input = *static_cast<Tensor<IoT>*>(variantPack.at(x_uid));
+            auto& weight = *static_cast<Tensor<IoT>*>(variantPack.at(w_uid));
+            auto& output = *static_cast<Tensor<IoT>*>(variantPack.at(y_uid));
 
             std::vector<int64_t> strides(conv_attrs->stride()->begin(),
                                          conv_attrs->stride()->end());
@@ -188,12 +188,12 @@ public:
             int64_t mean_uid = mean_uid_opt.value();
             int64_t var_uid = var_uid_opt.value();
 
-            auto& input = *static_cast<ITensor<IoT>*>(variantPack.at(x_uid));
-            auto& scale = *static_cast<ITensor<IntermediateT>*>(variantPack.at(scale_uid));
-            auto& bias = *static_cast<ITensor<IntermediateT>*>(variantPack.at(bias_uid));
-            auto& estimatedMean = *static_cast<ITensor<IntermediateT>*>(variantPack.at(mean_uid));
-            auto& estimatedVar = *static_cast<ITensor<IntermediateT>*>(variantPack.at(var_uid));
-            auto& output = *static_cast<ITensor<IoT>*>(variantPack.at(y_uid));
+            auto& input = *static_cast<Tensor<IoT>*>(variantPack.at(x_uid));
+            auto& scale = *static_cast<Tensor<IntermediateT>*>(variantPack.at(scale_uid));
+            auto& bias = *static_cast<Tensor<IntermediateT>*>(variantPack.at(bias_uid));
+            auto& estimatedMean = *static_cast<Tensor<IntermediateT>*>(variantPack.at(mean_uid));
+            auto& estimatedVar = *static_cast<Tensor<IntermediateT>*>(variantPack.at(var_uid));
+            auto& output = *static_cast<Tensor<IoT>*>(variantPack.at(y_uid));
 
             constexpr double epsilon = 1e-5;
 
@@ -226,14 +226,14 @@ public:
             int64_t mean_uid = mean_uid_opt.value();
             int64_t inv_var_uid = inv_var_uid_opt.value();
 
-            auto& dy = *static_cast<ITensor<IoT>*>(variantPack.at(dy_uid));
-            auto& x = *static_cast<ITensor<IoT>*>(variantPack.at(x_uid));
-            auto& mean = *static_cast<ITensor<IntermediateT>*>(variantPack.at(mean_uid));
-            auto& invVariance = *static_cast<ITensor<IntermediateT>*>(variantPack.at(inv_var_uid));
-            auto& scale = *static_cast<ITensor<IntermediateT>*>(variantPack.at(scale_uid));
-            auto& dx = *static_cast<ITensor<IoT>*>(variantPack.at(dx_uid));
-            auto& dscale = *static_cast<ITensor<IntermediateT>*>(variantPack.at(dscale_uid));
-            auto& dbias = *static_cast<ITensor<IntermediateT>*>(variantPack.at(dbias_uid));
+            auto& dy = *static_cast<Tensor<IoT>*>(variantPack.at(dy_uid));
+            auto& x = *static_cast<Tensor<IoT>*>(variantPack.at(x_uid));
+            auto& mean = *static_cast<Tensor<IntermediateT>*>(variantPack.at(mean_uid));
+            auto& invVariance = *static_cast<Tensor<IntermediateT>*>(variantPack.at(inv_var_uid));
+            auto& scale = *static_cast<Tensor<IntermediateT>*>(variantPack.at(scale_uid));
+            auto& dx = *static_cast<Tensor<IoT>*>(variantPack.at(dx_uid));
+            auto& dscale = *static_cast<Tensor<IntermediateT>*>(variantPack.at(dscale_uid));
+            auto& dbias = *static_cast<Tensor<IntermediateT>*>(variantPack.at(dbias_uid));
 
             ImplType::batchnormBwd(dy, x, mean, invVariance, scale, dx, dscale, dbias);
         }
@@ -451,12 +451,12 @@ class ReferenceContainer
 {
 public:
     template <typename InputT, typename ScaleBiasT, typename MeanVarT>
-    void batchnormFwdInference(const ITensor<InputT>& input,
-                               const ITensor<ScaleBiasT>& scale,
-                               const ITensor<ScaleBiasT>& bias,
-                               const ITensor<MeanVarT>& estimatedMean,
-                               const ITensor<MeanVarT>& estimatedVariance,
-                               ITensor<InputT>& output,
+    void batchnormFwdInference(const TensorBase<InputT>& input,
+                               const TensorBase<ScaleBiasT>& scale,
+                               const TensorBase<ScaleBiasT>& bias,
+                               const TensorBase<MeanVarT>& estimatedMean,
+                               const TensorBase<MeanVarT>& estimatedVariance,
+                               TensorBase<InputT>& output,
                                double epsilon)
     {
         using ImplType = typename ImplTraits<NodeAttributes_BatchnormInferenceAttributes,
@@ -468,14 +468,14 @@ public:
     }
 
     template <typename InputT, typename ScaleBiasT, typename MeanVarT>
-    void batchnormBwd(const ITensor<InputT>& dy,
-                      const ITensor<InputT>& x,
-                      const ITensor<MeanVarT>& bnMean,
-                      const ITensor<MeanVarT>& bnInvVariance,
-                      const ITensor<ScaleBiasT>& bnScale,
-                      ITensor<InputT>& dx,
-                      ITensor<ScaleBiasT>& dScale,
-                      ITensor<ScaleBiasT>& dBias)
+    void batchnormBwd(const TensorBase<InputT>& dy,
+                      const TensorBase<InputT>& x,
+                      const TensorBase<MeanVarT>& bnMean,
+                      const TensorBase<MeanVarT>& bnInvVariance,
+                      const TensorBase<ScaleBiasT>& bnScale,
+                      TensorBase<InputT>& dx,
+                      TensorBase<ScaleBiasT>& dScale,
+                      TensorBase<ScaleBiasT>& dBias)
     {
         using ImplType = typename ImplTraits<NodeAttributes_BatchnormBackwardAttributes,
                                              InputT,
@@ -485,9 +485,9 @@ public:
     }
 
     template <typename T>
-    void convFwdInference(const ITensor<T>& input,
-                          const ITensor<T>& weight,
-                          ITensor<T>& output,
+    void convFwdInference(const TensorBase<T>& input,
+                          const TensorBase<T>& weight,
+                          TensorBase<T>& output,
                           const std::vector<int64_t>& strides,
                           const std::vector<int64_t>& dilations,
                           const std::vector<int64_t>& padding)

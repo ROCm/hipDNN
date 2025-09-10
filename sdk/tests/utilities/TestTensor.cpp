@@ -10,8 +10,6 @@ using namespace hipdnn_sdk::utilities;
 
 TEST(TestTensor, BasicRowMajorUsage)
 {
-    SKIP_IF_NO_DEVICES();
-
     Tensor<float> tensor({1, 2, 3, 4});
 
     // NCHW (row-major) strides with dims {N=1, C=2, H=3, W=4}:
@@ -26,10 +24,8 @@ TEST(TestTensor, BasicRowMajorUsage)
     EXPECT_EQ(tensor.strides()[3], 1);
 }
 
-TEST(TestTensor, FillWithValuesUsage)
+TEST(TestTensor, FillWithValues)
 {
-    SKIP_IF_NO_DEVICES();
-
     Tensor<float> tensor({1, 2, 3, 4});
 
     tensor.fillWithValue(1.0f);
@@ -41,10 +37,8 @@ TEST(TestTensor, FillWithValuesUsage)
     }
 }
 
-TEST(TestTensor, FillWithRandomValuesUsage)
+TEST(TestTensor, FillWithRandomValues)
 {
-    SKIP_IF_NO_DEVICES();
-
     Tensor<float> tensor({1, 2, 3, 4});
 
     tensor.fillWithRandomValues(1.0f, 3.0f);
@@ -57,10 +51,8 @@ TEST(TestTensor, FillWithRandomValuesUsage)
     }
 }
 
-TEST(TestTensor, BasicNHWCUsage)
+TEST(TestTensor, BasicNhwcUsage)
 {
-    SKIP_IF_NO_DEVICES();
-
     Tensor<float> tensor({1, 2, 3, 4}, TensorLayout::NHWC);
 
     EXPECT_EQ(tensor.memory().count(), 24);
@@ -75,24 +67,28 @@ TEST(TestTensor, BasicNHWCUsage)
     EXPECT_EQ(tensor.strides()[3], 2);
 }
 
-TEST(TestTensor, GetAndSetHostValueNCHW)
+TEST(TestTensor, GetAndSetHostValueNchw)
 {
-    SKIP_IF_NO_DEVICES();
-
     Tensor<float> tensor({1, 2, 3, 4});
     tensor.fillWithValue(0.0f);
-    tensor.setHostValue(0, 1, 1, 2, 99.0f);
+    tensor.setHostValue(99.0f, 0, 1, 1, 2);
 
     EXPECT_FLOAT_EQ(tensor.getHostValue(0, 1, 1, 2), 99.0f);
 }
 
-TEST(TestTensor, GetAndSetHostValueNHWC)
+TEST(TestTensor, GetAndSetHostValueNhwc)
 {
-    SKIP_IF_NO_DEVICES();
-
     Tensor<float> tensor({1, 2, 3, 4}, TensorLayout::NHWC);
     tensor.fillWithValue(0.0f);
-    tensor.setHostValue(0, 1, 1, 2, 99.0f);
+    tensor.setHostValue(99.0f, 0, 1, 1, 2);
 
     EXPECT_FLOAT_EQ(tensor.getHostValue(0, 1, 1, 2), 99.0f);
+}
+
+TEST(TestTensor, ExceedDimensions)
+{
+    Tensor<float> tensor({1, 2, 3, 4});
+    tensor.fillWithValue(0.0f);
+
+    EXPECT_THROW(tensor.setHostValue(99.0f, 0, 1, 1, 2, 3), std::invalid_argument);
 }

@@ -1,8 +1,8 @@
 // Copyright © Advanced Micro Devices, Inc., or its affiliates.
 // SPDX-License-Identifier: MIT
 
+#include "DescriptorTestUtils.hpp"
 #include "HipdnnException.hpp"
-#include "TestDescriptorUtils.hpp"
 #include "TestMacros.hpp"
 #include "descriptors/EngineConfigDescriptor.hpp"
 #include "descriptors/ExecutionPlanDescriptor.hpp"
@@ -19,12 +19,12 @@
 
 using namespace hipdnn_backend;
 using namespace plugin;
-using namespace test_descriptor_utils;
+using namespace hipdnn_backend::test_utilities;
 using namespace ::testing;
 
 using ::testing::Return;
 
-class ExecutionPlanDescriptorTest : public ::testing::Test
+class TestExecutionPlanDescriptor : public ::testing::Test
 {
 public:
     std::unique_ptr<HipdnnBackendDescriptor> _planWrapper = nullptr;
@@ -84,6 +84,7 @@ public:
 
     void setEngineConfig()
     {
+        EXPECT_CALL(*getMockGraph(), getHandle()).WillRepeatedly(Return(_mockHandle.get()));
         EXPECT_CALL(*getMockEngine(), getEngineId()).WillOnce(Return(ENGINE_ID));
         EXPECT_CALL(*getMockEngine(), getGraph()).WillOnce(Return(getMockGraph()));
 
@@ -110,7 +111,7 @@ protected:
     void SetUp() override
     {
         _planWrapper = createDescriptor<ExecutionPlanDescriptor>();
-        _mockGraphWrapper = test_descriptor_utils::createDescriptor<MockGraphDescriptor>();
+        _mockGraphWrapper = hipdnn_backend::test_utilities::createDescriptor<MockGraphDescriptor>();
         _mockEngineWrapper = createDescriptor<MockEngineDescriptor>();
         _mockEngineConfigWrapper = createDescriptor<MockEngineConfigDescriptor>();
         _mockEngineConfigBadTypeWrapper = createDescriptor<MockEngineConfigDescriptor>();
@@ -125,7 +126,7 @@ private:
     static constexpr int64_t ENGINE_ID = 0;
 };
 
-TEST_F(ExecutionPlanDescriptorTest, CreateExecutionPlanDescriptor)
+TEST_F(TestExecutionPlanDescriptor, CreateExecutionPlanDescriptor)
 {
     auto plan = getExecutionPlanDescriptor();
     ASSERT_NE(plan, nullptr);
@@ -133,7 +134,7 @@ TEST_F(ExecutionPlanDescriptorTest, CreateExecutionPlanDescriptor)
     ASSERT_EQ(plan->getType(), HIPDNN_BACKEND_EXECUTION_PLAN_DESCRIPTOR);
 }
 
-TEST_F(ExecutionPlanDescriptorTest, SetAttrOnUnfinalizedExecutionPlanDescriptor)
+TEST_F(TestExecutionPlanDescriptor, SetAttrWhenNotFinalized)
 {
     auto plan = getExecutionPlanDescriptor();
     uint64_t dummyWorkspaceSize;
@@ -151,7 +152,7 @@ TEST_F(ExecutionPlanDescriptorTest, SetAttrOnUnfinalizedExecutionPlanDescriptor)
         HIPDNN_STATUS_NOT_INITIALIZED);
 }
 
-TEST_F(ExecutionPlanDescriptorTest, SetExecutionPlanDescriptorHandle)
+TEST_F(TestExecutionPlanDescriptor, SetHandle)
 {
     auto plan = getExecutionPlanDescriptor();
     hipdnnHandle_t handle = nullptr;
@@ -176,7 +177,7 @@ TEST_F(ExecutionPlanDescriptorTest, SetExecutionPlanDescriptorHandle)
     plan->setAttribute(HIPDNN_ATTR_EXECUTION_PLAN_HANDLE, HIPDNN_TYPE_HANDLE, 1, &handle);
 }
 
-TEST_F(ExecutionPlanDescriptorTest, SetExecutionPlanDescriptorEngineConfig)
+TEST_F(TestExecutionPlanDescriptor, SetEngineConfig)
 {
     auto plan = getExecutionPlanDescriptor();
     auto mockEngineConfig = getMockEngineConfig();
@@ -234,7 +235,7 @@ TEST_F(ExecutionPlanDescriptorTest, SetExecutionPlanDescriptorEngineConfig)
                                HIPDNN_STATUS_BAD_PARAM);
 }
 
-TEST_F(ExecutionPlanDescriptorTest, FinalizeExecutionPlanDescriptor)
+TEST_F(TestExecutionPlanDescriptor, Finalize)
 {
     auto plan = getExecutionPlanDescriptor();
     ASSERT_THROW_HIPDNN_STATUS(plan->finalize(), HIPDNN_STATUS_BAD_PARAM);
@@ -247,7 +248,7 @@ TEST_F(ExecutionPlanDescriptorTest, FinalizeExecutionPlanDescriptor)
     ASSERT_THROW(plan->finalize(), hipdnn_backend::HipdnnException);
 }
 
-TEST_F(ExecutionPlanDescriptorTest, GetAttrOnUnfinalizedExecutionPlanDescriptor)
+TEST_F(TestExecutionPlanDescriptor, GetAttrWhenNotFinalized)
 {
     auto plan = getExecutionPlanDescriptor();
     uint64_t dummyWorkspaceSize;
@@ -260,7 +261,7 @@ TEST_F(ExecutionPlanDescriptorTest, GetAttrOnUnfinalizedExecutionPlanDescriptor)
                                HIPDNN_STATUS_NOT_INITIALIZED);
 }
 
-TEST_F(ExecutionPlanDescriptorTest, GetExecutionPlanDescriptorWorkspaceSize)
+TEST_F(TestExecutionPlanDescriptor, GetWorkspaceSize)
 {
     auto plan = getExecutionPlanDescriptor();
     auto mockEngineConfig = getMockEngineConfig();
@@ -273,7 +274,7 @@ TEST_F(ExecutionPlanDescriptorTest, GetExecutionPlanDescriptorWorkspaceSize)
     ASSERT_EQ(workspaceSize, 1024);
 }
 
-TEST_F(ExecutionPlanDescriptorTest, GetExecutionPlanDescriptorEngineConfig)
+TEST_F(TestExecutionPlanDescriptor, GetEngineConfig)
 {
     auto plan = getExecutionPlanDescriptor();
 
@@ -301,7 +302,7 @@ TEST_F(ExecutionPlanDescriptorTest, GetExecutionPlanDescriptorEngineConfig)
     ASSERT_EQ(*nullCountEngineConfig.get(), *(_mockEngineConfigWrapper.get()));
 }
 
-TEST_F(ExecutionPlanDescriptorTest, GetExecutionPlanDescriptorEngineConfigErrors)
+TEST_F(TestExecutionPlanDescriptor, GetEngineConfigErrors)
 {
     auto plan = getExecutionPlanDescriptor();
     hipdnnBackendDescriptor_t returnedEngineConfig = nullptr;
@@ -323,7 +324,7 @@ TEST_F(ExecutionPlanDescriptorTest, GetExecutionPlanDescriptorEngineConfigErrors
                                HIPDNN_STATUS_BAD_PARAM);
 }
 
-TEST_F(ExecutionPlanDescriptorTest, GetExecutionPlanDescriptorUnsupportedAttr)
+TEST_F(TestExecutionPlanDescriptor, GetUnsupportedAttr)
 {
     auto plan = getExecutionPlanDescriptor();
     int64_t count = 0;
@@ -339,13 +340,13 @@ TEST_F(ExecutionPlanDescriptorTest, GetExecutionPlanDescriptorUnsupportedAttr)
                                HIPDNN_STATUS_NOT_SUPPORTED);
 }
 
-TEST_F(ExecutionPlanDescriptorTest, GetEngineConfigThrowsIfNotFinalized)
+TEST_F(TestExecutionPlanDescriptor, GetEngineConfigThrowsIfNotFinalized)
 {
     auto plan = getExecutionPlanDescriptor();
     ASSERT_THROW_HIPDNN_STATUS(plan->getEngineConfig(), HIPDNN_STATUS_INTERNAL_ERROR);
 }
 
-TEST_F(ExecutionPlanDescriptorTest, GetEngineConfigReturnsPointerIfFinalized)
+TEST_F(TestExecutionPlanDescriptor, GetEngineConfigReturnsPointerIfFinalized)
 {
     auto plan = getExecutionPlanDescriptor();
     makeExecutionPlanFinalized();
@@ -355,7 +356,7 @@ TEST_F(ExecutionPlanDescriptorTest, GetEngineConfigReturnsPointerIfFinalized)
               static_cast<const IBackendDescriptor*>(getMockEngineConfig().get()));
 }
 
-TEST_F(ExecutionPlanDescriptorTest, ExecutionPlanDescriptorGetExecutionContext)
+TEST_F(TestExecutionPlanDescriptor, GetExecutionContext)
 {
     auto plan = getExecutionPlanDescriptor();
     makeExecutionPlanFinalized();

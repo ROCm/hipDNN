@@ -3,7 +3,6 @@
 
 #include "../utils/Helpers.hpp"
 
-#include <hipdnn_backend.h>
 #include <hipdnn_frontend.hpp>
 #include <hipdnn_frontend/Graph.hpp>
 #include <hipdnn_frontend/attributes/BatchnormAttributes.hpp>
@@ -66,7 +65,7 @@ void SampleRunner::operator()(const TensorLayout& layout)
     HIPDNN_FE_CHECK(graph->build_operation_graph(handle));
     std::cout << "Operation graph build successful.\n";
 
-    HIPDNN_FE_CHECK(graph->create_execution_plans(handle));
+    HIPDNN_FE_CHECK(graph->create_execution_plans());
     std::cout << "Execution plans created successfully.\n";
 
     HIPDNN_FE_CHECK(graph->check_support());
@@ -156,11 +155,11 @@ void SampleRunner::operator()(const TensorLayout& layout)
         // auto epsilon = get_epsilon<InputType>();
         //
         // auto y_validator
-        //     = hipdnn_sdk::reference_test_utilities::CpuFpReferenceValidation<InputType>(
+        //     = hipdnn_sdk::test_utilities::CpuFpReferenceValidation<InputType>(
         //         static_cast<InputType>(epsilon), static_cast<InputType>(epsilon));
         //
         // auto stats_validator
-        //     = hipdnn_sdk::reference_test_utilities::CpuFpReferenceValidation<IntermediateType>(
+        //     = hipdnn_sdk::test_utilities::CpuFpReferenceValidation<IntermediateType>(
         //         static_cast<IntermediateType>(epsilon), static_cast<IntermediateType>(epsilon));
         // bool y_valid = y_validator.allClose(y_ref_tensor.memory(), y_tensor.memory());
         // bool next_mean_valid = stats_validator.allClose(next_mean_ref_tensor.memory(),

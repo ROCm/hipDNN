@@ -36,9 +36,9 @@ public:
         return true;
     }
 
-    static void convFwdInference(const ITensor<InputDataType>& input,
-                                 const ITensor<InputDataType>& weight,
-                                 ITensor<InputDataType>& output,
+    static void convFwdInference(const TensorBase<InputDataType>& input,
+                                 const TensorBase<InputDataType>& weight,
+                                 TensorBase<InputDataType>& output,
                                  const std::vector<int64_t>& strides,
                                  const std::vector<int64_t>& dilations,
                                  const std::vector<int64_t>& padding)
@@ -153,7 +153,7 @@ public:
 
             int64_t outputChannel = gIdx * outputChannelsPerGroup + kIdx;
             output.setHostValue(
-                nIdx, outputChannel, hoIdx, woIdx, static_cast<InputDataType>(accumulator));
+                static_cast<InputDataType>(accumulator), nIdx, outputChannel, hoIdx, woIdx);
         };
 
         makeParallelTensorFunctor(

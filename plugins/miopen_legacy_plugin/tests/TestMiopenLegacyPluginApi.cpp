@@ -16,7 +16,7 @@ void testLoggingCallback(hipdnnSeverity_t severity, const char* msg)
     (void)msg;
 }
 
-class MiopenLegacyPluginApiTest : public ::testing::Test
+class TestMiopenLegacyPluginApi : public ::testing::Test
 {
 protected:
     void SetUp() override
@@ -27,43 +27,43 @@ protected:
 };
 } // namespace
 
-TEST_F(MiopenLegacyPluginApiTest, GetNameSuccess)
+TEST_F(TestMiopenLegacyPluginApi, GetNameSuccess)
 {
     const char* name = nullptr;
     EXPECT_EQ(hipdnnPluginGetName(&name), HIPDNN_PLUGIN_STATUS_SUCCESS);
     EXPECT_STREQ(name, "miopen_legacy_plugin");
 }
 
-TEST_F(MiopenLegacyPluginApiTest, GetNameNullptr)
+TEST_F(TestMiopenLegacyPluginApi, GetNameNullptr)
 {
     EXPECT_EQ(hipdnnPluginGetName(nullptr), HIPDNN_PLUGIN_STATUS_BAD_PARAM);
 }
 
-TEST_F(MiopenLegacyPluginApiTest, GetVersionSuccess)
+TEST_F(TestMiopenLegacyPluginApi, GetVersionSuccess)
 {
     const char* version = nullptr;
     EXPECT_EQ(hipdnnPluginGetVersion(&version), HIPDNN_PLUGIN_STATUS_SUCCESS);
     EXPECT_STREQ(version, "1.0.0");
 }
 
-TEST_F(MiopenLegacyPluginApiTest, GetVersionNullptr)
+TEST_F(TestMiopenLegacyPluginApi, GetVersionNullptr)
 {
     EXPECT_EQ(hipdnnPluginGetVersion(nullptr), HIPDNN_PLUGIN_STATUS_BAD_PARAM);
 }
 
-TEST_F(MiopenLegacyPluginApiTest, GetTypeSuccess)
+TEST_F(TestMiopenLegacyPluginApi, GetTypeSuccess)
 {
     hipdnnPluginType_t type;
     EXPECT_EQ(hipdnnPluginGetType(&type), HIPDNN_PLUGIN_STATUS_SUCCESS);
     EXPECT_EQ(type, HIPDNN_PLUGIN_TYPE_ENGINE);
 }
 
-TEST_F(MiopenLegacyPluginApiTest, GetTypeNullptr)
+TEST_F(TestMiopenLegacyPluginApi, GetTypeNullptr)
 {
     EXPECT_EQ(hipdnnPluginGetType(nullptr), HIPDNN_PLUGIN_STATUS_BAD_PARAM);
 }
 
-TEST_F(MiopenLegacyPluginApiTest, GetLastErrorStringSuccess)
+TEST_F(TestMiopenLegacyPluginApi, GetLastErrorStringSuccess)
 {
     const char* errorStr = nullptr;
     hipdnnPluginGetLastErrorString(&errorStr);
@@ -71,7 +71,7 @@ TEST_F(MiopenLegacyPluginApiTest, GetLastErrorStringSuccess)
     EXPECT_GE(strlen(errorStr), 0u);
 }
 
-TEST_F(MiopenLegacyPluginApiTest, GetLastErrorStringNullptr)
+TEST_F(TestMiopenLegacyPluginApi, GetLastErrorStringNullptr)
 {
     EXPECT_NO_THROW(hipdnnPluginGetLastErrorString(nullptr));
 }

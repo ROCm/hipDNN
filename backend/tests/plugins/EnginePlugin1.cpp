@@ -72,15 +72,12 @@ void getAllEngineIds(int64_t* engineIds, uint32_t maxEngines, uint32_t* numEngin
     *numEngines = PLUGIN_NUM_ENGINES;
 }
 
-void getApplicableEngineIds(hipdnnEnginePluginHandle_t handle,
-                            const hipdnnPluginConstData_t* opGraph,
+void getApplicableEngineIds([[maybe_unused]] hipdnnEnginePluginHandle_t handle,
+                            [[maybe_unused]] const hipdnnPluginConstData_t* opGraph,
                             int64_t* engineIds,
                             uint32_t maxEngines,
                             uint32_t* numEngines)
 {
-    std::ignore = handle;
-    std::ignore = opGraph;
-
     // TODO Implement actual logic to determine applicable engine IDs.
     // Now we just return a fixed set of engine IDs.
     for(uint32_t i = 0; i < maxEngines && i < PLUGIN_NUM_ENGINES; ++i)
@@ -99,15 +96,11 @@ void checkEngineIdValidity(int64_t engineId)
     }
 }
 
-void getEngineDetails(hipdnnEnginePluginHandle_t handle,
-                      int64_t engineId,
-                      const hipdnnPluginConstData_t* opGraph,
+void getEngineDetails([[maybe_unused]] hipdnnEnginePluginHandle_t handle,
+                      [[maybe_unused]] int64_t engineId,
+                      [[maybe_unused]] const hipdnnPluginConstData_t* opGraph,
                       hipdnnPluginConstData_t* engineDetails)
 {
-    std::ignore = handle;
-    std::ignore = engineId;
-    std::ignore = opGraph;
-
     // TODO Implement actual logic
     // For now, we just allocate some memory for engine details.
     size_t size = 1024;
@@ -115,60 +108,45 @@ void getEngineDetails(hipdnnEnginePluginHandle_t handle,
     engineDetails->size = size;
 }
 
-void destroyEngineDetails(hipdnnEnginePluginHandle_t handle, hipdnnPluginConstData_t* engineDetails)
+void destroyEngineDetails([[maybe_unused]] hipdnnEnginePluginHandle_t handle,
+                          hipdnnPluginConstData_t* engineDetails)
 {
-    std::ignore = handle;
-
     delete[] static_cast<const uint8_t*>(engineDetails->ptr);
     engineDetails->ptr = nullptr;
     engineDetails->size = 0;
 }
 
-size_t getWorkspaceSize(hipdnnEnginePluginHandle_t handle,
-                        const hipdnnPluginConstData_t* engineConfig,
-                        const hipdnnPluginConstData_t* opGraph)
+size_t getWorkspaceSize([[maybe_unused]] hipdnnEnginePluginHandle_t handle,
+                        [[maybe_unused]] const hipdnnPluginConstData_t* engineConfig,
+                        [[maybe_unused]] const hipdnnPluginConstData_t* opGraph)
 {
-    std::ignore = handle;
-    std::ignore = engineConfig;
-    std::ignore = opGraph;
-
     // TODO Implement actual logic
     // For now, we just return a fixed workspace size.
     return 4096;
 }
 
 hipdnnEnginePluginExecutionContext_t
-    createExecutionContext(hipdnnEnginePluginHandle_t handle,
-                           const hipdnnPluginConstData_t* engineConfig,
-                           const hipdnnPluginConstData_t* opGraph)
+    createExecutionContext([[maybe_unused]] hipdnnEnginePluginHandle_t handle,
+                           [[maybe_unused]] const hipdnnPluginConstData_t* engineConfig,
+                           [[maybe_unused]] const hipdnnPluginConstData_t* opGraph)
 {
-    std::ignore = handle;
-    std::ignore = engineConfig;
-    std::ignore = opGraph;
-
     auto executionContext = new HipdnnEnginePluginExecutionContext(0);
     return executionContext;
 }
 
-void destroyExecutionContext(hipdnnEnginePluginHandle_t handle,
+void destroyExecutionContext([[maybe_unused]] hipdnnEnginePluginHandle_t handle,
                              hipdnnEnginePluginExecutionContext_t executionContext)
 {
-    std::ignore = handle;
-
     // Free the memory allocated for the execution context.
     delete executionContext;
 }
 
-void executeOpGraph(hipdnnEnginePluginHandle_t handle,
-                    hipdnnEnginePluginExecutionContext_t executionContext,
-                    void* workspace,
+void executeOpGraph([[maybe_unused]] hipdnnEnginePluginHandle_t handle,
+                    [[maybe_unused]] hipdnnEnginePluginExecutionContext_t executionContext,
+                    [[maybe_unused]] void* workspace,
                     const hipdnnPluginDeviceBuffer_t* deviceBuffers,
                     uint32_t numDeviceBuffers)
 {
-    std::ignore = handle;
-    std::ignore = executionContext;
-    std::ignore = workspace;
-
     if(numDeviceBuffers != 2)
     {
         throw HipdnnPluginException(HIPDNN_PLUGIN_STATUS_INVALID_VALUE,

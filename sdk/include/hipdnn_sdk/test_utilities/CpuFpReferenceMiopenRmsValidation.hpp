@@ -5,8 +5,8 @@
 
 #if defined(__HIP_PLATFORM_AMD__)
 // Need these for the half and bfloat16 types
-#include <hipdnn_sdk/utilities/HalfUtils.hpp>
-#include <hipdnn_sdk/utilities/HipBfloat16Utils.hpp>
+#include <hipdnn_sdk/utilities/UtilsBfp16.hpp>
+#include <hipdnn_sdk/utilities/UtilsFp16.hpp>
 #endif
 
 #include <hipdnn_sdk/logging/Logger.hpp>
@@ -14,7 +14,7 @@
 
 namespace hipdnn_sdk
 {
-namespace reference_test_utilities
+namespace test_utilities
 {
 
 using namespace hipdnn_sdk::utilities;
@@ -31,7 +31,7 @@ public:
     CpuFpReferenceMiopenRmsValidation(T relativeTolerance = std::numeric_limits<T>::epsilon())
         : _relativeTolerance(static_cast<double>(relativeTolerance))
     {
-        if(relativeTolerance < T{0})
+        if(relativeTolerance < T{0.0})
         {
             throw std::invalid_argument("Tolerances must be non-negative");
         }
@@ -39,8 +39,7 @@ public:
 
     ~CpuFpReferenceMiopenRmsValidation() override = default;
 
-    bool allClose(Migratable_memory_interface<T>& reference,
-                  Migratable_memory_interface<T>& implementation) override
+    bool allClose(IMigratableMemory<T>& reference, IMigratableMemory<T>& implementation) override
     {
         if(reference.count() != implementation.count())
         {
@@ -54,8 +53,8 @@ public:
             return true;
         }
 
-        const T* refData = reference.host_data();
-        const T* implData = implementation.host_data();
+        const T* refData = reference.hostData();
+        const T* implData = implementation.hostData();
 
         double squareDifference = 0.0;
         double maxRefMagnitude = 0.0;
@@ -91,5 +90,5 @@ private:
     double _relativeTolerance;
 };
 
-} // namespace reference_test_utilities
+} // namespace test_utilities
 } // namespace hipdnn_sdk

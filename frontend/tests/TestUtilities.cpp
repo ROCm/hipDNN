@@ -8,40 +8,40 @@
 using namespace hipdnn_frontend;
 using namespace hipdnn_frontend::graph;
 
-TEST(UtilitiesTests, FindCommonShapeValid)
+TEST(TestUtilities, FindCommonShapeValid)
 {
     std::vector<std::vector<int64_t>> inputShapes = {{1, 2, 3}, {1, 2, 1}, {1, 1, 3}};
     std::vector<int64_t> commonShape;
 
     auto error = findCommonShape(inputShapes, commonShape);
-    EXPECT_EQ(error.code, error_code_t::OK);
+    EXPECT_EQ(error.code, ErrorCode::OK);
     EXPECT_EQ(commonShape, (std::vector<int64_t>{1, 2, 3}));
 }
 
-TEST(UtilitiesTests, FindCommonShapeEmptyInput)
+TEST(TestUtilities, FindCommonShapeEmptyInput)
 {
     std::vector<std::vector<int64_t>> inputShapes = {};
     std::vector<int64_t> commonShape;
 
     auto error = findCommonShape(inputShapes, commonShape);
-    EXPECT_EQ(error.code, error_code_t::INVALID_VALUE);
+    EXPECT_EQ(error.code, ErrorCode::INVALID_VALUE);
 }
 
-TEST(UtilitiesTests, FindCommonShapeIncompatibleShapes)
+TEST(TestUtilities, FindCommonShapeIncompatibleShapes)
 {
     std::vector<std::vector<int64_t>> inputShapes = {{1, 2, 3}, {1, 2, 4}, {1, 2}};
     std::vector<int64_t> commonShape;
 
     auto error = findCommonShape(inputShapes, commonShape);
-    EXPECT_EQ(error.code, error_code_t::INVALID_VALUE);
+    EXPECT_EQ(error.code, ErrorCode::INVALID_VALUE);
 }
 
-TEST(UtilitiesTests, FindCommonShapeSingleInput)
+TEST(TestUtilities, FindCommonShapeSingleInput)
 {
     std::vector<std::vector<int64_t>> inputShapes = {{1, 2, 3}};
     std::vector<int64_t> commonShape;
 
     auto error = findCommonShape(inputShapes, commonShape);
-    EXPECT_EQ(error.code, error_code_t::OK);
+    EXPECT_EQ(error.code, ErrorCode::OK);
     EXPECT_EQ(commonShape, (std::vector<int64_t>{1, 2, 3}));
 }

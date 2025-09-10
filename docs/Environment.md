@@ -70,7 +70,7 @@ hipDNN provides functions for retrieving error information:
 const char* error_str = hipdnnGetErrorString(status);
 
 // Get detailed error message for the current thread
-char message[HIPDNN_MAX_ERROR_STRING_SIZE];
+char message[HIPDNN_ERROR_STRING_MAX_LENGTH];
 hipdnnGetLastErrorString(message, sizeof(message));
 ```
 

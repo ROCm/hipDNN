@@ -3,7 +3,6 @@
 
 #include "../utils/Helpers.hpp"
 
-#include <hipdnn_backend.h>
 #include <hipdnn_frontend.hpp>
 #include <hipdnn_frontend/Graph.hpp>
 #include <hipdnn_frontend/attributes/BatchnormInferenceAttributes.hpp>
@@ -55,7 +54,7 @@ void SampleRunner::operator()(const TensorLayout& layout)
     HIPDNN_FE_CHECK(graph->build_operation_graph(handle));
     std::cout << "Operation graph build successful.\n";
 
-    HIPDNN_FE_CHECK(graph->create_execution_plans(handle));
+    HIPDNN_FE_CHECK(graph->create_execution_plans());
     std::cout << "Execution plans created successfully.\n";
 
     HIPDNN_FE_CHECK(graph->check_support());
@@ -118,7 +117,7 @@ void SampleRunner::operator()(const TensorLayout& layout)
         refImpl.batchnormFwdInference<InputType, IntermediateType, IntermediateType>(
             xTensor, scaleTensor, biasTensor, meanTensor, varianceTensor, yRefTensor, epsilon);
 
-        auto validator = hipdnn_sdk::reference_test_utilities::CpuFpReferenceValidation<InputType>(
+        auto validator = hipdnn_sdk::test_utilities::CpuFpReferenceValidation<InputType>(
             static_cast<InputType>(epsilon), static_cast<InputType>(epsilon));
 
         std::cout << "CPU reference validation "

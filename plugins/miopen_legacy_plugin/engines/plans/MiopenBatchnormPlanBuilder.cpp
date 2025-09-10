@@ -36,11 +36,10 @@ bool MiopenBatchnormPlanBuilder::isApplicable(const hipdnn_plugin::IGraph& opGra
     return true;
 }
 
-size_t MiopenBatchnormPlanBuilder::getWorkspaceSize(const HipdnnEnginePluginHandle& handle,
-                                                    const hipdnn_plugin::IGraph& opGraph) const
+size_t MiopenBatchnormPlanBuilder::getWorkspaceSize(
+    [[maybe_unused]] const HipdnnEnginePluginHandle& handle,
+    [[maybe_unused]] const hipdnn_plugin::IGraph& opGraph) const
 {
-    std::ignore = handle;
-    std::ignore = opGraph;
     //batchnorm plan builder does not require workspace size
     return 0u;
 }
@@ -53,13 +52,11 @@ std::string getNodeName(const hipdnn_sdk::data_objects::Node& node)
     return node.name() != nullptr ? node.name()->str() : "";
 }
 
-void buildPlanInferenceSingleNode(const HipdnnEnginePluginHandle& handle,
+void buildPlanInferenceSingleNode([[maybe_unused]] const HipdnnEnginePluginHandle& handle,
                                   const hipdnn_plugin::IGraph& opGraph,
                                   const hipdnn_sdk::data_objects::Node& node,
                                   HipdnnEnginePluginExecutionContext& executionContext)
 {
-    std::ignore = handle;
-
     const auto* attr = node.attributes_as_BatchnormInferenceAttributes();
     if(attr == nullptr)
     {
@@ -74,13 +71,11 @@ void buildPlanInferenceSingleNode(const HipdnnEnginePluginHandle& handle,
     executionContext.setPlan(std::move(plan));
 }
 
-void buildPlanBwdSingleNode(const HipdnnEnginePluginHandle& handle,
+void buildPlanBwdSingleNode([[maybe_unused]] const HipdnnEnginePluginHandle& handle,
                             const hipdnn_plugin::IGraph& opGraph,
                             const hipdnn_sdk::data_objects::Node& node,
                             HipdnnEnginePluginExecutionContext& executionContext)
 {
-    std::ignore = handle;
-
     const auto* attr = node.attributes_as_BatchnormBackwardAttributes();
     if(attr == nullptr)
     {

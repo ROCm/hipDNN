@@ -14,7 +14,7 @@
 #include <hipdnn_sdk/utilities/PlatformUtils.hpp>
 #include <logging/Logging.hpp>
 
-class BackendLoggingTest : public ::testing::Test
+class TestBackendLogger : public ::testing::Test
 {
 public:
     std::string _logFile;
@@ -70,7 +70,7 @@ public:
     }
 };
 
-TEST_F(BackendLoggingTest, MacrosDontLogWhenOff)
+TEST_F(TestBackendLogger, MacrosDontLogWhenOff)
 {
     HIPDNN_LOG_INFO("Initializing with info message");
     HIPDNN_LOG_WARN("Initializing with warn message");
@@ -81,7 +81,7 @@ TEST_F(BackendLoggingTest, MacrosDontLogWhenOff)
         << std::string("Expected stderr to be empty, but it contained:\n") << logContent;
 }
 
-TEST_F(BackendLoggingTest, MacrosRespectLogLevelInfo)
+TEST_F(TestBackendLogger, MacrosRespectLogLevelInfo)
 {
     hipdnn_sdk::utilities::setEnv("HIPDNN_LOG_LEVEL", "info");
 
@@ -95,7 +95,7 @@ TEST_F(BackendLoggingTest, MacrosRespectLogLevelInfo)
     EXPECT_NE(logContent.find("Error test message"), std::string::npos);
 }
 
-TEST_F(BackendLoggingTest, MacrosRespectLogLevelWarn)
+TEST_F(TestBackendLogger, MacrosRespectLogLevelWarn)
 {
     hipdnn_sdk::utilities::setEnv("HIPDNN_LOG_LEVEL", "warn");
 
@@ -109,7 +109,7 @@ TEST_F(BackendLoggingTest, MacrosRespectLogLevelWarn)
     EXPECT_NE(logContent.find("Error should appear"), std::string::npos);
 }
 
-TEST_F(BackendLoggingTest, MacrosRespectLogLevelError)
+TEST_F(TestBackendLogger, MacrosRespectLogLevelError)
 {
     hipdnn_sdk::utilities::setEnv("HIPDNN_LOG_LEVEL", "error");
 
@@ -123,7 +123,7 @@ TEST_F(BackendLoggingTest, MacrosRespectLogLevelError)
     EXPECT_NE(logContent.find("Error should appear"), std::string::npos);
 }
 
-TEST_F(BackendLoggingTest, LoggingCanBeReinitialized)
+TEST_F(TestBackendLogger, LoggingCanBeReinitialized)
 {
     hipdnn_sdk::utilities::setEnv("HIPDNN_LOG_LEVEL", "off");
     HIPDNN_LOG_INFO("This should not appear");
@@ -136,7 +136,7 @@ TEST_F(BackendLoggingTest, LoggingCanBeReinitialized)
     verifyStderrContains("This should appear after reinitialization");
 }
 
-TEST_F(BackendLoggingTest, LogPatternFormatIsCorrectOnStderr)
+TEST_F(TestBackendLogger, LogPatternFormatIsCorrectOnStderr)
 {
     hipdnn_sdk::utilities::setEnv("HIPDNN_LOG_LEVEL", "info");
 
@@ -152,7 +152,7 @@ TEST_F(BackendLoggingTest, LogPatternFormatIsCorrectOnStderr)
         << std::string("Expected log format pattern not found. Stderr content:\n") << logContent;
 }
 
-TEST_F(BackendLoggingTest, MultipleMessagesAreLoggedToStderr)
+TEST_F(TestBackendLogger, MultipleMessagesAreLoggedToStderr)
 {
     hipdnn_sdk::utilities::setEnv("HIPDNN_LOG_LEVEL", "info");
 
@@ -174,7 +174,7 @@ TEST_F(BackendLoggingTest, MultipleMessagesAreLoggedToStderr)
         << std::string("Messages not logged in expected order to stderr");
 }
 
-TEST_F(BackendLoggingTest, LogFileCanBeSpecifiedByEnvVar)
+TEST_F(TestBackendLogger, LogFileCanBeSpecifiedByEnvVar)
 {
     _logFile = "custom_backend_test.log";
     hipdnn_sdk::utilities::setEnv("HIPDNN_LOG_FILE", _logFile.c_str());

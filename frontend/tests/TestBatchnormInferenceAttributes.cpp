@@ -3,7 +3,7 @@
 #include <gtest/gtest.h>
 #include <hipdnn_frontend/attributes/BatchnormInferenceAttributes.hpp>
 
-TEST(BatchnormInferenceAttributesTests, CreateBatchnormInferenceAttributes)
+TEST(TestBatchnormInferenceAttributes, CreateBatchnormInferenceAttributes)
 {
     hipdnn_frontend::graph::BatchnormInferenceAttributes batchnormAttributes;
 
@@ -18,83 +18,83 @@ TEST(BatchnormInferenceAttributesTests, CreateBatchnormInferenceAttributes)
     auto inputTensor = batchnormAttributes.get_x();
     inputTensor->set_uid(1)
         .set_name("InputTensor")
-        .set_data_type(hipdnn_frontend::DataType_t::FLOAT)
+        .set_data_type(hipdnn_frontend::DataType::FLOAT)
         .set_dim({1, 2, 3, 4})
         .set_stride({5, 6, 7, 8});
 
     auto outputTensor = batchnormAttributes.get_y();
     outputTensor->set_uid(2)
         .set_name("OutputTensor")
-        .set_data_type(hipdnn_frontend::DataType_t::FLOAT)
+        .set_data_type(hipdnn_frontend::DataType::FLOAT)
         .set_dim({1, 2, 3, 4})
         .set_stride({5, 6, 7, 8});
 
     auto meanTensor = batchnormAttributes.get_mean();
     meanTensor->set_uid(3)
         .set_name("MeanTensor")
-        .set_data_type(hipdnn_frontend::DataType_t::FLOAT)
+        .set_data_type(hipdnn_frontend::DataType::FLOAT)
         .set_dim({1, 2, 3, 4})
         .set_stride({5, 6, 7, 8});
 
     auto varianceTensor = batchnormAttributes.get_inv_variance();
     varianceTensor->set_uid(4)
         .set_name("VarianceTensor")
-        .set_data_type(hipdnn_frontend::DataType_t::FLOAT)
+        .set_data_type(hipdnn_frontend::DataType::FLOAT)
         .set_dim({1, 2, 3, 4})
         .set_stride({5, 6, 7, 8});
 
     auto scaleTensor = batchnormAttributes.get_scale();
     scaleTensor->set_uid(5)
         .set_name("ScaleTensor")
-        .set_data_type(hipdnn_frontend::DataType_t::FLOAT)
+        .set_data_type(hipdnn_frontend::DataType::FLOAT)
         .set_dim({1, 2, 3, 4})
         .set_stride({5, 6, 7, 8});
 
     auto biasTensor = batchnormAttributes.get_bias();
     biasTensor->set_uid(6)
         .set_name("BiasTensor")
-        .set_data_type(hipdnn_frontend::DataType_t::FLOAT)
+        .set_data_type(hipdnn_frontend::DataType::FLOAT)
         .set_dim({1, 2, 3, 4})
         .set_stride({5, 6, 7, 8});
 
     EXPECT_EQ(inputTensor->get_uid(), 1);
     EXPECT_EQ(inputTensor->get_name(), "InputTensor");
-    EXPECT_EQ(inputTensor->get_data_type(), hipdnn_frontend::DataType_t::FLOAT);
+    EXPECT_EQ(inputTensor->get_data_type(), hipdnn_frontend::DataType::FLOAT);
     EXPECT_EQ(inputTensor->get_dim(), (std::vector<int64_t>{1, 2, 3, 4}));
     EXPECT_EQ(inputTensor->get_stride(), (std::vector<int64_t>{5, 6, 7, 8}));
 
     EXPECT_EQ(outputTensor->get_uid(), 2);
     EXPECT_EQ(outputTensor->get_name(), "OutputTensor");
-    EXPECT_EQ(outputTensor->get_data_type(), hipdnn_frontend::DataType_t::FLOAT);
+    EXPECT_EQ(outputTensor->get_data_type(), hipdnn_frontend::DataType::FLOAT);
     EXPECT_EQ(outputTensor->get_dim(), (std::vector<int64_t>{1, 2, 3, 4}));
     EXPECT_EQ(outputTensor->get_stride(), (std::vector<int64_t>{5, 6, 7, 8}));
 
     EXPECT_EQ(meanTensor->get_uid(), 3);
     EXPECT_EQ(meanTensor->get_name(), "MeanTensor");
-    EXPECT_EQ(meanTensor->get_data_type(), hipdnn_frontend::DataType_t::FLOAT);
+    EXPECT_EQ(meanTensor->get_data_type(), hipdnn_frontend::DataType::FLOAT);
     EXPECT_EQ(meanTensor->get_dim(), (std::vector<int64_t>{1, 2, 3, 4}));
     EXPECT_EQ(meanTensor->get_stride(), (std::vector<int64_t>{5, 6, 7, 8}));
 
     EXPECT_EQ(varianceTensor->get_uid(), 4);
     EXPECT_EQ(varianceTensor->get_name(), "VarianceTensor");
-    EXPECT_EQ(varianceTensor->get_data_type(), hipdnn_frontend::DataType_t::FLOAT);
+    EXPECT_EQ(varianceTensor->get_data_type(), hipdnn_frontend::DataType::FLOAT);
     EXPECT_EQ(varianceTensor->get_dim(), (std::vector<int64_t>{1, 2, 3, 4}));
     EXPECT_EQ(varianceTensor->get_stride(), (std::vector<int64_t>{5, 6, 7, 8}));
 
     EXPECT_EQ(scaleTensor->get_uid(), 5);
     EXPECT_EQ(scaleTensor->get_name(), "ScaleTensor");
-    EXPECT_EQ(scaleTensor->get_data_type(), hipdnn_frontend::DataType_t::FLOAT);
+    EXPECT_EQ(scaleTensor->get_data_type(), hipdnn_frontend::DataType::FLOAT);
     EXPECT_EQ(scaleTensor->get_dim(), (std::vector<int64_t>{1, 2, 3, 4}));
     EXPECT_EQ(scaleTensor->get_stride(), (std::vector<int64_t>{5, 6, 7, 8}));
 
     EXPECT_EQ(biasTensor->get_uid(), 6);
     EXPECT_EQ(biasTensor->get_name(), "BiasTensor");
-    EXPECT_EQ(biasTensor->get_data_type(), hipdnn_frontend::DataType_t::FLOAT);
+    EXPECT_EQ(biasTensor->get_data_type(), hipdnn_frontend::DataType::FLOAT);
     EXPECT_EQ(biasTensor->get_dim(), (std::vector<int64_t>{1, 2, 3, 4}));
     EXPECT_EQ(biasTensor->get_stride(), (std::vector<int64_t>{5, 6, 7, 8}));
 }
 
-TEST(BatchnormInferenceAttributesTests, SetXWithMove)
+TEST(TestBatchnormInferenceAttributes, SetXWithMove)
 {
     hipdnn_frontend::graph::BatchnormInferenceAttributes batchnormAttributes;
 
@@ -113,7 +113,7 @@ TEST(BatchnormInferenceAttributesTests, SetXWithMove)
     EXPECT_EQ(retrieved.get(), rawPtr);
 }
 
-TEST(BatchnormInferenceAttributesTests, SetMeanWithMove)
+TEST(TestBatchnormInferenceAttributes, SetMeanWithMove)
 {
     hipdnn_frontend::graph::BatchnormInferenceAttributes batchnormAttributes;
 
@@ -132,7 +132,7 @@ TEST(BatchnormInferenceAttributesTests, SetMeanWithMove)
     EXPECT_EQ(retrieved.get(), rawPtr);
 }
 
-TEST(BatchnormInferenceAttributesTests, SetInvVarianceWithMove)
+TEST(TestBatchnormInferenceAttributes, SetInvVarianceWithMove)
 {
     hipdnn_frontend::graph::BatchnormInferenceAttributes batchnormAttributes;
 
@@ -151,7 +151,7 @@ TEST(BatchnormInferenceAttributesTests, SetInvVarianceWithMove)
     EXPECT_EQ(retrieved.get(), rawPtr);
 }
 
-TEST(BatchnormInferenceAttributesTests, SetScaleWithMove)
+TEST(TestBatchnormInferenceAttributes, SetScaleWithMove)
 {
     hipdnn_frontend::graph::BatchnormInferenceAttributes batchnormAttributes;
 
@@ -170,7 +170,7 @@ TEST(BatchnormInferenceAttributesTests, SetScaleWithMove)
     EXPECT_EQ(retrieved.get(), rawPtr);
 }
 
-TEST(BatchnormInferenceAttributesTests, SetBiasWithMove)
+TEST(TestBatchnormInferenceAttributes, SetBiasWithMove)
 {
     hipdnn_frontend::graph::BatchnormInferenceAttributes batchnormAttributes;
 
@@ -189,7 +189,7 @@ TEST(BatchnormInferenceAttributesTests, SetBiasWithMove)
     EXPECT_EQ(retrieved.get(), rawPtr);
 }
 
-TEST(BatchnormInferenceAttributesTests, SetYWithMove)
+TEST(TestBatchnormInferenceAttributes, SetYWithMove)
 {
     hipdnn_frontend::graph::BatchnormInferenceAttributes batchnormAttributes;
 
@@ -210,7 +210,7 @@ TEST(BatchnormInferenceAttributesTests, SetYWithMove)
 
 // Simplified move tests - testing move semantics without setting uid/name
 
-TEST(BatchnormInferenceAttributesTests, SimplifiedSetXWithMove)
+TEST(TestBatchnormInferenceAttributes, SimplifiedSetXWithMove)
 {
     hipdnn_frontend::graph::BatchnormInferenceAttributes batchnormAttributes;
 
@@ -221,7 +221,7 @@ TEST(BatchnormInferenceAttributesTests, SimplifiedSetXWithMove)
     EXPECT_NE(batchnormAttributes.get_x(), nullptr);
 }
 
-TEST(BatchnormInferenceAttributesTests, SimplifiedSetMeanWithMove)
+TEST(TestBatchnormInferenceAttributes, SimplifiedSetMeanWithMove)
 {
     hipdnn_frontend::graph::BatchnormInferenceAttributes batchnormAttributes;
 
@@ -232,7 +232,7 @@ TEST(BatchnormInferenceAttributesTests, SimplifiedSetMeanWithMove)
     EXPECT_NE(batchnormAttributes.get_mean(), nullptr);
 }
 
-TEST(BatchnormInferenceAttributesTests, SimplifiedSetInvVarianceWithMove)
+TEST(TestBatchnormInferenceAttributes, SimplifiedSetInvVarianceWithMove)
 {
     hipdnn_frontend::graph::BatchnormInferenceAttributes batchnormAttributes;
 
@@ -243,7 +243,7 @@ TEST(BatchnormInferenceAttributesTests, SimplifiedSetInvVarianceWithMove)
     EXPECT_NE(batchnormAttributes.get_inv_variance(), nullptr);
 }
 
-TEST(BatchnormInferenceAttributesTests, SimplifiedSetScaleWithMove)
+TEST(TestBatchnormInferenceAttributes, SimplifiedSetScaleWithMove)
 {
     hipdnn_frontend::graph::BatchnormInferenceAttributes batchnormAttributes;
 
@@ -254,7 +254,7 @@ TEST(BatchnormInferenceAttributesTests, SimplifiedSetScaleWithMove)
     EXPECT_NE(batchnormAttributes.get_scale(), nullptr);
 }
 
-TEST(BatchnormInferenceAttributesTests, SimplifiedSetBiasWithMove)
+TEST(TestBatchnormInferenceAttributes, SimplifiedSetBiasWithMove)
 {
     hipdnn_frontend::graph::BatchnormInferenceAttributes batchnormAttributes;
 
@@ -265,7 +265,7 @@ TEST(BatchnormInferenceAttributesTests, SimplifiedSetBiasWithMove)
     EXPECT_NE(batchnormAttributes.get_bias(), nullptr);
 }
 
-TEST(BatchnormInferenceAttributesTests, SimplifiedSetYWithMove)
+TEST(TestBatchnormInferenceAttributes, SimplifiedSetYWithMove)
 {
     hipdnn_frontend::graph::BatchnormInferenceAttributes batchnormAttributes;
 

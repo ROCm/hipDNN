@@ -3,10 +3,13 @@
 
 #include "../utils/Helpers.hpp"
 
-#include <hipdnn_backend.h>
 #include <hipdnn_frontend.hpp>
+<<<<<<< HEAD
 #include <hipdnn_frontend/Graph.hpp>
 #include <hipdnn_frontend/attributes/BatchnormBackwardAttributes.hpp>
+=======
+#include <hipdnn_sdk/test_utilities/CpuFpReferenceImplementation.hpp>
+>>>>>>> e14c60382601a58475f97467ac1e964b2c5054dd
 #include <hipdnn_sdk/test_utilities/CpuFpReferenceValidation.hpp>
 #include <hipdnn_sdk/test_utilities/ReferenceImplementationInterface.hpp>
 #include <hipdnn_sdk/utilities/Tensor.hpp>
@@ -60,7 +63,7 @@ void SampleRunner::operator()(const TensorLayout& layout)
     HIPDNN_FE_CHECK(graph->build_operation_graph(handle));
     std::cout << "Operation graph build successful.\n";
 
-    HIPDNN_FE_CHECK(graph->create_execution_plans(handle));
+    HIPDNN_FE_CHECK(graph->create_execution_plans());
     std::cout << "Execution plans created successfully.\n";
 
     HIPDNN_FE_CHECK(graph->check_support());
@@ -130,11 +133,10 @@ void SampleRunner::operator()(const TensorLayout& layout)
 
         auto epsilon = getEpsilon<InputType>();
 
-        auto dxValidator
-            = hipdnn_sdk::reference_test_utilities::CpuFpReferenceValidation<InputType>(
-                static_cast<InputType>(epsilon), static_cast<InputType>(epsilon));
+        auto dxValidator = hipdnn_sdk::test_utilities::CpuFpReferenceValidation<InputType>(
+            static_cast<InputType>(epsilon), static_cast<InputType>(epsilon));
         auto dscaleDbiasValidator
-            = hipdnn_sdk::reference_test_utilities::CpuFpReferenceValidation<IntermediateType>(
+            = hipdnn_sdk::test_utilities::CpuFpReferenceValidation<IntermediateType>(
                 static_cast<IntermediateType>(epsilon), static_cast<IntermediateType>(epsilon));
 
         bool dxValid = dxValidator.allClose(dxRefTensor.memory(), dxTensor.memory());

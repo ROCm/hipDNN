@@ -2,9 +2,9 @@
 // SPDX-License-Identifier:  MIT
 #pragma once
 
-#include "Error.hpp"
 #include "HipdnnException.hpp"
 #include "HipdnnStatus.h"
+#include "LastErrorManager.hpp"
 
 #include <iostream>
 
@@ -12,7 +12,7 @@ namespace hipdnn_backend
 {
 
 template <class F>
-hipdnnStatus_t tryCatch(F f)
+hipdnnStatus_t tryCatch(F f, std::string const& prefix = std::string{})
 {
     try
     {
@@ -20,16 +20,17 @@ hipdnnStatus_t tryCatch(F f)
     }
     catch(const HipdnnException& ex)
     {
-        return LastErrorManager::setLastError(ex.getStatus(), ex.what());
+        return LastErrorManager::setLastError(ex.getStatus(), (prefix + ex.what()).c_str());
     }
     catch(const std::exception& ex)
     {
-        return LastErrorManager::setLastError(HIPDNN_STATUS_INTERNAL_ERROR, ex.what());
+        return LastErrorManager::setLastError(HIPDNN_STATUS_INTERNAL_ERROR,
+                                              (prefix + ex.what()).c_str());
     }
     catch(...)
     {
         return LastErrorManager::setLastError(HIPDNN_STATUS_INTERNAL_ERROR,
-                                              "Unknown exception occured");
+                                              (prefix + "Unknown exception occured").c_str());
     }
     return HIPDNN_STATUS_SUCCESS;
 }

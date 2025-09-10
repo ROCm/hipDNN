@@ -1,32 +1,20 @@
 // Copyright © Advanced Micro Devices, Inc., or its affiliates.
 // SPDX-License-Identifier:  MIT
 
+#include "Helpers.hpp"
+
 #include <gtest/gtest.h>
 
 #include <hipdnn_sdk/test_utilities/CpuFpReferenceValidation.hpp>
 #include <hipdnn_sdk/test_utilities/TestUtilities.hpp>
-#include <hipdnn_sdk/utilities/HalfUtils.hpp>
-#include <hipdnn_sdk/utilities/HipBfloat16Utils.hpp>
+#include <hipdnn_sdk/utilities/UtilsBfp16.hpp>
+#include <hipdnn_sdk/utilities/UtilsFp16.hpp>
 
-using namespace hipdnn_sdk::reference_test_utilities;
+using namespace hipdnn_sdk::test_utilities;
 using namespace hipdnn_sdk::utilities;
+using namespace helpers;
 
-template <typename T>
-MigratableMemory<T> createBuffer(size_t size, T mult)
-{
-    MigratableMemory<T> buffer(size);
-
-    T* data = buffer.hostData();
-
-    for(size_t i = 0; i < size; ++i)
-    {
-        data[i] = static_cast<T>(static_cast<float>(i)) * mult;
-    }
-
-    return buffer;
-}
-
-TEST(CpuFpReferenceValidation, BasicBFloat16Usage)
+TEST(TestCpuFpReferenceValidationBfp16, BasicUsage)
 {
     CpuFpReferenceValidation<hip_bfloat16> refValidation;
 
@@ -36,7 +24,7 @@ TEST(CpuFpReferenceValidation, BasicBFloat16Usage)
     EXPECT_TRUE(refValidation.allClose(buffer1, buffer2));
 }
 
-TEST(CpuFpReferenceValidation, BasicHalfUsage)
+TEST(TestCpuFpReferenceValidationFp16, BasicUsage)
 {
     CpuFpReferenceValidation<half> refValidation;
 
@@ -46,7 +34,7 @@ TEST(CpuFpReferenceValidation, BasicHalfUsage)
     EXPECT_TRUE(refValidation.allClose(buffer1, buffer2));
 }
 
-TEST(CpuFpReferenceValidation, BasicFloatUsage)
+TEST(TestCpuFpReferenceValidationFp32, BasicUsage)
 {
     CpuFpReferenceValidation<float> refValidation;
 
@@ -56,7 +44,7 @@ TEST(CpuFpReferenceValidation, BasicFloatUsage)
     EXPECT_TRUE(refValidation.allClose(buffer1, buffer2));
 }
 
-TEST(CpuFpReferenceValidation, BasicDoubleUsage)
+TEST(TestCpuFpReferenceValidationFp64, BasicUsage)
 {
     CpuFpReferenceValidation<double> refValidation;
 
@@ -66,7 +54,7 @@ TEST(CpuFpReferenceValidation, BasicDoubleUsage)
     EXPECT_TRUE(refValidation.allClose(buffer1, buffer2));
 }
 
-TEST(CpuFpReferenceValidation, BFloat16NotComparable)
+TEST(TestCpuFpReferenceValidationBfp16, NotComparable)
 {
     CpuFpReferenceValidation<hip_bfloat16> refValidation;
 
@@ -76,7 +64,7 @@ TEST(CpuFpReferenceValidation, BFloat16NotComparable)
     EXPECT_FALSE(refValidation.allClose(buffer1, buffer2));
 }
 
-TEST(CpuFpReferenceValidation, HalfNotComparable)
+TEST(TestCpuFpReferenceValidationFp16, NotComparable)
 {
     CpuFpReferenceValidation<half> refValidation;
 
@@ -86,7 +74,7 @@ TEST(CpuFpReferenceValidation, HalfNotComparable)
     EXPECT_FALSE(refValidation.allClose(buffer1, buffer2));
 }
 
-TEST(CpuFpReferenceValidation, FloatNotComparable)
+TEST(TestCpuFpReferenceValidationFp32, NotComparable)
 {
     CpuFpReferenceValidation<float> refValidation;
 
@@ -96,7 +84,7 @@ TEST(CpuFpReferenceValidation, FloatNotComparable)
     EXPECT_FALSE(refValidation.allClose(buffer1, buffer2));
 }
 
-TEST(CpuFpReferenceValidation, DoubleNotComparable)
+TEST(TestCpuFpReferenceValidationFp64, NotComparable)
 {
     CpuFpReferenceValidation<double> refValidation;
 
@@ -106,7 +94,7 @@ TEST(CpuFpReferenceValidation, DoubleNotComparable)
     EXPECT_FALSE(refValidation.allClose(buffer1, buffer2));
 }
 
-TEST(CpuFpReferenceValidation, ToleranceComparison)
+TEST(TestCpuFpReferenceValidation, ToleranceComparison)
 {
     CpuFpReferenceValidation<double> refValidationLowTolerance(1e-7, 1e-7);
     CpuFpReferenceValidation<double> refValidationHighTolerance(1e-5, 1e-5);
@@ -119,4 +107,22 @@ TEST(CpuFpReferenceValidation, ToleranceComparison)
 
     // Change the tolerance to a larger value
     EXPECT_FALSE(refValidationLowTolerance.allClose(buffer1, buffer2));
+}
+
+TEST(TestCpuFpReferenceValidation, DefaultTolerance)
+{
+    CpuFpReferenceValidation<float> refValidation;
+
+    MigratableMemory<float> buffer1(1);
+    MigratableMemory<float> buffer2(1);
+
+    buffer1.hostData()[0] = 1.0f;
+    buffer2.hostData()[0] = 1.0f + std::numeric_limits<float>::epsilon();
+
+    EXPECT_TRUE(refValidation.allClose(buffer1, buffer2));
+}
+
+TEST(TestCpuFpReferenceValidation, NegativeToleranceThrows)
+{
+    EXPECT_THROW(CpuFpReferenceValidation<float> refValidation(-1e-5f), std::invalid_argument);
 }

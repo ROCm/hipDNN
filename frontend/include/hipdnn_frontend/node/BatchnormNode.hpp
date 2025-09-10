@@ -12,64 +12,60 @@
 
 namespace hipdnn_frontend::graph
 {
-class BatchNormNode : public NodeCRTP<BatchNormNode> //NOLINT
+class BatchnormNode : public BaseNode<BatchnormNode>
 {
 public:
     BatchnormAttributes attributes;
 
-    BatchNormNode(BatchnormAttributes&& batchnormAttrs, const GraphAttributes& graphAttrs)
-        : NodeCRTP(graphAttrs)
+    BatchnormNode(BatchnormAttributes&& batchnormAttrs, const GraphAttributes& graphAttrs)
+        : BaseNode(graphAttrs)
         , attributes(std::move(batchnormAttrs))
     {
     }
 
-    error_t pre_validate_node() const override
+    Error pre_validate_node() const override
     {
         if(!attributes.get_x())
         {
-            return {error_code_t::ATTRIBUTE_NOT_SET, "BatchnormNode missing x for pre-validation"};
+            return {ErrorCode::ATTRIBUTE_NOT_SET, "BatchnormNode missing x for pre-validation"};
         }
         if(!attributes.get_scale())
         {
-            return {error_code_t::ATTRIBUTE_NOT_SET,
-                    "BatchnormNode missing scale for pre-validation"};
+            return {ErrorCode::ATTRIBUTE_NOT_SET, "BatchnormNode missing scale for pre-validation"};
         }
         if(!attributes.get_bias())
         {
-            return {error_code_t::ATTRIBUTE_NOT_SET,
-                    "BatchnormNode missing bias for pre-validation"};
+            return {ErrorCode::ATTRIBUTE_NOT_SET, "BatchnormNode missing bias for pre-validation"};
         }
         if(!attributes.get_y())
         {
-            return {error_code_t::ATTRIBUTE_NOT_SET, "BatchnormNode missing y for pre-validation"};
+            return {ErrorCode::ATTRIBUTE_NOT_SET, "BatchnormNode missing y for pre-validation"};
         }
         if(!attributes.get_epsilon())
         {
-            return {error_code_t::ATTRIBUTE_NOT_SET,
+            return {ErrorCode::ATTRIBUTE_NOT_SET,
                     "BatchnormNode missing epsilon for pre-validation"};
         }
 
         return {};
     }
 
-    error_t infer_properties_node() override
+    Error infer_properties_node() override
     {
         auto x = attributes.get_x();
         auto y = attributes.get_y();
 
         if(!x)
         {
-            return {error_code_t::ATTRIBUTE_NOT_SET,
-                    "BatchnormNode missing x for setting properties"};
+            return {ErrorCode::ATTRIBUTE_NOT_SET, "BatchnormNode missing x for setting properties"};
         }
 
         if(!y)
         {
-            return {error_code_t::ATTRIBUTE_NOT_SET,
-                    "BatchnormNode missing y for setting properties"};
+            return {ErrorCode::ATTRIBUTE_NOT_SET, "BatchnormNode missing y for setting properties"};
         }
 
-        HIPDNN_CHECK_ERROR(attributes.fill_from_graph_attributes(graph_attributes));
+        HIPDNN_CHECK_ERROR(attributes.fill_from_context(graph_attributes));
 
         if(y->get_dim().empty())
         {
@@ -128,7 +124,7 @@ public:
 
     void gather_hipdnn_tensor_ids(std::unordered_set<int64_t>& usedIds) const override
     {
-        NodeCRTP<BatchNormNode>::gather_hipdnn_tensor_ids(usedIds);
+        BaseNode<BatchnormNode>::gather_hipdnn_tensor_ids(usedIds);
 
         for(auto& tensor : attributes.peer_stats)
         {
@@ -139,12 +135,12 @@ public:
         }
     }
 
-    error_t populate_hipdnn_tensor_ids(
+    Error populate_hipdnn_tensor_ids(
         std::unordered_map<int64_t, std::shared_ptr<TensorAttributes>>& tensorLookup,
         int64_t& currentTensorId,
         std::unordered_set<int64_t>& usedIds) const override
     {
-        NodeCRTP<BatchNormNode>::populate_hipdnn_tensor_ids(tensorLookup, currentTensorId, usedIds);
+        BaseNode<BatchnormNode>::populate_hipdnn_tensor_ids(tensorLookup, currentTensorId, usedIds);
 
         for(auto& tensor : attributes.peer_stats)
         {
@@ -164,11 +160,11 @@ public:
     {
         return hipdnn_sdk::data_objects::CreateNodeDirect(
             builder,
-            attributes.name.c_str(),
+            attributes.get_name().c_str(),
             hipdnn_sdk::data_objects::NodeAttributes::NodeAttributes_BatchnormAttributes,
             attributes.pack_attributes(builder).Union());
     }
 };
 
-typedef BatchNormNode BatchnormNode;
+typedef BatchnormNode BatchNormNode;
 }

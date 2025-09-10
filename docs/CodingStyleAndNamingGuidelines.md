@@ -7,28 +7,34 @@ This document defines the canonical project-wide coding and test naming conventi
 - [1. Naming Summary](#1-naming-summary)
 - [2. File & Class Naming](#2-file--class-naming)
 - [3. Functions](#3-functions)
+  - [3.1 Unused Function Arguments](#31-unused-function-arguments)
 - [4. Variables](#4-variables)
 - [5. Members](#5-members)
 - [6. Globals](#6-globals)
 - [7. Interfaces](#7-interfaces)
 - [8. Enums](#8-enums)
 - [9. Constants](#9-constants)
-- [10. Test Naming Guidelines](#10-test-naming-guidelines)
-  - [10.1 Keywords (reserved positions)](#101-keywords-reserved-positions)
-  - [10.2 Valid Examples](#102-valid-examples)
-  - [10.3 Invalid Examples (and why)](#103-invalid-examples-and-why)
-  - [10.4 Test Case (second parameter)](#104-test-case-second-parameter)
-  - [10.5 Rationale](#105-rationale)
-- [11. Examples](#11-examples)
+- [10. Namespaces](#10-namespaces)
+- [11. Test Naming Guidelines](#11-test-naming-guidelines)
+  - [11.1 Keywords](#111-keywords)
+  - [11.2 Unit Tests](#112-unit-tests)
+    - [Naming Examples](#naming-examples)
+    - [File Naming](#file-naming)
+  - [11.3 Integration Tests](#113-integration-tests)
+    - [Naming Examples](#naming-examples-1)
+    - [File Naming](#file-naming-1)
+  - [11.4 Test Case Naming](#114-test-case-naming)
+  - [11.5 Rationale](#115-rationale)
+- [12. Examples](#12-examples)
   - [Class & File](#class--file)
   - [Interface](#interface)
   - [Constant & Enum](#constant--enum)
   - [Test (gtest)](#test-gtest)
-- [12. Decision Checklist](#12-decision-checklist)
-- [13. Deviation Process](#13-deviation-process)
-- [14. Automated Tooling](#14-automated-tooling)
-  - [14.1 Clang-Tidy Rules](#141-clang-tidy-rules)
-  - [14.2 Test Naming Enforcement Tool](#142-test-naming-enforcement-tool)
+- [13. Decision Checklist](#13-decision-checklist)
+- [14. Deviation Process](#14-deviation-process)
+- [15. Automated Tooling](#15-automated-tooling)
+  - [15.1 Clang-Tidy Rules](#151-clang-tidy-rules)
+  - [15.2 Test Naming Enforcement Tool](#152-test-naming-enforcement-tool)
 
 ## 1. Naming Summary
 
@@ -56,6 +62,11 @@ This document defines the canonical project-wide coding and test naming conventi
 ## 3. Functions
 
 - Use descriptive action-oriented verbs: `createPlan`, `finalizeConfig`, `launchKernels`.
+
+### 3.1 Unused Function Arguments
+
+- Prefer use of `[[maybe_unused]]` rather than commenting-out argument names or using std::ignore
+  - Exception is for arguments that *shall not* be used, such as the case in a legacy version of a method that has an argument that is no longer relevant and shouldn't be used.  In this case, comment-out the argument name and leave a comment indicating the reason.
 
 ## 4. Variables
 
@@ -102,63 +113,73 @@ If later you add invariants or non-trivial behavior, consider converting to a cl
 - UPPER_CASE with optional single underscores: `DEFAULT_ALIGNMENT`, `MAX_TENSOR_RANK`.
 - Prefer `constexpr` over macros when possible.
 
-## 10. Test Naming Guidelines
+## 10. Namespaces
+
+- lower_snake_case with single underscores
+- Most code should fit generally within a few namespaces
+  - `hipdnn_<component>`: (eg. hipdnn_frontend) Contains all basic code required for the component
+    - `utilities`: Contains code that can aid and assist in using component code
+    - `test_utilities`: Contains code that can aid and assist in testing component code
+
+## 11. Test Naming Guidelines
 
 GoogleTest reserves underscores in test suite and test names for future expansion. Current repository names with underscores risk future incompatibility; we proactively constrain test suite naming.
 
-Rules below apply ONLY to the TestSuite name (first parameter of `TEST` / `TEST_F`). The TestCase (second parameter) can be descriptive but should still avoid the reserved keywords where noted.
+Rules below apply ONLY to the TestSuite name (first parameter of `TEST` / `TEST_F` / `TEST_P`). The TestCase (second parameter) can be descriptive but should still avoid the reserved keywords where noted.  When writing parameterized tests the prefix(parameter name is `InstantiationName`) in the `INSTANTIATE_TEST_SUITE_P` macro can be left blank or used for another purpose that make sense for that test.
 
-**Ordering & Composition (left → right):**
+### 11.1 Keywords
 
-1. Optional `Integration` prefix for integration tests.
-2. Optional `Gpu` (immediately after `Integration` if both apply) for GPU-required tests.
-3. Core Feature / Subject under test (PascalCase, no underscores).
-4. Optional Shape/Layout token(s) (e.g. `Nhwc`, `Nchw`) BEFORE datatype if datatype is present.
-5. Optional Datatype token (`Bfp16`, `Fp16`, `Float`) at the end.
+- **Integration**: Only for integration tests, always first if present
+- **Test**: Mainly for unit tests, always first if test is not an Integration test.
+- **Gpu**: Optional after Integration or Test but before suite name if the test needs Gpu support.
+- **Datatypes**: Bfp16, Fp16, Fp32. Always last if present.
 
-Omit any category that does not apply.
+### 11.2 Unit Tests
 
-### 10.1 Keywords (reserved positions)
+In most cases unit style tests should be named so the directly mirror the class under test.  If the class is named `MyClass`, then the test suite should be named `TestMyClass`.  In general these kinds of tests should try to avoid using anything that requires Gpu support.  This is not always possible, in the cases where Gpu support is required, the test suite should be named `TestGpuMyClass`.
 
-- **Integration** (only for integration tests, always first if present).
-- **Gpu** (always first unless preceded by Integration).
-- **Datatypes**: Bfp16, Fp16, Float.
-- **Layout / Shape** (examples): Nchw, Nhwc (optional).
-
-### 10.2 Valid Examples
+#### Naming Examples
 
 ```cpp
-IntegrationGpuConvolutionPlannerNchwFloat
-GpuActivationKernelNchwFloat
-GpuExecutionPlanBuilderFloat
-GpuExecutionPlanBuilderNchw
-IntegrationGraphFusion
-ConvolutionHeuristicsFloat
-ConvolutionHeuristics
+TestBackendLogger
+TestHandle
+TestGpuHandle
+TestBatchnormBwdPlan
+TestBatchnormBwdPlanFp32
+TestBatchnormBwdPlanFp16
 ```
 
-### 10.3 Invalid Examples (and why)
+#### File Naming
+The test file name should mirror the primary test suite it contains.  For example, if the main test in a suite is `TestMyClass`, the file should be named `TestMyClass.cpp`.  That same file may also contain `TestGpuMyClass` but it is not the primary test suite so the file name does not need to reflect it.
 
-| Name | Issue |
-|------|-------|
-| GpuIntegrationConvolution | Wrong order; Integration must precede Gpu |
-| ConvolutionFloatNchw | Layout must precede datatype |
-| IntegrationConvolutionGpuFloat | Gpu must directly follow Integration |
-| Gpu_Convolution | Underscore not allowed |
-| GpuConvolutionFP16 | Datatype token must match exact casing `Fp16` |
+### 11.3 Integration Tests
 
-### 10.4 Test Case (second parameter)
+See [TestingStrategy.md](testing/TestingStrategy.md) for more information on integration tests. Integration tests should be named to reflect the feature or component under test.
 
-May be richly descriptive: `HandlesLargeStride`, `RejectsMismatchedLayouts`. Avoid duplicating suite-level keywords (`Integration`, `Gpu`, datatype tokens) redundantly inside the test case name unless clarity requires.
+#### Naming Examples
 
-### 10.5 Rationale
+```cpp
+IntegrationGpuBatchnormBackwardNchwFp32
+IntegrationGpuBatchnormBackwardNchwBfp16
+IntegrationGpuBatchnormBackwardNchwFp16
+IntegrationGraphFusion
+```
+
+#### File Naming
+For integration tests, the main test suite might be named `IntegrationGpuFeatureX` but have several child suites like `IntegrationGpuFeatureXFp32` and `IntegrationGpuFeatureXBfp16`. The parent suite name is the primary suite, so the file name should be `IntegrationGpuFeatureX.cpp`. 
+
+### 11.4 Test Case Naming
+
+May be richly descriptive `HandlesLargeStride`, `RejectsMismatchedLayouts` or very simple `Correctness`, `Accuracy`. Avoid duplicating suite-level keywords (`Integration`, `Gpu`, datatype tokens) redundantly inside the test case name.  The test case name is the preferred place to list the shape/layout variant being tested (e.g. `Nchw`, `Nhwc`).  In general there should not be duplication across the suite name and test case name.  Otherwise the naming of the test case is entirely up to the developer.
+
+### 11.5 Rationale
 
 - Ordering enforces quick visual parsing (environment → scope → subject → specialization).
 - Avoid underscores to remain future-proof with gtest evolution.
 - Suffix datatype to emphasize functional context before precision variant.
-- Consistent pattern simplifies filtering (e.g. `--gtest_filter=Gpu*Float`).
+- Consistent pattern simplifies filtering (e.g. `--gtest_filter=*Gpu*Fp32`).
 
-## 11. Examples
+## 12. Examples
 
 ### Class & File
 
@@ -203,20 +224,19 @@ constexpr size_t MAX_WORKSPACE_BYTES = 1ull << 32;
 ### Test (gtest)
 
 ```cpp
-TEST(GpuConvolutionPlannerNchwFloat, HandlesLargeKernels) {
+TEST(IntegrationGpuGraphFusionFp32, FusesThreeSequentialOps) {
+    // ...
+}
+TEST(IntegrationGpuGraphFusionBfp16, FusesThreeSequentialOps) {
     // ...
 }
 
-TEST(IntegrationGpuGraphFusionFloat, FusesThreeSequentialOps) {
-    // ...
-}
-
-TEST(ConvolutionHeuristics, ChoosesDeterministicPath) {
+TEST(TestExecutionPlan, BuildsGraphCorrectly) {
     // ...
 }
 ```
 
-## 12. Decision Checklist
+## 13. Decision Checklist
 
 When adding new code, verify:
 - Names follow the table in Section 1.
@@ -225,21 +245,21 @@ When adding new code, verify:
 - Layout tokens appear before datatype tokens when both used.
 - No stray underscores in test suite names.
 
-## 13. Deviation Process
+## 14. Deviation Process
 
 If an external API or standard library interop forces divergence (e.g., fixed enum value names), document the exception with a brief comment near the declaration.
 
-## 14. Automated Tooling
+## 15. Automated Tooling
 
 The repository includes automated tooling to enforce coding standards and maintain consistency across the codebase.
 
-### 14.1 Clang-Tidy Rules
+### 15.1 Clang-Tidy Rules
 
 The project uses clang-tidy to automatically enforce many of the coding style guidelines defined in this document. The configuration can be found in `.clang-tidy` at the repository root.
 
 The CI pipeline automatically runs clang-tidy on all pull requests to ensure compliance before merging.
 
-### 14.2 Test Naming Enforcement Tool
+### 15.2 Test Naming Enforcement Tool
 
 *[Placeholder: A dedicated test naming enforcement tool is planned to automatically validate that all test names follow the conventions outlined in Section 10]*
 

@@ -20,7 +20,7 @@ set_target_properties(FlatBuffers PROPERTIES
 
 set(HIP_DNN_SDK_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include")
 
-set(SCHEMA_FILES 
+set(SCHEMA_FILES
     schemas/batchnorm_attributes.fbs
     schemas/batchnorm_backward_attributes.fbs
     schemas/batchnorm_inference_attributes.fbs
@@ -36,14 +36,14 @@ _save_var(FLATBUFFERS_FLATC_SCHEMA_EXTRA_ARGS)
 
 SET(FLATBUFFERS_FLATC_SCHEMA_EXTRA_ARGS "--gen-object-api;--gen-mutable;--gen-compare;--defaults-json")
 build_flatbuffers(
-    "${SCHEMA_FILES}" 
-    "" 
-    generate_hipdnn_sdk_headers 
-    "" 
-    ${HIP_DNN_SDK_INCLUDE_DIR}/hipdnn_sdk/data_objects 
-    "" 
-    ""
-) 
+    "${SCHEMA_FILES}" #flatbuffers_schemas
+    "" # schema_include_dirs
+    generate_hipdnn_sdk_headers  #custom_target_name
+    "" # additional_dependencies
+    ${HIP_DNN_SDK_INCLUDE_DIR}/hipdnn_sdk/data_objects  # generated_includes_dir
+    ""  # binary_schemas_dir
+    "" #copy_text_schemas_dir
+)
 
 # Flatc build has some warnings that trigger and print to the console.  Since we dont want these we can
 # suppress all warnings by using the -w compile flag.  This command prepends -w to the compile flats for
@@ -57,15 +57,25 @@ hipdnn_add_dependency(spdlog VERSION 1.15.2)
 
 add_library(hipdnn_sdk INTERFACE)
 target_link_libraries(hipdnn_sdk INTERFACE FlatBuffers spdlog_header_only)
+add_dependencies(hipdnn_sdk generate_hipdnn_sdk_headers)
 
 target_include_directories(hipdnn_sdk INTERFACE
     $<BUILD_INTERFACE:${HIP_DNN_SDK_INCLUDE_DIR}>
     $<INSTALL_INTERFACE:${HIP_DNN_SDK_INSTALL_INCLUDE_DIR}>
 )
 
-install( 
+# This is required to use hip/hip_fp16.h and hip/hip_bfloat16.h in any code that includes the sdk
+# By doing this, we don't need to link to hip::device
+target_compile_definitions(hipdnn_sdk INTERFACE __HIPCC__)
+
+install(
     TARGETS hipdnn_sdk FlatBuffers spdlog_header_only
     EXPORT hipdnn_sdk_targets
+)
+
+export(
+    TARGETS hipdnn_sdk FlatBuffers spdlog_header_only
+    FILE  ${CMAKE_BINARY_DIR}/lib/cmake/hipdnn_sdk/hipdnn_sdkConfig.cmake
 )
 
 #todo, get spdlog to install its headers
@@ -75,7 +85,7 @@ install(
 )
 
 install(EXPORT hipdnn_sdk_targets
-    DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/cmake/hipdnn_sdk
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/hipdnn_sdk
     FILE hipdnn_sdkConfig.cmake
 )
 

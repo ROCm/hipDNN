@@ -23,7 +23,7 @@ private:
     static void logBackendError([[maybe_unused]] const std::string& errorString,
                                 [[maybe_unused]] const hipdnnStatus_t status)
     {
-        std::array<char, HIPDNN_MAX_ERROR_STRING_SIZE> backendErrMsg;
+        std::array<char, HIPDNN_ERROR_STRING_MAX_LENGTH> backendErrMsg;
         hipdnn_frontend::hipdnnBackend()->getLastErrorString(backendErrMsg.data(),
                                                              backendErrMsg.size());
         HIPDNN_LOG_ERROR(

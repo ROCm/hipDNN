@@ -7,13 +7,13 @@
 using namespace hipdnn_frontend;
 using namespace hipdnn_frontend::graph;
 
-TEST(PointwiseAttributesTests, CreatePointwiseAttributes)
+TEST(TestPointwiseAttributes, CreatePointwiseAttributes)
 {
     PointwiseAttributes pointwiseAttributes;
 
     pointwiseAttributes.set_input_0(std::make_shared<TensorAttributes>());
     pointwiseAttributes.set_output_0(std::make_shared<TensorAttributes>());
-    pointwiseAttributes.set_mode(PointwiseMode_t::RELU_FWD)
+    pointwiseAttributes.set_mode(PointwiseMode::RELU_FWD)
         .set_relu_lower_clip(0.1f)
         .set_relu_upper_clip(6.0f)
         .set_relu_lower_clip_slope(0.01f)
@@ -24,7 +24,7 @@ TEST(PointwiseAttributesTests, CreatePointwiseAttributes)
 
     inputTensor->set_uid(1)
         .set_name("InputTensor")
-        .set_data_type(DataType_t::FLOAT)
+        .set_data_type(DataType::FLOAT)
         .set_dim({1, 2, 3, 4})
         .set_stride({5, 6, 7, 8});
 
@@ -33,49 +33,49 @@ TEST(PointwiseAttributesTests, CreatePointwiseAttributes)
 
     outputTensor->set_uid(2)
         .set_name("OutputTensor")
-        .set_data_type(DataType_t::HALF)
+        .set_data_type(DataType::HALF)
         .set_dim({5, 6, 7, 8})
         .set_stride({1, 2, 3, 4});
 
     EXPECT_EQ(inputTensor->get_uid(), 1);
     EXPECT_EQ(inputTensor->get_name(), "InputTensor");
-    EXPECT_EQ(inputTensor->get_data_type(), DataType_t::FLOAT);
+    EXPECT_EQ(inputTensor->get_data_type(), DataType::FLOAT);
     EXPECT_EQ(inputTensor->get_dim(), (std::vector<int64_t>{1, 2, 3, 4}));
     EXPECT_EQ(inputTensor->get_stride(), (std::vector<int64_t>{5, 6, 7, 8}));
 
     EXPECT_EQ(outputTensor->get_uid(), 2);
     EXPECT_EQ(outputTensor->get_name(), "OutputTensor");
-    EXPECT_EQ(outputTensor->get_data_type(), DataType_t::HALF);
+    EXPECT_EQ(outputTensor->get_data_type(), DataType::HALF);
     EXPECT_EQ(outputTensor->get_dim(), (std::vector<int64_t>{5, 6, 7, 8}));
     EXPECT_EQ(outputTensor->get_stride(), (std::vector<int64_t>{1, 2, 3, 4}));
 
-    EXPECT_EQ(pointwiseAttributes.get_mode(), PointwiseMode_t::RELU_FWD);
+    EXPECT_EQ(pointwiseAttributes.get_mode(), PointwiseMode::RELU_FWD);
     EXPECT_EQ(pointwiseAttributes.get_relu_lower_clip(), 0.1f);
     EXPECT_EQ(pointwiseAttributes.get_relu_upper_clip(), 6.0f);
     EXPECT_EQ(pointwiseAttributes.get_relu_lower_slope(), 0.01f);
     EXPECT_EQ(pointwiseAttributes.get_axis(), 1);
 }
 
-TEST(PointwiseAttributesTests, CreatePointwiseAttributesWithTwoInputs)
+TEST(TestPointwiseAttributes, CreatePointwiseAttributesWithTwoInputs)
 {
     PointwiseAttributes pointwiseAttributes;
 
     pointwiseAttributes.set_input_0(std::make_shared<TensorAttributes>());
     pointwiseAttributes.set_input_1(std::make_shared<TensorAttributes>());
     pointwiseAttributes.set_output_0(std::make_shared<TensorAttributes>());
-    pointwiseAttributes.set_mode(PointwiseMode_t::RELU_FWD);
+    pointwiseAttributes.set_mode(PointwiseMode::RELU_FWD);
 
     auto inputTensor0 = pointwiseAttributes.get_input_0();
     inputTensor0->set_uid(1)
         .set_name("InputTensor0")
-        .set_data_type(DataType_t::FLOAT)
+        .set_data_type(DataType::FLOAT)
         .set_dim({1, 2, 3, 4})
         .set_stride({5, 6, 7, 8});
 
     auto inputTensor1 = pointwiseAttributes.get_input_1();
     inputTensor1->set_uid(2)
         .set_name("InputTensor1")
-        .set_data_type(DataType_t::FLOAT)
+        .set_data_type(DataType::FLOAT)
         .set_dim({1, 2, 3, 4})
         .set_stride({5, 6, 7, 8});
 
@@ -88,10 +88,10 @@ TEST(PointwiseAttributesTests, CreatePointwiseAttributesWithTwoInputs)
     EXPECT_EQ(inputTensor1->get_name(), "InputTensor1");
     EXPECT_EQ(outputTensor->get_uid(), 3);
     EXPECT_EQ(outputTensor->get_name(), "OutputTensor");
-    EXPECT_EQ(pointwiseAttributes.get_mode(), PointwiseMode_t::RELU_FWD);
+    EXPECT_EQ(pointwiseAttributes.get_mode(), PointwiseMode::RELU_FWD);
 }
 
-TEST(PointwiseAttributesTests, SetInput0WithMove)
+TEST(TestPointwiseAttributes, SetInput0WithMove)
 {
     PointwiseAttributes pointwiseAttributes;
 
@@ -110,7 +110,7 @@ TEST(PointwiseAttributesTests, SetInput0WithMove)
     EXPECT_EQ(retrieved.get(), rawPtr);
 }
 
-TEST(PointwiseAttributesTests, SetInput1WithMove)
+TEST(TestPointwiseAttributes, SetInput1WithMove)
 {
     PointwiseAttributes pointwiseAttributes;
 
@@ -129,7 +129,7 @@ TEST(PointwiseAttributesTests, SetInput1WithMove)
     EXPECT_EQ(retrieved.get(), rawPtr);
 }
 
-TEST(PointwiseAttributesTests, SetInput2WithMove)
+TEST(TestPointwiseAttributes, SetInput2WithMove)
 {
     PointwiseAttributes pointwiseAttributes;
 
@@ -148,7 +148,7 @@ TEST(PointwiseAttributesTests, SetInput2WithMove)
     EXPECT_EQ(retrieved.get(), rawPtr);
 }
 
-TEST(PointwiseAttributesTests, SetOutput0WithMove)
+TEST(TestPointwiseAttributes, SetOutput0WithMove)
 {
     PointwiseAttributes pointwiseAttributes;
 
@@ -169,7 +169,7 @@ TEST(PointwiseAttributesTests, SetOutput0WithMove)
 
 // Simplified move tests - testing move semantics without setting uid/name
 
-TEST(PointwiseAttributesTests, SimplifiedSetInput0WithMove)
+TEST(TestPointwiseAttributes, SimplifiedSetInput0WithMove)
 {
     PointwiseAttributes pointwiseAttributes;
 
@@ -180,7 +180,7 @@ TEST(PointwiseAttributesTests, SimplifiedSetInput0WithMove)
     EXPECT_NE(pointwiseAttributes.get_input_0(), nullptr);
 }
 
-TEST(PointwiseAttributesTests, SimplifiedSetInput1WithMove)
+TEST(TestPointwiseAttributes, SimplifiedSetInput1WithMove)
 {
     PointwiseAttributes pointwiseAttributes;
 
@@ -191,7 +191,7 @@ TEST(PointwiseAttributesTests, SimplifiedSetInput1WithMove)
     EXPECT_NE(pointwiseAttributes.get_input_1(), nullptr);
 }
 
-TEST(PointwiseAttributesTests, SimplifiedSetInput2WithMove)
+TEST(TestPointwiseAttributes, SimplifiedSetInput2WithMove)
 {
     PointwiseAttributes pointwiseAttributes;
 
@@ -202,7 +202,7 @@ TEST(PointwiseAttributesTests, SimplifiedSetInput2WithMove)
     EXPECT_NE(pointwiseAttributes.get_input_2(), nullptr);
 }
 
-TEST(PointwiseAttributesTests, SimplifiedSetOutput0WithMove)
+TEST(TestPointwiseAttributes, SimplifiedSetOutput0WithMove)
 {
     PointwiseAttributes pointwiseAttributes;
 
@@ -213,7 +213,7 @@ TEST(PointwiseAttributesTests, SimplifiedSetOutput0WithMove)
     EXPECT_NE(pointwiseAttributes.get_output_0(), nullptr);
 }
 
-TEST(PointwiseAttributesTests, CreatePointwiseAttributesWithThreeInputs)
+TEST(TestPointwiseAttributes, CreatePointwiseAttributesWithThreeInputs)
 {
     PointwiseAttributes pointwiseAttributes;
 
@@ -221,26 +221,26 @@ TEST(PointwiseAttributesTests, CreatePointwiseAttributesWithThreeInputs)
     pointwiseAttributes.set_input_1(std::make_shared<TensorAttributes>());
     pointwiseAttributes.set_input_2(std::make_shared<TensorAttributes>());
     pointwiseAttributes.set_output_0(std::make_shared<TensorAttributes>());
-    pointwiseAttributes.set_mode(PointwiseMode_t::RELU_FWD);
+    pointwiseAttributes.set_mode(PointwiseMode::RELU_FWD);
 
     auto inputTensor0 = pointwiseAttributes.get_input_0();
     inputTensor0->set_uid(1)
         .set_name("InputTensor0")
-        .set_data_type(DataType_t::FLOAT)
+        .set_data_type(DataType::FLOAT)
         .set_dim({1, 2, 3, 4})
         .set_stride({5, 6, 7, 8});
 
     auto inputTensor1 = pointwiseAttributes.get_input_1();
     inputTensor1->set_uid(2)
         .set_name("InputTensor1")
-        .set_data_type(DataType_t::FLOAT)
+        .set_data_type(DataType::FLOAT)
         .set_dim({1, 2, 3, 4})
         .set_stride({5, 6, 7, 8});
 
     auto inputTensor2 = pointwiseAttributes.get_input_2();
     inputTensor2->set_uid(3)
         .set_name("InputTensor2")
-        .set_data_type(DataType_t::FLOAT)
+        .set_data_type(DataType::FLOAT)
         .set_dim({1, 2, 3, 4})
         .set_stride({5, 6, 7, 8});
 
@@ -255,5 +255,5 @@ TEST(PointwiseAttributesTests, CreatePointwiseAttributesWithThreeInputs)
     EXPECT_EQ(inputTensor2->get_name(), "InputTensor2");
     EXPECT_EQ(outputTensor->get_uid(), 4);
     EXPECT_EQ(outputTensor->get_name(), "OutputTensor");
-    EXPECT_EQ(pointwiseAttributes.get_mode(), PointwiseMode_t::RELU_FWD);
+    EXPECT_EQ(pointwiseAttributes.get_mode(), PointwiseMode::RELU_FWD);
 }
