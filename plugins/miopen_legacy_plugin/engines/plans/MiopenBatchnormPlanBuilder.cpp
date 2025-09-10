@@ -14,11 +14,9 @@
 namespace miopen_legacy_plugin
 {
 
-bool MiopenBatchnormPlanBuilder::isApplicable(const HipdnnEnginePluginHandle& handle,
+bool MiopenBatchnormPlanBuilder::isApplicable([[maybe_unused]] const HipdnnEnginePluginHandle& handle,
                                               const hipdnn_plugin::IGraph& opGraph) const
 {
-    std::ignore = handle;
-
     if(opGraph.nodeCount() != 1)
     {
         HIPDNN_LOG_INFO(
