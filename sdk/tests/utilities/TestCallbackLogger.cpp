@@ -17,7 +17,7 @@ static std::mutex s_logMutex; //NOLINT
 
 // Custom callback for testing. It doesn't fully simulate the real logging behavior,
 // but the backend tests use the true callback function. The test could use the backend callback, but then it has to link against the backend.
-void testLoggingCallback(hipdnnSeverity_t severity [[maybe_unused]], const char* msg)
+void testLoggingCallback([[maybe_unused]] hipdnnSeverity_t severity, const char* msg)
 {
     std::lock_guard<std::mutex> lock(s_logMutex);
     if(msg != nullptr)

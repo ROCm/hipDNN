@@ -78,7 +78,7 @@ DataType getDataTypeEnumFromType()
     }
 }
 
-[[maybe_unused]] static hipdnn_sdk::data_objects::ConvMode toSdkType(const ConvolutionMode& type)
+inline hipdnn_sdk::data_objects::ConvMode toSdkType(const ConvolutionMode& type)
 {
     switch(type)
     {
@@ -91,7 +91,7 @@ DataType getDataTypeEnumFromType()
     }
 }
 
-[[maybe_unused]] static hipdnn_sdk::data_objects::DataType toSdkType(const DataType& type)
+inline hipdnn_sdk::data_objects::DataType toSdkType(const DataType& type)
 {
     switch(type)
     {
@@ -112,7 +112,7 @@ DataType getDataTypeEnumFromType()
     }
 }
 
-[[maybe_unused]] static hipdnn_sdk::data_objects::PointwiseMode toSdkType(const PointwiseMode& type)
+inline hipdnn_sdk::data_objects::PointwiseMode toSdkType(const PointwiseMode& type)
 {
     switch(type)
     {
@@ -123,7 +123,7 @@ DataType getDataTypeEnumFromType()
     }
 }
 
-[[maybe_unused]] static hipdnnBackendHeurMode_t toBackendType(const HeuristicMode& type)
+inline hipdnnBackendHeurMode_t toBackendType(const HeuristicMode& type)
 {
     switch(type)
     {
@@ -135,7 +135,7 @@ DataType getDataTypeEnumFromType()
 }
 
 // NOLINTNEXTLINE(readability-identifier-naming)
-[[maybe_unused]] static const char* to_string(const DataType& type)
+inline const char* to_string(const DataType& type)
 {
     switch(type)
     {
@@ -156,7 +156,7 @@ DataType getDataTypeEnumFromType()
     }
 }
 
-[[maybe_unused]] static std::ostream& operator<<(std::ostream& os, const DataType& type)
+inline std::ostream& operator<<(std::ostream& os, const DataType& type)
 {
     return os << to_string(type);
 }
