@@ -9,9 +9,9 @@
 #include <hipdnn_sdk/data_objects/tensor_attributes_generated.h>
 #include <hipdnn_sdk/test_utilities/CpuFpReferenceBatchnorm.hpp>
 #include <hipdnn_sdk/test_utilities/CpuFpReferenceConvolution.hpp>
-#include <hipdnn_sdk/utilities/UtilsFp16.hpp>
-#include <hipdnn_sdk/utilities/UtilsBfp16.hpp>
 #include <hipdnn_sdk/utilities/Tensor.hpp>
+#include <hipdnn_sdk/utilities/UtilsBfp16.hpp>
+#include <hipdnn_sdk/utilities/UtilsFp16.hpp>
 #include <iostream>
 #include <memory>
 #include <stdexcept>
@@ -97,9 +97,12 @@ struct CpuImplTraits;
         using type = ImplClass<ComputeT, IntermediateT, IoT>;          \
     };
 
-DEFINE_CPU_IMPL_TRAITS(NodeAttributes_ConvolutionFwdAttributes, hipdnn_sdk::reference_test_utilities::CpuFpReferenceConvolutionImpl)
-DEFINE_CPU_IMPL_TRAITS(NodeAttributes_BatchnormInferenceAttributes, hipdnn_sdk::test_utilities::CpuFpReferenceBatchnormImpl)
-DEFINE_CPU_IMPL_TRAITS(NodeAttributes_BatchnormBackwardAttributes, hipdnn_sdk::test_utilities::CpuFpReferenceBatchnormImpl)
+DEFINE_CPU_IMPL_TRAITS(NodeAttributes_ConvolutionFwdAttributes,
+                       hipdnn_sdk::reference_test_utilities::CpuFpReferenceConvolutionImpl)
+DEFINE_CPU_IMPL_TRAITS(NodeAttributes_BatchnormInferenceAttributes,
+                       hipdnn_sdk::test_utilities::CpuFpReferenceBatchnormImpl)
+DEFINE_CPU_IMPL_TRAITS(NodeAttributes_BatchnormBackwardAttributes,
+                       hipdnn_sdk::test_utilities::CpuFpReferenceBatchnormImpl)
 
 #undef DEFINE_CPU_IMPL_TRAITS
 

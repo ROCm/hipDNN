@@ -225,13 +225,14 @@ protected:
     void runCpuBatchnormFwd(Batchnorm2dTensorBundle& cpuTensorBundle)
     {
         CpuReferenceContainer cpuRefImpl;
-        cpuRefImpl.batchnormFwdInference<InputType, IntermediateType, IntermediateType>(cpuTensorBundle.xTensor,
-                                         cpuTensorBundle.scaleTensor,
-                                         cpuTensorBundle.biasTensor,
-                                         cpuTensorBundle.meanTensor,
-                                         cpuTensorBundle.varianceTensor,
-                                         cpuTensorBundle.yTensor,
-                                         1e-3);
+        cpuRefImpl.batchnormFwdInference<InputType, IntermediateType, IntermediateType>(
+            cpuTensorBundle.xTensor,
+            cpuTensorBundle.scaleTensor,
+            cpuTensorBundle.biasTensor,
+            cpuTensorBundle.meanTensor,
+            cpuTensorBundle.varianceTensor,
+            cpuTensorBundle.yTensor,
+            1e-3);
     }
 
     void runBatchnormTest(InputType tolerance = 1e-4f,

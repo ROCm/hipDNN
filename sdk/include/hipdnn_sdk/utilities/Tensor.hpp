@@ -119,22 +119,25 @@ public:
     Tensor(Tensor&&) = default;
     Tensor& operator=(Tensor&&) = default;
 
-    const std::vector<int64_t>& dims() const override  // NOLINT(portability-template-virtual-member-function)
+    const std::vector<int64_t>&
+        dims() const override // NOLINT(portability-template-virtual-member-function)
     {
         return _dims;
     }
 
-    const std::vector<int64_t>& strides() const override  // NOLINT(portability-template-virtual-member-function)
+    const std::vector<int64_t>&
+        strides() const override // NOLINT(portability-template-virtual-member-function)
     {
         return _strides;
     }
 
-    const IMigratableMemory<T>& memory() const override  // NOLINT(portability-template-virtual-member-function)
+    const IMigratableMemory<T>&
+        memory() const override // NOLINT(portability-template-virtual-member-function)
     {
         return _memory;
     }
 
-    IMigratableMemory<T>& memory() override  // NOLINT(portability-template-virtual-member-function)
+    IMigratableMemory<T>& memory() override // NOLINT(portability-template-virtual-member-function)
     {
         return _memory;
     }

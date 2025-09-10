@@ -274,35 +274,26 @@ TEST_P(TestGpuMiopenBatchnormFwdInferenceExecuteGraphNchwFp64, DISABLED_Correctn
     deviceBuffers.push_back(generateEmptyDeviceBuffer(yTensor, 2));
 
     PinnedTensor<double> scaleTensor(derivedDims);
-    deviceBuffers.push_back(generateRandomDeviceBuffer(scaleTensor,
-                                                       3,
-                                                       static_cast<double>(0.0f),
-                                                       static_cast<double>(1.0f),
-                                                       seed));
+    deviceBuffers.push_back(generateRandomDeviceBuffer(
+        scaleTensor, 3, static_cast<double>(0.0f), static_cast<double>(1.0f), seed));
 
     PinnedTensor<double> biasTensor(derivedDims);
-    deviceBuffers.push_back(generateRandomDeviceBuffer(biasTensor,
-                                                       4,
-                                                       static_cast<double>(0.0f),
-                                                       static_cast<double>(1.0f),
-                                                       seed));
+    deviceBuffers.push_back(generateRandomDeviceBuffer(
+        biasTensor, 4, static_cast<double>(0.0f), static_cast<double>(1.0f), seed));
 
     PinnedTensor<double> meanTensor(derivedDims);
-    deviceBuffers.push_back(generateRandomDeviceBuffer(meanTensor,
-                                                       5,
-                                                       static_cast<double>(0.0f),
-                                                       static_cast<double>(1.0f),
-                                                       seed));
+    deviceBuffers.push_back(generateRandomDeviceBuffer(
+        meanTensor, 5, static_cast<double>(0.0f), static_cast<double>(1.0f), seed));
 
     PinnedTensor<double> varianceTensor(derivedDims);
-    deviceBuffers.push_back(generateRandomDeviceBuffer(varianceTensor,
-                                                       6,
-                                                       static_cast<double>(0.1f),
-                                                       static_cast<double>(1.0f),
-                                                       seed));
+    deviceBuffers.push_back(generateRandomDeviceBuffer(
+        varianceTensor, 6, static_cast<double>(0.1f), static_cast<double>(1.0f), seed));
 
     auto batchnormBuilder = hipdnn_backend::test_utilities::createValidBatchnormGraph(
-        xTensor.strides(), xTensor.dims(), true, hipdnn_sdk::data_objects::DataType::DataType_DOUBLE);
+        xTensor.strides(),
+        xTensor.dims(),
+        true,
+        hipdnn_sdk::data_objects::DataType::DataType_DOUBLE);
 
     hipdnnPluginConstData_t opGraph;
     opGraph.ptr = batchnormBuilder.GetBufferPointer();
@@ -329,31 +320,26 @@ TEST_P(TestGpuMiopenBatchnormFwdInferenceExecuteGraphNchwFp64, DISABLED_Correctn
     hipdnnEnginePluginDestroyExecutionContext(_handle, executionContext);
 
     Tensor<double> xTensorCpu(dims, _layout);
-    xTensorCpu.fillWithRandomValues(
-        static_cast<double>(0.0f), static_cast<double>(1.0f), seed);
+    xTensorCpu.fillWithRandomValues(static_cast<double>(0.0f), static_cast<double>(1.0f), seed);
     Tensor<double> yTensorCpu(dims, _layout);
     Tensor<double> scaleTensorCpu(derivedDims);
-    scaleTensorCpu.fillWithRandomValues(
-        static_cast<double>(0.0f), static_cast<double>(1.0f), seed);
+    scaleTensorCpu.fillWithRandomValues(static_cast<double>(0.0f), static_cast<double>(1.0f), seed);
     Tensor<double> biasTensorCpu(derivedDims);
-    biasTensorCpu.fillWithRandomValues(
-        static_cast<double>(0.0f), static_cast<double>(1.0f), seed);
+    biasTensorCpu.fillWithRandomValues(static_cast<double>(0.0f), static_cast<double>(1.0f), seed);
     Tensor<double> meanTensorCpu(derivedDims);
-    meanTensorCpu.fillWithRandomValues(
-        static_cast<double>(0.0f), static_cast<double>(1.0f), seed);
+    meanTensorCpu.fillWithRandomValues(static_cast<double>(0.0f), static_cast<double>(1.0f), seed);
     Tensor<double> varianceTensorCpu(derivedDims);
     varianceTensorCpu.fillWithRandomValues(
         static_cast<double>(0.1f), static_cast<double>(1.0f), seed);
 
     CpuReferenceContainer cpuRefImpl;
-    cpuRefImpl.batchnormFwdInference<double, double, double>(
-        xTensorCpu,
-        scaleTensorCpu,
-        biasTensorCpu,
-        meanTensorCpu,
-        varianceTensorCpu,
-        yTensorCpu,
-        1e-3);
+    cpuRefImpl.batchnormFwdInference<double, double, double>(xTensorCpu,
+                                                             scaleTensorCpu,
+                                                             biasTensorCpu,
+                                                             meanTensorCpu,
+                                                             varianceTensorCpu,
+                                                             yTensorCpu,
+                                                             1e-3);
 
     CpuFpReferenceValidation<double> cpuRefValidation(1e-6, 1e-6);
     EXPECT_TRUE(cpuRefValidation.allClose(yTensorCpu.memory(), yTensor.memory()));
