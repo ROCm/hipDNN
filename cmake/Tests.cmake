@@ -117,9 +117,9 @@ function(_append_test_to_check_target_internal TARGET WORKING_DIR TEST_TYPE STAT
     
     set(NEW_COMMAND "")
     if("${${COMMAND_VAR}}" STREQUAL "")
-        set(NEW_COMMAND cd ${WORKING_DIR} && ${TEST_ENVIRONMENT} ${EXEC_PREFIX}${TARGET})
+        set(NEW_COMMAND ${TEST_ENVIRONMENT} ${CMAKE_BINARY_DIR}/bin/${TARGET})
     else()
-        set(NEW_COMMAND && cd ${WORKING_DIR} && ${TEST_ENVIRONMENT} ${EXEC_PREFIX}${TARGET})
+        set(NEW_COMMAND && ${TEST_ENVIRONMENT} ${CMAKE_BINARY_DIR}/bin/${TARGET})
     endif()
     
     set(${COMMAND_VAR} ${${COMMAND_VAR}} ${NEW_COMMAND} CACHE INTERNAL "${CACHE_DESC}" FORCE)
