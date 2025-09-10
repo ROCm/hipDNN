@@ -14,8 +14,9 @@
 namespace miopen_legacy_plugin
 {
 
-bool MiopenBatchnormPlanBuilder::isApplicable([[maybe_unused]] const HipdnnEnginePluginHandle& handle,
-                                              const hipdnn_plugin::IGraph& opGraph) const
+bool MiopenBatchnormPlanBuilder::isApplicable(
+    [[maybe_unused]] const HipdnnEnginePluginHandle& handle,
+    const hipdnn_plugin::IGraph& opGraph) const
 {
     if(opGraph.nodeCount() != 1)
     {
