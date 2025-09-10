@@ -189,7 +189,7 @@ hipdnnStatus_t hipdnnSetEnginePluginPaths_ext(
 #### Path Resolution
 
 Custom paths can be:
-- **Relative paths**: Resolved from the current working directory
+- **Relative paths**: Resolved from the backend shared library location
 - **Absolute paths**: Used as specified
 
 #### Loading Modes
@@ -205,7 +205,7 @@ Custom paths can be:
 // Add custom plugin directories
 const char* custom_paths[] = {
     "/home/user/my_plugins",        // Absolute path
-    "./local_plugins",              // Relative to working directory
+    "./local_plugins",              // Relative to backend shared library
     "/opt/custom/hipdnn/plugins"
 };
 

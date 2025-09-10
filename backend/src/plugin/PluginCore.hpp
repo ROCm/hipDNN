@@ -100,33 +100,6 @@ protected:
     {
     }
 
-    // TODO: figure out how to ignore cognitive complexity warnings induced by logging macros
-    std::set<std::filesystem::path> resolveDefaultPaths() const
-    {
-        std::filesystem::path baseDir;
-        try
-        {
-            baseDir = hipdnn_backend::platform_utilities::getCurrentModuleDirectory();
-        }
-        catch(const HipdnnException& e)
-        {
-            HIPDNN_LOG_WARN(
-                "Failed to resolve module directory, will use unresolved default paths: {}",
-                e.getMessage());
-            // Fallback to using original, unresolved paths. TODO: possibly remove.
-            return _defaultPluginPaths;
-        }
-
-        std::set<std::filesystem::path> resolvedPaths;
-
-        for(const auto& path : _defaultPluginPaths)
-        {
-            resolvedPaths.insert(path.is_relative() ? baseDir / path : path);
-        }
-
-        return resolvedPaths;
-    }
-
     // This function is called before adding a plugin to the plugin list.
     // The function must throw Hipdnn_exception if the plugin is not valid.
     virtual void validateBeforeAdding([[maybe_unused]] const Plugin& plugin) {}
@@ -140,24 +113,22 @@ public:
     virtual void loadPlugins(const std::set<std::filesystem::path>& customPaths,
                              hipdnnPluginLoadingMode_ext_t mode)
     {
-        std::set<std::filesystem::path> pathsToLoad;
+        std::set<std::filesystem::path> pathsToProcess;
 
         if(mode == HIPDNN_PLUGIN_LOADING_ADDITIVE)
         {
-            // Default paths are resolved relative to the shared libary path, and are therefore handled separately.
-            auto defaultPaths = resolveDefaultPaths();
-            for(const auto& path : defaultPaths)
-            {
-                HIPDNN_LOG_INFO("Scanning default plugin path: {}", path.string());
-
-                if(std::filesystem::is_directory(path))
-                {
-                    scanDirectoryForPlugins(path, pathsToLoad);
-                }
-            }
+            pathsToProcess.insert(_defaultPluginPaths.begin(), _defaultPluginPaths.end());
         }
 
-        for(const auto& path : customPaths)
+        pathsToProcess.insert(customPaths.begin(), customPaths.end());
+
+        if(mode == HIPDNN_PLUGIN_LOADING_ABSOLUTE)
+        {
+            clearPlugins();
+        }
+
+        std::set<std::filesystem::path> filesToLoad;
+        for(const auto& path : pathsToProcess)
         {
             try
             {
@@ -171,14 +142,15 @@ public:
                 }
 
                 resolvedPath = std::filesystem::weakly_canonical(resolvedPath);
+
                 if(std::filesystem::is_directory(resolvedPath))
                 {
-                    scanDirectoryForPlugins(resolvedPath, pathsToLoad);
+                    scanDirectoryForPlugins(resolvedPath, filesToLoad);
                 }
                 // Cannot necessarily check that a custom file path exists, because it can be platform opaque
                 else if(!resolvedPath.filename().empty())
                 {
-                    pathsToLoad.insert(resolvedPath);
+                    filesToLoad.insert(resolvedPath);
                 }
                 else
                 {
@@ -189,19 +161,13 @@ public:
             }
             catch(const std::filesystem::filesystem_error& e)
             {
-                HIPDNN_LOG_ERROR(
-                    "Error resolving custom plugin path '{}': {}", path.string(), e.what());
+                HIPDNN_LOG_ERROR("Error resolving plugin path '{}': {}", path.string(), e.what());
             }
         }
 
-        if(mode == HIPDNN_PLUGIN_LOADING_ABSOLUTE)
+        for(const auto& filePath : filesToLoad)
         {
-            clearPlugins();
-        }
-
-        for(const auto& path : pathsToLoad)
-        {
-            loadPluginFromFile(path);
+            loadPluginFromFile(filePath);
         }
     }
 
