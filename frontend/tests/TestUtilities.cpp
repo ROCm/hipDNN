@@ -4,7 +4,7 @@
 #include <gtest/gtest.h>
 #include <hipdnn_frontend/Error.hpp>
 #include <hipdnn_frontend/Utilities.hpp>
-#include <hipdnn_sdk/test_utilities/EnvironmentVariableGuard.hpp>
+#include <hipdnn_sdk/test_utilities/ScopedEnvironmentVariableSetter.hpp>
 #include <hipdnn_sdk/utilities/PlatformUtils.hpp>
 
 using namespace hipdnn_frontend;
@@ -51,7 +51,7 @@ TEST(TestUtilities, FindCommonShapeSingleInput)
 
 TEST(TestUtilities, InitializeFrontendLoggingReturnsCorrectly)
 {
-    EnvironmentVariableGuard guard("HIPDNN_LOG_LEVEL");
+    ScopedEnvironmentVariableSetter guard("HIPDNN_LOG_LEVEL");
 
     hipdnn_sdk::utilities::setEnv("HIPDNN_LOG_LEVEL", "info");
     EXPECT_EQ(hipdnn_frontend::initializeFrontendLogging(nullptr), -1);

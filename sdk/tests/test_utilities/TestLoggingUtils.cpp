@@ -4,7 +4,7 @@
 #include <gtest/gtest.h>
 #include <hipdnn_sdk/logging/ComponentFormatter.hpp>
 #include <hipdnn_sdk/logging/LoggingUtils.hpp>
-#include <hipdnn_sdk/test_utilities/EnvironmentVariableGuard.hpp>
+#include <hipdnn_sdk/test_utilities/ScopedEnvironmentVariableSetter.hpp>
 #include <hipdnn_sdk/utilities/PlatformUtils.hpp>
 #include <spdlog/details/log_msg.h>
 #include <spdlog/pattern_formatter.h>
@@ -40,7 +40,7 @@ TEST(TestLoggingUtils, IsValidLogLevelWithInvalidLevels)
 
 TEST(TestLoggingUtils, IsLoggingEnabledWithValidLevels)
 {
-    EnvironmentVariableGuard guard("HIPDNN_LOG_LEVEL");
+    ScopedEnvironmentVariableSetter guard("HIPDNN_LOG_LEVEL");
 
     hipdnn_sdk::utilities::setEnv("HIPDNN_LOG_LEVEL", "off");
     EXPECT_FALSE(isLoggingEnabled());
@@ -54,7 +54,7 @@ TEST(TestLoggingUtils, IsLoggingEnabledWithValidLevels)
 
 TEST(TestLoggingUtils, IsLoggingEnabledWithInvalidOrUnsetLevels)
 {
-    EnvironmentVariableGuard guard("HIPDNN_LOG_LEVEL");
+    ScopedEnvironmentVariableSetter guard("HIPDNN_LOG_LEVEL");
 
     hipdnn_sdk::utilities::setEnv("HIPDNN_LOG_LEVEL", "invalid");
     EXPECT_FALSE(isLoggingEnabled());

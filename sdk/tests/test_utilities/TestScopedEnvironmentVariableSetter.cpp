@@ -2,12 +2,12 @@
 // SPDX-License-Identifier:  MIT
 
 #include <gtest/gtest.h>
-#include <hipdnn_sdk/test_utilities/EnvironmentVariableGuard.hpp>
+#include <hipdnn_sdk/test_utilities/ScopedEnvironmentVariableSetter.hpp>
 #include <hipdnn_sdk/utilities/PlatformUtils.hpp>
 
 using namespace hipdnn_sdk::test_utilities;
 
-TEST(TestEnvironmentVariableGuard, RestoresOriginalValue)
+TEST(TestScopedEnvironmentVariableSetter, RestoresOriginalValue)
 {
     const char* testVar = "HIPDNN_TEST_ENV_VAR";
     const char* originalValue = "original";
@@ -16,7 +16,7 @@ TEST(TestEnvironmentVariableGuard, RestoresOriginalValue)
     hipdnn_sdk::utilities::setEnv(testVar, originalValue);
 
     {
-        EnvironmentVariableGuard guard(testVar);
+        ScopedEnvironmentVariableSetter guard(testVar);
 
         hipdnn_sdk::utilities::setEnv(testVar, newValue);
 
@@ -28,14 +28,14 @@ TEST(TestEnvironmentVariableGuard, RestoresOriginalValue)
     hipdnn_sdk::utilities::unsetEnv(testVar);
 }
 
-TEST(TestEnvironmentVariableGuard, RestoresUnsetVariable)
+TEST(TestScopedEnvironmentVariableSetter, RestoresUnsetVariable)
 {
     const char* testVar = "HIPDNN_TEST_ENV_VAR_UNSET";
 
     hipdnn_sdk::utilities::unsetEnv(testVar);
 
     {
-        EnvironmentVariableGuard guard(testVar);
+        ScopedEnvironmentVariableSetter guard(testVar);
 
         hipdnn_sdk::utilities::setEnv(testVar, "temporary");
 
@@ -46,14 +46,14 @@ TEST(TestEnvironmentVariableGuard, RestoresUnsetVariable)
     EXPECT_TRUE(hipdnn_sdk::utilities::getEnv(testVar).empty());
 }
 
-TEST(TestEnvironmentVariableGuard, HandlesEmptyValue)
+TEST(TestScopedEnvironmentVariableSetter, HandlesEmptyValue)
 {
     const char* testVar = "HIPDNN_TEST_ENV_VAR_EMPTY";
 
     hipdnn_sdk::utilities::setEnv(testVar, "");
 
     {
-        EnvironmentVariableGuard guard(testVar);
+        ScopedEnvironmentVariableSetter guard(testVar);
 
         hipdnn_sdk::utilities::setEnv(testVar, "non-empty");
 
