@@ -68,6 +68,8 @@ target_include_directories(hipdnn_sdk INTERFACE
 # By doing this, we don't need to link to hip::device
 target_compile_definitions(hipdnn_sdk INTERFACE __HIPCC__)
 
+target_compile_definitions(hipdnn_sdk INTERFACE HIPDNN_BUILD_DIR="${CMAKE_BINARY_DIR}")
+
 install(
     TARGETS hipdnn_sdk FlatBuffers spdlog_header_only
     EXPORT hipdnn_sdk_targets

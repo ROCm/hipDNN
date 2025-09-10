@@ -29,6 +29,7 @@ add_executable(hipdnn_sdk_tests
     utilities/TestFloats.cpp
     utilities/TestShapeUtilities.cpp
     utilities/TestTensor.cpp
+    utilities/TestPlatformUtils.cpp
     test_utilities/TestCpuFpReferenceImplementation.cpp
     test_utilities/TestCpuFpReferenceValidation.cpp
     test_utilities/TestCpuFpReferenceMiopenRmsValidation.cpp

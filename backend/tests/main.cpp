@@ -4,8 +4,8 @@ SPDX-License-Identifier: MIT
 */
 
 #include "logging/Logging.hpp"
-#include <hipdnn_sdk/utilities/PlatformUtils.hpp>
 #include <gtest/gtest.h>
+#include <hipdnn_sdk/utilities/PlatformUtils.hpp>
 
 int main(int argc, char** argv)
 {

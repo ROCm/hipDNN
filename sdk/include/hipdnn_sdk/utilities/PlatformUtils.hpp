@@ -34,5 +34,14 @@ inline std::string getExecutableName(const char* executableBaseName)
     return std::string(executableBaseName) + EXECUTABLE_EXT;
 }
 
+inline std::string getBuildDir()
+{
+#ifdef HIPDNN_BUILD_DIR
+    return HIPDNN_BUILD_DIR;
+#else
+    return "/opt/rocm/";
+#endif
+}
+
 }
 }
