@@ -7,7 +7,6 @@
 #include <hipdnn_frontend/Graph.hpp>
 #include <hipdnn_frontend/attributes/BatchnormAttributes.hpp>
 #include <hipdnn_sdk/test_utilities/CpuFpReferenceValidation.hpp>
-#include <hipdnn_sdk/test_utilities/ReferenceImplementationInterface.hpp>
 #include <hipdnn_sdk/utilities/Tensor.hpp>
 
 #include <iostream>
@@ -129,8 +128,6 @@ void SampleRunner::operator()(const TensorLayout& layout)
     if(config.cpuValidation)
     {
         std::cout << "Running CPU reference validation...\n";
-
-        auto refImpl = hipdnn_sdk::reference_test_utilities::CpuReferenceContainer();
 
         Tensor<InputType> yRefTensor(y->get_dim(), layout);
         Tensor<IntermediateType> nextMeanRefTensor(nextRunningMean->get_dim());
