@@ -188,7 +188,6 @@ protected:
 
         if(!yTensorAttr->has_uid())
         {
-            HIPDNN_LOG_INFO("yTensorAttr does not have a UID, giving it a UID");
             yTensorAttr->set_uid(uid++);
         }
 
@@ -243,7 +242,6 @@ protected:
         auto intermediateDataType = getDataTypeEnumFromType<IntermediateType>();
 
         unsigned int seed = std::random_device{}();
-        //log the random seed in case we need to reproduce the test
         HIPDNN_LOG_INFO("Test is using {} for its random seed", seed);
 
         Batchnorm2dTensorBundle graphTensorBundle(testCase.getDims(), seed, layout);

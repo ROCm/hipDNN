@@ -4,9 +4,12 @@
 #include <gtest/gtest.h>
 #include <hipdnn_frontend/Error.hpp>
 #include <hipdnn_frontend/Utilities.hpp>
+#include <hipdnn_sdk/test_utilities/ScopedEnvironmentVariableSetter.hpp>
+#include <hipdnn_sdk/utilities/PlatformUtils.hpp>
 
 using namespace hipdnn_frontend;
 using namespace hipdnn_frontend::graph;
+using namespace hipdnn_sdk::test_utilities;
 
 TEST(TestUtilities, FindCommonShapeValid)
 {
@@ -44,4 +47,13 @@ TEST(TestUtilities, FindCommonShapeSingleInput)
     auto error = findCommonShape(inputShapes, commonShape);
     EXPECT_EQ(error.code, ErrorCode::OK);
     EXPECT_EQ(commonShape, (std::vector<int64_t>{1, 2, 3}));
+}
+
+TEST(TestUtilities, InitializeFrontendLoggingReturnsCorrectly)
+{
+    ScopedEnvironmentVariableSetter guard("HIPDNN_LOG_LEVEL");
+
+    hipdnn_sdk::utilities::setEnv("HIPDNN_LOG_LEVEL", "info");
+    EXPECT_EQ(hipdnn_frontend::initializeFrontendLogging(nullptr), -1);
+    EXPECT_EQ(hipdnn_frontend::initializeFrontendLogging(), 0);
 }

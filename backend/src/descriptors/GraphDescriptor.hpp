@@ -27,16 +27,16 @@ private:
 public:
     void finalize() override;
 
-    void getAttribute([[maybe_unused]] hipdnnBackendAttributeName_t attributeName,
-                      [[maybe_unused]] hipdnnBackendAttributeType_t attributeType,
-                      [[maybe_unused]] int64_t requestedElementCount,
-                      [[maybe_unused]] int64_t* elementCount,
-                      [[maybe_unused]] void* arrayOfElements) const override;
+    void getAttribute(hipdnnBackendAttributeName_t attributeName,
+                      hipdnnBackendAttributeType_t attributeType,
+                      int64_t requestedElementCount,
+                      int64_t* elementCount,
+                      void* arrayOfElements) const override;
 
-    void setAttribute([[maybe_unused]] hipdnnBackendAttributeName_t attributeName,
-                      [[maybe_unused]] hipdnnBackendAttributeType_t attributeType,
-                      [[maybe_unused]] int64_t elementCount,
-                      [[maybe_unused]] const void* arrayOfElements) override;
+    void setAttribute(hipdnnBackendAttributeName_t attributeName,
+                      hipdnnBackendAttributeType_t attributeType,
+                      int64_t elementCount,
+                      const void* arrayOfElements) override;
 
     void deserializeGraph(const uint8_t* serializedGraph, size_t graphByteSize);
 

@@ -42,10 +42,10 @@ void EngineDescriptor::finalize()
 }
 
 void EngineDescriptor::getAttribute(hipdnnBackendAttributeName_t attributeName,
-                                    [[maybe_unused]] hipdnnBackendAttributeType_t attributeType,
-                                    [[maybe_unused]] int64_t requestedElementCount,
-                                    [[maybe_unused]] int64_t* elementCount,
-                                    [[maybe_unused]] void* arrayOfElements) const
+                                    hipdnnBackendAttributeType_t attributeType,
+                                    int64_t requestedElementCount,
+                                    int64_t* elementCount,
+                                    void* arrayOfElements) const
 {
     THROW_IF_FALSE(isFinalized(),
                    HIPDNN_STATUS_NOT_INITIALIZED,

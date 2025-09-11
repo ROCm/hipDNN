@@ -192,7 +192,6 @@ protected:
         auto& dxTensorAttr = outputTensorsAttr[0];
         if(!dxTensorAttr->has_uid())
         {
-            HIPDNN_LOG_INFO("dxTensorAttr does not have a UID, giving it a UID");
             dxTensorAttr->set_uid(uid++);
         }
         dxTensorAttr->set_data_type(inputDataType);
@@ -200,7 +199,6 @@ protected:
         auto& dscaleTensorAttr = outputTensorsAttr[1];
         if(!dscaleTensorAttr->has_uid())
         {
-            HIPDNN_LOG_INFO("dscaleTensorAttr does not have a UID, giving it a UID");
             dscaleTensorAttr->set_uid(uid++);
         }
         dscaleTensorAttr->set_data_type(intermediateDataType);
@@ -208,7 +206,6 @@ protected:
         auto& dbiasTensorAttr = outputTensorsAttr[2];
         if(!dbiasTensorAttr->has_uid())
         {
-            HIPDNN_LOG_INFO("dbiasTensorAttr does not have a UID, giving it a UID");
             dbiasTensorAttr->set_uid(uid++);
         }
         dbiasTensorAttr->set_data_type(intermediateDataType);

@@ -4,7 +4,7 @@
 #include "Logging.hpp"
 
 #include <hipdnn_sdk/logging/ComponentFormatter.hpp>
-#include <hipdnn_sdk/logging/Formatting.hpp>
+#include <hipdnn_sdk/logging/LoggingUtils.hpp>
 #include <hipdnn_sdk/utilities/PlatformUtils.hpp>
 #include <iostream>
 
@@ -42,11 +42,8 @@ void initialize()
             return;
         }
 
-        std::string logLevel = hipdnn_sdk::utilities::getEnv("HIPDNN_LOG_LEVEL", "off");
-        std::string logFilePath = hipdnn_sdk::utilities::getEnv("HIPDNN_LOG_FILE");
-
         // It doesn't need to return if logLevel == off, but it avoids unnecessary initialization
-        if(logLevel == "off")
+        if(!hipdnn_sdk::logging::isLoggingEnabled())
         {
             s_loggingInitialized = true;
             return;
@@ -56,6 +53,9 @@ void initialize()
         {
             spdlog::init_thread_pool(8192, 1);
         }
+
+        std::string logLevel = hipdnn_sdk::utilities::getEnv("HIPDNN_LOG_LEVEL", "off");
+        std::string logFilePath = hipdnn_sdk::utilities::getEnv("HIPDNN_LOG_FILE");
 
         std::shared_ptr<spdlog::sinks::sink> sharedSink;
         if(!logFilePath.empty())
