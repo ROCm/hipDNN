@@ -5,8 +5,12 @@
 #include "Error.hpp"
 #include "attributes/TensorAttributes.hpp"
 #include <algorithm>
+#include <hipdnn_backend.h>
 #include <hipdnn_sdk/logging/CallbackTypes.h>
 #include <hipdnn_sdk/logging/Logger.hpp>
+#include <hipdnn_sdk/logging/LoggingUtils.hpp>
+#include <hipdnn_sdk/test_utilities/LoggingUtils.hpp>
+#include <hipdnn_sdk/utilities/PlatformUtils.hpp>
 #include <hipdnn_sdk/utilities/Tensor.hpp>
 #include <numeric>
 #include <ranges>
@@ -73,11 +77,19 @@ inline TensorAttributes
 
 }
 
-inline int32_t initializeFrontendLogging(hipdnnCallback_t fn)
+inline int32_t initializeFrontendLogging(hipdnnCallback_t fn = hipdnnLoggingCallback_ext)
 {
     if(fn == nullptr)
     {
         return -1;
+    }
+
+    static bool loggingInitialized = false;
+    static bool loggingEnabled = hipdnn_sdk::logging::isLoggingEnabled();
+
+    if(loggingInitialized || !loggingEnabled)
+    {
+        return 0;
     }
 
 #ifdef COMPONENT_NAME
@@ -86,9 +98,38 @@ inline int32_t initializeFrontendLogging(hipdnnCallback_t fn)
     return -1;
 #endif
 
+    loggingInitialized = true;
     HIPDNN_LOG_INFO("Frontend logging initialized via callback.");
 
     return 0;
 }
+
+#define HIPDNN_FE_LOG_INFO(...)                       \
+    do                                                \
+    {                                                 \
+        hipdnn_frontend::initializeFrontendLogging(); \
+        HIPDNN_LOG_INFO(__VA_ARGS__);                 \
+    } while(0)
+
+#define HIPDNN_FE_LOG_WARN(...)                       \
+    do                                                \
+    {                                                 \
+        hipdnn_frontend::initializeFrontendLogging(); \
+        HIPDNN_LOG_WARN(__VA_ARGS__);                 \
+    } while(0)
+
+#define HIPDNN_FE_LOG_ERROR(...)                      \
+    do                                                \
+    {                                                 \
+        hipdnn_frontend::initializeFrontendLogging(); \
+        HIPDNN_LOG_ERROR(__VA_ARGS__);                \
+    } while(0)
+
+#define HIPDNN_FE_LOG_FATAL(...)                      \
+    do                                                \
+    {                                                 \
+        hipdnn_frontend::initializeFrontendLogging(); \
+        HIPDNN_LOG_FATAL(__VA_ARGS__);                \
+    } while(0)
 
 }

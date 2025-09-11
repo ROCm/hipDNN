@@ -22,7 +22,6 @@ add_executable(miopen_plugin_integration_test
 
 target_compile_options(miopen_plugin_integration_test PRIVATE ${HIPDNN_WARNING_COMPILE_OPTIONS})
 target_compile_definitions(miopen_plugin_integration_test PRIVATE
-    COMPONENT_NAME="miopen_plugin_integration_test"
     PLUGIN_DIR="${MIOPEN_LEGACY_PLUGIN_DIR}/"
 )
 

@@ -33,6 +33,8 @@ add_executable(hipdnn_sdk_tests
     test_utilities/TestCpuFpReferenceValidation.cpp
     test_utilities/TestCpuFpReferenceMiopenRmsValidation.cpp
     test_utilities/TestTempDirectory.cpp
+    test_utilities/TestScopedEnvironmentVariableSetter.cpp
+    test_utilities/TestLoggingUtils.cpp
 )
 
 target_compile_definitions(hipdnn_sdk_tests PRIVATE

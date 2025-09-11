@@ -7,6 +7,8 @@ add_subdirectory(tests)
 
 add_library(hipdnn_frontend INTERFACE)
 
+target_compile_definitions(hipdnn_frontend INTERFACE COMPONENT_NAME="hipdnn_frontend")
+
 target_link_libraries(hipdnn_frontend INTERFACE hipdnn_sdk hipdnn_backend)
 
 SET(HIP_DNN_FRONTEND_INSTALL_INCLUDE_DIR "${CMAKE_INSTALL_INCLUDEDIR}/hipdnn/frontend")
