@@ -8,11 +8,12 @@
 #include <hipdnn_sdk/plugin/PluginApiDataTypes.h>
 #include <hipdnn_sdk/test_utilities/CpuFpReferenceValidation.hpp>
 #include <hipdnn_sdk/test_utilities/FlatbufferGraphTestUtils.hpp>
-#include <hipdnn_sdk/test_utilities/ReferenceImplementationInterface.hpp>
 #include <hipdnn_sdk/test_utilities/TestUtilities.hpp>
 #include <hipdnn_sdk/utilities/Tensor.hpp>
 #include <hipdnn_sdk/utilities/UtilsBfp16.hpp>
 #include <hipdnn_sdk/utilities/UtilsFp16.hpp>
+
+#include <hipdnn_sdk/test_utilities/CpuFpReferenceBatchnorm.hpp>
 
 #include "HipdnnEnginePluginExecutionContext.hpp"
 #include "HipdnnEnginePluginHandle.hpp"
@@ -148,8 +149,7 @@ protected:
         invVarianceTensorCpu.fillWithRandomValues(
             static_cast<IntermediateType>(1.9f), static_cast<IntermediateType>(2.0f), seed);
 
-        CpuReferenceContainer cpuRefImpl;
-        cpuRefImpl.batchnormBwd<InputType, IntermediateType, IntermediateType>(dyTensorCpu,
+        CpuFpReferenceBatchnormImpl<InputType, IntermediateType>::batchnormBwd(dyTensorCpu,
                                                                                xTensorCpu,
                                                                                meanTensorCpu,
                                                                                invVarianceTensorCpu,

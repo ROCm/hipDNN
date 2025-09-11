@@ -4,7 +4,6 @@
 #pragma once
 
 #include <hipdnn_sdk/test_utilities/CpuFpReferenceUtilities.hpp>
-#include <hipdnn_sdk/test_utilities/ReferenceImplementationInterface.hpp>
 #include <hipdnn_sdk/utilities/Tensor.hpp>
 #include <stdexcept>
 #include <thread>
@@ -12,14 +11,12 @@
 
 namespace hipdnn_sdk
 {
-namespace reference_test_utilities
+namespace test_utilities
 {
 
 using namespace hipdnn_sdk::utilities;
 
-template <class InputDataType,
-          class ScaleBiasDataType,
-          class MeanVarianceDataType = ScaleBiasDataType>
+template <class InputDataType, class AccumulatorType>
 class CpuFpReferenceConvolutionImpl
 {
 public:
@@ -115,7 +112,7 @@ public:
         int64_t padW = padding[1];
 
         auto convolutionFunc = [&](auto g, auto n, auto k, auto ho, auto wo) {
-            float accumulator = 0.0f;
+            AccumulatorType accumulator = 0.0f;
 
             int64_t gIdx = static_cast<int64_t>(g);
             int64_t nIdx = static_cast<int64_t>(n);
@@ -144,8 +141,8 @@ public:
                             int64_t weightIdx = gIdx * outputChannelsPerGroup + kIdx;
                             InputDataType weightVal = weight.getHostValue(weightIdx, c, y, x);
 
-                            accumulator
-                                += static_cast<float>(inputVal) * static_cast<float>(weightVal);
+                            accumulator += static_cast<AccumulatorType>(inputVal)
+                                           * static_cast<AccumulatorType>(weightVal);
                         }
                     }
                 }

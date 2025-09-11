@@ -12,10 +12,11 @@
 #include <hipdnn_frontend/Utilities.hpp>
 #include <hipdnn_frontend/attributes/TensorAttributes.hpp>
 #include <hipdnn_sdk/test_utilities/CpuFpReferenceValidation.hpp>
-#include <hipdnn_sdk/test_utilities/ReferenceImplementationInterface.hpp>
 #include <hipdnn_sdk/test_utilities/TestUtilities.hpp>
 #include <hipdnn_sdk/utilities/MigratableMemory.hpp>
 #include <hipdnn_sdk/utilities/Tensor.hpp>
+
+#include <hipdnn_sdk/test_utilities/CpuFpReferenceBatchnorm.hpp>
 
 using namespace hipdnn_frontend;
 using namespace hipdnn_sdk::utilities;
@@ -244,8 +245,7 @@ protected:
 
     void runCpuBatchnormBwd(Batchnorm2dTensorBundle& cpuTensorBundle)
     {
-        CpuReferenceContainer cpuRefImpl;
-        cpuRefImpl.batchnormBwd<InputType, IntermediateType, IntermediateType>(
+        CpuFpReferenceBatchnormImpl<InputType, IntermediateType>::batchnormBwd(
             cpuTensorBundle.dyTensor,
             cpuTensorBundle.xTensor,
             cpuTensorBundle.meanTensor,

@@ -8,11 +8,12 @@
 #include <hipdnn_sdk/plugin/PluginApiDataTypes.h>
 #include <hipdnn_sdk/test_utilities/CpuFpReferenceValidation.hpp>
 #include <hipdnn_sdk/test_utilities/FlatbufferGraphTestUtils.hpp>
-#include <hipdnn_sdk/test_utilities/ReferenceImplementationInterface.hpp>
 #include <hipdnn_sdk/test_utilities/TestUtilities.hpp>
 #include <hipdnn_sdk/utilities/Tensor.hpp>
 #include <hipdnn_sdk/utilities/UtilsBfp16.hpp>
 #include <hipdnn_sdk/utilities/UtilsFp16.hpp>
+
+#include <hipdnn_sdk/test_utilities/CpuFpReferenceBatchnorm.hpp>
 
 #include "HipdnnEnginePluginExecutionContext.hpp"
 #include "HipdnnEnginePluginHandle.hpp"
@@ -139,8 +140,7 @@ protected:
         varianceTensorCpu.fillWithRandomValues(
             static_cast<IntermediateType>(0.1f), static_cast<IntermediateType>(1.0f), seed);
 
-        CpuReferenceContainer cpuRefImpl;
-        cpuRefImpl.batchnormFwdInference<InputType, IntermediateType, IntermediateType>(
+        CpuFpReferenceBatchnormImpl<InputType, IntermediateType>::batchnormFwdInference(
             xTensorCpu,
             scaleTensorCpu,
             biasTensorCpu,
@@ -332,14 +332,13 @@ TEST_P(TestGpuMiopenBatchnormFwdInferenceExecuteGraphNchwFp64, DISABLED_Correctn
     varianceTensorCpu.fillWithRandomValues(
         static_cast<double>(0.1f), static_cast<double>(1.0f), seed);
 
-    CpuReferenceContainer cpuRefImpl;
-    cpuRefImpl.batchnormFwdInference<double, double, double>(xTensorCpu,
-                                                             scaleTensorCpu,
-                                                             biasTensorCpu,
-                                                             meanTensorCpu,
-                                                             varianceTensorCpu,
-                                                             yTensorCpu,
-                                                             1e-3);
+    CpuFpReferenceBatchnormImpl<double, double>::batchnormFwdInference(xTensorCpu,
+                                                                       scaleTensorCpu,
+                                                                       biasTensorCpu,
+                                                                       meanTensorCpu,
+                                                                       varianceTensorCpu,
+                                                                       yTensorCpu,
+                                                                       1e-3);
 
     CpuFpReferenceValidation<double> cpuRefValidation(1e-6, 1e-6);
     EXPECT_TRUE(cpuRefValidation.allClose(yTensorCpu.memory(), yTensor.memory()));
