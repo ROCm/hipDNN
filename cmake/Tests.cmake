@@ -126,12 +126,7 @@ function(_append_test_to_check_target_internal TARGET WORKING_DIR TEST_TYPE STAT
     set(${DEPENDS_VAR} ${${DEPENDS_VAR}} ${TARGET} CACHE INTERNAL "Accumulated ${TEST_TYPE} check depends" FORCE)
     
     # Track the binary paths for test name validation
-    file(RELATIVE_PATH REL_WORKING_DIR ${CMAKE_BINARY_DIR} ${WORKING_DIR})
-    if(REL_WORKING_DIR)
-        set(EXECUTABLE_PATH "${REL_WORKING_DIR}/${TARGET}")
-    else()
-        set(EXECUTABLE_PATH "${TARGET}")
-    endif()
+    set(EXECUTABLE_PATH "bin/${TARGET}")
     set(CHECK_EXECUTABLE_PATHS_GLOBAL ${CHECK_EXECUTABLE_PATHS_GLOBAL} ${EXECUTABLE_PATH} CACHE INTERNAL "Accumulated check executable paths" FORCE)
 endfunction()
 
