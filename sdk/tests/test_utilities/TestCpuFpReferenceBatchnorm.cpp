@@ -2,19 +2,19 @@
 // SPDX-License-Identifier:  MIT
 
 #include <gtest/gtest.h>
-#include <hipdnn_sdk/test_utilities/CpuFpReferenceImplementation.hpp>
-
 #include <hipdnn_sdk/test_utilities/FlatbufferGraphTestUtils.hpp>
 #include <hipdnn_sdk/test_utilities/TestUtilities.hpp>
 #include <hipdnn_sdk/utilities/Tensor.hpp>
 #include <hipdnn_sdk/utilities/UtilsBfp16.hpp>
 #include <hipdnn_sdk/utilities/UtilsFp16.hpp>
 
+#include <hipdnn_sdk/test_utilities/CpuFpReferenceBatchnorm.hpp>
+
 using namespace hipdnn_sdk::test_utilities;
 using namespace hipdnn_sdk::data_objects;
 using namespace hipdnn_sdk::utilities;
 
-TEST(TestCpuFpReferenceImplementationFp32, BatchnormFwdInferenceNchw)
+TEST(TestCpuFpReferenceBatchnormFp32, BatchnormFwdInferenceNchw)
 {
     Tensor<float> inputTensor({1, 3, 224, 224});
     Tensor<float> outputTensor({1, 3, 224, 224});
@@ -23,13 +23,11 @@ TEST(TestCpuFpReferenceImplementationFp32, BatchnormFwdInferenceNchw)
     Tensor<float> meanTensor({1, 3});
     Tensor<float> varianceTensor({1, 3});
 
-    CpuFpReferenceImplementation<float, float, float> refImpl;
-
-    refImpl.batchnormFwdInference(
+    CpuFpReferenceBatchnormImpl<float, float>::batchnormFwdInference(
         inputTensor, scaleTensor, biasTensor, meanTensor, varianceTensor, outputTensor, 1e-5);
 }
 
-TEST(TestCpuFpReferenceImplementationBfp16, BatchnormFwdInferenceNchw)
+TEST(TestCpuFpReferenceBatchnormBfp16, BatchnormFwdInferenceNchw)
 {
     Tensor<hip_bfloat16> inputTensor({1, 3, 224, 224});
     Tensor<hip_bfloat16> outputTensor({1, 3, 224, 224});
@@ -38,13 +36,11 @@ TEST(TestCpuFpReferenceImplementationBfp16, BatchnormFwdInferenceNchw)
     Tensor<float> meanTensor({1, 3});
     Tensor<float> varianceTensor({1, 3});
 
-    CpuFpReferenceImplementation<hip_bfloat16, float, float> refImpl;
-
-    refImpl.batchnormFwdInference(
+    CpuFpReferenceBatchnormImpl<hip_bfloat16, float>::batchnormFwdInference(
         inputTensor, scaleTensor, biasTensor, meanTensor, varianceTensor, outputTensor, 1e-5);
 }
 
-TEST(TestCpuFpReferenceImplementationFp16, BatchnormFwdInferenceNchw)
+TEST(TestCpuFpReferenceBatchnormFp16, BatchnormFwdInferenceNchw)
 {
     Tensor<half> inputTensor({1, 3, 224, 224});
     Tensor<half> outputTensor({1, 3, 224, 224});
@@ -53,13 +49,11 @@ TEST(TestCpuFpReferenceImplementationFp16, BatchnormFwdInferenceNchw)
     Tensor<float> meanTensor({1, 3});
     Tensor<float> varianceTensor({1, 3});
 
-    CpuFpReferenceImplementation<half, float, float> refImpl;
-
-    refImpl.batchnormFwdInference(
+    CpuFpReferenceBatchnormImpl<half, float>::batchnormFwdInference(
         inputTensor, scaleTensor, biasTensor, meanTensor, varianceTensor, outputTensor, 1e-5);
 }
 
-TEST(TestCpuFpReferenceImplementationFp64, BatchnormFwdInferenceNchw)
+TEST(TestCpuFpReferenceBatchnormFp64, BatchnormFwdInferenceNchw)
 {
     Tensor<double> inputTensor({1, 3, 224, 224});
     Tensor<double> outputTensor({1, 3, 224, 224});
@@ -68,13 +62,11 @@ TEST(TestCpuFpReferenceImplementationFp64, BatchnormFwdInferenceNchw)
     Tensor<double> meanTensor({1, 3});
     Tensor<double> varianceTensor({1, 3});
 
-    CpuFpReferenceImplementation<double, double, double> refImpl;
-
-    refImpl.batchnormFwdInference(
+    CpuFpReferenceBatchnormImpl<double, double>::batchnormFwdInference(
         inputTensor, scaleTensor, biasTensor, meanTensor, varianceTensor, outputTensor, 1e-5);
 }
 
-TEST(TestCpuFpReferenceImplementationFp32, BatchnormFwdInferenceNhwc)
+TEST(TestCpuFpReferenceBatchnormFp32, BatchnormFwdInferenceNhwc)
 {
     Tensor<float> inputTensor({6, 3, 32, 32}, TensorLayout::NHWC);
     Tensor<float> outputTensor({6, 3, 32, 32}, TensorLayout::NHWC);
@@ -83,13 +75,11 @@ TEST(TestCpuFpReferenceImplementationFp32, BatchnormFwdInferenceNhwc)
     Tensor<float> meanTensor({1, 3});
     Tensor<float> varianceTensor({1, 3});
 
-    CpuFpReferenceImplementation<float, float, float> refImpl;
-
-    refImpl.batchnormFwdInference(
+    CpuFpReferenceBatchnormImpl<float, float>::batchnormFwdInference(
         inputTensor, scaleTensor, biasTensor, meanTensor, varianceTensor, outputTensor, 1e-5);
 }
 
-TEST(TestCpuFpReferenceImplementationFp64, BatchnormFwdInferenceSanityValidationNchw)
+TEST(TestCpuFpReferenceBatchnormFp64, BatchnormFwdInferenceSanityValidationNchw)
 {
     const std::vector<int64_t> dims = {1, 1, 2, 2};
 
@@ -122,8 +112,7 @@ TEST(TestCpuFpReferenceImplementationFp64, BatchnormFwdInferenceSanityValidation
     // where inv_variance (named by convention) = 1 / sqrt(1.25 + 1e-5) = 0.894423613312618
     const std::vector<double> expectedOutput = {-2.18327084, -0.39442361, 1.39442361, 3.18327084};
 
-    CpuFpReferenceImplementation<double, double, double> refImpl;
-    refImpl.batchnormFwdInference(
+    CpuFpReferenceBatchnormImpl<double, double>::batchnormFwdInference(
         inputTensor, scaleTensor, biasTensor, meanTensor, varianceTensor, outputTensor, 1e-5);
 
     auto tolerance = 1e-6;
@@ -134,7 +123,7 @@ TEST(TestCpuFpReferenceImplementationFp64, BatchnormFwdInferenceSanityValidation
     EXPECT_NEAR(outputTensor.getHostValue(0, 0, 1, 1), expectedOutput[3], tolerance);
 }
 
-TEST(TestCpuFpReferenceImplementationFp32, BatchnormBackwardNchw)
+TEST(TestCpuFpReferenceBatchnormFp32, BatchnormBackwardNchw)
 {
     Tensor<float> xTensor({6, 3, 32, 32});
     Tensor<float> dyTensor({6, 3, 32, 32});
@@ -145,19 +134,17 @@ TEST(TestCpuFpReferenceImplementationFp32, BatchnormBackwardNchw)
     Tensor<float> dscaleTensor({1, 3});
     Tensor<float> dbiasTensor({1, 3});
 
-    CpuFpReferenceImplementation<float, float, float> refImpl;
-
-    refImpl.batchnormBwd(dyTensor,
-                         xTensor,
-                         meanTensor,
-                         invVarianceTensor,
-                         scaleTensor,
-                         dxTensor,
-                         dscaleTensor,
-                         dbiasTensor);
+    CpuFpReferenceBatchnormImpl<float, float>::batchnormBwd(dyTensor,
+                                                            xTensor,
+                                                            meanTensor,
+                                                            invVarianceTensor,
+                                                            scaleTensor,
+                                                            dxTensor,
+                                                            dscaleTensor,
+                                                            dbiasTensor);
 }
 
-TEST(TestCpuFpReferenceImplementationBfp16, BatchnormBackwardNchw)
+TEST(TestCpuFpReferenceBatchnormBfp16, BatchnormBackwardNchw)
 {
     Tensor<hip_bfloat16> xTensor({6, 3, 32, 32});
     Tensor<hip_bfloat16> dyTensor({6, 3, 32, 32});
@@ -168,19 +155,17 @@ TEST(TestCpuFpReferenceImplementationBfp16, BatchnormBackwardNchw)
     Tensor<float> dscaleTensor({1, 3});
     Tensor<float> dbiasTensor({1, 3});
 
-    CpuFpReferenceImplementation<hip_bfloat16, float, float> refImpl;
-
-    refImpl.batchnormBwd(dyTensor,
-                         xTensor,
-                         meanTensor,
-                         invVarianceTensor,
-                         scaleTensor,
-                         dxTensor,
-                         dscaleTensor,
-                         dbiasTensor);
+    CpuFpReferenceBatchnormImpl<hip_bfloat16, float>::batchnormBwd(dyTensor,
+                                                                   xTensor,
+                                                                   meanTensor,
+                                                                   invVarianceTensor,
+                                                                   scaleTensor,
+                                                                   dxTensor,
+                                                                   dscaleTensor,
+                                                                   dbiasTensor);
 }
 
-TEST(TestCpuFpReferenceImplementationFp16, BatchnormBackwardNchw)
+TEST(TestCpuFpReferenceBatchnormFp16, BatchnormBackwardNchw)
 {
     Tensor<half> xTensor({6, 3, 32, 32});
     Tensor<half> dyTensor({6, 3, 32, 32});
@@ -191,19 +176,17 @@ TEST(TestCpuFpReferenceImplementationFp16, BatchnormBackwardNchw)
     Tensor<float> dscaleTensor({1, 3});
     Tensor<float> dbiasTensor({1, 3});
 
-    CpuFpReferenceImplementation<half, float, float> refImpl;
-
-    refImpl.batchnormBwd(dyTensor,
-                         xTensor,
-                         meanTensor,
-                         invVarianceTensor,
-                         scaleTensor,
-                         dxTensor,
-                         dscaleTensor,
-                         dbiasTensor);
+    CpuFpReferenceBatchnormImpl<half, float>::batchnormBwd(dyTensor,
+                                                           xTensor,
+                                                           meanTensor,
+                                                           invVarianceTensor,
+                                                           scaleTensor,
+                                                           dxTensor,
+                                                           dscaleTensor,
+                                                           dbiasTensor);
 }
 
-TEST(TestCpuFpReferenceImplementationFp64, BatchnormBackwardNchw)
+TEST(TestCpuFpReferenceBatchnormFp64, BatchnormBackwardNchw)
 {
     Tensor<double> xTensor({6, 3, 32, 32});
     Tensor<double> dyTensor({6, 3, 32, 32});
@@ -214,19 +197,17 @@ TEST(TestCpuFpReferenceImplementationFp64, BatchnormBackwardNchw)
     Tensor<double> dscaleTensor({1, 3});
     Tensor<double> dbiasTensor({1, 3});
 
-    CpuFpReferenceImplementation<double, double, double> refImpl;
-
-    refImpl.batchnormBwd(dyTensor,
-                         xTensor,
-                         meanTensor,
-                         invVarianceTensor,
-                         scaleTensor,
-                         dxTensor,
-                         dscaleTensor,
-                         dbiasTensor);
+    CpuFpReferenceBatchnormImpl<double, double>::batchnormBwd(dyTensor,
+                                                              xTensor,
+                                                              meanTensor,
+                                                              invVarianceTensor,
+                                                              scaleTensor,
+                                                              dxTensor,
+                                                              dscaleTensor,
+                                                              dbiasTensor);
 }
 
-TEST(TestCpuFpReferenceImplementationFp32, BatchnormBackwardNhwc)
+TEST(TestCpuFpReferenceBatchnormFp32, BatchnormBackwardNhwc)
 {
     Tensor<float> xTensor({6, 3, 32, 32}, TensorLayout::NHWC);
     Tensor<float> dyTensor({6, 3, 32, 32}, TensorLayout::NHWC);
@@ -237,19 +218,17 @@ TEST(TestCpuFpReferenceImplementationFp32, BatchnormBackwardNhwc)
     Tensor<float> dscaleTensor({1, 3});
     Tensor<float> dbiasTensor({1, 3});
 
-    CpuFpReferenceImplementation<float, float, float> refImpl;
-
-    refImpl.batchnormBwd(dyTensor,
-                         xTensor,
-                         meanTensor,
-                         invVarianceTensor,
-                         scaleTensor,
-                         dxTensor,
-                         dscaleTensor,
-                         dbiasTensor);
+    CpuFpReferenceBatchnormImpl<float, float>::batchnormBwd(dyTensor,
+                                                            xTensor,
+                                                            meanTensor,
+                                                            invVarianceTensor,
+                                                            scaleTensor,
+                                                            dxTensor,
+                                                            dscaleTensor,
+                                                            dbiasTensor);
 }
 
-TEST(TestCpuFpReferenceImplementationFp64, BatchnormBwdSanityValidationNchw)
+TEST(TestCpuFpReferenceBatchnormFp64, BatchnormBwdSanityValidationNchw)
 {
     const std::vector<int64_t> dims = {1, 1, 2, 2};
 
@@ -296,15 +275,14 @@ TEST(TestCpuFpReferenceImplementationFp64, BatchnormBwdSanityValidationNchw)
     std::vector<double> expectedDx
         = {-2.14659950e-06, -7.15533166e-07, 7.15533166e-07, 2.14659950e-06};
 
-    CpuFpReferenceImplementation<double, double, double> refImpl;
-    refImpl.batchnormBwd(dyTensor,
-                         xTensor,
-                         meanTensor,
-                         invVarianceTensor,
-                         scaleTensor,
-                         dxTensor,
-                         dscaleTensor,
-                         dbiasTensor);
+    CpuFpReferenceBatchnormImpl<double, double>::batchnormBwd(dyTensor,
+                                                              xTensor,
+                                                              meanTensor,
+                                                              invVarianceTensor,
+                                                              scaleTensor,
+                                                              dxTensor,
+                                                              dscaleTensor,
+                                                              dbiasTensor);
 
     auto tolerance = 1e-6;
 

@@ -4,7 +4,8 @@
 #include "../utils/Helpers.hpp"
 
 #include <hipdnn_frontend.hpp>
-#include <hipdnn_sdk/test_utilities/CpuFpReferenceImplementation.hpp>
+#include <hipdnn_frontend/Graph.hpp>
+#include <hipdnn_frontend/attributes/BatchnormAttributes.hpp>
 #include <hipdnn_sdk/test_utilities/CpuFpReferenceValidation.hpp>
 #include <hipdnn_sdk/utilities/Tensor.hpp>
 
@@ -128,9 +129,6 @@ void SampleRunner::operator()(const TensorLayout& layout)
     {
         std::cout << "Running CPU reference validation...\n";
 
-        auto refImpl = hipdnn_sdk::test_utilities::CpuFpReferenceImplementation<InputType,
-                                                                                IntermediateType>();
-
         Tensor<InputType> yRefTensor(y->get_dim(), layout);
         Tensor<IntermediateType> nextMeanRefTensor(nextRunningMean->get_dim());
         Tensor<IntermediateType> nextVarRefTensor(nextRunningVar->get_dim());
@@ -138,7 +136,7 @@ void SampleRunner::operator()(const TensorLayout& layout)
         Tensor<IntermediateType> savedInvVarRefTensor(savedInvVariance->get_dim());
 
         // TODO: Uncomment when CPU reference implemented
-        // ref_impl.batchnorm_fwd_training(x_tensor,
+        // CpuFpReferenceBatchnormImpl<InputType, IntermediateType>::batchnorm_fwd_training(x_tensor,
         //                                scale_tensor,
         //                                bias_tensor,
         //                                prev_mean_tensor,
