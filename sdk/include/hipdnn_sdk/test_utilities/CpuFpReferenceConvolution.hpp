@@ -112,7 +112,7 @@ public:
         int64_t padW = padding[1];
 
         auto convolutionFunc = [&](auto g, auto n, auto k, auto ho, auto wo) {
-            AccumulatorType accumulator = 0.0f;
+            AccumulatorType accumulator = static_cast<AccumulatorType>(0);
 
             int64_t gIdx = static_cast<int64_t>(g);
             int64_t nIdx = static_cast<int64_t>(n);
@@ -153,7 +153,7 @@ public:
                 static_cast<InputDataType>(accumulator), nIdx, outputChannel, hoIdx, woIdx);
         };
 
-        makeParallelTensorFunctor(
+        hipdnn_sdk::reference_test_utilities::makeParallelTensorFunctor(
             convolutionFunc, nGroups, nBatch, outputChannelsPerGroup, outputHeight, outputWidth)(
             std::thread::hardware_concurrency());
 
@@ -161,5 +161,5 @@ public:
     }
 };
 
-} // namespace reference_test_utilities
+} // namespace test_utilities
 } // namespace hipdnn_sdk

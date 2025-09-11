@@ -136,7 +136,7 @@ void SampleRunner::operator()(const TensorLayout& layout)
         Tensor<IntermediateType> savedInvVarRefTensor(savedInvVariance->get_dim());
 
         // TODO: Uncomment when CPU reference implemented
-        // ref_impl.batchnorm_fwd_training(x_tensor,
+        // CpuFpReferenceBatchnormImpl<InputType, IntermediateType>::batchnorm_fwd_training(x_tensor,
         //                                scale_tensor,
         //                                bias_tensor,
         //                                prev_mean_tensor,
