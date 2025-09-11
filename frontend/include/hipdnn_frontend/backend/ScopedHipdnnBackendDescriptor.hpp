@@ -5,9 +5,9 @@
 
 #include <utility>
 
+#include <hipdnn_frontend/Utilities.hpp>
 #include <hipdnn_frontend/backend/BackendLoggingHelpers.hpp>
 #include <hipdnn_frontend/backend/BackendWrapper.hpp>
-#include <hipdnn_sdk/logging/Logger.hpp>
 
 namespace hipdnn_frontend
 {
@@ -23,7 +23,7 @@ private:
         std::array<char, HIPDNN_ERROR_STRING_MAX_LENGTH> backendErrMsg;
         hipdnn_frontend::hipdnnBackend()->getLastErrorString(backendErrMsg.data(),
                                                              backendErrMsg.size());
-        HIPDNN_LOG_ERROR(
+        HIPDNN_FE_LOG_ERROR(
             "{}: {}. Backend error string: {}", errorString, status, backendErrMsg.data());
     }
 

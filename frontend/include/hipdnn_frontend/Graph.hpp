@@ -2,6 +2,7 @@
 // SPDX-License-Identifier:  MIT
 #pragma once
 
+#include <hipdnn_frontend/Utilities.hpp>
 #include <hipdnn_frontend/attributes/BatchnormAttributes.hpp>
 #include <hipdnn_frontend/attributes/BatchnormInferenceAttributes.hpp>
 #include <hipdnn_frontend/attributes/ConvolutionFpropAttributes.hpp>
@@ -147,15 +148,20 @@ public:
     Graph()
         : INode(GraphAttributes{})
     {
+        HIPDNN_FE_LOG_INFO("Creating new Graph instance");
     }
 
     Error validate()
     {
+        HIPDNN_FE_LOG_INFO("Validating graph {}", graph_attributes.get_name());
+
         return validateSubtree();
     }
 
     Error build_operation_graph(hipdnnHandle_t handle) // NOLINT(readability-identifier-naming)
     {
+        HIPDNN_FE_LOG_INFO("Building operation graph {}", graph_attributes.get_name());
+
         std::unordered_set<int64_t> usedTensorUids;
         gatherHipdnnTensorIdsSubtree(usedTensorUids);
 
@@ -221,6 +227,8 @@ public:
     Error create_execution_plans(std::vector<HeuristicMode> const& modes
                                  = {HeuristicMode::FALLBACK})
     {
+        HIPDNN_FE_LOG_INFO("Creating execution plans for graph {}", graph_attributes.get_name());
+
         if(!_graphDesc || !_graphDesc->valid())
         {
             return {ErrorCode::HIPDNN_BACKEND_ERROR,
@@ -248,6 +256,9 @@ public:
 
     Error check_support() // NOLINT(readability-identifier-naming)
     {
+        HIPDNN_FE_LOG_INFO("Checking execution plan support for graph {}",
+                           graph_attributes.get_name());
+
         if(!_executionPlanDesc || !_executionPlanDesc->valid())
         {
             return {ErrorCode::HIPDNN_BACKEND_ERROR,
@@ -259,6 +270,8 @@ public:
 
     Error build_plans() // NOLINT(readability-identifier-naming)
     {
+        HIPDNN_FE_LOG_INFO("Building plans for graph {}", graph_attributes.get_name());
+
         RETURN_ON_BACKEND_FAILURE(hipdnnBackend()->backendFinalize(_engineConfigDesc->get()),
                                   "Failed to finalize engine config descriptor");
 
@@ -317,6 +330,8 @@ public:
                   std::unordered_map<int64_t, void*>& variantPack,
                   void* workspace) const
     {
+        HIPDNN_FE_LOG_INFO("Executing graph {}", graph_attributes.get_name());
+
         auto variantPackDesc = std::make_unique<ScopedHipdnnBackendDescriptor>(
             HIPDNN_BACKEND_VARIANT_PACK_DESCRIPTOR);
         if(!variantPackDesc || !variantPackDesc->valid())

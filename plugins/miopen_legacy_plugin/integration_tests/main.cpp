@@ -5,16 +5,13 @@ SPDX-License-Identifier: MIT
 
 #include <gtest/gtest.h>
 
-#include <hipdnn_sdk/logging/Logger.hpp>
-#include <hipdnn_sdk/test_utilities/LoggingUtils.hpp>
-
-#define MIOPEN_LEGACY_PLUGIN_TESTS "miopen_legacy_plugin_tests"
+#include <hipdnn_frontend.hpp>
 
 int main(int argc, char** argv)
 {
     ::testing::InitGoogleTest(&argc, argv);
 
-    hipdnn_sdk::test_utilities::initializeSpdlogDefaultLogger(MIOPEN_LEGACY_PLUGIN_TESTS);
+    hipdnn_frontend::initializeFrontendLogging();
 
     return RUN_ALL_TESTS();
 }
