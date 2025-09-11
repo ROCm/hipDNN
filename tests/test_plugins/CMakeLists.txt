@@ -48,6 +48,11 @@ function(add_test_plugin target_name)
             ${HIPDNN_WARNING_COMPILE_OPTIONS}
     )
 
+    set_target_properties(${target_name} PROPERTIES
+        LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib/hipdnn_plugins"
+    )
+
+
     clang_tidy_check(${target_name})
 
 endfunction()
@@ -76,9 +81,10 @@ add_test_plugin(${TEST_INCOMPLETE_API_PLUGIN_NAME} TestIncompleteApiPlugin.cpp)
 # Create a duplicated default plugin that gets installed to the default plugin directory
 add_test_plugin(test_good_default_plugin TestGoodDefaultPlugin.cpp)
 
-# Create the default plugin directory relative to where the .so is located (backend/src)
-set(DEFAULT_PLUGIN_DIR "${CMAKE_BINARY_DIR}/backend/src/hipdnn_plugins/engines")
-file(MAKE_DIRECTORY ${DEFAULT_PLUGIN_DIR})
+# Override the output directory for only the default plugin
+set_target_properties(test_good_default_plugin PROPERTIES
+    LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib/hipdnn_plugins/engines"
+)
 
 # Install the default plugin to the default plugin directory
 add_custom_command(TARGET test_good_default_plugin POST_BUILD
@@ -86,6 +92,7 @@ add_custom_command(TARGET test_good_default_plugin POST_BUILD
         $<TARGET_FILE:test_good_default_plugin>
         ${DEFAULT_PLUGIN_DIR}/$<TARGET_FILE_NAME:test_good_default_plugin>
 )
+
 
 # Export plugin names to parent scope for use in test compilation
 set(TEST_GOOD_PLUGIN_NAME "${TEST_GOOD_PLUGIN_NAME}" PARENT_SCOPE)

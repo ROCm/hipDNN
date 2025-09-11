@@ -94,9 +94,13 @@ target_link_libraries(miopen_legacy_plugin PRIVATE "-Xlinker --exclude-libs=ALL"
 target_compile_options(miopen_legacy_plugin PRIVATE ${HIPDNN_WARNING_COMPILE_OPTIONS})
 set_target_properties(miopen_legacy_plugin PROPERTIES CXX_VISIBILITY_PRESET hidden)
 
+set_target_properties(miopen_legacy_plugin PROPERTIES
+    LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+)
+
 clang_tidy_check(miopen_legacy_plugin)
 
-set(MIOPEN_LEGACY_PLUGIN_DIR ${CMAKE_CURRENT_BINARY_DIR} CACHE INTERNAL "miopen legacy plugin dir" FORCE)
+set(MIOPEN_LEGACY_PLUGIN_PATH ./miopen_legacy_plugin CACHE INTERNAL "miopen legacy plugin dir" FORCE)
 
 add_subdirectory(tests)
 add_subdirectory(integration_tests)

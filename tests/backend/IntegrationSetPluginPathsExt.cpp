@@ -8,6 +8,7 @@
 #include <gtest/gtest.h>
 #include <hipdnn_sdk/data_objects/graph_generated.h>
 #include <hipdnn_sdk/utilities/PlatformUtils.hpp>
+#include <iostream>
 #include <vector>
 
 using namespace hipdnn_sdk::utilities;
@@ -90,8 +91,15 @@ TEST(IntegrationSetPluginPathsExt, GetLoadedPluginPathsLoadsDefault)
 
     auto loadedPlugins = test_util::getLoadedPlugins(handle);
 
-    fs::path expectedPluginPath = fs::path(getBuildDir()) / "backend" / "src" / "hipdnn_plugins"
-                                  / "engines" / getLibraryName("test_good_default_plugin");
+    fs::path expectedPluginPath = fs::path(getBuildDir()) / "lib" / "hipdnn_plugins" / "engines"
+                                  / getLibraryName("test_good_default_plugin");
+
+    std::cout << "Expected default plugin path: " << expectedPluginPath << "\n";
+    std::cout << "Loaded plugins:\n";
+    for(const auto& plugin : loadedPlugins)
+    {
+        std::cout << "  " << plugin << "\n";
+    }
 
     EXPECT_TRUE(test_util::isPluginLoaded(loadedPlugins, expectedPluginPath.string()));
     EXPECT_EQ(hipdnnDestroy(handle), HIPDNN_STATUS_SUCCESS);
@@ -113,9 +121,17 @@ TEST(IntegrationSetPluginPathsExt, GetLoadedPluginPathsAdditiveLoadsBothDefaultA
     auto loadedPlugins = test_util::getLoadedPlugins(handle);
     EXPECT_GE(loadedPlugins.size(), 2);
 
-    auto defaultPluginPath = fs::path(getBuildDir()) / "backend" / "src" / "hipdnn_plugins"
-                             / "engines" / getLibraryName("test_good_default_plugin");
-    auto testPluginPath = getPluginDir() / getLibraryName(TEST_GOOD_PLUGIN_NAME);
+    auto defaultPluginPath = fs::path(getBuildDir()) / "lib" / "hipdnn_plugins" / "engines"
+                             / getLibraryName("test_good_default_plugin");
+    auto testPluginPath = fs::path(getBuildDir()) / "lib" / "hipdnn_plugins"
+                          / getLibraryName(TEST_GOOD_PLUGIN_NAME);
+
+    std::cout << "Expected default plugin path: " << testPluginPath << "\n";
+    std::cout << "Loaded plugins:\n";
+    for(const auto& plugin : loadedPlugins)
+    {
+        std::cout << "  " << plugin << "\n";
+    }
 
     EXPECT_TRUE(test_util::isPluginLoaded(loadedPlugins, defaultPluginPath.string()));
     EXPECT_TRUE(test_util::isPluginLoaded(loadedPlugins, testPluginPath.string()));
@@ -139,11 +155,20 @@ TEST(IntegrationSetPluginPathsExt, GetLoadedPluginPathsAbsoluteLoadsOnlyCustom)
     auto loadedPlugins = test_util::getLoadedPlugins(handle);
     EXPECT_EQ(loadedPlugins.size(), 1);
 
-    auto defaultPluginPath = fs::path(getBuildDir()) / "backend" / "src" / "hipdnn_plugins"
-                             / "engines" / getLibraryName("test_good_default_plugin");
+    auto defaultPluginPath = fs::path(getBuildDir()) / "lib" / "hipdnn_plugins" / "engines"
+                             / getLibraryName("test_good_default_plugin");
+    auto testPluginPath = fs::path(getBuildDir()) / "lib" / "hipdnn_plugins"
+                          / getLibraryName(TEST_GOOD_PLUGIN_NAME);
+
+    std::cout << "Expected default plugin path: " << pluginFilePath << "\n";
+    std::cout << "Loaded plugins:\n";
+    for(const auto& plugin : loadedPlugins)
+    {
+        std::cout << "  " << plugin << "\n";
+    }
 
     EXPECT_FALSE(test_util::isPluginLoaded(loadedPlugins, defaultPluginPath.string()));
-    EXPECT_TRUE(test_util::isPluginLoaded(loadedPlugins, pluginFilePath));
+    EXPECT_TRUE(test_util::isPluginLoaded(loadedPlugins, testPluginPath));
 
     EXPECT_EQ(hipdnnDestroy(handle), HIPDNN_STATUS_SUCCESS);
 }
