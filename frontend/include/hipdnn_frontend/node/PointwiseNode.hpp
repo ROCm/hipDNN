@@ -8,7 +8,7 @@
 #include <hipdnn_frontend/attributes/GraphAttributes.hpp>
 #include <hipdnn_frontend/attributes/PointwiseAttributes.hpp>
 #include <hipdnn_sdk/data_objects/graph_generated.h>
-#include <hipdnn_sdk/utilities/ShapeUtils.hpp>
+#include <hipdnn_sdk/utilities/ShapeUtilities.hpp>
 
 namespace hipdnn_frontend::graph
 {
@@ -40,73 +40,17 @@ public:
             return {ErrorCode::INVALID_VALUE, "PointwiseNode must have exactly one output"};
         }
 
-        // Validate input count matches operation type
-        switch(attributes.inputs.size())
+        auto checkInputsMatchOp = checkInputsMatchOperationType();
+        if(checkInputsMatchOp.is_bad())
         {
-        case 0:
-            return {ErrorCode::INVALID_VALUE, "PointwiseNode must have at least one input"};
-        case 1:
-            if(!unaryPointwiseModes().contains(attributes.get_mode()))
-            {
-                return {ErrorCode::INVALID_VALUE,
-                        "PointwiseNode with one input must have a unary operation"};
-            }
-            break;
-        case 2:
-            if(!binaryPointwiseModes().contains(attributes.get_mode()))
-            {
-                return {ErrorCode::INVALID_VALUE,
-                        "PointwiseNode with two inputs must have a binary operation"};
-            }
-            break;
-        case 3:
-            if(!ternaryPointwiseModes().contains(attributes.get_mode()))
-            {
-                return {ErrorCode::INVALID_VALUE,
-                        "PointwiseNode with three inputs must have a ternary operation"};
-            }
-            break;
-        default:
-            return {ErrorCode::INVALID_VALUE,
-                    "PointwiseNode can only have one, two, or three inputs"};
+            return checkInputsMatchOp;
         }
 
-        // Check that ALL inputs are compatible with output dimensions
-        auto output = attributes.get_output_0();
-        if(output && !output->get_dim().empty())
-        {
-            const auto& outputDims = output->get_dim();
-
-            for(const auto& [_, inputTensor] : attributes.inputs)
-            {
-                if(inputTensor)
-                {
-                    const auto& inputDims = inputTensor->get_dim();
-
-                    if(!hipdnn_sdk::utilities::areDimensionsBroadcastCompatible(inputDims,
-                                                                                outputDims))
-                    {
-                        return {ErrorCode::INVALID_VALUE,
-                                "PointwiseNode input '" + inputTensor->get_name()
-                                    + "' has dimensions incompatible with output. "
-                                    + "All inputs must be broadcastable to output dimensions."};
-                    }
-                }
-            }
-        }
-
-        return {};
+        return checkInputsAndOutputsAreBroadcastCompatible();
     }
 
     Error infer_properties_node() override
     {
-        auto in0 = attributes.get_input_0();
-        if(!in0)
-        {
-            return {ErrorCode::ATTRIBUTE_NOT_SET,
-                    "PointwiseNode missing input for setting properties"};
-        }
-
         auto out = attributes.get_output_0();
         if(!out)
         {
@@ -126,6 +70,10 @@ public:
                 {
                     inputShapes.push_back(tensor->get_dim());
                 }
+                else
+                {
+                    return {ErrorCode::INVALID_VALUE, "PointwiseNode has null input tensor"};
+                }
             }
 
             auto outputDims = out->get_dim();
@@ -137,7 +85,12 @@ public:
         {
             for(const auto& [_, tensor] : attributes.inputs)
             {
-                if(tensor && tensor->get_dim() == out->get_dim())
+                if(!tensor)
+                {
+                    return {ErrorCode::INVALID_VALUE, "PointwiseNode has null input tensor"};
+                }
+
+                if(tensor->get_dim() == out->get_dim())
                 {
                     HIPDNN_LOG_INFO(
                         "PointwiseNode {} inferring stride from input tensor {} for output {}",
@@ -166,6 +119,74 @@ public:
             attributes.get_name().c_str(),
             hipdnn_sdk::data_objects::NodeAttributes::NodeAttributes_PointwiseAttributes,
             attributes.pack_attributes(builder).Union());
+    }
+
+private:
+    Error checkInputsMatchOperationType() const
+    {
+        switch(attributes.inputs.size())
+        {
+        case 0:
+            return {ErrorCode::INVALID_VALUE, "PointwiseNode must have at least one input"};
+        case 1:
+            if(!isUnaryPointwiseMode(attributes.get_mode()))
+            {
+                return {ErrorCode::INVALID_VALUE,
+                        "PointwiseNode with one input must have a unary operation"};
+            }
+            break;
+        case 2:
+            if(!isBinaryPointwiseMode(attributes.get_mode()))
+            {
+                return {ErrorCode::INVALID_VALUE,
+                        "PointwiseNode with two inputs must have a binary operation"};
+            }
+            break;
+        case 3:
+            if(!isTernaryPointwiseMode(attributes.get_mode()))
+            {
+                return {ErrorCode::INVALID_VALUE,
+                        "PointwiseNode with three inputs must have a ternary operation"};
+            }
+            break;
+        default:
+            return {ErrorCode::INVALID_VALUE,
+                    "PointwiseNode can only have one, two, or three inputs"};
+        }
+
+        return {};
+    }
+
+    Error checkInputsAndOutputsAreBroadcastCompatible() const
+    {
+        auto output = attributes.get_output_0();
+        if(output && !output->get_dim().empty())
+        {
+            const auto& outputDims = output->get_dim();
+
+            for(const auto& [_, inputTensor] : attributes.inputs)
+            {
+                if(inputTensor)
+                {
+                    const auto& inputDims = inputTensor->get_dim();
+
+                    if(!hipdnn_sdk::utilities::areDimensionsBroadcastCompatible(inputDims,
+                                                                                outputDims))
+                    {
+                        return {ErrorCode::INVALID_VALUE,
+                                "PointwiseNode input '" + inputTensor->get_name()
+                                    + "' has dimensions incompatible with output. "
+                                    + "All inputs must be broadcastable to output dimensions."};
+                    }
+                }
+                else
+                {
+                    return {ErrorCode::INVALID_VALUE, "PointwiseNode has null input tensor"};
+                }
+            }
+        }
+
+        return {};
     }
 };
 }

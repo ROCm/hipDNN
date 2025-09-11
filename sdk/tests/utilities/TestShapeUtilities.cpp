@@ -2,7 +2,7 @@
 // SPDX-License-Identifier:  MIT
 
 #include <gtest/gtest.h>
-#include <hipdnn_sdk/utilities/ShapeUtils.hpp>
+#include <hipdnn_sdk/utilities/ShapeUtilities.hpp>
 
 using namespace hipdnn_sdk::utilities;
 

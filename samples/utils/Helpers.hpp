@@ -5,7 +5,7 @@
 #include <hip/hip_runtime.h>
 #include <hipdnn_backend.h>
 #include <hipdnn_frontend.hpp>
-#include <hipdnn_sdk/utilities/ShapeUtils.hpp>
+#include <hipdnn_sdk/utilities/ShapeUtilities.hpp>
 #include <hipdnn_sdk/utilities/Tensor.hpp>
 
 #include <algorithm>

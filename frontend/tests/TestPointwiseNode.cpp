@@ -8,16 +8,51 @@
 #include <hipdnn_frontend/attributes/PointwiseAttributes.hpp>
 #include <hipdnn_frontend/attributes/TensorAttributes.hpp>
 #include <hipdnn_frontend/node/PointwiseNode.hpp>
+#include <hipdnn_sdk/data_objects/pointwise_attributes_generated.h>
 #include <vector>
 
 using namespace hipdnn_frontend;
 using namespace hipdnn_frontend::graph;
 
-// Helper function to convert set to vector for parameterized tests
-template <typename T>
-std::vector<T> setToVector(const std::set<T>& s)
+namespace
 {
-    return std::vector<T>(s.begin(), s.end());
+namespace
+{
+// Generic helper function to generate vectors of pointwise modes based on a checker function
+template <typename CheckerFunc>
+std::vector<PointwiseMode> getPointwiseModesByChecker(CheckerFunc checker)
+{
+    std::vector<PointwiseMode> modes;
+    // Iterate through all possible PointwiseMode values and check if they match the criteria
+    for(int i = static_cast<int>(hipdnn_sdk::data_objects::PointwiseMode::PointwiseMode_MIN);
+        i <= static_cast<int>(hipdnn_sdk::data_objects::PointwiseMode::PointwiseMode_MAX);
+        ++i)
+    {
+        auto mode = static_cast<PointwiseMode>(i);
+        if(checker(mode))
+        {
+            modes.push_back(mode);
+        }
+    }
+    return modes;
+}
+
+// Helper functions that use the generic function with specific checkers
+std::vector<PointwiseMode> getUnaryPointwiseModes()
+{
+    return getPointwiseModesByChecker(isUnaryPointwiseMode);
+}
+
+std::vector<PointwiseMode> getBinaryPointwiseModes()
+{
+    return getPointwiseModesByChecker(isBinaryPointwiseMode);
+}
+
+std::vector<PointwiseMode> getTernaryPointwiseModes()
+{
+    return getPointwiseModesByChecker(isTernaryPointwiseMode);
+}
+}
 }
 
 // Parameterized test for unary operations
@@ -32,7 +67,7 @@ protected:
     PointwiseMode _mode;
 };
 
-TEST_P(TestPointwiseNodeUnaryOps, validWithOneInput)
+TEST_P(TestPointwiseNodeUnaryOps, ValidWithOneInput)
 {
     PointwiseAttributes attributes;
     attributes.set_input_0(std::make_shared<TensorAttributes>());
@@ -57,7 +92,7 @@ TEST_P(TestPointwiseNodeUnaryOps, validWithOneInput)
         << "Unary operation " << static_cast<int>(_mode) << " should be valid with one input";
 }
 
-TEST_P(TestPointwiseNodeUnaryOps, invalidWithTwoInputs)
+TEST_P(TestPointwiseNodeUnaryOps, InvalidWithTwoInputs)
 {
     PointwiseAttributes attributes;
     attributes.set_input_0(std::make_shared<TensorAttributes>());
@@ -73,7 +108,7 @@ TEST_P(TestPointwiseNodeUnaryOps, invalidWithTwoInputs)
         << "Unary operation " << static_cast<int>(_mode) << " should be invalid with two inputs";
 }
 
-TEST_P(TestPointwiseNodeUnaryOps, invalidWithThreeInputs)
+TEST_P(TestPointwiseNodeUnaryOps, InvalidWithThreeInputs)
 {
     PointwiseAttributes attributes;
     attributes.set_input_0(std::make_shared<TensorAttributes>());
@@ -91,7 +126,9 @@ TEST_P(TestPointwiseNodeUnaryOps, invalidWithThreeInputs)
 }
 
 // Instantiate test suite with all unary operations from Types.hpp
-INSTANTIATE_TEST_SUITE_P(, TestPointwiseNodeUnaryOps, ::testing::ValuesIn(unaryPointwiseModes()));
+INSTANTIATE_TEST_SUITE_P(,
+                         TestPointwiseNodeUnaryOps,
+                         ::testing::ValuesIn(getUnaryPointwiseModes()));
 
 // Parameterized test for binary operations
 class TestPointwiseNodeBinaryOps : public ::testing::TestWithParam<PointwiseMode>
@@ -105,7 +142,7 @@ protected:
     PointwiseMode _mode;
 };
 
-TEST_P(TestPointwiseNodeBinaryOps, invalidWithOneInput)
+TEST_P(TestPointwiseNodeBinaryOps, InvalidWithOneInput)
 {
     PointwiseAttributes attributes;
     attributes.set_input_0(std::make_shared<TensorAttributes>());
@@ -120,7 +157,7 @@ TEST_P(TestPointwiseNodeBinaryOps, invalidWithOneInput)
         << "Binary operation " << static_cast<int>(_mode) << " should be invalid with one input";
 }
 
-TEST_P(TestPointwiseNodeBinaryOps, validWithTwoInputs)
+TEST_P(TestPointwiseNodeBinaryOps, ValidWithTwoInputs)
 {
     PointwiseAttributes attributes;
     attributes.set_input_0(std::make_shared<TensorAttributes>());
@@ -153,7 +190,7 @@ TEST_P(TestPointwiseNodeBinaryOps, validWithTwoInputs)
         << "Binary operation " << static_cast<int>(_mode) << " should be valid with two inputs";
 }
 
-TEST_P(TestPointwiseNodeBinaryOps, invalidWithThreeInputs)
+TEST_P(TestPointwiseNodeBinaryOps, InvalidWithThreeInputs)
 {
     PointwiseAttributes attributes;
     attributes.set_input_0(std::make_shared<TensorAttributes>());
@@ -171,7 +208,9 @@ TEST_P(TestPointwiseNodeBinaryOps, invalidWithThreeInputs)
 }
 
 // Instantiate test suite with all binary operations from Types.hpp
-INSTANTIATE_TEST_SUITE_P(, TestPointwiseNodeBinaryOps, ::testing::ValuesIn(binaryPointwiseModes()));
+INSTANTIATE_TEST_SUITE_P(,
+                         TestPointwiseNodeBinaryOps,
+                         ::testing::ValuesIn(getBinaryPointwiseModes()));
 
 // Parameterized test for ternary operations
 class TestPointwiseNodeTernaryOps : public ::testing::TestWithParam<PointwiseMode>
@@ -185,7 +224,7 @@ protected:
     PointwiseMode _mode;
 };
 
-TEST_P(TestPointwiseNodeTernaryOps, invalidWithOneInput)
+TEST_P(TestPointwiseNodeTernaryOps, InvalidWithOneInput)
 {
     PointwiseAttributes attributes;
     attributes.set_input_0(std::make_shared<TensorAttributes>());
@@ -200,7 +239,7 @@ TEST_P(TestPointwiseNodeTernaryOps, invalidWithOneInput)
         << "Ternary operation " << static_cast<int>(_mode) << " should be invalid with one input";
 }
 
-TEST_P(TestPointwiseNodeTernaryOps, invalidWithTwoInputs)
+TEST_P(TestPointwiseNodeTernaryOps, InvalidWithTwoInputs)
 {
     PointwiseAttributes attributes;
     attributes.set_input_0(std::make_shared<TensorAttributes>());
@@ -216,7 +255,7 @@ TEST_P(TestPointwiseNodeTernaryOps, invalidWithTwoInputs)
         << "Ternary operation " << static_cast<int>(_mode) << " should be invalid with two inputs";
 }
 
-TEST_P(TestPointwiseNodeTernaryOps, validWithThreeInputs)
+TEST_P(TestPointwiseNodeTernaryOps, ValidWithThreeInputs)
 {
     PointwiseAttributes attributes;
     attributes.set_input_0(std::make_shared<TensorAttributes>());
@@ -260,9 +299,9 @@ TEST_P(TestPointwiseNodeTernaryOps, validWithThreeInputs)
 // Instantiate test suite with all ternary operations from Types.hpp
 INSTANTIATE_TEST_SUITE_P(,
                          TestPointwiseNodeTernaryOps,
-                         ::testing::ValuesIn(ternaryPointwiseModes()));
+                         ::testing::ValuesIn(getTernaryPointwiseModes()));
 
-TEST(TestPointwiseNode, zeroInputsError)
+TEST(TestPointwiseNode, ZeroInputsError)
 {
     PointwiseAttributes attributes;
     attributes.set_output_0(std::make_shared<TensorAttributes>());
@@ -275,7 +314,7 @@ TEST(TestPointwiseNode, zeroInputsError)
     EXPECT_EQ(error.code, ErrorCode::INVALID_VALUE);
 }
 
-TEST(TestPointwiseNode, moreThanThreeInputsError)
+TEST(TestPointwiseNode, MoreThanThreeInputsError)
 {
     PointwiseAttributes attributes;
     attributes.set_input_0(std::make_shared<TensorAttributes>());
@@ -295,7 +334,7 @@ TEST(TestPointwiseNode, moreThanThreeInputsError)
     EXPECT_EQ(error.code, ErrorCode::INVALID_VALUE);
 }
 
-TEST(TestPointwiseNode, missingOutputError)
+TEST(TestPointwiseNode, MissingOutputError)
 {
     PointwiseAttributes attributes;
     attributes.set_input_0(std::make_shared<TensorAttributes>());
@@ -308,7 +347,7 @@ TEST(TestPointwiseNode, missingOutputError)
     EXPECT_EQ(error.code, ErrorCode::ATTRIBUTE_NOT_SET);
 }
 
-TEST(TestPointwiseNode, broadcastableDimsValid)
+TEST(TestPointwiseNode, BroadcastableDimsValid)
 {
     PointwiseAttributes attributes;
     attributes.set_input_0(std::make_shared<TensorAttributes>());
@@ -346,7 +385,7 @@ TEST(TestPointwiseNode, broadcastableDimsValid)
     EXPECT_EQ(error.code, ErrorCode::OK);
 }
 
-TEST(TestPointwiseNode, strideInferenceFailsWithMismatchedDims)
+TEST(TestPointwiseNode, StrideInferenceFailsWithMismatchedDims)
 {
     PointwiseAttributes attributes;
     attributes.set_input_0(std::make_shared<TensorAttributes>());
@@ -375,7 +414,7 @@ TEST(TestPointwiseNode, strideInferenceFailsWithMismatchedDims)
     EXPECT_EQ(error.code, ErrorCode::ATTRIBUTE_NOT_SET);
 }
 
-TEST(TestPointwiseNode, inferDimsAndStridesFromSingleInput)
+TEST(TestPointwiseNode, InferDimsAndStridesFromSingleInput)
 {
     PointwiseAttributes attributes;
     attributes.set_input_0(std::make_shared<TensorAttributes>());
@@ -405,7 +444,7 @@ TEST(TestPointwiseNode, inferDimsAndStridesFromSingleInput)
     EXPECT_EQ(outputTensor->get_stride(), (std::vector<int64_t>{12, 4, 1}));
 }
 
-TEST(TestPointwiseNode, broadcastTwoInputsWithMismatchedDims)
+TEST(TestPointwiseNode, BroadcastTwoInputsWithMismatchedDims)
 {
     PointwiseAttributes attributes;
     attributes.set_input_0(std::make_shared<TensorAttributes>());
@@ -444,7 +483,7 @@ TEST(TestPointwiseNode, broadcastTwoInputsWithMismatchedDims)
     EXPECT_EQ(error.code, ErrorCode::OK);
 }
 
-TEST(TestPointwiseNode, inferCommonShapeFromMultipleInputs)
+TEST(TestPointwiseNode, InferCommonShapeFromMultipleInputs)
 {
     PointwiseAttributes attributes;
     attributes.set_input_0(std::make_shared<TensorAttributes>());
@@ -484,7 +523,7 @@ TEST(TestPointwiseNode, inferCommonShapeFromMultipleInputs)
     EXPECT_EQ(outputTensor->get_stride(), (std::vector<int64_t>{3, 1, 1}));
 }
 
-TEST(TestPointwiseNode, scalarBroadcast)
+TEST(TestPointwiseNode, ScalarBroadcast)
 {
     PointwiseAttributes attributes;
     attributes.set_input_0(std::make_shared<TensorAttributes>());
@@ -523,7 +562,7 @@ TEST(TestPointwiseNode, scalarBroadcast)
     EXPECT_EQ(error.code, ErrorCode::OK);
 }
 
-TEST(TestPointwiseNode, broadcastWithFewerDimensions)
+TEST(TestPointwiseNode, BroadcastWithFewerDimensions)
 {
     PointwiseAttributes attributes;
     attributes.set_input_0(std::make_shared<TensorAttributes>());
@@ -562,7 +601,7 @@ TEST(TestPointwiseNode, broadcastWithFewerDimensions)
     EXPECT_EQ(error.code, ErrorCode::OK);
 }
 
-TEST(TestPointwiseNode, nonBroadcastableDimensionsError)
+TEST(TestPointwiseNode, NonBroadcastableDimensionsError)
 {
     PointwiseAttributes attributes;
     attributes.set_input_0(std::make_shared<TensorAttributes>());
@@ -601,7 +640,7 @@ TEST(TestPointwiseNode, nonBroadcastableDimensionsError)
     EXPECT_EQ(error.code, ErrorCode::INVALID_VALUE);
 }
 
-TEST(TestPointwiseNode, multipleOutputsError)
+TEST(TestPointwiseNode, MultipleOutputsError)
 {
     PointwiseAttributes attributes;
     attributes.set_input_0(std::make_shared<TensorAttributes>());
@@ -617,5 +656,135 @@ TEST(TestPointwiseNode, multipleOutputsError)
     PointwiseNode node(std::move(attributes), graphAttributes);
 
     auto error = node.pre_validate_node();
+    EXPECT_EQ(error.code, ErrorCode::INVALID_VALUE);
+}
+
+TEST(TestPointwiseNode, nullInputTensorPreValidation)
+{
+    PointwiseAttributes attributes;
+    // Set input_0 to nullptr explicitly
+    attributes.inputs[PointwiseAttributes::InputNames::IN_0] = nullptr;
+    attributes.set_output_0(std::make_shared<TensorAttributes>());
+    attributes.set_mode(PointwiseMode::RELU_FWD);
+
+    auto outputTensor = attributes.get_output_0();
+    outputTensor->set_uid(1)
+        .set_name("OutputTensor")
+        .set_data_type(DataType::FLOAT)
+        .set_dim({2, 3, 4})
+        .set_stride({12, 4, 1});
+
+    GraphAttributes graphAttributes;
+    PointwiseNode node(std::move(attributes), graphAttributes);
+
+    auto error = node.pre_validate_node();
+    EXPECT_EQ(error.code, ErrorCode::INVALID_VALUE);
+}
+
+TEST(TestPointwiseNode, nullInputAmongMultipleInputsPreValidation)
+{
+    PointwiseAttributes attributes;
+    attributes.set_input_0(std::make_shared<TensorAttributes>());
+    // Set input_1 to nullptr
+    attributes.inputs[PointwiseAttributes::InputNames::IN_1] = nullptr;
+    attributes.set_output_0(std::make_shared<TensorAttributes>());
+    attributes.set_mode(PointwiseMode::ADD);
+
+    auto inputTensor0 = attributes.get_input_0();
+    inputTensor0->set_uid(1)
+        .set_name("InputTensor0")
+        .set_data_type(DataType::FLOAT)
+        .set_dim({2, 3, 4})
+        .set_stride({12, 4, 1});
+
+    auto outputTensor = attributes.get_output_0();
+    outputTensor->set_uid(3)
+        .set_name("OutputTensor")
+        .set_data_type(DataType::FLOAT)
+        .set_dim({2, 3, 4})
+        .set_stride({12, 4, 1});
+
+    GraphAttributes graphAttributes;
+    PointwiseNode node(std::move(attributes), graphAttributes);
+
+    auto error = node.pre_validate_node();
+    EXPECT_EQ(error.code, ErrorCode::INVALID_VALUE);
+}
+
+TEST(TestPointwiseNode, nullInputTensorInferProperties)
+{
+    PointwiseAttributes attributes;
+    // Set input_0 to nullptr
+    attributes.inputs[PointwiseAttributes::InputNames::IN_0] = nullptr;
+    attributes.set_output_0(std::make_shared<TensorAttributes>());
+    attributes.set_mode(PointwiseMode::RELU_FWD);
+
+    auto outputTensor = attributes.get_output_0();
+    outputTensor->set_uid(1).set_name("OutputTensor").set_data_type(DataType::FLOAT);
+
+    GraphAttributes graphAttributes;
+    PointwiseNode node(std::move(attributes), graphAttributes);
+
+    auto error = node.infer_properties_node();
+    EXPECT_EQ(error.code, ErrorCode::INVALID_VALUE);
+}
+
+TEST(TestPointwiseNode, nullInputAmongMultipleInferProperties)
+{
+    PointwiseAttributes attributes;
+    attributes.set_input_0(std::make_shared<TensorAttributes>());
+    attributes.set_input_1(std::make_shared<TensorAttributes>());
+    // Set input_2 to nullptr
+    attributes.inputs[PointwiseAttributes::InputNames::IN_2] = nullptr;
+    attributes.set_output_0(std::make_shared<TensorAttributes>());
+    attributes.set_mode(PointwiseMode::BINARY_SELECT);
+
+    auto inputTensor0 = attributes.get_input_0();
+    inputTensor0->set_uid(1)
+        .set_name("InputTensor0")
+        .set_data_type(DataType::FLOAT)
+        .set_dim({2, 3, 4})
+        .set_stride({12, 4, 1});
+
+    auto inputTensor1 = attributes.get_input_1();
+    inputTensor1->set_uid(2)
+        .set_name("InputTensor1")
+        .set_data_type(DataType::FLOAT)
+        .set_dim({2, 3, 4})
+        .set_stride({12, 4, 1});
+
+    auto outputTensor = attributes.get_output_0();
+    outputTensor->set_uid(4).set_name("OutputTensor").set_data_type(DataType::FLOAT);
+
+    GraphAttributes graphAttributes;
+    PointwiseNode node(std::move(attributes), graphAttributes);
+
+    auto error = node.infer_properties_node();
+    EXPECT_EQ(error.code, ErrorCode::INVALID_VALUE);
+}
+
+TEST(TestPointwiseNode, nullSecondInputInferProperties)
+{
+    PointwiseAttributes attributes;
+    attributes.set_input_0(std::make_shared<TensorAttributes>());
+    // Manually add nullptr as second input
+    attributes.inputs[PointwiseAttributes::InputNames::IN_1] = nullptr;
+    attributes.set_output_0(std::make_shared<TensorAttributes>());
+    attributes.set_mode(PointwiseMode::ADD);
+
+    auto inputTensor0 = attributes.get_input_0();
+    inputTensor0->set_uid(1)
+        .set_name("InputTensor0")
+        .set_data_type(DataType::FLOAT)
+        .set_dim({2, 3, 4})
+        .set_stride({12, 4, 1});
+
+    auto outputTensor = attributes.get_output_0();
+    outputTensor->set_uid(3).set_name("OutputTensor").set_data_type(DataType::FLOAT);
+
+    GraphAttributes graphAttributes;
+    PointwiseNode node(std::move(attributes), graphAttributes);
+
+    auto error = node.infer_properties_node();
     EXPECT_EQ(error.code, ErrorCode::INVALID_VALUE);
 }

@@ -9,6 +9,9 @@
 #include <hipdnn_sdk/utilities/UtilsBfp16.hpp>
 #include <hipdnn_sdk/utilities/UtilsFp16.hpp>
 
+#include <bitset>
+#include <set>
+
 namespace hipdnn_frontend
 {
 
@@ -299,70 +302,109 @@ inline std::ostream& operator<<(std::ostream& os, const DataType& type)
     return os << to_string(type);
 }
 
-inline const std::set<PointwiseMode>& unaryPointwiseModes()
+// Bitset size based on the maximum PointwiseMode value + 1
+static constexpr size_t POINTWISE_MODE_COUNT
+    = static_cast<size_t>(hipdnn_sdk::data_objects::PointwiseMode::PointwiseMode_MAX) + 1;
+
+using PointwiseModeBitset = std::bitset<POINTWISE_MODE_COUNT>;
+
+constexpr size_t toBitPosition(PointwiseMode mode)
 {
-    static const std::set<PointwiseMode> unaryPointwiseModes = {PointwiseMode::ABS,
-                                                                PointwiseMode::CEIL,
-                                                                PointwiseMode::ELU_FWD,
-                                                                PointwiseMode::ERF,
-                                                                PointwiseMode::EXP,
-                                                                PointwiseMode::FLOOR,
-                                                                PointwiseMode::GELU_APPROX_TANH_FWD,
-                                                                PointwiseMode::GELU_FWD,
-                                                                PointwiseMode::GEN_INDEX,
-                                                                PointwiseMode::IDENTITY,
-                                                                PointwiseMode::LOG,
-                                                                PointwiseMode::LOGICAL_NOT,
-                                                                PointwiseMode::NEG,
-                                                                PointwiseMode::RECIPROCAL,
-                                                                PointwiseMode::RELU_FWD,
-                                                                PointwiseMode::RSQRT,
-                                                                PointwiseMode::SIGMOID_FWD,
-                                                                PointwiseMode::SIN,
-                                                                PointwiseMode::SOFTPLUS_FWD,
-                                                                PointwiseMode::SQRT,
-                                                                PointwiseMode::SWISH_FWD,
-                                                                PointwiseMode::TAN,
-                                                                PointwiseMode::TANH_FWD};
-
-    return unaryPointwiseModes;
+    return static_cast<size_t>(mode);
 }
 
-inline const std::set<PointwiseMode>& binaryPointwiseModes()
+// Static bitsets for each category
+inline const PointwiseModeBitset& getUnaryModesBitset()
 {
-    static const std::set<PointwiseMode> binaryPointwiseModes
-        = {PointwiseMode::ADD,
-           PointwiseMode::ADD_SQUARE,
-           PointwiseMode::CMP_EQ,
-           PointwiseMode::CMP_GE,
-           PointwiseMode::CMP_GT,
-           PointwiseMode::CMP_LE,
-           PointwiseMode::CMP_LT,
-           PointwiseMode::CMP_NEQ,
-           PointwiseMode::DIV,
-           PointwiseMode::ELU_BWD,
-           PointwiseMode::GELU_APPROX_TANH_BWD,
-           PointwiseMode::GELU_BWD,
-           PointwiseMode::LOGICAL_AND,
-           PointwiseMode::LOGICAL_OR,
-           PointwiseMode::MAX,
-           PointwiseMode::MIN,
-           PointwiseMode::MUL,
-           PointwiseMode::RELU_BWD,
-           PointwiseMode::SIGMOID_BWD,
-           PointwiseMode::SOFTPLUS_BWD,
-           PointwiseMode::SUB,
-           PointwiseMode::SWISH_BWD,
-           PointwiseMode::TANH_BWD};
-
-    return binaryPointwiseModes;
+    static const PointwiseModeBitset unaryModes = []() {
+        PointwiseModeBitset bitset;
+        bitset.set(toBitPosition(PointwiseMode::ABS));
+        bitset.set(toBitPosition(PointwiseMode::CEIL));
+        bitset.set(toBitPosition(PointwiseMode::ELU_FWD));
+        bitset.set(toBitPosition(PointwiseMode::ERF));
+        bitset.set(toBitPosition(PointwiseMode::EXP));
+        bitset.set(toBitPosition(PointwiseMode::FLOOR));
+        bitset.set(toBitPosition(PointwiseMode::GELU_APPROX_TANH_FWD));
+        bitset.set(toBitPosition(PointwiseMode::GELU_FWD));
+        bitset.set(toBitPosition(PointwiseMode::GEN_INDEX));
+        bitset.set(toBitPosition(PointwiseMode::IDENTITY));
+        bitset.set(toBitPosition(PointwiseMode::LOG));
+        bitset.set(toBitPosition(PointwiseMode::LOGICAL_NOT));
+        bitset.set(toBitPosition(PointwiseMode::NEG));
+        bitset.set(toBitPosition(PointwiseMode::RECIPROCAL));
+        bitset.set(toBitPosition(PointwiseMode::RELU_FWD));
+        bitset.set(toBitPosition(PointwiseMode::RSQRT));
+        bitset.set(toBitPosition(PointwiseMode::SIGMOID_FWD));
+        bitset.set(toBitPosition(PointwiseMode::SIN));
+        bitset.set(toBitPosition(PointwiseMode::SOFTPLUS_FWD));
+        bitset.set(toBitPosition(PointwiseMode::SQRT));
+        bitset.set(toBitPosition(PointwiseMode::SWISH_FWD));
+        bitset.set(toBitPosition(PointwiseMode::TAN));
+        bitset.set(toBitPosition(PointwiseMode::TANH_FWD));
+        return bitset;
+    }();
+    return unaryModes;
 }
 
-inline const std::set<PointwiseMode>& ternaryPointwiseModes()
+inline const PointwiseModeBitset& getBinaryModesBitset()
 {
-    static const std::set<PointwiseMode> ternaryPointwiseModes = {PointwiseMode::BINARY_SELECT};
-
-    return ternaryPointwiseModes;
+    static const PointwiseModeBitset binaryModes = []() {
+        PointwiseModeBitset bitset;
+        bitset.set(toBitPosition(PointwiseMode::ADD));
+        bitset.set(toBitPosition(PointwiseMode::ADD_SQUARE));
+        bitset.set(toBitPosition(PointwiseMode::CMP_EQ));
+        bitset.set(toBitPosition(PointwiseMode::CMP_GE));
+        bitset.set(toBitPosition(PointwiseMode::CMP_GT));
+        bitset.set(toBitPosition(PointwiseMode::CMP_LE));
+        bitset.set(toBitPosition(PointwiseMode::CMP_LT));
+        bitset.set(toBitPosition(PointwiseMode::CMP_NEQ));
+        bitset.set(toBitPosition(PointwiseMode::DIV));
+        bitset.set(toBitPosition(PointwiseMode::ELU_BWD));
+        bitset.set(toBitPosition(PointwiseMode::GELU_APPROX_TANH_BWD));
+        bitset.set(toBitPosition(PointwiseMode::GELU_BWD));
+        bitset.set(toBitPosition(PointwiseMode::LOGICAL_AND));
+        bitset.set(toBitPosition(PointwiseMode::LOGICAL_OR));
+        bitset.set(toBitPosition(PointwiseMode::MAX));
+        bitset.set(toBitPosition(PointwiseMode::MIN));
+        bitset.set(toBitPosition(PointwiseMode::MUL));
+        bitset.set(toBitPosition(PointwiseMode::RELU_BWD));
+        bitset.set(toBitPosition(PointwiseMode::SIGMOID_BWD));
+        bitset.set(toBitPosition(PointwiseMode::SOFTPLUS_BWD));
+        bitset.set(toBitPosition(PointwiseMode::SUB));
+        bitset.set(toBitPosition(PointwiseMode::SWISH_BWD));
+        bitset.set(toBitPosition(PointwiseMode::TANH_BWD));
+        return bitset;
+    }();
+    return binaryModes;
 }
 
+inline const PointwiseModeBitset& getTernaryModesBitset()
+{
+    static const PointwiseModeBitset ternaryModes = []() {
+        PointwiseModeBitset bitset;
+        bitset.set(toBitPosition(PointwiseMode::BINARY_SELECT));
+        return bitset;
+    }();
+    return ternaryModes;
 }
+
+// Fast O(1) check functions
+inline bool isUnaryPointwiseMode(PointwiseMode mode)
+{
+    auto position = toBitPosition(mode);
+    return position < POINTWISE_MODE_COUNT && getUnaryModesBitset().test(position);
+}
+
+inline bool isBinaryPointwiseMode(PointwiseMode mode)
+{
+    auto position = toBitPosition(mode);
+    return position < POINTWISE_MODE_COUNT && getBinaryModesBitset().test(position);
+}
+
+inline bool isTernaryPointwiseMode(PointwiseMode mode)
+{
+    auto position = toBitPosition(mode);
+    return position < POINTWISE_MODE_COUNT && getTernaryModesBitset().test(position);
+}
+
+} // namespace hipdnn_frontend
