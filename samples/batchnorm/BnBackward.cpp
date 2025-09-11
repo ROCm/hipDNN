@@ -117,16 +117,15 @@ void SampleRunner::operator()(const TensorLayout& layout)
         Tensor<IntermediateType> dscaleRefTensor(dscale->get_dim());
         Tensor<IntermediateType> dbiasRefTensor(dbias->get_dim());
 
-        hipdnn_sdk::reference_test_utilities::
-            CpuFpReferenceBatchnormImpl<InputType, IntermediateType>::batchnormBwd(
-                dyTensor,
-                xTensor,
-                savedMeanTensor,
-                savedInvVarTensor,
-                scaleTensor,
-                dxRefTensor,
-                dscaleRefTensor,
-                dbiasRefTensor);
+        hipdnn_sdk::test_utilities::CpuFpReferenceBatchnormImpl<InputType, IntermediateType>::
+            batchnormBwd(dyTensor,
+                         xTensor,
+                         savedMeanTensor,
+                         savedInvVarTensor,
+                         scaleTensor,
+                         dxRefTensor,
+                         dscaleRefTensor,
+                         dbiasRefTensor);
 
         auto epsilon = getEpsilon<InputType>();
 

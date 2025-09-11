@@ -114,8 +114,8 @@ void SampleRunner::operator()(const TensorLayout& layout)
 
         auto epsilon = getEpsilon<InputType>();
 
-        hipdnn_sdk::reference_test_utilities::
-            CpuFpReferenceBatchnormImpl<InputType, IntermediateType>::batchnormFwdInference(
+        hipdnn_sdk::test_utilities::CpuFpReferenceBatchnormImpl<InputType, IntermediateType>::
+            batchnormFwdInference(
                 xTensor, scaleTensor, biasTensor, meanTensor, varianceTensor, yRefTensor, epsilon);
 
         auto validator = hipdnn_sdk::test_utilities::CpuFpReferenceValidation<InputType>(

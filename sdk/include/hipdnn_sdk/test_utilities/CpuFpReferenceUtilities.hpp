@@ -12,7 +12,7 @@
 
 namespace hipdnn_sdk
 {
-namespace reference_test_utilities
+namespace test_utilities
 {
 
 // Parallel execution utilities for CPU reference implementations
@@ -110,5 +110,5 @@ static auto makeParallelTensorFunctor(F f, Xs... xs)
     return ParallelTensorFunctor<F, Xs...>(f, xs...);
 }
 
-} // namespace reference_test_utilities
+} // namespace test_utilities
 } // namespace hipdnn_sdk

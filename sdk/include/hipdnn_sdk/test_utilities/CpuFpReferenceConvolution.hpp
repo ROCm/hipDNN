@@ -153,7 +153,7 @@ public:
                 static_cast<InputDataType>(accumulator), nIdx, outputChannel, hoIdx, woIdx);
         };
 
-        hipdnn_sdk::reference_test_utilities::makeParallelTensorFunctor(
+        hipdnn_sdk::test_utilities::makeParallelTensorFunctor(
             convolutionFunc, nGroups, nBatch, outputChannelsPerGroup, outputHeight, outputWidth)(
             std::thread::hardware_concurrency());
 
