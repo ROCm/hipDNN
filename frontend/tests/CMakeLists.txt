@@ -36,9 +36,6 @@ add_executable(hipdnn_frontend_tests
 )
 
 target_compile_options(hipdnn_frontend_tests PRIVATE ${HIPDNN_WARNING_COMPILE_OPTIONS})
-target_compile_definitions(hipdnn_frontend_tests PRIVATE
-    COMPONENT_NAME="hipdnn_frontend_tests"
-)
 
 target_link_libraries(hipdnn_frontend_tests 
     GTest::gtest 
