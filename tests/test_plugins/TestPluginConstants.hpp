@@ -13,10 +13,17 @@ namespace hipdnn_tests
 {
 namespace plugin_constants
 {
-// Test plugin directory - dynamically constructed using build directory
-inline std::filesystem::path getPluginDir()
+// Test plugin directory constants - relative to backend .so location
+inline const std::string& getTestPluginDefaultDir()
 {
-    return std::filesystem::path(hipdnn_sdk::utilities::getBuildDir()) / "lib" / "test_plugins";
+    static const std::string s_defaultDir = "./test_plugins/default";
+    return s_defaultDir;
+}
+
+inline const std::string& getTestPluginCustomDir()
+{
+    static const std::string s_customDir = "./test_plugins/custom";
+    return s_customDir;
 }
 
 // Compose full plugin path with existence checking
@@ -25,16 +32,15 @@ inline std::string getPluginPath(const char* pluginName)
     namespace fs = std::filesystem;
 
     fs::path pluginFile
-        = fs::path("./test_plugins/custom") / hipdnn_sdk::utilities::getLibraryName(pluginName);
-
-    // Can't check because it's relative to lib
-    // // Check if the file exists
-    // if(!fs::exists(pluginFile))
-    // {
-    //     throw std::runtime_error("Plugin file not found: " + pluginFile.string());
-    // }
+        = fs::path(getTestPluginCustomDir()) / hipdnn_sdk::utilities::getLibraryName(pluginName);
 
     return pluginFile.string();
+}
+
+inline std::string getDefaultPluginPath()
+{
+    namespace fs = std::filesystem;
+    return (fs::path(getTestPluginDefaultDir()) / hipdnn_sdk::utilities::getLibraryName("test_good_default_plugin")).string();
 }
 
 inline const std::string& testGoodPluginPath()

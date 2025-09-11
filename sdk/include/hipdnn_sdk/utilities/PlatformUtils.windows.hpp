@@ -7,6 +7,9 @@
 
 #define NOMINMAX
 #include <windows.h>
+#include <algorithm>
+#include <cwctype>
+#include <filesystem>
 
 namespace hipdnn_sdk
 {
@@ -48,6 +51,14 @@ inline void unsetEnv(const char* var)
     SetEnvironmentVariableA(var, nullptr);
 }
 
+}
+
+inline bool pathCompEq(const std::filesystem::path& a, const std::filesystem::path& b) 
+{
+    std::wstring A = a.native(), B = b.native();
+    std::transform(A.begin(), A.end(), A.begin(), ::towlower);
+    std::transform(B.begin(), B.end(), B.begin(), ::towlower);
+    return A == B;
 }
 }
 
