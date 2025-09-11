@@ -32,6 +32,12 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
+set(HIPDNN_PLUGIN_ENGINE_SUBDIR "hipdnn_plugins/engines" CACHE STRING "Subdirectory for official hipDNN engine plugins")
+set(HIPDNN_BUILD_PLUGIN_ENGINE_DIR "${CMAKE_BINARY_DIR}/lib/${HIPDNN_PLUGIN_ENGINE_SUBDIR}" CACHE PATH "Build directory for official hipDNN engine plugins")
+set(HIPDNN_INSTALL_PLUGIN_ENGINE_DIR "lib/${HIPDNN_PLUGIN_ENGINE_SUBDIR}" CACHE STRING "Install directory for official hipDNN engine plugins (relative to CMAKE_INSTALL_PREFIX)")
+
+set(HIPDNN_TEST_PLUGIN_DIR "${CMAKE_BINARY_DIR}/lib/test_plugins" CACHE INTERNAL "Build directory for test plugins")
+
 option(HIP_DNN_BUILD_BACKEND "Build the backend code" ON)
 option(HIP_DNN_BUILD_FRONTEND "Build the frontend code" ON)
 option(HIP_DNN_SKIP_TESTS "Skips building all tests" OFF)
@@ -119,6 +125,7 @@ endif()
 add_subdirectory(tests)
 
 if(HIP_DNN_BUILD_PLUGINS)
+    file(MAKE_DIRECTORY ${HIPDNN_BUILD_PLUGIN_ENGINE_DIR})
     add_subdirectory(plugins)
 endif()
 

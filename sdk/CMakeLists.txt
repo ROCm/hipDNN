@@ -70,6 +70,16 @@ target_compile_definitions(hipdnn_sdk INTERFACE __HIPCC__)
 
 target_compile_definitions(hipdnn_sdk INTERFACE HIPDNN_BUILD_DIR="${CMAKE_BINARY_DIR}")
 
+# Export plugin directory variables for external plugin developers
+set(HIPDNN_PLUGIN_ENGINE_SUBDIR "${HIPDNN_PLUGIN_ENGINE_SUBDIR}")
+set(HIPDNN_INSTALL_PLUGIN_ENGINE_DIR "${HIPDNN_INSTALL_PLUGIN_ENGINE_DIR}")
+
+configure_file(
+    "${CMAKE_CURRENT_SOURCE_DIR}/cmake/hipdnn_sdk_plugin_config.cmake.in"
+    "${CMAKE_BINARY_DIR}/lib/cmake/hipdnn_sdk/hipdnn_sdk_plugin_config.cmake"
+    @ONLY
+)
+
 install(
     TARGETS hipdnn_sdk FlatBuffers spdlog_header_only
     EXPORT hipdnn_sdk_targets
@@ -89,6 +99,12 @@ install(
 install(EXPORT hipdnn_sdk_targets
     DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/hipdnn_sdk
     FILE hipdnn_sdkConfig.cmake
+)
+
+# Install the plugin config file
+install(FILES
+    "${CMAKE_BINARY_DIR}/lib/cmake/hipdnn_sdk/hipdnn_sdk_plugin_config.cmake"
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/hipdnn_sdk
 )
 
 add_subdirectory(tests)

@@ -3,6 +3,8 @@
 
 #pragma once
 
+#include <cstdlib>
+#include <filesystem>
 #include <set>
 #include <string>
 
@@ -19,7 +21,7 @@ class EnginePluginManager : public PluginManagerBase<EnginePlugin>
 {
 public:
     EnginePluginManager()
-        : PluginManagerBase<EnginePlugin>({"hipdnn_plugins/engines/"})
+        : PluginManagerBase<EnginePlugin>(getPluginSearchPaths())
     {
     }
 
@@ -45,6 +47,18 @@ private:
     }
 
     std::set<int64_t> _engineIds;
+
+    // TODO: fix
+    static std::set<std::filesystem::path> getPluginSearchPaths()
+    {
+        const char* envPath = std::getenv("HIPDNN_PLUGIN_DIR");
+        if(envPath != nullptr && std::string(envPath).length() > 0)
+        {
+            return {std::filesystem::path(envPath)};
+        }
+
+        return {std::filesystem::path("hipdnn_plugins/engines/")};
+    }
 };
 
 } // namespace plugin

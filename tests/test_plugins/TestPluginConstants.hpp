@@ -16,7 +16,7 @@ namespace plugin_constants
 // Test plugin directory - dynamically constructed using build directory
 inline std::filesystem::path getPluginDir()
 {
-    return std::filesystem::path(hipdnn_sdk::utilities::getBuildDir()) / "lib" / "hipdnn_plugins";
+    return std::filesystem::path(hipdnn_sdk::utilities::getBuildDir()) / "lib" / "test_plugins";
 }
 
 // Compose full plugin path with existence checking
@@ -25,7 +25,7 @@ inline std::string getPluginPath(const char* pluginName)
     namespace fs = std::filesystem;
 
     fs::path pluginFile
-        = fs::path("./hipdnn_plugins") / hipdnn_sdk::utilities::getLibraryName(pluginName);
+        = fs::path("./test_plugins/custom") / hipdnn_sdk::utilities::getLibraryName(pluginName);
 
     // Can't check because it's relative to lib
     // // Check if the file exists

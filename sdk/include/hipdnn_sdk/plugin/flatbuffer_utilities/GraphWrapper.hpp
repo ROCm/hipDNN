@@ -58,7 +58,12 @@ public:
     uint32_t nodeCount() const override
     {
         throwIfNotValid();
-        return _shallowGraph->nodes()->size();
+        auto nodes = _shallowGraph->nodes();
+        if(nodes == nullptr)
+        {
+            return 0;
+        }
+        return static_cast<uint32_t>(nodes->size());
     }
 
     bool hasOnlySupportedAttributes(

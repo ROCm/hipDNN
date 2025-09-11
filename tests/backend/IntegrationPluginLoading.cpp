@@ -5,19 +5,25 @@
 
 #include "TestUtil.hpp"
 #include "descriptors/BackendDescriptor.hpp"
-#include "hipdnn_backend.h"
-#include "hipdnn_sdk/plugin/EnginePluginApi.h"
-#include "hipdnn_sdk/plugin/PluginApi.h"
-#include "hipdnn_sdk/utilities/PlatformUtils.hpp"
 #include <HipdnnBackendAttributeName.h>
 #include <HipdnnBackendAttributeType.h>
 #include <HipdnnBackendHeuristicType.h>
+#include <hipdnn_backend.h>
+#include <hipdnn_sdk/plugin/EnginePluginApi.h>
+#include <hipdnn_sdk/plugin/PluginApi.h>
+#include <hipdnn_sdk/test_utilities/ScopedEnvironmentVariableSetter.hpp>
 #include <hipdnn_sdk/test_utilities/TempDirectory.hpp>
+#include <hipdnn_sdk/utilities/PlatformUtils.hpp>
 #include <test_plugins/TestPluginConstants.hpp>
 #include <test_plugins/TestPluginEngineIdMap.hpp>
 
+#include <filesystem>
 #include <gtest/gtest.h>
 #include <spdlog/spdlog.h>
+
+using namespace hipdnn_sdk::utilities;
+using namespace hipdnn_tests::plugin_constants;
+namespace fs = std::filesystem;
 
 class IntegrationPluginLoading : public ::testing::Test
 {
@@ -254,6 +260,13 @@ TEST_F(IntegrationPluginLoading, MultiplePluginsNoApplicableEngines)
 
 TEST_F(IntegrationPluginLoading, MultiplePluginsOneApplicableEngine)
 {
+    // TODO: maybe move this to setup since they can all pass with it.
+    // Only consideration is env guard scope.
+    hipdnn_sdk::test_utilities::ScopedEnvironmentVariableSetter envSetter("HIPDNN_PLUGIN_DIR");
+    std::string testPluginDir
+        = (fs::path(getBuildDir()) / "lib" / "test_plugins" / "default").string();
+    hipdnn_sdk::utilities::setEnv("HIPDNN_PLUGIN_DIR", testPluginDir.c_str());
+
     const std::array<const char*, 1> paths
         = {hipdnn_tests::plugin_constants::testNoApplicableEnginesAPluginPath().c_str()};
     ASSERT_EQ(
@@ -284,6 +297,12 @@ TEST_F(IntegrationPluginLoading, MultiplePluginsOneApplicableEngine)
 
 TEST_F(IntegrationPluginLoading, MultiplePluginsMultipleApplicableEngines)
 {
+
+    hipdnn_sdk::test_utilities::ScopedEnvironmentVariableSetter envSetter("HIPDNN_PLUGIN_DIR");
+    std::string testPluginDir
+        = (fs::path(getBuildDir()) / "lib" / "test_plugins" / "default").string();
+    hipdnn_sdk::utilities::setEnv("HIPDNN_PLUGIN_DIR", testPluginDir.c_str());
+
     const std::array<const char*, 1> paths
         = {hipdnn_tests::plugin_constants::testGoodPluginPath().c_str()};
     ASSERT_EQ(
