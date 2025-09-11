@@ -216,7 +216,7 @@ TEST_F(TestGraph, PointwiseNodeCreationTwoInputs)
 
     PointwiseAttributes attributes;
     attributes.set_name("PointwiseNode");
-    attributes.set_mode(PointwiseMode::RELU_FWD);
+    attributes.set_mode(PointwiseMode::ADD);
 
     auto out0 = graph.pointwise(in0, in1, attributes);
 
@@ -241,7 +241,7 @@ TEST_F(TestGraph, PointwiseNodeCreationThreeInputs)
 
     PointwiseAttributes attributes;
     attributes.set_name("PointwiseNode");
-    attributes.set_mode(PointwiseMode::RELU_FWD);
+    attributes.set_mode(PointwiseMode::BINARY_SELECT);
 
     auto out0 = graph.pointwise(in0, in1, in2, attributes);
 
