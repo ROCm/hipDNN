@@ -4,12 +4,8 @@
 #include "../utils/Helpers.hpp"
 
 #include <hipdnn_frontend.hpp>
-<<<<<<< HEAD
 #include <hipdnn_frontend/Graph.hpp>
 #include <hipdnn_frontend/attributes/BatchnormBackwardAttributes.hpp>
-    =======
-#include <hipdnn_sdk/test_utilities/CpuFpReferenceImplementation.hpp>
-    >>>>>>> e14c60382601a58475f97467ac1e964b2c5054dd
 #include <hipdnn_sdk/test_utilities/CpuFpReferenceValidation.hpp>
 #include <hipdnn_sdk/test_utilities/ReferenceImplementationInterface.hpp>
 #include <hipdnn_sdk/utilities/Tensor.hpp>
@@ -18,7 +14,7 @@
 #include <string>
 #include <unordered_map>
 
-    using namespace hipdnn_frontend;
+using namespace hipdnn_frontend;
 using namespace hipdnn_sdk::utilities;
 
 // TODO: verify this sample when applicable engines are added
