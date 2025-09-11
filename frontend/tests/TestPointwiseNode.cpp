@@ -659,7 +659,7 @@ TEST(TestPointwiseNode, MultipleOutputsError)
     EXPECT_EQ(error.code, ErrorCode::INVALID_VALUE);
 }
 
-TEST(TestPointwiseNode, nullInputTensorPreValidation)
+TEST(TestPointwiseNode, NullInputTensorPreValidation)
 {
     PointwiseAttributes attributes;
     // Set input_0 to nullptr explicitly
@@ -681,7 +681,7 @@ TEST(TestPointwiseNode, nullInputTensorPreValidation)
     EXPECT_EQ(error.code, ErrorCode::INVALID_VALUE);
 }
 
-TEST(TestPointwiseNode, nullInputAmongMultipleInputsPreValidation)
+TEST(TestPointwiseNode, NullInputAmongMultipleInputsPreValidation)
 {
     PointwiseAttributes attributes;
     attributes.set_input_0(std::make_shared<TensorAttributes>());
@@ -711,7 +711,7 @@ TEST(TestPointwiseNode, nullInputAmongMultipleInputsPreValidation)
     EXPECT_EQ(error.code, ErrorCode::INVALID_VALUE);
 }
 
-TEST(TestPointwiseNode, nullInputTensorInferProperties)
+TEST(TestPointwiseNode, NullInputTensorInferProperties)
 {
     PointwiseAttributes attributes;
     // Set input_0 to nullptr
@@ -729,7 +729,7 @@ TEST(TestPointwiseNode, nullInputTensorInferProperties)
     EXPECT_EQ(error.code, ErrorCode::INVALID_VALUE);
 }
 
-TEST(TestPointwiseNode, nullInputAmongMultipleInferProperties)
+TEST(TestPointwiseNode, NullInputAmongMultipleInferProperties)
 {
     PointwiseAttributes attributes;
     attributes.set_input_0(std::make_shared<TensorAttributes>());
@@ -763,7 +763,7 @@ TEST(TestPointwiseNode, nullInputAmongMultipleInferProperties)
     EXPECT_EQ(error.code, ErrorCode::INVALID_VALUE);
 }
 
-TEST(TestPointwiseNode, nullSecondInputInferProperties)
+TEST(TestPointwiseNode, NullSecondInputInferProperties)
 {
     PointwiseAttributes attributes;
     attributes.set_input_0(std::make_shared<TensorAttributes>());
