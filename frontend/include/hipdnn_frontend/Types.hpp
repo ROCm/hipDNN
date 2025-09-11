@@ -313,7 +313,6 @@ constexpr size_t toBitPosition(PointwiseMode mode)
     return static_cast<size_t>(mode);
 }
 
-// Static bitsets for each category
 inline const PointwiseModeBitset& getUnaryModesBitset()
 {
     static const PointwiseModeBitset unaryModes = []() {
@@ -388,7 +387,6 @@ inline const PointwiseModeBitset& getTernaryModesBitset()
     return ternaryModes;
 }
 
-// Fast O(1) check functions
 inline bool isUnaryPointwiseMode(PointwiseMode mode)
 {
     auto position = toBitPosition(mode);
