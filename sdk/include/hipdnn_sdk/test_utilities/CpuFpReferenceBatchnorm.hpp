@@ -3,9 +3,8 @@
 
 #pragma once
 
-#include <hipdnn_sdk/test_utilities/ReferenceImplementationInterface.hpp>
-#include <hipdnn_sdk/utilities/UtilsBfp16.hpp>
-#include <hipdnn_sdk/utilities/UtilsFp16.hpp>
+#include <algorithm>
+#include <hipdnn_sdk/utilities/Tensor.hpp>
 #include <numeric>
 #include <vector>
 
@@ -19,20 +18,31 @@ using namespace hipdnn_sdk::utilities;
 template <class InputDataType,
           class ScaleBiasDataType,
           class MeanVarianceDataType = ScaleBiasDataType>
-class CpuFpReferenceImplementation
-    : public IReferenceImplementation<InputDataType, ScaleBiasDataType, MeanVarianceDataType>
+class CpuFpReferenceBatchnormImpl
 {
 public:
-    CpuFpReferenceImplementation() = default;
-    ~CpuFpReferenceImplementation() override = default;
+    static bool isApplicable(const hipdnn_sdk::data_objects::Node& node)
+    {
+        using namespace hipdnn_sdk::data_objects;
 
-    void batchnormFwdInference(const TensorBase<InputDataType>& input,
-                               const TensorBase<ScaleBiasDataType>& scale,
-                               const TensorBase<ScaleBiasDataType>& bias,
-                               const TensorBase<MeanVarianceDataType>& estimatedMean,
-                               const TensorBase<MeanVarianceDataType>& estimatedVariance,
-                               TensorBase<InputDataType>& output,
-                               double epsilon) override
+        // Support both BatchNorm inference and backward
+        if(node.attributes_type() != NodeAttributes_BatchnormInferenceAttributes
+           && node.attributes_type() != NodeAttributes_BatchnormBackwardAttributes)
+        {
+            return false;
+        }
+
+        // Default to supporting the node
+        return true;
+    }
+
+    static void batchnormFwdInference(const TensorBase<InputDataType>& input,
+                                      const TensorBase<ScaleBiasDataType>& scale,
+                                      const TensorBase<ScaleBiasDataType>& bias,
+                                      const TensorBase<MeanVarianceDataType>& estimatedMean,
+                                      const TensorBase<MeanVarianceDataType>& estimatedVariance,
+                                      TensorBase<InputDataType>& output,
+                                      double epsilon)
     {
         if(input.dims().size() != 4)
         {
@@ -79,14 +89,14 @@ public:
         output.memory().markHostModified(); // Mark output memory as modified on host
     }
 
-    void batchnormBwd(const TensorBase<InputDataType>& dy,
-                      const TensorBase<InputDataType>& x,
-                      const TensorBase<MeanVarianceDataType>& mean,
-                      const TensorBase<MeanVarianceDataType>& invVariance,
-                      const TensorBase<ScaleBiasDataType>& scale,
-                      TensorBase<InputDataType>& dx,
-                      TensorBase<ScaleBiasDataType>& dscale,
-                      TensorBase<ScaleBiasDataType>& dbias) override
+    static void batchnormBwd(const TensorBase<InputDataType>& dy,
+                             const TensorBase<InputDataType>& x,
+                             const TensorBase<MeanVarianceDataType>& mean,
+                             const TensorBase<MeanVarianceDataType>& invVariance,
+                             const TensorBase<ScaleBiasDataType>& scale,
+                             TensorBase<InputDataType>& dx,
+                             TensorBase<ScaleBiasDataType>& dscale,
+                             TensorBase<ScaleBiasDataType>& dbias)
     {
         if(x.dims().size() != 4)
         {
@@ -171,12 +181,12 @@ public:
     }
 
 private:
-    double sqrtInternal(double value) const
+    static double sqrtInternal(double value)
     {
         return std::sqrt(value);
     }
 
-    float sqrtInternal(float value) const
+    static float sqrtInternal(float value)
     {
         return sqrtf(value);
     }

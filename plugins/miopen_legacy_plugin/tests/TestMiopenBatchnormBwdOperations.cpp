@@ -6,13 +6,14 @@
 
 #include <hipdnn_sdk/plugin/EnginePluginApi.h>
 #include <hipdnn_sdk/plugin/PluginApiDataTypes.h>
-#include <hipdnn_sdk/test_utilities/CpuFpReferenceImplementation.hpp>
 #include <hipdnn_sdk/test_utilities/CpuFpReferenceValidation.hpp>
 #include <hipdnn_sdk/test_utilities/FlatbufferGraphTestUtils.hpp>
 #include <hipdnn_sdk/test_utilities/TestUtilities.hpp>
 #include <hipdnn_sdk/utilities/Tensor.hpp>
 #include <hipdnn_sdk/utilities/UtilsBfp16.hpp>
 #include <hipdnn_sdk/utilities/UtilsFp16.hpp>
+
+#include <hipdnn_sdk/test_utilities/CpuFpReferenceBatchnorm.hpp>
 
 #include "HipdnnEnginePluginExecutionContext.hpp"
 #include "HipdnnEnginePluginHandle.hpp"
@@ -148,15 +149,14 @@ protected:
         invVarianceTensorCpu.fillWithRandomValues(
             static_cast<IntermediateType>(1.9f), static_cast<IntermediateType>(2.0f), seed);
 
-        CpuFpReferenceImplementation<InputType, IntermediateType, IntermediateType> cpuRefImpl;
-        cpuRefImpl.batchnormBwd(dyTensorCpu,
-                                xTensorCpu,
-                                meanTensorCpu,
-                                invVarianceTensorCpu,
-                                scaleTensorCpu,
-                                dxTensorCpu,
-                                dscaleTensorCpu,
-                                dbiasTensorCpu);
+        CpuFpReferenceBatchnormImpl<InputType, IntermediateType>::batchnormBwd(dyTensorCpu,
+                                                                               xTensorCpu,
+                                                                               meanTensorCpu,
+                                                                               invVarianceTensorCpu,
+                                                                               scaleTensorCpu,
+                                                                               dxTensorCpu,
+                                                                               dscaleTensorCpu,
+                                                                               dbiasTensorCpu);
 
         CpuFpReferenceValidation<InputType> cpuRefValidationInput(epsilon, epsilon);
         CpuFpReferenceValidation<IntermediateType> cpuRefValidationIntermediate(epsilon, epsilon);

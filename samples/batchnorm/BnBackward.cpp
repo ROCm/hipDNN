@@ -4,9 +4,12 @@
 #include "../utils/Helpers.hpp"
 
 #include <hipdnn_frontend.hpp>
-#include <hipdnn_sdk/test_utilities/CpuFpReferenceImplementation.hpp>
+#include <hipdnn_frontend/Graph.hpp>
+#include <hipdnn_frontend/attributes/BatchnormBackwardAttributes.hpp>
 #include <hipdnn_sdk/test_utilities/CpuFpReferenceValidation.hpp>
 #include <hipdnn_sdk/utilities/Tensor.hpp>
+
+#include <hipdnn_sdk/test_utilities/CpuFpReferenceBatchnorm.hpp>
 
 #include <iostream>
 #include <string>
@@ -110,21 +113,19 @@ void SampleRunner::operator()(const TensorLayout& layout)
     {
         std::cout << "Running CPU reference validation...\n";
 
-        auto refImpl = hipdnn_sdk::test_utilities::CpuFpReferenceImplementation<InputType,
-                                                                                IntermediateType>();
-
         Tensor<InputType> dxRefTensor(dx->get_dim(), layout);
         Tensor<IntermediateType> dscaleRefTensor(dscale->get_dim());
         Tensor<IntermediateType> dbiasRefTensor(dbias->get_dim());
 
-        refImpl.batchnormBwd(dyTensor,
-                             xTensor,
-                             savedMeanTensor,
-                             savedInvVarTensor,
-                             scaleTensor,
-                             dxRefTensor,
-                             dscaleRefTensor,
-                             dbiasRefTensor);
+        hipdnn_sdk::test_utilities::CpuFpReferenceBatchnormImpl<InputType, IntermediateType>::
+            batchnormBwd(dyTensor,
+                         xTensor,
+                         savedMeanTensor,
+                         savedInvVarTensor,
+                         scaleTensor,
+                         dxRefTensor,
+                         dscaleRefTensor,
+                         dbiasRefTensor);
 
         auto epsilon = getEpsilon<InputType>();
 

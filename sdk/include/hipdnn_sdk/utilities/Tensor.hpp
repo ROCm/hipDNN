@@ -4,7 +4,7 @@
 #pragma once
 
 #include <hipdnn_sdk/utilities/MigratableMemory.hpp>
-#include <hipdnn_sdk/utilities/ShapeUtils.hpp>
+#include <hipdnn_sdk/utilities/ShapeUtilities.hpp>
 #include <iostream>
 #include <numeric>
 #include <random>
