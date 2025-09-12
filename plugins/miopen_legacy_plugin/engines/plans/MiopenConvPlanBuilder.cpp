@@ -262,6 +262,15 @@ bool MiopenConvPlanBuilder::isApplicable(const HipdnnEnginePluginHandle& handle,
 size_t MiopenConvPlanBuilder::getWorkspaceSize(const HipdnnEnginePluginHandle& handle,
                                                const hipdnn_plugin::IGraph& opGraph) const
 {
+    if(opGraph.nodeCount() != 1)
+    {
+        throw hipdnn_plugin::HipdnnPluginException(
+            HIPDNN_PLUGIN_STATUS_BAD_PARAM,
+            "Convolution plan builder supports only single node graphs. Graph has "
+                + std::to_string(opGraph.nodeCount())
+                + " nodes");
+    }
+
     const auto& node = opGraph.getNode(0);
 
     switch(node.attributes_type())
@@ -280,6 +289,15 @@ void MiopenConvPlanBuilder::buildPlan(const HipdnnEnginePluginHandle& handle,
                                       const hipdnn_plugin::IGraph& opGraph,
                                       HipdnnEnginePluginExecutionContext& executionContext) const
 {
+    if(opGraph.nodeCount() != 1)
+    {
+        throw hipdnn_plugin::HipdnnPluginException(
+            HIPDNN_PLUGIN_STATUS_BAD_PARAM,
+            "Convolution plan builder supports only single node graphs. Graph has "
+                + std::to_string(opGraph.nodeCount())
+                + " nodes");
+    }
+
     const auto& node = opGraph.getNode(0);
 
     std::string nodeName = getNodeName(node);

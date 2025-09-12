@@ -211,6 +211,62 @@ inline flatbuffers::FlatBufferBuilder
     return builder;
 }
 
+inline flatbuffers::FlatBufferBuilder
+    createValidConvFwdGraph(std::vector<int64_t> xDims = {1, 1, 1, 1},
+                            std::vector<int64_t> xStrides = {1, 1, 1, 1},
+                            std::vector<int64_t> wDims = {1, 1, 1, 1},
+                            std::vector<int64_t> wStrides = {1, 1, 1, 1},
+                            std::vector<int64_t> yDims = {1, 1, 1, 1},
+                            std::vector<int64_t> yStrides = {1, 1, 1, 1},
+                            std::vector<int64_t> convPrePadding = {0, 0},
+                            std::vector<int64_t> convPostPadding = {0, 0},
+                            std::vector<int64_t> convStrides = {1, 1},
+                            std::vector<int64_t> convDilation = {1, 1},
+                            hipdnn_sdk::data_objects::DataType dataType = DataType_FLOAT)
+{
+    flatbuffers::FlatBufferBuilder builder;
+    std::vector<::flatbuffers::Offset<hipdnn_sdk::data_objects::TensorAttributes>> tensorAttributes;
+
+    tensorAttributes.push_back(hipdnn_sdk::data_objects::CreateTensorAttributesDirect(
+        builder, 1, "x", dataType, &xStrides, &xDims));
+
+    tensorAttributes.push_back(hipdnn_sdk::data_objects::CreateTensorAttributesDirect(
+        builder, 2, "w", dataType, &wStrides, &wDims));
+
+    tensorAttributes.push_back(hipdnn_sdk::data_objects::CreateTensorAttributesDirect(
+        builder, 3, "y", dataType, &yStrides, &yDims));
+
+    auto convAttributes = hipdnn_sdk::data_objects::CreateConvolutionFwdAttributesDirect(
+        builder,
+        1, // x tensor uid
+        2, // w tensor uid
+        3, // y tensor uid
+        &convPrePadding,
+        &convPostPadding,
+        &convStrides,
+        &convDilation,
+        hipdnn_sdk::data_objects::ConvMode_CROSS_CORRELATION
+    );
+
+    std::vector<::flatbuffers::Offset<hipdnn_sdk::data_objects::Node>> nodes;
+    auto node = hipdnn_sdk::data_objects::CreateNodeDirect(
+        builder,
+        "conv_fwd",
+        hipdnn_sdk::data_objects::NodeAttributes_ConvolutionFwdAttributes,
+        convAttributes.Union());
+    nodes.push_back(node);
+
+    auto graphOffset = hipdnn_sdk::data_objects::CreateGraphDirect(builder,
+                                                                   "test",
+                                                                   DataType_FLOAT,
+                                                                   DataType_FLOAT,
+                                                                   DataType_FLOAT,
+                                                                   &tensorAttributes,
+                                                                   &nodes);
+    builder.Finish(graphOffset);
+    return builder;
+}
+
 inline hipdnnPluginConstData_t
     createValidConstDataGraph(flatbuffers::DetachedBuffer& serializedGraph)
 {
