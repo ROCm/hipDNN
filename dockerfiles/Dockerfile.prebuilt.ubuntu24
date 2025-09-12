@@ -1,0 +1,64 @@
+# Copyright © Advanced Micro Devices, Inc., or its affiliates.
+# SPDX-License-Identifier:  MIT
+
+FROM ubuntu:24.04 AS install_therock
+
+# ARG to select which asic to use from https://therock-nightly-tarball.s3.amazonaws.com/
+# Ex. gfx94X, gfx950, gfx110x
+ARG THEROCK_ASIC=gfx94X
+
+# ARG to select which git tag to use from https://therock-nightly-tarball.s3.amazonaws.com/
+ARG THEROCK_GIT_TAG=7.0.0rc20250909
+
+# ARG to specify the full tarball tag from https://therock-nightly-tarball.s3.amazonaws.com/
+# Defaults to therock-dist-linux-gfx94X-dcgpu-7.0.0rc20250909.tar.gz
+ARG THEROCK_TARBALL=therock-dist-linux-$THEROCK_ASIC-dcgpu-$THEROCK_GIT_TAG.tar.gz
+
+# Install wget for downloading the tarball
+RUN apt-get update && apt-get install -y wget ca-certificates && rm -rf /var/lib/apt/lists/*
+
+RUN mkdir -p /opt/rocm
+WORKDIR /tmp
+
+RUN wget https://therock-nightly-tarball.s3.us-east-2.amazonaws.com/$THEROCK_TARBALL
+RUN tar -xf $THEROCK_TARBALL -C /opt/rocm --strip-components=1
+
+FROM ubuntu:24.04 AS hipdnn
+
+# Set environment variables to avoid interactive prompts
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Install system dependencies for TheRock and other developer tools.
+RUN apt-get update && apt-get install -y \
+    gfortran \
+    git-lfs \
+    ninja-build \
+    cmake \
+    g++ \
+    pkg-config \
+    xxd \
+    patchelf \
+    automake \
+    python3-venv \
+    python3-dev \
+    libegl1-mesa-dev \
+    curl \
+    wget \
+    unzip \
+    patchelf \
+    libtool \
+    python3-pip \
+    vim \
+    rsync \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy TheRock installation from the first stage
+COPY --from=install_therock /opt/rocm /opt/rocm
+
+# Set environment variables for hipDNN
+ENV PATH="/opt/rocm/bin:/opt/rocm:${PATH}"
+ENV CMAKE_GENERATOR="Ninja"
+
+# Set hip platform to avoid platform detection errors
+ENV HIP_PLATFORM=amd
