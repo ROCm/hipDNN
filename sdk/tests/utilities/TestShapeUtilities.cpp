@@ -2,7 +2,7 @@
 // SPDX-License-Identifier:  MIT
 
 #include <gtest/gtest.h>
-#include <hipdnn_sdk/utilities/ShapeUtils.hpp>
+#include <hipdnn_sdk/utilities/ShapeUtilities.hpp>
 
 using namespace hipdnn_sdk::utilities;
 
@@ -98,4 +98,174 @@ TEST(TestShapeUtils, GenerateStridesEmptyDimensions)
     auto strides = generateStrides(dim, strideOrder);
 
     EXPECT_EQ(strides, (std::vector<int64_t>{}));
+}
+
+TEST(TestShapeUtils, BroadcastCompatibleExactMatch)
+{
+    std::vector<int64_t> inputDims = {2, 3, 4};
+    std::vector<int64_t> outputDims = {2, 3, 4};
+
+    EXPECT_TRUE(areDimensionsBroadcastCompatible(inputDims, outputDims));
+}
+
+TEST(TestShapeUtils, BroadcastCompatibleInputNon1OutputIs1Invalid)
+{
+    // Input has non-1 value where output has 1 - invalid
+    std::vector<int64_t> inputDims = {2, 3, 4};
+    std::vector<int64_t> outputDims = {2, 1, 4};
+
+    EXPECT_FALSE(areDimensionsBroadcastCompatible(inputDims, outputDims));
+}
+
+TEST(TestShapeUtils, BroadcastCompatibleInputIs1OutputNon1Valid)
+{
+    // Input has 1 where output has non-1 - valid (broadcast)
+    std::vector<int64_t> inputDims = {2, 1, 4};
+    std::vector<int64_t> outputDims = {2, 3, 4};
+
+    EXPECT_TRUE(areDimensionsBroadcastCompatible(inputDims, outputDims));
+}
+
+TEST(TestShapeUtils, BroadcastCompatibleFewerInputDims)
+{
+    // Input has fewer dimensions - valid (implicit leading 1s)
+    std::vector<int64_t> inputDims = {3, 4};
+    std::vector<int64_t> outputDims = {2, 3, 4};
+
+    EXPECT_TRUE(areDimensionsBroadcastCompatible(inputDims, outputDims));
+}
+
+TEST(TestShapeUtils, BroadcastCompatibleMoreInputDimsInvalid)
+{
+    // Input has more dimensions than output - invalid
+    std::vector<int64_t> inputDims = {2, 3, 4, 5};
+    std::vector<int64_t> outputDims = {3, 4, 5};
+
+    EXPECT_FALSE(areDimensionsBroadcastCompatible(inputDims, outputDims));
+}
+
+TEST(TestShapeUtils, BroadcastCompatibleMismatchedDimsInvalid)
+{
+    // Input and output don't match (3 vs 5) - invalid
+    std::vector<int64_t> inputDims = {2, 3, 4};
+    std::vector<int64_t> outputDims = {2, 5, 4};
+
+    EXPECT_FALSE(areDimensionsBroadcastCompatible(inputDims, outputDims));
+}
+
+TEST(TestShapeUtils, BroadcastCompatibleEmptyInputValid)
+{
+    // Empty input is broadcastable to any output
+    std::vector<int64_t> inputDims = {};
+    std::vector<int64_t> outputDims = {2, 3, 4};
+
+    EXPECT_TRUE(areDimensionsBroadcastCompatible(inputDims, outputDims));
+}
+
+TEST(TestShapeUtils, BroadcastCompatibleEmptyOutputWithNonEmptyInputInvalid)
+{
+    // Non-empty input cannot broadcast to empty output
+    std::vector<int64_t> inputDims = {2, 3};
+    std::vector<int64_t> outputDims = {};
+
+    EXPECT_FALSE(areDimensionsBroadcastCompatible(inputDims, outputDims));
+}
+
+TEST(TestShapeUtils, BroadcastCompatibleBothEmpty)
+{
+    // Both empty is valid (exact match)
+    std::vector<int64_t> inputDims = {};
+    std::vector<int64_t> outputDims = {};
+
+    EXPECT_TRUE(areDimensionsBroadcastCompatible(inputDims, outputDims));
+}
+
+TEST(TestShapeUtils, BroadcastCompatibleScalarToTensor)
+{
+    // Scalar [1] broadcasts to any shape
+    std::vector<int64_t> inputDims = {1};
+    std::vector<int64_t> outputDims = {2, 3, 4};
+
+    EXPECT_TRUE(areDimensionsBroadcastCompatible(inputDims, outputDims));
+}
+
+TEST(TestShapeUtils, BroadcastCompatibleVectorToMatrix)
+{
+    // Vector [4] broadcasts to matrix [3, 4]
+    std::vector<int64_t> inputDims = {4};
+    std::vector<int64_t> outputDims = {3, 4};
+
+    EXPECT_TRUE(areDimensionsBroadcastCompatible(inputDims, outputDims));
+}
+
+TEST(TestShapeUtils, BroadcastCompatibleVectorMismatchInvalid)
+{
+    // Vector [5] cannot broadcast to matrix [3, 4]
+    std::vector<int64_t> inputDims = {5};
+    std::vector<int64_t> outputDims = {3, 4};
+
+    EXPECT_FALSE(areDimensionsBroadcastCompatible(inputDims, outputDims));
+}
+
+TEST(TestShapeUtils, BroadcastCompatibleComplexBroadcast)
+{
+    // Complex broadcast: [1, 3, 1] -> [2, 3, 4]
+    std::vector<int64_t> inputDims = {1, 3, 1};
+    std::vector<int64_t> outputDims = {2, 3, 4};
+
+    EXPECT_TRUE(areDimensionsBroadcastCompatible(inputDims, outputDims));
+}
+
+TEST(TestShapeUtils, BroadcastCompatiblePartialMatchWithOnes)
+{
+    // [2, 1, 4] -> [2, 3, 4]
+    std::vector<int64_t> inputDims = {2, 1, 4};
+    std::vector<int64_t> outputDims = {2, 3, 4};
+
+    EXPECT_TRUE(areDimensionsBroadcastCompatible(inputDims, outputDims));
+}
+
+TEST(TestShapeUtils, BroadcastCompatibleHigherDimensionalBroadcast)
+{
+    // 5D broadcast: [1, 1, 3, 1, 5] -> [2, 4, 3, 6, 5]
+    std::vector<int64_t> inputDims = {1, 1, 3, 1, 5};
+    std::vector<int64_t> outputDims = {2, 4, 3, 6, 5};
+
+    EXPECT_TRUE(areDimensionsBroadcastCompatible(inputDims, outputDims));
+}
+
+TEST(TestShapeUtils, BroadcastCompatibleLeadingOnesImplicit)
+{
+    // [3, 4] broadcasts to [1, 2, 3, 4] (implicit leading 1s)
+    std::vector<int64_t> inputDims = {3, 4};
+    std::vector<int64_t> outputDims = {1, 2, 3, 4};
+
+    EXPECT_TRUE(areDimensionsBroadcastCompatible(inputDims, outputDims));
+}
+
+TEST(TestShapeUtils, BroadcastCompatibleSingleDimToMultiDim)
+{
+    // Single dimension [5] to multi-dimensional [2, 3, 5]
+    std::vector<int64_t> inputDims = {5};
+    std::vector<int64_t> outputDims = {2, 3, 5};
+
+    EXPECT_TRUE(areDimensionsBroadcastCompatible(inputDims, outputDims));
+}
+
+TEST(TestShapeUtils, BroadcastCompatibleAllOnesInput)
+{
+    // All 1s input broadcasts to any matching rank output
+    std::vector<int64_t> inputDims = {1, 1, 1};
+    std::vector<int64_t> outputDims = {5, 7, 9};
+
+    EXPECT_TRUE(areDimensionsBroadcastCompatible(inputDims, outputDims));
+}
+
+TEST(TestShapeUtils, BroadcastCompatibleMixedOnesAndMatches)
+{
+    // Mix of exact matches and 1s: [2, 1, 4, 1] -> [2, 3, 4, 5]
+    std::vector<int64_t> inputDims = {2, 1, 4, 1};
+    std::vector<int64_t> outputDims = {2, 3, 4, 5};
+
+    EXPECT_TRUE(areDimensionsBroadcastCompatible(inputDims, outputDims));
 }

@@ -11,11 +11,12 @@
 #include <hipdnn_frontend/Graph.hpp>
 #include <hipdnn_frontend/Utilities.hpp>
 #include <hipdnn_frontend/attributes/TensorAttributes.hpp>
-#include <hipdnn_sdk/test_utilities/CpuFpReferenceImplementation.hpp>
 #include <hipdnn_sdk/test_utilities/CpuFpReferenceValidation.hpp>
 #include <hipdnn_sdk/test_utilities/TestUtilities.hpp>
 #include <hipdnn_sdk/utilities/MigratableMemory.hpp>
 #include <hipdnn_sdk/utilities/Tensor.hpp>
+
+#include <hipdnn_sdk/test_utilities/CpuFpReferenceBatchnorm.hpp>
 
 using namespace hipdnn_frontend;
 using namespace hipdnn_sdk::utilities;
@@ -241,15 +242,15 @@ protected:
 
     void runCpuBatchnormBwd(Batchnorm2dTensorBundle& cpuTensorBundle)
     {
-        CpuFpReferenceImplementation<InputType, IntermediateType, IntermediateType> cpuRefImpl;
-        cpuRefImpl.batchnormBwd(cpuTensorBundle.dyTensor,
-                                cpuTensorBundle.xTensor,
-                                cpuTensorBundle.meanTensor,
-                                cpuTensorBundle.invVarianceTensor,
-                                cpuTensorBundle.scaleTensor,
-                                cpuTensorBundle.dxTensor,
-                                cpuTensorBundle.dscaleTensor,
-                                cpuTensorBundle.dbiasTensor);
+        CpuFpReferenceBatchnormImpl<InputType, IntermediateType>::batchnormBwd(
+            cpuTensorBundle.dyTensor,
+            cpuTensorBundle.xTensor,
+            cpuTensorBundle.meanTensor,
+            cpuTensorBundle.invVarianceTensor,
+            cpuTensorBundle.scaleTensor,
+            cpuTensorBundle.dxTensor,
+            cpuTensorBundle.dscaleTensor,
+            cpuTensorBundle.dbiasTensor);
     }
 
     void runBatchnormTest(InputType tolerance = 1e4f,
