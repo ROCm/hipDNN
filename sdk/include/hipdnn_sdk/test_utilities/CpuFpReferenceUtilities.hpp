@@ -84,6 +84,11 @@ struct ParallelTensorFunctor
 
     void operator()(std::size_t numThreads = 1) const
     {
+        if(numThreads == 0 || _totalElements == 0)
+        {
+            return;
+        }
+
         std::size_t workPerThread = (_totalElements + numThreads - 1) / numThreads;
 
         std::vector<JoinableThread> threads(numThreads);
