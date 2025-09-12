@@ -16,16 +16,16 @@ using namespace hipdnn_backend;
 namespace
 {
 
-const char* const LIBRARY_PATH = "./hipdnn_test_plugin1";
-const char* const LIBRARY_PATH_LIB_NAME_ONLY = "libhipdnn_test_plugin1.so";
+const char* const LIBRARY_PATH = "../lib/test_plugins/hipdnn_test_plugin1";
+const char* const LIBRARY_PATH_LIB_NAME_ONLY = "../lib/test_plugins/libhipdnn_test_plugin1.so";
 
 const char* const WRONG_LIBRARY_PATH = "./wrong_path";
 const char* const SYMBOL_NAME = "hipdnnPluginGetName";
 const char* const WRONG_SYMBOL_NAME = "wrong_symbol_name";
 
 const std::string FULL_LIBRARY_PATH
-    = (hipdnn_backend::platform_utilities::getCurrentModuleDirectory()
-       /= hipdnn_sdk::utilities::getLibraryName("hipdnn_test_plugin1"))
+    = (hipdnn_backend::platform_utilities::getCurrentModuleDirectory().parent_path()
+       / "lib/test_plugins" / hipdnn_sdk::utilities::getLibraryName("hipdnn_test_plugin1"))
           .string();
 
 }

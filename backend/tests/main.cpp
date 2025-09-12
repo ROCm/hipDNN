@@ -9,7 +9,6 @@ SPDX-License-Identifier: MIT
 
 int main(int argc, char** argv)
 {
-    hipdnn_sdk::utilities::setEnv("HIPDNN_LOG_LEVEL", "info");
     hipdnn_backend::logging::initialize();
 
     ::testing::InitGoogleTest(&argc, argv);

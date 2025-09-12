@@ -40,7 +40,9 @@ inline std::string getPluginPath(const char* pluginName)
 inline std::string getDefaultPluginPath()
 {
     namespace fs = std::filesystem;
-    return (fs::path(getTestPluginDefaultDir()) / hipdnn_sdk::utilities::getLibraryName("test_good_default_plugin")).string();
+    return (fs::path(getTestPluginDefaultDir())
+            / hipdnn_sdk::utilities::getLibraryName("test_good_default_plugin"))
+        .string();
 }
 
 inline const std::string& testGoodPluginPath()

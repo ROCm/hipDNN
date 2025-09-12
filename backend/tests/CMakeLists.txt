@@ -60,7 +60,7 @@ target_compile_options(hipdnn_test_plugin1 PRIVATE ${HIPDNN_WARNING_COMPILE_OPTI
 target_compile_definitions(hipdnn_test_plugin1 PRIVATE COMPONENT_NAME="plugin1")
 clang_tidy_check(hipdnn_test_plugin1)
 add_dependencies(hipdnn_backend_tests hipdnn_test_plugin1)
-set_target_properties(hipdnn_test_plugin1 PROPERTIES LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
+set_target_properties(hipdnn_test_plugin1 PROPERTIES LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib/test_plugins")
 
 # libhipdnn_test_plugin2.so or hipdnn_test_plugin2.dll (used by TestPlugin.cpp)
 add_library(hipdnn_test_plugin2 SHARED plugins/PluginApiImpl.cpp plugins/Plugin2.cpp)
@@ -70,7 +70,7 @@ target_compile_options(hipdnn_test_plugin2 PRIVATE ${HIPDNN_WARNING_COMPILE_OPTI
 target_compile_definitions(hipdnn_test_plugin2 PRIVATE COMPONENT_NAME="plugin2")
 clang_tidy_check(hipdnn_test_plugin2)
 add_dependencies(hipdnn_backend_tests hipdnn_test_plugin2)
-set_target_properties(hipdnn_test_plugin2 PROPERTIES LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
+set_target_properties(hipdnn_test_plugin2 PROPERTIES LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib/test_plugins")
 
 
 # libhipdnn_test_engine_plugin1.so or hipdnn_test_engine_plugin1.dll (used by TestEnginePlugin.cpp)
@@ -89,9 +89,8 @@ target_compile_options(hipdnn_test_engine_plugin1 PRIVATE ${HIPDNN_WARNING_COMPI
 
 clang_tidy_check(hipdnn_test_engine_plugin1)
 add_dependencies(hipdnn_backend_tests hipdnn_test_engine_plugin1)
-# Ensure plugin lands beside the test binary (Linux/macOS: LIBRARY, Windows: RUNTIME)
 set_target_properties(hipdnn_test_engine_plugin1 PROPERTIES
-    LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+    LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib/test_plugins"
 )
 
 

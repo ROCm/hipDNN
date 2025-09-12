@@ -79,8 +79,7 @@ void SharedLibrary::load(const std::filesystem::path& libraryPath)
 
     if(modifiedLibraryPath.is_relative())
     {
-        // If the path is relative, resolve it to our current module directory instead of allowing
-        // std::filesystem to resolve it relative to the current working directory.
+        // Paths are typically resolved by here, but this is a fallback for some unit tests
         modifiedLibraryPath
             = hipdnn_backend::platform_utilities::getCurrentModuleDirectory() / modifiedLibraryPath;
     }

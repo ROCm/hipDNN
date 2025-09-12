@@ -41,7 +41,7 @@ inline void unsetEnv(const char* var)
     unsetenv(var);
 }
 
-inline bool pathCompEq(const std::filesystem::path& a, const std::filesystem::path& b) 
+inline bool pathCompEq(const std::filesystem::path& a, const std::filesystem::path& b)
 {
     return a.native() == b.native();
 }

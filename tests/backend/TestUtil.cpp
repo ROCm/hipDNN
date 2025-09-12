@@ -9,8 +9,8 @@
 #include <hipdnn_sdk/logging/Logger.hpp>
 #include <hipdnn_sdk/test_utilities/FlatbufferGraphTestUtils.hpp>
 #include <hipdnn_sdk/utilities/PlatformUtils.hpp>
-#include <stdexcept>
 #include <span>
+#include <stdexcept>
 
 namespace fs = std::filesystem;
 
@@ -328,16 +328,19 @@ std::vector<std::string> getLoadedPlugins(hipdnnHandle_t handle)
     return pluginPaths;
 }
 
-static inline bool leafEqAllowExt(const fs::path& needle, const fs::path& hay) 
+static inline bool leafEqAllowExt(const fs::path& needle, const fs::path& hay)
 {
     using hipdnn_sdk::utilities::pathCompEq;
-    if (pathCompEq(needle, hay)) {
+    if(pathCompEq(needle, hay))
+    {
         return true;
     }
-    if (!needle.has_extension() && hay.has_extension() && pathCompEq(needle, hay.stem())) {
+    if(!needle.has_extension() && hay.has_extension() && pathCompEq(needle, hay.stem()))
+    {
         return true;
     }
-    if (needle.has_extension() && !hay.has_extension() && pathCompEq(needle.stem(), hay)) {
+    if(needle.has_extension() && !hay.has_extension() && pathCompEq(needle.stem(), hay))
+    {
         return true;
     }
     return false;
@@ -346,42 +349,52 @@ static inline bool leafEqAllowExt(const fs::path& needle, const fs::path& hay)
 static bool isPluginLoadedByRelativePathInternal(const fs::path& fullPath, const fs::path& suffix)
 {
     using hipdnn_sdk::utilities::pathCompEq;
-    
-    fs::path suffixNorm   = suffix.lexically_normal();
+
+    fs::path suffixNorm = suffix.lexically_normal();
     fs::path fullPathNorm = fullPath.lexically_normal();
 
-    if (suffixNorm.empty() || suffixNorm.is_absolute()) {
+    if(suffixNorm.empty() || suffixNorm.is_absolute())
+    {
         return false;
     }
 
-    for (const auto& c : suffixNorm) {
-        if (c == "..") { // would be ambiguous otherwise
+    for(const auto& c : suffixNorm)
+    {
+        if(c == "..")
+        { // would be ambiguous otherwise
             return false;
         }
     }
 
     std::vector<fs::path> suffixComps;
     std::vector<fs::path> fullComps;
-    for (const auto& c : suffixNorm) {
+    for(const auto& c : suffixNorm)
+    {
         suffixComps.push_back(c);
     }
-    for (const auto& c : fullPathNorm) {
+    for(const auto& c : fullPathNorm)
+    {
         fullComps.push_back(c);
     }
-    if (suffixComps.size() > fullComps.size()) {
+    if(suffixComps.size() > fullComps.size())
+    {
         return false;
     }
 
     auto si = suffixComps.rbegin();
     auto fi = fullComps.rbegin();
 
-    if (!leafEqAllowExt(*si, *fi)) {
+    if(!leafEqAllowExt(*si, *fi))
+    {
         return false;
     }
-    ++si; ++fi;
+    ++si;
+    ++fi;
 
-    for (; si != suffixComps.rend(); ++si, ++fi) {
-        if (!pathCompEq(*si, *fi)) {
+    for(; si != suffixComps.rend(); ++si, ++fi)
+    {
+        if(!pathCompEq(*si, *fi))
+        {
             return false;
         }
     }
@@ -402,11 +415,14 @@ bool isPluginLoaded(const std::vector<std::string>& loadedPlugins, const std::st
     });
 }
 
-bool isPluginLoadedByRelativePath(const std::vector<std::string>& loadedPlugins, const std::string& relativePath)
+bool isPluginLoadedByRelativePath(const std::vector<std::string>& loadedPlugins,
+                                  const std::string& relativePath)
 {
     const fs::path needle{relativePath};
-    for (const auto& s : loadedPlugins) {
-        if (isPluginLoadedByRelativePathInternal(fs::path{s}, needle)) {
+    for(const auto& s : loadedPlugins)
+    {
+        if(isPluginLoadedByRelativePathInternal(fs::path{s}, needle))
+        {
             return true;
         }
     }

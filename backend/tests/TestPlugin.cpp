@@ -77,15 +77,15 @@ bool TestPluginCallback::s_callbackCalled = false;
 const std::string PLUGIN_NAME1 = "hipdnn_test_plugin1";
 const std::string PLUGIN_NAME2 = "hipdnn_test_plugin2";
 
-const std::filesystem::path PLUGIN_PATH1 = PLUGIN_NAME1;
-const std::filesystem::path PLUGIN_PATH2 = PLUGIN_NAME2;
+const std::filesystem::path PLUGIN_PATH1 = "../lib/test_plugins/" + PLUGIN_NAME1;
+const std::filesystem::path PLUGIN_PATH2 = "../lib/test_plugins/" + PLUGIN_NAME2;
 
 const std::filesystem::path FULL_PLUGIN_PATH1
-    = hipdnn_backend::platform_utilities::getCurrentModuleDirectory()
-    /= hipdnn_sdk::utilities::getLibraryName(PLUGIN_NAME1.c_str());
+    = hipdnn_backend::platform_utilities::getCurrentModuleDirectory().parent_path()
+      / "lib/test_plugins" / hipdnn_sdk::utilities::getLibraryName(PLUGIN_NAME1.c_str());
 const std::filesystem::path FULL_PLUGIN_PATH2
-    = hipdnn_backend::platform_utilities::getCurrentModuleDirectory()
-    /= hipdnn_sdk::utilities::getLibraryName(PLUGIN_NAME2.c_str());
+    = hipdnn_backend::platform_utilities::getCurrentModuleDirectory().parent_path()
+      / "lib/test_plugins" / hipdnn_sdk::utilities::getLibraryName(PLUGIN_NAME2.c_str());
 
 } // namespace
 
