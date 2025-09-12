@@ -1,7 +1,57 @@
-FROM ubuntu:24.04 AS hipdnn
+# Copyright © Advanced Micro Devices, Inc., or its affiliates.
+# SPDX-License-Identifier:  MIT
 
-# ARG to build for specific GPU support (default to gfx90a)
-ARG AMDGPU_FAMILIES=gfx90a
+# Build stage selection via ARG
+ARG BUILD_TYPE=prebuilt
+
+# ============================================================================
+# Prebuilt stage - downloads and extracts tarball
+#
+# Example build command for default tarball build (gfx94X, 7.0.0rc20250909): 
+# docker build -f Dockerfile.ubuntu24 -t hipdnn:prebuilt .
+#
+# Example build command for overriding tarball build args (gfx950, 7.0.0rc20250908):
+# docker build -f Dockerfile.ubuntu24 --build-arg THEROCK_ASIC=gfx950 --build-arg THEROCK_GIT_TAG=7.0.0rc20250908 -t hipdnn:fullbuild .
+# ============================================================================
+FROM ubuntu:24.04 AS install_therock_prebuilt
+
+# ARG to select which asic to use from https://therock-nightly-tarball.s3.amazonaws.com/
+# Ex. gfx94X, gfx950, gfx110x
+ARG THEROCK_ASIC=gfx94X
+
+# ARG to select which git tag to use from https://therock-nightly-tarball.s3.amazonaws.com/
+ARG THEROCK_GIT_TAG=7.0.0rc20250909
+
+# ARG to specify the full tarball tag from https://therock-nightly-tarball.s3.amazonaws.com/
+# Defaults to therock-dist-linux-gfx94X-dcgpu-7.0.0rc20250909.tar.gz
+ARG THEROCK_TARBALL=therock-dist-linux-$THEROCK_ASIC-dcgpu-$THEROCK_GIT_TAG.tar.gz
+
+# Install wget for downloading the tarball
+RUN apt-get update && apt-get install -y wget ca-certificates
+
+RUN mkdir -p /opt/rocm
+WORKDIR /tmp
+
+RUN wget https://therock-nightly-tarball.s3.us-east-2.amazonaws.com/$THEROCK_TARBALL
+RUN tar -xf $THEROCK_TARBALL -C /opt/rocm --strip-components=1
+
+# ============================================================================
+# Build from source stage - clones and builds TheRock
+#
+# Example build command for default source build (default branch, gfx90a):
+# docker build -f Dockerfile.ubuntu24 --build-arg BUILD_TYPE=fullbuild -t hipdnn:fullbuild .
+#
+# Example build command for overriding ASIC and git hash:
+# docker build -f Dockerfile.ubuntu24 --build-arg BUILD_TYPE=fullbuild --build-arg THEROCK_ASIC=gfx950 --build-arg THEROCK_GIT_HASH=abc123def456 -t hipdnn:custom_source_build .
+# ============================================================================
+FROM ubuntu:24.04 AS install_therock_fullbuild
+
+# ARG to select which ASIC to build for
+ARG THEROCK_ASIC=gfx90a
+
+# ARG to specify a specific git hash to checkout (optional)
+# If not specified or set to "default", will use the default branch
+ARG THEROCK_GIT_HASH=default
 
 # Set environment variables to avoid interactive prompts
 ENV DEBIAN_FRONTEND=noninteractive
@@ -9,7 +59,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 # Set hip platform to avoid platform detection errors
 ENV HIP_PLATFORM=amd
 
-# Install system dependencies for TheRock and other developer tools.
+# Install build dependencies for TheRock
 RUN apt-get update && apt-get install -y \
     gfortran \
     git-lfs \
@@ -33,25 +83,89 @@ RUN apt-get update && apt-get install -y \
     ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
+# Configure git
+RUN git config --global user.email "docker@build.local" && \
+    git config --global user.name "Docker Build"
+
+# Clone TheRock repository with LFS disabled initially
 RUN git clone https://github.com/ROCm/TheRock.git
+
 WORKDIR /TheRock
 
-RUN python3 -m venv /opt/venv
+# Checkout specific hash if provided
+RUN if [ "$THEROCK_GIT_HASH" != "default" ]; then \
+        echo "Checking out specific hash: $THEROCK_GIT_HASH"; \
+        git checkout $THEROCK_GIT_HASH; \
+    else \
+        echo "Using default branch"; \
+    fi
 
-#enable venv
+RUN python3 -m venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 
 RUN pip install -r requirements.txt
-RUN python ./build_tools/fetch_sources.py
+
+# Configure git to use HTTPS without authentication for public repos
+# and fetch sources with proper git configuration
+RUN git config --global url."https://github.com/".insteadOf git@github.com: && \
+    git config --global credential.helper "!f() { echo username=anonymous; echo password=; }; f" && \
+    python ./build_tools/fetch_sources.py
 
 RUN mkdir build
 WORKDIR /TheRock/build
 
-RUN cmake -GNinja .. -DTHEROCK_ENABLE_ALL=OFF -DTHEROCK_ENABLE_MIOPEN=ON -DTHEROCK_AMDGPU_FAMILIES=$AMDGPU_FAMILIES -DCMAKE_INSTALL_PREFIX=/opt/rocm
-
+RUN cmake -GNinja .. \
+    -DCMAKE_INSTALL_PREFIX=/opt/rocm \
+    -DTHEROCK_ENABLE_ALL=OFF \
+    -DTHEROCK_ENABLE_MIOPEN=ON \
+    -DTHEROCK_AMDGPU_FAMILIES=$THEROCK_ASIC
 RUN cmake --build .
-
 RUN cmake --install .
 
+# ============================================================================
+# Select which build stage to use
+# ============================================================================
+FROM install_therock_${BUILD_TYPE} AS install_therock
+
+# ============================================================================
+# Common hipDNN development environment
+# ============================================================================
+FROM ubuntu:24.04 AS hipdnn
+
+# Set environment variables to avoid interactive prompts
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Install development deps
+RUN apt-get update && apt-get install -y \
+    gfortran \
+    git-lfs \
+    ninja-build \
+    cmake \
+    g++ \
+    pkg-config \
+    xxd \
+    patchelf \
+    automake \
+    python3-venv \
+    python3-dev \
+    libegl1-mesa-dev \
+    curl \
+    unzip \
+    patchelf \
+    libtool \
+    python3-pip \
+    vim \
+    rsync \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy TheRock installation from the selected build stage
+COPY --from=install_therock /opt/rocm /opt/rocm
+
+# Set environment variables for hipDNN
+ENV HIP_PLATFORM=amd
 ENV PATH="/opt/rocm/bin:/opt/rocm:${PATH}"
 ENV CMAKE_GENERATOR="Ninja"
+
+# Create a working directory for development
+WORKDIR /workspace

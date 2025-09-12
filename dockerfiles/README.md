@@ -1,6 +1,6 @@
 # hipDNN Docker Environments
 
-This directory contains Dockerfiles for building hipDNN development environments on different platforms.
+This directory contains the Dockerfile for building hipDNN development environment.
 
 ## 📋 Prerequisites
 
@@ -8,12 +8,10 @@ This directory contains Dockerfiles for building hipDNN development environments
 - ROCm-compatible GPU (for running with GPU support)
 - Sufficient disk space for Docker images
 
-## 🐳 Available Containers
+## 🐳 Ubuntu 24.04
 
-### Ubuntu 22.04
-
-- **File**: [`Dockerfile.ubuntu22`](Dockerfile.ubuntu22)
-- **Base Image**: Ubuntu 22.04 LTS
+- **File**: [`Dockerfile.ubuntu24`](Dockerfile.ubuntu24)
+- **Base Image**: Ubuntu 24.04 LTS
 - **Purpose**: Primary development environment for hipDNN
 - **Includes**:
   - ROCm development tools
@@ -21,35 +19,59 @@ This directory contains Dockerfiles for building hipDNN development environments
   - Google Test framework
   - Ninja build tool
 
-### AlmaLinux 8
+## 🔨 Building the Docker Image
 
-- **File**: [`Dockerfile.almalinux`](Dockerfile.almalinux)
-- **Base Image**: AlmaLinux 8 (RHEL8 compatible)
-- **Purpose**: Support for RHEL-based systems and enterprise environments
-- **Includes**:
-  - ROCm development tools
-  - CMake build system
-  - Google Test framework
-  - Ninja build tool
+The Dockerfile supports two build types: **prebuilt** (using nightly tarballs) and **fullbuild** (building from source).
 
-## 🔨 Building the Docker Images
+### Build Arguments
 
-### Basic Build Command
+#### 🔧 Common Arguments (Both Build Types)
 
+| Argument | Default | Description | Valid Values |
+|----------|---------|-------------|--------------|
+| `BUILD_TYPE` | `prebuilt` | Selects build method | `prebuilt`, `fullbuild` |
+| `THEROCK_ASIC` | `gfx94X` (prebuilt)<br>`gfx90a` (fullbuild) | GPU architecture target | `gfx94X`, `gfx950`, `gfx110X`, `gfx90a`, etc. |
+
+#### 📦 Prebuilt-Only Arguments
+
+| Argument | Default | Description |
+|----------|---------|-------------|
+| `THEROCK_GIT_TAG` | `7.0.0rc20250909` | Git tag for [nightly tarballs](https://therock-nightly-tarball.s3.amazonaws.com/) |
+
+> **Note**: Prebuilt mode downloads pre-compiled binaries from TheRock nightly builds (much faster)
+
+#### 🏗️ Fullbuild-Only Arguments
+
+| Argument | Default | Description |
+|----------|---------|-------------|
+| `THEROCK_GIT_HASH` | `default` | Specific git commit hash to checkout (uses default branch if not specified) |
+
+> **Note**: Fullbuild mode clones and compiles TheRock from source (slower but more flexible)
+
+### Build Examples
+
+#### 📦 Prebuilt Mode (Recommended)
+
+**Default prebuilt** (gfx94X, tag 7.0.0rc20250909):
 ```bash
-docker build -f <Dockerfile> -t <image-name> .
+docker build -f Dockerfile.ubuntu24 -t hipdnn:prebuilt .
 ```
 
-### Examples
-
-Build Ubuntu 22.04 container:
+**Override ASIC and Git Tag** (gfx950, tag 7.0.0rc20250908):
 ```bash
-docker build -f Dockerfile.ubuntu22 -t hipdnn:ubuntu22 .
+docker build -f Dockerfile.ubuntu24 --build-arg THEROCK_ASIC=gfx950 --build-arg THEROCK_GIT_TAG=7.0.0rc20250908 -t hipdnn:prebuilt_gfx950 .
 ```
 
-Build AlmaLinux 8 container:
+#### 🏗️ Fullbuild Mode
+
+**Default fullbuild** (gfx90a, default branch):
 ```bash
-docker build -f Dockerfile.almalinux -t hipdnn:almalinux8 .
+docker build -f Dockerfile.ubuntu24 --build-arg BUILD_TYPE=fullbuild -t hipdnn:fullbuild .
+```
+
+**Custom ASIC and Git Hash** (gfx950, hash abcd1234):
+```bash
+docker build -f Dockerfile.ubuntu24 --build-arg BUILD_TYPE=fullbuild --build-arg THEROCK_ASIC=gfx950 --build-arg THEROCK_GIT_HASH=abcd1234 -t hipdnn:custom_source_build .
 ```
 
 ## 🚀 Running the Containers
@@ -100,21 +122,7 @@ docker run -it \
   --group-add video \
   --cap-add=SYS_PTRACE \
   --security-opt seccomp=unconfined \
-  hipdnn:ubuntu22
-```
-
-AlmaLinux 8:
-```bash
-docker run -it \
-  -v $(pwd):/workspace/hipdnn \
-  --privileged \
-  --rm \
-  --device=/dev/kfd \
-  --device /dev/dri:/dev/dri:rw \
-  --group-add video \
-  --cap-add=SYS_PTRACE \
-  --security-opt seccomp=unconfined \
-  hipdnn:almalinux8
+  hipdnn:prebuilt
 ```
 
 ## 💡 Tips and Best Practices
@@ -130,14 +138,6 @@ docker run -it \
    ```
 
 3. **Development Workflow**: The containers include all necessary development tools, so you can edit code on your host machine and build/test inside the container.
-
-## 📁 Helper Scripts
-
-The `scripts/` directory contains helper scripts used during Docker image building:
-
-- `install_cmake.sh` - Installs CMake build system
-- `install_gtest.sh` - Installs Google Test framework
-- `install_ninja.sh` - Installs Ninja build tool
 
 ## ⚠️ Troubleshooting
 
