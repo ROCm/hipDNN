@@ -328,18 +328,24 @@ std::vector<std::string> getLoadedPlugins(hipdnnHandle_t handle)
     return pluginPaths;
 }
 
-static inline bool leafEqAllowExt(const fs::path& needle, const fs::path& hay)
+static inline bool leafEqAllowExt(const fs::path& pathFileName, const fs::path& suffixFileName)
 {
     using hipdnn_sdk::utilities::pathCompEq;
-    if(pathCompEq(needle, hay))
+    if(pathCompEq(pathFileName, suffixFileName))
     {
         return true;
     }
-    if(!needle.has_extension() && hay.has_extension() && pathCompEq(needle, hay.stem()))
+
+    // The file names are not necessarily fully qualified. Realistically, only
+    // need the second conditional because the returned path from backend will
+    // be fully qualified.
+    if(!pathFileName.has_extension() && suffixFileName.has_extension()
+       && pathCompEq(pathFileName, suffixFileName.stem()))
     {
         return true;
     }
-    if(needle.has_extension() && !hay.has_extension() && pathCompEq(needle.stem(), hay))
+    if(pathFileName.has_extension() && !suffixFileName.has_extension()
+       && pathCompEq(pathFileName.stem(), suffixFileName))
     {
         return true;
     }
@@ -353,7 +359,7 @@ static bool isPluginLoadedByRelativePathInternal(const fs::path& fullPath, const
     fs::path suffixNorm = suffix.lexically_normal();
     fs::path fullPathNorm = fullPath.lexically_normal();
 
-    if(suffixNorm.empty() || suffixNorm.is_absolute())
+    if(suffixNorm.empty())
     {
         return false;
     }
@@ -361,8 +367,8 @@ static bool isPluginLoadedByRelativePathInternal(const fs::path& fullPath, const
     for(const auto& c : suffixNorm)
     {
         if(c == "..")
-        { // would be ambiguous otherwise
-            return false;
+        {
+            return false; // Is unresolvable
         }
     }
 
@@ -418,10 +424,15 @@ bool isPluginLoaded(const std::vector<std::string>& loadedPlugins, const std::st
 bool isPluginLoadedByRelativePath(const std::vector<std::string>& loadedPlugins,
                                   const std::string& relativePath)
 {
-    const fs::path needle{relativePath};
+    // We cannot resolve a relative path to the hipdnn_backend module externally
+    // of the backend. We can retrieve the absolute loaded path, but our
+    // comparison to the originally specified path is limited. In particular, we
+    // can check that the loaded path is suffixed with the resolved portion of
+    // the relative path.
+    const fs::path suffix{relativePath};
     for(const auto& s : loadedPlugins)
     {
-        if(isPluginLoadedByRelativePathInternal(fs::path{s}, needle))
+        if(isPluginLoadedByRelativePathInternal(fs::path{s}, suffix))
         {
             return true;
         }

@@ -11,6 +11,7 @@
 #include "EnginePlugin.hpp"
 #include "HipdnnException.hpp"
 #include "PluginCore.hpp"
+#include <hipdnn_sdk/utilities/PlatformUtils.hpp>
 
 namespace hipdnn_backend
 {
@@ -21,7 +22,8 @@ class EnginePluginManager : public PluginManagerBase<EnginePlugin>
 {
 public:
     EnginePluginManager()
-        : PluginManagerBase<EnginePlugin>(getPluginSearchPaths())
+        : PluginManagerBase<EnginePlugin>(getPluginSearchPaths(
+              "HIPDNN_PLUGIN_DIR", {std::filesystem::path("hipdnn_plugins/engines/")}))
     {
     }
 
@@ -47,18 +49,6 @@ private:
     }
 
     std::set<int64_t> _engineIds;
-
-    // TODO: fix
-    static std::set<std::filesystem::path> getPluginSearchPaths()
-    {
-        const char* envPath = std::getenv("HIPDNN_PLUGIN_DIR");
-        if(envPath != nullptr && std::string(envPath).length() > 0)
-        {
-            return {std::filesystem::path(envPath)};
-        }
-
-        return {std::filesystem::path("hipdnn_plugins/engines/")};
-    }
 };
 
 } // namespace plugin

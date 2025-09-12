@@ -16,17 +16,19 @@ using namespace hipdnn_backend;
 namespace
 {
 
-const char* const LIBRARY_PATH = "../lib/test_plugins/hipdnn_test_plugin1";
-const char* const LIBRARY_PATH_LIB_NAME_ONLY = "../lib/test_plugins/libhipdnn_test_plugin1.so";
+const auto TEST_PLUGIN_DIR = std::filesystem::path("lib/test_plugins");
 
-const char* const WRONG_LIBRARY_PATH = "./wrong_path";
-const char* const SYMBOL_NAME = "hipdnnPluginGetName";
-const char* const WRONG_SYMBOL_NAME = "wrong_symbol_name";
+const auto LIBRARY_PATH = ".." / TEST_PLUGIN_DIR / TEST_PLUGIN1_NAME;
+const auto LIBRARY_PATH_LIB_NAME_ONLY
+    = ".." / TEST_PLUGIN_DIR / hipdnn_sdk::utilities::getLibraryName(TEST_PLUGIN1_NAME);
 
-const std::string FULL_LIBRARY_PATH
+const auto WRONG_LIBRARY_PATH = std::filesystem::path("./wrong_path");
+const auto SYMBOL_NAME = std::string("hipdnnPluginGetName");
+const auto WRONG_SYMBOL_NAME = std::string("wrong_symbol_name");
+
+const auto FULL_LIBRARY_PATH
     = (hipdnn_backend::platform_utilities::getCurrentModuleDirectory().parent_path()
-       / "lib/test_plugins" / hipdnn_sdk::utilities::getLibraryName("hipdnn_test_plugin1"))
-          .string();
+       / TEST_PLUGIN_DIR / hipdnn_sdk::utilities::getLibraryName(TEST_PLUGIN1_NAME));
 
 }
 

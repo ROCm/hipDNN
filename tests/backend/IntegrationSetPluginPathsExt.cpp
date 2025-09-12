@@ -95,13 +95,6 @@ TEST(IntegrationSetPluginPathsExt, GetLoadedPluginPathsLoadsDefault)
 
     std::string expectedPluginPath = getDefaultPluginPath();
 
-    std::cout << "Expected default plugin path: " << expectedPluginPath << "\n";
-    std::cout << "Loaded plugins:\n";
-    for(const auto& plugin : loadedPlugins)
-    {
-        std::cout << "  " << plugin << "\n";
-    }
-
     EXPECT_EQ(loadedPlugins.size(), 1);
     EXPECT_TRUE(test_util::isPluginLoadedByRelativePath(loadedPlugins, expectedPluginPath));
     EXPECT_EQ(hipdnnDestroy(handle), HIPDNN_STATUS_SUCCESS);

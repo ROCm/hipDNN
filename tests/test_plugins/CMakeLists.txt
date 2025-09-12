@@ -15,6 +15,7 @@ set(TEST_NO_APPLICABLE_ENGINES_B_PLUGIN_NAME "test_no_applicable_engines_b_plugi
 set(TEST_DUPLICATE_ID_A_PLUGIN_NAME "test_duplicate_id_a_plugin")
 set(TEST_DUPLICATE_ID_B_PLUGIN_NAME "test_duplicate_id_b_plugin")
 set(TEST_INCOMPLETE_API_PLUGIN_NAME "test_incomplete_api_plugin")
+set(TEST_GOOD_DEFAULT_PLUGIN_NAME "test_good_default_plugin")
 
 
 # Function to create a test plugin with common configuration
@@ -85,7 +86,7 @@ add_test_plugin(${TEST_INCOMPLETE_API_PLUGIN_NAME} TestIncompleteApiPlugin.cpp)
 
 # Create a duplicated default plugin (will be in test_plugins/default directory)
 set(test_good_default_plugin_OUTPUT_DIR "${HIPDNN_TEST_PLUGIN_DIR}/default")
-add_test_plugin(test_good_default_plugin TestGoodDefaultPlugin.cpp)
+add_test_plugin(${TEST_GOOD_DEFAULT_PLUGIN_NAME} TestGoodDefaultPlugin.cpp)
 
 
 # Export plugin names to parent scope for use in test compilation
@@ -96,3 +97,5 @@ set(TEST_NO_APPLICABLE_ENGINES_B_PLUGIN_NAME "${TEST_NO_APPLICABLE_ENGINES_B_PLU
 set(TEST_DUPLICATE_ID_A_PLUGIN_NAME "${TEST_DUPLICATE_ID_A_PLUGIN_NAME}" PARENT_SCOPE)
 set(TEST_DUPLICATE_ID_B_PLUGIN_NAME "${TEST_DUPLICATE_ID_B_PLUGIN_NAME}" PARENT_SCOPE)
 set(TEST_INCOMPLETE_API_PLUGIN_NAME "${TEST_INCOMPLETE_API_PLUGIN_NAME}" PARENT_SCOPE)
+set(TEST_GOOD_DEFAULT_PLUGIN_NAME "${TEST_GOOD_DEFAULT_PLUGIN_NAME}" PARENT_SCOPE)
+

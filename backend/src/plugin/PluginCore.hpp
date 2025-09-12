@@ -94,6 +94,21 @@ class PluginManagerBase
 {
     static_assert(std::is_base_of_v<PluginBase, Plugin>, "Plugin must be derived from PluginBase");
 
+public:
+    // For cases where tests need to override the default plugin search paths
+    static std::set<std::filesystem::path>
+        getPluginSearchPaths(const char* envVarName,
+                             const std::set<std::filesystem::path>& defaultPaths)
+    {
+        const auto envPath = hipdnn_sdk::utilities::getEnv(envVarName);
+        if(!envPath.empty())
+        {
+            // Could make this take multiple dirs
+            return {std::filesystem::path(envPath)};
+        }
+        return defaultPaths;
+    }
+
 protected:
     explicit PluginManagerBase(std::set<std::filesystem::path> defaultPaths)
         : _defaultPluginPaths(std::move(defaultPaths))

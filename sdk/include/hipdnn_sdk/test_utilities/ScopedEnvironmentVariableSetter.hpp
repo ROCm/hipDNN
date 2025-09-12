@@ -16,9 +16,8 @@ public:
     explicit ScopedEnvironmentVariableSetter(const std::string& varName)
         : _varName(varName)
     {
-        auto originalValue = std::getenv(varName.c_str());
-        _hadOriginalValue = (originalValue != nullptr);
-        _originalValue = _hadOriginalValue ? originalValue : "";
+        _originalValue = hipdnn_sdk::utilities::getEnv(varName.c_str());
+        _hadOriginalValue = !_originalValue.empty();
     }
 
     ~ScopedEnvironmentVariableSetter()

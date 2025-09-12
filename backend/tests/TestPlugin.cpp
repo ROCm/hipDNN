@@ -12,7 +12,9 @@
 #include <utility>
 
 #include "plugin/PluginCore.hpp"
+#include <hipdnn_sdk/test_utilities/ScopedEnvironmentVariableSetter.hpp>
 #include <hipdnn_sdk/test_utilities/TempDirectory.hpp>
+#include <hipdnn_sdk/utilities/PlatformUtils.hpp>
 
 using namespace hipdnn_backend;
 using namespace hipdnn_sdk::test_utilities;
@@ -52,6 +54,8 @@ public:
         : plugin::PluginManagerBase<Plugin>(std::move(paths))
     {
     }
+
+    using plugin::PluginManagerBase<Plugin>::getPluginSearchPaths;
 };
 
 class TestPluginCallback : public ::testing::Test
@@ -74,18 +78,17 @@ protected:
 
 bool TestPluginCallback::s_callbackCalled = false;
 
-const std::string PLUGIN_NAME1 = "hipdnn_test_plugin1";
-const std::string PLUGIN_NAME2 = "hipdnn_test_plugin2";
+const std::filesystem::path TEST_PLUGIN_DIR = "lib/test_plugins";
 
-const std::filesystem::path PLUGIN_PATH1 = "../lib/test_plugins/" + PLUGIN_NAME1;
-const std::filesystem::path PLUGIN_PATH2 = "../lib/test_plugins/" + PLUGIN_NAME2;
+const auto PLUGIN_PATH1 = ".." / TEST_PLUGIN_DIR / TEST_PLUGIN1_NAME;
+const auto PLUGIN_PATH2 = ".." / TEST_PLUGIN_DIR / TEST_PLUGIN2_NAME;
 
-const std::filesystem::path FULL_PLUGIN_PATH1
+const auto FULL_PLUGIN_PATH1
     = hipdnn_backend::platform_utilities::getCurrentModuleDirectory().parent_path()
-      / "lib/test_plugins" / hipdnn_sdk::utilities::getLibraryName(PLUGIN_NAME1.c_str());
-const std::filesystem::path FULL_PLUGIN_PATH2
+      / TEST_PLUGIN_DIR / hipdnn_sdk::utilities::getLibraryName(TEST_PLUGIN1_NAME);
+const auto FULL_PLUGIN_PATH2
     = hipdnn_backend::platform_utilities::getCurrentModuleDirectory().parent_path()
-      / "lib/test_plugins" / hipdnn_sdk::utilities::getLibraryName(PLUGIN_NAME2.c_str());
+      / TEST_PLUGIN_DIR / hipdnn_sdk::utilities::getLibraryName(TEST_PLUGIN2_NAME);
 
 } // namespace
 
@@ -349,4 +352,48 @@ TEST_F(TestPluginCallback, SetLoggingCallback)
     EXPECT_EQ(plugin.setLoggingCallback(dummyCallback), HIPDNN_PLUGIN_STATUS_SUCCESS);
     EXPECT_TRUE(s_callbackCalled);
     EXPECT_EQ(plugin.setLoggingCallback(nullptr), HIPDNN_PLUGIN_STATUS_BAD_PARAM);
+}
+
+TEST(TestPluginCore, GetPluginSearchPathsWithEnvVar)
+{
+    const char* envVarName = "TEST_PLUGIN_PATH";
+    const std::string testPath = "/custom/plugin/path";
+
+    ScopedEnvironmentVariableSetter envSetter(envVarName);
+    hipdnn_sdk::utilities::setEnv(envVarName, testPath.c_str());
+
+    std::set<std::filesystem::path> defaultPaths = {"/default/path1", "/default/path2"};
+
+    auto result = TestPluginManager::getPluginSearchPaths(envVarName, defaultPaths);
+
+    ASSERT_EQ(result.size(), 1);
+    EXPECT_EQ(result.begin()->string(), testPath);
+}
+
+TEST(TestPluginCore, GetPluginSearchPathsWithoutEnvVar)
+{
+    const char* envVarName = "TEST_PLUGIN_PATH_UNSET";
+
+    std::set<std::filesystem::path> defaultPaths = {"/default/path1", "/default/path2"};
+
+    auto result = TestPluginManager::getPluginSearchPaths(envVarName, defaultPaths);
+
+    ASSERT_EQ(result.size(), 2);
+    EXPECT_EQ(result, defaultPaths);
+}
+
+TEST(TestPluginCore, GetPluginSearchPathsWithEmptyEnvVar)
+{
+    const char* envVarName = "TEST_PLUGIN_PATH_EMPTY";
+
+    ScopedEnvironmentVariableSetter envSetter(envVarName);
+    hipdnn_sdk::utilities::setEnv(envVarName, "");
+
+    std::set<std::filesystem::path> defaultPaths
+        = {"/default/path1", "/default/path2", "/default/path3"};
+
+    auto result = TestPluginManager::getPluginSearchPaths(envVarName, defaultPaths);
+
+    ASSERT_EQ(result.size(), 3);
+    EXPECT_EQ(result, defaultPaths);
 }
