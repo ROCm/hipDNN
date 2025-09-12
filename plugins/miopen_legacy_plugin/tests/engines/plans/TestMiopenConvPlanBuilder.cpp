@@ -7,8 +7,8 @@
 #include <hipdnn_sdk/test_utilities/TestUtilities.hpp>
 #include <miopen/miopen.h>
 
-#include "engines/plans/MiopenConvPlanBuilder.hpp"
 #include "HipdnnEnginePluginHandle.hpp"
+#include "engines/plans/MiopenConvPlanBuilder.hpp"
 
 using namespace miopen_legacy_plugin;
 using namespace hipdnn_plugin;

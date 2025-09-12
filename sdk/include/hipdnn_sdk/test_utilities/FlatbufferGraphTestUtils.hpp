@@ -245,8 +245,7 @@ inline flatbuffers::FlatBufferBuilder
         &convPostPadding,
         &convStrides,
         &convDilation,
-        hipdnn_sdk::data_objects::ConvMode_CROSS_CORRELATION
-    );
+        hipdnn_sdk::data_objects::ConvMode_CROSS_CORRELATION);
 
     std::vector<::flatbuffers::Offset<hipdnn_sdk::data_objects::Node>> nodes;
     auto node = hipdnn_sdk::data_objects::CreateNodeDirect(
@@ -256,13 +255,8 @@ inline flatbuffers::FlatBufferBuilder
         convAttributes.Union());
     nodes.push_back(node);
 
-    auto graphOffset = hipdnn_sdk::data_objects::CreateGraphDirect(builder,
-                                                                   "test",
-                                                                   DataType_FLOAT,
-                                                                   DataType_FLOAT,
-                                                                   DataType_FLOAT,
-                                                                   &tensorAttributes,
-                                                                   &nodes);
+    auto graphOffset = hipdnn_sdk::data_objects::CreateGraphDirect(
+        builder, "test", DataType_FLOAT, DataType_FLOAT, DataType_FLOAT, &tensorAttributes, &nodes);
     builder.Finish(graphOffset);
     return builder;
 }
