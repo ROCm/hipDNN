@@ -92,10 +92,14 @@ target_compile_definitions(miopen_legacy_plugin PRIVATE
 target_link_libraries(miopen_legacy_plugin PRIVATE miopen_legacy_plugin_private)
 target_link_libraries(miopen_legacy_plugin PRIVATE "-Xlinker --exclude-libs=ALL") # Hide symbols from linked static libs
 target_compile_options(miopen_legacy_plugin PRIVATE ${HIPDNN_WARNING_COMPILE_OPTIONS})
-set_target_properties(miopen_legacy_plugin PROPERTIES CXX_VISIBILITY_PRESET hidden)
-
-set_target_properties(miopen_legacy_plugin PROPERTIES
+set_target_properties(miopen_legacy_plugin PROPERTIES 
+    CXX_VISIBILITY_PRESET hidden
     LIBRARY_OUTPUT_DIRECTORY "${HIPDNN_BUILD_PLUGIN_ENGINE_DIR}"
+    BUILD_WITH_INSTALL_RPATH OFF
+    BUILD_RPATH "$ORIGIN/../../../lib"
+    INSTALL_RPATH ""
+    INSTALL_RPATH_USE_LINK_PATH FALSE
+    BUILD_RPATH_USE_ORIGIN TRUE
 )
 
 clang_tidy_check(miopen_legacy_plugin)

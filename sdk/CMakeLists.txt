@@ -68,8 +68,6 @@ target_include_directories(hipdnn_sdk INTERFACE
 # By doing this, we don't need to link to hip::device
 target_compile_definitions(hipdnn_sdk INTERFACE __HIPCC__)
 
-target_compile_definitions(hipdnn_sdk INTERFACE HIPDNN_BUILD_DIR="${CMAKE_BINARY_DIR}")
-
 # Export plugin directory variables for external plugin developers
 set(HIPDNN_PLUGIN_ENGINE_SUBDIR "${HIPDNN_PLUGIN_ENGINE_SUBDIR}")
 set(HIPDNN_INSTALL_PLUGIN_ENGINE_DIR "${HIPDNN_INSTALL_PLUGIN_ENGINE_DIR}")

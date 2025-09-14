@@ -94,7 +94,19 @@ class PluginManagerBase
 {
     static_assert(std::is_base_of_v<PluginBase, Plugin>, "Plugin must be derived from PluginBase");
 
-public:
+protected:
+    explicit PluginManagerBase(std::set<std::filesystem::path> defaultPaths)
+        : _defaultPluginPaths(std::move(defaultPaths))
+    {
+    }
+
+    // This function is called before adding a plugin to the plugin list.
+    // The function must throw Hipdnn_exception if the plugin is not valid.
+    virtual void validateBeforeAdding([[maybe_unused]] const Plugin& plugin) {}
+
+    // This function is called after the plugin is added to the plugin list.
+    virtual void actionAfterAdding([[maybe_unused]] const Plugin& plugin) {}
+
     // For cases where tests need to override the default plugin search paths
     static std::set<std::filesystem::path>
         getPluginSearchPaths(const char* envVarName,
@@ -108,19 +120,6 @@ public:
         }
         return defaultPaths;
     }
-
-protected:
-    explicit PluginManagerBase(std::set<std::filesystem::path> defaultPaths)
-        : _defaultPluginPaths(std::move(defaultPaths))
-    {
-    }
-
-    // This function is called before adding a plugin to the plugin list.
-    // The function must throw Hipdnn_exception if the plugin is not valid.
-    virtual void validateBeforeAdding([[maybe_unused]] const Plugin& plugin) {}
-
-    // This function is called after the plugin is added to the plugin list.
-    virtual void actionAfterAdding([[maybe_unused]] const Plugin& plugin) {}
 
 public:
     virtual ~PluginManagerBase() = default;
