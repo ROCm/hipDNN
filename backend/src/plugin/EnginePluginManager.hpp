@@ -3,7 +3,6 @@
 
 #pragma once
 
-#include <cstdlib>
 #include <filesystem>
 #include <set>
 #include <string>
@@ -11,7 +10,6 @@
 #include "EnginePlugin.hpp"
 #include "HipdnnException.hpp"
 #include "PluginCore.hpp"
-#include <hipdnn_sdk/utilities/PlatformUtils.hpp>
 
 namespace hipdnn_backend
 {

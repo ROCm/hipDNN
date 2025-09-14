@@ -328,7 +328,7 @@ std::vector<std::string> getLoadedPlugins(hipdnnHandle_t handle)
     return pluginPaths;
 }
 
-static inline bool leafEqAllowExt(const fs::path& pathFileName, const fs::path& suffixFileName)
+static inline bool stemEq(const fs::path& pathFileName, const fs::path& suffixFileName)
 {
     using hipdnn_sdk::utilities::pathCompEq;
     if(pathCompEq(pathFileName, suffixFileName))
@@ -336,20 +336,9 @@ static inline bool leafEqAllowExt(const fs::path& pathFileName, const fs::path& 
         return true;
     }
 
-    // The file names are not necessarily fully qualified. Realistically, only
-    // need the second conditional because the returned path from backend will
-    // be fully qualified.
-    if(!pathFileName.has_extension() && suffixFileName.has_extension()
-       && pathCompEq(pathFileName, suffixFileName.stem()))
-    {
-        return true;
-    }
-    if(pathFileName.has_extension() && !suffixFileName.has_extension()
-       && pathCompEq(pathFileName.stem(), suffixFileName))
-    {
-        return true;
-    }
-    return false;
+    // The full path should have an extension, but the suffix may not
+    return pathFileName.has_extension() && !suffixFileName.has_extension()
+           && pathCompEq(pathFileName.stem(), suffixFileName);
 }
 
 static bool isPluginLoadedByRelativePathInternal(const fs::path& fullPath, const fs::path& suffix)
@@ -390,7 +379,7 @@ static bool isPluginLoadedByRelativePathInternal(const fs::path& fullPath, const
     auto si = suffixComps.rbegin();
     auto fi = fullComps.rbegin();
 
-    if(!leafEqAllowExt(*si, *fi))
+    if(!stemEq(*si, *fi))
     {
         return false;
     }

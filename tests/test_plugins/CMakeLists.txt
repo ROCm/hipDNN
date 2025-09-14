@@ -84,7 +84,7 @@ add_test_plugin(${TEST_DUPLICATE_ID_B_PLUGIN_NAME} TestDuplicateIdBPlugin.cpp)
 add_test_plugin(${TEST_INCOMPLETE_API_PLUGIN_NAME} TestIncompleteApiPlugin.cpp)
 
 
-# Create a duplicated default plugin (will be in test_plugins/default directory)
+# Create the default plugin in test_plugins/default
 set(test_good_default_plugin_OUTPUT_DIR "${HIPDNN_TEST_PLUGIN_DIR}/default")
 add_test_plugin(${TEST_GOOD_DEFAULT_PLUGIN_NAME} TestGoodDefaultPlugin.cpp)
 

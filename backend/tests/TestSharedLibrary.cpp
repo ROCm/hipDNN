@@ -19,7 +19,7 @@ namespace
 const auto TEST_PLUGIN_DIR = std::filesystem::path("lib/test_plugins");
 
 const auto LIBRARY_PATH = ".." / TEST_PLUGIN_DIR / TEST_PLUGIN1_NAME;
-const auto LIBRARY_PATH_LIB_NAME_ONLY
+const auto LIBRARY_PATH_LIB_EXT
     = ".." / TEST_PLUGIN_DIR / hipdnn_sdk::utilities::getLibraryName(TEST_PLUGIN1_NAME);
 
 const auto WRONG_LIBRARY_PATH = std::filesystem::path("./wrong_path");
@@ -39,10 +39,10 @@ TEST(TestSharedLibrary, LoadLibrary)
     library.unload();
 }
 
-TEST(TestSharedLibrary, LoadLibraryWithLibNameOnly)
+TEST(TestSharedLibrary, LoadLibraryWithLibExt)
 {
     plugin::SharedLibrary library;
-    library.load(LIBRARY_PATH_LIB_NAME_ONLY);
+    library.load(LIBRARY_PATH_LIB_EXT);
     library.unload();
 }
 

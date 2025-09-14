@@ -260,8 +260,6 @@ TEST_F(IntegrationPluginLoading, MultiplePluginsNoApplicableEngines)
 
 TEST_F(IntegrationPluginLoading, MultiplePluginsOneApplicableEngine)
 {
-    // TODO: maybe move this to setup since they can all pass with it.
-    // Only consideration is env guard scope.
     hipdnn_sdk::test_utilities::ScopedEnvironmentVariableSetter envSetter("HIPDNN_PLUGIN_DIR");
     hipdnn_sdk::utilities::setEnv("HIPDNN_PLUGIN_DIR", getTestPluginDefaultDir().c_str());
 

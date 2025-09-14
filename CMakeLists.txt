@@ -33,9 +33,9 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 # RPATH settings for build portability
-# Ensures binaries can find libraries when the build directory is moved
+# So binaries can find libraries when the build directory is moved
 set(CMAKE_BUILD_WITH_INSTALL_RPATH OFF)
-set(CMAKE_INSTALL_RPATH_USE_LINK_PATH FALSE)  # Don't automatically add link directories to install RPATH
+set(CMAKE_INSTALL_RPATH_USE_LINK_PATH FALSE)
 
 set(CMAKE_BUILD_RPATH_USE_ORIGIN TRUE)
 # Set default build RPATH for executables in bin/ to find libraries in lib/
@@ -154,11 +154,11 @@ add_dependencies(check_ctest validate_test_names)
 
 if(CODE_COVERAGE)
     if(HIP_DNN_BUILD_PLUGINS)
-        set(MIOPEN_PLUGIN_CODE_COVERAGE_OBJECT -object ./plugins/miopen_legacy_plugin/libmiopen_legacy_plugin.so -object ./bin/miopen_legacy_plugin_tests)
+        set(MIOPEN_PLUGIN_CODE_COVERAGE_OBJECT -object ${HIPDNN_BUILD_PLUGIN_ENGINE_DIR}/libmiopen_legacy_plugin.so -object ./bin/miopen_legacy_plugin_tests)
     endif()
 
     set(CODE_COVERAGE_IGNORE_REGEX "\(.*deps.*\)|\(.*tests.*\)|\(.*sdk/include/hipdnn_sdk/data_objects.*\)|\(.*sdk/include/hipdnn_sdk/test_utilities.*\)|\(.*sdk/include/hipdnn_sdk/plugin/test_utils.*\)")
-    set(CODE_COVERAGE_OBJECTS -object ./backend/src/libhipdnn_backend.so -object ./bin/hipdnn_backend_tests -object ./bin/hipdnn_frontend_tests -object ./bin/public_hipdnn_backend_tests -object ./bin/hipdnn_sdk_tests ${MIOPEN_PLUGIN_CODE_COVERAGE_OBJECT})
+    set(CODE_COVERAGE_OBJECTS -object ./lib/libhipdnn_backend.so -object ./bin/hipdnn_backend_tests -object ./bin/hipdnn_frontend_tests -object ./bin/public_hipdnn_backend_tests -object ./bin/hipdnn_sdk_tests ${MIOPEN_PLUGIN_CODE_COVERAGE_OBJECT})
     
     add_custom_target(
         code_coverage

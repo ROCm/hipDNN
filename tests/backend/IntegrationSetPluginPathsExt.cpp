@@ -9,7 +9,6 @@
 #include <hipdnn_sdk/data_objects/graph_generated.h>
 #include <hipdnn_sdk/test_utilities/ScopedEnvironmentVariableSetter.hpp>
 #include <hipdnn_sdk/utilities/PlatformUtils.hpp>
-#include <iostream>
 #include <vector>
 
 using namespace hipdnn_sdk::utilities;
