@@ -40,7 +40,3 @@ if(BUILD_PLUGIN_AS_DEPENDENCY)
     
     add_integration_test_target(miopen_plugin_integration_test ${CMAKE_CURRENT_BINARY_DIR})
 endif()
-
-set_target_properties(miopen_plugin_integration_test PROPERTIES
-    BUILD_RPATH "$ORIGIN/../lib/hipdnn_plugins/engines"
-)

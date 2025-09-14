@@ -56,11 +56,6 @@ function(add_test_plugin target_name)
     
     set_target_properties(${target_name} PROPERTIES
         LIBRARY_OUTPUT_DIRECTORY "${${target_name}_OUTPUT_DIR}"
-        BUILD_WITH_INSTALL_RPATH OFF
-        BUILD_RPATH "$ORIGIN/../../.."
-        INSTALL_RPATH ""
-        INSTALL_RPATH_USE_LINK_PATH FALSE
-        BUILD_RPATH_USE_ORIGIN TRUE
     )
 
 

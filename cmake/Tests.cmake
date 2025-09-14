@@ -173,11 +173,6 @@ function(_add_gtest_target_internal APPEND_FUNCTION_SUFFIX TARGET WORKING_DIR)
     
     set_target_properties(${TARGET} PROPERTIES
         RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
-        BUILD_WITH_INSTALL_RPATH OFF
-        BUILD_RPATH "$ORIGIN/../lib"
-        INSTALL_RPATH ""
-        INSTALL_RPATH_USE_LINK_PATH FALSE
-        BUILD_RPATH_USE_ORIGIN TRUE
     )
 
     add_dependencies(check_ctest ${TARGET})
