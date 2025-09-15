@@ -106,7 +106,7 @@ RUN cmake --install .
 # Select which build stage to use
 # ============================================================================
 ARG BUILD_TYPE=prebuilt
-FROM install_therock_${BUILD_TYPE} AS install_therock
+FROM install_therock_$BUILD_TYPE AS install_therock
 
 # ============================================================================
 # Common hipDNN development environment
