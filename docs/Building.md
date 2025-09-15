@@ -62,11 +62,9 @@ The following libraries are automatically managed by CMake (see [Dependencies.cm
    ```bash
    cd hipDNN/dockerfiles/
    
-   # For Ubuntu 22.04 (recommended)
-   docker build -f ./Dockerfile.ubuntu22 -t hipdnn-dev:ubuntu22 .
-   
-   # For AlmaLinux
-   docker build -f ./Dockerfile.almalinux -t hipdnn-dev:almalinux .
+   # For Ubuntu 24.04 using prebuilt tarballs with gfx94X support (recommended)
+   # (see Docker README for other options if needed)
+   docker build -f ./Dockerfile.ubuntu24 -t hipdnn-dev:ubuntu24 .
    ```
 
 3. **Run the Container**
@@ -83,7 +81,7 @@ The following libraries are automatically managed by CMake (see [Dependencies.cm
      --group-add video \
      --cap-add=SYS_PTRACE \
      --security-opt seccomp=unconfined \
-     hipdnn-dev:ubuntu22
+     hipdnn-dev:ubuntu24
    ```
 
 4. **Build and Test**
