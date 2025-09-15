@@ -30,7 +30,7 @@ The Dockerfile supports two build types: **prebuilt** (using nightly tarballs) a
 | Argument | Default | Description | Valid Values |
 |----------|---------|-------------|--------------|
 | `BUILD_TYPE` | `prebuilt` | Selects build method | `prebuilt`, `fullbuild` |
-| `THEROCK_ASIC` | `gfx94X` (prebuilt)<br>`gfx90a` (fullbuild) | GPU architecture target | `gfx94X`, `gfx950`, `gfx110X`, `gfx90a`, etc. |
+| `THEROCK_ASIC` | `gfx94X` (prebuilt)<br>`gfx90a` (fullbuild) | GPU architecture target | values for prebuild [here](https://github.com/ROCm/TheRock/blob/main/RELEASES.md), values for fullbuild [here](https://rocm.docs.amd.com/projects/install-on-linux/en/latest/reference/system-requirements.html) |
 
 #### 📦 Prebuilt-Only Arguments
 
@@ -153,3 +153,6 @@ docker run -it \
 ### Build Failures
 - Ensure all submodules are initialized: `git submodule update --init --recursive`
 - Check that the ROCm version in the container matches your GPU requirements
+
+### fullbuild not updating to latest version of TheRock
+- Since the docker build doesn't change when the cloned source is updated, you will need to either provide a new hash for the docker build to rebuild `--build-arg THEROCK_GIT_HASH=abcd1234`, or provide `--no-cache` option when building to force rebuild
