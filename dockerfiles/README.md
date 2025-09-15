@@ -45,6 +45,7 @@ The Dockerfile supports two build types: **prebuilt** (using nightly tarballs) a
 | Argument | Default | Description |
 |----------|---------|-------------|
 | `THEROCK_GIT_HASH` | `default` | Specific git commit hash to checkout (uses default branch if not specified) |
+| `THEROCK_BUILD_TYPE` | `Debug` | Specific build type when compiling TheRock for env |
 
 > **Note**: Fullbuild mode clones and compiles TheRock from source (slower but more flexible)
 

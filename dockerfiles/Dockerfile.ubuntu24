@@ -71,6 +71,7 @@ FROM base AS install_therock_fullbuild
 
 ARG THEROCK_ASIC=gfx90a
 ARG THEROCK_GIT_HASH=default
+ARG THEROCK_BUILD_TYPE=Debug
 
 RUN git config --global user.email "docker@build.local" && \
     git config --global user.name "Docker Build"
@@ -102,7 +103,8 @@ RUN cmake -GNinja .. \
     -DCMAKE_INSTALL_PREFIX=/opt/rocm \
     -DTHEROCK_ENABLE_ALL=OFF \
     -DTHEROCK_ENABLE_MIOPEN=ON \
-    -DTHEROCK_AMDGPU_FAMILIES=$THEROCK_ASIC
+    -DTHEROCK_AMDGPU_FAMILIES=$THEROCK_ASIC \
+    -DCMAKE_BUILD_TYPE=$THEROCK_BUILD_TYPE
 RUN cmake --build .
 RUN cmake --install .
 
