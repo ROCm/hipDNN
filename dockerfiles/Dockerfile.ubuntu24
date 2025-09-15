@@ -97,14 +97,18 @@ RUN git config --global url."https://github.com/".insteadOf git@github.com: && \
     git config --global credential.helper "!f() { echo username=anonymous; echo password=; }; f" && \
     python ./build_tools/fetch_sources.py
 
-RUN cmake --preset=$THEROCK_BUILD_PRESET \
+RUN mkdir build
+WORKDIR /TheRock/build
+
+RUN cmake .. \
+    --preset=$THEROCK_BUILD_PRESET \
     -DCMAKE_INSTALL_PREFIX=/opt/rocm \
     -DTHEROCK_ENABLE_ALL=OFF \
     -DTHEROCK_ENABLE_MIOPEN=ON \
     -DTHEROCK_AMDGPU_FAMILIES=$THEROCK_ASIC
 
-RUN cmake --build build && \
-    cmake --install build
+RUN cmake --build . && \
+    cmake --install .
 
 # ============================================================================
 # Select which build stage to use
