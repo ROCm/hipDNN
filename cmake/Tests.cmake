@@ -13,6 +13,26 @@ else()
     set(EXEC_PREFIX "./")
 endif()
 
+# Function to make test executables relocatable by setting proper RPATH
+# This allows test binaries to find libraries when the build directory is moved
+# Windows does not use RPATH, so this function will have no effect there
+function(MakeExecutableRelocatable target)
+    set(RPATH_LIST "$ORIGIN/../lib")
+    
+    # Add any additional RPATH entries passed as extra arguments
+    foreach(extra_rpath ${ARGN})
+        list(APPEND RPATH_LIST ${extra_rpath})
+    endforeach()
+    
+    set_target_properties(${target} PROPERTIES
+        BUILD_WITH_INSTALL_RPATH OFF
+        INSTALL_RPATH_USE_LINK_PATH FALSE
+        BUILD_RPATH_USE_ORIGIN TRUE
+        BUILD_RPATH "${RPATH_LIST}"
+    )
+endfunction()
+
+# TODO: Consider adding test project run instructions to docs when we finalize it
 set(INSTALL_TEST_PROJECT "${CMAKE_CURRENT_BINARY_DIR}/test_project/CMakeLists.txt")
 file(WRITE "${INSTALL_TEST_PROJECT}"
 [=[
@@ -174,6 +194,9 @@ function(_add_gtest_target_internal APPEND_FUNCTION_SUFFIX TARGET WORKING_DIR)
     set_target_properties(${TARGET} PROPERTIES
         RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
     )
+    
+    # Make test executables relocatable so they can find libraries when build directory is moved
+    MakeExecutableRelocatable(${TARGET})
 
     add_dependencies(check_ctest ${TARGET})
     add_test(
