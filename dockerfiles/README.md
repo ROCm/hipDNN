@@ -30,13 +30,14 @@ The Dockerfile supports two build types: **prebuilt** (using nightly tarballs) a
 | Argument | Default | Description | Valid Values |
 |----------|---------|-------------|--------------|
 | `BUILD_TYPE` | `prebuilt` | Selects build method | `prebuilt`, `fullbuild` |
-| `THEROCK_ASIC` | `gfx94X` (prebuilt)<br>`gfx90a` (fullbuild) | GPU architecture target | values for prebuild [here](https://github.com/ROCm/TheRock/blob/main/RELEASES.md), values for fullbuild [here](https://rocm.docs.amd.com/projects/install-on-linux/en/latest/reference/system-requirements.html) |
+| `THEROCK_ASIC` | `gfx94X` (prebuilt)<br>`gfx90a` (fullbuild) | GPU architecture target | values for prebuild [here](https://github.com/ROCm/TheRock/blob/main/RELEASES.md), future support [here](https://github.com/ROCm/TheRock/blob/main/ROADMAP.md#rocm-on-linux), and values for fullbuild [here](https://rocm.docs.amd.com/projects/install-on-linux/en/latest/reference/system-requirements.html) |
 
 #### 📦 Prebuilt-Only Arguments
 
 | Argument | Default | Description |
 |----------|---------|-------------|
 | `THEROCK_GIT_TAG` | `7.0.0rc20250909` | Git tag for [nightly tarballs](https://therock-nightly-tarball.s3.amazonaws.com/) |
+| `THEROCK_TARBALL` | `therock-dist-linux-gfx94X-dcgpu-7.0.0rc20250909.tar.gz` | Overrides the full tarball path for [nightly tarballs](https://therock-nightly-tarball.s3.amazonaws.com/) (setting this will ignore THEROCK_ASIC, and THEROCK_GIT_TAG) |
 
 > **Note**: Prebuilt mode downloads pre-compiled binaries from TheRock nightly builds (much faster)
 
@@ -45,7 +46,7 @@ The Dockerfile supports two build types: **prebuilt** (using nightly tarballs) a
 | Argument | Default | Description |
 |----------|---------|-------------|
 | `THEROCK_GIT_HASH` | `default` | Specific git commit hash to checkout (uses default branch if not specified) |
-| `THEROCK_BUILD_TYPE` | `Debug` | Specific build type when compiling TheRock for env |
+| `THEROCK_BUILD_PRESET` | `linux-release-package` | Specify which build preset to use when building TheRock |
 
 > **Note**: Fullbuild mode clones and compiles TheRock from source (slower but more flexible)
 

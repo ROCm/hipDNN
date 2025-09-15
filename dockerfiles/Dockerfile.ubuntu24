@@ -13,6 +13,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 ENV HIP_PLATFORM=amd
 
 RUN apt-get update && apt-get install -y \
+    git \
     gdb \
     gfortran \
     git-lfs \
@@ -71,7 +72,7 @@ FROM base AS install_therock_fullbuild
 
 ARG THEROCK_ASIC=gfx90a
 ARG THEROCK_GIT_HASH=default
-ARG THEROCK_BUILD_TYPE=Debug
+ARG THEROCK_BUILD_PRESET=linux-release-package
 
 RUN git config --global user.email "docker@build.local" && \
     git config --global user.name "Docker Build"
@@ -96,17 +97,14 @@ RUN git config --global url."https://github.com/".insteadOf git@github.com: && \
     git config --global credential.helper "!f() { echo username=anonymous; echo password=; }; f" && \
     python ./build_tools/fetch_sources.py
 
-RUN mkdir build
-WORKDIR /TheRock/build
-
-RUN cmake -GNinja .. \
+RUN cmake --preset=$THEROCK_BUILD_PRESET \
     -DCMAKE_INSTALL_PREFIX=/opt/rocm \
     -DTHEROCK_ENABLE_ALL=OFF \
     -DTHEROCK_ENABLE_MIOPEN=ON \
-    -DTHEROCK_AMDGPU_FAMILIES=$THEROCK_ASIC \
-    -DCMAKE_BUILD_TYPE=$THEROCK_BUILD_TYPE
-RUN cmake --build .
-RUN cmake --install .
+    -DTHEROCK_AMDGPU_FAMILIES=$THEROCK_ASIC
+
+RUN cmake --build build && \
+    cmake --install build
 
 # ============================================================================
 # Select which build stage to use
