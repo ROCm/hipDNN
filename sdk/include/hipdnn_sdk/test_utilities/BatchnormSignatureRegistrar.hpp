@@ -89,28 +89,29 @@ struct BatchnormRegistryInitializer
                                           std::any& output,
                                           double epsilon) {
                 auto& inputT
-                    = std::any_cast<std::reference_wrapper<hipdnn_sdk::utilities::Tensor<float>>>(
-                          input)
+                    = std::any_cast<
+                          std::reference_wrapper<hipdnn_sdk::utilities::TensorBase<float>>>(input)
                           .get();
                 auto& scaleT
-                    = std::any_cast<std::reference_wrapper<hipdnn_sdk::utilities::Tensor<float>>>(
-                          scale)
+                    = std::any_cast<
+                          std::reference_wrapper<hipdnn_sdk::utilities::TensorBase<float>>>(scale)
                           .get();
                 auto& biasT
-                    = std::any_cast<std::reference_wrapper<hipdnn_sdk::utilities::Tensor<float>>>(
-                          bias)
+                    = std::any_cast<
+                          std::reference_wrapper<hipdnn_sdk::utilities::TensorBase<float>>>(bias)
                           .get();
                 auto& meanT
-                    = std::any_cast<std::reference_wrapper<hipdnn_sdk::utilities::Tensor<float>>>(
-                          mean)
+                    = std::any_cast<
+                          std::reference_wrapper<hipdnn_sdk::utilities::TensorBase<float>>>(mean)
                           .get();
                 auto& varianceT
-                    = std::any_cast<std::reference_wrapper<hipdnn_sdk::utilities::Tensor<float>>>(
+                    = std::any_cast<
+                          std::reference_wrapper<hipdnn_sdk::utilities::TensorBase<float>>>(
                           variance)
                           .get();
                 auto& outputT
-                    = std::any_cast<std::reference_wrapper<hipdnn_sdk::utilities::Tensor<float>>>(
-                          output)
+                    = std::any_cast<
+                          std::reference_wrapper<hipdnn_sdk::utilities::TensorBase<float>>>(output)
                           .get();
 
                 BatchnormBuilder<FwdBatchnormSignatureFloat{}>::Instance::batchnormFwdInference(
@@ -160,30 +161,6 @@ struct BatchnormRegistryInitializer
                     inputT, scaleT, biasT, meanT, varianceT, outputT, epsilon);
             };
         }
-        // BFLOAT16
-        // {
-        //     BatchnormSignatureKey key{
-        //         .inputDataType = DataType::DataType_BFLOAT16,
-        //         .nodeAttributesType = NodeAttributes_BatchnormInferenceAttributes,
-        //     };
-        //     batchnormRegistry()[key] = [](std::any& input,
-        //                                   std::any& scale,
-        //                                   std::any& bias,
-        //                                   std::any& mean,
-        //                                   std::any& variance,
-        //                                   std::any& output,
-        //                                   double epsilon) {
-        //         auto& inputT = std::any_cast<Tensor<bfloat16>&>(input);
-        //         auto& scaleT = std::any_cast<Tensor<bfloat16>&>(scale);
-        //         auto& biasT = std::any_cast<Tensor<bfloat16>&>(bias);
-        //         auto& meanT = std::any_cast<Tensor<bfloat16>&>(mean);
-        //         auto& varianceT = std::any_cast<Tensor<bfloat16>&>(variance);
-        //         auto& outputT = std::any_cast<Tensor<bfloat16>&>(output);
-
-        //         BatchnormBuilder<FwdBatchnormSignatureBfloat16>::Instance::batchnormFwdInference(
-        //             inputT, scaleT, biasT, meanT, varianceT, outputT, epsilon);
-        //     };
-        // }
     }
 };
 static BatchnormRegistryInitializer _batchnormRegistryInitializer;
