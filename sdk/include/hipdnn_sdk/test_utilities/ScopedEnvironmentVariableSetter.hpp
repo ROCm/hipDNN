@@ -13,11 +13,12 @@ namespace hipdnn_sdk::test_utilities
 class ScopedEnvironmentVariableSetter
 {
 public:
-    explicit ScopedEnvironmentVariableSetter(const std::string& varName)
+    ScopedEnvironmentVariableSetter(const std::string& varName, const std::string& value = "")
         : _varName(varName)
     {
         _originalValue = hipdnn_sdk::utilities::getEnv(varName.c_str());
         _hadOriginalValue = !_originalValue.empty();
+        hipdnn_sdk::utilities::setEnv(varName.c_str(), value.c_str());
     }
 
     ~ScopedEnvironmentVariableSetter()
@@ -30,6 +31,11 @@ public:
         {
             hipdnn_sdk::utilities::unsetEnv(_varName.c_str());
         }
+    }
+
+    void setValue(const std::string& value)
+    {
+        hipdnn_sdk::utilities::setEnv(_varName.c_str(), value.c_str());
     }
 
     ScopedEnvironmentVariableSetter(const ScopedEnvironmentVariableSetter&) = delete;

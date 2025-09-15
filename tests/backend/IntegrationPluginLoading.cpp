@@ -260,8 +260,8 @@ TEST_F(IntegrationPluginLoading, MultiplePluginsNoApplicableEngines)
 
 TEST_F(IntegrationPluginLoading, MultiplePluginsOneApplicableEngine)
 {
-    hipdnn_sdk::test_utilities::ScopedEnvironmentVariableSetter envSetter("HIPDNN_PLUGIN_DIR");
-    hipdnn_sdk::utilities::setEnv("HIPDNN_PLUGIN_DIR", getTestPluginDefaultDir().c_str());
+    hipdnn_sdk::test_utilities::ScopedEnvironmentVariableSetter envSetter(
+        "HIPDNN_PLUGIN_DIR", getTestPluginDefaultDir());
 
     const std::array<const char*, 1> paths
         = {hipdnn_tests::plugin_constants::testNoApplicableEnginesAPluginPath().c_str()};
@@ -294,8 +294,8 @@ TEST_F(IntegrationPluginLoading, MultiplePluginsOneApplicableEngine)
 TEST_F(IntegrationPluginLoading, MultiplePluginsMultipleApplicableEngines)
 {
 
-    hipdnn_sdk::test_utilities::ScopedEnvironmentVariableSetter envSetter("HIPDNN_PLUGIN_DIR");
-    hipdnn_sdk::utilities::setEnv("HIPDNN_PLUGIN_DIR", getTestPluginDefaultDir().c_str());
+    hipdnn_sdk::test_utilities::ScopedEnvironmentVariableSetter envSetter(
+        "HIPDNN_PLUGIN_DIR", getTestPluginDefaultDir());
 
     const std::array<const char*, 1> paths
         = {hipdnn_tests::plugin_constants::testGoodPluginPath().c_str()};

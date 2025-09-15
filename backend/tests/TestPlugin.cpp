@@ -359,8 +359,7 @@ TEST(TestPluginCore, GetPluginSearchPathsWithEnvVar)
     const char* envVarName = "TEST_PLUGIN_PATH";
     const std::string testPath = "/custom/plugin/path";
 
-    ScopedEnvironmentVariableSetter envSetter(envVarName);
-    hipdnn_sdk::utilities::setEnv(envVarName, testPath.c_str());
+    ScopedEnvironmentVariableSetter envSetter(envVarName, testPath);
 
     std::set<std::filesystem::path> defaultPaths = {"/default/path1", "/default/path2"};
 
@@ -387,7 +386,6 @@ TEST(TestPluginCore, GetPluginSearchPathsWithEmptyEnvVar)
     const char* envVarName = "TEST_PLUGIN_PATH_EMPTY";
 
     ScopedEnvironmentVariableSetter envSetter(envVarName);
-    hipdnn_sdk::utilities::setEnv(envVarName, "");
 
     std::set<std::filesystem::path> defaultPaths
         = {"/default/path1", "/default/path2", "/default/path3"};
