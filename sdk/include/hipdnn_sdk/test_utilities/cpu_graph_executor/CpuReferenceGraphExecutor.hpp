@@ -11,7 +11,7 @@
 
 namespace hipdnn_sdk
 {
-namespace utilities
+namespace test_utilities
 {
 
 class CpuReferenceGraphExecutor
@@ -25,7 +25,6 @@ public:
         void* ptr, const std::vector<int64_t>& dims, const std::vector<int64_t>& strides)
     {
         return std::make_unique<TensorView<T>>(ptr, dims, strides);
-        //return std::make_unique TensorView<T>(ptr, dims, strides);
     }
 
     static std::vector<int64_t> flatbufferVectorToStd(const ::flatbuffers::Vector<int64_t>* fbVec)

@@ -11,6 +11,10 @@
 #include <hipdnn_sdk/data_objects/graph_generated.h>
 #include <hipdnn_sdk/test_utilities/CpuFpReferenceBatchnorm.hpp>
 #include <hipdnn_sdk/utilities/UtilsFp16.hpp>
+namespace hipdnn_sdk
+{
+namespace test_utilities
+{
 
 template <hipdnn_sdk::data_objects::DataType DT>
 struct DataTypeToNative;
@@ -59,11 +63,5 @@ struct BatchnormBuilder
     using Instance = hipdnn_sdk::test_utilities::CpuFpReferenceBatchnormImpl<InputType, InputType>;
 };
 
-// struct FwdBatchnormSignature
-// {
-//     static constexpr auto INPUT_DATA_TYPE = hipdnn_sdk::data_objects::DataType::DataType_FLOAT;
-//     static constexpr auto NODE_ATTRIBUTES_TYPE
-//         = hipdnn_sdk::data_objects::NodeAttributes_BatchnormInferenceAttributes;
-// };
-
-// static_assert(BatchnormSignatureDescriptor<FwdBatchnormSignature>);
+}
+}

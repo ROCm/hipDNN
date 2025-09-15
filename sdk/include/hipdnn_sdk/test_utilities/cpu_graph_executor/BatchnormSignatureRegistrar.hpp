@@ -7,31 +7,12 @@
 #include <hipdnn_sdk/data_objects/data_types_generated.h>
 #include <hipdnn_sdk/data_objects/graph_generated.h>
 
-template <typename T>
-struct BatchnormImpl
-{
-    static BatchnormImpl getStaticType()
-    {
-        return T::getStaticType();
-    }
-};
+#include <hipdnn_sdk/test_utilities/cpu_graph_executor/BatchnormSignature.hpp>
 
-// 1. Define the signature POD
-struct FwdBatchnormSignatureFloat
+namespace hipdnn_sdk
 {
-    static constexpr auto INPUT_DATA_TYPE = hipdnn_sdk::data_objects::DataType_FLOAT;
-    static constexpr auto NODE_ATTRIBUTES_TYPE
-        = hipdnn_sdk::data_objects::NodeAttributes_BatchnormInferenceAttributes;
-};
-static_assert(BatchnormSignatureDescriptor<FwdBatchnormSignatureFloat>);
-
-struct FwdBatchnormSignatureHalf
+namespace test_utilities
 {
-    static constexpr auto INPUT_DATA_TYPE = hipdnn_sdk::data_objects::DataType_HALF;
-    static constexpr auto NODE_ATTRIBUTES_TYPE
-        = hipdnn_sdk::data_objects::NodeAttributes_BatchnormInferenceAttributes;
-};
-static_assert(BatchnormSignatureDescriptor<FwdBatchnormSignatureHalf>);
 
 // 2. Define the key for the registry
 struct BatchnormSignatureKey
@@ -46,18 +27,27 @@ struct BatchnormSignatureKey
     }
 };
 
+}
+}
+
+//todo, figure out better way to do this. hash cant be inside the hipdnn_sdk namespace
 namespace std
 {
 template <>
-struct hash<BatchnormSignatureKey>
+struct hash<hipdnn_sdk::test_utilities::BatchnormSignatureKey>
 {
-    std::size_t operator()(const BatchnormSignatureKey& k) const
+    std::size_t operator()(const hipdnn_sdk::test_utilities::BatchnormSignatureKey& k) const
     {
         return std::hash<int>()(static_cast<int>(k.inputDataType))
                ^ (std::hash<int>()(static_cast<int>(k.nodeAttributesType)) << 1);
     }
 };
 }
+
+namespace hipdnn_sdk
+{
+namespace test_utilities
+{
 
 using BatchnormFn
     = std::function<void(std::any&, std::any&, std::any&, std::any&, std::any&, std::any&, double)>;
@@ -164,3 +154,6 @@ struct BatchnormRegistryInitializer
     }
 };
 static BatchnormRegistryInitializer _batchnormRegistryInitializer;
+
+}
+}

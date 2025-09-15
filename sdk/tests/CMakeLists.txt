@@ -37,7 +37,7 @@ add_executable(hipdnn_sdk_tests
     test_utilities/TestTempDirectory.cpp
     test_utilities/TestScopedEnvironmentVariableSetter.cpp
     test_utilities/TestLoggingUtils.cpp
-    test_utilities/TestAdamTestStuff.cpp
+    test_utilities/TestCpuReferenceGraphExecutor.cpp
 )
 
 target_compile_definitions(hipdnn_sdk_tests PRIVATE
