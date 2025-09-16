@@ -44,16 +44,15 @@ public:
                                       TensorBase<InputDataType>& output,
                                       double epsilon)
     {
-        if(input.dims().size() != 4)
+        if(input.dims().size() < 2)
         {
-            throw std::runtime_error("Batchnorm inference requires a 4D tensor.");
+            throw std::runtime_error(
+                "Batchnorm inference requires at least 2D tensor (batch and channel).");
         }
 
-        int64_t nBatches = input.dims().at(0);
-        std::vector<int64_t> channels(static_cast<size_t>(input.dims().at(1)));
+        auto nChannels = input.dims().at(1);
+        std::vector<int64_t> channels(static_cast<size_t>(nChannels));
         std::iota(channels.begin(), channels.end(), 0);
-        int64_t height = input.dims().at(2);
-        int64_t width = input.dims().at(3);
 
         std::for_each(channels.begin(), channels.end(), [&](int64_t cidx) {
             auto mean = estimatedMean.getHostValue(0, cidx);
@@ -63,27 +62,16 @@ public:
                   / sqrtInternal(variance + static_cast<MeanVarianceDataType>(epsilon));
 
             // process the batch per channel
-            for(int bidx = 0; bidx < nBatches; bidx++)
-            {
-                for(int row = 0; row < height; row++)
-                {
-                    for(int column = 0; column < width; column++)
-                    {
-                        auto in = static_cast<MeanVarianceDataType>(
-                            input.getHostValue(bidx, cidx, row, column));
-                        MeanVarianceDataType elemStd = in - mean;
-                        MeanVarianceDataType inhat = elemStd * invVariance;
-                        output.setHostValue(
-                            static_cast<InputDataType>((scale.getHostValue(0, cidx)
-                                                        * static_cast<ScaleBiasDataType>(inhat))
-                                                       + bias.getHostValue(0, cidx)),
-                            bidx,
-                            cidx,
-                            row,
-                            column);
-                    }
-                }
-            }
+            iterateChannelElements(input, cidx, [&](const std::vector<int64_t>& indices) {
+                auto inVal = static_cast<MeanVarianceDataType>(input.getHostValue(indices));
+                MeanVarianceDataType elemStd = inVal - mean;
+                MeanVarianceDataType inhat = elemStd * invVariance;
+                output.setHostValue(
+                    static_cast<InputDataType>(
+                        (scale.getHostValue(0, cidx) * static_cast<ScaleBiasDataType>(inhat))
+                        + bias.getHostValue(0, cidx)),
+                    indices);
+            });
         });
 
         output.memory().markHostModified(); // Mark output memory as modified on host
