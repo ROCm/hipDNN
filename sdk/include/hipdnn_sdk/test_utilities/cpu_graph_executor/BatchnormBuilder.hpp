@@ -44,12 +44,16 @@ concept NodeAttributesType
 template <auto Sig>
 concept ValidBatchnormSignature = requires {
     requires BatchnormDataType<Sig.INPUT_DATA_TYPE>;
+    requires BatchnormDataType<Sig.SCALE_BIAS_DATA_TYPE>;
+    requires BatchnormDataType<Sig.MEAN_VARIANCE_DATA_TYPE>;
     requires NodeAttributesType<Sig.NODE_ATTRIBUTES_TYPE>;
 };
 
 template <typename T>
 concept BatchnormSignatureDescriptor = requires(T t) {
     { t.INPUT_DATA_TYPE } -> std::convertible_to<hipdnn_sdk::data_objects::DataType>;
+    { t.SCALE_BIAS_DATA_TYPE } -> std::convertible_to<hipdnn_sdk::data_objects::DataType>;
+    { t.MEAN_VARIANCE_DATA_TYPE } -> std::convertible_to<hipdnn_sdk::data_objects::DataType>;
     { t.NODE_ATTRIBUTES_TYPE } -> std::convertible_to<hipdnn_sdk::data_objects::NodeAttributes>;
 };
 
@@ -57,10 +61,12 @@ template <BatchnormSignatureDescriptor auto SIGNATURE>
     requires ValidBatchnormSignature<SIGNATURE>
 struct BatchnormBuilder
 {
-    using InputType = typename DataTypeToNative<SIGNATURE.INPUT_DATA_TYPE>::type;
+    using InputDataType = typename DataTypeToNative<SIGNATURE.INPUT_DATA_TYPE>::type;
+    using ScaleBiasDataType = typename DataTypeToNative<SIGNATURE.SCALE_BIAS_DATA_TYPE>::type;
+    using MeanVarianceDataType = typename DataTypeToNative<SIGNATURE.MEAN_VARIANCE_DATA_TYPE>::type;
 
-    //todo, add scale biat type
-    using Instance = hipdnn_sdk::test_utilities::CpuFpReferenceBatchnormImpl<InputType, InputType>;
+    using Instance = hipdnn_sdk::test_utilities::
+        CpuFpReferenceBatchnormImpl<InputDataType, ScaleBiasDataType, MeanVarianceDataType>;
 };
 
 }

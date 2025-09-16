@@ -9,6 +9,8 @@
 #include <hipdnn_sdk/utilities/UtilsBfp16.hpp>
 #include <hipdnn_sdk/utilities/UtilsFp16.hpp>
 
+#include <hipdnn_sdk/test_utilities/cpu_graph_executor/TensorVariant.hpp>
+
 namespace hipdnn_sdk
 {
 namespace test_utilities
@@ -19,28 +21,6 @@ class CpuReferenceGraphExecutor
 public:
     CpuReferenceGraphExecutor() = default;
     ~CpuReferenceGraphExecutor() = default;
-
-    template <typename T>
-    static std::unique_ptr<TensorBase<T>> createHostOnlyShallowTensor(
-        void* ptr, const std::vector<int64_t>& dims, const std::vector<int64_t>& strides)
-    {
-        return std::make_unique<TensorView<T>>(ptr, dims, strides);
-    }
-
-    static std::vector<int64_t> flatbufferVectorToStd(const ::flatbuffers::Vector<int64_t>* fbVec)
-    {
-        std::vector<int64_t> result;
-        if(fbVec == nullptr)
-        {
-            return result;
-        }
-        result.reserve(fbVec->size());
-        for(auto v : *fbVec)
-        {
-            result.push_back(v);
-        }
-        return result;
-    }
 
     static void executeTheGraph(void* graphBuffer,
                                 size_t size,
@@ -56,9 +36,14 @@ public:
             {
                 const auto& tensorMap = graphWrap.getTensorMap();
                 auto xTensorAttr = tensorMap.at(nodeAttributes->x_tensor_uid());
-                //std::ignore = xTensorAttr;
+                auto scaleTensorAttr = tensorMap.at(nodeAttributes->scale_tensor_uid());
+                //todo, its optional so use scale if not provided
+                auto meanTensorAttr = tensorMap.at(nodeAttributes->mean_tensor_uid().value());
+
                 BatchnormSignatureKey key{
                     .inputDataType = xTensorAttr->data_type(),
+                    .scaleBiasDataType = scaleTensorAttr->data_type(),
+                    .meanVarianceDataType = meanTensorAttr->data_type(),
                     .nodeAttributesType
                     = hipdnn_sdk::data_objects::NodeAttributes_BatchnormInferenceAttributes,
                 };
@@ -67,47 +52,35 @@ public:
                 {
                     BatchnormFn fn = it->second;
 
-                    auto shallowXTensor = createHostOnlyShallowTensor<float>(
-                        variantPack.at(xTensorAttr->uid()),
-                        flatbufferVectorToStd(xTensorAttr->dims()),
-                        flatbufferVectorToStd(xTensorAttr->strides()));
-                    std::any input = std::ref(*shallowXTensor);
+                    auto shallowXTensor = createHostOnlyShallowTensorVariant(
+                        *xTensorAttr, variantPack.at(xTensorAttr->uid()));
+                    std::any input = std::ref(shallowXTensor);
 
                     auto yTensorAttr = tensorMap.at(nodeAttributes->y_tensor_uid());
-                    auto shallowYTensor = createHostOnlyShallowTensor<float>(
-                        variantPack.at(yTensorAttr->uid()),
-                        flatbufferVectorToStd(yTensorAttr->dims()),
-                        flatbufferVectorToStd(yTensorAttr->strides()));
-                    std::any output = std::ref(*shallowYTensor);
+                    auto shallowYTensor = createHostOnlyShallowTensorVariant(
+                        *yTensorAttr, variantPack.at(yTensorAttr->uid()));
+                    std::any output = std::ref(shallowYTensor);
 
-                    auto scaleTensorAttr = tensorMap.at(nodeAttributes->scale_tensor_uid());
-                    auto shallowScaleTensor = createHostOnlyShallowTensor<float>(
-                        variantPack.at(scaleTensorAttr->uid()),
-                        flatbufferVectorToStd(scaleTensorAttr->dims()),
-                        flatbufferVectorToStd(scaleTensorAttr->strides()));
-                    std::any scale = std::ref(*shallowScaleTensor);
+                    //auto scaleTensorAttr = tensorMap.at(nodeAttributes->scale_tensor_uid());
+                    auto shallowScaleTensor = createHostOnlyShallowTensorVariant(
+                        *scaleTensorAttr, variantPack.at(scaleTensorAttr->uid()));
+                    std::any scale = std::ref(shallowScaleTensor);
 
                     auto biasTensorAttr = tensorMap.at(nodeAttributes->bias_tensor_uid());
-                    auto shallowBiasTensor = createHostOnlyShallowTensor<float>(
-                        variantPack.at(biasTensorAttr->uid()),
-                        flatbufferVectorToStd(biasTensorAttr->dims()),
-                        flatbufferVectorToStd(biasTensorAttr->strides()));
-                    std::any bias = std::ref(*shallowBiasTensor);
+                    auto shallowBiasTensor = createHostOnlyShallowTensorVariant(
+                        *biasTensorAttr, variantPack.at(biasTensorAttr->uid()));
+                    std::any bias = std::ref(shallowBiasTensor);
 
-                    auto meanTensorAttr = tensorMap.at(nodeAttributes->mean_tensor_uid().value());
-                    auto shallowMeanTensor = createHostOnlyShallowTensor<float>(
-                        variantPack.at(meanTensorAttr->uid()),
-                        flatbufferVectorToStd(meanTensorAttr->dims()),
-                        flatbufferVectorToStd(meanTensorAttr->strides()));
-                    std::any mean = std::ref(*shallowMeanTensor);
+                    //auto meanTensorAttr = tensorMap.at(nodeAttributes->mean_tensor_uid().value());
+                    auto shallowMeanTensor = createHostOnlyShallowTensorVariant(
+                        *meanTensorAttr, variantPack.at(meanTensorAttr->uid()));
+                    std::any mean = std::ref(shallowMeanTensor);
 
                     auto invVarianceTensorAttr
                         = tensorMap.at(nodeAttributes->inv_variance_tensor_uid().value());
-                    auto shallowInvVarianceTensor = createHostOnlyShallowTensor<float>(
-                        variantPack.at(invVarianceTensorAttr->uid()),
-                        flatbufferVectorToStd(invVarianceTensorAttr->dims()),
-                        flatbufferVectorToStd(invVarianceTensorAttr->strides()));
-                    std::any variance = std::ref(*shallowInvVarianceTensor);
+                    auto shallowInvVarianceTensor = createHostOnlyShallowTensorVariant(
+                        *invVarianceTensorAttr, variantPack.at(invVarianceTensorAttr->uid()));
+                    std::any variance = std::ref(shallowInvVarianceTensor);
 
                     fn(input, scale, bias, mean, variance, output, 1e-3);
                 }

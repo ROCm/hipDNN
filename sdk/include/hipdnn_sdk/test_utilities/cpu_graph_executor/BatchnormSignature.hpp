@@ -16,6 +16,9 @@ namespace test_utilities
 struct FwdBatchnormSignatureFloat
 {
     static constexpr auto INPUT_DATA_TYPE = hipdnn_sdk::data_objects::DataType_FLOAT;
+    static constexpr auto SCALE_BIAS_DATA_TYPE = hipdnn_sdk::data_objects::DataType_FLOAT;
+    static constexpr auto MEAN_VARIANCE_DATA_TYPE = hipdnn_sdk::data_objects::DataType_FLOAT;
+
     static constexpr auto NODE_ATTRIBUTES_TYPE
         = hipdnn_sdk::data_objects::NodeAttributes_BatchnormInferenceAttributes;
 };
@@ -24,10 +27,25 @@ static_assert(BatchnormSignatureDescriptor<FwdBatchnormSignatureFloat>);
 struct FwdBatchnormSignatureHalf
 {
     static constexpr auto INPUT_DATA_TYPE = hipdnn_sdk::data_objects::DataType_HALF;
+    static constexpr auto SCALE_BIAS_DATA_TYPE = hipdnn_sdk::data_objects::DataType_HALF;
+    static constexpr auto MEAN_VARIANCE_DATA_TYPE = hipdnn_sdk::data_objects::DataType_HALF;
     static constexpr auto NODE_ATTRIBUTES_TYPE
         = hipdnn_sdk::data_objects::NodeAttributes_BatchnormInferenceAttributes;
 };
 static_assert(BatchnormSignatureDescriptor<FwdBatchnormSignatureHalf>);
+
+struct FwdBatchnormSignatureTest
+{
+    static constexpr auto INPUT_DATA_TYPE = hipdnn_sdk::data_objects::DataType_FLOAT;
+    static constexpr auto SCALE_BIAS_DATA_TYPE = hipdnn_sdk::data_objects::DataType_HALF;
+    static constexpr auto MEAN_VARIANCE_DATA_TYPE = hipdnn_sdk::data_objects::DataType_HALF;
+    static constexpr auto NODE_ATTRIBUTES_TYPE
+        = hipdnn_sdk::data_objects::NodeAttributes_BatchnormInferenceAttributes;
+};
+static_assert(BatchnormSignatureDescriptor<FwdBatchnormSignatureTest>);
+
+using BatchnormSignatureVariants = std::
+    variant<FwdBatchnormSignatureFloat, FwdBatchnormSignatureHalf, FwdBatchnormSignatureTest>;
 
 }
 }
