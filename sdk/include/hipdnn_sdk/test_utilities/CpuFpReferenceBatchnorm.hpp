@@ -50,14 +50,8 @@ public:
                 "Batchnorm inference requires at least 2D tensor (batch and channel).");
         }
 
-        auto nBatches = input.dims().at(0);
         auto nChannels = input.dims().at(1);
-
-        int64_t elementsPerChannel = nBatches;
-        for(size_t i = 2; i < input.dims().size(); ++i)
-        {
-            elementsPerChannel *= input.dims().at(i);
-        }
+        int64_t elementsPerChannel = calculateElementsPerChannel(input.dims());
 
         std::vector<int64_t> channels(static_cast<size_t>(nChannels));
         std::iota(channels.begin(), channels.end(), 0);
@@ -106,14 +100,8 @@ public:
                 "Batchnorm training requires at least 2D tensor (batch and channel).");
         }
 
-        auto nBatches = x.dims().at(0);
         auto nChannels = x.dims().at(1);
-
-        int64_t elementsPerChannel = nBatches;
-        for(size_t i = 2; i < x.dims().size(); ++i)
-        {
-            elementsPerChannel *= x.dims().at(i);
-        }
+        int64_t elementsPerChannel = calculateElementsPerChannel(x.dims());
 
         auto nhw = static_cast<MeanVarianceDataType>(elementsPerChannel);
 
@@ -214,17 +202,15 @@ public:
                              TensorBase<ScaleBiasDataType>& dscale,
                              TensorBase<ScaleBiasDataType>& dbias)
     {
-        if(x.dims().size() != 4)
+        if(x.dims().size() < 2)
         {
-            throw std::runtime_error("Batchnorm backward requires a 4D tensor.");
+            throw std::runtime_error(
+                "Batchnorm backward requires at least 2D tensor (batch and channel).");
         }
 
-        int64_t nBatches = x.dims().at(0);
-        int64_t nChannels = x.dims().at(1);
-        int64_t height = x.dims().at(2);
-        int64_t width = x.dims().at(3);
-        int64_t nhw = nBatches * height * width; // Total elements per channel
-        auto nhwF = static_cast<MeanVarianceDataType>(nhw);
+        auto nChannels = x.dims().at(1);
+        int64_t elementsPerChannel = calculateElementsPerChannel(x.dims());
+        auto nhwF = static_cast<MeanVarianceDataType>(elementsPerChannel);
 
         std::vector<int64_t> channels(static_cast<size_t>(nChannels));
         std::iota(channels.begin(), channels.end(), 0);
@@ -238,23 +224,15 @@ public:
             MeanVarianceDataType dotProduct = 0;
             MeanVarianceDataType sumDy = 0;
 
-            for(int bidx = 0; bidx < nBatches; bidx++)
-            {
-                for(int row = 0; row < height; row++)
-                {
-                    for(int column = 0; column < width; column++)
-                    {
-                        auto xVal = static_cast<MeanVarianceDataType>(
-                            x.getHostValue(bidx, cidx, row, column));
-                        auto dyVal = static_cast<MeanVarianceDataType>(
-                            dy.getHostValue(bidx, cidx, row, column));
+            iterateChannelElements(
+                x, cidx, elementsPerChannel, [&](const std::vector<int64_t>& indices) {
+                    auto xVal = static_cast<MeanVarianceDataType>(x.getHostValue(indices));
+                    auto dyVal = static_cast<MeanVarianceDataType>(dy.getHostValue(indices));
 
-                        MeanVarianceDataType xHat = (xVal - channelMean) * channelInvVariance;
-                        dotProduct += xHat * dyVal;
-                        sumDy += dyVal;
-                    }
-                }
-            }
+                    MeanVarianceDataType xHat = (xVal - channelMean) * channelInvVariance;
+                    dotProduct += xHat * dyVal;
+                    sumDy += dyVal;
+                });
 
             // Per channel:
             // - dscale = ∑ (xHat * dy)
@@ -262,7 +240,6 @@ public:
             // - dx = scale * invVariance * (dy - mean(dy) - xHat * mean(dy * xHat))
 
             dscale.setHostValue(static_cast<ScaleBiasDataType>(dotProduct), 0, cidx);
-
             dbias.setHostValue(static_cast<ScaleBiasDataType>(sumDy), 0, cidx);
 
             MeanVarianceDataType meanDy = sumDy / nhwF;
@@ -270,25 +247,16 @@ public:
             MeanVarianceDataType scalarCoef
                 = static_cast<MeanVarianceDataType>(channelScale) * channelInvVariance;
 
-            for(int bidx = 0; bidx < nBatches; bidx++)
-            {
-                for(int row = 0; row < height; row++)
-                {
-                    for(int column = 0; column < width; column++)
-                    {
-                        auto xVal = static_cast<MeanVarianceDataType>(
-                            x.getHostValue(bidx, cidx, row, column));
-                        auto dyVal = static_cast<MeanVarianceDataType>(
-                            dy.getHostValue(bidx, cidx, row, column));
+            iterateChannelElements(
+                x, cidx, elementsPerChannel, [&](const std::vector<int64_t>& indices) {
+                    auto xVal = static_cast<MeanVarianceDataType>(x.getHostValue(indices));
+                    auto dyVal = static_cast<MeanVarianceDataType>(dy.getHostValue(indices));
 
-                        MeanVarianceDataType xHat = (xVal - channelMean) * channelInvVariance;
-                        MeanVarianceDataType dxVal
-                            = (dyVal - meanDy - xHat * meanDyXhat) * scalarCoef;
+                    MeanVarianceDataType xHat = (xVal - channelMean) * channelInvVariance;
+                    MeanVarianceDataType dxVal = (dyVal - meanDy - xHat * meanDyXhat) * scalarCoef;
 
-                        dx.setHostValue(static_cast<InputDataType>(dxVal), bidx, cidx, row, column);
-                    }
-                }
-            }
+                    dx.setHostValue(static_cast<InputDataType>(dxVal), indices);
+                });
         });
 
         dx.memory().markHostModified();
@@ -297,6 +265,21 @@ public:
     }
 
 private:
+    static int64_t calculateElementsPerChannel(const std::vector<int64_t>& dims)
+    {
+        if(dims.size() < 2)
+        {
+            throw std::runtime_error("Tensor must have at least 2 dimensions (batch and channel).");
+        }
+
+        int64_t elementsPerChannel = dims.at(0); // batch dimension
+        for(size_t i = 2; i < dims.size(); ++i)
+        {
+            elementsPerChannel *= dims.at(i);
+        }
+        return elementsPerChannel;
+    }
+
     static double sqrtInternal(double value)
     {
         return std::sqrt(value);
