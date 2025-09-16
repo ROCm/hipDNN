@@ -72,14 +72,8 @@ DEFINE_BATCHNORM_SIGNATURE(FwdBatchnormSignatureHalf,
                            DataType_HALF,
                            NodeAttributes_BatchnormInferenceAttributes);
 
-DEFINE_BATCHNORM_SIGNATURE(FwdBatchnormSignatureTest,
-                           DataType_FLOAT,
-                           DataType_HALF,
-                           DataType_HALF,
-                           NodeAttributes_BatchnormInferenceAttributes);
-
-using BatchnormSignatureVariants = std::
-    variant<FwdBatchnormSignatureFloat, FwdBatchnormSignatureHalf, FwdBatchnormSignatureTest>;
+using BatchnormSignatureVariants
+    = std::variant<FwdBatchnormSignatureFloat, FwdBatchnormSignatureHalf>;
 
 }
 }
