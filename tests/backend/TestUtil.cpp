@@ -8,7 +8,11 @@
 #include <hipdnn_sdk/data_objects/graph_generated.h>
 #include <hipdnn_sdk/logging/Logger.hpp>
 #include <hipdnn_sdk/test_utilities/FlatbufferGraphTestUtils.hpp>
+#include <hipdnn_sdk/utilities/PlatformUtils.hpp>
+#include <span>
 #include <stdexcept>
+
+namespace fs = std::filesystem;
 
 namespace test_util
 {
@@ -324,10 +328,76 @@ std::vector<std::string> getLoadedPlugins(hipdnnHandle_t handle)
     return pluginPaths;
 }
 
+static inline bool stemEq(const fs::path& pathFileName, const fs::path& suffixFileName)
+{
+    using hipdnn_sdk::utilities::pathCompEq;
+    if(pathCompEq(pathFileName, suffixFileName))
+    {
+        return true;
+    }
+
+    // The full path should have an extension, but the suffix may not
+    return pathFileName.has_extension() && !suffixFileName.has_extension()
+           && pathCompEq(pathFileName.stem(), suffixFileName);
+}
+
+static bool isPluginLoadedByRelativePathInternal(const fs::path& fullPath, const fs::path& suffix)
+{
+    using hipdnn_sdk::utilities::pathCompEq;
+
+    fs::path suffixNorm = suffix.lexically_normal();
+    fs::path fullPathNorm = fullPath.lexically_normal();
+
+    if(suffixNorm.empty())
+    {
+        return false;
+    }
+
+    for(const auto& c : suffixNorm)
+    {
+        if(c == "..")
+        {
+            return false; // Is unresolvable
+        }
+    }
+
+    std::vector<fs::path> suffixComps;
+    std::vector<fs::path> fullComps;
+    for(const auto& c : suffixNorm)
+    {
+        suffixComps.push_back(c);
+    }
+    for(const auto& c : fullPathNorm)
+    {
+        fullComps.push_back(c);
+    }
+    if(suffixComps.size() > fullComps.size())
+    {
+        return false;
+    }
+
+    auto si = suffixComps.rbegin();
+    auto fi = fullComps.rbegin();
+
+    if(!stemEq(*si, *fi))
+    {
+        return false;
+    }
+    ++si;
+    ++fi;
+
+    for(; si != suffixComps.rend(); ++si, ++fi)
+    {
+        if(!pathCompEq(*si, *fi))
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
 bool isPluginLoaded(const std::vector<std::string>& loadedPlugins, const std::string& pluginName)
 {
-    namespace fs = std::filesystem;
-
     return std::ranges::any_of(loadedPlugins, [&](const std::string& loadedPathStr) {
         try
         {
@@ -338,6 +408,25 @@ bool isPluginLoaded(const std::vector<std::string>& loadedPlugins, const std::st
             return false;
         }
     });
+}
+
+bool isPluginLoadedByRelativePath(const std::vector<std::string>& loadedPlugins,
+                                  const std::string& relativePath)
+{
+    // We cannot resolve a relative path to the hipdnn_backend module externally
+    // of the backend. We can retrieve the absolute loaded path, but our
+    // comparison to the originally specified path is limited. In particular, we
+    // can check that the loaded path is suffixed with the resolved portion of
+    // the relative path.
+    const fs::path suffix{relativePath};
+    for(const auto& s : loadedPlugins)
+    {
+        if(isPluginLoadedByRelativePathInternal(fs::path{s}, suffix))
+        {
+            return true;
+        }
+    }
+    return false;
 }
 
 } // namespace test_util

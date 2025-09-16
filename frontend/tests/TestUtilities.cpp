@@ -51,9 +51,8 @@ TEST(TestUtilities, FindCommonShapeSingleInput)
 
 TEST(TestUtilities, InitializeFrontendLoggingReturnsCorrectly)
 {
-    ScopedEnvironmentVariableSetter guard("HIPDNN_LOG_LEVEL");
+    ScopedEnvironmentVariableSetter guard("HIPDNN_LOG_LEVEL", "info");
 
-    hipdnn_sdk::utilities::setEnv("HIPDNN_LOG_LEVEL", "info");
     EXPECT_EQ(hipdnn_frontend::initializeFrontendLogging(nullptr), -1);
     EXPECT_EQ(hipdnn_frontend::initializeFrontendLogging(), 0);
 }

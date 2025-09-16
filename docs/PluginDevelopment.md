@@ -148,6 +148,49 @@ Your plugin's CMakeLists.txt should:
 - Set appropriate install paths
 - Link to required compute libraries (ie. HIP)
 
+#### Using hipDNN SDK in External Plugins
+
+When building an external plugin, the hipDNN SDK provides CMake variables to help you install your plugin in the correct location:
+
+```cmake
+find_package(hipdnn_sdk CONFIG REQUIRED)
+
+# The SDK provides these variables:
+# HIPDNN_PLUGIN_ENGINE_SUBDIR - Subdirectory path for engine plugins (e.g., "hipdnn_plugins/engines")
+# HIPDNN_INSTALL_PLUGIN_ENGINE_DIR - Install directory relative to CMAKE_INSTALL_PREFIX
+# HIPDNN_PLUGIN_ENGINE_INSTALL_PATH - Full install path for plugins
+
+# Example: Configure your plugin to install to the correct location
+install(
+    TARGETS your_plugin_name
+    LIBRARY DESTINATION ${HIPDNN_INSTALL_PLUGIN_ENGINE_DIR}
+)
+```
+
+This ensures your plugin will be installed to the same directory structure that hipDNN expects for plugin discovery.
+
+#### Build and Install Directory Structure
+
+The hipDNN build system maintains consistent directory structures for plugins:
+
+**Build directory structure:**
+```
+build/lib/
+└── hipdnn_plugins/
+    └── engines/
+        └── your_plugin.so
+```
+
+**Install directory structure:**
+```
+/opt/rocm/lib/
+└── hipdnn_plugins/
+    └── engines/
+        └── your_plugin.so
+```
+
+External plugins should follow this same structure to ensure compatibility.
+
 ## Plugin Loading
 
 hipDNN supports dynamic plugin loading with configurable search paths.
@@ -156,23 +199,39 @@ hipDNN supports dynamic plugin loading with configurable search paths.
 
 By default, hipDNN loads plugins from:
 ```
-./hipdnn_plugins/plugin_type/plugins
+./hipdnn_plugins/engines/
 ```
 
 This path is relative to the backend shared library location, typically:
 ```
-/opt/rocm/lib/hipdnn/
+/opt/rocm/lib/
 ```
 
 **Default structure example:**
 ```
-/opt/rocm/lib/hipdnn/
+/opt/rocm/lib/
 └── hipdnn_plugins/
     └── engines/
-        └── plugins/
-            ├── miopen_legacy_plugin.so
-            └── other_plugin.so
+        ├── miopen_legacy_plugin.so
+        └── other_plugin.so
 ```
+
+### Environment Variable Override
+
+You can override the default plugin directory using the `HIPDNN_PLUGIN_DIR` environment variable. This is particularly useful for testing and development:
+
+```bash
+# Load plugins from a custom directory
+export HIPDNN_PLUGIN_DIR=/path/to/test/plugins
+
+# Example: Load test plugins during testing
+export HIPDNN_PLUGIN_DIR=/home/user/hipDNN/build/lib/test_plugins
+```
+
+When `HIPDNN_PLUGIN_DIR` is set, hipDNN will **only** load plugins from the specified directory and supplementary custom paths, ignoring the default location. This allows complete control over which plugins are loaded, which is essential for:
+- Running tests with test-specific plugins
+- Development and debugging of new plugins
+- Isolating production plugins from test plugins
 
 ### Custom Plugin Paths
 
@@ -189,7 +248,7 @@ hipdnnStatus_t hipdnnSetEnginePluginPaths_ext(
 #### Path Resolution
 
 Custom paths can be:
-- **Relative paths**: Resolved from the current working directory
+- **Relative paths**: Resolved from the backend shared library location
 - **Absolute paths**: Used as specified
 
 #### Loading Modes
@@ -205,7 +264,7 @@ Custom paths can be:
 // Add custom plugin directories
 const char* custom_paths[] = {
     "/home/user/my_plugins",        // Absolute path
-    "./local_plugins",              // Relative to working directory
+    "./local_plugins",              // Relative to backend shared library
     "/opt/custom/hipdnn/plugins"
 };
 

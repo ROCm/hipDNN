@@ -297,7 +297,8 @@ HIPDNN_BACKEND_EXPORT void hipdnnLoggingCallback_ext(hipdnnSeverity_t severity, 
  * This function configures the search paths for engine plugins and must be called before 
  * creating a hipDNN handle, as plugins are loaded during handle creation.
  *
- * Paths can be either directories or specific plugin files. The backend can resolve 
+ * Paths can be either directories or specific plugin files. Relative paths are resolved 
+ * from the location of the libhipdnn_backend.so file. The backend can resolve 
  * platform-agnostic names, allowing users to omit prefixes like `lib` and extensions 
  * like `.so` or `.dll`.
  *

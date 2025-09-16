@@ -73,4 +73,7 @@ std::vector<std::string> getLoadedPlugins(hipdnnHandle_t handle);
 
 bool isPluginLoaded(const std::vector<std::string>& loadedPlugins, const std::string& pluginName);
 
+bool isPluginLoadedByRelativePath(const std::vector<std::string>& loadedPlugins,
+                                  const std::string& relativePath);
+
 } // namespace test_util
