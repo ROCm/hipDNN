@@ -9,7 +9,7 @@
 #include <vector>
 
 #include <hipdnn_sdk/utilities/MigratableMemory.hpp>
-#include <hipdnn_sdk/utilities/ShapeUtils.hpp>
+#include <hipdnn_sdk/utilities/ShapeUtilities.hpp>
 #include <hipdnn_sdk/utilities/Tensor.hpp>
 
 namespace hipdnn_sdk
