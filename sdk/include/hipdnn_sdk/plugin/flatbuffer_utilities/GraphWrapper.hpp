@@ -74,7 +74,7 @@ public:
         auto nodes = _shallowGraph->nodes();
         if(nodes == nullptr)
         {
-            return true;  // No nodes means no unsupported attributes
+            return true; // No nodes means no unsupported attributes
         }
 
         // NOLINTNEXTLINE(readability-use-anyofallof)
