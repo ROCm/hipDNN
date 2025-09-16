@@ -2,7 +2,7 @@
 # SPDX-License-Identifier:  MIT
 
 set(CLANG_FORMAT_PRUNE -path "./build" -prune -o -path "./sdk/include/hipdnn_sdk/data_objects" -prune -o)
-set(CLANG_FORMAT_BINARY /opt/rocm/llvm/bin/clang-format)
+set(CLANG_FORMAT_BINARY clang-format)
 add_custom_target(
     check_format
     COMMAND  find . ${CLANG_FORMAT_PRUNE} -regex ".*\\.\\(cpp\\|hpp\\|c\\|h\\)" -exec ${CLANG_FORMAT_BINARY} --dry-run --Werror {} +
