@@ -50,7 +50,15 @@ public:
                 "Batchnorm inference requires at least 2D tensor (batch and channel).");
         }
 
+        auto nBatches = input.dims().at(0);
         auto nChannels = input.dims().at(1);
+
+        int64_t elementsPerChannel = nBatches;
+        for(size_t i = 2; i < input.dims().size(); ++i)
+        {
+            elementsPerChannel *= input.dims().at(i);
+        }
+
         std::vector<int64_t> channels(static_cast<size_t>(nChannels));
         std::iota(channels.begin(), channels.end(), 0);
 
@@ -62,16 +70,17 @@ public:
                   / sqrtInternal(variance + static_cast<MeanVarianceDataType>(epsilon));
 
             // process the batch per channel
-            iterateChannelElements(input, cidx, [&](const std::vector<int64_t>& indices) {
-                auto inVal = static_cast<MeanVarianceDataType>(input.getHostValue(indices));
-                MeanVarianceDataType elemStd = inVal - mean;
-                MeanVarianceDataType inhat = elemStd * invVariance;
-                output.setHostValue(
-                    static_cast<InputDataType>(
-                        (scale.getHostValue(0, cidx) * static_cast<ScaleBiasDataType>(inhat))
-                        + bias.getHostValue(0, cidx)),
-                    indices);
-            });
+            iterateChannelElements(
+                input, cidx, elementsPerChannel, [&](const std::vector<int64_t>& indices) {
+                    auto inVal = static_cast<MeanVarianceDataType>(input.getHostValue(indices));
+                    MeanVarianceDataType elemStd = inVal - mean;
+                    MeanVarianceDataType inhat = elemStd * invVariance;
+                    output.setHostValue(
+                        static_cast<InputDataType>(
+                            (scale.getHostValue(0, cidx) * static_cast<ScaleBiasDataType>(inhat))
+                            + bias.getHostValue(0, cidx)),
+                        indices);
+                });
         });
 
         output.memory().markHostModified(); // Mark output memory as modified on host

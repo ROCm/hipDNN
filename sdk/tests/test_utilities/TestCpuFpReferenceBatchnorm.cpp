@@ -172,9 +172,12 @@ TEST(TestCpuFpReferenceBatchnormFp32, BatchnormFwdInference3D)
 
 TEST(TestCpuFpReferenceBatchnormFp32, BatchnormFwdInference5D)
 {
+    // TODO: switch this when 5D tensor layouts are added
+    TensorLayout ncdhw{.name = "NCDHW", .strideOrder = {4, 3, 2, 1, 0}};
+
     // Test with 5D tensor (batch, channel, depth, height, width)
-    Tensor<float> inputTensor({2, 3, 4, 5, 6});
-    Tensor<float> outputTensor({2, 3, 4, 5, 6});
+    Tensor<float> inputTensor({2, 3, 4, 5, 6}, ncdhw);
+    Tensor<float> outputTensor({2, 3, 4, 5, 6}, ncdhw);
     Tensor<float> scaleTensor({1, 3});
     Tensor<float> biasTensor({1, 3});
     Tensor<float> meanTensor({1, 3});
@@ -728,6 +731,7 @@ TEST(TestCpuFpReferenceBatchnormFp32, BatchnormFwdTraining3D)
 
 TEST(TestCpuFpReferenceBatchnormFp32, BatchnormFwdTraining5D)
 {
+    // TODO: switch this when 5D tensor layouts are added
     TensorLayout ncdhw{.name = "NCDHW", .strideOrder = {4, 3, 2, 1, 0}};
 
     // Test with 5D tensor (batch, channel, depth, height, width)
