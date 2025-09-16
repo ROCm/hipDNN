@@ -42,21 +42,20 @@ TEST(TestLoggingUtils, IsLoggingEnabledWithValidLevels)
 {
     ScopedEnvironmentVariableSetter guard("HIPDNN_LOG_LEVEL");
 
-    hipdnn_sdk::utilities::setEnv("HIPDNN_LOG_LEVEL", "off");
+    guard.setValue("off");
     EXPECT_FALSE(isLoggingEnabled());
 
-    hipdnn_sdk::utilities::setEnv("HIPDNN_LOG_LEVEL", "info");
+    guard.setValue("info");
     EXPECT_TRUE(isLoggingEnabled());
 
-    hipdnn_sdk::utilities::setEnv("HIPDNN_LOG_LEVEL", "error");
+    guard.setValue("error");
     EXPECT_TRUE(isLoggingEnabled());
 }
 
 TEST(TestLoggingUtils, IsLoggingEnabledWithInvalidOrUnsetLevels)
 {
-    ScopedEnvironmentVariableSetter guard("HIPDNN_LOG_LEVEL");
+    ScopedEnvironmentVariableSetter guard("HIPDNN_LOG_LEVEL", "invalid");
 
-    hipdnn_sdk::utilities::setEnv("HIPDNN_LOG_LEVEL", "invalid");
     EXPECT_FALSE(isLoggingEnabled());
 
     hipdnn_sdk::utilities::unsetEnv("HIPDNN_LOG_LEVEL");

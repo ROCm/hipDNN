@@ -13,6 +13,42 @@ else()
     set(EXEC_PREFIX "./")
 endif()
 
+# Function to make test executables relocatable by setting proper RPATH
+# This allows test binaries to find libraries when the build directory is moved
+# Windows does not use RPATH, so this function will have no effect there
+function(MakeExecutableRelocatable target)
+    set(RPATH_LIST "$ORIGIN/../lib")
+    
+    # Add any additional RPATH entries passed as extra arguments
+    foreach(extra_rpath ${ARGN})
+        list(APPEND RPATH_LIST ${extra_rpath})
+    endforeach()
+    
+    set_target_properties(${target} PROPERTIES
+        BUILD_WITH_INSTALL_RPATH OFF
+        INSTALL_RPATH_USE_LINK_PATH FALSE
+        BUILD_RPATH_USE_ORIGIN TRUE
+        BUILD_RPATH "${RPATH_LIST}"
+    )
+endfunction()
+
+# TODO: Consider adding test project run instructions to docs when we finalize it
+set(INSTALL_TEST_PROJECT "${CMAKE_CURRENT_BINARY_DIR}/test_project/CMakeLists.txt")
+file(WRITE "${INSTALL_TEST_PROJECT}"
+[=[
+# CMake test project to aid with running the tests easilly via ctest
+
+cmake_minimum_required(VERSION 3.25.2)
+
+project(
+    hipDNN_tests
+    LANGUAGES CXX)
+
+enable_testing()
+
+]=]
+)
+
 set(CHECK_COMMAND_GLOBAL "" CACHE INTERNAL "Accumulated check commands" FORCE)
 set(CHECK_DEPENDS_GLOBAL "" CACHE INTERNAL "Accumulated check depends" FORCE)
 set(CHECK_EXECUTABLE_PATHS_GLOBAL "" CACHE INTERNAL "Accumulated check executable paths" FORCE)
@@ -24,6 +60,25 @@ set(UNIT_CHECK_DEPENDS_GLOBAL "" CACHE INTERNAL "Accumulated unit check depends"
 # Global collections for integration tests
 set(INTEGRATION_CHECK_COMMAND_GLOBAL "" CACHE INTERNAL "Accumulated integration check commands" FORCE)
 set(INTEGRATION_CHECK_DEPENDS_GLOBAL "" CACHE INTERNAL "Accumulated integration check depends" FORCE)
+
+function(add_test_to_test_project test_target)
+    get_target_property(EXE_PATH ${test_target} RUNTIME_OUTPUT_DIRECTORY)
+    if(EXE_PATH STREQUAL "EXE_PATH-NOTFOUND")
+        set(EXE_PATH ".")
+    endif()
+    get_filename_component(EXE_PATH "${EXE_PATH}" ABSOLUTE BASE_DIR "${CMAKE_CURRENT_BINARY_DIR}")
+    get_target_property(EXE_NAME ${test_target} RUNTIME_OUTPUT_NAME)
+    if(EXE_NAME STREQUAL "EXE_NAME-NOTFOUND")
+        get_target_property(EXE_NAME ${test_target} OUTPUT_NAME)
+        if(EXE_NAME STREQUAL "EXE_NAME-NOTFOUND")
+            set(EXE_NAME "${test_target}")
+        endif()
+    endif()
+    file(RELATIVE_PATH rel_path "${CMAKE_CURRENT_BINARY_DIR}" "${EXE_PATH}/${EXE_NAME}")
+
+
+    file(APPEND "${INSTALL_TEST_PROJECT}" "add_test(${test_target} \"../bin/${EXE_NAME}\")\n")
+endfunction()
 
 function(create_test_name_validation_target)
     if(Python3_FOUND)
@@ -82,21 +137,16 @@ function(_append_test_to_check_target_internal TARGET WORKING_DIR TEST_TYPE STAT
     
     set(NEW_COMMAND "")
     if("${${COMMAND_VAR}}" STREQUAL "")
-        set(NEW_COMMAND cd ${WORKING_DIR} && ${TEST_ENVIRONMENT} ${EXEC_PREFIX}${TARGET})
+        set(NEW_COMMAND ${TEST_ENVIRONMENT} ${CMAKE_BINARY_DIR}/bin/${TARGET})
     else()
-        set(NEW_COMMAND && cd ${WORKING_DIR} && ${TEST_ENVIRONMENT} ${EXEC_PREFIX}${TARGET})
+        set(NEW_COMMAND && ${TEST_ENVIRONMENT} ${CMAKE_BINARY_DIR}/bin/${TARGET})
     endif()
     
     set(${COMMAND_VAR} ${${COMMAND_VAR}} ${NEW_COMMAND} CACHE INTERNAL "${CACHE_DESC}" FORCE)
     set(${DEPENDS_VAR} ${${DEPENDS_VAR}} ${TARGET} CACHE INTERNAL "Accumulated ${TEST_TYPE} check depends" FORCE)
     
     # Track the binary paths for test name validation
-    file(RELATIVE_PATH REL_WORKING_DIR ${CMAKE_BINARY_DIR} ${WORKING_DIR})
-    if(REL_WORKING_DIR)
-        set(EXECUTABLE_PATH "${REL_WORKING_DIR}/${TARGET}")
-    else()
-        set(EXECUTABLE_PATH "${TARGET}")
-    endif()
+    set(EXECUTABLE_PATH "bin/${TARGET}")
     set(CHECK_EXECUTABLE_PATHS_GLOBAL ${CHECK_EXECUTABLE_PATHS_GLOBAL} ${EXECUTABLE_PATH} CACHE INTERNAL "Accumulated check executable paths" FORCE)
 endfunction()
 
@@ -141,12 +191,21 @@ function(_add_gtest_target_internal APPEND_FUNCTION_SUFFIX TARGET WORKING_DIR)
         message(FATAL_ERROR "Unknown test type suffix: ${APPEND_FUNCTION_SUFFIX}")
     endif()
     
-    add_dependencies(check_ctest ${TARGET})
-    gtest_discover_tests(
-        ${TARGET}
-        WORKING_DIRECTORY ${WORKING_DIR}
-        DISCOVERY_MODE PRE_TEST
+    set_target_properties(${TARGET} PROPERTIES
+        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
     )
+    
+    # Make test executables relocatable so they can find libraries when build directory is moved
+    MakeExecutableRelocatable(${TARGET})
+
+    add_dependencies(check_ctest ${TARGET})
+    add_test(
+        NAME ${TARGET}
+        COMMAND ${TARGET} 
+        WORKING_DIRECTORY ${WORKING_DIR}
+    )
+
+    add_test_to_test_project(${TARGET})
 endfunction()
 
 # Adds a generic test target

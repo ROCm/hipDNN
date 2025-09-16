@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include <filesystem>
 #include <set>
 #include <string>
 
@@ -19,7 +20,8 @@ class EnginePluginManager : public PluginManagerBase<EnginePlugin>
 {
 public:
     EnginePluginManager()
-        : PluginManagerBase<EnginePlugin>({"hipdnn_plugins/engines/"})
+        : PluginManagerBase<EnginePlugin>(getPluginSearchPaths(
+              "HIPDNN_PLUGIN_DIR", {std::filesystem::path("hipdnn_plugins/engines/")}))
     {
     }
 
