@@ -9,8 +9,8 @@
 #include <hipdnn_sdk/test_utilities/cpu_graph_executor/BatchnormBuilder.hpp>
 #include <hipdnn_sdk/test_utilities/cpu_graph_executor/BatchnormSignatureRegistrar.hpp>
 #include <hipdnn_sdk/test_utilities/cpu_graph_executor/CpuReferenceGraphExecutor.hpp>
+#include <hipdnn_sdk/utilities/ShallowTensor.hpp>
 #include <hipdnn_sdk/utilities/Tensor.hpp>
-#include <hipdnn_sdk/utilities/TensorView.hpp>
 #include <hipdnn_sdk/utilities/UtilsBfp16.hpp>
 #include <hipdnn_sdk/utilities/UtilsFp16.hpp>
 
@@ -170,7 +170,7 @@ TEST(TestCpuReferenceGraphExecutor, CanExecuteAGraphWithAFwdBatchnormNode)
         variantPack[deviceBuffer.uid] = deviceBuffer.ptr;
     }
 
-    hipdnn_sdk::test_utilities::CpuReferenceGraphExecutor::executeTheGraph(
+    hipdnn_sdk::test_utilities::CpuReferenceGraphExecutor::execute(
         batchnormGraph, batchnormBuilder.GetSize(), variantPack);
 }
 
@@ -234,7 +234,7 @@ TEST(TestCpuReferenceGraphExecutor, CanExecuteAGraphWithAFwdBatchnormNodeHalfsie
         variantPack[deviceBuffer.uid] = deviceBuffer.ptr;
     }
 
-    hipdnn_sdk::test_utilities::CpuReferenceGraphExecutor::executeTheGraph(
+    hipdnn_sdk::test_utilities::CpuReferenceGraphExecutor::execute(
         batchnormGraph, batchnormBuilder.GetSize(), variantPack);
 }
 
@@ -298,6 +298,6 @@ TEST(TestCpuReferenceGraphExecutor, CanExecuteAGraphWithAFwdBatchnormNodeTypesDo
         variantPack[deviceBuffer.uid] = deviceBuffer.ptr;
     }
 
-    hipdnn_sdk::test_utilities::CpuReferenceGraphExecutor::executeTheGraph(
+    hipdnn_sdk::test_utilities::CpuReferenceGraphExecutor::execute(
         batchnormGraph, batchnormBuilder.GetSize(), variantPack);
 }

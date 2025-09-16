@@ -12,40 +12,89 @@ namespace hipdnn_sdk
 namespace test_utilities
 {
 
-// 1. Define the signature POD
-struct FwdBatchnormSignatureFloat
+struct BatchnormSignatureKey
 {
-    static constexpr auto INPUT_DATA_TYPE = hipdnn_sdk::data_objects::DataType_FLOAT;
-    static constexpr auto SCALE_BIAS_DATA_TYPE = hipdnn_sdk::data_objects::DataType_FLOAT;
-    static constexpr auto MEAN_VARIANCE_DATA_TYPE = hipdnn_sdk::data_objects::DataType_FLOAT;
+    hipdnn_sdk::data_objects::DataType inputDataType;
+    hipdnn_sdk::data_objects::DataType scaleBiasDataType;
+    hipdnn_sdk::data_objects::DataType meanVarianceDataType;
 
-    static constexpr auto NODE_ATTRIBUTES_TYPE
-        = hipdnn_sdk::data_objects::NodeAttributes_BatchnormInferenceAttributes;
-};
-static_assert(BatchnormSignatureDescriptor<FwdBatchnormSignatureFloat>);
+    hipdnn_sdk::data_objects::NodeAttributes nodeAttributesType;
 
-struct FwdBatchnormSignatureHalf
-{
-    static constexpr auto INPUT_DATA_TYPE = hipdnn_sdk::data_objects::DataType_HALF;
-    static constexpr auto SCALE_BIAS_DATA_TYPE = hipdnn_sdk::data_objects::DataType_HALF;
-    static constexpr auto MEAN_VARIANCE_DATA_TYPE = hipdnn_sdk::data_objects::DataType_HALF;
-    static constexpr auto NODE_ATTRIBUTES_TYPE
-        = hipdnn_sdk::data_objects::NodeAttributes_BatchnormInferenceAttributes;
+    bool operator==(const BatchnormSignatureKey& other) const
+    {
+        return inputDataType == other.inputDataType && scaleBiasDataType == other.scaleBiasDataType
+               && meanVarianceDataType == other.meanVarianceDataType
+               && nodeAttributesType == other.nodeAttributesType;
+    }
 };
-static_assert(BatchnormSignatureDescriptor<FwdBatchnormSignatureHalf>);
 
-struct FwdBatchnormSignatureTest
-{
-    static constexpr auto INPUT_DATA_TYPE = hipdnn_sdk::data_objects::DataType_FLOAT;
-    static constexpr auto SCALE_BIAS_DATA_TYPE = hipdnn_sdk::data_objects::DataType_HALF;
-    static constexpr auto MEAN_VARIANCE_DATA_TYPE = hipdnn_sdk::data_objects::DataType_HALF;
-    static constexpr auto NODE_ATTRIBUTES_TYPE
-        = hipdnn_sdk::data_objects::NodeAttributes_BatchnormInferenceAttributes;
-};
-static_assert(BatchnormSignatureDescriptor<FwdBatchnormSignatureTest>);
+/**
+ * How to add a new batchnorm signature
+ * 
+ * To add a new batchnorm signature:
+ * 1. Use the DEFINE_BATCHNORM_SIGNATURE macro with your custom name and data types:
+ *    DEFINE_BATCHNORM_SIGNATURE(YourSignatureName,
+ *                               InputDataType,
+ *                               ScaleBiasDataType, 
+ *                               MeanVarianceDataType,
+ *                               NodeAttributesType);
+ * 
+ * 2. Update the BatchnormSignatureVariants variant type to include your new signature:
+ *    using BatchnormSignatureVariants = std::variant<
+ *        FwdBatchnormSignatureFloat,
+ *        FwdBatchnormSignatureHalf,
+ *        FwdBatchnormSignatureTest,
+ *        YourSignatureName>;  // Add your new type here
+ * 
+ * If you forget to update the BatchnormSignatureVariants, the graph will not be able to find
+ * your new signature. 
+ */
+#define DEFINE_BATCHNORM_SIGNATURE(Name, InputType, ScaleBiasType, MeanVarianceType, NodeAttrType) \
+    struct Name                                                                                    \
+    {                                                                                              \
+        static constexpr auto INPUT_DATA_TYPE = hipdnn_sdk::data_objects::InputType;               \
+        static constexpr auto SCALE_BIAS_DATA_TYPE = hipdnn_sdk::data_objects::ScaleBiasType;      \
+        static constexpr auto MEAN_VARIANCE_DATA_TYPE                                              \
+            = hipdnn_sdk::data_objects::MeanVarianceType;                                          \
+        static constexpr auto NODE_ATTRIBUTES_TYPE = hipdnn_sdk::data_objects::NodeAttrType;       \
+    };                                                                                             \
+    static_assert(BatchnormSignatureDescriptor<Name>)
+
+DEFINE_BATCHNORM_SIGNATURE(FwdBatchnormSignatureFloat,
+                           DataType_FLOAT,
+                           DataType_FLOAT,
+                           DataType_FLOAT,
+                           NodeAttributes_BatchnormInferenceAttributes);
+
+DEFINE_BATCHNORM_SIGNATURE(FwdBatchnormSignatureHalf,
+                           DataType_HALF,
+                           DataType_HALF,
+                           DataType_HALF,
+                           NodeAttributes_BatchnormInferenceAttributes);
+
+DEFINE_BATCHNORM_SIGNATURE(FwdBatchnormSignatureTest,
+                           DataType_FLOAT,
+                           DataType_HALF,
+                           DataType_HALF,
+                           NodeAttributes_BatchnormInferenceAttributes);
 
 using BatchnormSignatureVariants = std::
     variant<FwdBatchnormSignatureFloat, FwdBatchnormSignatureHalf, FwdBatchnormSignatureTest>;
 
 }
+}
+
+namespace std
+{
+template <>
+struct hash<hipdnn_sdk::test_utilities::BatchnormSignatureKey>
+{
+    std::size_t operator()(const hipdnn_sdk::test_utilities::BatchnormSignatureKey& k) const
+    {
+        return std::hash<int>()(static_cast<int>(k.inputDataType))
+               ^ (std::hash<int>()(static_cast<int>(k.scaleBiasDataType)) << 1)
+               ^ (std::hash<int>()(static_cast<int>(k.meanVarianceDataType)) << 1)
+               ^ (std::hash<int>()(static_cast<int>(k.nodeAttributesType)) << 1);
+    }
+};
 }

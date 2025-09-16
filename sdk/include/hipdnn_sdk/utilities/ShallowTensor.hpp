@@ -98,21 +98,23 @@ private:
 };
 
 template <class T>
-class TensorView : public TensorBase<T>
+class ShallowTensor : public TensorBase<T>
 {
 public:
-    TensorView(void* memory, const std::vector<int64_t>& dims, const std::vector<int64_t>& strides)
+    ShallowTensor(void* memory,
+                  const std::vector<int64_t>& dims,
+                  const std::vector<int64_t>& strides)
         : _memory(memory)
         , _dims(dims)
         , _strides(strides)
     {
     }
 
-    TensorView(const TensorView&) = delete;
-    TensorView& operator=(const TensorView&) = delete;
+    ShallowTensor(const ShallowTensor&) = delete;
+    ShallowTensor& operator=(const ShallowTensor&) = delete;
 
-    TensorView(TensorView&&) = default;
-    TensorView& operator=(TensorView&&) = default;
+    ShallowTensor(ShallowTensor&&) = default;
+    ShallowTensor& operator=(ShallowTensor&&) = default;
 
     const std::vector<int64_t>& dims() const override
     {

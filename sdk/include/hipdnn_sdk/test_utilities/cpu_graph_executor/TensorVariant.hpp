@@ -4,8 +4,8 @@
 #include <hipdnn_sdk/plugin/EnginePluginApi.h>
 #include <hipdnn_sdk/plugin/PluginApiDataTypes.h>
 #include <hipdnn_sdk/plugin/flatbuffer_utilities/GraphWrapper.hpp>
+#include <hipdnn_sdk/utilities/ShallowTensor.hpp>
 #include <hipdnn_sdk/utilities/Tensor.hpp>
-#include <hipdnn_sdk/utilities/TensorView.hpp>
 #include <hipdnn_sdk/utilities/UtilsBfp16.hpp>
 #include <hipdnn_sdk/utilities/UtilsFp16.hpp>
 
@@ -23,7 +23,7 @@ template <typename T>
 static std::unique_ptr<TensorBase<T>> createHostOnlyShallowTensor(
     void* ptr, const std::vector<int64_t>& dims, const std::vector<int64_t>& strides)
 {
-    return std::make_unique<TensorView<T>>(ptr, dims, strides);
+    return std::make_unique<ShallowTensor<T>>(ptr, dims, strides);
 }
 
 static TensorVariant
