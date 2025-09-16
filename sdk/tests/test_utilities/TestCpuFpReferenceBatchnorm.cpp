@@ -293,3 +293,394 @@ TEST(TestCpuFpReferenceBatchnormFp64, BatchnormBwdSanityValidationNchw)
     EXPECT_NEAR(dxTensor.getHostValue(0, 0, 1, 0), expectedDx[2], tolerance);
     EXPECT_NEAR(dxTensor.getHostValue(0, 0, 1, 1), expectedDx[3], tolerance);
 }
+
+TEST(TestCpuFpReferenceBatchnormFp32, BatchnormFwdTrainingNchwBasic)
+{
+    Tensor<float> inputTensor({2, 3, 4, 4});
+    Tensor<float> outputTensor({2, 3, 4, 4});
+    Tensor<float> scaleTensor({1, 3});
+    Tensor<float> biasTensor({1, 3});
+
+    inputTensor.fillWithValue(1.0f);
+    for(int i = 0; i < 3; i++)
+    {
+        scaleTensor.setHostValue(1.0f, 0, i);
+        biasTensor.setHostValue(0.0f, 0, i);
+    }
+
+    // Call without optional tensors
+    CpuFpReferenceBatchnormImpl<float, float>::batchnormFwdTraining(
+        inputTensor, scaleTensor, biasTensor, outputTensor, 1e-5f, 0.1f);
+}
+
+TEST(TestCpuFpReferenceBatchnormFp32, BatchnormFwdTrainingNchwWithSavedStats)
+{
+    Tensor<float> inputTensor({2, 3, 4, 4});
+    Tensor<float> outputTensor({2, 3, 4, 4});
+    Tensor<float> scaleTensor({1, 3});
+    Tensor<float> biasTensor({1, 3});
+    Tensor<float> savedMean({1, 3});
+    Tensor<float> savedInvVariance({1, 3});
+
+    inputTensor.fillWithValue(1.0f);
+    for(int i = 0; i < 3; i++)
+    {
+        scaleTensor.setHostValue(1.0f, 0, i);
+        biasTensor.setHostValue(0.0f, 0, i);
+    }
+
+    // Call with saved statistics for backward pass
+    CpuFpReferenceBatchnormImpl<float, float>::batchnormFwdTraining(inputTensor,
+                                                                    scaleTensor,
+                                                                    biasTensor,
+                                                                    outputTensor,
+                                                                    1e-5f,
+                                                                    0.1f,
+                                                                    &savedMean,
+                                                                    &savedInvVariance);
+
+    // Verify saved statistics were populated
+    for(int i = 0; i < 3; i++)
+    {
+        EXPECT_NE(savedMean.getHostValue(0, i), 0.0f);
+        EXPECT_GT(savedInvVariance.getHostValue(0, i), 0.0f);
+    }
+}
+
+TEST(TestCpuFpReferenceBatchnormFp32, BatchnormFwdTrainingNchwWithRunningStats)
+{
+    Tensor<float> inputTensor({2, 3, 4, 4});
+    Tensor<float> outputTensor({2, 3, 4, 4});
+    Tensor<float> scaleTensor({1, 3});
+    Tensor<float> biasTensor({1, 3});
+    Tensor<float> prevRunningMean({1, 3});
+    Tensor<float> prevRunningVariance({1, 3});
+    Tensor<float> nextRunningMean({1, 3});
+    Tensor<float> nextRunningVariance({1, 3});
+
+    inputTensor.fillWithValue(1.0f);
+    for(int i = 0; i < 3; i++)
+    {
+        scaleTensor.setHostValue(1.0f, 0, i);
+        biasTensor.setHostValue(0.0f, 0, i);
+        prevRunningMean.setHostValue(0.5f, 0, i);
+        prevRunningVariance.setHostValue(1.0f, 0, i);
+    }
+
+    float momentum = 0.1f;
+
+    // Call with running statistics
+    CpuFpReferenceBatchnormImpl<float, float>::batchnormFwdTraining(inputTensor,
+                                                                    scaleTensor,
+                                                                    biasTensor,
+                                                                    outputTensor,
+                                                                    1e-5f,
+                                                                    momentum,
+                                                                    nullptr,
+                                                                    nullptr,
+                                                                    &prevRunningMean,
+                                                                    &prevRunningVariance,
+                                                                    &nextRunningMean,
+                                                                    &nextRunningVariance);
+
+    // Verify running statistics were updated
+    for(int i = 0; i < 3; i++)
+    {
+        // Next running mean should be different from previous
+        EXPECT_NE(nextRunningMean.getHostValue(0, i), prevRunningMean.getHostValue(0, i));
+        // Next running variance should be different from previous
+        EXPECT_NE(nextRunningVariance.getHostValue(0, i), prevRunningVariance.getHostValue(0, i));
+    }
+}
+
+TEST(TestCpuFpReferenceBatchnormFp32, BatchnormFwdTrainingNchwFullFeatures)
+{
+    Tensor<float> inputTensor({2, 3, 4, 4});
+    Tensor<float> outputTensor({2, 3, 4, 4});
+    Tensor<float> scaleTensor({1, 3});
+    Tensor<float> biasTensor({1, 3});
+    Tensor<float> savedMean({1, 3});
+    Tensor<float> savedInvVariance({1, 3});
+    Tensor<float> prevRunningMean({1, 3});
+    Tensor<float> prevRunningVariance({1, 3});
+    Tensor<float> nextRunningMean({1, 3});
+    Tensor<float> nextRunningVariance({1, 3});
+
+    outputTensor.fillWithValue(-10.0f);
+    for(int i = 0; i < 3; i++)
+    {
+        scaleTensor.setHostValue(2.0f, 0, i);
+        biasTensor.setHostValue(0.5f, 0, i);
+        prevRunningMean.setHostValue(0.0f, 0, i);
+        prevRunningVariance.setHostValue(1.0f, 0, i);
+    }
+
+    // Initialize input with known values
+    for(int b = 0; b < 2; b++)
+    {
+        for(int c = 0; c < 3; c++)
+        {
+            for(int h = 0; h < 4; h++)
+            {
+                for(int w = 0; w < 4; w++)
+                {
+                    inputTensor.setHostValue(static_cast<float>(b + c + h + w), b, c, h, w);
+                }
+            }
+        }
+    }
+
+    // Call with all optional parameters
+    CpuFpReferenceBatchnormImpl<float, float>::batchnormFwdTraining(inputTensor,
+                                                                    scaleTensor,
+                                                                    biasTensor,
+                                                                    outputTensor,
+                                                                    1e-5f,
+                                                                    0.1f,
+                                                                    &savedMean,
+                                                                    &savedInvVariance,
+                                                                    &prevRunningMean,
+                                                                    &prevRunningVariance,
+                                                                    &nextRunningMean,
+                                                                    &nextRunningVariance);
+
+    // Verify all outputs were populated
+    for(int i = 0; i < 3; i++)
+    {
+        EXPECT_GT(savedInvVariance.getHostValue(0, i), 0.0f);
+        EXPECT_NE(nextRunningMean.getHostValue(0, i), prevRunningMean.getHostValue(0, i));
+        EXPECT_NE(nextRunningVariance.getHostValue(0, i), prevRunningVariance.getHostValue(0, i));
+    }
+
+    for(int b = 0; b < 2; b++)
+    {
+        for(int c = 0; c < 3; c++)
+        {
+            for(int h = 0; h < 4; h++)
+            {
+                for(int w = 0; w < 4; w++)
+                {
+                    EXPECT_NE(outputTensor.getHostValue(b, c, h, w), -10.0f);
+                }
+            }
+        }
+    }
+}
+
+TEST(TestCpuFpReferenceBatchnormBfp16, BatchnormFwdTrainingNchw)
+{
+    Tensor<hip_bfloat16> inputTensor({2, 3, 4, 4});
+    Tensor<hip_bfloat16> outputTensor({2, 3, 4, 4});
+    Tensor<float> scaleTensor({1, 3});
+    Tensor<float> biasTensor({1, 3});
+    Tensor<float> savedMean({1, 3});
+    Tensor<float> savedInvVariance({1, 3});
+
+    inputTensor.fillWithValue(1.0_bf);
+    for(int i = 0; i < 3; i++)
+    {
+        scaleTensor.setHostValue(1.0f, 0, i);
+        biasTensor.setHostValue(0.0f, 0, i);
+    }
+
+    CpuFpReferenceBatchnormImpl<hip_bfloat16, float>::batchnormFwdTraining(inputTensor,
+                                                                           scaleTensor,
+                                                                           biasTensor,
+                                                                           outputTensor,
+                                                                           1e-5f,
+                                                                           0.1f,
+                                                                           &savedMean,
+                                                                           &savedInvVariance);
+}
+
+TEST(TestCpuFpReferenceBatchnormFp16, BatchnormFwdTrainingNchw)
+{
+    Tensor<half> inputTensor({2, 3, 4, 4});
+    Tensor<half> outputTensor({2, 3, 4, 4});
+    Tensor<float> scaleTensor({1, 3});
+    Tensor<float> biasTensor({1, 3});
+    Tensor<float> savedMean({1, 3});
+    Tensor<float> savedInvVariance({1, 3});
+
+    inputTensor.fillWithValue(1.0_h);
+    for(int i = 0; i < 3; i++)
+    {
+        scaleTensor.setHostValue(1.0f, 0, i);
+        biasTensor.setHostValue(0.0f, 0, i);
+    }
+
+    CpuFpReferenceBatchnormImpl<half, float>::batchnormFwdTraining(inputTensor,
+                                                                   scaleTensor,
+                                                                   biasTensor,
+                                                                   outputTensor,
+                                                                   1e-5f,
+                                                                   0.1f,
+                                                                   &savedMean,
+                                                                   &savedInvVariance);
+}
+
+TEST(TestCpuFpReferenceBatchnormFp64, BatchnormFwdTrainingNchw)
+{
+    Tensor<double> inputTensor({2, 3, 4, 4});
+    Tensor<double> outputTensor({2, 3, 4, 4});
+    Tensor<double> scaleTensor({1, 3});
+    Tensor<double> biasTensor({1, 3});
+    Tensor<double> savedMean({1, 3});
+    Tensor<double> savedInvVariance({1, 3});
+
+    inputTensor.fillWithValue(1.0);
+    for(int i = 0; i < 3; i++)
+    {
+        scaleTensor.setHostValue(1.0, 0, i);
+        biasTensor.setHostValue(0.0, 0, i);
+    }
+
+    CpuFpReferenceBatchnormImpl<double, double>::batchnormFwdTraining(inputTensor,
+                                                                      scaleTensor,
+                                                                      biasTensor,
+                                                                      outputTensor,
+                                                                      1e-5,
+                                                                      0.1,
+                                                                      &savedMean,
+                                                                      &savedInvVariance);
+}
+
+TEST(TestCpuFpReferenceBatchnormFp64, BatchnormFwdTrainingSanityValidationNchw)
+{
+    const std::vector<int64_t> dims = {1, 1, 2, 2};
+
+    Tensor<double> inputTensor(dims);
+    Tensor<double> outputTensor(dims);
+    Tensor<double> scaleTensor({1, 1});
+    Tensor<double> biasTensor({1, 1});
+    Tensor<double> savedMean({1, 1});
+    Tensor<double> savedInvVariance({1, 1});
+    Tensor<double> prevRunningMean({1, 1});
+    Tensor<double> prevRunningVariance({1, 1});
+    Tensor<double> nextRunningMean({1, 1});
+    Tensor<double> nextRunningVariance({1, 1});
+
+    // x = [1, 2, 3, 4]
+    inputTensor.setHostValue(1.0, 0, 0, 0, 0);
+    inputTensor.setHostValue(2.0, 0, 0, 0, 1);
+    inputTensor.setHostValue(3.0, 0, 0, 1, 0);
+    inputTensor.setHostValue(4.0, 0, 0, 1, 1);
+
+    // fixed scale and bias parameters
+    scaleTensor.setHostValue(2.0, 0, 0);
+    biasTensor.setHostValue(0.5, 0, 0);
+
+    // Initialize running statistics
+    prevRunningMean.setHostValue(0.0, 0, 0);
+    prevRunningVariance.setHostValue(1.0, 0, 0);
+
+    double epsilon = 1e-5;
+    double momentum = 0.1;
+
+    // During training, batch statistics are calculated:
+    // mean = (1+2+3+4)/4 = 2.5
+    // variance = [(-1.5)^2 + (-0.5)^2 + (0.5)^2 + (1.5)^2] / 4 = 1.25
+    // invVariance = 1 / sqrt(1.25 + 1e-5) = 0.894423613312618
+    // y = scale * (x - mean) * invVariance + bias
+    const std::vector<double> expectedOutput = {-2.18327084, -0.39442361, 1.39442361, 3.18327084};
+
+    CpuFpReferenceBatchnormImpl<double, double>::batchnormFwdTraining(inputTensor,
+                                                                      scaleTensor,
+                                                                      biasTensor,
+                                                                      outputTensor,
+                                                                      epsilon,
+                                                                      momentum,
+                                                                      &savedMean,
+                                                                      &savedInvVariance,
+                                                                      &prevRunningMean,
+                                                                      &prevRunningVariance,
+                                                                      &nextRunningMean,
+                                                                      &nextRunningVariance);
+
+    auto tolerance = 1e-6;
+
+    // Verify output values
+    EXPECT_NEAR(outputTensor.getHostValue(0, 0, 0, 0), expectedOutput[0], tolerance);
+    EXPECT_NEAR(outputTensor.getHostValue(0, 0, 0, 1), expectedOutput[1], tolerance);
+    EXPECT_NEAR(outputTensor.getHostValue(0, 0, 1, 0), expectedOutput[2], tolerance);
+    EXPECT_NEAR(outputTensor.getHostValue(0, 0, 1, 1), expectedOutput[3], tolerance);
+
+    // Verify saved statistics
+    EXPECT_NEAR(savedMean.getHostValue(0, 0), 2.5, tolerance);
+    EXPECT_NEAR(savedInvVariance.getHostValue(0, 0), 0.894423613312618, tolerance);
+
+    // Verify running statistics update
+    // newRunningMean = (1 - 0.1) * 0.0 + 0.1 * 2.5 = 0.25
+    EXPECT_NEAR(nextRunningMean.getHostValue(0, 0), 0.25, tolerance);
+
+    // Bessel's correction: adjustedVariance = 1.25 * (4 / 3) = 1.66666...
+    // newRunningVariance = (1 - 0.1) * 1.0 + 0.1 * 1.66666... = 0.9 + 0.166666... = 1.066666...
+    EXPECT_NEAR(nextRunningVariance.getHostValue(0, 0), 1.06666666666667, tolerance);
+}
+
+TEST(TestCpuFpReferenceBatchnormFp32, BatchnormFwdTraining2D)
+{
+    // Test with 2D tensor (batch, channel)
+    Tensor<float> inputTensor({4, 3});
+    Tensor<float> outputTensor({4, 3});
+    Tensor<float> scaleTensor({1, 3});
+    Tensor<float> biasTensor({1, 3});
+
+    inputTensor.fillWithValue(1.0);
+    for(int i = 0; i < 3; i++)
+    {
+        scaleTensor.setHostValue(1.0f, 0, i);
+        biasTensor.setHostValue(0.0f, 0, i);
+    }
+
+    CpuFpReferenceBatchnormImpl<float, float>::batchnormFwdTraining(
+        inputTensor, scaleTensor, biasTensor, outputTensor, 1e-5f, 0.1f);
+}
+
+TEST(TestCpuFpReferenceBatchnormFp32, BatchnormFwdTraining3D)
+{
+    // Test with 3D tensor (batch, channel, length)
+    Tensor<float> inputTensor({2, 3, 10});
+    Tensor<float> outputTensor({2, 3, 10});
+    Tensor<float> scaleTensor({1, 3});
+    Tensor<float> biasTensor({1, 3});
+
+    inputTensor.fillWithValue(1.0);
+    for(int i = 0; i < 3; i++)
+    {
+        scaleTensor.setHostValue(1.0f, 0, i);
+        biasTensor.setHostValue(0.0f, 0, i);
+    }
+
+    CpuFpReferenceBatchnormImpl<float, float>::batchnormFwdTraining(
+        inputTensor, scaleTensor, biasTensor, outputTensor, 1e-5f, 0.1f);
+}
+
+TEST(TestCpuFpReferenceBatchnormFp32, BatchnormFwdTraining5D)
+{
+    TensorLayout ncdhw{.name = "NCDHW", .strideOrder = {4, 3, 2, 1, 0}};
+
+    // Test with 5D tensor (batch, channel, depth, height, width)
+    Tensor<float> inputTensor({2, 3, 4, 5, 6}, ncdhw);
+    Tensor<float> outputTensor({2, 3, 4, 5, 6}, ncdhw);
+    Tensor<float> scaleTensor({1, 3});
+    Tensor<float> biasTensor({1, 3});
+    Tensor<float> savedMean({1, 3});
+    Tensor<float> savedInvVariance({1, 3});
+
+    inputTensor.fillWithValue(1.0);
+    for(int i = 0; i < 3; i++)
+    {
+        scaleTensor.setHostValue(1.0f, 0, i);
+        biasTensor.setHostValue(0.0f, 0, i);
+    }
+
+    CpuFpReferenceBatchnormImpl<float, float>::batchnormFwdTraining(inputTensor,
+                                                                    scaleTensor,
+                                                                    biasTensor,
+                                                                    outputTensor,
+                                                                    1e-5f,
+                                                                    0.1f,
+                                                                    &savedMean,
+                                                                    &savedInvVariance);
+}

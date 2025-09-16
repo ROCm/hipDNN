@@ -53,6 +53,12 @@ inline std::vector<int64_t> generateStrides(const std::vector<int64_t>& dim,
                                             const std::vector<int64_t>& strideOrder)
 {
     size_t numDims = dim.size();
+
+    if(numDims > strideOrder.size())
+    {
+        throw std::invalid_argument("dims must be less than or equal stride size");
+    }
+
     std::vector<int64_t> stride(numDims, 1);
 
     // Create a mapping of stride order to dimension index
