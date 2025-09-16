@@ -45,22 +45,27 @@ struct ConvTestCase
         // W - Width, always at index 3 for 4D tensors and index 4 for 5D tensors
         constexpr int N = 0; // Batch size index
 
-        if(_xDims.size() != _wDims.size()) {
+        if(_xDims.size() != _wDims.size())
+        {
             throw std::invalid_argument("xDims and wDims must have the same number of dimensions.");
         }
 
         // Ensure xDims has at least 3 dimensions (N, C, and at least 1 spatial dimension)
-        if (_xDims.size() < 3) {
-            throw std::invalid_argument("xDims must have at least 3 dimensions (N, C, and at least 1 spatial dimension).");
+        if(_xDims.size() < 3)
+        {
+            throw std::invalid_argument(
+                "xDims must have at least 3 dimensions (N, C, and at least 1 spatial dimension).");
         }
 
         // Determine the number of spatial dimensions
         auto spatialDims = _xDims.size() - 2; // Exclude N and C
 
         // Validate that the convolution parameter vectors match the number of spatial dimensions
-        if (_convPrePadding.size() != spatialDims || _convPostPadding.size() != spatialDims ||
-            _convDilation.size() != spatialDims || _convStride.size() != spatialDims) {
-            throw std::invalid_argument("Convolution parameter vectors must match the number of spatial dimensions.");
+        if(_convPrePadding.size() != spatialDims || _convPostPadding.size() != spatialDims
+           || _convDilation.size() != spatialDims || _convStride.size() != spatialDims)
+        {
+            throw std::invalid_argument(
+                "Convolution parameter vectors must match the number of spatial dimensions.");
         }
 
         // Calculate output dimensions based on input dimensions and convolution parameters
@@ -68,7 +73,7 @@ struct ConvTestCase
         auto c_out = _wDims[N];
         std::vector<int64_t> outputDims = {n, c_out};
 
-        for (size_t i = 0; i < spatialDims; ++i)
+        for(size_t i = 0; i < spatialDims; ++i)
         {
             auto paddedInputSize = _xDims[2 + i] + _convPrePadding[i] + _convPostPadding[i];
             auto effectiveKernelSize = _convDilation[i] * (_wDims[2 + i] - 1) + 1;
@@ -152,7 +157,7 @@ hipdnnPluginDeviceBuffer_t generateEmptyDeviceBuffer(TensorBase<T>& tensor, int 
 inline std::vector<ConvTestCase> getConvTestCases()
 {
     return {
-        {{1,20,20,20},{1,1,3,3},{1,1},{1,1},{1,1},{1,1}},
+        {{1, 20, 20, 20}, {1, 1, 3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}},
     };
 }
 

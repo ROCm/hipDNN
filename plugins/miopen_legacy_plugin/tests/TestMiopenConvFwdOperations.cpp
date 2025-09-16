@@ -12,7 +12,6 @@
 #include <hipdnn_sdk/utilities/UtilsBfp16.hpp>
 #include <hipdnn_sdk/utilities/UtilsFp16.hpp>
 
-
 #include "HipdnnEnginePluginExecutionContext.hpp"
 #include "HipdnnEnginePluginHandle.hpp"
 #include "common/TestOperationsCommon.hpp"
@@ -47,8 +46,8 @@ protected:
     }
 
     void runConvFwdGraph(const ConvTestCase& testCase,
-                              hipdnn_sdk::data_objects::DataType inputDataType,
-                              DataType epsilon)
+                         hipdnn_sdk::data_objects::DataType inputDataType,
+                         DataType epsilon)
     {
         unsigned int seed = std::random_device{}();
 
@@ -57,7 +56,7 @@ protected:
         PinnedTensor<DataType> xTensor(testCase._xDims, _layout);
         deviceBuffers.push_back(generateRandomDeviceBuffer(
             xTensor, 1, static_cast<DataType>(-1.0f), static_cast<DataType>(1.0f), seed));
-        
+
         PinnedTensor<DataType> wTensor(testCase._wDims, _layout);
         deviceBuffers.push_back(generateRandomDeviceBuffer(
             wTensor, 2, static_cast<DataType>(-1.0f), static_cast<DataType>(1.0f), seed));
@@ -65,18 +64,18 @@ protected:
         PinnedTensor<DataType> yTensor(testCase._yDims, _layout);
         deviceBuffers.push_back(generateEmptyDeviceBuffer(yTensor, 3));
 
-        auto convBuilder = hipdnn_backend::test_utilities::createValidConvFwdGraph(
-            xTensor.dims(),
-            xTensor.strides(),
-            wTensor.dims(),
-            wTensor.strides(),
-            yTensor.dims(),
-            yTensor.strides(),
-            testCase._convPrePadding,
-            testCase._convPostPadding,
-            testCase._convStride,
-            testCase._convDilation,
-            inputDataType);
+        auto convBuilder
+            = hipdnn_backend::test_utilities::createValidConvFwdGraph(xTensor.dims(),
+                                                                      xTensor.strides(),
+                                                                      wTensor.dims(),
+                                                                      wTensor.strides(),
+                                                                      yTensor.dims(),
+                                                                      yTensor.strides(),
+                                                                      testCase._convPrePadding,
+                                                                      testCase._convPostPadding,
+                                                                      testCase._convStride,
+                                                                      testCase._convDilation,
+                                                                      inputDataType);
 
         hipdnnPluginConstData_t opGraph;
         opGraph.ptr = convBuilder.GetBufferPointer();
@@ -112,11 +111,11 @@ protected:
         Tensor<DataType> yTensorCpu(yTensor.dims(), _layout);
 
         CpuFpReferenceConvolutionImpl<DataType, float>::convFwdInference(xTensorCpu,
-                                                                       wTensorCpu,
-                                                                       yTensorCpu,
-                                                                       testCase._convStride,
-                                                                       testCase._convDilation,
-                                                                       testCase._convPrePadding);
+                                                                         wTensorCpu,
+                                                                         yTensorCpu,
+                                                                         testCase._convStride,
+                                                                         testCase._convDilation,
+                                                                         testCase._convPrePadding);
 
         CpuFpReferenceValidation<DataType> cpuRefValidationInput(epsilon, epsilon);
 
@@ -126,8 +125,7 @@ protected:
     hipdnnEnginePluginHandle_t _handle = nullptr;
 };
 
-class TestGpuMiopenConvFwdExecuteGraphNchwFp32
-    : public ConvFwdExecuteGraphBase<float>
+class TestGpuMiopenConvFwdExecuteGraphNchwFp32 : public ConvFwdExecuteGraphBase<float>
 {
 public:
     TestGpuMiopenConvFwdExecuteGraphNchwFp32()
@@ -136,8 +134,7 @@ public:
     }
 };
 
-class TestGpuMiopenConvFwdExecuteGraphNchwFp16
-    : public ConvFwdExecuteGraphBase<half>
+class TestGpuMiopenConvFwdExecuteGraphNchwFp16 : public ConvFwdExecuteGraphBase<half>
 {
 public:
     TestGpuMiopenConvFwdExecuteGraphNchwFp16()
@@ -146,8 +143,7 @@ public:
     }
 };
 
-class TestGpuMiopenConvFwdExecuteGraphNchwBfp16
-    : public ConvFwdExecuteGraphBase<hip_bfloat16>
+class TestGpuMiopenConvFwdExecuteGraphNchwBfp16 : public ConvFwdExecuteGraphBase<hip_bfloat16>
 {
 public:
     TestGpuMiopenConvFwdExecuteGraphNchwBfp16()
@@ -156,8 +152,7 @@ public:
     }
 };
 
-class TestGpuMiopenConvFwdExecuteGraphNhwcFp32
-    : public ConvFwdExecuteGraphBase<float>
+class TestGpuMiopenConvFwdExecuteGraphNhwcFp32 : public ConvFwdExecuteGraphBase<float>
 {
 public:
     TestGpuMiopenConvFwdExecuteGraphNhwcFp32()
@@ -166,8 +161,7 @@ public:
     }
 };
 
-class TestGpuMiopenConvFwdExecuteGraphNhwcFp16
-    : public ConvFwdExecuteGraphBase<half>
+class TestGpuMiopenConvFwdExecuteGraphNhwcFp16 : public ConvFwdExecuteGraphBase<half>
 {
 public:
     TestGpuMiopenConvFwdExecuteGraphNhwcFp16()
@@ -176,8 +170,7 @@ public:
     }
 };
 
-class TestGpuMiopenConvFwdExecuteGraphNhwcBfp16
-    : public ConvFwdExecuteGraphBase<hip_bfloat16>
+class TestGpuMiopenConvFwdExecuteGraphNhwcBfp16 : public ConvFwdExecuteGraphBase<hip_bfloat16>
 {
 public:
     TestGpuMiopenConvFwdExecuteGraphNhwcBfp16()
