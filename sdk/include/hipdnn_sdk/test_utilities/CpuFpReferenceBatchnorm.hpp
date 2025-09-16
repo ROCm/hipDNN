@@ -128,34 +128,37 @@ public:
             MeanVarianceDataType varianceAccum = 0.0;
 
             // Calculate mean and variance for this channel
-            iterateChannelElements(x, cidx, [&](const std::vector<int64_t>& indices) {
-                auto inVal = x.getHostValue(indices);
-                meanAccum += inVal;
-                varianceAccum += inVal * inVal;
-            });
+            iterateChannelElements(
+                x, cidx, elementsPerChannel, [&](const std::vector<int64_t>& indices) {
+                    auto inVal = x.getHostValue(indices);
+                    meanAccum += inVal;
+                    varianceAccum += inVal * inVal;
+                });
 
-            meanAccum /= nhw;
-            varianceAccum /= nhw;
-            varianceAccum -= (meanAccum * meanAccum);
+            MeanVarianceDataType channelMean = meanAccum /= nhw;
+            MeanVarianceDataType channelVariance
+                = (varianceAccum / nhw) - (channelMean * channelMean);
 
             auto invVar
-                = static_cast<MeanVarianceDataType>(1.0) / sqrtInternal(varianceAccum + epsilon);
+                = static_cast<MeanVarianceDataType>(1.0) / sqrtInternal(channelVariance + epsilon);
 
             // Apply normalization with scale and bias
-            iterateChannelElements(x, cidx, [&](const std::vector<int64_t>& indices) {
-                auto xVal = static_cast<MeanVarianceDataType>(x.getHostValue(indices));
-                auto xHat = (xVal - static_cast<MeanVarianceDataType>(meanAccum)) * invVar;
+            iterateChannelElements(
+                x, cidx, elementsPerChannel, [&](const std::vector<int64_t>& indices) {
+                    auto xVal = static_cast<MeanVarianceDataType>(x.getHostValue(indices));
+                    auto xHat = (xVal - channelMean) * invVar;
 
-                y.setHostValue(static_cast<InputDataType>(scale.getHostValue(0, cidx)
-                                                              * static_cast<ScaleBiasDataType>(xHat)
-                                                          + bias.getHostValue(0, cidx)),
-                               indices);
-            });
+                    y.setHostValue(
+                        static_cast<InputDataType>(scale.getHostValue(0, cidx)
+                                                       * static_cast<ScaleBiasDataType>(xHat)
+                                                   + bias.getHostValue(0, cidx)),
+                        indices);
+                });
 
             // Save mean and inverse variance for backward pass if provided
             if(mean != nullptr)
             {
-                mean->setHostValue(static_cast<MeanVarianceDataType>(meanAccum), 0, cidx);
+                mean->setHostValue(channelMean, 0, cidx);
             }
 
             if(invVariance != nullptr)
@@ -169,13 +172,13 @@ public:
             {
                 constexpr MeanVarianceDataType one = static_cast<MeanVarianceDataType>(1.0f);
                 auto currentMean = prevRunningMean->getHostValue(0, cidx);
-                auto newMean = (one - momentum) * currentMean + momentum * meanAccum;
+                auto newMean = (one - momentum) * currentMean + momentum * channelMean;
                 nextRunningMean->setHostValue(newMean, 0, cidx);
 
                 auto currentVar = prevRunningVariance->getHostValue(0, cidx);
                 // Apply Bessel's correction for unbiased variance estimate
                 auto adjustedVariance
-                    = (nhw == one) ? varianceAccum : (nhw / (nhw - one)) * varianceAccum;
+                    = (nhw == one) ? channelVariance : (nhw / (nhw - one)) * channelVariance;
                 auto newVar = (one - momentum) * currentVar + momentum * adjustedVariance;
                 nextRunningVariance->setHostValue(newVar, 0, cidx);
             }
@@ -310,6 +313,7 @@ private:
     // Utility method to iterate over all elements for a specific channel in an N-dimensional tensor
     static void iterateChannelElements(const TensorBase<InputDataType>& tensor,
                                        int64_t channelIdx,
+                                       int64_t elementsPerChannel,
                                        std::function<void(const std::vector<int64_t>&)> func)
     {
         auto dims = tensor.dims();
@@ -322,18 +326,7 @@ private:
         std::vector<int64_t> indices(dims.size(), 0);
         indices[1] = channelIdx;
 
-        // Calculate total iterations needed (excluding channel dimension)
-        int64_t totalIterations = 1;
-        for(size_t dim = 0; dim < dims.size(); ++dim)
-        {
-            // Skip channel dimension
-            if(dim != 1)
-            {
-                totalIterations *= dims[dim];
-            }
-        }
-
-        for(int64_t iter = 0; iter < totalIterations; ++iter)
+        for(int64_t iter = 0; iter < elementsPerChannel; ++iter)
         {
             func(indices);
 
