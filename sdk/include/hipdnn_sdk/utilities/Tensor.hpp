@@ -71,6 +71,26 @@ public:
             indexVector.begin(), indexVector.end(), strides().begin(), int64_t{0});
     }
 
+    template <typename IndexType>
+    int64_t getIndex(const std::vector<IndexType>& indices) const
+    {
+        static_assert(std::is_integral<IndexType>::value, "Index type must be integral!");
+
+        if(indices.size() > strides().size())
+        {
+            throw std::invalid_argument("Number of indices (" + std::to_string(indices.size())
+                                        + ") must not be greater than the number of dimensions ("
+                                        + std::to_string(strides().size()) + ")");
+        }
+
+        int64_t result = 0;
+        for(size_t i = 0; i < indices.size(); ++i)
+        {
+            result += static_cast<int64_t>(indices[i]) * strides()[i];
+        }
+        return result;
+    }
+
     template <typename... Args>
     T getHostValue(Args... indices) const
     {
@@ -79,10 +99,30 @@ public:
         return data[index];
     }
 
+    template <typename IndexType>
+    T getHostValue(const std::vector<IndexType>& indices) const
+    {
+        static_assert(std::is_integral<IndexType>::value, "Index type must be integral!");
+
+        int64_t index = getIndex(indices);
+        const auto* data = memory().hostData();
+        return data[index];
+    }
+
     template <typename... Args>
     void setHostValue(T value, Args... indices)
     {
         int64_t index = getIndex(indices...);
+        auto* data = memory().hostData();
+        data[index] = value;
+    }
+
+    template <typename IndexType>
+    void setHostValue(T value, const std::vector<IndexType>& indices)
+    {
+        static_assert(std::is_integral<IndexType>::value, "Index type must be integral!");
+
+        int64_t index = getIndex(indices);
         auto* data = memory().hostData();
         data[index] = value;
     }
