@@ -62,3 +62,5 @@ if(BUILD_PLUGIN_AS_DEPENDENCY)
     
     add_target_to_check_targets(miopen_legacy_plugin_tests ${CMAKE_CURRENT_BINARY_DIR})
 endif()
+
+MakeExecutableRelocatable(miopen_legacy_plugin_tests "$ORIGIN/../lib/hipdnn_plugins/engines")

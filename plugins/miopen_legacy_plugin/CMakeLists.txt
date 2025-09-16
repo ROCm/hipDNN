@@ -92,11 +92,14 @@ target_compile_definitions(miopen_legacy_plugin PRIVATE
 target_link_libraries(miopen_legacy_plugin PRIVATE miopen_legacy_plugin_private)
 target_link_libraries(miopen_legacy_plugin PRIVATE "-Xlinker --exclude-libs=ALL") # Hide symbols from linked static libs
 target_compile_options(miopen_legacy_plugin PRIVATE ${HIPDNN_WARNING_COMPILE_OPTIONS})
-set_target_properties(miopen_legacy_plugin PROPERTIES CXX_VISIBILITY_PRESET hidden)
+set_target_properties(miopen_legacy_plugin PROPERTIES 
+    CXX_VISIBILITY_PRESET hidden
+    LIBRARY_OUTPUT_DIRECTORY "${HIPDNN_BUILD_PLUGIN_ENGINE_DIR}"
+)
 
 clang_tidy_check(miopen_legacy_plugin)
 
-set(MIOPEN_LEGACY_PLUGIN_DIR ${CMAKE_CURRENT_BINARY_DIR} CACHE INTERNAL "miopen legacy plugin dir" FORCE)
+set(MIOPEN_LEGACY_PLUGIN_PATH ./hipdnn_plugins/engines/miopen_legacy_plugin CACHE INTERNAL "miopen legacy plugin dir" FORCE)
 
 add_subdirectory(tests)
 add_subdirectory(integration_tests)
@@ -104,5 +107,5 @@ add_subdirectory(integration_tests)
 install(
     TARGETS miopen_legacy_plugin
     EXPORT miopen-legacy-plugin
-    LIBRARY DESTINATION lib/hipdnn_plugins/engines
+    LIBRARY DESTINATION ${HIPDNN_INSTALL_PLUGIN_ENGINE_DIR}
 )

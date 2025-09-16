@@ -58,7 +58,12 @@ public:
     uint32_t nodeCount() const override
     {
         throwIfNotValid();
-        return _shallowGraph->nodes()->size();
+        auto nodes = _shallowGraph->nodes();
+        if(nodes == nullptr)
+        {
+            return 0;
+        }
+        return static_cast<uint32_t>(nodes->size());
     }
 
     bool hasOnlySupportedAttributes(
@@ -66,8 +71,14 @@ public:
     {
         throwIfNotValid();
 
+        auto nodes = _shallowGraph->nodes();
+        if(nodes == nullptr)
+        {
+            return true; // No nodes means no unsupported attributes
+        }
+
         // NOLINTNEXTLINE(readability-use-anyofallof)
-        for(const auto node : *_shallowGraph->nodes())
+        for(const auto node : *nodes)
         {
             if(!supportedAttributes.contains(node->attributes_type()))
             {
@@ -81,12 +92,18 @@ public:
     {
         throwIfNotValid();
 
-        if(index >= _shallowGraph->nodes()->size())
+        auto nodes = _shallowGraph->nodes();
+        if(nodes == nullptr)
+        {
+            throw std::out_of_range("No nodes in graph");
+        }
+
+        if(index >= nodes->size())
         {
             throw std::out_of_range("Index out of range for graph nodes");
         }
 
-        return *_shallowGraph->nodes()->Get(index);
+        return *nodes->Get(index);
     }
 
     const std::unordered_map<int64_t, const hipdnn_sdk::data_objects::TensorAttributes*>&
@@ -99,9 +116,13 @@ public:
             return _tensorMap;
         }
 
-        for(const auto tensor : *_shallowGraph->tensors())
+        auto tensors = _shallowGraph->tensors();
+        if(tensors != nullptr)
         {
-            _tensorMap[tensor->uid()] = tensor;
+            for(const auto tensor : *tensors)
+            {
+                _tensorMap[tensor->uid()] = tensor;
+            }
         }
 
         return _tensorMap;

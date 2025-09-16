@@ -4,6 +4,7 @@
 #pragma once
 
 #if defined(__linux__)
+#include <filesystem>
 namespace hipdnn_sdk
 {
 namespace utilities
@@ -38,6 +39,11 @@ inline void setEnv(const char* var, const char* value)
 inline void unsetEnv(const char* var)
 {
     unsetenv(var);
+}
+
+inline bool pathCompEq(const std::filesystem::path& a, const std::filesystem::path& b)
+{
+    return a.native() == b.native();
 }
 
 }
