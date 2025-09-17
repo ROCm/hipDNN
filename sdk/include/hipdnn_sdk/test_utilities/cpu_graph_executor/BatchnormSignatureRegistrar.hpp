@@ -22,7 +22,7 @@ using BatchnormFwdInferenceFn
     = std::function<void(std::any&, std::any&, std::any&, std::any&, std::any&, std::any&, double)>;
 
 // Registry keyed by BatchnormSignatureKey
-std::unordered_map<BatchnormSignatureKey, BatchnormFwdInferenceFn>& batchnormRegistry()
+inline std::unordered_map<BatchnormSignatureKey, BatchnormFwdInferenceFn>& batchnormRegistry()
 {
     static std::unordered_map<BatchnormSignatureKey, BatchnormFwdInferenceFn> _reg;
     return _reg;

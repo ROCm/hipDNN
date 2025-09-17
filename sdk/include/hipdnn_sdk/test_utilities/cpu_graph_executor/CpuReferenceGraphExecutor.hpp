@@ -51,32 +51,34 @@ public:
                 {
                     BatchnormFwdInferenceFn fn = it->second;
 
-                    auto shallowXTensor = createHostOnlyShallowTensorVariant(
+                    auto shallowXTensor = TensorVariantUtils::createHostOnlyShallowTensorVariant(
                         *xTensorAttr, variantPack.at(xTensorAttr->uid()));
                     std::any input = std::ref(shallowXTensor);
 
                     auto yTensorAttr = tensorMap.at(nodeAttributes->y_tensor_uid());
-                    auto shallowYTensor = createHostOnlyShallowTensorVariant(
+                    auto shallowYTensor = TensorVariantUtils::createHostOnlyShallowTensorVariant(
                         *yTensorAttr, variantPack.at(yTensorAttr->uid()));
                     std::any output = std::ref(shallowYTensor);
 
-                    auto shallowScaleTensor = createHostOnlyShallowTensorVariant(
-                        *scaleTensorAttr, variantPack.at(scaleTensorAttr->uid()));
+                    auto shallowScaleTensor
+                        = TensorVariantUtils::createHostOnlyShallowTensorVariant(
+                            *scaleTensorAttr, variantPack.at(scaleTensorAttr->uid()));
                     std::any scale = std::ref(shallowScaleTensor);
 
                     auto biasTensorAttr = tensorMap.at(nodeAttributes->bias_tensor_uid());
-                    auto shallowBiasTensor = createHostOnlyShallowTensorVariant(
+                    auto shallowBiasTensor = TensorVariantUtils::createHostOnlyShallowTensorVariant(
                         *biasTensorAttr, variantPack.at(biasTensorAttr->uid()));
                     std::any bias = std::ref(shallowBiasTensor);
 
-                    auto shallowMeanTensor = createHostOnlyShallowTensorVariant(
+                    auto shallowMeanTensor = TensorVariantUtils::createHostOnlyShallowTensorVariant(
                         *meanTensorAttr, variantPack.at(meanTensorAttr->uid()));
                     std::any mean = std::ref(shallowMeanTensor);
 
                     auto invVarianceTensorAttr
                         = tensorMap.at(nodeAttributes->inv_variance_tensor_uid().value());
-                    auto shallowInvVarianceTensor = createHostOnlyShallowTensorVariant(
-                        *invVarianceTensorAttr, variantPack.at(invVarianceTensorAttr->uid()));
+                    auto shallowInvVarianceTensor
+                        = TensorVariantUtils::createHostOnlyShallowTensorVariant(
+                            *invVarianceTensorAttr, variantPack.at(invVarianceTensorAttr->uid()));
                     std::any variance = std::ref(shallowInvVarianceTensor);
 
                     fn(input, scale, bias, mean, variance, output, 1e-3);

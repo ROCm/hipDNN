@@ -19,61 +19,66 @@ namespace test_utilities
 using TensorVariant = std::variant<std::unique_ptr<hipdnn_sdk::utilities::TensorBase<float>>,
                                    std::unique_ptr<hipdnn_sdk::utilities::TensorBase<half>>>;
 
-template <typename T>
-static std::unique_ptr<hipdnn_sdk::utilities::TensorBase<T>> createHostOnlyShallowTensor(
-    void* ptr, const std::vector<int64_t>& dims, const std::vector<int64_t>& strides)
+class TensorVariantUtils
 {
-    return std::make_unique<hipdnn_sdk::utilities::ShallowTensor<T>>(ptr, dims, strides);
-}
-
-static TensorVariant
-    createHostOnlyShallowTensorVariantInternal(hipdnn_sdk::data_objects::DataType dataType,
-                                               void* ptr,
-                                               const std::vector<int64_t>& dims,
-                                               const std::vector<int64_t>& strides)
-{
-    switch(dataType)
+public:
+    static TensorVariant createHostOnlyShallowTensorVariant(
+        const hipdnn_sdk::data_objects::TensorAttributes& tensorAttributes, void* ptr)
     {
-    case hipdnn_sdk::data_objects::DataType::DataType_FLOAT:
-        return createHostOnlyShallowTensor<float>(ptr, dims, strides);
-    case hipdnn_sdk::data_objects::DataType::DataType_HALF:
-        return createHostOnlyShallowTensor<half>(ptr, dims, strides);
-    case hipdnn_sdk::data_objects::DataType::DataType_UNSET:
-    case hipdnn_sdk::data_objects::DataType::DataType_BFLOAT16:
-    case hipdnn_sdk::data_objects::DataType::DataType_DOUBLE:
-    case hipdnn_sdk::data_objects::DataType::DataType_UINT8:
-    case hipdnn_sdk::data_objects::DataType::DataType_INT32:
-    default:
-        break;
+        return createHostOnlyShallowTensorVariantInternal(
+            tensorAttributes.data_type(),
+            ptr,
+            flatbufferVectorToStd(tensorAttributes.dims()),
+            flatbufferVectorToStd(tensorAttributes.strides()));
     }
 
-    throw std::runtime_error("Unsupported data type for shallow tensor creation");
-}
-
-static std::vector<int64_t> flatbufferVectorToStd(const ::flatbuffers::Vector<int64_t>* fbVec)
-{
-    std::vector<int64_t> result;
-    if(fbVec == nullptr)
+private:
+    template <typename T>
+    static std::unique_ptr<hipdnn_sdk::utilities::TensorBase<T>> createHostOnlyShallowTensor(
+        void* ptr, const std::vector<int64_t>& dims, const std::vector<int64_t>& strides)
     {
+        return std::make_unique<hipdnn_sdk::utilities::ShallowTensor<T>>(ptr, dims, strides);
+    }
+
+    static TensorVariant
+        createHostOnlyShallowTensorVariantInternal(hipdnn_sdk::data_objects::DataType dataType,
+                                                   void* ptr,
+                                                   const std::vector<int64_t>& dims,
+                                                   const std::vector<int64_t>& strides)
+    {
+        switch(dataType)
+        {
+        case hipdnn_sdk::data_objects::DataType::DataType_FLOAT:
+            return createHostOnlyShallowTensor<float>(ptr, dims, strides);
+        case hipdnn_sdk::data_objects::DataType::DataType_HALF:
+            return createHostOnlyShallowTensor<half>(ptr, dims, strides);
+        case hipdnn_sdk::data_objects::DataType::DataType_UNSET:
+        case hipdnn_sdk::data_objects::DataType::DataType_BFLOAT16:
+        case hipdnn_sdk::data_objects::DataType::DataType_DOUBLE:
+        case hipdnn_sdk::data_objects::DataType::DataType_UINT8:
+        case hipdnn_sdk::data_objects::DataType::DataType_INT32:
+        default:
+            break;
+        }
+
+        throw std::runtime_error("Unsupported data type for shallow tensor creation");
+    }
+
+    static std::vector<int64_t> flatbufferVectorToStd(const ::flatbuffers::Vector<int64_t>* fbVec)
+    {
+        std::vector<int64_t> result;
+        if(fbVec == nullptr)
+        {
+            return result;
+        }
+        result.reserve(fbVec->size());
+        for(auto v : *fbVec)
+        {
+            result.push_back(v);
+        }
         return result;
     }
-    result.reserve(fbVec->size());
-    for(auto v : *fbVec)
-    {
-        result.push_back(v);
-    }
-    return result;
-}
-
-static TensorVariant createHostOnlyShallowTensorVariant(
-    const hipdnn_sdk::data_objects::TensorAttributes& tensorAttributes, void* ptr)
-{
-    return createHostOnlyShallowTensorVariantInternal(
-        tensorAttributes.data_type(),
-        ptr,
-        flatbufferVectorToStd(tensorAttributes.dims()),
-        flatbufferVectorToStd(tensorAttributes.strides()));
-}
+};
 
 }
 }

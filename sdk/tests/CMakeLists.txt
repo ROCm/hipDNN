@@ -42,7 +42,7 @@ add_executable(hipdnn_sdk_tests
     test_utilities/TestLoggingUtils.cpp
     test_utilities/cpu_graph_executor/TestCpuReferenceGraphExecutor.cpp
     test_utilities/cpu_graph_executor/TestBatchnormSignature.cpp
-
+    test_utilities/cpu_graph_executor/TestBatchnormSignatureRegistrar.cpp
     test_utilities/cpu_graph_executor/TestTensorVariant.cpp
 
 
