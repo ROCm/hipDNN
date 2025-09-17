@@ -9,13 +9,13 @@ TEST(TestTypes, DataTypeConversion)
 {
     using namespace hipdnn_frontend;
 
-    EXPECT_EQ(toSdkType(DataType::FLOAT), hipdnn_sdk::data_objects::DataType::DataType_FLOAT);
-    EXPECT_EQ(toSdkType(DataType::HALF), hipdnn_sdk::data_objects::DataType::DataType_HALF);
-    EXPECT_EQ(toSdkType(DataType::BFLOAT16), hipdnn_sdk::data_objects::DataType::DataType_BFLOAT16);
-    EXPECT_EQ(toSdkType(DataType::DOUBLE), hipdnn_sdk::data_objects::DataType::DataType_DOUBLE);
-    EXPECT_EQ(toSdkType(DataType::UINT8), hipdnn_sdk::data_objects::DataType::DataType_UINT8);
-    EXPECT_EQ(toSdkType(DataType::INT32), hipdnn_sdk::data_objects::DataType::DataType_INT32);
-    EXPECT_EQ(toSdkType(DataType::NOT_SET), hipdnn_sdk::data_objects::DataType::DataType_UNSET);
+    EXPECT_EQ(toSdkType(DataType::FLOAT), hipdnn_sdk::data_objects::DataType::FLOAT);
+    EXPECT_EQ(toSdkType(DataType::HALF), hipdnn_sdk::data_objects::DataType::HALF);
+    EXPECT_EQ(toSdkType(DataType::BFLOAT16), hipdnn_sdk::data_objects::DataType::BFLOAT16);
+    EXPECT_EQ(toSdkType(DataType::DOUBLE), hipdnn_sdk::data_objects::DataType::DOUBLE);
+    EXPECT_EQ(toSdkType(DataType::UINT8), hipdnn_sdk::data_objects::DataType::
+    EXPECT_EQ(toSdkType(DataType::INT32), hipdnn_sdk::data_objects::DataType::INT32);
+    EXPECT_EQ(toSdkType(DataType::NOT_SET), hipdnn_sdk::data_objects::DataType::UNSET);
 }
 
 TEST(TestTypes, ConvolutionModeConversion)

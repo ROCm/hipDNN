@@ -145,19 +145,19 @@ inline hipdnn_sdk::data_objects::DataType toSdkType(const DataType& type)
     switch(type)
     {
     case DataType::FLOAT:
-        return hipdnn_sdk::data_objects::DataType::DataType_FLOAT;
+        return hipdnn_sdk::data_objects::DataType::FLOAT;
     case DataType::HALF:
-        return hipdnn_sdk::data_objects::DataType::DataType_HALF;
+        return hipdnn_sdk::data_objects::DataType::HALF;
     case DataType::BFLOAT16:
-        return hipdnn_sdk::data_objects::DataType::DataType_BFLOAT16;
+        return hipdnn_sdk::data_objects::DataType::BFLOAT16;
     case DataType::DOUBLE:
-        return hipdnn_sdk::data_objects::DataType::DataType_DOUBLE;
+        return hipdnn_sdk::data_objects::DataType::DOUBLE;
     case DataType::UINT8:
-        return hipdnn_sdk::data_objects::DataType::DataType_UINT8;
+        return hipdnn_sdk::data_objects::DataType::UINT8;
     case DataType::INT32:
-        return hipdnn_sdk::data_objects::DataType::DataType_INT32;
+        return hipdnn_sdk::data_objects::DataType::INT32;
     default:
-        return hipdnn_sdk::data_objects::DataType::DataType_UNSET;
+        return hipdnn_sdk::data_objects::DataType::UNSET;
     }
 }
 

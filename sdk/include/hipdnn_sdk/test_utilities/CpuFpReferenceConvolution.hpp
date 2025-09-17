@@ -25,7 +25,7 @@ public:
     {
         using namespace hipdnn_sdk::data_objects;
 
-        if(node.attributes_type() != NodeAttributes_ConvolutionFwdAttributes)
+        if(node.attributes_type() != NodeAttributes::ConvolutionFwdAttributes)
         {
             return false;
         }

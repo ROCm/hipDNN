@@ -117,7 +117,7 @@ public:
         return hipdnn_sdk::data_objects::CreateNodeDirect(
             builder,
             attributes.get_name().c_str(),
-            hipdnn_sdk::data_objects::NodeAttributes::NodeAttributes_PointwiseAttributes,
+            hipdnn_sdk::data_objects::NodeAttributes::PointwiseAttributes,
             attributes.pack_attributes(builder).Union());
     }
 

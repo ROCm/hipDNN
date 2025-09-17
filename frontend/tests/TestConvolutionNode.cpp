@@ -691,7 +691,7 @@ TEST(TestConvolutionNode, PackNode)
 
     EXPECT_STREQ(nodeFlatbuffer->name()->c_str(), "Convolution");
     EXPECT_EQ(nodeFlatbuffer->attributes_type(),
-              hipdnn_sdk::data_objects::NodeAttributes_ConvolutionFwdAttributes);
+              hipdnn_sdk::data_objects::NodeAttributes::ConvolutionFwdAttributes);
 
     auto packedAttributes = nodeFlatbuffer->attributes_as_ConvolutionFwdAttributes();
     ASSERT_NE(packedAttributes, nullptr);
