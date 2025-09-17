@@ -126,6 +126,6 @@ struct BatchnormRegistryInitializer
     }
 };
 
-static BatchnormRegistryInitializer _batchnormRegistryInitializer;
+inline BatchnormRegistryInitializer _batchnormRegistryInitializer;
 }
 }

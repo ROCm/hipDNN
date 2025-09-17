@@ -87,8 +87,8 @@ struct hash<hipdnn_sdk::test_utilities::BatchnormSignatureKey>
     {
         return std::hash<int>()(static_cast<int>(k.inputDataType))
                ^ (std::hash<int>()(static_cast<int>(k.scaleBiasDataType)) << 1)
-               ^ (std::hash<int>()(static_cast<int>(k.meanVarianceDataType)) << 1)
-               ^ (std::hash<int>()(static_cast<int>(k.nodeAttributesType)) << 1);
+               ^ (std::hash<int>()(static_cast<int>(k.meanVarianceDataType)) << 2)
+               ^ (std::hash<int>()(static_cast<int>(k.nodeAttributesType)) << 3);
     }
 };
 }

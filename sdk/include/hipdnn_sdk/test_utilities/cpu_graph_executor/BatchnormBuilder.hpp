@@ -10,26 +10,13 @@
 #include <hipdnn_sdk/data_objects/data_types_generated.h>
 #include <hipdnn_sdk/data_objects/graph_generated.h>
 #include <hipdnn_sdk/test_utilities/CpuFpReferenceBatchnorm.hpp>
+#include <hipdnn_sdk/test_utilities/FlatbufferDatatypeToType.hpp>
 #include <hipdnn_sdk/utilities/UtilsFp16.hpp>
+
 namespace hipdnn_sdk
 {
 namespace test_utilities
 {
-
-template <hipdnn_sdk::data_objects::DataType DT>
-struct DataTypeToNative;
-
-template <>
-struct DataTypeToNative<hipdnn_sdk::data_objects::DataType::DataType_FLOAT>
-{
-    using type = float;
-};
-
-template <>
-struct DataTypeToNative<hipdnn_sdk::data_objects::DataType::DataType_HALF>
-{
-    using type = half;
-};
 
 template <hipdnn_sdk::data_objects::DataType T>
 concept BatchnormDataType = (T == hipdnn_sdk::data_objects::DataType::DataType_FLOAT)
