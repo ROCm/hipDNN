@@ -26,8 +26,8 @@ public:
         using namespace hipdnn_sdk::data_objects;
 
         // Support both BatchNorm inference and backward
-        if(node.attributes_type() != NodeAttributes_BatchnormInferenceAttributes
-           && node.attributes_type() != NodeAttributes_BatchnormBackwardAttributes)
+        if(node.attributes_type() != NodeAttributes::BatchnormInferenceAttributes
+           && node.attributes_type() != NodeAttributes::BatchnormBackwardAttributes)
         {
             return false;
         }
@@ -44,16 +44,23 @@ public:
                                       TensorBase<InputDataType>& output,
                                       double epsilon)
     {
-        if(input.dims().size() != 4)
+        if(input.dims().size() < 2)
         {
-            throw std::runtime_error("Batchnorm inference requires a 4D tensor.");
+            throw std::runtime_error(
+                "Batchnorm inference requires at least 2D tensor (batch and channel).");
         }
 
-        int64_t nBatches = input.dims().at(0);
-        std::vector<int64_t> channels(static_cast<size_t>(input.dims().at(1)));
+        auto nBatches = input.dims().at(0);
+        auto nChannels = input.dims().at(1);
+
+        int64_t elementsPerChannel = nBatches;
+        for(size_t i = 2; i < input.dims().size(); ++i)
+        {
+            elementsPerChannel *= input.dims().at(i);
+        }
+
+        std::vector<int64_t> channels(static_cast<size_t>(nChannels));
         std::iota(channels.begin(), channels.end(), 0);
-        int64_t height = input.dims().at(2);
-        int64_t width = input.dims().at(3);
 
         std::for_each(channels.begin(), channels.end(), [&](int64_t cidx) {
             auto mean = estimatedMean.getHostValue(0, cidx);
@@ -63,30 +70,139 @@ public:
                   / sqrtInternal(variance + static_cast<MeanVarianceDataType>(epsilon));
 
             // process the batch per channel
-            for(int bidx = 0; bidx < nBatches; bidx++)
-            {
-                for(int row = 0; row < height; row++)
-                {
-                    for(int column = 0; column < width; column++)
-                    {
-                        auto in = static_cast<MeanVarianceDataType>(
-                            input.getHostValue(bidx, cidx, row, column));
-                        MeanVarianceDataType elemStd = in - mean;
-                        MeanVarianceDataType inhat = elemStd * invVariance;
-                        output.setHostValue(
-                            static_cast<InputDataType>((scale.getHostValue(0, cidx)
-                                                        * static_cast<ScaleBiasDataType>(inhat))
-                                                       + bias.getHostValue(0, cidx)),
-                            bidx,
-                            cidx,
-                            row,
-                            column);
-                    }
-                }
-            }
+            iterateChannelElements(
+                input, cidx, elementsPerChannel, [&](const std::vector<int64_t>& indices) {
+                    auto inVal = static_cast<MeanVarianceDataType>(input.getHostValue(indices));
+                    MeanVarianceDataType elemStd = inVal - mean;
+                    MeanVarianceDataType inhat = elemStd * invVariance;
+                    output.setHostValue(
+                        static_cast<InputDataType>(
+                            (scale.getHostValue(0, cidx) * static_cast<ScaleBiasDataType>(inhat))
+                            + bias.getHostValue(0, cidx)),
+                        indices);
+                });
         });
 
         output.memory().markHostModified(); // Mark output memory as modified on host
+    }
+
+    static void
+        batchnormFwdTraining(const TensorBase<InputDataType>& x,
+                             const TensorBase<ScaleBiasDataType>& scale,
+                             const TensorBase<ScaleBiasDataType>& bias,
+                             TensorBase<InputDataType>& y,
+                             MeanVarianceDataType epsilon,
+                             MeanVarianceDataType momentum,
+                             TensorBase<MeanVarianceDataType>* mean = nullptr,
+                             TensorBase<MeanVarianceDataType>* invVariance = nullptr,
+                             const TensorBase<MeanVarianceDataType>* prevRunningMean = nullptr,
+                             const TensorBase<MeanVarianceDataType>* prevRunningVariance = nullptr,
+                             TensorBase<MeanVarianceDataType>* nextRunningMean = nullptr,
+                             TensorBase<MeanVarianceDataType>* nextRunningVariance = nullptr)
+    {
+        if(x.dims().size() < 2)
+        {
+            throw std::runtime_error(
+                "Batchnorm training requires at least 2D tensor (batch and channel).");
+        }
+
+        auto nBatches = x.dims().at(0);
+        auto nChannels = x.dims().at(1);
+
+        int64_t elementsPerChannel = nBatches;
+        for(size_t i = 2; i < x.dims().size(); ++i)
+        {
+            elementsPerChannel *= x.dims().at(i);
+        }
+
+        auto nhw = static_cast<MeanVarianceDataType>(elementsPerChannel);
+
+        std::vector<int64_t> channels(static_cast<size_t>(nChannels));
+        std::iota(channels.begin(), channels.end(), 0);
+
+        std::for_each(channels.begin(), channels.end(), [&](int64_t cidx) {
+            MeanVarianceDataType meanAccum = 0.0;
+            MeanVarianceDataType varianceAccum = 0.0;
+
+            // Calculate mean and variance for this channel
+            iterateChannelElements(
+                x, cidx, elementsPerChannel, [&](const std::vector<int64_t>& indices) {
+                    auto inVal = x.getHostValue(indices);
+                    meanAccum += inVal;
+                    varianceAccum += inVal * inVal;
+                });
+
+            MeanVarianceDataType channelMean = meanAccum /= nhw;
+            MeanVarianceDataType channelVariance
+                = (varianceAccum / nhw) - (channelMean * channelMean);
+
+            auto invVar
+                = static_cast<MeanVarianceDataType>(1.0) / sqrtInternal(channelVariance + epsilon);
+
+            // Apply normalization with scale and bias
+            iterateChannelElements(
+                x, cidx, elementsPerChannel, [&](const std::vector<int64_t>& indices) {
+                    auto xVal = static_cast<MeanVarianceDataType>(x.getHostValue(indices));
+                    auto xHat = (xVal - channelMean) * invVar;
+
+                    y.setHostValue(
+                        static_cast<InputDataType>(scale.getHostValue(0, cidx)
+                                                       * static_cast<ScaleBiasDataType>(xHat)
+                                                   + bias.getHostValue(0, cidx)),
+                        indices);
+                });
+
+            // Save mean and inverse variance for backward pass if provided
+            if(mean != nullptr)
+            {
+                mean->setHostValue(channelMean, 0, cidx);
+            }
+
+            if(invVariance != nullptr)
+            {
+                invVariance->setHostValue(invVar, 0, cidx);
+            }
+
+            // Update running statistics if all required tensors are provided
+            if(prevRunningMean != nullptr && prevRunningVariance != nullptr
+               && nextRunningMean != nullptr && nextRunningVariance != nullptr)
+            {
+                constexpr MeanVarianceDataType one = static_cast<MeanVarianceDataType>(1.0f);
+                auto currentMean = prevRunningMean->getHostValue(0, cidx);
+                auto newMean = (one - momentum) * currentMean + momentum * channelMean;
+                nextRunningMean->setHostValue(newMean, 0, cidx);
+
+                auto currentVar = prevRunningVariance->getHostValue(0, cidx);
+                // Apply Bessel's correction for unbiased variance estimate
+                auto adjustedVariance
+                    = (nhw == one) ? channelVariance : (nhw / (nhw - one)) * channelVariance;
+                auto newVar = (one - momentum) * currentVar + momentum * adjustedVariance;
+                nextRunningVariance->setHostValue(newVar, 0, cidx);
+            }
+        });
+
+        // Mark all modified tensors as host-modified
+        y.memory().markHostModified();
+
+        if(mean != nullptr)
+        {
+            mean->memory().markHostModified();
+        }
+
+        if(invVariance != nullptr)
+        {
+            invVariance->memory().markHostModified();
+        }
+
+        if(nextRunningMean != nullptr)
+        {
+            nextRunningMean->memory().markHostModified();
+        }
+
+        if(nextRunningVariance != nullptr)
+        {
+            nextRunningVariance->memory().markHostModified();
+        }
     }
 
     static void batchnormBwd(const TensorBase<InputDataType>& dy,
@@ -189,6 +305,50 @@ private:
     static float sqrtInternal(float value)
     {
         return sqrtf(value);
+    }
+
+    // Utility method to iterate over all elements for a specific channel in an N-dimensional tensor
+    static void iterateChannelElements(const TensorBase<InputDataType>& tensor,
+                                       int64_t channelIdx,
+                                       int64_t elementsPerChannel,
+                                       std::function<void(const std::vector<int64_t>&)> func)
+    {
+        auto dims = tensor.dims();
+
+        if(dims.size() < 2)
+        {
+            throw std::runtime_error("iterateChannelElements requires at least 2 dims.");
+        }
+
+        std::vector<int64_t> indices(dims.size(), 0);
+        indices[1] = channelIdx;
+
+        for(int64_t iter = 0; iter < elementsPerChannel; ++iter)
+        {
+            func(indices);
+
+            // Since we iterate from end -> start, we need to use a signed int instead of size_t
+            // Otherwise you will get an overflow.
+            for(int dim = static_cast<int>(dims.size()) - 1; dim >= 0; --dim)
+            {
+                // Skip channel dimension
+                if(dim == 1)
+                    continue;
+
+                // Cast to size_t to avoid warnings.
+                size_t index = static_cast<size_t>(dim);
+                indices[index]++;
+
+                // No carry needed
+                if(indices[index] < dims[index])
+                {
+                    break;
+                }
+
+                // Reset and carry inc to next dimension
+                indices[index] = 0;
+            }
+        }
     }
 };
 

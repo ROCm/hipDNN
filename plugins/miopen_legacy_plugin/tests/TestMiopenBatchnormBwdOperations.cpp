@@ -254,32 +254,32 @@ public:
 TEST_P(TestGpuMiopenBatchnormBwdExecuteGraphNchwFp32, Correctness)
 {
     Batchnorm2dTestCase testCase = GetParam();
-    runBwdBatchnormGraph(testCase, hipdnn_sdk::data_objects::DataType::DataType_FLOAT, 4e-3f);
+    runBwdBatchnormGraph(testCase, hipdnn_sdk::data_objects::DataType::FLOAT, 4e-3f);
 }
 
 TEST_P(TestGpuMiopenBatchnormBwdExecuteGraphNchwBfp16, Correctness)
 {
     Batchnorm2dTestCase testCase = GetParam();
-    runBwdBatchnormGraph(testCase, hipdnn_sdk::data_objects::DataType::DataType_BFLOAT16, 4e-3_bf);
+    runBwdBatchnormGraph(testCase, hipdnn_sdk::data_objects::DataType::BFLOAT16, 4e-3_bf);
 }
 
 TEST_P(TestGpuMiopenBatchnormBwdExecuteGraphNchwFp16, Correctness)
 {
     Batchnorm2dTestCase testCase = GetParam();
-    runBwdBatchnormGraph(testCase, hipdnn_sdk::data_objects::DataType::DataType_HALF, 4e-3_h);
+    runBwdBatchnormGraph(testCase, hipdnn_sdk::data_objects::DataType::HALF, 4e-3_h);
 }
 
 // TODO: Re-enable when double support is added to MIOpen plugin
 TEST_P(TestGpuMiopenBatchnormBwdExecuteGraphNchwFp64, DISABLED_Correctness)
 {
     Batchnorm2dTestCase testCase = GetParam();
-    runBwdBatchnormGraph(testCase, hipdnn_sdk::data_objects::DataType::DataType_DOUBLE, 4e-3);
+    runBwdBatchnormGraph(testCase, hipdnn_sdk::data_objects::DataType::DOUBLE, 4e-3);
 }
 
 TEST_P(TestGpuMiopenBatchnormBwdExecuteGraphNhwcFp32, Correctness)
 {
     Batchnorm2dTestCase testCase = GetParam();
-    runBwdBatchnormGraph(testCase, hipdnn_sdk::data_objects::DataType::DataType_FLOAT, 4e-3f);
+    runBwdBatchnormGraph(testCase, hipdnn_sdk::data_objects::DataType::FLOAT, 4e-3f);
 }
 
 // TODO: add unique test suite and conform to naming rules
@@ -289,7 +289,7 @@ TEST_P(TestGpuMiopenBatchnormBwdExecuteGraphNhwcFp32, Correctness)
 TEST_P(TestGpuMiopenBatchnormBwdExecuteGraphNhwcBfp16, DISABLED_Correctness)
 {
     Batchnorm2dTestCase testCase = GetParam();
-    runBwdBatchnormGraph(testCase, hipdnn_sdk::data_objects::DataType::DataType_BFLOAT16, 4e-3_bf);
+    runBwdBatchnormGraph(testCase, hipdnn_sdk::data_objects::DataType::BFLOAT16, 4e-3_bf);
 }
 
 // MIOpen segfaults for this case, re-enable when fix is released:
@@ -297,14 +297,14 @@ TEST_P(TestGpuMiopenBatchnormBwdExecuteGraphNhwcBfp16, DISABLED_Correctness)
 TEST_P(TestGpuMiopenBatchnormBwdExecuteGraphNhwcFp16, DISABLED_Correctness)
 {
     Batchnorm2dTestCase testCase = GetParam();
-    runBwdBatchnormGraph(testCase, hipdnn_sdk::data_objects::DataType::DataType_HALF, 4e-3_h);
+    runBwdBatchnormGraph(testCase, hipdnn_sdk::data_objects::DataType::HALF, 4e-3_h);
 }
 
 // TODO: Re-enable when double support is added to MIOpen plugin
 TEST_P(TestGpuMiopenBatchnormBwdExecuteGraphNhwcFp64, DISABLED_Correctness)
 {
     Batchnorm2dTestCase testCase = GetParam();
-    runBwdBatchnormGraph(testCase, hipdnn_sdk::data_objects::DataType::DataType_DOUBLE, 4e-3);
+    runBwdBatchnormGraph(testCase, hipdnn_sdk::data_objects::DataType::DOUBLE, 4e-3);
 }
 
 INSTANTIATE_TEST_SUITE_P(,

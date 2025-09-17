@@ -24,8 +24,8 @@ std::vector<PointwiseMode> getPointwiseModesByChecker(CheckerFunc checker)
 {
     std::vector<PointwiseMode> modes;
     // Iterate through all possible PointwiseMode values and check if they match the criteria
-    for(int i = static_cast<int>(hipdnn_sdk::data_objects::PointwiseMode::PointwiseMode_MIN);
-        i <= static_cast<int>(hipdnn_sdk::data_objects::PointwiseMode::PointwiseMode_MAX);
+    for(int i = static_cast<int>(hipdnn_sdk::data_objects::PointwiseMode::MIN);
+        i <= static_cast<int>(hipdnn_sdk::data_objects::PointwiseMode::MAX);
         ++i)
     {
         auto mode = static_cast<PointwiseMode>(i);

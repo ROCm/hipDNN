@@ -269,3 +269,42 @@ TEST(TestShapeUtils, BroadcastCompatibleMixedOnesAndMatches)
 
     EXPECT_TRUE(areDimensionsBroadcastCompatible(inputDims, outputDims));
 }
+
+TEST(TestShapeUtils, GenerateStridesMoreDimsThanStridesThrows)
+{
+    std::vector<int64_t> dim = {1, 2, 3, 4};
+    std::vector<int64_t> strideOrder = {2, 1, 0};
+
+    EXPECT_THROW(generateStrides(dim, strideOrder), std::invalid_argument);
+}
+
+TEST(TestShapeUtils, GenerateStridesLessDimsThanStridesValid)
+{
+    std::vector<int64_t> dim = {1, 2, 3};
+    std::vector<int64_t> strideOrder = {3, 2, 1, 0};
+
+    auto strides = generateStrides(dim, strideOrder);
+
+    EXPECT_EQ(strides, (std::vector<int64_t>{6, 3, 1}));
+}
+
+TEST(TestShapeUtils, GenerateStridesFewerDimsNhwcOrdering)
+{
+    std::vector<int64_t> dim = {2, 3, 4};
+    std::vector<int64_t> strideOrder = {2, 0, 1, 3};
+
+    // Should use first 3 elements: {2, 0, 1} for NHW ordering
+    auto strides = generateStrides(dim, strideOrder);
+
+    EXPECT_EQ(strides, (std::vector<int64_t>{12, 1, 3}));
+}
+
+TEST(TestShapeUtils, GenerateStridesEmptyDimsWithNonEmptyStridesValid)
+{
+    std::vector<int64_t> dim = {};
+    std::vector<int64_t> strideOrder = {3, 2, 1, 0};
+
+    auto strides = generateStrides(dim, strideOrder);
+
+    EXPECT_EQ(strides, (std::vector<int64_t>{}));
+}
