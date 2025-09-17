@@ -21,7 +21,7 @@ class SimpleEnginePluginManager : public plugin::PluginManagerBase<plugin::Engin
 {
 public:
     SimpleEnginePluginManager()
-        : plugin::PluginManagerBase<plugin::EnginePlugin>({"./"})
+        : plugin::PluginManagerBase<plugin::EnginePlugin>({})
     {
     }
 };
@@ -34,7 +34,7 @@ TEST(TestGpuEnginePluginManager, LoadPluginsAndExecuteOpGraph)
     SimpleEnginePluginManager pluginManager;
 
     // Create a list of paths to plugins
-    std::set<std::filesystem::path> pluginPaths = {"./hipdnn_test_engine_plugin1"};
+    std::set<std::filesystem::path> pluginPaths = {"../lib/test_plugins/" TEST_ENGINE_PLUGIN1_NAME};
 
     // Load the plugins
     pluginManager.loadPlugins(pluginPaths, HIPDNN_PLUGIN_LOADING_ABSOLUTE);

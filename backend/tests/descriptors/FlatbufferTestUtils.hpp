@@ -20,9 +20,9 @@ inline flatbuffers::FlatBufferBuilder createValidGraph()
     auto graphOffset
         = hipdnn_sdk::data_objects::CreateGraphDirect(builder,
                                                       "test",
-                                                      hipdnn_sdk::data_objects::DataType_FLOAT,
-                                                      hipdnn_sdk::data_objects::DataType_HALF,
-                                                      hipdnn_sdk::data_objects::DataType_BFLOAT16,
+                                                      hipdnn_sdk::data_objects::DataType::FLOAT,
+                                                      hipdnn_sdk::data_objects::DataType::HALF,
+                                                      hipdnn_sdk::data_objects::DataType::BFLOAT16,
                                                       &tensorAttributes,
                                                       &nodes);
     builder.Finish(graphOffset);

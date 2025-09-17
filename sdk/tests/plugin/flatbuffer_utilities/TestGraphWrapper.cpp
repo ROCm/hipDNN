@@ -62,10 +62,10 @@ TEST(TestGraphWrapper, HasSupportedTypesReturnsTrueIfAllSupported)
     GraphWrapper wrapper(serializedGraph.data(), serializedGraph.size());
 
     std::set<hipdnn_sdk::data_objects::NodeAttributes> supported
-        = {hipdnn_sdk::data_objects::NodeAttributes_BatchnormInferenceAttributes};
+        = {hipdnn_sdk::data_objects::NodeAttributes::BatchnormInferenceAttributes};
     EXPECT_TRUE(wrapper.hasOnlySupportedAttributes(supported));
 
-    supported.insert(hipdnn_sdk::data_objects::NodeAttributes_PointwiseAttributes);
+    supported.insert(hipdnn_sdk::data_objects::NodeAttributes::PointwiseAttributes);
     EXPECT_TRUE(wrapper.hasOnlySupportedAttributes(supported));
 }
 
@@ -78,10 +78,10 @@ TEST(TestGraphWrapper, HasSupportedTypesReturnsFalseIfAnyUnsupported)
     GraphWrapper wrapper(serializedGraph.data(), serializedGraph.size());
 
     std::set<hipdnn_sdk::data_objects::NodeAttributes> supported
-        = {hipdnn_sdk::data_objects::NodeAttributes_PointwiseAttributes};
+        = {hipdnn_sdk::data_objects::NodeAttributes::PointwiseAttributes};
     EXPECT_FALSE(wrapper.hasOnlySupportedAttributes(supported));
 
-    supported.insert(hipdnn_sdk::data_objects::NodeAttributes_BatchnormAttributes);
+    supported.insert(hipdnn_sdk::data_objects::NodeAttributes::BatchnormAttributes);
     EXPECT_FALSE(wrapper.hasOnlySupportedAttributes(supported));
 }
 
@@ -107,15 +107,15 @@ TEST(TestGraphWrapper, GetTensorMapReturnsCorrectTensors)
     std::vector<int64_t> dims = {1, 1, 1, 1};
     std::vector<::flatbuffers::Offset<hipdnn_sdk::data_objects::TensorAttributes>> tensorAttributes;
     tensorAttributes.push_back(hipdnn_sdk::data_objects::CreateTensorAttributesDirect(
-        builder, 1, "x", hipdnn_sdk::data_objects::DataType_FLOAT, &strides, &dims));
+        builder, 1, "x", hipdnn_sdk::data_objects::DataType::FLOAT, &strides, &dims));
     tensorAttributes.push_back(hipdnn_sdk::data_objects::CreateTensorAttributesDirect(
-        builder, 2, "y", hipdnn_sdk::data_objects::DataType_FLOAT, &strides, &dims));
+        builder, 2, "y", hipdnn_sdk::data_objects::DataType::FLOAT, &strides, &dims));
 
     auto graph = hipdnn_sdk::data_objects::CreateGraphDirect(builder,
                                                              "test",
-                                                             DataType_FLOAT,
-                                                             DataType_HALF,
-                                                             DataType_BFLOAT16,
+                                                             DataType::FLOAT,
+                                                             DataType::HALF,
+                                                             DataType::BFLOAT16,
                                                              &tensorAttributes,
                                                              &nodes);
     builder.Finish(graph);

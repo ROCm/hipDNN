@@ -3,8 +3,6 @@
 
 #pragma once
 
-#define COMPONENT_NAME "hipdnn_frontend"
-
 #include <hipdnn_frontend/Error.hpp>
 #include <hipdnn_frontend/Graph.hpp>
 #include <hipdnn_frontend/Types.hpp>

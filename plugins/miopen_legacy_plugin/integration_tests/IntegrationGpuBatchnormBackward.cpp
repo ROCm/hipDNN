@@ -11,11 +11,12 @@
 #include <hipdnn_frontend/Graph.hpp>
 #include <hipdnn_frontend/Utilities.hpp>
 #include <hipdnn_frontend/attributes/TensorAttributes.hpp>
-#include <hipdnn_sdk/test_utilities/CpuFpReferenceImplementation.hpp>
 #include <hipdnn_sdk/test_utilities/CpuFpReferenceValidation.hpp>
 #include <hipdnn_sdk/test_utilities/TestUtilities.hpp>
 #include <hipdnn_sdk/utilities/MigratableMemory.hpp>
 #include <hipdnn_sdk/utilities/Tensor.hpp>
+
+#include <hipdnn_sdk/test_utilities/CpuFpReferenceBatchnorm.hpp>
 
 using namespace hipdnn_frontend;
 using namespace hipdnn_sdk::utilities;
@@ -100,7 +101,7 @@ protected:
         ASSERT_EQ(hipGetDevice(&_deviceId), hipSuccess);
 
         // Note: The plugin paths has to be set before we create the hipdnn handle.
-        const std::array<const char*, 1> paths = {PLUGIN_DIR};
+        const std::array<const char*, 1> paths = {PLUGIN_PATH};
         ASSERT_EQ(hipdnnSetEnginePluginPaths_ext(
                       paths.size(), paths.data(), HIPDNN_PLUGIN_LOADING_ABSOLUTE),
                   HIPDNN_STATUS_SUCCESS);
@@ -192,7 +193,6 @@ protected:
         auto& dxTensorAttr = outputTensorsAttr[0];
         if(!dxTensorAttr->has_uid())
         {
-            HIPDNN_LOG_INFO("dxTensorAttr does not have a UID, giving it a UID");
             dxTensorAttr->set_uid(uid++);
         }
         dxTensorAttr->set_data_type(inputDataType);
@@ -200,7 +200,6 @@ protected:
         auto& dscaleTensorAttr = outputTensorsAttr[1];
         if(!dscaleTensorAttr->has_uid())
         {
-            HIPDNN_LOG_INFO("dscaleTensorAttr does not have a UID, giving it a UID");
             dscaleTensorAttr->set_uid(uid++);
         }
         dscaleTensorAttr->set_data_type(intermediateDataType);
@@ -208,7 +207,6 @@ protected:
         auto& dbiasTensorAttr = outputTensorsAttr[2];
         if(!dbiasTensorAttr->has_uid())
         {
-            HIPDNN_LOG_INFO("dbiasTensorAttr does not have a UID, giving it a UID");
             dbiasTensorAttr->set_uid(uid++);
         }
         dbiasTensorAttr->set_data_type(intermediateDataType);
@@ -244,15 +242,15 @@ protected:
 
     void runCpuBatchnormBwd(Batchnorm2dTensorBundle& cpuTensorBundle)
     {
-        CpuFpReferenceImplementation<InputType, IntermediateType, IntermediateType> cpuRefImpl;
-        cpuRefImpl.batchnormBwd(cpuTensorBundle.dyTensor,
-                                cpuTensorBundle.xTensor,
-                                cpuTensorBundle.meanTensor,
-                                cpuTensorBundle.invVarianceTensor,
-                                cpuTensorBundle.scaleTensor,
-                                cpuTensorBundle.dxTensor,
-                                cpuTensorBundle.dscaleTensor,
-                                cpuTensorBundle.dbiasTensor);
+        CpuFpReferenceBatchnormImpl<InputType, IntermediateType>::batchnormBwd(
+            cpuTensorBundle.dyTensor,
+            cpuTensorBundle.xTensor,
+            cpuTensorBundle.meanTensor,
+            cpuTensorBundle.invVarianceTensor,
+            cpuTensorBundle.scaleTensor,
+            cpuTensorBundle.dxTensor,
+            cpuTensorBundle.dscaleTensor,
+            cpuTensorBundle.dbiasTensor);
     }
 
     void runBatchnormTest(InputType tolerance = 1e4f,

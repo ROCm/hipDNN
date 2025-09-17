@@ -25,39 +25,177 @@ struct PointwiseAttributesT;
 bool operator==(const PointwiseAttributesT &lhs, const PointwiseAttributesT &rhs);
 bool operator!=(const PointwiseAttributesT &lhs, const PointwiseAttributesT &rhs);
 
-enum PointwiseMode : int8_t {
-  PointwiseMode_UNSET = 0,
-  PointwiseMode_RELU_FWD = 1,
-  PointwiseMode_MIN = PointwiseMode_UNSET,
-  PointwiseMode_MAX = PointwiseMode_RELU_FWD
+enum class PointwiseMode : int8_t {
+  UNSET = 0,
+  ABS = 1,
+  ADD = 2,
+  ADD_SQUARE = 3,
+  BINARY_SELECT = 4,
+  CEIL = 5,
+  CMP_EQ = 6,
+  CMP_GE = 7,
+  CMP_GT = 8,
+  CMP_LE = 9,
+  CMP_LT = 10,
+  CMP_NEQ = 11,
+  DIV = 12,
+  ELU_BWD = 13,
+  ELU_FWD = 14,
+  ERF = 15,
+  EXP = 16,
+  FLOOR = 17,
+  GELU_APPROX_TANH_BWD = 18,
+  GELU_APPROX_TANH_FWD = 19,
+  GELU_BWD = 20,
+  GELU_FWD = 21,
+  GEN_INDEX = 22,
+  IDENTITY = 23,
+  LOG = 24,
+  LOGICAL_AND = 25,
+  LOGICAL_NOT = 26,
+  LOGICAL_OR = 27,
+  MAX_OP = 28,
+  MIN_OP = 29,
+  MUL = 30,
+  NEG = 31,
+  RECIPROCAL = 32,
+  RELU_BWD = 33,
+  RELU_FWD = 34,
+  RSQRT = 35,
+  SIGMOID_BWD = 36,
+  SIGMOID_FWD = 37,
+  SIN = 38,
+  SOFTPLUS_BWD = 39,
+  SOFTPLUS_FWD = 40,
+  SQRT = 41,
+  SUB = 42,
+  SWISH_BWD = 43,
+  SWISH_FWD = 44,
+  TAN = 45,
+  TANH_BWD = 46,
+  TANH_FWD = 47,
+  MIN = UNSET,
+  MAX = TANH_FWD
 };
 
-inline const PointwiseMode (&EnumValuesPointwiseMode())[2] {
+inline const PointwiseMode (&EnumValuesPointwiseMode())[48] {
   static const PointwiseMode values[] = {
-    PointwiseMode_UNSET,
-    PointwiseMode_RELU_FWD
+    PointwiseMode::UNSET,
+    PointwiseMode::ABS,
+    PointwiseMode::ADD,
+    PointwiseMode::ADD_SQUARE,
+    PointwiseMode::BINARY_SELECT,
+    PointwiseMode::CEIL,
+    PointwiseMode::CMP_EQ,
+    PointwiseMode::CMP_GE,
+    PointwiseMode::CMP_GT,
+    PointwiseMode::CMP_LE,
+    PointwiseMode::CMP_LT,
+    PointwiseMode::CMP_NEQ,
+    PointwiseMode::DIV,
+    PointwiseMode::ELU_BWD,
+    PointwiseMode::ELU_FWD,
+    PointwiseMode::ERF,
+    PointwiseMode::EXP,
+    PointwiseMode::FLOOR,
+    PointwiseMode::GELU_APPROX_TANH_BWD,
+    PointwiseMode::GELU_APPROX_TANH_FWD,
+    PointwiseMode::GELU_BWD,
+    PointwiseMode::GELU_FWD,
+    PointwiseMode::GEN_INDEX,
+    PointwiseMode::IDENTITY,
+    PointwiseMode::LOG,
+    PointwiseMode::LOGICAL_AND,
+    PointwiseMode::LOGICAL_NOT,
+    PointwiseMode::LOGICAL_OR,
+    PointwiseMode::MAX_OP,
+    PointwiseMode::MIN_OP,
+    PointwiseMode::MUL,
+    PointwiseMode::NEG,
+    PointwiseMode::RECIPROCAL,
+    PointwiseMode::RELU_BWD,
+    PointwiseMode::RELU_FWD,
+    PointwiseMode::RSQRT,
+    PointwiseMode::SIGMOID_BWD,
+    PointwiseMode::SIGMOID_FWD,
+    PointwiseMode::SIN,
+    PointwiseMode::SOFTPLUS_BWD,
+    PointwiseMode::SOFTPLUS_FWD,
+    PointwiseMode::SQRT,
+    PointwiseMode::SUB,
+    PointwiseMode::SWISH_BWD,
+    PointwiseMode::SWISH_FWD,
+    PointwiseMode::TAN,
+    PointwiseMode::TANH_BWD,
+    PointwiseMode::TANH_FWD
   };
   return values;
 }
 
 inline const char * const *EnumNamesPointwiseMode() {
-  static const char * const names[3] = {
+  static const char * const names[49] = {
     "UNSET",
+    "ABS",
+    "ADD",
+    "ADD_SQUARE",
+    "BINARY_SELECT",
+    "CEIL",
+    "CMP_EQ",
+    "CMP_GE",
+    "CMP_GT",
+    "CMP_LE",
+    "CMP_LT",
+    "CMP_NEQ",
+    "DIV",
+    "ELU_BWD",
+    "ELU_FWD",
+    "ERF",
+    "EXP",
+    "FLOOR",
+    "GELU_APPROX_TANH_BWD",
+    "GELU_APPROX_TANH_FWD",
+    "GELU_BWD",
+    "GELU_FWD",
+    "GEN_INDEX",
+    "IDENTITY",
+    "LOG",
+    "LOGICAL_AND",
+    "LOGICAL_NOT",
+    "LOGICAL_OR",
+    "MAX_OP",
+    "MIN_OP",
+    "MUL",
+    "NEG",
+    "RECIPROCAL",
+    "RELU_BWD",
     "RELU_FWD",
+    "RSQRT",
+    "SIGMOID_BWD",
+    "SIGMOID_FWD",
+    "SIN",
+    "SOFTPLUS_BWD",
+    "SOFTPLUS_FWD",
+    "SQRT",
+    "SUB",
+    "SWISH_BWD",
+    "SWISH_FWD",
+    "TAN",
+    "TANH_BWD",
+    "TANH_FWD",
     nullptr
   };
   return names;
 }
 
 inline const char *EnumNamePointwiseMode(PointwiseMode e) {
-  if (::flatbuffers::IsOutRange(e, PointwiseMode_UNSET, PointwiseMode_RELU_FWD)) return "";
+  if (::flatbuffers::IsOutRange(e, PointwiseMode::UNSET, PointwiseMode::TANH_FWD)) return "";
   const size_t index = static_cast<size_t>(e);
   return EnumNamesPointwiseMode()[index];
 }
 
 struct PointwiseAttributesT : public ::flatbuffers::NativeTable {
   typedef PointwiseAttributes TableType;
-  hipdnn_sdk::data_objects::PointwiseMode operation = hipdnn_sdk::data_objects::PointwiseMode_UNSET;
+  hipdnn_sdk::data_objects::PointwiseMode operation = hipdnn_sdk::data_objects::PointwiseMode::UNSET;
   ::flatbuffers::Optional<float> relu_lower_clip = ::flatbuffers::nullopt;
   ::flatbuffers::Optional<float> relu_upper_clip = ::flatbuffers::nullopt;
   ::flatbuffers::Optional<float> relu_lower_slope = ::flatbuffers::nullopt;
@@ -198,7 +336,7 @@ struct PointwiseAttributesBuilder {
 
 inline ::flatbuffers::Offset<PointwiseAttributes> CreatePointwiseAttributes(
     ::flatbuffers::FlatBufferBuilder &_fbb,
-    hipdnn_sdk::data_objects::PointwiseMode operation = hipdnn_sdk::data_objects::PointwiseMode_UNSET,
+    hipdnn_sdk::data_objects::PointwiseMode operation = hipdnn_sdk::data_objects::PointwiseMode::UNSET,
     ::flatbuffers::Optional<float> relu_lower_clip = ::flatbuffers::nullopt,
     ::flatbuffers::Optional<float> relu_upper_clip = ::flatbuffers::nullopt,
     ::flatbuffers::Optional<float> relu_lower_slope = ::flatbuffers::nullopt,

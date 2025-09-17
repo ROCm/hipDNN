@@ -65,7 +65,9 @@ target_compile_options(hipdnn_backend PRIVATE ${HIPDNN_WARNING_COMPILE_OPTIONS})
 target_compile_definitions(hipdnn_backend PRIVATE HIPDNN_BACKEND_COMPILATION)
 target_link_libraries(hipdnn_backend PRIVATE hipdnn_backend_private)
 target_link_libraries(hipdnn_backend PRIVATE "-Xlinker --exclude-libs=ALL" ) # HIDE symbols from linked static libs
-set_target_properties(hipdnn_backend PROPERTIES CXX_VISIBILITY_PRESET hidden)
+set_target_properties(hipdnn_backend PROPERTIES 
+    CXX_VISIBILITY_PRESET hidden
+)
 
 clang_tidy_check(hipdnn_backend)
 

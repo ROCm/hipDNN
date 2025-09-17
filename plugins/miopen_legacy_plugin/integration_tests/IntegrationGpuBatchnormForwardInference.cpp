@@ -11,11 +11,12 @@
 #include <hipdnn_frontend/Graph.hpp>
 #include <hipdnn_frontend/Utilities.hpp>
 #include <hipdnn_frontend/attributes/TensorAttributes.hpp>
-#include <hipdnn_sdk/test_utilities/CpuFpReferenceImplementation.hpp>
 #include <hipdnn_sdk/test_utilities/CpuFpReferenceValidation.hpp>
 #include <hipdnn_sdk/test_utilities/TestUtilities.hpp>
 #include <hipdnn_sdk/utilities/MigratableMemory.hpp>
 #include <hipdnn_sdk/utilities/Tensor.hpp>
+
+#include <hipdnn_sdk/test_utilities/CpuFpReferenceBatchnorm.hpp>
 
 using namespace hipdnn_frontend;
 using namespace hipdnn_sdk::utilities;
@@ -98,7 +99,7 @@ protected:
         ASSERT_EQ(hipGetDevice(&_deviceId), hipSuccess);
 
         // Note: The plugin paths has to be set before we create the hipdnn handle.
-        const std::array<const char*, 1> paths = {PLUGIN_DIR};
+        const std::array<const char*, 1> paths = {PLUGIN_PATH};
         ASSERT_EQ(hipdnnSetEnginePluginPaths_ext(
                       paths.size(), paths.data(), HIPDNN_PLUGIN_LOADING_ABSOLUTE),
                   HIPDNN_STATUS_SUCCESS);
@@ -188,7 +189,6 @@ protected:
 
         if(!yTensorAttr->has_uid())
         {
-            HIPDNN_LOG_INFO("yTensorAttr does not have a UID, giving it a UID");
             yTensorAttr->set_uid(uid++);
         }
 
@@ -224,14 +224,14 @@ protected:
 
     void runCpuBatchnormFwd(Batchnorm2dTensorBundle& cpuTensorBundle)
     {
-        CpuFpReferenceImplementation<InputType, IntermediateType, IntermediateType> cpuRefImpl;
-        cpuRefImpl.batchnormFwdInference(cpuTensorBundle.xTensor,
-                                         cpuTensorBundle.scaleTensor,
-                                         cpuTensorBundle.biasTensor,
-                                         cpuTensorBundle.meanTensor,
-                                         cpuTensorBundle.varianceTensor,
-                                         cpuTensorBundle.yTensor,
-                                         1e-3);
+        CpuFpReferenceBatchnormImpl<InputType, IntermediateType>::batchnormFwdInference(
+            cpuTensorBundle.xTensor,
+            cpuTensorBundle.scaleTensor,
+            cpuTensorBundle.biasTensor,
+            cpuTensorBundle.meanTensor,
+            cpuTensorBundle.varianceTensor,
+            cpuTensorBundle.yTensor,
+            1e-3);
     }
 
     void runBatchnormTest(InputType tolerance = 1e-4f,
@@ -243,7 +243,6 @@ protected:
         auto intermediateDataType = getDataTypeEnumFromType<IntermediateType>();
 
         unsigned int seed = std::random_device{}();
-        //log the random seed in case we need to reproduce the test
         HIPDNN_LOG_INFO("Test is using {} for its random seed", seed);
 
         Batchnorm2dTensorBundle graphTensorBundle(testCase.getDims(), seed, layout);

@@ -5,9 +5,9 @@
 
 #include <utility>
 
+#include <hipdnn_frontend/Utilities.hpp>
 #include <hipdnn_frontend/backend/BackendLoggingHelpers.hpp>
 #include <hipdnn_frontend/backend/BackendWrapper.hpp>
-#include <hipdnn_sdk/logging/Logger.hpp>
 
 namespace hipdnn_frontend
 {
@@ -18,15 +18,12 @@ private:
     hipdnnBackendDescriptor_t _descriptor;
     bool _valid;
 
-    // For some reason clang isnt picking up the usage of the two variables correctly.
-    // Ive marked them as [[maybe_unused]] to avoid warnings.
-    static void logBackendError([[maybe_unused]] const std::string& errorString,
-                                [[maybe_unused]] const hipdnnStatus_t status)
+    static void logBackendError(const std::string& errorString, const hipdnnStatus_t status)
     {
         std::array<char, HIPDNN_ERROR_STRING_MAX_LENGTH> backendErrMsg;
         hipdnn_frontend::hipdnnBackend()->getLastErrorString(backendErrMsg.data(),
                                                              backendErrMsg.size());
-        HIPDNN_LOG_ERROR(
+        HIPDNN_FE_LOG_ERROR(
             "{}: {}. Backend error string: {}", errorString, status, backendErrMsg.data());
     }
 

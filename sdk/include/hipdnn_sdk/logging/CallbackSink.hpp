@@ -4,7 +4,7 @@
 #pragma once
 
 #include "CallbackTypes.h"
-#include "Formatting.hpp"
+#include "LoggingUtils.hpp"
 #include <functional>
 #include <mutex>
 #include <spdlog/async.h>

@@ -49,10 +49,10 @@ void populateTestExecutionPlan(hipdnnBackendDescriptor_t* executionPlan,
 
 flatbuffers::FlatBufferBuilder createAndPopulateBatchnormNode();
 
-void* allocateTensorMemory([[maybe_unused]] const int64_t* dims,
-                           [[maybe_unused]] size_t dimsCount,
-                           [[maybe_unused]] hipdnnBackendAttributeType_t dataType,
-                           [[maybe_unused]] bool initialize);
+void* allocateTensorMemory(const int64_t* dims,
+                           size_t dimsCount,
+                           hipdnnBackendAttributeType_t dataType,
+                           bool initialize);
 
 void freeTensorMemory(void* dataPtr);
 
@@ -72,5 +72,8 @@ void extractTensorInfoFromGraph(const flatbuffers::DetachedBuffer& serializedGra
 std::vector<std::string> getLoadedPlugins(hipdnnHandle_t handle);
 
 bool isPluginLoaded(const std::vector<std::string>& loadedPlugins, const std::string& pluginName);
+
+bool isPluginLoadedByRelativePath(const std::vector<std::string>& loadedPlugins,
+                                  const std::string& relativePath);
 
 } // namespace test_util

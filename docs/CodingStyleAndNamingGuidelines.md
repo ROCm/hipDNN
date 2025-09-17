@@ -16,13 +16,15 @@ This document defines the canonical project-wide coding and test naming conventi
 - [9. Constants](#9-constants)
 - [10. Namespaces](#10-namespaces)
 - [11. Test Naming Guidelines](#11-test-naming-guidelines)
-  - [11.1 Keywords (reserved positions)](#111-keywords-reserved-positions)
+  - [11.1 Keywords](#111-keywords)
   - [11.2 Unit Tests](#112-unit-tests)
-  - [11.3 Valid Examples](#113-valid-examples)
-  - [11.4 Invalid Examples (and why)](#114-invalid-examples-and-why)
-  - [11.5 Test Case (second parameter)](#115-test-case-second-parameter)
-  - [11.6 Test File naming](#116-test-file-naming)
-  - [11.7 Rationale](#117-rationale)
+    - [Naming Examples](#naming-examples)
+    - [File Naming](#file-naming)
+  - [11.3 Integration Tests](#113-integration-tests)
+    - [Naming Examples](#naming-examples-1)
+    - [File Naming](#file-naming-1)
+  - [11.4 Test Case Naming](#114-test-case-naming)
+  - [11.5 Rationale](#115-rationale)
 - [12. Examples](#12-examples)
   - [Class & File](#class--file)
   - [Interface](#interface)
@@ -123,63 +125,59 @@ If later you add invariants or non-trivial behavior, consider converting to a cl
 
 GoogleTest reserves underscores in test suite and test names for future expansion. Current repository names with underscores risk future incompatibility; we proactively constrain test suite naming.
 
-Rules below apply ONLY to the TestSuite name (first parameter of `TEST` / `TEST_F` / `TEST_P`). The TestCase (second parameter) can be descriptive but should still avoid the reserved keywords where noted.
+Rules below apply ONLY to the TestSuite name (first parameter of `TEST` / `TEST_F` / `TEST_P`). The TestCase (second parameter) can be descriptive but should still avoid the reserved keywords where noted.  When writing parameterized tests the prefix(parameter name is `InstantiationName`) in the `INSTANTIATE_TEST_SUITE_P` macro can be left blank or used for another purpose that make sense for that test.
 
-**Enforced Ordering & Composition (left → right):**
+### 11.1 Keywords
 
-1. Optional `Integration` prefix for integration tests.
-2. Optional `Gpu` (immediately after `Integration` if both apply) for GPU-required tests.
-3. Core Feature / Subject under test (PascalCase, no underscores).
-4. Optional Datatype token (`Bfp16`, `Fp16`, `Fp32`) at the end.
-
-Omit any category that does not apply.
-
-### 11.1 Keywords (reserved positions)
-
-- **Integration** (only for integration tests, always first if present).
-- **Gpu** (always first unless preceded by Integration).
-- **Datatypes**: Bfp16, Fp16, Fp32.
+- **Integration**: Only for integration tests, always first if present
+- **Test**: Mainly for unit tests, always first if test is not an Integration test.
+- **Gpu**: Optional after Integration or Test but before suite name if the test needs Gpu support.
+- **Datatypes**: Bfp16, Fp16, Fp32. Always last if present.
 
 ### 11.2 Unit Tests
 
-In most cases unit style tests should be named so the directly mirror the class under test.  If the class is named `MyClass`, then the test suite should be named `TestMyClass`.  In general these kinds of tests should try to avoid using anything that requires Gpu support.  This is not always possible, in the cases where Gpu support is required, the test suite should be named `GpuTestMyClass`.
+In most cases unit style tests should be named so the directly mirror the class under test.  If the class is named `MyClass`, then the test suite should be named `TestMyClass`.  In general these kinds of tests should try to avoid using anything that requires Gpu support.  This is not always possible, in the cases where Gpu support is required, the test suite should be named `TestGpuMyClass`.
 
-### 11.3 Valid Examples
+#### Naming Examples
 
 ```cpp
-IntegrationGpuConvolutionPlannerNchwFp32
-GpuTestActivationKernelNchwFp32
-GpuTestExecutionPlanBuilderFp32
-GpuTestExecutionPlanBuilderNchw
-IntegrationGraphFusion
-TestConvolutionHeuristicsFp32
-TestConvolutionHeuristics
+TestBackendLogger
+TestHandle
+TestGpuHandle
+TestBatchnormBwdPlan
+TestBatchnormBwdPlanFp32
+TestBatchnormBwdPlanFp16
 ```
 
-### 11.4 Invalid Examples (and why)
+#### File Naming
+The test file name should mirror the primary test suite it contains.  For example, if the main test in a suite is `TestMyClass`, the file should be named `TestMyClass.cpp`.  That same file may also contain `TestGpuMyClass` but it is not the primary test suite so the file name does not need to reflect it.
 
-| Name | Issue |
-|------|-------|
-| GpuIntegrationConvolution | Wrong order; Integration must precede Gpu |
-| ConvolutionFp32Nchw | Layout must precede datatype |
-| IntegrationConvolutionGpuFp32 | Gpu must directly follow Integration |
-| Gpu_Convolution | Underscore not allowed |
-| GpuConvolutionFP16 | Datatype token must match exact casing `Fp16` |
+### 11.3 Integration Tests
 
-### 11.5 Test Case (second parameter)
+See [TestingStrategy.md](testing/TestingStrategy.md) for more information on integration tests. Integration tests should be named to reflect the feature or component under test.
 
-May be richly descriptive: `HandlesLargeStride`, `RejectsMismatchedLayouts`. Avoid duplicating suite-level keywords (`Integration`, `Gpu`, datatype tokens) redundantly inside the test case name unless clarity requires.  The test case name is the preferred place to list the shape/layout variant being tested (e.g. `Nchw`, `Nhwc`).
+#### Naming Examples
 
-### 11.6 Test File Naming
+```cpp
+IntegrationGpuBatchnormBackwardNchwFp32
+IntegrationGpuBatchnormBackwardNchwBfp16
+IntegrationGpuBatchnormBackwardNchwFp16
+IntegrationGraphFusion
+```
 
-The test file name should mirror the primary test suite it contains.  For example, if the main test in a suite is `TestMyClass`, the file should be named `TestMyClass.cpp`.  That same file may also contain `GpuTestMyClass` but it is not the primary test suite so the file name does not need to reflect it.  For integration tests, the main test suite might be named `IntegrationGpuFeatureX` but have several child suites like `IntegrationGpuFeatureXFp32` and `IntegrationGpuFeatureXBfp16`. The parent suite name is the primary suite, so the file name should be `IntegrationGpuFeatureX.cpp`. 
+#### File Naming
+For integration tests, the main test suite might be named `IntegrationGpuFeatureX` but have several child suites like `IntegrationGpuFeatureXFp32` and `IntegrationGpuFeatureXBfp16`. The parent suite name is the primary suite, so the file name should be `IntegrationGpuFeatureX.cpp`. 
 
-### 11.7 Rationale
+### 11.4 Test Case Naming
+
+May be richly descriptive `HandlesLargeStride`, `RejectsMismatchedLayouts` or very simple `Correctness`, `Accuracy`. Avoid duplicating suite-level keywords (`Integration`, `Gpu`, datatype tokens) redundantly inside the test case name.  The test case name is the preferred place to list the shape/layout variant being tested (e.g. `Nchw`, `Nhwc`).  In general there should not be duplication across the suite name and test case name.  Otherwise the naming of the test case is entirely up to the developer.
+
+### 11.5 Rationale
 
 - Ordering enforces quick visual parsing (environment → scope → subject → specialization).
 - Avoid underscores to remain future-proof with gtest evolution.
 - Suffix datatype to emphasize functional context before precision variant.
-- Consistent pattern simplifies filtering (e.g. `--gtest_filter=Gpu*Fp32`).
+- Consistent pattern simplifies filtering (e.g. `--gtest_filter=*Gpu*Fp32`).
 
 ## 12. Examples
 

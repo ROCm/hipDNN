@@ -28,6 +28,16 @@ project(
     
 set(CMAKE_CXX_STANDARD 20)
 
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+
+set(HIPDNN_PLUGIN_ENGINE_SUBDIR "hipdnn_plugins/engines" CACHE STRING "Subdirectory for official hipDNN engine plugins")
+set(HIPDNN_BUILD_PLUGIN_ENGINE_DIR "${CMAKE_BINARY_DIR}/lib/${HIPDNN_PLUGIN_ENGINE_SUBDIR}" CACHE PATH "Build directory for official hipDNN engine plugins")
+set(HIPDNN_INSTALL_PLUGIN_ENGINE_DIR "lib/${HIPDNN_PLUGIN_ENGINE_SUBDIR}" CACHE STRING "Install directory for official hipDNN engine plugins (relative to CMAKE_INSTALL_PREFIX)")
+
+set(HIPDNN_TEST_PLUGIN_DIR "${CMAKE_BINARY_DIR}/lib/test_plugins" CACHE INTERNAL "Build directory for test plugins")
+
 option(HIP_DNN_BUILD_BACKEND "Build the backend code" ON)
 option(HIP_DNN_BUILD_FRONTEND "Build the frontend code" ON)
 option(HIP_DNN_SKIP_TESTS "Skips building all tests" OFF)
@@ -115,6 +125,7 @@ endif()
 add_subdirectory(tests)
 
 if(HIP_DNN_BUILD_PLUGINS)
+    file(MAKE_DIRECTORY ${HIPDNN_BUILD_PLUGIN_ENGINE_DIR})
     add_subdirectory(plugins)
 endif()
 
@@ -132,11 +143,11 @@ add_dependencies(check_ctest validate_test_names)
 
 if(CODE_COVERAGE)
     if(HIP_DNN_BUILD_PLUGINS)
-        set(MIOPEN_PLUGIN_CODE_COVERAGE_OBJECT -object ./plugins/miopen_legacy_plugin/libmiopen_legacy_plugin.so -object ./plugins/miopen_legacy_plugin/tests/miopen_legacy_plugin_tests)
+        set(MIOPEN_PLUGIN_CODE_COVERAGE_OBJECT -object ${HIPDNN_BUILD_PLUGIN_ENGINE_DIR}/libmiopen_legacy_plugin.so -object ./bin/miopen_legacy_plugin_tests)
     endif()
 
     set(CODE_COVERAGE_IGNORE_REGEX "\(.*deps.*\)|\(.*tests.*\)|\(.*sdk/include/hipdnn_sdk/data_objects.*\)|\(.*sdk/include/hipdnn_sdk/test_utilities.*\)|\(.*sdk/include/hipdnn_sdk/plugin/test_utils.*\)")
-    set(CODE_COVERAGE_OBJECTS -object ./backend/src/libhipdnn_backend.so -object ./backend/tests/hipdnn_backend_tests -object ./frontend/tests/hipdnn_frontend_tests -object ./tests/backend/public_hipdnn_backend_tests -object ./sdk/tests/hipdnn_sdk_tests ${MIOPEN_PLUGIN_CODE_COVERAGE_OBJECT})
+    set(CODE_COVERAGE_OBJECTS -object ./lib/libhipdnn_backend.so -object ./bin/hipdnn_backend_tests -object ./bin/hipdnn_frontend_tests -object ./bin/public_hipdnn_backend_tests -object ./bin/hipdnn_sdk_tests ${MIOPEN_PLUGIN_CODE_COVERAGE_OBJECT})
     
     add_custom_target(
         code_coverage

@@ -126,7 +126,7 @@ TEST(TestConvolutionFwdAttributes, PackAttributes)
     EXPECT_EQ(convAttributesFb->dilation()->Get(0), 1);
     EXPECT_EQ(convAttributesFb->dilation()->Get(1), 1);
 
-    EXPECT_EQ(convAttributesFb->conv_mode(), hipdnn_sdk::data_objects::ConvMode_CROSS_CORRELATION);
+    EXPECT_EQ(convAttributesFb->conv_mode(), hipdnn_sdk::data_objects::ConvMode::CROSS_CORRELATION);
 }
 
 TEST(TestConvolutionFwdAttributes, DefaultValues)

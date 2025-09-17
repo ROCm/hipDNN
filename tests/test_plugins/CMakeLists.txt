@@ -15,6 +15,7 @@ set(TEST_NO_APPLICABLE_ENGINES_B_PLUGIN_NAME "test_no_applicable_engines_b_plugi
 set(TEST_DUPLICATE_ID_A_PLUGIN_NAME "test_duplicate_id_a_plugin")
 set(TEST_DUPLICATE_ID_B_PLUGIN_NAME "test_duplicate_id_b_plugin")
 set(TEST_INCOMPLETE_API_PLUGIN_NAME "test_incomplete_api_plugin")
+set(TEST_GOOD_DEFAULT_PLUGIN_NAME "test_good_default_plugin")
 
 
 # Function to create a test plugin with common configuration
@@ -48,6 +49,16 @@ function(add_test_plugin target_name)
             ${HIPDNN_WARNING_COMPILE_OPTIONS}
     )
 
+    # Default to custom test plugin directory unless overridden
+    if(NOT DEFINED ${target_name}_OUTPUT_DIR)
+        set(${target_name}_OUTPUT_DIR "${HIPDNN_TEST_PLUGIN_DIR}/custom")
+    endif()
+    
+    set_target_properties(${target_name} PROPERTIES
+        LIBRARY_OUTPUT_DIRECTORY "${${target_name}_OUTPUT_DIR}"
+    )
+
+
     clang_tidy_check(${target_name})
 
 endfunction()
@@ -73,19 +84,10 @@ add_test_plugin(${TEST_DUPLICATE_ID_B_PLUGIN_NAME} TestDuplicateIdBPlugin.cpp)
 add_test_plugin(${TEST_INCOMPLETE_API_PLUGIN_NAME} TestIncompleteApiPlugin.cpp)
 
 
-# Create a duplicated default plugin that gets installed to the default plugin directory
-add_test_plugin(test_good_default_plugin TestGoodDefaultPlugin.cpp)
+# Create the default plugin in test_plugins/default
+set(test_good_default_plugin_OUTPUT_DIR "${HIPDNN_TEST_PLUGIN_DIR}/default")
+add_test_plugin(${TEST_GOOD_DEFAULT_PLUGIN_NAME} TestGoodDefaultPlugin.cpp)
 
-# Create the default plugin directory relative to where the .so is located (backend/src)
-set(DEFAULT_PLUGIN_DIR "${CMAKE_BINARY_DIR}/backend/src/hipdnn_plugins/engines")
-file(MAKE_DIRECTORY ${DEFAULT_PLUGIN_DIR})
-
-# Install the default plugin to the default plugin directory
-add_custom_command(TARGET test_good_default_plugin POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy 
-        $<TARGET_FILE:test_good_default_plugin>
-        ${DEFAULT_PLUGIN_DIR}/$<TARGET_FILE_NAME:test_good_default_plugin>
-)
 
 # Export plugin names to parent scope for use in test compilation
 set(TEST_GOOD_PLUGIN_NAME "${TEST_GOOD_PLUGIN_NAME}" PARENT_SCOPE)
@@ -95,3 +97,4 @@ set(TEST_NO_APPLICABLE_ENGINES_B_PLUGIN_NAME "${TEST_NO_APPLICABLE_ENGINES_B_PLU
 set(TEST_DUPLICATE_ID_A_PLUGIN_NAME "${TEST_DUPLICATE_ID_A_PLUGIN_NAME}" PARENT_SCOPE)
 set(TEST_DUPLICATE_ID_B_PLUGIN_NAME "${TEST_DUPLICATE_ID_B_PLUGIN_NAME}" PARENT_SCOPE)
 set(TEST_INCOMPLETE_API_PLUGIN_NAME "${TEST_INCOMPLETE_API_PLUGIN_NAME}" PARENT_SCOPE)
+set(TEST_GOOD_DEFAULT_PLUGIN_NAME "${TEST_GOOD_DEFAULT_PLUGIN_NAME}" PARENT_SCOPE)

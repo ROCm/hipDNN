@@ -185,7 +185,7 @@ TEST(TestBatchnormInferenceNode, PackNode)
 
     EXPECT_STREQ(nodeFlatbuffer->name()->c_str(), "BatchnormInference");
     EXPECT_EQ(nodeFlatbuffer->attributes_type(),
-              hipdnn_sdk::data_objects::NodeAttributes_BatchnormInferenceAttributes);
+              hipdnn_sdk::data_objects::NodeAttributes::BatchnormInferenceAttributes);
 
     auto packedAttributes = nodeFlatbuffer->attributes_as_BatchnormInferenceAttributes();
     ASSERT_NE(packedAttributes, nullptr);
@@ -250,7 +250,7 @@ TEST(TestBatchnormInferenceNode, PackNodeWithoutMeanAndInvVariance)
 
     EXPECT_STREQ(nodeFlatbuffer->name()->c_str(), "BatchnormInference");
     EXPECT_EQ(nodeFlatbuffer->attributes_type(),
-              hipdnn_sdk::data_objects::NodeAttributes_BatchnormInferenceAttributes);
+              hipdnn_sdk::data_objects::NodeAttributes::BatchnormInferenceAttributes);
 
     auto packedAttributes = nodeFlatbuffer->attributes_as_BatchnormInferenceAttributes();
     ASSERT_NE(packedAttributes, nullptr);

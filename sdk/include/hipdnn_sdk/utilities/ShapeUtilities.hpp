@@ -12,6 +12,40 @@ namespace hipdnn_sdk
 namespace utilities
 {
 
+// Check broadcastability: input can be broadcast to output
+// Broadcasting rules:
+// 1. Dimensions are compared from right to left
+// 2. Two dimensions are compatible if they are equal or input is 1 (output needs to be max size)
+// 3. The input can have fewer dimensions than output (implicit leading 1s)
+inline bool areDimensionsBroadcastCompatible(const std::vector<int64_t>& inputDims,
+                                             const std::vector<int64_t>& outputDims)
+{
+    if(inputDims == outputDims)
+    {
+        return true;
+    }
+
+    if(inputDims.size() > outputDims.size())
+    {
+        return false;
+    }
+
+    auto inputIt = inputDims.rbegin();
+    auto outputIt = outputDims.rbegin();
+
+    while(inputIt != inputDims.rend() && outputIt != outputDims.rend())
+    {
+        if(*inputIt != *outputIt && *inputIt != 1)
+        {
+            return false;
+        }
+        ++inputIt;
+        ++outputIt;
+    }
+
+    return true;
+}
+
 // Sets a default stride ordering based off the provided stride order.
 // Ex. dim = {1,2,3,4} stride_order = {3, 0, 2, 1} for NHWC
 // returns {24, 1, 8, 2}
@@ -19,6 +53,12 @@ inline std::vector<int64_t> generateStrides(const std::vector<int64_t>& dim,
                                             const std::vector<int64_t>& strideOrder)
 {
     size_t numDims = dim.size();
+
+    if(numDims > strideOrder.size())
+    {
+        throw std::invalid_argument("dims must be less than or equal stride size");
+    }
+
     std::vector<int64_t> stride(numDims, 1);
 
     // Create a mapping of stride order to dimension index

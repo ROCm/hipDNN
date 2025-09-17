@@ -49,27 +49,27 @@ bool operator!=(const Float64Value &lhs, const Float64Value &rhs);
 bool operator==(const TensorAttributesT &lhs, const TensorAttributesT &rhs);
 bool operator!=(const TensorAttributesT &lhs, const TensorAttributesT &rhs);
 
-enum TensorValue : uint8_t {
-  TensorValue_NONE = 0,
-  TensorValue_Float32Value = 1,
-  TensorValue_Float16Value = 2,
-  TensorValue_BFloat16Value = 3,
-  TensorValue_Float8Value = 4,
-  TensorValue_Int32Value = 5,
-  TensorValue_Float64Value = 6,
-  TensorValue_MIN = TensorValue_NONE,
-  TensorValue_MAX = TensorValue_Float64Value
+enum class TensorValue : uint8_t {
+  NONE = 0,
+  Float32Value = 1,
+  Float16Value = 2,
+  BFloat16Value = 3,
+  Float8Value = 4,
+  Int32Value = 5,
+  Float64Value = 6,
+  MIN = NONE,
+  MAX = Float64Value
 };
 
 inline const TensorValue (&EnumValuesTensorValue())[7] {
   static const TensorValue values[] = {
-    TensorValue_NONE,
-    TensorValue_Float32Value,
-    TensorValue_Float16Value,
-    TensorValue_BFloat16Value,
-    TensorValue_Float8Value,
-    TensorValue_Int32Value,
-    TensorValue_Float64Value
+    TensorValue::NONE,
+    TensorValue::Float32Value,
+    TensorValue::Float16Value,
+    TensorValue::BFloat16Value,
+    TensorValue::Float8Value,
+    TensorValue::Int32Value,
+    TensorValue::Float64Value
   };
   return values;
 }
@@ -89,74 +89,74 @@ inline const char * const *EnumNamesTensorValue() {
 }
 
 inline const char *EnumNameTensorValue(TensorValue e) {
-  if (::flatbuffers::IsOutRange(e, TensorValue_NONE, TensorValue_Float64Value)) return "";
+  if (::flatbuffers::IsOutRange(e, TensorValue::NONE, TensorValue::Float64Value)) return "";
   const size_t index = static_cast<size_t>(e);
   return EnumNamesTensorValue()[index];
 }
 
 template<typename T> struct TensorValueTraits {
-  static const TensorValue enum_value = TensorValue_NONE;
+  static const TensorValue enum_value = TensorValue::NONE;
 };
 
 template<> struct TensorValueTraits<hipdnn_sdk::data_objects::Float32Value> {
-  static const TensorValue enum_value = TensorValue_Float32Value;
+  static const TensorValue enum_value = TensorValue::Float32Value;
 };
 
 template<> struct TensorValueTraits<hipdnn_sdk::data_objects::Float16Value> {
-  static const TensorValue enum_value = TensorValue_Float16Value;
+  static const TensorValue enum_value = TensorValue::Float16Value;
 };
 
 template<> struct TensorValueTraits<hipdnn_sdk::data_objects::BFloat16Value> {
-  static const TensorValue enum_value = TensorValue_BFloat16Value;
+  static const TensorValue enum_value = TensorValue::BFloat16Value;
 };
 
 template<> struct TensorValueTraits<hipdnn_sdk::data_objects::Float8Value> {
-  static const TensorValue enum_value = TensorValue_Float8Value;
+  static const TensorValue enum_value = TensorValue::Float8Value;
 };
 
 template<> struct TensorValueTraits<hipdnn_sdk::data_objects::Int32Value> {
-  static const TensorValue enum_value = TensorValue_Int32Value;
+  static const TensorValue enum_value = TensorValue::Int32Value;
 };
 
 template<> struct TensorValueTraits<hipdnn_sdk::data_objects::Float64Value> {
-  static const TensorValue enum_value = TensorValue_Float64Value;
+  static const TensorValue enum_value = TensorValue::Float64Value;
 };
 
 template<typename T> struct TensorValueUnionTraits {
-  static const TensorValue enum_value = TensorValue_NONE;
+  static const TensorValue enum_value = TensorValue::NONE;
 };
 
 template<> struct TensorValueUnionTraits<hipdnn_sdk::data_objects::Float32Value> {
-  static const TensorValue enum_value = TensorValue_Float32Value;
+  static const TensorValue enum_value = TensorValue::Float32Value;
 };
 
 template<> struct TensorValueUnionTraits<hipdnn_sdk::data_objects::Float16Value> {
-  static const TensorValue enum_value = TensorValue_Float16Value;
+  static const TensorValue enum_value = TensorValue::Float16Value;
 };
 
 template<> struct TensorValueUnionTraits<hipdnn_sdk::data_objects::BFloat16Value> {
-  static const TensorValue enum_value = TensorValue_BFloat16Value;
+  static const TensorValue enum_value = TensorValue::BFloat16Value;
 };
 
 template<> struct TensorValueUnionTraits<hipdnn_sdk::data_objects::Float8Value> {
-  static const TensorValue enum_value = TensorValue_Float8Value;
+  static const TensorValue enum_value = TensorValue::Float8Value;
 };
 
 template<> struct TensorValueUnionTraits<hipdnn_sdk::data_objects::Int32Value> {
-  static const TensorValue enum_value = TensorValue_Int32Value;
+  static const TensorValue enum_value = TensorValue::Int32Value;
 };
 
 template<> struct TensorValueUnionTraits<hipdnn_sdk::data_objects::Float64Value> {
-  static const TensorValue enum_value = TensorValue_Float64Value;
+  static const TensorValue enum_value = TensorValue::Float64Value;
 };
 
 struct TensorValueUnion {
   TensorValue type;
   void *value;
 
-  TensorValueUnion() : type(TensorValue_NONE), value(nullptr) {}
+  TensorValueUnion() : type(TensorValue::NONE), value(nullptr) {}
   TensorValueUnion(TensorValueUnion&& u) FLATBUFFERS_NOEXCEPT :
-    type(TensorValue_NONE), value(nullptr)
+    type(TensorValue::NONE), value(nullptr)
     { std::swap(type, u.type); std::swap(value, u.value); }
   TensorValueUnion(const TensorValueUnion &);
   TensorValueUnion &operator=(const TensorValueUnion &u)
@@ -172,7 +172,7 @@ struct TensorValueUnion {
     typedef typename std::remove_reference<T>::type RT;
     Reset();
     type = TensorValueUnionTraits<RT>::enum_value;
-    if (type != TensorValue_NONE) {
+    if (type != TensorValue::NONE) {
       value = new RT(std::forward<T>(val));
     }
   }
@@ -181,51 +181,51 @@ struct TensorValueUnion {
   ::flatbuffers::Offset<void> Pack(::flatbuffers::FlatBufferBuilder &_fbb, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr) const;
 
   hipdnn_sdk::data_objects::Float32Value *AsFloat32Value() {
-    return type == TensorValue_Float32Value ?
+    return type == TensorValue::Float32Value ?
       reinterpret_cast<hipdnn_sdk::data_objects::Float32Value *>(value) : nullptr;
   }
   const hipdnn_sdk::data_objects::Float32Value *AsFloat32Value() const {
-    return type == TensorValue_Float32Value ?
+    return type == TensorValue::Float32Value ?
       reinterpret_cast<const hipdnn_sdk::data_objects::Float32Value *>(value) : nullptr;
   }
   hipdnn_sdk::data_objects::Float16Value *AsFloat16Value() {
-    return type == TensorValue_Float16Value ?
+    return type == TensorValue::Float16Value ?
       reinterpret_cast<hipdnn_sdk::data_objects::Float16Value *>(value) : nullptr;
   }
   const hipdnn_sdk::data_objects::Float16Value *AsFloat16Value() const {
-    return type == TensorValue_Float16Value ?
+    return type == TensorValue::Float16Value ?
       reinterpret_cast<const hipdnn_sdk::data_objects::Float16Value *>(value) : nullptr;
   }
   hipdnn_sdk::data_objects::BFloat16Value *AsBFloat16Value() {
-    return type == TensorValue_BFloat16Value ?
+    return type == TensorValue::BFloat16Value ?
       reinterpret_cast<hipdnn_sdk::data_objects::BFloat16Value *>(value) : nullptr;
   }
   const hipdnn_sdk::data_objects::BFloat16Value *AsBFloat16Value() const {
-    return type == TensorValue_BFloat16Value ?
+    return type == TensorValue::BFloat16Value ?
       reinterpret_cast<const hipdnn_sdk::data_objects::BFloat16Value *>(value) : nullptr;
   }
   hipdnn_sdk::data_objects::Float8Value *AsFloat8Value() {
-    return type == TensorValue_Float8Value ?
+    return type == TensorValue::Float8Value ?
       reinterpret_cast<hipdnn_sdk::data_objects::Float8Value *>(value) : nullptr;
   }
   const hipdnn_sdk::data_objects::Float8Value *AsFloat8Value() const {
-    return type == TensorValue_Float8Value ?
+    return type == TensorValue::Float8Value ?
       reinterpret_cast<const hipdnn_sdk::data_objects::Float8Value *>(value) : nullptr;
   }
   hipdnn_sdk::data_objects::Int32Value *AsInt32Value() {
-    return type == TensorValue_Int32Value ?
+    return type == TensorValue::Int32Value ?
       reinterpret_cast<hipdnn_sdk::data_objects::Int32Value *>(value) : nullptr;
   }
   const hipdnn_sdk::data_objects::Int32Value *AsInt32Value() const {
-    return type == TensorValue_Int32Value ?
+    return type == TensorValue::Int32Value ?
       reinterpret_cast<const hipdnn_sdk::data_objects::Int32Value *>(value) : nullptr;
   }
   hipdnn_sdk::data_objects::Float64Value *AsFloat64Value() {
-    return type == TensorValue_Float64Value ?
+    return type == TensorValue::Float64Value ?
       reinterpret_cast<hipdnn_sdk::data_objects::Float64Value *>(value) : nullptr;
   }
   const hipdnn_sdk::data_objects::Float64Value *AsFloat64Value() const {
-    return type == TensorValue_Float64Value ?
+    return type == TensorValue::Float64Value ?
       reinterpret_cast<const hipdnn_sdk::data_objects::Float64Value *>(value) : nullptr;
   }
 };
@@ -234,30 +234,30 @@ struct TensorValueUnion {
 inline bool operator==(const TensorValueUnion &lhs, const TensorValueUnion &rhs) {
   if (lhs.type != rhs.type) return false;
   switch (lhs.type) {
-    case TensorValue_NONE: {
+    case TensorValue::NONE: {
       return true;
     }
-    case TensorValue_Float32Value: {
+    case TensorValue::Float32Value: {
       return *(reinterpret_cast<const hipdnn_sdk::data_objects::Float32Value *>(lhs.value)) ==
              *(reinterpret_cast<const hipdnn_sdk::data_objects::Float32Value *>(rhs.value));
     }
-    case TensorValue_Float16Value: {
+    case TensorValue::Float16Value: {
       return *(reinterpret_cast<const hipdnn_sdk::data_objects::Float16Value *>(lhs.value)) ==
              *(reinterpret_cast<const hipdnn_sdk::data_objects::Float16Value *>(rhs.value));
     }
-    case TensorValue_BFloat16Value: {
+    case TensorValue::BFloat16Value: {
       return *(reinterpret_cast<const hipdnn_sdk::data_objects::BFloat16Value *>(lhs.value)) ==
              *(reinterpret_cast<const hipdnn_sdk::data_objects::BFloat16Value *>(rhs.value));
     }
-    case TensorValue_Float8Value: {
+    case TensorValue::Float8Value: {
       return *(reinterpret_cast<const hipdnn_sdk::data_objects::Float8Value *>(lhs.value)) ==
              *(reinterpret_cast<const hipdnn_sdk::data_objects::Float8Value *>(rhs.value));
     }
-    case TensorValue_Int32Value: {
+    case TensorValue::Int32Value: {
       return *(reinterpret_cast<const hipdnn_sdk::data_objects::Int32Value *>(lhs.value)) ==
              *(reinterpret_cast<const hipdnn_sdk::data_objects::Int32Value *>(rhs.value));
     }
-    case TensorValue_Float64Value: {
+    case TensorValue::Float64Value: {
       return *(reinterpret_cast<const hipdnn_sdk::data_objects::Float64Value *>(lhs.value)) ==
              *(reinterpret_cast<const hipdnn_sdk::data_objects::Float64Value *>(rhs.value));
     }
@@ -272,7 +272,7 @@ inline bool operator!=(const TensorValueUnion &lhs, const TensorValueUnion &rhs)
 }
 
 bool VerifyTensorValue(::flatbuffers::Verifier &verifier, const void *obj, TensorValue type);
-bool VerifyTensorValueVector(::flatbuffers::Verifier &verifier, const ::flatbuffers::Vector<::flatbuffers::Offset<void>> *values, const ::flatbuffers::Vector<uint8_t> *types);
+bool VerifyTensorValueVector(::flatbuffers::Verifier &verifier, const ::flatbuffers::Vector<::flatbuffers::Offset<void>> *values, const ::flatbuffers::Vector<TensorValue> *types);
 
 FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(4) Float32Value FLATBUFFERS_FINAL_CLASS {
  private:
@@ -458,7 +458,7 @@ struct TensorAttributesT : public ::flatbuffers::NativeTable {
   typedef TensorAttributes TableType;
   int64_t uid = 0;
   std::string name{};
-  hipdnn_sdk::data_objects::DataType data_type = hipdnn_sdk::data_objects::DataType_UNSET;
+  hipdnn_sdk::data_objects::DataType data_type = hipdnn_sdk::data_objects::DataType::UNSET;
   std::vector<int64_t> strides{};
   std::vector<int64_t> dims{};
   bool virtual_ = false;
@@ -522,22 +522,22 @@ struct TensorAttributes FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   }
   template<typename T> const T *value_as() const;
   const hipdnn_sdk::data_objects::Float32Value *value_as_Float32Value() const {
-    return value_type() == hipdnn_sdk::data_objects::TensorValue_Float32Value ? static_cast<const hipdnn_sdk::data_objects::Float32Value *>(value()) : nullptr;
+    return value_type() == hipdnn_sdk::data_objects::TensorValue::Float32Value ? static_cast<const hipdnn_sdk::data_objects::Float32Value *>(value()) : nullptr;
   }
   const hipdnn_sdk::data_objects::Float16Value *value_as_Float16Value() const {
-    return value_type() == hipdnn_sdk::data_objects::TensorValue_Float16Value ? static_cast<const hipdnn_sdk::data_objects::Float16Value *>(value()) : nullptr;
+    return value_type() == hipdnn_sdk::data_objects::TensorValue::Float16Value ? static_cast<const hipdnn_sdk::data_objects::Float16Value *>(value()) : nullptr;
   }
   const hipdnn_sdk::data_objects::BFloat16Value *value_as_BFloat16Value() const {
-    return value_type() == hipdnn_sdk::data_objects::TensorValue_BFloat16Value ? static_cast<const hipdnn_sdk::data_objects::BFloat16Value *>(value()) : nullptr;
+    return value_type() == hipdnn_sdk::data_objects::TensorValue::BFloat16Value ? static_cast<const hipdnn_sdk::data_objects::BFloat16Value *>(value()) : nullptr;
   }
   const hipdnn_sdk::data_objects::Float8Value *value_as_Float8Value() const {
-    return value_type() == hipdnn_sdk::data_objects::TensorValue_Float8Value ? static_cast<const hipdnn_sdk::data_objects::Float8Value *>(value()) : nullptr;
+    return value_type() == hipdnn_sdk::data_objects::TensorValue::Float8Value ? static_cast<const hipdnn_sdk::data_objects::Float8Value *>(value()) : nullptr;
   }
   const hipdnn_sdk::data_objects::Int32Value *value_as_Int32Value() const {
-    return value_type() == hipdnn_sdk::data_objects::TensorValue_Int32Value ? static_cast<const hipdnn_sdk::data_objects::Int32Value *>(value()) : nullptr;
+    return value_type() == hipdnn_sdk::data_objects::TensorValue::Int32Value ? static_cast<const hipdnn_sdk::data_objects::Int32Value *>(value()) : nullptr;
   }
   const hipdnn_sdk::data_objects::Float64Value *value_as_Float64Value() const {
-    return value_type() == hipdnn_sdk::data_objects::TensorValue_Float64Value ? static_cast<const hipdnn_sdk::data_objects::Float64Value *>(value()) : nullptr;
+    return value_type() == hipdnn_sdk::data_objects::TensorValue::Float64Value ? static_cast<const hipdnn_sdk::data_objects::Float64Value *>(value()) : nullptr;
   }
   void *mutable_value() {
     return GetPointer<void *>(VT_VALUE);
@@ -630,11 +630,11 @@ inline ::flatbuffers::Offset<TensorAttributes> CreateTensorAttributes(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     int64_t uid = 0,
     ::flatbuffers::Offset<::flatbuffers::String> name = 0,
-    hipdnn_sdk::data_objects::DataType data_type = hipdnn_sdk::data_objects::DataType_UNSET,
+    hipdnn_sdk::data_objects::DataType data_type = hipdnn_sdk::data_objects::DataType::UNSET,
     ::flatbuffers::Offset<::flatbuffers::Vector<int64_t>> strides = 0,
     ::flatbuffers::Offset<::flatbuffers::Vector<int64_t>> dims = 0,
     bool virtual_ = false,
-    hipdnn_sdk::data_objects::TensorValue value_type = hipdnn_sdk::data_objects::TensorValue_NONE,
+    hipdnn_sdk::data_objects::TensorValue value_type = hipdnn_sdk::data_objects::TensorValue::NONE,
     ::flatbuffers::Offset<void> value = 0) {
   TensorAttributesBuilder builder_(_fbb);
   builder_.add_uid(uid);
@@ -652,11 +652,11 @@ inline ::flatbuffers::Offset<TensorAttributes> CreateTensorAttributesDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     int64_t uid = 0,
     const char *name = nullptr,
-    hipdnn_sdk::data_objects::DataType data_type = hipdnn_sdk::data_objects::DataType_UNSET,
+    hipdnn_sdk::data_objects::DataType data_type = hipdnn_sdk::data_objects::DataType::UNSET,
     const std::vector<int64_t> *strides = nullptr,
     const std::vector<int64_t> *dims = nullptr,
     bool virtual_ = false,
-    hipdnn_sdk::data_objects::TensorValue value_type = hipdnn_sdk::data_objects::TensorValue_NONE,
+    hipdnn_sdk::data_objects::TensorValue value_type = hipdnn_sdk::data_objects::TensorValue::NONE,
     ::flatbuffers::Offset<void> value = 0) {
   auto name__ = name ? _fbb.CreateString(name) : 0;
   auto strides__ = strides ? _fbb.CreateVector<int64_t>(*strides) : 0;
@@ -741,32 +741,32 @@ inline ::flatbuffers::Offset<TensorAttributes> CreateTensorAttributes(::flatbuff
 
 inline bool VerifyTensorValue(::flatbuffers::Verifier &verifier, const void *obj, TensorValue type) {
   switch (type) {
-    case TensorValue_NONE: {
+    case TensorValue::NONE: {
       return true;
     }
-    case TensorValue_Float32Value: {
+    case TensorValue::Float32Value: {
       return verifier.VerifyField<hipdnn_sdk::data_objects::Float32Value>(static_cast<const uint8_t *>(obj), 0, 4);
     }
-    case TensorValue_Float16Value: {
+    case TensorValue::Float16Value: {
       return verifier.VerifyField<hipdnn_sdk::data_objects::Float16Value>(static_cast<const uint8_t *>(obj), 0, 4);
     }
-    case TensorValue_BFloat16Value: {
+    case TensorValue::BFloat16Value: {
       return verifier.VerifyField<hipdnn_sdk::data_objects::BFloat16Value>(static_cast<const uint8_t *>(obj), 0, 4);
     }
-    case TensorValue_Float8Value: {
+    case TensorValue::Float8Value: {
       return verifier.VerifyField<hipdnn_sdk::data_objects::Float8Value>(static_cast<const uint8_t *>(obj), 0, 1);
     }
-    case TensorValue_Int32Value: {
+    case TensorValue::Int32Value: {
       return verifier.VerifyField<hipdnn_sdk::data_objects::Int32Value>(static_cast<const uint8_t *>(obj), 0, 4);
     }
-    case TensorValue_Float64Value: {
+    case TensorValue::Float64Value: {
       return verifier.VerifyField<hipdnn_sdk::data_objects::Float64Value>(static_cast<const uint8_t *>(obj), 0, 8);
     }
     default: return true;
   }
 }
 
-inline bool VerifyTensorValueVector(::flatbuffers::Verifier &verifier, const ::flatbuffers::Vector<::flatbuffers::Offset<void>> *values, const ::flatbuffers::Vector<uint8_t> *types) {
+inline bool VerifyTensorValueVector(::flatbuffers::Verifier &verifier, const ::flatbuffers::Vector<::flatbuffers::Offset<void>> *values, const ::flatbuffers::Vector<TensorValue> *types) {
   if (!values || !types) return !values && !types;
   if (values->size() != types->size()) return false;
   for (::flatbuffers::uoffset_t i = 0; i < values->size(); ++i) {
@@ -781,27 +781,27 @@ inline bool VerifyTensorValueVector(::flatbuffers::Verifier &verifier, const ::f
 inline void *TensorValueUnion::UnPack(const void *obj, TensorValue type, const ::flatbuffers::resolver_function_t *resolver) {
   (void)resolver;
   switch (type) {
-    case TensorValue_Float32Value: {
+    case TensorValue::Float32Value: {
       auto ptr = reinterpret_cast<const hipdnn_sdk::data_objects::Float32Value *>(obj);
       return new hipdnn_sdk::data_objects::Float32Value(*ptr);
     }
-    case TensorValue_Float16Value: {
+    case TensorValue::Float16Value: {
       auto ptr = reinterpret_cast<const hipdnn_sdk::data_objects::Float16Value *>(obj);
       return new hipdnn_sdk::data_objects::Float16Value(*ptr);
     }
-    case TensorValue_BFloat16Value: {
+    case TensorValue::BFloat16Value: {
       auto ptr = reinterpret_cast<const hipdnn_sdk::data_objects::BFloat16Value *>(obj);
       return new hipdnn_sdk::data_objects::BFloat16Value(*ptr);
     }
-    case TensorValue_Float8Value: {
+    case TensorValue::Float8Value: {
       auto ptr = reinterpret_cast<const hipdnn_sdk::data_objects::Float8Value *>(obj);
       return new hipdnn_sdk::data_objects::Float8Value(*ptr);
     }
-    case TensorValue_Int32Value: {
+    case TensorValue::Int32Value: {
       auto ptr = reinterpret_cast<const hipdnn_sdk::data_objects::Int32Value *>(obj);
       return new hipdnn_sdk::data_objects::Int32Value(*ptr);
     }
-    case TensorValue_Float64Value: {
+    case TensorValue::Float64Value: {
       auto ptr = reinterpret_cast<const hipdnn_sdk::data_objects::Float64Value *>(obj);
       return new hipdnn_sdk::data_objects::Float64Value(*ptr);
     }
@@ -812,27 +812,27 @@ inline void *TensorValueUnion::UnPack(const void *obj, TensorValue type, const :
 inline ::flatbuffers::Offset<void> TensorValueUnion::Pack(::flatbuffers::FlatBufferBuilder &_fbb, const ::flatbuffers::rehasher_function_t *_rehasher) const {
   (void)_rehasher;
   switch (type) {
-    case TensorValue_Float32Value: {
+    case TensorValue::Float32Value: {
       auto ptr = reinterpret_cast<const hipdnn_sdk::data_objects::Float32Value *>(value);
       return _fbb.CreateStruct(*ptr).Union();
     }
-    case TensorValue_Float16Value: {
+    case TensorValue::Float16Value: {
       auto ptr = reinterpret_cast<const hipdnn_sdk::data_objects::Float16Value *>(value);
       return _fbb.CreateStruct(*ptr).Union();
     }
-    case TensorValue_BFloat16Value: {
+    case TensorValue::BFloat16Value: {
       auto ptr = reinterpret_cast<const hipdnn_sdk::data_objects::BFloat16Value *>(value);
       return _fbb.CreateStruct(*ptr).Union();
     }
-    case TensorValue_Float8Value: {
+    case TensorValue::Float8Value: {
       auto ptr = reinterpret_cast<const hipdnn_sdk::data_objects::Float8Value *>(value);
       return _fbb.CreateStruct(*ptr).Union();
     }
-    case TensorValue_Int32Value: {
+    case TensorValue::Int32Value: {
       auto ptr = reinterpret_cast<const hipdnn_sdk::data_objects::Int32Value *>(value);
       return _fbb.CreateStruct(*ptr).Union();
     }
-    case TensorValue_Float64Value: {
+    case TensorValue::Float64Value: {
       auto ptr = reinterpret_cast<const hipdnn_sdk::data_objects::Float64Value *>(value);
       return _fbb.CreateStruct(*ptr).Union();
     }
@@ -842,27 +842,27 @@ inline ::flatbuffers::Offset<void> TensorValueUnion::Pack(::flatbuffers::FlatBuf
 
 inline TensorValueUnion::TensorValueUnion(const TensorValueUnion &u) : type(u.type), value(nullptr) {
   switch (type) {
-    case TensorValue_Float32Value: {
+    case TensorValue::Float32Value: {
       value = new hipdnn_sdk::data_objects::Float32Value(*reinterpret_cast<hipdnn_sdk::data_objects::Float32Value *>(u.value));
       break;
     }
-    case TensorValue_Float16Value: {
+    case TensorValue::Float16Value: {
       value = new hipdnn_sdk::data_objects::Float16Value(*reinterpret_cast<hipdnn_sdk::data_objects::Float16Value *>(u.value));
       break;
     }
-    case TensorValue_BFloat16Value: {
+    case TensorValue::BFloat16Value: {
       value = new hipdnn_sdk::data_objects::BFloat16Value(*reinterpret_cast<hipdnn_sdk::data_objects::BFloat16Value *>(u.value));
       break;
     }
-    case TensorValue_Float8Value: {
+    case TensorValue::Float8Value: {
       value = new hipdnn_sdk::data_objects::Float8Value(*reinterpret_cast<hipdnn_sdk::data_objects::Float8Value *>(u.value));
       break;
     }
-    case TensorValue_Int32Value: {
+    case TensorValue::Int32Value: {
       value = new hipdnn_sdk::data_objects::Int32Value(*reinterpret_cast<hipdnn_sdk::data_objects::Int32Value *>(u.value));
       break;
     }
-    case TensorValue_Float64Value: {
+    case TensorValue::Float64Value: {
       value = new hipdnn_sdk::data_objects::Float64Value(*reinterpret_cast<hipdnn_sdk::data_objects::Float64Value *>(u.value));
       break;
     }
@@ -873,32 +873,32 @@ inline TensorValueUnion::TensorValueUnion(const TensorValueUnion &u) : type(u.ty
 
 inline void TensorValueUnion::Reset() {
   switch (type) {
-    case TensorValue_Float32Value: {
+    case TensorValue::Float32Value: {
       auto ptr = reinterpret_cast<hipdnn_sdk::data_objects::Float32Value *>(value);
       delete ptr;
       break;
     }
-    case TensorValue_Float16Value: {
+    case TensorValue::Float16Value: {
       auto ptr = reinterpret_cast<hipdnn_sdk::data_objects::Float16Value *>(value);
       delete ptr;
       break;
     }
-    case TensorValue_BFloat16Value: {
+    case TensorValue::BFloat16Value: {
       auto ptr = reinterpret_cast<hipdnn_sdk::data_objects::BFloat16Value *>(value);
       delete ptr;
       break;
     }
-    case TensorValue_Float8Value: {
+    case TensorValue::Float8Value: {
       auto ptr = reinterpret_cast<hipdnn_sdk::data_objects::Float8Value *>(value);
       delete ptr;
       break;
     }
-    case TensorValue_Int32Value: {
+    case TensorValue::Int32Value: {
       auto ptr = reinterpret_cast<hipdnn_sdk::data_objects::Int32Value *>(value);
       delete ptr;
       break;
     }
-    case TensorValue_Float64Value: {
+    case TensorValue::Float64Value: {
       auto ptr = reinterpret_cast<hipdnn_sdk::data_objects::Float64Value *>(value);
       delete ptr;
       break;
@@ -906,7 +906,7 @@ inline void TensorValueUnion::Reset() {
     default: break;
   }
   value = nullptr;
-  type = TensorValue_NONE;
+  type = TensorValue::NONE;
 }
 
 }  // namespace data_objects
