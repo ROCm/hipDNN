@@ -41,6 +41,8 @@ add_executable(hipdnn_sdk_tests
     test_utilities/TestScopedEnvironmentVariableSetter.cpp
     test_utilities/TestLoggingUtils.cpp
     test_utilities/TestCpuReferenceGraphExecutor.cpp
+    test_utilities/TestTensorVariant.cpp
+
 
 )
 

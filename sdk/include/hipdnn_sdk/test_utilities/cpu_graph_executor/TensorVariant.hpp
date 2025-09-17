@@ -16,14 +16,14 @@ namespace hipdnn_sdk
 namespace test_utilities
 {
 
-using TensorVariant
-    = std::variant<std::unique_ptr<TensorBase<float>>, std::unique_ptr<TensorBase<half>>>;
+using TensorVariant = std::variant<std::unique_ptr<hipdnn_sdk::utilities::TensorBase<float>>,
+                                   std::unique_ptr<hipdnn_sdk::utilities::TensorBase<half>>>;
 
 template <typename T>
-static std::unique_ptr<TensorBase<T>> createHostOnlyShallowTensor(
+static std::unique_ptr<hipdnn_sdk::utilities::TensorBase<T>> createHostOnlyShallowTensor(
     void* ptr, const std::vector<int64_t>& dims, const std::vector<int64_t>& strides)
 {
-    return std::make_unique<ShallowTensor<T>>(ptr, dims, strides);
+    return std::make_unique<hipdnn_sdk::utilities::ShallowTensor<T>>(ptr, dims, strides);
 }
 
 static TensorVariant
