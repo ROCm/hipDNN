@@ -8,6 +8,7 @@
 #include <iostream>
 #include <numeric>
 #include <random>
+#include <span>
 #include <vector>
 
 namespace hipdnn_sdk
@@ -113,11 +114,34 @@ public:
     {
     }
 
+    Tensor(const std::vector<int64_t>& dims, const TensorLayout& layout, std::span<const T> values)
+        : Tensor(dims, layout)
+    {
+        std::memcpy(_memory.hostData(), values.data(), values.size_bytes());
+    }
+
+    Tensor(const std::vector<int64_t>& dims,
+           const TensorLayout& layout,
+           std::vector<T> const& values)
+        : Tensor(dims, layout, std::span(values.data(), values.size()))
+    {
+    }
+
     Tensor(const Tensor&) = delete;
     Tensor& operator=(const Tensor&) = delete;
 
     Tensor(Tensor&&) = default;
     Tensor& operator=(Tensor&&) = default;
+
+    void setData(std::span<T> values)
+    {
+        std::memcpy(_memory.hostData(), values.data(), values.size_bytes());
+    }
+
+    void setData(std::vector<T> const& values)
+    {
+        setData(values);
+    }
 
     const std::vector<int64_t>& dims() const override
     {
