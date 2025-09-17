@@ -30,6 +30,8 @@ add_executable(hipdnn_sdk_tests
     utilities/TestShapeUtilities.cpp
     utilities/TestTensor.cpp
     utilities/TestPlatformUtils.cpp
+    utilities/TestShallowHostOnlyMigratableMemory.cpp
+    utilities/TestShallowTensor.cpp
     test_utilities/TestCpuFpReferenceBatchnorm.cpp
     test_utilities/TestCpuFpReferenceConvolution.cpp
     test_utilities/TestCpuFpReferenceUtilities.cpp
@@ -39,6 +41,7 @@ add_executable(hipdnn_sdk_tests
     test_utilities/TestScopedEnvironmentVariableSetter.cpp
     test_utilities/TestLoggingUtils.cpp
     test_utilities/TestCpuReferenceGraphExecutor.cpp
+
 )
 
 target_compile_definitions(hipdnn_sdk_tests PRIVATE
