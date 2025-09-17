@@ -253,7 +253,7 @@ protected:
             cpuTensorBundle.dbiasTensor);
     }
 
-    void runBatchnormTest(InputType tolerance = 1e4f,
+    void runBatchnormTest(InputType tolerance = 1e-4f,
                           const TensorLayout& layout = TensorLayout::NCHW)
     {
         Batchnorm2dTestCase testCase = GetParam();

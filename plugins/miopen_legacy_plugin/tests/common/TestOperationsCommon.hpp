@@ -70,15 +70,15 @@ struct ConvTestCase
 
         // Calculate output dimensions based on input dimensions and convolution parameters
         auto n = _xDims[N];
-        auto c_out = _wDims[N];
-        std::vector<int64_t> outputDims = {n, c_out};
+        auto cOut = _wDims[N];
+        std::vector<int64_t> outputDims = {n, cOut};
 
         for(size_t i = 0; i < spatialDims; ++i)
         {
             auto paddedInputSize = _xDims[2 + i] + _convPrePadding[i] + _convPostPadding[i];
             auto effectiveKernelSize = _convDilation[i] * (_wDims[2 + i] - 1) + 1;
-            auto dim_out = (paddedInputSize - effectiveKernelSize) / _convStride[i] + 1;
-            outputDims.push_back(dim_out);
+            auto dimOut = ((paddedInputSize - effectiveKernelSize) / _convStride[i]) + 1;
+            outputDims.push_back(dimOut);
         }
 
         _yDims = outputDims;
@@ -158,6 +158,9 @@ inline std::vector<ConvTestCase> getConvTestCases()
 {
     return {
         {{1, 20, 20, 20}, {1, 1, 3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}},
+        {{1, 20, 20, 20}, {1, 1, 3, 3}, {0, 0}, {0, 0}, {1, 1}, {1, 1}},
+        {{1, 20, 20, 20}, {1, 1, 3, 3}, {1, 1}, {1, 1}, {2, 2}, {1, 1}},
+        {{1, 20, 20, 20}, {1, 1, 3, 3}, {2, 2}, {2, 2}, {1, 1}, {2, 2}},
     };
 }
 

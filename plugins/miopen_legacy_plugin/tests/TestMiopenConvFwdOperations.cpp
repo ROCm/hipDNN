@@ -182,37 +182,37 @@ public:
 TEST_P(TestGpuMiopenConvFwdExecuteGraphNchwFp32, Correctness)
 {
     const ConvTestCase& testCase = GetParam();
-    runConvFwdGraph(testCase, hipdnn_sdk::data_objects::DataType::DataType_FLOAT, 4e-3f);
+    runConvFwdGraph(testCase, hipdnn_sdk::data_objects::DataType::DataType_FLOAT, 1e-6f);
 }
 
 TEST_P(TestGpuMiopenConvFwdExecuteGraphNchwBfp16, Correctness)
 {
     const ConvTestCase& testCase = GetParam();
-    runConvFwdGraph(testCase, hipdnn_sdk::data_objects::DataType::DataType_BFLOAT16, 4e-3_bf);
+    runConvFwdGraph(testCase, hipdnn_sdk::data_objects::DataType::DataType_BFLOAT16, 1e-4_bf);
 }
 
 TEST_P(TestGpuMiopenConvFwdExecuteGraphNchwFp16, Correctness)
 {
     const ConvTestCase& testCase = GetParam();
-    runConvFwdGraph(testCase, hipdnn_sdk::data_objects::DataType::DataType_HALF, 4e-3_h);
+    runConvFwdGraph(testCase, hipdnn_sdk::data_objects::DataType::DataType_HALF, 1e-4_h);
 }
 
 TEST_P(TestGpuMiopenConvFwdExecuteGraphNhwcFp32, Correctness)
 {
     const ConvTestCase& testCase = GetParam();
-    runConvFwdGraph(testCase, hipdnn_sdk::data_objects::DataType::DataType_FLOAT, 4e-3f);
+    runConvFwdGraph(testCase, hipdnn_sdk::data_objects::DataType::DataType_FLOAT, 1e-6f);
 }
 
 TEST_P(TestGpuMiopenConvFwdExecuteGraphNhwcBfp16, Correctness)
 {
     const ConvTestCase& testCase = GetParam();
-    runConvFwdGraph(testCase, hipdnn_sdk::data_objects::DataType::DataType_BFLOAT16, 4e-3_bf);
+    runConvFwdGraph(testCase, hipdnn_sdk::data_objects::DataType::DataType_BFLOAT16, 1e-4_bf);
 }
 
 TEST_P(TestGpuMiopenConvFwdExecuteGraphNhwcFp16, Correctness)
 {
     const ConvTestCase& testCase = GetParam();
-    runConvFwdGraph(testCase, hipdnn_sdk::data_objects::DataType::DataType_HALF, 4e-3_h);
+    runConvFwdGraph(testCase, hipdnn_sdk::data_objects::DataType::DataType_HALF, 1e-4_h);
 }
 
 INSTANTIATE_TEST_SUITE_P(,
