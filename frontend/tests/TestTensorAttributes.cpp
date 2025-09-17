@@ -120,7 +120,7 @@ TEST(TestTensorAttributes, PackAttributes)
 
     EXPECT_EQ(unpacked->uid, 1);
     EXPECT_EQ(unpacked->name, "PackedTensor");
-    EXPECT_EQ(unpacked->data_type, hipdnn_sdk::data_objects::DataType_FLOAT);
+    EXPECT_EQ(unpacked->data_type, hipdnn_sdk::data_objects::DataType::FLOAT);
     EXPECT_EQ(unpacked->strides, std::vector<int64_t>({1, 2, 3}));
     EXPECT_EQ(unpacked->dims, std::vector<int64_t>({4, 5, 6}));
     EXPECT_TRUE(unpacked->virtual_);

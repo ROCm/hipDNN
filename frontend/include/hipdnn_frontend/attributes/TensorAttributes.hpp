@@ -209,43 +209,43 @@ public:
                 if constexpr(std::is_same_v<T, float>)
                 {
                     hipdnn_sdk::data_objects::Float32Value floatVal(arg);
-                    return {hipdnn_sdk::data_objects::TensorValue_Float32Value,
+                    return {hipdnn_sdk::data_objects::TensorValue::Float32Value,
                             builder.CreateStruct(floatVal).Union()};
                 }
                 else if constexpr(std::is_same_v<T, double>)
                 {
                     hipdnn_sdk::data_objects::Float64Value doubleVal(arg);
-                    return {hipdnn_sdk::data_objects::TensorValue_Float64Value,
+                    return {hipdnn_sdk::data_objects::TensorValue::Float64Value,
                             builder.CreateStruct(doubleVal).Union()};
                 }
                 else if constexpr(std::is_same_v<T, half>)
                 {
                     hipdnn_sdk::data_objects::Float16Value halfVal(arg);
-                    return {hipdnn_sdk::data_objects::TensorValue_Float16Value,
+                    return {hipdnn_sdk::data_objects::TensorValue::Float16Value,
                             builder.CreateStruct(halfVal).Union()};
                 }
                 else if constexpr(std::is_same_v<T, hip_bfloat16>)
                 {
                     hipdnn_sdk::data_objects::BFloat16Value bfVal(arg);
-                    return {hipdnn_sdk::data_objects::TensorValue_BFloat16Value,
+                    return {hipdnn_sdk::data_objects::TensorValue::BFloat16Value,
                             builder.CreateStruct(bfVal).Union()};
                 }
                 else if constexpr(std::is_same_v<T, uint8_t>)
                 {
                     hipdnn_sdk::data_objects::Float8Value uint8Val(arg);
-                    return {hipdnn_sdk::data_objects::TensorValue_Float8Value,
+                    return {hipdnn_sdk::data_objects::TensorValue::Float8Value,
                             builder.CreateStruct(uint8Val).Union()};
                 }
                 else if constexpr(std::is_same_v<T, int32_t>)
                 {
                     hipdnn_sdk::data_objects::Int32Value int32Val(arg);
-                    return {hipdnn_sdk::data_objects::TensorValue_Int32Value,
+                    return {hipdnn_sdk::data_objects::TensorValue::Int32Value,
                             builder.CreateStruct(int32Val).Union()};
                 }
                 else
                 {
                     // For std::monostate case
-                    return {hipdnn_sdk::data_objects::TensorValue_NONE, 0};
+                    return {hipdnn_sdk::data_objects::TensorValue::NONE, 0};
                 }
             },
             _value);

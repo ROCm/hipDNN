@@ -26,8 +26,8 @@ public:
         using namespace hipdnn_sdk::data_objects;
 
         // Support both BatchNorm inference and backward
-        if(node.attributes_type() != NodeAttributes_BatchnormInferenceAttributes
-           && node.attributes_type() != NodeAttributes_BatchnormBackwardAttributes)
+        if(node.attributes_type() != NodeAttributes::BatchnormInferenceAttributes
+           && node.attributes_type() != NodeAttributes::BatchnormBackwardAttributes)
         {
             return false;
         }

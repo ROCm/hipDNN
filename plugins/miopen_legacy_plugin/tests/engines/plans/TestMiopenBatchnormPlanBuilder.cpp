@@ -88,15 +88,15 @@ TEST_F(TestMiopenBatchnormPlanBuilder, BuildPlanThrowsForUnsupportedNodeType)
 
     // Node with NONE attributes type
     auto node = hipdnn_sdk::data_objects::CreateNodeDirect(
-        builder, "unsupported", hipdnn_sdk::data_objects::NodeAttributes_NONE, 0);
+        builder, "unsupported", hipdnn_sdk::data_objects::NodeAttributes::NONE, 0);
     nodes.push_back(node);
 
     auto graphOffset
         = hipdnn_sdk::data_objects::CreateGraphDirect(builder,
                                                       "test",
-                                                      hipdnn_sdk::data_objects::DataType_FLOAT,
-                                                      hipdnn_sdk::data_objects::DataType_HALF,
-                                                      hipdnn_sdk::data_objects::DataType_BFLOAT16,
+                                                      hipdnn_sdk::data_objects::DataType::FLOAT,
+                                                      hipdnn_sdk::data_objects::DataType::HALF,
+                                                      hipdnn_sdk::data_objects::DataType::BFLOAT16,
                                                       &tensorAttributes,
                                                       &nodes);
     builder.Finish(graphOffset);

@@ -32,13 +32,11 @@ TEST(TestMiopenUtils, FindDeviceBufferThrowsIfNotFound)
 
 TEST(TestMiopenUtils, TensorDataTypeToMiopenDataType)
 {
-    using hipdnn_sdk::data_objects::DataType_BFLOAT16;
-    using hipdnn_sdk::data_objects::DataType_FLOAT;
-    using hipdnn_sdk::data_objects::DataType_HALF;
+    using namespace hipdnn_sdk::data_objects;
 
-    EXPECT_EQ(miopen_utils::tensorDataTypeToMiopenDataType(DataType_FLOAT), miopenFloat);
-    EXPECT_EQ(miopen_utils::tensorDataTypeToMiopenDataType(DataType_HALF), miopenHalf);
-    EXPECT_EQ(miopen_utils::tensorDataTypeToMiopenDataType(DataType_BFLOAT16), miopenBFloat16);
+    EXPECT_EQ(miopen_utils::tensorDataTypeToMiopenDataType(DataType::FLOAT), miopenFloat);
+    EXPECT_EQ(miopen_utils::tensorDataTypeToMiopenDataType(DataType::HALF), miopenHalf);
+    EXPECT_EQ(miopen_utils::tensorDataTypeToMiopenDataType(DataType::BFLOAT16), miopenBFloat16);
 }
 
 TEST(TestMiopenUtils, TensorDataTypeToMiopenDataTypeThrowsOnUnsupported)

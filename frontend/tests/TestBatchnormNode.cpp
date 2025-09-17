@@ -209,7 +209,7 @@ TEST(TestBatchnormNode, PackNode)
 
     EXPECT_STREQ(nodeFlatbuffer->name()->c_str(), "Batchnorm");
     EXPECT_EQ(nodeFlatbuffer->attributes_type(),
-              hipdnn_sdk::data_objects::NodeAttributes_BatchnormAttributes);
+              hipdnn_sdk::data_objects::NodeAttributes::BatchnormAttributes);
 
     auto packedAttributes = nodeFlatbuffer->attributes_as_BatchnormAttributes();
     ASSERT_NE(packedAttributes, nullptr);

@@ -86,7 +86,7 @@ public:
         return hipdnn_sdk::data_objects::CreateNodeDirect(
             builder,
             attributes.get_name().c_str(),
-            hipdnn_sdk::data_objects::NodeAttributes::NodeAttributes_BatchnormInferenceAttributes,
+            hipdnn_sdk::data_objects::NodeAttributes::BatchnormInferenceAttributes,
             attributes.pack_attributes(builder).Union());
     }
 };
