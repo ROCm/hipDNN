@@ -40,8 +40,10 @@ add_executable(hipdnn_sdk_tests
     test_utilities/TestTempDirectory.cpp
     test_utilities/TestScopedEnvironmentVariableSetter.cpp
     test_utilities/TestLoggingUtils.cpp
-    test_utilities/TestCpuReferenceGraphExecutor.cpp
-    test_utilities/TestTensorVariant.cpp
+    test_utilities/cpu_graph_executor/TestCpuReferenceGraphExecutor.cpp
+    test_utilities/cpu_graph_executor/TestBatchnormSignature.cpp
+
+    test_utilities/cpu_graph_executor/TestTensorVariant.cpp
 
 
 )
