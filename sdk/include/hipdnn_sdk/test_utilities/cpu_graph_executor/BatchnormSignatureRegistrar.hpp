@@ -44,7 +44,7 @@ inline void forEachBatchnormSignatureAlt(F&& f)
 }
 
 template <typename BatchnormSignature>
-inline BatchnormSignatureKey makeKeyFromSigTag(std::type_identity<BatchnormSignature>)
+inline BatchnormSignatureKey makeKeyFromBatchnormSignature(std::type_identity<BatchnormSignature>)
 {
     return BatchnormSignatureKey{
         .inputDataType = BatchnormSignature::INPUT_DATA_TYPE,
@@ -67,7 +67,6 @@ static TensorVariant& unwrapTensorVariant(std::any& a)
     throw std::bad_any_cast();
 }
 
-// Build a BatchnormFn for a signature tag type
 template <typename BatchnormSignature>
 inline BatchnormFwdInferenceFn
     makeBatchnormFwdInferenceFnForSignature(std::type_identity<BatchnormSignature>)
@@ -99,7 +98,7 @@ inline BatchnormFwdInferenceFn
         auto& vaTensor = *std::get<std::unique_ptr<TensorBase<MeanVarianceT>>>(vaVar);
         auto& outTensor = *std::get<std::unique_ptr<TensorBase<InputT>>>(outVar);
 
-        BatchnormBuilder<BatchnormSignature{}>::Instance::batchnormFwdInference(
+        BatchnormFwdInferenceBuilder<BatchnormSignature{}>::Instance::batchnormFwdInference(
             inTensor, scTensor, biTensor, meTensor, vaTensor, outTensor, epsilon);
     };
 }
@@ -108,9 +107,10 @@ inline BatchnormFwdInferenceFn
     buildBatchnormFwdInferenceFnFromSignatureVariant(const BatchnormSignatureVariants& v)
 {
     return std::visit(
-        [](auto sigTag) {
-            using Sig = std::decay_t<decltype(sigTag)>;
-            return makeBatchnormFwdInferenceFnForSignature<Sig>(std::type_identity<Sig>{});
+        [](auto batchnormSignature) {
+            using BatchnormSignature = std::decay_t<decltype(batchnormSignature)>;
+            return makeBatchnormFwdInferenceFnForSignature<BatchnormSignature>(
+                std::type_identity<BatchnormSignature>{});
         },
         v);
 }
@@ -119,9 +119,9 @@ struct BatchnormRegistryInitializer
 {
     BatchnormRegistryInitializer()
     {
-        forEachBatchnormSignatureAlt([](auto tag) {
-            auto key = makeKeyFromSigTag(tag);
-            batchnormRegistry()[key] = makeBatchnormFwdInferenceFnForSignature(tag);
+        forEachBatchnormSignatureAlt([](auto signature) {
+            auto key = makeKeyFromBatchnormSignature(signature);
+            batchnormRegistry()[key] = makeBatchnormFwdInferenceFnForSignature(signature);
         });
     }
 };

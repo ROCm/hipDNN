@@ -59,7 +59,7 @@ concept BatchnormSignatureDescriptor = requires(T t) {
 
 template <BatchnormSignatureDescriptor auto SIGNATURE>
     requires ValidBatchnormSignature<SIGNATURE>
-struct BatchnormBuilder
+struct BatchnormFwdInferenceBuilder
 {
     using InputDataType = typename DataTypeToNative<SIGNATURE.INPUT_DATA_TYPE>::type;
     using ScaleBiasDataType = typename DataTypeToNative<SIGNATURE.SCALE_BIAS_DATA_TYPE>::type;
