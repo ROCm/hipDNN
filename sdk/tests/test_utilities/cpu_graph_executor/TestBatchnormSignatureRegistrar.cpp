@@ -15,18 +15,18 @@ using namespace hipdnn_sdk::data_objects;
 
 static BatchnormSignatureKey makeKeyFloat()
 {
-    return {.inputDataType = DataType_FLOAT,
-            .scaleBiasDataType = DataType_FLOAT,
-            .meanVarianceDataType = DataType_FLOAT,
-            .nodeAttributesType = NodeAttributes_BatchnormInferenceAttributes};
+    return {.inputDataType = DataType::FLOAT,
+            .scaleBiasDataType = DataType::FLOAT,
+            .meanVarianceDataType = DataType::FLOAT,
+            .nodeAttributesType = NodeAttributes::BatchnormInferenceAttributes};
 }
 
 static BatchnormSignatureKey makeKeyHalf()
 {
-    return {.inputDataType = DataType_HALF,
-            .scaleBiasDataType = DataType_HALF,
-            .meanVarianceDataType = DataType_HALF,
-            .nodeAttributesType = NodeAttributes_BatchnormInferenceAttributes};
+    return {.inputDataType = DataType::HALF,
+            .scaleBiasDataType = DataType::HALF,
+            .meanVarianceDataType = DataType::HALF,
+            .nodeAttributesType = NodeAttributes::BatchnormInferenceAttributes};
 }
 
 TEST(TestBatchnormSignatureRegistrar, RegistryContainsAllSignatures)

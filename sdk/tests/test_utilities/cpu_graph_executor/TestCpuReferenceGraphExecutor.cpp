@@ -27,9 +27,9 @@ public:
         std::vector<int64_t> strides = {1, 3, 224, 224},
         std::vector<int64_t> dims = {1, 3, 224, 224},
         bool hasOptionalAttributes = true,
-        hipdnn_sdk::data_objects::DataType inputDataType = DataType_FLOAT,
-        hipdnn_sdk::data_objects::DataType scaleBiasDataType = DataType_FLOAT,
-        hipdnn_sdk::data_objects::DataType meanVarianceDataType = DataType_FLOAT)
+        hipdnn_sdk::data_objects::DataType inputDataType = DataType::FLOAT,
+        hipdnn_sdk::data_objects::DataType scaleBiasDataType = DataType::FLOAT,
+        hipdnn_sdk::data_objects::DataType meanVarianceDataType = DataType::FLOAT)
     {
         flatbuffers::FlatBufferBuilder builder;
         std::vector<::flatbuffers::Offset<hipdnn_sdk::data_objects::TensorAttributes>>
@@ -75,15 +75,15 @@ public:
         auto node = hipdnn_sdk::data_objects::CreateNodeDirect(
             builder,
             "batchnorm",
-            hipdnn_sdk::data_objects::NodeAttributes_BatchnormInferenceAttributes,
+            hipdnn_sdk::data_objects::NodeAttributes::BatchnormInferenceAttributes,
             bnormAttributes.Union());
         nodes.push_back(node);
 
         auto graphOffset = hipdnn_sdk::data_objects::CreateGraphDirect(builder,
                                                                        "test",
-                                                                       DataType_FLOAT,
-                                                                       DataType_HALF,
-                                                                       DataType_BFLOAT16,
+                                                                       DataType::FLOAT,
+                                                                       DataType::HALF,
+                                                                       DataType::BFLOAT16,
                                                                        &tensorAttributes,
                                                                        &nodes);
         builder.Finish(graphOffset);
@@ -184,22 +184,22 @@ public:
 TEST(TestCpuReferenceGraphExecutor, BatchnormFwdInferenceAllFloats)
 {
     TestCpuReferenceGraphExecutor::runBatchnormFwdTest<float, float, float>(
-        DataType_FLOAT, DataType_FLOAT, DataType_FLOAT);
+        DataType::FLOAT, DataType::FLOAT, DataType::FLOAT);
 }
 
 TEST(TestCpuReferenceGraphExecutor, BatchnormFwdInferenceAllHalfs)
 {
     TestCpuReferenceGraphExecutor::runBatchnormFwdTest<half, half, half>(
-        DataType_HALF, DataType_HALF, DataType_HALF);
+        DataType::HALF, DataType::HALF, DataType::HALF);
 }
 
 TEST(TestCpuReferenceGraphExecutor, SignaturesThatDontExist)
 {
     EXPECT_THROW((TestCpuReferenceGraphExecutor::runBatchnormFwdTest<float, half, half>(
-                     DataType_FLOAT, DataType_HALF, DataType_HALF)),
+                     DataType::FLOAT, DataType::HALF, DataType::HALF)),
                  std::runtime_error);
 
     EXPECT_THROW((TestCpuReferenceGraphExecutor::runBatchnormFwdTest<float, half, float>(
-                     DataType_FLOAT, DataType_HALF, DataType_FLOAT)),
+                     DataType::FLOAT, DataType::HALF, DataType::FLOAT)),
                  std::runtime_error);
 }

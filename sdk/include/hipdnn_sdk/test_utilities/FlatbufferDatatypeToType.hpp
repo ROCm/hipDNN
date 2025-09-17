@@ -21,23 +21,23 @@ constexpr auto getTypeWrapper()
 {
     using DataType = hipdnn_sdk::data_objects::DataType;
 
-    if constexpr(DT == DataType::DataType_FLOAT)
+    if constexpr(DT == DataType::FLOAT)
     {
         return TypeWrapper<float>{};
     }
-    else if constexpr(DT == DataType::DataType_HALF)
+    else if constexpr(DT == DataType::HALF)
     {
         return TypeWrapper<half>{};
     }
-    else if constexpr(DT == DataType::DataType_DOUBLE)
+    else if constexpr(DT == DataType::DOUBLE)
     {
         return TypeWrapper<double>{};
     }
-    else if constexpr(DT == DataType::DataType_INT32)
+    else if constexpr(DT == DataType::INT32)
     {
         return TypeWrapper<int32_t>{};
     }
-    else if constexpr(DT == DataType::DataType_BFLOAT16)
+    else if constexpr(DT == DataType::BFLOAT16)
     {
         return TypeWrapper<hip_bfloat16>{};
     }

@@ -44,7 +44,7 @@ public:
                     .scaleBiasDataType = scaleTensorAttr->data_type(),
                     .meanVarianceDataType = meanTensorAttr->data_type(),
                     .nodeAttributesType
-                    = hipdnn_sdk::data_objects::NodeAttributes_BatchnormInferenceAttributes,
+                    = hipdnn_sdk::data_objects::NodeAttributes::BatchnormInferenceAttributes,
                 };
                 auto it = batchnormRegistry().find(key);
                 if(it != batchnormRegistry().end())

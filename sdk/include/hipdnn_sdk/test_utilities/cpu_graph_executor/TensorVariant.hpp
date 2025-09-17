@@ -48,15 +48,15 @@ private:
     {
         switch(dataType)
         {
-        case hipdnn_sdk::data_objects::DataType::DataType_FLOAT:
+        case hipdnn_sdk::data_objects::DataType::FLOAT:
             return createHostOnlyShallowTensor<float>(ptr, dims, strides);
-        case hipdnn_sdk::data_objects::DataType::DataType_HALF:
+        case hipdnn_sdk::data_objects::DataType::HALF:
             return createHostOnlyShallowTensor<half>(ptr, dims, strides);
-        case hipdnn_sdk::data_objects::DataType::DataType_UNSET:
-        case hipdnn_sdk::data_objects::DataType::DataType_BFLOAT16:
-        case hipdnn_sdk::data_objects::DataType::DataType_DOUBLE:
-        case hipdnn_sdk::data_objects::DataType::DataType_UINT8:
-        case hipdnn_sdk::data_objects::DataType::DataType_INT32:
+        case hipdnn_sdk::data_objects::DataType::UNSET:
+        case hipdnn_sdk::data_objects::DataType::BFLOAT16:
+        case hipdnn_sdk::data_objects::DataType::DOUBLE:
+        case hipdnn_sdk::data_objects::DataType::UINT8:
+        case hipdnn_sdk::data_objects::DataType::INT32:
         default:
             break;
         }

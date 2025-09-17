@@ -20,7 +20,7 @@ TEST(TestTensorVariantUtils, CreateHostOnlyShallowTensorVariantFloat)
     std::vector<int64_t> dims{1, 3, 4, 4};
     std::vector<int64_t> strides{48, 16, 4, 1};
     auto attrOffset
-        = CreateTensorAttributesDirect(builder, 7, "x", DataType_FLOAT, &strides, &dims);
+        = CreateTensorAttributesDirect(builder, 7, "x", DataType::FLOAT, &strides, &dims);
     builder.Finish(attrOffset);
     auto* attr = flatbuffers::GetRoot<TensorAttributes>(builder.GetBufferPointer());
 
@@ -38,7 +38,8 @@ TEST(TestTensorVariantUtils, CreateHostOnlyShallowTensorVariantHalf)
     flatbuffers::FlatBufferBuilder builder;
     std::vector<int64_t> dims{1, 1, 1, 2};
     std::vector<int64_t> strides{2, 2, 2, 1};
-    auto attrOffset = CreateTensorAttributesDirect(builder, 7, "x", DataType_HALF, &strides, &dims);
+    auto attrOffset
+        = CreateTensorAttributesDirect(builder, 7, "x", DataType::HALF, &strides, &dims);
     builder.Finish(attrOffset);
     auto* attr = flatbuffers::GetRoot<TensorAttributes>(builder.GetBufferPointer());
 
@@ -57,7 +58,7 @@ TEST(TestTensorVariantUtils, UnsupportedDataTypeThrows)
     std::vector<int64_t> dims{1};
     std::vector<int64_t> strides{1};
     auto attrOffset
-        = CreateTensorAttributesDirect(builder, 7, "x", DataType_INT32, &strides, &dims);
+        = CreateTensorAttributesDirect(builder, 7, "x", DataType::INT32, &strides, &dims);
     builder.Finish(attrOffset);
     auto* attr = flatbuffers::GetRoot<TensorAttributes>(builder.GetBufferPointer());
 
@@ -72,7 +73,7 @@ TEST(TestTensorVariantUtils, CreateWithEmptyDimsAndStrides)
     std::vector<int64_t> dims{};
     std::vector<int64_t> strides{};
     auto attrOffset
-        = CreateTensorAttributesDirect(builder, 7, "x", DataType_FLOAT, &strides, &dims);
+        = CreateTensorAttributesDirect(builder, 7, "x", DataType::FLOAT, &strides, &dims);
     builder.Finish(attrOffset);
     auto* attr = flatbuffers::GetRoot<TensorAttributes>(builder.GetBufferPointer());
 

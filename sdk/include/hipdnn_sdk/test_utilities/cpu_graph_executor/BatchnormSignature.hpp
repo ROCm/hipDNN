@@ -61,16 +61,16 @@ struct BatchnormSignatureKey
     static_assert(BatchnormSignatureDescriptor<Name>)
 
 DEFINE_BATCHNORM_SIGNATURE(FwdBatchnormSignatureFloat,
-                           DataType_FLOAT,
-                           DataType_FLOAT,
-                           DataType_FLOAT,
-                           NodeAttributes_BatchnormInferenceAttributes);
+                           DataType::FLOAT,
+                           DataType::FLOAT,
+                           DataType::FLOAT,
+                           NodeAttributes::BatchnormInferenceAttributes);
 
 DEFINE_BATCHNORM_SIGNATURE(FwdBatchnormSignatureHalf,
-                           DataType_HALF,
-                           DataType_HALF,
-                           DataType_HALF,
-                           NodeAttributes_BatchnormInferenceAttributes);
+                           DataType::HALF,
+                           DataType::HALF,
+                           DataType::HALF,
+                           NodeAttributes::BatchnormInferenceAttributes);
 
 using BatchnormSignatureVariants
     = std::variant<FwdBatchnormSignatureFloat, FwdBatchnormSignatureHalf>;

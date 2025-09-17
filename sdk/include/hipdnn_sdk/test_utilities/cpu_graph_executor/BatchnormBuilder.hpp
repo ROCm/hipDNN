@@ -19,14 +19,13 @@ namespace test_utilities
 {
 
 template <hipdnn_sdk::data_objects::DataType T>
-concept BatchnormDataType = (T == hipdnn_sdk::data_objects::DataType::DataType_FLOAT)
-                            || (T == hipdnn_sdk::data_objects::DataType::DataType_HALF)
-                            || (T == hipdnn_sdk::data_objects::DataType::DataType_BFLOAT16);
+concept BatchnormDataType = (T == hipdnn_sdk::data_objects::DataType::FLOAT)
+                            || (T == hipdnn_sdk::data_objects::DataType::HALF)
+                            || (T == hipdnn_sdk::data_objects::DataType::BFLOAT16);
 
 template <hipdnn_sdk::data_objects::NodeAttributes T>
 concept NodeAttributesType
-    = (T == hipdnn_sdk::data_objects::NodeAttributes_BatchnormInferenceAttributes)
-      || (T == hipdnn_sdk::data_objects::NodeAttributes_BatchnormBackwardAttributes);
+    = (T == hipdnn_sdk::data_objects::NodeAttributes::BatchnormInferenceAttributes);
 
 template <auto Sig>
 concept ValidBatchnormSignature = requires {

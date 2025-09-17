@@ -24,47 +24,47 @@ constexpr BatchnormSignatureKey makeKey()
 
 TEST(TestBatchnormSignature, StaticValuesFloatSignature)
 {
-    static_assert(FwdBatchnormSignatureFloat::INPUT_DATA_TYPE == DataType_FLOAT);
-    static_assert(FwdBatchnormSignatureFloat::SCALE_BIAS_DATA_TYPE == DataType_FLOAT);
-    static_assert(FwdBatchnormSignatureFloat::MEAN_VARIANCE_DATA_TYPE == DataType_FLOAT);
+    static_assert(FwdBatchnormSignatureFloat::INPUT_DATA_TYPE == DataType::FLOAT);
+    static_assert(FwdBatchnormSignatureFloat::SCALE_BIAS_DATA_TYPE == DataType::FLOAT);
+    static_assert(FwdBatchnormSignatureFloat::MEAN_VARIANCE_DATA_TYPE == DataType::FLOAT);
     static_assert(FwdBatchnormSignatureFloat::NODE_ATTRIBUTES_TYPE
-                  == NodeAttributes_BatchnormInferenceAttributes);
+                  == NodeAttributes::BatchnormInferenceAttributes);
 
     auto key = makeKey<FwdBatchnormSignatureFloat>();
 
-    EXPECT_EQ(key.inputDataType, DataType_FLOAT);
-    EXPECT_EQ(key.scaleBiasDataType, DataType_FLOAT);
-    EXPECT_EQ(key.meanVarianceDataType, DataType_FLOAT);
-    EXPECT_EQ(key.nodeAttributesType, NodeAttributes_BatchnormInferenceAttributes);
+    EXPECT_EQ(key.inputDataType, DataType::FLOAT);
+    EXPECT_EQ(key.scaleBiasDataType, DataType::FLOAT);
+    EXPECT_EQ(key.meanVarianceDataType, DataType::FLOAT);
+    EXPECT_EQ(key.nodeAttributesType, NodeAttributes::BatchnormInferenceAttributes);
 }
 
 TEST(TestBatchnormSignature, StaticValuesHalfSignature)
 {
-    static_assert(FwdBatchnormSignatureHalf::INPUT_DATA_TYPE == DataType_HALF);
-    static_assert(FwdBatchnormSignatureHalf::SCALE_BIAS_DATA_TYPE == DataType_HALF);
-    static_assert(FwdBatchnormSignatureHalf::MEAN_VARIANCE_DATA_TYPE == DataType_HALF);
+    static_assert(FwdBatchnormSignatureHalf::INPUT_DATA_TYPE == DataType::HALF);
+    static_assert(FwdBatchnormSignatureHalf::SCALE_BIAS_DATA_TYPE == DataType::HALF);
+    static_assert(FwdBatchnormSignatureHalf::MEAN_VARIANCE_DATA_TYPE == DataType::HALF);
     static_assert(FwdBatchnormSignatureHalf::NODE_ATTRIBUTES_TYPE
-                  == NodeAttributes_BatchnormInferenceAttributes);
+                  == NodeAttributes::BatchnormInferenceAttributes);
 
     auto key = makeKey<FwdBatchnormSignatureHalf>();
 
-    EXPECT_EQ(key.inputDataType, DataType_HALF);
-    EXPECT_EQ(key.scaleBiasDataType, DataType_HALF);
-    EXPECT_EQ(key.meanVarianceDataType, DataType_HALF);
-    EXPECT_EQ(key.nodeAttributesType, NodeAttributes_BatchnormInferenceAttributes);
+    EXPECT_EQ(key.inputDataType, DataType::HALF);
+    EXPECT_EQ(key.scaleBiasDataType, DataType::HALF);
+    EXPECT_EQ(key.meanVarianceDataType, DataType::HALF);
+    EXPECT_EQ(key.nodeAttributesType, NodeAttributes::BatchnormInferenceAttributes);
 }
 
 TEST(TestBatchnormSignature, KeyEqualityAndInequality)
 {
-    BatchnormSignatureKey a{.inputDataType = DataType_FLOAT,
-                            .scaleBiasDataType = DataType_FLOAT,
-                            .meanVarianceDataType = DataType_FLOAT,
-                            .nodeAttributesType = NodeAttributes_BatchnormInferenceAttributes};
+    BatchnormSignatureKey a{.inputDataType = DataType::FLOAT,
+                            .scaleBiasDataType = DataType::FLOAT,
+                            .meanVarianceDataType = DataType::FLOAT,
+                            .nodeAttributesType = NodeAttributes::BatchnormInferenceAttributes};
     BatchnormSignatureKey b = a;
-    BatchnormSignatureKey c{.inputDataType = DataType_HALF,
-                            .scaleBiasDataType = DataType_HALF,
-                            .meanVarianceDataType = DataType_HALF,
-                            .nodeAttributesType = NodeAttributes_BatchnormInferenceAttributes};
+    BatchnormSignatureKey c{.inputDataType = DataType::HALF,
+                            .scaleBiasDataType = DataType::HALF,
+                            .meanVarianceDataType = DataType::HALF,
+                            .nodeAttributesType = NodeAttributes::BatchnormInferenceAttributes};
 
     EXPECT_TRUE(a == b);
     EXPECT_FALSE(a == c);
@@ -72,15 +72,15 @@ TEST(TestBatchnormSignature, KeyEqualityAndInequality)
 
 TEST(TestBatchnormSignature, HashConsistency)
 {
-    BatchnormSignatureKey a{.inputDataType = DataType_FLOAT,
-                            .scaleBiasDataType = DataType_FLOAT,
-                            .meanVarianceDataType = DataType_FLOAT,
-                            .nodeAttributesType = NodeAttributes_BatchnormInferenceAttributes};
+    BatchnormSignatureKey a{.inputDataType = DataType::FLOAT,
+                            .scaleBiasDataType = DataType::FLOAT,
+                            .meanVarianceDataType = DataType::FLOAT,
+                            .nodeAttributesType = NodeAttributes::BatchnormInferenceAttributes};
     BatchnormSignatureKey b = a;
-    BatchnormSignatureKey c{.inputDataType = DataType_HALF,
-                            .scaleBiasDataType = DataType_HALF,
-                            .meanVarianceDataType = DataType_HALF,
-                            .nodeAttributesType = NodeAttributes_BatchnormInferenceAttributes};
+    BatchnormSignatureKey c{.inputDataType = DataType::HALF,
+                            .scaleBiasDataType = DataType::HALF,
+                            .meanVarianceDataType = DataType::HALF,
+                            .nodeAttributesType = NodeAttributes::BatchnormInferenceAttributes};
 
     std::hash<BatchnormSignatureKey> h;
     auto ha = h(a);
@@ -93,15 +93,15 @@ TEST(TestBatchnormSignature, HashConsistency)
 
 TEST(TestBatchnormSignature, UnorderedSetBehavior)
 {
-    BatchnormSignatureKey a{.inputDataType = DataType_FLOAT,
-                            .scaleBiasDataType = DataType_FLOAT,
-                            .meanVarianceDataType = DataType_FLOAT,
-                            .nodeAttributesType = NodeAttributes_BatchnormInferenceAttributes};
+    BatchnormSignatureKey a{.inputDataType = DataType::FLOAT,
+                            .scaleBiasDataType = DataType::FLOAT,
+                            .meanVarianceDataType = DataType::FLOAT,
+                            .nodeAttributesType = NodeAttributes::BatchnormInferenceAttributes};
     BatchnormSignatureKey b = a;
-    BatchnormSignatureKey c{.inputDataType = DataType_HALF,
-                            .scaleBiasDataType = DataType_HALF,
-                            .meanVarianceDataType = DataType_HALF,
-                            .nodeAttributesType = NodeAttributes_BatchnormInferenceAttributes};
+    BatchnormSignatureKey c{.inputDataType = DataType::HALF,
+                            .scaleBiasDataType = DataType::HALF,
+                            .meanVarianceDataType = DataType::HALF,
+                            .nodeAttributesType = NodeAttributes::BatchnormInferenceAttributes};
 
     std::unordered_set<BatchnormSignatureKey> set;
     set.insert(a);
@@ -125,9 +125,9 @@ TEST(TestBatchnormSignature, VariantToKeyVisit)
     auto kFloat = std::visit(toKey, vFloat);
     auto kHalf = std::visit(toKey, vHalf);
 
-    EXPECT_EQ(kFloat.inputDataType, DataType_FLOAT);
-    EXPECT_EQ(kHalf.inputDataType, DataType_HALF);
+    EXPECT_EQ(kFloat.inputDataType, DataType::FLOAT);
+    EXPECT_EQ(kHalf.inputDataType, DataType::HALF);
     EXPECT_NE(kFloat.inputDataType, kHalf.inputDataType);
-    EXPECT_EQ(kFloat.nodeAttributesType, NodeAttributes_BatchnormInferenceAttributes);
-    EXPECT_EQ(kHalf.nodeAttributesType, NodeAttributes_BatchnormInferenceAttributes);
+    EXPECT_EQ(kFloat.nodeAttributesType, NodeAttributes::BatchnormInferenceAttributes);
+    EXPECT_EQ(kHalf.nodeAttributesType, NodeAttributes::BatchnormInferenceAttributes);
 }
