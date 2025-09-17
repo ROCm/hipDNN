@@ -581,7 +581,7 @@ TEST_F(TestGraph, BuildAndSerializeBatchnormAndPointwiseGraph)
     EXPECT_EQ(deserializedPointwiseAttributes->in_0_tensor_uid, y->get_uid());
     EXPECT_EQ(deserializedPointwiseAttributes->out_0_tensor_uid, out0->get_uid());
     EXPECT_EQ(deserializedPointwiseAttributes->operation,
-              hipdnn_sdk::data_objects::PointwiseMode_RELU_FWD);
+              hipdnn_sdk::data_objects::PointwiseMode::RELU_FWD);
 }
 
 TEST_F(TestGraph, BuildAndSerializePointwiseGraph)
@@ -640,7 +640,7 @@ TEST_F(TestGraph, BuildAndSerializePointwiseGraph)
     EXPECT_EQ(deserializedPointwiseAttributes->in_0_tensor_uid, in0->get_uid());
     EXPECT_EQ(deserializedPointwiseAttributes->out_0_tensor_uid, out0->get_uid());
     EXPECT_EQ(deserializedPointwiseAttributes->operation,
-              hipdnn_sdk::data_objects::PointwiseMode_RELU_FWD);
+              hipdnn_sdk::data_objects::PointwiseMode::RELU_FWD);
 }
 
 TEST_F(TestGraph, BuildAndSerializePointwiseAndBatchnormInferenceGraph)
@@ -733,7 +733,7 @@ TEST_F(TestGraph, BuildAndSerializePointwiseAndBatchnormInferenceGraph)
     EXPECT_EQ(deserializedPointwiseAttributes->in_0_tensor_uid, y->get_uid());
     EXPECT_EQ(deserializedPointwiseAttributes->out_0_tensor_uid, out0->get_uid());
     EXPECT_EQ(deserializedPointwiseAttributes->operation,
-              hipdnn_sdk::data_objects::PointwiseMode_RELU_FWD);
+              hipdnn_sdk::data_objects::PointwiseMode::RELU_FWD);
 }
 
 TEST_F(TestGraph, BuildAndSerializeBatchnormBackwardGraph)
@@ -978,7 +978,7 @@ TEST_F(TestGraph, BuildAndSerializePointwiseAndBatchnormBackwardGraph)
     EXPECT_EQ(deserializedPointwiseAttributes->in_0_tensor_uid, xPointwise->get_uid());
     EXPECT_EQ(deserializedPointwiseAttributes->out_0_tensor_uid, dy->get_uid());
     EXPECT_EQ(deserializedPointwiseAttributes->operation,
-              hipdnn_sdk::data_objects::PointwiseMode_RELU_FWD);
+              hipdnn_sdk::data_objects::PointwiseMode::RELU_FWD);
 
     EXPECT_EQ(deserializedGraph->nodes[1]->name, "BatchnormBackwardNode");
     EXPECT_EQ(deserializedGraph->nodes[1]->attributes.type,

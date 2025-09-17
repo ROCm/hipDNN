@@ -108,7 +108,7 @@ TEST(IntegrationBackendDescriptor, SetOperationGraph)
         = hipdnn_sdk::data_objects::CreateGraphDirect(builder,
                                                       "Test GRAPH!",
                                                       hipdnn_sdk::data_objects::DataType::FLOAT,
-                                                      hipdnn_sdk::data_objects::DataType::FFLOAT,
+                                                      hipdnn_sdk::data_objects::DataType::FLOAT,
                                                       hipdnn_sdk::data_objects::DataType::FLOAT,
                                                       &tensorAttributes,
                                                       &nodes);
