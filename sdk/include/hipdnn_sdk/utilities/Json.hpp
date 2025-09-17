@@ -261,8 +261,8 @@ auto node(flatbuffers::FlatBufferBuilder& builder, const nlohmann::json& inNode)
         case data_objects::NodeAttributes_BatchnormInferenceAttributes:
             return batchnormInferenceAttributes(builder, inNode).Union();
         default:
-            throw std::runtime_error(
-                fmt::format("Unsupported NodeAttribute type: {}", EnumNameNodeAttributes(type)));
+            throw std::runtime_error("Unsupported NodeAttribute type: "
+                                     + std::string{EnumNameNodeAttributes(type)});
         }
     }();
 

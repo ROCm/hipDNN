@@ -1,6 +1,7 @@
 // Copyright © Advanced Micro Devices, Inc., or its affiliates.
 // SPDX-License-Identifier:  MIT
 
+#include "data_types_generated.h"
 #include "graph_generated.h"
 #include "hipdnn_sdk/test_utilities/FlatbufferGraphTestUtils.hpp"
 #include <gtest/gtest.h>
@@ -17,4 +18,15 @@ TEST(TestJson, SerializeGraphAsJson)
     auto graphJson = hipdnn_sdk::json::json(*graph);
     std::string out = graphJson.dump();
     std::cout << out << "\n";
+}
+
+TEST(TestJson, DataTypeConversion)
+{
+    {
+        nlohmann::json obj = hipdnn_sdk::data_objects::DataType::DataType_FLOAT;
+
+        std::cout << obj.dump() << "\n";
+    }
+
+    nlohmann::json obj = "float";
 }

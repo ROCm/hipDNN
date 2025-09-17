@@ -34,7 +34,7 @@ set(SCHEMA_FILES
 
 _save_var(FLATBUFFERS_FLATC_SCHEMA_EXTRA_ARGS)
 
-SET(FLATBUFFERS_FLATC_SCHEMA_EXTRA_ARGS "--gen-object-api;--gen-mutable;--gen-compare;--defaults-json")
+SET(FLATBUFFERS_FLATC_SCHEMA_EXTRA_ARGS "--gen-object-api;--gen-mutable;--gen-compare;--defaults-json;--scoped-enums")
 build_flatbuffers(
     "${SCHEMA_FILES}" #flatbuffers_schemas
     "" # schema_include_dirs
