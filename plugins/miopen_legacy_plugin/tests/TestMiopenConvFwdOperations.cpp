@@ -15,10 +15,12 @@
 
 #include "HipdnnEnginePluginExecutionContext.hpp"
 #include "HipdnnEnginePluginHandle.hpp"
-#include "common/TestOperationsCommon.hpp"
+#include "common/ConvolutionCommon.hpp"
+#include "common/Helpers.hpp"
 
 using namespace hipdnn_sdk::test_utilities;
-using namespace test_operations_common;
+using namespace test_conv_common;
+using namespace test_helpers;
 
 template <typename DataType>
 class ConvFwdExecuteGraphBase : public ::testing::TestWithParam<ConvTestCase>

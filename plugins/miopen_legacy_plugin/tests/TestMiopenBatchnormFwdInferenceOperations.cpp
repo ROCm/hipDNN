@@ -17,10 +17,12 @@
 
 #include "HipdnnEnginePluginExecutionContext.hpp"
 #include "HipdnnEnginePluginHandle.hpp"
-#include "common/TestOperationsCommon.hpp"
+#include "common/BatchnormCommon.hpp"
+#include "common/Helpers.hpp"
 
 using namespace hipdnn_sdk::test_utilities;
-using namespace test_operations_common;
+using namespace test_bn_common;
+using namespace test_helpers;
 
 template <typename InputType, typename IntermediateType>
 class BatchnormFwdInferenceExecuteGraphBase : public ::testing::TestWithParam<Batchnorm2dTestCase>
