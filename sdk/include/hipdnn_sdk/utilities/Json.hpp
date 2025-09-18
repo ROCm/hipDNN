@@ -2,14 +2,54 @@
 #include "batchnorm_inference_attributes_generated.h"
 #include <flatbuffers/flatbuffer_builder.h>
 #include <hipdnn_sdk/data_objects/graph_generated.h>
+#include <iostream>
 #include <nlohmann/detail/macro_scope.hpp>
 #include <nlohmann/json.hpp>
 #include <optional>
 #include <spdlog/fmt/bundled/base.h>
 #include <spdlog/fmt/bundled/format.h>
 
+namespace hipdnn_sdk::data_objects
+{
+
+NLOHMANN_JSON_SERIALIZE_ENUM(
+    NodeAttributes,
+    {{NodeAttributes::BatchnormInferenceAttributes, "BatchnormInferenceAttributes"},
+     {NodeAttributes::PointwiseAttributes, "PointwiseAttributes"},
+     {NodeAttributes::BatchnormBackwardAttributes, "BatchnormBackwardAttributes"},
+     {NodeAttributes::BatchnormAttributes, "BatchnormAttributes"},
+     {NodeAttributes::ConvolutionFwdAttributes, "ConvolutionFwdAttributes"},
+     {NodeAttributes::NONE, ""}})
+
+NLOHMANN_JSON_SERIALIZE_ENUM(DataType,
+                             {
+                                 {DataType::UNSET, "unset"},
+                                 {DataType::FLOAT, "float"},
+                                 {DataType::HALF, "half"},
+                                 {DataType::BFLOAT16, "bfloat16"},
+                                 {DataType::DOUBLE, "double"},
+                                 {DataType::UINT8, "uint8"},
+                                 {DataType::INT32, "int32"},
+                             }
+
+)
+}
+
 namespace hipdnn_sdk::json
 {
+
+// template<class T>
+// nlohmann::json json(std::vector<T> )
+
+// // NOLINT(readability-identifier=)
+// nlohmann::json to_json(data_objects::TensorAttributes const& attr)
+// {
+//     nlohmann::json attrJson;
+
+//     attrJson["uid"] = attr.uid();
+//     attrJson["data_type"] = attr.data_type();
+//     attrJson["dims"] = attr.dims();
+// }
 
 nlohmann::json json(data_objects::BatchnormInferenceAttributes const& bn)
 {
@@ -27,33 +67,11 @@ nlohmann::json json(data_objects::BatchnormInferenceAttributes const& bn)
     return batchnormJson;
 }
 
-NLOHMANN_JSON_SERIALIZE_ENUM(
-    data_objects::NodeAttributes,
-    {{data_objects::NodeAttributes_BatchnormInferenceAttributes, "BatchnormInferenceAttributes"},
-     {data_objects::NodeAttributes_PointwiseAttributes, "PointwiseAttributes"},
-     {data_objects::NodeAttributes_BatchnormBackwardAttributes, "BatchnormBackwardAttributes"},
-     {data_objects::NodeAttributes_BatchnormAttributes, "BatchnormAttributes"},
-     {data_objects::NodeAttributes_ConvolutionFwdAttributes, "ConvolutionFwdAttributes"},
-     {data_objects::NodeAttributes_NONE, ""}})
-
-NLOHMANN_JSON_SERIALIZE_ENUM(data_objects::DataType,
-                             {
-                                 {data_objects::DataType_UNSET, "unset"},
-                                 {data_objects::DataType_FLOAT, "float"},
-                                 {data_objects::DataType_HALF, "half"},
-                                 {data_objects::DataType_BFLOAT16, "bfloat16"},
-                                 {data_objects::DataType_DOUBLE, "double"},
-                                 {data_objects::DataType_UINT8, "uint8"},
-                                 {data_objects::DataType_INT32, "int32"},
-                             }
-
-)
-
 nlohmann::json json(data_objects::Node const& node)
 {
     auto type = node.attributes_type();
     nlohmann::json nodeJson = [&]() {
-        if(type == data_objects::NodeAttributes_BatchnormInferenceAttributes)
+        if(type == data_objects::NodeAttributes::BatchnormInferenceAttributes)
         {
             return json(*node.attributes_as_BatchnormInferenceAttributes());
         }
@@ -76,16 +94,16 @@ nlohmann::json json(data_objects::Graph const& graph)
 {
 
     nlohmann::json graphJson;
-    graphJson["node"] = nlohmann::json::array();
+    graphJson["nodes"] = nlohmann::json::array();
 
     for(auto node : *graph.nodes())
     {
-        graphJson["node"].push_back(json(*node));
+        graphJson["nodes"].push_back(json(*node));
     }
 
-    graphJson["compute_type"] = json(graph.compute_type());
-    graphJson["io_type"] = json(graph.io_type());
-    graphJson["intermediate_type"] = json(graph.intermediate_type());
+    graphJson["compute_type"] = graph.compute_type();
+    graphJson["io_type"] = graph.io_type();
+    graphJson["intermediate_type"] = graph.intermediate_type();
 
     graphJson["name"] = graph.name()->c_str();
 
@@ -123,7 +141,7 @@ auto node(flatbuffers::FlatBufferBuilder& builder, const nlohmann::json& inNode)
     flatbuffers::Offset<void> node = [&]() {
         switch(type)
         {
-        case data_objects::NodeAttributes_BatchnormInferenceAttributes:
+        case data_objects::NodeAttributes::BatchnormInferenceAttributes:
             return batchnormInferenceAttributes(builder, inNode).Union();
         default:
             throw std::runtime_error("Unsupported NodeAttribute type: "

@@ -18,15 +18,23 @@ TEST(TestJson, SerializeGraphAsJson)
     auto graphJson = hipdnn_sdk::json::json(*graph);
     std::string out = graphJson.dump();
     std::cout << out << "\n";
+
+    flatbuffers::FlatBufferBuilder builder;
+    auto newGraph = hipdnn_sdk::json::graph(builder, graphJson);
+    builder.Finish(newGraph);
+    auto finishedGraph = hipdnn_sdk::data_objects::GetGraph(builder.GetBufferPointer());
+    std::cout << hipdnn_sdk::json::json(*finishedGraph).dump() << "\n";
 }
 
 TEST(TestJson, DataTypeConversion)
 {
     {
-        nlohmann::json obj = hipdnn_sdk::data_objects::DataType::DataType_FLOAT;
+        nlohmann::json obj = hipdnn_sdk::data_objects::DataType::FLOAT;
 
         std::cout << obj.dump() << "\n";
     }
 
     nlohmann::json obj = "float";
+    ASSERT_EQ(obj.get<hipdnn_sdk::data_objects::DataType>(),
+              hipdnn_sdk::data_objects::DataType::FLOAT);
 }
