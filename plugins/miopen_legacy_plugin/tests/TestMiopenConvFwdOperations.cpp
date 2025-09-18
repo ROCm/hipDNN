@@ -11,6 +11,7 @@
 #include <hipdnn_sdk/utilities/Tensor.hpp>
 #include <hipdnn_sdk/utilities/UtilsBfp16.hpp>
 #include <hipdnn_sdk/utilities/UtilsFp16.hpp>
+#include <hipdnn_sdk/utilities/Workspace.hpp>
 
 #include "HipdnnEnginePluginExecutionContext.hpp"
 #include "HipdnnEnginePluginHandle.hpp"
@@ -86,21 +87,29 @@ protected:
         engineConfig.ptr = engineConfigBuilder.GetBufferPointer();
         engineConfig.size = engineConfigBuilder.GetSize();
 
-        hipdnnEnginePluginExecutionContext_t executionContext;
-        hipdnnEnginePluginCreateExecutionContext(
-            _handle, &engineConfig, &opGraph, &executionContext);
+        hipdnnPluginStatus_t status;
+        size_t workspaceSize;
+        status = hipdnnEnginePluginGetWorkspaceSize(_handle, &engineConfig, &opGraph, &workspaceSize);
+        EXPECT_EQ(status, HIPDNN_PLUGIN_STATUS_SUCCESS);
+        hipdnn_sdk::utilities::Workspace workspace(workspaceSize);
 
-        hipdnnPluginStatus_t status
+        hipdnnEnginePluginExecutionContext_t executionContext;
+        status = hipdnnEnginePluginCreateExecutionContext(
+            _handle, &engineConfig, &opGraph, &executionContext);
+        EXPECT_EQ(status, HIPDNN_PLUGIN_STATUS_SUCCESS);
+
+        status
             = hipdnnEnginePluginExecuteOpGraph(_handle,
                                                executionContext,
-                                               nullptr,
+                                               workspace.get(),
                                                deviceBuffers.data(),
                                                static_cast<uint32_t>(deviceBuffers.size()));
         EXPECT_EQ(status, HIPDNN_PLUGIN_STATUS_SUCCESS);
 
         yTensor.memory().markDeviceModified();
 
-        hipdnnEnginePluginDestroyExecutionContext(_handle, executionContext);
+        status = hipdnnEnginePluginDestroyExecutionContext(_handle, executionContext);
+        EXPECT_EQ(status, HIPDNN_PLUGIN_STATUS_SUCCESS);
 
         Tensor<DataType> xTensorCpu(xTensor.dims(), _layout);
         xTensorCpu.fillWithRandomValues(
