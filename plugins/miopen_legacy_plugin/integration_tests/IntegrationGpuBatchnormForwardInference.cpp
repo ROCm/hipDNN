@@ -72,7 +72,7 @@ class BatchnormForwardInference : public ::testing::TestWithParam<TestCaseType>
         TensorBundle(const std::vector<int64_t>& dims,
                      unsigned int seed = 1,
                      const TensorLayout& layout = TensorLayout::NCHW)
-            : derivedDims(getDerivedDims(dims))
+            : derivedDims(getPerChannelShape(dims))
             , xTensor(dims, layout)
             , yTensor(dims, layout)
             , scaleTensor(derivedDims)
