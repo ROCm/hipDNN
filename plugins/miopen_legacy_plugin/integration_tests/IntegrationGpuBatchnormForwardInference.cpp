@@ -53,11 +53,12 @@ struct Batchnorm3dTestCase
     int64_t d;
     int64_t h;
     int64_t w;
+    unsigned int seed;
 
     friend std::ostream& operator<<(std::ostream& ss, const Batchnorm3dTestCase& tc)
     {
         return ss << "(n:" << tc.n << " c:" << tc.c << " d:" << tc.d << " h:" << tc.h
-                  << " w:" << tc.w << ")";
+                  << " w:" << tc.w << " seed:" << tc.seed << ")";
     }
 
     std::vector<int64_t> getDims() const
@@ -365,9 +366,11 @@ std::vector<Batchnorm2dTestCase> getBnFwdInferenceTestCases()
 
 std::vector<Batchnorm3dTestCase> getBnFwdInference3dTestCases()
 {
+    unsigned int seed = std::random_device{}();
+
     return {
-        {.n = 2, .c = 3, .d = 3, .h = 1, .w = 1},
-        {.n = 16, .c = 3, .d = 8, .h = 14, .w = 14},
+        {.n = 2, .c = 3, .d = 3, .h = 1, .w = 1, .seed = seed},
+        {.n = 16, .c = 3, .d = 8, .h = 14, .w = 14, .seed = seed},
     };
 }
 
