@@ -433,3 +433,17 @@ TEST(TestShapeUtils, GenerateDefaultPackedStridesAllOnes)
 
     EXPECT_EQ(strides, (std::vector<int64_t>{1, 1, 1, 1}));
 }
+
+TEST(TestShapeUtils, GetDerivedShape5DValid)
+{
+    std::vector<int64_t> shape = {2, 4, 8, 16, 32};
+    auto derivedShape = getDerivedShape(shape);
+
+    EXPECT_EQ(derivedShape, (std::vector<int64_t>{1, 4, 1, 1, 1}));
+}
+
+TEST(TestShapeUtils, GetDerivedShapeThrowsForSingleDimension)
+{
+    std::vector<int64_t> shape = {10};
+    EXPECT_THROW(getDerivedShape(shape), std::runtime_error);
+}
