@@ -112,19 +112,19 @@ protected:
         hipdnnEnginePluginExecutionContext_t executionContext;
         status = hipdnnEnginePluginCreateExecutionContext(
             _handle, &engineConfig, &opGraph, &executionContext);
-        EXPECT_EQ(status, HIPDNN_PLUGIN_STATUS_SUCCESS);
+        ASSERT_EQ(status, HIPDNN_PLUGIN_STATUS_SUCCESS);
 
         status = hipdnnEnginePluginExecuteOpGraph(_handle,
                                                   executionContext,
                                                   nullptr,
                                                   deviceBuffers.data(),
                                                   static_cast<uint32_t>(deviceBuffers.size()));
-        EXPECT_EQ(status, HIPDNN_PLUGIN_STATUS_SUCCESS);
+        ASSERT_EQ(status, HIPDNN_PLUGIN_STATUS_SUCCESS);
 
         yTensor.memory().markDeviceModified();
 
         status = hipdnnEnginePluginDestroyExecutionContext(_handle, executionContext);
-        EXPECT_EQ(status, HIPDNN_PLUGIN_STATUS_SUCCESS);
+        ASSERT_EQ(status, HIPDNN_PLUGIN_STATUS_SUCCESS);
 
         Tensor<InputType> xTensorCpu(dims, _layout);
         xTensorCpu.fillWithRandomValues(

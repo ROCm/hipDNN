@@ -92,25 +92,25 @@ protected:
         size_t workspaceSize;
         status
             = hipdnnEnginePluginGetWorkspaceSize(_handle, &engineConfig, &opGraph, &workspaceSize);
-        EXPECT_EQ(status, HIPDNN_PLUGIN_STATUS_SUCCESS);
+        ASSERT_EQ(status, HIPDNN_PLUGIN_STATUS_SUCCESS);
         hipdnn_sdk::utilities::Workspace workspace(workspaceSize);
 
         hipdnnEnginePluginExecutionContext_t executionContext;
         status = hipdnnEnginePluginCreateExecutionContext(
             _handle, &engineConfig, &opGraph, &executionContext);
-        EXPECT_EQ(status, HIPDNN_PLUGIN_STATUS_SUCCESS);
+        ASSERT_EQ(status, HIPDNN_PLUGIN_STATUS_SUCCESS);
 
         status = hipdnnEnginePluginExecuteOpGraph(_handle,
                                                   executionContext,
                                                   workspace.get(),
                                                   deviceBuffers.data(),
                                                   static_cast<uint32_t>(deviceBuffers.size()));
-        EXPECT_EQ(status, HIPDNN_PLUGIN_STATUS_SUCCESS);
+        ASSERT_EQ(status, HIPDNN_PLUGIN_STATUS_SUCCESS);
 
         yTensor.memory().markDeviceModified();
 
         status = hipdnnEnginePluginDestroyExecutionContext(_handle, executionContext);
-        EXPECT_EQ(status, HIPDNN_PLUGIN_STATUS_SUCCESS);
+        ASSERT_EQ(status, HIPDNN_PLUGIN_STATUS_SUCCESS);
 
         Tensor<DataType> xTensorCpu(xTensor.dims(), _layout);
         xTensorCpu.fillWithRandomValues(
