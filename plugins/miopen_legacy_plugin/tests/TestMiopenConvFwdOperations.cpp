@@ -89,7 +89,8 @@ protected:
 
         hipdnnPluginStatus_t status;
         size_t workspaceSize;
-        status = hipdnnEnginePluginGetWorkspaceSize(_handle, &engineConfig, &opGraph, &workspaceSize);
+        status
+            = hipdnnEnginePluginGetWorkspaceSize(_handle, &engineConfig, &opGraph, &workspaceSize);
         EXPECT_EQ(status, HIPDNN_PLUGIN_STATUS_SUCCESS);
         hipdnn_sdk::utilities::Workspace workspace(workspaceSize);
 
@@ -98,12 +99,11 @@ protected:
             _handle, &engineConfig, &opGraph, &executionContext);
         EXPECT_EQ(status, HIPDNN_PLUGIN_STATUS_SUCCESS);
 
-        status
-            = hipdnnEnginePluginExecuteOpGraph(_handle,
-                                               executionContext,
-                                               workspace.get(),
-                                               deviceBuffers.data(),
-                                               static_cast<uint32_t>(deviceBuffers.size()));
+        status = hipdnnEnginePluginExecuteOpGraph(_handle,
+                                                  executionContext,
+                                                  workspace.get(),
+                                                  deviceBuffers.data(),
+                                                  static_cast<uint32_t>(deviceBuffers.size()));
         EXPECT_EQ(status, HIPDNN_PLUGIN_STATUS_SUCCESS);
 
         yTensor.memory().markDeviceModified();
