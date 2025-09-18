@@ -44,7 +44,8 @@ protected:
     {
         if(_handle != nullptr)
         {
-            hipdnnEnginePluginDestroy(_handle);
+            hipdnnPluginStatus_t status = hipdnnEnginePluginDestroy(_handle);
+            ASSERT_EQ(status, HIPDNN_PLUGIN_STATUS_SUCCESS);
         }
     }
 
@@ -110,11 +111,13 @@ protected:
         engineConfig.ptr = engineConfigBuilder.GetBufferPointer();
         engineConfig.size = engineConfigBuilder.GetSize();
 
+        hipdnnPluginStatus_t status;
         hipdnnEnginePluginExecutionContext_t executionContext;
-        hipdnnEnginePluginCreateExecutionContext(
+        status = hipdnnEnginePluginCreateExecutionContext(
             _handle, &engineConfig, &opGraph, &executionContext);
+        EXPECT_EQ(status, HIPDNN_PLUGIN_STATUS_SUCCESS);
 
-        hipdnnPluginStatus_t status
+        status
             = hipdnnEnginePluginExecuteOpGraph(_handle,
                                                executionContext,
                                                nullptr,
@@ -126,7 +129,8 @@ protected:
         dscaleTensor.memory().markDeviceModified();
         dbiasTensor.memory().markDeviceModified();
 
-        hipdnnEnginePluginDestroyExecutionContext(_handle, executionContext);
+        status = hipdnnEnginePluginDestroyExecutionContext(_handle, executionContext);
+        EXPECT_EQ(status, HIPDNN_PLUGIN_STATUS_SUCCESS);
 
         Tensor<InputType> xTensorCpu(dims, _layout);
         xTensorCpu.fillWithRandomValues(

@@ -14,6 +14,7 @@
 #include <hipdnn_sdk/utilities/MigratableMemory.hpp>
 #include <hipdnn_sdk/utilities/StringUtil.hpp>
 #include <hipdnn_sdk/utilities/Tensor.hpp>
+#include <hipdnn_sdk/utilities/Workspace.hpp>
 
 using namespace hipdnn_frontend;
 using namespace hipdnn_sdk::utilities;
@@ -232,10 +233,16 @@ protected:
         result = graphObj->build_plans();
         ASSERT_EQ(result.code, ErrorCode::OK) << result.err_msg;
 
+        int64_t workspaceSize;
+        result = graphObj->get_workspace_size(workspaceSize);
+        ASSERT_EQ(result.code, ErrorCode::OK) << result.err_msg;
+        ASSERT_GE(workspaceSize, 0) << result.err_msg;
+        Workspace workspace(static_cast<size_t>(workspaceSize));
+
         auto variantPack
             = createVariantPack(*xTensorAttr, *wTensorAttr, *yTensorAttr, graphTensorBundle);
 
-        result = graphObj->execute(_handle, variantPack, _stream);
+        result = graphObj->execute(_handle, variantPack, workspace.get());
         ASSERT_EQ(result.code, ErrorCode::OK) << result.err_msg;
     }
 

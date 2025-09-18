@@ -23,7 +23,10 @@ public:
     Workspace(size_t size)
         : _size(size)
     {
-        _ptr = _allocator.allocate(size);
+        if(size != 0)
+        {
+            _ptr = _allocator.allocate(size);
+        }
     }
 
     ~Workspace()
@@ -31,6 +34,33 @@ public:
         if(_ptr)
             _allocator.deallocate(static_cast<char*>(_ptr), _size);
     }
+
+    Workspace(Workspace&& other) noexcept
+        : _ptr(other._ptr)
+        , _size(other._size)
+    {
+        other._ptr  = nullptr;
+        other._size = 0;
+    }
+
+    Workspace& operator=(Workspace&& other) noexcept
+    {
+        if(this != &other)
+        {
+            if(_ptr)
+                _allocator.deallocate(static_cast<char*>(_ptr), _size);
+
+            _ptr       = other._ptr;
+            _size      = other._size;
+
+            other._ptr  = nullptr;
+            other._size = 0;
+        }
+        return *this;
+    }
+
+    Workspace(const Workspace&) = delete;
+    Workspace& operator=(const Workspace&) = delete;
 
     void* get() const
     {

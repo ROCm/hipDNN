@@ -42,7 +42,8 @@ protected:
     {
         if(_handle != nullptr)
         {
-            hipdnnEnginePluginDestroy(_handle);
+            hipdnnPluginStatus_t status = hipdnnEnginePluginDestroy(_handle);
+            ASSERT_EQ(status, HIPDNN_PLUGIN_STATUS_SUCCESS);
         }
     }
 
