@@ -10,7 +10,6 @@
 #include <hipdnn_sdk/test_utilities/TestUtilities.hpp>
 #include <hipdnn_sdk/utilities/Json.hpp>
 #include <spdlog/fmt/bundled/format.h>
-#include <type_traits>
 
 using namespace hipdnn_sdk::data_objects;
 
