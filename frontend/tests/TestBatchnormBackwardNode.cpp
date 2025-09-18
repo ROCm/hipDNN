@@ -296,7 +296,7 @@ TEST(TestBatchnormBackwardNode, PackNode)
 
     EXPECT_STREQ(nodeFlatbuffer->name()->c_str(), "BatchnormBackward");
     EXPECT_EQ(nodeFlatbuffer->attributes_type(),
-              hipdnn_sdk::data_objects::NodeAttributes_BatchnormBackwardAttributes);
+              hipdnn_sdk::data_objects::NodeAttributes::BatchnormBackwardAttributes);
 
     auto packedAttributes = nodeFlatbuffer->attributes_as_BatchnormBackwardAttributes();
     ASSERT_NE(packedAttributes, nullptr);
@@ -378,7 +378,7 @@ TEST(TestBatchnormBackwardNode, PackNodeWithoutMeanAndInvVariance)
 
     EXPECT_STREQ(nodeFlatbuffer->name()->c_str(), "BatchnormBackward");
     EXPECT_EQ(nodeFlatbuffer->attributes_type(),
-              hipdnn_sdk::data_objects::NodeAttributes_BatchnormBackwardAttributes);
+              hipdnn_sdk::data_objects::NodeAttributes::BatchnormBackwardAttributes);
 
     auto packedAttributes = nodeFlatbuffer->attributes_as_BatchnormBackwardAttributes();
     ASSERT_NE(packedAttributes, nullptr);

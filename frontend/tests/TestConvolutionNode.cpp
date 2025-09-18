@@ -691,7 +691,7 @@ TEST(TestConvolutionNode, PackNode)
 
     EXPECT_STREQ(nodeFlatbuffer->name()->c_str(), "Convolution");
     EXPECT_EQ(nodeFlatbuffer->attributes_type(),
-              hipdnn_sdk::data_objects::NodeAttributes_ConvolutionFwdAttributes);
+              hipdnn_sdk::data_objects::NodeAttributes::ConvolutionFwdAttributes);
 
     auto packedAttributes = nodeFlatbuffer->attributes_as_ConvolutionFwdAttributes();
     ASSERT_NE(packedAttributes, nullptr);
@@ -716,7 +716,7 @@ TEST(TestConvolutionNode, PackNode)
     EXPECT_EQ(packedAttributes->dilation()->Get(0), 1);
     EXPECT_EQ(packedAttributes->dilation()->Get(1), 1);
 
-    EXPECT_EQ(packedAttributes->conv_mode(), hipdnn_sdk::data_objects::ConvMode_CROSS_CORRELATION);
+    EXPECT_EQ(packedAttributes->conv_mode(), hipdnn_sdk::data_objects::ConvMode::CROSS_CORRELATION);
 }
 
 TEST(TestConvolutionNode, GatherHipdnnTensorIds)

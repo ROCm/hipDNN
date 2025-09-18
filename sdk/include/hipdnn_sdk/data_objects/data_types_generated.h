@@ -17,27 +17,27 @@ static_assert(FLATBUFFERS_VERSION_MAJOR == 23 &&
 namespace hipdnn_sdk {
 namespace data_objects {
 
-enum DataType : int8_t {
-  DataType_UNSET = 0,
-  DataType_FLOAT = 1,
-  DataType_HALF = 2,
-  DataType_BFLOAT16 = 3,
-  DataType_DOUBLE = 4,
-  DataType_UINT8 = 5,
-  DataType_INT32 = 6,
-  DataType_MIN = DataType_UNSET,
-  DataType_MAX = DataType_INT32
+enum class DataType : int8_t {
+  UNSET = 0,
+  FLOAT = 1,
+  HALF = 2,
+  BFLOAT16 = 3,
+  DOUBLE = 4,
+  UINT8 = 5,
+  INT32 = 6,
+  MIN = UNSET,
+  MAX = INT32
 };
 
 inline const DataType (&EnumValuesDataType())[7] {
   static const DataType values[] = {
-    DataType_UNSET,
-    DataType_FLOAT,
-    DataType_HALF,
-    DataType_BFLOAT16,
-    DataType_DOUBLE,
-    DataType_UINT8,
-    DataType_INT32
+    DataType::UNSET,
+    DataType::FLOAT,
+    DataType::HALF,
+    DataType::BFLOAT16,
+    DataType::DOUBLE,
+    DataType::UINT8,
+    DataType::INT32
   };
   return values;
 }
@@ -57,7 +57,7 @@ inline const char * const *EnumNamesDataType() {
 }
 
 inline const char *EnumNameDataType(DataType e) {
-  if (::flatbuffers::IsOutRange(e, DataType_UNSET, DataType_INT32)) return "";
+  if (::flatbuffers::IsOutRange(e, DataType::UNSET, DataType::INT32)) return "";
   const size_t index = static_cast<size_t>(e);
   return EnumNamesDataType()[index];
 }

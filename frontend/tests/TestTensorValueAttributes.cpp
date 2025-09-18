@@ -61,12 +61,12 @@ TEST(TestTensorValueAttributes, PackUnpackFloatValue)
 
     EXPECT_EQ(fbTensor->uid(), 7);
     EXPECT_STREQ(fbTensor->name()->c_str(), "value_tensor");
-    EXPECT_EQ(fbTensor->data_type(), DataType_FLOAT);
+    EXPECT_EQ(fbTensor->data_type(), DataType::FLOAT);
     EXPECT_EQ(fbTensor->strides()->size(), 1u);
     EXPECT_EQ(fbTensor->dims()->size(), 1u);
     EXPECT_FALSE(fbTensor->virtual_());
 
-    EXPECT_EQ(fbTensor->value_type(), TensorValue_Float32Value);
+    EXPECT_EQ(fbTensor->value_type(), TensorValue::Float32Value);
     auto fval = fbTensor->value_as_Float32Value();
     ASSERT_NE(fval, nullptr);
     EXPECT_FLOAT_EQ(fval->value(), std::numbers::e_v<float>);
@@ -74,7 +74,7 @@ TEST(TestTensorValueAttributes, PackUnpackFloatValue)
     auto unpacked = std::unique_ptr<TensorAttributesT>(fbTensor->UnPack());
     EXPECT_EQ(unpacked->uid, 7);
     EXPECT_EQ(unpacked->name, "value_tensor");
-    EXPECT_EQ(unpacked->data_type, DataType_FLOAT);
+    EXPECT_EQ(unpacked->data_type, DataType::FLOAT);
 
     std::vector<int64_t> expectedStrides = {1};
     std::vector<int64_t> expectedDims = {1};
@@ -83,7 +83,7 @@ TEST(TestTensorValueAttributes, PackUnpackFloatValue)
 
     EXPECT_FALSE(unpacked->virtual_);
 
-    ASSERT_EQ(unpacked->value.type, TensorValue_Float32Value);
+    ASSERT_EQ(unpacked->value.type, TensorValue::Float32Value);
     auto* floatVal = unpacked->value.AsFloat32Value();
     ASSERT_NE(floatVal, nullptr);
     EXPECT_FLOAT_EQ(floatVal->value(), std::numbers::e_v<float>);
@@ -105,13 +105,13 @@ TEST(TestTensorValueAttributes, PackUnpackHalfValue)
     auto bufferPointer = builder.GetBufferPointer();
     auto fbTensor = flatbuffers::GetRoot<TensorAttributes>(bufferPointer);
 
-    EXPECT_EQ(fbTensor->value_type(), TensorValue_Float16Value);
+    EXPECT_EQ(fbTensor->value_type(), TensorValue::Float16Value);
     auto hval = fbTensor->value_as_Float16Value();
     ASSERT_NE(hval, nullptr);
     EXPECT_EQ(hval->value(), 1.0_h);
 
     auto unpacked = std::unique_ptr<TensorAttributesT>(fbTensor->UnPack());
-    ASSERT_EQ(unpacked->value.type, TensorValue_Float16Value);
+    ASSERT_EQ(unpacked->value.type, TensorValue::Float16Value);
     auto* halfVal = unpacked->value.AsFloat16Value();
     ASSERT_NE(halfVal, nullptr);
     EXPECT_EQ(halfVal->value(), 1.0_h);
@@ -133,13 +133,13 @@ TEST(TestTensorValueAttributes, PackUnpackBFloat1Value)
     auto bufferPointer = builder.GetBufferPointer();
     auto fbTensor = flatbuffers::GetRoot<TensorAttributes>(bufferPointer);
 
-    EXPECT_EQ(fbTensor->value_type(), TensorValue_BFloat16Value);
+    EXPECT_EQ(fbTensor->value_type(), TensorValue::BFloat16Value);
     auto hval = fbTensor->value_as_BFloat16Value();
     ASSERT_NE(hval, nullptr);
     EXPECT_EQ(hval->value(), 1.0_bf);
 
     auto unpacked = std::unique_ptr<TensorAttributesT>(fbTensor->UnPack());
-    ASSERT_EQ(unpacked->value.type, TensorValue_BFloat16Value);
+    ASSERT_EQ(unpacked->value.type, TensorValue::BFloat16Value);
     auto* halfVal = unpacked->value.AsBFloat16Value();
     ASSERT_NE(halfVal, nullptr);
     EXPECT_EQ(halfVal->value(), 1.0_bf);
@@ -161,13 +161,13 @@ TEST(TestTensorValueAttributes, PackUnpackDoubleValue)
     auto bufferPointer = builder.GetBufferPointer();
     auto fbTensor = flatbuffers::GetRoot<TensorAttributes>(bufferPointer);
 
-    EXPECT_EQ(fbTensor->value_type(), TensorValue_Float64Value);
+    EXPECT_EQ(fbTensor->value_type(), TensorValue::Float64Value);
     auto dval = fbTensor->value_as_Float64Value();
     ASSERT_NE(dval, nullptr);
     EXPECT_DOUBLE_EQ(dval->value(), std::numbers::pi_v<double>);
 
     auto unpacked = std::unique_ptr<TensorAttributesT>(fbTensor->UnPack());
-    ASSERT_EQ(unpacked->value.type, TensorValue_Float64Value);
+    ASSERT_EQ(unpacked->value.type, TensorValue::Float64Value);
     auto* doubleVal = unpacked->value.AsFloat64Value();
     ASSERT_NE(doubleVal, nullptr);
     EXPECT_DOUBLE_EQ(doubleVal->value(), std::numbers::pi_v<double>);
@@ -192,10 +192,10 @@ TEST(TestTensorValueAttributes, PackUnpackEmptyValue)
     auto bufferPointer = builder.GetBufferPointer();
     auto fbTensor = flatbuffers::GetRoot<TensorAttributes>(bufferPointer);
 
-    EXPECT_EQ(fbTensor->value_type(), TensorValue_NONE);
+    EXPECT_EQ(fbTensor->value_type(), TensorValue::NONE);
 
     auto unpacked = std::unique_ptr<TensorAttributesT>(fbTensor->UnPack());
-    EXPECT_EQ(unpacked->value.type, TensorValue_NONE);
+    EXPECT_EQ(unpacked->value.type, TensorValue::NONE);
 }
 
 TEST(TestTensorValueAttributes, TypeSafety)
