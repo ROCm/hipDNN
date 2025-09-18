@@ -227,36 +227,37 @@ inline flatbuffers::FlatBufferBuilder
     flatbuffers::FlatBufferBuilder builder;
     std::vector<::flatbuffers::Offset<TensorAttributes>> tensorAttributes;
 
-    tensorAttributes.push_back(CreateTensorAttributesDirect(
-        builder, 1, "x", dataType, &xStrides, &xDims));
+    tensorAttributes.push_back(
+        CreateTensorAttributesDirect(builder, 1, "x", dataType, &xStrides, &xDims));
 
-    tensorAttributes.push_back(CreateTensorAttributesDirect(
-        builder, 2, "w", dataType, &wStrides, &wDims));
+    tensorAttributes.push_back(
+        CreateTensorAttributesDirect(builder, 2, "w", dataType, &wStrides, &wDims));
 
-    tensorAttributes.push_back(CreateTensorAttributesDirect(
-        builder, 3, "y", dataType, &yStrides, &yDims));
+    tensorAttributes.push_back(
+        CreateTensorAttributesDirect(builder, 3, "y", dataType, &yStrides, &yDims));
 
-    auto convAttributes = CreateConvolutionFwdAttributesDirect(
-        builder,
-        1, // x tensor uid
-        2, // w tensor uid
-        3, // y tensor uid
-        &convPrePadding,
-        &convPostPadding,
-        &convStrides,
-        &convDilation,
-        ConvMode::CROSS_CORRELATION);
+    auto convAttributes = CreateConvolutionFwdAttributesDirect(builder,
+                                                               1, // x tensor uid
+                                                               2, // w tensor uid
+                                                               3, // y tensor uid
+                                                               &convPrePadding,
+                                                               &convPostPadding,
+                                                               &convStrides,
+                                                               &convDilation,
+                                                               ConvMode::CROSS_CORRELATION);
 
     std::vector<::flatbuffers::Offset<Node>> nodes;
     auto node = CreateNodeDirect(
-        builder,
-        "conv_fwd",
-        NodeAttributes::ConvolutionFwdAttributes,
-        convAttributes.Union());
+        builder, "conv_fwd", NodeAttributes::ConvolutionFwdAttributes, convAttributes.Union());
     nodes.push_back(node);
 
-    auto graphOffset = CreateGraphDirect(
-        builder, "test", DataType::FLOAT, DataType::FLOAT, DataType::FLOAT, &tensorAttributes, &nodes);
+    auto graphOffset = CreateGraphDirect(builder,
+                                         "test",
+                                         DataType::FLOAT,
+                                         DataType::FLOAT,
+                                         DataType::FLOAT,
+                                         &tensorAttributes,
+                                         &nodes);
     builder.Finish(graphOffset);
     return builder;
 }
