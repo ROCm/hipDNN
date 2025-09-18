@@ -492,7 +492,6 @@ INSTANTIATE_TEST_SUITE_P(,
                          IntegrationGpuBatchnormBackwardNcdhwFp16,
                          testing::ValuesIn(getBnBwd3dTestCases()));
 
-// 3D test cases for NDHWC
 TEST_P(IntegrationGpuBatchnormBackwardNdhwcFp32, Correctness)
 {
     runBatchnormTest(4e-3f, TensorLayout::NDHWC);

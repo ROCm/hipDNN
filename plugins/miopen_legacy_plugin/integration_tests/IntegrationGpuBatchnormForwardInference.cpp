@@ -424,7 +424,6 @@ INSTANTIATE_TEST_SUITE_P(,
                          IntegrationGpuBatchnormForwardInferenceNhwcFp16,
                          testing::ValuesIn(getBnFwdInferenceTestCases()));
 
-// 3D test cases for NCDHW
 TEST_P(IntegrationGpuBatchnormForwardInferenceNcdhwFp32, Correctness)
 {
     runBatchnormTest(1e-6f, TensorLayout::NCDHW);
@@ -452,7 +451,6 @@ INSTANTIATE_TEST_SUITE_P(,
                          IntegrationGpuBatchnormForwardInferenceNcdhwFp16,
                          testing::ValuesIn(getBnFwdInference3dTestCases()));
 
-// 3D test cases for NDHWC
 TEST_P(IntegrationGpuBatchnormForwardInferenceNdhwcFp32, Correctness)
 {
     runBatchnormTest(1e-6f, TensorLayout::NDHWC);
