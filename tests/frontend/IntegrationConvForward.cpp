@@ -13,7 +13,9 @@
 #include <hipdnn_sdk/test_utilities/TestUtilities.hpp>
 #include <hipdnn_sdk/utilities/MigratableMemory.hpp>
 #include <hipdnn_sdk/utilities/Tensor.hpp>
-#include <test_plugins/TestPluginConstants.hpp>
+#include <hipdnn_sdk/utilities/Workspace.hpp>
+
+#include "test_plugins/TestPluginConstants.hpp"
 
 using namespace hipdnn_frontend;
 using namespace hipdnn_frontend::graph;
@@ -222,13 +224,19 @@ protected:
         result = graph->build_plans();
         ASSERT_EQ(result.code, ErrorCode::OK) << result.err_msg;
 
+        int64_t workspaceSize;
+        result = graph->get_workspace_size(workspaceSize);
+        ASSERT_EQ(result.code, ErrorCode::OK) << result.err_msg;
+        ASSERT_GE(workspaceSize, 0) << result.err_msg;
+        Workspace workspace(static_cast<size_t>(workspaceSize));
+
         ASSERT_TRUE(tensors.x->has_uid());
         ASSERT_TRUE(tensors.w->has_uid());
         ASSERT_TRUE(tensors.y->has_uid());
 
         auto variantPack = createVariantPack(tensors, tensorBundle);
 
-        result = graph->execute(handle, variantPack, nullptr);
+        result = graph->execute(handle, variantPack, workspace.get());
         if(expectedFailure == FailurePoint::EXECUTE)
         {
             ASSERT_NE(result.code, ErrorCode::OK) << "Execute should fail";
