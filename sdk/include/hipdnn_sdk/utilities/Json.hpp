@@ -151,8 +151,8 @@ std::optional<T> optionalValue(nlohmann::json obj, Key&& key)
     return (it != obj.end()) ? std::optional<T>(it->template get<T>()) : std::nullopt;
 }
 
-auto batchnormInferenceAttributes(flatbuffers::FlatBufferBuilder& builder,
-                                  const nlohmann::json& attributes)
+auto toBatchnormInferenceAttributes(flatbuffers::FlatBufferBuilder& builder,
+                                    const nlohmann::json& attributes)
 {
     auto& input = attributes["inputs"];
     return data_objects::CreateBatchnormInferenceAttributes(
@@ -165,7 +165,7 @@ auto batchnormInferenceAttributes(flatbuffers::FlatBufferBuilder& builder,
         attributes["outputs"]["y"].get<int64_t>());
 }
 
-auto node(flatbuffers::FlatBufferBuilder& builder, const nlohmann::json& inNode)
+auto toNode(flatbuffers::FlatBufferBuilder& builder, const nlohmann::json& inNode)
 {
     auto type = inNode["type"].get<data_objects::NodeAttributes>();
     auto name = inNode["name"].get<std::string>();
@@ -174,7 +174,7 @@ auto node(flatbuffers::FlatBufferBuilder& builder, const nlohmann::json& inNode)
         switch(type)
         {
         case data_objects::NodeAttributes::BatchnormInferenceAttributes:
-            return batchnormInferenceAttributes(builder, inNode).Union();
+            return toBatchnormInferenceAttributes(builder, inNode).Union();
         default:
             throw std::runtime_error("Unsupported NodeAttribute type: "
                                      + std::string{EnumNameNodeAttributes(type)});
@@ -184,7 +184,8 @@ auto node(flatbuffers::FlatBufferBuilder& builder, const nlohmann::json& inNode)
     return data_objects::CreateNodeDirect(builder, name.c_str(), type, node);
 }
 
-auto tensorAttributes(flatbuffers::FlatBufferBuilder& builder, const nlohmann::json& tensorAttrJson)
+auto toTensorAttributes(flatbuffers::FlatBufferBuilder& builder,
+                        const nlohmann::json& tensorAttrJson)
 {
     auto uid = tensorAttrJson["uid"].get<int64_t>();
     auto name = tensorAttrJson["name"].get<std::string>();
@@ -197,7 +198,7 @@ auto tensorAttributes(flatbuffers::FlatBufferBuilder& builder, const nlohmann::j
         builder, uid, name.c_str(), dataType, &strides, &dims, isVirtual);
 }
 
-auto graph(flatbuffers::FlatBufferBuilder& builder, const nlohmann::json& inGraph)
+auto toGraph(flatbuffers::FlatBufferBuilder& builder, const nlohmann::json& inGraph)
 {
     auto name = inGraph.value<std::string>("name", std::string{});
     auto computeType = inGraph["compute_type"].get<data_objects::DataType>();
@@ -212,7 +213,7 @@ auto graph(flatbuffers::FlatBufferBuilder& builder, const nlohmann::json& inGrap
     }
     for(const auto& n : inGraph["nodes"])
     {
-        nodes.push_back(node(builder, n));
+        nodes.push_back(toNode(builder, n));
     }
 
     if(!inGraph["tensors"].is_array())
@@ -221,7 +222,7 @@ auto graph(flatbuffers::FlatBufferBuilder& builder, const nlohmann::json& inGrap
     }
     for(const auto& t : inGraph["tensors"])
     {
-        tensors.push_back(tensorAttributes(builder, t));
+        tensors.push_back(toTensorAttributes(builder, t));
     }
 
     return data_objects::CreateGraphDirect(
