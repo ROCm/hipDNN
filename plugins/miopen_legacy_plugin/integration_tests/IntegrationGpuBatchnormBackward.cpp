@@ -395,11 +395,11 @@ std::vector<Batchnorm2dTestCase> getBnBwdTestCases()
         // https://github.com/ROCm/rocm-libraries/pull/1197
         // {.n = 1, .c = 256, .h = 1, .w = 1}, // Would produce near-zero variance in theory
         {.n = 2, .c = 3, .h = 1, .w = 1},
-        // {.n = 32, .c = 1, .h = 14, .w = 14},
-        // {.n = 32, .c = 3, .h = 1, .w = 14},
-        // {.n = 32, .c = 3, .h = 14, .w = 1},
-        // {.n = 64, .c = 64, .h = 112, .w = 112},
-        // {.n = 64, .c = 512, .h = 14, .w = 14},
+        {.n = 32, .c = 1, .h = 14, .w = 14},
+        {.n = 32, .c = 3, .h = 1, .w = 14},
+        {.n = 32, .c = 3, .h = 14, .w = 1},
+        {.n = 64, .c = 64, .h = 112, .w = 112},
+        {.n = 64, .c = 512, .h = 14, .w = 14},
     };
 }
 
