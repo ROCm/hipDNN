@@ -5,6 +5,7 @@
 #include <hipdnn_frontend/Utilities.hpp>
 #include <hipdnn_frontend/attributes/BatchnormAttributes.hpp>
 #include <hipdnn_frontend/attributes/BatchnormInferenceAttributes.hpp>
+#include <hipdnn_frontend/attributes/ConvolutionDgradAttributes.hpp>
 #include <hipdnn_frontend/attributes/ConvolutionFpropAttributes.hpp>
 #include <hipdnn_frontend/attributes/GraphAttributes.hpp>
 #include <hipdnn_frontend/attributes/PointwiseAttributes.hpp>
@@ -13,6 +14,7 @@
 #include <hipdnn_frontend/node/BatchnormBackwardNode.hpp>
 #include <hipdnn_frontend/node/BatchnormInferenceNode.hpp>
 #include <hipdnn_frontend/node/BatchnormNode.hpp>
+#include <hipdnn_frontend/node/ConvolutionDgradNode.hpp>
 #include <hipdnn_frontend/node/ConvolutionFpropNode.hpp>
 #include <hipdnn_frontend/node/Node.hpp>
 #include <hipdnn_frontend/node/PointwiseNode.hpp>
@@ -638,6 +640,36 @@ public:
             std::make_shared<ConvolutionFpropNode>(std::move(attributes), graph_attributes));
 
         return y;
+    }
+
+    // NOLINTNEXTLINE(readability-identifier-naming)
+    std::shared_ptr<TensorAttributes> conv_dgrad(std::shared_ptr<TensorAttributes> dy,
+                                                 std::shared_ptr<TensorAttributes> w,
+                                                 ConvDgradAttributes attributes)
+    {
+        if(attributes.get_name().empty())
+        {
+            attributes.set_name("ConvolutionDgrad_" + std::to_string(_sub_nodes.size()));
+        }
+        if(dy->get_name().empty())
+        {
+            dy->set_name(attributes.get_name() + "::DY");
+        }
+        if(w->get_name().empty())
+        {
+            w->set_name(attributes.get_name() + "::W");
+        }
+
+        auto dx = outputTensor(attributes.get_name() + "::DX");
+
+        attributes.set_dy(std::move(dy));
+        attributes.set_w(std::move(w));
+        attributes.set_dx(dx);
+
+        _sub_nodes.emplace_back(
+            std::make_shared<ConvolutionDgradNode>(std::move(attributes), graph_attributes));
+
+        return dx;
     }
 
     // NOLINTBEGIN(readability-identifier-naming)
