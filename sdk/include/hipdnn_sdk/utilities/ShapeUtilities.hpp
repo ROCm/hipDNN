@@ -91,7 +91,7 @@ inline std::vector<int64_t> generateStrides(const std::vector<int64_t>& dims)
     strides.back() = 1;
     for(size_t i = dims.size() - 1; i > 0; --i)
     {
-        strides[i - 1] = strides[i] * static_cast<int64_t>(dims[i]);
+        strides[i - 1] = strides[i] * dims[i];
     }
     return strides;
 }
