@@ -132,14 +132,16 @@ endif()
 # keep this after all build folder have been added so they have a chance to register their tests
 # using append_test_to_check_target
 
-create_test_name_validation_target()
+if(NOT HIP_DNN_SKIP_TESTS)
+    create_test_name_validation_target()
 
-finalize_custom_check_target()
-finalize_unit_check_target()
-finalize_integration_check_target()
+    finalize_custom_check_target()
+    finalize_unit_check_target()
+    finalize_integration_check_target()
 
-add_dependencies(check validate_test_names)
-add_dependencies(check_ctest validate_test_names)
+    add_dependencies(check validate_test_names)
+    add_dependencies(check_ctest validate_test_names)
+endif()
 
 if(CODE_COVERAGE)
     if(HIP_DNN_BUILD_PLUGINS)

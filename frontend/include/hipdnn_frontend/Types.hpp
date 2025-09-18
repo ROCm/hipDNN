@@ -132,11 +132,11 @@ inline hipdnn_sdk::data_objects::ConvMode toSdkType(const ConvolutionMode& type)
     switch(type)
     {
     case ConvolutionMode::CROSS_CORRELATION:
-        return hipdnn_sdk::data_objects::ConvMode::ConvMode_CROSS_CORRELATION;
+        return hipdnn_sdk::data_objects::ConvMode::CROSS_CORRELATION;
     case ConvolutionMode::CONVOLUTION:
-        return hipdnn_sdk::data_objects::ConvMode::ConvMode_CONVOLUTION;
+        return hipdnn_sdk::data_objects::ConvMode::CONVOLUTION;
     default:
-        return hipdnn_sdk::data_objects::ConvMode::ConvMode_UNSET;
+        return hipdnn_sdk::data_objects::ConvMode::UNSET;
     }
 }
 
@@ -145,19 +145,19 @@ inline hipdnn_sdk::data_objects::DataType toSdkType(const DataType& type)
     switch(type)
     {
     case DataType::FLOAT:
-        return hipdnn_sdk::data_objects::DataType::DataType_FLOAT;
+        return hipdnn_sdk::data_objects::DataType::FLOAT;
     case DataType::HALF:
-        return hipdnn_sdk::data_objects::DataType::DataType_HALF;
+        return hipdnn_sdk::data_objects::DataType::HALF;
     case DataType::BFLOAT16:
-        return hipdnn_sdk::data_objects::DataType::DataType_BFLOAT16;
+        return hipdnn_sdk::data_objects::DataType::BFLOAT16;
     case DataType::DOUBLE:
-        return hipdnn_sdk::data_objects::DataType::DataType_DOUBLE;
+        return hipdnn_sdk::data_objects::DataType::DOUBLE;
     case DataType::UINT8:
-        return hipdnn_sdk::data_objects::DataType::DataType_UINT8;
+        return hipdnn_sdk::data_objects::DataType::UINT8;
     case DataType::INT32:
-        return hipdnn_sdk::data_objects::DataType::DataType_INT32;
+        return hipdnn_sdk::data_objects::DataType::INT32;
     default:
-        return hipdnn_sdk::data_objects::DataType::DataType_UNSET;
+        return hipdnn_sdk::data_objects::DataType::UNSET;
     }
 }
 
@@ -166,101 +166,101 @@ inline hipdnn_sdk::data_objects::PointwiseMode toSdkType(const PointwiseMode& ty
     switch(type)
     {
     case PointwiseMode::ABS:
-        return hipdnn_sdk::data_objects::PointwiseMode::PointwiseMode_ABS;
+        return hipdnn_sdk::data_objects::PointwiseMode::ABS;
     case PointwiseMode::ADD:
-        return hipdnn_sdk::data_objects::PointwiseMode::PointwiseMode_ADD;
+        return hipdnn_sdk::data_objects::PointwiseMode::ADD;
     case PointwiseMode::ADD_SQUARE:
-        return hipdnn_sdk::data_objects::PointwiseMode::PointwiseMode_ADD_SQUARE;
+        return hipdnn_sdk::data_objects::PointwiseMode::ADD_SQUARE;
     case PointwiseMode::BINARY_SELECT:
-        return hipdnn_sdk::data_objects::PointwiseMode::PointwiseMode_BINARY_SELECT;
+        return hipdnn_sdk::data_objects::PointwiseMode::BINARY_SELECT;
     case PointwiseMode::CEIL:
-        return hipdnn_sdk::data_objects::PointwiseMode::PointwiseMode_CEIL;
+        return hipdnn_sdk::data_objects::PointwiseMode::CEIL;
     case PointwiseMode::CMP_EQ:
-        return hipdnn_sdk::data_objects::PointwiseMode::PointwiseMode_CMP_EQ;
+        return hipdnn_sdk::data_objects::PointwiseMode::CMP_EQ;
     case PointwiseMode::CMP_GE:
-        return hipdnn_sdk::data_objects::PointwiseMode::PointwiseMode_CMP_GE;
+        return hipdnn_sdk::data_objects::PointwiseMode::CMP_GE;
     case PointwiseMode::CMP_GT:
-        return hipdnn_sdk::data_objects::PointwiseMode::PointwiseMode_CMP_GT;
+        return hipdnn_sdk::data_objects::PointwiseMode::CMP_GT;
     case PointwiseMode::CMP_LE:
-        return hipdnn_sdk::data_objects::PointwiseMode::PointwiseMode_CMP_LE;
+        return hipdnn_sdk::data_objects::PointwiseMode::CMP_LE;
     case PointwiseMode::CMP_LT:
-        return hipdnn_sdk::data_objects::PointwiseMode::PointwiseMode_CMP_LT;
+        return hipdnn_sdk::data_objects::PointwiseMode::CMP_LT;
     case PointwiseMode::CMP_NEQ:
-        return hipdnn_sdk::data_objects::PointwiseMode::PointwiseMode_CMP_NEQ;
+        return hipdnn_sdk::data_objects::PointwiseMode::CMP_NEQ;
     case PointwiseMode::DIV:
-        return hipdnn_sdk::data_objects::PointwiseMode::PointwiseMode_DIV;
+        return hipdnn_sdk::data_objects::PointwiseMode::DIV;
     case PointwiseMode::ELU_BWD:
-        return hipdnn_sdk::data_objects::PointwiseMode::PointwiseMode_ELU_BWD;
+        return hipdnn_sdk::data_objects::PointwiseMode::ELU_BWD;
     case PointwiseMode::ELU_FWD:
-        return hipdnn_sdk::data_objects::PointwiseMode::PointwiseMode_ELU_FWD;
+        return hipdnn_sdk::data_objects::PointwiseMode::ELU_FWD;
     case PointwiseMode::ERF:
-        return hipdnn_sdk::data_objects::PointwiseMode::PointwiseMode_ERF;
+        return hipdnn_sdk::data_objects::PointwiseMode::ERF;
     case PointwiseMode::EXP:
-        return hipdnn_sdk::data_objects::PointwiseMode::PointwiseMode_EXP;
+        return hipdnn_sdk::data_objects::PointwiseMode::EXP;
     case PointwiseMode::FLOOR:
-        return hipdnn_sdk::data_objects::PointwiseMode::PointwiseMode_FLOOR;
+        return hipdnn_sdk::data_objects::PointwiseMode::FLOOR;
     case PointwiseMode::GELU_APPROX_TANH_BWD:
-        return hipdnn_sdk::data_objects::PointwiseMode::PointwiseMode_GELU_APPROX_TANH_BWD;
+        return hipdnn_sdk::data_objects::PointwiseMode::GELU_APPROX_TANH_BWD;
     case PointwiseMode::GELU_APPROX_TANH_FWD:
-        return hipdnn_sdk::data_objects::PointwiseMode::PointwiseMode_GELU_APPROX_TANH_FWD;
+        return hipdnn_sdk::data_objects::PointwiseMode::GELU_APPROX_TANH_FWD;
     case PointwiseMode::GELU_BWD:
-        return hipdnn_sdk::data_objects::PointwiseMode::PointwiseMode_GELU_BWD;
+        return hipdnn_sdk::data_objects::PointwiseMode::GELU_BWD;
     case PointwiseMode::GELU_FWD:
-        return hipdnn_sdk::data_objects::PointwiseMode::PointwiseMode_GELU_FWD;
+        return hipdnn_sdk::data_objects::PointwiseMode::GELU_FWD;
     case PointwiseMode::GEN_INDEX:
-        return hipdnn_sdk::data_objects::PointwiseMode::PointwiseMode_GEN_INDEX;
+        return hipdnn_sdk::data_objects::PointwiseMode::GEN_INDEX;
     case PointwiseMode::IDENTITY:
-        return hipdnn_sdk::data_objects::PointwiseMode::PointwiseMode_IDENTITY;
+        return hipdnn_sdk::data_objects::PointwiseMode::IDENTITY;
     case PointwiseMode::LOG:
-        return hipdnn_sdk::data_objects::PointwiseMode::PointwiseMode_LOG;
+        return hipdnn_sdk::data_objects::PointwiseMode::LOG;
     case PointwiseMode::LOGICAL_AND:
-        return hipdnn_sdk::data_objects::PointwiseMode::PointwiseMode_LOGICAL_AND;
+        return hipdnn_sdk::data_objects::PointwiseMode::LOGICAL_AND;
     case PointwiseMode::LOGICAL_NOT:
-        return hipdnn_sdk::data_objects::PointwiseMode::PointwiseMode_LOGICAL_NOT;
+        return hipdnn_sdk::data_objects::PointwiseMode::LOGICAL_NOT;
     case PointwiseMode::LOGICAL_OR:
-        return hipdnn_sdk::data_objects::PointwiseMode::PointwiseMode_LOGICAL_OR;
+        return hipdnn_sdk::data_objects::PointwiseMode::LOGICAL_OR;
     case PointwiseMode::MAX:
-        return hipdnn_sdk::data_objects::PointwiseMode::PointwiseMode_MAX_OP;
+        return hipdnn_sdk::data_objects::PointwiseMode::MAX_OP;
     case PointwiseMode::MIN:
-        return hipdnn_sdk::data_objects::PointwiseMode::PointwiseMode_MIN_OP;
+        return hipdnn_sdk::data_objects::PointwiseMode::MIN_OP;
     case PointwiseMode::MUL:
-        return hipdnn_sdk::data_objects::PointwiseMode::PointwiseMode_MUL;
+        return hipdnn_sdk::data_objects::PointwiseMode::MUL;
     case PointwiseMode::NEG:
-        return hipdnn_sdk::data_objects::PointwiseMode::PointwiseMode_NEG;
+        return hipdnn_sdk::data_objects::PointwiseMode::NEG;
     case PointwiseMode::RECIPROCAL:
-        return hipdnn_sdk::data_objects::PointwiseMode::PointwiseMode_RECIPROCAL;
+        return hipdnn_sdk::data_objects::PointwiseMode::RECIPROCAL;
     case PointwiseMode::RELU_BWD:
-        return hipdnn_sdk::data_objects::PointwiseMode::PointwiseMode_RELU_BWD;
+        return hipdnn_sdk::data_objects::PointwiseMode::RELU_BWD;
     case PointwiseMode::RELU_FWD:
-        return hipdnn_sdk::data_objects::PointwiseMode::PointwiseMode_RELU_FWD;
+        return hipdnn_sdk::data_objects::PointwiseMode::RELU_FWD;
     case PointwiseMode::RSQRT:
-        return hipdnn_sdk::data_objects::PointwiseMode::PointwiseMode_RSQRT;
+        return hipdnn_sdk::data_objects::PointwiseMode::RSQRT;
     case PointwiseMode::SIGMOID_BWD:
-        return hipdnn_sdk::data_objects::PointwiseMode::PointwiseMode_SIGMOID_BWD;
+        return hipdnn_sdk::data_objects::PointwiseMode::SIGMOID_BWD;
     case PointwiseMode::SIGMOID_FWD:
-        return hipdnn_sdk::data_objects::PointwiseMode::PointwiseMode_SIGMOID_FWD;
+        return hipdnn_sdk::data_objects::PointwiseMode::SIGMOID_FWD;
     case PointwiseMode::SIN:
-        return hipdnn_sdk::data_objects::PointwiseMode::PointwiseMode_SIN;
+        return hipdnn_sdk::data_objects::PointwiseMode::SIN;
     case PointwiseMode::SOFTPLUS_BWD:
-        return hipdnn_sdk::data_objects::PointwiseMode::PointwiseMode_SOFTPLUS_BWD;
+        return hipdnn_sdk::data_objects::PointwiseMode::SOFTPLUS_BWD;
     case PointwiseMode::SOFTPLUS_FWD:
-        return hipdnn_sdk::data_objects::PointwiseMode::PointwiseMode_SOFTPLUS_FWD;
+        return hipdnn_sdk::data_objects::PointwiseMode::SOFTPLUS_FWD;
     case PointwiseMode::SQRT:
-        return hipdnn_sdk::data_objects::PointwiseMode::PointwiseMode_SQRT;
+        return hipdnn_sdk::data_objects::PointwiseMode::SQRT;
     case PointwiseMode::SUB:
-        return hipdnn_sdk::data_objects::PointwiseMode::PointwiseMode_SUB;
+        return hipdnn_sdk::data_objects::PointwiseMode::SUB;
     case PointwiseMode::SWISH_BWD:
-        return hipdnn_sdk::data_objects::PointwiseMode::PointwiseMode_SWISH_BWD;
+        return hipdnn_sdk::data_objects::PointwiseMode::SWISH_BWD;
     case PointwiseMode::SWISH_FWD:
-        return hipdnn_sdk::data_objects::PointwiseMode::PointwiseMode_SWISH_FWD;
+        return hipdnn_sdk::data_objects::PointwiseMode::SWISH_FWD;
     case PointwiseMode::TAN:
-        return hipdnn_sdk::data_objects::PointwiseMode::PointwiseMode_TAN;
+        return hipdnn_sdk::data_objects::PointwiseMode::TAN;
     case PointwiseMode::TANH_BWD:
-        return hipdnn_sdk::data_objects::PointwiseMode::PointwiseMode_TANH_BWD;
+        return hipdnn_sdk::data_objects::PointwiseMode::TANH_BWD;
     case PointwiseMode::TANH_FWD:
-        return hipdnn_sdk::data_objects::PointwiseMode::PointwiseMode_TANH_FWD;
+        return hipdnn_sdk::data_objects::PointwiseMode::TANH_FWD;
     default:
-        return hipdnn_sdk::data_objects::PointwiseMode::PointwiseMode_UNSET;
+        return hipdnn_sdk::data_objects::PointwiseMode::UNSET;
     }
 }
 
@@ -304,7 +304,7 @@ inline std::ostream& operator<<(std::ostream& os, const DataType& type)
 
 // Bitset size based on the maximum PointwiseMode value + 1
 static constexpr size_t POINTWISE_MODE_COUNT
-    = static_cast<size_t>(hipdnn_sdk::data_objects::PointwiseMode::PointwiseMode_MAX) + 1;
+    = static_cast<size_t>(hipdnn_sdk::data_objects::PointwiseMode::MAX) + 1;
 
 using PointwiseModeBitset = std::bitset<POINTWISE_MODE_COUNT>;
 

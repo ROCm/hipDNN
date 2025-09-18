@@ -85,7 +85,7 @@ macro(_build_local)
         message(STATUS "=========== Adding ${dep_name} ===========")
     endif()
     _pushstate()
-    set(CMAKE_MESSAGE_INDENT "[${dep_name}] ")
+    set(CMAKE_MESSAGE_INDENT "${CMAKE_MESSAGE_INDENT}[${dep_name}] ")
     cmake_language(
         CALL _fetch_${dep_name} "${PARSE_VERSION}" "${PARSE_HASH}"
     )

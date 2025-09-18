@@ -27,8 +27,8 @@ bool MiopenBatchnormPlanBuilder::isApplicable(
     }
 
     if(!opGraph.hasOnlySupportedAttributes(std::set<hipdnn_sdk::data_objects::NodeAttributes>{
-           hipdnn_sdk::data_objects::NodeAttributes_BatchnormInferenceAttributes,
-           hipdnn_sdk::data_objects::NodeAttributes_BatchnormBackwardAttributes}))
+           hipdnn_sdk::data_objects::NodeAttributes::BatchnormInferenceAttributes,
+           hipdnn_sdk::data_objects::NodeAttributes::BatchnormBackwardAttributes}))
     {
         HIPDNN_LOG_INFO("Batchnorm plan builder is not applicable for this graph");
         return false;
@@ -103,11 +103,11 @@ void MiopenBatchnormPlanBuilder::buildPlan(
     std::string nodeName = getNodeName(node);
     switch(node.attributes_type())
     {
-    case hipdnn_sdk::data_objects::NodeAttributes_BatchnormInferenceAttributes:
+    case hipdnn_sdk::data_objects::NodeAttributes::BatchnormInferenceAttributes:
         HIPDNN_LOG_INFO("Building batchnorm fwd inference plan for node: {}", nodeName);
         buildPlanInferenceSingleNode(handle, opGraph, node, executionContext);
         break;
-    case hipdnn_sdk::data_objects::NodeAttributes_BatchnormBackwardAttributes:
+    case hipdnn_sdk::data_objects::NodeAttributes::BatchnormBackwardAttributes:
         HIPDNN_LOG_INFO("Building batchnorm backward plan for node: {}", nodeName);
         buildPlanBwdSingleNode(handle, opGraph, node, executionContext);
         break;

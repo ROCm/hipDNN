@@ -30,11 +30,11 @@ miopenDataType_t tensorDataTypeToMiopenDataType(const hipdnn_sdk::data_objects::
 {
     switch(dataType)
     {
-    case hipdnn_sdk::data_objects::DataType_FLOAT:
+    case hipdnn_sdk::data_objects::DataType::FLOAT:
         return miopenFloat;
-    case hipdnn_sdk::data_objects::DataType_HALF:
+    case hipdnn_sdk::data_objects::DataType::HALF:
         return miopenHalf;
-    case hipdnn_sdk::data_objects::DataType_BFLOAT16:
+    case hipdnn_sdk::data_objects::DataType::BFLOAT16:
         return miopenBFloat16;
     default:
         throw hipdnn_plugin::HipdnnPluginException(
