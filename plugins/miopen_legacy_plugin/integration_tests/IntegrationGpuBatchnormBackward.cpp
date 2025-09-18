@@ -73,7 +73,7 @@ class BatchnormBackward : public ::testing::TestWithParam<TestCaseType>
         TensorBundle(const std::vector<int64_t>& dims,
                      unsigned int seed = 1,
                      const TensorLayout& layout = TensorLayout::NCHW)
-            : derivedDims(getPerChannelShape(dims))
+            : derivedDims(getDerivedShape(dims))
             , xTensor(dims, layout)
             , dyTensor(dims, layout)
             , dxTensor(dims, layout)

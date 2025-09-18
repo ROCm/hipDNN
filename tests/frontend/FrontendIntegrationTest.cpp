@@ -81,7 +81,7 @@ protected:
     struct SimpleBatchnorm2DTensorBundle
     {
         SimpleBatchnorm2DTensorBundle(const std::vector<int64_t>& dims)
-            : derivedDims(getPerChannelShape(dims))
+            : derivedDims(getDerivedShape(dims))
             , xTensor(Tensor<Input_type>(dims))
             , yTensor(Tensor<Input_type>(dims))
             , scaleTensor(Tensor<Intermediate_type>(derivedDims))

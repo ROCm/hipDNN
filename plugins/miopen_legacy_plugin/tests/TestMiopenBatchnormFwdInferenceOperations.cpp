@@ -57,7 +57,7 @@ protected:
 
         auto dims = std::vector<int64_t>{testCase.n, testCase.c, testCase.h, testCase.w};
 
-        auto derivedDims = getPerChannelShape(dims);
+        auto derivedDims = getDerivedShape(dims);
 
         auto deviceBuffers = std::vector<hipdnnPluginDeviceBuffer_t>{};
 

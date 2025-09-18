@@ -40,8 +40,8 @@ inline flatbuffers::FlatBufferBuilder
     flatbuffers::FlatBufferBuilder builder;
     std::vector<::flatbuffers::Offset<hipdnn_sdk::data_objects::TensorAttributes>> tensorAttributes;
 
-    std::vector<int64_t> derivedStrides = getPerChannelShape(strides);
-    std::vector<int64_t> derivedDims = getPerChannelShape(dims);
+    std::vector<int64_t> derivedStrides = getDerivedShape(strides);
+    std::vector<int64_t> derivedDims = getDerivedShape(dims);
 
     tensorAttributes.push_back(hipdnn_sdk::data_objects::CreateTensorAttributesDirect(
         builder, 1, "x", inputDataType, &strides, &dims));
@@ -124,8 +124,8 @@ inline flatbuffers::FlatBufferBuilder
     flatbuffers::FlatBufferBuilder builder;
     std::vector<::flatbuffers::Offset<hipdnn_sdk::data_objects::TensorAttributes>> tensorAttributes;
 
-    std::vector<int64_t> derivedStrides = getPerChannelShape(strides);
-    std::vector<int64_t> derivedDims = getPerChannelShape(dims);
+    std::vector<int64_t> derivedStrides = getDerivedShape(strides);
+    std::vector<int64_t> derivedDims = getDerivedShape(dims);
 
     tensorAttributes.push_back(hipdnn_sdk::data_objects::CreateTensorAttributesDirect(
         builder, 1, "x", inputDataType, &strides, &dims));

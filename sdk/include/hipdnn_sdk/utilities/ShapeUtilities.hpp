@@ -118,7 +118,9 @@ inline std::vector<int64_t> strideOrderNhwc(size_t numDims)
     return strideOrder;
 }
 
-inline std::vector<int64_t> getPerChannelShape(const std::vector<int64_t>& shape)
+// Gets the derived (per channel) shape from a full Tensor shape.
+// Ex. {1, 3, 224, 224} will return {1, 3, 1, 1}
+inline std::vector<int64_t> getDerivedShape(const std::vector<int64_t>& shape)
 {
     if(shape.size() < 2)
     {

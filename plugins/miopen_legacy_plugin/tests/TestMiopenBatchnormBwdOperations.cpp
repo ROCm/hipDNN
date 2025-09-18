@@ -57,7 +57,7 @@ protected:
 
         std::vector<int64_t> dims = {testCase.n, testCase.c, testCase.h, testCase.w};
 
-        std::vector<int64_t> derivedDims = getPerChannelShape(dims);
+        std::vector<int64_t> derivedDims = getDerivedShape(dims);
 
         std::vector<hipdnnPluginDeviceBuffer_t> deviceBuffers;
 
