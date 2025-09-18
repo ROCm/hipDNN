@@ -39,7 +39,7 @@ public:
         : _ptr(other._ptr)
         , _size(other._size)
     {
-        other._ptr  = nullptr;
+        other._ptr = nullptr;
         other._size = 0;
     }
 
@@ -50,10 +50,10 @@ public:
             if(_ptr)
                 _allocator.deallocate(static_cast<char*>(_ptr), _size);
 
-            _ptr       = other._ptr;
-            _size      = other._size;
+            _ptr = other._ptr;
+            _size = other._size;
 
-            other._ptr  = nullptr;
+            other._ptr = nullptr;
             other._size = 0;
         }
         return *this;

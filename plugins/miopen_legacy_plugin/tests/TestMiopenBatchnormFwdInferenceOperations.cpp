@@ -114,12 +114,11 @@ protected:
             _handle, &engineConfig, &opGraph, &executionContext);
         EXPECT_EQ(status, HIPDNN_PLUGIN_STATUS_SUCCESS);
 
-        status
-            = hipdnnEnginePluginExecuteOpGraph(_handle,
-                                               executionContext,
-                                               nullptr,
-                                               deviceBuffers.data(),
-                                               static_cast<uint32_t>(deviceBuffers.size()));
+        status = hipdnnEnginePluginExecuteOpGraph(_handle,
+                                                  executionContext,
+                                                  nullptr,
+                                                  deviceBuffers.data(),
+                                                  static_cast<uint32_t>(deviceBuffers.size()));
         EXPECT_EQ(status, HIPDNN_PLUGIN_STATUS_SUCCESS);
 
         yTensor.memory().markDeviceModified();
