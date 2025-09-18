@@ -47,13 +47,13 @@ void toJsonAndBackTestSuite(const hipdnn_sdk::data_objects::Graph* graph,
 TEST(TestJson, GraphToJsonAndBack)
 {
     {
-        auto graphBuilder = hipdnn_backend::test_utilities::createValidBatchnormGraph();
+        auto graphBuilder = hipdnn_sdk::test_utilities::createValidBatchnormGraph();
         auto graph = hipdnn_sdk::data_objects::GetGraph(graphBuilder.GetBufferPointer());
 
         toJsonAndBackTestSuite(graph, "(valid graph)");
     }
     {
-        auto graphBuilder = hipdnn_backend::test_utilities::createEmptyValidGraph();
+        auto graphBuilder = hipdnn_sdk::test_utilities::createEmptyValidGraph();
         auto graph = hipdnn_sdk::data_objects::GetGraph(graphBuilder.GetBufferPointer());
 
         toJsonAndBackTestSuite(graph, "(empty valid graph)");

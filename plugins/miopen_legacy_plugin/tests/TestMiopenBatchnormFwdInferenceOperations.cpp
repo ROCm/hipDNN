@@ -95,14 +95,14 @@ protected:
                                                            static_cast<IntermediateType>(1.0f),
                                                            seed));
 
-        auto batchnormBuilder = hipdnn_backend::test_utilities::createValidBatchnormGraph(
+        auto batchnormBuilder = hipdnn_sdk::test_utilities::createValidBatchnormGraph(
             xTensor.strides(), xTensor.dims(), true, inputDataType);
 
         hipdnnPluginConstData_t opGraph;
         opGraph.ptr = batchnormBuilder.GetBufferPointer();
         opGraph.size = batchnormBuilder.GetSize();
 
-        auto engineConfigBuilder = hipdnn_backend::test_utilities::createValidEngineConfig(1);
+        auto engineConfigBuilder = hipdnn_sdk::test_utilities::createValidEngineConfig(1);
         hipdnnPluginConstData_t engineConfig;
         engineConfig.ptr = engineConfigBuilder.GetBufferPointer();
         engineConfig.size = engineConfigBuilder.GetSize();
