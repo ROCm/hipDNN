@@ -71,7 +71,18 @@ class BatchnormForwardInference : public ::testing::TestWithParam<TestCaseType>
         TensorBundle(const std::vector<int64_t>& dims,
                      unsigned int seed = 1,
                      const TensorLayout& layout = TensorLayout::NCHW)
-            : derivedDims(createDerivedDims(dims))
+            : derivedDims([&dims]() {
+                if(dims.size() < 2)
+                {
+                    throw std::runtime_error(
+                        "Batchnorm tensors must have at least 2 dimensions (batch and channel)");
+                }
+
+                auto result = std::vector<int64_t>(dims.size(), 1);
+                result[1] = dims[1];
+
+                return result;
+            }())
             , xTensor(dims, layout)
             , yTensor(dims, layout)
             , scaleTensor(derivedDims)
@@ -95,16 +106,6 @@ class BatchnormForwardInference : public ::testing::TestWithParam<TestCaseType>
 
             varianceTensor.fillWithRandomValues(
                 static_cast<IntermediateType>(0.1f), static_cast<IntermediateType>(1.0f), seed);
-        }
-
-        static std::vector<int64_t> createDerivedDims(const std::vector<int64_t>& dims)
-        {
-            std::vector<int64_t> result(dims.size(), 1);
-            if(dims.size() > 1)
-            {
-                result[1] = dims[1]; // Channel dimension is always at index 1
-            }
-            return result;
         }
 
         std::vector<int64_t> derivedDims;
