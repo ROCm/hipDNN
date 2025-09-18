@@ -150,10 +150,10 @@ if(CODE_COVERAGE)
 
     set(CODE_COVERAGE_IGNORE_REGEX "\(.*deps.*\)|\(.*tests.*\)|\(.*sdk/include/hipdnn_sdk/data_objects.*\)|\(.*sdk/include/hipdnn_sdk/test_utilities.*\)|\(.*sdk/include/hipdnn_sdk/plugin/test_utils.*\)")
     set(CODE_COVERAGE_OBJECTS -object ./lib/libhipdnn_backend.so -object ./bin/hipdnn_backend_tests -object ./bin/hipdnn_frontend_tests -object ./bin/public_hipdnn_backend_tests -object ./bin/hipdnn_sdk_tests ${MIOPEN_PLUGIN_CODE_COVERAGE_OBJECT})
-    
+
     add_custom_target(
         code_coverage
-        COMMAND cd ${CMAKE_BINARY_DIR} && find . -name "*.profraw" -print0 | xargs -0 /opt/rocm/llvm/bin/llvm-profdata merge -sparse -o ./hipdnn.profdata
+        COMMAND cd ${CMAKE_BINARY_DIR} && find . -name \"*.profraw\" -print0 | xargs -0 /opt/rocm/llvm/bin/llvm-profdata merge -sparse -o ./hipdnn.profdata
         COMMAND /opt/rocm/llvm/bin/llvm-cov report ${CODE_COVERAGE_OBJECTS} -instr-profile=./hipdnn.profdata -ignore-filename-regex=\"${CODE_COVERAGE_IGNORE_REGEX}\" > ./code_cov_hipdnn.report
         COMMAND /opt/rocm/llvm/bin/llvm-cov show -Xdemangler=/opt/rocm/llvm/bin/llvm-cxxfilt ${CODE_COVERAGE_OBJECTS} -instr-profile=./hipdnn.profdata -ignore-filename-regex=\"${CODE_COVERAGE_IGNORE_REGEX}\" --format=html --output-dir=./hipdnn_coverage_html
         DEPENDS check
