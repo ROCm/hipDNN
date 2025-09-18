@@ -16,6 +16,7 @@ static_assert(FLATBUFFERS_VERSION_MAJOR == 23 &&
 #include "batchnorm_attributes_generated.h"
 #include "batchnorm_backward_attributes_generated.h"
 #include "batchnorm_inference_attributes_generated.h"
+#include "convolution_bwd_attributes_generated.h"
 #include "convolution_fwd_attributes_generated.h"
 #include "data_types_generated.h"
 #include "pointwise_attributes_generated.h"
