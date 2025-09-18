@@ -14,11 +14,9 @@
 
 using namespace hipdnn_sdk::data_objects;
 
-TEST(TestJson, GraphToJsonAndBack)
+void toJsonAndBackTestSuite(const hipdnn_sdk::data_objects::Graph* graph,
+                            const std::string& context)
 {
-    auto graphBuilder = hipdnn_backend::test_utilities::createValidBatchnormGraph();
-    auto graph = hipdnn_sdk::data_objects::GetGraph(graphBuilder.GetBufferPointer());
-
     nlohmann::json graphJson = *graph;
 
     flatbuffers::FlatBufferBuilder builder;
@@ -26,36 +24,58 @@ TEST(TestJson, GraphToJsonAndBack)
     builder.Finish(newGraphBuilder);
     auto newGraph = hipdnn_sdk::data_objects::GetGraph(builder.GetBufferPointer());
 
-    EXPECT_EQ(graph->compute_type(), newGraph->compute_type());
-    EXPECT_EQ(graph->io_type(), newGraph->io_type());
-    EXPECT_EQ(graph->name()->str(), newGraph->name()->str());
+    EXPECT_EQ(graph->compute_type(), newGraph->compute_type()) << context;
+    EXPECT_EQ(graph->io_type(), newGraph->io_type()) << context;
+    EXPECT_EQ(graph->name()->str(), newGraph->name()->str()) << context;
 
-    ASSERT_EQ(graph->tensors()->size(), newGraph->tensors()->size());
+    ASSERT_EQ(graph->tensors()->size(), newGraph->tensors()->size()) << context;
     auto t1 = graph->tensors()->begin();
     auto t2 = newGraph->tensors()->begin();
     for(; t1 != graph->tensors()->end() && t2 != newGraph->tensors()->end(); t1++, t2++)
     {
-        EXPECT_EQ(*t1->UnPack(), *t2->UnPack());
+        EXPECT_EQ(*t1->UnPack(), *t2->UnPack()) << context;
     }
 
-    ASSERT_EQ(graph->nodes()->size(), newGraph->nodes()->size());
+    ASSERT_EQ(graph->nodes()->size(), newGraph->nodes()->size()) << context;
     auto n1 = graph->nodes()->begin();
     auto n2 = newGraph->nodes()->begin();
     for(; n1 != graph->nodes()->end() && n2 != newGraph->nodes()->end(); n1++, n2++)
     {
-        EXPECT_EQ(*n1->UnPack(), *n2->UnPack());
+        EXPECT_EQ(*n1->UnPack(), *n2->UnPack()) << context;
     }
+}
+
+TEST(TestJson, GraphToJsonAndBack)
+{
+    {
+        auto graphBuilder = hipdnn_backend::test_utilities::createValidBatchnormGraph();
+        auto graph = hipdnn_sdk::data_objects::GetGraph(graphBuilder.GetBufferPointer());
+
+        toJsonAndBackTestSuite(graph, "(valid graph)");
+    }
+    {
+        auto graphBuilder = hipdnn_backend::test_utilities::createEmptyValidGraph();
+        auto graph = hipdnn_sdk::data_objects::GetGraph(graphBuilder.GetBufferPointer());
+
+        toJsonAndBackTestSuite(graph, "(empty valid graph)");
+    }
+}
+
+void vectorTestSuite(std::vector<int> const& vec, const std::string& context)
+{
+    nlohmann::json vecJson = vec;
+    ASSERT_EQ(vec.size(), vecJson.size()) << context;
+    for(size_t i = 0; i < vec.size(); i++)
+    {
+        EXPECT_EQ(vec[i], vecJson[i].get<int>()) << context;
+    }
+    EXPECT_EQ(vec, vecJson.get<std::vector<int>>()) << context;
 }
 
 TEST(TestJson, FromVector)
 {
-    std::vector<int> vec = {0, 1, 2, 3, 4};
-    nlohmann::json vecJson = vec;
-    EXPECT_EQ(vec.size(), vecJson.size());
-    for(size_t i = 0; i < vec.size(); i++)
-    {
-        ASSERT_EQ(vec[i], vecJson[i].get<int>());
-    }
+    vectorTestSuite({0, 1, 2, 3, 4}, "(filled vector)");
+    vectorTestSuite({}, "(empty vector)");
 }
 
 template <class T>
@@ -73,7 +93,7 @@ TEST(TestJson, Enum)
 {
     using namespace hipdnn_sdk::data_objects;
 
-    enumTestSuite(DataType::FLOAT, "float", "(for hipdnn_sdk::data_objects::DataType)");
+    enumTestSuite(DataType::FLOAT, "float", "(hipdnn_sdk::data_objects::DataType)");
     enumTestSuite(NodeAttributes::BatchnormInferenceAttributes,
                   "BatchnormInferenceAttributes",
                   "(for hipdnn_sdk::data_objects::NodeAttributes)");
