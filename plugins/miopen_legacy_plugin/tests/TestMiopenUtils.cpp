@@ -83,7 +83,7 @@ TEST(TestMiopenUtils, GetSpatialDimCountReturnsCorrectValue)
 
     flatbuffers::FlatBufferBuilder builder;
     auto attrOffset = hipdnn_sdk::data_objects::CreateTensorAttributesDirect(
-        builder, 1, "", hipdnn_sdk::data_objects::DataType_UNSET, nullptr, &dims);
+        builder, 1, "", hipdnn_sdk::data_objects::DataType::UNSET, nullptr, &dims);
     builder.Finish(attrOffset);
 
     auto attrPtr1 = flatbuffers::GetRoot<hipdnn_sdk::data_objects::TensorAttributes>(
@@ -98,7 +98,7 @@ TEST(TestMiopenUtils, GetSpatialDimCountThrowsOnInvalidDims)
 
     flatbuffers::FlatBufferBuilder builder;
     auto attrOffset = hipdnn_sdk::data_objects::CreateTensorAttributesDirect(
-        builder, 1, "", hipdnn_sdk::data_objects::DataType_UNSET, nullptr, &dims);
+        builder, 1, "", hipdnn_sdk::data_objects::DataType::UNSET, nullptr, &dims);
     builder.Finish(attrOffset);
 
     auto attrPtr1 = flatbuffers::GetRoot<hipdnn_sdk::data_objects::TensorAttributes>(

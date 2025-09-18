@@ -44,7 +44,7 @@ bool isApplicableFwd(const HipdnnEnginePluginHandle& handle, const hipdnn_plugin
     // Check convolution mode
 
     const auto convMode = attr->conv_mode();
-    if(convMode != hipdnn_sdk::data_objects::ConvMode::ConvMode_CROSS_CORRELATION)
+    if(convMode != hipdnn_sdk::data_objects::ConvMode::CROSS_CORRELATION)
     {
         HIPDNN_LOG_INFO("Convolution plan builder supports only CROSS_CORRELATION");
         return false;
@@ -245,7 +245,7 @@ bool MiopenConvPlanBuilder::isApplicable(const HipdnnEnginePluginHandle& handle,
 
     switch(node.attributes_type())
     {
-    case hipdnn_sdk::data_objects::NodeAttributes_ConvolutionFwdAttributes:
+    case hipdnn_sdk::data_objects::NodeAttributes::ConvolutionFwdAttributes:
         ret = isApplicableFwd(handle, opGraph);
         break;
     default:
@@ -274,7 +274,7 @@ size_t MiopenConvPlanBuilder::getWorkspaceSize(const HipdnnEnginePluginHandle& h
 
     switch(node.attributes_type())
     {
-    case hipdnn_sdk::data_objects::NodeAttributes_ConvolutionFwdAttributes:
+    case hipdnn_sdk::data_objects::NodeAttributes::ConvolutionFwdAttributes:
         return getWorkspaceSizeFwd(handle, opGraph);
     default:
         throw hipdnn_plugin::HipdnnPluginException(
@@ -301,7 +301,7 @@ void MiopenConvPlanBuilder::buildPlan(const HipdnnEnginePluginHandle& handle,
     std::string nodeName = getNodeName(node);
     switch(node.attributes_type())
     {
-    case hipdnn_sdk::data_objects::NodeAttributes_ConvolutionFwdAttributes:
+    case hipdnn_sdk::data_objects::NodeAttributes::ConvolutionFwdAttributes:
         HIPDNN_LOG_INFO("Building convolution fwd plan for node: {}", nodeName);
         buildPlanFwd(handle, opGraph, executionContext);
         break;

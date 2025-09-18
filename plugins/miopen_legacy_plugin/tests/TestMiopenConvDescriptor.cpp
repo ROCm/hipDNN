@@ -18,7 +18,7 @@ TEST(TestMiopenConvDescriptor, CreateValidDescriptor)
     const std::vector<int64_t> postPadding{0, 0, 0};
     const std::vector<int64_t> stride{1, 1, 1};
     const std::vector<int64_t> dilation{1, 1, 1};
-    const auto convMode = hipdnn_sdk::data_objects::ConvMode_CROSS_CORRELATION;
+    const auto convMode = hipdnn_sdk::data_objects::ConvMode::CROSS_CORRELATION;
     size_t spatialDimCount = 3;
 
     flatbuffers::FlatBufferBuilder builder;
@@ -58,7 +58,7 @@ TEST(TestMiopenConvDescriptor, ThrowsOnWrongSpatialDimCount)
     const std::vector<int64_t> postPadding{0, 0, 0};
     const std::vector<int64_t> stride{1, 1, 1};
     const std::vector<int64_t> dilation{1, 1, 1};
-    const auto convMode = hipdnn_sdk::data_objects::ConvMode_CROSS_CORRELATION;
+    const auto convMode = hipdnn_sdk::data_objects::ConvMode::CROSS_CORRELATION;
 
     flatbuffers::FlatBufferBuilder builder;
     auto attrOffset = hipdnn_sdk::data_objects::CreateConvolutionFwdAttributesDirect(
@@ -83,7 +83,7 @@ TEST(TestMiopenConvDescriptor, ThrowsOnWrongConvMode)
     const std::vector<int64_t> postPadding{0, 0, 0};
     const std::vector<int64_t> stride{1, 1, 1};
     const std::vector<int64_t> dilation{1, 1, 1};
-    const auto convMode = hipdnn_sdk::data_objects::ConvMode_CONVOLUTION;
+    const auto convMode = hipdnn_sdk::data_objects::ConvMode::CONVOLUTION;
     size_t spatialDimCount = 3;
 
     flatbuffers::FlatBufferBuilder builder;
@@ -103,7 +103,7 @@ TEST(TestMiopenConvDescriptor, ThrowsOnAsymmetricPadding)
     const std::vector<int64_t> postPadding{0, 1, 0};
     const std::vector<int64_t> stride{1, 1, 1};
     const std::vector<int64_t> dilation{1, 1, 1};
-    const auto convMode = hipdnn_sdk::data_objects::ConvMode_CROSS_CORRELATION;
+    const auto convMode = hipdnn_sdk::data_objects::ConvMode::CROSS_CORRELATION;
     size_t spatialDimCount = 3;
 
     flatbuffers::FlatBufferBuilder builder;
@@ -123,7 +123,7 @@ TEST(TestMiopenConvDescriptor, ThrowsOnWrongPadding)
     const std::vector<int64_t> postPadding{0, -1, 0};
     const std::vector<int64_t> stride{1, 1, 1};
     const std::vector<int64_t> dilation{1, 1, 1};
-    const auto convMode = hipdnn_sdk::data_objects::ConvMode_CROSS_CORRELATION;
+    const auto convMode = hipdnn_sdk::data_objects::ConvMode::CROSS_CORRELATION;
     size_t spatialDimCount = 3;
 
     flatbuffers::FlatBufferBuilder builder;
@@ -143,7 +143,7 @@ TEST(TestMiopenConvDescriptor, ThrowsOnWrongStride)
     const std::vector<int64_t> postPadding{0, 0, 0};
     const std::vector<int64_t> stride{1, 0, 1};
     const std::vector<int64_t> dilation{1, 1, 1};
-    const auto convMode = hipdnn_sdk::data_objects::ConvMode_CROSS_CORRELATION;
+    const auto convMode = hipdnn_sdk::data_objects::ConvMode::CROSS_CORRELATION;
     size_t spatialDimCount = 3;
 
     flatbuffers::FlatBufferBuilder builder;
@@ -163,7 +163,7 @@ TEST(TestMiopenConvDescriptor, ThrowsOnWrongDilation)
     const std::vector<int64_t> postPadding{0, 0, 0};
     const std::vector<int64_t> stride{1, 1, 1};
     const std::vector<int64_t> dilation{1, 0, 1};
-    const auto convMode = hipdnn_sdk::data_objects::ConvMode_CROSS_CORRELATION;
+    const auto convMode = hipdnn_sdk::data_objects::ConvMode::CROSS_CORRELATION;
     size_t spatialDimCount = 3;
 
     flatbuffers::FlatBufferBuilder builder;

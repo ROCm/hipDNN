@@ -55,11 +55,11 @@ MiopenConvDescriptor::MiopenConvDescriptor(
     }
 
     const auto convMode = attributes.conv_mode();
-    if(convMode != hipdnn_sdk::data_objects::ConvMode::ConvMode_CROSS_CORRELATION)
+    if(convMode != hipdnn_sdk::data_objects::ConvMode::CROSS_CORRELATION)
     {
         throw hipdnn_plugin::HipdnnPluginException(
             HIPDNN_PLUGIN_STATUS_BAD_PARAM,
-            "MiopenConvDescriptor: only ConvMode_CROSS_CORRELATION is supported");
+            "MiopenConvDescriptor: only ConvMode::CROSS_CORRELATION is supported");
     }
 
     if((attributes.pre_padding() == nullptr) != (attributes.post_padding() == nullptr))

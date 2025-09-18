@@ -222,21 +222,21 @@ inline flatbuffers::FlatBufferBuilder
                             std::vector<int64_t> convPostPadding = {0, 0},
                             std::vector<int64_t> convStrides = {1, 1},
                             std::vector<int64_t> convDilation = {1, 1},
-                            hipdnn_sdk::data_objects::DataType dataType = DataType_FLOAT)
+                            DataType dataType = DataType::FLOAT)
 {
     flatbuffers::FlatBufferBuilder builder;
-    std::vector<::flatbuffers::Offset<hipdnn_sdk::data_objects::TensorAttributes>> tensorAttributes;
+    std::vector<::flatbuffers::Offset<TensorAttributes>> tensorAttributes;
 
-    tensorAttributes.push_back(hipdnn_sdk::data_objects::CreateTensorAttributesDirect(
+    tensorAttributes.push_back(CreateTensorAttributesDirect(
         builder, 1, "x", dataType, &xStrides, &xDims));
 
-    tensorAttributes.push_back(hipdnn_sdk::data_objects::CreateTensorAttributesDirect(
+    tensorAttributes.push_back(CreateTensorAttributesDirect(
         builder, 2, "w", dataType, &wStrides, &wDims));
 
-    tensorAttributes.push_back(hipdnn_sdk::data_objects::CreateTensorAttributesDirect(
+    tensorAttributes.push_back(CreateTensorAttributesDirect(
         builder, 3, "y", dataType, &yStrides, &yDims));
 
-    auto convAttributes = hipdnn_sdk::data_objects::CreateConvolutionFwdAttributesDirect(
+    auto convAttributes = CreateConvolutionFwdAttributesDirect(
         builder,
         1, // x tensor uid
         2, // w tensor uid
@@ -245,18 +245,18 @@ inline flatbuffers::FlatBufferBuilder
         &convPostPadding,
         &convStrides,
         &convDilation,
-        hipdnn_sdk::data_objects::ConvMode_CROSS_CORRELATION);
+        ConvMode::CROSS_CORRELATION);
 
-    std::vector<::flatbuffers::Offset<hipdnn_sdk::data_objects::Node>> nodes;
-    auto node = hipdnn_sdk::data_objects::CreateNodeDirect(
+    std::vector<::flatbuffers::Offset<Node>> nodes;
+    auto node = CreateNodeDirect(
         builder,
         "conv_fwd",
-        hipdnn_sdk::data_objects::NodeAttributes_ConvolutionFwdAttributes,
+        NodeAttributes::ConvolutionFwdAttributes,
         convAttributes.Union());
     nodes.push_back(node);
 
-    auto graphOffset = hipdnn_sdk::data_objects::CreateGraphDirect(
-        builder, "test", DataType_FLOAT, DataType_FLOAT, DataType_FLOAT, &tensorAttributes, &nodes);
+    auto graphOffset = CreateGraphDirect(
+        builder, "test", DataType::FLOAT, DataType::FLOAT, DataType::FLOAT, &tensorAttributes, &nodes);
     builder.Finish(graphOffset);
     return builder;
 }
@@ -273,7 +273,7 @@ inline hipdnnPluginConstData_t
 inline flatbuffers::FlatBufferBuilder createValidEngineDetails(int64_t engineId)
 {
     flatbuffers::FlatBufferBuilder builder;
-    auto engineDetailsOffset = hipdnn_sdk::data_objects::CreateEngineDetails(builder, engineId);
+    auto engineDetailsOffset = CreateEngineDetails(builder, engineId);
     builder.Finish(engineDetailsOffset);
     return builder;
 }
@@ -290,7 +290,7 @@ inline hipdnnPluginConstData_t
 inline flatbuffers::FlatBufferBuilder createValidEngineConfig(int64_t configId)
 {
     flatbuffers::FlatBufferBuilder builder;
-    auto engineConfigOffset = hipdnn_sdk::data_objects::CreateEngineConfig(builder, configId);
+    auto engineConfigOffset = CreateEngineConfig(builder, configId);
     builder.Finish(engineConfigOffset);
     return builder;
 }
