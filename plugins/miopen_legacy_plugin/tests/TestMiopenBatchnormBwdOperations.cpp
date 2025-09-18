@@ -52,8 +52,6 @@ protected:
                               hipdnn_sdk::data_objects::DataType inputDataType,
                               InputType epsilon)
     {
-        unsigned int seed = std::random_device{}();
-
         std::vector<int64_t> dims = {testCase.n, testCase.c, testCase.h, testCase.w};
 
         std::vector<int64_t> derivedDims = {1, dims[1]};
@@ -61,12 +59,18 @@ protected:
         std::vector<hipdnnPluginDeviceBuffer_t> deviceBuffers;
 
         PinnedTensor<InputType> xTensor(dims, _layout);
-        deviceBuffers.push_back(generateRandomDeviceBuffer(
-            xTensor, 1, static_cast<InputType>(-1.0f), static_cast<InputType>(1.0f), seed));
+        deviceBuffers.push_back(generateRandomDeviceBuffer(xTensor,
+                                                           1,
+                                                           static_cast<InputType>(-1.0f),
+                                                           static_cast<InputType>(1.0f),
+                                                           testCase.seed));
 
         PinnedTensor<InputType> dyTensor(dims, _layout);
-        deviceBuffers.push_back(generateRandomDeviceBuffer(
-            dyTensor, 2, static_cast<InputType>(-0.1f), static_cast<InputType>(0.1f), seed));
+        deviceBuffers.push_back(generateRandomDeviceBuffer(dyTensor,
+                                                           2,
+                                                           static_cast<InputType>(-0.1f),
+                                                           static_cast<InputType>(0.1f),
+                                                           testCase.seed));
 
         PinnedTensor<InputType> dxTensor(dims, _layout);
         deviceBuffers.push_back(generateEmptyDeviceBuffer(dxTensor, 3));
@@ -76,7 +80,7 @@ protected:
                                                            4,
                                                            static_cast<IntermediateType>(-0.1f),
                                                            static_cast<IntermediateType>(0.1f),
-                                                           seed));
+                                                           testCase.seed));
 
         PinnedTensor<IntermediateType> dscaleTensor(derivedDims);
         deviceBuffers.push_back(generateEmptyDeviceBuffer(dscaleTensor, 5));
@@ -89,14 +93,14 @@ protected:
                                                            7,
                                                            static_cast<IntermediateType>(-0.1f),
                                                            static_cast<IntermediateType>(0.1f),
-                                                           seed));
+                                                           testCase.seed));
 
         PinnedTensor<IntermediateType> invVarianceTensor(derivedDims);
         deviceBuffers.push_back(generateRandomDeviceBuffer(invVarianceTensor,
                                                            8,
                                                            static_cast<IntermediateType>(1.9f),
                                                            static_cast<IntermediateType>(2.0f),
-                                                           seed));
+                                                           testCase.seed));
 
         auto batchnormBuilder = hipdnn_backend::test_utilities::createValidBatchnormBwdGraph(
             dyTensor.strides(), dyTensor.dims(), true, inputDataType);
@@ -130,24 +134,27 @@ protected:
 
         Tensor<InputType> xTensorCpu(dims, _layout);
         xTensorCpu.fillWithRandomValues(
-            static_cast<InputType>(-1.0f), static_cast<InputType>(1.0f), seed);
+            static_cast<InputType>(-1.0f), static_cast<InputType>(1.0f), testCase.seed);
         Tensor<InputType> dyTensorCpu(dims, _layout);
         dyTensorCpu.fillWithRandomValues(
-            static_cast<InputType>(-0.1f), static_cast<InputType>(0.1f), seed);
+            static_cast<InputType>(-0.1f), static_cast<InputType>(0.1f), testCase.seed);
         Tensor<InputType> dxTensorCpu(dims, _layout);
 
         Tensor<IntermediateType> scaleTensorCpu(derivedDims);
-        scaleTensorCpu.fillWithRandomValues(
-            static_cast<IntermediateType>(-0.1f), static_cast<IntermediateType>(0.1f), seed);
+        scaleTensorCpu.fillWithRandomValues(static_cast<IntermediateType>(-0.1f),
+                                            static_cast<IntermediateType>(0.1f),
+                                            testCase.seed);
         Tensor<IntermediateType> dscaleTensorCpu(derivedDims);
         Tensor<IntermediateType> dbiasTensorCpu(derivedDims);
         Tensor<IntermediateType> meanTensorCpu(derivedDims);
-        meanTensorCpu.fillWithRandomValues(
-            static_cast<IntermediateType>(-0.1f), static_cast<IntermediateType>(0.1f), seed);
+        meanTensorCpu.fillWithRandomValues(static_cast<IntermediateType>(-0.1f),
+                                           static_cast<IntermediateType>(0.1f),
+                                           testCase.seed);
 
         Tensor<IntermediateType> invVarianceTensorCpu(derivedDims);
-        invVarianceTensorCpu.fillWithRandomValues(
-            static_cast<IntermediateType>(1.9f), static_cast<IntermediateType>(2.0f), seed);
+        invVarianceTensorCpu.fillWithRandomValues(static_cast<IntermediateType>(1.9f),
+                                                  static_cast<IntermediateType>(2.0f),
+                                                  testCase.seed);
 
         CpuFpReferenceBatchnormImpl<InputType, IntermediateType>::batchnormBwd(dyTensorCpu,
                                                                                xTensorCpu,
