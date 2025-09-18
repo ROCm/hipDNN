@@ -14,6 +14,7 @@
 #include <hipdnn_sdk/test_utilities/CpuFpReferenceValidation.hpp>
 #include <hipdnn_sdk/test_utilities/TestUtilities.hpp>
 #include <hipdnn_sdk/utilities/MigratableMemory.hpp>
+#include <hipdnn_sdk/utilities/ShapeUtilities.hpp>
 #include <hipdnn_sdk/utilities/Tensor.hpp>
 
 #include <hipdnn_sdk/test_utilities/CpuFpReferenceBatchnorm.hpp>
@@ -71,18 +72,7 @@ class BatchnormForwardInference : public ::testing::TestWithParam<TestCaseType>
         TensorBundle(const std::vector<int64_t>& dims,
                      unsigned int seed = 1,
                      const TensorLayout& layout = TensorLayout::NCHW)
-            : derivedDims([&dims]() {
-                if(dims.size() < 2)
-                {
-                    throw std::runtime_error(
-                        "Batchnorm tensors must have at least 2 dimensions (batch and channel)");
-                }
-
-                auto result = std::vector<int64_t>(dims.size(), 1);
-                result[1] = dims[1];
-
-                return result;
-            }())
+            : derivedDims(getDerivedDims(dims))
             , xTensor(dims, layout)
             , yTensor(dims, layout)
             , scaleTensor(derivedDims)

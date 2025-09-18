@@ -118,5 +118,18 @@ inline std::vector<int64_t> strideOrderNhwc(size_t numDims)
     return strideOrder;
 }
 
+inline std::vector<int64_t> getDerivedDims(const std::vector<int64_t>& dims)
+{
+    if(dims.size() < 2)
+    {
+        throw std::runtime_error("Tensors must have at least 2 dimensions (batch and channel)");
+    }
+
+    auto result = std::vector<int64_t>(dims.size(), 1);
+    result[1] = dims[1];
+
+    return result;
+}
+
 }
 }
