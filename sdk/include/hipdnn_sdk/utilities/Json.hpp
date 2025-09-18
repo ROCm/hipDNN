@@ -1,13 +1,65 @@
-#include "batchnorm_attributes_generated.h"
 #include "batchnorm_inference_attributes_generated.h"
+#include "tensor_attributes_generated.h"
 #include <flatbuffers/flatbuffer_builder.h>
+#include <hip/amd_detail/amd_hip_bfloat16.h>
+#include <hip/amd_detail/hip_fp16_gcc.h>
 #include <hipdnn_sdk/data_objects/graph_generated.h>
-#include <iostream>
 #include <nlohmann/detail/macro_scope.hpp>
 #include <nlohmann/json.hpp>
 #include <optional>
-#include <spdlog/fmt/bundled/base.h>
-#include <spdlog/fmt/bundled/format.h>
+
+namespace hipdnn_sdk::json
+{
+template <class T>
+concept JsonConstructible = requires(T obj) {
+    { obj } -> std::convertible_to<nlohmann::json>;
+};
+}
+
+namespace std
+{
+template <hipdnn_sdk::json::JsonConstructible T>
+// NOLINTNEXTLINE(readability-identifier-naming)
+void to_json(nlohmann::json& vectorList, vector<T> const& vec)
+{
+    vectorList = nlohmann::json::array();
+    for(auto v : vec)
+    {
+        vectorList.push_back(v);
+    }
+}
+
+template <hipdnn_sdk::json::JsonConstructible T>
+// NOLINTNEXTLINE(readability-identifier-naming)
+void from_json(const nlohmann::json& vecJson, vector<T>& vec)
+{
+    if(!vecJson.is_array())
+    {
+        throw std::runtime_error("from_json: Attempting to deserialize non-array into vector");
+    }
+    vec.reserve(vecJson.size());
+    for(const auto& v : vecJson)
+    {
+        vec.push_back(v.get<T>());
+    }
+}
+}
+
+namespace flatbuffers
+{
+template <class T>
+    requires(hipdnn_sdk::json::JsonConstructible<T>)
+// NOLINTNEXTLINE(readability-identifier-naming)
+void to_json(nlohmann::json& vectorList, Vector<Offset<T>> const& vec)
+{
+    vectorList = nlohmann::json::array();
+    for(auto v : vec)
+    {
+        vectorList.push_back(*v);
+    }
+}
+
+}
 
 namespace hipdnn_sdk::data_objects
 {
@@ -33,27 +85,21 @@ NLOHMANN_JSON_SERIALIZE_ENUM(DataType,
                              }
 
 )
+
+// NOLINTNEXTLINE(readability-identifier-naming)
+void to_json(nlohmann::json& tensorAttrJson, data_objects::TensorAttributes const& tensorAttr)
+{
+    tensorAttrJson["uid"] = tensorAttr.uid();
+    tensorAttrJson["data_type"] = tensorAttr.data_type();
+    tensorAttrJson["dims"] = *tensorAttr.dims();
+    tensorAttrJson["strides"] = *tensorAttr.strides();
+    tensorAttrJson["name"] = tensorAttr.name()->c_str();
+    tensorAttrJson["virtual"] = tensorAttr.virtual_();
 }
 
-namespace hipdnn_sdk::json
+// NOLINTNEXTLINE(readability-identifier-naming)
+void to_json(nlohmann::json& batchnormJson, BatchnormInferenceAttributes const& bn)
 {
-
-// template<class T>
-// nlohmann::json json(std::vector<T> )
-
-// // NOLINT(readability-identifier=)
-// nlohmann::json to_json(data_objects::TensorAttributes const& attr)
-// {
-//     nlohmann::json attrJson;
-
-//     attrJson["uid"] = attr.uid();
-//     attrJson["data_type"] = attr.data_type();
-//     attrJson["dims"] = attr.dims();
-// }
-
-nlohmann::json json(data_objects::BatchnormInferenceAttributes const& bn)
-{
-    nlohmann::json batchnormJson;
     auto& inputs = batchnormJson["inputs"] = {};
 
     inputs["x"] = bn.x_tensor_uid();
@@ -63,54 +109,40 @@ nlohmann::json json(data_objects::BatchnormInferenceAttributes const& bn)
     inputs["bias"] = bn.bias_tensor_uid();
 
     batchnormJson["outputs"]["y"] = bn.y_tensor_uid();
-
-    return batchnormJson;
 }
 
-nlohmann::json json(data_objects::Node const& node)
+// NOLINTNEXTLINE(readability-identifier-naming)
+void to_json(nlohmann::json& nodeJson, data_objects::Node const& node)
 {
     auto type = node.attributes_type();
-    nlohmann::json nodeJson = [&]() {
-        if(type == data_objects::NodeAttributes::BatchnormInferenceAttributes)
-        {
-            return json(*node.attributes_as_BatchnormInferenceAttributes());
-        }
 
+    if(type == data_objects::NodeAttributes::BatchnormInferenceAttributes)
+    {
+        nodeJson = nlohmann::json(*node.attributes_as_BatchnormInferenceAttributes());
+    }
+    else
+    {
         throw std::runtime_error("Unsupported NodeAttribute  type: "
                                  + std::to_string(static_cast<int8_t>(node.attributes_type())));
-    }();
+    }
     nodeJson["name"] = node.name()->c_str();
     nodeJson["type"] = node.attributes_type();
-
-    return nodeJson;
 }
 
-nlohmann::json json(data_objects::DataType const& type)
+// NOLINTNEXTLINE(readability-identifier-naming)
+void to_json(nlohmann::json& graphJson, data_objects::Graph const& graph)
 {
-    return static_cast<int8_t>(type);
-}
-
-nlohmann::json json(data_objects::Graph const& graph)
-{
-
-    nlohmann::json graphJson;
-    graphJson["nodes"] = nlohmann::json::array();
-
-    for(auto node : *graph.nodes())
-    {
-        graphJson["nodes"].push_back(json(*node));
-    }
-
+    graphJson["nodes"] = *graph.nodes();
     graphJson["compute_type"] = graph.compute_type();
     graphJson["io_type"] = graph.io_type();
     graphJson["intermediate_type"] = graph.intermediate_type();
-
     graphJson["name"] = graph.name()->c_str();
-
-    // TODO: Handle tensors
-
-    return graphJson;
+    graphJson["tensors"] = *graph.tensors();
 }
+}
+
+namespace hipdnn_sdk::json
+{
 
 template <class T, class Key>
 std::optional<T> optionalValue(nlohmann::json obj, Key&& key)
@@ -152,6 +184,19 @@ auto node(flatbuffers::FlatBufferBuilder& builder, const nlohmann::json& inNode)
     return data_objects::CreateNodeDirect(builder, name.c_str(), type, node);
 }
 
+auto tensorAttributes(flatbuffers::FlatBufferBuilder& builder, const nlohmann::json& tensorAttrJson)
+{
+    auto uid = tensorAttrJson["uid"].get<int64_t>();
+    auto name = tensorAttrJson["name"].get<std::string>();
+    auto dataType = tensorAttrJson["data_type"].get<data_objects::DataType>();
+    auto dims = tensorAttrJson["dims"].get<std::vector<int64_t>>();
+    auto strides = tensorAttrJson["strides"].get<std::vector<int64_t>>();
+    bool isVirtual = tensorAttrJson.value<bool>("virtual", false);
+
+    return data_objects::CreateTensorAttributesDirect(
+        builder, uid, name.c_str(), dataType, &strides, &dims, isVirtual);
+}
+
 auto graph(flatbuffers::FlatBufferBuilder& builder, const nlohmann::json& inGraph)
 {
     auto name = inGraph.value<std::string>("name", std::string{});
@@ -160,16 +205,26 @@ auto graph(flatbuffers::FlatBufferBuilder& builder, const nlohmann::json& inGrap
     auto intermediateType = inGraph["intermediate_type"].get<data_objects::DataType>();
 
     std::vector<flatbuffers::Offset<data_objects::Node>> nodes;
+    std::vector<flatbuffers::Offset<data_objects::TensorAttributes>> tensors;
     if(!inGraph["nodes"].is_array())
     {
-        throw std::runtime_error("json::graph: nodes field is not an array");
+        throw std::runtime_error("json::graph: \"nodes\" field is not an array");
     }
     for(const auto& n : inGraph["nodes"])
     {
         nodes.push_back(node(builder, n));
     }
 
+    if(!inGraph["tensors"].is_array())
+    {
+        throw std::runtime_error("json::graph: \"tensors\" field is not an array");
+    }
+    for(const auto& t : inGraph["tensors"])
+    {
+        tensors.push_back(tensorAttributes(builder, t));
+    }
+
     return data_objects::CreateGraphDirect(
-        builder, name.c_str(), computeType, intermediateType, ioType, nullptr, &nodes);
+        builder, name.c_str(), computeType, intermediateType, ioType, &tensors, &nodes);
 }
 }

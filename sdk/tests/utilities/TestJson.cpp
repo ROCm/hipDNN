@@ -11,11 +11,12 @@
 
 TEST(TestJson, SerializeGraphAsJson)
 {
+    std::cout << "---SerializeGraphAsJson---\n";
     auto graphBuilder = hipdnn_backend::test_utilities::createValidBatchnormGraph();
     auto graphFlatbuffer = graphBuilder.Release();
     auto graph = hipdnn_sdk::data_objects::GetGraph(graphFlatbuffer.data());
 
-    auto graphJson = hipdnn_sdk::json::json(*graph);
+    nlohmann::json graphJson = *graph;
     std::string out = graphJson.dump();
     std::cout << out << "\n";
 
@@ -23,7 +24,7 @@ TEST(TestJson, SerializeGraphAsJson)
     auto newGraph = hipdnn_sdk::json::graph(builder, graphJson);
     builder.Finish(newGraph);
     auto finishedGraph = hipdnn_sdk::data_objects::GetGraph(builder.GetBufferPointer());
-    std::cout << hipdnn_sdk::json::json(*finishedGraph).dump() << "\n";
+    std::cout << nlohmann::json(*finishedGraph).dump() << "\n";
 }
 
 TEST(TestJson, DataTypeConversion)
