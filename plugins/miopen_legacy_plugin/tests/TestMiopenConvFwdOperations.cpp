@@ -129,6 +129,28 @@ protected:
 
         CpuFpReferenceValidation<DataType> cpuRefValidationInput(epsilon, epsilon);
 
+#if 1 // TODO remove
+        ASSERT_NE(yTensor.memory().count(), 0);
+        ASSERT_NE(yTensorCpu.memory().count(), 0);
+        ASSERT_EQ(yTensor.memory().count(), yTensorCpu.memory().count());
+
+        std::cerr << "yTensor: ";
+        auto gpuData = yTensor.memory().hostData();
+        for(size_t i = 0; i < yTensor.memory().count() && i < 20; i++)
+        {
+            std::cerr << static_cast<float>(gpuData[i]) << " ";
+        }
+        std::cerr << '\n';
+
+        std::cerr << "yTensorCpu: ";
+        auto cpuData = yTensorCpu.memory().hostData();
+        for(size_t i = 0; i < yTensorCpu.memory().count() && i < 20; i++)
+        {
+            std::cerr << static_cast<float>(cpuData[i]) << " ";
+        }
+        std::cerr << '\n';
+#endif
+
         EXPECT_TRUE(cpuRefValidationInput.allClose(yTensorCpu.memory(), yTensor.memory()));
     }
 
