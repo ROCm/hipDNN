@@ -33,14 +33,12 @@ public:
     std::unordered_map<InputNames, std::shared_ptr<TensorAttributes>> inputs;
     std::unordered_map<OutputNames, std::shared_ptr<TensorAttributes>> outputs;
 
-    // Convolution parameters
     std::vector<int64_t> pre_padding;
     std::vector<int64_t> post_padding;
     std::vector<int64_t> stride;
     std::vector<int64_t> dilation;
     ConvolutionMode math_mode = ConvolutionMode::CROSS_CORRELATION;
 
-    // Getters for tensors
     // NOLINTNEXTLINE(readability-identifier-naming)
     std::shared_ptr<TensorAttributes> get_dy() const
     {
@@ -91,8 +89,8 @@ public:
     // NOLINTNEXTLINE(readability-identifier-naming)
     ConvDgradAttributes& set_padding(std::vector<int64_t> padding)
     {
-        pre_padding = padding;
-        post_padding = std::move(padding);
+        set_pre_padding(padding);
+        set_post_padding(std::move(padding));
         return *this;
     }
 

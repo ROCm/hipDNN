@@ -247,8 +247,7 @@ public:
             // Therefore, assume groups = 1.
             dxDims[1] = wDims[1]; // C (input channels)
 
-            // Calculate spatial dimensions (i_2, ..., i_n)
-            // For backward pass: dx_size = stride * (dy_size - 1) + dilated_kernel_size - pre_pad - post_pad
+            // We calculate spatial dimensions (i_2, ..., i_n)
             for(size_t i = 2; i < dyDims.size(); ++i)
             {
                 auto spatialIdx = i - 2;
@@ -287,6 +286,11 @@ public:
                                     ErrorCode::INVALID_VALUE,
                                     "ConvolutionDgradNode: Post-padding must be non-negative");
 
+                // Conv fwd output spatial dim size:
+                // out_i = (in_i + pre_padding + post_padding - dilation * (kernel_size - 1) - 1) / stride + 1
+
+                // Solve for input spatial dim size:
+                // in_i = stride * (out_i - 1) - pre_padding - post_padding + dilation * (kernel_size - 1) + 1)
                 auto dilatedKernelSize = (dilationVal * (kernelSize - 1)) + 1;
 
                 dxDims[i] = strideVal * (dySize - 1) + dilatedKernelSize - prePad - postPad;
