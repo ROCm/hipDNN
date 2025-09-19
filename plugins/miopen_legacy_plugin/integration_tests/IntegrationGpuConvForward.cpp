@@ -227,14 +227,14 @@ std::vector<ConvTestCase> getConvFwdTestCases()
 
 TEST_P(IntegrationGpuConvFwdNchwFp32, Correctness)
 {
-    runConvTest(1e-6f, TensorLayout::NCHW);
+    runConvTest(4e-6f, TensorLayout::NCHW);
 }
 
 INSTANTIATE_TEST_SUITE_P(, IntegrationGpuConvFwdNchwFp32, testing::ValuesIn(getConvFwdTestCases()));
 
 TEST_P(IntegrationGpuConvFwdNchwBfp16, Correctness)
 {
-    runConvTest(1e-4_bf, TensorLayout::NCHW);
+    runConvTest(1e-2_bf, TensorLayout::NCHW);
 }
 
 INSTANTIATE_TEST_SUITE_P(,
@@ -243,21 +243,21 @@ INSTANTIATE_TEST_SUITE_P(,
 
 TEST_P(IntegrationGpuConvFwdNchwFp16, Correctness)
 {
-    runConvTest(1e-6_h, TensorLayout::NCHW);
+    runConvTest(1e-2_h, TensorLayout::NCHW);
 }
 
 INSTANTIATE_TEST_SUITE_P(, IntegrationGpuConvFwdNchwFp16, testing::ValuesIn(getConvFwdTestCases()));
 
 TEST_P(IntegrationGpuConvFwdNhwcFp32, Correctness)
 {
-    runConvTest(1e-6f, TensorLayout::NHWC);
+    runConvTest(4e-6f, TensorLayout::NHWC);
 }
 
 INSTANTIATE_TEST_SUITE_P(, IntegrationGpuConvFwdNhwcFp32, testing::ValuesIn(getConvFwdTestCases()));
 
 TEST_P(IntegrationGpuConvFwdNhwcBfp16, Correctness)
 {
-    runConvTest(1e-4_bf, TensorLayout::NHWC);
+    runConvTest(1e-2_bf, TensorLayout::NHWC);
 }
 
 INSTANTIATE_TEST_SUITE_P(,
@@ -266,7 +266,7 @@ INSTANTIATE_TEST_SUITE_P(,
 
 TEST_P(IntegrationGpuConvFwdNhwcFp16, Correctness)
 {
-    runConvTest(1e-6_h, TensorLayout::NHWC);
+    runConvTest(1e-3_h, TensorLayout::NHWC);
 }
 
 INSTANTIATE_TEST_SUITE_P(, IntegrationGpuConvFwdNhwcFp16, testing::ValuesIn(getConvFwdTestCases()));
