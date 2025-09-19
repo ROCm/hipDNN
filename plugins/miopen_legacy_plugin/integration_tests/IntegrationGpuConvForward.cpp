@@ -32,19 +32,22 @@ struct ConvTestCase
     std::vector<int64_t> _convPostPadding;
     std::vector<int64_t> _convStride;
     std::vector<int64_t> _convDilation;
+    unsigned _seed;
 
     ConvTestCase(std::vector<int64_t>&& xDims,
                  std::vector<int64_t>&& wDims,
                  std::vector<int64_t>&& convPrePadding,
                  std::vector<int64_t>&& convPostPadding,
                  std::vector<int64_t>&& convStride,
-                 std::vector<int64_t>&& convDilation)
+                 std::vector<int64_t>&& convDilation,
+                 unsigned seed)
         : _xDims(std::move(xDims))
         , _wDims(std::move(wDims))
         , _convPrePadding(std::move(convPrePadding))
         , _convPostPadding(std::move(convPostPadding))
         , _convStride(std::move(convStride))
         , _convDilation(std::move(convDilation))
+        , _seed(seed)
     {
         // Indices for dimensions
         // N - Batch size, always at index 0
@@ -96,19 +99,20 @@ struct ConvTestCase
     friend std::ostream& operator<<(std::ostream& ss, const ConvTestCase& tc)
     {
         ss << "(x:";
-        hipdnn_sdk::test_utilities::vecToStream(ss, tc._xDims);
+        vecToStream(ss, tc._xDims);
         ss << " w:";
-        hipdnn_sdk::test_utilities::vecToStream(ss, tc._wDims);
+        vecToStream(ss, tc._wDims);
         ss << " y:";
-        hipdnn_sdk::test_utilities::vecToStream(ss, tc._yDims);
+        vecToStream(ss, tc._yDims);
         ss << " prePad:";
-        hipdnn_sdk::test_utilities::vecToStream(ss, tc._convPrePadding);
+        vecToStream(ss, tc._convPrePadding);
         ss << " postPad:";
-        hipdnn_sdk::test_utilities::vecToStream(ss, tc._convPostPadding);
+        vecToStream(ss, tc._convPostPadding);
         ss << " stride:";
-        hipdnn_sdk::test_utilities::vecToStream(ss, tc._convStride);
+        vecToStream(ss, tc._convStride);
         ss << " dilation:";
-        hipdnn_sdk::test_utilities::vecToStream(ss, tc._convDilation);
+        vecToStream(ss, tc._convDilation);
+        ss << " seed:" << tc._seed;
         ss << ")";
 
         return ss;
@@ -121,16 +125,15 @@ class ConvForward : public ::testing::TestWithParam<ConvTestCase>
     struct ConvTensorBundle
     {
         ConvTensorBundle(const ConvTestCase& testCase,
-                         unsigned int seed = 1,
                          const TensorLayout& layout = TensorLayout::NCHW)
             : xTensor(testCase._xDims, layout)
             , wTensor(testCase._wDims, layout)
             , yTensor(testCase._yDims, layout)
         {
             xTensor.fillWithRandomValues(
-                static_cast<DataType>(-1.0f), static_cast<DataType>(1.0f), seed);
+                static_cast<DataType>(-1.0f), static_cast<DataType>(1.0f), testCase._seed);
             wTensor.fillWithRandomValues(
-                static_cast<DataType>(-1.0f), static_cast<DataType>(1.0f), seed);
+                static_cast<DataType>(-1.0f), static_cast<DataType>(1.0f), testCase._seed);
             yTensor.fillWithValue(static_cast<DataType>(0.0));
         }
 
@@ -262,12 +265,11 @@ protected:
 
         auto inputDataType = getDataTypeEnumFromType<DataType>();
 
-        unsigned int seed = std::random_device{}();
-        HIPDNN_LOG_INFO("Test is using {} for its random seed", seed);
+        HIPDNN_LOG_INFO("Test is using {} for its random seed", testCase._seed);
 
-        ConvTensorBundle graphTensorBundle(testCase, seed, layout);
+        ConvTensorBundle graphTensorBundle(testCase, layout);
 
-        ConvTensorBundle cpuTensorBundle(testCase, seed, layout);
+        ConvTensorBundle cpuTensorBundle(testCase, layout);
 
         runMiopenConvFwd(testCase, graphTensorBundle, inputDataType);
         graphTensorBundle.yTensor.memory().markDeviceModified();
@@ -311,11 +313,13 @@ class IntegrationGpuConvFwdNhwcFp16 : public ConvForward<half>
 
 std::vector<ConvTestCase> getConvFwdTestCases()
 {
+    unsigned seed = std::random_device{}();
+
     return {
-        {{1, 20, 20, 20}, {1, 20, 3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}},
-        {{1, 20, 20, 20}, {1, 20, 3, 3}, {0, 0}, {0, 0}, {1, 1}, {1, 1}},
-        {{1, 20, 20, 20}, {1, 20, 3, 3}, {1, 1}, {1, 1}, {2, 2}, {1, 1}},
-        {{1, 20, 20, 20}, {1, 20, 3, 3}, {2, 2}, {2, 2}, {1, 1}, {2, 2}},
+        {{1, 20, 20, 20}, {1, 20, 3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, seed},
+        {{1, 20, 20, 20}, {1, 20, 3, 3}, {0, 0}, {0, 0}, {1, 1}, {1, 1}, seed},
+        {{1, 20, 20, 20}, {1, 20, 3, 3}, {1, 1}, {1, 1}, {2, 2}, {1, 1}, seed},
+        {{1, 20, 20, 20}, {1, 20, 3, 3}, {2, 2}, {2, 2}, {1, 1}, {2, 2}, seed},
     };
 }
 

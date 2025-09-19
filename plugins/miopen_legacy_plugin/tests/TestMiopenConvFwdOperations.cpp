@@ -53,17 +53,15 @@ protected:
                          hipdnn_sdk::data_objects::DataType inputDataType,
                          DataType epsilon)
     {
-        unsigned int seed = std::random_device{}();
-
         std::vector<hipdnnPluginDeviceBuffer_t> deviceBuffers;
 
         PinnedTensor<DataType> xTensor(testCase._xDims, _layout);
         deviceBuffers.push_back(generateRandomDeviceBuffer(
-            xTensor, 1, static_cast<DataType>(-1.0f), static_cast<DataType>(1.0f), seed));
+            xTensor, 1, static_cast<DataType>(-1.0f), static_cast<DataType>(1.0f), testCase._seed));
 
         PinnedTensor<DataType> wTensor(testCase._wDims, _layout);
         deviceBuffers.push_back(generateRandomDeviceBuffer(
-            wTensor, 2, static_cast<DataType>(-1.0f), static_cast<DataType>(1.0f), seed));
+            wTensor, 2, static_cast<DataType>(-1.0f), static_cast<DataType>(1.0f), testCase._seed));
 
         PinnedTensor<DataType> yTensor(testCase._yDims, _layout);
         deviceBuffers.push_back(generateEmptyDeviceBuffer(yTensor, 3));
@@ -116,10 +114,10 @@ protected:
 
         Tensor<DataType> xTensorCpu(xTensor.dims(), _layout);
         xTensorCpu.fillWithRandomValues(
-            static_cast<DataType>(-1.0f), static_cast<DataType>(1.0f), seed);
+            static_cast<DataType>(-1.0f), static_cast<DataType>(1.0f), testCase._seed);
         Tensor<DataType> wTensorCpu(wTensor.dims(), _layout);
         wTensorCpu.fillWithRandomValues(
-            static_cast<DataType>(-1.0f), static_cast<DataType>(1.0f), seed);
+            static_cast<DataType>(-1.0f), static_cast<DataType>(1.0f), testCase._seed);
         Tensor<DataType> yTensorCpu(yTensor.dims(), _layout);
 
         CpuFpReferenceConvolutionImpl<DataType, float>::convFwdInference(xTensorCpu,

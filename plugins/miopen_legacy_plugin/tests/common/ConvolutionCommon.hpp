@@ -21,19 +21,22 @@ struct ConvTestCase
     std::vector<int64_t> _convPostPadding;
     std::vector<int64_t> _convStride;
     std::vector<int64_t> _convDilation;
+    unsigned _seed;
 
     ConvTestCase(std::vector<int64_t>&& xDims,
                  std::vector<int64_t>&& wDims,
                  std::vector<int64_t>&& convPrePadding,
                  std::vector<int64_t>&& convPostPadding,
                  std::vector<int64_t>&& convStride,
-                 std::vector<int64_t>&& convDilation)
+                 std::vector<int64_t>&& convDilation,
+                 unsigned seed)
         : _xDims(std::move(xDims))
         , _wDims(std::move(wDims))
         , _convPrePadding(std::move(convPrePadding))
         , _convPostPadding(std::move(convPostPadding))
         , _convStride(std::move(convStride))
         , _convDilation(std::move(convDilation))
+        , _seed(seed)
     {
         // Indices for dimensions
         // N - Batch size, always at index 0
@@ -100,6 +103,7 @@ struct ConvTestCase
         vecToStream(ss, tc._convStride);
         ss << " dilation:";
         vecToStream(ss, tc._convDilation);
+        ss << " seed:" << tc._seed;
         ss << ")";
 
         return ss;
@@ -108,11 +112,13 @@ struct ConvTestCase
 
 inline std::vector<ConvTestCase> getConvTestCases()
 {
+    unsigned seed = std::random_device{}();
+
     return {
-        {{1, 20, 20, 20}, {1, 20, 3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}},
-        {{1, 20, 20, 20}, {1, 20, 3, 3}, {0, 0}, {0, 0}, {1, 1}, {1, 1}},
-        {{1, 20, 20, 20}, {1, 20, 3, 3}, {1, 1}, {1, 1}, {2, 2}, {1, 1}},
-        {{1, 20, 20, 20}, {1, 20, 3, 3}, {2, 2}, {2, 2}, {1, 1}, {2, 2}},
+        {{1, 20, 20, 20}, {1, 20, 3, 3}, {1, 1}, {1, 1}, {1, 1}, {1, 1}, seed},
+        {{1, 20, 20, 20}, {1, 20, 3, 3}, {0, 0}, {0, 0}, {1, 1}, {1, 1}, seed},
+        {{1, 20, 20, 20}, {1, 20, 3, 3}, {1, 1}, {1, 1}, {2, 2}, {1, 1}, seed},
+        {{1, 20, 20, 20}, {1, 20, 3, 3}, {2, 2}, {2, 2}, {1, 1}, {2, 2}, seed},
     };
 }
 
