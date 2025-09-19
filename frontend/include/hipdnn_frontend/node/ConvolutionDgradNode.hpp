@@ -3,12 +3,14 @@
 #pragma once
 
 #include "Node.hpp"
+#include <algorithm>
 #include <hipdnn_frontend/Error.hpp>
 #include <hipdnn_frontend/Utilities.hpp>
 #include <hipdnn_frontend/attributes/ConvolutionDgradAttributes.hpp>
 #include <hipdnn_frontend/attributes/GraphAttributes.hpp>
 #include <hipdnn_sdk/data_objects/graph_generated.h>
 #include <hipdnn_sdk/utilities/ShapeUtilities.hpp>
+#include <numeric>
 
 namespace hipdnn_frontend::graph
 {
@@ -25,20 +27,20 @@ public:
 
     Error pre_validate_node() const override
     {
-        // Validate tensor pointers
-        HIPDNN_RETURN_IF_FALSE(attributes.get_dy(),
-                               ErrorCode::ATTRIBUTE_NOT_SET,
-                               "ConvolutionDgradNode missing dy (gradient of output) for pre-validation");
+        HIPDNN_RETURN_IF_FALSE(
+            attributes.get_dy(),
+            ErrorCode::ATTRIBUTE_NOT_SET,
+            "ConvolutionDgradNode missing dy (gradient of output) for pre-validation");
 
         HIPDNN_RETURN_IF_FALSE(attributes.get_w(),
                                ErrorCode::ATTRIBUTE_NOT_SET,
                                "ConvolutionDgradNode missing w (weights) for pre-validation");
 
-        HIPDNN_RETURN_IF_FALSE(attributes.get_dx(),
-                               ErrorCode::ATTRIBUTE_NOT_SET,
-                               "ConvolutionDgradNode missing dx (gradient of input) for pre-validation");
+        HIPDNN_RETURN_IF_FALSE(
+            attributes.get_dx(),
+            ErrorCode::ATTRIBUTE_NOT_SET,
+            "ConvolutionDgradNode missing dx (gradient of input) for pre-validation");
 
-        // Validate convolution parameters
         HIPDNN_RETURN_IF_TRUE(attributes.get_pre_padding().empty(),
                               ErrorCode::ATTRIBUTE_NOT_SET,
                               "ConvolutionDgradNode missing pre_padding for pre-validation");
@@ -55,12 +57,10 @@ public:
                               ErrorCode::ATTRIBUTE_NOT_SET,
                               "ConvolutionDgradNode missing dilation for pre-validation");
 
-        // Get tensor references
         auto dy = attributes.get_dy();
         auto w = attributes.get_w();
         auto dx = attributes.get_dx();
 
-        // Validate dy tensor dimensions and strides
         auto& dyDims = dy->get_dim();
 
         HIPDNN_RETURN_IF_FALSE(
@@ -74,7 +74,6 @@ public:
             ErrorCode::INVALID_VALUE,
             "ConvolutionDgradNode: dy tensor must have at least 3 dimensions (N, C, spatial)");
 
-        // Validate weight tensor dimensions and strides
         auto& wDims = w->get_dim();
 
         HIPDNN_RETURN_IF_FALSE(
@@ -89,14 +88,13 @@ public:
             "ConvolutionDgradNode: Weight tensor dimension count must match dy tensor "
             "dimension count");
 
-        // Validate output channels match between dy and weight tensors
+        // Validate output channels match between dy and w tensors
         HIPDNN_RETURN_IF_NE(
             dyDims[1],
             wDims[0],
             ErrorCode::INVALID_VALUE,
             "ConvolutionDgradNode: dy tensor channels must match weight tensor output channels");
 
-        // Validate dx tensor dimensions and strides if they are set
         auto& dxDims = dx->get_dim();
         auto& dxStrides = dx->get_stride();
 
@@ -116,7 +114,9 @@ public:
                                 "ConvolutionDgradNode: dx tensor batch size must match dy "
                                 "tensor batch size");
 
-            // For grouped convolution: dx_dims[1] / w_dims[1] is group count
+            // dxDims[1] / wDims[1] is group count
+            // weightChannels = inputChannels / groups
+            // groups = inputChannels / weightChannels
             auto groupCount = dxDims[1] / wDims[1];
             HIPDNN_RETURN_IF_NE(
                 dxDims[1] % wDims[1],
@@ -185,7 +185,6 @@ public:
             auto strideVal = stride[i];
             auto dilationVal = dilation[i];
 
-            // Validate parameters
             HIPDNN_RETURN_IF_LT(
                 strideVal, 1, ErrorCode::INVALID_VALUE, "ConvolutionDgradNode: Stride must be > 0");
 
@@ -230,7 +229,6 @@ public:
 
         auto dxDims = dx->get_dim();
 
-        // Infer dx dimensions if not set
         if(dxDims.empty())
         {
             auto& dyDims = dy->get_dim();
@@ -245,17 +243,15 @@ public:
 
             dxDims[0] = dyDims[0]; // N (batch) matches dy
 
-            // For grouped convolution, need to compute the number of groups
-            // Groups = output_channels / (weight_output_channels)
-            // Then input_channels = weight_input_channels * groups
-            auto groups = dyDims[1] / wDims[0];
-            dxDims[1] = wDims[1] * groups; // C (input channels)
+            // Impossible to infer group count without dx dimensions.
+            // Therefore, assume groups = 1.
+            dxDims[1] = wDims[1]; // C (input channels)
 
-            // Calculate spatial dimensions (Optional D, H, W)
+            // Calculate spatial dimensions (i_2, ..., i_n)
             // For backward pass: dx_size = stride * (dy_size - 1) + dilated_kernel_size - pre_pad - post_pad
             for(size_t i = 2; i < dyDims.size(); ++i)
             {
-                auto spatialIdx = i - 2; // Index into spatial dimension arrays
+                auto spatialIdx = i - 2;
 
                 HIPDNN_RETURN_IF_TRUE(
                     spatialIdx >= prePadding.size() || spatialIdx >= postPadding.size()
@@ -271,7 +267,6 @@ public:
                 auto strideVal = stride[spatialIdx];
                 auto dilationVal = dilation[spatialIdx];
 
-                // Validate parameters
                 HIPDNN_RETURN_IF_LT(strideVal,
                                     1,
                                     ErrorCode::INVALID_VALUE,
@@ -292,18 +287,14 @@ public:
                                     ErrorCode::INVALID_VALUE,
                                     "ConvolutionDgradNode: Post-padding must be non-negative");
 
-                // Calculate dilated kernel size
                 auto dilatedKernelSize = (dilationVal * (kernelSize - 1)) + 1;
 
-                // Calculate dx dimension
                 dxDims[i] = strideVal * (dySize - 1) + dilatedKernelSize - prePad - postPad;
             }
 
-            // Set the inferred dimensions
             dx->set_dim(dxDims);
         }
 
-        // Infer dx strides if not set
         if(dx->get_stride().empty())
         {
             auto& dyStrides = dy->get_stride();
@@ -325,17 +316,15 @@ public:
                 ErrorCode::ATTRIBUTE_NOT_SET,
                 "ConvolutionDgradNode: Stride dimension mismatch between dy and dx tensors");
 
-            // All validations passed - perform stride generation
             std::vector<int64_t> strideOrder(dyStrides.size());
             std::vector<size_t> indices(dyStrides.size());
             std::iota(indices.begin(), indices.end(), 0);
 
             // Sort indices by their corresponding stride values (ascending)
-            std::ranges::sort(indices.begin(), indices.end(), [&dyStrides](size_t a, size_t b) {
+            std::sort(indices.begin(), indices.end(), [&dyStrides](size_t a, size_t b) {
                 return dyStrides[a] < dyStrides[b];
             });
 
-            // Assign order based on sorted indices
             for(size_t i = 0; i < indices.size(); ++i)
             {
                 strideOrder[indices[i]] = static_cast<int64_t>(i);

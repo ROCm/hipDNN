@@ -12,7 +12,7 @@ include "pointwise_attributes.fbs";
 
 namespace hipdnn_sdk.data_objects;
 
-union NodeAttributes {BatchnormInferenceAttributes, PointwiseAttributes, BatchnormBackwardAttributes, BatchnormAttributes, ConvolutionFwdAttributes}
+union NodeAttributes {BatchnormInferenceAttributes, PointwiseAttributes, BatchnormBackwardAttributes, BatchnormAttributes, ConvolutionFwdAttributes, ConvolutionBwdAttributes}
 
 table Node {
 	name: string;

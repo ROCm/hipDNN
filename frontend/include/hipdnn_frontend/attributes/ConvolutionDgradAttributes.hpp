@@ -20,7 +20,7 @@ public:
     enum class InputNames
     {
         DY = 0, // Gradient of output tensor
-        W = 1   // Weights/filter tensor
+        W = 1 // Weights/filter tensor
     };
     typedef InputNames input_names; // NOLINT(readability-identifier-naming)
 
