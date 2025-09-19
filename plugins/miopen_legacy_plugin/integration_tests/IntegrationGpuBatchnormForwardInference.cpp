@@ -31,10 +31,12 @@ struct Batchnorm2dTestCase
     int64_t c;
     int64_t h;
     int64_t w;
+    unsigned int seed;
 
     friend std::ostream& operator<<(std::ostream& ss, const Batchnorm2dTestCase& tc)
     {
-        return ss << "(n:" << tc.n << " c:" << tc.c << " h:" << tc.h << " w:" << tc.w << ")";
+        return ss << "(n:" << tc.n << " c:" << tc.c << " h:" << tc.h << " w:" << tc.w
+                  << " seed:" << tc.seed << ")";
     }
 
     std::vector<int64_t> getDims() const
@@ -242,12 +244,11 @@ protected:
         auto inputDataType = getDataTypeEnumFromType<InputType>();
         auto intermediateDataType = getDataTypeEnumFromType<IntermediateType>();
 
-        unsigned int seed = std::random_device{}();
-        HIPDNN_LOG_INFO("Test is using {} for its random seed", seed);
+        HIPDNN_LOG_INFO("Test is using {} for its random seed", testCase.seed);
 
-        Batchnorm2dTensorBundle graphTensorBundle(testCase.getDims(), seed, layout);
+        Batchnorm2dTensorBundle graphTensorBundle(testCase.getDims(), testCase.seed, layout);
 
-        Batchnorm2dTensorBundle cpuTensorBundle(testCase.getDims(), seed, layout);
+        Batchnorm2dTensorBundle cpuTensorBundle(testCase.getDims(), testCase.seed, layout);
 
         runMiopenBatchnormFwd(graphTensorBundle, inputDataType, intermediateDataType);
         graphTensorBundle.yTensor.memory().markDeviceModified();
@@ -297,15 +298,17 @@ class IntegrationGpuBatchnormForwardInferenceNhwcFp16
 
 std::vector<Batchnorm2dTestCase> getBnFwdInferenceTestCases()
 {
+    unsigned int seed = std::random_device{}();
+
     return {
-        {.n = 1, .c = 3, .h = 14, .w = 14},
-        {.n = 1, .c = 256, .h = 1, .w = 1},
-        {.n = 2, .c = 3, .h = 1, .w = 1},
-        {.n = 32, .c = 1, .h = 14, .w = 14},
-        {.n = 32, .c = 3, .h = 1, .w = 14},
-        {.n = 32, .c = 3, .h = 14, .w = 1},
-        {.n = 64, .c = 64, .h = 112, .w = 112},
-        {.n = 64, .c = 512, .h = 14, .w = 14},
+        {.n = 1, .c = 3, .h = 14, .w = 14, .seed = seed},
+        {.n = 1, .c = 256, .h = 1, .w = 1, .seed = seed},
+        {.n = 2, .c = 3, .h = 1, .w = 1, .seed = seed},
+        {.n = 32, .c = 1, .h = 14, .w = 14, .seed = seed},
+        {.n = 32, .c = 3, .h = 1, .w = 14, .seed = seed},
+        {.n = 32, .c = 3, .h = 14, .w = 1, .seed = seed},
+        {.n = 64, .c = 64, .h = 112, .w = 112, .seed = seed},
+        {.n = 64, .c = 512, .h = 14, .w = 14, .seed = seed},
     };
 }
 
