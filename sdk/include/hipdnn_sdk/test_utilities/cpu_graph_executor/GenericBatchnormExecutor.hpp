@@ -7,7 +7,7 @@
 #include <variant>
 
 #include <hipdnn_sdk/test_utilities/CpuFpReferenceBatchnorm.hpp>
-#include <hipdnn_sdk/test_utilities/FlatbufferDatatypeToType.hpp>
+#include <hipdnn_sdk/test_utilities/FlatbufferDatatypeMapping.hpp>
 #include <hipdnn_sdk/test_utilities/cpu_graph_executor/BatchnormSignatureKey.hpp>
 
 namespace hipdnn_sdk

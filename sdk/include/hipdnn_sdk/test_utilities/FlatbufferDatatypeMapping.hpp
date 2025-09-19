@@ -15,7 +15,6 @@ struct TypeWrapper
     using type = T;
 };
 
-// Mapping function
 template <hipdnn_sdk::data_objects::DataType DT>
 constexpr auto getTypeWrapper()
 {
@@ -47,7 +46,6 @@ constexpr auto getTypeWrapper()
     }
 }
 
-// Bidirectional mapping function
 template <typename T>
 constexpr auto toDataType()
 {
@@ -97,13 +95,6 @@ struct NativeToDataType
 {
     static constexpr auto value = toDataType<T>();
 };
-
-// // Convenience aliases
-// template <hipdnn_sdk::data_objects::DataType DT>
-// using DataTypeToNative_t = typename DataTypeToNative<DT>::type;
-
-// template <typename T>
-// inline constexpr auto TypeToDataType_v = NativeToDataType<T>::value;
 
 }
 }
