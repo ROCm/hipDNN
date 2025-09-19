@@ -11,6 +11,8 @@
 
 #include <hipdnn_sdk/test_utilities/cpu_graph_executor/TensorVariant.hpp>
 
+#include <hipdnn_sdk/test_utilities/cpu_graph_executor/BatchnormRegistry.hpp>
+
 namespace hipdnn_sdk
 {
 namespace test_utilities
@@ -43,14 +45,12 @@ public:
                     .inputDataType = xTensorAttr->data_type(),
                     .scaleBiasDataType = scaleTensorAttr->data_type(),
                     .meanVarianceDataType = meanTensorAttr->data_type(),
-                    .nodeAttributesType
-                    = hipdnn_sdk::data_objects::NodeAttributes::BatchnormInferenceAttributes,
                 };
+
                 auto it = batchnormRegistry().find(key);
+
                 if(it != batchnormRegistry().end())
                 {
-                    BatchnormFwdInferenceFn fn = it->second;
-
                     auto shallowXTensor = TensorVariantUtils::createHostOnlyShallowTensorVariant(
                         *xTensorAttr, variantPack.at(xTensorAttr->uid()));
                     std::any input = std::ref(shallowXTensor);
@@ -81,7 +81,8 @@ public:
                             *invVarianceTensorAttr, variantPack.at(invVarianceTensorAttr->uid()));
                     std::any variance = std::ref(shallowInvVarianceTensor);
 
-                    fn(input, scale, bias, mean, variance, output, 1e-3);
+                    it->second->batchnormFwdInference(
+                        input, scale, bias, mean, variance, output, 1e-3);
                 }
                 else
                 {
@@ -95,6 +96,5 @@ public:
         }
     }
 };
-
 }
 }

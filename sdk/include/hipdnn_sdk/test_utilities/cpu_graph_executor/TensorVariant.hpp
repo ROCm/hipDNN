@@ -32,6 +32,19 @@ public:
             flatbufferVectorToStd(tensorAttributes.strides()));
     }
 
+    static TensorVariant& unwrapToTensorVariant(std::any& a)
+    {
+        if(auto p = std::any_cast<TensorVariant>(&a))
+        {
+            return *p;
+        }
+        if(auto pr = std::any_cast<std::reference_wrapper<TensorVariant>>(&a))
+        {
+            return pr->get();
+        }
+        throw std::bad_any_cast();
+    }
+
 private:
     template <typename T>
     static std::unique_ptr<hipdnn_sdk::utilities::TensorBase<T>> createHostOnlyShallowTensor(

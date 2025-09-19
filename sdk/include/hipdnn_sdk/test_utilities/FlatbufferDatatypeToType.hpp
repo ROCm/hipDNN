@@ -46,6 +46,37 @@ constexpr auto getTypeWrapper()
         static_assert(DT != DT, "Unsupported DataType");
     }
 }
+
+// Bidirectional mapping function
+template <typename T>
+constexpr auto toDataType()
+{
+    if constexpr(std::is_same_v<T, float>)
+    {
+        return hipdnn_sdk::data_objects::DataType::FLOAT;
+    }
+    else if constexpr(std::is_same_v<T, half>)
+    {
+        return hipdnn_sdk::data_objects::DataType::HALF;
+    }
+    else if constexpr(std::is_same_v<T, double>)
+    {
+        return hipdnn_sdk::data_objects::DataType::DOUBLE;
+    }
+    else if constexpr(std::is_same_v<T, int32_t>)
+    {
+        return hipdnn_sdk::data_objects::DataType::INT32;
+    }
+    else if constexpr(std::is_same_v<T, hip_bfloat16>)
+    {
+        return hipdnn_sdk::data_objects::DataType::BFLOAT16;
+    }
+    else
+    {
+        static_assert(sizeof(T) == 0, "Unsupported native type");
+    }
+}
+
 }
 
 namespace hipdnn_sdk
@@ -53,14 +84,26 @@ namespace hipdnn_sdk
 namespace test_utilities
 {
 
+// Struct for DataType to native type conversion
 template <hipdnn_sdk::data_objects::DataType DT>
 struct DataTypeToNative
 {
     using type = typename decltype(getTypeWrapper<DT>())::type;
 };
 
-template <hipdnn_sdk::data_objects::DataType DT>
-using DataTypeToNative_t = typename DataTypeToNative<DT>::type;
+// Struct for native type to DataType conversion
+template <typename T>
+struct NativeToDataType
+{
+    static constexpr auto value = toDataType<T>();
+};
+
+// // Convenience aliases
+// template <hipdnn_sdk::data_objects::DataType DT>
+// using DataTypeToNative_t = typename DataTypeToNative<DT>::type;
+
+// template <typename T>
+// inline constexpr auto TypeToDataType_v = NativeToDataType<T>::value;
 
 }
 }
