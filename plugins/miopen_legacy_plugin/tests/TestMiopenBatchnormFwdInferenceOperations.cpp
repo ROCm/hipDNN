@@ -95,7 +95,7 @@ protected:
                                                            testCase.seed));
 
         auto batchnormBuilder = hipdnn_backend::test_utilities::createValidBatchnormGraph(
-            xTensor.strides(), xTensor.dims(), true, inputDataType);
+            xTensor.strides(), xTensor.dims(), inputDataType);
 
         hipdnnPluginConstData_t opGraph;
         opGraph.ptr = batchnormBuilder.GetBufferPointer();
