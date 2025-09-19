@@ -41,7 +41,7 @@ struct IntegrationTestCase
 
     friend std::ostream& operator<<(std::ostream& os, const IntegrationTestCase& tc)
     {
-        os << "BatchnormTestCase{" << "plugin_path: " << tc.pluginPath
+        os << "ConvTestCase{" << "plugin_path: " << tc.pluginPath
            << ", description: " << tc.description << ", graph_name: " << tc.graphName
            << ", expected_failure: ";
 
