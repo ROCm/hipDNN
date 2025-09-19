@@ -43,6 +43,8 @@ add_executable(hipdnn_sdk_tests
     test_utilities/TestFlatbufferDatatypeMapping.cpp
     test_utilities/cpu_graph_executor/TestCpuReferenceGraphExecutor.cpp
     test_utilities/cpu_graph_executor/TestTensorVariant.cpp
+    test_utilities/cpu_graph_executor/TestBatchnormSignatureKey.cpp
+
 
 
 )
