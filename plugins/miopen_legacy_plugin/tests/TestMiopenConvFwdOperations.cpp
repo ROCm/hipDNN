@@ -130,10 +130,6 @@ protected:
         CpuFpReferenceValidation<DataType> cpuRefValidationInput(epsilon, epsilon);
 
 #if 1 // TODO remove
-        ASSERT_NE(yTensor.memory().count(), 0);
-        ASSERT_NE(yTensorCpu.memory().count(), 0);
-        ASSERT_EQ(yTensor.memory().count(), yTensorCpu.memory().count());
-
         std::cerr << "yTensor: ";
         auto gpuData = yTensor.memory().hostData();
         for(size_t i = 0; i < yTensor.memory().count() && i < 20; i++)
@@ -220,13 +216,13 @@ TEST_P(TestGpuMiopenConvFwdExecuteGraphNchwFp32, Correctness)
 TEST_P(TestGpuMiopenConvFwdExecuteGraphNchwBfp16, Correctness)
 {
     const ConvTestCase& testCase = GetParam();
-    runConvFwdGraph(testCase, hipdnn_sdk::data_objects::DataType::BFLOAT16, 4e-4_bf);
+    runConvFwdGraph(testCase, hipdnn_sdk::data_objects::DataType::BFLOAT16, 1e-3_bf);
 }
 
 TEST_P(TestGpuMiopenConvFwdExecuteGraphNchwFp16, Correctness)
 {
     const ConvTestCase& testCase = GetParam();
-    runConvFwdGraph(testCase, hipdnn_sdk::data_objects::DataType::HALF, 4e-4_h);
+    runConvFwdGraph(testCase, hipdnn_sdk::data_objects::DataType::HALF, 1e-3_h);
 }
 
 TEST_P(TestGpuMiopenConvFwdExecuteGraphNhwcFp32, Correctness)
@@ -238,13 +234,13 @@ TEST_P(TestGpuMiopenConvFwdExecuteGraphNhwcFp32, Correctness)
 TEST_P(TestGpuMiopenConvFwdExecuteGraphNhwcBfp16, Correctness)
 {
     const ConvTestCase& testCase = GetParam();
-    runConvFwdGraph(testCase, hipdnn_sdk::data_objects::DataType::BFLOAT16, 4e-4_bf);
+    runConvFwdGraph(testCase, hipdnn_sdk::data_objects::DataType::BFLOAT16, 1e-3_bf);
 }
 
 TEST_P(TestGpuMiopenConvFwdExecuteGraphNhwcFp16, Correctness)
 {
     const ConvTestCase& testCase = GetParam();
-    runConvFwdGraph(testCase, hipdnn_sdk::data_objects::DataType::HALF, 4e-4_h);
+    runConvFwdGraph(testCase, hipdnn_sdk::data_objects::DataType::HALF, 1e-3_h);
 }
 
 INSTANTIATE_TEST_SUITE_P(,

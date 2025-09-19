@@ -78,7 +78,11 @@ ConvFwdPlan::~ConvFwdPlan()
 {
     if(_solution != nullptr)
     {
-        std::ignore = miopenDestroySolution(_solution);
+        auto status = miopenDestroySolution(_solution);
+        if(status != miopenStatusSuccess)
+        {
+            HIPDNN_LOG_ERROR("miopenDestroySolution failed in ConvFwdPlan destructor");
+        }
     }
 }
 
@@ -95,7 +99,11 @@ ConvFwdPlan& ConvFwdPlan::operator=(ConvFwdPlan&& other) noexcept
     {
         if(_solution != nullptr)
         {
-            std::ignore = miopenDestroySolution(_solution);
+            auto status = miopenDestroySolution(_solution);
+            if(status != miopenStatusSuccess)
+            {
+                HIPDNN_LOG_ERROR("miopenDestroySolution failed in ConvFwdPlan move assignment");
+            }
         }
         _params = std::move(other._params);
         _solution = other._solution;
