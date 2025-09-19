@@ -7,11 +7,13 @@
 #include <hipdnn_sdk/data_objects/engine_details_generated.h>
 #include <hipdnn_sdk/data_objects/graph_generated.h>
 #include <hipdnn_sdk/plugin/PluginApiDataTypes.h>
+#include <hipdnn_sdk/utilities/ShapeUtilities.hpp>
 
 namespace hipdnn_backend::test_utilities
 {
 
 using namespace hipdnn_sdk::data_objects;
+using namespace hipdnn_sdk::utilities;
 
 inline flatbuffers::FlatBufferBuilder createEmptyValidGraph()
 {
@@ -38,8 +40,8 @@ inline flatbuffers::FlatBufferBuilder
     flatbuffers::FlatBufferBuilder builder;
     std::vector<::flatbuffers::Offset<hipdnn_sdk::data_objects::TensorAttributes>> tensorAttributes;
 
-    std::vector<int64_t> derivedStrides = {1, strides[1], 1, 1};
-    std::vector<int64_t> derivedDims = {1, dims[1], 1, 1};
+    std::vector<int64_t> derivedStrides = getDerivedShape(strides);
+    std::vector<int64_t> derivedDims = getDerivedShape(dims);
 
     tensorAttributes.push_back(hipdnn_sdk::data_objects::CreateTensorAttributesDirect(
         builder, 1, "x", inputDataType, &strides, &dims));
@@ -122,8 +124,8 @@ inline flatbuffers::FlatBufferBuilder
     flatbuffers::FlatBufferBuilder builder;
     std::vector<::flatbuffers::Offset<hipdnn_sdk::data_objects::TensorAttributes>> tensorAttributes;
 
-    std::vector<int64_t> derivedStrides = {1, strides[1], 1, 1};
-    std::vector<int64_t> derivedDims = {1, dims[1], 1, 1};
+    std::vector<int64_t> derivedStrides = getDerivedShape(strides);
+    std::vector<int64_t> derivedDims = getDerivedShape(dims);
 
     tensorAttributes.push_back(hipdnn_sdk::data_objects::CreateTensorAttributesDirect(
         builder, 1, "x", inputDataType, &strides, &dims));
