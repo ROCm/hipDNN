@@ -144,6 +144,95 @@ if(NOT HIP_DNN_SKIP_TESTS)
 endif()
 
 if(CODE_COVERAGE)
+    
+    set(LLVM_TOOL_PATHS /usr/bin /opt/rocm/llvm/bin)
+    set(EXPECTED_LLVM_VERSION "20")
+
+    find_program(LLVM_PROFDATA_BINARY
+        NAMES
+            llvm-profdata-20
+            llvm-profdata
+        PATHS
+            ${LLVM_TOOL_PATHS}
+    )
+    
+    find_program(LLVM_COV_BINARY
+        NAMES
+            llvm-cov-20
+            llvm-cov
+        PATHS
+            ${LLVM_TOOL_PATHS}
+    )
+    
+    find_program(LLVM_CXXFILT_BINARY
+        NAMES
+            llvm-cxxfilt-20
+            llvm-cxxfilt
+        PATHS
+            ${LLVM_TOOL_PATHS}
+    )
+    
+    if(NOT LLVM_PROFDATA_BINARY)
+        message(FATAL_ERROR "llvm-profdata not found in PATH, /opt/rocm/llvm/bin, or compiler directory")
+    endif()
+    if(NOT LLVM_COV_BINARY)
+        message(FATAL_ERROR "llvm-cov not found in PATH, /opt/rocm/llvm/bin, or compiler directory")
+    endif()
+    if(NOT LLVM_CXXFILT_BINARY)
+        message(FATAL_ERROR "llvm-cxxfilt not found in PATH, /opt/rocm/llvm/bin, or compiler directory")
+    endif()
+    
+    # Check llvm-profdata version
+    execute_process(
+        COMMAND ${LLVM_PROFDATA_BINARY} --version
+        OUTPUT_VARIABLE LLVM_PROFDATA_VERSION_OUTPUT
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+    )
+    if(LLVM_PROFDATA_VERSION_OUTPUT MATCHES "LLVM version ([0-9]+)\\.")
+        set(LLVM_PROFDATA_MAJOR_VERSION "${CMAKE_MATCH_1}")
+        if(NOT LLVM_PROFDATA_MAJOR_VERSION STREQUAL EXPECTED_LLVM_VERSION)
+            message(WARNING "llvm-profdata version mismatch! Expected: ${EXPECTED_LLVM_VERSION}, Found: ${LLVM_PROFDATA_MAJOR_VERSION}, Full version: ${LLVM_PROFDATA_VERSION_OUTPUT}")
+        else()
+            message(STATUS "Found llvm-profdata version ${LLVM_PROFDATA_MAJOR_VERSION} at ${LLVM_PROFDATA_BINARY}")
+        endif()
+    else()
+        message(WARNING "Could not determine llvm-profdata version from: ${LLVM_PROFDATA_VERSION_OUTPUT}")
+    endif()
+
+    # Check llvm-cov version
+    execute_process(
+        COMMAND ${LLVM_COV_BINARY} --version
+        OUTPUT_VARIABLE LLVM_COV_VERSION_OUTPUT
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+    )
+    if(LLVM_COV_VERSION_OUTPUT MATCHES "LLVM version ([0-9]+)\\.")
+        set(LLVM_COV_MAJOR_VERSION "${CMAKE_MATCH_1}")
+        if(NOT LLVM_COV_MAJOR_VERSION STREQUAL EXPECTED_LLVM_VERSION)
+            message(WARNING "llvm-cov version mismatch! Expected: ${EXPECTED_LLVM_VERSION}, Found: ${LLVM_COV_MAJOR_VERSION}, Full version: ${LLVM_COV_VERSION_OUTPUT}")
+        else()
+            message(STATUS "Found llvm-cov version ${LLVM_COV_MAJOR_VERSION} at ${LLVM_COV_BINARY}")
+        endif()
+    else()
+        message(WARNING "Could not determine llvm-cov version from: ${LLVM_COV_VERSION_OUTPUT}")
+    endif()
+
+    # Check llvm-cxxfilt version
+    execute_process(
+        COMMAND ${LLVM_CXXFILT_BINARY} --version
+        OUTPUT_VARIABLE LLVM_CXXFILT_VERSION_OUTPUT
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+    )
+    if(LLVM_CXXFILT_VERSION_OUTPUT MATCHES "LLVM version ([0-9]+)\\.")
+        set(LLVM_CXXFILT_MAJOR_VERSION "${CMAKE_MATCH_1}")
+        if(NOT LLVM_CXXFILT_MAJOR_VERSION STREQUAL EXPECTED_LLVM_VERSION)
+            message(WARNING "llvm-cxxfilt version mismatch! Expected: ${EXPECTED_LLVM_VERSION}, Found: ${LLVM_CXXFILT_MAJOR_VERSION}, Full version: ${LLVM_CXXFILT_VERSION_OUTPUT}")
+        else()
+            message(STATUS "Found llvm-cxxfilt version ${LLVM_CXXFILT_MAJOR_VERSION} at ${LLVM_CXXFILT_BINARY}")
+        endif()
+    else()
+        message(WARNING "Could not determine llvm-cxxfilt version from: ${LLVM_CXXFILT_VERSION_OUTPUT}")
+    endif()
+    
     if(HIP_DNN_BUILD_PLUGINS)
         set(MIOPEN_PLUGIN_CODE_COVERAGE_OBJECT -object ${HIPDNN_BUILD_PLUGIN_ENGINE_DIR}/libmiopen_legacy_plugin.so -object ./bin/miopen_legacy_plugin_tests)
     endif()
@@ -153,9 +242,9 @@ if(CODE_COVERAGE)
 
     add_custom_target(
         code_coverage
-        COMMAND cd ${CMAKE_BINARY_DIR} && find . -name \"*.profraw\" -print0 | xargs -0 /opt/rocm/llvm/bin/llvm-profdata merge -sparse -o ./hipdnn.profdata
-        COMMAND /opt/rocm/llvm/bin/llvm-cov report ${CODE_COVERAGE_OBJECTS} -instr-profile=./hipdnn.profdata -ignore-filename-regex=\"${CODE_COVERAGE_IGNORE_REGEX}\" > ./code_cov_hipdnn.report
-        COMMAND /opt/rocm/llvm/bin/llvm-cov show -Xdemangler=/opt/rocm/llvm/bin/llvm-cxxfilt ${CODE_COVERAGE_OBJECTS} -instr-profile=./hipdnn.profdata -ignore-filename-regex=\"${CODE_COVERAGE_IGNORE_REGEX}\" --format=html --output-dir=./hipdnn_coverage_html
+        COMMAND cd ${CMAKE_BINARY_DIR} && find . -name \"*.profraw\" -print0 | xargs -0 ${LLVM_PROFDATA_BINARY} merge -sparse -o ./hipdnn.profdata
+        COMMAND ${LLVM_COV_BINARY} report ${CODE_COVERAGE_OBJECTS} -instr-profile=./hipdnn.profdata -ignore-filename-regex=\"${CODE_COVERAGE_IGNORE_REGEX}\" > ./code_cov_hipdnn.report
+        COMMAND ${LLVM_COV_BINARY} show -Xdemangler=${LLVM_CXXFILT_BINARY} ${CODE_COVERAGE_OBJECTS} -instr-profile=./hipdnn.profdata -ignore-filename-regex=\"${CODE_COVERAGE_IGNORE_REGEX}\" --format=html --output-dir=./hipdnn_coverage_html
         DEPENDS check
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
         COMMENT "Generating code coverage report"

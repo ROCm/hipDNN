@@ -2,17 +2,15 @@
 # SPDX-License-Identifier:  MIT
 
 if(ENABLE_CLANG_TIDY)
-    get_filename_component(CLANG_TIDY_EXE_HINT "${CMAKE_CXX_COMPILER}" PATH)
+    get_filename_component(COMPILER_PATH "${CMAKE_CXX_COMPILER}" PATH)
     find_program(CLANG_TIDY_EXE
         NAMES
+            clang-tidy-20
             clang-tidy
-        HINTS
-            ${CLANG_TIDY_EXE_HINT}
-        PATH_SUFFIXES
-            compiler/bin
         PATHS
+            /usr/bin
             /opt/rocm/llvm/bin
-            /usr/local/opt/llvm/bin
+            ${COMPILER_PATH}
     )
 
     function(find_clang_tidy_version VAR)
@@ -26,15 +24,28 @@ if(ENABLE_CLANG_TIDY)
         else()
             set(${VAR} "0.0" PARENT_SCOPE)
         endif()
-
     endfunction()
 
-    if( NOT CLANG_TIDY_EXE )
-        message( STATUS "Clang tidy not found" )
+    # Check clang-tidy version
+    set(EXPECTED_CLANG_TIDY_VERSION "20")
+    
+    if(NOT CLANG_TIDY_EXE)
+        message(STATUS "Clang tidy not found")
         set(CLANG_TIDY_VERSION "0.0")
     else()
         find_clang_tidy_version(CLANG_TIDY_VERSION)
-        message( STATUS "Clang tidy found: ${CLANG_TIDY_VERSION}. Path:${CLANG_TIDY_EXE}")
+        
+        # Extract major version number
+        if(CLANG_TIDY_VERSION MATCHES "^([0-9]+)\\.")
+            set(CLANG_TIDY_MAJOR_VERSION "${CMAKE_MATCH_1}")
+            if(NOT CLANG_TIDY_MAJOR_VERSION STREQUAL EXPECTED_CLANG_TIDY_VERSION)
+                message(WARNING "clang-tidy version mismatch! Expected: ${EXPECTED_CLANG_TIDY_VERSION}, Found: ${CLANG_TIDY_MAJOR_VERSION}, Full version: ${CLANG_TIDY_VERSION}")
+            else()
+                message(STATUS "Found clang-tidy version ${CLANG_TIDY_MAJOR_VERSION} at ${CLANG_TIDY_EXE}")
+            endif()
+        else()
+            message(WARNING "Could not determine clang-tidy major version from: ${CLANG_TIDY_VERSION}")
+        endif()
     endif()
 
     set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
