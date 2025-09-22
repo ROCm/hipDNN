@@ -27,7 +27,7 @@ inline void copyMaxSizeWithNullTerminator(char* destination, const char* source,
 }
 
 template <typename T>
-void vecToStream(std::ostream& os, const std::vector<T>& vec)
+inline void vecToStream(std::ostream& os, const std::vector<T>& vec)
 {
     if(vec.empty())
     {
