@@ -218,7 +218,7 @@ class IntegrationGpuConvFwdNhwcFp16 : public ConvForward<half>
 {
 };
 
-std::vector<ConvTestCase> getConvFwdTestCases()
+std::vector<ConvTestCase> getTestCases()
 {
     return getConvTestCases();
 }
@@ -230,43 +230,39 @@ TEST_P(IntegrationGpuConvFwdNchwFp32, Correctness)
     runConvTest(4e-6f, TensorLayout::NCHW);
 }
 
-INSTANTIATE_TEST_SUITE_P(, IntegrationGpuConvFwdNchwFp32, testing::ValuesIn(getConvFwdTestCases()));
+INSTANTIATE_TEST_SUITE_P(, IntegrationGpuConvFwdNchwFp32, testing::ValuesIn(getTestCases()));
 
 TEST_P(IntegrationGpuConvFwdNchwBfp16, Correctness)
 {
     runConvTest(1e-2_bf, TensorLayout::NCHW);
 }
 
-INSTANTIATE_TEST_SUITE_P(,
-                         IntegrationGpuConvFwdNchwBfp16,
-                         testing::ValuesIn(getConvFwdTestCases()));
+INSTANTIATE_TEST_SUITE_P(, IntegrationGpuConvFwdNchwBfp16, testing::ValuesIn(getTestCases()));
 
 TEST_P(IntegrationGpuConvFwdNchwFp16, Correctness)
 {
     runConvTest(1e-2_h, TensorLayout::NCHW);
 }
 
-INSTANTIATE_TEST_SUITE_P(, IntegrationGpuConvFwdNchwFp16, testing::ValuesIn(getConvFwdTestCases()));
+INSTANTIATE_TEST_SUITE_P(, IntegrationGpuConvFwdNchwFp16, testing::ValuesIn(getTestCases()));
 
 TEST_P(IntegrationGpuConvFwdNhwcFp32, Correctness)
 {
     runConvTest(4e-6f, TensorLayout::NHWC);
 }
 
-INSTANTIATE_TEST_SUITE_P(, IntegrationGpuConvFwdNhwcFp32, testing::ValuesIn(getConvFwdTestCases()));
+INSTANTIATE_TEST_SUITE_P(, IntegrationGpuConvFwdNhwcFp32, testing::ValuesIn(getTestCases()));
 
 TEST_P(IntegrationGpuConvFwdNhwcBfp16, Correctness)
 {
     runConvTest(1e-2_bf, TensorLayout::NHWC);
 }
 
-INSTANTIATE_TEST_SUITE_P(,
-                         IntegrationGpuConvFwdNhwcBfp16,
-                         testing::ValuesIn(getConvFwdTestCases()));
+INSTANTIATE_TEST_SUITE_P(, IntegrationGpuConvFwdNhwcBfp16, testing::ValuesIn(getTestCases()));
 
 TEST_P(IntegrationGpuConvFwdNhwcFp16, Correctness)
 {
     runConvTest(1e-3_h, TensorLayout::NHWC);
 }
 
-INSTANTIATE_TEST_SUITE_P(, IntegrationGpuConvFwdNhwcFp16, testing::ValuesIn(getConvFwdTestCases()));
+INSTANTIATE_TEST_SUITE_P(, IntegrationGpuConvFwdNhwcFp16, testing::ValuesIn(getTestCases()));

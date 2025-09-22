@@ -9,8 +9,6 @@
 #include <hipdnn_sdk/test_utilities/FlatbufferGraphTestUtils.hpp>
 #include <hipdnn_sdk/test_utilities/TestUtilities.hpp>
 #include <hipdnn_sdk/utilities/Tensor.hpp>
-#include <hipdnn_sdk/utilities/UtilsBfp16.hpp>
-#include <hipdnn_sdk/utilities/UtilsFp16.hpp>
 #include <hipdnn_sdk/utilities/Workspace.hpp>
 
 #include "HipdnnEnginePluginExecutionContext.hpp"
@@ -21,6 +19,9 @@
 using namespace hipdnn_sdk::test_utilities;
 using namespace test_conv_common;
 using namespace test_helpers;
+
+namespace
+{
 
 template <typename DataType>
 class ConvFwdExecuteGraphBase : public ::testing::TestWithParam<ConvTestCase>
@@ -135,6 +136,15 @@ protected:
     hipdnnEnginePluginHandle_t _handle = nullptr;
 };
 
+std::vector<ConvTestCase> getTestCases()
+{
+    unsigned seed = std::random_device{}();
+
+    return {
+        {{1, 16, 16, 16}, {1, 16, 1, 1}, {0, 0}, {0, 0}, {1, 1}, {1, 1}, seed},
+    };
+}
+
 class TestGpuMiopenConvFwdExecuteGraphNchwFp32 : public ConvFwdExecuteGraphBase<float>
 {
 public:
@@ -144,50 +154,7 @@ public:
     }
 };
 
-class TestGpuMiopenConvFwdExecuteGraphNchwFp16 : public ConvFwdExecuteGraphBase<half>
-{
-public:
-    TestGpuMiopenConvFwdExecuteGraphNchwFp16()
-        : ConvFwdExecuteGraphBase(TensorLayout::NCHW)
-    {
-    }
-};
-
-class TestGpuMiopenConvFwdExecuteGraphNchwBfp16 : public ConvFwdExecuteGraphBase<hip_bfloat16>
-{
-public:
-    TestGpuMiopenConvFwdExecuteGraphNchwBfp16()
-        : ConvFwdExecuteGraphBase(TensorLayout::NCHW)
-    {
-    }
-};
-
-class TestGpuMiopenConvFwdExecuteGraphNhwcFp32 : public ConvFwdExecuteGraphBase<float>
-{
-public:
-    TestGpuMiopenConvFwdExecuteGraphNhwcFp32()
-        : ConvFwdExecuteGraphBase(TensorLayout::NHWC)
-    {
-    }
-};
-
-class TestGpuMiopenConvFwdExecuteGraphNhwcFp16 : public ConvFwdExecuteGraphBase<half>
-{
-public:
-    TestGpuMiopenConvFwdExecuteGraphNhwcFp16()
-        : ConvFwdExecuteGraphBase(TensorLayout::NHWC)
-    {
-    }
-};
-
-class TestGpuMiopenConvFwdExecuteGraphNhwcBfp16 : public ConvFwdExecuteGraphBase<hip_bfloat16>
-{
-public:
-    TestGpuMiopenConvFwdExecuteGraphNhwcBfp16()
-        : ConvFwdExecuteGraphBase(TensorLayout::NHWC)
-    {
-    }
-};
+} // namespace
 
 TEST_P(TestGpuMiopenConvFwdExecuteGraphNchwFp32, Correctness)
 {
@@ -195,53 +162,6 @@ TEST_P(TestGpuMiopenConvFwdExecuteGraphNchwFp32, Correctness)
     runConvFwdGraph(testCase, hipdnn_sdk::data_objects::DataType::FLOAT, 4e-6f);
 }
 
-TEST_P(TestGpuMiopenConvFwdExecuteGraphNchwBfp16, Correctness)
-{
-    const ConvTestCase& testCase = GetParam();
-    runConvFwdGraph(testCase, hipdnn_sdk::data_objects::DataType::BFLOAT16, 1e-2_bf);
-}
-
-TEST_P(TestGpuMiopenConvFwdExecuteGraphNchwFp16, Correctness)
-{
-    const ConvTestCase& testCase = GetParam();
-    runConvFwdGraph(testCase, hipdnn_sdk::data_objects::DataType::HALF, 1e-2_h);
-}
-
-TEST_P(TestGpuMiopenConvFwdExecuteGraphNhwcFp32, Correctness)
-{
-    const ConvTestCase& testCase = GetParam();
-    runConvFwdGraph(testCase, hipdnn_sdk::data_objects::DataType::FLOAT, 4e-6f);
-}
-
-TEST_P(TestGpuMiopenConvFwdExecuteGraphNhwcBfp16, Correctness)
-{
-    const ConvTestCase& testCase = GetParam();
-    runConvFwdGraph(testCase, hipdnn_sdk::data_objects::DataType::BFLOAT16, 1e-2_bf);
-}
-
-TEST_P(TestGpuMiopenConvFwdExecuteGraphNhwcFp16, Correctness)
-{
-    const ConvTestCase& testCase = GetParam();
-    runConvFwdGraph(testCase, hipdnn_sdk::data_objects::DataType::HALF, 1e-3_h);
-}
-
 INSTANTIATE_TEST_SUITE_P(,
                          TestGpuMiopenConvFwdExecuteGraphNchwFp32,
-                         testing::ValuesIn(getConvTestCases()));
-
-INSTANTIATE_TEST_SUITE_P(,
-                         TestGpuMiopenConvFwdExecuteGraphNchwFp16,
-                         testing::ValuesIn(getConvTestCases()));
-
-INSTANTIATE_TEST_SUITE_P(,
-                         TestGpuMiopenConvFwdExecuteGraphNchwBfp16,
-                         testing::ValuesIn(getConvTestCases()));
-INSTANTIATE_TEST_SUITE_P(,
-                         TestGpuMiopenConvFwdExecuteGraphNhwcFp32,
-                         testing::ValuesIn(getConvTestCases()));
-INSTANTIATE_TEST_SUITE_P(,
-                         TestGpuMiopenConvFwdExecuteGraphNhwcFp16,
-                         testing::ValuesIn(getConvTestCases()));
-INSTANTIATE_TEST_SUITE_P(,
-                         TestGpuMiopenConvFwdExecuteGraphNhwcBfp16,
-                         testing::ValuesIn(getConvTestCases()));
+                         testing::ValuesIn(getTestCases()));
