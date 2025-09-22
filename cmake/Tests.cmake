@@ -1,6 +1,10 @@
 # Copyright © Advanced Micro Devices, Inc., or its affiliates.
 # SPDX-License-Identifier:  MIT
 
+if(HIP_DNN_SKIP_TESTS)
+    return()
+endif()
+
 hipdnn_add_dependency(GTest v1.16.0)
 include(GoogleTest)
 
@@ -133,6 +137,18 @@ function(_append_test_to_check_target_internal TARGET WORKING_DIR TEST_TYPE STAT
         set(COMMAND_VAR "CHECK_COMMAND_GLOBAL")
         set(DEPENDS_VAR "CHECK_DEPENDS_GLOBAL")
         set(CACHE_DESC "Accumulated check targets")
+    endif()
+
+    
+    if(CODE_COVERAGE)
+        # For code coverage builds, we want each profraw file to have a unique name.  The %m
+        # in the LLVM_PROFILE_FILE environment variable will auto generate a unique id.
+        if(DEFINED TEST_ENVIRONMENT)
+            set(TEST_ENVIRONMENT "${TEST_ENVIRONMENT} LLVM_PROFILE_FILE=./bin/%m.profraw")
+        else()
+            set(TEST_ENVIRONMENT "LLVM_PROFILE_FILE=./%m.profraw")
+        endif()
+
     endif()
     
     set(NEW_COMMAND "")
