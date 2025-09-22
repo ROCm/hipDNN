@@ -7,38 +7,33 @@
 #include <hipdnn_sdk/utilities/UtilsBfp16.hpp>
 #include <hipdnn_sdk/utilities/UtilsFp16.hpp>
 
-namespace
+namespace hipdnn_sdk::test_utilities
 {
-template <typename T>
-struct TypeWrapper
-{
-    using type = T;
-};
 
 template <hipdnn_sdk::data_objects::DataType DT>
-constexpr auto getTypeWrapper()
+constexpr auto datatypeToNative()
 {
     using DataType = hipdnn_sdk::data_objects::DataType;
 
     if constexpr(DT == DataType::FLOAT)
     {
-        return TypeWrapper<float>{};
+        return float{};
     }
     else if constexpr(DT == DataType::HALF)
     {
-        return TypeWrapper<half>{};
+        return half{};
     }
     else if constexpr(DT == DataType::DOUBLE)
     {
-        return TypeWrapper<double>{};
+        return double{};
     }
     else if constexpr(DT == DataType::INT32)
     {
-        return TypeWrapper<int32_t>{};
+        return int32_t{};
     }
     else if constexpr(DT == DataType::BFLOAT16)
     {
-        return TypeWrapper<hip_bfloat16>{};
+        return hip_bfloat16{};
     }
     else
     {
@@ -47,7 +42,7 @@ constexpr auto getTypeWrapper()
 }
 
 template <typename T>
-constexpr auto toDataType()
+constexpr hipdnn_sdk::data_objects::DataType nativeTypeToDataType()
 {
     if constexpr(std::is_same_v<T, float>)
     {
@@ -75,26 +70,10 @@ constexpr auto toDataType()
     }
 }
 
-}
-
-namespace hipdnn_sdk
-{
-namespace test_utilities
-{
-
-// Struct for DataType to native type conversion
 template <hipdnn_sdk::data_objects::DataType DT>
-struct DataTypeToNative
-{
-    using type = typename decltype(getTypeWrapper<DT>())::type;
-};
+using DataTypeToNative = decltype(datatypeToNative<DT>());
 
-// Struct for native type to DataType conversion
 template <typename T>
-struct NativeToDataType
-{
-    static constexpr auto value = toDataType<T>();
-};
+using NativeToDataType = decltype(nativeTypeToDataType<T>());
 
-}
 }

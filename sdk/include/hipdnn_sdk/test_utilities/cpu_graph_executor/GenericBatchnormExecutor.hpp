@@ -20,7 +20,7 @@ class IGenericBatchnormExecutor
 public:
     virtual ~IGenericBatchnormExecutor() = default;
 
-    virtual BatchnormSignatureKey signatureKey() const = 0;
+    // virtual BatchnormSignatureKey signatureKey() const = 0;
 
     //virtual bool isApplicable(const hipdnn_sdk::data_objects::Node& node) const = 0;
 
@@ -34,20 +34,49 @@ public:
         = 0;
 };
 
-template <typename BatchnormSignature>
+// template <typename T>
+// concept IsBatchnormSignatureRegistryKey = requires {
+//     { T::INPUT_DATA_TYPE } -> std::convertible_to<hipdnn_sdk::data_objects::DataType>;
+//     { T::SCALE_BIAS_DATA_TYPE } -> std::convertible_to<hipdnn_sdk::data_objects::DataType>;
+//     { T::MEAN_VARIANCE_DATA_TYPE } -> std::convertible_to<hipdnn_sdk::data_objects::DataType>;
+// };
+
+struct BatchnormSignatureRegistryKey
+{
+    constexpr BatchnormSignatureRegistryKey(hipdnn_sdk::data_objects::DataType input,
+                                            hipdnn_sdk::data_objects::DataType scaleBias,
+                                            hipdnn_sdk::data_objects::DataType meanVariance)
+        : INPUT_DATA_TYPE(input)
+        , SCALE_BIAS_DATA_TYPE(scaleBias)
+        , MEAN_VARIANCE_DATA_TYPE(meanVariance)
+    {
+    }
+
+    const hipdnn_sdk::data_objects::DataType INPUT_DATA_TYPE;
+    const hipdnn_sdk::data_objects::DataType SCALE_BIAS_DATA_TYPE;
+    const hipdnn_sdk::data_objects::DataType MEAN_VARIANCE_DATA_TYPE;
+
+    BatchnormSignatureKey toSignatureKey() const
+    {
+        return BatchnormSignatureKey{
+            INPUT_DATA_TYPE, SCALE_BIAS_DATA_TYPE, MEAN_VARIANCE_DATA_TYPE};
+    }
+};
+
+template <BatchnormSignatureRegistryKey ThisWontWork>
 class BatchnormExecutor : public IGenericBatchnormExecutor
 {
 public:
-    using InputDataType = typename BatchnormSignature::InputDataType;
-    using ScaleBiasDataType = typename BatchnormSignature::ScaleBiasDataType;
-    using MeanVarianceDataType = typename BatchnormSignature::MeanVarianceDataType;
+    using InputDataType = DataTypeToNative<ThisWontWork.INPUT_DATA_TYPE>;
+    using ScaleBiasDataType = DataTypeToNative<ThisWontWork.SCALE_BIAS_DATA_TYPE>;
+    using MeanVarianceDataType = DataTypeToNative<ThisWontWork.MEAN_VARIANCE_DATA_TYPE>;
 
-    BatchnormSignatureKey signatureKey() const override
-    {
-        return {NativeToDataType<InputDataType>::value,
-                NativeToDataType<ScaleBiasDataType>::value,
-                NativeToDataType<MeanVarianceDataType>::value};
-    }
+    // BatchnormSignatureKey signatureKey() const
+    // {
+    //     return {ThisWontWork.INPUT_DATA_TYPE,
+    //             ThisWontWork.SCALE_BIAS_DATA_TYPE,
+    //             ThisWontWork.MEAN_VARIANCE_DATA_TYPE};
+    // }
 
     // bool isApplicable(const hipdnn_sdk::data_objects::Node& node) const override
     // {
