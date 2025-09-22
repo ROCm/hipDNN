@@ -62,7 +62,7 @@ TEST(TestBatchnormSignatureRegistryKey, HashFunction)
                                        .SCALE_BIAS_DATA_TYPE = DataType::FLOAT,
                                        .MEAN_VARIANCE_DATA_TYPE = DataType::FLOAT};
 
-    std::hash<BatchnormSignatureRegistryKey> hasher;
+    BatchnormSignatureRegistryKeyHash hasher;
     EXPECT_EQ(hasher(key1), hasher(key2));
 
     BatchnormSignatureRegistryKey key3{.INPUT_DATA_TYPE = DataType::HALF,
@@ -98,7 +98,7 @@ TEST(TestBatchnormSignatureRegistryKey, Copy)
 
 TEST(TestBatchnormSignatureRegistryKey, UnorderedMapUsage)
 {
-    std::unordered_map<BatchnormSignatureRegistryKey, int> map;
+    std::unordered_map<BatchnormSignatureRegistryKey, int, BatchnormSignatureRegistryKeyHash> map;
 
     BatchnormSignatureRegistryKey key1{.INPUT_DATA_TYPE = DataType::FLOAT,
                                        .SCALE_BIAS_DATA_TYPE = DataType::FLOAT,
@@ -126,7 +126,7 @@ TEST(TestBatchnormSignatureRegistryKey, UnorderedMapUsage)
 
 TEST(TestBatchnormSignatureRegistryKey, UnorderedSetUsage)
 {
-    std::unordered_set<BatchnormSignatureRegistryKey> set;
+    std::unordered_set<BatchnormSignatureRegistryKey, BatchnormSignatureRegistryKeyHash> set;
 
     BatchnormSignatureRegistryKey key1{.INPUT_DATA_TYPE = DataType::FLOAT,
                                        .SCALE_BIAS_DATA_TYPE = DataType::FLOAT,

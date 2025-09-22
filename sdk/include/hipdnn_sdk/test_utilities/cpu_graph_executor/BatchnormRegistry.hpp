@@ -25,11 +25,13 @@ constexpr std::array ALL_BATCHNORM_SIGNATURES
            .MEAN_VARIANCE_DATA_TYPE = hipdnn_sdk::data_objects::DataType::HALF}};
 
 inline std::unordered_map<BatchnormSignatureRegistryKey,
-                          std::unique_ptr<IGenericBatchnormExecutor>>&
+                          std::unique_ptr<IGenericBatchnormExecutor>,
+                          BatchnormSignatureRegistryKeyHash>&
     batchnormRegistry()
 {
     static std::unordered_map<BatchnormSignatureRegistryKey,
-                              std::unique_ptr<IGenericBatchnormExecutor>>
+                              std::unique_ptr<IGenericBatchnormExecutor>,
+                              BatchnormSignatureRegistryKeyHash>
         registry;
     return registry; //
 }

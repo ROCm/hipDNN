@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include <functional>
 #include <hipdnn_sdk/data_objects/data_types_generated.h>
 #include <hipdnn_sdk/data_objects/graph_generated.h>
 
@@ -26,16 +27,15 @@ struct BatchnormSignatureRegistryKey
     hipdnn_sdk::data_objects::DataType MEAN_VARIANCE_DATA_TYPE;
 };
 
-} // namespace test_utilities
-} // namespace hipdnn_sdk
-
-template <>
-struct std::hash<hipdnn_sdk::test_utilities::BatchnormSignatureRegistryKey>
+struct BatchnormSignatureRegistryKeyHash
 {
-    std::size_t operator()(const hipdnn_sdk::test_utilities::BatchnormSignatureRegistryKey& k) const
+    std::size_t operator()(const BatchnormSignatureRegistryKey& k) const
     {
         return std::hash<int>()(static_cast<int>(k.INPUT_DATA_TYPE))
                ^ (std::hash<int>()(static_cast<int>(k.SCALE_BIAS_DATA_TYPE)) << 1)
                ^ (std::hash<int>()(static_cast<int>(k.MEAN_VARIANCE_DATA_TYPE)) << 2);
     }
 };
+
+} // namespace test_utilities
+} // namespace hipdnn_sdk
