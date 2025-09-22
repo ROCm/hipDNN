@@ -181,7 +181,7 @@ protected:
         {
             tensors.y->set_uid(uid++);
         }
-        tensors.y->set_data_type(getDataTypeEnumFromType<Data_type>());
+        tensors.y->set_output(true);
 
         return {graph, tensors};
     }

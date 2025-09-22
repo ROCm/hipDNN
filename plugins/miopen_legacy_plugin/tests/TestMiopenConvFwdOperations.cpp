@@ -50,7 +50,7 @@ protected:
     }
 
     void runConvFwdGraph(const ConvTestCase& testCase,
-                         hipdnn_sdk::data_objects::DataType inputDataType,
+                         hipdnn_sdk::data_objects::DataType dataType,
                          DataType epsilon)
     {
         std::vector<hipdnnPluginDeviceBuffer_t> deviceBuffers;
@@ -77,7 +77,7 @@ protected:
                                                                       testCase._convPostPadding,
                                                                       testCase._convStride,
                                                                       testCase._convDilation,
-                                                                      inputDataType);
+                                                                      dataType);
 
         hipdnnPluginConstData_t opGraph;
         opGraph.ptr = convBuilder.GetBufferPointer();

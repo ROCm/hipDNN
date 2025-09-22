@@ -45,6 +45,12 @@ bool isApplicableFwd(const HipdnnEnginePluginHandle& handle, const hipdnn_plugin
     const auto& tensorAttrW = miopen_utils::findTensorAttributes(tensorMap, attr->w_tensor_uid());
     const auto& tensorAttrY = miopen_utils::findTensorAttributes(tensorMap, attr->y_tensor_uid());
 
+    if(tensorAttrX.virtual_() || tensorAttrW.virtual_() || tensorAttrY.virtual_())
+    {
+        HIPDNN_LOG_WARN("All tensors must be non-virtual");
+        return false;
+    }
+
     size_t spatialDimCount;
     try
     {

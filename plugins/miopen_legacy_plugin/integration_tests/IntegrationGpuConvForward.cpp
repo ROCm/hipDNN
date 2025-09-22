@@ -97,7 +97,7 @@ protected:
 
     void runMiopenConvFwd(const ConvTestCase& testCase,
                           ConvTensorBundle& graphTensorBundle,
-                          hipdnn_frontend::DataType inputDataType)
+                          hipdnn_frontend::DataType dataType)
     {
         auto graphObj = std::make_shared<hipdnn_frontend::graph::Graph>();
 
@@ -105,11 +105,11 @@ protected:
 
         int64_t uid = 1;
 
-        auto xAttr = graph::makeTensorAttributes("x", inputDataType, graphTensorBundle.xTensor);
+        auto xAttr = graph::makeTensorAttributes("x", dataType, graphTensorBundle.xTensor);
         xAttr.set_uid(uid++);
         auto xTensorAttr = std::make_shared<graph::TensorAttributes>(std::move(xAttr));
 
-        auto wAttr = graph::makeTensorAttributes("w", inputDataType, graphTensorBundle.wTensor);
+        auto wAttr = graph::makeTensorAttributes("w", dataType, graphTensorBundle.wTensor);
         wAttr.set_uid(uid++);
         auto wTensorAttr = std::make_shared<graph::TensorAttributes>(std::move(wAttr));
 
@@ -126,7 +126,7 @@ protected:
         {
             yTensorAttr->set_uid(uid++);
         }
-        yTensorAttr->set_data_type(inputDataType);
+        yTensorAttr->set_output(true);
 
         auto result = graphObj->validate();
         ASSERT_EQ(result.code, ErrorCode::OK) << result.err_msg;
@@ -170,7 +170,7 @@ protected:
     {
         const ConvTestCase& testCase = GetParam();
 
-        auto inputDataType = getDataTypeEnumFromType<DataType>();
+        auto dataType = getDataTypeEnumFromType<DataType>();
 
         HIPDNN_LOG_INFO("Test is using {} for its random seed", testCase._seed);
 
@@ -178,7 +178,7 @@ protected:
 
         ConvTensorBundle cpuTensorBundle(testCase, layout);
 
-        runMiopenConvFwd(testCase, graphTensorBundle, inputDataType);
+        runMiopenConvFwd(testCase, graphTensorBundle, dataType);
         graphTensorBundle.yTensor.memory().markDeviceModified();
 
         runCpuConvFwd(testCase, cpuTensorBundle);
