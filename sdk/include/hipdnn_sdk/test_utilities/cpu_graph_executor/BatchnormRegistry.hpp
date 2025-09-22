@@ -14,13 +14,23 @@ namespace hipdnn_sdk
 namespace test_utilities
 {
 
-constexpr std::array allBatchnormSignatures
-    = {BatchnormSignatureRegistryKey(hipdnn_sdk::data_objects::DataType::FLOAT,
-                                     hipdnn_sdk::data_objects::DataType::FLOAT,
-                                     hipdnn_sdk::data_objects::DataType::FLOAT),
-       BatchnormSignatureRegistryKey(hipdnn_sdk::data_objects::DataType::HALF,
-                                     hipdnn_sdk::data_objects::DataType::HALF,
-                                     hipdnn_sdk::data_objects::DataType::HALF)};
+// constexpr std::array allBatchnormSignatures
+//     = {BatchnormSignatureRegistryKey(hipdnn_sdk::data_objects::DataType::FLOAT,
+//                                      hipdnn_sdk::data_objects::DataType::FLOAT,
+//                                      hipdnn_sdk::data_objects::DataType::FLOAT),
+//        BatchnormSignatureRegistryKey(hipdnn_sdk::data_objects::DataType::HALF,
+//                                      hipdnn_sdk::data_objects::DataType::HALF,
+//                                      hipdnn_sdk::data_objects::DataType::HALF)};
+
+constexpr std::array ALL_BATCHNORM_SIGNATURES
+    = {BatchnormSignatureRegistryKey{
+           .INPUT_DATA_TYPE = hipdnn_sdk::data_objects::DataType::FLOAT,
+           .SCALE_BIAS_DATA_TYPE = hipdnn_sdk::data_objects::DataType::FLOAT,
+           .MEAN_VARIANCE_DATA_TYPE = hipdnn_sdk::data_objects::DataType::FLOAT},
+       BatchnormSignatureRegistryKey{
+           .INPUT_DATA_TYPE = hipdnn_sdk::data_objects::DataType::HALF,
+           .SCALE_BIAS_DATA_TYPE = hipdnn_sdk::data_objects::DataType::HALF,
+           .MEAN_VARIANCE_DATA_TYPE = hipdnn_sdk::data_objects::DataType::HALF}};
 
 inline std::unordered_map<BatchnormSignatureRegistryKey,
                           std::unique_ptr<IGenericBatchnormExecutor>>&
@@ -29,7 +39,7 @@ inline std::unordered_map<BatchnormSignatureRegistryKey,
     static std::unordered_map<BatchnormSignatureRegistryKey,
                               std::unique_ptr<IGenericBatchnormExecutor>>
         registry;
-    return registry;
+    return registry; //
 }
 
 /**
@@ -37,11 +47,11 @@ inline std::unordered_map<BatchnormSignatureRegistryKey,
  * 
  * This variadic template function expands a parameter pack of indices to register
  * multiple BatchnormExecutor instances in the batchnormRegistry. Each executor
- * is instantiated with its corresponding signature from allBatchnormSignatures array.
+ * is instantiated with its corresponding signature from ALL_BATCHNORM_SIGNATURES array.
  * 
  * @tparam Is Variadic template parameter pack of indices
  * @param std::index_sequence<Is...> Compile-time sequence of indices used to
- *        iterate through allBatchnormSignatures array
+ *        iterate through ALL_BATCHNORM_SIGNATURES array
  * 
  * @note Uses C++17 fold expression with comma operator to expand and execute
  *       the registration for each index in the sequence
@@ -49,14 +59,14 @@ inline std::unordered_map<BatchnormSignatureRegistryKey,
 template <std::size_t... Is>
 void registerBatchnormExecutors(std::index_sequence<Is...>)
 {
-    ((batchnormRegistry()[allBatchnormSignatures[Is]]
-      = std::make_unique<BatchnormExecutor<allBatchnormSignatures[Is]>>()),
+    ((batchnormRegistry()[ALL_BATCHNORM_SIGNATURES[Is]]
+      = std::make_unique<BatchnormExecutor<ALL_BATCHNORM_SIGNATURES[Is]>>()),
      ...);
 }
 
 inline void initializeBatchnormRegistry()
 {
-    registerBatchnormExecutors(std::make_index_sequence<allBatchnormSignatures.size()>{});
+    registerBatchnormExecutors(std::make_index_sequence<ALL_BATCHNORM_SIGNATURES.size()>{});
 }
 
 struct BatchnormRegistryInitializer
