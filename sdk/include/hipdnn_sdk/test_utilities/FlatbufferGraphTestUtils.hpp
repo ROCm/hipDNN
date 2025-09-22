@@ -208,12 +208,12 @@ inline flatbuffers::FlatBufferBuilder
 }
 
 inline flatbuffers::FlatBufferBuilder
-    createValidConvFwdGraph(std::vector<int64_t> xDims = {1, 1, 1, 1},
-                            std::vector<int64_t> xStrides = {1, 1, 1, 1},
-                            std::vector<int64_t> wDims = {1, 1, 1, 1},
-                            std::vector<int64_t> wStrides = {1, 1, 1, 1},
-                            std::vector<int64_t> yDims = {1, 1, 1, 1},
-                            std::vector<int64_t> yStrides = {1, 1, 1, 1},
+    createValidConvFwdGraph(std::vector<int64_t> xDims = {4, 4, 4, 4},
+                            std::vector<int64_t> xStrides = {64, 16, 4, 1},
+                            std::vector<int64_t> wDims = {4, 4, 1, 1},
+                            std::vector<int64_t> wStrides = {4, 1, 1, 1},
+                            std::vector<int64_t> yDims = {4, 4, 4, 4},
+                            std::vector<int64_t> yStrides = {64, 16, 4, 1},
                             std::vector<int64_t> convPrePadding = {0, 0},
                             std::vector<int64_t> convPostPadding = {0, 0},
                             std::vector<int64_t> convStrides = {1, 1},
