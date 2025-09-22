@@ -6,45 +6,13 @@
 #include <functional>
 #include <variant>
 
-#include <hipdnn_sdk/test_utilities/cpu_graph_executor/BatchnormSignatureKey.hpp>
+#include <hipdnn_sdk/test_utilities/cpu_graph_executor/BatchnormSignatureRegistryKey.hpp>
 #include <hipdnn_sdk/test_utilities/cpu_graph_executor/GenericBatchnormExecutor.hpp>
 
 namespace hipdnn_sdk
 {
 namespace test_utilities
 {
-
-inline std::unordered_map<BatchnormSignatureKey, std::unique_ptr<IGenericBatchnormExecutor>>&
-    batchnormRegistry()
-{
-    static std::unordered_map<BatchnormSignatureKey, std::unique_ptr<IGenericBatchnormExecutor>>
-        _reg;
-    return _reg;
-}
-
-// template <typename InputT, typename ScaleBiasT, typename MeanVarianceT>
-// struct BatchnormSignature
-// {
-//     using InputDataType = InputT;
-//     using ScaleBiasDataType = ScaleBiasT;
-//     using MeanVarianceDataType = MeanVarianceT;
-// };
-
-//THIS DOESNT WORK AT ALL, need template params
-// constexpr std::array<BatchnormSignatureRegistryKey<hipdnn_sdk::data_objects::DataType::FLOAT,
-//                                                    hipdnn_sdk::data_objects::DataType::FLOAT,
-//                                                    hipdnn_sdk::data_objects::DataType::FLOAT>,
-//                      1>
-//     allBatchnormSignatures = {
-//         BatchnormSignatureRegistryKey<hipdnn_sdk::data_objects::DataType::FLOAT,
-//                                       hipdnn_sdk::data_objects::DataType::FLOAT,
-//                                       hipdnn_sdk::data_objects::DataType::FLOAT>{},
-//         //BatchnormSignatureRegistryKey<hipdnn_sdk::data_objects::DataType::HALF,
-//         //                              hipdnn_sdk::data_objects::DataType::HALF,
-//         //                              hipdnn_sdk::data_objects::DataType::HALF>{}
-// };
-
-// Registry key: compile-time template
 
 constexpr std::array allBatchnormSignatures
     = {BatchnormSignatureRegistryKey(hipdnn_sdk::data_objects::DataType::FLOAT,
@@ -54,11 +22,34 @@ constexpr std::array allBatchnormSignatures
                                      hipdnn_sdk::data_objects::DataType::HALF,
                                      hipdnn_sdk::data_objects::DataType::HALF)};
 
-//These functions are esentially looping over std::array and creating all the executors.
+inline std::unordered_map<BatchnormSignatureRegistryKey,
+                          std::unique_ptr<IGenericBatchnormExecutor>>&
+    batchnormRegistry()
+{
+    static std::unordered_map<BatchnormSignatureRegistryKey,
+                              std::unique_ptr<IGenericBatchnormExecutor>>
+        registry;
+    return registry;
+}
+
+/**
+ * @brief Registers all batchnorm executors at compile-time using fold expressions
+ * 
+ * This variadic template function expands a parameter pack of indices to register
+ * multiple BatchnormExecutor instances in the batchnormRegistry. Each executor
+ * is instantiated with its corresponding signature from allBatchnormSignatures array.
+ * 
+ * @tparam Is Variadic template parameter pack of indices
+ * @param std::index_sequence<Is...> Compile-time sequence of indices used to
+ *        iterate through allBatchnormSignatures array
+ * 
+ * @note Uses C++17 fold expression with comma operator to expand and execute
+ *       the registration for each index in the sequence
+ */
 template <std::size_t... Is>
 void registerBatchnormExecutors(std::index_sequence<Is...>)
 {
-    ((batchnormRegistry()[allBatchnormSignatures[Is].toSignatureKey()]
+    ((batchnormRegistry()[allBatchnormSignatures[Is]]
       = std::make_unique<BatchnormExecutor<allBatchnormSignatures[Is]>>()),
      ...);
 }
@@ -73,32 +64,6 @@ struct BatchnormRegistryInitializer
     BatchnormRegistryInitializer()
     {
         initializeBatchnormRegistry();
-        // constexpr auto something
-        //     = BatchnormSignatureRegistryKey(hipdnn_sdk::data_objects::DataType::FLOAT,
-        //                                     hipdnn_sdk::data_objects::DataType::FLOAT,
-        //                                     hipdnn_sdk::data_objects::DataType::FLOAT);
-
-        // auto stuff = BatchnormExecutor<something>();
-        // std::ignore = stuff;
-
-        // for(constexpr auto whatever : allBatchnormSignatures)
-        // {
-        //     auto stuff = BatchnormExecutor<whatever>();
-        //     // std::ignore = stuff;
-        // }
-
-        // std::array<std::unique_ptr<IGenericBatchnormExecutor>, 1> executors{
-        //     std::make_unique<BatchnormExecutor<
-        //         BatchnormSignatureRegistryKey<hipdnn_sdk::data_objects::DataType::FLOAT,
-        //                                       hipdnn_sdk::data_objects::DataType::FLOAT,
-        //                                       hipdnn_sdk::data_objects::DataType::FLOAT>{}>>(),
-        //     //std::make_unique<BatchnormExecutor<BatchnormSignatureRegistryKey<half, half, half>>>()
-        // };
-
-        // for(auto& executor : executors)
-        // {
-        //     batchnormRegistry()[executor->signatureKey()] = std::move(executor);
-        // }
     }
 };
 
