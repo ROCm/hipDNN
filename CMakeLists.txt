@@ -148,6 +148,25 @@ if(CODE_COVERAGE)
     set(LLVM_TOOL_PATHS /usr/bin /opt/rocm/llvm/bin)
     set(EXPECTED_LLVM_VERSION "20")
 
+    # Function to check LLVM tool version
+    function(checkLlvmToolVersion TOOL_BINARY TOOL_NAME)
+        execute_process(
+            COMMAND ${TOOL_BINARY} --version
+            OUTPUT_VARIABLE VERSION_OUTPUT
+            OUTPUT_STRIP_TRAILING_WHITESPACE
+        )
+        if(VERSION_OUTPUT MATCHES "LLVM version ([0-9]+)\\.")
+            set(TOOL_MAJOR_VERSION "${CMAKE_MATCH_1}")
+            if(NOT TOOL_MAJOR_VERSION STREQUAL EXPECTED_LLVM_VERSION)
+                message(WARNING "${TOOL_NAME} version mismatch! Expected: ${EXPECTED_LLVM_VERSION}, Found: ${TOOL_MAJOR_VERSION}, Full version: ${VERSION_OUTPUT}")
+            else()
+                message(STATUS "Found ${TOOL_NAME} version ${TOOL_MAJOR_VERSION} at ${TOOL_BINARY}")
+            endif()
+        else()
+            message(WARNING "Could not determine ${TOOL_NAME} version from: ${VERSION_OUTPUT}")
+        endif()
+    endfunction()
+
     find_program(LLVM_PROFDATA_BINARY
         NAMES
             llvm-profdata-20
@@ -182,56 +201,10 @@ if(CODE_COVERAGE)
         message(FATAL_ERROR "llvm-cxxfilt not found in PATH, /opt/rocm/llvm/bin, or compiler directory")
     endif()
     
-    # Check llvm-profdata version
-    execute_process(
-        COMMAND ${LLVM_PROFDATA_BINARY} --version
-        OUTPUT_VARIABLE LLVM_PROFDATA_VERSION_OUTPUT
-        OUTPUT_STRIP_TRAILING_WHITESPACE
-    )
-    if(LLVM_PROFDATA_VERSION_OUTPUT MATCHES "LLVM version ([0-9]+)\\.")
-        set(LLVM_PROFDATA_MAJOR_VERSION "${CMAKE_MATCH_1}")
-        if(NOT LLVM_PROFDATA_MAJOR_VERSION STREQUAL EXPECTED_LLVM_VERSION)
-            message(WARNING "llvm-profdata version mismatch! Expected: ${EXPECTED_LLVM_VERSION}, Found: ${LLVM_PROFDATA_MAJOR_VERSION}, Full version: ${LLVM_PROFDATA_VERSION_OUTPUT}")
-        else()
-            message(STATUS "Found llvm-profdata version ${LLVM_PROFDATA_MAJOR_VERSION} at ${LLVM_PROFDATA_BINARY}")
-        endif()
-    else()
-        message(WARNING "Could not determine llvm-profdata version from: ${LLVM_PROFDATA_VERSION_OUTPUT}")
-    endif()
-
-    # Check llvm-cov version
-    execute_process(
-        COMMAND ${LLVM_COV_BINARY} --version
-        OUTPUT_VARIABLE LLVM_COV_VERSION_OUTPUT
-        OUTPUT_STRIP_TRAILING_WHITESPACE
-    )
-    if(LLVM_COV_VERSION_OUTPUT MATCHES "LLVM version ([0-9]+)\\.")
-        set(LLVM_COV_MAJOR_VERSION "${CMAKE_MATCH_1}")
-        if(NOT LLVM_COV_MAJOR_VERSION STREQUAL EXPECTED_LLVM_VERSION)
-            message(WARNING "llvm-cov version mismatch! Expected: ${EXPECTED_LLVM_VERSION}, Found: ${LLVM_COV_MAJOR_VERSION}, Full version: ${LLVM_COV_VERSION_OUTPUT}")
-        else()
-            message(STATUS "Found llvm-cov version ${LLVM_COV_MAJOR_VERSION} at ${LLVM_COV_BINARY}")
-        endif()
-    else()
-        message(WARNING "Could not determine llvm-cov version from: ${LLVM_COV_VERSION_OUTPUT}")
-    endif()
-
-    # Check llvm-cxxfilt version
-    execute_process(
-        COMMAND ${LLVM_CXXFILT_BINARY} --version
-        OUTPUT_VARIABLE LLVM_CXXFILT_VERSION_OUTPUT
-        OUTPUT_STRIP_TRAILING_WHITESPACE
-    )
-    if(LLVM_CXXFILT_VERSION_OUTPUT MATCHES "LLVM version ([0-9]+)\\.")
-        set(LLVM_CXXFILT_MAJOR_VERSION "${CMAKE_MATCH_1}")
-        if(NOT LLVM_CXXFILT_MAJOR_VERSION STREQUAL EXPECTED_LLVM_VERSION)
-            message(WARNING "llvm-cxxfilt version mismatch! Expected: ${EXPECTED_LLVM_VERSION}, Found: ${LLVM_CXXFILT_MAJOR_VERSION}, Full version: ${LLVM_CXXFILT_VERSION_OUTPUT}")
-        else()
-            message(STATUS "Found llvm-cxxfilt version ${LLVM_CXXFILT_MAJOR_VERSION} at ${LLVM_CXXFILT_BINARY}")
-        endif()
-    else()
-        message(WARNING "Could not determine llvm-cxxfilt version from: ${LLVM_CXXFILT_VERSION_OUTPUT}")
-    endif()
+    # Check versions for all LLVM tools
+    checkLlvmToolVersion(${LLVM_PROFDATA_BINARY} "llvm-profdata")
+    checkLlvmToolVersion(${LLVM_COV_BINARY} "llvm-cov")
+    checkLlvmToolVersion(${LLVM_CXXFILT_BINARY} "llvm-cxxfilt")
     
     if(HIP_DNN_BUILD_PLUGINS)
         set(MIOPEN_PLUGIN_CODE_COVERAGE_OBJECT -object ${HIPDNN_BUILD_PLUGIN_ENGINE_DIR}/libmiopen_legacy_plugin.so -object ./bin/miopen_legacy_plugin_tests)
