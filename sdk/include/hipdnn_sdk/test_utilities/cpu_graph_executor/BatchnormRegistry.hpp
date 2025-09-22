@@ -14,14 +14,6 @@ namespace hipdnn_sdk
 namespace test_utilities
 {
 
-// constexpr std::array allBatchnormSignatures
-//     = {BatchnormSignatureRegistryKey(hipdnn_sdk::data_objects::DataType::FLOAT,
-//                                      hipdnn_sdk::data_objects::DataType::FLOAT,
-//                                      hipdnn_sdk::data_objects::DataType::FLOAT),
-//        BatchnormSignatureRegistryKey(hipdnn_sdk::data_objects::DataType::HALF,
-//                                      hipdnn_sdk::data_objects::DataType::HALF,
-//                                      hipdnn_sdk::data_objects::DataType::HALF)};
-
 constexpr std::array ALL_BATCHNORM_SIGNATURES
     = {BatchnormSignatureRegistryKey{
            .INPUT_DATA_TYPE = hipdnn_sdk::data_objects::DataType::FLOAT,
