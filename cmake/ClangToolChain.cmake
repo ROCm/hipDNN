@@ -3,6 +3,8 @@
 
 # Platform-specific compiler configuration
 
+include(${CMAKE_CURRENT_LIST_DIR}/CheckToolVersion.cmake)
+
 if(UNIX)
     # Unix/Linux: Use ROCm LLVM Clang
     set(ROCM_LLVM_BIN_DIR /opt/rocm/llvm/bin)
@@ -13,24 +15,7 @@ if(UNIX)
         set(CMAKE_C_COMPILER ${ROCM_LLVM_BIN_DIR}/clang)
         set(CMAKE_CXX_COMPILER ${ROCM_LLVM_BIN_DIR}/clang++)
         
-        # Find llvm-symbolizer using the same hierarchy as other tools
-        get_filename_component(COMPILER_PATH "${CMAKE_CXX_COMPILER}" PATH)
-        find_program(LLVM_SYMBOLIZER_EXE
-            NAMES
-                llvm-symbolizer-20
-                llvm-symbolizer
-            PATHS
-                /usr/bin
-                /opt/rocm/llvm/bin
-                ${COMPILER_PATH}
-        )
-        
-        if(LLVM_SYMBOLIZER_EXE)
-            set(CMAKE_SYMBOLIZER ${LLVM_SYMBOLIZER_EXE})
-            message(STATUS "Found llvm-symbolizer at ${LLVM_SYMBOLIZER_EXE}")
-        else()
-            message(WARNING "llvm-symbolizer not found")
-        endif()
+        findAndCheckLlvmSymbolizer()
         
         message(STATUS "Using ROCm Clang compilers from ${ROCM_LLVM_BIN_DIR}")
     else()

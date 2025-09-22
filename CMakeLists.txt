@@ -70,6 +70,7 @@ list(
 )
 
 include(cmake/Dependencies.cmake)
+include(cmake/CheckToolVersion.cmake)
 include(cmake/ClangCheck.cmake)
 include(cmake/ClangTidy.cmake)
 include(cmake/Sanitizers.cmake)
@@ -144,67 +145,7 @@ if(NOT HIP_DNN_SKIP_TESTS)
 endif()
 
 if(CODE_COVERAGE)
-    
-    set(LLVM_TOOL_PATHS /usr/bin /opt/rocm/llvm/bin)
-    set(EXPECTED_LLVM_VERSION "20")
-
-    # Function to check LLVM tool version
-    function(checkLlvmToolVersion TOOL_BINARY TOOL_NAME)
-        execute_process(
-            COMMAND ${TOOL_BINARY} --version
-            OUTPUT_VARIABLE VERSION_OUTPUT
-            OUTPUT_STRIP_TRAILING_WHITESPACE
-        )
-        if(VERSION_OUTPUT MATCHES "LLVM version ([0-9]+)\\.")
-            set(TOOL_MAJOR_VERSION "${CMAKE_MATCH_1}")
-            if(NOT TOOL_MAJOR_VERSION STREQUAL EXPECTED_LLVM_VERSION)
-                message(WARNING "${TOOL_NAME} version mismatch! Expected: ${EXPECTED_LLVM_VERSION}, Found: ${TOOL_MAJOR_VERSION}, Full version: ${VERSION_OUTPUT}")
-            else()
-                message(STATUS "Found ${TOOL_NAME} version ${TOOL_MAJOR_VERSION} at ${TOOL_BINARY}")
-            endif()
-        else()
-            message(WARNING "Could not determine ${TOOL_NAME} version from: ${VERSION_OUTPUT}")
-        endif()
-    endfunction()
-
-    find_program(LLVM_PROFDATA_BINARY
-        NAMES
-            llvm-profdata-20
-            llvm-profdata
-        PATHS
-            ${LLVM_TOOL_PATHS}
-    )
-    
-    find_program(LLVM_COV_BINARY
-        NAMES
-            llvm-cov-20
-            llvm-cov
-        PATHS
-            ${LLVM_TOOL_PATHS}
-    )
-    
-    find_program(LLVM_CXXFILT_BINARY
-        NAMES
-            llvm-cxxfilt-20
-            llvm-cxxfilt
-        PATHS
-            ${LLVM_TOOL_PATHS}
-    )
-    
-    if(NOT LLVM_PROFDATA_BINARY)
-        message(FATAL_ERROR "llvm-profdata not found in PATH, /opt/rocm/llvm/bin, or compiler directory")
-    endif()
-    if(NOT LLVM_COV_BINARY)
-        message(FATAL_ERROR "llvm-cov not found in PATH, /opt/rocm/llvm/bin, or compiler directory")
-    endif()
-    if(NOT LLVM_CXXFILT_BINARY)
-        message(FATAL_ERROR "llvm-cxxfilt not found in PATH, /opt/rocm/llvm/bin, or compiler directory")
-    endif()
-    
-    # Check versions for all LLVM tools
-    checkLlvmToolVersion(${LLVM_PROFDATA_BINARY} "llvm-profdata")
-    checkLlvmToolVersion(${LLVM_COV_BINARY} "llvm-cov")
-    checkLlvmToolVersion(${LLVM_CXXFILT_BINARY} "llvm-cxxfilt")
+    findAndCheckLlvmTools()
     
     if(HIP_DNN_BUILD_PLUGINS)
         set(MIOPEN_PLUGIN_CODE_COVERAGE_OBJECT -object ${HIPDNN_BUILD_PLUGIN_ENGINE_DIR}/libmiopen_legacy_plugin.so -object ./bin/miopen_legacy_plugin_tests)
