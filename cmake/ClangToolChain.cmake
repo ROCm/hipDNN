@@ -12,7 +12,26 @@ if(UNIX)
         # Set the C and C++ compilers to clang and clang++ with a specific directory hint
         set(CMAKE_C_COMPILER ${ROCM_LLVM_BIN_DIR}/clang)
         set(CMAKE_CXX_COMPILER ${ROCM_LLVM_BIN_DIR}/clang++)
-        set(CMAKE_SYMBOLIZER ${ROCM_LLVM_BIN_DIR}/llvm-symbolizer)
+        
+        # Find llvm-symbolizer using the same hierarchy as other tools
+        get_filename_component(COMPILER_PATH "${CMAKE_CXX_COMPILER}" PATH)
+        find_program(LLVM_SYMBOLIZER_EXE
+            NAMES
+                llvm-symbolizer-20
+                llvm-symbolizer
+            PATHS
+                /usr/bin
+                /opt/rocm/llvm/bin
+                ${COMPILER_PATH}
+        )
+        
+        if(LLVM_SYMBOLIZER_EXE)
+            set(CMAKE_SYMBOLIZER ${LLVM_SYMBOLIZER_EXE})
+            message(STATUS "Found llvm-symbolizer at ${LLVM_SYMBOLIZER_EXE}")
+        else()
+            message(WARNING "llvm-symbolizer not found")
+        endif()
+        
         message(STATUS "Using ROCm Clang compilers from ${ROCM_LLVM_BIN_DIR}")
     else()
         message(FATAL_ERROR "The directory /opt/rocm/llvm/bin does not exist. Cannot auto select clang compilers.")
