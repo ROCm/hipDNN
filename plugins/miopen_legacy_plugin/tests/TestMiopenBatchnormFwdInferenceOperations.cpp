@@ -95,7 +95,7 @@ protected:
                                                            static_cast<IntermediateType>(1.0f),
                                                            seed));
 
-        auto batchnormBuilder = hipdnn_sdk::test_utilities::createValidBatchnormGraph(
+        auto batchnormBuilder = hipdnn_sdk::test_utilities::createValidBatchnormInferenceGraph(
             xTensor.strides(), xTensor.dims(), true, inputDataType);
 
         hipdnnPluginConstData_t opGraph;

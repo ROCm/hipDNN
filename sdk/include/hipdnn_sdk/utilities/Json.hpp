@@ -1,9 +1,11 @@
+#include "batchnorm_backward_attributes_generated.h"
 #include "batchnorm_inference_attributes_generated.h"
 #include "tensor_attributes_generated.h"
 #include <flatbuffers/flatbuffer_builder.h>
 #include <hip/amd_detail/amd_hip_bfloat16.h>
 #include <hip/amd_detail/hip_fp16_gcc.h>
 #include <hipdnn_sdk/data_objects/graph_generated.h>
+#include <iostream>
 #include <nlohmann/detail/macro_scope.hpp>
 #include <nlohmann/json.hpp>
 #include <optional>
@@ -43,12 +45,29 @@ void from_json(const nlohmann::json& vecJson, vector<T>& vec)
         vec.push_back(v.get<T>());
     }
 }
+
+// template <hipdnn_sdk::json::JsonConstructible T>
+// // NOLINTNEXTLINE(readability-identifier-naming)
+// void to_json(nlohmann::json& entry, optional<T> const& opt)
+// {
+//     if(opt.has_value())
+//     {
+//         entry = opt.value();
+//     }
+// }
+
+template <hipdnn_sdk::json::JsonConstructible T>
+// NOLINTNEXTLINE(readability-identifier-naming)
+void from_json(const nlohmann::json& entry, optional<T>& opt)
+{
+    opt = (entry.is_null()) ? std::nullopt : std::optional<T>{entry.get<T>()};
+}
+
 }
 
 namespace flatbuffers
 {
-template <class T>
-    requires(hipdnn_sdk::json::JsonConstructible<T>)
+template <hipdnn_sdk::json::JsonConstructible T>
 // NOLINTNEXTLINE(readability-identifier-naming)
 void to_json(nlohmann::json& vectorList, Vector<Offset<T>> const& vec)
 {
@@ -112,18 +131,65 @@ void to_json(nlohmann::json& batchnormJson, BatchnormInferenceAttributes const& 
 }
 
 // NOLINTNEXTLINE(readability-identifier-naming)
+void to_json(nlohmann::json& batchnormJson, BatchnormBackwardAttributes const& bn)
+{
+    auto& inputs = batchnormJson["inputs"] = {};
+
+    inputs["dy"] = bn.dy_tensor_uid();
+    inputs["x"] = bn.x_tensor_uid();
+    inputs["mean"] = bn.mean_tensor_uid();
+    inputs["inv_variance"] = bn.inv_variance_tensor_uid();
+    inputs["scale"] = bn.scale_tensor_uid();
+    inputs["peer_stats"] = *bn.peer_stats_tensor_uid();
+
+    auto& outputs = batchnormJson["outputs"] = {};
+    outputs["dbias"] = bn.dbias_tensor_uid();
+    outputs["dscale"] = bn.dscale_tensor_uid();
+    outputs["dx"] = bn.dx_tensor_uid();
+}
+
+// NOLINTNEXTLINE(readability-identifier-naming)
+void to_json(nlohmann::json& batchnormJson, BatchnormAttributes const& bn)
+{
+    auto& inputs = batchnormJson["inputs"] = {};
+    auto& outputs = batchnormJson["outputs"] = {};
+
+    inputs["x"] = bn.x_tensor_uid();
+    inputs["scale"] = bn.scale_tensor_uid();
+    inputs["bias"] = bn.bias_tensor_uid();
+    inputs["epsilon"] = bn.epsilon_tensor_uid();
+    inputs["peer_stats"] = *bn.peer_stats_tensor_uid();
+    inputs["prev_running_mean"] = bn.prev_running_mean_tensor_uid();
+    inputs["prev_running_variance"] = bn.prev_running_variance_tensor_uid();
+    inputs["momentum"] = bn.momentum_tensor_uid();
+
+    outputs["y"] = bn.y_tensor_uid();
+    outputs["mean"] = bn.mean_tensor_uid();
+    outputs["inv_variance"] = bn.inv_variance_tensor_uid();
+    outputs["next_running_mean"] = bn.next_running_mean_tensor_uid();
+    outputs["next_running_variance"] = bn.next_running_variance_tensor_uid();
+}
+
+// NOLINTNEXTLINE(readability-identifier-naming)
 void to_json(nlohmann::json& nodeJson, data_objects::Node const& node)
 {
     auto type = node.attributes_type();
 
-    if(type == data_objects::NodeAttributes::BatchnormInferenceAttributes)
+    switch(type)
     {
-        nodeJson = nlohmann::json(*node.attributes_as_BatchnormInferenceAttributes());
-    }
-    else
-    {
-        throw std::runtime_error("Unsupported NodeAttribute  type: "
-                                 + std::to_string(static_cast<int8_t>(node.attributes_type())));
+    case data_objects::NodeAttributes::BatchnormInferenceAttributes:
+        nodeJson = *node.attributes_as_BatchnormInferenceAttributes();
+        break;
+    case data_objects::NodeAttributes::BatchnormBackwardAttributes:
+        nodeJson = *node.attributes_as_BatchnormBackwardAttributes();
+        break;
+    case data_objects::NodeAttributes::BatchnormAttributes:
+        nodeJson = *node.attributes_as_BatchnormAttributes();
+        break;
+    default:
+        throw std::runtime_error(
+            "hipdnn_sdk::data_objects::to_json(Node): Unsupported NodeAttributes type: "
+            + std::to_string(static_cast<int8_t>(node.attributes_type())));
     }
     nodeJson["name"] = node.name()->c_str();
     nodeJson["type"] = node.attributes_type();
@@ -151,81 +217,172 @@ std::optional<T> optionalValue(nlohmann::json obj, Key&& key)
     return (it != obj.end()) ? std::optional<T>(it->template get<T>()) : std::nullopt;
 }
 
-auto toBatchnormInferenceAttributes(flatbuffers::FlatBufferBuilder& builder,
-                                    const nlohmann::json& attributes)
+template <class T>
+auto to(flatbuffers::FlatBufferBuilder& builder, nlohmann::json const& entry);
+
+namespace details
 {
-    auto& input = attributes["inputs"];
-    return data_objects::CreateBatchnormInferenceAttributes(
-        builder,
-        input["x"].get<int64_t>(),
-        optionalValue<int64_t>(input, "mean"),
-        optionalValue<int64_t>(input, "inv_variance"),
-        input["scale"].get<int64_t>(),
-        input["bias"].get<int64_t>(),
-        attributes["outputs"]["y"].get<int64_t>());
+template <class T>
+struct To
+{
+};
+
+template <class T, class Allocator>
+struct To<std::vector<flatbuffers::Offset<T>, Allocator>>
+{
+    auto operator()(flatbuffers::FlatBufferBuilder& builder, const nlohmann::json& jsonValue)
+    {
+        if(!jsonValue.is_array())
+        {
+            throw std::runtime_error("hipdnn_sdk::json::to<vector<T>>(): field is not an array");
+        }
+        std::vector<flatbuffers::Offset<T>> ret;
+        for(const auto& v : jsonValue)
+        {
+            ret.push_back(to<T>(builder, v));
+        }
+
+        return ret;
+    }
+};
 }
 
-auto toNode(flatbuffers::FlatBufferBuilder& builder, const nlohmann::json& inNode)
+template <class T>
+auto toVector(flatbuffers::FlatBufferBuilder& builder, const nlohmann::json& entry)
 {
-    auto type = inNode["type"].get<data_objects::NodeAttributes>();
-    auto name = inNode["name"].get<std::string>();
+    if(!entry.is_array())
+    {
+        throw std::runtime_error("hipdnn_sdk::json::to<vector<T>>(): field is not an array");
+    }
+    std::vector<flatbuffers::Offset<T>> ret;
+    for(const auto& v : entry)
+    {
+        ret.push_back(to<T>(builder, v));
+    }
+
+    return ret;
+}
+
+template <>
+auto to<data_objects::BatchnormInferenceAttributes>(flatbuffers::FlatBufferBuilder& builder,
+                                                    const nlohmann::json& entry)
+{
+    auto& input = entry["inputs"];
+    return data_objects::CreateBatchnormInferenceAttributes(
+        builder,
+        input.at("x").get<int64_t>(),
+        optionalValue<int64_t>(input, "mean"),
+        optionalValue<int64_t>(input, "inv_variance"),
+        input.at("scale").get<int64_t>(),
+        input.at("bias").get<int64_t>(),
+        entry.at("outputs").at("y").get<int64_t>());
+}
+
+template <>
+auto to<data_objects::BatchnormBackwardAttributes>(flatbuffers::FlatBufferBuilder& builder,
+                                                   const nlohmann::json& entry)
+{
+    using namespace data_objects;
+    auto& inputs = entry.at("inputs");
+    auto& outputs = entry.at("outputs");
+
+    auto peerStats = inputs["peer_stats"].get<std::vector<int64_t>>();
+
+    return data_objects::CreateBatchnormBackwardAttributesDirect(
+        builder,
+        inputs.at("dy").get<int64_t>(),
+        inputs.at("x").get<int64_t>(),
+        inputs.at("mean").get<std::optional<int64_t>>(),
+        inputs.at("inv_variance").get<std::optional<int64_t>>(),
+        inputs.at("scale").get<int64_t>(),
+        &peerStats,
+        outputs.at("dx").get<int64_t>(),
+        outputs.at("dscale").get<int64_t>(),
+        outputs.at("dbias").get<int64_t>());
+}
+
+template <>
+auto to<data_objects::BatchnormAttributes>(flatbuffers::FlatBufferBuilder& builder,
+                                           const nlohmann::json& entry)
+{
+    using namespace data_objects;
+    auto& inputs = entry.at("inputs");
+    auto& outputs = entry.at("outputs");
+
+    auto peerStats = inputs["peer_stats"].get<std::vector<int64_t>>();
+
+    return data_objects::CreateBatchnormAttributesDirect(
+        builder,
+        inputs.at("x").get<int64_t>(),
+        inputs.at("scale").get<int64_t>(),
+        inputs.at("bias").get<int64_t>(),
+        inputs.at("epsilon").get<int64_t>(),
+        &peerStats,
+        inputs.at("prev_running_mean").get<std::optional<int64_t>>(),
+        inputs.at("prev_running_variance").get<std::optional<int64_t>>(),
+        inputs.at("momentum").get<std::optional<int64_t>>(),
+        outputs.at("y").get<int64_t>(),
+        outputs.at("mean").get<std::optional<int64_t>>(),
+        outputs.at("inv_variance").get<std::optional<int64_t>>(),
+        outputs.at("next_running_mean").get<std::optional<int64_t>>(),
+        outputs.at("next_running_variance").get<std::optional<int64_t>>());
+}
+
+template <>
+auto to<data_objects::Node>(flatbuffers::FlatBufferBuilder& builder, const nlohmann::json& entry)
+{
+    auto type = entry.at("type").get<data_objects::NodeAttributes>();
+    auto name = entry.at("name").get<std::string>();
 
     flatbuffers::Offset<void> node = [&]() {
         switch(type)
         {
         case data_objects::NodeAttributes::BatchnormInferenceAttributes:
-            return toBatchnormInferenceAttributes(builder, inNode).Union();
+            return to<data_objects::BatchnormInferenceAttributes>(builder, entry).Union();
+        case data_objects::NodeAttributes::BatchnormBackwardAttributes:
+            return to<data_objects::BatchnormBackwardAttributes>(builder, entry).Union();
+        case data_objects::NodeAttributes::BatchnormAttributes:
+            return to<data_objects::BatchnormAttributes>(builder, entry).Union();
         default:
-            throw std::runtime_error("Unsupported NodeAttribute type: "
-                                     + std::string{EnumNameNodeAttributes(type)});
+            throw std::runtime_error(
+                "hipdnn_sdk::json::to<data_objects::Node>(): Unsupported NodeAttributes type: "
+                + std::string{EnumNameNodeAttributes(type)});
         }
     }();
 
     return data_objects::CreateNodeDirect(builder, name.c_str(), type, node);
 }
 
-auto toTensorAttributes(flatbuffers::FlatBufferBuilder& builder,
-                        const nlohmann::json& tensorAttrJson)
+template <>
+auto to<data_objects::TensorAttributes>(flatbuffers::FlatBufferBuilder& builder,
+                                        const nlohmann::json& entry)
 {
-    auto uid = tensorAttrJson["uid"].get<int64_t>();
-    auto name = tensorAttrJson["name"].get<std::string>();
-    auto dataType = tensorAttrJson["data_type"].get<data_objects::DataType>();
-    auto dims = tensorAttrJson["dims"].get<std::vector<int64_t>>();
-    auto strides = tensorAttrJson["strides"].get<std::vector<int64_t>>();
-    bool isVirtual = tensorAttrJson.value<bool>("virtual", false);
+    auto uid = entry.at("uid").get<int64_t>();
+    auto name = entry.at("name").get<std::string>();
+    auto dataType = entry.at("data_type").get<data_objects::DataType>();
+    auto dims = entry.at("dims").get<std::vector<int64_t>>();
+    auto strides = entry.at("strides").get<std::vector<int64_t>>();
+    bool isVirtual = entry.at("virtual").get<bool>();
 
     return data_objects::CreateTensorAttributesDirect(
         builder, uid, name.c_str(), dataType, &strides, &dims, isVirtual);
 }
 
-auto toGraph(flatbuffers::FlatBufferBuilder& builder, const nlohmann::json& inGraph)
+template <>
+auto to<data_objects::Graph>(flatbuffers::FlatBufferBuilder& builder, const nlohmann::json& entry)
 {
-    auto name = inGraph.value<std::string>("name", std::string{});
-    auto computeType = inGraph["compute_type"].get<data_objects::DataType>();
-    auto ioType = inGraph["io_type"].get<data_objects::DataType>();
-    auto intermediateType = inGraph["intermediate_type"].get<data_objects::DataType>();
+    using namespace data_objects;
+    using namespace flatbuffers;
 
-    std::vector<flatbuffers::Offset<data_objects::Node>> nodes;
-    std::vector<flatbuffers::Offset<data_objects::TensorAttributes>> tensors;
-    if(!inGraph["nodes"].is_array())
-    {
-        throw std::runtime_error("json::graph: \"nodes\" field is not an array");
-    }
-    for(const auto& n : inGraph["nodes"])
-    {
-        nodes.push_back(toNode(builder, n));
-    }
+    auto name = entry.at("name").get<std::string>();
+    auto computeType = entry.at("compute_type").get<data_objects::DataType>();
+    auto ioType = entry.at("io_type").get<data_objects::DataType>();
+    auto intermediateType = entry.at("intermediate_type").get<data_objects::DataType>();
 
-    if(!inGraph["tensors"].is_array())
-    {
-        throw std::runtime_error("json::graph: \"tensors\" field is not an array");
-    }
-    for(const auto& t : inGraph["tensors"])
-    {
-        tensors.push_back(toTensorAttributes(builder, t));
-    }
-
+    auto nodes = toVector<Node>(builder, entry.at("nodes"));
+    auto tensors = toVector<TensorAttributes>(builder, entry.at("tensors"));
     return data_objects::CreateGraphDirect(
         builder, name.c_str(), computeType, intermediateType, ioType, &tensors, &nodes);
 }
+
 }

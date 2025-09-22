@@ -30,10 +30,11 @@ inline flatbuffers::FlatBufferBuilder createEmptyValidGraph()
 }
 
 inline flatbuffers::FlatBufferBuilder
-    createValidBatchnormGraph(std::vector<int64_t> strides = {1, 3, 224, 224},
-                              std::vector<int64_t> dims = {1, 3, 224, 224},
-                              bool hasOptionalAttributes = true,
-                              hipdnn_sdk::data_objects::DataType inputDataType = DataType::FLOAT)
+    createValidBatchnormInferenceGraph(std::vector<int64_t> strides = {1, 3, 224, 224},
+                                       std::vector<int64_t> dims = {1, 3, 224, 224},
+                                       bool hasOptionalAttributes = true,
+                                       hipdnn_sdk::data_objects::DataType inputDataType
+                                       = DataType::FLOAT)
 {
     flatbuffers::FlatBufferBuilder builder;
     std::vector<::flatbuffers::Offset<hipdnn_sdk::data_objects::TensorAttributes>> tensorAttributes;

@@ -19,7 +19,7 @@ void toJsonAndBackTestSuite(const hipdnn_sdk::data_objects::Graph* graph,
     nlohmann::json graphJson = *graph;
 
     flatbuffers::FlatBufferBuilder builder;
-    auto newGraphBuilder = hipdnn_sdk::json::toGraph(builder, graphJson);
+    auto newGraphBuilder = hipdnn_sdk::json::to<Graph>(builder, graphJson);
     builder.Finish(newGraphBuilder);
     auto newGraph = hipdnn_sdk::data_objects::GetGraph(builder.GetBufferPointer());
 
@@ -47,17 +47,29 @@ void toJsonAndBackTestSuite(const hipdnn_sdk::data_objects::Graph* graph,
 TEST(TestJson, GraphToJsonAndBack)
 {
     {
-        auto graphBuilder = hipdnn_sdk::test_utilities::createValidBatchnormGraph();
-        auto graph = hipdnn_sdk::data_objects::GetGraph(graphBuilder.GetBufferPointer());
-
-        toJsonAndBackTestSuite(graph, "(valid graph)");
-    }
-    {
         auto graphBuilder = hipdnn_sdk::test_utilities::createEmptyValidGraph();
         auto graph = hipdnn_sdk::data_objects::GetGraph(graphBuilder.GetBufferPointer());
 
         toJsonAndBackTestSuite(graph, "(empty valid graph)");
     }
+    {
+        auto graphBuilder = hipdnn_sdk::test_utilities::createValidBatchnormInferenceGraph();
+        auto graph = hipdnn_sdk::data_objects::GetGraph(graphBuilder.GetBufferPointer());
+
+        toJsonAndBackTestSuite(graph, "(valid batchnorm inference graph)");
+    }
+    {
+        auto graphBuilder = hipdnn_sdk::test_utilities::createValidBatchnormBwdGraph();
+        auto graph = hipdnn_sdk::data_objects::GetGraph(graphBuilder.GetBufferPointer());
+
+        toJsonAndBackTestSuite(graph, "(valid batchnorm backward graph)");
+    }
+    // {
+    //     auto graphBuilder = hipdnn_sdk::test_utilities::createValidBatchnormGraph();
+    //     auto graph = hipdnn_sdk::data_objects::GetGraph(graphBuilder.GetBufferPointer());
+
+    //     toJsonAndBackTestSuite(graph, "(valid batchnorm backward graph)");
+    // }
 }
 
 void vectorTestSuite(std::vector<int> const& vec, const std::string& context)

@@ -90,7 +90,6 @@ export(
     FILE  ${CMAKE_BINARY_DIR}/lib/cmake/hipdnn_sdk/hipdnn_sdkConfig.cmake
 )
 
-#todo, get spdlog to install its headers
 install(
     DIRECTORY ${HIP_DNN_SDK_INCLUDE_DIR}/ ${HIP_DNN_FLATBUFFERS_INCLUDE_DIR}/ ${HIP_DNN_SPDLOG_INCLUDE_DIR}/ ${HIP_DNN_NLOHMANN_JSON_INCLUDE_DIR}/
     DESTINATION ${HIP_DNN_SDK_INSTALL_INCLUDE_DIR}
