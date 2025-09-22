@@ -20,9 +20,6 @@ namespace miopen_legacy_plugin
 namespace
 {
 
-constexpr size_t MIN_SUPPORTED_TENSOR_DIMS = 4;
-constexpr size_t MAX_SUPPORTED_TENSOR_DIMS = 5;
-
 std::string getNodeName(const hipdnn_sdk::data_objects::Node& node)
 {
     return node.name() != nullptr ? node.name()->str() : "";
@@ -47,23 +44,6 @@ bool isApplicableFwd(const HipdnnEnginePluginHandle& handle, const hipdnn_plugin
     const auto& tensorAttrX = miopen_utils::findTensorAttributes(tensorMap, attr->x_tensor_uid());
     const auto& tensorAttrW = miopen_utils::findTensorAttributes(tensorMap, attr->w_tensor_uid());
     const auto& tensorAttrY = miopen_utils::findTensorAttributes(tensorMap, attr->y_tensor_uid());
-
-    if(tensorAttrX.dims()->size() < MIN_SUPPORTED_TENSOR_DIMS
-       || tensorAttrX.dims()->size() > MAX_SUPPORTED_TENSOR_DIMS)
-    {
-        HIPDNN_LOG_INFO("Convolution plan builder supports only tensors with "
-                        + std::to_string(MIN_SUPPORTED_TENSOR_DIMS) + " to "
-                        + std::to_string(MAX_SUPPORTED_TENSOR_DIMS) + " dimensions");
-        return false;
-    }
-
-    if(tensorAttrY.dims()->size() != tensorAttrX.dims()->size()
-       || tensorAttrW.dims()->size() != tensorAttrX.dims()->size())
-    {
-        HIPDNN_LOG_WARN(
-            "Convolution plan builder requires all tensors to have the same number of dimensions");
-        return false;
-    }
 
     size_t spatialDimCount;
     try
@@ -94,13 +74,16 @@ bool isApplicableFwd(const HipdnnEnginePluginHandle& handle, const hipdnn_plugin
     }
 
     size_t solutionCount;
-    THROW_ON_MIOPEN_FAILURE(miopenConvolutionForwardGetSolutionCount(handle.miopenHandle,
-                                                                     tensorW.tensorDescriptor(),
-                                                                     tensorX.tensorDescriptor(),
-                                                                     convDesc.convDescriptor(),
-                                                                     tensorY.tensorDescriptor(),
-                                                                     &solutionCount));
-
+    auto status = miopenConvolutionForwardGetSolutionCount(handle.miopenHandle,
+                                                           tensorW.tensorDescriptor(),
+                                                           tensorX.tensorDescriptor(),
+                                                           convDesc.convDescriptor(),
+                                                           tensorY.tensorDescriptor(),
+                                                           &solutionCount);
+    if(status != miopenStatusSuccess)
+    {
+        return false;
+    }
     return solutionCount != 0;
 }
 

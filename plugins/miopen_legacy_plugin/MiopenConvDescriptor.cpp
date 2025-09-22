@@ -19,7 +19,6 @@ namespace
 void copyWithCheck(const flatbuffers::Vector<int64_t>* src,
                    std::vector<int>& dst,
                    size_t expectedSize,
-                   int64_t minValue,
                    const char* name,
                    const char* expectedSizeName)
 {
@@ -31,13 +30,6 @@ void copyWithCheck(const flatbuffers::Vector<int64_t>* src,
                                                        "MiopenConvDescriptor: " + std::string(name)
                                                            + " size must be equal to "
                                                            + std::string(expectedSizeName));
-        }
-        if(!std::ranges::all_of(*src, [minValue](int64_t v) { return v >= minValue; }))
-        {
-            throw hipdnn_plugin::HipdnnPluginException(
-                HIPDNN_PLUGIN_STATUS_BAD_PARAM,
-                "MiopenConvDescriptor: " + std::string(name)
-                    + " values must be greater than or equal to " + std::to_string(minValue));
         }
         if(!std::ranges::all_of(*src,
                                 [](int64_t v) { return v <= std::numeric_limits<int>::max(); }))
@@ -103,9 +95,9 @@ MiopenConvDescriptor::MiopenConvDescriptor(
     std::vector<int> stride(spatialDimCount, 1);
     std::vector<int> dilation(spatialDimCount, 1);
 
-    copyWithCheck(attrPadding, padding, spatialDimCount, 0, "attrPadding", "spatialDimCount");
-    copyWithCheck(attrStride, stride, spatialDimCount, 1, "attrStride", "spatialDimCount");
-    copyWithCheck(attrDilation, dilation, spatialDimCount, 1, "attrDilation", "spatialDimCount");
+    copyWithCheck(attrPadding, padding, spatialDimCount, "attrPadding", "spatialDimCount");
+    copyWithCheck(attrStride, stride, spatialDimCount, "attrStride", "spatialDimCount");
+    copyWithCheck(attrDilation, dilation, spatialDimCount, "attrDilation", "spatialDimCount");
 
     THROW_ON_MIOPEN_FAILURE(miopenCreateConvolutionDescriptor(&_descriptor));
     THROW_ON_MIOPEN_FAILURE(miopenInitConvolutionNdDescriptor(_descriptor,
