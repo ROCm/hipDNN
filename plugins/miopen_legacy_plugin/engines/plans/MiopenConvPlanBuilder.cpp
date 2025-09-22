@@ -41,15 +41,6 @@ bool isApplicableFwd(const HipdnnEnginePluginHandle& handle, const hipdnn_plugin
                 + getNodeName(node));
     }
 
-    // Check convolution mode
-
-    const auto convMode = attr->conv_mode();
-    if(convMode != hipdnn_sdk::data_objects::ConvMode::CROSS_CORRELATION)
-    {
-        HIPDNN_LOG_INFO("Convolution plan builder supports only CROSS_CORRELATION");
-        return false;
-    }
-
     // Check tensor attributes
 
     const auto& tensorMap = opGraph.getTensorMap();
@@ -74,91 +65,14 @@ bool isApplicableFwd(const HipdnnEnginePluginHandle& handle, const hipdnn_plugin
         return false;
     }
 
-    // Check convolution attributes
-
-    const auto prePadding = attr->pre_padding();
-    const auto postPadding = attr->post_padding();
-    const auto stride = attr->stride();
-    const auto dilation = attr->dilation();
-
-    const auto spatialDimCount = miopen_utils::getSpatialDimCount(tensorAttrX);
-
-    auto checkVectorSize = [&](const auto* vec, const char* name) {
-        if(vec != nullptr && vec->size() != spatialDimCount)
-        {
-            HIPDNN_LOG_WARN("Convolution plan builder: " + std::string(name)
-                            + " size does not match spatial dimension count");
-            return false;
-        }
-        return true;
-    };
-
-    if(!checkVectorSize(prePadding, "prePadding") || !checkVectorSize(postPadding, "postPadding")
-       || !checkVectorSize(stride, "stride") || !checkVectorSize(dilation, "dilation"))
+    size_t spatialDimCount;
+    try
     {
-        return false;
+        spatialDimCount = miopen_utils::getSpatialDimCount(tensorAttrX);
     }
-
-    // Check padding symmetry
-
-    if((prePadding == nullptr) != (postPadding == nullptr))
+    catch(const hipdnn_plugin::HipdnnPluginException& e)
     {
-        HIPDNN_LOG_INFO("Convolution plan builder requires both prePadding and postPadding to be "
-                        "set or both to be null");
-        return false;
-    }
-
-    if(prePadding != nullptr && postPadding != nullptr)
-    {
-        // flatbuffers::Vector does not have comparison operators
-        if(!std::equal(prePadding->cbegin(), prePadding->cend(), postPadding->cbegin()))
-        {
-            HIPDNN_LOG_INFO("Convolution plan builder supports only symmetric padding");
-            return false;
-        }
-    }
-
-    // integer overflow + correctness checks
-
-    auto checkVectorMinValue = [](const auto* vec, const char* name, int64_t minValue) {
-        if(vec != nullptr)
-        {
-            if(std::any_of(vec->cbegin(), vec->cend(), [&](auto v) { return v < minValue; }))
-            {
-                HIPDNN_LOG_WARN("Convolution plan builder: " + std::string(name)
-                                + " has value less than " + std::to_string(minValue));
-                return false;
-            }
-        }
-        return true;
-    };
-
-    if(!checkVectorMinValue(prePadding, "prePadding", 0)
-       || !checkVectorMinValue(stride, "stride", 1)
-       || !checkVectorMinValue(dilation, "dilation", 1))
-    {
-        return false;
-    }
-
-    auto checkVectorIntegerOverflow = [](const auto* vec, const char* name) {
-        if(vec != nullptr)
-        {
-            if(std::any_of(vec->cbegin(), vec->cend(), [](auto v) {
-                   return v > static_cast<int64_t>(std::numeric_limits<int>::max());
-               }))
-            {
-                HIPDNN_LOG_INFO("Convolution plan builder: " + std::string(name)
-                                + " has value greater than INT_MAX");
-                return false;
-            }
-        }
-        return true;
-    };
-
-    if(!checkVectorIntegerOverflow(prePadding, "prePadding")
-       || !checkVectorIntegerOverflow(stride, "stride")
-       || !checkVectorIntegerOverflow(dilation, "dilation"))
-    {
+        HIPDNN_LOG_INFO(e.what());
         return false;
     }
 
@@ -168,7 +82,16 @@ bool isApplicableFwd(const HipdnnEnginePluginHandle& handle, const hipdnn_plugin
     const MiopenTensor tensorY(tensorAttrY);
 
     // Create MIOpen convolution descriptor
-    const MiopenConvDescriptor convDesc(spatialDimCount, *attr);
+    MiopenConvDescriptor convDesc;
+    try
+    {
+        convDesc = MiopenConvDescriptor(spatialDimCount, *attr);
+    }
+    catch(const hipdnn_plugin::HipdnnPluginException& e)
+    {
+        HIPDNN_LOG_INFO(e.what());
+        return false;
+    }
 
     size_t solutionCount;
     THROW_ON_MIOPEN_FAILURE(miopenConvolutionForwardGetSolutionCount(handle.miopenHandle,

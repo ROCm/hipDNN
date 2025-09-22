@@ -12,6 +12,7 @@ namespace miopen_legacy_plugin
 class MiopenConvDescriptor
 {
 public:
+    MiopenConvDescriptor() = default;
     MiopenConvDescriptor(size_t spatialDimCount,
                          const hipdnn_sdk::data_objects::ConvolutionFwdAttributes& attributes);
 
