@@ -26,13 +26,11 @@ struct BatchnormSignatureRegistryKey
     hipdnn_sdk::data_objects::DataType MEAN_VARIANCE_DATA_TYPE;
 };
 
-}
-}
+} // namespace test_utilities
+} // namespace hipdnn_sdk
 
-namespace std
-{
 template <>
-struct hash<hipdnn_sdk::test_utilities::BatchnormSignatureRegistryKey>
+struct std::hash<hipdnn_sdk::test_utilities::BatchnormSignatureRegistryKey>
 {
     std::size_t operator()(const hipdnn_sdk::test_utilities::BatchnormSignatureRegistryKey& k) const
     {
@@ -41,4 +39,3 @@ struct hash<hipdnn_sdk::test_utilities::BatchnormSignatureRegistryKey>
                ^ (std::hash<int>()(static_cast<int>(k.MEAN_VARIANCE_DATA_TYPE)) << 2);
     }
 };
-}

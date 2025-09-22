@@ -39,7 +39,7 @@ public:
                 auto xTensorAttr = tensorMap.at(nodeAttributes->x_tensor_uid());
                 auto scaleTensorAttr = tensorMap.at(nodeAttributes->scale_tensor_uid());
                 //todo, its optional so use scale if not provided
-                auto meanTensorAttr = tensorMap.at(nodeAttributes->mean_tensor_uid().value());
+                auto meanTensorAttr = tensorMap.at(nodeAttributes->mean_tensor_uid());
                 BatchnormSignatureRegistryKey key{
                     .INPUT_DATA_TYPE = xTensorAttr->data_type(),
                     .SCALE_BIAS_DATA_TYPE = scaleTensorAttr->data_type(),
@@ -73,7 +73,7 @@ public:
                     std::any mean = std::ref(shallowMeanTensor);
 
                     auto invVarianceTensorAttr
-                        = tensorMap.at(nodeAttributes->inv_variance_tensor_uid().value());
+                        = tensorMap.at(nodeAttributes->inv_variance_tensor_uid());
                     auto shallowInvVarianceTensor
                         = TensorVariantUtils::createHostOnlyShallowTensorVariant(
                             *invVarianceTensorAttr, variantPack.at(invVarianceTensorAttr->uid()));

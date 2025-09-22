@@ -57,17 +57,15 @@ public:
                 builder, 6, "est_variance", meanVarianceDataType, &derivedStrides, &derivedDims));
         }
 
-        auto bnormAttributes = hipdnn_sdk::data_objects::CreateBatchnormInferenceAttributes(
-            builder,
-            1, // x uid
-            hasOptionalAttributes ? flatbuffers::Optional<int64_t>(5)
-                                  : flatbuffers::nullopt, // mean uid
-            hasOptionalAttributes ? flatbuffers::Optional<int64_t>(6)
-                                  : flatbuffers::nullopt, // inv_variance uid
-            3, // scale uid
-            4, // bias uid
-            2 // y uid
-        );
+        auto bnormAttributes
+            = hipdnn_sdk::data_objects::CreateBatchnormInferenceAttributes(builder,
+                                                                           1, // x uid
+                                                                           5, // mean uid
+                                                                           6, // inv_variance uid
+                                                                           3, // scale uid
+                                                                           4, // bias uid
+                                                                           2 // y uid
+            );
 
         std::vector<::flatbuffers::Offset<hipdnn_sdk::data_objects::Node>> nodes;
         auto node = hipdnn_sdk::data_objects::CreateNodeDirect(
