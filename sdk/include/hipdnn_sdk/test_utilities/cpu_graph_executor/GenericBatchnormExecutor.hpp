@@ -36,9 +36,9 @@ template <BatchnormSignatureRegistryKey ThisWontWork>
 class BatchnormExecutor : public IGenericBatchnormExecutor
 {
 public:
-    using InputDataType = DataTypeToNative<ThisWontWork.INPUT_DATA_TYPE>;
-    using ScaleBiasDataType = DataTypeToNative<ThisWontWork.SCALE_BIAS_DATA_TYPE>;
-    using MeanVarianceDataType = DataTypeToNative<ThisWontWork.MEAN_VARIANCE_DATA_TYPE>;
+    using InputDataType = DataTypeToNative<ThisWontWork.inputDataType>;
+    using ScaleBiasDataType = DataTypeToNative<ThisWontWork.scaleBiasDataType>;
+    using MeanVarianceDataType = DataTypeToNative<ThisWontWork.meanVarianceDataType>;
 
     // bool isApplicable(const hipdnn_sdk::data_objects::Node& node) const override
     // {

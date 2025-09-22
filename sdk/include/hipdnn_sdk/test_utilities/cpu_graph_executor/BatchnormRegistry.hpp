@@ -15,14 +15,14 @@ namespace test_utilities
 {
 
 constexpr std::array ALL_BATCHNORM_SIGNATURES
-    = {BatchnormSignatureRegistryKey{
-           .INPUT_DATA_TYPE = hipdnn_sdk::data_objects::DataType::FLOAT,
-           .SCALE_BIAS_DATA_TYPE = hipdnn_sdk::data_objects::DataType::FLOAT,
-           .MEAN_VARIANCE_DATA_TYPE = hipdnn_sdk::data_objects::DataType::FLOAT},
-       BatchnormSignatureRegistryKey{
-           .INPUT_DATA_TYPE = hipdnn_sdk::data_objects::DataType::HALF,
-           .SCALE_BIAS_DATA_TYPE = hipdnn_sdk::data_objects::DataType::HALF,
-           .MEAN_VARIANCE_DATA_TYPE = hipdnn_sdk::data_objects::DataType::HALF}};
+    = {BatchnormSignatureRegistryKey{.inputDataType = hipdnn_sdk::data_objects::DataType::FLOAT,
+                                     .scaleBiasDataType = hipdnn_sdk::data_objects::DataType::FLOAT,
+                                     .meanVarianceDataType
+                                     = hipdnn_sdk::data_objects::DataType::FLOAT},
+       BatchnormSignatureRegistryKey{.inputDataType = hipdnn_sdk::data_objects::DataType::HALF,
+                                     .scaleBiasDataType = hipdnn_sdk::data_objects::DataType::HALF,
+                                     .meanVarianceDataType
+                                     = hipdnn_sdk::data_objects::DataType::HALF}};
 
 inline std::unordered_map<BatchnormSignatureRegistryKey,
                           std::unique_ptr<IGenericBatchnormExecutor>,
