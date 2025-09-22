@@ -22,24 +22,20 @@ void copyWithCheck(const flatbuffers::Vector<int64_t>* src,
                    const char* name,
                    const char* expectedSizeName)
 {
-    if(src != nullptr)
+    if(src->size() != expectedSize)
     {
-        if(src->size() != expectedSize)
-        {
-            throw hipdnn_plugin::HipdnnPluginException(HIPDNN_PLUGIN_STATUS_BAD_PARAM,
-                                                       "MiopenConvDescriptor: " + std::string(name)
-                                                           + " size must be equal to "
-                                                           + std::string(expectedSizeName));
-        }
-        if(!std::ranges::all_of(*src,
-                                [](int64_t v) { return v <= std::numeric_limits<int>::max(); }))
-        {
-            throw hipdnn_plugin::HipdnnPluginException(HIPDNN_PLUGIN_STATUS_BAD_PARAM,
-                                                       "MiopenConvDescriptor: " + std::string(name)
-                                                           + " values must be less than INT_MAX");
-        }
-        std::ranges::copy(*src, dst.begin());
+        throw hipdnn_plugin::HipdnnPluginException(HIPDNN_PLUGIN_STATUS_BAD_PARAM,
+                                                   "MiopenConvDescriptor: " + std::string(name)
+                                                       + " size must be equal to "
+                                                       + std::string(expectedSizeName));
     }
+    if(!std::ranges::all_of(*src, [](int64_t v) { return v <= std::numeric_limits<int>::max(); }))
+    {
+        throw hipdnn_plugin::HipdnnPluginException(HIPDNN_PLUGIN_STATUS_BAD_PARAM,
+                                                   "MiopenConvDescriptor: " + std::string(name)
+                                                       + " values must be less than INT_MAX");
+    }
+    std::ranges::copy(*src, dst.begin());
 }
 
 }
@@ -62,40 +58,53 @@ MiopenConvDescriptor::MiopenConvDescriptor(
             "MiopenConvDescriptor: only ConvMode::CROSS_CORRELATION is supported");
     }
 
-    if((attributes.pre_padding() == nullptr) != (attributes.post_padding() == nullptr))
+    const auto attrPrePadding = attributes.pre_padding();
+    if(attrPrePadding == nullptr)
+    {
+        throw hipdnn_plugin::HipdnnPluginException(HIPDNN_PLUGIN_STATUS_BAD_PARAM,
+                                                   "MiopenConvDescriptor: pre_padding must be set");
+    }
+
+    const auto attrPostPadding = attributes.post_padding();
+    if(attrPostPadding == nullptr)
+    {
+        throw hipdnn_plugin::HipdnnPluginException(
+            HIPDNN_PLUGIN_STATUS_BAD_PARAM, "MiopenConvDescriptor: post_padding must be set");
+    }
+
+    const auto attrStride = attributes.stride();
+    if(attrStride == nullptr)
+    {
+        throw hipdnn_plugin::HipdnnPluginException(HIPDNN_PLUGIN_STATUS_BAD_PARAM,
+                                                   "MiopenConvDescriptor: stride must be set");
+    }
+
+    const auto attrDilation = attributes.dilation();
+    if(attrDilation == nullptr)
+    {
+        throw hipdnn_plugin::HipdnnPluginException(HIPDNN_PLUGIN_STATUS_BAD_PARAM,
+                                                   "MiopenConvDescriptor: dilation must be set");
+    }
+
+    if(attrPrePadding->size() != attrPostPadding->size())
     {
         throw hipdnn_plugin::HipdnnPluginException(
             HIPDNN_PLUGIN_STATUS_BAD_PARAM,
-            "MiopenConvDescriptor: both pre_padding and post_padding should be set or both "
-            "should be null");
+            "MiopenConvDescriptor: pre_padding and post_padding sizes must be equal");
     }
 
-    if(attributes.pre_padding() != nullptr && attributes.post_padding() != nullptr)
+    if(!std::ranges::equal(*attrPrePadding, *attrPostPadding))
     {
-        if(attributes.pre_padding()->size() != attributes.post_padding()->size())
-        {
-            throw hipdnn_plugin::HipdnnPluginException(
-                HIPDNN_PLUGIN_STATUS_BAD_PARAM,
-                "MiopenConvDescriptor: pre_padding and post_padding sizes must be equal");
-        }
-
-        if(!std::ranges::equal(*attributes.pre_padding(), *attributes.post_padding()))
-        {
-            throw hipdnn_plugin::HipdnnPluginException(
-                HIPDNN_PLUGIN_STATUS_BAD_PARAM,
-                "MiopenConvDescriptor: asymmetric padding is not supported");
-        }
+        throw hipdnn_plugin::HipdnnPluginException(
+            HIPDNN_PLUGIN_STATUS_BAD_PARAM,
+            "MiopenConvDescriptor: asymmetric padding is not supported");
     }
 
-    const auto attrPadding = attributes.pre_padding();
-    const auto attrStride = attributes.stride();
-    const auto attrDilation = attributes.dilation();
+    std::vector<int> padding(spatialDimCount);
+    std::vector<int> stride(spatialDimCount);
+    std::vector<int> dilation(spatialDimCount);
 
-    std::vector<int> padding(spatialDimCount, 0);
-    std::vector<int> stride(spatialDimCount, 1);
-    std::vector<int> dilation(spatialDimCount, 1);
-
-    copyWithCheck(attrPadding, padding, spatialDimCount, "attrPadding", "spatialDimCount");
+    copyWithCheck(attrPrePadding, padding, spatialDimCount, "attrPadding", "spatialDimCount");
     copyWithCheck(attrStride, stride, spatialDimCount, "attrStride", "spatialDimCount");
     copyWithCheck(attrDilation, dilation, spatialDimCount, "attrDilation", "spatialDimCount");
 
