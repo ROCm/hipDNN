@@ -4,6 +4,7 @@
 #include "data_types_generated.h"
 #include "graph_generated.h"
 #include "hipdnn_sdk/test_utilities/FlatbufferGraphTestUtils.hpp"
+#include "tensor_attributes_generated.h"
 #include <flatbuffers/flatbuffer_builder.h>
 #include <gtest/gtest.h>
 
@@ -17,6 +18,8 @@ void toJsonAndBackTestSuite(const hipdnn_sdk::data_objects::Graph* graph,
                             const std::string& context)
 {
     nlohmann::json graphJson = *graph;
+
+    std::cout << graphJson.dump() << "\n";
 
     flatbuffers::FlatBufferBuilder builder;
     auto newGraphBuilder = hipdnn_sdk::json::to<Graph>(builder, graphJson);
@@ -64,12 +67,18 @@ TEST(TestJson, GraphToJsonAndBack)
 
         toJsonAndBackTestSuite(graph, "(valid batchnorm backward graph)");
     }
-    // {
-    //     auto graphBuilder = hipdnn_sdk::test_utilities::createValidBatchnormGraph();
-    //     auto graph = hipdnn_sdk::data_objects::GetGraph(graphBuilder.GetBufferPointer());
+    {
+        auto graphBuilder = hipdnn_sdk::test_utilities::createBatchnormGraph();
+        auto graph = hipdnn_sdk::data_objects::GetGraph(graphBuilder.GetBufferPointer());
 
-    //     toJsonAndBackTestSuite(graph, "(valid batchnorm backward graph)");
-    // }
+        toJsonAndBackTestSuite(graph, "(valid batchnorm backward graph)");
+    }
+    {
+        auto graphBuilder = hipdnn_sdk::test_utilities::createPointwiseGraph();
+        auto graph = hipdnn_sdk::data_objects::GetGraph(graphBuilder.GetBufferPointer());
+
+        toJsonAndBackTestSuite(graph, "(valid pointwise graph)");
+    }
 }
 
 void vectorTestSuite(std::vector<int> const& vec, const std::string& context)

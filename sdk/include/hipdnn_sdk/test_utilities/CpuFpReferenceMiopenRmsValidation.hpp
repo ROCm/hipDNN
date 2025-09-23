@@ -82,6 +82,13 @@ public:
         double relativeRmsError = std::sqrt(squareDifference)
                                   / (std::sqrt(static_cast<double>(elementCount)) * maxMagnitude);
 
+        if(relativeRmsError > _relativeTolerance)
+        {
+            HIPDNN_LOG_ERROR("Validation failed: relative rms error = {}, relative tolerance = {}",
+                             relativeRmsError,
+                             _relativeTolerance);
+        }
+
         return relativeRmsError <= _relativeTolerance;
     }
 

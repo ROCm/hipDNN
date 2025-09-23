@@ -170,14 +170,11 @@ TEST(TestCpuFpReferenceBatchnormFp32, BatchnormFwdInference3D)
         inputTensor, scaleTensor, biasTensor, meanTensor, varianceTensor, outputTensor, 1e-5);
 }
 
-TEST(TestCpuFpReferenceBatchnormFp32, BatchnormFwdInference5D)
+TEST(TestCpuFpReferenceBatchnormFp32, BatchnormFwdInferenceNcdhw)
 {
-    // TODO: switch this when 5D tensor layouts are added
-    TensorLayout ncdhw{.name = "NCDHW", .strideOrder = {4, 3, 2, 1, 0}};
-
     // Test with 5D tensor (batch, channel, depth, height, width)
-    Tensor<float> inputTensor({2, 3, 4, 5, 6}, ncdhw);
-    Tensor<float> outputTensor({2, 3, 4, 5, 6}, ncdhw);
+    Tensor<float> inputTensor({2, 3, 4, 5, 6});
+    Tensor<float> outputTensor({2, 3, 4, 5, 6});
     Tensor<float> scaleTensor({1, 3});
     Tensor<float> biasTensor({1, 3});
     Tensor<float> meanTensor({1, 3});
@@ -190,6 +187,28 @@ TEST(TestCpuFpReferenceBatchnormFp32, BatchnormFwdInference5D)
         biasTensor.setHostValue(0.5f, 0, i);
         meanTensor.setHostValue(1.5f, 0, i);
         varianceTensor.setHostValue(0.5f, 0, i);
+    }
+
+    CpuFpReferenceBatchnormImpl<float, float>::batchnormFwdInference(
+        inputTensor, scaleTensor, biasTensor, meanTensor, varianceTensor, outputTensor, 1e-5);
+}
+
+TEST(TestCpuFpReferenceBatchnormBfp16, BatchnormFwdInferenceNdhwc)
+{
+    Tensor<float> inputTensor({2, 3, 4, 5, 6}, TensorLayout::NDHWC);
+    Tensor<float> outputTensor({2, 3, 4, 5, 6}, TensorLayout::NDHWC);
+    Tensor<float> biasTensor({1, 3});
+    Tensor<float> scaleTensor({1, 3});
+    Tensor<float> meanTensor({1, 3});
+    Tensor<float> varianceTensor({1, 3});
+
+    inputTensor.fillWithValue(1.5f);
+    for(int i = 0; i < 3; i++)
+    {
+        scaleTensor.setHostValue(2.0f, 0, i);
+        biasTensor.setHostValue(0.5f, 0, i);
+        meanTensor.setHostValue(1.5f, 0, i);
+        varianceTensor.setHostValue(1.0f, 0, i);
     }
 
     CpuFpReferenceBatchnormImpl<float, float>::batchnormFwdInference(
@@ -365,6 +384,129 @@ TEST(TestCpuFpReferenceBatchnormFp64, BatchnormBwdSanityValidationNchw)
     EXPECT_NEAR(dxTensor.getHostValue(0, 0, 0, 1), expectedDx[1], tolerance);
     EXPECT_NEAR(dxTensor.getHostValue(0, 0, 1, 0), expectedDx[2], tolerance);
     EXPECT_NEAR(dxTensor.getHostValue(0, 0, 1, 1), expectedDx[3], tolerance);
+}
+
+TEST(TestCpuFpReferenceBatchnormFp32, BatchnormBackward2D)
+{
+    // Test with 2D tensor (batch, channel)
+    Tensor<float> xTensor({4, 3});
+    Tensor<float> dyTensor({4, 3});
+    Tensor<float> dxTensor({4, 3});
+    Tensor<float> scaleTensor({1, 3});
+    Tensor<float> meanTensor({1, 3});
+    Tensor<float> invVarianceTensor({1, 3});
+    Tensor<float> dscaleTensor({1, 3});
+    Tensor<float> dbiasTensor({1, 3});
+
+    xTensor.fillWithValue(1.0f);
+    dyTensor.fillWithValue(0.1f);
+    for(int i = 0; i < 3; i++)
+    {
+        scaleTensor.setHostValue(1.0f, 0, i);
+        meanTensor.setHostValue(1.0f, 0, i);
+        invVarianceTensor.setHostValue(1.0f, 0, i);
+    }
+
+    CpuFpReferenceBatchnormImpl<float, float>::batchnormBwd(dyTensor,
+                                                            xTensor,
+                                                            meanTensor,
+                                                            invVarianceTensor,
+                                                            scaleTensor,
+                                                            dxTensor,
+                                                            dscaleTensor,
+                                                            dbiasTensor);
+}
+
+TEST(TestCpuFpReferenceBatchnormFp32, BatchnormBackward3D)
+{
+    // Test with 3D tensor (batch, channel, length)
+    Tensor<float> xTensor({2, 3, 10});
+    Tensor<float> dyTensor({2, 3, 10});
+    Tensor<float> dxTensor({2, 3, 10});
+    Tensor<float> scaleTensor({1, 3});
+    Tensor<float> meanTensor({1, 3});
+    Tensor<float> invVarianceTensor({1, 3});
+    Tensor<float> dscaleTensor({1, 3});
+    Tensor<float> dbiasTensor({1, 3});
+
+    xTensor.fillWithValue(2.0f);
+    dyTensor.fillWithValue(0.2f);
+    for(int i = 0; i < 3; i++)
+    {
+        scaleTensor.setHostValue(2.0f, 0, i);
+        meanTensor.setHostValue(2.0f, 0, i);
+        invVarianceTensor.setHostValue(0.5f, 0, i);
+    }
+
+    CpuFpReferenceBatchnormImpl<float, float>::batchnormBwd(dyTensor,
+                                                            xTensor,
+                                                            meanTensor,
+                                                            invVarianceTensor,
+                                                            scaleTensor,
+                                                            dxTensor,
+                                                            dscaleTensor,
+                                                            dbiasTensor);
+}
+
+TEST(TestCpuFpReferenceBatchnormFp32, BatchnormBackwardNcdhw)
+{
+    // Test with 5D tensor (batch, channel, depth, height, width)
+    Tensor<float> xTensor({2, 3, 4, 5, 6});
+    Tensor<float> dyTensor({2, 3, 4, 5, 6});
+    Tensor<float> dxTensor({2, 3, 4, 5, 6});
+    Tensor<float> scaleTensor({1, 3});
+    Tensor<float> meanTensor({1, 3});
+    Tensor<float> invVarianceTensor({1, 3});
+    Tensor<float> dscaleTensor({1, 3});
+    Tensor<float> dbiasTensor({1, 3});
+
+    xTensor.fillWithValue(1.5f);
+    dyTensor.fillWithValue(0.1f);
+    for(int i = 0; i < 3; i++)
+    {
+        scaleTensor.setHostValue(1.0f, 0, i);
+        meanTensor.setHostValue(1.5f, 0, i);
+        invVarianceTensor.setHostValue(0.7071f, 0, i); // 1/sqrt(2)
+    }
+
+    CpuFpReferenceBatchnormImpl<float, float>::batchnormBwd(dyTensor,
+                                                            xTensor,
+                                                            meanTensor,
+                                                            invVarianceTensor,
+                                                            scaleTensor,
+                                                            dxTensor,
+                                                            dscaleTensor,
+                                                            dbiasTensor);
+}
+
+TEST(TestCpuFpReferenceBatchnormFp32, BatchnormBackwardNdhwc)
+{
+    Tensor<float> xTensor({2, 3, 4, 5, 6}, TensorLayout::NDHWC);
+    Tensor<float> dyTensor({2, 3, 4, 5, 6}, TensorLayout::NDHWC);
+    Tensor<float> dxTensor({2, 3, 4, 5, 6}, TensorLayout::NDHWC);
+    Tensor<float> scaleTensor({1, 3});
+    Tensor<float> meanTensor({1, 3});
+    Tensor<float> invVarianceTensor({1, 3});
+    Tensor<float> dscaleTensor({1, 3});
+    Tensor<float> dbiasTensor({1, 3});
+
+    xTensor.fillWithValue(1.5f);
+    dyTensor.fillWithValue(0.1f);
+    for(int i = 0; i < 3; i++)
+    {
+        scaleTensor.setHostValue(1.0f, 0, i);
+        meanTensor.setHostValue(1.5f, 0, i);
+        invVarianceTensor.setHostValue(0.7071f, 0, i); // 1/sqrt(2)
+    }
+
+    CpuFpReferenceBatchnormImpl<float, float>::batchnormBwd(dyTensor,
+                                                            xTensor,
+                                                            meanTensor,
+                                                            invVarianceTensor,
+                                                            scaleTensor,
+                                                            dxTensor,
+                                                            dscaleTensor,
+                                                            dbiasTensor);
 }
 
 TEST(TestCpuFpReferenceBatchnormFp32, BatchnormFwdTrainingNchwBasic)
@@ -729,20 +871,44 @@ TEST(TestCpuFpReferenceBatchnormFp32, BatchnormFwdTraining3D)
         inputTensor, scaleTensor, biasTensor, outputTensor, 1e-5f, 0.1f);
 }
 
-TEST(TestCpuFpReferenceBatchnormFp32, BatchnormFwdTraining5D)
+TEST(TestCpuFpReferenceBatchnormFp32, BatchnormFwdTrainingNcdhw)
 {
-    // TODO: switch this when 5D tensor layouts are added
-    TensorLayout ncdhw{.name = "NCDHW", .strideOrder = {4, 3, 2, 1, 0}};
-
     // Test with 5D tensor (batch, channel, depth, height, width)
-    Tensor<float> inputTensor({2, 3, 4, 5, 6}, ncdhw);
-    Tensor<float> outputTensor({2, 3, 4, 5, 6}, ncdhw);
+    Tensor<float> inputTensor({2, 3, 4, 5, 6});
+    Tensor<float> outputTensor({2, 3, 4, 5, 6});
     Tensor<float> scaleTensor({1, 3});
     Tensor<float> biasTensor({1, 3});
     Tensor<float> savedMean({1, 3});
     Tensor<float> savedInvVariance({1, 3});
 
     inputTensor.fillWithValue(1.0);
+    for(int i = 0; i < 3; i++)
+    {
+        scaleTensor.setHostValue(1.0f, 0, i);
+        biasTensor.setHostValue(0.0f, 0, i);
+    }
+
+    CpuFpReferenceBatchnormImpl<float, float>::batchnormFwdTraining(inputTensor,
+                                                                    scaleTensor,
+                                                                    biasTensor,
+                                                                    outputTensor,
+                                                                    1e-5f,
+                                                                    0.1f,
+                                                                    &savedMean,
+                                                                    &savedInvVariance);
+}
+
+TEST(TestCpuFpReferenceBatchnormFp32, BatchnormFwdTrainingNdhwc)
+{
+    // Test with 5D tensor in NDHWC layout
+    Tensor<float> inputTensor({2, 3, 4, 5, 6}, TensorLayout::NDHWC);
+    Tensor<float> outputTensor({2, 3, 4, 5, 6}, TensorLayout::NDHWC);
+    Tensor<float> scaleTensor({1, 3});
+    Tensor<float> biasTensor({1, 3});
+    Tensor<float> savedMean({1, 3});
+    Tensor<float> savedInvVariance({1, 3});
+
+    inputTensor.fillWithRandomValues(-1.0f, 1.0f, 123);
     for(int i = 0; i < 3; i++)
     {
         scaleTensor.setHostValue(1.0f, 0, i);
