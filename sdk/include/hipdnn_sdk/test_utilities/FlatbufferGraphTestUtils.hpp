@@ -268,7 +268,7 @@ inline flatbuffers::FlatBufferBuilder createPointwiseGraph()
     auto pointwiseNode
         = CreatePointwiseAttributes(builder, PointwiseMode::DIV, 1.f, 2.f, 3.f, 0, 1, 2, 3, 4);
     nodes.push_back(CreateNodeDirect(
-        builder, "Node", NodeAttributes::BatchnormAttributes, pointwiseNode.Union()));
+        builder, "Node", NodeAttributes::PointwiseAttributes, pointwiseNode.Union()));
 
     std::array tensorNames = {"axis", "in_0", "in_1", "in_2", "out_0"};
     std::vector<flatbuffers::Offset<TensorAttributes>> tensors;

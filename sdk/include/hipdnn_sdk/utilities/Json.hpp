@@ -1,5 +1,6 @@
 #include "batchnorm_backward_attributes_generated.h"
 #include "batchnorm_inference_attributes_generated.h"
+#include "data_types_generated.h"
 #include "pointwise_attributes_generated.h"
 #include "tensor_attributes_generated.h"
 #include <flatbuffers/flatbuffer_builder.h>
@@ -230,7 +231,7 @@ void to_json(nlohmann::json& pointwiseJson, PointwiseAttributes const& pw)
     inputs["relu_lower_clip"] = pw.relu_lower_clip();
     inputs["relu_upper_clip"] = pw.relu_upper_clip();
     inputs["relu_lower_slope"] = pw.relu_lower_slope();
-    inputs["axis_tensor_uid"] = pw.relu_lower_slope();
+    inputs["axis_tensor_uid"] = pw.axis_tensor_uid();
     inputs["in_0_tensor_uid"] = pw.in_0_tensor_uid();
     inputs["in_1_tensor_uid"] = pw.in_1_tensor_uid();
     inputs["in_2_tensor_uid"] = pw.in_2_tensor_uid();
@@ -383,14 +384,14 @@ auto to<data_objects::PointwiseAttributes>(flatbuffers::FlatBufferBuilder& build
     return data_objects::CreatePointwiseAttributes(
         builder,
         inputs.at("operation").get<PointwiseMode>(),
-        inputs.at("relu_lower_clip").get<std::optional<int64_t>>(),
-        inputs.at("relu_upper_clip").get<std::optional<int64_t>>(),
-        inputs.at("relu_lower_slope").get<std::optional<int64_t>>(),
-        inputs.at("axis_tensor_id").get<std::optional<int64_t>>(),
+        inputs.at("relu_lower_clip").get<std::optional<float>>(),
+        inputs.at("relu_upper_clip").get<std::optional<float>>(),
+        inputs.at("relu_lower_slope").get<std::optional<float>>(),
+        inputs.at("axis_tensor_uid").get<std::optional<int64_t>>(),
         inputs.at("in_0_tensor_uid").get<int64_t>(),
-        inputs.at("in_1").get<std::optional<int64_t>>(),
-        inputs.at("in_2").get<std::optional<int64_t>>(),
-        outputs.at("out_0").get<int64_t>());
+        inputs.at("in_1_tensor_uid").get<std::optional<int64_t>>(),
+        inputs.at("in_2_tensor_uid").get<std::optional<int64_t>>(),
+        outputs.at("out_0_tensor_uid").get<int64_t>());
 }
 
 template <>
@@ -435,6 +436,8 @@ auto to<data_objects::Node>(flatbuffers::FlatBufferBuilder& builder, const nlohm
             return to<data_objects::BatchnormBackwardAttributes>(builder, entry).Union();
         case data_objects::NodeAttributes::BatchnormAttributes:
             return to<data_objects::BatchnormAttributes>(builder, entry).Union();
+        case data_objects::NodeAttributes::PointwiseAttributes:
+            return to<data_objects::PointwiseAttributes>(builder, entry).Union();
         default:
             throw std::runtime_error(
                 "hipdnn_sdk::json::to<data_objects::Node>(): Unsupported NodeAttributes type: "
