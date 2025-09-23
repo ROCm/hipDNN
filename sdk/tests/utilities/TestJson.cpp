@@ -19,8 +19,6 @@ void toJsonAndBackTestSuite(const hipdnn_sdk::data_objects::Graph* graph,
 {
     nlohmann::json graphJson = *graph;
 
-    std::cout << graphJson.dump() << "\n";
-
     flatbuffers::FlatBufferBuilder builder;
     auto newGraphBuilder = hipdnn_sdk::json::to<Graph>(builder, graphJson);
     builder.Finish(newGraphBuilder);
