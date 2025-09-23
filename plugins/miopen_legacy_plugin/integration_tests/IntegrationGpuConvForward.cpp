@@ -127,6 +127,7 @@ protected:
             yTensorAttr->set_uid(uid++);
         }
         yTensorAttr->set_output(true);
+        yTensorAttr->set_data_type(dataType);
 
         auto result = graphObj->validate();
         ASSERT_EQ(result.code, ErrorCode::OK) << result.err_msg;
@@ -170,14 +171,12 @@ protected:
     {
         const ConvTestCase& testCase = GetParam();
 
-        auto dataType = getDataTypeEnumFromType<DataType>();
-
         HIPDNN_LOG_INFO("Test is using {} for its random seed", testCase._seed);
 
         ConvTensorBundle graphTensorBundle(testCase, layout);
-
         ConvTensorBundle cpuTensorBundle(testCase, layout);
 
+        auto dataType = getDataTypeEnumFromType<DataType>();
         runMiopenConvFwd(testCase, graphTensorBundle, dataType);
         graphTensorBundle.yTensor.memory().markDeviceModified();
 
@@ -194,34 +193,23 @@ private:
     int _deviceId = 0;
 };
 
-class IntegrationGpuConvFwdNchwFp32 : public ConvForward<float>
-{
-};
+using IntegrationGpuConvFwdNchwFp32 = ConvForward<float>;
+using IntegrationGpuConvFwdNcdhwFp32 = ConvForward<float>;
 
-class IntegrationGpuConvFwdNchwBfp16 : public ConvForward<hip_bfloat16>
-{
-};
+using IntegrationGpuConvFwdNchwBfp16 = ConvForward<hip_bfloat16>;
+using IntegrationGpuConvFwdNcdhwBfp16 = ConvForward<hip_bfloat16>;
 
-class IntegrationGpuConvFwdNchwFp16 : public ConvForward<half>
-{
-};
+using IntegrationGpuConvFwdNchwFp16 = ConvForward<half>;
+using IntegrationGpuConvFwdNcdhwFp16 = ConvForward<half>;
 
-class IntegrationGpuConvFwdNhwcFp32 : public ConvForward<float>
-{
-};
+using IntegrationGpuConvFwdNhwcFp32 = ConvForward<float>;
+using IntegrationGpuConvFwdNdhwcFp32 = ConvForward<float>;
 
-class IntegrationGpuConvFwdNhwcBfp16 : public ConvForward<hip_bfloat16>
-{
-};
+using IntegrationGpuConvFwdNhwcBfp16 = ConvForward<hip_bfloat16>;
+using IntegrationGpuConvFwdNdhwcBfp16 = ConvForward<hip_bfloat16>;
 
-class IntegrationGpuConvFwdNhwcFp16 : public ConvForward<half>
-{
-};
-
-std::vector<ConvTestCase> getTestCases()
-{
-    return getConvTestCases();
-}
+using IntegrationGpuConvFwdNhwcFp16 = ConvForward<half>;
+using IntegrationGpuConvFwdNdhwcFp16 = ConvForward<half>;
 
 } // namespace
 
@@ -230,39 +218,85 @@ TEST_P(IntegrationGpuConvFwdNchwFp32, Correctness)
     runConvTest(4e-6f, TensorLayout::NCHW);
 }
 
-INSTANTIATE_TEST_SUITE_P(, IntegrationGpuConvFwdNchwFp32, testing::ValuesIn(getTestCases()));
+TEST_P(IntegrationGpuConvFwdNcdhwFp32, Correctness)
+{
+    runConvTest(4e-6f, TensorLayout::NCDHW);
+}
 
 TEST_P(IntegrationGpuConvFwdNchwBfp16, Correctness)
 {
     runConvTest(1e-2_bf, TensorLayout::NCHW);
 }
 
-INSTANTIATE_TEST_SUITE_P(, IntegrationGpuConvFwdNchwBfp16, testing::ValuesIn(getTestCases()));
+TEST_P(IntegrationGpuConvFwdNcdhwBfp16, Correctness)
+{
+    runConvTest(1e-2_bf, TensorLayout::NCDHW);
+}
 
 TEST_P(IntegrationGpuConvFwdNchwFp16, Correctness)
 {
     runConvTest(1e-2_h, TensorLayout::NCHW);
 }
 
-INSTANTIATE_TEST_SUITE_P(, IntegrationGpuConvFwdNchwFp16, testing::ValuesIn(getTestCases()));
+TEST_P(IntegrationGpuConvFwdNcdhwFp16, Correctness)
+{
+    runConvTest(1e-2_h, TensorLayout::NCDHW);
+}
 
 TEST_P(IntegrationGpuConvFwdNhwcFp32, Correctness)
 {
     runConvTest(4e-6f, TensorLayout::NHWC);
 }
 
-INSTANTIATE_TEST_SUITE_P(, IntegrationGpuConvFwdNhwcFp32, testing::ValuesIn(getTestCases()));
+TEST_P(IntegrationGpuConvFwdNdhwcFp32, Correctness)
+{
+    runConvTest(4e-6f, TensorLayout::NDHWC);
+}
 
 TEST_P(IntegrationGpuConvFwdNhwcBfp16, Correctness)
 {
     runConvTest(1e-2_bf, TensorLayout::NHWC);
 }
 
-INSTANTIATE_TEST_SUITE_P(, IntegrationGpuConvFwdNhwcBfp16, testing::ValuesIn(getTestCases()));
+TEST_P(IntegrationGpuConvFwdNdhwcBfp16, Correctness)
+{
+    runConvTest(1e-2_bf, TensorLayout::NDHWC);
+}
 
 TEST_P(IntegrationGpuConvFwdNhwcFp16, Correctness)
 {
     runConvTest(1e-3_h, TensorLayout::NHWC);
 }
 
-INSTANTIATE_TEST_SUITE_P(, IntegrationGpuConvFwdNhwcFp16, testing::ValuesIn(getTestCases()));
+TEST_P(IntegrationGpuConvFwdNdhwcFp16, Correctness)
+{
+    runConvTest(1e-3_h, TensorLayout::NDHWC);
+}
+
+INSTANTIATE_TEST_SUITE_P(, IntegrationGpuConvFwdNchwFp32, testing::ValuesIn(getConvTestCases4D()));
+
+INSTANTIATE_TEST_SUITE_P(, IntegrationGpuConvFwdNchwBfp16, testing::ValuesIn(getConvTestCases4D()));
+
+INSTANTIATE_TEST_SUITE_P(, IntegrationGpuConvFwdNchwFp16, testing::ValuesIn(getConvTestCases4D()));
+
+INSTANTIATE_TEST_SUITE_P(, IntegrationGpuConvFwdNhwcFp32, testing::ValuesIn(getConvTestCases4D()));
+
+INSTANTIATE_TEST_SUITE_P(, IntegrationGpuConvFwdNhwcBfp16, testing::ValuesIn(getConvTestCases4D()));
+
+INSTANTIATE_TEST_SUITE_P(, IntegrationGpuConvFwdNhwcFp16, testing::ValuesIn(getConvTestCases4D()));
+
+INSTANTIATE_TEST_SUITE_P(, IntegrationGpuConvFwdNcdhwFp32, testing::ValuesIn(getConvTestCases5D()));
+
+INSTANTIATE_TEST_SUITE_P(,
+                         IntegrationGpuConvFwdNcdhwBfp16,
+                         testing::ValuesIn(getConvTestCases5D()));
+
+INSTANTIATE_TEST_SUITE_P(, IntegrationGpuConvFwdNcdhwFp16, testing::ValuesIn(getConvTestCases5D()));
+
+INSTANTIATE_TEST_SUITE_P(, IntegrationGpuConvFwdNdhwcFp32, testing::ValuesIn(getConvTestCases5D()));
+
+INSTANTIATE_TEST_SUITE_P(,
+                         IntegrationGpuConvFwdNdhwcBfp16,
+                         testing::ValuesIn(getConvTestCases5D()));
+
+INSTANTIATE_TEST_SUITE_P(, IntegrationGpuConvFwdNdhwcFp16, testing::ValuesIn(getConvTestCases5D()));
