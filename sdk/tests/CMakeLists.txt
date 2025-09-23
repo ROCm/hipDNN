@@ -22,11 +22,12 @@ add_executable(hipdnn_sdk_tests
     plugin/flatbuffer_utilities/TestGraphWrapper.cpp
     plugin/flatbuffer_utilities/TestEngineConfigWrapper.cpp
     plugin/flatbuffer_utilities/TestEngineDetailsWrapper.cpp
-    utilities/TestScopedResource.cpp
+    utilities/TestAllocators.cpp
     utilities/TestCallbackLogger.cpp
     utilities/TestMigratableMemory.cpp
-    utilities/TestAllocators.cpp
     utilities/TestFloats.cpp
+    utilities/TestJson.cpp
+    utilities/TestScopedResource.cpp
     utilities/TestShapeUtilities.cpp
     utilities/TestTensor.cpp
     utilities/TestPlatformUtils.cpp
