@@ -7,17 +7,9 @@
 #include <nlohmann/detail/macro_scope.hpp>
 #include <nlohmann/json.hpp>
 
-namespace hipdnn_sdk::json
-{
-template <class T>
-concept JsonConstructible = requires(T obj) {
-    { obj } -> std::convertible_to<nlohmann::json>;
-};
-}
-
 namespace std
 {
-template <hipdnn_sdk::json::JsonConstructible T>
+template <class T>
 // NOLINTNEXTLINE(readability-identifier-naming)
 void to_json(nlohmann::json& vectorList, vector<T> const& vec)
 {
@@ -28,7 +20,7 @@ void to_json(nlohmann::json& vectorList, vector<T> const& vec)
     }
 }
 
-template <hipdnn_sdk::json::JsonConstructible T>
+template <class T>
 // NOLINTNEXTLINE(readability-identifier-naming)
 void from_json(const nlohmann::json& vecJson, vector<T>& vec)
 {
@@ -43,7 +35,7 @@ void from_json(const nlohmann::json& vecJson, vector<T>& vec)
     }
 }
 
-template <hipdnn_sdk::json::JsonConstructible T>
+template <class T>
 // NOLINTNEXTLINE(readability-identifier-naming)
 void from_json(const nlohmann::json& entry, optional<T>& opt)
 {
@@ -54,7 +46,7 @@ void from_json(const nlohmann::json& entry, optional<T>& opt)
 
 namespace flatbuffers
 {
-template <hipdnn_sdk::json::JsonConstructible T>
+template <class T>
 // NOLINTNEXTLINE(readability-identifier-naming)
 void to_json(nlohmann::json& vectorList, Vector<Offset<T>> const& vec)
 {
@@ -95,33 +87,6 @@ std::optional<T> optionalValue(nlohmann::json obj, Key&& key)
 
 template <class T>
 auto to(flatbuffers::FlatBufferBuilder& builder, nlohmann::json const& entry);
-
-namespace details
-{
-template <class T>
-struct To
-{
-};
-
-template <class T, class Allocator>
-struct To<std::vector<flatbuffers::Offset<T>, Allocator>>
-{
-    auto operator()(flatbuffers::FlatBufferBuilder& builder, const nlohmann::json& jsonValue)
-    {
-        if(!jsonValue.is_array())
-        {
-            throw std::runtime_error("hipdnn_sdk::json::to<vector<T>>(): field is not an array");
-        }
-        std::vector<flatbuffers::Offset<T>> ret;
-        for(const auto& v : jsonValue)
-        {
-            ret.push_back(to<T>(builder, v));
-        }
-
-        return ret;
-    }
-};
-}
 
 template <class T>
 auto toVector(flatbuffers::FlatBufferBuilder& builder, const nlohmann::json& entry)
