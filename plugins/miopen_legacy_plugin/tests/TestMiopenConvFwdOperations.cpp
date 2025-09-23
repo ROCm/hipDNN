@@ -67,24 +67,23 @@ protected:
         PinnedTensor<DataType> yTensor(testCase._yDims, _layout);
         deviceBuffers.push_back(generateEmptyDeviceBuffer(yTensor, 3));
 
-        auto convBuilder
-            = hipdnn_backend::test_utilities::createValidConvFwdGraph(xTensor.dims(),
-                                                                      xTensor.strides(),
-                                                                      wTensor.dims(),
-                                                                      wTensor.strides(),
-                                                                      yTensor.dims(),
-                                                                      yTensor.strides(),
-                                                                      testCase._convPrePadding,
-                                                                      testCase._convPostPadding,
-                                                                      testCase._convStride,
-                                                                      testCase._convDilation,
-                                                                      dataType);
+        auto convBuilder = createValidConvFwdGraph(xTensor.dims(),
+                                                   xTensor.strides(),
+                                                   wTensor.dims(),
+                                                   wTensor.strides(),
+                                                   yTensor.dims(),
+                                                   yTensor.strides(),
+                                                   testCase._convPrePadding,
+                                                   testCase._convPostPadding,
+                                                   testCase._convStride,
+                                                   testCase._convDilation,
+                                                   dataType);
 
         hipdnnPluginConstData_t opGraph;
         opGraph.ptr = convBuilder.GetBufferPointer();
         opGraph.size = convBuilder.GetSize();
 
-        auto engineConfigBuilder = hipdnn_backend::test_utilities::createValidEngineConfig(1);
+        auto engineConfigBuilder = createValidEngineConfig(1);
         hipdnnPluginConstData_t engineConfig;
         engineConfig.ptr = engineConfigBuilder.GetBufferPointer();
         engineConfig.size = engineConfigBuilder.GetSize();

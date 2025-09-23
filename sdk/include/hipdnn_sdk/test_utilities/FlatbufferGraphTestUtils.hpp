@@ -209,6 +209,55 @@ inline flatbuffers::FlatBufferBuilder
     return builder;
 }
 
+// TODO: Replace with a createValidBatchnormGraph function once one is made and tested
+// This may be useful to keep in general though, as it has distinct and non-null values for all fields
+inline flatbuffers::FlatBufferBuilder createBatchnormGraph()
+{
+    flatbuffers::FlatBufferBuilder builder;
+
+    std::vector<flatbuffers::Offset<Node>> nodes;
+    std::vector<int64_t> peerStats = {-1, -2, -3, -4};
+    auto batchnormNode = CreateBatchnormAttributesDirect(
+        builder, 0, 1, 2, 3, &peerStats, 4, 5, 6, 7, 8, 9, 10, 11);
+    nodes.push_back(CreateNodeDirect(
+        builder, "Node", NodeAttributes::BatchnormAttributes, batchnormNode.Union()));
+
+    std::array tensorNames = {"x",
+                              "scale",
+                              "bias",
+                              "epsilon",
+                              "peer_stats",
+                              "prev_running_mean",
+                              "momentum",
+                              "y",
+                              "mean",
+                              "inv_variance",
+                              "next_running_mean",
+                              "next_running_variance"};
+    std::vector<flatbuffers::Offset<TensorAttributes>> tensors;
+    tensors.reserve(tensorNames.size());
+    int64_t tensorUid = 0;
+    std::vector<int64_t> dims = {1, 2, 3, 4};
+    std::vector<int64_t> strides = {5, 6, 7, 8};
+    for(auto name : tensorNames)
+    {
+        tensors.push_back(CreateTensorAttributesDirect(
+            builder, tensorUid++, name, DataType::UINT8, &strides, &dims, false));
+    }
+
+    auto graph = CreateGraphDirect(builder,
+                                   "BatchnormGraph",
+                                   DataType::FLOAT,
+                                   DataType::HALF,
+                                   DataType::BFLOAT16,
+                                   &tensors,
+                                   &nodes);
+
+    builder.Finish(graph);
+
+    return builder;
+}
+
 inline flatbuffers::FlatBufferBuilder
     createValidConvFwdGraph(std::vector<int64_t> xDims = {4, 4, 4, 4},
                             std::vector<int64_t> xStrides = {64, 16, 4, 1},
@@ -257,55 +306,6 @@ inline flatbuffers::FlatBufferBuilder
                                          &tensorAttributes,
                                          &nodes);
     builder.Finish(graphOffset);
-    return builder;
-}
-
-// TODO: Replace with a createValidBatchnormGraph function once one is made and tested
-// This may be useful to keep in general though, as it has distinct and non-null values for all fields
-inline flatbuffers::FlatBufferBuilder createBatchnormGraph()
-{
-    flatbuffers::FlatBufferBuilder builder;
-
-    std::vector<flatbuffers::Offset<Node>> nodes;
-    std::vector<int64_t> peerStats = {-1, -2, -3, -4};
-    auto batchnormNode = CreateBatchnormAttributesDirect(
-        builder, 0, 1, 2, 3, &peerStats, 4, 5, 6, 7, 8, 9, 10, 11);
-    nodes.push_back(CreateNodeDirect(
-        builder, "Node", NodeAttributes::BatchnormAttributes, batchnormNode.Union()));
-
-    std::array tensorNames = {"x",
-                              "scale",
-                              "bias",
-                              "epsilon",
-                              "peer_stats",
-                              "prev_running_mean",
-                              "momentum",
-                              "y",
-                              "mean",
-                              "inv_variance",
-                              "next_running_mean",
-                              "next_running_variance"};
-    std::vector<flatbuffers::Offset<TensorAttributes>> tensors;
-    tensors.reserve(tensorNames.size());
-    int64_t tensorUid = 0;
-    std::vector<int64_t> dims = {1, 2, 3, 4};
-    std::vector<int64_t> strides = {5, 6, 7, 8};
-    for(auto name : tensorNames)
-    {
-        tensors.push_back(CreateTensorAttributesDirect(
-            builder, tensorUid++, name, DataType::UINT8, &strides, &dims, false));
-    }
-
-    auto graph = CreateGraphDirect(builder,
-                                   "BatchnormGraph",
-                                   DataType::FLOAT,
-                                   DataType::HALF,
-                                   DataType::BFLOAT16,
-                                   &tensors,
-                                   &nodes);
-
-    builder.Finish(graph);
-
     return builder;
 }
 
