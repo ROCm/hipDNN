@@ -48,16 +48,6 @@ void from_json(const nlohmann::json& vecJson, vector<T>& vec)
     }
 }
 
-// template <hipdnn_sdk::json::JsonConstructible T>
-// // NOLINTNEXTLINE(readability-identifier-naming)
-// void to_json(nlohmann::json& entry, optional<T> const& opt)
-// {
-//     if(opt.has_value())
-//     {
-//         entry = opt.value();
-//     }
-// }
-
 template <hipdnn_sdk::json::JsonConstructible T>
 // NOLINTNEXTLINE(readability-identifier-naming)
 void from_json(const nlohmann::json& entry, optional<T>& opt)
@@ -173,13 +163,13 @@ void to_json(nlohmann::json& batchnormJson, BatchnormInferenceAttributes const& 
 {
     auto& inputs = batchnormJson["inputs"] = {};
 
-    inputs["x"] = bn.x_tensor_uid();
-    inputs["mean"] = bn.mean_tensor_uid();
-    inputs["scale"] = bn.scale_tensor_uid();
-    inputs["inv_variance"] = bn.inv_variance_tensor_uid();
-    inputs["bias"] = bn.bias_tensor_uid();
+    inputs["x_tensor_uid"] = bn.x_tensor_uid();
+    inputs["mean_tensor_uid"] = bn.mean_tensor_uid();
+    inputs["scale_tensor_uid"] = bn.scale_tensor_uid();
+    inputs["inv_variance_tensor_uid"] = bn.inv_variance_tensor_uid();
+    inputs["bias_tensor_uid"] = bn.bias_tensor_uid();
 
-    batchnormJson["outputs"]["y"] = bn.y_tensor_uid();
+    batchnormJson["outputs"]["y_tensor_uid"] = bn.y_tensor_uid();
 }
 
 // NOLINTNEXTLINE(readability-identifier-naming)
@@ -187,17 +177,17 @@ void to_json(nlohmann::json& batchnormJson, BatchnormBackwardAttributes const& b
 {
     auto& inputs = batchnormJson["inputs"] = {};
 
-    inputs["dy"] = bn.dy_tensor_uid();
-    inputs["x"] = bn.x_tensor_uid();
-    inputs["mean"] = bn.mean_tensor_uid();
-    inputs["inv_variance"] = bn.inv_variance_tensor_uid();
-    inputs["scale"] = bn.scale_tensor_uid();
-    inputs["peer_stats"] = *bn.peer_stats_tensor_uid();
+    inputs["dy_tensor_uid"] = bn.dy_tensor_uid();
+    inputs["x_tensor_uid"] = bn.x_tensor_uid();
+    inputs["mean_tensor_uid"] = bn.mean_tensor_uid();
+    inputs["inv_variance_tensor_uid"] = bn.inv_variance_tensor_uid();
+    inputs["scale_tensor_uid"] = bn.scale_tensor_uid();
+    inputs["peer_stats_tensor_uid"] = *bn.peer_stats_tensor_uid();
 
     auto& outputs = batchnormJson["outputs"] = {};
-    outputs["dbias"] = bn.dbias_tensor_uid();
-    outputs["dscale"] = bn.dscale_tensor_uid();
-    outputs["dx"] = bn.dx_tensor_uid();
+    outputs["dbias_tensor_uid"] = bn.dbias_tensor_uid();
+    outputs["dscale_tensor_uid"] = bn.dscale_tensor_uid();
+    outputs["dx_tensor_uid"] = bn.dx_tensor_uid();
 }
 
 // NOLINTNEXTLINE(readability-identifier-naming)
@@ -206,20 +196,20 @@ void to_json(nlohmann::json& batchnormJson, BatchnormAttributes const& bn)
     auto& inputs = batchnormJson["inputs"] = {};
     auto& outputs = batchnormJson["outputs"] = {};
 
-    inputs["x"] = bn.x_tensor_uid();
-    inputs["scale"] = bn.scale_tensor_uid();
-    inputs["bias"] = bn.bias_tensor_uid();
-    inputs["epsilon"] = bn.epsilon_tensor_uid();
-    inputs["peer_stats"] = *bn.peer_stats_tensor_uid();
-    inputs["prev_running_mean"] = bn.prev_running_mean_tensor_uid();
-    inputs["prev_running_variance"] = bn.prev_running_variance_tensor_uid();
-    inputs["momentum"] = bn.momentum_tensor_uid();
+    inputs["x_tensor_uid"] = bn.x_tensor_uid();
+    inputs["scale_tensor_uid"] = bn.scale_tensor_uid();
+    inputs["bias_tensor_uid"] = bn.bias_tensor_uid();
+    inputs["epsilon_tensor_uid"] = bn.epsilon_tensor_uid();
+    inputs["peer_stats_tensor_uid"] = *bn.peer_stats_tensor_uid();
+    inputs["prev_running_mean_tensor_uid"] = bn.prev_running_mean_tensor_uid();
+    inputs["prev_running_variance_tensor_uid"] = bn.prev_running_variance_tensor_uid();
+    inputs["momentum_tensor_uid"] = bn.momentum_tensor_uid();
 
-    outputs["y"] = bn.y_tensor_uid();
-    outputs["mean"] = bn.mean_tensor_uid();
-    outputs["inv_variance"] = bn.inv_variance_tensor_uid();
-    outputs["next_running_mean"] = bn.next_running_mean_tensor_uid();
-    outputs["next_running_variance"] = bn.next_running_variance_tensor_uid();
+    outputs["y_tensor_uid"] = bn.y_tensor_uid();
+    outputs["mean_tensor_uid"] = bn.mean_tensor_uid();
+    outputs["inv_variance_tensor_uid"] = bn.inv_variance_tensor_uid();
+    outputs["next_running_mean_tensor_uid"] = bn.next_running_mean_tensor_uid();
+    outputs["next_running_variance_tensor_uid"] = bn.next_running_variance_tensor_uid();
 }
 
 // NOLINTNEXTLINE(readability-identifier-naming)
@@ -342,12 +332,12 @@ auto to<data_objects::BatchnormInferenceAttributes>(flatbuffers::FlatBufferBuild
     auto& inputs = entry["inputs"];
     return data_objects::CreateBatchnormInferenceAttributes(
         builder,
-        inputs.at("x").get<int64_t>(),
-        inputs.at("mean").get<int64_t>(),
-        inputs.at("inv_variance").get<int64_t>(),
-        inputs.at("scale").get<int64_t>(),
-        inputs.at("bias").get<int64_t>(),
-        entry.at("outputs").at("y").get<int64_t>());
+        inputs.at("x_tensor_uid").get<int64_t>(),
+        inputs.at("mean_tensor_uid").get<int64_t>(),
+        inputs.at("inv_variance_tensor_uid").get<int64_t>(),
+        inputs.at("scale_tensor_uid").get<int64_t>(),
+        inputs.at("bias_tensor_uid").get<int64_t>(),
+        entry.at("outputs").at("y_tensor_uid").get<int64_t>());
 }
 
 template <>
@@ -358,19 +348,19 @@ auto to<data_objects::BatchnormBackwardAttributes>(flatbuffers::FlatBufferBuilde
     auto& inputs = entry.at("inputs");
     auto& outputs = entry.at("outputs");
 
-    auto peerStats = inputs["peer_stats"].get<std::vector<int64_t>>();
+    auto peerStats = inputs.at("peer_stats_tensor_uid").get<std::vector<int64_t>>();
 
     return data_objects::CreateBatchnormBackwardAttributesDirect(
         builder,
-        inputs.at("dy").get<int64_t>(),
-        inputs.at("x").get<int64_t>(),
-        inputs.at("mean").get<std::optional<int64_t>>(),
-        inputs.at("inv_variance").get<std::optional<int64_t>>(),
-        inputs.at("scale").get<int64_t>(),
+        inputs.at("dy_tensor_uid").get<int64_t>(),
+        inputs.at("x_tensor_uid").get<int64_t>(),
+        inputs.at("mean_tensor_uid").get<std::optional<int64_t>>(),
+        inputs.at("inv_variance_tensor_uid").get<std::optional<int64_t>>(),
+        inputs.at("scale_tensor_uid").get<int64_t>(),
         &peerStats,
-        outputs.at("dx").get<int64_t>(),
-        outputs.at("dscale").get<int64_t>(),
-        outputs.at("dbias").get<int64_t>());
+        outputs.at("dx_tensor_uid").get<int64_t>(),
+        outputs.at("dscale_tensor_uid").get<int64_t>(),
+        outputs.at("dbias_tensor_uid").get<int64_t>());
 }
 
 template <>
@@ -402,23 +392,23 @@ auto to<data_objects::BatchnormAttributes>(flatbuffers::FlatBufferBuilder& build
     auto& inputs = entry.at("inputs");
     auto& outputs = entry.at("outputs");
 
-    auto peerStats = inputs["peer_stats"].get<std::vector<int64_t>>();
+    auto peerStats = inputs.at("peer_stats_tensor_uid").get<std::vector<int64_t>>();
 
     return data_objects::CreateBatchnormAttributesDirect(
         builder,
-        inputs.at("x").get<int64_t>(),
-        inputs.at("scale").get<int64_t>(),
-        inputs.at("bias").get<int64_t>(),
-        inputs.at("epsilon").get<int64_t>(),
+        inputs.at("x_tensor_uid").get<int64_t>(),
+        inputs.at("scale_tensor_uid").get<int64_t>(),
+        inputs.at("bias_tensor_uid").get<int64_t>(),
+        inputs.at("epsilon_tensor_uid").get<int64_t>(),
         &peerStats,
-        inputs.at("prev_running_mean").get<std::optional<int64_t>>(),
-        inputs.at("prev_running_variance").get<std::optional<int64_t>>(),
-        inputs.at("momentum").get<std::optional<int64_t>>(),
-        outputs.at("y").get<int64_t>(),
-        outputs.at("mean").get<std::optional<int64_t>>(),
-        outputs.at("inv_variance").get<std::optional<int64_t>>(),
-        outputs.at("next_running_mean").get<std::optional<int64_t>>(),
-        outputs.at("next_running_variance").get<std::optional<int64_t>>());
+        inputs.at("prev_running_mean_tensor_uid").get<std::optional<int64_t>>(),
+        inputs.at("prev_running_variance_tensor_uid").get<std::optional<int64_t>>(),
+        inputs.at("momentum_tensor_uid").get<std::optional<int64_t>>(),
+        outputs.at("y_tensor_uid").get<int64_t>(),
+        outputs.at("mean_tensor_uid").get<std::optional<int64_t>>(),
+        outputs.at("inv_variance_tensor_uid").get<std::optional<int64_t>>(),
+        outputs.at("next_running_mean_tensor_uid").get<std::optional<int64_t>>(),
+        outputs.at("next_running_variance_tensor_uid").get<std::optional<int64_t>>());
 }
 
 template <>
