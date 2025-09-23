@@ -1,5 +1,6 @@
 #include "batchnorm_backward_attributes_generated.h"
 #include "batchnorm_inference_attributes_generated.h"
+#include "pointwise_attributes_generated.h"
 #include "tensor_attributes_generated.h"
 #include <flatbuffers/flatbuffer_builder.h>
 #include <hip/amd_detail/amd_hip_bfloat16.h>
@@ -105,6 +106,56 @@ NLOHMANN_JSON_SERIALIZE_ENUM(DataType,
 
 )
 
+NLOHMANN_JSON_SERIALIZE_ENUM(PointwiseMode,
+                             {{PointwiseMode::UNSET, "unset"},
+                              {PointwiseMode::ABS, "abs"},
+                              {PointwiseMode::ADD, "add"},
+                              {PointwiseMode::ADD_SQUARE, "add_square"},
+                              {PointwiseMode::BINARY_SELECT, "binary_select"},
+                              {PointwiseMode::CEIL, "ceil"},
+                              {PointwiseMode::CMP_EQ, "cmp_eq"},
+                              {PointwiseMode::CMP_GE, "cmp_ge"},
+                              {PointwiseMode::CMP_GT, "cmp_gt"},
+                              {PointwiseMode::CMP_LE, "cmp_le"},
+                              {PointwiseMode::CMP_LT, "cmp_lt"},
+                              {PointwiseMode::CMP_NEQ, "cmp_neq"},
+                              {PointwiseMode::DIV, "div"},
+                              {PointwiseMode::ELU_BWD, "elu_bwd"},
+                              {PointwiseMode::ELU_FWD, "elu_fwd"},
+                              {PointwiseMode::ERF, "erf"},
+                              {PointwiseMode::EXP, "exp"},
+                              {PointwiseMode::FLOOR, "floor"},
+                              {PointwiseMode::GELU_APPROX_TANH_BWD, "gelu_approx_tanh_bwd"},
+                              {PointwiseMode::GELU_APPROX_TANH_FWD, "gelu_approx_tanh_fwd"},
+                              {PointwiseMode::GELU_BWD, "gelu_bwd"},
+                              {PointwiseMode::GELU_FWD, "gelu_fwd"},
+                              {PointwiseMode::GEN_INDEX, "gen_index"},
+                              {PointwiseMode::IDENTITY, "identity"},
+                              {PointwiseMode::LOG, "log"},
+                              {PointwiseMode::LOGICAL_AND, "logical_and"},
+                              {PointwiseMode::LOGICAL_NOT, "logical_not"},
+                              {PointwiseMode::LOGICAL_OR, "logical_or"},
+                              {PointwiseMode::MAX_OP, "max_op"}, // Max is reserved
+                              {PointwiseMode::MIN_OP, "min_op"}, // Min is reserved
+                              {PointwiseMode::MUL, "mul"},
+                              {PointwiseMode::NEG, "neg"},
+                              {PointwiseMode::RECIPROCAL, "reciprocal"},
+                              {PointwiseMode::RELU_BWD, "relu_bwd"},
+                              {PointwiseMode::RELU_FWD, "relu_fwd"},
+                              {PointwiseMode::RSQRT, "rsqrt"},
+                              {PointwiseMode::SIGMOID_BWD, "sigmoid_bwd"},
+                              {PointwiseMode::SIGMOID_FWD, "sigmoid_fwd"},
+                              {PointwiseMode::SIN, "sin"},
+                              {PointwiseMode::SOFTPLUS_BWD, "softplus_bwd"},
+                              {PointwiseMode::SOFTPLUS_FWD, "softplus_fwd"},
+                              {PointwiseMode::SQRT, "sqrt"},
+                              {PointwiseMode::SUB, "sub"},
+                              {PointwiseMode::SWISH_BWD, "swish_bwd"},
+                              {PointwiseMode::SWISH_FWD, "swish_fwd"},
+                              {PointwiseMode::TAN, "tan"},
+                              {PointwiseMode::TANH_BWD, "tanh_bwd"},
+                              {PointwiseMode::TANH_FWD, "tanh_fwd"}})
+
 // NOLINTNEXTLINE(readability-identifier-naming)
 void to_json(nlohmann::json& tensorAttrJson, data_objects::TensorAttributes const& tensorAttr)
 {
@@ -171,6 +222,23 @@ void to_json(nlohmann::json& batchnormJson, BatchnormAttributes const& bn)
 }
 
 // NOLINTNEXTLINE(readability-identifier-naming)
+void to_json(nlohmann::json& pointwiseJson, PointwiseAttributes const& pw)
+{
+    auto& inputs = pointwiseJson["inputs"] = {};
+
+    inputs["operation"] = pw.operation();
+    inputs["relu_lower_clip"] = pw.relu_lower_clip();
+    inputs["relu_upper_clip"] = pw.relu_upper_clip();
+    inputs["relu_lower_slope"] = pw.relu_lower_slope();
+    inputs["axis_tensor_uid"] = pw.relu_lower_slope();
+    inputs["in_0_tensor_uid"] = pw.in_0_tensor_uid();
+    inputs["in_1_tensor_uid"] = pw.in_1_tensor_uid();
+    inputs["in_2_tensor_uid"] = pw.in_2_tensor_uid();
+
+    pointwiseJson["outputs"]["out_0_tensor_uid"] = pw.out_0_tensor_uid();
+}
+
+// NOLINTNEXTLINE(readability-identifier-naming)
 void to_json(nlohmann::json& nodeJson, data_objects::Node const& node)
 {
     auto type = node.attributes_type();
@@ -185,6 +253,9 @@ void to_json(nlohmann::json& nodeJson, data_objects::Node const& node)
         break;
     case data_objects::NodeAttributes::BatchnormAttributes:
         nodeJson = *node.attributes_as_BatchnormAttributes();
+        break;
+    case data_objects::NodeAttributes::PointwiseAttributes:
+        nodeJson = *node.attributes_as_PointwiseAttributes();
         break;
     default:
         throw std::runtime_error(
@@ -267,14 +338,14 @@ template <>
 auto to<data_objects::BatchnormInferenceAttributes>(flatbuffers::FlatBufferBuilder& builder,
                                                     const nlohmann::json& entry)
 {
-    auto& input = entry["inputs"];
+    auto& inputs = entry["inputs"];
     return data_objects::CreateBatchnormInferenceAttributes(
         builder,
-        input.at("x").get<int64_t>(),
-        optionalValue<int64_t>(input, "mean"),
-        optionalValue<int64_t>(input, "inv_variance"),
-        input.at("scale").get<int64_t>(),
-        input.at("bias").get<int64_t>(),
+        inputs.at("x").get<int64_t>(),
+        inputs.at("mean").get<int64_t>(),
+        inputs.at("inv_variance").get<int64_t>(),
+        inputs.at("scale").get<int64_t>(),
+        inputs.at("bias").get<int64_t>(),
         entry.at("outputs").at("y").get<int64_t>());
 }
 
@@ -299,6 +370,27 @@ auto to<data_objects::BatchnormBackwardAttributes>(flatbuffers::FlatBufferBuilde
         outputs.at("dx").get<int64_t>(),
         outputs.at("dscale").get<int64_t>(),
         outputs.at("dbias").get<int64_t>());
+}
+
+template <>
+auto to<data_objects::PointwiseAttributes>(flatbuffers::FlatBufferBuilder& builder,
+                                           const nlohmann::json& entry)
+{
+    using namespace data_objects;
+    auto& inputs = entry.at("inputs");
+    auto& outputs = entry.at("outputs");
+
+    return data_objects::CreatePointwiseAttributes(
+        builder,
+        inputs.at("operation").get<PointwiseMode>(),
+        inputs.at("relu_lower_clip").get<std::optional<int64_t>>(),
+        inputs.at("relu_upper_clip").get<std::optional<int64_t>>(),
+        inputs.at("relu_lower_slope").get<std::optional<int64_t>>(),
+        inputs.at("axis_tensor_id").get<std::optional<int64_t>>(),
+        inputs.at("in_0_tensor_uid").get<int64_t>(),
+        inputs.at("in_1").get<std::optional<int64_t>>(),
+        inputs.at("in_2").get<std::optional<int64_t>>(),
+        outputs.at("out_0").get<int64_t>());
 }
 
 template <>
