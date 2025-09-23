@@ -218,7 +218,8 @@ TEST_P(IntegrationGpuConvFwdNchwFp32, Correctness)
     runConvTest(4e-6f, TensorLayout::NCHW);
 }
 
-TEST_P(IntegrationGpuConvFwdNcdhwFp32, Correctness)
+// TODO: Enable 5D tests once the reference implementation for 5D is ready
+TEST_P(IntegrationGpuConvFwdNcdhwFp32, DISABLED_Correctness)
 {
     runConvTest(4e-6f, TensorLayout::NCDHW);
 }
@@ -228,7 +229,7 @@ TEST_P(IntegrationGpuConvFwdNchwBfp16, Correctness)
     runConvTest(1e-2_bf, TensorLayout::NCHW);
 }
 
-TEST_P(IntegrationGpuConvFwdNcdhwBfp16, Correctness)
+TEST_P(IntegrationGpuConvFwdNcdhwBfp16, DISABLED_Correctness)
 {
     runConvTest(1e-2_bf, TensorLayout::NCDHW);
 }
@@ -238,7 +239,7 @@ TEST_P(IntegrationGpuConvFwdNchwFp16, Correctness)
     runConvTest(1e-2_h, TensorLayout::NCHW);
 }
 
-TEST_P(IntegrationGpuConvFwdNcdhwFp16, Correctness)
+TEST_P(IntegrationGpuConvFwdNcdhwFp16, DISABLED_Correctness)
 {
     runConvTest(1e-2_h, TensorLayout::NCDHW);
 }
@@ -248,7 +249,7 @@ TEST_P(IntegrationGpuConvFwdNhwcFp32, Correctness)
     runConvTest(4e-6f, TensorLayout::NHWC);
 }
 
-TEST_P(IntegrationGpuConvFwdNdhwcFp32, Correctness)
+TEST_P(IntegrationGpuConvFwdNdhwcFp32, DISABLED_Correctness)
 {
     runConvTest(4e-6f, TensorLayout::NDHWC);
 }
@@ -258,7 +259,7 @@ TEST_P(IntegrationGpuConvFwdNhwcBfp16, Correctness)
     runConvTest(1e-2_bf, TensorLayout::NHWC);
 }
 
-TEST_P(IntegrationGpuConvFwdNdhwcBfp16, Correctness)
+TEST_P(IntegrationGpuConvFwdNdhwcBfp16, DISABLED_Correctness)
 {
     runConvTest(1e-2_bf, TensorLayout::NDHWC);
 }
@@ -268,7 +269,7 @@ TEST_P(IntegrationGpuConvFwdNhwcFp16, Correctness)
     runConvTest(1e-3_h, TensorLayout::NHWC);
 }
 
-TEST_P(IntegrationGpuConvFwdNdhwcFp16, Correctness)
+TEST_P(IntegrationGpuConvFwdNdhwcFp16, DISABLED_Correctness)
 {
     runConvTest(1e-3_h, TensorLayout::NDHWC);
 }
