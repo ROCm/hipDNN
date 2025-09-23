@@ -114,10 +114,6 @@ public:
                                 "ConvolutionDgradNode: dx tensor batch size must match dy "
                                 "tensor batch size");
 
-            // dxDims[1] / wDims[1] is group count
-            // weightChannels = inputChannels / groups
-            // groups = inputChannels / weightChannels
-            auto groupCount = dxDims[1] / wDims[1];
             HIPDNN_RETURN_IF_NE(
                 dxDims[1] % wDims[1],
                 0,
@@ -125,6 +121,10 @@ public:
                 "ConvolutionDgradNode: dx tensor channels must be divisible by weight "
                 "tensor input channels");
 
+            // dxDims[1] / wDims[1] is group count
+            // weightChannels = inputChannels / groups
+            // groups = inputChannels / weightChannels
+            auto groupCount = dxDims[1] / wDims[1];
             HIPDNN_RETURN_IF_NE(
                 wDims[0] % groupCount,
                 0,
@@ -309,30 +309,14 @@ public:
                 ErrorCode::ATTRIBUTE_NOT_SET,
                 "ConvolutionDgradNode: Cannot infer dx strides - missing dy strides");
 
-            HIPDNN_RETURN_IF_TRUE(
-                dxDimsFinal.empty(),
-                ErrorCode::ATTRIBUTE_NOT_SET,
-                "ConvolutionDgradNode: Cannot infer dx strides - missing dx dimensions");
-
             HIPDNN_RETURN_IF_NE(
                 dyStrides.size(),
                 dxDimsFinal.size(),
                 ErrorCode::ATTRIBUTE_NOT_SET,
                 "ConvolutionDgradNode: Stride dimension mismatch between dy and dx tensors");
 
-            std::vector<int64_t> strideOrder(dyStrides.size());
-            std::vector<size_t> indices(dyStrides.size());
-            std::iota(indices.begin(), indices.end(), 0);
-
-            // Sort indices by their corresponding stride values (ascending)
-            std::sort(indices.begin(), indices.end(), [&dyStrides](size_t a, size_t b) {
-                return dyStrides[a] < dyStrides[b];
-            });
-
-            for(size_t i = 0; i < indices.size(); ++i)
-            {
-                strideOrder[indices[i]] = static_cast<int64_t>(i);
-            }
+            // Extract stride order from dy tensor and apply to dx tensor
+            auto strideOrder = hipdnn_sdk::utilities::extractStrideOrder(dyStrides);
 
             // Generate dx strides using the extracted stride order and dx dimensions
             auto dxStrides = hipdnn_sdk::utilities::generateStrides(dxDimsFinal, strideOrder);

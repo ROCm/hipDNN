@@ -986,3 +986,331 @@ TEST(TestConvolutionDgradNode, PreValidateGroupedConvInvalidOutputChannels)
     // wDims[0] % groupCount (63 % 2) will fail
     EXPECT_EQ(error.code, error_code_t::INVALID_VALUE);
 }
+
+TEST(TestConvolutionDgradNode, PreValidateGroupedConv2GroupsWithDxSet)
+{
+    ConvDgradAttributes convAttributes;
+
+    auto dyTensor = std::make_shared<TensorAttributes>();
+    dyTensor->set_dim({1, 64, 32, 32}); // 64 output channels
+    dyTensor->set_stride({65536, 1024, 32, 1});
+    convAttributes.set_dy(dyTensor);
+
+    auto wTensor = std::make_shared<TensorAttributes>();
+    // 64 output channels, 32 input channels per group
+    wTensor->set_dim({64, 32, 3, 3});
+    wTensor->set_stride({288, 9, 3, 1});
+    convAttributes.set_w(wTensor);
+
+    auto dxTensor = std::make_shared<TensorAttributes>();
+    // 64 input channels total, so groups = 64/32 = 2
+    dxTensor->set_dim({1, 64, 32, 32});
+    dxTensor->set_stride({65536, 1024, 32, 1});
+    convAttributes.set_dx(dxTensor);
+
+    convAttributes.set_pre_padding({1, 1});
+    convAttributes.set_post_padding({1, 1});
+    convAttributes.set_stride({1, 1});
+    convAttributes.set_dilation({1, 1});
+
+    GraphAttributes graphAttributes;
+    ConvolutionDgradNode node(std::move(convAttributes), graphAttributes);
+
+    auto error = node.pre_validate_node();
+    EXPECT_EQ(error.code, error_code_t::OK) << error.err_msg;
+}
+
+TEST(TestConvolutionDgradNode, PreValidateGroupedConv4GroupsWithDxSet)
+{
+    ConvDgradAttributes convAttributes;
+
+    auto dyTensor = std::make_shared<TensorAttributes>();
+    dyTensor->set_dim({2, 128, 16, 16}); // 128 output channels
+    dyTensor->set_stride({32768, 256, 16, 1});
+    convAttributes.set_dy(dyTensor);
+
+    auto wTensor = std::make_shared<TensorAttributes>();
+    // 128 output channels, 16 input channels per group
+    wTensor->set_dim({128, 16, 3, 3});
+    wTensor->set_stride({144, 9, 3, 1});
+    convAttributes.set_w(wTensor);
+
+    auto dxTensor = std::make_shared<TensorAttributes>();
+    // 64 input channels total, so groups = 64/16 = 4
+    dxTensor->set_dim({2, 64, 16, 16});
+    dxTensor->set_stride({16384, 256, 16, 1});
+    convAttributes.set_dx(dxTensor);
+
+    convAttributes.set_pre_padding({1, 1});
+    convAttributes.set_post_padding({1, 1});
+    convAttributes.set_stride({1, 1});
+    convAttributes.set_dilation({1, 1});
+
+    GraphAttributes graphAttributes;
+    ConvolutionDgradNode node(std::move(convAttributes), graphAttributes);
+
+    auto error = node.pre_validate_node();
+    EXPECT_EQ(error.code, error_code_t::OK) << error.err_msg;
+}
+
+TEST(TestConvolutionDgradNode, PreValidateGroupedConvInvalidInputChannels)
+{
+    ConvDgradAttributes convAttributes;
+
+    auto dyTensor = std::make_shared<TensorAttributes>();
+    dyTensor->set_dim({1, 64, 32, 32});
+    dyTensor->set_stride({65536, 1024, 32, 1});
+    convAttributes.set_dy(dyTensor);
+
+    auto wTensor = std::make_shared<TensorAttributes>();
+    wTensor->set_dim({64, 32, 3, 3});
+    wTensor->set_stride({288, 9, 3, 1});
+    convAttributes.set_w(wTensor);
+
+    auto dxTensor = std::make_shared<TensorAttributes>();
+    // 63 input channels is not divisible by 32
+    dxTensor->set_dim({1, 63, 32, 32});
+    dxTensor->set_stride({64512, 1024, 32, 1});
+    convAttributes.set_dx(dxTensor);
+
+    convAttributes.set_pre_padding({1, 1});
+    convAttributes.set_post_padding({1, 1});
+    convAttributes.set_stride({1, 1});
+    convAttributes.set_dilation({1, 1});
+
+    GraphAttributes graphAttributes;
+    ConvolutionDgradNode node(std::move(convAttributes), graphAttributes);
+
+    auto error = node.pre_validate_node();
+    EXPECT_EQ(error.code, error_code_t::INVALID_VALUE);
+}
+
+TEST(TestConvolutionDgradNode, InferGroupedConvStrideInferenceNchwLayout)
+{
+    ConvDgradAttributes convAttributes;
+
+    auto dyTensor = std::make_shared<TensorAttributes>();
+    dyTensor->set_dim({1, 128, 32, 32});
+    dyTensor->set_stride({131072, 1024, 32, 1}); // NCHW layout
+    convAttributes.set_dy(dyTensor);
+
+    auto wTensor = std::make_shared<TensorAttributes>();
+    wTensor->set_dim({128, 32, 3, 3});
+    convAttributes.set_w(wTensor);
+
+    auto dxTensor = std::make_shared<TensorAttributes>();
+    // Set dimensions to establish groups = 2
+    dxTensor->set_dim({1, 64, 32, 32});
+    // No stride set - should be inferred
+    convAttributes.set_dx(dxTensor);
+
+    convAttributes.set_pre_padding({1, 1});
+    convAttributes.set_post_padding({1, 1});
+    convAttributes.set_stride({1, 1});
+    convAttributes.set_dilation({1, 1});
+
+    GraphAttributes graphAttributes;
+    ConvolutionDgradNode node(std::move(convAttributes), graphAttributes);
+
+    auto error = node.infer_properties_node();
+    EXPECT_EQ(error.code, error_code_t::OK) << error.err_msg;
+
+    auto inferredStrides = dxTensor->get_stride();
+    EXPECT_EQ(inferredStrides.size(), 4);
+    EXPECT_EQ(inferredStrides[0], 65536); // N stride: 64 * 32 * 32
+    EXPECT_EQ(inferredStrides[1], 1024); // C stride: 32 * 32
+    EXPECT_EQ(inferredStrides[2], 32); // H stride: 32
+    EXPECT_EQ(inferredStrides[3], 1); // W stride: 1
+}
+
+TEST(TestConvolutionDgradNode, InferGroupedConvStrideInferenceNhwcLayout)
+{
+    ConvDgradAttributes convAttributes;
+
+    auto dyTensor = std::make_shared<TensorAttributes>();
+    dyTensor->set_dim({1, 32, 32, 128});
+    dyTensor->set_stride({131072, 4096, 128, 1}); // NHWC layout
+    convAttributes.set_dy(dyTensor);
+
+    auto wTensor = std::make_shared<TensorAttributes>();
+    wTensor->set_dim({128, 32, 3, 3});
+    convAttributes.set_w(wTensor);
+
+    auto dxTensor = std::make_shared<TensorAttributes>();
+    // Set dimensions to establish groups = 2
+    dxTensor->set_dim({1, 32, 32, 64});
+    // No stride set - should be inferred
+    convAttributes.set_dx(dxTensor);
+
+    convAttributes.set_pre_padding({1, 1});
+    convAttributes.set_post_padding({1, 1});
+    convAttributes.set_stride({1, 1});
+    convAttributes.set_dilation({1, 1});
+
+    GraphAttributes graphAttributes;
+    ConvolutionDgradNode node(std::move(convAttributes), graphAttributes);
+
+    auto error = node.infer_properties_node();
+    EXPECT_EQ(error.code, error_code_t::OK) << error.err_msg;
+
+    auto inferredStrides = dxTensor->get_stride();
+    EXPECT_EQ(inferredStrides.size(), 4);
+    EXPECT_EQ(inferredStrides[0], 65536); // N stride: 32 * 32 * 64
+    EXPECT_EQ(inferredStrides[1], 2048); // H stride: 32 * 64
+    EXPECT_EQ(inferredStrides[2], 64); // W stride: 64
+    EXPECT_EQ(inferredStrides[3], 1); // C stride: 1
+}
+
+TEST(TestConvolutionDgradNode, InferGroupedConvWithDilation)
+{
+    ConvDgradAttributes convAttributes;
+
+    auto dyTensor = std::make_shared<TensorAttributes>();
+    dyTensor->set_dim({1, 64, 20, 20});
+    dyTensor->set_stride({25600, 400, 20, 1});
+    convAttributes.set_dy(dyTensor);
+
+    auto wTensor = std::make_shared<TensorAttributes>();
+    // 64 output channels, 16 input channels per group
+    wTensor->set_dim({64, 16, 3, 3});
+    convAttributes.set_w(wTensor);
+
+    auto dxTensor = std::make_shared<TensorAttributes>();
+    // 32 input channels total, so groups = 32/16 = 2
+    dxTensor->set_dim({1, 32, 20, 20});
+    convAttributes.set_dx(dxTensor);
+
+    convAttributes.set_pre_padding({2, 2});
+    convAttributes.set_post_padding({2, 2});
+    convAttributes.set_stride({1, 1});
+    convAttributes.set_dilation({2, 2}); // 2x2 dilation
+
+    GraphAttributes graphAttributes;
+    ConvolutionDgradNode node(std::move(convAttributes), graphAttributes);
+
+    auto error = node.infer_properties_node();
+    EXPECT_EQ(error.code, error_code_t::OK) << error.err_msg;
+
+    auto inferredStrides = dxTensor->get_stride();
+    EXPECT_EQ(inferredStrides.size(), 4);
+    EXPECT_GT(inferredStrides[0], 0);
+    EXPECT_GT(inferredStrides[1], 0);
+    EXPECT_GT(inferredStrides[2], 0);
+    EXPECT_GT(inferredStrides[3], 0);
+}
+
+TEST(TestConvolutionDgradNode, InferGroupedConvWithLargeStride)
+{
+    ConvDgradAttributes convAttributes;
+
+    auto dyTensor = std::make_shared<TensorAttributes>();
+    dyTensor->set_dim({2, 128, 8, 8});
+    dyTensor->set_stride({8192, 64, 8, 1});
+    convAttributes.set_dy(dyTensor);
+
+    auto wTensor = std::make_shared<TensorAttributes>();
+    // 128 output channels, 8 input channels per group
+    wTensor->set_dim({128, 8, 5, 5});
+    convAttributes.set_w(wTensor);
+
+    auto dxTensor = std::make_shared<TensorAttributes>();
+    // 64 input channels total, so groups = 64/8 = 8
+    dxTensor->set_dim({2, 64, 22, 22});
+    convAttributes.set_dx(dxTensor);
+
+    convAttributes.set_pre_padding({2, 2});
+    convAttributes.set_post_padding({2, 2});
+    convAttributes.set_stride({3, 3}); // Large stride
+    convAttributes.set_dilation({1, 1});
+
+    GraphAttributes graphAttributes;
+    ConvolutionDgradNode node(std::move(convAttributes), graphAttributes);
+
+    auto error = node.infer_properties_node();
+    EXPECT_EQ(error.code, error_code_t::OK) << error.err_msg;
+
+    auto inferredStrides = dxTensor->get_stride();
+    EXPECT_EQ(inferredStrides.size(), 4);
+    EXPECT_EQ(inferredStrides[0], 30976); // N stride: 64 * 22 * 22
+    EXPECT_EQ(inferredStrides[1], 484); // C stride: 22 * 22
+    EXPECT_EQ(inferredStrides[2], 22); // H stride: 22
+    EXPECT_EQ(inferredStrides[3], 1); // W stride: 1
+}
+
+TEST(TestConvolutionDgradNode, InferGroupedConv3D)
+{
+    ConvDgradAttributes convAttributes;
+
+    auto dyTensor = std::make_shared<TensorAttributes>();
+    dyTensor->set_dim({2, 64, 8, 16, 16});
+    dyTensor->set_stride({131072, 2048, 256, 16, 1});
+    convAttributes.set_dy(dyTensor);
+
+    auto wTensor = std::make_shared<TensorAttributes>();
+    // 64 output channels, 8 input channels per group
+    wTensor->set_dim({64, 8, 3, 3, 3});
+    convAttributes.set_w(wTensor);
+
+    auto dxTensor = std::make_shared<TensorAttributes>();
+    // 32 input channels total, so groups = 32/8 = 4
+    dxTensor->set_dim({2, 32, 8, 16, 16});
+    convAttributes.set_dx(dxTensor);
+
+    convAttributes.set_pre_padding({1, 1, 1});
+    convAttributes.set_post_padding({1, 1, 1});
+    convAttributes.set_stride({1, 1, 1});
+    convAttributes.set_dilation({1, 1, 1});
+
+    GraphAttributes graphAttributes;
+    ConvolutionDgradNode node(std::move(convAttributes), graphAttributes);
+
+    auto error = node.infer_properties_node();
+    EXPECT_EQ(error.code, error_code_t::OK) << error.err_msg;
+
+    auto inferredStrides = dxTensor->get_stride();
+    EXPECT_EQ(inferredStrides.size(), 5);
+    EXPECT_EQ(inferredStrides[0], 65536); // N stride: 32 * 8 * 16 * 16
+    EXPECT_EQ(inferredStrides[1], 2048); // C stride: 8 * 16 * 16
+    EXPECT_EQ(inferredStrides[2], 256); // D stride: 16 * 16
+    EXPECT_EQ(inferredStrides[3], 16); // H stride: 16
+    EXPECT_EQ(inferredStrides[4], 1); // W stride: 1
+}
+
+TEST(TestConvolutionDgradNode, InferGroupedConvDepthwiseSeparable)
+{
+    ConvDgradAttributes convAttributes;
+
+    auto dyTensor = std::make_shared<TensorAttributes>();
+    dyTensor->set_dim({1, 32, 112, 112}); // 32 output channels
+    dyTensor->set_stride({401408, 12544, 112, 1});
+    convAttributes.set_dy(dyTensor);
+
+    auto wTensor = std::make_shared<TensorAttributes>();
+    // Depthwise: 32 output channels, 1 input channel per group (32 groups)
+    wTensor->set_dim({32, 1, 3, 3});
+    wTensor->set_stride({9, 9, 3, 1});
+    convAttributes.set_w(wTensor);
+
+    auto dxTensor = std::make_shared<TensorAttributes>();
+    // 32 input channels total, so groups = 32/1 = 32
+    dxTensor->set_dim({1, 32, 112, 112});
+    convAttributes.set_dx(dxTensor);
+
+    convAttributes.set_pre_padding({1, 1});
+    convAttributes.set_post_padding({1, 1});
+    convAttributes.set_stride({1, 1});
+    convAttributes.set_dilation({1, 1});
+
+    GraphAttributes graphAttributes;
+    ConvolutionDgradNode node(std::move(convAttributes), graphAttributes);
+
+    auto error = node.infer_properties_node();
+    EXPECT_EQ(error.code, error_code_t::OK) << error.err_msg;
+
+    auto inferredStrides = dxTensor->get_stride();
+    EXPECT_EQ(inferredStrides.size(), 4);
+    EXPECT_EQ(inferredStrides[0], 401408); // N stride
+    EXPECT_EQ(inferredStrides[1], 12544); // C stride
+    EXPECT_EQ(inferredStrides[2], 112); // H stride
+    EXPECT_EQ(inferredStrides[3], 1); // W stride
+}
