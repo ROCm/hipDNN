@@ -67,9 +67,9 @@ inline std::vector<Batchnorm2dTestCase> getBatchnorm2dTestCases()
 {
     unsigned int seed = std::random_device{}();
 
-    return {
-        {.n = 1, .c = 3, .h = 14, .w = 14, .seed = seed},
-        {.n = 2, .c = 3, .h = 14, .w = 14, .seed = seed},
+    return std::vector<Batchnorm2dTestCase>{
+        {1, 3, 14, 14, seed},
+        {2, 3, 14, 14, seed},
     };
 }
 

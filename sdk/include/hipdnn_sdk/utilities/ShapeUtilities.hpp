@@ -64,7 +64,7 @@ inline std::vector<int64_t> generateStrides(const std::vector<int64_t>& dim,
     // Create a mapping of stride order to dimension index
     std::vector<size_t> indices(numDims);
     std::iota(indices.begin(), indices.end(), 0);
-    std::ranges::sort(indices.begin(), indices.end(), [&strideOrder](size_t a, size_t b) {
+    std::sort(indices.begin(), indices.end(), [&strideOrder](size_t a, size_t b) {
         return strideOrder[a] < strideOrder[b];
     });
 

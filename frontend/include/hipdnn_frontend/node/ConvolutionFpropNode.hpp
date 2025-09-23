@@ -343,7 +343,7 @@ public:
             std::iota(indices.begin(), indices.end(), 0);
 
             // Sort indices by their corresponding stride values (ascending)
-            std::ranges::sort(indices.begin(), indices.end(), [&xStrides](size_t a, size_t b) {
+            std::sort(indices.begin(), indices.end(), [&xStrides](size_t a, size_t b) {
                 return xStrides[a] < xStrides[b];
             });
 
