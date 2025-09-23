@@ -141,7 +141,7 @@ inline std::vector<int64_t> extractStrideOrder(const std::vector<int64_t>& strid
 
     return strideOrder;
 }
-  
+
 // Gets the derived (per channel) shape from a full Tensor shape.
 // Ex. {1, 3, 224, 224} will return {1, 3, 1, 1}
 inline std::vector<int64_t> getDerivedShape(const std::vector<int64_t>& shape)
