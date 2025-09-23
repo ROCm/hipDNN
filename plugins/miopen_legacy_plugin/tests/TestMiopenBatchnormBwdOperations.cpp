@@ -18,10 +18,12 @@
 
 #include "HipdnnEnginePluginExecutionContext.hpp"
 #include "HipdnnEnginePluginHandle.hpp"
-#include "common/TestOperationsCommon.hpp"
+#include "common/BatchnormCommon.hpp"
+#include "common/Helpers.hpp"
 
 using namespace hipdnn_sdk::test_utilities;
-using namespace test_operations_common;
+using namespace test_bn_common;
+using namespace test_helpers;
 
 template <typename InputType, typename IntermediateType>
 class BatchnormBwdExecuteGraphBase : public ::testing::TestWithParam<Batchnorm2dTestCase>
@@ -45,7 +47,8 @@ protected:
     {
         if(_handle != nullptr)
         {
-            hipdnnEnginePluginDestroy(_handle);
+            hipdnnPluginStatus_t status = hipdnnEnginePluginDestroy(_handle);
+            ASSERT_EQ(status, HIPDNN_PLUGIN_STATUS_SUCCESS);
         }
     }
 
@@ -115,23 +118,25 @@ protected:
         engineConfig.ptr = engineConfigBuilder.GetBufferPointer();
         engineConfig.size = engineConfigBuilder.GetSize();
 
+        hipdnnPluginStatus_t status;
         hipdnnEnginePluginExecutionContext_t executionContext;
-        hipdnnEnginePluginCreateExecutionContext(
+        status = hipdnnEnginePluginCreateExecutionContext(
             _handle, &engineConfig, &opGraph, &executionContext);
+        ASSERT_EQ(status, HIPDNN_PLUGIN_STATUS_SUCCESS);
 
-        hipdnnPluginStatus_t status
-            = hipdnnEnginePluginExecuteOpGraph(_handle,
-                                               executionContext,
-                                               nullptr,
-                                               deviceBuffers.data(),
-                                               static_cast<uint32_t>(deviceBuffers.size()));
-        EXPECT_EQ(status, HIPDNN_PLUGIN_STATUS_SUCCESS);
+        status = hipdnnEnginePluginExecuteOpGraph(_handle,
+                                                  executionContext,
+                                                  nullptr,
+                                                  deviceBuffers.data(),
+                                                  static_cast<uint32_t>(deviceBuffers.size()));
+        ASSERT_EQ(status, HIPDNN_PLUGIN_STATUS_SUCCESS);
 
         dxTensor.memory().markDeviceModified();
         dscaleTensor.memory().markDeviceModified();
         dbiasTensor.memory().markDeviceModified();
 
-        hipdnnEnginePluginDestroyExecutionContext(_handle, executionContext);
+        status = hipdnnEnginePluginDestroyExecutionContext(_handle, executionContext);
+        ASSERT_EQ(status, HIPDNN_PLUGIN_STATUS_SUCCESS);
 
         Tensor<InputType> xTensorCpu(dims, _layout);
         xTensorCpu.fillWithRandomValues(

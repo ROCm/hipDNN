@@ -9,15 +9,15 @@
 namespace miopen_legacy_plugin
 {
 
-class MiopenBatchnormPlanBuilder : public IPlanBuilder
+class MiopenConvPlanBuilder : public IPlanBuilder
 {
 public:
-    MiopenBatchnormPlanBuilder() = default;
-    ~MiopenBatchnormPlanBuilder() override = default;
+    MiopenConvPlanBuilder() = default;
+    ~MiopenConvPlanBuilder() override = default;
 
     // Disallow copy and assignment
-    MiopenBatchnormPlanBuilder(const MiopenBatchnormPlanBuilder&) = delete;
-    MiopenBatchnormPlanBuilder& operator=(const MiopenBatchnormPlanBuilder&) = delete;
+    MiopenConvPlanBuilder(const MiopenConvPlanBuilder&) = delete;
+    MiopenConvPlanBuilder& operator=(const MiopenConvPlanBuilder&) = delete;
 
     bool isApplicable(const HipdnnEnginePluginHandle& handle,
                       const hipdnn_plugin::IGraph& opGraph) const override;
