@@ -9,7 +9,7 @@
 #include <gtest/gtest.h>
 
 #include <hipdnn_sdk/test_utilities/TestUtilities.hpp>
-#include <hipdnn_sdk/utilities/Json.hpp>
+#include <hipdnn_sdk/utilities/json/Graph.hpp>
 #include <spdlog/fmt/bundled/format.h>
 
 using namespace hipdnn_sdk::data_objects;
