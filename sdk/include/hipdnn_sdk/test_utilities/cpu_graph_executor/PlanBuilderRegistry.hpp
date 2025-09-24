@@ -13,13 +13,13 @@
 namespace hipdnn_sdk::test_utilities
 {
 
-inline std::unordered_map<std::shared_ptr<BaseSigKey>,
+inline std::unordered_map<std::unique_ptr<BaseSigKey>,
                           std::unique_ptr<IGraphNodePlanBuilder>,
                           BaseSigKeyHash,
                           BaseSigKeyEqual>&
     planBuilderRegistry()
 {
-    static std::unordered_map<std::shared_ptr<BaseSigKey>,
+    static std::unordered_map<std::unique_ptr<BaseSigKey>,
                               std::unique_ptr<IGraphNodePlanBuilder>,
                               BaseSigKeyHash,
                               BaseSigKeyEqual>
@@ -27,11 +27,11 @@ inline std::unordered_map<std::shared_ptr<BaseSigKey>,
     return registry;
 }
 
-//TODO FIX DOCUMENTATION FOR THIS.
+// //TODO FIX DOCUMENTATION FOR THIS.
 template <std::size_t... Is>
 void registerBatchnormFwdInferencePlanBuilders(std::index_sequence<Is...>)
 {
-    ((planBuilderRegistry()[std::make_shared<BatchnormSignatureRegistryKey>(
+    ((planBuilderRegistry()[std::make_unique<BatchnormSignatureRegistryKey>(
           ALL_SUPPORTED_BATCHNORM_SIGNATURES[Is])]
       = std::make_unique<
           BatchnormFwdInferencePlanBuilder<ALL_SUPPORTED_BATCHNORM_SIGNATURES[Is]>>()),

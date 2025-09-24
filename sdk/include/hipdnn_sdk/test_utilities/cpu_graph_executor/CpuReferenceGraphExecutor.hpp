@@ -61,7 +61,7 @@ public:
         return planBuilder->buildNodePlan(graph, node);
     }
 
-    static std::shared_ptr<BaseSigKey> buildSignatureKey(
+    static std::unique_ptr<BaseSigKey> buildSignatureKey(
         const hipdnn_sdk::data_objects::Node& node,
         const std::unordered_map<int64_t, const hipdnn_sdk::data_objects::TensorAttributes*>&
             tensorMap)
@@ -73,7 +73,7 @@ public:
         auto scaleTensorAttr = tensorMap.at(nodeAttributes->scale_tensor_uid());
         auto meanTensorAttr = tensorMap.at(nodeAttributes->mean_tensor_uid());
 
-        return std::make_shared<BatchnormSignatureRegistryKey>(
+        return std::make_unique<BatchnormSignatureRegistryKey>(
             xTensorAttr->data_type(), scaleTensorAttr->data_type(), meanTensorAttr->data_type());
     }
 };

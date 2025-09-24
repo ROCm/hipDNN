@@ -22,7 +22,7 @@ struct BaseSigKey
 
 struct BaseSigKeyHash
 {
-    std::size_t operator()(const std::shared_ptr<BaseSigKey> k) const
+    std::size_t operator()(const std::unique_ptr<BaseSigKey>& k) const
     {
         return k->hash_self();
     }
@@ -30,8 +30,8 @@ struct BaseSigKeyHash
 
 struct BaseSigKeyEqual
 {
-    bool operator()(const std::shared_ptr<BaseSigKey> lhs,
-                    const std::shared_ptr<BaseSigKey> rhs) const
+    bool operator()(const std::unique_ptr<BaseSigKey>& lhs,
+                    const std::unique_ptr<BaseSigKey>& rhs) const
     {
         return lhs->equal(*rhs);
     }
