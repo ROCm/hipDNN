@@ -319,7 +319,7 @@ INSTANTIATE_TEST_SUITE_P(
     // Provide a custom name for each test instance
     [](const ::testing::TestParamInfo<IntegrationTestCase>& info) {
         std::string name = info.param.description;
-        std::transform(name.begin(), name.end(), name.begin(), [](char c) {
+        std::transform(name.cbegin(), name.cend(), name.begin(), [](char c) {
             return std::isalnum(static_cast<unsigned char>(c)) ? c : '_';
         });
         return name;
