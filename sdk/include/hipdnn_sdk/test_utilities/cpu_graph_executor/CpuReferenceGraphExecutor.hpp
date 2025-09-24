@@ -61,20 +61,37 @@ public:
         return planBuilder->buildNodePlan(graph, node);
     }
 
-    static std::shared_ptr<BaseSigKey> buildSignatureKey(
+    static SignatureKey buildSignatureKey(
         const hipdnn_sdk::data_objects::Node& node,
         const std::unordered_map<int64_t, const hipdnn_sdk::data_objects::TensorAttributes*>&
             tensorMap)
     {
-        //todo switch on the node type .....
-        const auto* nodeAttributes = node.attributes_as_BatchnormInferenceAttributes();
+        switch(node.attributes_type())
+        {
+        case hipdnn_sdk::data_objects::NodeAttributes::BatchnormInferenceAttributes:
+            return createBatchnormFwdInferenceSignatureKey(node, tensorMap);
+            break;
+        case hipdnn_sdk::data_objects::NodeAttributes::PointwiseAttributes:
+        case hipdnn_sdk::data_objects::NodeAttributes::BatchnormBackwardAttributes:
+        case hipdnn_sdk::data_objects::NodeAttributes::BatchnormAttributes:
+        case hipdnn_sdk::data_objects::NodeAttributes::ConvolutionFwdAttributes:
+        default:
+            throw std::runtime_error("Unsupported node type for signature key generation");
+        }
+    }
 
+    static SignatureKey createBatchnormFwdInferenceSignatureKey(
+        const hipdnn_sdk::data_objects::Node& node,
+        const std::unordered_map<int64_t, const hipdnn_sdk::data_objects::TensorAttributes*>&
+            tensorMap)
+    {
+        const auto* nodeAttributes = node.attributes_as_BatchnormInferenceAttributes();
         auto xTensorAttr = tensorMap.at(nodeAttributes->x_tensor_uid());
         auto scaleTensorAttr = tensorMap.at(nodeAttributes->scale_tensor_uid());
         auto meanTensorAttr = tensorMap.at(nodeAttributes->mean_tensor_uid());
 
-        return std::make_shared<BatchnormSignatureRegistryKey>(
-            xTensorAttr->data_type(), scaleTensorAttr->data_type(), meanTensorAttr->data_type());
+        return BatchnormSignatureRegistryKey{
+            xTensorAttr->data_type(), scaleTensorAttr->data_type(), meanTensorAttr->data_type()};
     }
 };
 }
