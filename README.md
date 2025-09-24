@@ -1,7 +1,7 @@
 # hipDNN
 
 > [!CAUTION]
-> **hipDNN is in the early stages of development. There is currently limited functionality available to solve problems. See [Operation Support](./docs/OperationSupport.md) for reference.**
+> The hipDNN repository is retired, please use the [ROCm/rocm-libraries](https://github.com/ROCm/rocm-libraries) repository
 
 ## Overview
 
