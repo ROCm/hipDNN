@@ -1689,7 +1689,7 @@ TEST_F(TestGraph, ExecutePacksVariantPackAndPassesTheCorrectArguments)
             auto keys = static_cast<const int64_t*>(ptr);
             for(int i = 0; i < 4; i++)
             {
-                EXPECT_TRUE(variantPack.contains(keys[i]));
+                EXPECT_TRUE(variantPack.find(keys[i]) != variantPack.end());
             }
             return HIPDNN_STATUS_SUCCESS;
         }));

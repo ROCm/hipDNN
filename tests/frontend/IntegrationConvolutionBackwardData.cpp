@@ -304,10 +304,12 @@ INSTANTIATE_TEST_SUITE_P(
                             "NoEnginesPluginConvBackwardDataTest",
                             FailurePoint::CREATE_EXECUTION_PLAN,
                             true}),
-    // Provide a custom name for each test instance
+    // Provide a custom name for each test instance (C++17 compatible)
     [](const ::testing::TestParamInfo<IntegrationTestCase>& info) {
         std::string name = info.param.description;
-        std::ranges::replace_if(name, [](char c) { return !std::isalnum(c); }, '_');
+        std::transform(name.cbegin(), name.cend(), name.begin(), [](char c) {
+            return std::isalnum(static_cast<unsigned char>(c)) ? c : '_';
+        });
         return name;
     });
 

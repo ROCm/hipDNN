@@ -108,7 +108,7 @@ private:
         int requiredCount = 1;
         std::vector<std::unique_ptr<ScopedHipdnnBackendDescriptor>> engineConfigs;
         std::vector<hipdnnBackendDescriptor_t> engineConfigsShallow;
-        for(size_t i = 0; std::cmp_less(i, requiredCount); ++i)
+        for(size_t i = 0; i < static_cast<size_t>(requiredCount); ++i)
         {
             auto engineCfgDesc = std::make_unique<ScopedHipdnnBackendDescriptor>(
                 HIPDNN_BACKEND_ENGINECFG_DESCRIPTOR);
