@@ -25,7 +25,7 @@ TEST(TestTensorVariantUtils, CreateHostOnlyShallowTensorVariantFloat)
     auto* attr = flatbuffers::GetRoot<TensorAttributes>(builder.GetBufferPointer());
 
     std::array<float, 48> backing = {0};
-    auto variant = TensorVariantUtils::createHostOnlyShallowTensorVariant(*attr, backing.data());
+    auto variant = createHostOnlyShallowTensorVariant(*attr, backing.data());
     ASSERT_TRUE(std::holds_alternative<std::unique_ptr<TensorBase<float>>>(variant));
     auto& t = *std::get<std::unique_ptr<TensorBase<float>>>(variant);
     EXPECT_EQ(t.dims(), dims);
@@ -44,7 +44,7 @@ TEST(TestTensorVariantUtils, CreateHostOnlyShallowTensorVariantHalf)
     auto* attr = flatbuffers::GetRoot<TensorAttributes>(builder.GetBufferPointer());
 
     std::array<half, 2> backing = {};
-    auto variant = TensorVariantUtils::createHostOnlyShallowTensorVariant(*attr, backing.data());
+    auto variant = createHostOnlyShallowTensorVariant(*attr, backing.data());
     EXPECT_TRUE(std::holds_alternative<std::unique_ptr<TensorBase<half>>>(variant));
     auto& ptr = *std::get<std::unique_ptr<TensorBase<half>>>(variant);
     EXPECT_EQ(ptr.dims(), dims);
@@ -63,8 +63,7 @@ TEST(TestTensorVariantUtils, UnsupportedDataTypeThrows)
     auto* attr = flatbuffers::GetRoot<TensorAttributes>(builder.GetBufferPointer());
 
     std::array<int, 1> dummy = {0};
-    EXPECT_THROW(TensorVariantUtils::createHostOnlyShallowTensorVariant(*attr, dummy.data()),
-                 std::runtime_error);
+    EXPECT_THROW(createHostOnlyShallowTensorVariant(*attr, dummy.data()), std::runtime_error);
 }
 
 TEST(TestTensorVariantUtils, CreateWithEmptyDimsAndStrides)
@@ -78,7 +77,7 @@ TEST(TestTensorVariantUtils, CreateWithEmptyDimsAndStrides)
     auto* attr = flatbuffers::GetRoot<TensorAttributes>(builder.GetBufferPointer());
 
     float backing = 0;
-    auto variant = TensorVariantUtils::createHostOnlyShallowTensorVariant(*attr, &backing);
+    auto variant = createHostOnlyShallowTensorVariant(*attr, &backing);
     ASSERT_TRUE(std::holds_alternative<std::unique_ptr<TensorBase<float>>>(variant));
     auto& t = *std::get<std::unique_ptr<TensorBase<float>>>(variant);
     EXPECT_TRUE(t.dims().empty());
