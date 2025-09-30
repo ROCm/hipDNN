@@ -10,40 +10,39 @@
 namespace hipdnn_sdk::test_utilities
 {
 
-struct BatchnormFwdInferenceSignatureKey
+struct BatchnormTrainSignatureKey
 {
     const hipdnn_sdk::data_objects::NodeAttributes nodeType
-        = hipdnn_sdk::data_objects::NodeAttributes::BatchnormInferenceAttributes;
+        = hipdnn_sdk::data_objects::NodeAttributes::BatchnormAttributes;
     hipdnn_sdk::data_objects::DataType inputDataType;
     hipdnn_sdk::data_objects::DataType scaleBiasDataType;
     hipdnn_sdk::data_objects::DataType meanVarianceDataType;
 
-    constexpr BatchnormFwdInferenceSignatureKey(hipdnn_sdk::data_objects::DataType input,
-                                                hipdnn_sdk::data_objects::DataType scaleBias,
-                                                hipdnn_sdk::data_objects::DataType meanVariance)
+    constexpr BatchnormTrainSignatureKey(hipdnn_sdk::data_objects::DataType input,
+                                         hipdnn_sdk::data_objects::DataType scaleBias,
+                                         hipdnn_sdk::data_objects::DataType meanVariance)
         : inputDataType(input)
         , scaleBiasDataType(scaleBias)
         , meanVarianceDataType(meanVariance)
     {
     }
 
-    BatchnormFwdInferenceSignatureKey(
+    BatchnormTrainSignatureKey(
         const hipdnn_sdk::data_objects::Node& node,
         const std::unordered_map<int64_t, const hipdnn_sdk::data_objects::TensorAttributes*>&
             tensorMap)
     {
-        const auto* nodeAttributes = node.attributes_as_BatchnormInferenceAttributes();
+        const auto* nodeAttributes = node.attributes_as_BatchnormAttributes();
         if(nodeAttributes == nullptr)
         {
-            throw std::runtime_error(
-                "Node attributes could not be cast to BatchnormInferenceAttributes");
+            throw std::runtime_error("Node attributes could not be cast to BatchnormAttributes");
         }
 
         auto xTensorAttr = tensorMap.at(nodeAttributes->x_tensor_uid());
+        auto meanTensorAttr = tensorMap.at(nodeAttributes->mean_tensor_uid().value());
         auto scaleTensorAttr = tensorMap.at(nodeAttributes->scale_tensor_uid());
-        auto meanTensorAttr = tensorMap.at(nodeAttributes->mean_tensor_uid());
 
-        if(xTensorAttr == nullptr || scaleTensorAttr == nullptr || meanTensorAttr == nullptr)
+        if(xTensorAttr == nullptr || meanTensorAttr == nullptr || scaleTensorAttr == nullptr)
         {
             throw std::runtime_error("One or more tensor attributes could not be found in the map, "
                                      "failed to construct key");
@@ -62,12 +61,11 @@ struct BatchnormFwdInferenceSignatureKey
                ^ (static_cast<std::size_t>(static_cast<int>(meanVarianceDataType)) << 12);
     }
 
-    bool operator==(const BatchnormFwdInferenceSignatureKey& other) const noexcept
+    bool operator==(const BatchnormTrainSignatureKey& other) const noexcept
     {
         return nodeType == other.nodeType && inputDataType == other.inputDataType
                && scaleBiasDataType == other.scaleBiasDataType
                && meanVarianceDataType == other.meanVarianceDataType;
     }
 };
-
 }
