@@ -7,60 +7,60 @@
 #include <hipdnn_sdk/utilities/ScopedResource.hpp>
 
 #include "HipdnnEnginePluginHandle.hpp"
-#include "MiopenConvFwdPlan.hpp"
+#include "MiopenConvBwdPlan.hpp"
 #include "MiopenUtils.hpp"
 
 namespace miopen_legacy_plugin
 {
 
-ConvFwdParams::ConvFwdParams(
-    const hipdnn_sdk::data_objects::ConvolutionFwdAttributes& attributes,
+ConvBwdParams::ConvBwdParams(
+    const hipdnn_sdk::data_objects::ConvolutionBwdAttributes& attributes,
     const std::unordered_map<int64_t, const hipdnn_sdk::data_objects::TensorAttributes*>& tensorMap)
     : _spatialDimCount(miopen_utils::getSpatialDimCount(
-          miopen_utils::findTensorAttributes(tensorMap, attributes.x_tensor_uid())))
-    , _x(miopen_utils::createTensor(tensorMap, attributes.x_tensor_uid()))
+          miopen_utils::findTensorAttributes(tensorMap, attributes.dx_tensor_uid())))
+    , _dx(miopen_utils::createTensor(tensorMap, attributes.dx_tensor_uid()))
     , _w(miopen_utils::createTensor(tensorMap, attributes.w_tensor_uid()))
-    , _y(miopen_utils::createTensor(tensorMap, attributes.y_tensor_uid()))
+    , _dy(miopen_utils::createTensor(tensorMap, attributes.dy_tensor_uid()))
     , _conv(_spatialDimCount, attributes)
 {
 }
 
-const MiopenTensor& ConvFwdParams::x() const
+const MiopenTensor& ConvBwdParams::dx() const
 {
-    return _x;
+    return _dx;
 }
 
-const MiopenTensor& ConvFwdParams::w() const
+const MiopenTensor& ConvBwdParams::w() const
 {
     return _w;
 }
 
-const MiopenTensor& ConvFwdParams::y() const
+const MiopenTensor& ConvBwdParams::dy() const
 {
-    return _y;
+    return _dy;
 }
 
-const MiopenConvDescriptor& ConvFwdParams::conv() const
+const MiopenConvDescriptor& ConvBwdParams::conv() const
 {
     return _conv;
 }
 
-ConvFwdPlan::ConvFwdPlan(const HipdnnEnginePluginHandle& handle, ConvFwdParams&& params)
+ConvBwdPlan::ConvBwdPlan(const HipdnnEnginePluginHandle& handle, ConvBwdParams&& params)
     : _params(std::move(params))
 {
     // MIOpen Find 2.0 API
     miopenProblem_t problem;
     THROW_ON_MIOPEN_FAILURE(miopenCreateConvProblem(
-        &problem, _params.conv().convDescriptor(), miopenProblemDirectionForward));
+        &problem, _params.conv().convDescriptor(), miopenProblemDirectionBackward));
     hipdnn_sdk::utilities::ScopedResource problemRes(
         problem, [](miopenProblem_t p) { std::ignore = miopenDestroyProblem(p); });
 
     THROW_ON_MIOPEN_FAILURE(miopenSetProblemTensorDescriptor(
-        problem, miopenTensorConvolutionX, _params.x().tensorDescriptor()));
+        problem, miopenTensorConvolutionX, _params.dx().tensorDescriptor()));
     THROW_ON_MIOPEN_FAILURE(miopenSetProblemTensorDescriptor(
         problem, miopenTensorConvolutionW, _params.w().tensorDescriptor()));
     THROW_ON_MIOPEN_FAILURE(miopenSetProblemTensorDescriptor(
-        problem, miopenTensorConvolutionY, _params.y().tensorDescriptor()));
+        problem, miopenTensorConvolutionY, _params.dy().tensorDescriptor()));
 
     size_t numSolutions;
     miopenSolution_t solution = nullptr;
@@ -86,11 +86,10 @@ ConvFwdPlan::ConvFwdPlan(const HipdnnEnginePluginHandle& handle, ConvFwdParams&&
                                                    "miopenFindSolutions returned no solutions");
     }
 
-    // Get workspace size
     THROW_ON_MIOPEN_FAILURE(miopenGetSolutionWorkspaceSize(_solution.get(), &_workspaceSize));
 }
 
-ConvFwdPlan::ConvFwdPlan(ConvFwdPlan&& other) noexcept
+ConvBwdPlan::ConvBwdPlan(ConvBwdPlan&& other) noexcept
     : _params(std::move(other._params))
     , _solution(std::move(other._solution))
     , _workspaceSize(other._workspaceSize)
@@ -98,7 +97,7 @@ ConvFwdPlan::ConvFwdPlan(ConvFwdPlan&& other) noexcept
     other._workspaceSize = 0;
 }
 
-ConvFwdPlan& ConvFwdPlan::operator=(ConvFwdPlan&& other) noexcept
+ConvBwdPlan& ConvBwdPlan::operator=(ConvBwdPlan&& other) noexcept
 {
     if(this != &other)
     {
@@ -110,31 +109,31 @@ ConvFwdPlan& ConvFwdPlan::operator=(ConvFwdPlan&& other) noexcept
     return *this;
 }
 
-size_t ConvFwdPlan::getWorkspaceSize([[maybe_unused]] const HipdnnEnginePluginHandle& handle) const
+size_t ConvBwdPlan::getWorkspaceSize([[maybe_unused]] const HipdnnEnginePluginHandle& handle) const
 {
     return _workspaceSize;
 }
 
-void ConvFwdPlan::execute(const HipdnnEnginePluginHandle& handle,
+void ConvBwdPlan::execute(const HipdnnEnginePluginHandle& handle,
                           const hipdnnPluginDeviceBuffer_t* deviceBuffers,
                           uint32_t numDeviceBuffers,
                           void* workspace) const
 {
-    auto xDesc = _params.x().tensorDescriptor();
+    auto dxDesc = _params.dx().tensorDescriptor();
     auto wDesc = _params.w().tensorDescriptor();
-    auto yDesc = _params.y().tensorDescriptor();
+    auto dyDesc = _params.dy().tensorDescriptor();
 
     auto xBuffer
-        = miopen_utils::findDeviceBuffer(_params.x().uid(), deviceBuffers, numDeviceBuffers);
+        = miopen_utils::findDeviceBuffer(_params.dx().uid(), deviceBuffers, numDeviceBuffers);
     auto wBuffer
         = miopen_utils::findDeviceBuffer(_params.w().uid(), deviceBuffers, numDeviceBuffers);
     auto yBuffer
-        = miopen_utils::findDeviceBuffer(_params.y().uid(), deviceBuffers, numDeviceBuffers);
+        = miopen_utils::findDeviceBuffer(_params.dy().uid(), deviceBuffers, numDeviceBuffers);
 
     std::array<miopenTensorArgument_t, 3> tensors
-        = {miopenTensorArgument_t{miopenTensorConvolutionX, &xDesc, xBuffer.ptr},
+        = {miopenTensorArgument_t{miopenTensorConvolutionX, &dxDesc, xBuffer.ptr},
            miopenTensorArgument_t{miopenTensorConvolutionW, &wDesc, wBuffer.ptr},
-           miopenTensorArgument_t{miopenTensorConvolutionY, &yDesc, yBuffer.ptr}};
+           miopenTensorArgument_t{miopenTensorConvolutionY, &dyDesc, yBuffer.ptr}};
 
     size_t workspaceSize = 0;
     if(workspace != nullptr)

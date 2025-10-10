@@ -5,7 +5,7 @@
 
 #include <memory>
 
-#include <hipdnn_sdk/data_objects/convolution_fwd_attributes_generated.h>
+#include <hipdnn_sdk/data_objects/convolution_bwd_attributes_generated.h>
 #include <hipdnn_sdk/data_objects/tensor_attributes_generated.h>
 #include <hipdnn_sdk/utilities/ScopedResource.hpp>
 #include <miopen/miopen.h>
@@ -17,44 +17,44 @@
 namespace miopen_legacy_plugin
 {
 
-class ConvFwdParams
+class ConvBwdParams
 {
 public:
-    ConvFwdParams(
-        const hipdnn_sdk::data_objects::ConvolutionFwdAttributes& attributes,
+    ConvBwdParams(
+        const hipdnn_sdk::data_objects::ConvolutionBwdAttributes& attributes,
         const std::unordered_map<int64_t, const hipdnn_sdk::data_objects::TensorAttributes*>&
             tensorMap);
 
-    ConvFwdParams(const ConvFwdParams&) = delete;
-    ConvFwdParams& operator=(const ConvFwdParams&) = delete;
+    ConvBwdParams(const ConvBwdParams&) = delete;
+    ConvBwdParams& operator=(const ConvBwdParams&) = delete;
 
-    ConvFwdParams(ConvFwdParams&&) = default;
-    ConvFwdParams& operator=(ConvFwdParams&&) = default;
+    ConvBwdParams(ConvBwdParams&&) = default;
+    ConvBwdParams& operator=(ConvBwdParams&&) = default;
 
-    const MiopenTensor& x() const;
+    const MiopenTensor& dx() const;
     const MiopenTensor& w() const;
-    const MiopenTensor& y() const;
+    const MiopenTensor& dy() const;
     const MiopenConvDescriptor& conv() const;
 
 private:
     size_t _spatialDimCount;
-    MiopenTensor _x;
+    MiopenTensor _dx;
     MiopenTensor _w;
-    MiopenTensor _y;
+    MiopenTensor _dy;
     MiopenConvDescriptor _conv;
 };
 
-class ConvFwdPlan : public IPlan
+class ConvBwdPlan : public IPlan
 {
 public:
-    ConvFwdPlan(const HipdnnEnginePluginHandle& handle, ConvFwdParams&& params);
-    ~ConvFwdPlan() override = default;
+    ConvBwdPlan(const HipdnnEnginePluginHandle& handle, ConvBwdParams&& params);
+    ~ConvBwdPlan() override = default;
 
-    ConvFwdPlan(const ConvFwdPlan&) = delete;
-    ConvFwdPlan& operator=(const ConvFwdPlan&) = delete;
+    ConvBwdPlan(const ConvBwdPlan&) = delete;
+    ConvBwdPlan& operator=(const ConvBwdPlan&) = delete;
 
-    ConvFwdPlan(ConvFwdPlan&& other) noexcept;
-    ConvFwdPlan& operator=(ConvFwdPlan&& other) noexcept;
+    ConvBwdPlan(ConvBwdPlan&& other) noexcept;
+    ConvBwdPlan& operator=(ConvBwdPlan&& other) noexcept;
 
     size_t getWorkspaceSize(const HipdnnEnginePluginHandle& handle) const override;
 
@@ -64,7 +64,7 @@ public:
                  void* workspace = nullptr) const override;
 
 private:
-    ConvFwdParams _params;
+    ConvBwdParams _params;
     hipdnn_sdk::utilities::ScopedResource<miopenSolution_t> _solution;
     size_t _workspaceSize = 0;
 };
