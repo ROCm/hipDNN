@@ -45,6 +45,129 @@ struct AllOfTypes : std::conjunction<Predicate<Ts>...>
 {
 };
 
+class ITensor;
+
+template <bool IsConst = false>
+class ITensorIterator
+{
+public:
+    using iterator_category = std::forward_iterator_tag;
+    using value_type = std::conditional_t<IsConst, const void*, void*>;
+    using difference_type = std::ptrdiff_t;
+    using pointer = std::conditional_t<IsConst, const void*, void*>;
+    using reference = std::conditional_t<IsConst, const void*, void*>;
+
+    using TensorType = std::conditional_t<IsConst, const ITensor&, ITensor&>;
+
+    ITensorIterator() = default;
+
+    template <bool C = IsConst, std::enable_if_t<!C, int> = 0>
+    ITensorIterator(ITensor& tensor, bool isEnd = false)
+        : _tensor(tensor)
+        , _indices(_tensor.dims().size(), 0)
+    {
+        if(isEnd && !_tensor.dims().empty())
+        {
+            _indices[0] = _tensor.dims()[0];
+        }
+    }
+
+    template <bool C = IsConst, std::enable_if_t<C, int> = 0>
+    ITensorIterator(const ITensor& tensor, bool isEnd = false)
+        : _tensor(tensor)
+        , _indices(_tensor.dims().size(), 0)
+    {
+        if(isEnd && !_tensor.dims().empty())
+        {
+            _indices[0] = _tensor.dims()[0];
+        }
+    }
+
+    ITensorIterator(const ITensorIterator& other)
+        : _tensor(other._tensor)
+        , _indices(other._indices)
+    {
+    }
+
+    ITensorIterator(ITensorIterator&&) = default;
+
+    ITensorIterator& operator=(const ITensorIterator& other)
+    {
+        if(this != &other)
+        {
+            _tensor = other._tensor;
+            _indices = other._indices;
+        }
+        return *this;
+    }
+
+    ITensorIterator& operator=(ITensorIterator&&) = default;
+
+    value_type operator*()
+    {
+        throwIfOutOfBounds("Cannot dereference end iterator");
+
+        return _tensor.hostDataOffsetFromIndex(_tensor.getIndex(_indices));
+    }
+
+    ITensorIterator& operator++()
+    {
+        throwIfOutOfBounds("Iterator cannot be incremented past the end");
+
+        const auto& dims = _tensor.dims();
+        for(int dim = static_cast<int>(dims.size()) - 1; dim >= 0; --dim)
+        {
+            auto dimIdx = static_cast<size_t>(dim);
+            _indices[dimIdx]++;
+            if(_indices[dimIdx] < dims[dimIdx])
+            {
+                return *this;
+            }
+            _indices[dimIdx] = 0;
+        }
+
+        //set 1 past end.
+        _indices[0] = dims[0];
+
+        return *this;
+    }
+
+    ITensorIterator operator++(int)
+    {
+        ITensorIterator temp = *this;
+        ++(*this);
+        return temp;
+    }
+
+    bool operator==(const ITensorIterator& other) const
+    {
+        return (&_tensor == &other._tensor) && (_indices == other._indices);
+    }
+
+    bool operator!=(const ITensorIterator& other) const
+    {
+        return !(*this == other);
+    }
+
+    std::vector<int64_t> indices() const
+    {
+        return _indices;
+    }
+
+private:
+    void throwIfOutOfBounds(const std::string& reason) const
+    {
+        const auto& dims = _tensor.dims();
+        if(dims.empty() || _indices[0] == dims[0])
+        {
+            throw std::out_of_range(reason);
+        }
+    }
+
+    TensorType _tensor;
+    std::vector<int64_t> _indices;
+};
+
 class ITensor
 {
 public:
@@ -58,8 +181,8 @@ public:
 
     virtual size_t elementCount() const = 0;
     virtual size_t elementSpace() const = 0;
+    virtual void* hostDataOffsetFromIndex(int64_t index) = 0;
     virtual const void* hostDataOffsetFromIndex(int64_t index) const = 0;
-    virtual const void* hostDataOffsetFromIndex(int64_t index) = 0;
 
     virtual void fillTensorWithValue(float value) = 0;
     virtual void
@@ -92,6 +215,11 @@ public:
         return throwIfOutOfBounds(
             std::inner_product(indices.begin(), indices.end(), strides().begin(), int64_t{0}));
     }
+
+    virtual ITensorIterator<false> begin() = 0;
+    virtual ITensorIterator<false> end() = 0;
+    virtual ITensorIterator<true> cbegin() const = 0;
+    virtual ITensorIterator<true> cend() const = 0;
 
     virtual bool isPacked() const = 0;
 
@@ -128,12 +256,12 @@ public:
         return memory().deviceData();
     }
 
-    const void* hostDataOffsetFromIndex(int64_t index) const override
+    void* hostDataOffsetFromIndex(int64_t index) override
     {
         return memory().hostData() + index;
     }
 
-    const void* hostDataOffsetFromIndex(int64_t index) override
+    const void* hostDataOffsetFromIndex(int64_t index) const override
     {
         return memory().hostData() + index;
     }
@@ -187,6 +315,26 @@ public:
 
     virtual void fillWithValue(T value) = 0;
     virtual void fillWithRandomValues(T min, T max, unsigned int seed = std::random_device{}()) = 0;
+
+    ITensorIterator<false> begin() override
+    {
+        return ITensorIterator<false>(*this, false);
+    }
+
+    ITensorIterator<false> end() override
+    {
+        return ITensorIterator<false>(*this, true);
+    }
+
+    ITensorIterator<true> cbegin() const override
+    {
+        return ITensorIterator<true>(*this, false);
+    }
+
+    ITensorIterator<true> cend() const override
+    {
+        return ITensorIterator<true>(*this, true);
+    }
 
     void markHostModified() override
     {

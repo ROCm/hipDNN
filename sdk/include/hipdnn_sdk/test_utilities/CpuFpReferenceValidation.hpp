@@ -6,6 +6,7 @@
 #include <hipdnn_sdk/logging/Logger.hpp>
 #include <hipdnn_sdk/test_utilities/CpuFpReferenceUtilities.hpp>
 #include <hipdnn_sdk/test_utilities/ReferenceValidationInterface.hpp>
+#include <hipdnn_sdk/utilities/TensorView.hpp>
 #include <hipdnn_sdk/utilities/UtilsBfp16.hpp>
 #include <hipdnn_sdk/utilities/UtilsFp16.hpp>
 
@@ -42,34 +43,35 @@ public:
         }
         bool result = true;
 
-        iterateAlongDimensions(reference.dims(), [&](const std::vector<int64_t>& indices) {
-            auto refIdx = reference.getIndex(indices);
-            auto implIdx = implementation.getIndex(indices);
-            T refValue = *static_cast<const T*>(reference.hostDataOffsetFromIndex(refIdx));
-            T implValue = *static_cast<const T*>(implementation.hostDataOffsetFromIndex(implIdx));
+        TensorView<T> refView(reference);
+        TensorView<T> implView(implementation);
+
+        auto refItr = refView.begin();
+        auto implItr = implView.begin();
+
+        while(refItr != refView.end() && implItr != implView.end())
+        {
+            T refValue = *refItr++;
+            T implValue = *implItr++;
 
             T absDiff = std::fabs(implValue - refValue);
             T threshold = _absoluteTolerance + _relativeTolerance * std::fabs(refValue);
 
             if(absDiff > threshold)
             {
-                HIPDNN_LOG_ERROR(
-                    "Validation failed at ref index {}, impl index {}: reference value = {}, "
-                    "implementation value = {}, "
-                    "absolute difference = {}, threshold = {} (atol={}, rtol={})",
-                    refIdx,
-                    implIdx,
-                    refValue,
-                    implValue,
-                    absDiff,
-                    threshold,
-                    _absoluteTolerance,
-                    _relativeTolerance);
+                HIPDNN_LOG_ERROR("Validation failed: reference value = {}, "
+                                 "implementation value = {}, "
+                                 "absolute difference = {}, threshold = {} (atol={}, rtol={})",
+                                 refValue,
+                                 implValue,
+                                 absDiff,
+                                 threshold,
+                                 _absoluteTolerance,
+                                 _relativeTolerance);
                 result = false;
-                return false;
+                break;
             }
-            return true;
-        });
+        }
         return result;
     }
 

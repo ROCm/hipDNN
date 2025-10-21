@@ -11,6 +11,7 @@
 
 #include <hipdnn_sdk/logging/Logger.hpp>
 #include <hipdnn_sdk/test_utilities/ReferenceValidationInterface.hpp>
+#include <hipdnn_sdk/utilities/TensorView.hpp>
 
 namespace hipdnn_sdk
 {
@@ -56,11 +57,16 @@ public:
         double maxRefMagnitude = 0.0;
         double maxImplMagnitude = 0.0;
 
-        iterateAlongDimensions(reference.dims(), [&](const std::vector<int64_t>& indices) {
-            auto refIdx = reference.getIndex(indices);
-            auto implIdx = implementation.getIndex(indices);
-            T refValueT = *static_cast<const T*>(reference.hostDataOffsetFromIndex(refIdx));
-            T implValueT = *static_cast<const T*>(implementation.hostDataOffsetFromIndex(implIdx));
+        TensorView<T> refView(reference);
+        TensorView<T> implView(implementation);
+
+        auto refItr = refView.begin();
+        auto implItr = implView.begin();
+
+        while(refItr != refView.end() && implItr != implView.end())
+        {
+            T refValueT = *refItr++;
+            T implValueT = *implItr++;
 
             auto refValue = static_cast<double>(refValueT);
             auto implValue = static_cast<double>(implValueT);
@@ -71,7 +77,7 @@ public:
             // Track maximum magnitudes
             maxRefMagnitude = std::max(maxRefMagnitude, std::fabs(refValue));
             maxImplMagnitude = std::max(maxImplMagnitude, std::fabs(implValue));
-        });
+        }
 
         return checkRmsError(
             squareDifference, maxRefMagnitude, maxImplMagnitude, reference.elementCount());
